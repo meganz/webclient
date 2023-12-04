@@ -1450,7 +1450,7 @@ export class ConversationPanel extends MegaRenderMixin {
             createTimeoutPromise(() => chatRoom.topic && chatRoom.state === ChatRoom.STATE.READY, 350, 15000)
                 .always(() => {
                     return chatRoom.isCurrentlyActive ?
-                        this.setState({ chatLinkDialog: true }) :
+                        this.setState({ chatLinkDialog: true }, () => affiliateUI.registeredDialog.show()) :
                         chatRoom.updatePublicHandle(false, true);
                 });
         });

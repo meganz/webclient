@@ -9,6 +9,8 @@ export class ChatlinkDialog extends MegaRenderMixin {
         disableCheckingVisibility: true
     }
 
+    static NAMESPACE = 'chat-link-dialog';
+
     constructor(props) {
         super(props);
         this.state = {
@@ -88,6 +90,24 @@ export class ChatlinkDialog extends MegaRenderMixin {
         }
     };
 
+    componentDidMount() {
+        super.componentDidMount();
+        M.safeShowDialog(ChatlinkDialog.NAMESPACE, () => {
+            if (!this.isMounted()) {
+                throw new Error(`${ChatlinkDialog.NAMESPACE} dialog: component not mounted.`);
+            }
+
+            return $(`#${ChatlinkDialog.NAMESPACE}`);
+        });
+    }
+
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        if ($.dialog === ChatlinkDialog.NAMESPACE) {
+            closeDialog();
+        }
+    }
+
     render() {
         const { chatRoom } = this.props;
         const { newTopic, link } = this.state;
@@ -102,6 +122,7 @@ export class ChatlinkDialog extends MegaRenderMixin {
         return (
             <ModalDialogsUI.ModalDialog
                 {...this.state}
+                id={ChatlinkDialog.NAMESPACE}
                 title={chatRoom.iAmOperator() && !chatRoom.topic
                     ? chatRoom.isMeeting
                         ? l.rename_meeting /* `Rename Meeting` */

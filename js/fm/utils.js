@@ -1185,7 +1185,7 @@ MegaUtils.prototype.checkForDuplication = function(id) {
     for (let i = M.v.length; i--;) {
         const n = M.v[i] || false;
 
-        if (!n.name || missingkeys[n.h]) {
+        if (!n.name || missingkeys[n.h] || n.p !== id) {
             if (d) {
                 console.debug('name-less node', missingkeys[n.h], [n]);
             }
@@ -1259,7 +1259,7 @@ mBroadcaster.addListener('mega:openfolder', SoonFc(300, function(id) {
     'use strict';
 
     var dups = M.checkForDuplication(id);
-    if (dups && (dups.files || dups.folders) && !M.gallery) {
+    if (dups && (dups.files || dups.folders)) {
         var $bar = $('.fm-notification-block.duplicated-items-found').addClass('visible');
 
         $('.fix-me-btn', $bar).rebind('click.df', function() {

@@ -55,6 +55,50 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
     }
 
     /**
+     * Show the layout when it fails to load the first time (e.g. for deactivated accounts visiting a file link)
+     * @param {String} nodeHandle A public or regular node handle
+     * @returns {void}
+     */
+    async showLayout(nodeHandle) {
+        this.setNode(nodeHandle);
+
+        const isPreviewable = this.nodeComponent.previewable;
+        const isLink = this.nodeComponent.node.link;
+        const downloadSupport = await MegaMobileViewOverlay.checkSupport(this.nodeComponent.node);
+
+        this.bottomBar = new MegaMobileBottomBar({
+            parentNode: this.domNode.querySelector('.media-viewer-container footer .image-controls'),
+            actions: this.getActionsArray(downloadSupport, isLink, isPreviewable)
+        });
+
+        if (isPreviewable) {
+            this.domNode.querySelector('.media-viewer-container .content').classList.remove('hidden');
+            this.domNode.querySelector('.media-viewer-container .content-info').classList.add('hidden');
+        }
+        else {
+            this.domNode.querySelector('.media-viewer-container .content').classList.add('hidden');
+            this.domNode.querySelector('.media-viewer-container .content-info').classList.remove('hidden');
+        }
+
+        if (!is_video(this.nodeComponent.node)) {
+            this.domNode.querySelector('.video-block').classList.add('hidden');
+        }
+
+        this.domNode.querySelector('.media-viewer-container').classList.remove('hidden');
+        this.domNode.querySelector('.img-wrap').classList.add('hidden');
+        this.domNode.querySelector('.gallery-btn.previous').classList.add('hidden');
+        this.domNode.querySelector('.gallery-btn.next').classList.add('hidden');
+        this.domNode.querySelector('.viewer-pending').classList.add('hidden');
+
+        this.domNode.classList.add('active');
+        this.domNode.parentNode.classList.remove('hidden');
+
+        mainlayout.classList.add('fm-overlay-link');
+
+        mobile.appBanner.updateBanner(nodeHandle);
+    }
+
+    /**
      * Show the overlay
      * @param {String} nodeHandle A public or regular node handle
      * @returns {void}

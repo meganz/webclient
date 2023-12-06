@@ -552,7 +552,8 @@ class Minimized extends MegaRenderMixin {
                             confirmLeave({
                                 title: l.assign_host_leave_call /* `Assign host to leave call` */,
                                 body: l.assign_host_leave_call_details /* `You're the only host on this call...` */,
-                                cta: l.assign_host_button /* `Assign host` */
+                                cta: l.assign_host_button /* `Assign host` */,
+                                altCta: l.leave_anyway /* `Leave anyway` */,
                             });
                     }}>
                     <span>{l[5884] /* `End call` */}</span>
@@ -622,6 +623,7 @@ class Minimized extends MegaRenderMixin {
                     chatRoom={chatRoom}
                     participants={chatRoom.getCallParticipants()}
                     onLeave={onCallEnd}
+                    onConfirmDenied={onCallEnd}
                 />
             </div>
         );

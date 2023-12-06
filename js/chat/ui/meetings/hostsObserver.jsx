@@ -88,13 +88,21 @@ export const withHostsObserver = Component => {
                 $(document).trigger('closeDropdowns');
             };
 
-            confirmLeave = ({ title, body, cta }) => {
+            confirmLeave = ({ title, body, cta, altCta }) => {
                 msgDialog(
-                    `confirmationa:!^${cta}!${l[82] /* `Cancel` */}`,
+                    `confirmationa:!^${cta}!${altCta || l[82] /* `Cancel` */}`,
                     null,
                     title,
                     body,
-                    cb => cb && this.toggleDialog(),
+                    cb => {
+                        if (cb) {
+                            this.toggleDialog();
+                        }
+                        else if (cb === false) {
+                            // Only when specifically denied. Dismiss does not count.
+                            this.props.onConfirmDenied?.();
+                        }
+                    },
                     1
                 );
             };

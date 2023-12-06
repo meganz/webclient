@@ -172,7 +172,7 @@
 
             // In some cases, when previewing files, the dropdown still remains, hide it, but check if its defined first
             if ($dropdownSearch) {
-                $dropdownSearch.addClass('hidden');
+                hideDropdown();
             }
 
             if (mega.config.get('showRecents') === 1) {
@@ -303,7 +303,7 @@
                             recentlySearched.addTerm(val);
                         }
                         loadSubPage(`fm/search/${val}`);
-                        $dropdownSearch.addClass('hidden');
+                        hideDropdown();
                         addDropdownEventListeners();
                         showEmptyState = true;
                     }
@@ -317,7 +317,7 @@
                             $('#main-search-fake-form .js-filesearcher', $topbar).trigger('focus');
                         }
                         $('.js-btnclearSearch', $topbar).removeClass('hidden');
-                        $dropdownSearch.addClass('hidden');
+                        hideDropdown();
 
                         if (pfid && mega.gallery) {
                             mega.gallery.clearMdView();
@@ -415,8 +415,7 @@
                 $('.dropdown-recents.dropdown-section', $dropdownSearch).addClass('hidden');
                 $dropdownEmptyState.addClass('hidden');
 
-                // TODO: remove this line if including search results
-                $dropdownSearch.addClass('hidden');
+                hideDropdown();
 
                 // Show search results
                 // $dropdownResultsSection.removeClass('hidden');
@@ -462,19 +461,11 @@
             renderUpdatedDropdown();
         });
 
-        // Dropdown trigger on defocus
-        $('.fmholder').rebind('mousedown.searchbar', (event) => {
-            const $target = $(event.target);
-            if ($target.closest('.dropdown-search').length === 0
-                && $target.closest('.js-topbar-searcher').length === 0) {
-                $dropdownSearch.addClass('hidden');
-            }
-        });
 
         // Escape key hides dropdown
         $('#bodyel').rebind('keydown.searchbar', (event) => {
             if (event.key === 'Escape') {
-                $dropdownSearch.addClass('hidden');
+                hideDropdown();
             }
         });
     }
@@ -513,7 +504,6 @@
     function showCorrectSearch(page) {
         const $miniSearch = $('.mini-search', $topbar);
         const $mainSearch = $('.searcher-wrapper .js-topbar-searcher', $topbar);
-        const $dropdownSearch = $('.dropdown-search', $topbar);
 
         // Show the correct search bar
         if ((u_type !== false || pfid) && !pfcol) {
@@ -527,13 +517,30 @@
             else {
                 $miniSearch.addClass('hidden');
                 $mainSearch.removeClass('hidden');
-                $dropdownSearch.addClass('hidden');
             }
         }
         else {
             // static (logged out), other pages
             $miniSearch.addClass('hidden');
             $mainSearch.addClass('hidden');
+        }
+    }
+
+    /**
+     * Hides the dropdown
+     *
+     * @param {boolean} resetDOMCache Set to true when its necessary to re-cache the DOM node
+     *
+     * @return {undefined}
+     */
+    function hideDropdown(resetDOMCache = false) {
+        if (resetDOMCache || !$dropdownSearch) {
+            $dropdownSearch = $('.dropdown-search', $topbar);
+        }
+
+
+        if ($dropdownSearch) {
+            $dropdownSearch.addClass('hidden');
         }
     }
 
@@ -571,7 +578,7 @@
 
         // Hide dropdown if Hide Recents is on
         if (hideRecents || noRecentActivity && !showEmptyState) {
-            $dropdownSearch.addClass('hidden');
+            hideDropdown();
             return;
         }
 
@@ -587,7 +594,7 @@
         }
 
         if (noRecentActivity && !showEmptyState) {
-            $dropdownSearch.addClass('hidden');
+            hideDropdown();
             return;
         }
 
@@ -678,7 +685,7 @@
             $fileSearch.val(itemText);
             $('#main-search-fake-form', $topbar).trigger('submit');
             $dropdownSearch.rebind('blur', () => {
-                $dropdownSearch.addClass('hidden');
+                hideDropdown();
             });
         });
     }
@@ -715,7 +722,7 @@
         }
 
         if (!nodes || nodes.length === 0) {
-            $dropdownSearch.addClass('hidden');
+            hideDropdown();
             $dropdownResultSearched.addClass('hidden');
             $('.js-btnclearSearch', $topbar).addClass('hidden');
             return;
@@ -784,7 +791,7 @@
             const h = $(e.currentTarget).attr('id');
             const n = M.getNodeByHandle(h);
 
-            $dropdownSearch.addClass('hidden');
+            hideDropdown();
             $dropdownResultSearched.addClass('hidden');
             $resultSearchBody.empty();
             $('.js-filesearcher', $topbar).val('');
@@ -900,7 +907,7 @@
 
             // Preview the file
             delay('recentlyOpened.click', eventlog.bind(null, 99905));
-            $dropdownSearch.addClass('hidden');
+            hideDropdown();
             const {id, editable} = $(this).data();
 
             recentlyOpened.addFile(id, editable);
@@ -928,7 +935,7 @@
     }
 
     mBroadcaster.once('fm:initialized', () => {
-        later(initSearch);
+        initSearch();
     });
 
     // export

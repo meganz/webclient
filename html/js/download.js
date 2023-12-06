@@ -444,7 +444,9 @@ async function setupSingleDownloadPage(res) {
 
                     if (is_mobile) {
                         $('.mobile.slideshow-image-previewer').addClass('browserscreen');
-                        slideshow(dl_node.h);
+                        if (slideshow(dl_node.h) === false) {
+                            mega.ui.viewerOverlay.showLayout(dl_node.h);
+                        }
                     }
                     else {
                         $('.media-viewer-container').appendTo('.js-image-preview');
@@ -486,7 +488,9 @@ async function setupSingleDownloadPage(res) {
                     $('.mobile.filetype-img').addClass('hidden');
                     $(window).trigger('resize');
                     if (is_mobile) {
-                        slideshow(dl_node.h);
+                        if (slideshow(dl_node.h) === false) {
+                            mega.ui.viewerOverlay.showLayout(dl_node.h);
+                        }
                     }
 
                 }).catch(function(ex) {

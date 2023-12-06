@@ -90,7 +90,7 @@
     margin: auto;
     overflow: unset;
 }
-.bottom-page.pricing-pg .bottom-page.full-block * {
+.bottom-page.pricing-pg .bottom-page.full-block *:not(.pricing-plan-btn) {
     user-select: text;
     -webkit-user-select: text;
 }

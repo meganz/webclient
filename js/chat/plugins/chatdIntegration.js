@@ -671,7 +671,6 @@ ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatIn
                                         return chatRoom.scheduledMeeting ? null : chatRoom.trigger('onNewMeetingReady');
                                     }
                                     chatRoom.trigger('showGetChatLinkDialog');
-                                    affiliateUI.registeredDialog.show();
                                 });
                         }
                     })

@@ -2173,11 +2173,16 @@ BusinessAccountUI.prototype.showExp_GraceUIElements = function() {
  */
 BusinessAccountUI.prototype.showExpiredDialog = function(isMaster) {
     "use strict";
-    var $dialog;
+
+    const $dialog = isMaster ?
+        $('.payment-reminder.user-management-dialog') :
+        $('.user-management-able-user-dialog.warning.user-management-dialog');
+
+    if (!$dialog.length) {
+        return;
+    }
 
     if (isMaster) {
-        $dialog = $('.payment-reminder.user-management-dialog');
-
         $('button.js-close', $dialog)
             .rebind('click.subuser', function closeExpiredAccountDialog() {
                 closeDialog();
@@ -2208,8 +2213,6 @@ BusinessAccountUI.prototype.showExpiredDialog = function(isMaster) {
         });
     }
     else {
-        $dialog = $('.user-management-able-user-dialog.warning.user-management-dialog');
-
         $('.dialog-text-one', $dialog).safeHTML(l[20462]);
         $('.text-two-text', $dialog).text(l[20463]);
         $('.bold-warning', $dialog).text(l[20464] + ':');

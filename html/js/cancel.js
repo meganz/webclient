@@ -94,14 +94,30 @@
                 if (typeof res === 'number') {
                     if (res === EEXPIRED) {
                         loadingDialog.hide();
-                        msgDialog('warninga', l[6184], l[6185], '', function() {
+                        let type = 'warninga';
+                        let title = l[6184];
+                        let msg = l[6185];
+                        if (is_mobile) {
+                            type = 'error';
+                            title = l.account_delete_invalid_confirmation_link;
+                            msg = l.account_delete_link_expired;
+                        }
+                        msgDialog(type, title, msg, '', () => {
                             loadSubPage('fm/account');
                         });
                         promise.reject(res);
                     }
                     else {
+                        let type = 'warninga';
+                        let title = l[6186];
+                        let msg = l[6187];
+                        if (is_mobile) {
+                            type = 'error';
+                            title = l.account_delete_invalid_link;
+                            msg = l.account_delete_invalid_link_try_again;
+                        }
                         loadingDialog.hide();
-                        msgDialog('warninga', l[6186], l[6187], '', function() {
+                        msgDialog(type, title, msg, '', () => {
                             loadSubPage('fm/account');
                         });
                         promise.reject(res);

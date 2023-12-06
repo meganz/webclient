@@ -3076,7 +3076,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/settings/account.js', n: 'mobile_my_account_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/linksOptions.js', n: 'mobile_account_file_management_js', j:1, w: 1});
         jsl.push({f:'js/mobile/settings/backupRecoveryKey.js', n: 'mobile_backup_recovery_key_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.account.cancel.js', n: 'mobile_account_cancel_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.account.paymentcard.js', n: 'mobile_payment_card_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.account.cancel-subscription.js', n: 'mobile_account_cancel_sub_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/settings/support.js', n: 'mobile_settings_support_js', j: 1, w:1});
@@ -3085,6 +3084,8 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/settings/changeEmail.js', n: 'mobile_change_email_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/verifyEmail.js', n: 'mobile_verfiy_email_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/twofactorVerifyAction.js', n: 'mobile_verfiy_action_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/deleteAccount.js', n: 'mobile_delete_accountl_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/verifyDelete.js', n: 'mobile_verify_delete_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/privacyAndSecurity.js', n: 'mobile_privacy_security_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/history.js', n: 'mobile_session_history_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/fileManagement.js', n: 'mobile_file_management_js', j: 1, w:1});

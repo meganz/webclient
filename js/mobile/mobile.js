@@ -1042,6 +1042,12 @@ function accountUI() {
     else if (subpath.startsWith('security/verify')) {
         mobile.settings.account.verifyEmail.init();
     }
+    else if (subpath === 'delete') {
+        mobile.settings.account.deleteAccount.init();
+    }
+    else if (subpath.startsWith('delete/verify')) {
+        mobile.settings.account.verifyDelete.init();
+    }
     else if (subpath === 'notifications') {
         mobile.settings.account.notifications.init();
     }

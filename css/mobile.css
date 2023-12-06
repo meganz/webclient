@@ -3499,8 +3499,7 @@ div.checkboxOn {
 }
 
 /* Dialog Styling */
-.mobile.generic-dialog-overlay,
-.mobile.cancel-account-overlay {
+.mobile.generic-dialog-overlay {
     width: 100%;
     height: 100%;
     position: fixed;
@@ -3510,8 +3509,7 @@ div.checkboxOn {
     background-color: rgba(0,0,0,0);
     display: table;
 }
-.mobile.generic-dialog-overlay .overlay-info,
-.mobile.cancel-account-dialog .overlay-info {
+.mobile.generic-dialog-overlay .overlay-info {
     margin: 0;
     padding: 0;
 }
@@ -3519,7 +3517,7 @@ div.checkboxOn {
     font-family: 'source_sans_prosemibold';
     color: #eb4444;
 }
-.mobile.check-email-dialog, .mobile.cancel-account-dialog {
+.mobile.check-email-dialog {
     position: relative;
     width: 100%;
     width: calc(100% - 32px);
@@ -3528,21 +3526,6 @@ div.checkboxOn {
     height: auto;
     border-radius: 2px;
     padding: 16px;
-}
-.mobile.cancel-account .confirm-close-account-button {
-    margin: 0 20px 20px 20px;
-}
-.mobile.cancel-account .radio-button-form .radio-txt {
-    margin: 0;
-}
-.mobile.cancel-account .radio-option {
-    margin: 24px 0 24px;
-    display: flex !important;
-    align-items: center;
-}
-.mobile.cancel-account .radio-option .radioOn,
-.mobile.cancel-account .radio-option .radioOff {
-    display: flex !important;
 }
 .mobile.header-icon {
     width: 36px;

@@ -72,6 +72,91 @@
 
 /* End of Settings  form */
 
+/* Settings page */
+
+.mega-mobile-settings.default-page {
+    padding: 0 24px 24px;
+}
+
+.mega-mobile-settings.default-page > * {
+    font: var(--mobile-font-copy-regular);
+}
+
+.mega-mobile-settings.default-page .mobile-settings-content {
+    width: 100%;
+}
+
+.mega-mobile-settings.default-page .mobile-settings-content > *:empty {
+    display: none;
+}
+
+.mega-mobile-settings.default-page .mobile-settings-result,
+.mega-mobile-settings.default-page .mobile-settings-info {
+    color: var(--mobile-text-secondary);
+}
+
+.mega-mobile-settings.default-page .mobile-settings-result.bold-style {
+    font: var(--mobile-font-heading-h3);
+}
+
+.mega-mobile-settings.default-page .mobile-settings-prompt {
+    font: var(--mobile-font-heading-h3);
+    color: var(--mobile-text-primary);
+}
+
+.mega-mobile-settings.default-page .mobile-settings-content > *,
+.mega-mobile-settings.default-page .mobile-settings-form .mobile-settings-prompt {
+    margin-bottom: 16px;
+}
+
+.mega-mobile-settings.default-page .mobile-settings-info ul {
+    margin: 0 16px;
+}
+
+.mega-mobile-settings.default-page .mobile-settings-info li {
+    list-style-type: initial;
+    padding-left: 5px;
+}
+
+.mega-mobile-settings.default-page .mobile-settings-info li:not(:last-child),
+.mega-mobile-settings.default-page .mobile-settings-info p:not(:last-child) {
+    padding-bottom: 12px;
+}
+
+.mega-mobile-settings.default-page .mobile-settings-info p {
+    margin: 0;
+}
+
+.mega-mobile-settings.default-page .mega-component.banner {
+    max-width: 382px;
+}
+
+.mega-mobile-settings.default-page .mega-component.banner .content-box {
+    flex-flow: initial;
+}
+
+.mega-mobile-settings.default-page .mega-radio-button .radio-wrapper {
+    background: none;
+    border: 2px solid var(--mobile-selection-control);
+}
+
+.mega-mobile-settings.default-page .mega-radio-button .radio-action {
+    flex: 1;
+}
+
+.mega-mobile-settings.default-page .mobile-settings-buttons {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.mega-mobile-settings.default-page .nav-elem.button {
+    height: 47px;
+    margin: 12px 0 0;
+}
+
+/* End of Settings  page */
+
 body.bottom-pages .fmholder {
     grid: initial;
 }

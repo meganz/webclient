@@ -344,34 +344,8 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
                     text: l[16115],
                     icon: 'sprite-mobile-fm-mono icon-user-x-thin-outline',
                     componentClassname: 'delete-account hidden',
-                    binding: () => {
-                        eventlog(99844);
-
-                        // Please confirm that all your data will be deleted
-                        let confirmMessage = l[1974];
-                        const $cancelAccountOverlay = $('#mobile-ui-error');
-                        const $page = $(this.parentNode);
-
-                        // Search through their Pro plan purchase history
-                        for (let i = 0; i < M.account.purchases.length; i++) {
-                            // Get payment method name
-                            const paymentMethodId = M.account.purchases[i][4];
-                            const paymentMethod = pro.getPaymentGatewayName(paymentMethodId).name;
-
-                            // If they have paid with iTunes or Google Play in the past
-                            if (paymentMethod === 'apple' || paymentMethod === 'google') {
-                                // Update confirmation message to remind them to cancel iTunes or Google Play
-                                confirmMessage += ` ${l[8854]}`;
-                                break;
-                            }
-                        }
-
-                        // Show a confirm dialog
-                        mobile.settings.account.showAccCancelConfirmDialog($page, confirmMessage);
-
-                        // Show close button
-                        $('.text-button', $cancelAccountOverlay).removeClass('hidden');
-                    },
+                    href: 'fm/account/delete',
+                    eventLog: 99844
                 });
             }
 
@@ -416,97 +390,6 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
                     versionClickCounter = 0;
                 }, 1000);
             });
-        }
-    },
-
-    /**
-     * Show dialog asking for confirmation and send an email to the user to finish the process if they agree
-     * @param {String} $page The jQuery selector for the current page
-     * @param {String} confirmMessage The message to be displayed in the confirmation dialog
-     */
-    showAccCancelConfirmDialog: {
-        value: function($page, confirmMessage) {
-            'use strict';
-
-            // Show dialog asking for confirmation and continue if they agree
-            mobile.messageOverlay.show(l[6181], confirmMessage, false, false, false, true).then(() => {
-
-                loadingDialog.show();
-
-                // Check if 2FA is enabled on their account
-                mobile.twofactor.isEnabledForAccount()
-                    .then((result) => {
-
-                        loadingDialog.hide();
-
-                        // If 2FA is enabled
-                        if (result) {
-
-                            // Show the verify 2FA page to collect the user's PIN
-                            return mobile.settings.account.twofactorVerifyAction.init();
-                        }
-                    })
-                    .then((twoFactorPin) => {
-
-                        if (twoFactorPin === false) {
-                            return false;
-                        }
-
-                        // Complete the cancellation process
-                        mobile.settings.account.continueAccountCancelProcess($page, twoFactorPin || null);
-                    })
-                    .catch(tell);
-            }).catch(dump);
-        },
-    },
-
-    /**
-     * Finalise the account cancellation process
-     * @param {String} $page The jQuery selector for the current page
-     * @param {String|null} twoFactorPin The 2FA PIN code or null if not applicable
-     */
-    continueAccountCancelProcess: {
-        value: function($page, twoFactorPin) {
-
-            'use strict';
-
-            // Prepare the request
-            var request = {a: 'erm', m: u_attr.email, t: 21};
-
-            // If 2FA PIN is set, add it to the request
-            if (twoFactorPin !== null) {
-                request.mfa = twoFactorPin;
-            }
-
-            loadingDialog.show();
-
-            // Make account cancellation request
-            api.req(request)
-                .then(({result}) => {
-                    // If successful, show a dialog saying they need to check their email
-                    if (result === 0) {
-                        $page.removeClass('hidden');
-                        mobile.showEmailConfirmOverlay();
-                        $('#startholder').addClass('no-scroll');
-                    }
-                })
-                .catch((ex) => {
-                    // If something went wrong with the 2FA PIN
-                    if (ex === EFAILED || ex === EEXPIRED) {
-                        msgDialog('warninga', l[135], l[19216]);
-                    }
-                    // Check for incorrect email
-                    else if (ex === ENOENT) {
-                        $page.removeClass('hidden');
-                        msgDialog('warninga', l[1513], l[1946]);
-                    }
-                    else {
-                        // Oops, something went wrong
-                        $page.removeClass('hidden');
-                        msgDialog('warninga', l[135], l[200]);
-                    }
-                })
-                .finally(() => loadingDialog.hide());
         }
     },
 

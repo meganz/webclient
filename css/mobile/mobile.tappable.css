@@ -24,7 +24,6 @@ Implemented styles:
 .nav-elem.secondary
 .nav-elem.text-only
 .nav-elem.destructive
-.nav-elem.destructive-outline
 .nav-elem.outline
 
  */
@@ -170,34 +169,18 @@ button.nav-elem,
     color: var(--mobile-button-primary-pressed);
 }
 
-.nav-elem.destructive-outline {
-    background: none;
-    border: solid 2px var(--mobile-button-error);
-    color: var(--mobile-button-error);
-}
-.nav-elem.destructive-outline.disabled,
-.nav-elem.destructive-outline.disabled:active {
-    background: none;
-    border: solid 2px #FEA3B5; /* Temp */
-    color: #FEA3B5; /* Temp */
-}
-.nav-elem.destructive-outline:active {
-    background: #A11045; /* Temp */
-    color: var(--mobile-text-inverse);
-}
-
 .nav-elem.destructive {
-    background: var(--mobile-button-brand);
+    background: var(--mobile-button-error);
     color: var(--mobile-text-on-color);
 }
 .nav-elem.destructive.disabled,
 .nav-elem.destructive.disabled:active {
-    background: #FEA3B5; /* Temp */
-    color: var(--mobile-text-disabled);
+    background: var(--mobile-button-disabled);
+    color: var(--mobile-text-on-color-disabled);
 }
 .nav-elem.destructive:active {
-    background: #A11045; /* Temp */
-    color: var(--mobile-text-inverse);
+    background: var(--mobile-button-error-pressed);
+    color: var(--mobile-text-on-color);
 }
 .nav-elem.no-active:active {
     background: initial;

@@ -1143,7 +1143,7 @@ function init_page() {
             ac.validateCodeWithSession().done(function() {
                 if (is_mobile) {
                     parsepage(pages.mobile);
-                    mobile.settings.account.cancel.init();
+                    mobile.settings.account.verifyDelete.init();
                 }
                 else {
                     ac.handleFeedback();
@@ -1165,7 +1165,7 @@ function init_page() {
             if (is_mobile) {
                 parsepage(pages.mobile);
                 login_next = page;
-                msgDialog('warninga', l[6186], l[5841], false, function () {
+                msgDialog('warninga', l[5841], l.account_login_to_continue, false, () => {
                     loadSubPage('login');
                 });
             }

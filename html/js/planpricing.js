@@ -687,7 +687,7 @@ lazy(pro, 'proplan2', () => {
             }
             else {
                 $('.pricing-plan-monthly', $planCard).addClass('hidden');
-                $('.pricing-plan-only', $planCard).addClass('hidden').removeClass('strikethrough');
+                $('.pricing-plan-only', $planCard).text(l.pr_only).removeClass('strikethrough');
             }
 
             // get the storage/bandwidth, then convert it to bytes (it comes in GB) to format.

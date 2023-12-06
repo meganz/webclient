@@ -1785,7 +1785,7 @@ accountUI.account = {
                                 }
                             })
                             .then((twoFactorPin) => continueCancelAccount(twoFactorPin || null))
-                            .catch(tell);
+                            .catch((ex) => ex !== EBLOCKED && tell(ex));
                     }
                 });
             });

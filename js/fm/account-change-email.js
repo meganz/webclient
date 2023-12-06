@@ -106,7 +106,7 @@ var accountChangeEmail = {
                         }
                     })
                     .then((twoFactorPin) => accountChangeEmail.continueChangeEmail(newEmail, twoFactorPin || null))
-                    .catch(tell);
+                    .catch((ex) => ex !== EBLOCKED && tell(ex));
             }
         });
     },

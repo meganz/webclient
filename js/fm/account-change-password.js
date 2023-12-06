@@ -121,7 +121,7 @@ var accountChangePassword = {
                     else if (String(ex).includes(l[22126])) {
                         msgDialog('warninga', l[135], l[22126]);
                     }
-                    else {
+                    else if (ex !== EBLOCKED) {
                         tell(ex);
                     }
                 })

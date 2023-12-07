@@ -184,13 +184,16 @@
                 }
                 showToast('clipboard', notificationText);
             }
-            var star = '';
+            var icon = '';
             const rootHandle = M.getNodeRoot(n.h);
 
             if (n.fav && !folderlink && rootHandle !== M.RubbishID) {
-                star = ' sprite-fm-mono icon-favourite-filled';
+                icon = ' sprite-fm-mono icon-favourite-filled';
             }
-            $dialog.find('.file-status-icon').attr('class', 'file-status-icon ' + star);
+            else if (missingkeys[n.h]) {
+                icon = ' sprite-fm-mono icon-info';
+            }
+            $('.file-status-icon', $dialog).attr('class', 'file-status-icon ' + icon);
 
             if (icons.includes('outgoing')) {
                 $dialog.addClass('shared');

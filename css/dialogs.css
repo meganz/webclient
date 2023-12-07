@@ -4284,7 +4284,10 @@ body.de .mega-dialog.contact-picker-widget {
         left: 16px;
         top: 16px;
         --mask-color: var(--icon-rest);
-        --icon-size: 16px;
+        --icon-size: 20px;
+    }
+    .mega-dialog.properties-dialog .file-status-icon.icon-info{
+        --mask-color: var(--secondary-orange);
     }
     .rtl .mega-dialog.properties-dialog .file-status-icon {
         left: auto;

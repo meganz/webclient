@@ -147,7 +147,7 @@ MegaData.prototype.sortByModTime = function(d) {
     this.sort();
 };
 
-MegaData.prototype.sortByModTimeFn = () => {
+MegaData.prototype.sortByModTimeFn = function() {
 
     "use strict";
 
@@ -168,7 +168,7 @@ MegaData.prototype.sortByModTimeFn = () => {
     };
 };
 
-MegaData.prototype.sortByModTimeFn2 = () => {
+MegaData.prototype.sortByModTimeFn2 = function() {
     'use strict';
 
     return (a, b, d) => {
@@ -180,6 +180,20 @@ MegaData.prototype.sortByModTimeFn2 = () => {
         }
 
         return M.doFallbackSortWithName(a, b, d);
+    };
+};
+
+MegaData.prototype.sortByModTimeFn3 = function() {
+    'use strict';
+
+    return (a, b, d) => {
+        const timeA = a.mtime || a.ts || 0;
+        const timeB = b.mtime || b.ts || 0;
+
+        if (timeA && timeB && timeA !== timeB) {
+            return timeA < timeB ? -d : d;
+        }
+        return this.compareStrings(a.h, b.h, d);
     };
 };
 

@@ -799,11 +799,11 @@ var mega = {
             }
         }
 
-        if (storage.csp) {
+        if (!toMegaIo && storage.csp) {
             to += _getSeperator() + 'csp=' + storage.csp;
         }
 
-        if (storage.utm) {
+        if (!toMegaIo && storage.utm) {
             to += _getSeperator() + 'sra=' + b64encode(storage.utm);
         }
 
@@ -821,7 +821,7 @@ var mega = {
             window.onload = window.onerror = null;
             return location.replace(to + (urlQs || ''));
         }
-        window.open(to + (urlQs || ''), '_blank', 'noopener,noreferrer');
+        window.open(to + (urlQs || ''), '_blank', toMegaIo ? 'noopener' : 'noopener,noreferrer');
     },
 
     /**

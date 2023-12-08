@@ -441,17 +441,18 @@ mBroadcaster.once('boot_done', () => {
                 return false;
             }
         },
-        '.file-request-link': {
-            text: l.file_request_dropdown_link,
-            icon: 'sprite-mobile-fm-mono icon-folder-request-thin-outline',
+        '.file-request-copy-link': {
+            text: l.file_request_dropdown_copy,
+            icon: 'sprite-mobile-fm-mono icon-url-thin-outline',
             subMenu: false,
             classNames: '',
             onClick: function(nodeHandle) {
-
                 const puPagePublicHandle = mega.fileRequest.storage.getPuHandleByNodeHandle(nodeHandle);
 
                 if (puPagePublicHandle) {
-                    return mega.fileRequest.generator.generateUrl(puPagePublicHandle.p);
+                    const frUrl = mega.fileRequest.generator.generateUrl(puPagePublicHandle.p);
+
+                    copyToClipboard(frUrl, l.file_request_link_copied);
                 }
 
                 return null;

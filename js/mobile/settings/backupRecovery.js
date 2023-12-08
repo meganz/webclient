@@ -50,8 +50,7 @@ mobile.settings.backupRecovery = Object.create(mobile.settingsHelper, {
                 componentClassname: 'text-icon'
             });
             copyButton.on('tap', () => {
-                navigator.clipboard.writeText(recoveryKey);
-                mega.ui.toast.show(l[6040]); // Recovery key copied
+                copyToClipboard(recoveryKey, l[6040]);
             });
 
             // Download button

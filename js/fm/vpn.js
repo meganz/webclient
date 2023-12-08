@@ -1,23 +1,4 @@
-class MEvent {
-    constructor() {
-        this._callbacks = { };
-    }
-
-    invoke(...eventArgs) {
-        for (const callback of Object.values(this._callbacks)) {
-            callback(...eventArgs);
-        }
-    }
-
-    addListener(callback) {
-        this._callbacks[callback] = callback;
-    }
-
-    removeListener(callback) {
-        delete this._callbacks[callback];
-    }
-}
-
+/** Scripting for VPN-related tasks. */
 class VpnCredsManager {
     logIt() {
         console.log('Non-static member.'); // Jenkins
@@ -134,6 +115,7 @@ class VpnCredsManager {
     }
 }
 
+/** Frontend scripting specific to the VPN page. */
 class VpnPage {
     constructor() {
         this.page = document.querySelector('.fm-right-account-block .fm-account-vpn');

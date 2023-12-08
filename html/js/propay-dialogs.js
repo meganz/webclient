@@ -1435,7 +1435,6 @@ var addressDialog = {
 
             // Set the date to current date e.g. 3 May 2022 (will be converted to local language wording/format)
             const date = new Date();
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
             date.setMonth(date.getMonth() + numOfMonths);
 
             // Get the selected Pro plan name
@@ -1448,7 +1447,7 @@ var addressDialog = {
             // Update text for "When the #-month/year promotion ends on 26 April, 2024 you will start a
             // recurring monthly/yearly subscription for Pro I of EUR9.99 and your card will be billed monthly/yearly."
             discountRecurringText = mega.icu.format(discountRecurringText, monthsOrYears);
-            discountRecurringText = discountRecurringText.replace('%1', date.toLocaleDateString(undefined, options));
+            discountRecurringText = discountRecurringText.replace('%1', time2date(date.getTime() / 1000, 2));
             discountRecurringText = discountRecurringText.replace('%2', proPlanName);
             discountRecurringText = discountRecurringText.replace('%3', formatCurrency(regularMonthlyPrice));
 

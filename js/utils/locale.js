@@ -128,7 +128,7 @@ function localeImages(scope) {
  * 4:       Monday, 3 October 2022
  * 5:       Monday, 3 October 2022 at 10:30:00 NZDT
  * 6:       Oct 2022
- * 7:       3 October 2022
+ * 7:       Monday, 3 October 2022 at 10:30 NZDT
  * 8:       3 October 2022
  * 9:       3 October 2022
  * 10:      Mon

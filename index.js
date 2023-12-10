@@ -241,7 +241,15 @@ function topMenuDataUpdate(data) {
 
     $('.loader', $storageBlock).removeClass('loading');
     $('.storage-txt', $storageBlock).safeHTML(storageHtml);
-    $('.storage span', $storageBlock).outerWidth(perc + '%');
+    const $storageBar = $('.storage', $storageBlock);
+
+    if (u_attr && !u_attr.pf) {
+        $('span', $storageBar).outerWidth(perc + '%');
+        $storageBar.removeClass('hidden');
+    }
+    else {
+        $storageBar.addClass('hidden');
+    }
 }
 
 function topMenuScroll($scrollBlock) {

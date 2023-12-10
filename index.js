@@ -2314,9 +2314,6 @@ function topmenuUI() {
                     .rebind('click', () => M.reload(-0x7e080f))
                     .removeClass('hidden');
             }
-            else {
-                $('.top-menu-item.infinity-item', $topMenu).addClass('hidden');
-            }
         }
 
         if (pfcol) {

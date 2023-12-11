@@ -1073,7 +1073,7 @@ function accountUI() {
         mobile.settings.backup.init();
     }
     else if (subpath === 'security/two-factor-authentication') {
-        mobile.twofactor.settings.init();
+        mobile.settings.account.twofactorSettings.init();
     }
     else if (subpath.startsWith('sms')) {
 

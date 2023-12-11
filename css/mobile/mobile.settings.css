@@ -20,14 +20,25 @@
     color: var(--mobile-text-primary);
 }
 
+.mega-mobile-settings a.primary-link,
+.mega-mobile-settings a.primary-link:link,
+.mega-mobile-settings a.primary-link:visited,
+.mega-mobile-settings a.primary-link:hover,
+.mega-mobile-settings a.primary-link:active {
+    color: var(--mobile-link-primary);
+    text-decoration: underline;
+}
+
 /* Settings form */
 
 .mega-mobile-settings.default-form {
+    color: var(--text-color-high);
+    font: var(--mobile-font-copy-regular);
     padding: 0 24px 24px;
 }
 
 .mega-overlay .mega-mobile-settings.default-form.fixed-width {
-    max-width: 382px;
+    max-width: var(--mobile-elem-max-width);
 }
 
 .mega-mobile-settings.default-form h1.form-title {
@@ -55,12 +66,12 @@
     margin-top: 2px;
 }
 
-.mega-mobile-settings.default-form .nav-elem.button {
+.mega-mobile-settings.default-form .nav-elem.button.block {
     height: 47px;
     margin: 12px 0;
 }
 
-.mega-mobile-settings.default-form .nav-elem.button:last-child {
+.mega-mobile-settings.default-form .nav-elem.button.block:last-child {
     margin-bottom: 0;
 }
 
@@ -166,6 +177,60 @@ body.bottom-pages .fmholder {
     text-align: left;
 }
 
+/* 2FA setup in Settings */
+
+.mega-mobile-settings.two-factor-settings .settings-step {
+    width: 100%;
+}
+
+.mega-mobile-settings.two-factor-settings .tab-container {
+    margin: 24px 0;
+}
+
+.mega-mobile-settings.two-factor-settings p {
+    padding: 0;
+    margin: 16px 0 0;
+}
+
+.mega-mobile-settings.two-factor-settings p + a {
+    display: inline-block;
+    margin: 16px 0 0;
+}
+
+.mega-mobile-settings.two-factor-settings h2 + p {
+    margin: 8px 0;
+}
+
+.mega-mobile-settings.two-factor-settings .two-factor-tabs span {
+    font: var(--mobile-font-caption-large-regular);
+}
+
+.mega-mobile-settings.two-factor-settings .two-factor-tab-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.mega-mobile-settings.two-factor-settings .qr-code-img {
+    line-height: 0;
+    margin: 12px 0 18px;
+    max-width: var(--mobile-elem-max-width);
+    text-align: center;
+}
+
+.mega-mobile-settings.two-factor-settings .qr-code-img canvas {
+    outline: white 4px solid;
+}
+
+.mega-sheet .fm-scrolling.scroller-space div.two-fa-app-links {
+    margin: 24px 0 0;
+}
+
+.mega-sheet .two-fa-app-links .nav-elem.button {
+    padding: 0;
+}
+
+/* End of 2FA setup in Settings */
+
 /* 2FA confirmation of actions in Settings */
 
 .mega-mobile-settings.two-factor-verification .code-container {
@@ -261,6 +326,14 @@ body.bottom-pages .fmholder {
 }
     
 /* End of Settings form */
+
+/* 2FA setup in Settings */
+
+.mega-mobile-settings.two-factor-settings .qr-code-img {
+    text-align: start;
+}
+
+/* End of 2FA setup in Settings */
 
 }
 

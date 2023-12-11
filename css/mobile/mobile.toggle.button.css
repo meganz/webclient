@@ -16,6 +16,11 @@
     line-height: 14px;
 }
 
+.mega-toggle-button .toggle-label {
+    -webkit-padding-end: 16px;
+    padding-inline-end: 16px;
+}
+
 .mega-toggle-button .toggle-wrapper {
     position: relative;
     width: 48px;

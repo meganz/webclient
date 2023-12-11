@@ -62,7 +62,7 @@ Implemented styles:
 
 .nav-elem.normal.block {
     width: 100%;
-    max-width: 382px;
+    max-width: var(--mobile-elem-max-width);
 }
 
 .nav-elem.normal.block .primary-text {

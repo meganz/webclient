@@ -159,13 +159,13 @@ mobile.settings.account.changeEmail = Object.create(mobile.settingsHelper, {
 
                     // If they have already requested a confirmation link for that email address, show an error
                     else if (ex === -12) {
-                        msgDialog('error', l.resend_email_error,  mega.icu.format(l.resend_email_error_info, 2));
+                        msgDialog('warninga', l.resend_email_error,  mega.icu.format(l.resend_email_error_info, 2));
                     }
 
                     // If they have already requested the confirmation links twice in one hour, show an error
                     else if (ex === -6) {
                         msgDialog(
-                            'error', l.change_email_error,
+                            'warninga', l.change_email_error,
                             mega.icu.format(l.change_email_error_info, u_attr.b ? 10 : 2)
                         );
                     }

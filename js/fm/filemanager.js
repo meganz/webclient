@@ -3000,7 +3000,9 @@ FileManager.prototype.initUIKeyEvents = function() {
                 $.warningCallback = null;
             }
         }
-        else if (e.keyCode === 13 && ($.msgDialog === 'confirmation' || $.msgDialog === 'remove')) {
+        else if (e.keyCode === 13 && ($.msgDialog === 'confirmation' || $.msgDialog === 'remove' ||
+            (($.msgDialog === 'warninga' || $.msgDialog === 'warningb' || $.msgDialog === 'info' ||
+            $.msgDialog === 'error') && $('#msgDialog .mega-button').length === 1))) {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);

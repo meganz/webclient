@@ -2679,18 +2679,22 @@ function topmenuUI() {
                 var subpage;
                 /*  TODO: Add bird when its done */
                 var subPages = [
-                    'about', 'account', 'keybackup', 'cmd', 'contact',
-                    'copyright', 'corporate', 'credits', 'desktop', 'doc', 'extensions',
-                    'login', 'mega', 'nzippmember', 'nziphotographer', 'privacy', 'mobileapp',
-                    'mobile', 'register', 'sdk', 'sitemap', 'sourcecode',
-                    'support', 'takedown', 'terms', 'start', 'security', 'affiliate',
-                    'nas', 'pro', 'cookie', 'securechat', 'collaboration', 'storage', 'special',
-                    'achievements', 'objectstorage', 'megabackup'
+                    'about', 'account', 'achievements', 'affiliate', 'bug-bounty', 'business',
+                    'chatandmeetings', 'cmd', 'collaboration', 'contact', 'cookie', 'copyright',
+                    'corporate', 'credits', 'desktop', 'developers', 'dispute', 'doc',
+                    'extensions', 'keybackup', 'login', 'media', 'mega', 'megabackup', 'mobile',
+                    'mobileapp', 'nas', 'nziphotographer', 'nzippmember', 'objectstorage',
+                    'privacy', 'pro', 'register', 'reliability', 'resellers', 'sdk',
+                    'securechat', 'security', 'share', 'sitemap', 'sourcecode', 'special',
+                    'start', 'storage', 'support', 'syncing', 'takedown', 'terms', 'transparency'
                 ];
                 const ioPages = [
-                    'about', 'cmd', 'contact', 'copyright', 'corporate', 'desktop', 'doc', 'extensions', 'privacy',
-                    'mobileapp', 'mobile', 'sdk', 'sourcecode', 'takedown', 'terms', 'security', 'affiliate', 'nas',
-                    'cookie', 'securechat', 'collaboration', 'storage', 'achievements', 'objectstorage', 'megabackup',
+                    'about', 'achievements', 'affiliate', 'bug-bounty', 'business',
+                    'chatandmeetings', 'cmd', 'collaboration', 'contact', 'cookie', 'copyright',
+                    'corporate', 'desktop', 'developers', 'dispute', 'doc', 'extensions', 'media',
+                    'megabackup', 'mobile', 'mobileapp', 'nas', 'objectstorage', 'privacy',
+                    'reliability', 'resellers', 'sdk', 'securechat', 'security', 'share',
+                    'sourcecode', 'storage', 'syncing', 'takedown', 'terms', 'transparency'
                 ];
                 var moveTo = {
                     account: 'fm/account',
@@ -2744,17 +2748,14 @@ function topmenuUI() {
                 else if (className.indexOf('logout') > -1) {
                     mLogout();
                 }
-                else if (className.indexOf('transparency') > -1) {
-                    window.open('https://transparency.mega.io', '_blank', 'noopener,noreferrer');
-                }
                 else if (className.includes('help')) {
-                    window.open(l.mega_help_host, '_blank', 'noopener,noreferrer');
+                    window.open(l.mega_help_host, '_blank', 'noopener');
                 }
                 else if (className.includes('blog')) {
-                    window.open('https://blog.mega.io');
+                    window.open('https://blog.mega.io', '_blank', 'noopener');
                 }
-                else if (className.includes('resellers')) {
-                    window.open('https://mega.io/resellers', '_blank', 'noopener,noreferrer');
+                else if (className.includes('jobs') || className.includes('careers')) {
+                    window.open('https://careers.mega.nz', '_blank', 'noopener');
                 }
             }
             return false;

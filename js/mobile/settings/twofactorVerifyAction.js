@@ -2,14 +2,16 @@ mobile.settings.account.twofactorVerifyAction = Object.create(mobile.settingsHel
     /**
      * Initiate and render the page, fetch from cache if already inited.
      *
+     * @param {String} msg Description of the action for 2FA verification, optional
      * @returns {Promise<*>} 2FA code entered or false
      */
     init: {
-        value: function() {
+        value: function(msg) {
             'use strict';
 
             return new Promise((resolve) => {
                 this.resolve = resolve;
+                this.msg = msg;
                 this.pinLength = 6;
 
                 if (this.domNode) {
@@ -23,7 +25,7 @@ mobile.settings.account.twofactorVerifyAction = Object.create(mobile.settingsHel
                 mCreateElement('h1', {'class': 'form-title'}, this.domNode)
                     .textContent = MegaMobileHeader.headings['fm/two-factor-confirmation'];
 
-                mCreateElement('div', {'class': 'form-info'}, this.domNode).textContent = l.enter_two_fa_code;
+                this.msgNode = mCreateElement('div', {'class': 'form-info'}, this.domNode);
 
                 const setNode =  mCreateElement('fieldset', {
                     'class': 'code-container'
@@ -68,6 +70,7 @@ mobile.settings.account.twofactorVerifyAction = Object.create(mobile.settingsHel
             'use strict';
 
             this.domNode.classList.add('default-form', 'fixed-width');
+            this.msgNode.textContent = this.msg || l.enter_two_fa_code;
 
             // Bind fieldset events
             this.initPinInputs();

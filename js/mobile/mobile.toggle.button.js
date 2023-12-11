@@ -8,6 +8,22 @@ class MegaMobileToggleButton extends MegaMobileComponent {
             return;
         }
 
+        this.setButtonState = (val) => {
+            if (!this.input) {
+                return false;
+            }
+
+            this.checked = val;
+            this.input.ariaChecked = this.checked;
+            this.toggle.classList.remove('icon-check-after', 'icon-minimise-after');
+            this.toggle.classList.add(`icon-${this.checked ? 'check' : 'minimise'}-after`);
+            this.domNode.classList.remove('on');
+
+            if (this.checked) {
+                this.domNode.classList.add('on');
+            }
+        };
+
         const isProUserOption = options.isProUserOption || false;
 
         let targetNode = this.domNode;
@@ -41,15 +57,8 @@ class MegaMobileToggleButton extends MegaMobileComponent {
             subNode.disabled = options.disabled;
             targetNode.appendChild(subNode);
 
-            this.checked = options.checked || false;
             this.disabled = options.disabled || false;
-
-            const iconToShow = this.checked ? 'check' : 'minimise';
-            this.toggle.classList.add(`icon-${iconToShow}-after`);
-
-            if (this.checked) {
-                this.domNode.classList.add('on');
-            }
+            this.setButtonState(options.checked || false);
         }
 
         const _checkToggle = (event) => {
@@ -58,13 +67,7 @@ class MegaMobileToggleButton extends MegaMobileComponent {
                 return;
             }
 
-            this.checked = !this.checked;
-            this.input.ariaChecked = this.checked;
-
-            this.domNode.classList.toggle('on');
-
-            this.toggle.classList.toggle('icon-check-after');
-            this.toggle.classList.toggle('icon-minimise-after');
+            this.setButtonState(!this.checked);
 
             if (typeof options.onChange === 'function') {
                 options.onChange.call(this);

@@ -176,7 +176,7 @@ class MegaMobileHeader extends MegaMobileComponent {
                 }
 
                 if (String(M.currentdirid).includes('two-factor-authentication')) {
-                    return mobile.twofactor.settings.previousPage();
+                    return mobile.settings.account.twofactorSettings.previousPage();
                 }
 
                 history.back();

@@ -1,7 +1,7 @@
 .mega-transfer-block {
     display: flex;
     flex-direction: column;
-    max-width: 382px;
+    max-width: var(--mobile-elem-max-width);
     width: 100%;
 }
 

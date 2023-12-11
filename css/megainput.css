@@ -134,17 +134,17 @@
 }
 
 /* Icons after span or input (Usually dropdown its dropdown arrow or three dots) */
-.mega-input > input + i,
-.mega-input > span + i {
+.mega-input > input ~ i,
+.mega-input > span ~ i {
     --mask-color: var(--icon-inactive);
     margin: 0;
     -webkit-margin-end: 3px;
     margin-inline-end: 3px;
 }
-.mega-input:hover > input + i,
-.mega-input:hover > span + i,
-.mega-input.active > input + i,
-.mega-input.active > span + i {
+.mega-input:hover > input ~ i,
+.mega-input:hover > span ~ i,
+.mega-input.active > input ~ i,
+.mega-input.active > span ~ i {
     --mask-color: var(--icon-rest);
 }
 
@@ -184,6 +184,11 @@
 .mega-input.box-style > i {
     -webkit-margin-start: 8px;
     margin-inline-start: 8px;
+}
+.mega-input.box-style > input ~ i {
+    margin: 0;
+    -webkit-margin-end: 8px;
+    margin-inline-end: 8px;
 }
 .mega-input.box-style .mega-input-dropdown {
     top: -6px;
@@ -228,8 +233,8 @@
 .mega-input.text-style::before {
     display: none;
 }
-.mega-input.text-style > input + i,
-.mega-input.text-style > span + i {
+.mega-input.text-style > input ~ i,
+.mega-input.text-style > span ~ i {
     --mask-color: var(--icon-active);
     -webkit-margin-end: 0;
     margin-inline-end: 0;
@@ -642,7 +647,7 @@
     background: var(--mobile-page-background);
 }
 .mobile.mega-input.box-style.fixed-width {
-    max-width: 382px;
+    max-width: var(--mobile-elem-max-width);
 }
 .mobile.mega-input.box-style.active {
     border-color: var(--mobile-border-strong-selected);
@@ -684,15 +689,12 @@
 .mobile.mega-input.title-ontop {
     margin: 36px 0 16px;
 }
-.mobile.mega-input.with-icon i {
+.mobile.mega-input > i,
+.mobile.mega-input:hover > i,
+.mobile.mega-input.active > i {
     --icon-size: 20px;
-    padding: 2px;
     --mask-color: var(--mobile-icon-secondary);
-}
-.mobile.mega-input i.clear-input {
-    color: var(--mobile-icon-primary);
-    margin-inline-end: 8px;
-    -webkit-margin-end: 8px;
+    opacity: 1;
 }
 .mobile.mega-input input {
     padding: 14px 12px;
@@ -753,7 +755,7 @@
     color: var(--mobile-text-secondary);
     font: var(--mobile-font-caption-large-regular);
 }
-.mobile.mega-input.text-field i.clear-input {
+.mobile.mega-input.text-field i {
     margin-inline-end: 0;
     -webkit-margin-end: 0;
 }

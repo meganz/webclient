@@ -3039,10 +3039,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.upload-overlay.js', n: 'mobile_upload_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.contact-link.js', n: 'mobile_contactlink_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.js', n: 'mobile_twofactor_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.twofactor.intro.js', n: 'mobile_twofactor_info_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.twofactor.setup.js', n: 'mobile_twofactor_setup_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.twofactor.verify-setup.js', n: 'mobile_twofactor_verify_setup_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.twofactor.verify-disable.js', n: 'mobile_twofactor_verify_disable_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.verify-login.js', n: 'mobile_twofactor_verify_login_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.sms.phone-input.js', n: 'mobile_sms_phone_input_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.sms.verify-code.js', n: 'mobile_sms_verify_code_js', j: 1, w: 1});
@@ -3091,6 +3087,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/settings/fileManagement.js', n: 'mobile_file_management_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/notifications.js', n: 'mobile_account_notifications_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/settings/termsPolicies.js', n: 'mobile_terms_policies_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/settings/twofactorSettings.js', n: 'mobile_twofactor_settings_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.msgdialog.js', n: 'mobile_msgdialog_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.rack.slot.js', n: 'mobile_rack_slot_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.rack.js', n: 'mobile_rack_js', j: 1, w:1});

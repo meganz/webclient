@@ -72,7 +72,7 @@
 }
 
 .mobile.decrypt-button.nav-elem.normal {
-    max-width: 382px;
+    max-width: var(--mobile-elem-max-width);
     width: 100%;
     min-height: 48px;
 }

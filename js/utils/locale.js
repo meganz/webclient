@@ -1874,6 +1874,14 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.two_fa_download_app = escapeHTML(l.two_fa_download_app)
         .replace('[A]', '<a href="">')
         .replace('[/A]', '</a>');
+
+    l.recovery_key_blurb = escapeHTML(l.recovery_key_blurb)
+        .replace('[A]', `<a href="${recoveryKeyLink}" target="_blank">`)
+        .replace('[/A]', '</a>')
+        .replace('[S1]', '<span>')
+        .replace('[S2]', '<span class="hc-article-link">')
+        .replace(/\[\/S\d]/g, '</span>');
+
     const common = [
         15536, 16107, 16119, 16120, 16136, 16304, 16313, 16316, 16358, 16360, 16361, 16394, 18228, 18268, 18282,
         18284, 18285, 18286, 18287, 18289, 18290, 18291, 18294, 18295, 18296, 18297, 18298, 18302, 18303, 18304,

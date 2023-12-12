@@ -1133,11 +1133,12 @@ function init_page() {
         return loadSubPage('login');
     }
     else if (page === 'keybackup') {
-        parsepage(pages.keybackup);
         if (is_mobile) {
-            mobile.settings.backup.init();
+            loadSubPage('fm/account/security/backup-key', 'override');
+            return false;
         }
         else {
+            parsepage(pages.keybackup);
             init_backup();
         }
     }

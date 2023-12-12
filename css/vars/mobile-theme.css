@@ -130,6 +130,8 @@ body,
     /* default maximum element width: inputs, buttons, etc */
 
         --mobile-elem-max-width: 382px;
+        --mobile-page-max-width: 697px;
+        --mobile-tablet-elem-width: 327px;
 }
 
 

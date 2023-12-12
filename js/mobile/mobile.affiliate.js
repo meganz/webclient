@@ -297,9 +297,13 @@ mobile.affiliate = {
             if (page === 'start') {
                 page = '';
             }
-
             M.affiliate.getURL(page).then(function(url) {
-                $('.url', $urlBar).safeHTML(url.replace(page, '<span>' + page + '</span>'));
+                if (page === 'help') {
+                    $('.url', $urlBar).safeHTML(url);
+                }
+                else {
+                    $('.url', $urlBar).safeHTML(url.replace(page, `<span>${page}</span>`));
+                }
             });
         });
 

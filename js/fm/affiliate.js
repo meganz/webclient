@@ -322,7 +322,7 @@ affiliateUI.referralUrlDialog = {
         'use strict';
 
         var val = $('.url-input', this.$dialog).val();
-        var baseUrl = getBaseUrl();
+        var baseUrl = 'https://mega.io';
         var baseUrlRegExp = new RegExp(baseUrl, 'ig');
 
         if (!val) {
@@ -379,7 +379,8 @@ affiliateUI.referralUrlDialog = {
         }
 
         return M.affiliate.getURL(targetPage).then(function(url) {
-            var urlWithoutAfftag = getBaseUrl() + (targetPage === '' ? '' : '/' + targetPage);
+            const urlWithoutAfftag = targetPage === 'help' ? l.mega_help_host
+                : `https://mega.io/${targetPage}`;
             $urlBlock.safeHTML(url.replace(urlWithoutAfftag, '<span>' + urlWithoutAfftag + '</span>'));
         });
     },

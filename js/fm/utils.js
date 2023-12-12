@@ -1487,7 +1487,7 @@ MegaUtils.prototype.getStorageState = async function(force) {
     }
 
     // XXX: Not using mega.attr.get since we don't want the result indexedDB-cached.
-    const {result} = await api.send({'a': 'uga', 'u': u_handle, 'ua': '^!usl', 'v': 1});
+    const result = await api.send({'a': 'uga', 'u': u_handle, 'ua': '^!usl', 'v': 1});
     if (d) {
         console.debug('getStorageState', result);
         console.assert(result === ENOENT || result.av, `getStorageState: Unexpected response... ${result}`);

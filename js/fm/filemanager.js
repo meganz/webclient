@@ -1529,7 +1529,9 @@ FileManager.prototype.initContextUI = function() {
     var safeMoveNodes = function() {
         if (!$(this).hasClass('disabled')) {
             $.hideContextMenu();
-            M.safeMoveNodes(String($(this).attr('id')).replace('fi_', '')).catch(dump);
+            mLoadingSpinner.show('safeMoveNodes');
+            M.safeMoveNodes(String($(this).attr('id')).replace('fi_', '')).catch(dump)
+                .finally(() => mLoadingSpinner.hide('safeMoveNodes'));
         }
         return false;
     };

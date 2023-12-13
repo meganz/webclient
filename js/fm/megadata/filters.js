@@ -87,6 +87,17 @@ MegaData.prototype.filterByParent = function(id) {
             return (node.p === id);
         });
     }
+
+    if (mega.ui.mNodeFilter.selectedFilters) {
+
+        for (let i = this.v.length; i--;) {
+
+            if (!mega.ui.mNodeFilter.match(this.v[i])) {
+
+                this.v.splice(i, 1);
+            }
+        }
+    }
 };
 
 MegaData.prototype.filterBySearch = function (str) {
@@ -205,6 +216,8 @@ MegaData.prototype.filterBySearch = function (str) {
 };
 
 MegaData.prototype.getFilterBySearchFn = function(searchTerm) {
+    'use strict';
+
     // Simple glob/wildcard support.
     // spaces are replaced with *, and * moved to regexp's .* matching
     var regex;
@@ -215,6 +228,13 @@ MegaData.prototype.getFilterBySearchFn = function(searchTerm) {
             regex = RegExp(str.replace(/(\W)/g, '\\$1').replace(/\\\*/g, '.*'), 'i');
         }
         catch (ex) {}
+    }
+
+    if (mega.ui.mNodeFilter.selectedFilters) {
+        if (regex) {
+            return (n) => n.name && regex.test(n.name) && mega.ui.mNodeFilter.match(n);
+        }
+        return (n) => n.name && n.name.toLowerCase().includes(str) && mega.ui.mNodeFilter.match(n);
     }
 
     if (regex) {

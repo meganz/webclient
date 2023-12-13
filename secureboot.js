@@ -927,6 +927,12 @@ lazy(mega, 'infinity', function() {
     return mega.flags.inf > 0 || !!localStorage.mInfinity || !!localStorage.megaLiteMode;
 });
 
+/** @property mega.rewindEnabled */
+lazy(mega, 'rewindEnabled', function() {
+    'use strict';
+    return (mega.flags.rw || localStorage.rewindEnable) && !is_mobile;
+});
+
 /** @property mega.viewID */
 lazy(mega, 'viewID', function() {
     'use strict';
@@ -2845,6 +2851,10 @@ else if (!browserUpdate) {
         jsl.push({f:'js/fm/dashboard.js', n: 'fmdashboard_js', j:1, w:5});
         jsl.push({f:'js/fm/recents.js', n: 'fmrecents_js', j:1, w:5});
         jsl.push({f:'js/time_checker.js', n: 'time_checker_js', j:1});
+        jsl.push({f:'js/ui/contextMenu.js', n: 'context_menu_js', j: 1});
+        jsl.push({f:'js/ui/dragselect.js', n: 'dargselect_js', j:1});
+        jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
+        jsl.push({f:'js/ui/sms.js', n: 'sms_js', j: 1, w: 1});
         jsl.push({f:'js/fm/account.js', n: 'fm_account_js', j:1});
         jsl.push({f:'js/fm/account-change-password.js', n: 'fm_account_change_password_js', j:1});
         jsl.push({f:'js/fm/account-change-email.js', n: 'fm_account_change_email_js', j:1});
@@ -2855,8 +2865,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
         jsl.push({f:'js/fm/affiliate.js', n: 'fm_affiliate_js', j: 1});
         jsl.push({f:'js/fm/vpn.js', n: 'fmvpn_js', j: 1});
-        jsl.push({f:'js/ui/contextMenu.js', n: 'context_menu_js', j: 1});
-        jsl.push({f:'js/ui/dragselect.js', n: 'dargselect_js', j:1});
 
         // Gallery helpers
         jsl.push({f:'js/fm/gallery/helpers/GalleryTitleControl.js', n: 'fm_gallery_title_control_js', j:1});
@@ -2873,8 +2881,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/fm/albums/Albums.js', n: 'fm_albums_js', j:1});
         jsl.push({f:'js/fm/albums/AlbumTimeline.js', n: 'fm_albums_timeline_js', j:1});
 
-        jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
-        jsl.push({f:'js/ui/sms.js', n: 'sms_js', j: 1, w: 1});
         jsl.push({f:'html/onboarding.html', n: 'onboarding', j:0,w:2});
         jsl.push({f:'css/onboarding.css', n: 'onboarding_css', j:2,w:5,c:1,d:1,cache:1});
 
@@ -2915,6 +2921,7 @@ else if (!browserUpdate) {
         jsl.push({f:'html/fm.html', n: 'fm', j:0, w:3});
         jsl.push({f:'html/top-login.html', n: 'top-login', j:0});
         jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
+        jsl.push({f:'html/rewind.html', n: 'rewind_html', j:0});
         jsl.push({f:'css/topbar.css', n: 'topbar_css', j:2,w:5,c:1,d:1,cache:1});
     } // !is_mobile
 
@@ -3286,6 +3293,13 @@ else if (!browserUpdate) {
             's4:fm_s4_policies_js': {f:'js/fm/s4/policies.js', n: 'fm_s4_policies_js', j:1},
             's4:fm_s4_policy_properties_js': {f:'js/fm/s4/properties-policy.js', n: 'fm_s4_policy_properties_js', j:1},
             's4:kernel': {f:'js/utils/s4.js', n: 'js_utils_s4_js', j: 1}
+        },
+        'rewind': {
+            'rewind_css': {f:'css/rewind.css', n: 'rewind_css', j:2, w:5},
+            'rewind_js': {f:'js/rewind/index.js', n: 'rewind_js', j: 1, w: 1},
+            'rewind_ui_js': {f:'js/rewind/ui.js', n: 'rewind_ui_js', j: 1, w: 1},
+            'rewind_utils_js': {f:'js/rewind/utils.js', n: 'rewind_utils_js', j: 1, w: 1},
+            'rewind_storage_js': {f:'js/rewind/storage.js', n: 'rewind_storage_js', j: 1, w: 1}
         },
         'chat': {
             /* chat related css */

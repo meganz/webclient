@@ -555,7 +555,7 @@ table.grid-table .grid-url-arrow {
     width: 24px;
     display: block;
     cursor: pointer;
-    transition: all 50ms ease-in-out;
+    /* transition: all 50ms ease-in-out; */
     position: absolute;
     background-color: transparent;
     top: 0;

@@ -47,6 +47,7 @@
             scope = document.querySelector('.fm-right-files-block .fm-right-header .fm-breadcrumbs-wrapper');
         }
         let items = this.getPath(fileHandle || this.currentdirid);
+        const hasRewind = scope.classList.contains('rewind');
 
         const dictionary = handle => {
             let name = '';
@@ -164,6 +165,10 @@
         };
 
         this.renderBreadcrumbs(items, scope, dictionary, id => {
+            if (hasRewind) {
+                return;
+            }
+
             breadcrumbClickHandler.call(this, id);
         });
 

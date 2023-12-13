@@ -185,6 +185,17 @@ FileManager.prototype.initFileManager = async function() {
                 await s4load;
             }
         }
+
+        if (mega.rewindEnabled) {
+
+            Promise.resolve(M.require('rewind'))
+                .then(() => {
+                    mega.rewind.init();
+                })
+                .catch((ex) => {
+                    reportError(ex);
+                });
+        }
     }
 
     if (path) {

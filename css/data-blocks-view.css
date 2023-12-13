@@ -163,7 +163,8 @@
 .data-block-view .file-status-icon.icon-info,
 .data-block-view.linked .icon-link {
     --icon-size: 16px;
-    margin-right: 4px;
+    margin-inline-end: 4px;
+    -webkit-margin-end: 4px;
     margin-top: 4px;
     margin-bottom: 4px;
     background-image: none;
@@ -298,12 +299,15 @@
     color: var(--stroke-main-inverted);
     top: 4px;
     position: absolute;
-    text-align: left;
+    text-align: start;
     display: none;
     left: 4px;
     z-index: 2;
 }
-
+.rtl .video-thumb-details {
+    left: auto;
+    right: 4px;
+}
 .data-block-bg.video .video-thumb-details {
     display: block;
 }

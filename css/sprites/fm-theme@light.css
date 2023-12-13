@@ -16,6 +16,10 @@
 .theme-light-forced .sprite-fm-theme.icon-camera-disabled, .theme-light-forced .sprite-fm-theme-before.icon-camera-disabled-before::before, .theme-light-forced .sprite-fm-theme-after.icon-camera-disabled-after::after {
    background-image: url("../../images/sprites/fm-theme@light.svg#icon-camera-disabled");
 }
+.theme-light .sprite-fm-theme.icon-checkbox-minimize, .theme-light .sprite-fm-theme-before.icon-checkbox-minimize-before::before, .theme-light .sprite-fm-theme-after.icon-checkbox-minimize-after::after,
+.theme-light-forced .sprite-fm-theme.icon-checkbox-minimize, .theme-light-forced .sprite-fm-theme-before.icon-checkbox-minimize-before::before, .theme-light-forced .sprite-fm-theme-after.icon-checkbox-minimize-after::after {
+   background-image: url("../../images/sprites/fm-theme@light.svg#icon-checkbox-minimize");
+}
 .theme-light .sprite-fm-theme.icon-dlocal, .theme-light .sprite-fm-theme-before.icon-dlocal-before::before, .theme-light .sprite-fm-theme-after.icon-dlocal-after::after,
 .theme-light-forced .sprite-fm-theme.icon-dlocal, .theme-light-forced .sprite-fm-theme-before.icon-dlocal-before::before, .theme-light-forced .sprite-fm-theme-after.icon-dlocal-after::after {
    background-image: url("../../images/sprites/fm-theme@light.svg#icon-dlocal");

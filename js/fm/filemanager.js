@@ -4466,7 +4466,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
                 $('.fm-download-as-zip', $btnWrap).rebind('click', () => {
 
-                    eventlog(99766);
+                    eventlog(pfcol ? 99954 : 99766);
                     // Download the current folder, could be the root or sub folder
                     M.addDownload([M.RootID], true);
                 });

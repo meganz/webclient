@@ -174,6 +174,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                             return;
                         }
 
+                        eventlog(99954);
                         M.addDownload(selections);
                     }
                 },

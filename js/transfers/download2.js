@@ -2045,7 +2045,10 @@ var dlmanager = {
             // Load the membership plans
             dlmanager.setPlanPrices($dialog);
 
-            api_req({a: 'log', e: 99648, m: 'on overquota dialog shown'});
+            if (window.pfcol) {
+                eventlog(99956);
+            }
+            eventlog(99648);
 
             if (asyncTaskID) {
                 loadingDialog.show();

@@ -2839,6 +2839,8 @@ else if (!browserUpdate) {
 
         jsl.push({f:'html/top.html', n: 'top', j:0});
         jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/fm-header.css', n: 'fm_header_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/fm-breadcrumb.css', n: 'fm_breadcrumb_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/fm-lists.css', n: 'fm_lists_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/grid-table.css', n: 'grid_table_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/tabs.css', n: 'tabs_css', j:2,w:5,c:1,d:1,cache:1});

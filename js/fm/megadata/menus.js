@@ -199,6 +199,7 @@ MegaData.prototype.menuItems = async function menuItems() {
                         exp = selNode.shares.EXP;
                     }
                 }
+
                 items['.sh4r1ng-item'] = 1;
 
                 if (shares.length || M.ps[selNode.h]) {
@@ -229,6 +230,11 @@ MegaData.prototype.menuItems = async function menuItems() {
             // If the selected folder contains any versioning show clear version
             if (selNode.tvf && M.getNodeRights(selNode.h) > 1) {
                 items['.clearprevious-versions'] = 1;
+            }
+
+            // This is just to make sure the source root is on the cloud drive
+            if (mega.rewindEnabled && M.getNodeRoot(selNode.h) === M.RootID) {
+                items['.rewind-item'] = 1;
             }
         }
         else {
@@ -736,6 +742,10 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
                     if ($.hasWebKitDirectorySupport) {
                         $(menuCMI).filter('.folderupload-item').removeClass('hidden');
                     }
+
+                    if (mega.rewindEnabled) {
+                        $(menuCMI).filter('.rewind-item').removeClass('hidden');
+                    }
                 }
                 itemsViewed = true;
             }
@@ -961,6 +971,12 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
         else if (currNodeClass && (currNodeClass.indexOf('cloud-drive') > -1
             || currNodeClass.indexOf('folder-link') > -1)) {
             flt = '.properties-item';
+
+            if (mega.rewindEnabled
+                && (currNodeClass.indexOf('cloud-drive') > -1 && currNodeClass.indexOf('js-clouddrive-btn') > -1)) {
+                flt += ',.rewind-item';
+            }
+
             if (folderlink) {
                 flt += ',.import-item';
             }
@@ -1078,6 +1094,15 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
                     }
                     else {
                         $('i', $openItem).removeClass('icon-bucket').addClass('icon-folder-open');
+                    }
+                }
+
+                // We know the rewind-item is already active and passed the check
+                // We need to check the 2nd time if the source of event is on right location
+                if (items['.rewind-item']) {
+                    const fromCloudDriveTree = $currentTarget.closest('.js-myfile-tree-panel').length;
+                    if (!fromCloudDriveTree && M.currentrootid !== M.RootID) {
+                        $menuCMI.filter('.rewind-item').addClass('hidden');
                     }
                 }
             };

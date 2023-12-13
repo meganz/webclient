@@ -1855,6 +1855,22 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.s4_voucher_terms = escapeHTML(l.s4_voucher_terms)
         .replace('[A]', '<a class="clickurl" href="https://mega.io/s4-terms" target="_blank">')
         .replace('[/A]', '</a>');
+
+    const rewindHelpLink = 'https://help.mega.io/files-folders/rewind/how-do-i-use-rewind';
+    const rewindLinkAttr = 'target="_blank" class="clickurl" rel="noopener noreferrer"';
+    l.rewind_upg_content_free = escapeHTML(l.rewind_upg_content_free)
+        .replace('[A]', `<a ${rewindLinkAttr} href="${rewindHelpLink}">`)
+        .replace('[/A]', '</a>')
+        .replace('[BR]', '<br />');
+    l.rewind_upg_content_pro_lite = escapeHTML(l.rewind_upg_content_pro_lite)
+        .replace('[A]', `<a ${rewindLinkAttr} href="${rewindHelpLink}">`)
+        .replace('[/A]', '</a>')
+        .replace('[BR]', '<br />');
+    l.rewind_upg_content_pro_flexi = escapeHTML(l.rewind_upg_content_pro_flexi)
+        .replace('[A]', `<a ${rewindLinkAttr} href="${rewindHelpLink}">`)
+        .replace('[/A]', '</a>')
+        .replace('[BR]', '<br />');
+
     l.two_fa_download_app = escapeHTML(l.two_fa_download_app)
         .replace('[A]', '<a href="">')
         .replace('[/A]', '</a>');

@@ -2863,6 +2863,8 @@ else if (!browserUpdate) {
         jsl.push({f:'js/fm/dialogs.js', n: 'fm_dialogs_js', j:1});
         jsl.push({f:'js/fm/properties.js', n: 'fm_properties_js', j:1});
         jsl.push({f:'js/ui/dropdowns.js', n: 'dropdowns_js', j:1});
+        jsl.push({f:'css/node-filter.css', n: 'nodefilter_css', j:2});
+        jsl.push({f:'js/ui/node-filter.js', n: 'nodefilter_js', j:1});
         jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
         jsl.push({f:'js/fm/affiliate.js', n: 'fm_affiliate_js', j: 1});

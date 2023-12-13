@@ -7,6 +7,10 @@
 }
 .rtl .fm-right-header {
     direction: rtl;
+    display: flex;
+}
+.rtl .fm-search-count {
+    float: right;
 }
 .fm-transfers-header {
     -webkit-padding-end: 16px;

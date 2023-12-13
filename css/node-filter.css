@@ -1,0 +1,72 @@
+/* For the wrapper and filter chips */
+.fm-filter-chips-wrapper {
+    margin-inline: 20px;
+    -webkit-margin-start: 20px;
+    -webkit-margin-end: 20px;
+    min-height: 36px;
+    display: flex;
+}
+.rtl .fm-filter-chips-wrapper {
+    flex-direction: row-reverse;
+}
+.fm-filter-chips-wrapper .fm-filter-chips {
+    width: fit-content;
+    display: flex;
+    gap: 8px;
+}
+.rtl .fm-filter-chips-wrapper .fm-filter-chips {
+    flex-direction: row-reverse;
+}
+.fm-filter-chips .fm-filter-reset {
+    display: flex;
+    height: 24px;
+    color: var(--text-color-info);
+    align-items: center;
+    cursor: pointer;
+}
+.fm-filter-chips .fm-filter-chip-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    height: 24px;
+    padding-inline: 12px;
+    -webkit-padding-start: 12px;
+    -webkit-padding-end: 12px;
+    border-radius: 12px;
+    background: var(--surface-grey-2);
+    cursor: pointer;
+}
+.fm-filter-chips .fm-filter-chip-button .fm-filter-chip-button-text {
+    color: var(--stroke-main-inverted);
+}
+.rtl .fm-filter-chips .fm-filter-chip-button .nw-fm-tree-arrow::before {
+    transform: rotate(90deg) !important;
+}
+.fm-filter-chips .fm-filter-chip-button.selected {
+    background: rgba(0, 191, 165, 0.30);
+}
+
+/* For the MComponent dropdowns */
+.hide-radio-on .radioOn {
+    display: none !important;
+};
+.m-dropdown-item.hide-radio-on:hover {
+    color: var(--text-color-medium);
+}
+.m-dropdown-item.hide-radio-on:hover,
+.m-dropdown-item.hide-radio-on:focus,
+.m-dropdown-item.hide-radio-on:active img {
+    --mask-color: var(--icon-rest);
+}
+.m-dropdown-item.hide-radio-on.selected {
+    background: var(--surface-grey-2);
+    color: var(--text-color-medium);
+}
+.m-dropdown-item.hide-radio-on .selected-mark {
+    display: none;
+}
+.m-dropdown-item.hide-radio-on.selected .selected-mark {
+    display: block;
+    --mask-color: var(--icon-rest);
+}

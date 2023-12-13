@@ -297,6 +297,9 @@
             }
             else if (val.length >= 2 || !asciionly(val)) {
                 M.fmSearchNodes(val).then(function() {
+                    if (!M.search) {
+                        mega.ui.mNodeFilter.resetFilterSelections();
+                    }
                     if (!pfid) {
                         recentlySearched.justSearched = true;
                         if (mega.config.get('showRecents') === 1) {

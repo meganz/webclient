@@ -329,14 +329,24 @@
             queueMicrotask(() => s4.ui.render());
         }
 
-        const $fmRightHeader = $('.fm-right-header', '.fm-right-files-block');
-        const $resultsCount = $('.fm-search-count', $fmRightHeader);
+        const $fmRightFilesBlock = $('.fm-right-files-block');
+        const $fmRightHeader = $('.fm-right-header', $fmRightFilesBlock);
+        const $resultsCount = $('.fm-search-count', $fmRightHeader).addClass('hidden');
 
         $('.nw-fm-tree-item.opened').removeClass('opened');
         $('.fm-notification-block.duplicated-items-found').removeClass('visible');
-        $('.fm-breadcrumbs-wrapper', $fmRightHeader).removeClass('hidden');
-        $('.column-settings.overlap').removeClass('hidden');
-        $resultsCount.addClass('hidden');
+        $('.fm-breadcrumbs-wrapper, .column-settings.overlap', $fmRightFilesBlock).removeClass('hidden');
+
+        if (mega.flags.ab_fchips) {
+            // XXX: Do not reset the filter selections if navigated to the same location.
+            let stash = this.previousdirid === this.currentdirid;
+
+            if (!stash && this.previousdirid) {
+                stash = this.search && String(this.previousdirid).substr(0, 6) === 'search';
+            }
+
+            mega.ui.mNodeFilter.resetFilterSelections(stash);
+        }
 
         if (folderlink && !pfcol || id !== M.RootID && M.currentrootid === M.RootID) {
             this.gallery = 0;
@@ -381,11 +391,11 @@
         }
         else {
 
-            $('.fm-right-files-block').removeClass('hidden');
-
             if (d) {
                 console.time('time for rendering');
             }
+
+            $fmRightFilesBlock.removeClass('hidden');
 
             if (id === 'transfers') {
                 this.v = [];
@@ -433,6 +443,7 @@
             if (id.substr(0, 9) !== 'transfers') {
                 this.labelFilterBlockUI();
             }
+
 
             var viewmode = 0;// 0 is list view, 1 block view
             if (this.overrideViewMode !== undefined) {
@@ -613,7 +624,7 @@
         const $viewIcons =
             $(`.fm-files-view-icon${pfid ? '' : ':not(.media-view)'}`)
                 .removeClass('hidden');
-        $('.fm-right-account-block, .fm-right-block').addClass('hidden');
+        $('.fm-right-account-block, .fm-right-block, .fm-filter-chips-wrapper').addClass('hidden');
 
         this.chat = false;
         this.search = false;

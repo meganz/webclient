@@ -821,6 +821,10 @@ FileManager.prototype.initFileManagerUI = function() {
             M.openFolder(M.currentdirid, true).then(reselect.bind(null, 1));
         }
 
+        if (viewValue === 2 && mega.ui.mNodeFilter) {
+            mega.ui.mNodeFilter.resetFilterSelections();
+        }
+
         return false;
     });
 

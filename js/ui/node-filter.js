@@ -464,11 +464,14 @@ lazy(mega.ui, 'mNodeFilter', () => {
                 }
             }
 
-            const hidden = M.gallery || M.chat
+            const hidden = M.gallery || M.chat || M.albums
                 || M.currentrootid === 'shares'
                 || M.currentrootid === M.RubbishID
                 || hiddenSections.has(M.currentdirid)
-                || M.currentrootid && M.currentrootid === (M.BackupsId && M.getNodeByHandle(M.BackupsId).p);
+                || M.currentrootid && M.currentrootid === (M.BackupsId && M.getNodeByHandle(M.BackupsId).p)
+                || M.currentrootid === 's4' && M.currentCustomView.subType !== 'bucket'
+                || String(M.currentdirid).startsWith('user-management')
+                || folderlink;
 
             if (hidden) {
                 $filterChipsWrapper.addClass('hidden');

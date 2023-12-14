@@ -337,19 +337,6 @@
         $('.fm-notification-block.duplicated-items-found').removeClass('visible');
         $('.fm-breadcrumbs-wrapper, .column-settings.overlap', $fmRightFilesBlock).removeClass('hidden');
 
-        if (mega.flags.ab_fchips) {
-            // XXX: Do not reset the filter selections if navigated to the same location.
-            let stash = this.previousdirid === this.currentdirid;
-
-            if (!stash && this.previousdirid) {
-                stash = this.search && String(this.previousdirid).substr(0, 6) === 'search';
-            }
-
-            if (mega.ui.mNodeFilter) {
-                mega.ui.mNodeFilter.resetFilterSelections(stash);
-            }
-        }
-
         if (folderlink && !pfcol || id !== M.RootID && M.currentrootid === M.RootID) {
             this.gallery = 0;
             if ((fmconfig.uiviewmode | 0) && fmconfig.viewmode === 2 ||
@@ -361,6 +348,19 @@
         }
         else {
             $('.fm-files-view-icon').filter('.media-view').addClass('hidden');
+        }
+
+        if (mega.flags.ab_fchips) {
+            // XXX: Do not reset the filter selections if navigated to the same location.
+            let stash = this.previousdirid === this.currentdirid;
+
+            if (!stash && this.previousdirid) {
+                stash = this.search && String(this.previousdirid).substr(0, 6) === 'search';
+            }
+
+            if (mega.ui.mNodeFilter) {
+                mega.ui.mNodeFilter.resetFilterSelections(stash);
+            }
         }
 
         if (id === undefined && folderlink) {

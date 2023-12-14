@@ -219,12 +219,6 @@ accountUI.renderAccountPage = function(account) {
 
             accountUI.calls.init();
             break;
-        case '/fm/account/vpn':
-            $('.fm-account-vpn').removeClass('hidden');
-            sectionClass = 'vpn';
-
-            accountUI.vpn.init();
-            break;
         default:
 
             // This is the main entry point for users who just had upgraded their accounts
@@ -772,8 +766,6 @@ accountUI.leftPane = {
                 return 'fm/account/reseller';
             case $section.hasClass('calls'):
                 return 'fm/account/calls';
-            case $section.hasClass('vpn'):
-                return 'fm/account/vpn';
             default:
                 return 'fm/account';
         }
@@ -4752,14 +4744,5 @@ accountUI.calls = {
                 }
             );
         }
-    }
-};
-
-accountUI.vpn = {
-    init: function() {
-        'use strict';
-
-        this.vpnPage = this.vpnPage || new VpnPage();
-        this.vpnPage.show();
     }
 };

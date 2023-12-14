@@ -88,7 +88,7 @@ MegaData.prototype.filterByParent = function(id) {
         });
     }
 
-    if (mega.ui.mNodeFilter.selectedFilters) {
+    if (mega.ui.mNodeFilter && mega.ui.mNodeFilter.selectedFilters) {
 
         for (let i = this.v.length; i--;) {
 

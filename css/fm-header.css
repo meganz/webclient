@@ -9,9 +9,6 @@
     direction: rtl;
     display: flex;
 }
-.rtl .fm-search-count {
-    float: right;
-}
 .fm-transfers-header {
     -webkit-padding-end: 16px;
     padding-inline-end: 16px;
@@ -50,6 +47,15 @@
 .fm-right-header .fm-breadcrumbs-wrapper {
     width: 100%;
     overflow: hidden;
+}
+.fm-right-header .fm-search-count {
+    height: 48px;
+    display: flex;
+    align-items: center;
+    padding-inline-start: 28px;
+    -webkit-padding-start: 28px;
+    margin-inline-end: auto;
+    -webkit-margin-end: auto;
 }
 .fm-header-buttons {
     font-size: 0;

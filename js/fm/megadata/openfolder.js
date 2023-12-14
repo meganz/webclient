@@ -345,7 +345,9 @@
                 stash = this.search && String(this.previousdirid).substr(0, 6) === 'search';
             }
 
-            mega.ui.mNodeFilter.resetFilterSelections(stash);
+            if (mega.ui.mNodeFilter) {
+                mega.ui.mNodeFilter.resetFilterSelections(stash);
+            }
         }
 
         if (folderlink && !pfcol || id !== M.RootID && M.currentrootid === M.RootID) {

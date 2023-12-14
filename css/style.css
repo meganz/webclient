@@ -13537,14 +13537,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations {
 .pro-login-dialog.sign .login-checkbox {
     margin: 8px 11px 0 0;
 }
-.fm-search-count {
-    float: left;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    padding-inline-start: 28px;
-    -webkit-padding-start: 28px;
-}
 
 /* corner toasts and transfer popup */
 .corner-messages {

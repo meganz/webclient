@@ -4977,32 +4977,32 @@ textarea.mobile.support-text-field {
 
 /* End Change email page */
 
-.mobile.recovery-key-page,
 .two-factor-qr-block {
     background-color: #fff;
     padding: 32px 0 26px 0;
     position: relative;
 }
-.mobile.recovery-key-page.logout-export {
-    padding: 0;
-}
-.mobile.recovery-key-page.logout-export .recovery-key-heading {
-    padding-top: 32px;
-}
 .verify-login-page .two-factor-qr-block {
     border-bottom: 1px solid #eee;
 }
-.mobile.main-block.forgot-password-page, .mobile.main-block.recover-account-page, .mobile.main-block.enter-recovery-key-page {
+.mobile.main-block.forgot-password-page,
+.mobile.main-block.recover-account-page {
     background-color: #fff;
 }
-.mobile.recovery-key-page .mobile.recovery-key-heading, .mobile.forgot-password-page .mobile.forgot-password-heading, .mobile.r-a-heading, .mobile.two-factor-page .two-factor-heading, .mobile.main-block.error-overlay .password-decryption-heading {
+.mobile.forgot-password-page .mobile.forgot-password-heading,
+.mobile.r-a-heading,
+.mobile.two-factor-page .two-factor-heading,
+.mobile.main-block.error-overlay .password-decryption-heading {
     color: #495057;
     font-family: 'LatoWebBold', 'source_sans_prosemibold';
     font-size: 17px;
     line-height: 1.5;
     margin: 0 24px 0 24px;
 }
-.mobile.recovery-key-page .mobile.recovery-key-body-text, .mobile.forgot-password-page .mobile.forgot-password-body-text, .mobile.recover-account-page .mobile.recover-account-body-text, .two-factor-body-text, .mobile.main-block.error-overlay .password-decryption-body-text {
+.mobile.forgot-password-page .mobile.forgot-password-body-text,
+.mobile.recover-account-page .mobile.recover-account-body-text,
+.two-factor-body-text,
+.mobile.main-block.error-overlay .password-decryption-body-text {
     color: #676D75;
     font-size: 14px;
     line-height: 24px;
@@ -5026,17 +5026,12 @@ textarea.mobile.support-text-field {
 .mobile.park-account.confirm-data-loss .checkdiv {
     margin-right: 5px;
 }
-.mobile.recovery-key-page .mobile.recovery-key-string-block, .mobile.two-factor-qr-code-wrapper, .mobile.two-factor-verify-seed-wrapper {
+.mobile.two-factor-qr-code-wrapper,
+.mobile.two-factor-verify-seed-wrapper {
     margin: 16px 24px 4px;
 }
 .mobile.recover-account-page .mobile.recover-account-block {
     margin-top: 24px;
-}
-.mobile.recovery-key-page .mobile.recovery-key-body-text.form-info {
-    font-size: 13px;
-    color: #00BFA5;
-    margin: 4px 24px 8px;
-    line-height: 21px;
 }
 .mobile.signin-input.recover-account, .mobile.signin-input.input-recovery-key {
     background-color: #FAFAFA;
@@ -5076,7 +5071,9 @@ textarea.mobile.support-text-field {
     left: 16px;
     top: 13px;
 }
-.mobile.recovery-key-page .mobile.recovery-key-copy-btn, .mobile.recovery-key-page .mobile.recovery-key-download-btn, .mobile.recover-account-page .mobile.recover-account-email-send-btn, .mobile.verify-recovery-key-btn, .mobile.upload-recovery-key {
+.mobile.recover-account-page .mobile.recover-account-email-send-btn,
+.mobile.verify-recovery-key-btn,
+.mobile.upload-recovery-key {
     background: #ff4444;
     background-image: linear-gradient(-179deg, #FF3333 0%, #FF4444 100%);
     border: 1px solid #D82928;
@@ -5097,11 +5094,6 @@ textarea.mobile.support-text-field {
 .mobile.upload-recovery-key {
     display: block;
 }
-.mobile.recovery-key-page .mobile.recovery-key-download-btn {
-    margin-top: 8px;
-}
-.mobile.recovery-key-page .recovery-key-copy-btn.active,
-.mobile.recovery-key-page .recovery-key-download-btn.active,
 .mobile.recover-account-page .recover-account-email-send-btn.active,
 .mobile.verify-recovery-key-btn.active ,
 .mobile.upload-recovery-key.active {
@@ -9187,7 +9179,6 @@ Thank You dialog
         padding: 0 20px;
         margin: 18px auto 0;
     }
-    .mobile.recovery-key-page .mobile.recovery-key-block,
     .two-factor-qr-block {
         margin: 26px 38px 0 38px;
     }

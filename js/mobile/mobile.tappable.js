@@ -295,6 +295,7 @@ class MegaMobileTappable extends MegaMobileComponent {
 
 MegaMobileTappable.iconSizesClass = Object.freeze({
     16: 'icon-size-16',
+    20: 'icon-size-20',
     22: 'icon-size-22',
     24: 'icon-size-24',
     28: 'icon-size-28',

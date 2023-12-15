@@ -2316,7 +2316,7 @@ function topmenuUI() {
         if (is_fm()) {
             $menuRefreshItem.removeClass('hidden');
 
-            if (self.d) {
+            if (self.d && !String(location.host).includes('mega.')) {
                 $('.top-menu-item.infinity-item span', $topMenu)
                     .text(`${mega.infinity ? l.leave : l[5906]} Infinity \u{1F343}`)
                     .parent()

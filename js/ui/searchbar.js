@@ -876,7 +876,7 @@
             $icon.addClass(iconClass);
             $('.dropdown-recently-opened-item-filename', $item).text(filename);
             $('.dropdown-recently-opened-item-location', $item).text(parentName);
-            $('.dropdown-recently-opened-item-time', $item).text(date.toLocaleDateString());
+            $('.dropdown-recently-opened-item-time', $item).text(time2date(date.getTime() / 1000, 1));
 
             if (thumbUri) {
                 const $imgNode = $('img', $icon);

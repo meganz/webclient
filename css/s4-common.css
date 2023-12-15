@@ -133,7 +133,7 @@
     border: 1px solid var(--banner-border-warning);
     border-radius: 4px;
     display: block;
-    margin: 8px 24px 0;
+    margin: 8px 24px;
     padding: 1px 8px;
 }
 .bucket-access-warning.fm-notification-block a,

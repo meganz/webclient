@@ -5845,6 +5845,8 @@ textarea.mobile.support-text-field {
     background-color: #F52929;
     left: calc(50% - 18px);
     top: calc(50% - 18px);
+    padding: 0;
+    border: none;
 }
 .mobile .play-video-button i {
     --icon-size: 24px;

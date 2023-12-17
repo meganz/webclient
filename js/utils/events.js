@@ -51,3 +51,31 @@ MegaEvents.prototype.on = function(name, callback) {
     }
     return this;
 };
+
+/**
+ * Referenced, nameless event system that follows the Observer pattern.
+ * For named events intended for global usage about application state, see {@see mBroadcaster}.
+ * For other named events, see {@var MegaEvents}.
+ *
+ * @see mBroadcaster
+ * @see MegaEvents
+ */
+class MEvent {
+    constructor() {
+        this._callbacks = { };
+    }
+
+    invoke(...eventArgs) {
+        for (const callback of Object.values(this._callbacks)) {
+            callback(...eventArgs);
+        }
+    }
+
+    addListener(callback) {
+        this._callbacks[callback] = callback;
+    }
+
+    removeListener(callback) {
+        delete this._callbacks[callback];
+    }
+}

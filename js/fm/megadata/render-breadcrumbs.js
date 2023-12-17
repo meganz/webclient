@@ -28,7 +28,9 @@
 
         removeSimpleTip($('.fm-breadcrumbs', $block));
         showHideBreadcrumbDropdown(extraItems, scope, dropdown);
-        applyBreadcrumbEventHandlers(scope, dropdown, clickAction);
+        if (!scope.parentNode.classList.contains('simpletip-tooltip')) {
+            applyBreadcrumbEventHandlers(scope, dropdown, clickAction);
+        }
     };
 
     /**
@@ -37,16 +39,20 @@
      * @param {string} fileHandle - the id of the selected file or folder
      * @return {undefined}
      */
-    MegaData.prototype.renderPathBreadcrumbs = function(fileHandle, isInfoBlock = false) {
+    MegaData.prototype.renderPathBreadcrumbs = function(fileHandle, isInfoBlock = false, isSimpletip = false) {
         let scope;
 
         if (isInfoBlock) {
             scope = document.querySelector('.properties-breadcrumb .fm-breadcrumbs-wrapper');
         }
+        else if (isSimpletip) {
+            scope = document.querySelector('.simpletip-tooltip .fm-breadcrumbs-wrapper');
+        }
         else {
             scope = document.querySelector('.fm-right-files-block .fm-right-header .fm-breadcrumbs-wrapper');
         }
         let items = this.getPath(fileHandle || this.currentdirid);
+        const hasRewind = scope.classList.contains('rewind');
 
         const dictionary = handle => {
             let name = '';
@@ -164,11 +170,15 @@
         };
 
         this.renderBreadcrumbs(items, scope, dictionary, id => {
+            if (hasRewind) {
+                return;
+            }
+
             breadcrumbClickHandler.call(this, id);
         });
 
         // if on info dialog we do not want to open the file versioning dialog
-        if (!is_mobile && fileHandle && !isInfoBlock) {
+        if (!is_mobile && fileHandle && !isInfoBlock && !isSimpletip) {
             fileversioning.fileVersioningDialog(fileHandle);
         }
     };
@@ -384,9 +394,13 @@
         const maxPathLength = getMaxPathLength(14, container);
         let extraItems = [];
         let isInfoBlock = false;
+        let isSimpletip = false;
         let lastPos = 0;
 
-        if (container.classList.contains('info')) {
+        if (container.parentNode.parentNode.classList.contains('simpletip-tooltip')) {
+            isSimpletip = true;
+        }
+        else if (container.classList.contains('info')) {
             isInfoBlock = true;
         }
 
@@ -394,19 +408,23 @@
 
         for (let i = 0; i < items.length; i++) {
 
+            if (isSimpletip && i === lastPos) {
+                continue;
+            }
+
             let {name, typeClass, id} = dictionary(items[i]);
 
             // Some items are not shown, so if we don't have a name, don't show this breadcrumb
             // Don't include the contact name (can be removed later if you want it back)
             if (name !== '') {
 
-                const isLastItem = i === lastPos;
+                const isLastItem = isSimpletip ? i === lastPos + 1 : i === lastPos;
                 const isRoot = i === items.length - 1;
                 let item;
                 // if we won't have space, add it to the dropdown, but always render the current folder,
                 // and root if there are no extraItems
                 // for info block we show max 2 items in the in-view breadcrumb
-                if (!isDyhRoot && !isLastItem &&
+                if (!isDyhRoot && !isLastItem && !isSimpletip &&
                     (currentPathLength > maxPathLength && !isInfoBlock) || (isInfoBlock && i > 1)) {
                     extraItems.push({
                         name,
@@ -452,7 +470,8 @@
         let $currentBreadcrumb;
         for (let i = 0; i < $breadCrumbs.length; i++) {
             $currentBreadcrumb = $($breadCrumbs[i]);
-            if ($('span', $currentBreadcrumb).get(0).offsetWidth >= $('span', $currentBreadcrumb).get(0).scrollWidth) {
+            if ($('span', $currentBreadcrumb).get(0).offsetWidth >= $('span', $currentBreadcrumb).get(0).scrollWidth
+                || $currentBreadcrumb.parents('.simpletip-tooltip').length > 0) {
                 $('.right-arrow-bg', $currentBreadcrumb).removeClass('simpletip');
             }
         }

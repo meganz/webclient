@@ -274,10 +274,12 @@
         return new Promise(function(resolve, reject) {
 
             var _formatURL = function() {
-                targetPage = targetPage ? '/' + targetPage + '/' : '/';
-                return getBaseUrl() + targetPage + 'aff=' + M.affiliate.id;
+                if (targetPage === 'help') {
+                    return `${l.mega_help_host}?aff=${M.affiliate.id}`;
+                }
+                targetPage = targetPage ? `/${targetPage}?` : '/?';
+                return `https://mega.io${targetPage}aff=${M.affiliate.id}`;
             };
-
             if (M.affiliate.id) {
                 resolve(_formatURL());
             }

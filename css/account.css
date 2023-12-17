@@ -624,6 +624,7 @@ button.loading .loader {
     font-size: 14px;
     line-height: 20px;
     text-decoration: underline;
+    white-space: normal;
 }
 .register-slide-wrapper {
     white-space: nowrap;

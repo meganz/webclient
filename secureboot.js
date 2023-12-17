@@ -799,11 +799,11 @@ var mega = {
             }
         }
 
-        if (storage.csp) {
+        if (!toMegaIo && storage.csp) {
             to += _getSeperator() + 'csp=' + storage.csp;
         }
 
-        if (storage.utm) {
+        if (!toMegaIo && storage.utm) {
             to += _getSeperator() + 'sra=' + b64encode(storage.utm);
         }
 
@@ -821,7 +821,7 @@ var mega = {
             window.onload = window.onerror = null;
             return location.replace(to + (urlQs || ''));
         }
-        window.open(to + (urlQs || ''), '_blank', 'noopener,noreferrer');
+        window.open(to + (urlQs || ''), '_blank', toMegaIo ? 'noopener' : 'noopener,noreferrer');
     },
 
     /**
@@ -925,6 +925,12 @@ Object.defineProperty(mega, 'active', {
 /** @property mega.infinity */
 lazy(mega, 'infinity', function() {
     return mega.flags.inf > 0 || !!localStorage.mInfinity || !!localStorage.megaLiteMode;
+});
+
+/** @property mega.rewindEnabled */
+lazy(mega, 'rewindEnabled', function() {
+    'use strict';
+    return (mega.flags.rw || localStorage.rewindEnable) && !is_mobile;
 });
 
 /** @property mega.viewID */
@@ -2608,6 +2614,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/utils/workers.js', n: 'js_utils_workers_js', j: 1});
     jsl.push({f:'js/utils/trans.js', n: 'js_utils_trans_js', j: 1});
     jsl.push({f:'js/utils/webgl.js', n: 'webgl_js', j:1});
+    jsl.push({f:'js/utils/subtitles.js', n: 'subtitles_js', j:1});
 
     // Sets and elements
     jsl.push({f:'js/utils/sets.js', n: 'fm_sets_js', j:1});
@@ -2833,6 +2840,8 @@ else if (!browserUpdate) {
 
         jsl.push({f:'html/top.html', n: 'top', j:0});
         jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/fm-header.css', n: 'fm_header_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/fm-breadcrumb.css', n: 'fm_breadcrumb_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/fm-lists.css', n: 'fm_lists_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/grid-table.css', n: 'grid_table_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/tabs.css', n: 'tabs_css', j:2,w:5,c:1,d:1,cache:1});
@@ -2845,18 +2854,22 @@ else if (!browserUpdate) {
         jsl.push({f:'js/fm/dashboard.js', n: 'fmdashboard_js', j:1, w:5});
         jsl.push({f:'js/fm/recents.js', n: 'fmrecents_js', j:1, w:5});
         jsl.push({f:'js/time_checker.js', n: 'time_checker_js', j:1});
+        jsl.push({f:'js/ui/contextMenu.js', n: 'context_menu_js', j: 1});
+        jsl.push({f:'js/ui/dragselect.js', n: 'dargselect_js', j:1});
+        jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
+        jsl.push({f:'js/ui/sms.js', n: 'sms_js', j: 1, w: 1});
         jsl.push({f:'js/fm/account.js', n: 'fm_account_js', j:1});
         jsl.push({f:'js/fm/account-change-password.js', n: 'fm_account_change_password_js', j:1});
         jsl.push({f:'js/fm/account-change-email.js', n: 'fm_account_change_email_js', j:1});
         jsl.push({f:'js/fm/dialogs.js', n: 'fm_dialogs_js', j:1});
         jsl.push({f:'js/fm/properties.js', n: 'fm_properties_js', j:1});
         jsl.push({f:'js/ui/dropdowns.js', n: 'dropdowns_js', j:1});
+        jsl.push({f:'css/node-filter.css', n: 'nodefilter_css', j:2});
+        jsl.push({f:'js/ui/node-filter.js', n: 'nodefilter_js', j:1});
         jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
         jsl.push({f:'js/fm/affiliate.js', n: 'fm_affiliate_js', j: 1});
         jsl.push({f:'js/fm/vpn.js', n: 'fmvpn_js', j: 1});
-        jsl.push({f:'js/ui/contextMenu.js', n: 'context_menu_js', j: 1});
-        jsl.push({f:'js/ui/dragselect.js', n: 'dargselect_js', j:1});
 
         // Gallery helpers
         jsl.push({f:'js/fm/gallery/helpers/GalleryTitleControl.js', n: 'fm_gallery_title_control_js', j:1});
@@ -2873,8 +2886,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/fm/albums/Albums.js', n: 'fm_albums_js', j:1});
         jsl.push({f:'js/fm/albums/AlbumTimeline.js', n: 'fm_albums_timeline_js', j:1});
 
-        jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
-        jsl.push({f:'js/ui/sms.js', n: 'sms_js', j: 1, w: 1});
         jsl.push({f:'html/onboarding.html', n: 'onboarding', j:0,w:2});
         jsl.push({f:'css/onboarding.css', n: 'onboarding_css', j:2,w:5,c:1,d:1,cache:1});
 
@@ -2901,7 +2912,6 @@ else if (!browserUpdate) {
         jsl.push({f:'css/context-menu.css', n: 'context_menu_css', j:2, w:5, c:1, d:1, cache:1});
         jsl.push({f:'css/tables.css', n: 'tables_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/recents.css', n: 'recents_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/vpn.css', n: 'vpn_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/transfer-widget.css', n: 'transfer_widget_css', j:2, w:30, c:1, d:1, cache:1});
 
         // CSS Revamp changes
@@ -2915,6 +2925,7 @@ else if (!browserUpdate) {
         jsl.push({f:'html/fm.html', n: 'fm', j:0, w:3});
         jsl.push({f:'html/top-login.html', n: 'top-login', j:0});
         jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
+        jsl.push({f:'html/rewind.html', n: 'rewind_html', j:0});
         jsl.push({f:'css/topbar.css', n: 'topbar_css', j:2,w:5,c:1,d:1,cache:1});
     } // !is_mobile
 
@@ -3005,6 +3016,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/mobile/mobile.public.link.css', n: 'mobile_public_linkcss', j: 2, w: 1});
         jsl.push({f:'css/mobile/mobile.datepicker.css', n: 'mobile_datepicker_css', j: 2, w: 1});
         jsl.push({f:'css/mobile/mobile.account.cancel-subscription.css', n: 'mobile_account_cancel_sub_css', j: 2, w: 1});
+        jsl.push({f:'css/mobile/mobile.backup.recovery.css', n: 'mobile_backup_recovery_css', j: 2, w: 1});
 
         jsl.push({f:'html/mobile.html', n: 'mobile', j: 0, w: 1});
         jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
@@ -3039,10 +3051,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.upload-overlay.js', n: 'mobile_upload_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.contact-link.js', n: 'mobile_contactlink_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.js', n: 'mobile_twofactor_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.twofactor.intro.js', n: 'mobile_twofactor_info_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.twofactor.setup.js', n: 'mobile_twofactor_setup_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.twofactor.verify-setup.js', n: 'mobile_twofactor_verify_setup_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.twofactor.verify-disable.js', n: 'mobile_twofactor_verify_disable_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.verify-login.js', n: 'mobile_twofactor_verify_login_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.sms.phone-input.js', n: 'mobile_sms_phone_input_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.sms.verify-code.js', n: 'mobile_sms_verify_code_js', j: 1, w: 1});
@@ -3075,7 +3083,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/settings/settings.js', n: 'mobile_settings_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/account.js', n: 'mobile_my_account_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/linksOptions.js', n: 'mobile_account_file_management_js', j:1, w: 1});
-        jsl.push({f:'js/mobile/settings/backupRecoveryKey.js', n: 'mobile_backup_recovery_key_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.account.paymentcard.js', n: 'mobile_payment_card_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.account.cancel-subscription.js', n: 'mobile_account_cancel_sub_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/settings/support.js', n: 'mobile_settings_support_js', j: 1, w:1});
@@ -3088,9 +3095,11 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/settings/verifyDelete.js', n: 'mobile_verify_delete_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/privacyAndSecurity.js', n: 'mobile_privacy_security_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/history.js', n: 'mobile_session_history_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/backupRecovery.js', n: 'mobile_backup_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/settings/fileManagement.js', n: 'mobile_file_management_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/notifications.js', n: 'mobile_account_notifications_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/settings/termsPolicies.js', n: 'mobile_terms_policies_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/settings/twofactorSettings.js', n: 'mobile_twofactor_settings_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.msgdialog.js', n: 'mobile_msgdialog_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.rack.slot.js', n: 'mobile_rack_slot_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.rack.js', n: 'mobile_rack_js', j: 1, w:1});
@@ -3289,6 +3298,13 @@ else if (!browserUpdate) {
             's4:fm_s4_policies_js': {f:'js/fm/s4/policies.js', n: 'fm_s4_policies_js', j:1},
             's4:fm_s4_policy_properties_js': {f:'js/fm/s4/properties-policy.js', n: 'fm_s4_policy_properties_js', j:1},
             's4:kernel': {f:'js/utils/s4.js', n: 'js_utils_s4_js', j: 1}
+        },
+        'rewind': {
+            'rewind_css': {f:'css/rewind.css', n: 'rewind_css', j:2, w:5},
+            'rewind_js': {f:'js/rewind/index.js', n: 'rewind_js', j: 1, w: 1},
+            'rewind_ui_js': {f:'js/rewind/ui.js', n: 'rewind_ui_js', j: 1, w: 1},
+            'rewind_utils_js': {f:'js/rewind/utils.js', n: 'rewind_utils_js', j: 1, w: 1},
+            'rewind_storage_js': {f:'js/rewind/storage.js', n: 'rewind_storage_js', j: 1, w: 1}
         },
         'chat': {
             /* chat related css */

@@ -174,15 +174,21 @@
     padding: 6px 8px;
     position: absolute;
     bottom: 100%;
+    flex-direction: row;
 }
 
 .mobile .media-viewer .video-controls .video-progress-block {
     padding: 11px;
 }
 
+.mobile .media-viewer .video-controls .bar {
+    width: auto;
+}
+
 .mobile .media-viewer .video-controls .bar > li {
     width: auto;
     height: auto;
+    margin: 0;
 }
 
 .mobile .media-viewer .video-controls button.v-btn {

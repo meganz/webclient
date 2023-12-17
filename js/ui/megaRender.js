@@ -223,6 +223,24 @@
                 '</span>' +
                 '<span class="file-block-title"></span>' +
             '</a>'
+        ],
+
+        'subtitles': [
+            // List view mode
+            '<table>' +
+                '<tr>' +
+                    '<td class="space-maintainer-start"></td>' +
+                    '<td megatype="fname">' +
+                        '<span class="transfer-filetype-icon"><img/></span>' +
+                        '<span class="tranfer-filetype-txt"></span>' +
+                    '</td>' +
+                    '<td megatype="size" class="size"></td>' +
+                    '<td megatype="timeAd" class="time ad"></td>' +
+                    '<td megatype="location" class="location">' +
+                        '<span class="simpletip simpletip-breadcrumb block w-full text-ellipsis"></span>' +
+                    '</td>' +
+                '</tr>' +
+            '</table>'
         ]
     };
 
@@ -242,6 +260,9 @@
         'file-requests': [
             '.grid-table.fm',
             '.fm-blocks-view.fm .file-block-scrolling',
+        ],
+        'subtitles': [
+            '.mega-dialog .grid-table'
         ]
     };
 
@@ -305,7 +326,6 @@
         var location = 'default';
 
         if (M.currentdirid === 'shares') {
-
             section = 'shares';
         }
         else if (M.currentdirid === 'out-shares') {
@@ -313,6 +333,12 @@
         }
         else if (M.currentrootid === 'file-requests') {
             section = 'file-requests';
+        }
+        else if (typeof aViewMode === 'string') {
+            section = aViewMode;
+
+            // For now, only lists are landing here, no need to set to 1
+            aViewMode = 0;
         }
         if (section === 'cloud-drive') {
 
@@ -425,7 +451,7 @@
                     $('.fm-empty-trashbin').removeClass('hidden');
                     $('.fm-clearbin-button').addClass('hidden');
                 }
-                else if (String(M.currentdirid).substr(0, 7) === 'search/') {
+                else if (String(M.currentdirid).substr(0, 7) === 'search/' || mega.ui.mNodeFilter.selectedFilters) {
                     $('.fm-empty-search').removeClass('hidden');
                 }
                 else if (M.currentdirid === M.RootID && folderlink) {
@@ -1365,6 +1391,49 @@
                 }
 
                 return renderTemplate;
+            },
+            'subtitles': function(aNode, aProperties, aTemplate) {
+                let tmp;
+                let title = [];
+
+                if (String(aProperties.name).length > 78) {
+                    if (aProperties.width) {
+                        title.push(`${aProperties.width}x${aProperties.height} @${aProperties.fps}fps`);
+                    }
+                    if (aProperties.codecs) {
+                        title.push(aProperties.codecs);
+                    }
+                    if (aNode.s) {
+                        title.push(bytesToSize(aNode.s, 0));
+                    }
+                    if (aProperties.name) {
+                        title.push(aProperties.name);
+                    }
+                }
+                title = title.join(' ');
+
+                if (aProperties.size !== undefined) {
+                    aTemplate.querySelector('.size').textContent = aProperties.size;
+                }
+                aTemplate.querySelector('.time').textContent = aProperties.time;
+                aTemplate.querySelector('.location span').textContent =
+                    aNode.p === M.RootID ? l[164] : M.d[aNode.p].name;
+
+                tmp = aTemplate.querySelector('.tranfer-filetype-txt');
+                tmp.textContent = aProperties.name;
+                if (title) {
+                    tmp.setAttribute('title', title);
+                }
+
+                tmp = aTemplate.querySelector('.transfer-filetype-icon');
+
+                if (aProperties.icon) {
+                    tmp.classList.add(aProperties.icon);
+                }
+
+                this.addClasses(tmp, aProperties.classNames);
+
+                return aTemplate;
             }
         }),
 

@@ -36,6 +36,16 @@
  * - Clear button - simple extension of adding clear button on right side of input
  *      Class: `clearButton`
  *      Example: `<input class="underlinedText clearButton"/>`
+ *
+ * - Copy to clipboard button - simple extension of adding Copy to clipboard button on right side of input
+ *      Class: `copyButton`
+ *      Example: `<input class="underlinedText copyButton"/>`
+ *      Options once MegaInput init:
+ *          Pass `copyToastText` on options once MegaInput if custom text in "Copied to clipboard" toast is required
+ *
+ *              `var megaInput = new mega.ui.MegaInputs($input, {
+ *                  copyToastText: l.value_copied
+ *              });`
  */
 mega.ui.MegaInputs.prototype.underlinedText = function() {
 
@@ -295,6 +305,25 @@ mega.ui.MegaInputs.prototype.underlinedText._withIconOrPrefix = function() {
 
     var $input = this.$input;
     var $wrapper = this.$wrapper;
+
+    // Copy to clipboard button
+    if ($input.hasClass('copyButton')) {
+
+        const icon = is_mobile ? 'sprite-mobile-fm-mono icon-copy-thin-outline' :
+            'sprite-fm-mono icon-copy-2';
+
+        $wrapper.safeAppend(`<i class="${icon} copy-input-value"></i>`);
+
+        const $copyBtn = $('.copy-input-value', $wrapper);
+
+        $copyBtn.rebind('click.copyInputValue tap.copyInputValue', () => {
+            copyToClipboard(
+                $input.val(),
+                escapeHTML(this.options.copyToastText) ||  l[371]
+            );
+            return false;
+        });
+    }
 
     if ($input.hasClass('clearButton')) {
 

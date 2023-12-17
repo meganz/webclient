@@ -695,7 +695,6 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                 var activeDate = '--------';
                 if (dd) {
                     activeDate = new Date(dd.substr(0, 4), dd.substr(4, 2) - 1, dd.substr(6, 2));
-                    // activeDate = activeDate.toLocaleDateString();
                     activeDate = time2date(activeDate.getTime() / 1000, 1);
                 }
                 $('.business-sub-last-active span', $subTr).text(activeDate);
@@ -2723,7 +2722,6 @@ BusinessAccountUI.prototype.viewBusinessInvoicesPage = function () {
             var invId = invoicesList[k].n;
 
             $newInvoiceRow.attr('id', invId);
-            // $newInvoiceRow.find('.inv-date').text(invoiceDate.toLocaleDateString());
             $newInvoiceRow.find('.inv-date').text(time2date(invoicesList[k].ts, 1));
             $newInvoiceRow.find('.inv-desc').text(invoicesList[k].d);
             $('.inv-total', $newInvoiceRow).text(formatCurrency(invoicesList[k].tot));

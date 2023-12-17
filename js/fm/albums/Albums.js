@@ -82,6 +82,10 @@ lazy(mega.gallery, 'albums', () => {
      * @returns {void}
      */
     scope.reportDownload = () => {
+        if (pfcol) {
+            eventlog(99954);
+        }
+
         const onlySelection = scope.albums.grid.timeline && scope.albums.grid.timeline.selCount > 0;
         eventlog((onlySelection) ? 99793 : 99792);
     };
@@ -4062,6 +4066,8 @@ lazy(mega.gallery, 'albums', () => {
             const rfBlock = $('.fm-right-files-block', '.fmholder');
             rfBlock.removeClass('hidden');
             $('.onboarding-control-panel', rfBlock).addClass('hidden');
+
+            eventlog(99952);
         }
 
         /**

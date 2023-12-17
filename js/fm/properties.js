@@ -81,6 +81,7 @@
         var versioningFlag = false;
         var hasValid = false;
         var icons = [];
+        let fromRewind = false;
         const selected = [];
 
         for (var i = $.selected.length; i--;) {
@@ -129,6 +130,10 @@
         if (n.tvf) {
             $dialog.addClass('versioning');
             versioningFlag = true;
+
+            if (n.rewind) {
+                fromRewind = true;
+            }
         }
 
         // Hide versioning details temporarily, due to it not working correctly in MEGA Lite / Infinity
@@ -155,6 +160,7 @@
                 onIdle(() => {
                     // we pass the filehandle, so it is available if we search on files on search
                     M.renderPathBreadcrumbs(n.h, true);
+                    mBroadcaster.sendMessage('properties:finish', n.h);
                 });
             }
             return $dialog;
@@ -184,13 +190,16 @@
                 }
                 showToast('clipboard', notificationText);
             }
-            var star = '';
+            var icon = '';
             const rootHandle = M.getNodeRoot(n.h);
 
             if (n.fav && !folderlink && rootHandle !== M.RubbishID) {
-                star = ' sprite-fm-mono icon-favourite-filled';
+                icon = ' sprite-fm-mono icon-favourite-filled';
             }
-            $dialog.find('.file-status-icon').attr('class', 'file-status-icon ' + star);
+            else if (missingkeys[n.h]) {
+                icon = ' sprite-fm-mono icon-info';
+            }
+            $('.file-status-icon', $dialog).attr('class', 'file-status-icon ' + icon);
 
             if (icons.includes('outgoing')) {
                 $dialog.addClass('shared');
@@ -315,7 +324,7 @@
                     p.t11 = fm_contains(sfilecnt, sfoldercnt, true);
                 }
             }
-            if (filecnt && versioningFlag && M.currentrootid !== M.RubbishID) {
+            if (filecnt && versioningFlag && M.currentrootid !== M.RubbishID && !fromRewind) {
                 p.t14 = '<a id="previousversions">' + p.t14 + '</a>';
             }
         }

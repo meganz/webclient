@@ -112,9 +112,12 @@ var signin = {
             // Show a failed login
             $('#login-name2').megaInputsShowError().blur();
             $('#login-password2').megaInputsShowError(l[7431]).val('').blur();
+            if (document.activeElement) {
+                document.activeElement.blur();
+            }
 
             msgDialog('warninga', l[135], l[7431], false, () => {
-                $('#login-name2').select();
+                $('#login-password2').select();
             });
         }
     }

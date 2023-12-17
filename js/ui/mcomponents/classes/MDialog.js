@@ -8,7 +8,7 @@ class MDialog extends MComponent {
      * @param {String} [data.leftIcon] Classes for the side icon on the left
      * @param {Function} [onclose] Callback to trigger when the dialog is closed
      */
-    constructor({ ok, cancel, dialogClasses, contentClasses, leftIcon, onclose, doNotShowCheckboxText }) {
+    constructor({ ok, cancel, dialogClasses, contentClasses, leftIcon, onclose, doNotShowCheckboxText, dialogName }) {
         super('section.mega-dialog-container:not(.common-container)', false);
 
         this._ok = ok;
@@ -21,6 +21,8 @@ class MDialog extends MComponent {
         this.onclose = onclose;
 
         this._doNotShowCheckboxText = doNotShowCheckboxText;
+
+        this._dialogName = dialogName || 'm-dialog';
 
         if (leftIcon) {
             this.leftIcon = document.createElement('i');
@@ -88,8 +90,8 @@ class MDialog extends MComponent {
     }
 
     show() {
-        // @todo FIXME use *unique* names per dialog
-        M.safeShowDialog('m-dialog', () => {
+        // use *unique* names per dialog
+        M.safeShowDialog(this._dialogName, () => {
             this._show();
 
             if (this.onMDialogShown) {
@@ -97,6 +99,7 @@ class MDialog extends MComponent {
             }
 
             return $(this.el).rebind('dialog-closed.mDialog', () => {
+                delete this.isShowing;
                 this.detachEl();
 
                 if (typeof this.onclose === 'function') {
@@ -161,9 +164,15 @@ class MDialog extends MComponent {
                 this._aside.classList.remove('-ml-18');
             }
         }
+
+        this.isShowing = true;
     }
 
     hide(ignoreNewOnes = false) {
+        if (!this.isShowing) {
+            return;
+        }
+
         const nextDialog = this.el.nextElementSibling;
 
         if (!ignoreNewOnes && nextDialog && nextDialog.classList.contains('m-dialog')) {
@@ -177,7 +186,7 @@ class MDialog extends MComponent {
             delete this._doNotShowCheckbox;
         }
 
-        assert($.dialog === 'm-dialog');
+        assert($.dialog === this._dialogName);
         closeDialog();
     }
 
@@ -250,11 +259,14 @@ class MDialog extends MComponent {
             this.okBtn = new MButton(
                 this._ok.label || l[1596],
                 null,
-                () => {
+                async() => {
                     let result = true;
 
                     if (typeof this._ok === 'function') {
                         result = this._ok();
+                    }
+                    else if (this._ok.callback && this._ok.callback[Symbol.toStringTag] === 'AsyncFunction') {
+                        result = await this._ok.callback();
                     }
                     else if (this._ok.callback) {
                         result = this._ok.callback();

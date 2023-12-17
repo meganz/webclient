@@ -310,6 +310,29 @@ mega.tpw = new function TransferProgressWidget() {
         this.updateHeaderAndContent();
     };
 
+    /**
+     * Hide action buttons if file node is removed
+     * @return {void}
+     */
+    const hideCompleteActions = (e) => {
+        let actionsNode;
+
+        if (!(e.currentTarget.classList.contains('complete')
+            && (actionsNode = e.currentTarget.querySelector('.transfer-complete-actions')))) {
+
+            return;
+        }
+
+        const h = e.currentTarget.getAttribute('nhandle')
+            || e.currentTarget.getAttribute('id').split('_').pop();
+
+        if (h && M.d[h]) {
+            actionsNode.classList.remove('hidden');
+        }
+        else {
+            actionsNode.classList.add('hidden');
+        }
+    };
 
     var actionsOnRowEventHandler = function() {
         var $me = $(this);
@@ -451,9 +474,10 @@ mega.tpw = new function TransferProgressWidget() {
         $widgetFooter = $('.transfer-widget-footer', $widget);
         $overQuotaBanner = $('.banner.transfer', $widget);
         $rowTemplate = $($(tpwRowSelector, $rowsContainer)[0]).clone();
+        $rowTemplate.rebind('mouseover.hideButtons', hideCompleteActions);
         rowProgressWidth = $($rowsContainer[0]).find('.transfer-progress-bar').width();
-        $downloadRowTemplate = $rowTemplate.clone().removeClass('upload').addClass('download icon-down');
-        $uploadRowTemplate = $rowTemplate.clone().removeClass('download').addClass('upload icon-up');
+        $downloadRowTemplate = $rowTemplate.clone(true).removeClass('upload').addClass('download icon-down');
+        $uploadRowTemplate = $rowTemplate.clone(true).removeClass('download').addClass('upload icon-up');
         $uploadChart = $('.transfer-progress-type.upload .progress-chart', $widgetHeadAndBody);
         $downloadChart = $('.transfer-progress-type.download .progress-chart', $widgetHeadAndBody);
 
@@ -706,7 +730,8 @@ mega.tpw = new function TransferProgressWidget() {
                 $targetedRow.remove();
             }
             if (!$row) {
-                $row = (type === this.DOWNLOAD) ? $downloadRowTemplate.clone() : $uploadRowTemplate.clone();
+                $row = (type === this.DOWNLOAD)
+                    ? $downloadRowTemplate.clone(true) : $uploadRowTemplate.clone(true);
 
                 $row.attr('id', id);
             }

@@ -185,6 +185,17 @@ FileManager.prototype.initFileManager = async function() {
                 await s4load;
             }
         }
+
+        if (mega.rewindEnabled) {
+
+            Promise.resolve(M.require('rewind'))
+                .then(() => {
+                    mega.rewind.init();
+                })
+                .catch((ex) => {
+                    reportError(ex);
+                });
+        }
     }
 
     if (path) {
@@ -810,6 +821,10 @@ FileManager.prototype.initFileManagerUI = function() {
             M.openFolder(M.currentdirid, true).then(reselect.bind(null, 1));
         }
 
+        if (viewValue === 2 && mega.ui.mNodeFilter) {
+            mega.ui.mNodeFilter.resetFilterSelections();
+        }
+
         return false;
     });
 
@@ -912,7 +927,7 @@ FileManager.prototype.initFileManagerUI = function() {
         }
         var $target = $(e.target);
         var exclude = '.upgradelink, .campaign-logo, .resellerbuy, .linkified, '
-            + 'a.red, a.mailto, a.top-social-button, .notif-help, .vpn-link';
+            + 'a.red, a.mailto, a.top-social-button, .notif-help';
 
         if ($target.attr('type') !== 'file'
             && !$target.is(exclude)
@@ -1529,7 +1544,9 @@ FileManager.prototype.initContextUI = function() {
     var safeMoveNodes = function() {
         if (!$(this).hasClass('disabled')) {
             $.hideContextMenu();
-            M.safeMoveNodes(String($(this).attr('id')).replace('fi_', '')).catch(dump);
+            mLoadingSpinner.show('safeMoveNodes');
+            M.safeMoveNodes(String($(this).attr('id')).replace('fi_', '')).catch(dump)
+                .finally(() => mLoadingSpinner.hide('safeMoveNodes'));
         }
         return false;
     };
@@ -3000,7 +3017,9 @@ FileManager.prototype.initUIKeyEvents = function() {
                 $.warningCallback = null;
             }
         }
-        else if (e.keyCode === 13 && ($.msgDialog === 'confirmation' || $.msgDialog === 'remove')) {
+        else if (e.keyCode === 13 && ($.msgDialog === 'confirmation' || $.msgDialog === 'remove' ||
+            (($.msgDialog === 'warninga' || $.msgDialog === 'warningb' || $.msgDialog === 'info' ||
+            $.msgDialog === 'error') && $('#msgDialog .mega-button').length === 1))) {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
@@ -4021,7 +4040,8 @@ FileManager.prototype.getDDhelper = function getDDhelper() {
 FileManager.prototype.addSelectDragDropUI = function(refresh) {
     "use strict";
 
-    if (this.currentdirid && (this.currentdirid.substr(0, 7) === 'account' || M.isGalleryPage())) {
+    if (this.currentdirid &&
+        (this.currentdirid.substr(0, 7) === 'account' || M.isGalleryPage())) {
         return false;
     }
 
@@ -4451,7 +4471,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
                 $('.fm-download-as-zip', $btnWrap).rebind('click', () => {
 
-                    eventlog(99766);
+                    eventlog(pfcol ? 99954 : 99766);
                     // Download the current folder, could be the root or sub folder
                     M.addDownload([M.RootID], true);
                 });

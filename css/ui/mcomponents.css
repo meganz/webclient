@@ -233,6 +233,9 @@ body.rtl .m-dropdown-item i.ml-3 {
 .gap-4 {
     gap: 1rem;
 }
+.block {
+    display: block;
+}
 .flex {
     display: flex;
 }

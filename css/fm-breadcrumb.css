@@ -1,0 +1,71 @@
+.breadcrumb-dropdown {
+    display: none;
+    position: relative;
+}
+.breadcrumb-dropdown.active {
+  display: flex;
+  flex-direction: column;
+  width: max-content;
+  min-width: 200px;
+  background-color: var(--context-menu-background);
+  padding: 10px;
+  z-index: 999;
+  border-radius: 12px;
+  box-shadow: var(--dropdown-shadow);
+  left: 24px;
+  position: absolute;
+  top: 32px;
+}
+.fm-breadcrumbs-wrapper .breadcrumb-dropdown.active {
+    max-height: 85vh;
+    z-index: 300;
+}
+.rtl .breadcrumb-dropdown.active {
+    left: auto;
+    right: 24px;
+}
+.search-bottom-wrapper .breadcrumb-dropdown {
+    position: absolute;
+    bottom: 52px;
+    top: auto;
+    z-index: 200;
+}
+
+.breadcrumb-dropdown a {
+    height: 32px;
+    padding: 6px;
+    box-sizing: border-box;
+    border-radius: 4px;
+    font: var(--text-body1);
+    color: var(--stroke-main-inverted);
+    opacity: 0.7;
+    display: flex;
+    position: relative;
+    margin-right: 0;
+    align-items: center;
+}
+
+.breadcrumb-dropdown a:hover {
+    opacity: 1;
+    background-color: var(--stroke-grey-4);
+}
+
+.breadcrumb-dropdown a i {
+    display: block;
+    --mask-color: var(--icon-rest);
+}
+
+.breadcrumb-dropdown a span {
+    margin-left: 8px;
+    white-space: nowrap;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fm-breadcrumbs.contacts .right-arrow-bg span {
+    display: none;
+}
+.fm-picker-breadcrumbs .fm-breadcrumbs.contacts .right-arrow-bg span {
+    display: inline-block;
+}

@@ -125,6 +125,13 @@ body,
             --mobile-background-blur-subtle: blur(2px);
             --mobile-background-blur-medium: blur(4px);
             --mobile-background-blur-strong: blur(8px);
+
+
+    /* default maximum element width: inputs, buttons, etc */
+
+        --mobile-elem-max-width: 382px;
+        --mobile-page-max-width: 697px;
+        --mobile-tablet-elem-width: 327px;
 }
 
 

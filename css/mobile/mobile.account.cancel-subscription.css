@@ -18,7 +18,7 @@
 }
 
 .cancel-subscription-survey .mega-component.banner {
-    max-width: 382px;
+    max-width: var(--mobile-elem-max-width);
 }
 
 .cancel-subscription-survey .cancel-sub-buttons {

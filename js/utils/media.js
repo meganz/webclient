@@ -886,6 +886,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
         }, 3000);
     };
 
+    let speedMenu;
+    let subtitlesMenu;
+
     // @private Init custom video controls
     var _initVideoControls = function(wrapper, streamer, node, options) {
         var $wrapper = $(wrapper);
@@ -898,6 +901,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
         var filters = Object.create(null);
         let duration, playevent;
         const MOUSE_IDLE_TID = 'auto-hide-media-controls';
+        const $playPauseButton = $('.play-pause-video-button', $wrapper);
+        const $watchAgainButton = $('.watch-again-button', $wrapper);
+        let playbackRate = 1;
+        let audioTime = 0;
+        let previousTime = 0;
+        let continuePlay;
 
         const props = Object.defineProperties(Object.create(null), {
             duration: {
@@ -920,7 +929,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
         var $progressBar = $('.video-time-bar', $videoControls);
         var $fullscreen = $('.fs', $videoControls);
         var $volumeBar = $('.volume-bar', $videoControls);
-        var $pendingBlock = $('.viewer-pending', $wrapper);
+        var $pendingBlock = $(is_embed ? '.viewer-pending' : '.loader-grad', $wrapper);
+        const $repeat = $('.repeat', $videoControls);
+        const $speed = $('.speed', $videoControls);
+        const $subtitlesButton = $('button.subtitles', $videoControls);
 
         // time-update elements and helpers.
         var onTimeUpdate;
@@ -946,6 +958,16 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         // As the video is playing, update the progress bar
         onTimeUpdate = function(offset, length) {
+            // Recalculate actual time and reset playbackRate for audio
+            if (streamer.stream._audioSource) {
+                streamer.stream._audioSource.playbackRate.value = playbackRate;
+                audioTime = offset = (offset - previousTime) * playbackRate + audioTime;
+                previousTime = streamer.currentTime;
+                if (audioTime >= duration) {
+                    videoElement.pause();
+                }
+            }
+
             offset = (offset > length ? length : offset) | 0;
 
             if (offset !== onTimeUpdate.last) {
@@ -963,44 +985,200 @@ FullScreenManager.prototype.enterFullscreen = function() {
             }
         };
 
+        const isAudio = is_audio(node);
+
+        if (isAudio) {
+            $subtitlesButton.parent().addClass('hidden');
+        }
+        else if (page === 'download' || is_embed || pfcol) {
+            $subtitlesButton.attr('disabled', 'disabled').addClass('mask-color-grey-out');
+        }
+
+        let $subtitles;
+        let subtitlesManager;
+        if (!is_mobile && !is_embed) {
+            subtitlesManager = mega.utils.subtitles;
+            subtitlesManager.init();
+        }
+
+        const selectSubtitles = (index) => {
+            const success = subtitlesManager.select(index);
+            if (success || success === undefined) {
+                $('div.video-subtitles', $wrapper).remove();
+                $subtitles = null;
+                if (index === -1) {
+                    return;
+                }
+                const subtitlesElement = document.createElement('div');
+                subtitlesElement.setAttribute('class', 'video-subtitles');
+                videoElement.after(subtitlesElement);
+                $subtitles = $('div.video-subtitles', $wrapper);
+                $subtitles.rebind('click.subtitles', () => {
+                    $playpause.trigger('click');
+                });
+                $subtitles.rebind('dblclick.subtitles', () => {
+                    $fullscreen.trigger('click');
+                });
+                subtitlesManager.displaySubtitles(streamer, $subtitles);
+                return true;
+            }
+            return false;
+        };
+
         // programmatic timeupdate helper
         setTimeUpdate = function() {
             if (streamer) {
                 onTimeUpdate(streamer.currentTime, props.duration);
+                if ($subtitles) {
+                    subtitlesManager.displaySubtitles(streamer, $subtitles);
+                }
             }
         };
         $video.rebind('timeupdate.xyz', setTimeUpdate);
+
+        const volumeIcon = (volume) => {
+            if (is_embed) {
+                return '';
+            }
+
+            if (volume < 0.5) {
+                return 'icon-volume-small-regular-outline';
+            }
+
+            if (volume >= 0.5 && volume < 0.75) {
+                return 'icon-volume-min-small-regular-outline';
+            }
+
+            return 'icon-volume-max-small-regular-outline';
+        };
+
+        const getTimeOffset = (x) => {
+            const maxduration = props.duration || 0;
+            const position = x - $progress.offset().left; // Click pos
+            const percentage = Math.max(0, Math.min(100, 100 * position / $progress.width()));
+            const selectedTime = Math.round(maxduration * percentage / 100);
+            return {time: selectedTime | 0, percent: percentage};
+        };
+
+        // Update Progress Bar control
+        const updatebar = (x) => {
+            if (streamer) {
+                const o = getTimeOffset(x);
+
+                // Update progress bar and video current time
+                progressBarElementStyle.setProperty('width', o.percent + '%');
+                videoTimingElement.textContent = secondsToTimeShort(o.time, 1);
+                $('.video-progress-time', $videoControls)
+                    .css({'left': (x - 15.4) + 'px', 'display': 'block'})
+                    .text(secondsToTimeShort(getTimeOffset(x).time, 1));
+
+                if (!timeDrag) {
+                    streamer.currentTime = o.time;
+
+                    // Also set startTime, needed by AudioStream.
+                    options.startTime = o.time;
+
+                    // Reset actual time and playbackRate for audio
+                    if (streamer.stream._audioSource) {
+                        streamer.stream._audioSource.playbackRate.value = playbackRate;
+                        previousTime = audioTime = o.time;
+                    }
+                }
+            }
+        };
 
         // Changes the button state of certain button's so the correct visuals can be displayed with CSS
         var changeButtonState = function(type) {
             // Play/Pause button
             if (type === 'playpause' && !timeDrag) {
-                if (videoElement.paused || videoElement.ended) {
+                if (is_embed && (videoElement.paused || videoElement.ended)) {
                     $('i', $playpause).removeClass('icon-pause').addClass('icon-play');
                     $playVideoButton.removeClass('hidden');
+                }
+                else if (
+                    $watchAgainButton.hasClass('hidden')
+                    && (videoElement.ended || streamer.stream._audioSource && audioTime >= duration)
+                ) {
+                    if (page === 'download' ? $.repeat === M.v[0].h : $.repeat === slideshowid) {
+                        if (isAudio) {
+                            audioTime = 0;
+                            updatebar();
+                        }
+
+                        $playpause.trigger('click');
+                        return;
+                    }
+
+                    $('i', $playpause).removeClass('icon-pause-small-regular-outline')
+                        .addClass('icon-rotate-ccw-small-regular-outline');
+                    $('.playpause-wrapper .tooltip', $wrapper).text(l.video_player_watch_again);
+                    $watchAgainButton.removeClass('hidden');
+                    videoElement.style.filter = 'blur(6px)';
+                }
+                else if (videoElement.paused) {
+                    if (is_embed) {
+                        $('i', $playpause).removeClass('icon-pause').addClass('icon-play');
+                    }
+                    else {
+                        $('i', $playpause).removeClass('icon-pause-small-regular-outline')
+                            .addClass('icon-play-small-regular-outline');
+                    }
+
+                    $('.playpause-wrapper .tooltip', $wrapper).text(l.video_player_play);
                     $pendingBlock.addClass('hidden');
+                    $watchAgainButton.addClass('hidden');
+                    $playPauseButton.removeClass('hidden');
+                    videoElement.style.filter = '';
+                    $('i', $playPauseButton).removeClass('icon-play-regular-solid')
+                        .addClass('icon-pause-small-regular-solid');
+                    tSleep(2.5).then(() => $playPauseButton.addClass('hidden'));
 
                     if (is_mobile && playevent) {
                         clearTimeout(hideMobileVideoControls);
                         $videoControls.removeClass('invisible');
                     }
-
-                    if (videoElement.ended && typeof slideshow_next === 'function' && $document.fullScreen()) {
-                        onIdle(() => slideshow_next());
-                    }
                 }
                 else {
-                    $('i', $playpause).removeClass('icon-play').addClass('icon-pause');
+                    if (is_embed) {
+                        $('i', $playpause).removeClass('icon-play').addClass('icon-pause');
+                    }
+                    else {
+                        $('i', $playpause).removeClass().addClass('sprite-fm-mono icon-pause-small-regular-outline');
+                    }
+
+                    $('.playpause-wrapper .tooltip', $wrapper).text(l.video_player_pause);
                     $playVideoButton.addClass('hidden');
+                    $watchAgainButton.addClass('hidden');
+                    videoElement.style.filter = '';
+                    if ($('i', $playPauseButton).hasClass('icon-pause-small-regular-solid')) {
+                        $playPauseButton.removeClass('hidden');
+                        $('i', $playPauseButton).addClass('icon-play-regular-solid')
+                            .removeClass('icon-pause-small-regular-solid');
+                        tSleep(2.5).then(() => $playPauseButton.addClass('hidden'));
+                    }
                 }
             }
             // Mute button
             else if (type === 'mute') {
                 if (videoElement.muted) {
-                    $('i', $mute).removeClass('icon-volume').addClass('icon-volume-muted');
+                    if (is_embed) {
+                        $('i', $mute).removeClass('icon-volume').addClass('icon-volume-muted');
+                    }
+                    else {
+                        $('i', $mute).removeClass().addClass('sprite-fm-mono icon-volume-x-small-regular-outline');
+                    }
+
+                    $('.vol-wrapper .tooltip', $wrapper).text(l.video_player_unmute);
                 }
                 else {
-                    $('i', $mute).removeClass('icon-volume-muted').addClass('icon-volume');
+                    if (is_embed) {
+                        $('i', $mute).removeClass('icon-volume-muted').addClass('icon-volume');
+                    }
+                    else {
+                        $('i', $mute).removeClass().addClass(`sprite-fm-mono ${volumeIcon(streamer.volume)}`);
+                    }
+
+                    $('.vol-wrapper .tooltip', $wrapper).text(l.video_player_mute);
                 }
             }
         };
@@ -1014,14 +1192,6 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     }
                 }, 2600);
             }
-        };
-
-        var getTimeOffset = function(x) {
-            var maxduration = props.duration || 0;
-            var position = x - $progress.offset().left; // Click pos
-            var percentage = Math.max(0, Math.min(100, 100 * position / $progress.width()));
-            var selectedTime = Math.round(maxduration * percentage / 100);
-            return {time: selectedTime | 0, percent: percentage};
         };
 
         // Set video duration in progress bar
@@ -1048,7 +1218,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 changeButtonState('mute');
             }
             streamer.volume += v;
-            $('span', $volumeBar).css('height', Math.round(streamer.volume * 100) + '%');
+            $('span', $volumeBar).css('width', Math.round(streamer.volume * 100) + '%');
         };
 
         // Increase/decrease color filter
@@ -1089,12 +1259,11 @@ FullScreenManager.prototype.enterFullscreen = function() {
         };
 
         // Set Init Values
-        changeButtonState('playpause');
         changeButtonState('mute');
         $('.video-timing', $wrapper).text('00:00');
         $progressBar.removeAttr('style');
         $volumeBar.find('style').removeAttr('style');
-        if ($('.viewer-pending', $wrapper).hasClass('hidden')) {
+        if ($(is_embed ? '.viewer-pending' : '.loader-grad', $wrapper).hasClass('hidden')) {
             $playVideoButton.removeClass('hidden');
         }
 
@@ -1110,9 +1279,41 @@ FullScreenManager.prototype.enterFullscreen = function() {
             applyVideoFilter.apply(this, options.filter.map(v => v / 10));
         }
 
+        // Playback Speed context menu
+        if (!speedMenu && !is_embed) {
+            speedMenu = contextMenu.create({
+                template: $('#media-viewer-speed-menu', $wrapper)[0],
+                sibling: $('.speed-wrapper .tooltip', $wrapper)[0],
+                animationDuration: 150,
+                boundingElement: $wrapper[0]
+            });
+        }
+
+        // Subtitles context menu
+        if (!subtitlesMenu && !is_embed) {
+            subtitlesMenu = contextMenu.create({
+                template: $('#media-viewer-subtitles-menu', $wrapper)[0],
+                sibling: $('.subtitles-wrapper .tooltip', $wrapper)[0],
+                animationDuration: 150,
+                boundingElement: $wrapper[0]
+            });
+        }
+
+        if (!$subtitlesButton.prop('disabled') && !is_mobile && !is_embed && !isAudio) {
+            subtitlesManager.configure(node);
+        }
+
         // Add event listeners for video specific events
         $video.rebind('play pause', function() {
-            changeButtonState('playpause');
+            if (!videoElement.paused &&
+                ($.dialog === 'subtitles-dialog' ||
+                $('.context-menu.subtitles', $wrapper).get(0) &&
+                $('.context-menu.subtitles', $wrapper).get(0).classList.contains('visible'))) {
+                videoElement.pause();
+            }
+            else {
+                changeButtonState('playpause');
+            }
         });
 
         $video.rebind('playing', function() {
@@ -1125,7 +1326,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                         setDuration(streamer.duration);
                     }
 
-                    if (is_audio(node)) {
+                    if (isAudio) {
                         streamer.on('duration', (ev, value) => {
                             if (duration < value) {
                                 setDuration(value);
@@ -1150,6 +1351,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
                         $playpause.trigger('click');
                     });
 
+                    $watchAgainButton.rebind('click', () => {
+                        $playpause.trigger('click');
+                    });
+
                     const $vc = $('.vol-wrapper', $wrapper);
 
                     if (streamer.hasAudio) {
@@ -1163,7 +1368,8 @@ FullScreenManager.prototype.enterFullscreen = function() {
                             title = escapeHTML(l[19060]).replace('%1', streamer.hasUnsupportedAudio);
                         }
                         $vc.attr('title', title);
-                        $('i', $vc).removeClass('icon-volume').addClass('icon-volume-muted');
+                        $('i', $vc).removeClass().addClass('sprite-fm-mono icon-volume-x-small-regular-outline');
+                        $('.vol-wrapper .tooltip', $wrapper).text(l.video_player_unmute);
                     }
 
                     streamer._megaNode = node;
@@ -1204,7 +1410,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         // Add events for all buttons
         $playpause.rebind('click', function() {
-            if (videoElement.paused || videoElement.ended) {
+            if (videoElement.paused || videoElement.ended || isAudio && !audioTime) {
                 if (dlmanager.isOverQuota) {
                     $wrapper.trigger('is-over-quota');
                     dlmanager.showOverQuotaDialog();
@@ -1214,6 +1420,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     if (streamer.currentTime >= props.duration) {
                         streamer.currentTime = 0;
                     }
+                    // Reset actual time for audio
+                    else if (streamer.stream._audioSource && audioTime >= props.duration) {
+                        streamer.currentTime = previousTime = audioTime = 0;
+                    }
                     else {
                         streamer.play();
                     }
@@ -1222,38 +1432,15 @@ FullScreenManager.prototype.enterFullscreen = function() {
             else {
                 videoElement.pause();
             }
+
+            // Reset playbackRate for audio
+            if (streamer.stream._audioSource) {
+                streamer.stream._audioSource.playbackRate.value = playbackRate;
+            }
             return false;
         });
 
-        // Volume Bar control
-        var volumeDrag = false;
-        /* Drag status */
-        $volumeBar.rebind('mousedown.volumecontrol', function(e) {
-            volumeDrag = true;
-            updateVolumeBar(e.pageY);
-        });
-
-        $document.rebind('mouseup.volumecontrol', function(e) {
-            if (volumeDrag) {
-                volumeDrag = false;
-                updateVolumeBar(e.pageY);
-            }
-        });
-
-        $document.rebind('mousemove.volumecontrol', function(e) {
-            if (volumeDrag) {
-                updateVolumeBar(e.pageY);
-            }
-        });
-
-        $('.vol-wrapper', $wrapper).rebind('mousewheel.volumecontrol', function(e) {
-            var delta = Math.max(-1, Math.min(1, (e.wheelDelta || e.deltaY || -e.detail)));
-            setVideoVolume(0.1 * delta);
-            return false;
-        });
-
-        // update Volume Bar control
-        var updateVolumeBar = function(y) {
+        const updateEmbedVolumeBar = (y) => {
             var $this = $($volumeBar);
 
             if (y) {
@@ -1286,6 +1473,72 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 }
             }
         };
+
+        // update Volume Bar control
+        var updateVolumeBar = function(x) {
+            if (is_embed) {
+                updateEmbedVolumeBar(x);
+                return;
+            }
+
+            var $this = $($volumeBar);
+
+            if (x) {
+                var position = $this.width() - (x - $this.offset().left);
+                var percentage = 100 - (100 * position / $this.width());
+
+                // Check within range
+                if (percentage > 100) {
+                    percentage = 100;
+                }
+                else if (percentage > 0) {
+                    videoElement.muted = false;
+                }
+                else {
+                    percentage = 0;
+                    videoElement.muted = true;
+                }
+
+                changeButtonState('mute');
+                $('span', $this).css('width', percentage + '%');
+                streamer.volume = percentage / 100;
+            }
+            else if (videoElement.muted) {
+                $('span', $this).css('width', '0%');
+            }
+            else {
+                var currentVolume = streamer.volume * 100;
+                $('span', $this).css('width', currentVolume + '%');
+            }
+        };
+
+        // Volume Bar control
+        var volumeDrag = false;
+        /* Drag status */
+        $volumeBar.rebind('mousedown.volumecontrol', (e) => {
+            volumeDrag = true;
+            updateVolumeBar(is_embed ? e.pageY : e.pageX);
+        });
+
+        $document.rebind('mouseup.volumecontrol', (e) => {
+            if (volumeDrag) {
+                volumeDrag = false;
+                updateVolumeBar(is_embed ? e.pageY : e.pageX);
+            }
+        });
+
+        $document.rebind('mousemove.volumecontrol', (e) => {
+            if (volumeDrag) {
+                updateVolumeBar(is_embed ? e.pageY : e.pageX);
+            }
+        });
+
+        $('.vol-wrapper', $wrapper).rebind('mousewheel.volumecontrol', (e) => {
+            var delta = Math.max(-1, Math.min(1, (e.wheelDelta || (is_embed ? e.deltaY : e.deltaX) || -e.detail)));
+            setVideoVolume(0.1 * delta);
+            return false;
+        });
+
         updateVolumeBar();
 
         // Add the event listener of clicking mute/unmute buttons from the right click menu when play video/audio
@@ -1303,24 +1556,6 @@ FullScreenManager.prototype.enterFullscreen = function() {
             }
             return false;
         });
-
-        // Update Progress Bar control
-        var updatebar = function(x) {
-            if (streamer) {
-                var o = getTimeOffset(x);
-
-                // Update progress bar and video current time
-                progressBarElementStyle.setProperty('width', o.percent + '%');
-                videoTimingElement.textContent = secondsToTimeShort(o.time, 1);
-
-                if (!timeDrag) {
-                    streamer.currentTime = o.time;
-
-                    // Also set startTime, needed by AudioStream.
-                    options.startTime = o.time;
-                }
-            }
-        };
 
         // Get page X based on event
         var getX = function(e) {
@@ -1365,6 +1600,8 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 $videoControl.removeClass('timeDrag');
                 _initHideMobileVideoControls($wrapper);
             }
+
+            $('.video-progress-time', $videoControls).css('display', '');
         });
 
         $document.rebind('mousemove.videoprogress', function(e) {
@@ -1374,7 +1611,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
         });
 
         $progress.rebind('mousemove.videoprogress', function(e) {
-            this.setAttribute('title', secondsToTimeShort(getTimeOffset(getX(e)).time, 1));
+            $('.video-progress-time', $videoControls).css('left', (getX(e) - 15.4) + 'px')
+                .text(secondsToTimeShort(getTimeOffset(getX(e)).time, 1));
+            $('.video-expected-time-bar', $videoControls)
+                .css('width', 100 * (getX(e) - $progress.offset().left) / $progress.width() + '%');
         });
 
         $progress.rebind('touchmove.videoprogress', function(e) {
@@ -1391,15 +1631,180 @@ FullScreenManager.prototype.enterFullscreen = function() {
             $fullscreen.attr('data-state', state ? 'cancel-fullscreen' : 'go-fullscreen');
 
             if (state) {
-                $('i', $fullscreen).removeClass('icon-fullscreen-enter').addClass('icon-fullscreen-leave');
+                $('i', $fullscreen).removeClass('icon-maximize-02-small-regular-outline')
+                    .addClass('icon-minimize-02-small-regular-outline');
+                $('.fs-wrapper .tooltip', $wrapper).text(l.video_player_exit_fullscreen);
             }
             else {
-                $('i', $fullscreen).removeClass('icon-fullscreen-leave').addClass('icon-fullscreen-enter');
+                $('i', $fullscreen).removeClass('icon-minimize-02-small-regular-outline')
+                    .addClass('icon-maximize-02-small-regular-outline');
+                $('.fs-wrapper .tooltip', $wrapper).text(l.video_player_fullscreen);
             }
         };
 
         var $element = page === 'download' ? $wrapper.find('.video-block') : $wrapper;
         var fullScreenManager = FullScreenManager($fullscreen, $element).change(setFullscreenData);
+
+        // Bind Repeat button
+        $repeat.rebind('click', () => {
+            if (page === 'download' ? $.repeat === M.v[0].h : $.repeat === slideshowid) {
+                delete $.repeat;
+                $repeat.removeClass('mask-color-brand');
+                $('.repeat-wrapper .tooltip', $wrapper).text(l.video_player_repeat);
+            }
+            else {
+                $.repeat = page === 'download' ? M.v[0].h : slideshowid;
+                $repeat.addClass('mask-color-brand');
+                $('.repeat-wrapper .tooltip', $wrapper).text(l.video_player_stop_repeat);
+                eventlog(99940);
+            }
+        });
+
+        // Speed icon
+        $speed.rebind('click.media-viewer', function() {
+            var $this = $(this);
+
+            if ($this.hasClass('hidden')) {
+                return false;
+            }
+            if ($this.hasClass('active')) {
+                $this.removeClass('active deactivated');
+                contextMenu.close(speedMenu);
+            }
+            else {
+                $this.addClass('active deactivated').trigger('simpletipClose');
+                // xxx: no, this is not a window.open() call..
+                // eslint-disable-next-line local-rules/open
+                contextMenu.open(speedMenu);
+            }
+            return false;
+        });
+
+        // Subtitles icon
+        $subtitlesButton.rebind('click.media-viewer', function() {
+            var $this = $(this);
+
+            if ($this.hasClass('hidden')) {
+                return false;
+            }
+            if ($this.hasClass('active')) {
+                $this.removeClass('active deactivated');
+                contextMenu.close(subtitlesMenu);
+            }
+            else {
+                if (videoElement.paused) {
+                    continuePlay = false;
+                }
+                else {
+                    continuePlay = true;
+                    $playpause.trigger('click');
+                    $wrapper.rebind('mouseup.close-subtitles-context-menu', () => {
+                        if (videoElement.paused) {
+                            $playpause.trigger('click');
+                        }
+                        $wrapper.off('mouseup.close-subtitles-context-menu');
+                    });
+                }
+
+                $this.addClass('active deactivated').trigger('simpletipClose');
+                // xxx: no, this is not a window.open() call..
+                // eslint-disable-next-line local-rules/open
+                contextMenu.open(subtitlesMenu);
+            }
+            return false;
+        });
+
+        // Close context menu
+        if (!is_embed) {
+            $wrapper.rebind('mouseup.video-player', () => {
+                $speed.removeClass('active deactivated');
+                contextMenu.close(speedMenu);
+
+                $subtitlesButton.removeClass('active deactivated');
+                contextMenu.close(subtitlesMenu);
+            });
+        }
+
+        // Bind Playback Speed context menu
+        $('.context-menu.playback-speed button', $wrapper).rebind('click.media-viewer', function() {
+            const $this = $(this);
+
+            if ($this.hasClass('05x')) {
+                $('i', $speed).removeClass()
+                    .addClass('sprite-fm-mono icon-playback-05x-small-regular-outline icon-size-36');
+                $speed.addClass('margin-2');
+                $('.context-menu.playback-speed button i', $wrapper).addClass('hidden');
+                $('.context-menu.playback-speed button.05x i', $wrapper).removeClass('hidden');
+                videoElement.playbackRate = 0.5;
+                if (streamer.stream._audioSource) {
+                    streamer.stream._audioSource.playbackRate.value = 0.5;
+                    playbackRate = 0.5;
+                }
+            }
+            else if ($this.hasClass('1x')) {
+                $('i', $speed).removeClass().addClass('sprite-fm-mono icon-playback-1x-small-regular-outline');
+                $speed.removeClass('margin-2');
+                $('.context-menu.playback-speed button i', $wrapper).addClass('hidden');
+                $('.context-menu.playback-speed button.1x i', $wrapper).removeClass('hidden');
+                videoElement.playbackRate = 1;
+                if (streamer.stream._audioSource) {
+                    streamer.stream._audioSource.playbackRate.value = 1;
+                    playbackRate = 1;
+                }
+            }
+            else if ($this.hasClass('15x')) {
+                $('i', $speed).removeClass()
+                    .addClass('sprite-fm-mono icon-playback-15x-small-regular-outline icon-size-36');
+                $speed.addClass('margin-2');
+                $('.context-menu.playback-speed button i', $wrapper).addClass('hidden');
+                $('.context-menu.playback-speed button.15x i', $wrapper).removeClass('hidden');
+                videoElement.playbackRate = 1.5;
+                if (streamer.stream._audioSource) {
+                    streamer.stream._audioSource.playbackRate.value = 1.5;
+                    playbackRate = 1.5;
+                }
+            }
+            else if ($this.hasClass('2x')) {
+                $('i', $speed).removeClass().addClass('sprite-fm-mono icon-playback-2x-small-regular-outline');
+                $speed.removeClass('margin-2');
+                $('.context-menu.playback-speed button i', $wrapper).addClass('hidden');
+                $('.context-menu.playback-speed button.2x i', $wrapper).removeClass('hidden');
+                videoElement.playbackRate = 2;
+                if (streamer.stream._audioSource) {
+                    streamer.stream._audioSource.playbackRate.value = 2;
+                    playbackRate = 2;
+                }
+            }
+        });
+
+        // Bind Subtitles context menu
+        $('.context-menu.subtitles', $wrapper).rebind('click.media-viewer', 'button', function() {
+            const $this = $(this);
+            const name = $this[0].className;
+            const index = name === 'add' ? -1 : $this.index();
+            const length = $this.parent().children().length;
+
+            if (index >= 0 && index < length) {
+                const success = selectSubtitles(index - 1);
+                if (success || success === undefined) {
+                    $('.context-menu.subtitles button i', $wrapper).addClass('hidden');
+                    $(`.context-menu.subtitles button.${name} i`, $wrapper).removeClass('hidden');
+                    if (index === 0) {
+                        $subtitlesButton.removeClass('mask-color-brand');
+                    }
+                    else {
+                        $subtitlesButton.addClass('mask-color-brand');
+                    }
+                }
+            }
+            else if (index === -1) {
+                if (!videoElement.paused) {
+                    continuePlay = true;
+                    $playpause.trigger('click');
+                }
+                subtitlesManager.addSubtitlesDialog(continuePlay);
+            }
+        });
 
         // Video playback keyboard event handler.
         var videoKeyboardHandler = function(ev) {
@@ -1511,6 +1916,15 @@ FullScreenManager.prototype.enterFullscreen = function() {
             $progress.off();
             $playpause.off();
             $volumeBar.off();
+            $repeat.off();
+            $speed.off();
+            if ($subtitles) {
+                $subtitles.off();
+            }
+            $subtitlesButton.off();
+            if (!is_mobile && subtitlesManager) {
+                subtitlesManager.destroySubtitlesMenu();
+            }
             delay.cancel(MOUSE_IDLE_TID);
 
             if (videoElement) {
@@ -1518,6 +1932,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
             }
             if (options.vad) {
                 return false;
+            }
+            if (speedMenu) {
+                contextMenu.close(speedMenu);
+            }
+            if (subtitlesMenu) {
+                contextMenu.close(subtitlesMenu);
             }
             fullScreenManager.destroy(!!$.videoAutoFullScreen);
             window.removeEventListener('keydown', videoKeyboardHandler, true);
@@ -1545,7 +1965,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
         var opt = {autoplay: options.autoplay};
         var $control = $('.viewer-vad-control', $wrapper).removeClass('skip');
         var $thumb = $('.thumb', $control).removeClass('active');
-        var $pendingBlock = $('.viewer-pending', $wrapper);
+        var $pendingBlock = $(is_embed ? '.viewer-pending' : '.loader-grad', $wrapper);
         var nop = function(ev) {
             ev.preventDefault();
             ev.stopPropagation();
@@ -1712,7 +2132,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
         });
 
         if (options.autoplay) {
-            $('.viewer-pending', $wrapper).removeClass('hidden');
+            $(is_embed ? '.viewer-pending' : '.loader-grad', $wrapper).removeClass('hidden');
         }
         options.autoplay = false;
 
@@ -1858,7 +2278,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 console.debug(ev.type, ev);
             }
 
-            var $pinner = $('.viewer-pending', $wrapper);
+            var $pinner = $(is_embed ? '.viewer-pending' : '.loader-grad', $wrapper);
             $pinner.removeClass('hidden');
             $('span', $pinner).text(navigator.onLine === false ? 'No internet access.' : '');
 
@@ -1904,7 +2324,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 console.debug(ev.type, ev);
             }
 
-            var $pinner = $wrapper.find('.viewer-pending');
+            var $pinner = $(is_embed ? '.viewer-pending' : '.loader-grad', $wrapper);
             if (this.file.playing) {
                 // only hide the spinner if we are not in the initial loading state
                 $pinner.addClass('hidden');
@@ -2150,7 +2570,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     }
 
                     // Show Loader until video is playing
-                    $('.viewer-pending', $wrapper).removeClass('hidden');
+                    $(is_embed ? '.viewer-pending' : '.loader-grad', $wrapper).removeClass('hidden');
                     $(this).addClass('hidden');
 
                     if (!vsp) {

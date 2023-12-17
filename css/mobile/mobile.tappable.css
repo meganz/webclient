@@ -62,7 +62,7 @@ Implemented styles:
 
 .nav-elem.normal.block {
     width: 100%;
-    max-width: 382px;
+    max-width: var(--mobile-elem-max-width);
 }
 
 .nav-elem.normal.block .primary-text {
@@ -263,6 +263,9 @@ button.nav-elem,
 
 .nav-elem i.icon-size-16 {
     --icon-size: 16px;
+}
+.nav-elem i.icon-size-20 {
+    --icon-size: 20px;
 }
 .nav-elem i.icon-size-22 {
     --icon-size: 22px;

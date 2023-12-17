@@ -172,7 +172,8 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
                                 s: node.s,
                                 c: node.hash,
                                 ts: node.mtime || node.ts,
-                                k: a32_to_base64(node.k)
+                                k: a32_to_base64(node.k),
+                                rewind: node.rewind
                             });
                         }
                         else {
@@ -221,6 +222,10 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
             if (!files.length) {
                 console.error('No files');
                 return webdl();
+            }
+
+            if (files[0].rewind) {
+                cmd.a = 'gd';
             }
 
             cmd.f = files;
@@ -370,7 +375,7 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
             zipid: z,
             zipname: zipname,
             preview: preview,
-            p: path,
+            p: n.path || path,
             ph: undefined,
             onDownloadProgress: this.dlprogress.bind(this),
             onDownloadComplete: this.dlcomplete.bind(this),
@@ -378,6 +383,11 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
             onDownloadError: this.dlerror.bind(this),
             onDownloadStart: this.dlstart.bind(this)
         };
+
+        if (n.rewind) {
+            entry.customRequest = 'gd';
+        }
+
         entries.push({node: n, entry: entry});
     }
 

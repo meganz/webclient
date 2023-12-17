@@ -19,7 +19,7 @@
 }
 
 .mobile .mega-promo-banner.overlay-wrap .content {
-    max-width: 382px;
+    max-width: var(--mobile-elem-max-width);
 }
 
 .mobile .mega-promo-banner .icon-mega-logo-rounded-square {

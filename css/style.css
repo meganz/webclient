@@ -4001,343 +4001,23 @@ body.loading .light-overlay {
     height: calc(100% - 48px);
     position: relative;
 }
-.fm-right-header {
-    -webkit-padding-end: 8px;
-    padding-inline-end: 8px;
-}
-.rtl .fm-right-header {
-    direction: rtl;
-}
-.fm-transfers-header {
-    -webkit-padding-end: 16px;
-    padding-inline-end: 16px;
-    margin-bottom: 4px;
-}
-.fm-right-header,
-.new-notification-top,
-.fm-transfers-header {
-    height: 48px;
-    flex-shrink: 0;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    white-space: nowrap;
-    background-color: var(--stroke-main);
-    position: relative;
-    overflow: hidden;
-}
-.fm-right-header .mega-button,
-.fm-transfers-header .mega-button {
-    -webkit-margin-end: 8px;
-    margin-inline-end: 8px;
-}
-.fm-transfers-header .mega-button {
-    margin-top: 5px;
-}
-.fm-transfers-header .mega-button i {
-    --mask-color: var(--icon-rest);
-}
-.fm-transfers-header .mega-button.transfer-clear-all-icon i {
-    --mask-color: var(--secondary-red);
-}
-.fm-right-header .mega-button.fm-new-shared-folder {
-    overflow: visible;
-}
-.fm-header-buttons {
-    float: right;
-    font-size: 0;
-    white-space: nowrap;
-    box-sizing: border-box;
-    padding-right: 9px;
-    height: 48px;
-    display: flex;
-    flex-direction: row-reverse;
-    align-items: center;
-}
-.rtl .fm-header-buttons {
-    float: left;
-    width: 100%;
-}
-
-.fm-breadcrumbs-block {
-    height: 36px;
-    overflow: hidden;
-    box-sizing: border-box;
-    font-size: 0;
-    white-space: nowrap;
-}
-.properties-breadcrumb .fm-breadcrumbs-block.info {
-    height: 24px;
-}
-.properties-breadcrumb .fm-breadcrumbs-wrapper.info {
-    -webkit-padding-start: 8px;
-    padding-inline-start: 8px;
-    margin-top: unset;
-}
-.fm-breadcrumbs-wrapper {
-    display: flex;
-    align-items: center;
-    -webkit-padding-start: 20px;
-    padding-inline-start: 20px;
-    margin-top: 6px;
-}
-.fm-breadcrumbs-block:not(.hidden) {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    -webkit-padding-end: 24px;
-    padding-inline-end: 24px;
-}
-.fm-breadcrumbs {
-    align-items: center;
-    cursor: pointer;
-    height: 24px;
-    display: flex;
-    position: relative;
-    text-decoration: none;
-    min-width: 0;
-}
-.fm-breadcrumbs.root {
-    flex-shrink: 0;
-}
-.properties-breadcrumb .fm-breadcrumbs:last-of-type {
-    flex-shrink: 0;
-    max-width: 70%;
-}
-.properties-breadcrumb .fm-breadcrumbs-wrapper a {
-    min-width: 44px;
-}
-.fm-breadcrumbs:last-of-type {
-    flex-shrink: 0;
-    max-width: 70%;
-}
-.fm-breadcrumbs:only-child {
-    max-width: 100%;
-}
-.fm-breadcrumbs .sprite-fm-mono {
-    --mask-color: var(--icon-rest);
-}
-
-.fm-breadcrumbs span.sprite-fm-mono {
-    margin-left: 10px;
-}
-
-.fm-breadcrumbs .next-arrow {
-    display: block;
-    top: 3px;
-    right: -4px;
-    --mask-color: var(--icon-rest);
-}
-.rtl .fm-breadcrumbs .next-arrow {
-    transform: rotate(180deg);
-}
-
-.crumb-overflow-link {
-    display: flex;
-    align-items: center;
-    padding: 0 4px;
-    background-color: var(--stroke-main);
-}
-.properties-breadcrumb .crumb-overflow-link {
-    background-color: unset;
-}
-.crumb-overflow-link .breadcrumb-dropdown-link {
-    border-radius: 12px;
-    height: 24px;
-}
-.crumb-overflow-link .breadcrumb-dropdown-link:hover {
-    background: var(--surface-grey-2);
-}
-.search-bottom-wrapper .crumb-overflow-link {
-    height: 64px;
-    background: var(--surface-grey-2);
-}
-.search-bottom-wrapper .crumb-overflow-link .breadcrumb-dropdown-link {
-    height: 24px;
-    border-radius: 12px;
-}
-.search-bottom-wrapper .crumb-overflow-link .breadcrumb-dropdown-link:hover {
-    background: var(--surface-grey-1);
-}
-.crumb-overflow-link i {
-    flex-shrink: 0;
-    --mask-color: var(--icon-rest);
-}
-.rtl .crumb-overflow-link i {
-    transform: rotate(180deg);
-}
-.crumb-overflow-link i.menu-icon {
-    margin: 0 8px;
-}
-
-.fm-breadcrumbs:first-child .sprite-fm-mono.icon-arrow-right {
-    --icon-size: 16px;
-}
-.fm-breadcrumbs .right-arrow-bg {
-    font: var(--text-body1);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
-    padding: 0 8px;
-    position: relative;
-    text-align: center;
-    user-select: text;
-}
-.fm-breadcrumbs.public-links i.small-icon.get-link {
-    position: absolute;
-    left: 12px;
-    top: 8px;
-    opacity: 0.75;
-    margin: 0;
-}
-.fm-account-top .right-arrow-bg {
-    font-size: var(--text-body1);
-    color: var(--text-color-high);
-    text-overflow: ellipsis;
-    width: 100%;
-    display: block;
-    overflow: hidden;
-}
-
-.breadcrumb-dropdown {
-    display: none;
-    position: relative;
-}
-.breadcrumb-dropdown.active {
-  display: flex;
-  flex-direction: column;
-  width: max-content;
-  min-width: 200px;
-  background-color: var(--context-menu-background);
-  padding: 10px;
-  z-index: 999;
-  border-radius: 12px;
-  box-shadow: var(--dropdown-shadow);
-  left: 24px;
-  position: absolute;
-  top: 32px;
-}
-.fm-breadcrumbs-wrapper .breadcrumb-dropdown.active {
-    max-height: 85vh;
-    z-index: 300;
-}
-.rtl .breadcrumb-dropdown.active {
-    left: auto;
-    right: 24px;
-}
-.search-bottom-wrapper .breadcrumb-dropdown {
-    position: absolute;
-    bottom: 52px;
-    top: auto;
-    z-index: 200;
-}
-
-.breadcrumb-dropdown a {
-    height: 32px;
-    padding: 6px;
-    box-sizing: border-box;
-    border-radius: 4px;
-    font: var(--text-body1);
-    color: var(--stroke-main-inverted);
-    opacity: 0.7;
-    display: flex;
-    position: relative;
-    margin-right: 0;
-    align-items: center;
-}
-
-.breadcrumb-dropdown a:hover {
-    opacity: 1;
-    background-color: var(--stroke-grey-4);
-}
-
-.breadcrumb-dropdown a i {
-    display: block;
-    --mask-color: var(--icon-rest);
-}
-
-.breadcrumb-dropdown a span {
-    margin-left: 8px;
-    white-space: nowrap;
-    max-width: 300px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
 .deleted .avatar-wrapper,
 .ignored .avatar-wrapper,
 .deleted .fm-chat-user-info,
 .ignored .fm-chat-user-info {
     opacity: 0.5;
 }
-.fm-breadcrumbs.contacts .right-arrow-bg span {
-    display: none;
-}
-.fm-picker-breadcrumbs .fm-breadcrumbs.contacts .right-arrow-bg span {
-    display: inline-block;
-}
-.fm-files-view-icon {
-    width: 24px;
-    height: 24px;
-    display: block;
-    float: right;
-    transition: opacity 200ms ease-in-out;
-    cursor: pointer;
-}
-
-.fm-files-view-icon .small-icon {
-    background-image: none;
-}
-
-.fm-files-view-icon i {
-    --mask-color: var(--stroke-mid-grey);
-    --icon-size: 24px;
-}
-.fm-files-view-icon .listing-view-icon {
-    background-position: -4px -1333px;
-    padding: 3px;
-    width: 22px;
-    height: 22px;
-}
-.fm-files-view-icon.listing-view {
-    background-image: none;
-}
-.fm-files-view-icon.listing-view,
-.fm-files-view-icon.block-view {
-    background-image: none;
-    margin: 0;
-}
-.fm-files-view-icon.listing-view.active,
-.fm-files-view-icon.block-view.active,
-.fm-files-view-icon.media-view.active {
-    border-bottom: 2px solid var(--secondary-blue);
-}
-
-.fm-files-view-icon.listing-view.active i,
-.fm-files-view-icon.block-view.active i,
-.fm-files-view-icon.media-view.active i {
-    --mask-color: var(--icon-active);
-}
-
-.fm-files-view-icon.listing-view.inactive,
-.fm-files-view-icon.block-view.inactive {
-    cursor: default;
-}
-
 .fm-files-search input::-webkit-input-placeholder {
     opacity: 0.3;
 }
-
-.context-menu, .dialog-sorting-menu, .fm-sorting-menu {
+.context-menu,
+.dialog-sorting-menu {
     min-width: 160px;
     position: absolute;
     background-color: #333333;
-    -moz-border-radius: 8px;
-    -webkit-border-radius: 8px;
     border-radius: 8px;
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
     box-sizing: border-box;
     z-index: 500;
     padding: 8px 0;
@@ -4349,7 +4029,7 @@ body.loading .light-overlay {
     right: -155px;
     top: 33px;
 }
-.dropdown.body.dialog-sorting-menu, .fm-sorting-menu {
+.dropdown.body.dialog-sorting-menu {
     min-width: 198px;
     left: 590px;
     top: 103px;
@@ -5348,14 +5028,6 @@ span.orange {
 }
 .read-only .context-menu-icon {
     background-position: -75px -238px;
-}
-.fm-account-top-title {
-    font-size: 17px;
-    line-height: 48px;
-    padding: 0 0 0 20px;
-    color: #333333;
-    text-align: left;
-    position: absolute;
 }
 .fm-account-main {
     height: 100%;
@@ -13865,17 +13537,7 @@ body.megaChatDisabled .nw-fm-left-icon.conversations {
 .pro-login-dialog.sign .login-checkbox {
     margin: 8px 11px 0 0;
 }
-.fm-search-count {
-    float: left;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    padding-inline-start: 28px;
-    -webkit-padding-start: 28px;
-}
-.fm-right-header {
-    overflow: visible;
-}
+
 /* corner toasts and transfer popup */
 .corner-messages {
     position: fixed;

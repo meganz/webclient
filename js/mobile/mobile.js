@@ -1070,10 +1070,10 @@ function accountUI() {
         mobile.settings.privacyAndSecurity.init();
     }
     else if (subpath === 'security/backup-key') {
-        mobile.settings.backup.init();
+        mobile.settings.backupRecovery.init();
     }
     else if (subpath === 'security/two-factor-authentication') {
-        mobile.twofactor.settings.init();
+        mobile.settings.account.twofactorSettings.init();
     }
     else if (subpath.startsWith('sms')) {
 

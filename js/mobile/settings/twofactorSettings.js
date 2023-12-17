@@ -261,7 +261,7 @@ mobile.settings.account.twofactorSettings = Object.create(mobile.settingsHelper,
 
                     // The Two-Factor has already been setup, return to the My Account page to disable
                     if (ex === EEXIST) {
-                        msgDialog('warninga', l[19219], '', '', () => this.previousPage());
+                        msgDialog('warninga', l[19219], '', '', () => this.back());
                     }
                     else {
                         tell(ex);
@@ -295,7 +295,7 @@ mobile.settings.account.twofactorSettings = Object.create(mobile.settingsHelper,
                 .then(() => {
 
                     // Show in itial settings page
-                    this.previousPage();
+                    this.back();
                     mega.ui.toast.show(l[19206]);
                 })
                 .catch((ex) => {
@@ -501,7 +501,7 @@ mobile.settings.account.twofactorSettings = Object.create(mobile.settingsHelper,
      * Back to previous page
      * @returns {void} void
      */
-    previousPage: {
+    back: {
         value: function() {
             'use strict';
 

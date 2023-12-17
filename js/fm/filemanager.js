@@ -4040,7 +4040,8 @@ FileManager.prototype.getDDhelper = function getDDhelper() {
 FileManager.prototype.addSelectDragDropUI = function(refresh) {
     "use strict";
 
-    if (this.currentdirid && (this.currentdirid.substr(0, 7) === 'account' || M.isGalleryPage())) {
+    if (this.currentdirid &&
+        (this.currentdirid.substr(0, 7) === 'account' || M.isGalleryPage())) {
         return false;
     }
 

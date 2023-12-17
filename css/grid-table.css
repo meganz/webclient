@@ -103,7 +103,7 @@
     background-size: 100% 1px;
 }
 
-.grid-scrolling-table,
+.grid-scrolling-table:not(.subtitles-grid-table),
 .transfer-scrolling-table {
     height: 100%;
 }

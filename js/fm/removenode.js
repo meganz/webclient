@@ -165,6 +165,11 @@ function removeUInode(h, parent) {
             break;
     }
 
+    // Remove item in subtitles dialog
+    if ($.dialog === 'subtitles-dialog') {
+        $('.add-subtitles-dialog #' + h).remove();
+    }
+
     if (M.megaRender && M.megaRender.megaList) {
         if (parent) {
             // this was a move node op

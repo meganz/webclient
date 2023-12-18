@@ -617,7 +617,9 @@ lazy(mega, 'rewindUi', () => {
             }
 
             this.currentIcon = icon;
-            folderIcon.classList.add(icon);
+            if (folderIcon) {
+                folderIcon.classList.add(icon);
+            }
             const folderNameElement = this.sidebar.querySelector('.folder-info .folder-name');
             folderNameElement.innerText = this.getNodeNameInfo(this.currentNode)[0];
             folderNameElement.classList.add('simpletip');

@@ -3108,8 +3108,9 @@ function loadSubPage(tpage, event) {
         page = '';
     }
 
+    let hold;
     if (page) {
-        var tmp = [];
+        const tmp = [];
 
         for (var p in subpages) {
             if (page.substr(0, p.length) === p) {
@@ -3144,6 +3145,7 @@ function loadSubPage(tpage, event) {
             }
 
             jsl = tmp;
+            hold = true;
         }
     }
 
@@ -3164,7 +3166,7 @@ function loadSubPage(tpage, event) {
         return false;
     }
 
-    if (jsl.length > 0) {
+    if (hold) {
         loadingDialog.show('jsl-loader');
         jsl_start();
     }

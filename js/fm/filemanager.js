@@ -190,10 +190,13 @@ FileManager.prototype.initFileManager = async function() {
 
             Promise.resolve(M.require('rewind'))
                 .then(() => {
-                    mega.rewind.init();
+                    if (d) {
+                        console.info('REWIND Initialized.', [mega.rewind]);
+                    }
                 })
                 .catch((ex) => {
                     reportError(ex);
+                    delete mega.rewind;
                 });
         }
     }

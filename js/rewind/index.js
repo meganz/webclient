@@ -1,3 +1,4 @@
+/** @property mega.rewind */
 lazy(mega, 'rewind', () => {
     'use strict';
 
@@ -49,11 +50,6 @@ lazy(mega, 'rewind', () => {
 
     class FileRequestContextMenu {
         constructor() {
-            this.$contextMenu = null;
-            this.$rewindButton = null;
-        }
-
-        init() {
             this.$contextMenu = $('.dropdown.body.context', document.body);
             this.$rewindButton = $('.dropdown-item.rewind-item', this.$contextMenu);
             const clickEventNamespace = 'click.rewind';
@@ -103,23 +99,32 @@ lazy(mega, 'rewind', () => {
                     }
                 }
 
-                const listContainer = mega.rewind.getListContainer();
-                mega.rewind.openSidebar(listContainer, selectedHandle);
-
-                const eventData = mega.rewind.getOpenSidebarEventData(selectedHandle);
-                if (eventData) {
-                    delay('rewind:open', eventlog.bind(null, 500001, eventData));
-                }
+                mega.rewind.openSidebar(null, selectedHandle)
+                    .then(() => {
+                        const eventData = mega.rewind.getOpenSidebarEventData(selectedHandle);
+                        if (eventData) {
+                            eventlog(500001, eventData);
+                        }
+                    })
+                    .catch(tell);
             });
         }
     }
 
     return new class Rewind {
         constructor() {
+            /** @property mega.rewind.contextMenu */
             lazy(this, 'contextMenu', () => new FileRequestContextMenu);
+
             this.ACCOUNT_TYPE_FREE = ACCOUNT_TYPE_FREE;
             this.ACCOUNT_TYPE_PRO_LITE = ACCOUNT_TYPE_PRO_LITE;
 
+            if (pages.rewind) {
+                $(document.body).safeAppend(translate(pages.rewind.replace(/{staticpath}/g, staticpath)));
+                delete pages.rewind;
+            }
+
+            this.clear();
             this.changeLog = null;
             this.changeLogTimestamp = null;
             this.selectedHandle = null;
@@ -131,13 +136,6 @@ lazy(mega, 'rewind', () => {
             this.lastRewindableMonth = null;
             this.lastRewindableYear = null;
             this.folderRedirect = null;
-
-            this.nodeDictionary = Object.create(null);
-            this.nodeChildrenDictionary = Object.create(null);
-            this.nodeTreeDictionary = Object.create(null);
-            this.nodeTreeStateDictionary = Object.create(null);
-            this.sizeTreeDictionary = Object.create(null);
-            this.treeCacheHistory = Object.create(null);
 
             mBroadcaster.addListener('mega:openfolder', () => {
                 const listContainer = mega.rewind.getListContainer();
@@ -159,37 +157,52 @@ lazy(mega, 'rewind', () => {
 
                 if (lastSelectedHandle && openRewind) {
                     onIdle(() => {
-                        const listContainer = mega.rewind.getListContainer();
-                        mega.rewind.openSidebar(listContainer, lastSelectedHandle, isOpenFolder);
-
-                        const eventData = mega.rewind.getOpenSidebarEventData(lastSelectedHandle, 1);
-                        if (eventData) {
-                            delay('rewind:open', eventlog.bind(null, 500001, eventData));
-                        }
+                        mega.rewind.openSidebar(null, lastSelectedHandle, isOpenFolder)
+                            .then(() => {
+                                const eventData = mega.rewind.getOpenSidebarEventData(lastSelectedHandle, 1);
+                                if (eventData) {
+                                    eventlog(500001, eventData);
+                                }
+                            })
+                            .catch(tell);
                     });
                 }
             });
-        }
-
-        init() {
-            mega.rewind.contextMenu.init();
         }
 
         async removeNodeListener() {
             mBroadcaster.removeListener(`nodeUpdated:${this.selectedHandle}`);
         }
 
-        async openSidebar(listContainer, selectedHandle, isOpenFolder) {
-            if (!listContainer) {
-                logger.info('Rewind.openSidebar - No container found', selectedHandle, isOpenFolder);
-                loadingDialog.hide();
-                return;
+        async openSidebar(...args) {
+            let finished;
+
+            if (d) {
+                console.time('rewind:index:open');
+            }
+            setTimeout(() => !finished && loadingDialog.show('rewind-sidebar'), 480);
+
+            return this._openSidebarStub(...args)
+                .finally(() => {
+                    finished = true;
+                    loadingDialog.hide('rewind-sidebar');
+                    if (d) {
+                        console.timeEnd('rewind:index:open');
+                    }
+                });
+        }
+
+        async _openSidebarStub(listContainer, selectedHandle, isOpenFolder) {
+            if (!(listContainer && listContainer.parentNode)) {
+                listContainer = this.getListContainer();
+            }
+            if (!(listContainer && listContainer.parentNode)) {
+                logger.error('Rewind.openSidebar - No container found', selectedHandle, isOpenFolder);
+                throw ENOENT;
             }
 
-            console.time('rewind:index:open');
             this.logAccountTypeChanges();
             logger.info('Rewind.openSidebar - Sidebar Opening..');
-            loadingDialog.show();
 
             this.removeNodeListener();
             this.selectedHandle = selectedHandle;
@@ -206,10 +219,8 @@ lazy(mega, 'rewind', () => {
 
             await mega.rewindUi.sidebar.init(listContainer, selectedHandle, isOpenFolder);
 
+            onIdle(clickURLs);
             logger.info('Rewind.openSidebar - Sidebar opened..');
-            clickURLs();
-            loadingDialog.hide();
-            console.timeEnd('rewind:index:open');
         }
 
         getAccountType() {

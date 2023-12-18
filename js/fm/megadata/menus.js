@@ -233,8 +233,8 @@ MegaData.prototype.menuItems = async function menuItems() {
             }
 
             // This is just to make sure the source root is on the cloud drive
-            if (mega.rewindEnabled && M.getNodeRoot(selNode.h) === M.RootID) {
-                items['.rewind-item'] = 1;
+            if (mega.rewind && sourceRoot === M.RootID) {
+                items['.rewind-item'] = !!mega.rewind.contextMenu;
             }
         }
         else {
@@ -743,7 +743,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
                         $(menuCMI).filter('.folderupload-item').removeClass('hidden');
                     }
 
-                    if (mega.rewindEnabled) {
+                    if (mega.rewind) {
                         $(menuCMI).filter('.rewind-item').removeClass('hidden');
                     }
                 }
@@ -972,16 +972,15 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
             || currNodeClass.indexOf('folder-link') > -1)) {
             flt = '.properties-item';
 
-            if (mega.rewindEnabled
-                && (currNodeClass.indexOf('cloud-drive') > -1 && currNodeClass.indexOf('js-clouddrive-btn') > -1)) {
-                flt += ',.rewind-item';
-            }
-
             if (folderlink) {
                 flt += ',.import-item';
             }
             else {
                 flt += ',.findupes-item';
+
+                if (mega.rewind) {
+                    flt += ',.rewind-item';
+                }
             }
             if (M.v.length && folderlink) {
                 flt += ',.zipdownload-item,.download-item';

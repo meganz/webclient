@@ -944,13 +944,14 @@ lazy(mega, 'rewindUi', () => {
                     return;
                 }
 
-                const listContainer = mega.rewind.getListContainer();
-                mega.rewind.openSidebar(listContainer, currentHandle, true);
-
-                const eventData = mega.rewind.getOpenSidebarEventData(selectedHandle, 0, 1);
-                if (eventData) {
-                    delay('rewind:open', eventlog.bind(null, 500001, eventData));
-                }
+                mega.rewind.openSidebar(null, currentHandle, true)
+                    .then(() => {
+                        const eventData = mega.rewind.getOpenSidebarEventData(selectedHandle, 0, 1);
+                        if (eventData) {
+                            eventlog(500001, eventData);
+                        }
+                    })
+                    .catch(tell);
             });
 
             $(DATEPICKER_SELECTOR, document).rebind('click.rewind', '.rewind-datepicker-upgrade', () => {

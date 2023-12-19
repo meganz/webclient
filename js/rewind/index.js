@@ -119,11 +119,6 @@ lazy(mega, 'rewind', () => {
             this.ACCOUNT_TYPE_FREE = ACCOUNT_TYPE_FREE;
             this.ACCOUNT_TYPE_PRO_LITE = ACCOUNT_TYPE_PRO_LITE;
 
-            if (pages.rewind) {
-                $(document.body).safeAppend(translate(pages.rewind.replace(/{staticpath}/g, staticpath)));
-                delete pages.rewind;
-            }
-
             this.clear();
             this.changeLog = null;
             this.changeLogTimestamp = null;

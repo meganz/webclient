@@ -63,7 +63,6 @@ lazy(mega, 'rewindUi', () => {
             this.currentIcon = null;
             this.currentNode = null;
             this.currentHandle = null;
-            this.template = null;
             this.selectedNodes = Object.create(null);
             this.selectedNodesPartial = Object.create(null);
             this.selectedDate = null;
@@ -72,6 +71,13 @@ lazy(mega, 'rewindUi', () => {
             this.$downloadUpgradeDialog = null;
             this.firstSelect = false;
             this.firstSelectLookup = false;
+
+            /** @property RewindSidebar.template */
+            lazy(this, 'template', () => {
+                const res = getTemplate(pages.rewind ? 'rewind' : 'rewind_html');
+                delete pages.rewind;
+                return res;
+            });
         }
 
         // eslint-disable-next-line complexity
@@ -123,10 +129,6 @@ lazy(mega, 'rewindUi', () => {
 
             if (this.parentContainer && this.parentContainer !== parentContainer) {
                 this.parentContainer.querySelector('.rewind-sidebar').remove();
-            }
-
-            if (!this.template) {
-                this.template = getTemplate('rewind_html');
             }
 
             this.parentContainer = parentContainer;

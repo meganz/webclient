@@ -1915,6 +1915,10 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
                         usersM.viewBusinessInvoicesPage();
 
                         $('.fm-right-files-block', '.fmholder').removeClass('hidden emptied');
+
+                        if (mega.ui.mNodeFilter) {
+                            mega.ui.mNodeFilter.resetFilterSelections();
+                        }
                     });
                 });
             });

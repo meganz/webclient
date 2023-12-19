@@ -85,7 +85,6 @@ mobile.recovery.fromEmailLink = {
                     else if (result[0] === 10) {
 
                         if (u_type || u_type === 0) {
-                            debugger;
 
                             msgDialog("warninga", '', l[22818], '', function() {
                                 loadSubPage('fm');

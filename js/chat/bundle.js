@@ -31276,7 +31276,7 @@ let MegaList2 = (_dec = (0,mixins.M9)(30, true), (_class = class MegaList2 exten
       extraRows: 8,
       batchPages: 0,
       perfectScrollOptions: {
-        'handlers': ['click-rail', 'drag-scrollbar', 'wheel', 'touch'],
+        'handlers': ['click-rail', 'drag-thumb', 'wheel', 'touch'],
         'minScrollbarLength': 20
       }
     };
@@ -33687,7 +33687,7 @@ let PerfectScrollbar = (_dec = (0,_chat_mixins0__.M9)(30, true), _dec2 = (0,_cha
     var $elem = self.get$Node();
     $elem.height('100%');
     var options = Object.assign({}, {
-      'handlers': ['click-rail', 'drag-scrollbar', 'keyboard', 'wheel', 'touch', 'selection'],
+      'handlers': ['click-rail', 'drag-thumb', 'keyboard', 'wheel', 'touch'],
       'minScrollbarLength': 20
     }, self.props.options);
     Ps.initialize($elem[0], options);

@@ -494,7 +494,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                 itemHeightCallback: () => this.rowHeight,
                 onResize: this.onResize.bind(this),
                 perfectScrollOptions: {
-                    handlers: ['click-rail', 'drag-scrollbar', 'wheel', 'touch'],
+                    handlers: ['click-rail', 'drag-thumb', 'wheel', 'touch'],
                     minScrollbarLength: 50
                 }
             });

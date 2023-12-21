@@ -1303,17 +1303,17 @@ table.out-shares .fm-chat-users {
    Scroller customisation for sticky header
 \* ======================================== */
 
-.grid-scrolling-table.ps > .ps__scrollbar-y-rail,
-.user-management-scroll.ps > .ps__scrollbar-y-rail {
+.grid-scrolling-table.ps > .ps__rail-y,
+.user-management-scroll.ps > .ps__rail-y {
     margin-top: 36px;
 }
-.contacts-list .grid-scrolling-table.ps > .ps__scrollbar-y-rail {
+.contacts-list .grid-scrolling-table.ps > .ps__rail-y {
     margin-top: 24px;
 }
-.add-from-cloud-dialog .grid-scrolling-table.ps > .ps__scrollbar-y-rail {
+.add-from-cloud-dialog .grid-scrolling-table.ps > .ps__rail-y {
     margin-top: 34px;
 }
-.transfer-scrolling-table.ps > .ps__scrollbar-y-rail {
+.transfer-scrolling-table.ps > .ps__rail-y {
     margin-top: 26px;
 }
 

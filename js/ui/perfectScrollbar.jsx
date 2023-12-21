@@ -77,7 +77,7 @@ export class PerfectScrollbar extends MegaRenderMixin {
 
 
         var options = Object.assign({}, {
-            'handlers': ['click-rail', 'drag-scrollbar', 'keyboard', 'wheel', 'touch', 'selection'],
+            'handlers': ['click-rail', 'drag-thumb', 'keyboard', 'wheel', 'touch'],
             'minScrollbarLength': 20
         }, self.props.options);
 

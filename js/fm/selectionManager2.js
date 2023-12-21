@@ -595,8 +595,8 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
                 if ($target.is(`${$.selectddUIgrid}:not(.hidden)`) &&
                     e.button === 0 && !e.shiftKey && !e.metaKey && !e.ctrlKey &&
-                    !e.target.classList.contains('ps__scrollbar-x-rail') &&
-                    !e.target.classList.contains('ps__scrollbar-y-rail')) {
+                    !e.target.classList.contains('ps__rail-x') &&
+                    !e.target.classList.contains('ps__rail-y')) {
                     this.clear_selection();
                 }
             });

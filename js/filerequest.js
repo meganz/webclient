@@ -418,9 +418,9 @@ lazy(mega, 'fileRequest', () => {
                     return;
                 }
 
-                const $scrollableYRail = $('.ps__scrollbar-y-rail', $scrollableContent);
+                const $scrollableYRail = $('.ps__rail-y', $scrollableContent);
                 if ($scrollableYRail.length) {
-                    $('.ps__scrollbar-y-rail', $scrollableContent).trigger('click');
+                    $('.ps__rail-y', $scrollableContent).trigger('click');
                     $scrollableContent.scrollTop(0);
                 }
             });

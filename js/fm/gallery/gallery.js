@@ -1196,7 +1196,7 @@ class MegaGallery {
             'onResize': this.throttledResize.bind(this),
             'onScroll': this.throttledOnScroll.bind(this),
             'perfectScrollOptions': {
-                'handlers': ['click-rail', 'drag-scrollbar', 'wheel', 'touch'],
+                'handlers': ['click-rail', 'drag-thumb', 'wheel', 'touch'],
                 'minScrollbarLength': 20
             }
         });

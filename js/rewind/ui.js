@@ -376,13 +376,7 @@ lazy(mega, 'rewindUi', () => {
                 this.$contentUpgradeNote.removeClass('hidden');
             }
 
-            if (totalFiles === 0 && totalDirectories === 0) {
-                this.$contentEmpty.removeClass('hidden');
-            }
-            else {
-                this.$contentUpgrade.removeClass('hidden');
-            }
-
+            this.$contentUpgrade.removeClass('hidden');
 
             // Filter button
             this.$filterSelectButton = $('.filter-select-button', this.sidebar);

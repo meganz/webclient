@@ -480,6 +480,7 @@ function u_logout(logout) {
         localStorage.removeItem('signupcode');
         localStorage.removeItem('registeremail');
         localStorage.removeItem('mInfinity');
+        localStorage.removeItem('megaLiteMode');
 
         fminitialized = false;
         if ($.leftPaneResizable) {

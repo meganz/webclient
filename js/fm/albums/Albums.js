@@ -873,7 +873,7 @@ lazy(mega.gallery, 'albums', () => {
         }
 
         clearSlideshowSelections() {
-            const cells = scope.albums.grid.timeline.cellCache;
+            const cells = scope.albums.grid.timeline ? scope.albums.grid.timeline.cellCache : {};
 
             for (let i = 0; i < Object.keys(cells).length; i++) {
                 const mComponent = cells[Object.keys(cells)[i]];

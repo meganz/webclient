@@ -1106,6 +1106,10 @@ FileManager.prototype.initFileManagerUI = function() {
             if (~clickedClass.indexOf(tab)) {
                 tab = self.fmTabState[tab];
 
+                if (tab.root === 'transfers' && pfcol) {
+                    break;
+                }
+
                 var targetFolder = null;
 
                 if (tab.root === 'backups') {

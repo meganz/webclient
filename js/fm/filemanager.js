@@ -4559,7 +4559,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         $('.shares-tabs-bl').addClass('hidden');
     }
 
-    if (tmpId !== 'gallery' || isAlbums) {
+    if (!M.gallery || isAlbums) {
         $('.gallery-view').addClass('hidden');
     }
 

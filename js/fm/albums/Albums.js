@@ -4624,7 +4624,7 @@ lazy(mega.gallery, 'albums', () => {
                 if (album.cellEl) {
                     album.cellEl.updatePlaceholders();
 
-                    if (!album.node || isCover) {
+                    if (!album.node || isCover || album.node.fa !== album.cellEl.coverFa) {
                         album.cellEl.updateCoverImage();
                     }
                 }

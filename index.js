@@ -2956,9 +2956,6 @@ function parsepage(pagehtml) {
 
     pagehtml = translate('' + pagehtml).replace(/{staticpath}/g, staticpath);
 
-    if (pagehtml.indexOf('((MEGAINFO))') > -1) {
-        pagehtml = pagehtml.replace(/\(\(MEGAINFO\)\)/g, translate(pages.megainfo));
-    }
     if (pagehtml.indexOf('((TOP))') > -1) {
         pagehtml = pagehtml.replace(/\(\(TOP\)\)/g, parsetopmenu());
     }

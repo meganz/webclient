@@ -2667,7 +2667,6 @@ else if (!browserUpdate) {
     jsl.push({f:'html/js/bottompage.js', n: 'bottompage_js', j:1});
     jsl.push({f:'html/pagesmenu.html', n: 'pagesmenu', j:0});
     jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
-    jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
     jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
     jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
     jsl.push({f:'js/vendor/exif.js', n: 'exif_js', j:1, w:3});
@@ -3213,7 +3212,6 @@ else if (!browserUpdate) {
         'download': {f:'html/download.html', n: 'download', j:0},
         'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
         'disputenotice': {f:'html/disputenotice.html', n: 'disputenotice', j:0},
-        'copyrightnotice': {f:'html/copyrightnotice.html', n: 'copyrightnotice', j:0},
         'copyright_js': {f:'html/js/copyright.js', n: 'copyright_js', j:1},
         'keybackup': {f:'html/backup.html', n: 'keybackup', j:0},
         'keybackup_js': {f:'html/js/backup.js', n: 'keybackup_js', j:1},
@@ -3379,7 +3377,6 @@ else if (!browserUpdate) {
         'discountpromo': ['discountpromo', 'discountpromo_js', 'discountpromo_css'],
         's': ['discountpromo', 'discountpromo_js', 'discountpromo_css'], // Short URL for 'sale' e.g. /s/blackfriday
         'disputenotice': ['disputenotice', 'copyright_js'],
-        'copyrightnotice': ['copyrightnotice', 'copyright_js'],
         'support': ['support_js', 'support'],
         'recover': ['reset', 'reset_js'],
         'redeem': ['redeem', 'redeem_js'],

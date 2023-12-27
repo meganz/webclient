@@ -1072,6 +1072,9 @@ function accountUI() {
     else if (subpath === 'security/backup-key') {
         mobile.settings.backupRecovery.init();
     }
+    else if (subpath === 'security/lost-auth-device') {
+        mobile.settings.account.lostAuthDevice.init();
+    }
     else if (subpath === 'security/two-factor-authentication') {
         mobile.settings.account.twofactorSettings.init();
     }

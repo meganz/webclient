@@ -3089,6 +3089,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/settings/about.js', n: 'mobile_settings_about_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/changePassword.js', n: 'mobile_change_password_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/changeEmail.js', n: 'mobile_change_email_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/lostAuthDevice.js', n: 'mobile_lost_auth_device_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/verifyEmail.js', n: 'mobile_verfiy_email_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/twofactorVerifyAction.js', n: 'mobile_verfiy_action_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/deleteAccount.js', n: 'mobile_delete_accountl_js', j: 1, w:1});

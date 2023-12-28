@@ -87,6 +87,9 @@ function addNewContact($addButton, cd) {
 
             // after all process is done, and there is added email(s), show invitation sent dialog.
             Promise.allSettled(promises).always(() => {
+                const shareFolderName = $.dialog === 'share'
+                    && $('.share-dialog-folder-name', '.mega-dialog.share-dialog').text();
+
                 if (addedEmails.length > 0) {
                     title = mega.icu.format(l.contacts_invited_title, addedEmails.length);
                     msg = addedEmails.length === 1 ? l[5898] : l[5899];
@@ -95,17 +98,16 @@ function addNewContact($addButton, cd) {
                 else {
                     cd = false;
                 }
-                if ($.dialog === 'share') {
-                    $folderName = $('.share-dialog-folder-name', '.mega-dialog.share-dialog').text();
-                }
+
                 if (cd) {
                     closeDialog();
                     $('.token-input-token-mega').remove();
                 }
 
                 loadingDialog.phide();
-                if ($folderName) {
-                    showToast('view', l.share_folder_toast.replace('%1', $folderName));
+
+                if (shareFolderName) {
+                    showToast('view', l.share_folder_toast.replace('%1', shareFolderName));
                 }
 
                 promise.resolve();
@@ -2999,9 +3001,6 @@ function closeDialog(ev) {
         // the createfolder dialog was closed
         // eslint-disable-next-line local-rules/hints
         $.dialog = $.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog;
-
-        $('.mega-dialog').addClass('arrange-to-back');
-        $('.mega-dialog.fm-picker-dialog').removeClass('arrange-to-back');
     }
 
     if ($.shareDialog) {

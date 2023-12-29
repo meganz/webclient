@@ -1501,9 +1501,9 @@ class MegaGallery {
             }
 
             if (!this.inPreview) {
-                const {state = false} = ev.originalEvent || !1;
+                const { state = false } = ev.originalEvent || !1;
 
-                if (state.galleryMode && this.onpage) {
+                if (state && state.galleryMode && this.onpage) {
                     this.setMode(state.galleryMode, undefined, true);
                     this.render(false);
 

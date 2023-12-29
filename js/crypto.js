@@ -467,7 +467,7 @@ function sc_residue(sc) {
     "use strict";
 
     if (d) {
-        console.info('sc-residue', [sc], initialscfetch, scqtail, scqhead);
+        console.info('sc-residue', initialscfetch, scqtail, scqhead, tryCatch(() => JSON.stringify(sc))() || sc);
     }
 
     if (sc.sn) {
@@ -492,15 +492,10 @@ function sc_residue(sc) {
                 mega.keyMgr.pendingpullkey = true;
             }
         }
-        window.gettingsc = false;
 
         // we're done, wait for more
         if (sc.w) {
             waitsc.setURL(`${sc.w}?${this.sid}&sn=${currsn}`);
-        }
-        else if (!waitsc.ok) {
-            console.error("Strange error, we dont know WSC url and we didnt get it");
-            return tSleep(2 + Math.random() * 7).then(() => getsc(true));
         }
 
         if ((mega.state & window.MEGAFLAG_LOADINGCLOUD) && !mega.loadReport.recvAPs) {
@@ -516,10 +511,6 @@ function sc_residue(sc) {
     }
 }
 
-// getsc() serialisation (getsc() can be called anytime from anywhere if
-// someone thinks that it is beneficial!)
-var gettingsc;
-
 // request new actionpackets and stream them to sc_packet() as they come in
 // nodes in t packets are streamed to sc_node()
 function getsc(force) {
@@ -529,59 +520,45 @@ function getsc(force) {
         return Promise.resolve(EEXIST);
     }
 
-    let timer = null;
-    const {promise} = mega;
-    const done = (a0) => {
-        promise.resolve(a0);
-    };
-
-    gettingsc = true;
-    waitsc.stop();
-
-    if (initialscfetch) {
-
-        (timer = tSleep(77)).then((res) => {
-            timer = null;
-            if (initialscfetch) {
-                if (d) {
-                    if (res) {
-                        console.error(`Unexpected API response for w/sc request (${res.result})`, res);
-                    }
-                    else {
-                        console.error('w/sc connection is taking too long, aborting...');
-                    }
-                }
-                return waitsc.recover();
-            }
-        }).catch(dump).finally(done);
-    }
-
     // retire existing channel that may still be completing the request
     api.reset(5);
+    waitsc.stop('w/sc-fetch');
 
-    if (currsn) {
-        api.req(`sn=${currsn}`, 5)
-            .then((res) => timer && timer.expedite(res))
-            .catch(dump)
-            .finally(done);
-
-        if (window.loadingInitDialog.progress) {
-            window.loadingInitDialog.step3(loadfm.fromapi ? 40 : 1, 55);
-        }
-
-        if (mega.state & window.MEGAFLAG_LOADINGCLOUD) {
-            mega.loadReport.scSent = Date.now();
-        }
-    }
-    else {
+    if (!self.currsn) {
         if (d) {
-            console.error('Get WSC is called but without SN, it\'s a bug... please trace');
+            console.error('Invalid w/sc fetcher invocation, out of context...', self.currsn);
         }
-        eventlog(99737);
+        eventlog(99737, JSON.stringify([1, !!self.initialscfetch | 0, !!self.pfid | 0, !!self.dlid | 0]));
 
-        done(EFAILED); // hmm..
+        return Promise.resolve(EACCESS);
     }
 
+    if (window.loadingInitDialog.progress) {
+        window.loadingInitDialog.step3(loadfm.fromapi ? 40 : 1, 55);
+    }
+
+    if (mega.state & window.MEGAFLAG_LOADINGCLOUD) {
+        mega.loadReport.scSent = Date.now();
+    }
+    const runId = getsc.locked = currsn + makeUUID().slice(-18);
+
+    if (d) {
+        console.info('BEGIN w/sc fetcher <%s>', runId);
+    }
+
+    return getsc.fire(runId)
+        .finally(() => {
+            if (d) {
+                console.info('END w/sc fetcher <%s>', runId);
+            }
+
+            if (getsc.validate(runId)) {
+
+                getsc.locked = false;
+            }
+        });
+
+    // eslint-disable-next-line no-unreachable -- remove once merged, it's messing the commit history otherwise
     return promise;
 }
 
@@ -589,24 +566,7 @@ function waitsc() {
     "use strict";
 
     if (!waitsc.kas) {
-        waitsc.kas = new MEGAKeepAliveStream(function(buffer) {
-            let res = buffer.byteLength < 6 && String.fromCharCode.apply(null, new Uint8Array(buffer)) || '';
-
-            if (res === '0') {
-                // immediately re-connect.
-                return this.restart('server-request');
-            }
-
-            if (res[0] === '-' && (res |= 0) < 0) {
-                // WSC is stopped at the beginning.
-                if (d) {
-                    this.logger.warn('wsc error %s, %s...', res, api_strerror(res));
-                }
-                return res === ETOOMANY && fm_fullreload(null, 'ETOOMANY');
-            }
-
-            return api.deliver(5, buffer);
-        });
+        waitsc.kas = new MEGAKeepAliveStream(waitsc.sink);
     }
 
     // re/set initial backoff value.
@@ -618,11 +578,45 @@ Object.defineProperties(waitsc, {
         value: null,
         writable: true
     },
+    sink: {
+        value: freeze({
+            onerror(ex) {
+                'use strict';
+                // @todo This is meant to work around API-1987, remove when resolved!
+                if (this.status === 500 && waitsc.ok) {
+                    if (d) {
+                        console.info('w/sc connection failure, starting over...', [ex]);
+                    }
+                    getsc(true);
+                    eventlog(99992);
+                }
+            },
+            onload(buffer) {
+                'use strict';
+                let res = buffer.byteLength < 6 && String.fromCharCode.apply(null, new Uint8Array(buffer)) || '';
+
+                if (res === '0') {
+                    // immediately re-connect.
+                    return this.restart('server-request');
+                }
+
+                if (res[0] === '-' && (res |= 0) < 0) {
+                    // WSC is stopped at the beginning.
+                    if (d) {
+                        this.logger.warn('wsc error %s, %s...', res, api_strerror(res));
+                    }
+                    return res === ETOOMANY && fm_fullreload(null, 'ETOOMANY');
+                }
+
+                return api.deliver(5, buffer);
+            }
+        })
+    },
     stop: {
-        value() {
+        value(reason) {
             'use strict';
             if (this.kas) {
-                this.kas.destroy('stop-request');
+                this.kas.destroy(`stop-request ${reason || ''}`);
                 this.kas = null;
             }
         }
@@ -673,7 +667,118 @@ Object.defineProperties(waitsc, {
     running: {
         get() {
             'use strict';
-            return !!this.kas || gettingsc;
+            return !!this.ok || getsc.locked;
+        }
+    }
+});
+
+Object.defineProperties(getsc, {
+    locked: {
+        value: null,
+        writable: true
+    },
+    validate: {
+        value(runId) {
+            'use strict';
+
+            if (this.locked === runId) {
+
+                return true;
+            }
+
+            if (d) {
+                console.warn('w/sc connection %s superseded by %s...', runId, this.locked);
+            }
+        }
+    },
+    onLine: {
+        async value() {
+            'use strict';
+
+            if (navigator.onLine === false) {
+                if (d) {
+                    console.warn('waiting for network connection to be back online...');
+                }
+                return new Promise((resolve) => {
+                    const ready = () => {
+                        tSleep(1 + Math.random()).then(resolve);
+                        window.removeEventListener('online', ready);
+                    };
+                    window.addEventListener('online', ready);
+                });
+            }
+        }
+    },
+    fire: {
+        async value(runId) {
+            'use strict';
+
+            if (navigator.onLine === false) {
+                if (d) {
+                    console.error('<%s> Network connection is offline...', runId);
+                }
+
+                if (initialscfetch) {
+                    // No need to wait for network connectivity, immediately show the FM...
+
+                    onIdle(getsc);
+                    return sc_residue({sn: currsn});
+                }
+                await this.onLine();
+            }
+
+            if (this.validate(runId)) {
+                const timer = tSleep(48);
+                const res = await Promise.race([timer, api.req(`sn=${currsn}`, 5)]).catch(echo);
+                timer.abort();
+
+                if (Number(res) !== EROLLEDBACK && this.validate(runId)) {
+                    if (d) {
+                        if (res) {
+                            if (initialscfetch || res.result !== 1) {
+                                console.error(`Unexpected API response for w/sc request (${res.result})`, res);
+                            }
+                        }
+                        else {
+                            console.error('w/sc connection is taking too long, aborting...');
+                        }
+                    }
+
+                    // at this point, sc_residue() should have been called with a new w/sc URL, but it may do not.
+                    if (!waitsc.ok) {
+                        if (navigator.onLine === false) {
+
+                            await this.onLine();
+                        }
+                        else {
+                            console.error(' ---- caught faulty w/sc connection ----', res);
+
+                            const data = [
+                                !!self.initialscfetch | 0, res ? 1 : 0, (res && res.result) | 0, res | 0
+                            ];
+                            eventlog(99993, JSON.stringify([1, ...data]));
+                        }
+
+                        tSleep(3 + Math.random() * 9)
+                            .then(() => {
+
+                                if (!this.locked && !waitsc.ok) {
+
+                                    return getsc(true)
+                                        .finally(() => {
+                                            // Check for and release any held locks, if needed...
+                                            api.poke().catch(dump);
+                                        });
+                                }
+                            })
+                            .catch(reportError);
+                    }
+
+                    return res;
+                }
+            }
+
+            return EEXPIRED;
         }
     }
 });

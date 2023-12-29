@@ -233,8 +233,9 @@ PresencedIntegration.prototype._updateuicb = function presencedIntegration_updat
 PresencedIntegration.prototype._peerstatuscb = function(user_hash, presence, isWebrtcFlag) {
     var self = this;
 
-    self.logger.debug("peerstatuscb", user_hash, presence, isWebrtcFlag);
-
+    if (d > 1) {
+        self.logger.debug("peerstatuscb", user_hash, presence, isWebrtcFlag);
+    }
 
     isWebrtcFlag = isWebrtcFlag === PresencedIntegration.FLAGS.IS_WEBRTC;
     self._presence[user_hash] = presence;

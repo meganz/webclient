@@ -2376,7 +2376,7 @@ Chat.prototype.initContacts = function (userHandles, c) {
 Chat.prototype.proxyUserChangeToRooms = function (handle) {
   delay(`chat:proxy-user-change-to-rooms.${handle}`, () => {
     const rooms = Object.values(this.chats);
-    if (d) {
+    if (d > 1) {
       this.logger.debug('userChange', handle);
     }
     for (let i = rooms.length; i--;) {
@@ -5214,7 +5214,7 @@ ChatRoom.prototype.subscribeForCallEvents = function () {
   });
 };
 ChatRoom.prototype.stateIsLeftOrLeaving = function () {
-  return this.state == ChatRoom.STATE.LEFT || this.state == ChatRoom.STATE.LEAVING || !is_chatlink && this.state === ChatRoom.STATE.READY && this.membersSetFromApi && !this.membersSetFromApi.members.hasOwnProperty(u_handle) || is_chatlink && !this.members.hasOwnProperty(u_handle);
+  return this.state == ChatRoom.STATE.LEFT || this.state == ChatRoom.STATE.LEAVING || (!is_chatlink && this.state === ChatRoom.STATE.READY && this.membersSetFromApi && !this.membersSetFromApi.members.hasOwnProperty(u_handle) || (is_chatlink && !this.members.hasOwnProperty(u_handle)));
 };
 ChatRoom.prototype._clearChatMessagesFromChatd = function () {
   this.chatd.shards[this.chatShard].retention(base64urldecode(this.chatId), 1);

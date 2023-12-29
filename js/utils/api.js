@@ -296,7 +296,7 @@ class MEGAPIRequest {
     abort() {
         const queue = [...this.queue, ...this.inflight || []];
 
-        if (d && !queue.length) {
+        if (d) {
             this.logger.warn('Aborting %s API channel...', this.idle ? 'idle' : 'busy', [this]);
         }
         Object.defineProperty(this, '__ident_1', {value: 'ABORTED'});
@@ -554,8 +554,12 @@ class MEGAPIRequest {
                     if (!this.backoff) {
                         this.backoff = 192 + -Math.log(Math.random()) * 256;
                     }
-
                     this.backoff = Math.max(63, Math.min(3e5, this.backoff << 1));
+
+                    if (navigator.onLine === false) {
+                        // api.retry() will be invoked whenever getting back online.
+                        this.backoff = 8888888;
+                    }
                     this.timer = new MEGADeferredController('timer').fire(this.backoff);
 
                     if (self.d && this.backoff > 4e3) {
@@ -682,7 +686,8 @@ class MEGAPIRequest {
         }
 
         if (d && response instanceof Response) {
-            this.logger.info('API response:', response.statusText);
+            const data = tryCatch(() => ab_to_str(this.last.buffer.slice(-280)).replace(/[\w-]{15,}/g, '\u2026'))();
+            this.logger.info('API response: %s, \u2026\u2702\u2026\u2026%s', response.statusText, data);
         }
 
         const rc = splitter.chunkproc(chunk, true);
@@ -736,6 +741,10 @@ class MEGAPIRequest {
             if (ctx && ctx.progress && this.totalBytes > 2) {
                 ctx.progress(this.received / this.totalBytes * 100);
             }
+        }
+
+        if (self.d) {
+            this.last = chunk;
         }
 
         // send incoming live data to splitter
@@ -818,7 +827,8 @@ class MEGAKeepAliveStream {
             handlers = {onload: handlers};
         }
 
-        Object.defineProperty(this, 'debug', {value: window.d | 0, writable: true});
+        const value = Math.max(self.d | 0, 'rad' in mega && 3);
+        Object.defineProperty(this, 'debug', {value, writable: true});
         Object.defineProperty(this, 'options', {value: {...options}, writable: true});
         Object.defineProperty(this, 'verbose', {value: this.debug > 2, writable: true});
 
@@ -1056,6 +1066,10 @@ class MEGAKeepAliveStream {
     }
 
     schedule(backoff) {
+        if (navigator.onLine === false) {
+            return;
+        }
+
         if (!backoff) {
             if (this.status === 200) {
                 // Increase backoff if we do keep receiving packets is rapid succession, so that we maintain
@@ -1077,7 +1091,14 @@ class MEGAKeepAliveStream {
         const {body, ok, status, statusText} = await fetch(this.url, options);
 
         this.status = status;
-        this.logger.assert(ok && status === 200, `Server error ${status} (${statusText})`);
+        if (!(ok && status === 200)) {
+            const ex = new MEGAException(`Server error ${status} (${statusText})`, this, 'NetworkError');
+
+            if (this.onerror) {
+                this.onerror(ex);
+            }
+            throw ex;
+        }
 
         this.reader = body.getReader();
         return new ReadableStream(this);
@@ -1146,6 +1167,12 @@ class MEGAKeepAliveStream {
                 size = 0;
                 return new MEGAKeepAliveStream({
                     ...handlers,
+                    onerror(ex) {
+                        if (size > 1e4) {
+                            this.destroy(ex);
+                        }
+                        throw new Error(`trap <${ex}>`);
+                    },
                     onclose() {
                         if (size > 7e4) {
                             this.destroy('test-stage3');
@@ -1757,7 +1784,7 @@ lazy(self, 'api', () => {
                 api.webLockSummary();
 
                 lock(req.channel, async() => {
-                    if (!req.idle) {
+                    if (!req.idle && req.service === 'cs') {
                         if (d) {
                             req.logger.warn('Flushing and aborting channel...', [req]);
                         }
@@ -1827,6 +1854,13 @@ lazy(self, 'api', () => {
          */
         retry() {
             const cap = 3000;
+
+            if (navigator.onLine === false) {
+                if (self.d > 1) {
+                    logger.warn('will not retry, network is offline...');
+                }
+                return;
+            }
 
             for (let i = apixs.length; i--;) {
                 const req = apixs[i];
@@ -2125,6 +2159,39 @@ lazy(self, 'api', () => {
                     queueMicrotask(callback.bind(null, data));
                 });
             });
+        },
+
+        /**
+         * Check for and release any held locks due to a faulty w/sc connection.
+         * @returns {Promise<void>}
+         * @memberOf api
+         */
+        async poke() {
+
+            if (!(await navigator.locks.query()).held.map(o => o.name).join('|').includes('sc-inflight.lock')) {
+                logger.info('cannot poke, sc-inflight is not being held...');
+                return;
+            }
+
+            if (isScRunning()) {
+                logger.warn('cannot poke, w/sc is running...');
+                return;
+            }
+
+            for (const [k, {st, options = false, payload: {a, i} = false}] of inflight) {
+
+                if (st && options.scack === true) {
+                    const pid = inflight.get(st);
+
+                    logger.assert(pid === k && pid === i, `Invalid state ${pid}~~${k}~~${i}`);
+
+                    if (pid === i) {
+                        logger.warn(`dispatching held command ... ${a}~~${i}~~${st} ...`);
+
+                        this.ack({st, a: 'd00m3d'}, pid);
+                    }
+                }
+            }
         },
 
         /**

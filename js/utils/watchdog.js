@@ -176,15 +176,15 @@ lazy(self, 'watchdog', () => Object.freeze({
         if (String(ev.key).indexOf(this.eTag) !== 0) {
             return;
         }
-        if (d) {
-            console.debug('mWatchDog ' + ev.type + '-event', ev.key, ev.newValue, ev);
+        if (self.d > 2) {
+            console.debug(`mWatchDog ${ev.type}-event`, ev.key, ev.newValue, ev);
         }
 
         var msg = ev.key.substr(this.eTag.length);
         var strg = JSON.parse(ev.newValue || '""');
 
         if (!strg || strg.origin === this.wdID) {
-            if (d) {
+            if (self.d > 2) {
                 console.log('Ignoring mWatchDog event', msg, strg);
             }
             return;

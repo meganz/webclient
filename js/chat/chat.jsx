@@ -1320,7 +1320,7 @@ Chat.prototype.proxyUserChangeToRooms = function(handle) {
     delay(`chat:proxy-user-change-to-rooms.${handle}`, () => {
         const rooms = Object.values(this.chats);
 
-        if (d) {
+        if (d > 1) {
             this.logger.debug('userChange', handle);
         }
 

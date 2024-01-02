@@ -1986,6 +1986,7 @@ function execsc() {
             switch (v) {
                 case 7:
                     if (d) {
+                        api.webLockSummary();
                         console.info(`Awaiting API response for SC command '${a.a}..${a.st}..${a.i}'`);
                     }
                     return;

@@ -110,6 +110,12 @@
     order: 10;
 }
 
+/* Banner right icons */
+.mega-component.banner .banner.right-icon.chat {
+    content: url("../../images/mobile/chat.png");
+    width: 60px;
+}
+
 /* Component styles, default info */
 .mega-component.banner,
 .mega-component.banner.info {

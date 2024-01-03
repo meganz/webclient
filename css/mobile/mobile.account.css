@@ -164,6 +164,6 @@
 
     .mega-mobile-settings .button.mobile-log-out,
     .mega-overlay .mega-mobile-settings .button.mobile-log-out {
-        width: 327px;
+        width: var(--mobile-tablet-elem-width);
     }
 }

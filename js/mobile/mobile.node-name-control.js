@@ -169,6 +169,7 @@ class MobileNodeNameControl {
 
         if (newName.trim() === newName) { // Check if folder/file name does not contain spaces at the beginning or end
             nameInput.hideMessage();
+            nameInput.$wrapper.removeClass('warning');
         }
         else {
             const alertIcon = '<i class="alert sprite-mobile-fm-mono icon-alert-circle-thin-outline"></i>';
@@ -176,6 +177,7 @@ class MobileNodeNameControl {
                 `${alertIcon}
                     ${nodeType === 1 ? escapeHTML(l.whitespaces_on_foldername) :
         escapeHTML(l.whitespaces_on_filename)}`);
+            nameInput.$wrapper.addClass('warning');
         }
     }
 

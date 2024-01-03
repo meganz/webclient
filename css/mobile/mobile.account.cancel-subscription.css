@@ -1,6 +1,6 @@
 .cancel-subscription-survey {
     padding: 0 24px;
-    max-width: 697px;
+    max-width: var(--mobile-page-max-width);
 }
 
 .cancel-subscription-survey > * {

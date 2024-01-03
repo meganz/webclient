@@ -222,6 +222,13 @@
     position: relative;
     width: 100%;
 }
+.mega-input.box-style.textarea.auto-height {
+    padding: 4px 0;
+}
+.mega-input.box-style.textarea.auto-height textarea {
+    min-height: 24px;
+    height: 24px;
+}
 
 /* Text input style (transparent without borders) */
 .mega-input.dropdown-input.text-style {
@@ -652,7 +659,7 @@
 .mobile.mega-input.box-style.active {
     border-color: var(--mobile-border-strong-selected);
 }
-.mobile.mega-input.box-style.msg {
+.mobile.mega-input.box-style.warning {
     border-color: var(--mobile-support-warning);
 }
 .mobile.mega-input.box-style.error {
@@ -705,7 +712,10 @@
     padding-inline-start: 0;
     -webkit-padding-start: 0;
     color: var(--mobile-text-primary);
-    top: -24px
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    top: -24px;
 }
 .mobile.mega-input .message-container {
     font: var(--mobile-font-caption-large-regular);
@@ -714,7 +724,7 @@
     text-align: start;
     top: 51px;
 }
-.mobile.mega-input.msg .message-container {
+.mobile.mega-input.warning .message-container {
     color: var(--mobile-text-warning);
     display: flex;
 }
@@ -722,17 +732,17 @@
     color: var(--mobile-text-error);
     display: flex;
 }
-.mobile.mega-input.text-field.error .message-container {
-    top: 146px;
-}
 .mobile.mega-input.error .message-container .alert,
-.mobile.mega-input.msg .message-container .alert {
+.mobile.mega-input.msg .message-container i {
     display: inline-block;
     vertical-align: top;
     margin-top: 3px;
     -webkit-margin-end: 8px;
     margin-inline-end: 8px;
 }
+
+/* Mobile textarea */
+
 .mobile.mega-input textarea {
     font: var(--mobile-font-copy-regular);
     color: var(--mobile-text-primary);
@@ -741,24 +751,49 @@
     height: 100%;
     white-space: normal;
 }
-.mobile.mega-input.text-field {
+
+.mobile.mega-input.textarea {
     padding: 14px 12px;
     width: 100%;
     height: 142px;
     resize: none;
     align-items: flex-start;
 }
-.mobile.mega-input.text-field .length-check {
+
+.mobile.mega-input.textarea .length-check {
     position: absolute;
-    top: 142px;
+    top: 100%;
     right: 0;
     color: var(--mobile-text-secondary);
     font: var(--mobile-font-caption-large-regular);
 }
-.mobile.mega-input.text-field i {
+
+.mobile.mega-input.textarea i {
     margin-inline-end: 0;
     -webkit-margin-end: 0;
 }
+
+/* Textarea with auto height */
+
+.mobile.mega-input.textarea.box-style.auto-height {
+    height: auto;
+    min-height: 47px;
+    padding: 9px 6px;
+}
+
+.mobile.mega-input.textarea.box-style.auto-height textarea {
+    display: block;
+    height: 24px;
+    overflow: auto;
+    padding: 0 6px;
+    min-height: 24px;
+}
+
+.mobile.mega-input.textarea.box-style.auto-height .message-container {
+    top: calc(100% + 6px);
+}
+
+/* End of Mobile textarea */
 
 .mobile.mega-input.strengthChecker.msg:not(.error) {
     border-color: var(--stroke-mid-grey);

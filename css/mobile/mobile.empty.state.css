@@ -18,7 +18,7 @@
 
 .overlay-wrap .empty-states .main {
     overflow-y: scroll;
-    max-width: 697px;
+    max-width: var(--mobile-page-max-width);
 }
 
 .empty-states .button.nav-elem {

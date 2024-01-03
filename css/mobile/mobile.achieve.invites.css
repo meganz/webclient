@@ -1,0 +1,54 @@
+.invite-friends-page {
+    padding: 0 24px 24px;
+    max-width: var(--mobile-page-max-width);
+}
+
+.invite-friends-page > * {
+    font: var(--mobile-font-copy-regular);
+    color: var(--mobile-text-primary);
+}
+
+.invite-friends-page .how-it-works {
+    margin: 16px 0;
+    padding: 0;
+    color: var(--mobile-link-primary);
+    height: 24px;
+}
+
+.invite-friends-page .mega-component.banner {
+    margin-top: 16px;
+}
+
+.invite-friends-page .mega-component.banner span.message-text {
+    margin: 0;
+}
+
+.invite-friends-page .mega-input .message-container {
+    color: var(--text-color-medium);
+}
+
+.invite-friends-page .message-container .email-list {
+    margin-top: 16px;
+    word-break: break-word;
+}
+
+.invite-friends-page .sent-invites .message-text {
+    white-space: pre-line;
+}
+
+.mega-sheet .how-it-works-contents {
+    padding: 0 0 4px;
+}
+
+.mega-sheet .how-it-works-contents ul {
+    padding: 10px 0;
+    padding-inline-start: 23px;
+    -webkit-padding-start: 23px;
+    list-style-type: disc;
+}
+
+.mega-sheet .how-it-works-contents li {
+    list-style: outside;
+    padding-inline-start: 1px;
+    -webkit-padding-start: 1px;
+}

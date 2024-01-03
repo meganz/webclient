@@ -299,6 +299,7 @@ MegaMobileTappable.iconSizesClass = Object.freeze({
     22: 'icon-size-22',
     24: 'icon-size-24',
     28: 'icon-size-28',
+    32: 'icon-size-32',
     48: 'icon-size-48',
     80: 'icon-size-80'
 });

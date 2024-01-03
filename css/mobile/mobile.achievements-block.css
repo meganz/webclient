@@ -1,0 +1,50 @@
+.achievements-block {
+    background-color: var(--mobile-surface-1);
+    border: 1px solid var(--mobile-border-strong);
+    border-radius: 8px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    margin-top: 8px;
+    width: 100%;
+}
+
+.achievements-block > * {
+    font: var(--mobile-font-copy-regular);
+    color: var(--mobile-text-primary);
+}
+.achievements-block > *:not(:last-child) {
+    margin-bottom: 16px;
+}
+
+.achievements-block .segment {
+    display: grid;
+    grid-template-columns: 5fr 2fr;
+}
+
+.achievements-block .segment .achievement,
+.achievements-block .segment .divider-and-unit .divider {
+    margin-right: 12px;
+}
+
+.achievements-block .segment .divider-and-unit {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+}
+
+.achievements-block .segment .divider-and-unit .divider {
+    width: 1px;
+    height: 100%;
+    background-color: var(--mobile-border-strong);
+}
+
+.achievements-block .segment .achievement {
+    font: var(--mobile-font-copy-semibold);
+}
+
+.achievements-block .segment .achievement,
+.achievements-block .segment .divider-and-unit .unit {
+    padding: 8px 0;
+}

@@ -1012,9 +1012,12 @@ function accountUI() {
         mobile.settings.account.init();
     }
     else if (subpath === 'invites/how-it-works') {
-        mobile.achieve.howItWorks.init();
+        loadSubPage('fm/account/invite-friends', 'override');
     }
     else if (subpath === 'invites') {
+        mobile.achieve.inviteBonuses.init();
+    }
+    else if (subpath === 'invite-friends') {
         mobile.achieve.invites.init();
     }
     else if (page === 'fm/refer') {

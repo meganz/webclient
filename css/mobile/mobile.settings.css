@@ -37,8 +37,10 @@
     padding: 0 24px 24px;
 }
 
-.mega-overlay .mega-mobile-settings.default-form.fixed-width {
+.mega-mobile-settings .fixed-width,
+.mega-mobile-settings.default-form.fixed-width {
     max-width: var(--mobile-elem-max-width);
+    width: 100%;
 }
 
 .mega-mobile-settings.default-form h1.form-title {

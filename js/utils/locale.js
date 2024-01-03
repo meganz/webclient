@@ -1882,6 +1882,13 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[S2]', '<span class="hc-article-link">')
         .replace(/\[\/S\d]/g, '</span>');
 
+    l.want_more_storage_prompt = escapeHTML(l.want_more_storage_prompt)
+        .replace('[A]', '<a class="clickurl" href="/pro" target="_blank">')
+        .replace('[/A]', '</a>');
+    l.how_it_works_blurb = escapeHTML(l.how_it_works_blurb)
+        .replace('[UL]', '<ul>').replace('[/UL]', '</ul>')
+        .replace(/\[LI]/g, '<li class="">').replace(/\[\/LI]/g, '</li>');
+
     l.account_reset_email_info = escapeHTML(l.account_reset_email_info)
         .replace('[A]', '<a href="mailto:support@mega.nz" class="primary-link">').replace('[/A]', '</a>');
     l.account_reset_details = escapeHTML(l.account_reset_details).replace('[B]', '<b>').replace('[/B]', '</b>');

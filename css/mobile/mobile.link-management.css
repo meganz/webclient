@@ -90,7 +90,7 @@
 @media screen and (min-width: 769px) {
     .link-mgmt-container .toggle-container.expiry-date .date-picker,
     .mobile .link-mgmt-container .mega-input.box-style {
-        width: 327px;
+        width: var(--mobile-tablet-elem-width);
     }
 
     .link-mgmt-container .toggle-container.expiry-date .date-picker input {

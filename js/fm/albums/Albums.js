@@ -2091,6 +2091,25 @@ lazy(mega.gallery, 'albums', () => {
         }
     }
 
+    class NoMediaNoAlbums extends MEmptyPad {
+        constructor() {
+            super();
+            this.setContents();
+        }
+
+        setContents() {
+            this.el.appendChild(MEmptyPad.createIcon('section-icon sprite-fm-theme icon-gallery-photos'));
+            this.el.appendChild(MEmptyPad.createTxt(l.no_albums, 'fm-empty-cloud-txt empty-albums-title'));
+            this.el.appendChild(MEmptyPad.createTxt(l.gallery_get_start, 'fm-empty-description'));
+
+            this.appendOptions([
+                [l.empty_album_instruction_1, 'sprite-fm-mono icon-camera-uploads'],
+                [l.empty_album_instruction_2, 'sprite-fm-mono icon-mobile'],
+                [l.empty_album_instruction_3, 'sprite-fm-mono icon-pc']
+            ]);
+        }
+    }
+
     class AlbumsEmpty {
         constructor(title, btnLabel, buttonFn) {
             this.el = document.createElement('div');
@@ -3182,18 +3201,25 @@ lazy(mega.gallery, 'albums', () => {
 
             if (useDefaultEmptyPad) {
                 if (isEmpty) {
-                    this.addEmptyBlock(new AlbumsEmpty(
-                        l.no_albums,
-                        l.create_new_album,
-                        () => {
-                            const dialog = new AlbumNameDialog();
-                            dialog.show();
-                        }
-                    ));
+                    if (M.v.length) {
+                        this.addEmptyBlock(new AlbumsEmpty(
+                            l.no_albums,
+                            l.create_new_album,
+                            () => {
+                                const dialog = new AlbumNameDialog();
+                                dialog.show();
+                            }
+                        ));
+                    }
+                    else {
+                        this.updateGridState(0, false);
+                        this.addEmptyBlock(new NoMediaNoAlbums());
+                    }
                 }
                 else {
                     this.removeEmptyBlock();
                 }
+                this.header.el.classList.toggle('invisible', isEmpty && !M.v.length);
             }
         }
 

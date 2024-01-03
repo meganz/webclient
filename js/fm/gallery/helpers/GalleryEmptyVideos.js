@@ -5,7 +5,7 @@ class GalleryEmptyVideos extends MEmptyPad {
     }
 
     setContents() {
-        this.el.append(MEmptyPad.createIcon('section-icon sprite-fm-theme icon-gallery-photos'));
+        this.el.append(MEmptyPad.createIcon('section-icon sprite-fm-theme icon-gallery-videos'));
         this.el.append(MEmptyPad.createTxt(l.gallery_no_videos, 'fm-empty-cloud-txt'));
         this.el.append(MEmptyPad.createTxt(l.gallery_get_start, 'fm-empty-description'));
 

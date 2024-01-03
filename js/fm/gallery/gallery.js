@@ -1274,6 +1274,8 @@ class MegaGallery {
             mega.gallery.showEmpty(M.currentdirid);
             this.galleryBlock.classList.add('hidden');
         }
+        galleryHeader.toggleClass('invisible', !M.v.length &&
+            (this.id === 'photos' || this.id === 'images' || this.id === 'videos'));
     }
 
     resetAndRender() {
@@ -2332,7 +2334,7 @@ mega.gallery.resetAll = () => {
 mega.gallery.showEmpty = (type) => {
     'use strict';
 
-    if (!M.c[M.currentdirid] || !Object.values(M.c[M.currentdirid]).length) {
+    if (M.currentrootid === M.RootID && (!M.c[M.currentdirid] || !Object.values(M.c[M.currentdirid]).length)) {
         $('.fm-empty-folder', '.fm-right-files-block').removeClass('hidden');
         return;
     }

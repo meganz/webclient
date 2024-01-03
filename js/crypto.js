@@ -557,9 +557,6 @@ function getsc(force) {
                 getsc.locked = false;
             }
         });
-
-    // eslint-disable-next-line no-unreachable -- remove once merged, it's messing the commit history otherwise
-    return promise;
 }
 
 function waitsc() {
@@ -605,7 +602,14 @@ Object.defineProperties(waitsc, {
                     if (d) {
                         this.logger.warn('wsc error %s, %s...', res, api_strerror(res));
                     }
-                    return res === ETOOMANY && fm_fullreload(null, 'ETOOMANY');
+                    switch (res) {
+                        case ESID:
+                        case EBLOCKED:
+                            // reach api.deliver();
+                            break;
+                        default:
+                            return res === ETOOMANY && fm_fullreload(null, 'ETOOMANY');
+                    }
                 }
 
                 return api.deliver(5, buffer);
@@ -635,27 +639,6 @@ Object.defineProperties(waitsc, {
             waitsc();
             this.kas.setURL(url);
             this.poke('switching url');
-        }
-    },
-    recover: {
-        async value() {
-            'use strict';
-            assert(!this.kas, 'Invalid recover state..');
-
-            api.reset(5);
-            if (!navigator.onLine) {
-                // @todo show a toast indicating we're offline?
-
-                await new Promise((resolve) => {
-                    const onOnline = () => {
-                        later(resolve);
-                        window.removeEventListener('online', onOnline);
-                    };
-                    window.addEventListener('online', onOnline);
-                });
-            }
-
-            return initialscfetch && sc_residue({sn: currsn});
         }
     },
     ok: {

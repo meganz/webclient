@@ -712,13 +712,30 @@ class MEGAPIRequest {
         this.logger.assert(!this.cancelled && this.received === 0, 'invalid state to deliver');
 
         if (d) {
-            // @todo disable
             this.logger.info('deliver', tryCatch(() => JSON.parse(ab_to_str(chunk)))() || chunk);
         }
 
         this.response = chunk;
         this.totalBytes = chunk.byteLength;
-        return this.parser(new JSONSplitter(this.split, this, true));
+        return this.parser(new JSONSplitter(this.split, this, true))
+            .then((res) => {
+                const val = res | 0;
+                if (val < 0) {
+                    throw val;
+                }
+            })
+            .catch((ex) => {
+                if (d) {
+                    this.logger.warn('Caught delivery error...', ex);
+                }
+
+                if (this.isRequestError(ex)) {
+
+                    return this.errorHandler(ex | 0);
+                }
+
+                throw ex;
+            });
     }
 
     async progress(splitter, chunk) {

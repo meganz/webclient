@@ -2487,7 +2487,7 @@ function logExportEvt(type, target) {
                 fileUrlKey = '!' + pfkey;
                 fileUrlNodeHandle = (item.t ? '!' : '?') + item.h;
             }
-            fileSize = item.s && htmlentities(bytesToSize(item.s)) || '';
+            fileSize = item.s && bytesToSize(item.s) || '';
 
             // Hide the | separator after the folder name
             hideSeparatorClass = ' hide-separator';
@@ -2524,7 +2524,7 @@ function logExportEvt(type, target) {
             // Shared item type is file
             type = '';
             key = item.k;
-            fileSize = htmlentities(bytesToSize(item.s));
+            fileSize = bytesToSize(item.s);
         }
 
         if (!fileUrlWithoutKey) {

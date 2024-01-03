@@ -19,7 +19,7 @@ mobile.settings.privacyAndSecurity = Object.create(mobile.settingsHelper, {
             /* First Section */
             const menuItems1 = [
                 {
-                    text: l.recovery_key_menu,
+                    text: l[8839],
                     icon: 'sprite-mobile-fm-mono icon-key-02-thin-outline',
                     href: 'fm/account/security/backup-key',
                     eventLog: 99838
@@ -31,7 +31,7 @@ mobile.settings.privacyAndSecurity = Object.create(mobile.settingsHelper, {
                     eventLog: 99839
                 },
                 {
-                    text: l.sess_his_menu,
+                    text: l[429],
                     icon: 'sprite-mobile-fm-mono icon-clock-rotate-thin-outline',
                     href: 'fm/account/security/session-history',
                     eventLog: 99841

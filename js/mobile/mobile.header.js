@@ -821,7 +821,7 @@ lazy(MegaMobileHeader, 'headings', () => {
         'fm/refer/distribution': l[22709],
         'fm/refer/redeem': l[23403],
         'fm/account/security': l.mobile_settings_privacy_security_title,
-        'fm/account/security/backup-key': l[8859],
+        'fm/account/security/backup-key': l[8839],
         'fm/account/security/lost-auth-device': l.lost_auth_device,
         'fm/account/security/two-factor-authentication': l[19194],
         'fm/account/security/session-history': l[429],

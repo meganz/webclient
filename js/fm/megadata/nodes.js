@@ -788,6 +788,11 @@ MegaData.prototype.copyNodes = async function(cn, t, del, tree) {
                             // ---> here i am stopping 'del'
                         }
                     }
+
+                    if (del) {
+                        // Ensure we do only remove nodes agreed on the conflict resolution
+                        cn = handles;
+                    }
                 }
 
                 // 3. provide data back to getCopyNodes

@@ -340,7 +340,7 @@ accountUI.general = {
             }
 
             // Maximum bandwidth
-            var b2 = bytesToSize(account.tfsq.max, 0).split(' ');
+            var b2 = bytesToSize(account.tfsq.max, 0).split('\u00A0');
             var usedB = bytesToSize(account.tfsq.used);
             $('.chart.data .size-txt', $bandwidthChart).text(usedB);
             $('.chart.data .pecents-txt', $bandwidthChart).text(bytesToSize(account.tfsq.max, 3, 4));

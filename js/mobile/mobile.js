@@ -1012,9 +1012,12 @@ function accountUI() {
         mobile.settings.account.init();
     }
     else if (subpath === 'invites/how-it-works') {
-        mobile.achieve.howItWorks.init();
+        loadSubPage('fm/account/invite-friends', 'override');
     }
     else if (subpath === 'invites') {
+        mobile.achieve.inviteBonuses.init();
+    }
+    else if (subpath === 'invite-friends') {
         mobile.achieve.invites.init();
     }
     else if (page === 'fm/refer') {
@@ -1071,6 +1074,9 @@ function accountUI() {
     }
     else if (subpath === 'security/backup-key') {
         mobile.settings.backupRecovery.init();
+    }
+    else if (subpath === 'security/lost-auth-device') {
+        mobile.settings.account.lostAuthDevice.init();
     }
     else if (subpath === 'security/two-factor-authentication') {
         mobile.settings.account.twofactorSettings.init();

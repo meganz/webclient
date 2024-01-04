@@ -50,14 +50,13 @@ mobile.settings.account.twofactorVerifyAction = Object.create(mobile.settingsHel
                 }).on('tap.confirmAction', () => this.verifyTwoFA());
 
                 // Create Lost device button
-                // @todo: Unhide for logged in users when Recovery page is revamped
-                new MegaMobileButton({
+                this.lostDeviceButton = new MegaMobileButton({
                     parentNode: this.domNode,
-                    componentClassname: `block text-only${u_attr ? ' hidden' : ''}`,
+                    componentClassname: 'block text-only',
                     text: l[19215]
                 }).on('tap.lostDevice', () => {
                     this.completeCallback(false);
-                    loadSubPage('recovery');
+                    loadSubPage('fm/account/security/lost-auth-device');
                 });
 
                 this.show();
@@ -71,6 +70,14 @@ mobile.settings.account.twofactorVerifyAction = Object.create(mobile.settingsHel
 
             this.domNode.classList.add('default-form', 'fixed-width');
             this.msgNode.textContent = this.msg || l.enter_two_fa_code;
+
+            // Hide Lost device button when enabling 2FA
+            if (this.msg === l.two_fa_verify_enable) {
+                this.lostDeviceButton.domNode.classList.add('hidden');
+            }
+            else {
+                this.lostDeviceButton.domNode.classList.remove('hidden');
+            }
 
             // Bind fieldset events
             this.initPinInputs();

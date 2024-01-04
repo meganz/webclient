@@ -83,7 +83,7 @@ mobile.overBandwidthQuota = {
                 M.account.lastupdate = 0;
             }
             M.accountData((account) => {
-                var tfsQuotaLimit = bytesToSize(account.bw, 0).split(' ');
+                var tfsQuotaLimit = bytesToSize(account.bw, 0).split('\u00A0');
                 var tfsQuotaUsed = account.downbw_used + M.account.servbw_used;
                 var perc = Math.min(100, Math.ceil(tfsQuotaUsed * 100 / account.bw));
 

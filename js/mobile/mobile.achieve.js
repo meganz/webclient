@@ -1,428 +1,229 @@
 /**
- * Functionality for the mobile My Account section
+ * Functionality for the mobile Achievements page (fm/account/achievements)
  */
-mobile.achieve = {
+mobile.achieve = Object.create(mobile.settingsHelper, {
 
     /**
-     * Bonus classes of achievements for the API objects maf.a (awarded classes) and maf.u (available award classes)
+     * Bonus classes of achievements for maf[a|u] (awarded classes | available award classes)
      */
-    BONUS_CLASS_REGISTRATION: 1,
-    BONUS_CLASS_REFERRAL: 3,
-    BONUS_CLASS_MEGA_SYNC: 4,
-    BONUS_CLASS_MOBILE_APP: 5,
-    BONUS_CLASS_VERIFY_PHONE: 9,
+    BONUS_CLASS_REFERRAL: {
+        value: 3
+    },
+    BONUS_CLASS_MEGA_SYNC: {
+        value: 4
+    },
+    BONUS_CLASS_MOBILE_APP: {
+        value: 5
+    },
+    BONUS_CLASS_VERIFY_PHONE: {
+        value: 9
+    },
 
     /**
-     * Array indexes for the API objects maf.r (reward details) and maf.u (available award classes)
-     */
-    AWARD_INDEX_STORAGE: 0,
-    AWARD_INDEX_TRANSFER: 1,
-    AWARD_INDEX_TIME: 2,
-
-    /**
-     * jQuery selector for this page
-     */
-    $page: null,
+     * Array index for the API objects maf[r|u] (reward details | available award classes)
+    */
+    AWARD_INDEX_STORAGE: {
+        value: 0
+    },
+    AWARD_INDEX_TRANSFER: {
+        value: 1
+    },
 
     /**
      * Initialise the main Achievements page
-     */
-    init: function() {
+    */
+    init: {
+        value: function() {
+            'use strict';
 
-        'use strict';
+            // If not logged in, return to the login page
+            if (typeof u_attr === 'undefined') {
+                loadSubPage('login');
+                return false;
+            }
 
-        // If not logged in, return to the login page
-        if (typeof u_attr === 'undefined') {
-            loadSubPage('login');
-            return false;
+            // Add a server log
+            eventlog(99673);
+
+            if (this.domNode) {
+                this.show();
+                return true;
+            }
+
+            this.domNode = this.generatePage('achievements-page');
+
+            // Initialise functionality
+            const _initCallback = () => {
+                this.showAchievementsBlock();
+                this.showInlineAlert();
+                this.showBonusInformation();
+                this.show();
+            };
+
+            if (M.account.maf) {
+                _initCallback();
+            }
+            else {
+                // Fetch account data if it doesn't exist
+                M.accountData(_initCallback, true);
+            }
         }
+    },
 
-        // Cache selector
-        this.$page = $('.mobile.achievements-page');
+    /**
+     * Show the achievements block (bonus space earned and number of friends invited)
+     */
+    showAchievementsBlock: {
+        value: function() {
+            'use strict';
 
-        // Initialise functionality
-        this.fetchAndDisplayBonusInformation();
-        this.initInviteFriendsButton();
-        this.initReferralBonusesButton();
-        this.initMobileAppButton();
-        this.initMegaSyncButton();
-        this.initVerifyPhoneButton();
+            this.achievementsBlock = new MegaMobileAchievementsBlock({
+                parentNode: this.domNode,
+                componentClassname: 'achievements-block fixed-width',
+                achievements: ['allbonuses', 'friends'],
+            });
+        }
+    },
 
-        // Initialise back button to go back to the My Account page
-        mobile.initBackButton(this.$page, 'fm/account/');
+    /**
+     * Show the inline invite friends CTA
+     */
+    showInlineAlert: {
+        value: function() {
+            'use strict';
 
-        // Initialise the top menu
-        topmenuUI();
-
-        // Show the account page content
-        this.$page.removeClass('hidden');
-
-        // Add a server log
-        api_req({ a: 'log', e: 99673, m: 'Mobile web main Achievements page accessed' });
+            const inlineAlert = mobile.inline.alert.create({
+                parentNode: this.domNode,
+                componentClassname: 'invite-friends-cta advertisement fixed-width',
+                text: l.invite_friend_reward,
+                actionButtonText: l.invite_friend_btn,
+                rightIcon: 'chat',
+                closeButton: false
+            });
+            inlineAlert.on('cta', () => {
+                loadSubPage('fm/account/invite-friends');
+            });
+        }
     },
 
     /**
      * Displays the bonus information and achievement status
      */
-    fetchAndDisplayBonusInformation: function() {
+    showBonusInformation: {
+        value: function() {
+            'use strict';
 
-        'use strict';
+            const bonusClasses = [
+                this.BONUS_CLASS_REFERRAL,
+                this.BONUS_CLASS_MOBILE_APP,
+                this.BONUS_CLASS_MEGA_SYNC
+            ];
+            const linkTitles = [l.invite_bonuses, l[16280], l.install_desktop_app];
+            const linkTargets = ['fm/account/invites', 'mobile', 'desktop'];
+            const links = [];
 
-        // Show a loading dialog while the data is fetched from the API
-        loadingDialog.show();
+            for (let i = 0; i < linkTitles.length; i++) {
+                const daysToExpiry = this.getBonusExpiry(bonusClasses[i]);
+                let linkIcon = 'sprite-mobile-fm-mono icon-check-circle-thin-';
+                let status;
 
-        // Fetch all account data from the API
-        M.accountData(function() {
+                const isReferralBtn = bonusClasses[i] === this.BONUS_CLASS_REFERRAL;
 
-            // Hide the loading dialog after request completes
-            loadingDialog.hide();
-
-            // Cache selectors
-            var $bonusBlocks = mobile.achieve.$page.find('.bonus-information-block');
-            var $registrationBonus = $bonusBlocks.filter('.registration');
-            var $referralBonus = $bonusBlocks.filter('.referral');
-            var $megaSyncBonus = $bonusBlocks.filter('.install-mega-sync');
-            var $mobileAppBonus = $bonusBlocks.filter('.install-mobile-app');
-            var $verifyPhoneBonus = $bonusBlocks.filter('.verify-phone-number');
-
-            // Display the available bonuses and whether they are achieved or not
-            mobile.achieve.displayBonusItemInfo($registrationBonus, mobile.achieve.BONUS_CLASS_REGISTRATION);
-            mobile.achieve.displayBonusItemInfo($referralBonus, mobile.achieve.BONUS_CLASS_REFERRAL);
-            mobile.achieve.displayBonusItemInfo($megaSyncBonus, mobile.achieve.BONUS_CLASS_MEGA_SYNC);
-            mobile.achieve.displayBonusItemInfo($mobileAppBonus, mobile.achieve.BONUS_CLASS_MOBILE_APP);
-            mobile.achieve.displayBonusItemInfo($verifyPhoneBonus, mobile.achieve.BONUS_CLASS_VERIFY_PHONE);
-
-            // Display calculation of overall total storage and transfer bonus
-            mobile.achieve.calculateAndDisplayTotalsUnlocked();
-            mobile.achieve.updateInviteFriendsText(mobile.achieve.$page);
-        });
-    },
-
-    /**
-     * Displays the individual bonus information
-     * @param {Object} $containerElement The jQuery container element to be updated
-     * @param {Number} classNumber The bonus class number from the API
-     */
-    displayBonusItemInfo: function($containerElement, classNumber) {
-
-        'use strict';
-
-        // Get achievement bonus information
-        var actualBonusesReceivedInfo = M.account.maf && M.account.maf.r;
-        var bonusRewardedInfo = mobile.achieve.getInfoAboutAwardedBonus(classNumber);
-
-        // Check the bonus information is available
-        if (bonusRewardedInfo !== null) {
-
-            // Get the award ID
-            var awardId = bonusRewardedInfo.r;
-
-            // If they have actually received a bonus the object will exist
-            if (typeof actualBonusesReceivedInfo[awardId] !== 'undefined') {
-
-                // Calculate if award is expired
-                var currentTimestamp = unixtime();
-                var expiryTimestamp = bonusRewardedInfo.e;
-                var timeDifference = expiryTimestamp - currentTimestamp;
-
-                // Set text to 'Expired' by default
-                var daysRemainingWording = l[1664];
-                var storageCssClass = 'greyed-out';
-                var transferCssClass = 'greyed-out';
-                var daysRemainingClass = '';
-
-                // If not expired
-                if (timeDifference > 0) {
-
-                    // Set text to 'x days left'
-                    var daysRemaining = Math.round(timeDifference / 86400);
-                    daysRemainingWording = mega.icu.format(l[16284], daysRemaining);
-
-                    // Remove the greyed out CSS class
-                    storageCssClass = '';
-                    transferCssClass = '';
-
-                    // If less than 2 weeks remain show as red text
-                    if (daysRemaining <= 14) {
-                        daysRemainingClass = 'expiring-soon';
-                    }
-
-                    // If there is a valid referral unhide the arrow icon to show they can go to the Referral page
-                    if (classNumber === mobile.achieve.BONUS_CLASS_REFERRAL) {
-                        $containerElement.removeClass('disabled');
-                    }
-
-                    // Remove the inactive styling so the boxes have a filled in blue/green colour
-                    $containerElement.removeClass('inactive');
+                if (daysToExpiry > 0) {
+                    linkIcon += 'solid active';
+                    status = mega.icu.format(l[16284], daysToExpiry);
+                }
+                else if (daysToExpiry === null) {
+                    linkIcon += 'outline not-achieved';
+                    status = isReferralBtn ? l.referral_bonus_not_achieved : l.app_bonus_not_achieved;
+                }
+                else {
+                    linkIcon += `${isReferralBtn ? 'outline' : 'solid'} expired`;
+                    status = isReferralBtn ? l.referral_bonus_expired : l.app_bonus_expired;
                 }
 
-                // Update the text and CSS classes
-                $containerElement.find('.time-remaining').addClass(daysRemainingClass).text(daysRemainingWording);
-                $containerElement.find('.storage-bonus').addClass(storageCssClass);
-                $containerElement.find('.transfer-bonus').addClass(transferCssClass);
+                links[i] = {
+                    text: linkTitles[i],
+                    subtext: status,
+                    icon: linkIcon,
+                    iconSize: 32,
+                    href: linkTargets[i]
+                };
             }
-        }
 
-        // Display per bonus storage and transfer
-        // mobile.achieve.displayStorageAndTransfer($containerElement, classNumber);
+            const linksDiv = document.createElement('div');
+            linksDiv.className = 'links';
+            this.domNode.append(linksDiv);
+
+            for (const link of links) {
+                this.generateMenuItem(linksDiv, link);
+            }
+
+            const moreStoragePrompt = document.createElement('div');
+            moreStoragePrompt.className = 'more-storage-prompt';
+            moreStoragePrompt.append(parseHTML(l.want_more_storage_prompt));
+
+            this.domNode.append(moreStoragePrompt);
+        }
     },
 
     /**
-     * Display possible awards of storage and transfer per bonus
-     * @param {Object} $containerElement The jQuery container element to be updated
-     * @param {Number} classNum The bonus class number from the API
+     * Get the expiry date of the bonus class chosen
+     *
+     * @param {Number} classNumber The bonus class number from the API
+     * @returns {Integer|null} timeDifference time until expiry of bonus (or null if unavailable)
      */
-    displayStorageAndTransfer: function($containerElement, classNum) {
+    getBonusExpiry: {
+        value: function(classNumber) {
+            'use strict';
 
-        'use strict';
+            // Get achievement bonus information
+            const actualBonusesReceivedInfo = M.account.maf && M.account.maf.r;
+            const bonusRewardedInfo = this.getInfoAboutAwardedBonus(classNumber);
 
-        // Convert storage and bandwidth to 'x GB'
-        var allPossibleBonuses = M.account.maf.u;
-        var storageAmount = allPossibleBonuses[classNum][mobile.achieve.AWARD_INDEX_STORAGE];
-        var transferAmount = allPossibleBonuses[classNum][mobile.achieve.AWARD_INDEX_TRANSFER];
-        var storageAmountFormatted = bytesToSize(storageAmount, 0);
-        var transferAmountFormatted = bytesToSize(transferAmount, 0);
+            // Check the bonus information is available
+            if (bonusRewardedInfo !== null) {
+                const awardId = bonusRewardedInfo.r;
 
-        // Update the storage and bandwidth bonus information
-        $containerElement.find('.storage-bonus').text(storageAmountFormatted);
-        $containerElement.find('.transfer-bonus').text(transferAmountFormatted);
-    },
+                // If they have actually received a bonus the object will exist
+                if (typeof actualBonusesReceivedInfo[awardId] !== 'undefined') {
+                    // Calculate if award is expired
+                    const currentTimestamp = unixtime();
+                    const expiryTimestamp = bonusRewardedInfo.e;
+                    const timeDifference = expiryTimestamp - currentTimestamp;
 
-    /**
-     * Updates the placeholders in the string 17466 with the storage and bandwidth amount
-     * @param {Object} $page The jQuery object for the current page
-     */
-    updateInviteFriendsText: function($page) {
+                    return timeDifference > 0 ? Math.round(timeDifference / 86400) : -1;
+                }
+            }
 
-        'use strict';
-
-        if (!M.account.maf) {
-            // If account doesn't have achievements this text is pointless.
-            return;
+            return null;
         }
-
-        // Convert storage and bandwidth to 'x GB'
-        var allPossibleBonuses = M.account.maf.u;
-        var storage = allPossibleBonuses[mobile.achieve.BONUS_CLASS_REFERRAL][mobile.achieve.AWARD_INDEX_STORAGE];
-        var transfer = allPossibleBonuses[mobile.achieve.BONUS_CLASS_REFERRAL][mobile.achieve.AWARD_INDEX_TRANSFER];
-        var storageAmountFormatted = bytesToSize(storage, 0);
-        var transferAmountFormatted = bytesToSize(transfer, 0);
-
-        // Update text in the Invite Friends text to 'Get x GB of storage and x GB of transfers for each referral
-        var langString = l[17466].replace('%1$s', storageAmountFormatted).replace('%2$s', transferAmountFormatted);
-
-        // Update the page text
-        $page.find('.invite-friends-text').text(langString);
     },
 
     /**
      * Get information about the earned reward e.g. expiry time for an achievement class
-     * @param {Number} classNum The class number to find
-     * @returns {Object|null} Returns the award object from M.account.maf.a or null if the award was not achieved
+     * @returns {Object|null} Returns award object from M.account.maf.a or null if the award was not achieved
      */
-    getInfoAboutAwardedBonus: function(classNum) {
+    getInfoAboutAwardedBonus: {
+        value: function(classNum) {
+            'use strict';
 
-        'use strict';
+            if (M.account.maf.a) {
+                // Get the list of awarded bonuses
+                const awardedBonuses = M.account.maf.a;
 
-        if (M.account.maf.a) {
-            // Get the list of awarded bonuses
-            var awardedBonuses = M.account.maf.a;
+                // Search through the array looking for the bonus class number
+                for (let i = 0; i < awardedBonuses.length; i++) {
 
-            // Search through the array looking for the bonus class number
-            for (var i = 0; i < awardedBonuses.length; i++) {
-
-                // If the award id is the same return it
-                if (awardedBonuses[i].a === classNum) {
-                    return awardedBonuses[i];
+                    // If the award id is the same return it
+                    if (awardedBonuses[i].a === classNum) {
+                        return awardedBonuses[i];
+                    }
                 }
             }
+
+            // Award not achieved yet
+            return null;
         }
-
-        // Award not achieved yet
-        return null;
     },
-
-    /**
-     * Calculates and displays the overall bonus totals for storage and transfer that were unlocked
-     */
-    calculateAndDisplayTotalsUnlocked: function() {
-
-        'use strict';
-
-
-        // Set variables to accumulate totals
-        var totalStorage = 0;
-
-        if (M.account.maf.r) {
-
-            // Get bonus information
-            var rewardedBonuses = M.account.maf.a;
-            var bonusesReceivedInfo = M.account.maf.r;
-
-            // Loop through all awarded bonuses
-            for (var i = 0; i < rewardedBonuses.length; i++) {
-
-                // Calculate if award is expired
-                var rewardedBonus = rewardedBonuses[i];
-                var awardId = rewardedBonus.r;
-                var expiryTimestamp = rewardedBonus.e;
-                var currentTimestamp = unixtime();
-                var difference = expiryTimestamp - currentTimestamp;
-
-                // If expired don't add
-                if (difference <= 0) {
-                    continue;
-                }
-
-                // Accumulate storage and transfer bytes to overall total
-                totalStorage += bonusesReceivedInfo[awardId][mobile.achieve.AWARD_INDEX_STORAGE];
-            }
-        }
-
-
-        // Format storage and transfer bytes to 'x GB'
-        var totalStorageFormatted = numOfBytes(totalStorage, 0);
-
-        // Display the total storage and transfer
-        var $unlockedRewards = mobile.achieve.$page.find('.unlocked-rewards-block');
-        $unlockedRewards.find('.storage-amount').text(totalStorageFormatted.size);
-        $unlockedRewards.find('.storage-unit').text(totalStorageFormatted.unit);
-    },
-
-    /**
-     * Initialise the button to take them to the Invite Friends page
-     */
-    initInviteFriendsButton: function() {
-
-        'use strict';
-
-        // On clicking/tapping the Referral Bonuses button
-        mobile.achieve.$page.find('.invite-friends-block').off('tap').on('tap', function() {
-
-            // Load the page
-            loadSubPage('fm/account/invites');
-            return false;
-        });
-    },
-
-    /**
-     * Initialise the button to take them to the Referral Bonuses page
-     */
-    initReferralBonusesButton: function() {
-
-        'use strict';
-
-        // On clicking/tapping the Referral Bonuses button
-        mobile.achieve.$page.find('.referral').off('tap').on('tap', function() {
-
-            // Don't go to the Referral Bonuses page if they don't have any referral bonuses
-            if ($(this).hasClass('disabled')) {
-                return false;
-            }
-
-            // Load the page
-            loadSubPage('fm/account/referrals');
-            return false;
-        });
-    },
-
-    /**
-     * Initialise the button to take them to the relevant app page
-     */
-    initMobileAppButton: function() {
-
-        'use strict';
-
-        // On clicking/tapping the Install a mobile app button
-        mobile.achieve.$page.find('.install-mobile-app').off('tap').on('tap', function() {
-            eventlog(99847);
-
-            // Load the page
-            mega.redirect('mega.io', 'mobile', false, false, false);
-            return false;
-        });
-    },
-
-    /**
-     * Initialise the button to take them to the MEGAsync page
-     */
-    initMegaSyncButton: function() {
-
-        'use strict';
-
-        // On clicking/tapping the Install MEGAsync button
-        mobile.achieve.$page.find('.install-mega-sync').off('tap').on('tap', function() {
-            eventlog(99848);
-
-            // Load the page
-            mega.redirect('mega.io', 'desktop', false, false, false);
-            return false;
-        });
-    },
-
-    /**
-     * Initialise the button to take them Add Phone Number introduction screen
-     */
-    initVerifyPhoneButton: function() {
-
-        'use strict';
-
-        // If SMS verification enable is not on level 2 (Opt-in and unblock SMS allowed) then do nothing
-        if (u_attr.flags.smsve !== 2) {
-            return false;
-        }
-
-        var $verifyPhoneButton = mobile.achieve.$page.find('.verify-phone-number');
-
-        // Unhide the button because the SMS verification is enabled
-        $verifyPhoneButton.removeClass('hidden');
-
-        // On clicking/tapping the Verify phone number button
-        $verifyPhoneButton.off('tap').on('tap', function() {
-
-            // If they already have already added a phone number don't let them add again
-            if (typeof u_attr.smsv !== 'undefined') {
-                return false;
-            }
-
-            // Load the page
-            loadSubPage('sms/phone-achievement-intro');
-
-            // Prevent double taps
-            return false;
-        });
-    },
-
-    /**
-     * Initialise and bind click events to trigger the respective link
-     */
-    bindEvents: function(selector) {
-        'use strict';
-
-        this.rebind('click', () => {
-
-            switch (selector) {
-                case 'ach-install-megasync':
-                    $('.install-mega-sync', mobile.achieve.$page).tap();
-                    break;
-
-                case 'ach-install-mobile-app':
-                    $('.install-mobile-app', mobile.achieve.$page).tap();
-                    break;
-
-                case 'ach-invite-friend':
-                    $('.invite-friends-block', mobile.achieve.$page).tap();
-                    break;
-
-                case 'ach-sms-verification':
-                    $('.verify-phone-number', mobile.achieve.$page).tap();
-                    break;
-            }
-
-            return false;
-
-        });
-
-    }
-
-};
+});

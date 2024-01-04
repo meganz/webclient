@@ -4,7 +4,7 @@
     padding: 24px;
     overflow-x: visible;
     overflow-y: scroll;
-    max-width: 697px;
+    max-width: var(--mobile-page-max-width);
     margin: 0 auto;
 }
 

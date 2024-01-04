@@ -46,6 +46,18 @@
  *              `var megaInput = new mega.ui.MegaInputs($input, {
  *                  copyToastText: l.value_copied
  *              });`
+ *
+ * Text area with automatic height. Increase/decrease the text area in height depending on the amount of text.
+ *      wrapperClass: `textarea auto-height`
+ *      Example: `<input class="underlinedText copyButton" data-wrapper-class="textarea auto-height"/>`
+ *      Options once MegaInput init:
+ *          Pass `autoHeight` on options once MegaInput init
+ *          Pass `maxHeight` on options once MegaInput init if you need to stop increasing it by height at some point
+ *
+ *              `var megaInput = new mega.ui.MegaInputs($input, {
+ *                  autoHeight: true,
+ *                  maxHeight: 140,
+ *              });`
  */
 mega.ui.MegaInputs.prototype.underlinedText = function() {
 
@@ -141,6 +153,11 @@ mega.ui.MegaInputs.prototype.underlinedText._init = function() {
         if ($input.data('wrapper-class')) {
             $wrapper.addClass($input.data('wrapper-class'));
         }
+
+        // Add special class for textarea with auto height
+        if (this.options.autoHeight) {
+            $wrapper.addClass('textarea auto-height');
+        }
     }
 };
 
@@ -179,6 +196,15 @@ mega.ui.MegaInputs.prototype.underlinedText._bindEvent = function() {
 
     // Hide error upon input changes
     var self = this;
+
+    // Textarea with auto height
+    if (this.options.autoHeight) {
+        $input.rebind('input.autoHeight', (e) => {
+            e.target.style.height = 0;
+            e.target.style.height = `${this.options.maxHeight && parseInt(this.options.maxHeight) <=
+                e.target.scrollHeight ? this.options.maxHeight : e.target.scrollHeight}px`;
+        });
+    }
 
     if (!$input.hasClass('strengthChecker')) {
         $input.rebind('input.underlinedText', function() {

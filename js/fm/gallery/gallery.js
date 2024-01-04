@@ -2127,7 +2127,7 @@ mega.gallery.isGalleryNode = (n, ext) => {
     'use strict';
 
     ext = ext || fileext(n && n.name || n, true, true);
-    return mega.gallery.isImage(n, ext) || mega.gallery.isVideo(n);
+    return n.fa && (mega.gallery.isImage(n, ext) || mega.gallery.isVideo(n));
 };
 
 /**

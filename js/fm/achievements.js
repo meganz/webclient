@@ -406,12 +406,7 @@ mega.achievem.bindStorageDataToView = function bindStorageDataToView($viewContex
 
                 calculateAndBindRewardData(data, idx);
 
-                if (is_mobile) {
-                    mobile.achieve.bindEvents.call($('.mega-button.positive', $cell), selector);
-                }
-                else {
-                    ach.bind.call($('.mega-button.positive', $cell), ach.mapToAction[idx]);
-                }
+                ach.bind.call($('.mega-button.positive', $cell), ach.mapToAction[idx]);
                 $cell.removeClass('hidden');
 
                 // If this is the SMS achievement, and SMS achievements are not enabled yet, hide the container

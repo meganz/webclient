@@ -45,7 +45,7 @@ mobile.settingsHelper = {
         const props = {
             type: 'fullwidth',
             componentClassname: `text-icon ${opt.componentClassname || ''}`,
-            iconSize: 24,
+            iconSize: opt.iconSize || 24,
             rightIcon: menuIcon,
             rightIconSize: 24,
             text: opt.text,

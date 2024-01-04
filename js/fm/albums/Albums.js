@@ -209,12 +209,6 @@ lazy(mega.gallery, 'albums', () => {
                 mBroadcaster.once('slideshow:close', () => {
                     M.v = tmpMv;
 
-                    // double click will mess _selCount, so we need to reset here
-                    if (scope.albums.grid && scope.albums.grid.timeline) {
-                        scope.albums.grid.timeline._selCount = selHandles.length;
-                        scope.albums.grid.timeline.adjustToBottomBar();
-                    }
-
                     scope.reinitiateEvents();
 
                     if (window.selectionManager.clearSlideshowSelections) {
@@ -877,7 +871,7 @@ lazy(mega.gallery, 'albums', () => {
         }
 
         clearSlideshowSelections() {
-            const cells = scope.albums.grid.timeline.cellCache;
+            const cells = scope.albums.grid.timeline ? scope.albums.grid.timeline.cellCache : {};
 
             for (let i = 0; i < Object.keys(cells).length; i++) {
                 const mComponent = cells[Object.keys(cells)[i]];
@@ -3079,6 +3073,13 @@ lazy(mega.gallery, 'albums', () => {
                     cell.isSelected = true;
                     this._selCount++;
 
+                    // double click will mess _selCount, so we need to reset here
+                    if (scope.albums.grid && scope.albums.grid.timeline) {
+                        const selHandles = scope.albums.grid.timeline.selections;
+                        scope.albums.grid.timeline._selCount = Object.keys(selHandles).length;
+                        scope.albums.grid.timeline.onSelectToggle();
+                    }
+
                     delay('render:in_album_node_preview', () => {
                         const isVideo = scope.isVideo(cell.el.ref.node);
 
@@ -4630,7 +4631,7 @@ lazy(mega.gallery, 'albums', () => {
                 if (album.cellEl) {
                     album.cellEl.updatePlaceholders();
 
-                    if (!album.node || isCover) {
+                    if (!album.node || isCover || album.node.fa !== album.cellEl.coverFa) {
                         album.cellEl.updateCoverImage();
                     }
                 }

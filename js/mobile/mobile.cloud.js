@@ -389,6 +389,10 @@ mobile.cloud = {
             }];
         }
 
+        if (this.bottomBar) {
+            this.bottomBar.destroy();
+        }
+
         this.bottomBar = new MegaMobileBottomBar({
             parentNode: document.getElementById('fmholder'),
             actions: [[actions]]

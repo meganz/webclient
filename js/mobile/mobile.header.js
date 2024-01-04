@@ -165,6 +165,10 @@ class MegaMobileHeader extends MegaMobileComponent {
                     if (String(M.currentdirid).split('/').pop() === 'verify') {
                         return loadSubPage('fm/account');
                     }
+
+                    if (typeof mobile.settingsHelper.currentPage.back === 'function') {
+                        return mobile.settingsHelper.currentPage.back();
+                    }
                 }
 
                 // @todo: Refactor back button logic. `history.back` is incorrect here
@@ -173,10 +177,6 @@ class MegaMobileHeader extends MegaMobileComponent {
                 }
                 if (M.currentdirid === 'account/settings') {
                     return loadSubPage('fm');
-                }
-
-                if (String(M.currentdirid).includes('two-factor-authentication')) {
-                    return mobile.settings.account.twofactorSettings.previousPage();
                 }
 
                 history.back();
@@ -797,8 +797,8 @@ lazy(MegaMobileHeader, 'headings', () => {
         'fm/account': l[403],
         'fm/account/achievements': l[16117],
         'fm/account/cancel': l[7165],
-        'fm/account/invites': l[17465],
-        'fm/account/invites/how-it-works': l[1070],
+        'fm/account/invite-friends': l[17465],
+        'fm/account/invites': l.invite_bonuses,
         'fm/account/my-details': l.settings_account_details,
         'fm/account/name': l[86],
         'fm/account/country': l[481],
@@ -821,7 +821,8 @@ lazy(MegaMobileHeader, 'headings', () => {
         'fm/refer/distribution': l[22709],
         'fm/refer/redeem': l[23403],
         'fm/account/security': l.mobile_settings_privacy_security_title,
-        'fm/account/security/backup-key': l[8859],
+        'fm/account/security/backup-key': l[8839],
+        'fm/account/security/lost-auth-device': l.lost_auth_device,
         'fm/account/security/two-factor-authentication': l[19194],
         'fm/account/security/session-history': l[429],
         'fm/account/settings': l[823],

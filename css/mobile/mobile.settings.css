@@ -37,8 +37,10 @@
     padding: 0 24px 24px;
 }
 
-.mega-overlay .mega-mobile-settings.default-form.fixed-width {
+.mega-mobile-settings .fixed-width,
+.mega-mobile-settings.default-form.fixed-width {
     max-width: var(--mobile-elem-max-width);
+    width: 100%;
 }
 
 .mega-mobile-settings.default-form h1.form-title {
@@ -51,7 +53,21 @@
     padding: 0 0 4px;
 }
 
+.mega-mobile-settings.default-form p {
+    margin: 0;
+    padding: 8px 0;
+}
+
+.mega-mobile-settings.default-form p:first-child {
+    padding-top: 0;   
+}
+
 /* Settings form. Inputs */
+
+.mega-mobile-settings.default-form .form-elements {
+    display: flex;
+    flex-direction: column;
+}
 
 .mega-mobile-settings.default-form .mobile.mega-input.box-style {
     margin: 12px 0;

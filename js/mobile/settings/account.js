@@ -238,28 +238,6 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
 
             const menuItems = [];
 
-            if (this.overlayAccount) {
-
-                api.req({a: 'maf', v: mega.achievem.RWDLVL}).then(({result: res}) => {
-                    if (typeof res === 'object') {
-                        const achievementBtn = this.domNode.componentSelector('.achievement-btn');
-                        if (achievementBtn) {
-                            achievementBtn.show();
-                        }
-                    }
-                }).catch(dump);
-            }
-            else {
-                M.accountData(() => {
-                    if (M.account.maf) {
-                        const achievementBtn = this.domNode.componentSelector('.achievement-btn');
-                        if (achievementBtn) {
-                            achievementBtn.show();
-                        }
-                    }
-                });
-            }
-
             /* First Links */
             menuItems.push(
                 {
@@ -330,6 +308,27 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
 
             for (const item of menuItems) {
                 this.generateMenuItem(this.domNode, item);
+            }
+
+            if (this.overlayAccount) {
+                api.req({a: 'maf', v: mega.achievem.RWDLVL}).then(({result: res}) => {
+                    if (typeof res === 'object') {
+                        const achievementBtn = this.domNode.componentSelector('.achievement-btn');
+                        if (achievementBtn) {
+                            achievementBtn.show();
+                        }
+                    }
+                }).catch(dump);
+            }
+            else {
+                M.accountData(() => {
+                    if (M.account.maf) {
+                        const achievementBtn = this.domNode.componentSelector('.achievement-btn');
+                        if (achievementBtn) {
+                            achievementBtn.show();
+                        }
+                    }
+                });
             }
 
             if (mega.flags.refpr) {

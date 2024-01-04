@@ -276,6 +276,9 @@ button.nav-elem,
 .nav-elem i.icon-size-28 {
     --icon-size: 28px;
 }
+.nav-elem i.icon-size-32 {
+    --icon-size: 32px;
+}
 .nav-elem i.icon-size-48 {
     --icon-size: 48px;
 }

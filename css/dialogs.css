@@ -92,9 +92,6 @@
     display: block;
     background-color: rgba(0,0,0,0.1);
 }
-.mega-dialog.arrange-to-back, div.overlay.arrange-to-back {
-    z-index: 900;
-}
 .arrange-to-front, .dropdown.context.arrange-to-front {
     z-index: 1300;
 }
@@ -10216,9 +10213,6 @@ body.de .mega-dialog.contact-picker-widget {
 
 /* msgDialog (aka dialog-template-message) */
 
-    .mega-dialog.dialog-template-message {
-        z-index: 1201;
-    }
     .mega-dialog.dialog-template-message button.close {
         display: none;
     }

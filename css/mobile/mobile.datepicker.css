@@ -16,6 +16,6 @@
 
 @media only screen and (min-width: 769px) {
     .mega-component.date-picker.ios input[type="date"] {
-        width: 327px;
+        width: var(--mobile-tablet-elem-width);
     }
 }

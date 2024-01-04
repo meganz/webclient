@@ -790,6 +790,9 @@ body.rtl .js-lp-gallery .btn-galleries.expansion-btn:not(.expansion-btn-open) i.
 }
 .empty-albums-title + .mega-button {
     margin-top: 2.3rem;
+    max-width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
 }
 .album-timeline-main {
     position: relative;
@@ -868,6 +871,8 @@ body.rtl .js-lp-gallery .btn-galleries.expansion-btn:not(.expansion-btn-open) i.
 }
 .empty-albums-section i {
     --icon-size: 192px;
+    margin-left: auto;
+    margin-right: auto;
 }
 .album-content-grid .gallery-view-zoom-control {
     position: absolute;

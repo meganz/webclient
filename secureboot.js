@@ -2667,7 +2667,6 @@ else if (!browserUpdate) {
     jsl.push({f:'html/js/bottompage.js', n: 'bottompage_js', j:1});
     jsl.push({f:'html/pagesmenu.html', n: 'pagesmenu', j:0});
     jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
-    jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
     jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
     jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
     jsl.push({f:'js/vendor/exif.js', n: 'exif_js', j:1, w:3});
@@ -3017,15 +3016,15 @@ else if (!browserUpdate) {
         jsl.push({f:'css/mobile/mobile.datepicker.css', n: 'mobile_datepicker_css', j: 2, w: 1});
         jsl.push({f:'css/mobile/mobile.account.cancel-subscription.css', n: 'mobile_account_cancel_sub_css', j: 2, w: 1});
         jsl.push({f:'css/mobile/mobile.backup.recovery.css', n: 'mobile_backup_recovery_css', j: 2, w: 1});
+        jsl.push({f:'css/mobile/mobile.achieve.css', n: 'mobile_achieve_css', j: 2, w: 1});
+        jsl.push({f:'css/mobile/mobile.achieve.invites.css', n: 'mobile_achieve_invites_css', j: 2, w: 1});
+        jsl.push({f:'css/mobile/mobile.achievements-block.css', n: 'mobile_achievements_block_css', j: 2, w: 1});
+        jsl.push({f:'css/mobile/mobile.achieve.invite-bonuses.css', n: 'mobile_achieve_inv_bonuses_css', j: 2, w: 1});
 
         jsl.push({f:'html/mobile.html', n: 'mobile', j: 0, w: 1});
         jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
         jsl.push({f:'js/mobile/mobile.js', n: 'mobile_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.megaRender.js', n: 'mobile_mega_render_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.achieve.js', n: 'mobile_achieve_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.achieve.how-it-works.js', n: 'mobile_achieve_how_it_works_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.achieve.invites.js', n: 'mobile_achieve_invites_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.achieve.referrals.js', n: 'mobile_achieve_referrals_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.affiliate.js', n: 'mobile_affiliate_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.cloud.js', n: 'mobile_cloud_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.cloud.action-bar.js', n: 'mobile_cloud_action_bar_js', j: 1, w: 1});
@@ -3085,10 +3084,16 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/settings/linksOptions.js', n: 'mobile_account_file_management_js', j:1, w: 1});
         jsl.push({f:'js/mobile/mobile.account.paymentcard.js', n: 'mobile_payment_card_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.account.cancel-subscription.js', n: 'mobile_account_cancel_sub_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.achieve.js', n: 'mobile_achieve_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.achievements-block.js', n: 'mobile_achievements_block_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.achieve.invites.js', n: 'mobile_achieve_invites_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.achieve.referrals.js', n: 'mobile_achieve_referrals_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.achieve.invite-bonuses.js', n: 'mobile_achieve_inv_bonuses_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/settings/support.js', n: 'mobile_settings_support_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/about.js', n: 'mobile_settings_about_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/changePassword.js', n: 'mobile_change_password_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/changeEmail.js', n: 'mobile_change_email_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/lostAuthDevice.js', n: 'mobile_lost_auth_device_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/verifyEmail.js', n: 'mobile_verfiy_email_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/twofactorVerifyAction.js', n: 'mobile_verfiy_action_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/deleteAccount.js', n: 'mobile_delete_accountl_js', j: 1, w:1});
@@ -3212,7 +3217,6 @@ else if (!browserUpdate) {
         'download': {f:'html/download.html', n: 'download', j:0},
         'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
         'disputenotice': {f:'html/disputenotice.html', n: 'disputenotice', j:0},
-        'copyrightnotice': {f:'html/copyrightnotice.html', n: 'copyrightnotice', j:0},
         'copyright_js': {f:'html/js/copyright.js', n: 'copyright_js', j:1},
         'keybackup': {f:'html/backup.html', n: 'keybackup', j:0},
         'keybackup_js': {f:'html/js/backup.js', n: 'keybackup_js', j:1},
@@ -3378,7 +3382,6 @@ else if (!browserUpdate) {
         'discountpromo': ['discountpromo', 'discountpromo_js', 'discountpromo_css'],
         's': ['discountpromo', 'discountpromo_js', 'discountpromo_css'], // Short URL for 'sale' e.g. /s/blackfriday
         'disputenotice': ['disputenotice', 'copyright_js'],
-        'copyrightnotice': ['copyrightnotice', 'copyright_js'],
         'support': ['support_js', 'support'],
         'recover': ['reset', 'reset_js'],
         'redeem': ['redeem', 'redeem_js'],

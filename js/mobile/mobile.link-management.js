@@ -88,8 +88,7 @@ mobile.linkManagement = {
             [
                 ['copy-link', l.mobile_manage_link_copy_link_button, () => {
                     const link = this.pwdProtectedLink || this.formatLink();
-                    navigator.clipboard.writeText(link);
-                    mega.ui.toast.show(l.mobile_link_copied_toast_text, 4);
+                    copyToClipboard(link, l.mobile_link_copied_toast_text);
 
                     if (this.passwordInput) {
                         const pwdInput = this.passwordInput.$input.val();
@@ -475,8 +474,7 @@ mobile.linkManagement = {
         // Only copy text if icon is tapped
         this.$decKeyInput.$wrapper.rebind('tap', (e) => {
             if (e.target.classList.contains('icon-copy-thin-outline')) {
-                navigator.clipboard.writeText(decKeyInputField.placeholder);
-                mega.ui.toast.show(l.mobile_link_dec_key_copied_toast_text, 4);
+                copyToClipboard(decKeyInputField.placeholder, l.mobile_link_dec_key_copied_toast_text);
             }
         });
     },

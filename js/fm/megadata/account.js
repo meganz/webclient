@@ -817,7 +817,7 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
             }
 
             // Storage chart and info
-            var strQuotaLimit = bytesToSize(quota.mstrg, 0).split(' ');
+            var strQuotaLimit = bytesToSize(quota.mstrg, 0).split('\u00A0');
             var strQuotaUsed = bytesToSize(quota.cstrg);
             var $storageChart = $('.fm-account-blocks.storage', $strgdlg);
 

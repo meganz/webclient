@@ -413,16 +413,12 @@ class ScheduledMeeting {
     return this.isRoot ? null : this.megaChat.plugins.meetingsManager.getMeetingById(this.parentId);
   }
   setNextOccurrence() {
-    if (this.occurrences && this.occurrences.length) {
-      const nextOccurrences = Object.values(this.occurrences).filter(o => o.isUpcoming).sort((a, b) => a.start - b.start);
+    const occurrences = Object.values(this.occurrences).filter(o => o.isUpcoming);
+    if (occurrences && occurrences.length) {
+      const nextOccurrences = occurrences.sort((a, b) => a.start - b.start);
       this.nextOccurrenceStart = nextOccurrences[0].start;
       this.nextOccurrenceEnd = nextOccurrences[0].end;
-      return {
-        start: this.nextOccurrenceStart,
-        end: this.nextOccurrenceEnd
-      };
     }
-    return null;
   }
   async getOccurrences(options) {
     const {
@@ -13257,7 +13253,7 @@ class ConversationRightArea extends mixins.wl {
       className: "observers-count"
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-eye-reveal"
-    }), room.observers)) : external_React_default().createElement("div", null), isRecurring && isUpcoming && scheduledMeeting.occurrences.some(o => !o.canceled) && external_React_default().createElement(AccordionPanel, {
+    }), room.observers)) : external_React_default().createElement("div", null), isRecurring && isUpcoming && scheduledMeeting.occurrences.some(o => o.isUpcoming) && external_React_default().createElement(AccordionPanel, {
       key: "occurrences",
       className: "chat-occurrences-panel",
       accordionClass: "chatroom-occurrences-panel",

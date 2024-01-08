@@ -4602,7 +4602,7 @@ lazy(mega.gallery, 'albums', () => {
             }
 
             const delHandle = album.eIds[id];
-            const isCover = album.node && album.node.h === delHandle;
+            this.isCover = this.isCover || album.node && album.node.h === delHandle;
 
             album.nodes = album.nodes.filter(({ h }) => h !== delHandle);
 
@@ -4611,7 +4611,9 @@ lazy(mega.gallery, 'albums', () => {
 
             delay('album:' + s + ':update_placeholder', () => {
                 if (album.nodes.length) {
-                    album.node = album.nodes[0];
+                    if (this.isCover) {
+                        album.node = album.nodes[0];
+                    }
                 }
                 else {
                     delete album.node;
@@ -4620,10 +4622,12 @@ lazy(mega.gallery, 'albums', () => {
                 if (album.cellEl) {
                     album.cellEl.updatePlaceholders();
 
-                    if (!album.node || isCover || album.node.fa !== album.cellEl.coverFa) {
+                    if (!album.node || this.isCover || album.node.fa !== album.cellEl.coverFa) {
                         album.cellEl.updateCoverImage();
                     }
                 }
+
+                delete this.isCover;
             });
 
             if (M.currentdirid === 'albums/' + s) {

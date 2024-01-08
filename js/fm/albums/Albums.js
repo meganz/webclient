@@ -4278,7 +4278,7 @@ lazy(mega.gallery, 'albums', () => {
          * @returns {void}
          */
         createAlbumData({ e, at, k, id, ts, p, cts }, ignoreHandles, isPublic) {
-            const attr = (isPublic)
+            const attr = at === '' || !at ? {} : isPublic
                 ? mega.sets.decryptPublicSetAttr(at, k)
                 : mega.sets.decryptSetAttr(at, k);
             const label = attr.n || l.unknown_album_name;

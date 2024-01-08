@@ -355,9 +355,13 @@ mobile.downloadOverlay = {
             eventlog(99803, 'ZipIO Download completed on mobile.'); // Downloaded file on mobile webclient
         }
 
-        if (dl.hasResumeSupport) {
+        if (dlid) {
+            fdl_queue_var = false;
+        }
+        else if (dl.hasResumeSupport) {
             dlmanager.remResumeInfo(dl).dump();
         }
+
         Soon(M.resetUploadDownload);
 
         this.downloadTransfer.finishTransfer(false);

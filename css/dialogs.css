@@ -2197,7 +2197,6 @@ body.de .mega-dialog.contact-picker-widget {
         padding-top: 16px;
     }
     .mega-dialog.export-links-dialog .pro.disabled::before {
-        content: '';
         display: block;
         left: 0;
         top: 0;
@@ -2205,11 +2204,13 @@ body.de .mega-dialog.contact-picker-widget {
         width: 100%;
         height: 100%;
         z-index: 10;
-        cursor: pointer;
     }
     .rtl .mega-dialog.export-links-dialog .pro.disabled::before {
         left: auto;
         right: 0;
+    }
+    .mega-dialog.export-links-dialog .pro.disabled .pro-only-feature {
+        cursor: pointer;
     }
     .mega-dialog.export-links-dialog .pro-only-feature {
         color: var(--text-color-error);

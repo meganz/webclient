@@ -47,7 +47,7 @@
  *                  copyToastText: l.value_copied
  *              });`
  *
- * Text area with automatic height. Increase/decrease the text area in height depending on the amount of text.
+ * - Text area with automatic height. Increase/decrease the text area in height depending on the amount of text.
  *      wrapperClass: `textarea auto-height`
  *      Example: `<input class="underlinedText copyButton" data-wrapper-class="textarea auto-height"/>`
  *      Options once MegaInput init:
@@ -58,6 +58,11 @@
  *                  autoHeight: true,
  *                  maxHeight: 140,
  *              });`
+ *
+ * - Length Checker - Show number of characters entered below input field if it has a limit (no-of-chars / limit)
+ *      Class: `lengthChecker`
+ *      Example: `<input class="underlinedText lengthChecker" type="text" name="register-name" id="register-name"
+ *          placeholder="[$195]" maxlength="1000" />`
  */
 mega.ui.MegaInputs.prototype.underlinedText = function() {
 
@@ -145,6 +150,9 @@ mega.ui.MegaInputs.prototype.underlinedText._init = function() {
 
         // Insert password strength checker
         this.underlinedText._strengthChecker.call(this);
+
+        // Insert input length checker
+        this.textArea._lengthChecker.call(this);
 
         // With icon or prefix (e.g. currency)
         this.underlinedText._withIconOrPrefix.call(this);
@@ -529,6 +537,48 @@ mega.ui.MegaInputs.prototype.underlinedText._botSpaceCalc = function() {
                      this.origBotSpace
                      + $('.message-container', $wrapper).outerHeight()
                      + ($wrapper.hasClass('fix-msg') ? 4 : 9));
+    }
+};
+
+mega.ui.MegaInputs.prototype.underlinedText._lengthChecker = function() {
+
+    'use strict';
+
+    var $input = this.$input;
+    var $wrapper = this.$wrapper;
+
+    const maxLength = $input.attr('maxlength');
+
+    if ($input.hasClass('lengthChecker') && maxLength) {
+
+        // Length section
+        $wrapper.safeAppend('<div class="length-check hidden">' +
+            '<span class="chars-used"></span>' +
+            `<span class="char-limit">/${maxLength}</span>` +
+        '</div>');
+
+        const $lengthCheck = $('.length-check', $wrapper);
+
+        if ($input.val().length) {
+            $lengthCheck.removeClass('hidden');
+            $('.chars-used', $lengthCheck).text($input.val().length);
+        }
+
+        $input.rebind('keyup.lengthChecker input.lengthChecker change.lengthChecker', (e) => {
+
+            if (e.keyCode === 13) {
+                return false;
+            }
+
+            this.hideError();
+
+            const inputSize = $input.val().length;
+
+            $lengthCheck.toggleClass('hidden', !inputSize);
+
+            const $charsUsed = $('.chars-used', $wrapper);
+            $charsUsed.text(inputSize);
+        });
     }
 };
 

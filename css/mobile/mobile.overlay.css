@@ -14,10 +14,6 @@
     transition: visibility 0.2s ease-out;
 }
 
-.mega-sheet.overlay-wrap {
-    z-index: 1201;
-}
-
 .overlay-wrap.active {
     visibility: visible;
 }

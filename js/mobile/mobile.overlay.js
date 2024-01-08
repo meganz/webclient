@@ -17,20 +17,12 @@ class MegaMobileOverlay extends MegaMobileComponent {
 
         targetNode = overlay;
 
-        const closeButton = new MegaMobileButton({
+        this.closeButton = new MegaMobileButton({
             parentNode: targetNode,
             type: 'icon',
             componentClassname: 'text-icon close',
             icon: 'sprite-mobile-fm-mono icon-x-thin-outline',
             iconSize: 24
-        });
-
-        closeButton.on('tap.closeOverlay', () => {
-            this.hide();
-            if (mega.ui.toast) {
-                mega.ui.toast.rack.removeClass('above-actions');
-            }
-            this.trigger('close');
         });
 
         subNode = document.createElement('div');
@@ -131,6 +123,23 @@ class MegaMobileOverlay extends MegaMobileComponent {
 
             _bindEvent(options.onShow);
         }
+
+        this.closeButton.rebind('tap.closeOverlay', async() => {
+            // If the overlay requires a confirmation action before closing it,
+            // wait for the user's response before trying to close the overlay
+            if (options && options.confirmClose) {
+                const closeOverlay = await options.confirmClose();
+                if (!closeOverlay) {
+                    return;
+                }
+            }
+
+            this.hide();
+            if (mega.ui.toast) {
+                mega.ui.toast.rack.removeClass('above-actions');
+            }
+            this.trigger('close');
+        });
 
         this.domNode.classList.add('active');
     }

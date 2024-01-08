@@ -420,7 +420,7 @@ mBroadcaster.once('boot_done', () => {
 
                 eventlog(99833);
 
-                mega.fileRequest.showCreateMobileDialog(nodeHandle);
+                mobile.fileRequestManagement.showOverlay(nodeHandle);
 
                 return false;
             }
@@ -436,7 +436,7 @@ mBroadcaster.once('boot_done', () => {
                     return false;
                 }
 
-                mega.fileRequest.showManageMobileDialog(nodeHandle);
+                mobile.fileRequestManagement.showOverlay(nodeHandle);
 
                 return false;
             }
@@ -473,9 +473,7 @@ mBroadcaster.once('boot_done', () => {
                     return false;
                 }
 
-                mega.fileRequest.dialogs.removeWarningMobileDialog.init({
-                    h: nodeHandle
-                });
+                mobile.fileRequestManagement.removeFileRequest(nodeHandle);
 
                 return false;
             }

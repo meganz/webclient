@@ -307,7 +307,15 @@ class MegaMobileNode extends MegaMobileComponent {
         }
 
         if (_shouldUpdate('icon')) {
-            this.domNode.querySelector('.fm-item-img i').className = this.icon;
+            const iconNode = this.domNode.querySelector('.fm-item-img i');
+            const imgNode = iconNode.parentNode;
+
+            if (iconNode.className !== this.icon) {
+
+                // Rendering issue fix. File/folder blocks were not re-rendered when changing svg icon classname
+                iconNode.remove();
+                mCreateElement('i', {'class': this.icon}, imgNode);
+            }
         }
 
         if (_shouldUpdate('fav')) {

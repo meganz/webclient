@@ -740,17 +740,16 @@
     -webkit-margin-end: 8px;
     margin-inline-end: 8px;
 }
+.mobile.mega-input .length-check {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-large-regular);
+    margin-top: 2px;
+}
 
 /* Mobile textarea */
-
-.mobile.mega-input textarea {
-    font: var(--mobile-font-copy-regular);
-    color: var(--mobile-text-primary);
-    overflow: hidden;
-    padding: 0;
-    height: 100%;
-    white-space: normal;
-}
 
 .mobile.mega-input.textarea {
     padding: 14px 12px;
@@ -760,12 +759,17 @@
     align-items: flex-start;
 }
 
-.mobile.mega-input.textarea .length-check {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    color: var(--mobile-text-secondary);
-    font: var(--mobile-font-caption-large-regular);
+.mobile.mega-input.textarea textarea {
+    font: var(--mobile-font-copy-regular);
+    color: var(--mobile-text-primary);
+    overflow: hidden;
+    padding: 0;
+    height: 100%;
+    white-space: pre-wrap;
+}
+
+.mobile.mega-input.textarea textarea::placeholder {
+    font: var(--mobile-font-copy-regular);
 }
 
 .mobile.mega-input.textarea i {
@@ -776,6 +780,7 @@
 /* Textarea with auto height */
 
 .mobile.mega-input.textarea.box-style.auto-height {
+    align-items: center;
     height: auto;
     min-height: 47px;
     padding: 9px 6px;
@@ -787,6 +792,12 @@
     overflow: auto;
     padding: 0 6px;
     min-height: 24px;
+}
+
+.mobile.mega-input.textarea.box-style.auto-height textarea ~ i {
+    margin: 0;
+    margin-inline-end: 6px;
+    -webkit-margin-end: 6px;
 }
 
 .mobile.mega-input.textarea.box-style.auto-height .message-container {

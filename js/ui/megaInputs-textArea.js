@@ -59,7 +59,7 @@ mega.ui.MegaInputs.prototype.textArea._init = function() {
         $input.wrap(`<div class="mega-input ${wrapperClass}"></div>`);
 
         const $wrapper = this.$wrapper = $input.closest(`.mega-input`);
-        $wrapper.addClass('text-field');
+        $wrapper.addClass('textarea');
 
         // Hide wrapper if input has hidden class
         if ($input.hasClass('hidden')) {
@@ -73,6 +73,10 @@ mega.ui.MegaInputs.prototype.textArea._init = function() {
 
             // Adding required sign
             title += this.required ? ' <span class="required-red">*</span>' : '';
+
+            if ($input.hasClass('optional')) {
+                title += `<span class="optional">${l[7347]}</span>`;
+            }
 
             const titleBlock = '<div class="mega-input-title">' + title + '</div>';
 
@@ -97,7 +101,7 @@ mega.ui.MegaInputs.prototype.textArea._init = function() {
         // With clear button
         this.textArea._withClearButton.call(this);
 
-        // Insert password length checker
+        // Insert input length checker
         this.textArea._lengthChecker.call(this);
 
         // Add some class to wrapper
@@ -146,41 +150,7 @@ mega.ui.MegaInputs.prototype.textArea._withClearButton = function() {
     }
 };
 
-mega.ui.MegaInputs.prototype.textArea._lengthChecker = function() {
-
-    'use strict';
-
-    var $input = this.$input;
-    var $wrapper = this.$wrapper;
-
-    const maxLength = $input.attr('maxlength');
-
-    if ($input.hasClass('lengthChecker') && maxLength) {
-
-        // Length section
-        $wrapper.safeAppend('<div class="length-check hidden">' +
-            '<span class="chars-used"></span>' +
-            `<span class="char-limit">/${maxLength}</span>` +
-        '</div>');
-
-        $input.rebind('keyup.lengthChecker input.lengthChecker change.lengthChecker', (e) => {
-
-            if (e.keyCode === 13) {
-                return false;
-            }
-
-            this.hideError();
-
-            const inputSize = $input.val().length;
-
-            const $lengthCheck = $('.length-check', $wrapper);
-            $lengthCheck.toggleClass('hidden', !inputSize);
-
-            const $charsUsed = $('.chars-used', $wrapper);
-            $charsUsed.text(inputSize);
-        });
-    }
-};
+mega.ui.MegaInputs.prototype.textArea._lengthChecker = mega.ui.MegaInputs.prototype.underlinedText._lengthChecker;
 
 mega.ui.MegaInputs.prototype.textArea._extendedFunctions =
     mega.ui.MegaInputs.prototype.underlinedText._extendedFunctions;

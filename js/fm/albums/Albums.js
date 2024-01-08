@@ -3757,6 +3757,7 @@ lazy(mega.gallery, 'albums', () => {
 
         removeAlbum(album) {
             if (album.button) {
+                album.button.el.classList.remove('active');
                 this.treeList.removeChild(album.button.el);
             }
         }

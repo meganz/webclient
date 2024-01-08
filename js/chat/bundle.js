@@ -4131,7 +4131,7 @@ ChatRoom.prototype.getRetentionLabel = function (retentionTime) {
   const hours = secondsToHours(retentionTime);
   switch (this.getRetentionFormat(retentionTime)) {
     case RETENTION_FORMAT.DISABLED:
-      return l[7070];
+      return l.disabled_chat_history_cleaning_status;
     case RETENTION_FORMAT.MONTHS:
       return mega.icu.format(l.months_chat_history_plural, months);
     case RETENTION_FORMAT.WEEKS:
@@ -13183,7 +13183,7 @@ class ConversationRightArea extends mixins.wl {
     }, external_React_default().createElement("div", {
       className: "dropdown-item link-button retention-history-menu__list__elem",
       onClick: () => this.setRetention(room, 0)
-    }, external_React_default().createElement("span", null, l[7070]), retentionTime === 0 && ICON_ACTIVE), external_React_default().createElement("div", {
+    }, external_React_default().createElement("span", null, l.disabled_chat_history_cleaning_status), retentionTime === 0 && ICON_ACTIVE), external_React_default().createElement("div", {
       className: "dropdown-item link-button retention-history-menu__list__elem",
       onClick: () => this.setRetention(room, daysToSeconds(1))
     }, external_React_default().createElement("span", null, l[23437]), retentionTime === 1 && ICON_ACTIVE), external_React_default().createElement("div", {

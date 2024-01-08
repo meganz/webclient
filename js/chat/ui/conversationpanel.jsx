@@ -863,7 +863,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                         <div
                             className={ELEM_CLASSNAME}
                             onClick={() => this.setRetention(room, 0)}>
-                            <span>{l[7070]}</span>
+                            <span>{l.disabled_chat_history_cleaning_status}</span>
                             {retentionTime === 0 && ICON_ACTIVE}
                         </div>
                         <div

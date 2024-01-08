@@ -1191,7 +1191,7 @@ lazy(mega, 'backupCenter', () => {
                 mCreateElement('i', {
                     'class': 'sprite-fm-mono warning icon-disable'
                 }, statusParentNode);
-                mCreateElement('span', {'class': 'warning'}, statusParentNode).textContent = l[7070];
+                mCreateElement('span', {'class': 'warning'}, statusParentNode).textContent = l.backup_disabled_by_user;
 
                 if (!isDeviceCard) {
 

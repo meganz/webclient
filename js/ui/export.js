@@ -1762,6 +1762,7 @@ function logExportEvt(type, target) {
         var $embedFooter = $('footer .embed-footer', $linksDialog);
         var $options = $('.options', $linksTab);
         var $proOptions = $('.pro', $options);
+        var $proOnlyLink = $('.pro-only-feature', $proOptions);
         var $setExpiryItem = $('.link-button.set-exp-date', $linksTab);
         var $removeItem = $('.link-button.remove-item', $linksTab);
         var $bottomBar = $('.links-footer', $linksDialog);
@@ -1830,7 +1831,8 @@ function logExportEvt(type, target) {
         $setExpiryItem.addClass('hidden');
         $removeItem.addClass('hidden');
         $options.addClass('hidden');
-        $proOptions.addClass('hidden disabled').unbind('click.openpro');
+        $proOptions.addClass('hidden disabled');
+        $proOnlyLink.unbind('click.openpro');
         $updateSuccessBanner.addClass('hidden');
         $linksContainer.removeClass('multiple-links');
         $passwordInput.val('');
@@ -2367,7 +2369,7 @@ function logExportEvt(type, target) {
             $removeItem.removeClass('hidden');
 
             // On PRO options click, go to the Pro page
-            $proOptions.rebind('click.openpro', function() {
+            $proOnlyLink.rebind('click.openpro', () => {
                 open(getAppBaseUrl() + '#pro');
             });
 

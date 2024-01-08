@@ -392,6 +392,30 @@ i.text-color-medium {
 .pointer-events-none {
     pointer-events: none;
 }
+.shimmer {
+    animation: shimmer 10s linear infinite;
+    background: linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0) 0%,
+        rgba(0, 0, 0, 0) 42%,
+        var(--surface-highlight-1) 47.5%,
+        var(--surface-highlight-1) 50%,
+        var(--surface-highlight-1) 52.5%,
+        rgba(0, 0, 0, 0) 58%,
+        rgba(0, 0, 0, 0) 100%
+    );
+    background-size: 800% 100%;
+    background-color: var(--surface-grey-6);
+}
+
+@keyframes shimmer {
+    from {
+        background-position: 0% 0;
+    }
+    to {
+        background-position: -800% 0;
+    }
+}
 @keyframes dialogpopin
 {
     from {

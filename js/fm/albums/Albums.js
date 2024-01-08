@@ -15,37 +15,6 @@ lazy(mega.gallery, 'albums', () => {
     scope.cellMargin = 4;
 
     /**
-     * Adding a loading icon to the cell
-     * @param {HTMLElement} el DOM Element to add the loading icon to
-     * @param {Boolean} isVideo Whether to attach loading icon as for a video or an image
-     * @returns {void}
-     */
-    scope.attachLoadingIcon = (el, isVideo = false) => {
-        if (!el.classList.contains('cover-loading')) {
-            el.classList.add('cover-loading');
-            const i = document.createElement('i');
-            i.className = `sprite-fm-mono ${ isVideo ? 'icon-videos video' : 'icon-images image' }`;
-            el.appendChild(i);
-        }
-    };
-
-    /**
-     * Removing the loading icon from the cell
-     * @param {HTMLElement} el DOM Element to remove the loading icon from
-     * @returns {void}
-     */
-    scope.detachLoadingIcon = (el) => {
-        if (el.classList.contains('cover-loading')) {
-            el.classList.remove('cover-loading');
-            const i = [...el.children].find(child => child.tagName === 'I');
-
-            if (i) {
-                el.removeChild(i);
-            }
-        }
-    };
-
-    /**
      * Checking whether an event is being dispatched with Ctrl key in hold
      * @param {Event} evt Event object to check
      * @returns {Boolean}
@@ -381,6 +350,10 @@ lazy(mega.gallery, 'albums', () => {
     const limitNameLength = name => (name.length > nameLenLimit) ? name.substring(0, nameLenLimit) + '...' : name;
 
     const getAlbumsCount = () => Object.values(scope.albums.store).filter(({ filterFn }) => !filterFn).length;
+
+    const openMainPage = () => {
+        M.openFolder('albums');
+    };
 
     /**
      * @param {HTMLElement} el DOM element to apply PerfectScroll to
@@ -762,7 +735,7 @@ lazy(mega.gallery, 'albums', () => {
                     });
                 }
                 else if (album.filterFn) {
-                    M.openFolder('albums');
+                    openMainPage();
                     grid.showAllAlbums();
                 }
                 else {
@@ -2492,7 +2465,7 @@ lazy(mega.gallery, 'albums', () => {
         buildElement() {
             this.el = document.createElement('div');
             this.el.className = 'albums-grid-cell flex flex-column justify-end cursor-pointer';
-            scope.attachLoadingIcon(this.el);
+            scope.setShimmering(this.el);
         }
 
         selectCell(clearSiblingSelections) {
@@ -2518,7 +2491,7 @@ lazy(mega.gallery, 'albums', () => {
                 this.el.style.backgroundImage = 'url(\'' + dataUrl + '\')';
                 this.el.style.backgroundColor = 'white';
                 this.coverFa = fa;
-                scope.detachLoadingIcon(this.el);
+                scope.unsetShimmering(this.el);
             }
         }
 
@@ -2634,7 +2607,7 @@ lazy(mega.gallery, 'albums', () => {
                         '',
                         'icon-next-arrow rot-180',
                         () => {
-                            M.openFolder('albums');
+                            openMainPage();
                         },
                         'mega-button breadcrumb-btn action'
                     );
@@ -2934,14 +2907,6 @@ lazy(mega.gallery, 'albums', () => {
             this.el = document.createElement('div');
             this.el.className = 'albums-grid justify-center ps-ignore-keys';
 
-            MComponent.listen(this.el, 'click', ({ shiftKey }) => {
-                AlbumCell.clearSiblingSelections();
-
-                if (!shiftKey) {
-                    this.lastSelected = null;
-                }
-            });
-
             parent.appendChild(this.el);
         }
 
@@ -2979,6 +2944,30 @@ lazy(mega.gallery, 'albums', () => {
                 this.el.removeChild(this.pendingCell);
                 delete this.pendingCell;
             }
+        }
+
+        addSkeletonCells(albums) {
+            for (let i = 0; i < albums.length; i++) {
+                const { label, nodes } = albums[i];
+                const cell = document.createElement('div');
+
+                cell.className = 'albums-grid-cell flex flex-column justify-end shimmer';
+                const subdiv = document.createElement('div');
+                const labelEl = document.createElement('div');
+                labelEl.className = 'album-label';
+                labelEl.textContent = label;
+                const captionEl = document.createElement('div');
+                captionEl.textContent = mega.icu.format(l.album_items_count, nodes.length);
+
+                subdiv.appendChild(labelEl);
+                subdiv.appendChild(captionEl);
+                cell.appendChild(subdiv);
+
+                this.el.appendChild(cell);
+            }
+
+            this.updateGridState(albums.length);
+            this.el.scrollTop = 0;
         }
 
         showEmptyAlbumPage(albumId) {
@@ -3230,7 +3219,7 @@ lazy(mega.gallery, 'albums', () => {
                     MegaGallery.addThumbnails([albumCell.el.album]);
                 }
                 else {
-                    scope.detachLoadingIcon(albumCell.el);
+                    scope.unsetShimmering(albumCell.el);
                 }
             }
         }
@@ -3255,7 +3244,7 @@ lazy(mega.gallery, 'albums', () => {
                         thumbBlocks.push(albumCell.el.album);
                     }
                     else {
-                        scope.detachLoadingIcon(albumCell.el);
+                        scope.unsetShimmering(albumCell.el);
                     }
                 }
             }
@@ -3510,7 +3499,7 @@ lazy(mega.gallery, 'albums', () => {
             const album = id ? scope.albums.store[id] : null;
 
             if (!album || !albumIsRenderable(album)) {
-                M.openFolder('albums');
+                openMainPage();
             }
             else {
                 this.showAlbumContents(id);
@@ -3657,7 +3646,7 @@ lazy(mega.gallery, 'albums', () => {
                     storeLastActiveTab();
 
                     if (!M.isAlbumsPage(1)) {
-                        M.openFolder('albums');
+                        openMainPage();
                     }
 
                     if (this.listExpanded) {
@@ -3958,7 +3947,7 @@ lazy(mega.gallery, 'albums', () => {
                             this.grid.removeEmptyBlock();
                         }
 
-                        M.openFolder('albums');
+                        openMainPage();
                     }
                 }),
                 mega.sets.subscribe('aep', 'albums', (element) => {

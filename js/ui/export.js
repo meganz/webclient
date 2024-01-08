@@ -368,6 +368,8 @@ var exportPassword = {
                     .finally(() => {
                         loadingDialog.hide();
                     });
+
+                return false;
             });
         },
 

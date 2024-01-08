@@ -1557,6 +1557,7 @@ var exportExpiry = {
         //  turn it on and this will also trigger the current expiry date to be shown in the datepicker
         if (expiryTimestamps.length && $expiryOptionToggle.hasClass('toggle-off')) {
             $expiryOptionToggle.trigger('click');
+            $setDateInput.trigger('blur');
         }
     },
 

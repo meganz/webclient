@@ -35,6 +35,9 @@ var notify = {
     // The welcome dialog has been shown this session
     welcomeDialogShown: false,
 
+    // User added to the experiment this session (to avoid duplicate api calls to add user to experiment)
+    checkedExperiment: false,
+
     /**
      * Initialise the notifications system
      */
@@ -1314,9 +1317,19 @@ var notify = {
         // free account after the experiment started
         // Send the request to add them to the experiment if they have the experiment flag
         // and signed up from free after the experiment started
-        if ((u_attr['^!welDlg'] === 1) && (typeof mega.flags.ab_wdns !== 'undefined')) {
+        if (((u_attr['^!welDlg'] | 0) === 1)
+                && (typeof mega.flags.ab_wdns !== 'undefined')
+                && !notify.checkedExperiment) {
+
             api.req({'a': 'abta', c: 'ab_wdns'}).catch(dump);
+            if (d) {
+                console.info('User was added to experiment wdns');
+            }
         }
+        else if (d && (typeof mega.flags.ab_wdns !== 'undefined') && !notify.checkedExperiment) {
+            console.info('User was NOT added to experiment wdns');
+        }
+        notify.checkedExperiment = true;
 
         if (!notification.seen
                 && !notify.welcomeDialogShown
@@ -1326,6 +1339,9 @@ var notify = {
 
             notify.createNewUserDialog(notification);
             notify.welcomeDialogShown = true;
+            mega.attr.set('welDlg', 0, -2, true);
+        }
+        else if ((u_attr['^!welDlg'] | 0) === 1 && mega.flags.ab_wdns === 0) {
             mega.attr.set('welDlg', 0, -2, true);
         }
 

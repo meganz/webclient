@@ -4146,15 +4146,6 @@ lazy(fm_thumbnails, 'exclude', () => {
     'use strict';
     const res = {
         recents: 5,
-        photos: 7,
-        [mega.gallery.secKeys.cuphotos]: 7,
-        [mega.gallery.secKeys.cdphotos]: 7,
-        images: 7,
-        [mega.gallery.secKeys.cuimages]: 7,
-        [mega.gallery.secKeys.cdimages]: 7,
-        videos: 7,
-        [mega.gallery.secKeys.cuvideos]: 7,
-        [mega.gallery.secKeys.cdvideos]: 7,
         favourites: 7
     };
     return Object.setPrototypeOf(res, null);
@@ -4166,7 +4157,7 @@ function fm_thumbnails(mode, nodeList, callback)
 
     const pwd = M.currentdirid;
     const exclude = fm_thumbnails.exclude[pwd];
-    if (M.gallery || M.chat && mode !== 'standalone' || exclude > 6) {
+    if ((M.gallery || M.chat || M.albums) && mode !== 'standalone' || exclude > 6) {
         return;
     }
     nodeList = (mode === 'standalone' ? nodeList : false) || M.v;

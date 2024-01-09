@@ -2362,7 +2362,7 @@ mega.gallery.arrayBufferContainsAlpha = (ab) => {
 /**
  * A method to make/load the thumbnails of specific size based on the list of handles provided
  * @param {Array} keys Handle+size key to fetch from local database or to generate.
- * Key example: `1P9hFJwb|w233` - handle is 1P9hFJwb, width 233px
+ * Key example: `1P9hFJwb|w320` - handle is 1P9hFJwb, width 320px
  * @param {Function} [onLoad] Single image successful load callback
  * @param {Function} [onErr] Callback when a single image is failed to load
  * @returns {void}
@@ -2766,7 +2766,9 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
         GalleryNodeBlock.thumbCache = Object.create(null);
     }
 
+    const thumbSize = 240;
     const keys = [];
+    const thumbBlocks = {};
 
     for (let i = 0; i < nodeBlocks.length; i++) {
         if (!nodeBlocks[i].node) { // No node is associated with the block
@@ -2790,6 +2792,15 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
             mega.gallery.pendingFaBlocks[h][width] = nodeBlocks[i];
             continue;
         }
+        else if (width <= thumbSize) {
+            if (thumbBlocks[nodeBlocks[i].node.h]) {
+                thumbBlocks[nodeBlocks[i].node.h].push(nodeBlocks[i]);
+            }
+            else {
+                thumbBlocks[nodeBlocks[i].node.h] = [nodeBlocks[i]];
+            }
+            continue;
+        }
 
         if (GalleryNodeBlock.thumbCache[key]) {
             nodeBlocks[i].setThumb(GalleryNodeBlock.thumbCache[key], nodeBlocks[i].node.fa);
@@ -2806,6 +2817,21 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
         else {
             mega.gallery.pendingThumbBlocks[key] = [nodeBlocks[i]];
         }
+    }
+
+    // Checking if there are any re-usable thumbnails available
+    const thumbHandles = Object.keys(thumbBlocks);
+
+    if (thumbHandles.length) {
+        fm_thumbnails(
+            'standalone',
+            thumbHandles.map(h => M.d[h]),
+            ({ h, fa }) => {
+                for (let i = 0; i < thumbBlocks[h].length; i++) {
+                    thumbBlocks[h][i].setThumb(thumbnails.get(fa), fa);
+                }
+            }
+        );
     }
 
     // All nodes are in pending state, no need to proceed

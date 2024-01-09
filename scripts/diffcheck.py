@@ -115,7 +115,7 @@ def get_commits_in_branch(current_branch=None):
         current_branch = get_current_branch()
 
     if current_branch in protected_branches:
-        logging.warn('In protected branch ({})'.format(current_branch))
+        logging.warning(f'In protected branch ({current_branch})')
         return -1, 0
 
     commits = int(run_git_command('rev-list --no-merges --count {}..{}'.format(BASE_BRANCH, current_branch)).decode('utf8'))
@@ -349,7 +349,7 @@ def reduce_htmlhint(file_line_mapping, **extra):
         return '*** HTMLHint: {} ***'.format(ex), 0
     output = strip_ansi_codes(output.decode('utf8')).rstrip().split('\n')
 
-    if re.search('Scanned \d+ files, no errors found', output[-1]):
+    if re.search(r'Scanned \d+ files, no errors found', output[-1]):
         return '', 0
 
     # Go through output and collect only relevant lines to the result.
@@ -529,10 +529,11 @@ def reduce_validator(file_line_mapping, **extra):
         file_path = os.path.join(*filename)
         file_extension = os.path.splitext(file_path)[-1]
 
-        if not any([n in file_path for n in special_chars_exclude]):
+        if not any([n in file_path for n in special_chars_exclude]) and file_extension not in ['.py', '.sh']:
             if analyse_files_for_special_chars(file_path, result):
                 fatal += 1
                 # break
+
         # Ignore known custom made files
         if file_path in config.VALIDATOR_IGNORE_FILES:
             continue

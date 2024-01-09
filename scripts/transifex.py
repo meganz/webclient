@@ -16,22 +16,21 @@ Requirements:
 This script will work with both Python 2.7 as well as 3.x.
 """
 
-import copy, json, os, sys, re, subprocess, time, io, random, argparse, datetime
-from threading import Thread
+import argparse
+import datetime
+import io
+import json
+import os
+import random
+import re
+import subprocess
+import sys
+import time
 from collections import OrderedDict
 from functools import cmp_to_key
-version = sys.version_info.major
-if version == 2:
-    from urllib2 import Request, urlopen, install_opener, build_opener, HTTPRedirectHandler, HTTPError
-else:
-    from urllib.request import Request, urlopen, install_opener, build_opener, HTTPRedirectHandler
-    from urllib.error import HTTPError
-
-base_url = None
-organisation_id = None
-project_id = None
-resource_slug = None
-transifex_token = None
+from threading import Thread
+from urllib.error import HTTPError
+from urllib.request import Request, urlopen, install_opener, build_opener, HTTPRedirectHandler
 
 base_url = os.getenv('TRANSIFEX_BASE_URL')
 organisation_id = os.getenv('TRANSIFEX_ORGANISATION')
@@ -60,8 +59,8 @@ if os.path.exists(config_file):
     transifex_bot_url = transifex_config.get('TRANSIFEX_BOT_URL') or transifex_bot_url
 
 if not base_url or not organisation_id or not project_id or not resource_slug or not transifex_token:
-     print("ERROR: Incomplete Transifex settings.")
-     sys.exit(1)
+    print("ERROR: Incomplete Transifex settings.")
+    sys.exit(1)
 
 BASE_URL = base_url
 RESOURCE = resource_slug
@@ -94,12 +93,12 @@ def sanitise_string(string, convert_quotes, escape_tag):
 
     # Quotes
     quotes = [
-        ['"(.+)"',       u"\u201c\g<1>\u201d"],           # Enclosing double quotes
-        ["(\W)'(.+)'",   u"\g<1>\u2018\g<2>\u2019"],      # Enclosing single quotes
-        ["(\w)'",        u"\g<1>\u2019"],                 # Remaining single quote
+        [r'"(.+)"',      r"“\g<1>”"],       # Enclosing double quotes
+        [r"(\W)'(.+)'",  r"\g<1>‘\g<2>’"],  # Enclosing single quotes
+        [r"(\w)'",       r"\g<1>’"],        # Remaining single quote
     ]
 
-    replacements = [["\.\.\.", u"\u2026"]]
+    replacements = [[r"\.\.\.", "…"]]
 
     if convert_quotes:
         replacements = replacements + quotes
@@ -173,7 +172,7 @@ language_cache = None
 
 def get_languages():
     global language_cache
-    if language_cache != None:
+    if language_cache is not None:
         return language_cache
     try:
         url = BASE_URL + "/projects/" + PROJECT_ID + "/languages"
@@ -294,7 +293,7 @@ def download_languages(resource, lang = []):
             try:
                 content = json.loads(e.read().decode('utf8'))
                 print_error(content['errors'])
-            except JSONDecodeError as e2:
+            except json.JSONDecodeError:
                 print('ERROR: Unable to read error download message')
             finally:
                 return False
@@ -316,12 +315,8 @@ def get_branch_resource_name(is_upload = False, is_force = False, is_override = 
     if branch_name in ["master", "develop"]:
         if is_upload:
             if is_override:
-                version = sys.version_info.major
                 input_note = "WARNING: This command will update main resource file. Type \"YES\" to proceed: "
-                if version == 2:
-                    user_input = raw_input(input_note)
-                else:
-                    user_input = input(input_note)
+                user_input = input(input_note)
                 if user_input == "YES":
                     branch_resource_name = "prod"
                 else:
@@ -346,12 +341,8 @@ def get_branch_resource_name(is_upload = False, is_force = False, is_override = 
                 print("")
                 return False
             if is_force:
-                version = sys.version_info.major
                 input_note = "WARNING: Only create an empty branch resource if sub-branches will be made for this branch in future. Type \"YES\" to proceed: "
-                if version == 2:
-                    user_input = raw_input(input_note)
-                else:
-                    user_input = input(input_note)
+                user_input = input(input_note)
                 if user_input != "YES":
                     return "skip_force"
             print("Creating new resource... ")
@@ -452,10 +443,10 @@ def string_validation(new_strings, en_strings):
         elif 'developer_comment' not in data:
             print('ERROR: String with key {} has no developer comment.'.format(key))
             valid_strings = False
-        elif re.sub('\s', '', key) == '':
+        elif re.sub(r'\s', '', key) == '':
             print('ERROR: A string key is empty')
             valid_strings = False
-        elif re.sub('\s', '', data['string']) == '' and re.sub('\s', '', data['developer_comment']) != '':
+        elif re.sub(r'\s', '', data['string']) == '' and re.sub(r'\s', '', data['developer_comment']) != '':
             print('ERROR: String with key {} has no string content'.format(key))
             valid_strings = False
         elif len(data['developer_comment']) and 'hotfix' not in branch_name.lower() and re.search("^[A-Z]{2,4}-\d+:", data['developer_comment']) is None:
@@ -471,10 +462,7 @@ def string_validation(new_strings, en_strings):
                         print("If the string has the same context consider using it instead.")
                         # May find multiple strings so warn for all until the user rejects or there are no more to check.
                         note = "Do you want to add a duplicate? (Y/N): "
-                        if sys.version_info.major == 2:
-                            user_input = raw_input(note)
-                        else:
-                            user_input = input(note)
+                        user_input = input(note)
                         if user_input.lower()[0:1] == "y":
                             should_add = True
                         else:
@@ -497,9 +485,9 @@ def validate_strings(key_value_pairs):
     duplicated_keys = []
     for key, value in key_value_pairs:
         if key in strings:
-           duplicated_keys.append(key)
+            duplicated_keys.append(key)
         else:
-           strings[key] = value
+            strings[key] = value
     if len(duplicated_keys) > 0:
         print('ERROR: Duplicated key: {}'.format(", ".join(duplicated_keys)))
         sys.exit(1)
@@ -528,8 +516,7 @@ def get_update(filename, en_strings):
         return False
 
 def has_locked_msgs(is_prod):
-
-    if is_prod != True:
+    if not is_prod:
         return False
 
     from datetime import datetime, timedelta
@@ -552,7 +539,7 @@ def has_locked_msgs(is_prod):
     flaggedStrings=[]
     pageNB = 1
 
-    while nextPage != None:
+    while nextPage is not None:
         print("Page check for tags ", pageNB)
         pageNB+=1
 
@@ -586,7 +573,7 @@ def has_locked_msgs(is_prod):
             content = json.loads(e.read().decode("utf8"))
             print_error(content["errors"])
             if len(flaggedStrings) > 0 :
-                    print("Found tagged string till the EXCEPTION got raised: ", flaggedStrings)
+                print("Found tagged string till the EXCEPTION got raised: ", flaggedStrings)
             sys.exit(1)
 
     if len(flaggedStrings) > 0 :
@@ -660,7 +647,7 @@ def lock_resource(branch_resource_name, keys, branch, update_time = 0):
                     content = json.loads(e.read().decode('utf8'))
                     print_error(content['errors'])
                     return False
-            if content["links"]["next"] != None:
+            if content["links"]["next"] is not None:
                 url = content["links"]["next"]
 
 def pruning():
@@ -743,7 +730,7 @@ def main():
         pruning()
     if args.production:
         is_prod = args.production
-    elif args.language != None and len(args.language) > 0:
+    elif args.language is not None and len(args.language) > 0:
         try:
             languages = args.language[0].split(",")
         except:
@@ -757,10 +744,10 @@ def main():
         print("Failed to fetch main language files.")
         sys.exit(1)
 
-    if args.update != None:
+    if args.update is not None:
         print("~ Import started ~")
         filepath = os.path.dirname(os.path.abspath(__file__)) + "/../lang/strings.json"
-        if args.filepath != None:
+        if args.filepath is not None:
             filepath = args.filepath
         is_force = args.update == "force"
         is_override = args.update == "override_production"
@@ -868,4 +855,4 @@ def main():
 try:
     main()
 except KeyboardInterrupt:
-    os._exit(1)
+    sys.exit(1)

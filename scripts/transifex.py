@@ -449,7 +449,7 @@ def string_validation(new_strings, en_strings):
         elif re.sub(r'\s', '', data['string']) == '' and re.sub(r'\s', '', data['developer_comment']) != '':
             print('ERROR: String with key {} has no string content'.format(key))
             valid_strings = False
-        elif len(data['developer_comment']) and 'hotfix' not in branch_name.lower() and re.search("^[A-Z]{2,4}-\d+:", data['developer_comment']) is None:
+        elif len(data['developer_comment']) and 'hotfix' not in branch_name.lower() and re.search(r"^[A-Z]{2,4}-\d+:", data['developer_comment']) is None:
             print('ERROR: Developer comment for string with key {} does not start with a JIRA ticket id e.g: WEB-16334: Comment content'.format(key))
             valid_strings = False
         else:

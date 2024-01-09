@@ -970,7 +970,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                 <div/>
                             }
 
-                            {isRecurring && isUpcoming && scheduledMeeting.occurrences.some(o => !o.canceled) &&
+                            {isRecurring && isUpcoming && scheduledMeeting.occurrences.some(o => o.isUpcoming) &&
                                 <AccordionPanel
                                     key="occurrences"
                                     className="chat-occurrences-panel"

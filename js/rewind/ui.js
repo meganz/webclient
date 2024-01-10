@@ -1301,7 +1301,7 @@ lazy(mega, 'rewindUi', () => {
                     return 32;
                 },
                 perfectScrollOptions: {
-                    handlers: ['click-rail', 'drag-scrollbar', 'wheel', 'touch'],
+                    handlers: ['click-rail', 'drag-thumb', 'wheel', 'touch'],
                     minScrollbarLength: 50
                 }
             });

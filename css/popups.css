@@ -238,7 +238,7 @@ body.tl .dropdown.body.popup.contacts-search {
     position: relative;
     padding: 0 48px;
 }
-.horizontal-contacts-list div.ps > .ps__scrollbar-x-rail > .ps__scrollbar-x {
+.horizontal-contacts-list div.ps > .ps__rail-x > .ps__thumb-x {
     height: 6px;
     bottom: 1px;
 }

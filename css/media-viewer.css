@@ -645,8 +645,8 @@
                 padding-left: 8px;
             }
             .media-viewer .video-controls .bar li:not(.timing) > div:first-child,
-            .media-viewer .video-controls .bar li:not(.timing) > div.ps__scrollbar-x-rail,
-            .media-viewer .video-controls .bar li:not(.timing) > div.ps__scrollbar-y-rail {
+            .media-viewer .video-controls .bar li:not(.timing) > div.ps__rail-x,
+            .media-viewer .video-controls .bar li:not(.timing) > div.ps__rail-y {
                 padding-left: 0;
             }
             .media-viewer .video-controls .bar li.timing {

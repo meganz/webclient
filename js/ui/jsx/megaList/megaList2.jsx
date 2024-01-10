@@ -24,7 +24,7 @@ export class MegaList2 extends MegaRenderMixin {
             extraRows: 8,
             batchPages: 0,
             perfectScrollOptions: {
-                'handlers': ['click-rail', 'drag-scrollbar', 'wheel', 'touch'],
+                'handlers': ['click-rail', 'drag-thumb', 'wheel', 'touch'],
                 'minScrollbarLength': 20
             }
         };

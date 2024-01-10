@@ -334,7 +334,7 @@
             this.$listContainer.rebind('scroll.' + ns, self.throttledOnScroll.bind(self));
         }
         else {
-            $(document).rebind('ps-scroll-y.ps' + ns, self.throttledOnScroll.bind(self));
+            $(this.listContainer).rebind('ps-scroll-y.ps' + ns, self.throttledOnScroll.bind(self));
         }
     };
 
@@ -352,7 +352,7 @@
             this.$listContainer.off('scroll.' + ns);
         }
         else {
-            $(document).off('ps-scroll-y.ps' + ns);
+            $(this.listContainer).off('ps-scroll-y.ps' + ns);
         }
     };
 

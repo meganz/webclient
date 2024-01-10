@@ -11473,7 +11473,7 @@ body.de .mega-dialog.contact-picker-widget {
 }
 
 
-.mega-dialog.s4 .s4-table-scroll .ps__scrollbar-y-rail {
+.mega-dialog.s4 .s4-table-scroll .ps__rail-y {
     margin: 36px 0 4px;
 }
 .mega-dialog.s4 .radio-wrap {
@@ -11805,7 +11805,7 @@ body.de .mega-dialog.contact-picker-widget {
     overflow-y: auto;
 }
 
-.mega-dialog.file-request .content .scrollable .ps__scrollbar-y-rail {
+.mega-dialog.file-request .content .scrollable .ps__rail-y {
     margin-right: 8px;
     opacity: 0.6;
 }

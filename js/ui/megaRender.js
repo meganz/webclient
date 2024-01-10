@@ -1502,7 +1502,7 @@
                                 M.rmSetupUIDelayed(911);
                             },
                             'perfectScrollOptions': {
-                                'handlers': ['click-rail', 'drag-scrollbar', 'wheel', 'touch'],
+                                'handlers': ['click-rail', 'drag-thumb', 'wheel', 'touch'],
                                 'minScrollbarLength': 20
                             },
                         };

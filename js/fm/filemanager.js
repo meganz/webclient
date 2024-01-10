@@ -789,7 +789,7 @@ FileManager.prototype.initFileManagerUI = function() {
         });
     });
 
-    $fmholder
+    $('.ps', $fmholder)
         .rebind('ps-scroll-left.fm-x-scroll ps-scroll-right.fm-x-scroll', function(e) {
             if (!e || !e.target) {
                 console.warn('no scroll event info...!');
@@ -1226,9 +1226,9 @@ FileManager.prototype.initFileManagerUI = function() {
 
     if (ua.details.os === "Apple") {
 
-        $(window).rebind('blur.ps-unfocus', function() {
+        $(window).rebind('blur.ps-unfocus', () => {
 
-            $(document).rebind('ps-scroll-y.ps-unfocus', function(e) {
+            $(document).rebind('ps-scroll-y.ps-unfocus', '.ps', e => {
 
                 $(e.target).addClass('ps-outfocused-scrolling');
 
@@ -1244,7 +1244,7 @@ FileManager.prototype.initFileManagerUI = function() {
 
         $(window).rebind('focus.ps-unfocus', function() {
 
-            $(document).off('ps-scroll-y.ps-unfocus');
+            $(document).off('ps-scroll-y.ps-unfocus', '.ps');
         });
     }
 
@@ -4148,7 +4148,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
 
     $ddUIgrid.selectable({
         filter: $.selectddUIitem,
-        cancel: '.ps__scrollbar-y-rail, .ps__scrollbar-x-rail, thead',
+        cancel: '.ps__rail-y, .ps__rail-x, thead',
         start: e => {
             $.hideContextMenu(e);
             $.hideTopMenu();

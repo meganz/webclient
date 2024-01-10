@@ -243,7 +243,7 @@ body.file-request-drag .file-request-upload-page .page-main .page-content .block
     padding-right: 15px;
 }
 
-.file-request-upload-page .page-main .page-content .block-uploading .block-uploading-scroll .ps__scrollbar-y-rail {
+.file-request-upload-page .page-main .page-content .block-uploading .block-uploading-scroll .ps__rail-y {
     margin-top: 8px;
     margin-bottom: 8px;
 }

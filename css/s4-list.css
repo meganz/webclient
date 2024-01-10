@@ -80,10 +80,10 @@
     border-color: var(--surface-grey-3);
 }
 
-.s4-users-management-scroll.sticky-header-table-container.ps .ps__scrollbar-y-rail,
-.s4-groups-management-scroll.sticky-header-table-container.ps .ps__scrollbar-y-rail,
-.s4-keys-management-scroll.sticky-header-table-container.ps .ps__scrollbar-y-rail,
-.s4-policies-management-scroll.sticky-header-table-container.ps .ps__scrollbar-y-rail {
+.s4-users-management-scroll.sticky-header-table-container.ps .ps__rail-y,
+.s4-groups-management-scroll.sticky-header-table-container.ps .ps__rail-y,
+.s4-keys-management-scroll.sticky-header-table-container.ps .ps__rail-y,
+.s4-policies-management-scroll.sticky-header-table-container.ps .ps__rail-y {
     margin-top: 34px;
 }
 

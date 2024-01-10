@@ -1269,7 +1269,7 @@ FileManager.prototype.initFileManagerUI = function() {
 
         $(window).rebind('blur.ps-unfocus', () => {
 
-            $(document).rebind('ps-scroll-y.ps-unfocus', '.ps', e => {
+            $('.ps').rebind('ps-scroll-y.ps-unfocus', e => {
 
                 $(e.target).addClass('ps-outfocused-scrolling');
 
@@ -1285,7 +1285,7 @@ FileManager.prototype.initFileManagerUI = function() {
 
         $(window).rebind('focus.ps-unfocus', function() {
 
-            $(document).off('ps-scroll-y.ps-unfocus', '.ps');
+            $('.ps').off('ps-scroll-y.ps-unfocus');
         });
     }
 

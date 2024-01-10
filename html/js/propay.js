@@ -518,19 +518,13 @@ pro.propay = {
 
         // Otherwise pre-select the chosen period from previous page
 
-        // For active experiments call the API to inform them that the user is relevant to the experiment
-        if (typeof mega.flags.ab_bbyd !== 'undefined') {
-            api.send({a: 'abta', c: 'ab_bbyd'});
-        }
-        const defaultPeriod = mega.flags.ab_bbyd ? 12 : 1;
-        const selectedPeriod = sessionStorage['pro.period'] || defaultPeriod;
+        const selectedPeriod = sessionStorage['pro.period'] || 12;
         let $selectedOption = $('.payment-duration[data-plan-months="'
             + selectedPeriod + '"]', '.duration-options-list');
 
-        // Otherwise pre-select monthly payment, or yearly if they are in the experiment group
+        // Otherwise pre-select yearly payment
         if (!$selectedOption.length) {
-            const $durationOptions = $('.payment-duration:not(.template)', '.duration-options-list');
-            $selectedOption = mega.flags.ab_bbyd ? $durationOptions.last() : $durationOptions.first();
+            $selectedOption = $('.payment-duration:not(.template)', '.duration-options-list').last();
         }
 
         $('input', $selectedOption).prop('checked', true);

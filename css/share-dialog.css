@@ -419,7 +419,7 @@
     max-width: calc(100% - 10px);
 }
 
-.mega-dialog.share-add-dialog .horizontal-contacts-list div.ps > .ps__scrollbar-x-rail > .ps__scrollbar-x {
+.mega-dialog.share-add-dialog .horizontal-contacts-list div.ps > .ps__rail-x > .ps__thumb-x {
     border-radius: 2px;
     height: 4px;
     bottom: 2px;

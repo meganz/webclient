@@ -245,7 +245,7 @@ class GalleryTitleControl extends MComponent {
                         name: 'remember_location_pref',
                         id: 'remember-location-pref',
                         checked: false,
-                        lazy: true
+                        passive: true
                     });
 
                     mega.gallery.prefs.init().then(({ getItem }) => {

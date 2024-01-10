@@ -203,7 +203,7 @@ RecentsRender.prototype._initialRender = function(actions) {
             'onResize': function() { return self.thottledResize(); },
             'onScroll': function() { return self.onScroll(); },
             'perfectScrollOptions': {
-                'handlers': ['click-rail', 'drag-scrollbar', 'wheel', 'touch'],
+                'handlers': ['click-rail', 'drag-thumb', 'wheel', 'touch'],
                 'minScrollbarLength': 20
             },
             'viewPortBuffer': 50

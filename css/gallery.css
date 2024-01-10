@@ -130,7 +130,7 @@
     padding-top: 100%;
     width: auto;
     height: 100%;
-    background: var(--surface-main);
+    background: transparent;
 }
 .gallery-view .content .data-block-view.ui-selected::after,
 .gallery-view .content .data-block-view:hover::after {
@@ -201,6 +201,10 @@
     padding: 2px 8px;
     border-radius: 12px;
     background: var(--surface-highlight-1);
+}
+
+.gallery-view.gallery-type-a a.data-block-view.shimmer .video-thumb-details {
+    display: none;
 }
 
 .gallery-view.gallery-type-a.zoom-4 .data-block-bg.video .video-thumb-details {
@@ -671,8 +675,17 @@
 .albums-grid:not(.albums-grid-3-col) .albums-grid-cell {
     height: 300px;
 }
+.albums-grid:not(.albums-grid-3-col) .albums-grid-cell.shimmer:nth-child(2n) {
+    animation-delay: 0.18s;
+}
 .albums-grid.albums-grid-3-col .albums-grid-cell {
     height: 200px;
+}
+.albums-grid.albums-grid-3-col .albums-grid-cell.shimmer:nth-child(3n + 2) {
+    animation-delay: 0.25s;
+}
+.albums-grid.albums-grid-3-col .albums-grid-cell.shimmer:nth-child(3n) {
+    animation-delay: 0.5s;
 }
 .albums-grid.albums-grid-3-col .albums-grid-cell .album-label {
     font: bold var(--text-h3);
@@ -689,13 +702,15 @@
 .albums-grid-cell {
     border-radius: 24px;
     overflow: hidden;
+    position: relative;
+}
+.albums-grid-cell:not(.shimmer) {
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
     transition: background-color 100ms ease-in-out, box-shadow 100ms ease-in-out;
     transition-duration: 200ms;
     background-color: var(--surface-main);
-    position: relative;
 }
 .albums-grid-cell.ui-selected,
 .album-timeline-cell.ui-selected {
@@ -713,6 +728,11 @@ body.rtl .albums-grid-cell > div:not(.flex-row) {
     padding: 20px 24px;
     color: var(--text-color-white-high);
     text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+}
+.albums-grid-cell.shimmer > div {
+    background: none;
+    color: var(--stroke-main-inverted);
+    text-shadow: none;
 }
 .albums-grid-cell.album-placeholder > div {
     color: var(--text-color-high);
@@ -818,11 +838,169 @@ body.rtl .js-lp-gallery .btn-galleries.expansion-btn:not(.expansion-btn-open) i.
 }
 .album-timeline-cell {
     position: relative;
+    margin: 4px;
+    transition: background-image 1s ease;
+    background-image: none;
+}
+.album-timeline-cell:not(.shimmer) {
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
-    margin: 4px;
     background-color: var(--surface-main);
+}
+.album-timeline-zoom-0 .album-timeline-cell.shimmer,
+.album-timeline-zoom-1 .album-timeline-cell.shimmer,
+.gallery-view.zoom-3 a.data-block-view.shimmer,
+.gallery-view.zoom-4 a.data-block-view.shimmer {
+    background: linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0) 0%,
+        rgba(0, 0, 0, 0) 25%,
+        var(--surface-highlight-1) 35%,
+        var(--surface-highlight-1) 50%,
+        var(--surface-highlight-1) 65%,
+        rgba(0, 0, 0, 0) 75%,
+        rgba(0, 0, 0, 0) 100%
+    );
+    background-color: var(--surface-grey-6);
+    background-size: 1500% 100%;
+}
+.album-timeline-zoom-2 .album-timeline-cell.shimmer,
+.album-timeline-zoom-3 .album-timeline-cell.shimmer,
+.gallery-view.zoom-1 a.data-block-view.shimmer,
+.gallery-view.zoom-2 a.data-block-view.shimmer {
+    background: linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0) 0%,
+        rgba(0, 0, 0, 0) 40%,
+        var(--surface-highlight-1) 45%,
+        var(--surface-highlight-1) 50%,
+        var(--surface-highlight-1) 55%,
+        rgba(0, 0, 0, 0) 60%,
+        rgba(0, 0, 0, 0) 100%
+    );
+    background-color: var(--surface-grey-6);
+    background-size: 1500% 100%;
+}
+.album-timeline-zoom-0 .album-timeline-cell.shimmer:nth-child(15),
+.album-timeline-zoom-1 .album-timeline-cell.shimmer:nth-child(15),
+.gallery-view.zoom-3 a.data-block-view.shimmer:nth-child(10n + 15),
+.gallery-view.zoom-4 a.data-block-view.shimmer:nth-child(15n + 15) {
+    animation-delay: 0.7s;
+}
+.album-timeline-zoom-0 .album-timeline-cell.shimmer:nth-child(14),
+.album-timeline-zoom-1 .album-timeline-cell.shimmer:nth-child(14),
+.gallery-view.zoom-3 a.data-block-view.shimmer:nth-child(10n + 14),
+.gallery-view.zoom-4 a.data-block-view.shimmer:nth-child(15n + 14) {
+    animation-delay: 0.65s;
+}
+.album-timeline-zoom-0 .album-timeline-cell.shimmer:nth-child(13),
+.album-timeline-zoom-1 .album-timeline-cell.shimmer:nth-child(13),
+.gallery-view.zoom-3 a.data-block-view.shimmer:nth-child(10n + 13),
+.gallery-view.zoom-4 a.data-block-view.shimmer:nth-child(15n + 13) {
+    animation-delay: 0.6s;
+}
+.album-timeline-zoom-0 .album-timeline-cell.shimmer:nth-child(12),
+.album-timeline-zoom-1 .album-timeline-cell.shimmer:nth-child(12),
+.gallery-view.zoom-3 a.data-block-view.shimmer:nth-child(10n + 12),
+.gallery-view.zoom-4 a.data-block-view.shimmer:nth-child(15n + 12) {
+    animation-delay: 0.55s;
+}
+.album-timeline-zoom-0 .album-timeline-cell.shimmer:nth-child(11),
+.album-timeline-zoom-1 .album-timeline-cell.shimmer:nth-child(11),
+.gallery-view.zoom-3 a.data-block-view.shimmer:nth-child(10n + 11),
+.gallery-view.zoom-4 a.data-block-view.shimmer:nth-child(15n + 11) {
+    animation-delay: 0.5s;
+}
+.album-timeline-zoom-0 .album-timeline-cell.shimmer:nth-child(10),
+.album-timeline-zoom-1 .album-timeline-cell.shimmer:nth-child(10),
+.gallery-view.zoom-3 a.data-block-view.shimmer:nth-child(10n + 10),
+.gallery-view.zoom-4 a.data-block-view.shimmer:nth-child(15n + 10) {
+    animation-delay: 0.45s;
+}
+.album-timeline-zoom-0 .album-timeline-cell.shimmer:nth-child(9),
+.album-timeline-zoom-1 .album-timeline-cell.shimmer:nth-child(9),
+.gallery-view.zoom-3 a.data-block-view.shimmer:nth-child(10n + 9),
+.gallery-view.zoom-4 a.data-block-view.shimmer:nth-child(15n + 9) {
+    animation-delay: 0.4s;
+}
+.album-timeline-zoom-0 .album-timeline-cell.shimmer:nth-child(8),
+.album-timeline-zoom-1 .album-timeline-cell.shimmer:nth-child(8),
+.gallery-view.zoom-3 a.data-block-view.shimmer:nth-child(10n + 8),
+.gallery-view.zoom-4 a.data-block-view.shimmer:nth-child(15n + 8) {
+    animation-delay: 0.35s;
+}
+.album-timeline-zoom-0 .album-timeline-cell.shimmer:nth-child(7),
+.album-timeline-zoom-1 .album-timeline-cell.shimmer:nth-child(7),
+.gallery-view.zoom-3 a.data-block-view.shimmer:nth-child(10n + 7),
+.gallery-view.zoom-4 a.data-block-view.shimmer:nth-child(15n + 7) {
+    animation-delay: 0.3s;
+}
+.album-timeline-zoom-0 .album-timeline-cell.shimmer:nth-child(6),
+.album-timeline-zoom-1 .album-timeline-cell.shimmer:nth-child(6),
+.gallery-view.zoom-3 a.data-block-view.shimmer:nth-child(10n + 6),
+.gallery-view.zoom-4 a.data-block-view.shimmer:nth-child(15n + 6) {
+    animation-delay: 0.25s;
+}
+.album-timeline-zoom-0 .album-timeline-cell.shimmer:nth-child(5),
+.album-timeline-zoom-1 .album-timeline-cell.shimmer:nth-child(5),
+.gallery-view.zoom-3 a.data-block-view.shimmer:nth-child(10n + 5),
+.gallery-view.zoom-4 a.data-block-view.shimmer:nth-child(15n + 5) {
+    animation-delay: 0.2s;
+}
+.album-timeline-zoom-0 .album-timeline-cell.shimmer:nth-child(4),
+.album-timeline-zoom-1 .album-timeline-cell.shimmer:nth-child(4),
+.gallery-view.zoom-3 a.data-block-view.shimmer:nth-child(10n + 4),
+.gallery-view.zoom-4 a.data-block-view.shimmer:nth-child(15n + 4) {
+    animation-delay: 0.15s;
+}
+.album-timeline-zoom-0 .album-timeline-cell.shimmer:nth-child(3),
+.album-timeline-zoom-1 .album-timeline-cell.shimmer:nth-child(3),
+.gallery-view.zoom-3 a.data-block-view.shimmer:nth-child(10n + 3),
+.gallery-view.zoom-4 a.data-block-view.shimmer:nth-child(15n + 3) {
+    animation-delay: 0.1s;
+}
+.album-timeline-zoom-0 .album-timeline-cell.shimmer:nth-child(2),
+.album-timeline-zoom-1 .album-timeline-cell.shimmer:nth-child(2),
+.gallery-view.zoom-3 a.data-block-view.shimmer:nth-child(10n + 2),
+.gallery-view.zoom-4 a.data-block-view.shimmer:nth-child(15n + 2) {
+    animation-delay: 0.05s;
+}
+.album-timeline-zoom-0 .album-timeline-cell.shimmer:nth-child(1),
+.album-timeline-zoom-1 .album-timeline-cell.shimmer:nth-child(1),
+.gallery-view.zoom-3 a.data-block-view.shimmer:nth-child(10n + 1),
+.gallery-view.zoom-4 a.data-block-view.shimmer:nth-child(15n + 1) {
+    animation-delay: 0s;
+}
+.album-timeline-zoom-2 .album-timeline-cell.shimmer:nth-child(5),
+.album-timeline-zoom-3 .album-timeline-cell.shimmer:nth-child(5),
+.gallery-view.zoom-1 a.data-block-view.shimmer:nth-child(3n + 5),
+.gallery-view.zoom-2 a.data-block-view.shimmer:nth-child(5n + 5) {
+    animation-delay: 0.4s;
+}
+.album-timeline-zoom-2 .album-timeline-cell.shimmer:nth-child(4),
+.album-timeline-zoom-3 .album-timeline-cell.shimmer:nth-child(4),
+.gallery-view.zoom-1 a.data-block-view.shimmer:nth-child(3n + 4),
+.gallery-view.zoom-2 a.data-block-view.shimmer:nth-child(5n + 4) {
+    animation-delay: 0.3s;
+}
+.album-timeline-zoom-2 .album-timeline-cell.shimmer:nth-child(3),
+.album-timeline-zoom-3 .album-timeline-cell.shimmer:nth-child(3),
+.gallery-view.zoom-1 a.data-block-view.shimmer:nth-child(3n + 3),
+.gallery-view.zoom-2 a.data-block-view.shimmer:nth-child(5n + 3) {
+    animation-delay: 0.2s;
+}
+.album-timeline-zoom-2 .album-timeline-cell.shimmer:nth-child(2),
+.album-timeline-zoom-3 .album-timeline-cell.shimmer:nth-child(2),
+.gallery-view.zoom-1 a.data-block-view.shimmer:nth-child(3n + 2),
+.gallery-view.zoom-2 a.data-block-view.shimmer:nth-child(5n + 2) {
+    animation-delay: 0.1s;
+}
+.album-timeline-zoom-2 .album-timeline-cell.shimmer:nth-child(1),
+.album-timeline-zoom-3 .album-timeline-cell.shimmer:nth-child(1),
+.gallery-view.zoom-1 a.data-block-view.shimmer:nth-child(3n + 1),
+.gallery-view.zoom-2 a.data-block-view.shimmer:nth-child(5n + 1) {
+    animation-delay: 0s;
 }
 .album-timeline-cell.show-date::before,
 .album-timeline-cell.show-video-duration::after {
@@ -843,6 +1021,10 @@ body.rtl .js-lp-gallery .btn-galleries.expansion-btn:not(.expansion-btn-open) i.
 .album-timeline-cell.show-video-duration::after {
     content: attr(data-video-duration);
     bottom: 0.25rem;
+}
+.album-timeline-cell.shimmer.show-date::before,
+.album-timeline-cell.shimmer.show-video-duration::after {
+    display: none;
 }
 .album-timeline-cell.ui-selected i.icon-check-circle {
     position: absolute;

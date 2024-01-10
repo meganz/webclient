@@ -1,12 +1,13 @@
 class MCheckbox extends MComponent {
     /**
-     * @param {Object.<String, any>} data An enclosing data object
+     * @constructor
+     * @param {Object.<String, String|Boolean>} data An enclosing data object
      * @param {String} data.id Id for Input and Label
      * @param {String} data.name Input name
      * @param {String} data.label Label for the checkbox
      * @param {String} [data.classes] Additional classes to add
      * @param {Boolean} [data.checked] Whether checked or not on init
-     * @param {Boolean} [data.lazy] Whether checkbox should or shouldn't change state on click right away
+     * @param {Boolean} [data.passive] Whether checkbox should or shouldn't change state on click right away
      */
     constructor({
         label,
@@ -15,11 +16,11 @@ class MCheckbox extends MComponent {
         checked,
         classes,
         disabled,
-        lazy
+        passive
     }) {
         super();
 
-        this.prepareInput(id, name, checked === true, lazy === true);
+        this.prepareInput(id, name, checked === true, passive === true);
 
         if (label) {
             this.label = label;
@@ -104,7 +105,7 @@ class MCheckbox extends MComponent {
         this.el.appendChild(this.checkDiv);
     }
 
-    prepareInput(id, name, checked, lazy) {
+    prepareInput(id, name, checked, passive) {
         if (id) {
             this.inputEl.id = id;
         }
@@ -115,7 +116,7 @@ class MCheckbox extends MComponent {
         this.inputEl.name = name || id;
         this.checked = checked === true;
 
-        if (lazy) {
+        if (passive) {
             this.attachEvent(
                 'click',
                 (evt) => {

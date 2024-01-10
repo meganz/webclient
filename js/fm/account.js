@@ -1582,7 +1582,7 @@ accountUI.account = {
                 $('.copy-qr-link', this.$QRSettings).removeClass('hidden');
                 $('.qr-dlg-cpy-lnk', this.$QRSettings).rebind('click', function() {
                     var links = $.trim($(this).next('.qr-http-link').text());
-                    var toastTxt = l[7654];
+                    var toastTxt = l[1642];
                     copyToClipboard(links, toastTxt);
                 });
             }

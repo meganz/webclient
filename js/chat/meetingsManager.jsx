@@ -150,17 +150,12 @@ class ScheduledMeeting {
     }
 
     setNextOccurrence() {
-        if (this.occurrences && this.occurrences.length) {
-            const nextOccurrences = Object.values(this.occurrences)
-                .filter(o => o.isUpcoming)
-                .sort((a, b) => a.start - b.start);
-
+        const occurrences = Object.values(this.occurrences).filter(o => o.isUpcoming);
+        if (occurrences && occurrences.length) {
+            const nextOccurrences = occurrences.sort((a, b) => a.start - b.start);
             this.nextOccurrenceStart = nextOccurrences[0].start;
             this.nextOccurrenceEnd = nextOccurrences[0].end;
-
-            return { start: this.nextOccurrenceStart, end: this.nextOccurrenceEnd };
         }
-        return null;
     }
 
     async getOccurrences(options) {

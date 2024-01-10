@@ -155,21 +155,62 @@ FileManager.prototype.initFileManager = async function() {
 
     if (!pfid && !is_mobile && u_type) {
         const s4e = u_attr.s4;
+        const pTag = 's4-setup';
 
-        if (s4e) {
+        if (d) {
+            console.assert(!window[pTag], 'S4 Setup already ongoing...');
+        }
+
+        if (s4e && !window[pTag]) {
             const hold = !!this.getNodeByHandle(path.slice(0, 8)).s4;
+            window[pTag] = Date.now();
 
             const s4load =
-                Promise.resolve(M.require('s4'))
-                    .then(() => {
+                Promise.allSettled([this.getPersistentData(pTag), this.require('s4')])
+                    .then(([{value}]) => {
+                        this.setPersistentData(pTag, Date.now()).catch(dump);
+
                         const cnt = Object.keys(this.c[this.RootID] || {})
                             .map((h) => this.d[h]).filter((n) => n && n.s4);
 
+                        const res = [cnt, value];
+                        return cnt.length && value ? dbfetch.geta(cnt.map(n => n.h)).then(() => res) : res;
+                    })
+                    .then(([cnt, pending]) => {
+                        const promises = [];
+
+                        if (pending) {
+                            if (d) {
+                                pending = new Date(pending).toISOString();
+                                console.warn('Previous S4 Container creation did not complete.', pending);
+                            }
+
+                            while (cnt.length) {
+                                const n = cnt.pop();
+
+                                if (Object.keys(this.c[n.h] || {}).length) {
+                                    cnt.push(n);
+                                    if (d) {
+                                        console.error(`S4 Container ${n.h} is not empty.`, cnt);
+                                    }
+                                    break;
+                                }
+
+                                promises.push(
+                                    api.setNodeAttributes(n, {name: `${pTag}.lost&found`})
+                                        .then(() => this.moveToRubbish([n.h]))
+                                );
+                            }
+                        }
+
                         if (!cnt.length) {
-                            return s4.kernel.container.create(true);
+                            return Promise.allSettled(promises)
+                                .then(() => s4.kernel.container.create(true));
                         }
                     })
                     .then(() => {
+                        window[pTag] = null;
+                        this.delPersistentData(pTag).dump(pTag);
                         $('.js-s4-tree-panel').removeClass('hidden');
                         return this.buildtree({h: 's4'}, this.buildtree.FORCE_REBUILD);
                     })
@@ -789,7 +830,7 @@ FileManager.prototype.initFileManagerUI = function() {
         });
     });
 
-    $fmholder
+    $('.ps', $fmholder)
         .rebind('ps-scroll-left.fm-x-scroll ps-scroll-right.fm-x-scroll', function(e) {
             if (!e || !e.target) {
                 console.warn('no scroll event info...!');
@@ -1226,9 +1267,9 @@ FileManager.prototype.initFileManagerUI = function() {
 
     if (ua.details.os === "Apple") {
 
-        $(window).rebind('blur.ps-unfocus', function() {
+        $(window).rebind('blur.ps-unfocus', () => {
 
-            $(document).rebind('ps-scroll-y.ps-unfocus', function(e) {
+            $(document).rebind('ps-scroll-y.ps-unfocus', '.ps', e => {
 
                 $(e.target).addClass('ps-outfocused-scrolling');
 
@@ -1244,7 +1285,7 @@ FileManager.prototype.initFileManagerUI = function() {
 
         $(window).rebind('focus.ps-unfocus', function() {
 
-            $(document).off('ps-scroll-y.ps-unfocus');
+            $(document).off('ps-scroll-y.ps-unfocus', '.ps');
         });
     }
 
@@ -4148,7 +4189,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
 
     $ddUIgrid.selectable({
         filter: $.selectddUIitem,
-        cancel: '.ps__scrollbar-y-rail, .ps__scrollbar-x-rail, thead',
+        cancel: '.ps__rail-y, .ps__rail-x, thead',
         start: e => {
             $.hideContextMenu(e);
             $.hideTopMenu();

@@ -146,7 +146,7 @@ mega.tpw = new function TransferProgressWidget() {
         }
 
         if ($widgetTabCompleted.hasClass('active')) {
-            $('.ps__scrollbar-y-rail', $bodyContainer).addClass('y-rail-offset');
+            $('.ps__rail-y', $bodyContainer).addClass('y-rail-offset');
         }
 
         initScrolling();

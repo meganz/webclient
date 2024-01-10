@@ -234,7 +234,6 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
             this._selected = false;
 
             this.attachEvents(clickFn, dbclickFn, useMenu);
-            scope.attachLoadingIcon(this.el, this.el.ref.isVideo);
         }
 
         get isActive() {
@@ -342,10 +341,10 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
         }
 
         setThumb(dataUrl) {
-            if (this.el.classList.contains('cover-loading')) {
+            if (this.el.classList.contains('shimmer')) {
                 this.el.style.backgroundImage = `url('${dataUrl}')`;
                 this.el.style.backgroundColor = 'white';
-                scope.detachLoadingIcon(this.el);
+                scope.unsetShimmering(this.el);
             }
         }
     }
@@ -402,6 +401,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
             this._limitReached = false;
             this._selCount = 0;
 
+            this.el.classList.add(`album-timeline-zoom-${this._zoomStep}`);
             this.attachEvents();
         }
 
@@ -458,7 +458,9 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                 return;
             }
 
+            this.el.classList.remove(`album-timeline-zoom-${this._zoomStep}`);
             this._zoomStep = step;
+            this.el.classList.add(`album-timeline-zoom-${step}`);
 
             if (!this.skipGlobalZoom) {
                 globalZoomStep = step;
@@ -492,7 +494,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                 itemHeightCallback: () => this.rowHeight,
                 onResize: this.onResize.bind(this),
                 perfectScrollOptions: {
-                    handlers: ['click-rail', 'drag-scrollbar', 'wheel', 'touch'],
+                    handlers: ['click-rail', 'drag-thumb', 'wheel', 'touch'],
                     minScrollbarLength: 50
                 }
             });
@@ -1173,6 +1175,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
                     tCell.el.style.width = sizePx;
                     tCell.el.style.height = sizePx;
+                    scope.setShimmering(tCell.el);
 
                     if (this.showMonthLabel && !i && monthLabel) {
                         tCell.applyMonthLabel(monthLabel);

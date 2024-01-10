@@ -1266,6 +1266,7 @@ function dashboardUI() {}
 function galleryUI() {}
 function fm_resize_handler() {}
 function fm_tfsupdate() {}
+function fingerprintDialog() {}
 accountUI.account = {
     renderBirthYear: function() {},
     renderBirthMonth: function() {},
@@ -1359,7 +1360,7 @@ mega.gallery = {
                             return;
                         }
 
-                        coverImg.classList.remove('cover-loading');
+                        coverImg.classList.remove('shimmer');
                         coverImg.style.backgroundImage = `url(${url})`;
                     }
                 );

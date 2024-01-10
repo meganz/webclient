@@ -413,16 +413,12 @@ class ScheduledMeeting {
     return this.isRoot ? null : this.megaChat.plugins.meetingsManager.getMeetingById(this.parentId);
   }
   setNextOccurrence() {
-    if (this.occurrences && this.occurrences.length) {
-      const nextOccurrences = Object.values(this.occurrences).filter(o => o.isUpcoming).sort((a, b) => a.start - b.start);
+    const occurrences = Object.values(this.occurrences).filter(o => o.isUpcoming);
+    if (occurrences && occurrences.length) {
+      const nextOccurrences = occurrences.sort((a, b) => a.start - b.start);
       this.nextOccurrenceStart = nextOccurrences[0].start;
       this.nextOccurrenceEnd = nextOccurrences[0].end;
-      return {
-        start: this.nextOccurrenceStart,
-        end: this.nextOccurrenceEnd
-      };
     }
-    return null;
   }
   async getOccurrences(options) {
     const {
@@ -4131,7 +4127,7 @@ ChatRoom.prototype.getRetentionLabel = function (retentionTime) {
   const hours = secondsToHours(retentionTime);
   switch (this.getRetentionFormat(retentionTime)) {
     case RETENTION_FORMAT.DISABLED:
-      return l[7070];
+      return l.disabled_chat_history_cleaning_status;
     case RETENTION_FORMAT.MONTHS:
       return mega.icu.format(l.months_chat_history_plural, months);
     case RETENTION_FORMAT.WEEKS:
@@ -13183,7 +13179,7 @@ class ConversationRightArea extends mixins.wl {
     }, external_React_default().createElement("div", {
       className: "dropdown-item link-button retention-history-menu__list__elem",
       onClick: () => this.setRetention(room, 0)
-    }, external_React_default().createElement("span", null, l[7070]), retentionTime === 0 && ICON_ACTIVE), external_React_default().createElement("div", {
+    }, external_React_default().createElement("span", null, l.disabled_chat_history_cleaning_status), retentionTime === 0 && ICON_ACTIVE), external_React_default().createElement("div", {
       className: "dropdown-item link-button retention-history-menu__list__elem",
       onClick: () => this.setRetention(room, daysToSeconds(1))
     }, external_React_default().createElement("span", null, l[23437]), retentionTime === 1 && ICON_ACTIVE), external_React_default().createElement("div", {
@@ -13257,7 +13253,7 @@ class ConversationRightArea extends mixins.wl {
       className: "observers-count"
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-eye-reveal"
-    }), room.observers)) : external_React_default().createElement("div", null), isRecurring && isUpcoming && scheduledMeeting.occurrences.some(o => !o.canceled) && external_React_default().createElement(AccordionPanel, {
+    }), room.observers)) : external_React_default().createElement("div", null), isRecurring && isUpcoming && scheduledMeeting.occurrences.some(o => o.isUpcoming) && external_React_default().createElement(AccordionPanel, {
       key: "occurrences",
       className: "chat-occurrences-panel",
       accordionClass: "chatroom-occurrences-panel",
@@ -31280,7 +31276,7 @@ let MegaList2 = (_dec = (0,mixins.M9)(30, true), (_class = class MegaList2 exten
       extraRows: 8,
       batchPages: 0,
       perfectScrollOptions: {
-        'handlers': ['click-rail', 'drag-scrollbar', 'wheel', 'touch'],
+        'handlers': ['click-rail', 'drag-thumb', 'wheel', 'touch'],
         'minScrollbarLength': 20
       }
     };
@@ -33691,7 +33687,7 @@ let PerfectScrollbar = (_dec = (0,_chat_mixins0__.M9)(30, true), _dec2 = (0,_cha
     var $elem = self.get$Node();
     $elem.height('100%');
     var options = Object.assign({}, {
-      'handlers': ['click-rail', 'drag-scrollbar', 'keyboard', 'wheel', 'touch', 'selection'],
+      'handlers': ['click-rail', 'drag-thumb', 'keyboard', 'wheel', 'touch'],
       'minScrollbarLength': 20
     }, self.props.options);
     Ps.initialize($elem[0], options);

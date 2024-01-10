@@ -676,7 +676,7 @@ ChatRoom.prototype.getRetentionLabel = function(retentionTime) {
     switch (this.getRetentionFormat(retentionTime)) {
         case RETENTION_FORMAT.DISABLED:
             // `Disabled`
-            return l[7070];
+            return l.disabled_chat_history_cleaning_status;
         case RETENTION_FORMAT.MONTHS:
             // `month` || `months`
             return mega.icu.format(l.months_chat_history_plural, months);

@@ -3587,19 +3587,8 @@ div.checkboxOn {
     display: table-cell;
 }
 
-.file-request-block .input-warning-block {
-    position: relative;
-}
-
-.file-request-block .input-warning-block .fm-icon.red-warning {
-    left: -4px;
-    position: absolute;
-    top: -3px;
-    margin-top: 6px;
-}
 .two-factor-page .warning-text-field,
-.mobile.verify-number .warning-text-field,
-.file-request-block .input-warning-block .warning-text {
+.mobile.verify-number .warning-text-field {
     opacity: 0.75;
     color: #131313;
     font-size: 12px;
@@ -11514,59 +11503,6 @@ code, c {
     font: var(--text-caption);
     text-decoration: underline;
 }
-
-/*
- * Mobile file request create dialog
- */
-.file-request-block .dialog-heading-text {
-    color: var(--text-color-black-high);
-    font: var(--text-h2);
-    line-height: 24px;
-}
-
-.file-request-block .dialog-body-text {
-    color: var(--text-color-black-medium);
-    font: var(--text-body1);
-    margin-bottom: 16px;
-}
-
-.file-request-block .dialog-body-text.caption {
-    color: var(--text-color-black-medium);
-    font: var(--text-body2);
-    text-align: left;
-    margin-bottom: 24px;
-}
-
-.file-request-block .input-container {
-    padding: 16px 0 8px;
-}
-
-.file-request-block .input-text {
-    font-family: LatoWeb, "source_sans_proregular", sans-serif, Arial;
-
-    background: rgba(0, 0, 0, 0.02);
-    border: 1px solid rgba(38, 47, 59, 0.15);
-    border-radius: 3px;
-    box-sizing: border-box;
-
-    color: #676D75;
-    font-size: 15px;
-    line-height: 19px;
-    padding: 11px 16px;
-    width: 100%;
-}
-
-.file-request-block .input-text::placeholder {
-    color: var(--text-color-black-low);
-}
-
-.file-request-block .input-warning-block {
-    text-align: left;
-}
-
-/*
- * End Mobile file request create dialog
- */
 
 /*
  * Retina Sprite for mobile

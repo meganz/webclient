@@ -1303,7 +1303,7 @@ strong.small-header {
 .properties-breadcrumb .breadcrumb-dropdown {
     max-height: 177px;
 }
-.properties-breadcrumb .breadcrumb-dropdown .ps__scrollbar-y-rail {
+.properties-breadcrumb .breadcrumb-dropdown .ps__rail-y {
     margin: 8px 0;
 }
 .properties-name-block .file-settings-icon {

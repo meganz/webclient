@@ -3,6 +3,7 @@
     "cache": true,
     "format": "ownerChanged, time",
     "reject": [
+        "chai",
         "sinon",
         "@types/react"
     ]

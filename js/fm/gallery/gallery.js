@@ -22,6 +22,8 @@ class GalleryNodeBlock {
         if (this.el.nextSibling && this.el.nextSibling.classList.contains('gallery-block-bg-wrap')) {
             this.el.nextSibling.querySelector('img').src = dataUrl;
         }
+
+        mega.gallery.unsetShimmering(this.el);
     }
 
     fill(mode) {
@@ -29,12 +31,12 @@ class GalleryNodeBlock {
 
         const spanMedia = document.createElement('span');
         this.spanEl.appendChild(spanMedia);
-        spanMedia.className = 'block-view-file-type file sprite-fm-mono';
+        spanMedia.className = 'block-view-file-type';
         this.thumb = document.createElement('img');
         spanMedia.appendChild(this.thumb);
 
         if (this.isVideo) {
-            spanMedia.classList.add('icon-videos', 'video');
+            spanMedia.classList.add('video');
             this.spanEl.classList.add('video');
 
             const div = document.createElement('div');
@@ -46,7 +48,7 @@ class GalleryNodeBlock {
             div.appendChild(spanTime);
         }
         else {
-            spanMedia.classList.add('icon-images', 'image');
+            spanMedia.classList.add('image');
         }
 
         const spanFav = document.createElement('span');
@@ -1194,7 +1196,7 @@ class MegaGallery {
             'onResize': this.throttledResize.bind(this),
             'onScroll': this.throttledOnScroll.bind(this),
             'perfectScrollOptions': {
-                'handlers': ['click-rail', 'drag-scrollbar', 'wheel', 'touch'],
+                'handlers': ['click-rail', 'drag-thumb', 'wheel', 'touch'],
                 'minScrollbarLength': 20
             }
         });
@@ -1682,6 +1684,8 @@ class MegaGallery {
 
         const elm = new GalleryNodeBlock(node);
 
+        mega.gallery.setShimmering(elm.el);
+
         if (this.nodeBlockObserver) {
             this.nodeBlockObserver.observe(elm.el, this);
         }
@@ -2087,6 +2091,11 @@ mega.gallery.pendingFaBlocks = {};
 mega.gallery.pendingThumbBlocks = {};
 mega.gallery.disallowedExtensions = { 'PSD': true, 'SVG': true };
 
+/**
+ * @TODO: Remove this check once we bump all browsers up to support this feature
+ */
+mega.gallery.hasWebAnimationsApi = typeof document.body.getAnimations === 'function';
+
 Object.defineProperty(mega.gallery, 'albumsRendered', {
     get() {
         'use strict';
@@ -2128,6 +2137,43 @@ mega.gallery.isGalleryNode = (n, ext) => {
 
     ext = ext || fileext(n && n.name || n, true, true);
     return n.fa && (mega.gallery.isImage(n, ext) || mega.gallery.isVideo(n));
+};
+
+/**
+     * Adding a loading icon to the cell
+     * @param {HTMLElement} el DOM Element to add the loading icon to
+     * @param {Boolean} isVideo Whether to attach loading icon as for a video or an image
+     * @returns {void}
+     */
+mega.gallery.setShimmering = (el) => {
+    'use strict';
+
+    // Image is already loaded
+    if (el.style.backgroundImage) {
+        return;
+    }
+
+    el.classList.add('shimmer');
+
+    if (mega.gallery.hasWebAnimationsApi) {
+        requestAnimationFrame(() => {
+            const anims = el.getAnimations();
+
+            for (let i = 0; i < anims.length; i++) {
+                anims[i].startTime = 0;
+            }
+        });
+    }
+};
+
+/**
+ * Removing the loading icon from the cell
+ * @param {HTMLElement} el DOM Element to remove the loading icon from
+ * @returns {void}
+ */
+mega.gallery.unsetShimmering = (el) => {
+    'use strict';
+    el.classList.remove('shimmer');
 };
 
 /**

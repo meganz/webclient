@@ -1266,6 +1266,7 @@ function dashboardUI() {}
 function galleryUI() {}
 function fm_resize_handler() {}
 function fm_tfsupdate() {}
+function fingerprintDialog() {}
 accountUI.account = {
     renderBirthYear: function() {},
     renderBirthMonth: function() {},

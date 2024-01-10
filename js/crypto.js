@@ -729,6 +729,12 @@ Object.defineProperties(getsc, {
 
                     // at this point, sc_residue() should have been called with a new w/sc URL, but it may do not.
                     if (!waitsc.ok) {
+
+                        if (initialscfetch) {
+                            // No need to wait for the w/sc connection, immediately show the FM.
+                            sc_residue({sn: currsn});
+                        }
+
                         if (navigator.onLine === false) {
 
                             await this.onLine();

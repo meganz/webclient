@@ -4493,9 +4493,8 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
 
                 // This is an album import dialog, entering $.albumImport mode
                 if (data[3] === '<pfcol>') {
-                    $.albumImport = true;
+                    console.assert($.albumImport, 'Error: Failed to load temporary value from session storage...');
                     mega.gallery.albumsRendered = false;
-                    MegaGallery.dbActionPassed = false;
                 }
 
                 if (d) {
@@ -4564,6 +4563,7 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
 
                     if (pfcol) {
                         this.preparePublicSetImport(pfid, data);
+                        sessionStorage.albumLinkImport = pfid;
                     }
 
                     if (!sessionStorage.folderLinkImport || nodes.length > 6000) {

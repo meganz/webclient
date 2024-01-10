@@ -2062,7 +2062,6 @@
             }
 
             delete $.onImportCopyNodes;
-            delete $.albumImport;
 
             return false;
         });

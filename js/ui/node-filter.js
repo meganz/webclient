@@ -174,6 +174,71 @@ lazy(mega.ui, 'mNodeFilter', () => {
             ]
         },
 
+        dateadded: {
+            title: l['17445'],
+            selection: false,
+            eid: 500018,
+            match(n) {
+
+                const nodeAddedTime = n.ts * 1000;
+
+                // Date range
+                if (this.selection && this.selection.min && this.selection.max) {
+                    return nodeAddedTime >= this.selection.min && nodeAddedTime <= this.selection.max;
+                }
+
+                return this.selection < 0 ? nodeAddedTime < lastYearStart : nodeAddedTime >= this.selection;
+            },
+            menu: [
+                {
+                    eid: 99995,
+                    label: l.filter_chip_mdate_today,
+                    get data() {
+                        // Set hours to 12am today
+                        return new Date().setHours(0, 0 ,0 ,0);
+                    }
+                },
+                {
+                    eid: 500013,
+                    label: l.filter_chip_mdate_seven,
+                    get data() {
+                        return new Date().setDate(today.getDate() - 7);
+                    }
+                },
+                {
+                    eid: 500014,
+                    label: l.filter_chip_mdate_thirty,
+                    get data() {
+                        return new Date().setDate(today.getDate() - 30);
+                    }
+                },
+                {
+                    eid: 500015,
+                    label: l.filter_chip_mdate_year,
+                    get data() {
+                        return currentYearStart;
+                    }
+                },
+                {
+                    eid: 500017,
+                    label: l.filter_chip_mdate_lyear,
+                    get data() {
+                        return  {
+                            min: lastYearStart,
+                            max: lastYearEnd
+                        };
+                    }
+                },
+                {
+                    eid: 500016,
+                    label: l.filter_chip_mdate_older,
+                    get data() {
+                        return -1;
+                    }
+                }
+            ]
+        },
+
         location: {
             title: l['17818'],
             selection: false,

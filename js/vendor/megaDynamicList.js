@@ -579,7 +579,7 @@
             self.resized();
         });
 
-        $(document).rebind('ps-scroll-y.ps' + ns, '.ps', self.throttledOnScroll.bind(self));
+        $('.ps').rebind('ps-scroll-y.ps' + ns, self.throttledOnScroll.bind(self));
     };
 
     /**
@@ -591,7 +591,7 @@
         var ns = this._generateEventNamespace();
 
         $(window).off("resize." + ns);
-        $(document).off('ps-scroll-y.ps' + ns, '.ps');
+        $('.ps').off('ps-scroll-y.ps' + ns);
     };
 
     /**

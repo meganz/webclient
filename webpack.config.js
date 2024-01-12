@@ -102,8 +102,8 @@ var webpackConfigs = {
             app: entryPoints
         },
         performance: {
-            maxAssetSize: 1222333,
-            maxEntrypointSize: 1222333
+            maxAssetSize: 1666999,
+            maxEntrypointSize: 1666999
         },
         output: {
             path: __dirname + "/",

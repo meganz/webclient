@@ -115,12 +115,7 @@ lazy(mega.ui, 'mNodeFilter', () => {
             selection: false,
             eid: 99953,
             match(n) {
-                if (n.t) {
-                    // Folders do not have a modified date
-                    return false;
-                }
-
-                const nodeMtime = n.mtime * 1000;
+                const nodeMtime = (n.mtime || n.ts) * 1000;
 
                 // Date range
                 if (this.selection && this.selection.min && this.selection.max) {

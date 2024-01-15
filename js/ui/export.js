@@ -2138,7 +2138,10 @@ function logExportEvt(type, target) {
         });
 
         // Remove link/s button functionality
-        $removeLinkButton.rebind('click.removeLink', () => {
+        $removeLinkButton.rebind('click.removeLink', (evt) => {
+            if ($(evt.target).is('a')) {
+                evt.preventDefault();
+            }
 
             // Pluralise dialog text
             const msg = mega.icu.format(l.remove_link_question, linkCount);

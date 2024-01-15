@@ -111,9 +111,6 @@ lazy(pro, 'proplan2', () => {
 
         // If user is logged in and has the flag ab_flag, add them to the experiment.
         if (u_attr) {
-            if (typeof mega.flags.ab_uspct !== 'undefined') {
-                api.req({a: 'abta', c: 'ab_uspct'}).catch(dump);
-            }
             if ((typeof mega.flags.ab_ctasc !== 'undefined') && !is_mobile) {
                 api.send({a: 'abta', c: 'ab_ctasc'}).catch(dump);
             }
@@ -124,12 +121,6 @@ lazy(pro, 'proplan2', () => {
         }
         else if (mega.flags.ab_ctasc && !is_mobile) {
             $buttons.removeClass('hidden');
-        }
-
-        if (mega.flags.ab_uspct) {
-            $dataTable.removeClass('hidden');
-            $arrowIcon.addClass('inv');
-            $showBtnTxt.text(l.pr_hide_plan);
         }
 
         $showBtn.rebind('click.pricing', () => {

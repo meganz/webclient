@@ -1055,6 +1055,7 @@
             font-size: 24px;
             font-style: normal;
             font-weight: 400;
+            z-index: 10;
         }
 
         .border-top {

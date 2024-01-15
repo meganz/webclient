@@ -2017,7 +2017,7 @@ function topbarUI(holderId) {
         else if (this.classList.contains('feedback')) {
             mega.config.set('rvonbrddl', 1);
             window.open(
-                'https://survey.mega.co.nz/index.php?r=survey/index&sid=765691&lang=en',
+                'https://survey.mega.co.nz/index.php?r=survey/index&sid=692176&lang=en',
                 '_blank',
                 'noopener,noreferrer'
             );

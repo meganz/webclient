@@ -154,7 +154,7 @@ mobile.settings.account.changeEmail = Object.create(mobile.settingsHelper, {
 
                     // If something went wrong with the 2FA PIN
                     if (ex === EFAILED || ex === EEXPIRED) {
-                        msgDialog('warninga', l[135], l[19216]);
+                        msgDialog('warninga', l[135], l[19192]);
                     }
 
                     // If they have already requested a confirmation link for that email address, show an error

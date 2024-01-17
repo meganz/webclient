@@ -1741,7 +1741,7 @@ accountUI.account = {
 
                             // Check for invalid 2FA code
                             if (res === EFAILED || res === EEXPIRED) {
-                                msgDialog('warninga', l[135], l[19216]);
+                                msgDialog('warninga', l[135], l[19192]);
                             }
 
                             // Check for incorrect email

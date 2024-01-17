@@ -126,7 +126,7 @@ mobile.settings.account.changePassword = Object.create(mobile.settingsHelper, {
 
                     // If something went wrong with the 2FA PIN
                     if (ex === EFAILED || ex === EEXPIRED) {
-                        msgDialog('warninga', l[135], l[19216]);
+                        msgDialog('warninga', l[135], l[19192]);
                     }
                     // If it is the same password as the current one
                     else if (String(ex).includes(l[22126])) {

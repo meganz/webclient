@@ -24,6 +24,10 @@ class GalleryNodeBlock {
         }
 
         mega.gallery.unsetShimmering(this.el);
+
+        if (this.thumb) {
+            this.thumb.classList.remove('w-full');
+        }
     }
 
     fill(mode) {
@@ -136,6 +140,10 @@ class MegaGallery {
                     threshold: 0.1
                 }
             );
+
+        this.blockSizeObserver = typeof ResizeObserver === 'undefined'
+            ? null
+            : new ResizeObserver((entries) => MegaGallery.handleResize(entries));
     }
 
     dropDynamicList() {
@@ -2817,6 +2825,11 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
         else {
             mega.gallery.pendingThumbBlocks[key] = [nodeBlocks[i]];
         }
+
+        // Stretch the image when loading
+        if (nodeBlocks[i].thumb) {
+            nodeBlocks[i].thumb.classList.add('w-full');
+        }
     }
 
     // Checking if there are any re-usable thumbnails available
@@ -2932,12 +2945,39 @@ MegaGallery.handleIntersect = (entries, gallery) => {
             if (Array.isArray($.selected) && $.selected.includes(nodeBlock.node.h)) {
                 nodeBlock.el.classList.add('ui-selected');
             }
+
+            if (gallery.blockSizeObserver) {
+                gallery.blockSizeObserver.observe(nodeBlock.el);
+            }
+        }
+        else if (gallery.blockSizeObserver) {
+            gallery.blockSizeObserver.unobserve(nodeBlock.el);
         }
     }
 
     if (toFetchAttributes.length) {
         MegaGallery.addThumbnails(toFetchAttributes);
     }
+};
+
+MegaGallery.handleResize = (entries) => {
+    'use strict';
+
+    const toFetchAttributes = [];
+
+    for (let i = 0; i < entries.length; i++) {
+        const { contentRect, target: { nodeBlock }, target: { nodeBlock: { thumb } } } = entries[i];
+
+        if (contentRect.width > thumb.naturalWidth) {
+            toFetchAttributes.push(nodeBlock);
+        }
+    }
+
+    delay('gallery.nodeBlockResize', () => {
+        if (toFetchAttributes.length) {
+            MegaGallery.addThumbnails(toFetchAttributes);
+        }
+    });
 };
 
 MegaGallery.dbAction = () => {

@@ -124,6 +124,9 @@
     height: auto;
     max-width: 100%;
 }
+.gallery-view .data-block-view .data-block-bg.thumb img.w-full {
+    width: 100%;
+}
 .gallery-view .content .data-block-view .data-block-bg {
     border-radius: 0;
     border: none;

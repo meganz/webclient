@@ -4084,6 +4084,8 @@ MegaData.prototype.emptySharefolderUI = tryCatch(function(lSel) {
     let selectedView = null;
     let emptyBlock = null;
     let clonedEmptyBlock = null;
+    const emptyBlockFilter = mega.ui.mNodeFilter && mega.ui.mNodeFilter.selectedFilters
+        ? '.fm-empty-search' : '.fm-empty-folder';
 
     if (!contentBlock) {
         return;
@@ -4096,7 +4098,7 @@ MegaData.prototype.emptySharefolderUI = tryCatch(function(lSel) {
         return;
     }
 
-    clonedEmptyBlock = document.querySelector('.fm-empty-folder').cloneNode(true);
+    clonedEmptyBlock = document.querySelector(emptyBlockFilter).cloneNode(true);
     clonedEmptyBlock.classList.remove('hidden');
     clonedEmptyBlock.classList.add('fm-empty-sharef');
 

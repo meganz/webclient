@@ -34,7 +34,7 @@ mobile.terms  = Object.create(mobile.settingsHelper, {
                 {
                     text: l[24629],
                     icon: 'sprite-mobile-fm-mono icon-cookie-thin-outline',
-                    href: 'https://mega.io/cookie',
+                    href: `${getBaseUrl()}/cookie`,
                     target: '_blank',
                     rightIcon: null
                 }

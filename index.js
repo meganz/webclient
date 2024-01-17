@@ -1466,7 +1466,16 @@ function init_page() {
         init_done();
     }
     else if (page === 'cookie') {
-        mega.redirect('mega.io', 'cookie', false, false);
+        if (mega.flags.ab_adse) {
+            parsepage(pages.cookiepolicy);
+            $cookiePolicyPage = $('body #mainlayout #startholder .bottom-page.cookie-policy');
+            $('.cookie-policy .cookiesdialog', $cookiePolicyPage).rebind('click', () => {
+                csp.trigger().dump('csp.trigger');
+            });
+        }
+        else {
+            mega.redirect('mega.io', 'cookie', false, false);
+        }
     }
     else if (page === 'cookiedialog') {
 
@@ -2017,7 +2026,7 @@ function topbarUI(holderId) {
         else if (this.classList.contains('feedback')) {
             mega.config.set('rvonbrddl', 1);
             window.open(
-                'https://survey.mega.co.nz/index.php?r=survey/index&sid=765691&lang=en',
+                'https://survey.mega.co.nz/index.php?r=survey/index&sid=692176&lang=en',
                 '_blank',
                 'noopener,noreferrer'
             );
@@ -2717,6 +2726,9 @@ function topmenuUI() {
                 }
                 else if (!is_mobile && subpage === 'keybackup') {
                     M.showRecoveryKeyDialog(2);
+                }
+                else if (subpage === 'cookie' && mega.flags.ab_adse) {
+                    window.open(`${getBaseUrl()}/cookie`, '_blank', 'noopener,noreferrer');
                 }
                 else if (subpage) {
                     if (ioPages.includes(subpage)) {

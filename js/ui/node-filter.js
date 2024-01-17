@@ -15,7 +15,7 @@ lazy(mega.ui, 'mNodeFilter', () => {
 
     // static sections where we don't show filtering capabilities
     const hiddenSections = new Set([
-        'shares', 'out-shares', 'public-links', 'file-requests', 'faves', 'recents'
+        'shares', 'out-shares', 'file-requests', 'faves', 'recents'
     ]);
 
     // filtering bitfield
@@ -115,12 +115,7 @@ lazy(mega.ui, 'mNodeFilter', () => {
             selection: false,
             eid: 99953,
             match(n) {
-                if (n.t) {
-                    // Folders do not have a modified date
-                    return false;
-                }
-
-                const nodeMtime = n.mtime * 1000;
+                const nodeMtime = (n.mtime || n.ts) * 1000;
 
                 // Date range
                 if (this.selection && this.selection.min && this.selection.max) {
@@ -465,7 +460,6 @@ lazy(mega.ui, 'mNodeFilter', () => {
             }
 
             const hidden = M.gallery || M.chat || M.albums
-                || M.currentrootid === 'shares'
                 || M.currentrootid === M.RubbishID
                 || hiddenSections.has(M.currentdirid)
                 || M.currentrootid && M.currentrootid === (M.BackupsId && M.getNodeByHandle(M.BackupsId).p)

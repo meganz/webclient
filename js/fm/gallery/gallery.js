@@ -24,6 +24,10 @@ class GalleryNodeBlock {
         }
 
         mega.gallery.unsetShimmering(this.el);
+
+        if (this.thumb) {
+            this.thumb.classList.remove('w-full');
+        }
     }
 
     fill(mode) {
@@ -136,6 +140,10 @@ class MegaGallery {
                     threshold: 0.1
                 }
             );
+
+        this.blockSizeObserver = typeof ResizeObserver === 'undefined'
+            ? null
+            : new ResizeObserver((entries) => MegaGallery.handleResize(entries));
     }
 
     dropDynamicList() {
@@ -1501,9 +1509,9 @@ class MegaGallery {
             }
 
             if (!this.inPreview) {
-                const {state = false} = ev.originalEvent || !1;
+                const { state = false } = ev.originalEvent || !1;
 
-                if (state.galleryMode && this.onpage) {
+                if (state && state.galleryMode && this.onpage) {
                     this.setMode(state.galleryMode, undefined, true);
                     this.render(false);
 
@@ -2362,7 +2370,7 @@ mega.gallery.arrayBufferContainsAlpha = (ab) => {
 /**
  * A method to make/load the thumbnails of specific size based on the list of handles provided
  * @param {Array} keys Handle+size key to fetch from local database or to generate.
- * Key example: `1P9hFJwb|w233` - handle is 1P9hFJwb, width 233px
+ * Key example: `1P9hFJwb|w320` - handle is 1P9hFJwb, width 320px
  * @param {Function} [onLoad] Single image successful load callback
  * @param {Function} [onErr] Callback when a single image is failed to load
  * @returns {void}
@@ -2766,7 +2774,9 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
         GalleryNodeBlock.thumbCache = Object.create(null);
     }
 
+    const thumbSize = 240;
     const keys = [];
+    const thumbBlocks = {};
 
     for (let i = 0; i < nodeBlocks.length; i++) {
         if (!nodeBlocks[i].node) { // No node is associated with the block
@@ -2790,6 +2800,15 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
             mega.gallery.pendingFaBlocks[h][width] = nodeBlocks[i];
             continue;
         }
+        else if (width <= thumbSize) {
+            if (thumbBlocks[nodeBlocks[i].node.h]) {
+                thumbBlocks[nodeBlocks[i].node.h].push(nodeBlocks[i]);
+            }
+            else {
+                thumbBlocks[nodeBlocks[i].node.h] = [nodeBlocks[i]];
+            }
+            continue;
+        }
 
         if (GalleryNodeBlock.thumbCache[key]) {
             nodeBlocks[i].setThumb(GalleryNodeBlock.thumbCache[key], nodeBlocks[i].node.fa);
@@ -2806,6 +2825,26 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
         else {
             mega.gallery.pendingThumbBlocks[key] = [nodeBlocks[i]];
         }
+
+        // Stretch the image when loading
+        if (nodeBlocks[i].thumb) {
+            nodeBlocks[i].thumb.classList.add('w-full');
+        }
+    }
+
+    // Checking if there are any re-usable thumbnails available
+    const thumbHandles = Object.keys(thumbBlocks);
+
+    if (thumbHandles.length) {
+        fm_thumbnails(
+            'standalone',
+            thumbHandles.map(h => M.d[h]),
+            ({ h, fa }) => {
+                for (let i = 0; i < thumbBlocks[h].length; i++) {
+                    thumbBlocks[h][i].setThumb(thumbnails.get(fa), fa);
+                }
+            }
+        );
     }
 
     // All nodes are in pending state, no need to proceed
@@ -2906,12 +2945,39 @@ MegaGallery.handleIntersect = (entries, gallery) => {
             if (Array.isArray($.selected) && $.selected.includes(nodeBlock.node.h)) {
                 nodeBlock.el.classList.add('ui-selected');
             }
+
+            if (gallery.blockSizeObserver) {
+                gallery.blockSizeObserver.observe(nodeBlock.el);
+            }
+        }
+        else if (gallery.blockSizeObserver) {
+            gallery.blockSizeObserver.unobserve(nodeBlock.el);
         }
     }
 
     if (toFetchAttributes.length) {
         MegaGallery.addThumbnails(toFetchAttributes);
     }
+};
+
+MegaGallery.handleResize = (entries) => {
+    'use strict';
+
+    const toFetchAttributes = [];
+
+    for (let i = 0; i < entries.length; i++) {
+        const { contentRect, target: { nodeBlock }, target: { nodeBlock: { thumb } } } = entries[i];
+
+        if (contentRect.width > thumb.naturalWidth) {
+            toFetchAttributes.push(nodeBlock);
+        }
+    }
+
+    delay('gallery.nodeBlockResize', () => {
+        if (toFetchAttributes.length) {
+            MegaGallery.addThumbnails(toFetchAttributes);
+        }
+    });
 };
 
 MegaGallery.dbAction = () => {

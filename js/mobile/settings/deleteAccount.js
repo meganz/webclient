@@ -137,7 +137,7 @@ mobile.settings.account.deleteAccount = Object.create(mobile.settingsHelper, {
 
                     // Check for invalid 2FA code
                     if (ex === EFAILED || ex === EEXPIRED) {
-                        msgDialog('warninga', l[135], l[19216]);
+                        msgDialog('warninga', l[135], l[19192]);
                     }
                     // Check for incorrect email
                     else if (ex === ENOENT) {

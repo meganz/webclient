@@ -1741,7 +1741,7 @@ accountUI.account = {
 
                             // Check for invalid 2FA code
                             if (res === EFAILED || res === EEXPIRED) {
-                                msgDialog('warninga', l[135], l[19216]);
+                                msgDialog('warninga', l[135], l[19192]);
                             }
 
                             // Check for incorrect email
@@ -2139,13 +2139,8 @@ accountUI.plan = {
 
                 this.$options = this.$dialog.find('.label-wrap');
 
-                // If the user has experiment flag, add them to experiment
-                if (typeof mega.flags.ab_dbbuc !== 'undefined') {
-                    api.req({'a': 'abta', c: 'ab_dbbuc'});
-                }
-
-                // Show benefits dialog before cancellation dialog if user has experiment flag
-                if (mega.flags.ab_dbbuc && !u_attr.pf && !u_attr.b) {
+                // Show benefits dialog before cancellation dialog if user does not have Pro Flex or Business
+                if (!u_attr.pf && !u_attr.b) {
                     this.displayBenefits();
                 }
                 else {

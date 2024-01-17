@@ -271,6 +271,11 @@ mega.metatags = new function() {
             mTags.mega_title = l[24012] || mTags.en_title;
             mTags.mega_desc = l.mtags_desc_registerb || mTags.en_desc;
         }
+        else if (page === 'cookie') {
+            mTags.mega_title = 'Cookie Policy - MEGA';
+            mTags.mega_desc = 'Our Cookie Policy explains what types of cookies we use ' +
+                'and what we do with the information we collect.';
+        }
         else if (typeof Object(window.dlmanager).isStreaming === 'object') {
             mTags.mega_title = dlmanager.isStreaming._megaNode.name + ' - MEGA';
             mTags.dynamic = true;

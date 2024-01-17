@@ -80,15 +80,20 @@ mobile.settings.account.deleteAccount = Object.create(mobile.settingsHelper, {
         }
     },
 
+    /**
+     * Check 2FA and run the proccess
+     * @param {Number} error API exception value to display an error message in 2FA, optional
+     * @returns {void} void
+     */
     deleteAccount: {
-        value: async function() {
+        value: async function(error) {
             'use strict';
 
             const hasTwoFactor = await twofactor.isEnabledForAccount();
             let twoFactorPin = null;
 
             if (hasTwoFactor &&
-                !(twoFactorPin = await mobile.settings.account.twofactorVerifyAction.init())) {
+                !(twoFactorPin = await mobile.settings.account.twofactorVerifyAction.init(false, error))) {
                 return false;
             }
             this.continueDeleteAccount(twoFactorPin);
@@ -121,6 +126,9 @@ mobile.settings.account.deleteAccount = Object.create(mobile.settingsHelper, {
             // Delete account request
             api.req(requestParams)
                 .then(() => {
+                    // Hide 2FA overlay
+                    mega.ui.overlay.hide();
+
                     this.result.textContent = '';
                     this.prompt.textContent = l.account_email_confirmation_sent;
 
@@ -137,10 +145,15 @@ mobile.settings.account.deleteAccount = Object.create(mobile.settingsHelper, {
 
                     // Check for invalid 2FA code
                     if (ex === EFAILED || ex === EEXPIRED) {
-                        msgDialog('warninga', l[135], l[19192]);
+                        this.deleteAccount(ex).catch(tell);
+                        return false;
                     }
+
+                    // Hide 2FA overlay
+                    mega.ui.overlay.hide();
+
                     // Check for incorrect email
-                    else if (ex === ENOENT) {
+                    if (ex === ENOENT) {
                         msgDialog('warningb', l[1513], l[1946]);
                     }
                     else {

@@ -238,19 +238,20 @@ mobile.signin.old = {
         // Hide the loading spinner
         mobile.signin.$screen.find('.signin-button').removeClass('loading');
 
-        // If the Two-Factor PIN is required
-        if (result === EMFAREQUIRED) {
-
-            mobile.signin.$screen.addClass('hidden');
-
-            // Load the Two-Factor PIN entry page
-            loadSubPage('twofactor/verify-login');
+        // If there was a 2FA error, show a message that the PIN code was incorrect
+        if (result === EFAILED) {
+            mobile.settings.account.twofactorVerifyAction.init(false, result);
             return false;
         }
 
-        // If there was a 2FA error, show a message that the PIN code was incorrect and clear the text field
-        else if (result === EFAILED) {
-            mobile.twofactor.verifyLogin.showVerificationError();
+        // Hide overlays
+        mega.ui.overlay.hide();
+
+        // If the Two-Factor PIN is required
+        if (result === EMFAREQUIRED) {
+
+            // Load the Two-Factor PIN entry page
+            mobile.settings.account.twofactorVerifyAction.init();
             return false;
         }
 
@@ -345,6 +346,9 @@ mobile.signin.new = {
 
         // If email confirm code is ok
         if (confirmok) {
+            // Hide 2FA overlay
+            mega.ui.overlay.hide();
+
             // Cleanup temporary login variables
             security.login.email = null;
             security.login.password = null;
@@ -363,19 +367,21 @@ mobile.signin.new = {
             }
         }
         else {
-            // If the Two-Factor PIN is required
-            if (result === EMFAREQUIRED) {
 
-                mobile.signin.$screen.addClass('hidden');
-
-                // Load the Two-Factor PIN entry page
-                loadSubPage('twofactor/verify-login');
+            // If there was a 2FA error, show a message that the PIN code was incorrect
+            if (result === EFAILED) {
+                mobile.settings.account.twofactorVerifyAction.init(false, result);
                 return false;
             }
 
-            // If there was a 2FA error, show a message that the PIN code was incorrect and clear the text field
-            else if (result === EFAILED) {
-                mobile.twofactor.verifyLogin.showVerificationError();
+            // Hide 2FA overlay
+            mega.ui.overlay.hide();
+
+            // If the Two-Factor PIN is required
+            if (result === EMFAREQUIRED) {
+
+                // Load the Two-Factor PIN entry page
+                mobile.settings.account.twofactorVerifyAction.init();
                 return false;
             }
 

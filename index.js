@@ -1025,10 +1025,6 @@ function init_page() {
         loadSubPage('fm');
         return false;
     }
-    else if (is_mobile && page.startsWith('twofactor/verify-login')) {
-        mobile.twofactor.verifyLogin.init();
-        return false;
-    }
     else if (is_mobile && (page.startsWith('twofactor') || page.startsWith('sms'))) {
         loadSubPage(`fm/account/${page}`);
         return false;

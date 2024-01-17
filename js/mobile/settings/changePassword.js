@@ -88,48 +88,43 @@ mobile.settings.account.changePassword = Object.create(mobile.settingsHelper, {
             }
 
             // Pass the encrypted password to the API
-            this.processChange(newPassword)
-                .then((res) => {
-                    // Progress stopped
-                    if (res === false) {
-                        return false;
-                    }
+            this.processChange(newPassword).catch(tell);
+        }
+    },
 
-                    // Load the account page
-                    loadSubPage('fm/account');
+    /**
+     * Check 2FA and run the proccess
+     * @param {String} newPassword The new password
+     * @param {Number} error API exception value to display an error message in 2FA, optional
+     * @returns {void} void
+     */
+    processChange: {
+        value: async function(newPassword, error) {
+            'use strict';
 
-                    const moreInfo = document.createElement('p');
-                    moreInfo.append(parseHTML(l.password_changed_more_info));
+            const hasTwoFactor = await twofactor.isEnabledForAccount();
+            let twoFactorPin = null;
 
-                    // Show 'Your password has been changed' message
-                    mega.ui.sheet.show({
-                        name: 'change-password',
-                        type: 'modal',
-                        showClose: true,
-                        icon: 'key',
-                        title: l.password_changed_title,
-                        contents: [l.password_changed_info, moreInfo],
-                        actions: [
-                            {
-                                type: 'normal',
-                                text: l.recovery_key_export_save,
-                                className: 'primary',
-                                onClick: () => {
-                                    mega.ui.sheet.hide();
-                                    loadSubPage('fm/account/security/backup-key');
-                                }
-                            }
-                        ]
-                    });
-                })
+            if (hasTwoFactor &&
+                !(twoFactorPin = await mobile.settings.account.twofactorVerifyAction.init(false, error))) {
+                return false;
+            }
+
+            this.continueChangePassword(newPassword, twoFactorPin)
+                .then(() => this.completeChangePassword())
                 .catch((ex) => {
 
                     // If something went wrong with the 2FA PIN
                     if (ex === EFAILED || ex === EEXPIRED) {
-                        msgDialog('warninga', l[135], l[19192]);
+                        this.processChange(newPassword, ex).catch(tell);
+                        return false;
                     }
+
+                    // Hide 2FA overlay
+                    mega.ui.overlay.hide();
+
                     // If it is the same password as the current one
-                    else if (String(ex).includes(l[22126])) {
+                    if (String(ex).includes(l[22126])) {
                         msgDialog('warninga', l[135], l[22126]);
                     }
                     else {
@@ -139,21 +134,6 @@ mobile.settings.account.changePassword = Object.create(mobile.settingsHelper, {
                 .finally(() => {
                     loadingDialog.hide();
                 });
-        }
-    },
-
-    processChange: {
-        value: async function(newPassword) {
-            'use strict';
-
-            const hasTwoFactor = await twofactor.isEnabledForAccount();
-            let twoFactorPin = null;
-
-            if (hasTwoFactor &&
-                !(twoFactorPin = await mobile.settings.account.twofactorVerifyAction.init())) {
-                return false;
-            }
-            return this.continueChangePassword(newPassword, twoFactorPin);
         }
     },
 
@@ -178,6 +158,42 @@ mobile.settings.account.changePassword = Object.create(mobile.settingsHelper, {
             }
 
             return security.changePassword.oldMethod(newPassword, twoFactorPin);
+        }
+    },
+
+    completeChangePassword: {
+        value: function() {
+            'use strict';
+
+            // Hide 2FA overlay
+            mega.ui.overlay.hide();
+
+            // Load the account page
+            loadSubPage('fm/account');
+
+            const moreInfo = document.createElement('p');
+            moreInfo.append(parseHTML(l.password_changed_more_info));
+
+            // Show 'Your password has been changed' message
+            mega.ui.sheet.show({
+                name: 'change-password',
+                type: 'modal',
+                showClose: true,
+                icon: 'key',
+                title: l.password_changed_title,
+                contents: [l.password_changed_info, moreInfo],
+                actions: [
+                    {
+                        type: 'normal',
+                        text: l.recovery_key_export_save,
+                        className: 'primary',
+                        onClick: () => {
+                            mega.ui.sheet.hide();
+                            loadSubPage('fm/account/security/backup-key');
+                        }
+                    }
+                ]
+            });
         }
     }
 });

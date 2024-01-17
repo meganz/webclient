@@ -350,17 +350,14 @@
             $('.fm-files-view-icon').filter('.media-view').addClass('hidden');
         }
 
-        if (mega.flags.ab_fchips) {
+        if (mega.ui.mNodeFilter) {
             // XXX: Do not reset the filter selections if navigated to the same location.
             let stash = this.previousdirid === this.currentdirid;
 
             if (!stash && this.previousdirid) {
                 stash = this.search && String(this.previousdirid).substr(0, 6) === 'search';
             }
-
-            if (mega.ui.mNodeFilter) {
-                mega.ui.mNodeFilter.resetFilterSelections(stash);
-            }
+            mega.ui.mNodeFilter.resetFilterSelections(stash);
         }
 
         if (id === undefined && folderlink) {

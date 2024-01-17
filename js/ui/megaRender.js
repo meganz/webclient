@@ -451,7 +451,9 @@
                     $('.fm-empty-trashbin').removeClass('hidden');
                     $('.fm-clearbin-button').addClass('hidden');
                 }
-                else if (String(M.currentdirid).substr(0, 7) === 'search/' || mega.ui.mNodeFilter.selectedFilters) {
+                else if (String(M.currentdirid).substr(0, 7) === 'search/'
+                        || mega.ui.mNodeFilter.selectedFilters
+                        && M.currentrootid !== 'shares') {
                     $('.fm-empty-search').removeClass('hidden');
                 }
                 else if (M.currentdirid === M.RootID && folderlink) {

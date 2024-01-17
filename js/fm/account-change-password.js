@@ -116,7 +116,7 @@ var accountChangePassword = {
                 .catch((ex) => {
 
                     if (ex === EFAILED || ex === EEXPIRED) {
-                        msgDialog('warninga', l[135], l[19216]);
+                        msgDialog('warninga', l[135], l[19192]);
                     }
                     else if (String(ex).includes(l[22126])) {
                         msgDialog('warninga', l[135], l[22126]);

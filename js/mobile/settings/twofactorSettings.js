@@ -306,7 +306,7 @@ mobile.settings.account.twofactorSettings = Object.create(mobile.settingsHelper,
                     }
                     // If something went wrong with the 2FA PIN
                     else if (ex === EFAILED || ex === EEXPIRED) {
-                        msgDialog('warninga', l[135], l[19216]);
+                        msgDialog('warninga', l[135], l[19192]);
                     }
                     // If something else went wrong, show an error
                     else {
@@ -361,7 +361,7 @@ mobile.settings.account.twofactorSettings = Object.create(mobile.settingsHelper,
                     }
                     // If something went wrong with the 2FA PIN
                     else if (ex === EFAILED || ex === EEXPIRED) {
-                        msgDialog('warninga', l[135], l[19216]);
+                        msgDialog('warninga', l[135], l[19192]);
                     }
                     // If something else went wrong, show an error
                     else {

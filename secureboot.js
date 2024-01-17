@@ -2693,6 +2693,8 @@ else if (!browserUpdate) {
     jsl.push({f:'js/vendor/perfect-scrollbar.js', n: 'ps_js', j:1,w:1});
     jsl.push({f:'js/ui/languageDialog.js', n: 'languageDialog_js', j:1,w:7});
     jsl.push({f:'css/jquery-ui.extra.css', n: 'jquery_ui_extra_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'html/cookiepolicy.html', n: 'cookiepolicy', j:0});
+    jsl.push({f:'css/cookiepolicy.css', n: 'cookiepolicy_css', j:2,w:5,c:1,d:1,cache:1});
 
     jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j:1});
 

@@ -1,6 +1,6 @@
 /*!
- * perfect-scrollbar v1.5.6 - mega.nz build.
- * Copyright 2023 Hyunje Jun, MDBootstrap and Contributors
+ * perfect-scrollbar v1.5.7 - mega.nz build.
+ * Copyright 2024 Hyunje Jun, MDBootstrap and Contributors
  * Licensed under MIT
  */
 
@@ -576,11 +576,10 @@
     let scrollBy = null;
 
     function mouseMoveHandler(e) {
-      if (e.touches && e.touches[0]) {
-        e[pageY] = e.touches[0].pageY;
-      }
+      const y = e.touches && e.touches[0] ? e.touches[0].pageY : e[pageY];
+
       element[scrollTop] =
-        startingScrollTop + scrollBy * (e[pageY] - startingMousePageY);
+        startingScrollTop + scrollBy * (y - startingMousePageY);
       addScrollingClass(i, y);
       updateGeometry(i);
 
@@ -601,10 +600,9 @@
         return;
       }
       startingScrollTop = element[scrollTop];
-      if (touchMode && e.touches) {
-        e[pageY] = e.touches[0].pageY;
-      }
-      startingMousePageY = e[pageY];
+      startingMousePageY =
+        touchMode && e.touches && e.touches[0] ? e.touches[0].pageY : e[pageY];
+
       scrollBy =
         (i[contentHeight] - i[containerHeight]) /
         (i[railYHeight] - i[scrollbarYHeight]);

@@ -13,7 +13,9 @@
 
     &.full { width: 100%; }
 
-    &.hovered ~ .stream-controls, &.hovered ~ .sidebar-controls { bottom: 0; }
+    &.hovered ~ .stream-controls,
+    &.hovered ~ .sidebar-controls,
+    &.hovered ~ .recording-control { bottom: 0; }
     &.hovered .stream-head { top: 0; }
 
     @import '_participantsNotice.scss';

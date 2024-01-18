@@ -17,9 +17,27 @@
   /* [...] */
 }
 .meetings-call-onboarding .mega-onboarding-dialog {
+  z-index: 11;
+}
+.meetings-call-onboarding .mega-onboarding-dialog.onboarding-UI {
   top: 74px;
   right: 84px;
-  z-index: 11;
+}
+.meetings-call-onboarding .mega-onboarding-dialog.onboarding-recording {
+  bottom: 100px;
+  left: 12px;
+}
+.meetings-call-onboarding .mega-onboarding-dialog.onboarding-recording #ob-dialog-arrow {
+  left: 32px;
+}
+.meetings-call-onboarding .mega-onboarding-dialog.onboarding-recording .link-button {
+  text-decoration: underline;
+}
+.meetings-call-onboarding .mega-onboarding-dialog.onboarding-recording .link-button:hover {
+  text-decoration: none;
+}
+.meetings-call-onboarding .mega-onboarding-dialog h2 {
+  font: var(--text-h2-bold);
 }
 .meetings-call .stream {
   position: relative;
@@ -31,7 +49,7 @@
 .meetings-call .stream.full {
   width: 100%;
 }
-.meetings-call .stream.hovered ~ .stream-controls, .meetings-call .stream.hovered ~ .sidebar-controls {
+.meetings-call .stream.hovered ~ .stream-controls, .meetings-call .stream.hovered ~ .sidebar-controls, .meetings-call .stream.hovered ~ .recording-control {
   bottom: 0;
 }
 .meetings-call .stream.hovered .stream-head {
@@ -398,13 +416,101 @@ body.rtl .meetings-call .stream .stream-participants-block .participants-contain
   --icon-size: 20px;
   justify-content: center;
 }
+.meetings-call div.recording-control {
+  position: absolute;
+  left: 32px;
+  bottom: -250px;
+  padding: 0 0 14px 0;
+  transition: opacity 500ms ease-in-out, bottom 500ms ease-in-out;
+  text-align: center;
+  z-index: 13;
+}
+.meetings-call div.recording-control.recording-fixed {
+  bottom: 0;
+  margin: 0 0 14px 0;
+}
+.meetings-call div.recording-control .record-label {
+  display: block;
+  margin: 4px 0 0 0;
+  font: var(--text-body2);
+  color: var(--secondary-white);
+  cursor: pointer;
+}
+.meetings-call div.recording-control .recording-start {
+  /* [...] */
+}
+.meetings-call div.recording-control .recording-start div {
+  width: 24px;
+  height: 24px;
+  border-radius: 200px;
+  border: 3px solid var(--secondary-white);
+}
+.meetings-call div.recording-control .recording-start div i {
+  display: block;
+  width: 10px;
+  height: 10px;
+  background: var(--secondary-white);
+  border-radius: 200px;
+}
+.meetings-call div.recording-control .recording-ongoing {
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 6px;
+  box-sizing: border-box;
+  font: var(--text-body1);
+  background: #333;
+  color: var(--secondary-white);
+}
+.meetings-call div.recording-control .recording-ongoing.plain-background {
+  background: transparent;
+}
+.meetings-call div.recording-control .recording-ongoing span {
+  display: inline-block;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+.meetings-call div.recording-control .recording-ongoing .recording-icon {
+  display: flex;
+  align-items: center;
+  font: var(--text-body2);
+  background: var(--secondary-red);
+}
+.meetings-call div.recording-control .recording-ongoing .recording-icon i {
+  display: block;
+  width: 8px;
+  height: 8px;
+  margin: 0 0 0 6px;
+  border-radius: 200px;
+  background: var(--secondary-white);
+  animation: fadeInOutLoopSubtle 4s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+}
+@keyframes fadeInOutLoopSubtle {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+.meetings-call div.recording-control .recording-ongoing .recording-toggle {
+  margin: 0 0 0 8px;
+  padding: 2px 6px;
+  cursor: pointer;
+}
+.meetings-call div.recording-control .recording-ongoing .recording-toggle:hover:not(.disabled) {
+  background: rgba(255, 255, 255, 0.1);
+}
 .meetings-call .stream-controls {
   display: flex;
   align-items: center;
   justify-content: center;
   position: absolute;
   bottom: -250px;
-  padding: 0 0 24px 0;
+  padding: 0 0 14px 0;
   width: 100%;
   text-align: center;
   transition: opacity 500ms ease-in-out, bottom 500ms ease-in-out;
@@ -424,12 +530,33 @@ body.rtl .meetings-call .stream .stream-participants-block .participants-contain
   position: relative;
   display: inline-block;
   padding: 0 11px 0 11px;
+  cursor: pointer;
+}
+.meetings-call .stream-controls ul li.disabled {
+  /* [...] */
+}
+.meetings-call .stream-controls ul li.disabled button {
+  /* [...] */
+}
+.meetings-call .stream-controls ul li.disabled button span {
+  color: var(--text-color-low);
 }
 .meetings-call .stream-controls ul li button {
   cursor: pointer;
 }
+.meetings-call .stream-controls ul li button.with-fill {
+  background: var(--secondary-white);
+}
+.meetings-call .stream-controls ul li button.with-fill i {
+  --mask-color: var(--icon-active);
+}
 .meetings-call .stream-controls ul li button.end-call {
+  background: #FF333A;
   color: var(--text-color-high);
+  box-shadow: none;
+}
+.meetings-call .stream-controls ul li button.end-call:hover {
+  background: #FF6560;
 }
 .meetings-call .stream-controls ul li button.end-call i {
   --mask-color: var(--secondary-white);
@@ -437,13 +564,14 @@ body.rtl .meetings-call .stream .stream-participants-block .participants-contain
 .meetings-call .stream-controls ul li button i {
   display: block;
   margin: 0 auto;
-  --icon-size: 32px;
-  --mask-color: var(--icon-active);
+  --icon-size: 24px;
+  --mask-color: var(--secondary-white);
 }
-.meetings-call .stream-controls ul li button span {
-  position: fixed;
-  bottom: -9999px;
-  visibility: hidden;
+.meetings-call .stream-controls ul li span {
+  display: block;
+  margin: 8px 0 0 0;
+  font: var(--text-body2);
+  color: var(--secondary-white);
 }
 .meetings-call .stream-controls .stream-debug {
   /* [...] */
@@ -484,14 +612,18 @@ body.rtl .meetings-call .stream .stream-participants-block .participants-contain
 .meetings-call .stream-controls .end-options-content button span {
   position: relative;
   bottom: auto;
+  margin: 0;
+  font: var(--text-body1);
   visibility: visible;
 }
 .meetings-call .sidebar-controls {
+  display: flex;
+  justify-content: flex-end;
   position: absolute;
-  right: 14px;
+  right: 32px;
   bottom: -250px;
-  width: 140px;
-  padding: 0 0 24px 0;
+  width: 200px;
+  padding: 0 0 14px 0;
   transition: opacity 500ms ease-in-out, bottom 500ms ease-in-out;
   z-index: 12;
 }
@@ -504,6 +636,8 @@ body.rtl .meetings-call .stream .stream-participants-block .participants-contain
   position: relative;
   float: left;
   margin: 0 11px 0 11px;
+  text-align: center;
+  cursor: pointer;
 }
 .meetings-call .sidebar-controls ul li:last-child {
   margin-right: 0;
@@ -512,39 +646,39 @@ body.rtl .meetings-call .stream .stream-participants-block .participants-contain
   color: var(--text-color-high);
 }
 .meetings-call .sidebar-controls ul li button.selected, .meetings-call .sidebar-controls ul li button.selected:hover {
-  background: rgb(155, 229, 247);
-  background: linear-gradient(90deg, rgb(155, 229, 247) 0%, rgb(79, 192, 238) 100%);
+  /* [...] */
 }
 .meetings-call .sidebar-controls ul li button i {
   margin: 0 auto;
-  --icon-size: 32px;
+  --icon-size: 24px;
   --mask-color: var(--secondary-white);
 }
-.meetings-call .sidebar-controls ul li button span {
-  position: fixed;
-  bottom: -9999px;
-  visibility: hidden;
+.meetings-call .sidebar-controls ul span.control-label {
+  display: block;
+  margin: 4px 0 0 0;
+  font: var(--text-body2);
+  color: var(--secondary-white);
 }
-.meetings-call .sidebar-controls ul span {
+.meetings-call .sidebar-controls ul span.notification-badge {
   position: absolute;
   width: 19px;
   height: 19px;
   border-radius: 200px;
   text-align: center;
-  font: var(--text-body1);
+  font: var(--text-body2);
 }
-.meetings-call .sidebar-controls ul span.notifications-count {
+.meetings-call .sidebar-controls ul span.notification-badge.notifications-count {
   top: -2px;
-  right: -1px;
+  right: -6px;
   background: var(--surface-error);
   color: var(--secondary-white);
 }
-.meetings-call .sidebar-controls ul span.participants-count {
-  right: -3px;
-  bottom: -4px;
-  line-height: 21px;
-  color: var(--text-color-black-high);
-  background: var(--secondary-white);
+.meetings-call .sidebar-controls ul span.notification-badge.participants-count {
+  top: -2px;
+  right: 3px;
+  line-height: 19px;
+  color: var(--secondary-white);
+  background: var(--badge-fill);
 }
 .meetings-call .sidebar-wrapper {
   display: flex;
@@ -598,6 +732,17 @@ body.rtl .meetings-call .stream .stream-participants-block .participants-contain
   line-height: 16px;
   background: var(--secondary-blue);
   color: var(--secondary-white);
+}
+@keyframes fadeInOutLoopSubtle {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 .meetings-call .sidebar-wrapper .sidebar .participants {
   padding: 12px 0 0 0;
@@ -722,10 +867,32 @@ body.rtl .meetings-call .sidebar-wrapper .sidebar .participants ul li .name span
   color: var(--text-color-low);
 }
 .meetings-call .sidebar-wrapper .sidebar .participants ul li .status {
+  display: flex;
+  align-items: center;
   margin: 5px 0 0 auto;
 }
 body.rtl .meetings-call .sidebar-wrapper .sidebar .participants ul li .status {
   float: left;
+}
+.meetings-call .sidebar-wrapper .sidebar .participants ul li .status .recording-status {
+  display: block;
+  position: relative;
+  width: 16px;
+  height: 16px;
+  border-radius: 200px;
+  background: var(--secondary-red);
+  animation: fadeInOutLoopSubtle 4s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+}
+.meetings-call .sidebar-wrapper .sidebar .participants ul li .status .recording-status span {
+  display: block;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 200px;
+  background: var(--secondary-white);
 }
 .meetings-call .sidebar-wrapper .sidebar .participants ul li .status i {
   display: inline-block;
@@ -1016,6 +1183,19 @@ body.rtl .meetings-call .sidebar-wrapper .sidebar-head button.add {
   position: fixed;
   bottom: -9999px;
   visibility: hidden;
+}
+.meetings-call button.call-action {
+  background: transparent;
+  box-shadow: none;
+}
+.meetings-call button.call-action:hover {
+  background: #333;
+}
+.meetings-call button.call-action i {
+  display: block;
+  margin: 0 auto;
+  --icon-size: 24px;
+  --mask-color: var(--secondary-white);
 }
 
 .local-stream-mirrored video {
@@ -1713,24 +1893,43 @@ body.theme-dark .mega-dialog.meetings-permissions-dialog .permissions-warning-co
   justify-content: space-evenly;
   position: absolute;
   left: 50%;
-  bottom: 20px;
+  bottom: 8px;
   transform: translate(-50%);
   width: 85%;
   text-align: center;
+  z-index: 1;
 }
 .float-video.minimized .float-video-overlay .float-video-controls button {
-  /* [...] */
+  background: transparent;
+  box-shadow: none;
+}
+.float-video.minimized .float-video-overlay .float-video-controls button:hover {
+  background: #333;
 }
 .float-video.minimized .float-video-overlay .float-video-controls button:last-child {
   margin-right: 0;
 }
-.float-video.minimized .float-video-overlay .float-video-controls button i {
-  --icon-size: 32px;
+.float-video.minimized .float-video-overlay .float-video-controls button.with-fill {
+  background: var(--secondary-white);
+}
+.float-video.minimized .float-video-overlay .float-video-controls button.with-fill i {
   --mask-color: var(--icon-active);
 }
+.float-video.minimized .float-video-overlay .float-video-controls button i {
+  margin: 0 auto;
+  --icon-size: 24px;
+  --mask-color: var(--secondary-white);
+}
+.float-video.minimized .float-video-overlay .float-video-controls button i.icon-options {
+  transform: rotate(90deg);
+}
 .float-video.minimized .float-video-overlay .float-video-controls button.end-call {
-  background: rgb(255, 104, 99);
-  background: linear-gradient(0deg, rgb(255, 104, 99) 0%, rgb(255, 156, 151) 100%);
+  background: #FF333A;
+  color: var(--text-color-high);
+  box-shadow: none;
+}
+.float-video.minimized .float-video-overlay .float-video-controls button.end-call:hover {
+  background: #FF6560;
 }
 .float-video.minimized .float-video-overlay .float-video-controls .button-group {
   /* [...] */
@@ -1738,6 +1937,15 @@ body.theme-dark .mega-dialog.meetings-permissions-dialog .permissions-warning-co
 .float-video.minimized .float-video-overlay .float-video-controls .button-group .active-indicator {
   top: -1px;
   right: 2px;
+}
+.float-video.minimized .float-video-overlay .float-video-fade {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 61px;
+  border-radius: 0 0 24px 24px;
+  background: rgba(0, 0, 0, 0.3);
 }
 .float-video.minimized .float-video-notifications {
   position: absolute;
@@ -1891,9 +2099,12 @@ body div:has(+ div.dropdown.body.button-group-menu:hover) .float-video .float-vi
 .meetings-signal-issue i {
   position: absolute;
   top: -4px;
-  right: -10px;
+  right: -18px;
   --icon-size: 24px;
   --mask-color: var(--secondary-orange);
+}
+.in-call .meetings-signal-issue i, .float-video-overlay .meetings-signal-issue i {
+  right: -2px;
 }
 .dropdown.button-group-menu .meetings-signal-issue {
   top: 34px;
@@ -2315,35 +2526,45 @@ body.theme-dark .start-meeting-preview .preview-meeting {
   transform: translate(-50%, -65%);
 }
 .preview-meeting-controls {
+  display: flex;
+  justify-content: center;
   position: absolute;
-  left: 50%;
-  bottom: 24px;
-  transform: translateX(-50%);
+  bottom: 0;
+  width: 100%;
+  padding: 8px 0;
   z-index: 2;
+  background: rgba(0, 0, 0, 0.3);
 }
 .preview-meeting-controls .preview-control-wrapper {
-  display: inline-block;
   position: relative;
   width: 70px;
-  padding: 0 11px 0 11px;
   box-sizing: border-box;
+  text-align: center;
 }
-.preview-meeting-controls button {
+.preview-meeting-controls button.preview-meeting-control {
   display: inline;
+  background: transparent;
+  box-shadow: none;
 }
-.preview-meeting-controls button:first-child {
-  margin-inline-end: 32px;
-  -webkit-margin-end: 32px;
+.preview-meeting-controls button.preview-meeting-control:hover {
+  background: #333;
 }
-.preview-meeting-controls button i {
-  margin: 0 auto;
-  --icon-size: 32px;
+.preview-meeting-controls button.preview-meeting-control.with-fill {
+  background: var(--secondary-white);
+}
+.preview-meeting-controls button.preview-meeting-control.with-fill i {
   --mask-color: var(--icon-active);
 }
-.preview-meeting-controls button span {
-  position: fixed;
-  bottom: -9999px;
-  visibility: hidden;
+.preview-meeting-controls button.preview-meeting-control i {
+  margin: 0 auto;
+  --icon-size: 24px;
+  --mask-color: var(--secondary-white);
+}
+.preview-meeting-controls span {
+  display: block;
+  margin: 6px 0 0 0;
+  font: var(--text-body2);
+  color: var(--secondary-white);
 }
 
 .incoming-dialog {
@@ -2757,9 +2978,6 @@ body.theme-dark .start-meeting-preview .preview-meeting {
 .waiting-room--await, .waiting-room--redirect {
   justify-content: center;
   top: 0;
-}
-.waiting-room--await .preview-meeting-controls .mega-button, .waiting-room--redirect .preview-meeting-controls .mega-button {
-  background: linear-gradient(rgb(255, 255, 255) 0%, rgb(242, 242, 242) 100%);
 }
 .waiting-room--chatlink-landing {
   justify-content: normal;
@@ -3490,3 +3708,5 @@ body.theme-dark .meetings-recurring-content .mega-button.recurring-toggle-button
 .meetings-unsupported-container .unsupported-info ul li {
   /* [...] */
 }
+
+/*# sourceMappingURL=chat-bundle.css.map */

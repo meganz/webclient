@@ -16,12 +16,10 @@ export default class FloatExtendedControls extends MegaRenderMixin {
             onScreenSharingClick, onHoldClick,
         } = this.props;
         const { onHold, Screen } = SfuClient.Av;
-        const screenSharingLabel = this.isActive(Screen) ?
-            l[22890] /* `End screen sharing` */ :
-            l[22889] /* `Start screen sharing` */;
-        const callHoldLabel = this.isActive(onHold) ?
-            l[23459] /* `Resume call` */ :
-            l[23460] /* `Hold call` */;
+        const isOnHold = this.isActive(onHold);
+        const callHoldLabel = isOnHold ? l[23459] /* `Resume call` */ : l[23460] /* `Hold call` */;
+        const screenSharingLabel =
+            this.isActive(Screen) ? l[22890] /* `End screen sharing` */ : l[22889] /* `Start screen sharing` */;
 
         return (
             <Button
@@ -48,21 +46,27 @@ export default class FloatExtendedControls extends MegaRenderMixin {
                         key="call-hold"
                         className={`
                             theme-dark-forced
-                            ${this.isActive(onHold) ? 'active' : ''}
+                            ${isOnHold ? 'active' : ''}
                         `}
                         label={callHoldLabel}
-                        icon={`sprite-fm-mono ${this.isActive(onHold) ? 'icon-play' : 'icon-pause'}`}
+                        icon={`
+                            sprite-fm-mono
+                            ${isOnHold ? 'icon-play-small-regular-outline' : 'icon-pause-small-regular-outline'}
+                        `}
                         onClick={onHoldClick}
                     />
                     <DropdownItem
                         key="screen-sharing"
                         className={`
                             theme-dark-forced
-                            ${this.isActive(onHold) ? 'disabled' : ''}
+                            ${isOnHold ? 'disabled' : ''}
                             ${this.isActive(Screen) ? 'active' : ''}
                         `}
                         label={screenSharingLabel}
-                        icon={`sprite-fm-mono ${this.isActive(Screen) ? 'icon-end-screenshare' : 'icon-screen-share'}`}
+                        icon={`
+                            sprite-fm-mono
+                            ${this.isActive(Screen) ? 'icon-monitor-off' : 'icon-monitor'}
+                        `}
                         onClick={() => {
                             resetError(Av.Screen);
                             onScreenSharingClick();

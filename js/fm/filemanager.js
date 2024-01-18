@@ -316,6 +316,7 @@ FileManager.prototype.initFileManagerUI = function() {
             || $.dialog === "chat-incoming-call"
             || $.dialog === 'stripe-pay'
             || $.dialog === 'start-meeting-dialog'
+            || $.dialog === 'meetings-call-consent'
             || $.dialog === 'fingerprint-dialog'
             || $.dialog === 'fingerprint-admin-dlg'
             || $.dialog === 'meetings-schedule-dialog'

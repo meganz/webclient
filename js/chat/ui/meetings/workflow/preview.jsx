@@ -154,16 +154,16 @@ class Preview extends MegaRenderMixin {
                             className={`
                                 mega-button
                                 round
-                                large
                                 theme-light-forced
-                                ${audio ? '' : 'inactive'}
+                                ${NAMESPACE}-control
+                                ${audio ? '' : 'with-fill'}
                             `}
-                            icon={audio ? 'icon-audio-filled' : 'icon-audio-off'}
+                            icon={audio ? 'icon-mic-thin-outline' : 'icon-mic-off-thin-outline'}
                             onClick={() => {
                                 this.toggleStream(Preview.STREAMS.AUDIO);
                             }}>
-                            <span>{audio ? l[16214] /* `Mute` */ : l[16708] /* `Unmute` */}</span>
                         </Button>
+                        <span>{l.mic_button /* `Mic` */}</span>
                         {hasToRenderPermissionsWarning(Av.Audio) ? renderPermissionsWarning(Av.Audio) : null}
                     </div>
                     <div className="preview-control-wrapper">
@@ -175,14 +175,14 @@ class Preview extends MegaRenderMixin {
                             className={`
                                 mega-button
                                 round
-                                large
                                 theme-light-forced
-                                ${video ? '' : 'inactive'}
+                                ${NAMESPACE}-control
+                                ${video ? '' : 'with-fill'}
                             `}
-                            icon={video ? 'icon-video-call-filled' : 'icon-video-off'}
+                            icon={video ? 'icon-video-thin-outline' : 'icon-video-off-thin-outline'}
                             onClick={() => this.toggleStream(Preview.STREAMS.VIDEO)}>
-                            <span>{video ? l[22894] /* `Disable video` */ : l[22893] /* `Enable video` */}</span>
                         </Button>
+                        <span>{l.camera_button /* `Camera` */}</span>
                         {hasToRenderPermissionsWarning(Av.Camera) ? renderPermissionsWarning(Av.Camera) : null}
                     </div>
                 </div>

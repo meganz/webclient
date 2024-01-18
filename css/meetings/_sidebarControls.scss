@@ -3,11 +3,13 @@
  */
 
 .sidebar-controls {
+    display: flex;
+    justify-content: flex-end;
     position: absolute;
-    right: 14px;
+    right: 32px;
     bottom: -250px;
-    width: 140px;
-    padding: 0 0 24px 0;
+    width: 200px;
+    padding: 0 0 14px 0;
     transition: opacity 500ms ease-in-out, bottom 500ms ease-in-out;
     z-index: 12;
 
@@ -20,6 +22,8 @@
             position: relative;
             float: left;
             margin: 0 11px 0 11px;
+            text-align: center;
+            cursor: pointer;
 
             &:last-child {
                 margin-right: 0;
@@ -30,45 +34,45 @@
 
                 &.selected,
                 &.selected:hover {
-                    background: rgb(155,229,247);
-                    background: linear-gradient(90deg, rgba(155,229,247,1) 0%, rgba(79,192,238,1) 100%);
+                    /* [...] */
                 }
 
                 i {
                     margin: 0 auto;
-                    --icon-size: 32px;
+                    --icon-size: 24px;
                     --mask-color: var(--secondary-white);
-                }
-
-                span {
-                    position: fixed;
-                    bottom: -9999px;
-                    visibility: hidden;
                 }
             }
         }
 
-        span {
+        span.control-label {
+            display: block;
+            margin: 4px 0 0 0;
+            font: var(--text-body2);
+            color: var(--secondary-white);
+        }
+
+        span.notification-badge {
             position: absolute;
             width: 19px;
             height: 19px;
             border-radius: 200px;
             text-align: center;
-            font: var(--text-body1);
+            font: var(--text-body2);
 
             &.notifications-count {
                 top: -2px;
-                right: -1px;
+                right: -6px;
                 background: var(--surface-error);
                 color: var(--secondary-white);
             }
 
             &.participants-count {
-                right: -3px;
-                bottom: -4px;
-                line-height: 21px;
-                color: var(--text-color-black-high);
-                background: var(--secondary-white);
+                top: -2px;
+                right: 3px;
+                line-height: 19px;
+                color: var(--secondary-white);
+                background: var(--badge-fill);
             }
         }
     }

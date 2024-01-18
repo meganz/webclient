@@ -24,6 +24,7 @@ import Alert from './meetings/workflow/alert.jsx';
 import { isSameDay, isToday, isTomorrow } from './meetings/schedule/helpers.jsx';
 import { withHostsObserver } from './meetings/hostsObserver.jsx';
 import WaitingRoom from './meetings/waitingRoom/waitingRoom.jsx';
+import { renderEndConfirm, renderLeaveConfirm } from './meetings/streamControls';
 
 const ENABLE_GROUP_CALLING_FLAG = true;
 const MAX_USERS_CHAT_PRIVATE = 100;
@@ -55,16 +56,22 @@ class EndCallButton extends MegaRenderMixin {
                     icon="sprite-fm-mono icon-leave-call"
                     label={l.leave}
                     persistent={true}
-                    onClick={() =>
-                        hasHost(chatRoom.getCallParticipants()) ?
-                            onLeave() :
-                            confirmLeave({
-                                title: l.assign_host_leave_call /* `Assign host to leave call` */,
-                                body: l.assign_host_leave_call_details /* `You're the only host on...` */,
-                                cta: l.assign_host_button /* `Assign host` */,
-                                altCta: l.leave_anyway /* `Leave anyway` */,
-                            })
-                    }
+                    onClick={() => {
+                        const doLeave = () =>
+                            hasHost(chatRoom.getCallParticipants()) ?
+                                onLeave() :
+                                confirmLeave({
+                                    title: l.assign_host_leave_call /* `Assign host to leave call` */,
+                                    body: l.assign_host_leave_call_details /* `You're the only host on...` */,
+                                    cta: l.assign_host_button /* `Assign host` */,
+                                    altCta: l.leave_anyway /* `Leave anyway` */,
+                                });
+
+                        const { recorder, sfuClient } = chatRoom.call;
+                        return recorder && recorder === u_handle ?
+                            renderLeaveConfirm(doLeave, () => sfuClient.recordingStop()) :
+                            doLeave();
+                    }}
                 />
             );
         }
@@ -102,6 +109,7 @@ class EndCallButton extends MegaRenderMixin {
 
             // Moderator in a public call: render `End call...` drop down w/ `Leave` and `End for all` options.
             if (this.IS_MODERATOR) {
+                const doEnd = () => chatRoom.endCallForAll();
                 return this.renderButton({
                     label: l[5884],
                     onClick: peers ? null : () => call.hangUp(),
@@ -121,7 +129,12 @@ class EndCallButton extends MegaRenderMixin {
                                 className="link-button"
                                 icon="sprite-fm-mono icon-contacts"
                                 label={l.end_for_all}
-                                onClick={() => chatRoom.endCallForAll()}
+                                onClick={() => {
+                                    const { recorder, sfuClient } = call;
+                                    return recorder && recorder === u_handle ?
+                                        renderEndConfirm(doEnd, () => sfuClient.recordingStop()) :
+                                        doEnd();
+                                }}
                             />
                         </Dropdown>
                     )

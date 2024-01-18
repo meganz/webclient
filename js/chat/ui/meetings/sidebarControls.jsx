@@ -5,9 +5,9 @@ import { VIEW } from './call.jsx';
 
 export default class SidebarControls extends MegaRenderMixin {
     render() {
-        const { npeers, view, sidebar, chatRoom, onChatToggle, onParticipantsToggle } = this.props;
-        const SIMPLETIP = { position: 'top', offset: 5, className: 'theme-dark-forced' };
+        const { npeers, view, sidebar, call, chatRoom, onChatToggle, onParticipantsToggle } = this.props;
         const notifications = chatRoom.getUnreadCount();
+        const isOnHold = !!(call?.av & Av.onHold);
 
         //
         // `SidebarControls`
@@ -15,39 +15,44 @@ export default class SidebarControls extends MegaRenderMixin {
 
         return (
             <div className="sidebar-controls">
-                <ul>
-                    <li>
+                <ul className={isOnHold ? 'disabled' : ''}>
+                    <li onClick={isOnHold ? null : onChatToggle}>
                         <Button
                             className={`
                                 mega-button
                                 theme-dark-forced
+                                call-action
                                 round
-                                large
                                 ${sidebar && view === VIEW.CHAT ? 'selected' : ''}
+                                ${isOnHold ? 'disabled' : ''}
                             `}
-                            simpletip={{ ...SIMPLETIP, label: l.chats /* `Chats` */ }}
-                            icon="icon-chat-filled"
-                            onClick={onChatToggle}>
-                            <span>{l.chats /* `Chats` */}</span>
-                        </Button>
+                            icon={sidebar && view === VIEW.CHAT ? 'icon-chat-filled' : 'icon-message-chat-circle'}
+                        />
+                        <span className="control-label">{l.chat_call_button /* `Chat` */}</span>
                         {notifications > 0 &&
-                        <span className="notifications-count">{notifications > 9 ? '9+' : notifications }</span>}
+                            <span className="notification-badge notifications-count">
+                                {notifications > 9 ? '9+' : notifications }
+                            </span>
+                        }
                     </li>
-                    <li>
+                    <li onClick={isOnHold ? null : onParticipantsToggle}>
                         <Button
                             className={`
                                 mega-button
                                 theme-dark-forced
+                                call-action
                                 round
-                                large
                                 ${sidebar && view === VIEW.PARTICIPANTS ? 'selected' : ''}
+                                ${isOnHold ? 'disabled' : ''}
                             `}
-                            simpletip={{ ...SIMPLETIP, label: l[16217] /* `Participants` */ }}
-                            icon="icon-contacts"
-                            onClick={onParticipantsToggle}>
-                            <span>{l[16217] /* `Participants` */}</span>
-                        </Button>
-                        <span className="participants-count">{npeers + 1}</span>
+                            icon={
+                                sidebar && view === VIEW.PARTICIPANTS ?
+                                    'icon-users-thin-solid' :
+                                    'icon-users-thin-outline'
+                            }
+                        />
+                        <span className="control-label">{l.participants_call_button /* `Participants` */}</span>
+                        <span className="notification-badge participants-count theme-dark-forced">{npeers + 1}</span>
                     </li>
                 </ul>
             </div>

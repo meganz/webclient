@@ -23,9 +23,12 @@
     i {
         position: absolute;
         top: -4px;
-        right: -10px;
+        right: -18px;
         --icon-size: 24px;
         --mask-color: var(--secondary-orange);
+
+        .in-call &,
+        .float-video-overlay & { right: -2px; }
     }
 
     .dropdown.button-group-menu & {

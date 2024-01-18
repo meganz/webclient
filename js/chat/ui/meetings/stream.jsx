@@ -223,7 +223,7 @@ export default class Stream extends MegaRenderMixin {
         const rest = filteredPeers.filter(p => !streaming.includes(p));
 
         //
-        //  `Thumbnail Mode`
+        //  `Thumbnail` view
         // -------------------------------------------------------------------------
 
         if (mode === MODE.THUMBNAIL) {
@@ -369,7 +369,7 @@ export default class Stream extends MegaRenderMixin {
         }
 
         //
-        //  `Main mode`
+        //  `Main` view
         // -------------------------------------------------------------------------
 
         let source;
@@ -385,6 +385,7 @@ export default class Stream extends MegaRenderMixin {
                 return null;
             }
         }
+
         return (
             <VideoType
                 key={source.clientId}
@@ -569,8 +570,8 @@ export default class Stream extends MegaRenderMixin {
         const { overlayed, page, streamsPerPage, floatDetached } = this.state;
         const {
             mode, call, chatRoom, minimized, peers, sidebar, hovered, forcedLocal, view, isOnHold, waitingRoomPeers,
-            onCallMinimize, onCallExpand, onModeChange, onAudioClick, onVideoClick, onCallEnd, onScreenSharingClick,
-            onHoldClick, onSpeakerChange
+            recorder, onRecordingToggle, onCallMinimize, onCallExpand, onModeChange, onAudioClick, onVideoClick,
+            onCallEnd, onScreenSharingClick, onHoldClick, onSpeakerChange
         } = this.props;
 
         return (
@@ -641,6 +642,8 @@ export default class Stream extends MegaRenderMixin {
                     forcedLocal={forcedLocal}
                     wrapperRef={this.wrapperRef}
                     waitingRoomPeers={waitingRoomPeers}
+                    recorder={recorder}
+                    onRecordingToggle={onRecordingToggle}
                     onAudioClick={onAudioClick}
                     onVideoClick={onVideoClick}
                     onCallEnd={onCallEnd}

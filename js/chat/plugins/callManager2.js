@@ -130,6 +130,11 @@
                 this.hasScreenAndCam = (av & Av.ScreenHiRes) && (av & Av.CameraLowRes);
                 this.isScreen = !!(av & Av.ScreenHiRes);
             }
+            if ((av ^ this.av) & Av.Recording) {
+                this.isRecording = !!(av & Av.Recording);
+                this.call.recorder = this.userHandle;
+                this.call.chatRoom.trigger(this.isRecording ? 'onRecordingStarted' : 'onRecordingStopped', this);
+            }
             this.av = av;
             for (const cons of this.consumers) {
                 cons.onAvChange();
@@ -239,8 +244,7 @@
             }
             else if (newQuality === VIDEO_QUALITY.NO_VIDEO) {
                 this.setResState(RES_STATE.NO_VIDEO);
-                const { sfuPeer } = this;
-                sfuPeer.stopHiResVideo();
+                this.delHiResPlayer();
                 this.delVthumbPlayer();
             }
         }
@@ -251,6 +255,11 @@
                 }
             }
             this._consumersUpdated = true;
+        }
+        delHiResPlayer() {
+            if (this.hiResPlayer) {
+                this.hiResPlayer.destroy();
+            }
         }
         delVthumbPlayer() {
             if (this.vThumbPlayer) {
@@ -265,7 +274,7 @@
             }
             if (this.hiResPlayer) {
                 this.setResState(RES_STATE.HD);
-                peer.setHiResDivider(resDivider);
+                this.hiResPlayer.setHiResDivider(resDivider);
                 return;
             }
             // request hi-res stream
@@ -294,12 +303,12 @@
             }
             if (this.vThumbPlayer) {
                 this.setResState(RES_STATE.THUMB);
-                peer.stopHiResVideo();
+                this.delHiResPlayer();
                 return;
             }
             if (this.noVideoSlotsForSmoothSwitch()) {
                 console.warn("requestThumbStream: No free video slot, freeing hires one if used");
-                peer.stopHiResVideo();
+                this.delHiResPlayer();
             }
             this.setResState(RES_STATE.THUMB_PENDING);
             this.vThumbPlayer = peer.getThumbVideo((player) => {
@@ -313,7 +322,7 @@
                     }
                     return;
                 }
-                peer.stopHiResVideo();
+                this.delHiResPlayer();
                 this.setResState(RES_STATE.THUMB);
             };
         }
@@ -329,7 +338,6 @@
             }
             // clean up cached quality, if there are no players
             if (!this.hiResPlayer && !this.vThumbPlayer) {
-                assert(!this.presenterPlayer);
                 this.currentQuality = VIDEO_QUALITY.NO_VIDEO;
                 // console.warn("No video from peer, setting quality to NO_VIDEO");
             }
@@ -478,6 +486,7 @@
             const callManagerPeer = this.peers[peer.cid];
             assert(callManagerPeer);
             callManagerPeer.onAvChange(av);
+            this.chatRoom.trigger('onPeerAvChange', peer);
         }
         onNoMicInput() {
             this.chatRoom.trigger('onNoMicInput');
@@ -570,7 +579,7 @@
                 this.forcedActiveStream = null;
             }
 
-            if (newMode === CALL_VIEW_MODES.MAIN || newMode === CALL_VIEW_MODES.MINI) {
+            if (newMode === CALL_VIEW_MODES.MAIN || newMode === CALL_VIEW_MODES.MINI || this.recorder) {
                 this.sfuClient.enableSpeakerDetector(true);
             }
             else {

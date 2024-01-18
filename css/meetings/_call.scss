@@ -15,16 +15,52 @@
         /* [...] */
 
         .mega-onboarding-dialog {
-            top: 74px;
-            right: 84px;
             z-index: 11;
+
+            &.onboarding-UI {
+                top: 74px;
+                right: 84px;
+            }
+
+            &.onboarding-recording {
+                bottom: 100px;
+                left: 12px;
+
+                #ob-dialog-arrow { left: 32px; }
+
+                .link-button {
+                    text-decoration: underline;
+                    &:hover { text-decoration: none; }
+                }
+            }
+
+            h2 {
+                font: var(--text-h2-bold);
+            }
         }
     }
 
     @import '_stream.scss';
+    @import '_recordingControl.scss';
     @import '_streamControls.scss';
     @import '_sidebarControls.scss';
     @import '_sidebar.scss';
+
+    button.call-action {
+        background: transparent;
+        box-shadow: none;
+
+        &:hover {
+            background: #333;
+        }
+
+        i {
+            display: block;
+            margin: 0 auto;
+            --icon-size: 24px;
+            --mask-color: var(--secondary-white);
+        }
+    }
 }
 
 .local-stream-mirrored video {

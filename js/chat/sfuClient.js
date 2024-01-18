@@ -31,7 +31,7 @@ __webpack_require__.d(__webpack_exports__, {
   "S": () => (/* binding */ ConnState)
 });
 
-// UNUSED EXPORTS: CallJoinPermission, ScreenShareType, SfuClient, SpeakerState
+// UNUSED EXPORTS: CallJoinPermission, ScreenShareType, SfuClient
 
 ;// CONCATENATED MODULE: ../shared/termCodes.ts
 var TermCode;
@@ -40,15 +40,17 @@ var TermCode;
     TermCode[TermCode["kFlagError"] = 128] = "kFlagError";
     TermCode[TermCode["kFlagDisconn"] = 64] = "kFlagDisconn";
     TermCode[TermCode["kUserHangup"] = 0] = "kUserHangup";
-    TermCode[TermCode["kTooManyParticipants"] = 1] = "kTooManyParticipants";
+    TermCode[TermCode["kCallParticipantLimit"] = 1] = "kCallParticipantLimit";
     TermCode[TermCode["kLeavingRoom"] = 2] = "kLeavingRoom";
     TermCode[TermCode["kCallEndedByModerator"] = 3] = "kCallEndedByModerator";
     TermCode[TermCode["kCallEndedByApi"] = 4] = "kCallEndedByApi";
     TermCode[TermCode["kPeerJoinTimeout"] = 5] = "kPeerJoinTimeout";
     TermCode[TermCode["kPushedToWaitingRoom"] = 6] = "kPushedToWaitingRoom";
     TermCode[TermCode["kKickedFromWaitingRoom"] = 7] = "kKickedFromWaitingRoom";
-    TermCode[TermCode["kTooManyUserClients"] = 8] = "kTooManyUserClients";
+    TermCode[TermCode["kCallUserClientLimit"] = 8] = "kCallUserClientLimit";
     TermCode[TermCode["kWaitingRoomAllowTimeout"] = 9] = "kWaitingRoomAllowTimeout";
+    TermCode[TermCode["kCallDurLimit"] = 10] = "kCallDurLimit";
+    TermCode[TermCode["kCallUserLimit"] = 11] = "kCallUserLimit";
     // Disconnects
     TermCode[TermCode["kRtcDisconn"] = 64] = "kRtcDisconn";
     TermCode[TermCode["kSigDisconn"] = 65] = "kSigDisconn";
@@ -514,11 +516,16 @@ class SvcDriver {
     }
     async onStats() {
         const stats = this.client.rtcStats;
-        let { pl: plost, rtt } = stats;
+        let { txpl: plost, rtt } = stats;
         if (isNaN(rtt)) {
             return;
         }
-        assert(!isNaN(plost));
+        if (plost < 0) {
+            plost = stats.rxpl;
+        }
+        if (plost < 0) {
+            plost = 0;
+        }
         if (isNaN(this.maRtt)) {
             this.maRtt = rtt;
             this.smaPlost = this.fmaPlost = plost;
@@ -562,7 +569,7 @@ class SvcDriver {
         if (plost > this.plostUpper) {
             do {
                 if (window.d) {
-                    console.warn(kLogTag, "Decreasing rxQ due to PACKET LOSS of", plost.toFixed(1));
+                    console.log(kLogTag, "Decreasing rxQ due to PACKET LOSS of", plost.toFixed(1));
                 }
             } while (0);
             this.decRxQuality(plost >= SvcDriver.kPlostCap);
@@ -593,7 +600,7 @@ class SvcDriver {
             else if (stats.vtxdly > 2500) {
                 do {
                     if (window.d) {
-                        console.warn(kLogTag, `scrnshare: Tx delay ${stats.vtxdly} ms too large, decreasing quality...`);
+                        console.log(kLogTag, `scrnshare: Tx delay ${stats.vtxdly} ms too large, decreasing quality...`);
                     }
                 } while (0);
                 this.switchTxQuality(-1, "scr");
@@ -616,11 +623,11 @@ class SvcDriver {
         // handle "bad network" notification
         let txBad = !isNaN(stats.vtxdly) && (stats.vtxdly > 1500);
         if (adaptScrnTx) {
-            txBad || (txBad = this.currTxQuality < 1);
+            txBad = txBad || this.currTxQuality < 1;
         }
         else if (stats._vtxIsHiRes && stats.vtxh) {
             this.maVideoTxHeight = !isNaN(this.maVideoTxHeight) ? (this.maVideoTxHeight * 3 + stats.vtxh) / 4 : stats.vtxh;
-            txBad || (txBad = this.maVideoTxHeight < 200);
+            txBad = txBad || (this.maVideoTxHeight < 200);
         }
         const statFlags = stats.f;
         const rxBad = (rtt > 1500) || (plost > 30);
@@ -641,7 +648,7 @@ class SvcDriver {
         this.rttUpper = rtt + SvcDriver.kRttUpperHeadroom;
         do {
             if (window.d) {
-                console.warn(kLogTag, "Rtt floor set to", rtt.toFixed(2));
+                console.log(kLogTag, "Rtt floor set to", rtt.toFixed(2));
             }
         } while (0);
     }
@@ -682,14 +689,14 @@ class SvcDriver {
                 hist.tsValidTill = now + span;
                 do {
                     if (window.d) {
-                        console.warn(kLogTag, `decRxQuality[${this.currRxQuality} -> ${newQ}]: Marking rx quality switch up attempt as failed: critcal: ${!!critical}, for period: ${span}`);
+                        console.log(kLogTag, `decRxQuality[${this.currRxQuality} -> ${newQ}]: Marking rx quality switch up attempt as failed: critcal: ${!!critical}, for period: ${span}`);
                     }
                 } while (0);
             }
             else {
                 do {
                     if (window.d) {
-                        console.warn(kLogTag, `decRxQuality[${this.currRxQuality} -> ${newQ}]: not marking as failed: areaMatch: ${hist.hiArea === this.rxTotalArea()}, timeMatch: ${Date.now() - hist.tsMonitorTill}`);
+                        console.log(kLogTag, `decRxQuality[${this.currRxQuality} -> ${newQ}]: not marking as failed: areaMatch: ${hist.hiArea === this.rxTotalArea()}, timeMatch: ${Date.now() - hist.tsMonitorTill}`);
                     }
                 } while (0);
             }
@@ -714,7 +721,7 @@ class SvcDriver {
             if (histMatch && (hist.tsValidTill - now) >= 0) {
                 do {
                     if (window.d) {
-                        console.warn(kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Not increasing rxQ, have failed recently`);
+                        console.log(kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Not increasing rxQ, have failed recently`);
                     }
                 } while (0);
                 return;
@@ -722,7 +729,7 @@ class SvcDriver {
             else {
                 do {
                     if (window.d) {
-                        console.warn(kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: not failed(recently): upFails:${hist.upFails}, timeMatch: ${(hist.tsValidTill - now)}, kbpsMatch: ${kbpsMatch} (hist: ${hist.kbps}, curr: ${stats.rx}), rttMatch: ${rttMatch} (hist: ${hist.rtt.toFixed()}, curr: ${this.maRtt.toFixed()}), areaDiff: ${this.rxTotalArea() - hist.lowArea}`);
+                        console.log(kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: not failed(recently): upFails:${hist.upFails}, timeMatch: ${(hist.tsValidTill - now)}, kbpsMatch: ${kbpsMatch} (hist: ${hist.kbps}, curr: ${stats.rx}), rttMatch: ${rttMatch} (hist: ${hist.rtt.toFixed()}, curr: ${this.maRtt.toFixed()}), areaDiff: ${this.rxTotalArea() - hist.lowArea}`);
                     }
                 } while (0);
             }
@@ -733,7 +740,7 @@ class SvcDriver {
             hist.rtt = stats.rtt;
             do {
                 if (window.d) {
-                    console.warn(kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Same up-fail parameters, preserving fail descriptor`);
+                    console.log(kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Same up-fail parameters, preserving fail descriptor`);
                 }
             } while (0);
         }
@@ -745,7 +752,7 @@ class SvcDriver {
             };
             do {
                 if (window.d) {
-                    console.warn(kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Created new up-fail descriptor`);
+                    console.log(kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Created new up-fail descriptor`);
                 }
             } while (0);
         }
@@ -766,7 +773,7 @@ class SvcDriver {
         this.rxqSwitchSeqNo++;
         do {
             if (window.d) {
-                console.warn(kLogTag, `Switching rx SVC quality from ${this.currRxQuality} to ${newQ}: ${JSON.stringify(params)}`);
+                console.log(kLogTag, `Switching rx SVC quality from ${this.currRxQuality} to ${newQ}: ${JSON.stringify(params)}`);
             }
         } while (0);
         this.currRxQuality = newQ;
@@ -777,7 +784,7 @@ class SvcDriver {
             if (this.currRxQuality > 0) {
                 do {
                     if (window.d) {
-                        console.warn(kLogTag, `Decreasing rxQ due to HIGH RTT of ${this.maRtt.toFixed()}, saving checkpoint`);
+                        console.log(kLogTag, `Decreasing rxQ due to HIGH RTT of ${this.maRtt.toFixed()}, saving checkpoint`);
                     }
                 } while (0);
                 this.rxRttDowngr = { startQ: this.currRxQuality, lastRtt: stats.rtt, lastPlost: stats.pl };
@@ -795,7 +802,7 @@ class SvcDriver {
                 // rtt did not change
                 do {
                     if (window.d) {
-                        console.warn(kLogTag, `Decreased rxQ by ${nSteps} steps: rtt didnt change much (${stats.rtt - this.rxRttDowngr.lastRtt}), is not over 1000 and there is no extra packet loss. Updating rtt floor`);
+                        console.log(kLogTag, `Decreased rxQ by ${nSteps} steps: rtt didnt change much (${stats.rtt - this.rxRttDowngr.lastRtt}), is not over 1000 and there is no extra packet loss. Updating rtt floor`);
                     }
                 } while (0);
                 this.setRttWindow(this.maRtt);
@@ -809,7 +816,7 @@ class SvcDriver {
                 // because of network conditions. Either way, we should further downgrade quality
                 do {
                     if (window.d) {
-                        console.warn(kLogTag, `Decreased rxQ by ${nSteps} steps: rtt ${stats.rtt} changed by ${Math.round(stats.rtt - this.rxRttDowngr.lastRtt)}, plost: ${this.fmaPlost.toFixed(1)}. Keeping current rtt floor of ${this.lowestRttSeen.toFixed(2)}`);
+                        console.log(kLogTag, `Decreased rxQ by ${nSteps} steps: rtt ${stats.rtt} changed by ${Math.round(stats.rtt - this.rxRttDowngr.lastRtt)}, plost: ${this.fmaPlost.toFixed(1)}. Keeping current rtt floor of ${this.lowestRttSeen.toFixed(2)}`);
                     }
                 } while (0);
                 this.rxRttDowngr = { startQ: this.currRxQuality, lastRtt: stats.rtt, lastPlost: stats.pl };
@@ -846,7 +853,7 @@ class SvcDriver {
                 ar = this.client.screenAspectRatio = res.width / res.height;
                 do {
                     if (window.d) {
-                        console.warn(kLogTag, `Screen capture res: ${res.width}x${res.height} (aspect ratio: ${Math.round(ar * 1000) / 1000})`);
+                        console.log(kLogTag, `Screen capture res: ${res.width}x${res.height} (aspect ratio: ${Math.round(ar * 1000) / 1000})`);
                     }
                 } while (0);
             }
@@ -854,7 +861,7 @@ class SvcDriver {
                 ar = 1.78;
                 do {
                     if (window.d) {
-                        console.warn(kLogTag, "setTxQuality: Could not obtain screen track's resolution, assuming AR of", ar);
+                        console.log(kLogTag, "setTxQuality: Could not obtain screen track's resolution, assuming AR of", ar);
                     }
                 } while (0);
             }
@@ -862,7 +869,7 @@ class SvcDriver {
         params.width = Math.round(params.height * ar);
         do {
             if (window.d) {
-                console.warn(kLogTag, `Switching TX quality from ${this.currTxQuality} to ${newQ}: ${JSON.stringify(params)} (AR: ${this.client.screenAspectRatio ? this.client.screenAspectRatio.toFixed(3) : "unknown"})`);
+                console.log(kLogTag, `Switching TX quality from ${this.currTxQuality} to ${newQ}: ${JSON.stringify(params)} (AR: ${this.client.screenAspectRatio ? this.client.screenAspectRatio.toFixed(3) : "unknown"})`);
             }
         } while (0);
         this.currTxQuality = newQ;
@@ -1048,9 +1055,15 @@ class CallRecorder {
         };
     }
     recordLocalAudio() {
+        const currLocalAudioTrack = this.sender.localAudioTrack();
+        if (this.localAudioInNode && this.recordedLocalAudioTrack !== currLocalAudioTrack) {
+            this.localAudioInNode.disconnect();
+            delete this.localAudioInNode;
+        }
         if (!this.localAudioInNode) {
             // the local audio track, once obtained, never changes, so we create the stream source node only once
-            this.localAudioInNode = this.audioCtx.createMediaStreamSource(new MediaStream([this.sender.localAudioTrack()]));
+            this.localAudioInNode = this.audioCtx.createMediaStreamSource(new MediaStream([currLocalAudioTrack]));
+            this.recordedLocalAudioTrack = currLocalAudioTrack;
         }
         this.localAudioInNode.connect(this.audioMixer);
     }
@@ -1059,16 +1072,20 @@ class CallRecorder {
             return;
         }
         this.localAudioInNode.disconnect();
+        delete this.recordedLocalAudioTrack;
     }
-    async setVideoTrack(vTrack) {
+    async _setVideoTrack(vTrack) {
         this.deinitStaticVideo();
         const cloned = vTrack.clone();
         try {
             await cloned.applyConstraints({
                 resizeMode: "crop-and-scale",
-                height: this.videoHeight
+                height: { exact: this.videoHeight }
                 // width: this.videoHeight * 16 / 10
             });
+            if (cloned.getSettings().height !== this.videoHeight) {
+                throw new Error("applyConstraints to resize video had no effect");
+            }
         }
         catch (ex) {
             do {
@@ -1083,59 +1100,67 @@ class CallRecorder {
         return this.videoTx.replaceTrack(cloned);
     }
     switchToLocalVideo() {
-        this.setVideoTrack((this.localAv & shared_av.Screen)
+        this._setVideoTrack((this.localAv & shared_av.Screen)
             ? this.sender.localScreenTrack()
             : this.sender.localCameraTrack());
     }
-    forceVideoTrack(vTrack) {
-        if (!vTrack) {
-            if (!this.forcedVideoTrack) {
-                return;
+    setVideoInput(vTrack, releaseCb) {
+        if (this.videoInput) {
+            if (this.videoInput.releaseCb) {
+                this.videoInput.releaseCb();
             }
-            delete this.forcedVideoTrack;
-            this.switchToLocalOrStaticVideo();
+            delete this.videoInput;
+        }
+        if (vTrack) {
+            this.videoInput = { track: vTrack, releaseCb };
+            this._setVideoTrack(vTrack);
         }
         else {
-            this.forcedVideoTrack = vTrack;
-            this.setVideoTrack(vTrack);
+            this.switchToLocalOrStaticVideo();
         }
+    }
+    videoInputTrack() {
+        return this.videoInput ? this.videoInput.track : null;
     }
     async switchToStaticVideo() {
         if (this.canvas) {
             do {
                 if (window.d) {
-                    console.warn(recorder_kLogTag, "switchToStaticVideo: Already in static video mode");
+                    console.log(recorder_kLogTag, "switchToStaticVideo: Already in static video mode");
                 }
             } while (0);
             return;
         }
+        const canv = this.canvas = window.document.createElement("canvas");
+        canv.height = this.videoHeight;
+        canv.width = this.videoHeight * 16 / 9;
         const logo = new Image;
         const pms = new Promise((resolve) => {
             logo.onload = resolve;
         });
         logo.src = recordingLogo;
         await pms;
-        if (this.isDestroyed()) {
-            return; // destroyed meanwhile
+        if (this.isDestroyed() || !this.canvas) {
+            do {
+                if (window.d) {
+                    console.log(recorder_kLogTag, "switchToStaticVideo: destroyed or static video disabled while loading static image");
+                }
+            } while (0);
+            return; // destroyed meanwhile, or stopped static video
         }
-        const canv = this.canvas = window.document.createElement("canvas");
-        canv.height = this.videoHeight;
-        canv.width = this.videoHeight * 16 / 9;
         const ctx = canv.getContext('2d');
         ctx.drawImage(logo, (canv.width - logo.width) / 2, (canv.height - logo.height) / 2);
         let tsPrev = Date.now();
         this.staticVideoRefreshTimer = setInterval(() => {
             this.canvas.getContext('2d').fillRect(0, 0, 1, 1);
+            /*
             const now = Date.now();
             const period = now - tsPrev;
             tsPrev = now;
             if (period > 70) {
-                do {
-                    if (window.d) {
-                        console.warn(recorder_kLogTag, "recorder: slow draw:", period);
-                    }
-                } while (0);
+                LOGW("recorder: slow draw:", period);
             }
+            */
         }, 60);
         const staticVtrack = this.canvas.captureStream(20).getVideoTracks()[0];
         do {
@@ -1199,10 +1224,13 @@ class CallRecorder {
     isDestroyed() {
         return !this.videoRx;
     }
-    onLocalMediaChange() {
+    onLocalMediaChange(updateAv) {
         const av = this.sender.availAv;
-        const change = (this.localAv === -1) ? (shared_av.Audio | shared_av.Video) : this.localAv ^ av;
+        let change = (this.localAv === -1) ? (shared_av.Audio | shared_av.Video) : this.localAv ^ av;
         this.localAv = av;
+        if (updateAv) {
+            change |= updateAv;
+        }
         if (change & shared_av.Audio) {
             if (av & shared_av.Audio) {
                 this.recordLocalAudio();
@@ -1211,7 +1239,7 @@ class CallRecorder {
                 this.stopRecordingLocalAudio();
             }
         }
-        if (!this.forcedVideoTrack && (change & shared_av.Video)) {
+        if (!this.videoInput && (change & shared_av.Video)) {
             this.switchToLocalOrStaticVideo();
         }
     }
@@ -1236,7 +1264,7 @@ class CallRecorder {
 }
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = '1966c788f5';
+const COMMIT_ID = '9700c0b512';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -1249,12 +1277,6 @@ const COMMIT_ID = '1966c788f5';
 
 
 const client_kLogTag = "sfuClient:";
-var SpeakerState;
-(function (SpeakerState) {
-    SpeakerState[SpeakerState["kNoSpeaker"] = 0] = "kNoSpeaker";
-    SpeakerState[SpeakerState["kPending"] = 1] = "kPending";
-    SpeakerState[SpeakerState["kActive"] = 2] = "kActive";
-})(SpeakerState || (SpeakerState = {}));
 var ConnState;
 (function (ConnState) {
     ConnState[ConnState["kDisconnected"] = 0] = "kDisconnected";
@@ -1343,9 +1365,8 @@ class SfuClient {
         this.userId = userId;
         this.app = app;
         this._reqBarrier = new RequestBarrier;
-        this._speakerState = SpeakerState.kNoSpeaker;
         this._connState = ConnState.kDisconnected;
-        this.options = options || {};
+        this.options = options;
         if (callKey) {
             this.setCallKey(callKey);
         }
@@ -1371,6 +1392,12 @@ class SfuClient {
     }
     get isModerator() {
         return this.moderators ? this.moderators.has(this.userId) : true;
+    }
+    get isSpeaker() {
+        return !this.speakApproval || this.isModerator || this.speakers.has(this.userId);
+    }
+    get hasSpeakRequest() {
+        return this.speakRequests.has(this.userId);
     }
     get isJoining() {
         return this._connState < ConnState.kCallJoined;
@@ -1692,6 +1719,7 @@ class SfuClient {
         delete this.termCode;
         delete this.waitingRoomUsers;
         delete this.moderators;
+        this.speakers = new Set(); // may be needed before ANSWER is received
         this.cryptoWorker.postMessage(['r']); // reset crypto
         this.statCtx = {};
         this._statsRecorder.reset();
@@ -1859,9 +1887,7 @@ class SfuClient {
         this.assert(msg.na);
         this.cid = msg.cid;
         this.numInputAudioTracks = msg.na;
-        if (msg.mods) {
-            this.moderators = new Set(msg.mods);
-        }
+        this.moderators = msg.mods ? new Set(msg.mods) : undefined;
         this.speakApproval = !!msg.sr;
         this._fire("onConnected");
         const wr = msg.wr;
@@ -1920,8 +1946,16 @@ class SfuClient {
             binToHex(this.outASpeakerTrack.iv.buffer)
         ];
         const sessSignedPubKey = await this.generateSessionKeyPair();
-        this._speakerState = this.options.speak ? SpeakerState.kPending : SpeakerState.kNoSpeaker;
-        await this._updateSentTracks(null); // at this point we are not sending anything: no key should be sent out
+        // Need this to get the availAv flags (without audio).
+        // As we are not in kJoined state, no tracks are sent, only obtained. So, sentAv is 0, and
+        // availAv's audio flag is always copied from sentAv, as we may cache the audio track
+        // and still not want to advertise it as available (for quick unmuting, we don't want to obtain
+        // it every time). Hence, we have availAv reflect all video media that we will actually send,
+        // and audio flag is always zero.
+        // At this point we are not sending anything: no key should be sent out
+        await this._updateSentTracks(null, false);
+        this.assert(this.sentAv === 0); // updateSentTracks() doesn't send any tracks if not in kJoined state
+        this.assert(!(this.availAv & shared_av.Audio));
         if (this._connState !== ConnState.kCallJoining) {
             do {
                 if (window.d) {
@@ -1930,7 +1964,6 @@ class SfuClient {
             } while (0);
             return;
         }
-        this.assert(this.sentAv === 0);
         let offerCmd = {
             a: "JOIN",
             sdp: sdp,
@@ -1941,10 +1974,7 @@ class SfuClient {
         if (this.prevCid) { // when reconnecting, tell the SFU the CID of the previous connection, so it can kill it instantly
             offerCmd.cid = this.prevCid;
         }
-        if (this.initialVthumbCount) {
-            offerCmd.vthumbs = this.initialVthumbCount;
-        }
-        if (this._speakerState === SpeakerState.kPending) {
+        if (this.options.speak) {
             offerCmd.spk = 1;
         }
         this.send(offerCmd);
@@ -1979,8 +2009,8 @@ class SfuClient {
         if (!track) {
             return;
         }
+        this[name] = null; // first null it, because onended handler will try to re-request it
         track.stop();
-        delete this[name];
     }
     async _doGetLocalTracks() {
         var self = this;
@@ -1988,7 +2018,7 @@ class SfuClient {
         let screen = self._isSharingScreen;
         let camera = !self._muteCamera;
         // get audio track when active speaker, even if muted. This will speed up unmuting
-        let audio = (this._speakerState > SpeakerState.kNoSpeaker) ? true : false;
+        let audio = this.isSpeaker;
         if (this._muteAudio && audio && this._audioGetFailedOnce) {
             audio = false;
         }
@@ -2033,13 +2063,30 @@ class SfuClient {
             }
         } while (0);
         if (gettingAudio) {
-            promises.push(navigator.mediaDevices.getUserMedia({ audio: true })
+            const micId = localStorage.getItem("calls.micId");
+            const constraints = micId
+                ? Object.assign({ deviceId: micId }, SfuClient.kAudioCaptureOptions)
+                : SfuClient.kAudioCaptureOptions;
+            promises.push(navigator.mediaDevices.getUserMedia({ audio: constraints })
                 .then(function (stream) {
                 let atrack = self._audioTrack = stream.getAudioTracks()[0];
                 if (!atrack) {
                     return Promise.reject("Local audio stream has no audio track");
                 }
                 delete self._audioGetFailedOnce;
+                atrack.onended = () => {
+                    if (self._audioTrack !== atrack) {
+                        return;
+                    }
+                    self._audioTrack = null;
+                    atrack.onended = null;
+                    do {
+                        if (window.d) {
+                            console.warn(client_kLogTag, "Input audio track stopped (possibly device removed), re-requesting audio input...");
+                        }
+                    } while (0);
+                    self._updateSentTracks(null, true);
+                };
             })
                 .catch(function (err) {
                 self._audioGetFailedOnce = true; // avoid re-retying to get audio in advance
@@ -2058,7 +2105,11 @@ class SfuClient {
             }));
         }
         if (gettingCam) {
-            promises.push(navigator.mediaDevices.getUserMedia({ video: SfuClient.kVideoCaptureOptions })
+            const camId = localStorage.getItem("calls.camId");
+            const constraints = camId
+                ? Object.assign({ deviceId: camId }, SfuClient.kVideoCaptureOptions)
+                : SfuClient.kVideoCaptureOptions;
+            promises.push(navigator.mediaDevices.getUserMedia({ video: constraints })
                 .then(function (stream) {
                 let vtrack = self._cameraTrack = stream.getVideoTracks()[0];
                 if (!vtrack) {
@@ -2074,7 +2125,7 @@ class SfuClient {
             }));
         }
         if (gettingScreen) {
-            promises.push(navigator.mediaDevices.getDisplayMedia(SfuClient.kScreenCaptureOptions)
+            promises.push(navigator.mediaDevices.getDisplayMedia({ video: SfuClient.kScreenCaptureOptions })
                 .then(function (stream) {
                 let strack = self._screenTrack = stream.getVideoTracks()[0];
                 if (!strack) {
@@ -2148,7 +2199,7 @@ class SfuClient {
             }
             let promises = [];
             // first, determine which tracks we want to obtain, and null sender tracks that we want disabled
-            if (self._speakerState === SpeakerState.kActive) {
+            if (self.isSpeaker) {
                 if (!self._muteAudio && self._audioTrack) {
                     // do a check in advance here (unlike elsewhere) to avoid unneeded restarts of the micMuteMonitor
                     const already = self.outASpeakerTrack.sentTrack === self._audioTrack;
@@ -2330,35 +2381,60 @@ class SfuClient {
         this._sendAvState();
     }
     recordingForcePeerVideo(cid) {
-        const rec = this.callRecorder;
-        if (cid === null) {
-            if (rec) {
-                delete rec.forcedVideoPeerCid;
-                rec.forceVideoTrack(null);
+        if (cid === this.recForcedPeerCid) {
+            if (cid) {
+                do {
+                    if (window.d) {
+                        console.warn(client_kLogTag, `Already recording peer ${cid}`);
+                    }
+                } while (0);
             }
             return;
         }
-        if (!rec) {
-            throw new Error("Not recording");
+        delete this.recForcedPeerCid;
+        const rec = this.callRecorder;
+        if (!cid) {
+            if (rec) {
+                rec.setVideoInput(null);
+            }
+            return true;
         }
+        this.throwIfNotRecording();
         const peer = this.peers.get(cid);
         if (!peer) {
             do {
                 if (window.d) {
-                    console.warn(client_kLogTag, "Peer not found");
+                    console.warn(client_kLogTag, `Unknown peer with cid ${cid}`);
                 }
             } while (0);
+            return false;
+        }
+        if (!(peer.av & shared_av.HiResVideo)) {
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, `Peer ${cid} is not sending hi-res video to record`);
+                }
+            } while (0);
+            rec.setVideoInput(null);
             return;
         }
-        rec.forcedVideoPeerCid = this.cid;
-        if (!peer.hiResSlot) {
-            return;
+        this.recForcedPeerCid = cid;
+        peer._doStartRecording();
+        return true;
+    }
+    _maybeResumeRecordingPeer(peer) {
+        const recCid = this.recForcedPeerCid;
+        if (!recCid || !this.callRecorder) {
+            return false;
         }
-        const track = peer.hiResSlot.inTrack;
-        if (!track) {
-            return;
+        if (recCid === peer.prevCid) {
+            this.recForcedPeerCid = peer.cid; // peer reconnected, update recording cid
         }
-        rec.forceVideoTrack(track);
+        else if (recCid !== peer.cid) {
+            return false;
+        }
+        peer._doStartRecording();
+        return true;
     }
     sentTracksString() {
         let result = "";
@@ -2396,16 +2472,13 @@ class SfuClient {
         return this._audioTrack;
     }
     localAudioMuted() {
-        if (!this._speakerState) {
-            return false;
+        if (!this.isSpeaker) {
+            return true;
         }
         return this._onHold ? this._onHold.muteAudio : this._muteAudio;
     }
     localCameraMuted() {
         return this._onHold ? this._onHold.muteCamera : this._muteCamera;
-    }
-    get speakerState() {
-        return this._speakerState;
     }
     _sendAvState() {
         if (this._connState !== ConnState.kCallJoined) {
@@ -2432,14 +2505,23 @@ class SfuClient {
         }
         return this._updateSentTracks(() => { this._muteCamera = mute; });
     }
-    muteAudio(mute) {
+    _doMuteAudio(mute, dontSendAv) {
+        if (!mute && !this.isSpeaker) {
+            const msg = "Can't unmute audio: no speak permission";
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, msg);
+                }
+            } while (0);
+            return Promise.reject(msg);
+        }
         if (this._onHold) {
             this._onHold.muteAudio = mute;
-            return;
+            return Promise.resolve();
         }
-        if (this._connState === ConnState.kDisconnected || this._connState === ConnState.kDisconnectedRetrying) {
+        if (!this.rtcConn) {
             this._muteAudio = mute;
-            return;
+            return Promise.resolve();
         }
         if (mute === this._muteAudio) {
             do {
@@ -2449,7 +2531,54 @@ class SfuClient {
             } while (0);
             return Promise.resolve();
         }
-        return this._updateSentTracks(() => { this._muteAudio = mute; });
+        return this._updateSentTracks(() => {
+            this._muteAudio = mute;
+        }, dontSendAv);
+    }
+    muteAudio(mute) {
+        return this._doMuteAudio(mute, false);
+    }
+    _setInputDevice(lsKey, varName, deviceId, diffAv) {
+        if (deviceId) {
+            localStorage.setItem(lsKey, deviceId);
+        }
+        else {
+            localStorage.removeItem(lsKey);
+        }
+        if (!this[varName]) {
+            return;
+        }
+        return this._updateSentTracks(() => {
+            this[varName] = null;
+        }, true)
+            .then(() => {
+            this._fire("onLocalMediaChange", diffAv);
+            if (this.callRecorder) {
+                this.callRecorder.onLocalMediaChange(diffAv);
+            }
+        });
+    }
+    static enumMediaDevices() {
+        return navigator.mediaDevices.enumerateDevices()
+            .then((devices) => {
+            const audio = [];
+            const video = [];
+            for (const device of devices) {
+                if (device.kind === "audioinput" && device.deviceId !== "default") {
+                    audio.push(device);
+                }
+                else if (device.kind === "videoinput" && device.deviceId !== "default") {
+                    video.push(device);
+                }
+            }
+            return { audioIn: audio, videoIn: video };
+        });
+    }
+    setMicDevice(deviceId) {
+        return this._setInputDevice("calls.micId", "_audioTrack", deviceId, shared_av.Audio);
+    }
+    setCameraDevice(deviceId) {
+        return this._setInputDevice("calls.camId", "_cameraTrack", deviceId, shared_av.Video);
     }
     async putOnHold() {
         await this._updateSentTracks(() => {
@@ -2642,11 +2771,8 @@ class SfuClient {
     }
     async msgAnswer(msg) {
         this.inputPacketQueue = [];
-        this.assert(msg.cid);
-        this.assignCid(msg.cid);
-        if (msg.mods) {
-            this.moderators = new Set(msg.mods);
-        }
+        this.assert(this.cid);
+        this.assignCid(this.cid);
         this._tsCallJoin = Date.now();
         this._tsCallStart = this._tsCallJoin - msg.t;
         this.joinToffs = msg.t;
@@ -2659,12 +2785,6 @@ class SfuClient {
                 }
             } while (0);
             return;
-        }
-        if (msg.peers) {
-            for (let peerCid of msg.peers) {
-                new Peer(this, peerCid, true);
-            }
-            this.encryptAndSendLastKeyToAllPeers();
         }
         let sdp;
         try {
@@ -2694,32 +2814,27 @@ class SfuClient {
         // knows that this user had joined
         this._joinRetries = 0;
         this._setConnState(ConnState.kCallJoined);
-        this._fire("onJoined");
         this.enableStats();
         this.setThumbVtrackResScale();
-        if (msg.vthumbs) {
-            this.handleIncomingVideoTracks(msg.vthumbs, false);
-        }
-        let speakers = msg.speakers;
-        if (speakers) {
-            for (const desc of speakers) {
-                if (Array.isArray(desc)) {
-                    const peer = this.addPeerSpeaker(desc[0]);
-                    if (peer) {
-                        peer.onAudioStart(desc[1]);
-                    }
-                }
-                else {
-                    this.addPeerSpeaker(desc);
-                }
+        this.speakers = new Set(msg.speakers || undefined);
+        this.speakRequests = new Set(msg.spkrqs || undefined);
+        if (msg.peers) {
+            for (const peerInfo of msg.peers) {
+                new Peer(this, peerInfo, true);
             }
+            this.encryptAndSendLastKeyToAllPeers();
+        }
+        this._fire("onJoined");
+        if (this.isSpeaker) {
+            this._updateSentTracks(null);
+            this._fire("onCanSpeak");
         }
         setTimeout(() => this.processInputQueue(), 0);
     }
     setThumbVtrackResScale() {
         let height;
         if (this._isSharingScreen) {
-            height = SfuClient.kScreenCaptureOptions.video.height.max;
+            height = SfuClient.kScreenCaptureOptions.height.max;
         }
         else {
             if (!this._cameraTrack || !(height = this._cameraTrack.getSettings().height)) {
@@ -2816,9 +2931,6 @@ class SfuClient {
             stmp: screenTmp
         });
     }
-    isSpeaker() {
-        return this._speakerState === SpeakerState.kActive;
-    }
     enableSpeakerDetector(enable) {
         this._speakerDetector.enable(enable);
     }
@@ -2830,12 +2942,7 @@ class SfuClient {
     }
     mutePeer(cid) {
         if (!this.isModerator) {
-            do {
-                if (window.d) {
-                    console.warn(client_kLogTag, "mutePeer: We don't have moderator privilege");
-                }
-            } while (0);
-            return;
+            throw new Error("mutePeer: Not a moderator");
         }
         const msg = { a: "MUTE", av: shared_av.Audio };
         if (cid) {
@@ -2843,90 +2950,45 @@ class SfuClient {
         }
         this.send(msg);
     }
-    revokePeerSpeaker(cid) {
+    speakerDel(userId) {
         if (!this.isModerator) {
-            do {
-                if (window.d) {
-                    console.warn(client_kLogTag, "mutePeer: We don't have moderator privilege");
-                }
-            } while (0);
-            return;
+            throw new Error("speakerDel: Not a moderator");
         }
-        this.send({ a: "SPEAKER_DEL", cid });
+        this.send({ a: "SPEAKER_DEL", user: userId });
     }
-    sendSpeakRequest(cid) {
-        let cmd = { a: "SPEAK_RQ" };
-        if (cid) {
-            cmd.cid = cid;
+    speakerAdd(userId) {
+        if (!this.isModerator) {
+            throw new Error("speakerAdd: Not a moderator");
         }
-        else {
-            cmd.av = this.obtainedAv();
-        }
-        this.send(cmd);
+        this.send({ a: "SPEAKER_ADD", user: userId });
     }
-    cancelSpeakRequest(cid) {
-        let cmd = { a: "SPEAK_RQ_DEL" };
-        if (cid) {
-            cmd.cid = cid;
+    speakRequestDelete(userId) {
+        if (userId && !this.isModerator) {
+            throw new Error("speakRequestDelete: Not a moderator");
         }
-        this.send(cmd);
+        this.send({ a: "SPEAKRQ_DEL", ...(userId && { user: userId }) });
     }
-    async requestStartSpeaking() {
-        if (this._speakerState) {
-            return;
-        }
-        this._speakerState = SpeakerState.kPending;
-        await this._getLocalTracks();
-        this.sendSpeakRequest();
+    speakRequestSend() {
+        this.send({ a: "SPEAKRQ" });
     }
-    stopSpeaking() {
+    speakStop() {
         this.send({ a: "SPEAKER_DEL" });
     }
-    async onStartSpeaking() {
-        if (this._speakerState !== SpeakerState.kPending) {
-            return; // we should have just sent a cancel message, which will stop the SFU from treating us as speaker
-        }
-        await this._updateSentTracks(() => { this._speakerState = SpeakerState.kActive; });
-        this._fire("onSpeaker");
+    msgSpeakReq(msg) {
+        this.assert(msg.user);
+        this.speakRequests.add(msg.user);
+        this._fire("onSpeakReqAdd", msg.user);
     }
-    async onStopSpeaking() {
-        if (!this._speakerState) {
-            return;
+    msgSpeakReqDel(msg) {
+        this.assert(msg.user);
+        if (!this.speakRequests.delete(msg.user)) {
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "msgSpeakReqDel: Speak request was not in our list");
+                }
+            } while (0);
         }
-        await this._updateSentTracks(() => { this._speakerState = SpeakerState.kNoSpeaker; }, true);
-        this._fire("onNoSpeaker");
-    }
-    addPeerSpeaker(cid) {
-        this.assert(cid !== this.cid);
-        let peer = this.peers.get(cid);
-        if (!peer) {
-            this.logError("addPeerSpeaker: Unknown cid", cid);
-            return null;
-        }
-        peer.onSpeaker();
-        return peer;
-    }
-    msgSpeakRequestDel(msg) {
-        if (msg.cid === this.cid) {
-            this._fire("onOwnSpeakRequestDel");
-            if (this._speakerState === SpeakerState.kActive) { // we were approved
-                return;
-            }
-            this._speakerState = SpeakerState.kNoSpeaker;
-            this._getLocalTracks();
-        }
-        else {
-            let peer = this.peers.get(msg.cid);
-            if (!peer) {
-                do {
-                    if (window.d) {
-                        console.warn(client_kLogTag, "Unknown peer cid", msg.cid);
-                    }
-                } while (0);
-                return;
-            }
-            peer.delSpeakReq();
-        }
+        this._fire("onSpeakReqDel", msg.user);
     }
     msgMuted(msg) {
         if ((msg.av & shared_av.Audio) === 0) {
@@ -2937,7 +2999,7 @@ class SfuClient {
             } while (0);
             return;
         }
-        this._updateSentTracks(() => { this._muteAudio = true; }, true);
+        this._doMuteAudio(true, true);
     }
     msgHiresStart(msg) {
         if (this._onHold) {
@@ -2967,30 +3029,31 @@ class SfuClient {
         }
         this._updateSentTracks(() => { this._sendVthumb = false; });
     }
-    msgSpeakOn(msg) {
-        if (!msg.cid) {
-            this.onStartSpeaking();
+    msgSpeakerAdd(msg) {
+        let userId = msg.user;
+        if (!userId) {
+            userId = this.userId;
         }
-        else {
-            this.addPeerSpeaker(msg.cid);
+        this.assert(!this.speakers.has(userId));
+        this.speakers.add(userId);
+        this.speakRequests.delete(userId);
+        this._fire("onSpeakerAdd", userId);
+        if ((userId === this.userId) && !this.isModerator) {
+            this._updateSentTracks(null);
+            this._fire("onCanSpeak");
         }
     }
-    msgSpeakOff(msg) {
-        if (!msg.cid) {
-            this.onStopSpeaking();
+    msgSpeakerDel(msg) {
+        let userId = msg.user;
+        if (!userId) {
+            userId = this.userId;
         }
-        else {
-            const peer = this.peers.get(msg.cid);
-            if (!peer) {
-                do {
-                    if (window.d) {
-                        console.warn(client_kLogTag, "delPeerSpeaker: Unknown peer cid", msg.cid);
-                    }
-                } while (0);
-                return null;
-            }
-            peer.onNoSpeaker();
+        this.speakers.delete(userId);
+        if ((userId === this.userId) && !this.isModerator) {
+            this._updateSentTracks(null, true);
+            this._fire("onCanNotSpeak");
         }
+        this._fire("onSpeakerDel", userId);
     }
     msgAv(msg) {
         let cid = msg.cid;
@@ -3014,32 +3077,21 @@ class SfuClient {
         }
         peer.onAvChange(msg);
     }
-    msgSpeakReqs(msg) {
-        for (let cid of msg.cids) {
-            if (cid === this.cid) {
-                this._fire("onOwnSpeakRequest"); //TODO: maintain a flag if we are requesting to speak?
-                continue;
-            }
-            let peer = this.peers.get(cid);
-            if (!peer) {
-                do {
-                    if (window.d) {
-                        console.warn(client_kLogTag, "Unknown cid", cid);
-                    }
-                } while (0);
-                continue;
-            }
-            peer.setSpeakReq();
-        }
-    }
     msgModAdd(msg) {
-        this.assert(msg.user);
+        const userId = msg.user;
+        this.assert(userId);
         if (!this.moderators) {
             this.logError("BUG: msgModAdd: moderators list does not exist, creating it");
             this.moderators = new Set();
         }
-        this.moderators.add(msg.user);
+        this.moderators.add(userId);
+        const wasSpeaker = this.speakers.delete(userId);
+        this.speakRequests.delete(msg.user);
+        // if a user with pending spk request became moderator, request is deleted
         this._fire("onModeratorAdd", msg.user);
+        if (!wasSpeaker) {
+            this._fire("onCanSpeak");
+        }
     }
     msgModDel(msg) {
         this.assert(msg.user);
@@ -3048,6 +3100,12 @@ class SfuClient {
         }
         else {
             this.moderators.delete(msg.user);
+        }
+        // if we were speaking as moderator, stop speaking
+        if ((msg.user === this.userId) && this.speakApproval) {
+            // this.speakers.has(msg.user) must be false
+            this._doMuteAudio(true, true);
+            this._fire("onCanNotSpeak");
         }
         this._fire("onModeratorDel", msg.user);
     }
@@ -3108,9 +3166,6 @@ class SfuClient {
         }
         this._callJoinPermission = CallJoinPermission.kAllow;
         this.cid = msg.cid;
-        if (msg.mods) {
-            this.moderators = new Set(msg.mods);
-        }
         this._fire("wrOnJoinAllowed");
     }
     msgWrDeny(msg) {
@@ -3118,9 +3173,6 @@ class SfuClient {
             return;
         }
         this._callJoinPermission = CallJoinPermission.kDeny;
-        if (msg.mods) {
-            this.moderators = new Set(msg.mods);
-        }
         this._fire("wrOnJoinNotAllowed");
     }
     // ====
@@ -3150,7 +3202,7 @@ class SfuClient {
                 break;
             }
             case "audio": {
-                this.muteAudio(true);
+                this._doMuteAudio(true, true);
                 this._fire("onAudioSendDenied", msg.msg);
                 break;
             }
@@ -3187,23 +3239,19 @@ class SfuClient {
         delete this.statTimer;
     }
     async pollTxVideoStats() {
-        let isHiRes;
-        let sender = this.outVSpeakerTrack.xponder.sender;
-        if (sender.track) {
-            isHiRes = true;
+        let slot = this.outVSpeakerTrack;
+        if (!slot.isSendingTrack()) {
+            slot = this.outVThumbTrack;
         }
-        else {
-            sender = this.outVThumbTrack.xponder.sender;
-            isHiRes = false;
-        }
-        if (!sender.track) {
-            if (this.app.onVideoTxStat) {
+        const stats = slot.isSendingTrack() ? (await slot.pollTxStats()) : null;
+        if (this.app.onVideoTxStat) {
+            if (stats) {
+                this.app.onVideoTxStat(slot.isHiRes, this.rtcStats, stats);
+            }
+            else if (stats === null) {
                 this.app.onVideoTxStat(null);
             }
-            return;
         }
-        let stats = await sender.getStats();
-        this.parseTxVideoStats(stats, isHiRes);
     }
     async pollMicAudioLevel() {
         let sender = this.outASpeakerTrack.xponder.sender;
@@ -3227,26 +3275,25 @@ class SfuClient {
             } while (0);
             return;
         }
-        let stats = this.rtcStats = { pl: 0, jtr: 1000000 };
+        const stats = this.rtcStats = { txpl: 0, _pktTxTotal: 0, rxpl: 0, _pktRxTotal: 0, jtr: 1000000 };
         this.hasConnStats = false;
         let promises = [this.pollTxVideoStats(), this.pollMicAudioLevel()];
-        // first, get all audio stats, because the stats display callbacks are connected to the video
-        // stats, and they may want to display audio stats as well - audio stats should be already available
+        if (this.outASpeakerTrack.isSendingTrack()) {
+            promises.push(this.outASpeakerTrack.pollTxStats());
+        }
         for (const rxTrack of this.inAudioTracks.values()) {
-            if (!rxTrack.active) {
-                continue;
+            if (rxTrack.active) {
+                promises.push(rxTrack.pollRxStats());
             }
-            promises.push(rxTrack.pollRxStats());
         }
-        if (promises.length) {
-            await Promise.allSettled(promises);
-        }
-        promises = [];
+        // NOTE: before we used to first wait for all audio stats, because the stats display callbacks are connected
+        // to the video stats, and they may want to display audio stats as well - audio stats should be
+        // already available. In practice this was not used, and having the audio stats from the previous second
+        // would not be a big problem
         for (const rxTrack of this.inVideoTracks.values()) {
-            if (!rxTrack.active) {
-                continue;
+            if (rxTrack.active) {
+                promises.push(rxTrack.pollRxStats());
             }
-            promises.push(rxTrack.pollRxStats());
         }
         if (promises.length) {
             await Promise.allSettled(promises);
@@ -3261,17 +3308,18 @@ class SfuClient {
         if (stats.jtr === 1000000) {
             stats.jtr = -1;
         }
-        if (stats._pktRxTotal) {
-            stats.pl = Math.round(stats.pl * 1000 / (stats._pktRxTotal + stats.pl)) / 10; // truncate to single decimal
-        }
-        else {
-            stats.pl = -1;
-        }
+        stats.rxpl = SfuClient.calcPacketLossPct(stats.rxpl, stats._pktRxTotal);
+        stats.txpl = SfuClient.calcPacketLossPct(stats.txpl, stats._pktTxTotal);
         this._statsRecorder.onStats(this.rtcStats);
         this._svcDriver.onStats();
         if (this.app.onConnStats) {
             this.app.onConnStats(this.rtcStats);
         }
+    }
+    static calcPacketLossPct(lost, total) {
+        return (total || lost)
+            ? Math.round(lost * 1000 / (total + lost)) / 10 // truncate to single decimal
+            : -1;
     }
     addNonRtcStats() {
         let stats = this.rtcStats;
@@ -3280,81 +3328,6 @@ class SfuClient {
         stats.nrxh = this._numRxHiRes;
         stats.nrxl = this._numRxVthumb;
         stats.nrxa = this._numRxAudio;
-    }
-    parseTxVideoStats(stats, isHiRes) {
-        let getConnTotals = !this.hasConnStats;
-        let rtcStats = this.rtcStats;
-        let txStat;
-        for (let stat of stats.values()) {
-            let type = stat.type;
-            if (type === "outbound-rtp") {
-                let tag;
-                if (isHiRes) {
-                    tag = (this.outVSpeakerTrack.sentTrack === this._screenTrack) ? "hi-scr" : "hi-cam";
-                }
-                else {
-                    tag = "vthumb";
-                }
-                let ctx = this.statCtx[tag];
-                if (!ctx) {
-                    ctx = this.statCtx[tag] = {};
-                }
-                if (!ctx.prev) {
-                    ctx.prev = stat;
-                }
-                else {
-                    const prev = ctx.prev;
-                    ctx.prev = stat;
-                    const period = (stat.timestamp - prev.timestamp) / 1000;
-                    rtcStats._vtxIsHiRes = isHiRes;
-                    if (isNaN((rtcStats._vtxkbps = ((stat.bytesSent - prev.bytesSent) / 128) / period))) {
-                        rtcStats._vtxkbps = 0;
-                    }
-                    rtcStats.vtxfps = stat.framesPerSecond;
-                    rtcStats.vtxw = stat.frameWidth;
-                    rtcStats.vtxh = stat.frameHeight;
-                    rtcStats._vtxkfps = (stat.keyFramesEncoded - prev.keyFramesEncoded) / period;
-                    const pktSent = stat.packetsSent - prev.packetsSent;
-                    rtcStats.vtxdly = pktSent
-                        ? Math.round((stat.totalPacketSendDelay - prev.totalPacketSendDelay) * 1000 / pktSent)
-                        : -1;
-                    let limitFlags;
-                    switch (stat.qualityLimitationReason) {
-                        case "none":
-                            limitFlags = 0;
-                            break;
-                        case "cpu":
-                            limitFlags = 1 /* TxQualityLimit.kCpu */;
-                            break;
-                        case "bandwidth":
-                            limitFlags = 2 /* TxQualityLimit.kBandwidth */;
-                            break;
-                        case "other":
-                        default:
-                            limitFlags = 4 /* TxQualityLimit.kOther */;
-                            break;
-                    }
-                    rtcStats.f = limitFlags;
-                    txStat = stat;
-                    //  LOGI("tag:", tag, "nacks:", stat.nackCount, "pli:", stat.pliCount, "fir", stat.firCount, "vtxh:", rtcStats.vtxh);
-                }
-                if (!getConnTotals) {
-                    break;
-                }
-            }
-            else if (getConnTotals && type === "candidate-pair" && stat.nominated) {
-                this.parseConnStats(stat);
-                getConnTotals = false;
-            }
-        }
-        if (this.app.onVideoTxStat) {
-            if (txStat) {
-                this.app.onVideoTxStat(isHiRes, rtcStats, txStat);
-            }
-            else {
-                this.app.onVideoTxStat(null);
-            }
-        }
     }
     parseConnStats(stat) {
         let s = this.rtcStats;
@@ -3380,7 +3353,6 @@ class SfuClient {
         const per = (stat.timestamp - prev.timestamp) / 1000;
         s.rx = Math.round(((stat.bytesReceived - prev.bytesReceived) / 128) / per);
         s.tx = Math.round(((stat.bytesSent - prev.bytesSent) / 128) / per);
-        s._pktRxTotal = stat.packetsReceived - prev.packetsReceived;
     }
     async getConnStatsFromPeerConn() {
         if (!this.rtcConn) {
@@ -3412,12 +3384,15 @@ class SfuClient {
         ];
     }
 }
-SfuClient.kProtocolVersion = 2;
+SfuClient.kProtocolVersion = 3;
 SfuClient.debugSdp = localStorage.debugSdp ? 1 : 0;
 SfuClient.kMaxVideoSlotsDefault = 24;
 SfuClient.kSpatialLayerCount = 3;
+SfuClient.kAudioCaptureOptions = {
+    echoCancellation: true, autoGainControl: true, noiseSuppression: true
+};
 SfuClient.kVideoCaptureOptions = { height: 720 };
-SfuClient.kScreenCaptureOptions = { video: { height: { max: 1440 } } };
+SfuClient.kScreenCaptureOptions = { height: { max: 1440 } };
 SfuClient.kVthumbHeight = 90;
 SfuClient.kRotateKeyUseDelay = 100;
 SfuClient.kPeerReconnNoKeyRotationPeriod = 1000;
@@ -3426,7 +3401,6 @@ SfuClient.kSpeakerVolThreshold = 0.001;
 SfuClient.kWorkerUrl = '/worker.sfuClient.bundle.js';
 SfuClient.kStatServerUrl = "https://stats.sfu.mega.co.nz";
 SfuClient.kSpeakerChangeMinInterval = 4000;
-SfuClient.SpeakerState = SpeakerState;
 SfuClient.ConnState = ConnState;
 SfuClient.TermCode = termCodes;
 SfuClient.ScreenShareType = ScreenShareType;
@@ -3444,10 +3418,10 @@ SfuClient.msgHandlerMap = {
     "HIRES_STOP": SfuClient.prototype.msgHiresStop,
     "VTHUMB_START": SfuClient.prototype.msgVthumbStart,
     "VTHUMB_STOP": SfuClient.prototype.msgVthumbStop,
-    "SPEAK_REQS": SfuClient.prototype.msgSpeakReqs,
-    "SPEAK_RQ_DEL": SfuClient.prototype.msgSpeakRequestDel,
-    "SPEAK_ON": SfuClient.prototype.msgSpeakOn,
-    "SPEAK_OFF": SfuClient.prototype.msgSpeakOff,
+    "SPEAKRQ": SfuClient.prototype.msgSpeakReq,
+    "SPEAKRQ_DEL": SfuClient.prototype.msgSpeakReqDel,
+    "SPEAKER_ADD": SfuClient.prototype.msgSpeakerAdd,
+    "SPEAKER_DEL": SfuClient.prototype.msgSpeakerDel,
     "MOD_ADD": SfuClient.prototype.msgModAdd,
     "MOD_DEL": SfuClient.prototype.msgModDel,
     "MUTED": SfuClient.prototype.msgMuted,
@@ -3465,7 +3439,7 @@ SfuClient.msgHandlerMap = {
 class Slot {
     constructor(client, xponder, generateIv) {
         this.active = false;
-        this.rxStatCtx = {};
+        this.statCtx = {};
         this.client = client;
         this.xponder = xponder;
         xponder.slot = this;
@@ -3515,25 +3489,26 @@ class Slot {
         return !!this._sentTrack;
     }
     async pollRxStats() {
-        let client = this.client;
-        let commonStats = client.rtcStats;
-        let ctx = this.rxStatCtx;
+        const client = this.client;
+        const commonStats = client.rtcStats;
+        const ctx = this.statCtx;
         let rtpParsed;
-        let stats = await this.xponder.receiver.getStats();
+        const stats = await this.xponder.receiver.getStats();
         let parseConnStats = !client.hasConnStats;
         for (let stat of stats.values()) {
             if (stat.type === "inbound-rtp") {
                 rtpParsed = true;
-                if (!ctx.prev) {
-                    ctx.prev = stat;
+                if (!ctx.rxPrev) {
+                    ctx.rxPrev = stat;
                 }
                 else {
-                    const prev = ctx.prev;
-                    ctx.prev = stat;
+                    const prev = ctx.rxPrev;
+                    ctx.rxPrev = stat;
                     const period = (stat.timestamp - prev.timestamp) / 1000;
                     const recvd = stat.packetsReceived - prev.packetsReceived;
+                    commonStats._pktRxTotal += recvd;
                     const plost = (stat.packetsLost - prev.packetsLost);
-                    commonStats.pl += plost;
+                    commonStats.rxpl += plost;
                     if (!this.isVideo) {
                         if (stat.jitter != null) {
                             let jtr = Math.round(stat.jitter * 1000);
@@ -3574,6 +3549,76 @@ class Slot {
                     return;
                 }
             }
+        }
+    }
+    async pollTxStats() {
+        const client = this.client;
+        const reports = await this.xponder.sender.getStats();
+        let local, remote;
+        let getConnTotals = !client.hasConnStats;
+        for (const report of reports.values()) {
+            const type = report.type;
+            if (type === "outbound-rtp") {
+                local = report;
+                remote = reports.get(local.remoteId);
+                if (!getConnTotals) {
+                    break;
+                }
+            }
+            else if (getConnTotals && (type === "candidate-pair") && report.nominated) {
+                getConnTotals = false;
+                client.parseConnStats(report);
+            }
+        }
+        if (!local || !remote) {
+            return null; // not sending
+        }
+        const ctx = this.statCtx;
+        const stats = { local: local, remote: remote };
+        const prev = ctx.txPrev;
+        if (!prev) {
+            ctx.txPrev = stats;
+            return undefined; // no stats available yet
+        }
+        const prevLocal = prev.local;
+        const prevRemote = prev.remote;
+        ctx.txPrev = stats;
+        const rtcStats = client.rtcStats;
+        const period = (local.timestamp - prevLocal.timestamp) / 1000;
+        const pktSent = local.packetsSent - prevLocal.packetsSent;
+        const pktLost = remote.packetsLost - prevRemote.packetsLost;
+        rtcStats.txpl += pktLost;
+        rtcStats._pktTxTotal += pktSent;
+        if (this.isVideo) {
+            rtcStats._vtxIsHiRes = this.isHiRes;
+            if (isNaN((rtcStats._vtxkbps = ((local.bytesSent - prevLocal.bytesSent) / 128) / period))) {
+                rtcStats._vtxkbps = 0;
+            }
+            rtcStats.vtxfps = local.framesPerSecond;
+            rtcStats.vtxw = local.frameWidth;
+            rtcStats.vtxh = local.frameHeight;
+            rtcStats._vtxkfps = (local.keyFramesEncoded - prevLocal.keyFramesEncoded) / period;
+            rtcStats.vtxdly = pktSent
+                ? Math.round((local.totalPacketSendDelay - prevLocal.totalPacketSendDelay) * 1000 / pktSent)
+                : -1;
+            let limitFlags;
+            switch (local.qualityLimitationReason) {
+                case "none":
+                    limitFlags = 0;
+                    break;
+                case "cpu":
+                    limitFlags = 1 /* TxQualityLimit.kCpu */;
+                    break;
+                case "bandwidth":
+                    limitFlags = 2 /* TxQualityLimit.kBandwidth */;
+                    break;
+                default: // case "other":
+                    limitFlags = 4 /* TxQualityLimit.kOther */;
+                    break;
+            }
+            rtcStats.f = limitFlags;
+            //  LOGI("tag:", tag, "nacks:", stat.nackCount, "pli:", stat.pliCount, "fir", stat.firCount, "vtxh:", rtcStats.vtxh);
+            return local;
         }
     }
 }
@@ -3656,6 +3701,9 @@ class VideoSlot extends Slot {
         this.active = false;
     }
     _onPlayerAttached(player) {
+        if (this.isHiRes) {
+            this.peer.updateHiResDivider();
+        }
         if (player.gui.onRxStats) {
             this.rxStatsCallbacks.set(player, player.gui.onRxStats.bind(player.gui));
         }
@@ -3663,17 +3711,9 @@ class VideoSlot extends Slot {
     /** Called by video players when they are detached */
     _onPlayerDetached(player) {
         this.client.assert(this.players);
-        if (!this.players.has(player)) {
-            do {
-                if (window.d) {
-                    console.warn(client_kLogTag, "Slot._onPlayerDetached: Was not attached to that player");
-                }
-            } while (0);
-            return;
-        }
         this.rxStatsCallbacks.delete(player);
         // LOGW(`slot ${this.isHiRes ? "hires":"lores"} detach from player -> refcnt =`, this.players.size);
-        if (this.players.size === 1) {
+        if (!this.players.size) {
             this.active = false;
             this._releaseTrackCb();
             delete this.players;
@@ -3684,23 +3724,29 @@ class VideoSlot extends Slot {
                 this.client._numRxVthumb--;
             }
         }
+        else if (this.isHiRes) {
+            this.peer.updateHiResDivider();
+        }
     }
 }
 /** Video players are created synchronously upon calling getHiResVideo/getVthumbVideo, added to the peer's
- * hiResPlayers/vThumbPlayers, and are temorarily left unattached to a track, because the track's mid is not yet known.
+ * hiResPlayers/vThumbPlayers, and are temporarily left unattached to a track, because the track's mid is not yet known.
  * When the SFU responds with the mid, the peer's hiresPlayers/vThumbPlayers are attached to the track. This means that
- * the lifetime of players is independent of Slots
+ * the lifetime of players is independent of Slots. Each Peer has two sets of VideoPlayer-s. These sets are managed
+ * here
  */
 class VideoPlayer {
-    constructor(peer, isHiRes, guiCreateCb) {
+    constructor(peer, isHiRes, guiCreateCb, hiResDivider) {
         this.peer = peer;
         this._isHiRes = !!isHiRes;
+        this._hiResDivider = hiResDivider;
         this.gui = guiCreateCb(this);
         if (isHiRes) {
-            if (peer.hiResSlot) {
+            if (peer.hiResSlot) { // we already have the hi-res stream
                 this._attachToTrack(peer.hiResSlot);
+                this.peer.updateHiResDivider();
             }
-            else {
+            else { // we don't have the hi-res stream yet, queue player
                 this.players = peer.hiResPlayers;
                 this.players.add(this);
             }
@@ -3723,6 +3769,16 @@ class VideoPlayer {
     }
     get track() {
         return this.slot ? this.slot.inTrack : null;
+    }
+    get hiResDivider() {
+        return this._hiResDivider;
+    }
+    setHiResDivider(divider) {
+        if (divider < 0 || divider > 2) {
+            throw new Error(`Invalid res divider ${divider}`);
+        }
+        this._hiResDivider = divider;
+        this.peer.updateHiResDivider();
     }
     _attachToTrack(slot) {
         const client = this.peer.client;
@@ -3760,26 +3816,29 @@ class VideoPlayer {
         this.destroy(); //TODO: Maybe not destroy even if track is gone
     }
     _detachFromCurrentTrack() {
-        let slot = this.slot;
+        this.peer.client.assert(this.players);
+        if (!this.players.delete(this)) {
+            this.peer.client.logError("VideoPlayer._detachFromCurrentTrack: BUG: Was not in the players set");
+        }
+        const slot = this.slot;
         if (slot) {
             this.gui.detachFromTrack();
             slot._onPlayerDetached(this);
             delete this.slot;
         }
-        this.players.delete(this); // safe, even if already be deleted from players
     }
     destroy() {
         if (this.isDestroyed) {
             do {
                 if (window.d) {
-                    console.warn(client_kLogTag, "VideoPlayer.destroy: Already destroyed");
+                    console.warn(client_kLogTag, "VideoPlayer.destroy: Already destroying/destroyed");
                 }
             } while (0);
             return;
         }
+        this.isDestroyed = true; // callbacks may try to destroy() us again
         this._detachFromCurrentTrack(); // manages refcounting and deletion from vThumbPlayers and hiResPlayers sets
         this.gui.onPlayerDestroy();
-        this.isDestroyed = true;
     }
 }
 class AudioPlayer {
@@ -3859,7 +3918,6 @@ function logReplacerFunc(name, val) {
 class Peer {
     constructor(client, info, isInitialDump) {
         this.data = {};
-        this._isSpeaker = false;
         this._audioLevel = 0;
         this._speakReq = false;
         this.vThumbPlayers = new Set();
@@ -3868,10 +3926,14 @@ class Peer {
         this.audioPktLoss = 0;
         client.assert(info.cid);
         client.assert(info.userId);
+        client.assert(info.pubk);
         client.assert(!isNaN(info.av));
         this.client = client;
         this.handler = client.app;
         this.cid = info.cid;
+        if (info.prevCid) {
+            this.prevCid = info.prevCid;
+        }
         this.userId = info.userId;
         this.version = info.v;
         this.av = info.av;
@@ -3879,35 +3941,26 @@ class Peer {
         this.keyDecryptIv = hexToBin(this.strIvs[0] + this.strIvs[1].substring(0, 8));
         this.encryptKeyToUser = client.app.encryptKeyToUser.bind(client.app); // performance optimization
         client._addPeer(this);
+        this.verifyAndDeriveSharedSessKey(info.pubk);
+        if (info.amid) {
+            this.onAudioStart(info.amid);
+        }
         if (!isInitialDump) {
             this._fire("onPeerJoined");
         }
-        if (info.pubk) {
-            this.verifyAndDeriveSharedSessKey(info.pubk);
-        }
+        client._maybeResumeRecordingPeer(this);
     }
     get isModerator() {
         let mods = this.client.moderators;
-        return mods ? mods.has(this.userId) : false;
+        return mods ? mods.has(this.userId) : true;
     }
-    get isSpeaker() { return this._isSpeaker; }
+    get isSpeaker() {
+        const client = this.client;
+        return client.speakApproval || this.isModerator || client.speakers.has(this.userId);
+    }
     get audioLevel() { return this._audioLevel; }
     get speakRequested() { return this._speakReq; }
     get isLeavingCall() { return this.isLeaving; }
-    setSpeakReq() {
-        if (this._speakReq) {
-            return;
-        }
-        this._speakReq = true;
-        this._fire("onPeerSpeakReq");
-    }
-    delSpeakReq() {
-        if (!this._speakReq) {
-            return;
-        }
-        this._speakReq = false;
-        this._fire("onPeerSpeakReqDel");
-    }
     async verifyAndDeriveSharedSessKey(pubKey) {
         const pms = this.sessSharedKey = createPromiseWithResolveMethods();
         const items = pubKey.split(':');
@@ -4006,7 +4059,6 @@ class Peer {
     }
     destroy(reason) {
         this.isLeaving = true;
-        this.delSpeakReq();
         this.client._removePeer(this);
         if (this.audioPlayer) {
             this.audioPlayer.destroy();
@@ -4025,6 +4077,9 @@ class Peer {
     get receivingThumbVideo() { return this.vThumbPlayers.size > 0; }
     get receivingHiResVideo() { return this.hiResPlayers.size > 0; }
     getThumbVideo(guiCreateCb, reuseHiRes) {
+        if (!(this.av & shared_av.LowResVideo)) {
+            throw new Error(`getThumbVideo: Peer ${this.cid} is not sending low-res video`);
+        }
         const player = new VideoPlayer(this, false, guiCreateCb);
         if (this.vThumbPlayers.size === 1 || reuseHiRes) {
             // we had no vthumb track and players, or we had all vthumb players hooked to the hi-res track
@@ -4037,23 +4092,41 @@ class Peer {
             player.destroy();
         }
     }
+    calcHiResDivider() {
+        let divider = 2;
+        for (const player of this.hiResPlayers) {
+            const playerDiv = player.hiResDivider;
+            if (playerDiv < divider) {
+                divider = playerDiv;
+            }
+        }
+        return divider;
+    }
+    updateHiResDivider() {
+        const newDiv = this.calcHiResDivider();
+        this._setHiResDivider(newDiv);
+    }
     getHiResVideo(resDivider, guiCreateCb, reuseVthumb) {
-        const player = new VideoPlayer(this, true, guiCreateCb);
-        if (this.hiResPlayers.size === 1 || reuseVthumb) {
+        if (!(this.av & shared_av.HiResVideo)) {
+            throw new Error(`getHiResVideo: Peer ${this.cid} is not sending hi-res video`);
+        }
+        if (resDivider < 0 || resDivider > 2) {
+            throw new Error(`Invalid res divider ${resDivider}`);
+        }
+        const player = new VideoPlayer(this, true, guiCreateCb, resDivider);
+        if (!this.receivingHiRes || reuseVthumb) {
             this.hiResDivider = resDivider;
             this.client.send({
                 a: "GET_HIRES",
                 cid: this.cid,
-                ...(resDivider && { lo: resDivider }),
+                lo: resDivider,
                 ...(reuseVthumb && { r: 1 })
             });
-        }
-        else if (this.hiResDivider !== resDivider) {
-            this.setHiResDivider(resDivider);
+            this.receivingHiRes = true;
         }
         return player;
     }
-    stopHiResVideo() {
+    _stopHiResVideo() {
         for (const player of this.hiResPlayers) {
             player.destroy();
         }
@@ -4088,6 +4161,7 @@ class Peer {
     _sendDelHires() {
         if (!this.isLeaving) {
             this.client.send({ a: "DEL_HIRES", cids: [this.cid] });
+            delete this.receivingHiRes;
         }
     }
     incomingHiResVideoTrack(mid, reused) {
@@ -4108,21 +4182,12 @@ class Peer {
             if (slot !== this.hiResSlot) {
                 return;
             }
-            const recorder = this.client.callRecorder;
-            if (recorder && (recorder.forcedVideoTrack === slot.inTrack)) {
-                recorder.forceVideoTrack(null);
-            }
             delete this.hiResSlot;
             this._sendDelHires();
         });
         this.client.assert(this.hiResSlot && this.hiResSlot.players);
-        // if we want to record this peer's video
-        const rec = this.client.callRecorder;
-        if (rec && rec.forcedVideoPeerCid === this.cid && !rec.forcedVideoTrack) {
-            rec.forceVideoTrack(slot.inTrack);
-        }
     }
-    setHiResDivider(divider) {
+    _setHiResDivider(divider) {
         if (divider < 0 || divider > 2) {
             do {
                 if (window.d) {
@@ -4167,8 +4232,10 @@ class Peer {
             }
         }
         finally {
-            this._fire("onPeerAvChange", av);
-            this._notifyPlayers("onAvChange", av);
+            this._fire("onPeerAvChange", av, oldAv);
+            // Must be last, so that the players have the updated state of the app as a result of onPeerAvChange
+            // This is used by the recorder link player to know if we are still recording that peer
+            this._notifyPlayers("onAvChange", av, oldAv);
         }
     }
     _notifyPlayers(event, ...args) {
@@ -4190,35 +4257,15 @@ class Peer {
     sendsCameraAndScreen() {
         return shared_av.hasCamAndScreen(this.av);
     }
-    onSpeaker() {
-        if (this._isSpeaker) {
-            this.client.logError(`Peer.onSpeaker: Peer ${this.cid} is already a speaker`);
-            return;
-        }
-        this._isSpeaker = true;
-        this._fire("onPeerSpeaker");
-    }
     onAudioStart(mid) {
         // prepare track
         const slot = this.client.inAudioTracks.get(mid);
         if (!slot) {
-            this.client.logError("addPeerSpeaker: Unknown audio track mid", mid);
+            this.client.logError("onAudioStart: Unknown audio track mid", mid);
             return;
         }
         slot.reassign(this, this.strIvs[TxTrackIndex.kAudio]);
         this.audioPlayer = new AudioPlayer(this, slot);
-    }
-    onNoSpeaker() {
-        if (!this._isSpeaker) {
-            do {
-                if (window.d) {
-                    console.warn(client_kLogTag, `Peer.onNoSpeaker: Peer ${this.cid} was not a speaker`);
-                }
-            } while (0);
-            return;
-        }
-        this._isSpeaker = false;
-        this._fire("onPeerNoSpeaker");
     }
     onAudioEnd() {
         if (this.audioPlayer) {
@@ -4258,6 +4305,11 @@ class Peer {
         catch (ex) {
             this.client.logError("Event handler for", evName, "threw exception:", ex.stack);
         }
+    }
+    _doStartRecording() {
+        this.getHiResVideo(0, (player) => {
+            return new PeerRecorderLink(player, this.client.callRecorder);
+        });
     }
 }
 function createPromiseWithResolveMethods() {
@@ -4367,6 +4419,7 @@ class MicMuteMonitor {
         }
         else {
             this.client._fire("onNoMicInput");
+            this.client.logError("No mic signal detected");
         }
     }
     onLevel(level) {
@@ -4613,6 +4666,41 @@ class StatsRecorder {
     }
 }
 ;
+class PeerRecorderLink {
+    constructor(player, recorder) {
+        this.player = player;
+        this.recorder = recorder;
+    }
+    attachToTrack(track) {
+        this.track = track;
+        this.recorder.setVideoInput(track, () => {
+            delete this.track; // makes detachFromTrack() ignore us
+            if (!this.player.isDestroyed) {
+                this.player.destroy(); // we may be called from detachFromTrack, being called from Player.destroy()
+            }
+        });
+    }
+    detachFromTrack() {
+        const track = this.track;
+        if (!track) {
+            return;
+        }
+        delete this.track;
+        if (this.recorder.videoInputTrack() === track) {
+            this.recorder.setVideoInput(null);
+        }
+    }
+    onPlayerDestroy() { }
+    onAvChange(av, oldAv) {
+        const peer = this.player.peer;
+        if (peer.client.recForcedPeerCid !== peer.cid) {
+            return;
+        }
+        if (!(av & shared_av.HiResVideo)) {
+            this.recorder.setVideoInput(null);
+        }
+    }
+}
 function msDelay(ms) {
     return new Promise(function (resolve, reject) {
         setTimeout(() => resolve(), ms);

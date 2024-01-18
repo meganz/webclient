@@ -1,3 +1,9 @@
+@keyframes fadeInOutLoopSubtle {
+    0%   { opacity: 1; }
+    50%  { opacity: 0; }
+    100% { opacity: 1; }
+}
+
 .participants {
     padding: 12px 0 0 0;
     height: calc(100% - 70px);
@@ -135,10 +141,34 @@
             }
 
             .status {
+                display: flex;
+                align-items: center;
                 margin: 5px 0 0 auto;
 
                 body.rtl & {
                     float: left;
+                }
+
+                .recording-status {
+                    display: block;
+                    position: relative;
+                    width: 16px;
+                    height: 16px;
+                    border-radius: 200px;
+                    background: var(--secondary-red);
+                    animation: fadeInOutLoopSubtle 4s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+
+                    span {
+                        display: block;
+                        position: absolute;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        width: 6px;
+                        height: 6px;
+                        border-radius: 200px;
+                        background: var(--secondary-white);
+                    }
                 }
 
                 i {

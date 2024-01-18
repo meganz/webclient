@@ -251,7 +251,7 @@ def reduce_stylelint(file_line_mapping, **extra):
     warnings = 0
     output = None
     try:
-        output = subprocess.check_output(command.split())
+        output = subprocess.check_output(command.split(), stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as ex:
         # StyleLint found something, so it has returned an error code.
         # But we still want the output in the same fashion.

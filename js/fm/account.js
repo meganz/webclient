@@ -3413,6 +3413,9 @@ accountUI.fileManagement = {
         // User Interface
         this.userInterface.render();
 
+        // Subfolder media discovery
+        this.subfolderMediaDiscovery.render();
+
         // Hide Recents
         this.hideRecents.render();
 
@@ -3685,6 +3688,21 @@ accountUI.fileManagement = {
 
             this._initOption('uisorting');
             this._initOption('uiviewmode');
+        }
+    },
+
+    subfolderMediaDiscovery: {
+        render: function() {
+            'use strict';
+
+            accountUI.inputs.switch.init(
+                '#subfolder-media-discovery',
+                $('#subfolder-media-discovery', accountUI.$contentBlock).parent(),
+                !mega.config.get('noSubfolderMd'),
+                (val) => {
+                    mega.config.setn('noSubfolderMd', val ? undefined : 1);
+                }
+            );
         }
     },
 

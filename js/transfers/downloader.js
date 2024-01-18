@@ -676,6 +676,9 @@ ClassFile.prototype.run = function(task_done) {
                 }
             }
             else if (fatal) {
+                if (this.dl) {
+                    dlmanager.dlReportStatus(this.dl, error);
+                }
                 cancelOnInit(true);
             }
             else {

@@ -665,7 +665,6 @@ MegaData.prototype.dlcomplete = function(dl) {
 
     var $tr = $('.transfer-table #' + id);
     $tr.removeClass('transfer-started').addClass('transfer-completed');
-    $('.link-transfer-status', $tr).addClass('hidden');
     $tr.find('.left-c p, .right-c p').css('transform', 'rotate(180deg)');
     $tr.find('.transfer-status').text(l[1418]);
     $tr.find('.eta, .speed').text('').removeClass('unknown');
@@ -783,7 +782,17 @@ MegaData.prototype.dlerror = function(dl, error) {
                     $tr.find('.transfer-status').addClass('overquota');
                 }
             }
-            setTransferStatus(dl, errorstr);
+
+            switch (error) {
+                case EACCESS:
+                case ETOOMANY:
+                case EBLOCKED:
+                    dlFatalError(dl, errorstr);
+                    delete dlmanager.onDownloadFatalError;
+                    break;
+                default:
+                    setTransferStatus(dl, errorstr);
+            }
         }
     }
 };

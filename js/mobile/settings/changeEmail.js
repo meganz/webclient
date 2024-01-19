@@ -95,7 +95,7 @@ mobile.settings.account.changeEmail = Object.create(mobile.settingsHelper, {
 
             // If there is text in the email field and it doesn't match the existing one
             if (newEmail && u_attr.email !== newEmail) {
-                this.processChange(newEmail).catch((ex) => this.showError(ex));
+                this.processChange(newEmail).catch(tell);
             }
             else {
                 this.showError(l.m_change_email_same);
@@ -103,15 +103,21 @@ mobile.settings.account.changeEmail = Object.create(mobile.settingsHelper, {
         }
     },
 
+    /**
+     * Check 2FA and run the proccess
+     * @param {String} newEmail The new email
+     * @param {Number} error API exception value to display an error message in 2FA, optional
+     * @returns {void} void
+     */
     processChange: {
-        value: async function(newEmail) {
+        value: async function(newEmail, error) {
             'use strict';
 
             const hasTwoFactor = await twofactor.isEnabledForAccount();
             let twoFactorPin = null;
 
             if (hasTwoFactor &&
-                !(twoFactorPin = await mobile.settings.account.twofactorVerifyAction.init())) {
+                !(twoFactorPin = await mobile.settings.account.twofactorVerifyAction.init(false, error))) {
                 return false;
             }
             this.continueChangeEmail(newEmail, twoFactorPin);
@@ -146,6 +152,9 @@ mobile.settings.account.changeEmail = Object.create(mobile.settingsHelper, {
             // Change of email request
             api.req(requestParams)
                 .then(() => {
+                    // Hide 2FA overlay
+                    mega.ui.overlay.hide();
+
                     this.buttonLabel.textContent = l.resend_email;
                     mobile.showToast(l.email_confirmation_sent.replace('%1', newEmail));
                     localStorage.new_email = newEmail;
@@ -154,11 +163,15 @@ mobile.settings.account.changeEmail = Object.create(mobile.settingsHelper, {
 
                     // If something went wrong with the 2FA PIN
                     if (ex === EFAILED || ex === EEXPIRED) {
-                        msgDialog('warninga', l[135], l[19192]);
+                        this.processChange(newEmail, ex).catch(tell);
+                        return false;
                     }
 
+                    // Hide 2FA overlay
+                    mega.ui.overlay.hide();
+
                     // If they have already requested a confirmation link for that email address, show an error
-                    else if (ex === -12) {
+                    if (ex === -12) {
                         msgDialog('warninga', l.resend_email_error,  mega.icu.format(l.resend_email_error_info, 2));
                     }
 

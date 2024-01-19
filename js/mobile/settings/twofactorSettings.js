@@ -273,15 +273,16 @@ mobile.settings.account.twofactorSettings = Object.create(mobile.settingsHelper,
 
     /**
      * Get the Authenticator PIN code from the user and enable 2FA
+     * @param {Number} error API exception value to display an error message in 2FA, optional
      * @returns {void} void
      */
     enableTwoFA: {
-        value: async function() {
+        value: async function(error) {
             'use strict';
 
             // Get the Authenticator PIN code from the user
             const twoFactorPin = await mobile.settings.account.twofactorVerifyAction
-                .init(l.two_fa_verify_enable);
+                .init(l.two_fa_verify_enable, error);
 
             // Cancel the process if user closed the overlay
             if (!twoFactorPin) {
@@ -293,6 +294,8 @@ mobile.settings.account.twofactorSettings = Object.create(mobile.settingsHelper,
             // Run Multi-Factor Auth Setup (mfas) request
             api.send({a: 'mfas', mfa: twoFactorPin})
                 .then(() => {
+                    // Hide 2FA overlay
+                    mega.ui.overlay.hide();
 
                     // Show in itial settings page
                     this.back();
@@ -300,13 +303,18 @@ mobile.settings.account.twofactorSettings = Object.create(mobile.settingsHelper,
                 })
                 .catch((ex) => {
 
+                    // If something went wrong with the 2FA PIN
+                    if (ex === EFAILED || ex === EEXPIRED) {
+                        this.enableTwoFA(ex).catch(tell);
+                        return false;
+                    }
+
+                    // Hide 2FA overlay
+                    mega.ui.overlay.hide();
+
                     // The Two-Factor has already been setup
                     if (ex === EEXIST) {
                         msgDialog('warninga', l[19219], '', '', () => this.render());
-                    }
-                    // If something went wrong with the 2FA PIN
-                    else if (ex === EFAILED || ex === EEXPIRED) {
-                        msgDialog('warninga', l[135], l[19192]);
                     }
                     // If something else went wrong, show an error
                     else {
@@ -321,15 +329,16 @@ mobile.settings.account.twofactorSettings = Object.create(mobile.settingsHelper,
 
     /**
      * Get the Authenticator PIN code from the user and disable 2FA
+     * @param {Number} error API exception value to display an error message in 2FA, optional
      * @returns {void} void
      */
     disableTwoFA: {
-        value: async function() {
+        value: async function(error) {
             'use strict';
 
             // Get the Authenticator PIN code from the user
             const twoFactorPin = await mobile.settings.account.twofactorVerifyAction
-                .init(l.two_fa_verify_disable);
+                .init(l.two_fa_verify_disable, error);
 
             // Cancel the process if user closed the overlay
             if (!twoFactorPin) {
@@ -345,6 +354,8 @@ mobile.settings.account.twofactorSettings = Object.create(mobile.settingsHelper,
             // Run Multi-Factor Auth Setup (mfas) request
             api.send({a: 'mfad', mfa: twoFactorPin})
                 .then(() => {
+                    // Hide 2FA overlay
+                    mega.ui.overlay.hide();
 
                     // Update settings page
                     this.render();
@@ -355,13 +366,18 @@ mobile.settings.account.twofactorSettings = Object.create(mobile.settingsHelper,
                     // Set Enabled 2FA state back
                     this.toggleButton.setButtonState(this.isEnabled);
 
+                    // If something went wrong with the 2FA PIN
+                    if (ex === EFAILED || ex === EEXPIRED) {
+                        this.disableTwoFA(ex).catch(tell);
+                        return false;
+                    }
+
+                    // Hide 2FA overlay
+                    mega.ui.overlay.hide();
+
                     // The Two-Factor has already been disabled
                     if (ex === ENOENT) {
                         msgDialog('warninga', l[19217]);
-                    }
-                    // If something went wrong with the 2FA PIN
-                    else if (ex === EFAILED || ex === EEXPIRED) {
-                        msgDialog('warninga', l[135], l[19192]);
                     }
                     // If something else went wrong, show an error
                     else {

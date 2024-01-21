@@ -12474,6 +12474,7 @@ class WaitingRoom extends mixins.wl {
     super.componentWillUnmount();
     clearInterval(this.redirectInterval);
     this.props.chatRoom.unbind(`onCallLeft.${waitingRoom_NAMESPACE}`);
+    this.props.chatRoom.unbind(`onModeratorAdd.${waitingRoom_NAMESPACE}`);
   }
   componentDidMount() {
     super.componentDidMount();

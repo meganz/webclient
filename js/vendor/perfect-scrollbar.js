@@ -576,10 +576,10 @@
     let scrollBy = null;
 
     function mouseMoveHandler(e) {
-      const y = e.touches && e.touches[0] ? e.touches[0].pageY : e[pageY];
+      const py = e.touches && e.touches[0] ? e.touches[0].pageY : e[pageY];
 
       element[scrollTop] =
-        startingScrollTop + scrollBy * (y - startingMousePageY);
+        startingScrollTop + scrollBy * (py - startingMousePageY);
       addScrollingClass(i, y);
       updateGeometry(i);
 

@@ -3605,7 +3605,12 @@ async function prepareExportIo(dl) {
   if (window.isSecureContext && typeof showSaveFilePicker === 'function' && typeof FileSystemFileHandle !== 'undefined' && 'createWritable' in FileSystemFileHandle.prototype && typeof FileSystemWritableFileStream !== 'undefined' && 'seek' in FileSystemWritableFileStream.prototype) {
     const file = await window.showSaveFilePicker({
       suggestedName: zname
-    }).catch(dump);
+    }).catch(ex => {
+      if (String(ex).includes('aborted')) {
+        throw new Error('Aborted');
+      }
+      dump(ex);
+    });
     if (file) {
       const stream = await file.createWritable().catch(dump);
       if (stream) {
@@ -5506,7 +5511,7 @@ ChatRoom.prototype.exportToFile = function () {
     eventlog(99875, JSON.stringify([1]));
   }).catch(ex => {
     if (d) {
-      console.error('Chat export: ', ex);
+      console.warn('Chat export: ', ex);
     }
     const report = [String(ex && ex.message || ex).replace(/\s+/g, '').substring(0, 64)];
     report.unshift(report[0] === 'Aborted' ? 1 : 0);

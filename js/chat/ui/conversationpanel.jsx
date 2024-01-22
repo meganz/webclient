@@ -2484,7 +2484,7 @@ export class ConversationPanel extends MegaRenderMixin {
                         onAddParticipantSelected={contactHashes => {
                             room.scrolledToBottom = true;
 
-                            if (room.type === 'public') {
+                            if (room.type === 'group' || room.type === 'public') {
                                 // Waiting rooms -- allow the invited peer to join the call immediately without having
                                 // them go through the waiting room list.
                                 if (room.options.w && room.call) {

@@ -125,10 +125,8 @@ lazy(self, 'mLoadingSpinner', () => {
     });
 });
 
-var loadingInitDialog;
-
 if (typeof loadingDialog === 'undefined') {
-    var loadingDialog = Object.create(null);
+    window.loadingDialog = Object.create(null);
 
     // New subject value to specify loading dialog subject.
     // Loading dialog with subject will not disappear until it hided with the subject
@@ -267,7 +265,7 @@ if (typeof loadingDialog === 'undefined') {
 }
 
 if (typeof loadingInitDialog === 'undefined') {
-    loadingInitDialog = Object.create(null);
+    window.loadingInitDialog = Object.create(null);
     loadingInitDialog.progress = false;
     loadingInitDialog.active = false;
     loadingInitDialog.show = function() {
@@ -561,6 +559,12 @@ function startNodesFetching(scni) {
 // enqueue parsed actionpacket
 function sc_packet(a) {
     "use strict";
+
+    if (getsc.timer) {
+        // a timer is running for 48 seconds, parsing action-packets should
+        // take less than that, but in case it does not...let's stop it.
+        getsc.stop();
+    }
 
     // set scq slot number
     a.scqi = scqhead;
@@ -1503,7 +1507,7 @@ scparser.$add('usc', function() {
         return;
     }
     // user state cleared - mark local DB as invalid
-    fm_forcerefresh();
+    return fm_fullreload();
 });
 
 // Payment received
@@ -2068,39 +2072,19 @@ function initworkerpool() {
     }
 }
 
-// queue a DB invalidation-plus-reload request to the FMDB subsystem
-// if it isn't up, reload directly
-// the server-side treecache is wiped (otherwise, we could run into
-// an endless loop)
-function fm_forcerefresh(light) {
+/**
+ * Queue a DB invalidation-plus-reload request to the FMDB subsystem.
+ * If it isn't up, reload directly.
+ *
+ * The server-side tree-cache may be wiped,
+ * e.g., because it's too old or damaged (otherwise, we could run into an endless loop)
+ *
+ * @param {Boolean|MEGAPIRequest} [light] Perform a light reload, without tree-cache wiping.
+ * @param {String} [logMsg] optional event-log message, if light != true
+ * @returns {Promise<void>} undefined
+ */
+async function fm_fullreload(light, logMsg) {
     "use strict";
-
-    if (light !== true) {
-        localStorage.force = 1;
-    }
-
-    if (fmdb) {
-        // stop further SC processing
-        window.execsc = nop;
-
-        // bring DB to a defined state
-        return fmdb.invalidate().finally(() => location.reload());
-    }
-
-    location.reload();
-}
-
-// triggers a full reload including wiping the remote treecache
-// (e.g. because the treecache is damaged or too old)
-async function fm_fullreload(q, logMsg) {
-    "use strict";
-
-    if (q) {
-        console.assert(q instanceof MEGAPIRequest);
-        if (q instanceof MEGAPIRequest) {
-            q.abort();
-        }
-    }
 
     // FIXME: properly encapsulate ALL client state in an object
     // that supports destruction.
@@ -2110,12 +2094,26 @@ async function fm_fullreload(q, logMsg) {
     // without restarting them.
     // until then - it's the sledgehammer method; can't be anything
     // more surgical :(
-    if (logMsg === 'ETOOMANY' && mega.loadReport.mode < 2 && !sessionStorage.lightTreeReload) {
-        sessionStorage.lightTreeReload = 1;
+    if (light !== true) {
+        if (light instanceof MEGAPIRequest) {
+            light.abort();
+        }
+
+        if (logMsg === 'ETOOMANY' && mega.loadReport.mode < 2 && !sessionStorage.lightTreeReload) {
+            sessionStorage.lightTreeReload = 1;
+        }
+        else {
+            localStorage.force = 1;
+            delete sessionStorage.lightTreeReload;
+        }
+
     }
-    else {
-        localStorage.force = 1;
-        delete sessionStorage.lightTreeReload;
+
+    if (window.loadingDialog) {
+        // 1141: 'Please be patient.'
+        loadingInitDialog.hide('force');
+        loadingDialog.show('full-reload', l[1141]);
+        loadingDialog.show = loadingDialog.hide = nop;
     }
 
     // stop further SC processing
@@ -2124,10 +2122,14 @@ async function fm_fullreload(q, logMsg) {
     // and error reporting, if any
     window.onerror = null;
 
+    // nuke w/sc connection
+    getsc.stop(-1, 'full-reload');
+    window.getsc = nop;
+
     return Promise.allSettled([
         fmdb && fmdb.invalidate(),
         logMsg && eventlog(99624, logMsg)
-    ]).finally(() => location.reload(true));
+    ]).then(() => location.reload(true));
 }
 
 // this receives the ok elements one by one as per the filter rule
@@ -3871,7 +3873,7 @@ function loadfm_done(mDBload) {
                 // Force reload the account to get tree nodes consistency back...
                 localStorage['treeic$' + u_handle] = Date.now();
                 localStorage['treefixup$' + u_handle] = 1;
-                return fm_forcerefresh();
+                return fm_fullreload(0, 'tree-nodes');
             }
         }
         delete localStorage['treefixup$' + u_handle];

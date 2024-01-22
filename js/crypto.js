@@ -521,8 +521,7 @@ function getsc(force) {
     }
 
     // retire existing channel that may still be completing the request
-    api.reset(5);
-    waitsc.stop('w/sc-fetch');
+    getsc.stop(-1, 'w/sc-fetch');
 
     if (!self.currsn) {
         if (d) {
@@ -584,7 +583,10 @@ Object.defineProperties(waitsc, {
                     if (d) {
                         console.info('w/sc connection failure, starting over...', [ex]);
                     }
-                    getsc(true);
+                    getsc.stop(-1, 'http-500');
+                    tSleep(4 + -Math.log(Math.random()) * 3)
+                        .then(() => !getsc.locked && !waitsc.ok && getsc(true))
+                        .catch(dump);
                     eventlog(99992);
                 }
             },
@@ -692,6 +694,24 @@ Object.defineProperties(getsc, {
             }
         }
     },
+    stop: {
+        value(level, reason) {
+            'use strict';
+
+            if (this.timer) {
+                this.timer.abort();
+                this.timer = null;
+            }
+
+            if ((level >>>= 0)) {
+                api.reset(5);
+
+                if (level > 1) {
+                    waitsc.stop(reason);
+                }
+            }
+        }
+    },
     fire: {
         async value(runId) {
             'use strict';
@@ -711,9 +731,12 @@ Object.defineProperties(getsc, {
             }
 
             if (this.validate(runId)) {
-                const timer = tSleep(48);
-                const res = await Promise.race([timer, api.req(`sn=${currsn}`, 5)]).catch(echo);
-                timer.abort();
+                if (getsc.timer) {
+                    console.assert(false);
+                    getsc.stop();
+                }
+                getsc.timer = tSleep(48);
+                const res = await Promise.race([getsc.timer, api.req(`sn=${currsn}`, 5)]).catch(echo);
 
                 if (Number(res) !== EROLLEDBACK && this.validate(runId)) {
                     if (d) {
@@ -726,6 +749,7 @@ Object.defineProperties(getsc, {
                             console.error('w/sc connection is taking too long, aborting...');
                         }
                     }
+                    getsc.stop();
 
                     // at this point, sc_residue() should have been called with a new w/sc URL, but it may do not.
                     if (!waitsc.ok) {
@@ -745,7 +769,9 @@ Object.defineProperties(getsc, {
                             const data = [
                                 !!self.initialscfetch | 0, res ? 1 : 0, (res && res.result) | 0, res | 0
                             ];
-                            eventlog(99993, JSON.stringify([1, ...data]));
+                            if (res || data[0]) {
+                                eventlog(99993, JSON.stringify([2, ...data]), true);
+                            }
                         }
 
                         tSleep(3 + Math.random() * 9)

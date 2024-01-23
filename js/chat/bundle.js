@@ -29477,7 +29477,7 @@ class ScheduleMetaChange extends _mixin_jsx1__.y {
     if (this.props.mode === ScheduleMetaChange.MODE.CREATED) {
       if (is_chatlink) {
         this.setState({
-          link: `chat/${is_chatlink.ph}#${is_chatlink.key}`
+          link: `${getBaseUrl()}/chat/${is_chatlink.ph}#${is_chatlink.key}`
         });
       } else {
         const {

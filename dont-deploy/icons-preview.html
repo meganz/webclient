@@ -19,9 +19,6 @@
         body {
             margin-top: 32px;
         }
-        #themeSwitcherSelect {
-            float: right;
-        }
         #previewer span {
             width: 200px;
             text-align: center;
@@ -68,6 +65,20 @@
                     .replace("@light.css", "@" + newTheme + ".css")
                     .replace("@dark.css", "@" + newTheme + ".css");
             }
+        };
+
+        switchSprite = type => {
+
+            type = '.' + type.toLowerCase();
+
+            document.querySelectorAll("#previewer > span").forEach(node => {
+                if (type === '.all' || node.dataset.cls.toLowerCase().startsWith(type)) {
+                    node.classList.remove("hidden");
+                }
+                else {
+                    node.classList.add("hidden");
+                }
+            })
         };
 
         // replaced by the build script
@@ -381,6 +392,8 @@
         ".sprite-fm-mono.icon-send-to-chat",
         ".sprite-fm-mono.icon-session-history-filled",
         ".sprite-fm-mono.icon-session-history",
+        ".sprite-fm-mono.icon-settings-02-small-regular-outline",
+        ".sprite-fm-mono.icon-settings-02-small-regular-solid",
         ".sprite-fm-mono.icon-settings-outline",
         ".sprite-fm-mono.icon-settings",
         ".sprite-fm-mono.icon-share-02-thin-outline",
@@ -404,7 +417,7 @@
         ".sprite-fm-mono.icon-star-filled",
         ".sprite-fm-mono.icon-star",
         ".sprite-fm-mono.icon-subtitles-02-small-regular-outline",
-        ".sprite-fm-mono.icon-subtitles-02",
+        ".sprite-fm-mono.icon-subtitles-02-small-regular-solid",
         ".sprite-fm-mono.icon-support",
         ".sprite-fm-mono.icon-sync",
         ".sprite-fm-mono.icon-takedown",
@@ -1312,14 +1325,19 @@
         };
         render = () => {
             let $previewer = document.getElementById("previewer");
+            const sprites = new Set;
+
             $META.allClasses.forEach((cls) => {
                 let demoNode = document.createElement("span");
                 demoNode.dataset.cls = cls;
 
                 let i = document.createElement("i");
-                cls.split(".").forEach((kk) => {
+                cls.split(".").forEach((kk, idx) => {
                     if (kk) {
                         i.classList.add(kk);
+                    }
+                    if (idx === 1) {
+                        sprites.add(kk);
                     }
                 });
                 demoNode.appendChild(i);
@@ -1336,6 +1354,16 @@
                         input.select(0, input.value.length);
                     }
                 });
+            });
+
+            let spriteSwitcherSelect = document.getElementById('spriteSwitcherSelect');
+
+            sprites.forEach(st => {
+                const newopt = document.createElement('option');
+                newopt.value = st;
+                newopt.textContent = st;
+
+                spriteSwitcherSelect.appendChild(newopt);
             });
         }
         document.addEventListener('readystatechange', event => {
@@ -1362,6 +1390,11 @@
 <body class="theme-light light">
 <div id="topbar">
     <input type="search" placeholder="Search..." oninput="doSearch(this.value);"/>
+    <label for="spriteSwitcherSelect">Sprite:</label>
+    <select onchange="switchSprite(this.value)" id="spriteSwitcherSelect">
+        <option value="all" selected>All</option>
+    </select>
+    <label for="themeSwitcherSelect">Theme:</label>
     <select onchange="switchTheme(this.value)" id="themeSwitcherSelect">
         <option value="light" selected>Light</option>
         <option value="dark">Dark</option>

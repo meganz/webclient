@@ -876,9 +876,16 @@ FileManager.prototype.initFileManagerUI = function() {
     $('.fm-folder-upload, .fm-file-upload').rebind('click', (element) => {
         $.hideContextMenu();
         if (element.currentTarget.classList.contains('fm-folder-upload')) {
+
+            // Log that User clicks on Upload folder button
+            eventlog(500009);
+
             $('#fileselect2').click();
         }
         else {
+            // Log that User clicks on Upload file button
+            eventlog(500011);
+
             $('#fileselect1').click();
         }
     });
@@ -2523,6 +2530,10 @@ FileManager.prototype.createFolderUI = function() {
     const ltWSpaceWarning = new InputFloatWarning($inputWrapper);
 
     var doCreateFolder = function() {
+
+        // Log that Create button clicked within the Create folder dialog
+        eventlog(500008);
+
         var $input = $('input', $inputWrapper);
         var name = $input.val();
         var errorMsg = '';
@@ -2586,6 +2597,9 @@ FileManager.prototype.createFolderUI = function() {
         }
 
         ltWSpaceWarning.hide();
+
+        // Log that top menu Create folder clicked
+        eventlog(500007);
 
         var $me = $(this);
         var $nFolderDialog = $('.create-new-folder', 'body').removeClass('filled-input');

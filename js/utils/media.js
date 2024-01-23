@@ -940,6 +940,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
         var progressBarElementStyle = $progressBar.get(0).style;
         var videoTimingElement = $('.video-timing.current', $wrapper).get(0);
 
+        const $expectTimeBar = $('.video-expected-time-bar', $videoControls);
+        const $progressTimeBar = $('.video-progress-time', $videoControls);
+
         // set idle state, i.e. hide controls
         var setIdle = function(value) {
             if (setIdle.value !== value) {
@@ -1068,9 +1071,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 // Update progress bar and video current time
                 progressBarElementStyle.setProperty('width', o.percent + '%');
                 videoTimingElement.textContent = secondsToTimeShort(o.time, 1);
-                $('.video-progress-time', $videoControls)
-                    .css({'left': (x - 15.4) + 'px', 'display': 'block'})
-                    .text(secondsToTimeShort(getTimeOffset(x).time, 1));
+                $progressTimeBar.text(secondsToTimeShort(getTimeOffset(x).time, 1));
 
                 if (!timeDrag) {
                     streamer.currentTime = o.time;
@@ -1601,7 +1602,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 _initHideMobileVideoControls($wrapper);
             }
 
-            $('.video-progress-time', $videoControls).css('display', '');
+            $progressTimeBar.css('display', '');
         });
 
         $document.rebind('mousemove.videoprogress', function(e) {
@@ -1610,12 +1611,16 @@ FullScreenManager.prototype.enterFullscreen = function() {
             }
         });
 
-        $progress.rebind('mousemove.videoprogress', function(e) {
-            $('.video-progress-time', $videoControls).css('left', (getX(e) - 15.4) + 'px')
-                .text(secondsToTimeShort(getTimeOffset(getX(e)).time, 1));
-            $('.video-expected-time-bar', $videoControls)
-                .css('width', 100 * (getX(e) - $progress.offset().left) / $progress.width() + '%');
-        });
+        const _hoverAction = e => {
+
+            const x = getX(e);
+
+            $progressTimeBar.text(secondsToTimeShort(getTimeOffset(x).time, 1));
+            $expectTimeBar.css('width', `${100 * (x - $progress.offset().left) / $progress.width()}%`);
+        };
+
+        $progress.rebind('mousemove.videoprogress',_hoverAction);
+        $('.video-progress-block', $videoControls).rebind('mouseenter.videoprogress', _hoverAction);
 
         $progress.rebind('touchmove.videoprogress', function(e) {
             updatebar(getX(e));

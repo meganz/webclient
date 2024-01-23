@@ -658,21 +658,22 @@
             .media-viewer .video-progress-block {
                 flex: 1 1 auto;
                 width: 100%;
+                height: 6px;
+                display: flex;
+                align-items: center;
             }
             .media-viewer .video-progress-bar {
                 background: var(--progress-bar-background);
-                border-radius: 2px;
+                border-radius: 3px;
                 cursor: pointer;
                 height: 2px;
-                margin: 2px 0;
                 position: relative;
                 text-align: left;
-                transition: var(--transition-all);
+                transition: var(--transition-height);
+                width: 100%;
             }
             .video-progress-block:hover .video-progress-bar {
-                border-radius: 3px;
-                height: 6px;
-                margin: 0;
+                height: 100%;
             }
             .media-viewer .video-time-bar,
             .media-viewer .video-buffer-bar {
@@ -714,9 +715,11 @@
                 display: none;
                 position: absolute;
                 background-color: var(--surface-black-bar);
-                bottom: 74px;
                 color: var(--text-color-high);
                 font: var(--text-body2);
+                top: -24px;
+                right: 0;
+                transform: translateX(50%);
             }
             .media-viewer .video-progress-block:hover .video-progress-time {
                 display: block;

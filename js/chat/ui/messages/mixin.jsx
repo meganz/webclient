@@ -137,6 +137,11 @@ class ConversationMessageMixin extends ContactAwareComponent {
         }
     }
 
+    eventuallyUpdate() {
+        super.eventuallyUpdate();
+        this.__cmmUpdateTickCount = -2;
+    }
+
     handleChangeEvent(x, z, k) {
         // no updates needed in case of 'ts' or 'ats' change
         // e.g. reduce recursion of full history re-render in case of a new message is sent to a room.
@@ -145,10 +150,21 @@ class ConversationMessageMixin extends ContactAwareComponent {
         }
         // console.warn('xyz', this.__cmmUpdateTickCount, this.__cmmId, [this]);
 
-        delay(this.__cmmId, () => {
-            this.eventuallyUpdate();
-            this.__cmmUpdateTickCount = -2;
-        }, ++this.__cmmUpdateTickCount > 5 ? -1 : 90);
+        if (this.isComponentEventuallyVisible()) {
+
+            if (++this.__cmmUpdateTickCount > 5) {
+
+                this.eventuallyUpdate();
+                delay.cancel(this.__cmmId);
+            }
+            else {
+
+                delay(this.__cmmId, () => this.eventuallyUpdate(), 90);
+            }
+        }
+        else {
+            this._requiresUpdateOnResize = true;
+        }
     }
 
     componentWillUnmount() {

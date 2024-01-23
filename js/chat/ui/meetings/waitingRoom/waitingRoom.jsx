@@ -418,6 +418,7 @@ export default class WaitingRoom extends MegaRenderMixin {
         super.componentWillUnmount();
         clearInterval(this.redirectInterval);
         this.props.chatRoom.unbind(`onCallLeft.${NAMESPACE}`);
+        this.props.chatRoom.unbind(`onModeratorAdd.${NAMESPACE}`);
     }
 
     componentDidMount() {

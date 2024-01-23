@@ -417,6 +417,12 @@ lazy(mega, 'sets', () => {
             }
         }
 
+        // No need in tmp value, can be removed now
+        if ($.albumImport) {
+            delete mega.gallery.albums.store[$.albumImport.id];
+            delete $.albumImport;
+        }
+
         const payload = await add(albumName);
         const { id, k } = payload;
         const elArr = await elements.bulkAdd(handlesToAdd, id, k);
@@ -445,7 +451,7 @@ lazy(mega, 'sets', () => {
             content: l.album_added.replace('%s', albumName)
         });
 
-        return M.openFolder('albums');
+        return M.openFolder('albums', true);
     };
 
     /**
@@ -474,6 +480,11 @@ lazy(mega, 'sets', () => {
      * @returns {Promise}
      */
     const copyNodesAndSet = async(selectedNodes, targetHandle) => {
+        // Temporarily adding the importing album data to the albums list
+        if (!mega.gallery.albums[$.albumImport.id]) {
+            mega.gallery.albums.store[$.albumImport.id] = $.albumImport;
+        }
+
         const tree = $.onImportCopyNodes;
         const [albumNode] = tree;
         const node = crypto_decryptnode({...albumNode});

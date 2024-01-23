@@ -16152,6 +16152,7 @@ class Recurring extends mixins.wl {
       const nextDate = new Date(nextProps.startDateTime);
       nextState.monthDays = [nextDate.getDate()];
       nextState.offset.weekDay = ((_Object$values$find2 = Object.values(this.WEEK_DAYS).find(d => d.value === nextDate.getDay())) == null ? void 0 : _Object$values$find2.value) || this.WEEK_DAYS.SUNDAY.value;
+      nextState.monthDaysWarning = nextState.monthDays > 28;
     }
     if (nextState.view === this.VIEWS.MONTHLY && this.state.interval > 12) {
       nextState.interval = 12;

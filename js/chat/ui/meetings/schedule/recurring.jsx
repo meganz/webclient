@@ -518,6 +518,7 @@ export default class Recurring extends MegaRenderMixin {
             nextState.offset.weekDay =
                 Object.values(this.WEEK_DAYS).find(d => d.value === nextDate.getDay())?.value ||
                 this.WEEK_DAYS.SUNDAY.value;
+            nextState.monthDaysWarning = nextState.monthDays > 28;
         }
 
         // Reset interval when selecting `Monthly` if the current interval is more than `12`, e.g. 52 weeks

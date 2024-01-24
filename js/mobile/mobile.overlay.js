@@ -142,6 +142,10 @@ class MegaMobileOverlay extends MegaMobileComponent {
         });
 
         this.domNode.classList.add('active');
+
+        if (mega.flags.ab_ads) {
+            mega.commercials.updateOverlays(undefined, true);
+        }
     }
 
     hide() {
@@ -149,6 +153,10 @@ class MegaMobileOverlay extends MegaMobileComponent {
 
         mainlayout.classList.remove('fm-overlay');
         document.documentElement.classList.remove('overlayed');
+
+        if (mega.flags.ab_ads) {
+            mega.commercials.updateOverlays();
+        }
     }
 
     clear() {

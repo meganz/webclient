@@ -1517,6 +1517,7 @@ label.iPhoneCheckLabelOff span {
     height: 100%;
     min-width: 100%;
     position: relative;
+    display: grid;
 }
 .content-panel {
     display: none;

@@ -395,7 +395,8 @@ mobile.cloud = {
 
         this.bottomBar = new MegaMobileBottomBar({
             parentNode: document.getElementById('fmholder'),
-            actions: [[actions]]
+            actions: [[actions]],
+            adWrapper: 'adFolder'
         });
     }
 };

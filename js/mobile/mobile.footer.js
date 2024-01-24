@@ -67,6 +67,9 @@ class MegaMobileFooter extends MegaMobileComponent {
                 }
             }
         ];
+        if (mega.flags.ab_ads) {
+            mega.commercials.init();
+        }
     }
 
     static init() {

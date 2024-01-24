@@ -27,6 +27,9 @@ class MegaMobileSheet extends MegaMobileOverlay {
 
         this.domNode.megaSheetType = sheetType;
         this.domNode.classList.add(sheetType);
+        if (mega.flags.ab_ads) {
+            mega.commercials.updateOverlays(sheetType);
+        }
     }
 
     get type() {

@@ -1223,7 +1223,7 @@ FileManager.prototype.initFileManagerUI = function() {
     const lPane = $('.fm-left-panel').filter(":not(.chat-lp-body)");
     $.leftPaneResizable = new FMResizablePane(lPane, {
         'direction': 'e',
-        'minWidth': 200,
+        'minWidth': mega.flags.ab_ads ? 260 : 200,
         'maxWidth': 400,
         'persistanceKey': 'leftPaneWidth',
         'handle': '.left-pane-drag-handle',
@@ -4740,6 +4740,15 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     }
 
     // Revamp Implementation End
+
+
+    if (mega.flags.ab_ads) {
+        delay('mega:comm-setup', () => {
+            mega.commercials.init();
+            mega.commercials.getComms();
+        });
+    }
+
     if (d) {
         console.timeEnd('sectionUIOpen');
         console.groupEnd();

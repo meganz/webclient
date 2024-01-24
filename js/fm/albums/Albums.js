@@ -3536,6 +3536,12 @@ lazy(mega.gallery, 'albums', () => {
             if (M.currentdirid === 'albums/' + s) {
                 const { timeline, header } = this;
 
+                const album = mega.gallery.albums.store[s];
+
+                if (!album) {
+                    return;
+                }
+
                 // Checking if that is the first node and clearing up the empty state
                 if (album.nodes.length === 1) {
                     this.removeEmptyBlock();

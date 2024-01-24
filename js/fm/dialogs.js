@@ -1810,12 +1810,15 @@
 
             $tooltip.find('.contacts-info.body')
                 .safeHTML(
+                    '<div class="user-card-wrap">' +
                     avatar +
                     '<div class="user-card-data no-status">' +
                     '  <div class="user-card-name small selectable-txt">@@<span class="grey">(@@)</span></div>' +
                     '  <div class="user-card-email selectable-txt small">@@</div>' +
-                    '  <div class="user-card-email selectable-txt small @@">@@</div>' +
-                    '</div>', displayName || '', l[8664], user.m || '', note ? 'note' : '', note || ''
+                    '</div>' +
+                    '</div>' +
+                    ' <div class="user-card-email selectable-txt small @@">@@</div>',
+                    displayName || '', l[8664], user.m || '', note ? 'note' : '', note || ''
                 );
 
             clearTimeout(dialogTooltipTimer);

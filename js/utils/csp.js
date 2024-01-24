@@ -8,14 +8,15 @@ lazy(self, 'csp', () => {
     const pid = Math.random().toString(28).slice(-6);
 
     // Cookie settings.
-    const CS_ESSENT = 1 << 0;
-    const CS_PREFER = 1 << 1;
-    const CS_ANALYT = 1 << 2;
-    const CS_ADVERT = 1 << 3;
-    const CS_THIRDP = 1 << 4;
+    const CS_ESSENT = 1 << 0;   // 1    Essential cookies
+    const CS_PREFER = 1 << 1;   // 2    Preference cookies
+    const CS_ANALYT = 1 << 2;   // 4    Analytics cookies
+    const CS_ADVERT = 1 << 3;   // 8    Advertisement cookies
+    const CS_THIRDP = 1 << 4;   // 16   Thirdparty cookies
+    const CS_SETADS = 1 << 5;   // 32   Check if ads cookies are correctly set.
 
     const bitdef = {
-        cs: {s: CS_ESSENT, r: CS_PREFER, n: CS_ANALYT, d: CS_ADVERT, h: CS_THIRDP}
+        cs: {s: CS_ESSENT, r: CS_PREFER, n: CS_ANALYT, d: CS_ADVERT, h: CS_THIRDP, e: CS_SETADS},
     };
 
     const sgValue = async(newValue, byUser) => {
@@ -45,6 +46,7 @@ lazy(self, 'csp', () => {
                     return;
                 }
 
+                u_attr['^!csp'] = String(newValue);
                 storage['csp.' + u_handle] = newValue;
                 const res = srv === newValue ? -srv : mega.attr.set('csp', newValue, -2, 1);
 
@@ -73,7 +75,7 @@ lazy(self, 'csp', () => {
         };
 
         (function check(page) {
-            if (pfid || exclude[String(page).split('/')[0]]) {
+            if (!mega.flags.ab_adse && (pfid || exclude[String(page).split('/')[0]])) {
                 return mBroadcaster.once('pagechange', check);
             }
             if ($.msgDialog) {
@@ -99,6 +101,11 @@ lazy(self, 'csp', () => {
             const chg = value && mega.user && value !== val ? value : false;
 
             value = val;
+            if (mega.flags.ab_adse && !csp.has('setad')) {
+                // reset and ask to re-configure per new requirements.
+                value = 0;
+            }
+
             if (chg || !csp.has('essential')) {
                 await canShowDialog();
                 await csp.showCookiesDialog(chg);
@@ -153,6 +160,11 @@ lazy(self, 'csp', () => {
                 step = null;
             }
 
+            // Show advertisement cookies option if commercials are enabled.
+            if (mega.flags.ab_adse) {
+                dialog.querySelector('.settings-row.advertisement').classList.remove('hidden');
+            }
+
             const $banner = $(banner);
             const $dialog = $(dialog);
             const first = !csp.has('essential');
@@ -195,11 +207,30 @@ lazy(self, 'csp', () => {
                     all('.saved');
                     all('.current');
 
+                    if (mega.flags.ab_adse) {
+                        banner.querySelector('.info .experiment').classList.remove('hidden');
+                    }
+                    else {
+                        banner.querySelector('.info .current').classList.remove('hidden');
+                    }
+
                     return false;
                 }
 
                 banner.classList.add('hidden');
                 M.safeShowDialog(tag, $dialog);
+
+                // Add settings policy link to the last dialog option, if it does not already have them.
+                const $settingsLinks = $('.settings-links.hidden', $dialog).clone().removeClass('hidden');
+                const $lastSetting =
+                    $('.settings-row:not(.hidden) .settings-cell:not(.current):not(.saved)', $dialog).last();
+
+                if (!$('.settings-links', $lastSetting).length){
+
+                    // It's possible that it was previously added to another option, remove it from all options first.
+                    $('.settings-row .settings-links', $dialog).remove();
+                    $lastSetting.safeAppend($settingsLinks.prop('outerHTML'));
+                }
 
                 if (chg) {
                     dialog.classList.add('active-saved-cookies');
@@ -312,13 +343,18 @@ lazy(self, 'csp', () => {
 
                 value = CS_ESSENT;
                 forEachCell((type, toggle) => {
-                    if (toggle.classList.contains('toggle-on')) {
+                    if (toggle.classList.contains('toggle-on')
+                    && !toggle.closest('.settings-row').classList.contains('hidden')) {
                         value |= bitdef.cs[type[1]];
                     }
                     else {
                         value &= ~bitdef.cs[type[1]];
                     }
                 }, ev === true ? '.saved' : '.current');
+
+                if (mega.flags.ab_adse) {
+                    value |= CS_SETADS;
+                }
 
                 await sgValue(value, true).catch(dump);
                 resolve(value);
@@ -340,6 +376,7 @@ lazy(self, 'csp', () => {
                 if (page === 'cookiedialog') {
                     window.location.replace('https://mega.io/cookie');
                 }
+                mBroadcaster.sendMessage('csp:settingsSaved');
             };
 
             value |= CS_ESSENT;
@@ -371,7 +408,36 @@ lazy(self, 'csp', () => {
                     save(-0xBADF);
                 }
             }, 7654);
-        })
+        }),
+
+        showCurrentCookies: async function() {
+
+            if (!d) {
+                return;
+            }
+
+            await csp.init();
+
+            const text = {
+                1: 'essential cookies',
+                2: 'preferences cookies',
+                4: 'analytics/performance cookies',
+                8: 'advertisement cookies',
+                16: 'thirdparty cookies',
+                32: 'set advertisement cookies',
+            };
+
+            console.group('Current Cookies: ' + localStorage[`csp.${u_handle}`]);
+            for (let i = 1; i <= 32; i *= 2) {
+                if (csp.has(text[i])) {
+                    console.info(`${i} SET: ${text[i]}`);
+                }
+                else {
+                    console.info(`${i} NOT SET: ${text[i]}`);
+                }
+            }
+            console.groupEnd();
+        }
     });
 });
 

@@ -159,6 +159,10 @@
             <div class="scrollable-block">
                 <!-- Settings !-->
                 <div class="settings">
+                    <div  class="settings-links hidden">
+                        <a class="settings-link clickurl" href="/cookie" target="_blank">[$24629]</a>
+                        <a class="settings-link clickurl" href="https://mega.io/privacy" target="_blank">[$386]</a>
+                    </div>
                     <div class="settings-row" data-type="::all">
                         <div class="settings-cell">
                             <div class="settings-header">[$24643]</div>
@@ -213,10 +217,6 @@
                         <div class="settings-cell">
                             <div class="settings-header">[$24654]</div>
                             <div class="settings-text">[$24655] </div>
-                            <div  class="settings-links">
-                                <a class="settings-link clickurl" href="/cookie" target="_blank">[$24629]</a>
-                                <a class="settings-link clickurl" href="https://mega.io/privacy" target="_blank">[$386]</a>
-                            </div>
                         </div>
                         <div class="settings-cell current">
                             <div class="mega-switch" role="switch" aria-checked="false" tabindex="0">
@@ -229,7 +229,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="settings-row hidden" data-type="advetisement">
+                    <div class="settings-row advertisement hidden" data-type="advertisement">
                         <div class="settings-cell">
                             <div class="settings-header">[$24656]</div>
                             <div class="settings-text">[$24657]</div>
@@ -351,9 +351,12 @@
 
             <header>
                 <div class="info">
-                    <h3 id="cookie-banner-title">[$your_privacy]</h3>
-                    <p>
+                    <h3 id="cookie-banner-title">[$cookie_manage_cookies]</h3>
+                    <p class="current hidden">
                         [$cookie_banner_txt]
+                    </p>
+                    <p class="experiment hidden">
+                        [$cookie_banner_txt_upd_cookies]
                     </p>
                 </div>
             </header>

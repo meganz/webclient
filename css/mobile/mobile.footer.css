@@ -27,3 +27,21 @@
 .general-actions .nav-elem span {
     font: var(--mobile-font-link-large-regular);
 }
+
+@media only screen and (min-width: 360px) {
+    .mega-footer.commercials {
+        margin-bottom: 75px;
+    }
+}
+
+@media only screen and (min-width: 1024px) {
+    .mega-footer.commercials {
+        margin-bottom: 125px;
+    }
+}
+
+@media only screen and (max-height: 600px), (max-width: 360px) {
+    .mega-footer.commercials {
+        margin-bottom: 0;
+    }
+}

@@ -288,6 +288,10 @@ class MegaMobileTopMenu extends MegaMobileComponent {
 
         const page = MegaMobileTopMenu.getPageRoot();
 
+        if (mega.flags.ab_ads) {
+            mega.commercials.mobileFmTabHander();
+        }
+
         for (const item of this.domNode.querySelectorAll('.menu-item')) {
 
             const isASharesPage = item.dataset.section === '/fm/shares' &&

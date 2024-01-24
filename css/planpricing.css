@@ -331,7 +331,8 @@
     font: var(--text-h5-pricing);
 }
 .pricing-get-free-banner .pricing-get-free-storage,
-.pricing-get-free-banner .pricing-get-free-transfer {
+.pricing-get-free-banner .pricing-get-free-transfer,
+.pricing-get-free-banner .pricing-get-free-ads {
     display: flex;
     align-items: center;
     gap: 8px;

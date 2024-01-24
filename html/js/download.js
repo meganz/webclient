@@ -627,6 +627,10 @@ async function setupSingleDownloadPage(res) {
             dlPageStartDownload();
         }
     }
+
+    if (mega.flags.ab_ads && !is_mobile) {
+        mega.commercials.init();
+    }
 }
 
 function initDownloadScroll() {

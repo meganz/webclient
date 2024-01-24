@@ -1207,6 +1207,10 @@ var slideshowid;
 
                     slideshow_imgPosition($overlay);
 
+                    if (mega.flags.ab_ads) {
+                        mega.commercials.updateOverlays();
+                    }
+
                     return false;
                 });
 

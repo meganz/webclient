@@ -103,7 +103,11 @@ function dlFatalError(dl, error, ethrow, lock) {
             // ^ Let's stop logging Incognito issues, they are too common and we do have fallback logic anyway
             // Also stop obsolete browsers (e.g. attempting to use FlashIO, sigh) from logging errors
             if (!window.Incognito && mega.es2019 && !/^[\d\s,.]+$/.test(error)) {
-                srvlog('dlFatalError: ' + error.substr(0, 72));
+                // srvlog('dlFatalError: ' + error.substr(0, 72));
+                // @todo fix the Incognito flag.
+                if (d) {
+                    dlmanager.logger.warn(`dlFatalError: ${error}`, dl);
+                }
             }
         }
     });

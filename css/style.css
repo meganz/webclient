@@ -3889,6 +3889,9 @@ body.loading .light-overlay {
     -khtml-opacity: 1;
     opacity: 1;
 }
+.transfer-completed .link-transfer-status {
+    display: none;
+}
 .transfer-type::before,
 .transfer-type.upload::before,
 .transfer-type.download::before,

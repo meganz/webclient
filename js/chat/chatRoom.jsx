@@ -1136,6 +1136,11 @@ ChatRoom.prototype.leave = function(notify) {
         this.setState(ChatRoom.STATE.LEAVING);
         this.setState(ChatRoom.STATE.LEFT);
     }
+    if (this.activeCallIds.length) {
+        for (const activeCallId of this.activeCallIds.keys()) {
+            this.activeCallIds.remove(activeCallId);
+        }
+    }
 };
 
 /**
@@ -2699,7 +2704,7 @@ ChatRoom.prototype.exportToFile = function() {
         })
         .catch(ex => {
             if (d) {
-                console.error('Chat export: ', ex);
+                console.warn('Chat export: ', ex);
             }
             const report = [
                 String(ex && ex.message || ex).replace(/\s+/g, '').substring(0, 64),

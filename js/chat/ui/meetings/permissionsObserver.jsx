@@ -311,7 +311,7 @@ export const withPermissionsObserver = Component => {
                                 }
                             })
                     }>
-                    <i className="sprite-fm-mono icon-exclamation-filled"/>
+                    <i className="sprite-fm-mono icon-exclamation-filled" />
                     {this.state[`dialog-${av}`] && this.renderPermissionsDialog(av, child)}
                 </div>
             );

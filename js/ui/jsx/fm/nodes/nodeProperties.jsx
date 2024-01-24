@@ -180,6 +180,10 @@ export class NodeProperties {
         let node = this.node;
 
         lazy(this, 'title', () => {
+            if (missingkeys[node.h]) {
+                /* `undecryptable file/folder` */
+                return node.t ? l[8686] : l[8687];
+            }
             return M.getNameByHandle(node.h);
         });
         lazy(this, 'classNames', () => {

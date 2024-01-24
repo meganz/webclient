@@ -816,6 +816,7 @@
 
 .mobile.mega-input.strengthChecker.msg:not(.error) .message-container {
     color: var(--mobile-text-secondary);
+    display: flex;
 }
 
 .mobile.mega-input.strengthChecker .account-pass-lines {

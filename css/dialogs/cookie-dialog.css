@@ -65,6 +65,11 @@
     margin-inline-end: 8px;
 }
 
+/* Cookies banner */
+.mega-banner-template.cookie-banner .content {
+    min-height: 72px;
+}
+
 /* Step 1. Common info */
 .cookie-dialog .scrollable-block.big-pad {
     padding: 62px 50px;

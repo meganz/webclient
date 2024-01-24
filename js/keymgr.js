@@ -32,14 +32,14 @@ lazy(mega, 'keyMgr', () => {
             }
             else if (debug && !String(n.k).includes(`${h}:`)) {
 
-                debug.push(`Invalid key on ${h}/${n.h}, ${n.k}`);
+                debug.push(`Invalid key on ${h}/${n.h}, ${n.k || '<empty!>'}`);
             }
         }
 
         if (nodes.length) {
             if (debug) {
-                console.group(`${logger.name}: Trying to decrypt ${h}/${nodes}...`);
-                debug.map(m => logger.error(m));
+                console.groupCollapsed(`${logger.name}: Trying to decrypt ${h}/${nodes}...`);
+                debug.map(m => logger.info(m));
             }
             const fixed = crypto_fixmissingkeys(array.to.object(nodes));
 

@@ -6,8 +6,12 @@ import Invite from './workflow/invite/invite.jsx';
 import Ephemeral from './workflow/ephemeral.jsx';
 import Offline from './offline.jsx';
 import { allContactsInChat, excludedParticipants } from '../conversationpanel.jsx';
-import StreamControls from './streamControls';
-import SidebarControls from './sidebarControls';
+import StreamControls from './streamControls.jsx';
+import SidebarControls from './sidebarControls.jsx';
+import Button from './button.jsx';
+import ModalDialogsUI from '../../../ui/modalDialogs.jsx';
+import { ParsedHTML } from '../../../ui/utils.jsx';
+import Link from "../link.jsx";
 
 const NAMESPACE = 'meetings-call';
 export const EXPANDED_FLAG = 'in-call';
@@ -122,9 +126,71 @@ export const inProgressAlert = (isJoin, chatRoom) => {
     });
 };
 
+class RecordingConsentDialog extends MegaRenderMixin {
+    static dialogName = `${NAMESPACE}-consent`;
+
+    render() {
+        const { recorder, onCallEnd, onClose } = this.props;
+        const recorderName = nicknames.getNickname(recorder).substr(0, ChatToastIntegration.MAX_NAME_CHARS);
+
+        return (
+            <ModalDialogsUI.ModalDialog
+                dialogName={RecordingConsentDialog.dialogName}
+                className={`
+                    mega-dialog
+                    dialog-template-message
+                    info
+                `}
+                stopKeyPropagation={true}
+                noCloseOnClickOutside={true}>
+                <header>
+                    <div className="graphic">
+                        <i className="info sprite-fm-uni icon-info"/>
+                    </div>
+                    <div className="info-container">
+                        <h3 id="msgDialog-title">{l.call_recorded_heading}</h3>
+                        <p className="text">
+                            <ParsedHTML>
+                                {l.call_recorded_body
+                                    .replace(
+                                        '[A]',
+                                        `<a href="https://mega.io/privacy" target="_blank" class="clickurl">`
+                                    )
+                                    .replace('[/A]', '</a>')
+                                }
+                            </ParsedHTML>
+                        </p>
+                    </div>
+                </header>
+                <footer>
+                    <div className="footer-container">
+                        <div className="space-between">
+                            <Button
+                                className="mega-button"
+                                onClick={onCallEnd}>
+                                <span>{l[5883]}</span>
+                            </Button>
+                            <Button
+                                className="mega-button positive"
+                                onClick={() => {
+                                    onClose();
+                                    ChatToast.quick(l.user_recording_toast.replace('%NAME', recorderName));
+                                }}>
+                                <span>{l.ok_button}</span>
+                            </Button>
+                        </div>
+                    </div>
+                </footer>
+            </ModalDialogsUI.ModalDialog>
+        );
+    }
+}
+
 // --
 
 export default class Call extends MegaRenderMixin {
+
+    recordingConsentDialog = `${NAMESPACE}-consent`;
 
     ephemeralAddListener = undefined;
     delayProcID = null;
@@ -159,7 +225,11 @@ export default class Call extends MegaRenderMixin {
         guest: isGuest(),
         waitingRoomPeers: [],
         initialCallRinging: false,
-        onboarding: false
+        onboardingUI: false,
+        onboardingRecording: false,
+        recorder: undefined,
+        recordingConsentDialog: false,
+        recordingConsented: false
     };
 
     /**
@@ -205,10 +275,30 @@ export default class Call extends MegaRenderMixin {
         const { SOUNDS } = megaChat;
         [SOUNDS.RECONNECT, SOUNDS.CALL_END, SOUNDS.CALL_JOIN_WAITING].map(sound => ion.sound.preload(sound));
         this.state.mode = props.call.viewMode;
-        this.state.onboarding = this.state.hovered = this.flagMap && !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_UI);
+        // TODO: refactor and transition to `ChatOnboarding`
+        this.state.onboardingUI = this.state.hovered = this.flagMap && !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_UI);
+        if (!this.state.onboardingUI) {
+            this.state.onboardingRecording = this.state.hovered =
+                this.flagMap && !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_RECORDING);
+        }
         this.handleMouseMove = this.handleMouseMove.bind(this);
         this.handleMouseOut = this.handleMouseOut.bind(this);
     }
+
+    recordActiveStream = () => {
+        if (this.state.recorder && this.state.recorder === u_handle) {
+            const { call, peers } = this.props;
+            const activeStream =
+                peers[call.forcedActiveStream] ||
+                Object.values(peers).findLast(p => p.isScreen) ||
+                peers[call.activeStream] ||
+                peers.getItem(0);
+
+            call.sfuClient?.recordingForcePeerVideo(
+                activeStream.isScreen || !activeStream.videoMuted ? activeStream?.clientId : null
+            );
+        }
+    };
 
     /**
      * handleMouseMove
@@ -269,7 +359,7 @@ export default class Call extends MegaRenderMixin {
         if (!this.pCallTimer) {
             (this.pCallTimer = tSleep(30))
                 .then(() => {
-                    this.setState({offline: true});
+                    this.setState({ offline: true });
                 });
         }
     }
@@ -285,7 +375,7 @@ export default class Call extends MegaRenderMixin {
             this.pCallTimer.abort();
             this.pCallTimer = null;
         }
-        this.setState({offline: false});
+        this.setState({ offline: false });
     };
 
     // Force as always visible.
@@ -304,8 +394,14 @@ export default class Call extends MegaRenderMixin {
     bindCallEvents = () => {
         const { chatRoom } = this.props;
 
-        chatRoom.rebind(`onCallPeerLeft.${NAMESPACE}`, () => {
-            const { minimized, peers, call } = this.props;
+        chatRoom.rebind(`onCallPeerLeft.${NAMESPACE}`, (ev, { userHandle }) => {
+            const { minimized, peers, call, chatRoom } = this.props;
+
+            // Recording peer dropped the call -> notify all peers and update the state to reflect that
+            if (userHandle === this.state.recorder) {
+                chatRoom.trigger('onRecordingStopped', { userHandle });
+            }
+
             if (minimized) {
                 this.setState({ mode: peers.length === 0 ? MODE.THUMBNAIL : MODE.MINI }, () => {
                     call.setViewMode(this.state.mode);
@@ -369,6 +465,49 @@ export default class Call extends MegaRenderMixin {
                     this.isMounted() && this.setState({ waitingRoomPeers: [...this.state.waitingRoomPeers, handle] });
             })
         );
+
+        // --
+
+        chatRoom.rebind(`onRecordingStarted.${NAMESPACE}`, (ev, { userHandle }) => {
+            if (!this.state.recorder) {
+                return (
+                    this.state.recordingConsented ?
+                        this.setState({ recorder: userHandle }, () => {
+                            ChatToast.quick(
+                                l.user_recording_toast.replace(
+                                    '%NAME',
+                                    nicknames.getNickname(this.state.recorder)
+                                        .substr(0, ChatToastIntegration.MAX_NAME_CHARS)
+                                )
+                            );
+                        }) :
+                        M.safeShowDialog(
+                            RecordingConsentDialog.dialogName,
+                            () => this.setState({ recorder: userHandle, recordingConsentDialog: true })
+                        )
+                );
+            }
+        });
+
+        chatRoom.rebind(`onRecordingStopped.${NAMESPACE}`, (ev, { userHandle }) => {
+            const { recorder } = this.state;
+            this.setState(
+                { recordingConsentDialog: false, recorder: userHandle === recorder ? false : recorder },
+                () => {
+                    if (userHandle === recorder) {
+                        ChatToast.quick(
+                            l.user_recording_nop_toast
+                                .replace(
+                                    '%NAME',
+                                    nicknames.getNickname(userHandle).substr(0, ChatToastIntegration.MAX_NAME_CHARS)
+                                )
+                        );
+                    }
+                }
+            );
+        });
+
+        chatRoom.rebind('onPeerAvChange', () => this.recordActiveStream());
     };
 
     unbindCallEvents = () =>
@@ -379,6 +518,9 @@ export default class Call extends MegaRenderMixin {
             `wrOnUsersEntered.${NAMESPACE}`,
             `wrOnUserLeft.${NAMESPACE}`,
             `alterUserPrivilege.${NAMESPACE}`,
+            `onCallState.${NAMESPACE}`,
+            `onRecordingStarted.${NAMESPACE}`,
+            `onRecordingStopped.${NAMESPACE}`
         ]
             .map(event => this.props.chatRoom.off(event));
 
@@ -622,6 +764,132 @@ export default class Call extends MegaRenderMixin {
         onIdle(() => this.safeForceUpdate());
     };
 
+    handleRecordingToggle = () => {
+        const { sfuClient } = this.props.call;
+
+        if (this.state.recorder) {
+            return (
+                msgDialog(
+                    `confirmation:!^${l.stop_recording_dialog_cta}!${l.stop_recording_nop_dialog_cta}`,
+                    undefined,
+                    l.stop_recording_dialog_heading,
+                    l.stop_recording_dialog_body,
+                    cb => cb &&
+                        this.setState({ recorder: undefined }, () => {
+                            sfuClient.recordingStop();
+                            ChatToast.quick(l.stopped_recording_toast);
+                        }),
+                    1
+                )
+            );
+        }
+
+        msgDialog(
+            `warningb:!^${l.start_recording_dialog_cta}!${l[82]}`,
+            null,
+            l.notify_participants_dialog_heading,
+            l.notify_participants_dialog_body,
+            cb => {
+                if (cb || cb === null) {
+                    return;
+                }
+                sfuClient.recordingStart()
+                    .then(() => {
+                        this.setState({ recorder: u_handle });
+                        this.handleModeChange(MODE.MAIN);
+                        this.recordActiveStream();
+                        ChatToast.quick(l.started_recording_toast);
+                    })
+                    .catch(dump);
+            },
+            1
+        );
+    };
+
+    renderRecordingControl = () => {
+        const { recorder } = this.state;
+        const isModerator = Call.isModerator(this.props.chatRoom, u_handle);
+        const $$CONTAINER = ({ className, onClick, children }) =>
+            <div
+                className={`recording-control ${className || ''}`}
+                onClick={onClick}>{children}</div>;
+
+        if (recorder) {
+            const simpletip = {
+                'data-simpletip': `${nicknames.getNickname(recorder)} is recording`,
+                'data-simpletipposition': 'top',
+                'data-simpletipoffset': 5,
+                'data-simpletip-class': 'theme-dark-forced'
+            };
+
+            return (
+                <$$CONTAINER className="recording-fixed">
+                    <div
+                        className={`
+                            recording-ongoing
+                            simpletip
+                            ${isModerator ? '' : 'plain-background'}
+                        `}
+                        {...(recorder !== u_handle && simpletip)}>
+                        <span className="recording-icon">
+                            REC <i/>
+                        </span>
+                        {isModerator &&
+                            <span
+                                className={`
+                                    recording-toggle
+                                    ${recorder !== u_handle ? 'disabled' : ''}
+                                `}
+                                onClick={() => {
+                                    return recorder !== u_handle ? null : this.handleRecordingToggle();
+                                }}>
+                                {l.record_stop_button /* `Stop recording` */}
+                            </span>
+                        }
+                    </div>
+                </$$CONTAINER>
+            );
+        }
+
+        const isOnHold = !!(this.props.call?.av & Av.onHold);
+        return (
+            isModerator &&
+            <$$CONTAINER
+                className={isOnHold ? 'disabled' : ''}
+                onClick={() => {
+                    this.setState({ onboardingRecording: false, hovered: false }, () => {
+                        this.flagMap.setSync(OBV4_FLAGS.CHAT_CALL_RECORDING, 1);
+                        this.flagMap.safeCommit();
+                    });
+                    return isOnHold || recorder && recorder !== u_handle ? null : this.handleRecordingToggle();
+                }}>
+                <Button
+                    className={`
+                        mega-button
+                        theme-dark-forced
+                        call-action
+                        round
+                        large
+                        recording-start
+                        ${isOnHold ? 'disabled' : ''}
+                    `}>
+                    <div>
+                        <i/>
+                    </div>
+                </Button>
+                <span className="record-label">{l.record_start_button /* `Record` */}</span>
+            </$$CONTAINER>
+        );
+    };
+
+    componentDidUpdate(prevProps, prevState) {
+        super.componentDidUpdate();
+        if (prevState.recorder !== this.state.recorder) {
+            this.props.call.recorder = this.state.recorder;
+        }
+        this.recordActiveStream();
+    }
+
     componentWillUnmount() {
         super.componentWillUnmount();
         const { minimized, willUnmount, chatRoom } = this.props;
@@ -635,6 +903,10 @@ export default class Call extends MegaRenderMixin {
 
         clearTimeout(this.callStartTimeout);
         delay.cancel('callOffline');
+
+        if ($.dialog) {
+            closeDialog();
+        }
 
         this.unbindCallEvents();
         willUnmount?.(minimized);
@@ -656,6 +928,7 @@ export default class Call extends MegaRenderMixin {
 
         chatRoom.megaChat.rebind(`sfuConnOpen.${NAMESPACE}`, this.handleCallOnline);
         chatRoom.megaChat.rebind(`sfuConnClose.${NAMESPACE}`, () => this.handleCallOffline());
+        chatRoom.rebind(`onCallState.${NAMESPACE}`, (ev, { arg }) => this.setState({ initialCallRinging: arg }));
 
         this.callStartTimeout = setTimeout(() => {
             if (!mega.config.get('callemptytout') && !call.hasOtherParticipant()) {
@@ -679,23 +952,19 @@ export default class Call extends MegaRenderMixin {
 
         this.bindCallEvents();
         didMount?.();
-
-        // --
-
-        // TODO: proper namespacing
-        chatRoom.rebind('onCallState.callComp', (ev, { arg }) => this.setState({ initialCallRinging: arg }));
     }
 
     render() {
         const { minimized, peers, call, chatRoom, parent, onDeleteMessage } = this.props;
         const {
             mode, view, sidebar, hovered, forcedLocal, invite, ephemeral, ephemeralAccounts, guest,
-            offline, onboarding, everHadPeers, initialCallRinging, waitingRoomPeers
+            offline, onboardingUI, onboardingRecording, everHadPeers, initialCallRinging, waitingRoomPeers, recorder,
+            recordingConsentDialog
         } = this.state;
         const { stayOnEnd } = call;
         const STREAM_PROPS = {
             mode, peers, sidebar, hovered, forcedLocal, call, view, chatRoom, parent, stayOnEnd,
-            everHadPeers, waitingRoomPeers,
+            everHadPeers, waitingRoomPeers, recorder,
             hasOtherParticipants: call.hasOtherParticipant(),
             isOnHold: call.sfuClient.isOnHold(), onSpeakerChange: this.handleSpeakerChange,
             onInviteToggle: this.handleInviteToggle, onStayConfirm: this.handleStayConfirm,
@@ -711,8 +980,8 @@ export default class Call extends MegaRenderMixin {
                     meetings-call
                     ${minimized ? 'minimized' : ''}
                 `}
-                onMouseMove={onboarding ? null : this.handleMouseMove}
-                onMouseOut={onboarding ? null : this.handleMouseOut}>
+                onMouseMove={onboardingUI || onboardingRecording ? null : this.handleMouseMove}
+                onMouseOut={onboardingUI || onboardingRecording ? null : this.handleMouseOut}>
                 <Stream
                     {...STREAM_PROPS}
                     minimized={minimized}
@@ -721,6 +990,10 @@ export default class Call extends MegaRenderMixin {
                     onCallExpand={this.handleCallExpand}
                     onCallEnd={this.handleCallEnd}
                     onStreamToggle={this.handleStreamToggle}
+                    onRecordingToggle={() =>
+                        // TODO: method instead a prop
+                        this.setState({ recorder: undefined }, () => call.sfuClient.recordingStop())
+                    }
                     onModeChange={this.handleModeChange}
                     onChatToggle={this.handleChatToggle}
                     onParticipantsToggle={this.handleParticipantsToggle}
@@ -745,11 +1018,17 @@ export default class Call extends MegaRenderMixin {
                 {minimized ?
                     null :
                     <>
+                        {this.renderRecordingControl()}
                         <StreamControls
                             call={call}
                             minimized={minimized}
                             peers={peers}
                             chatRoom={chatRoom}
+                            recorder={recorder}
+                            onRecordingToggle={() =>
+                                // TODO: method instead a prop
+                                this.setState({ recorder: undefined }, () => call.sfuClient.recordingStop())
+                            }
                             onAudioClick={() => call.toggleAudio()}
                             onVideoClick={() => call.toggleVideo()}
                             onScreenSharingClick={this.handleScreenSharingToggle}
@@ -758,6 +1037,7 @@ export default class Call extends MegaRenderMixin {
                             onHoldClick={this.handleHoldToggle}
                         />
                         <SidebarControls
+                            call={call}
                             chatRoom={chatRoom}
                             npeers={peers.length}
                             mode={mode}
@@ -802,15 +1082,15 @@ export default class Call extends MegaRenderMixin {
                     />
                 }
 
-                {onboarding &&
-                    <div className="meetings-call-onboarding">
+                {onboardingUI &&
+                    <div className={`${NAMESPACE}-onboarding`}>
                         <div
-                            className="mega-dialog mega-onboarding-dialog dialog-template-message"
+                            className="mega-dialog mega-onboarding-dialog dialog-template-message onboarding-UI"
                             id="ob-dialog"
                             role="dialog"
                             aria-labelledby="ob-dialog-title"
                             aria-modal="true">
-                            <i className="sprite-fm-mono icon-tooltip-arrow tooltip-arrow top" id="ob-dialog-arrow" />
+                            <i className="sprite-fm-mono icon-tooltip-arrow tooltip-arrow top" id="ob-dialog-arrow"/>
                             <header>
                                 <div>
                                     <h2 id="ob-dialog-title">{l.onboarding_call_title}</h2>
@@ -822,10 +1102,17 @@ export default class Call extends MegaRenderMixin {
                                     <button
                                         className="mega-button js-next small theme-light-forced"
                                         onClick={() => {
-                                            this.setState({ onboarding: false, hovered: false }, () => {
-                                                this.flagMap.setSync(OBV4_FLAGS.CHAT_CALL_UI, 1);
-                                                this.flagMap.safeCommit();
-                                            });
+                                            this.setState(
+                                                {
+                                                    onboardingUI: false,
+                                                    onboardingRecording:
+                                                        !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_RECORDING)
+                                                },
+                                                () => {
+                                                    this.flagMap.setSync(OBV4_FLAGS.CHAT_CALL_UI, 1);
+                                                    this.flagMap.safeCommit();
+                                                }
+                                            );
                                         }}>
                                         <span>{l.ok_button}</span>
                                     </button>
@@ -833,6 +1120,61 @@ export default class Call extends MegaRenderMixin {
                             </footer>
                         </div>
                     </div>
+                }
+
+                {onboardingRecording && Call.isModerator(chatRoom, u_handle) &&
+                    <div className={`${NAMESPACE}-onboarding`}>
+                        <div
+                            className="mega-dialog mega-onboarding-dialog dialog-template-message onboarding-recording"
+                            id="ob-dialog"
+                            role="dialog"
+                            aria-labelledby="ob-dialog-title"
+                            aria-modal="true">
+                            <i
+                                className="sprite-fm-mono icon-tooltip-arrow tooltip-arrow bottom" id="ob-dialog-arrow"
+                            />
+                            <header>
+                                <div>
+                                    <h2 id="ob-dialog-title">{l.recording_onboarding_title}</h2>
+                                    <p id="ob-dialog-text">{l.recording_onboarding_body_intro}</p>
+                                    <p id="ob-dialog-text">{l.recording_onboarding_body_details}</p>
+                                </div>
+                            </header>
+                            <footer>
+                                <div className="footer-container">
+                                    <Link
+                                        className="link-button"
+                                        to="https://help.mega.io/chats-meetings/chats/call-recording"
+                                        target="_blank">
+                                        {l[8742] /* `Learn more` */}
+                                    </Link>
+                                    <button
+                                        className="mega-button js-next small theme-light-forced"
+                                        onClick={() => {
+                                            this.setState({ onboardingRecording: false, hovered: false }, () => {
+                                                this.flagMap.setSync(OBV4_FLAGS.CHAT_CALL_RECORDING, 1);
+                                                this.flagMap.safeCommit();
+                                            });
+                                        }}>
+                                        <span>{l.ok_button /* `OK, got it` */}</span>
+                                    </button>
+                                </div>
+                            </footer>
+                        </div>
+                    </div>
+                }
+
+                {recordingConsentDialog &&
+                    <RecordingConsentDialog
+                        recorder={recorder}
+                        onClose={() =>
+                            this.setState({
+                                recordingConsentDialog: false,
+                                recordingConsented: true
+                            })
+                        }
+                        onCallEnd={this.handleCallEnd}
+                    />
                 }
             </div>
         );

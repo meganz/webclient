@@ -3950,6 +3950,13 @@ function loadfm_done(mDBload) {
             // Reposition UI elements right after hiding the loading overlay,
             // without waiting for the lazy $.tresizer() triggered by MegaRender
             fm_resize_handler(true);
+
+            // Securing previously generated public album data to use later in the importing procedure
+            if (sessionStorage.albumLinkImport) {
+                $.albumImport = Object.values(mega.gallery.albums.store)
+                    .find(({ p }) => !!p && p.ph === sessionStorage.albumLinkImport);
+                delete sessionStorage.albumLinkImport;
+            }
         });
 
         // -0x800e0fff indicates a call to loadfm() when it was already loaded

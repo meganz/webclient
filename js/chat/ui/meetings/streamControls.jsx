@@ -7,6 +7,38 @@ import { withPermissionsObserver } from './permissionsObserver.jsx';
 import Call from './call.jsx';
 import { withHostsObserver } from './hostsObserver.jsx';
 
+export const renderLeaveConfirm = (onConfirm, onRecordingToggle) =>
+    msgDialog(
+        `confirmation:!^${l.leave_call_recording_dialog_cta}!${l.leave_call_recording_dialog_nop_cta}`,
+        undefined,
+        l.leave_call_recording_dialog_heading,
+        l.leave_call_recording_dialog_body,
+        cb => {
+            if (cb) {
+                onRecordingToggle();
+                onConfirm();
+            }
+        },
+        1
+    );
+
+export const renderEndConfirm = (onConfirm, onRecordingToggle) =>
+    msgDialog(
+        `confirmation:!^${l.end_call_recording_dialog_cta}!${l.end_call_recording_dialog_nop_cta}`,
+        undefined,
+        l.end_call_recording_dialog_heading,
+        l.end_call_recording_dialog_body,
+        cb => {
+            if (cb) {
+                onRecordingToggle();
+                onConfirm();
+            }
+        },
+        1
+    );
+
+// --
+
 class StreamControls extends MegaRenderMixin {
     static NAMESPACE = 'stream-controls';
 
@@ -21,22 +53,30 @@ class StreamControls extends MegaRenderMixin {
 
     LeaveButton = withHostsObserver(
         ({ hasHost, chatRoom, confirmLeave, onLeave }) => {
+            const doLeave = () =>
+                hasHost(chatRoom.getCallParticipants()) ?
+                    // Leave the call directly w/o any further actions if
+                    // there are other hosts already present in the call.
+                    onLeave() :
+                    // Show the `Assign host and leave call` confirmation dialog
+                    confirmLeave({
+                        title: l.assign_host_leave_call /* `Assign host to leave call` */,
+                        body: l.assign_host_leave_call_details /* `You're the only host...` */,
+                        cta: l.assign_host_button /* `Assign host` */,
+                        altCta: l.leave_anyway /* `Leave anyway` */
+                    });
+
             return (
                 <Button
                     className="mega-button"
-                    onClick={() =>
-                        hasHost(chatRoom.getCallParticipants()) ?
-                            // Leave the call directly w/o any further actions if
-                            // there are other hosts already present in the call.
-                            onLeave() :
-                            // Show the `Assign host and leave call` confirmation dialog
-                            confirmLeave({
-                                title: l.assign_host_leave_call /* `Assign host to leave call` */,
-                                body: l.assign_host_leave_call_details /* `You're the only host on this call...` */,
-                                cta: l.assign_host_button /* `Assign host` */,
-                                altCta: l.leave_anyway /* `Leave anyway` */
-                            })
-                    }>
+                    onClick={() => {
+                        const { recorder, onRecordingToggle } = this.props;
+                        return (
+                            recorder && recorder === u_handle ?
+                                renderLeaveConfirm(doLeave, onRecordingToggle) :
+                                doLeave()
+                        );
+                    }}>
                     <span>{l.leave /* `Leave` */}</span>
                 </Button>
             );
@@ -80,8 +120,9 @@ class StreamControls extends MegaRenderMixin {
     };
 
     renderEndCallOptions = () => {
-        const { chatRoom, onCallEnd } = this.props;
+        const { chatRoom, recorder, onRecordingToggle, onCallEnd } = this.props;
         const { endCallOptions, endCallPending } = this.state;
+        const doEnd = () => this.setState({ endCallPending: true }, () => chatRoom.endCallForAll());
 
         return (
             <div
@@ -93,6 +134,7 @@ class StreamControls extends MegaRenderMixin {
                 <div className="end-options-content">
                     <this.LeaveButton
                         chatRoom={chatRoom}
+                        recorder={recorder}
                         participants={chatRoom.getCallParticipants()}
                         onLeave={onCallEnd}
                         onConfirmDenied={onCallEnd}
@@ -103,11 +145,12 @@ class StreamControls extends MegaRenderMixin {
                             positive
                             ${endCallPending ? 'disabled' : ''}
                         `}
-                        onClick={() =>
-                            endCallPending ?
-                                null :
-                                this.setState({ endCallPending: true }, () => chatRoom.endCallForAll())
-                        }>
+                        onClick={() => {
+                            if (recorder && recorder === u_handle) {
+                                return renderEndConfirm(doEnd, onRecordingToggle);
+                            }
+                            return doEnd();
+                        }}>
                         <span>{l.end_for_all /* `End for all` */}</span>
                     </Button>
                 </div>
@@ -116,28 +159,42 @@ class StreamControls extends MegaRenderMixin {
     };
 
     renderEndCall = () => {
-        const { chatRoom, peers, onCallEnd } = this.props;
+        const { chatRoom, peers, recorder, onRecordingToggle, onCallEnd } = this.props;
+
         return (
             <div
                 ref={this.endContainerRef}
-                className="end-call-container">
+                className="end-call-container"
+                onClick={() => {
+                    // Host on a group call w/ other peers in the call -> show the end call options menu;
+                    // see `renderEndCallOptions`
+                    if (chatRoom.type !== 'private' && peers.length && Call.isModerator(chatRoom, u_handle)) {
+                        return (
+                            this.setState(state => ({ endCallOptions: !state.endCallOptions }), () =>
+                                this.endButtonRef && $(this.endButtonRef.current).trigger('simpletipClose')
+                            )
+                        );
+                    }
+
+                    // Call recording is ongoing -> confirm before ending the call
+                    if (recorder && recorder === u_handle) {
+                        return chatRoom.type === 'private' ?
+                            renderEndConfirm(onCallEnd, onRecordingToggle) :
+                            renderLeaveConfirm(onCallEnd, onRecordingToggle);
+                    }
+
+                    return onCallEnd();
+                }}>
                 {this.renderEndCallOptions()}
                 <Button
                     simpletip={{ ...this.SIMPLETIP, label: l[5884] /* `End call` */ }}
-                    className="mega-button theme-dark-forced round large negative end-call"
-                    icon="icon-end-call"
+                    className="mega-button theme-dark-forced round negative end-call"
+                    icon="icon-phone-02"
                     didMount={button => {
                         this.endButtonRef = button.buttonRef;
                     }}
-                    onClick={() =>
-                        chatRoom.type !== 'private' && peers.length && Call.isModerator(chatRoom, u_handle) ?
-                            this.setState(state => ({ endCallOptions: !state.endCallOptions }), () =>
-                                this.endButtonRef && $(this.endButtonRef.current).trigger('simpletipClose')
-                            ) :
-                            onCallEnd()
-                    }>
-                    <span>{l[5884] /* `End call` */}</span>
-                </Button>
+                />
+                <span>End</span>
             </div>
         );
     };
@@ -154,16 +211,11 @@ class StreamControls extends MegaRenderMixin {
 
     render() {
         const {
-            call, chatRoom, signal, onAudioClick, onVideoClick, onScreenSharingClick, onHoldClick, renderSignalWarning,
+            call, signal, onAudioClick, onVideoClick, onScreenSharingClick, onHoldClick, renderSignalWarning,
             hasToRenderPermissionsWarning, renderPermissionsWarning, resetError, blocked, renderBlockedWarning
         } = this.props;
         const avFlags = call.av;
-        const audioLabel = avFlags & Av.Audio ? l[16214] /* `Mute` */ : l[16708] /* `Unmute` */;
-        const videoLabel = avFlags & Av.Camera ? l[22894] /* `Disable video` */ : l[22893] /* `Enable video` */;
-        const screenSharingLabel = avFlags & Av.Screen
-            ? l[22890] /* `End screen sharing` */
-            : l[22889]; /* `Start screen sharing` */
-        const callHoldLabel = avFlags & Av.onHold ? l[23459] /* `Resume call` */ : l[23460] /* `Hold call` */;
+        const isOnHold = avFlags & Av.onHold;
 
         //
         // `StreamControls`
@@ -173,89 +225,104 @@ class StreamControls extends MegaRenderMixin {
             <>
                 {blocked && renderBlockedWarning()}
                 <div className={StreamControls.NAMESPACE}>
-                    {d ? this.renderDebug() : ''}
+                    {d && nop() ? this.renderDebug() : ''}
                     <ul>
-                        <li>
+                        <li
+                            className={isOnHold ? 'disabled' : ''}
+                            onClick={() => {
+                                if (isOnHold) {
+                                    return;
+                                }
+                                resetError(Av.Audio);
+                                onAudioClick();
+                            }}>
                             <Button
-                                simpletip={{ ...this.SIMPLETIP, label: audioLabel }}
                                 className={`
                                     mega-button
                                     theme-light-forced
+                                    call-action
                                     round
-                                    large
-                                    ${avFlags & Av.onHold ? 'disabled' : ''}
-                                    ${avFlags & Av.Audio ? '' : 'inactive'}
+                                    ${isOnHold ? 'disabled' : ''}
+                                    ${avFlags & Av.Audio || isOnHold ? '' : 'with-fill'}
                                 `}
-                                icon={`${avFlags & Av.Audio ? 'icon-audio-filled' : 'icon-audio-off'}`}
-                                onClick={() => {
-                                    resetError(Av.Audio);
-                                    onAudioClick();
-                                }}>
-                                <span>{audioLabel}</span>
-                            </Button>
+                                icon={avFlags & Av.Audio ? 'icon-mic-thin-outline' : 'icon-mic-off-thin-outline'}
+                            />
+                            <span>{l.mic_button /* `Mic` */}</span>
                             {signal ? null : renderSignalWarning()}
                             {hasToRenderPermissionsWarning(Av.Audio) ? renderPermissionsWarning(Av.Audio) : null}
                         </li>
-                        <li>
+                        <li
+                            className={isOnHold ? 'disabled' : ''}
+                            onClick={() => {
+                                if (isOnHold) {
+                                    return;
+                                }
+                                resetError(Av.Camera);
+                                onVideoClick();
+                            }}>
                             <Button
-                                simpletip={{ ...this.SIMPLETIP, label: videoLabel }}
                                 className={`
                                     mega-button
                                     theme-light-forced
+                                    call-action
                                     round
-                                    large
-                                    ${avFlags & Av.onHold ? 'disabled' : ''}
-                                    ${avFlags & Av.Camera ? '' : 'inactive'}
+                                    ${isOnHold ? 'disabled' : ''}
+                                    ${avFlags & Av.Camera || isOnHold ? '' : 'with-fill'}
                                 `}
-                                icon={`${avFlags & Av.Camera ? 'icon-video-call-filled' : 'icon-video-off'}`}
-                                onClick={() => {
-                                    resetError(Av.Camera);
-                                    onVideoClick();
-                                }}>
-                                <span>{videoLabel}</span>
-                            </Button>
+                                icon={avFlags & Av.Camera ? 'icon-video-thin-outline' : 'icon-video-off-thin-outline'}
+                            />
+                            <span>{l.camera_button /* `Camera` */}</span>
                             {hasToRenderPermissionsWarning(Av.Camera) ? renderPermissionsWarning(Av.Camera) : null}
                         </li>
-                        <li>
+                        <li
+                            className={isOnHold ? 'disabled' : ''}
+                            onClick={() => {
+                                if (isOnHold) {
+                                    return;
+                                }
+                                resetError(Av.Screen);
+                                onScreenSharingClick();
+                            }}>
                             <Button
                                 key="screen-sharing"
-                                simpletip={{ ...this.SIMPLETIP, label: screenSharingLabel }}
                                 className={`
                                     mega-button
                                     theme-light-forced
+                                    call-action
                                     round
-                                    large
-                                    ${avFlags & Av.onHold ? 'disabled' : ''}
-                                    ${avFlags & Av.Screen ? 'active' : ''}
+                                    ${isOnHold ? 'disabled' : ''}
+                                    ${avFlags & Av.Screen ? 'with-fill' : ''}
                                 `}
-                                icon={avFlags & Av.Screen ? 'icon-end-screenshare' : 'icon-screen-share'}
-                                onClick={() => {
-                                    resetError(Av.Screen);
-                                    onScreenSharingClick();
-                                }}>
-                                <span>{screenSharingLabel}</span>
-                            </Button>
-                            {
-                                hasToRenderPermissionsWarning(Av.Screen)
-                                    ? renderPermissionsWarning(Av.Screen, this)
-                                    : null
+                                icon={avFlags & Av.Screen ? 'icon-monitor-off' : 'icon-monitor'}
+                            />
+                            <span>
+                                {avFlags & Av.Screen ?
+                                    l.screenshare_stop_button /* `Stop sharing` */ :
+                                    l.screenshare_button /* `Share` */
+                                }
+                            </span>
+                            {hasToRenderPermissionsWarning(Av.Screen) ?
+                                renderPermissionsWarning(Av.Screen, this) :
+                                null
                             }
                         </li>
-                        <li>
+                        <li onClick={onHoldClick}>
                             <Button
                                 key="call-hold"
-                                simpletip={{ ...this.SIMPLETIP, label: callHoldLabel }}
                                 className={`
                                     mega-button
                                     theme-light-forced
+                                    call-action
                                     round
-                                    large
-                                    ${avFlags & Av.onHold ? 'active' : ''}
+                                    ${isOnHold ? 'with-fill' : ''}
                                 `}
-                                icon={avFlags & Av.onHold ? 'icon-play' : 'icon-pause'}
-                                onClick={onHoldClick}>
-                                <span>{callHoldLabel}</span>
-                            </Button>
+                                icon={
+                                    isOnHold ?
+                                        'icon-play-small-regular-outline' :
+                                        'icon-pause-small-regular-outline'
+                                }
+                            />
+                            <span>{isOnHold ? l.resume_call_button /* `Resume` */ : l.hold_button /* `Hold` */}</span>
                         </li>
                         <li>
                             {this.renderEndCall()}

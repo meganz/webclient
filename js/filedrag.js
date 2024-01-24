@@ -326,6 +326,13 @@
 
         useMegaSync = -1;
 
+        const elem = e.target;
+        const isFolderUpload = elem.hasAttribute('webkitdirectory') || elem.hasAttribute('mozdirectory')
+            || elem.hasAttribute('msdirectory') || elem.hasAttribute('odirectory') || elem.hasAttribute('directory');
+
+        // Log that User selected a folder (or file) for upload from the file explorer
+        eventlog(isFolderUpload ? 500010 : 500012);
+
         var currentDir = M.currentCustomView ? M.currentCustomView.nodeID : M.currentdirid;
 
         if ($.awaitingLoginToUpload) {

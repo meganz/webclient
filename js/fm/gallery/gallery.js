@@ -1805,7 +1805,10 @@ class MegaGallery {
     }
 
     setView() {
-        if (this.nodes) {
+        const tempSubfolderMd = this.subfolderMd;
+        this.subfolderMd = !mega.config.get('noSubfolderMd');
+
+        if (this.nodes && this.subfolderMd === tempSubfolderMd) {
 
             M.v = Object.keys(this.nodes).map(h => M.d[h] || this.updNode[h]);
             MegaGallery.sortViewNodes();
@@ -1846,7 +1849,8 @@ class MegaTargetGallery extends MegaGallery {
             return false;
         }
 
-        const handles = this.id === 'photos' ? MegaGallery.getCameraHandles() : M.getTreeHandles(this.id);
+        const handles = this.id === 'photos' ? MegaGallery.getCameraHandles()
+            : this.subfolderMd ? M.getTreeHandles(this.id) : [this.id];
         let subs = [];
 
         if (self.fmdb) {

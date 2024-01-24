@@ -558,6 +558,11 @@ function dashboardUI(updProcess) {
         onIdle(fm_resize_handler);
         initTreeScroll();
 
+        // Init the dashboard content scroll, after we've fetched account data (in MEGA Lite this takes longer)
+        if (mega.lite.inLiteMode) {
+            initDashboardScroll();
+        }
+
         // Button on dashboard to backup their master key
         $('.dashboard .backup-master-key').rebind('click', function() {
             M.showRecoveryKeyDialog(2);

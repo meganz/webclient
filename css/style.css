@@ -1517,6 +1517,7 @@ label.iPhoneCheckLabelOff span {
     height: 100%;
     min-width: 100%;
     position: relative;
+    display: grid;
 }
 .content-panel {
     display: none;
@@ -3888,6 +3889,9 @@ body.loading .light-overlay {
     -moz-opacity: 1;
     -khtml-opacity: 1;
     opacity: 1;
+}
+.transfer-completed .link-transfer-status {
+    display: none;
 }
 .transfer-type::before,
 .transfer-type.upload::before,

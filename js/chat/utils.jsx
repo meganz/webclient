@@ -9,7 +9,12 @@ export async function prepareExportIo(dl) {
         && typeof FileSystemWritableFileStream !== 'undefined'
         && 'seek' in FileSystemWritableFileStream.prototype
     ) {
-        const file = await window.showSaveFilePicker({ suggestedName: zname }).catch(dump);
+        const file = await window.showSaveFilePicker({ suggestedName: zname }).catch(ex => {
+            if (String(ex).includes('aborted')) {
+                throw new Error('Aborted');
+            }
+            dump(ex);
+        });
         if (file) {
             const stream = await file.createWritable().catch(dump);
             if (stream) {

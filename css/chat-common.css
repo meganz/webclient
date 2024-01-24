@@ -1356,3 +1356,6 @@ button.fm-empty-button {
     padding-inline-end: 26px;
     -webkit-padding-end: 26px;
 }
+.mega-dialog.scheduled-description-dialog span {
+    overflow-wrap: break-word;
+}

@@ -512,6 +512,10 @@ mBroadcaster.once('boot_done', function radSetup() {
             ++indent;
             log(name, args);
         },
+        groupCollapsed(name, args) {
+            ++indent;
+            log('group', args);
+        },
         groupEnd() {
             --indent;
         },
@@ -525,7 +529,7 @@ mBroadcaster.once('boot_done', function radSetup() {
         }
     };
 
-    'debug,error,info,log,warn,table,group,groupEnd,assert'
+    'debug,error,info,log,warn,table,group,groupCollapsed,groupEnd,assert'
         .split(',')
         .map(tryCatch((fn) => {
             const gConsoleMethod = console[fn];

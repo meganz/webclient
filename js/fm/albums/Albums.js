@@ -3532,24 +3532,7 @@ lazy(mega.gallery, 'albums', () => {
             }
         }
 
-        async updateInAlbumNode({ s, h: handle, id }) {
-            const album = scope.albums.store[s];
-
-            // Checking if the album is still available or if it has already got a requested node
-            if (!album || album.nodes.some(({ h }) => h === handle)) {
-                return;
-            }
-
-            if (!M.d[handle]) {
-                await dbfetch.get(handle);
-            }
-
-            album.nodes.push(M.d[handle]);
-            album.eHandles[handle] = id;
-            album.eIds[id] = handle;
-
-            debouncedAlbumCellUpdate(s, true);
-
+        updateInAlbumGrid(s) {
             if (M.currentdirid === 'albums/' + s) {
                 const { timeline, header } = this;
 
@@ -3816,7 +3799,7 @@ lazy(mega.gallery, 'albums', () => {
             'contextmenu',
             (evt) => {
                 evt.preventDefault();
-                if (scope.albums.store[albumId].nodes.length) {
+                if (!pfcol || scope.albums.store[albumId].nodes.length) {
                     const contextMenu = new AlbumContextMenu(albumId, scope.albums.isPublic);
                     contextMenu.show(evt.pageX, evt.pageY);
                 }
@@ -3951,9 +3934,26 @@ lazy(mega.gallery, 'albums', () => {
                         openMainPage();
                     }
                 }),
-                mega.sets.subscribe('aep', 'albums', (element) => {
+                mega.sets.subscribe('aep', 'albums', async({ s, h: handle, id }) => {
+                    const album = scope.albums.store[s];
+
+                    // Checking if the album is still available or if it has already got a requested node
+                    if (!album || album.nodes.some(({ h }) => h === handle)) {
+                        return;
+                    }
+
+                    if (!M.d[handle]) {
+                        await dbfetch.get(handle);
+                    }
+
+                    album.nodes.push(M.d[handle]);
+                    album.eHandles[handle] = id;
+                    album.eIds[id] = handle;
+
+                    debouncedAlbumCellUpdate(s, true);
+
                     if (this.grid) {
-                        this.grid.updateInAlbumNode(element);
+                        this.grid.updateInAlbumGrid(s);
                     }
 
                     debouncedLoadingUnset();
@@ -4888,8 +4888,7 @@ lazy(mega.gallery, 'albums', () => {
                 return name;
             }
 
-            const album = Object.values(scope.albums.store).find(({ p }) => p && p.ph === h);
-            const newName = await AlbumNameDialog.prompt(album.id, names);
+            const newName = await AlbumNameDialog.prompt($.albumImport.id, names);
 
             return (newName === null) ? null : newName || name;
         }

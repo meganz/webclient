@@ -4,7 +4,7 @@
     justify-content: center;
     position: absolute;
     bottom: -250px;
-    padding: 0 0 24px 0;
+    padding: 0 0 14px 0;
     width: 100%;
     text-align: center;
     transition: opacity 500ms ease-in-out, bottom 500ms ease-in-out;
@@ -25,28 +25,49 @@
             position: relative;
             display: inline-block;
             padding: 0 11px 0 11px;
+            cursor: pointer;
+
+            &.disabled {
+                /* [...] */
+
+                button {
+                    /* [...] */
+
+                    span { color: var(--text-color-low); }
+                }
+            }
 
             button {
                 cursor: pointer;
 
+                &.with-fill {
+                    background: var(--secondary-white);
+                    i { --mask-color: var(--icon-active); }
+                }
+
                 &.end-call {
+                    background: #FF333A;
                     color: var(--text-color-high);
+                    box-shadow: none;
+                    &:hover { background: #FF6560; }
 
                     i { --mask-color: var(--secondary-white); }
                 }
 
+
                 i {
                     display: block;
                     margin: 0 auto;
-                    --icon-size: 32px;
-                    --mask-color: var(--icon-active);
+                    --icon-size: 24px;
+                    --mask-color: var(--secondary-white);
                 }
+            }
 
-                span {
-                    position: fixed;
-                    bottom: -9999px;
-                    visibility: hidden;
-                }
+            span {
+                display: block;
+                margin: 8px 0 0 0;
+                font: var(--text-body2);
+                color: var(--secondary-white);
             }
         }
     }
@@ -93,6 +114,8 @@
                 span {
                     position: relative;
                     bottom: auto;
+                    margin: 0;
+                    font: var(--text-body1);
                     visibility: visible;
                 }
             }

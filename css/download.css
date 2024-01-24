@@ -840,6 +840,7 @@ body:not(.pro-user) .download.over-transfer-quota .overquoata-error {
     display: flex;
     flex-direction: column;
     height: calc(100% - 118px);
+    min-height: 63px;
 }
 
 .download.info-block .file-details-wrapper {
@@ -1192,4 +1193,25 @@ body:not(.pro-user) .download.over-transfer-quota .overquoata-error {
 .download.image-block .media-viewer-container.browserscreen header,
 .download.image-block .media-viewer-container.fullscreen header {
     display: block;
+}
+
+@media only screen and (max-height: 330px) {
+
+    .download-page.download-content:has(.commercial-wrapper:not(.hidden)) {
+        height: calc(100% - 60px);
+        margin-top: 40px;
+        min-height: 215px;
+    }
+}
+
+@media only screen and (min-width: 450px) {
+    .video-theatre-mode .download.transfer-wrapper.fil-commercials {
+        height: calc(100% - 110px);
+    }
+}
+
+@media only screen and (min-width: 956px) {
+    .video-theatre-mode .download.transfer-wrapper.fil-commercials {
+        height: calc(100% - 120px);
+    }
 }

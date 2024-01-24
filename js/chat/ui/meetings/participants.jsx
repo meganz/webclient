@@ -25,20 +25,26 @@ class Participant extends MegaRenderMixin {
     }
 
     render() {
-        const { chatRoom, handle, name, source } = this.props;
+        const { chatRoom, source, handle, name, recorder } = this.props;
 
         return (
             <>
                 <Avatar contact={M.u[handle]}/>
                 <div className="name">
                     <Emoji>{handle === u_handle ? `${name} ${l.me}` : name}</Emoji>
-                    {chatRoom.isMeeting && Call.isModerator(chatRoom, handle) && (
+                    {chatRoom.isMeeting && Call.isModerator(chatRoom, handle) &&
                         <span>
                             <i className={`${this.baseIconClass} icon-admin-outline`}/>
                         </span>
-                    )}
+                    }
                 </div>
                 <div className="status">
+                    {recorder && recorder === handle ?
+                        <div className="recording-status">
+                            <span />
+                        </div> :
+                        null
+                    }
                     <i
                         className={`
                             ${this.baseIconClass}
@@ -115,7 +121,8 @@ export default class Participants extends MegaRenderMixin {
     };
 
     getCallParticipants = () => {
-        const { call, chatRoom, peers } = this.props;
+        const { call, chatRoom, peers, recorder } = this.props;
+
         return (
             <ul>
                 <li>
@@ -125,6 +132,7 @@ export default class Participants extends MegaRenderMixin {
                         source={call.getLocalStream()}
                         handle={u_handle}
                         name={M.getNameByHandle(u_handle)}
+                        recorder={recorder}
                     />
                 </li>
                 {peers.map(peer =>
@@ -134,6 +142,7 @@ export default class Participants extends MegaRenderMixin {
                             source={peer}
                             handle={peer.userHandle}
                             name={peer.name}
+                            recorder={recorder}
                         />
                     </li>
                 )}

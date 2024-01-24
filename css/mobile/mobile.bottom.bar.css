@@ -34,3 +34,47 @@
 .mega-bottom-bar .text-actions {
     flex: 1;
 }
+.mega-bottom-bar.mega-comms {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 0;
+}
+.mega-bottom-bar.mega-comms .mega-bottom-bar {
+    position: relative;
+    border: none;
+    padding-top: 0;
+}
+.commercial-wrapper#commercial-wrapper-mwebfolinkb,
+.commercial-wrapper#commercial-wrapper-mwebtfolinkb,
+.commercial-wrapper#commercial-wrapper-mwebtfilinkb,
+.commercial-wrapper#commercial-wrapper-mwebfilinkb {
+    padding-bottom: 20px;
+}
+.commercial-wrapper {
+    width: calc(100% + 35px);
+    justify-content: center;
+}
+.mega-comms .mega-bottom-bar {
+    position: relative;
+}
+.commercial-wrapper.tablet {
+    display: flex;
+    height: 90px;
+}
+.mega-comms .commercial-wrapper.mobile {
+    display: none;
+    height: 45px;
+    padding-top: 0;
+}
+
+@media only screen and (max-width: 769px) {
+    .mega-comms .commercial-wrapper.tablet {
+        display: none;
+    }
+}
+
+@media only screen and (max-width: 769px) and (min-width: 370px) {
+    .mega-comms .commercial-wrapper.mobile {
+        display: flex;
+    }
+}

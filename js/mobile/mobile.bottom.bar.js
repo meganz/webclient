@@ -4,7 +4,13 @@ class MegaMobileBottomBar extends MegaMobileComponent {
 
         super(options);
 
-        this.domNode.classList.add('mega-bottom-bar');
+        // If ads are disabled, use the original bottom bar
+        // Otherwise create a new bottom bar wrapper and return the node for the bottom bar
+        const bottomNode = (options.adWrapper && mega.flags.ab_ads)
+            ? mega.commercials.addCommsToBottomBar(this.domNode, options.adWrapper === 'adFolder')
+            : this.domNode;
+
+        bottomNode.classList.add('mega-bottom-bar');
 
         this.actions = [];
 
@@ -21,7 +27,7 @@ class MegaMobileBottomBar extends MegaMobileComponent {
 
         let subNode = document.createElement('div');
         subNode.className = 'text-actions';
-        this.domNode.appendChild(subNode);
+        bottomNode.appendChild(subNode);
 
         if (options.actions && options.actions[0]) {
 
@@ -42,7 +48,7 @@ class MegaMobileBottomBar extends MegaMobileComponent {
 
         subNode = document.createElement('div');
         subNode.className = 'icon-actions';
-        this.domNode.appendChild(subNode);
+        bottomNode.appendChild(subNode);
 
         if (options.actions && options.actions[1]) {
 
@@ -60,6 +66,11 @@ class MegaMobileBottomBar extends MegaMobileComponent {
 
                 buildAction(iconOptions);
             }
+        }
+
+        // Create new ads in the bottom bar
+        if (options.adWrapper && mega.flags.ab_ads) {
+            mega.commercials.createMobileBottomBarSlots(this.domNode, options.adWrapper === 'adFolder');
         }
     }
 }

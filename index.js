@@ -650,7 +650,7 @@ function init_page() {
                     keyCutPlace = linkRemaining.length;
                 }
             }
-            pfkey = linkRemaining.substring(0, keyCutPlace).replace(/[^\w-]+/g, "") || false;
+            pfkey = linkRemaining.substring(0, keyCutPlace).replace(/[^\w-]+/g, "").slice(0, 22) || false;
         }
 
         n_h = pfid;
@@ -1023,10 +1023,6 @@ function init_page() {
     }
     else if (!mega.flags.refpr && page.substr(0, 8) === 'fm/refer') {
         loadSubPage('fm');
-        return false;
-    }
-    else if (is_mobile && page.startsWith('twofactor/verify-login')) {
-        mobile.twofactor.verifyLogin.init();
         return false;
     }
     else if (is_mobile && (page.startsWith('twofactor') || page.startsWith('sms'))) {

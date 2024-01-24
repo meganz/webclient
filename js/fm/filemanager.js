@@ -316,6 +316,7 @@ FileManager.prototype.initFileManagerUI = function() {
             || $.dialog === "chat-incoming-call"
             || $.dialog === 'stripe-pay'
             || $.dialog === 'start-meeting-dialog'
+            || $.dialog === 'meetings-call-consent'
             || $.dialog === 'fingerprint-dialog'
             || $.dialog === 'fingerprint-admin-dlg'
             || $.dialog === 'meetings-schedule-dialog'
@@ -875,9 +876,16 @@ FileManager.prototype.initFileManagerUI = function() {
     $('.fm-folder-upload, .fm-file-upload').rebind('click', (element) => {
         $.hideContextMenu();
         if (element.currentTarget.classList.contains('fm-folder-upload')) {
+
+            // Log that User clicks on Upload folder button
+            eventlog(500009);
+
             $('#fileselect2').click();
         }
         else {
+            // Log that User clicks on Upload file button
+            eventlog(500011);
+
             $('#fileselect1').click();
         }
     });
@@ -1215,7 +1223,7 @@ FileManager.prototype.initFileManagerUI = function() {
     const lPane = $('.fm-left-panel').filter(":not(.chat-lp-body)");
     $.leftPaneResizable = new FMResizablePane(lPane, {
         'direction': 'e',
-        'minWidth': 200,
+        'minWidth': mega.flags.ab_ads ? 260 : 200,
         'maxWidth': 400,
         'persistanceKey': 'leftPaneWidth',
         'handle': '.left-pane-drag-handle',
@@ -2522,6 +2530,10 @@ FileManager.prototype.createFolderUI = function() {
     const ltWSpaceWarning = new InputFloatWarning($inputWrapper);
 
     var doCreateFolder = function() {
+
+        // Log that Create button clicked within the Create folder dialog
+        eventlog(500008);
+
         var $input = $('input', $inputWrapper);
         var name = $input.val();
         var errorMsg = '';
@@ -2585,6 +2597,9 @@ FileManager.prototype.createFolderUI = function() {
         }
 
         ltWSpaceWarning.hide();
+
+        // Log that top menu Create folder clicked
+        eventlog(500007);
 
         var $me = $(this);
         var $nFolderDialog = $('.create-new-folder', 'body').removeClass('filled-input');
@@ -4725,6 +4740,15 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     }
 
     // Revamp Implementation End
+
+
+    if (mega.flags.ab_ads) {
+        delay('mega:comm-setup', () => {
+            mega.commercials.init();
+            mega.commercials.getComms();
+        });
+    }
+
     if (d) {
         console.timeEnd('sectionUIOpen');
         console.groupEnd();

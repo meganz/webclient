@@ -22,7 +22,7 @@ export default class ScheduleMetaChange extends ConversationMessageMixin {
         if (this.props.mode === ScheduleMetaChange.MODE.CREATED) {
 
             if (is_chatlink) {
-                this.setState({link: `chat/${is_chatlink.ph}#${is_chatlink.key}`});
+                this.setState({link: `${getBaseUrl()}/chat/${is_chatlink.ph}#${is_chatlink.key}`});
             }
             else {
                 const {chatRoom} = this.props;

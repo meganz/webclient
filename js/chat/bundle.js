@@ -2577,7 +2577,35 @@ Chat.prototype.renderListing = async function megaChatRenderListing(location, is
     room = valid(this.chats[this.lastOpenedChat]);
     if (!room) {
       let idx = 0;
-      const rooms = Object.values(this.chats).filter(r => r.isMeeting === !!this.currentlyOpenedView).sort(M.sortObjFn('lastActivity', -1));
+      const chats = [];
+      const meetings = [];
+      for (const room of Object.values(this.chats)) {
+        if (!room.isArchived()) {
+          if (room.isMeeting) {
+            meetings.push(room);
+          } else {
+            chats.push(room);
+          }
+        }
+      }
+      let rooms = chats;
+      let view;
+      if (this.currentlyOpenedView === conversations.nk.MEETINGS) {
+        if (meetings.length) {
+          rooms = meetings;
+        } else {
+          view = conversations.nk.CHATS;
+        }
+      } else if (!chats.length) {
+        rooms = meetings;
+        view = conversations.nk.MEETINGS;
+      }
+      if (view) {
+        onIdle(() => {
+          this.trigger(conversations.FP.NAV_RENDER_VIEW, view);
+        });
+      }
+      rooms.sort(M.sortObjFn('lastActivity', -1));
       do {
         room = valid(rooms[idx]);
       } while (!room && ++idx < rooms.length);

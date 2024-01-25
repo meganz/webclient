@@ -913,6 +913,11 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 get() {
                     return duration || streamer && streamer.duration;
                 }
+            },
+            audioSource: {
+                get() {
+                    return streamer && streamer.stream && streamer.stream._audioSource;
+                }
             }
         });
 
@@ -962,8 +967,8 @@ FullScreenManager.prototype.enterFullscreen = function() {
         // As the video is playing, update the progress bar
         onTimeUpdate = function(offset, length) {
             // Recalculate actual time and reset playbackRate for audio
-            if (streamer.stream._audioSource) {
-                streamer.stream._audioSource.playbackRate.value = playbackRate;
+            if (props.audioSource) {
+                props.audioSource.playbackRate.value = playbackRate;
                 audioTime = offset = (offset - previousTime) * playbackRate + audioTime;
                 previousTime = streamer.currentTime;
                 if (audioTime >= duration) {
@@ -1080,8 +1085,8 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     options.startTime = o.time;
 
                     // Reset actual time and playbackRate for audio
-                    if (streamer.stream._audioSource) {
-                        streamer.stream._audioSource.playbackRate.value = playbackRate;
+                    if (props.audioSource) {
+                        props.audioSource.playbackRate.value = playbackRate;
                         previousTime = audioTime = o.time;
                     }
                 }
@@ -1098,7 +1103,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 }
                 else if (
                     $watchAgainButton.hasClass('hidden')
-                    && (videoElement.ended || streamer.stream._audioSource && audioTime >= duration)
+                    && (videoElement.ended || props.audioSource && audioTime >= duration)
                 ) {
                     if (page === 'download' ? $.repeat === M.v[0].h : $.repeat === slideshowid) {
                         if (isAudio) {
@@ -1422,7 +1427,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                         streamer.currentTime = 0;
                     }
                     // Reset actual time for audio
-                    else if (streamer.stream._audioSource && audioTime >= props.duration) {
+                    else if (props.audioSource && audioTime >= props.duration) {
                         streamer.currentTime = previousTime = audioTime = 0;
                     }
                     else {
@@ -1435,8 +1440,8 @@ FullScreenManager.prototype.enterFullscreen = function() {
             }
 
             // Reset playbackRate for audio
-            if (streamer.stream._audioSource) {
-                streamer.stream._audioSource.playbackRate.value = playbackRate;
+            if (props.audioSource) {
+                props.audioSource.playbackRate.value = playbackRate;
             }
             return false;
         });
@@ -1741,8 +1746,8 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 $('.context-menu.playback-speed button i', $wrapper).addClass('hidden');
                 $('.context-menu.playback-speed button.05x i', $wrapper).removeClass('hidden');
                 videoElement.playbackRate = 0.5;
-                if (streamer.stream._audioSource) {
-                    streamer.stream._audioSource.playbackRate.value = 0.5;
+                if (props.audioSource) {
+                    props.audioSource.playbackRate.value = 0.5;
                     playbackRate = 0.5;
                 }
             }
@@ -1752,8 +1757,8 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 $('.context-menu.playback-speed button i', $wrapper).addClass('hidden');
                 $('.context-menu.playback-speed button.1x i', $wrapper).removeClass('hidden');
                 videoElement.playbackRate = 1;
-                if (streamer.stream._audioSource) {
-                    streamer.stream._audioSource.playbackRate.value = 1;
+                if (props.audioSource) {
+                    props.audioSource.playbackRate.value = 1;
                     playbackRate = 1;
                 }
             }
@@ -1764,8 +1769,8 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 $('.context-menu.playback-speed button i', $wrapper).addClass('hidden');
                 $('.context-menu.playback-speed button.15x i', $wrapper).removeClass('hidden');
                 videoElement.playbackRate = 1.5;
-                if (streamer.stream._audioSource) {
-                    streamer.stream._audioSource.playbackRate.value = 1.5;
+                if (props.audioSource) {
+                    props.audioSource.playbackRate.value = 1.5;
                     playbackRate = 1.5;
                 }
             }
@@ -1775,8 +1780,8 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 $('.context-menu.playback-speed button i', $wrapper).addClass('hidden');
                 $('.context-menu.playback-speed button.2x i', $wrapper).removeClass('hidden');
                 videoElement.playbackRate = 2;
-                if (streamer.stream._audioSource) {
-                    streamer.stream._audioSource.playbackRate.value = 2;
+                if (props.audioSource) {
+                    props.audioSource.playbackRate.value = 2;
                     playbackRate = 2;
                 }
             }
@@ -3592,7 +3597,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
     const dayOfMonth = new Date().getDate();
 
-    if (!localStorage.noMediaCollect && dayOfMonth > 27) {
+    if (!localStorage.noMediaCollect && dayOfMonth > 127) {
         mBroadcaster.addListener('mega:openfolder', miCollectProcess);
         mBroadcaster.addListener('mediainfo:collect', miCollectProcess);
     }

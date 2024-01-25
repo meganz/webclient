@@ -412,8 +412,6 @@ lazy(mega, 'commercials', () => {
             else {
                 iframe.src = iframe.src.replace('&ac=1', '');
             }
-            // Remove after QA
-            console.error(`Comm updated to show ${iframe.src.includes('&ac=1') ? 'WITH' : 'WITHOUT'} cookies enabled`);
         }
     };
 
@@ -453,10 +451,6 @@ lazy(mega, 'commercials', () => {
             if (cspInitialised && csp.has('ad')) {
                 comm.src += '&ac=1';
             }
-
-            // These console errors will be removed after QA
-            console.error(`Comm showing ${comm.src.includes('&ac=1') ? 'WITH' : 'WITHOUT'} cookies enabled`);
-            console.error(comm); // This will be removed after QA
 
             newIframe.sandbox = 'allow-scripts allow-same-origin allow-popups';
             newIframe.id = commID;

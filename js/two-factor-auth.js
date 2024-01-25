@@ -51,6 +51,9 @@ twofactor.loginDialog = {
 
         'use strict';
 
+        // Reset the 2FA dialog back to default UI
+        this.resetState();
+
         // Show the dialog
         var $dialog = $('.mega-dialog.verify-two-factor-login');
 
@@ -203,6 +206,9 @@ twofactor.loginDialog = {
         var $warningText = $dialog.find('.warning-text-field');
         var $pinCodeInput = $dialog.find('.pin-input');
         var $submitButton = $dialog.find('.submit-button');
+
+        // Reset the 2FA dialog back to default UI
+        this.resetState();
 
         // Re-show the background overlay which is removed from loading dialog being hidden,
         // then show a message that the PIN code was incorrect and clear the text field

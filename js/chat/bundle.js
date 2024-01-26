@@ -22341,11 +22341,7 @@ class Call extends mixins.wl {
         this.setState({
           recordingConsentDialog: false,
           recorder: userHandle === recorder ? false : recorder
-        }, () => {
-          if (userHandle === recorder) {
-            ChatToast.quick(l.user_recording_nop_toast.replace('%NAME', nicknames.getNickname(userHandle).substr(0, ChatToastIntegration.MAX_NAME_CHARS)));
-          }
-        });
+        }, () => window.sfuClient && userHandle === recorder && ChatToast.quick(l.user_recording_nop_toast.replace('%NAME', nicknames.getNickname(userHandle).substr(0, ChatToastIntegration.MAX_NAME_CHARS))));
       });
       chatRoom.rebind('onPeerAvChange', () => this.recordActiveStream());
     };

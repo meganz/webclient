@@ -294,9 +294,11 @@ export default class Call extends MegaRenderMixin {
                 peers[call.activeStream] ||
                 peers.getItem(0);
 
-            call.sfuClient?.recordingForcePeerVideo(
-                activeStream.isScreen || !activeStream.videoMuted ? activeStream?.clientId : null
-            );
+            if (activeStream) {
+                call.sfuClient?.recordingForcePeerVideo(
+                    activeStream.isScreen || !activeStream.videoMuted ? activeStream.clientId : null
+                );
+            }
         }
     };
 

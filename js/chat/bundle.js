@@ -22215,13 +22215,15 @@ class Call extends mixins.wl {
     };
     this.recordActiveStream = () => {
       if (this.state.recorder && this.state.recorder === u_handle) {
-        var _call$sfuClient;
         const {
           call,
           peers
         } = this.props;
         const activeStream = peers[call.forcedActiveStream] || Object.values(peers).findLast(p => p.isScreen) || peers[call.activeStream] || peers.getItem(0);
-        (_call$sfuClient = call.sfuClient) == null || _call$sfuClient.recordingForcePeerVideo(activeStream.isScreen || !activeStream.videoMuted ? activeStream == null ? void 0 : activeStream.clientId : null);
+        if (activeStream) {
+          var _call$sfuClient;
+          (_call$sfuClient = call.sfuClient) == null || _call$sfuClient.recordingForcePeerVideo(activeStream.isScreen || !activeStream.videoMuted ? activeStream.clientId : null);
+        }
       }
     };
     this.handleRetryTimeout = () => {

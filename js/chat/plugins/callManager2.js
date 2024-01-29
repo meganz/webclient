@@ -1020,13 +1020,17 @@
      * @param textMessage {String}
      * @param [html] {boolean} pass true to return (eventually) HTML formatted messages
      * @param [participants] {Array} optional list of handles to use for this message
+     * @param [rawContent] {*} optional flag to disable escaping html characters. DO NOT USE IF UNSURE
      */
-    CallManager2._getMltiStrTxtCntsForMsg = function(message, textMessage, html, participants) {
+    CallManager2._getMltiStrTxtCntsForMsg = function(message, textMessage, html, participants, rawContent) {
         var tmpMsg;
         var contact = Message.getContactForMessage(message);
         var contactName = "";
         if (contact) {
-            contactName = htmlentities(M.getNameByHandle(contact.u));
+            contactName = M.getNameByHandle(contact.u);
+            if (rawContent !== 0xBADF) {
+                contactName = escapeHTML(contactName);
+            }
         }
 
         if (!participants && message.meta && message.meta.participants && message.meta.participants.length > 0) {

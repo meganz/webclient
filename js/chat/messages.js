@@ -49,7 +49,10 @@ Message._mockupNonLoadedMessage = function(msgId, msg, orderValueIfNotFound) {
     }
 };
 
-Message._getTextContentsForDialogType = function(message) {
+// @todo complexity
+// eslint-disable-next-line complexity
+Message._getTextContentsForDialogType = function(message, rawContent) {
+    'use strict';
     if (
         !message.textContents ||
         (
@@ -67,7 +70,10 @@ Message._getTextContentsForDialogType = function(message) {
         var contact = Message.getContactForMessage(message);
         var contactName = "";
         if (contact) {
-            contactName = htmlentities(M.getNameByHandle(contact.u));
+            contactName = M.getNameByHandle(contact.u);
+            if (rawContent !== 0xBADF) {
+                contactName = escapeHTML(contactName);
+            }
         }
 
         if (message.dialogType === "privilegeChange" && message.meta) {
@@ -112,7 +118,11 @@ Message._getTextContentsForDialogType = function(message) {
                             ? l.meeting_mgmt_user_joined /* `%1 joined the meeting.` */
                             : l.meeting_mgmt_user_added; /* `%1 joined the meeting by invitation from %2.` */
                     }
-                    textMessage = textMessage.replace('%1', htmlentities(M.getNameByHandle(otherContact.h)));
+                    let otherName = M.getNameByHandle(otherContact.h);
+                    if (rawContent !== 0xBADF) {
+                        otherName = escapeHTML(otherName);
+                    }
+                    textMessage = textMessage.replace('%1', otherName);
                     if (!isSelfJoin) {
                         textMessage = textMessage.replace('%2', contactName);
                     }
@@ -125,7 +135,7 @@ Message._getTextContentsForDialogType = function(message) {
         else if (message.dialogType === "topicChange") {
             textMessage = l[9081].replace(
                 "%s",
-                '"' + htmlentities(message.meta.topic) + '"'
+                '"' + rawContent === 0xBADF ? message.meta.topic : escapeHTML(message.meta.topic) + '"'
             );
         }
         else if (message.dialogType === "remoteCallStarted") {
@@ -136,7 +146,8 @@ Message._getTextContentsForDialogType = function(message) {
             );
 
             if (textMessage.splice) {
-                textMessage = CallManager2._getMltiStrTxtCntsForMsg(message, textMessage);
+                textMessage =
+                    CallManager2._getMltiStrTxtCntsForMsg(message, textMessage, undefined, undefined, rawContent);
             }
             else {
                 textMessage = textMessage.replace("[X]", contactName);
@@ -190,7 +201,8 @@ Message._getTextContentsForDialogType = function(message) {
 
 
             if (textMessage.splice) {
-                textMessage = CallManager2._getMltiStrTxtCntsForMsg(message, textMessage);
+                textMessage =
+                    CallManager2._getMltiStrTxtCntsForMsg(message, textMessage, undefined, undefined, rawContent);
             }
             else {
                 textMessage = textMessage.replace("[X]", contactName);
@@ -201,7 +213,7 @@ Message._getTextContentsForDialogType = function(message) {
             textMessage = ScheduleMetaChange.getTitleText(message.meta);
         }
         else if (textMessage.splice) {
-            textMessage = CallManager2._getMltiStrTxtCntsForMsg(message, textMessage);
+            textMessage = CallManager2._getMltiStrTxtCntsForMsg(message, textMessage, undefined, undefined, rawContent);
         }
         else {
             textMessage = textMessage.replace("[X]", contactName);
@@ -2419,7 +2431,7 @@ MessagesBuff.prototype.getRenderableSummary = function(lastMessage, rawContent) 
             renderableSummary = lastMessage.getMessageRetentionSummary();
         }
         else if (!lastMessage.textContents && lastMessage.dialogType) {
-            renderableSummary = Message._getTextContentsForDialogType(lastMessage);
+            renderableSummary = Message._getTextContentsForDialogType(lastMessage, rawContent);
         }
         else {
             renderableSummary = lastMessage.textContents;

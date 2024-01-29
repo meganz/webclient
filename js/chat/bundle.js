@@ -18,7 +18,7 @@ var external_ReactDOM_default = __webpack_require__.n(external_ReactDOM_);
 // EXTERNAL MODULE: ./js/chat/ui/conversations.jsx + 20 modules
 var conversations = __webpack_require__(978);
 ;// CONCATENATED MODULE: ./js/chat/chatRouting.jsx
-var _class;
+var _ChatRouting;
 class ChatRouting {
   constructor(megaChatInstance) {
     this.megaChat = megaChatInstance;
@@ -240,7 +240,7 @@ class ChatRouting {
     });
   }
 }
-_class = ChatRouting;
+_ChatRouting = ChatRouting;
 ChatRouting.gPageHandlers = {
   async start({
     location
@@ -251,11 +251,11 @@ ChatRouting.gPageHandlers = {
   },
   async redirect(target, path = 'fm/chat') {
     target.location = path;
-    return _class.gPageHandlers.start(target);
+    return _ChatRouting.gPageHandlers.start(target);
   },
   async new_meeting(target) {
     megaChat.trigger('onStartNewMeeting');
-    return _class.gPageHandlers.redirect(target);
+    return _ChatRouting.gPageHandlers.redirect(target);
   },
   async contacts({
     section,
@@ -1165,10 +1165,10 @@ var applyDecoratedDescriptor = __webpack_require__(229);
 var mixins = __webpack_require__(503);
 ;// CONCATENATED MODULE: ./js/chat/chatOnboarding.jsx
 
-var _dec, chatOnboarding_class;
+var _dec, _class;
 
 
-let ChatOnboarding = (_dec = (0,mixins.M9)(1000), (chatOnboarding_class = class ChatOnboarding {
+let ChatOnboarding = (_dec = (0,mixins.M9)(1000), (_class = class ChatOnboarding {
   constructor(megaChat) {
     this.finished = false;
     this.currentChatIsScheduled = false;
@@ -1475,7 +1475,7 @@ let ChatOnboarding = (_dec = (0,mixins.M9)(1000), (chatOnboarding_class = class 
       delete this.schedListeners;
     }
   }
-}, ((0,applyDecoratedDescriptor.Z)(chatOnboarding_class.prototype, "checkAndShowStep", [_dec], Object.getOwnPropertyDescriptor(chatOnboarding_class.prototype, "checkAndShowStep"), chatOnboarding_class.prototype)), chatOnboarding_class));
+}, ((0,applyDecoratedDescriptor.Z)(_class.prototype, "checkAndShowStep", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "checkAndShowStep"), _class.prototype)), _class));
 
 // EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 11 modules
 var call = __webpack_require__(476);
@@ -11610,7 +11610,7 @@ ChatlinkDialog.defaultProps = {
 ChatlinkDialog.NAMESPACE = 'chat-link-dialog';
 ;// CONCATENATED MODULE: ./js/chat/ui/pushSettingsDialog.jsx
 
-var pushSettingsDialog_class;
+var _PushSettingsDialog;
 
 
 
@@ -11664,7 +11664,7 @@ class PushSettingsDialog extends mixins.wl {
     }, external_React_default().createElement("span", null, l[726])))));
   }
 }
-pushSettingsDialog_class = PushSettingsDialog;
+_PushSettingsDialog = PushSettingsDialog;
 PushSettingsDialog.options = {
   30: l[22012],
   60: l[19048],
@@ -11672,7 +11672,7 @@ PushSettingsDialog.options = {
   1440: l[22014],
   Infinity: l[22011]
 };
-PushSettingsDialog.default = pushSettingsDialog_class.options[pushSettingsDialog_class.options.length - 1];
+PushSettingsDialog.default = _PushSettingsDialog.options[_PushSettingsDialog.options.length - 1];
 // EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 11 modules
 var call = __webpack_require__(476);
 // EXTERNAL MODULE: ./js/chat/ui/historyPanel.jsx + 7 modules
@@ -12557,7 +12557,7 @@ var streamControls = __webpack_require__(230);
 ;// CONCATENATED MODULE: ./js/chat/ui/conversationpanel.jsx
 
 
-var conversationpanel_dec, _dec2, _class4;
+var conversationpanel_dec, _dec2, conversationpanel_class;
 
 
 
@@ -13530,7 +13530,7 @@ class ConversationRightArea extends mixins.wl {
 ConversationRightArea.defaultProps = {
   'requiresUpdateOnResize': true
 };
-let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2 = (0,mixins.LY)(0.7, 9), (_class4 = class ConversationPanel extends mixins.wl {
+let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2 = (0,mixins.LY)(0.7, 9), (conversationpanel_class = class ConversationPanel extends mixins.wl {
   constructor(props) {
     super(props);
     this.containerRef = external_React_default().createRef();
@@ -14624,7 +14624,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
       containerRef: this.containerRef
     }))));
   }
-}, ((0,applyDecoratedDescriptor.Z)(_class4.prototype, "onMouseMove", [conversationpanel_dec], Object.getOwnPropertyDescriptor(_class4.prototype, "onMouseMove"), _class4.prototype), (0,applyDecoratedDescriptor.Z)(_class4.prototype, "render", [_dec2], Object.getOwnPropertyDescriptor(_class4.prototype, "render"), _class4.prototype)), _class4));
+}, ((0,applyDecoratedDescriptor.Z)(conversationpanel_class.prototype, "onMouseMove", [conversationpanel_dec], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMouseMove"), conversationpanel_class.prototype), (0,applyDecoratedDescriptor.Z)(conversationpanel_class.prototype, "render", [_dec2], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "render"), conversationpanel_class.prototype)), conversationpanel_class));
 class ConversationPanels extends mixins.wl {
   constructor(props) {
     super(props);
@@ -14849,7 +14849,7 @@ var ui_link = __webpack_require__(941);
 var utils = __webpack_require__(79);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/start.jsx
 
-var _class;
+var _Start;
 
 
 
@@ -14997,9 +14997,9 @@ class Start extends mixins.wl {
     }, l.how_meetings_work)));
   }
 }
-_class = Start;
+_Start = Start;
 Start.NAMESPACE = 'start-meeting';
-Start.dialogName = `${_class.NAMESPACE}-dialog`;
+Start.dialogName = `${_Start.NAMESPACE}-dialog`;
 Start.CLASS_NAMES = {
   EDIT: 'call-title-edit',
   INPUT: 'call-title-input'
@@ -16448,7 +16448,7 @@ class Edit extends mixins.wl {
 var chat_chatRoom = __webpack_require__(804);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/schedule.jsx
 
-var schedule_class;
+var _Schedule;
 
 
 
@@ -16946,9 +16946,9 @@ class Schedule extends mixins.wl {
     }));
   }
 }
-schedule_class = Schedule;
+_Schedule = Schedule;
 Schedule.NAMESPACE = 'schedule-dialog';
-Schedule.dialogName = `meetings-${schedule_class.NAMESPACE}`;
+Schedule.dialogName = `meetings-${_Schedule.NAMESPACE}`;
 const CloseDialog = ({
   onToggle,
   onClose
@@ -17894,7 +17894,7 @@ class ResultContainer extends mixins.wl {
   }
 }
 ;// CONCATENATED MODULE: ./js/chat/ui/searchPanel/searchField.jsx
-var searchField_class;
+var _SearchField;
 
 
 
@@ -17995,19 +17995,19 @@ class SearchField extends mixins.wl {
     }), searching && status && external_React_default().createElement((external_React_default()).Fragment, null, this.renderStatusControls(), this.renderStatusBanner()));
   }
 }
-searchField_class = SearchField;
+_SearchField = SearchField;
 SearchField.inputRef = external_React_default().createRef();
 SearchField.select = () => {
-  const inputElement = searchField_class.inputRef && searchField_class.inputRef.current;
+  const inputElement = _SearchField.inputRef && _SearchField.inputRef.current;
   const value = inputElement && inputElement.value;
   if (inputElement && value) {
     inputElement.selectionStart = 0;
     inputElement.selectionEnd = value.length;
   }
 };
-SearchField.focus = () => searchField_class.inputRef && searchField_class.inputRef.current && searchField_class.inputRef.current.focus();
-SearchField.hasValue = () => searchField_class.inputRef && searchField_class.inputRef.current && !!searchField_class.inputRef.current.value.length;
-SearchField.isVisible = () => searchField_class.inputRef && searchField_class.inputRef.current && elementIsVisible(searchField_class.inputRef.current);
+SearchField.focus = () => _SearchField.inputRef && _SearchField.inputRef.current && _SearchField.inputRef.current.focus();
+SearchField.hasValue = () => _SearchField.inputRef && _SearchField.inputRef.current && !!_SearchField.inputRef.current.value.length;
+SearchField.isVisible = () => _SearchField.inputRef && _SearchField.inputRef.current && elementIsVisible(_SearchField.inputRef.current);
 ;// CONCATENATED MODULE: ./js/chat/ui/searchPanel/searchPanel.jsx
 
 
@@ -18381,12 +18381,12 @@ class Actions extends mixins.wl {
 var applyDecoratedDescriptor = __webpack_require__(229);
 ;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/conversationsListItem.jsx
 
-var _dec, _dec2, conversationsListItem_class;
+var _dec, _dec2, _class;
 
 
 
 
-let ConversationsListItem = (_dec = utils.ZP.SoonFcWrap(40, true), _dec2 = (0,mixins.LY)(0.7, 8), (conversationsListItem_class = class ConversationsListItem extends mixins.wl {
+let ConversationsListItem = (_dec = utils.ZP.SoonFcWrap(40, true), _dec2 = (0,mixins.LY)(0.7, 8), (_class = class ConversationsListItem extends mixins.wl {
   constructor(...args) {
     super(...args);
     this.state = {
@@ -18640,7 +18640,7 @@ let ConversationsListItem = (_dec = utils.ZP.SoonFcWrap(40, true), _dec2 = (0,mi
       className: `unread-messages items-${notificationItems.length}`
     }, notificationItems)) : null));
   }
-}, ((0,applyDecoratedDescriptor.Z)(conversationsListItem_class.prototype, "eventuallyScrollTo", [_dec], Object.getOwnPropertyDescriptor(conversationsListItem_class.prototype, "eventuallyScrollTo"), conversationsListItem_class.prototype), (0,applyDecoratedDescriptor.Z)(conversationsListItem_class.prototype, "render", [_dec2], Object.getOwnPropertyDescriptor(conversationsListItem_class.prototype, "render"), conversationsListItem_class.prototype)), conversationsListItem_class));
+}, ((0,applyDecoratedDescriptor.Z)(_class.prototype, "eventuallyScrollTo", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "eventuallyScrollTo"), _class.prototype), (0,applyDecoratedDescriptor.Z)(_class.prototype, "render", [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, "render"), _class.prototype)), _class));
 
 ;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/toggle.jsx
 
@@ -19365,7 +19365,7 @@ var mixins = __webpack_require__(503);
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
 var perfectScrollbar = __webpack_require__(285);
 ;// CONCATENATED MODULE: ./js/chat/ui/gifPanel/searchField.jsx
-var _class;
+var _SearchField;
 
 
 
@@ -19405,10 +19405,10 @@ class SearchField extends mixins.wl {
     })));
   }
 }
-_class = SearchField;
+_SearchField = SearchField;
 SearchField.inputRef = external_React_default().createRef();
-SearchField.focus = () => _class.inputRef && _class.inputRef.current && _class.inputRef.current.focus();
-SearchField.hasValue = () => _class.inputRef && _class.inputRef.current && !!_class.inputRef.current.value.length;
+SearchField.focus = () => _SearchField.inputRef && _SearchField.inputRef.current && _SearchField.inputRef.current.focus();
+SearchField.hasValue = () => _SearchField.inputRef && _SearchField.inputRef.current && !!_SearchField.inputRef.current.value.length;
 ;// CONCATENATED MODULE: ./js/chat/ui/gifPanel/result.jsx
 
 
@@ -21597,7 +21597,7 @@ class Sidebar extends mixins.wl {
 // EXTERNAL MODULE: ./js/ui/modalDialogs.jsx + 1 modules
 var modalDialogs = __webpack_require__(182);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/invite/search.jsx
-var _class;
+var _Search;
 
 
 
@@ -21622,10 +21622,10 @@ class Search extends mixins.wl {
     }));
   }
 }
-_class = Search;
+_Search = Search;
 Search.inputRef = external_React_default().createRef();
 Search.focus = () => {
-  return _class.inputRef && _class.inputRef.current && _class.inputRef.current.focus();
+  return _Search.inputRef && _Search.inputRef.current && _Search.inputRef.current.focus();
 };
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/invite/footer.jsx
 
@@ -26366,7 +26366,7 @@ class StreamControls extends _mixins1__.wl {
         didMount: button => {
           this.endButtonRef = button.buttonRef;
         }
-      }), react0().createElement("span", null, "End"));
+      }), react0().createElement("span", null, l.end_button));
     };
   }
   componentWillUnmount() {
@@ -34091,10 +34091,10 @@ F: () => (PerfectScrollbar)
 var _applyDecoratedDescriptor1__ = __webpack_require__(229);
 var _chat_mixins0__ = __webpack_require__(503);
 
-var _dec, _dec2, _class, _class2;
+var _dec, _dec2, _class, _PerfectScrollbar;
 var React = __webpack_require__(363);
 
-let PerfectScrollbar = (_dec = (0,_chat_mixins0__.M9)(30, true), _dec2 = (0,_chat_mixins0__.M9)(30, true), (_class = (_class2 = class PerfectScrollbar extends _chat_mixins0__.wl {
+let PerfectScrollbar = (_dec = (0,_chat_mixins0__.M9)(30, true), _dec2 = (0,_chat_mixins0__.M9)(30, true), (_class = (_PerfectScrollbar = class PerfectScrollbar extends _chat_mixins0__.wl {
   constructor(props) {
     super(props);
     this.isUserScroll = true;
@@ -34359,10 +34359,10 @@ let PerfectScrollbar = (_dec = (0,_chat_mixins0__.M9)(30, true), _dec2 = (0,_cha
       className: this.props.className
     }, self.props.children);
   }
-}, _class2.defaultProps = {
+}, _PerfectScrollbar.defaultProps = {
   className: "perfectScrollbarContainer",
   requiresUpdateOnResize: true
-}, _class2), ((0,_applyDecoratedDescriptor1__.Z)(_class.prototype, "eventuallyReinitialise", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "eventuallyReinitialise"), _class.prototype), (0,_applyDecoratedDescriptor1__.Z)(_class.prototype, "onResize", [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, "onResize"), _class.prototype)), _class));
+}, _PerfectScrollbar), ((0,_applyDecoratedDescriptor1__.Z)(_class.prototype, "eventuallyReinitialise", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "eventuallyReinitialise"), _class.prototype), (0,_applyDecoratedDescriptor1__.Z)(_class.prototype, "onResize", [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, "onResize"), _class.prototype)), _class));
 
 /***/ }),
 

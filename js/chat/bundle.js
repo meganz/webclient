@@ -22538,7 +22538,7 @@ class Call extends mixins.wl {
       }, children);
       if (recorder) {
         const simpletip = {
-          'data-simpletip': `${nicknames.getNickname(recorder)} is recording`,
+          'data-simpletip': l.host_recording.replace('%NAME', nicknames.getNickname(recorder)),
           'data-simpletipposition': 'top',
           'data-simpletipoffset': 5,
           'data-simpletip-class': 'theme-dark-forced'
@@ -22549,18 +22549,13 @@ class Call extends mixins.wl {
           className: `
                             recording-ongoing
                             simpletip
-                            ${isModerator ? '' : 'plain-background'}
+                            ${isModerator && recorder === u_handle ? '' : 'plain-background'}
                         `
         }, recorder !== u_handle && simpletip), external_React_default().createElement("span", {
           className: "recording-icon"
-        }, "REC ", external_React_default().createElement("i", null)), isModerator && external_React_default().createElement("span", {
-          className: `
-                                    recording-toggle
-                                    ${recorder !== u_handle ? 'disabled' : ''}
-                                `,
-          onClick: () => {
-            return recorder !== u_handle ? null : this.handleRecordingToggle();
-          }
+        }, "REC ", external_React_default().createElement("i", null)), isModerator && recorder === u_handle && external_React_default().createElement("span", {
+          className: "recording-toggle",
+          onClick: this.handleRecordingToggle
         }, l.record_stop_button)));
       }
       const isOnHold = !!(((_this$props$call2 = this.props.call) == null ? void 0 : _this$props$call2.av) & Av.onHold);

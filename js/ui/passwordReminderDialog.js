@@ -240,6 +240,7 @@
 
         // Handle forgot password button.
         $(self.dialog.querySelector('.forgot-password')).rebind('click.prd', function() {
+            eventlog(500021);
             self.onChangePassClicked();
             return false;
         });
@@ -249,6 +250,7 @@
             undefined,
             function(newState) {
                 if (newState === true) {
+                    eventlog(500024);
                     self.passwordReminderAttribute.dontShowAgain = 1;
                 }
                 else {
@@ -293,15 +295,19 @@
 
     PasswordReminderDialog.prototype.onButtonClicked = function(element, evt) {
         if (element.classList.contains('button-prd-confirm')) {
+            eventlog(500019);
             this.onConfirmClicked(element, evt);
         }
         else if (element.classList.contains('button-prd-skip')) {
+            eventlog(500023);
             this.onSkipClicked(element, evt);
         }
         else if (element.classList.contains('button-prd-backup')) {
+            eventlog(500020);
             this.onBackupClicked(element, evt);
         }
         else if (element.classList.contains('change-pass')) {
+            eventlog(500022);
             this.onChangePassClicked(element, evt);
         }
     };
@@ -417,10 +423,6 @@
         }
 
         delete $.dialog;
-
-        if (is_mobile) {
-            eventlog(99853);
-        }
 
         loadSubPage('keybackup');
     };
@@ -642,6 +644,9 @@
                         'href="https://mega.io/security" target="_blank" class="red">')
                     .replace('[/A]', '</a>')
             );
+            $('a', this.firstText).rebind('click.more', () => {
+                eventlog(500025);
+            });
         }
         this.resetUI();
 

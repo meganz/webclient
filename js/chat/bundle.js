@@ -22140,6 +22140,12 @@ const inProgressAlert = (isJoin, chatRoom) => {
   });
 };
 class RecordingConsentDialog extends mixins.wl {
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    if ($.dialog && $.dialog === RecordingConsentDialog.dialogName) {
+      closeDialog();
+    }
+  }
   render() {
     const {
       recorder,

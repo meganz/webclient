@@ -129,6 +129,13 @@ export const inProgressAlert = (isJoin, chatRoom) => {
 class RecordingConsentDialog extends MegaRenderMixin {
     static dialogName = `${NAMESPACE}-consent`;
 
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        if ($.dialog && $.dialog === RecordingConsentDialog.dialogName) {
+            closeDialog();
+        }
+    }
+
     render() {
         const { recorder, onCallEnd, onClose } = this.props;
         const recorderName = nicknames.getNickname(recorder).substr(0, ChatToastIntegration.MAX_NAME_CHARS);

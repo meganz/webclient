@@ -1032,24 +1032,28 @@ lazy(mega, 'fileRequest', () => {
                     continue;
                 }
 
-                this.storage.saveOrUpdatePuHandle(
-                    {
-                        state: puHandleState,
-                        publicHandle: puHandleId,
-                        pagePublicHandle: puPageId
-                    }
-                );
+                // Lets check puHandle
+                const nodeHandle = this.getNodeHandleByPuHandle(puHandleId);
+                if (nodeHandle) {
+                    this.storage.saveOrUpdatePuHandle(
+                        {
+                            nodeHandle,
+                            state: puHandleState,
+                            publicHandle: puHandleId,
+                            pagePublicHandle: puPageId
+                        }
+                    );
 
-                promises.push(this.getPuPage(puPageId, puHandleId));
+                    promises.push(this.getPuPage(puPageId, puHandleId));
+                }
             }
 
             return Promise.all(promises);
         }
 
         async processUploadedPuHandles(fetchNodesResponse) {
-
-            return this.actionHandler.processUploadedPuHandles(fetchNodesResponse)
-                .then(() => this.refreshPuPageList());
+            this.actionHandler.processUploadedPuHandles(fetchNodesResponse);
+            return this.refreshPuPageList();
         }
 
         getPuHandleList() {

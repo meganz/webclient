@@ -14500,7 +14500,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
       },
       onAddParticipantSelected: contactHashes => {
         room.scrolledToBottom = true;
-        if (room.type === 'public') {
+        if (room.type === 'group' || room.type === 'public') {
           if (room.options.w && room.call) {
             var _room$call$sfuClient;
             (_room$call$sfuClient = room.call.sfuClient) == null || _room$call$sfuClient.wrAllowJoin(contactHashes);

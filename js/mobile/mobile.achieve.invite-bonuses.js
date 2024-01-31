@@ -98,7 +98,7 @@ mobile.achieve.inviteBonuses = Object.create(mobile.settingsHelper, {
             this.referralList.textContent = '';
 
             // Get list of friends invited
-            const rewardedBonuses = M.account.maf.a || [];
+            const rewardedBonuses = M.account.maf && M.account.maf.a || [];
 
             const activeReferralsList = [];
             const expiredReferralsList = [];

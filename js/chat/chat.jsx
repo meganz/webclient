@@ -1313,27 +1313,6 @@ Chat.prototype.initContacts = function(userHandles, c) {
     return newUsers;
 };
 
-Chat.prototype.proxyUserChangeToRooms = function(handle) {
-    // There will likely be a performance hit during the room/contact loading phase as user updates come in
-    // Beyond that it shouldn't impact the performance of chat much as fewer updates would be expected.
-
-    delay(`chat:proxy-user-change-to-rooms.${handle}`, () => {
-        const rooms = Object.values(this.chats);
-
-        if (d > 1) {
-            this.logger.debug('userChange', handle);
-        }
-
-        for (let i = rooms.length; i--;) {
-            const chatRoom = rooms[i];
-
-            if (handle in chatRoom.members) {
-                chatRoom.trackDataChange('user-updated', handle);
-            }
-        }
-    }, 350);
-};
-
 /**
  * Wrapper around openChat() that does wait for the chat to be ready.
  * @see Chat.openChat

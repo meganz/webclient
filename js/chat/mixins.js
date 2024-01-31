@@ -478,7 +478,7 @@ export class MegaRenderMixin extends React.Component {
      */
     isComponentEventuallyVisible() {
         // .__isMounted is faster then .isMounted() or any other operation
-        if (!this.__isMounted) {
+        if (!this.__isMounted || this.props.chatRoom && !this.props.chatRoom.isCurrentlyActive) {
             return false;
         }
 
@@ -557,7 +557,10 @@ export class MegaRenderMixin extends React.Component {
     _recurseAddListenersIfNeeded(idx, map, depth) {
         depth |= 0;
 
-        if (map instanceof MegaDataMap) {
+        // Add a listener if there isn't one already.
+        if (map instanceof MegaDataMap
+            && !(this._contactChangeListeners && this._contactChangeListeners.includes(map))) {
+
             var cacheKey = this._getUniqueIDForMap(map, idx);
             var instanceId = this.getUniqueId();
 
@@ -565,6 +568,7 @@ export class MegaRenderMixin extends React.Component {
                 _propertyTrackChangesVars._listenersMap[instanceId] = Object.create(null);
             }
             if (!_propertyTrackChangesVars._listenersMap[instanceId][cacheKey]) {
+
                 _propertyTrackChangesVars._listenersMap[instanceId][cacheKey]
                     = [map, map.addChangeListener(() => this.onPropOrStateUpdated())];
             }

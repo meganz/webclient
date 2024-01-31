@@ -2369,20 +2369,6 @@ Chat.prototype.initContacts = function (userHandles, c) {
   }
   return newUsers;
 };
-Chat.prototype.proxyUserChangeToRooms = function (handle) {
-  delay(`chat:proxy-user-change-to-rooms.${handle}`, () => {
-    const rooms = Object.values(this.chats);
-    if (d > 1) {
-      this.logger.debug('userChange', handle);
-    }
-    for (let i = rooms.length; i--;) {
-      const chatRoom = rooms[i];
-      if (handle in chatRoom.members) {
-        chatRoom.trackDataChange('user-updated', handle);
-      }
-    }
-  }, 350);
-};
 Chat.prototype.smartOpenChat = function (...args) {
   var self = this;
   if (typeof args[0] === 'string') {
@@ -6060,7 +6046,7 @@ let MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 = l
     return verge.inViewport(domNode);
   }
   isComponentEventuallyVisible() {
-    if (!this.__isMounted) {
+    if (!this.__isMounted || this.props.chatRoom && !this.props.chatRoom.isCurrentlyActive) {
       return false;
     }
     if (this.customIsEventuallyVisible) {
@@ -6109,7 +6095,7 @@ let MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 = l
   }
   _recurseAddListenersIfNeeded(idx, map, depth) {
     depth |= 0;
-    if (map instanceof MegaDataMap) {
+    if (map instanceof MegaDataMap && !(this._contactChangeListeners && this._contactChangeListeners.includes(map))) {
       var cacheKey = this._getUniqueIDForMap(map, idx);
       var instanceId = this.getUniqueId();
       if (!_propertyTrackChangesVars._listenersMap[instanceId]) {
@@ -29233,14 +29219,24 @@ class ConversationMessageMixin extends _mixins1__._p {
       console.warn('%s.addContactListenerIfMissing', this.getReactId(), [this], added);
     }
   }
+  eventuallyUpdate() {
+    super.eventuallyUpdate();
+    this.__cmmUpdateTickCount = -2;
+  }
   handleChangeEvent(x, z, k) {
     if (k === 'ts' || k === 'ats') {
       return;
     }
-    delay(this.__cmmId, () => {
-      this.eventuallyUpdate();
-      this.__cmmUpdateTickCount = -2;
-    }, ++this.__cmmUpdateTickCount > 5 ? -1 : 90);
+    if (this.isComponentEventuallyVisible()) {
+      if (++this.__cmmUpdateTickCount > 5) {
+        this.eventuallyUpdate();
+        delay.cancel(this.__cmmId);
+      } else {
+        delay(this.__cmmId, () => this.eventuallyUpdate(), 90);
+      }
+    } else {
+      this._requiresUpdateOnResize = true;
+    }
   }
   componentWillUnmount() {
     super.componentWillUnmount();

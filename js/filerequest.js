@@ -1033,7 +1033,7 @@ lazy(mega, 'fileRequest', () => {
                 }
 
                 // Lets check puHandle
-                const nodeHandle = this.getNodeHandleByPuHandle(puHandleId);
+                const nodeHandle = this.storage.getNodeHandleByPuHandle(puHandleId);
                 if (nodeHandle) {
                     this.storage.saveOrUpdatePuHandle(
                         {
@@ -1045,6 +1045,9 @@ lazy(mega, 'fileRequest', () => {
                     );
 
                     promises.push(this.getPuPage(puPageId, puHandleId));
+                }
+                else {
+                    this.storage.removePuHandle(null, puHandleId);
                 }
             }
 

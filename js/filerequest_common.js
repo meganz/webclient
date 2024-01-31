@@ -203,6 +203,10 @@ lazy(mega, 'fileRequestCommon', () => {
             if (nodeHandle && this.cache.puHandle[nodeHandle]) {
                 delete this.cache.puHandle[nodeHandle];
             }
+
+            if (fminitialized && nodeHandle) {
+                removeFileRequestIcon(nodeHandle);
+            }
         }
 
         addPuHandle(puHandleNodeHandle, puHandlePublicHandle, data, pagePublicHandle) {
@@ -863,8 +867,6 @@ lazy(mega, 'fileRequestCommon', () => {
                 mega.fileRequest.storage.removePuHandle(h, ph);
 
                 if (fminitialized) {
-                    removeFileRequestIcon(h);
-
                     // @todo ideally we should not openFolder(true)
                     delay('fr:processPublicUploadHandle', refreshFileRequestPageList);
                 }
@@ -892,6 +894,9 @@ lazy(mega, 'fileRequestCommon', () => {
             if (d) {
                 logger.info('Handler.processPublicUploadPage - %s pup', doAdd ? 'Add' : 'Remove', actionPacket);
             }
+
+            assert(actionPacket && typeof actionPacket.p === 'string',
+                   'processPublicUploadPage: No PUP Handle - Check this', actionPacket.ph, [actionPacket]);
 
             if (doAdd) {
 

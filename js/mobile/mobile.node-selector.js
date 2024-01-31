@@ -60,10 +60,22 @@ class MobileSelectionRender extends MobileMegaRender {
             {name: l[164], key: 'cloud', active: M.currentrootid === M.RootID, type: 'link', href: 'fm'},
             {name: l[16770], key: 'shares', active: M.currentrootid === 'shares', type: 'link', href: 'fm/shares'}
         ];
-        const _getCompleteString = (sn, th, type) =>
-            l[`mobile_${type}${sn.t ? '_folder' : ''}${th === M.RootID ? '_to_cloud' : ''}_toast_complete`]
+        const _getCompleteString = (sn, th, type) => {
+            /**
+             * List of possible string key combinations:
+             * l.mobile_move_folder_to_cloud_toast_complete
+             * l.mobile_move_folder_toast_complete
+             * l.mobile_move_to_cloud_toast_complete
+             * l.mobile_move_toast_complete
+             * l.mobile_copy_folder_to_cloud_toast_complete
+             * l.mobile_copy_folder_toast_complete
+             * l.mobile_copy_to_cloud_toast_complete
+             * l.mobile_copy_toast_complete
+             */
+            return l[`mobile_${type}${sn.t ? '_folder' : ''}${th === M.RootID ? '_to_cloud' : ''}_toast_complete`]
                 .replace('%1', mobile.nodeSelector[`${type}Renamed${sn.h}`] || sn.name || '')
                 .replace('%2', M.getNameByHandle(th));
+        };
 
         return {
             'copy': {
@@ -74,7 +86,6 @@ class MobileSelectionRender extends MobileMegaRender {
                     button.loading = true;
 
                     const {selected} = mobile.nodeSelector;
-                    const sn = M.getNodeByHandle(selected);
                     mobile.nodeSelector[`copyRenamed${selected}`] = null;
 
                     // selection action
@@ -82,6 +93,7 @@ class MobileSelectionRender extends MobileMegaRender {
                         .catch(tell)
                         .then(res => {
                             if (res && res.length) {
+                                const sn = M.getNodeByHandle(res[0]);
                                 mega.ui.toast.show(
                                     _getCompleteString(sn, h, 'copy'),
                                     undefined,
@@ -110,13 +122,13 @@ class MobileSelectionRender extends MobileMegaRender {
                     button.loading = true;
 
                     const {selected} = mobile.nodeSelector;
-                    const sn = M.getNodeByHandle(selected);
                     // TODO: remove this type logic once we fix move another section treat as copy.
                     const aType = treetype(h) === treetype(selected) ? 'move' : 'copy';
                     mobile.nodeSelector[`${aType}Renamed${selected}`] = null;
 
                     M.safeMoveNodes(h, [selected])
                         .then(() => {
+                            const sn = M.getNodeByHandle(selected);
                             mega.ui.toast.show(
                                 _getCompleteString(sn, h, aType),
                                 undefined,

@@ -309,16 +309,6 @@ MegaData.prototype.syncContactEmail = async function(userHash, forced) {
 (function() {
     "use strict";
 
-    const chatListener = freeze({
-        handleChangeEvent(user) {
-
-            if (user instanceof MegaDataObject && M.chat && megaChatIsReady && !megaChat.isLoggingOut) {
-
-                megaChat.proxyUserChangeToRooms(user.u || user.h);
-            }
-        }
-    });
-
     /**
      * Set new user into map store and returns it
      * @param {String} u_h user handle
@@ -369,9 +359,9 @@ MegaData.prototype.syncContactEmail = async function(userHash, forced) {
                 fmdb.add('u', {u: u.u, d: {...user.toJS()}});
             }
 
-            if (fminitialized || user.u === window.u_handle) {
+            if (user.c === 1 || user.u === window.u_handle) {
 
-                if (!user.c && !ignoreDB) {
+                if (!ignoreDB) {
                     user.lastName = '';
                     user.firstName = '';
                     attribCache.removeItem(`${user.u}_lastname`);
@@ -387,11 +377,6 @@ MegaData.prototype.syncContactEmail = async function(userHash, forced) {
                 if (megaChatIsReady && megaChat.plugins.presencedIntegration) {
                     megaChat.plugins.presencedIntegration.eventuallyAddPeer(user.u);
                 }
-            }
-
-            if (!user._chatListener) {
-                // @todo reuse the mixin one (!?)
-                user._chatListener = user.addChangeListener(chatListener);
             }
         }
     };

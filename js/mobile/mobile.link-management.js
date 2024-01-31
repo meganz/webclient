@@ -158,7 +158,7 @@ mobile.linkManagement = {
             defaultValue: expiryTimestamp,
             frontInputID: 'exp-date',
         });
-        this.datePicker[expiryTimestamp ? 'removeClass' : 'addClass']('hidden');
+        this.datePicker[u_attr && u_attr.p && expiryTimestamp ? 'removeClass' : 'addClass']('hidden');
 
         this.datePicker.rebind('change', () => {
             this.changeExpiryDate(this.datePicker.picker.value);

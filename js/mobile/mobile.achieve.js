@@ -208,7 +208,7 @@ mobile.achieve = Object.create(mobile.settingsHelper, {
         value: function(classNum) {
             'use strict';
 
-            if (M.account.maf.a) {
+            if (M.account.maf && M.account.maf.a) {
                 // Get the list of awarded bonuses
                 const awardedBonuses = M.account.maf.a;
 

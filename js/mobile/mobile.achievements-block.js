@@ -68,7 +68,7 @@ class MegaMobileAchievementsBlock extends MegaMobileComponent {
         const isFriendsAchievement = achievement === 'friends';
         const isInviteBonuses = achievement === 'invitebonuses';
 
-        if (M.account.maf.r) {
+        if (M.account.maf && M.account.maf.r) {
             // Get bonus information
             const rewardedBonuses = M.account.maf.a;
             const bonusesReceivedInfo = M.account.maf.r;

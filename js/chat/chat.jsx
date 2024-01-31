@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import ConversationsUI from './ui/conversations.jsx';
+import ConversationsUI, { EVENTS, VIEWS } from './ui/conversations.jsx';
 
 require("./chatGlobalEventManager.jsx");
 // load chatRoom.jsx, so that its included in bundle.js, despite that ChatRoom is legacy ES ""class""
@@ -1313,27 +1313,6 @@ Chat.prototype.initContacts = function(userHandles, c) {
     return newUsers;
 };
 
-Chat.prototype.proxyUserChangeToRooms = function(handle) {
-    // There will likely be a performance hit during the room/contact loading phase as user updates come in
-    // Beyond that it shouldn't impact the performance of chat much as fewer updates would be expected.
-
-    delay(`chat:proxy-user-change-to-rooms.${handle}`, () => {
-        const rooms = Object.values(this.chats);
-
-        if (d > 1) {
-            this.logger.debug('userChange', handle);
-        }
-
-        for (let i = rooms.length; i--;) {
-            const chatRoom = rooms[i];
-
-            if (handle in chatRoom.members) {
-                chatRoom.trackDataChange('user-updated', handle);
-            }
-        }
-    }, 350);
-};
-
 /**
  * Wrapper around openChat() that does wait for the chat to be ready.
  * @see Chat.openChat
@@ -1660,9 +1639,40 @@ Chat.prototype.renderListing = async function megaChatRenderListing(location, is
 
         if (!room) {
             let idx = 0;
-            const rooms = Object.values(this.chats)
-                .filter(r => r.isMeeting === !!this.currentlyOpenedView)
-                .sort(M.sortObjFn('lastActivity', -1));
+            const chats = [];
+            const meetings = [];
+            // Filter rooms into chat/meetings sections in case the view is empty and another needs to be picked
+            for (const room of Object.values(this.chats)) {
+                if (!room.isArchived()) {
+                    if (room.isMeeting) {
+                        meetings.push(room);
+                    }
+                    else {
+                        chats.push(room);
+                    }
+                }
+            }
+            let rooms = chats;
+            let view;
+            if (this.currentlyOpenedView === VIEWS.MEETINGS) {
+                if (meetings.length) {
+                    rooms = meetings;
+                }
+                else {
+                    view = VIEWS.CHATS;
+                }
+            }
+            else if (!chats.length) {
+                rooms = meetings;
+                view = VIEWS.MEETINGS;
+            }
+            if (view) {
+                onIdle(() => {
+                    this.trigger(EVENTS.NAV_RENDER_VIEW, view);
+                });
+            }
+
+            rooms.sort(M.sortObjFn('lastActivity', -1));
 
             do {
                 room = valid(rooms[idx]);

@@ -203,9 +203,13 @@ lazy(mega, 'fileRequestCommon', () => {
             if (nodeHandle && this.cache.puHandle[nodeHandle]) {
                 delete this.cache.puHandle[nodeHandle];
             }
+
+            if (fminitialized && nodeHandle) {
+                removeFileRequestIcon(nodeHandle);
+            }
         }
 
-        async addPuHandle(puHandleNodeHandle, puHandlePublicHandle, data, pagePublicHandle) {
+        addPuHandle(puHandleNodeHandle, puHandlePublicHandle, data, pagePublicHandle) {
             if (d) {
                 logger.info('Storage.addPuHandle', {
                     puHandleNodeHandle,
@@ -213,18 +217,15 @@ lazy(mega, 'fileRequestCommon', () => {
                 });
             }
             let n = M.getNodeByHandle(puHandleNodeHandle);
-
+            // Since the name is getting retrieved asynchronously, we can update it later
             if (!n.name) {
-                await dbfetch.acquire(puHandleNodeHandle);
-
-                if (!(n = M.getNodeByHandle(puHandleNodeHandle)).name) {
-
-                    throw new Error(`addPuHandle: ${puHandleNodeHandle} not found.`);
+                if (d) {
+                    logger.warn('Storage.addPuHandle - no name was found', n, puHandleNodeHandle, puHandlePublicHandle);
                 }
             }
 
-            const {name} = n;
             const puHandleState = 2;
+            const {name = ''} = n;
             let title = '';
             let description = '';
 
@@ -245,6 +246,7 @@ lazy(mega, 'fileRequestCommon', () => {
                 );
             }
 
+            // This just make sure we have the entry saved on cache locally
             this.saveOrUpdatePuHandle(
                 {
                     nodeHandle: puHandleNodeHandle,
@@ -256,8 +258,6 @@ lazy(mega, 'fileRequestCommon', () => {
                     pagePublicHandle
                 }
             );
-
-            this.addPuMessage(puHandlePublicHandle);
         }
 
         saveOrUpdatePuHandle(options, update) {
@@ -269,7 +269,7 @@ lazy(mega, 'fileRequestCommon', () => {
                 );
             }
 
-            const {
+            let {
                 nodeHandle,
                 title,
                 description,
@@ -278,6 +278,15 @@ lazy(mega, 'fileRequestCommon', () => {
                 publicHandle,
                 pagePublicHandle
             } = this.setPuHandleValues(options, update);
+
+            // This is to look for
+            if (!nodeHandle && publicHandle) {
+                nodeHandle = this.getNodeHandleByPuHandle(publicHandle);
+            }
+
+            // Node handle should exist
+            assert(typeof nodeHandle === 'string', 'saveOrUpdatePuHandle: No Handle - Check this',
+                   publicHandle, [options, nodeHandle]);
 
             const puHandleCacheData = {
                 p: pagePublicHandle || '', // Page public handle
@@ -778,6 +787,26 @@ lazy(mega, 'fileRequestCommon', () => {
                 this.cache.puPage[puPageHandle] = puPageObject;
             }
         }
+
+        getNodeHandleByPuHandle(puHandlePublicHandle) {
+            if (!this.cache.puHandle) {
+                return null;
+            }
+
+            const puHandleObjects = this.cache.puHandle;
+
+            for (const key in puHandleObjects) {
+                if (puHandleObjects[key]) {
+                    const puHandleObject = puHandleObjects[key];
+
+                    if (puHandleObject.ph === puHandlePublicHandle) {
+                        return key;
+                    }
+                }
+            }
+
+            return null;
+        }
     }
 
     class FileRequestGenerator {
@@ -838,45 +867,24 @@ lazy(mega, 'fileRequestCommon', () => {
                 mega.fileRequest.storage.removePuHandle(h, ph);
 
                 if (fminitialized) {
-                    removeFileRequestIcon(h);
-
                     // @todo ideally we should not openFolder(true)
                     delay('fr:processPublicUploadHandle', refreshFileRequestPageList);
                 }
             }
             else {
-                mega.fileRequestCommon.storage.addPuHandle(h, ph).catch(dump);
+                mega.fileRequestCommon.storage.addPuHandle(h, ph);
             }
         }
 
-        async processUploadedPuHandles(fetchNodesResponse) {
+        processUploadedPuHandles(fetchNodesResponse) {
             if (d) {
                 logger.debug('[uph] processUploadedPuHandles', fetchNodesResponse);
             }
 
-            const promises = [];
             for (let i = 0; i < fetchNodesResponse.length; ++i) {
                 const {h, ph} = fetchNodesResponse[i];
-
-                promises.push(mega.fileRequestCommon.storage.addPuHandle(h, ph));
+                mega.fileRequestCommon.storage.addPuHandle(h, ph);
             }
-
-            return Promise.allSettled(promises)
-                .then((res) => {
-                    if (d) {
-                        for (let i = res.length; i--;) {
-                            if (!res[i].reason) {
-                                res.splice(i, 1);
-                            }
-                        }
-
-                        if (res.length) {
-                            console.group('processUploadedPuHandles');
-                            res.map((ex) => logger.warn(ex.reason));
-                            console.groupEnd();
-                        }
-                    }
-                });
         }
 
         processPublicUploadPage(actionPacket) {
@@ -886,6 +894,9 @@ lazy(mega, 'fileRequestCommon', () => {
             if (d) {
                 logger.info('Handler.processPublicUploadPage - %s pup', doAdd ? 'Add' : 'Remove', actionPacket);
             }
+
+            assert(actionPacket && typeof actionPacket.p === 'string',
+                   'processPublicUploadPage: No PUP Handle - Check this', actionPacket.ph, [actionPacket]);
 
             if (doAdd) {
 

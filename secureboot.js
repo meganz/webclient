@@ -3024,6 +3024,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/mobile/mobile.achievements-block.css', n: 'mobile_achievements_block_css', j: 2, w: 1});
         jsl.push({f:'css/mobile/mobile.achieve.invite-bonuses.css', n: 'mobile_achieve_inv_bonuses_css', j: 2, w: 1});
         jsl.push({f:'css/mobile/mobile.file-request-management.css', n: 'mobile_fr_mgmt_css', j: 2, w: 1});
+        jsl.push({f:'css/mobile/mobile.conflict-resolution.css', n: 'mobile_conflict_resolution_css', j: 2, w: 1});
 
         jsl.push({f:'html/mobile.html', n: 'mobile', j: 0, w: 1});
         jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
@@ -3060,7 +3061,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.sms.verify-success.js', n: 'mobile_sms_verify_success_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.sms.achievement.js', n: 'mobile_sms_achievement', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.rubbishbin.js', n: 'mobile_rubbishbin_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.conflict-resolution-overlay.js', n: 'mobile_conflict_resolution_overlay_js', j: 1 });
+        jsl.push({f:'js/mobile/mobile.conflict-resolution.js', n: 'mobile_conflict_resolution_js', j: 1 });
         jsl.push({f:'js/mobile/mobile.over-bandwidth-quota.js', n: 'mobile_over_bandwidth_quota_js', j: 1 });
         jsl.push({f:'js/mobile/mobile.over-storage-quota.js', n: 'mobile_over_storage_quota_js', j: 1 });
         jsl.push({f:'html/mvoucherinfo.html', n: 'mvoucherinfo', j: 0, w: 1});

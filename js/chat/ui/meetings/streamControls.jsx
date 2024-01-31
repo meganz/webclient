@@ -194,7 +194,7 @@ class StreamControls extends MegaRenderMixin {
                         this.endButtonRef = button.buttonRef;
                     }}
                 />
-                <span>End</span>
+                <span>{l.end_button /* `End` */}</span>
             </div>
         );
     };

@@ -1406,9 +1406,6 @@ security.login = {
 
         loadingDialog.hide();
 
-        // Reset the 2FA dialog back to default UI
-        twofactor.loginDialog.resetState();
-
         // If the Two-Factor Auth PIN is required
         if (result === EMFAREQUIRED) {
 
@@ -1446,12 +1443,7 @@ security.login = {
 
         // Check for incomplete registration
         else if (result === EINCOMPLETE) {
-            if (is_mobile) {
-                mobile.messageOverlay.show(l[882], l[9082]);
-            }
-            else {
-                msgDialog('warningb', l[882], l[9082]); // This account has not completed the registration
-            }
+            msgDialog('warningb', l[882], l[9082]); // This account has not completed the registration
 
             return true;
         }

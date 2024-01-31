@@ -50,6 +50,7 @@ mobile.settings.backupRecovery = Object.create(mobile.settingsHelper, {
                 componentClassname: 'text-icon'
             });
             copyButton.on('tap', () => {
+                eventlog(500026);
                 copyToClipboard(recoveryKey, l[6040]);
             });
 
@@ -60,7 +61,7 @@ mobile.settings.backupRecovery = Object.create(mobile.settingsHelper, {
                 componentClassname: 'primary block dlButton'
             });
             dlButton.on('tap', () => {
-
+                eventlog(99994);
                 M.saveAs(recoveryKey, `${M.getSafeName(l[20830])}.txt`)
                     .then(() => {
                         mega.ui.toast.show(l.recovery_key_download_toast); // Downloaded copy

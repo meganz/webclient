@@ -238,6 +238,7 @@ mobile.signin.old = {
         // Hide the loading spinner
         mobile.signin.$screen.find('.signin-button').removeClass('loading');
 
+        // @todo: Unify 2FA calls for desktop and mobile
         // If there was a 2FA error, show a message that the PIN code was incorrect
         if (result === EFAILED) {
             mobile.settings.account.twofactorVerifyAction.init(false, result);
@@ -255,18 +256,13 @@ mobile.signin.old = {
             return false;
         }
 
-        // Cleanup temporary login variables
-        security.login.email = null;
-        security.login.password = null;
-        security.login.rememberMe = false;
-
-        // Check they are not locked out
-        if (result === EBLOCKED) {
-            mobile.messageOverlay.show(l[730]);
+        // Check and handle the common login errors
+        if (security.login.checkForCommonErrors(result)) {
+            return false;
         }
 
         // Otherwise if successful
-        else if (result !== false && result >= 0) {
+        if (result !== false && result >= 0) {
 
             // Set the u_type e.g. 3 is fully registered user
             u_type = result;
@@ -307,7 +303,7 @@ mobile.signin.old = {
         }
         else {
             // Otherwise they used an incorrect email or password so show an error
-            mobile.messageOverlay.show(l[16349], l[16350]);
+            msgDialog('warninga', l[16349], l[16350]);
         }
     }
 };
@@ -355,7 +351,7 @@ mobile.signin.new = {
             security.login.rememberMe = false;
 
             if (result === EBLOCKED) {
-                mobile.messageOverlay.show(l[730]);
+                msgDialog('warninga', l[6789], l[730]);
             }
             else if (result !== false && result >= 0) {
                 u_type = result;
@@ -363,11 +359,12 @@ mobile.signin.new = {
             }
             else {
                 // Otherwise they used an incorrect email or password so show an error
-                mobile.messageOverlay.show(l[16349], l[16350]);
+                msgDialog('warninga', l[16349], l[16350]);
             }
         }
         else {
 
+            // @todo: Unify 2FA calls for desktop and mobile
             // If there was a 2FA error, show a message that the PIN code was incorrect
             if (result === EFAILED) {
                 mobile.settings.account.twofactorVerifyAction.init(false, result);
@@ -385,18 +382,13 @@ mobile.signin.new = {
                 return false;
             }
 
-            // Cleanup temporary login variables
-            security.login.email = null;
-            security.login.password = null;
-            security.login.rememberMe = false;
-
-            // Check they are not locked out
-            if (result === EBLOCKED) {
-                mobile.messageOverlay.show(l[730]);
+            // Check and handle the common login errors
+            if (security.login.checkForCommonErrors(result)) {
+                return false;
             }
 
             // Otherwise if successful
-            else if (result !== false && result >= 0) {
+            if (result !== false && result >= 0) {
 
                 // Set the u_type e.g. 3 is fully registered user
                 u_type = result;
@@ -437,7 +429,7 @@ mobile.signin.new = {
             }
             else {
                 // Otherwise they used an incorrect email or password so show an error
-                mobile.messageOverlay.show(l[16349], l[16350]);
+                msgDialog('warninga', l[16349], l[16350]);
             }
         }
     }

@@ -712,7 +712,7 @@ pro.propay = {
         $planName.text(pro.propay.planName);
 
         // Default to svg sprite icon format icon-crests-pro-x-details
-        let iconClass = `icon-crests-pro-${pro.propay.planNum}-details`;
+        let iconClass = `sprite-fm-uni icon-crests-pro-${pro.propay.planNum}-details`;
 
         // Special handling for PRO Lite (account level 4) and Pro Flexi (account level 101)
         if (pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_LITE) {

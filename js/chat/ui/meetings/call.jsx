@@ -129,6 +129,13 @@ export const inProgressAlert = (isJoin, chatRoom) => {
 class RecordingConsentDialog extends MegaRenderMixin {
     static dialogName = `${NAMESPACE}-consent`;
 
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        if ($.dialog && $.dialog === RecordingConsentDialog.dialogName) {
+            closeDialog();
+        }
+    }
+
     render() {
         const { recorder, onCallEnd, onClose } = this.props;
         const recorderName = nicknames.getNickname(recorder).substr(0, ChatToastIntegration.MAX_NAME_CHARS);
@@ -294,9 +301,11 @@ export default class Call extends MegaRenderMixin {
                 peers[call.activeStream] ||
                 peers.getItem(0);
 
-            call.sfuClient?.recordingForcePeerVideo(
-                activeStream.isScreen || !activeStream.videoMuted ? activeStream?.clientId : null
-            );
+            if (activeStream) {
+                call.sfuClient?.recordingForcePeerVideo(
+                    activeStream.isScreen || !activeStream.videoMuted ? activeStream.clientId : null
+                );
+            }
         }
     };
 
@@ -493,17 +502,16 @@ export default class Call extends MegaRenderMixin {
             const { recorder } = this.state;
             this.setState(
                 { recordingConsentDialog: false, recorder: userHandle === recorder ? false : recorder },
-                () => {
-                    if (userHandle === recorder) {
-                        ChatToast.quick(
-                            l.user_recording_nop_toast
-                                .replace(
-                                    '%NAME',
-                                    nicknames.getNickname(userHandle).substr(0, ChatToastIntegration.MAX_NAME_CHARS)
-                                )
-                        );
-                    }
-                }
+                () =>
+                    window.sfuClient &&
+                    userHandle === recorder &&
+                    ChatToast.quick(
+                        l.user_recording_nop_toast
+                            .replace(
+                                '%NAME',
+                                nicknames.getNickname(userHandle).substr(0, ChatToastIntegration.MAX_NAME_CHARS)
+                            )
+                    )
             );
         });
 
@@ -816,7 +824,7 @@ export default class Call extends MegaRenderMixin {
 
         if (recorder) {
             const simpletip = {
-                'data-simpletip': `${nicknames.getNickname(recorder)} is recording`,
+                'data-simpletip': l.host_recording.replace('%NAME', nicknames.getNickname(recorder)),
                 'data-simpletipposition': 'top',
                 'data-simpletipoffset': 5,
                 'data-simpletip-class': 'theme-dark-forced'
@@ -828,21 +836,16 @@ export default class Call extends MegaRenderMixin {
                         className={`
                             recording-ongoing
                             simpletip
-                            ${isModerator ? '' : 'plain-background'}
+                            ${isModerator && recorder === u_handle ? '' : 'plain-background'}
                         `}
                         {...(recorder !== u_handle && simpletip)}>
                         <span className="recording-icon">
                             REC <i/>
                         </span>
-                        {isModerator &&
+                        {isModerator && recorder === u_handle &&
                             <span
-                                className={`
-                                    recording-toggle
-                                    ${recorder !== u_handle ? 'disabled' : ''}
-                                `}
-                                onClick={() => {
-                                    return recorder !== u_handle ? null : this.handleRecordingToggle();
-                                }}>
+                                className="recording-toggle"
+                                onClick={this.handleRecordingToggle}>
                                 {l.record_stop_button /* `Stop recording` */}
                             </span>
                         }

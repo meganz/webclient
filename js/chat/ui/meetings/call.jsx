@@ -824,7 +824,7 @@ export default class Call extends MegaRenderMixin {
 
         if (recorder) {
             const simpletip = {
-                'data-simpletip': `${nicknames.getNickname(recorder)} is recording`,
+                'data-simpletip': l.host_recording.replace('%NAME', nicknames.getNickname(recorder)),
                 'data-simpletipposition': 'top',
                 'data-simpletipoffset': 5,
                 'data-simpletip-class': 'theme-dark-forced'
@@ -836,21 +836,16 @@ export default class Call extends MegaRenderMixin {
                         className={`
                             recording-ongoing
                             simpletip
-                            ${isModerator ? '' : 'plain-background'}
+                            ${isModerator && recorder === u_handle ? '' : 'plain-background'}
                         `}
                         {...(recorder !== u_handle && simpletip)}>
                         <span className="recording-icon">
                             REC <i/>
                         </span>
-                        {isModerator &&
+                        {isModerator && recorder === u_handle &&
                             <span
-                                className={`
-                                    recording-toggle
-                                    ${recorder !== u_handle ? 'disabled' : ''}
-                                `}
-                                onClick={() => {
-                                    return recorder !== u_handle ? null : this.handleRecordingToggle();
-                                }}>
+                                className="recording-toggle"
+                                onClick={this.handleRecordingToggle}>
                                 {l.record_stop_button /* `Stop recording` */}
                             </span>
                         }

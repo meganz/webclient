@@ -662,9 +662,15 @@
 
         moveLegacySettings();
 
-        // eslint-disable-next-line guard-for-in
-        for (let key in fmconfig) {
+        for (const key in fmconfig) {
             let value = fmconfig[key];
+
+            if (key.includes('firefox')
+                || key.startsWith('confirmModal_')) {
+
+                mega.config.remove(key);
+                continue;
+            }
 
             if (typeof value === 'string') {
                 value = parse(fmconfig[key]);

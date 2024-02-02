@@ -747,7 +747,7 @@ export default class Call extends MegaRenderMixin {
      */
 
     handleCallEnd = () => {
-        this.props.call?.destroy();
+        this.props.call?.destroy(SfuClient.TermCode.kUserHangup);
     };
 
     /**

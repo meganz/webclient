@@ -529,6 +529,7 @@
         }
 // == end SfuClientIClientEventListener interface
         handleDisconnect(termCode) {
+            console.assert(termCode !== undefined, "handleDisconnect: termCode is undefined");
             this.isDisconnecting = true;
             this.chatRoom.trigger('onCallLeft', {
                 callId: this.callId,
@@ -537,7 +538,7 @@
                 termCode
             });
 
-            if (termCode === SfuClient.TermCode.kTooManyParticipants) {
+            if (termCode === SfuClient.TermCode.kCallParticipantLimit) {
                 msgDialog('warningb', '', l[20200]);
             }
 
@@ -653,6 +654,9 @@
                 return;
             }
             this.isDestroyed = true;
+            if (reason === undefined) {
+                reason = SfuClient.TermCode.kUserHangup;
+            }
             if (!this.isDisconnecting && !this.sfuClient.disconnect(reason)) {
                 this.handleDisconnect(reason);
             }

@@ -28,7 +28,7 @@ var __webpack_exports__ = {};
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  "S": () => (/* binding */ ConnState)
+  S: () => (/* binding */ ConnState)
 });
 
 // UNUSED EXPORTS: CallJoinPermission, ScreenShareType, SfuClient
@@ -111,7 +111,6 @@ Av.HiResVideo = 20;
 Av.Video = 30;
 Av.Recording = 64;
 Av.onHold = 128;
-/* harmony default export */ const shared_av = (Av);
 
 ;// CONCATENATED MODULE: ../shared/sdpCompress.ts
 const endl = "\r\n";
@@ -504,8 +503,8 @@ function base64DecodeToArr(str) {
 const kLogTag = "sfuAdapt:";
 class SvcDriver {
     constructor(client) {
-        this.currRxQuality = 4; // start at half resolution, full fps
-        this.currTxQuality = 2;
+        this.currRxQuality = SvcDriver.kDefaultRxQualityIndex;
+        this.currTxQuality = SvcDriver.kDefaultTxQualityIndex;
         // rtt window
         this.lowestRttSeen = 10000; // force recalculation on first stat sample
         this.rxqSwitchSeqNo = 0;
@@ -551,7 +550,7 @@ class SvcDriver {
         const adaptScrnTx = stats._vtxIsHiRes && this.client.isSendingScreenHiRes();
         if (adaptScrnTx) { // calculate tx average kbps
             const txBwidth = (stats.txBwe > 0) ? stats.txBwe : stats._vtxkbps;
-            if (this.maTxKbps == null) {
+            if (isNaN(this.maTxKbps)) {
                 maTxKbps = this.maTxKbps = txBwidth;
             }
             else {
@@ -594,7 +593,7 @@ class SvcDriver {
                 }
                 const delta = q - this.currTxQuality;
                 if (delta < 0) {
-                    this.switchTxQuality(delta, "scr");
+                    this.switchTxQuality(delta);
                 }
             }
             else if (stats.vtxdly > 2500) {
@@ -603,7 +602,7 @@ class SvcDriver {
                         console.log(kLogTag, `scrnshare: Tx delay ${stats.vtxdly} ms too large, decreasing quality...`);
                     }
                 } while (0);
-                this.switchTxQuality(-1, "scr");
+                this.switchTxQuality(-1);
             }
             else if (stats.vtxdly > 0 && stats.vtxdly < 1400) {
                 let q = this.currTxQuality;
@@ -616,7 +615,7 @@ class SvcDriver {
                 }
                 const delta = q - this.currTxQuality;
                 if (delta > 0) {
-                    this.switchTxQuality(delta, "scr");
+                    this.switchTxQuality(delta);
                 }
             }
         }
@@ -631,7 +630,7 @@ class SvcDriver {
         }
         const statFlags = stats.f;
         const rxBad = (rtt > 1500) || (plost > 30);
-        const hasBadNet = (txBad || rxBad || (statFlags & 2 /* TxQualityLimit.kBandwidth */) !== 0);
+        const hasBadNet = (txBad || rxBad);
         if (hasBadNet !== this.hasBadNetwork) {
             this.hasBadNetwork = hasBadNet;
             this.client._fire("onBadNetwork", hasBadNet);
@@ -824,7 +823,7 @@ class SvcDriver {
         }
         this.decRxQuality();
     }
-    switchTxQuality(delta, mode) {
+    switchTxQuality(delta) {
         let newQ = this.currTxQuality + delta;
         if (newQ < 0) {
             newQ = 0;
@@ -835,9 +834,9 @@ class SvcDriver {
         if (newQ === this.currTxQuality) {
             return false;
         }
-        return this.setTxQuality(newQ, mode);
+        return this.setTxQuality(newQ);
     }
-    setTxQuality(newQ, mode) {
+    setTxQuality(newQ) {
         const track = this.client.outVSpeakerTrack.sentTrack;
         if (!track) {
             return false;
@@ -845,7 +844,7 @@ class SvcDriver {
         const info = SvcDriver.TxQuality[newQ];
         assert(info);
         this.tsNoSwitchUntil = Date.now() + SvcDriver.kQualityIncreaseSettleTime;
-        const params = info[mode];
+        const params = info.scr;
         let ar = this.client.screenAspectRatio;
         if (!ar) {
             const res = track.getSettings();
@@ -879,7 +878,7 @@ class SvcDriver {
     rxTotalArea() {
         let area = 0;
         for (const peer of this.client.peers.values()) {
-            if ((peer.av & shared_av.onHold)) {
+            if ((peer.av & Av.onHold)) {
                 continue;
             }
             const slot = peer.hiResSlot;
@@ -893,7 +892,7 @@ class SvcDriver {
     initTx() {
         if (this.client.isSendingScreenHiRes()) {
             // need small delay to have the track started
-            setTimeout(this.setTxQuality.bind(this, this.currTxQuality, "scr"), 100);
+            setTimeout(this.setTxQuality.bind(this, SvcDriver.kDefaultTxQualityIndex), 100);
         }
     }
 }
@@ -925,17 +924,24 @@ SvcDriver.RxQuality = [
     [2, 2, 2], //6
 ];
 SvcDriver.kMaxRxQualityIndex = SvcDriver.RxQuality.length - 1;
+SvcDriver.kDefaultRxQualityIndex = 4; // start at half resolution, full fps
 // minKbps, maxKbps, scr: constraints for applyConstraints() on sent screen track
+// avoid too high resolutions as packet loss can easily drop very large fragmented frames
 SvcDriver.TxQuality = [
-    { minKbps: 0, maxKbps: 300, scr: { height: 540, frameRate: 4 } },
+    { minKbps: 0, maxKbps: 50, scr: { height: 240, frameRate: 4 } },
+    { minKbps: 40, maxKbps: 300, scr: { height: 540, frameRate: 4 } },
     { minKbps: 280, maxKbps: 700, scr: { height: 720, frameRate: 4 } },
-    { minKbps: 680, maxKbps: 1000, scr: { height: 840, frameRate: 4 } },
-    { minKbps: 900, maxKbps: 1600, scr: { height: 1080, frameRate: 4 } },
-    { minKbps: 1500, maxKbps: 1800, scr: { height: 1080, frameRate: 8 } },
-    { minKbps: 1700, maxKbps: 2000, scr: { height: 1200, frameRate: 8 } },
-    { minKbps: 1900, maxKbps: 4000, scr: { height: 1440, frameRate: 8 } } // 6
+    { minKbps: 680, maxKbps: 1100, scr: { height: 840, frameRate: 4 } },
+    { minKbps: 1000, maxKbps: 1600, scr: { height: 1080, frameRate: 4 } },
+    { minKbps: 1500, maxKbps: 2100, scr: { height: 1080, frameRate: 8 } },
+    { minKbps: 2000, maxKbps: 4100, scr: { height: 1080, frameRate: 16 } },
+    { minKbps: 4000, maxKbps: 9000, scr: { height: 1200, frameRate: 8 } } // 6
+    //      { minKbps: 1700, maxKbps: 2000, scr: { height: 1200, frameRate: 8 }},  // 6
+    //      { minKbps: 1900, maxKbps: 4000, scr: { height: 1440, frameRate: 8 }}   // 7
 ];
 SvcDriver.kMaxTxQualityIndex = SvcDriver.TxQuality.length - 1;
+SvcDriver.kDefaultTxQualityIndex = 3;
+SvcDriver.kScreenCaptureHeight = SvcDriver.TxQuality[SvcDriver.kMaxTxQualityIndex].scr.height;
 
 ;// CONCATENATED MODULE: ./recordingLogo.ts
 //export default const kLogoImageBlobUrl = "data:image/svg+xml,%3Csvg xml:space='preserve' width='362' height='361.39999' viewBox='0 0 362 361.39998' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23d9272e' d='M 180.7,0 C 80.9,0 0,80.9 0,180.7 c 0,99.8 80.9,180.7 180.7,180.7 99.8,0 180.7,-80.9 180.7,-180.7 C 361.4,80.9 280.5,0 180.7,0 Z m 93.8,244.6 c 0,3.1 -2.5,5.6 -5.6,5.6 h -23.6 c -3.1,0 -5.6,-2.5 -5.6,-5.6 v -72.7 c 0,-0.6 -0.7,-0.9 -1.2,-0.5 l -50,50 c -4.3,4.3 -11.4,4.3 -15.7,0 l -50,-50 c -0.4,-0.4 -1.2,-0.1 -1.2,0.5 v 72.7 c 0,3.1 -2.5,5.6 -5.6,5.6 H 92.4 c -3.1,0 -5.6,-2.5 -5.6,-5.6 V 116.8 c 0,-3.1 2.5,-5.6 5.6,-5.6 h 16.2 c 2.9,0 5.8,1.2 7.9,3.3 l 62.2,62.2 c 1.1,1.1 2.8,1.1 3.9,0 l 62.2,-62.2 c 2.1,-2.1 4.9,-3.3 7.9,-3.3 h 16.2 c 3.1,0 5.6,2.5 5.6,5.6 z' id='path2' /%3E%3C/svg%3E%0A";
@@ -1100,7 +1106,7 @@ class CallRecorder {
         return this.videoTx.replaceTrack(cloned);
     }
     switchToLocalVideo() {
-        this._setVideoTrack((this.localAv & shared_av.Screen)
+        this._setVideoTrack((this.localAv & Av.Screen)
             ? this.sender.localScreenTrack()
             : this.sender.localCameraTrack());
     }
@@ -1226,25 +1232,25 @@ class CallRecorder {
     }
     onLocalMediaChange(updateAv) {
         const av = this.sender.availAv;
-        let change = (this.localAv === -1) ? (shared_av.Audio | shared_av.Video) : this.localAv ^ av;
+        let change = (this.localAv === -1) ? (Av.Audio | Av.Video) : this.localAv ^ av;
         this.localAv = av;
         if (updateAv) {
             change |= updateAv;
         }
-        if (change & shared_av.Audio) {
-            if (av & shared_av.Audio) {
+        if (change & Av.Audio) {
+            if (av & Av.Audio) {
                 this.recordLocalAudio();
             }
             else {
                 this.stopRecordingLocalAudio();
             }
         }
-        if (!this.videoInput && (change & shared_av.Video)) {
+        if (!this.videoInput && (change & Av.Video)) {
             this.switchToLocalOrStaticVideo();
         }
     }
     switchToLocalOrStaticVideo() {
-        if ((this.localAv & shared_av.Video) === 0) {
+        if ((this.localAv & Av.Video) === 0) {
             this.switchToStaticVideo();
         }
         else {
@@ -1264,7 +1270,7 @@ class CallRecorder {
 }
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = '9700c0b512';
+const COMMIT_ID = '22bc3ec9cc';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -1306,30 +1312,6 @@ var TxTrackIndex;
     TxTrackIndex[TxTrackIndex["kAudio"] = 2] = "kAudio";
 })(TxTrackIndex || (TxTrackIndex = {}));
 class SfuClient {
-    get micInputSeen() { return this.micMuteMonitor.micInputSeen; }
-    static platformHasSupport() {
-        return window.RTCRtpSender &&
-            !!RTCRtpSender.prototype.createEncodedStreams;
-    }
-    logError(...args) {
-        console.error.apply(console, args);
-        this.remoteLogError(args.join(' '));
-    }
-    remoteLogError(msg) {
-        let url = `${SfuClient.kStatServerUrl}/msglog?userid=${this.userId}&t=e`;
-        if (this.callId) {
-            url += `&callid=${this.callId}`;
-        }
-        fetch(url, { method: "POST", body: msg });
-    }
-    assert(cond) {
-        if (cond) {
-            return;
-        }
-        const ex = new Error("Assertion failed");
-        this.remoteLogError(ex.stack);
-        throw ex;
-    }
     constructor(userId, app, callKey, options) {
         this.peers = new Map();
         this._numRxHiRes = 0;
@@ -1377,6 +1359,30 @@ class SfuClient {
         this._speakerDetector = new SpeakerDetector(this);
         this._statsRecorder = new StatsRecorder(this);
         this.micMuteMonitor = new MicMuteMonitor(this);
+    }
+    get micInputSeen() { return this.micMuteMonitor.micInputSeen; }
+    static platformHasSupport() {
+        return window.RTCRtpSender &&
+            !!RTCRtpSender.prototype.createEncodedStreams;
+    }
+    logError(...args) {
+        console.error.apply(console, args);
+        this.remoteLogError(args.join(' '));
+    }
+    remoteLogError(msg) {
+        let url = `${SfuClient.kStatServerUrl}/msglog?userid=${this.userId}&t=e`;
+        if (this.callId) {
+            url += `&callid=${this.callId}`;
+        }
+        fetch(url, { method: "POST", body: msg });
+    }
+    assert(cond) {
+        if (cond) {
+            return;
+        }
+        const ex = new Error("Assertion failed");
+        this.remoteLogError(ex.stack);
+        throw ex;
     }
     onCryptoWorkerEvent(event) {
         let msg = event.data;
@@ -1955,7 +1961,7 @@ class SfuClient {
         // At this point we are not sending anything: no key should be sent out
         await this._updateSentTracks(null, false);
         this.assert(this.sentAv === 0); // updateSentTracks() doesn't send any tracks if not in kJoined state
-        this.assert(!(this.availAv & shared_av.Audio));
+        this.assert(!(this.availAv & Av.Audio));
         if (this._connState !== ConnState.kCallJoining) {
             do {
                 if (window.d) {
@@ -2286,32 +2292,32 @@ class SfuClient {
         if (this._onHold) {
             return;
         }
-        let sentAv = this.outASpeakerTrack.sentTrack ? shared_av.Audio : 0;
+        let sentAv = this.outASpeakerTrack.sentTrack ? Av.Audio : 0;
         let availAv = sentAv;
         if (this._screenTrack) {
             if (this._cameraTrack) {
-                availAv |= shared_av.ScreenHiRes | shared_av.CameraLowRes;
+                availAv |= Av.ScreenHiRes | Av.CameraLowRes;
             }
             else {
-                availAv |= shared_av.ScreenHiRes | shared_av.ScreenLowRes;
+                availAv |= Av.ScreenHiRes | Av.ScreenLowRes;
             }
         }
         else {
             if (this._cameraTrack) {
-                availAv |= shared_av.Camera; // both high-res and low-res
+                availAv |= Av.Camera; // both high-res and low-res
             }
         }
         if (this.callRecorder) {
-            availAv |= shared_av.Recording;
+            availAv |= Av.Recording;
         }
         this._availAv = availAv;
         let track = this.outVThumbTrack.sentTrack;
         if (track) {
-            sentAv |= ((track === this._cameraTrack) ? shared_av.CameraLowRes : shared_av.ScreenLowRes);
+            sentAv |= ((track === this._cameraTrack) ? Av.CameraLowRes : Av.ScreenLowRes);
         }
         track = this.outVSpeakerTrack.sentTrack;
         if (track) {
-            sentAv |= ((track === this._cameraTrack) ? shared_av.CameraHiRes : shared_av.ScreenHiRes);
+            sentAv |= ((track === this._cameraTrack) ? Av.CameraHiRes : Av.ScreenHiRes);
         }
         this._sentAv = sentAv;
     }
@@ -2350,7 +2356,7 @@ class SfuClient {
         this.callRecorder = new CallRecorder(this, sink, videoHeight);
         await this.callRecorder.init(this.getPeerInputTracks());
         this.callRecorder.start();
-        this._availAv |= shared_av.Recording;
+        this._availAv |= Av.Recording;
         this._sendAvState();
     }
     throwIfNotRecording() {
@@ -2377,7 +2383,7 @@ class SfuClient {
         } while (0);
         this.callRecorder.destroy();
         delete this.callRecorder;
-        this._availAv &= ~shared_av.Recording;
+        this._availAv &= ~Av.Recording;
         this._sendAvState();
     }
     recordingForcePeerVideo(cid) {
@@ -2409,7 +2415,7 @@ class SfuClient {
             } while (0);
             return false;
         }
-        if (!(peer.av & shared_av.HiResVideo)) {
+        if (!(peer.av & Av.HiResVideo)) {
             do {
                 if (window.d) {
                     console.warn(client_kLogTag, `Peer ${cid} is not sending hi-res video to record`);
@@ -2450,12 +2456,12 @@ class SfuClient {
         return result;
     }
     obtainedAv() {
-        let av = this._audioTrack ? shared_av.Audio : 0;
+        let av = this._audioTrack ? Av.Audio : 0;
         if (this._cameraTrack) {
-            av |= shared_av.Camera;
+            av |= Av.Camera;
         }
         if (this._screenTrack) {
-            av |= shared_av.Screen;
+            av |= Av.Screen;
         }
         return av;
     }
@@ -2575,18 +2581,18 @@ class SfuClient {
         });
     }
     setMicDevice(deviceId) {
-        return this._setInputDevice("calls.micId", "_audioTrack", deviceId, shared_av.Audio);
+        return this._setInputDevice("calls.micId", "_audioTrack", deviceId, Av.Audio);
     }
     setCameraDevice(deviceId) {
-        return this._setInputDevice("calls.camId", "_cameraTrack", deviceId, shared_av.Video);
+        return this._setInputDevice("calls.camId", "_cameraTrack", deviceId, Av.Video);
     }
     async putOnHold() {
         await this._updateSentTracks(() => {
             if (this._onHold) {
                 return;
             }
-            this._availAv |= shared_av.onHold;
-            this._sentAv = shared_av.onHold;
+            this._availAv |= Av.onHold;
+            this._sentAv = Av.onHold;
             this._onHold = {
                 muteCamera: this._muteCamera,
                 muteAudio: this._muteAudio,
@@ -2600,14 +2606,14 @@ class SfuClient {
         // updateSentTracks() does not register avflags and local media change because it sees the on-hold availAv,
         // which is constant before and after the media change. So, we have to fire the event manually
         this._sendAvState();
-        this._fire("onLocalMediaChange", shared_av.onHold);
+        this._fire("onLocalMediaChange", Av.onHold);
     }
     async releaseHold() {
         await this._updateSentTracks(() => {
             if (!this._onHold) {
                 return;
             }
-            this.assert(this._availAv & shared_av.onHold);
+            this.assert(this._availAv & Av.onHold);
             let oh = this._onHold;
             this._muteCamera = oh.muteCamera;
             this._muteAudio = oh.muteAudio;
@@ -2616,7 +2622,7 @@ class SfuClient {
             this._sendVthumb = oh.sendVthumb;
             delete this._onHold;
             // reflect the actual state of the sent tracks, so that the actual delta is seen correctly
-            this._availAv = shared_av.onHold;
+            this._availAv = Av.onHold;
         });
     }
     isOnHold() {
@@ -2944,7 +2950,7 @@ class SfuClient {
         if (!this.isModerator) {
             throw new Error("mutePeer: Not a moderator");
         }
-        const msg = { a: "MUTE", av: shared_av.Audio };
+        const msg = { a: "MUTE", av: Av.Audio };
         if (cid) {
             msg.cid = cid;
         }
@@ -2990,8 +2996,8 @@ class SfuClient {
         }
         this._fire("onSpeakReqDel", msg.user);
     }
-    msgMuted(msg) {
-        if ((msg.av & shared_av.Audio) === 0) {
+    async msgMuted(msg) {
+        if ((msg.av & Av.Audio) === 0) {
             do {
                 if (window.d) {
                     console.warn(client_kLogTag, "MUTED received without audio flag");
@@ -2999,7 +3005,12 @@ class SfuClient {
             } while (0);
             return;
         }
-        this._doMuteAudio(true, true);
+        const wasMuted = this.localAudioMuted();
+        await this._doMuteAudio(true, true);
+        const by = msg.by;
+        if (!isNaN(by) && !wasMuted) {
+            this._fire("onMutedBy", by);
+        }
     }
     msgHiresStart(msg) {
         if (this._onHold) {
@@ -3054,6 +3065,9 @@ class SfuClient {
             this._fire("onCanNotSpeak");
         }
         this._fire("onSpeakerDel", userId);
+    }
+    msgWillEnd(msg) {
+        this._fire("onCallAboutToEnd", msg.in);
     }
     msgAv(msg) {
         let cid = msg.cid;
@@ -3239,14 +3253,18 @@ class SfuClient {
         delete this.statTimer;
     }
     async pollTxVideoStats() {
+        let txIsHiRes;
         let slot = this.outVSpeakerTrack;
-        if (!slot.isSendingTrack()) {
+        if (slot.isSendingTrack()) {
+            txIsHiRes = this.rtcStats._vtxIsHiRes = true;
+        }
+        else {
             slot = this.outVThumbTrack;
         }
         const stats = slot.isSendingTrack() ? (await slot.pollTxStats()) : null;
         if (this.app.onVideoTxStat) {
             if (stats) {
-                this.app.onVideoTxStat(slot.isHiRes, this.rtcStats, stats);
+                this.app.onVideoTxStat(!!txIsHiRes, this.rtcStats, stats);
             }
             else if (stats === null) {
                 this.app.onVideoTxStat(null);
@@ -3392,7 +3410,7 @@ SfuClient.kAudioCaptureOptions = {
     echoCancellation: true, autoGainControl: true, noiseSuppression: true
 };
 SfuClient.kVideoCaptureOptions = { height: 720 };
-SfuClient.kScreenCaptureOptions = { height: { max: 1440 } };
+SfuClient.kScreenCaptureOptions = { height: { max: SvcDriver.kScreenCaptureHeight } };
 SfuClient.kVthumbHeight = 90;
 SfuClient.kRotateKeyUseDelay = 100;
 SfuClient.kPeerReconnNoKeyRotationPeriod = 1000;
@@ -3404,7 +3422,7 @@ SfuClient.kSpeakerChangeMinInterval = 4000;
 SfuClient.ConnState = ConnState;
 SfuClient.TermCode = termCodes;
 SfuClient.ScreenShareType = ScreenShareType;
-SfuClient.Av = shared_av;
+SfuClient.Av = Av;
 SfuClient.kZeroIv128 = new Uint8Array(16);
 SfuClient.msgHandlerMap = {
     "HELLO": SfuClient.prototype.msgHello,
@@ -3427,6 +3445,7 @@ SfuClient.msgHandlerMap = {
     "MUTED": SfuClient.prototype.msgMuted,
     "KEY": SfuClient.prototype.msgKey,
     "BYE": SfuClient.prototype.msgBye,
+    "WILL_END": SfuClient.prototype.msgWillEnd,
     "WR_ALLOW": SfuClient.prototype.msgWrAllow,
     "WR_DENY": SfuClient.prototype.msgWrDeny,
     "WR_DUMP": SfuClient.prototype.msgWrDump,
@@ -3590,7 +3609,6 @@ class Slot {
         rtcStats.txpl += pktLost;
         rtcStats._pktTxTotal += pktSent;
         if (this.isVideo) {
-            rtcStats._vtxIsHiRes = this.isHiRes;
             if (isNaN((rtcStats._vtxkbps = ((local.bytesSent - prevLocal.bytesSent) / 128) / period))) {
                 rtcStats._vtxkbps = 0;
             }
@@ -3625,17 +3643,17 @@ class Slot {
 class VideoSlot extends Slot {
     constructor(client, xponder, generateIv) {
         super(client, xponder, generateIv);
-        this.isHiRes = false;
+        this.rxIsHiRes = false;
         this.sentLayers = SfuClient.kSpatialLayerCount;
         this.rxStatsCallbacks = new Map; // key is a VideoPlayer object that receives the stats
         this.isVideo = true;
     }
-    reassignV(peer, iv, isHiRes, trackReused, releaseCb) {
+    reassignV(peer, iv, rxIsHiRes, trackReused, releaseCb) {
         this.release();
-        this.isHiRes = isHiRes;
+        this.rxIsHiRes = rxIsHiRes;
         this._releaseTrackCb = releaseCb;
         super.reassign(peer, iv);
-        if (this.isHiRes) {
+        if (this.rxIsHiRes) {
             this.players = peer.hiResPlayers;
             this.client._numRxHiRes++;
         }
@@ -3701,7 +3719,7 @@ class VideoSlot extends Slot {
         this.active = false;
     }
     _onPlayerAttached(player) {
-        if (this.isHiRes) {
+        if (this.rxIsHiRes) {
             this.peer.updateHiResDivider();
         }
         if (player.gui.onRxStats) {
@@ -3717,14 +3735,14 @@ class VideoSlot extends Slot {
             this.active = false;
             this._releaseTrackCb();
             delete this.players;
-            if (this.isHiRes) {
+            if (this.rxIsHiRes) {
                 this.client._numRxHiRes--;
             }
             else {
                 this.client._numRxVthumb--;
             }
         }
-        else if (this.isHiRes) {
+        else if (this.rxIsHiRes) {
             this.peer.updateHiResDivider();
         }
     }
@@ -3906,7 +3924,7 @@ function playerStop(player) {
 }
 function logReplacerFunc(name, val) {
     if (name === "av") {
-        return `${val}(${shared_av.toString(val)})`;
+        return `${val}(${Av.toString(val)})`;
     }
     else if (name === "sdp") {
         return SfuClient.debugSdp ? val : compressedSdpToString(val);
@@ -3956,7 +3974,7 @@ class Peer {
     }
     get isSpeaker() {
         const client = this.client;
-        return client.speakApproval || this.isModerator || client.speakers.has(this.userId);
+        return !client.speakApproval || this.isModerator || client.speakers.has(this.userId);
     }
     get audioLevel() { return this._audioLevel; }
     get speakRequested() { return this._speakReq; }
@@ -4077,7 +4095,7 @@ class Peer {
     get receivingThumbVideo() { return this.vThumbPlayers.size > 0; }
     get receivingHiResVideo() { return this.hiResPlayers.size > 0; }
     getThumbVideo(guiCreateCb, reuseHiRes) {
-        if (!(this.av & shared_av.LowResVideo)) {
+        if (!(this.av & Av.LowResVideo)) {
             throw new Error(`getThumbVideo: Peer ${this.cid} is not sending low-res video`);
         }
         const player = new VideoPlayer(this, false, guiCreateCb);
@@ -4107,7 +4125,7 @@ class Peer {
         this._setHiResDivider(newDiv);
     }
     getHiResVideo(resDivider, guiCreateCb, reuseVthumb) {
-        if (!(this.av & shared_av.HiResVideo)) {
+        if (!(this.av & Av.HiResVideo)) {
             throw new Error(`getHiResVideo: Peer ${this.cid} is not sending hi-res video`);
         }
         if (resDivider < 0 || resDivider > 2) {
@@ -4156,7 +4174,6 @@ class Peer {
             this._sendDelVthumbs();
         });
         // reassignV sets the .players property of the slot
-        this.client.assert(this.vThumbSlot && this.vThumbSlot.players);
     }
     _sendDelHires() {
         if (!this.isLeaving) {
@@ -4185,7 +4202,6 @@ class Peer {
             delete this.hiResSlot;
             this._sendDelHires();
         });
-        this.client.assert(this.hiResSlot && this.hiResSlot.players);
     }
     _setHiResDivider(divider) {
         if (divider < 0 || divider > 2) {
@@ -4217,8 +4233,8 @@ class Peer {
         const oldAv = this.av;
         this.av = av;
         try {
-            if ((oldAv ^ av) & shared_av.Audio) { // change in audio
-                if (av & shared_av.Audio) { // peer starts sending audio
+            if ((oldAv ^ av) & Av.Audio) { // change in audio
+                if (av & Av.Audio) { // peer starts sending audio
                     const mid = msg.amid;
                     if (isNaN(mid)) {
                         this.client.logError("Peer.onAvChange: No 'amid' specified when started sending audio");
@@ -4255,7 +4271,7 @@ class Peer {
         }
     }
     sendsCameraAndScreen() {
-        return shared_av.hasCamAndScreen(this.av);
+        return Av.hasCamAndScreen(this.av);
     }
     onAudioStart(mid) {
         // prepare track
@@ -4593,7 +4609,6 @@ class StatsRecorder {
             let arr = arrs[id];
             if (arr.length < len) {
                 let oldLen = arr.length;
-                arr.length = oldLen;
                 for (let i = oldLen; i < len; i++) {
                     arr[i] = -1;
                 }
@@ -4696,7 +4711,7 @@ class PeerRecorderLink {
         if (peer.client.recForcedPeerCid !== peer.cid) {
             return;
         }
-        if (!(av & shared_av.HiResVideo)) {
+        if (!(av & Av.HiResVideo)) {
             this.recorder.setVideoInput(null);
         }
     }
@@ -4726,7 +4741,7 @@ ns.hexToBin = hexToBin;
 ns.base64ArrEncode = base64ArrEncode;
 ns.base64DecodeToArr = base64DecodeToArr;
 window.SfuClient = SfuClient;
-window.Av = shared_av;
+window.Av = Av;
 
 /******/ })()
 ;

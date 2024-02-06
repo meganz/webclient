@@ -374,7 +374,8 @@ lazy(mega.gallery, 'albums', () => {
      * @returns {void}
      */
     const sortInAlbumNodes = (nodes) => {
-        nodes.sort((a, b) => M.sortByModTimeFn2()(a, b, -1));
+        const sort = M.sortByModTimeFn3();
+        nodes.sort((a, b) => sort(a, b, -1));
     };
 
     const debouncedLoadingUnset = () => {

@@ -116,7 +116,9 @@ var ChatNotifications = function(megaChat, options) {
                                     'icon': avatarUrl,
                                     'anfFlag': 'chat_enabled',
                                     'params': {
-                                        'from': fullName
+                                        'from': fullName,
+                                        type: megaRoom.type,
+                                        roomTitle: megaRoom.getRoomTitle(),
                                     }
                                 },
                                 unreadFlag

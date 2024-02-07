@@ -124,13 +124,19 @@ function Chat() {
         'chatNotificationOptions':  {
             'textMessages': {
                 'incoming-chat-message': {
-                    title: l.notif_title_incoming_msg, /* `Incoming chat message` */
+                    title: l.notif_title_incoming_msg, /* `New message` */
                     'icon': function(notificationObj) {
                         return notificationObj.options.icon;
                     },
                     'body': function(notificationObj, params) {
-                        /* `You have new incoming chat message from: %s` */
-                        return l.notif_body_incoming_msg.replace('%s', params.from);
+                        if (params.type === 'private') {
+                            /* `%s sent you a message.` */
+                            return l.notif_body_incoming_msg.replace('%s', params.from);
+                        }
+                        /* `%1 sent a message to %2` */
+                        return l.notif_body_incoming_msg_group
+                            .replace('%1', params.from)
+                            .replace('%2', params.roomTitle);
                     }
                 },
                 'incoming-attachment': {

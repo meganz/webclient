@@ -111,15 +111,12 @@ lazy(pro, 'proplan2', () => {
 
         // If user is logged in and has the flag ab_flag, add them to the experiment.
         if (u_attr) {
-            if ((typeof mega.flags.ab_ctasc !== 'undefined') && !is_mobile) {
-                api.send({a: 'abta', c: 'ab_ctasc'}).catch(dump);
-            }
         }
 
-        if (u_attr && mega.flags.ab_ctasc && !is_mobile) {
+        if (u_attr && !is_mobile) {
             $buttonsNotFree.removeClass('hidden');
         }
-        else if (mega.flags.ab_ctasc && !is_mobile) {
+        else if (!is_mobile) {
             $buttons.removeClass('hidden');
         }
 
@@ -687,10 +684,9 @@ lazy(pro, 'proplan2', () => {
 
     const fillPlansInfo = (period) => {
 
-        const defaultPeriod = mega.flags.ab_bbyd ? 12 : 1;
-        const ab_test_flag = mega.flags.ab_apmap;
+        period = period || 12;
 
-        period = period || defaultPeriod;
+        const ab_test_flag = mega.flags.ab_apmap;
 
         // If user has ab_apmap flag, attach them to the experiment
         if (typeof ab_test_flag !== 'undefined') {
@@ -957,12 +953,7 @@ lazy(pro, 'proplan2', () => {
         const $strgFlexInput = $('#esti-storage', $proflexiBlock);
         const $transFlexInput = $('#esti-trans', $proflexiBlock);
 
-        // For active experiments call the API to inform them that the user is relevant to the experiment
-        if (u_attr && typeof mega.flags.ab_bbyd !== 'undefined') {
-            api.send({a: 'abta', c: 'ab_bbyd'}).catch(dump);
-        }
-        const defaultDuration = mega.flags.ab_bbyd ? 12 : 0;
-        const preSelectedPeriod = (sessionStorage.getItem('pro.period') | 0) || defaultDuration;
+        const preSelectedPeriod = (sessionStorage.getItem('pro.period') | 0) || 12;
 
         if (preSelectedPeriod === 12) {
             $radioOptions.removeClass('selected');
@@ -981,7 +972,6 @@ lazy(pro, 'proplan2', () => {
             else {
                 delay('pricing.plan', eventlog.bind(null, is_mobile ? 99869 : 99868));
             }
-
             fillPlansInfo(this.dataset.period | 0);
             estimateFlexiPrice($strgFlexInput.val(), $transFlexInput.val());
 

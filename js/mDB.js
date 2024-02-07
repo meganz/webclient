@@ -463,7 +463,7 @@ FMDB.prototype._transactionErrorHandled = function(ch, ex) {
             case 3:
                 if (!mega.nobp) {
                     localStorage.nobp = 1;
-                    fm_forcerefresh(true);
+                    fm_fullreload(true);
                     break;
                 }
             /* fallthrough */
@@ -3119,9 +3119,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                     console.warn('Force-reloading due to indexedDB corruption...', r);
                 }
                 sessionStorage.dbcrpt = 1;
-                fm_forcerefresh(true);
-
-                return tSleep(15).then(() => location.reload());
+                return fm_fullreload(true);
             }
 
             // fetch all top-level nodes

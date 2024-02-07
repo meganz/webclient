@@ -1565,7 +1565,10 @@ function Chat() {
             return notificationObj.options.icon;
           },
           'body': function (notificationObj, params) {
-            return l.notif_body_incoming_msg.replace('%s', params.from);
+            if (params.type === 'private') {
+              return l.notif_body_incoming_msg.replace('%s', params.from);
+            }
+            return l.notif_body_incoming_msg_group.replace('%1', params.from).replace('%2', params.roomTitle);
           }
         },
         'incoming-attachment': {
@@ -29203,6 +29206,9 @@ class ConversationMessageMixin extends _mixins1__._p {
     this._contactChangeListeners = users;
   }
   addContactListenerIfMissing(contacts) {
+    if (!this._contactChangeListeners) {
+      return false;
+    }
     if (!Array.isArray(contacts)) {
       contacts = [contacts];
     }

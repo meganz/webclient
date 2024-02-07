@@ -113,6 +113,7 @@ accountUI.renderAccountPage = function(account) {
         }
         else {
             id = `${accountRootUrl}/${urlPart0}`;
+            id = id.replace(/\W+$/, '');
             subSectionId = urlPart1;
         }
     }

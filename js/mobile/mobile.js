@@ -1331,7 +1331,8 @@ mega.gallery = {
             const elCount = setNodes.length;
 
             if (!coverNode && elCount) {
-                setNodes.sort((a, b) => M.sortByModTimeFn2()(a, b, -1));
+                const sort = M.sortByModTimeFn3();
+                setNodes.sort((a, b) => sort(a, b, -1));
                 coverNode = setNodes[0];
             }
 

@@ -7814,7 +7814,7 @@ class ContactPickerWidget extends _mixins1__.ei {
       const {
         contacts,
         emailTooltips,
-        onSelect
+        onSelected
       } = this.props;
       const {
         selected
@@ -7835,7 +7835,7 @@ class ContactPickerWidget extends _mixins1__.ei {
           onClick: () => {
             this.setState({
               selected: added ? selected.filter(h => h !== handle) : [...selected, handle]
-            }, () => onSelect(this.state.selected));
+            }, () => onSelected(this.state.selected));
           }
         });
       });
@@ -22982,7 +22982,7 @@ const withHostsObserver = Component => {
           onClose: () => this.setState({
             dialog: false
           }),
-          onSelect: selected => this.setState({
+          onSelected: selected => this.setState({
             selected
           }, () => this.safeForceUpdate())
         })), react0().createElement("footer", null, react0().createElement("div", {

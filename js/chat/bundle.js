@@ -29206,6 +29206,9 @@ class ConversationMessageMixin extends _mixins1__._p {
     this._contactChangeListeners = users;
   }
   addContactListenerIfMissing(contacts) {
+    if (!this._contactChangeListeners) {
+      return false;
+    }
     if (!Array.isArray(contacts)) {
       contacts = [contacts];
     }

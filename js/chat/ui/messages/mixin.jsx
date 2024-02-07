@@ -119,6 +119,10 @@ class ConversationMessageMixin extends ContactAwareComponent {
     }
 
     addContactListenerIfMissing(contacts) {
+        if (!this._contactChangeListeners) {
+            // Unmounted or not shown (race).
+            return false;
+        }
         if (!Array.isArray(contacts)) {
             contacts = [contacts];
         }

@@ -719,7 +719,7 @@ var mega = {
                 // Do not tell API to rebuild the treecache if we were loading from indexedDB
                 if (r.mode === 1 && !sessionStorage.lightTreeReload) {
                     sessionStorage.lightTreeReload = true;
-                    fm_forcerefresh(true);
+                    fm_fullreload(true);
                 }
                 else {
                     onIdle(function() {
@@ -729,7 +729,7 @@ var mega = {
                     $.closeMsgDialog = 1;
                     msgDialog('warninga:!^' + l[17704] + '!' + l[17705], l[882], l[17706], 0, function(yes) {
                         if (yes) {
-                            fm_forcerefresh();
+                            fm_fullreload();
                         }
                         $.closeMsgDialog = 0;
                     });

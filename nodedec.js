@@ -1050,7 +1050,7 @@ lazy(self, 'decWorkerPool', function decWorkerPool() {
                             );
                         }
                         else {
-                            fm_forcerefresh(!cnt);
+                            fm_fullreload(!cnt, cnt && 'nodedec-err');
                         }
                     }
                 });

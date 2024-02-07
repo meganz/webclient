@@ -111,15 +111,12 @@ lazy(pro, 'proplan2', () => {
 
         // If user is logged in and has the flag ab_flag, add them to the experiment.
         if (u_attr) {
-            if ((typeof mega.flags.ab_ctasc !== 'undefined') && !is_mobile) {
-                api.send({a: 'abta', c: 'ab_ctasc'}).catch(dump);
-            }
         }
 
-        if (u_attr && mega.flags.ab_ctasc && !is_mobile) {
+        if (u_attr && !is_mobile) {
             $buttonsNotFree.removeClass('hidden');
         }
-        else if (mega.flags.ab_ctasc && !is_mobile) {
+        else if (!is_mobile) {
             $buttons.removeClass('hidden');
         }
 

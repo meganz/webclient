@@ -205,12 +205,7 @@ function goToMobileApp(aBaseLink) {
     }, false)();
 
     if (is_ios || testbed === 'ios') {
-        tryCatch(function() {
-            sessionStorage.setItem('__mobile_app_tap', 1);
-        }, false)();
-
-        var link = 'https://' + location.host + '/' + aBaseLink;
-        openExternalLink('mega://' + aBaseLink, link + '?mobileapptap');
+        openExternalLink('mega://' + aBaseLink);
     }
     else if (is_windowsphone || testbed === 'winphone') {
         top.location = 'mega://' + aBaseLink;
@@ -230,36 +225,37 @@ function goToMobileApp(aBaseLink) {
     return false;
 }
 
-function openExternalLink(aExternalLink, aFallbackLink, aTimeout) {
+function openExternalLink(aExternalLink) {
     'use strict';
-    var vis = 0;
-    var dsp = function() {
-        // failed to go to the external link if visibility hasn't changed
-        if (vis !== 1) {
-            if (aFallbackLink) {
-                if (top.location.href === aFallbackLink) {
-                    vis = 3;
-                }
-                top.location = aFallbackLink;
-            }
-            // we came back from the external link if visibility changed twice.
-            if (vis > 1) {
-                location.reload();
-            }
-        }
+
+    // Clear page events
+    var clearEvents = function() {
+        document.removeEventListener('visibilitychange', clearEvents);
+        clearTimeout(window.appLnkInt);
+        window.appLnkInt = undefined;
     };
-    if (aFallbackLink === 'self') {
-        aFallbackLink = 'https://' + location.host + '/#' + getCleanSitePath().replace('?mobileapptap', '');
-    }
-    setTimeout(dsp, parseInt(aTimeout) || 3e3);
-    document.addEventListener('visibilitychange', function() {
-        if (++vis > 1) {
-            dsp();
-        }
+    var bpcListener = mBroadcaster.addListener('beforepagechange', function() {
+        clearEvents();
+        mBroadcaster.removeListener(bpcListener);
     });
+
+    // Clear events when changing the tab visibility
+    clearEvents();
+    document.addEventListener('visibilitychange', clearEvents);
+
+    // Open App link
     tryCatch(function() {
         top.location = aExternalLink;
-    }, dsp)();
+    })();
+
+    // Try to open Store link If application link is not opened
+    window.appLnkInt = setTimeout(function() {
+
+        if (!document.hidden) {
+            top.location = getMobileStoreLink();
+        }
+        clearEvents();
+    }, 3e3);
 }
 
 function getSitePath() {
@@ -555,21 +551,6 @@ if (!browserUpdate) try
                 'please note this session is temporal, ' +
                 'it will die once you close/reload the browser/tab.');
         }, 4000);
-    }
-
-    if (is_mobile && String(location.href).indexOf("mobileapptap") > 0) {
-        tmp = true;
-        tryCatch(function() {
-            'use strict';
-            tmp = sessionStorage.getItem('__mobile_app_tap');
-            sessionStorage.removeItem('__mobile_app_tap');
-        })();
-        tryCatch(function() {
-            'use strict';
-            if (tmp) {
-                openExternalLink(getMobileStoreLink(), 'self');
-            }
-        })();
     }
 
     if (!is_livesite && !is_karma && !is_webcache) {

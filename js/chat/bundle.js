@@ -22472,7 +22472,7 @@ class Call extends mixins.wl {
     };
     this.handleCallEnd = () => {
       var _this$props$call;
-      (_this$props$call = this.props.call) == null || _this$props$call.destroy();
+      (_this$props$call = this.props.call) == null || _this$props$call.destroy(SfuClient.TermCode.kUserHangup);
     };
     this.handleEphemeralAdd = handle => handle && this.setState(state => ({
       ephemeral: true,

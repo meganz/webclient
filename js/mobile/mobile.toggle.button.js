@@ -28,9 +28,21 @@ class MegaMobileToggleButton extends MegaMobileComponent {
 
         let targetNode = this.domNode;
         let subNode = document.createElement('div');
+        subNode.className = 'toggle-labels';
+        targetNode.appendChild(subNode);
+
+        targetNode = subNode;
+        subNode = document.createElement('div');
         subNode.className = 'toggle-label';
         subNode.textContent = options.label;
         targetNode.appendChild(subNode);
+
+        if (options.sublabel) {
+            subNode = document.createElement('div');
+            subNode.className = 'toggle-sublabel';
+            subNode.textContent = options.sublabel;
+            targetNode.appendChild(subNode);
+        }
 
         targetNode = this.domNode;
 

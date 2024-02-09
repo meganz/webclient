@@ -333,9 +333,6 @@ var tooltiplogin = {
                 page = getSitePath().substr(1);
                 init_page();
                 tooltiplogin.init(1);
-                if (mega.flags.ab_ads) {
-                    mega.commercials.init();
-                }
             }
             else {
                 loadSubPage('fm');

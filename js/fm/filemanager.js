@@ -4741,14 +4741,6 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
     // Revamp Implementation End
 
-
-    if (mega.flags.ab_ads) {
-        delay('mega:comm-setup', () => {
-            mega.commercials.init();
-            mega.commercials.getComms();
-        });
-    }
-
     if (d) {
         console.timeEnd('sectionUIOpen');
         console.groupEnd();

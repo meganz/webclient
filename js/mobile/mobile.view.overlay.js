@@ -48,6 +48,14 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
             mega.ui.contextMenu.show(this.nodeComponent.handle);
             return false;
         });
+
+        // Stop native zoom in
+        this.domNode.addEventListener('touchmove', event => {
+
+            if (event.touches.length > 1) {
+                event.preventDefault();
+            }
+        });
     }
 
     get visible() {

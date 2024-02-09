@@ -6,7 +6,7 @@
     padding: 24px;
     background: var(--mobile-surface-1);
     border-radius: var(--mobile-border-radius-large) var(--mobile-border-radius-large) 0 0;
-    transform: translateY(100%);
+    transform: translateY(calc(50% + 50vh));
     transition: transform 0.2s ease-out;
     max-height: calc(100% - 16px);
 }
@@ -87,13 +87,6 @@
         max-width: 562px;
         max-height: 95%;
         margin: auto;
-        opacity: 0;
-        transform: none;
-        transition: opacity 0.2s ease-out;
-    }
-
-    .mega-sheet.active .sheet {
-        opacity: 1;
     }
 
     .mega-sheet .actions {

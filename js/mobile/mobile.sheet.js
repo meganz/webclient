@@ -15,6 +15,32 @@ class MegaMobileSheet extends MegaMobileOverlay {
                 this.trigger('close');
             }
         });
+
+        const sheetElm = this.domNode.firstChild;
+
+        this.gesture = new MegaGesture({
+            domNode: this.domNode,
+            onTouchMove: ev => {
+
+                const yDiff = this.gesture.yStart - ev.touches[0].clientY;
+
+                sheetElm.style.transform = `translateY(${Math.max(0, -yDiff)}px)`;
+            },
+            onSwipeDown: () => {
+
+                this.hide();
+                this.trigger('close');
+            },
+            onTouchEnd: () => {
+                sheetElm.style.transform = '';
+            }
+        });
+
+        // For dialog like sheet should move more to close
+        window.addEventListener('resize', () => {
+            this.gesture.minSwipeDistanceY = document.body.offsetWidth < 769 ? 250 / window.devicePixelRatio
+                : document.body.offsetHeight / 4;
+        });
     }
 
     set type(key) {

@@ -666,7 +666,7 @@ var mega = {
      */
     apiMiscFlags: null,
 
-    /** Get browser brancd internal ID */
+    /** Get browser brand internal ID */
     getBrowserBrandID: function() {
         if (Object(window.chrome).torch) {
             return 1;

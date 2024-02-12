@@ -172,7 +172,9 @@ class MegaMobileHeader extends MegaMobileComponent {
                 }
 
                 // @todo: Refactor back button logic. `history.back` is incorrect here
-                if (M.currentdirid === 'account/security') {
+                if (M.currentdirid === 'account/security'
+                    || M.currentdirid === 'account/notifications'
+                    || M.currentdirid === 'account/file-management') {
                     return loadSubPage('fm/account/settings');
                 }
                 if (M.currentdirid === 'account/settings') {
@@ -829,7 +831,6 @@ lazy(MegaMobileHeader, 'headings', () => {
         'fm/account/file-management': l[16159],
         'fm/account/file-management/file-version': l[20168],
         'fm/account/file-management/rubbish-cleaning': l.settings_file_management_rubbish_cleaning,
-        'fm/account/file-management/link-options': l.mobile_settings_file_manage_title,
         'fm/account/about': l[16112],
         'fm/account/support': l[383],
         'fm/account/paymentcard': l.payment_card,

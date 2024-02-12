@@ -504,61 +504,6 @@ var mobile = {
     },
 
     /**
-     * Initialize a toggle switch in mobile web.
-     * @param $container
-     * @param startingValue
-     * @param onChange
-     */
-    initSwitch: function ($container, startingValue, onChange) {
-        'use strict';
-
-        var self = this;
-
-        // Set inital state.
-        this.setSwitch($container, startingValue);
-
-        // Handle change event.
-        $container.off('tap').on('tap', function () {
-            var newState = self.toggleSwitch($container);
-            if (typeof onChange === 'function') {
-                onChange(newState);
-            }
-            return false;
-        });
-    },
-
-    /**
-     * Toggle a feature toggle switch to the opposite state.
-     * @param $container
-     */
-    toggleSwitch: function($container) {
-        'use strict';
-
-        if ($container.hasClass('toggle-on')) {
-            $container.removeClass('toggle-on');
-            return 0;
-        } else {
-            $container.addClass('toggle-on');
-            return 1;
-        }
-    },
-
-    /**
-     * Set a feature toggle switch to a given state.
-     * @param $container
-     * @param state
-     */
-    setSwitch: function($container, state) {
-        'use strict';
-
-        if (state) {
-            $container.addClass('toggle-on');
-        } else {
-            $container.removeClass('toggle-on');
-        }
-    },
-
-    /**
      * Initialise the MEGA icon on various pages to go back to the homepage or cloud drive
      */
     initHeaderMegaIcon: function() {
@@ -1052,16 +997,13 @@ function accountUI() {
         mobile.settings.account.verifyDelete.init();
     }
     else if (subpath === 'notifications') {
-        mobile.settings.account.notifications.init();
+        mobile.settings.notifications.init();
     }
     else if (subpath.startsWith('notifications')) {
         loadSubPage('fm/account/notifications', 'override');
     }
     else if (subpath === 'file-management') {
         mobile.settings.fileManagement.init();
-    }
-    else if (subpath === 'file-management/link-options') {
-        mobile.settings.account.linksOptions.render();
     }
     else if (subpath === 'support') {
         mobile.settings.support.init();

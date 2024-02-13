@@ -48,7 +48,7 @@ export const withHostsObserver = Component => {
                                 emailTooltips={true}
                                 nothingSelectedButtonLabel={l.add_hosts_placeholder /* `Add hosts` */}
                                 onClose={() => this.setState({ dialog: false })}
-                                onSelect={selected => this.setState({ selected }, () => this.safeForceUpdate())}
+                                onSelected={selected => this.setState({ selected }, () => this.safeForceUpdate())}
                             />
                         </div>
 

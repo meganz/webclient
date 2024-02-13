@@ -880,7 +880,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
     };
 
     renderParticipantsList = () => {
-        const { contacts, emailTooltips, onSelect } = this.props;
+        const { contacts, emailTooltips, onSelected } = this.props;
         const { selected } = this.state;
         const $$list =
             contacts.map(handle => {
@@ -900,7 +900,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                         onClick={() => {
                             this.setState(
                                 { selected: added ? selected.filter(h => h !== handle) : [...selected, handle] },
-                                () => onSelect(this.state.selected)
+                                () => onSelected(this.state.selected)
                             );
                         }}
                     />

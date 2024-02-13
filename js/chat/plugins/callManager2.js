@@ -521,6 +521,9 @@
         wrOnUserLeft(user) {
             this.chatRoom.trigger('wrOnUserLeft', user);
         }
+        wrOnUsersAllow(users) {
+            this.chatRoom.trigger('wrOnUsersAllow', [users]);
+        }
         wrOnUserDump(users) {
             this.chatRoom.trigger('wrOnUserDump', users);
         }

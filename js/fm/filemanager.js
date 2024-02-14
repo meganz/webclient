@@ -1660,9 +1660,24 @@ FileManager.prototype.initContextUI = function() {
         $.hideContextMenu();
     });
 
-    $(c + '.getlink-item, ' + c + '.embedcode-item').rebind('click', this.getLinkAction);
+    $(c + '.getlink-item, ' + c + '.embedcode-item, ' + c + '.cd-getlink-item').rebind('click', (e) => {
 
-    $(c + '.removelink-item').rebind('click', function() {
+        this.getLinkAction();
+
+        if ($(e.currentTarget).hasClass('cd-getlink-item')) {
+            if ($(e.currentTarget).hasClass('manage-link')) {
+                // event log for manage link/s
+                eventlog(500030);
+            }
+            else {
+                // event log for share link
+                eventlog(500028);
+            }
+        }
+
+    });
+
+    $(c + '.removelink-item, ' + c + '.cd-removelink-item').rebind('click', (e) => {
         // check if this is a business expired account
         if (M.isInvalidUserStatus()) {
             return;
@@ -1721,6 +1736,10 @@ FileManager.prototype.initContextUI = function() {
                 msgDialog('confirmation', '', title, subtitle, removeLink, 'nowarnpl');
             }
         }
+
+        if ($(e.currentTarget).hasClass('cd-removelink-item')) {
+            eventlog(500031);
+        }
     });
 
     $(c + '.dispute-item').rebind('click', function() {
@@ -1751,7 +1770,7 @@ FileManager.prototype.initContextUI = function() {
         M.openSharingDialog($.selected[0]);
     });
 
-    $(`${c}.removeshare-item`).rebind('click', () => {
+    $(`${c}.removeshare-item, ${c}.cd-removeshare-item`).rebind('click', (e) => {
         if (M.isInvalidUserStatus()) {
             return;
         }
@@ -1761,6 +1780,23 @@ FileManager.prototype.initContextUI = function() {
                 new mega.Share().removeSharesFromSelected().dump('remove-share');
             }
         }, 1);
+
+        if ($(e.currentTarget).hasClass('cd-removeshare-item')) {
+            eventlog(500033);
+        }
+    });
+
+    $(c + '.cd-sh4r1ng-item').rebind('click', (e) => {
+        M.openSharingDialog($.selected[0]);
+
+        if ($(e.currentTarget).hasClass('manage-share')) {
+            // event log for manage folder
+            eventlog(500032);
+        }
+        else {
+            // event log for share folder
+            eventlog(500029);
+        }
     });
 
     // Move Dialog
@@ -2136,8 +2172,13 @@ FileManager.prototype.initContextUI = function() {
         M.favourite($.selected, newFavState);
     });
 
-    $(c + '.send-to-contact-item').rebind('click', function () {
+    $(`${c}.send-to-contact-item, ${c}.cd-send-to-contact-item`).rebind('click', (ev) => {
         openCopyDialog('conversations');
+
+        if ($(ev.currentTarget).hasClass('cd-send-to-contact-item')) {
+            // eveng log for send contact folder
+            eventlog(500027);
+        }
     });
 
     $('.submenu.labels .dropdown-colour-item').rebind('click', function() {

@@ -87,20 +87,32 @@
         Call.PlayerCtx.prototype.onRxStats = function(track, info, raw) {
             const text = Call.rxStatsToText(track, info, raw);
             for (const cons of this.appPeer.consumers) {
-                cons.displayStats(text);
+                if (!cons.onRxStats) {
+                    cons.displayStats(text);
+                }
             }
         };
         Call.prototype.onVideoTxStat = function(isHiRes, stats, raw) {
             if (!window.sfuClient) {
                 return;
             }
-            let text = (isHiRes === null)
-                ? "loc: <not sending>" // onVideoTxStat(null) is called when there is no output video track
-                : `loc: ${stats.vtxw}x${stats.vtxh}:${sfuClient.sentTracksString()} ${Math.round(stats._vtxkbps)
-                    }kbps\n${stats.vtxfps || 0}fps ${Math.round(stats._vtxkfps)}kfs rtt: ${stats.rtt} dly: ${stats.vtxdly}`;
-
-            if (isHiRes && sfuClient.isSendingScreenHiRes()) {
-                text += `\ntxq: ${sfuClient.txQuality}`;
+            let text;
+            if (isHiRes === null) {
+                text = "loc: <not sending>"; // onVideoTxStat(null) is called when there is no output video track
+            }
+            else {
+                text = `loc: ${stats.vtxw}x${stats.vtxh}:${sfuClient.sentTracksString()} ${Math.round(stats._vtxkbps)
+                    }kbps\n${stats.vtxfps || 0}fps ${Math.round(stats._vtxkfps)}kfs txpl: ${stats.txpl
+                    } rtt: ${stats.rtt} dly: ${stats.vtxdly}`;
+                if (isHiRes && sfuClient.isSendingScreenHiRes()) {
+                    text += ` txq: ${sfuClient.txQuality}`;
+                }
+                text += ` bwe: ${stats.txBwe || '??'}`;
+                const lim = stats.f & 0x03; // the 2 least significant bits
+                if (lim) {
+                    const type = (lim === 1) ? "cpu" : ((lim === 2) ? "net" : lim);
+                    text += ` lim: ${type}`;
+                }
             }
             for (const cons of this.localPeerStream.consumers) {
                 cons.displayStats(text);

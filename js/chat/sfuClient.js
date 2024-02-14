@@ -550,12 +550,9 @@ class SvcDriver {
         const adaptScrnTx = stats._vtxIsHiRes && this.client.isSendingScreenHiRes();
         if (adaptScrnTx) { // calculate tx average kbps
             const txBwidth = (stats.txBwe > 0) ? stats.txBwe : stats._vtxkbps;
-            if (isNaN(this.maTxKbps)) {
-                maTxKbps = this.maTxKbps = txBwidth;
-            }
-            else {
-                maTxKbps = this.maTxKbps = (this.maTxKbps * 5 + txBwidth) / 6;
-            }
+            maTxKbps = this.maTxKbps = isNaN(this.maTxKbps)
+                ? txBwidth
+                : (this.maTxKbps * 5 + txBwidth) / 6;
             do {
                 if (window.dSfuAdapt) {
                     console.log(kLogTag, "scrshare: maTxKbps:", maTxKbps, "mom:", txBwidth);
@@ -1270,7 +1267,7 @@ class CallRecorder {
 }
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = '22bc3ec9cc';
+const COMMIT_ID = '40bfc52622';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -1360,7 +1357,9 @@ class SfuClient {
         this._statsRecorder = new StatsRecorder(this);
         this.micMuteMonitor = new MicMuteMonitor(this);
     }
-    get micInputSeen() { return this.micMuteMonitor.micInputSeen; }
+    get micInputSeen() {
+        return this.micMuteMonitor.micInputSeen;
+    }
     static platformHasSupport() {
         return window.RTCRtpSender &&
             !!RTCRtpSender.prototype.createEncodedStreams;

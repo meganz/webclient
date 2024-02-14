@@ -23568,126 +23568,7 @@ var mixins = __webpack_require__(436);
 var meetings_call = __webpack_require__(144);
 // EXTERNAL MODULE: ./js/chat/ui/contacts.jsx
 var contacts = __webpack_require__(40);
-// EXTERNAL MODULE: ./js/chat/ui/meetings/button.jsx
-var meetings_button = __webpack_require__(600);
-// EXTERNAL MODULE: ./js/ui/utils.jsx
-var utils = __webpack_require__(240);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/videoNodeMenu.jsx
-
-
-
-
-
-class VideoNodeMenu extends mixins.ei {
-  constructor(props) {
-    super(props);
-    this.Contact = this.Contact.bind(this);
-    this.Pin = this.Pin.bind(this);
-    this.Privilege = this.Privilege.bind(this);
-  }
-  Contact() {
-    const {
-      stream,
-      ephemeralAccounts,
-      onCallMinimize
-    } = this.props;
-    const {
-      userHandle
-    } = stream;
-    const IS_GUEST = (0,meetings_call.or)() || ephemeralAccounts && ephemeralAccounts.includes(userHandle);
-    const HAS_RELATIONSHIP = M.u[userHandle].c === 1;
-    if (HAS_RELATIONSHIP) {
-      return external_React_default().createElement(meetings_button.c, {
-        icon: "sprite-fm-mono icon-chat",
-        onClick: () => {
-          onCallMinimize();
-          loadSubPage(`fm/chat/p/${userHandle}`);
-        }
-      }, external_React_default().createElement("span", null, l[7997]));
-    }
-    return external_React_default().createElement(meetings_button.c, {
-      className: IS_GUEST ? 'disabled' : '',
-      icon: "sprite-fm-mono icon-add",
-      onClick: () => {
-        return IS_GUEST ? false : M.syncContactEmail(userHandle, true).then(email => {
-          const OPC = Object.values(M.opc);
-          if (OPC && OPC.length && OPC.some(opc => opc.m === email)) {
-            return msgDialog('warningb', '', l[17545]);
-          }
-          msgDialog('info', l[150], l[5898]);
-          M.inviteContact(M.u[u_handle].m, email);
-        }).catch(() => mBroadcaster.sendMessage('meetings:ephemeralAdd', userHandle));
-      }
-    }, external_React_default().createElement("span", null, l[24581]));
-  }
-  Pin() {
-    const {
-      stream,
-      onSpeakerChange
-    } = this.props;
-    if (onSpeakerChange) {
-      return external_React_default().createElement(meetings_button.c, {
-        icon: "sprite-fm-mono grid-main",
-        onClick: () => onSpeakerChange(stream)
-      }, external_React_default().createElement("span", null, l.display_in_main_view));
-    }
-    return null;
-  }
-  Privilege() {
-    const {
-      stream,
-      chatRoom
-    } = this.props;
-    const {
-      call,
-      userHandle
-    } = stream;
-    if (call && call.isPublic) {
-      const {
-        OPERATOR,
-        FULL
-      } = ChatRoom.MembersSet.PRIVILEGE_STATE;
-      const currentUserModerator = chatRoom.members[u_handle] === OPERATOR;
-      const targetUserModerator = chatRoom.members[userHandle] === OPERATOR;
-      return currentUserModerator && external_React_default().createElement(meetings_button.c, {
-        targetUserModerator: targetUserModerator,
-        icon: "sprite-fm-mono icon-admin-outline",
-        onClick: () => {
-          ['alterUserPrivilege', 'onCallPrivilegeChange'].map(event => chatRoom.trigger(event, [userHandle, targetUserModerator ? FULL : OPERATOR]));
-        }
-      }, external_React_default().createElement("span", null, targetUserModerator ? l.remove_moderator : l.make_moderator));
-    }
-    return null;
-  }
-  render() {
-    const {
-      NAMESPACE
-    } = VideoNodeMenu;
-    const {
-      userHandle
-    } = this.props.stream;
-    if (userHandle !== u_handle) {
-      return external_React_default().createElement("div", {
-        className: `
-                        ${NAMESPACE}
-                        theme-dark-forced
-                    `
-      }, external_React_default().createElement("div", {
-        className: `${NAMESPACE}-toggle`
-      }, external_React_default().createElement(utils.O, null, M.getNameByHandle(userHandle)), external_React_default().createElement("i", {
-        className: "sprite-fm-mono icon-side-menu"
-      })), external_React_default().createElement("div", {
-        className: `${NAMESPACE}-content`
-      }, external_React_default().createElement("ul", null, [this.Contact, this.Pin, this.Privilege].map((button, index) => external_React_default().createElement("li", {
-        key: index
-      }, button())))));
-    }
-    return null;
-  }
-}
-VideoNodeMenu.NAMESPACE = 'node-menu';
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/videoNode.jsx
-
 
 
 
@@ -23698,7 +23579,6 @@ class VideoNode extends mixins.ei {
     this.nodeRef = external_React_default().createRef();
     this.contRef = external_React_default().createRef();
     this.statsHudRef = external_React_default().createRef();
-    this.isVideo = true;
     this.source = source;
   }
   componentDidMount() {
@@ -23721,9 +23601,15 @@ class VideoNode extends mixins.ei {
     }
     this.requestVideo();
   }
+  onAvChange() {
+    this.safeForceUpdate();
+  }
   displayVideoElement(video, container) {
     this.attachVideoElemHandlers(video);
     container.replaceChildren(video);
+    if (video.readyState === 4) {
+      container.classList.remove("video-node-loading");
+    }
   }
   attachVideoElemHandlers(video) {
     if (video._snSetup) {
@@ -23738,6 +23624,9 @@ class VideoNode extends mixins.ei {
       }
     };
     video.onloadeddata = ev => {
+      if (this.contRef.current) {
+        this.contRef.current.classList.remove("video-node-loading");
+      }
       if (this.props.onLoadedData) {
         this.props.onLoadedData(ev);
       }
@@ -23797,7 +23686,7 @@ class VideoNode extends mixins.ei {
     if (source.isStreaming()) {
       return external_React_default().createElement("div", {
         ref: this.contRef,
-        className: "video-node-holder"
+        className: "video-node-holder video-node-loading"
       });
     }
     delete this._lastResizeWidth;
@@ -23833,7 +23722,7 @@ class VideoNode extends mixins.ei {
     if (source.isOnHold) {
       return external_React_default().createElement($$CONTAINER, null, this.getStatusIcon('icon-pause', onHoldLabel));
     }
-    return external_React_default().createElement((external_React_default()).Fragment, null, mode === meetings_call.Mh.MAIN && meetings_call.cp.isModerator(chatRoom, userHandle) && this.getStatusIcon('icon-admin-outline call-role-icon', l[8875]), external_React_default().createElement($$CONTAINER, null, source.audioMuted ? this.getStatusIcon('icon-mic-off-thin-outline', l.muted) : null, sfuClient.haveBadNetwork ? this.getStatusIcon('icon-weak-signal', l.poor_connection) : null, source.hasScreenAndCam && this.isThumb ? this.getStatusIcon('icon-pc-linux', 'Sharing screen') : null));
+    return external_React_default().createElement((external_React_default()).Fragment, null, mode === meetings_call.Mh.MAIN && meetings_call.cp.isModerator(chatRoom, userHandle) && this.getStatusIcon('icon-admin-outline call-role-icon', l[8875]), external_React_default().createElement($$CONTAINER, null, source.audioMuted ? this.getStatusIcon('icon-mic-off-thin-outline', l.muted) : null, sfuClient.haveBadNetwork ? this.getStatusIcon('icon-weak-signal', l.poor_connection) : null));
   }
   render() {
     const {
@@ -23876,7 +23765,7 @@ class VideoNode extends mixins.ei {
 class DynVideo extends VideoNode {
   onAvChange() {
     this._lastResizeWidth = null;
-    this.safeForceUpdate();
+    super.onAvChange();
   }
   dynRequestVideo(forceVisible) {
     const {
@@ -23918,7 +23807,7 @@ class DynVideo extends VideoNode {
       newQ = CallManager2.VIDEO_QUALITY.HIGH;
     } else if (w > 200) {
       newQ = CallManager2.VIDEO_QUALITY.MEDIUM;
-    } else if (w > 180) {
+    } else if (w > 180 || this.noThumb) {
       newQ = CallManager2.VIDEO_QUALITY.LOW;
     } else {
       newQ = CallManager2.VIDEO_QUALITY.THUMB;
@@ -23926,11 +23815,12 @@ class DynVideo extends VideoNode {
     this.dynRequestVideoQuality(newQ);
   }
   dynUpdateVideoElem() {
+    var _this$source$hiResPla;
     const vidCont = this.contRef.current;
     if (!this.isMounted() || !vidCont) {
       return;
     }
-    const player = this.source.player;
+    const player = this.noThumb ? (_this$source$hiResPla = this.source.hiResPlayer) == null || (_this$source$hiResPla = _this$source$hiResPla.gui) == null ? void 0 : _this$source$hiResPla.video : this.source.player;
     if (!player) {
       vidCont.replaceChildren();
       return;
@@ -23980,31 +23870,27 @@ class DynVideoCloned extends DynVideo {
 class PeerVideoThumb extends DynVideoCloned {
   constructor(props) {
     super(props, props.source);
-    this.isThumb = true;
+    this.requestVideo = this.dynRequestVideo;
+  }
+}
+class PeerVideoThumbFixed extends VideoNode {
+  constructor(props) {
+    super(props, props.source);
+    assert(props.source.hasScreenAndCam);
+    this.ownVideo = document.createElement("video");
     if (CallManager2.Call.VIDEO_DEBUG_MODE) {
       this.onRxStats = this._onRxStats;
     }
   }
-  requestVideo(forceVisible) {
-    if (!this.source.hasScreenAndCam) {
-      if (this.fixedThumbPlayer) {
-        this.fixedThumbPlayer.destroy();
-      }
-      this.dynRequestVideo(forceVisible);
-    } else {
-      delete this.requestedQ;
-      this.requestFixedThumbVideo();
-    }
-  }
-  addFixedThumbVideo() {
+  addVideo() {
     assert(this.source.hasScreenAndCam);
     const vidCont = this.contRef.current;
     assert(vidCont);
     if (vidCont.firstChild !== this.ownVideo) {
-      vidCont.replaceChildren(this.ownVideo);
+      this.displayVideoElement(this.ownVideo, vidCont);
     }
   }
-  delFixedThumbVideo() {
+  delVideo() {
     SfuClient.playerStop(this.ownVideo);
     const vidCont = this.contRef.current;
     if (!vidCont) {
@@ -24012,20 +23898,22 @@ class PeerVideoThumb extends DynVideoCloned {
     }
     vidCont.replaceChildren();
   }
-  requestFixedThumbVideo() {
-    if (this.fixedThumbPlayer) {
-      this.playFixedThumbVideo();
+  requestVideo(forceVisible) {
+    if (!this.isComponentVisible() && !forceVisible) {
+      return;
+    }
+    if (this.player) {
+      this.playVideo();
     } else {
-      this.addFixedThumbVideo();
-      this.fixedThumbPlayer = this.source.sfuPeer.getThumbVideo(player => {
-        this.fixedThumbPlayer = player;
+      this.addVideo();
+      this.player = this.source.sfuPeer.getThumbVideo(() => {
         return this;
       });
     }
   }
-  playFixedThumbVideo() {
-    var _this$fixedThumbPlaye;
-    const track = (_this$fixedThumbPlaye = this.fixedThumbPlayer.slot) == null ? void 0 : _this$fixedThumbPlaye.inTrack;
+  playVideo() {
+    var _this$player$slot;
+    const track = (_this$player$slot = this.player.slot) == null ? void 0 : _this$player$slot.inTrack;
     if (!track) {
       return;
     }
@@ -24038,14 +23926,55 @@ class PeerVideoThumb extends DynVideoCloned {
     SfuClient.playerPlay(this.ownVideo, track);
   }
   detachFromTrack() {
-    this.delFixedThumbVideo();
+    this.delVideo();
   }
   onPlayerDestroy() {
-    delete this.fixedThumbPlayer;
+    delete this.player;
+  }
+  componentWillUnmount() {
+    if (this.player) {
+      this.player.destroy();
+    }
+    super.componentWillUnmount();
   }
   _onRxStats(track, info, raw) {
-    if (!this.source.player) {
+    if (this.player) {
       this.displayStats(CallManager2.Call.rxStatsToText(track, info, raw));
+    }
+  }
+}
+class PeerVideoHiResCloned extends DynVideoCloned {
+  constructor(props) {
+    super(props, props.source);
+    this.noThumb = true;
+    this.requestVideo = this.dynRequestVideo;
+  }
+}
+class LocalVideoHiResCloned extends VideoNode {
+  constructor(props) {
+    super(props, props.chatRoom.call.getLocalStream());
+    this.isLocal = true;
+    this.ownVideo = document.createElement("video");
+  }
+  get isLocalScreen() {
+    return this.source.av & Av.Screen;
+  }
+  requestVideo(forceVisible) {
+    if (d > 1 && forceVisible) {
+      console.debug('ignoring forceVisible');
+    }
+    const vidCont = this.contRef.current;
+    if (!vidCont) {
+      return;
+    }
+    const track = this.source.sfuClient.localScreenTrack();
+    if (!track) {
+      vidCont.replaceChildren();
+    } else {
+      if (vidCont.firstChild !== this.ownVideo) {
+        this.displayVideoElement(this.ownVideo, vidCont);
+      }
+      SfuClient.playerPlay(this.ownVideo, track, true);
     }
   }
 }
@@ -24062,7 +23991,7 @@ class LocalVideoThumb extends VideoNode {
   constructor(props) {
     const source = props.chatRoom.call.getLocalStream();
     super(props, source);
-    this.isLocal = this.isThumb = true;
+    this.isLocal = true;
     this.isLocalScreen = source.av & Av.Screen && !(source.av & Av.Camera);
     this.sfuClient = props.chatRoom.call.sfuClient;
     this.ownVideo = document.createElement("video");
@@ -24090,9 +24019,13 @@ class LocalVideoThumb extends VideoNode {
   onAvChange() {
     const av = this.sfuClient.availAv;
     this.isLocalScreen = av & Av.Screen && !(av & Av.Camera);
-    this.safeForceUpdate();
+    super.onAvChange();
   }
 }
+// EXTERNAL MODULE: ./js/ui/utils.jsx
+var utils = __webpack_require__(240);
+// EXTERNAL MODULE: ./js/chat/ui/meetings/button.jsx
+var meetings_button = __webpack_require__(600);
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
 var dropdowns = __webpack_require__(868);
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
@@ -25057,6 +24990,120 @@ class ParticipantsBlock extends mixins.ei {
     return null;
   }
 }
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/videoNodeMenu.jsx
+
+
+
+
+
+class VideoNodeMenu extends mixins.ei {
+  constructor(props) {
+    super(props);
+    this.Contact = this.Contact.bind(this);
+    this.Pin = this.Pin.bind(this);
+    this.Privilege = this.Privilege.bind(this);
+  }
+  Contact() {
+    const {
+      stream,
+      ephemeralAccounts,
+      onCallMinimize
+    } = this.props;
+    const {
+      userHandle
+    } = stream;
+    const IS_GUEST = (0,meetings_call.or)() || ephemeralAccounts && ephemeralAccounts.includes(userHandle);
+    const HAS_RELATIONSHIP = M.u[userHandle].c === 1;
+    if (HAS_RELATIONSHIP) {
+      return external_React_default().createElement(meetings_button.c, {
+        icon: "sprite-fm-mono icon-chat",
+        onClick: () => {
+          onCallMinimize();
+          loadSubPage(`fm/chat/p/${userHandle}`);
+        }
+      }, external_React_default().createElement("span", null, l[7997]));
+    }
+    return external_React_default().createElement(meetings_button.c, {
+      className: IS_GUEST ? 'disabled' : '',
+      icon: "sprite-fm-mono icon-add",
+      onClick: () => {
+        return IS_GUEST ? false : M.syncContactEmail(userHandle, true).then(email => {
+          const OPC = Object.values(M.opc);
+          if (OPC && OPC.length && OPC.some(opc => opc.m === email)) {
+            return msgDialog('warningb', '', l[17545]);
+          }
+          msgDialog('info', l[150], l[5898]);
+          M.inviteContact(M.u[u_handle].m, email);
+        }).catch(() => mBroadcaster.sendMessage('meetings:ephemeralAdd', userHandle));
+      }
+    }, external_React_default().createElement("span", null, l[24581]));
+  }
+  Pin() {
+    const {
+      stream,
+      onSpeakerChange
+    } = this.props;
+    if (onSpeakerChange) {
+      return external_React_default().createElement(meetings_button.c, {
+        icon: "sprite-fm-mono grid-main",
+        onClick: () => onSpeakerChange(stream)
+      }, external_React_default().createElement("span", null, l.display_in_main_view));
+    }
+    return null;
+  }
+  Privilege() {
+    const {
+      stream,
+      chatRoom
+    } = this.props;
+    const {
+      call,
+      userHandle
+    } = stream;
+    if (call && call.isPublic) {
+      const {
+        OPERATOR,
+        FULL
+      } = ChatRoom.MembersSet.PRIVILEGE_STATE;
+      const currentUserModerator = chatRoom.members[u_handle] === OPERATOR;
+      const targetUserModerator = chatRoom.members[userHandle] === OPERATOR;
+      return currentUserModerator && external_React_default().createElement(meetings_button.c, {
+        targetUserModerator: targetUserModerator,
+        icon: "sprite-fm-mono icon-admin-outline",
+        onClick: () => {
+          ['alterUserPrivilege', 'onCallPrivilegeChange'].map(event => chatRoom.trigger(event, [userHandle, targetUserModerator ? FULL : OPERATOR]));
+        }
+      }, external_React_default().createElement("span", null, targetUserModerator ? l.remove_moderator : l.make_moderator));
+    }
+    return null;
+  }
+  render() {
+    const {
+      NAMESPACE
+    } = VideoNodeMenu;
+    const {
+      userHandle
+    } = this.props.stream;
+    if (userHandle !== u_handle) {
+      return external_React_default().createElement("div", {
+        className: `
+                        ${NAMESPACE}
+                        theme-dark-forced
+                    `
+      }, external_React_default().createElement("div", {
+        className: `${NAMESPACE}-toggle`
+      }, external_React_default().createElement(utils.O, null, M.getNameByHandle(userHandle)), external_React_default().createElement("i", {
+        className: "sprite-fm-mono icon-side-menu"
+      })), external_React_default().createElement("div", {
+        className: `${NAMESPACE}-content`
+      }, external_React_default().createElement("ul", null, [this.Contact, this.Pin, this.Privilege].map((button, index) => external_React_default().createElement("li", {
+        key: index
+      }, button())))));
+    }
+    return null;
+  }
+}
+VideoNodeMenu.NAMESPACE = 'node-menu';
 // EXTERNAL MODULE: ./js/ui/modalDialogs.jsx + 1 modules
 var modalDialogs = __webpack_require__(776);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/modeSwitch.jsx

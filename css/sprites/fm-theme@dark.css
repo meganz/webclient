@@ -76,6 +76,10 @@
 .theme-dark-forced .sprite-fm-theme.icon-gallery-photos, .theme-dark-forced .sprite-fm-theme-before.icon-gallery-photos-before::before, .theme-dark-forced .sprite-fm-theme-after.icon-gallery-photos-after::after {
    background-image: url("../../images/sprites/fm-theme@dark.svg#icon-gallery-photos");
 }
+.theme-dark .sprite-fm-theme.icon-gallery-videos, .theme-dark .sprite-fm-theme-before.icon-gallery-videos-before::before, .theme-dark .sprite-fm-theme-after.icon-gallery-videos-after::after,
+.theme-dark-forced .sprite-fm-theme.icon-gallery-videos, .theme-dark-forced .sprite-fm-theme-before.icon-gallery-videos-before::before, .theme-dark-forced .sprite-fm-theme-after.icon-gallery-videos-after::after {
+   background-image: url("../../images/sprites/fm-theme@dark.svg#icon-gallery-videos");
+}
 .theme-dark .sprite-fm-theme.icon-gif-rest, .theme-dark .sprite-fm-theme-before.icon-gif-rest-before::before, .theme-dark .sprite-fm-theme-after.icon-gif-rest-after::after,
 .theme-dark-forced .sprite-fm-theme.icon-gif-rest, .theme-dark-forced .sprite-fm-theme-before.icon-gif-rest-before::before, .theme-dark-forced .sprite-fm-theme-after.icon-gif-rest-after::after {
    background-image: url("../../images/sprites/fm-theme@dark.svg#icon-gif-rest");

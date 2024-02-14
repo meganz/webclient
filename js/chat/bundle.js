@@ -378,6 +378,7 @@ class ScheduledMeeting {
     this.nextOccurrenceStart = this.start;
     this.nextOccurrenceEnd = this.end;
     this.ownerHandle = meetingInfo.u;
+    this.isPast = (this.isRecurring ? this.recurring.end : this.end) < Date.now();
     this.chatRoom = meetingInfo.chatRoom;
     this.chatRoom.scheduledMeeting = this.isRoot ? this : this.parent;
     if (fromActionPacket) {
@@ -389,10 +390,6 @@ class ScheduledMeeting {
   }
   get isCanceled() {
     return !!this.canceled;
-  }
-  get isPast() {
-    const end = this.isRecurring ? this.recurring.end : this.end;
-    return end < Date.now();
   }
   get isUpcoming() {
     return !this.isCanceled && !this.isPast;
@@ -413,12 +410,14 @@ class ScheduledMeeting {
     return this.isRoot ? null : this.megaChat.plugins.meetingsManager.getMeetingById(this.parentId);
   }
   setNextOccurrence() {
-    const occurrences = Object.values(this.occurrences).filter(o => o.isUpcoming);
-    if (occurrences && occurrences.length) {
-      const nextOccurrences = occurrences.sort((a, b) => a.start - b.start);
-      this.nextOccurrenceStart = nextOccurrences[0].start;
-      this.nextOccurrenceEnd = nextOccurrences[0].end;
+    const upcomingOccurrences = Object.values(this.occurrences).filter(o => o.isUpcoming);
+    if (!upcomingOccurrences || !upcomingOccurrences.length) {
+      this.isPast = this.isRecurring;
+      return;
     }
+    const sortedOccurrences = upcomingOccurrences.sort((a, b) => a.start - b.start);
+    this.nextOccurrenceStart = sortedOccurrences[0].start;
+    this.nextOccurrenceEnd = sortedOccurrences[0].end;
   }
   async getOccurrences(options) {
     const {

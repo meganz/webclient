@@ -836,17 +836,16 @@ FullScreenManager.prototype.enterFullscreen = function() {
     var _makethumb = function(n, stream) {
         if (String(n.fa).indexOf(':0*') < 0 || String(n.fa).indexOf(':1*') < 0) {
             var onVideoPlaying = function() {
-                var video = this.video;
 
-                if (video && video.duration) {
-                    var took = Math.round(2 * video.duration / 100);
+                if (this.duration) {
+                    const took = Math.round(2 * this.duration / 100);
 
                     if (d) {
                         console.debug('Video thumbnail missing, will take image at %s...', secondsToTime(took));
                     }
 
                     this.on('timeupdate', function() {
-                        if (video.currentTime < took) {
+                        if (this.currentTime < took) {
                             return true;
                         }
 
@@ -903,20 +902,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
         const MOUSE_IDLE_TID = 'auto-hide-media-controls';
         const $playPauseButton = $('.play-pause-video-button', $wrapper);
         const $watchAgainButton = $('.watch-again-button', $wrapper);
-        let playbackRate = 1;
-        let audioTime = 0;
-        let previousTime = 0;
         let continuePlay;
 
         const props = Object.defineProperties(Object.create(null), {
             duration: {
                 get() {
                     return duration || streamer && streamer.duration;
-                }
-            },
-            audioSource: {
-                get() {
-                    return streamer && streamer.stream && streamer.stream._audioSource;
                 }
             }
         });
@@ -966,16 +957,6 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         // As the video is playing, update the progress bar
         onTimeUpdate = function(offset, length) {
-            // Recalculate actual time and reset playbackRate for audio
-            if (props.audioSource) {
-                props.audioSource.playbackRate.value = playbackRate;
-                audioTime = offset = (offset - previousTime) * playbackRate + audioTime;
-                previousTime = streamer.currentTime;
-                if (audioTime >= duration) {
-                    videoElement.pause();
-                }
-            }
-
             offset = (offset > length ? length : offset) | 0;
 
             if (offset !== onTimeUpdate.last) {
@@ -1072,23 +1053,18 @@ FullScreenManager.prototype.enterFullscreen = function() {
         const updatebar = (x) => {
             if (streamer) {
                 const o = getTimeOffset(x);
+                const t = secondsToTimeShort(o.time, 1);
 
                 // Update progress bar and video current time
+                $progressTimeBar.text(t);
+                videoTimingElement.textContent = t;
                 progressBarElementStyle.setProperty('width', o.percent + '%');
-                videoTimingElement.textContent = secondsToTimeShort(o.time, 1);
-                $progressTimeBar.text(secondsToTimeShort(getTimeOffset(x).time, 1));
 
                 if (!timeDrag) {
                     streamer.currentTime = o.time;
 
                     // Also set startTime, needed by AudioStream.
                     options.startTime = o.time;
-
-                    // Reset actual time and playbackRate for audio
-                    if (props.audioSource) {
-                        props.audioSource.playbackRate.value = playbackRate;
-                        previousTime = audioTime = o.time;
-                    }
                 }
             }
         };
@@ -1097,19 +1073,15 @@ FullScreenManager.prototype.enterFullscreen = function() {
         var changeButtonState = function(type) {
             // Play/Pause button
             if (type === 'playpause' && !timeDrag) {
+                const {ended} = streamer || !1;
+
                 if (is_embed && (videoElement.paused || videoElement.ended)) {
                     $('i', $playpause).removeClass('icon-pause').addClass('icon-play');
                     $playVideoButton.removeClass('hidden');
                 }
-                else if (
-                    $watchAgainButton.hasClass('hidden')
-                    && (videoElement.ended || props.audioSource && audioTime >= duration)
-                ) {
+                else if (ended && $watchAgainButton.hasClass('hidden')) {
+
                     if (page === 'download' ? $.repeat === M.v[0].h : $.repeat === slideshowid) {
-                        if (isAudio) {
-                            audioTime = 0;
-                            updatebar();
-                        }
 
                         $playpause.trigger('click');
                         return;
@@ -1193,7 +1165,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             setIdle(false);
             if (dlmanager.isStreaming) {
                 delay(MOUSE_IDLE_TID, () => {
-                    if (videoElement && !(videoElement.paused || videoElement.ended)) {
+                    if (streamer && !streamer.interrupted) {
                         setIdle(true);
                     }
                 }, 2600);
@@ -1208,12 +1180,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         // Increase/decrease video speed
         var setVideoSpeed = function(rate) {
-            if (!rate) {
-                videoElement.playbackRate = 1.0;
+            if (rate) {
+                const r = streamer.playbackRate;
+                streamer.playbackRate = Math.min(Math.max(r + rate, 0.25), 6);
             }
             else {
-                var r = videoElement.playbackRate;
-                videoElement.playbackRate = Math.min(Math.max(r + rate, 0.25), 4);
+                streamer.playbackRate = 1.0;
             }
         };
 
@@ -1323,7 +1295,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
         });
 
         $video.rebind('playing', function() {
-            if (streamer.duration) {
+            if (streamer.currentTime + 0.01) {
                 $pendingBlock.addClass('hidden');
 
                 if (!playevent) {
@@ -1332,14 +1304,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
                         setDuration(streamer.duration);
                     }
 
-                    if (isAudio) {
-                        streamer.on('duration', (ev, value) => {
-                            if (duration < value) {
-                                setDuration(value);
-                                return true;
-                            }
-                        });
-                    }
+                    streamer.on('duration', (ev, value) => {
+                        if (duration < value) {
+                            setDuration(value);
+                            return true;
+                        }
+                    });
 
                     // play/pause on click
                     $video.rebind('click', function() {
@@ -1398,7 +1368,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             setIdle(false);
             delay.cancel(MOUSE_IDLE_TID);
             $document.off('mousemove.idle');
-            if (streamer.currentTime + 0.01 >= props.duration) {
+            if (streamer.ended) {
                 delete sessionStorage.previewTime;
                 onIdle(() => progressBarElementStyle.setProperty('width', '100%'));
             }
@@ -1416,19 +1386,16 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         // Add events for all buttons
         $playpause.rebind('click', function() {
-            if (videoElement.paused || videoElement.ended || isAudio && !audioTime) {
+            if (streamer.interrupted) {
                 if (dlmanager.isOverQuota) {
                     $wrapper.trigger('is-over-quota');
                     dlmanager.showOverQuotaDialog();
                 }
                 else {
                     later(hideControls);
-                    if (streamer.currentTime >= props.duration) {
+
+                    if (streamer.ended) {
                         streamer.currentTime = 0;
-                    }
-                    // Reset actual time for audio
-                    else if (props.audioSource && audioTime >= props.duration) {
-                        streamer.currentTime = previousTime = audioTime = 0;
                     }
                     else {
                         streamer.play();
@@ -1437,11 +1404,6 @@ FullScreenManager.prototype.enterFullscreen = function() {
             }
             else {
                 videoElement.pause();
-            }
-
-            // Reset playbackRate for audio
-            if (props.audioSource) {
-                props.audioSource.playbackRate.value = playbackRate;
             }
             return false;
         });
@@ -1737,54 +1699,30 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         // Bind Playback Speed context menu
         $('.context-menu.playback-speed button', $wrapper).rebind('click.media-viewer', function() {
+            let rate = 1;
+            let cl = '1x';
             const $this = $(this);
 
             if ($this.hasClass('05x')) {
-                $('i', $speed).removeClass()
-                    .addClass('sprite-fm-mono icon-playback-05x-small-regular-outline icon-size-36');
-                $speed.addClass('margin-2');
-                $('.context-menu.playback-speed button i', $wrapper).addClass('hidden');
-                $('.context-menu.playback-speed button.05x i', $wrapper).removeClass('hidden');
-                videoElement.playbackRate = 0.5;
-                if (props.audioSource) {
-                    props.audioSource.playbackRate.value = 0.5;
-                    playbackRate = 0.5;
-                }
-            }
-            else if ($this.hasClass('1x')) {
-                $('i', $speed).removeClass().addClass('sprite-fm-mono icon-playback-1x-small-regular-outline');
-                $speed.removeClass('margin-2');
-                $('.context-menu.playback-speed button i', $wrapper).addClass('hidden');
-                $('.context-menu.playback-speed button.1x i', $wrapper).removeClass('hidden');
-                videoElement.playbackRate = 1;
-                if (props.audioSource) {
-                    props.audioSource.playbackRate.value = 1;
-                    playbackRate = 1;
-                }
+                cl = '05x';
+                rate = 0.5;
             }
             else if ($this.hasClass('15x')) {
-                $('i', $speed).removeClass()
-                    .addClass('sprite-fm-mono icon-playback-15x-small-regular-outline icon-size-36');
-                $speed.addClass('margin-2');
-                $('.context-menu.playback-speed button i', $wrapper).addClass('hidden');
-                $('.context-menu.playback-speed button.15x i', $wrapper).removeClass('hidden');
-                videoElement.playbackRate = 1.5;
-                if (props.audioSource) {
-                    props.audioSource.playbackRate.value = 1.5;
-                    playbackRate = 1.5;
-                }
+                cl = '15x';
+                rate = 1.5;
             }
             else if ($this.hasClass('2x')) {
-                $('i', $speed).removeClass().addClass('sprite-fm-mono icon-playback-2x-small-regular-outline');
-                $speed.removeClass('margin-2');
-                $('.context-menu.playback-speed button i', $wrapper).addClass('hidden');
-                $('.context-menu.playback-speed button.2x i', $wrapper).removeClass('hidden');
-                videoElement.playbackRate = 2;
-                if (props.audioSource) {
-                    props.audioSource.playbackRate.value = 2;
-                    playbackRate = 2;
-                }
+                cl = '15x';
+                rate = 2;
             }
+
+            $('.context-menu.playback-speed button i', $wrapper).addClass('hidden');
+            $(`.context-menu.playback-speed button.${cl} i`, $wrapper).removeClass('hidden');
+            $('i', $speed.removeClass('margin-2'))
+                .removeClass()
+                .addClass(`sprite-fm-mono icon-playback-${cl}-small-regular-outline`);
+
+            streamer.playbackRate = rate;
         });
 
         // Bind Subtitles context menu
@@ -2003,6 +1941,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     this.abort();
                 }
                 else if (opt.autoplay) {
+                    options.autoplay = true;
                     this.parent.play();
                 }
                 else {
@@ -2692,6 +2631,27 @@ FullScreenManager.prototype.enterFullscreen = function() {
             }
 
             return '';
+        }
+    });
+    Object.defineProperty(MediaInfoReport.prototype, 'addMediaData', {
+        value: function(file, timeout = 9) {
+            return Promise.race([tSleep(timeout), MediaAttribute.getMediaData(file)])
+                .then((res) => {
+                    if (res) {
+                        const {duration, width, height} = res;
+
+                        if (!this.width && width > 0) {
+                            Object.defineProperty(this, 'width', {value: width});
+                        }
+                        if (!this.height && height > 0) {
+                            Object.defineProperty(this, 'height', {value: height});
+                        }
+                        if (!this.playtime && duration > 0) {
+                            Object.defineProperty(this, 'playtime', {value: duration});
+                        }
+                    }
+                    return res;
+                });
         }
     });
     Object.defineProperty(MediaInfoReport.prototype, 'container', {
@@ -3390,7 +3350,15 @@ FullScreenManager.prototype.enterFullscreen = function() {
                         var res = new MediaInfoReport();
                         res.bytesRead = bytesRead;
                         res.entry = file;
-                        resolve(res);
+
+                        Promise.resolve(res.playtime)
+                            .then((time) => {
+                                if (!time && file instanceof Blob) {
+                                    return res.addMediaData(file);
+                                }
+                            })
+                            .catch(dump)
+                            .finally(() => resolve(res));
                     }
                     else {
                         _nextChunk(self.chunkSize < 0x2000 ? Math.min(0x80000, length << 1) : self.chunkSize);
@@ -3891,6 +3859,29 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     resolve(MediaAttribute.isTypeSupported.apply(null, mfa));
                 })
                 .catch(reject);
+        });
+    };
+
+    /**
+     * Retrieve HTMLMediaElement meta data.
+     * @param {File|Blob} entry File entry or Blob.
+     * @returns {Promise<*>} metadata
+     */
+    MediaAttribute.getMediaData = function(entry) {
+        return new Promise((resolve) => {
+            const elm = document.createElement('video');
+            elm.preload = 'metadata';
+            elm.currentTime = 0x80000;
+            elm.ondurationchange = function() {
+                if (elm.duration !== Infinity) {
+                    const {videoWidth: width, videoHeight: height, duration, src, videoTracks, audioTracks} = elm;
+
+                    URL.revokeObjectURL(src);
+                    elm.ondurationchange = null;
+                    resolve(freeze({width, height, duration, video: [...videoTracks], audio: [...audioTracks]}));
+                }
+            };
+            elm.src = URL.createObjectURL(entry);
         });
     };
 

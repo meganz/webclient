@@ -1778,7 +1778,7 @@ var slideshowid;
         }
 
         preqs[n.h] = 1;
-        var maxSize = ua.details.engine === 'Trident' ? 12 : 50;
+        const maxSize = parseInt(localStorage.maxPrvOrigSize) || 50;
         var loadOriginal = n.s < maxSize * 1048576 && is_image(n) === 1;
         var loadPreview = !loadOriginal || !slideshowplay && n.s > 1048576;
         var onPreviewError = loadOriginal ? previewimg.bind(window, n.h, null) : eot;

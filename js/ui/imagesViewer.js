@@ -500,7 +500,13 @@ var slideshowid;
         }
     }
 
-    const slideshow_zoomSlider = is_mobile ? nop : (value = 100) => {
+    function slideshow_zoomSlider(value = 100) {
+
+        if (is_mobile) {
+            mega.ui.viewerOverlay.zoom = value;
+            return;
+        }
+
         const container = document.querySelector('.media-viewer-container');
         const wrapper = container && container.querySelector('.zoom-slider-wrap');
         const $elm = $('.zoom-slider', wrapper);
@@ -706,29 +712,32 @@ var slideshowid;
         var lastPos = {x: null, y: null};
 
         if (close) {
-            $imgWrap.off('mousedown.pickpan');
-            $imgWrap.off('mouseup.pickpan mouseout.pickpan');
-            $imgWrap.off('mousemove.pickpan');
+            $imgWrap.off('mousedown.pickpan touchstart.pickpan');
+            $imgWrap.off('mouseup.pickpan mouseout.pickpan touchend.pickpan');
+            $imgWrap.off('mousemove.pickpan touchmove.pickpan');
             return false;
         }
 
         // Get cursor last position before dragging
-        $imgWrap.rebind('mousedown.pickpan', function(event) {
-            dragStart = 1;
+        $imgWrap.rebind('mousedown.pickpan touchstart.pickpan', function(event) {
+            dragStart = (!event.touches || event.touches.length === 1) | 0; // double finger should not treated as drag
             lastPos = {x: event.pageX, y: event.pageY};
             $(this).addClass('picked');
         });
 
         // Stop dragging
-        $imgWrap.rebind('mouseup.pickpan mouseout.pickpan', function() {
+        $imgWrap.rebind('mouseup.pickpan mouseout.pickpan touchend.pickpan', function() {
             dragStart = 0;
             $(this).removeClass('picked');
         });
 
         // Drag image if it doesn't fit into the container
-        $imgWrap.rebind('mousemove.pickpan', function(event) {
+        $imgWrap.rebind('mousemove.pickpan touchmove.pickpan', event => {
             if (dragStart) {
-                var currentPos = {x: event.pageX, y: event.pageY};
+
+                const {pageX, pageY} = event.type === 'touchmove' ? event.touches[0] : event;
+
+                var currentPos = {x: pageX, y: pageY};
                 var changeX = currentPos.x - lastPos.x;
                 var changeY = currentPos.y - lastPos.y;
 
@@ -788,7 +797,6 @@ var slideshowid;
         else if (!zoomout) {
             zoomStep = (newPerc * 1.2).toFixed(2);
             newPerc = zoomStep <= 1000 ? zoomStep : 1000;
-            console.log(newPerc);
         }
 
         newPerc /= devicePixelRatio * 100;
@@ -881,6 +889,109 @@ var slideshowid;
             'top': (viewerHeight - imgHeight) / 2,
         });
         slideshow_zoomSlider(imgWidth / origImgWidth * 100 * devicePixelRatio);
+    }
+
+    // Mobile finger gesture
+    function slideshow_gesture(elm, type) {
+
+        // TODO: change to `!is_touchable` to support desktop touch device
+        if (!is_mobile) {
+            return;
+        }
+
+        const name = type ? 'iframeGesture' : 'gesture';
+
+        // Lets reset
+        if (mega.ui.viewerOverlay[name]) {
+
+            mega.ui.viewerOverlay[name].destroy();
+            delete mega.ui.viewerOverlay[name];
+        }
+
+        // no node passed means it is closing
+        if (!elm) {
+
+            delete mega.ui.viewerOverlay.zoom;
+
+            return;
+        }
+
+        let containerSelector;
+
+        if (type) {
+
+            containerSelector = type === 'PDF' ? '#viewerContainer' : 'body';
+            elm = elm.contentDocument;
+        }
+        else {
+            containerSelector = is_video(mega.ui.viewerOverlay.nodeComponent.node) ? '.video-block' : '.img-wrap';
+            elm = elm.querySelector('.content');
+        }
+
+        console.assert(elm, 'Invalid element to initialise slideshow gesture');
+
+        const options = {
+            domNode: elm,
+            onTouchStart: function() {
+
+                const container = this.domNode.querySelector(containerSelector);
+
+                this.onEdge = {
+                    top: container.scrollTop === 0,
+                    right: (container.scrollLeft + container.offsetWidth) / container.scrollWidth > 0.999,
+                    bottom: (container.scrollTop + container.offsetHeight) / container.scrollHeight > 0.999,
+                    left: container.scrollLeft === 0
+                };
+            }
+        };
+
+        options.onSwipeRight = options.onSwipeLeft = options.onSwipeDown = options.onSwipeUp = ev => {
+            ev.preventDefault();
+        };
+
+        if (page !== 'download') {
+
+            options.onSwipeRight = function() {
+
+                if (this.onEdge.left) {
+                    slideshow_prev();
+                }
+            };
+
+            options.onSwipeLeft = function() {
+
+                if (this.onEdge.right) {
+                    slideshow_next();
+                }
+            };
+        }
+
+        if (!type) {
+
+            options.onPinchZoom = function(ev, mag) {
+
+                mega.ui.viewerOverlay.zoom *= mag;
+                slideshow_zoom($(elm), 0, mega.ui.viewerOverlay.zoom);
+            };
+        }
+        else if (type === 'DOCX') {
+            options.onPinchZoom = function(ev, mag) {
+
+                const dElm = this.domNode.documentElement;
+                const curr = parseFloat(dElm.style.transform.replace(/[^\d.]/g, '')) || 1;
+
+                if (!this.initZoom) {
+                    this.initZoom = curr;
+                }
+
+                const newVal = Math.max(curr * mag, this.initZoom);
+
+                dElm.style.transform = `scale(${newVal.toFixed(6)})`;
+                dElm.classList.add('scaled');
+            };
+        }
+
+        mega.ui.viewerOverlay[name] = new MegaGesture(options);
     }
 
     function sendToChatHandler() {
@@ -1007,6 +1118,8 @@ var slideshowid;
                     document.getElementById('docxpreviewdiv1').contentDocument.dispatchEvent(ev);
                 })();
             }
+
+            slideshow_gesture();
 
             return false;
         }
@@ -1514,6 +1627,8 @@ var slideshowid;
         if (is_mobile) {
             mega.ui.viewerOverlay.show(id);
         }
+
+        slideshow_gesture($overlay[0]);
     }
 
     function slideshow_toggle_pause($button) {
@@ -1663,7 +1778,7 @@ var slideshowid;
         }
 
         preqs[n.h] = 1;
-        var maxSize = ua.details.engine === 'Trident' ? 12 : 50;
+        const maxSize = parseInt(localStorage.maxPrvOrigSize) || 50;
         var loadOriginal = n.s < maxSize * 1048576 && is_image(n) === 1;
         var loadPreview = !loadOriginal || !slideshowplay && n.s > 1048576;
         var onPreviewError = loadOriginal ? previewimg.bind(window, n.h, null) : eot;
@@ -1930,6 +2045,7 @@ var slideshowid;
             ev.initEvent("pdfjs-openfile.meganz", true);
             ev.data = data.buffer || data.src;
             elm.contentDocument.body.dispatchEvent(ev);
+            slideshow_gesture(elm, 'PDF');
             return true;
         });
 
@@ -1986,6 +2102,7 @@ var slideshowid;
                 blob: data.blob
             };
             elem.contentDocument.dispatchEvent(ev);
+            slideshow_gesture(elem, 'DOCX');
         });
 
         if (_docxSeen) {
@@ -2218,7 +2335,6 @@ var slideshowid;
                     slideshow_imgPosition($overlay);
                     $img.removeClass('vo-hidden');
                 });
-                // slideshow_zoomSlider($img.width() / origImgWidth * 100 * devicePixelRatio);
             }
 
             // Apply exit orientation

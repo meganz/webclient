@@ -695,6 +695,39 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
     $.hideContextMenu(e);
     $contactDetails.addClass('hidden');
 
+    /**
+     * Adding context menu for share folder while you're on it
+     * @param {Object} n node
+     * @returns {void}
+     */
+    var shareContextMenu = function(n) {
+        // Hide shares context menu for root id, out shares and S4
+        const hideFrom = !['s4', 'out-shares', 'shares', 'file-requests'].includes(M.currentrootid)
+            && M.RootID !== M.currentdirid;
+
+        if (hideFrom) {
+            $.selected = [n.h];
+
+            $(menuCMI).filter('.cd-send-to-contact-item').removeClass('hidden');
+            $(menuCMI).filter('.cd-getlink-item').removeClass('hidden');
+            $(menuCMI).filter('.cd-sh4r1ng-item').removeClass('hidden');
+
+            onIdle(() => M.setContextMenuShareText());
+            onIdle(() => M.setContextMenuGetLinkText());
+        }
+
+        var cl = new mega.Share();
+        var hasExportLink = cl.hasExportLink(n.h);
+
+        if (hideFrom && hasExportLink) {
+            $(menuCMI).filter('.cd-removelink-item').removeClass('hidden');
+        }
+
+        if (hideFrom && M.getNodeShareUsers(n.h, 'EXP').length || M.ps[n.h]) {
+            $(menuCMI).filter('.cd-removeshare-item').removeClass('hidden');
+        }
+    };
+
     // Used when right click is occured outside item, on empty canvas
     if (ll === 2) {
         // to init megaSync, as the user may click of file/folder upload
@@ -746,6 +779,11 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
                     if (mega.rewind) {
                         $(menuCMI).filter('.rewind-item').removeClass('hidden');
                     }
+                    // Flag added for share folder while on it at context menu
+                    if (mega.flags.ab_ctxmenu_shares) {
+                        shareContextMenu(n);
+                    }
+
                 }
                 itemsViewed = true;
             }
@@ -1195,13 +1233,24 @@ MegaData.prototype.setContextMenuGetLinkText = function() {
         }
     }
 
+    // Toggle manage link class for a/b testing purposes
+    const cdGetLinkToggle = (func) => {
+        const el = document.querySelector('.dropdown.body .cd-getlink-item');
+
+        if (el && !is_mobile) {
+            el.classList[func]('manage-link');
+        }
+    };
+
     // If all the selected nodes have existing public links, set text to 'Manage links' or 'Manage link'
     if (numOfSelectedNodes === numOfExistingPublicLinks) {
         getLinkText = numOfSelectedNodes > 1 ? l[17520] : l[6909];
+        cdGetLinkToggle('add');
     }
     else {
         // Otherwise change text to 'Share links' or 'Share link' if there are selected nodes without links
         getLinkText = mega.icu.format(l.share_link, numOfSelectedNodes);
+        cdGetLinkToggle('remove');
     }
 
     // If there are multiple nodes with existing links selected, set text to 'Remove links', otherwise 'Remove link'
@@ -1216,6 +1265,8 @@ MegaData.prototype.setContextMenuGetLinkText = function() {
     else {
         document.querySelector('.dropdown.body .getlink-item span').textContent = getLinkText;
         document.querySelector('.dropdown.body .removelink-item span').textContent = removeLinkText;
+        document.querySelector('.dropdown.body .cd-getlink-item span').textContent = getLinkText;
+        document.querySelector('.dropdown.body .cd-removelink-item span').textContent = removeLinkText;
     }
 };
 
@@ -1234,6 +1285,7 @@ MegaData.prototype.setContextMenuShareText = function() {
     let getLinkIcon = 'sprite-mobile-fm-mono icon-share-thin-outline';
     let manageIcon = 'icon-folder-outgoing-share';
     let removeIcon = 'icon-folder-remove-share';
+    const cdShareItem = document.querySelector('.dropdown.body .cd-sh4r1ng-item');
 
     if (isS4Bucket) {
         getLinkText = l.s4_share_bucket;
@@ -1241,10 +1293,21 @@ MegaData.prototype.setContextMenuShareText = function() {
         removeIcon = 'icon-bucket-remove-share';
     }
 
+    // Toggle manage share class for a/b testing purposes
+    const cdShareToggle = (func) => {
+        if (cdShareItem && !is_mobile) {
+            cdShareItem.classList[func]('manage-share');
+        }
+    };
+
     // If the node has shares or pending shares, set to 'Manage share', else, 'Share folder'
     if (n && M.getNodeShareUsers(n, 'EXP').length || M.ps[n]) {
         getLinkText = l.manage_share;
         getLinkIcon = 'sprite-mobile-fm-mono icon-settings-thin-outline';
+        cdShareToggle('add');
+    }
+    else {
+        cdShareToggle('remove');
     }
 
     if (is_mobile) {
@@ -1257,10 +1320,14 @@ MegaData.prototype.setContextMenuShareText = function() {
 
         const shareItem = document.querySelector('.dropdown.body .sh4r1ng-item');
         const removeItem = document.querySelector('.dropdown.body .removeshare-item');
+        const cdRemoveItem = document.querySelector('.dropdown.body .cd-removeshare-item');
 
+        cdShareItem.querySelector('span').textContent = getLinkText;
+        cdShareItem.querySelector('i').className = `sprite-fm-mono ${manageIcon}`;
         shareItem.querySelector('span').textContent = getLinkText;
         shareItem.querySelector('i').className = `sprite-fm-mono ${manageIcon}`;
         removeItem.querySelector('i').className = `sprite-fm-mono ${removeIcon}`;
+        cdRemoveItem.querySelector('i').className = `sprite-fm-mono ${removeIcon}`;
     }
 };
 

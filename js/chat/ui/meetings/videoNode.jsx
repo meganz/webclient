@@ -2,30 +2,32 @@ import React from 'react';
 import { MegaRenderMixin } from '../../mixins';
 import { Avatar } from '../contacts.jsx';
 import Call, { MODE } from './call.jsx';
-import VideoNodeMenu from './videoNodeMenu.jsx';
 
 /** The class hiearachy of video components is the following:
                                     VideoNode
                               (Base rendering code)
-                              /                    \
-                            /                       \
-                     DynVideo                  LocalVideoThumb
-            (Uses an externally managed        (shows local camera track if avail,
-              (dynamic) video player)           otherwise screenshare track)
-              /                      \
-             /                        \
-  DynVideoCloned                   DynVideoDirect
- (uses a clone of             (renders the pre-loaded
-the dynamic player              dynamic player directly,
-for smooth swithcing)             /                \
-        |                        /                  \
-PeerVideoThumb           PeerVideoHiRes          LocalVideoHiRes
-(Thumbnail video         (Big video of       (shows screenshare track if avail,
- of a peer, used in       a peer,used in         otherwise camera track)
- the RHP. If peer).       main, self and
-has screen+cam, locks     mini view)
-on the thumb stream,
-(non-dynamic mode))
+                              |          |       |
+             /----------------/          |       \----------------------------\
+         DynVideo              PeerVideoThumbFixed                      LocalVideoThumb
+(Uses an externally managed    (Always displays thumb              (shows local camera track
+  (dynamic) video player)      video, not dynamic) Used              if avail, otherwise
+            |       |         for camera when screen+cam             screenshare track)
+            |        \--------------------------------\
+    DynVideoCloned                              DynVideoDirect
+    (uses a clone of                        (renders the pre-loaded
+    the dynamic player                       dynamic player directly,
+    for smooth swithcing)                          |                 \
+            |          \                           |                  \
+  PeerVideoThumb      PeerVideoHiResCloned   PeerVideoHiRes       LocalVideoHiRes
+(Normal thumbnail      (Shows a peer's        (Big video of        (shows screenshare track if avail,
+video of a peer,       hi-res shared screen   a peer,used in      otherwise camera track)
+used in the RHP.       as thumbnail, only     main, self and
+                       when peer sends both   mini view)
+                       screen and camera.
+                       Is dynamic but never
+                       switches down to
+                       thumbnail)
+
 */
 /** Base class for all video components - does the actual rendering */
 class VideoNode extends MegaRenderMixin {
@@ -36,14 +38,12 @@ class VideoNode extends MegaRenderMixin {
     /*
         Methods and properties that descendants must implement:
         requestVideo();
-        isThumb
         isLocal
         isDirect
     */
 
     constructor(props, source) {
         super(props);
-        this.isVideo = true; // the source uses this to differentiate video widgets from other event subscribers
         this.source = source;
     }
 
@@ -68,10 +68,18 @@ class VideoNode extends MegaRenderMixin {
         this.requestVideo();
     }
 
+    onAvChange() {
+        // force re-request if video stream changed
+        this.safeForceUpdate();
+    }
+
     displayVideoElement(video, container) {
         this.attachVideoElemHandlers(video);
         // insert/replace the video in the DOM
         container.replaceChildren(video);
+        if (video.readyState === 4) {
+            container.classList.remove("video-node-loading");
+        }
     }
 
     attachVideoElemHandlers(video) {
@@ -87,6 +95,9 @@ class VideoNode extends MegaRenderMixin {
             }
         };
         video.onloadeddata = (ev) => {
+            if (this.contRef.current) {
+                this.contRef.current.classList.remove("video-node-loading");
+            }
             // Trigger fake onResize when video finishes loading
             if (this.props.onLoadedData) {
                 this.props.onLoadedData(ev);
@@ -145,11 +156,11 @@ class VideoNode extends MegaRenderMixin {
 
     renderContent() {
         const source = this.source;
-        if (source.isStreaming()) {
+        if (source.isStreaming()) { // (this.props.isPresenterNode || (source.av & Av.Camera)) {
             return (
                 <div
                     ref={this.contRef}
-                    className="video-node-holder"
+                    className="video-node-holder video-node-loading"
                 />
             );
         }
@@ -193,8 +204,6 @@ class VideoNode extends MegaRenderMixin {
                     {source.audioMuted ? this.getStatusIcon('icon-mic-off-thin-outline', l.muted /* `Muted` */) : null}
                     {sfuClient.haveBadNetwork ?
                         this.getStatusIcon('icon-weak-signal', l.poor_connection /* `Poor connection` */) : null}
-                    {source.hasScreenAndCam && this.isThumb ?
-                        this.getStatusIcon('icon-pc-linux', 'Sharing screen') : null}
                 </$$CONTAINER>
             </>
         );
@@ -265,7 +274,7 @@ class DynVideo extends VideoNode {
     onAvChange() {
         // force re-request if video stream changed
         this._lastResizeWidth = null;
-        this.safeForceUpdate();
+        super.onAvChange();
     }
     dynRequestVideo(forceVisible) {
         const {source} = this;
@@ -316,7 +325,7 @@ class DynVideo extends VideoNode {
         else if (w > 200) {
             newQ = CallManager2.VIDEO_QUALITY.MEDIUM;
         }
-        else if (w > 180) {
+        else if (w > 180 || this.noThumb) {
             newQ = CallManager2.VIDEO_QUALITY.LOW;
         }
         else {
@@ -330,7 +339,7 @@ class DynVideo extends VideoNode {
         if (!this.isMounted() || !vidCont) {
             return;
         }
-        const player = this.source.player;
+        const player = this.noThumb ? this.source.hiResPlayer?.gui?.video : this.source.player;
         if (!player) { // remove video from DOM
             vidCont.replaceChildren();
             return;
@@ -384,40 +393,37 @@ class DynVideoCloned extends DynVideo {
         }
     }
 }
-/* Can operate in two modes - dynamic video cloned, or statically obtain thumbnail stream
- The second is needed when the peer does screensharing + camera, in which case the thumbnail (which should
- display peer's camera video) cannot simply clone the dynamic stream, but must explicitly play the video
- thiumbnail stream
+/*
+  Used to display a peer's video using the dynamic switching mechanism
 */
 export class PeerVideoThumb extends DynVideoCloned {
     constructor(props) {
         super(props, props.source);
-        this.isThumb = true;
+        this.requestVideo = this.dynRequestVideo;
+    }
+}
+/*
+  Displays only the thumbnail video, registering directly as a player GUI with the sfuPeer
+  Used to display the camera video when peer is sending both screen and cam
+*/
+export class PeerVideoThumbFixed extends VideoNode {
+    constructor(props) {
+        super(props, props.source);
+        assert(props.source.hasScreenAndCam);
+        this.ownVideo = document.createElement("video");
         if (CallManager2.Call.VIDEO_DEBUG_MODE) {
             this.onRxStats = this._onRxStats; // for staticThumb track
         }
     }
-    requestVideo(forceVisible) {
-        if (!this.source.hasScreenAndCam) {
-            if (this.fixedThumbPlayer) {
-                this.fixedThumbPlayer.destroy();
-            }
-            this.dynRequestVideo(forceVisible);
-        }
-        else {
-            delete this.requestedQ;
-            this.requestFixedThumbVideo();
-        }
-    }
-    addFixedThumbVideo() {
+    addVideo() {
         assert(this.source.hasScreenAndCam);
         const vidCont = this.contRef.current;
         assert(vidCont);
         if (vidCont.firstChild !== this.ownVideo) {
-            vidCont.replaceChildren(this.ownVideo);
+            this.displayVideoElement(this.ownVideo, vidCont);
         }
     }
-    delFixedThumbVideo() {
+    delVideo() {
         SfuClient.playerStop(this.ownVideo);
         const vidCont = this.contRef.current;
         if (!vidCont) {
@@ -425,20 +431,22 @@ export class PeerVideoThumb extends DynVideoCloned {
         }
         vidCont.replaceChildren();
     }
-    requestFixedThumbVideo() {
-        if (this.fixedThumbPlayer) {
-            this.playFixedThumbVideo();
+    requestVideo(forceVisible) {
+        if (!this.isComponentVisible() && !forceVisible) {
+            return;
+        }
+        if (this.player) {
+            this.playVideo();
         }
         else {
-            this.addFixedThumbVideo();
-            this.fixedThumbPlayer = this.source.sfuPeer.getThumbVideo((player) => {
-                this.fixedThumbPlayer = player;
+            this.addVideo();
+            this.player = this.source.sfuPeer.getThumbVideo((player) => {
                 return this;
             });
         }
     }
-    playFixedThumbVideo() {
-        const track = this.fixedThumbPlayer.slot?.inTrack;
+    playVideo() {
+        const track = this.player.slot?.inTrack;
         if (!track) {
             return;
         }
@@ -452,14 +460,60 @@ export class PeerVideoThumb extends DynVideoCloned {
         SfuClient.playerPlay(this.ownVideo, track);
     }
     detachFromTrack() {
-        this.delFixedThumbVideo();
+        this.delVideo();
     }
     onPlayerDestroy() {
-        delete this.fixedThumbPlayer;
+        delete this.player;
+    }
+    componentWillUnmount() {
+        if (this.player) {
+            this.player.destroy();
+        }
+        super.componentWillUnmount();
     }
     _onRxStats(track, info, raw) {
-        if (!this.source.player) {
+        if (this.player) {
             this.displayStats(CallManager2.Call.rxStatsToText(track, info, raw));
+        }
+    }
+}
+/** Hi-resolution peer video, cloned from the peer's hi-res track. Essentially a DynVideoCloned, but never lowers
+ * quality down to thumbnail track, i.e. uses only the hi-res track. Used for presenter views. */
+export class PeerVideoHiResCloned extends DynVideoCloned {
+    constructor(props) {
+        super(props, props.source);
+        this.noThumb = true;
+        this.requestVideo = this.dynRequestVideo;
+    }
+}
+/** Hi-resolution local video cloned from the local screen track. Used for presenter views. */
+export class LocalVideoHiResCloned extends VideoNode {
+    constructor(props) {
+        super(props, props.chatRoom.call.getLocalStream());
+        this.isLocal = true;
+        this.ownVideo = document.createElement("video");
+    }
+    get isLocalScreen() {
+        return this.source.av & Av.Screen;
+    }
+    requestVideo(forceVisible) {
+        if (d > 1 && forceVisible) {
+            console.debug('ignoring forceVisible');
+        }
+        const vidCont = this.contRef.current;
+        if (!vidCont) {
+            return;
+        }
+        const track = this.source.sfuClient.localScreenTrack();
+        if (!track) {
+            vidCont.replaceChildren();
+        }
+        else {
+            if (vidCont.firstChild !== this.ownVideo) {
+                // insert our cloned video in the DOM
+                this.displayVideoElement(this.ownVideo, vidCont);
+            }
+            SfuClient.playerPlay(this.ownVideo, track, true);
         }
     }
 }
@@ -477,7 +531,7 @@ export class LocalVideoThumb extends VideoNode {
     constructor(props) {
         const source = props.chatRoom.call.getLocalStream();
         super(props, source);
-        this.isLocal = this.isThumb = true;
+        this.isLocal = true;
         this.isLocalScreen = (source.av & Av.Screen) && !(source.av & Av.Camera);
         this.sfuClient = props.chatRoom.call.sfuClient;
         this.ownVideo = document.createElement("video");
@@ -509,6 +563,6 @@ export class LocalVideoThumb extends VideoNode {
     onAvChange() {
         const av = this.sfuClient.availAv;
         this.isLocalScreen = (av & Av.Screen) && !(av & Av.Camera);
-        this.safeForceUpdate();
+        super.onAvChange();
     }
 }

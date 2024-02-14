@@ -229,6 +229,42 @@ class MegaMobileTopMenu extends MegaMobileComponent {
         mBroadcaster.addListener('beforepagechange', () => {
             $('.mobile.main-block, .mobile.old-page').addClass('hidden');
         });
+
+        const _gestureHandler = () => {
+
+            if (document.body.offsetWidth < 769) {
+
+                if (this.gesture) {
+                    return;
+                }
+
+                this.gesture = new MegaGesture({
+                    domNode: this.domNode,
+                    onTouchMove: ev => {
+
+                        const xDiff = this.gesture.xStart - ev.touches[0].clientX;
+
+                        this.domNode.style.transform = `translateX(${Math.max(0, -xDiff)}px)`;
+                    },
+                    onSwipeRight: () => {
+
+                        this.hide(true);
+                        this.trigger('close');
+                    },
+                    onTouchEnd: () => {
+                        this.domNode.style.transform = '';
+                    }
+                });
+            }
+            else if (this.gesture) {
+                this.gesture.destroy();
+                delete this.gesture;
+            }
+        };
+
+        _gestureHandler();
+
+        window.addEventListener('resize', _gestureHandler);
     }
 
     static init() {
@@ -279,9 +315,16 @@ class MegaMobileTopMenu extends MegaMobileComponent {
         this.domNode.classList.add('active', 'animate');
     }
 
-    hide() {
-        this.domNode.classList.remove('active');
+    hide(noDelay) {
+
+        if (noDelay) {
+            this.domNode.classList.add('no-delay');
+        }
+
         this.domNode.classList.add('animate');
+        this.domNode.classList.remove('active');
+
+        onIdle(() => this.domNode.classList.remove('no-delay'));
     }
 
     toggleActive() {

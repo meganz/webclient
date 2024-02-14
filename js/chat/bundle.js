@@ -2,7 +2,7 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 51:
+/***/ 816:
 /***/ ((__unused_webpack_module, __unused_webpack___webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -10,13 +10,13 @@
 // UNUSED EXPORTS: default
 
 // EXTERNAL MODULE: external "React"
-var external_React_ = __webpack_require__(363);
+var external_React_ = __webpack_require__(376);
 var external_React_default = __webpack_require__.n(external_React_);
 // EXTERNAL MODULE: external "ReactDOM"
-var external_ReactDOM_ = __webpack_require__(533);
+var external_ReactDOM_ = __webpack_require__(944);
 var external_ReactDOM_default = __webpack_require__.n(external_ReactDOM_);
 // EXTERNAL MODULE: ./js/chat/ui/conversations.jsx + 20 modules
-var conversations = __webpack_require__(978);
+var conversations = __webpack_require__(408);
 ;// CONCATENATED MODULE: ./js/chat/chatRouting.jsx
 var _ChatRouting;
 class ChatRouting {
@@ -272,9 +272,9 @@ ChatRouting.gPageHandlers = {
   }
 };
 // EXTERNAL MODULE: ./js/chat/ui/messages/scheduleMetaChange.jsx
-var scheduleMetaChange = __webpack_require__(97);
+var scheduleMetaChange = __webpack_require__(808);
 // EXTERNAL MODULE: ./js/chat/chatRoom.jsx + 1 modules
-var chat_chatRoom = __webpack_require__(804);
+var chat_chatRoom = __webpack_require__(56);
 ;// CONCATENATED MODULE: ./js/chat/meetingsManager.jsx
 
 
@@ -1160,15 +1160,15 @@ class MeetingsManager {
 const meetingsManager = (MeetingsManager);
 window.MeetingsManager = MeetingsManager;
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
-var applyDecoratedDescriptor = __webpack_require__(229);
+var applyDecoratedDescriptor = __webpack_require__(888);
 // EXTERNAL MODULE: ./js/chat/mixins.js
-var mixins = __webpack_require__(503);
+var mixins = __webpack_require__(436);
 ;// CONCATENATED MODULE: ./js/chat/chatOnboarding.jsx
 
 var _dec, _class;
 
 
-let ChatOnboarding = (_dec = (0,mixins.M9)(1000), (_class = class ChatOnboarding {
+let ChatOnboarding = (_dec = (0,mixins.aS)(1000), (_class = class ChatOnboarding {
   constructor(megaChat) {
     this.finished = false;
     this.currentChatIsScheduled = false;
@@ -1420,7 +1420,7 @@ let ChatOnboarding = (_dec = (0,mixins.M9)(1000), (_class = class ChatOnboarding
         return;
       }
       if (obChat.steps[nextIdx].map.flag === OBV4_FLAGS.CHAT_SCHEDULE_ADDED && this.hasDisplayableScheduleMeeting && !this.isMeetingsTab) {
-        this.megaChat.trigger(conversations.FP.NAV_RENDER_VIEW, conversations.nk.MEETINGS);
+        this.megaChat.trigger(conversations.UH.NAV_RENDER_VIEW, conversations.o7.MEETINGS);
       }
       const res = obChat.startNextOpenSteps(nextIdx);
       if (obChat.steps[nextIdx].map.flag === OBV4_FLAGS.CHAT_SCHEDULE_CONF && res !== false) {
@@ -1475,17 +1475,17 @@ let ChatOnboarding = (_dec = (0,mixins.M9)(1000), (_class = class ChatOnboarding
       delete this.schedListeners;
     }
   }
-}, ((0,applyDecoratedDescriptor.Z)(_class.prototype, "checkAndShowStep", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "checkAndShowStep"), _class.prototype)), _class));
+}, ((0,applyDecoratedDescriptor.c)(_class.prototype, "checkAndShowStep", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "checkAndShowStep"), _class.prototype)), _class));
 
 // EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 11 modules
-var call = __webpack_require__(476);
+var call = __webpack_require__(144);
 ;// CONCATENATED MODULE: ./js/chat/chat.jsx
 
 
 
-__webpack_require__(62);
-__webpack_require__(804);
-__webpack_require__(336);
+__webpack_require__(356);
+__webpack_require__(56);
+__webpack_require__(396);
 
 
 
@@ -1740,7 +1740,7 @@ Chat.prototype.init = promisify(function (resolve, reject) {
     if (is_mobile) {
       return;
     }
-    self.$conversationsAppInstance = external_ReactDOM_default().render(self.$conversationsApp = external_React_default().createElement(conversations.ZP.ConversationsApp, {
+    self.$conversationsAppInstance = external_ReactDOM_default().render(self.$conversationsApp = external_React_default().createElement(conversations.cp.ConversationsApp, {
       megaChat: self,
       routingSection: self.routingSection,
       routingSubSection: self.routingSubSection,
@@ -2579,19 +2579,19 @@ Chat.prototype.renderListing = async function megaChatRenderListing(location, is
       }
       let rooms = chats;
       let view;
-      if (this.currentlyOpenedView === conversations.nk.MEETINGS) {
+      if (this.currentlyOpenedView === conversations.o7.MEETINGS) {
         if (meetings.length) {
           rooms = meetings;
         } else {
-          view = conversations.nk.CHATS;
+          view = conversations.o7.CHATS;
         }
       } else if (!chats.length) {
         rooms = meetings;
-        view = conversations.nk.MEETINGS;
+        view = conversations.o7.MEETINGS;
       }
       if (view) {
         onIdle(() => {
-          this.trigger(conversations.FP.NAV_RENDER_VIEW, view);
+          this.trigger(conversations.UH.NAV_RENDER_VIEW, view);
         });
       }
       rooms.sort(M.sortObjFn('lastActivity', -1));
@@ -3555,7 +3555,7 @@ Chat.prototype.openScheduledMeeting = function (meetingId, toCall) {
           }
         }
       }
-      (0,call.xt)(true, meetingRoom).then(() => meetingRoom.startAudioCall(true)).catch(ex => d && console.warn('Already in a call.', ex));
+      (0,call.OO)(true, meetingRoom).then(() => meetingRoom.startAudioCall(true)).catch(ex => d && console.warn('Already in a call.', ex));
     });
   }
 };
@@ -3567,7 +3567,7 @@ const chat = ({
 
 /***/ }),
 
-/***/ 62:
+/***/ 356:
 /***/ (() => {
 
 (function () {
@@ -3599,7 +3599,7 @@ const chat = ({
 
 /***/ }),
 
-/***/ 804:
+/***/ 56:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -5667,22 +5667,22 @@ const chatRoom = ({
 
 /***/ }),
 
-/***/ 503:
+/***/ 436:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-LY: () => (timing),
-M9: () => (SoonFcWrap),
-_p: () => (ContactAwareComponent),
-qC: () => (compose),
-wl: () => (MegaRenderMixin)
+CI: () => (timing),
+Jn: () => (compose),
+_k: () => (ContactAwareComponent),
+aS: () => (SoonFcWrap),
+ei: () => (MegaRenderMixin)
 });
 
-var _applyDecoratedDescriptor2__ = __webpack_require__(229);
-var react_dom0__ = __webpack_require__(533);
+var _applyDecoratedDescriptor2__ = __webpack_require__(888);
+var react_dom0__ = __webpack_require__(944);
 var react_dom0 = __webpack_require__.n(react_dom0__);
-var react1__ = __webpack_require__(363);
+var react1__ = __webpack_require__(376);
 var react1 = __webpack_require__.n(react1__);
 
 var _dec, _dec2, _dec3, _dec4, _dec5, _class;
@@ -6350,7 +6350,7 @@ let MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 = l
     var id = obj.addChangeListener((obj, data, k) => properties[k] && this.onPropOrStateUpdated());
     this._dataStructListeners.push(['dsprops', id, obj]);
   }
-}, ((0,_applyDecoratedDescriptor2__.Z)(_class.prototype, "componentWillUnmount", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "componentWillUnmount"), _class.prototype), (0,_applyDecoratedDescriptor2__.Z)(_class.prototype, "debouncedForceUpdate", [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, "debouncedForceUpdate"), _class.prototype), (0,_applyDecoratedDescriptor2__.Z)(_class.prototype, "componentDidMount", [_dec3], Object.getOwnPropertyDescriptor(_class.prototype, "componentDidMount"), _class.prototype), (0,_applyDecoratedDescriptor2__.Z)(_class.prototype, "eventuallyUpdate", [_dec4], Object.getOwnPropertyDescriptor(_class.prototype, "eventuallyUpdate"), _class.prototype), (0,_applyDecoratedDescriptor2__.Z)(_class.prototype, "onResizeDoUpdate", [_dec5], Object.getOwnPropertyDescriptor(_class.prototype, "onResizeDoUpdate"), _class.prototype)), _class));
+}, ((0,_applyDecoratedDescriptor2__.c)(_class.prototype, "componentWillUnmount", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "componentWillUnmount"), _class.prototype), (0,_applyDecoratedDescriptor2__.c)(_class.prototype, "debouncedForceUpdate", [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, "debouncedForceUpdate"), _class.prototype), (0,_applyDecoratedDescriptor2__.c)(_class.prototype, "componentDidMount", [_dec3], Object.getOwnPropertyDescriptor(_class.prototype, "componentDidMount"), _class.prototype), (0,_applyDecoratedDescriptor2__.c)(_class.prototype, "eventuallyUpdate", [_dec4], Object.getOwnPropertyDescriptor(_class.prototype, "eventuallyUpdate"), _class.prototype), (0,_applyDecoratedDescriptor2__.c)(_class.prototype, "onResizeDoUpdate", [_dec5], Object.getOwnPropertyDescriptor(_class.prototype, "onResizeDoUpdate"), _class.prototype)), _class));
 class ContactAwareComponent extends MegaRenderMixin {
   constructor(props) {
     super(props);
@@ -6440,24 +6440,24 @@ ContactAwareComponent.unavailableNames = Object.create(null);
 
 /***/ }),
 
-/***/ 142:
+/***/ 464:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-Z: () => (ChatToaster)
+c: () => (ChatToaster)
 });
-var react0__ = __webpack_require__(363);
+var react0__ = __webpack_require__(376);
 var react0 = __webpack_require__.n(react0__);
-var _mixins1__ = __webpack_require__(503);
-var _meetings_call_jsx2__ = __webpack_require__(476);
-var _ui_buttons3__ = __webpack_require__(204);
+var _mixins1__ = __webpack_require__(436);
+var _meetings_call_jsx2__ = __webpack_require__(144);
+var _ui_buttons3__ = __webpack_require__(536);
 
 
 
 
 const NAMESPACE = 'chat-toast';
-class ChatToaster extends _mixins1__.wl {
+class ChatToaster extends _mixins1__.ei {
   constructor(props) {
     super(props);
     this.state = {
@@ -6492,7 +6492,7 @@ class ChatToaster extends _mixins1__.wl {
     } = this.props;
     const now = Date.now();
     if (this.toasts.length + this.persistentToasts.length) {
-      if (this.isMounted() && (!isRootToaster && _meetings_call_jsx2__.ZP.isExpanded() || M.chat)) {
+      if (this.isMounted() && (!isRootToaster && _meetings_call_jsx2__.cp.isExpanded() || M.chat)) {
         if (this.toasts.length && !shownToast) {
           this.dispatchToast(this.toasts.shift(), now);
         }
@@ -6740,7 +6740,7 @@ class ChatToaster extends _mixins1__.wl {
     }));
   }
 }
-class ChatToastMsg extends _mixins1__.wl {
+class ChatToastMsg extends _mixins1__.ei {
   constructor(...args) {
     super(...args);
     this.state = {
@@ -6799,7 +6799,7 @@ class ChatToastMsg extends _mixins1__.wl {
         className: `${NAMESPACE} chat-persistent-toast`
       }, value || toast.render());
     }
-    const closeButton = toast.close && react0().createElement(_ui_buttons3__.z, {
+    const closeButton = toast.close && react0().createElement(_ui_buttons3__.q, {
       className: "chat-toast-close",
       icon: "sprite-fm-mono icon-close-component",
       onClick: onClose
@@ -6826,25 +6826,25 @@ class ChatToastMsg extends _mixins1__.wl {
 
 /***/ }),
 
-/***/ 813:
+/***/ 912:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  Z: () => (ComposedTextArea)
+  c: () => (ComposedTextArea)
 });
 
 // EXTERNAL MODULE: external "React"
-var external_React_ = __webpack_require__(363);
+var external_React_ = __webpack_require__(376);
 var external_React_default = __webpack_require__.n(external_React_);
 // EXTERNAL MODULE: ./js/chat/mixins.js
-var mixins = __webpack_require__(503);
+var mixins = __webpack_require__(436);
 ;// CONCATENATED MODULE: ./js/chat/ui/whosTyping.jsx
-var React = __webpack_require__(363);
+var React = __webpack_require__(376);
 
-class WhosTyping extends mixins.wl {
+class WhosTyping extends mixins.ei {
   constructor(props) {
     super(props);
     this.state = {
@@ -6953,11 +6953,11 @@ class WhosTyping extends mixins.wl {
 }
 
 // EXTERNAL MODULE: ./js/chat/ui/typingArea.jsx + 1 modules
-var typingArea = __webpack_require__(825);
+var typingArea = __webpack_require__(856);
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
-var buttons = __webpack_require__(204);
+var buttons = __webpack_require__(536);
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
-var dropdowns = __webpack_require__(78);
+var dropdowns = __webpack_require__(868);
 ;// CONCATENATED MODULE: ./js/chat/ui/composedTextArea.jsx
 
 
@@ -6965,7 +6965,7 @@ var dropdowns = __webpack_require__(78);
 
 
 
-class ComposedTextArea extends mixins.wl {
+class ComposedTextArea extends mixins.ei {
   render() {
     const {
       chatRoom: room,
@@ -6976,7 +6976,7 @@ class ComposedTextArea extends mixins.wl {
       className: "chat-textarea-block"
     }, external_React_default().createElement(WhosTyping, {
       chatRoom: room
-    }), external_React_default().createElement(typingArea.j, {
+    }), external_React_default().createElement(typingArea.i, {
       chatRoom: room,
       className: "main-typing-area",
       containerRef: containerRef,
@@ -7025,7 +7025,7 @@ class ComposedTextArea extends mixins.wl {
           }
         }
       }
-    }, external_React_default().createElement(buttons.z, {
+    }, external_React_default().createElement(buttons.q, {
       className: "popup-button left",
       icon: "sprite-fm-mono icon-add",
       disabled: room.isReadOnly()
@@ -7060,7 +7060,7 @@ class ComposedTextArea extends mixins.wl {
 
 /***/ }),
 
-/***/ 13:
+/***/ 40:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -7080,16 +7080,16 @@ LastActivity: () => (LastActivity),
 MAX_FREQUENTS: () => (MAX_FREQUENTS),
 MembersAmount: () => (MembersAmount)
 });
-var _extends8__ = __webpack_require__(462);
-var react0__ = __webpack_require__(363);
+var _extends8__ = __webpack_require__(72);
+var react0__ = __webpack_require__(376);
 var react0 = __webpack_require__.n(react0__);
-var _mixins1__ = __webpack_require__(503);
-var _ui_utils_jsx2__ = __webpack_require__(79);
-var _ui_perfectScrollbar_jsx3__ = __webpack_require__(285);
-var _ui_buttons_jsx4__ = __webpack_require__(204);
-var _ui_dropdowns_jsx5__ = __webpack_require__(78);
-var _contactsPanel_contactsPanel_jsx6__ = __webpack_require__(808);
-var _ui_modalDialogs7__ = __webpack_require__(182);
+var _mixins1__ = __webpack_require__(436);
+var _ui_utils_jsx2__ = __webpack_require__(240);
+var _ui_perfectScrollbar_jsx3__ = __webpack_require__(447);
+var _ui_buttons_jsx4__ = __webpack_require__(536);
+var _ui_dropdowns_jsx5__ = __webpack_require__(868);
+var _contactsPanel_contactsPanel_jsx6__ = __webpack_require__(368);
+var _ui_modalDialogs7__ = __webpack_require__(776);
 
 
 
@@ -7104,7 +7104,7 @@ const MAX_FREQUENTS = 3;
 const closeDropdowns = () => {
   document.dispatchEvent(new Event('closeDropdowns'));
 };
-class ContactButton extends _mixins1__._p {
+class ContactButton extends _mixins1__._k {
   constructor(props) {
     super(props);
     this.dropdownItemGenerator = this.dropdownItemGenerator.bind(this);
@@ -7346,7 +7346,7 @@ class ContactButton extends _mixins1__._p {
     }
     return noContextMenu ? react0().createElement("div", {
       className: "user-card-name light selectable-txt"
-    }, label) : react0().createElement(_ui_buttons_jsx4__.z, {
+    }, label) : react0().createElement(_ui_buttons_jsx4__.q, {
       className: className,
       icon: dropdownIconClasses,
       disabled: dropdownDisabled,
@@ -7366,7 +7366,7 @@ ContactButton.defaultProps = {
   'manualDataChangeTracking': true,
   'skipQueuedUpdatesOnResize': true
 };
-class ContactVerified extends _mixins1__.wl {
+class ContactVerified extends _mixins1__.ei {
   attachRerenderCallbacks() {
     this.addDataStructListenerForProperties(this.props.contact, ['fingerprint']);
   }
@@ -7402,7 +7402,7 @@ ContactVerified.defaultProps = {
   'manualDataChangeTracking': true,
   'skipQueuedUpdatesOnResize': true
 };
-class ContactPresence extends _mixins1__.wl {
+class ContactPresence extends _mixins1__.ei {
   attachRerenderCallbacks() {
     this.addDataStructListenerForProperties(this.props.contact, ['presence']);
   }
@@ -7422,7 +7422,7 @@ ContactPresence.defaultProps = {
   'manualDataChangeTracking': true,
   'skipQueuedUpdatesOnResize': true
 };
-class LastActivity extends _mixins1__._p {
+class LastActivity extends _mixins1__._k {
   attachRerenderCallbacks() {
     this._attachRerenderCbContacts(['ats', 'lastGreen', 'presence']);
   }
@@ -7441,7 +7441,7 @@ class LastActivity extends _mixins1__._p {
     return react0().createElement("span", null, hasActivityStatus ? (l[19994] || "Last seen %s").replace("%s", timeToLast) : M.onlineStatusClass(contact.presence)[0]);
   }
 }
-class ContactAwareName extends _mixins1__._p {
+class ContactAwareName extends _mixins1__._k {
   render() {
     const {
       contact,
@@ -7453,13 +7453,13 @@ class ContactAwareName extends _mixins1__._p {
     }
     const name = M.getNameByHandle(contact.u || contact.h);
     if (emoji || overflow) {
-      const EmojiComponent = overflow ? _ui_utils_jsx2__.a0 : _ui_utils_jsx2__.dy;
+      const EmojiComponent = overflow ? _ui_utils_jsx2__.Sm : _ui_utils_jsx2__.O;
       return react0().createElement(EmojiComponent, this.props, name);
     }
     return react0().createElement("span", null, name);
   }
 }
-class MembersAmount extends _mixins1__._p {
+class MembersAmount extends _mixins1__._k {
   render() {
     const {
       chatRoom
@@ -7467,7 +7467,7 @@ class MembersAmount extends _mixins1__._p {
     return react0().createElement("span", null, mega.icu.format(l[20233], Object.keys(chatRoom.members).length));
   }
 }
-class ContactFingerprint extends _mixins1__.wl {
+class ContactFingerprint extends _mixins1__.ei {
   attachRerenderCallbacks() {
     this.addDataStructListenerForProperties(this.props.contact, ['fingerprint']);
   }
@@ -7488,7 +7488,7 @@ class ContactFingerprint extends _mixins1__.wl {
     if (contact.c === 1 && u_authring && u_authring.Ed25519) {
       var verifyState = u_authring.Ed25519[contact.u] || {};
       if (typeof verifyState.method === "undefined" || verifyState.method < authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON) {
-        verifyButton = react0().createElement(_ui_buttons_jsx4__.z, {
+        verifyButton = react0().createElement(_ui_buttons_jsx4__.q, {
           className: "dropdown-verify active",
           label: l.verify_credentials,
           icon: "sprite-fm-mono icon-key",
@@ -7516,7 +7516,7 @@ ContactFingerprint.defaultProps = {
   'manualDataChangeTracking': true,
   'skipQueuedUpdatesOnResize': true
 };
-class Avatar extends _mixins1__._p {
+class Avatar extends _mixins1__._k {
   render() {
     var self = this;
     var contact = this.props.contact;
@@ -7555,7 +7555,7 @@ class Avatar extends _mixins1__._p {
       }
     }
     if (avatarMeta.type === "image") {
-      displayedAvatar = react0().createElement("div", (0,_extends8__.Z)({
+      displayedAvatar = react0().createElement("div", (0,_extends8__.c)({
         className: classes,
         style: this.props.style
       }, extraProps, {
@@ -7573,7 +7573,7 @@ class Avatar extends _mixins1__._p {
       if (isLoading) {
         classes += " default-bg";
       }
-      displayedAvatar = react0().createElement("div", (0,_extends8__.Z)({
+      displayedAvatar = react0().createElement("div", (0,_extends8__.c)({
         className: classes,
         style: this.props.style
       }, extraProps, {
@@ -7590,7 +7590,7 @@ Avatar.defaultProps = {
   'manualDataChangeTracking': true,
   'skipQueuedUpdatesOnResize': true
 };
-class ContactCard extends _mixins1__._p {
+class ContactCard extends _mixins1__._k {
   attachRerenderCallbacks() {
     this._attachRerenderCbContacts(['presence']);
   }
@@ -7630,7 +7630,7 @@ class ContactCard extends _mixins1__._p {
     if (contact.u === u_handle) {
       username += " (" + escapeHTML(l[8885]) + ")";
     }
-    var escapedUsername = react0().createElement(_ui_utils_jsx2__.a0, null, username);
+    var escapedUsername = react0().createElement(_ui_utils_jsx2__.Sm, null, username);
     var dropdowns = this.props.dropdowns ? this.props.dropdowns : [];
     var noContextMenu = this.props.noContextMenu ? this.props.noContextMenu : "";
     var noContextButton = this.props.noContextButton ? this.props.noContextButton : "";
@@ -7663,7 +7663,7 @@ class ContactCard extends _mixins1__._p {
           });
         }
         if (matches.length > 0) {
-          escapedUsername = react0().createElement(_ui_utils_jsx2__.Cw, null, megaChat.highlight(megaChat.html(username), matches, true));
+          escapedUsername = react0().createElement(_ui_utils_jsx2__.Ub, null, megaChat.highlight(megaChat.html(username), matches, true));
         }
       }
       if (emailTooltips) {
@@ -7754,7 +7754,7 @@ ContactCard.defaultProps = {
   'manualDataChangeTracking': true,
   'skipQueuedUpdatesOnResize': true
 };
-class ContactItem extends _mixins1__._p {
+class ContactItem extends _mixins1__._k {
   render() {
     var self = this;
     var contact = this.props.contact;
@@ -7786,7 +7786,7 @@ class ContactItem extends _mixins1__._p {
       noContextMenu: this.props.noContextMenu,
       contact: contact,
       className: "light",
-      label: react0().createElement(_ui_utils_jsx2__.dy, null, username),
+      label: react0().createElement(_ui_utils_jsx2__.O, null, username),
       chatRoom: this.props.chatRoom
     })));
   }
@@ -7795,7 +7795,7 @@ ContactItem.defaultProps = {
   'manualDataChangeTracking': true,
   'skipQueuedUpdatesOnResize': true
 };
-class ContactPickerWidget extends _mixins1__.wl {
+class ContactPickerWidget extends _mixins1__.ei {
   constructor(...args) {
     super(...args);
     this.contactLinkListener = null;
@@ -7814,7 +7814,7 @@ class ContactPickerWidget extends _mixins1__.wl {
       const {
         contacts,
         emailTooltips,
-        onSelect
+        onSelected
       } = this.props;
       const {
         selected
@@ -7835,11 +7835,11 @@ class ContactPickerWidget extends _mixins1__.wl {
           onClick: () => {
             this.setState({
               selected: added ? selected.filter(h => h !== handle) : [...selected, handle]
-            }, () => onSelect(this.state.selected));
+            }, () => onSelected(this.state.selected));
           }
         });
       });
-      return react0().createElement(_ui_perfectScrollbar_jsx3__.F, {
+      return react0().createElement(_ui_perfectScrollbar_jsx3__.e, {
         className: "contacts-search-scroll",
         selected: selected,
         contacts: contacts
@@ -8104,7 +8104,7 @@ class ContactPickerWidget extends _mixins1__.wl {
         }
         multipleContacts = react0().createElement("div", {
           className: "horizontal-contacts-list"
-        }, react0().createElement(_ui_perfectScrollbar_jsx3__.F, {
+        }, react0().createElement(_ui_perfectScrollbar_jsx3__.e, {
           className: "perfectScrollbarContainer selected-contact-block horizontal-only",
           selected: this.state.selected,
           ref: function (psSelected) {
@@ -8212,7 +8212,7 @@ class ContactPickerWidget extends _mixins1__.wl {
           }, l[19115])));
         }
       } else {
-        contactsList = react0().createElement(_ui_perfectScrollbar_jsx3__.F, {
+        contactsList = react0().createElement(_ui_perfectScrollbar_jsx3__.e, {
           ref: ref => {
             self.searchContactsScroll = ref;
           },
@@ -8279,7 +8279,7 @@ class ContactPickerWidget extends _mixins1__.wl {
                     `
       }, react0().createElement("i", {
         className: "sprite-fm-mono icon-link-circle"
-      }), react0().createElement(_ui_utils_jsx2__.Cw, null, l[19111])));
+      }), react0().createElement(_ui_utils_jsx2__.Ub, null, l[19111])));
       extraClasses += " no-contacts";
     }
     const totalContactsNum = contacts.length + frequentContacts.length;
@@ -8307,7 +8307,7 @@ class ContactPickerWidget extends _mixins1__.wl {
           closeDropdowns();
           onClick(e);
         }
-      }, react0().createElement(_ui_buttons_jsx4__.z, {
+      }, react0().createElement(_ui_buttons_jsx4__.q, {
         className: `
                                             ${className || ''}
                                             ${key === 'newChatLink' ? 'branded-blue' : ''}
@@ -8354,7 +8354,7 @@ class ContactPickerWidget extends _mixins1__.wl {
       className: "contacts-search-header-separator"
     })), this.props.participantsList ? this.renderParticipantsList() : contactsList, selectFooter, _contactsPanel_contactsPanel_jsx6__["default"].hasContacts() && this.props.showAddContact && react0().createElement("div", {
       className: "contacts-search-bottom"
-    }, react0().createElement(_ui_buttons_jsx4__.z, {
+    }, react0().createElement(_ui_buttons_jsx4__.q, {
       className: "mega-button action positive",
       icon: "sprite-fm-mono icon-add-circle",
       label: l[71],
@@ -8379,7 +8379,7 @@ ContactPickerWidget.defaultProps = {
   newNoContact: false,
   emailTooltips: false
 };
-class ContactPickerDialog extends _mixins1__.wl {
+class ContactPickerDialog extends _mixins1__.ei {
   render() {
     const {
       active,
@@ -8396,7 +8396,7 @@ class ContactPickerDialog extends _mixins1__.wl {
       onClose,
       onSelectDone
     } = this.props;
-    return react0().createElement(_ui_modalDialogs7__.Z.ModalDialog, {
+    return react0().createElement(_ui_modalDialogs7__.M.ModalDialog, {
       name: name,
       className: `${className} contact-picker-dialog contacts-search`,
       onClose: onClose
@@ -8420,7 +8420,7 @@ class ContactPickerDialog extends _mixins1__.wl {
 
 /***/ }),
 
-/***/ 808:
+/***/ 368:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -8431,18 +8431,18 @@ __webpack_require__.d(__webpack_exports__, {
 });
 
 // EXTERNAL MODULE: external "React"
-var external_React_ = __webpack_require__(363);
+var external_React_ = __webpack_require__(376);
 var external_React_default = __webpack_require__.n(external_React_);
 // EXTERNAL MODULE: ./js/chat/mixins.js
-var mixins = __webpack_require__(503);
+var mixins = __webpack_require__(436);
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
-var buttons = __webpack_require__(204);
+var buttons = __webpack_require__(536);
 ;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/navigation.jsx
 
 
 
 
-class Navigation extends mixins.wl {
+class Navigation extends mixins.ei {
   render() {
     const {
       view
@@ -8469,7 +8469,7 @@ class Navigation extends mixins.wl {
             page = page === 'contacts' ? '' : page;
             loadSubPage(`fm/chat/contacts/${page}`);
           }
-        }, external_React_default().createElement(buttons.z, {
+        }, external_React_default().createElement(buttons.q, {
           className: `
                                                 mega-button
                                                 action
@@ -8485,13 +8485,13 @@ class Navigation extends mixins.wl {
   }
 }
 // EXTERNAL MODULE: ./js/ui/utils.jsx
-var utils = __webpack_require__(79);
+var utils = __webpack_require__(240);
 ;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/nil.jsx
 
 
 
 
-class Nil extends mixins.wl {
+class Nil extends mixins.ei {
   componentDidMount() {
     super.componentDidMount();
     setContactLink();
@@ -8510,31 +8510,31 @@ class Nil extends mixins.wl {
       className: "fm-empty-cloud-txt"
     }, title), external_React_default().createElement("div", {
       className: "fm-empty-description"
-    }, l[19115]), external_React_default().createElement(buttons.z, {
+    }, l[19115]), external_React_default().createElement(buttons.q, {
       className: "mega-button positive large fm-empty-button",
       onClick: () => contactAddDialog()
     }, external_React_default().createElement("span", null, l[71])), external_React_default().createElement("div", {
       className: "empty-share-public"
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-link-circle"
-    }), external_React_default().createElement(utils.Cw, null, l[19111]))));
+    }), external_React_default().createElement(utils.Ub, null, l[19111]))));
   }
 }
 // EXTERNAL MODULE: ./js/ui/jsx/fm/fmView.jsx + 10 modules
-var fmView = __webpack_require__(309);
+var fmView = __webpack_require__(608);
 // EXTERNAL MODULE: ./js/chat/ui/contacts.jsx
-var contacts = __webpack_require__(13);
+var contacts = __webpack_require__(40);
 // EXTERNAL MODULE: ./js/ui/jsx/fm/nodes/genericNodePropsComponent.jsx + 1 modules
-var genericNodePropsComponent = __webpack_require__(297);
+var genericNodePropsComponent = __webpack_require__(0);
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactName.jsx
 
 
 
 
-class ColumnContactName extends genericNodePropsComponent.L {
+class ColumnContactName extends genericNodePropsComponent.i {
   constructor(...args) {
     super(...args);
-    this.Mail = (0,utils.pQ)(() => external_React_default().createElement("span", {
+    this.Mail = (0,utils.aq)(() => external_React_default().createElement("span", {
       className: "contact-item-email"
     }, this.props.nodeAdapter.props.node.m));
   }
@@ -8552,7 +8552,7 @@ class ColumnContactName extends genericNodePropsComponent.L {
       className: "contact-item"
     }, external_React_default().createElement("div", {
       className: "contact-item-user"
-    }, external_React_default().createElement(utils.a0, null, nodeAdapter.nodeProps.title)), external_React_default().createElement(this.Mail, null)), external_React_default().createElement("div", {
+    }, external_React_default().createElement(utils.Sm, null, nodeAdapter.nodeProps.title)), external_React_default().createElement(this.Mail, null)), external_React_default().createElement("div", {
       className: "clear"
     }));
   }
@@ -8564,7 +8564,7 @@ ColumnContactName.megatype = "name";
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactStatus.jsx
 
 
-class ColumnContactStatus extends genericNodePropsComponent.L {
+class ColumnContactStatus extends genericNodePropsComponent.i {
   render() {
     let {
       nodeAdapter
@@ -8589,7 +8589,7 @@ ColumnContactStatus.megatype = "status";
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactLastInteraction.jsx
 
 
-class ColumnContactLastInteraction extends genericNodePropsComponent.L {
+class ColumnContactLastInteraction extends genericNodePropsComponent.i {
   constructor(...args) {
     super(...args);
     this.getLastInteractionIcon = handle => {
@@ -8646,7 +8646,7 @@ ColumnContactLastInteraction.megatype = "interaction";
 
 
 
-class ColumnContactVerifiedStatus extends genericNodePropsComponent.L {
+class ColumnContactVerifiedStatus extends genericNodePropsComponent.i {
   constructor(...args) {
     super(...args);
     this.getFingerPrintDialogLink = handle => {
@@ -8692,9 +8692,9 @@ ColumnContactVerifiedStatus.verifiedLabel = external_React_default().createEleme
   className: "small-icon icons-sprite tiny-green-tick"
 }), l[6776]);
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
-var dropdowns = __webpack_require__(78);
+var dropdowns = __webpack_require__(868);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 11 modules
-var call = __webpack_require__(476);
+var call = __webpack_require__(144);
 ;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/contextMenu.jsx
 
 
@@ -8703,7 +8703,7 @@ var call = __webpack_require__(476);
 
 
 
-class ContextMenu extends mixins.wl {
+class ContextMenu extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.EVENT_CLOSE = new Event('closeDropdowns');
@@ -8746,7 +8746,7 @@ class ContextMenu extends mixins.wl {
         className: "avatar-wrapper context-avatar"
       }), external_React_default().createElement("div", {
         className: "dropdown-profile"
-      }, external_React_default().createElement("span", null, external_React_default().createElement(utils.dy, null, M.getNameByHandle(contact.u))), external_React_default().createElement(contacts.ContactPresence, {
+      }, external_React_default().createElement("span", null, external_React_default().createElement(utils.O, null, M.getNameByHandle(contact.u))), external_React_default().createElement(contacts.ContactPresence, {
         contact: contact
       }))), external_React_default().createElement(dropdowns.DropdownItem, {
         icon: "sprite-fm-mono icon-chat",
@@ -8784,7 +8784,7 @@ class ContextMenu extends mixins.wl {
         icon: "sprite-fm-mono icon-phone",
         disabled: !navigator.onLine || !megaChat.hasSupportForCalls,
         label: l[5896],
-        onClick: () => (0,call.xt)().then(() => this.close(() => megaChat.createAndShowPrivateRoom(contact.u).then(room => {
+        onClick: () => (0,call.OO)().then(() => this.close(() => megaChat.createAndShowPrivateRoom(contact.u).then(room => {
           room.setActive();
           room.startAudioCall();
         }))).catch(() => d && console.warn('Already in a call.'))
@@ -8792,7 +8792,7 @@ class ContextMenu extends mixins.wl {
         icon: "sprite-fm-mono icon-video-call-filled",
         disabled: !navigator.onLine || !megaChat.hasSupportForCalls,
         label: l[5897],
-        onClick: () => (0,call.xt)().then(() => this.close(() => megaChat.createAndShowPrivateRoom(contact.u).then(room => {
+        onClick: () => (0,call.OO)().then(() => this.close(() => megaChat.createAndShowPrivateRoom(contact.u).then(room => {
           room.setActive();
           room.startVideoCall();
         }))).catch(() => d && console.warn('Already in a call.'))
@@ -8845,7 +8845,7 @@ class ContextMenu extends mixins.wl {
 
 
 
-class ColumnContactButtons extends genericNodePropsComponent.L {
+class ColumnContactButtons extends genericNodePropsComponent.i {
   render() {
     const {
       nodeAdapter
@@ -8862,32 +8862,32 @@ class ColumnContactButtons extends genericNodePropsComponent.L {
       className: "contact-item"
     }, external_React_default().createElement("div", {
       className: "contact-item-controls"
-    }, external_React_default().createElement(buttons.z, {
+    }, external_React_default().createElement(buttons.q, {
       className: "mega-button action simpletip",
       icon: "sprite-fm-mono icon-phone",
       attrs: {
         'data-simpletip': !megaChat.hasSupportForCalls ? l.unsupported_browser_audio : l[5896]
       },
       disabled: !navigator.onLine || !megaChat.hasSupportForCalls,
-      onClick: () => (0,call.xt)().then(() => megaChat.createAndShowPrivateRoom(handle).then(room => {
+      onClick: () => (0,call.OO)().then(() => megaChat.createAndShowPrivateRoom(handle).then(room => {
         room.setActive();
         room.startAudioCall();
       })).catch(() => d && console.warn('Already in a call.'))
-    }), external_React_default().createElement(buttons.z, {
+    }), external_React_default().createElement(buttons.q, {
       className: "mega-button action simpletip",
       icon: "sprite-fm-mono icon-chat",
       attrs: {
         'data-simpletip': l[8632]
       },
       onClick: () => loadSubPage('fm/chat/p/' + handle)
-    }), external_React_default().createElement(buttons.z, {
+    }), external_React_default().createElement(buttons.q, {
       className: "mega-button action simpletip",
       icon: "sprite-fm-mono icon-send-files",
       attrs: {
         'data-simpletip': l[6834]
       },
       onClick: () => megaChat.openChatAndSendFilesDialog(handle)
-    }), external_React_default().createElement(buttons.z, {
+    }), external_React_default().createElement(buttons.q, {
       ref: node => {
         this.props.onContextMenuRef(handle, node);
       },
@@ -8924,7 +8924,7 @@ ColumnContactButtons.megatype = "grid-url-header-nw";
 
 
 
-class ContactList extends mixins.wl {
+class ContactList extends mixins.ei {
   constructor(props) {
     super(props);
     this.contextMenuRefs = [];
@@ -9020,7 +9020,7 @@ class ContactList extends mixins.wl {
     if (contacts && contacts.length > 1) {
       return external_React_default().createElement("div", {
         className: "contacts-list"
-      }, external_React_default().createElement(fmView.Z, {
+      }, external_React_default().createElement(fmView.c, {
         dataSource: this.props.contacts,
         customFilterFn: r => {
           return r.c === 1;
@@ -9071,7 +9071,7 @@ class ContactList extends mixins.wl {
 
 
 
-class ColumnContactRequestsEmail extends mixins.wl {
+class ColumnContactRequestsEmail extends mixins.ei {
   render() {
     const {
       nodeAdapter,
@@ -9082,7 +9082,7 @@ class ColumnContactRequestsEmail extends mixins.wl {
     } = nodeAdapter.props;
     return external_React_default().createElement("td", null, currView && currView === 'opc' ? external_React_default().createElement("span", null, external_React_default().createElement("i", {
       className: "sprite-fm-uni icon-send-requests"
-    })) : external_React_default().createElement(utils.Cw, null, useravatar.contact(node.m, 'box-avatar')), external_React_default().createElement("div", {
+    })) : external_React_default().createElement(utils.Ub, null, useravatar.contact(node.m, 'box-avatar')), external_React_default().createElement("div", {
       className: "contact-item"
     }, external_React_default().createElement("div", {
       className: "contact-item-user"
@@ -9098,7 +9098,7 @@ ColumnContactRequestsEmail.megatype = "email";
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactRequestsTs.jsx
 
 
-class ColumnContactRequestsTs extends mixins.wl {
+class ColumnContactRequestsTs extends mixins.ei {
   render() {
     let {
       nodeAdapter
@@ -9129,7 +9129,7 @@ ColumnContactRequestsTs.megatype = "ts";
 
 
 
-class ColumnContactRequestsRcvdBtns extends mixins.wl {
+class ColumnContactRequestsRcvdBtns extends mixins.ei {
   render() {
     let {
       nodeAdapter
@@ -9142,17 +9142,17 @@ class ColumnContactRequestsRcvdBtns extends mixins.wl {
       className: ColumnContactRequestsRcvdBtns.megatype
     }, external_React_default().createElement("div", {
       className: "contact-item-controls"
-    }, external_React_default().createElement(buttons.z, {
+    }, external_React_default().createElement(buttons.q, {
       className: "mega-button action contact-reject",
       icon: "sprite-fm-mono icon-close-component",
       label: l[20981],
       onClick: () => this.props.onReject(node.p)
-    }), external_React_default().createElement(buttons.z, {
+    }), external_React_default().createElement(buttons.q, {
       className: "mega-button action contact-block",
       icon: "sprite-fm-mono icon-disable",
       label: l[20980],
       onClick: () => this.props.onBlock(node.p)
-    }), external_React_default().createElement(buttons.z, {
+    }), external_React_default().createElement(buttons.q, {
       className: "mega-button action contact-accept",
       icon: "sprite-fm-mono icon-check",
       label: l[5856],
@@ -9172,14 +9172,14 @@ ColumnContactRequestsRcvdBtns.megatype = "grid-url-header-nw contact-controls-co
 
 
 
-class ReceivedRequests extends mixins.wl {
+class ReceivedRequests extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.drawReceivedRequests = () => {
       const {
         received
       } = this.props;
-      return external_React_default().createElement(fmView.Z, {
+      return external_React_default().createElement(fmView.c, {
         sortFoldersFirst: false,
         dataSource: received,
         customFilterFn: r => {
@@ -9240,7 +9240,7 @@ class ReceivedRequests extends mixins.wl {
 
 
 
-class ColumnContactRequestsSentBtns extends mixins.wl {
+class ColumnContactRequestsSentBtns extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.reinviteAllowed = rts => {
@@ -9260,12 +9260,12 @@ class ColumnContactRequestsSentBtns extends mixins.wl {
       className: ColumnContactRequestsSentBtns.megatype
     }, external_React_default().createElement("div", {
       className: "contact-item-controls contact-request-sent"
-    }, !node.dts && this.reinviteAllowed(node.rts) && external_React_default().createElement(buttons.z, {
+    }, !node.dts && this.reinviteAllowed(node.rts) && external_React_default().createElement(buttons.q, {
       className: "mega-button action",
       icon: "sprite-fm-mono icon-rewind",
       label: l[5861],
       onClick: () => this.props.onReinvite(node.m)
-    }), !node.dts && external_React_default().createElement(buttons.z, {
+    }), !node.dts && external_React_default().createElement(buttons.q, {
       className: "mega-button action contact-reject",
       icon: "sprite-fm-mono icon-close-component",
       label: l[82],
@@ -9293,7 +9293,7 @@ ColumnContactRequestsRts.megatype = "rts";
 
 
 
-class SentRequests extends mixins.wl {
+class SentRequests extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.handleReinvite = mail => {
@@ -9309,7 +9309,7 @@ class SentRequests extends mixins.wl {
       const {
         sent
       } = this.props;
-      return external_React_default().createElement(fmView.Z, {
+      return external_React_default().createElement(fmView.c, {
         sortFoldersFirst: false,
         dataSource: sent,
         currentlyViewedEntry: "opc",
@@ -9363,11 +9363,11 @@ class SentRequests extends mixins.wl {
   }
 }
 // EXTERNAL MODULE: ./js/ui/jsx/fm/nodes/columns/columnFavIcon.jsx
-var columnFavIcon = __webpack_require__(310);
+var columnFavIcon = __webpack_require__(976);
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnSharedFolderName.jsx
 
 
-class ColumnSharedFolderName extends genericNodePropsComponent.L {
+class ColumnSharedFolderName extends genericNodePropsComponent.i {
   render() {
     let {
       nodeAdapter
@@ -9396,7 +9396,7 @@ ColumnSharedFolderName.megatype = "name";
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnSharedFolderAccess.jsx
 
 
-class ColumnSharedFolderAccess extends genericNodePropsComponent.L {
+class ColumnSharedFolderAccess extends genericNodePropsComponent.i {
   render() {
     const {
       nodeAdapter
@@ -9422,7 +9422,7 @@ ColumnSharedFolderAccess.megatype = 'access';
 
 
 
-class ColumnSharedFolderButtons extends genericNodePropsComponent.L {
+class ColumnSharedFolderButtons extends genericNodePropsComponent.i {
   render() {
     let {
       nodeAdapter
@@ -9438,7 +9438,7 @@ class ColumnSharedFolderButtons extends genericNodePropsComponent.L {
       className: "contact-item"
     }, external_React_default().createElement("div", {
       className: "contact-item-controls"
-    }, external_React_default().createElement(buttons.z, {
+    }, external_React_default().createElement(buttons.q, {
       className: "mega-button action contact-more",
       icon: "sprite-fm-mono icon-options",
       onClick: (button, e) => {
@@ -9465,7 +9465,7 @@ ColumnSharedFolderButtons.id = "grid-url-header-nw";
 ColumnSharedFolderButtons.label = "";
 ColumnSharedFolderButtons.megatype = "grid-url-header-nw";
 // EXTERNAL MODULE: ./js/chat/ui/link.jsx
-var ui_link = __webpack_require__(941);
+var ui_link = __webpack_require__(620);
 ;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/contactProfile.jsx
 
 
@@ -9483,7 +9483,7 @@ var ui_link = __webpack_require__(941);
 
 
 
-class ContactProfile extends mixins.wl {
+class ContactProfile extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.state = {
@@ -9505,11 +9505,11 @@ class ContactProfile extends mixins.wl {
       } = this.props;
       return external_React_default().createElement("div", {
         className: "profile-breadcrumb"
-      }, external_React_default().createElement("ul", null, external_React_default().createElement("li", null, external_React_default().createElement(ui_link.Z, {
+      }, external_React_default().createElement("ul", null, external_React_default().createElement("li", null, external_React_default().createElement(ui_link.c, {
         to: "/fm/chat/contacts"
       }, ContactsPanel.LABEL.CONTACTS), external_React_default().createElement("i", {
         className: "sprite-fm-mono icon-arrow-right"
-      })), external_React_default().createElement("li", null, external_React_default().createElement(utils.dy, null, M.getNameByHandle(handle)))));
+      })), external_React_default().createElement("li", null, external_React_default().createElement(utils.O, null, M.getNameByHandle(handle)))));
     };
     this.Credentials = () => {
       const {
@@ -9587,7 +9587,7 @@ class ContactProfile extends mixins.wl {
     });
   }
   getSharedFoldersView() {
-    return this.state.loading ? null : external_React_default().createElement(fmView.Z, {
+    return this.state.loading ? null : external_React_default().createElement(fmView.c, {
       currentlyViewedEntry: this.props.handle,
       onSelected: handle => this.setState({
         selected: handle
@@ -9602,7 +9602,7 @@ class ContactProfile extends mixins.wl {
       headerContainerClassName: "grid-table-header",
       containerClassName: "grid-table shared-with-me",
       onContextMenu: (ev, handle) => this.handleContextMenu(ev, handle),
-      listAdapterColumns: [columnFavIcon.l, [ColumnSharedFolderName, {
+      listAdapterColumns: [columnFavIcon.C, [ColumnSharedFolderName, {
         'label': `${l.shared_folders_from.replace('%NAME', M.getNameByHandle(this.props.handle))}`
       }], ColumnSharedFolderAccess, ColumnSharedFolderButtons]
     });
@@ -9630,18 +9630,18 @@ class ContactProfile extends mixins.wl {
         className: "profile-photo avatar-wrapper contacts-medium-avatar"
       }), external_React_default().createElement("div", {
         className: "profile-info"
-      }, external_React_default().createElement("h2", null, external_React_default().createElement(utils.dy, null, M.getNameByHandle(handle)), external_React_default().createElement(contacts.ContactPresence, {
+      }, external_React_default().createElement("h2", null, external_React_default().createElement(utils.O, null, M.getNameByHandle(handle)), external_React_default().createElement(contacts.ContactPresence, {
         contact: contact
       })), external_React_default().createElement("span", null, contact.m)), HAS_RELATIONSHIP && external_React_default().createElement("div", {
         className: "profile-controls"
-      }, external_React_default().createElement(buttons.z, {
+      }, external_React_default().createElement(buttons.q, {
         className: "mega-button round simpletip",
         icon: "sprite-fm-mono icon-chat-filled",
         attrs: {
           'data-simpletip': l[8632]
         },
         onClick: () => loadSubPage(`fm/chat/p/${handle}`)
-      }), external_React_default().createElement(buttons.z, {
+      }), external_React_default().createElement(buttons.q, {
         className: "mega-button round simpletip",
         icon: "sprite-fm-mono icon-send-files",
         attrs: {
@@ -9653,7 +9653,7 @@ class ContactProfile extends mixins.wl {
           }
           megaChat.openChatAndSendFilesDialog(handle);
         }
-      }), external_React_default().createElement(buttons.z, {
+      }), external_React_default().createElement(buttons.q, {
         className: "mega-button round",
         icon: "sprite-fm-mono icon-options"
       }, external_React_default().createElement(dropdowns.Dropdown, {
@@ -9679,7 +9679,7 @@ class ContactProfile extends mixins.wl {
 
 
 
-class ContactsPanel extends mixins.wl {
+class ContactsPanel extends mixins.ei {
   get view() {
     switch (megaChat.routingSubSection) {
       case null:
@@ -9847,40 +9847,40 @@ ContactsPanel.getUserFingerprint = handle => {
 
 /***/ }),
 
-/***/ 21:
+/***/ 828:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  GY: () => (ConversationPanels),
-  L2: () => (EmptyConvPanel),
-  R7: () => (allContactsInChat),
-  hU: () => (excludedParticipants)
+  A3: () => (ConversationPanels),
+  EB: () => (EmptyConvPanel),
+  i_: () => (allContactsInChat),
+  cb: () => (excludedParticipants)
 });
 
 // UNUSED EXPORTS: ConversationPanel, ConversationRightArea, JoinCallNotification
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
-var applyDecoratedDescriptor = __webpack_require__(229);
+var applyDecoratedDescriptor = __webpack_require__(888);
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/extends.js
-var esm_extends = __webpack_require__(462);
+var esm_extends = __webpack_require__(72);
 // EXTERNAL MODULE: external "React"
-var external_React_ = __webpack_require__(363);
+var external_React_ = __webpack_require__(376);
 var external_React_default = __webpack_require__.n(external_React_);
 // EXTERNAL MODULE: ./js/ui/utils.jsx
-var utils = __webpack_require__(79);
+var utils = __webpack_require__(240);
 // EXTERNAL MODULE: ./js/chat/mixins.js
-var mixins = __webpack_require__(503);
+var mixins = __webpack_require__(436);
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
-var buttons = __webpack_require__(204);
+var buttons = __webpack_require__(536);
 // EXTERNAL MODULE: ./js/ui/modalDialogs.jsx + 1 modules
-var modalDialogs = __webpack_require__(182);
+var modalDialogs = __webpack_require__(776);
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/viewModeSelector.jsx
 
 
-class ViewModeSelector extends mixins.wl {
+class ViewModeSelector extends mixins.ei {
   render() {
     let viewMode = this.props.viewMode;
     return external_React_default().createElement("div", {
@@ -9911,7 +9911,7 @@ ViewModeSelector.VIEW_MODE = {
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/breadcrumbs.jsx
 
 
-class Breadcrumbs extends mixins.wl {
+class Breadcrumbs extends mixins.ei {
   constructor(props) {
     super(props);
     this.state = {
@@ -10093,7 +10093,7 @@ class Breadcrumbs extends mixins.wl {
   }
 }
 // EXTERNAL MODULE: ./js/ui/jsx/fm/fmView.jsx + 10 modules
-var fmView = __webpack_require__(309);
+var fmView = __webpack_require__(608);
 ;// CONCATENATED MODULE: ./js/ui/cloudBrowserModalDialog.jsx
 
 
@@ -10102,7 +10102,7 @@ var fmView = __webpack_require__(309);
 
 
 const MIN_SEARCH_LENGTH = 2;
-class CloudBrowserDialog extends mixins.wl {
+class CloudBrowserDialog extends mixins.ei {
   constructor(props) {
     super(props);
     this.state = {
@@ -10388,7 +10388,7 @@ class CloudBrowserDialog extends mixins.wl {
       });
     }
     let breadcrumbPath = M.getPath(entryId);
-    return external_React_default().createElement(modalDialogs.Z.ModalDialog, {
+    return external_React_default().createElement(modalDialogs.M.ModalDialog, {
       title: self.props.title || l[8011],
       className: classes + (isSearch && this.state.selected.length > 0 ? 'has-breadcrumbs-bottom' : ''),
       onClose: () => {
@@ -10452,7 +10452,7 @@ class CloudBrowserDialog extends mixins.wl {
       isSearch: isSearch,
       highlighted: this.state.highlighted,
       currentlyViewedEntry: this.state.currentlyViewedEntry
-    })), external_React_default().createElement(fmView.Z, {
+    })), external_React_default().createElement(fmView.c, {
       nodeLoading: this.state.nodeLoading,
       sortFoldersFirst: true,
       currentlyViewedEntry: this.state.currentlyViewedEntry,
@@ -10502,7 +10502,7 @@ const cloudBrowserModalDialog = ({
   CloudBrowserDialog
 });
 // EXTERNAL MODULE: ./js/chat/chatRoom.jsx + 1 modules
-var chat_chatRoom = __webpack_require__(804);
+var chat_chatRoom = __webpack_require__(56);
 ;// CONCATENATED MODULE: ./js/ui/historyRetentionDialog.jsx
 
 
@@ -10658,7 +10658,7 @@ class HistoryRetentionDialog extends external_React_.Component {
       selectedTimeFormat,
       timeRange
     } = this.state;
-    return external_React_default().createElement(modalDialogs.Z.ModalDialog, (0,esm_extends.Z)({}, this.state, {
+    return external_React_default().createElement(modalDialogs.M.ModalDialog, (0,esm_extends.c)({}, this.state, {
       chatRoom: chatRoom,
       onClose: onClose,
       dialogName: "msg-retention-dialog",
@@ -10726,15 +10726,15 @@ function CustomRadioButton({
   })));
 }
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
-var dropdowns = __webpack_require__(78);
+var dropdowns = __webpack_require__(868);
 // EXTERNAL MODULE: ./js/chat/ui/contacts.jsx
-var ui_contacts = __webpack_require__(13);
+var ui_contacts = __webpack_require__(40);
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
-var perfectScrollbar = __webpack_require__(285);
+var perfectScrollbar = __webpack_require__(447);
 ;// CONCATENATED MODULE: ./js/ui/accordion.jsx
-var React = __webpack_require__(363);
+var React = __webpack_require__(376);
 
-class AccordionPanel extends mixins.wl {
+class AccordionPanel extends mixins.ei {
   render() {
     var self = this;
     var contentClass = self.props.className ? self.props.className : '';
@@ -10752,7 +10752,7 @@ class AccordionPanel extends mixins.wl {
     }, this.props.children) : null);
   }
 }
-class Accordion extends mixins.wl {
+class Accordion extends mixins.ei {
   constructor(props) {
     super(props);
     this.state = {
@@ -10801,10 +10801,10 @@ class Accordion extends mixins.wl {
 ;// CONCATENATED MODULE: ./js/chat/ui/participantsList.jsx
 
 
-var DropdownsUI = __webpack_require__(78);
-var ContactsUI = __webpack_require__(13);
-var PerfectScrollbar = (__webpack_require__(285).F);
-class ParticipantsList extends mixins.wl {
+var DropdownsUI = __webpack_require__(868);
+var ContactsUI = __webpack_require__(40);
+var PerfectScrollbar = (__webpack_require__(447).e);
+class ParticipantsList extends mixins.ei {
   constructor(props) {
     super(props);
     this.state = {
@@ -10910,7 +10910,7 @@ ParticipantsList.defaultProps = {
   'requiresUpdateOnResize': true,
   'contactCardHeight': 36
 };
-class ParticipantsListInner extends mixins.wl {
+class ParticipantsListInner extends mixins.ei {
   render() {
     var room = this.props.chatRoom;
     var contactCardHeight = this.props.contactCardHeight;
@@ -11058,14 +11058,14 @@ ParticipantsListInner.defaultProps = {
 };
 
 // EXTERNAL MODULE: ./js/chat/ui/messages/generic.jsx + 14 modules
-var generic = __webpack_require__(931);
+var generic = __webpack_require__(248);
 ;// CONCATENATED MODULE: ./js/chat/ui/sharedFilesAccordionPanel.jsx
 
 var _dec, _class;
-var sharedFilesAccordionPanel_React = __webpack_require__(363);
+var sharedFilesAccordionPanel_React = __webpack_require__(376);
 
 
-class SharedFileItem extends mixins._p {
+class SharedFileItem extends mixins._k {
   render() {
     var self = this;
     var message = this.props.message;
@@ -11095,12 +11095,12 @@ class SharedFileItem extends mixins._p {
       className: "txt"
     }, node.name), sharedFilesAccordionPanel_React.createElement("span", {
       className: "txt small"
-    }, sharedFilesAccordionPanel_React.createElement(utils.dy, null, name)), sharedFilesAccordionPanel_React.createElement("span", {
+    }, sharedFilesAccordionPanel_React.createElement(utils.O, null, name)), sharedFilesAccordionPanel_React.createElement("span", {
       className: "txt small grey"
     }, timestamp)));
   }
 }
-let SharedFilesAccordionPanel = (_dec = utils.ZP.SoonFcWrap(350), (_class = class SharedFilesAccordionPanel extends mixins.wl {
+let SharedFilesAccordionPanel = (_dec = utils.cp.SoonFcWrap(350), (_class = class SharedFilesAccordionPanel extends mixins.ei {
   eventuallyRenderThumbnails() {
     if (this.allShownNodes) {
       var pending = [];
@@ -11273,12 +11273,12 @@ let SharedFilesAccordionPanel = (_dec = utils.ZP.SoonFcWrap(350), (_class = clas
       className: "chat-shared-files-container" + (self.isLoadingMore ? "is-loading" : "")
     }, contents));
   }
-}, ((0,applyDecoratedDescriptor.Z)(_class.prototype, "eventuallyRenderThumbnails", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "eventuallyRenderThumbnails"), _class.prototype)), _class));
+}, ((0,applyDecoratedDescriptor.c)(_class.prototype, "eventuallyRenderThumbnails", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "eventuallyRenderThumbnails"), _class.prototype)), _class));
 
 ;// CONCATENATED MODULE: ./js/chat/ui/incomingSharesAccordionPanel.jsx
-var incomingSharesAccordionPanel_React = __webpack_require__(363);
+var incomingSharesAccordionPanel_React = __webpack_require__(376);
 
-class SharedFolderItem extends mixins.wl {
+class SharedFolderItem extends mixins.ei {
   render() {
     var self = this;
     var node = this.props.node;
@@ -11302,7 +11302,7 @@ class SharedFolderItem extends mixins.wl {
     }, fm_contains(node.tf, node.td))));
   }
 }
-class IncSharesAccordionPanel extends mixins.wl {
+class IncSharesAccordionPanel extends mixins.ei {
   componentWillMount() {
     this.hadLoaded = false;
   }
@@ -11407,7 +11407,7 @@ class IncSharesAccordionPanel extends mixins.wl {
 
 
 
-class ChatlinkDialog extends mixins.wl {
+class ChatlinkDialog extends mixins.ei {
   constructor(props) {
     super(props);
     this.onPopupDidMount = $node => {
@@ -11506,7 +11506,7 @@ class ChatlinkDialog extends mixins.wl {
       className: "mega-button negative links-button",
       onClick: this.onClose
     }, external_React_default().createElement("span", null, l[148]));
-    return external_React_default().createElement(modalDialogs.Z.ModalDialog, (0,esm_extends.Z)({}, this.state, {
+    return external_React_default().createElement(modalDialogs.M.ModalDialog, (0,esm_extends.c)({}, this.state, {
       id: ChatlinkDialog.NAMESPACE,
       title: chatRoom.iAmOperator() && !chatRoom.topic ? chatRoom.isMeeting ? l.rename_meeting : l[9080] : '',
       className: `
@@ -11546,7 +11546,7 @@ class ChatlinkDialog extends mixins.wl {
       className: "sprite-fm-uni icon-chat-group"
     }), external_React_default().createElement("h2", {
       id: "chat-link-dialog-title"
-    }, external_React_default().createElement(utils.dy, null, chatRoom.getRoomTitle()))), external_React_default().createElement("section", {
+    }, external_React_default().createElement(utils.O, null, chatRoom.getRoomTitle()))), external_React_default().createElement("section", {
       className: "content"
     }, external_React_default().createElement("div", {
       className: "content-block"
@@ -11603,7 +11603,7 @@ var _PushSettingsDialog;
 
 
 
-class PushSettingsDialog extends mixins.wl {
+class PushSettingsDialog extends mixins.ei {
   constructor(props) {
     super(props);
     this.renderOptions = () => {
@@ -11630,7 +11630,7 @@ class PushSettingsDialog extends mixins.wl {
     };
   }
   render() {
-    return external_React_default().createElement(modalDialogs.Z.ModalDialog, (0,esm_extends.Z)({}, this.state, {
+    return external_React_default().createElement(modalDialogs.M.ModalDialog, (0,esm_extends.c)({}, this.state, {
       name: "push-settings",
       title: l.dnd_mute_title,
       subtitle: this.props.room.isMeeting ? l.meeting_dnd_subtitle : l[22015],
@@ -11663,15 +11663,15 @@ PushSettingsDialog.options = {
 };
 PushSettingsDialog.default = _PushSettingsDialog.options[_PushSettingsDialog.options.length - 1];
 // EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 11 modules
-var call = __webpack_require__(476);
+var call = __webpack_require__(144);
 // EXTERNAL MODULE: ./js/chat/ui/historyPanel.jsx + 7 modules
-var historyPanel = __webpack_require__(192);
+var historyPanel = __webpack_require__(328);
 // EXTERNAL MODULE: ./js/chat/ui/composedTextArea.jsx + 1 modules
-var composedTextArea = __webpack_require__(813);
+var composedTextArea = __webpack_require__(912);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/loading.jsx
 
 
-class Loading extends mixins.wl {
+class Loading extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.PERMISSIONS = {
@@ -11769,11 +11769,11 @@ class Loading extends mixins.wl {
 }
 Loading.NAMESPACE = 'meetings-loading';
 // EXTERNAL MODULE: ./js/chat/ui/meetings/button.jsx
-var meetings_button = __webpack_require__(193);
+var meetings_button = __webpack_require__(600);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/workflow/preview.jsx
-var preview = __webpack_require__(889);
+var preview = __webpack_require__(768);
 // EXTERNAL MODULE: ./js/chat/ui/link.jsx
-var ui_link = __webpack_require__(941);
+var ui_link = __webpack_require__(620);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/join.jsx
 
 
@@ -11783,7 +11783,7 @@ var ui_link = __webpack_require__(941);
 
 
 
-class Join extends mixins.wl {
+class Join extends mixins.ei {
   constructor(props) {
     super(props);
     this.state = {
@@ -11819,7 +11819,7 @@ class Join extends mixins.wl {
         ephemeralDialog: false
       });
       const msgFragments = l.ephemeral_data_lost.split(/\[A]|\[\/A]/);
-      return external_React_default().createElement(modalDialogs.Z.ModalDialog, {
+      return external_React_default().createElement(modalDialogs.M.ModalDialog, {
         name: "end-ephemeral",
         dialogType: "message",
         icon: "sprite-fm-uni icon-warning",
@@ -11839,7 +11839,7 @@ class Join extends mixins.wl {
           }
         }],
         onClose: onCancel
-      }, external_React_default().createElement("p", null, msgFragments[0], external_React_default().createElement(ui_link.Z, {
+      }, external_React_default().createElement("p", null, msgFragments[0], external_React_default().createElement(ui_link.c, {
         to: "/register",
         onClick: () => loadSubPage('register')
       }, msgFragments[1]), msgFragments[2]));
@@ -11855,7 +11855,7 @@ class Join extends mixins.wl {
                             sprite-fm-illustration-wide
                             ${document.body.classList.contains('theme-dark') ? 'mega-logo-dark' : 'img-mega-logo-light'}
                         `
-      })), external_React_default().createElement("h1", null, external_React_default().createElement(utils.dy, null, l.you_have_invitation.replace('%1', (_this$props$chatRoom = this.props.chatRoom) == null ? void 0 : _this$props$chatRoom.topic))), isEphemeral() && external_React_default().createElement("div", {
+      })), external_React_default().createElement("h1", null, external_React_default().createElement(utils.O, null, l.you_have_invitation.replace('%1', (_this$props$chatRoom = this.props.chatRoom) == null ? void 0 : _this$props$chatRoom.topic))), isEphemeral() && external_React_default().createElement("div", {
         className: "ephemeral-info"
       }, external_React_default().createElement("i", {
         className: "sprite-fm-uni icon-warning"
@@ -11868,12 +11868,12 @@ class Join extends mixins.wl {
         className: `${Join.NAMESPACE}-content`
       }, children), this.Chat());
       if (isEphemeral()) {
-        return external_React_default().createElement($$CONTAINER, null, external_React_default().createElement(meetings_button.Z, {
+        return external_React_default().createElement($$CONTAINER, null, external_React_default().createElement(meetings_button.c, {
           className: "mega-button positive",
           onClick: () => this.setState({
             ephemeralDialog: true
           })
-        }, l.join_as_guest), external_React_default().createElement(meetings_button.Z, {
+        }, l.join_as_guest), external_React_default().createElement(meetings_button.c, {
           className: "mega-button",
           onClick: () => loadSubPage('register')
         }, l[5582]), external_React_default().createElement("span", null, l[5585], external_React_default().createElement("a", {
@@ -11886,12 +11886,12 @@ class Join extends mixins.wl {
           }))
         }, l[171])));
       }
-      return external_React_default().createElement($$CONTAINER, null, external_React_default().createElement(meetings_button.Z, {
+      return external_React_default().createElement($$CONTAINER, null, external_React_default().createElement(meetings_button.c, {
         className: "mega-button positive",
         onClick: () => this.setState({
           view: Join.VIEW.GUEST
         })
-      }, l.join_as_guest), external_React_default().createElement(meetings_button.Z, {
+      }, l.join_as_guest), external_React_default().createElement(meetings_button.c, {
         className: "mega-button",
         onClick: () => {
           var _this$props$chatRoom2;
@@ -11899,7 +11899,7 @@ class Join extends mixins.wl {
             view: Join.VIEW.ACCOUNT
           }));
         }
-      }, l[171]), external_React_default().createElement("p", null, external_React_default().createElement(utils.Cw, {
+      }, l[171]), external_React_default().createElement("p", null, external_React_default().createElement(utils.Ub, {
         onClick: e => {
           e.preventDefault();
           megaChat.loginOrRegisterBeforeJoining(this.props.chatRoom.publicChatHandle, true, undefined, undefined, () => this.setState({
@@ -11927,11 +11927,11 @@ class Join extends mixins.wl {
         onClick: () => this.setState({
           preview: !preview
         })
-      }, external_React_default().createElement(utils.dy, null, chatRoom.topic), external_React_default().createElement(meetings_button.Z, {
+      }, external_React_default().createElement(utils.O, null, chatRoom.topic), external_React_default().createElement(meetings_button.c, {
         icon: "icon-minimise"
       })), preview && external_React_default().createElement("div", {
         className: "chat-body"
-      }, external_React_default().createElement(historyPanel.Z, {
+      }, external_React_default().createElement(historyPanel.c, {
         chatRoom: chatRoom,
         onMount: cmp => cmp.messagesListScrollable.scrollToBottom()
       }))));
@@ -11947,12 +11947,12 @@ class Join extends mixins.wl {
         className: "card"
       }, external_React_default().createElement("div", {
         className: "card-body"
-      }, children, external_React_default().createElement("div", null, external_React_default().createElement(ui_link.Z, {
+      }, children, external_React_default().createElement("div", null, external_React_default().createElement(ui_link.c, {
         to: "https://mega.io/chatandmeetings",
         target: "_blank"
       }, l.how_meetings_work))), external_React_default().createElement("div", {
         className: "card-preview"
-      }, external_React_default().createElement(preview.Z, {
+      }, external_React_default().createElement(preview.c, {
         audio: previewAudio,
         video: previewVideo,
         context: Join.NAMESPACE,
@@ -11995,7 +11995,7 @@ class Join extends mixins.wl {
       name: "firstName"
     }, l[1096]), external_React_default().createElement(this.Field, {
       name: "lastName"
-    }, l[1097])), external_React_default().createElement(meetings_button.Z, {
+    }, l[1097])), external_React_default().createElement(meetings_button.c, {
       className: `
                     mega-button
                     positive
@@ -12026,7 +12026,7 @@ class Join extends mixins.wl {
         }
       }
     }, l.join_chat_button));
-    this.Account = () => external_React_default().createElement(this.Card, null, external_React_default().createElement("h4", null, l.join_meeting), external_React_default().createElement(meetings_button.Z, {
+    this.Account = () => external_React_default().createElement(this.Card, null, external_React_default().createElement("h4", null, l.join_meeting), external_React_default().createElement(meetings_button.c, {
       className: `mega-button positive large ${this.state.joining && " loading disabled"}`,
       onClick: () => {
         if (!this.state.joining) {
@@ -12043,7 +12043,7 @@ class Join extends mixins.wl {
       className: "sprite-fm-uni icon-error"
     }), external_React_default().createElement("div", {
       className: "unsupported-info"
-    }, external_React_default().createElement("h3", null, l.heading_unsupported_browser), external_React_default().createElement("h3", null, l.join_meeting_methods), external_React_default().createElement("ul", null, external_React_default().createElement("li", null, l.join_via_link), external_React_default().createElement("li", null, external_React_default().createElement(utils.Cw, null, l.join_via_mobile.replace('[A]', '<a href="https://mega.io/mobile" target="_blank" class="clickurl">').replace('[/A]', '</a>'))))));
+    }, external_React_default().createElement("h3", null, l.heading_unsupported_browser), external_React_default().createElement("h3", null, l.join_meeting_methods), external_React_default().createElement("ul", null, external_React_default().createElement("li", null, l.join_via_link), external_React_default().createElement("li", null, external_React_default().createElement(utils.Ub, null, l.join_via_mobile.replace('[A]', '<a href="https://mega.io/mobile" target="_blank" class="clickurl">').replace('[/A]', '</a>'))))));
     this.View = view => {
       switch (view) {
         default:
@@ -12088,7 +12088,7 @@ class Join extends mixins.wl {
       view,
       ephemeralDialog
     } = this.state;
-    return external_React_default().createElement(utils.ZP.RenderTo, {
+    return external_React_default().createElement(utils.cp.RenderTo, {
       element: document.body
     }, external_React_default().createElement("div", {
       className: Join.NAMESPACE
@@ -12106,7 +12106,7 @@ Join.VIEW = {
 
 
 const NAMESPACE = 'meetings-alert';
-class Alert extends mixins.wl {
+class Alert extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.alertRef = external_React_default().createRef();
@@ -12161,9 +12161,9 @@ Alert.TYPE = {
   HIGH: 'high'
 };
 // EXTERNAL MODULE: ./js/chat/ui/meetings/schedule/helpers.jsx
-var helpers = __webpack_require__(435);
+var helpers = __webpack_require__(312);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/hostsObserver.jsx
-var hostsObserver = __webpack_require__(419);
+var hostsObserver = __webpack_require__(712);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/waitingRoom/waitingRoom.jsx
 
 
@@ -12180,7 +12180,7 @@ const VIEW = {
   UNSUPPORTED: 4,
   REDIRECT: 5
 };
-class WaitingRoom extends mixins.wl {
+class WaitingRoom extends mixins.ei {
   constructor(props) {
     super(props);
     this.redirectInterval = undefined;
@@ -12210,7 +12210,7 @@ class WaitingRoom extends mixins.wl {
         nextOccurrenceStart,
         nextOccurrenceEnd
       } = chatRoom.scheduledMeeting || {};
-      return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(utils.Cw, {
+      return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(utils.Ub, {
         tag: "h2",
         content: megaChat.html(chatRoom.topic)
       }), external_React_default().createElement("div", {
@@ -12287,7 +12287,7 @@ class WaitingRoom extends mixins.wl {
         className: "card-body"
       }, children), external_React_default().createElement("div", {
         className: "card-preview"
-      }, external_React_default().createElement(preview.Z, {
+      }, external_React_default().createElement(preview.c, {
         audio: audio,
         video: video,
         onToggle: (audio, video) => {
@@ -12319,14 +12319,14 @@ class WaitingRoom extends mixins.wl {
                     `
       })), external_React_default().createElement("h1", {
         className: (megaChat.initialChatId || is_chatlink) && this.state.view !== VIEW.INTRO ? 'hidden' : ''
-      }, external_React_default().createElement(utils.dy, null, title || l.you_have_invitation.replace('%1', (_this$props$chatRoom3 = this.props.chatRoom) == null ? void 0 : _this$props$chatRoom3.topic))));
+      }, external_React_default().createElement(utils.O, null, title || l.you_have_invitation.replace('%1', (_this$props$chatRoom3 = this.props.chatRoom) == null ? void 0 : _this$props$chatRoom3.topic))));
     };
     this.Await = () => {
       return external_React_default().createElement((external_React_default()).Fragment, null, megaChat.initialChatId ? external_React_default().createElement(this.Head, null) : null, external_React_default().createElement(this.Card, {
         className: megaChat.initialChatId ? '' : 'fit-spacing'
       }, this.renderWaitingRoomInfo(), external_React_default().createElement("div", {
         className: `${waitingRoom_NAMESPACE}-message`
-      }, this.state.call ? l.wr_wait_to_admit : l.wr_wait_to_start), external_React_default().createElement(meetings_button.Z, {
+      }, this.state.call ? l.wr_wait_to_admit : l.wr_wait_to_start), external_React_default().createElement(meetings_button.c, {
         icon: "sprite-fm-mono icon-log-out-thin-solid",
         className: `${waitingRoom_NAMESPACE}-leave`,
         onClick: () => this.renderLeaveDialog()
@@ -12338,7 +12338,7 @@ class WaitingRoom extends mixins.wl {
         audio,
         video
       } = this.state;
-      return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(this.Head, null), external_React_default().createElement(this.Card, null, this.renderWaitingRoomInfo(), external_React_default().createElement(meetings_button.Z, {
+      return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(this.Head, null), external_React_default().createElement(this.Card, null, this.renderWaitingRoomInfo(), external_React_default().createElement(meetings_button.c, {
         className: `
                            mega-button
                            positive
@@ -12367,7 +12367,7 @@ class WaitingRoom extends mixins.wl {
             }).catch(ex => console.error(`Failed to join room: ${ex}`));
           });
         }
-      }, l.wr_ask_to_join), external_React_default().createElement("div", null, external_React_default().createElement(ui_link.Z, {
+      }, l.wr_ask_to_join), external_React_default().createElement("div", null, external_React_default().createElement(ui_link.c, {
         to: "https://mega.io/chatandmeetings",
         target: "_blank"
       }, l.how_meetings_work))));
@@ -12391,7 +12391,7 @@ class WaitingRoom extends mixins.wl {
         name: "firstName"
       }, l[1096]), external_React_default().createElement(this.Field, {
         name: "lastName"
-      }, l[1097])), external_React_default().createElement(meetings_button.Z, {
+      }, l[1097])), external_React_default().createElement(meetings_button.c, {
         className: `
                             mega-button
                             positive
@@ -12410,7 +12410,7 @@ class WaitingRoom extends mixins.wl {
             }).catch(ex => d && console.error(`E++ account failure: ${ex}`));
           });
         }
-      }, l.wr_ask_to_join), external_React_default().createElement("div", null, external_React_default().createElement(ui_link.Z, {
+      }, l.wr_ask_to_join), external_React_default().createElement("div", null, external_React_default().createElement(ui_link.c, {
         to: "https://mega.io/chatandmeetings",
         target: "_blank"
       }, l.how_meetings_work))));
@@ -12421,19 +12421,19 @@ class WaitingRoom extends mixins.wl {
       } = this.props;
       return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(this.Head, null), external_React_default().createElement("div", {
         className: "join-meeting-content"
-      }, external_React_default().createElement(meetings_button.Z, {
+      }, external_React_default().createElement(meetings_button.c, {
         className: "mega-button positive",
         onClick: () => {
           megaChat.loginOrRegisterBeforeJoining(chatRoom.publicChatHandle, false, true, undefined, () => this.setState({
             view: VIEW.ACCOUNT
           }));
         }
-      }, l[171]), external_React_default().createElement(meetings_button.Z, {
+      }, l[171]), external_React_default().createElement(meetings_button.c, {
         className: "mega-button",
         onClick: () => this.setState({
           view: VIEW.GUEST
         })
-      }, l.join_as_guest), external_React_default().createElement("p", null, external_React_default().createElement(utils.Cw, {
+      }, l.join_as_guest), external_React_default().createElement("p", null, external_React_default().createElement(utils.Ub, {
         onClick: e => {
           e.preventDefault();
           megaChat.loginOrRegisterBeforeJoining(chatRoom.publicChatHandle, true, undefined, undefined, () => this.setState({
@@ -12450,7 +12450,7 @@ class WaitingRoom extends mixins.wl {
         className: "sprite-fm-uni icon-error"
       }), external_React_default().createElement("div", {
         className: "unsupported-info"
-      }, external_React_default().createElement("h3", null, l.heading_unsupported_browser), external_React_default().createElement("h3", null, l.join_meeting_methods), external_React_default().createElement("ul", null, external_React_default().createElement("li", null, l.join_via_link), external_React_default().createElement("li", null, external_React_default().createElement(utils.Cw, null, l.join_via_mobile.replace('[A]', '<a href="https://mega.io/mobile" target="_blank" class="clickurl">').replace('[/A]', '</a>')))))));
+      }, external_React_default().createElement("h3", null, l.heading_unsupported_browser), external_React_default().createElement("h3", null, l.join_meeting_methods), external_React_default().createElement("ul", null, external_React_default().createElement("li", null, l.join_via_link), external_React_default().createElement("li", null, external_React_default().createElement(utils.Ub, null, l.join_via_mobile.replace('[A]', '<a href="https://mega.io/mobile" target="_blank" class="clickurl">').replace('[/A]', '</a>')))))));
     };
     this.renderView = view => {
       switch (view) {
@@ -12527,7 +12527,7 @@ class WaitingRoom extends mixins.wl {
     const {
       view
     } = this.state;
-    return external_React_default().createElement(utils.ZP.RenderTo, {
+    return external_React_default().createElement(utils.cp.RenderTo, {
       element: document.body
     }, external_React_default().createElement("div", {
       className: `
@@ -12542,7 +12542,7 @@ class WaitingRoom extends mixins.wl {
   }
 }
 // EXTERNAL MODULE: ./js/chat/ui/meetings/streamControls.jsx
-var streamControls = __webpack_require__(230);
+var streamControls = __webpack_require__(227);
 ;// CONCATENATED MODULE: ./js/chat/ui/conversationpanel.jsx
 
 
@@ -12576,12 +12576,12 @@ var conversationpanel_dec, _dec2, conversationpanel_class;
 
 const ENABLE_GROUP_CALLING_FLAG = true;
 const MAX_USERS_CHAT_PRIVATE = 100;
-class EndCallButton extends mixins.wl {
+class EndCallButton extends mixins.ei {
   constructor(...args) {
     super(...args);
-    this.IS_MODERATOR = call.ZP.isModerator(this.props.chatRoom, u_handle);
+    this.IS_MODERATOR = call.cp.isModerator(this.props.chatRoom, u_handle);
     this.EVENTS = ['onCallPeerJoined.endCallButton', 'onCallPeerLeft.endCallButton'];
-    this.LeaveButton = (0,hostsObserver.N)(({
+    this.LeaveButton = (0,hostsObserver._)(({
       hasHost,
       chatRoom,
       confirmLeave,
@@ -12603,7 +12603,7 @@ class EndCallButton extends mixins.wl {
             recorder,
             sfuClient
           } = chatRoom.call;
-          return recorder && recorder === u_handle ? (0,streamControls.px)(doLeave, () => sfuClient.recordingStop()) : doLeave();
+          return recorder && recorder === u_handle ? (0,streamControls.uA)(doLeave, () => sfuClient.recordingStop()) : doLeave();
         }
       });
     });
@@ -12625,7 +12625,7 @@ class EndCallButton extends mixins.wl {
     children = null,
     disabled
   }) {
-    return external_React_default().createElement(buttons.z, {
+    return external_React_default().createElement(buttons.q, {
       className: `
                     link-button
                     light
@@ -12678,7 +12678,7 @@ class EndCallButton extends mixins.wl {
                 recorder,
                 sfuClient
               } = call;
-              return recorder && recorder === u_handle ? (0,streamControls.qJ)(doEnd, () => sfuClient.recordingStop()) : doEnd();
+              return recorder && recorder === u_handle ? (0,streamControls.kf)(doEnd, () => sfuClient.recordingStop()) : doEnd();
             }
           }))
         });
@@ -12698,7 +12698,7 @@ class EndCallButton extends mixins.wl {
     return null;
   }
 }
-class StartMeetingNotification extends mixins.wl {
+class StartMeetingNotification extends mixins.ei {
   customIsEventuallyVisible() {
     return this.props.chatRoom.isCurrentlyActive;
   }
@@ -12721,14 +12721,14 @@ class StartMeetingNotification extends mixins.wl {
         if (chatRoom.options.w && !chatRoom.iAmOperator()) {
           return onWaitingRoomJoin();
         }
-        return onStartCall(call.wD.AUDIO);
+        return onStartCall(call._M.AUDIO);
       }
     }, external_React_default().createElement("button", {
       className: "mega-button positive small"
     }, l.schedule_start_aot));
   }
 }
-class JoinCallNotification extends mixins.wl {
+class JoinCallNotification extends mixins.ei {
   customIsEventuallyVisible() {
     return this.props.chatRoom.isCurrentlyActive;
   }
@@ -12753,9 +12753,9 @@ class JoinCallNotification extends mixins.wl {
       }
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-phone"
-    }), external_React_default().createElement(utils.Cw, {
+    }), external_React_default().createElement(utils.Ub, {
       onClick: () => {
-        return (0,call.xt)(true, chatRoom).then(() => chatRoom.joinCall()).catch(ex => d && console.warn('Already in a call.', ex));
+        return (0,call.OO)(true, chatRoom).then(() => chatRoom.joinCall()).catch(ex => d && console.warn('Already in a call.', ex));
       }
     }, (l[20460] || 'There is an active group call. [A]Join[/A]').replace('[A]', '<button class="mega-button positive joinActiveCall small">').replace('[/A]', '</button>')));
   }
@@ -12777,7 +12777,7 @@ const excludedParticipants = room => {
   }
   return excParticipants;
 };
-class Occurrences extends mixins.wl {
+class Occurrences extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.loadingMore = false;
@@ -12855,7 +12855,7 @@ class Occurrences extends mixins.wl {
                                 `
       }, external_React_default().createElement("div", {
         className: "chat-occurrence-date"
-      }, (0,helpers.zk)(occurrence.start) && external_React_default().createElement("span", null, l.today_occurrence_label, " -"), (0,helpers.Pm)(occurrence.start) && external_React_default().createElement("span", null, l.tomorrow_occurrence_label, " -"), external_React_default().createElement("span", null, time2date(occurrence.start / 1000, 19))), external_React_default().createElement("div", {
+      }, (0,helpers.MF)(occurrence.start) && external_React_default().createElement("span", null, l.today_occurrence_label, " -"), (0,helpers.CS)(occurrence.start) && external_React_default().createElement("span", null, l.tomorrow_occurrence_label, " -"), external_React_default().createElement("span", null, time2date(occurrence.start / 1000, 19))), external_React_default().createElement("div", {
         className: "chat-occurrence-content"
       }, external_React_default().createElement("div", {
         className: "chat-occurrence-title"
@@ -12868,7 +12868,7 @@ class Occurrences extends mixins.wl {
         "data-simpletip": l[1342],
         "data-simpletipposition": "top",
         "data-simpletipoffset": "5"
-      }, external_React_default().createElement(buttons.z, {
+      }, external_React_default().createElement(buttons.q, {
         icon: "sprite-fm-mono icon-rename",
         onClick: () => {
           megaChat.trigger(megaChat.plugins.meetingsManager.EVENTS.EDIT, occurrence);
@@ -12878,7 +12878,7 @@ class Occurrences extends mixins.wl {
         "data-simpletip": l[82],
         "data-simpletipposition": "top",
         "data-simpletipoffset": "5"
-      }, external_React_default().createElement(buttons.z, {
+      }, external_React_default().createElement(buttons.q, {
         icon: "sprite-fm-mono icon-bin",
         onClick: () => this.renderCancelConfirmation(occurrence)
       }))))) : null));
@@ -12896,7 +12896,7 @@ class Occurrences extends mixins.wl {
     } = this.state;
     return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("div", {
       className: "chat-occurrences-list"
-    }, external_React_default().createElement(perfectScrollbar.F, {
+    }, external_React_default().createElement(perfectScrollbar.e, {
       chatRoom: chatRoom,
       ref: ref => {
         this.contactsListScroll = ref;
@@ -12912,10 +12912,10 @@ class Occurrences extends mixins.wl {
     }, this.renderOccurrences()))));
   }
 }
-class ConversationRightArea extends mixins.wl {
+class ConversationRightArea extends mixins.ei {
   constructor(props) {
     super(props);
-    this.LeaveButton = (0,hostsObserver.N)(({
+    this.LeaveButton = (0,hostsObserver._)(({
       chatRoom,
       hasHost,
       confirmLeave,
@@ -12950,7 +12950,7 @@ class ConversationRightArea extends mixins.wl {
         chatRoom
       } = this.props;
       const isDisabled = !chatRoom.iAmOperator() || disabled;
-      return external_React_default().createElement(buttons.z, {
+      return external_React_default().createElement(buttons.q, {
         className: `
                     link-button
                     light
@@ -13015,7 +13015,7 @@ class ConversationRightArea extends mixins.wl {
       className: "room-settings-banner"
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-info"
-    }), external_React_default().createElement(utils.Cw, null, l.waiting_room_invite.replace('[A]', `<a
+    }), external_React_default().createElement(utils.Ub, null, l.waiting_room_invite.replace('[A]', `<a
                                 href="${l.mega_help_host}/wp-admin/post.php?post=3005&action=edit"
                                 target="_blank"
                                 class="ulickurl">`).replace('[/A]', '</a>'))) : null;
@@ -13032,7 +13032,7 @@ class ConversationRightArea extends mixins.wl {
       className: "push-settings"
     }, external_React_default().createElement("div", {
       className: "chat-button-separator"
-    }), external_React_default().createElement(buttons.z, {
+    }), external_React_default().createElement(buttons.q, {
       className: `
                         link-button
                         light
@@ -13104,7 +13104,7 @@ class ConversationRightArea extends mixins.wl {
                         ${megaChat.hasSupportForCalls ? '' : 'simpletip'}
                         ${startCallDisabled ? 'disabled' : ''}
                     `,
-        onClick: () => onStartCall(call.wD.AUDIO)
+        onClick: () => onStartCall(call._M.AUDIO)
       }, external_React_default().createElement("i", {
         className: "sprite-fm-mono icon-phone"
       }), external_React_default().createElement("span", null, l[5896]));
@@ -13119,7 +13119,7 @@ class ConversationRightArea extends mixins.wl {
                         ${megaChat.hasSupportForCalls ? '' : 'simpletip'}
                         ${startCallDisabled ? 'disabled' : ''}
                     `,
-        onClick: () => onStartCall(call.wD.VIDEO)
+        onClick: () => onStartCall(call._M.VIDEO)
       }, external_React_default().createElement("i", {
         className: "sprite-fm-mono icon-video-call-filled"
       }), external_React_default().createElement("span", null, l[5897]));
@@ -13144,12 +13144,12 @@ class ConversationRightArea extends mixins.wl {
     const renameButtonClass = `
             link-button
             light
-            ${(0,call.nJ)() || room.isReadOnly() || !room.iAmOperator() ? 'disabled' : ''}
+            ${(0,call.or)() || room.isReadOnly() || !room.iAmOperator() ? 'disabled' : ''}
         `;
     const getChatLinkClass = `
             link-button
             light
-            ${(0,call.nJ)() || room.isReadOnly() ? 'disabled' : ''}
+            ${(0,call.or)() || room.isReadOnly() ? 'disabled' : ''}
         `;
     let participantsList = null;
     if (room.type === "group" || room.type === "public") {
@@ -13162,11 +13162,11 @@ class ConversationRightArea extends mixins.wl {
         isCurrentlyActive: room.isCurrentlyActive
       }));
     }
-    const addParticipantBtn = external_React_default().createElement(buttons.z, {
+    const addParticipantBtn = external_React_default().createElement(buttons.q, {
       className: "link-button light",
       icon: "sprite-fm-mono icon-add-small",
       label: l[8007],
-      disabled: (0,call.nJ)() || room.isReadOnly() || !(room.iAmOperator() || room.type !== 'private' && room.options[MCO_FLAGS.OPEN_INVITE]),
+      disabled: (0,call.or)() || room.isReadOnly() || !(room.iAmOperator() || room.type !== 'private' && room.options[MCO_FLAGS.OPEN_INVITE]),
       onClick: () => M.u.length > 1 ? !allContactsInChat(exParticipants) ? this.setState({
         contactPickerDialog: true
       }) : msgDialog(`confirmationa:!^${l[8726]}!${l[82]}`, null, `${l.all_contacts_added}`, `${l.all_contacts_added_to_chat}`, res => {
@@ -13206,11 +13206,11 @@ class ConversationRightArea extends mixins.wl {
     const ICON_ACTIVE = external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-check"
     });
-    const retentionHistoryBtn = external_React_default().createElement(buttons.z, {
+    const retentionHistoryBtn = external_React_default().createElement(buttons.q, {
       className: "link-button light history-retention-btn",
       icon: "sprite-fm-mono icon-recents-filled",
       label: l[23436],
-      disabled: !room.iAmOperator() || room.isReadOnly() || (0,call.nJ)(),
+      disabled: !room.iAmOperator() || room.isReadOnly() || (0,call.or)(),
       secondLabel: room.getRetentionLabel(),
       secondLabelClass: "label--red",
       chatRoom: room
@@ -13256,7 +13256,7 @@ class ConversationRightArea extends mixins.wl {
     }
     return external_React_default().createElement("div", {
       className: "chat-right-area"
-    }, external_React_default().createElement(perfectScrollbar.F, {
+    }, external_React_default().createElement(perfectScrollbar.e, {
       className: "chat-right-area conversation-details-scroll",
       options: {
         'suppressScrollX': true
@@ -13272,7 +13272,7 @@ class ConversationRightArea extends mixins.wl {
                             chat-right-pad
                             ${room.haveActiveCall() ? 'in-call' : ''}
                         `
-    }, external_React_default().createElement(Accordion, (0,esm_extends.Z)({}, this.state, {
+    }, external_React_default().createElement(Accordion, (0,esm_extends.c)({}, this.state, {
       chatRoom: room,
       onToggle: SoonFc(20, () => {
         if (this.rightScroll) {
@@ -13395,7 +13395,7 @@ class ConversationRightArea extends mixins.wl {
       }
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-rename"
-    }), external_React_default().createElement("span", null, l[20597])) : null, scheduledMeeting ? null : external_React_default().createElement((external_React_default()).Fragment, null, AVseperator, external_React_default().createElement(buttons.z, {
+    }), external_React_default().createElement("span", null, l[20597])) : null, scheduledMeeting ? null : external_React_default().createElement((external_React_default()).Fragment, null, AVseperator, external_React_default().createElement(buttons.q, {
       className: "link-button light dropdown-element",
       icon: "sprite-fm-mono icon-upload-filled",
       label: l[23753],
@@ -13423,7 +13423,7 @@ class ConversationRightArea extends mixins.wl {
       onClick: () => {
         this.props.onAttachFromComputerClicked();
       }
-    })))), this.renderPushSettingsButton(), room.type === 'private' ? null : external_React_default().createElement((external_React_default()).Fragment, null, room.scheduledMeeting && this.OptionsButton(waitingRoomButton), this.OptionsButton(openInviteButton), this.renderOptionsBanner(), AVseperator), mega.es2020 && external_React_default().createElement(buttons.z, {
+    })))), this.renderPushSettingsButton(), room.type === 'private' ? null : external_React_default().createElement((external_React_default()).Fragment, null, room.scheduledMeeting && this.OptionsButton(waitingRoomButton), this.OptionsButton(openInviteButton), this.renderOptionsBanner(), AVseperator), mega.es2020 && external_React_default().createElement(buttons.q, {
       className: "link-button light export-chat-button",
       disabled: room.messagesBuff.messages.length === 0 || room.exportIo,
       onClick: () => {
@@ -13431,7 +13431,7 @@ class ConversationRightArea extends mixins.wl {
       }
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-export-chat-filled"
-    }), external_React_default().createElement("span", null, room.isMeeting ? l.export_meeting_rhp : l.export_chat_rhp)), external_React_default().createElement(buttons.z, {
+    }), external_React_default().createElement("span", null, room.isMeeting ? l.export_meeting_rhp : l.export_chat_rhp)), external_React_default().createElement(buttons.q, {
       className: "link-button light clear-history-button",
       disabled: dontShowTruncateButton || !room.members.hasOwnProperty(u_handle),
       onClick: () => {
@@ -13519,7 +13519,7 @@ class ConversationRightArea extends mixins.wl {
 ConversationRightArea.defaultProps = {
   'requiresUpdateOnResize': true
 };
-let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2 = (0,mixins.LY)(0.7, 9), (conversationpanel_class = class ConversationPanel extends mixins.wl {
+let ConversationPanel = (conversationpanel_dec = utils.cp.SoonFcWrap(360), _dec2 = (0,mixins.CI)(0.7, 9), (conversationpanel_class = class ConversationPanel extends mixins.ei {
   constructor(props) {
     super(props);
     this.containerRef = external_React_default().createRef();
@@ -13602,7 +13602,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
     if (this.props.onToggleExpandedFlag) {
       this.props.onToggleExpandedFlag();
     }
-    return document.body.classList[call.ZP.isExpanded() ? 'remove' : 'add'](call.F3);
+    return document.body.classList[call.cp.isExpanded() ? 'remove' : 'add'](call.tG);
   }
   startCall(type, scheduled) {
     const {
@@ -13611,7 +13611,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
     if (isStartCallDisabled(chatRoom) || chatRoom.iAmWaitingRoomPeer()) {
       return false;
     }
-    return type === call.wD.AUDIO ? chatRoom.startAudioCall(scheduled) : chatRoom.startVideoCall(scheduled);
+    return type === call._M.AUDIO ? chatRoom.startAudioCall(scheduled) : chatRoom.startVideoCall(scheduled);
   }
   renderUpcomingInfo() {
     const {
@@ -13624,7 +13624,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
         nextOccurrenceEnd,
         isUpcoming
       } = scheduledMeeting;
-      const until = `${(0,helpers.KC)(nextOccurrenceStart, nextOccurrenceEnd) ? '' : time2date(nextOccurrenceEnd / 1000, 4)} ${toLocaleTime(nextOccurrenceEnd)}`;
+      const until = `${(0,helpers.EP)(nextOccurrenceStart, nextOccurrenceEnd) ? '' : time2date(nextOccurrenceEnd / 1000, 4)} ${toLocaleTime(nextOccurrenceEnd)}`;
       return external_React_default().createElement((external_React_default()).Fragment, null, isUpcoming && recurring && external_React_default().createElement("span", null, l.next_meeting), external_React_default().createElement("span", null, (l.schedule_formatted_date || '%1 from %2 to %3').replace('%1', time2date(nextOccurrenceStart / 1000, 4)).replace('%2', toLocaleTime(nextOccurrenceStart)).replace('%3', until)));
     }
     return null;
@@ -13880,7 +13880,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
           'nonLoggedInJoinChatDialog': false
         });
       };
-      nonLoggedInJoinChatDialog = external_React_default().createElement(modalDialogs.Z.ModalDialog, {
+      nonLoggedInJoinChatDialog = external_React_default().createElement(modalDialogs.M.ModalDialog, {
         title: l[20596],
         className: "mega-dialog chat-links-preview-desktop dialog-template-graphic",
         chatRoom: room,
@@ -13891,7 +13891,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
         className: "chatlink-contents"
       }, external_React_default().createElement("div", {
         className: "huge-icon group-chat"
-      }), external_React_default().createElement("h3", null, external_React_default().createElement(utils.dy, null, room.getRoomTitle())), external_React_default().createElement("h5", null, usersCount ? mega.icu.format(l[20233], usersCount) : ''), external_React_default().createElement("p", null, l[20595]))), external_React_default().createElement("footer", null, external_React_default().createElement("div", {
+      }), external_React_default().createElement("h3", null, external_React_default().createElement(utils.O, null, room.getRoomTitle())), external_React_default().createElement("h5", null, usersCount ? mega.icu.format(l[20233], usersCount) : ''), external_React_default().createElement("p", null, l[20595]))), external_React_default().createElement("footer", null, external_React_default().createElement("div", {
         className: "bottom-buttons"
       }, external_React_default().createElement("button", {
         className: "mega-button positive",
@@ -13926,7 +13926,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
       const onClose = () => this.setState({
         privateChatDialog: false
       });
-      privateChatDialog = external_React_default().createElement(modalDialogs.Z.ModalDialog, {
+      privateChatDialog = external_React_default().createElement(modalDialogs.M.ModalDialog, {
         title: l[20594],
         className: "mega-dialog create-private-chat",
         chatRoom: room,
@@ -13961,7 +13961,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
           }
         });
       }
-      sendContactDialog = external_React_default().createElement(modalDialogs.Z.SelectContactDialog, {
+      sendContactDialog = external_React_default().createElement(modalDialogs.M.SelectContactDialog, {
         chatRoom: room,
         exclude: excludedContacts,
         onClose: () => {
@@ -13980,7 +13980,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
     }
     var confirmDeleteDialog = null;
     if (self.state.confirmDeleteDialog === true) {
-      confirmDeleteDialog = external_React_default().createElement(modalDialogs.Z.ConfirmDialog, {
+      confirmDeleteDialog = external_React_default().createElement(modalDialogs.M.ConfirmDialog, {
         chatRoom: room,
         dialogType: "main",
         title: l[8004],
@@ -14026,7 +14026,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
         className: "content"
       }, external_React_default().createElement("div", {
         className: "content-block"
-      }, external_React_default().createElement(generic.Z, {
+      }, external_React_default().createElement(generic.c, {
         className: " dialog-wrapper",
         message: self.state.messageToBeDeleted,
         hideActionButtons: true,
@@ -14036,7 +14036,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
       }))));
     }
     if (self.state.pasteImageConfirmDialog) {
-      confirmDeleteDialog = external_React_default().createElement(modalDialogs.Z.ConfirmDialog, {
+      confirmDeleteDialog = external_React_default().createElement(modalDialogs.M.ConfirmDialog, {
         chatRoom: room,
         title: l[20905],
         subtitle: l[20906],
@@ -14105,7 +14105,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
       });
     }
     if (self.state.truncateDialog === true) {
-      confirmDeleteDialog = external_React_default().createElement(modalDialogs.Z.ConfirmDialog, {
+      confirmDeleteDialog = external_React_default().createElement(modalDialogs.M.ConfirmDialog, {
         chatRoom: room,
         title: room.isMeeting ? l.meeting_clear_hist : l[8871],
         subtitle: room.isMeeting ? l.meeting_trunc_txt : l[8881],
@@ -14128,7 +14128,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
       });
     }
     if (self.state.archiveDialog === true) {
-      confirmDeleteDialog = external_React_default().createElement(modalDialogs.Z.ConfirmDialog, {
+      confirmDeleteDialog = external_React_default().createElement(modalDialogs.M.ConfirmDialog, {
         chatRoom: room,
         title: room.isMeeting ? l.meeting_archive_dlg : l[19068],
         subtitle: room.isMeeting ? l.meeting_archive_dlg_text : l[19069],
@@ -14150,7 +14150,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
       });
     }
     if (self.state.unarchiveDialog === true) {
-      confirmDeleteDialog = external_React_default().createElement(modalDialogs.Z.ConfirmDialog, {
+      confirmDeleteDialog = external_React_default().createElement(modalDialogs.M.ConfirmDialog, {
         chatRoom: room,
         title: room.isMeeting ? l.meeting_unarchive_dlg : l[19063],
         subtitle: room.isMeeting ? l.meeting_unarchive_dlg_text : l[19064],
@@ -14183,7 +14183,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
         e.stopPropagation();
       };
       var renameDialogValue = typeof self.state.renameDialogValue !== 'undefined' ? self.state.renameDialogValue : self.props.chatRoom.getRoomTitle();
-      confirmDeleteDialog = external_React_default().createElement(modalDialogs.Z.ModalDialog, {
+      confirmDeleteDialog = external_React_default().createElement(modalDialogs.M.ModalDialog, {
         chatRoom: room,
         title: room.isMeeting ? l.rename_meeting : l[9080],
         name: "rename-group",
@@ -14242,7 +14242,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
     let {
       descriptionDialog
     } = this.state;
-    descriptionDialog = descriptionDialog ? external_React_default().createElement(modalDialogs.Z.ModalDialog, {
+    descriptionDialog = descriptionDialog ? external_React_default().createElement(modalDialogs.M.ModalDialog, {
       className: "scheduled-description-dialog",
       meeting: room.scheduledMeeting,
       onClose: () => {
@@ -14252,9 +14252,9 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
       }
     }, external_React_default().createElement("header", null, external_React_default().createElement("h3", null, l.schedule_desc_dlg_title)), external_React_default().createElement("section", {
       className: "content"
-    }, external_React_default().createElement(perfectScrollbar.F, {
+    }, external_React_default().createElement(perfectScrollbar.e, {
       className: "description-scroller"
-    }, external_React_default().createElement(utils.Cw, null, megaChat.html(room.scheduledMeeting.description).replace(/\n/g, '<br>') || l.schedule_no_desc)))) : null;
+    }, external_React_default().createElement(utils.Ub, null, megaChat.html(room.scheduledMeeting.description).replace(/\n/g, '<br>') || l.schedule_no_desc)))) : null;
     var topicInfo = null;
     const isUpcoming = room.scheduledMeeting && room.scheduledMeeting.isUpcoming;
     const isRecurring = room.scheduledMeeting && room.scheduledMeeting.isRecurring;
@@ -14272,7 +14272,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
         className: "chat-topic-text"
       }, external_React_default().createElement("span", {
         className: "txt"
-      }, external_React_default().createElement(utils.dy, null, room.getRoomTitle()), isUpcoming && isRecurring && external_React_default().createElement("i", {
+      }, external_React_default().createElement(utils.O, null, room.getRoomTitle()), isUpcoming && isRecurring && external_React_default().createElement("i", {
         className: "sprite-fm-mono icon-repeat"
       })), external_React_default().createElement("span", {
         className: "txt small"
@@ -14337,7 +14337,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
     }, room.meetingsLoading && external_React_default().createElement(Loading, {
       chatRoom: room,
       title: room.meetingsLoading.title
-    }), room.call && external_React_default().createElement(call.ZP, {
+    }), room.call && external_React_default().createElement(call.cp, {
       chatRoom: room,
       peers: room.call.peers,
       call: room.call,
@@ -14423,7 +14423,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
       messagesBuff: room.messagesBuff,
       pushSettingsValue: pushNotificationSettings.getDnd(this.props.chatRoom.chatId),
       occurrencesLoading: this.state.occurrencesLoading,
-      onStartCall: mode => (0,call.xt)().then(() => this.startCall(mode)).catch(() => d && console.warn('Already in a call.')),
+      onStartCall: mode => (0,call.OO)().then(() => this.startCall(mode)).catch(() => d && console.warn('Already in a call.')),
       onAttachFromComputerClicked: function () {
         self.props.chatRoom.uploadFromComputer();
       },
@@ -14525,7 +14525,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
                         `
     }, external_React_default().createElement("div", {
       className: "chat-topic-buttons"
-    }, external_React_default().createElement(buttons.z, {
+    }, external_React_default().createElement(buttons.q, {
       className: "right",
       disableCheckingVisibility: true,
       icon: "sprite-fm-mono icon-info-filled",
@@ -14539,9 +14539,9 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
                                     right
                                     ${startCallDisabled ? 'disabled' : ''}
                                 `
-    }, external_React_default().createElement(buttons.z, {
+    }, external_React_default().createElement(buttons.q, {
       icon: "sprite-fm-mono icon-video-call-filled",
-      onClick: () => startCallDisabled ? false : (0,call.xt)().then(() => this.startCall(call.wD.VIDEO)).catch(() => d && console.warn('Already in a call.'))
+      onClick: () => startCallDisabled ? false : (0,call.OO)().then(() => this.startCall(call._M.VIDEO)).catch(() => d && console.warn('Already in a call.'))
     })), external_React_default().createElement("div", {
       "data-simpletip": l.unsupported_browser_audio,
       "data-simpletipposition": "top",
@@ -14551,9 +14551,9 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
                                     right
                                     ${startCallDisabled ? 'disabled' : ''}
                                 `
-    }, external_React_default().createElement(buttons.z, {
+    }, external_React_default().createElement(buttons.q, {
       icon: "sprite-fm-mono icon-phone",
-      onClick: () => startCallDisabled ? false : (0,call.xt)().then(() => this.startCall(call.wD.AUDIO)).catch(() => d && console.warn('Already in a call.'))
+      onClick: () => startCallDisabled ? false : (0,call.OO)().then(() => this.startCall(call._M.AUDIO)).catch(() => d && console.warn('Already in a call.'))
     }))), topicInfo), external_React_default().createElement("div", {
       ref: this.containerRef,
       className: `
@@ -14568,7 +14568,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
       onClose: () => this.setState({
         invalidKeysBanner: false
       })
-    }), external_React_default().createElement(historyPanel.Z, (0,esm_extends.Z)({}, this.props, {
+    }), external_React_default().createElement(historyPanel.c, (0,esm_extends.c)({}, this.props, {
       onMessagesListScrollableMount: mls => {
         this.messagesListScrollable = mls;
       },
@@ -14583,7 +14583,7 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
         waitingRoom: true
       }),
       onStartCall: mode => {
-        return isStartCallDisabled(room) ? null : (0,call.xt)(true, room).then(() => this.startCall(mode, true)).catch(ex => d && console.warn(`Already in a call. ${ex}`));
+        return isStartCallDisabled(room) ? null : (0,call.OO)(true, room).then(() => this.startCall(mode, true)).catch(ex => d && console.warn(`Already in a call. ${ex}`));
       }
     }) : null, !is_chatlink && room.state !== ChatRoom.STATE.LEFT && (room.havePendingGroupCall() || room.havePendingCall()) && navigator.onLine ? external_React_default().createElement(JoinCallNotification, {
       chatRoom: room,
@@ -14607,14 +14607,14 @@ let ConversationPanel = (conversationpanel_dec = utils.ZP.SoonFcWrap(360), _dec2
         clearTimeout(self.state.setNonLoggedInJoinChatDlgTrue);
         join();
       }
-    }, l[20597])) : external_React_default().createElement(composedTextArea.Z, {
+    }, l[20597])) : external_React_default().createElement(composedTextArea.c, {
       chatRoom: room,
       parent: this,
       containerRef: this.containerRef
     }))));
   }
-}, ((0,applyDecoratedDescriptor.Z)(conversationpanel_class.prototype, "onMouseMove", [conversationpanel_dec], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMouseMove"), conversationpanel_class.prototype), (0,applyDecoratedDescriptor.Z)(conversationpanel_class.prototype, "render", [_dec2], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "render"), conversationpanel_class.prototype)), conversationpanel_class));
-class ConversationPanels extends mixins.wl {
+}, ((0,applyDecoratedDescriptor.c)(conversationpanel_class.prototype, "onMouseMove", [conversationpanel_dec], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "onMouseMove"), conversationpanel_class.prototype), (0,applyDecoratedDescriptor.c)(conversationpanel_class.prototype, "render", [_dec2], Object.getOwnPropertyDescriptor(conversationpanel_class.prototype, "render"), conversationpanel_class.prototype)), conversationpanel_class));
+class ConversationPanels extends mixins.ei {
   constructor(props) {
     super(props);
     this.alertsOffset = 4;
@@ -14682,7 +14682,7 @@ class ConversationPanels extends mixins.wl {
       onClose: () => this.setState({
         notificationsPermissions: undefined
       })
-    }, external_React_default().createElement(utils.Cw, {
+    }, external_React_default().createElement(utils.Ub, {
       content: l.notifications_permissions_denied_info.replace('[A]', `<a href="${this.notificationHelpURL}" target="_blank" class="clickurl">`).replace('[/A]', '</a>')
     }));
   }
@@ -14727,7 +14727,7 @@ class ConversationPanels extends mixins.wl {
                                 ${megaChat.chatUIFlags.convPanelCollapse ? 'full-span' : ''}
                                 ${isEmpty ? 'empty-state' : ''}
                             `,
-      content: call.ZP.getUnsupportedBrowserMessage(),
+      content: call.cp.getUnsupportedBrowserMessage(),
       onClose: this.closeSupportAlert
     }), megaChat.chats.map(chatRoom => {
       if (chatRoom.isCurrentlyActive || now - chatRoom.lastShownInUI < 900000) {
@@ -14747,7 +14747,7 @@ class ConversationPanels extends mixins.wl {
     }));
   }
 }
-class EmptyConvPanel extends mixins.wl {
+class EmptyConvPanel extends mixins.ei {
   renderActions() {
     const {
       isMeeting,
@@ -14756,7 +14756,7 @@ class EmptyConvPanel extends mixins.wl {
       onScheduleMeeting
     } = this.props;
     if (isMeeting) {
-      return external_React_default().createElement(buttons.z, {
+      return external_React_default().createElement(buttons.q, {
         className: "mega-button large positive",
         label: l.create_meeting
       }, external_React_default().createElement(dropdowns.Dropdown, {
@@ -14775,7 +14775,7 @@ class EmptyConvPanel extends mixins.wl {
         onClick: onScheduleMeeting
       })));
     }
-    return external_React_default().createElement(buttons.z, {
+    return external_React_default().createElement(buttons.q, {
       className: "mega-button large positive",
       label: l.add_chat,
       onClick: onNewChat
@@ -14792,7 +14792,7 @@ class EmptyConvPanel extends mixins.wl {
   }
 }
 function isStartCallDisabled(room) {
-  if ((0,call.nJ)()) {
+  if ((0,call.or)()) {
     return true;
   }
   if (!megaChat.hasSupportForCalls) {
@@ -14803,39 +14803,39 @@ function isStartCallDisabled(room) {
 
 /***/ }),
 
-/***/ 978:
+/***/ 408:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  FP: () => (conversations_EVENTS),
-  nk: () => (VIEWS),
-  ZP: () => (conversations)
+  UH: () => (conversations_EVENTS),
+  o7: () => (VIEWS),
+  cp: () => (conversations)
 });
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/extends.js
-var esm_extends = __webpack_require__(462);
+var esm_extends = __webpack_require__(72);
 // EXTERNAL MODULE: external "React"
-var external_React_ = __webpack_require__(363);
+var external_React_ = __webpack_require__(376);
 var external_React_default = __webpack_require__.n(external_React_);
 // EXTERNAL MODULE: ./js/chat/mixins.js
-var mixins = __webpack_require__(503);
+var mixins = __webpack_require__(436);
 // EXTERNAL MODULE: ./js/chat/ui/conversationpanel.jsx + 14 modules
-var conversationpanel = __webpack_require__(21);
+var conversationpanel = __webpack_require__(828);
 // EXTERNAL MODULE: ./js/chat/ui/contactsPanel/contactsPanel.jsx + 20 modules
-var contactsPanel = __webpack_require__(808);
+var contactsPanel = __webpack_require__(368);
 // EXTERNAL MODULE: ./js/ui/modalDialogs.jsx + 1 modules
-var modalDialogs = __webpack_require__(182);
+var modalDialogs = __webpack_require__(776);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/button.jsx
-var meetings_button = __webpack_require__(193);
+var meetings_button = __webpack_require__(600);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/workflow/preview.jsx
-var preview = __webpack_require__(889);
+var preview = __webpack_require__(768);
 // EXTERNAL MODULE: ./js/chat/ui/link.jsx
-var ui_link = __webpack_require__(941);
+var ui_link = __webpack_require__(620);
 // EXTERNAL MODULE: ./js/ui/utils.jsx
-var utils = __webpack_require__(79);
+var utils = __webpack_require__(240);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/start.jsx
 
 var _Start;
@@ -14846,7 +14846,7 @@ var _Start;
 
 
 
-class Start extends mixins.wl {
+class Start extends mixins.ei {
   constructor(props) {
     super(props);
     this.inputRef = external_React_default().createRef();
@@ -14946,7 +14946,7 @@ class Start extends mixins.wl {
       editing,
       topic
     } = this.state;
-    return external_React_default().createElement(modalDialogs.Z.ModalDialog, (0,esm_extends.Z)({}, this.state, {
+    return external_React_default().createElement(modalDialogs.M.ModalDialog, (0,esm_extends.c)({}, this.state, {
       name: NAMESPACE,
       className: NAMESPACE,
       stopKeyPropagation: editing,
@@ -14954,7 +14954,7 @@ class Start extends mixins.wl {
       onClose: () => this.props.onClose()
     }), external_React_default().createElement("div", {
       className: `${NAMESPACE}-preview`
-    }, external_React_default().createElement(preview.Z, {
+    }, external_React_default().createElement(preview.c, {
       context: NAMESPACE,
       onToggle: this.onStreamToggle
     })), external_React_default().createElement("div", {
@@ -14963,7 +14963,7 @@ class Start extends mixins.wl {
       className: `${NAMESPACE}-title`
     }, editing ? external_React_default().createElement(this.Input, null) : external_React_default().createElement("h2", {
       onClick: this.toggleEdit
-    }, external_React_default().createElement(utils.dy, null, topic)), external_React_default().createElement(meetings_button.Z, {
+    }, external_React_default().createElement(utils.O, null, topic)), external_React_default().createElement(meetings_button.c, {
       className: `
                                 mega-button
                                 action
@@ -14977,10 +14977,10 @@ class Start extends mixins.wl {
         position: 'top'
       },
       onClick: this.toggleEdit
-    }, external_React_default().createElement("span", null, l[1342]))), external_React_default().createElement(meetings_button.Z, {
+    }, external_React_default().createElement("span", null, l[1342]))), external_React_default().createElement(meetings_button.c, {
       className: "mega-button positive large start-meeting-button",
       onClick: this.startMeeting
-    }, external_React_default().createElement("span", null, l[7315])), external_React_default().createElement(ui_link.Z, {
+    }, external_React_default().createElement("span", null, l[7315])), external_React_default().createElement(ui_link.c, {
       to: "https://mega.io/chatandmeetings",
       target: "_blank"
     }, l.how_meetings_work)));
@@ -14998,15 +14998,15 @@ Start.STREAMS = {
   VIDEO: 2
 };
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
-var perfectScrollbar = __webpack_require__(285);
+var perfectScrollbar = __webpack_require__(447);
 // EXTERNAL MODULE: ./js/chat/ui/contacts.jsx
-var ui_contacts = __webpack_require__(13);
+var ui_contacts = __webpack_require__(40);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/invite.jsx
 
 
 
 
-class Invite extends mixins.wl {
+class Invite extends mixins.ei {
   constructor(props) {
     super(props);
     this.containerRef = external_React_default().createRef();
@@ -15139,7 +15139,7 @@ class Invite extends mixins.wl {
       className: "invite-section-list"
     }, children));
     if (hasMoreFrequents || contacts.length) {
-      return external_React_default().createElement(perfectScrollbar.F, {
+      return external_React_default().createElement(perfectScrollbar.e, {
         ref: this.wrapperRef,
         className: "invite-scroll-wrapper",
         options: {
@@ -15225,11 +15225,11 @@ class Invite extends mixins.wl {
 }
 Invite.NAMESPACE = 'meetings-invite';
 // EXTERNAL MODULE: ./js/chat/ui/meetings/schedule/helpers.jsx
-var helpers = __webpack_require__(435);
+var helpers = __webpack_require__(312);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/datepicker.jsx
 
 
-class Datepicker extends mixins.wl {
+class Datepicker extends mixins.ei {
   constructor(props) {
     super(props);
     this.OPTIONS = {
@@ -15346,7 +15346,7 @@ Datepicker.NAMESPACE = 'meetings-datepicker';
 
 
 
-class Select extends mixins.wl {
+class Select extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.containerRef = external_React_default().createRef();
@@ -15480,7 +15480,7 @@ class Select extends mixins.wl {
           value
         } = this.props;
         const prevDate = moment(value);
-        const inputTime = (0,helpers.K6)(manualTimeInput);
+        const inputTime = (0,helpers.g1)(manualTimeInput);
         prevDate.set({
           hours: inputTime.get('hours'),
           minutes: inputTime.get('minutes')
@@ -15509,7 +15509,7 @@ class Select extends mixins.wl {
                                 mega-input-dropdown
                                 ${this.state.expanded ? '' : 'hidden'}
                             `
-    }, external_React_default().createElement(perfectScrollbar.F, {
+    }, external_React_default().createElement(perfectScrollbar.e, {
       ref: this.menuRef,
       options: {
         suppressScrollX: true
@@ -15536,7 +15536,7 @@ Select.NAMESPACE = 'meetings-select';
 
 
 
-class DateTime extends mixins.wl {
+class DateTime extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.state = {
@@ -15559,7 +15559,7 @@ class DateTime extends mixins.wl {
       const {
         value
       } = ev.target;
-      const date = (0,helpers.p6)(value);
+      const date = (0,helpers.UH)(value);
       const timestamp = date.valueOf();
       const dateObj = new Date(timestamp);
       dateObj.setHours(initialDate.getHours(), initialDate.getMinutes());
@@ -15642,7 +15642,7 @@ class DateTime extends mixins.wl {
 
 
 
-class Recurring extends mixins.wl {
+class Recurring extends mixins.ei {
   constructor(props) {
     var _Object$values$find;
     super(props);
@@ -15719,7 +15719,7 @@ class Recurring extends mixins.wl {
       DAY: 'day',
       OFFSET: 'offset'
     };
-    this.initialEnd = (0,helpers.zI)(this.props.startDateTime, 6);
+    this.initialEnd = (0,helpers.Q9)(this.props.startDateTime, 6);
     this.initialWeekDays = Object.values(this.WEEK_DAYS).map(d => d.value);
     this.initialMonthDay = this.props.startDateTime ? new Date(this.props.startDateTime).getDate() : undefined;
     this.state = {
@@ -15844,7 +15844,7 @@ class Recurring extends mixins.wl {
       label
     }) => {
       const isCurrentlySelected = weekDays.includes(value);
-      return external_React_default().createElement(meetings_button.Z, {
+      return external_React_default().createElement(meetings_button.c, {
         key: value,
         className: `
                                 mega-button
@@ -16121,7 +16121,7 @@ class Recurring extends mixins.wl {
     }))))), this.renderEndControls());
   }
   renderNavigation(view) {
-    return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(meetings_button.Z, {
+    return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(meetings_button.c, {
       className: `
                         mega-button
                         action
@@ -16129,7 +16129,7 @@ class Recurring extends mixins.wl {
                         ${view === this.VIEWS.DAILY ? 'active' : ''}
                     `,
       onClick: () => this.toggleView(this.VIEWS.DAILY, this.FREQUENCIES.DAILY)
-    }, l.recurring_daily), external_React_default().createElement(meetings_button.Z, {
+    }, l.recurring_daily), external_React_default().createElement(meetings_button.c, {
       className: `
                         mega-button
                         action
@@ -16137,7 +16137,7 @@ class Recurring extends mixins.wl {
                         ${view === this.VIEWS.WEEKLY ? 'active' : ''}
                     `,
       onClick: () => this.toggleView(this.VIEWS.WEEKLY, this.FREQUENCIES.WEEKLY)
-    }, l.recurring_weekly), external_React_default().createElement(meetings_button.Z, {
+    }, l.recurring_weekly), external_React_default().createElement(meetings_button.c, {
       className: `
                         mega-button
                         action
@@ -16161,11 +16161,11 @@ class Recurring extends mixins.wl {
     if (this.state.view !== this.VIEWS.DAILY && nextState.view === this.VIEWS.DAILY) {
       nextState.weekDays = this.initialWeekDays;
     }
-    if (nextState.weekDays.length === Object.keys(this.WEEK_DAYS).length && this.state.view !== this.VIEWS.WEEKLY && nextState.view === this.VIEWS.WEEKLY || !(0,helpers.KC)(nextProps.startDateTime, this.props.startDateTime) && this.state.view === this.VIEWS.WEEKLY) {
+    if (nextState.weekDays.length === Object.keys(this.WEEK_DAYS).length && this.state.view !== this.VIEWS.WEEKLY && nextState.view === this.VIEWS.WEEKLY || !(0,helpers.EP)(nextProps.startDateTime, this.props.startDateTime) && this.state.view === this.VIEWS.WEEKLY) {
       const weekday = new Date(nextProps.startDateTime).getDay();
       nextState.weekDays = [weekday === 0 ? 7 : weekday];
     }
-    if (!(0,helpers.KC)(nextProps.startDateTime, this.props.startDateTime) && this.state.view === this.VIEWS.MONTHLY) {
+    if (!(0,helpers.EP)(nextProps.startDateTime, this.props.startDateTime) && this.state.view === this.VIEWS.MONTHLY) {
       var _Object$values$find2;
       const nextDate = new Date(nextProps.startDateTime);
       nextState.monthDays = [nextDate.getDate()];
@@ -16200,7 +16200,7 @@ class Recurring extends mixins.wl {
   }
 }
 Recurring.NAMESPACE = 'meetings-recurring';
-class Edit extends mixins.wl {
+class Edit extends mixins.ei {
   constructor(props) {
     super(props);
     this.occurrenceRef = null;
@@ -16336,7 +16336,7 @@ class Edit extends mixins.wl {
     if (callExpanded || overlayed) {
       dialogClasses.push('hidden');
     }
-    return external_React_default().createElement(modalDialogs.Z.ModalDialog, (0,esm_extends.Z)({}, this.state, {
+    return external_React_default().createElement(modalDialogs.M.ModalDialog, (0,esm_extends.c)({}, this.state, {
       id: Schedule.NAMESPACE,
       className: dialogClasses.join(' '),
       dialogName: Schedule.dialogName,
@@ -16352,7 +16352,7 @@ class Edit extends mixins.wl {
       className: "mega-banner body recurring-edit-banner"
     }, external_React_default().createElement("div", {
       className: "cell"
-    }, (0,utils.hV)(l.scheduled_edit_occurrence_note, '[A]', ui_link.Z, {
+    }, (0,utils.wH)(l.scheduled_edit_occurrence_note, '[A]', ui_link.c, {
       onClick: () => {
         onClose();
         megaChat.trigger(megaChat.plugins.meetingsManager.EVENTS.EDIT, chatRoom);
@@ -16369,7 +16369,7 @@ class Edit extends mixins.wl {
       datepickerRef: this.datepickerRefs.startDateTime,
       startDate: startDateTime,
       value: startDateTime,
-      filteredTimeIntervals: (0,helpers.nl)(startDateTime),
+      filteredTimeIntervals: (0,helpers.gb)(startDateTime),
       label: l.schedule_start_date,
       onMount: datepicker => {
         this.datepickerRefs.startDateTime = datepicker;
@@ -16395,7 +16395,7 @@ class Edit extends mixins.wl {
       datepickerRef: this.datepickerRefs.endDateTime,
       startDate: endDateTime,
       value: endDateTime,
-      filteredTimeIntervals: (0,helpers.nl)(endDateTime, startDateTime),
+      filteredTimeIntervals: (0,helpers.gb)(endDateTime, startDateTime),
       label: l.schedule_end_date,
       onMount: datepicker => {
         this.datepickerRefs.endDateTime = datepicker;
@@ -16412,7 +16412,7 @@ class Edit extends mixins.wl {
       onBlur: timestamp => timestamp && this.onEndDateSelect(timestamp)
     })))), external_React_default().createElement("footer", null, external_React_default().createElement("div", {
       className: "footer-container"
-    }, external_React_default().createElement(meetings_button.Z, {
+    }, external_React_default().createElement(meetings_button.c, {
       className: "mega-button positive",
       onClick: () => {
         const {
@@ -16434,7 +16434,7 @@ class Edit extends mixins.wl {
   }
 }
 // EXTERNAL MODULE: ./js/chat/chatRoom.jsx + 1 modules
-var chat_chatRoom = __webpack_require__(804);
+var chat_chatRoom = __webpack_require__(56);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/schedule.jsx
 
 var _Schedule;
@@ -16449,7 +16449,7 @@ var _Schedule;
 
 
 
-class Schedule extends mixins.wl {
+class Schedule extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.wrapperRef = external_React_default().createRef();
@@ -16459,12 +16459,12 @@ class Schedule extends mixins.wl {
     this.incomingCallListener = 'onIncomingCall.scheduleDialog';
     this.ringingStoppedListener = 'onRingingStopped.scheduleDialog';
     this.interval = ChatRoom.SCHEDULED_MEETINGS_INTERVAL;
-    this.nearestHalfHour = (0,helpers.Ny)();
+    this.nearestHalfHour = (0,helpers.W)();
     this.state = {
       topic: '',
       startDateTime: this.nearestHalfHour,
       endDateTime: this.nearestHalfHour + this.interval,
-      timezone: (0,helpers.Sv)(),
+      timezone: (0,helpers.oT)(),
       recurring: false,
       participants: [],
       link: false,
@@ -16556,7 +16556,7 @@ class Schedule extends mixins.wl {
           recurring
         } = this.state;
         if (recurring && recurring.end) {
-          const recurringEnd = (0,helpers.zI)(this.state.startDateTime, 6);
+          const recurringEnd = (0,helpers.Q9)(this.state.startDateTime, 6);
           this.datepickerRefs.recurringEnd.selectDate(new Date(recurringEnd));
         }
         if (callback) {
@@ -16627,7 +16627,7 @@ class Schedule extends mixins.wl {
     }
   }
   getFilteredTimeIntervals(timestamp, offsetFrom) {
-    const timeIntervals = (0,helpers.nl)(timestamp, offsetFrom);
+    const timeIntervals = (0,helpers.gb)(timestamp, offsetFrom);
     const {
       end
     } = this.scheduledMeetingRef || {};
@@ -16659,7 +16659,7 @@ class Schedule extends mixins.wl {
       this.state.topic = scheduledMeeting.title;
       this.state.startDateTime = scheduledMeeting.start;
       this.state.endDateTime = scheduledMeeting.end;
-      this.state.timezone = scheduledMeeting.timezone || (0,helpers.Sv)();
+      this.state.timezone = scheduledMeeting.timezone || (0,helpers.oT)();
       this.state.recurring = scheduledMeeting.recurring;
       this.state.participants = chatRoom.getParticipantsExceptMe();
       this.state.link = !!publicLink;
@@ -16749,7 +16749,7 @@ class Schedule extends mixins.wl {
       descriptionInvalid,
       overlayed
     } = this.state;
-    return external_React_default().createElement(modalDialogs.Z.ModalDialog, (0,esm_extends.Z)({}, this.state, {
+    return external_React_default().createElement(modalDialogs.M.ModalDialog, (0,esm_extends.c)({}, this.state, {
       id: Schedule.NAMESPACE,
       className: `
                     ${closeDialog ? 'with-confirmation-dialog' : ''}
@@ -16760,7 +16760,7 @@ class Schedule extends mixins.wl {
       onClose: () => isDirty ? this.handleToggle('closeDialog') : this.props.onClose()
     }), external_React_default().createElement(Header, {
       chatRoom: isEdit && this.props.chatRoom
-    }), external_React_default().createElement(perfectScrollbar.F, {
+    }), external_React_default().createElement(perfectScrollbar.e, {
       ref: this.wrapperRef,
       className: "fm-dialog-body",
       options: {
@@ -16911,7 +16911,7 @@ class Schedule extends mixins.wl {
       onToggle: this.handleToggle
     }), waitingRoom && openInvite ? external_React_default().createElement(Row, null, external_React_default().createElement("div", {
       className: "schedule-dialog-banner warn"
-    }, external_React_default().createElement(utils.Cw, null, l.waiting_room_invite.replace('[A]', `<a
+    }, external_React_default().createElement(utils.Ub, null, l.waiting_room_invite.replace('[A]', `<a
                                                 href="${l.mega_help_host}/wp-admin/post.php?post=3005&action=edit"
                                                 target="_blank"
                                                 class="clickurl">
@@ -16942,7 +16942,7 @@ const CloseDialog = ({
   onToggle,
   onClose
 }) => {
-  return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(modalDialogs.Z.ModalDialog, {
+  return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(modalDialogs.M.ModalDialog, {
     name: `${Schedule.NAMESPACE}-confirmation`,
     dialogType: "message",
     className: `
@@ -17138,7 +17138,7 @@ const Footer = ({
 }) => {
   return external_React_default().createElement("footer", null, external_React_default().createElement("div", {
     className: "footer-container"
-  }, external_React_default().createElement(meetings_button.Z, {
+  }, external_React_default().createElement(meetings_button.c, {
     className: `
                         mega-button
                         positive
@@ -17151,7 +17151,7 @@ const Footer = ({
 ;// CONCATENATED MODULE: ./js/ui/miniui.jsx
 
 
-class ToggleCheckbox extends mixins.wl {
+class ToggleCheckbox extends mixins.ei {
   constructor(props) {
     super(props);
     this.onToggle = () => {
@@ -17187,12 +17187,12 @@ const miniui = ({
   ToggleCheckbox
 });
 ;// CONCATENATED MODULE: ./js/chat/ui/startGroupChatWizard.jsx
-var React = __webpack_require__(363);
+var React = __webpack_require__(376);
 
 
 
 
-class StartGroupChatWizard extends mixins.wl {
+class StartGroupChatWizard extends mixins.ei {
   constructor(props) {
     super(props);
     this.inputContainerRef = React.createRef();
@@ -17440,7 +17440,7 @@ class StartGroupChatWizard extends mixins.wl {
         className: "group-chat-dialog description chatlinks-intermediate-msg"
       }, l[20573]) : null);
     }
-    return React.createElement(modalDialogs.Z.ModalDialog, {
+    return React.createElement(modalDialogs.M.ModalDialog, {
       step: self.state.step,
       title: this.props.flowType === 2 && self.state.createChatLink ? l[20638] : this.props.customDialogTitle || l[19483],
       className: classes,
@@ -17518,13 +17518,13 @@ const startGroupChatWizard = ({
   StartGroupChatWizard
 });
 // EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 11 modules
-var call = __webpack_require__(476);
+var call = __webpack_require__(144);
 // EXTERNAL MODULE: ./js/chat/ui/chatToaster.jsx
-var chatToaster = __webpack_require__(142);
+var chatToaster = __webpack_require__(464);
 ;// CONCATENATED MODULE: ./js/chat/ui/searchPanel/resultTable.jsx
 
 
-class ResultTable extends mixins.wl {
+class ResultTable extends mixins.ei {
   render() {
     const {
       heading,
@@ -17581,7 +17581,7 @@ const lastActivity = room => {
   }
   return l[8000];
 };
-class MessageRow extends mixins.wl {
+class MessageRow extends mixins.ei {
   render() {
     const {
       data,
@@ -17618,7 +17618,7 @@ class MessageRow extends mixins.wl {
       className: "user-card"
     }, external_React_default().createElement("span", {
       className: "title"
-    }, isGroup ? external_React_default().createElement(utils.a0, null, room.getRoomTitle()) : external_React_default().createElement(ui_contacts.ContactAwareName, {
+    }, isGroup ? external_React_default().createElement(utils.Sm, null, room.getRoomTitle()) : external_React_default().createElement(ui_contacts.ContactAwareName, {
       contact: M.u[contact],
       overflow: true
     })), isGroup ? null : external_React_default().createElement(ui_contacts.ContactPresence, {
@@ -17629,7 +17629,7 @@ class MessageRow extends mixins.wl {
       className: "message-result-info"
     }, external_React_default().createElement("div", {
       className: "summary"
-    }, external_React_default().createElement(utils.nF, {
+    }, external_React_default().createElement(utils.yg, {
       content: megaChat.highlight(summary, matches, true)
     })), external_React_default().createElement("div", {
       className: "result-separator"
@@ -17640,7 +17640,7 @@ class MessageRow extends mixins.wl {
     }, getTimeMarker(data.delay, true)))));
   }
 }
-class ChatRow extends mixins.wl {
+class ChatRow extends mixins.ei {
   render() {
     const {
       room,
@@ -17664,12 +17664,12 @@ class ChatRow extends mixins.wl {
       className: USER_CARD_CLASS
     }, external_React_default().createElement("div", {
       className: "graphic"
-    }, external_React_default().createElement(utils.nF, null, result)), lastActivity(room)), external_React_default().createElement("div", {
+    }, external_React_default().createElement(utils.yg, null, result)), lastActivity(room)), external_React_default().createElement("div", {
       className: "clear"
     }));
   }
 }
-class MemberRow extends mixins.wl {
+class MemberRow extends mixins.ei {
   render() {
     const {
       data,
@@ -17697,7 +17697,7 @@ class MemberRow extends mixins.wl {
       className: USER_CARD_CLASS
     }, external_React_default().createElement("div", {
       className: "graphic"
-    }, isGroup ? external_React_default().createElement(utils.nF, null, megaChat.highlight(megaChat.html(room.getRoomTitle()), matches, true)) : external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(utils.nF, null, megaChat.highlight(megaChat.html(nicknames.getNickname(data)), matches, true)), external_React_default().createElement(ui_contacts.ContactPresence, {
+    }, isGroup ? external_React_default().createElement(utils.yg, null, megaChat.highlight(megaChat.html(room.getRoomTitle()), matches, true)) : external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(utils.yg, null, megaChat.highlight(megaChat.html(nicknames.getNickname(data)), matches, true)), external_React_default().createElement(ui_contacts.ContactPresence, {
       contact: contact
     }))), lastActivity(room)), external_React_default().createElement("div", {
       className: "clear"
@@ -17721,12 +17721,12 @@ const NilRow = ({
   }), external_React_default().createElement("span", null, LABEL.NO_RESULTS), isFirstQuery && external_React_default().createElement("div", {
     className: "search-messages",
     onClick: onSearchMessages
-  }, external_React_default().createElement(utils.nF, {
+  }, external_React_default().createElement(utils.yg, {
     tag: "div",
     content: label
   }))));
 };
-class ResultRow extends mixins.wl {
+class ResultRow extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.setActive = nodeRef => {
@@ -17767,7 +17767,7 @@ class ResultRow extends mixins.wl {
         case TYPE.CHAT:
           return external_React_default().createElement(ChatRow, PROPS);
         case TYPE.MEMBER:
-          return external_React_default().createElement(MemberRow, (0,esm_extends.Z)({}, PROPS, {
+          return external_React_default().createElement(MemberRow, (0,esm_extends.c)({}, PROPS, {
             contact: M.u[data]
           }));
         default:
@@ -17805,7 +17805,7 @@ const LABEL = {
   SEARCH_PAUSED: l[23549],
   SEARCH_COMPLETE: l[23546]
 };
-class ResultContainer extends mixins.wl {
+class ResultContainer extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.renderResults = (results, status, isFirstQuery, onSearchMessages) => {
@@ -17890,7 +17890,7 @@ var _SearchField;
 
 const SEARCH_STATUS_CLASS = 'search-field-status';
 const BASE_ICON_CLASS = 'sprite-fm-mono';
-class SearchField extends mixins.wl {
+class SearchField extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.state = {
@@ -18017,7 +18017,7 @@ const ACTIONS = {
   RESUME: 'resume'
 };
 const SEARCH_PANEL_CLASS = `search-panel`;
-class SearchPanel extends mixins.wl {
+class SearchPanel extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.wrapperRef = null;
@@ -18164,7 +18164,7 @@ class SearchPanel extends mixins.wl {
       onChange: this.handleChange,
       onToggle: this.handleToggle,
       onReset: this.handleReset
-    }), external_React_default().createElement(perfectScrollbar.F, {
+    }), external_React_default().createElement(perfectScrollbar.e, {
       className: "search-results-wrapper",
       ref: wrapper => {
         this.wrapperRef = wrapper;
@@ -18181,13 +18181,13 @@ class SearchPanel extends mixins.wl {
   }
 }
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
-var buttons = __webpack_require__(204);
+var buttons = __webpack_require__(536);
 ;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/navigation.jsx
 
 
 
 
-class Navigation extends mixins.wl {
+class Navigation extends mixins.ei {
   constructor(props) {
     super(props);
     this.state = {
@@ -18243,7 +18243,7 @@ class Navigation extends mixins.wl {
                         ${view === CHATS && routingSection === 'chat' ? 'active' : ''}
                     `,
       onClick: () => renderView(CHATS)
-    }, external_React_default().createElement(buttons.z, {
+    }, external_React_default().createElement(buttons.q, {
       unreadChats: unreadChats,
       className: `${LeftPanel.NAMESPACE}-nav-button`,
       icon: "sprite-fm-mono icon-chat-filled"
@@ -18256,7 +18256,7 @@ class Navigation extends mixins.wl {
                         ${view === MEETINGS && routingSection === 'chat' ? 'active' : ''}
                     `,
       onClick: () => renderView(MEETINGS)
-    }, external_React_default().createElement(buttons.z, {
+    }, external_React_default().createElement(buttons.q, {
       unreadMeetings: unreadMeetings,
       className: `${LeftPanel.NAMESPACE}-nav-button`,
       icon: "sprite-fm-mono icon-video-call-filled"
@@ -18269,7 +18269,7 @@ class Navigation extends mixins.wl {
                             ${routingSection === 'contacts' ? 'active' : ''}
                         `,
       onClick: () => loadSubPage('fm/chat/contacts')
-    }, external_React_default().createElement(buttons.z, {
+    }, external_React_default().createElement(buttons.q, {
       className: `${LeftPanel.NAMESPACE}-nav-button`,
       contactRequests: contactRequests,
       icon: "sprite-fm-mono icon-contacts"
@@ -18282,7 +18282,7 @@ class Navigation extends mixins.wl {
   }
 }
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
-var dropdowns = __webpack_require__(78);
+var dropdowns = __webpack_require__(868);
 ;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/actions.jsx
 
 
@@ -18290,7 +18290,7 @@ var dropdowns = __webpack_require__(78);
 
 
 
-class Actions extends mixins.wl {
+class Actions extends mixins.ei {
   render() {
     const {
       view,
@@ -18310,9 +18310,9 @@ class Actions extends mixins.wl {
     }
     return external_React_default().createElement("div", {
       className: `${LeftPanel.NAMESPACE}-action-buttons`
-    }, view === LOADING && external_React_default().createElement(buttons.z, {
+    }, view === LOADING && external_React_default().createElement(buttons.q, {
       className: "mega-button action loading-sketch"
-    }, external_React_default().createElement("i", null), external_React_default().createElement("span", null)), view === CHATS && routingSection !== 'contacts' && external_React_default().createElement(buttons.z, {
+    }, external_React_default().createElement("i", null), external_React_default().createElement("span", null)), view === CHATS && routingSection !== 'contacts' && external_React_default().createElement(buttons.q, {
       className: "mega-button action",
       icon: "sprite-fm-mono icon-add-circle",
       label: l.add_chat
@@ -18336,7 +18336,7 @@ class Actions extends mixins.wl {
         onClick: createGroupChat
       }],
       showAddContact: contactsPanel["default"].hasContacts()
-    })), view === MEETINGS && routingSection !== 'contacts' && external_React_default().createElement(buttons.z, {
+    })), view === MEETINGS && routingSection !== 'contacts' && external_React_default().createElement(buttons.q, {
       className: "mega-button action",
       icon: "sprite-fm-mono icon-add-circle",
       label: l.create_meeting
@@ -18358,7 +18358,7 @@ class Actions extends mixins.wl {
       icon: "sprite-fm-mono icon-calendar2",
       label: l.schedule_meeting_start,
       onClick: scheduleMeeting
-    }))), routingSection === 'contacts' && external_React_default().createElement(buttons.z, {
+    }))), routingSection === 'contacts' && external_React_default().createElement(buttons.q, {
       className: "mega-button action",
       icon: "sprite-fm-mono icon-add-circle",
       label: l[71],
@@ -18367,7 +18367,7 @@ class Actions extends mixins.wl {
   }
 }
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
-var applyDecoratedDescriptor = __webpack_require__(229);
+var applyDecoratedDescriptor = __webpack_require__(888);
 ;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/conversationsListItem.jsx
 
 var _dec, _dec2, _class;
@@ -18375,7 +18375,7 @@ var _dec, _dec2, _class;
 
 
 
-let ConversationsListItem = (_dec = utils.ZP.SoonFcWrap(40, true), _dec2 = (0,mixins.LY)(0.7, 8), (_class = class ConversationsListItem extends mixins.wl {
+let ConversationsListItem = (_dec = utils.cp.SoonFcWrap(40, true), _dec2 = (0,mixins.CI)(0.7, 8), (_class = class ConversationsListItem extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.state = {
@@ -18527,7 +18527,7 @@ let ConversationsListItem = (_dec = utils.ZP.SoonFcWrap(40, true), _dec2 = (0,mi
       }
       lastMessageDiv = external_React_default().createElement("div", {
         className: lastMsgDivClasses
-      }, external_React_default().createElement(utils.Cw, null, renderableSummary));
+      }, external_React_default().createElement(utils.Ub, null, renderableSummary));
       if (lastMessage.textContents && lastMessage.textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP && lastMessage.getAttachmentMeta()[0]) {
         const playTime = secondsToTimeShort(lastMessage.getAttachmentMeta()[0].playtime);
         lastMessageDiv = external_React_default().createElement("div", {
@@ -18552,11 +18552,11 @@ let ConversationsListItem = (_dec = utils.ZP.SoonFcWrap(40, true), _dec2 = (0,mi
     if (chatRoom.type !== "public") {
       nameClassString += " privateChat";
     }
-    let roomTitle = external_React_default().createElement(utils.nF, null, megaChat.html(chatRoom.getRoomTitle()));
+    let roomTitle = external_React_default().createElement(utils.yg, null, megaChat.html(chatRoom.getRoomTitle()));
     if (chatRoom.type === "private") {
       roomTitle = external_React_default().createElement("span", null, external_React_default().createElement("div", {
         className: "user-card-wrapper"
-      }, external_React_default().createElement(utils.nF, null, megaChat.html(chatRoom.getRoomTitle()))));
+      }, external_React_default().createElement(utils.yg, null, megaChat.html(chatRoom.getRoomTitle()))));
     }
     nameClassString += chatRoom.type === "private" || chatRoom.type === "group" ? ' badge-pad' : '';
     const {
@@ -18629,13 +18629,13 @@ let ConversationsListItem = (_dec = utils.ZP.SoonFcWrap(40, true), _dec2 = (0,mi
       className: `unread-messages items-${notificationItems.length}`
     }, notificationItems)) : null));
   }
-}, ((0,applyDecoratedDescriptor.Z)(_class.prototype, "eventuallyScrollTo", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "eventuallyScrollTo"), _class.prototype), (0,applyDecoratedDescriptor.Z)(_class.prototype, "render", [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, "render"), _class.prototype)), _class));
+}, ((0,applyDecoratedDescriptor.c)(_class.prototype, "eventuallyScrollTo", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "eventuallyScrollTo"), _class.prototype), (0,applyDecoratedDescriptor.c)(_class.prototype, "render", [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, "render"), _class.prototype)), _class));
 
 ;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/toggle.jsx
 
 
 
-class TogglePanel extends mixins.wl {
+class TogglePanel extends mixins.ei {
   componentDidUpdate() {
     super.componentDidUpdate();
     const {
@@ -18684,7 +18684,7 @@ TogglePanel.KEYS = {
   PAST: 'past',
   ARCHIVE: 'archive'
 };
-class Toggle extends mixins.wl {
+class Toggle extends mixins.ei {
   constructor(props) {
     super(props);
     this.state = {
@@ -18764,7 +18764,7 @@ class Toggle extends mixins.wl {
 
 
 
-class ConversationsList extends mixins.wl {
+class ConversationsList extends mixins.ei {
   constructor(props) {
     super(props);
     this.backgroundUpdateInterval = null;
@@ -18842,7 +18842,7 @@ class ConversationsList extends mixins.wl {
       conversations,
       onConversationClick
     } = this.props;
-    return external_React_default().createElement(perfectScrollbar.F, {
+    return external_React_default().createElement(perfectScrollbar.e, {
       className: "chat-lp-scroll-area",
       ref: ref => {
         megaChat.$chatTreePanePs = ref;
@@ -18904,7 +18904,7 @@ ConversationsList.defaultProps = {
 
 
 
-class LeftPanel extends mixins.wl {
+class LeftPanel extends mixins.ei {
   renderConversations(type) {
     const {
       view,
@@ -18951,7 +18951,7 @@ class LeftPanel extends mixins.wl {
       createGroupChat
     } = this.props;
     const IS_LOADING = view === views.LOADING;
-    return external_React_default().createElement("div", (0,esm_extends.Z)({
+    return external_React_default().createElement("div", (0,esm_extends.c)({
       className: `
                     fm-left-panel
                     chat-lp-body
@@ -19024,7 +19024,7 @@ const VIEWS = {
 const conversations_EVENTS = {
   NAV_RENDER_VIEW: 'navRenderView'
 };
-class ConversationsApp extends mixins.wl {
+class ConversationsApp extends mixins.ei {
   constructor(props) {
     super(props);
     this.chatRoomRef = null;
@@ -19043,7 +19043,7 @@ class ConversationsApp extends mixins.wl {
   }
   startMeeting() {
     if (megaChat.hasSupportForCalls) {
-      return (0,call.xt)().then(() => this.setState({
+      return (0,call.OO)().then(() => this.setState({
         startMeetingDialog: true
       })).catch(() => d && console.warn('Already in a call.'));
     }
@@ -19226,14 +19226,14 @@ class ConversationsApp extends mixins.wl {
                     in-chat
                     ${is_chatlink ? 'chatlink' : ''}
                 `
-    }, !isLoading && external_React_default().createElement(chatToaster.Z, {
+    }, !isLoading && external_React_default().createElement(chatToaster.c, {
       isRootToaster: true
     }), !isLoading && routingSection === 'contacts' && external_React_default().createElement(contactsPanel["default"], {
       megaChat: megaChat,
       contacts: M.u,
       received: M.ipc,
       sent: M.opc
-    }), !isLoading && routingSection === 'notFound' && external_React_default().createElement("span", null, external_React_default().createElement("center", null, "Section not found")), !isLoading && isEmpty && external_React_default().createElement(conversationpanel.L2, {
+    }), !isLoading && routingSection === 'notFound' && external_React_default().createElement("span", null, external_React_default().createElement("center", null, "Section not found")), !isLoading && isEmpty && external_React_default().createElement(conversationpanel.EB, {
       isMeeting: view === MEETINGS,
       onNewChat: () => this.setState({
         startGroupChatDialog: true
@@ -19242,7 +19242,7 @@ class ConversationsApp extends mixins.wl {
       onScheduleMeeting: () => this.setState({
         scheduleMeetingDialog: true
       })
-    }), !isLoading && external_React_default().createElement(conversationpanel.GY, (0,esm_extends.Z)({}, this.props, {
+    }), !isLoading && external_React_default().createElement(conversationpanel.A3, (0,esm_extends.c)({}, this.props, {
       className: routingSection === 'chat' ? '' : 'hidden',
       routingSection: routingSection,
       currentlyOpenedChat: currentlyOpenedChat,
@@ -19250,7 +19250,7 @@ class ConversationsApp extends mixins.wl {
       chatUIFlags: chatUIFlags,
       onToggleExpandedFlag: () => {
         this.setState(() => ({
-          callExpanded: call.ZP.isExpanded()
+          callExpanded: call.cp.isExpanded()
         }));
       },
       onMount: () => {
@@ -19334,31 +19334,31 @@ const conversations = ({
 
 /***/ }),
 
-/***/ 722:
+/***/ 966:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  bl: () => (API),
-  wS: () => (LABELS),
-  ZP: () => (GifPanel)
+  We: () => (API),
+  Ke: () => (LABELS),
+  cp: () => (GifPanel)
 });
 
 // EXTERNAL MODULE: external "React"
-var external_React_ = __webpack_require__(363);
+var external_React_ = __webpack_require__(376);
 var external_React_default = __webpack_require__.n(external_React_);
 // EXTERNAL MODULE: ./js/chat/mixins.js
-var mixins = __webpack_require__(503);
+var mixins = __webpack_require__(436);
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
-var perfectScrollbar = __webpack_require__(285);
+var perfectScrollbar = __webpack_require__(447);
 ;// CONCATENATED MODULE: ./js/chat/ui/gifPanel/searchField.jsx
 var _SearchField;
 
 
 
-class SearchField extends mixins.wl {
+class SearchField extends mixins.ei {
   render() {
     const {
       value,
@@ -19402,7 +19402,7 @@ SearchField.hasValue = () => _SearchField.inputRef && _SearchField.inputRef.curr
 
 
 
-class Result extends mixins.wl {
+class Result extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.resultRef = external_React_default().createRef();
@@ -19461,7 +19461,7 @@ const Nil = ({
 }, external_React_default().createElement("i", {
   className: "huge-icon sad-smile"
 }), external_React_default().createElement("span", null, children)));
-class ResultContainer extends mixins.wl {
+class ResultContainer extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.intersectionObserver = null;
@@ -19596,7 +19596,7 @@ const LABELS = {
   NO_RESULTS: l[24050],
   NOT_AVAILABLE: l[24512]
 };
-class GifPanel extends mixins.wl {
+class GifPanel extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.pathRef = '';
@@ -19781,7 +19781,7 @@ class GifPanel extends mixins.wl {
       onBack: this.handleBack
     })), external_React_default().createElement("div", {
       className: "gif-panel-content"
-    }, external_React_default().createElement(perfectScrollbar.F, {
+    }, external_React_default().createElement(perfectScrollbar.e, {
       ref: container => {
         this.resultContainerRef = container;
       },
@@ -19801,29 +19801,29 @@ class GifPanel extends mixins.wl {
 
 /***/ }),
 
-/***/ 192:
+/***/ 328:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  Z: () => (HistoryPanel)
+  c: () => (HistoryPanel)
 });
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
-var applyDecoratedDescriptor = __webpack_require__(229);
+var applyDecoratedDescriptor = __webpack_require__(888);
 // EXTERNAL MODULE: external "React"
-var external_React_ = __webpack_require__(363);
+var external_React_ = __webpack_require__(376);
 var external_React_default = __webpack_require__.n(external_React_);
 // EXTERNAL MODULE: ./js/chat/mixins.js
-var mixins = __webpack_require__(503);
+var mixins = __webpack_require__(436);
 // EXTERNAL MODULE: ./js/ui/utils.jsx
-var utils = __webpack_require__(79);
+var utils = __webpack_require__(240);
 ;// CONCATENATED MODULE: ./js/chat/ui/messages/alterParticipants.jsx
-var React = __webpack_require__(363);
-var ContactsUI = __webpack_require__(13);
-var ConversationMessageMixin = (__webpack_require__(416).y);
+var React = __webpack_require__(376);
+var ContactsUI = __webpack_require__(40);
+var ConversationMessageMixin = (__webpack_require__(564).o);
 
 class AltPartsConvMessage extends ConversationMessageMixin {
   haveMoreContactListeners() {
@@ -19884,10 +19884,10 @@ class AltPartsConvMessage extends ConversationMessageMixin {
         className: "message",
         contact: otherContact,
         chatRoom: self.props.chatRoom,
-        label: React.createElement(utils.dy, null, otherDisplayName)
+        label: React.createElement(utils.O, null, otherDisplayName)
       }), datetime, React.createElement("div", {
         className: "message text-block"
-      }, React.createElement(utils.Cw, null, text)))));
+      }, React.createElement(utils.Ub, null, text)))));
     });
     message.meta.excluded.forEach(function (h) {
       var otherContact = M.u[h] ? M.u[h] : {
@@ -19917,19 +19917,19 @@ class AltPartsConvMessage extends ConversationMessageMixin {
         className: "message",
         chatRoom: self.props.chatRoom,
         contact: otherContact,
-        label: React.createElement(utils.dy, null, otherDisplayName)
+        label: React.createElement(utils.O, null, otherDisplayName)
       }), datetime, React.createElement("div", {
         className: "message text-block"
-      }, React.createElement(utils.Cw, null, text)))));
+      }, React.createElement(utils.Ub, null, text)))));
     });
     return React.createElement("div", null, messages);
   }
 }
 
 ;// CONCATENATED MODULE: ./js/chat/ui/messages/truncated.jsx
-var truncated_React = __webpack_require__(363);
-var truncated_ContactsUI = __webpack_require__(13);
-var truncated_ConversationMessageMixin = (__webpack_require__(416).y);
+var truncated_React = __webpack_require__(376);
+var truncated_ContactsUI = __webpack_require__(40);
+var truncated_ConversationMessageMixin = (__webpack_require__(564).o);
 
 class TruncatedMessage extends truncated_ConversationMessageMixin {
   render() {
@@ -19973,7 +19973,7 @@ class TruncatedMessage extends truncated_ConversationMessageMixin {
     }, truncated_React.createElement(truncated_ContactsUI.ContactButton, {
       contact: contact,
       className: "message",
-      label: truncated_React.createElement(utils.dy, null, displayName),
+      label: truncated_React.createElement(utils.O, null, displayName),
       chatRoom: chatRoom
     }), datetime, truncated_React.createElement("div", {
       className: "message text-block"
@@ -19982,9 +19982,9 @@ class TruncatedMessage extends truncated_ConversationMessageMixin {
 }
 
 ;// CONCATENATED MODULE: ./js/chat/ui/messages/privilegeChange.jsx
-var privilegeChange_React = __webpack_require__(363);
-var privilegeChange_ContactsUI = __webpack_require__(13);
-var privilegeChange_ConversationMessageMixin = (__webpack_require__(416).y);
+var privilegeChange_React = __webpack_require__(376);
+var privilegeChange_ContactsUI = __webpack_require__(40);
+var privilegeChange_ConversationMessageMixin = (__webpack_require__(564).o);
 
 class PrivilegeChange extends privilegeChange_ConversationMessageMixin {
   haveMoreContactListeners() {
@@ -20045,18 +20045,18 @@ class PrivilegeChange extends privilegeChange_ConversationMessageMixin {
       className: "message",
       chatRoom: self.props.chatRoom,
       contact: otherContact,
-      label: privilegeChange_React.createElement(utils.dy, null, otherDisplayName)
+      label: privilegeChange_React.createElement(utils.O, null, otherDisplayName)
     }), datetime, privilegeChange_React.createElement("div", {
       className: "message text-block"
-    }, privilegeChange_React.createElement(utils.Cw, null, text)))));
+    }, privilegeChange_React.createElement(utils.Ub, null, text)))));
     return privilegeChange_React.createElement("div", null, messages);
   }
 }
 
 ;// CONCATENATED MODULE: ./js/chat/ui/messages/topicChange.jsx
-var topicChange_React = __webpack_require__(363);
-var topicChange_ContactsUI = __webpack_require__(13);
-var topicChange_ConversationMessageMixin = (__webpack_require__(416).y);
+var topicChange_React = __webpack_require__(376);
+var topicChange_ContactsUI = __webpack_require__(40);
+var topicChange_ConversationMessageMixin = (__webpack_require__(564).o);
 
 class TopicChange extends topicChange_ConversationMessageMixin {
   render() {
@@ -20098,18 +20098,18 @@ class TopicChange extends topicChange_ConversationMessageMixin {
       className: "message",
       chatRoom: chatRoom,
       contact: contact,
-      label: topicChange_React.createElement(utils.dy, null, displayName)
+      label: topicChange_React.createElement(utils.O, null, displayName)
     }), datetime, topicChange_React.createElement("div", {
       className: "message text-block"
-    }, topicChange_React.createElement(utils.Cw, null, (chatRoom.scheduledMeeting ? l.schedule_mgmt_title.replace('%1', `<strong>${oldTopic}</strong>`) : l[9081]).replace('%s', `<strong>${topic}</strong>`))))));
+    }, topicChange_React.createElement(utils.Ub, null, (chatRoom.scheduledMeeting ? l.schedule_mgmt_title.replace('%1', `<strong>${oldTopic}</strong>`) : l[9081]).replace('%s', `<strong>${topic}</strong>`))))));
     return topicChange_React.createElement("div", null, messages);
   }
 }
 
 ;// CONCATENATED MODULE: ./js/chat/ui/messages/closeOpenMode.jsx
-var closeOpenMode_React = __webpack_require__(363);
-var closeOpenMode_ContactsUI = __webpack_require__(13);
-var closeOpenMode_ConversationMessageMixin = (__webpack_require__(416).y);
+var closeOpenMode_React = __webpack_require__(376);
+var closeOpenMode_ContactsUI = __webpack_require__(40);
+var closeOpenMode_ConversationMessageMixin = (__webpack_require__(564).o);
 
 class CloseOpenModeMessage extends closeOpenMode_ConversationMessageMixin {
   render() {
@@ -20151,16 +20151,16 @@ class CloseOpenModeMessage extends closeOpenMode_ConversationMessageMixin {
       className: "message content-area small-info-txt selectable-txt"
     }, closeOpenMode_React.createElement("div", {
       className: "message user-card-name"
-    }, closeOpenMode_React.createElement(utils.dy, null, displayName)), datetime, closeOpenMode_React.createElement("div", {
+    }, closeOpenMode_React.createElement(utils.O, null, displayName)), datetime, closeOpenMode_React.createElement("div", {
       className: "message text-block"
     }, l[20569])));
   }
 }
 
 ;// CONCATENATED MODULE: ./js/chat/ui/messages/chatHandle.jsx
-var chatHandle_React = __webpack_require__(363);
-var chatHandle_ContactsUI = __webpack_require__(13);
-var chatHandle_ConversationMessageMixin = (__webpack_require__(416).y);
+var chatHandle_React = __webpack_require__(376);
+var chatHandle_ContactsUI = __webpack_require__(40);
+var chatHandle_ConversationMessageMixin = (__webpack_require__(564).o);
 
 class ChatHandleMessage extends chatHandle_ConversationMessageMixin {
   render() {
@@ -20202,26 +20202,26 @@ class ChatHandleMessage extends chatHandle_ConversationMessageMixin {
       className: "message content-area small-info-txt selectable-txt"
     }, chatHandle_React.createElement("div", {
       className: "message user-card-name"
-    }, chatHandle_React.createElement(utils.dy, null, displayName)), datetime, chatHandle_React.createElement("div", {
+    }, chatHandle_React.createElement(utils.O, null, displayName)), datetime, chatHandle_React.createElement("div", {
       className: "message text-block"
     }, message.meta.handleUpdate === 1 ? l[20570] : l[20571])));
   }
 }
 
 // EXTERNAL MODULE: ./js/chat/ui/messages/generic.jsx + 14 modules
-var generic = __webpack_require__(931);
+var generic = __webpack_require__(248);
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
-var perfectScrollbar = __webpack_require__(285);
+var perfectScrollbar = __webpack_require__(447);
 // EXTERNAL MODULE: ./js/chat/ui/messages/mixin.jsx
-var mixin = __webpack_require__(416);
+var mixin = __webpack_require__(564);
 // EXTERNAL MODULE: ./js/chat/ui/contacts.jsx
-var contacts = __webpack_require__(13);
+var contacts = __webpack_require__(40);
 ;// CONCATENATED MODULE: ./js/chat/ui/messages/retentionChange.jsx
 
 
 
 
-class RetentionChange extends mixin.y {
+class RetentionChange extends mixin.o {
   render() {
     const {
       message
@@ -20239,7 +20239,7 @@ class RetentionChange extends mixin.y {
     }, external_React_default().createElement(contacts.ContactButton, {
       contact: contact,
       className: "message",
-      label: external_React_default().createElement(utils.dy, null, M.getNameByHandle(contact.u))
+      label: external_React_default().createElement(utils.O, null, M.getNameByHandle(contact.u))
     }), external_React_default().createElement("div", {
       className: "message date-time simpletip",
       "data-simpletip": time2date(this.getTimestamp(), 17)
@@ -20249,9 +20249,9 @@ class RetentionChange extends mixin.y {
   }
 }
 // EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 11 modules
-var call = __webpack_require__(476);
+var call = __webpack_require__(144);
 // EXTERNAL MODULE: ./js/chat/ui/messages/scheduleMetaChange.jsx
-var scheduleMetaChange = __webpack_require__(97);
+var scheduleMetaChange = __webpack_require__(808);
 ;// CONCATENATED MODULE: ./js/chat/ui/historyPanel.jsx
 
 var _dec, _class;
@@ -20269,7 +20269,7 @@ var _dec, _class;
 
 
 
-let HistoryPanel = (_dec = (0,mixins.M9)(450, true), (_class = class HistoryPanel extends mixins.wl {
+let HistoryPanel = (_dec = (0,mixins.aS)(450, true), (_class = class HistoryPanel extends mixins.ei {
   constructor(props) {
     super(props);
     this.$container = null;
@@ -20503,7 +20503,7 @@ let HistoryPanel = (_dec = (0,mixins.M9)(450, true), (_class = class HistoryPane
     if (!self.$messages) {
       return;
     }
-    if (call.ZP.isExpanded()) {
+    if (call.cp.isExpanded()) {
       const $container = $('.meetings-call');
       const $messages = $('.js-messages-scroll-area', $container);
       const $textarea = $('.chat-textarea-block', $container);
@@ -20652,16 +20652,16 @@ let HistoryPanel = (_dec = (0,mixins.M9)(450, true), (_class = class HistoryPane
           key: "initialMsg"
         }, external_React_default().createElement("div", {
           className: "header"
-        }, external_React_default().createElement(utils.Cw, {
+        }, external_React_default().createElement(utils.Ub, {
           tag: "div",
           content: room.scheduledMeeting ? megaChat.html(room.getRoomTitle()) : headerText
         })), external_React_default().createElement("div", {
           className: "info"
         }, l[8080], external_React_default().createElement("p", null, external_React_default().createElement("i", {
           className: "sprite-fm-mono icon-lock"
-        }), external_React_default().createElement(utils.Cw, null, l[8540].replace("[S]", "<strong>").replace("[/S]", "</strong>"))), external_React_default().createElement("p", null, external_React_default().createElement("i", {
+        }), external_React_default().createElement(utils.Ub, null, l[8540].replace("[S]", "<strong>").replace("[/S]", "</strong>"))), external_React_default().createElement("p", null, external_React_default().createElement("i", {
           className: "sprite-fm-mono icon-accept"
-        }), external_React_default().createElement(utils.Cw, null, l[8539].replace("[S]", "<strong>").replace("[/S]", "</strong>"))))));
+        }), external_React_default().createElement(utils.Ub, null, l[8539].replace("[S]", "<strong>").replace("[/S]", "</strong>"))))));
       }
     }
     var lastTimeMarker;
@@ -20811,7 +20811,7 @@ let HistoryPanel = (_dec = (0,mixins.M9)(450, true), (_class = class HistoryPane
           if (!v.chatRoom) {
             v.chatRoom = room;
           }
-          messagesList.push(external_React_default().createElement(generic.Z, {
+          messagesList.push(external_React_default().createElement(generic.c, {
             message: v,
             state: v.state,
             key: v.messageId,
@@ -20867,7 +20867,7 @@ let HistoryPanel = (_dec = (0,mixins.M9)(450, true), (_class = class HistoryPane
       className: "dropdown notification-text"
     }, external_React_default().createElement("i", {
       className: "small-icon conversations"
-    }), l[8884])), external_React_default().createElement(perfectScrollbar.F, {
+    }), l[8884])), external_React_default().createElement(perfectScrollbar.e, {
       onFirstInit: ps => {
         ps.scrollToBottom(true);
         this.props.chatRoom.scrolledToBottom = 1;
@@ -20922,24 +20922,24 @@ let HistoryPanel = (_dec = (0,mixins.M9)(450, true), (_class = class HistoryPane
       }
     }), messagesList))), this.renderToast());
   }
-}, ((0,applyDecoratedDescriptor.Z)(_class.prototype, "enableScrollbar", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "enableScrollbar"), _class.prototype)), _class));
+}, ((0,applyDecoratedDescriptor.c)(_class.prototype, "enableScrollbar", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "enableScrollbar"), _class.prototype)), _class));
 
 
 /***/ }),
 
-/***/ 941:
+/***/ 620:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-Z: () => (Link)
+c: () => (Link)
 });
-var react0__ = __webpack_require__(363);
+var react0__ = __webpack_require__(376);
 var react0 = __webpack_require__.n(react0__);
-var _mixins1__ = __webpack_require__(503);
+var _mixins1__ = __webpack_require__(436);
 
 
-class Link extends _mixins1__.wl {
+class Link extends _mixins1__.ei {
   constructor(props) {
     super(props);
     this.IS_CLICK_URL = undefined;
@@ -20985,19 +20985,19 @@ class Link extends _mixins1__.wl {
 
 /***/ }),
 
-/***/ 193:
+/***/ 600:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-Z: () => (__WEBPACK_DEFAULT_EXPORT__)
+c: () => (__WEBPACK_DEFAULT_EXPORT__)
 });
-var react0__ = __webpack_require__(363);
+var react0__ = __webpack_require__(376);
 var react0 = __webpack_require__.n(react0__);
-var _mixins1__ = __webpack_require__(503);
+var _mixins1__ = __webpack_require__(436);
 
 
-class Group extends _mixins1__.wl {
+class Group extends _mixins1__.ei {
   constructor(props) {
     super(props);
     this.containerRef = react0().createRef();
@@ -21065,7 +21065,7 @@ class Group extends _mixins1__.wl {
 }
 Group.NAMESPACE = 'buttonGroup';
 Group.BASE_CLASS = 'button-group';
-class Button extends _mixins1__.wl {
+class Button extends _mixins1__.ei {
   constructor(...args) {
     super(...args);
     this.buttonRef = react0().createRef();
@@ -21113,43 +21113,43 @@ const __WEBPACK_DEFAULT_EXPORT__ = (Button);
 
 /***/ }),
 
-/***/ 476:
+/***/ 144:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  F3: () => (EXPANDED_FLAG),
-  IK: () => (MODE),
-  wD: () => (TYPE),
-  t3: () => (VIEW),
-  ZP: () => (Call),
-  xt: () => (inProgressAlert),
-  nJ: () => (isGuest)
+  tG: () => (EXPANDED_FLAG),
+  Mh: () => (MODE),
+  _M: () => (TYPE),
+  Mr: () => (VIEW),
+  cp: () => (Call),
+  OO: () => (inProgressAlert),
+  or: () => (isGuest)
 });
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/extends.js
-var esm_extends = __webpack_require__(462);
+var esm_extends = __webpack_require__(72);
 // EXTERNAL MODULE: external "React"
-var external_React_ = __webpack_require__(363);
+var external_React_ = __webpack_require__(376);
 var external_React_default = __webpack_require__.n(external_React_);
 // EXTERNAL MODULE: ./js/chat/mixins.js
-var mixins = __webpack_require__(503);
+var mixins = __webpack_require__(436);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/stream.jsx + 9 modules
-var stream = __webpack_require__(302);
+var stream = __webpack_require__(968);
 // EXTERNAL MODULE: ./js/chat/ui/composedTextArea.jsx + 1 modules
-var composedTextArea = __webpack_require__(813);
+var composedTextArea = __webpack_require__(912);
 // EXTERNAL MODULE: ./js/chat/ui/historyPanel.jsx + 7 modules
-var historyPanel = __webpack_require__(192);
+var historyPanel = __webpack_require__(328);
 // EXTERNAL MODULE: ./js/chat/ui/contacts.jsx
-var ui_contacts = __webpack_require__(13);
+var ui_contacts = __webpack_require__(40);
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
-var perfectScrollbar = __webpack_require__(285);
+var perfectScrollbar = __webpack_require__(447);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/collapse.jsx
 
 
-class Collapse extends mixins.wl {
+class Collapse extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.state = {
@@ -21183,9 +21183,9 @@ class Collapse extends mixins.wl {
   }
 }
 // EXTERNAL MODULE: ./js/ui/utils.jsx
-var utils = __webpack_require__(79);
+var utils = __webpack_require__(240);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/button.jsx
-var meetings_button = __webpack_require__(193);
+var meetings_button = __webpack_require__(600);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/participants.jsx
 
 
@@ -21196,7 +21196,7 @@ var meetings_button = __webpack_require__(193);
 
 
 
-class Participant extends mixins.wl {
+class Participant extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.baseIconClass = 'sprite-fm-mono';
@@ -21224,7 +21224,7 @@ class Participant extends mixins.wl {
       contact: M.u[handle]
     }), external_React_default().createElement("div", {
       className: "name"
-    }, external_React_default().createElement(utils.dy, null, handle === u_handle ? `${name} ${l.me}` : name), chatRoom.isMeeting && Call.isModerator(chatRoom, handle) && external_React_default().createElement("span", null, external_React_default().createElement("i", {
+    }, external_React_default().createElement(utils.O, null, handle === u_handle ? `${name} ${l.me}` : name), chatRoom.isMeeting && Call.isModerator(chatRoom, handle) && external_React_default().createElement("span", null, external_React_default().createElement("i", {
       className: `${this.baseIconClass} icon-admin-outline`
     }))), external_React_default().createElement("div", {
       className: "status"
@@ -21243,7 +21243,7 @@ class Participant extends mixins.wl {
     })));
   }
 }
-class Participants extends mixins.wl {
+class Participants extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.FILTER = {
@@ -21339,7 +21339,7 @@ class Participants extends mixins.wl {
       if (chatParticipants != null && chatParticipants.length) {
         return external_React_default().createElement((external_React_default()).Fragment, null, chatParticipants.length > 1 ? (() => {
           const isRingingAll = initialCallRinging || JSON.stringify(ringingPeers) === JSON.stringify(chatParticipants);
-          return external_React_default().createElement(meetings_button.Z, {
+          return external_React_default().createElement(meetings_button.c, {
             className: `
                                         mega-button
                                         action
@@ -21359,7 +21359,7 @@ class Participants extends mixins.wl {
             contact: contact
           }), external_React_default().createElement("div", {
             className: "name"
-          }, external_React_default().createElement(utils.dy, null, M.getNameByHandle(handle)), external_React_default().createElement("span", {
+          }, external_React_default().createElement(utils.O, null, M.getNameByHandle(handle)), external_React_default().createElement("span", {
             className: `
                                             user-card-presence
                                             ${megaChat.userPresenceToCssClass(contact.presence)}
@@ -21370,7 +21370,7 @@ class Participants extends mixins.wl {
             className: "call-state"
           }, this.getCallState(handle))), isRinging ? null : external_React_default().createElement("div", {
             className: "call-control"
-          }, external_React_default().createElement(meetings_button.Z, {
+          }, external_React_default().createElement(meetings_button.c, {
             className: "mega-button action neutral",
             onClick: () => this.doCall(handle)
           }, l.call_button)));
@@ -21392,7 +21392,7 @@ class Participants extends mixins.wl {
                     ${filter === this.FILTER.CALL ? '' : 'with-chat-participants'}
                     ${this.props.guest ? 'guest' : ''}
                 `
-      }, external_React_default().createElement(perfectScrollbar.F, {
+      }, external_React_default().createElement(perfectScrollbar.e, {
         filter: filter,
         options: {
           'suppressScrollX': true
@@ -21439,17 +21439,17 @@ class Participants extends mixins.wl {
       className: "participants"
     }, chatRoom.type === 'private' ? null : external_React_default().createElement("div", {
       className: "participants-nav"
-    }, external_React_default().createElement(meetings_button.Z, {
+    }, external_React_default().createElement(meetings_button.c, {
       className: filter === CALL ? 'active' : '',
       onClick: () => this.setState({
         filter: CALL
       })
-    }, l.call_heading_in_call), external_React_default().createElement(meetings_button.Z, {
+    }, l.call_heading_in_call), external_React_default().createElement(meetings_button.c, {
       className: filter === CHAT ? 'active' : '',
       onClick: () => this.setState({
         filter: CHAT
       })
-    }, l.call_heading_not_in_call)), filter === CALL ? external_React_default().createElement(Collapse, (0,esm_extends.Z)({}, this.props, {
+    }, l.call_heading_not_in_call)), filter === CALL ? external_React_default().createElement(Collapse, (0,esm_extends.c)({}, this.props, {
       filter: filter,
       heading: l[16217],
       badge: (peers == null ? void 0 : peers.length) + 1
@@ -21460,19 +21460,19 @@ class Participants extends mixins.wl {
 
 
 
-class Guest extends mixins.wl {
+class Guest extends mixins.ei {
   render() {
     return external_React_default().createElement("div", {
       className: "guest-register"
     }, external_React_default().createElement("div", {
       className: "guest-register-content"
-    }, external_React_default().createElement(meetings_button.Z, {
+    }, external_React_default().createElement(meetings_button.c, {
       className: "close-guest-register",
       icon: "icon-close-component",
       onClick: this.props.onGuestClose
     }, external_React_default().createElement("span", null, l[148])), external_React_default().createElement("div", null, external_React_default().createElement("i", {
       className: "sprite-fm-illustration-wide registration"
-    }), l.meetings_signup), external_React_default().createElement(meetings_button.Z, {
+    }), l.meetings_signup), external_React_default().createElement(meetings_button.c, {
       className: "mega-button positive register-button",
       onClick: () => loadSubPage('register')
     }, l[968])));
@@ -21493,7 +21493,7 @@ const inviteAllowed = chatRoom => {
   }
   return false;
 };
-class Sidebar extends mixins.wl {
+class Sidebar extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.containerRef = external_React_default().createRef();
@@ -21504,7 +21504,7 @@ class Sidebar extends mixins.wl {
     }) => {
       return external_React_default().createElement("div", {
         className: "sidebar-head"
-      }, external_React_default().createElement(meetings_button.Z, {
+      }, external_React_default().createElement(meetings_button.c, {
         simpletip: {
           label: l.close_sidebar,
           className: 'theme-dark-forced'
@@ -21527,7 +21527,7 @@ class Sidebar extends mixins.wl {
       const withInvite = inviteAllowed(chatRoom);
       const $$HEAD = this.renderHead({
         title: l[16217],
-        children: u_type && withInvite ? external_React_default().createElement(meetings_button.Z, {
+        children: u_type && withInvite ? external_React_default().createElement(meetings_button.c, {
           className: "mega-button round positive add",
           icon: "icon-add",
           onClick: onInviteToggle
@@ -21550,14 +21550,14 @@ class Sidebar extends mixins.wl {
       } = this.props;
       return external_React_default().createElement((external_React_default()).Fragment, null, this.renderHead({
         title: l.chats
-      }), external_React_default().createElement(historyPanel.Z, {
+      }), external_React_default().createElement(historyPanel.c, {
         ref: ref => {
           this.historyPanel = ref;
         },
         chatRoom: chatRoom,
         className: "in-call",
         onDeleteClicked: onDeleteMessage
-      }), external_React_default().createElement(composedTextArea.Z, {
+      }), external_React_default().createElement(composedTextArea.c, {
         chatRoom: chatRoom,
         parent: this,
         containerRef: this.containerRef
@@ -21584,13 +21584,13 @@ class Sidebar extends mixins.wl {
   }
 }
 // EXTERNAL MODULE: ./js/ui/modalDialogs.jsx + 1 modules
-var modalDialogs = __webpack_require__(182);
+var modalDialogs = __webpack_require__(776);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/invite/search.jsx
 var _Search;
 
 
 
-class Search extends mixins.wl {
+class Search extends mixins.ei {
   render() {
     const {
       value,
@@ -21620,7 +21620,7 @@ Search.focus = () => {
 
 
 
-class Footer extends mixins.wl {
+class Footer extends mixins.ei {
   render() {
     const {
       selected,
@@ -21629,10 +21629,10 @@ class Footer extends mixins.wl {
     } = this.props;
     return external_React_default().createElement("footer", null, external_React_default().createElement("div", {
       className: "footer-container"
-    }, external_React_default().createElement(meetings_button.Z, {
+    }, external_React_default().createElement(meetings_button.c, {
       className: "mega-button",
       onClick: onClose
-    }, l[82]), external_React_default().createElement(meetings_button.Z, {
+    }, l[82]), external_React_default().createElement(meetings_button.c, {
       className: `
                             mega-button
                             positive
@@ -21646,7 +21646,7 @@ class Footer extends mixins.wl {
 
 
 
-class Nil extends mixins.wl {
+class Nil extends mixins.ei {
   render() {
     return external_React_default().createElement("div", {
       className: `${Invite.NAMESPACE}-nil`
@@ -21656,7 +21656,7 @@ class Nil extends mixins.wl {
   }
 }
 // EXTERNAL MODULE: ./js/chat/ui/link.jsx
-var ui_link = __webpack_require__(941);
+var ui_link = __webpack_require__(620);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/invite/invite.jsx
 
 
@@ -21677,7 +21677,7 @@ const HAS_CONTACTS = () => {
     }
   }
 };
-class Invite extends mixins.wl {
+class Invite extends mixins.ei {
   constructor(props) {
     super(props);
     this.wrapperRef = external_React_default().createRef();
@@ -21852,7 +21852,7 @@ class Invite extends mixins.wl {
         if (frequents.length === 0 && contacts.length === 0) {
           return external_React_default().createElement(Nil, null);
         }
-        return external_React_default().createElement(perfectScrollbar.F, {
+        return external_React_default().createElement(perfectScrollbar.e, {
           ref: this.wrapperRef,
           options: {
             'suppressScrollX': true
@@ -21892,7 +21892,7 @@ class Invite extends mixins.wl {
       isMeeting,
       publicLink
     } = chatRoom || {};
-    return external_React_default().createElement(modalDialogs.Z.ModalDialog, (0,esm_extends.Z)({}, this.state, {
+    return external_React_default().createElement(modalDialogs.M.ModalDialog, (0,esm_extends.c)({}, this.state, {
       name: NAMESPACE,
       className: `
                     ${NAMESPACE}
@@ -21904,10 +21904,10 @@ class Invite extends mixins.wl {
       className: `${NAMESPACE}-head`
     }, external_React_default().createElement("h2", null, isMeeting ? l.invite_participants : l[8726]), isMeeting && publicLink && external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("p", null, l.copy_and_share), external_React_default().createElement("div", {
       className: "link-input-container"
-    }, external_React_default().createElement(meetings_button.Z, {
+    }, external_React_default().createElement(meetings_button.c, {
       className: `mega-button large positive ${publicLink ? '' : 'disabled'}`,
       onClick: () => publicLink && copyToClipboard(`${getBaseUrl()}/${publicLink}`, l[371])
-    }, !publicLink ? l[7006] : l[1394]), external_React_default().createElement(ui_link.Z, {
+    }, !publicLink ? l[7006] : l[1394]), external_React_default().createElement(ui_link.c, {
       className: "view-link-control",
       field: field,
       onClick: () => this.setState({
@@ -21944,7 +21944,7 @@ Invite.NAMESPACE = 'invite-meeting';
 
 
 
-class Ephemeral extends mixins.wl {
+class Ephemeral extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.buttons = [{
@@ -21959,7 +21959,7 @@ class Ephemeral extends mixins.wl {
       onClose
     } = this.props;
     const ephemeralAccount = ephemeralAccounts && ephemeralAccounts[ephemeralAccounts.length - 1];
-    return external_React_default().createElement(modalDialogs.Z.ModalDialog, {
+    return external_React_default().createElement(modalDialogs.M.ModalDialog, {
       name: Ephemeral.NAMESPACE,
       dialogType: "message",
       icon: "sprite-fm-uni icon-info",
@@ -21978,7 +21978,7 @@ Ephemeral.NAMESPACE = 'ephemeral-dialog';
 
 
 
-class Offline extends mixins.wl {
+class Offline extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.buttons = [{
@@ -21993,7 +21993,7 @@ class Offline extends mixins.wl {
     }];
   }
   render() {
-    return external_React_default().createElement(modalDialogs.Z.ModalDialog, {
+    return external_React_default().createElement(modalDialogs.M.ModalDialog, {
       name: Offline.NAMESPACE,
       dialogType: "message",
       icon: "sprite-fm-uni icon-warning",
@@ -22006,15 +22006,15 @@ class Offline extends mixins.wl {
 }
 Offline.NAMESPACE = 'reconnect-dialog';
 // EXTERNAL MODULE: ./js/chat/ui/conversationpanel.jsx + 14 modules
-var conversationpanel = __webpack_require__(21);
+var conversationpanel = __webpack_require__(828);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/streamControls.jsx
-var streamControls = __webpack_require__(230);
+var streamControls = __webpack_require__(227);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/sidebarControls.jsx
 
 
 
 
-class SidebarControls extends mixins.wl {
+class SidebarControls extends mixins.ei {
   render() {
     const {
       npeers,
@@ -22033,7 +22033,7 @@ class SidebarControls extends mixins.wl {
       className: isOnHold ? 'disabled' : ''
     }, external_React_default().createElement("li", {
       onClick: isOnHold ? null : onChatToggle
-    }, external_React_default().createElement(meetings_button.Z, {
+    }, external_React_default().createElement(meetings_button.c, {
       className: `
                                 mega-button
                                 theme-dark-forced
@@ -22049,7 +22049,7 @@ class SidebarControls extends mixins.wl {
       className: "notification-badge notifications-count"
     }, notifications > 9 ? '9+' : notifications)), external_React_default().createElement("li", {
       onClick: isOnHold ? null : onParticipantsToggle
-    }, external_React_default().createElement(meetings_button.Z, {
+    }, external_React_default().createElement(meetings_button.c, {
       className: `
                                 mega-button
                                 theme-dark-forced
@@ -22128,7 +22128,7 @@ const inProgressAlert = (isJoin, chatRoom) => {
     resolve();
   });
 };
-class RecordingConsentDialog extends mixins.wl {
+class RecordingConsentDialog extends mixins.ei {
   componentWillUnmount() {
     super.componentWillUnmount();
     if ($.dialog && $.dialog === RecordingConsentDialog.dialogName) {
@@ -22142,7 +22142,7 @@ class RecordingConsentDialog extends mixins.wl {
       onClose
     } = this.props;
     const recorderName = nicknames.getNickname(recorder).substr(0, ChatToastIntegration.MAX_NAME_CHARS);
-    return external_React_default().createElement(modalDialogs.Z.ModalDialog, {
+    return external_React_default().createElement(modalDialogs.M.ModalDialog, {
       dialogName: RecordingConsentDialog.dialogName,
       className: `
                     mega-dialog
@@ -22161,14 +22161,14 @@ class RecordingConsentDialog extends mixins.wl {
       id: "msgDialog-title"
     }, l.call_recorded_heading), external_React_default().createElement("p", {
       className: "text"
-    }, external_React_default().createElement(utils.Cw, null, l.call_recorded_body.replace('[A]', `<a href="https://mega.io/privacy" target="_blank" class="clickurl">`).replace('[/A]', '</a>'))))), external_React_default().createElement("footer", null, external_React_default().createElement("div", {
+    }, external_React_default().createElement(utils.Ub, null, l.call_recorded_body.replace('[A]', `<a href="https://mega.io/privacy" target="_blank" class="clickurl">`).replace('[/A]', '</a>'))))), external_React_default().createElement("footer", null, external_React_default().createElement("div", {
       className: "footer-container"
     }, external_React_default().createElement("div", {
       className: "space-between"
-    }, external_React_default().createElement(meetings_button.Z, {
+    }, external_React_default().createElement(meetings_button.c, {
       className: "mega-button",
       onClick: onCallEnd
-    }, external_React_default().createElement("span", null, l[5883])), external_React_default().createElement(meetings_button.Z, {
+    }, external_React_default().createElement("span", null, l[5883])), external_React_default().createElement(meetings_button.c, {
       className: "mega-button positive",
       onClick: () => {
         onClose();
@@ -22178,7 +22178,7 @@ class RecordingConsentDialog extends mixins.wl {
   }
 }
 RecordingConsentDialog.dialogName = `${"meetings-call"}-consent`;
-class Call extends mixins.wl {
+class Call extends mixins.ei {
   constructor(props) {
     super(props);
     this.recordingConsentDialog = `${NAMESPACE}-consent`;
@@ -22305,9 +22305,14 @@ class Call extends mixins.wl {
           mBroadcaster.sendMessage('meetings:peersWaiting', waitingRoomPeers);
         });
       }));
-      chatRoom.rebind(`wrOnUserLeft.${NAMESPACE}`, (ev, user) => this.isMounted() && this.setState({
-        waitingRoomPeers: this.state.waitingRoomPeers.filter(h => h !== user)
-      }, () => mBroadcaster.sendMessage('meetings:peersWaiting', this.state.waitingRoomPeers)));
+      const usrwr = (e, users) => {
+        users = typeof users === 'string' ? [users] : users;
+        return this.isMounted() && this.setState({
+          waitingRoomPeers: this.state.waitingRoomPeers.filter(h => !users.includes(h))
+        }, () => mBroadcaster.sendMessage('meetings:peersWaiting', this.state.waitingRoomPeers));
+      };
+      chatRoom.rebind(`wrOnUserLeft.${NAMESPACE}`, usrwr);
+      chatRoom.rebind(`wrOnUsersAllow.${NAMESPACE}`, usrwr);
       chatRoom.rebind(`wrOnUserDump.${NAMESPACE}`, (ev, users) => Object.entries(users).forEach(([handle, host]) => {
         return host || this.state.waitingRoomPeers.includes(handle) ? null : this.isMounted() && this.setState({
           waitingRoomPeers: [...this.state.waitingRoomPeers, handle]
@@ -22340,7 +22345,7 @@ class Call extends mixins.wl {
       });
       chatRoom.rebind('onPeerAvChange', () => this.recordActiveStream());
     };
-    this.unbindCallEvents = () => [`onCallPeerLeft.${NAMESPACE}`, `onCallPeerJoined.${NAMESPACE}`, `onCallLeft.${NAMESPACE}`, `wrOnUsersEntered.${NAMESPACE}`, `wrOnUserLeft.${NAMESPACE}`, `alterUserPrivilege.${NAMESPACE}`, `onCallState.${NAMESPACE}`, `onRecordingStarted.${NAMESPACE}`, `onRecordingStopped.${NAMESPACE}`].map(event => this.props.chatRoom.off(event));
+    this.unbindCallEvents = () => [`onCallPeerLeft.${NAMESPACE}`, `onCallPeerJoined.${NAMESPACE}`, `onCallLeft.${NAMESPACE}`, `wrOnUsersAllow.${NAMESPACE}`, `wrOnUsersEntered.${NAMESPACE}`, `wrOnUserLeft.${NAMESPACE}`, `alterUserPrivilege.${NAMESPACE}`, `onCallState.${NAMESPACE}`, `onRecordingStarted.${NAMESPACE}`, `onRecordingStopped.${NAMESPACE}`].map(event => this.props.chatRoom.off(event));
     this.handleCallMinimize = () => {
       const {
         call,
@@ -22388,10 +22393,10 @@ class Call extends mixins.wl {
       const {
         peers
       } = this.props;
-      if (action === stream.Uf.ADD && peers.length === stream.L2) {
+      if (action === stream.It.ADD && peers.length === stream.Yj) {
         return;
       }
-      return action === stream.Uf.ADD ? peers.addFakeDupStream() : peers.removeFakeDupStream();
+      return action === stream.It.ADD ? peers.addFakeDupStream() : peers.removeFakeDupStream();
     };
     this.handleSpeakerChange = videoNode => {
       if (videoNode) {
@@ -22435,8 +22440,8 @@ class Call extends mixins.wl {
     };
     this.handleInviteToggle = () => {
       if (M.u.length > 1) {
-        const participants = (0,conversationpanel.hU)(this.props.chatRoom);
-        if ((0,conversationpanel.R7)(participants)) {
+        const participants = (0,conversationpanel.cb)(this.props.chatRoom);
+        if ((0,conversationpanel.i_)(participants)) {
           msgDialog(`confirmationa:!^${l[8726]}!${l[82]}`, null, `${l.all_contacts_added}`, `${l.all_contacts_added_to_chat}`, res => {
             if (res) {
               contactAddDialog(null, false);
@@ -22472,7 +22477,7 @@ class Call extends mixins.wl {
     };
     this.handleCallEnd = () => {
       var _this$props$call;
-      (_this$props$call = this.props.call) == null || _this$props$call.destroy();
+      (_this$props$call = this.props.call) == null || _this$props$call.destroy(SfuClient.TermCode.kUserHangup);
     };
     this.handleEphemeralAdd = handle => handle && this.setState(state => ({
       ephemeral: true,
@@ -22534,7 +22539,7 @@ class Call extends mixins.wl {
         };
         return external_React_default().createElement($$CONTAINER, {
           className: "recording-fixed"
-        }, external_React_default().createElement("div", (0,esm_extends.Z)({
+        }, external_React_default().createElement("div", (0,esm_extends.c)({
           className: `
                             recording-ongoing
                             simpletip
@@ -22560,7 +22565,7 @@ class Call extends mixins.wl {
           });
           return isOnHold || recorder && recorder !== u_handle ? null : this.handleRecordingToggle();
         }
-      }, external_React_default().createElement(meetings_button.Z, {
+      }, external_React_default().createElement(meetings_button.c, {
         className: `
                         mega-button
                         theme-dark-forced
@@ -22745,7 +22750,7 @@ class Call extends mixins.wl {
                 `,
       onMouseMove: onboardingUI || onboardingRecording ? null : this.handleMouseMove,
       onMouseOut: onboardingUI || onboardingRecording ? null : this.handleMouseOut
-    }, external_React_default().createElement(stream.ZP, (0,esm_extends.Z)({}, STREAM_PROPS, {
+    }, external_React_default().createElement(stream.cp, (0,esm_extends.c)({}, STREAM_PROPS, {
       minimized: minimized,
       ephemeralAccounts: ephemeralAccounts,
       onCallMinimize: this.handleCallMinimize,
@@ -22763,7 +22768,7 @@ class Call extends mixins.wl {
       onScreenSharingClick: this.handleScreenSharingToggle,
       onHoldClick: this.handleHoldToggle,
       onThumbnailDoubleClick: videoNode => this.handleSpeakerChange(videoNode)
-    })), sidebar && external_React_default().createElement(Sidebar, (0,esm_extends.Z)({}, STREAM_PROPS, {
+    })), sidebar && external_React_default().createElement(Sidebar, (0,esm_extends.c)({}, STREAM_PROPS, {
       guest: guest,
       initialCallRinging: initialCallRinging,
       onGuestClose: () => this.setState({
@@ -22773,7 +22778,7 @@ class Call extends mixins.wl {
         ...Call.STATE.DEFAULT
       }),
       onDeleteMessage: onDeleteMessage
-    })), minimized ? null : external_React_default().createElement((external_React_default()).Fragment, null, this.renderRecordingControl(), external_React_default().createElement(streamControls.ZP, {
+    })), minimized ? null : external_React_default().createElement((external_React_default()).Fragment, null, this.renderRecordingControl(), external_React_default().createElement(streamControls.cp, {
       call: call,
       minimized: minimized,
       peers: peers,
@@ -22869,7 +22874,7 @@ class Call extends mixins.wl {
       id: "ob-dialog-text"
     }, l.recording_onboarding_body_details))), external_React_default().createElement("footer", null, external_React_default().createElement("div", {
       className: "footer-container"
-    }, external_React_default().createElement(ui_link.Z, {
+    }, external_React_default().createElement(ui_link.c, {
       className: "link-button",
       to: "https://help.mega.io/chats-meetings/chats/call-recording",
       target: "_blank"
@@ -22915,20 +22920,20 @@ Call.getUnsupportedBrowserMessage = () => navigator.userAgent.match(/Chrom(e|ium
 
 /***/ }),
 
-/***/ 419:
+/***/ 712:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-N: () => (withHostsObserver)
+_: () => (withHostsObserver)
 });
-var _extends5__ = __webpack_require__(462);
-var react0__ = __webpack_require__(363);
+var _extends5__ = __webpack_require__(72);
+var react0__ = __webpack_require__(376);
 var react0 = __webpack_require__.n(react0__);
-var _mixins_js1__ = __webpack_require__(503);
-var _ui_modalDialogs_jsx2__ = __webpack_require__(182);
-var _contacts_jsx3__ = __webpack_require__(13);
-var _ui_buttons_jsx4__ = __webpack_require__(204);
+var _mixins_js1__ = __webpack_require__(436);
+var _ui_modalDialogs_jsx2__ = __webpack_require__(776);
+var _contacts_jsx3__ = __webpack_require__(40);
+var _ui_buttons_jsx4__ = __webpack_require__(536);
 
 
 
@@ -22936,7 +22941,7 @@ var _ui_buttons_jsx4__ = __webpack_require__(204);
 
 
 const withHostsObserver = Component => {
-  return class extends _mixins_js1__.wl {
+  return class extends _mixins_js1__.ei {
     constructor(...args) {
       super(...args);
       this.state = {
@@ -22955,7 +22960,7 @@ const withHostsObserver = Component => {
         const {
           selected
         } = this.state;
-        return react0().createElement(_ui_modalDialogs_jsx2__.Z.ModalDialog, (0,_extends5__.Z)({}, this.state, {
+        return react0().createElement(_ui_modalDialogs_jsx2__.M.ModalDialog, (0,_extends5__.c)({}, this.state, {
           className: "assign-host contact-picker-widget",
           dialogName: "assign-host-dialog",
           dialogType: "tool",
@@ -22977,16 +22982,16 @@ const withHostsObserver = Component => {
           onClose: () => this.setState({
             dialog: false
           }),
-          onSelect: selected => this.setState({
+          onSelected: selected => this.setState({
             selected
           }, () => this.safeForceUpdate())
         })), react0().createElement("footer", null, react0().createElement("div", {
           className: "footer-container"
-        }, react0().createElement(_ui_buttons_jsx4__.z, {
+        }, react0().createElement(_ui_buttons_jsx4__.q, {
           label: l[82],
           className: "mega-button",
           onClick: this.toggleDialog
-        }), react0().createElement(_ui_buttons_jsx4__.z, {
+        }), react0().createElement(_ui_buttons_jsx4__.q, {
           label: l.assign_and_leave,
           className: `
                                         mega-button
@@ -23028,7 +23033,7 @@ const withHostsObserver = Component => {
       };
     }
     render() {
-      return react0().createElement((react0().Fragment), null, react0().createElement(Component, (0,_extends5__.Z)({}, this.props, {
+      return react0().createElement((react0().Fragment), null, react0().createElement(Component, (0,_extends5__.c)({}, this.props, {
         confirmLeave: this.confirmLeave,
         hasHost: this.hasHost
       })), this.state.dialog && this.renderDialog());
@@ -23038,23 +23043,23 @@ const withHostsObserver = Component => {
 
 /***/ }),
 
-/***/ 203:
+/***/ 8:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-n: () => (withMicObserver)
+s: () => (withMicObserver)
 });
-var _extends3__ = __webpack_require__(462);
-var react0__ = __webpack_require__(363);
+var _extends3__ = __webpack_require__(72);
+var react0__ = __webpack_require__(376);
 var react0 = __webpack_require__.n(react0__);
-var _mixins1__ = __webpack_require__(503);
-var _button_jsx2__ = __webpack_require__(193);
+var _mixins1__ = __webpack_require__(436);
+var _button_jsx2__ = __webpack_require__(600);
 
 
 
 
-const withMicObserver = Component => class extends _mixins1__.wl {
+const withMicObserver = Component => class extends _mixins1__.ei {
   constructor(props) {
     super(props);
     this.namespace = `SO-${Component.NAMESPACE}`;
@@ -23120,7 +23125,7 @@ const withMicObserver = Component => class extends _mixins1__.wl {
       className: "stream-toast-icon sprite-fm-uni icon-warning"
     }), react0().createElement("div", {
       className: "stream-toast-message"
-    }, l.max_speakers_toast), react0().createElement(_button_jsx2__.Z, {
+    }, l.max_speakers_toast), react0().createElement(_button_jsx2__.c, {
       className: "mega-button action stream-toast-close",
       icon: "sprite-fm-mono icon-close-component",
       onClick: () => this.setState({
@@ -23137,7 +23142,7 @@ const withMicObserver = Component => class extends _mixins1__.wl {
     this.bindObservers();
   }
   render() {
-    return react0().createElement(Component, (0,_extends3__.Z)({}, this.props, {
+    return react0().createElement(Component, (0,_extends3__.c)({}, this.props, {
       signal: this.state.signal,
       renderSignalWarning: this.renderSignalWarning,
       blocked: this.state.blocked,
@@ -23148,19 +23153,19 @@ const withMicObserver = Component => class extends _mixins1__.wl {
 
 /***/ }),
 
-/***/ 209:
+/***/ 24:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-Q: () => (withPermissionsObserver)
+s: () => (withPermissionsObserver)
 });
-var _extends4__ = __webpack_require__(462);
-var react0__ = __webpack_require__(363);
+var _extends4__ = __webpack_require__(72);
+var react0__ = __webpack_require__(376);
 var react0 = __webpack_require__.n(react0__);
-var _mixins_js1__ = __webpack_require__(503);
-var _ui_modalDialogs_jsx2__ = __webpack_require__(182);
-var _ui_utils_jsx3__ = __webpack_require__(79);
+var _mixins_js1__ = __webpack_require__(436);
+var _ui_modalDialogs_jsx2__ = __webpack_require__(776);
+var _ui_utils_jsx3__ = __webpack_require__(240);
 
 
 
@@ -23176,7 +23181,7 @@ const isUserActionError = error => {
   return error && error === errors.browser;
 };
 const withPermissionsObserver = Component => {
-  return class extends _mixins_js1__.wl {
+  return class extends _mixins_js1__.ei {
     constructor(props) {
       super(props);
       this.namespace = `PO-${Component.NAMESPACE}`;
@@ -23366,7 +23371,7 @@ const withPermissionsObserver = Component => {
         buttons,
         cover
       } = content[av] || {};
-      return react0().createElement(_ui_modalDialogs_jsx2__.Z.ModalDialog, {
+      return react0().createElement(_ui_modalDialogs_jsx2__.M.ModalDialog, {
         dialogName: `${this.namespace}-permissions-${av}`,
         className: `
                         meetings-permissions-dialog
@@ -23393,7 +23398,7 @@ const withPermissionsObserver = Component => {
         className: "permissions-warning-cover"
       }, react0().createElement("span", {
         className: cover
-      })), react0().createElement(_ui_utils_jsx3__.Cw, {
+      })), react0().createElement(_ui_utils_jsx3__.Ub, {
         tag: "p",
         className: "permissions-warning-info",
         content: info
@@ -23452,7 +23457,7 @@ const withPermissionsObserver = Component => {
       });
     }
     render() {
-      return react0().createElement(Component, (0,_extends4__.Z)({}, this.props, this.state, {
+      return react0().createElement(Component, (0,_extends4__.c)({}, this.props, this.state, {
         errMic: this.state.errMic,
         errCamera: this.state.errCamera,
         errScreen: this.state.errScreen,
@@ -23466,20 +23471,20 @@ const withPermissionsObserver = Component => {
 
 /***/ }),
 
-/***/ 435:
+/***/ 312:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-K6: () => (stringToTime),
-KC: () => (isSameDay),
-Ny: () => (getNearestHalfHour),
-Pm: () => (isTomorrow),
-Sv: () => (getUserTimezone),
-nl: () => (getTimeIntervals),
-p6: () => (stringToDate),
-zI: () => (addMonths),
-zk: () => (isToday)
+CS: () => (isTomorrow),
+EP: () => (isSameDay),
+MF: () => (isToday),
+Q9: () => (addMonths),
+UH: () => (stringToDate),
+W: () => (getNearestHalfHour),
+g1: () => (stringToTime),
+gb: () => (getTimeIntervals),
+oT: () => (getUserTimezone)
 });
 
 const stringToDate = string => {
@@ -23537,163 +23542,43 @@ const getTimeIntervals = (timestamp, offsetFrom, interval = 30) => {
 
 /***/ }),
 
-/***/ 302:
+/***/ 968:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  L2: () => (MAX_STREAMS),
-  Xg: () => (PAGINATION),
-  wY: () => (STREAMS_PER_PAGE),
-  Uf: () => (STREAM_ACTIONS),
-  Fv: () => (chunkNodes),
-  ZP: () => (stream_Stream)
+  Yj: () => (MAX_STREAMS),
+  E3: () => (PAGINATION),
+  Uh: () => (STREAMS_PER_PAGE),
+  It: () => (STREAM_ACTIONS),
+  Cq: () => (chunkNodes),
+  cp: () => (stream_Stream)
 });
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/extends.js
-var esm_extends = __webpack_require__(462);
+var esm_extends = __webpack_require__(72);
 // EXTERNAL MODULE: external "React"
-var external_React_ = __webpack_require__(363);
+var external_React_ = __webpack_require__(376);
 var external_React_default = __webpack_require__.n(external_React_);
 // EXTERNAL MODULE: ./js/chat/mixins.js
-var mixins = __webpack_require__(503);
+var mixins = __webpack_require__(436);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 11 modules
-var meetings_call = __webpack_require__(476);
+var meetings_call = __webpack_require__(144);
 // EXTERNAL MODULE: ./js/chat/ui/contacts.jsx
-var contacts = __webpack_require__(13);
-// EXTERNAL MODULE: ./js/chat/ui/meetings/button.jsx
-var meetings_button = __webpack_require__(193);
-// EXTERNAL MODULE: ./js/ui/utils.jsx
-var utils = __webpack_require__(79);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/videoNodeMenu.jsx
-
-
-
-
-
-class VideoNodeMenu extends mixins.wl {
-  constructor(props) {
-    super(props);
-    this.Contact = this.Contact.bind(this);
-    this.Pin = this.Pin.bind(this);
-    this.Privilege = this.Privilege.bind(this);
-  }
-  Contact() {
-    const {
-      stream,
-      ephemeralAccounts,
-      onCallMinimize
-    } = this.props;
-    const {
-      userHandle
-    } = stream;
-    const IS_GUEST = (0,meetings_call.nJ)() || ephemeralAccounts && ephemeralAccounts.includes(userHandle);
-    const HAS_RELATIONSHIP = M.u[userHandle].c === 1;
-    if (HAS_RELATIONSHIP) {
-      return external_React_default().createElement(meetings_button.Z, {
-        icon: "sprite-fm-mono icon-chat",
-        onClick: () => {
-          onCallMinimize();
-          loadSubPage(`fm/chat/p/${userHandle}`);
-        }
-      }, external_React_default().createElement("span", null, l[7997]));
-    }
-    return external_React_default().createElement(meetings_button.Z, {
-      className: IS_GUEST ? 'disabled' : '',
-      icon: "sprite-fm-mono icon-add",
-      onClick: () => {
-        return IS_GUEST ? false : M.syncContactEmail(userHandle, true).then(email => {
-          const OPC = Object.values(M.opc);
-          if (OPC && OPC.length && OPC.some(opc => opc.m === email)) {
-            return msgDialog('warningb', '', l[17545]);
-          }
-          msgDialog('info', l[150], l[5898]);
-          M.inviteContact(M.u[u_handle].m, email);
-        }).catch(() => mBroadcaster.sendMessage('meetings:ephemeralAdd', userHandle));
-      }
-    }, external_React_default().createElement("span", null, l[24581]));
-  }
-  Pin() {
-    const {
-      stream,
-      onSpeakerChange
-    } = this.props;
-    if (onSpeakerChange) {
-      return external_React_default().createElement(meetings_button.Z, {
-        icon: "sprite-fm-mono grid-main",
-        onClick: () => onSpeakerChange(stream)
-      }, external_React_default().createElement("span", null, l.display_in_main_view));
-    }
-    return null;
-  }
-  Privilege() {
-    const {
-      stream,
-      chatRoom
-    } = this.props;
-    const {
-      call,
-      userHandle
-    } = stream;
-    if (call && call.isPublic) {
-      const {
-        OPERATOR,
-        FULL
-      } = ChatRoom.MembersSet.PRIVILEGE_STATE;
-      const currentUserModerator = chatRoom.members[u_handle] === OPERATOR;
-      const targetUserModerator = chatRoom.members[userHandle] === OPERATOR;
-      return currentUserModerator && external_React_default().createElement(meetings_button.Z, {
-        targetUserModerator: targetUserModerator,
-        icon: "sprite-fm-mono icon-admin-outline",
-        onClick: () => {
-          ['alterUserPrivilege', 'onCallPrivilegeChange'].map(event => chatRoom.trigger(event, [userHandle, targetUserModerator ? FULL : OPERATOR]));
-        }
-      }, external_React_default().createElement("span", null, targetUserModerator ? l.remove_moderator : l.make_moderator));
-    }
-    return null;
-  }
-  render() {
-    const {
-      NAMESPACE
-    } = VideoNodeMenu;
-    const {
-      userHandle
-    } = this.props.stream;
-    if (userHandle !== u_handle) {
-      return external_React_default().createElement("div", {
-        className: `
-                        ${NAMESPACE}
-                        theme-dark-forced
-                    `
-      }, external_React_default().createElement("div", {
-        className: `${NAMESPACE}-toggle`
-      }, external_React_default().createElement(utils.dy, null, M.getNameByHandle(userHandle)), external_React_default().createElement("i", {
-        className: "sprite-fm-mono icon-side-menu"
-      })), external_React_default().createElement("div", {
-        className: `${NAMESPACE}-content`
-      }, external_React_default().createElement("ul", null, [this.Contact, this.Pin, this.Privilege].map((button, index) => external_React_default().createElement("li", {
-        key: index
-      }, button())))));
-    }
-    return null;
-  }
-}
-VideoNodeMenu.NAMESPACE = 'node-menu';
+var contacts = __webpack_require__(40);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/videoNode.jsx
 
 
 
 
-
-class VideoNode extends mixins.wl {
+class VideoNode extends mixins.ei {
   constructor(props, source) {
     super(props);
     this.nodeRef = external_React_default().createRef();
     this.contRef = external_React_default().createRef();
     this.statsHudRef = external_React_default().createRef();
-    this.isVideo = true;
     this.source = source;
   }
   componentDidMount() {
@@ -23716,9 +23601,15 @@ class VideoNode extends mixins.wl {
     }
     this.requestVideo();
   }
+  onAvChange() {
+    this.safeForceUpdate();
+  }
   displayVideoElement(video, container) {
     this.attachVideoElemHandlers(video);
     container.replaceChildren(video);
+    if (video.readyState === 4) {
+      container.classList.remove("video-node-loading");
+    }
   }
   attachVideoElemHandlers(video) {
     if (video._snSetup) {
@@ -23733,6 +23624,9 @@ class VideoNode extends mixins.wl {
       }
     };
     video.onloadeddata = ev => {
+      if (this.contRef.current) {
+        this.contRef.current.classList.remove("video-node-loading");
+      }
       if (this.props.onLoadedData) {
         this.props.onLoadedData(ev);
       }
@@ -23792,7 +23686,7 @@ class VideoNode extends mixins.wl {
     if (source.isStreaming()) {
       return external_React_default().createElement("div", {
         ref: this.contRef,
-        className: "video-node-holder"
+        className: "video-node-holder video-node-loading"
       });
     }
     delete this._lastResizeWidth;
@@ -23828,7 +23722,7 @@ class VideoNode extends mixins.wl {
     if (source.isOnHold) {
       return external_React_default().createElement($$CONTAINER, null, this.getStatusIcon('icon-pause', onHoldLabel));
     }
-    return external_React_default().createElement((external_React_default()).Fragment, null, mode === meetings_call.IK.MAIN && meetings_call.ZP.isModerator(chatRoom, userHandle) && this.getStatusIcon('icon-admin-outline call-role-icon', l[8875]), external_React_default().createElement($$CONTAINER, null, source.audioMuted ? this.getStatusIcon('icon-mic-off-thin-outline', l.muted) : null, sfuClient.haveBadNetwork ? this.getStatusIcon('icon-weak-signal', l.poor_connection) : null, source.hasScreenAndCam && this.isThumb ? this.getStatusIcon('icon-pc-linux', 'Sharing screen') : null));
+    return external_React_default().createElement((external_React_default()).Fragment, null, mode === meetings_call.Mh.MAIN && meetings_call.cp.isModerator(chatRoom, userHandle) && this.getStatusIcon('icon-admin-outline call-role-icon', l[8875]), external_React_default().createElement($$CONTAINER, null, source.audioMuted ? this.getStatusIcon('icon-mic-off-thin-outline', l.muted) : null, sfuClient.haveBadNetwork ? this.getStatusIcon('icon-weak-signal', l.poor_connection) : null));
   }
   render() {
     const {
@@ -23865,13 +23759,13 @@ class VideoNode extends mixins.wl {
       onClick: ev => onClick && onClick(source, ev)
     }, source && external_React_default().createElement((external_React_default()).Fragment, null, children || null, external_React_default().createElement("div", {
       className: "video-node-content"
-    }, CallManager2.Call.VIDEO_DEBUG_MODE ? this.renderVideoDebugMode() : null, this.renderContent(), mode === meetings_call.IK.MINI || minimized ? null : this.renderStatus())));
+    }, CallManager2.Call.VIDEO_DEBUG_MODE ? this.renderVideoDebugMode() : null, this.renderContent(), mode === meetings_call.Mh.MINI || minimized ? null : this.renderStatus())));
   }
 }
 class DynVideo extends VideoNode {
   onAvChange() {
     this._lastResizeWidth = null;
-    this.safeForceUpdate();
+    super.onAvChange();
   }
   dynRequestVideo(forceVisible) {
     const {
@@ -23913,7 +23807,7 @@ class DynVideo extends VideoNode {
       newQ = CallManager2.VIDEO_QUALITY.HIGH;
     } else if (w > 200) {
       newQ = CallManager2.VIDEO_QUALITY.MEDIUM;
-    } else if (w > 180) {
+    } else if (w > 180 || this.noThumb) {
       newQ = CallManager2.VIDEO_QUALITY.LOW;
     } else {
       newQ = CallManager2.VIDEO_QUALITY.THUMB;
@@ -23921,11 +23815,12 @@ class DynVideo extends VideoNode {
     this.dynRequestVideoQuality(newQ);
   }
   dynUpdateVideoElem() {
+    var _this$source$hiResPla;
     const vidCont = this.contRef.current;
     if (!this.isMounted() || !vidCont) {
       return;
     }
-    const player = this.source.player;
+    const player = this.noThumb ? (_this$source$hiResPla = this.source.hiResPlayer) == null || (_this$source$hiResPla = _this$source$hiResPla.gui) == null ? void 0 : _this$source$hiResPla.video : this.source.player;
     if (!player) {
       vidCont.replaceChildren();
       return;
@@ -23975,31 +23870,27 @@ class DynVideoCloned extends DynVideo {
 class PeerVideoThumb extends DynVideoCloned {
   constructor(props) {
     super(props, props.source);
-    this.isThumb = true;
+    this.requestVideo = this.dynRequestVideo;
+  }
+}
+class PeerVideoThumbFixed extends VideoNode {
+  constructor(props) {
+    super(props, props.source);
+    assert(props.source.hasScreenAndCam);
+    this.ownVideo = document.createElement("video");
     if (CallManager2.Call.VIDEO_DEBUG_MODE) {
       this.onRxStats = this._onRxStats;
     }
   }
-  requestVideo(forceVisible) {
-    if (!this.source.hasScreenAndCam) {
-      if (this.fixedThumbPlayer) {
-        this.fixedThumbPlayer.destroy();
-      }
-      this.dynRequestVideo(forceVisible);
-    } else {
-      delete this.requestedQ;
-      this.requestFixedThumbVideo();
-    }
-  }
-  addFixedThumbVideo() {
+  addVideo() {
     assert(this.source.hasScreenAndCam);
     const vidCont = this.contRef.current;
     assert(vidCont);
     if (vidCont.firstChild !== this.ownVideo) {
-      vidCont.replaceChildren(this.ownVideo);
+      this.displayVideoElement(this.ownVideo, vidCont);
     }
   }
-  delFixedThumbVideo() {
+  delVideo() {
     SfuClient.playerStop(this.ownVideo);
     const vidCont = this.contRef.current;
     if (!vidCont) {
@@ -24007,20 +23898,22 @@ class PeerVideoThumb extends DynVideoCloned {
     }
     vidCont.replaceChildren();
   }
-  requestFixedThumbVideo() {
-    if (this.fixedThumbPlayer) {
-      this.playFixedThumbVideo();
+  requestVideo(forceVisible) {
+    if (!this.isComponentVisible() && !forceVisible) {
+      return;
+    }
+    if (this.player) {
+      this.playVideo();
     } else {
-      this.addFixedThumbVideo();
-      this.fixedThumbPlayer = this.source.sfuPeer.getThumbVideo(player => {
-        this.fixedThumbPlayer = player;
+      this.addVideo();
+      this.player = this.source.sfuPeer.getThumbVideo(() => {
         return this;
       });
     }
   }
-  playFixedThumbVideo() {
-    var _this$fixedThumbPlaye;
-    const track = (_this$fixedThumbPlaye = this.fixedThumbPlayer.slot) == null ? void 0 : _this$fixedThumbPlaye.inTrack;
+  playVideo() {
+    var _this$player$slot;
+    const track = (_this$player$slot = this.player.slot) == null ? void 0 : _this$player$slot.inTrack;
     if (!track) {
       return;
     }
@@ -24033,14 +23926,55 @@ class PeerVideoThumb extends DynVideoCloned {
     SfuClient.playerPlay(this.ownVideo, track);
   }
   detachFromTrack() {
-    this.delFixedThumbVideo();
+    this.delVideo();
   }
   onPlayerDestroy() {
-    delete this.fixedThumbPlayer;
+    delete this.player;
+  }
+  componentWillUnmount() {
+    if (this.player) {
+      this.player.destroy();
+    }
+    super.componentWillUnmount();
   }
   _onRxStats(track, info, raw) {
-    if (!this.source.player) {
+    if (this.player) {
       this.displayStats(CallManager2.Call.rxStatsToText(track, info, raw));
+    }
+  }
+}
+class PeerVideoHiResCloned extends DynVideoCloned {
+  constructor(props) {
+    super(props, props.source);
+    this.noThumb = true;
+    this.requestVideo = this.dynRequestVideo;
+  }
+}
+class LocalVideoHiResCloned extends VideoNode {
+  constructor(props) {
+    super(props, props.chatRoom.call.getLocalStream());
+    this.isLocal = true;
+    this.ownVideo = document.createElement("video");
+  }
+  get isLocalScreen() {
+    return this.source.av & Av.Screen;
+  }
+  requestVideo(forceVisible) {
+    if (d > 1 && forceVisible) {
+      console.debug('ignoring forceVisible');
+    }
+    const vidCont = this.contRef.current;
+    if (!vidCont) {
+      return;
+    }
+    const track = this.source.sfuClient.localScreenTrack();
+    if (!track) {
+      vidCont.replaceChildren();
+    } else {
+      if (vidCont.firstChild !== this.ownVideo) {
+        this.displayVideoElement(this.ownVideo, vidCont);
+      }
+      SfuClient.playerPlay(this.ownVideo, track, true);
     }
   }
 }
@@ -24057,7 +23991,7 @@ class LocalVideoThumb extends VideoNode {
   constructor(props) {
     const source = props.chatRoom.call.getLocalStream();
     super(props, source);
-    this.isLocal = this.isThumb = true;
+    this.isLocal = true;
     this.isLocalScreen = source.av & Av.Screen && !(source.av & Av.Camera);
     this.sfuClient = props.chatRoom.call.sfuClient;
     this.ownVideo = document.createElement("video");
@@ -24085,19 +24019,23 @@ class LocalVideoThumb extends VideoNode {
   onAvChange() {
     const av = this.sfuClient.availAv;
     this.isLocalScreen = av & Av.Screen && !(av & Av.Camera);
-    this.safeForceUpdate();
+    super.onAvChange();
   }
 }
+// EXTERNAL MODULE: ./js/ui/utils.jsx
+var utils = __webpack_require__(240);
+// EXTERNAL MODULE: ./js/chat/ui/meetings/button.jsx
+var meetings_button = __webpack_require__(600);
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
-var dropdowns = __webpack_require__(78);
+var dropdowns = __webpack_require__(868);
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
-var buttons = __webpack_require__(204);
+var buttons = __webpack_require__(536);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/floatExtendedControls.jsx
 
 
 
 
-class FloatExtendedControls extends mixins.wl {
+class FloatExtendedControls extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.isActive = type => {
@@ -24120,7 +24058,7 @@ class FloatExtendedControls extends mixins.wl {
     const isOnHold = this.isActive(onHold);
     const callHoldLabel = isOnHold ? l[23459] : l[23460];
     const screenSharingLabel = this.isActive(Screen) ? l[22890] : l[22889];
-    return external_React_default().createElement(buttons.z, {
+    return external_React_default().createElement(buttons.q, {
       className: "mega-button theme-light-forced round large button-group",
       icon: "sprite-fm-mono icon-options",
       showScreenDialog: showScreenDialog
@@ -24174,13 +24112,13 @@ class FloatExtendedControls extends mixins.wl {
 }
 FloatExtendedControls.NAMESPACE = 'stream-extended-controls';
 // EXTERNAL MODULE: ./js/chat/ui/meetings/micObserver.jsx
-var micObserver = __webpack_require__(203);
+var micObserver = __webpack_require__(8);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/permissionsObserver.jsx
-var permissionsObserver = __webpack_require__(209);
+var permissionsObserver = __webpack_require__(24);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/hostsObserver.jsx
-var hostsObserver = __webpack_require__(419);
+var hostsObserver = __webpack_require__(712);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/streamControls.jsx
-var streamControls = __webpack_require__(230);
+var streamControls = __webpack_require__(227);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/float.jsx
 
 
@@ -24194,7 +24132,7 @@ var streamControls = __webpack_require__(230);
 
 
 
-class FloatingVideo extends mixins.wl {
+class FloatingVideo extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.collapseListener = null;
@@ -24257,7 +24195,7 @@ class FloatingVideo extends mixins.wl {
       onLoadedData: this.onLoadedData
     };
     if (minimized) {
-      return external_React_default().createElement(utils.ZP.RenderTo, {
+      return external_React_default().createElement(utils.cp.RenderTo, {
         element: document.body
       }, external_React_default().createElement(Stream, STREAM_PROPS));
     }
@@ -24266,7 +24204,7 @@ class FloatingVideo extends mixins.wl {
 }
 FloatingVideo.NAMESPACE = 'float-video';
 FloatingVideo.POSITION_MODIFIER = 'with-sidebar';
-class Stream extends mixins.wl {
+class Stream extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.containerRef = external_React_default().createRef();
@@ -24326,7 +24264,7 @@ class Stream extends mixins.wl {
         mode,
         forcedLocal
       } = this.props;
-      return mode === meetings_call.IK.MINI && !forcedLocal ? call.getActiveStream() : call.getLocalStream();
+      return mode === meetings_call.Mh.MINI && !forcedLocal ? call.getActiveStream() : call.getLocalStream();
     };
     this.unbindEvents = () => {
       const events = [...this.EVENTS.MINIMIZE, ...this.EVENTS.EXPAND];
@@ -24352,7 +24290,7 @@ class Stream extends mixins.wl {
             return;
           }
           delete this.PREV_STATE.minimised;
-          return this.props.view === meetings_call.t3.CHAT && this.props.onCallExpand();
+          return this.props.view === meetings_call.Mr.CHAT && this.props.onCallExpand();
         });
       }
       document.addEventListener('click', this.handleOptionsClose);
@@ -24406,7 +24344,7 @@ class Stream extends mixins.wl {
         toggleCollapsedMode,
         onMoveIntoGrid
       } = this.props;
-      const IS_SPEAKER_VIEW = mode === meetings_call.IK.MAIN && forcedLocal;
+      const IS_SPEAKER_VIEW = mode === meetings_call.Mh.MAIN && forcedLocal;
       const {
         POSITION
       } = this.DRAGGABLE;
@@ -24417,7 +24355,7 @@ class Stream extends mixins.wl {
                      ${POSITION.left < 200 && POSITION.top < 100 ? 'options-bottom' : ''}
                      theme-dark-forced
                  `
-      }, external_React_default().createElement("ul", null, external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.Z, {
+      }, external_React_default().createElement("ul", null, external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.c, {
         icon: `
                                 sprite-fm-mono
                                 ${IS_SPEAKER_VIEW ? 'grid-9' : 'grid-main'}
@@ -24426,21 +24364,21 @@ class Stream extends mixins.wl {
           options: false
         }, () => {
           if (IS_SPEAKER_VIEW) {
-            return onModeChange(meetings_call.IK.THUMBNAIL);
+            return onModeChange(meetings_call.Mh.THUMBNAIL);
           }
           onSpeakerChange(call.getLocalStream());
         })
-      }, external_React_default().createElement("div", null, IS_SPEAKER_VIEW ? l.switch_to_thumb_view : l.display_in_main_view))), external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.Z, {
+      }, external_React_default().createElement("div", null, IS_SPEAKER_VIEW ? l.switch_to_thumb_view : l.display_in_main_view))), external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.c, {
         icon: "sprite-fm-mono icon-collapse-up",
         onClick: onMoveIntoGrid
-      }, external_React_default().createElement("div", null, l.move_into_grid_button))), external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.Z, {
+      }, external_React_default().createElement("div", null, l.move_into_grid_button))), external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.c, {
         icon: "sprite-fm-mono icon-download-standard",
         onClick: () => this.setState({
           options: false
         }, () => toggleCollapsedMode())
       }, external_React_default().createElement("div", null, l.collapse_self_video)))), !!(call.av & SfuClient.Av.Screen) && external_React_default().createElement("ul", {
         className: "has-separator"
-      }, external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.Z, {
+      }, external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.c, {
         className: "end-screen-share",
         icon: "icon-end-screenshare",
         onClick: () => {
@@ -24490,7 +24428,7 @@ class Stream extends mixins.wl {
         onLoadedData: onLoadedData
       }), external_React_default().createElement("div", {
         className: `${FloatingVideo.NAMESPACE}-self-overlay`
-      }, minimized ? null : external_React_default().createElement(meetings_button.Z, {
+      }, minimized ? null : external_React_default().createElement(meetings_button.c, {
         className: `
                                 mega-button
                                 theme-light-forced
@@ -24536,7 +24474,7 @@ class Stream extends mixins.wl {
       toggleCollapsedMode,
       onCallExpand
     } = this.props;
-    const IS_MINI_MODE = mode === meetings_call.IK.MINI;
+    const IS_MINI_MODE = mode === meetings_call.Mh.MINI;
     if (collapsed) {
       return external_React_default().createElement("div", {
         ref: this.containerRef,
@@ -24564,12 +24502,12 @@ class Stream extends mixins.wl {
       onClick: ({
         target
       }) => minimized && target.classList.contains(`${NAMESPACE}-overlay`) && onCallExpand()
-    }, IS_MINI_MODE && this.renderMiniMode(), !IS_MINI_MODE && this.renderSelfView(), minimized && external_React_default().createElement(__Minimized, (0,esm_extends.Z)({}, this.props, {
+    }, IS_MINI_MODE && this.renderMiniMode(), !IS_MINI_MODE && this.renderSelfView(), minimized && external_React_default().createElement(__Minimized, (0,esm_extends.c)({}, this.props, {
       onOptionsToggle: this.handleOptionsToggle
     })));
   }
 }
-class Minimized extends mixins.wl {
+class Minimized extends mixins.ei {
   constructor(props) {
     super(props);
     this.SIMPLETIP_PROPS = {
@@ -24621,13 +24559,13 @@ class Minimized extends mixins.wl {
       } = this.props;
       const audioLabel = this.isActive(SfuClient.Av.Audio) ? l[16214] : l[16708];
       const videoLabel = this.isActive(SfuClient.Av.Camera) ? l[22894] : l[22893];
-      const LeaveButton = (0,hostsObserver.N)(({
+      const LeaveButton = (0,hostsObserver._)(({
         hasHost,
         chatRoom,
         confirmLeave,
         onLeave
       }) => {
-        return external_React_default().createElement(meetings_button.Z, {
+        return external_React_default().createElement(meetings_button.c, {
           simpletip: {
             ...this.SIMPLETIP_PROPS,
             label: l[5884]
@@ -24643,7 +24581,7 @@ class Minimized extends mixins.wl {
               cta: l.assign_host_button,
               altCta: l.leave_anyway
             });
-            return recorder && recorder === u_handle ? (0,streamControls.px)(doLeave, onRecordingToggle) : doLeave();
+            return recorder && recorder === u_handle ? (0,streamControls.uA)(doLeave, onRecordingToggle) : doLeave();
           }
         }, external_React_default().createElement("span", null, l[5884]));
       });
@@ -24651,7 +24589,7 @@ class Minimized extends mixins.wl {
         className: `${FloatingVideo.NAMESPACE}-controls`
       }, external_React_default().createElement("div", {
         className: "meetings-signal-container"
-      }, external_React_default().createElement(meetings_button.Z, {
+      }, external_React_default().createElement(meetings_button.c, {
         simpletip: {
           ...this.SIMPLETIP_PROPS,
           label: audioLabel
@@ -24671,7 +24609,7 @@ class Minimized extends mixins.wl {
         }
       }, external_React_default().createElement("span", null, audioLabel)), this.renderSignalWarning(), this.renderPermissionsWarning(Av.Audio)), external_React_default().createElement("div", {
         className: "meetings-signal-container"
-      }, external_React_default().createElement(meetings_button.Z, {
+      }, external_React_default().createElement(meetings_button.c, {
         simpletip: {
           ...this.SIMPLETIP_PROPS,
           label: videoLabel
@@ -24719,7 +24657,7 @@ class Minimized extends mixins.wl {
                     theme-dark-forced
                 `,
         onClick: this.props.onCallExpand
-      }, waitingRoomPeers.length > 1 ? l.wr_peers_waiting.replace('%1', waitingRoomPeers.length) : external_React_default().createElement(utils.Cw, {
+      }, waitingRoomPeers.length > 1 ? l.wr_peers_waiting.replace('%1', waitingRoomPeers.length) : external_React_default().createElement(utils.Ub, {
         tag: "span",
         content: l.wr_peer_waiting.replace('%s', megaChat.html(M.getNameByHandle(waitingRoomPeers[0])))
       }));
@@ -24750,7 +24688,7 @@ class Minimized extends mixins.wl {
     } = this.state;
     return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("div", {
       className: `${FloatingVideo.NAMESPACE}-overlay`
-    }, external_React_default().createElement(meetings_button.Z, {
+    }, external_React_default().createElement(meetings_button.c, {
       simpletip: {
         ...this.SIMPLETIP_PROPS,
         label: l.expand_mini_call
@@ -24763,7 +24701,7 @@ class Minimized extends mixins.wl {
       }
     }), this.renderStreamControls()), waitingRoomPeers && waitingRoomPeers.length ? this.renderPeersWaiting() : null, unread ? external_React_default().createElement("div", {
       className: `${FloatingVideo.NAMESPACE}-notifications`
-    }, external_React_default().createElement(meetings_button.Z, {
+    }, external_React_default().createElement(meetings_button.c, {
       className: "mega-button round large chat-control",
       icon: "icon-chat-filled"
     }, external_React_default().createElement("span", null, l.chats)), external_React_default().createElement("span", null, unread > 9 ? '9+' : unread)) : null);
@@ -24771,7 +24709,7 @@ class Minimized extends mixins.wl {
 }
 Minimized.NAMESPACE = 'float-video-minimized';
 Minimized.UNREAD_EVENT = 'onUnreadCountUpdate.localStreamNotifications';
-const __Minimized = (0,mixins.qC)(micObserver.n, permissionsObserver.Q)(Minimized);
+const __Minimized = (0,mixins.Jn)(micObserver.s, permissionsObserver.s)(Minimized);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/participantsNotice.jsx
 
 
@@ -24779,7 +24717,7 @@ const __Minimized = (0,mixins.qC)(micObserver.n, permissionsObserver.Q)(Minimize
 
 
 
-class ParticipantsNotice extends mixins.wl {
+class ParticipantsNotice extends mixins.ei {
   constructor(props) {
     super(props);
     this.renderUserAlone = () => external_React_default().createElement("div", {
@@ -24794,12 +24732,12 @@ class ParticipantsNotice extends mixins.wl {
       className: `${ParticipantsNotice.NAMESPACE}-content user-alone`
     }, external_React_default().createElement("h3", null, l.only_one_here), external_React_default().createElement("p", {
       className: "theme-dark-forced"
-    }, external_React_default().createElement(utils.Cw, null, l.empty_call_dlg_text.replace('%s', '2'))), external_React_default().createElement("div", {
+    }, external_React_default().createElement(utils.Ub, null, l.empty_call_dlg_text.replace('%s', '2'))), external_React_default().createElement("div", {
       className: "notice-footer"
-    }, external_React_default().createElement(meetings_button.Z, {
+    }, external_React_default().createElement(meetings_button.c, {
       className: "mega-button large stay-on-call",
       onClick: this.props.onStayConfirm
-    }, external_React_default().createElement("span", null, l.empty_call_stay_button)), external_React_default().createElement(meetings_button.Z, {
+    }, external_React_default().createElement("span", null, l.empty_call_stay_button)), external_React_default().createElement(meetings_button.c, {
       className: "mega-button positive large stay-on-call",
       onClick: this.props.onCallEnd
     }, external_React_default().createElement("span", null, l.empty_call_dlg_end)))));
@@ -24817,7 +24755,7 @@ class ParticipantsNotice extends mixins.wl {
                 `
       }, external_React_default().createElement("div", {
         className: `${ParticipantsNotice.NAMESPACE}-heading`
-      }, chatRoom.type === 'private' ? external_React_default().createElement("h1", null, external_React_default().createElement(utils.dy, null, l.waiting_for_peer.replace('%NAME', chatRoom.getRoomTitle()))) : external_React_default().createElement("h1", null, l.waiting_for_others)), chatRoom.isMeeting && chatRoom.publicLink && external_React_default().createElement("div", {
+      }, chatRoom.type === 'private' ? external_React_default().createElement("h1", null, external_React_default().createElement(utils.O, null, l.waiting_for_peer.replace('%NAME', chatRoom.getRoomTitle()))) : external_React_default().createElement("h1", null, l.waiting_for_others)), chatRoom.isMeeting && chatRoom.publicLink && external_React_default().createElement("div", {
         className: `${ParticipantsNotice.NAMESPACE}-content`
       }, external_React_default().createElement("h3", null, l.copy_and_share), external_React_default().createElement("div", {
         className: "mega-input with-icon box-style"
@@ -24828,12 +24766,12 @@ class ParticipantsNotice extends mixins.wl {
         className: "megaInputs",
         readOnly: true,
         defaultValue: link
-      })), external_React_default().createElement(meetings_button.Z, {
+      })), external_React_default().createElement(meetings_button.c, {
         className: "mega-button positive large copy-to-clipboard",
         onClick: () => copyToClipboard(link, l[7654])
-      }, external_React_default().createElement("span", null, l[17835])), meetings_call.ZP.isModerator(chatRoom, u_handle) && external_React_default().createElement("div", {
+      }, external_React_default().createElement("span", null, l[17835])), meetings_call.cp.isModerator(chatRoom, u_handle) && external_React_default().createElement("div", {
         className: "peers-invite"
-      }, external_React_default().createElement("hr", null), external_React_default().createElement(meetings_button.Z, {
+      }, external_React_default().createElement("hr", null), external_React_default().createElement(meetings_button.c, {
         className: "mega-button action",
         onClick: onInviteToggle
       }, l.invite_from_contact_list))));
@@ -24870,7 +24808,7 @@ class ParticipantsNotice extends mixins.wl {
 }
 ParticipantsNotice.NAMESPACE = 'participants-notice';
 // EXTERNAL MODULE: ./js/chat/ui/chatToaster.jsx
-var chatToaster = __webpack_require__(142);
+var chatToaster = __webpack_require__(464);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/participantsBlock.jsx
 
 
@@ -24884,7 +24822,7 @@ const SIMPLE_TIP = {
   offset: 5,
   className: 'theme-dark-forced'
 };
-class ParticipantsBlock extends mixins.wl {
+class ParticipantsBlock extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.nodeMenuRef = external_React_default().createRef();
@@ -24907,7 +24845,7 @@ class ParticipantsBlock extends mixins.wl {
       } = this.props;
       const localStream = call.getLocalStream();
       if (localStream) {
-        const IS_SPEAKER_VIEW = mode === meetings_call.IK.MAIN && forcedLocal;
+        const IS_SPEAKER_VIEW = mode === meetings_call.Mh.MAIN && forcedLocal;
         return external_React_default().createElement(LocalVideoThumb, {
           key: u_handle,
           className: `
@@ -24941,18 +24879,18 @@ class ParticipantsBlock extends mixins.wl {
           className: "sprite-fm-mono icon-options"
         })), external_React_default().createElement("div", {
           className: "node-menu-content"
-        }, external_React_default().createElement("ul", null, external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.Z, {
+        }, external_React_default().createElement("ul", null, external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.c, {
           icon: `
                                             sprite-fm-mono
                                             ${IS_SPEAKER_VIEW ? 'grid-9' : 'grid-main'}
                                         `,
           onClick: () => {
             if (IS_SPEAKER_VIEW) {
-              return onModeChange(meetings_call.IK.THUMBNAIL);
+              return onModeChange(meetings_call.Mh.THUMBNAIL);
             }
             return onSpeakerChange(localStream);
           }
-        }, external_React_default().createElement("span", null, IS_SPEAKER_VIEW ? l.switch_to_thumb_view : l.display_in_main_view))), external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.Z, {
+        }, external_React_default().createElement("span", null, IS_SPEAKER_VIEW ? l.switch_to_thumb_view : l.display_in_main_view))), external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.c, {
           icon: "sprite-fm-mono grid-separate",
           onClick: onSeparate
         }, external_React_default().createElement("span", null, l.separate_from_grid_button)))))));
@@ -25052,15 +24990,129 @@ class ParticipantsBlock extends mixins.wl {
     return null;
   }
 }
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/videoNodeMenu.jsx
+
+
+
+
+
+class VideoNodeMenu extends mixins.ei {
+  constructor(props) {
+    super(props);
+    this.Contact = this.Contact.bind(this);
+    this.Pin = this.Pin.bind(this);
+    this.Privilege = this.Privilege.bind(this);
+  }
+  Contact() {
+    const {
+      stream,
+      ephemeralAccounts,
+      onCallMinimize
+    } = this.props;
+    const {
+      userHandle
+    } = stream;
+    const IS_GUEST = (0,meetings_call.or)() || ephemeralAccounts && ephemeralAccounts.includes(userHandle);
+    const HAS_RELATIONSHIP = M.u[userHandle].c === 1;
+    if (HAS_RELATIONSHIP) {
+      return external_React_default().createElement(meetings_button.c, {
+        icon: "sprite-fm-mono icon-chat",
+        onClick: () => {
+          onCallMinimize();
+          loadSubPage(`fm/chat/p/${userHandle}`);
+        }
+      }, external_React_default().createElement("span", null, l[7997]));
+    }
+    return external_React_default().createElement(meetings_button.c, {
+      className: IS_GUEST ? 'disabled' : '',
+      icon: "sprite-fm-mono icon-add",
+      onClick: () => {
+        return IS_GUEST ? false : M.syncContactEmail(userHandle, true).then(email => {
+          const OPC = Object.values(M.opc);
+          if (OPC && OPC.length && OPC.some(opc => opc.m === email)) {
+            return msgDialog('warningb', '', l[17545]);
+          }
+          msgDialog('info', l[150], l[5898]);
+          M.inviteContact(M.u[u_handle].m, email);
+        }).catch(() => mBroadcaster.sendMessage('meetings:ephemeralAdd', userHandle));
+      }
+    }, external_React_default().createElement("span", null, l[24581]));
+  }
+  Pin() {
+    const {
+      stream,
+      onSpeakerChange
+    } = this.props;
+    if (onSpeakerChange) {
+      return external_React_default().createElement(meetings_button.c, {
+        icon: "sprite-fm-mono grid-main",
+        onClick: () => onSpeakerChange(stream)
+      }, external_React_default().createElement("span", null, l.display_in_main_view));
+    }
+    return null;
+  }
+  Privilege() {
+    const {
+      stream,
+      chatRoom
+    } = this.props;
+    const {
+      call,
+      userHandle
+    } = stream;
+    if (call && call.isPublic) {
+      const {
+        OPERATOR,
+        FULL
+      } = ChatRoom.MembersSet.PRIVILEGE_STATE;
+      const currentUserModerator = chatRoom.members[u_handle] === OPERATOR;
+      const targetUserModerator = chatRoom.members[userHandle] === OPERATOR;
+      return currentUserModerator && external_React_default().createElement(meetings_button.c, {
+        targetUserModerator: targetUserModerator,
+        icon: "sprite-fm-mono icon-admin-outline",
+        onClick: () => {
+          ['alterUserPrivilege', 'onCallPrivilegeChange'].map(event => chatRoom.trigger(event, [userHandle, targetUserModerator ? FULL : OPERATOR]));
+        }
+      }, external_React_default().createElement("span", null, targetUserModerator ? l.remove_moderator : l.make_moderator));
+    }
+    return null;
+  }
+  render() {
+    const {
+      NAMESPACE
+    } = VideoNodeMenu;
+    const {
+      userHandle
+    } = this.props.stream;
+    if (userHandle !== u_handle) {
+      return external_React_default().createElement("div", {
+        className: `
+                        ${NAMESPACE}
+                        theme-dark-forced
+                    `
+      }, external_React_default().createElement("div", {
+        className: `${NAMESPACE}-toggle`
+      }, external_React_default().createElement(utils.O, null, M.getNameByHandle(userHandle)), external_React_default().createElement("i", {
+        className: "sprite-fm-mono icon-side-menu"
+      })), external_React_default().createElement("div", {
+        className: `${NAMESPACE}-content`
+      }, external_React_default().createElement("ul", null, [this.Contact, this.Pin, this.Privilege].map((button, index) => external_React_default().createElement("li", {
+        key: index
+      }, button())))));
+    }
+    return null;
+  }
+}
+VideoNodeMenu.NAMESPACE = 'node-menu';
 // EXTERNAL MODULE: ./js/ui/modalDialogs.jsx + 1 modules
-var modalDialogs = __webpack_require__(182);
+var modalDialogs = __webpack_require__(776);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/modeSwitch.jsx
 
 
 
 
 
-class ModeSwitch extends mixins.wl {
+class ModeSwitch extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.containerRef = external_React_default().createRef();
@@ -25090,9 +25142,9 @@ class ModeSwitch extends mixins.wl {
     };
     this.getModeIcon = mode => {
       switch (mode) {
-        case meetings_call.IK.THUMBNAIL:
+        case meetings_call.Mh.THUMBNAIL:
           return 'grid-9';
-        case meetings_call.IK.MAIN:
+        case meetings_call.Mh.MAIN:
           return 'grid-main';
         default:
           return null;
@@ -25105,9 +25157,9 @@ class ModeSwitch extends mixins.wl {
       return external_React_default().createElement("div", {
         className: `${ModeSwitch.BASE_CLASS}-toggle`,
         onClick: this.doToggle
-      }, external_React_default().createElement(meetings_button.Z, null, external_React_default().createElement("i", {
+      }, external_React_default().createElement(meetings_button.c, null, external_React_default().createElement("i", {
         className: `sprite-fm-mono ${this.getModeIcon(mode)}`
-      }), mode === meetings_call.IK.THUMBNAIL && external_React_default().createElement("div", null, l.thumbnail_view), mode === meetings_call.IK.MAIN && external_React_default().createElement("div", null, l.main_view)), external_React_default().createElement("i", {
+      }), mode === meetings_call.Mh.THUMBNAIL && external_React_default().createElement("div", null, l.thumbnail_view), mode === meetings_call.Mh.MAIN && external_React_default().createElement("div", null, l.main_view)), external_React_default().createElement("i", {
         className: "sprite-fm-mono icon-arrow-down"
       }));
     };
@@ -25124,7 +25176,7 @@ class ModeSwitch extends mixins.wl {
           this.doToggle();
           this.props.onModeChange(mode);
         }
-      }, external_React_default().createElement(meetings_button.Z, null, external_React_default().createElement("i", {
+      }, external_React_default().createElement(meetings_button.c, null, external_React_default().createElement("i", {
         className: `sprite-fm-mono ${this.getModeIcon(mode)}`
       }), external_React_default().createElement("div", null, label)));
     };
@@ -25227,16 +25279,16 @@ class ModeSwitch extends mixins.wl {
                     `
     }, external_React_default().createElement(Option, {
       label: l.main_view,
-      mode: meetings_call.IK.MAIN
+      mode: meetings_call.Mh.MAIN
     }), external_React_default().createElement(Option, {
       label: l.thumbnail_view,
-      mode: meetings_call.IK.THUMBNAIL
+      mode: meetings_call.Mh.THUMBNAIL
     }), external_React_default().createElement("div", {
       className: `${ModeSwitch.BASE_CLASS}-option`,
       onClick: () => this.setState({
         settings: true
       }, doToggle)
-    }, external_React_default().createElement(meetings_button.Z, null, external_React_default().createElement("i", {
+    }, external_React_default().createElement(meetings_button.c, null, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-settings"
     }), external_React_default().createElement("div", null, l.layout_settings_button)))), state.settings && external_React_default().createElement(Settings, null));
   }
@@ -25253,7 +25305,7 @@ ModeSwitch.BASE_CLASS = 'mode';
 
 
 
-class StreamHead extends mixins.wl {
+class StreamHead extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.delayProcID = null;
@@ -25316,7 +25368,7 @@ class StreamHead extends mixins.wl {
     this.Dialog = () => {
       const link = `${getBaseUrl()}/${this.props.chatRoom.publicLink}`;
       const mods = this.getModerators();
-      return external_React_default().createElement(modalDialogs.Z.ModalDialog, (0,esm_extends.Z)({
+      return external_React_default().createElement(modalDialogs.M.ModalDialog, (0,esm_extends.c)({
         ref: this.dialogRef
       }, this.state, {
         mods: mods,
@@ -25328,7 +25380,7 @@ class StreamHead extends mixins.wl {
         className: "content"
       }, external_React_default().createElement("div", {
         className: "content-block"
-      }, external_React_default().createElement(utils.dy, {
+      }, external_React_default().createElement(utils.O, {
         className: "info"
       }, mods), external_React_default().createElement("div", {
         className: "info"
@@ -25343,7 +25395,7 @@ class StreamHead extends mixins.wl {
         className: "megaInputs",
         readOnly: true,
         value: link
-      })), external_React_default().createElement(meetings_button.Z, {
+      })), external_React_default().createElement(meetings_button.c, {
         className: "mega-button positive copy-to-clipboard",
         onClick: () => {
           if (copyToClipboard(link)) {
@@ -25368,10 +25420,10 @@ class StreamHead extends mixins.wl {
         chunksLength,
         onMovePage
       } = this.props;
-      if (mode === meetings_call.IK.THUMBNAIL && peers && peers.length > (floatDetached ? streamsPerPage : streamsPerPage - 1)) {
+      if (mode === meetings_call.Mh.THUMBNAIL && peers && peers.length > (floatDetached ? streamsPerPage : streamsPerPage - 1)) {
         return external_React_default().createElement("div", {
           className: `${StreamHead.NAMESPACE}-pagination`
-        }, external_React_default().createElement(meetings_button.Z, {
+        }, external_React_default().createElement(meetings_button.c, {
           className: `
                             carousel-button-prev
                             theme-dark-forced
@@ -25379,7 +25431,7 @@ class StreamHead extends mixins.wl {
                         `,
           icon: "sprite-fm-mono icon-arrow-left",
           onClick: () => page !== 0 && onMovePage(PAGINATION.PREV)
-        }), external_React_default().createElement("div", null, page + 1, "/", chunksLength), external_React_default().createElement(meetings_button.Z, {
+        }), external_React_default().createElement("div", null, page + 1, "/", chunksLength), external_React_default().createElement(meetings_button.c, {
           className: `
                             carousel-button-next
                             theme-dark-forced
@@ -25456,7 +25508,7 @@ class StreamHead extends mixins.wl {
         dialog: !dialog,
         banner: false
       })
-    }, external_React_default().createElement(utils.dy, null, chatRoom.getRoomTitle()), chatRoom.isMeeting && chatRoom.publicLink && external_React_default().createElement("i", {
+    }, external_React_default().createElement(utils.O, null, chatRoom.getRoomTitle()), chatRoom.isMeeting && chatRoom.publicLink && external_React_default().createElement("i", {
       className: `
                                         sprite-fm-mono
                                         ${dialog ? 'icon-arrow-up' : 'icon-arrow-down'}
@@ -25468,7 +25520,7 @@ class StreamHead extends mixins.wl {
       streamsPerPage: streamsPerPage,
       onStreamsPerPageChange: onStreamsPerPageChange,
       onModeChange: onModeChange
-    }), external_React_default().createElement(meetings_button.Z, {
+    }), external_React_default().createElement(meetings_button.c, {
       className: "head-control",
       simpletip: {
         ...SIMPLETIP,
@@ -25476,7 +25528,7 @@ class StreamHead extends mixins.wl {
       },
       icon: this.fullscreen ? 'icon-fullscreen-leave' : 'icon-fullscreen-enter',
       onClick: this.toggleFullscreen
-    }, external_React_default().createElement("span", null, this.fullscreen ? l.exit_fullscreen : l[17803])), external_React_default().createElement(meetings_button.Z, {
+    }, external_React_default().createElement("span", null, this.fullscreen ? l.exit_fullscreen : l[17803])), external_React_default().createElement(meetings_button.c, {
       className: "head-control",
       simpletip: {
         ...SIMPLETIP,
@@ -25494,7 +25546,7 @@ StreamHead.EVENTS = {
   CLICK_DIALOG: 'click'
 };
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
-var perfectScrollbar = __webpack_require__(285);
+var perfectScrollbar = __webpack_require__(447);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/waitingRoom/admit.jsx
 
 
@@ -25503,7 +25555,7 @@ var perfectScrollbar = __webpack_require__(285);
 
 
 const NAMESPACE = 'admit';
-class Admit extends mixins.wl {
+class Admit extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.peersWaitingRef = external_React_default().createRef();
@@ -25538,7 +25590,7 @@ class Admit extends mixins.wl {
       const {
         peers
       } = this.props;
-      return external_React_default().createElement(perfectScrollbar.F, {
+      return external_React_default().createElement(perfectScrollbar.e, {
         ref: this.peersWaitingRef,
         options: {
           'suppressScrollX': true
@@ -25555,7 +25607,7 @@ class Admit extends mixins.wl {
           contact: M.u[handle]
         })), external_React_default().createElement("div", {
           className: "peer-name"
-        }, external_React_default().createElement(utils.dy, null, M.getNameByHandle(handle))), external_React_default().createElement("div", {
+        }, external_React_default().createElement(utils.O, null, M.getNameByHandle(handle))), external_React_default().createElement("div", {
           className: "peer-controls"
         }, external_React_default().createElement(this.Icon, {
           icon: "icon-close-component",
@@ -25588,12 +25640,12 @@ class Admit extends mixins.wl {
           className: `${NAMESPACE}-content`
         }, this.renderPeersList()), external_React_default().createElement("div", {
           className: `${NAMESPACE}-controls`
-        }, expanded ? null : external_React_default().createElement(meetings_button.Z, {
+        }, expanded ? null : external_React_default().createElement(meetings_button.c, {
           className: "mega-button theme-dark-forced",
           onClick: () => this.setState({
             expanded: true
           })
-        }, external_React_default().createElement("span", null, l.wr_see_waiting)), external_React_default().createElement(meetings_button.Z, {
+        }, external_React_default().createElement("span", null, l.wr_see_waiting)), external_React_default().createElement(meetings_button.c, {
           peers: peers,
           className: "mega-button positive theme-dark-forced",
           onClick: () => call.sfuClient.wrAllowJoin(peers)
@@ -25607,15 +25659,15 @@ class Admit extends mixins.wl {
       } = this.props;
       const peer = peers[0];
       if (peer) {
-        return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(utils.Cw, {
+        return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(utils.Ub, {
           tag: "h3",
           content: l.wr_peer_waiting.replace('%s', megaChat.html(M.getNameByHandle(peer)))
         }), external_React_default().createElement("div", {
           className: `${NAMESPACE}-controls`
-        }, external_React_default().createElement(meetings_button.Z, {
+        }, external_React_default().createElement(meetings_button.c, {
           className: "mega-button theme-dark-forced",
           onClick: () => this.doDeny(peer)
-        }, external_React_default().createElement("span", null, l.wr_deny)), external_React_default().createElement(meetings_button.Z, {
+        }, external_React_default().createElement("span", null, l.wr_deny)), external_React_default().createElement(meetings_button.c, {
           className: "mega-button positive theme-dark-forced",
           onClick: () => this.doAdmit(peer)
         }, external_React_default().createElement("span", null, l.wr_admit))));
@@ -25686,7 +25738,7 @@ const chunkNodes = (nodes, size) => {
   }
   return null;
 };
-class stream_Stream extends mixins.wl {
+class stream_Stream extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.wrapperRef = external_React_default().createRef();
@@ -25757,7 +25809,7 @@ class stream_Stream extends mixins.wl {
     if (streamsInUI) {
       const streamCountInUI = peers.length > nodesPerPage || floatDetached ? streamsInUI.length : streamsInUI.length + 1;
       let rows;
-      if (mode === meetings_call.IK.THUMBNAIL) {
+      if (mode === meetings_call.Mh.THUMBNAIL) {
         columns = typeof columns === 'number' ? columns : this.getColumns(streamCountInUI);
         rows = Math.ceil(streamCountInUI / columns);
       } else {
@@ -25774,7 +25826,7 @@ class stream_Stream extends mixins.wl {
       }
       const nodeRefs = this.nodeRefs.flat();
       const nodeRefsLength = nodeRefs.length;
-      const viewMode = mode || meetings_call.IK.MAIN;
+      const viewMode = mode || meetings_call.Mh.MAIN;
       let cache = `${viewMode}:${targetWidth}:${targetHeight}:${nodeRefsLength}:${rows}:${streamCountInUI}:${columns}`;
       for (let i = 0; i < nodeRefsLength; i++) {
         cache += `${nodeRefs[i].cacheKey}:`;
@@ -25813,7 +25865,7 @@ class stream_Stream extends mixins.wl {
     const filteredPeers = Object.values(peers).filter(p => p instanceof CallManager2.Peer);
     const streaming = [...filteredPeers.filter(p => p.isScreen), ...filteredPeers.filter(p => !p.videoMuted)];
     const rest = filteredPeers.filter(p => !streaming.includes(p));
-    if (mode === meetings_call.IK.THUMBNAIL) {
+    if (mode === meetings_call.Mh.THUMBNAIL) {
       const nodesPerPage = floatDetached ? streamsPerPage : streamsPerPage - 1;
       if (peers.length <= nodesPerPage) {
         const $$PEER = (peer, i) => {
@@ -25966,14 +26018,14 @@ class stream_Stream extends mixins.wl {
       className: "node-menu theme-dark-forced"
     }, external_React_default().createElement("div", {
       className: "node-menu-toggle"
-    }, external_React_default().createElement(utils.dy, null, M.getNameByHandle(u_handle)), external_React_default().createElement("i", {
+    }, external_React_default().createElement(utils.O, null, M.getNameByHandle(u_handle)), external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-side-menu"
     })), external_React_default().createElement("div", {
       className: "node-menu-content"
-    }, external_React_default().createElement("ul", null, external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.Z, {
+    }, external_React_default().createElement("ul", null, external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.c, {
       icon: "sprite-fm-mono grid-main",
       onClick: () => onSpeakerChange(call.getLocalStream())
-    }, external_React_default().createElement("span", null, l.display_in_main_view))), external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.Z, {
+    }, external_React_default().createElement("span", null, l.display_in_main_view))), external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.c, {
       icon: "sprite-fm-mono grid-separate",
       onClick: this.toggleFloatDetachment
     }, external_React_default().createElement("span", null, l.separate_from_grid_button))))));
@@ -26007,8 +26059,8 @@ class stream_Stream extends mixins.wl {
       className: `
                     ${stream_NAMESPACE}-container
                     ${peers.length === 0 || !hasOtherParticipants ? 'with-notice' : ''}
-                    ${peers.length === 1 && mode === meetings_call.IK.THUMBNAIL && this.state.floatDetached ? 'single-stream' : ''}
-                    ${peers.length === 1 && mode === meetings_call.IK.THUMBNAIL && !this.state.floatDetached ? 'dual-stream' : ''}
+                    ${peers.length === 1 && mode === meetings_call.Mh.THUMBNAIL && this.state.floatDetached ? 'single-stream' : ''}
+                    ${peers.length === 1 && mode === meetings_call.Mh.THUMBNAIL && !this.state.floatDetached ? 'dual-stream' : ''}
                 `
     }, content);
     if (peers.length === 0 || !hasOtherParticipants) {
@@ -26028,7 +26080,7 @@ class stream_Stream extends mixins.wl {
     return streamContainer(this.renderNodes());
   }
   renderToaster() {
-    return external_React_default().createElement(chatToaster.Z, {
+    return external_React_default().createElement(chatToaster.c, {
       showDualNotifications: true,
       hidden: this.props.minimized,
       onShownToast: toast => {
@@ -26116,11 +26168,11 @@ class stream_Stream extends mixins.wl {
     }) : null, this.renderToaster(), minimized ? null : external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("div", {
       className: `
                                 ${stream_NAMESPACE}-wrapper
-                                ${mode === meetings_call.IK.MAIN ? 'with-participants-block' : ''}
+                                ${mode === meetings_call.Mh.MAIN ? 'with-participants-block' : ''}
                             `
     }, isOnHold ? this.renderOnHold() : overlayed && external_React_default().createElement("div", {
       className: "call-overlay"
-    }), this.renderStreamContainer()), mode === meetings_call.IK.MAIN && external_React_default().createElement(ParticipantsBlock, (0,esm_extends.Z)({}, this.props, {
+    }), this.renderStreamContainer()), mode === meetings_call.Mh.MAIN && external_React_default().createElement(ParticipantsBlock, (0,esm_extends.c)({}, this.props, {
       floatDetached: floatDetached,
       onSeparate: this.toggleFloatDetachment
     })), external_React_default().createElement(StreamHead, {
@@ -26173,24 +26225,24 @@ class stream_Stream extends mixins.wl {
 
 /***/ }),
 
-/***/ 230:
+/***/ 227:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-ZP: () => (__WEBPACK_DEFAULT_EXPORT__),
-px: () => (renderLeaveConfirm),
-qJ: () => (renderEndConfirm)
+cp: () => (__WEBPACK_DEFAULT_EXPORT__),
+kf: () => (renderEndConfirm),
+uA: () => (renderLeaveConfirm)
 });
-var react0__ = __webpack_require__(363);
+var react0__ = __webpack_require__(376);
 var react0 = __webpack_require__.n(react0__);
-var _mixins1__ = __webpack_require__(503);
-var _button_jsx2__ = __webpack_require__(193);
-var _stream_jsx3__ = __webpack_require__(302);
-var _micObserver_jsx4__ = __webpack_require__(203);
-var _permissionsObserver_jsx5__ = __webpack_require__(209);
-var _call_jsx6__ = __webpack_require__(476);
-var _hostsObserver_jsx7__ = __webpack_require__(419);
+var _mixins1__ = __webpack_require__(436);
+var _button_jsx2__ = __webpack_require__(600);
+var _stream_jsx3__ = __webpack_require__(968);
+var _micObserver_jsx4__ = __webpack_require__(8);
+var _permissionsObserver_jsx5__ = __webpack_require__(24);
+var _call_jsx6__ = __webpack_require__(144);
+var _hostsObserver_jsx7__ = __webpack_require__(712);
 
 
 
@@ -26211,7 +26263,7 @@ const renderEndConfirm = (onConfirm, onRecordingToggle) => msgDialog(`confirmati
     onConfirm();
   }
 }, 1);
-class StreamControls extends _mixins1__.wl {
+class StreamControls extends _mixins1__.ei {
   constructor(...args) {
     super(...args);
     this.endContainerRef = react0().createRef();
@@ -26225,7 +26277,7 @@ class StreamControls extends _mixins1__.wl {
       endCallOptions: false,
       endCallPending: false
     };
-    this.LeaveButton = (0,_hostsObserver_jsx7__.N)(({
+    this.LeaveButton = (0,_hostsObserver_jsx7__._)(({
       hasHost,
       chatRoom,
       confirmLeave,
@@ -26237,7 +26289,7 @@ class StreamControls extends _mixins1__.wl {
         cta: l.assign_host_button,
         altCta: l.leave_anyway
       });
-      return react0().createElement(_button_jsx2__.Z, {
+      return react0().createElement(_button_jsx2__.c, {
         className: "mega-button",
         onClick: () => {
           const {
@@ -26264,20 +26316,20 @@ class StreamControls extends _mixins1__.wl {
           alignItems: 'center',
           color: 'tomato'
         }
-      }, react0().createElement(_button_jsx2__.Z, {
+      }, react0().createElement(_button_jsx2__.c, {
         className: "mega-button round small theme-dark-forced positive",
         simpletip: {
           ...this.SIMPLETIP,
           label: 'Add Stream'
         },
-        onClick: () => this.props.onStreamToggle(_stream_jsx3__.Uf.ADD)
-      }, react0().createElement("span", null, l.add)), react0().createElement(_button_jsx2__.Z, {
+        onClick: () => this.props.onStreamToggle(_stream_jsx3__.It.ADD)
+      }, react0().createElement("span", null, l.add)), react0().createElement(_button_jsx2__.c, {
         className: "mega-button round small theme-dark-forced negative",
         simpletip: {
           ...this.SIMPLETIP,
           label: 'Remove Stream'
         },
-        onClick: () => this.props.peers.length > 1 && this.props.onStreamToggle(_stream_jsx3__.Uf.REMOVE)
+        onClick: () => this.props.peers.length > 1 && this.props.onStreamToggle(_stream_jsx3__.It.REMOVE)
       }, react0().createElement("span", null, l[83])), react0().createElement("span", null, this.props.peers.length + 1));
     };
     this.renderEndCallOptions = () => {
@@ -26308,7 +26360,7 @@ class StreamControls extends _mixins1__.wl {
         participants: chatRoom.getCallParticipants(),
         onLeave: onCallEnd,
         onConfirmDenied: onCallEnd
-      }), react0().createElement(_button_jsx2__.Z, {
+      }), react0().createElement(_button_jsx2__.c, {
         className: `
                             mega-button
                             positive
@@ -26334,7 +26386,7 @@ class StreamControls extends _mixins1__.wl {
         ref: this.endContainerRef,
         className: "end-call-container",
         onClick: () => {
-          if (chatRoom.type !== 'private' && peers.length && _call_jsx6__.ZP.isModerator(chatRoom, u_handle)) {
+          if (chatRoom.type !== 'private' && peers.length && _call_jsx6__.cp.isModerator(chatRoom, u_handle)) {
             return this.setState(state => ({
               endCallOptions: !state.endCallOptions
             }), () => this.endButtonRef && $(this.endButtonRef.current).trigger('simpletipClose'));
@@ -26344,7 +26396,7 @@ class StreamControls extends _mixins1__.wl {
           }
           return onCallEnd();
         }
-      }, this.renderEndCallOptions(), react0().createElement(_button_jsx2__.Z, {
+      }, this.renderEndCallOptions(), react0().createElement(_button_jsx2__.c, {
         simpletip: {
           ...this.SIMPLETIP,
           label: l[5884]
@@ -26393,7 +26445,7 @@ class StreamControls extends _mixins1__.wl {
         resetError(Av.Audio);
         onAudioClick();
       }
-    }, react0().createElement(_button_jsx2__.Z, {
+    }, react0().createElement(_button_jsx2__.c, {
       className: `
                                     mega-button
                                     theme-light-forced
@@ -26412,7 +26464,7 @@ class StreamControls extends _mixins1__.wl {
         resetError(Av.Camera);
         onVideoClick();
       }
-    }, react0().createElement(_button_jsx2__.Z, {
+    }, react0().createElement(_button_jsx2__.c, {
       className: `
                                     mega-button
                                     theme-light-forced
@@ -26431,7 +26483,7 @@ class StreamControls extends _mixins1__.wl {
         resetError(Av.Screen);
         onScreenSharingClick();
       }
-    }, react0().createElement(_button_jsx2__.Z, {
+    }, react0().createElement(_button_jsx2__.c, {
       key: "screen-sharing",
       className: `
                                     mega-button
@@ -26444,7 +26496,7 @@ class StreamControls extends _mixins1__.wl {
       icon: avFlags & Av.Screen ? 'icon-monitor-off' : 'icon-monitor'
     }), react0().createElement("span", null, avFlags & Av.Screen ? l.screenshare_stop_button : l.screenshare_button), hasToRenderPermissionsWarning(Av.Screen) ? renderPermissionsWarning(Av.Screen, this) : null), react0().createElement("li", {
       onClick: onHoldClick
-    }, react0().createElement(_button_jsx2__.Z, {
+    }, react0().createElement(_button_jsx2__.c, {
       key: "call-hold",
       className: `
                                     mega-button
@@ -26458,11 +26510,11 @@ class StreamControls extends _mixins1__.wl {
   }
 }
 StreamControls.NAMESPACE = 'stream-controls';
-const __WEBPACK_DEFAULT_EXPORT__ = ((0,_mixins1__.qC)(_micObserver_jsx4__.n, _permissionsObserver_jsx5__.Q)(StreamControls));
+const __WEBPACK_DEFAULT_EXPORT__ = ((0,_mixins1__.Jn)(_micObserver_jsx4__.s, _permissionsObserver_jsx5__.s)(StreamControls));
 
 /***/ }),
 
-/***/ 336:
+/***/ 396:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -26470,15 +26522,15 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.d(__webpack_exports__, {
 "default": () => (Incoming)
 });
-var _extends7__ = __webpack_require__(462);
-var react0__ = __webpack_require__(363);
+var _extends7__ = __webpack_require__(72);
+var react0__ = __webpack_require__(376);
 var react0 = __webpack_require__.n(react0__);
-var _mixins1__ = __webpack_require__(503);
-var _contacts_jsx2__ = __webpack_require__(13);
-var _ui_modalDialogs_jsx3__ = __webpack_require__(182);
-var _button_jsx4__ = __webpack_require__(193);
-var _call_jsx5__ = __webpack_require__(476);
-var _ui_utils_jsx6__ = __webpack_require__(79);
+var _mixins1__ = __webpack_require__(436);
+var _contacts_jsx2__ = __webpack_require__(40);
+var _ui_modalDialogs_jsx3__ = __webpack_require__(776);
+var _button_jsx4__ = __webpack_require__(600);
+var _call_jsx5__ = __webpack_require__(144);
+var _ui_utils_jsx6__ = __webpack_require__(240);
 
 
 
@@ -26487,7 +26539,7 @@ var _ui_utils_jsx6__ = __webpack_require__(79);
 
 
 
-class Incoming extends _mixins1__.wl {
+class Incoming extends _mixins1__.ei {
   constructor(props) {
     super(props);
     this.state = {
@@ -26512,10 +26564,10 @@ class Incoming extends _mixins1__.wl {
           ev.stopPropagation();
           this.props.onSwitch();
         }
-      }, react0().createElement(_button_jsx4__.Z, {
+      }, react0().createElement(_button_jsx4__.c, {
         className: `${className} negative`,
         icon: "icon-end-call"
-      }), react0().createElement(_button_jsx4__.Z, {
+      }), react0().createElement(_button_jsx4__.c, {
         className: `${className} positive`,
         icon: "icon-phone"
       })));
@@ -26529,7 +26581,7 @@ class Incoming extends _mixins1__.wl {
         onAnswer,
         onToggleVideo
       } = this.props;
-      return react0().createElement((react0().Fragment), null, react0().createElement(_button_jsx4__.Z, {
+      return react0().createElement((react0().Fragment), null, react0().createElement(_button_jsx4__.c, {
         className: `
                         mega-button
                         positive
@@ -26542,7 +26594,7 @@ class Incoming extends _mixins1__.wl {
           label: l[7205]
         },
         onClick: unsupported ? null : onAnswer
-      }, react0().createElement("span", null, l[7205])), react0().createElement(_button_jsx4__.Z, {
+      }, react0().createElement("span", null, l[7205])), react0().createElement(_button_jsx4__.c, {
         className: `
                         mega-button
                         large
@@ -26591,7 +26643,7 @@ class Incoming extends _mixins1__.wl {
       const CALL_IN_PROGRESS = window.sfuClient;
       const isPrivateRoom = chatRoom.type === 'private';
       const rejectLabel = isPrivateRoom ? l[20981] : l[82];
-      return react0().createElement(_ui_modalDialogs_jsx3__.Z.ModalDialog, (0,_extends7__.Z)({}, this.state, {
+      return react0().createElement(_ui_modalDialogs_jsx3__.M.ModalDialog, (0,_extends7__.c)({}, this.state, {
         name: NAMESPACE,
         className: NAMESPACE,
         roomName: chatRoom.getRoomTitle(),
@@ -26604,12 +26656,12 @@ class Incoming extends _mixins1__.wl {
         contact: M.u[callerId]
       })), react0().createElement("div", {
         className: `${NAMESPACE}-info`
-      }, react0().createElement("h1", null, react0().createElement(_ui_utils_jsx6__.dy, null, chatRoom.getRoomTitle())), react0().createElement("span", null, isPrivateRoom ? l[17878] : l[19995])), react0().createElement("div", {
+      }, react0().createElement("h1", null, react0().createElement(_ui_utils_jsx6__.O, null, chatRoom.getRoomTitle())), react0().createElement("span", null, isPrivateRoom ? l[17878] : l[19995])), react0().createElement("div", {
         className: `
                                 ${NAMESPACE}-controls
                                 ${CALL_IN_PROGRESS ? 'call-in-progress' : ''}
                             `
-      }, react0().createElement(_button_jsx4__.Z, {
+      }, react0().createElement(_button_jsx4__.c, {
         className: `
                                     mega-button
                                     large
@@ -26627,7 +26679,7 @@ class Incoming extends _mixins1__.wl {
         className: `${NAMESPACE}-unsupported`
       }, react0().createElement("div", {
         className: "unsupported-message"
-      }, _call_jsx5__.ZP.getUnsupportedBrowserMessage()))));
+      }, _call_jsx5__.cp.getUnsupportedBrowserMessage()))));
     }
     console.error('Incoming dialog received missing chatRoom prop.');
     return null;
@@ -26638,27 +26690,27 @@ window.ChatCallIncomingDialog = Incoming;
 
 /***/ }),
 
-/***/ 889:
+/***/ 768:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-Z: () => (__WEBPACK_DEFAULT_EXPORT__)
+c: () => (__WEBPACK_DEFAULT_EXPORT__)
 });
-var react0__ = __webpack_require__(363);
+var react0__ = __webpack_require__(376);
 var react0 = __webpack_require__.n(react0__);
-var _mixins_js1__ = __webpack_require__(503);
-var _contacts_jsx2__ = __webpack_require__(13);
-var _call_jsx3__ = __webpack_require__(476);
-var _button_jsx4__ = __webpack_require__(193);
-var _permissionsObserver_jsx5__ = __webpack_require__(209);
+var _mixins_js1__ = __webpack_require__(436);
+var _contacts_jsx2__ = __webpack_require__(40);
+var _call_jsx3__ = __webpack_require__(144);
+var _button_jsx4__ = __webpack_require__(600);
+var _permissionsObserver_jsx5__ = __webpack_require__(24);
 
 
 
 
 
 
-class Preview extends _mixins_js1__.wl {
+class Preview extends _mixins_js1__.ei {
   constructor(props) {
     super(props);
     this.videoRef = react0().createRef();
@@ -26722,7 +26774,7 @@ class Preview extends _mixins_js1__.wl {
       (_this$props$resetErro = (_this$props = this.props).resetError) == null || _this$props$resetErro.call(_this$props, type === Preview.STREAMS.AUDIO ? Av.Audio : Av.Camera);
     };
     this.renderAvatar = () => {
-      if ((0,_call_jsx3__.nJ)()) {
+      if ((0,_call_jsx3__.or)()) {
         return react0().createElement("div", {
           className: "avatar-guest"
         }, react0().createElement("i", {
@@ -26802,7 +26854,7 @@ class Preview extends _mixins_js1__.wl {
       className: `${NAMESPACE}-controls`
     }, react0().createElement("div", {
       className: "preview-control-wrapper"
-    }, react0().createElement(_button_jsx4__.Z, {
+    }, react0().createElement(_button_jsx4__.c, {
       simpletip: {
         ...SIMPLETIP_PROPS,
         label: audio ? l[16214] : l[16708]
@@ -26820,7 +26872,7 @@ class Preview extends _mixins_js1__.wl {
       }
     }), react0().createElement("span", null, l.mic_button), hasToRenderPermissionsWarning(Av.Audio) ? renderPermissionsWarning(Av.Audio) : null), react0().createElement("div", {
       className: "preview-control-wrapper"
-    }, react0().createElement(_button_jsx4__.Z, {
+    }, react0().createElement(_button_jsx4__.c, {
       simpletip: {
         ...SIMPLETIP_PROPS,
         label: video ? l[22894] : l[22893]
@@ -26842,37 +26894,37 @@ Preview.STREAMS = {
   AUDIO: 1,
   VIDEO: 2
 };
-const __WEBPACK_DEFAULT_EXPORT__ = ((0,_mixins_js1__.qC)(_permissionsObserver_jsx5__.Q)(Preview));
+const __WEBPACK_DEFAULT_EXPORT__ = ((0,_mixins_js1__.Jn)(_permissionsObserver_jsx5__.s)(Preview));
 
 /***/ }),
 
-/***/ 931:
+/***/ 248:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  Z: () => (GenericConversationMessage)
+  c: () => (GenericConversationMessage)
 });
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/extends.js
-var esm_extends = __webpack_require__(462);
+var esm_extends = __webpack_require__(72);
 // EXTERNAL MODULE: external "React"
-var external_React_ = __webpack_require__(363);
+var external_React_ = __webpack_require__(376);
 var external_React_default = __webpack_require__.n(external_React_);
 // EXTERNAL MODULE: ./js/chat/ui/messages/mixin.jsx
-var mixin = __webpack_require__(416);
+var mixin = __webpack_require__(564);
 // EXTERNAL MODULE: ./js/chat/ui/contacts.jsx
-var ui_contacts = __webpack_require__(13);
+var ui_contacts = __webpack_require__(40);
 // EXTERNAL MODULE: ./js/ui/utils.jsx
-var utils = __webpack_require__(79);
+var utils = __webpack_require__(240);
 ;// CONCATENATED MODULE: ./js/chat/ui/messages/abstractGenericMessage.jsx
 
 
 
 
-class AbstractGenericMessage extends mixin.y {
+class AbstractGenericMessage extends mixin.o {
   getAvatar() {
     const contact = this.getContact() || Message.getContactForMessage(this.props.message);
     if (this.props.grouped) {
@@ -26892,7 +26944,7 @@ class AbstractGenericMessage extends mixin.y {
     return contact ? external_React_default().createElement(ui_contacts.ContactButton, {
       contact: contact,
       className: "message",
-      label: external_React_default().createElement(utils.dy, null, M.getNameByHandle(contact.u)),
+      label: external_React_default().createElement(utils.O, null, M.getNameByHandle(contact.u)),
       chatRoom: this.props.message.chatRoom,
       dropdownDisabled: !!this.props.dialog
     }) : null;
@@ -27223,7 +27275,7 @@ class Local extends AbstractGenericMessage {
     return message.showInitiatorAvatar && !grouped ? external_React_default().createElement(ui_contacts.ContactButton, {
       contact: contact,
       className: "message",
-      label: external_React_default().createElement(utils.dy, null, message.authorContact ? M.getNameByHandle(message.authorContact.u) : ''),
+      label: external_React_default().createElement(utils.O, null, message.authorContact ? M.getNameByHandle(message.authorContact.u) : ''),
       chatRoom: message.chatRoom
     }) : M.getNameByHandle(contact.u);
   }
@@ -27241,7 +27293,7 @@ class Local extends AbstractGenericMessage {
       className: "call-info"
     }, external_React_default().createElement("div", {
       className: "call-info-container"
-    }, external_React_default().createElement(utils.Cw, {
+    }, external_React_default().createElement(utils.Ub, {
       className: "info-wrapper"
     }, this._getText())), external_React_default().createElement("div", {
       className: "call-info-avatars"
@@ -27251,9 +27303,9 @@ class Local extends AbstractGenericMessage {
   }
 }
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
-var dropdowns = __webpack_require__(78);
+var dropdowns = __webpack_require__(868);
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
-var buttons = __webpack_require__(204);
+var buttons = __webpack_require__(536);
 ;// CONCATENATED MODULE: ./js/chat/ui/messages/types/contact.jsx
 
 
@@ -27320,7 +27372,7 @@ class Contact extends AbstractGenericMessage {
     if (megaChat.FORCE_EMAIL_LOADING) {
       name += "(" + contact.m + ")";
     }
-    return external_React_default().createElement(buttons.z, {
+    return external_React_default().createElement(buttons.q, {
       className: "tiny-button",
       icon: "tiny-icon icons-sprite grey-dots"
     }, external_React_default().createElement(dropdowns.Dropdown, {
@@ -27397,7 +27449,7 @@ class Contact extends AbstractGenericMessage {
         className: "message shared-info"
       }, external_React_default().createElement("div", {
         className: "message data-title selectable-txt"
-      }, external_React_default().createElement(utils.dy, null, M.getNameByHandle(contact.u))), M.u[contact.u] ? external_React_default().createElement(ui_contacts.ContactVerified, {
+      }, external_React_default().createElement(utils.O, null, M.getNameByHandle(contact.u))), M.u[contact.u] ? external_React_default().createElement(ui_contacts.ContactVerified, {
         className: "right-align",
         contact: M.u[contact.u]
       }) : null, external_React_default().createElement("div", {
@@ -27478,7 +27530,7 @@ class Attachment extends AbstractGenericMessage {
         }));
       }
       if (contact.u === u_handle) {
-        dropdown = external_React_default().createElement(buttons.z, {
+        dropdown = external_React_default().createElement(buttons.q, {
           className: "tiny-button",
           icon: "tiny-icon icons-sprite grey-dots"
         }, external_React_default().createElement(dropdowns.Dropdown, {
@@ -27565,7 +27617,7 @@ class Attachment extends AbstractGenericMessage {
           }
         }));
       } else {
-        dropdown = external_React_default().createElement(buttons.z, {
+        dropdown = external_React_default().createElement(buttons.q, {
           className: "tiny-button",
           icon: "tiny-icon icons-sprite grey-dots"
         }, external_React_default().createElement(dropdowns.Dropdown, {
@@ -27669,11 +27721,11 @@ class Attachment extends AbstractGenericMessage {
   }
 }
 // EXTERNAL MODULE: ./js/chat/mixins.js
-var mixins = __webpack_require__(503);
+var mixins = __webpack_require__(436);
 ;// CONCATENATED MODULE: ./js/chat/ui/messages/types/partials/audioPlayer.jsx
 
 
-class AudioPlayer extends mixins.wl {
+class AudioPlayer extends mixins.ei {
   constructor(props) {
     super(props);
     this.state = {
@@ -27844,7 +27896,7 @@ class AudioPlayer extends mixins.wl {
 
 
 
-class AudioContainer extends mixins.wl {
+class AudioContainer extends mixins.ei {
   constructor(props) {
     super(props);
     this.state = {
@@ -27934,7 +27986,7 @@ class VoiceClip extends AbstractGenericMessage {
     const isBeingEdited = this.props.isBeingEdited() === true;
     const chatIsReadOnly = this.props.chatRoom.isReadOnly() === true;
     if (iAmSender && stillEditable && !isBeingEdited && !chatIsReadOnly && !this.props.dialog) {
-      return external_React_default().createElement(buttons.z, {
+      return external_React_default().createElement(buttons.q, {
         className: "tiny-button",
         icon: "tiny-icon icons-sprite grey-dots"
       }, external_React_default().createElement(dropdowns.Dropdown, {
@@ -27971,9 +28023,9 @@ class VoiceClip extends AbstractGenericMessage {
   }
 }
 ;// CONCATENATED MODULE: ./js/chat/ui/messages/types/partials/metaRichpreview.jsx
-var React = __webpack_require__(363);
-var ConversationMessageMixin = (__webpack_require__(416).y);
-var MetaRichPreviewLoading = (__webpack_require__(480).F);
+var React = __webpack_require__(376);
+var ConversationMessageMixin = (__webpack_require__(564).o);
+var MetaRichPreviewLoading = (__webpack_require__(348).G);
 class MetaRichpreview extends ConversationMessageMixin {
   getBase64Url(b64incoming) {
     if (!b64incoming || !b64incoming.split) {
@@ -28064,8 +28116,8 @@ class MetaRichpreview extends ConversationMessageMixin {
 }
 
 ;// CONCATENATED MODULE: ./js/chat/ui/messages/types/partials/metaRichpreviewConfirmation.jsx
-var metaRichpreviewConfirmation_React = __webpack_require__(363);
-var metaRichpreviewConfirmation_ConversationMessageMixin = (__webpack_require__(416).y);
+var metaRichpreviewConfirmation_React = __webpack_require__(376);
+var metaRichpreviewConfirmation_ConversationMessageMixin = (__webpack_require__(564).o);
 class MetaRichprevConfirmation extends metaRichpreviewConfirmation_ConversationMessageMixin {
   doAllow() {
     var message = this.props.message;
@@ -28188,14 +28240,14 @@ function GeoLocation(props) {
 }
 const geoLocation = (GeoLocation);
 // EXTERNAL MODULE: ./js/chat/ui/messages/types/partials/metaRichPreviewLoading.jsx
-var metaRichPreviewLoading = __webpack_require__(480);
+var metaRichPreviewLoading = __webpack_require__(348);
 ;// CONCATENATED MODULE: ./js/chat/ui/messages/types/partials/metaRichpreviewMegaLinks.jsx
 
 
 
 
 
-class MetaRichpreviewMegaLinks extends mixin.y {
+class MetaRichpreviewMegaLinks extends mixin.o {
   render() {
     var message = this.props.message;
     var chatRoom = this.props.message.chatRoom;
@@ -28224,7 +28276,7 @@ class MetaRichpreviewMegaLinks extends mixin.y {
             });
           });
         }
-        previewContainer = external_React_default().createElement(metaRichPreviewLoading.F, {
+        previewContainer = external_React_default().createElement(metaRichPreviewLoading.G, {
           message: message,
           isLoading: megaLinkInfo.hadLoaded()
         });
@@ -28307,7 +28359,7 @@ class MetaRichpreviewMegaLinks extends mixin.y {
           className: "message richpreview data-title selectable-txt"
         }, external_React_default().createElement("span", {
           className: "message richpreview title"
-        }, external_React_default().createElement(utils.dy, null, megaLinkInfo.info.name || megaLinkInfo.info.topic || ""))), external_React_default().createElement("div", {
+        }, external_React_default().createElement(utils.O, null, megaLinkInfo.info.name || megaLinkInfo.info.topic || ""))), external_React_default().createElement("div", {
           className: "message richpreview desc"
         }, desc), external_React_default().createElement("div", {
           className: "message richpreview url-container"
@@ -28354,9 +28406,9 @@ class MetaRichpreviewMegaLinks extends mixin.y {
 }
 
 // EXTERNAL MODULE: ./js/chat/ui/typingArea.jsx + 1 modules
-var typingArea = __webpack_require__(825);
+var typingArea = __webpack_require__(856);
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
-var perfectScrollbar = __webpack_require__(285);
+var perfectScrollbar = __webpack_require__(447);
 ;// CONCATENATED MODULE: ./js/chat/ui/messages/types/text.jsx
 
 
@@ -28451,7 +28503,7 @@ class Text extends AbstractGenericMessage {
           label: l[1342],
           onClick: () => this.props.onEditToggle(true)
         });
-        messageActionButtons = external_React_default().createElement(buttons.z, {
+        messageActionButtons = external_React_default().createElement(buttons.q, {
           key: "delete-msg",
           className: "tiny-button",
           icon: "sprite-fm-mono icon-options"
@@ -28477,7 +28529,7 @@ class Text extends AbstractGenericMessage {
       returnedButtons.push(messageActionButtons);
     }
     if (message.messageHtml && message.messageHtml.includes('<pre class="rtf-multi">') && message.messageHtml.includes('</pre>')) {
-      returnedButtons.push(external_React_default().createElement(buttons.z, {
+      returnedButtons.push(external_React_default().createElement(buttons.q, {
         key: "copy-msg",
         className: "tiny-button simpletip copy-txt-block",
         icon: "sprite-fm-mono icon-copy",
@@ -28577,7 +28629,7 @@ class Text extends AbstractGenericMessage {
     if (isBeingEdited() === true) {
       let msgContents = message.textContents;
       msgContents = megaChat.plugins.emoticonsFilter.fromUtfToShort(msgContents);
-      messageDisplayBlock = external_React_default().createElement(typingArea.j, {
+      messageDisplayBlock = external_React_default().createElement(typingArea.i, {
         iconClass: "small-icon writing-pen textarea-icon",
         initialText: msgContents,
         chatRoom: chatRoom,
@@ -28608,15 +28660,15 @@ class Text extends AbstractGenericMessage {
         textMessage = `${textMessage} <em class="edited">${l[8887]}</em>`;
       }
       if (this.props.initTextScrolling) {
-        messageDisplayBlock = external_React_default().createElement(perfectScrollbar.F, {
+        messageDisplayBlock = external_React_default().createElement(perfectScrollbar.e, {
           className: "message text-block scroll"
         }, external_React_default().createElement("div", {
           className: "message text-scroll"
-        }, external_React_default().createElement(utils.Cw, null, textMessage)));
+        }, external_React_default().createElement(utils.Ub, null, textMessage)));
       } else {
         messageDisplayBlock = external_React_default().createElement("div", {
           className: "message text-block"
-        }, external_React_default().createElement(utils.Cw, null, textMessage));
+        }, external_React_default().createElement(utils.Ub, null, textMessage));
       }
     }
     return external_React_default().createElement((external_React_default()).Fragment, null, messageNotSendIndicator, IS_GEOLOCATION ? null : messageDisplayBlock, subMessageComponent, spinnerElement, IS_GEOLOCATION && external_React_default().createElement(geoLocation, {
@@ -28626,7 +28678,7 @@ class Text extends AbstractGenericMessage {
   }
 }
 // EXTERNAL MODULE: ./js/chat/ui/gifPanel/gifPanel.jsx + 3 modules
-var gifPanel = __webpack_require__(722);
+var gifPanel = __webpack_require__(966);
 ;// CONCATENATED MODULE: ./js/chat/ui/messages/types/giphy.jsx
 
 
@@ -28664,7 +28716,7 @@ class Giphy extends AbstractGenericMessage {
   }
   onVisibilityChange(isIntersecting) {
     this.setState({
-      src: isIntersecting ? gifPanel.bl.convert(this.props.message.meta.src) : undefined
+      src: isIntersecting ? gifPanel.We.convert(this.props.message.meta.src) : undefined
     }, () => {
       var _this$gifRef;
       (_this$gifRef = this.gifRef) == null || (_this$gifRef = _this$gifRef.current) == null || _this$gifRef[isIntersecting ? 'load' : 'pause']();
@@ -28680,7 +28732,7 @@ class Giphy extends AbstractGenericMessage {
       onDelete,
       message
     } = this.props;
-    const $$BUTTONS = [message.isEditable() && external_React_default().createElement(buttons.z, {
+    const $$BUTTONS = [message.isEditable() && external_React_default().createElement(buttons.q, {
       key: "delete-GIPHY-button",
       className: "tiny-button",
       icon: "sprite-fm-mono icon-options"
@@ -28724,7 +28776,7 @@ class Giphy extends AbstractGenericMessage {
         height: `${h}px`
       },
       onClick: () => !autoPlay && this.toggle(),
-      src: hideActionButtons ? gifPanel.bl.convert(src) : this.state.src
+      src: hideActionButtons ? gifPanel.We.convert(src) : this.state.src
     });
   }
 }
@@ -28740,7 +28792,7 @@ class Giphy extends AbstractGenericMessage {
 
 
 const CLICKABLE_ATTACHMENT_CLASSES = '.message.data-title, .message.file-size, .data-block-view.semi-big, .data-block-view.medium';
-class GenericConversationMessage extends mixin.y {
+class GenericConversationMessage extends mixin.o {
   constructor(props) {
     super(props);
     this.state = {
@@ -29057,7 +29109,7 @@ class GenericConversationMessage extends mixin.y {
       case MESSAGE.TYPE.REVOKED || MESSAGE.TYPE.REVOKE_ATTACHMENT:
         return null;
       case MESSAGE.TYPE.ATTACHMENT:
-        return external_React_default().createElement(Attachment, (0,esm_extends.Z)({}, MESSAGE.props, {
+        return external_React_default().createElement(Attachment, (0,esm_extends.c)({}, MESSAGE.props, {
           onPreviewStart: (v, e) => this._startPreview(v, e),
           onDownloadStart: v => this._startDownload(v),
           onAddLinkButtons: (h, arr) => this._addLinkButtons(h, arr),
@@ -29065,22 +29117,22 @@ class GenericConversationMessage extends mixin.y {
           onAddFavouriteButtons: (h, arr) => this._addFavouriteButtons(h, arr)
         }));
       case MESSAGE.TYPE.CONTACT:
-        return external_React_default().createElement(Contact, (0,esm_extends.Z)({}, MESSAGE.props, {
+        return external_React_default().createElement(Contact, (0,esm_extends.c)({}, MESSAGE.props, {
           onDelete: MESSAGE.onDelete
         }));
       case MESSAGE.TYPE.VOICE_CLIP:
-        return external_React_default().createElement(VoiceClip, (0,esm_extends.Z)({}, MESSAGE.props, {
+        return external_React_default().createElement(VoiceClip, (0,esm_extends.c)({}, MESSAGE.props, {
           isBeingEdited: MESSAGE.isBeingEdited,
           onDelete: MESSAGE.onDelete
         }));
       case MESSAGE.TYPE.INLINE:
         return external_React_default().createElement(Local, MESSAGE.props);
       case MESSAGE.TYPE.GIPHY:
-        return external_React_default().createElement(Giphy, (0,esm_extends.Z)({}, MESSAGE.props, {
+        return external_React_default().createElement(Giphy, (0,esm_extends.c)({}, MESSAGE.props, {
           onDelete: MESSAGE.onDelete
         }));
       case MESSAGE.TYPE.TEXT:
-        return external_React_default().createElement(Text, (0,esm_extends.Z)({}, MESSAGE.props, {
+        return external_React_default().createElement(Text, (0,esm_extends.c)({}, MESSAGE.props, {
           onEditToggle: editing => this.setState({
             editing
           }),
@@ -29098,23 +29150,23 @@ class GenericConversationMessage extends mixin.y {
 
 /***/ }),
 
-/***/ 416:
+/***/ 564:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-y: () => (ConversationMessageMixin)
+o: () => (ConversationMessageMixin)
 });
-var react0__ = __webpack_require__(363);
+var react0__ = __webpack_require__(376);
 var react0 = __webpack_require__.n(react0__);
-var _mixins1__ = __webpack_require__(503);
-var _ui_buttons_jsx2__ = __webpack_require__(204);
-var _ui_emojiDropdown_jsx3__ = __webpack_require__(768);
+var _mixins1__ = __webpack_require__(436);
+var _ui_buttons_jsx2__ = __webpack_require__(536);
+var _ui_emojiDropdown_jsx3__ = __webpack_require__(996);
 
 
 
 
-class ConversationMessageMixin extends _mixins1__._p {
+class ConversationMessageMixin extends _mixins1__._k {
   constructor(props) {
     super(props);
     this.attachRerenderCallbacks = false;
@@ -29425,7 +29477,7 @@ class ConversationMessageMixin extends _mixins1__._p {
       return !!v;
     });
     if (emojisImages && emojisImages.length > 0) {
-      const reactionBtn = !chatRoom.isReadOnly() ? react0().createElement(_ui_buttons_jsx2__.z, {
+      const reactionBtn = !chatRoom.isReadOnly() ? react0().createElement(_ui_buttons_jsx2__.q, {
         className: "popup-button reactions-button hover-colorized simpletip",
         icon: "sprite-fm-theme icon-emoji-reactions reactions-icon",
         disabled: false,
@@ -29435,7 +29487,7 @@ class ConversationMessageMixin extends _mixins1__._p {
           'data-simpletipoffset': "3",
           'data-simpletipposition': "top"
         }
-      }, react0().createElement(_ui_emojiDropdown_jsx3__.l, {
+      }, react0().createElement(_ui_emojiDropdown_jsx3__.I, {
         horizOffset: this.haveMeetingsCall() ? -150 : 0,
         onActiveChange: this._emojiOnActiveStateChange,
         className: "popup emoji reactions-dropdown",
@@ -29453,7 +29505,7 @@ class ConversationMessageMixin extends _mixins1__._p {
       chatRoom,
       message
     } = this.props;
-    return message instanceof Message && message.isSentOrReceived() && !chatRoom.isReadOnly() ? react0().createElement(_ui_buttons_jsx2__.z, {
+    return message instanceof Message && message.isSentOrReceived() && !chatRoom.isReadOnly() ? react0().createElement(_ui_buttons_jsx2__.q, {
       className: "popup-button reactions-button tiny-button simpletip",
       icon: `${"sprite-fm-theme reactions-icon"} icon-emoji-reactions`,
       iconHovered: `${"sprite-fm-theme reactions-icon"} icon-emoji-reactions-active`,
@@ -29464,7 +29516,7 @@ class ConversationMessageMixin extends _mixins1__._p {
         'data-simpletipoffset': "3",
         'data-simpletipposition': "top"
       }
-    }, react0().createElement(_ui_emojiDropdown_jsx3__.l, {
+    }, react0().createElement(_ui_emojiDropdown_jsx3__.I, {
       horizOffset: this.haveMeetingsCall() ? -110 : 0,
       noArrow: true,
       onActiveChange: this._emojiOnActiveStateChange,
@@ -29477,25 +29529,25 @@ class ConversationMessageMixin extends _mixins1__._p {
 
 /***/ }),
 
-/***/ 97:
+/***/ 808:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
 "default": () => (ScheduleMetaChange)
 });
-var react0__ = __webpack_require__(363);
+var react0__ = __webpack_require__(376);
 var react0 = __webpack_require__.n(react0__);
-var _mixin_jsx1__ = __webpack_require__(416);
-var _contacts_jsx2__ = __webpack_require__(13);
-var _ui_utils_jsx3__ = __webpack_require__(79);
-var _ui_buttons_jsx4__ = __webpack_require__(204);
+var _mixin_jsx1__ = __webpack_require__(564);
+var _contacts_jsx2__ = __webpack_require__(40);
+var _ui_utils_jsx3__ = __webpack_require__(240);
+var _ui_buttons_jsx4__ = __webpack_require__(536);
 
 
 
 
 
-class ScheduleMetaChange extends _mixin_jsx1__.y {
+class ScheduleMetaChange extends _mixin_jsx1__.o {
   constructor(...args) {
     super(...args);
     this.state = {
@@ -29696,7 +29748,7 @@ class ScheduleMetaChange extends _mixin_jsx1__.y {
       className: "message",
       chatRoom: chatRoom,
       contact: contact,
-      label: react0().createElement(_ui_utils_jsx3__.dy, null, M.getNameByHandle(contact.u))
+      label: react0().createElement(_ui_utils_jsx3__.O, null, M.getNameByHandle(contact.u))
     }), react0().createElement("div", {
       className: "message date-time simpletip",
       "data-simpletip": time2date(this.getTimestamp())
@@ -29716,14 +29768,14 @@ class ScheduleMetaChange extends _mixin_jsx1__.y {
       className: "schedule-detail-main"
     }, react0().createElement("div", {
       className: "schedule-meeting-title"
-    }, mode === MODE.CANCELLED ? react0().createElement("s", null, meta.topic || chatRoom.topic) : meta.topic || chatRoom.topic), this.renderTimingBlock()), chatRoom.iAmInRoom() && scheduledMeeting && mode !== MODE.CANCELLED && react0().createElement(_ui_buttons_jsx4__.z, {
+    }, mode === MODE.CANCELLED ? react0().createElement("s", null, meta.topic || chatRoom.topic) : meta.topic || chatRoom.topic), this.renderTimingBlock()), chatRoom.iAmInRoom() && scheduledMeeting && mode !== MODE.CANCELLED && react0().createElement(_ui_buttons_jsx4__.q, {
       className: "mega-button",
       onClick: () => this.onAddToCalendar()
     }, react0().createElement("span", null, mode === MODE.CREATED && !meta.occurrence ? l.schedule_add_calendar : l.schedule_update_calendar))), mode === MODE.CREATED && scheduledMeeting && scheduledMeeting.description && react0().createElement("div", {
       className: "schedule-description"
-    }, react0().createElement(_ui_utils_jsx3__.Cw, null, megaChat.html(scheduledMeeting.description).replace(/\n/g, '<br>'))), link && react0().createElement("div", null, react0().createElement("div", {
+    }, react0().createElement(_ui_utils_jsx3__.Ub, null, megaChat.html(scheduledMeeting.description).replace(/\n/g, '<br>'))), link && react0().createElement("div", null, react0().createElement("div", {
       className: "schedule-meeting-link"
-    }, react0().createElement("span", null, link), react0().createElement(_ui_buttons_jsx4__.z, {
+    }, react0().createElement("span", null, link), react0().createElement(_ui_buttons_jsx4__.q, {
       className: "mega-button positive",
       onClick: () => {
         copyToClipboard(link, l[7654]);
@@ -29740,15 +29792,15 @@ window.ScheduleMetaChange = ScheduleMetaChange;
 
 /***/ }),
 
-/***/ 480:
+/***/ 348:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-F: () => (MetaRichpreviewLoading)
+G: () => (MetaRichpreviewLoading)
 });
-var React = __webpack_require__(363);
-var ConversationMessageMixin = (__webpack_require__(416).y);
+var React = __webpack_require__(376);
+var ConversationMessageMixin = (__webpack_require__(564).o);
 class MetaRichpreviewLoading extends ConversationMessageMixin {
   render() {
     return React.createElement("div", {
@@ -29762,34 +29814,34 @@ class MetaRichpreviewLoading extends ConversationMessageMixin {
 
 /***/ }),
 
-/***/ 825:
+/***/ 856:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  j: () => (TypingArea)
+  i: () => (TypingArea)
 });
 
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
-var applyDecoratedDescriptor = __webpack_require__(229);
+var applyDecoratedDescriptor = __webpack_require__(888);
 // EXTERNAL MODULE: external "React"
-var external_React_ = __webpack_require__(363);
+var external_React_ = __webpack_require__(376);
 var external_React_default = __webpack_require__.n(external_React_);
 // EXTERNAL MODULE: ./js/ui/utils.jsx
-var utils = __webpack_require__(79);
+var utils = __webpack_require__(240);
 // EXTERNAL MODULE: ./js/chat/mixins.js
-var mixins = __webpack_require__(503);
+var mixins = __webpack_require__(436);
 // EXTERNAL MODULE: ./js/ui/emojiDropdown.jsx
-var emojiDropdown = __webpack_require__(768);
+var emojiDropdown = __webpack_require__(996);
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
-var ui_buttons = __webpack_require__(204);
+var ui_buttons = __webpack_require__(536);
 ;// CONCATENATED MODULE: ./js/chat/ui/emojiAutocomplete.jsx
 
-var React = __webpack_require__(363);
+var React = __webpack_require__(376);
 
-class EmojiAutocomplete extends mixins.wl {
+class EmojiAutocomplete extends mixins.ei {
   constructor(props) {
     super(props);
     this.state = {
@@ -29986,7 +30038,7 @@ class EmojiAutocomplete extends mixins.wl {
     }
     return React.createElement("div", {
       className: "textarea-autofill-bl"
-    }, React.createElement(utils.Cw, {
+    }, React.createElement(utils.Ub, {
       tag: "div",
       className: "textarea-autofill-info"
     }, l.emoji_suggestion_instruction), React.createElement("div", {
@@ -30001,9 +30053,9 @@ EmojiAutocomplete.defaultProps = {
   'maxEmojis': 12
 };
 // EXTERNAL MODULE: ./js/chat/ui/gifPanel/gifPanel.jsx + 3 modules
-var gifPanel = __webpack_require__(722);
+var gifPanel = __webpack_require__(966);
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
-var perfectScrollbar = __webpack_require__(285);
+var perfectScrollbar = __webpack_require__(447);
 ;// CONCATENATED MODULE: ./js/chat/ui/typingArea.jsx
 
 var _dec, _class;
@@ -30015,7 +30067,7 @@ var _dec, _class;
 
 
 
-let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea extends mixins.wl {
+let TypingArea = (_dec = (0,mixins.aS)(54, true), (_class = class TypingArea extends mixins.ei {
   constructor(props) {
     super(props);
     this.typingAreaRef = external_React_default().createRef();
@@ -30492,12 +30544,12 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
     var room = this.props.chatRoom;
     var buttons = null;
     if (self.props.showButtons === true) {
-      buttons = [external_React_default().createElement(ui_buttons.z, {
+      buttons = [external_React_default().createElement(ui_buttons.q, {
         key: "save",
         className: `${"mega-button right"} positive`,
         label: l[776],
         onClick: self.onSaveClicked.bind(self)
-      }), external_React_default().createElement(ui_buttons.z, {
+      }), external_React_default().createElement(ui_buttons.q, {
         key: "cancel",
         className: "mega-button right",
         label: l[1718],
@@ -30586,7 +30638,7 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
                     typingarea-component
                     ${this.props.className}
                 `
-    }, this.state.gifPanelActive && external_React_default().createElement(gifPanel.ZP, {
+    }, this.state.gifPanelActive && external_React_default().createElement(gifPanel.cp, {
       chatRoom: this.props.chatRoom,
       onToggle: () => {
         this.setState({
@@ -30599,7 +30651,7 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
                         chat-textarea
                         ${this.props.className}
                     `
-    }, emojiAutocomplete, self.props.children, self.props.editing ? null : external_React_default().createElement(ui_buttons.z, {
+    }, emojiAutocomplete, self.props.children, self.props.editing ? null : external_React_default().createElement(ui_buttons.q, {
       className: `
                                 popup-button
                                 gif-button
@@ -30613,16 +30665,16 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
           gifPanelActive: !state.gifPanelActive
         };
       })
-    }), external_React_default().createElement(ui_buttons.z, {
+    }), external_React_default().createElement(ui_buttons.q, {
       className: "popup-button emoji-button",
       icon: "sprite-fm-theme icon-emoji",
       iconHovered: "sprite-fm-theme icon-emoji-active",
       disabled: this.props.disabled
-    }, external_React_default().createElement(emojiDropdown.l, {
+    }, external_React_default().createElement(emojiDropdown.I, {
       className: "popup emoji",
       vertOffset: 17,
       onClick: this.onEmojiClicked
-    })), external_React_default().createElement("hr", null), external_React_default().createElement(perfectScrollbar.F, {
+    })), external_React_default().createElement("hr", null), external_React_default().createElement(perfectScrollbar.e, {
       chatRoom: self.props.chatRoom,
       className: "chat-textarea-scroll textarea-scroll",
       options: {
@@ -30634,7 +30686,7 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
       }
     }, external_React_default().createElement("div", {
       className: "messages-textarea-placeholder"
-    }, self.state.typedMessage ? null : external_React_default().createElement(utils.dy, null, (l[18763] || `Write message to \u201c%s\u201d\u2026`).replace('%s', room.getRoomTitle()))), external_React_default().createElement("textarea", {
+    }, self.state.typedMessage ? null : external_React_default().createElement(utils.O, null, (l[18763] || `Write message to \u201c%s\u201d\u2026`).replace('%s', room.getRoomTitle()))), external_React_default().createElement("textarea", {
       className: `
                                 ${"messages-textarea"}
                                 ${disabledTextarea ? 'disabled' : ''}
@@ -30654,26 +30706,26 @@ let TypingArea = (_dec = (0,mixins.M9)(54, true), (_class = class TypingArea ext
       className: "message-preview"
     }))), buttons);
   }
-}, ((0,applyDecoratedDescriptor.Z)(_class.prototype, "handleWindowResize", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "handleWindowResize"), _class.prototype)), _class));
+}, ((0,applyDecoratedDescriptor.c)(_class.prototype, "handleWindowResize", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "handleWindowResize"), _class.prototype)), _class));
 
 /***/ }),
 
-/***/ 204:
+/***/ 536:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-z: () => (Button)
+q: () => (Button)
 });
-var _extends2__ = __webpack_require__(462);
-var react0__ = __webpack_require__(363);
+var _extends2__ = __webpack_require__(72);
+var react0__ = __webpack_require__(376);
 var react0 = __webpack_require__.n(react0__);
-var _chat_mixins1__ = __webpack_require__(503);
+var _chat_mixins1__ = __webpack_require__(436);
 
 
 
 let _buttonGroups = {};
-class Button extends _chat_mixins1__.wl {
+class Button extends _chat_mixins1__.ei {
   constructor(props) {
     super(props);
     this.buttonClass = `.button`;
@@ -30828,7 +30880,7 @@ class Button extends _chat_mixins1__.wl {
     } = this.props;
     const isMegaButton = className && className.indexOf('mega-button') > -1;
     const TagName = isMegaButton ? 'button' : 'div';
-    return react0().createElement(TagName, (0,_extends2__.Z)({
+    return react0().createElement(TagName, (0,_extends2__.c)({
       className: `
                     button
                     ${className || ''}
@@ -30872,7 +30924,7 @@ class Button extends _chat_mixins1__.wl {
 
 /***/ }),
 
-/***/ 78:
+/***/ 868:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -30882,14 +30934,14 @@ Dropdown: () => (Dropdown),
 DropdownContactsSelector: () => (DropdownContactsSelector),
 DropdownItem: () => (DropdownItem)
 });
-var _utils_jsx0__ = __webpack_require__(79);
-var _chat_mixins1__ = __webpack_require__(503);
-var _chat_ui_contacts_jsx2__ = __webpack_require__(13);
-var React = __webpack_require__(363);
+var _utils_jsx0__ = __webpack_require__(240);
+var _chat_mixins1__ = __webpack_require__(436);
+var _chat_ui_contacts_jsx2__ = __webpack_require__(40);
+var React = __webpack_require__(376);
 
 
 
-class Dropdown extends _chat_mixins1__.wl {
+class Dropdown extends _chat_mixins1__.ei {
   constructor(props) {
     super(props);
     this.onActiveChange = this.onActiveChange.bind(this);
@@ -31063,7 +31115,7 @@ class Dropdown extends _chat_mixins1__.wl {
       }
       return null;
     }
-    return React.createElement(_utils_jsx0__.ZP.RenderTo, {
+    return React.createElement(_utils_jsx0__.cp.RenderTo, {
       element: document.body,
       className: classes,
       style: styles,
@@ -31086,7 +31138,7 @@ class Dropdown extends _chat_mixins1__.wl {
 Dropdown.defaultProps = {
   'requiresUpdateOnResize': true
 };
-class DropdownContactsSelector extends _chat_mixins1__.wl {
+class DropdownContactsSelector extends _chat_mixins1__.ei {
   constructor(props) {
     super(props);
     this.state = {
@@ -31161,7 +31213,7 @@ class DropdownContactsSelector extends _chat_mixins1__.wl {
 DropdownContactsSelector.defaultProps = {
   requiresUpdateOnResize: true
 };
-class DropdownItem extends _chat_mixins1__.wl {
+class DropdownItem extends _chat_mixins1__.ei {
   constructor(props) {
     super(props);
     this.state = {
@@ -31253,21 +31305,21 @@ DropdownItem.defaultProps = {
 
 /***/ }),
 
-/***/ 768:
+/***/ 996:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-l: () => (DropdownEmojiSelector)
+I: () => (DropdownEmojiSelector)
 });
-var _extends1__ = __webpack_require__(462);
-var _chat_mixins0__ = __webpack_require__(503);
+var _extends1__ = __webpack_require__(72);
+var _chat_mixins0__ = __webpack_require__(436);
 
-var React = __webpack_require__(363);
+var React = __webpack_require__(376);
 
-var DropdownsUI = __webpack_require__(78);
-var PerfectScrollbar = (__webpack_require__(285).F);
-class DropdownEmojiSelector extends _chat_mixins0__.wl {
+var DropdownsUI = __webpack_require__(868);
+var PerfectScrollbar = (__webpack_require__(447).e);
+class DropdownEmojiSelector extends _chat_mixins0__.ei {
   constructor(props) {
     super(props);
     this.emojiSearchField = React.createRef();
@@ -31653,7 +31705,7 @@ class DropdownEmojiSelector extends _chat_mixins0__.wl {
     } else {
       popupContents = null;
     }
-    return React.createElement(DropdownsUI.Dropdown, (0,_extends1__.Z)({
+    return React.createElement(DropdownsUI.Dropdown, (0,_extends1__.c)({
       className: "popup emoji"
     }, self.props, {
       ref: "dropdown",
@@ -31688,27 +31740,27 @@ DropdownEmojiSelector.defaultProps = {
 
 /***/ }),
 
-/***/ 309:
+/***/ 608:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  Z: () => (FMView)
+  c: () => (FMView)
 });
 
 // EXTERNAL MODULE: external "React"
-var external_React_ = __webpack_require__(363);
+var external_React_ = __webpack_require__(376);
 var external_React_default = __webpack_require__.n(external_React_);
 // EXTERNAL MODULE: ./js/chat/mixins.js
-var mixins = __webpack_require__(503);
+var mixins = __webpack_require__(436);
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/extends.js
-var esm_extends = __webpack_require__(462);
+var esm_extends = __webpack_require__(72);
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
-var applyDecoratedDescriptor = __webpack_require__(229);
+var applyDecoratedDescriptor = __webpack_require__(888);
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
-var perfectScrollbar = __webpack_require__(285);
+var perfectScrollbar = __webpack_require__(447);
 ;// CONCATENATED MODULE: ./js/ui/jsx/megaList/megaList2.jsx
 
 
@@ -31716,7 +31768,7 @@ var _dec, _class;
 
 
 
-let MegaList2 = (_dec = (0,mixins.M9)(30, true), (_class = class MegaList2 extends mixins.wl {
+let MegaList2 = (_dec = (0,mixins.aS)(30, true), (_class = class MegaList2 extends mixins.ei {
   constructor(props) {
     super(props);
     this._calculated = false;
@@ -32006,7 +32058,7 @@ let MegaList2 = (_dec = (0,mixins.M9)(30, true), (_class = class MegaList2 exten
     let nodes = [];
     for (var i = first; i < last; i++) {
       let node = entries[i];
-      nodes.push(external_React_default().createElement(this.props.nodeAdapter, (0,esm_extends.Z)({
+      nodes.push(external_React_default().createElement(this.props.nodeAdapter, (0,esm_extends.c)({
         key: i + "_" + node[this.props.keyProp],
         h: node[this.props.keyProp],
         index: i,
@@ -32023,7 +32075,7 @@ let MegaList2 = (_dec = (0,mixins.M9)(30, true), (_class = class MegaList2 exten
       }, nodeAdapterProps)));
     }
     let listAdapterName = listAdapter.prototype.constructor.name;
-    return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(perfectScrollbar.F, {
+    return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(perfectScrollbar.e, {
       key: "ps_" + listAdapterName + "_" + viewMode,
       options: this.options.perfectScrollOptions,
       onUserScroll: this.onPsUserScroll,
@@ -32034,7 +32086,7 @@ let MegaList2 = (_dec = (0,mixins.M9)(30, true), (_class = class MegaList2 exten
       ref: instance => {
         this.ps = instance;
       }
-    }, external_React_default().createElement(this.props.listAdapter, (0,esm_extends.Z)({
+    }, external_React_default().createElement(this.props.listAdapter, (0,esm_extends.c)({
       containerClassName: this.props.containerClassName,
       key: "ps_" + listAdapterName + "_" + this.props.viewMode + "_la",
       ref: listAdapterInstance => {
@@ -32048,13 +32100,13 @@ let MegaList2 = (_dec = (0,mixins.M9)(30, true), (_class = class MegaList2 exten
       calculated: this._calculated
     }, listAdapterOpts), nodes)));
   }
-}, ((0,applyDecoratedDescriptor.Z)(_class.prototype, "onPsUserScroll", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "onPsUserScroll"), _class.prototype)), _class));
+}, ((0,applyDecoratedDescriptor.c)(_class.prototype, "onPsUserScroll", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "onPsUserScroll"), _class.prototype)), _class));
 // EXTERNAL MODULE: ./js/ui/jsx/fm/nodes/genericNodePropsComponent.jsx + 1 modules
-var genericNodePropsComponent = __webpack_require__(297);
+var genericNodePropsComponent = __webpack_require__(0);
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/genericGrid.jsx
 
 
-class GenericGrid extends genericNodePropsComponent.L {
+class GenericGrid extends genericNodePropsComponent.i {
   render() {
     let {
       node,
@@ -32127,7 +32179,7 @@ class GenericGrid extends genericNodePropsComponent.L {
 
 
 
-class GenericTableHeader extends mixins.wl {
+class GenericTableHeader extends mixins.ei {
   render() {
     let {
       sortBy,
@@ -32173,7 +32225,7 @@ class GenericTableHeader extends mixins.wl {
     return external_React_default().createElement("thead", null, external_React_default().createElement("tr", null, columnsRendered));
   }
 }
-class GenericTable extends genericNodePropsComponent.L {
+class GenericTable extends genericNodePropsComponent.i {
   render() {
     var _this$nodeProps;
     let {
@@ -32227,7 +32279,7 @@ class GenericTable extends genericNodePropsComponent.L {
 ;// CONCATENATED MODULE: ./js/ui/jsx/megaList/adapters.jsx
 
 
-class GenericListAdapter extends mixins.wl {
+class GenericListAdapter extends mixins.ei {
   constructor(...args) {
     super(...args);
     this.customIsEventuallyVisible = true;
@@ -32294,11 +32346,11 @@ Table.itemHeight = 32;
 Table.itemsPerRow = 1;
 Table.containerClassName = "grid-scrolling-table megaListContainer";
 // EXTERNAL MODULE: ./js/ui/jsx/fm/nodes/columns/columnFavIcon.jsx
-var columnFavIcon = __webpack_require__(310);
+var columnFavIcon = __webpack_require__(976);
 ;// CONCATENATED MODULE: ./js/ui/tooltips.jsx
-var React = __webpack_require__(363);
+var React = __webpack_require__(376);
 
-class Handler extends mixins.wl {
+class Handler extends mixins.ei {
   render() {
     var classes = "tooltip-handler" + (this.props.className ? " " + this.props.className : "");
     return React.createElement("span", {
@@ -32311,7 +32363,7 @@ class Handler extends mixins.wl {
 Handler.defaultProps = {
   'hideable': true
 };
-class Contents extends mixins.wl {
+class Contents extends mixins.ei {
   render() {
     var className = 'tooltip-contents dropdown body tooltip ' + (this.props.className ? this.props.className : "");
     if (this.props.active) {
@@ -32329,7 +32381,7 @@ class Contents extends mixins.wl {
 Contents.defaultProps = {
   'hideable': true
 };
-class Tooltip extends mixins.wl {
+class Tooltip extends mixins.ei {
   constructor(props) {
     super(props);
     this.state = {
@@ -32455,7 +32507,7 @@ const tooltips = ({
 
 
 
-class ColumnNodeName extends genericNodePropsComponent.L {
+class ColumnNodeName extends genericNodePropsComponent.i {
   constructor(...args) {
     super(...args);
     this.state = {
@@ -32519,7 +32571,7 @@ ColumnNodeName.megatype = 'fname';
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnSize.jsx
 
 
-class ColumnSize extends genericNodePropsComponent.L {
+class ColumnSize extends genericNodePropsComponent.i {
   render() {
     let {
       nodeAdapter
@@ -32537,7 +32589,7 @@ ColumnSize.megatype = "size";
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnTimeAdded.jsx
 
 
-class ColumnTimeAdded extends genericNodePropsComponent.L {
+class ColumnTimeAdded extends genericNodePropsComponent.i {
   render() {
     let {
       nodeAdapter
@@ -32555,7 +32607,7 @@ ColumnTimeAdded.megatype = "timeAd";
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnExtras.jsx
 
 
-class ColumnExtras extends genericNodePropsComponent.L {
+class ColumnExtras extends genericNodePropsComponent.i {
   render() {
     return external_React_default().createElement("td", {
       megatype: ColumnExtras.megatype,
@@ -32586,7 +32638,7 @@ ColumnExtras.headerClassName = "grid-url-header";
 
 
 
-class BrowserEntries extends mixins.wl {
+class BrowserEntries extends mixins.ei {
   constructor(props) {
     super(props);
     this.state = {
@@ -32903,7 +32955,7 @@ class BrowserEntries extends mixins.wl {
     var viewMode = this.props.viewMode;
     let listAdapterOpts = this.props.listAdapterOpts || {};
     if (!viewMode) {
-      listAdapterOpts.columns = [columnFavIcon.l, ColumnNodeName, ColumnSize, ColumnTimeAdded, ColumnExtras];
+      listAdapterOpts.columns = [columnFavIcon.C, ColumnNodeName, ColumnSize, ColumnTimeAdded, ColumnExtras];
     }
     if (this.props.listAdapterColumns) {
       listAdapterOpts.columns = this.props.listAdapterColumns;
@@ -33002,7 +33054,7 @@ BrowserEntries.defaultProps = {
 
 
 
-class FMView extends mixins.wl {
+class FMView extends mixins.ei {
   constructor(props) {
     var _this$dataSource;
     super(props);
@@ -33349,19 +33401,19 @@ class FMView extends mixins.wl {
 
 /***/ }),
 
-/***/ 310:
+/***/ 976:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-l: () => (ColumnFavIcon)
+C: () => (ColumnFavIcon)
 });
-var react0__ = __webpack_require__(363);
+var react0__ = __webpack_require__(376);
 var react0 = __webpack_require__.n(react0__);
-var _genericNodePropsComponent1__ = __webpack_require__(297);
+var _genericNodePropsComponent1__ = __webpack_require__(0);
 
 
-class ColumnFavIcon extends _genericNodePropsComponent1__.L {
+class ColumnFavIcon extends _genericNodePropsComponent1__.i {
   render() {
     let {
       nodeAdapter
@@ -33392,18 +33444,18 @@ ColumnFavIcon.headerClassName = "grid-first-th fav";
 
 /***/ }),
 
-/***/ 297:
+/***/ 0:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  L: () => (GenericNodePropsComponent)
+  i: () => (GenericNodePropsComponent)
 });
 
 // EXTERNAL MODULE: ./js/chat/mixins.js
-var mixins = __webpack_require__(503);
+var mixins = __webpack_require__(436);
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/nodeProperties.jsx
 class NodeProperties {
   static get(node, changeListener) {
@@ -33584,7 +33636,7 @@ if (d) {
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/genericNodePropsComponent.jsx
 
 
-class GenericNodePropsComponent extends mixins.wl {
+class GenericNodePropsComponent extends mixins.ei {
   constructor(props) {
     super(props);
     if (this.props.node.h) {
@@ -33618,26 +33670,26 @@ class GenericNodePropsComponent extends mixins.wl {
 
 /***/ }),
 
-/***/ 182:
+/***/ 776:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  Z: () => (modalDialogs)
+  M: () => (modalDialogs)
 });
 
 // UNUSED EXPORTS: ExtraFooterElement
 
 // EXTERNAL MODULE: ./js/ui/utils.jsx
-var utils = __webpack_require__(79);
+var utils = __webpack_require__(240);
 // EXTERNAL MODULE: ./js/chat/mixins.js
-var mixins = __webpack_require__(503);
+var mixins = __webpack_require__(436);
 ;// CONCATENATED MODULE: ./js/ui/forms.jsx
-var React = __webpack_require__(363);
+var React = __webpack_require__(376);
 
-class Checkbox extends mixins.wl {
+class Checkbox extends mixins.ei {
   constructor(props) {
     super(props);
     this.state = {
@@ -33685,17 +33737,17 @@ const ui_forms = ({
   Checkbox
 });
 ;// CONCATENATED MODULE: ./js/ui/modalDialogs.jsx
-var modalDialogs_React = __webpack_require__(363);
+var modalDialogs_React = __webpack_require__(376);
 
 
 
-var ContactsUI = __webpack_require__(13);
-class ExtraFooterElement extends mixins.wl {
+var ContactsUI = __webpack_require__(40);
+class ExtraFooterElement extends mixins.ei {
   render() {
     return this.props.children;
   }
 }
-class ModalDialog extends mixins.wl {
+class ModalDialog extends mixins.ei {
   constructor(props) {
     super(props);
     this.onBlur = this.onBlur.bind(this);
@@ -33841,7 +33893,7 @@ class ModalDialog extends mixins.wl {
         }, buttons) : null, extraFooterElements.length > 0 ? modalDialogs_React.createElement("aside", null, extraFooterElements) : null);
       }
     }
-    return modalDialogs_React.createElement(utils.ZP.RenderTo, {
+    return modalDialogs_React.createElement(utils.cp.RenderTo, {
       element: document.body,
       className: "fm-modal-dialog",
       popupDidMount: this.onPopupDidMount
@@ -33875,7 +33927,7 @@ ModalDialog.defaultProps = {
   'showSelectedNum': false,
   'selectedNum': 0
 };
-class SelectContactDialog extends mixins.wl {
+class SelectContactDialog extends mixins.ei {
   constructor(props) {
     super(props);
     this.state = {
@@ -33951,7 +34003,7 @@ SelectContactDialog.defaultProps = {
   'cancelLabel': l[82],
   'hideable': true
 };
-class ConfirmDialog extends mixins.wl {
+class ConfirmDialog extends mixins.ei {
   static saveState(o) {
     let state = mega.config.get('xcod') >>> 0;
     mega.config.set('xcod', state | 1 << o.props.pref);
@@ -34082,20 +34134,20 @@ const modalDialogs = ({
 
 /***/ }),
 
-/***/ 285:
+/***/ 447:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-F: () => (PerfectScrollbar)
+e: () => (PerfectScrollbar)
 });
-var _applyDecoratedDescriptor1__ = __webpack_require__(229);
-var _chat_mixins0__ = __webpack_require__(503);
+var _applyDecoratedDescriptor1__ = __webpack_require__(888);
+var _chat_mixins0__ = __webpack_require__(436);
 
 var _dec, _dec2, _class, _PerfectScrollbar;
-var React = __webpack_require__(363);
+var React = __webpack_require__(376);
 
-let PerfectScrollbar = (_dec = (0,_chat_mixins0__.M9)(30, true), _dec2 = (0,_chat_mixins0__.M9)(30, true), (_class = (_PerfectScrollbar = class PerfectScrollbar extends _chat_mixins0__.wl {
+let PerfectScrollbar = (_dec = (0,_chat_mixins0__.aS)(30, true), _dec2 = (0,_chat_mixins0__.aS)(30, true), (_class = (_PerfectScrollbar = class PerfectScrollbar extends _chat_mixins0__.ei {
   constructor(props) {
     super(props);
     this.isUserScroll = true;
@@ -34363,26 +34415,26 @@ let PerfectScrollbar = (_dec = (0,_chat_mixins0__.M9)(30, true), _dec2 = (0,_cha
 }, _PerfectScrollbar.defaultProps = {
   className: "perfectScrollbarContainer",
   requiresUpdateOnResize: true
-}, _PerfectScrollbar), ((0,_applyDecoratedDescriptor1__.Z)(_class.prototype, "eventuallyReinitialise", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "eventuallyReinitialise"), _class.prototype), (0,_applyDecoratedDescriptor1__.Z)(_class.prototype, "onResize", [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, "onResize"), _class.prototype)), _class));
+}, _PerfectScrollbar), ((0,_applyDecoratedDescriptor1__.c)(_class.prototype, "eventuallyReinitialise", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "eventuallyReinitialise"), _class.prototype), (0,_applyDecoratedDescriptor1__.c)(_class.prototype, "onResize", [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, "onResize"), _class.prototype)), _class));
 
 /***/ }),
 
-/***/ 79:
+/***/ 240:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-Cw: () => (ParsedHTML),
-ZP: () => (__WEBPACK_DEFAULT_EXPORT__),
-a0: () => (OFlowEmoji),
-dy: () => (Emoji),
-hV: () => (reactStringWrap),
-nF: () => (OFlowParsedHTML),
-pQ: () => (withOverflowObserver)
+O: () => (Emoji),
+Sm: () => (OFlowEmoji),
+Ub: () => (ParsedHTML),
+aq: () => (withOverflowObserver),
+cp: () => (__WEBPACK_DEFAULT_EXPORT__),
+wH: () => (reactStringWrap),
+yg: () => (OFlowParsedHTML)
 });
-var _chat_mixins0__ = __webpack_require__(503);
-var React = __webpack_require__(363);
-var ReactDOM = __webpack_require__(533);
+var _chat_mixins0__ = __webpack_require__(436);
+var React = __webpack_require__(376);
+var ReactDOM = __webpack_require__(944);
 
 class RenderTo extends React.Component {
   componentDidMount() {
@@ -34426,7 +34478,7 @@ class RenderTo extends React.Component {
     return null;
   }
 }
-const withOverflowObserver = Component => class extends _chat_mixins0__._p {
+const withOverflowObserver = Component => class extends _chat_mixins0__._k {
   constructor(props) {
     super(props);
     this.displayName = 'OverflowObserver';
@@ -34524,14 +34576,14 @@ const OFlowEmoji = withOverflowObserver(Emoji);
 const OFlowParsedHTML = withOverflowObserver(ParsedHTML);
 const __WEBPACK_DEFAULT_EXPORT__ = ({
   RenderTo,
-  SoonFcWrap: _chat_mixins0__.M9,
+  SoonFcWrap: _chat_mixins0__.aS,
   OFlowEmoji,
   OFlowParsedHTML
 });
 
 /***/ }),
 
-/***/ 363:
+/***/ 376:
 /***/ ((module) => {
 
 "use strict";
@@ -34539,7 +34591,7 @@ module.exports = React;
 
 /***/ }),
 
-/***/ 533:
+/***/ 944:
 /***/ ((module) => {
 
 "use strict";
@@ -34547,12 +34599,12 @@ module.exports = ReactDOM;
 
 /***/ }),
 
-/***/ 229:
+/***/ 888:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-Z: () => (_applyDecoratedDescriptor)
+c: () => (_applyDecoratedDescriptor)
 });
 function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
   var desc = {};
@@ -34580,12 +34632,12 @@ function _applyDecoratedDescriptor(target, property, decorators, descriptor, con
 
 /***/ }),
 
-/***/ 462:
+/***/ 72:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
-Z: () => (_extends)
+c: () => (_extends)
 });
 function _extends() {
   _extends = Object.assign ? Object.assign.bind() : function (target) {
@@ -34675,9 +34727,9 @@ function _extends() {
 /******/ 	
 /******/ 	// startup
 /******/ 	// Load entry module and return exports
-/******/ 	__webpack_require__(51);
+/******/ 	__webpack_require__(816);
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__(978);
+/******/ 	var __webpack_exports__ = __webpack_require__(408);
 /******/ 	
 /******/ })()
 ;

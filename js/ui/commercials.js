@@ -185,15 +185,17 @@ lazy(mega, 'commercials', () => {
             const commID = commSlots[i];
             const $slotWrapper = getCommWrapper(commID);
 
-            if (hideWrapper) {
-                $slotWrapper.addClass('hidden');
-                const index = activeSlots.indexOf(commID);
-                if (index > -1) {
-                    activeSlots.splice(activeSlots.indexOf(commID), 1);
+            if ($slotWrapper.length) {
+                if (hideWrapper) {
+                    $slotWrapper.addClass('hidden');
+                    const index = activeSlots.indexOf(commID);
+                    if (index > -1) {
+                        activeSlots.splice(activeSlots.indexOf(commID), 1);
+                    }
                 }
-            }
 
-            $slotWrapper.empty();
+                $slotWrapper.empty();
+            }
 
             // Unblocks future loading additions if the page size is changed between mobile/tablet
             // It is safe to assume that if a slot should be hidden, its linked comms should also be
@@ -258,11 +260,13 @@ lazy(mega, 'commercials', () => {
             if (activeSlots.includes(commSlots[i])) {
 
                 const $slotWrapper = getCommWrapper(commSlots[i]);
-                resize = $slotWrapper.hasClass('hidden');
+                if ($slotWrapper.length) {
+                    resize = $slotWrapper.hasClass('hidden');
 
-                $('iframe', $slotWrapper).removeClass('hidden');
-                $slotWrapper.removeClass('hidden');
-                $('.commercial-close-button', $slotWrapper).removeClass('hidden');
+                    $('iframe', $slotWrapper).removeClass('hidden');
+                    $slotWrapper.removeClass('hidden');
+                    $('.commercial-close-button', $slotWrapper).removeClass('hidden');
+                }
             }
         }
         if (currentPage === 'mobileFilelink' && resize) {
@@ -404,9 +408,13 @@ lazy(mega, 'commercials', () => {
         }
         adCookies = csp.has('ad');
         for (let i = 0; i < activeSlots.length; i++) {
-            const iframe = $('> iframe', slotWrappers[activeSlots[i]])[0];
-
-            if (adCookies && !iframe.src.includes('&ac=1')) {
+            const $slotWrapper = getCommWrapper(activeSlots[i]);
+            const iframe = $('> iframe', $slotWrapper)[0];
+            // If there is no iframe found we cannot edit the cookies, so remove the iframe to be safe
+            if (!iframe) {
+                hideComms([activeSlots[i]], true);
+            }
+            else if (adCookies && !iframe.src.includes('&ac=1')) {
                 iframe.src += '&ac=1';
             }
             else {
@@ -590,7 +598,7 @@ lazy(mega, 'commercials', () => {
             // There are no ads for the user to render
             if (ex === ENOENT) {
                 if (d) {
-                    console.error('No ads returned from api for:', req);
+                    console.info('No ads returned from api for:', req);
                 }
             }
             else if (d) {
@@ -1008,3 +1016,17 @@ mBroadcaster.addListener('csp:settingsSaved', () => {
         mega.commercials.updateCommCookies();
     }
 });
+
+mBroadcaster.addListener('login2', () => {
+    'use strict';
+    if (mega.flags.ab_ads) {
+        mega.commercials.init(true);
+    }
+});
+
+mBroadcaster.addListener('mega:openfolder', SoonFc(90, () => {
+    'use strict';
+    if (mega.flags.ab_ads) {
+        mega.commercials.getComms(is_mobile);
+    }
+}));

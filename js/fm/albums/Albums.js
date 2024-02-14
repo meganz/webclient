@@ -388,9 +388,11 @@ lazy(mega.gallery, 'albums', () => {
      * Updating the album cell if available
      * @param {String} albumId Album id
      * @param {Boolean} sortNodes Whether to re-sort existing nodes or not
+     * @param {Boolean} forceCoverUpdate Whether to reset the cover to first node of album
+     * @param {Node} coverNode Node that should be used as the cover
      * @returns {void}
      */
-    const debouncedAlbumCellUpdate = (albumId, sortNodes = false) => {
+    const debouncedAlbumCellUpdate = (albumId, sortNodes = false, forceCoverReset = false, coverNode = undefined) => {
         const album = scope.albums.store[albumId];
 
         if (!album) {
@@ -404,8 +406,15 @@ lazy(mega.gallery, 'albums', () => {
 
             let coverUpdated = false;
 
-
-            if (album.nodes.length) {
+            if (forceCoverReset || !album.nodes.length) {
+                album.node = album.nodes[0];
+                coverUpdated = true;
+            }
+            else if (coverNode) {
+                album.node = coverNode;
+                coverUpdated = true;
+            }
+            else {
                 const shouldUpdateCover = (album.filterFn)
                     ? !album.node || album.nodes[0].h !== album.node.h
                     : !album.node
@@ -418,10 +427,6 @@ lazy(mega.gallery, 'albums', () => {
                     album.node = album.nodes[0];
                     coverUpdated = true;
                 }
-            }
-            else {
-                album.node = album.nodes[0];
-                coverUpdated = true;
             }
 
             if (album.cellEl) {
@@ -697,7 +702,7 @@ lazy(mega.gallery, 'albums', () => {
             scope.albums.removeAlbumFromGridAndTree(albumId);
         }
 
-        debouncedAlbumCellUpdate(albumId);
+        debouncedAlbumCellUpdate(albumId, false, !!album.node && album.node.h === handle);
 
         const { grid } = scope.albums;
 
@@ -743,6 +748,26 @@ lazy(mega.gallery, 'albums', () => {
                     grid.showEmptyAlbumPage(albumId);
                 }
             }
+        }
+    };
+
+    /**
+     * Removing the node from album timeline in dialog
+     * @param {String} handle Node handle
+     * @returns {void}
+     */
+    const removeNodeFromTimelineDialog = (handle) => {
+        const timeline = $.timelineDialog.timeline;
+
+        if (timeline) {
+            if (timeline.selections[handle]) {
+                timeline.deselectNode(M.d[handle]);
+                $.timelineDialog.updateSelectedCount(timeline.selCount);
+            }
+
+            delay('timeline_dialog:remove_items', () => {
+                timeline.nodes = M.v;
+            });
         }
     };
 
@@ -1420,6 +1445,7 @@ lazy(mega.gallery, 'albums', () => {
                     timemarks.albumCreateNamed = 0;
                     timemarks.albumItemsSelectStarted = 0;
                     scope.reinitiateEvents();
+                    delete $.timelineDialog;
                 }
             });
 
@@ -1433,6 +1459,7 @@ lazy(mega.gallery, 'albums', () => {
             this.keepEnabled = keepEnabled;
             this._title.classList.add('text-center');
             this.albumId = albumId;
+            $.timelineDialog = this;
         }
 
         setContent(albumName) {
@@ -1580,12 +1607,14 @@ lazy(mega.gallery, 'albums', () => {
                 contentClasses: 'px-1',
                 onclose: () => {
                     scope.reinitiateEvents();
+                    delete $.timelineDialog;
                 }
             });
 
             this.setContent();
             this._title.classList.add('text-center');
             this.albumId = albumId;
+            $.timelineDialog = this;
         }
 
         setContent() {
@@ -4562,6 +4591,14 @@ lazy(mega.gallery, 'albums', () => {
             for (let i = 0; i < albumKeys.length; i++) {
                 removeNodeFromAlbum(albumKeys[i], handle);
             }
+
+            if (slideshowid) {
+                tmpMv.splice(tmpMv.indexOf(node), 1);
+            }
+
+            if ($.timelineDialog) {
+                removeNodeFromTimelineDialog(handle);
+            }
         }
 
         /**
@@ -4599,6 +4636,15 @@ lazy(mega.gallery, 'albums', () => {
 
             for (let i = 0; i < keys.length; i++) {
                 this.updateAlbumDataByUpdatedNode(keys[i], node);
+            }
+
+            if (!M.v.includes(node)) {
+                M.v.push(node);
+                sortInAlbumNodes(M.v);
+            }
+
+            if ($.timelineDialog) {
+                this.updateTimelineDialog();
             }
         }
 
@@ -4664,7 +4710,7 @@ lazy(mega.gallery, 'albums', () => {
          * @param {String} albumId Album id
          * @returns {void}
          */
-        updateGridAfterAddingNode(albumId) {
+        updateGridAfterAddingNode(albumId, node) {
             const album = this.store[albumId];
 
             if (!album) {
@@ -4684,7 +4730,7 @@ lazy(mega.gallery, 'albums', () => {
                 }
             }
 
-            debouncedAlbumCellUpdate(albumId, true);
+            debouncedAlbumCellUpdate(albumId, true, false, album.eHandles[node.h] === album.at.c ? node : undefined);
 
             if (albumId === scope.getAlbumIdFromPath() && this.grid) {
                 if (album.nodes.length === 1) {
@@ -4728,9 +4774,24 @@ lazy(mega.gallery, 'albums', () => {
                 album.nodes = (Array.isArray(album.nodes)) ? [...album.nodes, node] : [node];
 
                 if (this.grid) {
-                    this.updateGridAfterAddingNode(albumId);
+                    this.updateGridAfterAddingNode(albumId, node);
                     debouncedLoadingUnset();
                 }
+            }
+        }
+
+        /**
+         * Updating the data of the timeline dialog based on the new node details
+         * @param {MegaNode} node Updated node
+         * @returns {void}
+         */
+        updateTimelineDialog() {
+            const timeline = $.timelineDialog.timeline;
+
+            if (timeline) {
+                delay('timeline_dialog:add_items', () => {
+                    timeline.nodes = M.v;
+                });
             }
         }
 

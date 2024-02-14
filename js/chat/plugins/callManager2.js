@@ -127,7 +127,7 @@
             else {
                 this.audioMuted = !(av & Av.Audio);
                 this.videoMuted = !(av & Av.Camera);
-                this.hasScreenAndCam = (av & Av.ScreenHiRes) && (av & Av.CameraLowRes);
+                this.hasScreenAndCam = !!((av & Av.ScreenHiRes) && (av & Av.CameraLowRes));
                 this.isScreen = !!(av & Av.ScreenHiRes);
             }
             if ((av ^ this.av) & Av.Recording) {
@@ -273,8 +273,12 @@
                 return;
             }
             if (this.hiResPlayer) {
-                this.setResState(RES_STATE.HD);
+                assert(this.resState !== RES_STATE.THUMB);
                 this.hiResPlayer.setHiResDivider(resDivider);
+                if (this.resState === RES_STATE.THUMB_PENDING) { // cancel vthumb request, revert to hi-res
+                    this.delVthumbPlayer();
+                    this.setResState(RES_STATE.HD);
+                }
                 return;
             }
             // request hi-res stream
@@ -302,8 +306,11 @@
                 return;
             }
             if (this.vThumbPlayer) {
-                this.setResState(RES_STATE.THUMB);
-                this.delHiResPlayer();
+                assert(this.resState !== RES_STATE.HD);
+                if (this.resState === RES_STATE.HD_PENDING) {
+                    this.delHiResPlayer();
+                    this.setResState(RES_STATE.THUMB);
+                }
                 return;
             }
             if (this.noVideoSlotsForSmoothSwitch()) {
@@ -433,16 +440,12 @@
             this.chatRoom.unbind("onCallLeft.start");
             this.chatRoom.megaChat.trigger('sfuConnOpen');
         }
-        onPeerJoined(peer, isInitial) {
-            new Peer(this, peer.userId, peer.cid, peer.av);
+        onPeerJoined(sfuPeer, isInitial) {
+            new Peer(this, sfuPeer.userId, sfuPeer.cid, sfuPeer.av);
             if (!isInitial) {
-                this.chatRoom.trigger('onCallPeerJoined', peer.userId);
+                this.chatRoom.trigger('onCallPeerJoined', sfuPeer.userId);
             }
-
-            // Force high res for now:
-            // thumb is already loaded, only uncomment if we want HD by default?
-            // this.sfuClient.peers.get(peer.cid).requestThumbnailVideo();
-            if (peer.userId !== u_handle) {
+            if (sfuPeer.userId !== u_handle) {
                 this.callTimeoutDone();
             }
             if (this.stayOnEnd !== !!mega.config.get('callemptytout')) {
@@ -521,6 +524,9 @@
         wrOnUserLeft(user) {
             this.chatRoom.trigger('wrOnUserLeft', user);
         }
+        wrOnUsersAllow(users) {
+            this.chatRoom.trigger('wrOnUsersAllow', [users]);
+        }
         wrOnUserDump(users) {
             this.chatRoom.trigger('wrOnUserDump', users);
         }
@@ -529,6 +535,7 @@
         }
 // == end SfuClientIClientEventListener interface
         handleDisconnect(termCode) {
+            console.assert(termCode !== undefined, "handleDisconnect: termCode is undefined");
             this.isDisconnecting = true;
             this.chatRoom.trigger('onCallLeft', {
                 callId: this.callId,
@@ -537,7 +544,7 @@
                 termCode
             });
 
-            if (termCode === SfuClient.TermCode.kTooManyParticipants) {
+            if (termCode === SfuClient.TermCode.kCallParticipantLimit) {
                 msgDialog('warningb', '', l[20200]);
             }
 
@@ -653,6 +660,9 @@
                 return;
             }
             this.isDestroyed = true;
+            if (reason === undefined) {
+                reason = SfuClient.TermCode.kUserHangup;
+            }
             if (!this.isDisconnecting && !this.sfuClient.disconnect(reason)) {
                 this.handleDisconnect(reason);
             }
@@ -836,6 +846,7 @@
         }
         setSfuClient(sfuClient) {
             this.sfuClient = sfuClient;
+            this.clientId = sfuClient.cid;
             this.av = sfuClient.availAv;
         }
         onAvChange(avDiff) {
@@ -869,7 +880,7 @@
         }
         get hasScreenAndCam() {
             const av = this.sfuClient.availAv;
-            return (av & Av.ScreenHiRes) && (av & Av.CameraLowRes);
+            return !!((av & Av.ScreenHiRes) && (av & Av.CameraLowRes));
         }
         registerConsumer(consumer) {
             this.consumers.add(consumer);

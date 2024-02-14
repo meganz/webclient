@@ -26,6 +26,10 @@
     transition-delay: 200ms;
 }
 
+.mega-top-menu.animate.no-delay {
+    transition-delay: 0s;
+}
+
 .mega-top-menu .top-nav {
     display: flex;
     flex-direction: row;

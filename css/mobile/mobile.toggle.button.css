@@ -16,9 +16,16 @@
     line-height: 14px;
 }
 
-.mega-toggle-button .toggle-label {
+.mega-toggle-button .toggle-labels {
     -webkit-padding-end: 16px;
     padding-inline-end: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.mega-toggle-button .toggle-sublabel {
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-large-regular);
 }
 
 .mega-toggle-button .toggle-wrapper {

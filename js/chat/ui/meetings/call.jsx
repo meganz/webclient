@@ -459,13 +459,19 @@ export default class Call extends MegaRenderMixin {
             })
         );
 
-        chatRoom.rebind(`wrOnUserLeft.${NAMESPACE}`, (ev, user) =>
-            this.isMounted() &&
-            this.setState(
-                { waitingRoomPeers: this.state.waitingRoomPeers.filter(h => h !== user) },
-                () => mBroadcaster.sendMessage('meetings:peersWaiting', this.state.waitingRoomPeers)
-            )
-        );
+        // Remove peers from the waiting room once they're admitted
+        const usrwr = (e, users) => {
+            users = typeof users === 'string' ? [users] : users;
+            return (
+                this.isMounted() &&
+                this.setState(
+                    { waitingRoomPeers: this.state.waitingRoomPeers.filter(h => !users.includes(h)) },
+                    () => mBroadcaster.sendMessage('meetings:peersWaiting', this.state.waitingRoomPeers)
+                )
+            );
+        };
+        chatRoom.rebind(`wrOnUserLeft.${NAMESPACE}`, usrwr);
+        chatRoom.rebind(`wrOnUsersAllow.${NAMESPACE}`, usrwr);
 
         chatRoom.rebind(`wrOnUserDump.${NAMESPACE}`, (ev, users) =>
             Object.entries(users).forEach(([handle, host]) => {
@@ -523,6 +529,7 @@ export default class Call extends MegaRenderMixin {
             `onCallPeerLeft.${NAMESPACE}`,
             `onCallPeerJoined.${NAMESPACE}`,
             `onCallLeft.${NAMESPACE}`,
+            `wrOnUsersAllow.${NAMESPACE}`,
             `wrOnUsersEntered.${NAMESPACE}`,
             `wrOnUserLeft.${NAMESPACE}`,
             `alterUserPrivilege.${NAMESPACE}`,
@@ -747,7 +754,7 @@ export default class Call extends MegaRenderMixin {
      */
 
     handleCallEnd = () => {
-        this.props.call?.destroy();
+        this.props.call?.destroy(SfuClient.TermCode.kUserHangup);
     };
 
     /**

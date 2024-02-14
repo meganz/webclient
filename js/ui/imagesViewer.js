@@ -894,7 +894,8 @@ var slideshowid;
     // Mobile finger gesture
     function slideshow_gesture(elm, type) {
 
-        if (!is_touchable) {
+        // TODO: change to `!is_touchable` to support desktop touch device
+        if (!is_mobile) {
             return;
         }
 

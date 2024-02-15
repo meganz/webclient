@@ -895,7 +895,7 @@ var slideshowid;
     function slideshow_gesture(elm, type) {
 
         // TODO: change to `!is_touchable` to support desktop touch device
-        if (!is_mobile) {
+        if (!is_mobile || !mega.ui.viewerOverlay) {
             return;
         }
 

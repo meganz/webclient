@@ -1660,9 +1660,9 @@ FileManager.prototype.initContextUI = function() {
         $.hideContextMenu();
     });
 
-    $(c + '.getlink-item, ' + c + '.embedcode-item, ' + c + '.cd-getlink-item').rebind('click', (e) => {
+    $(c + '.getlink-item, ' + c + '.embedcode-item, ' + c + '.cd-getlink-item').rebind('click', function(e) {
 
-        this.getLinkAction();
+        M.getLinkAction.call(this);
 
         if ($(e.currentTarget).hasClass('cd-getlink-item')) {
             if ($(e.currentTarget).hasClass('manage-link')) {

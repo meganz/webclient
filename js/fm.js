@@ -3856,10 +3856,9 @@ function fingerprintDialog(userid, isAdminVerify, callback) {
         const promises = [];
         loadingDialog.show();
 
-        if (!authring.getContactAuthenticated(userid, 'Cu25519')) {
+        if (!authring.getContactAuthenticated(userid, 'Cu25519') || !pubCu25519[userid]) {
             promises.push(crypt.getPubCu25519(userid, true));
         }
-
         // Generate fingerprint
         promises.push(crypt.getFingerprintEd25519(userid, 'string'));
 

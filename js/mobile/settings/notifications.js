@@ -1,169 +1,196 @@
-mobile.settings.account.notifications = Object.create(mobile.settingsHelper, {
+mobile.settings.notifications = Object.create(mobile.settingsHelper, {
+    /**
+     * Initiate and render the page.
+     *
+     * @returns {void}
+     */
     init: {
         value: function() {
             'use strict';
 
             if (this.domNode) {
-                this.show();
-                return true;
+                return this.render();
             }
 
-            // Fetch account data, then render.
+            this.domNode = this.generatePage('settings-notifications');
+
+            const container = mCreateElement('div', {
+                'class': 'mobile-settings-content',
+            }, this.domNode);
+
+            const form = mCreateElement('div', {
+                'class': 'mobile-settings-form',
+            }, container);
+
+            mCreateElement('div', {
+                'class': 'mobile-settings-prompt',
+            }, form).textContent = l[20898];
+
+            const toggleList = mCreateElement('div', {
+                'class': 'mobile-settings-list',
+            }, form);
+
+            // Build toggle ALL component
+            this.toggleAllComponent = new MegaMobileToggleButton({
+                parentNode: toggleList,
+                componentClassname: 'mega-toggle-button',
+                value: 'all',
+                id: 'enotif-all',
+                label: l[20897],
+                role: 'switch',
+                onChange: () => {
+                    mega.enotif.setAllState(!this.toggleAllComponent.checked);
+                    this.setTogglesStatus();
+                }
+            });
+
+            // Options for toggle list
+            const toggleArray = [
+                {
+                    value: 'contact-request',
+                    id: 'enotif-contact-request',
+                    label: l.notifications_contact_request
+                },
+                {
+                    value: 'chat-message',
+                    id: 'enotif-chat-message',
+                    label: l.notifications_chat_message
+                },
+                {
+                    value: 'achievements',
+                    id: 'enotif-achievements',
+                    label: l[20891],
+                    sublabel: l[20892]
+                },
+                {
+                    value: 'quota',
+                    id: 'enotif-quota',
+                    label: l[20893],
+                },
+                {
+                    value: 'account-inactive',
+                    id: 'enotif-inactive',
+                    label: l[20895],
+                },
+                {
+                    value: 'referral-program',
+                    id: 'enotif-referral-program',
+                    label: l[23280],
+                },
+                {
+                    value: 'card-expiry',
+                    id: 'enotif-card-expiry',
+                    label: l.payment_card_noti_title,
+                }
+            ];
+
+            // Build toggle components and store in togglesComponents array by id
+            this.togglesComponents = [];
+            for (const toggle of toggleArray){
+                const toggleComponent = new MegaMobileToggleButton({
+                    parentNode: toggleList,
+                    componentClassname: 'mega-toggle-button',
+                    ...toggle,
+                    role: 'switch',
+                    onChange: () => {
+                        mega.enotif.setState(toggleComponent.input.name, !toggleComponent.checked);
+                        this.setToggleAllStatus();
+                    }
+                });
+                this.togglesComponents[toggle.id] = toggleComponent;
+            }
+
             M.accountData(() => {
-                mega.config.fetch();
                 this.render();
             }, false, true);
 
-            // Add a server log
-            api.req({a: 'log', e: 99805, m: 'Mobile web fm/account/notifications visited'});
+            eventlog(99805);
         },
     },
 
-    /**
-     * Render the page.
-     */
     render: {
         value: function() {
             'use strict';
 
-            if (this.domNode) {
-                this.show();
-                return true;
+            this.domNode.classList.add('default-page', 'default-form');
+
+            // Hide achievements toggle if achievements not an option for the user
+            if (M.maf) {
+                this.togglesComponents['enotif-achievements'].removeClass('hidden');
+            }
+            else {
+                this.togglesComponents['enotif-achievements'].addClass('hidden');
             }
 
-            this.domNode = this.generatePage('notifications');
-            this.domNode.classList.add('theme-light-forced');
+            // Hide card expiry toggle if card expiry not an option for the user
+            if ((u_attr.p || u_attr.b) && M.account.stype === 'S'
+                && (Array.isArray(M.account.sgw) && M.account.sgw.includes('Stripe')
+                    || Array.isArray(M.account.sgwids)
+                    && M.account.sgwids.includes((addressDialog || {}).gatewayId_stripe || 19))) {
+                this.togglesComponents['enotif-card-expiry'].removeClass('hidden');
+            }
+            else {
+                this.togglesComponents['enotif-card-expiry'].addClass('hidden');
+            }
 
-            const oldPage = document.querySelector('.mobile.account-notifications-page .fm-scrolling');
-
-            oldPage.classList.remove('fm-scrolling');
-
-            this.domNode.appendChild(oldPage);
-            this.$page = $('.mega-mobile-settings.notifications');
+            this.setTogglesStatus(true);
 
             this.show();
-
-            this.initRowTapEvent();
-            this.initAccountNotifications();
-            this.initENotify();
         },
     },
+
     /**
-     * Init account notification switches.
+     * Set the status of toggle ALL depending on the status of toggle list.
+     * If all toggles in the list are on, the global state will be on.
+     * Otherwise, off.
+     *
+     * @returns {void}
      */
-    initAccountNotifications: {
+    setToggleAllStatus: {
         value: function() {
             'use strict';
 
-            // New setting need to force cloud and contacts notification available.
-            if (!mega.notif.has('enabled', 'cloud')) {
-                mega.notif.set('enabled', 'cloud');
-            }
-
-            if (!mega.notif.has('enabled', 'contacts')) {
-                mega.notif.set('enabled', 'contacts');
-            }
-
-            // Select switches.
-            var $NAll = this.$page.find('.account-notifications .mega-switch#notif-all');
-            var $NEach = this.$page.find('.account-notifications .mega-switch:not(#notif-all)');
-
-            // Init each individual notification switchs.
-            for (const item of $NEach) {
-                const $this = $(item);
-                const nName = $this.attr('name');
-                const sectionName = $this.attr('data-section');
-
-                // eslint-disable-next-line no-loop-func
-                mobile.initSwitch($this, mega.notif.has(nName, sectionName), (newState) => {
-                    const updateFunction = newState ? mega.notif.set : mega.notif.unset;
-                    const uiUpdateFunction = newState ? $.fn.addClass : $.fn.removeClass;
-
-                    updateFunction(nName, sectionName);
-                    uiUpdateFunction.apply($NAll, ['toggle-on']);
-                });
-            }
-
-            // Handle all toggle switch.
-            mobile.initSwitch($NAll, $NEach.hasClass('toggle-on'), (newState) => {
-                const updateFunction = newState ? mega.notif.set : mega.notif.unset;
-                const uiUpdateFunction = newState ? $.fn.addClass : $.fn.removeClass;
-                for (const item of $NEach) {
-                    const $this = $(item);
-                    const nName = $this.attr('name');
-                    const sectionName = $this.attr('data-section');
-
-                    updateFunction(nName, sectionName);
-                    uiUpdateFunction.apply($this, ['toggle-on']);
+            let globalState = true;
+            for (const id in this.togglesComponents) {
+                if (this.togglesComponents.hasOwnProperty(id)) {
+                    const toggleComponent = this.togglesComponents[id];
+                    if (!toggleComponent.checked && !toggleComponent.hasClass('hidden')) {
+                        globalState = false;
+                    }
                 }
-            });
+            }
+            this.toggleAllComponent.setButtonState(globalState);
         },
     },
+
     /**
-     * Init Email Notifications Logic.
+     * Set the status of each of the toggles.
+     * Also, set the status of toggle ALL if initial is true.
+     * @param {Boolean} initial
+     *
+     * @returns {void}
      */
-    initENotify: {
-        value: function() {
+    setTogglesStatus: {
+        value: function(initial) {
             'use strict';
 
-            loadingDialog.show('mobile:account/notifications:enotify');
+            loadingDialog.show();
 
-            // Select switches.
-            const $EAll = this.$page.find('.email-notifications .mega-switch#enotif-all');
-            const $EEach = this.$page.find('.email-notifications .mega-switch:not(#enotif-all)');
-            const {$page} = this;
-
-            // Hide achievements toggle if achievements not an option for this user.
-            (M.account.maf ? $.fn.removeClass : $.fn.addClass).apply(
-                this.$page.find('#enotif-achievements').closest('.notification-setting-row'),
-                ['hidden']
-            );
-
-            // Load the enotify settings.
+            // Load the enotify settings
             mega.enotif.all().then((enotifStates) => {
-                // Handle individual email toggles.
-
-                for (const notif of $EEach){
-                    const $this = $(notif);
-                    const eName = $this.attr('name');
-                    // eslint-disable-next-line no-loop-func
-                    mobile.initSwitch($this, !enotifStates[eName], (newState) => {
-                        mega.enotif.setState(eName, !newState);
-                        (newState || $EEach.hasClass('toggle-on') ? $.fn.addClass : $.fn.removeClass)
-                            .apply($EAll, ['toggle-on']);
-                        loadingDialog.hide('mobile:account/notifications:enotify');
-                    });
+                for (const id in this.togglesComponents) {
+                    if (this.togglesComponents.hasOwnProperty(id)) {
+                        const toggleComponent = this.togglesComponents[id];
+                        toggleComponent.setButtonState(!enotifStates[toggleComponent.input.name]);
+                    }
                 }
 
-                // Handle All toggle.
-                mobile.initSwitch($EAll, $EEach.hasClass('toggle-on'), (newState) => {
-                    mega.enotif.setAllState(!newState);
-                    (newState ? $.fn.addClass : $.fn.removeClass).apply($EEach, ['toggle-on']);
-                    loadingDialog.hide('mobile:account/notifications:enotify');
-                });
-
-                if ((u_attr.p || u_attr.b) && M.account.stype === 'S'
-                    && (Array.isArray(M.account.sgw) && M.account.sgw.includes('Stripe')
-                        || Array.isArray(M.account.sgwids)
-                        && M.account.sgwids.includes((addressDialog || {}).gatewayId_stripe || 19))) {
-
-                    $('.notification-setting-row.payment-card-noti', $page).removeClass('hidden');
+                if (initial) {
+                    this.setToggleAllStatus();
                 }
 
-                loadingDialog.hide('mobile:account/notifications:enotify');
+                loadingDialog.hide();
             });
         },
-    },
-    /**
-     * Allow taping anywhere on row to switch toggle.
-     */
-    initRowTapEvent: {
-        value: function() {
-            'use strict';
-
-            $('.notification-setting-row', this.domNode).rebind('tap.notif', function() {
-                $('.mega-switch', this).tap();
-            });
-        },
-    },
+    }
 });

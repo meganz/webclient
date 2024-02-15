@@ -16,10 +16,6 @@
     margin: 0;
 }
 
-.mega-mobile-settings.notifications  .content-txt {
-    color: var(--mobile-text-primary);
-}
-
 .mega-mobile-settings a.primary-link,
 .mega-mobile-settings a.primary-link:link,
 .mega-mobile-settings a.primary-link:visited,
@@ -311,10 +307,6 @@ body.bottom-pages .fmholder {
 .mobile .affiliate-redeem-page {
     height: 100%;
     overflow: auto;
-}
-
-.mobile.main-block.account-file-management-page .notification-setting-row {
-    padding-left: 20px;
 }
 
 .mobile.context-menu-container .fm-icon {

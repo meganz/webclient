@@ -31,7 +31,7 @@ mobile.settings = Object.create(mobile.settingsHelper, {
                 {
                     text: l.mobile_settings_file_manage_title,
                     icon: 'sprite-mobile-fm-mono icon-folder-thin-outline',
-                    href: 'fm/account/file-management/link-options',
+                    href: 'fm/account/file-management',
                     eventLog: 99842
                 },
                 {

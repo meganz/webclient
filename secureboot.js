@@ -2974,7 +2974,6 @@ else if (!browserUpdate) {
         jsl.push({f:'css/mobile/mobile.transfer.block.css', n: 'mobile_transfer_block_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/mobile/mobile.bottom.bar.css', n: 'mobile_bottom_bar_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/mobile/mobile.account.css', n: 'mobile_account_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/mobile/mobile.notifications.css', n: 'mobile_notifications_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/mobile/mobile.download.css', n: 'mobile_download_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/mobile/mobile.promo.banner.css', n: 'mobile_promo_banner_css', j:2,w:5,c:1,d:1,cache:1});
 
@@ -3068,7 +3067,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/settings/settingsHelper.js', n: 'mobile_settings_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/settings.js', n: 'mobile_settings_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/account.js', n: 'mobile_my_account_js', j: 1, w:1});
-        jsl.push({f:'js/mobile/settings/linksOptions.js', n: 'mobile_account_file_management_js', j:1, w: 1});
         jsl.push({f:'js/mobile/mobile.account.paymentcard.js', n: 'mobile_payment_card_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.account.cancel-subscription.js', n: 'mobile_account_cancel_sub_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.achieve.js', n: 'mobile_achieve_js', j: 1, w: 1});

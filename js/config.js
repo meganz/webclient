@@ -565,10 +565,10 @@
                 accountUI.renderAccountPage(M.account);
             }
             else if (page === 'fm/account/notifications') {
-                mobile.settings.account.notifications.render();
+                mobile.settings.notifications.render();
             }
             else if (page === 'fm/account/file-management') {
-                mobile.settings.account.filemanagement.render();
+                mobile.settings.fileManagement.render();
             }
 
             return;
@@ -781,7 +781,7 @@
                 toast = true;
             }
 
-            if (toast && !is_mobile) {
+            if (toast) {
                 showToast('settings', toastText || l[16168]);
             }
         });

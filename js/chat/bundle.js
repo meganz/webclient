@@ -8686,7 +8686,7 @@ class ColumnContactVerifiedStatus extends genericNodePropsComponent.i {
 ColumnContactVerifiedStatus.sortable = true;
 ColumnContactVerifiedStatus.id = "verification";
 ColumnContactVerifiedStatus.megatype = "verification";
-ColumnContactVerifiedStatus.label = external_React_default().createElement((external_React_default()).Fragment, null, l.contact_ver_verification, external_React_default().createElement("i", {
+ColumnContactVerifiedStatus.label = external_React_default().createElement((external_React_default()).Fragment, null, l.contact_ver_verification, "\xA0", external_React_default().createElement("i", {
   className: "simpletip sprite-fm-mono contacts-verification-icon icon-info",
   "data-simpletip": l.contact_ver_tooltip_content,
   "data-simpletip-class": "contacts-verification-icon-simpletip"

@@ -1086,11 +1086,11 @@ li.active .call-duration i {
     -webkit-padding-start: 16px;
     padding-inline-start: 16px;
 }
+.contacts-table thead th span i {
+    float: none;
+}
 .contacts-verification-label-container {
     display: flex;
-}
-.contacts-verification-icon {
-    margin: 0 8px;
 }
 .contacts-verification-icon-simpletip {
     max-width: 280px !important;

@@ -291,6 +291,10 @@ function browserdetails(useragent) {
         || useragent.indexOf('trident') > 0) {
         browser = 'Internet Explorer';
     }
+    else if (useragent.indexOf('megavpn/') > 0) {
+        icon = 'mega.png';
+        browser = 'MEGA VPN';
+    }
 
     if (browser === 'Edgium') {
         icon = 'edgium.png';

@@ -1,20 +1,11 @@
 /* Cookie dialog */
 
-/* TODO: adapt it to new dialogs styles once it merged */
-.cookie-dialog {
-    display: flex;
+.mega-dialog.cookie-dialog {
     max-height: calc(100% - 30px);
-    max-width: 596px;
+    max-width: 640px;
     text-align: center;
-    margin: 0 !important;
-    z-index: 9999 !important;
-
-    /* TODO: Remove once new dialogs are merged */
     width: calc(100% - 30px);
-}
-.mobile .mega-dialog.cookie-dialog {
-    overflow: visible;
-    max-width: 596px;
+    z-index: 9999!important;
 }
 .cookie-dialog .content-block {
     border-radius: var(--border-radius);
@@ -239,48 +230,92 @@
     display: table-cell;
 }
 
-/* Step 3. Third Party Cookies */
-.cookie-dialog .info-block {
-    color: var(--text-color-low);
-    font-size: 14px;
-    line-height: 22px;
-    padding: 0 0 52px 0;
-    text-align: start;
-}
-.cookie-dialog .header.small {
-    font: var(--text-h3);
-    padding: 0 0 4px 0;
-}
-.cookie-dialog .info-block .category {
-    color: var(--text-color-medium);
-    padding: 0 0 7px 0;
-}
-.cookie-dialog .info-block ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
-.cookie-dialog .info-block li::before {
-    content: '\2022';
-    display: inline-block;
-    vertical-align: top;
-    -webkit-margin-end: 4px;
-    margin-inline-end: 4px;
-}
-
 /* Mobile devices */
 
-/* Mobile devices. Step 1. Common info  */
-.mobile .cookie-dialog .scrollable-block.big-pad {
-    padding: 40px 30px 20px 30px;
+.mobile .mega-dialog.cookie-dialog {
+    background: none;
+    border-radius: 0;
+    box-shadow: none;
+    max-height: none;
+    max-width: none;
+    width: 100%;
 }
-
-/* Mobile devices. Step 2. Cookie settings */
+.mobile .cookie-dialog .content-block {
+    background: none;
+    border-radius: 0;
+}
 .mobile .cookie-dialog .scrollable-block {
-    padding: 0 20px;
+    padding: 0;
+}
+.mobile .cookie-dialog .header.medium {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-heading-h1);
+    margin: 0;
+    padding: 0;
+    text-align: start;
 }
 .mobile .cookie-dialog .settings-links {
-    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    width: fit-content;
+}
+.mobile .cookie-dialog .settings-links a,
+.mobile .cookie-dialog .settings-links a:visited,
+.mobile .cookie-dialog .settings-links a:hover,
+.mobile .cookie-dialog .settings-links a:active {
+    font: var(--mobile-font-copy-regular);
+    color: var(--mobile-link-primary);
+    text-decoration: underline;
+    margin: 24px 0 0;
+}
+.mobile .cookie-dialog .settings-tip {
+    font: var(--mobile-font-copy-regular);
+    color: var(--mobile-text-primary);
+    padding: 0;
+    margin: 24px 0 0;
+    max-width: unset;
+    text-align: start;
+}
+.mobile .cookie-dialog .tabs {
+    padding: 24px 0;
+    margin: 0;
+}
+.mobile .cookie-dialog .settings-tab {
+    font: var(--mobile-font-copy-regular);
+    color: var(--mobile-text-primary);
+    background-color: var(--mobile-button-secondary);
+    border-radius: 8px;
+    height: 40px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.mobile .cookie-dialog .settings-tab.active {
+    background-color: var(--mobile-button-primary);
+    color: var(--mobile-text-inverse-accent);
+}
+.mobile .cookie-dialog .settings-text {
+    font: var(--mobile-font-copy-regular);
+    color: var(--mobile-text-primary);
+}
+.mobile .cookie-dialog .settings-row {
+    border: none;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 24px;
+}
+.mobile .cookie-dialog .settings-cell {
+    padding: 0;
+}
+.mobile .cookie-dialog .settings-cell + * {
+    -webkit-padding-start: 8px;
+    padding-inline-start: 8px;
+}
+.mobile .cookie-dialog .settings-header {
+    font: var(--mobile-font-heading-h3);
 }
 .mobile .cookie-dialog .toggle-header {
     display: none;
@@ -289,60 +324,68 @@
     background-color: transparent;
 }
 .mobile .active-saved-cookies .tabs {
-    display: block;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 24px 0 0;
 }
-
-/* Mobile devices. Step 3. Third Party Cookies */
-.mobile .cookie-dialog .info-block {
-    padding: 10px 0 28px 0;
-}
-.mobile .cookie-dialog .bottom-buttons.pad {
-    padding-bottom: 30px;
-}
-
-/* Mobile devices. Buttons */
 .mobile .cookie-dialog .bottom-buttons {
-    background-color: transparent;
-    box-shadow: none;
-    height: auto;
-    padding: 26px 16px 12px 16px;
+    background: none;
+    border-radius: 0;
+    padding: 24px 0 0;
+    height: unset;
+    text-align: start;
 }
-.mobile .cookie-dialog .bottom-buttons .mega-button {
-    margin-bottom: 8px;
-    width: 100%;
-}
-.mobile .cookie-dialog .bottom-buttons .mega-button,
-.mobile .cookie-banner .buttons .mega-button {
-    background: linear-gradient(180deg, rgb(255 255 255) 0%, rgb(253 253 253) 100%);
-    border-radius: 4px;
-    box-shadow: 0 1px 1px 0 rgb(0 0 0 / 0.07), inset 0 0 0 1px rgb(226 226 226);
-    color: #303233;
-    line-height: 24px;
-    padding: 6px 8px;
-    text-decoration: none;
-}
-.mobile .cookie-dialog .bottom-buttons .mega-button::before {
-    display: none;
-}
-.mobile .cookie-dialog .bottom-buttons .mega-button.positive,
-.mobile .cookie-banner .buttons .mega-button.positive {
-    background: linear-gradient(180deg, rgb(7 190 177) 0%, rgb(0 191 165) 100%);
-    box-shadow: 0 1px 1px 0 rgba(0 0 0 / 0.11), inset 0 2px 1px 0 rgba(255 255 255 / 0.2);
-    color: #FFF;
-    line-height: 24px;
-    padding: 6px 8px;
-}
-.mobile .cookie-dialog .bottom-buttons .mega-button.m-lnk {
-    color: #818993;
+.mobile .cookie-banner {
     background: none;
     box-shadow: none;
-    font-size: 12px;
-    height: 36px;
-    line-height: 36px;
+    position: unset;
+}
+.mobile .cookie-banner > .content {
+    flex-direction: column;
+    padding: 0;
+    font: var(--mobile-font-copy-regular);
+}
+.mobile .cookie-banner h3 {
+    display: none;
+}
+.mobile .mega-banner-template.cookie-banner p {
+    font: var(--mobile-font-copy-regular);
+    color: var(--mobile-text-primary);
+    margin-bottom: 24px;
+}
+.mobile .mega-banner-template.cookie-banner a {
+    color: var(--mobile-link-primary);
     text-decoration: underline;
 }
-.mobile .cookie-dialog .bottom-buttons .mega-button.m-lnk::before {
-    display: none;
+.mobile .cookie-banner .buttons {
+    flex-direction: column;
+    margin: 0 auto;
+    width: 100%;
+    max-width: var(--mobile-elem-max-width);
+    align-items: center;
+}
+.mobile .cookie-banner .buttons .mega-button,
+.mobile .cookie-dialog .bottom-buttons .mega-button {
+    background: var(--mobile-button-secondary);
+    border-radius: 8px;
+    box-shadow: none;
+    display: flex;
+    font: var(--mobile-font-link-large-regular);
+    font-weight: var(--mobile-font-weight-semibold);
+    float: none;
+    height: 48px;
+    order: 1;
+    margin-top: 16px;
+    max-width: var(--mobile-elem-max-width);
+    width: 100%;
+}
+.mobile .cookie-banner .buttons .mega-button.positive,
+.mobile .cookie-dialog .bottom-buttons .mega-button.positive {
+    background: var(--mobile-button-primary);
+    color: var(--mobile-text-inverse-accent);
+    order: 0;
+    margin: 0;
 }
 
 /* Low resolution displays */

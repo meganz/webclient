@@ -42,3 +42,49 @@
     margin-inline-start: 27px;
     --mask-color: var(--switch-handle-active-icon);
 }
+
+/* Mobile switches */
+
+/* @todo: use similar classnames for both mobile and desktop clients */
+
+.mobile .mega-switch {
+    background: var(--mobile-page-background);
+    border: 1px solid var(--mobile-selection-control);
+    border-radius: 12px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    flex: none;
+}
+.mobile .mega-switch.toggle-on {
+    background: var(--mobile-selection-control);
+    box-shadow: none;
+}
+.mobile .mega-switch.disabled {
+    border: 1px solid var(--mobile-border-disabled);
+    opacity: 1;
+}
+.mobile .mega-switch.toggle-on.disabled {
+    background: var(--mobile-border-disabled);
+}
+.mobile .mega-switch .mega-feature-switch::after {
+    background: var(--mobile-selection-control);
+    color: var(--mobile-page-background);
+    border-radius: 50%;
+}
+.mobile .mega-switch.toggle-on .mega-feature-switch::after {
+    background: var(--mobile-page-background);
+    color: var(--mobile-selection-control);
+    border-radius: 50%;
+}
+.mobile .mega-switch.disabled .mega-feature-switch::after {
+    background: var(--mobile-border-disabled);
+}
+.mobile .mega-switch.toggle-on.disabled .mega-feature-switch::after {
+    background: var(--mobile-page-background);
+    color: var(--mobile-border-disabled);
+}
+.mobile .mega-feature-switch {
+    border: none;
+    transition: .1s ease-in-out;
+}

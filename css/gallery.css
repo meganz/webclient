@@ -623,6 +623,9 @@
 .gallery-tabs-bl .gallery-section-title .sprite-fm-mono.icon-favourite-filled {
     --mask-color: var(--secondary-red);
 }
+.gallery-tabs-bl.invisible {
+    visibility: hidden;
+}
 .m-menu-select .remember-location-pref > span {
     font: var(--text-body1);
 }
@@ -647,6 +650,9 @@
     background-color: var(--surface-main);
     padding-left: 21px;
     padding-right: 21px;
+}
+.albums-header.invisible {
+    visibility: hidden;
 }
 .rtl .albums-header {
     direction: rtl;

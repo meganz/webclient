@@ -523,16 +523,11 @@ lazy(mega, 'rewind', () => {
             this.resetProgress();
 
             console.time('rewind:index:getRecords');
-            // timestamp is the selected UTC date on calendar
-            // so we need to set the date to the utc date
-            // We create a date instance
-            // We get the day and convert it to utc
-            const utcDate = new Date(timestamp);
-            utcDate.setUTCHours(23, 59, 59, 999); // Set end of day UTC
-            utcDate.setUTCDate(utcDate.getDate());
+            const date = new Date(timestamp);
+            date.setHours(23, 59, 59, 999);
+            date.setDate(date.getDate());
 
-            const utcTimestamp = utcDate.getTime();
-            let timestampInSeconds = utcTimestamp / 1000;
+            let timestampInSeconds = date.getTime() / 1000;
 
             const selectedTreeCache = this.getNearestTreeCache(timestampInSeconds);
 
@@ -591,11 +586,7 @@ lazy(mega, 'rewind', () => {
             }
 
             const currentDate = Date.now();
-            if (currentDate < utcDate) {
-                // utcDate end of day is a future date
-                // then we use the current time so we can always get
-                // the latest action packets or compare
-                // the last snapshot or udpated time
+            if (currentDate < date) {
                 timestampInSeconds = currentDate / 1000;
             }
 
@@ -786,25 +777,25 @@ lazy(mega, 'rewind', () => {
                 };
 
                 const currentDate = new Date(currentTimestamp * 1000);
-                currentDate.setUTCHours(23, 59, 59, 999); // set end of day
+                currentDate.setHours(23, 59, 59, 999); // set end of day
 
                 const timestampInSeconds = currentDate.getTime() / 1000;
 
-                const getActionUtcDate = (inputTimestamp) => {
+                const getActionDate = (inputTimestamp) => {
                     if (!inputTimestamp) {
                         return [0, 0];
                     }
 
                     const actionDate = new Date(inputTimestamp * 1000);
-                    actionDate.setUTCHours(23, 59, 59, 999);
+                    actionDate.setHours(23, 59, 59, 999);
 
                     return [actionDate.getTime() / 1000, actionDate.toISOString().split('T')[0]];
                 };
 
-                const prepareDateData = (actionUtcDate, dateData) => {
-                    if (!dateData[actionUtcDate]) {
-                        dateData[actionUtcDate] = {
-                            utcDate: actionUtcDate,
+                const prepareDateData = (actionDate, dateData) => {
+                    if (!dateData[actionDate]) {
+                        dateData[actionDate] = {
+                            date: actionDate,
                             added: Object.create(null),
                             modified: Object.create(null),
                             removed: Object.create(null),
@@ -843,22 +834,23 @@ lazy(mega, 'rewind', () => {
                     const actionPacketFiles = packetInfo.d.f;
 
                     // Handle packets
-                    // Get UTC Date
                     const itemTimestamp = packetTimestamp;
-                    const actionUtcDateInfo = getActionUtcDate(itemTimestamp);
-                    const actionUtcTimestamp = actionUtcDateInfo[0];
-                    const actionUtcDateString = actionUtcDateInfo[1];
+                    const actionDateInfo = getActionDate(itemTimestamp);
+                    const actionTimestamp = actionDateInfo[0];
+                    const actionDateString = actionDateInfo[1];
 
                     switch (actionPacketCommand) {
                         case 't':
                             // We make sure date data is available
-                            prepareDateData(actionUtcDateString, dateData);
-                            this.handleTreePacket(dateData, actionPacket, actionPacketFiles, actionUtcDateString,
-                                                  itemTimestamp, timestampInSeconds, actionUtcTimestamp);
+                            prepareDateData(actionDateString, dateData);
+                            this.handleTreePacket(
+                                dateData, actionPacket, actionPacketFiles, actionDateString,
+                                itemTimestamp, timestampInSeconds, actionTimestamp
+                            );
                             break;
                         case 'd':
-                            prepareDateData(actionUtcDateString, dateData);
-                            this.handleDeletePacket(dateData, actionPacket, actionUtcDateString, itemTimestamp);
+                            prepareDateData(actionDateString, dateData);
+                            this.handleDeletePacket(dateData, actionPacket, actionDateString, itemTimestamp);
                             break;
                     }
                     // end handle packets
@@ -913,10 +905,12 @@ lazy(mega, 'rewind', () => {
 
         // FIXME: Adjust later
         // eslint-disable-next-line complexity
-        handleTreePacket(dateData, actionPacket, actionPacketFiles, actionUtcDateString,
-                         actionPacketTimestamp, currentTimestamp, actionUtcTimestamp) {
+        handleTreePacket(
+            dateData, actionPacket, actionPacketFiles, actionDateString,
+            actionPacketTimestamp, currentTimestamp, actionTimestamp
+        ) {
             // FIXME: dateData for debugging purposes
-            dateData[actionUtcDateString].actions.push({
+            dateData[actionDateString].actions.push({
                 d: {
                     a: actionPacket,
                     f: actionPacketFiles
@@ -928,14 +922,14 @@ lazy(mega, 'rewind', () => {
                 let existingNode = null;
                 if (node) {
                     existingNode = this.nodeDictionary[node.h];
-                    dateData[actionUtcDateString].added[node.h] = node;
-                    dateData[actionUtcDateString].type[node.h] = TYPE_ADDED;
+                    dateData[actionDateString].added[node.h] = node;
+                    dateData[actionDateString].type[node.h] = TYPE_ADDED;
                     this.prepareNode(node, this.nodeDictionary, this.nodeChildrenDictionary);
                 }
 
                 if (node.fv) {
-                    this.prepareNode(node, dateData[actionUtcDateString].modified, false, true);
-                    dateData[actionUtcDateString].type[node.h] = TYPE_MODIFIED;
+                    this.prepareNode(node, dateData[actionDateString].modified, false, true);
+                    dateData[actionDateString].type[node.h] = TYPE_MODIFIED;
 
                     // Cleanup previous records (might be at top of hierarchy)
                     this.removeNode(node.h, this.nodeDictionary, this.nodeChildrenDictionary);
@@ -945,31 +939,31 @@ lazy(mega, 'rewind', () => {
                 }
 
                 if (node && node.p === M.RubbishID) {
-                    dateData[actionUtcDateString].removed[node.h] = node; // TODO: CACHE: Better way caching removed
-                    dateData[actionUtcDateString].type[node.h] = TYPE_REMOVED;
+                    dateData[actionDateString].removed[node.h] = node; // TODO: CACHE: Better way caching removed
+                    dateData[actionDateString].type[node.h] = TYPE_REMOVED;
 
                     if (existingNode) {
                         node.lp = existingNode.p;
                     }
 
-                    if (dateData[actionUtcDateString].modified[node.h]) {
-                        delete dateData[actionUtcDateString].modified[node.h];
+                    if (dateData[actionDateString].modified[node.h]) {
+                        delete dateData[actionDateString].modified[node.h];
                     }
 
-                    if (dateData[actionUtcDateString].added[node.h]) {
-                        delete dateData[actionUtcDateString].added[node.h];
+                    if (dateData[actionDateString].added[node.h]) {
+                        delete dateData[actionDateString].added[node.h];
                     }
 
-                    if (currentTimestamp > actionUtcTimestamp) {
+                    if (currentTimestamp > actionTimestamp) {
                         this.removeNode(node.h, this.nodeDictionary, this.nodeChildrenDictionary);
                     }
                 }
             }
         }
 
-        handleDeletePacket(dateData, actionPacket, actionUtcDate, actionPacketTimestamp) {
+        handleDeletePacket(dateData, actionPacket, actionDate, actionPacketTimestamp) {
             const {a, n, v, m} = actionPacket;
-            dateData[actionUtcDate].actions.push({
+            dateData[actionDate].actions.push({
                 d: {
                     a,
                     n,
@@ -981,40 +975,19 @@ lazy(mega, 'rewind', () => {
 
             const deletedNode = this.nodeDictionary[n];
             if (deletedNode && (!m && !v)) {
-                dateData[actionUtcDate].removed[n] = deletedNode; // TODO: CACHE: Better way caching removed
-                dateData[actionUtcDate].type[n] = TYPE_REMOVED;
+                dateData[actionDate].removed[n] = deletedNode; // TODO: CACHE: Better way caching removed
+                dateData[actionDate].type[n] = TYPE_REMOVED;
                 deletedNode.more = {
                     v,
                     m
                 };
             }
 
-            if (dateData[actionUtcDate].added[n]) {
-                delete dateData[actionUtcDate].added[n];
+            if (dateData[actionDate].added[n]) {
+                delete dateData[actionDate].added[n];
             }
 
             this.removeNode(n, this.nodeDictionary, this.nodeChildrenDictionary);
-        }
-
-        getBeforeDaysBetweenDateUTC(fromTimestamp, toTimestamp, beforeDays) {
-            const daysArray = [];
-
-            const fromDate = new Date(fromTimestamp * 1000);
-            const toDate = new Date(toTimestamp * 1000);
-
-            if (beforeDays) {
-                fromDate.setDate(fromDate.getDate() - beforeDays);
-            }
-
-            // eslint-disable-next-line no-unmodified-loop-condition
-            while (fromDate <= toDate) {
-                const newDate = new Date(fromDate);
-                newDate.setUTCHours(0, 0, 0, 0);
-                daysArray.push(`${newDate.getTime()}`);
-                fromDate.setDate(fromDate.getDate() + 1);
-            }
-
-            return daysArray;
         }
 
         async prepareTreeCacheNodes(treeCacheHistory, nodeDictionary, nodeChildrenDictionary) {
@@ -1088,7 +1061,16 @@ lazy(mega, 'rewind', () => {
             delete this.nodeDictionary[nodeHandle];
         }
 
-        getChildNodes(selectedHandle, currentLevel = 1, includeParent = true) {
+        getChildNodes({selectedHandle, currentLevel = 1, includeParent = true, ts = 0}) {
+            let timestampInSeconds = 0;
+
+            if (ts) {
+                const date = new Date(ts);
+                date.setHours(23, 59, 59, 999);
+                date.setDate(date.getDate());
+                timestampInSeconds = date.getTime() / 1000;
+            }
+
             const childrenNodes = this.nodeChildrenDictionary[selectedHandle];
             const currentNode = this.nodeDictionary[selectedHandle];
             const nodes = [];
@@ -1113,12 +1095,17 @@ lazy(mega, 'rewind', () => {
 
             for (let i = 0; i < sortedNodes.length; i++) {
                 const node = mega.rewind.nodeDictionary[sortedNodes[i]];
-                if (node.t && this.isTreeOpen(node.h)) {
-                    const result = this.getChildNodes(node.h, currentLevel + 1);
-                    nodes.push(...result);
-                }
-                else if (!node.fv) {
-                    nodes.push(node.h);
+                if (!timestampInSeconds || node.ts <= timestampInSeconds) {
+                    if (node.t && this.isTreeOpen(node.h)) {
+                        const result = this.getChildNodes({
+                            selectedHandle: node.h,
+                            currentLevel: currentLevel + 1
+                        });
+                        nodes.push(...result);
+                    }
+                    else if (!node.fv) {
+                        nodes.push(node.h);
+                    }
                 }
 
                 // Last item, save last element

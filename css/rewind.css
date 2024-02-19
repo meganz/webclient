@@ -167,25 +167,6 @@ body.theme-dark .active-rewind .rewind-sidebar {
     color: var(--text-color-medium);
 }
 
-.sidebar .sidebar-container .sidebar-header .folder-history .datepicker-tooltip {
-    display: flex;
-    column-gap: 2px;
-}
-
-.sidebar .sidebar-container .sidebar-header .folder-history .datepicker-tooltip span {
-    font: var(--text-body1-bold);
-    color: var(--text-color-high);
-}
-
-.sidebar .sidebar-container .sidebar-header .folder-history .datepicker-tooltip i {
-    --mask-color: var(--text-color-medium);
-    margin-top: 2px;
-}
-
-.rewind-datepicker-tooltip i.tooltip-arrow {
-    --mask-color: var(--stroke-grey-1-inverted) !important;
-}
-
 .sidebar .sidebar-container .sidebar-header .folder-history .history-datepicker .datepicker-container {
     background: var(--surface-main);
     border: 1px solid #EFEFEF;

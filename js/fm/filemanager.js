@@ -1401,7 +1401,9 @@ FileManager.prototype.updFileManagerUI = async function() {
             treebuild[newNode.p] = 1;
         }
 
-        if (view[newNode.p] || view[newNode.h] || newNode.su && this.currentdirid === 'shares') {
+        if (view[newNode.p] || view[newNode.h]
+            || newNode.su && this.currentdirid === 'shares'
+            || newNode.shares && this.currentdirid === 'out-shares') {
 
             UImain = true;
 

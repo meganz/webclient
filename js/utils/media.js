@@ -1712,7 +1712,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 rate = 1.5;
             }
             else if ($this.hasClass('2x')) {
-                cl = '15x';
+                cl = '2x';
                 rate = 2;
             }
 
@@ -3878,7 +3878,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
                     URL.revokeObjectURL(src);
                     elm.ondurationchange = null;
-                    resolve(freeze({width, height, duration, video: [...videoTracks], audio: [...audioTracks]}));
+                    resolve(freeze({width, height, duration, video: videoTracks, audio: audioTracks}));
                 }
             };
             elm.src = URL.createObjectURL(entry);

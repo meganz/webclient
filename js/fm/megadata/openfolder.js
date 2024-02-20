@@ -383,7 +383,7 @@
             }
 
             if (this.gallery) {
-                onIdle(() => {
+                queueMicrotask(() => {
                     galleryUI(this.gallery > 1 && this.currentCustomView.nodeID);
                 });
             }

@@ -39,66 +39,121 @@
         }
     }
 
-    function _propertiesDialog(action) {
-        const update = action === 3;
-        const close = !update && action;
-        const $dialog = $('.mega-dialog.properties-dialog', '.mega-dialog-container');
-        const $icon = $('.properties-file-icon', $dialog);
-
-        $(document).off('MegaCloseDialog.Properties');
-
-        if (close) {
-            delete $.propertiesDialog;
-            if (close !== 2) {
-                closeDialog();
-            }
-            else {
-                fm_hideoverlay();
-            }
-            $('.contact-list-icon').removeClass('active');
-            $('.properties-context-menu').fadeOut(200);
-            if ($.hideContextMenu) {
-                $.hideContextMenu();
-            }
-
-            return true;
+    /**
+     * Gets properties HTML
+     * @param {Object} p The properties data
+     * @returns {String} Properties HTML
+     */
+    function getPropertiesContent(p) {
+        if  (typeof p !== 'object') {
+            return false;
         }
 
-        $dialog.removeClass('multiple folders-only two-elements shared shared-with-me');
-        $dialog.removeClass('read-only read-and-write full-access taken-down undecryptable');
-        $dialog.removeClass('hidden-context versioning');
-        $('.properties-elements-counter span').text('');
+        // Name
+        const namehtml = is_mobile ? '' : '<div class="properties-name-container">'
+            + '<div class="properties-small-gray">' + p.t1 + '</div>'
+            + '<div class="properties-name-block"><div class="propreties-dark-txt">' + p.t2 + '</div>'
+            + '</div></div>';
 
-        var users = null;
-        var filecnt = 0;
-        var foldercnt = 0;
-        var size = 0;
-        var sfilecnt = 0;
-        var sfoldercnt = 0;
-        var vsize = 0;
-        var svfilecnt = 0;
-        var n;
-        var versioningFlag = false;
-        var hasValid = false;
-        var icons = [];
-        let fromRewind = false;
+        // Type
+        const typehtml = is_mobile && p.t23 ? '<div class="properties-float-bl">'
+            + '<span class="properties-small-gray">' + p.t22 + '</span>'
+            + '<span class="propreties-dark-txt">' + p.t23 + '</span></div>' : '';
+
+        // Versioning info
+        const vhtml = p.versioningFlag
+            ?
+            '<div class="properties-float-bl' + p.t12 + '"><span class="properties-small-gray">' + p.t13 + '</span>'
+            + '<span class="propreties-dark-txt">' + p.t14 + '</span></div>'
+            + '<div class="properties-float-bl"><span class="properties-small-gray">' + p.t15 + '</span>'
+            + '<span class="propreties-dark-txt">' + p.t16 + '</span></div>'
+            + '<div class="properties-float-bl' + p.t17 + '"><span class="properties-small-gray">' + p.t18 + '</span>'
+            + '<span class="propreties-dark-txt">' + p.t19 + '</span></div>'
+            : '';
+
+        // Modifed or Owner
+        const singlenodeinfohtml  = '<div class="properties-float-bl' + p.t5 + ' properties-contains">'
+            + '<span class="properties-small-gray">' + p.t6 + '</span>'
+            + '<span class="propreties-dark-txt t7">' + p.t7 + '</span></div>';
+
+        // Link created
+        const linkcreatedhtml = is_mobile && p.t21 ? '<div class="properties-float-bl">'
+            + '<span class="properties-small-gray">' + p.t20 + '</span>'
+            + '<span class="propreties-dark-txt t7">' + p.t21 + '</span></div>' : '';
+
+        // Created or Contains
+        const shareinfohtml = typeof p.t10 === 'undefined' && typeof p.t11 === 'undefined'
+            ? ''
+            : '<div class="properties-float-bl"><div class="properties-small-gray t10">' + p.t10 + '</div>'
+            + '<div class="propreties-dark-txt t11">' + p.t11 + '</div></div></div>';
+
+        return namehtml
+            + `<div class="properties-breadcrumb"><div class="properties-small-gray path">${l.path_lbl}</div>`
+            + '<div class="fm-breadcrumbs-wrapper info">'
+            +                    '<div class="crumb-overflow-link dropdown">'
+            +                       '<a class="breadcrumb-dropdown-link info-dlg">'
+            +                            '<i class="menu-icon sprite-fm-mono icon-options icon24"></i>'
+            +                        '</a>'
+            +                        '<i class="sprite-fm-mono icon-arrow-right icon16"></i>'
+            +                    '</div>'
+            +                    `<div class="fm-breadcrumbs-block info${is_mobile ? ' location' : ''}"></div>`
+            +                    '<div class="breadcrumb-dropdown"></div>'
+            +                '</div>'
+            + '</div>'
+            + '<div class="properties-items"><div class="properties-float-bl properties-total-size">'
+            + '<span class="properties-small-gray">' + p.t3 + '</span>'
+            + '<span class="propreties-dark-txt">' + p.t4 + '</span></div>'
+            + typehtml
+            + vhtml
+            + singlenodeinfohtml
+            + '<div class="properties-float-bl">'
+            + (p.n.h === M.RootID || p.n.h === M.RubbishID || p.n.h === M.InboxID ?
+                '<div class="contact-list-icon sprite-fm-mono icon-info-filled"></div>'
+                + '</div>'
+                + shareinfohtml :
+                '<div class="properties-small-gray">' + p.t8
+                + '</div><div class="propreties-dark-txt contact-list">'
+                + '<span>' + p.t9 + '</span>'
+                + '<div class="contact-list-icon sprite-fm-mono icon-info-filled"></div>'
+                + '</div></div>'
+                + shareinfohtml
+                + linkcreatedhtml);
+    }
+
+    /**
+     * Gets properties data
+     * @param {String|Array} handles Selected node handles {optional}
+     * @returns {Object|Boolean} Properties data and strings
+     */
+    function getNodeProperties(handles) {
+        let filecnt = 0;
+        let foldercnt = 0;
+        let size = 0;
+        let sfilecnt = 0;
+        let sfoldercnt = 0;
+        let vsize = 0;
+        let svfilecnt = 0;
+        let n;
+        const icons = [];
         const selected = [];
+        const p = Object.create(null);
 
-        for (var i = $.selected.length; i--;) {
-            const node = M.getNodeByHandle($.selected[i]);
+        handles = typeof handles === 'string' && [handles] || handles || $.selected || [];
+
+        for (var i = handles.length; i--;) {
+            const node = M.getNodeByHandle(handles[i]);
 
             if (!node) {
 
                 if (d) {
-                    console.log('propertiesDialog: invalid node', $.selected[i]);
+                    console.log('propertiesDialog: invalid node', handles[i]);
                 }
                 continue;
             }
 
             n = node;
-            hasValid = true;
             icons.push(fileIcon(n));
-            selected.push($.selected[i]);
+            selected.push(handles[i]);
 
             if (n.t) {
                 size += n.tb;// - (n.tvb || 0);
@@ -116,102 +171,61 @@
             }
         }
 
-        if (!hasValid) {
-            // $.selected had no valid nodes!
-            propertiesDialog(1);
-
-            return msgDialog('warninga', l[882], l[24196]);
-        }
-
         if (selected.length > 1) {
             n = Object.create(null); // empty n [multiple selection]
         }
 
+        if (!n) {
+            return false;
+        }
+
         if (n.tvf) {
-            $dialog.addClass('versioning');
-            versioningFlag = true;
+            p.versioningFlag = true;
 
             if (n.rewind) {
-                fromRewind = true;
+                p.fromRewind = true;
             }
         }
 
         // Hide versioning details temporarily, due to it not working correctly in MEGA Lite / Infinity
         if (mega.lite.inLiteMode) {
-            versioningFlag = false;
+            p.versioningFlag = false;
         }
 
-        if ($.dialog === 'onboardingDialog') {
-            closeDialog();
-        }
+        const exportLink = new mega.Share.ExportLink({});
+        p.isTakenDown = exportLink.isTakenDown(selected);
+        p.isUndecrypted = missingkeys[n.h];
 
-        M.safeShowDialog('properties', function() {
-            $.propertiesDialog = 'properties';
-
-            // If it is download page or
-            // node is not owned by current user on chat
-            // (possible old shared file and no longer exist on cloud-drive, or shared by other user in the chat room),
-            // don't display path
-            if (page === 'download' || M.chat && n.u !== u_handle || !n.h && !M.d[M.currentdirid] || M.isAlbumsPage()) {
-                $('.properties-breadcrumb', $dialog).addClass('hidden');
-            }
-            else {
-                // on idle so we can call renderPathBreadcrumbs only once the info dialog is rendered.
-                onIdle(() => {
-                    // we pass the filehandle, so it is available if we search on files on search
-                    M.renderPathBreadcrumbs(n.h, true);
-                    mBroadcaster.sendMessage('properties:finish', n.h);
-                });
-            }
-            return $dialog;
-        });
-
-        var exportLink = new mega.Share.ExportLink({});
-        var isTakenDown = exportLink.isTakenDown(selected);
-        var isUndecrypted = missingkeys[n.h];
-        var notificationText = '';
-
-        var p = {};
         if (filecnt + foldercnt === 1) { // one item
-            if (isTakenDown || isUndecrypted) {
-                if (isTakenDown) {
-                    $dialog.addClass('taken-down');
-                    notificationText = l[7703] + '\n';
-                }
-                if (isUndecrypted) {
-                    $dialog.addClass('undecryptable');
-                    notificationText += M.getUndecryptedLabel(n);
-                }
-                showToast('clipboard', notificationText);
-            }
-            var icon = '';
-            const rootHandle = M.getNodeRoot(n.h);
-
-            if (n.fav && !folderlink && rootHandle !== M.RubbishID) {
-                icon = ' sprite-fm-mono icon-favourite-filled';
+            // Favorite icon
+            if (n.fav && !folderlink && M.getNodeRoot(n.h) !== M.RubbishID) {
+                p.favIcon = ' sprite-fm-mono icon-favourite-filled';
             }
             else if (missingkeys[n.h]) {
-                icon = ' sprite-fm-mono icon-info';
+                p.favIcon = ' sprite-fm-mono icon-info';
             }
-            $('.file-status-icon', $dialog).attr('class', 'file-status-icon ' + icon);
 
+            // Outgoing share
+            // @todo: Fix live site issue. Outgoing contacts are never shown
             if (icons.includes('outgoing')) {
-                $dialog.addClass('shared');
+                p.share = true;
             }
 
+            // Incoming share
             if (typeof n.r === "number") {
-                var zclass = "read-only";
+                p.zclass = 'read-only';
 
                 if (n.r === 1) {
-                    zclass = "read-and-write";
+                    p.zclass = 'read-and-write';
                 }
                 else if (n.r === 2) {
-                    zclass = "full-access";
+                    p.zclass = 'full-access';
                 }
-                $dialog.addClass('shared shared-with-me ' + zclass);
+                p.share = true;
             }
 
-            var user = Object(M.d[n.su || n.p]);
+            const user = Object(M.d[n.su || n.p]);
+            const shareTs = M.getNodeShare(n).ts;
 
             if (d) {
                 console.log('propertiesDialog', n, user);
@@ -235,15 +249,11 @@
             }
             p.t1 = l[1764];
 
-            // Hide context menu button
-            if (n.h === M.RootID || slideshowid || n.h === M.RubbishID) {
-                $dialog.addClass('hidden-context');
-            }
-
-            if (isUndecrypted) {
+            if (p.isUndecrypted) {
                 p.t2 = htmlentities(l[8649]);
             }
-            else if (mega.backupCenter.selectedSync
+            else if (mega.backupCenter
+                && mega.backupCenter.selectedSync
                 && mega.backupCenter.selectedSync.nodeHandle === n.h
                 && mega.backupCenter.selectedSync.localName) {
 
@@ -262,11 +272,7 @@
                 p.t2 = htmlentities(l[167]);
             }
 
-            if (page.substr(0, 7) === 'fm/chat') {
-                $dialog.addClass('hidden-context');
-            }
-
-            p.t4 = versioningFlag ? bytesToSize(size + vsize) : bytesToSize(size);
+            p.t4 = p.versioningFlag ? bytesToSize(size + vsize) : bytesToSize(size);
             p.t9 = n.ts && htmlentities(time2date(n.ts)) || '';
             p.t8 = p.t9 ? l[22143] : '';
             p.t12 = ' second';
@@ -278,31 +284,37 @@
             p.t18 = l[22146];
             p.t19 = bytesToSize(vsize);
 
+            // Link created
+            p.t20 = l.link_created_with_colon;
+            p.t21 = shareTs && htmlentities(time2date(shareTs)) || '';
+
+            // Item type
+            p.t22 = l[22149];
+            p.t23 = foldercnt ? l[1049] : filetype(n, 0, 1);
+
             if (foldercnt) {
                 p.t6 = l[22147];
                 p.t7 = fm_contains(sfilecnt, sfoldercnt, true);
                 p.t15 = l[22148];
-                if ($dialog.hasClass('shared')) {
-                    users = M.getSharingUsers(selected, true);
+                if (p.share) {
+                    p.users = M.getSharingUsers(selected, true);
 
-                    // In case that user doesn't share with other
-                    // Do NOT show contact informations in property dialog
-                    if (!users.length) {
-                        p.hideContacts = true;
-                    }
-                    else {
+                    // In case that user shares with other
+                    // Show contact informations in property dialog
+                    if (p.users.length) {
                         p.t8 = l[5611];
-                        p.t9 = mega.icu.format(l.contact_count, users.length);
+                        p.t9 = mega.icu.format(l.contact_count, p.users.length);
                         p.t11 = n.ts ? htmlentities(time2date(n.ts)) : '';
                         p.t10 = p.t11 ? l[6084] : '';
-                        $('.properties-elements-counter span').text(typeof n.r === "number" ? '' : users.length);
-
-                        fillPropertiesContactList($dialog, users);
+                        p.usersCounter = typeof n.r !== "number" && p.users.length;
+                    }
+                    else {
+                        p.hideContacts = true;
                     }
                 }
-                if ($dialog.hasClass('shared-with-me')) {
+                if (typeof n.r === "number") {
                     p.t3 = l[5612];
-                    var rights = l[55];
+                    let rights = l[55];
                     if (n.r === 1) {
                         rights = l[56];
                     }
@@ -313,26 +325,26 @@
                     p.t6 = l[22157];
                     p.t7 = htmlentities(M.getNameByHandle(user.h));
                     p.t8 = l[22130];
-                    p.t9 = versioningFlag ? bytesToSize(size + vsize) : bytesToSize(size);
+                    p.t9 = p.versioningFlag ? bytesToSize(size + vsize) : bytesToSize(size);
                     p.t10 = l[22147];
                     p.t11 = fm_contains(sfilecnt, sfoldercnt, true);
                 }
             }
-            if (filecnt && versioningFlag && M.currentrootid !== M.RubbishID && !fromRewind) {
+            if (filecnt && p.versioningFlag && M.currentrootid !== M.RubbishID && !p.fromRewind) {
                 p.t14 = '<a id="previousversions">' + p.t14 + '</a>';
             }
         }
         else {
-            $dialog.addClass('multiple folders-only');
             p.t1 = '';
             p.t2 = '<b>' + fm_contains(filecnt, foldercnt) + '</b>';
             p.t3 = l[22130];
-            p.t4 = versioningFlag ? bytesToSize(size + vsize) : bytesToSize(size);
+            p.t4 = p.versioningFlag ? bytesToSize(size + vsize) : bytesToSize(size);
             if (foldercnt) {
                 p.t5 = '';
                 p.t6 = l[22147];
                 p.t7 = fm_contains(sfilecnt + filecnt, sfoldercnt + foldercnt, true);
-            } else {
+            }
+            else {
                 p.t5 = ' second';
             }
             p.t8 = l[22149];
@@ -347,6 +359,131 @@
             p.t19 = bytesToSize(vsize);
         }
 
+        return {...p, n, filecnt, foldercnt, icons};
+    }
+
+    function _propertiesDialog(action) {
+        const update = action === 3;
+        const close = !update && action;
+        const $dialog = $('.mega-dialog.properties-dialog', '.mega-dialog-container');
+        const $icon = $('.properties-file-icon', $dialog);
+
+        $(document).off('MegaCloseDialog.Properties');
+
+        if (close) {
+            delete $.propertiesDialog;
+            if (close === 2) {
+                fm_hideoverlay();
+            }
+            else {
+                closeDialog();
+            }
+            $('.contact-list-icon').removeClass('active');
+            $('.properties-context-menu').fadeOut(200);
+            if ($.hideContextMenu) {
+                $.hideContextMenu();
+            }
+
+            return true;
+        }
+
+        $dialog.removeClass('multiple folders-only two-elements shared shared-with-me');
+        $dialog.removeClass('read-only read-and-write full-access taken-down undecryptable');
+        $dialog.removeClass('hidden-context versioning');
+        $('.properties-elements-counter span').text('');
+
+        const p = getNodeProperties();
+        const {n, filecnt, foldercnt, icons} = p;
+
+        if (!n) {
+            // $.selected had no valid nodes!
+            propertiesDialog(1);
+
+            return msgDialog('warninga', l[882], l[24196]);
+        }
+
+        if ($.dialog === 'onboardingDialog') {
+            closeDialog();
+        }
+
+        M.safeShowDialog('properties', () => {
+            $.propertiesDialog = 'properties';
+
+            // If it is download page or
+            // node is not owned by current user on chat
+            // (possible old shared file and no longer exist on cloud-drive, or shared by other user in the chat room),
+            // don't display path
+            if (page === 'download' || M.chat && n.u !== u_handle
+                || !n.h && !M.d[M.currentdirid] || M.isAlbumsPage()) {
+
+                $('.properties-breadcrumb', $dialog).addClass('hidden');
+            }
+            else {
+                // on idle so we can call renderPathBreadcrumbs only once the info dialog is rendered.
+                onIdle(() => {
+                    // we pass the filehandle, so it is available if we search on files on search
+                    M.renderPathBreadcrumbs(n.h, true);
+                    mBroadcaster.sendMessage('properties:finish', n.h);
+                });
+            }
+            return $dialog;
+        });
+
+        // Set properties data
+        $('.properties-txt-pad').safeHTML(getPropertiesContent(p));
+
+        // Hide context menu button
+        if (page.substr(0, 7) === 'fm/chat' || n.h === M.RootID || slideshowid || n.h === M.RubbishID) {
+            $dialog.addClass('hidden-context');
+        }
+
+        if (filecnt + foldercnt === 1) {
+            // Show takenDown / undecrypted message
+            if (p.isTakenDown || p.isUndecrypted) {
+                let notificationText = '';
+                if (p.isTakenDown) {
+                    $dialog.addClass('taken-down');
+                    notificationText = l[7703] + '\n';
+                }
+                if (p.isUndecrypted) {
+                    $dialog.addClass('undecryptable');
+                    notificationText += M.getUndecryptedLabel(n);
+                }
+                showToast('clipboard', notificationText);
+            }
+        }
+        // Adapt UI for multiple selected items
+        // @todo: probably remove folder only (?)
+        else {
+            $dialog.addClass('multiple folders-only');
+        }
+
+        // Adapt UI for file versioning
+        if (p.versioningFlag) {
+            $dialog.addClass('versioning');
+        }
+
+        // Adapt UI for outgoing shares
+        if (p.share) {
+            $dialog.addClass('shared');
+        }
+
+        // Add incoming share access icon
+        if (p.zclass) {
+            $dialog.addClass(`shared shared-with-me ${p.zclass}`);
+        }
+
+        // Fill in information about the users with whom the folder was shared
+        if (p.users && !p.hideContacts) {
+            $('.properties-elements-counter span').text(p.usersCounter || '');
+            fillPropertiesContactList($dialog, p.users);
+        }
+
+        // Add Favourite icon
+        if (p.favIcon) {
+            $('.file-status-icon', $dialog).attr('class', 'file-status-icon ' + p.favIcon);
+        }
+
         /* If in MEGA Lite mode for folders, temporarily hide the Total Size and Contains info which isn't known */
         if (mega.lite.inLiteMode && mega.lite.containsFolderInSelection($.selected)) {
             $dialog.addClass('hide-size-and-contains');
@@ -355,61 +492,8 @@
             $dialog.removeClass('hide-size-and-contains');
         }
 
-        var vhtml = versioningFlag
-            ?
-            '<div class="properties-float-bl' + p.t12 + '"><span class="properties-small-gray">' + p.t13 + '</span>'
-            + '<span class="propreties-dark-txt">' + p.t14 + '</span></div>'
-            + '<div class="properties-float-bl"><span class="properties-small-gray">' + p.t15 + '</span>'
-            + '<span class="propreties-dark-txt">' + p.t16 + '</span></div>'
-            + '<div class="properties-float-bl' + p.t17 + '"><span class="properties-small-gray">' + p.t18 + '</span>'
-            + '<span class="propreties-dark-txt">' + p.t19 + '</span></div>'
-            : '';
-
-        var singlenodeinfohtml  = '<div class="properties-float-bl' + p.t5 + ' properties-contains">'
-            + '<span class="properties-small-gray">' + p.t6 + '</span>'
-            + '<span class="propreties-dark-txt t7">' + p.t7 + '</span></div>';
-
-        var shareinfohtml = (typeof p.t10 === 'undefined' && typeof p.t11 === 'undefined')
-            ? ''
-            : '<div class="properties-float-bl"><div class="properties-small-gray t10">' + p.t10 + '</div>'
-            + '<div class="propreties-dark-txt t11">' + p.t11 + '</div></div></div>';
-
-        var html = '<div class="properties-name-container"><div class="properties-small-gray">' + p.t1 + '</div>'
-            + '<div class="properties-name-block"><div class="propreties-dark-txt">' + p.t2 + '</div>'
-            + '</div></div>'
-            + `<div class="properties-breadcrumb"><div class="properties-small-gray path">${l.path_lbl}</div>`
-            + '<div class="fm-breadcrumbs-wrapper info">'
-            +                    '<div class="crumb-overflow-link dropdown">'
-            +                       '<a class="breadcrumb-dropdown-link info-dlg">'
-            +                            '<i class="menu-icon sprite-fm-mono icon-options icon24"></i>'
-            +                        '</a>'
-            +                        '<i class="sprite-fm-mono icon-arrow-right icon16"></i>'
-            +                    '</div>'
-            +                    '<div class="fm-breadcrumbs-block info"></div>'
-            +                    '<div class="breadcrumb-dropdown"></div>'
-            +                '</div>'
-            + '</div>'
-            + '<div class="properties-items"><div class="properties-float-bl properties-total-size">'
-            + '<span class="properties-small-gray">' + p.t3 + '</span>'
-            + '<span class="propreties-dark-txt">' + p.t4 + '</span></div>'
-            + vhtml
-            + singlenodeinfohtml
-            + '<div class="properties-float-bl">'
-            + (n.h === M.RootID || n.h === M.RubbishID || n.h === M.InboxID ?
-                '<div class="contact-list-icon sprite-fm-mono icon-info-filled"></div>'
-                + '</div>'
-                + shareinfohtml :
-                '<div class="properties-small-gray">' + p.t8
-                + '</div><div class="propreties-dark-txt contact-list">'
-                + '<span>' + p.t9 + '</span>'
-                + '<div class="contact-list-icon sprite-fm-mono icon-info-filled"></div>'
-                + '</div></div>'
-                + shareinfohtml);
-
-        $('.properties-txt-pad').safeHTML(html);
-
-        if ($dialog.hasClass('shared-with-me')) {
-            $('.properties-txt-pad').find('.contact-list-icon').remove();
+        if ($dialog.hasClass('shared-with-me') || p.hideContacts) {
+            $('.contact-list-icon', '.properties-txt-pad').addClass('hidden');
         }
 
         $('.properties-body', $dialog).rebind('click', function() {
@@ -472,10 +556,6 @@
         });
 
         $(document).rebind('MegaCloseDialog.Properties', __fsi_close);
-
-        if (p.hideContacts) {
-            $('.properties-txt-pad .contact-list-icon', $dialog).addClass('hidden');
-        }
 
         if ($dialog.hasClass('shared')) {
             $('.contact-list-icon').rebind('click', function() {
@@ -590,6 +670,10 @@
     }
 
     /**
+     * @global
+     */
+
+    /**
      * Open properties dialog for the selected node(s)
      * @param {Number|Boolean} [close] Whether it should be rather closed.
      * @returns {*|MegaPromise}
@@ -620,5 +704,8 @@
             return promise;
         }
     };
+
+    global.getPropertiesContent = getPropertiesContent;
+    global.getNodeProperties = getNodeProperties;
 
 })(self);

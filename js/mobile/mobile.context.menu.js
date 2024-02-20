@@ -600,16 +600,15 @@ mBroadcaster.once('boot_done', () => {
                 });
             }
         },
-        // Phase 2
-        // '.properties-item': {
-        //     text: l[6859],
-        //     icon: 'sprite-mobile-fm-mono icon-info-thin-outline',
-        //     subMenu: false,
-        //     classNames: '',
-        //     callback: function() {
-        //         // TODO: Build the functionality once the designs are ready
-        //     }
-        // },
+        '.properties-item': {
+            text: l[6859],
+            icon: 'sprite-mobile-fm-mono icon-info-thin-outline',
+            subMenu: false,
+            classNames: '',
+            onClick: (nodeHandle) => {
+                mega.ui.viewerOverlay.show(nodeHandle, true);
+            }
+        },
         '.revert-item': {
             text: l[5726],
             icon: 'sprite-mobile-fm-mono icon-rotate-cw-thin-outline',

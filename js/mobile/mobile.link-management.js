@@ -553,6 +553,13 @@ mobile.linkManagement = {
         if (removeLink && res && res.length) {
             mega.ui.toast.show(l.mobile_link_removed_toast_text, 4);
         }
+
+        // Update button labels and link info in File viewer/Properties overlay
+        if (mega.ui.viewerOverlay.nodeComponent
+            && mega.ui.viewerOverlay.nodeComponent.node
+            && mega.ui.viewerOverlay.nodeComponent.node.h === handle) {
+            mega.ui.viewerOverlay.updateContent(handle);
+        }
     },
 
     /**

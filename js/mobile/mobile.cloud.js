@@ -117,6 +117,12 @@ mobile.cloud = {
                         });
                     })(slideshow_steps().backward[0]);
                 }
+                // Close item properties overlay if opened
+                else if (mega.ui.viewerOverlay.nodeComponent
+                    && mega.ui.viewerOverlay.nodeComponent.node
+                    && mega.ui.viewerOverlay.nodeComponent.node.h === v) {
+                    mega.ui.viewerOverlay.hide();
+                }
                 M.v.splice(k, 1);
                 break;
             }

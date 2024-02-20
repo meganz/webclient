@@ -958,8 +958,16 @@ class MeetingsManager {
                 };
                 meta.timeRules.startTime = s[1] || s[0];
             }
+            const meeting = this.getMeetingOrOccurrenceParent(scheduledId);
             if (Array.isArray(e)) {
-                // If e is set there would have been an s too.
+                if (!meta.prevTiming) {
+                    // Handling for historic messages that don't have the `s` field but `e` is present.
+                    // Assume start time of the meeting has not changed from the default
+                    meta.prevTiming = {
+                        startTime: meeting ? Math.floor(meeting.start / 1000) : 0,
+                    };
+                    meta.timeRules.startTime = meta.prevTiming.startTime;
+                }
                 meta.prevTiming.endTime = e[0];
                 meta.timeRules.endTime = e[1] || e[0];
                 onlyTitle = false;
@@ -992,7 +1000,6 @@ class MeetingsManager {
                 onlyTitle = false;
             }
 
-            const meeting = this.getMeetingOrOccurrenceParent(scheduledId);
             if (!meeting || meeting.id !== scheduledId) {
                 // Likely an occurrence
                 // Don't try pull data from the meeting object that might not exist. Let the renderer handle it instead.

@@ -9,6 +9,7 @@ export class ColumnContactVerifiedStatus extends GenericNodePropsComponent {
 
     static label = <>
         {l.contact_ver_verification}
+        &nbsp;
         <i className="simpletip sprite-fm-mono contacts-verification-icon icon-info"
             data-simpletip={l.contact_ver_tooltip_content}
             data-simpletip-class="contacts-verification-icon-simpletip"

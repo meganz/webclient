@@ -940,7 +940,14 @@ class MeetingsManager {
         };
         meta.timeRules.startTime = s[1] || s[0];
       }
+      const meeting = this.getMeetingOrOccurrenceParent(scheduledId);
       if (Array.isArray(e)) {
+        if (!meta.prevTiming) {
+          meta.prevTiming = {
+            startTime: meeting ? Math.floor(meeting.start / 1000) : 0
+          };
+          meta.timeRules.startTime = meta.prevTiming.startTime;
+        }
         meta.prevTiming.endTime = e[0];
         meta.timeRules.endTime = e[1] || e[0];
         onlyTitle = false;
@@ -968,7 +975,6 @@ class MeetingsManager {
         }
         onlyTitle = false;
       }
-      const meeting = this.getMeetingOrOccurrenceParent(scheduledId);
       if (!meeting || meeting.id !== scheduledId) {
         meta.occurrence = true;
         meta.recurring = true;

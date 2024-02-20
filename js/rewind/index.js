@@ -55,6 +55,11 @@ lazy(mega, 'rewind', () => {
             const clickEventNamespace = 'click.rewind';
 
             this.$rewindButton.off(clickEventNamespace).on(clickEventNamespace, () => {
+
+                if (M.isInvalidUserStatus()) {
+                    return;
+                }
+
                 const selectedHandle = $.selected.length && $.selected[0] || M.currentdirid;
                 const nodeRoot = M.getNodeRoot(selectedHandle);
 

@@ -39,33 +39,28 @@ export default class Sidebar extends MegaRenderMixin {
     };
 
     renderParticipantsView = () => {
-        const { call, peers, initialCallRinging, chatRoom, guest, recorder, onInviteToggle } = this.props;
+        const {
+            call, mode, peers, initialCallRinging, chatRoom, guest, recorder, onInviteToggle,
+            onCallMinimize, onSpeakerChange, onModeChange
+        } = this.props;
         const withInvite = inviteAllowed(chatRoom);
-        const $$HEAD =
-            this.renderHead({
-                title: l[16217] /* `Participants` */,
-                children:
-                    u_type && withInvite ?
-                        <Button
-                            className="mega-button round positive add"
-                            icon="icon-add"
-                            onClick={onInviteToggle}>
-                            <span>{l[8007] /* `Add participant` */}</span>
-                        </Button> :
-                        null
-            });
 
         return (
             <>
-                {$$HEAD}
+                {this.renderHead({ title: l[16217] /* `Participants` */ })}
                 <Participants
+                    withInvite={withInvite}
                     call={call}
+                    mode={mode}
                     peers={peers}
                     initialCallRinging={initialCallRinging}
                     chatRoom={chatRoom}
                     guest={guest}
                     recorder={recorder}
-                    withInvite={withInvite}
+                    onInviteToggle={onInviteToggle}
+                    onCallMinimize={onCallMinimize}
+                    onSpeakerChange={onSpeakerChange}
+                    onModeChange={onModeChange}
                 />
             </>
         );
@@ -73,6 +68,7 @@ export default class Sidebar extends MegaRenderMixin {
 
     renderChatView = () => {
         const { chatRoom, onDeleteMessage } = this.props;
+
         return (
             <>
                 {this.renderHead({ title: l.chats /* `Chats` */ })}

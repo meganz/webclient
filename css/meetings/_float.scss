@@ -22,7 +22,7 @@
     }
 
     &.with-sidebar {
-        right: 324px;
+        right: 360px;
     }
 
     &.collapsed {
@@ -32,13 +32,34 @@
         background: var(--surface-black);
         z-index: 1000;
 
-        i {
+        .icon-collapse {
             --icon-size: 24px;
             --mask-color: var(--secondary-white);
+        }
+
+        .collapsed-audio-indicator {
+            position: absolute;
+            top: 4px;
+            left: 8px;
+
+            i {
+                --icon-size: 16px;
+                --mask-color: var(--secondary-green);
+
+                &.inactive { --mask-color: var(--secondary-red); }
+            }
+
+            .mic-fill {
+                bottom: 9px;
+                max-height: 10px;
+                border-radius: 3px;
+            }
         }
     }
 
     &:hover {
+        /* [...] */
+
         .float-video-self-overlay {
             position: absolute;
             width: 100%;

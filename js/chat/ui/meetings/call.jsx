@@ -521,7 +521,16 @@ export default class Call extends MegaRenderMixin {
             );
         });
 
-        chatRoom.rebind('onPeerAvChange', () => this.recordActiveStream());
+        chatRoom.rebind(`onPeerAvChange.${NAMESPACE}`, () => this.recordActiveStream());
+
+        // --
+
+        chatRoom.rebind(`onMutedBy.${NAMESPACE}`, (ev, { cid }) =>
+            ChatToast.quick(
+                /* `You've been muted by %NAME` */
+                l.muted_by.replace('%NAME', nicknames.getNickname(this.props.peers[cid]))
+            )
+        );
     };
 
     unbindCallEvents = () =>
@@ -537,7 +546,7 @@ export default class Call extends MegaRenderMixin {
             `onRecordingStarted.${NAMESPACE}`,
             `onRecordingStopped.${NAMESPACE}`
         ]
-            .map(event => this.props.chatRoom.off(event));
+            .map(event => this.props.chatRoom.off(`${event}.${NAMESPACE}`));
 
     /**
      * handleCallMinimize
@@ -906,6 +915,8 @@ export default class Call extends MegaRenderMixin {
 
         chatRoom.megaChat.off(`sfuConnClose.${NAMESPACE}`);
         chatRoom.megaChat.off(`sfuConnOpen.${NAMESPACE}`);
+        chatRoom.megaChat.off(`onSpeakerChange.${NAMESPACE}`);
+
         mBroadcaster.removeListener(this.ephemeralAddListener);
         if (this.pageChangeListener) {
             mBroadcaster.removeListener(this.pageChangeListener);
@@ -939,6 +950,7 @@ export default class Call extends MegaRenderMixin {
         chatRoom.megaChat.rebind(`sfuConnOpen.${NAMESPACE}`, this.handleCallOnline);
         chatRoom.megaChat.rebind(`sfuConnClose.${NAMESPACE}`, () => this.handleCallOffline());
         chatRoom.rebind(`onCallState.${NAMESPACE}`, (ev, { arg }) => this.setState({ initialCallRinging: arg }));
+        chatRoom.rebind(`onSpeakerChange.${NAMESPACE}`, () => this.state.mode === MODE.THUMBNAIL && $(window).resize());
 
         this.callStartTimeout = setTimeout(() => {
             if (!mega.config.get('callemptytout') && !call.hasOtherParticipant()) {
@@ -975,9 +987,9 @@ export default class Call extends MegaRenderMixin {
         const STREAM_PROPS = {
             mode, peers, sidebar, hovered, forcedLocal, call, view, chatRoom, parent, stayOnEnd,
             everHadPeers, waitingRoomPeers, recorder,
-            hasOtherParticipants: call.hasOtherParticipant(),
-            isOnHold: call.sfuClient.isOnHold(), onSpeakerChange: this.handleSpeakerChange,
-            onInviteToggle: this.handleInviteToggle, onStayConfirm: this.handleStayConfirm,
+            hasOtherParticipants: call.hasOtherParticipant(), isOnHold: call.sfuClient.isOnHold(),
+            onSpeakerChange: this.handleSpeakerChange, onModeChange: this.handleModeChange,
+            onInviteToggle: this.handleInviteToggle, onStayConfirm: this.handleStayConfirm
         };
 
         //
@@ -1004,7 +1016,6 @@ export default class Call extends MegaRenderMixin {
                         // TODO: method instead a prop
                         this.setState({ recorder: undefined }, () => call.sfuClient.recordingStop())
                     }
-                    onModeChange={this.handleModeChange}
                     onChatToggle={this.handleChatToggle}
                     onParticipantsToggle={this.handleParticipantsToggle}
                     onAudioClick={() => call.toggleAudio()}
@@ -1022,6 +1033,7 @@ export default class Call extends MegaRenderMixin {
                         onGuestClose={() => this.setState({ guest: false })}
                         onSidebarClose={() => this.setState({ ...Call.STATE.DEFAULT })}
                         onDeleteMessage={onDeleteMessage}
+                        onCallMinimize={this.handleCallMinimize}
                     />
                 }
 

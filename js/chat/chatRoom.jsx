@@ -2064,6 +2064,7 @@ ChatRoom.prototype.startOrJoinCall = function(callId, url, audio, video) {
         call.setSfuClient(sfuClient);
         sfuClient.muteAudio(!audio);
         sfuClient.muteCamera(!video);
+        sfuClient.enableSpeakerDetector(true);
         return sfuClient.connect(url, callId, {isGroup: this.type !== "private"});
     }, ex => {
         this.call = megaChat.activeCall = null;

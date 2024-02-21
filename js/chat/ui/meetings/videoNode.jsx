@@ -3,6 +3,29 @@ import { MegaRenderMixin } from '../../mixins';
 import { Avatar } from '../contacts.jsx';
 import Call, { MODE } from './call.jsx';
 
+export const renderAudioIndicator = source => {
+    if (source) {
+        const { audioMuted, clientId } = source;
+        return (
+            <span
+                className="simpletip"
+                data-simpletip-class="theme-dark-forced"
+                data-simpletipposition="top"
+                data-simpletipoffset="5"
+                data-simpletip={audioMuted ? l.muted /* `Muted` */ : ''}>
+                <i
+                    className={`
+                        sprite-fm-mono
+                        ${audioMuted ? 'icon-mic-off-thin-outline inactive' : 'icon-mic-thin-outline'}
+                    `}>
+                    {audioMuted ? null : <div className={`mic-fill indicator-${clientId}`}/>}
+                </i>
+            </span>
+        );
+    }
+    return null;
+};
+
 /** The class hiearachy of video components is the following:
                                     VideoNode
                               (Base rendering code)
@@ -50,10 +73,14 @@ class VideoNode extends MegaRenderMixin {
     componentDidMount() {
         super.componentDidMount();
         this.source.registerConsumer(this);
-        if (this.props.didMount) {
-            this.props.didMount(this.nodeRef?.current);
-        }
+        this.props.didMount?.(this.nodeRef?.current);
         this.requestVideo(true);
+        this.source?.sfuPeer?.requestAudioLevel(audioLevel => {
+            const speakerIndicationRefs = document.querySelectorAll(`.mic-fill.indicator-${this.source.clientId}`);
+            for (const speakerIndication of speakerIndicationRefs) {
+                speakerIndication.style.height = `${audioLevel * 100 + 2}px`;
+            }
+        });
     }
 
     onVisibilityChange(isVisible) {
@@ -183,13 +210,17 @@ class VideoNode extends MegaRenderMixin {
 
     renderStatus() {
         const { mode, chatRoom } = this.props;
-        const source = this.source;
-        const sfuClient = chatRoom.call.sfuClient;
-        const userHandle = source.userHandle;
+        const { source, isThumb } = this;
+        const { sfuClient } = chatRoom.call;
+        const { userHandle, isOnHold, hasScreenAndCam } = source;
         const $$CONTAINER = ({ children }) => <div className="video-node-status theme-dark-forced">{children}</div>;
-        const onHoldLabel = l[23542].replace('%s', M.getNameByHandle(userHandle)); /* `%s has put the call on hold` */
-        if (source.isOnHold) {
-            return <$$CONTAINER>{this.getStatusIcon('icon-pause', onHoldLabel)}</$$CONTAINER>;
+
+        if (isOnHold) {
+            return (
+                <$$CONTAINER>
+                    {this.getStatusIcon('icon-pause', l[23542].replace('%s', M.getNameByHandle(userHandle)))}
+                </$$CONTAINER>
+            );
         }
 
         return (
@@ -198,12 +229,12 @@ class VideoNode extends MegaRenderMixin {
                     // If in `Main` mode and the participant is a moderator -- show icon in the top-right corner
                     mode === MODE.MAIN &&
                     Call.isModerator(chatRoom, userHandle) &&
-                    this.getStatusIcon('icon-admin-outline call-role-icon', l[8875] /* `Moderator` */)
+                    this.getStatusIcon('icon-admin-outline call-role-icon', l[8875])
                 }
                 <$$CONTAINER>
-                    {source.audioMuted ? this.getStatusIcon('icon-mic-off-thin-outline', l.muted /* `Muted` */) : null}
-                    {sfuClient.haveBadNetwork ?
-                        this.getStatusIcon('icon-weak-signal', l.poor_connection /* `Poor connection` */) : null}
+                    {renderAudioIndicator(source)}
+                    {sfuClient.haveBadNetwork ? this.getStatusIcon('icon-weak-signal', l.poor_connection) : null}
+                    {hasScreenAndCam && isThumb ? this.getStatusIcon('icon-pc-linux', 'Sharing screen') : null}
                 </$$CONTAINER>
             </>
         );
@@ -225,6 +256,9 @@ class VideoNode extends MegaRenderMixin {
             return null;
         }
 
+        const { call } = chatRoom;
+        const isActiveSpeaker = !source.audioMuted && call.activeStream && call.activeStream === source.clientId;
+
         return (
             <div
                 ref={nodeRef}
@@ -234,22 +268,23 @@ class VideoNode extends MegaRenderMixin {
                     ${className || ''}
                     ${isLocal && !isLocalScreen ? ' local-stream-mirrored' : ''}
                     ${simpletip ? 'simpletip' : ''}
+                    ${isActiveSpeaker && mode === MODE.THUMBNAIL ? 'active-speaker' : ''}
                 `}
                 data-simpletip={simpletip?.label}
                 data-simpletipposition={simpletip?.position}
                 data-simpletipoffset={simpletip?.offset}
                 data-simpletip-class={simpletip?.className}
                 onClick={ev => onClick && onClick(source, ev)}>
-                {source && (
+                {source &&
                     <>
                         {children || null}
                         <div className="video-node-content">
                             {CallManager2.Call.VIDEO_DEBUG_MODE ? this.renderVideoDebugMode() : null}
                             {this.renderContent()}
-                            { mode === MODE.MINI || minimized ? null : this.renderStatus()}
+                            {mode === MODE.MINI || minimized ? null : this.renderStatus()}
                         </div>
                     </>
-                )}
+                }
             </div>
         );
     }

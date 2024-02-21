@@ -6,6 +6,9 @@ import Collapse from './collapse.jsx';
 import Call from './call.jsx';
 import { Emoji } from '../../../ui/utils.jsx';
 import Button from './button.jsx';
+import ContactsPanel from '../contactsPanel/contactsPanel.jsx';
+import { Pin, Privilege } from './videoNodeMenu.jsx';
+import { renderAudioIndicator } from './videoNode.jsx';
 
 class Participant extends MegaRenderMixin {
     baseIconClass = 'sprite-fm-mono';
@@ -25,7 +28,20 @@ class Participant extends MegaRenderMixin {
     }
 
     render() {
-        const { chatRoom, source, handle, name, recorder } = this.props;
+        const {
+            call,
+            mode,
+            chatRoom,
+            source,
+            contact,
+            handle,
+            name,
+            recorder,
+            onCallMinimize,
+            onSpeakerChange,
+            onModeChange
+        } = this.props;
+        const hasRelationship = ContactsPanel.hasRelationship(contact);
 
         return (
             <>
@@ -51,12 +67,82 @@ class Participant extends MegaRenderMixin {
                             ${source.videoMuted ? 'icon-video-off-thin-outline inactive' : 'icon-video-thin-outline'}
                         `}
                     />
-                    <i
-                        className={`
-                            ${this.baseIconClass}
-                            ${source.audioMuted ? 'icon-mic-off-thin-outline inactive' : 'icon-mic-thin-outline'}
-                         `}
-                    />
+                    {renderAudioIndicator(source)}
+                    <div className="participants-menu theme-dark-forced">
+                        <div className="participants-menu-toggle">
+                            <i className="sprite-fm-mono icon-side-menu"/>
+                        </div>
+                        <div className="participants-menu-content">
+                            <ul>
+                                {hasRelationship ?
+                                    <li>
+                                        <Button
+                                            icon="sprite-fm-mono icon-info"
+                                            onClick={() => {
+                                                onCallMinimize();
+                                                loadSubPage(`fm/chat/contacts/${handle}`);
+                                            }}>
+                                            <span>{l[6859] /* Info */}</span>
+                                        </Button>
+                                    </li> :
+                                    null
+                                }
+                                {chatRoom.iAmOperator() && u_handle !== handle && !source.audioMuted &&
+                                    <li>
+                                        <Button
+                                            icon="sprite-fm-mono icon-mic-off-thin-outline"
+                                            onClick={() => {
+                                                call.sfuClient.mutePeer(source.clientId);
+                                                ChatToast.quick(
+                                                    /* `Muted by %NAME` */
+                                                    l.you_muted_peer.replace('%NAME', nicknames.getNickname(handle))
+                                                );
+                                            }}>
+                                            <span>{l[16214] /* `Mute` */}</span>
+                                        </Button>
+                                    </li>
+                                }
+                                {hasRelationship ?
+                                    <li>
+                                        <Button
+                                            icon="sprite-fm-mono icon-chat"
+                                            onClick={() => {
+                                                onCallMinimize();
+                                                loadSubPage(`fm/chat/p/${handle}`);
+                                            }}>
+                                            <span>{l.send_message /* `Send message` */}</span>
+                                        </Button>
+                                    </li> :
+                                    null
+                                }
+                                {chatRoom.iAmOperator() && u_handle !== handle &&
+                                    <li>
+                                        <Privilege
+                                            stream={source}
+                                            chatRoom={chatRoom}
+                                        />
+                                    </li>
+                                }
+                                <li>
+                                    <Pin
+                                        mode={mode}
+                                        stream={source}
+                                        onSpeakerChange={onSpeakerChange}
+                                        onModeChange={onModeChange}
+                                    />
+                                </li>
+                                {chatRoom.iAmOperator() && u_handle !== handle &&
+                                    <li>
+                                        <Button
+                                            icon="sprite-fm-mono icon-disabled-filled"
+                                            onClick={() => chatRoom.trigger('onRemoveUserRequest', handle)}>
+                                            <span>{l[8867] /* `Remove participant` */}</span>
+                                        </Button>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </>
         );
@@ -64,13 +150,28 @@ class Participant extends MegaRenderMixin {
 }
 
 export default class Participants extends MegaRenderMixin {
-    FILTER = { CALL: 0, CHAT: 1 };
+    muteRef = React.createRef();
+
+    NAMESPACE = 'participants';
+    FILTER = { IN_CALL: 0, CHAT_PARTICIPANTS: 1 };
 
     state = {
-        filter: this.FILTER.CALL,
+        filter: this.FILTER.IN_CALL,
         noResponsePeers: [],
-        ringingPeers: []
+        ringingPeers: [],
+        allPeersMuted: undefined
     };
+
+    get allPeersMuted() {
+        return Object.values(this.props.peers)
+            .filter(p => p instanceof CallManager2.Peer)
+            .every(p => p.audioMuted);
+    }
+
+    constructor(props) {
+        super(props);
+        this.state.allPeersMuted = this.allPeersMuted;
+    }
 
     doHangUp = handle => {
         if (handle) {
@@ -121,28 +222,38 @@ export default class Participants extends MegaRenderMixin {
     };
 
     getCallParticipants = () => {
-        const { call, chatRoom, peers, recorder } = this.props;
+        const { call, mode, chatRoom, peers, recorder, onCallMinimize, onSpeakerChange, onModeChange } = this.props;
 
         return (
             <ul>
                 <li>
                     <Participant
                         call={call}
+                        mode={mode}
                         chatRoom={chatRoom}
                         source={call.getLocalStream()}
                         handle={u_handle}
                         name={M.getNameByHandle(u_handle)}
                         recorder={recorder}
+                        onCallMinimize={onCallMinimize}
+                        onSpeakerChange={onSpeakerChange}
+                        onModeChange={onModeChange}
                     />
                 </li>
                 {peers.map(peer =>
                     <li key={`${peer.clientId}-${peer.userHandle}`}>
                         <Participant
+                            call={call}
+                            mode={mode}
                             chatRoom={chatRoom}
                             source={peer}
+                            contact={M.u[peer.userHandle]}
                             handle={peer.userHandle}
                             name={peer.name}
                             recorder={recorder}
+                            onCallMinimize={onCallMinimize}
+                            onSpeakerChange={onSpeakerChange}
+                            onModeChange={onModeChange}
                         />
                     </li>
                 )}
@@ -240,67 +351,122 @@ export default class Participants extends MegaRenderMixin {
             <div
                 className={`
                     participants-list
-                    ${filter === this.FILTER.CALL ? '' : 'with-chat-participants'}
+                    ${filter === this.FILTER.IN_CALL ? '' : 'with-chat-participants'}
                     ${this.props.guest ? 'guest' : ''}
                 `}>
                 <PerfectScrollbar
                     filter={filter}
                     options={{ 'suppressScrollX': true }}>
-                    {filter === this.FILTER.CALL ? this.getCallParticipants() : this.getChatParticipants()}
+                    {filter === this.FILTER.IN_CALL ? this.getCallParticipants() : this.getChatParticipants()}
                 </PerfectScrollbar>
             </div>
         );
     };
 
+    renderMuteAllControl = () => {
+        const { allPeersMuted } = this.state;
+        const simpletip = {
+            label: l.mute_all_tooltip /* `This will mute all participants except the host` */,
+            position: 'top',
+            className: 'theme-dark-forced'
+        };
+
+        return (
+            <Button
+                ref={this.muteRef}
+                simpletip={allPeersMuted ? null : simpletip}
+                className={`
+                    mega-button
+                    action
+                    ${this.NAMESPACE}-mute
+                    ${allPeersMuted ? 'disabled' : ''}
+                `}
+                icon="sprite-fm-mono icon-mic-off-thin-outline"
+                onClick={() =>
+                    allPeersMuted ?
+                        null :
+                        this.setState({ allPeersMuted: true }, () => {
+                            this.props.call.sfuClient.mutePeer();
+                            ChatToast.quick(l.you_muted_all_peers /* `You've muted all participants` */);
+                            $(this.muteRef.current?.domNode).trigger('simpletipClose');
+                        })
+                }>
+                {allPeersMuted ? l.all_muted /* `All muted` */ : l.mute_all /* `Mute all` */}
+            </Button>
+        );
+    };
+
     componentWillUnmount() {
         super.componentWillUnmount();
-        this.props.chatRoom.off('onCallPeerJoined.participants');
+        ['onCallPeerJoined', 'onPeerAvChange'].map(event => this.props.chatRoom.off(`${event}.${this.NAMESPACE}`));
     }
 
     componentDidMount() {
         super.componentDidMount();
-
-        this.props.chatRoom.rebind('onCallPeerJoined.participants', (ev, userHandle) => {
-            const { noResponsePeers, ringingPeers } = this.state;
-            if (noResponsePeers.includes(userHandle)) {
-                this.setState({ noResponsePeers: noResponsePeers.filter(h => h !== userHandle) });
-            }
-            if (ringingPeers.includes(userHandle)) {
-                this.setState({ ringingPeers: ringingPeers.filter(h => h !== userHandle) });
-            }
-        });
+        this.props.chatRoom
+            .rebind(`onCallPeerJoined.${this.NAMESPACE}`, (ev, userHandle) => {
+                const { noResponsePeers, ringingPeers } = this.state;
+                this.setState({
+                    noResponsePeers: noResponsePeers.includes(userHandle) ?
+                        noResponsePeers.filter(h => h !== userHandle) :
+                        noResponsePeers,
+                    ringingPeers: ringingPeers.includes(userHandle) ?
+                        ringingPeers.filter(h => h !== userHandle) :
+                        ringingPeers
+                });
+            })
+            .rebind(`onPeerAvChange.${this.NAMESPACE}`, () =>
+                this.isMounted() && this.setState({ allPeersMuted: this.allPeersMuted })
+            );
     }
 
     render() {
-        const { CALL, CHAT } = this.FILTER;
-        const { chatRoom, peers } = this.props;
+        const { IN_CALL, CHAT_PARTICIPANTS } = this.FILTER;
+        const { withInvite, chatRoom, peers, onInviteToggle } = this.props;
         const { filter } = this.state;
 
         return (
-            <div className="participants">
+            <div className={this.NAMESPACE}>
                 {chatRoom.type === 'private' ?
                     null :
-                    <div className="participants-nav">
+                    <div className={`${this.NAMESPACE}-nav`}>
                         <Button
-                            className={filter === CALL ? 'active' : ''}
-                            onClick={() => this.setState({ filter: CALL })}>
+                            className={filter === IN_CALL ? 'active' : ''}
+                            onClick={() => this.setState({ filter: IN_CALL })}>
                             {l.call_heading_in_call /* `In call` */}
                         </Button>
                         <Button
-                            className={filter === CHAT ? 'active' : ''}
-                            onClick={() => this.setState({ filter: CHAT })}>
+                            className={filter === CHAT_PARTICIPANTS ? 'active' : ''}
+                            onClick={() => this.setState({ filter: CHAT_PARTICIPANTS })}>
                             {l.call_heading_not_in_call /* `Not in call` */}
                         </Button>
                     </div>
                 }
-                {filter === CALL ?
-                    <Collapse
-                        {...this.props}
-                        filter={filter}
-                        heading={l[16217] /* `Participants` */}
-                        badge={peers?.length + 1}>
-                        {this.renderParticipantsList()}
-                    </Collapse> :
+                {filter === IN_CALL ?
+                    <>
+                        <div className={`${this.NAMESPACE}-actions`}>
+                            {withInvite &&
+                                <Button
+                                    className={`
+                                        mega-button
+                                        action
+                                        ${this.NAMESPACE}-invite
+                                    `}
+                                    icon="sprite-fm-mono icon-join-call"
+                                    onClick={onInviteToggle}>
+                                    {l[8726] /* `Invite` */}
+                                </Button>
+                            }
+                            {chatRoom.iAmOperator() && this.renderMuteAllControl()}
+                        </div>
+                        <Collapse
+                            {...this.props}
+                            filter={filter}
+                            heading={l[16217] /* `Participants` */}
+                            badge={peers?.length + 1}>
+                            {this.renderParticipantsList()}
+                        </Collapse>
+                    </> :
                     this.renderParticipantsList()
                 }
             </div>

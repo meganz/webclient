@@ -533,6 +533,9 @@
         onModeratorAdd(user) {
             this.chatRoom.trigger('onModeratorAdd', user);
         }
+        onMutedBy(cid) {
+            this.chatRoom.trigger('onMutedBy', { cid });
+        }
 // == end SfuClientIClientEventListener interface
         handleDisconnect(termCode) {
             console.assert(termCode !== undefined, "handleDisconnect: termCode is undefined");
@@ -586,11 +589,7 @@
                 this.forcedActiveStream = null;
             }
 
-            if (newMode === CALL_VIEW_MODES.MAIN || newMode === CALL_VIEW_MODES.MINI || this.recorder) {
-                this.sfuClient.enableSpeakerDetector(true);
-            }
-            else {
-                this.sfuClient.enableSpeakerDetector(false);
+            if (newMode === CALL_VIEW_MODES.MINI) {
                 this.activeStream = null;
             }
         }
@@ -603,6 +602,7 @@
         }
         setActiveStream(clientId) {
             this.activeStream = clientId;
+            this.chatRoom.trigger('onSpeakerChange', clientId);
         }
         getActiveStream() {
             const activeStream = this.forcedActiveStream || this.activeStream;

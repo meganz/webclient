@@ -1,113 +1,107 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../mixins';
 import Button from './button.jsx';
-import { isGuest } from './call.jsx';
+import { isGuest, MODE } from './call.jsx';
 import { Emoji } from '../../../ui/utils.jsx';
 
-export default class VideoNodeMenu extends MegaRenderMixin {
-    static NAMESPACE = 'node-menu';
+export const Privilege = ({ chatRoom, stream }) => {
+    const { call, userHandle } = stream || {};
 
-    constructor(props) {
-        super(props);
-        this.Contact = this.Contact.bind(this);
-        this.Pin = this.Pin.bind(this);
-        this.Privilege = this.Privilege.bind(this);
-    }
-
-    Contact() {
-        const { stream, ephemeralAccounts, onCallMinimize } = this.props;
-        const { userHandle } = stream;
-        const IS_GUEST = isGuest() || ephemeralAccounts && ephemeralAccounts.includes(userHandle);
-        const HAS_RELATIONSHIP = M.u[userHandle].c === 1;
-
-        if (HAS_RELATIONSHIP) {
-            return (
-                <Button
-                    icon="sprite-fm-mono icon-chat"
-                    onClick={() => {
-                        onCallMinimize();
-                        loadSubPage(`fm/chat/p/${userHandle}`);
-                    }}>
-                    <span>{l[7997] /* `Chat` */}</span>
-                </Button>
-            );
-        }
+    if (call && call.isPublic) {
+        const { OPERATOR, FULL } = ChatRoom.MembersSet.PRIVILEGE_STATE;
+        const currentUserModerator = chatRoom.members[u_handle] === OPERATOR;
+        const targetUserModerator = chatRoom.members[userHandle] === OPERATOR;
 
         return (
+            currentUserModerator &&
             <Button
-                className={IS_GUEST ? 'disabled' : ''}
-                icon="sprite-fm-mono icon-add"
+                targetUserModerator={targetUserModerator}
+                icon="sprite-fm-mono icon-admin-outline"
                 onClick={() => {
-                    return (
-                        IS_GUEST ?
-                            false :
-                            M.syncContactEmail(userHandle, true)
-                                .then(email => {
-                                    const OPC = Object.values(M.opc);
-                                    if (OPC && OPC.length && OPC.some(opc => opc.m === email)) {
-                                        return msgDialog('warningb', '', l[17545]);
-                                    }
-                                    msgDialog('info', l[150], l[5898]);
-                                    M.inviteContact(M.u[u_handle].m, email);
-                                })
-                                .catch(() => mBroadcaster.sendMessage('meetings:ephemeralAdd', userHandle))
+                    ['alterUserPrivilege', 'onCallPrivilegeChange'].map(event =>
+                        chatRoom.trigger(event, [userHandle, targetUserModerator ? FULL : OPERATOR])
                     );
                 }}>
-                <span>{l[24581] /* `Add Contact` */}</span>
+                <span>
+                    {targetUserModerator ?
+                        l.remove_moderator /* `Remmove moderator` */ :
+                        l.make_moderator /* `Make moderator` */
+                    }
+                </span>
             </Button>
         );
     }
 
-    Pin() {
-        const { stream, onSpeakerChange } = this.props;
-        if (onSpeakerChange) {
-            return (
-                <Button
-                    icon="sprite-fm-mono grid-main"
-                    onClick={() => onSpeakerChange(stream)}>
-                    <span>{l.display_in_main_view /* `Display in main view` */}</span>
-                </Button>
-            );
-        }
-        return null;
+    return null;
+};
+
+const Contact = ({ stream, ephemeralAccounts, onCallMinimize }) => {
+    const { userHandle } = stream;
+    const IS_GUEST = isGuest() || ephemeralAccounts && ephemeralAccounts.includes(userHandle);
+    const HAS_RELATIONSHIP = M.u[userHandle].c === 1;
+
+    if (HAS_RELATIONSHIP) {
+        return (
+            <Button
+                icon="sprite-fm-mono icon-chat"
+                onClick={() => {
+                    onCallMinimize();
+                    loadSubPage(`fm/chat/p/${userHandle}`);
+                }}>
+                <span>{l[7997] /* `Chat` */}</span>
+            </Button>
+        );
     }
 
-    Privilege() {
-        const { stream, chatRoom } = this.props;
-        const { call, userHandle } = stream;
+    return (
+        <Button
+            className={IS_GUEST ? 'disabled' : ''}
+            icon="sprite-fm-mono icon-add"
+            onClick={() => {
+                return (
+                    IS_GUEST ?
+                        false :
+                        M.syncContactEmail(userHandle, true)
+                            .then(email => {
+                                const OPC = Object.values(M.opc);
+                                if (OPC && OPC.length && OPC.some(opc => opc.m === email)) {
+                                    return msgDialog('warningb', '', l[17545]);
+                                }
+                                msgDialog('info', l[150], l[5898]);
+                                M.inviteContact(M.u[u_handle].m, email);
+                            })
+                            .catch(() => mBroadcaster.sendMessage('meetings:ephemeralAdd', userHandle))
+                );
+            }}>
+            <span>{l[24581] /* `Add Contact` */}</span>
+        </Button>
+    );
+};
 
-        if (call && call.isPublic) {
-            const { OPERATOR, FULL } = ChatRoom.MembersSet.PRIVILEGE_STATE;
-            const currentUserModerator = chatRoom.members[u_handle] === OPERATOR;
-            const targetUserModerator = chatRoom.members[userHandle] === OPERATOR;
+export const Pin = ({ stream, mode, onSpeakerChange, onModeChange })  => {
+    return (
+        <Button
+            icon="sprite-fm-mono grid-main"
+            onClick={() => mode === MODE.THUMBNAIL ? onSpeakerChange?.(stream) : onModeChange?.(MODE.THUMBNAIL)}>
+            <span>
+                {mode === MODE.THUMBNAIL ?
+                    l.display_in_main_view /* `Display in main view` */ :
+                    l.switch_to_thumb_view /* `Switch to thumbnail view` */
+                }
+            </span>
+        </Button>
+    );
+};
 
-            return (
-                currentUserModerator &&
-                    <Button
-                        targetUserModerator={targetUserModerator}
-                        icon="sprite-fm-mono icon-admin-outline"
-                        onClick={() => {
-                            ['alterUserPrivilege', 'onCallPrivilegeChange'].map(event =>
-                                chatRoom.trigger(event, [userHandle, targetUserModerator ? FULL : OPERATOR])
-                            );
-                        }}>
-                        <span>
-                            {targetUserModerator ?
-                                l.remove_moderator /* `Remmove moderator` */ :
-                                l.make_moderator /* `Make moderator` */ }
-                        </span>
-                    </Button>
-            );
-        }
-
-        return null;
-    }
+export default class VideoNodeMenu extends MegaRenderMixin {
+    static NAMESPACE = 'node-menu';
 
     render() {
         const { NAMESPACE } = VideoNodeMenu;
-        const { userHandle } = this.props.stream;
+        const { stream } = this.props;
+        const $$CONTROLS = { Contact, Pin, Privilege };
 
-        if (userHandle !== u_handle) {
+        if (stream.userHandle !== u_handle) {
             return (
                 <div
                     className={`
@@ -115,13 +109,16 @@ export default class VideoNodeMenu extends MegaRenderMixin {
                         theme-dark-forced
                     `}>
                     <div className={`${NAMESPACE}-toggle`}>
-                        <Emoji>{M.getNameByHandle(userHandle)}</Emoji>
+                        <Emoji>{M.getNameByHandle(stream.userHandle)}</Emoji>
                         <i className="sprite-fm-mono icon-side-menu"/>
                     </div>
                     <div className={`${NAMESPACE}-content`}>
                         <ul>
-                            {[this.Contact, this.Pin, this.Privilege].map((button, index) =>
-                                <li key={index}>{button()}</li>
+                            {Object.values($$CONTROLS).map(($$CONTROL, i) =>
+                                <li
+                                    key={`${Object.keys($$CONTROLS)[i]}-${stream.clientId}-${stream.userHandle}`}>
+                                    <$$CONTROL {...this.props} />
+                                </li>
                             )}
                         </ul>
                     </div>

@@ -3,7 +3,7 @@ import { compose, MegaRenderMixin } from '../../mixins';
 import utils, { ParsedHTML } from '../../../ui/utils.jsx';
 import Button from './button.jsx';
 import { MODE, VIEW } from './call.jsx';
-import { LocalVideoThumb, LocalVideoHiRes, PeerVideoHiRes } from './videoNode.jsx';
+import { LocalVideoThumb, LocalVideoHiRes, PeerVideoHiRes, renderAudioIndicator } from './videoNode.jsx';
 import FloatExtendedControls from './floatExtendedControls.jsx';
 import { withMicObserver } from './micObserver.jsx';
 import { withPermissionsObserver } from './permissionsObserver.jsx';
@@ -426,7 +426,7 @@ class Stream extends MegaRenderMixin {
 
     render() {
         const { NAMESPACE, POSITION_MODIFIER } = FloatingVideo;
-        const { mode, minimized, sidebar, ratioClass, collapsed, toggleCollapsedMode, onCallExpand } = this.props;
+        const { call, mode, minimized, sidebar, ratioClass, collapsed, toggleCollapsedMode, onCallExpand } = this.props;
         const IS_MINI_MODE = mode === MODE.MINI;
         const IS_SELF_VIEW = !IS_MINI_MODE;
 
@@ -441,7 +441,10 @@ class Stream extends MegaRenderMixin {
                         ${sidebar && !minimized ? POSITION_MODIFIER : ''}
                     `}
                     onClick={toggleCollapsedMode}>
-                    <i className="sprite-fm-mono icon-arrow-up" />
+                    <i className="sprite-fm-mono icon-arrow-up icon-collapse" />
+                    <div className="collapsed-audio-indicator">
+                        {renderAudioIndicator(call.getLocalStream())}
+                    </div>
                 </div>
             );
         }

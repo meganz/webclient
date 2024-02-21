@@ -11,8 +11,8 @@
     height: calc(100% - 4px);
     min-height: 100%;
     margin: 6px;
-    border-radius: 6px;
-    box-sizing: content-box;
+    border-radius: 12px;
+    box-sizing: border-box;
     background: #333;
 
     &:after {
@@ -29,6 +29,15 @@
     &.quarter { width: 25%; }
 
     &.clickable { cursor: pointer; }
+
+    &.active,
+    &.active-speaker {
+        border: 2px solid #81CFB3;
+
+        video {
+            border-radius: 10px;
+        }
+    }
 
     .loading-icon {
         filter: invert(1);
@@ -82,6 +91,7 @@
             height: 100%;
             position: relative;
         }
+
         .presenter-video-holder {
             position: absolute;
             bottom: 0;
@@ -91,6 +101,7 @@
             background-color: black;
             border-top-left-radius: 6px;
         }
+
         .presenter-video-holder video {
             border-radius: inherit;
         }
@@ -156,6 +167,9 @@
             background: rgba(17,17,17,0.8);
 
             i {
+                overflow: hidden;
+                position: relative;
+                --mask-color: var(--secondary-green);
                 --icon-size: 16px;
 
                 &.icon-mic-off-thin-outline {
@@ -185,4 +199,17 @@
 .float-video .video-node-content .avatar-wrapper {
     width: 48px;
     height: 48px;
+}
+
+.mic-fill {
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    margin: 0 0 0 -2px;
+    width: 4px;
+    height: calc(100% - 6px);
+    max-height: 9px;
+    border-radius: 0 0 3px 3px;
+    background: var(--secondary-green);
+    transition: height 200ms ease-in-out;
 }

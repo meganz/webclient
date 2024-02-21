@@ -126,7 +126,7 @@ class MegaGallery {
     }
 
     get onpage() {
-        return this.id === M.currentCustomView.nodeID || (pfid && M.gallery);
+        return this.id === M.currentCustomView.nodeID || M.gallery;
     }
 
     setObserver() {
@@ -1895,6 +1895,15 @@ class MegaTargetGallery extends MegaGallery {
     }
 
     checkGalleryUpdate(n) {
+        if (!mega.gallery.isGalleryNode(n)) {
+            return;
+        }
+
+        if (M.currentdirid === n.p && !M.v.length) {
+            $(`.fm-empty-folder, .fm-empty-folder-link, .fm-empty-${M.currentdirid}`, '.fm-right-files-block')
+                .addClass('hidden');
+        }
+
         if (pfid) {
             delay(`pfid_discovery:node_update${n.h}`, () => {
                 if (M.currentdirid === n.p) {
@@ -1902,10 +1911,6 @@ class MegaTargetGallery extends MegaGallery {
                         this.updateNodeName(n);
                     }
                     else {
-                        if (!M.v.length) {
-                            $('.fm-empty-folder, .fm-empty-folder-link', '.fm-right-files-block').addClass('hidden');
-                        }
-
                         this.addNodeToGroups(n);
                     }
                 }
@@ -1917,7 +1922,7 @@ class MegaTargetGallery extends MegaGallery {
             return;
         }
 
-        if (!n.t && mega.gallery.isGalleryNode(n)) {
+        if (!n.t) {
             const cameraTree = M.getTreeHandles(this.isDiscovery ? this.id : M.CameraId);
             const rubTree = M.getTreeHandles(M.RubbishID);
 
@@ -2331,11 +2336,13 @@ mega.gallery.resetAll = () => {
     mega.gallery.nodeUpdated = false;
 };
 
-mega.gallery.showEmpty = (type) => {
+mega.gallery.showEmpty = (type, noMoreFiles) => {
     'use strict';
 
-    if (M.currentrootid === M.RootID && (!M.c[M.currentdirid] || !Object.values(M.c[M.currentdirid]).length)) {
+    if (noMoreFiles || M.currentrootid === M.RootID &&
+        (!M.c[M.currentdirid] || !Object.values(M.c[M.currentdirid]).length)) {
         $('.fm-empty-folder', '.fm-right-files-block').removeClass('hidden');
+        $(`.fm-empty-${M.currentdirid}`, '.fm-right-files-block').addClass('hidden');
         return;
     }
 

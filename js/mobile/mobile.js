@@ -326,25 +326,30 @@ var mobile = {
                     return;
                 }
 
-                if (status === 1) {
-                    mega.attr.get(u_handle, 'cardalmostexp', -2, true).always((res) => {
-                        if (res !== '1') {
-                            const banner = mobile.banner.show(
-                                l.card_expiry_title,
-                                l.card_expiry_msg,
-                                l.update_card, 'warning');
-                            banner.on('cta', () => loadSubPage('fm/account/paymentcard'));
-                            banner.on('close', () => mega.attr.set('cardalmostexp', '1', -2, true));
-                        }
-                    });
+                let bannerTitle;
+                let bannerDialog = u_attr && u_attr.b ? l.payment_card_update_details_b : l.payment_card_update_details;
+
+                // Expires next month (only show after the 15th of the current month)
+                if (status === 'expNextM') {
+                    bannerTitle = l.payment_card_exp_nxt_mnth;
                 }
-                else if (status === 2) {
-                    const banner = mobile.banner.show(
-                        l.card_expired,
-                        l.card_expired_msg,
-                        l.update_card, 'error', true);
-                    banner.on('cta', () => loadSubPage('fm/account/paymentcard'));
+                // Expires this month
+                else if (status === 'expThisM') {
+                    bannerTitle = l.payment_card_almost_exp;
                 }
+                // Expired
+                else if (status === 'exp') {
+                    bannerTitle = l.payment_card_exp_b_title;
+                    bannerDialog = u_attr && u_attr.b ? l.payment_card_at_risk_b : l.payment_card_at_risk;
+                }
+
+                const banner = mobile.banner.show(
+                    bannerTitle,
+                    bannerDialog,
+                    l.update_card,
+                    status === 'exp' ? 'error' : 'warning',
+                    false);
+                banner.on('cta', () => loadSubPage('fm/account/paymentcard'));
             }
         });
 

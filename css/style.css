@@ -2982,7 +2982,7 @@ body.loading .light-overlay {
 .fm-notification-block a:hover {
     text-decoration: none;
 }
-.fm-notification-block > a {
+.fm-notification-block:not(.payment-card-status) > a {
     -webkit-margin-start: auto;
     margin-inline-start: auto;
 }
@@ -3001,6 +3001,14 @@ body.loading .light-overlay {
 .fm-notification.full .visible-notification .fm-notification-block.full,
 .fm-notification.almost-full .visible-notification .fm-notification-block.almost-full {
     display: flex;
+}
+ .fm-notification-block.payment-card-status .payment-banner-content-wrapper{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+.fm-notification-block.payment-card-status .banner-title{
+    font: var(--text-body1-bold);
 }
 /* End of FM notification */
 

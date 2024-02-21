@@ -2642,4 +2642,34 @@ MegaUtils.prototype.noSleep = async function(stop, title) {
     }
 };
 
+MegaUtils.prototype.updatePaymentCardState = () => {
+    'use strict';
+    return api.req({a: 'cci'}).then((res) => {
+        const date = new Date();
+        const cardM = res.result.exp_month;
+        const cardY = res.result.exp_year;
+        const currentM = date.getMonth() + 1;
+        const currentY = date.getFullYear();
+        const currentD = date.getDate();
+        let state;
+        // Expired
+        if (currentY > cardY || ((currentM > cardM) && (currentY <= cardY))) {
+            state = 'exp';
+        }
+        // Expires this month
+        else if ((currentM === cardM) && (currentY === cardY)) {
+            state = 'expThisM';
+        }
+        // Expires next month (only show on/after the 15th of the current month)
+        else if ((((currentM + 1) === cardM) && (currentD >= 15)) && (currentY === cardY)) {
+            state = 'expNextM';
+        }
+        M.showPaymentCardBanner(state);
+        if (M.account && state) {
+            M.account.cce = state;
+        }
+    });
+};
+
+
 Object.freeze(MegaUtils.prototype);

@@ -3211,7 +3211,7 @@ function logExportEvt(type, target) {
 
             // Undecryptable node indicators
             if (missingkeys[nodeId]) {
-                titleTooltip += '\n' + l[8595];
+                titleTooltip += '\n' + M.getUndecryptedLabel(M.d[nodeId]);
             }
 
             $('.grid-table.fm #' + nodeId).attr('title', titleTooltip);
@@ -3223,7 +3223,7 @@ function logExportEvt(type, target) {
 
             // Undecryptable node indicators
             if (missingkeys[nodeId]) {
-                titleTooltip += '\n' + l[8602];
+                titleTooltip += '\n' + M.getUndecryptedLabel(M.d[nodeId]);
             }
 
             $('.grid-table.fm #' + nodeId).attr('title', titleTooltip);

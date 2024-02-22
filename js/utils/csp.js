@@ -148,8 +148,8 @@ lazy(self, 'csp', () => {
         },
 
         showCookiesDialog: promisify((resolve, reject, step, chg) => {
-            const banner = document.querySelector('.cookie-banner');
-            const dialog = document.querySelector('.cookie-dialog');
+            let banner = document.querySelector('.cookie-banner');
+            let dialog = document.querySelector('.cookie-dialog');
 
             if (!banner || !dialog) {
                 return reject(tag);
@@ -165,8 +165,8 @@ lazy(self, 'csp', () => {
                 dialog.querySelector('.settings-row.advertisement').classList.remove('hidden');
             }
 
-            const $banner = $(banner);
-            const $dialog = $(dialog);
+            let $banner = $(banner);
+            let $dialog = $(dialog);
             const first = !csp.has('essential');
             const qsa = (sel, cb) => dialog.querySelectorAll(sel).forEach(cb);
 
@@ -181,6 +181,17 @@ lazy(self, 'csp', () => {
                 }
             });
 
+            const updateMegaSwitch = (toggleSwitch, isOn) => {
+                const iconNode = toggleSwitch.querySelector('.mega-feature-switch');
+
+                toggleSwitch.classList[isOn ? 'add' : 'remove']('toggle-on');
+                toggleSwitch.setAttribute('aria-checked', isOn ? 'true' : 'false');
+
+                iconNode.classList.add('sprite-fm-mono-after');
+                iconNode.classList.remove('icon-check-after', 'icon-minimise-after');
+                iconNode.classList.add(`icon-${isOn ? 'check' : 'minimise'}-after`);
+            };
+
             const showBlock = (step) => {
                 const qsa = (sel, cb) => dialog.querySelectorAll(sel).forEach(cb);
                 const all = (sel = '.current') => {
@@ -190,9 +201,7 @@ lazy(self, 'csp', () => {
                     if (total) {
                         const active = dialog.querySelectorAll(`.settings-row:not(.hidden) ${sel}.toggle-on`).length;
 
-                        const toggleSwitch = dialog.querySelector(`${sel.split(':')[0]}.all`);
-                        toggleSwitch.classList[total === active ? 'add' : 'remove']('toggle-on');
-                        toggleSwitch.setAttribute('aria-checked', total === active ? 'true' : 'false');
+                        updateMegaSwitch(dialog.querySelector(`${sel.split(':')[0]}.all`), total === active);
                     }
                 };
 
@@ -203,7 +212,23 @@ lazy(self, 'csp', () => {
                         closeDialog();
                     }
 
+                    // Show banner in mobile sheet component
+                    if (is_mobile) {
+                        mega.ui.overlay.hide();
+                        $banner = $banner.clone(true);
+                        banner = $banner[0];
+
+                        mega.ui.sheet.show({
+                            name: 'cookie-banner',
+                            type: 'modalLeft',
+                            showClose: false,
+                            preventBgClosing: true,
+                            contents: [banner]
+                        });
+                    }
+
                     banner.classList.remove('hidden');
+
                     all('.saved');
                     all('.current');
 
@@ -218,7 +243,27 @@ lazy(self, 'csp', () => {
                 }
 
                 banner.classList.add('hidden');
-                M.safeShowDialog(tag, $dialog);
+
+                if (is_mobile) {
+                    mega.ui.sheet.hide();
+                    $dialog = $dialog.clone(true).removeClass('hidden');
+                    dialog = $dialog[0];
+                }
+
+                M.safeShowDialog(tag, () => {
+
+                    // Show dialog in mobile overlay component
+                    if (is_mobile) {
+                        mega.ui.overlay.show({
+                            name: 'cookie-settings-overlay',
+                            showClose: false,
+                            contents: [dialog],
+                        });
+                        return;
+                    }
+
+                    return $dialog;
+                });
 
                 // Add settings policy link to the last dialog option, if it does not already have them.
                 const $settingsLinks = $('.settings-links.hidden', $dialog).clone().removeClass('hidden');
@@ -240,7 +285,7 @@ lazy(self, 'csp', () => {
                     dialog.querySelector('.use-current-settings').classList.remove('hidden');
 
                     forEachCell((type, toggle) => {
-                        toggle.classList[chg & bitdef.cs[type[1]] ? 'add' : 'remove']('toggle-on');
+                        updateMegaSwitch(toggle, chg & bitdef.cs[type[1]]);
                     }, '.saved');
 
                     if (is_mobile) {
@@ -289,21 +334,20 @@ lazy(self, 'csp', () => {
 
                 $('.mega-switch', dialog).rebind('mousedown.toggle', function() {
                     if (!this.classList.contains('disabled')) {
+                        const setOn = !this.classList.contains('toggle-on');
 
                         if (this.classList.contains('all')) {
-                            const setOn = !this.classList.contains('toggle-on');
 
                             qsa('.settings-cell.current', cell => {
                                 const toggle = cell.querySelector('.mega-switch');
 
                                 if (!toggle.classList.contains('disabled')) {
-                                    toggle.classList[setOn ? 'add' : 'remove']('toggle-on');
-                                    toggle.setAttribute('aria-checked', setOn ? 'true' : 'false');
+                                    updateMegaSwitch(toggle, setOn);
                                 }
                             });
                         }
                         else {
-                            this.classList.toggle('toggle-on');
+                            updateMegaSwitch(this, setOn);
                             all();
                         }
                     }
@@ -336,6 +380,11 @@ lazy(self, 'csp', () => {
                         closeDialog();
                     }
                     banner.classList.add('hidden');
+
+                    if (is_mobile) {
+                        mega.ui.overlay.hide();
+                        mega.ui.sheet.hide();
+                    }
                 });
                 $('.fm-dialog-overlay').off('click.csp');
                 $('*', $dialog.off()).off();
@@ -386,11 +435,11 @@ lazy(self, 'csp', () => {
                 step = 'step2';
             }
 
-            forEachCell((type, toggle) => toggle.classList[csp.has(type) ? 'add' : 'remove']('toggle-on'), '.current');
+            forEachCell((type, toggle) => updateMegaSwitch(toggle, csp.has(type)), '.current');
             showBlock(step || 'step1');
 
             $('.accept-cookies', $banner).rebind('click.ac', (ev) => {
-                forEachCell((type, toggle) => toggle.classList.add('toggle-on'));
+                forEachCell((type, toggle) => updateMegaSwitch(toggle, true));
                 return save(ev);
             });
             $('.cookie-settings', $banner).rebind('click.ac', () => showBlock('step2'));

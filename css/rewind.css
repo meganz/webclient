@@ -17,6 +17,7 @@
 
 .fm-empty-section.active-rewind {
     flex-direction: row;
+    min-height: 0;
 }
 
 .fm-blocks-view.active-rewind .file-block-scrolling,

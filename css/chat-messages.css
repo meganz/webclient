@@ -98,10 +98,11 @@
 }
 
 .messages-block {
+    --messages-block-bg: var(--stroke-main);
     overflow: hidden;
     height: calc(100% - 49px);
     position: relative;
-    background-color: var(--stroke-main);
+    background-color: var(--messages-block-bg);
     margin-right: 256px;
 }
 .messages-block.small-block {

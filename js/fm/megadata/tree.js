@@ -341,7 +341,7 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
                 }
                 if (missingkeys[curItemHandle]) {
                     node.classList.add('undecryptable');
-                    titleTooltip.push(l[8595]);
+                    titleTooltip.push(M.getUndecryptedLabel(node));
                     name = l[8686];
                 }
                 if (titleTooltip.length) {

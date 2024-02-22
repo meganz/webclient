@@ -5,6 +5,18 @@ lazy(mega, 'fileRequestCommon', () => {
     const logger = new MegaLogger('common', null, MegaLogger.getLogger('FileRequest'));
     const folderClass = 'file-request-folder';
 
+    const ongoingRemoval = new Set();
+    const dspOngoingRemoval = () => {
+        const nodes = [...ongoingRemoval].map(h => Object.keys(M.c[h] || {})).flat().map(h => M.d[h]).filter(Boolean);
+
+        ongoingRemoval.clear();
+        mBroadcaster.sendMessage('mediainfo:collect', true, nodes);
+    };
+    const addOngoingRemoval = (h) => {
+        ongoingRemoval.add(h);
+        delay('file-request:ongoing-removal', dspOngoingRemoval, 2e3);
+    };
+
     const refreshFileRequestPageList = () => {
         if (fminitialized && M.currentdirid === 'file-requests') {
             M.openFolder(M.currentdirid, true);
@@ -120,6 +132,7 @@ lazy(mega, 'fileRequestCommon', () => {
         // Remove public upload folder
         remove(handle) {
 
+            addOngoingRemoval(handle);
             mLoadingSpinner.show('puf-remove');
 
             return api.screq({a: 'ul', d: 1, n: handle})

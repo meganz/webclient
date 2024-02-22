@@ -352,3 +352,18 @@ MegaData.prototype.initAddByEmailComponent = function(alreadyAddedContacts) {
         $('.share-message', $shareAddDialog).removeClass('focused');
     });
 };
+
+/**
+ * Return tooltip label for undecripted node depending on node type and shared or owned
+ * @param {Object} node The current node.
+ */
+MegaData.prototype.getUndecryptedLabel = function(node) {
+    'use strict';
+
+    const isShared = M.getNodeRoot(node.p) !== M.RootID;
+
+    if (node.t) {
+        return isShared ? l[8595] : l.undecryptable_folder_tooltip;
+    }
+    return isShared ? l[8602] : l.undecryptable_file_tooltip;
+};

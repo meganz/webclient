@@ -59,9 +59,9 @@ export default class ParticipantsBlock extends MegaRenderMixin {
                                     <li>
                                         <Button
                                             icon={`
-                                            sprite-fm-mono
-                                            ${IS_SPEAKER_VIEW ? 'grid-9' : 'grid-main'}
-                                        `}
+                                                sprite-fm-mono
+                                                ${IS_SPEAKER_VIEW ? 'grid-9' : 'grid-main'}
+                                            `}
                                             onClick={() => {
                                                 if (IS_SPEAKER_VIEW) {
                                                     return onModeChange(MODE.THUMBNAIL);
@@ -107,20 +107,24 @@ export default class ParticipantsBlock extends MegaRenderMixin {
             const streaming =
                 [...filteredPeers.filter(p => p.isScreen), ...filteredPeers.filter(p => !p.videoMuted)];
             const rest = filteredPeers.filter(p => !streaming.includes(p));
-            const $$PEER = peer =>
-                <PeerVideoThumb
-                    key={`${peer.userHandle}--${peer.clientId}`}
-                    className={
-                        peer.isActive || peer.clientId === call.forcedActiveStream ?
-                            'active' :
-                            ''
-                    }
-                    simpletip={{ ...SIMPLE_TIP, label: M.getNameByHandle(peer.userHandle) }}
-                    mode={mode}
-                    chatRoom={chatRoom}
-                    source={peer}
-                    onClick={onSpeakerChange}
-                />;
+            const $$PEER = peer => {
+                const isForcedActive = peer.isActive || peer.clientId === call.forcedActiveStream;
+                const isActiveSpeaker = !peer.audioMuted && call.activeStream && call.activeStream === peer.clientId;
+                return (
+                    <PeerVideoThumb
+                        key={`${peer.userHandle}--${peer.clientId}`}
+                        className={`
+                            ${isForcedActive ? 'active' : ''}
+                            ${isActiveSpeaker ? 'active-speaker' : ''}
+                        `}
+                        simpletip={{ ...SIMPLE_TIP, label: M.getNameByHandle(peer.userHandle) }}
+                        mode={mode}
+                        chatRoom={chatRoom}
+                        source={peer}
+                        onClick={onSpeakerChange}
+                    />
+                );
+            };
 
             //
             // Default, i.e. videos aligned within single page grid.

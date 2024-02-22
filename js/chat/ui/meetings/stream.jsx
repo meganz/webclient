@@ -408,17 +408,19 @@ export default class Stream extends MegaRenderMixin {
      */
 
     renderNodeMenu(peer) {
-        const { call, chatRoom, ephemeralAccounts, onCallMinimize, onSpeakerChange } = this.props;
+        const { call, mode, chatRoom, ephemeralAccounts, onCallMinimize, onSpeakerChange, onModeChange } = this.props;
 
         if (peer) {
             return (
                 <VideoNodeMenu
+                    mode={mode}
                     privilege={chatRoom.members[peer.userHandle]}
                     chatRoom={chatRoom}
                     stream={peer}
                     ephemeralAccounts={ephemeralAccounts}
                     onCallMinimize={onCallMinimize}
                     onSpeakerChange={onSpeakerChange}
+                    onModeChange={onModeChange}
                 />
             );
         }

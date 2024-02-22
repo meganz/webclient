@@ -62,20 +62,20 @@ MegaEvents.prototype.on = function(name, callback) {
  */
 class MEvent {
     constructor() {
-        this._callbacks = { };
+        this._callbacks = new Set();
     }
 
     invoke(...eventArgs) {
-        for (const callback of Object.values(this._callbacks)) {
+        for (const callback of this._callbacks) {
             callback(...eventArgs);
         }
     }
 
     addListener(callback) {
-        this._callbacks[callback] = callback;
+        this._callbacks.add(callback);
     }
 
     removeListener(callback) {
-        delete this._callbacks[callback];
+        this._callbacks.delete(callback);
     }
 }

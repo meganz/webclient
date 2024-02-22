@@ -326,25 +326,30 @@ var mobile = {
                     return;
                 }
 
-                if (status === 1) {
-                    mega.attr.get(u_handle, 'cardalmostexp', -2, true).always((res) => {
-                        if (res !== '1') {
-                            const banner = mobile.banner.show(
-                                l.card_expiry_title,
-                                l.card_expiry_msg,
-                                l.update_card, 'warning');
-                            banner.on('cta', () => loadSubPage('fm/account/paymentcard'));
-                            banner.on('close', () => mega.attr.set('cardalmostexp', '1', -2, true));
-                        }
-                    });
+                let bannerTitle;
+                let bannerDialog = u_attr && u_attr.b ? l.payment_card_update_details_b : l.payment_card_update_details;
+
+                // Expires next month (only show after the 15th of the current month)
+                if (status === 'expNextM') {
+                    bannerTitle = l.payment_card_exp_nxt_mnth;
                 }
-                else if (status === 2) {
-                    const banner = mobile.banner.show(
-                        l.card_expired,
-                        l.card_expired_msg,
-                        l.update_card, 'error', true);
-                    banner.on('cta', () => loadSubPage('fm/account/paymentcard'));
+                // Expires this month
+                else if (status === 'expThisM') {
+                    bannerTitle = l.payment_card_almost_exp;
                 }
+                // Expired
+                else if (status === 'exp') {
+                    bannerTitle = l.payment_card_exp_title;
+                    bannerDialog = u_attr && u_attr.b ? l.payment_card_at_risk_b : l.payment_card_at_risk;
+                }
+
+                const banner = mobile.banner.show(
+                    bannerTitle,
+                    bannerDialog,
+                    l.update_card,
+                    status === 'exp' ? 'error' : 'warning',
+                    false);
+                banner.on('cta', () => loadSubPage('fm/account/paymentcard'));
             }
         });
 
@@ -501,61 +506,6 @@ var mobile = {
             // Prevent double clicks
             return false;
         });
-    },
-
-    /**
-     * Initialize a toggle switch in mobile web.
-     * @param $container
-     * @param startingValue
-     * @param onChange
-     */
-    initSwitch: function ($container, startingValue, onChange) {
-        'use strict';
-
-        var self = this;
-
-        // Set inital state.
-        this.setSwitch($container, startingValue);
-
-        // Handle change event.
-        $container.off('tap').on('tap', function () {
-            var newState = self.toggleSwitch($container);
-            if (typeof onChange === 'function') {
-                onChange(newState);
-            }
-            return false;
-        });
-    },
-
-    /**
-     * Toggle a feature toggle switch to the opposite state.
-     * @param $container
-     */
-    toggleSwitch: function($container) {
-        'use strict';
-
-        if ($container.hasClass('toggle-on')) {
-            $container.removeClass('toggle-on');
-            return 0;
-        } else {
-            $container.addClass('toggle-on');
-            return 1;
-        }
-    },
-
-    /**
-     * Set a feature toggle switch to a given state.
-     * @param $container
-     * @param state
-     */
-    setSwitch: function($container, state) {
-        'use strict';
-
-        if (state) {
-            $container.addClass('toggle-on');
-        } else {
-            $container.removeClass('toggle-on');
-        }
     },
 
     /**
@@ -1052,16 +1002,13 @@ function accountUI() {
         mobile.settings.account.verifyDelete.init();
     }
     else if (subpath === 'notifications') {
-        mobile.settings.account.notifications.init();
+        mobile.settings.notifications.init();
     }
     else if (subpath.startsWith('notifications')) {
         loadSubPage('fm/account/notifications', 'override');
     }
     else if (subpath === 'file-management') {
         mobile.settings.fileManagement.init();
-    }
-    else if (subpath === 'file-management/link-options') {
-        mobile.settings.account.linksOptions.render();
     }
     else if (subpath === 'support') {
         mobile.settings.support.init();

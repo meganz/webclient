@@ -919,15 +919,8 @@
                     if (missingkeys[aHandle]) {
                         props.undecryptable = true;
                         props.classNames.push('undecryptable');
-
-                        if (aNode.t) {
-                            props.name = l[8686];// i.e. 'undecrypted folder'
-                            props.tooltip.push(l[8595]);
-                        }
-                        else {
-                            props.name = l[8687];// i.e. 'undecrypted file'
-                            props.tooltip.push(l[8602]);
-                        }
+                        props.name = aNode.t ? l[8686] : l[8687];
+                        props.tooltip.push(M.getUndecryptedLabel(aNode));
                     }
                 }
 

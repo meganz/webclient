@@ -74,7 +74,7 @@ MegaData.prototype.filterByParent = function(id) {
             .map((h) => M.d[h])
             .filter((n) => {
                 // Filter versioned file or undefined node.
-                if (!n || n.fv || n.s4 && n.p === M.RootID) {
+                if (!n || n.fv || n.s4 && n.p === M.RootID || M.gallery && !mega.gallery.isGalleryNode(n)) {
                     return false;
                 }
 

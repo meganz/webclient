@@ -1602,17 +1602,7 @@ scparser.$add('cce', () => {
     if (fminitialized && !folderlink) {
 
         delay('cce-action-packet', () => {
-
-            api.req({a: 'uq', pro: 1})
-                .then(({result: res}) => {
-                    if (typeof res === 'object') {
-                        M.showPaymentCardBanner(res.cce);
-                        if (M.account && res.cce) {
-                            M.account.cce = res.cce;
-                        }
-                    }
-                })
-                .catch(dump);
+            M.updatePaymentCardState().catch(dump);
         }, 2000);
     }
 });

@@ -111,7 +111,12 @@ function removeUInode(h, parent) {
                 $('.files-grid-view').addClass('hidden');
                 $('.grid-table.fm tbody tr').remove();
 
-                if (folderlink) {
+                if (M.gallery) {
+                    const lastToRemove = M.c[M.currentdirid] &&
+                        Object.values(M.c[M.currentdirid]).length === 1 && h in M.c[M.currentdirid];
+                    mega.gallery.showEmpty(M.currentdirid, lastToRemove);
+                }
+                else if (folderlink) {
                     $('.fm-empty-folder').removeClass('hidden');
                 }
                 else {
@@ -142,7 +147,14 @@ function removeUInode(h, parent) {
             if (!hasItems) {
 
                 __markEmptied();
-                if (M.dyh) {
+                if (M.gallery) {
+                    $('.files-grid-view').addClass('hidden');
+
+                    const lastToRemove = M.c[M.currentdirid] &&
+                        Object.values(M.c[M.currentdirid]).length === 1 && h in M.c[M.currentdirid];
+                    mega.gallery.showEmpty(M.currentdirid, lastToRemove);
+                }
+                else if (M.dyh) {
                     M.dyh('empty-ui');
                 }
                 else if (sharedFolderUI()) {

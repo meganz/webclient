@@ -650,36 +650,21 @@ MegaData.prototype.showContactVerificationDialog = function() {
 MegaData.prototype.showPaymentCardBanner = function(status) {
     'use strict';
 
-    $('.fm-notification-block.payment-card-status').removeClass('visible');
-
+    const $banner = $('.fm-notification-block.payment-card-status')
+        .removeClass('payment-card-almost-expired payment-card-expired visible');
     if (!status) {
         return;
     }
-    if (status === 1) {
-        mega.attr.get(u_handle, 'cardalmostexp', -2, true).always((res) => {
-            if (res !== '1') {
-                const $banner = $('.fm-notification-block.payment-card-almost-expired').addClass('visible');
 
-                $('i.close-banner', $banner).rebind('click', () => {
-                    $banner.removeClass('visible');
-                    mega.attr.set('cardalmostexp', '1', -2, true);
-                });
+    let bannerTitle;
+    let bannerDialog = u_attr && u_attr.b ? l.payment_card_update_details_b : l.payment_card_update_details;
+    let isExpiredClassName = 'payment-card-almost-expired';
+    // Expired
+    if (status === 'exp') {
+        bannerTitle = l.payment_card_exp_title;
+        bannerDialog = u_attr && u_attr.b ? l.payment_card_at_risk_b : l.payment_card_at_risk;
 
-                $('a', $banner)
-                    .rebind('click', loadSubPage.bind(null, 'fm/account/plan/account-card-info'));
-            }
-        });
-    }
-    else if (status === 2) {
-        const $banner = $('.fm-notification-block.payment-card-expired').addClass('visible');
-
-        $('i.close-banner', $banner).rebind('click', () => {
-            $banner.removeClass('visible');
-        });
-
-        $('a', $banner)
-            .rebind('click', loadSubPage.bind(null, 'fm/account/plan/account-card-info'));
-
+        isExpiredClassName = 'payment-card-expired';
         const $dialog = $('.payment-reminder.payment-card-expired');
 
         $('.close', $dialog).rebind('click', closeDialog);
@@ -692,6 +677,23 @@ MegaData.prototype.showPaymentCardBanner = function(status) {
 
         M.safeShowDialog('expired-card-dialog', $dialog);
     }
+    // Expires this month
+    else if (status === 'expThisM') {
+        bannerTitle = l.payment_card_almost_exp;
+    }
+    // Expires next month (only show from the 15th of the current month)
+    else if (status === 'expNextM') {
+        bannerTitle = l.payment_card_exp_nxt_mnth;
+    }
+    else {
+        return;
+    }
+
+    $('a', $banner).rebind('click', loadSubPage.bind(null, 'fm/account/plan/account-card-info'));
+
+    $banner.addClass(`visible ${isExpiredClassName}`);
+    $('.banner-title', $banner).text(bannerTitle);
+    $('.banner-txt', $banner).text(bannerDialog);
 };
 
 
@@ -988,15 +990,11 @@ mBroadcaster.once('fm:initialized', () => {
 
     if (u_attr && (u_attr.p || u_attr.b)) {
 
-        if (M.account) {
+        if (M.account && M.account.cce) {
             M.showPaymentCardBanner(M.account.cce);
         }
         else {
-            api.req({a: 'uq', pro: 1}).then(({result: res}) => {
-                if (typeof res === 'object' && res.cce) {
-                    M.showPaymentCardBanner(res.cce);
-                }
-            });
+            M.updatePaymentCardState().catch(dump);
         }
     }
 });

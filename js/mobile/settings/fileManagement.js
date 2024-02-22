@@ -1,44 +1,95 @@
 mobile.settings.fileManagement = Object.create(mobile.settingsHelper, {
     /**
-     * Initiate and render the page, fetch from cache if already inited.
+     * Initiate and render the page.
      *
-     * @returns {boolean} True if cached, undefined otherwise.
+     * @returns {void}
      */
     init: {
         value: function() {
             'use strict';
 
             if (this.domNode) {
-                this.show();
-                return true;
+                return this.render();
             }
 
-            this.domNode = this.generatePage('file-management');
+            this.domNode = this.generatePage('settings-file-management');
 
-            /* First Section */
-            const menuItems = [
-                /* {
-                    text: l[20168],
-                    icon: 'sprite-mobile-fm-mono icon-clock-rotate-thin-outline',
-                    href: 'fm/account/file-management/file-version',
-                },*/
-                /* {
-                    text: l.settings_file_management_rubbish_cleaning,
-                    icon: 'sprite-mobile-fm-mono icon-trash-thin-outline',
-                    href: 'fm/account/file-management/rubbish-cleaning',
-                },*/
+            const container = mCreateElement('div', {
+                'class': 'mobile-settings-content',
+            }, this.domNode);
+
+            const form = mCreateElement('div', {
+                'class': 'mobile-settings-form',
+            }, container);
+
+            const toggleList = mCreateElement('div', {
+                'class': 'mobile-settings-list',
+            }, form);
+
+            // Options for toggle list
+            const toggleArray = [
                 {
-                    text: l.setting_section_plink,
-                    icon: 'sprite-mobile-fm-mono icon-link-thin-outline',
-                    href: 'fm/account/file-management/link-options',
-                },
+                    value: 'nowarnpl',
+                    id: 'nowarnpl',
+                    label: l.setting_section_plink,
+                    sublabel: l.setting_plink_warn
+                }
             ];
 
-            for (const item of menuItems) {
-                this.generateMenuItem(this.domNode, item);
+            // Build toggle components and store in togglesComponents array by id
+            this.togglesComponents = [];
+            for (const toggle of toggleArray){
+                const toggleComponent = new MegaMobileToggleButton({
+                    parentNode: toggleList,
+                    componentClassname: 'mega-toggle-button',
+                    ...toggle,
+                    role: 'switch',
+                    onChange: () => {
+                        mega.config.setn(toggleComponent.input.name, toggleComponent.checked ^ 1);
+                    }
+                });
+                this.togglesComponents[toggle.id] = toggleComponent;
             }
+
+            // Fetch account data, then render.
+            M.accountData(() => {
+                mega.config.fetch();
+                this.render();
+            }, false, true);
+        },
+    },
+
+    render: {
+        value: function() {
+            'use strict';
+
+            this.domNode.classList.add('default-page', 'default-form');
+
+            this.setTogglesStatus();
 
             this.show();
         },
     },
+
+    /**
+     * Set the status of each of the toggles.
+     *
+     * @returns {void}
+     */
+    setTogglesStatus: {
+        value: function() {
+            'use strict';
+
+            loadingDialog.show();
+
+            for (const id in this.togglesComponents) {
+                if (this.togglesComponents.hasOwnProperty(id)) {
+                    const toggleComponent = this.togglesComponents[id];
+                    toggleComponent.setButtonState(!mega.config.get(toggleComponent.input.name));
+                }
+            }
+
+            loadingDialog.hide();
+        },
+    }
 });

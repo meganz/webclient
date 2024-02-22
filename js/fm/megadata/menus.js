@@ -233,8 +233,8 @@ MegaData.prototype.menuItems = async function menuItems() {
             }
 
             // This is just to make sure the source root is on the cloud drive
-            if (mega.rewind && sourceRoot === M.RootID) {
-                items['.rewind-item'] = !!mega.rewind.contextMenu;
+            if (mega.rewind && sourceRoot === M.RootID && !!mega.rewind.contextMenu) {
+                items['.rewind-item'] = 1;
             }
         }
         else {
@@ -750,9 +750,10 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
             const nodeRights = M.getNodeRights(M.currentCustomView.nodeID || M.currentdirid);
             const h = M.currentdirid.split('/').pop();
             const n = M.getNodeByHandle(h);
+            const nodeRoot = M.getNodeRoot(h);
 
             if (nodeRights && M.currentrootid !== M.RubbishID && M.currentrootid !== M.InboxID
-                && M.getNodeRoot(h) !== M.InboxID) {
+                && nodeRoot !== M.InboxID) {
 
                 if (M.currentrootid === 'contacts') {
                     $(menuCMI).filter('.addcontact-item').removeClass('hidden');
@@ -776,7 +777,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
                         $(menuCMI).filter('.folderupload-item').removeClass('hidden');
                     }
 
-                    if (mega.rewind) {
+                    if (nodeRoot !== 's4' && mega.rewind && !!mega.rewind.contextMenu) {
                         $(menuCMI).filter('.rewind-item').removeClass('hidden');
                     }
                     // Flag added for share folder while on it at context menu
@@ -1016,7 +1017,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
             else {
                 flt += ',.findupes-item';
 
-                if (mega.rewind) {
+                if (mega.rewind && !!mega.rewind.contextMenu) {
                     flt += ',.rewind-item';
                 }
             }

@@ -1712,7 +1712,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 rate = 1.5;
             }
             else if ($this.hasClass('2x')) {
-                cl = '15x';
+                cl = '2x';
                 rate = 2;
             }
 
@@ -3477,9 +3477,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
     var miCollectedBytes = 0;
     var miCollectRunning = 0;
-    var miCollectProcess = function() {
-        if (miCollectedBytes > 0x1000000 || M.chat) {
-            return 0xDEAD;
+    const miCollectProcess = function(force, nodes) {
+        // @todo improve depending whether 'nodes' is provided..
+        if (!force && miCollectedBytes > 0x4000000 || M.chat) {
+            return;
         }
 
         if (miCollectRunning) {
@@ -3494,7 +3495,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             return;
         }
 
-        delay('mediainfo:collect', function() {
+        delay('mediainfo:collect', () => {
             miCollectRunning = true;
 
             if (d) {
@@ -3509,9 +3510,13 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 }
                 miCollectRunning = false;
             };
+            nodes = nodes || M.v;
 
-            MediaInfoLib.collect(M.v)
-                .then(function(res) {
+            const opt = {
+                maxAtOnce: force && nodes.length || 32
+            };
+            MediaInfoLib.collect(nodes, opt)
+                .then((res) => {
                     var pending = 0;
                     var process = function() {
                         if (--pending < 1) {
@@ -3560,14 +3565,27 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     }
                     finish();
                 });
-        }, 4e3);
+        }, force || 4e3);
     };
 
     const dayOfMonth = new Date().getDate();
 
-    if (!localStorage.noMediaCollect && dayOfMonth > 127) {
-        mBroadcaster.addListener('mega:openfolder', miCollectProcess);
-        mBroadcaster.addListener('mediainfo:collect', miCollectProcess);
+    if (!localStorage.noMediaCollect) {
+        const shouldRun = () => {
+            const n = M.getNodeByHandle(M.currentCustomView.nodeID || M.currentdirid);
+
+            return n && mega.fileRequest.publicFolderExists(n.h);
+        };
+        const collector = tryCatch((...args) => {
+            const force = args[0] > 0;
+
+            if (force || dayOfMonth > 27 || shouldRun()) {
+
+                miCollectProcess.apply(self, force && args || []);
+            }
+        });
+        mBroadcaster.addListener('mega:openfolder', collector);
+        mBroadcaster.addListener('mediainfo:collect', collector);
     }
 
 })(self);
@@ -3878,7 +3896,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
                     URL.revokeObjectURL(src);
                     elm.ondurationchange = null;
-                    resolve(freeze({width, height, duration, video: [...videoTracks], audio: [...audioTracks]}));
+                    resolve(freeze({width, height, duration, video: videoTracks, audio: audioTracks}));
                 }
             };
             elm.src = URL.createObjectURL(entry);

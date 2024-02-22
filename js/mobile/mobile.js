@@ -339,7 +339,7 @@ var mobile = {
                 }
                 // Expired
                 else if (status === 'exp') {
-                    bannerTitle = l.payment_card_exp_title;
+                    bannerTitle = l.payment_card_exp_b_title;
                     bannerDialog = u_attr && u_attr.b ? l.payment_card_at_risk_b : l.payment_card_at_risk;
                 }
 

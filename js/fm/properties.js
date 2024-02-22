@@ -180,13 +180,7 @@
                 }
                 if (isUndecrypted) {
                     $dialog.addClass('undecryptable');
-
-                    if (n.t) {
-                        notificationText += l[8595];
-                    }
-                    else {
-                        notificationText += l[8602];
-                    }
+                    notificationText += M.getUndecryptedLabel(n);
                 }
                 showToast('clipboard', notificationText);
             }

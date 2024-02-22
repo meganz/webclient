@@ -7885,7 +7885,8 @@ body.de .mega-dialog.contact-picker-widget {
         .es .mega-dialog.setup-two-factor-verify .pin-input {
             font: var(--text-h3);
         }
-        .mega-dialog.verify-two-factor-login .warning-text-field {
+        .mega-dialog.verify-two-factor-login .warning-text-field,
+        .mega-dialog.two-factor-verify-action .warning-text-field {
             background: var(--banner-background-error);
             border: 1px solid var(--banner-border-error);
             border-radius: 2px;

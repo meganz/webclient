@@ -79,7 +79,8 @@ twofactor.loginDialog = {
         var $dialog = $('.mega-dialog.verify-two-factor-login');
         var $pinCodeInput = $dialog.find('.pin-input');
         var $submitButton = $dialog.find('.submit-button');
-        var $warningText = $dialog.find('.warning-text-field');
+        var $warningText = $('.warning-text-field.failed', $dialog);
+        var $warningText2 = $('.warning-text-field.empty', $dialog);
 
         // On keyup or clicking out of the text field
         $pinCodeInput.off('keyup blur').on('keyup blur', function(event) {
@@ -91,6 +92,7 @@ twofactor.loginDialog = {
 
             // Hide previous warnings for incorrect PIN codes
             $warningText.addClass('v-hidden');
+            $warningText2.addClass('hidden');
 
             // Trim whitespace from the ends of the PIN entered
             var pinCode = $pinCodeInput.val();
@@ -123,16 +125,25 @@ twofactor.loginDialog = {
         var $dialog = $('.mega-dialog.verify-two-factor-login');
         var $pinCodeInput = $dialog.find('.pin-input');
         var $submitButton = $dialog.find('.submit-button');
+        var $warningText = $('.warning-text-field.empty', $dialog);
 
         // On Submit button click
         $submitButton.rebind('click', () => {
 
             // Get the Google Authenticator PIN code from the user
             var pinCode = $.trim($pinCodeInput.val());
-            if (!pinCode || $submitButton.hasClass('loading')) {
+            if ($submitButton.hasClass('loading')) {
                 return;
             }
+
             this.resetState();
+
+            // Submit empty string
+            if (!pinCode) {
+                $warningText.removeClass('hidden');
+                $pinCodeInput.trigger('focus');
+                return;
+            }
 
             // Get cached data from the login form
             const {email, password, rememberMe} = security.login;
@@ -203,7 +214,7 @@ twofactor.loginDialog = {
         'use strict';
 
         var $dialog = $('.mega-dialog.verify-two-factor-login');
-        var $warningText = $dialog.find('.warning-text-field');
+        var $warningText = $('.warning-text-field.failed', $dialog);
         var $pinCodeInput = $dialog.find('.pin-input');
         var $submitButton = $dialog.find('.submit-button');
 
@@ -230,13 +241,15 @@ twofactor.loginDialog = {
         'use strict';
 
         var $dialog = $('.mega-dialog.verify-two-factor-login');
-        var $warningText = $dialog.find('.warning-text-field');
+        var $warningText = $('.warning-text-field.failed', $dialog);
+        var $warningText2 = $('.warning-text-field.empty', $dialog);
         var $pinCodeInput = $dialog.find('.pin-input');
         var $submitButton = $dialog.find('.submit-button');
 
         // Hide loading spinner, warning text and clear the text input
         $submitButton.removeClass('loading');
         $warningText.addClass('v-hidden');
+        $warningText2.addClass('hidden');
         $pinCodeInput.val('');
     },
 
@@ -634,13 +647,15 @@ twofactor.verifySetupDialog = {
         'use strict';
 
         var $pinCode = this.$dialog.find('.pin-input');
-        var $warningText = this.$dialog.find('.information-highlight.warning');
+        var $warningText = this.$dialog.find('.information-highlight.failed');
+        var $warningText2 = this.$dialog.find('.information-highlight.empty');
         var $successText = this.$dialog.find('.information-highlight.success');
         var $closeButton = this.$dialog.find('button.js-close');
 
         // Clear the text input, remove the warning/success boxes, unhide the close button
         $pinCode.val('');
         $warningText.addClass('hidden');
+        $warningText2.addClass('hidden');
         $successText.addClass('hidden');
         $closeButton.removeClass('hidden');
     },
@@ -680,7 +695,8 @@ twofactor.verifySetupDialog = {
 
         // Cache selectors
         var $pinCodeInput = this.$dialog.find('.pin-input');
-        var $warningText = this.$dialog.find('.information-highlight.warning');
+        var $warningText = this.$dialog.find('.information-highlight.failed');
+        var $warningText2 = this.$dialog.find('.information-highlight.empty');
         var $verifyButton = this.$dialog.find('.next-button');
 
         // On keyup or clicking out of the text field
@@ -688,6 +704,7 @@ twofactor.verifySetupDialog = {
 
             // Hide previous warnings for incorrect PIN codes
             $warningText.addClass('hidden');
+            $warningText2.addClass('hidden');
 
             // If Enter key is pressed, verify the code
             if (event.keyCode === 13) {
@@ -730,8 +747,9 @@ twofactor.verifySetupDialog = {
         var $backButton = this.$dialog.find('.back-button');
         var $closeButton = this.$dialog.find('button.js-close');
         var $verifyButton = this.$dialog.find('.next-button');
-        var $warningText = this.$dialog.find('.information-highlight.warning');
+        var $warningText = this.$dialog.find('.information-highlight.failed');
         var $successText = this.$dialog.find('.information-highlight.success');
+        var $warningText2 = this.$dialog.find('.information-highlight.empty');
 
         // On button click
         $verifyButton.rebind('click', function() {
@@ -743,12 +761,19 @@ twofactor.verifySetupDialog = {
 
             // Hide old warning
             $warningText.addClass('hidden');
+            $warningText2.addClass('hidden');
 
             // If the operation hasn't succeeded yet
             if ($successText.hasClass('hidden')) {
 
                 // Get the Google Authenticator PIN code from the user
                 var pinCode = $.trim($pinCodeInput.val());
+
+                if (pinCode === '' || pinCode.length !== 6 || Number.isInteger(pinCode)) {
+                    $warningText2.removeClass('hidden');
+                    $verifyButton.removeClass('disabled');
+                    return;
+                }
 
                 // Run Multi-Factor Auth Setup (mfas) request
                 api.req({a: 'mfas', mfa: pinCode})
@@ -908,9 +933,12 @@ twofactor.verifyActionDialog = {
         // Cache selectors
         var $pinCodeInput = this.$dialog.find('.pin-input');
         var $submitButton = this.$dialog.find('.submit-button');
+        var $warningText = this.$dialog.find('.information-highlight.warning');
 
         // On keyup or clicking out of the text field
         $pinCodeInput.off('keyup blur').on('keyup blur', function(event) {
+
+            $warningText.addClass('hidden');
 
             // If Enter key is pressed, submit the login code
             if (event.keyCode === 13) {
@@ -943,6 +971,7 @@ twofactor.verifyActionDialog = {
         // Cache selectors
         var $pinCodeInput = this.$dialog.find('.pin-input');
         var $submitButton = this.$dialog.find('.submit-button');
+        var $warningText = this.$dialog.find('.information-highlight.warning');
 
         // On Submit button click/tap
         $submitButton.rebind('click', function() {
@@ -950,11 +979,17 @@ twofactor.verifyActionDialog = {
             // Get the Google Authenticator PIN code from the user
             var pinCode = $.trim($pinCodeInput.val());
 
-            // Close the modal dialog
-            twofactor.verifyActionDialog.closeDialog();
+            if (pinCode === '' || pinCode.length !== 6 || Number.isInteger(pinCode)) {
+                $warningText.removeClass('hidden');
+                $pinCodeInput.trigger('focus');
+            }
+            else {
+                // Close the modal dialog
+                twofactor.verifyActionDialog.closeDialog();
 
-            // Send the PIN code to the callback
-            completeCallback(pinCode);
+                // Send the PIN code to the callback
+                completeCallback(pinCode);
+            }
         });
     },
 
@@ -1019,9 +1054,11 @@ twofactor.verifyActionDialog = {
 
         var $pinCodeInput = this.$dialog.find('.pin-input');
         var $submitButton = this.$dialog.find('.submit-button');
+        var $warningText = this.$dialog.find('.information-highlight.warning');
 
         // Hide loading spinner and clear the text input
         $submitButton.removeClass('active');
         $pinCodeInput.val('');
+        $warningText.addClass('hidden');
     }
 };

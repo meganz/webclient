@@ -2145,6 +2145,23 @@ mega.gallery.secKeys = {
     cdvideos: 'cloud-drive-videos'
 };
 
+mega.gallery.handleNodeRemoval = (n) => {
+    'use strict';
+
+    if (M.isAlbumsPage()) {
+        mega.gallery.albums.onCDNodeRemove(n);
+        mega.gallery.nodeUpdated = true;
+    }
+    else if (M.gallery) {
+        mega.gallery.checkEveryGalleryDelete(n.h);
+        mega.gallery.albums.onCDNodeRemove(n);
+    }
+    else {
+        mega.gallery.nodeUpdated = true;
+        mega.gallery.albumsRendered = false;
+    }
+};
+
 /**
  * Checking if the file is even available for the gallery
  * @param {String|MegaNode|Object} n An ufs-node, or filename

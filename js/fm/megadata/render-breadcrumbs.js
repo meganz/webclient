@@ -51,6 +51,12 @@
         else {
             scope = document.querySelector('.fm-right-files-block .fm-right-header .fm-breadcrumbs-wrapper');
         }
+
+        if (!scope) {
+            console.assert(false, 'invalid scope');
+            return;
+        }
+
         let items = this.getPath(fileHandle || this.currentdirid);
         const hasRewind = scope.classList.contains('rewind');
 

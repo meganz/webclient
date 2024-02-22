@@ -467,7 +467,7 @@ lazy(mega, 'commercials', () => {
             newIframe.height = comm.h;
             newIframe.classList.add('hidden');
             newIframe.onload = () => {
-                if (activeSlots.includes(commID.toLowerCase()) && !commsCovered) {
+                if (typeof commID === 'string' && activeSlots.includes(commID.toLowerCase()) && !commsCovered) {
                     unhideComms([commID]);
                 }
                 else {

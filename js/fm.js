@@ -2499,7 +2499,9 @@ function initShareDialogMultiInput(alreadyAddedContacts) {
                     scrollToElement($scrollBlock, $listedItemEle);
                 }
 
-                if ($.contactPickerSelected.indexOf($listedItemHandle) === -1) {
+                if ($.contactPickerSelected
+                    && !$.contactPickerSelected.includes($listedItemHandle)) {
+
                     $listedItemEle.trigger('click');
                 }
 

@@ -159,10 +159,8 @@ mobile.uploadOverlay = {
      * @param {Object} ul Upload transfer
      * @returns {void}
      */
-    finish: function(ul) {
+    finish: tryCatch(function(ul) {
         'use strict';
-
-        eventlog(99678);
 
         const uploadTransferComponent = this.uploadTransfers[`ul_${ul.id}`];
 
@@ -179,7 +177,9 @@ mobile.uploadOverlay = {
 
             this.updateHeaderAndButtons();
         }
-    },
+
+        eventlog(99678);
+    }),
 
     /**
     * Update the header and buttons in upload container overlay based on the status of uploads
@@ -391,27 +391,29 @@ mobile.uploadOverlay = {
     updateGeneralActions: function() {
         'use strict';
 
-        let pauseCont = 0;
-        let resumeCont = 0;
-        for (const id in this.uploadTransfers) {
-            if (this.uploadTransfers.hasOwnProperty(id)) {
-                const uploadTransferComponent = this.uploadTransfers[id];
-                if (uploadTransferComponent.pauseButton.visible === true) {
-                    pauseCont++;
-                }
-                else if (uploadTransferComponent.resumeButton.visible === true) {
-                    resumeCont++;
+        if (Object.keys(this.uploadTransfers || {}).length > 0) {
+            let pauseCont = 0;
+            let resumeCont = 0;
+            for (const id in this.uploadTransfers) {
+                if (this.uploadTransfers.hasOwnProperty(id)) {
+                    const uploadTransferComponent = this.uploadTransfers[id];
+                    if (uploadTransferComponent.pauseButton.visible === true) {
+                        pauseCont++;
+                    }
+                    else if (uploadTransferComponent.resumeButton.visible === true) {
+                        resumeCont++;
+                    }
                 }
             }
-        }
 
-        if (pauseCont === 0) {
-            mega.ui.overlay.actionsNode.querySelector('.pauseAll').component.hide();
-            mega.ui.overlay.actionsNode.querySelector('.resumeAll').component.show();
-        }
-        else if (resumeCont === 0) {
-            mega.ui.overlay.actionsNode.querySelector('.pauseAll').component.show();
-            mega.ui.overlay.actionsNode.querySelector('.resumeAll').component.hide();
+            if (pauseCont === 0) {
+                mega.ui.overlay.actionsNode.querySelector('.pauseAll').component.hide();
+                mega.ui.overlay.actionsNode.querySelector('.resumeAll').component.show();
+            }
+            else if (resumeCont === 0) {
+                mega.ui.overlay.actionsNode.querySelector('.pauseAll').component.show();
+                mega.ui.overlay.actionsNode.querySelector('.resumeAll').component.hide();
+            }
         }
     },
 

@@ -5,7 +5,7 @@
 
 .recovery-key.container {
     width: 100%;
-    max-width: var(--mobile-tablet-elem-width);
+    max-width: var(--mobile-elem-max-width);
     margin: 24px 0;
     display: flex;
     flex-flow: column nowrap;

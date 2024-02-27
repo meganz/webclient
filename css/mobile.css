@@ -2345,8 +2345,7 @@ body.de .mobile.verify-number .vn-input-wrapper .verify-number-code input::place
 }
 .signin-register-block .estimator-loading-icon,
 .recover-account-page .estimator-loading-icon,
-.bus-pw-confirm-block .estimator-loading-icon,
-.password-reminder-overlay .estimator-loading-icon {
+.bus-pw-confirm-block .estimator-loading-icon {
     background: rgba(0, 0, 0, 0) url("../images/mega/ajax-loader-gray.gif") no-repeat scroll 0 0 / 16px 16px;
     display: none;
     height: 16px;
@@ -5725,7 +5724,7 @@ textarea.mobile.support-text-field {
     background-color: white;
     box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.1);
 }
-.mobile .mobile.red-button.dl-browser, .mobile .unsub .default-white-button, .mobile.password-reminder-overlay .default-white-button {
+.mobile .mobile.red-button.dl-browser, .mobile .unsub .default-white-button {
     background: #FFFFFF;
     background-image: linear-gradient(-180deg, rgba(255,255,255,0.50) 0%, rgba(238,238,238,0.75) 100%);
     border: 1px solid #DFDFDF;
@@ -5733,7 +5732,7 @@ textarea.mobile.support-text-field {
     border-radius: 4px;
     color: #555;
 }
-.mobile .mobile.red-button.dl-browser.disabled, .mobile.password-reminder-overlay .default-white-button.disabled {
+.mobile .mobile.red-button.dl-browser.disabled {
     background: #eee;
     background-image: linear-gradient(-180deg, rgba(255,255,255,0.20) 0%, rgba(238,238,238,0.50) 100%);
     border: 1px solid #eee;
@@ -9764,103 +9763,6 @@ code, c {
         opacity: 0.5;
     }
 }
-/** Password Reminder Overlay **/
-.mobile.password-reminder-overlay .dont-show-again-container {
-    margin-top: 12px;
-    text-align: center;
-}
-
-.mobile.password-reminder-overlay .dont-show-again-container .checkbox-container {
-    display: inline-block;
-}
-
-.mobile.password-reminder-overlay .dont-show-again-container .checkboxOff {
-    margin-right: 0;
-}
-
-.mobile.password-reminder-overlay .try-password-container .signin-input {
-    margin-left: 0;
-    margin-right: 0;
-}
-.mobile.password-reminder-overlay .export-button {
-    margin-top: 30px;
-}
-
-.mobile.password-reminder-overlay .pass-reminder-container .result-text {
-    font-size: 12px;
-    letter-spacing: 0;
-    text-align: left;
-    line-height: 1.5;
-    white-space: normal;
-    display: inline-block;
-    width: calc(100% - 32px);
-    font-family: 'LatoWeb', 'source_sans_proregular', sans-serif;
-}
-
-.mobile.password-reminder-overlay .pass-reminder-container .result-txt.wrong .result-text {
-    color: #D90007;
-}
-.mobile.password-reminder-overlay .prd-reset-password-text {
-    font-size: 14px;
-    color: #676D75;
-    letter-spacing: 0;
-    text-align: center;
-    line-height: 1.5;
-    white-space: normal;
-    margin: 12px auto 20px;
-    font-family: 'LatoWeb', 'source_sans_proregular', sans-serif
-}
-.mobile.password-reminder-overlay .prd-reset-password-text .pass-reminder.forgot-password {
-    color: #00BFA5;
-    text-decoration: underline;
-    cursor: pointer;
-    margin-left: 8px;
-    vertical-align: top;
-    font-size: 14px;
-    line-height: 20px;
-}
-
-.mobile.password-reminder-overlay .pass-reminder-container .tiny-icon {
-    margin-right: 8px;
-}
-.mobile.password-reminder-overlay .mobile.buttons .dialog-body-text {
-    margin-top: 24px;
-    position: relative;
-    padding-top: 16px;
-    color: #999;
-}
-.mobile.password-reminder-overlay .mobile.buttons .dialog-body-text::before {
-    content: "";
-    height: 1px;
-    width: 100%;
-    left: 0;
-    background-color: rgba(0,0,0,0.1);
-    position: absolute;
-    display: inline-block;
-    top: 0;
-}
-.mobile.password-reminder-overlay .mobile.text-button {
-    margin: 0 auto;
-}
-.mobile.password-reminder-overlay .mobile.head-icon {
-    background-image: url(../images/mobile/mobile-sprite.png);
-    background-repeat: no-repeat;
-    background-position: -11px -3247px;
-    width: 88px;
-    height: 88px;
-    margin-top: 30px;
-    display: inline-block;
-}
-
-.mobile.password-reminder-overlay .mobile.change-password-button {
-    display: none;
-}
-.mobile.password-reminder-overlay.wrong .mobile.change-password-button {
-    display: block;
-}
-
-
-/** End Password Reminder Overlay **/
 
 .voucher-info-redeem {
     display: table;

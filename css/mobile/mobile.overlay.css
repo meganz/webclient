@@ -64,7 +64,8 @@
     height: 100%;
 }
 
-.mega-overlay.overlay-wrap .title {
+.mega-overlay.overlay-wrap .title,
+.mega-overlay.overlay-wrap .image {
     align-self: flex-start;
 }
 .overlay-wrap .title h1 {
@@ -78,7 +79,8 @@
     color: var(--mobile-text-primary);
     margin: 0;
 }
-.mega-overlay.overlay-wrap .title.centered {
+.mega-overlay.overlay-wrap .title.centered,
+.mega-overlay.overlay-wrap .image.centered {
     align-self: center;
 }
 .overlay-wrap .subtitle {
@@ -160,11 +162,25 @@
     background-image: url("../../images/mobile/reload.png");
 }
 
+.overlay-wrap .image i.bell {
+    background-image: url("../../images/mobile/bell.png");
+}
+.overlay-wrap .image i.password {
+    background-image: url("../../images/mobile/password.png");
+}
+
 .overlay-wrap .image i.key,
 .overlay-wrap .image i.reload {
     background-size: contain;
     width: 96px;
     height: 96px;
+}
+
+.overlay-wrap .image i.bell,
+.overlay-wrap .image i.password {
+    background-size: contain;
+    width: 64px;
+    height: 64px;
 }
 
 @media only screen and (orientation: landscape) and (max-height: 359px) {

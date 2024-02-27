@@ -1855,7 +1855,7 @@ function logStaticServerFailure(errorType, filename, staticPathToLog) {
 
     // Send log. NB: Not using staticpath global here, in case it changed in the main thread
     // and due to the onIdle timeout below it hasn't actually sent the log yet
-    onIdle(function() {
+    setTimeout(function() {
         var xhr = getxhr();
         xhr.open('POST', apipath + 'cs?id=0', true);
         xhr.send(
@@ -1914,7 +1914,7 @@ function siteLoadError(error, filename) {
     console.error(message);
     contenterror = 1;
 
-    if (window.sleTick) {
+    if (window.sleTick || window.top !== window) {
         return;
     }
 
@@ -4143,7 +4143,7 @@ else if (!browserUpdate) {
         voucher = localStorage.voucher !== undefined || page.substr(0, 7) === 'voucher';
         dl_res = page[0] === '!' || page[0] === 'E' && page[1] === '!' || page.substr(0, 5) === 'file/';
 
-        if (localStorage === u_storage) {
+        if (localStorage === u_storage || is_iframed) {
             ack();
         }
         else {
@@ -4164,7 +4164,7 @@ else if (!browserUpdate) {
                             data.sid = sessionStorage.sid;
                         }
 
-                        onIdle(function() {
+                        setTimeout(function() {
                             setLSItem('sb!sid', data);
                         });
                     }
@@ -4343,7 +4343,7 @@ function tryCatch(fn, onerror)
             }
 
             if (typeof onerror === 'function') {
-                onIdle(onerror.bind(null, e));
+                setTimeout(onerror.bind(null, e));
             }
         }
     };

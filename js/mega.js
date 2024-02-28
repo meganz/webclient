@@ -4144,8 +4144,7 @@ lazy(self, 'thumbnails', () => {
 lazy(fm_thumbnails, 'exclude', () => {
     'use strict';
     const res = {
-        recents: 5,
-        favourites: 7
+        recents: 5
     };
     return Object.setPrototypeOf(res, null);
 });

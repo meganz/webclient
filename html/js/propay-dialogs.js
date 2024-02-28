@@ -2101,27 +2101,12 @@ var addressDialog = {
         this.extraDetails.city = fieldValues['city'];
         this.extraDetails.zip_code = fieldValues['postcode'];
         this.extraDetails.country = country;
-        this.extraDetails.recurring = false;
+        this.extraDetails.recurring = true;
         this.extraDetails.taxCode = taxCode;
 
         // If the country is US or Canada, add the state by stripping the country code off e.g. to get QC from CA-QC
         if ((country === 'US') || (country === 'CA')) {
             this.extraDetails.state = state.substr(3);
-        }
-
-        // check if we are coming from business account register
-        if (!this.businessPlan || !this.userInfo) {
-            // Get the value for whether the user wants the plan to renew automatically
-            var autoRenewCheckedValue = $('.renewal-options-list input:checked', '.payment-section').val();
-
-            // If the provider supports recurring payments and the user wants the plan to renew automatically
-            if (autoRenewCheckedValue === 'yes') {
-                this.extraDetails.recurring = true;
-            }
-        }
-        else {
-            // in business accounts recurring is mandatory
-            this.extraDetails.recurring = true;
         }
 
         // Hide the dialog so the loading one will show, then proceed to pay

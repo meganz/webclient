@@ -1,6 +1,6 @@
 /**
  * Functionality for the Pro page Step 2 where the user has chosen their Pro plan and now they
- * will choose the payment provider, plan duration and whether they want recurring/non-recurring.
+ * will choose the payment provider and plan duration.
  */
 pro.propay = {
 
@@ -322,7 +322,6 @@ pro.propay = {
         // Show payment duration (e.g. month or year) and renewal option radio options
         pro.propay.renderPlanDurationOptions(discountInfo);
         pro.propay.initPlanDurationClickHandler();
-        pro.propay.initRenewalOptionClickHandler(discountInfo);
 
         // Hide/show Argentian warning message depending on ipcc
         if (u_attr.ipcc === 'AR') {
@@ -710,10 +709,10 @@ pro.propay = {
 
         // Special handling for PRO Lite (account level 4) and Pro Flexi (account level 101)
         if (pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_LITE) {
-            iconClass = 'icon-crests-lite-details';
+            iconClass = 'sprite-fm-uni icon-crests-lite-details';
         }
         else if (pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
-            iconClass = 'icon-crests-pro-flexi-details';
+            iconClass = 'sprite-fm-uni icon-crests-pro-flexi-details';
         }
 
         // Add svg icon class (for desktop and mobile)
@@ -851,14 +850,9 @@ pro.propay = {
             price = formatCurrency(localPrice, currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY]) + '*';
         }
 
-        // Get the value for whether the user wants the plan to renew automatically
-        let recurringEnabled = false;
-        const autoRenewCheckedValue = $('.renewal-options-list input:checked', this.$page).val();
-
-        // If the provider supports recurring payments and the user wants the plan to renew automatically
-        if (selectedProvider.supportsRecurring && (autoRenewCheckedValue === 'yes')) {
-            recurringEnabled = true;
-        }
+        // Set the value for whether the plan should renew automatically
+        // based on whether the provider supports doing so
+        const recurringEnabled = selectedProvider.supportsRecurring;
 
         // Set text
         var subscribeOrPurchase = (recurringEnabled) ? l[23675] : l[6190];
@@ -947,13 +941,12 @@ pro.propay = {
             }
         }
 
-        // Always show the extra Question 3 recurring option section if the provider supports recurring.
-        // The user can then toggle whether they want a recurring plan or not with the radio buttons.
-        if (selectedProvider.supportsRecurring) {
+        // Show the extra Question 3 recurring option section if the plan being bought
+        // is Pro Flexi (forced recurring)
+        if (currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
             $('.renewal-option', this.$page).removeClass('hidden');
         }
         else {
-            // Otherwise it's a one off only provider, hide the extra information
             $('.renewal-option', this.$page).addClass('hidden');
         }
 
@@ -1089,35 +1082,6 @@ pro.propay = {
         discountRecurringText = discountRecurringText.replace('%3', price);
 
         return discountRecurringText;
-    },
-
-    /**
-     * Add click handler for the radio buttons which are used for selecting the plan/subscription duration
-     */
-    initRenewalOptionClickHandler: function(discountInfo) {
-
-        'use strict';
-
-        var $renewalOptions = $('.renewal-options-list .renewal-option', 'body');
-
-        // Add click handler
-        $renewalOptions.rebind('click', function() {
-
-            var $this = $(this);
-
-            // Remove checked state on the other buttons
-            $('.membership-radio', $renewalOptions).removeClass('checked');
-            $('.membership-radio-label', $renewalOptions).removeClass('checked');
-            $('input', $renewalOptions).prop('checked', false);
-
-            // Add checked state to just to the clicked one
-            $('.membership-radio', $this).addClass('checked');
-            $('.membership-radio-label', $this).addClass('checked');
-            $('input', $this).prop('checked', true);
-
-            // Update the wording for one-time or recurring
-            pro.propay.updateTextDependingOnRecurring(discountInfo);
-        });
     },
 
     /**
@@ -1606,11 +1570,8 @@ pro.propay = {
             else if (pro.propay.proPaymentMethod.indexOf('sabadell') === 0) {
                 pro.lastPaymentProviderId = sabadell.gatewayId; // 17
 
-                // Get the value for whether the user wants the plan to renew automatically
-                var autoRenewCheckedValue = $('.renewal-options-list input:checked', '.payment-section').val();
-
-                // If the provider supports recurring payments and the user wants the plan to renew automatically
-                extra.recurring = autoRenewCheckedValue === 'yes';
+                // If the provider supports recurring payments set extra.recurring as true
+                extra.recurring = true;
             }
             else if (pro.propay.proPaymentMethod.toLowerCase().indexOf('stripe') === 0) {
                 Object.assign(extra, addressDialog.extraDetails);

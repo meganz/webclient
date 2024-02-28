@@ -1096,8 +1096,13 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a href="https://mega.io/terms/#Refunds" target="_blank" rel="noopener noreferrer">')
         .replace('[/A]', '</a>');
     l[10630] = escapeHTML(l[10630])
-        .replace('[A]', '<a href="https://mega.io/terms/#Refunds" target="_blank" rel="noopener noreferrer">')
-        .replace('[/A]', '</a>');
+        .replace('[A1]',
+                 `<a target="_blank" href="https://mega.io/terms#RecurringPaidSubscriptions">`)
+        .replace('[A2]',
+                 `<a target="_blank" href="https://mega.io/terms#Refunds">`)
+        .replace('[A3]',
+                 `<a target="_blank" href="https://help.mega.io/plans-storage/payments-billing/cancel-subscription">`)
+        .replace(/\[\/A\d]/g, '</a>');
     l[10634] = escapeHTML(l[10634])
         .replace('[A]', '<a href="https://mega.nz/support" target="_blank" rel="noopener noreferrer">')
         .replace('[/A]', '</a>');

@@ -35,17 +35,8 @@ function removeUInode(h, parent) {
         }
     }
 
-    if (M.isAlbumsPage()) {
-        mega.gallery.albums.onCDNodeRemove(n);
-        mega.gallery.nodeUpdated = true;
-    }
-    else if (M.gallery) {
-        mega.gallery.checkEveryGalleryDelete(h);
-        mega.gallery.albums.onCDNodeRemove(n);
-    }
-    else {
-        mega.gallery.nodeUpdated = true;
-        mega.gallery.albumsRendered = false;
+    if (mega.gallery.handleNodeRemoval) {
+        tryCatch(mega.gallery.handleNodeRemoval)(n);
     }
 
     if (M.isDynPage(M.currentdirid) > 1) {

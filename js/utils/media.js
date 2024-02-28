@@ -1663,7 +1663,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 $this.removeClass('active deactivated');
                 contextMenu.close(subtitlesMenu);
             }
-            else {
+            else if (videoElement) {
                 if (videoElement.paused) {
                     continuePlay = false;
                 }
@@ -1701,15 +1701,22 @@ FullScreenManager.prototype.enterFullscreen = function() {
         $('.context-menu.playback-speed button', $wrapper).rebind('click.media-viewer', function() {
             let rate = 1;
             let cl = '1x';
+            let icon = '';
             const $this = $(this);
+
+            $speed.removeClass('margin-2');
 
             if ($this.hasClass('05x')) {
                 cl = '05x';
                 rate = 0.5;
+                icon = 'icon-size-36';
+                $speed.addClass('margin-2');
             }
             else if ($this.hasClass('15x')) {
                 cl = '15x';
                 rate = 1.5;
+                icon = 'icon-size-36';
+                $speed.addClass('margin-2');
             }
             else if ($this.hasClass('2x')) {
                 cl = '2x';
@@ -1718,9 +1725,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
             $('.context-menu.playback-speed button i', $wrapper).addClass('hidden');
             $(`.context-menu.playback-speed button.${cl} i`, $wrapper).removeClass('hidden');
-            $('i', $speed.removeClass('margin-2'))
+            $('i', $speed)
                 .removeClass()
-                .addClass(`sprite-fm-mono icon-playback-${cl}-small-regular-outline`);
+                .addClass(`sprite-fm-mono icon-playback-${cl}-small-regular-outline ${icon}`);
 
             streamer.playbackRate = rate;
         });
@@ -1891,6 +1898,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             window.removeEventListener('keydown', videoKeyboardHandler, true);
             $wrapper.removeClass('mouse-idle video-theatre-mode video').off('is-over-quota');
             $pendingBlock.addClass('hidden');
+            $('.vol-wrapper', $wrapper).off();
             $document.off('mousemove.videoprogress');
             $document.off('mouseup.videoprogress');
             $document.off('mousemove.volumecontrol');

@@ -1786,8 +1786,6 @@ function logExportEvt(type, target) {
                 delete window.onCopyEventHandler;
             }
 
-            affiliateUI.registeredDialog.show();
-
             // Remove Datepicker dialogs
             for (var i = $datepickerInputs.length; i--;) {
 

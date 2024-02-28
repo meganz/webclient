@@ -116,7 +116,7 @@ class MegaGesture {
             return;
         }
 
-        const touch = ev.changedTouches[0];
+        const touch = ev.changedTouches && ev.changedTouches[0] || false;
 
         const xNext = touch.clientX;
         const yNext = touch.clientY;
@@ -145,7 +145,7 @@ class MegaGesture {
 
         if (this.action && typeof this.options[this.action] === 'function') {
 
-            this.options[this.action](ev);
+            tryCatch(() => this.options[this.action](ev))();
 
             // Stop other touch event or another gesture
             ev.stopPropagation();
@@ -168,7 +168,7 @@ mBroadcaster.once('startMega', () => {
 
     'use strict';
 
-    if (is_mobile) {
+    if (is_mobile && is_touchable && self.mainlayout) {
 
         mega.ui.mainlayoutGesture = new MegaGesture({
             domNode: mainlayout,

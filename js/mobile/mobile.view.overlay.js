@@ -59,7 +59,7 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
     }
 
     get visible() {
-        return this.domNode.classList.contains('active');
+        return this.domNode && this.domNode.classList.contains('active');
     }
 
     /**

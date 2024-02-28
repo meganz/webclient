@@ -3399,7 +3399,7 @@ div.checkboxOn {
 .mobile .payment-section .button.purchase {
     margin-top: 20px;
 }
-.mobile .payment-section .loading-placeholder-text {
+.mobile .payment-section .options-list .loading-placeholder-text {
     padding: 0 8px;
 }
 .big-green-button {

@@ -134,7 +134,7 @@ lazy(pro, 'proplan2', () => {
 
             return false;
         });
-        $('.no-ads', $tableContainer).toggleClass('hidden', !(mega.flags.ab_adse === 1));
+        $('.no-ads', $tableContainer).toggleClass('hidden', !(mega.flags.ab_ads));
 
         // set 20GB text for the storage value in the comparison table.
         $('#table-strg-v', $tableContainer).text(bytesToSize(20 * 1073741824, 0));
@@ -823,7 +823,7 @@ lazy(pro, 'proplan2', () => {
         $('.pricing-get-free-banner-price-val', $freeBanner)
             .text(formatCurrency(0, localPriceInfo, 'narrowSymbol', true));
 
-        $('.pricing-get-free-ads', $freeBanner).toggleClass('hidden', !(mega.flags.ab_adse === 1));
+        $('.pricing-get-free-ads', $freeBanner).toggleClass('hidden', !(mega.flags.ab_ads));
 
         $proflexiBlock = $('.pricing-pg.pricing-flexi-container', $page);
 

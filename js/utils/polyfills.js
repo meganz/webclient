@@ -3,25 +3,6 @@
  * @desc This is the only file where we're allowed to extend native prototypes, as required for polyfills.
  *//* eslint-disable no-extend-native */
 
-/** document.hasFocus polyfill */
-mBroadcaster.once('startMega', function() {
-    if (typeof document.hasFocus !== 'function') {
-        var hasFocus = true;
-
-        $(window)
-            .bind('focus', function() {
-                hasFocus = true;
-            })
-            .bind('blur', function() {
-                hasFocus = false;
-            });
-
-        document.hasFocus = function() {
-            return hasFocus;
-        };
-    }
-});
-
 /** document.exitFullScreen polyfill */
 mBroadcaster.once('startMega', function() {
     'use strict';
@@ -29,109 +10,6 @@ mBroadcaster.once('startMega', function() {
     if (typeof document.exitFullscreen !== 'function') {
         document.exitFullscreen = document.mozCancelFullScreen
             || document.webkitCancelFullScreen || document.msExitFullscreen || function() {};
-    }
-});
-
-mBroadcaster.once('startMega', tryCatch(function() {
-    'use strict';
-
-    // FIXME: this is a silly polyfill for our exact needs atm..
-    if (window.Intl && !Intl.NumberFormat.prototype.formatToParts) {
-        Intl.NumberFormat.prototype.formatToParts = function(n) {
-            var result;
-
-            tryCatch(function() {
-                result = Number(n).toLocaleString(getCountryAndLocales().locales).match(/(\d+)(\D)(\d+)/);
-            }, function() {
-                result = Number(n).toLocaleString().match(/(\d+)(\D)(\d+)/);
-            })();
-
-            if (!result || result.length !== 4) {
-                result = [NaN, NaN, '.', NaN];
-            }
-
-            return [
-                {type: "integer", value: result[1]},
-                {type: "decimal", value: result[2]},
-                {type: "fraction", value: result[3]}
-            ];
-        };
-    }
-}, false));
-
-mBroadcaster.once('startMega', function() {
-    "use strict";
-
-    // ArrayBuffer & Uint8Array slice polyfill based on:
-    // https://github.com/ttaubert/node-arraybuffer-slice
-    // (c) 2014 Tim Taubert <tim[a]timtaubert.de>
-    // arraybuffer-slice may be freely distributed under the MIT license.
-
-    function clamp(val, length) {
-        val = (val | 0) || 0;
-
-        if (val < 0) {
-            return Math.max(val + length, 0);
-        }
-
-        return Math.min(val, length);
-    }
-
-    if (!ArrayBuffer.prototype.slice) {
-        Object.defineProperty(ArrayBuffer.prototype, 'slice', {
-            writable: true,
-            configurable: true,
-            value: function(from, to) {
-                var length = this.byteLength;
-                var begin = clamp(from, length);
-                var end = length;
-
-                if (to !== undefined) {
-                    end = clamp(to, length);
-                }
-
-                if (begin > end) {
-                    return new ArrayBuffer(0);
-                }
-
-                var num = end - begin;
-                var target = new ArrayBuffer(num);
-                var targetArray = new Uint8Array(target);
-
-                var sourceArray = new Uint8Array(this, begin, num);
-                targetArray.set(sourceArray);
-
-                return target;
-            }
-        });
-    }
-
-    if (!Uint8Array.prototype.slice) {
-        Object.defineProperty(Uint8Array.prototype, 'slice', {
-            writable: true,
-            configurable: true,
-            value: function(from, to) {
-                return new Uint8Array(this.buffer.slice(from, to));
-            }
-        });
-    }
-
-    if (typeof Uint8Array.prototype.copyWithin !== 'function') {
-        Uint8Array.prototype.copyWithin = function(target, start, end) {
-            return Array.prototype.copyWithin.call(this, target, start,  end);
-        };
-    }
-});
-
-mBroadcaster.once('boot_done', function() {
-    'use strict';
-
-    if (typeof window.devicePixelRatio === 'undefined') {
-        Object.defineProperty(window, 'devicePixelRatio', {
-            get: function() {
-                return (screen.deviceXDPI / screen.logicalXDPI) || 1;
-            }
-        });
     }
 });
 
@@ -313,6 +191,61 @@ if (Object.fromEntries === undefined) {
         });
     }
 })();
+
+mBroadcaster.once('boot_done', tryCatch(() => {
+    'use strict';
+    // Based on code from https://github.com/yume-chan/ya-webadb/
+    // @todo Remove once we bump to Safari 15+
+
+    if (!DataView.prototype.setBigUint64) {
+        const UINT32_SHIFT = BigInt(32);
+
+        Object.defineProperties(DataView.prototype, {
+            setBigUint64: {
+                value(offset, value, le) {
+                    const hi = Number(value >> UINT32_SHIFT);
+                    const lo = Number(BigInt.asUintN(32, value));
+                    const [h, l] = le ? [4, 0] : [0, 4];
+
+                    this.setUint32(offset + h, hi, le);
+                    this.setUint32(offset + l, lo, le);
+                }
+            },
+            setBigInt64: {
+                value(offset, value, le) {
+                    const hi = Number(value >> UINT32_SHIFT);
+                    const lo = Number(BigInt.asUintN(32, value));
+                    const [h, l] = le ? [4, 0] : [0, 4];
+
+                    this.setInt32(offset + h, hi, le);
+                    this.setUint32(offset + l, lo, le);
+                }
+            },
+            getBigUint64: {
+                value(offset, le) {
+                    const bem = Number(!le);
+                    const lem = Number(!!le);
+
+                    const hi = this.getUint32(offset, le);
+                    const lo = this.getUint32(offset + 4, le);
+
+                    return BigInt(hi * bem + lo * lem) << UINT32_SHIFT | BigInt(hi * lem + lo * bem);
+                }
+            },
+            getBigInt64: {
+                value(offset, le) {
+                    const bem = Number(!le);
+                    const lem = Number(!!le);
+
+                    const hi = BigInt(this.getInt32(offset, le) * bem + this.getInt32(offset + 4, le) * lem);
+                    const lo = BigInt(this.getUint32(offset, le) * lem + this.getUint32(offset + 4, le) * bem);
+
+                    return hi << UINT32_SHIFT | lo;
+                }
+            }
+        });
+    }
+}));
 
 mBroadcaster.once('boot_done', tryCatch(() => {
     'use strict';

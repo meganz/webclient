@@ -30,8 +30,6 @@ module.exports = function(config) {
 
         // == Libraries ==
         'js/vendor/asmcrypto.js',
-        'js/vendor/jsbn.js',
-        'js/vendor/jsbn2.js',
         'js/vendor/nacl-fast.js',
         'js/vendor/moment.js',
 
@@ -121,7 +119,6 @@ module.exports = function(config) {
         'js/notify.js',
         'js/megaNotifications.js',
         'js/vendor/avatar.js',
-        'js/vendor/int64.js',
         'js/keymgr.js',
         'js/keepAlive.js',
         'js/metatags.js',

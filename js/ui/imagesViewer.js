@@ -685,7 +685,6 @@ var slideshowid;
             else {
                 $zoomOutButton.trigger('click.mediaviewer');
             }
-            return false;
         });
 
         // Bind Slideshow Close button

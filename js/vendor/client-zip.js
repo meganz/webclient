@@ -25,23 +25,6 @@ var clientZip = (() => {
     predictLength: () => predictLength
   });
 
-  // src/polyfills.ts
-  if (!("stream" in Blob.prototype))
-    Object.defineProperty(Blob.prototype, "stream", {
-      value() {
-        return new Response(this).body;
-      }
-    });
-  if (!("setBigUint64" in DataView.prototype))
-    Object.defineProperty(DataView.prototype, "setBigUint64", {
-      value(byteOffset, value, littleEndian) {
-        const lowWord = Number(value & 0xffffffffn);
-        const highWord = Number(value >> 32n);
-        this.setUint32(byteOffset + (littleEndian ? 0 : 4), lowWord, littleEndian);
-        this.setUint32(byteOffset + (littleEndian ? 4 : 0), highWord, littleEndian);
-      }
-    });
-
   // src/utils.ts
   var makeBuffer = (size) => new DataView(new ArrayBuffer(size));
   var makeUint8Array = (thing) => new Uint8Array(thing.buffer || thing);
@@ -100,7 +83,7 @@ var clientZip = (() => {
         }
       },
       cancel(err) {
-        upstream.throw?.(err);
+        upstream.throw && upstream.throw(err);
       }
     });
   }
@@ -142,7 +125,7 @@ var clientZip = (() => {
     if (size > -1) {
       return BigInt(size);
     }
-    return input ? void 0 : 0n;
+    return input ? void 0 : BigInt(0);
   }
   function normalizeName(name) {
     if (!name)
@@ -202,41 +185,44 @@ var clientZip = (() => {
   var zip64endRecordLength = 56;
   var zip64endLocatorSignature = 1347094023;
   var zip64endLocatorLength = 20;
+  var ZERO = BigInt(0);
+  var UINT32_MAX = BigInt(Math.pow(2, 32) - 1);
   function contentLength(files) {
     let centralLength = BigInt(endLength);
-    let offset = 0n;
+    let offset = ZERO;
     let archiveNeedsZip64 = false;
     for (const file of files) {
       if (!file.encodedName)
         throw new Error("Every file must have a non-empty name.");
       if (file.uncompressedSize === void 0)
         throw new Error(`Missing size for file "${new TextDecoder().decode(file.encodedName)}".`);
-      const bigFile = file.uncompressedSize >= 0xffffffffn;
-      const bigOffset = offset >= 0xffffffffn;
+      const bigFile = file.uncompressedSize >= UINT32_MAX;
+      const bigOffset = offset >= UINT32_MAX;
       offset += BigInt(fileHeaderLength + descriptorLength + file.encodedName.length + (bigFile && 8)) + file.uncompressedSize;
       centralLength += BigInt(file.encodedName.length + centralHeaderLength + (bigOffset * 12 | bigFile * 28));
-      archiveNeedsZip64 || (archiveNeedsZip64 = bigFile);
+      if (bigFile)
+        archiveNeedsZip64 = true;
     }
-    if (archiveNeedsZip64 || offset >= 0xffffffffn)
+    if (archiveNeedsZip64 || offset >= UINT32_MAX)
       centralLength += BigInt(zip64endRecordLength + zip64endLocatorLength);
     return centralLength + offset;
   }
   function flagNameUTF8({ encodedName, nameIsBuffer }, buffersAreUTF8) {
-    return (!nameIsBuffer || (buffersAreUTF8 ?? tryUTF8(encodedName))) * 8;
+    return (!nameIsBuffer || (buffersAreUTF8 || tryUTF8(encodedName))) * 8;
   }
   var UTF8Decoder = new TextDecoder("utf8", { fatal: true });
   function tryUTF8(str) {
     try {
       UTF8Decoder.decode(str);
-    } catch {
+    } catch (e) {
       return false;
     }
     return true;
   }
   async function* loadFiles(files, options) {
     const centralRecord = [];
-    let offset = 0n;
-    let fileCount = 0n;
+    let offset = ZERO;
+    let fileCount = ZERO;
     let archiveNeedsZip64 = false;
     for await (const file of files) {
       const flags = flagNameUTF8(file, options.buffersAreUTF8);
@@ -245,26 +231,27 @@ var clientZip = (() => {
       if (file.isFile) {
         yield* fileData(file);
       }
-      const bigFile = file.uncompressedSize >= 0xffffffffn;
-      const bigOffset = offset >= 0xffffffffn;
+      const bigFile = file.uncompressedSize >= UINT32_MAX;
+      const bigOffset = offset >= UINT32_MAX;
       const zip64HeaderLength = bigOffset * 12 | bigFile * 28;
       yield dataDescriptor(file, bigFile);
       centralRecord.push(centralHeader(file, offset, flags, zip64HeaderLength));
       centralRecord.push(file.encodedName);
       if (zip64HeaderLength)
         centralRecord.push(zip64ExtraField(file, offset, zip64HeaderLength));
-      if (bigFile)
-        offset += 8n;
+      if (bigFile) {
+        offset += BigInt(8);
+        archiveNeedsZip64 = true;
+      }
       fileCount++;
       offset += BigInt(fileHeaderLength + descriptorLength + file.encodedName.length) + file.uncompressedSize;
-      archiveNeedsZip64 || (archiveNeedsZip64 = bigFile);
     }
-    let centralSize = 0n;
+    let centralSize = ZERO;
     for (const record of centralRecord) {
       yield record;
       centralSize += BigInt(record.length);
     }
-    if (archiveNeedsZip64 || offset >= 0xffffffffn) {
+    if (archiveNeedsZip64 || offset >= UINT32_MAX) {
       const endZip64 = makeBuffer(zip64endRecordLength + zip64endLocatorLength);
       endZip64.setUint32(0, zip64endRecordSignature);
       endZip64.setBigUint64(4, BigInt(zip64endRecordLength - 12), true);
@@ -303,7 +290,7 @@ var clientZip = (() => {
       file.crc = crc32(bytes, 0);
       file.uncompressedSize = BigInt(bytes.length);
     } else {
-      file.uncompressedSize = 0n;
+      file.uncompressedSize = ZERO;
       const reader = bytes.getReader();
       while (true) {
         const { value, done } = await reader.read();
@@ -373,7 +360,7 @@ var clientZip = (() => {
         const [metaArgs, dataArgs] = normalizeArgs(res.value);
         return { done: false, value: Object.assign(normalizeInput(...dataArgs), normalizeMetadata(...metaArgs)) };
       },
-      throw: iterator.throw?.bind(iterator),
+      throw: iterator.throw && iterator.throw.bind(iterator),
       [Symbol.asyncIterator]() {
         return this;
       }

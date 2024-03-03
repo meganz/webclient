@@ -2715,7 +2715,7 @@ ChatRoom.prototype.exportToFile = function() {
             ];
             report.unshift(report[0] === 'Aborted' ? 1 : 0);
             if (!report[0]) {
-                msgDialog('error', '', l.export_chat_failed, '', undefined, undefined, true);
+                msgDialog('error', '', l.export_chat_failed, '', undefined, 1);
             }
             eventlog(99875, JSON.stringify(report));
         })
@@ -2826,15 +2826,14 @@ ChatRoom.prototype._exportChat = async function() {
                 const read = await reader.read().catch(dump);
                 if (!read) {
                     reader.cancel().catch(ex => {
-                        if (ex === EOVERQUOTA) {
-                            dlmanager.showOverQuotaDialog();
-                        }
-                        else {
-                            msgDialog('error', '', l.export_chat_failed, '', undefined, undefined, true);
+                        if (ex !== EOVERQUOTA) {
+
+                            msgDialog('error', '', l.export_chat_failed, ex < 0 ? api_strerror(ex) : ex, undefined, 1);
                         }
                     });
                     io.abort();
                     delete this.exportIo;
+                    loadingDialog.hideProgress();
                     return;
                 }
                 if (read.done) {
@@ -2848,8 +2847,7 @@ ChatRoom.prototype._exportChat = async function() {
                             l.export_chat_failed,
                             l.export_chat_partial_fail,
                             undefined,
-                            undefined,
-                            true
+                            1
                         );
                     }
                 }

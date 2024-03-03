@@ -197,6 +197,133 @@ megaUtilsGFSFetch.getTicketData = async(aData) => {
     throw res && res.e || res || EINTERNAL;
 };
 
+megaUtilsGFSFetch.roundOffsetBoundary = (value, min, max) => {
+    'use strict';
+    return value > max ? max : value <= min ? min : min * Math.floor(value / min);
+};
+
+megaUtilsGFSFetch.getOffsets = (length) => {
+    'use strict';
+    let offset = 0;
+    const res = [];
+    const KiB = 0x1ffec;
+    const MiB = 0x100000;
+
+    for (let i = 1; i < 9 && offset < length - i * KiB; ++i) {
+        const end = i * KiB;
+        res.push([offset, end]);
+        offset += end;
+    }
+    const size = megaUtilsGFSFetch.roundOffsetBoundary(length >> 4, MiB, MiB << 4);
+
+    while (offset < length) {
+        const end = Math.min(size, Math.floor((length - offset) / MiB + 1) * MiB);
+        res.push([offset, end]);
+        offset += end;
+    }
+
+    offset = res[res.length - 1];
+    if (length - offset[0] > 0) {
+        offset[1] = length - offset[0];
+    }
+
+    return res.reverse();
+};
+
+/**
+ * @param {Blob|MegaNode} file a Blob, File or MegaNode instance.
+ * @param {Number} [start] offset to start retrieving data from
+ * @param {Number} [end] retrieve data until this offset
+ * @returns {Promise<Uint8Array>}
+ */
+megaUtilsGFSFetch.managed = async(file, start, end) => {
+    'use strict';
+
+    if (self.dlmanager && dlmanager.isOverQuota) {
+        // @todo check dependants and do this on megaUtilsGFSFetch()
+        throw EOVERQUOTA;
+    }
+    const payload = typeof file.seen === 'object' && file.seen || file.link || file.h || file;
+
+    return megaUtilsGFSFetch(payload, start, start + end)
+        .catch((ex) => {
+            const {status} = ex && ex.target || false;
+
+            switch (status) {
+                case 0:
+                    ex = EAGAIN;
+                    break;
+                case 403:
+                    file.seen = -1;
+                    return megaUtilsGFSFetch.managed(file, start, end);
+                case 509:
+                    ex = EOVERQUOTA;
+                    break;
+            }
+
+            if (ex === EOVERQUOTA && self.dlmanager && !dlmanager.isOverQuota) {
+                dlmanager.showOverQuotaDialog();
+            }
+
+            throw ex;
+        });
+};
+
+/**
+ * @param {Blob|MegaNode} file a Blob, File or MegaNode instance.
+ * @param {*} [options] guess it.
+ */
+megaUtilsGFSFetch.getReadableStream = (file, options) => {
+    'use strict';
+    let offsets, size;
+
+    options = options || Object.create(null);
+
+    return new ReadableStream({
+        async start(controller) {
+            if (!((size = parseInt(file.size || file.s)) > 0)) {
+                return controller.close();
+            }
+            offsets = megaUtilsGFSFetch.getOffsets(size);
+            return this.pull(controller);
+        },
+        async pull(controller) {
+            if (!offsets.length) {
+                controller.close();
+                return;
+            }
+            const [start, end] = offsets.pop();
+
+            // @todo fire more parallel downloads per stream regardless of queueing strategy(?)
+            let chunk = await megaUtilsGFSFetch.managed(file, start, end)
+                .catch((ex) => {
+                    if (ex === EOVERQUOTA) {
+                        controller.error(ex);
+                    }
+                    return ex;
+                });
+
+            if (chunk instanceof Uint8Array && chunk.byteLength > 0) {
+
+                if (options.progress) {
+                    options.progress((start + end) / size * 100, file);
+                }
+                file.seen = chunk.payload;
+            }
+            else {
+                if (options.error) {
+                    options.error(chunk, file, controller);
+                }
+                chunk = new Uint8Array(0);
+            }
+
+            controller.enqueue(chunk);
+        }
+    }, options.queuingStrategy);
+};
+
+freeze(megaUtilsGFSFetch);
+
 /**
  * Promise-based XHR request
  * @param {Object|String} aURLOrOptions   URL or options

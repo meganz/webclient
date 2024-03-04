@@ -22463,7 +22463,7 @@ class Call extends mixins.w9 {
         cid
       }) => ChatToast.quick(l.muted_by.replace('%NAME', nicknames.getNickname(this.props.peers[cid]))));
     };
-    this.unbindCallEvents = () => [`onCallPeerLeft.${NAMESPACE}`, `onCallPeerJoined.${NAMESPACE}`, `onCallLeft.${NAMESPACE}`, `wrOnUsersAllow.${NAMESPACE}`, `wrOnUsersEntered.${NAMESPACE}`, `wrOnUserLeft.${NAMESPACE}`, `alterUserPrivilege.${NAMESPACE}`, `onCallState.${NAMESPACE}`, `onRecordingStarted.${NAMESPACE}`, `onRecordingStopped.${NAMESPACE}`].map(event => this.props.chatRoom.off(`${event}.${NAMESPACE}`));
+    this.unbindCallEvents = () => ['onCallPeerLeft', 'onCallPeerJoined', 'onCallLeft', 'wrOnUsersAllow', 'wrOnUsersEntered', 'wrOnUserLeft', 'alterUserPrivilege', 'onCallState', 'onRecordingStarted', 'onRecordingStopped'].map(event => this.props.chatRoom.off(`${event}.${NAMESPACE}`));
     this.handleCallMinimize = () => {
       const {
         call,

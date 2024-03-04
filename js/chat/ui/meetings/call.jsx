@@ -535,16 +535,16 @@ export default class Call extends MegaRenderMixin {
 
     unbindCallEvents = () =>
         [
-            `onCallPeerLeft.${NAMESPACE}`,
-            `onCallPeerJoined.${NAMESPACE}`,
-            `onCallLeft.${NAMESPACE}`,
-            `wrOnUsersAllow.${NAMESPACE}`,
-            `wrOnUsersEntered.${NAMESPACE}`,
-            `wrOnUserLeft.${NAMESPACE}`,
-            `alterUserPrivilege.${NAMESPACE}`,
-            `onCallState.${NAMESPACE}`,
-            `onRecordingStarted.${NAMESPACE}`,
-            `onRecordingStopped.${NAMESPACE}`
+            'onCallPeerLeft',
+            'onCallPeerJoined',
+            'onCallLeft',
+            'wrOnUsersAllow',
+            'wrOnUsersEntered',
+            'wrOnUserLeft',
+            'alterUserPrivilege',
+            'onCallState',
+            'onRecordingStarted',
+            'onRecordingStopped',
         ]
             .map(event => this.props.chatRoom.off(`${event}.${NAMESPACE}`));
 

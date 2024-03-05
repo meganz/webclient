@@ -233,7 +233,7 @@
             }
         });
 
-        $(self.dialog.querySelectorAll('.fm-dialog-close, button.js-close')).rebind('click.prd', () => {
+        $(this.getCloseButton()).rebind('click.prd', () => {
             self.dismiss();
             return false;
         });
@@ -260,24 +260,27 @@
             self.passwordReminderAttribute.dontShowAgain === 1
         );
 
+        const showTextIcon = is_mobile ? 'icon-eye-thin-outline' : 'icon-eye-reveal';
+        const hideTextIcon = is_mobile ? 'icon-eye-off-01-thin-outline' : 'icon-eye-hidden';
+
         $('.pass-visible', this.dialog).rebind('click.togglePassV', function() {
 
-            if (this.classList.contains('icon-eye-reveal')) {
+            if (this.classList.contains(showTextIcon)) {
 
                 self.passwordField.type = 'text';
                 if (self.passwordField.style.webkitTextSecurity) {
                     self.passwordField.style.webkitTextSecurity = 'none';
                 }
-                this.classList.remove('icon-eye-reveal');
-                this.classList.add('icon-eye-hidden');
+                this.classList.remove(showTextIcon);
+                this.classList.add(hideTextIcon);
             }
             else {
                 self.passwordField.type = 'password';
                 if (self.passwordField.style.webkitTextSecurity) {
                     self.passwordField.style.webkitTextSecurity = 'disc';
                 }
-                this.classList.add('icon-eye-reveal');
-                this.classList.remove('icon-eye-hidden');
+                this.classList.add(showTextIcon);
+                this.classList.remove(hideTextIcon);
             }
         });
     };
@@ -333,16 +336,19 @@
     PasswordReminderDialog.prototype.completeOnConfirmClicked = function(derivedEncryptionKeyArray32) {
 
         if (checkMyPassword(derivedEncryptionKeyArray32)) {
+            if (this.dialog) {
+                this.dialog.classList.add('accepted');
+            }
             if (this.correctLabel) {
                 this.correctLabel.classList.remove('hidden');
             }
             this.passwordReminderAttribute.lastSuccess = unixtime();
 
-            var skipButtonSpan = this.dialog.querySelector('.button-prd-skip span');
+            var skipButtonSpan = this.dialog.querySelector('button.button-prd-skip span');
             if (skipButtonSpan) {
                 skipButtonSpan.innerText = l[967];
-                this.succeeded = true;
             }
+            this.succeeded = true;
         }
         else {
             if (this.dialog) {
@@ -608,10 +614,7 @@
     };
 
     PasswordReminderDialog.prototype._initInternals = function() {
-        this.dialog = document.querySelector(is_mobile
-            ? '.mobile.password-reminder-overlay'
-            : '.mega-dialog.pass-reminder'
-        );
+        this.dialog = this.getDialog();
         assert(this.dialog, 'this.dialog not found');
         this.passwordField = this.dialog.querySelector('input#test-pass');
         $(this.passwordField).rebind('focus.hack', function() {
@@ -651,10 +654,6 @@
         this.resetUI();
 
         this.bindEvents();
-
-        if (is_mobile) {
-            mobile.initPasswordVisibleToggle($(this.dialog));
-        }
     };
 
     PasswordReminderDialog.prototype.show = function() {
@@ -668,7 +667,7 @@
         assert(this.dialog, 'dialog not defined.');
 
         if (is_mobile) {
-            this.dialog.classList.add('overlay');
+            this.showOverlay();
         }
         else {
             assert(this.topIcon, 'topIcon not defined.');
@@ -680,9 +679,9 @@
 
 
     PasswordReminderDialog.prototype.resetUI = function() {
-        $('.button-prd-skip span', $(this.dialog)).text(l[1379]);
+        $('button.button-prd-skip span', $(this.dialog)).text(l[1379]);
         if (this.dialog) {
-            this.dialog.classList.remove('wrong');
+            this.dialog.classList.remove('wrong', 'accepted');
         }
         if (this.wrongLabel) {
             this.wrongLabel.classList.add('hidden');
@@ -696,8 +695,11 @@
             this.exportButton.classList.add('green-button');
         }
 
-        $('i.pass-visible', this.dialog).removeClass('icon-eye-hidden').addClass('icon-eye-reveal');
-        $('#test-pass').attr({'style': '', 'type': 'password', 'readonly': true});
+        const showTextIcon = is_mobile ? 'icon-eye-thin-outline' : 'icon-eye-reveal';
+        const hideTextIcon = is_mobile ? 'icon-eye-off-01-thin-outline' : 'icon-eye-hidden';
+        $('i.pass-visible', this.dialog).removeClass(hideTextIcon).addClass(showTextIcon);
+        // On mobile, if the input were readonly, the keyboard would not open when taking focus
+        $('#test-pass', this.dialog).attr({'style': '', 'type': 'password', 'readonly': !is_mobile});
     };
 
     PasswordReminderDialog.prototype.hide = function() {
@@ -752,19 +754,9 @@
         $.dialog = "prd";
         this.dialogShown = true;
 
-        this._initInternals();
+        this.showOverlay();
 
-        if (is_mobile) {
-            this.dialog.classList.add('overlay');
-            if (page === 'fm/account') {
-                if (mobile.settingsHelper && mobile.settingsHelper.currentPage) {
-                    mobile.settingsHelper.currentPage.hide();
-                }
-            }
-        }
-        else {
-            fm_showoverlay();
-        }
+        this._initInternals();
 
         this.dialog.classList.remove('hidden');
 
@@ -776,17 +768,9 @@
     PasswordReminderDialog.prototype.hideDialog = function() {
         this.dialogShown = false;
 
-        fm_hideoverlay();
+        this.hideOverlay();
 
         this.dialog.classList.add('hidden');
-        if (is_mobile) {
-            this.dialog.classList.remove('overlay');
-            if (page === 'fm/account') {
-                if (mobile.settingsHelper && mobile.settingsHelper.currentPage) {
-                    mobile.settingsHelper.currentPage.show();
-                }
-            }
-        }
 
         this.resetUI();
 
@@ -853,6 +837,38 @@
         }
 
         return returnedPromise;
+    };
+
+    /**
+    * Get node from password reminder dialog.
+    * @returns {Object} Dialog
+    */
+    PasswordReminderDialog.prototype.getDialog = function() {
+        return document.querySelector('.mega-dialog.pass-reminder');
+    };
+
+    /**
+     * Show dialog using fm_showoverlay function.
+     * @returns {void}
+     */
+    PasswordReminderDialog.prototype.showOverlay = function() {
+        fm_showoverlay();
+    };
+
+    /**
+     * Hide dialog using fm_hideoverlay function.
+     * @returns {void}
+     */
+    PasswordReminderDialog.prototype.hideOverlay = function() {
+        fm_hideoverlay();
+    };
+
+    /**
+     * Get close button from password reminder dialog.
+     * @returns {Object} Close button
+     */
+    PasswordReminderDialog.prototype.getCloseButton = function() {
+        return this.dialog.querySelectorAll('button.js-close');
     };
 
     var passwordReminderDialog = new PasswordReminderDialog();

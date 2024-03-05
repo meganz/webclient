@@ -158,6 +158,7 @@ mobile.downloadOverlay = {
         this.node = node;
 
         mega.ui.overlay.titleNode.classList.add('centered');
+        mega.ui.overlay.imageNode.classList.add('centered');
 
         const cancelTransfer = new MegaMobileButton({
             parentNode: mega.ui.overlay.actionsNode,

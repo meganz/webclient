@@ -1,0 +1,61 @@
+.recovery-key-logout {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.recovery-key-logout .nav-elem.normal {
+    height: 48px;
+}
+
+.recovery-key-logout .skip-link {
+    margin-top: auto;
+}
+
+.recovery-key-logout .skip-link span {
+    font: var(--mobile-font-label-bold);
+}
+
+.recovery-key-logout .text.info a {
+    color: var(--mobile-link-primary);
+    text-decoration: underline;
+}
+
+.recovery-key-logout .pass-reminder-results .result-txt {
+    display: flex;
+    font: var(--mobile-font-caption-large-regular);
+    align-items: center;
+    margin: -12px 0 12px;
+}
+
+.recovery-key-logout .pass-reminder-results .result-txt i {
+    -webkit-margin-end: 8px;
+    margin-inline-end: 8px;
+}
+
+.recovery-key-logout .pass-reminder-results .result-txt.accepted {
+    color: var(--mobile-support-success);
+}
+
+.recovery-key-logout .pass-reminder-results .result-txt.wrong {
+    color: var(--mobile-support-error);
+}
+
+.recovery-key-logout.accepted .mobile.mega-input.box-style {
+    border-color: var(--mobile-support-success);
+}
+
+.recovery-key-logout.wrong .mobile.mega-input.box-style {
+    border-color: var(--mobile-support-error);
+}
+
+.recovery-key-logout .pass-reminder-forgot {
+    margin-top: 16px;
+    text-align: center;
+}
+
+.recovery-key-logout .pass-reminder-forgot a {
+    margin: 0 4px;
+    color: var(--mobile-link-primary);
+    text-decoration: underline;
+}

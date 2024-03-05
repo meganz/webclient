@@ -218,6 +218,7 @@ class MegaMobileOverlay extends MegaMobileComponent {
 
     clearImage() {
         this.imageNode.textContent = '';
+        this.imageNode.className = 'image';
     }
 
     addImage(imageClass, icon = true) {

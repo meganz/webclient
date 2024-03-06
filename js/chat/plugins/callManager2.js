@@ -86,12 +86,15 @@
             this.sfuPeer = call.sfuClient.peers.get(clientId);
             this.isActive = false;
             this.consumers = new Set();
+            this.vuLevelConsumers = new Set();
             this.currentQuality = VIDEO_QUALITY.NO_VIDEO;
             this.resState = RES_STATE.NO_VIDEO;
             this.player = null;
             this.onHdReleaseTimer = this._onHdReleaseTimer.bind(this);
             this.onAvChange(av);
             call.peers.push(this);
+            this.onAudioLevel = this.onAudioLevel.bind(this);
+            this.sfuPeer.requestAudioLevel(this.onAudioLevel);
         }
         destroy() {
             this.hdReleaseTimerStop();
@@ -102,13 +105,16 @@
             return M.getNameByHandle(this.userHandle);
         }
         setResState(newState) {
-            const oldPlayer = this.player;
             this.resState = newState;
-            this.player = (newState === RES_STATE.HD || newState === RES_STATE.THUMB_PENDING)
-                ? (this.hiResPlayer && this.hiResPlayer.gui.video)
-                : (this.vThumbPlayer && this.vThumbPlayer.gui.video);
+            const thumbVideo = this.vThumbPlayer && this.vThumbPlayer.gui.video;
+            const hdVideo = this.hiResPlayer && this.hiResPlayer.gui.video;
+            const player = (newState === RES_STATE.HD || newState === RES_STATE.THUMB_PENDING)
+                ? hdVideo || thumbVideo
+                : thumbVideo || hdVideo;
             // console.warn(`setResState[${this.clientId}]: ->`, newState, this.player);
-            if (this.player !== oldPlayer) {
+            const changed = this.player !== player;
+            this.player = player;
+            if (changed) {
                 this.updateConsumerVideos();
             }
         }
@@ -117,18 +123,23 @@
             // console.warn(`isStreaming[${this.clientId}]:`, !(av & Av.onHold) && (av & Av.Video));
             return !(av & Av.onHold) && (av & Av.Video);
         }
-        onAvChange(av) {
+        onAvChange(av, oldAv) {
             const Av = SfuClient.Av;
             this.isOnHold = !!(av & Av.onHold);
             if (this.onHold) {
                 this.audioMuted = this.videoMuted = true;
-                this.hasScreenAndCam = false;
+                this.isScreen = this.hasScreenAndCam = false;
+                delete this.hdLowQualityStart;
             }
             else {
                 this.audioMuted = !(av & Av.Audio);
                 this.videoMuted = !(av & Av.Camera);
                 this.hasScreenAndCam = !!((av & Av.ScreenHiRes) && (av & Av.CameraLowRes));
                 this.isScreen = !!(av & Av.ScreenHiRes);
+                const scrChange = !!((av ^ oldAv) & Av.ScreenHiRes);
+                if (scrChange) {
+                    this.hdLowQualityStart = this.isScreen;
+                }
             }
             if ((av ^ this.av) & Av.Recording) {
                 this.isRecording = !!(av & Av.Recording);
@@ -150,6 +161,21 @@
             this.consumers.delete(cons);
             if (cons.requestedQ !== undefined && !this.isDestroyed) {
                 this.dynUpdateVideoQuality();
+            }
+        }
+        registerVuLevelConsumer(cons) {
+            this.vuLevelConsumers.add(cons);
+        }
+        unregisterVuLevelConsumer(cons) {
+            this.vuLevelConsumers.delete(cons);
+        }
+        onAudioLevel(level) {
+            if (level === this.lastVuLevel) {
+                return;
+            }
+            this.lastVuLevel = level;
+            for (const cons of this.vuLevelConsumers) {
+                cons.updateAudioLevel(level);
             }
         }
         hdReleaseTimerStop() {
@@ -204,6 +230,10 @@
                     }
                 }
             }
+            if (this.hdLowQualityStart & maxQ > 2) {
+                maxQ = 2;
+             // console.warn("Limiting quality to 2 for low HD start");
+            }
             if (maxQ === this.currentQuality) {
                 this.hdReleaseTimerStop();
             }
@@ -217,8 +247,10 @@
                     this.hdReleaseTimerStop();
                     this.doGetVideoWithQuality(maxQ);
                 }
-                // start gradual lowering of stream quality
-                this.hdReleaseTimerRestart(maxQ);
+                else {
+                    // start gradual lowering of stream quality
+                    this.hdReleaseTimerRestart(maxQ);
+                }
             }
             return this._consumersUpdated; // return false for all cases except the ones that immediately change quality
         }
@@ -230,7 +262,6 @@
                 return;
             }
             this.currentQuality = newQuality;
-
             if (newQuality > VIDEO_QUALITY.THUMB) {
                 this.requestHdStream(4 - newQuality); // convert quality to resolution divider
             }
@@ -274,7 +305,9 @@
             }
             if (this.hiResPlayer) {
                 assert(this.resState !== RES_STATE.THUMB);
-                this.hiResPlayer.setHiResDivider(resDivider);
+                if (!this.hdLowQualityStart) {
+                    this.hiResPlayer.setHiResDivider(resDivider);
+                }
                 if (this.resState === RES_STATE.THUMB_PENDING) { // cancel vthumb request, revert to hi-res
                     this.delVthumbPlayer();
                     this.setResState(RES_STATE.HD);
@@ -286,16 +319,25 @@
                 console.warn("requestHdStream: No free video slots, freeing vthumb one if used");
                 this.delVthumbPlayer();
             }
-            this.setResState(RES_STATE.HD_PENDING);
+            if (this.hdLowQualityStart) {
+                resDivider = 2;
+             // console.warn("requestHdStream: Limiting HD quality to 2 for low HD start");
+            }
             this.hiResPlayer = peer.getHiResVideo(resDivider, (sfuPlayer) => {
                 return new PlayerCtx(this.call, sfuPlayer);
             });
-            this.hiResPlayer.gui.onPlay = () => {
+            this.setResState(RES_STATE.HD_PENDING);
+            this.hiResPlayer.gui.video.onplaying = () => {
                 if (this.resState !== RES_STATE.HD_PENDING) {
                     return false;
                 }
                 this.delVthumbPlayer();
                 this.setResState(RES_STATE.HD);
+                if (this.hdLowQualityStart) {
+                    delete this.hdLowQualityStart;
+                 // console.warn("hdPlayer screenshare started in low hd quality, ramping up quality");
+                    this.dynUpdateVideoQuality();
+                }
                 return true;
             };
         }
@@ -317,11 +359,11 @@
                 console.warn("requestThumbStream: No free video slot, freeing hires one if used");
                 this.delHiResPlayer();
             }
-            this.setResState(RES_STATE.THUMB_PENDING);
             this.vThumbPlayer = peer.getThumbVideo((player) => {
                 return new PlayerCtx(this.call, player);
             });
-            this.vThumbPlayer.gui.onPlay = () => {
+            this.setResState(RES_STATE.THUMB_PENDING);
+            this.vThumbPlayer.gui.video.onplaying = () => {
                 if (this.resState !== RES_STATE.THUMB_PENDING) {
                     if (this.resState === RES_STATE.HD) {
                         // vthumb request was aborted meanwhile, hd re-used. Delete the vthumb stream
@@ -396,15 +438,15 @@
     };
 
     class Call extends MegaDataObject {
-        constructor(chatRoom, callId) {
+        constructor(chatRoom, callId, callKey) {
             super({
                 'chatRoom': null,
                 'callId': null,
                 'av': null,
                 'localVideoStream': null,
                 'viewMode': null,
-                'activeStream': null,
-                'forcedActiveStream': null,
+                'speakerCid': null,
+                'pinnedCid': null,
                 'activeVideoStreamsCnt': 0,
                 'ts': Date.now(),
                 'left': false
@@ -412,17 +454,22 @@
             this.chatRoom = chatRoom;
             this.callId = callId;
             this.peers = new Peers(this);
-            this.localPeerStream = new LocalPeerStream(this);
             this.viewMode = CALL_VIEW_MODES.THUMBNAIL;
             this.stayOnEnd = !!mega.config.get('callemptytout');
 
             chatRoom.meetingsLoading = l.joining;
+            SfuClient.speakDetectorUseSetTimeout = true;
+            this.sfuClient = window.sfuClient = new SfuClient(u_handle, this, callKey, { numVideoSlots: 60 });
+            this.localPeerStream = new LocalPeerStream(this); // needs this.sfuClient
             // Peer is alone in a group call after 1 min -> mute mic
             tSleep(60).then(() => this.muteIfAlone()).catch(dump);
         }
-        setSfuClient(sfuClient) { // Call and sfuClient reference each other and need post-construction linking
-            this.sfuClient = sfuClient;
-            this.localPeerStream.setSfuClient(sfuClient);
+        connect(url, audio, video) {
+            const {sfuClient} = this;
+            sfuClient.muteAudio(!audio);
+            sfuClient.muteCamera(!video);
+            sfuClient.enableSpeakerDetector(true);
+            return sfuClient.connect(url, this.callId, {isGroup: this.chatRoom.type !== "private"});
         }
 // SfuClient.IClientEventListener interface
         onServerError(errCode) {
@@ -453,11 +500,11 @@
             }
         }
         onPeerLeft(peer, reason) {
-            if (this.activeStream && this.activeStream === peer.cid) {
-                this.activeStream = null;
+            if (this.speakerCid === peer.cid) {
+                this.speakerCid = null;
             }
-            if (this.forcedActiveStream === peer.cid) {
-                this.forcedActiveStream = null;
+            if (this.pinnedCid === peer.cid) {
+                this.pinnedCid = null;
             }
 
             this.peers[peer.cid].destroy();
@@ -474,21 +521,42 @@
             if (peer.client.isLeavingCall) {
                 this.muteIfAlone();
             }
+            this.recordActiveStream();
         }
         onActiveSpeakerChange(newPeer/* , prevPeer */) {
             if (newPeer) {
                 var peer = this.peers[newPeer.cid];
                 assert(peer);
-                this.setActiveStream(newPeer.cid);
+                this.speakerCid = newPeer.cid;
             }
             else {
-                this.setActiveStream(null);
+                this.speakerCid = null;
             }
+            this.recordActiveStream();
         }
-        onPeerAvChange(peer, av) {
+        recordActiveStream() {
+            if (!this.sfuClient.isRecording) {
+                return;
+            }
+            const { peers, pinnedCid, speakerCid, localPeerStream, sfuClient } = this;
+            const speaker = peers[speakerCid];
+            const pinned = pinnedCid === 0 ? localPeerStream : peers[pinnedCid];
+            const activeStream =
+                pinned ||
+                Object.values(peers).findLast(p => p.isScreen) ||
+                (speaker && (speaker.av & Av.HiResVideo) ? speaker : null) ||
+                peers.getItem(0);
+
+            sfuClient.recordingSetVideoSource(
+                activeStream && (activeStream.av & Av.HiResVideo) ? activeStream.clientId : null
+            );
+        }
+
+        onPeerAvChange(peer, av, oldAv) {
             const callManagerPeer = this.peers[peer.cid];
             assert(callManagerPeer);
-            callManagerPeer.onAvChange(av);
+            callManagerPeer.onAvChange(av, oldAv);
+            this.recordActiveStream();
             this.chatRoom.trigger('onPeerAvChange', peer);
         }
         onNoMicInput() {
@@ -496,6 +564,11 @@
         }
         onMicSignalDetected(signal) {
             this.chatRoom.trigger('onMicSignalDetected', signal);
+        }
+        onConnStats(stats) {
+            if (this.av & Av.Audio) {
+                this.localPeerStream.onAudioLevel(this.sfuClient.micAudioLevel);
+            }
         }
         onBadNetwork(e) {
             this.chatRoom.trigger('onBadNetwork', e);
@@ -581,33 +654,35 @@
         setViewMode(newMode) {
             this.viewMode = newMode;
             let activePeer;
-            if (this.forcedActiveStream && (activePeer = this.peers[this.forcedActiveStream])) {
+            if (this.pinnedCid && (activePeer = this.peers[this.pinnedCid])) {
                 activePeer.isActive = false;
             }
 
             if (newMode === CALL_VIEW_MODES.THUMBNAIL) {
-                this.forcedActiveStream = null;
+                this.pinnedCid = null;
             }
 
             if (newMode === CALL_VIEW_MODES.MINI) {
-                this.activeStream = null;
+                this.speakerCid = null;
             }
         }
-        setForcedActiveStream(clientId) {
-            const newCid = (this.forcedActiveStream === clientId) ? null : clientId;
-            this.forcedActiveStream = newCid;
-            if (this.sfuClient.callRecorder) {
-                this.sfuClient.recordingForcePeerVideo(newCid || null);
+        setPinnedCid(clientId, toggle) {
+            if (this.pinnedCid === clientId) {
+                if (!toggle) {
+                    return;
+                }
+                this.pinnedCid = null;
             }
-        }
-        setActiveStream(clientId) {
-            this.activeStream = clientId;
+            else {
+                this.pinnedCid = clientId;
+            }
             this.chatRoom.trigger('onSpeakerChange', clientId);
+            this.recordActiveStream();
         }
         getActiveStream() {
-            const activeStream = this.forcedActiveStream || this.activeStream;
-            if (activeStream) {
-                return this.peers[activeStream];
+            const clientId = this.pinnedCid || this.speakerCid;
+            if (clientId) {
+                return this.peers[clientId];
             }
             return this.peers.getItem(0);
         }
@@ -811,19 +886,12 @@
             this.player = player;
             this.appPeer = this.call.peers[player.peer.cid];
             assert(this.appPeer);
-            this.video = document.createElement("video");
+            this.video = CallManager2.createVideoElement();
         }
         attachToTrack(track) { // we wait for player to sync and start, so nothing to do here
-            this.video.onplaying = () => {
-                // console.warn("source video: onPlaying");
-                if (this.onPlay) {
-                    this.onPlay();
-                }
-            };
-            this.video.onpause = tryCatch(() => {
-                // console.warn("source video: onPause");
-            });
+         // this.video.onpause = tryCatch(() => { console.warn("source video: onPause"); });
             SfuClient.playerPlay(this.video, track);
+            this.appPeer.updateConsumerVideos();
         }
 
         detachFromTrack() {
@@ -842,12 +910,10 @@
             this.player = null; // local video player
             this.call = call;
             this.userHandle = u_handle;
+            this.clientId = 0; // for pinnedCid
             this.consumers = new Set();
-        }
-        setSfuClient(sfuClient) {
-            this.sfuClient = sfuClient;
-            this.clientId = sfuClient.cid;
-            this.av = sfuClient.availAv;
+            this.vuLevelConsumers = new Set();
+            this.sfuClient = call.sfuClient;
         }
         onAvChange(avDiff) {
             this.av = this.sfuClient.availAv;
@@ -857,7 +923,7 @@
                 if (vtrack) {
                     this.isScreen = vtrack._isScreen;
                     if (!this.player) {
-                        this.player = document.createElement("video");
+                        this.player = CallManager2.createVideoElement();
                     }
                     SfuClient.playerPlay(this.player, vtrack, true);
                 }
@@ -891,6 +957,21 @@
         }
         deregisterConsumer(consumer) {
             this.consumers.delete(consumer);
+        }
+        registerVuLevelConsumer(cons) {
+            this.vuLevelConsumers.add(cons);
+        }
+        unregisterVuLevelConsumer(cons) {
+            this.vuLevelConsumers.delete(cons);
+        }
+        onAudioLevel(level) {
+            if (level === this.lastAudioLevel) {
+                return;
+            }
+            this.lastAudioLevel = level;
+            for (const cons of this.vuLevelConsumers) {
+                cons.updateAudioLevel(level);
+            }
         }
         isStreaming() {
             return this.sfuClient.availAv & Av.Video;
@@ -1259,8 +1340,8 @@
         return result;
     };
 
-    CallManager2.prototype.createCall = function(chatRoom, callId) {
-        return (this.calls[`${chatRoom.chatId}_${callId}`] = new Call(chatRoom, callId));
+    CallManager2.prototype.createCall = function(chatRoom, callId, callKey) {
+        return (this.calls[`${chatRoom.chatId}_${callId}`] = new Call(chatRoom, callId, callKey));
     };
 
     CallManager2.prototype.onCallState = function(eventData, chatRoom) {
@@ -1314,7 +1395,9 @@
 
         chatRoom.callParticipantsUpdated();
     };
-
+    CallManager2.createVideoElement = function() {
+        return document.createElement("video");
+    };
     CallManager2.Peers = Peers;
     CallManager2.Peer = Peer;
     CallManager2.Call = Call;

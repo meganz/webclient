@@ -214,7 +214,7 @@ export default class Stream extends MegaRenderMixin {
             ephemeralAccounts,
             onCallMinimize,
             onSpeakerChange,
-            onThumbnailDoubleClick
+            onVideoDoubleClick
         } = this.props;
         const { page, streamsPerPage, floatDetached } = this.state;
         const filteredPeers = Object.values(peers).filter(p => p instanceof CallManager2.Peer);
@@ -249,7 +249,7 @@ export default class Stream extends MegaRenderMixin {
                             onDoubleClick={(e, videoNode) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                onThumbnailDoubleClick(videoNode);
+                                onVideoDoubleClick(videoNode);
                             }}
                             didMount={ref => {
                                 this.nodeRefs.push({ clientId: peer.clientId, cacheKey, ref });
@@ -273,7 +273,6 @@ export default class Stream extends MegaRenderMixin {
                             <LocalVideoHiRes
                                 key={`${mode}_${u_handle}`}
                                 chatRoom={chatRoom}
-                                className="with-contain"
                                 didMount={ref => {
                                     this.nodeRefs.push({ clientId: u_handle, cacheKey: `${mode}_${u_handle}`, ref });
                                     this.scaleNodes(undefined, true);
@@ -281,7 +280,7 @@ export default class Stream extends MegaRenderMixin {
                                 willUnmount={() => {
                                     this.nodeRefs = this.nodeRefs.filter(nodeRef => nodeRef.clientId !== u_handle);
                                 }}>
-                                {this.renderNodeMenu()}
+                                {this.renderSelfViewMenu()}
                             </LocalVideoHiRes>,
                             ...rest.map((p, i) => $$PEER(p, i))
                         ]
@@ -343,7 +342,6 @@ export default class Stream extends MegaRenderMixin {
                                             <LocalVideoHiRes
                                                 key={`${mode}_${u_handle}`}
                                                 chatRoom={chatRoom}
-                                                className="with-contain"
                                                 didMount={ref => {
                                                     if (!this.nodeRefs[i]) {
                                                         this.nodeRefs[i] = [];
@@ -385,6 +383,11 @@ export default class Stream extends MegaRenderMixin {
                 return null;
             }
         }
+        const videoNodeRef = React.createRef();
+        const setRef = node => {
+            videoNodeRef.current = node;
+            // console.warn("setRef:", node);
+        };
 
         return (
             <VideoType
@@ -392,12 +395,15 @@ export default class Stream extends MegaRenderMixin {
                 chatRoom={chatRoom}
                 source={source}
                 ephemeralAccounts={ephemeralAccounts}
-                onCallMinimize={onCallMinimize}>
-                {this.renderNodeMenu(source)}
+                onCallMinimize={onCallMinimize}
+                toggleFullScreen={() => {               // don't use onSpeakerChange, as it will cause a react update
+                    call.setPinnedCid(source.clientId); // and unmount the fullscreen element, canceling the fullscreen
+                }}
+                ref={setRef}>
+                {this.renderNodeMenu(source, {key: `${source.clientId}-main`, isMain: true, videoNodeRef})}
             </VideoType>
         );
     }
-
     /**
      * renderNodeMenu
      * @description Renders context menu for given stream node.
@@ -407,24 +413,23 @@ export default class Stream extends MegaRenderMixin {
      * @return {JSX.Element}
      */
 
-    renderNodeMenu(peer) {
-        const { call, mode, chatRoom, ephemeralAccounts, onCallMinimize, onSpeakerChange, onModeChange } = this.props;
-
-        if (peer) {
-            return (
-                <VideoNodeMenu
-                    mode={mode}
-                    privilege={chatRoom.members[peer.userHandle]}
-                    chatRoom={chatRoom}
-                    stream={peer}
-                    ephemeralAccounts={ephemeralAccounts}
-                    onCallMinimize={onCallMinimize}
-                    onSpeakerChange={onSpeakerChange}
-                    onModeChange={onModeChange}
-                />
-            );
-        }
-
+    renderNodeMenu(peer, props) {
+        const { mode, chatRoom, ephemeralAccounts, onCallMinimize, onSpeakerChange, onModeChange } = this.props;
+        return (
+            <VideoNodeMenu
+                mode={mode}
+                privilege={chatRoom.members[peer.userHandle]}
+                chatRoom={chatRoom}
+                stream={peer}
+                ephemeralAccounts={ephemeralAccounts}
+                onCallMinimize={onCallMinimize}
+                onSpeakerChange={onSpeakerChange}
+                onModeChange={onModeChange}
+                {...props}
+            />
+        );
+    }
+    renderSelfViewMenu() {
         return (
             <div className="node-menu theme-dark-forced">
                 <div className="node-menu-toggle">

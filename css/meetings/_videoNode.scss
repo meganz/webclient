@@ -107,12 +107,14 @@
         }
 
         video {
-            object-fit: cover;
+            object-position: center;
+            object-fit: contain;
 
-            .with-contain & {
-                object-fit: contain;
+            .video-crop & {
+                object-fit: cover;
             }
         }
+
         .video-node-loading::before {
             position: absolute;
             top: 50%;
@@ -123,6 +125,7 @@
             font-size: 1em;
             z-index: 0;
         }
+
         .avatar-wrapper {
             position: absolute;
             top: 50%;
@@ -207,7 +210,6 @@
     left: 50%;
     margin: 0 0 0 -2px;
     width: 4px;
-    height: calc(100% - 6px);
     max-height: 9px;
     border-radius: 0 0 3px 3px;
     background: var(--secondary-green);

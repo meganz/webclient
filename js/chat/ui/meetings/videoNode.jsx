@@ -3,29 +3,6 @@ import { MegaRenderMixin } from '../../mixins';
 import { Avatar } from '../contacts.jsx';
 import Call, { MODE } from './call.jsx';
 
-export const renderAudioIndicator = source => {
-    if (source) {
-        const { audioMuted, clientId } = source;
-        return (
-            <span
-                className="simpletip"
-                data-simpletip-class="theme-dark-forced"
-                data-simpletipposition="top"
-                data-simpletipoffset="5"
-                data-simpletip={audioMuted ? l.muted /* `Muted` */ : ''}>
-                <i
-                    className={`
-                        sprite-fm-mono
-                        ${audioMuted ? 'icon-mic-off-thin-outline inactive' : 'icon-mic-thin-outline'}
-                    `}>
-                    {audioMuted ? null : <div className={`mic-fill indicator-${clientId}`}/>}
-                </i>
-            </span>
-        );
-    }
-    return null;
-};
-
 /** The class hiearachy of video components is the following:
                                     VideoNode
                               (Base rendering code)
@@ -56,6 +33,7 @@ used in the RHP.       as thumbnail, only     main, self and
 class VideoNode extends MegaRenderMixin {
     nodeRef = React.createRef();
     contRef = React.createRef();
+    audioLevelRef = React.createRef();
     statsHudRef = React.createRef();
 
     /*
@@ -75,12 +53,6 @@ class VideoNode extends MegaRenderMixin {
         this.source.registerConsumer(this);
         this.props.didMount?.(this.nodeRef?.current);
         this.requestVideo(true);
-        this.source?.sfuPeer?.requestAudioLevel(audioLevel => {
-            const speakerIndicationRefs = document.querySelectorAll(`.mic-fill.indicator-${this.source.clientId}`);
-            for (const speakerIndication of speakerIndicationRefs) {
-                speakerIndication.style.height = `${audioLevel * 100 + 2}px`;
-            }
-        });
     }
 
     onVisibilityChange(isVisible) {
@@ -99,14 +71,11 @@ class VideoNode extends MegaRenderMixin {
         // force re-request if video stream changed
         this.safeForceUpdate();
     }
-
     displayVideoElement(video, container) {
         this.attachVideoElemHandlers(video);
+        this.video = video;
         // insert/replace the video in the DOM
         container.replaceChildren(video);
-        if (video.readyState === 4) {
-            container.classList.remove("video-node-loading");
-        }
     }
 
     attachVideoElemHandlers(video) {
@@ -116,25 +85,30 @@ class VideoNode extends MegaRenderMixin {
         video.autoplay = true;
         video.controls = false;
         video.muted = true;
-        video.ondblclick = (e) => {
-            if (this.props.onDoubleClick) {
-                this.props.onDoubleClick(e, this);
+        video.ondblclick = e => {
+            const { onDoubleClick, toggleFullScreen } = this.props;
+            onDoubleClick?.(e, this);
+            if (!document.fullscreenElement) {
+                if (toggleFullScreen && typeof toggleFullScreen === 'function') {
+                    toggleFullScreen(this);
+                }
+                this.nodeRef.current?.requestFullscreen({ navigationUI: 'hide' });
             }
         };
         video.onloadeddata = (ev) => {
-            if (this.contRef.current) {
-                this.contRef.current.classList.remove("video-node-loading");
-            }
-            // Trigger fake onResize when video finishes loading
+            /* NOTE: We don't remove the video-node-loading style, because:
+             - We don't need to: the loading symbol is covered by the <video> element as soon as it starts playback
+             - readyState may be 4 long before the video actually appears and starts playing
+            */
             if (this.props.onLoadedData) {
-                this.props.onLoadedData(ev);
+                this.props.onLoadedData(ev); // Trigger fake onResize when video finishes loading
             }
         };
         video._snSetup = true;
     }
-
     componentWillUnmount() {
         super.componentWillUnmount();
+        delete this.video;
         this.detachVideoElemHandlers();
         this.source.deregisterConsumer(this);
         if (this.props.willUnmount) {
@@ -151,7 +125,15 @@ class VideoNode extends MegaRenderMixin {
         video.ondblclick = null;
         delete video._snSetup;
     }
-
+    isVideoCropped() {
+        return this.video?.classList.contains("video-crop");
+    }
+    cropVideo() {
+        this.video?.classList.add("video-crop");
+    }
+    uncropVideo() {
+        this.video?.classList.remove("video-crop");
+    }
     displayStats(stats) {
         const elem = this.statsHudRef.current;
         if (!elem) {
@@ -191,7 +173,7 @@ class VideoNode extends MegaRenderMixin {
                 />
             );
         }
-        delete this._lastResizeWidth;
+        delete this._lastResizeHeight;
         return <Avatar contact={M.u[source.userHandle]}/>;
     }
 
@@ -210,9 +192,9 @@ class VideoNode extends MegaRenderMixin {
 
     renderStatus() {
         const { mode, chatRoom } = this.props;
-        const { source, isThumb } = this;
+        const { source } = this;
         const { sfuClient } = chatRoom.call;
-        const { userHandle, isOnHold, hasScreenAndCam } = source;
+        const { userHandle, isOnHold } = source;
         const $$CONTAINER = ({ children }) => <div className="video-node-status theme-dark-forced">{children}</div>;
 
         if (isOnHold) {
@@ -232,14 +214,12 @@ class VideoNode extends MegaRenderMixin {
                     this.getStatusIcon('icon-admin-outline call-role-icon', l[8875])
                 }
                 <$$CONTAINER>
-                    {renderAudioIndicator(source)}
+                    <AudioLevelIndicator source={source} />
                     {sfuClient.haveBadNetwork ? this.getStatusIcon('icon-weak-signal', l.poor_connection) : null}
-                    {hasScreenAndCam && isThumb ? this.getStatusIcon('icon-pc-linux', 'Sharing screen') : null}
                 </$$CONTAINER>
             </>
         );
     }
-
     render() {
         const {
             mode,
@@ -257,7 +237,7 @@ class VideoNode extends MegaRenderMixin {
         }
 
         const { call } = chatRoom;
-        const isActiveSpeaker = !source.audioMuted && call.activeStream && call.activeStream === source.clientId;
+        const isActiveSpeaker = !source.audioMuted && call.speakerCid === source.clientId;
 
         return (
             <div
@@ -308,7 +288,7 @@ class VideoNode extends MegaRenderMixin {
 class DynVideo extends VideoNode {
     onAvChange() {
         // force re-request if video stream changed
-        this._lastResizeWidth = null;
+        this._lastResizeHeight = null;
         super.onAvChange();
     }
     dynRequestVideo(forceVisible) {
@@ -316,12 +296,12 @@ class DynVideo extends VideoNode {
         if (source.isFake || source.isDestroyed) {
             return;
         }
-        if (source.isStreaming() && this.isMounted() && (this.isComponentVisible() || forceVisible)) {
+        if (source.isStreaming() && this.isMounted()) { // && (this.isComponentVisible() || forceVisible))
             const node = this.findDOMNode();
-            this.dynRequestVideoBySize(node.offsetWidth, node.offsetHeight);
+            this.dynRequestVideoBySize(node.offsetHeight);
         }
         else {
-            this.dynRequestVideoBySize(0, 0);
+            this.dynRequestVideoBySize(0);
             this.displayStats(null);
         }
     }
@@ -332,35 +312,34 @@ class DynVideo extends VideoNode {
             this.dynUpdateVideoElem();
         }
     }
-    dynRequestVideoBySize(w) {
-        // console.warn(`requestVideoBySize[${stream.clientId}]: ${w}x${h}(lastw: ${this._lastResizeWidth})`);
-        if (w === 0) {
-            this._lastResizeWidth = 0;
+    dynRequestVideoBySize(h) {
+        // console.warn(`requestVideoBySize[${stream.clientId}]: ${w}x${h}(lastw: ${this._lastResizeHeight})`);
+        if (h === 0) {
+            this._lastResizeHeight = 0;
             this.dynRequestVideoQuality(CallManager2.VIDEO_QUALITY.NO_VIDEO);
             return;
         }
         if (this.contRef.current) {
             // save some CPU cycles.
-            if (this._lastResizeWidth === w) {
-                // console.warn("... abort: same size");
+            if (this._lastResizeHeight === h) {
                 return;
             }
-            this._lastResizeWidth = w;
+            this._lastResizeHeight = h;
         }
         else {
             // if we requested video, but there is no player and we are unable to display it right away, don't prevent
             // re-requesting it, even with the same size. It makes sense to initiate the video request even before we
             // are ready to display it, to save some time. The re-request will use the previous result
-            this._lastResizeWidth = null;
+            this._lastResizeHeight = null;
         }
         let newQ;
-        if (w > 400) {
+        if (h > 360) {
             newQ = CallManager2.VIDEO_QUALITY.HIGH;
         }
-        else if (w > 200) {
+        else if (h > 180) {
             newQ = CallManager2.VIDEO_QUALITY.MEDIUM;
         }
-        else if (w > 180 || this.noThumb) {
+        else if (h > 90 || this.noThumb) {
             newQ = CallManager2.VIDEO_QUALITY.LOW;
         }
         else {
@@ -410,7 +389,7 @@ export class PeerVideoHiRes extends DynVideoDirect {
 class DynVideoCloned extends DynVideo {
     constructor(props, source) {
         super(props, source);
-        this.ownVideo = document.createElement("video");
+        this.ownVideo = CallManager2.createVideoElement();
     }
     dynSetVideoSource(srcPlayer, vidCont) {
         const cloned = this.ownVideo;
@@ -445,7 +424,7 @@ export class PeerVideoThumbFixed extends VideoNode {
     constructor(props) {
         super(props, props.source);
         assert(props.source.hasScreenAndCam);
-        this.ownVideo = document.createElement("video");
+        this.ownVideo = CallManager2.createVideoElement();
         if (CallManager2.Call.VIDEO_DEBUG_MODE) {
             this.onRxStats = this._onRxStats; // for staticThumb track
         }
@@ -526,7 +505,7 @@ export class LocalVideoHiResCloned extends VideoNode {
     constructor(props) {
         super(props, props.chatRoom.call.getLocalStream());
         this.isLocal = true;
-        this.ownVideo = document.createElement("video");
+        this.ownVideo = CallManager2.createVideoElement();
     }
     get isLocalScreen() {
         return this.source.av & Av.Screen;
@@ -569,7 +548,7 @@ export class LocalVideoThumb extends VideoNode {
         this.isLocal = true;
         this.isLocalScreen = (source.av & Av.Screen) && !(source.av & Av.Camera);
         this.sfuClient = props.chatRoom.call.sfuClient;
-        this.ownVideo = document.createElement("video");
+        this.ownVideo = CallManager2.createVideoElement();
     }
     requestVideo() {
         const vidCont = this.contRef.current;
@@ -599,5 +578,49 @@ export class LocalVideoThumb extends VideoNode {
         const av = this.sfuClient.availAv;
         this.isLocalScreen = (av & Av.Screen) && !(av & Av.Camera);
         super.onAvChange();
+    }
+}
+export class AudioLevelIndicator extends React.Component {
+    constructor(props) {
+        super(props);
+        this.source = props.source;
+        this.indicatorRef = React.createRef();
+        this.updateAudioLevel = this.updateAudioLevel.bind(this);
+    }
+    componentDidMount() {
+        this.source.registerVuLevelConsumer(this);
+    }
+    componentWillUnmount() {
+        this.source.unregisterVuLevelConsumer(this);
+    }
+    updateAudioLevel(level) {
+        const levelInd = this.indicatorRef.current;
+        if (!levelInd) {
+            return;
+        }
+        level = Math.round(level * 400);
+        if (level > 90) {
+            level = 90;
+        }
+        levelInd.style.height = `${level + 10}%`;
+    }
+    render() {
+        const { audioMuted } = this.source;
+        return (
+            <span
+                className="simpletip"
+                data-simpletip-class="theme-dark-forced"
+                data-simpletipposition="top"
+                data-simpletipoffset="5"
+                data-simpletip={audioMuted ? l.muted /* `Muted` */ : ''}>
+                <i
+                    className={`
+                        sprite-fm-mono
+                        ${audioMuted ? 'icon-mic-off-thin-outline inactive' : 'icon-mic-thin-outline'}
+                    `}>
+                    {audioMuted ? null : <div ref={this.indicatorRef} className="mic-fill"/>}
+                </i>
+            </span>
+        );
     }
 }

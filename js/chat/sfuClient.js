@@ -925,16 +925,16 @@ SvcDriver.kDefaultRxQualityIndex = 4; // start at half resolution, full fps
 // minKbps, maxKbps, scr: constraints for applyConstraints() on sent screen track
 // avoid too high resolutions as packet loss can easily drop very large fragmented frames
 SvcDriver.TxQuality = [
-    { minKbps: 0, maxKbps: 50, scr: { height: 240, frameRate: 4 } },
-    { minKbps: 40, maxKbps: 300, scr: { height: 540, frameRate: 4 } },
+    //      { minKbps:    0, maxKbps: 50,   scr: { height: 240,  frameRate: 4 }},  // 0 Barely usable, better than no frames
+    { minKbps: 0, maxKbps: 300, scr: { height: 540, frameRate: 4 } },
     { minKbps: 280, maxKbps: 700, scr: { height: 720, frameRate: 4 } },
     { minKbps: 680, maxKbps: 1100, scr: { height: 840, frameRate: 4 } },
     { minKbps: 1000, maxKbps: 1600, scr: { height: 1080, frameRate: 4 } },
     { minKbps: 1500, maxKbps: 2100, scr: { height: 1080, frameRate: 8 } },
     { minKbps: 2000, maxKbps: 4100, scr: { height: 1080, frameRate: 16 } },
     { minKbps: 4000, maxKbps: 9000, scr: { height: 1200, frameRate: 8 } } // 6
-    //      { minKbps: 1700, maxKbps: 2000, scr: { height: 1200, frameRate: 8 }},  // 6
-    //      { minKbps: 1900, maxKbps: 4000, scr: { height: 1440, frameRate: 8 }}   // 7
+    //      { minKbps: 1700, maxKbps: 2000, scr: { height: 1200, frameRate: 8 }},  // 7
+    //      { minKbps: 1900, maxKbps: 4000, scr: { height: 1440, frameRate: 8 }}   // 8
 ];
 SvcDriver.kMaxTxQualityIndex = SvcDriver.TxQuality.length - 1;
 SvcDriver.kDefaultTxQualityIndex = 3;
@@ -1047,7 +1047,7 @@ class CallRecorder {
     }
     async initRecording() {
         const recStream = new MediaStream([this.audioDestNode.stream.getAudioTracks()[0], this.videoRx.track]);
-        const recorder = this.recorder = new MediaRecorder(recStream);
+        const recorder = this.recorder = new MediaRecorder(recStream, { mimeType: 'video/webm;codecs="vp9,opus"' });
         recorder.onstop = () => {
             this.sink.close();
             this.recorder = null;
@@ -1118,8 +1118,11 @@ class CallRecorder {
             this.videoInput = { track: vTrack, releaseCb };
             this._setVideoTrack(vTrack);
         }
-        else {
+        else if (vTrack === 0) {
             this.switchToLocalOrStaticVideo();
+        }
+        else if (vTrack === null) {
+            this.switchToStaticVideo();
         }
     }
     videoInputTrack() {
@@ -1267,7 +1270,7 @@ class CallRecorder {
 }
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = '40bfc52622';
+const COMMIT_ID = '07d3ab3c7e';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -1326,9 +1329,9 @@ class SfuClient {
         this._sentAv = 0;
         this._joinRetries = 0;
         this._forcedDisconnect = false;
+        this._joinTimeOffs = 0;
         this._tsCallJoin = 0;
         this._tsCallStart = 0;
-        this.joinToffs = 0;
         this.statCtx = {};
         this.hasConnStats = false;
         this.maxPeers = 0;
@@ -1741,11 +1744,8 @@ class SfuClient {
             let xponder = e.transceiver;
             let track = e.track;
             let slot = xponder.slot;
-            do {
-                if (window.d) {
-                    console.log(client_kLogTag, `onTrack: mid: ${xponder.mid}, kind: ${track.kind}, dir: ${xponder.direction}, slot: ${slot ? "has" : "none-yet"}`);
-                }
-            } while (0);
+            // LOGD(`onTrack: mid: ${xponder.mid}, kind: ${track.kind}, dir: ${xponder.direction}, slot: ${
+            //     slot ? "has" : "none-yet"}`);
             if (track.kind === "video") {
                 if (!slot) {
                     this.assert(xponder.direction === "recvonly");
@@ -1769,11 +1769,7 @@ class SfuClient {
             }
         };
         pc.onaddstream = (event) => {
-            do {
-                if (window.d) {
-                    console.log(client_kLogTag, "onAddStream");
-                }
-            } while (0);
+            // LOGD("onAddStream");
             this.outVSpeakerTrack.createEncryptor();
             this.outVSpeakerTrack.createDecryptor();
             this.outASpeakerTrack.createEncryptor();
@@ -1894,6 +1890,7 @@ class SfuClient {
         this.numInputAudioTracks = msg.na;
         this.moderators = msg.mods ? new Set(msg.mods) : undefined;
         this.speakApproval = !!msg.sr;
+        this.callDurationLimit = msg.ldur;
         this._fire("onConnected");
         const wr = msg.wr;
         if (wr) {
@@ -2358,6 +2355,9 @@ class SfuClient {
         this._availAv |= Av.Recording;
         this._sendAvState();
     }
+    get isRecording() {
+        return !!this.callRecorder;
+    }
     throwIfNotRecording() {
         if (!this.callRecorder) {
             throw new Error("Not recording");
@@ -2385,45 +2385,38 @@ class SfuClient {
         this._availAv &= ~Av.Recording;
         this._sendAvState();
     }
-    recordingForcePeerVideo(cid) {
+    /** Can be called even if not recording, to avoid checks before each call
+     * @returns Whether recording to the specified peer was actually started, or recording was actually
+     * stopped, in case cid is null
+     */
+    recordingSetVideoSource(cid) {
+        if (!this.callRecorder) {
+            return false;
+        }
         if (cid === this.recForcedPeerCid) {
-            if (cid) {
-                do {
-                    if (window.d) {
-                        console.warn(client_kLogTag, `Already recording peer ${cid}`);
-                    }
-                } while (0);
-            }
-            return;
-        }
-        delete this.recForcedPeerCid;
-        const rec = this.callRecorder;
-        if (!cid) {
-            if (rec) {
-                rec.setVideoInput(null);
-            }
-            return true;
-        }
-        this.throwIfNotRecording();
-        const peer = this.peers.get(cid);
-        if (!peer) {
             do {
                 if (window.d) {
-                    console.warn(client_kLogTag, `Unknown peer with cid ${cid}`);
+                    console.warn(client_kLogTag, `Already recording peer ${cid}`);
+                }
+            } while (0);
+            return true;
+        }
+        if (cid === 0 || cid === null) {
+            delete this.recForcedPeerCid;
+            this.callRecorder.setVideoInput(cid);
+            return true;
+        }
+        this.recForcedPeerCid = cid;
+        const peer = this.peers.get(cid);
+        if (!peer || !(peer.av & Av.HiResVideo)) {
+            this.callRecorder.setVideoInput(null);
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, peer ? `Peer ${cid} not sending hi-res video to record` : `Unknown peer with cid ${cid}`);
                 }
             } while (0);
             return false;
         }
-        if (!(peer.av & Av.HiResVideo)) {
-            do {
-                if (window.d) {
-                    console.warn(client_kLogTag, `Peer ${cid} is not sending hi-res video to record`);
-                }
-            } while (0);
-            rec.setVideoInput(null);
-            return;
-        }
-        this.recForcedPeerCid = cid;
         peer._doStartRecording();
         return true;
     }
@@ -2778,9 +2771,9 @@ class SfuClient {
         this.inputPacketQueue = [];
         this.assert(this.cid);
         this.assignCid(this.cid);
+        this._joinTimeOffs = msg.t;
         this._tsCallJoin = Date.now();
         this._tsCallStart = this._tsCallJoin - msg.t;
-        this.joinToffs = msg.t;
         this._statsRecorder.start();
         await this.newKeyImmediate();
         if (this.connState !== ConnState.kCallJoining) {
@@ -2858,6 +2851,9 @@ class SfuClient {
     }
     get tsCallJoin() {
         return this._tsCallJoin;
+    }
+    get joinTimeOffset() {
+        return this._joinTimeOffs;
     }
     msgPeerJoin(msg) {
         if (!msg.cid || !msg.userId || msg.av == null) {
@@ -4460,6 +4456,58 @@ class SpeakerDetector {
     constructor(client) {
         this.players = new Set();
         this.tsLastChange = 0;
+        this._onTimerTick_passive = () => {
+            for (const player of this.players) {
+                player.pollAudioLevel();
+            }
+        };
+        this._onTimerTick_active = () => {
+            let maxLevel = SfuClient.kSpeakerVolThreshold;
+            let maxPlayer = null;
+            for (const player of this.players) {
+                const level = player.pollAudioLevel(true);
+                if (level > maxLevel) {
+                    maxLevel = level;
+                    maxPlayer = player;
+                }
+            }
+            if (!maxPlayer) {
+                return;
+            }
+            const now = Date.now();
+            const client = this.client;
+            const ourLevel = (now - client.tsMicAudioLevel < 1500) ? client.micAudioLevel : 0;
+            if (ourLevel > maxLevel) {
+                maxPlayer = null;
+            }
+            if (maxPlayer === this.currSpeaker) {
+                return;
+            }
+            if (now - this.tsLastChange < SfuClient.kSpeakerChangeMinInterval) {
+                return;
+            }
+            this.tsLastChange = now;
+            const prev = this.currSpeaker ? this.currSpeaker.peer : null;
+            this.currSpeaker = maxPlayer;
+            if (maxPlayer) {
+                const peer = maxPlayer.peer;
+                do {
+                    if (window.d) {
+                        console.warn(client_kLogTag, "Active speaker changed to", peer.userId);
+                    }
+                } while (0);
+                this.client.assert(this.client.peers.get(peer.cid));
+                this.client.app.onActiveSpeakerChange(peer, prev);
+            }
+            else {
+                do {
+                    if (window.d) {
+                        console.warn(client_kLogTag, "Active speaker changed to us");
+                    }
+                } while (0);
+                this.client.app.onActiveSpeakerChange(null, prev);
+            }
+        };
         this.client = client;
         this.enable(false);
     }
@@ -4469,14 +4517,25 @@ class SpeakerDetector {
             return;
         }
         this.deleteTimer();
-        let cb = enable ? this._onTimerTick_active.bind(this) : this._onTimerTick_passive.bind(this);
-        this.timer = setInterval(cb, SfuClient.kAudioMonTickPeriod);
+        this.startTimer(enable ? this._onTimerTick_active : this._onTimerTick_passive, SfuClient.kAudioMonTickPeriod);
+    }
+    startTimer(cb, msInterval) {
+        if (SfuClient.speakDetectorUseSetTimeout) {
+            const timerFunc = () => {
+                cb();
+                this.timer = setTimeout(timerFunc, msInterval);
+            };
+            this.timer = setTimeout(timerFunc, msInterval);
+        }
+        else {
+            this.timer = setInterval(cb, msInterval);
+        }
     }
     deleteTimer() {
         if (!this.timer) {
             return;
         }
-        clearInterval(this.timer);
+        (SfuClient.speakDetectorUseSetTimeout ? clearTimeout : clearInterval)(this.timer);
         delete this.timer;
     }
     registerPeer(player) {
@@ -4492,58 +4551,6 @@ class SpeakerDetector {
         }
         if (!this.players.size) {
             this.deleteTimer();
-        }
-    }
-    _onTimerTick_passive() {
-        for (const player of this.players) {
-            player.pollAudioLevel();
-        }
-    }
-    _onTimerTick_active() {
-        let maxLevel = SfuClient.kSpeakerVolThreshold;
-        let maxPlayer = null;
-        for (const player of this.players) {
-            const level = player.pollAudioLevel(true);
-            if (level > maxLevel) {
-                maxLevel = level;
-                maxPlayer = player;
-            }
-        }
-        if (!maxPlayer) {
-            return;
-        }
-        let now = Date.now();
-        let client = this.client;
-        let ourLevel = (now - client.tsMicAudioLevel < 1500) ? client.micAudioLevel : 0;
-        if (ourLevel > maxLevel) {
-            maxPlayer = null;
-        }
-        if (maxPlayer === this.currSpeaker) {
-            return;
-        }
-        if (now - this.tsLastChange < SfuClient.kSpeakerChangeMinInterval) {
-            return;
-        }
-        this.tsLastChange = now;
-        const prev = this.currSpeaker ? this.currSpeaker.peer : null;
-        this.currSpeaker = maxPlayer;
-        if (maxPlayer) {
-            const peer = maxPlayer.peer;
-            do {
-                if (window.d) {
-                    console.warn(client_kLogTag, "Active speaker changed to", peer.userId);
-                }
-            } while (0);
-            this.client.assert(this.client.peers.get(peer.cid));
-            this.client.app.onActiveSpeakerChange(peer, prev);
-        }
-        else {
-            do {
-                if (window.d) {
-                    console.warn(client_kLogTag, "Active speaker changed to us");
-                }
-            } while (0);
-            this.client.app.onActiveSpeakerChange(null, prev);
         }
     }
 }
@@ -4624,7 +4631,7 @@ class StatsRecorder {
             userid: client.userId,
             cid: client.cid,
             callid: client.callId,
-            toffs: client.joinToffs,
+            toffs: client.joinTimeOffset,
             dur: duration,
             peers: client.maxPeers,
             samples: arrs,

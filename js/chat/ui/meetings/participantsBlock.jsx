@@ -108,13 +108,14 @@ export default class ParticipantsBlock extends MegaRenderMixin {
                 [...filteredPeers.filter(p => p.isScreen), ...filteredPeers.filter(p => !p.videoMuted)];
             const rest = filteredPeers.filter(p => !streaming.includes(p));
             const $$PEER = peer => {
-                const isForcedActive = peer.isActive || peer.clientId === call.forcedActiveStream;
-                const isActiveSpeaker = !peer.audioMuted && call.activeStream && call.activeStream === peer.clientId;
+                const isPinned = peer.isActive || peer.clientId === call.pinnedCid;
+                const isActiveSpeaker = !peer.audioMuted && call.speakerCid === peer.clientId;
                 return (
                     <PeerVideoThumb
                         key={`${peer.userHandle}--${peer.clientId}`}
                         className={`
-                            ${isForcedActive ? 'active' : ''}
+                            video-crop
+                            ${isPinned ? 'active' : ''}
                             ${isActiveSpeaker ? 'active-speaker' : ''}
                         `}
                         simpletip={{ ...SIMPLE_TIP, label: M.getNameByHandle(peer.userHandle) }}

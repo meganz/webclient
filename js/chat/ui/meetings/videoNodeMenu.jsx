@@ -95,11 +95,35 @@ export const Pin = ({ stream, mode, onSpeakerChange, onModeChange })  => {
 
 export default class VideoNodeMenu extends MegaRenderMixin {
     static NAMESPACE = 'node-menu';
+    ToggleCrop = ({videoNodeRef}) => {
+        const videoNode = videoNodeRef?.current;
+        if (!videoNode) {
+            return null;
+        }
+        // FIXME: Translate strings, re-enable forceUpdate() calls
+        return videoNode.isVideoCropped() ?
+            <Button
+                icon="sprite-fm-mono grid-main"
+                onClick={() => {
+                    videoNode.uncropVideo();
+                    this.forceUpdate();
+                }}>
+                <span>Uncrop video</span>
+            </Button> :
+            <Button
+                icon="sprite-fm-mono grid-main"
+                onClick={() => {
+                    videoNode.cropVideo();
+                    this.forceUpdate();
+                }}>
+                <span>Crop video</span>
+            </Button>;
+    };
 
     render() {
         const { NAMESPACE } = VideoNodeMenu;
         const { stream } = this.props;
-        const $$CONTROLS = { Contact, Pin, Privilege };
+        const $$CONTROLS = { Contact, Pin, Privilege /* , ToggleCrop: this.ToggleCrop */};
 
         if (stream.userHandle !== u_handle) {
             return (

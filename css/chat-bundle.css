@@ -1757,10 +1757,11 @@ body.theme-dark .mega-dialog.meetings-permissions-dialog .permissions-warning-co
   border-radius: inherit;
 }
 .video-node-content video {
-  object-fit: cover;
-}
-.with-contain .video-node-content video {
+  object-position: center;
   object-fit: contain;
+}
+.video-crop .video-node-content video {
+  object-fit: cover;
 }
 .video-node-content .video-node-loading::before {
   position: absolute;
@@ -1845,7 +1846,6 @@ body.theme-dark .mega-dialog.meetings-permissions-dialog .permissions-warning-co
   left: 50%;
   margin: 0 0 0 -2px;
   width: 4px;
-  height: calc(100% - 6px);
   max-height: 9px;
   border-radius: 0 0 3px 3px;
   background: var(--secondary-green);

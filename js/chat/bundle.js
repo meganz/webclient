@@ -5026,19 +5026,11 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function (audio
 });
 ChatRoom.prototype.startOrJoinCall = function (callId, url, audio, video) {
   tryCatch(() => {
-    const call = this.call = megaChat.activeCall = megaChat.plugins.callManager2.createCall(this, callId);
-    const sfuClient = window.sfuClient = call.sfuClient = new SfuClient(u_handle, call, this.protocolHandler.chatMode === strongvelope.CHAT_MODE.PUBLIC && str_to_ab(this.protocolHandler.unifiedKey), {
-      'speak': true,
-      'moderator': true
-    });
-    call.setSfuClient(sfuClient);
-    sfuClient.muteAudio(!audio);
-    sfuClient.muteCamera(!video);
-    sfuClient.enableSpeakerDetector(true);
-    return sfuClient.connect(url, callId, {
-      isGroup: this.type !== "private"
-    });
+    const call = this.call = megaChat.activeCall = megaChat.plugins.callManager2.createCall(this, callId, this.protocolHandler.chatMode === strongvelope.CHAT_MODE.PUBLIC && str_to_ab(this.protocolHandler.unifiedKey));
+    return call.connect(url, audio, video);
   }, ex => {
+    var _this$call;
+    (_this$call = this.call) == null || _this$call.destroy();
     this.call = megaChat.activeCall = null;
     this.meetingsLoading = false;
     console.error('Failed to start/join call:', ex);
@@ -21257,7 +21249,9 @@ class Participant extends mixins.w9 {
                             ${this.baseIconClass}
                             ${source.videoMuted ? 'icon-video-off-thin-outline inactive' : 'icon-video-thin-outline'}
                         `
-    }), (0,videoNode.a5)(source), external_React_default().createElement("div", {
+    }), external_React_default().createElement(videoNode.Gz, {
+      source: source
+    }), external_React_default().createElement("div", {
       className: "participants-menu theme-dark-forced"
     }, external_React_default().createElement("div", {
       className: "participants-menu-toggle"
@@ -22323,26 +22317,12 @@ class Call extends mixins.w9 {
       recordingConsentDialog: false,
       recordingConsented: false
     };
-    this.recordActiveStream = () => {
-      if (this.state.recorder && this.state.recorder === u_handle) {
-        const {
-          call,
-          peers
-        } = this.props;
-        const activeStream = peers[call.forcedActiveStream] || Object.values(peers).findLast(p => p.isScreen) || peers[call.activeStream] || peers.getItem(0);
-        if (activeStream) {
-          var _call$sfuClient;
-          (_call$sfuClient = call.sfuClient) == null || _call$sfuClient.recordingForcePeerVideo(activeStream.isScreen || !activeStream.videoMuted ? activeStream.clientId : null);
-        }
-      }
-    };
     this.handleRetryTimeout = () => {
-      var _call$sfuClient2;
       const {
         call,
         chatRoom
       } = this.props;
-      if ((call == null || (_call$sfuClient2 = call.sfuClient) == null ? void 0 : _call$sfuClient2.connState) === SfuClient.ConnState.kDisconnectedRetrying) {
+      if ((call == null ? void 0 : call.sfuClient.connState) === SfuClient.ConnState.kDisconnectedRetrying) {
         this.handleCallEnd();
         chatRoom.trigger('onRetryTimeout');
         ion.sound.play(megaChat.SOUNDS.CALL_END);
@@ -22458,7 +22438,6 @@ class Call extends mixins.w9 {
           recorder: userHandle === recorder ? false : recorder
         }, () => window.sfuClient && userHandle === recorder && ChatToast.quick(l.user_recording_nop_toast.replace('%NAME', nicknames.getNickname(userHandle).substr(0, ChatToastIntegration.MAX_NAME_CHARS))));
       });
-      chatRoom.rebind(`onPeerAvChange.${NAMESPACE}`, () => this.recordActiveStream());
       chatRoom.rebind(`onMutedBy.${NAMESPACE}`, (ev, {
         cid
       }) => ChatToast.quick(l.muted_by.replace('%NAME', nicknames.getNickname(this.props.peers[cid]))));
@@ -22519,7 +22498,7 @@ class Call extends mixins.w9 {
     this.handleSpeakerChange = videoNode => {
       if (videoNode) {
         this.handleModeChange(MODE.MAIN);
-        this.props.call.setForcedActiveStream(videoNode.clientId);
+        this.props.call.setPinnedCid(videoNode.clientId);
         this.setState({
           forcedLocal: videoNode.isLocal
         });
@@ -22610,8 +22589,8 @@ class Call extends mixins.w9 {
     };
     this.handleRecordingToggle = () => {
       const {
-        sfuClient
-      } = this.props.call;
+        call
+      } = this.props;
       if (this.state.recorder) {
         return msgDialog(`confirmation:!^${l.stop_recording_dialog_cta}!${l.stop_recording_nop_dialog_cta}`, undefined, l.stop_recording_dialog_heading, l.stop_recording_dialog_body, cb => cb && this.setState({
           recorder: undefined
@@ -22624,12 +22603,12 @@ class Call extends mixins.w9 {
         if (cb || cb === null) {
           return;
         }
-        sfuClient.recordingStart().then(() => {
+        call.sfuClient.recordingStart().then(() => {
           this.setState({
             recorder: u_handle
           });
           this.handleModeChange(MODE.MAIN);
-          this.recordActiveStream();
+          call.recordActiveStream();
           ChatToast.quick(l.started_recording_toast);
         }).catch(dump);
       }, 1);
@@ -22737,13 +22716,6 @@ class Call extends mixins.w9 {
         });
       });
     }
-  }
-  componentDidUpdate(prevProps, prevState) {
-    super.componentDidUpdate();
-    if (prevState.recorder !== this.state.recorder) {
-      this.props.call.recorder = this.state.recorder;
-    }
-    this.recordActiveStream();
   }
   componentWillUnmount() {
     super.componentWillUnmount();
@@ -22887,7 +22859,7 @@ class Call extends mixins.w9 {
       onVideoClick: () => call.toggleVideo(),
       onScreenSharingClick: this.handleScreenSharingToggle,
       onHoldClick: this.handleHoldToggle,
-      onThumbnailDoubleClick: videoNode => this.handleSpeakerChange(videoNode)
+      onVideoDoubleClick: videoNode => this.handleSpeakerChange(videoNode)
     })), sidebar && external_React_default().createElement(Sidebar, (0,esm_extends.A)({}, STREAM_PROPS, {
       guest: guest,
       initialCallRinging: initialCallRinging,
@@ -24157,7 +24129,9 @@ class Stream extends mixins.w9 {
         className: "sprite-fm-mono icon-arrow-up icon-collapse"
       }), external_React_default().createElement("div", {
         className: "collapsed-audio-indicator"
-      }, (0,videoNode.a5)(call.getLocalStream())));
+      }, external_React_default().createElement(videoNode.Gz, {
+        source: call.getLocalStream()
+      })));
     }
     return external_React_default().createElement("div", {
       ref: this.containerRef,
@@ -24588,12 +24562,13 @@ class ParticipantsBlock extends mixins.w9 {
       const streaming = [...filteredPeers.filter(p => p.isScreen), ...filteredPeers.filter(p => !p.videoMuted)];
       const rest = filteredPeers.filter(p => !streaming.includes(p));
       const $$PEER = peer => {
-        const isForcedActive = peer.isActive || peer.clientId === call.forcedActiveStream;
-        const isActiveSpeaker = !peer.audioMuted && call.activeStream && call.activeStream === peer.clientId;
+        const isPinned = peer.isActive || peer.clientId === call.pinnedCid;
+        const isActiveSpeaker = !peer.audioMuted && call.speakerCid === peer.clientId;
         return external_React_default().createElement(videoNode.au, {
           key: `${peer.userHandle}--${peer.clientId}`,
           className: `
-                            ${isForcedActive ? 'active' : ''}
+                            video-crop
+                            ${isPinned ? 'active' : ''}
                             ${isActiveSpeaker ? 'active-speaker' : ''}
                         `,
           simpletip: {
@@ -25422,7 +25397,7 @@ class stream_Stream extends mixins.w9 {
       ephemeralAccounts,
       onCallMinimize,
       onSpeakerChange,
-      onThumbnailDoubleClick
+      onVideoDoubleClick
     } = this.props;
     const {
       page,
@@ -25449,7 +25424,7 @@ class stream_Stream extends mixins.w9 {
             onDoubleClick: (e, videoNode) => {
               e.preventDefault();
               e.stopPropagation();
-              onThumbnailDoubleClick(videoNode);
+              onVideoDoubleClick(videoNode);
             },
             didMount: ref => {
               this.nodeRefs.push({
@@ -25467,7 +25442,6 @@ class stream_Stream extends mixins.w9 {
         return floatDetached ? [...streaming, ...rest].map((p, i) => $$PEER(p, i)) : [...streaming.map((p, i) => $$PEER(p, i)), external_React_default().createElement(videoNode.Cn, {
           key: `${mode}_${u_handle}`,
           chatRoom: chatRoom,
-          className: "with-contain",
           didMount: ref => {
             this.nodeRefs.push({
               clientId: u_handle,
@@ -25479,7 +25453,7 @@ class stream_Stream extends mixins.w9 {
           willUnmount: () => {
             this.nodeRefs = this.nodeRefs.filter(nodeRef => nodeRef.clientId !== u_handle);
           }
-        }, this.renderNodeMenu()), ...rest.map((p, i) => $$PEER(p, i))];
+        }, this.renderSelfViewMenu()), ...rest.map((p, i) => $$PEER(p, i))];
       }
       this.chunks = chunkNodes(floatDetached ? [...streaming, ...rest] : [...streaming, Object.values(peers).find(p => !(p instanceof CallManager2.Peer)), ...rest], streamsPerPage);
       this.chunksLength = Object.values(this.chunks).length;
@@ -25525,7 +25499,6 @@ class stream_Stream extends mixins.w9 {
           return external_React_default().createElement(videoNode.Cn, {
             key: `${mode}_${u_handle}`,
             chatRoom: chatRoom,
-            className: "with-contain",
             didMount: ref => {
               if (!this.nodeRefs[i]) {
                 this.nodeRefs[i] = [];
@@ -25555,17 +25528,27 @@ class stream_Stream extends mixins.w9 {
         return null;
       }
     }
+    const videoNodeRef = external_React_default().createRef();
     return external_React_default().createElement(VideoType, {
       key: source.clientId,
       chatRoom: chatRoom,
       source: source,
       ephemeralAccounts: ephemeralAccounts,
-      onCallMinimize: onCallMinimize
-    }, this.renderNodeMenu(source));
+      onCallMinimize: onCallMinimize,
+      toggleFullScreen: () => {
+        call.setPinnedCid(source.clientId);
+      },
+      ref: node => {
+        videoNodeRef.current = node;
+      }
+    }, this.renderNodeMenu(source, {
+      key: `${source.clientId}-main`,
+      isMain: true,
+      videoNodeRef
+    }));
   }
-  renderNodeMenu(peer) {
+  renderNodeMenu(peer, props) {
     const {
-      call,
       mode,
       chatRoom,
       ephemeralAccounts,
@@ -25573,18 +25556,18 @@ class stream_Stream extends mixins.w9 {
       onSpeakerChange,
       onModeChange
     } = this.props;
-    if (peer) {
-      return external_React_default().createElement(videoNodeMenu.Ay, {
-        mode: mode,
-        privilege: chatRoom.members[peer.userHandle],
-        chatRoom: chatRoom,
-        stream: peer,
-        ephemeralAccounts: ephemeralAccounts,
-        onCallMinimize: onCallMinimize,
-        onSpeakerChange: onSpeakerChange,
-        onModeChange: onModeChange
-      });
-    }
+    return external_React_default().createElement(videoNodeMenu.Ay, (0,esm_extends.A)({
+      mode: mode,
+      privilege: chatRoom.members[peer.userHandle],
+      chatRoom: chatRoom,
+      stream: peer,
+      ephemeralAccounts: ephemeralAccounts,
+      onCallMinimize: onCallMinimize,
+      onSpeakerChange: onSpeakerChange,
+      onModeChange: onModeChange
+    }, props));
+  }
+  renderSelfViewMenu() {
     return external_React_default().createElement("div", {
       className: "node-menu theme-dark-forced"
     }, external_React_default().createElement("div", {
@@ -26091,7 +26074,7 @@ const __WEBPACK_DEFAULT_EXPORT__ = ((0,_mixins1__.Zz)(_micObserver_jsx4__.Q, _pe
 "use strict";
 __webpack_require__.d(__webpack_exports__, {
 Cn: () => (LocalVideoHiRes),
-a5: () => (renderAudioIndicator),
+Gz: () => (AudioLevelIndicator),
 au: () => (PeerVideoThumb),
 bJ: () => (LocalVideoThumb),
 zu: () => (PeerVideoHiRes)
@@ -26106,49 +26089,21 @@ var _call_jsx3__ = __webpack_require__(3);
 
 
 
-const renderAudioIndicator = source => {
-  if (source) {
-    const {
-      audioMuted,
-      clientId
-    } = source;
-    return react0().createElement("span", {
-      className: "simpletip",
-      "data-simpletip-class": "theme-dark-forced",
-      "data-simpletipposition": "top",
-      "data-simpletipoffset": "5",
-      "data-simpletip": audioMuted ? l.muted : ''
-    }, react0().createElement("i", {
-      className: `
-                        sprite-fm-mono
-                        ${audioMuted ? 'icon-mic-off-thin-outline inactive' : 'icon-mic-thin-outline'}
-                    `
-    }, audioMuted ? null : react0().createElement("div", {
-      className: `mic-fill indicator-${clientId}`
-    })));
-  }
-  return null;
-};
 class VideoNode extends _mixins1__.w9 {
   constructor(props, source) {
     super(props);
     this.nodeRef = react0().createRef();
     this.contRef = react0().createRef();
+    this.audioLevelRef = react0().createRef();
     this.statsHudRef = react0().createRef();
     this.source = source;
   }
   componentDidMount() {
-    var _this$props$didMount, _this$props, _this$nodeRef, _this$source;
+    var _this$props$didMount, _this$props, _this$nodeRef;
     super.componentDidMount();
     this.source.registerConsumer(this);
     (_this$props$didMount = (_this$props = this.props).didMount) == null || _this$props$didMount.call(_this$props, (_this$nodeRef = this.nodeRef) == null ? void 0 : _this$nodeRef.current);
     this.requestVideo(true);
-    (_this$source = this.source) == null || (_this$source = _this$source.sfuPeer) == null || _this$source.requestAudioLevel(audioLevel => {
-      const speakerIndicationRefs = document.querySelectorAll(`.mic-fill.indicator-${this.source.clientId}`);
-      for (const speakerIndication of speakerIndicationRefs) {
-        speakerIndication.style.height = `${audioLevel * 100 + 2}px`;
-      }
-    });
   }
   onVisibilityChange(isVisible) {
     this.requestVideo(isVisible);
@@ -26166,10 +26121,8 @@ class VideoNode extends _mixins1__.w9 {
   }
   displayVideoElement(video, container) {
     this.attachVideoElemHandlers(video);
+    this.video = video;
     container.replaceChildren(video);
-    if (video.readyState === 4) {
-      container.classList.remove("video-node-loading");
-    }
   }
   attachVideoElemHandlers(video) {
     if (video._snSetup) {
@@ -26179,14 +26132,22 @@ class VideoNode extends _mixins1__.w9 {
     video.controls = false;
     video.muted = true;
     video.ondblclick = e => {
-      if (this.props.onDoubleClick) {
-        this.props.onDoubleClick(e, this);
+      const {
+        onDoubleClick,
+        toggleFullScreen
+      } = this.props;
+      onDoubleClick == null || onDoubleClick(e, this);
+      if (!document.fullscreenElement) {
+        var _this$nodeRef$current;
+        if (toggleFullScreen && typeof toggleFullScreen === 'function') {
+          toggleFullScreen(this);
+        }
+        (_this$nodeRef$current = this.nodeRef.current) == null || _this$nodeRef$current.requestFullscreen({
+          navigationUI: 'hide'
+        });
       }
     };
     video.onloadeddata = ev => {
-      if (this.contRef.current) {
-        this.contRef.current.classList.remove("video-node-loading");
-      }
       if (this.props.onLoadedData) {
         this.props.onLoadedData(ev);
       }
@@ -26195,6 +26156,7 @@ class VideoNode extends _mixins1__.w9 {
   }
   componentWillUnmount() {
     super.componentWillUnmount();
+    delete this.video;
     this.detachVideoElemHandlers();
     this.source.deregisterConsumer(this);
     if (this.props.willUnmount) {
@@ -26210,6 +26172,18 @@ class VideoNode extends _mixins1__.w9 {
     video.onloadeddata = null;
     video.ondblclick = null;
     delete video._snSetup;
+  }
+  isVideoCropped() {
+    var _this$video;
+    return (_this$video = this.video) == null ? void 0 : _this$video.classList.contains("video-crop");
+  }
+  cropVideo() {
+    var _this$video2;
+    (_this$video2 = this.video) == null || _this$video2.classList.add("video-crop");
+  }
+  uncropVideo() {
+    var _this$video3;
+    (_this$video3 = this.video) == null || _this$video3.classList.remove("video-crop");
   }
   displayStats(stats) {
     const elem = this.statsHudRef.current;
@@ -26249,7 +26223,7 @@ class VideoNode extends _mixins1__.w9 {
         className: "video-node-holder video-node-loading"
       });
     }
-    delete this._lastResizeWidth;
+    delete this._lastResizeHeight;
     return react0().createElement(_contacts_jsx2__.Avatar, {
       contact: M.u[source.userHandle]
     });
@@ -26271,16 +26245,14 @@ class VideoNode extends _mixins1__.w9 {
       chatRoom
     } = this.props;
     const {
-      source,
-      isThumb
+      source
     } = this;
     const {
       sfuClient
     } = chatRoom.call;
     const {
       userHandle,
-      isOnHold,
-      hasScreenAndCam
+      isOnHold
     } = source;
     const $$CONTAINER = ({
       children
@@ -26290,7 +26262,9 @@ class VideoNode extends _mixins1__.w9 {
     if (isOnHold) {
       return react0().createElement($$CONTAINER, null, this.getStatusIcon('icon-pause', l[23542].replace('%s', M.getNameByHandle(userHandle))));
     }
-    return react0().createElement((react0().Fragment), null, mode === _call_jsx3__.g.MAIN && _call_jsx3__.Ay.isModerator(chatRoom, userHandle) && this.getStatusIcon('icon-admin-outline call-role-icon', l[8875]), react0().createElement($$CONTAINER, null, renderAudioIndicator(source), sfuClient.haveBadNetwork ? this.getStatusIcon('icon-weak-signal', l.poor_connection) : null, hasScreenAndCam && isThumb ? this.getStatusIcon('icon-pc-linux', 'Sharing screen') : null));
+    return react0().createElement((react0().Fragment), null, mode === _call_jsx3__.g.MAIN && _call_jsx3__.Ay.isModerator(chatRoom, userHandle) && this.getStatusIcon('icon-admin-outline call-role-icon', l[8875]), react0().createElement($$CONTAINER, null, react0().createElement(AudioLevelIndicator, {
+      source: source
+    }), sfuClient.haveBadNetwork ? this.getStatusIcon('icon-weak-signal', l.poor_connection) : null));
   }
   render() {
     const {
@@ -26314,7 +26288,7 @@ class VideoNode extends _mixins1__.w9 {
     const {
       call
     } = chatRoom;
-    const isActiveSpeaker = !source.audioMuted && call.activeStream && call.activeStream === source.clientId;
+    const isActiveSpeaker = !source.audioMuted && call.speakerCid === source.clientId;
     return react0().createElement("div", {
       ref: nodeRef,
       className: `
@@ -26337,21 +26311,21 @@ class VideoNode extends _mixins1__.w9 {
 }
 class DynVideo extends VideoNode {
   onAvChange() {
-    this._lastResizeWidth = null;
+    this._lastResizeHeight = null;
     super.onAvChange();
   }
-  dynRequestVideo(forceVisible) {
+  dynRequestVideo() {
     const {
       source
     } = this;
     if (source.isFake || source.isDestroyed) {
       return;
     }
-    if (source.isStreaming() && this.isMounted() && (this.isComponentVisible() || forceVisible)) {
+    if (source.isStreaming() && this.isMounted()) {
       const node = this.findDOMNode();
-      this.dynRequestVideoBySize(node.offsetWidth, node.offsetHeight);
+      this.dynRequestVideoBySize(node.offsetHeight);
     } else {
-      this.dynRequestVideoBySize(0, 0);
+      this.dynRequestVideoBySize(0);
       this.displayStats(null);
     }
   }
@@ -26361,26 +26335,26 @@ class DynVideo extends VideoNode {
       this.dynUpdateVideoElem();
     }
   }
-  dynRequestVideoBySize(w) {
-    if (w === 0) {
-      this._lastResizeWidth = 0;
+  dynRequestVideoBySize(h) {
+    if (h === 0) {
+      this._lastResizeHeight = 0;
       this.dynRequestVideoQuality(CallManager2.VIDEO_QUALITY.NO_VIDEO);
       return;
     }
     if (this.contRef.current) {
-      if (this._lastResizeWidth === w) {
+      if (this._lastResizeHeight === h) {
         return;
       }
-      this._lastResizeWidth = w;
+      this._lastResizeHeight = h;
     } else {
-      this._lastResizeWidth = null;
+      this._lastResizeHeight = null;
     }
     let newQ;
-    if (w > 400) {
+    if (h > 360) {
       newQ = CallManager2.VIDEO_QUALITY.HIGH;
-    } else if (w > 200) {
+    } else if (h > 180) {
       newQ = CallManager2.VIDEO_QUALITY.MEDIUM;
-    } else if (w > 180 || this.noThumb) {
+    } else if (h > 90 || this.noThumb) {
       newQ = CallManager2.VIDEO_QUALITY.LOW;
     } else {
       newQ = CallManager2.VIDEO_QUALITY.THUMB;
@@ -26424,7 +26398,7 @@ class PeerVideoHiRes extends DynVideoDirect {
 class DynVideoCloned extends DynVideo {
   constructor(props, source) {
     super(props, source);
-    this.ownVideo = document.createElement("video");
+    this.ownVideo = CallManager2.createVideoElement();
   }
   dynSetVideoSource(srcPlayer, vidCont) {
     const cloned = this.ownVideo;
@@ -26450,7 +26424,7 @@ class PeerVideoThumbFixed extends VideoNode {
   constructor(props) {
     super(props, props.source);
     assert(props.source.hasScreenAndCam);
-    this.ownVideo = document.createElement("video");
+    this.ownVideo = CallManager2.createVideoElement();
     if (CallManager2.Call.VIDEO_DEBUG_MODE) {
       this.onRxStats = this._onRxStats;
     }
@@ -26527,7 +26501,7 @@ class LocalVideoHiResCloned extends VideoNode {
   constructor(props) {
     super(props, props.chatRoom.call.getLocalStream());
     this.isLocal = true;
-    this.ownVideo = document.createElement("video");
+    this.ownVideo = CallManager2.createVideoElement();
   }
   get isLocalScreen() {
     return this.source.av & Av.Screen;
@@ -26567,7 +26541,7 @@ class LocalVideoThumb extends VideoNode {
     this.isLocal = true;
     this.isLocalScreen = source.av & Av.Screen && !(source.av & Av.Camera);
     this.sfuClient = props.chatRoom.call.sfuClient;
-    this.ownVideo = document.createElement("video");
+    this.ownVideo = CallManager2.createVideoElement();
   }
   requestVideo() {
     const vidCont = this.contRef.current;
@@ -26593,6 +26567,51 @@ class LocalVideoThumb extends VideoNode {
     const av = this.sfuClient.availAv;
     this.isLocalScreen = av & Av.Screen && !(av & Av.Camera);
     super.onAvChange();
+  }
+}
+class AudioLevelIndicator extends (react0().Component) {
+  constructor(props) {
+    super(props);
+    this.source = props.source;
+    this.indicatorRef = react0().createRef();
+    this.updateAudioLevel = this.updateAudioLevel.bind(this);
+  }
+  componentDidMount() {
+    this.source.registerVuLevelConsumer(this);
+  }
+  componentWillUnmount() {
+    this.source.unregisterVuLevelConsumer(this);
+  }
+  updateAudioLevel(level) {
+    const levelInd = this.indicatorRef.current;
+    if (!levelInd) {
+      return;
+    }
+    level = Math.round(level * 400);
+    if (level > 90) {
+      level = 90;
+    }
+    levelInd.style.height = `${level + 10}%`;
+  }
+  render() {
+    const {
+      audioMuted
+    } = this.source;
+    return react0().createElement("span", {
+      className: "simpletip",
+      "data-simpletip-class": "theme-dark-forced",
+      "data-simpletipposition": "top",
+      "data-simpletipoffset": "5",
+      "data-simpletip": audioMuted ? l.muted : ''
+    }, react0().createElement("i", {
+      className: `
+                        sprite-fm-mono
+                        ${audioMuted ? 'icon-mic-off-thin-outline inactive' : 'icon-mic-thin-outline'}
+                    `
+    }, audioMuted ? null : react0().createElement("div", {
+      ref: this.indicatorRef,
+      className: "mic-fill"
+    })));
   }
 }
 
@@ -26689,6 +26708,30 @@ const Pin = ({
   }, react0().createElement("span", null, mode === _call_jsx3__.g.THUMBNAIL ? l.display_in_main_view : l.switch_to_thumb_view));
 };
 class VideoNodeMenu extends _mixins1__.w9 {
+  constructor(...args) {
+    super(...args);
+    this.ToggleCrop = ({
+      videoNodeRef
+    }) => {
+      const videoNode = videoNodeRef == null ? void 0 : videoNodeRef.current;
+      if (!videoNode) {
+        return null;
+      }
+      return videoNode.isVideoCropped() ? react0().createElement(_button_jsx2__.A, {
+        icon: "sprite-fm-mono grid-main",
+        onClick: () => {
+          videoNode.uncropVideo();
+          this.forceUpdate();
+        }
+      }, react0().createElement("span", null, "Uncrop video")) : react0().createElement(_button_jsx2__.A, {
+        icon: "sprite-fm-mono grid-main",
+        onClick: () => {
+          videoNode.cropVideo();
+          this.forceUpdate();
+        }
+      }, react0().createElement("span", null, "Crop video"));
+    };
+  }
   render() {
     const {
       NAMESPACE

@@ -8,7 +8,7 @@ import { Emoji } from '../../../ui/utils.jsx';
 import Button from './button.jsx';
 import ContactsPanel from '../contactsPanel/contactsPanel.jsx';
 import { Pin, Privilege } from './videoNodeMenu.jsx';
-import { renderAudioIndicator } from './videoNode.jsx';
+import { AudioLevelIndicator } from './videoNode.jsx';
 
 class Participant extends MegaRenderMixin {
     baseIconClass = 'sprite-fm-mono';
@@ -67,7 +67,7 @@ class Participant extends MegaRenderMixin {
                             ${source.videoMuted ? 'icon-video-off-thin-outline inactive' : 'icon-video-thin-outline'}
                         `}
                     />
-                    {renderAudioIndicator(source)}
+                    <AudioLevelIndicator source={source} />
                     <div className="participants-menu theme-dark-forced">
                         <div className="participants-menu-toggle">
                             <i className="sprite-fm-mono icon-side-menu"/>

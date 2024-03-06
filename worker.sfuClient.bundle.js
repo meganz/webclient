@@ -1,7 +1,17 @@
+/** @file automatically generated, do not edit it. */
+/* eslint-disable max-len, indent, dot-notation, no-extra-parens */
 /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
 var __webpack_exports__ = {};
 
+const kLogTag = "sfuWorker:";
+var gDebug = false;
+var gOwnCid;
+var gEncryptKey;
+var gSenderCidAndKeyId;
+var gEncryptors;
+var gDecryptors;
+var gPeerKeys;
 function newCryptoModeDesc(iv) {
     return { name: 'AES-GCM', tagLength: 32, iv: iv };
 }
@@ -18,7 +28,7 @@ class Encryptor extends TransformStream {
         this.cryptoMode = newCryptoModeDesc(this.iv);
         this.mid = mid;
         this.iv.set(iv, 4);
-        console.debug(`cworker: Created encryptor for mid ${mid} iv=${binToHex(iv.buffer)}`);
+        // LOGD_CWORKER(`Created encryptor for mid ${mid} iv=${binToHex(iv.buffer)}`);
     }
 }
 class Decryptor extends TransformStream {
@@ -28,21 +38,19 @@ class Decryptor extends TransformStream {
         this.ivView = new DataView(this.iv.buffer);
         this.cryptoMode = newCryptoModeDesc(this.iv);
         this.mid = mid;
-        console.debug("cworker: Created decryptor for mid", mid);
+        // LOGD_CWORKER("Created decryptor for mid", mid);
     }
     assign(fromCid, iv) {
         this.senderCid = fromCid;
         this.iv.set(iv, 4);
         this.noPacketYet = true;
-        console.log(`cworker: Assigned track with mid ${this.mid} to peer cid ${fromCid} with iv: ${binToHex(iv.buffer)}`);
+        do {
+            if (gDebug) {
+                console.log(kLogTag, `Assigned track with mid ${this.mid} to peer cid ${fromCid} with iv: ${binToHex(iv.buffer)}`);
+            }
+        } while (0);
     }
 }
-var gOwnCid;
-var gEncryptKey;
-var gSenderCidAndKeyId;
-var gEncryptors;
-var gDecryptors;
-var gPeerKeys;
 function resetCrypto() {
     gPeerKeys = new Map;
     gEncryptors = {};
@@ -62,7 +70,7 @@ function createEncryptor(inputStream, outputStream, mid, iv) {
             return;
         }
         enc.ivView.setUint32(0, ++enc.ctr, true);
-        //console.log("encrypt[" + ctx.mid + "]: encrypting frame", ctx.ctr, "iv:", binToHex(ctx.ivView.buffer));
+        // LOGD_CWORKER("encrypt[" + ctx.mid + "]: encrypting frame", ctx.ctr, "iv:", binToHex(ctx.ivView.buffer));
         let packet = new Uint8Array(encodedFrame.data.byteLength + 12);
         let header = new DataView(packet.buffer, 0, 8);
         header.setUint32(0, gSenderCidAndKeyId, true);
@@ -83,7 +91,11 @@ function setEncryptKey(keyId, key, notify) {
         self.postMessage({ op: "keyset", keyId: keyId });
     }
     else {
-        console.log("cworker: updated send key -> id:", keyId);
+        do {
+            if (gDebug) {
+                console.log(kLogTag, "updated send key -> id:", keyId);
+            }
+        } while (0);
     }
 }
 function createDecryptor(inputStream, outputStream, mid) {
@@ -93,12 +105,12 @@ function createDecryptor(inputStream, outputStream, mid) {
         let fromCidAndKeyId = header.getUint32(0, true);
         let fromCid = fromCidAndKeyId >>> 8;
         if (fromCid !== dec.senderCid) {
-            console.warn("cworker: decrypt[" + dec.mid + "]: Skipping packet from unexpected sender cid", fromCid);
+            console.warn(kLogTag, `decrypt[${dec.mid}]: Skipping packet from unexpected sender cid ${fromCid}`);
             return;
         }
         let key = gPeerKeys.get(fromCidAndKeyId);
         if (!key) {
-            console.warn("cworker: decrypt[" + dec.mid + "]: Can't decrypt packet from cid %d with unknown key", fromCid, fromCidAndKeyId & 0xff);
+            console.warn(kLogTag, `decrypt[${dec.mid}]: Can't decrypt packet from cid ${fromCid} with unknown key ${fromCidAndKeyId & 0xff}`);
             return;
         }
         let frameCtr = header.getUint32(4, true);
@@ -106,25 +118,28 @@ function createDecryptor(inputStream, outputStream, mid) {
         let encData = new DataView(encodedFrame.data, 8);
         dec.cryptoMode.additionalData = header;
         try {
-            //console.log("decrypt[" + ctx.mid + "]: decrypting frame", frameCtr, "from peer", fromCid, "iv:", binToHex(ctx.ivView.buffer));
+            // LOG_CWORKER("decrypt[" + ctx.mid + "]: decrypting frame", frameCtr, "from peer", fromCid, "iv:", binToHex(ctx.ivView.buffer));
             let plaintext = await crypto.subtle.decrypt(dec.cryptoMode, key, encData);
             encodedFrame.data = plaintext;
             controller.enqueue(encodedFrame);
         }
         catch (err) {
             if (err.message) {
-                console.error("cworker: Error decrypting track with mid", mid, ":", err.message);
+                console.warn(kLogTag, `Error decrypting track with mid ${mid}: ${err.message}`);
             }
             else {
-                console.error("cworker: General error decrypting track with mid %d from peer", mid, fromCid);
+                console.warn(kLogTag, `General error decrypting track with mid ${mid} from peer ${fromCid}`);
             }
         }
         if (dec.noPacketYet) {
             delete dec.noPacketYet;
-            let msg = { op: "rxEvent", mid: mid };
+            const msg = { op: "rx-first", mid: mid };
+            if (encodedFrame.type) {
+                msg.type = encodedFrame.type;
+            }
             self.postMessage(msg);
         }
-        //console.log("frame size[" + mid +"]: ", encodedFrame.data.byteLength);
+        // LOG_CWORKER("frame size[" + mid +"]: ", encodedFrame.data.byteLength);
     });
     inputStream.pipeThrough(dec).pipeTo(outputStream);
 }
@@ -148,7 +163,11 @@ function delKeysOfPeer(cid) {
         }
     }
     if (num) {
-        console.log(`cworker: Deleted ${num} keys of peer`, cid);
+        do {
+            if (gDebug) {
+                console.log(kLogTag, `Deleted ${num} keys of peer`, cid);
+            }
+        } while (0);
     }
 }
 onmessage = function (event) {
@@ -179,8 +198,11 @@ onmessage = function (event) {
         case 'r':
             resetCrypto();
             return;
+        case 'dbg':
+            gDebug = data[1];
+            return;
         default:
-            console.error("cworker: Unknown command '" + cmd + "'");
+            console.warn(kLogTag, `Unknown command '${cmd}'`);
             return;
     }
 };

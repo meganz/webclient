@@ -299,6 +299,19 @@ if (Object.fromEntries === undefined) {
             }
         });
     }
+
+    if (!Array.prototype.findLast) {
+        Object.defineProperty(Array.prototype, 'findLast', {
+            configurable: !!window.is_karma,
+            value(callback) {
+                for (let i = this.length; i--;) {
+                    if (callback(this[i], i, this)) {
+                        return this[i];
+                    }
+                }
+            }
+        });
+    }
 })();
 
 mBroadcaster.once('boot_done', tryCatch(() => {

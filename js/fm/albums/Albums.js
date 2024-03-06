@@ -135,7 +135,7 @@ lazy(mega.gallery, 'albums', () => {
             }
 
             tmpMv = M.v;
-            M.v = [...album.nodes];
+            scope.fillMainView([...album.nodes]);
             previewMvLength = M.v.length;
 
             slideshow(firstNode, false);
@@ -176,7 +176,7 @@ lazy(mega.gallery, 'albums', () => {
                 }
 
                 mBroadcaster.once('slideshow:close', () => {
-                    M.v = tmpMv;
+                    scope.fillMainView(tmpMv);
 
                     scope.reinitiateEvents();
 
@@ -4034,7 +4034,11 @@ lazy(mega.gallery, 'albums', () => {
 
             if (Array.isArray(handles)) {
                 for (let i = 0; i < handles.length; i++) {
-                    nodes.push(M.d[handles[i]]);
+                    const n = M.d[handles[i]];
+                    console.assert(n, `node ${handles[i]} not in memory...`);
+                    if (n) {
+                        nodes.push(n);
+                    }
                 }
             }
             else {
@@ -4087,7 +4091,7 @@ lazy(mega.gallery, 'albums', () => {
 
             await this.buildAlbumsList(availableNodes);
 
-            M.v = availableNodes;
+            scope.fillMainView(availableNodes);
             const {id, button} = this.store[albumData.id];
 
             insertAlbumElement(id, button.el, this.tree.treeList, 'button');
@@ -4168,7 +4172,7 @@ lazy(mega.gallery, 'albums', () => {
 
             this.buildAlbumsList(availableNodes).then(() => {
                 if (isAlbums) {
-                    M.v = availableNodes;
+                    scope.fillMainView(availableNodes);
                     const id = M.currentdirid.replace(/albums\/?/i, '');
 
                     this.tree.focusAlbum(id);

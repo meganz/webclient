@@ -72,7 +72,7 @@ pro.propay = {
         }
 
         // Cache current Pro Payment page selector
-        this.$page = $('.payment-section', '.fmholder');
+        this.$page = $('.payment-section', '#startholder');
 
         const $selectedPlanName = $('.top-header.plan-title .plan-name', this.$page);
         const $purchaseButton = $('button.purchase', this.$page);
@@ -365,8 +365,11 @@ pro.propay = {
         // Sort plan durations by lowest number of months first
         pro.propay.sortMembershipPlans();
 
+        // Cache the duration options list
+        const $durationList = $('.duration-options-list', this.$page);
+
         // Clear the radio options, in case they revisted the page
-        $('.duration-options-list .payment-duration', this.$page).not('.template').remove();
+        $('.payment-duration', $durationList).not('.template').remove();
 
         // Loop through the available plan durations for the current membership plan
         for (var i = 0, length = pro.membershipPlans.length; i < length; i++) {
@@ -518,12 +521,11 @@ pro.propay = {
         // Otherwise pre-select the chosen period from previous page
 
         const selectedPeriod = sessionStorage['pro.period'] || 12;
-        let $selectedOption = $('.payment-duration[data-plan-months="'
-            + selectedPeriod + '"]', '.duration-options-list');
+        let $selectedOption = $(`.payment-duration[data-plan-months=${selectedPeriod}]`, $durationList);
 
-        // Otherwise pre-select yearly payment
+        // Otherwise pre-select yearly payment (or monthly if plan is Pro Flexi)
         if (!$selectedOption.length) {
-            $selectedOption = $('.payment-duration:not(.template)', '.duration-options-list').last();
+            $selectedOption = $('.payment-duration:not(.template)', $durationList).last();
         }
 
         $('input', $selectedOption).prop('checked', true);
@@ -941,14 +943,11 @@ pro.propay = {
             }
         }
 
+        const isFlexiPlan = currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === pro.ACCOUNT_LEVEL_PRO_FLEXI;
+
         // Show the extra Question 3 recurring option section if the plan being bought
         // is Pro Flexi (forced recurring)
-        if (currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
-            $('.renewal-option', this.$page).removeClass('hidden');
-        }
-        else {
-            $('.renewal-option', this.$page).addClass('hidden');
-        }
+        $('.renewal-option', this.$page).toggleClass('hidden', !isFlexiPlan);
 
         $numbers = $('.number:visible', this.$page);
 
@@ -1018,8 +1017,7 @@ pro.propay = {
         }
 
         // If discount with compulsory subscription or Pro Flexi, hide the No option so it'll be forced recurring
-        if ((discountInfo && discountInfo.cs) ||
-            currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
+        if ((discountInfo && discountInfo.cs) || isFlexiPlan) {
             $('.renewal-options-list .renewal-option', this.$page).last().addClass('hidden');
         }
 

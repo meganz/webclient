@@ -56,6 +56,8 @@ lazy(mega, 'rewindUi', () => {
     const TRIGGER_UPG_LANDING_FREE = 4;
     const TRIGGER_UPG_LANDING_PRO_LITE = 5;
 
+    const REWIND_ACTIVATION_DATE = new Date('2024-01-01T00:00:00');
+
     class RewindSidebar {
         constructor() {
             this.parentContainer = null;
@@ -185,7 +187,8 @@ lazy(mega, 'rewindUi', () => {
             this.DATEPICKER_OPTIONS = {
                 classes: 'rewind-datepicker-calendar',
                 dateFormat: 'mm/dd/yyyy',
-                minDate: null,
+                minDate: REWIND_ACTIVATION_DATE,
+                disableNavWhenOutOfRange: true,
                 startDate: null,
                 prevHtml: '<i class="sprite-fm-mono icon-arrow-right"></i>',
                 nextHtml: '<i class="sprite-fm-mono icon-arrow-right"></i>',
@@ -207,10 +210,16 @@ lazy(mega, 'rewindUi', () => {
                     let hasRecord = false;
                     let isFuture = false;
 
-                    if (mega.rewind.isAccountProType()) {
+                    const isBeforeActivationDate = date < REWIND_ACTIVATION_DATE;
+
+                    if (isBeforeActivationDate || mega.rewind.isAccountProType()) {
+                        const tooltip = isBeforeActivationDate
+                            ? l.rewind_datepicker_cell_tooltip_before_activation
+                            : l.rewind_datepicker_cell_tooltip_disabled_pro;
+
                         disabledCellContent = `<span 
                             class="cell-value simpletip"
-                            data-simpletip="${l.rewind_datepicker_cell_tooltip_disabled_pro}"
+                            data-simpletip="${tooltip}"
                             data-simpletip-class="rewind-calendar-tooltip theme-dark-forced">
                             ${oldHtml}
                         </span>`;
@@ -220,7 +229,7 @@ lazy(mega, 'rewindUi', () => {
                         const key = mega.rewind.getDayMonthYear(date);
                         const record = mega.rewind.changeLog.dates[key];
                         hasRecord = typeof record !== 'undefined';
-                        isDisabled = date < mega.rewind.lastRewindableDate;
+                        isDisabled = isBeforeActivationDate || date < mega.rewind.lastRewindableDate;
 
                         if (hasRecord) {
                             cellClasses += ' -has-value-';
@@ -277,11 +286,11 @@ lazy(mega, 'rewindUi', () => {
                         isFuture = date > mega.rewind.currentDate;
                     }
                     else if (cellType === DATEPICKER_CELL_TYPE_MONTH) {
-                        isDisabled = date < mega.rewind.lastRewindableMonth;
+                        isDisabled = isBeforeActivationDate || date < mega.rewind.lastRewindableMonth;
                         isFuture = date > mega.rewind.currentMonth;
                     }
                     else if (cellType === DATEPICKER_CELL_TYPE_YEAR) {
-                        isDisabled = date < mega.rewind.lastRewindableYear;
+                        isDisabled = isBeforeActivationDate || date < mega.rewind.lastRewindableYear;
                         isFuture = date > mega.rewind.currentYear;
                     }
 

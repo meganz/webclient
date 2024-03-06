@@ -54,6 +54,7 @@ function init_page() {
                 true
             );
         });
+        document.body.style.removeProperty('background');
     }
     else {
         console.info(404, tmp);

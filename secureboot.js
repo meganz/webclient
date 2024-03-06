@@ -2731,6 +2731,7 @@ else if (!browserUpdate) {
 
     jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
     jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
+    jsl.push({f:'js/fm/properties.js', n: 'fm_properties_js', j:1});
     jsl.push({f:'js/fm/removenode.js', n: 'fm_removenode_js', j: 1});
     jsl.push({f:'js/fm/ufssizecache.js', n: 'ufssizecache_js', j:1});
 
@@ -2845,7 +2846,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/fm/account-change-password.js', n: 'fm_account_change_password_js', j:1});
         jsl.push({f:'js/fm/account-change-email.js', n: 'fm_account_change_email_js', j:1});
         jsl.push({f:'js/fm/dialogs.js', n: 'fm_dialogs_js', j:1});
-        jsl.push({f:'js/fm/properties.js', n: 'fm_properties_js', j:1});
         jsl.push({f:'js/ui/dropdowns.js', n: 'dropdowns_js', j:1});
         jsl.push({f:'css/node-filter.css', n: 'nodefilter_css', j:2});
         jsl.push({f:'js/ui/node-filter.js', n: 'nodefilter_js', j:1});
@@ -3006,6 +3006,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/mobile/mobile.achieve.invite-bonuses.css', n: 'mobile_achieve_inv_bonuses_css', j: 2, w: 1});
         jsl.push({f:'css/mobile/mobile.file-request-management.css', n: 'mobile_fr_mgmt_css', j: 2, w: 1});
         jsl.push({f:'css/mobile/mobile.conflict-resolution.css', n: 'mobile_conflict_resolution_css', j: 2, w: 1});
+        jsl.push({f:'css/mobile/mobile.recovery.logout.css', n: 'mobile_recovery_logout_css', j: 2, w: 1});
 
         jsl.push({f:'html/mobile.html', n: 'mobile', j: 0, w: 1});
         jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
@@ -3043,6 +3044,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.sms.achievement.js', n: 'mobile_sms_achievement', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.rubbishbin.js', n: 'mobile_rubbishbin_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.conflict-resolution.js', n: 'mobile_conflict_resolution_js', j: 1 });
+        jsl.push({f:'js/mobile/mobile.recovery-logout.js', n: 'mobile_recovery_logout_js', j: 1 });
         jsl.push({f:'js/mobile/mobile.over-bandwidth-quota.js', n: 'mobile_over_bandwidth_quota_js', j: 1 });
         jsl.push({f:'js/mobile/mobile.over-storage-quota.js', n: 'mobile_over_storage_quota_js', j: 1 });
         jsl.push({f:'html/mvoucherinfo.html', n: 'mvoucherinfo', j: 0, w: 1});

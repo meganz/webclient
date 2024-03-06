@@ -406,6 +406,9 @@
         if (container.parentNode.parentNode.classList.contains('simpletip-tooltip')) {
             isSimpletip = true;
         }
+        else if (container.classList.contains('location')) {
+            items.shift(); // Show location of item without item itself
+        }
         else if (container.classList.contains('info')) {
             isInfoBlock = true;
         }
@@ -426,6 +429,8 @@
 
                 const isLastItem = isSimpletip ? i === lastPos + 1 : i === lastPos;
                 const isRoot = i === items.length - 1;
+                const icon = is_mobile ? 'sprite-mobile-fm-mono icon-chevron-right-thin-solid' :
+                    'sprite-fm-mono icon-arrow-right';
                 let item;
                 // if we won't have space, add it to the dropdown, but always render the current folder,
                 // and root if there are no extraItems
@@ -453,7 +458,7 @@
                                     </span>
                                     <i class="loading sprite-fm-theme icon-loading-spinner"></i>` : name}
                             </span>
-                            ${isLastItem ? '' : '<i class="next-arrow sprite-fm-mono icon-arrow-right icon16"></i>'}
+                            ${isLastItem ? '' : `<i class="next-arrow ${icon} icon16"></i>`}
                         </a>` + html;
 
                     // add on some space for the arrow

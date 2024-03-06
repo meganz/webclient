@@ -428,6 +428,9 @@ function init_register() {
         }, 4000);
     };
 
+    if (self.InitFileDrag) {
+        onIdle(InitFileDrag);
+    }
     startTimer();
 
     // Click next or prev.

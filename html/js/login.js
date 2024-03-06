@@ -260,6 +260,10 @@ function init_login() {
         pagelogin();
     });
 
+    if (self.InitFileDrag) {
+        onIdle(InitFileDrag);
+    }
+
     // Init inputs events
     accountinputs.init($formWrapper);
 }

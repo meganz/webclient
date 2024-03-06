@@ -292,23 +292,6 @@ export default class Call extends MegaRenderMixin {
         this.handleMouseOut = this.handleMouseOut.bind(this);
     }
 
-    recordActiveStream = () => {
-        if (this.state.recorder && this.state.recorder === u_handle) {
-            const { call, peers } = this.props;
-            const activeStream =
-                peers[call.forcedActiveStream] ||
-                Object.values(peers).findLast(p => p.isScreen) ||
-                peers[call.activeStream] ||
-                peers.getItem(0);
-
-            if (activeStream) {
-                call.sfuClient?.recordingForcePeerVideo(
-                    activeStream.isScreen || !activeStream.videoMuted ? activeStream.clientId : null
-                );
-            }
-        }
-    };
-
     /**
      * handleMouseMove
      * @description Mouse move event handler -- sets the `hovered` state and removes the hover delay.
@@ -350,7 +333,7 @@ export default class Call extends MegaRenderMixin {
 
     handleRetryTimeout = () => {
         const { call, chatRoom } = this.props;
-        if (call?.sfuClient?.connState === SfuClient.ConnState.kDisconnectedRetrying) {
+        if (call?.sfuClient.connState === SfuClient.ConnState.kDisconnectedRetrying) {
             this.handleCallEnd();
             chatRoom.trigger('onRetryTimeout');
             ion.sound.play(megaChat.SOUNDS.CALL_END);
@@ -520,11 +503,7 @@ export default class Call extends MegaRenderMixin {
                     )
             );
         });
-
-        chatRoom.rebind(`onPeerAvChange.${NAMESPACE}`, () => this.recordActiveStream());
-
         // --
-
         chatRoom.rebind(`onMutedBy.${NAMESPACE}`, (ev, { cid }) =>
             ChatToast.quick(
                 /* `You've been muted by %NAME` */
@@ -535,16 +514,16 @@ export default class Call extends MegaRenderMixin {
 
     unbindCallEvents = () =>
         [
-            `onCallPeerLeft.${NAMESPACE}`,
-            `onCallPeerJoined.${NAMESPACE}`,
-            `onCallLeft.${NAMESPACE}`,
-            `wrOnUsersAllow.${NAMESPACE}`,
-            `wrOnUsersEntered.${NAMESPACE}`,
-            `wrOnUserLeft.${NAMESPACE}`,
-            `alterUserPrivilege.${NAMESPACE}`,
-            `onCallState.${NAMESPACE}`,
-            `onRecordingStarted.${NAMESPACE}`,
-            `onRecordingStopped.${NAMESPACE}`
+            'onCallPeerLeft',
+            'onCallPeerJoined',
+            'onCallLeft',
+            'wrOnUsersAllow',
+            'wrOnUsersEntered',
+            'wrOnUserLeft',
+            'alterUserPrivilege',
+            'onCallState',
+            'onRecordingStarted',
+            'onRecordingStopped',
         ]
             .map(event => this.props.chatRoom.off(`${event}.${NAMESPACE}`));
 
@@ -630,7 +609,7 @@ export default class Call extends MegaRenderMixin {
     handleSpeakerChange = videoNode => {
         if (videoNode) {
             this.handleModeChange(MODE.MAIN);
-            this.props.call.setForcedActiveStream(videoNode.clientId);
+            this.props.call.setPinnedCid(videoNode.clientId);
             this.setState({ forcedLocal: videoNode.isLocal });
         }
     };
@@ -789,7 +768,7 @@ export default class Call extends MegaRenderMixin {
     };
 
     handleRecordingToggle = () => {
-        const { sfuClient } = this.props.call;
+        const { call } = this.props;
 
         if (this.state.recorder) {
             return (
@@ -817,11 +796,11 @@ export default class Call extends MegaRenderMixin {
                 if (cb || cb === null) {
                     return;
                 }
-                sfuClient.recordingStart()
+                call.sfuClient.recordingStart()
                     .then(() => {
                         this.setState({ recorder: u_handle });
                         this.handleModeChange(MODE.MAIN);
-                        this.recordActiveStream();
+                        call.recordActiveStream();
                         ChatToast.quick(l.started_recording_toast);
                     })
                     .catch(dump);
@@ -900,14 +879,6 @@ export default class Call extends MegaRenderMixin {
             </$$CONTAINER>
         );
     };
-
-    componentDidUpdate(prevProps, prevState) {
-        super.componentDidUpdate();
-        if (prevState.recorder !== this.state.recorder) {
-            this.props.call.recorder = this.state.recorder;
-        }
-        this.recordActiveStream();
-    }
 
     componentWillUnmount() {
         super.componentWillUnmount();
@@ -1022,7 +993,7 @@ export default class Call extends MegaRenderMixin {
                     onVideoClick={() => call.toggleVideo()}
                     onScreenSharingClick={this.handleScreenSharingToggle}
                     onHoldClick={this.handleHoldToggle}
-                    onThumbnailDoubleClick={videoNode => this.handleSpeakerChange(videoNode)}
+                    onVideoDoubleClick={videoNode => this.handleSpeakerChange(videoNode)}
                 />
 
                 {sidebar &&

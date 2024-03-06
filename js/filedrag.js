@@ -37,7 +37,7 @@
     function addUpload(files, emptyFolders) {
         var straight = $.doStraightUpload || Object(window.fmconfig).ulddd || M.currentrootid === M.RubbishID;
 
-        console.assert(page === 'start' || window.fminitialized, 'check this...');
+        console.assert(M.isFileDragPage(page) || window.fminitialized, 'check this...');
 
         if (M.InboxID && M.currentrootid && (M.currentrootid === M.InboxID
             || M.getNodeRoot(M.currentdirid.split('/').pop()) === M.InboxID)) {
@@ -46,7 +46,7 @@
             return false;
         }
 
-        if (page === 'start' || straight) {
+        if (M.isFileDragPage(page) || straight) {
             M.addUpload(files, false, emptyFolders);
         }
         else {
@@ -65,7 +65,7 @@
             filedrag_u = [];
             filedrag_paths = Object.create(null);
 
-            if (page === 'start') {
+            if (M.isFileDragPage(page)) {
                 start_upload();
             }
         }
@@ -361,7 +361,7 @@
             return false;
         }
 
-        if (page === 'start' && !is_mobile) {
+        if (M.isFileDragPage(page) && !is_mobile) {
             console.assert(typeof fm_addhtml === 'function');
             if (typeof fm_addhtml === 'function') {
                 fm_addhtml();
@@ -426,7 +426,7 @@
             return MegaDexie.import(files[0]).dump();
         }
 
-        if (window.d && (e.ctrlKey || e.metaKey) && MediaInfoLib.isFileSupported(files[0])) {
+        if ((e.ctrlKey || e.metaKey) && MediaInfoLib.isFileSupported(files[0])) {
             window.d = 2;
             document.body.textContent = 'Local videostream.js Test...';
             const video = mCreateElement('video', {width: 1280, height: 720, controls: true}, 'body');
@@ -473,7 +473,7 @@
                 }
             }
             M.addUpload(u);
-            if (page == 'start') {
+            if (M.isFileDragPage(page)) {
                 start_upload();
             }
             if (!window.InitFileDrag) {
@@ -513,7 +513,7 @@
      * @return {Boolean} Is allowed or not
      */
     function isFileDragAllowed() {
-        if (page === 'start') {
+        if (M.isFileDragPage(page)) {
             return true;
         }
         return !(is_fm() && // if page is fm,

@@ -298,6 +298,8 @@ mobile.uploadOverlay = {
             // Update subtitle with new progress
             mega.ui.overlay.addSubTitle(this.getProgress());
 
+            this.updateGeneralActions();
+
             this.updateHeaderAndButtons();
         }
     },

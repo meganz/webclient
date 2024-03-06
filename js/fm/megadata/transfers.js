@@ -1074,7 +1074,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
     var ul_id;
     var pause = '';
     var pauseTxt = '';
-    var ephemeral = page === 'start';
+    var ephemeral = M.isFileDragPage(page);
     var ttl = this.getTransferTableLengths();
 
     target = target || this.currentdirid;
@@ -1800,6 +1800,13 @@ MegaData.prototype.showTransferToast = function showTransferToast(t_type, t_leng
             icons
         });
     }
+};
+
+// @see filedrag.js
+MegaData.prototype.isFileDragPage = function(page) {
+    'use strict';
+
+    return page === 'start' || page === 'login' || page === 'register';
 };
 
 // report a transient upload error

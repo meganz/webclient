@@ -35,7 +35,7 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
             type: 'icon',
             parentNode: overlay.querySelector('.media-viewer-menu'),
             icon: 'sprite-mobile-fm-mono icon-more-horizontal-thin-outline',
-            iconSize: 28,
+            iconSize: 24,
             componentClassname: 'context-btn open-context-menu text-icon'
         });
         contextMenuButton.on('tap', () => {
@@ -70,24 +70,8 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
     async showLayout(nodeHandle) {
         this.setNode(nodeHandle);
 
-        const isPreviewable = this.nodeComponent.previewable;
-        const isLink = this.nodeComponent.node.link;
-        const downloadSupport = await MegaMobileViewOverlay.checkSupport(this.nodeComponent.node);
-
-        this.bottomBar = new MegaMobileBottomBar({
-            parentNode: this.domNode.querySelector('.media-viewer-container footer .image-controls'),
-            actions: this.getActionsArray(downloadSupport, isLink, isPreviewable),
-            adWrapper: 'adFile'
-        });
-
-        if (isPreviewable) {
-            this.domNode.querySelector('.media-viewer-container .content').classList.remove('hidden');
-            this.domNode.querySelector('.media-viewer-container .content-info').classList.add('hidden');
-        }
-        else {
-            this.domNode.querySelector('.media-viewer-container .content').classList.add('hidden');
-            this.domNode.querySelector('.media-viewer-container .content-info').classList.remove('hidden');
-        }
+        // Update media preview or item properties UI
+        await this.updateContent(nodeHandle);
 
         if (!is_video(this.nodeComponent.node)) {
             this.domNode.querySelector('.video-block').classList.add('hidden');
@@ -110,80 +94,24 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
     /**
      * Show the overlay
      * @param {String} nodeHandle A public or regular node handle
+     * @param {Boolean} isInfo File/folder information
      * @returns {void}
      */
-    async show(nodeHandle) {
+    async show(nodeHandle, isInfo) {
         this.setNode(nodeHandle);
+        this.isInfo = isInfo || this.isInfo; // Keep cached param when updating the content
+
+        // Show preview ot properties UI
+        await this.updateContent(nodeHandle);
 
         if (this.visible) {
+            // Make sure resize is triggered after hidden is gone for render media viewer
+            $(window).trigger('resize');
             return;
         }
 
-        const isPreviewable = this.nodeComponent.previewable;
-        const isLink = this.nodeComponent.node.link;
-        const downloadSupport = await MegaMobileViewOverlay.checkSupport(this.nodeComponent.node);
-
-        // Build bottom bar
-        if (this.bottomBar) {
-            this.bottomBar.destroy();
-        }
-
-        if (!M.currentrootid || M.currentrootid !== M.RubbishID) {
-
-            this.bottomBar = new MegaMobileBottomBar({
-                parentNode: this.domNode.querySelector('.media-viewer-container footer .image-controls'),
-                actions: this.getActionsArray(downloadSupport, isLink, isPreviewable),
-                adWrapper: 'adFile'
-
-            });
-
-            if (mobile.cloud.bottomBar) {
-                mobile.cloud.bottomBar.hide();
-            }
-        }
-
-        if (isPreviewable) {
-            this.domNode.querySelector('.media-viewer-container .content').classList.remove('hidden');
-            this.domNode.querySelector('.media-viewer-container .content-info').classList.add('hidden');
-        }
-        else {
-            // If user taps the browser's back button, push fake states of history/hash so they
-            // only go back one page rather than two (ref: imagesViewer.js 935 - 956)
-            pushHistoryState();
-            pushHistoryState(true);
-
-            this.domNode.querySelector('.media-viewer-container .content').classList.add('hidden');
-            this.domNode.querySelector('.media-viewer-container .content-info').classList.remove('hidden');
-
-            // Set file name and image
-            this.domNode.querySelector('.media-viewer-container').classList.remove('hidden');
-            this.domNode.querySelector('.media-viewer-container .file-name').textContent = this.nodeComponent.name;
-            this.domNode.querySelector('.media-viewer-container .filetype-img i').className =
-                this.nodeComponent.icon;
-
-            if (downloadSupport) {
-                if (this.inlineAlert) {
-                    this.inlineAlert.hide();
-                }
-            }
-            else if (this.inlineAlert) {
-                this.inlineAlert.show();
-            }
-            else {
-                this.inlineAlert = mobile.inline.alert.create({
-                    parentNode: this.domNode.querySelector('.media-viewer-container .content-info'),
-                    text: l.view_file_too_large,
-                    icon: 'sprite-mobile-fm-mono icon-info-thin-outline',
-                    iconSize: '24',
-                    closeButton: false,
-                    componentClassname: 'warning',
-                });
-            }
-        }
-
-        this.domNode.parentNode.classList.remove('hidden');
-
         // Show view file overlay
+        this.domNode.parentNode.classList.remove('hidden');
         this.domNode.classList.add('active');
         const fmlist = document.getElementById('file-manager-list-container');
 
@@ -191,7 +119,7 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
             fmlist.classList.add('hidden');
         }
 
-        if (isLink) {
+        if (this.nodeComponent.node.link) {
             mainlayout.classList.add('fm-overlay-link');
         }
         else {
@@ -239,6 +167,102 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
         if (mega.flags.ab_ads) {
             mega.commercials.updateOverlays();
         }
+
+        delete this.nodeComponent;
+        delete this.isInfo;
+    }
+
+    /**
+     * Update media preview or item properties UI
+     * @param {String} nodeHandle A public or regular node handle
+     * @returns {void}
+     */
+    async updateContent(nodeHandle) {
+        const isPreviewable = this.nodeComponent.previewable && !this.isInfo;
+        const isLink = this.nodeComponent.node.link;
+        const downloadSupport = await MegaMobileViewOverlay.checkSupport(this.nodeComponent.node);
+
+        // Build bottom bar
+        if (this.bottomBar) {
+            this.bottomBar.destroy();
+        }
+
+        if (!M.currentrootid || M.currentrootid !== M.RubbishID) {
+            this.bottomBar = new MegaMobileBottomBar({
+                parentNode: this.domNode.querySelector('.media-viewer-container footer .image-controls'),
+                actions: this.getActionsArray(downloadSupport, isLink, isPreviewable, this.isInfo),
+                adWrapper: 'adFile'
+            });
+
+            if (mobile.cloud.bottomBar) {
+                mobile.cloud.bottomBar.hide();
+            }
+        }
+
+        // Hide context button
+        this.domNode.querySelector('.context-btn').classList.remove('hidden');
+
+        if (isPreviewable) {
+            this.domNode.querySelector('.media-viewer-container .content').classList.remove('hidden');
+            this.domNode.querySelector('.media-viewer-container .content-info').classList.add('hidden');
+        }
+        else {
+            // If user taps the browser's back button, push fake states of history/hash so they
+            // only go back one page rather than two (ref: imagesViewer.js 935 - 956)
+            if (page !== 'download') {
+                pushHistoryState(page);
+            }
+
+            this.domNode.querySelector('.media-viewer-container .content').classList.add('hidden');
+            this.domNode.querySelector('.media-viewer-container').classList.remove('hidden');
+
+            const props = getNodeProperties(nodeHandle);
+            const propsNode = this.domNode.querySelector('.media-viewer-container .properties-content');
+            const iconNode = this.domNode.querySelector('.media-viewer-container .filetype-img');
+            const infoNode = this.domNode.querySelector('.media-viewer-container .content-info');
+
+            // Hide context menu button and video controls in Properties overlay
+            if (this.isInfo) {
+                this.domNode.querySelector('.context-btn').classList.add('hidden');
+                this.domNode.querySelector('.video-controls').classList.add('hidden');
+            }
+
+            // Set default
+            infoNode.classList.remove('hidden');
+            iconNode.textContent = '';
+            propsNode.textContent = '';
+            infoNode.scrollTo(0, 0);
+
+            // Set selected item data
+            mCreateElement('i', {'class': this.nodeComponent.icon}, iconNode);
+            this.domNode.querySelector('.media-viewer-container .file-name').textContent =
+                props.t2 || this.nodeComponent.name;
+
+            // Show "Too large file" or "Non-viewable" warnings
+            if (!downloadSupport || !this.isInfo) {
+                this.inlineAlert = mobile.inline.alert.create({
+                    parentNode: propsNode,
+                    text: downloadSupport ? l.non_viewable_item_info : l.view_file_too_large,
+                    icon: 'sprite-mobile-fm-mono icon-info-thin-outline',
+                    iconSize: '24',
+                    closeButton: false,
+                    componentClassname: 'warning',
+                });
+            }
+
+            // Fill properties data
+            if (props) {
+                propsNode.append(parseHTML(getPropertiesContent(props)));
+
+                // Render breadcrumbs or hide
+                if (page === 'download') {
+                    this.domNode.querySelector('.properties-breadcrumb').classList.add('hidden');
+                }
+                else {
+                    M.renderPathBreadcrumbs(nodeHandle, true);
+                }
+            }
+        }
     }
 
     /**
@@ -273,104 +297,60 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
      * @param {Boolean} downloadSupport File downloadable
      * @param {Boolean} isLink File Link
      * @param {Boolean} isPreviewable File Previewable
+     * @param {Boolean} isInfo File/folder information
      * @returns {Array} Array with applicable actions
      */
-    getActionsArray(downloadSupport, isLink, isPreviewable) {
+    getActionsArray(downloadSupport, isLink, isPreviewable, isInfo) {
 
-        if (!downloadSupport) {
-            return [
-                [
-                    ['openapp-button', l.view_file_open_in_app, () => {
+        const buttons = {
+            'openappButton' : ['openapp-button', l.view_file_open_in_app, () => {
+                eventlog(99912);
 
-                        eventlog(99912);
+                this.trigger('pauseStreamer');
+                goToMobileApp(MegaMobileViewOverlay.getAppLink(this.nodeComponent.handle));
+            }],
 
-                        this.trigger('pauseStreamer');
-                        goToMobileApp(MegaMobileViewOverlay.getAppLink(this.nodeComponent.handle));
-                    }]
-                ]
-            ];
-        }
-        if (isLink) {
-            return [
-                [
-                    ['openapp-button', l.view_file_open_in_app, () => {
+            'downloadButton': ['download-button', 'icon-download-thin', () => {
+                if (!validateUserAction()) {
+                    return false;
+                }
 
-                        eventlog(99912);
+                this.trigger('pauseStreamer');
+                mobile.downloadOverlay.startDownload(this.nodeComponent.handle);
+                eventlog(99913);
+                return false;
+            }],
 
-                        this.trigger('pauseStreamer');
-                        goToMobileApp(MegaMobileViewOverlay.getAppLink(this.nodeComponent.handle));
-                    }]
-                ],
-                [
-                    ['download-button', 'icon-download-thin', () => {
-                        if (!validateUserAction()) {
-                            return false;
-                        }
-
-                        eventlog(99913);
-
-                        this.trigger('pauseStreamer');
-                        mobile.downloadOverlay.startDownload(this.nodeComponent.handle);
-                        return false;
-                    }]
-                ]
-            ];
-        }
-        if (isPreviewable) {
-            return [
-                [
-                    ['sharelink-button', l[5622], () => {
-                        if (!validateUserAction()) {
-                            return false;
-                        }
-                        this.trigger('pauseStreamer');
-                        mobile.linkManagement.showOverlay(this.nodeComponent.handle);
-                        return false;
-                    }]
-                ],
-                [
-                    ['download-button', 'icon-download-thin', () => {
-                        if (!validateUserAction()) {
-                            return false;
-                        }
-
-                        eventlog(99913);
-
-                        this.trigger('pauseStreamer');
-                        mobile.downloadOverlay.startDownload(this.nodeComponent.handle);
-                        return false;
-                    }],
-                    ['slideshow-button', 'icon-play-square-thin-outline', function() {
-                        $('.media-viewer-container footer .v-btn.slideshow').trigger('click');
-                    }]
-                ]
-            ];
-        }
-        return [
-            [
-                ['sharelink-button', l[5622], () => {
+            'sharelinkButton': [
+                'sharelink-button',
+                MegaMobileViewOverlay.getLinkText(this.nodeComponent.handle), () => {
                     if (!validateUserAction()) {
                         return false;
                     }
                     this.trigger('pauseStreamer');
                     mobile.linkManagement.showOverlay(this.nodeComponent.handle);
                     return false;
-                }]
+                }
             ],
-            [
-                ['download-button', 'icon-download-thin', () => {
-                    if (!validateUserAction()) {
-                        return false;
-                    }
 
-                    eventlog(99913);
+            'slideshowButton': ['slideshow-button', 'icon-play-square-thin-outline', () => {
+                $('.media-viewer-container footer .v-btn.slideshow').trigger('click');
+            }]
+        };
 
-                    this.trigger('pauseStreamer');
-                    mobile.downloadOverlay.startDownload(this.nodeComponent.handle);
-                    return false;
-                }]
-            ]
-        ];
+        if (!downloadSupport) {
+            return [[buttons.openappButton]];
+        }
+        if (isLink) {
+            return [[buttons.openappButton], [buttons.downloadButton]];
+        }
+        if (isInfo) {
+            return [[buttons.sharelinkButton]];
+        }
+        if (isPreviewable) {
+            return [[buttons.sharelinkButton], [buttons.downloadButton, buttons.slideshowButton]];
+        }
+        return [[buttons.sharelinkButton], [buttons.downloadButton]];
     }
 
     /**
@@ -415,6 +395,39 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
 
         // Otherwise if in regular cloud drive, return just the node handle
         return `#${  nodeHandle}`;
+    }
+
+    /**
+     * Gets Share button label
+     *
+     * @param {String} nodeHandle The internal node handle of the folder or file
+     * @returns {void}
+     */
+    static getLinkText(nodeHandle) {
+
+        var publicLinks = 0;
+        var getLinkText = '';
+
+        nodeHandle = typeof nodeHandle === 'string' && [nodeHandle] || nodeHandle || $.selected || [];
+
+        // Loop through all selected nodes
+        for (var i = 0; i < nodeHandle.length; i++) {
+
+            // If it has a public link, then increment the count
+            if (M.getNodeShare(nodeHandle[i])) {
+                publicLinks++;
+            }
+        }
+
+        // If all the selected nodes have existing public links, set text to 'Manage links' or 'Manage link'
+        if (nodeHandle.length === publicLinks) {
+            getLinkText = nodeHandle.length > 1 ? l[17520] : l[6909];
+        }
+        else {
+            // Otherwise change text to 'Share links' or 'Share link' if there are selected nodes without links
+            getLinkText = mega.icu.format(l.share_link, nodeHandle.length);
+        }
+        return getLinkText;
     }
 
     /**

@@ -116,7 +116,7 @@ class MegaGallery {
         this.lastAddedKeys = {};
         this.galleryBlock = document.getElementById('gallery-view');
         this.contentRowTemplateNode = document.getElementById('gallery-cr-template');
-        this.updNode = {};
+        this.updNode = Object.create(null);
         this.type = mega.gallery.sections[id] ? 'basic' : 'discovery';
         this.shouldProcessScroll = true;
         this.inPreview = false;
@@ -127,6 +127,13 @@ class MegaGallery {
 
     get onpage() {
         return this.id === M.currentCustomView.nodeID || M.gallery;
+    }
+
+    mainViewNodeMapper(h) {
+        const n = M.d[h] || this.updNode[h] || false;
+
+        console.assert(!!n, `Node ${h} not found...`);
+        return n;
     }
 
     setObserver() {
@@ -1103,7 +1110,7 @@ class MegaGallery {
         this.addToYearGroup(n, updatedGroup[1]);
 
         if (this.dynamicList && this.onpage) {
-            M.v = Object.keys(this.nodes).map(h => M.d[h] || this.updNode[h]);
+            mega.gallery.fillMainView(this);
         }
 
         MegaGallery.sortViewNodes();
@@ -1130,7 +1137,7 @@ class MegaGallery {
         this.removeFromYearGroup(n.h, updatedGroup[1]);
 
         if (this.dynamicList && M.currentCustomView.original === this.id) {
-            M.v = Object.keys(this.nodes).map(h => M.d[h] || this.updNode[h]);
+            mega.gallery.fillMainView(this);
         }
 
         MegaGallery.sortViewNodes();
@@ -1280,7 +1287,7 @@ class MegaGallery {
 
     resetAndRender() {
         if (this.dynamicList && M.currentCustomView.original === this.id) {
-            M.v = Object.keys(this.nodes).map(h => M.d[h] || this.updNode[h]);
+            mega.gallery.fillMainView(this);
         }
 
         MegaGallery.sortViewNodes();
@@ -1812,7 +1819,7 @@ class MegaGallery {
 
         if (this.nodes && this.subfolderMd === tempSubfolderMd) {
 
-            M.v = Object.keys(this.nodes).map(h => M.d[h] || this.updNode[h]);
+            mega.gallery.fillMainView(this);
             MegaGallery.sortViewNodes();
 
             return false;
@@ -1885,7 +1892,7 @@ class MegaTargetGallery extends MegaGallery {
         for (const h of subs) {
             const n = M.d[h];
             this.nodes[n.h] = this.setGroup(n)[0];
-            M.v.push(M.d[n.h]);
+            M.v.push(n);
         }
 
         this.mergeYearGroup();
@@ -2011,7 +2018,7 @@ class MegaMediaTypeGallery extends MegaGallery {
 
             MegaGallery.dbActionPassed = true;
 
-            this.updNode = {};
+            this.updNode = Object.create(null);
 
             // Initializing albums here for the performace's sake
             if (mega.gallery.albums.awaitingDbAction) {
@@ -2045,7 +2052,7 @@ class MegaMediaTypeGallery extends MegaGallery {
             }
         }
 
-        M.v = Object.keys(this.nodes).map(h => M.d[h] || this.updNode[h]);
+        mega.gallery.fillMainView(this);
 
         this.mergeYearGroup();
         this.filterMonthGroup();
@@ -2143,6 +2150,23 @@ mega.gallery.secKeys = {
     cdimages: 'cloud-drive-images',
     cuvideos: 'camera-uploads-videos',
     cdvideos: 'cloud-drive-videos'
+};
+
+mega.gallery.fillMainView = (list, mapper) => {
+    'use strict';
+
+    if (list instanceof MegaGallery) {
+        mapper = list.mainViewNodeMapper.bind(list);
+        list = Object.keys(list.nodes);
+    }
+    const {length} = list;
+
+    if (mapper) {
+        list = list.map(mapper);
+    }
+    M.v = list.filter(Boolean);
+
+    console.assert(M.v.length === length, 'check this... filtered invalid entries.');
 };
 
 mega.gallery.handleNodeRemoval = (n) => {

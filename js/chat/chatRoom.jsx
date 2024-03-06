@@ -2048,25 +2048,16 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function(audio,
 });
 ChatRoom.prototype.startOrJoinCall = function(callId, url, audio, video) {
     tryCatch(() => {
-        const call = this.call = megaChat.activeCall = megaChat.plugins.callManager2.createCall(this, callId);
-        const sfuClient = window.sfuClient = call.sfuClient = new SfuClient(
-            u_handle,
-            call,
-            (
+        const call = this.call = megaChat.activeCall =
+            megaChat.plugins.callManager2.createCall(
+                this,
+                callId,
                 this.protocolHandler.chatMode === strongvelope.CHAT_MODE.PUBLIC &&
                 str_to_ab(this.protocolHandler.unifiedKey)
-            ),
-            {
-                'speak': true,
-                'moderator': true
-            }
-        );
-        call.setSfuClient(sfuClient);
-        sfuClient.muteAudio(!audio);
-        sfuClient.muteCamera(!video);
-        sfuClient.enableSpeakerDetector(true);
-        return sfuClient.connect(url, callId, {isGroup: this.type !== "private"});
+            );
+        return call.connect(url, audio, video);
     }, ex => {
+        this.call?.destroy();
         this.call = megaChat.activeCall = null;
         this.meetingsLoading = false;
         console.error('Failed to start/join call:', ex);

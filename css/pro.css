@@ -1758,6 +1758,9 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
 .third-section .payment-page.info-block {
     float: left;
 }
+.bottom-page.third-section .mega-button.purchase {
+    float: right;
+}
 .payment-page.info-block .provider-details {
     color: var(--text-color-high);
     display: inline-block;

@@ -25512,7 +25512,7 @@ class stream_Stream extends mixins.w9 {
             willUnmount: () => {
               this.nodeRefs = this.nodeRefs.map(chunk => chunk.filter(nodeRef => nodeRef.clientId !== u_handle));
             }
-          }, this.renderNodeMenu());
+          }, this.renderNodeMenu(call.getLocalStream()));
         }));
       })));
     }

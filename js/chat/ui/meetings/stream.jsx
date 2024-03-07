@@ -211,9 +211,6 @@ export default class Stream extends MegaRenderMixin {
             call,
             forcedLocal,
             chatRoom,
-            ephemeralAccounts,
-            onCallMinimize,
-            onSpeakerChange,
             onVideoDoubleClick
         } = this.props;
         const { page, streamsPerPage, floatDetached } = this.state;
@@ -243,13 +240,10 @@ export default class Stream extends MegaRenderMixin {
                             chatRoom={chatRoom}
                             menu={true}
                             source={peer}
-                            ephemeralAccounts={ephemeralAccounts}
-                            onCallMinimize={onCallMinimize}
-                            onSpeakerChange={onSpeakerChange}
-                            onDoubleClick={(e, videoNode) => {
+                            onDoubleClick={(peer, e) => {
                                 e.preventDefault();
                                 e.stopPropagation();
-                                onVideoDoubleClick(videoNode);
+                                onVideoDoubleClick(peer);
                             }}
                             didMount={ref => {
                                 this.nodeRefs.push({ clientId: peer.clientId, cacheKey, ref });
@@ -318,9 +312,11 @@ export default class Stream extends MegaRenderMixin {
                                                     key={peer.clientId}
                                                     source={peer}
                                                     chatRoom={chatRoom}
-                                                    ephemeralAccounts={ephemeralAccounts}
-                                                    onCallMinimize={onCallMinimize}
-                                                    onSpeakerChange={onSpeakerChange}
+                                                    onDoubleClick={(peer, e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        onVideoDoubleClick(peer);
+                                                    }}
                                                     didMount={ref => {
                                                         if (!this.nodeRefs[i]) {
                                                             this.nodeRefs[i] = [];
@@ -386,7 +382,6 @@ export default class Stream extends MegaRenderMixin {
         const videoNodeRef = React.createRef();
         const setRef = node => {
             videoNodeRef.current = node;
-            // console.warn("setRef:", node);
         };
 
         return (
@@ -394,8 +389,6 @@ export default class Stream extends MegaRenderMixin {
                 key={source.clientId}
                 chatRoom={chatRoom}
                 source={source}
-                ephemeralAccounts={ephemeralAccounts}
-                onCallMinimize={onCallMinimize}
                 toggleFullScreen={() => {               // don't use onSpeakerChange, as it will cause a react update
                     call.setPinnedCid(source.clientId); // and unmount the fullscreen element, canceling the fullscreen
                 }}
@@ -404,17 +397,20 @@ export default class Stream extends MegaRenderMixin {
             </VideoType>
         );
     }
+
     /**
      * renderNodeMenu
      * @description Renders context menu for given stream node.
      * @param {Peer} [peer]
+     * @param {Object} [props]
      * @see VideoNode
      * @see VideoNodeMenu
-     * @return {JSX.Element}
+     * @returns {JSX.Element}
      */
 
     renderNodeMenu(peer, props) {
         const { mode, chatRoom, ephemeralAccounts, onCallMinimize, onSpeakerChange, onModeChange } = this.props;
+
         return (
             <VideoNodeMenu
                 mode={mode}
@@ -429,7 +425,17 @@ export default class Stream extends MegaRenderMixin {
             />
         );
     }
+
+    /**
+     * renderSelfViewMenu
+     * @description Renders context menu for the local stream node.
+     * @see renderNodeMenu
+     * @returns {JSX.Element}
+     */
+
     renderSelfViewMenu() {
+        const { call, onSpeakerChange } = this.props;
+
         return (
             <div className="node-menu theme-dark-forced">
                 <div className="node-menu-toggle">

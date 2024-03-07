@@ -22495,14 +22495,15 @@ class Call extends mixins.w9 {
       }
       return action === stream.hK.ADD ? peers.addFakeDupStream() : peers.removeFakeDupStream();
     };
-    this.handleSpeakerChange = videoNode => {
-      if (videoNode) {
-        this.handleModeChange(MODE.MAIN);
-        this.props.call.setPinnedCid(videoNode.clientId);
-        this.setState({
-          forcedLocal: videoNode.isLocal
-        });
+    this.handleSpeakerChange = peer => {
+      if (!peer) {
+        return;
       }
+      this.handleModeChange(MODE.MAIN);
+      this.props.call.setPinnedCid(peer.clientId);
+      this.setState({
+        forcedLocal: peer.isLocal
+      });
     };
     this.handleModeChange = mode => {
       this.props.call.setViewMode(mode);
@@ -22624,7 +22625,11 @@ class Call extends mixins.w9 {
         onClick,
         children
       }) => external_React_default().createElement("div", {
-        className: `recording-control ${className || ''}`,
+        className: `
+                    recording-control
+                    ${localStorage.callDebug ? 'with-offset' : ''}
+                    ${className || ''}
+                `,
         onClick: onClick
       }, children);
       if (recorder) {
@@ -22859,7 +22864,7 @@ class Call extends mixins.w9 {
       onVideoClick: () => call.toggleVideo(),
       onScreenSharingClick: this.handleScreenSharingToggle,
       onHoldClick: this.handleHoldToggle,
-      onVideoDoubleClick: videoNode => this.handleSpeakerChange(videoNode)
+      onVideoDoubleClick: this.handleSpeakerChange
     })), sidebar && external_React_default().createElement(Sidebar, (0,esm_extends.A)({}, STREAM_PROPS, {
       guest: guest,
       initialCallRinging: initialCallRinging,
@@ -24541,6 +24546,20 @@ class ParticipantsBlock extends mixins.w9 {
       }
       return null;
     };
+    this.onScroll = (chunks, evt) => {
+      const {
+        page
+      } = this.state;
+      if (evt.deltaY < 0) {
+        if (page > 0) {
+          this.movePage(PAGINATION.PREV);
+        }
+      } else if (evt.deltaY > 0) {
+        if (page < Object.values(chunks).length - 1) {
+          this.movePage(PAGINATION.NEXT);
+        }
+      }
+    };
   }
   shouldComponentUpdate() {
     const {
@@ -24600,7 +24619,8 @@ class ParticipantsBlock extends mixins.w9 {
       return external_React_default().createElement("div", {
         className: "carousel"
       }, external_React_default().createElement("div", {
-        className: "carousel-container"
+        className: "carousel-container",
+        onWheel: evt => this.onScroll(chunks, evt)
       }, external_React_default().createElement("div", {
         className: "stream-participants-block theme-dark-forced"
       }, external_React_default().createElement("div", {
@@ -25394,9 +25414,6 @@ class stream_Stream extends mixins.w9 {
       call,
       forcedLocal,
       chatRoom,
-      ephemeralAccounts,
-      onCallMinimize,
-      onSpeakerChange,
       onVideoDoubleClick
     } = this.props;
     const {
@@ -25418,13 +25435,10 @@ class stream_Stream extends mixins.w9 {
             chatRoom: chatRoom,
             menu: true,
             source: peer,
-            ephemeralAccounts: ephemeralAccounts,
-            onCallMinimize: onCallMinimize,
-            onSpeakerChange: onSpeakerChange,
-            onDoubleClick: (e, videoNode) => {
+            onDoubleClick: (peer, e) => {
               e.preventDefault();
               e.stopPropagation();
-              onVideoDoubleClick(videoNode);
+              onVideoDoubleClick(peer);
             },
             didMount: ref => {
               this.nodeRefs.push({
@@ -25478,9 +25492,11 @@ class stream_Stream extends mixins.w9 {
               key: peer.clientId,
               source: peer,
               chatRoom: chatRoom,
-              ephemeralAccounts: ephemeralAccounts,
-              onCallMinimize: onCallMinimize,
-              onSpeakerChange: onSpeakerChange,
+              onDoubleClick: (peer, e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onVideoDoubleClick(peer);
+              },
               didMount: ref => {
                 if (!this.nodeRefs[i]) {
                   this.nodeRefs[i] = [];
@@ -25533,8 +25549,6 @@ class stream_Stream extends mixins.w9 {
       key: source.clientId,
       chatRoom: chatRoom,
       source: source,
-      ephemeralAccounts: ephemeralAccounts,
-      onCallMinimize: onCallMinimize,
       toggleFullScreen: () => {
         call.setPinnedCid(source.clientId);
       },
@@ -25568,6 +25582,10 @@ class stream_Stream extends mixins.w9 {
     }, props));
   }
   renderSelfViewMenu() {
+    const {
+      call,
+      onSpeakerChange
+    } = this.props;
     return external_React_default().createElement("div", {
       className: "node-menu theme-dark-forced"
     }, external_React_default().createElement("div", {
@@ -25990,7 +26008,7 @@ class StreamControls extends _mixins1__.w9 {
     const isOnHold = avFlags & Av.onHold;
     return react0().createElement((react0().Fragment), null, blocked && renderBlockedWarning(), react0().createElement("div", {
       className: StreamControls.NAMESPACE
-    }, d && nop() ? this.renderDebug() : '', react0().createElement("ul", null, react0().createElement("li", {
+    }, d && localStorage.callDebug ? this.renderDebug() : '', react0().createElement("ul", null, react0().createElement("li", {
       className: isOnHold ? 'disabled' : '',
       onClick: () => {
         if (isOnHold) {
@@ -26136,13 +26154,12 @@ class VideoNode extends _mixins1__.w9 {
         onDoubleClick,
         toggleFullScreen
       } = this.props;
-      onDoubleClick == null || onDoubleClick(e, this);
-      if (!document.fullscreenElement) {
-        var _this$nodeRef$current;
-        if (toggleFullScreen && typeof toggleFullScreen === 'function') {
+      onDoubleClick == null || onDoubleClick(this.source, e);
+      if (toggleFullScreen && !document.fullscreenElement && this.nodeRef.current) {
+        if (typeof toggleFullScreen === 'function') {
           toggleFullScreen(this);
         }
-        (_this$nodeRef$current = this.nodeRef.current) == null || _this$nodeRef$current.requestFullscreen({
+        this.nodeRef.current.requestFullscreen({
           navigationUI: 'hide'
         });
       }
@@ -26303,7 +26320,7 @@ class VideoNode extends _mixins1__.w9 {
       "data-simpletipposition": simpletip == null ? void 0 : simpletip.position,
       "data-simpletipoffset": simpletip == null ? void 0 : simpletip.offset,
       "data-simpletip-class": simpletip == null ? void 0 : simpletip.className,
-      onClick: ev => onClick && onClick(source, ev)
+      onClick: evt => onClick == null ? void 0 : onClick(source, evt)
     }, source && react0().createElement((react0().Fragment), null, children || null, react0().createElement("div", {
       className: "video-node-content"
     }, CallManager2.Call.VIDEO_DEBUG_MODE ? this.renderVideoDebugMode() : null, this.renderContent(), mode === _call_jsx3__.g.MINI || minimized ? null : this.renderStatus())));

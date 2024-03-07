@@ -359,7 +359,7 @@ body.rtl .meetings-call .stream .stream-participants-block .participants-contain
   left: 0;
 }
 .meetings-call .carousel {
-  width: 100%;
+  float: left;
   height: 100%;
 }
 .meetings-call .carousel-container {
@@ -424,6 +424,9 @@ body.rtl .meetings-call .stream .stream-participants-block .participants-contain
 .meetings-call div.recording-control.recording-fixed {
   bottom: 0;
   margin: 0 0 14px 0;
+}
+.meetings-call div.recording-control.with-offset {
+  left: 100px;
 }
 .meetings-call div.recording-control .record-label {
   display: block;
@@ -1165,7 +1168,7 @@ body.rtl .meetings-call .sidebar-wrapper .sidebar.chat-opened .sidebar-head {
   position: fixed;
   left: auto;
   right: -10px;
-  bottom: 60px;
+  bottom: 80px;
   width: 600px;
 }
 .meetings-call .sidebar-wrapper .sidebar.chat-opened .chat-textarea-block .chat-textarea {
@@ -3864,3 +3867,5 @@ body.theme-dark .meetings-recurring-content .mega-button.recurring-toggle-button
 .meetings-unsupported-container .unsupported-info ul li {
   /* [...] */
 }
+
+/*# sourceMappingURL=chat-bundle.css.map */

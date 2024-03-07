@@ -354,7 +354,7 @@ export default class Stream extends MegaRenderMixin {
                                                         chunk.filter(nodeRef => nodeRef.clientId !== u_handle)
                                                     );
                                                 }}>
-                                                {this.renderNodeMenu()}
+                                                {this.renderNodeMenu(call.getLocalStream())}
                                             </LocalVideoHiRes>
                                         );
                                     })}

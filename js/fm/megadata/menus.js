@@ -777,7 +777,9 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
                         $(menuCMI).filter('.folderupload-item').removeClass('hidden');
                     }
 
-                    if (nodeRoot !== 's4' && mega.rewind && !!mega.rewind.contextMenu) {
+                    if (nodeRoot !== 's4' && mega.rewind && !!mega.rewind.contextMenu
+                        && M.currentrootid !== 'file-requests') {
+
                         $(menuCMI).filter('.rewind-item').removeClass('hidden');
                     }
                     // Flag added for share folder while on it at context menu

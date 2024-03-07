@@ -233,7 +233,7 @@
             }
         });
 
-        $(this.getCloseButton()).rebind('click.prd', () => {
+        $(this.getCloseButton()).rebind(is_mobile ? 'tap.prd' : 'click.prd', () => {
             self.dismiss();
             return false;
         });

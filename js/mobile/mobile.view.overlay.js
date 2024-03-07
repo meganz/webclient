@@ -188,10 +188,13 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
         }
 
         if (!M.currentrootid || M.currentrootid !== M.RubbishID) {
-            if (!this.isInfo || M.currentrootid !== 'shares') {
+
+            const actions = this.getActionsArray(downloadSupport, isLink, isPreviewable, this.isInfo);
+
+            if (actions) {
                 this.bottomBar = new MegaMobileBottomBar({
                     parentNode: this.domNode.querySelector('.media-viewer-container footer .image-controls'),
-                    actions: this.getActionsArray(downloadSupport, isLink, isPreviewable, this.isInfo),
+                    actions: actions,
                     adWrapper: 'adFile'
                 });
             }
@@ -340,6 +343,8 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
             }]
         };
 
+        const shareBtn = M.currentrootid !== 'shares' && [buttons.sharelinkButton];
+
         if (!downloadSupport) {
             return [[buttons.openappButton]];
         }
@@ -347,12 +352,12 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
             return [[buttons.openappButton], [buttons.downloadButton]];
         }
         if (isInfo) {
-            return [[buttons.sharelinkButton]];
+            return shareBtn && [shareBtn];
         }
         if (isPreviewable) {
-            return [[buttons.sharelinkButton], [buttons.downloadButton, buttons.slideshowButton]];
+            return [shareBtn, [buttons.downloadButton, buttons.slideshowButton]];
         }
-        return [[buttons.sharelinkButton], [buttons.downloadButton]];
+        return [shareBtn, [buttons.downloadButton]];
     }
 
     /**

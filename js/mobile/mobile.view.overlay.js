@@ -188,11 +188,13 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
         }
 
         if (!M.currentrootid || M.currentrootid !== M.RubbishID) {
-            this.bottomBar = new MegaMobileBottomBar({
-                parentNode: this.domNode.querySelector('.media-viewer-container footer .image-controls'),
-                actions: this.getActionsArray(downloadSupport, isLink, isPreviewable, this.isInfo),
-                adWrapper: 'adFile'
-            });
+            if (!this.isInfo || M.currentrootid !== 'shares') {
+                this.bottomBar = new MegaMobileBottomBar({
+                    parentNode: this.domNode.querySelector('.media-viewer-container footer .image-controls'),
+                    actions: this.getActionsArray(downloadSupport, isLink, isPreviewable, this.isInfo),
+                    adWrapper: 'adFile'
+                });
+            }
 
             if (mobile.cloud.bottomBar) {
                 mobile.cloud.bottomBar.hide();

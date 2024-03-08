@@ -341,9 +341,10 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
         }
 
         setThumb(dataUrl) {
+            this.el.style.backgroundImage = `url('${dataUrl}')`;
+            this.el.style.backgroundColor = 'white';
+            this.naturalSize = this.el.style.width;
             if (this.el.classList.contains('shimmer')) {
-                this.el.style.backgroundImage = `url('${dataUrl}')`;
-                this.el.style.backgroundColor = 'white';
                 scope.unsetShimmering(this.el);
             }
         }
@@ -1172,6 +1173,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
                 for (let i = 0; i < list.length; i++) {
                     const tCell = this.getCachedCell(list[i]);
+                    const preSize = tCell.naturalSize || 0;
 
                     tCell.el.style.width = sizePx;
                     tCell.el.style.height = sizePx;
@@ -1195,7 +1197,9 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
                     tCell.el.ref.el = tCell.el;
 
-                    toFetchAttributes.push(tCell.el.ref);
+                    if (parseFloat(preSize) < parseFloat(tCell.el.style.width)) {
+                        toFetchAttributes.push(tCell.el.ref);
+                    }
                 }
             }
 

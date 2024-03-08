@@ -2225,7 +2225,6 @@ accountUI.plan = {
                     $('.pro-transfer', $cancelDialog).text(proTransfer);
                     $('.free-transfer', $cancelDialog).text(freeTransfer);
                     $('.plan-name', $cancelDialog).text(proPlanName);
-                    $('.rewind-free', $cancelDialog).text(mega.icu.format(l.days_chat_history_plural, 30));
 
                     $('span', $keepPlanBtn)
                         .text(l.cancel_pro_keep_current_plan.replace('%1', pro.getProPlanName(subscription)));

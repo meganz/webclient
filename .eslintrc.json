@@ -31,14 +31,20 @@
     "settings": {
         "polyfills": [
             // List of polyfills in place for eslint-plugin-compact to not complain about them
-            "Set",
-            "Number", // <- E.g. Number.isNaN, Number.parseFloat, etc are polyfilled on es6-shim.js
-            "Promise",
-            "TextEncoder",
-            "TextDecoder",
-            "Object.assign",
-            "Object.values"
+            "Array.findLast",
+            "Array.flat",
+            "Array.flatMap",
+            "document.exitFullscreen",
+            "navigator.locks",
+            "Object.fromEntries",
+            "Promise.allSettled",
+            "queueMicrotask",
+            "reportError",
+            "requestIdleCallback",
+            "structuredClone",
+            "WeakRef"
         ],
+        "lintAllEsApis": true,
         "react": {
             "version": "16.8.6"
         }
@@ -48,7 +54,7 @@
         "block-scoped-var": 2,
         "brace-style": [2, "stroustrup"],
         "comma-style": [2, "last"],
-        "complexity": [2, 15],
+        "complexity": [2, 18],
         "consistent-this": [2, "self"],
         "consistent-return": 0,
         "curly": [2, "all"],
@@ -171,7 +177,7 @@
 
         // ESLint plugins configuration follows
 
-        "compat/compat": 1,
+        "compat/compat": 2,
 
         "es/no-atomics": 2,
         "es/no-bigint": "off",

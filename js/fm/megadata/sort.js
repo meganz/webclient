@@ -38,22 +38,14 @@ MegaData.prototype.doFallbackSort = function(a, b, d) {
         return (a.ts < b.ts ? -1 : 1) * d;
     }
 
-    if (this.collator) {
-        return this.collator.compare(a.h, b.h) * d;
-    }
-
-    return String(a.h).localeCompare(String(b.h)) * d;
+    return this.compareStrings(a.h, b.h, d);
 };
 
 MegaData.prototype.doFallbackSortWithName = function(a, b, d) {
     'use strict';
 
     if (a.name !== b.name) {
-        if (this.collator) {
-            return this.collator.compare(a.name, b.name) * d;
-        }
-
-        return String(a.name).localeCompare(String(b.name)) * d;
+        return this.compareStrings(a.name, b.name, d);
     }
 
     return M.doFallbackSort(a, b, d);
@@ -79,30 +71,14 @@ MegaData.prototype.getSortByNameFn = function() {
 MegaData.prototype.getSortByNameFn2 = function(d) {
     'use strict';
 
-    if (typeof Intl !== 'undefined' && Intl.Collator) {
-        var intl = this.collator || new Intl.Collator('co', {numeric: true});
+    return (a, b) => {
+        const nameA = a.nickname ? `${a.nickname} ${a.name}` : a.name;
+        const nameB = b.nickname ? `${b.nickname} ${b.name}` : b.name;
 
-        return function(a, b) {
-
-            var nameA = (a.nickname) ? a.nickname + ' (' + a.name + ')' : a.name;
-            var nameB = (b.nickname) ? b.nickname + ' (' + b.name + ')' : b.name;
-
-            if (nameA !== nameB) {
-                return intl.compare(nameA, nameB) * d;
-            }
-
-            return M.doFallbackSort(a, b, d);
-        };
-    }
-
-    return function(a, b) {
-        if (typeof a.name === 'string' && typeof b.name === 'string') {
-
-            var nameA = (a.nickname) ? a.nickname + ' (' + a.name + ')' : a.name;
-            var nameB = (b.nickname) ? b.nickname + ' (' + b.name + ')' : b.name;
-
-            return nameA.localeCompare(nameB) * d;
+        if (nameA !== nameB) {
+            return this.compareStrings(nameA, nameB, d);
         }
+
         return M.doFallbackSort(a, b, d);
     };
 };
@@ -118,17 +94,9 @@ MegaData.prototype.sortByName = function(d) {
 MegaData.prototype.getSortByEmail = function() {
     "use strict";
 
-    if (typeof Intl !== 'undefined' && Intl.Collator) {
-        var intl = new Intl.Collator('co', {numeric: true});
-
-        return function(a, b, d) {
-            return intl.compare(a.m, b.m) * d;
-        };
-    }
-
     return function(a, b, d) {
         if (typeof a.m === 'string' && typeof b.m === 'string') {
-            return a.m.localeCompare(b.m) * d;
+            return M.compareStrings(a.m, b.m, d);
         }
         return -1;
     };

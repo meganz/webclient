@@ -142,9 +142,11 @@ export default class ParticipantsBlock extends MegaRenderMixin {
                                 `}>
                                 {floatDetached ?
                                     [...streaming, ...rest].map(p => $$PEER(p)) :
-                                    [...streaming, this.renderLocalNode(), ...rest].map(p =>
-                                        p instanceof CallManager2.Peer ? $$PEER(p) : p
-                                    )
+                                    <>
+                                        {streaming.map(p => $$PEER(p))}
+                                        {this.renderLocalNode()}
+                                        {rest.map(p => $$PEER(p))}
+                                    </>
                                 }
                             </div>
                         </div>

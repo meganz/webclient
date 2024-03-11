@@ -1013,7 +1013,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
             // Set default "Share folder" / "Share bucket" string
             shareButton.dataset.simpletip = sourceRoot === 's4'
-                && M.geS4NodeType(selNode) === 'bucket' && l.s4_share_bucket || l[5631];
+                && M.getS4NodeType(selNode) === 'bucket' && l.s4_share_bucket || l[5631];
 
             const { dataset } = selectionLinkWrapper.querySelector('.selection-links-wrapper .delete');
             dataset.simpletip = M.getSelectedRemoveLabel($.selected);

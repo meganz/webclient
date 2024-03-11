@@ -253,7 +253,7 @@ UFSSizeCache.prototype.addTreeNode = function(n, ignoreDB) {
         if (M.getNodeShare(n).down === 1)                            tmp.t |= M.IS_TAKENDOWN;
     }
 
-    if (n.s4) {
+    if (p === 's4') {
         tmp.s4 = Object.create(null);
     }
 

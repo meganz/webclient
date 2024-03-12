@@ -658,6 +658,10 @@ lazy(mega.gallery, 'albums', () => {
 
         const aIndex = aKeys.indexOf(albumId);
 
+        if (M.currentdirid === 'albums/' + albumId) {
+            domElement.classList.add('active');
+        }
+
         if (aIndex === aKeys.length - 1) {
             domContainer.appendChild(domElement);
         }

@@ -2660,6 +2660,7 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
 mega.gallery.removeDbActionCache = () => {
     'use strict';
     MegaGallery.dbActionPassed = false;
+    mega.gallery.resetAll();
 };
 
 /**

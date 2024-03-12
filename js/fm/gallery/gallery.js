@@ -126,7 +126,7 @@ class MegaGallery {
     }
 
     get onpage() {
-        return this.id === M.currentCustomView.nodeID || M.gallery;
+        return this.id === M.currentCustomView.nodeID || (M.gallery && M.currentrootid === M.RootID);
     }
 
     mainViewNodeMapper(h) {

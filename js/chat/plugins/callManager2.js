@@ -94,7 +94,9 @@
             this.onAvChange(av);
             call.peers.push(this);
             this.onAudioLevel = this.onAudioLevel.bind(this);
-            this.sfuPeer.requestAudioLevel(this.onAudioLevel);
+            if (this.sfuPeer) { // we may be a test fake peer with invalid clientId, in which case sfuPeer is undefined
+                this.sfuPeer.requestAudioLevel(this.onAudioLevel);
+            }
         }
         destroy() {
             this.hdReleaseTimerStop();
@@ -1396,7 +1398,9 @@
         chatRoom.callParticipantsUpdated();
     };
     CallManager2.createVideoElement = function() {
-        return document.createElement("video");
+        const video = document.createElement("video");
+        video.oncontextmenu = () => false;
+        return video;
     };
     CallManager2.Peers = Peers;
     CallManager2.Peer = Peer;

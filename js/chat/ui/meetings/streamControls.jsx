@@ -225,7 +225,7 @@ class StreamControls extends MegaRenderMixin {
             <>
                 {blocked && renderBlockedWarning()}
                 <div className={StreamControls.NAMESPACE}>
-                    {d && nop() ? this.renderDebug() : ''}
+                    {d && localStorage.callDebug ? this.renderDebug() : ''}
                     <ul>
                         <li
                             className={isOnHold ? 'disabled' : ''}

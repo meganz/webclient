@@ -1989,12 +1989,7 @@
                     }
 
                     mega.fileTextEditor.saveFileAs(saveAsName, $.mcselected, $.saveAsContent, nodeToSave)
-                        .then((handle) => {
-                            if ($.saveAsCallBack) {
-                                $.selected = Array.isArray(handle) ? handle : [handle];
-                                $.saveAsCallBack(handle);
-                            }
-                        })
+                        .then($.saveAsCallBack || nop)
                         .catch(tell);
                 });
 

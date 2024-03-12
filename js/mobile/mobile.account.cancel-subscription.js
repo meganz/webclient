@@ -204,15 +204,21 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
                     value: 7,
                     checked: false,
                     otherOption: false
-                },
-                {
-                    parentNode: radioOptions,
-                    label: l.cancel_sub_other_reason,
-                    value: 8,
-                    checked: false,
-                    otherOption: true
                 }
             ];
+
+            for (let i = options.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [options[i], options[j]] = [options[j], options[i]];
+            }
+
+            options.push({
+                parentNode: radioOptions,
+                label: l.cancel_sub_other_reason,
+                value: 8,
+                checked: false,
+                otherOption: true
+            });
 
             this.optionGroup = new MegaMobileRadioGroup({
                 name: 'reason',

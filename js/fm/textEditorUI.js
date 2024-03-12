@@ -347,6 +347,22 @@ mega.textEditorUI = new function TextEditorUI() {
             }
         );
 
+        const _saveAsAction = (h, contents) => {
+
+            $.selected = Array.isArray(h) ? h : [h];
+            h = $.selected[0];
+
+            M.getStorageQuota().then(data => {
+                loadingDialog.hide();
+                if (data.isFull) {
+                    ulmanager.ulShowOverStorageQuotaDialog();
+                    return false;
+                }
+
+                mega.textEditorUI.setupEditor(M.d[h].name, contents || '', h);
+            });
+        };
+
         $('.file-menu .new-f', $menuBar).rebind(
             'click.txt-editor',
             function newFileMenuClick() {
@@ -358,17 +374,7 @@ mega.textEditorUI = new function TextEditorUI() {
                         openSaveAsDialog(
                             {name: 'New file.txt'},
                             '',
-                            (handle) => {
-                                M.getStorageQuota().then(data => {
-                                    loadingDialog.hide();
-                                    if (data.isFull) {
-                                        ulmanager.ulShowOverStorageQuotaDialog();
-                                        return false;
-                                    }
-
-                                    mega.textEditorUI.setupEditor(M.d[handle].name, '', handle);
-                                });
-                            }
+                            _saveAsAction
                         );
                     }
                 );
@@ -386,17 +392,7 @@ mega.textEditorUI = new function TextEditorUI() {
                 openSaveAsDialog(
                     versionHandle || fileHandle,
                     editedTxt,
-                    (handle) => {
-                        M.getStorageQuota().then(data => {
-                            loadingDialog.hide();
-                            if (data.isFull) {
-                                ulmanager.ulShowOverStorageQuotaDialog();
-                                return false;
-                            }
-
-                            mega.textEditorUI.setupEditor(M.d[handle].name, editedTxt || savedFileData, handle);
-                        });
-                    }
+                    handle => _saveAsAction(handle, editedTxt || savedFileData)
                 );
             }
         );

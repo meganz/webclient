@@ -4077,6 +4077,7 @@ lazy(mega.gallery, 'albums', () => {
                 }
             }
 
+            scope.albumsRendered = false;
             MegaGallery.dbActionPassed = true;
 
             const availableNodes = this.getAvailableNodes(handles);

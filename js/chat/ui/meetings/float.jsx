@@ -662,7 +662,7 @@ class Minimized extends MegaRenderMixin {
                 `}
                 onClick={this.props.onCallExpand}>
                 {waitingRoomPeers.length > 1 ?
-                    l.wr_peers_waiting.replace('%1', waitingRoomPeers.length) :
+                    mega.icu.format(l.wr_peers_waiting, waitingRoomPeers.length) :
                     <ParsedHTML
                         tag="span"
                         content={

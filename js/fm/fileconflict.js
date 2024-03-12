@@ -267,7 +267,10 @@
             var conflictedNodes = [];
 
             if (!nodesToCopy || !target) {
-                return [];
+                return {
+                    okNodes: [],
+                    conflicts: []
+                };
             }
             if (!Array.isArray(nodesToCopy)) {
                 nodesToCopy = Object.keys(nodesToCopy);

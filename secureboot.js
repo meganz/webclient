@@ -2446,6 +2446,15 @@ else if (!browserUpdate) {
         // Get the preferred language in their browser
         var userLangs, userLang, ourLangs, k, v, j, i, u;
 
+        // Check if a language override exists on the URL where applicable.
+        if (is_drop) {
+            tmp = page.split('!').pop();
+
+            if (languages[tmp]) {
+                return tmp;
+            }
+        }
+
         // Otherwise get the user's preferred language in their browser settings
         userLangs = navigator.languages || navigator.language || navigator.userLanguage;
 

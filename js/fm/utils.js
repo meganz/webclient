@@ -121,12 +121,14 @@ MegaUtils.prototype.sortObjFn = function(key, order, alternativeFn) {
  * @returns {Number}
  */
 MegaUtils.prototype.compareStrings = function megaUtilsCompareStrings(stringA, stringB, direction) {
+    'use strict';
 
+    let res;
     if (this.collator) {
-        return this.collator.compare(stringA || '', stringB || '') * direction;
+        res = this.collator.compare(stringA || '', stringB || '') * direction;
     }
 
-    return (stringA || '').localeCompare(stringB || '') * direction;
+    return res || String(stringA || '').localeCompare(stringB || '') * direction;
 };
 
 /**

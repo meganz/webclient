@@ -1083,7 +1083,10 @@ class MegaGallery {
     }
 
     async addNodeToGroups(n) {
-        if (n.fv) {
+        if (
+            n.fv // Improper file version
+            || this.updNode[n.h] // The node is being added from another place
+        ) {
             return;
         }
 
@@ -2983,13 +2986,18 @@ MegaGallery.getCacheKey = (prefix, width) => {
     return width ? `${prefix}|w${parseInt(width)}` : prefix;
 };
 
-MegaGallery.handleIntersect = (entries, gallery) => {
+MegaGallery.handleIntersect = tryCatch((entries, gallery) => {
     'use strict';
 
     const toFetchAttributes = [];
 
     for (let i = 0; i < entries.length; i++) {
         const { isIntersecting, target: { nodeBlock } } = entries[i];
+
+        if (!nodeBlock) {
+            console.assert(false, 'MegaGallery.handleIntersect: nodeBlock not available.');
+            continue;
+        }
 
         if (isIntersecting) {
             if (!nodeBlock.isRendered) {
@@ -3013,27 +3021,29 @@ MegaGallery.handleIntersect = (entries, gallery) => {
     if (toFetchAttributes.length) {
         MegaGallery.addThumbnails(toFetchAttributes);
     }
-};
+});
 
-MegaGallery.handleResize = (entries) => {
+MegaGallery.handleResize = SoonFc(200, (entries) => {
     'use strict';
 
     const toFetchAttributes = [];
-
-    for (let i = 0; i < entries.length; i++) {
-        const { contentRect, target: { nodeBlock }, target: { nodeBlock: { thumb } } } = entries[i];
+    const fill = tryCatch((entry) => {
+        const {contentRect, target: {nodeBlock}, target: {nodeBlock: {thumb}}} = entry;
 
         if (contentRect.width > thumb.naturalWidth) {
             toFetchAttributes.push(nodeBlock);
         }
+    });
+
+    for (let i = 0; i < entries.length; i++) {
+
+        fill(entries[i]);
     }
 
-    delay('gallery.nodeBlockResize', () => {
-        if (toFetchAttributes.length) {
-            MegaGallery.addThumbnails(toFetchAttributes);
-        }
-    });
-};
+    if (toFetchAttributes.length) {
+        MegaGallery.addThumbnails(toFetchAttributes);
+    }
+});
 
 MegaGallery.dbAction = () => {
     'use strict';

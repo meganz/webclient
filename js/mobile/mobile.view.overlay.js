@@ -25,7 +25,7 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
             iconSize: 24
         });
         backLink.on('tap.back', () => {
-            if (this.nodeComponent.previewable) {
+            if (this.nodeComponent && this.nodeComponent.previewable) {
                 history.back();
             }
             this.hide();
@@ -39,13 +39,15 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
             componentClassname: 'context-btn open-context-menu text-icon'
         });
         contextMenuButton.on('tap', () => {
-            if (!mega.ui.contextMenu) {
-                mega.ui.contextMenu = new MegaMobileContextMenu();
+            if (this.nodeComponent) {
+                if (!mega.ui.contextMenu) {
+                    mega.ui.contextMenu = new MegaMobileContextMenu();
+                }
+
+                this.trigger('pauseStreamer');
+
+                mega.ui.contextMenu.show(this.nodeComponent.handle);
             }
-
-            this.trigger('pauseStreamer');
-
-            mega.ui.contextMenu.show(this.nodeComponent.handle);
             return false;
         });
 
@@ -70,6 +72,9 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
     async showLayout(nodeHandle) {
         this.setNode(nodeHandle);
 
+        // Bind hide events
+        this.bindEvents();
+
         // Update media preview or item properties UI
         await this.updateContent(nodeHandle);
 
@@ -77,6 +82,7 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
             this.domNode.querySelector('.video-block').classList.add('hidden');
         }
 
+        this.domNode.querySelector('.media-viewer').scrollTo(0, 0);
         this.domNode.querySelector('.media-viewer-container').classList.remove('hidden');
         this.domNode.querySelector('.img-wrap').classList.add('hidden');
         this.domNode.querySelector('.gallery-btn.previous').classList.add('hidden');
@@ -110,7 +116,11 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
             return;
         }
 
+        // Bind hide events
+        this.bindEvents();
+
         // Show view file overlay
+        this.domNode.querySelector('.media-viewer').scrollTo(0, 0);
         this.domNode.parentNode.classList.remove('hidden');
         this.domNode.classList.add('active');
         const fmlist = document.getElementById('file-manager-list-container');
@@ -138,6 +148,10 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
      * @returns {void}
      */
     hide() {
+        if (!this.visible) {
+            return false;
+        }
+
         this.domNode.classList.remove('active');
 
         const fmlist = M.v.length > 0 && document.getElementById('file-manager-list-container');
@@ -168,8 +182,31 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
             mega.commercials.updateOverlays();
         }
 
+        // Unbind close the viewer event listeners
+        if (this.bpcListener) {
+            mBroadcaster.removeListener(this.bpcListener);
+            delete this.bpcListener;
+        }
+        window.removeEventListener('popstate', this._hide);
+
+        delete this._hide;
         delete this.nodeComponent;
         delete this.isInfo;
+    }
+
+    /**
+     * Bind close the viewer event listeners
+     * @returns {void}
+     */
+    bindEvents() {
+        if (!this._hide) {
+            this._hide = () => this.hide();
+
+            console.assert(!this.bpcListener, 'check this..');
+            this.bpcListener = mBroadcaster.addListener('beforepagechange', this._hide);
+
+            window.addEventListener('popstate', this._hide);
+        }
     }
 
     /**
@@ -466,21 +503,11 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
         // Create and handle a specific overlay for file view
         // Note that this will be displayed inside the file-manager-block
         mega.ui.viewerOverlay = new MegaMobileViewOverlay({
-            parentNode: document.querySelector('.file-manager-block'),
+            parentNode: document.querySelector(`#${is_fm() ? 'fmholder' : 'startholder'} .file-manager-block`),
             componentClassname: 'mega-overlay mega-overlay-view',
             wrapperClassname: 'overlay'
         });
 
-        const _hide = () => {
-            if (mega.ui.viewerOverlay.visible) {
-                mega.ui.viewerOverlay.hide();
-            }
-        };
-
         mobile.appBanner.hide();
-
-        window.removeEventListener('popstate', _hide);
-        window.addEventListener('popstate', _hide);
-        mBroadcaster.addListener('beforepagechange', _hide);
     }
 }

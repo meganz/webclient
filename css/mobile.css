@@ -5459,24 +5459,6 @@ textarea.mobile.support-text-field {
 .mobile.video .img-controls {
     display: none;
 }
-.mobile.video .play-video-button {
-    position: absolute;
-    width: 36px;
-    height: 36px;
-    border-radius: 100%;
-    z-index: 10;
-    cursor: pointer;
-    background-color: #F52929;
-    left: calc(50% - 18px);
-    top: calc(50% - 18px);
-    padding: 0;
-    border: none;
-}
-.mobile .play-video-button i {
-    --icon-size: 24px;
-    margin: 6px;
-    --mask-color: var(--secondary-white);
-}
 .mobile.video .viewer-image-bl {
     width: 100%;
     height: 100%;

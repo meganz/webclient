@@ -286,11 +286,13 @@
     color: var(--mobile-text-primary);
     background-color: var(--mobile-button-secondary);
     border-radius: 8px;
-    height: 40px;
+    height: auto;
     border: none;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 8px;
+    white-space: normal;
 }
 .mobile .cookie-dialog .settings-tab.active {
     background-color: var(--mobile-button-primary);

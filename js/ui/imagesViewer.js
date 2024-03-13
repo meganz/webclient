@@ -803,7 +803,7 @@ var slideshowid;
         newImgWidth = origImgWidth * newPerc;
 
         $img.css({
-            'width': switchedSides ? newImgHeight : newImgWidth
+            'width': newImgWidth
         });
 
         zoom_mode = true;
@@ -1462,16 +1462,8 @@ var slideshowid;
             if (steps.backward.length) {
                 $prevNextButtons.filter('.previous').removeClass('hidden opacity-50').removeAttr('disabled');
             }
-            else if (is_video(n)) {
-                $prevNextButtons.filter('.previous').removeClass('hidden').addClass('opacity-50')
-                    .attr('disabled', 'disabled');
-            }
             if (steps.forward.length) {
                 $prevNextButtons.filter('.next').removeClass('hidden opacity-50').removeAttr('disabled');
-            }
-            else if (is_video(n)) {
-                $prevNextButtons.filter('.next').removeClass('hidden').addClass('opacity-50')
-                    .attr('disabled', 'disabled');
             }
 
             $prevNextButtons.rebind('click.mediaviewer', function() {
@@ -1624,7 +1616,7 @@ var slideshowid;
 
         $overlay.removeClass('hidden');
 
-        if (is_mobile) {
+        if (mega.ui.viewerOverlay) {
             mega.ui.viewerOverlay.show(id);
         }
 
@@ -2005,7 +1997,7 @@ var slideshowid;
 
         previews[id].poster = previews[id].poster || '';
 
-        if ($.autoplay === id || page === 'download') {
+        if ($.autoplay === id) {
             queueMicrotask(() => {
                 $playVideoButton.trigger('click');
             });

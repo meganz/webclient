@@ -3772,7 +3772,7 @@
 <!-- View file template !-->
 <template id="view-file-template">
     <div class="mobile main-block slideshow-image-previewer media-viewer-container hidden">
-        <div class="media-viewer">
+        <div class="media-viewer fm-scrolling">
             <header>
                 <nav class="viewer-bars">
                     <div class="media-viewer-menu"></div>
@@ -3789,16 +3789,93 @@
                     <img alt="" class="img2" />
                 </div>
 
+                <!-- Video player !-->
                 <div class="video-block">
                     <video id="mobile-video" data-autoplayvideo="false" data-playvideoonclick="false"></video>
+
+                    <!-- Video player loader !-->
+                    <div class="loader-grad hidden">
+                        <i class="sprite-fm-mono icon-loader-grad-small-regular-outline"></i>
+                    </div>
+
+                    <!-- Video player loader overlay !-->
+                    <div class="loader-grad-overlay"></div>
+
+                    <!-- Video player play button !-->
+                    <div class="play-video-button hidden">
+                        <i class="sprite-fm-mono icon-play"></i>
+                    </div>
+
+                    <!-- Video player play/pause indicator !-->
+                    <div class="play-pause-video-button hidden">
+                        <i class="sprite-fm-mono icon-play-regular-solid"></i>
+                    </div>
+
+                    <!-- Video player Ad controls !-->
+                    <div class="viewer-vad-control lato hidden">
+                        <div  class="thumb">
+                            <img alt="" />
+                        </div>
+                        <div class="counter">
+                            0
+                        </div>
+                        <div class="label">
+                            <span>[$22879]</span><i class="small-icon icons-sprite skip"></i>
+                        </div>
+                    </div>
+
+                    <!-- Video player nav bar !-->
+                    <nav class="viewer-bars video-controls hidden" data-state="hidden">
+                        <ul class="bar">
+                            <li>
+                                <button class="v-btn playpause" aria-label="[[play pause]]" data-state="play">
+                                    <!-- Active state: .icon-pause !-->
+                                    <i class="sprite-fm-mono icon-play"></i>
+                                </button>
+                            </li>
+                            <li class="vol-wrapper">
+                                <button class="v-btn mute" data-state="mute" aria-label="[[volume]]">
+                                    <!-- Active state: .icon-volume-muted !-->
+                                    <i class="sprite-fm-mono icon-volume"></i>
+                                </button>
+                                <div class="video-vol-range">
+                                    <div class="volume-bar"><span></span></div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="video-timing current">
+                                    00:00
+                                </div>
+                            </li>
+                        </ul>
+                        <div class="video-progress-block">
+                            <div class="video-progress-bar">
+                                <div class="video-time-bar"></div>
+                            </div>
+                        </div>
+                        <ul class="bar">
+                            <li>
+                                <div class="video-timing duration">
+                                    00:00
+                                </div>
+                            </li>
+                            <li>
+                                <button class="v-btn fs" aria-label="[[fullscreen]]" data-state="go-fullscreen">
+                                    <!-- Active state: .icon-fullscreen-leave !-->
+                                    <i class="sprite-fm-mono icon-maximize-02-small-regular-outline"></i>
+                                </button>
+                            </li>
+                        </ul>
+                    </nav>
+
+                    <!-- Video player progress bar !-->
+                    <div class="video-progress-bar vad" title="">
+                        <div class="video-time-bar"></div>
+                    </div>
                 </div>
 
                 <button class="gallery-btn previous" aria-label="[[previous]]"></button>
                 <button class="gallery-btn next" aria-label="[[next]]"></button>
-
-                <div class="play-video-button hidden">
-                    <i class="sprite-fm-mono icon-play"></i>
-                </div>
 
                 <div class="mobile viewer-pending">
                     <div class="bounce1"></div>
@@ -3857,49 +3934,6 @@
 
             <footer>
 
-                <nav class="viewer-bars video-controls hidden" data-state="hidden">
-                    <ul class="bar">
-                        <li>
-                            <button class="v-btn playpause" aria-label="[[play pause]]" data-state="play">
-                                <!-- Active state: .icon-pause !-->
-                                <i class="sprite-fm-mono icon-play"></i>
-                            </button>
-                        </li>
-                        <li class="vol-wrapper">
-                            <button class="v-btn mute" data-state="mute" aria-label="[[volume]]">
-                                <!-- Active state: .icon-volume-muted !-->
-                                <i class="sprite-fm-mono icon-volume"></i>
-                            </button>
-                            <div class="video-vol-range">
-                                <div class="volume-bar"><span></span></div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="video-timing current">
-                                00:00
-                            </div>
-                        </li>
-                    </ul>
-                    <div class="video-progress-block">
-                        <div class="video-progress-bar">
-                            <div class="video-time-bar"></div>
-                        </div>
-                    </div>
-                    <ul class="bar">
-                        <li>
-                            <div class="video-timing duration">
-                                00:00
-                            </div>
-                        </li>
-                        <li>
-                            <button class="v-btn fs" aria-label="[[fullscreen]]" data-state="go-fullscreen">
-                                <!-- Active state: .icon-fullscreen-leave !-->
-                                <i class="sprite-fm-mono icon-fullscreen-enter"></i>
-                            </button>
-                        </li>
-                    </ul>
-                </nav>
-
                 <nav class="viewer-bars image-controls">
                     <ul class="bar menu">
                         <li>
@@ -3929,21 +3963,6 @@
                     </div>
                 </nav>
 
-                <div class="viewer-vad-control lato hidden">
-                    <div  class="thumb">
-                        <img alt="" />
-                    </div>
-                    <div class="counter">
-                        0
-                    </div>
-                    <div class="label">
-                        <span>[$22879]</span><i class="small-icon icons-sprite skip"></i>
-                    </div>
-                </div>
-
-                <div class="video-progress-bar vad" title="">
-                    <div class="video-time-bar"></div>
-                </div>
             </footer>
         </div>
     </div>

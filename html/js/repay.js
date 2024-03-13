@@ -10,7 +10,9 @@ RepayPage.prototype.initPage = function() {
     // if mobile we view the related header for top-mobile.html and hide navigation div of desktop
     if (is_mobile) {
 
-        mega.ui.header.update();
+        if (mega.ui && mega.ui.header) {
+            mega.ui.header.update();
+        }
 
         $('.mobile.bus-repay').removeClass('hidden');
         $('.mobile.fm-header').addClass('hidden');

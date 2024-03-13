@@ -110,7 +110,7 @@ var mobile = {
                                 parentNode: mega.ui.sheet.contentNode,
                                 componentClassname : 'error',
                                 icon: 'sprite-mobile-fm-mono icon-alert-triangle-thin-outline',
-                                text: parseHTML(overlayTexts.dlgFooterText.replaceAll('span', 'strong')),
+                                text: parseHTML(overlayTexts.dlgFooterText.replace(/span/g, 'strong')),
                                 closeButton: false
                             });
 
@@ -1215,11 +1215,13 @@ function fm_resize_handler() {}
 function fm_tfsupdate() {}
 function fingerprintDialog() {}
 accountUI.account = {
-    renderBirthYear: function() {},
-    renderBirthMonth: function() {},
-    renderBirthDay: function() {},
-    renderCountry: function() {},
-    renderRubsched: function() {},
+    profiles: {
+        bindEvents: nop,
+        renderBirthYear: nop,
+        renderBirthMonth: nop,
+        renderBirthDay: nop,
+        renderCountry: nop
+    }
 };
 contextMenu = {
     create: nop,

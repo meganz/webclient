@@ -1284,8 +1284,13 @@ class MegaGallery {
             mega.gallery.showEmpty(M.currentdirid);
             this.galleryBlock.classList.add('hidden');
         }
-        galleryHeader.toggleClass('invisible', !M.v.length &&
-            (this.id === 'photos' || this.id === 'images' || this.id === 'videos'));
+        tryCatch(() => {
+            galleryHeader.toggleClass('invisible', !M.v.length &&
+                (this.id === 'photos' || this.id === 'images' || this.id === 'videos' ||
+                M.fmTabState.photos.subpages.includes(this.id) ||
+                M.fmTabState.images.subpages.includes(this.id) ||
+                M.fmTabState.videos.subpages.includes(this.id)));
+        })();
     }
 
     resetAndRender() {

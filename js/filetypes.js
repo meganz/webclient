@@ -678,7 +678,7 @@ function folderIcon(node) {
 
     if (node.t & M.IS_SHARED || M.ps[node.h] || M.getNodeShareUsers(node, 'EXP').length) {
 
-        if (M.geS4NodeType(node) === 'bucket') {
+        if (M.getS4NodeType(node) === 'bucket') {
             return 's4-bucket-shared';
         }
 
@@ -702,7 +702,7 @@ function folderIcon(node) {
         return `${folderIcon}folder-camera`;
     }
     // S4 Object storage
-    else if (M.geS4NodeType(node) === 'bucket') {
+    else if (M.getS4NodeType(node) === 'bucket') {
         return `${folderIcon}s4-bucket`;
     }
     // File request folder

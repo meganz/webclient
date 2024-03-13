@@ -60,17 +60,23 @@ lazy(mega, 'rewind', () => {
                     return;
                 }
 
-                const selectedHandle = $.selected.length && $.selected[0] || M.currentdirid;
+                let selectedHandle = $.selected.length && $.selected[0] || M.currentdirid;
+
+                if (mega.rewind.permittedRoots[M.currentrootid]
+                    && M.currentCustomView && M.currentCustomView.nodeID) {
+                    selectedHandle = M.currentCustomView.nodeID;
+                }
+
                 const nodeRoot = M.getNodeRoot(selectedHandle);
+                let redirect = false;
+                let redirectFolderHandle = selectedHandle;
 
                 // If not on cloud drive
                 if (nodeRoot === M.RootID) {
-                    let redirect = false;
-                    let redirectFolderHandle = selectedHandle;
 
                     if (M.currentrootid !== nodeRoot) {
                         redirect = true;
-                        redirectFolderHandle = nodeRoot;
+                        redirectFolderHandle = selectedHandle;
                     }
                     // We know the currentdirid is not same as the slected one
                     else if (selectedHandle !== M.currentdirid) {
@@ -96,12 +102,12 @@ lazy(mega, 'rewind', () => {
                             fmviewmode(M.currentdirid, 0);
                         }
                     }
+                }
 
-                    if (redirect) {
-                        mega.rewind.folderRedirect = selectedHandle;
-                        M.openFolder(redirectFolderHandle, true);
-                        return;
-                    }
+                if (redirect) {
+                    mega.rewind.folderRedirect = selectedHandle;
+                    M.openFolder(redirectFolderHandle, true);
+                    return;
                 }
 
                 mega.rewind.openSidebar(null, selectedHandle)
@@ -136,6 +142,12 @@ lazy(mega, 'rewind', () => {
             this.lastRewindableMonth = null;
             this.lastRewindableYear = null;
             this.folderRedirect = null;
+
+            // Now adding 'public-links', 'out-shares' to the following object will work as expected
+            this.permittedRoots = freeze({
+                [M.RootID]: true,
+                'file-requests': true,
+            });
 
             mBroadcaster.addListener('mega:openfolder', () => {
                 const listContainer = mega.rewind.getListContainer();

@@ -598,20 +598,21 @@ export default class Call extends MegaRenderMixin {
 
     /**
      * handleSpeakerChange
-     * @description Handles the selection of active speaker when in `Main Mode`.
-     * @param {Peer|VideoNode} videoNode the selected stream to set as active
+     * @description Selects the pinned speaker when in `Main Mode`.
+     * @param {Peer} peer the peer whose stream to pin
      * @see ParticipantsBlock
      * @see Local.renderOptionsDialog
      * @see VideoNodeMenu.Pin
      * @returns {void}
      */
 
-    handleSpeakerChange = videoNode => {
-        if (videoNode) {
-            this.handleModeChange(MODE.MAIN);
-            this.props.call.setPinnedCid(videoNode.clientId);
-            this.setState({ forcedLocal: videoNode.isLocal });
+    handleSpeakerChange = peer => {
+        if (!peer) {
+            return;
         }
+        this.handleModeChange(MODE.MAIN);
+        this.props.call.setPinnedCid(peer.clientId);
+        this.setState({ forcedLocal: peer.isLocal });
     };
 
     /**
@@ -814,7 +815,11 @@ export default class Call extends MegaRenderMixin {
         const isModerator = Call.isModerator(this.props.chatRoom, u_handle);
         const $$CONTAINER = ({ className, onClick, children }) =>
             <div
-                className={`recording-control ${className || ''}`}
+                className={`
+                    recording-control
+                    ${localStorage.callDebug ? 'with-offset' : ''}
+                    ${className || ''}
+                `}
                 onClick={onClick}>{children}</div>;
 
         if (recorder) {
@@ -993,7 +998,7 @@ export default class Call extends MegaRenderMixin {
                     onVideoClick={() => call.toggleVideo()}
                     onScreenSharingClick={this.handleScreenSharingToggle}
                     onHoldClick={this.handleHoldToggle}
-                    onVideoDoubleClick={videoNode => this.handleSpeakerChange(videoNode)}
+                    onVideoDoubleClick={this.handleSpeakerChange}
                 />
 
                 {sidebar &&

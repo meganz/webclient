@@ -167,7 +167,7 @@ export default class ParticipantsBlock extends MegaRenderMixin {
 
             return (
                 <div className="carousel">
-                    <div className="carousel-container">
+                    <div className="carousel-container" onWheel={(evt) => this.onScroll(chunks, evt)}>
                         <div className="stream-participants-block theme-dark-forced">
                             <div className="participants-container">
                                 {Object.values(chunks).map((chunk, i) => {
@@ -219,4 +219,17 @@ export default class ParticipantsBlock extends MegaRenderMixin {
 
         return null;
     }
+    onScroll = (chunks, evt) => {
+        const { page } = this.state;
+        if (evt.deltaY < 0) {
+            if (page > 0) {
+                this.movePage(PAGINATION.PREV);
+            }
+        }
+        else if (evt.deltaY > 0) {
+            if (page < Object.values(chunks).length - 1) {
+                this.movePage(PAGINATION.NEXT);
+            }
+        }
+    };
 }

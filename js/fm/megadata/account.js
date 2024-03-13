@@ -656,6 +656,10 @@ MegaData.prototype.showPaymentCardBanner = function(status) {
         return;
     }
 
+    $('.notification-block-icon', $banner)
+        .removeClass('icon-alert-triangle-thin-outline icon-alert-circle-thin-outline')
+        .addClass(`icon-alert-${status === 'exp' ? 'triangle' : 'circle'}-thin-outline`);
+
     let bannerTitle;
     let bannerDialog = u_attr && u_attr.b ? l.payment_card_update_details_b : l.payment_card_update_details;
     let isExpiredClassName = 'payment-card-almost-expired';

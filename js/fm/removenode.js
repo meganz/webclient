@@ -246,7 +246,7 @@ async function fmremove(selectedNodes, skipDelWarning) {
             filecnt++;
         }
 
-        if (M.geS4NodeType(n) === 'bucket') {
+        if (M.getS4NodeType(n) === 'bucket') {
             s4Bucketcnt++;
         }
     }

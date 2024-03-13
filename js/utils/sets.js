@@ -20,8 +20,7 @@ lazy(mega, 'sets', () => {
 
     /**
      * Storing all handlers from all subscribed sections
-     * To use it in other places, subscribe as per example:
-     * const unsubscribe = `mega.sets.subscribe('asp', () => {})`
+     * @type {Object.<String, Object.<String, Function>>}
      */
     const subscribers = {
         asp: {},
@@ -675,13 +674,20 @@ lazy(mega, 'sets', () => {
                 queueDbTask('ba', '', Object.values(tmpAesp.s));
             }
         },
-        subscribe: (key, id, handler) => {
-            if (!subscribers[key][id]) {
-                subscribers[key][id] = handler;
+        /**
+         * Usage example: const unsubscribe = `mega.sets.subscribe('asp', 'album_added', () => { ... })`
+         * @param {String} ap Action packet name to subscribe to
+         * @param {String} id Unique identifier of the subscriber
+         * @param {Function} fn Action to perform when the action packet is received
+         * @returns {Function} Returns an unsubscribe method to remove the handler
+         */
+        subscribe: (ap, id, fn) => {
+            if (!subscribers[ap][id]) {
+                subscribers[ap][id] = fn;
             }
 
             return () => {
-                delete subscribers[key][id];
+                delete subscribers[ap][id];
             };
         },
         parseAsp: async(payload) => {

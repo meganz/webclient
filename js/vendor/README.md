@@ -29,13 +29,6 @@ Unless otherwise noted, they were released under a [MIT License].
 > **This is a fork**, [See the changes](https://github.com/meganz/avatar-picker/commits/master)
 
 ---
-[bitcoin-math.js]: JS math for BTC and Satoshi values.
-
-> **This is a fork**, [Compare the changes](https://github.com/dangersalad/bitcoin-math/compare/master...meganz:master)
->
-> The bitcoin-math library is released under the [BSD 2-Clause License](https://opensource.org/licenses/BSD-2-Clause).
-
----
 [client-zip.js]: A lightweight zip archive creation library.
 
 > **This is a fork**, [See the changes](https://github.com/Touffy/client-zip/compare/master...meganz:master)
@@ -63,12 +56,6 @@ Unless otherwise noted, they were released under a [MIT License].
 > Released under [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0)
 
 ---
-[encoding.js, encoding-indexes.js]: Polyfill for the Living Standard's Encoding API
-
-> **This is a fork** to remove UTF characters, [see the changes](https://github.com/inexorabletash/text-encoding/compare/master...meganz:master)
-> Released as public domain.
-
----
 [exif-js]: JavaScript library for reading EXIF image metadata.
 
 > **This is a fork**, [Compare the changes](https://github.com/exif-js/exif-js/compare/master...meganz:master)
@@ -79,14 +66,6 @@ Unless otherwise noted, they were released under a [MIT License].
 > **This is a fork**, [Compare the changes](https://github.com/ejci/favico.js/compare/master...meganz:master)
 
 ---
-[filesaver.js]: FileSaver.js - An HTML5 saveAs() FileSaver implementation.
-
----
-[int64.js]: Support for representing 64-bit integers in JavaScript.
-
-> **This is a fork**, [Compare the changes](https://github.com/broofa/node-int64/compare/master...meganz:master)
-
----
 [ion.sound.js]: JavaScript plugin for playing sounds and music in browsers
 
 > **This is a fork**, [Compare the changes](https://github.com/IonDen/ion.sound/compare/master...meganz:master)
@@ -94,8 +73,7 @@ Unless otherwise noted, they were released under a [MIT License].
 ---
 [perfect-scrollbar.js]: JavaScript plugin for scrollbar v0.8.1
 
-> This is released under [MIT License](https://github.com/mdbootstrap/perfect-scrollbar/blob/master/LICENSE).
-> **This is a fork**, [Compare the changes](https://github.com/mdbootstrap/perfect-scrollbar/compare/master...meganz:master)
+> **This is a fork**, [Compare the changes](https://github.com/mdbootstrap/perfect-scrollbar/compare/main...meganz:main)
 
 ---
 [jquery.js]: jQuery JavaScript Library.
@@ -121,17 +99,10 @@ Unless otherwise noted, they were released under a [MIT License].
 ---
 [jquery.mousewheel.js]: A jQuery plugin that adds cross-browser mouse wheel support.
 
-> **This is a fork**, [Compare the changes](https://github.com/jquery/jquery-mousewheel/compare/master...meganz:master)
+> **This is a fork**, [Compare the changes](https://github.com/jquery/jquery-mousewheel/compare/main...meganz:jquery-mousewheel:master)
 
 ---
 [jquery.qrcode.js] & [qrcode.js]: jQuery plugin for a pure browser QR code generation.
-
----
-[jsbn.js]: Basic BigInteger implementation, just enough for RSA encryption and not much more.
-
-> **This is a fork**, [See the changes](https://github.com/meganz/jsbn.js/commits/master/jsbn.js)
-
-[jsbn2.js]: The rest of the library, including most public BigInteger methods.
 
 ---
 [mediainfo.js]: extract metadata about video and audio files.
@@ -164,7 +135,6 @@ Unless otherwise noted, they were released under a [MIT License].
 ---
 [codemirror.js]: Text editor in JavaScript Ver. 5.65.1
 
-> This is released under [MIT License](https://github.com/codemirror/CodeMirror/blob/master/LICENSE).
 > **This is a fork**, [See the changes](https://github.com/codemirror/CodeMirror/compare/master...meganz:master)
 
 ---
@@ -181,6 +151,7 @@ Unless otherwise noted, they were released under a [MIT License].
 
 > react.js and react-dom.js were patched using `./scripts/patch-react-non-asciis.php fixit` so that non-ascii
 characters were removed from the files
+
 ---
 [smartcrop.js]: Content aware image cropping.
 
@@ -220,19 +191,6 @@ characters were removed from the files
 > ```
 
 ---
-[chat/adapter.js]: Shim to insulate apps from spec changes and prefix differences (WebRTC related polyfill)
-
-> NB: We had to fork the project and remove the UTF characters from adapter.js, so we are using the repo:
-> https://github.com/meganz/adapter
->
-> ```bash
-> git clone https://github.com/webrtc/adapter
-> cd release
-> open adapter.js
-> search & replace any utf character with ""
-> ```
-
----
 [twemoji.noutf.js]: Twitter Emoji
 
 > NB: We had to fork the project and remove the UTF characters from twemoji.js, so we are using the repo:
@@ -251,29 +209,27 @@ characters were removed from the files
 [asmcrypto.js]: <https://github.com/meganz/asmcrypto.js>
 [autolinker.js]: <https://github.com/meganz/Autolinker.js>
 [avatar.js]: <https://github.com/meganz/avatar-picker>
-[bitcoin-math.js]: <https://github.com/meganz/bitcoin-math>
+[codemirror.js]: <https://github.com/meganz/codemirror/>
 [datepicker.js]: <https://github.com/meganz/air-datepicker>
 [dexie.js]: <https://github.com/dfahlander/Dexie.js>
 [dcraw.js]: <https://github.com/meganz/dcraw.js>
 [docx-preview.js]: <https://github.com/meganz/docxjs>
-[encoding.js, encoding-indexes.js]: <https://github.com/inexorabletash/text-encoding/tree/v0.6.3>
 [exif-js]: <https://github.com/meganz/exif-js>
 [favico.js]: <https://github.com/meganz/favico.js>
-[filesaver.js]: <https://github.com/eligrey/FileSaver.js/tree/d8388a1a3c781821caae9110ee3d7c28aa7d6e0b>
-[int64.js]: <https://github.com/meganz/node-int64>
 [ion.sound.js]: <https://github.com/meganz/ion.sound>
 [jquery.js]: <https://github.com/jquery/jquery/blob/3.7.0/dist/jquery.js>
 [jquery-ui.js]: <https://code.jquery.com/ui/1.12.1/jquery-ui.js>
+[jquery-ui-touch.js]: <https://github.com/meganz/jquery-ui-touch-punch/>
+[jquery.mobile.js]: <https://jquerymobile.com/>
 [jquery.fullscreen.js]: <https://github.com/meganz/jquery-fullscreen-plugin>
 [jquery.mousewheel.js]: <https://github.com/meganz/jquery-mousewheel>
 [jquery.qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/2bad93deab2f0ec66451b0cc962d56fad6fba403/src/jquery.qrcode.js>
-[jsbn.js]: <https://github.com/meganz/jsbn.js>
-[jsbn2.js]: <http://www-cs-students.stanford.edu/~tjw/jsbn/>
 [mediainfo.js]: <https://github.com/meganz/mediainfo.js>
 [megaLogger.js]: <https://github.com/meganz/megalogger>
 [megapix.js]: <https://github.com/meganz/ios-imagefile-megapixel>
 [moment.js]: <https://github.com/moment/moment/tree/2.10.6>
 [nacl-fast.js]: <https://github.com/dchest/tweetnacl-js/tree/v0.13.1>
+[perfect-scrollbar.js]: <https://github.com/meganz/perfect-scrollbar>
 [pdf.js]: <https://github.com/mega.nz/pdf.js>
 [qrcode.js]: <https://github.com/jeromeetienne/jquery-qrcode/blob/2bad93deab2f0ec66451b0cc962d56fad6fba403/src/qrcode.js>
 [react-dom.js, react.js]: https://github.com/facebook/react/releases/tag/v16.8.6
@@ -283,5 +239,3 @@ characters were removed from the files
 [web-streams-polyfill.js]: <https://github.com/meganz/web-streams-polyfill>
 [webp.js]: <https://github.com/meganz/libwebp>
 [zxcvbn.js]: <https://github.com/dropbox/zxcvbn/tree/1.0.1>
-[chat/adapter.js]: <https://github.com/webrtc/adapter>
-

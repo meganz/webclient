@@ -12,6 +12,10 @@ div.recording-control {
         margin: 0 0 14px 0;
     }
 
+    &.with-offset {
+        left: 100px;
+    }
+
     .record-label {
         display: block;
         margin: 4px 0 0 0;

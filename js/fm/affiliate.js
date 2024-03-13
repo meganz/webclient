@@ -1150,7 +1150,7 @@ affiliateUI.redemptionDialog = {
 
         // If user has a Pro Flexi or Business account, go straight to bitcoin redemption step1
         if (affiliateRedemption.currentStep === 0
-                && u_attr.p === pro.ACCOUNT_LEVEL_BUSINESS || u_attr.p === pro.ACCOUNT_LEVEL_PRO_FLEXI){
+                && (u_attr.p === pro.ACCOUNT_LEVEL_BUSINESS || u_attr.p === pro.ACCOUNT_LEVEL_PRO_FLEXI)){
             affiliateRedemption.currentStep = 1;
             affiliateRedemption.requests.first.m = 2;
         }

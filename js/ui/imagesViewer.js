@@ -303,12 +303,13 @@ var slideshowid;
 
             // Change favourite icon
             if (M.isFavourite(n.h)) {
+                const icon = is_video(n) ? 'icon-heart-broken-small-regular-outline' : 'icon-favourite-removed';
                 $('span', $favButton).text(l[5872]);
-                $('i', $favButton).removeClass('icon-favourite').addClass('icon-favourite-removed');
+                $('i', $favButton).removeClass().addClass(`sprite-fm-mono ${icon}`);
             }
             else {
                 $('span', $favButton).text(l[5871]);
-                $('i', $favButton).removeClass('icon-favourite-removed').addClass('icon-favourite');
+                $('i', $favButton).removeClass().addClass('sprite-fm-mono icon-favourite');
             }
         }
     }
@@ -685,7 +686,6 @@ var slideshowid;
             else {
                 $zoomOutButton.trigger('click.mediaviewer');
             }
-            return false;
         });
 
         // Bind Slideshow Close button

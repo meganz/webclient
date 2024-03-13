@@ -79,7 +79,7 @@ export default class Admit extends MegaRenderMixin {
             return (
                 <>
                     <div className={`${NAMESPACE}-head`}>
-                        <h3>{l.wr_peers_waiting.replace('%1', peers.length)}</h3>
+                        <h3>{mega.icu.format(l.wr_peers_waiting, peers.length)}</h3>
                         {expanded ?
                             <this.Icon
                                 icon="icon-arrow-up"

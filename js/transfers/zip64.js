@@ -69,18 +69,8 @@ function ezBuffer(size) {
             offset += text.length
         },
         i64: function(number, bigendian) {
-            var buffer = new Int64(number).buffer
-            if (!bigendian) {
-                // swap the by orders
-                var nbuffer = new Uint8Array(buffer.length),
-                    len = buffer.length - 1
-                for (var i = len; i >= 0; i--) {
-                    nbuffer[i] = buffer[len - i]
-                }
-                buffer = nbuffer;
-            }
-            // append the buffer
-            this.appendBytes(buffer);
+            buffer.setBigInt64(offset, BigInt(number), !bigendian);
+            offset += 8;
         },
         i32: function(number, bigendian) {
             buffer.setInt32(offset, number, !bigendian);

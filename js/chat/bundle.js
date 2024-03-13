@@ -15,8 +15,8 @@ var external_React_default = __webpack_require__.n(external_React_);
 // EXTERNAL MODULE: external "ReactDOM"
 var external_ReactDOM_ = __webpack_require__(206);
 var external_ReactDOM_default = __webpack_require__.n(external_ReactDOM_);
-// EXTERNAL MODULE: ./js/chat/ui/conversations.jsx + 20 modules
-var conversations = __webpack_require__(698);
+// EXTERNAL MODULE: ./js/chat/ui/conversations.jsx + 18 modules
+var conversations = __webpack_require__(30);
 ;// CONCATENATED MODULE: ./js/chat/chatRouting.jsx
 var _ChatRouting;
 class ChatRouting {
@@ -1513,6 +1513,7 @@ function Chat() {
   this.chats = new MegaDataMap();
   this.scheduledMeetings = new MegaDataMap();
   this.chatUIFlags = new MegaDataMap();
+  this.$chatTreePanePs = [];
   this.initChatUIFlagsManagement();
   this.currentlyOpenedChat = null;
   this.currentlyOpenedView = null;
@@ -4258,6 +4259,9 @@ ChatRoom.prototype.isAnonymous = function () {
 ChatRoom.prototype.isDisplayable = function () {
   return !this.isArchived() || this.call;
 };
+ChatRoom.prototype.isMuted = function () {
+  return pushNotificationSettings.getDnd(this.chatId) || pushNotificationSettings.getDnd(this.chatId) === 0;
+};
 ChatRoom.prototype.persistToFmdb = function () {
   var self = this;
   if (fmdb) {
@@ -4574,17 +4578,23 @@ ChatRoom.prototype.show = function () {
 };
 ChatRoom.prototype.scrollToChat = function () {
   this._scrollToOnUpdate = true;
-  if (megaChat.$chatTreePanePs) {
-    var li = document.querySelector('ul.conversations-pane li#conversation_' + this.roomId);
-    if (li) {
-      var pos = li.offsetTop;
-      if (!verge.inViewport(li, -72)) {
-        var treePane = document.querySelector('.conversationsApp .fm-tree-panel');
-        var wrapOuterHeight = $(treePane).outerHeight();
-        var itemOuterHeight = $('li:first', treePane).outerHeight();
-        megaChat.$chatTreePanePs.doProgramaticScroll(Math.max(0, pos - wrapOuterHeight / 2 + itemOuterHeight), true);
-        this._scrollToOnUpdate = false;
-      }
+  const {
+    $chatTreePanePs
+  } = megaChat;
+  if ($chatTreePanePs && $chatTreePanePs.length) {
+    const li = document.querySelector(`ul.conversations-pane li#conversation_${this.roomId}`);
+    if (li && !verge.inViewport(li, -72)) {
+      Object.values($chatTreePanePs).forEach(({
+        ref
+      }) => {
+        const wrapOuterHeight = $(ref.domNode).outerHeight();
+        const itemOuterHeight = $('li:first', ref.domNode).outerHeight();
+        const pos = li.offsetTop;
+        if (ref.domNode.contains(li)) {
+          ref.doProgramaticScroll == null || ref.doProgramaticScroll(Math.max(0, pos - wrapOuterHeight / 2 + itemOuterHeight), true);
+        }
+      });
+      this._scrollToOnUpdate = false;
     }
   }
 };
@@ -14801,7 +14811,7 @@ function isStartCallDisabled(room) {
 
 /***/ }),
 
-/***/ 698:
+/***/ 30:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -18293,10 +18303,12 @@ class Actions extends mixins.w9 {
     const {
       view,
       views,
+      filter,
       routingSection,
       startMeeting,
       scheduleMeeting,
-      createGroupChat
+      createGroupChat,
+      onFilter
     } = this.props;
     const {
       CHATS,
@@ -18356,7 +18368,36 @@ class Actions extends mixins.w9 {
       icon: "sprite-fm-mono icon-calendar2",
       label: l.schedule_meeting_start,
       onClick: scheduleMeeting
-    }))), routingSection === 'contacts' && external_React_default().createElement(buttons.$, {
+    }))), routingSection !== 'contacts' && external_React_default().createElement("div", {
+      className: "lhp-filter"
+    }, external_React_default().createElement("div", {
+      className: "lhp-filter-control"
+    }, external_React_default().createElement(buttons.$, {
+      icon: "sprite-fm-mono icon-sort-thin-solid"
+    }, external_React_default().createElement(dropdowns.Dropdown, {
+      className: "light",
+      noArrow: "true"
+    }, external_React_default().createElement(dropdowns.DropdownItem, {
+      className: "link-button",
+      icon: "sprite-fm-mono icon-eye-reveal",
+      label: l.filter_unread,
+      onClick: () => onFilter(FILTER.UNREAD)
+    }), external_React_default().createElement(dropdowns.DropdownItem, {
+      className: "link-button",
+      icon: "sprite-fm-mono icon-notification-off",
+      label: view === MEETINGS ? l.filter_muted__meetings : l.filter_muted__chats,
+      onClick: () => onFilter(FILTER.MUTED)
+    })))), filter && external_React_default().createElement((external_React_default()).Fragment, null, filter === FILTER.MUTED && external_React_default().createElement("div", {
+      className: "lhp-filter-tag",
+      onClick: () => onFilter(FILTER.MUTED)
+    }, external_React_default().createElement("span", null, view === MEETINGS ? l.filter_muted__meetings : l.filter_muted__chats), external_React_default().createElement("i", {
+      className: "sprite-fm-mono icon-close-component"
+    })), filter === FILTER.UNREAD && external_React_default().createElement("div", {
+      className: "lhp-filter-tag",
+      onClick: () => onFilter(FILTER.UNREAD)
+    }, external_React_default().createElement("span", null, l.filter_unread), external_React_default().createElement("i", {
+      className: "sprite-fm-mono icon-close-component"
+    })))), routingSection === 'contacts' && external_React_default().createElement(buttons.$, {
       className: "mega-button action",
       icon: "sprite-fm-mono icon-add-circle",
       label: l[71],
@@ -18592,14 +18633,16 @@ let ConversationsListItem = (_dec = utils.Ay.SoonFcWrap(40, true), _dec2 = (0,mi
       className: "conversation-data-top"
     }, external_React_default().createElement("div", {
       className: `conversation-data-name ${nameClassString}`
-    }, roomTitle), external_React_default().createElement("div", {
+    }, roomTitle, chatRoom.isMuted() ? external_React_default().createElement("i", {
+      className: "sprite-fm-mono icon-notification-off-filled muted-conversation-icon"
+    }) : null), external_React_default().createElement("div", {
       className: "conversation-data-badges"
-    }, chatRoom.type === 'private' && external_React_default().createElement("span", {
+    }, chatRoom.type === 'private' ? external_React_default().createElement("span", {
       className: `user-card-presence ${presenceClass}`
-    }), (chatRoom.type === 'group' || chatRoom.type === 'private') && external_React_default().createElement("i", {
+    }) : null, chatRoom.type === 'group' || chatRoom.type === 'private' ? external_React_default().createElement("i", {
       className: "sprite-fm-uni icon-ekr-key simpletip",
       "data-simpletip": l[20935]
-    }), scheduledMeeting && scheduledMeeting.isUpcoming && scheduledMeeting.isRecurring && external_React_default().createElement("i", {
+    }) : null, scheduledMeeting && scheduledMeeting.isUpcoming && scheduledMeeting.isRecurring && external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-repeat"
     }))), external_React_default().createElement("div", {
       className: "clear"
@@ -18629,164 +18672,120 @@ let ConversationsListItem = (_dec = utils.Ay.SoonFcWrap(40, true), _dec2 = (0,mi
   }
 }, ((0,applyDecoratedDescriptor.A)(_class.prototype, "eventuallyScrollTo", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "eventuallyScrollTo"), _class.prototype), (0,applyDecoratedDescriptor.A)(_class.prototype, "render", [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, "render"), _class.prototype)), _class));
 
-;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/toggle.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/leftPanel.jsx
 
 
 
-class TogglePanel extends mixins.w9 {
-  componentDidUpdate() {
-    super.componentDidUpdate();
-    const {
-      $chatTreePanePs: content
-    } = megaChat;
-    if (content) {
-      const container = document.querySelector(`.${LeftPanel.NAMESPACE}-conversations`);
-      const scrollable = content.getContentHeight() > container.offsetHeight - 40;
-      container.classList[scrollable ? 'add' : 'remove']('scrollable');
-      content.reinitialise();
-    }
-  }
-  specShouldComponentUpdate() {
-    return !this.props.loading;
-  }
-  render() {
-    const {
-      loading,
-      expanded,
-      heading,
-      children,
-      className,
-      onToggle
-    } = this.props;
-    return external_React_default().createElement("div", {
-      className: `
-                    toggle-panel
-                    ${expanded ? 'expanded' : ''}
-                    ${className || ''}
-                `,
-      onClick: onToggle
-    }, heading && external_React_default().createElement("div", {
-      className: "toggle-panel-heading"
-    }, external_React_default().createElement("i", {
-      className: "sprite-fm-mono icon-arrow-down"
-    }), external_React_default().createElement("span", null, heading)), expanded && external_React_default().createElement("div", {
-      className: `
-                            toggle-panel-content
-                            ${loading ? 'loading-sketch' : ''}
-                        `
-    }, children));
-  }
-}
-TogglePanel.KEYS = {
+
+
+
+
+
+
+const FILTER = {
+  MUTED: 'muted',
+  UNREAD: 'unread'
+};
+const CONVERSATION_TYPES = {
   UPCOMING: 'upcoming',
   PAST: 'past',
-  ARCHIVE: 'archive'
+  ARCHIVED: 'archive'
 };
-class Toggle extends mixins.w9 {
+class LeftPanel extends mixins.w9 {
   constructor(props) {
     super(props);
     this.state = {
-      expanded: null
+      updated: 0,
+      archived: false,
+      archivedUnmounting: false,
+      filter: ''
     };
-    this.state.expanded = this.props.expanded || null;
-  }
-  onMeetingInitialize(scheduledMeeting) {
-    assert(scheduledMeeting, 'Failed to initialize scheduled meeting.');
-    if (!M.chat || !this.isMounted() || !ChatdPersist.isMasterTab()) {
-      return;
-    }
-    const {
-      chatRoom,
-      iAmOwner
-    } = scheduledMeeting;
-    if (chatRoom && iAmOwner) {
-      this.setState({
-        expanded: TogglePanel.KEYS.UPCOMING
-      }, () => chatRoom.setActive());
-    }
-  }
-  specShouldComponentUpdate() {
-    return !this.props.loading;
-  }
-  componentWillUpdate(nextProps) {
-    const {
-      view,
-      views
-    } = this.props;
-    if (view !== views.MEETINGS && nextProps.view === views.MEETINGS) {
-      this.setState({
-        expanded: TogglePanel.KEYS.UPCOMING
+    this.toggleFilter = filter => {
+      this.setState(state => ({
+        filter: state.filter === filter ? '' : filter
+      }), () => {
+        Object.values(megaChat.$chatTreePanePs).map(({
+          ref
+        }) => ref.reinitialise == null ? void 0 : ref.reinitialise());
       });
-    }
-  }
-  componentDidUpdate() {
-    super.componentDidUpdate();
-    const {
-      view,
-      views,
-      children
-    } = this.props;
-    const hasExpandablePanel = children.some(child => child.key === this.state.expanded);
-    if (!hasExpandablePanel && view !== views.MEETINGS) {
-      this.setState({
-        expanded: TogglePanel.KEYS.PAST
-      });
-    }
-  }
-  componentDidMount() {
-    super.componentDidMount();
-    megaChat.rebind(`${megaChat.plugins.meetingsManager.EVENTS.INITIALIZE}.toggle`, (ev, scheduledMeeting) => this.onMeetingInitialize(scheduledMeeting));
-  }
-  render() {
-    const {
-      loading,
-      children
-    } = this.props;
-    if (children) {
-      return children.map(child => {
-        return child && external_React_default().cloneElement(child, {
-          loading,
-          expanded: this.state.expanded === child.key,
-          onToggle: () => this.setState({
-            expanded: child.key
-          })
-        });
-      });
-    }
-    return null;
-  }
-}
-;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/conversationsList.jsx
-
-
-
-
-
-class ConversationsList extends mixins.w9 {
-  constructor(props) {
-    super(props);
-    this.backgroundUpdateInterval = null;
-    this.state = {
-      updated: 0
     };
     this.doUpdate = this.doUpdate.bind(this);
   }
   customIsEventuallyVisible() {
     return M.chat;
   }
-  attachRerenderCallbacks() {
-    this._megaChatsListener = megaChat.chats.addChangeListener(() => this.onPropOrStateUpdated());
-  }
-  detachRerenderCallbacks() {
-    if (super.detachRerenderCallbacks) {
-      super.detachRerenderCallbacks();
-    }
-    megaChat.chats.removeChangeListener(this._megaChatsListener);
-  }
   doUpdate() {
     return this.isComponentVisible() && document.visibilityState === 'visible' && this.setState(state => ({
       updated: ++state.updated
     }), () => this.forceUpdate());
+  }
+  renderConversationsList(conversations) {
+    const {
+      view,
+      views
+    } = this.props;
+    return external_React_default().createElement(perfectScrollbar.O, {
+      className: "chat-lp-scroll-area",
+      didMount: (id, ref) => {
+        megaChat.$chatTreePanePs = [...megaChat.$chatTreePanePs, {
+          id,
+          ref
+        }];
+      },
+      willUnmount: id => {
+        megaChat.$chatTreePanePs = megaChat.$chatTreePanePs.filter(ref => ref.id !== id);
+      },
+      conversations: conversations
+    }, external_React_default().createElement("ul", {
+      className: `
+                        conversations-pane
+                        ${view === views.MEETINGS ? '' : 'with-offset'}
+                    `
+    }, conversations.map(chatRoom => {
+      if (chatRoom.roomId) {
+        return external_React_default().createElement(ConversationsListItem, {
+          key: chatRoom.roomId,
+          chatRoom: chatRoom,
+          contact: M.u[chatRoom.getParticipantsExceptMe()[0]] || null,
+          messages: chatRoom.messagesBuff,
+          onConversationClick: () => loadSubPage(chatRoom.getRoomUrl(false))
+        });
+      }
+      return null;
+    })));
+  }
+  renderArchived() {
+    const {
+      view,
+      views
+    } = this.props;
+    const {
+      NAMESPACE
+    } = LeftPanel;
+    const archivedConversations = this.getConversations(CONVERSATION_TYPES.ARCHIVED);
+    return external_React_default().createElement("div", {
+      className: `
+                    ${NAMESPACE}-archived
+                    ${this.state.archivedUnmounting ? 'is-unmounting' : ''}
+                `
+    }, external_React_default().createElement("div", {
+      className: `${NAMESPACE}-archived-head`
+    }, external_React_default().createElement(meetings_button.A, {
+      className: "mega-button round",
+      icon: "sprite-fm-mono icon-arrow-left-regular-outline",
+      onClick: () => this.setState({
+        archivedUnmounting: true
+      }, () => setTimeout(() => this.setState({
+        archivedUnmounting: false,
+        archived: false
+      }), 300))
+    }), external_React_default().createElement("h2", null, view === views.CHATS ? l.filter_archived__chats : '', view === views.MEETINGS ? l.filter_archived__meetings : '')), external_React_default().createElement("div", {
+      className: `${NAMESPACE}-archived-content`
+    }, archivedConversations && archivedConversations.length ? this.renderConversationsList(archivedConversations) : external_React_default().createElement("div", {
+      className: `${NAMESPACE}-archived-empty`
+    }, external_React_default().createElement("i", {
+      className: "sprite-fm-mono icon-archive"
+    }), external_React_default().createElement("h3", null, view === views.CHATS ? l.filter_archived__nil_chats : '', view === views.MEETINGS ? l.filter_archived__nil_meetings : ''))));
   }
   renderLoading() {
     return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("span", {
@@ -18813,59 +18812,85 @@ class ConversationsList extends mixins.w9 {
       }))));
     })));
   }
-  renderEmptyState() {
+  renderChats() {
     const {
-      type,
-      view,
-      views
-    } = this.props;
-    const isArchived = type === TogglePanel.KEYS.ARCHIVE;
-    const isUpcoming = type === TogglePanel.KEYS.UPCOMING;
-    const messages = {
-      [views.CHATS]: isArchived ? l.no_archived_chats_lhp : l.no_chats_lhp,
-      [views.MEETINGS]: (() => {
-        if (isArchived) {
-          return l.no_archived_meetings_lhp;
-        }
-        return isUpcoming ? l.no_upcoming_meetings_lhp : l.no_meetings_lhp;
-      })()
-    };
-    return external_React_default().createElement("span", {
-      className: "empty-conversations"
-    }, messages[view]);
+      NAMESPACE
+    } = LeftPanel;
+    const {
+      filter
+    } = this.state;
+    const recentChats = this.filterConversations(CONVERSATION_TYPES.PAST);
+    return external_React_default().createElement("div", {
+      className: "conversations-holder"
+    }, filter ? null : external_React_default().createElement("div", {
+      className: "conversations-category"
+    }, external_React_default().createElement("span", null, l.filter_heading__recent)), recentChats && recentChats.length ? this.renderConversationsList(recentChats) : external_React_default().createElement("div", {
+      className: `
+                            ${NAMESPACE}-nil
+                            ${filter ? `${NAMESPACE}-nil--chats` : ''}
+                        `
+    }, filter ? external_React_default().createElement((external_React_default()).Fragment, null, filter === FILTER.MUTED && external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("i", {
+      className: "sprite-fm-mono icon-notification-off-filled"
+    }), external_React_default().createElement("h3", null, l.filter_nil__muted_chats)), filter === FILTER.UNREAD && external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("i", {
+      className: "sprite-fm-mono icon-eye-thin-solid"
+    }), external_React_default().createElement("h3", null, l.filter_nil__unread_messages))) : external_React_default().createElement("span", null, l.no_chats_lhp)));
   }
-  renderConversationsList() {
+  renderMeetings() {
     const {
+      NAMESPACE
+    } = LeftPanel;
+    const {
+      filter
+    } = this.state;
+    const upcomingConversations = this.filterConversations(CONVERSATION_TYPES.UPCOMING);
+    const pastConversations = this.filterConversations(CONVERSATION_TYPES.PAST);
+    const $$HOLDER = (heading, content) => external_React_default().createElement("div", {
+      className: "conversations-holder"
+    }, external_React_default().createElement("div", {
+      className: "conversations-category"
+    }, external_React_default().createElement("span", null, heading)), content);
+    return external_React_default().createElement((external_React_default()).Fragment, null, $$HOLDER(l.filter_heading__upcoming, upcomingConversations && upcomingConversations.length ? this.renderConversationsList(upcomingConversations) : external_React_default().createElement("div", {
+      className: `${NAMESPACE}-nil`
+    }, filter ? external_React_default().createElement((external_React_default()).Fragment, null, filter === FILTER.MUTED && external_React_default().createElement("span", null, l.filter_nil__muted_upcoming), filter === FILTER.UNREAD && external_React_default().createElement("span", null, l.filter_nil__unread_upcoming)) : external_React_default().createElement("span", null, l.filter_nil__meetings_upcoming))), $$HOLDER(l.filter_heading__recent, pastConversations && pastConversations.length ? this.renderConversationsList(pastConversations) : external_React_default().createElement("div", {
+      className: `${NAMESPACE}-nil`
+    }, filter ? external_React_default().createElement((external_React_default()).Fragment, null, filter === FILTER.MUTED && external_React_default().createElement("span", null, l.filter_nil__muted_recent), filter === FILTER.UNREAD && external_React_default().createElement("span", null, l.filter_nil__unread_recent)) : external_React_default().createElement("span", null, l.filter_nil__meetings_recent))));
+  }
+  getConversations(type) {
+    const {
+      UPCOMING,
+      PAST,
+      ARCHIVED
+    } = CONVERSATION_TYPES;
+    let {
       view,
-      conversations,
-      onConversationClick
+      views,
+      conversations
     } = this.props;
-    return external_React_default().createElement(perfectScrollbar.O, {
-      className: "chat-lp-scroll-area",
-      ref: ref => {
-        megaChat.$chatTreePanePs = ref;
-      },
-      view: view,
-      conversations: conversations
-    }, external_React_default().createElement("ul", {
-      className: "conversations-pane"
-    }, conversations.map(chatRoom => {
-      if (chatRoom.roomId) {
-        return external_React_default().createElement(ConversationsListItem, {
-          key: chatRoom.roomId,
-          chatRoom: chatRoom,
-          contact: M.u[chatRoom.getParticipantsExceptMe()[0]] || null,
-          messages: chatRoom.messagesBuff,
-          onConversationClick: () => {
-            loadSubPage(chatRoom.getRoomUrl(false));
-            if (onConversationClick) {
-              onConversationClick(chatRoom);
-            }
-          }
+    conversations = Object.values(conversations);
+    switch (type) {
+      case UPCOMING:
+        return conversations.filter(c => c.isDisplayable() && c.isMeeting && c.scheduledMeeting && c.scheduledMeeting.isUpcoming).sort((a, b) => {
+          return a.scheduledMeeting.nextOccurrenceStart - b.scheduledMeeting.nextOccurrenceStart || a.ctime - b.ctime;
         });
-      }
-      return null;
-    })));
+      case PAST:
+        return conversations.filter(c => c.isDisplayable() && (view === views.MEETINGS ? c.isMeeting : !c.isMeeting) && (!c.scheduledMeeting || c.scheduledMeeting.isCanceled || c.scheduledMeeting.isPast)).sort(M.sortObjFn(c => c.lastActivity || c.ctime, -1));
+      case ARCHIVED:
+        return conversations.filter(c => c.isArchived() && (view === views.MEETINGS ? c.isMeeting : !c.isMeeting)).sort(M.sortObjFn(c => c.lastActivity || c.ctime, -1));
+    }
+  }
+  filterConversations(type) {
+    const {
+      filter
+    } = this.state;
+    const conversations = this.getConversations(type);
+    switch (filter) {
+      case FILTER.UNREAD:
+        return conversations.filter(c => c.messagesBuff.getUnreadCount() > 0);
+      case FILTER.MUTED:
+        return conversations.filter(c => c.isMuted());
+      default:
+        return conversations;
+    }
   }
   componentWillUnmount() {
     super.componentWillUnmount();
@@ -18882,77 +18907,26 @@ class ConversationsList extends mixins.w9 {
     const {
       view,
       views,
-      conversations
-    } = this.props;
-    if (conversations && conversations.length === 0) {
-      return this.renderEmptyState();
-    }
-    return view === views.LOADING ? this.renderLoading() : this.renderConversationsList();
-  }
-}
-ConversationsList.defaultProps = {
-  manualDataChangeTracking: true
-};
-;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/leftPanel.jsx
-
-
-
-
-
-
-
-
-class LeftPanel extends mixins.w9 {
-  renderConversations(type) {
-    const {
-      view,
-      views,
-      renderView
-    } = this.props;
-    const filteredConversations = this.filterConversations(type);
-    return external_React_default().createElement(ConversationsList, {
-      type: type,
-      view: view,
-      views: views,
-      conversations: filteredConversations,
-      onConversationClick: chatRoom => renderView(chatRoom.isMeeting ? views.MEETINGS : views.CHATS)
-    });
-  }
-  filterConversations(type) {
-    let {
-      view,
-      views,
-      conversations
-    } = this.props;
-    conversations = Object.values(conversations);
-    switch (type) {
-      case TogglePanel.KEYS.UPCOMING:
-        return conversations.filter(c => c.isDisplayable() && c.isMeeting && c.scheduledMeeting && c.scheduledMeeting.isUpcoming).sort((a, b) => {
-          return a.scheduledMeeting.nextOccurrenceStart - b.scheduledMeeting.nextOccurrenceStart || a.ctime - b.ctime;
-        });
-      case TogglePanel.KEYS.PAST:
-        return conversations.filter(c => c.isDisplayable() && (view === views.MEETINGS ? c.isMeeting : !c.isMeeting) && (!c.scheduledMeeting || c.scheduledMeeting.isCanceled || c.scheduledMeeting.isPast)).sort(M.sortObjFn(c => c.lastActivity || c.ctime, -1));
-      case TogglePanel.KEYS.ARCHIVE:
-        return conversations.filter(c => c.isArchived() && (view === views.MEETINGS ? c.isMeeting : !c.isMeeting)).sort(M.sortObjFn(c => c.lastActivity || c.ctime, -1));
-    }
-  }
-  render() {
-    const {
-      view,
-      views,
       routingSection,
-      conversations,
       leftPaneWidth,
       renderView,
       startMeeting,
       scheduleMeeting,
       createGroupChat
     } = this.props;
-    const IS_LOADING = view === views.LOADING;
+    const {
+      NAMESPACE
+    } = LeftPanel;
+    const {
+      CHATS,
+      MEETINGS,
+      LOADING
+    } = views;
     return external_React_default().createElement("div", (0,esm_extends.A)({
       className: `
                     fm-left-panel
                     chat-lp-body
+                    ${NAMESPACE}-container
                     ${is_chatlink && 'hidden' || ''}
                     ${megaChat._joinDialogIsShown && 'hidden' || ''}
                 `
@@ -18960,43 +18934,43 @@ class LeftPanel extends mixins.w9 {
       width: leftPaneWidth
     }), external_React_default().createElement("div", {
       className: "left-pane-drag-handle"
-    }), external_React_default().createElement(SearchPanel, null), external_React_default().createElement(Navigation, {
+    }), this.state.archived ? this.renderArchived() : external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement(SearchPanel, null), external_React_default().createElement(Navigation, {
       view: view,
       views: views,
       routingSection: routingSection,
-      renderView: renderView
+      renderView: view => this.setState({
+        filter: false
+      }, () => renderView(view))
     }), external_React_default().createElement(Actions, {
       view: view,
       views: views,
+      filter: this.state.filter,
       routingSection: routingSection,
       startMeeting: startMeeting,
       scheduleMeeting: scheduleMeeting,
-      createGroupChat: createGroupChat
+      createGroupChat: createGroupChat,
+      onFilter: this.toggleFilter
     }), external_React_default().createElement("div", {
       className: `
-                        ${LeftPanel.NAMESPACE}-conversations
-                        ${view === views.MEETINGS ? 'meetings-view' : 'chats-view'}
-                        conversations
-                        content-panel
-                        active
-                    `
-    }, external_React_default().createElement(Toggle, {
-      view: view,
-      views: views,
-      loading: IS_LOADING,
-      conversations: conversations,
-      expanded: TogglePanel.KEYS.UPCOMING
-    }, view === views.MEETINGS && external_React_default().createElement(TogglePanel, {
-      key: TogglePanel.KEYS.UPCOMING,
-      heading: l.upcoming_meetings
-    }, this.renderConversations(TogglePanel.KEYS.UPCOMING)), external_React_default().createElement(TogglePanel, {
-      key: TogglePanel.KEYS.PAST,
-      className: "lhp-toggle-past",
-      heading: !IS_LOADING && (view === views.CHATS ? l.contacts_and_groups : l.past_meetings)
-    }, this.renderConversations(TogglePanel.KEYS.PAST)), external_React_default().createElement(TogglePanel, {
-      key: TogglePanel.KEYS.ARCHIVE,
-      heading: !IS_LOADING && view === views.CHATS ? l[19067] : l.archived_meetings
-    }, this.renderConversations(TogglePanel.KEYS.ARCHIVE)))));
+                                ${NAMESPACE}-conversations
+                                ${view === MEETINGS ? 'meetings-view' : ''}
+                                ${view === CHATS ? 'chats-view' : ''}
+                                conversations
+                                content-panel
+                                active
+                            `
+    }, view === LOADING ? this.renderLoading() : external_React_default().createElement((external_React_default()).Fragment, null, view === MEETINGS && this.renderMeetings(), view === CHATS && this.renderChats(), external_React_default().createElement("div", {
+      className: `${NAMESPACE}-bottom`
+    }, external_React_default().createElement("div", {
+      className: `${NAMESPACE}-bottom-control`
+    }, external_React_default().createElement("div", {
+      className: "conversations-category",
+      onClick: () => this.setState({
+        archived: true
+      })
+    }, external_React_default().createElement("span", null, view === CHATS ? l.filter_archived__chats : l.filter_archived__meetings), external_React_default().createElement("i", {
+      className: "sprite-fm-mono icon-arrow-right"
+    }))))))));
   }
 }
 LeftPanel.NAMESPACE = 'lhp';
@@ -19189,7 +19163,7 @@ class ConversationsApp extends mixins.w9 {
         $chatTreePanePs,
         routingSection
       } = megaChat;
-      $chatTreePanePs == null || $chatTreePanePs.reinitialise();
+      Object.values($chatTreePanePs).forEach(ref => ref.reinitialise == null ? void 0 : ref.reinitialise());
       if (routingSection !== 'chat') {
         loadSubPage('fm/chat');
       }
@@ -22495,14 +22469,15 @@ class Call extends mixins.w9 {
       }
       return action === stream.hK.ADD ? peers.addFakeDupStream() : peers.removeFakeDupStream();
     };
-    this.handleSpeakerChange = videoNode => {
-      if (videoNode) {
-        this.handleModeChange(MODE.MAIN);
-        this.props.call.setPinnedCid(videoNode.clientId);
-        this.setState({
-          forcedLocal: videoNode.isLocal
-        });
+    this.handleSpeakerChange = peer => {
+      if (!peer) {
+        return;
       }
+      this.handleModeChange(MODE.MAIN);
+      this.props.call.setPinnedCid(peer.clientId);
+      this.setState({
+        forcedLocal: peer.isLocal
+      });
     };
     this.handleModeChange = mode => {
       this.props.call.setViewMode(mode);
@@ -22624,7 +22599,11 @@ class Call extends mixins.w9 {
         onClick,
         children
       }) => external_React_default().createElement("div", {
-        className: `recording-control ${className || ''}`,
+        className: `
+                    recording-control
+                    ${localStorage.callDebug ? 'with-offset' : ''}
+                    ${className || ''}
+                `,
         onClick: onClick
       }, children);
       if (recorder) {
@@ -22859,7 +22838,7 @@ class Call extends mixins.w9 {
       onVideoClick: () => call.toggleVideo(),
       onScreenSharingClick: this.handleScreenSharingToggle,
       onHoldClick: this.handleHoldToggle,
-      onVideoDoubleClick: videoNode => this.handleSpeakerChange(videoNode)
+      onVideoDoubleClick: this.handleSpeakerChange
     })), sidebar && external_React_default().createElement(Sidebar, (0,esm_extends.A)({}, STREAM_PROPS, {
       guest: guest,
       initialCallRinging: initialCallRinging,
@@ -24301,7 +24280,7 @@ class Minimized extends mixins.w9 {
                     theme-dark-forced
                 `,
         onClick: this.props.onCallExpand
-      }, waitingRoomPeers.length > 1 ? l.wr_peers_waiting.replace('%1', waitingRoomPeers.length) : external_React_default().createElement(utils.P9, {
+      }, waitingRoomPeers.length > 1 ? mega.icu.format(l.wr_peers_waiting, waitingRoomPeers.length) : external_React_default().createElement(utils.P9, {
         tag: "span",
         content: l.wr_peer_waiting.replace('%s', megaChat.html(M.getNameByHandle(waitingRoomPeers[0])))
       }));
@@ -24541,6 +24520,20 @@ class ParticipantsBlock extends mixins.w9 {
       }
       return null;
     };
+    this.onScroll = (chunks, evt) => {
+      const {
+        page
+      } = this.state;
+      if (evt.deltaY < 0) {
+        if (page > 0) {
+          this.movePage(PAGINATION.PREV);
+        }
+      } else if (evt.deltaY > 0) {
+        if (page < Object.values(chunks).length - 1) {
+          this.movePage(PAGINATION.NEXT);
+        }
+      }
+    };
   }
   shouldComponentUpdate() {
     const {
@@ -24600,7 +24593,8 @@ class ParticipantsBlock extends mixins.w9 {
       return external_React_default().createElement("div", {
         className: "carousel"
       }, external_React_default().createElement("div", {
-        className: "carousel-container"
+        className: "carousel-container",
+        onWheel: evt => this.onScroll(chunks, evt)
       }, external_React_default().createElement("div", {
         className: "stream-participants-block theme-dark-forced"
       }, external_React_default().createElement("div", {
@@ -25173,7 +25167,7 @@ class Admit extends mixins.w9 {
       if (peers && peers.length) {
         return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("div", {
           className: `${NAMESPACE}-head`
-        }, external_React_default().createElement("h3", null, l.wr_peers_waiting.replace('%1', peers.length)), expanded ? external_React_default().createElement(this.Icon, {
+        }, external_React_default().createElement("h3", null, mega.icu.format(l.wr_peers_waiting, peers.length)), expanded ? external_React_default().createElement(this.Icon, {
           icon: "icon-arrow-up",
           onClick: () => this.setState({
             expanded: false
@@ -25394,9 +25388,6 @@ class stream_Stream extends mixins.w9 {
       call,
       forcedLocal,
       chatRoom,
-      ephemeralAccounts,
-      onCallMinimize,
-      onSpeakerChange,
       onVideoDoubleClick
     } = this.props;
     const {
@@ -25418,13 +25409,10 @@ class stream_Stream extends mixins.w9 {
             chatRoom: chatRoom,
             menu: true,
             source: peer,
-            ephemeralAccounts: ephemeralAccounts,
-            onCallMinimize: onCallMinimize,
-            onSpeakerChange: onSpeakerChange,
-            onDoubleClick: (e, videoNode) => {
+            onDoubleClick: (peer, e) => {
               e.preventDefault();
               e.stopPropagation();
-              onVideoDoubleClick(videoNode);
+              onVideoDoubleClick(peer);
             },
             didMount: ref => {
               this.nodeRefs.push({
@@ -25478,9 +25466,11 @@ class stream_Stream extends mixins.w9 {
               key: peer.clientId,
               source: peer,
               chatRoom: chatRoom,
-              ephemeralAccounts: ephemeralAccounts,
-              onCallMinimize: onCallMinimize,
-              onSpeakerChange: onSpeakerChange,
+              onDoubleClick: (peer, e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onVideoDoubleClick(peer);
+              },
               didMount: ref => {
                 if (!this.nodeRefs[i]) {
                   this.nodeRefs[i] = [];
@@ -25533,8 +25523,6 @@ class stream_Stream extends mixins.w9 {
       key: source.clientId,
       chatRoom: chatRoom,
       source: source,
-      ephemeralAccounts: ephemeralAccounts,
-      onCallMinimize: onCallMinimize,
       toggleFullScreen: () => {
         call.setPinnedCid(source.clientId);
       },
@@ -25568,6 +25556,10 @@ class stream_Stream extends mixins.w9 {
     }, props));
   }
   renderSelfViewMenu() {
+    const {
+      call,
+      onSpeakerChange
+    } = this.props;
     return external_React_default().createElement("div", {
       className: "node-menu theme-dark-forced"
     }, external_React_default().createElement("div", {
@@ -25990,7 +25982,7 @@ class StreamControls extends _mixins1__.w9 {
     const isOnHold = avFlags & Av.onHold;
     return react0().createElement((react0().Fragment), null, blocked && renderBlockedWarning(), react0().createElement("div", {
       className: StreamControls.NAMESPACE
-    }, d && nop() ? this.renderDebug() : '', react0().createElement("ul", null, react0().createElement("li", {
+    }, d && localStorage.callDebug ? this.renderDebug() : '', react0().createElement("ul", null, react0().createElement("li", {
       className: isOnHold ? 'disabled' : '',
       onClick: () => {
         if (isOnHold) {
@@ -26136,13 +26128,12 @@ class VideoNode extends _mixins1__.w9 {
         onDoubleClick,
         toggleFullScreen
       } = this.props;
-      onDoubleClick == null || onDoubleClick(e, this);
-      if (!document.fullscreenElement) {
-        var _this$nodeRef$current;
-        if (toggleFullScreen && typeof toggleFullScreen === 'function') {
+      onDoubleClick == null || onDoubleClick(this.source, e);
+      if (toggleFullScreen && !document.fullscreenElement && this.nodeRef.current) {
+        if (typeof toggleFullScreen === 'function') {
           toggleFullScreen(this);
         }
-        (_this$nodeRef$current = this.nodeRef.current) == null || _this$nodeRef$current.requestFullscreen({
+        this.nodeRef.current.requestFullscreen({
           navigationUI: 'hide'
         });
       }
@@ -26303,7 +26294,7 @@ class VideoNode extends _mixins1__.w9 {
       "data-simpletipposition": simpletip == null ? void 0 : simpletip.position,
       "data-simpletipoffset": simpletip == null ? void 0 : simpletip.offset,
       "data-simpletip-class": simpletip == null ? void 0 : simpletip.className,
-      onClick: ev => onClick && onClick(source, ev)
+      onClick: evt => onClick == null ? void 0 : onClick(source, evt)
     }, source && react0().createElement((react0().Fragment), null, children || null, react0().createElement("div", {
       className: "video-node-content"
     }, CallManager2.Call.VIDEO_DEBUG_MODE ? this.renderVideoDebugMode() : null, this.renderContent(), mode === _call_jsx3__.g.MINI || minimized ? null : this.renderStatus())));
@@ -34403,6 +34394,7 @@ var React = __webpack_require__(594);
 let PerfectScrollbar = (_dec = (0,_chat_mixins0__.hG)(30, true), _dec2 = (0,_chat_mixins0__.hG)(30, true), (_class = (_PerfectScrollbar = class PerfectScrollbar extends _chat_mixins0__.w9 {
   constructor(props) {
     super(props);
+    this.ref = React.createRef();
     this.isUserScroll = true;
     this.scrollEventIncId = 0;
   }
@@ -34445,6 +34437,7 @@ let PerfectScrollbar = (_dec = (0,_chat_mixins0__.hG)(30, true), _dec2 = (0,_cha
     return true;
   }
   componentDidMount() {
+    var _this$props$didMount, _this$props;
     super.componentDidMount();
     var self = this;
     var $elem = self.get$Node();
@@ -34480,13 +34473,16 @@ let PerfectScrollbar = (_dec = (0,_chat_mixins0__.hG)(30, true), _dec2 = (0,_cha
     });
     self.onResize();
     this.attachAnimationEvents();
+    (_this$props$didMount = (_this$props = this.props).didMount) == null || _this$props$didMount.call(_this$props, this.getUniqueId(), this);
   }
   componentWillUnmount() {
+    var _this$props$willUnmou, _this$props2;
     super.componentWillUnmount();
     var $elem = this.get$Node();
     $elem.off('ps-scroll-y.ps' + this.getUniqueId());
     var ns = '.ps' + this.getUniqueId();
     $elem.parents('.have-animation').unbind('animationend' + ns + ' webkitAnimationEnd' + ns + ' oAnimationEnd' + ns);
+    (_this$props$willUnmou = (_this$props2 = this.props).willUnmount) == null || _this$props$willUnmou.call(_this$props2, this.getUniqueId(), this);
   }
   attachAnimationEvents() {}
   eventuallyReinitialise(forced, scrollPositionYPerc, scrollToElement) {
@@ -34659,11 +34655,16 @@ let PerfectScrollbar = (_dec = (0,_chat_mixins0__.hG)(30, true), _dec2 = (0,_cha
     return !chatRoom || chatRoom.isCurrentlyActive;
   }
   render() {
-    var self = this;
+    const {
+      style,
+      className,
+      children
+    } = this.props;
     return React.createElement("div", {
-      style: this.props.style,
-      className: this.props.className
-    }, self.props.children);
+      ref: this.ref,
+      style: style,
+      className: className
+    }, children);
   }
 }, _PerfectScrollbar.defaultProps = {
   className: "perfectScrollbarContainer",
@@ -34982,7 +34983,7 @@ function _extends() {
 /******/ 	// Load entry module and return exports
 /******/ 	__webpack_require__(326);
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__(698);
+/******/ 	var __webpack_exports__ = __webpack_require__(30);
 /******/ 	
 /******/ })()
 ;

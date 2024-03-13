@@ -878,7 +878,7 @@
                     props.classNames.push('inbound-share');
                 }
 
-                if (aNode.s4 && M.geS4NodeType(aNode) === 'bucket') {
+                if (aNode.s4 && M.getS4NodeType(aNode) === 'bucket') {
                     props.type = l.s4_bucket_type;
                     props.classNames.push('folder');
                     props.size = bytesToSize(aNode.tb || 0);

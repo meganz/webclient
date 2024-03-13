@@ -658,6 +658,10 @@ lazy(mega.gallery, 'albums', () => {
 
         const aIndex = aKeys.indexOf(albumId);
 
+        if (M.currentdirid === 'albums/' + albumId) {
+            domElement.classList.add('active');
+        }
+
         if (aIndex === aKeys.length - 1) {
             domContainer.appendChild(domElement);
         }
@@ -1284,6 +1288,12 @@ lazy(mega.gallery, 'albums', () => {
             });
 
             this.setContent(albumIds);
+
+            this.unsubscribeFromShare = mega.sets.subscribe('ass', 'albumsShare', ({ s }) => {
+                if (albumIds.includes(s)) {
+                    this.hide();
+                }
+            });
         }
 
         setContent(albumIds) {
@@ -1332,6 +1342,7 @@ lazy(mega.gallery, 'albums', () => {
             this.list.clearList();
             this.list.detachEl();
 
+            this.unsubscribeFromShare();
             super.hide();
         }
     }
@@ -2321,18 +2332,20 @@ lazy(mega.gallery, 'albums', () => {
                 }
 
                 if (isUserAlbum) {
-                    options.push(
-                        {},
-                        {
-                            label: l.add_album_items,
-                            icon: 'add',
-                            click: () => {
-                                const dialog = new AlbumItemsDialog(albumId);
-                                dialog.show();
-                            }
-                        },
-                        {}
-                    );
+                    if (M.v.length) {
+                        options.push(
+                            {},
+                            {
+                                label: l.add_album_items,
+                                icon: 'add',
+                                click: () => {
+                                    const dialog = new AlbumItemsDialog(albumId);
+                                    dialog.show();
+                                }
+                            },
+                            {}
+                        );
+                    }
 
                     if (p) {
                         options.push(
@@ -2340,6 +2353,11 @@ lazy(mega.gallery, 'albums', () => {
                                 label: l[6909],
                                 icon: 'link',
                                 click: () => {
+                                    // The share has changed already, ignoring
+                                    if (!scope.albums.store[albumId].p) {
+                                        return;
+                                    }
+
                                     const dialog = new AlbumShareDialog([albumId]);
                                     dialog.show();
                                 }
@@ -2358,6 +2376,11 @@ lazy(mega.gallery, 'albums', () => {
                             label: mega.icu.format(l.album_share_link, 1),
                             icon: 'link',
                             click: () => {
+                                // The share has changed already, ignoring
+                                if (scope.albums.store[albumId].p) {
+                                    return;
+                                }
+
                                 scope.albums.addShare([albumId]);
                             }
                         });
@@ -2410,6 +2433,15 @@ lazy(mega.gallery, 'albums', () => {
             }
 
             this.options = options;
+
+            this.unsubscribeFromShare = mega.sets.subscribe('ass', 'albumsShare', () => {
+                this.hide();
+            });
+        }
+
+        hide() {
+            this.unsubscribeFromShare();
+            super.hide();
         }
     }
 
@@ -2737,6 +2769,13 @@ lazy(mega.gallery, 'albums', () => {
                             p ? l[6909] : mega.icu.format(l.album_share_link, 1),
                             'link icon-yellow',
                             () => {
+                                const newP = scope.albums.store[albumId].p;
+
+                                // The share has changed already, ignoring
+                                if (!!p !== !!newP) {
+                                    return;
+                                }
+
                                 if (p) {
                                     const dialog = new AlbumShareDialog([albumId]);
                                     dialog.show();
@@ -4081,6 +4120,7 @@ lazy(mega.gallery, 'albums', () => {
                 }
             }
 
+            scope.albumsRendered = false;
             MegaGallery.dbActionPassed = true;
 
             const availableNodes = this.getAvailableNodes(handles);

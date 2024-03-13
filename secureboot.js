@@ -2446,6 +2446,15 @@ else if (!browserUpdate) {
         // Get the preferred language in their browser
         var userLangs, userLang, ourLangs, k, v, j, i, u;
 
+        // Check if a language override exists on the URL where applicable.
+        if (is_drop) {
+            tmp = page.split('!').pop();
+
+            if (languages[tmp]) {
+                return tmp;
+            }
+        }
+
         // Otherwise get the user's preferred language in their browser settings
         userLangs = navigator.languages || navigator.language || navigator.userLanguage;
 
@@ -2619,8 +2628,6 @@ else if (!browserUpdate) {
     jsl.push({f:'js/sharedlocalkvstorage.js', n: 'sharedlocalkvstorage_js', j: 1, w: 5});
 
     jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
-    jsl.push({f:'js/vendor/jsbn.js', n: 'jsbn_js', j:1, w:2});
-    jsl.push({f:'js/vendor/jsbn2.js', n: 'jsbn2_js', j:1, w:2});
     jsl.push({f:'js/vendor/nacl-fast.js', n: 'nacl_js', j:1,w:7});
 
     jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
@@ -2724,7 +2731,6 @@ else if (!browserUpdate) {
     jsl.push({f:'js/transfers/reader.js', n: 'upload_reader_js', j: 1, w: 2});
     jsl.push({f:'js/transfers/zip64.js', n: 'zip_js', j: 1});
     jsl.push({f:'js/transfers/cloudraid.js', n: 'cloudraid_js', j: 1});
-    jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
 
     // Everything else...
     jsl.push({f:'index.js', n: 'index', j:1,w:4});
@@ -3186,10 +3192,6 @@ else if (!browserUpdate) {
         }
     }
 
-    // If the TextEncoder is not supported natively (IE, Edge) then load the polyfill
-    if (typeof TextEncoder !== 'function') {
-        jsl.push({f:'js/vendor/encoding.js', n: 'encoding_js', j:1});
-    }
     if (page.substr(0, 5) === 'chat/') {
         jsl.push({f:'html/chatlink.html', n: 'chatlink', j: 0});
     }
@@ -3213,7 +3215,6 @@ else if (!browserUpdate) {
         'reset_js': {f:'html/js/reset.js', n: 'reset_js', j:1},
         'change_email_js': {f:'html/js/emailchange.js', n: 'change_email_js', j:1},
         'change_email': {f:'html/emailchange.html', n: 'change_email', j:0},
-        'filesaver': {f:'js/vendor/filesaver.js', n: 'filesaver', j:1},
         'recovery': {f:'html/recovery.html', n: 'recovery', j:0},
         'recovery_js': {f:'html/js/recovery.js', n: 'recovery_js', j:1},
         'sdkterms': {f:'html/sdkterms.html', n: 'sdkterms', j:0},
@@ -3320,7 +3321,6 @@ else if (!browserUpdate) {
             'favico_js': {f:'js/vendor/favico.js', n: 'favico_js', j:1},
             'autolinker_js': {f:'js/vendor/autolinker.js', n: 'autolinker_js', j:1},
             'strongvelope_js': {f:'js/chat/strongvelope.js', n: 'strongvelope_js', j:1},
-            'adapter_js': {f:'js/vendor/chat/adapter.js', n: 'adapter_js', j:1},
             'chatdpersist_js': {f:'js/chat/chatdPersist.js', n: 'chatdpersist_js', j:1},
             'chatd_js': {f:'js/chat/chatd.js', n: 'chatd_js', j:1},
             'sfuClient_js': {f:'js/chat/sfuClient.js', n: 'sfuClient_js', j:1},
@@ -3352,7 +3352,7 @@ else if (!browserUpdate) {
 
     var subpages =
     {
-        'keybackup': ['keybackup', 'keybackup_js', 'filesaver'],
+        'keybackup': ['keybackup', 'keybackup_js'],
         'recovery': ['recovery', 'recovery_js'],
         'reset': ['reset', 'reset_js'],
         'verify': ['change_email', 'change_email_js'],

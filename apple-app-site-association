@@ -5,7 +5,32 @@
             {
                 "appID": "T9RH74Y7L9.mega.ios",
                 "paths": [
-                    "NOT /emailverify/*", "NOT /#emailverify/*","NOT /dont-deploy/*", "*"
+                    "NOT /emailverify/*",
+                    "NOT /#emailverify/*",
+                    "NOT /dont-deploy/*",
+                    "*"
+                ]
+            },
+            {
+                "appID": "T9RH74Y7L9.mega.ios.dev",
+                "paths": [
+                    "NOT /emailverify*",
+                    "NOT /#emailverify*",
+                    "NOT /#pwrevert*",
+                    "NOT /pwrevert*",
+                    "NOT /dont-deploy/*",
+                    "*"
+                ]
+            },
+            {
+                "appID": "T9RH74Y7L9.mega.ios.qa",
+                "paths": [
+                    "NOT /emailverify*",
+                    "NOT /#emailverify*",
+                    "NOT /#pwrevert*",
+                    "NOT /pwrevert*",
+                    "NOT /dont-deploy/*",
+                    "*"
                 ]
             }
         ]

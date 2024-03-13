@@ -87,12 +87,12 @@ class VideoNode extends MegaRenderMixin {
         video.muted = true;
         video.ondblclick = e => {
             const { onDoubleClick, toggleFullScreen } = this.props;
-            onDoubleClick?.(e, this);
-            if (!document.fullscreenElement) {
-                if (toggleFullScreen && typeof toggleFullScreen === 'function') {
+            onDoubleClick?.(this.source, e);
+            if (toggleFullScreen && !document.fullscreenElement && this.nodeRef.current) {
+                if (typeof toggleFullScreen === 'function') {
                     toggleFullScreen(this);
                 }
-                this.nodeRef.current?.requestFullscreen({ navigationUI: 'hide' });
+                this.nodeRef.current.requestFullscreen({ navigationUI: 'hide' });
             }
         };
         video.onloadeddata = (ev) => {
@@ -254,7 +254,7 @@ class VideoNode extends MegaRenderMixin {
                 data-simpletipposition={simpletip?.position}
                 data-simpletipoffset={simpletip?.offset}
                 data-simpletip-class={simpletip?.className}
-                onClick={ev => onClick && onClick(source, ev)}>
+                onClick={(evt) => onClick?.(source, evt)}>
                 {source &&
                     <>
                         {children || null}

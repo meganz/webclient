@@ -2952,9 +2952,11 @@ body.loading .light-overlay {
 .mega-lite-mode .fm-notification-block.mega-lite-mode-warning {
     display: flex;
 }
+.fm-notification-block.grace-business {
+    background-color: var(--label-red);
+}
 .fm-notification-block.almost-full,
 .fm-notification-block.payment-card-almost-expired,
-.fm-notification-block.grace-business,
 .fm-notification-block.unverified-share,
 .fm-notification-block.mega-lite-mode-warning {
     background-color: var(--label-orange);

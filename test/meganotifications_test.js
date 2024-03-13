@@ -49,6 +49,18 @@ describe("MegaNotifications Unit Test", function() {
 
             return this;
         });
+        mStub(window, 'megaChat', {
+            playSound: (sound, options, stop) => {
+                if (options === true) {
+                    stop = true;
+                    options = undefined;
+                }
+                if (stop) {
+                    ion.sound.stop(sound);
+                }
+                return ion.sound.play(sound, options);
+            }
+        })
 
         megaNotifications = new MegaNotifications({
             anfFlag: 'chat_enabled',

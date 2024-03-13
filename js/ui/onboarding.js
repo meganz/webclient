@@ -234,7 +234,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                             dialogClass: 'mcob',
                             dialogTitle: l.onboard_megachat_dlg2_title,
                             dialogDesc: l.onboard_megachat_dlg2_text,
-                            targetElmClass: '.conversationsApp .toggle-panel-heading',
+                            targetElmClass: '.conversationsApp .conversations-category',
                             targetElmPosition: 'right',
                             markComplete: true,
                             ignoreBgClick: '.conversationsApp',
@@ -277,7 +277,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                     name: 'Schedule available',
                     flag: OBV4_FLAGS.CHAT_SCHEDULE_NEW,
                     get prerequisiteCondition() {
-                        return megaChat.plugins.chatOnboarding.canShowScheduledNew;
+                        return megaChatIsReady && megaChat.plugins.chatOnboarding.canShowScheduledNew;
                     },
                     actions: [
                         {
@@ -299,7 +299,8 @@ mBroadcaster.addListener('fm:initialized', () => {
                     name: 'Schedule created',
                     flag: OBV4_FLAGS.CHAT_SCHEDULE_ADDED,
                     get prerequisiteCondition() {
-                        return !!megaChat.scheduledMeetings.length && megaChat.plugins.chatOnboarding.isMeetingsTab;
+                        return megaChatIsReady && !!megaChat.scheduledMeetings.length &&
+                            megaChat.plugins.chatOnboarding.isMeetingsTab;
                     },
                     actions: [
                         {
@@ -326,7 +327,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                     name: 'Schedule options',
                     flag: OBV4_FLAGS.CHAT_SCHEDULE_CONF,
                     get prerequisiteCondition() {
-                        return M.chat
+                        return M.chat && megaChatIsReady
                             && megaChat.plugins.chatOnboarding.currentChatIsScheduled
                             && !megaChat.chatUIFlags.convPanelCollapse
                             && !megaChat.plugins.chatOnboarding.willShowOccurrences;
@@ -349,7 +350,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                     name: 'Schedule start early',
                     flag: OBV4_FLAGS.CHAT_SCHEDULE_START,
                     get prerequisiteCondition() {
-                        if (!M.chat) {
+                        if (!M.chat || !megaChatIsReady) {
                             return false;
                         }
                         const room = megaChat.getCurrentRoom();
@@ -372,7 +373,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                     name: 'Schedule past meetings',
                     flag: OBV4_FLAGS.CHAT_SCHEDULE_PAST,
                     get prerequisiteCondition() {
-                        return M.chat && megaChat.plugins.chatOnboarding.isMeetingsTab;
+                        return megaChatIsReady && M.chat && megaChat.plugins.chatOnboarding.isMeetingsTab;
                     },
                     actions: [
                         {
@@ -380,8 +381,8 @@ mBroadcaster.addListener('fm:initialized', () => {
                             dialogClass: 'mcob',
                             dialogTitle: l.onboard_megachat_dlg9_title,
                             dialogDesc: '',
-                            targetElmClass: `.conversationsApp .lhp-conversations
-                                             .toggle-panel.lhp-toggle-past .toggle-panel-heading`,
+                            targetElmClass:
+                                `.conversationsApp .lhp-conversations .conversations-category.category-past`,
                             targetElmPosition: 'right',
                             ignoreBgClick: '.conversationsApp',
                             markComplete: true,

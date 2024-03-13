@@ -461,7 +461,8 @@ export class DropdownEmojiSelector extends MegaRenderMixin {
                         this.scrollableArea.scrollToY(categoryPosition);
                         this._onScrollChanged(categoryPosition);
 
-                        this.emojiSearchField?.current.focus();
+                        const {current} = this.emojiSearchField || !1;
+                        current?.focus();
                     }}>
                     <i className={`sprite-fm-mono ${categoryIcons[categoryName]}`} />
                 </div>

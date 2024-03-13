@@ -888,7 +888,7 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
 
         delay('notifFavicoUpd', () => {
             self.favico.reset();
-            self.favico.badge(unreadCount);
+            tryCatch(() => self.favico.badge(unreadCount))();
         });
     }
 
@@ -3060,6 +3060,27 @@ Chat.prototype.openScheduledMeeting = function(meetingId, toCall) {
         });
     }
 };
+
+/**
+ * Use this to play sounds instead of directly using ion.sound.play
+ * Note: May use ion.sound.stop to stop a sound without playing another.
+ *
+ * @param {string} sound The sound to play refer to megaChat.SOUNDS for current sounds though any may be used
+ * @param {true|object} [options] If true will stop playing the sound before playing again. Otherwise an options object
+ * @param {boolean} [stop] If true will stop playing the sound before playing again.
+ *
+ * @see megaChat.SOUNDS
+ */
+Chat.prototype.playSound = tryCatch((sound, options, stop) => {
+    if (options === true) {
+        stop = true;
+        options = undefined;
+    }
+    if (stop) {
+        ion.sound.stop(sound);
+    }
+    return ion.sound.play(sound, options);
+});
 
 window.Chat = Chat;
 

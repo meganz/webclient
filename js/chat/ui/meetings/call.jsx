@@ -336,7 +336,7 @@ export default class Call extends MegaRenderMixin {
         if (call?.sfuClient.connState === SfuClient.ConnState.kDisconnectedRetrying) {
             this.handleCallEnd();
             chatRoom.trigger('onRetryTimeout');
-            ion.sound.play(megaChat.SOUNDS.CALL_END);
+            megaChat.playSound(megaChat.SOUNDS.CALL_END);
         }
     };
 
@@ -434,7 +434,7 @@ export default class Call extends MegaRenderMixin {
                         () => {
                             const { waitingRoomPeers } = this.state;
                             if (waitingRoomPeers && waitingRoomPeers.length === 1) {
-                                ion.sound.play(megaChat.SOUNDS.CALL_JOIN_WAITING);
+                                megaChat.playSound(megaChat.SOUNDS.CALL_JOIN_WAITING);
                             }
                             mBroadcaster.sendMessage('meetings:peersWaiting', waitingRoomPeers);
                         }

@@ -2011,6 +2011,10 @@ FileManager.prototype.initContextUI = function() {
         propertiesDialog();
     });
 
+    $(c + '.device-rename-item').rebind('click', () => {
+        mega.backupCenter.renameDialog();
+    });
+
     if (pfid) {
         $(`${c}.vhl-item`).rebind('click', () => {
             for (let i = $.selected.length; i--;) {

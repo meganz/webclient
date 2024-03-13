@@ -242,7 +242,7 @@ class ConversationsApp extends MegaRenderMixin {
     renderView(view) {
         this.setState({ view }, () => {
             const { $chatTreePanePs, routingSection } = megaChat;
-            $chatTreePanePs?.reinitialise();
+            Object.values($chatTreePanePs).forEach(ref => ref.reinitialise?.());
             if (routingSection !== 'chat') {
                 loadSubPage('fm/chat');
             }

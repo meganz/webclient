@@ -46,6 +46,7 @@ function Chat() {
     this.chats = new MegaDataMap();
     this.scheduledMeetings = new MegaDataMap();
     this.chatUIFlags = new MegaDataMap();
+    this.$chatTreePanePs = [];
     this.initChatUIFlagsManagement();
 
     this.currentlyOpenedChat = null;

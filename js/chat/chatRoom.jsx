@@ -839,6 +839,10 @@ ChatRoom.prototype.isDisplayable = function() {
     return !this.isArchived() || this.call;
 };
 
+ChatRoom.prototype.isMuted = function() {
+    return pushNotificationSettings.getDnd(this.chatId) || pushNotificationSettings.getDnd(this.chatId) === 0;
+};
+
 /**
  * Save chat into info fmdb.
  *
@@ -1358,21 +1362,19 @@ ChatRoom.prototype.show = function() {
 
 ChatRoom.prototype.scrollToChat = function() {
     this._scrollToOnUpdate = true;
-
-    if (megaChat.$chatTreePanePs) {
-        var li = document.querySelector('ul.conversations-pane li#conversation_' + this.roomId);
-        if (li) {
-            var pos = li.offsetTop;
-            if (!verge.inViewport(li, -72 /* 2 x 36 px height buttons */)) {
-                var treePane = document.querySelector('.conversationsApp .fm-tree-panel');
-                var wrapOuterHeight = $(treePane).outerHeight();
-                var itemOuterHeight = $('li:first', treePane).outerHeight();
-                megaChat.$chatTreePanePs.doProgramaticScroll(
-                    Math.max(0, pos - wrapOuterHeight / 2 + itemOuterHeight),
-                    true
-                );
-                this._scrollToOnUpdate = false;
-            }
+    const { $chatTreePanePs } = megaChat;
+    if ($chatTreePanePs && $chatTreePanePs.length) {
+        const li = document.querySelector(`ul.conversations-pane li#conversation_${this.roomId}`);
+        if (li && !verge.inViewport(li, -72 /* 2 x 36 px height buttons */)) {
+            Object.values($chatTreePanePs).forEach(({ ref }) => {
+                const wrapOuterHeight = $(ref.domNode).outerHeight();
+                const itemOuterHeight = $('li:first', ref.domNode).outerHeight();
+                const pos = li.offsetTop;
+                if (ref.domNode.contains(li)) {
+                    ref.doProgramaticScroll?.(Math.max(0, pos - wrapOuterHeight / 2 + itemOuterHeight), true);
+                }
+            });
+            this._scrollToOnUpdate = false;
         }
     }
 };

@@ -61,7 +61,11 @@
     padding: 6px 0 0;
     list-style-type: none;
 }
+.conversations-pane.with-offset {
+    padding-bottom: 40px;
+}
 .conversations-pane.loading-sketch {
+    width: 100%;
     animation: fadeInOutLoopSubtle 2s linear infinite;
 }
 .conversations-pane.loading-sketch li:hover {
@@ -97,10 +101,13 @@
     white-space: nowrap;
 }
 .content-panel.conversations {
+    position: relative;
     display: flex;
     flex-wrap: wrap;
     align-items: stretch;
+    align-content: flex-start;
     width: 100%;
+    height: 100%;
     background-color: var(--stroke-grey-2);
 }
 .content-panel.conversations span.empty-conversations {
@@ -228,6 +235,7 @@
     --icon-size: 18px;
 }
 .user-card-name.conversation-name {
+    display: flex;
     font: var(--text-body1);
     color: var(--text-color-high);
 }
@@ -286,6 +294,14 @@
 }
 .conversations-pane li.active .user-card-name {
     color: var(--text-color-higher);
+}
+.conversations-pane li .user-card-name .muted-conversation-icon,
+.conversation-data-badges .muted-conversation-icon {
+    margin: 2px 0 0;
+}
+.conversations-pane li .user-card-name .muted-conversation-icon,
+.conversation-data-badges .muted-conversation-icon i {
+    --mask-color: var(--icon-rest);
 }
 .conversations-pane li.active .conversation-message,
 .conversations-pane li.active .conversation-scheduled-data {
@@ -1797,6 +1813,7 @@ td.verification .contact-item {
 }
 
 .conversationsApp .lhp-action-buttons {
+    position: relative;
     font: var(--text-body1);
     color: var(--text-color-high);
     margin-bottom: 4px;
@@ -1829,7 +1846,7 @@ td.verification .contact-item {
     text-align: start;
 }
 
-.conversationsApp .lhp-action-buttons i {
+.conversationsApp .lhp-action-buttons button i {
     --icon-size: 24px;
     --mask-color: var(--secondary-green);
 }
@@ -1863,46 +1880,41 @@ td.verification .contact-item {
     --icon-size: 120px;
     --mask-color: var(--icon-inactive);
 }
-.lhp-conversations.scrollable.meetings-view .toggle-panel.expanded {
-    max-height: calc(100% - 60px);
-}
-.lhp-conversations.scrollable .toggle-panel.expanded {
-    max-height: calc(100% - 35px);
-}
 
-.lhp-conversations.scrollable .toggle-panel.expanded .toggle-panel-content {
-    max-height: calc(100% - 25px);
-    height: 100%;
-}
+/* --- */
 
-.lhp-conversations .toggle-panel {
-    overflow: hidden;
+.lhp-conversations .conversations-holder {
     width: 100%;
+    margin: 0 0 20px;
 }
 
-.lhp-conversations .toggle-panel .toggle-panel-heading {
+.lhp-conversations.chats-view .conversations-holder {
+    height: 95%;
+}
+
+.lhp-conversations.meetings-view .conversations-holder {
+    max-height: 46%;
+}
+
+@media only screen and (max-height: 750px) {
+    .lhp-conversations.meetings-view .conversations-holder {
+        max-height: 42%;
+        margin: 0 0 25px;
+    }
+}
+
+.lhp-conversations .conversations-category {
     display: flex;
-    align-items: center;
-    padding-inline-start: 10px;
-    -webkit-padding-start: 10px;
+    justify-content: space-between;
+    width: 100%;
     font: var(--text-body2);
-    cursor: pointer;
+    padding: 0 6px;
 }
 
-.lhp-conversations .toggle-panel .toggle-panel-heading i {
-    margin: 1px 0 0;
-    --icon-size: 24px;
-    --mask-color: var(--icon-rest);
-    transform: rotate(-90deg);
-    transition: transform 100ms ease-in-out;
+.lhp-conversations .conversations-nil {
+    padding: 6px 10px;
+    font: var(--text-body2);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text-color-medium);
 }
-
-.lhp-conversations .toggle-panel.expanded .toggle-panel-heading i {
-    transform: rotate(0deg);
-}
-
-.lhp-conversations .toggle-panel .toggle-panel-heading span {
-    display: block;
-    padding: 0 0 0 4px;
-}
-

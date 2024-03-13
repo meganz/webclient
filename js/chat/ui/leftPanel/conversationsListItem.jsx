@@ -267,13 +267,23 @@ export default class ConversationsListItem extends MegaRenderMixin {
                     <div className="conversation-data-top">
                         <div className={`conversation-data-name ${nameClassString}`}>
                             {roomTitle}
+                            {chatRoom.isMuted() ?
+                                <i className="sprite-fm-mono icon-notification-off-filled muted-conversation-icon" /> :
+                                null
+                            }
                         </div>
                         <div className="conversation-data-badges">
-                            {chatRoom.type === 'private' && <span className={`user-card-presence ${presenceClass}`} />}
-                            {(chatRoom.type === 'group' || chatRoom.type === 'private') &&
-                                <i className="sprite-fm-uni icon-ekr-key simpletip" data-simpletip={l[20935]} />}
+                            {chatRoom.type === 'private' ?
+                                <span className={`user-card-presence ${presenceClass}`} /> :
+                                null
+                            }
+                            {chatRoom.type === 'group' || chatRoom.type === 'private' ?
+                                <i className="sprite-fm-uni icon-ekr-key simpletip" data-simpletip={l[20935]} /> :
+                                null
+                            }
                             {scheduledMeeting && scheduledMeeting.isUpcoming && scheduledMeeting.isRecurring &&
-                                <i className="sprite-fm-mono icon-repeat" />}
+                                <i className="sprite-fm-mono icon-repeat" />
+                            }
                         </div>
                     </div>
                     <div className="clear" />

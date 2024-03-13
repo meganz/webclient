@@ -52,7 +52,7 @@ lazy(s4, 'ui', () => {
                 [type, localeName] = s4BcProp[id];
             }
             else {
-                const s4Type = M.geS4NodeType(id);
+                const s4Type = M.getS4NodeType(id);
 
                 if (s4Type === 'container') {
                     type = 's4-object-storage';

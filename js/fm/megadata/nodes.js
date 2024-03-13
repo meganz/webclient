@@ -349,7 +349,7 @@ MegaData.prototype.isCustomView = function(pathOrID) {
         result.prefixPath = '';
     }
     // Check whether the node is a bucket or a container
-    else if ('utils' in s4 && node.s4 && node.t) {
+    else if ('utils' in s4 && node.s4 && node.t && this.getS4NodeType(node)) {
         result.original = pathOrID.replace(/_/g, '/');
         const s4path = s4.utils.getS4SubPath(result.original).reverse();
 
@@ -2994,7 +2994,7 @@ MegaData.prototype.getNodeRights = function(id) {
         return false;
     }
 
-    if (this.geS4NodeType(id) === 'container') {
+    if (this.getS4NodeType(id) === 'container') {
         return 0;
     }
 
@@ -4625,7 +4625,7 @@ MegaData.prototype.preparePublicSetImport = function(pfid, data) {
  * @param {MegaNode|Object|String} n The object to check
  * @returns {String} Node type
  */
-MegaData.prototype.geS4NodeType = function(n) {
+MegaData.prototype.getS4NodeType = function(n) {
     "use strict";
 
     if (typeof n === 'string') {

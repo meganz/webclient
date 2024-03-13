@@ -2243,7 +2243,7 @@ var addressDialog = {
             else if (event.data === 'paysuccess') {
 
                 if (addressDialog.stripeSaleId === 'EDIT') {
-                    closeDialog();
+                    closeStripeDialog();
 
                     if (is_mobile) {
                         if (page === 'fm/account/paymentcard') {

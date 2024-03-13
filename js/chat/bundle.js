@@ -24306,7 +24306,7 @@ class Minimized extends mixins.w9 {
                     theme-dark-forced
                 `,
         onClick: this.props.onCallExpand
-      }, waitingRoomPeers.length > 1 ? l.wr_peers_waiting.replace('%1', waitingRoomPeers.length) : external_React_default().createElement(utils.P9, {
+      }, waitingRoomPeers.length > 1 ? mega.icu.format(l.wr_peers_waiting, waitingRoomPeers.length) : external_React_default().createElement(utils.P9, {
         tag: "span",
         content: l.wr_peer_waiting.replace('%s', megaChat.html(M.getNameByHandle(waitingRoomPeers[0])))
       }));
@@ -25193,7 +25193,7 @@ class Admit extends mixins.w9 {
       if (peers && peers.length) {
         return external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("div", {
           className: `${NAMESPACE}-head`
-        }, external_React_default().createElement("h3", null, l.wr_peers_waiting.replace('%1', peers.length)), expanded ? external_React_default().createElement(this.Icon, {
+        }, external_React_default().createElement("h3", null, mega.icu.format(l.wr_peers_waiting, peers.length)), expanded ? external_React_default().createElement(this.Icon, {
           icon: "icon-arrow-up",
           onClick: () => this.setState({
             expanded: false

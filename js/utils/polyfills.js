@@ -779,3 +779,13 @@ function mWebLockWrap(proto, method, name) {
         });
     };
 }
+
+tryCatch(() => {
+    'use strict';
+
+    if (self.is_karma) {
+        Object.freeze = echo;
+    }
+    Object.freeze(Object);
+
+}, false)();

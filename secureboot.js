@@ -2775,6 +2775,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/filerequest_common.js', n: 'filerequest_common_js', j:1});
     jsl.push({f:'js/filerequest_components.js', n: 'filerequest_components_js', j:1});
     jsl.push({f:'js/filerequest.js', n: 'filerequest_js', j:1});
+    jsl.push({f:'js/ui/sprites.js', n: 'sprites_js', j: 1, w: 1});
     jsl.push({f:'js/ui/theme.js', n: 'theme_js', j: 1, w: 1});
 
     // Variables which can be used across all stylesheets

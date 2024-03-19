@@ -3671,6 +3671,11 @@ function loadfm_callback(res) {
             parsepage(pages.placeholder);
             mega.ui.setTheme();
 
+            const n = M.d[M.RootID];
+            if (n && typeof n.k === 'string' && !n.k) {
+                eventlog(99977, JSON.stringify([1, pfid, M.RootID]));
+            }
+
             return mKeyDialog(pfid, true, true).catch(() => loadSubPage('start'));
         }
 

@@ -337,7 +337,7 @@ class ChatOnboarding {
         if (
             nextIdx !== false
             && (!this.$obDialog || !this.$obDialog.is(':visible'))
-            && (this.obToggleDrawn || $('.toggle-panel-heading', '.conversationsApp').length)
+            && (this.obToggleDrawn || $('.conversations-category', '.conversationsApp').length)
         ) {
             this.obToggleDrawn = true;
             if (

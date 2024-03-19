@@ -195,7 +195,7 @@ var ChatNotifications = function(megaChat, options) {
                 .rebind('ChatDisconnected.chatNotifications', ev => {
                     const chatRoom = ev.data;
                     self.disconnectNotification = new Notification(chatRoom.getRoomTitle(), { body: l.chat_offline });
-                    ion.sound.play(SOUNDS.RECONNECT);
+                    megaChat.playSound(SOUNDS.RECONNECT);
                     if (chatRoom.call.isSharingScreen()) {
                         chatRoom.call.toggleScreenSharing();
                     }

@@ -3200,7 +3200,7 @@ window.addEventListener('beforeunload', () => {
     }
 
     if (megaChatIsReady && megaChat.activeCall) {
-        ion.sound.play(megaChat.SOUNDS.ALERT);
+        megaChat.playSound(megaChat.SOUNDS.ALERT);
         return false;
     }
 

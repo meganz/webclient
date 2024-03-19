@@ -301,12 +301,11 @@
                     )
                 ) {
                     var playSound = function() {
-                        ion.sound.stop(self.options.sound);
-                        ion.sound.play(self.options.sound, {
+                        megaChat.playSound(self.options.sound, {
                             loop: self.options.soundLoop,
                             volume: self.options.soundVolume !== null ?
                                 self.options.soundVolume : self.megaNotifications.options.soundsVolume
-                        });
+                        }, true);
                     };
 
                     // if soundLoop is not true, then use 'delay' to eventually skip multiple sounds trying to play

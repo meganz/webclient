@@ -643,11 +643,10 @@
     height: 100%;
     min-height: 280px;
     overflow: hidden;
-    background: var(--surface-grey-1);
+    background: var(--surface-main);
 }
 .albums-header {
     height: 49px;
-    background-color: var(--surface-main);
     padding-left: 21px;
     padding-right: 21px;
 }
@@ -664,6 +663,7 @@
     height: calc(100vh - 97px);
     box-sizing: border-box;
     overflow: hidden;
+    background-color: var(--surface-grey-1);
 }
 .albums-grid .albums-grid-cell.album-placeholder > div i {
     margin-top: 2.2rem;

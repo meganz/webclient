@@ -62,7 +62,7 @@ mobile.recoveryLogout = {
                         'type': 'password',
                         'id': 'test-pass'
                     }),
-                    mCreateElement('i', {'class': 'sprite-mobile-fm-mono icon-eye-thin-outline pass-visible'})
+                    mCreateElement('i', {'class': 'sprite-mobile-fm-mono icon-eye-reveal pass-visible'})
                 ]),
                 mCreateElement('div', {'class': 'pass-reminder-results'}, [
                     mCreateElement('div', {'class': 'pass-reminder result-txt accepted hidden'}, [

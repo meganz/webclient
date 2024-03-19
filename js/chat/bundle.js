@@ -6067,7 +6067,7 @@ let MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 = l
     return verge.inViewport(domNode);
   }
   isComponentEventuallyVisible() {
-    if (!this.__isMounted || this.props.chatRoom && !this.props.chatRoom.isCurrentlyActive) {
+    if (!this.__isMounted) {
       return false;
     }
     if (this.customIsEventuallyVisible) {
@@ -22716,6 +22716,7 @@ class Call extends mixins.w9 {
     chatRoom.megaChat.off(`sfuConnClose.${NAMESPACE}`);
     chatRoom.megaChat.off(`sfuConnOpen.${NAMESPACE}`);
     chatRoom.megaChat.off(`onSpeakerChange.${NAMESPACE}`);
+    chatRoom.megaChat.off(`onPeerAvChange.${NAMESPACE}`);
     mBroadcaster.removeListener(this.ephemeralAddListener);
     if (this.pageChangeListener) {
       mBroadcaster.removeListener(this.pageChangeListener);
@@ -22749,7 +22750,11 @@ class Call extends mixins.w9 {
     }) => this.setState({
       initialCallRinging: arg
     }));
-    chatRoom.rebind(`onSpeakerChange.${NAMESPACE}`, () => this.state.mode === MODE.THUMBNAIL && $(window).resize());
+    const {
+      tresizer
+    } = $;
+    chatRoom.rebind(`onPeerAvChange.${NAMESPACE}`, tresizer);
+    chatRoom.rebind(`onSpeakerChange.${NAMESPACE}`, tresizer);
     this.callStartTimeout = setTimeout(() => {
       if (!mega.config.get('callemptytout') && !call.hasOtherParticipant()) {
         call.left = true;
@@ -24594,7 +24599,7 @@ class ParticipantsBlock extends mixins.w9 {
                                     participants-grid
                                     ${floatDetached && peers.length === 1 || peers.length === 0 ? 'single-column' : ''}
                                 `
-        }, floatDetached ? [...streaming, ...rest].map(p => $$PEER(p)) : [...streaming, this.renderLocalNode(), ...rest].map(p => p instanceof CallManager2.Peer ? $$PEER(p) : p))));
+        }, floatDetached ? [...streaming, ...rest].map(p => $$PEER(p)) : external_React_default().createElement((external_React_default()).Fragment, null, streaming.map(p => $$PEER(p)), this.renderLocalNode(), rest.map(p => $$PEER(p))))));
       }
       const {
         page

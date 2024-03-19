@@ -892,6 +892,7 @@ export default class Call extends MegaRenderMixin {
         chatRoom.megaChat.off(`sfuConnClose.${NAMESPACE}`);
         chatRoom.megaChat.off(`sfuConnOpen.${NAMESPACE}`);
         chatRoom.megaChat.off(`onSpeakerChange.${NAMESPACE}`);
+        chatRoom.megaChat.off(`onPeerAvChange.${NAMESPACE}`);
 
         mBroadcaster.removeListener(this.ephemeralAddListener);
         if (this.pageChangeListener) {
@@ -926,7 +927,9 @@ export default class Call extends MegaRenderMixin {
         chatRoom.megaChat.rebind(`sfuConnOpen.${NAMESPACE}`, this.handleCallOnline);
         chatRoom.megaChat.rebind(`sfuConnClose.${NAMESPACE}`, () => this.handleCallOffline());
         chatRoom.rebind(`onCallState.${NAMESPACE}`, (ev, { arg }) => this.setState({ initialCallRinging: arg }));
-        chatRoom.rebind(`onSpeakerChange.${NAMESPACE}`, () => this.state.mode === MODE.THUMBNAIL && $(window).resize());
+        const {tresizer} = $;
+        chatRoom.rebind(`onPeerAvChange.${NAMESPACE}`, tresizer);
+        chatRoom.rebind(`onSpeakerChange.${NAMESPACE}`, tresizer);
 
         this.callStartTimeout = setTimeout(() => {
             if (!mega.config.get('callemptytout') && !call.hasOtherParticipant()) {

@@ -1223,6 +1223,7 @@ function asyncApiReq(payload, options) {
     switch (payload.a) {
         case 'mcr':
         case 'mcph':
+        case 'mcsmfo':
             cache = null;
             break;
     }

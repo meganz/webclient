@@ -729,7 +729,8 @@ body.de .mega-dialog.contact-picker-widget {
 .create-folder-input-bl,
 .create-album-input-bl,
 .fm-account-input,
-.rename-input-bl {
+.rename-input-bl,
+.device-rename-input-bl {
     width: 100%;
     border: 1px solid var(--stroke-grey-2);
     box-sizing: border-box;
@@ -741,7 +742,8 @@ body.de .mega-dialog.contact-picker-widget {
 .create-folder-input-bl input,
 .create-album-input-bl input,
 .fm-account-input input,
-.rename-input-bl input {
+.rename-input-bl input,
+.device-rename-input-bl input {
     width: 100%;
     height: 36px;
     box-sizing: border-box;
@@ -1992,6 +1994,34 @@ body.de .mega-dialog.contact-picker-widget {
     }
 
 /* end rename-dialog*/
+
+/* device-rename-dialog */
+
+    .mega-dialog.device-rename-dialog {
+        width: 360px;
+    }
+    .mega-dialog.device-rename-dialog .content-block {
+        padding: 8px 20px;
+    }
+    
+    .mega-dialog.device-rename-dialog > header {
+        padding: 16px;
+    }
+    
+    .mega-dialog.device-rename-dialog > header h2 {
+        text-align: center;
+    }
+    
+    .mega-dialog button.close {
+        top: 20px;
+    }
+    
+    .mega-dialog.device-rename-dialog > footer .footer-container {
+        padding: 16px 24px 20px;
+    }
+      
+
+/* end device-rename-dialog */
 
 /* export-links-dialog */
 

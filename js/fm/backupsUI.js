@@ -269,7 +269,8 @@ lazy(mega, 'backupCenter', () => {
                         device: res[i].d,
                         handle: res[i].t === 5 && n.p ? n.p : '', // Set parent node handle if it's a Backup folder
                         folders: [res[i]],
-                        type: res[i].t
+                        type: res[i].t,
+                        dua: res[i].dua
                     });
                 }
             }
@@ -827,7 +828,7 @@ lazy(mega, 'backupCenter', () => {
             // If target is device card
             else if ($deviceCard.length === 1) {
 
-                menuItems = '.properties-item';
+                menuItems = '.properties-item, .device-rename-item';
 
                 // "Show in Cloud drive" for Backups only
                 if ($deviceCard.attr('data-handle') && M.d[$deviceCard.attr('data-handle')]) {
@@ -1233,6 +1234,7 @@ lazy(mega, 'backupCenter', () => {
                 const foldersNumber = this.data[i].folders.length;
                 const savedDeviceStates = this.deviceCardStates[this.data[i].device] || {};
                 let deviceState = '';
+                let deviceUserAgent = '';
                 let deviceName = '';
                 let deviceNode = null;
                 let headerNode = null;
@@ -1273,10 +1275,11 @@ lazy(mega, 'backupCenter', () => {
 
                 // Get device name
                 deviceName = this.getDeviceName(this.data[i].device, this.data[i].type, n);
+                deviceUserAgent = this.data[i].dua;
 
                 // Show Device icon
                 mCreateElement('i', {
-                    'class':`medium-file-icon ${deviceIcon(deviceName, this.data[i].type)}`
+                    'class':`medium-file-icon ${deviceIcon(deviceUserAgent || deviceName, this.data[i].type)}`
                 }, nameNode);
 
                 // Show Device name
@@ -1325,6 +1328,121 @@ lazy(mega, 'backupCenter', () => {
 
                 // Populate folders list for current device
                 this.populateFolders(this.data[i]);
+            }
+        }
+
+        // Device rename dialog
+        renameDialog() {
+
+            const $deviceEl = $('.backup-body.active', this.$contentBlock);
+            const deviceId = $deviceEl.data('id');
+
+            if (deviceId) {
+
+                var $dialog = $('.mega-dialog.device-rename-dialog');
+                var $input = $('input', $dialog);
+                var errMsg = '';
+                const maxDeviceNameLength = 32;
+
+                const deviceData = mega.backupCenter.data.find((dev) => dev.device === deviceId);
+
+                const deviceName = mega.backupCenter.dn[deviceId];
+                const deviceIconClass = deviceIcon(
+                    deviceData.dua || deviceName,
+                    deviceData.type
+                );
+
+                M.safeShowDialog('device-rename-dialog', () => {
+                    $dialog.removeClass('hidden').addClass('active');
+                    $input.trigger("focus");
+                    return $dialog;
+                });
+
+                $('button.js-close, .device-rename-dialog-button.cancel', $dialog)
+                    .rebind('click.dialogClose', closeDialog);
+
+                $('.device-rename-dialog-button.rename', $dialog).rebind('click.dialogRename', () => {
+                    if ($dialog.hasClass('active')) {
+
+                        var value = $input.val();
+                        errMsg = '';
+
+                        if (deviceName && deviceName !== value) {
+
+                            value = value.trim();
+
+                            if (!value) {
+                                errMsg = l.device_rename_dialog_warning_empty;
+                            }
+                            else if (M.isSafeName(value) && value.length <= maxDeviceNameLength) {
+
+                                if (Object.values(mega.backupCenter.dn).includes(value)) {
+                                    errMsg = l.device_rename_dialog_warning_duplicate;
+                                }
+                                else {
+                                    mega.backupCenter.dn[deviceId] = value;
+                                    loadingDialog.show();
+                                    mega.attr.set('dn', mega.backupCenter.dn, false, true)
+                                        .then(() => mega.backupCenter.renderContent(true))
+                                        .catch(tell)
+                                        .finally(() => loadingDialog.hide());
+                                }
+                            }
+                            else if (value.length > 32) {
+                                errMsg = mega.icu.format(l.device_rename_dialog_warning_length, maxDeviceNameLength);
+                            }
+                            else {
+                                errMsg = l[24708];
+                            }
+
+                            if (errMsg) {
+                                $('.duplicated-input-warning span', $dialog).safeHTML(errMsg);
+                                $dialog.addClass('duplicate');
+                                $input.addClass('error');
+
+                                setTimeout(() => {
+                                    $dialog.removeClass('duplicate');
+                                    $input.removeClass('error');
+
+                                    $input.trigger("focus");
+                                }, 2000);
+
+                                return;
+                            }
+                        }
+                        closeDialog();
+                    }
+                });
+
+                $input.val(deviceName);
+
+                $('.transfer-filetype-icon', $dialog)
+                    .attr('class',
+                          `transfer-filetype-icon ${deviceIconClass}`
+                    );
+
+                $input.rebind('focus.deviceRenameDialog', () => {
+                    $dialog.addClass('focused');
+                });
+
+                $input.rebind('blur.deviceRenameDialog', () => {
+                    $dialog.removeClass('focused');
+                });
+
+                $input.rebind('keydown.deviceRenameDialog', (event) => {
+                    // distingushing only keydown evet, then checking if it's Enter in order to preform the action'
+                    if (event.keyCode === 13) { // Enter
+                        $('.device-rename-dialog-button.rename', $dialog).click();
+                    }
+                    else if (event.keyCode === 27) { // ESC
+                        closeDialog();
+                    }
+                    else {
+                        $dialog.removeClass('duplicate').addClass('active');
+                        $input.removeClass('error');
+                    }
+                });
+
             }
         }
 

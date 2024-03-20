@@ -124,6 +124,8 @@
         var r = [];
 
         if ($.mcselected) {
+            const c = M.c[$.mcselected] || {};
+
             selectedNodes = selectedNodes || $.selected || [];
 
             for (var i = selectedNodes.length; i--;) {
@@ -133,6 +135,10 @@
 
                 if (selectedNodes[i] === $.mcselected) {
                     continue; // If the source node is equal to target node
+                }
+
+                if (c[selectedNodes[i]]) {
+                    continue; // If the target folder already contains this node
                 }
 
                 r.push(selectedNodes[i]);
@@ -172,9 +178,6 @@
         }
         else if (!$.mcselected) {
             $btn.addClass('disabled');
-        }
-        else if ($.copyDialog && section === 'cloud-drive') {
-            $btn.removeClass('disabled');
         }
         else if ($.selectFolderDialog && section === 'cloud-drive' && $.mcselected !== M.RootID) {
             $btn.removeClass('disabled');

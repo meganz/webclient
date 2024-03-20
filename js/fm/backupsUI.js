@@ -1471,6 +1471,7 @@ lazy(mega, 'backupCenter', () => {
                 tableHeaderNode = mCreateElement('tr', undefined, tableNode);
                 mCreateElement('th', undefined, tableHeaderNode); // Folder name without label
                 mCreateElement('th', undefined, tableHeaderNode).textContent = l[488]; // Status
+                mCreateElement('th', undefined, tableHeaderNode).textContent = l[93]; // Type
                 mCreateElement('th', undefined, tableHeaderNode)
                     .textContent = l.last_updated_label; // 'Last updated'
                 mCreateElement('th', undefined, tableHeaderNode)
@@ -1491,6 +1492,7 @@ lazy(mega, 'backupCenter', () => {
                 const isSelected = folder.id && folder.id === this.selectedSync.id
                         || folder.h === this.selectedSync.id;
                 let icon = '';
+                let type = '';
 
                 // Create new table if > 10 folders for pages navigator
                 if (foldersCounter === 10) {
@@ -1513,9 +1515,15 @@ lazy(mega, 'backupCenter', () => {
 
                 if (folder.id && folder.t === 5) {
                     icon = ' folder-backup';
+                    type = l[20606];
                 }
-                else if (folder.id && folder.t !== 3 && folder.t !== 4) {
+                else if (folder.id && folder.t === 3) {
+                    icon = ' folder-camera';
+                    type = l.camera_uploads;
+                }
+                else if (folder.id && folder.t !== 4) {
                     icon = ' folder-sync';
+                    type = l[17621];
                 }
 
                 // Show folder name
@@ -1533,6 +1541,12 @@ lazy(mega, 'backupCenter', () => {
 
                 // Show sync status
                 this.setSyncStatus(syncStatus, folderInfoNode);
+
+                // Create Type cell
+                folderCellNode = mCreateElement('td', undefined, folderRowNode);
+
+                // Show Used storage
+                folderCellNode.textContent = type;
 
                 // Create Last Updated cell
                 folderCellNode = mCreateElement('td', undefined, folderRowNode);

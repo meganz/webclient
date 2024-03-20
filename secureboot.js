@@ -111,10 +111,12 @@ var load_error_types = {
     file_load_error: 2
 };
 
-if (is_karma) {
-    Object.freeze = echo;
+if (Object.fromEntries) {
+    if (is_karma) {
+        Object.freeze = echo;
+    }
+    Object.freeze(Object);
 }
-Object.freeze(Object);
 
 Object.defineProperties(self, {
     'freeze': {
@@ -2224,6 +2226,19 @@ else if (!browserUpdate) {
                         is_drop ? '[drop] ' : ''
             ) + dump.m.replace(/\s+/g, ' ');
 
+            var injectedScript =
+                /userscript|user\.js|EvalError/.test(dump.m + url + (errobj && errobj.stack))
+                || dump.m.indexOf('Permission denied to access property') !== -1
+                || dump.m.indexOf('Cannot redefine property') !== -1
+                || dump.m.indexOf("evaluating 'ze(e,t)'") !== -1
+                || dump.m.indexOf("evaluating 'r(a,c)'") !== -1
+                || dump.m.indexOf('Error: hookFull') !== -1;
+
+            if (injectedScript) {
+                window.onerror = null;
+                window.log99723 = true;
+            }
+
             if (expectedSourceOrigin && !window.u_checked) {
                 // Alert the user if there was an uncaught exception while
                 // loading the site, this should only happen on some fancy
@@ -2232,12 +2247,7 @@ else if (!browserUpdate) {
                 return siteLoadError(dump.m, url + '^~' + ln);
             }
 
-            if (/userscript|user\.js|EvalError/.test(dump.m + url + (errobj && errobj.stack))
-                || dump.m.indexOf('Permission denied to access property') !== -1
-                || dump.m.indexOf('Cannot redefine property') !== -1
-                || dump.m.indexOf("evaluating 'r(a,c)'") !== -1
-                || dump.m.indexOf('Error: hookFull') !== -1) {
-
+            if (injectedScript) {
                 // Some third party extension is injecting bogus script(s)...
                 console.warn('Your account is only as secure as your computer...');
                 console.warn('Check your installed extensions for the one injecting bogus scripts on this page...');
@@ -2775,6 +2785,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/filerequest_common.js', n: 'filerequest_common_js', j:1});
     jsl.push({f:'js/filerequest_components.js', n: 'filerequest_components_js', j:1});
     jsl.push({f:'js/filerequest.js', n: 'filerequest_js', j:1});
+    jsl.push({f:'js/ui/sprites.js', n: 'sprites_js', j: 1, w: 1});
     jsl.push({f:'js/ui/theme.js', n: 'theme_js', j: 1, w: 1});
 
     // Variables which can be used across all stylesheets
@@ -4500,6 +4511,7 @@ mBroadcaster.once('startMega', function() {
     }
 
     Object.defineProperty(window, 'dump', {value: console.warn.bind(console, '[dump]')});
+    onIdle(postMessage.bind(self, {disableRightClick: -1, type: 'enable-right-click'}));
 });
 
 Object.defineProperty(self, 's4', {value: Object.create(null)});

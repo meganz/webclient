@@ -387,9 +387,9 @@ mega.ui.MegaInputs.prototype.underlinedText._withIconOrPrefix = function() {
 
     if (this.type === 'password') {
 
-        const iconSprite = is_mobile ? 'sprite-mobile-fm-mono' : 'sprite-fm-mono';
-        const showTextIcon = is_mobile ? 'icon-eye-thin-outline' : 'icon-eye-reveal';
-        const hideTextIcon = is_mobile ? 'icon-eye-off-01-thin-outline' : 'icon-eye-hidden';
+        const iconSprite = mega.ui.sprites.mono;
+        const showTextIcon = 'icon-eye-reveal';
+        const hideTextIcon = 'icon-eye-hidden';
 
         $wrapper.safeAppend(`<i class="${iconSprite} ${showTextIcon} pass-visible"></i>`);
 

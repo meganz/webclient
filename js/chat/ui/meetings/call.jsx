@@ -336,7 +336,7 @@ export default class Call extends MegaRenderMixin {
         if (call?.sfuClient.connState === SfuClient.ConnState.kDisconnectedRetrying) {
             this.handleCallEnd();
             chatRoom.trigger('onRetryTimeout');
-            ion.sound.play(megaChat.SOUNDS.CALL_END);
+            megaChat.playSound(megaChat.SOUNDS.CALL_END);
         }
     };
 
@@ -434,7 +434,7 @@ export default class Call extends MegaRenderMixin {
                         () => {
                             const { waitingRoomPeers } = this.state;
                             if (waitingRoomPeers && waitingRoomPeers.length === 1) {
-                                ion.sound.play(megaChat.SOUNDS.CALL_JOIN_WAITING);
+                                megaChat.playSound(megaChat.SOUNDS.CALL_JOIN_WAITING);
                             }
                             mBroadcaster.sendMessage('meetings:peersWaiting', waitingRoomPeers);
                         }
@@ -892,6 +892,7 @@ export default class Call extends MegaRenderMixin {
         chatRoom.megaChat.off(`sfuConnClose.${NAMESPACE}`);
         chatRoom.megaChat.off(`sfuConnOpen.${NAMESPACE}`);
         chatRoom.megaChat.off(`onSpeakerChange.${NAMESPACE}`);
+        chatRoom.megaChat.off(`onPeerAvChange.${NAMESPACE}`);
 
         mBroadcaster.removeListener(this.ephemeralAddListener);
         if (this.pageChangeListener) {
@@ -926,7 +927,9 @@ export default class Call extends MegaRenderMixin {
         chatRoom.megaChat.rebind(`sfuConnOpen.${NAMESPACE}`, this.handleCallOnline);
         chatRoom.megaChat.rebind(`sfuConnClose.${NAMESPACE}`, () => this.handleCallOffline());
         chatRoom.rebind(`onCallState.${NAMESPACE}`, (ev, { arg }) => this.setState({ initialCallRinging: arg }));
-        chatRoom.rebind(`onSpeakerChange.${NAMESPACE}`, () => this.state.mode === MODE.THUMBNAIL && $(window).resize());
+        const {tresizer} = $;
+        chatRoom.rebind(`onPeerAvChange.${NAMESPACE}`, tresizer);
+        chatRoom.rebind(`onSpeakerChange.${NAMESPACE}`, tresizer);
 
         this.callStartTimeout = setTimeout(() => {
             if (!mega.config.get('callemptytout') && !call.hasOtherParticipant()) {

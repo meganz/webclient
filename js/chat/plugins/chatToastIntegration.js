@@ -253,8 +253,7 @@ class ChatToastIntegration {
                                 close: true,
                                 cb: () => {
                                     if (!playingSound && !mega.config.get('callinout')) {
-                                        ion.sound.stop(SOUNDS.CALL_JOIN);
-                                        ion.sound.play(SOUNDS.CALL_JOIN);
+                                        megaChat.playSound(SOUNDS.CALL_JOIN, true);
                                     }
                                 },
                                 joiner: (arr) => {
@@ -295,8 +294,7 @@ class ChatToastIntegration {
                                         if (!mega.config.get('callinout')) {
                                             playingSound = true;
                                             ion.sound.stop(SOUNDS.CALL_JOIN);
-                                            ion.sound.stop(SOUNDS.CALL_LEFT);
-                                            ion.sound.play(SOUNDS.CALL_LEFT);
+                                            megaChat.playSound(SOUNDS.CALL_LEFT, true);
                                         }
 
                                         onIdle(() => {

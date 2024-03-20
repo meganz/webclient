@@ -646,7 +646,7 @@
             }
 
             if (termCode === SfuClient.TermCode.kCallEndedByModerator) {
-                ion.sound.play(megaChat.SOUNDS.CALL_END);
+                megaChat.playSound(megaChat.SOUNDS.CALL_END);
             }
         }
         get isPublic() {

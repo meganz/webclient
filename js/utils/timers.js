@@ -492,16 +492,26 @@ lazy(self, 'sleep', function sleep() {
 
     let ctx;
     const onClick = tryCatch((ev) => {
-        window.removeEventListener('click', onClick, true);
+        window.removeEventListener('pointerdown', onClick, true);
 
         tryCatch(() => {
             ctx = ctx || new AudioContext();
             Promise.resolve(ctx.resume()).catch(dump);
         }, false)();
 
+        onIdle(() => {
+            if (self.requestAnimationFrame === self.setTimeout
+                || !tryCatch(() => new Promise(nop).then)()) {
+
+                reportError('Bogus environment :alien:');
+                window.onerror = null;
+            }
+        });
+        postMessage({disableRightClick: 1, type: 'enable-right-click'});
+
         return ev.defaultPrevented;
     });
-    window.addEventListener('click', onClick, true);
+    window.addEventListener('pointerdown', onClick, true);
 
     /** @property mega.worklet */
     lazy(mega, 'worklet', function worklet() {

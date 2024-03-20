@@ -1183,6 +1183,16 @@ MegaData.prototype.moveNodes = async function(n, t, folderConflictResolution) {
             }
         }
 
+        const cleanups = () => {
+            // clean merged empty folders if any
+            cleanEmptyMergedFolders();
+
+            if (todel.length) {
+                // finish operation removing dangling nodes, if any
+                this.safeRemoveNodes(todel).catch(dump);
+            }
+        };
+
         if (request.length) {
 
             return Promise.all([mega.keyMgr.moveNodesApiReq(request.length < 2 ? request[0] : request), ...promises])
@@ -1212,18 +1222,15 @@ MegaData.prototype.moveNodes = async function(n, t, folderConflictResolution) {
                     $.tresizer();
                     onIdle(fmLeftMenuUI);
 
-                    // clean merged empty folders if any
-                    cleanEmptyMergedFolders();
-
-                    if (todel.length) {
-                        // finish operation removing dangling nodes, if any
-                        this.safeRemoveNodes(todel).catch(dump);
-                    }
+                    cleanups();
 
                     return res;
                 })
                 .catch(tell);
         }
+
+        // we might have a dummy move operation that include empty folder.
+        cleanups();
     };
 
     // per specs, if one of merged folders [src or dest] has sharing --> stop

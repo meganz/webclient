@@ -1411,7 +1411,7 @@ let ChatOnboarding = (_dec = (0,mixins.hG)(1000), (_class = class ChatOnboarding
   }
   showDefaultNextStep(obChat) {
     const nextIdx = obChat.searchNextOpenStep();
-    if (nextIdx !== false && (!this.$obDialog || !this.$obDialog.is(':visible')) && (this.obToggleDrawn || $('.toggle-panel-heading', '.conversationsApp').length)) {
+    if (nextIdx !== false && (!this.$obDialog || !this.$obDialog.is(':visible')) && (this.obToggleDrawn || $('.conversations-category', '.conversationsApp').length)) {
       this.obToggleDrawn = true;
       if (obChat.steps && obChat.steps[nextIdx] && obChat.steps[nextIdx].isComplete) {
         return;
@@ -2129,7 +2129,7 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function () {
     self._lastUnreadCount = unreadCount;
     delay('notifFavicoUpd', () => {
       self.favico.reset();
-      self.favico.badge(unreadCount);
+      tryCatch(() => self.favico.badge(unreadCount))();
     });
   }
   if (!this._lastNotifications || this._lastNotifications.chats !== notifications.chats || this._lastNotifications.meetings !== notifications.meetings) {
@@ -3565,6 +3565,16 @@ Chat.prototype.openScheduledMeeting = function (meetingId, toCall) {
     });
   }
 };
+Chat.prototype.playSound = tryCatch((sound, options, stop) => {
+  if (options === true) {
+    stop = true;
+    options = undefined;
+  }
+  if (stop) {
+    ion.sound.stop(sound);
+  }
+  return ion.sound.play(sound, options);
+});
 window.Chat = Chat;
 if (false) {}
 const chat = ({
@@ -6057,7 +6067,7 @@ let MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 = l
     return verge.inViewport(domNode);
   }
   isComponentEventuallyVisible() {
-    if (!this.__isMounted || this.props.chatRoom && !this.props.chatRoom.isCurrentlyActive) {
+    if (!this.__isMounted) {
       return false;
     }
     if (this.customIsEventuallyVisible) {
@@ -18844,16 +18854,16 @@ class LeftPanel extends mixins.w9 {
     } = this.state;
     const upcomingConversations = this.filterConversations(CONVERSATION_TYPES.UPCOMING);
     const pastConversations = this.filterConversations(CONVERSATION_TYPES.PAST);
-    const $$HOLDER = (heading, content) => external_React_default().createElement("div", {
+    const $$HOLDER = (heading, content, categoryName) => external_React_default().createElement("div", {
       className: "conversations-holder"
     }, external_React_default().createElement("div", {
-      className: "conversations-category"
+      className: `conversations-category category-${categoryName}`
     }, external_React_default().createElement("span", null, heading)), content);
     return external_React_default().createElement((external_React_default()).Fragment, null, $$HOLDER(l.filter_heading__upcoming, upcomingConversations && upcomingConversations.length ? this.renderConversationsList(upcomingConversations) : external_React_default().createElement("div", {
       className: `${NAMESPACE}-nil`
-    }, filter ? external_React_default().createElement((external_React_default()).Fragment, null, filter === FILTER.MUTED && external_React_default().createElement("span", null, l.filter_nil__muted_upcoming), filter === FILTER.UNREAD && external_React_default().createElement("span", null, l.filter_nil__unread_upcoming)) : external_React_default().createElement("span", null, l.filter_nil__meetings_upcoming))), $$HOLDER(l.filter_heading__recent, pastConversations && pastConversations.length ? this.renderConversationsList(pastConversations) : external_React_default().createElement("div", {
+    }, filter ? external_React_default().createElement((external_React_default()).Fragment, null, filter === FILTER.MUTED && external_React_default().createElement("span", null, l.filter_nil__muted_upcoming), filter === FILTER.UNREAD && external_React_default().createElement("span", null, l.filter_nil__unread_upcoming)) : external_React_default().createElement("span", null, l.filter_nil__meetings_upcoming)), 'upcoming'), $$HOLDER(l.filter_heading__recent, pastConversations && pastConversations.length ? this.renderConversationsList(pastConversations) : external_React_default().createElement("div", {
       className: `${NAMESPACE}-nil`
-    }, filter ? external_React_default().createElement((external_React_default()).Fragment, null, filter === FILTER.MUTED && external_React_default().createElement("span", null, l.filter_nil__muted_recent), filter === FILTER.UNREAD && external_React_default().createElement("span", null, l.filter_nil__unread_recent)) : external_React_default().createElement("span", null, l.filter_nil__meetings_recent))));
+    }, filter ? external_React_default().createElement((external_React_default()).Fragment, null, filter === FILTER.MUTED && external_React_default().createElement("span", null, l.filter_nil__muted_recent), filter === FILTER.UNREAD && external_React_default().createElement("span", null, l.filter_nil__unread_recent)) : external_React_default().createElement("span", null, l.filter_nil__meetings_recent)), 'past'));
   }
   getConversations(type) {
     const {
@@ -22299,7 +22309,7 @@ class Call extends mixins.w9 {
       if ((call == null ? void 0 : call.sfuClient.connState) === SfuClient.ConnState.kDisconnectedRetrying) {
         this.handleCallEnd();
         chatRoom.trigger('onRetryTimeout');
-        ion.sound.play(megaChat.SOUNDS.CALL_END);
+        megaChat.playSound(megaChat.SOUNDS.CALL_END);
       }
     };
     this.handleCallOnline = () => {
@@ -22369,7 +22379,7 @@ class Call extends mixins.w9 {
             waitingRoomPeers
           } = this.state;
           if (waitingRoomPeers && waitingRoomPeers.length === 1) {
-            ion.sound.play(megaChat.SOUNDS.CALL_JOIN_WAITING);
+            megaChat.playSound(megaChat.SOUNDS.CALL_JOIN_WAITING);
           }
           mBroadcaster.sendMessage('meetings:peersWaiting', waitingRoomPeers);
         });
@@ -22706,6 +22716,7 @@ class Call extends mixins.w9 {
     chatRoom.megaChat.off(`sfuConnClose.${NAMESPACE}`);
     chatRoom.megaChat.off(`sfuConnOpen.${NAMESPACE}`);
     chatRoom.megaChat.off(`onSpeakerChange.${NAMESPACE}`);
+    chatRoom.megaChat.off(`onPeerAvChange.${NAMESPACE}`);
     mBroadcaster.removeListener(this.ephemeralAddListener);
     if (this.pageChangeListener) {
       mBroadcaster.removeListener(this.pageChangeListener);
@@ -22739,7 +22750,11 @@ class Call extends mixins.w9 {
     }) => this.setState({
       initialCallRinging: arg
     }));
-    chatRoom.rebind(`onSpeakerChange.${NAMESPACE}`, () => this.state.mode === MODE.THUMBNAIL && $(window).resize());
+    const {
+      tresizer
+    } = $;
+    chatRoom.rebind(`onPeerAvChange.${NAMESPACE}`, tresizer);
+    chatRoom.rebind(`onSpeakerChange.${NAMESPACE}`, tresizer);
     this.callStartTimeout = setTimeout(() => {
       if (!mega.config.get('callemptytout') && !call.hasOtherParticipant()) {
         call.left = true;
@@ -24584,7 +24599,7 @@ class ParticipantsBlock extends mixins.w9 {
                                     participants-grid
                                     ${floatDetached && peers.length === 1 || peers.length === 0 ? 'single-column' : ''}
                                 `
-        }, floatDetached ? [...streaming, ...rest].map(p => $$PEER(p)) : [...streaming, this.renderLocalNode(), ...rest].map(p => p instanceof CallManager2.Peer ? $$PEER(p) : p))));
+        }, floatDetached ? [...streaming, ...rest].map(p => $$PEER(p)) : external_React_default().createElement((external_React_default()).Fragment, null, streaming.map(p => $$PEER(p)), this.renderLocalNode(), rest.map(p => $$PEER(p))))));
       }
       const {
         page
@@ -31883,7 +31898,6 @@ class DropdownEmojiSelector extends _chat_mixins0__.w9 {
                     `,
         key: categoryIcons[categoryName],
         onClick: e => {
-          var _this$emojiSearchFiel;
           e.stopPropagation();
           e.preventDefault();
           this.setState({
@@ -31894,7 +31908,10 @@ class DropdownEmojiSelector extends _chat_mixins0__.w9 {
           const categoryPosition = this.data_categoryPositions[this.data_categories.indexOf(categoryName)] + 10;
           this.scrollableArea.scrollToY(categoryPosition);
           this._onScrollChanged(categoryPosition);
-          (_this$emojiSearchFiel = this.emojiSearchField) == null || _this$emojiSearchFiel.current.focus();
+          const {
+            current
+          } = this.emojiSearchField || !1;
+          current == null || current.focus();
         }
       }, React.createElement("i", {
         className: `sprite-fm-mono ${categoryIcons[categoryName]}`

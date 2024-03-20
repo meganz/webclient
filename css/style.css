@@ -4109,6 +4109,7 @@ input.summary-ff-name.error {
     color: #D90007;
 }
 .rename-input-bl i,
+.device-rename-input-bl i,
 .create-folder-input-bl i,
 .create-album-input-bl i {
     width: 24px;
@@ -4117,6 +4118,12 @@ input.summary-ff-name.error {
     height: 24px;
     top: 6px;
     background-repeat: no-repeat;
+}
+.device-rename-input-bl {
+    height: 42px;
+}
+.device-rename-input-bl input {
+    height: 42px;
 }
 .fm-account-labels .labels-block.email-confirm-txt {
     height: 18px;

@@ -203,9 +203,11 @@ export default class LeftPanel extends MegaRenderMixin {
         const { filter } = this.state;
         const upcomingConversations = this.filterConversations(CONVERSATION_TYPES.UPCOMING);
         const pastConversations = this.filterConversations(CONVERSATION_TYPES.PAST);
-        const $$HOLDER = (heading, content) =>
+        // The `categoryName` selectors are used as references in the onboarding flow;
+        // see `chatOnboarding.jsx`, `onboarding.js` for further details.
+        const $$HOLDER = (heading, content, categoryName) =>
             <div className="conversations-holder">
-                <div className="conversations-category">
+                <div className={`conversations-category category-${categoryName}`}>
                     <span>{heading}</span>
                 </div>
                 {content}
@@ -225,7 +227,8 @@ export default class LeftPanel extends MegaRenderMixin {
                                 </> :
                                 <span>{l.filter_nil__meetings_upcoming}</span>
                             }
-                        </div>
+                        </div>,
+                    'upcoming'
                 )}
                 {$$HOLDER(
                     l.filter_heading__recent,
@@ -239,7 +242,8 @@ export default class LeftPanel extends MegaRenderMixin {
                                 </> :
                                 <span>{l.filter_nil__meetings_recent}</span>
                             }
-                        </div>
+                        </div>,
+                    'past'
                 )}
             </>
         );

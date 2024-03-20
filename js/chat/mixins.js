@@ -478,7 +478,7 @@ export class MegaRenderMixin extends React.Component {
      */
     isComponentEventuallyVisible() {
         // .__isMounted is faster then .isMounted() or any other operation
-        if (!this.__isMounted || this.props.chatRoom && !this.props.chatRoom.isCurrentlyActive) {
+        if (!this.__isMounted) {
             return false;
         }
 

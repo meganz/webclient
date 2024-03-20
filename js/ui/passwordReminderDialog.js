@@ -260,8 +260,8 @@
             self.passwordReminderAttribute.dontShowAgain === 1
         );
 
-        const showTextIcon = is_mobile ? 'icon-eye-thin-outline' : 'icon-eye-reveal';
-        const hideTextIcon = is_mobile ? 'icon-eye-off-01-thin-outline' : 'icon-eye-hidden';
+        const showTextIcon = 'icon-eye-reveal';
+        const hideTextIcon = 'icon-eye-hidden';
 
         $('.pass-visible', this.dialog).rebind('click.togglePassV', function() {
 
@@ -695,8 +695,8 @@
             this.exportButton.classList.add('green-button');
         }
 
-        const showTextIcon = is_mobile ? 'icon-eye-thin-outline' : 'icon-eye-reveal';
-        const hideTextIcon = is_mobile ? 'icon-eye-off-01-thin-outline' : 'icon-eye-hidden';
+        const showTextIcon = 'icon-eye-reveal';
+        const hideTextIcon = 'icon-eye-hidden';
         $('i.pass-visible', this.dialog).removeClass(hideTextIcon).addClass(showTextIcon);
         // On mobile, if the input were readonly, the keyboard would not open when taking focus
         $('#test-pass', this.dialog).attr({'style': '', 'type': 'password', 'readonly': !is_mobile});

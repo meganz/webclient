@@ -429,8 +429,7 @@
 
                 const isLastItem = isSimpletip ? i === lastPos + 1 : i === lastPos;
                 const isRoot = i === items.length - 1;
-                const icon = is_mobile ? 'sprite-mobile-fm-mono icon-chevron-right-thin-solid' :
-                    'sprite-fm-mono icon-arrow-right';
+                const icon = `${mega.ui.sprites.mono} icon-arrow-right`;
                 let item;
                 // if we won't have space, add it to the dropdown, but always render the current folder,
                 // and root if there are no extraItems

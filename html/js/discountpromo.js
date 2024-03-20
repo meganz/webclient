@@ -27,11 +27,18 @@ class DiscountPromo {
                 const matchedPlan = this.getMatchedPlan();
 
                 // Render the plan and discount details
-                this.renderDiscountDetails(matchedPlan);
-                this.initConfirmButton(matchedPlan);
+                if (matchedPlan) {
+                    this.renderDiscountDetails(matchedPlan);
+                    this.initConfirmButton(matchedPlan);
 
-                // Show the page
-                this.pageSelector.classList.remove('hidden');
+                    // Show the page
+                    this.pageSelector.classList.remove('hidden');
+                }
+                else {
+                    msgDialog('error', '', l.err_t_unable_to_proceed, l.err_m_inelligible_for_promo, () => {
+                        mega.redirect('mega.io', 'pricing', false, false);
+                    });
+                }
 
                 // Hide loading spinner
                 loadingDialog.hide();

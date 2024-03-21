@@ -1382,7 +1382,7 @@ lazy(mega, 'backupCenter', () => {
                                 else {
                                     mega.backupCenter.dn[deviceId] = value;
                                     loadingDialog.show();
-                                    mega.attr.set('dn', mega.backupCenter.dn, false, true)
+                                    mega.attr.set('dn', mega.attr.encodeObjectValues(mega.backupCenter.dn), false, true)
                                         .then(() => mega.backupCenter.renderContent(true))
                                         .catch(tell)
                                         .finally(() => loadingDialog.hide());

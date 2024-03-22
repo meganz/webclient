@@ -6,19 +6,27 @@ class MegaGesture {
         this.touchDistance = 0;
         this.minSwipeDistanceX = options.minSwipeDistanceX || 250 / window.devicePixelRatio;
         this.minSwipeDistanceY = options.minSwipeDistanceY || 250 / window.devicePixelRatio;
-        this.domNode = options.domNode;
 
-        if (!this.domNode.megaGesture) {
-            this._setupEventListeners();
-            this.domNode.megaGesture = true;
-        }
-    }
+        const _rgOpt = {capture: true};
+        const _registerGesture = () => {
+            document.body.removeEventListener('touchstart', _registerGesture, _rgOpt);
 
-    _setupEventListeners() {
+            if (!this.domNode || !this.domNode.megaGesture) {
 
-        this.domNode.addEventListener('touchstart', this);
-        this.domNode.addEventListener('touchmove', this, {passive: false});
-        this.domNode.addEventListener('touchend', this);
+                if ((this.domNode = this.domNode || this.options.domNode || false).parentNode) {
+
+                    this.domNode.addEventListener('touchend', this);
+                    this.domNode.addEventListener('touchstart', this);
+                    this.domNode.addEventListener('touchmove', this, {passive: false});
+
+                    this.domNode.megaGesture = true;
+                }
+                else if (!window.buildOlderThan10Days) {
+                    reportError('MegaGesture initialization failed.');
+                }
+            }
+        };
+        document.body.addEventListener('touchstart', _registerGesture, _rgOpt);
     }
 
     // This is the handleEvent method, it will be called for each event listener
@@ -164,14 +172,15 @@ class MegaGesture {
     }
 }
 
-mBroadcaster.once('startMega', () => {
-
+mBroadcaster.once('startMega:mobile', () => {
     'use strict';
 
-    if (is_mobile && is_touchable && self.mainlayout) {
+    if (is_touchable) {
 
         mega.ui.mainlayoutGesture = new MegaGesture({
-            domNode: mainlayout,
+            get domNode() {
+                return mainlayout;
+            },
             onSwipeLeft: () => history.forward(),
             onSwipeRight: () => history.back()
         });

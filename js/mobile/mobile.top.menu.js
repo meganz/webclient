@@ -230,41 +230,44 @@ class MegaMobileTopMenu extends MegaMobileComponent {
             $('.mobile.main-block, .mobile.old-page').addClass('hidden');
         });
 
-        const _gestureHandler = () => {
+        if (!is_touchable) {
 
-            if (document.body.offsetWidth < 769) {
+            const _gestureHandler = () => {
 
-                if (this.gesture) {
-                    return;
-                }
+                if (document.body.offsetWidth < 769) {
 
-                this.gesture = new MegaGesture({
-                    domNode: this.domNode,
-                    onTouchMove: ev => {
-
-                        const xDiff = this.gesture.xStart - ev.touches[0].clientX;
-
-                        this.domNode.style.transform = `translateX(${Math.max(0, -xDiff)}px)`;
-                    },
-                    onSwipeRight: () => {
-
-                        this.hide(true);
-                        this.trigger('close');
-                    },
-                    onTouchEnd: () => {
-                        this.domNode.style.transform = '';
+                    if (this.gesture) {
+                        return;
                     }
-                });
-            }
-            else if (this.gesture) {
-                this.gesture.destroy();
-                delete this.gesture;
-            }
-        };
 
-        _gestureHandler();
+                    this.gesture = new MegaGesture({
+                        domNode: this.domNode,
+                        onTouchMove: ev => {
 
-        window.addEventListener('resize', _gestureHandler);
+                            const xDiff = this.gesture.xStart - ev.touches[0].clientX;
+
+                            this.domNode.style.transform = `translateX(${Math.max(0, -xDiff)}px)`;
+                        },
+                        onSwipeRight: () => {
+
+                            this.hide(true);
+                            this.trigger('close');
+                        },
+                        onTouchEnd: () => {
+                            this.domNode.style.transform = '';
+                        }
+                    });
+                }
+                else if (this.gesture) {
+                    this.gesture.destroy();
+                    delete this.gesture;
+                }
+            };
+
+            _gestureHandler();
+
+            window.addEventListener('resize', _gestureHandler);
+        }
     }
 
     static init() {

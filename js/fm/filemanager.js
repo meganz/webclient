@@ -898,7 +898,7 @@ FileManager.prototype.initFileManagerUI = function() {
 
             a = event.target.parentNode;
             currentNodeClass = event.target.classList;
-            if (!currentNodeClass.length) {
+            if (a && !currentNodeClass.length) {
                 currentNodeClass = a.classList;
             }
             if (currentNodeClass && currentNodeClass.contains('dropdown')
@@ -2053,14 +2053,14 @@ FileManager.prototype.initContextUI = function() {
 
         loadingDialog.show('common', l[23130]);
 
-        mega.fileTextEditor.getFile(nodeHandle).done(
-            function(data) {
-                loadingDialog.hide();
+        mega.fileTextEditor.getFile(nodeHandle)
+            .then((data) => {
                 mega.textEditorUI.setupEditor(M.d[nodeHandle].name, data, nodeHandle);
-            }
-        ).fail(function() {
-            loadingDialog.hide();
-        });
+            })
+            .catch(dump)
+            .finally(() => {
+                loadingDialog.hide();
+            });
     });
 
     $(c + '.properties-versions').rebind('click', function() {
@@ -3288,9 +3288,10 @@ FileManager.prototype.addTransferPanelUI = function() {
 
     $.transferHeader = function(tfse) {
         tfse = tfse || M.getTransferElements();
-        var domTableEmptyTxt = tfse.domTableEmptyTxt;
-        var domScrollingTable = tfse.domScrollingTable;
-        var domTable = tfse.domTable;
+        if (!tfse) {
+            return;
+        }
+        const {domTableEmptyTxt, domScrollingTable, domTable} = tfse;
         tfse = undefined;
 
         // Show/Hide header if there is no items in transfer list
@@ -4927,7 +4928,7 @@ FileManager.prototype.initLeftPanel = function() {
         mega.gallery.albums.init();
     }
 
-    document.getElementsByClassName('js-lp-storage-usage')[0].classList.remove('hidden');
+    $('.js-lp-storage-usage').removeClass('hidden');
 
     this.checkLeftStorageBlock();
 

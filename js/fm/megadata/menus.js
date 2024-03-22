@@ -943,9 +943,10 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
             flt = '.remove-contact, .share-folder-item, .set-nickname';
 
             // Add .send-files-item to show Send files item
-            if (!window.megaChatIsDisabled) {
+            if (window.megaChatIsReady) {
                 flt += ',.startchat-item, .send-files-item';
-                if (megaChat && megaChat.hasSupportForCalls) {
+
+                if (megaChat.hasSupportForCalls) {
                     flt += ',.startaudiovideo-item';
                 }
             }
@@ -1175,7 +1176,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
                         updateUIPerItems($menuCMI, items);
                     }
 
-                    if (M.d[id].su) {
+                    if (M.getNodeByHandle(id).su) {
                         const ed = authring.getContactAuthenticated(M.d[id].su, 'Ed25519');
 
                         if (!(ed && ed.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON) &&

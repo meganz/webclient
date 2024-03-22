@@ -1080,8 +1080,7 @@ var ulmanager = {
             M.ulerror(ul, inShareOQ ? ESHAREROVERQUOTA : res);
 
             if (res !== EOVERQUOTA && res !== EGOINGOVERQUOTA) {
-                srvlog('Unexpected upload completion server response (' + res
-                    + ' @ ' + hostname(ctx.file.posturl) + ')');
+                console.warn(`Unexpected upload completion server response (${res} @ ${hostname(ctx.file.posturl)})`);
             }
         }
         delete ulmanager.ulCompletingPhase['ul_' + ctx.file.id];

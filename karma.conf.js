@@ -21,21 +21,13 @@ module.exports = function(config) {
         // == Basics ==
         'js/vendor/jquery.js',
         'js/vendor/jquery-ui.js',
-        'js/vendor/jquery.mousewheel.js',
-        'js/vendor/jquery.fullscreen.js',
-        'js/vendor/jquery.qrcode.js',
-        'js/jquery.tokeninput.js',
         'js/jquery.misc.js',
-        'js/jquery.checkboxes.js',
 
         // == Libraries ==
         'js/vendor/asmcrypto.js',
         'js/vendor/nacl-fast.js',
         'js/vendor/moment.js',
-
-        // Other.
         'js/vendor/autolinker.js',
-        'js/vendor/qrcode.js',
 
         // == Test helpers and test configuration ==
         'test/lang_dummy.js',

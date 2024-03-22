@@ -509,7 +509,7 @@ MegaData.prototype.getSearchedTreeHandles = function(h, term, deepness, res) {
 
         this.getSearchedTreeHandles(fHandles[i], term, deepness + 1, res);
 
-        if (res[fHandles[i]] || M.tree[h][fHandles[i]].name.toLowerCase().includes(term)) {
+        if (res[fHandles[i]] || String(M.tree[h][fHandles[i]].name).toLowerCase().includes(term)) {
 
             res[h] = deepness;
             res[fHandles[i]] = deepness + 1;

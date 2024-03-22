@@ -1961,8 +1961,10 @@ var addressDialog = {
      */
     closeDialog: function() {
 
-        this.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
-        this.$dialog.removeClass('active').addClass('hidden');
+        if (this.$backgroundOverlay) {
+            this.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+            this.$dialog.removeClass('active').addClass('hidden');
+        }
     },
 
     /**

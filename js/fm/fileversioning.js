@@ -23,7 +23,7 @@ var versiondialogid;
          *         otherwise it returns list with current version.
          */
         getAllVersionsSync: function(h) {
-            return this.getVersionHandles(h, true).map(h => M.d[h]);
+            return this.getVersionHandles(h, true).map(h => M.d[h]).filter(Boolean);
         },
 
         /**

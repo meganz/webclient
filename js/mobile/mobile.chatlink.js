@@ -60,7 +60,7 @@ mobile.chatlink = {
                             $('h2.topic', $overlay).safeHTML(megaChat.html(res.topic) || '');
                         }
                         if (res.ncm) {
-                            $('.members', $overlay).text(mega.icu.format(l[20233], result.ncm));
+                            $('.members', $overlay).text(mega.icu.format(l[20233], res.ncm));
                         }
                     })
                     .catch(dump);

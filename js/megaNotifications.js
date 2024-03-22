@@ -105,7 +105,7 @@
         soundsPreload: true,
         soundsVolume: 0.07,
         showFaviconCounter: false,
-        desktopNotifications: true,
+        desktopNotifications: !!window.Notification,
         anfFlag: false
     };
 

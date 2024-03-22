@@ -441,11 +441,12 @@ function ZipWriter(dl_id, dl) {
     this.zwriter.validateTask = dlZipWriterValidate.bind(this);
     this.logger = MegaLogger.getLogger('ZipWriter', {}, dlmanager.logger);
 
-    this.io.begin = function() {
-        this.is_ready = true;
-        this.zwriter.process();
-    }.bind(this);
-
+    this.io.begin = () => {
+        if (this.zwriter) {
+            this.is_ready = true;
+            this.zwriter.process();
+        }
+    };
 }
 
 ZipWriter.prototype.toString = function() {

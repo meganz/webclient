@@ -2313,7 +2313,7 @@ MegaData.prototype.applyLabelFilter = function(e) {
 MegaData.prototype.isLabelExistNodeList = function(nodelist) {
     "use strict";
 
-    for (var i = nodelist.length; i--;) {
+    for (var i = nodelist && nodelist.length; i--;) {
         var lbl = (nodelist[i] || {}).lbl | 0;
         if (lbl) {
             return true;

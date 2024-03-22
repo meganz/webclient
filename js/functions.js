@@ -829,7 +829,7 @@ function addZeroIfLenLessThen(val, len) {
 function ASSERT(what, msg, udata) {
     'use strict';
 
-    if (!what) {
+    if (!what && self.d > 0) {
         reportError(new Error(`failed assertion, ${msg}`));
     }
     return !!what;
@@ -839,7 +839,7 @@ function ASSERT(what, msg, udata) {
 function srvlog(msg, data, silent) {
     'use strict';
 
-    reportError(msg instanceof Error ? msg : new Error(msg));
+    (silent ? dump : reportError)(msg instanceof Error ? msg : new Error(msg));
 }
 
 // log failures through event id 99666

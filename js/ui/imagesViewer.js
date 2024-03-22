@@ -1534,7 +1534,6 @@ var slideshowid;
 
         $dlBut.rebind('click.media-viewer', function _dlButClick() {
 
-            // @todo how?..
             if (this.classList && this.classList.contains('disabled')) {
                 return false;
             }
@@ -1543,12 +1542,12 @@ var slideshowid;
 
             if (p && p.full && Object(p.buffer).byteLength) {
                 M.saveAs(p.buffer, n.name)
-                    .fail(function(ex) {
+                    .catch((ex) => {
                         if (d) {
                             console.debug(ex);
                         }
                         p.full = p.buffer = false;
-                        _dlButClick();
+                        _dlButClick.call(this);
                     });
                 return false;
             }

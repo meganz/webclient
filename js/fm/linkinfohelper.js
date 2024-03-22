@@ -286,7 +286,7 @@ LinkInfoHelper.prototype.getInfo = async function() {
         }
     }
     else if (this.is_chatlink) {
-        if (this.info.topic === undefined) {
+        if (this.info.topic === undefined && this.node_key) {
             const fakeRoom = {
                 'ct': this.info.ct,
                 'publicChatHandle': this.node_handle,
@@ -300,6 +300,9 @@ LinkInfoHelper.prototype.getInfo = async function() {
             fakeRoom.protocolHandler = ph;
             await megaChat.plugins.chatdIntegration.decryptTopic(fakeRoom).catch(dump);
             this.info.topic = fakeRoom.topic || '';
+        }
+        else if (!this.info.topic) {
+            this.info.topic = '';
         }
     }
     else if (!this.is_dir && this.info.at) {

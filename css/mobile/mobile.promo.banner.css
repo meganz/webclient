@@ -12,7 +12,7 @@
 }
 
 .mobile .mega-promo-banner .main {
-    padding: 20px 24px 0;
+    padding: 20px 24px 24px;
     box-sizing: border-box;
     height: auto;
     overflow-y: auto;

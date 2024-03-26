@@ -165,10 +165,12 @@ class MegaGesture {
 
     destroy() {
 
-        this.domNode.removeEventListener('touchstart', this);
-        this.domNode.removeEventListener('touchmove', this);
-        this.domNode.removeEventListener('touchend', this);
-        delete this.domNode.megaGesture;
+        if (this.domNode) {
+            this.domNode.removeEventListener('touchstart', this);
+            this.domNode.removeEventListener('touchmove', this);
+            this.domNode.removeEventListener('touchend', this);
+            delete this.domNode.megaGesture;
+        }
     }
 }
 

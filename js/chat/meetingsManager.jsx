@@ -178,6 +178,9 @@ class ScheduledMeeting {
 
         const occurrences = await asyncApiReq(req);
         if (Array.isArray(occurrences)) {
+            if (!options) {
+                this.occurrences.clear();
+            }
             for (let i = 0; i < occurrences.length; i++) {
                 const occurrence = new Occurrence(
                     this.megaChat,
@@ -201,22 +204,43 @@ class ScheduledMeeting {
         if (isUpcoming && isRecurring || parent) {
             return parent ?
                 (() => {
-                    // Processing an individual meeting occurrence, i.e. a children meeting -- do a partial fetch
-                    // for the occurrences via `getOccurrences` by passing `from` and `count` params for the `mcsmfo`
-                    // call. Construct `from` based on the start timestamp for the preceding occurrence, `count` based
-                    // on the number of subsequent occurrences in the list.
-                    const { chatId, start, startInitial } = this;
                     const occurrences = Object.values(parent.occurrences);
+                    if (occurrences.length <= 20) {
+                        // Only have the initial fetch so just clear them all and fetch new.
+                        return parent.getOccurrences().catch(nop);
+                    }
+                    // Need to replace the occurrences from where it was to the end of the direction it was moved to
+                    // as the order may be different. Don't need to fetch the other way as they shouldn't change
+                    occurrences.sort((a, b) => a.start - b.start);
+                    const { chatId, start, startInitial } = this;
                     const uid = `${chatId}-${(startInitial || start) / 1000}`;
                     const currentIndex = occurrences.findIndex(o => o.uid === uid);
                     const previous = occurrences[currentIndex - 1];
-
-                    return parent
-                        .getOccurrences({
-                            from: previous ? previous.start : Date.now(),
-                            count: occurrences.length - currentIndex
-                        })
-                        .catch(nop);
+                    if (!previous) {
+                        // Can't find the previous occurrence so just clear and refetch them
+                        return parent.getOccurrences().catch(nop);
+                    }
+                    const movedBack = start <= previous.start;
+                    let tmp = 0;
+                    let newStart = movedBack ? Date.now() : previous.end;
+                    const maxIdx = movedBack ? currentIndex + 1 : occurrences.length;
+                    const startIdx = movedBack ? 0 : currentIndex;
+                    for (let i = startIdx; i < maxIdx; i++) {
+                        // Fetch by chunks of 20 occurrences.
+                        if ((++tmp % 20) === 0) {
+                            parent.getOccurrences({ from: newStart, to: occurrences[i].end, count: 20 }).catch(dump);
+                            newStart = occurrences[i].end;
+                            tmp = 0;
+                        }
+                        parent.occurrences.remove(occurrences[i].uid);
+                    }
+                    if (tmp) {
+                        parent.getOccurrences({
+                            from: newStart,
+                            count: tmp,
+                            to: movedBack ? occurrences[currentIndex].end : occurrences[occurrences.length - 1].end
+                        }).catch(dump);
+                    }
                 })() :
                 // Root meeting -- fetch the default list of occurrences based on the meeting's repetition rules, e.g.
                 // first 20 occurrences.

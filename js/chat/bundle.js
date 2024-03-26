@@ -447,6 +447,9 @@ class ScheduledMeeting {
     }
     const occurrences = await asyncApiReq(req);
     if (Array.isArray(occurrences)) {
+      if (!options) {
+        this.occurrences.clear();
+      }
       for (let i = 0; i < occurrences.length; i++) {
         const occurrence = new Occurrence(this.megaChat, {
           scheduledMeeting: this,
@@ -473,18 +476,45 @@ class ScheduledMeeting {
     } = this;
     if (isUpcoming && isRecurring || parent) {
       return parent ? (() => {
+        const occurrences = Object.values(parent.occurrences);
+        if (occurrences.length <= 20) {
+          return parent.getOccurrences().catch(nop);
+        }
+        occurrences.sort((a, b) => a.start - b.start);
         const {
           chatId,
           start,
           startInitial
         } = this;
-        const occurrences = Object.values(parent.occurrences);
         const currentIndex = occurrences.findIndex(o => o.uid === `${chatId}-${(startInitial || start) / 1000}`);
         const previous = occurrences[currentIndex - 1];
-        return parent.getOccurrences({
-          from: previous ? previous.start : Date.now(),
-          count: occurrences.length - currentIndex
-        }).catch(nop);
+        if (!previous) {
+          return parent.getOccurrences().catch(nop);
+        }
+        const movedBack = start <= previous.start;
+        let tmp = 0;
+        let newStart = movedBack ? Date.now() : previous.end;
+        const maxIdx = movedBack ? currentIndex + 1 : occurrences.length;
+        const startIdx = movedBack ? 0 : currentIndex;
+        for (let i = startIdx; i < maxIdx; i++) {
+          if (++tmp % 20 === 0) {
+            parent.getOccurrences({
+              from: newStart,
+              to: occurrences[i].end,
+              count: 20
+            }).catch(dump);
+            newStart = occurrences[i].end;
+            tmp = 0;
+          }
+          parent.occurrences.remove(occurrences[i].uid);
+        }
+        if (tmp) {
+          parent.getOccurrences({
+            from: newStart,
+            count: tmp,
+            to: movedBack ? occurrences[currentIndex].end : occurrences[occurrences.length - 1].end
+          }).catch(dump);
+        }
       })() : this.getOccurrences().catch(nop);
     }
     megaChat.trigger(megaChat.plugins.meetingsManager.EVENTS[isCanceled ? 'CANCEL' : 'INITIALIZE'], this);

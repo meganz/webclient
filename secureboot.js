@@ -2977,6 +2977,7 @@ else if (!browserUpdate) {
 
         // Variables which can be used across all mobile stylesheets
         jsl.push({f:'css/vars/mobile-theme.css', n: 'vars_mobile_theme_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/vars/mobile-theme-auto.css', n: 'vars_mobile_theme_auto_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/mobile/mobile.dropdown.css', n: 'mobile_dropdown_css', j: 2, w: 1});
         jsl.push({f:'css/mobile/mobile.overlay.css', n: 'mobile_overlay_css', j:2, w:1});
         jsl.push({f:'css/mobile/mobile.sheet.css', n: 'mobile_sheet_css', j:2, w:30, c:1, d:1, cache:1});

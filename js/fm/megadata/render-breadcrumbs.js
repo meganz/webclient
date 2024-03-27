@@ -517,6 +517,7 @@
             'public-links',
             'file-requests'
         ];
+        mBroadcaster.sendMessage('trk:event', 'breadcrumb', 'click', id);
 
         // super special case (contact)
         if (M.u.hasOwnProperty(id)) {

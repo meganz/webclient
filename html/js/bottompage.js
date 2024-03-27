@@ -31,7 +31,6 @@ class AccordionComponent extends ExpandableComponent {
     constructor($accordionElement) {
         super($accordionElement);
 
-        this.expandStartEvent = new MEvent();
         this.transitionOptions = {
             easing: 'swing',
             duration: 200,
@@ -63,7 +62,6 @@ class AccordionComponent extends ExpandableComponent {
     }
 
     expand() {
-        this.expandStartEvent.invoke();
         super.expand();
         this.$drawer.stop().animate({
             height: 'show',

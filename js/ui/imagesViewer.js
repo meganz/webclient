@@ -1003,6 +1003,8 @@ var slideshowid;
         }
         $.noOpenChatFromPreview = true;
         openCopyDialog('conversations');
+
+        mBroadcaster.sendMessage('trk:event', 'preview', 'send-chat');
     }
 
     // Viewer Init
@@ -1056,9 +1058,6 @@ var slideshowid;
             $imgWrap.attr('data-count', '');
             $('img', $imgWrap).attr('src', '').removeAttr('style').removeClass('active');
             $('.v-btn.active', $controls).removeClass('active');
-            delete $.repeat;
-            $('.repeat', $videoControls).removeClass('mask-color-brand');
-            $('.repeat-wrapper .tooltip', $videoControls).text(l.video_player_repeat);
             $('.speed i', $videoControls).removeClass()
                 .addClass('sprite-fm-mono icon-playback-1x-small-regular-outline');
             $('.speed', $videoControls).removeClass('margin-2');
@@ -1069,6 +1068,9 @@ var slideshowid;
             $('.context-menu.subtitles button.off i', $videoControls).removeClass('hidden');
             $('.subtitles-wrapper', $videoControls).removeClass('hidden');
             $('button.subtitles', $videoControls).removeClass('mask-color-brand');
+            $('.settings', $videoControls).removeClass('mask-color-brand');
+            $('.settings i', $videoControls).removeClass('icon-settings-02-small-regular-solid')
+                .addClass('icon-settings-02-small-regular-outline');
             if (optionsMenu) {
                 contextMenu.close(optionsMenu);
             }
@@ -1183,9 +1185,6 @@ var slideshowid;
         $('.video-time-bar', $videoControls).removeAttr('style');
         $('.video-progress-bar', $videoControls).removeAttr('title');
         $('.video-timing', $videoControls).text('');
-        delete $.repeat;
-        $('.repeat', $videoControls).removeClass('mask-color-brand');
-        $('.repeat-wrapper .tooltip', $videoControls).text(l.video_player_repeat);
         $('.speed i', $videoControls).removeClass()
             .addClass('sprite-fm-mono icon-playback-1x-small-regular-outline');
         $('.speed', $videoControls).removeClass('margin-2');
@@ -1196,6 +1195,9 @@ var slideshowid;
         $('.context-menu.subtitles button.off i', $videoControls).removeClass('hidden');
         $('.subtitles-wrapper', $videoControls).removeClass('hidden');
         $('button.subtitles', $videoControls).removeClass('mask-color-brand');
+        $('.settings', $videoControls).removeClass('mask-color-brand');
+        $('.settings i', $videoControls).removeClass('icon-settings-02-small-regular-solid')
+            .addClass('icon-settings-02-small-regular-outline');
 
         // Init full screen icon and related data attributes
         if ($document.fullScreen()) {
@@ -1243,15 +1245,19 @@ var slideshowid;
                 const isDownloadPage = page === 'download';
 
                 if (e.keyCode === 37 && slideshowid && !e.altKey && !e.ctrlKey && !isDownloadPage) {
+                    mBroadcaster.sendMessage('trk:event', 'preview', 'arrow-key', this, self.slideshowid);
                     slideshow_prev();
                 }
                 else if (e.keyCode === 39 && slideshowid && !isDownloadPage) {
+                    mBroadcaster.sendMessage('trk:event', 'preview', 'arrow-key', this, self.slideshowid);
                     slideshow_next();
                 }
                 else if (e.keyCode === 46 && fullScreenManager) {
                     fullScreenManager.exitFullscreen();
                 }
                 else if (e.keyCode === 27 && slideshowid && !$document.fullScreen()) {
+                    mBroadcaster.sendMessage('trk:event', 'preview', 'close-btn', this, self.slideshowid);
+
                     if ($.dialog) {
                         closeDialog($.dialog);
                     }
@@ -1285,6 +1291,8 @@ var slideshowid;
 
             // Close icon
             $('.v-btn.close, .viewer-error-close', $overlay).rebind('click.media-viewer', function() {
+                mBroadcaster.sendMessage('trk:event', 'preview', 'close-btn', this, self.slideshowid);
+
                 if (page === 'download') {
                     if ($(document).fullScreen()) {
                         fullScreenManager.exitFullscreen();
@@ -1864,6 +1872,7 @@ var slideshowid;
         }
         var n = slideshow_node(id, $overlay);
         var $content = $('.content', $overlay);
+        const autoPlay = $.autoplay === id;
         const $pendingBlock = $('.loader-grad', $content);
         var $video = $('video', $content);
         var $playVideoButton = $('.play-video-button', $content);
@@ -1919,6 +1928,7 @@ var slideshowid;
 
             initVideoStream(n, $overlay, destroy).done(streamer => {
                 preqs[n.h] = streamer;
+                preqs[n.h].options.uclk = !autoPlay;
 
                 preqs[n.h].ev1 = mBroadcaster.addListener('slideshow:next', destroy);
                 preqs[n.h].ev2 = mBroadcaster.addListener('slideshow:prev', destroy);

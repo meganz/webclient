@@ -169,8 +169,8 @@ function removeUInode(h, parent) {
     }
 
     // Remove item in subtitles dialog
-    if ($.dialog === 'subtitles-dialog') {
-        $('.add-subtitles-dialog #' + h).remove();
+    if ($.subtitlesMegaRender && $.subtitlesMegaRender.nodeMap) {
+        $.subtitlesMegaRender.revokeDOMNode(h, true);
     }
 
     if (M.megaRender && M.megaRender.megaList) {
@@ -382,6 +382,7 @@ async function fmremove(selectedNodes, skipDelWarning) {
     else {
         var moveToRubbish = function() {
             mLoadingSpinner.show('move-to-rubbish');
+            mBroadcaster.sendMessage('trk:event', 'move-to-rubbish', 'remove', selectedNodes);
 
             return M.moveToRubbish(selectedNodes)
                 .catch(tell)

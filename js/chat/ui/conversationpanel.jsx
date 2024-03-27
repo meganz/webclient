@@ -463,7 +463,7 @@ export class ConversationRightArea extends MegaRenderMixin {
 
     LeaveButton = withHostsObserver(
         ({ chatRoom, hasHost, confirmLeave, onLeave }) => {
-            const isDisabled = chatRoom.call || chatRoom.isReadOnly() || is_chatlink;
+            const isDisabled = chatRoom.call || is_chatlink || !chatRoom.iAmInRoom();
             const participants = chatRoom.getParticipantsExceptMe();
 
             return (

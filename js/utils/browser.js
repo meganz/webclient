@@ -377,6 +377,10 @@ function browserdetails(useragent) {
         icon = 'mega.png';
         browser = 'MEGAcmd';
     }
+    else if (useragent.indexOf(' megaandroid/') === 0 || useragent.indexOf(' megaios/') === 0) {
+        icon = 'mega.png';
+        browser = 'MEGA App';
+    }
     else if (useragent.indexOf('msie') > 0
         || useragent.indexOf('trident') > 0) {
         browser = 'Internet Explorer';
@@ -400,12 +404,14 @@ function browserdetails(useragent) {
         if (guess && !guess.includes('Mozilla')) {
             browser = guess.split('/').shift();
             details.wild = true;
+            icon = 'unknown.png';
         }
     }
     else if (/^[\sa-z]+\/\d/.test(useragent)) {
         verSep = '^';
         browser = String(origUA).split('/').shift().trim();
         details.wild = true;
+        icon = 'unknown.png';
     }
 
     if (browser === 'Edgium') {

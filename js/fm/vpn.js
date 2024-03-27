@@ -4,16 +4,6 @@ class VpnCredsManager {
         console.log('Non-static member.'); // Jenkins
     }
 
-    static get credentialCreated() {
-        this._credentialCreated = this._credentialCreated || new MEvent();
-        return this._credentialCreated;
-    }
-
-    static get credentialDeactivated() {
-        this._credentialDeactivated = this._credentialDeactivated || new MEvent();
-        return this._credentialDeactivated;
-    }
-
     static getLocations() {
 
         return api.req({a: 'vpnr'})
@@ -61,7 +51,6 @@ class VpnCredsManager {
                     keypair: keypair,
                 };
 
-                VpnCredsManager.credentialCreated.invoke(cred);
                 return cred;
             })
             .catch((ex) => {
@@ -86,7 +75,6 @@ class VpnCredsManager {
             .then(({result}) => {
                 assert(result === 0);
 
-                this.credentialDeactivated.invoke(slotNum);
                 return result;
             })
             .catch((ex) => {

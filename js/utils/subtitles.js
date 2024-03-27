@@ -1,3 +1,4 @@
+/** @property mega.utils.subtitles */
 lazy(mega.utils, 'subtitles', () => {
     'use strict';
 
@@ -52,8 +53,8 @@ lazy(mega.utils, 'subtitles', () => {
                         if (!node) {
                             return false;
                         }
+                        mBroadcaster.sendMessage('trk:event', 'media-journey', 'subtitles', 'add', node);
 
-                        eventlog(99989, true);
                         this.disable();
                         await this.subtitlesManager.addSubtitles(node);
                     }
@@ -73,7 +74,10 @@ lazy(mega.utils, 'subtitles', () => {
 
                     $(this.el).off('click.subtitle_row');
                     $(document).off('keydown.subtitle_row');
+                    $('.mega-button:not(.positive)', this.el).off('click.cancel');
+                    $('.close', this.el).off('click.close');
                     delete window.disableVideoKeyboardHandler;
+                    delete $.subtitlesMegaRender;
                 },
                 dialogName: 'subtitles-dialog'
             });
@@ -108,6 +112,7 @@ lazy(mega.utils, 'subtitles', () => {
                 Ps.initialize(container);
                 const table = this.el.querySelector('.subtitles-grid-table');
                 const rows = table.querySelector('tbody');
+                $.subtitlesMegaRender = megaRender;
 
                 rowsObserver = new MutationObserver(() => {
                     const el = rows.querySelector('tr.ui-selected');
@@ -175,6 +180,14 @@ lazy(mega.utils, 'subtitles', () => {
 
             mBroadcaster.once('slideshow:close', () => {
                 this.hide();
+            });
+
+            $('.mega-button:not(.positive)', this.el).rebind('click.cancel', () => {
+                mBroadcaster.sendMessage('trk:event', 'media-journey', 'subtitles', 'cancel');
+            });
+
+            $('.close', this.el).rebind('click.close', () => {
+                mBroadcaster.sendMessage('trk:event', 'media-journey', 'subtitles', 'close');
             });
         }
 
@@ -270,17 +283,16 @@ lazy(mega.utils, 'subtitles', () => {
 
     class SubtitlesFactory {
         constructor() {
-            this.initParsers();
+            /** @property SubtitlesFactory._parsers */
+            lazy(this, '_parsers', () => {
+                return [
+                    new SRTSubtitles(),
+                    new VTTSubtitles()
+                ];
+            });
         }
 
-        initParsers() {
-            this._parsers = [
-                new SRTSubtitles(),
-                new VTTSubtitles()
-            ];
-        }
-
-        extensions() {
+        get extensions() {
             return this._parsers.map((parser) => parser.ext);
         }
 
@@ -293,7 +305,8 @@ lazy(mega.utils, 'subtitles', () => {
 
     class SubtitlesManager {
         constructor() {
-            this._factory = new SubtitlesFactory();
+            /** @property SubtitlesManager._factory */
+            lazy(this, '_factory', () => new SubtitlesFactory());
             this.init();
         }
 
@@ -302,6 +315,7 @@ lazy(mega.utils, 'subtitles', () => {
                 node: -1,
                 cue: -1
             };
+            return this;
         }
 
         init(wrapper) {
@@ -309,7 +323,8 @@ lazy(mega.utils, 'subtitles', () => {
             this._nodes = [];
             this._cues = [];
             this._subtitles = [];
-            this.resetIndex();
+
+            return this.resetIndex();
         }
 
         initSubtitlesMenu() {
@@ -333,10 +348,10 @@ lazy(mega.utils, 'subtitles', () => {
 
         async configure(vNode) {
             const vName = fileName(vNode);
-            const extensions = this._factory.extensions();
+            const {extensions} = this._factory;
             const promises = [];
 
-            const nodesIds = (vNode.p) ? Object.keys(M.c[vNode.p]) : [];
+            const nodesIds = Object.keys(M.c[vNode.p] || {});
             const nodes = [];
 
             for (const id of nodesIds) {
@@ -432,8 +447,9 @@ lazy(mega.utils, 'subtitles', () => {
         }
 
         async searchSubtitles() {
-            const extensions = this._factory.extensions();
             const nodes = [];
+            const {extensions} = this._factory;
+
             for (const ext of extensions) {
                 if (folderlink) {
                     for (let i = 0; i < M.v.length; i++) {
@@ -497,7 +513,7 @@ lazy(mega.utils, 'subtitles', () => {
 
         displaySubtitles(streamer, subtitles) {
             this.cue(
-                streamer.currentTime * 1000,
+                streamer ? streamer.currentTime * 1000 : 0,
                 (cue) => subtitles.safeHTML(cue),
                 () => subtitles.empty()
             );

@@ -3042,6 +3042,8 @@ function loadSubPage(tpage, event) {
     }
 
     if (window.slideshowid) {
+        mBroadcaster.sendMessage('trk:event', 'preview', 'close-nav', tpage, slideshowid);
+
         slideshow(0, 1);
     }
 

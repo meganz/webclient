@@ -2810,6 +2810,7 @@ else if (!browserUpdate) {
     jsl.push({f:'css/checkboxes.css', n: 'checkboxes_css', j:2,w:5,c:1,d:1,cache:1});
 
     jsl.push({f:'css/media-viewer.css', n: 'media_viewer_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/video-player.css', n: 'video_player_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/animations.css', n: 'animations_css', j:2, w:30, c:1, d:1, cache:1});
 
@@ -3158,6 +3159,7 @@ else if (!browserUpdate) {
         jsl.push({f:'nodedec.js', n: 'nodedec_js', j: 1});
         jsl.push({f:'js/vendor/jquery.js', n: 'jquery', j: 1, w: 10});
         jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
+        jsl.push({f:'js/vendor/jquery.mousewheel.js', n: 'jquerymouse_js', j: 1});
         jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j: 1});
         jsl.push({f:'html/js/embedplayer.js', n: 'embedplayer_js', j: 1, w: 4});
         jsl.push({f:'js/transfers/cloudraid.js', n: 'cloudraid_js', j: 1});
@@ -3178,6 +3180,7 @@ else if (!browserUpdate) {
 
         jsl.push({f:'js/crypto.js', n: 'crypto_js', j: 1, w: 5});
         jsl.push({f:'js/account.js', n: 'user_js', j: 1});
+        jsl.push({f:'js/ui/contextMenu.js', n: 'context_menu_js', j: 1});
 
         jsl.push({f:'js/transfers/queue.js', n: 'queue', j: 1, w: 4});
         jsl.push({f:'js/transfers/decrypter.js', n: 'dl_downloader', j: 1, w: 3});
@@ -3185,6 +3188,8 @@ else if (!browserUpdate) {
 
         jsl.push({f:'html/embedplayer.html', n: 'index', j: 0});
         jsl.push({f:'css/embedplayer.css', n: 'embedplayer_css', j: 2, w: 5});
+        jsl.push({f:'css/video-player.css', n: 'video_player_css', j: 2});
+        jsl.push({f:'css/sprites/embed-mono@mono.css', n: 'embed_mono_css', j:2});
     }
 
     if (is_drop) {
@@ -3977,6 +3982,7 @@ else if (!browserUpdate) {
 
             document.body.textContent = '';
             document.body.style.background = is_drop ? '#fff' : '#000';
+            document.body.className = is_drop ? 'theme-light' : 'theme-dark-forced';
             jsl_progress = function() {};
         }
         catch (ex) {

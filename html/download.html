@@ -114,6 +114,14 @@
                                                         [$video_player_subtitles]
                                                     </div>
                                                 </div>
+                                                <div class="settings-wrapper">
+                                                    <button class="v-btn settings" aria-label="[[settings]]" data-state="settings">
+                                                        <i class="sprite-fm-mono icon-settings-02-small-regular-outline"></i>
+                                                    </button>
+                                                    <div class="tooltip">
+                                                        [$823]
+                                                    </div>
+                                                </div>
                                                 <div class="fs-wrapper">
                                                     <button class="v-btn fs" aria-label="[[fullscreen]]" data-state="go-fullscreen">
                                                         <!-- Active state: .icon-fullscreen-leave !-->
@@ -176,27 +184,44 @@
                                             </ul>
                                         </nav>
                                     </template>
-                                    <template id="media-viewer-subtitles-menu">
-                                        <nav class="context-menu subtitles options-menu avoid-bottom" aria-expanded="false">
+                                    <template id="media-viewer-video-settings-menu">
+                                        <nav class="context-menu settings options-menu avoid-bottom" aria-expanded="false">
                                             <ul>
                                                 <li>
-                                                    <div class="title">[$video_player_subtitles]</div>
-                                                </li>
-                                                <li class="options">
-                                                    <div class="options-wrapper">
-                                                        <button class="off">
-                                                            <span>[$video_player_off]</span>
-                                                            <i class="sprite-fm-mono icon-active icon-check-small-regular-outline"></i>
-                                                        </button>
+                                                    <div class="settings-wrapper">
+                                                        <span>[$video_player_brightness]</span>
+                                                        <div class="settings-range">
+                                                            <span>0</span>
+                                                            <div class="settings-bar brightness-bar"><span></span></div>
+                                                            <div class="value">50</div>
+                                                            <span>100</span>
+                                                        </div>
                                                     </div>
                                                 </li>
-                                                <li class="divider">
-                                                    <hr/>
+                                                <li>
+                                                    <div class="settings-wrapper">
+                                                        <span>[$video_player_contrast]</span>
+                                                        <div class="settings-range">
+                                                            <span>0</span>
+                                                            <div class="settings-bar contrast-bar"><span></span></div>
+                                                            <div class="value">50</div>
+                                                            <span>100</span>
+                                                        </div>
+                                                    </div>
                                                 </li>
                                                 <li>
-                                                    <button class="add">
-                                                        <span>[$video_player_add_subtitles]</span>
-                                                    </button>
+                                                    <div class="settings-wrapper">
+                                                        <span>[$video_player_saturation]</span>
+                                                        <div class="settings-range">
+                                                            <span>0</span>
+                                                            <div class="settings-bar saturate-bar"><span></span></div>
+                                                            <div class="value">50</div>
+                                                            <span>100</span>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <button class="reset-all invisible">[$video_player_reset_all]</button>
                                                 </li>
                                             </ul>
                                         </nav>

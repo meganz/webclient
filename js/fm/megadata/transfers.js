@@ -1778,7 +1778,7 @@ MegaData.prototype.showTransferToast = function showTransferToast(t_type, t_leng
         }
 
         // Only display the "Show me" button in the toast if the user is logged in
-        if (u_type) {
+        if (self.fminitialized && u_type) {
             buttons.push({
                 text: l[7224],
                 onClick: () => {
@@ -1788,7 +1788,7 @@ MegaData.prototype.showTransferToast = function showTransferToast(t_type, t_leng
                     if (el) {
                         el.classList.add('hidden');
                     }
-                    document.querySelector('.nw-fm-left-icon.transfers').click();
+                    $('.nw-fm-left-icon.transfers').trigger('click');
                 }
             });
         }
@@ -2239,7 +2239,8 @@ function tfsheadcalc(update) {
             delete tfsheadupdate.stats[type][update.c];
             break;
         }
-        default: {
+        default:
+            if (tfsheadupdate.stats[type]) {
             const id = update[key];
             if (
                 typeof tfsheadupdate.stats[type][id] !== "undefined"

@@ -2137,7 +2137,9 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
     }
 
     // Restore the latest changed permission
-    if ($.changedPermissions[userHandle]) {
+    if ($.changedPermissions
+        && $.changedPermissions[userHandle]) {
+
         permissionLevel = $.changedPermissions[userHandle].r;
     }
 
@@ -2524,13 +2526,13 @@ function initShareDialogMultiInput(alreadyAddedContacts) {
             var newEmailsNum = $newEmails.length;
             var noNewContacts = true;
 
-            setTimeout(function() {
+            onIdle(() => {
                 $('.token-input-input-token-mega input', $scope).trigger("blur");
-            }, 0);
+            });
 
             for (var i = 0; i < newEmailsNum; i++) {
                 var newEmail = $($newEmails[i]).contents().eq(1).text();
-                if (typeof M.findOutgoingPendingContactIdByEmail(newEmail) === 'undefined') {
+                if (!M.findOutgoingPendingContactIdByEmail(newEmail)) {
                     noNewContacts = false;
                     break;
                 }
@@ -2543,11 +2545,13 @@ function initShareDialogMultiInput(alreadyAddedContacts) {
             }
 
             // If no new email is in multiInput box and contact picker, disable the button
-            if (JSON.stringify(clone($.contactPickerSelected).sort()) === JSON.stringify(alreadyAddedContacts.sort())
-                && newEmailsNum === 0) {
-                $('.add-share', $scope).addClass('disabled');
-            }
+            if (newEmailsNum === 0) {
+                const sel = $.contactPickerSelected;
 
+                if (Array.isArray(sel) && JSON.stringify(sel.sort()) === JSON.stringify(alreadyAddedContacts.sort())) {
+                    $('.add-share', $scope).addClass('disabled');
+                }
+            }
         }
     });
 }
@@ -2619,10 +2623,9 @@ function initShareDialog() {
     });
 
     // Change the permission for the specific contact or group
-    // eslint-disable-next-line complexity
     $('.share-dialog-permissions-menu .option', $dialog).rebind('click', function(e) {
         var $this = $(this);
-        var shares = M.d[$.selected[0]].shares;
+        const {shares} = M.getNodeByHandle($.selected[0]);
         var newPermLevel = checkMultiInputPermission($this);
         var newPerm = sharedPermissionLevel(newPermLevel[0]);
         var $selectedContact =  $('.share-dialog-access-node.active', $dialog);

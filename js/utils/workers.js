@@ -64,7 +64,6 @@ function CreateWorkers(url, message, size) {
             console.error(wid, ex);
         }
         msgDialog('warninga', l[47], '' + ex, l[20858]);
-        throw ex;
     };
 
     var create = function(i) {
@@ -83,7 +82,7 @@ function CreateWorkers(url, message, size) {
                 // this should not happens, onerror shall be reached instead, if some fancy browser does it fix this!
                 return false;
             }
-            workerLoadFailure(e);
+            return workerLoadFailure(e);
         }
 
         w.id = i;

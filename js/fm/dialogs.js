@@ -1199,10 +1199,9 @@
 
     /** Checks if the user can access dialogs copy/move/share */
     var isUserAllowedToOpenDialogs = function() {
-        if (M.isInvalidUserStatus()) {
-            return false;
-        }
-        return true;
+        console.assert($dialog, 'The dialogs subsystem is not yet initialized!');
+
+        return $dialog && !M.isInvalidUserStatus();
     };
 
     // ------------------------------------------------------------------------
@@ -1345,6 +1344,10 @@
      * @returns {Object}        The jquery object of the dialog
      */
     global.openSaveAsDialog = function(node, content, cb) {
+        if (!isUserAllowedToOpenDialogs()) {
+            return false;
+        }
+
         // Not allowed chats
         M.safeShowDialog('saveAs', function() {
             const ltWSpaceWarning = new InputFloatWarning($dialog);

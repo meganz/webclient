@@ -1127,8 +1127,11 @@ ChatRoom.prototype.setRoomTitle = function(newTopic, allowEmpty) {
  */
 
 ChatRoom.prototype.leave = function(notify) {
-    assert(this.type === 'group' || this.type === 'public', `Can't leave room "${this.roomId}" of type "${this.type}"`);
-
+    const valid = this.type === 'group' || this.type === 'public';
+    console.assert(valid, `Can't leave room "${this.roomId}" of type "${this.type}"`);
+    if (!valid) {
+        return;
+    }
     this._leaving = true;
     this.topic = '';
 
@@ -2223,9 +2226,12 @@ ChatRoom.prototype.subscribeForCallEvents = function() {
         this.callParticipantsUpdated();
     });
     this.rebind('onCallState.callManager', function(e, data) {
-        assert(this.activeCallIds[data.callId], `unknown call: ${data.callId}`);
-        callMgr.onCallState(data, this);
-        this.callParticipantsUpdated();
+        const ac = this.activeCallIds[data.callId];
+        console.assert(ac, `unknown call: ${data.callId}`);
+        if (ac) {
+            callMgr.onCallState(data, this);
+            this.callParticipantsUpdated();
+        }
     });
     this.rebind('onRoomDisconnected.callManager', function() {
         this.activeCallIds.clear(); // av: Added this to complement the explicit handling of chatd call events

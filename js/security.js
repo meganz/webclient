@@ -650,6 +650,10 @@ var security = {
                             var $input = $('.pass', $dialog);
                             var pwd = $input.val();
 
+                            if (!window.u_attr || !u_attr.evk) {
+                                return tell(ESID);
+                            }
+
                             showLoading();
                             security.verifyPassword(pwd, u_attr.evk, u_attr.privk)
                                 .then(function(res) {

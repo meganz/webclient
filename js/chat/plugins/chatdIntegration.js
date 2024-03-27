@@ -758,7 +758,7 @@ ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatIn
                             else {
                                 // someone else left the room
                                 if (
-                                    !M.u[v.u].c &&
+                                    !(M.u[v.u] && M.u[v.u].c) &&
                                     typeof(chatRoom.megaChat.plugins.presencedIntegration) !== 'undefined'
                                 ) {
                                     chatRoom.megaChat.plugins.presencedIntegration.eventuallyRemovePeer(

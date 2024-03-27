@@ -997,7 +997,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         }
         else if (isMegaList) {
             __showBtn('options');
-            const isSearch = page.startsWith('fm/search');
+            const isSearch = String(self.page).startsWith('fm/search');
             const selNode = M.getNodeByHandle($.selected[0]);
             const sourceRoot = M.getSelectedSourceRoot(isSearch);
             const shareButton = selectionLinkWrapper.querySelector(`.js-statusbarbtn.share`);

@@ -4069,12 +4069,18 @@ function loadfm_done(mDBload) {
         })
         .then(_completion)
         .catch((ex) => {
+            const eno = typeof ex === 'number' && ex < 0;
+            if (eno) {
+                ex = api_strerror(ex);
+            }
 
             // give time for window.onerror to fire 'cd2' before showing the blocking confirm-dialog
             setTimeout(() => siteLoadError(ex, 'loadfm'), 2e3);
 
             // reach window.onerror
-            reportError(ex);
+            if (!eno) {
+                reportError(ex);
+            }
         });
 }
 

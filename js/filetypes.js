@@ -736,10 +736,13 @@ function folderIcon(node) {
  * @returns {String} Folder Icon name
  */
 function fileIcon(node) {
-
     'use strict';
 
     let icon = '';
+
+    if (!node) {
+        return 'generic';
+    }
 
     if (node.t) {
 

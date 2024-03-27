@@ -646,7 +646,9 @@ Chat.prototype.registerUploadListeners = function() {
             ul.h = handle;
 
             if (ul.efa && !n) {
-                logger.error('Invalid state, efa set on deduplication?', ul.efa, ul);
+                if (d) {
+                    logger.error('Invalid state, efa set on deduplication?', ul.efa, ul);
+                }
                 ul.efa = 0;
             }
 

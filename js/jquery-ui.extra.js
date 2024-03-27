@@ -162,11 +162,11 @@ $.widget.extend($.ui.selectable.prototype, {
         for (let i = $target.length; i--;) {
             var doSelect;
             const selectee = $.data($target[i], 'selectable-item');
-            if (selectee) {
+            if (selectee && selectee.element) {
                 doSelect = !event.metaKey && !event.ctrlKey ||
                     !selectee.$element.hasClass('ui-selected');
-                this._removeClass(selectee.$element, doSelect ? 'ui-unselecting' : 'ui-selected')
-                    ._addClass(selectee.$element, doSelect ? 'ui-selecting' : 'ui-unselecting');
+                selectee.element.classList.remove(doSelect ? 'ui-unselecting' : 'ui-selected');
+                selectee.element.classList.add(doSelect ? 'ui-selecting' : 'ui-unselecting');
                 selectee.unselecting = !doSelect;
                 selectee.selecting = doSelect;
                 selectee.selected = doSelect;
@@ -193,7 +193,7 @@ $.widget.extend($.ui.selectable.prototype, {
 
         this.dragged = true;
 
-        if (this.options.disabled) {
+        if (this.options.disabled || !this.opos) {
             return;
         }
 
@@ -402,6 +402,10 @@ $.widget.extend($.ui.selectable.prototype, {
                 if (M.megaRender.megaList) {
                     delete this.mlistMap;
                 }
+            }
+
+            if (!(selectee && selectee.element)) {
+                continue;
             }
 
             if (elm.classList.contains('ui-unselecting')) {

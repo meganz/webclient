@@ -2232,11 +2232,13 @@ else if (!browserUpdate) {
                 || dump.m.indexOf('Cannot redefine property') !== -1
                 || dump.m.indexOf("evaluating 'ze(e,t)'") !== -1
                 || dump.m.indexOf("evaluating 'r(a,c)'") !== -1
+                || dump.m.indexOf("evaluating 'a.L") !== -1
                 || dump.m.indexOf('Error: hookFull') !== -1;
 
             if (injectedScript) {
                 window.onerror = null;
                 window.log99723 = true;
+                expectedSourceOrigin = false;
             }
 
             if (expectedSourceOrigin && !window.u_checked) {
@@ -3158,6 +3160,7 @@ else if (!browserUpdate) {
         jsl.push({f:'sjcl.js', n: 'sjcl_js', j: 1});
         jsl.push({f:'nodedec.js', n: 'nodedec_js', j: 1});
         jsl.push({f:'js/vendor/jquery.js', n: 'jquery', j: 1, w: 10});
+        jsl.push({f:'js/jquery.protect.js', n: 'jqueryprotect_js', j:1});
         jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
         jsl.push({f:'js/vendor/jquery.mousewheel.js', n: 'jquerymouse_js', j: 1});
         jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j: 1});
@@ -4479,6 +4482,24 @@ function tell(ex) {
     msgDialog('warninga', l[135], l[47], ex < 0 ? api_strerror(ex) : ex);
 }
 
+tryCatch(function(x) {
+    'use strict';
+    var ael = x.addEventListener;
+    var psy = tryCatch(function(f) {
+        return String(f).indexOf('Synchronizetion') > 0;
+    });
+    x.addEventListener = function(t, f) {
+        if (t === 'contextmenu' && psy(f)) {
+            window.onerror = null;
+            return;
+        }
+        return ael.apply(x, arguments);
+    };
+    mBroadcaster.once('startMega', tryCatch(function() {
+        x.addEventListener = ael;
+    }));
+})(window);
+
 var dump = nop;
 mBroadcaster.once('startMega', function() {
     'use strict';
@@ -4517,7 +4538,6 @@ mBroadcaster.once('startMega', function() {
     }
 
     Object.defineProperty(window, 'dump', {value: console.warn.bind(console, '[dump]')});
-    onIdle(postMessage.bind(self, {disableRightClick: -1, type: 'enable-right-click'}));
 });
 
 Object.defineProperty(self, 's4', {value: Object.create(null)});

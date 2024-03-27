@@ -127,7 +127,7 @@ lazy(mega.utils, 'subtitles', () => {
 
                 $(this.el).rebind('click.subtitle_row', '.file', (e) => selectTableRow(this, e));
 
-                $(document).rebind('keydown.subtitle_row', (e) => {
+                $(document).rebind('keydown.subtitle_row', tryCatch((e) => {
                     const isDown = e.keyCode === 40;
                     const isUp = !isDown && e.keyCode === 38;
 
@@ -136,7 +136,7 @@ lazy(mega.utils, 'subtitles', () => {
                     if (specialKeysOn) {
                         e.preventDefault();
                         e.stopPropagation();
-                        return;
+                        return false;
                     }
 
                     if (!isDown && !isUp) {
@@ -167,7 +167,8 @@ lazy(mega.utils, 'subtitles', () => {
 
                     e.preventDefault();
                     e.stopPropagation();
-                });
+                    return false;
+                }));
             }
             else {
                 const container = emptySubtitles.cloneNode(true);

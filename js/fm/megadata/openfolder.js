@@ -884,7 +884,7 @@
                     await dbfetch.tree([id]);
                 }
             }
-            else if (!dynPages[id]) {
+            else if (id && !dynPages[id]) {
                 const stream = fminitialized && !is_mobile;
 
                 if (stream) {

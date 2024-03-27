@@ -512,6 +512,8 @@
 
         if ((filecnt === 1) && (foldercnt === 0)) {
             $('#previousversions').rebind('click', function(ev) {
+                mBroadcaster.sendMessage('trk:event', 'properties-dialog', 'click', 'file-version', n);
+
                 if (M.currentrootid !== M.RubbishID) {
                     if (slideshowid) {
                         slideshow(n.h, 1);

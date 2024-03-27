@@ -105,7 +105,7 @@ function init_embed(ph, key, g) {
             open(getAppBaseUrl());
         });
 
-        $('.embedcode-item, .getlink-item, .share-generic').rebind('click', function() {
+        $('.embedcode-item, .getlink-item, .share').rebind('click', function() {
             var playing = false;
             var timeoffset = 0;
             var $block = $('.sharefile-block');
@@ -119,8 +119,8 @@ function init_embed(ph, key, g) {
                 $wrapper.removeClass('share-option');
             });
 
-            $('.sharefile-buttons .copy', $block).rebind('click', function() {
-                var content = String($('.tab-content', $block).text());
+            $('.copy', $block).rebind('click', function() {
+                let content = String(this.previousElementSibling.querySelectorAll('.tab-content')[0].textContent);
                 if (playing && document.getElementById('timecheckbox').checked) {
                     content = content.replace(/[!/][\w-]{8}[!#][^"]+/, '$&!' + timeoffset + 's');
                 }
@@ -134,17 +134,9 @@ function init_embed(ph, key, g) {
 
             (function _() {
                 $('.tab-link', $block).removeClass('active').rebind('click', _);
-
-                if ($(this).is('.getlink-item, .share-link')) {
-                    $('.tab-link.share-link', $block).addClass('active');
-                    $('.tab-content', $block).text(url.replace('/embed', '/' + (mega.flags.nlfe ? 'file' : '')));
-                    $('.sharefile-settings', $block).addClass('hidden');
-                }
-                else {
-                    $('.tab-link.share-embed-code', $block).addClass('active');
-                    $('.tab-content', $block).text(embed.replace('%', url));
-                    $('.sharefile-settings', $block).removeClass('hidden');
-                }
+                $('.share-link .tab-content', $block)
+                    .text(url.replace('/embed', '/' + (mega.flags.nlfe ? 'file' : '')));
+                $('.embed-code .tab-content', $block).text(embed.replace('%', url));
             }).call(this);
 
             if (node.stream) {

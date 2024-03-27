@@ -15,6 +15,7 @@ function browserdetails(useragent) {
     var brand = false;
     var details = {};
     var displayName;
+    var origUA = useragent;
 
     if (useragent === undefined || useragent === ua) {
         current = true;
@@ -102,10 +103,26 @@ function browserdetails(useragent) {
         brand = 'IEMobile';
         browser = 'Internet Explorer';
     }
+    else if (useragent.indexOf('oculusbrowser/') > 0) {
+        icon = 'oculus.png';
+        browser = 'OculusBrowser';
+    }
+    else if (useragent.indexOf('immersed/') > 0) {
+        browser = 'Immersed';
+    }
+    else if (useragent.indexOf('samsungbrowser') > 0) {
+        icon = 'samsung.png';
+        browser = 'SamsungBrowser';
+    }
     else if (useragent.indexOf('smarttv') > 0
+        || useragent.indexOf('smart-tv') > 0
         || useragent.indexOf('smart_tv') > 0
+        || useragent.indexOf('ezcast') > 0
         || useragent.indexOf('netcast') > 0
         || useragent.indexOf('webos') > 0
+        || useragent.indexOf(' tizen') > 0
+        || useragent.indexOf('appletv') > 0
+        || useragent.indexOf('tvos') > 0
         || useragent.indexOf('hbbtv') > 0) {
         icon = 'linux.png';
         browser = 'SmartTV';
@@ -171,6 +188,10 @@ function browserdetails(useragent) {
         browser = 'Edge';
         details.brand = verTag = 'EdgA';
     }
+    else if (useragent.indexOf(' edgw/') > 0) {
+        browser = 'Edge';
+        details.brand = verTag = 'EdgW';
+    }
     else if (useragent.indexOf(' edgios') > 0) {
         browser = 'Edge';
         details.brand = verTag = 'EdgiOS';
@@ -190,12 +211,15 @@ function browserdetails(useragent) {
     else if (useragent.indexOf('ucbrowser') > 0) {
         browser = 'UCBrowser';
     }
-    else if (useragent.indexOf('samsungbrowser') > 0) {
-        icon = 'samsung.png';
-        browser = 'SamsungBrowser';
+    else if (useragent.indexOf('windvane') > 0) {
+        browser = 'WindVane';
     }
     else if (useragent.indexOf('yabrowser') > 0) {
         browser = 'YaBrowser';
+    }
+    else if (useragent.indexOf('yasearchbrowser') > 0) {
+        browser = 'YaBrowser';
+        verTag = 'YaSearchBrowser';
     }
     else if (useragent.indexOf('miuibrowser') > 0) {
         verTag = 'XiaoMi/MiuiBrowser';
@@ -230,12 +254,75 @@ function browserdetails(useragent) {
         icon = 'coc.png';
         verTag = 'coc_coc_browser';
     }
+    else if (useragent.indexOf('maxbrowser') > 0) {
+        icon = 'max.png';
+        browser = 'MaxBrowser';
+    }
+    else if (useragent.indexOf(' kik/') === 0) {
+        browser = 'Kik';
+    }
+    else if (useragent.indexOf(' silk/') > 0) {
+        browser = 'Silk';
+    }
+    else if (useragent.indexOf(' soul/') > 0) {
+        browser = 'Soul';
+    }
+    else if (useragent.indexOf(' stargon/') > 0) {
+        browser = 'Stargon';
+    }
+    else if (useragent.indexOf(' sleipnir/') > 0) {
+        browser = 'Sleipnir';
+    }
+    else if (useragent.indexOf(' tenta/') > 0) {
+        browser = 'Tenta';
+    }
+    else if (useragent.indexOf(' quark/') > 0) {
+        browser = 'Quark';
+    }
+    else if (useragent.indexOf(' falkon/') > 0) {
+        browser = 'Falkon';
+    }
+    else if (useragent.indexOf('qtwebengine') > 0) {
+        icon = 'qtweb.png';
+        browser = 'QtWebEngine';
+    }
+    else if (useragent.indexOf('jiosphere/') > 0
+        || useragent.indexOf('jiopages/') > 0) {
+
+        browser = 'JioSphere';
+    }
+    else if (useragent.indexOf(' rddocuments/') > 0) {
+        icon = 'rdd.png';
+        browser = 'Documents 5 App';
+    }
+    else if (useragent.indexOf(' canvasframe/') > 0) {
+        icon = 'canvas.png';
+        browser = 'CanvasFrame';
+    }
+    else if (useragent.indexOf('huaweibrowser') > 0) {
+        icon = 'huaw.png';
+        browser = 'HuaweiBrowser';
+    }
+    else if (useragent.indexOf('heytapbrowser') > 0) {
+        icon = 'hey.png';
+        browser = 'HeyTapBrowser';
+    }
     else if (useragent.indexOf(' [fb') > 0
         || useragent.indexOf(' steam ') > 0
         || useragent.indexOf(' eve-') > 0
+        || useragent.indexOf(' zalo') > 0
         || useragent.indexOf(' kik/') > 0
         || useragent.indexOf(' gsa/') > 0
+        || useragent.indexOf('yjapp') > 0
+        || useragent.indexOf('talk/') > 0
+        || useragent.indexOf('(inapp') > 0
+        || useragent.indexOf('webview') > 0
+        || useragent.indexOf('akaotalk') > 0
+        || useragent.indexOf('inkedina') > 0
+        || useragent.indexOf('adfitsdk/') > 0
         || useragent.indexOf('messenger') > 0
+        || useragent.indexOf('ok.katana;') > 0
+        || useragent.indexOf('bingsapphire') > 0
         || useragent.indexOf('twit' + 'ter') > 0
         || useragent.indexOf('cros' + 'swalk') > 0
         || useragent.indexOf('snap' + 'chat') > 0
@@ -255,6 +342,9 @@ function browserdetails(useragent) {
         }
 
         details.brand = os === 'Android' ? 'Chrome' : 'Safari';
+    }
+    else if (useragent.indexOf(' line/') > 0) {
+        browser = 'Line';
     }
     else if (useragent.indexOf(' chromium/') > 0) {
         browser = 'Chromium';
@@ -295,11 +385,37 @@ function browserdetails(useragent) {
         icon = 'mega.png';
         browser = 'MEGA VPN';
     }
+    else if (useragent.indexOf('://') > 0) {
+        icon = 'bot.png';
+        os = os || 'Linux';
+        browser = 'Crawler';
+    }
+    else if (useragent.startsWith(' mozilla')) {
+        const guess = String(origUA)
+            .replace(/\([^)]+\)/g, '')
+            .split(/\s+/)
+            .filter((s) => /^\w{3,9}\/\d+\.\d/.test(s))
+            .pop();
+
+        if (guess && !guess.includes('Mozilla')) {
+            browser = guess.split('/').shift();
+            details.wild = true;
+        }
+    }
+    else if (/^[\sa-z]+\/\d/.test(useragent)) {
+        verSep = '^';
+        browser = String(origUA).split('/').shift().trim();
+        details.wild = true;
+    }
 
     if (browser === 'Edgium') {
         icon = 'edgium.png';
         verTag = verTag || 'Chrome';
         displayName = 'Edge (Chromium)';
+    }
+    else if (verTag === 'EdgW') {
+        icon = 'edgium.png';
+        displayName = 'Edge (WebView)';
     }
 
     // Translate "%1 on %2" to "Chrome on Windows"

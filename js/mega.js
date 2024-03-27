@@ -3508,7 +3508,7 @@ function processMCSM(mcsm, ignoreDB) {
     'use strict';
 
     if (Array.isArray(mcsm)) {
-        for (let i = mcsm.length; i--;) {
+        for (let i = 0; i < mcsm.length; i++) {
             const scheduledMeeting = mcsm[i];
             if (fmdb && !pfkey && !ignoreDB) {
                 fmdb.add('mcsm', { id: scheduledMeeting.id, d: scheduledMeeting });
@@ -4069,12 +4069,18 @@ function loadfm_done(mDBload) {
         })
         .then(_completion)
         .catch((ex) => {
+            const eno = typeof ex === 'number' && ex < 0;
+            if (eno) {
+                ex = api_strerror(ex);
+            }
 
             // give time for window.onerror to fire 'cd2' before showing the blocking confirm-dialog
             setTimeout(() => siteLoadError(ex, 'loadfm'), 2e3);
 
             // reach window.onerror
-            reportError(ex);
+            if (!eno) {
+                reportError(ex);
+            }
         });
 }
 

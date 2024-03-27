@@ -347,7 +347,7 @@ lazy(s4, 'ui', () => {
 
                 // Temp Policy Attachment value update
                 // @todo fix when s4.p/info is implemented
-                if (s4.ui.lastPathPart && s4.ui.selectedTab.includes('policy')) {
+                if (s4.ui.lastPathPart && String(s4.ui.selectedTab).includes('policy')) {
                     s4.policyProperties.handlers.policyDataUpdate();
                 }
             }

@@ -94,7 +94,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
             account.srenew = res.srenew;
         }
 
-        if (!Object(res.balance).length) {
+        if (!Object(res.balance).length || !res.balance[0]) {
             account.balance = [['0.00', 'EUR']];
         }
 
@@ -226,7 +226,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                 account.downbw_used = 0;
             }
 
-            if (pstatus !== u_attr.p) {
+            if (u_attr && pstatus !== u_attr.p) {
                 account.justUpgraded = Date.now();
 
                 M.checkStorageQuota(2);
@@ -240,7 +240,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
             }
 
             if (uqres) {
-                if (!u_attr.p) {
+                if (!u_attr || !u_attr.p) {
                     if (uqres.tal) {
                         account.bw = uqres.tal;
                     }
@@ -367,7 +367,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
             // transfers quota
             const tfsq = {max: account.bw, used: account.downbw_used};
 
-            if (u_attr.p) {
+            if (u_attr && u_attr.p) {
                 tfsq.used += account.servbw_used;
             }
             else if (M.maf) {

@@ -243,7 +243,7 @@ ClassChunk.prototype.onXHRerror = function(args, xhr) {
     if (d) {
         dlmanager.logger.error('ClassChunk.onXHRerror', this.task && this.task.chunk_id, args, xhr, this);
     }
-    if (this.isCancelled()) {
+    if (this.isCancelled() || !this.Progress.data[this.xid]) {
         return console.warn('This chunk should have been destroyed before reaching onerror...');
     }
 
@@ -438,7 +438,7 @@ ClassFile.prototype.destroy = function() {
         if (!macIntegritySuccess && !skipMacIntegrityCheck) {
             dlmanager.dlReportStatus(this.dl, EKEY);
 
-            if (this.dl.zipid) {
+            if (Zips[this.dl.zipid]) {
                 Zips[this.dl.zipid].destroy(EKEY);
             }
         }

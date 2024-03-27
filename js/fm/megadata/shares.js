@@ -174,7 +174,7 @@ MegaData.prototype.initShareAddDialog = function(alreadyAddedContacts, $extraCon
 
     // Detect the new added contact whether in the remove list or not
     var notRmContacts = function(handle) {
-        if (handle !== undefined && $.removedContactsFromShare[handle]) {
+        if ($.removedContactsFromShare && $.removedContactsFromShare[handle]) {
             delete $.removedContactsFromShare[handle];
             return false;
         }

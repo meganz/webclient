@@ -1436,8 +1436,12 @@ class MegaGallery {
 
         $('.gallery-view-zoom-control > button', this.galleryBlock).rebind('click.galleryZoom', e => {
             e.stopPropagation();
-
             $.hideContextMenu(e);
+
+            if (!this.dynamicList) {
+                // @todo dropDynamicList() shall $.off()..?
+                return false;
+            }
 
             if (!this.$middleBlock) {
                 this.$middleBlock = this.findMiddleImage();
@@ -1468,7 +1472,7 @@ class MegaGallery {
 
         if (!this.beforePageChangeListener) {
             this.beforePageChangeListener = mBroadcaster.addListener('beforepagechange', tpage => {
-                const pageId = page.replace('fm/', '');
+                const pageId = String(self.page).replace('fm/', '');
                 if (this.inPreview && (pageId.length < 5 ? M.RootID === M.currentdirid : pageId === M.currentdirid)) {
                     return;
                 }

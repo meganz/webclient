@@ -1,5 +1,5 @@
 /**
- * @preserve jquery.fullscreen 1.1.6
+ * @preserve jquery.fullscreen 1.1.7
  * https://github.com/kayahr/jquery-fullscreen-plugin
  * Copyright (C) 2012-2013 Klaus Reimer <k@ailis.de>
  * Licensed under the MIT license
@@ -85,9 +85,8 @@ function fullScreen(state)
             || (/** @type {?Function} */ e["mozRequestFullScreen"]);
         if (func) 
         {
-            func.call(e);
+            Promise.resolve(func.call(e)).catch(dump);
         }
-        return this;
     }
     else
     {
@@ -97,9 +96,12 @@ function fullScreen(state)
             || (/** @type {?Function} */ doc["webkitCancelFullScreen"])
             || (/** @type {?Function} */ doc["msExitFullscreen"])
             || (/** @type {?Function} */ doc["mozCancelFullScreen"]);
-        if (func && fullScreenState(doc)) func.call(doc);
-        return this;
+        if (func && fullScreenState(doc))
+        {
+            Promise.resolve(func.call(doc)).catch(dump);
+        }
     }
+    return this;
 }
 
 /**
@@ -184,8 +186,8 @@ function installFullScreenHandlers()
     jQuery(document).bind(error, fullScreenErrorHandler);
 }
 
-jQuery.fn["fullScreen"] = fullScreen;
-jQuery.fn["toggleFullScreen"] = toggleFullScreen;
+jQuery.fn["fullScreen"] = tryCatch(fullScreen);
+jQuery.fn["toggleFullScreen"] = tryCatch(toggleFullScreen);
 installFullScreenHandlers();
 
 })(jQuery);

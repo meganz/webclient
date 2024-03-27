@@ -2232,11 +2232,13 @@ else if (!browserUpdate) {
                 || dump.m.indexOf('Cannot redefine property') !== -1
                 || dump.m.indexOf("evaluating 'ze(e,t)'") !== -1
                 || dump.m.indexOf("evaluating 'r(a,c)'") !== -1
+                || dump.m.indexOf("evaluating 'a.L") !== -1
                 || dump.m.indexOf('Error: hookFull') !== -1;
 
             if (injectedScript) {
                 window.onerror = null;
                 window.log99723 = true;
+                expectedSourceOrigin = false;
             }
 
             if (expectedSourceOrigin && !window.u_checked) {
@@ -2627,6 +2629,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/security.js', n: 'security_js', j: 1, w: 5});
     jsl.push({f:'js/two-factor-auth.js', n: 'two_factor_auth_js', j: 1, w: 5});
     jsl.push({f:'js/attr.js', n: 'mega_attr_js', j:1});
+    jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j: 1});
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
     jsl.push({f:'js/reqstatclient.js', n: 'reqstatclient_js', j:1,w:5});
@@ -2694,8 +2697,6 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/commercials.js', n: 'commercials', j:1,w:1});
     jsl.push({f:'html/cookiepolicy.html', n: 'cookiepolicy', j:0});
     jsl.push({f:'css/cookiepolicy.css', n: 'cookiepolicy_css', j:2,w:5,c:1,d:1,cache:1});
-
-    jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j:1});
 
     if (!is_mobile) {
         jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
@@ -2810,6 +2811,7 @@ else if (!browserUpdate) {
     jsl.push({f:'css/checkboxes.css', n: 'checkboxes_css', j:2,w:5,c:1,d:1,cache:1});
 
     jsl.push({f:'css/media-viewer.css', n: 'media_viewer_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/video-player.css', n: 'video_player_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/animations.css', n: 'animations_css', j:2, w:30, c:1, d:1, cache:1});
 
@@ -3157,7 +3159,9 @@ else if (!browserUpdate) {
         jsl.push({f:'sjcl.js', n: 'sjcl_js', j: 1});
         jsl.push({f:'nodedec.js', n: 'nodedec_js', j: 1});
         jsl.push({f:'js/vendor/jquery.js', n: 'jquery', j: 1, w: 10});
+        jsl.push({f:'js/jquery.protect.js', n: 'jqueryprotect_js', j:1});
         jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
+        jsl.push({f:'js/vendor/jquery.mousewheel.js', n: 'jquerymouse_js', j: 1});
         jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j: 1});
         jsl.push({f:'html/js/embedplayer.js', n: 'embedplayer_js', j: 1, w: 4});
         jsl.push({f:'js/transfers/cloudraid.js', n: 'cloudraid_js', j: 1});
@@ -3178,6 +3182,7 @@ else if (!browserUpdate) {
 
         jsl.push({f:'js/crypto.js', n: 'crypto_js', j: 1, w: 5});
         jsl.push({f:'js/account.js', n: 'user_js', j: 1});
+        jsl.push({f:'js/ui/contextMenu.js', n: 'context_menu_js', j: 1});
 
         jsl.push({f:'js/transfers/queue.js', n: 'queue', j: 1, w: 4});
         jsl.push({f:'js/transfers/decrypter.js', n: 'dl_downloader', j: 1, w: 3});
@@ -3185,6 +3190,8 @@ else if (!browserUpdate) {
 
         jsl.push({f:'html/embedplayer.html', n: 'index', j: 0});
         jsl.push({f:'css/embedplayer.css', n: 'embedplayer_css', j: 2, w: 5});
+        jsl.push({f:'css/video-player.css', n: 'video_player_css', j: 2});
+        jsl.push({f:'css/sprites/embed-mono@mono.css', n: 'embed_mono_css', j:2});
     }
 
     if (is_drop) {
@@ -3977,6 +3984,7 @@ else if (!browserUpdate) {
 
             document.body.textContent = '';
             document.body.style.background = is_drop ? '#fff' : '#000';
+            document.body.className = is_drop ? 'theme-light' : 'theme-dark-forced';
             jsl_progress = function() {};
         }
         catch (ex) {
@@ -4473,6 +4481,24 @@ function tell(ex) {
     msgDialog('warninga', l[135], l[47], ex < 0 ? api_strerror(ex) : ex);
 }
 
+tryCatch(function(x) {
+    'use strict';
+    var ael = x.addEventListener;
+    var psy = tryCatch(function(f) {
+        return String(f).indexOf('Synchronizetion') > 0;
+    });
+    x.addEventListener = function(t, f) {
+        if (t === 'contextmenu' && psy(f)) {
+            window.onerror = null;
+            return;
+        }
+        return ael.apply(x, arguments);
+    };
+    mBroadcaster.once('startMega', tryCatch(function() {
+        x.addEventListener = ael;
+    }));
+})(window);
+
 var dump = nop;
 mBroadcaster.once('startMega', function() {
     'use strict';
@@ -4511,7 +4537,6 @@ mBroadcaster.once('startMega', function() {
     }
 
     Object.defineProperty(window, 'dump', {value: console.warn.bind(console, '[dump]')});
-    onIdle(postMessage.bind(self, {disableRightClick: -1, type: 'enable-right-click'}));
 });
 
 Object.defineProperty(self, 's4', {value: Object.create(null)});

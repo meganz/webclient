@@ -31,7 +31,6 @@ class AccordionComponent extends ExpandableComponent {
     constructor($accordionElement) {
         super($accordionElement);
 
-        this.expandStartEvent = new MEvent();
         this.transitionOptions = {
             easing: 'swing',
             duration: 200,
@@ -63,7 +62,6 @@ class AccordionComponent extends ExpandableComponent {
     }
 
     expand() {
-        this.expandStartEvent.invoke();
         super.expand();
         this.$drawer.stop().animate({
             height: 'show',
@@ -345,7 +343,7 @@ var bottompage = {
                 return false;
             }
 
-            function subMenuPos() {
+            const subMenuPos = tryCatch(() => {
                 var $this = $('.submenu-item.active', $topMenu);
                 var $submenu = $this.next('.submenu');
 
@@ -355,16 +353,14 @@ var bottompage = {
                     at: "center bottom",
                     collision: "fit"
                 });
-            }
+            });
 
             closePagesSubMenu();
             $this.addClass('active');
             $submenu.addClass('active');
             subMenuPos();
 
-            $(window).rebind('resize.pagesmenu', function() {
-                subMenuPos();
-            });
+            $(window).rebind('resize.pagesmenu', SoonFc(90, subMenuPos));
 
             // Close pages submenu by click outside of submenu
             $content.rebind('mousedown.closepmenu', function(e) {

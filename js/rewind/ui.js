@@ -1083,7 +1083,6 @@ lazy(mega, 'rewindUi', () => {
             utcDate.setUTCFullYear(date.getFullYear());
             utcDate.setUTCHours(date.getHours());
 
-            //
             if (utcDate > mega.rewind.currentUtcDate) {
                 utcDate.setUTCDate(mega.rewind.currentUtcDate.getUTCDate());
                 utcDate.setUTCFullYear(mega.rewind.currentUtcDate.getUTCFullYear());
@@ -1136,7 +1135,7 @@ lazy(mega, 'rewindUi', () => {
                 this.$contentFolder.addClass('hidden');
             }
             else {
-                this.prepareListView();
+                this.prepareListView({ts: date.getTime()});
                 if (this.isEmptyList()) {
                     this.$contentFolder.addClass('hidden');
                     this.$contentEmpty.removeClass('hidden');
@@ -1183,7 +1182,7 @@ lazy(mega, 'rewindUi', () => {
             this.$contentFolder.removeClass('hidden');
 
             this.selectedType = type;
-            this.prepareListView(type);
+            this.prepareListView({type});
             if (this.isEmptyList()) {
                 this.$contentFolder.addClass('hidden');
                 this.$contentEmpty.removeClass('hidden');
@@ -1248,7 +1247,7 @@ lazy(mega, 'rewindUi', () => {
             }
         }
 
-        prepareListView(type) {
+        prepareListView({type, ts}) {
             this.$contentFolderOptions.addClass('hidden');
 
             if (type) {
@@ -1256,7 +1255,10 @@ lazy(mega, 'rewindUi', () => {
                 this.$contentFolderOptions.removeClass('hidden');
             }
             else {
-                this.viewNodes = mega.rewind.getChildNodes(this.currentHandle);
+                this.viewNodes = mega.rewind.getChildNodes({
+                    selectedHandle: this.currentHandle,
+                    ts,
+                });
             }
 
             if (this.folderList) {
@@ -1980,7 +1982,11 @@ lazy(mega, 'rewindUi', () => {
                     parentNodeLevel = 0;
                 }
                 // Since we already have the parent, exclude it from list to insert
-                const nodes = mega.rewind.getChildNodes(selectedHandle, parentNodeLevel + 1, false);
+                const nodes = mega.rewind.getChildNodes({
+                    selectedHandle,
+                    currentLevel: parentNodeLevel + 1,
+                    includeParent: false,
+                });
                 // Restore partially selected items to selected nodes map
                 this.restorePartialKeys(selectedHandle);
 

@@ -202,7 +202,7 @@
             if (block) {
                 block.classList.remove('search-multi');
             }
-            if (selectionManager && selectionManager.selected_list.length > 0) {
+            if (self.selectionManager && selectionManager.selected_list.length > 0) {
                 block.classList.add('search');
 
                 const scope = block.querySelector('.search-bottom-wrapper');
@@ -517,6 +517,7 @@
             'public-links',
             'file-requests'
         ];
+        mBroadcaster.sendMessage('trk:event', 'breadcrumb', 'click', id);
 
         // super special case (contact)
         if (M.u.hasOwnProperty(id)) {

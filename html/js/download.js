@@ -488,9 +488,7 @@ async function setupSingleDownloadPage(res) {
                     $('.mobile.filetype-img').addClass('hidden');
                     $(window).trigger('resize');
                     if (is_mobile) {
-                        if (slideshow(dl_node.h) === false) {
-                            mega.ui.viewerOverlay.showLayout(dl_node.h);
-                        }
+                        mega.ui.viewerOverlay.showLayout(dl_node.h);
                     }
 
                 }).catch(function(ex) {

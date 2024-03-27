@@ -1560,9 +1560,8 @@ function completeProLogin(result) {
             // If no value was set on the discount promo page, find the plan they clicked on
             // before the login/register prompt popped up. Otherwise use the discount plan number.
             const continuePlanNum = sessionStorage.getItem('discountPromoContinuePlanNum');
-            const proNum = continuePlanNum === null ? pro.proplan2.selectedPlan ||
-                $('.pricing-page.plan.selected').data('payment') : continuePlanNum;
-
+            const proNum = (continuePlanNum === null ? pro.proplan2.selectedPlan ||
+                $('.pricing-page.plan.selected').data('payment') : continuePlanNum) | 0;
 
             loadingDialog.show();
 

@@ -56,7 +56,6 @@ class MobileMegaRender {
             'grey': l[16229]
         };
 
-        window.removeEventListener('resize', this);
         window.addEventListener('resize', this);
 
         this.touching = false;
@@ -79,6 +78,8 @@ class MobileMegaRender {
             const megaListOptions = this.getMListOptions();
 
             Object.defineProperty(this, 'megaList', {
+                enumerable: true,
+                configurable: true,
                 value: new MegaList(this.container, megaListOptions)
             });
 
@@ -156,6 +157,10 @@ class MobileMegaRender {
     }
 
     destroy() {
+        if (this.ready) {
+            this.cleanupLayout();
+        }
+        window.removeEventListener('resize', this);
 
         if (this.megaList) {
             this.megaList.destroy();
@@ -279,10 +284,18 @@ class MobileMegaRender {
         this.megaList.listContainer.removeEventListener('touchend', this);
     }
 
+    get ready() {
+        return this.megaList && this.megaList.listContainer && this.megaList.listContainer.parentNode;
+    }
+
     handleEvent({type}) {
 
         if (typeof this[`handle${type}`] === 'function') {
-            this[`handle${type}`].call(M.megaRender);
+            console.assert(this.ready, 'This MegaRender instance is receiving events out of context.');
+
+            if (this.ready) {
+                this[`handle${type}`]();
+            }
         }
     }
 
@@ -291,11 +304,11 @@ class MobileMegaRender {
         delay('mobileMegaListScroll', () => {
 
             // Seem user call destroy megalist while delay
-            if (!M.megaRender.megaList || !M.megaRender.megaList.listContainer) {
+            if (!this.ready) {
                 return;
             }
 
-            const {scrollTop} = M.megaRender.megaList.listContainer;
+            const {scrollTop} = this.megaList.listContainer;
             const {lastScrollTop, touching} = this;
             const {style: headerStyle, classList: headerClass , originalHeight} = mega.ui.header.bottomBlock;
             const {offsetHeight: footerHeight, style: footerStyle} = mega.ui.footer.domNode;
@@ -349,6 +362,7 @@ class MobileMegaRender {
         if ((originalHeight / 2 > parseInt(style.height || 0) ||
             scrollTop + listHeight > scrollHeight - originalHeight / 2) &&
             scrollTop >= originalHeight / 2) {
+
             mega.ui.header.hideBottomBlock();
             mega.ui.footer.hideButton();
         }
@@ -369,8 +383,8 @@ class MobileMegaRender {
         if (M.v.length) {
 
             onIdle(() => {
-                if (M.megaRender.megaList && M.megaRender.megaList.listContainer) {
-                    this.lastScrollTop = M.megaRender.megaList.listContainer.scrollTop;
+                if (this.ready) {
+                    this.lastScrollTop = this.megaList.listContainer.scrollTop;
                 }
             });
         }

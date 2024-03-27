@@ -296,6 +296,15 @@ function api_reqfailed(channel, error) {
             mega.loadReport.errs++;
         }
     }
+    else if (self.is_iframed) {
+        // most of the functions used here are not available on i-framed contexts, show a generic message.
+        tell(e);
+        if (e === ESID || e === EBLOCKED) {
+            window.onerror = null;
+            u_logout(true);
+        }
+        return e;
+    }
 
     // does this failure belong to a folder link, but not on the SC channel?
     if (this.sid[0] === 'n' && c !== 2) {
@@ -2206,7 +2215,7 @@ function api_fareq(res, ctx, xhr) {
                         }, this.fa_timeout);
                     }
 
-                    if (this.fah.parse && this.response) {
+                if (this.response && this.fah && this.fah.parse) {
                         this.fah.parse(this.response, ev);
                     }
                 };
@@ -2255,7 +2264,7 @@ function api_fareq(res, ctx, xhr) {
                             clearTimeout(this.fart);
                         }
 
-                        if (this.fah.done(ev)) {
+                        if (this.fah.done(ev) && self.fminitialized) {
                             delay('thumbnails', fm_thumbnails, 200);
                         }
 

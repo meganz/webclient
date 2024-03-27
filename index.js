@@ -2938,6 +2938,7 @@ function pagemetadata() {
     if (window.is_karma) {
         return;
     }
+    const page = String(window.page || '');
     var metas = mega.metatags.getPageMetaTags(page);
     var mega_desc = metas.mega_desc || mega.whoami;
     mega_title = metas.mega_title || 'MEGA';
@@ -3041,6 +3042,8 @@ function loadSubPage(tpage, event) {
     }
 
     if (window.slideshowid) {
+        mBroadcaster.sendMessage('trk:event', 'preview', 'close-nav', tpage, slideshowid);
+
         slideshow(0, 1);
     }
 

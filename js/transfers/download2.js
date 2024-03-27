@@ -37,7 +37,6 @@
  *
  * ***************** END MEGA LIMITED CODE REVIEW LICENCE ***************** */
 
-/* jshint -W003 */
 var dlmanager = {
     // Keep in track real active downloads.
     // ETA (in seconds) to consider a download finished, used to speed up chunks.
@@ -662,7 +661,7 @@ var dlmanager = {
     },
 
     abort: function DM_abort(gid, keepUI) {
-        /* jshint -W074 */
+
         if (gid === null || Array.isArray(gid)) {
             this._multiAbort = 1;
 
@@ -698,8 +697,7 @@ var dlmanager = {
                         }
 
                         try {
-                            /* jshint -W073 */
-                            if (typeof dl.io.abort === "function") {
+                            if (dl.io && typeof dl.io.abort === "function") {
                                 if (d) {
                                     dlmanager.logger.info('IO.abort', gid, dl);
                                 }
@@ -2487,6 +2485,11 @@ DownloadQueue.prototype.push = function() {
     var dl_id = dl.ph || dl.id;
     var dl_key = dl.key;
     var dlIO;
+
+    if (!self.dlMethod) {
+        onIdle(() => dlFatalError(dl, l[9065]));
+        return pos;
+    }
 
     if (dl.zipid) {
         if (!Zips[dl.zipid]) {

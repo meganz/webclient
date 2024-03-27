@@ -630,7 +630,7 @@ function filetype(n, getFullType, ik) {
 
 /**
  * Get backed up device Icon
- * @param {String} name Device name
+ * @param {String} name Device User Agent or Device name
  * @param {Number} type Device type number, 3 and 4 are mobile
  * @returns {String} Device Icon name
  */
@@ -638,25 +638,23 @@ function deviceIcon(name, type) {
 
     "use strict";
 
-    // Mobile icon
-    // TODO: Change conditions to smth more clever
-    if (type === 3 || type === 4) {
+    const classMap = freeze({
+        'Android': 'mobile-android',
+        'iPhone': 'mobile-ios',
+        'Apple': 'pc-mac',
+        'Windows': 'pc-win',
+        'Linux': 'pc-linux'
+    });
 
+    const os = browserdetails(name).os;
+
+    if (classMap[os]) {
+        return classMap[os];
+    }
+    // Fallback to generic
+    if (type === 3 || type === 4) {
         return 'mobile';
     }
-    if (name.includes('MacBook')) {
-
-        return 'pc-mac';
-    }
-    else if (name.includes('Windows')) {
-
-        return 'pc-win';
-    }
-    else if (name.includes('Linux')) {
-
-        return 'pc-linux';
-    }
-
     return 'pc';
 }
 
@@ -738,10 +736,13 @@ function folderIcon(node) {
  * @returns {String} Folder Icon name
  */
 function fileIcon(node) {
-
     'use strict';
 
     let icon = '';
+
+    if (!node) {
+        return 'generic';
+    }
 
     if (node.t) {
 

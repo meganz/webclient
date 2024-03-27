@@ -2629,6 +2629,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/security.js', n: 'security_js', j: 1, w: 5});
     jsl.push({f:'js/two-factor-auth.js', n: 'two_factor_auth_js', j: 1, w: 5});
     jsl.push({f:'js/attr.js', n: 'mega_attr_js', j:1});
+    jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j: 1});
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
     jsl.push({f:'js/reqstatclient.js', n: 'reqstatclient_js', j:1,w:5});
@@ -2696,8 +2697,6 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/commercials.js', n: 'commercials', j:1,w:1});
     jsl.push({f:'html/cookiepolicy.html', n: 'cookiepolicy', j:0});
     jsl.push({f:'css/cookiepolicy.css', n: 'cookiepolicy_css', j:2,w:5,c:1,d:1,cache:1});
-
-    jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j:1});
 
     if (!is_mobile) {
         jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});

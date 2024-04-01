@@ -480,13 +480,7 @@ export class Schedule extends MegaRenderMixin {
                                 onSelectDate={startDateTime => {
                                     this.handleDateSelect({ startDateTime }, this.onStartDateSelect);
                                 }}
-                                onSelectTime={({ value: startDateTime }) => {
-                                    this.handleTimeSelect({
-                                        startDateTime: startDateTime < Date.now() ?
-                                            this.nearestHalfHour :
-                                            startDateTime
-                                    });
-                                }}
+                                onSelectTime={({ value: startDateTime }) => this.handleTimeSelect({ startDateTime })}
                                 onChange={value => this.handleChange('startDateTime', value)}
                                 onBlur={timestamp => {
                                     if (timestamp) {
@@ -511,13 +505,7 @@ export class Schedule extends MegaRenderMixin {
                                 onSelectDate={endDateTime => {
                                     this.handleDateSelect({ endDateTime }, this.onEndDateSelect);
                                 }}
-                                onSelectTime={({ value: endDateTime }) => {
-                                    this.handleTimeSelect({
-                                        endDateTime: endDateTime < Date.now() ?
-                                            this.nearestHalfHour + this.interval :
-                                            endDateTime
-                                    });
-                                }}
+                                onSelectTime={({ value: endDateTime }) => this.handleTimeSelect({ endDateTime })}
                                 onChange={value => this.handleChange('endDateTime', value)}
                                 onBlur={timestamp => {
                                     this.handleDateSelect({ endDateTime: timestamp }, this.onEndDateSelect);

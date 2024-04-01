@@ -1564,7 +1564,11 @@ scparser.$add('sqac', (a) => {
                     dashboardUI(true);
                 }
                 else {
-                    M.accountData();
+                    M.accountData(() => {
+                        if (mega.rewindUi && mega.rewindUi.sidebar.active) {
+                            mBroadcaster.sendMessage('rewind:accountUpgraded');
+                        }
+                    });
                 }
             }
             if (u_attr) {

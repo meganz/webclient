@@ -694,7 +694,7 @@ lazy(mega, 'rewindUi', () => {
         }
 
         // eslint-disable-next-line complexity
-        close(currentDirectory, newListContainer) {
+        close(currentDirectory, newListContainer, isAccUpgraded) {
             if (!this.active) {
                 return false;
             }
@@ -702,8 +702,7 @@ lazy(mega, 'rewindUi', () => {
             let isOpenFolder = false;
             let closeRewind = true;
 
-            // We know its coming from openfolder
-            if (currentDirectory) {
+            if (!isAccUpgraded && currentDirectory) {
                 // If its a related folder we dont close it
                 if (this.currentHandle &&
                     this.isSameOrAncestor(M.d, currentDirectory, this.currentHandle)) {
@@ -753,7 +752,7 @@ lazy(mega, 'rewindUi', () => {
 
                 mega.rewind.removeNodeListener();
 
-                if (!isOpenFolder) {
+                if (!isAccUpgraded && !isOpenFolder) {
                     mega.rewind.clear();
                     this.selectedDate = null;
                 }

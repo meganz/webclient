@@ -879,7 +879,7 @@ function getCountryAndLocales() {
         locales = locale + '-' + country;
     }
     // Otherwise, try grab country data from browser's navigator.languages
-    else if (navigator.languages) {
+    else if (Array.isArray(navigator.languages)) {
 
         locales = navigator.languages.filter(l => l !== locale && l.startsWith(locale))[0];
 
@@ -1995,14 +1995,11 @@ lazy(mega, 'intl', function _() {
     /** @property mega.intl.locale */
     lazy(ns, 'locale', function() {
         const locale = window.locale || window.lang;
-        let navLocales;
-
-        if (navigator.languages) {
-            navLocales = navigator.languages.filter(l => l !== locale && l.startsWith(locale))[0];
-        }
+        const navLocales = Array.isArray(navigator.languages)
+            && navigator.languages.filter(l => l !== locale && l.startsWith(locale))[0];
 
         // @todo Polyfill Intl.Locale() and return an instance of it instead?
-        return this.test(navLocales) || this.test(locale) || 'en';
+        return navLocales && this.test(navLocales) || this.test(locale) || 'en';
     });
 
     /** @function mega.intl.get */

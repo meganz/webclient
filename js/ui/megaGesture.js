@@ -21,8 +21,8 @@ class MegaGesture {
 
                     this.domNode.megaGesture = true;
                 }
-                else if (!window.buildOlderThan10Days) {
-                    reportError('MegaGesture initialization failed.');
+                else if (d) {
+                    console.warn('MegaGesture initialization failed.', this.domNode, [this]);
                 }
             }
         };

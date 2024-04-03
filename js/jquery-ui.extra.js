@@ -1,6 +1,6 @@
 $.widget.extend($.ui.selectable.prototype, {
 
-    _create: function() {
+    _create: tryCatch(function() {
 
         'use strict';
 
@@ -76,11 +76,11 @@ $.widget.extend($.ui.selectable.prototype, {
 
         this._mouseInit();
 
-        this.helper = $('<div>');
-        this._addClass(this.helper, 'ui-selectable-helper');
-    },
+        this.helper = $(mCreateElement('div', {"class": "ui-selectable-helper"}));
+    }),
 
-    _mouseStart: function(event) {
+    // eslint-disable-next-line complexity -- @todo revamp
+    _mouseStart: tryCatch(function(event) {
 
         'use strict';
 
@@ -95,7 +95,7 @@ $.widget.extend($.ui.selectable.prototype, {
 
         this.opos = [event.pageX, event.pageY];
 
-        if (this.options.disabled) {
+        if (this.options.disabled || !this.helper) {
             return;
         }
 
@@ -185,7 +185,7 @@ $.widget.extend($.ui.selectable.prototype, {
                 break;
             }
         }
-    },
+    }),
 
     _mouseDrag: function(event) {
 
@@ -193,7 +193,7 @@ $.widget.extend($.ui.selectable.prototype, {
 
         this.dragged = true;
 
-        if (this.options.disabled || !this.opos) {
+        if (this.options.disabled || !this.opos || !this.helper) {
             return;
         }
 
@@ -385,7 +385,7 @@ $.widget.extend($.ui.selectable.prototype, {
         return false;
     },
 
-    _mouseStop: function(event) {
+    _mouseStop: tryCatch(function(event) {
 
         'use strict';
 
@@ -436,7 +436,7 @@ $.widget.extend($.ui.selectable.prototype, {
         this.helper.remove();
 
         return false;
-    },
+    }),
 
     // MegaRender and MegaList related custom functions. Only works when there is MegaRender and List
     _getJQSelecteesFromMegaList: function() {

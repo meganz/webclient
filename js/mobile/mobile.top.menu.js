@@ -230,7 +230,7 @@ class MegaMobileTopMenu extends MegaMobileComponent {
             $('.mobile.main-block, .mobile.old-page').addClass('hidden');
         });
 
-        if (!is_touchable) {
+        if (is_touchable) {
 
             const _gestureHandler = () => {
 

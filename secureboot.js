@@ -2164,12 +2164,10 @@ else if (!browserUpdate) {
             function mTrim(s)
             {
                 return String(s)
-                    .replace(/resource:.+->\s/,'')
+                    .replace('-extension://', '~')
                     .replace(/blob:[^:\s]+/, '..')
                     .replace(/([^'])\w+:\/\/[^\s:]+/, '$1..')
                     .replace(/\.\.:\/\/[^:\s]+/, '..')
-                    .replace('chrome://mega/content','..')
-                    .replace(/file:.+extensions/,'..fx')
                     .replace(/(?: line \d+ > eval)+/g,' >.eval')
                     .trim();
             }

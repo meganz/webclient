@@ -346,6 +346,9 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
 
         const buttons = {
             'openappButton' : ['openapp-button', l.view_file_open_in_app, () => {
+                if (!this.nodeComponent) {
+                    return false;
+                }
                 eventlog(99912);
 
                 this.trigger('pauseStreamer');
@@ -353,7 +356,7 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
             }],
 
             'downloadButton': ['download-button', 'icon-download-thin', () => {
-                if (!validateUserAction()) {
+                if (!validateUserAction() || !this.nodeComponent) {
                     return false;
                 }
 
@@ -366,7 +369,7 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
             'sharelinkButton': [
                 'sharelink-button',
                 MegaMobileViewOverlay.getLinkText(this.nodeComponent.handle), () => {
-                    if (!validateUserAction()) {
+                    if (!validateUserAction() || !this.nodeComponent) {
                         return false;
                     }
                     this.trigger('pauseStreamer');
@@ -445,7 +448,7 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
      * Gets Share button label
      *
      * @param {String} nodeHandle The internal node handle of the folder or file
-     * @returns {void}
+     * @returns {String}
      */
     static getLinkText(nodeHandle) {
 

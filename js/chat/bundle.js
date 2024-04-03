@@ -16860,11 +16860,9 @@ class Schedule extends mixins.w9 {
       },
       onSelectTime: ({
         value: startDateTime
-      }) => {
-        this.handleTimeSelect({
-          startDateTime: startDateTime < Date.now() ? this.nearestHalfHour : startDateTime
-        });
-      },
+      }) => this.handleTimeSelect({
+        startDateTime
+      }),
       onChange: value => this.handleChange('startDateTime', value),
       onBlur: timestamp => {
         if (timestamp) {
@@ -16893,11 +16891,9 @@ class Schedule extends mixins.w9 {
       },
       onSelectTime: ({
         value: endDateTime
-      }) => {
-        this.handleTimeSelect({
-          endDateTime: endDateTime < Date.now() ? this.nearestHalfHour + this.interval : endDateTime
-        });
-      },
+      }) => this.handleTimeSelect({
+        endDateTime
+      }),
       onChange: value => this.handleChange('endDateTime', value),
       onBlur: timestamp => {
         this.handleDateSelect({

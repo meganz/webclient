@@ -4800,7 +4800,8 @@ lazy(mega.gallery, 'albums', () => {
                 }
             }
 
-            debouncedAlbumCellUpdate(albumId, true, false, album.eHandles[node.h] === album.at.c ? node : undefined);
+            const coverNode = album.eHandles && album.at && album.eHandles[node.h] === album.at.c ? node : undefined;
+            debouncedAlbumCellUpdate(albumId, true, false, coverNode);
 
             if (albumId === scope.getAlbumIdFromPath() && this.grid) {
                 if (album.nodes.length === 1) {

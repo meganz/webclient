@@ -1208,7 +1208,7 @@ affiliateUI.redemptionDialog = {
 
         $('.next-btn', this.$dialog).removeClass('wide disabled').addClass('small');
         $('.cells.right', this.$dialog).addClass('hidden');
-        this.$dialog.addClass('dialog-small').removeClass('dialog-normal dialog-medium dialog-tall disabled');
+        this.$dialog.addClass('dialog-small').removeClass('disabled');
     },
 
     displayStep1: function() {
@@ -1219,7 +1219,7 @@ affiliateUI.redemptionDialog = {
         const $nextBtn = $('.next-btn', this.$dialog).removeClass('wide');
         $('.cells.right', this.$dialog).removeClass('hidden');
         $('.plan-select-message', this.$dialog).addClass('hidden');
-        this.$dialog.removeClass('dialog-small').addClass('dialog-normal');
+        this.$dialog.removeClass('dialog-small');
         const $bitcoinSummary = $('.cells.right.bitcoin', this.$dialog);
         const $megaquotaSummary = $('.cells.right.megaquota', this.$dialog);
         const $planRadios = $('.affiliate-redeem.plan-selection-wrapper', this.$dialog);
@@ -1228,7 +1228,6 @@ affiliateUI.redemptionDialog = {
             $megaquotaSummary.removeClass('hidden');
             $bitcoinSummary.addClass('hidden');
             $planRadios.removeClass('hidden');
-            this.$dialog.addClass('dialog-medium').removeClass('dialog-normal');
 
             this.handleProPlans();
         }
@@ -1236,7 +1235,6 @@ affiliateUI.redemptionDialog = {
             $bitcoinSummary.removeClass('hidden').addClass('small step1');
             $megaquotaSummary.addClass('hidden');
             $planRadios.addClass('hidden');
-            this.$dialog.removeClass('dialog-medium').addClass('dialog-normal');
             $nextBtn.removeClass('small');
 
             if (u_attr.p === pro.ACCOUNT_LEVEL_BUSINESS || u_attr.p === pro.ACCOUNT_LEVEL_PRO_FLEXI){
@@ -1491,7 +1489,6 @@ affiliateUI.redemptionDialog = {
             $('.insufficient-quota-warning', this.$dialog).addClass('hidden');
             $planSelectMessage.removeClass('hidden insufficient-quota-warning').addClass('under-price-warning')
                 .text(l.redemption_cost_too_low);
-            $dialogWindow.addClass('dialog-tall');
             return;
         }
 
@@ -1528,12 +1525,10 @@ affiliateUI.redemptionDialog = {
         if (totalCostEuros < 49.95) {
             $planSelectMessage.removeClass('hidden insufficient-quota-warning').addClass('under-price-warning')
                 .text(l.redemption_cost_too_low);
-            $dialogWindow.addClass('dialog-tall');
             affiliateUI.redemptionDialog.updateQuotaSummaryTable();
             return;
         }
         $planSelectMessage.addClass('hidden');
-        $dialogWindow.removeClass('dialog-tall');
 
         totalCostEuros = totalCostEuros.toFixed(8);
         totalCost = (totalCostEuros * pro.conversionRate).toFixed(8);
@@ -1584,11 +1579,9 @@ affiliateUI.redemptionDialog = {
         if (cost > M.affiliate.balance.available){
             $planSelectMessage.removeClass('hidden under-price-warning').addClass('insufficient-quota-warning')
                 .text(l.redemption_insufficient_available_commission);
-            $dialogWindow.addClass('dialog-tall');
         }
         else {
             $planSelectMessage.addClass('hidden');
-            $dialogWindow.removeClass('dialog-tall');
         }
     },
 

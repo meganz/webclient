@@ -272,6 +272,7 @@ def reduce_stylelint(file_line_mapping, **extra):
     result = ['\nStyleLint output:\n=================\n']
     cmdout_expression = re.compile(r'(.+): line (\d+), col \d+, .+')
     warning_result = []
+    warning_rules = r'"css-logical-props"'
     for line in output:
         parse_result = cmdout_expression.findall(line)
         # Check if we've got a relevant line.
@@ -281,17 +282,26 @@ def reduce_stylelint(file_line_mapping, **extra):
             # Check if the line is part of our selection list, or if a css syntax
             # error happened within a file since that will halt further parsing
             if line_no in file_line_mapping[file_name] or re.search(r'CssSyntaxError', line):
+                do_warn = False
+
                 if re.search(r': line \d+, col \d+, warning - ', line):
-                    warnings += 1
+                    do_warn = True
+                else:
                     # plugin/no-unsupported-browser-features is too verbose
                     # with e.g. Chrome 58,59,60,61,62,63,64,65,66,67,68,69
                     if re.search(r'Unexpected browser feature', line):
-                        line = re.sub(r'(\w+ \d+)(,\d+)+,(\d+)', r'\1-\3', line)
+                        line = re.sub(r'(\w+ [\d.]+)(,[\d.]+)+,([\d.]+)', r'\1-\3', line)
+                        if re.search(warning_rules, line):
+                            do_warn = True
+                            line = re.sub(', error -', ', warning -', line)
+
+                if do_warn:
+                    warnings += 1
                     warning_result.append(line)
                 else:
                     result.append(line)
 
-    result = result + warning_result;
+    result = result + warning_result
 
     # Add the number of errors and return in a nicely formatted way.
     error_count = len(result) - 1

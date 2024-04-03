@@ -785,7 +785,7 @@ function initTreeScroll() {
     if (folderlink || M.currentTreeType !== 'cloud-drive') {
         treeClass = 'js-other-tree-panel';
 
-        $('.js-other-tree-panel .section-title', fmholder)
+        $('.js-other-tree-panel .section-title')
             .text(
                 folderlink
                     ? (pfcol ? l.shared_album : l.folderlink_lp_title)

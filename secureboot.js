@@ -2164,12 +2164,10 @@ else if (!browserUpdate) {
             function mTrim(s)
             {
                 return String(s)
-                    .replace(/resource:.+->\s/,'')
+                    .replace('-extension://', '~')
                     .replace(/blob:[^:\s]+/, '..')
                     .replace(/([^'])\w+:\/\/[^\s:]+/, '$1..')
                     .replace(/\.\.:\/\/[^:\s]+/, '..')
-                    .replace('chrome://mega/content','..')
-                    .replace(/file:.+extensions/,'..fx')
                     .replace(/(?: line \d+ > eval)+/g,' >.eval')
                     .trim();
             }
@@ -2929,6 +2927,10 @@ else if (!browserUpdate) {
         jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
         jsl.push({f:'html/rewind.html', n: 'rewind_html', j:0});
         jsl.push({f:'css/topbar.css', n: 'topbar_css', j:2,w:5,c:1,d:1,cache:1});
+
+        // Notification banner
+        jsl.push({f:'css/notification-banner.css', n: 'notification-banner_css', j: 2, w: 5});
+        jsl.push({f:'js/ui/notificationBanner.js', n: 'notificationBanner_js', j:1,w:1});
     } // !is_mobile
 
     // do not change the order...

@@ -42,7 +42,7 @@
                     "css-sticky",
                     "intrinsic-width"
                 ],
-                "severity": "warning"
+                "severity": "error"
             }
         ],
         "alpha-value-notation": [

@@ -149,11 +149,11 @@ lazy(mega, 'rewind', () => {
                 'file-requests': true,
             });
 
-            mBroadcaster.addListener('mega:openfolder', () => {
+            const openSidebarListener = (isAccUpgraded) => {
                 const listContainer = mega.rewind.getListContainer();
                 let lastSelectedHandle = null;
                 const previousActive = mega.rewindUi.sidebar.active;
-                let isOpenFolder = mega.rewindUi.sidebar.close(M.currentdirid, listContainer);
+                let isOpenFolder = mega.rewindUi.sidebar.close(M.currentdirid, listContainer, isAccUpgraded);
                 let openRewind = false;
 
                 if (this.folderRedirect) {
@@ -162,16 +162,20 @@ lazy(mega, 'rewind', () => {
                     openRewind = true;
                     isOpenFolder = false;
                 }
-                else if (previousActive && isOpenFolder) {
+                else if (isAccUpgraded || (previousActive && isOpenFolder)) {
                     lastSelectedHandle = mega.rewindUi.sidebar.currentHandle;
                     openRewind = true;
                 }
-
                 if (lastSelectedHandle && openRewind) {
                     onIdle(() => {
-                        mega.rewind.openSidebar(null, lastSelectedHandle, isOpenFolder)
+                        mega.rewindUi.sidebar.updateDatepickerView();
+                        mega.rewind.openSidebar(null, lastSelectedHandle, isOpenFolder, isAccUpgraded)
                             .then(() => {
                                 const eventData = mega.rewind.getOpenSidebarEventData(lastSelectedHandle, 1);
+
+                                mega.rewindUi.sidebar.getDatepickerInstance().selectDate(
+                                    mega.rewindUi.sidebar.selectedDate);
+
                                 if (eventData) {
                                     eventlog(500001, eventData);
                                 }
@@ -179,7 +183,10 @@ lazy(mega, 'rewind', () => {
                             .catch(tell);
                     });
                 }
-            });
+            };
+
+            mBroadcaster.addListener('rewind:accountUpgraded', () => openSidebarListener(true));
+            mBroadcaster.addListener('mega:openfolder', () => openSidebarListener());
         }
 
         async removeNodeListener() {
@@ -204,12 +211,12 @@ lazy(mega, 'rewind', () => {
                 });
         }
 
-        async _openSidebarStub(listContainer, selectedHandle, isOpenFolder) {
+        async _openSidebarStub(listContainer, selectedHandle, isOpenFolder, isAccUpgraded) {
             if (!(listContainer && listContainer.parentNode)) {
                 listContainer = this.getListContainer();
             }
             if (!(listContainer && listContainer.parentNode)) {
-                logger.error('Rewind.openSidebar - No container found', selectedHandle, isOpenFolder);
+                logger.error('Rewind.openSidebar - No container found', selectedHandle, isOpenFolder, isAccUpgraded);
                 throw ENOENT;
             }
 
@@ -219,7 +226,7 @@ lazy(mega, 'rewind', () => {
             this.removeNodeListener();
             this.selectedHandle = selectedHandle;
 
-            if (!isOpenFolder) {
+            if (isAccUpgraded || !isOpenFolder) {
                 await this.loadTreeCacheList();
             }
 
@@ -229,7 +236,7 @@ lazy(mega, 'rewind', () => {
                 mega.rewindUi.sidebar.nodeUpdated();
             });
 
-            await mega.rewindUi.sidebar.init(listContainer, selectedHandle, isOpenFolder);
+            await mega.rewindUi.sidebar.init(listContainer, selectedHandle, isOpenFolder || isAccUpgraded);
 
             onIdle(clickURLs);
             logger.info('Rewind.openSidebar - Sidebar opened..');

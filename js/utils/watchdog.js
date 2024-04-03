@@ -309,7 +309,7 @@ lazy(self, 'watchdog', () => Object.freeze({
                 break;
 
             case 'chat_event':
-                if (strg.data.state === 'DISCARDED') {
+                if (strg.data.state === 'DISCARDED' && self.megaChatIsReady) {
                     var chatRoom = megaChat.plugins.chatdIntegration._getChatRoomFromEventData(strg.data);
                     megaChat.plugins.chatdIntegration.discardMessage(chatRoom, strg.data.messageId);
                 }

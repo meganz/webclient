@@ -3379,6 +3379,21 @@ mBroadcaster.once('boot_done', () => {
     }
 });
 
+mBroadcaster.addListener('fm:initialized', () => {
+    'use strict';
+
+    if (folderlink) {
+        return;
+    }
+
+    onIdle(() => {
+        // Add the dynamic notifications
+        if (typeof notify.addDynamicNotifications !== 'undefined') {
+            notify.addDynamicNotifications().catch(dump);
+        }
+    });
+});
+
 // After open folder call, check if we should restore any previously opened preview node.
 mBroadcaster.once('mega:openfolder', () => {
     'use strict';

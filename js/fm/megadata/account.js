@@ -450,7 +450,7 @@ MegaData.prototype.getAccountDetails = function() {
             const {u_attr} = window;
 
             if (u_attr && typeof result === 'object') {
-                const upd = `b,mkt,p,pf,uspw`.split(',');
+                const upd = `b,mkt,p,pf,uspw,notifs`.split(',');
 
                 for (let i = upd.length; i--;) {
                     const k = upd[i];
@@ -472,6 +472,10 @@ MegaData.prototype.getAccountDetails = function() {
                     value: freeze(result.flags || {})
                 });
                 mBroadcaster.sendMessage('global-mega-flags', u_attr.flags);
+
+                if (self.notify && notify.checkForNotifUpdates) {
+                    tryCatch(() => notify.checkForNotifUpdates())();
+                }
             }
 
             return result;

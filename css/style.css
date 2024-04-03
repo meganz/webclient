@@ -532,6 +532,7 @@ label span.black {
     cursor: pointer;
 }
 .notification-item {
+    --notification-color-promo: rgba(0, 191, 165, 1);
     display: block;
 }
 .notification-item:nth-of-type(even) {
@@ -684,6 +685,13 @@ label span.black {
 .notification-accepted-bl {
     display: none;
 }
+.notification-item .cta-buttons {
+    margin: 5px 0;
+    padding: 0 20px 0 12px;
+    text-align: right;
+    align-self: flex-start;
+    display: table-cell;
+}
 .notification-accepted {
     color: var(--text-color-medium);
     font-size: 13px;
@@ -768,12 +776,47 @@ label span.black {
 .nt-payment-reminder-notification .notification-icon .payment-icon,
 .nt-payment-notification .notification-icon .payment-icon,
 .nt-takedown-notification .notification-icon .takedown-icon,
-.nt-takedown-reinstated-notification .notification-icon .reinstated-icon {
+.nt-takedown-reinstated-notification .notification-icon .reinstated-icon,
+.nt-dynamic-notification .notification-icon .dynamic-icon{
     display: block;
 }
 .notification-avatar img {
     width: 48px;
     height: 48px;
+}
+.notification-promo {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 9px;
+}
+.notification-promo .promo-text{
+    font: var(--text-body1-bold);
+    color: var(--notification-color-promo);
+
+}
+.notification-promo .promo-icon{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--notification-color-promo);
+    color: var(--text-color-white-high);
+    font: var(--text-body2);
+    border-radius: 20px;
+    padding: 0 8px;
+    height: 18px;
+    margin-top: 2px;
+}
+.nt-dynamic-notification img {
+    width: 317px;
+    height: 115px;
+    margin: 4px 12px 2px;
+}
+.nt-dynamic-notification .notification-username {
+    white-space: initial;
+    text-overflow: initial;
+    overflow: initial;
+    margin-bottom: 8px;
 }
 .notification-username {
     display: block;

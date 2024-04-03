@@ -424,6 +424,33 @@ function time2last(timestamp, skipSeconds) {
     return mega.icu.format(l.day_last_count, Math.ceil(sec / 86400));
 }
 
+/**
+ * Function to create long date format for current locales.
+ * @param {Number} expiry The UNIX timestamp in seconds that the offer expires OR seconds until offer expires.
+ * @param {Boolean} remainingGiven Optional, are the remaining seconds given, otherwise is a UNIX timestamp.
+ * @returns {String} result Formatted date.
+ */
+function time2offerExpire(expiry, remainingGiven) {
+    'use strict';
+    const remainingSecs = remainingGiven ? expiry : expiry - Date.now() / 1000;
+    // Expired
+    if (remainingSecs <= 0) {
+        return l.notif_offer_expired;
+    }
+    else if (remainingSecs < 60) {
+        return mega.icu.format(l.notif_offer_exp_second, Math.floor(remainingSecs));
+    }
+    else if (remainingSecs < 3600) {
+        const mins = Math.floor(remainingSecs / 60);
+        const secs = Math.floor(remainingSecs % 60);
+        return l.notif_offer_exp_minute_second.replace('%1', mins).replace('%2', secs);
+    }
+    else if (remainingSecs < 86400) {
+        return mega.icu.format(l.notif_offer_exp_hour, Math.floor(remainingSecs / 3600));
+    }
+    return mega.icu.format(l.notif_offer_exp_day, Math.floor(remainingSecs / 86400));
+}
+
 /*
  * Calculate start and end of calendar on the week/month/year contains time passed or today.
  *

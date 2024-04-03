@@ -23,6 +23,9 @@ var notify = {
     $popupIcon: null,
     $popupNum: null,
 
+    /** Promise of if the intial notifications have loaded */
+    initialLoading: false,
+
     /** A flag for if the initial loading of notifications is complete */
     initialLoadComplete: false,
 
@@ -37,6 +40,10 @@ var notify = {
 
     // User added to the experiment this session (to avoid duplicate api calls to add user to experiment)
     checkedExperiment: false,
+
+    // Current dynamic notifications
+    dynamicNotifs: {},
+    lastSeenDynamic: undefined,
 
     /**
      * Initialise the notifications system
@@ -64,7 +71,7 @@ var notify = {
         notify.notifications = [];
 
         // Call API to fetch the most recent notifications
-        api.req(`c=${this.numOfNotifications}`, 3)
+        notify.initialLoading = api.req(`c=${this.numOfNotifications}`, 3)
             .then(({result}) => {
 
                 // Check it wasn't a negative number error response
@@ -145,9 +152,9 @@ var notify = {
         var newNotification = {
             data: actionPacket,                             // The action packet
             id: makeid(10),                                 // Make random ID
-            seen: false,                                    // New notification, so mark as unread
+            seen: actionPacket.seen || false,                                  // New notification, so mark as unread
             timeDelta: 0,                                   // Time since notification was sent
-            timestamp: unixtime(),                          // Get the current timestamps in seconds
+            timestamp: actionPacket.timestamp || unixtime(),                   // Get the current timestamps in seconds
             type: actionPacket.a,                           // Type of notification e.g. share
             userHandle: actionPacket.u || actionPacket.ou   // User handle e.g. new share from this user
         };
@@ -376,6 +383,13 @@ var notify = {
                         }
                     }
                 }
+                else if (notify.notifications[i].type === 'dynamic') {
+                    // Do not count expired promotions, if they have an expiration date
+                    if ((!notify.notifications[i].data.e || notify.notifications[i].data.e >= unixtime())
+                        && notify.notifications[i].data.id > this.lastSeenDynamic) {
+                        newNotifications++;
+                    }
+                }
                 else {
                     newNotifications++;
                 }
@@ -408,9 +422,21 @@ var notify = {
 
         'use strict';
 
+        let newMaxDynamic = false;
+
         // Loop through the notifications and mark them as seen (read)
         for (var i = 0; i < notify.notifications.length; i++) {
+            if (notify.notifications[i].type === 'dynamic') {
+                const newId = notify.notifications[i].data.id;
+                if (newId > this.lastSeenDynamic) {
+                    newMaxDynamic = true;
+                    this.lastSeenDynamic = newId;
+                }
+            }
             notify.notifications[i].seen = true;
+        }
+        if (newMaxDynamic) {
+            mega.attr.set('lnotif', String(this.lastSeenDynamic), -2, true);
         }
 
         // Hide red circle with number of new notifications
@@ -471,22 +497,38 @@ var notify = {
             this.$popup.closest('.js-dropdown-notification').removeClass('show');
             notify.markAllNotificationsAsSeen();
         }
+        notify.dynamicNotifCountdown.removeDynamicNotifCountdown();
     },
 
     /**
-     * Sort the notifications so the most recent ones appear first in the popup
+     * Sort dynamic notifications to be at the top sorted by id, then other notifications by timestamp
      */
     sortNotificationsByMostRecent: function() {
-
         notify.notifications.sort(function(notificationA, notificationB) {
 
-            if (notificationA.timestamp > notificationB.timestamp) {
-                return -1;
-            }
-            else if (notificationA.timestamp < notificationB.timestamp) {
-                return 1;
+            if (notificationA.type === 'dynamic' || notificationB.type === 'dynamic') {
+                if (notificationB.type !== 'dynamic') {
+                    return -1;
+                }
+                else if (notificationA.type !== 'dynamic') {
+                    return 1;
+                }
+
+                if (notificationA.data.id > notificationB.data.id) {
+                    return -1;
+                }
+                else if (notificationA.data.id < notificationB.data.id) {
+                    return 1;
+                }
+                return 0;
             }
             else {
+                if (notificationA.timestamp > notificationB.timestamp) {
+                    return -1;
+                }
+                else if (notificationA.timestamp < notificationB.timestamp) {
+                    return 1;
+                }
                 return 0;
             }
         });
@@ -613,7 +655,7 @@ var notify = {
         }
 
         // Update the list of notifications
-        notify.$popup.find('.notification-scr-list').append(allNotificationsHtml);
+        notify.$popup.find('.notification-scr-list').safeAppend(allNotificationsHtml);
         notify.$popup.removeClass('empty loading');
 
         // Add scrolling for the notifications
@@ -630,6 +672,12 @@ var notify = {
         notify.initAcceptContactClickHandler();
         notify.initSettingsClickHander();
         notify.initScheduledClickHandler();
+        notify.initDynamicClickHandler();
+
+        // Initialise countdown timer for dynamic notifications with expiry dates
+        if (this.$popup.closest('.js-dropdown-notification').hasClass('show')) {
+            notify.dynamicNotifCountdown.startTimer();
+        }
     },
 
     /**
@@ -806,6 +854,21 @@ var notify = {
         });
     },
 
+    initDynamicClickHandler: () => {
+        'use strict';
+        $('.nt-dynamic-notification', this.$popup).rebind('click.notifications', e => {
+            const dynamicId = $(e.currentTarget).attr('data-dynamic-id');
+            const ctaButton = notify.dynamicNotifs[dynamicId].cta1 || notify.dynamicNotifs[dynamicId].cta2;
+            if (ctaButton && ctaButton.link) {
+                notify.closePopup();
+                const link = ctaButton.link;
+                if (link) {
+                    window.open(link, '_blank', 'noopener,noreferrer');
+                }
+            }
+        });
+    },
+
     /**
      * Main function to update each notification with relevant style and details
      * @param {Object} $notificationHtml The jQuery clone of the HTML notification template
@@ -820,7 +883,7 @@ var notify = {
         var date = time2last(notification.timestamp);
         var data = notification.data;
         var userHandle = notification.userHandle;
-        var customIconNotifications = ['psts', 'pses', 'ph'];   // Payment & Takedown notification types
+        const customIconNotifications = ['psts', 'pses', 'ph', 'dynamic'];   // Payment & Takedown notification types
         var userEmail = l[7381];    // Unknown
         var avatar = '';
 
@@ -910,6 +973,8 @@ var notify = {
                 return notify.renderPaymentReminder($notificationHtml, notification);
             case 'ph':
                 return notify.renderTakedown($notificationHtml, notification);
+            case 'dynamic':
+                return notify.renderDynamic($notificationHtml, notification);
             case 'mcsmp': {
                 if (!window.megaChat || !window.megaChat.is_initialized) {
                     return false;
@@ -1683,6 +1748,151 @@ var notify = {
         return $notificationHtml;
     },
 
+    // This object handles the countdown timer for dynamic notifications with < 1h remaining.
+    // There will likely only ever be one, however it is possible to have
+    // any number of active notifications requiring a countdown.
+    dynamicNotifCountdown: {
+
+        countDownNotifs: {},
+        keys: [],
+
+        addNotifToCounter(id, expiry) {
+            'use strict';
+            this.countDownNotifs[id] = {
+                $expText: undefined,
+                expiry,
+            };
+        },
+
+        removeNotifFromCounter(id) {
+            'use strict';
+            delete this.countDownNotifs[id];
+            this.keys = Object.keys(this.countDownNotifs);
+            if (!this.keys.length) {
+                this.removeDynamicNotifCountdown();
+            }
+        },
+
+        disableClick(id) {
+            'use strict';
+            const $notification = $(`#dynamic-notif-${id}`, notify.$popup).off('click.notifications');
+            $('button', $notification).addClass('disabled');
+        },
+
+        // Re-check the current items in the countdown timer, and make sure that it is running
+        startTimer() {
+            'use strict';
+
+            this.keys = Object.keys(this.countDownNotifs);
+            if (!this.keys.length) {
+                return;
+            }
+
+            for (const key of this.keys) {
+                this.countDownNotifs[key].$expText = $(`#dynamic-notif-${key} .notification-date`, notify.$popup);
+            }
+
+            if (!this.countdown) {
+                this.countdown = setInterval(() => {
+                    const currentTime = unixtime();
+                    for (const key of this.keys) {
+                        const remaining = this.countDownNotifs[key].expiry - currentTime;
+                        this.countDownNotifs[key].$expText
+                            .text(time2offerExpire(remaining, true));
+                        if (remaining <= 0) {
+                            // Close the notification banner if the one currently shown has expired
+                            if (notificationBanner.currentNotification &&
+                                notificationBanner.currentNotification.id === parseInt(key)) {
+                                // Notify any other tabs a banner has closed
+                                mBroadcaster.crossTab.notify('closedBanner', parseInt(key));
+
+                                notificationBanner.updateBanner(true);
+                            }
+
+                            this.removeNotifFromCounter(key);
+                            this.disableClick(key);
+                        }
+                    }
+                }, 1000);
+            }
+        },
+
+        removeDynamicNotifCountdown() {
+            'use strict';
+            if (this.countdown) {
+                clearInterval(this.countdown);
+                delete this.countdown;
+            }
+        }
+    },
+
+    /**
+     * Takes in an object and creates a dynamic notification object based on what the object contains.
+     * @param {Object} $notificationHtml jQuery object of the notification template HTML
+     * @param {Object} notification The notification object. Must have: title(t), description(d) and id(id)
+     * May have: expiry date(e), cta button {link: string, text: string}, image details (img, dsp), flags (sb)
+     * @returns {Object|false} The HTML to be rendered for the notification
+     */
+    renderDynamic($notificationHtml, notification) {
+        'use strict';
+
+        const {data} = notification;
+        if (!data.t || !data.d || !data.id) {
+            return;
+        }
+
+        if (data.e) {
+            // If the notification is expired, do not show it.
+            const remaining = data.e - unixtime();
+            if (remaining <= 0) {
+                return false;
+            }
+            else if (remaining <= 3600) {
+                notify.dynamicNotifCountdown.addNotifToCounter(data.id, data.e);
+            }
+            const offerExpiryText = time2offerExpire(data.e);
+            $('.notification-date', $notificationHtml)
+                .text(offerExpiryText)
+                .addClass(remaining <= 3600 ? 'red' : '');
+        }
+
+        const ctaButton = data.cta1 || data.cta2;
+        if (ctaButton && ctaButton.link) {
+            const $ctas = $('.cta-buttons', $notificationHtml)
+                .removeClass('hidden')
+                .addClass(data.cta1 ? 'positive' : '');
+            const $button = $('button', $ctas).toggleClass('positive', !!data.cta1);
+            $('span', $button).text(ctaButton.text);
+        }
+        if (data.dsp && data.img) {
+            let failed = 0;
+            const retina = (window.devicePixelRatio > 1) ? '@2x' : '';
+            const imagePath = staticpath + 'images/mega/psa/' + data.img + '@2x.png';
+
+            $('.dynamic-image', $notificationHtml)
+                .attr('src', imagePath)
+                .removeClass('hidden')
+                .rebind('error', function() {
+                    // If it failed once it will likely keep failing, prevent infinite loop
+                    if (failed) {
+                        $(this).addClass('hidden');
+                        return;
+                    }
+                    $(this).attr('src', data.dsp + data.img + retina + '.png');
+                    failed = 1;
+                });
+        }
+
+        $('.notification-info', $notificationHtml).text(data.d);
+        $('.notification-username', $notificationHtml).text(data.t);
+        $('.notification-promo', $notificationHtml).removeClass('hidden');
+        $notificationHtml.addClass('nt-dynamic-notification');
+        $notificationHtml.attr('data-dynamic-id', data.id);
+        $notificationHtml.attr('id', 'dynamic-notif-' + data.id);
+
+        return $notificationHtml;
+    },
+
     /**
      * Truncates long file or folder names to 30 characters
      * @param {String} name The file or folder name
@@ -1736,5 +1946,110 @@ var notify = {
 
         // Escape and return
         return displayName;
+    },
+
+    /**
+     * Adds an array of dynamic notifications to the current notifications via the action packet system
+     * First await that the initial notifications have loaded, otherwise the notifyFromActionPacket call will be blocked
+     */
+    async addDynamicNotifications() {
+        'use strict';
+
+        // Make Get Notification (gnotif) API request
+        const {result} = await api.req({a: 'gnotif'});
+        let notifAdded = false;
+
+        if (typeof this.lastSeenDynamic === 'undefined') {
+            this.lastSeenDynamic
+                = parseInt(await Promise.resolve(mega.attr.get(u_handle, 'lnotif', -2, true)).catch(nop)) | 0;
+        }
+
+        for (let i = 0; i < result.length; i++) {
+            const givenNotif = result[i];
+
+            if (notify.dynamicNotifs[givenNotif.id]) {
+                continue;
+            }
+
+            const dynamicNotif = {
+                ...givenNotif,
+                a: 'dynamic',
+                timestamp: givenNotif.e || givenNotif.s,
+                seen: givenNotif.id <= this.lastSeenDynamic
+            };
+
+            // Decode title, description and CTA button texts
+            dynamicNotif.t = from8(b64decode(dynamicNotif.t));
+            dynamicNotif.d = from8(b64decode(dynamicNotif.d));
+            if (dynamicNotif.cta1) {
+                dynamicNotif.cta1.text = from8(b64decode(dynamicNotif.cta1.text));
+            }
+            if (dynamicNotif.cta2) {
+                dynamicNotif.cta2.text = from8(b64decode(dynamicNotif.cta2.text));
+            }
+
+            // Store the notification so that its variables can be easily accessed
+            notify.dynamicNotifs[dynamicNotif.id] = dynamicNotif;
+
+            notifAdded = true;
+
+            // Once the initial notifications have loaded, add the dynamic notification via the action packet system
+            notify.initialLoading.then(() => {
+                notify.notifyFromActionPacket(dynamicNotif);
+            }).catch(dump);
+        }
+
+        if (notifAdded) {
+            if (notificationBanner.bannerInited) {
+                notificationBanner.updateBanner(false);
+            }
+            else {
+                notificationBanner.init();
+            }
+        }
+    },
+
+    /**
+     * Check if the 'notifs' user attribute has been updated (e.g. after redeeming a promo notification,
+     * which should remove that notification ID from u_attr.notifs), and update the dynamic notifications
+     * and banner as appropriate
+     */
+    checkForNotifUpdates() {
+        'use strict';
+
+        if (!notificationBanner.bannerInited) {
+            return;
+        }
+
+        // Compare notifs user attribute value (list) to cached notifications list
+        const cachedNotifList = Object.keys(notify.dynamicNotifs).map(Number);
+        const newNotifList = u_attr.notifs;
+
+        if (cachedNotifList.length !== newNotifList.length) {
+            if (newNotifList.length > cachedNotifList.length) {
+                // If there's a new notification add it
+                notify.addDynamicNotifications().catch(dump);
+            }
+            else {
+                // Otherwise delete the missing notification(s) which should never be shown again
+                const notifListDiffs = cachedNotifList.filter(elem => !newNotifList.includes(elem));
+                for (const id of notifListDiffs) {
+                    delete notify.dynamicNotifs[id];
+                    notify.notifications.splice(
+                        notify.notifications.findIndex(elem => elem.data.id === id), 1
+                    );
+
+                    // Update the notification banner if the one currently being shown is no longer valid
+                    if (notificationBanner.currentNotification.id === id) {
+                        notificationBanner.updateBanner(true);
+                    }
+                }
+
+                // If the popup is open, re-render the notifications
+                if (!notify.$popup.hasClass('hidden')) {
+                    notify.renderNotifications();
+                }
+            }
+        }
     }
 };

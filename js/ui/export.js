@@ -1901,13 +1901,13 @@ function logExportEvt(type, target) {
                     var $input = $(s, c);
                     var value = String($input.val() || '').replace(/\.\d*$/g, '').replace(/\D/g, '');
 
-                    value = parseInt(value || $input.attr('min') || '0') | 0;
-                    $input.val(value);
+                    value = Math.min(Math.max(parseInt(value) || 0, $input.attr('min') | 0),
+                                     parseInt($input.attr('max')) || Number.MAX_SAFE_INTEGER) >>> 0;
                     return value;
                 };
 
-                time = getValue('input', $time) ? getValue('input', $time) : 0;
-                const timeString = mega.icu.format(l.start_video_at_embed, time);
+                const inputTime = getValue('input', $time) || 0;
+                const timeString = mega.icu.format(l.start_video_at_embed, inputTime);
                 const timeArray = timeString.split(/\[A]|\[\/A]/);
 
                 $('#embed_start_at_txt_1', $embedTab).text(timeArray[0]);
@@ -2001,10 +2001,13 @@ function logExportEvt(type, target) {
 
             $.itemExportEmbed = null;
 
+            const playtime = MediaAttribute(n).data.playtime;
             $('.video-filename span', $embedTab).text(n.name);
             $('.video-attributes .size', $embedTab).text(bytesToSize(n.s));
             $('.video-attributes .duration', $embedTab)
-                .text(secondsToTimeShort(MediaAttribute(n).data.playtime));
+                .text(secondsToTimeShort(playtime));
+            $('.start-video-at .embed-setting input', $embedTab).attr('max', playtime || 0);
+            $('.start-video-at', $embedTab).toggleClass('opacity-50 pointer-events-none', !playtime);
 
             var $thumb = $('.video-thumbnail img', $embedTab).attr('src', noThumbURI);
 

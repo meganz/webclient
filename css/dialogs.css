@@ -8351,33 +8351,21 @@ body.de .mega-dialog.contact-picker-widget {
 
     .mega-dialog.affiliate-redeem {
         text-align: center;
-    }
-    .mega-dialog.affiliate-redeem.dialog-normal {
-        text-align: center;
         width: 770px;
     }
     .mega-dialog.affiliate-redeem > section.content {
         flex-shrink: initial;
     }
-    .mega-dialog.affiliate-redeem.dialog-normal:has(.step1.bitcoin:not(.hidden)) {
+    .mega-dialog.affiliate-redeem:has(.step1.bitcoin:not(.hidden)) {
         text-align: center;
         width: 736px;
     }
-    .mega-dialog.affiliate-redeem.dialog-normal:has(.step1.bitcoin:not(.hidden)) footer .footer-container {
+    .mega-dialog.affiliate-redeem footer .footer-container {
         padding-top: 21px;
     }
     .mega-dialog.affiliate-redeem.dialog-small {
         width: 583px;
         height: 364px;
-    }
-    .mega-dialog.affiliate-redeem.dialog-medium {
-        text-align: center;
-        width: 736px;
-        height: 515px;
-    }
-    .mega-dialog.affiliate-redeem.dialog-tall {
-        text-align: center;
-        height: 567px;
     }
     .mega-dialog.affiliate-redeem .dialog-commisison-title {
         font: var(--text-h3);

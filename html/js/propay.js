@@ -1642,15 +1642,17 @@ pro.propay = {
      * @param {Object|Number} utcResult The results from the UTC call or a negative number on failure
      * @param {String}        saleId    The saleIds of the purchase.
      */
-    processUtcResults: function(utcResult, saleId) {
+    async processUtcResults(utcResult, saleId) {
         'use strict';
 
-        // If the user is upgrading from free, set a flag to show the welcome dialog when the psts notification
-        // arrives. Set this flag if the user is in the experiment, regardless of which variation they are in.
+        const welDlgAttr =
+            parseInt(await Promise.resolve(mega.attr.get(u_handle, 'welDlg', -2, true)).catch(nop)) | 0;
+
+        // If the user has purchased a subscription and they haven't seen the welcome dialog before (
+        // u_attr[^!welDlg] = 0), set welDlg to 1 which will show it when the psts notification arrives.
         // If the payment fails the welcome dialog will check if the user has a pro plan, and as such should still
         // work as expected.
-        // Only set if user has not seen the welcome dialog before
-        if ((u_attr['^!welDlg'] !== '0') && (typeof mega.flags.ab_wdns !== 'undefined')){
+        if (!welDlgAttr) {
             mega.attr.set('welDlg', 1, -2, true);
         }
 

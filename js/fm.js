@@ -603,6 +603,28 @@ function fmtopUI() {
     var $galleryTabBlock = $('.gallery-tabs-bl');
     const $galleryTabLink = $('.gallery-tab-lnk');
     const $header = $('.fm-right-header', '.fmholder');
+    const $fmShareButton = $('.fm-share-folder').off('click.shareFolder').addClass('hidden');
+
+    if ($fmShareButton.length) {
+        // Show share button unless for root id, out shares, s4, etc
+        const pages = ['s4', 'out-shares', 'shares', 'file-requests', 'faves', M.RubbishID];
+        const dirPages = [M.BackupsId, M.RootID, M.currentrootid];
+        const showButton = !pages.includes(M.currentrootid) && !dirPages.includes(M.currentdirid)
+            && M.currentrootid !== (M.BackupsId && M.getNodeByHandle(M.BackupsId).p);
+
+        if (showButton) {
+            const h = String(M.currentdirid).split('/').pop();
+            const n = M.getNodeByHandle(h);
+
+            if (M.getNodeRights(n.h) > 1) {
+                $fmShareButton.removeClass('hidden').rebind('click.shareFolder', () => {
+                    $.selected = [n.h];
+                    M.openSharingDialog($.selected[0]);
+                    return false;
+                });
+            }
+        }
+    }
 
     $('.shares-tab-lnk.active', $sharesTabBlock).removeClass('active');
     $('.gallery-tab-lnk.active', $galleryTabBlock).removeClass('active');

@@ -934,7 +934,7 @@ lazy(mega, 'rewind', () => {
                     this.prepareNode(node, this.nodeDictionary, this.nodeChildrenDictionary);
                 }
 
-                if (node.fv) {
+                if (node.fv || actionPacketFiles.length > 1) {
                     this.prepareNode(node, dateData[actionDateString].modified, false, true);
                     dateData[actionDateString].type[node.h] = TYPE_MODIFIED;
 

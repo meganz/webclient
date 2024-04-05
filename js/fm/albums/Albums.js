@@ -4708,7 +4708,7 @@ lazy(mega.gallery, 'albums', () => {
                 this.updateAlbumDataByUpdatedNode(keys[i], node);
             }
 
-            if (!M.v.includes(node)) {
+            if (M.currentCustomView.type === 'albums' && !M.v.includes(node)) {
                 M.v.push(node);
                 sortInAlbumNodes(M.v);
             }

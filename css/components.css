@@ -142,7 +142,7 @@
     margin-inline-end: 8px;
 }
 .lp-gallery .btn-galleries span {
-    width: auto;
+    width: 100%;
 }
 
 .btn-galleries.subalbum-btn::after {
@@ -152,7 +152,7 @@
     display: inline-block;
     right: -1px;
     background: var(--surface-tree-iconwrap);
-    padding: 8px 16px 8px 4px;
+    padding: 16px 16px 16px 4px;
 }
 
 .rtl .btn-galleries.subalbum-btn::after {

@@ -776,9 +776,9 @@ body.rtl .albums-grid-cell > div:not(.flex-row) {
 }
 .js-lp-gallery .subalbum-btn {
     padding-left: 2.5rem;
-    padding-right: 2.5rem;
     width: 100%;
     min-width: 100%;
+    display: inline-flex;
 }
 .js-lp-gallery .subalbum-btn.is-shared::after {
     display: none;

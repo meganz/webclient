@@ -804,7 +804,10 @@ function initTreeScroll() {
     var treeClass = 'js-myfiles-panel';
     var scrollBlock;
 
-    if (folderlink || M.currentTreeType !== 'cloud-drive') {
+    if (M.currentTreeType === 'gallery') {
+        treeClass = 'js-gallery-panel';
+    }
+    else if (folderlink || M.currentTreeType !== 'cloud-drive') {
         treeClass = 'js-other-tree-panel';
 
         $('.js-other-tree-panel .section-title')

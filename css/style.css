@@ -1592,6 +1592,9 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     background-color: rgba(217,0,7,0);
     padding: 4px 0;
 }
+.fm-other-tree-panel .nw-fm-tree-item {
+    overflow: hidden;
+}
 .nw-fm-tree-item .data-item-icon {
     top: 2px;
     right: 12px;

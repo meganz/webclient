@@ -146,7 +146,7 @@
     margin-inline-end: 8px;
 }
 .lp-gallery .btn-galleries span {
-    width: 100%;
+    width: calc(100% - 40px);
 }
 
 .btn-galleries.subalbum-btn::after {
@@ -157,6 +157,10 @@
     right: -1px;
     background: var(--surface-tree-iconwrap);
     padding: 16px 16px 16px 4px;
+}
+
+.fm-other-tree-panel .btn-galleries.subalbum-btn::after {
+    right: -7px;
 }
 
 .rtl .btn-galleries.subalbum-btn::after {

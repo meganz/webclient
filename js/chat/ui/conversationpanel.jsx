@@ -2985,7 +2985,7 @@ export class EmptyConvPanel extends MegaRenderMixin {
             return (
                 <Button
                     className="mega-button large positive"
-                    label={l.create_meeting /* `Create meeting` */}>
+                    label={l.new_meeting /* `New meeting` */}>
                     <Dropdown
                         className="light"
                         noArrow="true"

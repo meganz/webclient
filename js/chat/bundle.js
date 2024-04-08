@@ -8416,8 +8416,10 @@ class ContactPickerWidget extends _mixins1__.w9 {
       icon: "sprite-fm-mono icon-add-circle",
       label: l[71],
       onClick: () => {
+        var _this$props$onAddCont, _this$props;
         contactAddDialog();
         closeDropdowns();
+        (_this$props$onAddCont = (_this$props = this.props).onAddContact) == null || _this$props$onAddCont.call(_this$props);
       }
     })));
   }
@@ -14880,7 +14882,7 @@ class EmptyConvPanel extends mixins.w9 {
     if (isMeeting) {
       return external_React_default().createElement(buttons.$, {
         className: "mega-button large positive",
-        label: l.create_meeting
+        label: l.new_meeting
       }, external_React_default().createElement(dropdowns.Dropdown, {
         className: "light",
         noArrow: "true",
@@ -15101,7 +15103,10 @@ class Start extends mixins.w9 {
       onClick: this.toggleEdit
     }, external_React_default().createElement("span", null, l[1342]))), external_React_default().createElement(meetings_button.A, {
       className: "mega-button positive large start-meeting-button",
-      onClick: this.startMeeting
+      onClick: () => {
+        this.startMeeting();
+        eventlog(500235);
+      }
     }, external_React_default().createElement("span", null, l[7315])), external_React_default().createElement(ui_link.A, {
       to: "https://mega.io/chatandmeetings",
       target: "_blank"
@@ -17364,6 +17369,7 @@ class StartGroupChatWizard extends mixins.w9 {
       openInvite
     });
     this.props.onClose(this);
+    eventlog(500236);
   }
   render() {
     var self = this;
@@ -18357,7 +18363,10 @@ class Navigation extends mixins.w9 {
                         ${LeftPanel.NAMESPACE}-chats-tab
                         ${view === CHATS && routingSection === 'chat' ? 'active' : ''}
                     `,
-      onClick: () => renderView(CHATS)
+      onClick: () => {
+        renderView(CHATS);
+        eventlog(500233);
+      }
     }, external_React_default().createElement(buttons.$, {
       unreadChats: unreadChats,
       className: `${LeftPanel.NAMESPACE}-nav-button`,
@@ -18370,7 +18379,10 @@ class Navigation extends mixins.w9 {
                         ${LeftPanel.NAMESPACE}-meetings-tab
                         ${view === MEETINGS && routingSection === 'chat' ? 'active' : ''}
                     `,
-      onClick: () => renderView(MEETINGS)
+      onClick: () => {
+        renderView(MEETINGS);
+        eventlog(500234);
+      }
     }, external_React_default().createElement(buttons.$, {
       unreadMeetings: unreadMeetings,
       className: `${LeftPanel.NAMESPACE}-nav-button`,
@@ -18430,8 +18442,7 @@ class Actions extends mixins.w9 {
     }, view === LOADING && external_React_default().createElement(buttons.$, {
       className: "mega-button action loading-sketch"
     }, external_React_default().createElement("i", null), external_React_default().createElement("span", null)), view === CHATS && routingSection !== 'contacts' && external_React_default().createElement(buttons.$, {
-      className: "mega-button action",
-      icon: "sprite-fm-mono icon-add-circle",
+      className: "mega-button small positive new-chat-action",
       label: l.add_chat
     }, external_React_default().createElement(dropdowns.DropdownContactsSelector, {
       className: `
@@ -18454,11 +18465,10 @@ class Actions extends mixins.w9 {
       }],
       showAddContact: contactsPanel.A.hasContacts()
     })), view === MEETINGS && routingSection !== 'contacts' && external_React_default().createElement(buttons.$, {
-      className: "mega-button action",
-      icon: "sprite-fm-mono icon-add-circle",
-      label: l.create_meeting
+      className: "mega-button small positive",
+      label: l.new_meeting
     }, external_React_default().createElement("i", {
-      className: "sprite-fm-mono icon-arrow-down"
+      className: "dropdown-indicator sprite-fm-mono icon-arrow-down"
     }), external_React_default().createElement(dropdowns.Dropdown, {
       className: "light",
       noArrow: "true",
@@ -31821,13 +31831,16 @@ class DropdownContactsSelector extends _chat_mixins1__.w9 {
     this.props.onSelectClicked();
   }
   render() {
-    var self = this;
     return React.createElement(Dropdown, {
-      className: "popup contacts-search " + this.props.className + " tooltip-blur",
+      className: `
+                    popup contacts-search
+                    ${this.props.className}
+                    tooltip-blur
+                `,
       active: this.props.active,
       closeDropdown: this.props.closeDropdown,
-      ref: function (r) {
-        self.dropdownRef = r;
+      ref: ref => {
+        this.dropdownRef = ref;
       },
       positionMy: this.props.positionMy,
       positionAt: this.props.positionAt,
@@ -31838,8 +31851,8 @@ class DropdownContactsSelector extends _chat_mixins1__.w9 {
     }, React.createElement(_chat_ui_contacts_jsx2__.ContactPickerWidget, {
       onClose: this.props.closeDropdown,
       onEventuallyUpdated: () => {
-        var _self$dropdownRef;
-        (_self$dropdownRef = self.dropdownRef) == null || _self$dropdownRef.doRerender();
+        var _this$dropdownRef;
+        return (_this$dropdownRef = this.dropdownRef) == null ? void 0 : _this$dropdownRef.doRerender();
       },
       active: this.props.active,
       className: "popup contacts-search tooltip-blur small-footer",
@@ -31851,6 +31864,8 @@ class DropdownContactsSelector extends _chat_mixins1__.w9 {
       multiple: this.props.multiple,
       topButtons: this.props.topButtons,
       showAddContact: this.props.showAddContact,
+      onAddContact: () => eventlog(500237),
+      onSelected: () => eventlog(500238),
       onSelectDone: this.props.onSelectDone,
       multipleSelectedButtonLabel: this.props.multipleSelectedButtonLabel,
       singleSelectedButtonLabel: this.props.singleSelectedButtonLabel,

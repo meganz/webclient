@@ -943,8 +943,6 @@ lazy(pro, 'proplan2', () => {
             // If local currency values exist
             pro.proplan.businessPlanData.isLocalInfoValid = info.l && info.l.lcs && info.l.lc
                 && info.bd.us.lp && info.bd.sto.lp && info.bd.trns.lp;
-
-            populateBusinessPlanData();
         });
     };
 
@@ -1161,6 +1159,7 @@ lazy(pro, 'proplan2', () => {
             loadingDialog.show();
 
             await fetchPlansData();
+            await fetchBusinessPlanInfo();
             parsepage(pages.planpricing);
 
             if (mega.ui.header) {
@@ -1175,7 +1174,7 @@ lazy(pro, 'proplan2', () => {
             delay('pricingpage.init', eventlog.bind(null, is_mobile ? 99936 : 99935));
 
             initPlansCards();
-            fetchBusinessPlanInfo();
+            populateBusinessPlanData();
 
             initTabHandlers();
             initPeriodPickHandler();

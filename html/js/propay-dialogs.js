@@ -2213,7 +2213,7 @@ var addressDialog = {
             }
 
             $stripeIframe.remove();
-            $stripeDialog.addClass('hidden');
+            closeStripeDialog();
             M.safeShowDialog('stripe-pay-failure', $stripeFailureDialog);
         };
 

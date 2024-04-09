@@ -955,7 +955,7 @@ ul, li {
     flex-direction: column;
     z-index: 100;
 }
-.fm-scrolling.scroller-space > *:not(.language-selector):not(.download-file-container) {
+.fm-scrolling.scroller-space > *:not(.full-width) {
     margin-inline-end: 12px;
     -webkit-margin-end: 12px;
 }

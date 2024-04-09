@@ -2007,6 +2007,8 @@ var addressDialog = {
         $errorMessage.addClass(is_mobile ? 'v-hidden' : 'hidden');
         $errorMessageContainers.addClass('hidden');
         $allInputs.removeClass('error');
+        $stateSelect.removeClass('error');
+        $countrySelect.removeClass('error');
 
         // Add red border around the missing fields
         $.each(fieldValues, function(fieldName, value) {

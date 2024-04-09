@@ -3623,10 +3623,17 @@ body.theme-dark #schedule-dialog .recurring-edit-banner a {
   width: 100%;
   color: var(--text-color-medium);
 }
+#schedule-dialog .schedule-dialog-column.with-sub-label.schedule-dialog-switch .sub-label {
+  width: calc(100% - 48px);
+}
 #schedule-dialog .schedule-dialog-column label,
 #schedule-dialog .schedule-dialog-column .schedule-label {
   cursor: pointer;
   color: var(--text-color-high);
+}
+#schedule-dialog .schedule-dialog-column i.icon-mega-logo {
+  top: 0;
+  transform: translate(-50%, -100%);
 }
 #schedule-dialog .schedule-date-container {
   width: 100%;

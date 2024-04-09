@@ -1346,6 +1346,12 @@ body.theme-dark .message .audio-player {
     margin-top: 8px;
 }
 
+.message.schedule-message .schedule-link-instruction {
+    color: var(--text-color-high);
+    font: var(--text-body1-bold);
+    padding-top: 8px;
+}
+
 .message.schedule-message .schedule-meeting-link {
     background: var(--surface-grey-2);
     border-radius: 4px;

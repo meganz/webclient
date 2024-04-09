@@ -299,6 +299,8 @@ export class Schedule extends MegaRenderMixin {
                         else {
                             delay('chat-event-sm-button-create', () => eventlog(99922));
                         }
+                        delay('chat-events-sm-settings', () => this.submitStateEvents({ ...this.state }));
+
                         await megaChat.plugins.meetingsManager[chatRoom ? 'updateMeeting' : 'createMeeting'](...params);
                         this.setState({ isLoading: false }, () => onClose());
                     })
@@ -308,6 +310,36 @@ export class Schedule extends MegaRenderMixin {
         /* `Meeting name is required` */
         return this.setState({ topicInvalid: true, invalidTopicMsg: l.schedule_title_missing });
     };
+
+    /**
+     * Event logs after completing the scheduled meeting create/edit flow
+     *
+     * @param state
+     */
+    submitStateEvents(state) {
+        if (state.link) {
+            eventlog(500162);
+        }
+        if (state.sendInvite) {
+            eventlog(500163);
+        }
+        if (state.waitingRoom) {
+            eventlog(500164);
+        }
+        if (state.openInvite) {
+            eventlog(500165);
+        }
+        if (state.description) {
+            eventlog(500166);
+        }
+        if (state.recurring) {
+            eventlog(500167);
+        }
+        else {
+            eventlog(500168);
+        }
+        eventlog(500169, state.topic.length);
+    }
 
     componentWillUnmount() {
         super.componentWillUnmount();
@@ -563,6 +595,7 @@ export class Schedule extends MegaRenderMixin {
                         toggled={link}
                         label={l.schedule_link_label /* `Meeting link` */}
                         isLoading={isLoading}
+                        subLabel={l.schedule_link_info}
                         onToggle={prop => {
                             this.handleToggle(prop);
                             delay('chat-event-sm-meeting-link', () => eventlog(99920));
@@ -831,13 +864,14 @@ const Checkbox = ({ name, className, checked, label, subLabel, isLoading, onTogg
  * @return {React.Element}
  */
 
-const Switch = ({ name, toggled, label, isLoading, onToggle }) => {
+const Switch = ({ name, toggled, label, isLoading, subLabel, onToggle }) => {
+    const className = `${Schedule.NAMESPACE}-switch`;
     return (
         <Row>
             <Column>
                 <i className="sprite-fm-uni icon-mega-logo"/>
             </Column>
-            <Column>
+            <Column className={subLabel ? `with-sub-label ${className}` : className}>
                 <span
                     className={`
                         schedule-label
@@ -861,6 +895,7 @@ const Switch = ({ name, toggled, label, isLoading, onToggle }) => {
                         `}
                     />
                 </div>
+                {subLabel && <div className="sub-label">{subLabel}</div>}
             </Column>
         </Row>
     );

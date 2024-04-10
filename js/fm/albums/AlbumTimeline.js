@@ -477,7 +477,10 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
          * @returns {void}
          */
         set nodes(nodes) {
+            let $middleBlock;
+
             if (this.dynamicList) {
+                $middleBlock = this.findMiddleImage();
                 this.dynamicList.destroy();
                 this.dynamicList = null;
             }
@@ -550,11 +553,48 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                 this.el.parentNode.prepend(this.zoomControls);
             }
 
+            if ($middleBlock) {
+                const listContainerHeight = this.el.offsetHeight;
+                const blockSize = $('.album-timeline-cell', this.el).width();
+                const rowIndex = this.rowIndexCache[$middleBlock.attr('id')];
+                const newOffsetTop = this.dynamicList._offsets[rowIndex];
+                this.dynamicList.scrollToYPosition(newOffsetTop - (listContainerHeight - blockSize) / 2);
+            }
+
             delay('album_timeline:set_nodes', () => {
                 if (this.dynamicList) {
                     this.dynamicList.options.onResize = this.onResize.bind(this);
                 }
             });
+        }
+
+        findMiddleImage() {
+            const $blockViews = $('.album-timeline-cell', this.el);
+            const contentOffset = $('.MegaDynamicList-content', this.el).offset();
+            const listContainerHeight = this.el.offsetHeight;
+
+            let middleBlock = null;
+            let minDistance = 1e6;
+
+            const { scrollTop } = this.el;
+
+            for (const v of $blockViews) {
+                const $v = $(v);
+
+                if ($v.offset().left < contentOffset.left + 5) {
+                    const blockSize = $v.width();
+                    const blockTop = $v.offset().top - contentOffset.top - parseInt($v.css('margin-top'));
+                    const middle = blockTop + blockSize / 2 - scrollTop;
+                    const distance = Math.abs(listContainerHeight / 2 - middle);
+
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        middleBlock = $v;
+                    }
+                }
+            }
+
+            return middleBlock;
         }
 
         clearSiblingSelections(ignoreHandle) {

@@ -38,9 +38,6 @@ var notify = {
     // The welcome dialog has been shown this session
     welcomeDialogShown: false,
 
-    // User added to the experiment this session (to avoid duplicate api calls to add user to experiment)
-    checkedExperiment: false,
-
     // Current dynamic notifications
     dynamicNotifs: {},
     lastSeenDynamic: undefined,
@@ -1377,37 +1374,16 @@ var notify = {
      * @returns {Object} The HTML to be rendered for the notification
      */
     renderPayment: function($notificationHtml, notification) {
-
-        // If they have this attribute, then they signed up for the experiment from a
-        // free account after the experiment started
-        // Send the request to add them to the experiment if they have the experiment flag
-        // and signed up from free after the experiment started
-        if (((u_attr['^!welDlg'] | 0) === 1)
-                && (typeof mega.flags.ab_wdns !== 'undefined')
-                && !notify.checkedExperiment) {
-
-            api.req({'a': 'abta', c: 'ab_wdns'}).catch(dump);
-            if (d) {
-                console.info('User was added to experiment wdns');
-            }
-        }
-        else if (d && (typeof mega.flags.ab_wdns !== 'undefined') && !notify.checkedExperiment) {
-            console.info('User was NOT added to experiment wdns');
-        }
-        notify.checkedExperiment = true;
-
         if (!notification.seen
                 && !notify.welcomeDialogShown
-                && mega.flags.ab_wdns
                 && !(u_attr.pf || u_attr.b)
-                && (u_attr['^!welDlg'] | 0)) {
-
+                && (u_attr['^!welDlg'] | 0) === 1) {
+            // Show the welcome dialog to the user
             notify.createNewUserDialog(notification);
             notify.welcomeDialogShown = true;
-            mega.attr.set('welDlg', 0, -2, true);
-        }
-        else if ((u_attr['^!welDlg'] | 0) === 1 && mega.flags.ab_wdns === 0) {
-            mega.attr.set('welDlg', 0, -2, true);
+
+            // Set ^!welDlg to 2 (user has seen welcome dialog)
+            mega.attr.set('welDlg', 2, -2, true);
         }
 
         var proLevel = notification.data.p;
@@ -1447,6 +1423,7 @@ var notify = {
                 return -1;
             });
 
+            let purchaseEndTime;
             const getPlansEndingAfterPurchase = () => {
                 let plansEndingAfterSubscription = 0;
                 account.purchases.forEach(purchase => {
@@ -1458,6 +1435,7 @@ var notify = {
                     const purchaseEnd = days * 86400 + purchase[1];
 
                     if (((Date.now() / 1000) < purchaseEnd) && ((u_attr.p % 4) <= purchase[5])) {
+                        purchaseEndTime = purchaseEnd;
                         plansEndingAfterSubscription++;
                     }
                 });
@@ -1477,7 +1455,7 @@ var notify = {
                           l.welcome_dialog_thanks_for_sub.replace('%1', newPlan),
                           bodyText
                               .replace('%1', currentPlan)
-                              .replace('%3', time2date(account.suntil, 1))
+                              .replace('%3', time2date(purchaseEndTime || account.srenew, 1))
                               .replace('%2', newPlan));
                 return;
             }

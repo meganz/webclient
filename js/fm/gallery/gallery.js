@@ -1443,9 +1443,7 @@ class MegaGallery {
                 return false;
             }
 
-            if (!this.$middleBlock) {
-                this.$middleBlock = this.findMiddleImage();
-            }
+            this.$middleBlock = this.findMiddleImage();
 
             if (e.currentTarget.classList.contains('disabled')) {
                 return false;

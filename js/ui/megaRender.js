@@ -15,7 +15,7 @@
                         '<span class="grid-status-icon sprite-fm-mono icon-dot"></span>' +
                     '</td>' +
                     '<td megatype="fname">' +
-                        '<span class="transfer-filetype-icon"><img/></span>' +
+                        '<span class="item-type-icon"><img/></span>' +
                         '<span class="tranfer-filetype-txt"></span>' +
                     '</td>' +
                     '<td megatype="label" class="label"></td>' +
@@ -49,7 +49,7 @@
                         '</span>' +
                         '<i class="sprite-fm-mono icon-link"></i>' +
                     '</span>' +
-                    '<span class="block-view-file-type"><img/></span>' +
+                    '<span class="item-type-icon-90"><img/></span>' +
                     '<span class="file-settings-icon"><i class="sprite-fm-mono icon-options"></i></span>' +
                     '<div class="video-thumb-details">' +
                         '<i class="sprite-fm-mono icon-play"></i>' +
@@ -66,7 +66,10 @@
                 '<tr>' +
                     '<td></td>' +
                     '<td>' +
-                        '<div class="shared-folder-icon sprite-fm-uni-after icon-warning-after"></div>' +
+                        '<div ' +
+                            'class="item-type-icon-90 icon-folder-incoming-90 sprite-fm-uni-after icon-warning-after"' +
+                        '>' +
+                        '</div>' +
                         '<div class="shared-folder-info-block">' +
                             '<div class="shared-folder-name"></div>' +
                             '<div class="shared-folder-info"></div>' +
@@ -100,7 +103,7 @@
                        '<span class="file-status-icon indicator sprite-fm-mono"></span>' +
                        '<span class="shared-folder-access indicator sprite-fm-mono"></span>' +
                     '</span>' +
-                    '<span class="block-view-file-type"></span>' +
+                    '<span class="item-type-icon-90 icon-folder-incoming-90"></span>' +
                     '<span class="file-settings-icon"><i class="sprite-fm-mono icon-options"></i></span>' +
                     '<div class="video-thumb-details">' +
                         '<i class="sprite-fm-mono icon-play"></i>' +
@@ -119,11 +122,11 @@
             // List view mode
             '<table>' +
                 '<tr>' +
-                    '<td width="30">' +
+                    '<td width="50">' +
                         '<span class="grid-status-icon sprite-fm-mono icon-dot"></span>' +
                     '</td>' +
                     '<td>' +
-                        '<div class="shared-folder-icon medium-file-icon folder-shared"></div>' +
+                        '<div class="item-type-icon-90 icon-folder-outgoing-90"></div>' +
                         '<div class="shared-folder-info-block">' +
                             '<div class="shared-folder-name"></div>' +
                             '<div class="shared-folder-info"></div>' +
@@ -154,7 +157,7 @@
                     '<span class="data-block-indicators">' +
                        '<span class="file-status-icon indicator sprite-fm-mono"></span>' +
                     '</span>' +
-                    '<span class="block-view-file-type"></span>' +
+                    '<span class="item-type-icon-90 icon-folder-outgoing-90"></span>' +
                     '<span class="file-settings-icon"><i class="sprite-fm-mono icon-options"></i></span>' +
                     '<div class="video-thumb-details">' +
                         '<i class="sprite-fm-mono icon-play"></i>' +
@@ -177,7 +180,7 @@
                         '<span class="grid-status-icon sprite-fm-mono icon-dot"></span>' +
                     '</td>' +
                     '<td megatype="fname">' +
-                        '<span class="transfer-filetype-icon"><img/></span>' +
+                        '<span class="item-type-icon"><img/></span>' +
                         '<span class="tranfer-filetype-txt"></span>' +
                     '</td>' +
                     '<td megatype="label" class="label"></td>' +
@@ -214,7 +217,7 @@
                         '</span>' +
                         '<i class="sprite-fm-mono icon-link"></i>' +
                     '</span>' +
-                    '<span class="block-view-file-type"><img/></span>' +
+                    '<span class="item-type-icon-90"><img/></span>' +
                     '<span class="file-settings-icon"><i class="sprite-fm-mono icon-options"></i></span>' +
                     '<div class="video-thumb-details">' +
                         '<i class="sprite-fm-mono icon-play"></i>' +
@@ -231,7 +234,7 @@
                 '<tr>' +
                     '<td class="space-maintainer-start"></td>' +
                     '<td megatype="fname">' +
-                        '<span class="transfer-filetype-icon"><img/></span>' +
+                        '<span class="item-type-icon"><img/></span>' +
                         '<span class="tranfer-filetype-txt"></span>' +
                     '</td>' +
                     '<td megatype="size" class="size"></td>' +
@@ -873,6 +876,7 @@
             '*': function(aNode, aHandle, aExtendedInfo) {
                 const props = {classNames: []};
                 const share = M.getNodeShare(aNode);
+                let itemIcon = fileIcon(aNode);
 
                 if (aNode.su) {
                     props.classNames.push('inbound-share');
@@ -900,10 +904,9 @@
                 }
 
                 props.name = aNode.name;
-                props.icon = fileIcon(aNode);
 
                 if (missingkeys[aHandle] || share.down) {
-                    props.icon = 'generic';
+                    itemIcon = aNode.t ? 'folder' : 'generic';
                     props.type = l[7381];// i.e. 'unknown'
 
                     props.tooltip = [];
@@ -923,6 +926,9 @@
                         props.tooltip.push(M.getUndecryptedLabel(aNode));
                     }
                 }
+
+                props.icon = `icon-${itemIcon}-24`;
+                props.blockIcon = `icon-${itemIcon}-90`;
 
                 if (aExtendedInfo !== false) {
 
@@ -1135,11 +1141,9 @@
                 title = title.join(' ');
 
                 if (this.viewmode) {
-                    tmp = aTemplate.querySelector('.block-view-file-type');
+                    tmp = aTemplate.querySelector('.item-type-icon-90');
 
-                    if (aProperties.icon) {
-                        tmp.classList.add(aProperties.icon);
-                    }
+                    tmp.classList.add(aProperties.blockIcon);
 
                     if (aProperties.playtime !== undefined) {
                         aTemplate.querySelector('.data-block-bg').classList.add('video');
@@ -1175,7 +1179,7 @@
                         tmp.setAttribute('title', title);
                     }
 
-                    tmp = aTemplate.querySelector('.transfer-filetype-icon');
+                    tmp = aTemplate.querySelector('.item-type-icon');
 
                     // Public URL Access for S4 Bucket or Object
                     if (M.currentrootid === 's4' && s4.ui) {
@@ -1233,9 +1237,7 @@
 
                 if (this.viewmode) {
 
-                    if (aProperties.icon) {
-                        aTemplate.querySelector('.block-view-file-type').classList.add(aProperties.icon);
-                    }
+                    aTemplate.querySelector('.item-type-icon-90').classList.add(aProperties.blockIcon);
                     tmp.classList.add(aProperties.accessRightsIcon);
 
                     aTemplate.querySelector('.shared-folder-info')
@@ -1304,7 +1306,7 @@
                 aTemplate.querySelector('.shared-folder-name').textContent = aProperties.name;
 
                 if (this.viewmode) {
-                    elm = aTemplate.querySelector('.block-view-file-type');
+                    elm = aTemplate.querySelector('.item-type-icon-90');
 
                     if (aProperties.avatars) {
 
@@ -1331,8 +1333,8 @@
 
                     }
 
-                    if (aProperties.icon) {
-                        aTemplate.querySelector('.block-view-file-type').classList.add(aProperties.icon);
+                    if (aProperties.blockIcon) {
+                        aTemplate.querySelector('.item-type-icon-90').classList.add(aProperties.blockIcon);
                     }
 
                     if (String(aProperties.name).length > 20) {
@@ -1368,7 +1370,7 @@
                     }
 
                     if (aProperties.icon) {
-                        aTemplate.querySelector('.shared-folder-icon').classList.add(aProperties.icon);
+                        aTemplate.querySelector('.item-type-icon-90').classList.add(aProperties.icon);
                     }
                 }
 
@@ -1420,7 +1422,7 @@
                     tmp.setAttribute('title', title);
                 }
 
-                tmp = aTemplate.querySelector('.transfer-filetype-icon');
+                tmp = aTemplate.querySelector('.item-type-icon');
 
                 if (aProperties.icon) {
                     tmp.classList.add(aProperties.icon);

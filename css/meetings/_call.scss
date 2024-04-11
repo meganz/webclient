@@ -92,18 +92,18 @@
             background-position: center center;
 
             &.permissions-mic {
-                background-image: url(../../images/mega/permissions/mic-mac-light.svg);
+                background-image: url(../images/mega/permissions/mic-mac-light.svg);
 
                 body.theme-dark & {
-                    background-image: url(../../images/mega/permissions/mic-mac-dark.svg);
+                    background-image: url(../images/mega/permissions/mic-mac-dark.svg);
                 }
             }
 
             &.permissions-camera {
-                background-image: url(../../images/mega/permissions/camera-mac-light.svg);
+                background-image: url(../images/mega/permissions/camera-mac-light.svg);
 
                 body.theme-dark & {
-                    background-image: url(../../images/mega/permissions/camera-mac-dark.svg);
+                    background-image: url(../images/mega/permissions/camera-mac-dark.svg);
                 }
             }
         }

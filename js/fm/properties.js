@@ -152,7 +152,7 @@
             }
 
             n = node;
-            icons.push(fileIcon(n));
+            icons.push(`item-type-icon-90 icon-${fileIcon(n)}-90`);
             selected.push(handles[i]);
 
             if (n.t) {
@@ -207,7 +207,7 @@
 
             // Outgoing share
             // @todo: Fix live site issue. Outgoing contacts are never shown
-            if (icons.includes('outgoing')) {
+            if (icons.includes('icon-outgoing-90')) {
                 p.share = true;
             }
 
@@ -620,7 +620,6 @@
         $icon.text('');
 
         if (filecnt + foldercnt === 1) {
-
             mCreateElement('i', {
                 'class': icons[0]
             }, $icon[0]);
@@ -654,7 +653,7 @@
                 if (filecnt && foldercnt || iconsTypes.length > 1) {
 
                     mCreateElement('i', {
-                        'class': filecnt ? 'generic' : 'folder'
+                        'class': `item-type-icon-90 icon-${filecnt ? 'generic' : 'folder'}-90`
                     }, $icon[0]);
                 }
                 else {

@@ -1249,9 +1249,10 @@ body.de .mega-dialog.contact-picker-widget {
     -webkit-margin-start: 8px;
     margin-inline-start: 8px;
 }
-.fm-versioning .medium-file-icon {
+.fm-versioning .item-type-icon-90 {
+    --icon-size: 48px;
     display: inline-block;
-    margin: 0;
+    margin: -5px;
     flex-shrink: 0;
     vertical-align: middle;
 }
@@ -2562,19 +2563,21 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.export-links-dialog .item:last-child {
         margin-bottom: 12px;
     }
-    .mega-dialog.export-links-dialog .item .transfer-filetype-icon {
-        left: 0;
+    .mega-dialog.export-links-dialog .item .item-type-icon {
+        --icon-size: 24px;
+        position: absolute;
         top: 12px;
+        left: 0;
     }
-    .rtl .mega-dialog.export-links-dialog .item .transfer-filetype-icon {
+    .rtl .mega-dialog.export-links-dialog .item .item-type-icon {
         left: auto;
         right: 0;
     }
     .mega-dialog.export-links-dialog .item-title {
         display: inline-block;
         max-width: calc(100% - 230px);
-        -webkit-margin-start: 26px;
-        margin-inline-start: 26px;
+        -webkit-margin-start: 30px;
+        margin-inline-start: 30px;
         -webkit-margin-end: 3px;
         margin-inline-end: 3px;
         vertical-align: top;
@@ -2583,7 +2586,7 @@ body.de .mega-dialog.contact-picker-widget {
         position: relative;
         height: 29px;
         color: var(--text-color-high);
-        padding-top: 3px;
+        padding-top: 2px;
     }
     .rtl .mega-dialog.export-links-dialog .item-title {
         -webkit-margin-start: 0;
@@ -3048,8 +3051,8 @@ body.de .mega-dialog.contact-picker-widget {
         transition: 0.1s;
         box-sizing: border-box;
         left: 0;
-        height: 32px;
-        line-height: 31px;
+        height: 30px;
+        line-height: 30px;
         white-space: nowrap;
         vertical-align: middle;
         overflow: hidden;
@@ -3065,9 +3068,9 @@ body.de .mega-dialog.contact-picker-widget {
     }
     .mega-dialog.fm-picker-dialog .summary-input .summary-ff-name,
     .mega-dialog.fm-picker-dialog .summary-input .summary-ff-name-ellipsis {
-        height: 32px;
+        height: 30px;
         max-width: 280px;
-        line-height: 32px;
+        line-height: 30px;
         -webkit-margin-start: 36px;
         margin-inline-start: 36px;
         position: relative;
@@ -3076,18 +3079,6 @@ body.de .mega-dialog.contact-picker-widget {
         vertical-align: top;
         overflow: hidden;
         text-overflow: ellipsis;
-    }
-    .mega-dialog.fm-picker-dialog .summary-container .transfer-filetype-icon.chat {
-        background-image: url(../images/mega/fm-main-sprite.png);
-        background-repeat: no-repeat;
-        background-size: 48px auto;
-        background-position: -12px -4517px;
-        width: 24px;
-        height: 24px;
-        opacity: 0.4;
-    }
-    .mega-dialog.fm-picker-dialog .summary-container .transfer-filetype-icon.folder {
-        background-position: -337px -717px;
     }
     .mega-dialog.fm-picker-dialog .folder-container {
         width: 100%;
@@ -3509,11 +3500,11 @@ body.de .mega-dialog.contact-picker-widget {
         left: auto;
         right: 50%;
     }
-    .mega-dialog.fm-picker-dialog .summary-container .transfer-filetype-icon,
+    .mega-dialog.fm-picker-dialog .summary-container .item-type-icon,
     .mega-dialog.fm-picker-dialog .summary-container .target-icon {
-        margin: 4px 0 0 0;
-        -webkit-margin-start: 8px;
-        margin-inline-start: 8px;
+        margin: 3px 0;
+        -webkit-margin-start: 7px;
+        margin-inline-start: 7px;
         --icon-size: 24px;
         position: absolute;
         --mask-color: var(--icon-rest);
@@ -4227,7 +4218,6 @@ body.de .mega-dialog.contact-picker-widget {
         min-height: 280px;
     }
     .mega-dialog.properties-dialog .properties-file-icon {
-        padding: 8px;
         height: 256px;
         width: 256px;
         position: absolute;
@@ -4257,15 +4247,10 @@ body.de .mega-dialog.contact-picker-widget {
         right: 0;
     }
     .mega-dialog.properties-dialog .properties-file-icon i {
-        width: 242px;
-        height: 240px;
+        --icon-size: 210px;
         position: absolute;
         left: 0;
-        top: 0;
-        background-image: url(../images/mega/properties-sprite.png);
-        background-position: 29px 40px;
-        background-repeat: no-repeat;
-        margin: 8px;
+        margin: 23px;
         z-index: 3;
     }
     .rtl .mega-dialog.properties-dialog .properties-file-icon i {
@@ -4518,206 +4503,6 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.properties-dialog.show-key .properties-file-key {
         display: inline;
     }
-    .mega-dialog.properties-dialog .properties-file-icon i.word {
-        background-position: 29px 40px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.web-lang {
-        background-position: 29px -240px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.web-data {
-        background-position: 29px -520px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.video {
-        background-position: 29px -800px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.openoffice {
-        background-position: 29px -1080px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.keynote {
-        background-position: 29px -1360px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.vector {
-        background-position: 29px -1640px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.numbers {
-        background-position: 29px -1920px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.torrent {
-        background-position: 29px -2200px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.text {
-        background-position: 29px -2480px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.pages {
-        background-position: 29px -2760px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.spreadsheet {
-        background-position: 29px -3040px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.recovery {
-        background-position: 29px -3320px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.dmg {
-        background-position: 29px -3600px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.raw {
-        background-position: 29px -3880px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.premiere {
-        background-position: 29px -4160px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.powerpoint {
-        background-position: 29px -4440px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.megasync {
-        background-position: 29px -7420px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.megasync-mac {
-        background-position: 29px -5000px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.photoshop {
-        background-position: 29px -5280px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.pdf {
-        background-position: 29px -5560px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.experience {
-        background-position: 29px -5840px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.indesign {
-        background-position: 29px -6120px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.image {
-        background-position: -391px 40px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.illustrator {
-        background-position: -391px -240px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.sketch {
-        background-position: -391px -520px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.generic {
-        background-position: -391px -800px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.font {
-        background-position: -391px -1080px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.executable {
-        background-position: -391px -1360px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.excel {
-        background-position: -391px -1640px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.compressed {
-        background-position: -391px -1920px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.cad {
-        background-position: -391px -2200px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.audio {
-        background-position: -391px -2480px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.aftereffects {
-        background-position: -391px -2760px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.threed {
-        background-position: -391px -3040px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.folder {
-        background-position: -391px -3320px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.rubbish-folder {
-        background-position: -391px -3600px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.folder-camera {
-        background-position: -391px -3880px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.rubbish-folder-camera {
-        background-position: -391px -4160px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.folder-chat {
-        background-position: -391px -7260px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.rubbish-folder-chat {
-        background-position: -391px -7540px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.folder-sync {
-        background-position: -391px -6700px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.rubbish-folder-sync {
-        background-position: -391px -6980px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.folder-backup {
-        background-position: -391px -6140px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.rubbish-folder-backup {
-        background-position: -391px -6420px;
-    }
-
-
-    .mega-dialog.properties-dialog .properties-file-icon i.backup {
-        background-position: 13px -6423px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.pc {
-        background-position: 13px -6683px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.pc-linux {
-        background-position: 13px -7464px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.pc-mac {
-        background-position: 13px -6943px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.pc-win {
-        background-position: 13px -7203px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.mobile {
-        background-position: 13px -7723px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.mobile-ios {
-        background-position: 13px -7983px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.mobile-android {
-        background-position: -391px -7982px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.ex-device {
-        background-position: 9px -8242px;
-    }
-
-    .mega-dialog.properties-dialog .properties-file-icon i.folder-shared {
-        background-position: -391px -5020px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.rubbish-folder-shared {
-        background-position: -391px -5300px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.inbound-share {
-        background-position: -391px -4460px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.rubbish-inbound-share {
-        background-position: -391px -4460px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.puf-folder {
-        background-position: -391px -5580px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.rubbish-puf-folder {
-        background-position: -391px -5860px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.file-request-folder {
-        background-position: 9px -8520px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.rubbish-file-request-folder {
-        background-position: -391px -8520px;
-    }
-
-    .mega-dialog.properties-dialog .properties-file-icon i.s4-bucket {
-        background-position: 14px -8793px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.s4-bucket-shared {
-        background-position: 11px -9063px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.rubbish-s4-bucket {
-        background-position: -386px -8793px;
-    }
-
 
 /* end properties-dialog */
 
@@ -7545,11 +7330,16 @@ body.de .mega-dialog.contact-picker-widget {
         -o-text-overflow: ellipsis;
         text-overflow: ellipsis;
     }
-    .mega-dialog.duplicate-conflict .export-icon {
-        margin: 0;
-        -webkit-margin-start: -4px;
-        margin-inline-start: -4px;
+    .mega-dialog.duplicate-conflict .item-type-icon-90 {
+        --icon-size: 78px;
+        margin: -9px -11px;
         position: absolute;
+    }
+    .mega-dialog.duplicate-conflict .multiple-files .item-type-icon-90:nth-child(1) {
+        margin: -13px -3px;
+    }
+    .mega-dialog.duplicate-conflict .multiple-files .item-type-icon-90:nth-child(2) {
+        margin: -5px -11px;
     }
     .mega-dialog.duplicate-conflict .file-date span,
     .mega-dialog.duplicate-conflict .file-date i {
@@ -7581,16 +7371,6 @@ body.de .mega-dialog.contact-picker-widget {
     .rtl .mega-dialog.duplicate-conflict .file-date .time::before {
         left: auto;
         right: 10px;
-    }
-    .mega-dialog.duplicate-conflict .multiple-files .export-icon:nth-child(2) {
-        margin: 4px 0 0 0;
-        -webkit-margin-start: -4px;
-        margin-inline-start: -4px;
-    }
-    .mega-dialog.duplicate-conflict .multiple-files .export-icon:nth-child(1) {
-        margin: -4px 0 0 0;
-        -webkit-margin-start: 4px;
-        margin-inline-start: 4px;
     }
 
 /* end duplicate-conflict dialog */
@@ -11716,8 +11496,10 @@ body.de .mega-dialog.contact-picker-widget {
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.mega-dialog.s4-object-access-dialog .file-info .transfer-filetype-icon {
-    margin-left: 4px;
+.mega-dialog.s4-object-access-dialog .file-info .item-type-icon {
+    --icon-size: 24px;
+    margin: 1px 4px;
+    position: absolute;
 }
 .mega-dialog.s4-object-access-dialog .file-info .file-name {
     margin-left: 32px;

@@ -8,6 +8,7 @@
     width: var(--icon-size, 16px);
     height: var(--icon-size, 16px);
 }
+
 .sprite-mobile-fm-uni.icon-authy, .sprite-mobile-fm-uni-before.icon-authy-before::before, .sprite-mobile-fm-uni-after.icon-authy-after::after {
    background-image: url("../../images/sprites/mobile-fm-uni@uni.svg#icon-authy");
 }

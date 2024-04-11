@@ -2523,16 +2523,16 @@ body.rtl .meetings-call .sidebar-wrapper .sidebar-head button.add {
   background-position: center center;
 }
 .mega-dialog.meetings-permissions-dialog .permissions-warning-cover span.permissions-mic {
-  background-image: url(../../images/mega/permissions/mic-mac-light.svg);
+  background-image: url(../images/mega/permissions/mic-mac-light.svg);
 }
 body.theme-dark .mega-dialog.meetings-permissions-dialog .permissions-warning-cover span.permissions-mic {
-  background-image: url(../../images/mega/permissions/mic-mac-dark.svg);
+  background-image: url(../images/mega/permissions/mic-mac-dark.svg);
 }
 .mega-dialog.meetings-permissions-dialog .permissions-warning-cover span.permissions-camera {
-  background-image: url(../../images/mega/permissions/camera-mac-light.svg);
+  background-image: url(../images/mega/permissions/camera-mac-light.svg);
 }
 body.theme-dark .mega-dialog.meetings-permissions-dialog .permissions-warning-cover span.permissions-camera {
-  background-image: url(../../images/mega/permissions/camera-mac-dark.svg);
+  background-image: url(../images/mega/permissions/camera-mac-dark.svg);
 }
 .mega-dialog.meetings-permissions-dialog .permissions-warning-info {
   /* [...] */

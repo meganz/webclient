@@ -19,7 +19,7 @@ class SharedFileItem extends ContactAwareComponent {
                 onClick={() => this.props.isPreviewable ? M.viewMediaFile(node) : M.addDownload([node])}
                 onDoubleClick={() => M.addDownload([node])}>
                 <div className={`icon-or-thumb ${thumbnails.has(node.fa) ? "thumb" : ""}`}>
-                    <div className={"medium-file-icon " + icon}></div>
+                    <div className={`item-type-icon-90 icon-${icon}-90`}></div>
                     <div className="img-wrapper" id={this.props.imgId}>
                         <img alt="" src={thumbnails.get(node.fa) || ""}/>
                     </div>

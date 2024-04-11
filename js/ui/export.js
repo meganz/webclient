@@ -2559,7 +2559,7 @@ function logExportEvt(type, target) {
              +              '<input type="text" data-node-handle="' + nodeHandle + '">'
              +          '</i>'
              +      '</div>'
-             +      '<div class="transfer-filetype-icon ' + fileIcon(item) + '" ></div>'
+             +      '<div class="item-type-icon icon-' + fileIcon(item) + '-24" ></div>'
              +      '<div class="item-title selectable-txt">' + htmlentities(item.name) + '</div>'
              +      '<div class="item-size' + hideSeparatorClass + '">'
              +          htmlentities(fileSize) + htmlentities(folderContents)

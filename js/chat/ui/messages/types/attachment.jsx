@@ -246,7 +246,7 @@ export default class Attachment extends AbstractGenericMessage {
                     }}>
                     {dropdown}
                     <div className="data-block-bg">
-                        <div className={"block-view-file-type " + icon} />
+                        <div className={"item-type-icon-90 icon-" + icon + "-90"} />
                     </div>
                 </div>;
 

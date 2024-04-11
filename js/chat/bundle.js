@@ -9436,7 +9436,7 @@ class ColumnSharedFolderName extends genericNodePropsComponent.B {
       megatype: ColumnSharedFolderName.megatype,
       className: ColumnSharedFolderName.megatype
     }, external_React_default().createElement("div", {
-      className: "shared-folder-icon sprite-fm-uni-after icon-warning-after"
+      className: "item-type-icon-90 icon-folder-incoming-90 sprite-fm-uni-after icon-warning-after"
     }), external_React_default().createElement("div", {
       className: "shared-folder-info-block"
     }, external_React_default().createElement("div", {
@@ -11139,7 +11139,7 @@ class SharedFileItem extends mixins.u9 {
     }, sharedFilesAccordionPanel_React.createElement("div", {
       className: `icon-or-thumb ${thumbnails.has(node.fa) ? "thumb" : ""}`
     }, sharedFilesAccordionPanel_React.createElement("div", {
-      className: "medium-file-icon " + icon
+      className: `item-type-icon-90 icon-${icon}-90`
     }), sharedFilesAccordionPanel_React.createElement("div", {
       className: "img-wrapper",
       id: this.props.imgId
@@ -11349,7 +11349,7 @@ class SharedFolderItem extends mixins.w9 {
         M.openFolder(node.h);
       }
     }, incomingSharesAccordionPanel_React.createElement("div", {
-      className: "medium-file-icon inbound-share"
+      className: "item-type-icon-90 icon-folder-incoming-90"
     }), incomingSharesAccordionPanel_React.createElement("div", {
       className: "chat-shared-info"
     }, incomingSharesAccordionPanel_React.createElement("span", {
@@ -11426,9 +11426,9 @@ class IncSharesAccordionPanel extends mixins.w9 {
             M.openFolder(contactHandle);
           }
         }, incomingSharesAccordionPanel_React.createElement("span", {
-          className: "transfer-filetype-icon inbound-share"
+          className: "item-type-icon icon-folder-incoming-24"
         }, incomingSharesAccordionPanel_React.createElement("span", {
-          className: "transfer-filetype-icon inbound-share"
+          className: "item-type-icon icon-folder-incoming-24"
         })), incomingSharesAccordionPanel_React.createElement("span", {
           className: "txt"
         }, l[19797] ? l[19797] : "Show All"))) : null);
@@ -27954,7 +27954,7 @@ class Attachment extends AbstractGenericMessage {
       }, dropdown, external_React_default().createElement("div", {
         className: "data-block-bg"
       }, external_React_default().createElement("div", {
-        className: "block-view-file-type " + icon
+        className: "item-type-icon-90 icon-" + icon + "-90"
       })));
       if (showThumbnail) {
         var src = v.src || window.noThumbURI || '';
@@ -28646,7 +28646,7 @@ class MetaRichpreviewMegaLinks extends mixin.M {
         }, megaLinkInfo.is_chatlink ? external_React_default().createElement("i", {
           className: "huge-icon conversations"
         }) : external_React_default().createElement("div", {
-          className: "message richpreview icon block-view-file-type " + (megaLinkInfo.is_dir ? "folder" : fileIcon(megaLinkInfo.info))
+          className: "message richpreview icon item-type-icon-90 icon-" + (megaLinkInfo.is_dir ? "folder" : fileIcon(megaLinkInfo.info)) + "-90"
         })), external_React_default().createElement("div", {
           className: "message richpreview inner-wrapper"
         }, external_React_default().createElement("div", {
@@ -32461,7 +32461,7 @@ class GenericGrid extends genericNodePropsComponent.B {
     })), external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-link"
     })), external_React_default().createElement("span", {
-      className: "block-view-file-type " + this.nodeProps.icon
+      className: "item-type-icon-90 icon-" + this.nodeProps.icon + "-90"
     }, image), external_React_default().createElement("div", {
       className: "video-thumb-details"
     }, external_React_default().createElement("i", {
@@ -32838,7 +32838,7 @@ class ColumnNodeName extends genericNodePropsComponent.B {
         }
       }
     }, external_React_default().createElement(tooltips.Handler, {
-      className: `transfer-filetype-icon ${fileIcon(node)}`
+      className: `item-type-icon icon-${fileIcon(node)}-24`
     }), external_React_default().createElement(tooltips.Contents, {
       className: "img-preview"
     }, external_React_default().createElement("div", {
@@ -32850,10 +32850,7 @@ class ColumnNodeName extends genericNodePropsComponent.B {
       src: node.fa || src ? src || `${staticpath}/images/mega/ajax-loader-tiny.gif` : window.noThumbURI
     })))) : external_React_default().createElement("span", {
       className: `
-                            transfer-filetype-icon
-                            ${nodeAdapter.nodeProps.isFolder ? 'folder' : ''}
-                            ${nodeAdapter.nodeProps.icon}
-                            ${node.su ? 'inbound-share' : ''}
+                            item-type-icon icon-${fileIcon(node)}-24
                         `
     }), external_React_default().createElement("span", {
       className: "tranfer-filetype-txt"

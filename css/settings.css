@@ -309,8 +309,9 @@
 .content-panel .settings-button .head-title:hover,
 .content-panel .settings-button .sub-title:hover,
 .content-panel .settings-button.active .head-title {
+    --mask-color: var(--icon-rest);
     cursor: pointer;
-    color: var(--stroke-main-inverted);
+    color: var(--text-color-high);
     background-color: var(--stroke-grey-1);
     box-shadow: 0 1px 4px 0 rgb(0 0 0 / 0.1);
 }
@@ -340,7 +341,6 @@
     padding-inline-start: 50px;
 }
 .content-panel .settings-button .head-title:hover {
-    --mask-color: var(--icon-active);
     color: var(--text-color-high);
 }
 .content-panel .settings-button.active .head-title {

@@ -8,6 +8,7 @@
     width: var(--icon-size, 16px);
     height: var(--icon-size, 16px);
 }
+
 .theme-light .sprite-fm-theme.icon-bucket, .theme-light .sprite-fm-theme-before.icon-bucket-before::before, .theme-light .sprite-fm-theme-after.icon-bucket-after::after,
 .theme-light-forced .sprite-fm-theme.icon-bucket, .theme-light-forced .sprite-fm-theme-before.icon-bucket-before::before, .theme-light-forced .sprite-fm-theme-after.icon-bucket-after::after {
    background-image: url("../../images/sprites/fm-theme@light.svg#icon-bucket");

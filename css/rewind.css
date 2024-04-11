@@ -140,7 +140,7 @@ body.theme-dark .active-rewind .rewind-sidebar {
 }
 
 .sidebar .sidebar-container .sidebar-header .folder-details .folder-info .folder-icon {
-    width: 22px;
+    width: 24px;
     height: 24px;
     flex-shrink: 0;
 }
@@ -653,8 +653,8 @@ body.theme-dark .rewind-datepicker-calendar .datepicker--cell.-current- {
 
 .sidebar .sidebar-container .sidebar-content .content-folder .folder-list .folder-item .folder-main label {
     flex-grow: 1;
-    margin-inline-start: 1px;
-    -webkit-margin-start: 1px;
+    margin-inline-start: 3px;
+    -webkit-margin-start: 3px;
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;

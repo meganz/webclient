@@ -155,9 +155,8 @@
     opacity: 1;
 }
 .dropdown-search-results-item-file-icon {
-    width: 22px;
-    height: 24px;
     text-align: start;
+    --icon-size: 24px;
 }
 .dropdown-section .dropdown-section-clear {
     color: var(--stroke-info)

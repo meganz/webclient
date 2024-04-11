@@ -117,11 +117,11 @@ class MetaRichpreviewMegaLinks extends ConversationMessageMixin {
                             {megaLinkInfo.is_chatlink ?
                                 <i className="huge-icon conversations"></i>
                                 :
-                                <div className={"message richpreview icon block-view-file-type " + (
+                                <div className={"message richpreview icon item-type-icon-90 icon-" + (
                                     megaLinkInfo.is_dir ?
                                         "folder" :
                                         fileIcon(megaLinkInfo.info)
-                                )}></div>
+                                ) + "-90"}></div>
                             }
                         </div>
                     }

@@ -5,6 +5,9 @@
             {
                 "appID": "T9RH74Y7L9.mega.ios",
                 "paths": [
+                    "/fm/ipc/*",
+                    "/fm/chat/*",
+                    "NOT /fm/*",
                     "NOT /emailverify/*",
                     "NOT /#emailverify/*",
                     "NOT /dont-deploy/*",
@@ -14,6 +17,9 @@
             {
                 "appID": "T9RH74Y7L9.mega.ios.dev",
                 "paths": [
+                    "/fm/ipc/*",
+                    "/fm/chat/*",
+                    "NOT /fm/*",
                     "NOT /emailverify*",
                     "NOT /#emailverify*",
                     "NOT /#pwrevert*",
@@ -25,6 +31,9 @@
             {
                 "appID": "T9RH74Y7L9.mega.ios.qa",
                 "paths": [
+                    "/fm/ipc/*",
+                    "/fm/chat/*",
+                    "NOT /fm/*",
                     "NOT /emailverify*",
                     "NOT /#emailverify*",
                     "NOT /#pwrevert*",

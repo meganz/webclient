@@ -2793,6 +2793,8 @@ else if (!browserUpdate) {
 
     // Sprites
     jsl.push({f:'css/sprites/fm-uni@uni.css', n: 'fm_uni_css', j:2, w:30, c:1, d:1, cache:1});
+    jsl.push({f:'css/sprites/fm-mime@uni.css', n: 'fm_mime_css', j:2, w:30, c:1, d:1, cache:1});
+    jsl.push({f:'css/sprites/fm-mime-90@uni.css', n: 'fm_mime_90_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/sprites/fm-mono@mono.css', n: 'fm_mono_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/sprites/fm-theme@dark.css', n: 'fm_dark_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/sprites/fm-theme@light.css', n: 'fm_light_css', j:2, w:30, c:1, d:1, cache:1});

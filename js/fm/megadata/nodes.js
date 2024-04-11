@@ -4682,7 +4682,8 @@ lazy(MegaData.prototype, 'myChatFilesFolder', () => {
             }
 
             if (fmItem) {
-                fmItem.classList.add('folder-chat');
+                fmItem.classList.add('folder-chat', 'icon-folder-chat-90');
+                fmItem.classList.remove('icon-folder-90');
             }
         }
     });

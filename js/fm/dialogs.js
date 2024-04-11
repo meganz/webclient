@@ -450,7 +450,7 @@
 
             $('.summary-title.summary-selected-title', $dialog).text(l[1764]);
             var rowHtml = '<div class="item-row">' +
-                '<div class="transfer-filetype-icon file text"></div>' +
+                '<div class="item-type-icon icon-text-24"></div>' +
                 '<input id="f-name-input" class="summary-ff-name" type="text" value="' + escapeHTML($.nodeSaveAs.name)
                 + '" placeholder="' + l[17506] + '" autocomplete="off"/> &nbsp; '
                 + '</div>'
@@ -482,7 +482,7 @@
                 var name = names[h] || M.getNameByHandle(h) || n.name;
                 var tail = '<i class="delete-item sprite-fm-mono icon-close-component "></i>';
                 var summary = '<div class="summary-ff-name-ellipsis">@@</div>';
-                var icon = fileIcon(n);
+                var icon = fileIcon(n.h ? n : {name});
                 var data = n.uuid || h;
 
                 if (single) {
@@ -496,7 +496,7 @@
                 const pluralText = mega.icu.format(l.items_other_count, items.length - 1);
                 $div.safeAppend(
                     '<div class="item-row" data-node="@@">' +
-                    '    <div class="transfer-filetype-icon file @@"></div>' +
+                    '    <div class="item-type-icon icon-@@-24"></div>' +
                         summary + ' &nbsp; ' + tail +
                     '</div>', data, icon, name, pluralText
                 );

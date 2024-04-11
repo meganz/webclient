@@ -35,8 +35,8 @@ lazy(s4, 'objects', () => {
                 })
                 .catch(tell)
                 .finally(() => {
-                    $('.transfer-filetype-icon', this.$fileInfoContainer)
-                        .attr('class', `transfer-filetype-icon ${fileIcon(this.object)}`);
+                    $('.item-type-icon', this.$fileInfoContainer)
+                        .attr('class', `item-type-icon icon-${fileIcon(this.object)}-24`);
                     $('.file-name', this.$fileInfoContainer).text(this.object.name);
                     $('.file-size', this.$fileInfoContainer).text(bytesToSize(this.object.s));
 

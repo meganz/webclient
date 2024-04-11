@@ -348,22 +348,22 @@
             var $a1 = $('.action-block.a1', $dialog).removeClass('hidden');
             var $a2 = $('.action-block.a2', $dialog).removeClass('hidden');
             var $a3 = $('.action-block.a3', $dialog).removeClass('hidden');
-            var icons = $('.export-icon', $dialog);
-            var classes = icons.attr('class').split(' ');
-            icons.removeClass(classes[classes.length - 1]); // remove last class
+            var $icons = $('.item-type-icon-90', $dialog);
+            var classes = $icons.attr('class').split(' ');
+            $icons.removeClass(classes[classes.length - 1]); // remove last class
 
             // Hide the loading spinner, it will be shown again when the conflict is being resolved
             loadingDialog.phide();
 
             if (file.t) {
                 $a3.addClass('hidden');
-                icons.addClass(fileIcon(node));
+                $icons.addClass(`icon-${folderIcon(node)}-90`);
                 $('.info-txt.light-grey', $dialog).text(l[17556]);
                 $('.info-txt-fn', $dialog)
                     .safeHTML(escapeHTML(l[17550]).replace('%1', '<strong>' + name + '</strong>'));
             }
             else {
-                icons.addClass(fileIcon(node));
+                $icons.addClass(is_mobile ? fileIcon(node) : `icon-${fileIcon(node)}-90`);
 
                 // Check whether the user have full-access to the target, required to replace or create versions
                 if (M.getNodeRights(target) < 2) {

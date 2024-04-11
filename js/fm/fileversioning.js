@@ -390,7 +390,7 @@ var versiondialogid;
                     html += // <!-- File Data Row !-->
                             `<tr class="fm-versioning file-info-row ${activeClass}" id=v_${v.h}>
                                 <td class="fm-versioning file-icon">
-                                    <div class="medium-file-icon ${fileIcon({name : v.name})}"></div>
+                                    <div class="item-type-icon-90 icon-${fileIcon({name : v.name})}-90"></div>
                                 </td>
                                 <td class="fm-versioning file-data">
                                     <div class="fm-versioning file-name">
@@ -535,16 +535,16 @@ var versiondialogid;
 
                 $('.fm-versioning .header .pad .top-column .file-data .file-name').html(fnamehtml);
 
-                $('.fm-versioning .header .pad .top-column .medium-file-icon')
-                    .attr('class', 'medium-file-icon')
-                    .addClass(fileIcon({'name':f.name}));
+                $('.fm-versioning .header .pad .top-column .item-type-icon-90')
+                    .attr('class', `item-type-icon-90 icon-${fileIcon({'name':f.name})}-90`);
 
             };
             var fnamehtml = '<span>' + htmlentities(f.name);
 
             $('.fm-versioning .header .pad .top-column .file-data .file-name').html(fnamehtml);
             $('.fm-versioning .header .pad .top-column .file-data .file-path').html(pathHtml);
-            $('.fm-versioning .header .pad .top-column .medium-file-icon').addClass(fileIcon({'name':f.name}));
+            $('.fm-versioning .header .pad .top-column .item-type-icon-90')
+                .addClass(`icon-${fileIcon({'name':f.name})}-90`);
 
             $('.fm-versioning .pad .top-column button.js-download').rebind('click', () => {
                 M.addDownload(current_sel_version);

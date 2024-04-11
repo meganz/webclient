@@ -1705,7 +1705,8 @@
 
         // Store folder handle.
         ns.set = function(handle) {
-            return handle === Object(M[attribute]).h ? Promise.resolve(EEXIST) : factory.set(handle);
+            return handle === Object(M[attribute]).h ? Promise.resolve(EEXIST)
+                : factory.set(handle).then(factory.notify.bind(factory));
         };
 
         // Get notified about changes.

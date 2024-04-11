@@ -1920,7 +1920,7 @@ ul, li {
     display: block;
 }
 .mobile.empty-icon.sprite-fm-illustration {
-    background: url("../../images/sprites/fm-illustration-sprite.svg") no-repeat;
+    background: url("../images/sprites/fm-illustration-sprite.svg") no-repeat;
     background-size: 2000%;
 }
 .mobile.empty-icon.sprite-fm-illustration.img-dialog-payment-card-exp {

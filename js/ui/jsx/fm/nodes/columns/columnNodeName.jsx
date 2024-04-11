@@ -35,7 +35,7 @@ export class ColumnNodeName extends GenericNodePropsComponent {
                                 });
                             }
                         }}>
-                        <Tooltips.Handler className={`transfer-filetype-icon ${fileIcon(node)}`}/>
+                        <Tooltips.Handler className={`item-type-icon icon-${fileIcon(node)}-24`}/>
                         <Tooltips.Contents className="img-preview">
                             <div
                                 className="dropdown img-wrapper img-block"
@@ -57,10 +57,7 @@ export class ColumnNodeName extends GenericNodePropsComponent {
                     </Tooltips.Tooltip> :
                     <span
                         className={`
-                            transfer-filetype-icon
-                            ${nodeAdapter.nodeProps.isFolder ? 'folder' : ''}
-                            ${nodeAdapter.nodeProps.icon}
-                            ${node.su ? 'inbound-share' : ''}
+                            item-type-icon icon-${fileIcon(node)}-24
                         `}
                     />}
                 <span className={"tranfer-filetype-txt"}>{nodeAdapter.nodeProps.title}</span>

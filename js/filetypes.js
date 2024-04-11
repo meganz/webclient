@@ -22,6 +22,7 @@ var extensions = {
     'photoshop': [['abr', 'psb', 'psd'], 'Adobe Photoshop'],
     'powerpoint': [['pps', 'ppt', 'pptx'], 'Powerpoint'],
     'premiere': [['prproj', 'ppj'], 'Adobe Premiere'],
+    'experiencedesign': [['xd'], 'Adobe XD'],
     'raw': [
         Object.keys(is_image.raw)
             .map(function(e) {
@@ -666,54 +667,47 @@ function deviceIcon(name, type) {
 /**
  * Get folder type Icon
  * @param {Object} node A MEGA folder node
+ * @param {String} [root] A MEGA node handle of the root folder
  * @returns {String} Folder Icon name
  */
-function folderIcon(node) {
+function folderIcon(node, root) {
     'use strict';
 
     let folderIcon = '';
-    const root = M.getNodeRoot(node.h);
+    root = root || M.getNodeRoot(node.h);
 
     if (root === M.RubbishID) {
-
         folderIcon = 'rubbish-';
     }
 
     if (node.t & M.IS_SHARED || M.ps[node.h] || M.getNodeShareUsers(node, 'EXP').length) {
 
         if (M.getS4NodeType(node) === 'bucket') {
-            return 's4-bucket-shared';
+            return `${folderIcon}bucket-share`;
         }
 
-        // folderIcon += 'folder-outgoing'; for vector icon
-        return `${folderIcon}folder-shared`;
+        return `${folderIcon}folder-outgoing`;
     }
     // Incoming share
     else if (node.su) {
-
-        // `${folderIcon}folder-incoming`; for vector icon
-        return `${folderIcon}inbound-share`;
+        return `${folderIcon}folder-incoming`;
     }
     // My chat files
     else if (node.h === M.cf.h) {
-
         return `${folderIcon}folder-chat`;
     }
     // Camera uploads
     else if (node.h === M.CameraId) {
-
-        return `${folderIcon}folder-camera`;
+        return `${folderIcon}folder-camera-uploads`;
     }
     // S4 Object storage
     else if (M.getS4NodeType(node) === 'bucket') {
-        return `${folderIcon}s4-bucket`;
+        return `${folderIcon}bucket`;
     }
     // File request folder
     else if (mega.fileRequest.publicFolderExists(node.h)) {
-
-        return `${folderIcon}file-request-folder`;
+        return `${folderIcon}folder-public`;
     }
-
 
     // Backups
     if (root === M.InboxID) {
@@ -743,26 +737,29 @@ function folderIcon(node) {
 function fileIcon(node) {
     'use strict';
 
-    let icon = '';
-
     if (!node) {
         return 'generic';
     }
 
-    if (node.t) {
+    let icon = '';
+    let rubPrefix = '';
+    const root = M.getNodeRoot(node.h);
 
-        return folderIcon(node);
+    if (node.t === 1 && root === M.RubbishID) {
+        rubPrefix = 'rubbish-';
     }
-    else if ((icon = ext[fileext(node.name, 0, 1)])) {
 
-        return icon[0];
+    if (node.t) {
+        return folderIcon(node, root);
+    }
+    else if ((icon = ext[fileext(node.name, 0, 1)]) && icon[0] !== 'mega') {
+        return rubPrefix + icon[0];
     }
     else if ((icon = is_video(node)) > 0) {
-
-        return icon > 1 ? 'audio' : 'video';
+        return rubPrefix + (icon > 1 ? 'audio' : 'video');
     }
 
-    return 'generic';
+    return `${rubPrefix}generic`;
 }
 
 function fileext(name, upper, iknowwhatimdoing) {

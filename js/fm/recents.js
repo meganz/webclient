@@ -505,7 +505,7 @@ RecentsRender.prototype.populateBreadCrumb = function($container, action) {
     else if (action.outshare) {
         iconFolderType = "icon-folder-outgoing-share";
     }
-    $container.append('<i class="sprite-fm-mono ' + iconFolderType + '"></i>');
+    $container.safeAppend('<i class="js-path-icon sprite-fm-mono ' + iconFolderType + '"></i>');
 
     var pathTooltip = '';
     for (var k = action.path.length; k--;) {
@@ -576,10 +576,10 @@ RecentsRender.prototype.handleByUserHandle = function($newRow, action) {
 RecentsRender.prototype.handleInOutShareState = function($newRow, action) {
     'use strict';
 
-    $newRow.find(".transfer-filetype-icon")
-        .removeClass('hidden')
-        .addClass(action.outshare ? "folder-shared" : "inbound-share");
-    $newRow.find(".in-out-tooltip span")
+    $('.js-path-icon', $newRow)
+        .removeClass('hidden icon-folder icon-folder-outgoing-share icon-folder-incoming-share')
+        .addClass(action.outshare ? 'icon-folder-outgoing-share' : 'icon-folder-incoming-share');
+    $('.in-out-tooltip span', $newRow)
         .text(action.outshare ? l[5543] : l[5542]);
 };
 
@@ -669,11 +669,11 @@ RecentsRender.prototype._renderFiles = function($newRow, action, actionId) {
     var self = this;
     var isCreated = action.action === "added";
     var isOtherUser = action.user !== u_handle;
-    var $icon = $(".medium-file-icon", $newRow);
+    var $icon = $('.item-type-icon-90', $newRow);
     var iconClass = fileIcon(action[0]);
 
     // handle icon
-    $icon.addClass(iconClass);
+    $icon.addClass(`${iconClass.includes('video') ? 'video ' : ''}icon-${iconClass}-90`);
 
     if (action.length === 1 && (iconClass === 'image' && is_image2(action[0]) ||
         iconClass === 'video' && is_video(action[0]) || iconClass === 'pdf')) {
@@ -877,6 +877,7 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
     var videos = mediaCounts.videos;
     var images = mediaCounts.images;
     var pdfs = mediaCounts.pdfs;
+    var docxs = mediaCounts.docxs;
 
     $newRow.addClass('media expanded');
 
@@ -920,19 +921,14 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
         }
         node.seen = true;
 
+        $('.item-type-icon-90', $newThumb).addClass(`icon-${fileIcon(node)}-90`);
+
         if (is_video(node)) {
-            $(".block-view-file-type", $newThumb).removeClass("image").addClass("video");
-            $(".data-block-bg", $newThumb).addClass("video");
+            $('.data-block-bg', $newThumb).addClass('video');
             node = MediaAttribute(node, node.k);
             if (node && node.data && node.data.playtime) {
                 $('.video-thumb-details span', $newThumb).text(secondsToTimeShort(node.data.playtime));
             }
-        }
-        else if (fileIcon(node) === 'pdf') {
-            $(".block-view-file-type", $newThumb).removeClass("image").addClass("pdf");
-        }
-        else if (fileIcon(node) === 'word') {
-            $(".block-view-file-type", $newThumb).removeClass("image").addClass("word");
         }
 
         if (node.fav) {
@@ -1043,25 +1039,42 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
         });
 
     // Set the media block icons according to media content.
-    var $rearIcon = $newRow.find(".medium-file-icon.double");
-    var $frontIcon = $newRow.find(".medium-file-icon.double .medium-file-icon");
-    if (images === 0) {
-        $frontIcon.removeClass("image").addClass("video");
+    let fIcon;
+    let rIcon;
+
+    if (images) {
+        fIcon = rIcon = 'image';
+        if (videos) {
+            rIcon = 'video';
+        }
+        else if (pdfs) {
+            rIcon = 'pdf';
+        }
+        else if (docxs) {
+            rIcon = 'word';
+        }
+    }
+    else if (videos) {
+        fIcon = rIcon = 'video';
+        if (pdfs) {
+            rIcon = 'pdf';
+        }
+        else if (docxs) {
+            rIcon = 'word';
+        }
+    }
+    else if (pdfs) {
+        fIcon = rIcon = 'pdf';
+        if (docxs) {
+            rIcon = 'word';
+        }
+    }
+    else if (docxs) {
+        fIcon = rIcon = 'word';
     }
 
-    if (videos === 0) {
-        $frontIcon.removeClass('video').addClass('pdf');
-    }
-    else {
-        $rearIcon.removeClass("image").addClass("video");
-    }
-
-    if (pdfs === 0) {
-        $frontIcon.removeClass('pdf').addClass('image');
-    }
-    else {
-        $rearIcon.removeClass("image").addClass("pdf");
-    }
+    const $rearIcon = $('.item-type-icon-90.double', $newRow).addClass(`icon-${rIcon}-90`);
+    $('.item-type-icon-90', $rearIcon).addClass(`icon-${fIcon}-90`);
 
     // Attach resize listener to the image block.
     self._resizeListeners.push(function() {
@@ -1165,7 +1178,8 @@ RecentsRender.prototype._countMedia = function(action) {
     var counts = {
         images: 0,
         videos: 0,
-        pdfs: 0
+        pdfs: 0,
+        docxs: 0
     };
 
     for (var idx = action.length; idx--;) {
@@ -1179,6 +1193,9 @@ RecentsRender.prototype._countMedia = function(action) {
         }
         else if (fileIcon(n) === 'pdf') {
             counts.pdfs++;
+        }
+        else if (fileIcon(n) === 'word') {
+            counts.docxs++;
         }
         else if (d) {
             console.warn('What is this?...', n);

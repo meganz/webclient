@@ -1278,8 +1278,9 @@ lazy(mega, 'backupCenter', () => {
                 deviceUserAgent = this.data[i].dua;
 
                 // Show Device icon
+                const dIcon = deviceIcon(deviceUserAgent || deviceName, this.data[i].type);
                 mCreateElement('i', {
-                    'class':`medium-file-icon ${deviceIcon(deviceUserAgent || deviceName, this.data[i].type)}`
+                    'class':`medium-file-icon item-type-icon-90 icon-${dIcon}-90`
                 }, nameNode);
 
                 // Show Device name
@@ -1491,7 +1492,7 @@ lazy(mega, 'backupCenter', () => {
                     decodedFolderName.bn : n.name;
                 const isSelected = folder.id && folder.id === this.selectedSync.id
                         || folder.h === this.selectedSync.id;
-                let icon = '';
+                let icon = 'icon-folder-24';
                 let type = '';
 
                 // Create new table if > 10 folders for pages navigator
@@ -1514,15 +1515,15 @@ lazy(mega, 'backupCenter', () => {
                 }, tableNode);
 
                 if (folder.id && folder.t === 5) {
-                    icon = ' folder-backup';
+                    icon = 'icon-folder-backup-24 folder-backup';
                     type = l[20606];
                 }
                 else if (folder.id && folder.t === 3) {
-                    icon = ' folder-camera';
+                    icon = 'icon-folder-camera-uploads-24 folder-camera';
                     type = l.camera_uploads;
                 }
                 else if (folder.id && folder.t !== 4) {
-                    icon = ' folder-sync';
+                    icon = 'icon-folder-sync-24 folder-sync';
                     type = l[17621];
                 }
 
@@ -1530,7 +1531,7 @@ lazy(mega, 'backupCenter', () => {
                 folderCellNode = mCreateElement('td', undefined, folderRowNode);
                 folderInfoNode = mCreateElement('div', {'class': 'item-name'}, folderCellNode);
                 // sprite-fm-uni icon-folder-24 for vector
-                mCreateElement('i', {'class': `transfer-filetype-icon folder ${icon}`}, folderInfoNode);
+                mCreateElement('i', {'class': `item-type-icon ${icon}`}, folderInfoNode);
                 mCreateElement('span', {
                     'title': this.decodeFolderData(folder.l).lf || ''
                 }, folderInfoNode).textContent = folderName;

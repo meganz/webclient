@@ -1139,24 +1139,17 @@ export class ConversationRightArea extends MegaRenderMixin {
                                         </div> :
                                         null
                                     }
-                                    {room.type === "public" ?
+                                    {room.type === 'public' && !room.isMeeting ?
                                         <div
                                             className={getChatLinkClass}
                                             onClick={e => {
                                                 if ($(e.target).closest('.disabled').length > 0) {
                                                     return false;
                                                 }
-                                                if (scheduledMeeting) {
-                                                    delay('chat-event-sm-share-meeting-link', () => eventlog(99924));
-                                                }
                                                 this.props.onGetManageChatLinkClicked();
                                             }}>
                                             <i className="sprite-fm-mono icon-link-filled"/>
-                                            <span>
-                                                {/* `Share meeting` || `Get chat link` || `Get meeting link` */}
-                                                {scheduledMeeting ? l.share_meeting_button
-                                                    : room.isMeeting ? l.meeting_get_link : l[20481]}
-                                            </span>
+                                            <span>{l[20481] /* `Get chat link */}</span>
                                         </div> :
                                         null
                                     }
@@ -2624,6 +2617,13 @@ export class ConversationPanel extends MegaRenderMixin {
                             ${room.haveActiveCall() ? 'in-call' : ''}
                         `}>
                         <div className="chat-topic-buttons">
+                            {room.type === 'public' && room.isMeeting &&
+                                <Button
+                                    className="mega-button small share-meeting-button"
+                                    label={l.share_meeting_button /* `Share meeting` */}
+                                    onClick={() => this.setState({ chatLinkDialog: true }, () => eventlog(500230))}
+                                />
+                            }
                             <Button
                                 className="right"
                                 disableCheckingVisibility={true}

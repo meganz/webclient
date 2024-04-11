@@ -19,10 +19,6 @@ export class ChatlinkDialog extends MegaRenderMixin {
         };
     }
 
-    onPopupDidMount = $node => {
-        this.$popupNode = $node;
-    };
-
     componentWillMount() {
         this.retrieveChatLink();
     }
@@ -54,24 +50,6 @@ export class ChatlinkDialog extends MegaRenderMixin {
         if (!this.loading && chatRoom.topic) {
             this.retrieveChatLink();
         }
-
-        // Setup toast notification
-        this.toastTxt = l[7654] /* `1 link was copied to the clipboard` */;
-
-        if (!this.$popupNode) {
-            return;
-        }
-
-        const $node = this.$popupNode;
-        const $copyButton = $('.copy-to-clipboard', $node);
-
-        $copyButton.rebind('click', () => {
-            copyToClipboard(this.state.link, this.toastTxt);
-            return false;
-        });
-
-        // Setup the copy to clipboard buttons
-        $('span', $copyButton).text(l[1990] /* `Copy` */);
     }
 
     onClose = () => {
@@ -118,6 +96,7 @@ export class ChatlinkDialog extends MegaRenderMixin {
                 onClick={this.onClose}>
                 <span>{l[148] /* `Close` */}</span>
             </button>;
+        const publicLinkDetails = chatRoom.isMeeting ? l.meeting_link_details : l[20644];
 
         return (
             <ModalDialogsUI.ModalDialog
@@ -161,7 +140,12 @@ export class ChatlinkDialog extends MegaRenderMixin {
                     </section> :
                     <>
                         <header>
-                            <i className="sprite-fm-uni icon-chat-group"/>
+                            {chatRoom.isMeeting ?
+                                <div className="chat-topic-icon meeting-icon">
+                                    <i className="sprite-fm-mono icon-video-call-filled"/>
+                                </div> :
+                                <i className="sprite-fm-uni icon-chat-group"/>
+                            }
                             <h2 id="chat-link-dialog-title">
                                 <Emoji>{chatRoom.getRoomTitle()}</Emoji>
                             </h2>
@@ -176,8 +160,7 @@ export class ChatlinkDialog extends MegaRenderMixin {
                                         value={this.loading ? l[5533] : !chatRoom.topic ? l[20660] : link}
                                     />
                                 </div>
-                                {/* `People can join your group by using this link.` */}
-                                <div className="info">{chatRoom.publicLink ? l[20644] : null}</div>
+                                <div className="info">{chatRoom.publicLink ? publicLinkDetails : null}</div>
                             </div>
                         </section>
                     </>
@@ -197,7 +180,9 @@ export class ChatlinkDialog extends MegaRenderMixin {
                                     chatRoom.updatePublicHandle(1);
                                     this.onClose();
                                 }}>
-                                <span>{l[20487] /* `Delete chat link` */}</span>
+                                <span>
+                                    {chatRoom.isMeeting ? l.meeting_link_delete : l[20487] /* `Delete chat link` */}
+                                </span>
                             </button>
                         }
 
@@ -209,7 +194,13 @@ export class ChatlinkDialog extends MegaRenderMixin {
                                         positive
                                         copy-to-clipboard
                                         ${this.loading ? 'disabled' : ''}
-                                    `}>
+                                    `}
+                                    onClick={() => {
+                                        copyToClipboard(link, l[7654] /* `1 link was copied to the clipboard` */);
+                                        if (chatRoom.isMeeting) {
+                                            eventlog(500231);
+                                        }
+                                    }}>
                                     <span>{l[63] /* `Copy` */}</span>
                                 </button> :
                                 closeButton :

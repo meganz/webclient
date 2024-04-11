@@ -140,6 +140,13 @@ def pick_files_to_test(file_line_mapping, extensions=None, exclude=None):
     # logging.info(files_to_test)
     return files_to_test
 
+file_cache = {}
+def read_file(file_path):
+    if file_path not in file_cache:
+        with open(file_path) as file:
+            file_cache[file_path] = file.read().split('\n')
+    return file_cache[file_path]
+
 def reduce_eslint(file_line_mapping, **extra):
     """
     Runs ESLint on the project with the default configured rules. The output
@@ -272,16 +279,23 @@ def reduce_stylelint(file_line_mapping, **extra):
     result = ['\nStyleLint output:\n=================\n']
     cmdout_expression = re.compile(r'(.+): line (\d+), col \d+, .+')
     warning_result = []
-    warning_rules = r'"css-logical-props"'
+    warning_rules = r'"(?:css-logical-props|css-overflow)"'
+
+    def is_warn_content(filename, lineno, error):
+        if error.find('"css-overflow"') > 0:
+            return 0 if read_file(filename)[lineno - 1].find('clip') > 0 else 2
+
+        return 1
+
     for line in output:
         parse_result = cmdout_expression.findall(line)
         # Check if we've got a relevant line.
         if parse_result:
             file_name, line_no = parse_result[0][0], int(parse_result[0][1])
-            file_name = tuple(re.split(PATH_SPLITTER, file_name))
+            file_name_t = tuple(re.split(PATH_SPLITTER, file_name))
             # Check if the line is part of our selection list, or if a css syntax
             # error happened within a file since that will halt further parsing
-            if line_no in file_line_mapping[file_name] or re.search(r'CssSyntaxError', line):
+            if line_no in file_line_mapping[file_name_t] or re.search(r'CssSyntaxError', line):
                 do_warn = False
 
                 if re.search(r': line \d+, col \d+, warning - ', line):
@@ -290,10 +304,14 @@ def reduce_stylelint(file_line_mapping, **extra):
                     # plugin/no-unsupported-browser-features is too verbose
                     # with e.g. Chrome 58,59,60,61,62,63,64,65,66,67,68,69
                     if re.search(r'Unexpected browser feature', line):
-                        line = re.sub(r'(\w+ [\d.]+)(,[\d.]+)+,([\d.]+)', r'\1-\3', line)
+                        line = re.sub(r'(\w+ [\d.]+)(,[\d.-]+)+,([\d.]+)', r'\1-\3', line)
                         if re.search(warning_rules, line):
-                            do_warn = True
-                            line = re.sub(', error -', ', warning -', line)
+                            wt = is_warn_content(file_name, line_no, line)
+                            if wt > 1:
+                                continue
+                            if wt > 0:
+                                do_warn = True
+                                line = re.sub(', error -', ', warning -', line)
 
                 if do_warn:
                     warnings += 1

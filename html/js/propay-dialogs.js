@@ -2202,7 +2202,21 @@ var addressDialog = {
             const $stripeFailureDialog = $('.payment-stripe-failure-dialog');
             const $stripeIframe = $('iframe#stripe-widget', $stripeDialog);
 
-            $('button.js-close, .btn-close-dialog', $stripeFailureDialog).rebind('click.stripeDlg', closeDialog);
+            $('button.js-close, .btn-close-dialog', $stripeFailureDialog).rebind('click.stripeDlg', () => {
+
+                closeDialog();
+                // if we are coming from business plan, we need to reset registration
+                if (addressDialog.businessPlan && addressDialog.userInfo) {
+                    if (page === 'registerb') {
+                        page = '';
+                        loadSubPage('registerb');
+                    }
+                    else if (page === 'repay') {
+                        page = '';
+                        loadSubPage('repay');
+                    }
+                }
+            });
 
             $('.stripe-error', $stripeFailureDialog).text(error || '');
 

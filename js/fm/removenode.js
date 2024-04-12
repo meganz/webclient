@@ -423,7 +423,7 @@ async function fmremove(selectedNodes, skipDelWarning) {
             }
 
             if (filecnt + foldercnt === 1) {
-                message = message.replace('%1', M.d[selectedNodes[0]].name);
+                message = message.replace('%1', escapeHTML(M.d[selectedNodes[0]].name));
             }
 
             msgDialog(

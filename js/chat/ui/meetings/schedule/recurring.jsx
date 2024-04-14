@@ -363,7 +363,7 @@ export default class Recurring extends MegaRenderMixin {
                                 <div className="mega-banner body with-btn">
                                     <div className="green-notification cell text-cell">
                                         <div className="versioning-body-text">
-                                            {l.recurring_monthdays_warning.replace('%n', monthDays[0])}
+                                            {mega.icu.format(l.recurring_monthdays_warning, monthDays[0])}
                                         </div>
                                     </div>
                                 </div>

@@ -226,9 +226,7 @@ function Chat() {
     });
 
     // Just have the one interval (per minute) for the whole chat.
-    this.minuteClockInterval = setInterval(() => {
-        this._syncChats();
-    }, 6e4);
+    this.minuteClockInterval = setInterval(() => this._syncChats(), 6e4);
 
     return this;
 };

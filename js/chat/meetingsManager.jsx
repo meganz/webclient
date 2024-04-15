@@ -104,8 +104,8 @@ class ScheduledMeeting {
         this.occurrences = new MegaDataMap();
         this.nextOccurrenceStart = this.start;
         this.nextOccurrenceEnd = this.end;
-        this.ownerHandle = meetingInfo.u;
         this.isPast = (this.isRecurring ? this.recurring.end : this.end) < Date.now();
+        this.ownerHandle = meetingInfo.u;
         this.chatRoom = meetingInfo.chatRoom;
         this.chatRoom.scheduledMeeting = this.isRoot ? this : this.parent;
 
@@ -151,7 +151,7 @@ class ScheduledMeeting {
         if (!upcomingOccurrences || !upcomingOccurrences.length) {
             // We consider the recurring meeting as a past meeting once its last occurrence had passed, i.e.
             // irrespective of the meeting's recurrence end date.
-            this.isPast = this.isRecurring;
+            this.isPast = this.isRecurring || this.end < Date.now();
             return;
         }
 
@@ -437,7 +437,7 @@ class MeetingsManager {
 
     async updateMeeting(meetingInfo, chatRoom) {
         // [...] TODO: see `getRoomByMeetingId` over `chatRoom` param
-        const { scheduledMeeting, chatId, publicLink, options, topic } = chatRoom;
+        const { scheduledMeeting, chatId, publicLink, options } = chatRoom;
         await megaChat.plugins.chatdIntegration.updateScheduledMeeting(meetingInfo, scheduledMeeting.id, chatId);
 
         const nextParticipants = meetingInfo.participants;

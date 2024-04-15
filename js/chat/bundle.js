@@ -377,8 +377,8 @@ class ScheduledMeeting {
     this.occurrences = new MegaDataMap();
     this.nextOccurrenceStart = this.start;
     this.nextOccurrenceEnd = this.end;
-    this.ownerHandle = meetingInfo.u;
     this.isPast = (this.isRecurring ? this.recurring.end : this.end) < Date.now();
+    this.ownerHandle = meetingInfo.u;
     this.chatRoom = meetingInfo.chatRoom;
     this.chatRoom.scheduledMeeting = this.isRoot ? this : this.parent;
     if (fromActionPacket) {
@@ -412,7 +412,7 @@ class ScheduledMeeting {
   setNextOccurrence() {
     const upcomingOccurrences = Object.values(this.occurrences).filter(o => o.isUpcoming);
     if (!upcomingOccurrences || !upcomingOccurrences.length) {
-      this.isPast = this.isRecurring;
+      this.isPast = this.isRecurring || this.end < Date.now();
       return;
     }
     const sortedOccurrences = upcomingOccurrences.sort((a, b) => a.start - b.start);
@@ -778,8 +778,7 @@ class MeetingsManager {
       scheduledMeeting,
       chatId,
       publicLink,
-      options,
-      topic
+      options
     } = chatRoom;
     await megaChat.plugins.chatdIntegration.updateScheduledMeeting(meetingInfo, scheduledMeeting.id, chatId);
     const nextParticipants = meetingInfo.participants;
@@ -1682,9 +1681,7 @@ function Chat() {
       return typeof SfuClient !== 'undefined' && typeof TransformStream !== 'undefined' && window.RTCRtpSender && !!RTCRtpSender.prototype.createEncodedStreams;
     }
   });
-  this.minuteClockInterval = setInterval(() => {
-    this._syncChats();
-  }, 6e4);
+  this.minuteClockInterval = setInterval(() => this._syncChats(), 6e4);
   return this;
 }
 inherits(Chat, MegaDataObject);

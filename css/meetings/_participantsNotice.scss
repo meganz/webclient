@@ -88,4 +88,12 @@
             }
         }
     }
+    &-content-invite {
+        width: 460px;
+        padding: 12px;
+        margin: 12px auto 0;
+        box-sizing: border-box;
+        border-radius: 34px;
+        background: var(--surface-highlight-1);
+    }
 }

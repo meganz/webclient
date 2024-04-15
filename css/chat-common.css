@@ -582,6 +582,13 @@
 .rtl .chat-dropdown .link-button.light span {
     text-align: right;
 }
+.chat-dropdown button.invite-dialog-btn {
+    margin: 6px 0;
+    --mask-color: var(--secondary-green);
+}
+.chat-dropdown button.invite-dialog-btn span {
+    font: var(--text-body1-bold);
+}
 .chat-shared-block {
     padding: 5px 0;
     position: relative;

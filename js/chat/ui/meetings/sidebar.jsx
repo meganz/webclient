@@ -9,10 +9,10 @@ import Guest from './guest.jsx';
 
 const inviteAllowed = chatRoom => {
     if (chatRoom) {
-        return (
-            chatRoom.type !== 'private' &&
-            Call.isModerator(chatRoom, u_handle) &&
-            !chatRoom.iAmReadOnly()
+        return chatRoom.type !== 'private' && !!(
+            chatRoom.options[MCO_FLAGS.OPEN_INVITE] ||
+            Call.isModerator(chatRoom, u_handle) ||
+            chatRoom.publicLink
         );
     }
     return false;

@@ -99,7 +99,7 @@ export default class ParticipantsBlock extends MegaRenderMixin {
     }
 
     render() {
-        const { call, mode, peers, floatDetached, chatRoom, onSpeakerChange, } = this.props;
+        const { call, mode, peers, floatDetached, chatRoom, onSpeakerChange } = this.props;
 
         if (peers && peers.length) {
             // TODO: abstract/consolidate with the rest of the similar filtering/ordering instances

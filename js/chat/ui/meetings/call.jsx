@@ -611,8 +611,8 @@ export default class Call extends MegaRenderMixin {
             return;
         }
         this.handleModeChange(MODE.MAIN);
-        this.props.call.setPinnedCid(peer.clientId);
-        this.setState({ forcedLocal: peer.isLocal });
+        this.props.call.setPinnedCid(peer.clientId, true);
+        this.setState({ forcedLocal: peer.isLocal && peer.clientId === this.props.call.pinnedCid });
     };
 
     /**

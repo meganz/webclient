@@ -22519,9 +22519,9 @@ class Call extends mixins.w9 {
         return;
       }
       this.handleModeChange(MODE.MAIN);
-      this.props.call.setPinnedCid(peer.clientId);
+      this.props.call.setPinnedCid(peer.clientId, true);
       this.setState({
-        forcedLocal: peer.isLocal
+        forcedLocal: peer.isLocal && peer.clientId === this.props.call.pinnedCid
       });
     };
     this.handleModeChange = mode => {

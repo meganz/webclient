@@ -15842,6 +15842,33 @@ class Recurring extends mixins.w9 {
       frequency,
       ...state
     });
+    this.IntervalSelect = () => {
+      const {
+        interval,
+        view
+      } = this.state;
+      return external_React_default().createElement("div", {
+        className: "mega-input inline recurring-interval"
+      }, external_React_default().createElement(Select, {
+        name: `${Recurring.NAMESPACE}-interval`,
+        value: interval > 0 ? interval : 1,
+        icon: true,
+        options: [...Array(view === this.VIEWS.WEEKLY ? 52 : 12).keys()].map(value => {
+          value += 1;
+          return {
+            value,
+            label: value
+          };
+        }),
+        onSelect: ({
+          value
+        }) => {
+          this.setState({
+            interval: value === 1 ? 0 : value
+          });
+        }
+      }));
+    };
     const {
       chatRoom,
       startDateTime
@@ -15969,27 +15996,7 @@ class Recurring extends mixins.w9 {
     } = this.state;
     return external_React_default().createElement("div", {
       className: "recurring-field-row"
-    }, external_React_default().createElement("span", null, l.recur_rate), external_React_default().createElement("div", {
-      className: "mega-input inline recurring-interval"
-    }, external_React_default().createElement(Select, {
-      name: `${Recurring.NAMESPACE}-interval`,
-      value: interval > 0 ? interval : 1,
-      icon: true,
-      options: [...Array(view === this.VIEWS.WEEKLY ? 52 : 12).keys()].map(value => {
-        value += 1;
-        return {
-          value: value,
-          label: value
-        };
-      }),
-      onSelect: ({
-        value
-      }) => {
-        this.setState({
-          interval: value === 1 ? 0 : value
-        });
-      }
-    })), view === this.VIEWS.WEEKLY && external_React_default().createElement("span", null, mega.icu.format(l.plural_week, interval)), view === this.VIEWS.MONTHLY && external_React_default().createElement("span", null, mega.icu.format(l.plural_month, interval)));
+    }, (0,utils.lI)(mega.icu.format(view === this.VIEWS.MONTHLY ? l.recur_rate_monthly : l.recur_rate_weekly, interval > 0 ? interval : 1), "[S]", this.IntervalSelect));
   }
   renderEndControls() {
     const {

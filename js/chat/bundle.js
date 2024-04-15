@@ -12975,7 +12975,7 @@ class ConversationRightArea extends mixins.w9 {
       confirmLeave,
       onLeave
     }) => {
-      const isDisabled = chatRoom.call || chatRoom.isReadOnly() || is_chatlink;
+      const isDisabled = chatRoom.call || is_chatlink || !chatRoom.iAmInRoom();
       const participants = chatRoom.getParticipantsExceptMe();
       return external_React_default().createElement("div", {
         className: `

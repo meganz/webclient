@@ -24245,7 +24245,7 @@ class Minimized extends mixins.w9 {
           onClick: ev => {
             ev.stopPropagation();
             const callParticipants = chatRoom.getCallParticipants();
-            const doLeave = () => hasHost(callParticipants) || callParticipants.length === 1 ? onLeave() : confirmLeave({
+            const doLeave = () => !chatRoom.iAmOperator() || hasHost(callParticipants) || callParticipants.length === 1 ? onLeave() : confirmLeave({
               title: l.assign_host_leave_call,
               body: l.assign_host_leave_call_details,
               cta: l.assign_host_button,

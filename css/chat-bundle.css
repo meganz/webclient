@@ -1191,6 +1191,84 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   cursor: pointer;
 }
 
+.invite-panel {
+  box-sizing: border-box;
+  font-family: var(--text-font-family);
+  margin: 8px 24px;
+}
+.invite-panel h3 {
+  color: var(--text-color-high);
+  font: var(--text-h3);
+}
+.invite-panel .content div.content-block {
+  background: transparent;
+  color: var(--text-color-medium);
+  font: var(--text-body1);
+}
+.invite-panel .content div.content-block {
+  padding: 0;
+  height: 48px;
+}
+.invite-panel .content div.content-block.link-block {
+  display: flex;
+  justify-content: space-between;
+}
+.in-call .invite-panel .content div.content-block.link-block {
+  margin-bottom: 32px;
+  height: unset;
+}
+.invite-panel .content div.content-block.link-block .text-wrapper {
+  margin: auto 0;
+  max-width: calc(100% - 64px);
+}
+.invite-panel .content div.content-block.link-block .link-label {
+  color: var(--text-color-high);
+  font: var(--text-body1-bold);
+}
+.invite-panel .content div.content-block.link-block .meeting-link-toggle {
+  margin: auto 0;
+}
+.invite-panel .content div.content-block .button.flat-button {
+  border: 1px solid var(--stroke-mid-grey);
+  border-radius: 8px;
+  color: var(--text-color-high);
+  cursor: pointer;
+  display: flex;
+  font: var(--text-h3);
+  line-height: 24px;
+  margin: 8px auto 0;
+  padding: 12px;
+}
+.invite-panel .content div.content-block .button.flat-button i {
+  margin-inline-end: 12px;
+  -webkit-margin-end: 12px;
+  --icon-size: 24px;
+  --mask-color: var(--icon-active);
+}
+.invite-panel .content div.content-block .button.flat-button:hover {
+  border-color: var(--stroke-dark-grey);
+}
+.invite-panel .content div.content-block.invite-panel-divider {
+  color: var(--text-color-high);
+  height: 20px;
+  margin: 16px 0;
+  text-align: center;
+}
+.invite-panel .content div.content-block:last-child {
+  margin-bottom: 20px;
+}
+
+.mega-dialog:has(.invite-panel) {
+  width: 460px;
+}
+
+.dropdown.body.invite-dropdown {
+  display: block;
+}
+.dropdown.body.invite-dropdown a {
+  color: var(--text-color-medium);
+}
+
 .meetings-call {
   position: fixed;
   top: 0;
@@ -1325,6 +1403,14 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   color: var(--text-color-low);
   font: var(--text-body2);
   margin-top: 12px;
+}
+.meetings-call .stream .participants-notice-content-invite {
+  width: 460px;
+  padding: 12px;
+  margin: 12px auto 0;
+  box-sizing: border-box;
+  border-radius: 34px;
+  background: var(--surface-highlight-1);
 }
 .meetings-call .stream .stream-participants-block {
   float: left;
@@ -1814,7 +1900,6 @@ body.rtl .meetings-call .stream .stream-participants-block .participants-contain
   position: absolute;
   right: 32px;
   bottom: -250px;
-  width: 200px;
   padding: 0 0 14px 0;
   transition: opacity 500ms ease-in-out, bottom 500ms ease-in-out;
   z-index: 12;

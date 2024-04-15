@@ -452,7 +452,7 @@ export default class Participants extends MegaRenderMixin {
                                         action
                                         ${this.NAMESPACE}-invite
                                     `}
-                                    icon="sprite-fm-mono icon-join-call"
+                                    icon="sprite-fm-mono icon-user-plus-thin-outline"
                                     onClick={onInviteToggle}>
                                     {l[8726] /* `Invite` */}
                                 </Button>

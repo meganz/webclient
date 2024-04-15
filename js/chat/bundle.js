@@ -15,8 +15,8 @@ var external_React_default = __webpack_require__.n(external_React_);
 // EXTERNAL MODULE: external "ReactDOM"
 var external_ReactDOM_ = __webpack_require__(206);
 var external_ReactDOM_default = __webpack_require__.n(external_ReactDOM_);
-// EXTERNAL MODULE: ./js/chat/ui/conversations.jsx + 18 modules
-var conversations = __webpack_require__(30);
+// EXTERNAL MODULE: ./js/chat/ui/conversations.jsx + 17 modules
+var conversations = __webpack_require__(120);
 ;// CONCATENATED MODULE: ./js/chat/chatRouting.jsx
 var _ChatRouting;
 class ChatRouting {
@@ -4522,7 +4522,10 @@ ChatRoom.prototype.destroy = function (notifyOtherDevices, noRedirect) {
     }
   });
 };
-ChatRoom.prototype.updatePublicHandle = async function (remove, cim) {
+ChatRoom.prototype.updatePublicHandle = async function (remove, cim, force) {
+  if (force) {
+    this.publicLink = null;
+  }
   if (!remove && this.publicLink) {
     return this.publicLink;
   }
@@ -12597,10 +12600,13 @@ class WaitingRoom extends mixins.w9 {
 }
 // EXTERNAL MODULE: ./js/chat/ui/meetings/streamControls.jsx
 var streamControls = __webpack_require__(489);
+// EXTERNAL MODULE: ./js/chat/ui/inviteParticipantsPanel.jsx
+var inviteParticipantsPanel = __webpack_require__(815);
 ;// CONCATENATED MODULE: ./js/chat/ui/conversationpanel.jsx
 
 
 var conversationpanel_dec, _dec2, conversationpanel_class;
+
 
 
 
@@ -12967,8 +12973,12 @@ class Occurrences extends mixins.w9 {
   }
 }
 class ConversationRightArea extends mixins.w9 {
-  constructor(props) {
-    super(props);
+  constructor(...args) {
+    super(...args);
+    this.state = {
+      contactPickerDialog: false,
+      inviteDialog: false
+    };
     this.LeaveButton = (0,hostsObserver.C)(({
       chatRoom,
       hasHost,
@@ -13050,9 +13060,6 @@ class ConversationRightArea extends mixins.w9 {
         return chatRoom.hasUserMessages() ? msgDialog(`confirmation:!^${l.cancel_meeting_button}!${l.schedule_cancel_abort}`, null, l.schedule_cancel_dialog_title.replace('%s', title), l.schedule_cancel_dialog_move_single, doConfirm, 1) : msgDialog(`confirmation:!^${l.schedule_cancel_dialog_confirm}!${l.schedule_cancel_abort}`, null, l.schedule_cancel_dialog_title.replace('%s', title), l.schedule_cancel_dialog_archive_single, doConfirm, 1);
       }
     };
-    this.state = {
-      contactPickerDialog: false
-    };
   }
   customIsEventuallyVisible() {
     return this.props.chatRoom.isCurrentlyActive;
@@ -13073,6 +13080,25 @@ class ConversationRightArea extends mixins.w9 {
                                 href="${l.mega_help_host}/wp-admin/post.php?post=3005&action=edit"
                                 target="_blank"
                                 class="ulickurl">`).replace('[/A]', '</a>'))) : null;
+  }
+  handleAddParticipants() {
+    if (M.u.length > 1) {
+      if (allContactsInChat(excludedParticipants(this.props.chatRoom))) {
+        return msgDialog(`confirmationa:!^${l[8726]}!${l[82]}`, null, `${l.all_contacts_added}`, `${l.all_contacts_added_to_chat}`, res => {
+          if (res) {
+            contactAddDialog(null, false);
+          }
+        }, 1);
+      }
+      return this.setState({
+        contactPickerDialog: true
+      });
+    }
+    msgDialog(`confirmationa:!^${l[8726]}!${l[82]}`, null, `${l.no_contacts}`, `${l.no_contacts_text}`, resp => {
+      if (resp) {
+        contactAddDialog(null, false);
+      }
+    }, 1);
   }
   renderPushSettingsButton() {
     const {
@@ -13207,7 +13233,34 @@ class ConversationRightArea extends mixins.w9 {
         `;
     let participantsList = null;
     if (room.type === "group" || room.type === "public") {
-      participantsList = external_React_default().createElement("div", null, isReadOnlyElement, external_React_default().createElement(ParticipantsList, {
+      participantsList = external_React_default().createElement("div", null, isReadOnlyElement, external_React_default().createElement(buttons.$, {
+        className: "mega-button action invite-dialog-btn",
+        icon: "sprite-fm-mono icon-user-plus-thin-outline",
+        label: l[8726],
+        disabled: (0,call.P)() || room.isReadOnly() || !room.iAmOperator() && !room.publicLink && !room.options[MCO_FLAGS.OPEN_INVITE],
+        onClick: () => {
+          delay('chat-event-inv-rhp', () => eventlog(99963));
+          if (room.type === 'group') {
+            return this.handleAddParticipants();
+          }
+          loadingDialog.show('fetchchatlink');
+          room.updatePublicHandle(false, false, true).catch(dump).always(() => {
+            loadingDialog.hide('fetchchatlink');
+            if (!this.isMounted()) {
+              return;
+            }
+            if (!room.iAmOperator() && room.options[MCO_FLAGS.OPEN_INVITE] && !room.publicLink) {
+              this.handleAddParticipants();
+            } else if (room.type === 'public' && !room.topic) {
+              this.handleAddParticipants();
+            } else {
+              this.setState({
+                inviteDialog: true
+              });
+            }
+          });
+        }
+      }), external_React_default().createElement(ParticipantsList, {
         ref: function (r) {
           self.participantsListRef = r;
         },
@@ -13216,7 +13269,7 @@ class ConversationRightArea extends mixins.w9 {
         isCurrentlyActive: room.isCurrentlyActive
       }));
     }
-    const addParticipantBtn = external_React_default().createElement(buttons.$, {
+    const addParticipantBtn = room.type === 'private' && external_React_default().createElement(buttons.$, {
       className: "link-button light",
       icon: "sprite-fm-mono icon-add-small",
       label: l[8007],
@@ -13337,8 +13390,8 @@ class ConversationRightArea extends mixins.w9 {
         }
       }),
       expandedPanel: {
-        participants: (room.type === 'group' || room.type === 'public') && !isMeeting,
-        options: room.type === 'private' || isMeeting && !isRecurring,
+        participants: false,
+        options: false,
         occurrences: isMeeting && scheduledMeeting && isRecurring
       }
     }), participantsList ? external_React_default().createElement(AccordionPanel, {
@@ -13567,7 +13620,22 @@ class ConversationRightArea extends mixins.w9 {
         contactPickerDialog: false
       }),
       selectFooter: true
-    }));
+    }), this.state.inviteDialog && external_React_default().createElement(modalDialogs.A.ModalDialog, {
+      onClose: () => {
+        this.setState({
+          inviteDialog: false
+        });
+      },
+      dialogName: "chat-link-dialog",
+      chatRoom: room
+    }, external_React_default().createElement(inviteParticipantsPanel.Q, {
+      chatRoom: room,
+      onAddParticipants: () => {
+        this.setState({
+          inviteDialog: false
+        }, () => this.handleAddParticipants());
+      }
+    })));
   }
 }
 ConversationRightArea.defaultProps = {
@@ -14857,7 +14925,7 @@ function isStartCallDisabled(room) {
 
 /***/ }),
 
-/***/ 30:
+/***/ 120:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -17198,44 +17266,8 @@ const Footer = ({
     topic: topic
   }, external_React_default().createElement("span", null, isEdit ? l.update_meeting_button : l.schedule_meeting_button))));
 };
-;// CONCATENATED MODULE: ./js/ui/miniui.jsx
-
-
-class ToggleCheckbox extends mixins.w9 {
-  constructor(props) {
-    super(props);
-    this.onToggle = () => {
-      const newState = !this.state.value;
-      this.setState({
-        value: newState
-      });
-      if (this.props.onToggle) {
-        this.props.onToggle(newState);
-      }
-    };
-    this.state = {
-      value: this.props.value
-    };
-  }
-  render() {
-    return external_React_default().createElement("div", {
-      className: `
-                    mega-switch
-                    ${this.props.className}
-                    ${this.state.value ? 'toggle-on' : ''}
-                `,
-      role: "switch",
-      "aria-checked": !!this.state.value,
-      onClick: this.onToggle
-    }, external_React_default().createElement("div", {
-      className: `mega-feature-switch sprite-fm-mono-after
-                         ${this.state.value ? 'icon-check-after' : 'icon-minimise-after'}`
-    }));
-  }
-}
-const miniui = ({
-  ToggleCheckbox
-});
+// EXTERNAL MODULE: ./js/ui/miniui.jsx
+var miniui = __webpack_require__(818);
 ;// CONCATENATED MODULE: ./js/chat/ui/startGroupChatWizard.jsx
 var React = __webpack_require__(594);
 
@@ -17439,7 +17471,7 @@ class StartGroupChatWizard extends mixins.w9 {
         }
       }))), this.props.flowType === 2 ? null : React.createElement("div", {
         className: "group-chat-dialog content"
-      }, React.createElement(miniui.ToggleCheckbox, {
+      }, React.createElement(miniui.A.ToggleCheckbox, {
         className: "rotation-toggle",
         checked: this.state.keyRotation,
         onToggle: keyRotation => this.setState({
@@ -17449,7 +17481,7 @@ class StartGroupChatWizard extends mixins.w9 {
         className: "group-chat-dialog header"
       }, l[20576]), React.createElement("div", {
         className: "group-chat-dialog description"
-      }, l[20484]), React.createElement(miniui.ToggleCheckbox, {
+      }, l[20484]), React.createElement(miniui.A.ToggleCheckbox, {
         className: "open-invite-toggle",
         checked: this.state.openInvite,
         value: this.state.openInvite,
@@ -20941,6 +20973,231 @@ let HistoryPanel = (_dec = (0,mixins.hG)(450, true), (_class = class HistoryPane
 
 /***/ }),
 
+/***/ 815:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.d(__webpack_exports__, {
+Q: () => (InviteParticipantsPanel)
+});
+var react0__ = __webpack_require__(594);
+var react0 = __webpack_require__.n(react0__);
+var _mixins_js1__ = __webpack_require__(137);
+var _meetings_call_jsx2__ = __webpack_require__(3);
+var _ui_miniui_jsx3__ = __webpack_require__(818);
+var _ui_buttons_jsx4__ = __webpack_require__(994);
+var _ui_dropdowns_jsx5__ = __webpack_require__(911);
+
+
+
+
+
+
+const NAMESPACE = 'invite-panel';
+class InviteParticipantsPanel extends _mixins_js1__.w9 {
+  constructor(props) {
+    super(props);
+    this.state = {
+      link: '',
+      copied: false
+    };
+    this.retrieveChatLink();
+  }
+  retrieveChatLink(cim) {
+    const {
+      chatRoom
+    } = this.props;
+    if (!chatRoom.topic) {
+      return;
+    }
+    this.loading = chatRoom.updatePublicHandle(false, cim).always(() => {
+      delete this.loading;
+      if (this.isMounted()) {
+        if (chatRoom.publicLink) {
+          this.setState({
+            link: `${getBaseUrl()}/${chatRoom.publicLink}`
+          });
+        } else {
+          this.setState({
+            link: false
+          });
+        }
+      }
+    });
+  }
+  getInviteBody(encode) {
+    const {
+      chatRoom
+    } = this.props;
+    const {
+      link
+    } = this.state;
+    const {
+      scheduledMeeting
+    } = chatRoom;
+    let body = l.invite_body_text;
+    if (scheduledMeeting) {
+      const {
+        nextOccurrenceStart
+      } = chatRoom.scheduledMeeting;
+      body = l.invite_body_text_scheduled.replace('%4', time2date(nextOccurrenceStart / 1000, 20)).replace('%5', toLocaleTime(nextOccurrenceStart));
+    }
+    body = body.replace(/\[BR]/g, '\n').replace('%1', u_attr.name).replace('%2', chatRoom.getRoomTitle()).replace('%3', link);
+    return encode ? encodeURIComponent(body) : body;
+  }
+  render() {
+    const {
+      chatRoom,
+      disableLinkToggle,
+      onAddParticipants
+    } = this.props;
+    const {
+      link,
+      copied
+    } = this.state;
+    const inCall = _meetings_call_jsx2__.Ay.isExpanded();
+    if (this.loading) {
+      return react0().createElement("div", {
+        className: `
+                    ${NAMESPACE}
+                    ${inCall ? 'theme-dark-forced' : ''}
+                `
+      }, react0().createElement("header", null), react0().createElement("section", {
+        className: "content"
+      }, react0().createElement("div", {
+        className: "content-block"
+      })));
+    }
+    const canInvite = !!(chatRoom.iAmOperator() || chatRoom.options[MCO_FLAGS.OPEN_INVITE]) && onAddParticipants;
+    const canToggleLink = !disableLinkToggle && chatRoom.iAmOperator() && (chatRoom.isMeeting || chatRoom.topic);
+    const mailto = `mailto:?to=&subject=${l.invite_subject_text}&body=${this.getInviteBody(true)}`;
+    const copyText = chatRoom.isMeeting ? l.copy_meeting_link : l[1394];
+    return react0().createElement("div", {
+      className: `
+                    ${NAMESPACE}
+                    ${inCall ? 'theme-dark-forced' : ''}
+                `
+    }, react0().createElement("header", null, react0().createElement("h3", null, l.invite_participants)), react0().createElement("section", {
+      className: "content"
+    }, canToggleLink && chatRoom.type !== 'group' && react0().createElement("div", {
+      className: "content-block link-block"
+    }, react0().createElement("div", {
+      className: "text-wrapper"
+    }, react0().createElement("span", {
+      className: "link-label"
+    }, l.invite_toggle_link_label), react0().createElement("div", {
+      className: `link-description ${inCall ? '' : 'hidden'}`
+    }, l.invite_toggle_link_desc)), react0().createElement(_ui_miniui_jsx3__.A.ToggleCheckbox, {
+      className: "meeting-link-toggle",
+      checked: !!link,
+      value: !!link,
+      onToggle: () => {
+        if (this.loading) {
+          return;
+        }
+        if (link) {
+          this.loading = chatRoom.updatePublicHandle(true).always(() => {
+            delete this.loading;
+            if (this.isMounted()) {
+              this.setState({
+                link: false
+              });
+            }
+          });
+        } else {
+          this.retrieveChatLink(true);
+        }
+      }
+    })), link && react0().createElement("div", {
+      className: "content-block"
+    }, react0().createElement(_ui_buttons_jsx4__.$, {
+      className: "flat-button",
+      icon: `sprite-fm-mono icon-${copied ? 'check' : 'link-thin-outline'}`,
+      label: copied ? l.copied : copyText,
+      onClick: () => {
+        if (copied) {
+          return;
+        }
+        delay('chat-event-inv-copylink', () => eventlog(99964));
+        copyToClipboard(link);
+        this.setState({
+          copied: true
+        }, () => {
+          tSleep(3).then(() => {
+            if (this.isMounted()) {
+              this.setState({
+                copied: false
+              });
+            }
+          });
+        });
+      }
+    })), link && react0().createElement("div", {
+      className: "content-block"
+    }, react0().createElement(_ui_buttons_jsx4__.$, {
+      className: "flat-button",
+      label: l.share_chat_link,
+      icon: "sprite-fm-mono icon-share-02-thin-outline"
+    }, react0().createElement(_ui_dropdowns_jsx5__.Dropdown, {
+      className: `
+                                    button-group-menu
+                                    invite-dropdown
+                                    ${inCall ? 'theme-dark-forced' : ''}
+                                `,
+      noArrow: true,
+      positionAt: "left bottom",
+      collision: "none",
+      horizOffset: 79,
+      vertOffset: 6,
+      ref: r => {
+        this.dropdownRef = r;
+      },
+      onBeforeActiveChange: e => {
+        if (e) {
+          delay('chat-event-inv-dropdown', () => eventlog(99965));
+          $(document.body).trigger('closeAllDropdownsExcept', this.dropdownRef);
+        }
+      }
+    }, react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
+      key: "send-invite",
+      className: `
+                                        ${inCall ? 'theme-dark-forced' : ''}
+                                    `,
+      icon: "sprite-fm-mono icon-mail-thin-outline",
+      label: l.share_chat_link_invite,
+      onClick: () => {
+        delay('chat-event-inv-email', () => eventlog(99966));
+        window.open(mailto, '_self', 'noopener,noreferrer');
+      }
+    }), react0().createElement(_ui_dropdowns_jsx5__.DropdownItem, {
+      key: "copy-invite",
+      className: `
+                                        ${inCall ? 'theme-dark-forced' : ''}
+                                    `,
+      label: l.copy_chat_link_invite,
+      icon: "sprite-fm-mono icon-copy-2",
+      onClick: () => {
+        delay('chat-event-inv-copy', () => eventlog(99967));
+        copyToClipboard(this.getInviteBody(), l.invite_copied);
+      }
+    })))), canInvite && (link || canToggleLink) && chatRoom.type !== 'group' && react0().createElement("div", {
+      className: "content-block invite-panel-divider"
+    }, l.invite_dlg_divider), canInvite && react0().createElement("div", {
+      className: "content-block add-participant-block"
+    }, react0().createElement(_ui_buttons_jsx4__.$, {
+      className: "flat-button",
+      icon: "sprite-fm-mono icon-user-square-thin-outline",
+      label: l.add_participants,
+      onClick: () => {
+        delay('chat-event-inv-add-participant', () => eventlog(99968));
+        onAddParticipants();
+      }
+    }))));
+  }
+}
+
+/***/ }),
+
 /***/ 280:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -21569,7 +21826,7 @@ class Participants extends mixins.w9 {
                                         action
                                         ${this.NAMESPACE}-invite
                                     `,
-      icon: "sprite-fm-mono icon-join-call",
+      icon: "sprite-fm-mono icon-user-plus-thin-outline",
       onClick: onInviteToggle
     }, l[8726]), chatRoom.iAmOperator() && this.renderMuteAllControl()), external_React_default().createElement(Collapse, (0,esm_extends.A)({}, this.props, {
       filter: filter,
@@ -21611,7 +21868,7 @@ class Guest extends mixins.w9 {
 
 const inviteAllowed = chatRoom => {
   if (chatRoom) {
-    return chatRoom.type !== 'private' && Call.isModerator(chatRoom, u_handle) && !chatRoom.iAmReadOnly();
+    return chatRoom.type !== 'private' && !!(chatRoom.options[MCO_FLAGS.OPEN_INVITE] || Call.isModerator(chatRoom, u_handle) || chatRoom.publicLink);
   }
   return false;
 };
@@ -22148,15 +22405,29 @@ class SidebarControls extends mixins.w9 {
       call,
       chatRoom,
       onChatToggle,
-      onParticipantsToggle
+      onParticipantsToggle,
+      onInviteToggle
     } = this.props;
     const notifications = chatRoom.getUnreadCount();
     const isOnHold = !!((call == null ? void 0 : call.av) & Av.onHold);
+    const canInvite = chatRoom.type !== 'private' && !!(chatRoom.iAmOperator() || chatRoom.options[MCO_FLAGS.OPEN_INVITE] || chatRoom.publicLink);
     return external_React_default().createElement("div", {
       className: "sidebar-controls"
     }, external_React_default().createElement("ul", {
       className: isOnHold ? 'disabled' : ''
-    }, external_React_default().createElement("li", {
+    }, canInvite && external_React_default().createElement("li", {
+      onClick: isOnHold ? null : onInviteToggle
+    }, external_React_default().createElement(meetings_button.A, {
+      className: `
+                                mega-button
+                                theme-dark-forced
+                                call-action
+                                round
+                            `,
+      icon: "icon-user-plus-thin-outline"
+    }), external_React_default().createElement("span", {
+      className: "control-label"
+    }, l[8726])), external_React_default().createElement("li", {
       onClick: isOnHold ? null : onChatToggle
     }, external_React_default().createElement(meetings_button.A, {
       className: `
@@ -22191,7 +22462,10 @@ class SidebarControls extends mixins.w9 {
     }, npeers + 1))));
   }
 }
+// EXTERNAL MODULE: ./js/chat/ui/inviteParticipantsPanel.jsx
+var inviteParticipantsPanel = __webpack_require__(815);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/call.jsx
+
 
 
 
@@ -22331,7 +22605,8 @@ class Call extends mixins.w9 {
       onboardingRecording: false,
       recorder: undefined,
       recordingConsentDialog: false,
-      recordingConsented: false
+      recordingConsented: false,
+      invitePanel: false
     };
     this.handleRetryTimeout = () => {
       const {
@@ -22738,6 +23013,34 @@ class Call extends mixins.w9 {
       });
     }
   }
+  handleInvitePanelToggle() {
+    delay('chat-event-inv-call', () => eventlog(99962));
+    this.setState({
+      invitePanel: !this.state.invitePanel
+    });
+  }
+  handleInviteOrAdd() {
+    const {
+      chatRoom
+    } = this.props;
+    if (chatRoom.type === 'group') {
+      return this.handleInviteToggle();
+    }
+    loadingDialog.show('fetchchatlink');
+    chatRoom.updatePublicHandle(false, false, true).catch(dump).always(() => {
+      loadingDialog.hide('fetchchatlink');
+      if (!this.isMounted()) {
+        return;
+      }
+      if (!chatRoom.iAmOperator() && chatRoom.options[MCO_FLAGS.OPEN_INVITE] && !chatRoom.publicLink) {
+        this.handleInviteToggle();
+      } else if (chatRoom.type === 'public' && !chatRoom.topic) {
+        this.handleInviteToggle();
+      } else {
+        this.handleInvitePanelToggle();
+      }
+    });
+  }
   componentWillUnmount() {
     super.componentWillUnmount();
     const {
@@ -22836,7 +23139,8 @@ class Call extends mixins.w9 {
       initialCallRinging,
       waitingRoomPeers,
       recorder,
-      recordingConsentDialog
+      recordingConsentDialog,
+      invitePanel
     } = this.state;
     const {
       stayOnEnd
@@ -22896,7 +23200,8 @@ class Call extends mixins.w9 {
         ...Call.STATE.DEFAULT
       }),
       onDeleteMessage: onDeleteMessage,
-      onCallMinimize: this.handleCallMinimize
+      onCallMinimize: this.handleCallMinimize,
+      onInviteToggle: () => this.handleInviteOrAdd()
     })), minimized ? null : external_React_default().createElement((external_React_default()).Fragment, null, this.renderRecordingControl(), external_React_default().createElement(streamControls.Ay, {
       call: call,
       minimized: minimized,
@@ -22920,7 +23225,8 @@ class Call extends mixins.w9 {
       view: view,
       sidebar: sidebar,
       onChatToggle: this.handleChatToggle,
-      onParticipantsToggle: this.handleParticipantsToggle
+      onParticipantsToggle: this.handleParticipantsToggle,
+      onInviteToggle: () => this.handleInviteOrAdd()
     })), invite && external_React_default().createElement(Invite, {
       contacts: M.u,
       call: call,
@@ -23015,7 +23321,23 @@ class Call extends mixins.w9 {
         recordingConsented: true
       }),
       onCallEnd: this.handleCallEnd
-    }));
+    }), invitePanel && external_React_default().createElement(modalDialogs.A.ModalDialog, {
+      className: "theme-dark-forced",
+      onClose: () => {
+        this.setState({
+          invitePanel: false
+        });
+      },
+      dialogName: "chat-link-dialog",
+      chatRoom: chatRoom
+    }, external_React_default().createElement(inviteParticipantsPanel.Q, {
+      chatRoom: chatRoom,
+      onAddParticipants: () => {
+        this.setState({
+          invitePanel: false
+        }, () => this.handleInviteToggle());
+      }
+    })));
   }
 }
 Call.STATE = {
@@ -24380,6 +24702,8 @@ class Minimized extends mixins.w9 {
 Minimized.NAMESPACE = 'float-video-minimized';
 Minimized.UNREAD_EVENT = 'onUnreadCountUpdate.localStreamNotifications';
 const __Minimized = (0,mixins.Zz)(micObserver.Q, permissionsObserver.$)(Minimized);
+// EXTERNAL MODULE: ./js/chat/ui/inviteParticipantsPanel.jsx
+var inviteParticipantsPanel = __webpack_require__(815);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/participantsNotice.jsx
 
 
@@ -24416,7 +24740,6 @@ class ParticipantsNotice extends mixins.w9 {
         chatRoom,
         onInviteToggle
       } = this.props;
-      const link = `${getBaseUrl()}/${chatRoom.publicLink}`;
       return external_React_default().createElement("div", {
         className: `
                     ${ParticipantsNotice.NAMESPACE}
@@ -24426,25 +24749,16 @@ class ParticipantsNotice extends mixins.w9 {
       }, external_React_default().createElement("div", {
         className: `${ParticipantsNotice.NAMESPACE}-heading`
       }, chatRoom.type === 'private' ? external_React_default().createElement("h1", null, external_React_default().createElement(utils.zT, null, l.waiting_for_peer.replace('%NAME', chatRoom.getRoomTitle()))) : external_React_default().createElement("h1", null, l.waiting_for_others)), chatRoom.isMeeting && chatRoom.publicLink && external_React_default().createElement("div", {
-        className: `${ParticipantsNotice.NAMESPACE}-content`
-      }, external_React_default().createElement("h3", null, l.copy_and_share), external_React_default().createElement("div", {
-        className: "mega-input with-icon box-style"
-      }, external_React_default().createElement("i", {
-        className: "sprite-fm-mono icon-link"
-      }), external_React_default().createElement("input", {
-        type: "text",
-        className: "megaInputs",
-        readOnly: true,
-        defaultValue: link
-      })), external_React_default().createElement(meetings_button.A, {
-        className: "mega-button positive large copy-to-clipboard",
-        onClick: () => copyToClipboard(link, l[7654])
-      }, external_React_default().createElement("span", null, l[17835])), meetings_call.Ay.isModerator(chatRoom, u_handle) && external_React_default().createElement("div", {
-        className: "peers-invite"
-      }, external_React_default().createElement("hr", null), external_React_default().createElement(meetings_button.A, {
-        className: "mega-button action",
-        onClick: onInviteToggle
-      }, l.invite_from_contact_list))));
+        className: `${ParticipantsNotice.NAMESPACE}-content-invite`
+      }, external_React_default().createElement(inviteParticipantsPanel.Q, {
+        chatRoom: chatRoom,
+        disableLinkToggle: true,
+        onAddParticipants: () => {
+          this.setState({
+            inviteDialog: false
+          }, () => onInviteToggle());
+        }
+      })));
     };
     this.av = this.props.call.sfuClient.availAv;
   }
@@ -33960,6 +34274,56 @@ class GenericNodePropsComponent extends mixins.w9 {
 
 /***/ }),
 
+/***/ 818:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.d(__webpack_exports__, {
+A: () => (__WEBPACK_DEFAULT_EXPORT__)
+});
+var react0__ = __webpack_require__(594);
+var react0 = __webpack_require__.n(react0__);
+var _chat_mixins1__ = __webpack_require__(137);
+
+
+class ToggleCheckbox extends _chat_mixins1__.w9 {
+  constructor(props) {
+    super(props);
+    this.onToggle = () => {
+      const newState = !this.state.value;
+      this.setState({
+        value: newState
+      });
+      if (this.props.onToggle) {
+        this.props.onToggle(newState);
+      }
+    };
+    this.state = {
+      value: this.props.value
+    };
+  }
+  render() {
+    return react0().createElement("div", {
+      className: `
+                    mega-switch
+                    ${this.props.className}
+                    ${this.state.value ? 'toggle-on' : ''}
+                `,
+      role: "switch",
+      "aria-checked": !!this.state.value,
+      onClick: this.onToggle
+    }, react0().createElement("div", {
+      className: `mega-feature-switch sprite-fm-mono-after
+                         ${this.state.value ? 'icon-check-after' : 'icon-minimise-after'}`
+    }));
+  }
+}
+const __WEBPACK_DEFAULT_EXPORT__ = ({
+  ToggleCheckbox
+});
+
+/***/ }),
+
 /***/ 318:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -35029,7 +35393,7 @@ function _extends() {
 /******/ 	// Load entry module and return exports
 /******/ 	__webpack_require__(326);
 /******/ 	// This entry module is referenced by other modules so it can't be inlined
-/******/ 	var __webpack_exports__ = __webpack_require__(30);
+/******/ 	var __webpack_exports__ = __webpack_require__(120);
 /******/ 	
 /******/ })()
 ;

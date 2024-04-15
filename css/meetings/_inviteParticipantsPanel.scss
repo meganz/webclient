@@ -1,0 +1,90 @@
+.invite-panel {
+    box-sizing: border-box;
+    font-family: var(--text-font-family);
+    margin: 8px 24px;
+
+    h3 {
+        color: var(--text-color-high);
+        font: var(--text-h3);
+    }
+    .content div.content-block {
+        background: transparent;
+        color: var(--text-color-medium);
+        font: var(--text-body1);
+    }
+
+    .content div.content-block {
+        padding: 0;
+        height: 48px;
+
+        &.link-block {
+            display: flex;
+            justify-content: space-between;
+
+            .in-call & {
+                margin-bottom: 32px;
+                height: unset;
+            }
+
+            .text-wrapper {
+                margin: auto 0;
+                max-width: calc(100% - 64px);
+            }
+
+            .link-label {
+                color: var(--text-color-high);
+                font: var(--text-body1-bold);
+            }
+
+            .meeting-link-toggle {
+                margin: auto 0;
+            }
+        }
+
+        .button.flat-button {
+            border: 1px solid var(--stroke-mid-grey);
+            border-radius: 8px;
+            color: var(--text-color-high);
+            cursor: pointer;
+            display: flex;
+            font: var(--text-h3);
+            line-height: 24px;
+            margin: 8px auto 0;
+            padding: 12px;
+
+            i {
+                margin-inline-end: 12px;
+                -webkit-margin-end: 12px;
+                --icon-size: 24px;
+                --mask-color: var(--icon-active);
+            }
+
+            &:hover {
+                border-color: var(--stroke-dark-grey);
+            }
+        }
+
+        &.invite-panel-divider {
+            color: var(--text-color-high);
+            height: 20px;
+            margin: 16px 0;
+            text-align: center;
+        }
+
+        &:last-child {
+            margin-bottom: 20px;
+        }
+    }
+}
+
+.mega-dialog:has(.invite-panel) {
+    width: 460px;
+}
+
+.dropdown.body.invite-dropdown {
+    display: block;
+
+    a {
+        color: var(--text-color-medium);
+    }
+}

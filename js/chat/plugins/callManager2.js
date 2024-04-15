@@ -769,7 +769,7 @@
                 delete this.callToutInt;
                 delete this.callToutEnd;
             }
-            if ($('.stay-dlg-subtext').is(':visible')) {
+            if ($('.mega-dialog .stay-dlg-subtext').is(':visible')) {
                 closeDialog();
             }
             if (this.callToutId) {

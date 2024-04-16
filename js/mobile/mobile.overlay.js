@@ -21,7 +21,7 @@ class MegaMobileOverlay extends MegaMobileComponent {
             parentNode: targetNode,
             type: 'icon',
             componentClassname: 'text-icon close',
-            icon: 'sprite-mobile-fm-mono icon-x-thin-outline',
+            icon: 'sprite-mobile-fm-mono icon-dialog-close',
             iconSize: 24
         });
 

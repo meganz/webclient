@@ -45,7 +45,7 @@ class MegaMobileTransferBlock extends MegaMobileComponent {
             parentNode: targetNode,
             type: 'icon',
             componentClassname: 'text-icon cancel hidden',
-            icon: 'sprite-mobile-fm-mono icon-x-thin-outline',
+            icon: 'sprite-mobile-fm-mono icon-close-component',
             iconSize: 24
         });
         this.cancelButton.on('tap.cancelTransfer', () => {

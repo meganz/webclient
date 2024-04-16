@@ -125,10 +125,9 @@ mega.ui.MegaInputs.prototype.textArea._withClearButton = function() {
 
     if ($input.hasClass('clearButton')) {
 
-        const icon = is_mobile ? 'sprite-mobile-fm-mono icon-x-thin-outline icon-size-16' :
-            'sprite-fm-mono icon-close-component';
-
-        $wrapper.safeAppend(`<i class="${icon} clear-input"></i>`);
+        $wrapper.safeAppend(
+            `<i class="${mega.ui.sprites.mono} icon-close-component clear-input"></i>`
+        );
 
         const $clearBtn = $('.clear-input', $wrapper);
 

@@ -4,10 +4,12 @@
     align-content: center;
     align-items: center;
     flex-flow: column-reverse nowrap;
+    grid-row: 2/ 3;
 }
 
 /* Banner inner content */
 .mega-component.banner {
+    border: 0;
     display: flex;
     flex-flow: row nowrap;
     align-content: center;
@@ -15,21 +17,13 @@
     justify-content: space-between;
     box-sizing: border-box;
     padding: 24px;
+    position: static;
     top: 0;
     overflow: hidden;
     transition: top 1s ease-in;
     font: var(--mobile-font-caption-regular);
     width: 100%;
     color: var(--mobile-text-primary);
-}
-
-.mega-component.banner > *:not(:last-child) {
-    margin-inline-end: 8px;
-    -webkit-margin-end: 8px;
-}
-.mega-component.advertisement > *:not(:last-child) {
-    margin-inline-end: 16px;
-    -webkit-margin-end: 16px;
 }
 
 /* Banner overarching types */
@@ -43,13 +37,19 @@
 }
 
 .mega-component.banner .content-box {
-    -webkit-margin-end: auto;
-    margin-inline-end: auto;
+    align-items: flex-start;
     display: flex;
     flex-flow: column nowrap;
-    align-items: flex-start;
+    flex: 1 1 auto;
     order: 5;
+    padding: 0 8px;
 }
+
+.mega-component.advertisement .content-box,
+.mega-component.anouncement .content-box {
+    padding: 0 16px;
+}
+
 .mega-component.banner .end-box {
     display: flex;
     flex-flow: column nowrap;
@@ -59,17 +59,21 @@
     order: 10;
 }
 
-/* Gap for all non-empty spans */
-.mega-component.banner .content-box > span {
-    margin-bottom: 8px;
+/* Gap for all content child elems */
+
+.mega-component.banner .content-box > * {
+    margin-top: 8px;
 }
-.mega-component.banner .content-box > span:empty {
-    margin-bottom: 0;
+
+.mega-component.banner .content-box > *:empty,
+.mega-component.banner .content-box > *:first-child {
+    margin-top: 0;
 }
 
 /* Custom button styles */
 .mega-component.banner .button.icon-only {
-    margin-left: auto;
+    -webkit-margin-start: auto;
+    margin-inline-start: auto;
     padding: 0;
     justify-self: flex-end;
     align-self: flex-start;
@@ -109,6 +113,10 @@
     align-self: center;
     order: 10;
 }
+.mega-component.banner img {
+    height: 48px;
+    width: 48px;
+}
 
 /* Banner right icons */
 .mega-component.banner .banner.right-icon.chat {
@@ -119,22 +127,23 @@
 /* Component styles, default info */
 .mega-component.banner,
 .mega-component.banner.info {
-    background-color: var(--mobile-notification-info);
+    background: var(--mobile-notification-info);
     --icon-color: var(--mobile-support-info);
 }
 .mega-component.banner.success {
-    background-color: var(--mobile-notification-success);
+    background: var(--mobile-notification-success);
     --icon-color: var(--mobile-support-success);
 }
 .mega-component.banner.warning {
-    background-color: var(--mobile-notification-warning);
+    background: var(--mobile-notification-warning);
     --icon-color: var(--mobile-support-warning);
 }
 .mega-component.banner.error {
-    background-color: var(--mobile-notification-error);
+    background: var(--mobile-notification-error);
     --icon-color: var(--mobile-support-error);
 }
-.mega-component.banner.advertisement {
-    background-color: var(--mobile-surface-2);
+.mega-component.banner.advertisement,
+.mega-component.banner.anouncement {
+    background: var(--mobile-surface-2);
     --icon-color: var(--mobile-support-info);
 }

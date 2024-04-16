@@ -91,19 +91,19 @@
 }
 
 .mega-header .search-wrapper i.icon-search-thin-outline,
-.mega-header .search-wrapper i.icon-x-thin-outline {
+.mega-header .search-wrapper i.icon-close-component {
     --icon-size: 16px;
     position: absolute;
     color: var(--mobile-icon-primary);
 }
 
 .mega-header .search-wrapper i.icon-search-thin-outline,
-.rtl .mega-header .search-wrapper i.icon-x-thin-outline {
+.rtl .mega-header .search-wrapper i.icon-close-component {
     left: 11px;
     right: auto;
 }
 
-.mega-header .search-wrapper i.icon-x-thin-outline,
+.mega-header .search-wrapper i.icon-dialog-close,
 .rtl .mega-header .search-wrapper i.icon-search-thin-outline {
     left: auto;
     right: 11px;

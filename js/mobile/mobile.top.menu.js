@@ -30,7 +30,7 @@ class MegaMobileTopMenu extends MegaMobileComponent {
             parentNode: subNode,
             type: 'icon',
             componentClassname: 'text-icon close',
-            icon: 'sprite-mobile-fm-mono icon-x-thin-outline',
+            icon: 'sprite-mobile-fm-mono icon-dialog-close',
             iconSize: 24
         });
         closeButton.on('tap.close', () => {

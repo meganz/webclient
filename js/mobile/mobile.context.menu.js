@@ -504,7 +504,7 @@ mBroadcaster.once('boot_done', () => {
         },
         '.copy-item': {
             text: l.copy_to,
-            icon: 'sprite-mobile-fm-mono icon-copy-thin-outline',
+            icon: 'sprite-mobile-fm-mono icon-square-copy',
             subMenu: false,
             classNames: '',
             onClick: function(nodeHandle) {

@@ -343,10 +343,7 @@ mega.ui.MegaInputs.prototype.underlinedText._withIconOrPrefix = function() {
     // Copy to clipboard button
     if ($input.hasClass('copyButton')) {
 
-        const icon = is_mobile ? 'sprite-mobile-fm-mono icon-copy-thin-outline' :
-            'sprite-fm-mono icon-copy-2';
-
-        $wrapper.safeAppend(`<i class="${icon} copy-input-value"></i>`);
+        $wrapper.safeAppend(`<i class="${mega.ui.sprites.mono} icon-square-copy copy-input-value"></i>`);
 
         const $copyBtn = $('.copy-input-value', $wrapper);
 
@@ -361,10 +358,9 @@ mega.ui.MegaInputs.prototype.underlinedText._withIconOrPrefix = function() {
 
     if ($input.hasClass('clearButton')) {
 
-        const icon = is_mobile ? 'sprite-mobile-fm-mono icon-x-thin-outline icon-size-16' :
-            'sprite-fm-mono icon-close-component';
-
-        $wrapper.safeAppend(`<i class="${icon} clear-input"></i>`);
+        $wrapper.safeAppend(
+            `<i class="${mega.ui.sprites.mono} icon-close-component clear-input"></i>`
+        );
 
         const $clearBtn = $('.clear-input', $wrapper);
 

@@ -111,13 +111,6 @@ var load_error_types = {
     file_load_error: 2
 };
 
-if (Object.fromEntries) {
-    if (is_karma) {
-        Object.freeze = echo;
-    }
-    Object.freeze(Object);
-}
-
 Object.defineProperties(self, {
     'freeze': {
         value: function freeze(obj) {
@@ -1017,6 +1010,15 @@ if (tmp.substr(0, 12) === 'sitetransfer') {
 }
 else if (tmp.substr(0, 4) === 'test') {
     hashLogic = true;
+    tmp = -0x8feed;
+}
+
+// eslint-disable-next-line es/no-object-fromentries
+if (Object.fromEntries) {
+    if (is_karma || tmp === -0x8feed) {
+        Object.freeze = echo;
+    }
+    Object.freeze(Object);
 }
 
 if (!browserUpdate && is_extension)

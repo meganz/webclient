@@ -784,8 +784,8 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
                     // Flag added for share folder while on it at context menu
                     if (mega.flags.ab_ctxmenu_shares) {
                         shareContextMenu(n);
+                        eventlog(500035);
                     }
-
                 }
                 itemsViewed = true;
             }
@@ -921,6 +921,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
             // File manager left panel click
             if (id.includes('treea_')) {
                 id = id.replace(/treea_+|(os_|pl_)/g, '');
+                eventlog(500036);
             }
 
             // File manager breadcrumb path click

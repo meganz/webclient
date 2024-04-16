@@ -219,12 +219,6 @@
     font: var(--text-caption-regular-pricing);
     color: var(--color-copy-secondary);
 }
-.pricing-plan-card .pricing-plan-only.strikethrough {
-    margin-top: 32px;
-    font: var(--text-caption-regular-pricing);
-    color: var(--color-copy-secondary);
-    text-decoration: line-through;
-}
 .pricing-plan-card .pricing-plan-price {
     margin-top: 8px;
     font: var(--text-h2-pricing);
@@ -232,15 +226,6 @@
 }
 .pricing-plan-card .pricing-plan-price-unit {
     margin-top: 8px;
-    font: var(--text-caption-regular-pricing);
-    color: var(--color-copy-secondary);
-}
-.pricing-plan-card .pricing-plan-price-unit.billed-yearly {
-    margin-top: 8px;
-    font: var(--text-caption-bold-pricing);
-    color: var(--color-copy-secondary);
-}
-.pricing-plan-card .pricing-plan-monthly {
     font: var(--text-caption-regular-pricing);
     color: var(--color-copy-secondary);
 }

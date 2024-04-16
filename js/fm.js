@@ -620,6 +620,7 @@ function fmtopUI() {
                 $fmShareButton.removeClass('hidden').rebind('click.shareFolder', () => {
                     $.selected = [n.h];
                     M.openSharingDialog($.selected[0]);
+                    eventlog(500034);
                     return false;
                 });
             }
@@ -2755,6 +2756,7 @@ function initShareDialog() {
                 var share = new mega.Share();
 
                 share.updateNodeShares();
+                eventlog(500037);
             });
         }
 

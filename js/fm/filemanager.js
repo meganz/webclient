@@ -1770,6 +1770,7 @@ FileManager.prototype.initContextUI = function() {
 
     $(c + '.sh4r1ng-item').rebind('click', function() {
         M.openSharingDialog($.selected[0]);
+        eventlog(500029);
     });
 
     $(`${c}.removeshare-item, ${c}.cd-removeshare-item`).rebind('click', (e) => {

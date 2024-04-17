@@ -2004,23 +2004,23 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.device-rename-dialog .content-block {
         padding: 8px 20px;
     }
-    
+
     .mega-dialog.device-rename-dialog > header {
         padding: 16px;
     }
-    
+
     .mega-dialog.device-rename-dialog > header h2 {
         text-align: center;
     }
-    
+
     .mega-dialog button.close {
         top: 20px;
     }
-    
+
     .mega-dialog.device-rename-dialog > footer .footer-container {
         padding: 16px 24px 20px;
     }
-      
+
 
 /* end device-rename-dialog */
 
@@ -8017,6 +8017,13 @@ body.de .mega-dialog.contact-picker-widget {
     }
     .fr .mega-dialog.group-chat-link {
         width: 440px;
+    }
+    .mega-dialog.group-chat-link .meeting-icon {
+        margin-inline-end: 8px;
+    }
+    .mega-dialog.group-chat-link .meeting-icon i {
+        --icon-size: 24px;
+        margin-inline: auto;
     }
     .mega-dialog.group-chat-link .link-input-container,
     .mega-dialog.invite .link-input-container {

@@ -11467,9 +11467,6 @@ class IncSharesAccordionPanel extends mixins.w9 {
 class ChatlinkDialog extends mixins.w9 {
   constructor(props) {
     super(props);
-    this.onPopupDidMount = $node => {
-      this.$popupNode = $node;
-    };
     this.onClose = () => {
       if (this.props.onClose) {
         this.props.onClose();
@@ -11523,17 +11520,6 @@ class ChatlinkDialog extends mixins.w9 {
     if (!this.loading && chatRoom.topic) {
       this.retrieveChatLink();
     }
-    this.toastTxt = l[7654];
-    if (!this.$popupNode) {
-      return;
-    }
-    const $node = this.$popupNode;
-    const $copyButton = $('.copy-to-clipboard', $node);
-    $copyButton.rebind('click', () => {
-      copyToClipboard(this.state.link, this.toastTxt);
-      return false;
-    });
-    $('span', $copyButton).text(l[1990]);
   }
   componentDidMount() {
     super.componentDidMount();
@@ -11563,6 +11549,7 @@ class ChatlinkDialog extends mixins.w9 {
       className: "mega-button negative links-button",
       onClick: this.onClose
     }, external_React_default().createElement("span", null, l[148]));
+    const publicLinkDetails = chatRoom.isMeeting ? l.meeting_link_details : l[20644];
     return external_React_default().createElement(modalDialogs.A.ModalDialog, (0,esm_extends.A)({}, this.state, {
       id: ChatlinkDialog.NAMESPACE,
       title: chatRoom.iAmOperator() && !chatRoom.topic ? chatRoom.isMeeting ? l.rename_meeting : l[9080] : '',
@@ -11599,7 +11586,11 @@ class ChatlinkDialog extends mixins.w9 {
       onKeyPress: this.onTopicFieldKeyPress,
       placeholder: l[20616],
       maxLength: ChatRoom.TOPIC_MAX_LENGTH
-    })))) : external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("header", null, external_React_default().createElement("i", {
+    })))) : external_React_default().createElement((external_React_default()).Fragment, null, external_React_default().createElement("header", null, chatRoom.isMeeting ? external_React_default().createElement("div", {
+      className: "chat-topic-icon meeting-icon"
+    }, external_React_default().createElement("i", {
+      className: "sprite-fm-mono icon-video-call-filled"
+    })) : external_React_default().createElement("i", {
       className: "sprite-fm-uni icon-chat-group"
     }), external_React_default().createElement("h2", {
       id: "chat-link-dialog-title"
@@ -11617,7 +11608,7 @@ class ChatlinkDialog extends mixins.w9 {
       value: this.loading ? l[5533] : !chatRoom.topic ? l[20660] : link
     })), external_React_default().createElement("div", {
       className: "info"
-    }, chatRoom.publicLink ? l[20644] : null)))), external_React_default().createElement("footer", null, external_React_default().createElement("div", {
+    }, chatRoom.publicLink ? publicLinkDetails : null)))), external_React_default().createElement("footer", null, external_React_default().createElement("div", {
       className: "footer-container"
     }, chatRoom.iAmOperator() && chatRoom.publicLink && external_React_default().createElement("button", {
       key: "deleteLink",
@@ -11630,13 +11621,19 @@ class ChatlinkDialog extends mixins.w9 {
         chatRoom.updatePublicHandle(1);
         this.onClose();
       }
-    }, external_React_default().createElement("span", null, l[20487])), chatRoom.topic ? chatRoom.publicLink ? external_React_default().createElement("button", {
+    }, external_React_default().createElement("span", null, chatRoom.isMeeting ? l.meeting_link_delete : l[20487])), chatRoom.topic ? chatRoom.publicLink ? external_React_default().createElement("button", {
       className: `
                                         mega-button
                                         positive
                                         copy-to-clipboard
                                         ${this.loading ? 'disabled' : ''}
-                                    `
+                                    `,
+      onClick: () => {
+        copyToClipboard(link, l[7654]);
+        if (chatRoom.isMeeting) {
+          eventlog(500231);
+        }
+      }
     }, external_React_default().createElement("span", null, l[63])) : closeButton : chatRoom.iAmOperator() ? external_React_default().createElement("button", {
       key: "setTopic",
       className: `
@@ -13466,20 +13463,17 @@ class ConversationRightArea extends mixins.w9 {
       }
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-rename"
-    }), scheduledMeeting.isRecurring ? external_React_default().createElement("span", null, l.edit_meeting_series_button) : external_React_default().createElement("span", null, l.edit_meeting_button)) : null, room.type === "public" ? external_React_default().createElement("div", {
+    }), scheduledMeeting.isRecurring ? external_React_default().createElement("span", null, l.edit_meeting_series_button) : external_React_default().createElement("span", null, l.edit_meeting_button)) : null, room.type === 'public' && !room.isMeeting ? external_React_default().createElement("div", {
       className: getChatLinkClass,
       onClick: e => {
         if ($(e.target).closest('.disabled').length > 0) {
           return false;
         }
-        if (scheduledMeeting) {
-          delay('chat-event-sm-share-meeting-link', () => eventlog(99924));
-        }
         this.props.onGetManageChatLinkClicked();
       }
     }, external_React_default().createElement("i", {
       className: "sprite-fm-mono icon-link-filled"
-    }), external_React_default().createElement("span", null, scheduledMeeting ? l.share_meeting_button : room.isMeeting ? l.meeting_get_link : l[20481])) : null, scheduledMeeting ? external_React_default().createElement("div", {
+    }), external_React_default().createElement("span", null, l[20481])) : null, scheduledMeeting ? external_React_default().createElement("div", {
       className: `
                                                 link-button
                                                 light
@@ -14647,7 +14641,13 @@ let ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _dec2
                         `
     }, external_React_default().createElement("div", {
       className: "chat-topic-buttons"
-    }, external_React_default().createElement(buttons.$, {
+    }, room.type === 'public' && room.isMeeting && external_React_default().createElement(buttons.$, {
+      className: "mega-button small share-meeting-button",
+      label: l.share_meeting_button,
+      onClick: () => this.setState({
+        chatLinkDialog: true
+      }, () => eventlog(500230))
+    }), external_React_default().createElement(buttons.$, {
       className: "right",
       disableCheckingVisibility: true,
       icon: "sprite-fm-mono icon-info-filled",

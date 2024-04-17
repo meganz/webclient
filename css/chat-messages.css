@@ -27,6 +27,12 @@
     flex: 0 0 auto;
     order: 1;
 }
+.chat-topic-buttons .share-meeting-button,
+.chat-topic-buttons .share-meeting-button:hover {
+    background: transparent;
+    box-shadow: none;
+    border: 1px solid var(--stroke-grey-2);
+}
 .chat-topic-info {
     align-items: center;
     display: flex;

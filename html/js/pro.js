@@ -40,6 +40,10 @@ var pro = {
     ACCOUNT_STATUS_ENABLED: 1,
     ACCOUNT_STATUS_GRACE_PERIOD: 2,
 
+    /* Number of bytes for conversion, as we recieve GB for plans, and use bytes for sizing */
+    BYTES_PER_GB: 1024 * 1024 * 1024,
+    BYTES_PER_TB: 1024 * 1024 * 1024 * 1024,
+
     /**
      * Determines if a Business or Pro Flexi account is expired or in grace period
      * @param {Number} accountStatus The account status e.g. from u_attr.b.s (Business) or u_attr.pf.s (Pro Flexi)

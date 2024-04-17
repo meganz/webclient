@@ -1137,6 +1137,11 @@ lazy(pro, 'proplan2', () => {
 
             loadingDialog.hide();
 
+            if (window.mScrollTo === 'flexi' && ProFlexiFound) {
+                $proflexiBlock[0].scrollIntoView({behavior: 'smooth'});
+                delete window.mScrollTo;
+            }
+
             if (window.nextPage === '1' && window.pickedPlan) {
 
                 pro.proplan2.selectedPlan = window.pickedPlan;

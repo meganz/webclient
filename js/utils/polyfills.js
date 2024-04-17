@@ -786,6 +786,8 @@ tryCatch(() => {
     if (self.is_karma) {
         Object.freeze = echo;
     }
-    Object.freeze(Object);
+    if (!self.mShowAds) {
+        Object.freeze(Object);
+    }
 
 }, false)();

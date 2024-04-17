@@ -471,7 +471,7 @@ class MegaMobileBanner extends MegaMobileComponent {
         };
 
         mBroadcaster.addListener('pagechange', () => {
-            const isPub = isPublicLink() || isPublickLinkV2();
+            const isPub = isPublicLink() || isPublicLinkV2();
 
             if (is_fm() || isPub) {
                 mega.ui.alerts.removeClass('hidden');

@@ -1047,7 +1047,7 @@ async function mKeyDialog(ph, fl, keyr, selector) {
 
                 var currLink = getSitePath();
 
-                if (isPublickLinkV2(currLink)) {
+                if (isPublicLinkV2(currLink)) {
                     newHash = `${(pfcol ? '/collection/' : fl ? '/folder/' : '/file/') + ph}#${key}${selector || ''}`;
                 }
 

@@ -1,4 +1,3 @@
-
 lazy(mega, 'commercials', () => {
 
     'use strict';
@@ -55,6 +54,7 @@ lazy(mega, 'commercials', () => {
     let commsCovered;       // Store if any commercials are covered by something that they shouldn't be displayed behind
     let cspInitialised = false;        // Have csp been initialised?
     let adCookies = 0;
+    let publicUser;
 
 
     // Check if the slotWrapper is cached, if not then retrieve and cache it, and return the commWrapper
@@ -174,6 +174,10 @@ lazy(mega, 'commercials', () => {
     // Empties the slot instead of hiding it to give more accurate data from megaad about loaded comms
     const hideComms = (commSlots, hideWrapper) => {
 
+        if (window.googletag) {
+            googletag.destroySlots();
+        }
+
         commSlots = commSlots && commSlots.length
             ? commSlots
             : activeSlots;
@@ -262,7 +266,6 @@ lazy(mega, 'commercials', () => {
                 const $slotWrapper = getCommWrapper(commSlots[i]);
                 if ($slotWrapper.length) {
                     resize = $slotWrapper.hasClass('hidden');
-
                     $('iframe', $slotWrapper).removeClass('hidden');
                     $slotWrapper.removeClass('hidden');
                     $('.commercial-close-button', $slotWrapper).removeClass('hidden');
@@ -403,22 +406,27 @@ lazy(mega, 'commercials', () => {
 
     // This should only be called after an await csp.init() call
     const updateCommCookies = () => {
-        if (csp.has('ad') === adCookies) {
+        if (csp.has('ad') === adCookies || publicUser === undefined) {
             return;
         }
-        adCookies = csp.has('ad');
-        for (let i = 0; i < activeSlots.length; i++) {
-            const $slotWrapper = getCommWrapper(activeSlots[i]);
-            const iframe = $('> iframe', $slotWrapper)[0];
-            // If there is no iframe found we cannot edit the cookies, so remove the iframe to be safe
-            if (!iframe) {
-                hideComms([activeSlots[i]], true);
-            }
-            else if (adCookies && !iframe.src.includes('&ac=1')) {
-                iframe.src += '&ac=1';
-            }
-            else {
-                iframe.src = iframe.src.replace('&ac=1', '');
+        adCookies = !!csp.has('ad');
+        if (window.googletag) {
+            googletag.pubads().setPrivacySettings({nonPersonalizedAds: adCookies});
+        }
+        else {
+            for (let i = 0; i < activeSlots.length; i++) {
+                const $slotWrapper = getCommWrapper(activeSlots[i]);
+                const iframe = $('> iframe', $slotWrapper)[0];
+                // If there is no iframe found we cannot edit the cookies, so remove the iframe to be safe
+                if (!iframe) {
+                    hideComms([activeSlots[i]], true);
+                }
+                else if (adCookies && !iframe.src.includes('&ac=1')) {
+                    iframe.src += '&ac=1';
+                }
+                else if (!adCookies){
+                    iframe.src = iframe.src.replace('&ac=1', '');
+                }
             }
         }
     };
@@ -430,8 +438,8 @@ lazy(mega, 'commercials', () => {
                 console.info('begin await ad init cookies');
             }
             await csp.init();
-            updateCommCookies();
             cspInitialised = true;
+            updateCommCookies();
             if (d) {
                 console.info('finish await ad init cookies');
             }
@@ -527,8 +535,111 @@ lazy(mega, 'commercials', () => {
         }
     };
 
+    const createGoogleComm = (comm) => {
+
+        const commID = comm.id.toLowerCase();
+        const slotWrapper = getCommWrapper(commID)[0];
+
+        if (slotWrapper) {
+
+            window.googletag = window.googletag || {cmd: []};
+            googletag.cmd.push(() => {
+
+                googletag.pubads().setForceSafeFrame(true);
+
+                if (typeof commID === 'string' && activeSlots.includes(commID.toLowerCase()) && !commsCovered) {
+                    unhideComms([commID]);
+                }
+                else {
+                    $(slotWrapper).empty();
+                }
+
+                googletag.defineSlot(
+                    `/22060108601/${commID.toUpperCase()}`,
+                    [comm.w, comm.h], slotWrapper.id).addService(googletag.pubads()
+                );
+                googletag.pubads().set('page_url', 'https://mega.nz/');
+                handleCookies();
+                googletag.enableServices();
+                googletag.display(slotWrapper.id);
+
+                if (linkedSlots[commID]) {
+                    for (let i = 0; i < linkedSlots[commID].length; i++) {
+                        loading.delete(linkedSlots[commID][i]);
+                    }
+                }
+                else {
+                    loading.delete(commID);
+                }
+            });
+        }
+        else {
+            if (d) {
+                console.error('No slot wrapper found for', commID);
+            }
+            loading.delete(commID);
+        }
+    };
+
+    const _destroyLogin = () => {
+        Object.defineProperties(window, {
+            api_getsid: {value: null, writable: false, configurable: false},
+            u_checklogin: {value: null, writable: false, configurable: false},
+            u_checklogin2: {value: null, writable: false, configurable: false},
+            u_checklogin3a: {value: null, writable: false, configurable: false},
+            u_checklogin4: {value: null, writable: false, configurable: false},
+            security: {value: null, writable: false, configurable: false},
+            u_login: {value: null, writable: false, configurable: false},
+            signin: {value: null, writable: false, configurable: false},
+            init_login: {value: null, writable: false, configurable: false},
+            api_createuser: {value: null, writable: false, configurable: false},
+            AccountRecoveryControl: {value: null, writable: false, configurable: false},
+        });
+    };
+
+    const handleCommType = (res) => {
+        if (publicUser) {
+            if (window.googletag) {
+                for (let i = 0; i < res.length; i++) {
+                    createGoogleComm(res[i]);
+                }
+            }
+            else if (!window.buildOlderThan10Days) {
+
+                _destroyLogin();
+
+                const gpt = mCreateElement(
+                    'script',
+                    {type: 'application/javascript', src: 'https://securepubads.g.doubleclick.net/tag/js/gpt.js'},
+                    'head'
+                );
+                gpt.onload = () => {
+                    if (d) {
+                        console.info('gpt.js loaded');
+                    }
+                    // loop activeSlots and create googletag ad slots
+                    for (let i = 0; i < res.length; i++) {
+                        createGoogleComm(res[i]);
+                    }
+                };
+                gpt.onerror = (error) => {
+                    console.error('Failed to load gpt.js:', error);
+                };
+            }
+        }
+        else {
+            for (let i = 0; i < res.length; i++) {
+                if (!newUserClosedSlots.has(res[i].id.toLowerCase())) {
+                    createComm(res[i]);
+                }
+            }
+        }
+    };
+
     // Update current page, and get the comms that should be loaded
     const getComms = (getMobile, force) => {
+
+        publicUser = mShowAds && !u_attr && !u_handle && mega.flags.ab_adse && (isPublicLink() || isPublicLinkV2());
 
         const stopUpdate = updateCurrentPage(getMobile);
 
@@ -580,11 +691,7 @@ lazy(mega, 'commercials', () => {
         api.req(req).then((res) => {
             res = res.result;
             if (res[0] !== ENOENT) {
-                for (let i = 0; i < res.length; i++) {
-                    if (!newUserClosedSlots.has(res[i].id.toLowerCase())) {
-                        createComm(res[i]);
-                    }
-                }
+                handleCommType(res);
             }
         }).catch((ex) => {
 
@@ -1007,7 +1114,7 @@ lazy(mega, 'commercials', () => {
         setVideoTheatreMode,
         updateCommCookies,
         setAdFlag,
-        getAdFlag,
+        getAdFlag
     };
 });
 

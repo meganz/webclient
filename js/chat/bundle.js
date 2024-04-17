@@ -16726,6 +16726,9 @@ class Schedule extends mixins.w9 {
           } else {
             delay('chat-event-sm-button-create', () => eventlog(99922));
           }
+          delay('chat-events-sm-settings', () => this.submitStateEvents({
+            ...this.state
+          }));
           await megaChat.plugins.meetingsManager[chatRoom ? 'updateMeeting' : 'createMeeting'](...params);
           this.setState({
             isLoading: false
@@ -16759,6 +16762,29 @@ class Schedule extends mixins.w9 {
     return timeIntervals.filter(o => {
       return offsetFrom ? o.value > this.nearestHalfHour : o.value > Date.now();
     });
+  }
+  submitStateEvents(state) {
+    if (state.link) {
+      eventlog(500162);
+    }
+    if (state.sendInvite) {
+      eventlog(500163);
+    }
+    if (state.waitingRoom) {
+      eventlog(500164);
+    }
+    if (state.openInvite) {
+      eventlog(500165);
+    }
+    if (state.description) {
+      eventlog(500166);
+    }
+    if (state.recurring) {
+      eventlog(500167);
+    } else {
+      eventlog(500168);
+    }
+    eventlog(500169, state.topic.length);
   }
   componentWillUnmount() {
     super.componentWillUnmount();
@@ -16997,6 +17023,7 @@ class Schedule extends mixins.w9 {
       toggled: link,
       label: l.schedule_link_label,
       isLoading: isLoading,
+      subLabel: l.schedule_link_info,
       onToggle: prop => {
         this.handleToggle(prop);
         delay('chat-event-sm-meeting-link', () => eventlog(99920));
@@ -17193,11 +17220,15 @@ const Switch = ({
   toggled,
   label,
   isLoading,
+  subLabel,
   onToggle
 }) => {
+  const className = `${Schedule.NAMESPACE}-switch`;
   return external_React_default().createElement(Row, null, external_React_default().createElement(Column, null, external_React_default().createElement("i", {
     className: "sprite-fm-uni icon-mega-logo"
-  })), external_React_default().createElement(Column, null, external_React_default().createElement("span", {
+  })), external_React_default().createElement(Column, {
+    className: subLabel ? `with-sub-label ${className}` : className
+  }, external_React_default().createElement("span", {
     className: `
                         schedule-label
                         ${isLoading ? 'disabled' : ''}
@@ -17216,7 +17247,9 @@ const Switch = ({
                             sprite-fm-mono-after
                             ${toggled ? 'icon-check-after' : 'icon-minimise-after'}
                         `
-  }))));
+  })), subLabel && external_React_default().createElement("div", {
+    className: "sub-label"
+  }, subLabel)));
 };
 const Textarea = ({
   name,
@@ -30206,6 +30239,12 @@ class ScheduleMetaChange extends _mixin_jsx1__.M {
       megaChat.off(this.redrawListener);
     }
   }
+  specShouldComponentUpdate(nextProps) {
+    if (this.props.mode === ScheduleMetaChange.MODE.CREATED && this.props.link !== nextProps.link) {
+      return true;
+    }
+    return null;
+  }
   componentDidUpdate(prevProps) {
     if (this.props.mode === ScheduleMetaChange.MODE.CREATED && prevProps.link !== this.props.link) {
       this.setState({
@@ -30223,6 +30262,7 @@ class ScheduleMetaChange extends _mixin_jsx1__.M {
     } = chatRoom && chatRoom.scheduledMeeting || {};
     if (id) {
       delay(`fetchical${id}`, () => {
+        eventlog(500038);
         asyncApiReq({
           a: 'mcsmfical',
           id
@@ -30379,11 +30419,14 @@ class ScheduleMetaChange extends _mixin_jsx1__.M {
     }, react0().createElement("span", null, mode === MODE.CREATED && !meta.occurrence ? l.schedule_add_calendar : l.schedule_update_calendar))), mode === MODE.CREATED && scheduledMeeting && scheduledMeeting.description && react0().createElement("div", {
       className: "schedule-description"
     }, react0().createElement(_ui_utils_jsx3__.P9, null, megaChat.html(scheduledMeeting.description).replace(/\n/g, '<br>'))), link && react0().createElement("div", null, react0().createElement("div", {
+      className: "schedule-link-instruction"
+    }, l.schedule_mgmt_link_instruct), react0().createElement("div", {
       className: "schedule-meeting-link"
     }, react0().createElement("span", null, link), react0().createElement(_ui_buttons_jsx4__.$, {
       className: "mega-button positive",
       onClick: () => {
         copyToClipboard(link, l[7654]);
+        delay('chat-event-sm-copy-link', () => eventlog(500039));
       }
     }, react0().createElement("span", null, l[63]))), react0().createElement("span", null, l.schedule_link_note))))));
   }

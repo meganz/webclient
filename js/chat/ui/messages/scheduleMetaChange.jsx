@@ -61,6 +61,14 @@ export default class ScheduleMetaChange extends ConversationMessageMixin {
         }
     }
 
+    specShouldComponentUpdate(nextProps) {
+        if (this.props.mode === ScheduleMetaChange.MODE.CREATED && this.props.link !== nextProps.link) {
+            return true;
+        }
+        // Let the mixin handle the other cases.
+        return null;
+    }
+
     componentDidUpdate(prevProps) {
         if (this.props.mode === ScheduleMetaChange.MODE.CREATED && prevProps.link !== this.props.link) {
             this.setState({ link: this.props.link ? `${getBaseUrl()}/${this.props.link}` : ''});
@@ -73,6 +81,7 @@ export default class ScheduleMetaChange extends ConversationMessageMixin {
         // Reduce chances of spamming
         if (id) {
             delay(`fetchical${id}`, () => {
+                eventlog(500038);
                 asyncApiReq({ a: 'mcsmfical', id })
                     .then(([, res]) => {
                         delay(`saveical${id}`, () => {
@@ -248,12 +257,14 @@ export default class ScheduleMetaChange extends ConversationMessageMixin {
                             }
                             {link && (
                                 <div>
+                                    <div className="schedule-link-instruction">{l.schedule_mgmt_link_instruct}</div>
                                     <div className="schedule-meeting-link">
                                         <span>{link}</span>
                                         <Button
                                             className="mega-button positive"
                                             onClick={() => {
                                                 copyToClipboard(link, l[7654]);
+                                                delay('chat-event-sm-copy-link', () => eventlog(500039));
                                             }}>
                                             <span>{l[63] /* `Copy` */}</span>
                                         </Button>

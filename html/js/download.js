@@ -422,8 +422,9 @@ async function setupSingleDownloadPage(res) {
             $fileinfoBlock.find('.small-txt').text(fileSize);
 
             $('.download.bar-filename').text(filename).attr('title', filename);
+            // DO NOT CHANGE {name: filename} to dl_node as this will called before codec list is loaded
             $('.info-block .item-type-icon-90').removeClass('icon-generic-90')
-                .addClass(`icon-${fileIcon(dl_node)}-90`);
+                .addClass(`icon-${fileIcon({name: filename})}-90`);
 
             if (dlQueue.isPaused(dlmanager.getGID(fdl_queue_var))) {
                 $('.download.download-page').addClass('paused-transfer');

@@ -6792,9 +6792,10 @@ body.de .mega-dialog.contact-picker-widget {
     }
     .mega-dialog.storage-dialog header .graphic {
         height: 90px;
+        margin: 32px auto;
     }
     .mega-dialog.storage-dialog .fm-dialog-body {
-        padding: 0 48px 19px 48px;
+        padding: 0 48px 30px;
         text-align: center;
     }
     .mega-dialog.storage-dialog .body-p {
@@ -6852,63 +6853,26 @@ body.de .mega-dialog.contact-picker-widget {
         font: var(--text-body1);
         padding: 2px 0 0 0;
     }
-    .mega-dialog.storage-dialog .body-p.small {
-        font: var(--text-body2);
-        color: var(--text-color-medium);
-        padding: 12px 0 15px 0;
-    }
-    .mega-dialog.storage-dialog .body-p.small.top-pad {
-        padding: 24px 0 0 0;
-    }
-    .mega-dialog.storage-dialog .divider-txt {
-        padding: 16px 0 13px 0;
-        position: relative;
-        font: var(--text-body1);
-        color: var(--text-color-low);
-        margin-top: 12px;
-    }
-    .mega-dialog.storage-dialog .divider-txt::before {
-        content: '';
-        position: absolute;
-        height: 1px;
-        background: var(--surface-grey-2);
-        left: 0;
-        top: 28px;
-        width: 100%;
-    }
-    .rtl .mega-dialog.storage-dialog .divider-txt::before {
-        left: auto;
-        right: 0;
-    }
-    .mega-dialog.storage-dialog .divider-txt span {
-        background: var(--surface-main);
-        padding: 0 16px;
-        display: inline-block;
-        position: relative;
-    }
-    .mega-dialog.storage-dialog .achievements-bl,
-    .mega-dialog.storage-dialog.achievements .no-achievements-bl {
-        display: none;
-    }
-    .mega-dialog.storage-dialog.achievements .achievements-bl {
-        display: block;
-    }
     .mega-dialog.storage-dialog .body-p i.rocket {
         cursor: pointer;
     }
-    .mega-dialog.storage-dialog .body-p.small a {
+    .mega-dialog.storage-dialog .body-p.rubbish-text a {
         color: var(--text-color-medium);
         cursor: pointer;
         text-decoration: underline;
     }
-    .mega-dialog.storage-dialog .body-p.small i {
-        vertical-align: top;
-        display: inline-block;
-        margin: -2px 0 0 0;
+    .mega-dialog.storage-dialog.full header {
+        padding-bottom: 32px;
+    }
+    .mega-dialog.storage-dialog.full .body-p.long {
+        padding: 0 45px 12px;
     }
     .mega-dialog.storage-dialog.almost-full .full,
     .mega-dialog.storage-dialog.full .almost-full {
         display: none;
+    }
+    .mega-dialog.storage-dialog.full {
+        display: block;
     }
     .mega-dialog.storage-dialog .buttons-block {
         display: flex;
@@ -6918,6 +6882,11 @@ body.de .mega-dialog.contact-picker-widget {
     }
     .mega-dialog.storage-dialog .buttons-block button {
         margin: 0 6px;
+    }
+    .mega-dialog.storage-dialog .estimated-price-text {
+        margin-top: 20px;
+        font: var(--text-body2);
+        margin-bottom: -10px;
     }
     .mega-dialog.storage-dialog.almost-full .chart.progressbars span::before {
         background: var(--stroke-warning);

@@ -743,9 +743,13 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
     var prevState = $('.fm-main').is('.almost-full, .full');
     $('.fm-main').removeClass('fm-notification almost-full full');
     var $odqWarn = $('.odq-warning', $strgdlgBodyFull).addClass('hidden');
-    var $fullExtras = $('.full-extras', $strgdlgBodyFull).removeClass('hidden');
     var $upgradeBtn = $('.choose-plan span', $strgdlg).text(l[8696]);
+    const $headerFull = $('header h2.full', $strgdlg);
+    const $estimatedPriceText = $('.estimated-price-text', $strgdlg);
+    const $rubbishBinText = $('.rubbish-text', $strgdlg).toggleClass('hidden', quota === EPAYWALL);
 
+    let upgradeTo;
+    let isEuro;
 
     if (quota === EPAYWALL) { // ODQ paywall
 
@@ -769,8 +773,9 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
 
         $strgdlgBodyFull.addClass('odq');
         $odqWarn.removeClass('hidden');
-        $fullExtras.addClass('hidden');
         $upgradeBtn.text(l[5549]);
+        $headerFull.text(l[16360]);
+
         $('.storage-dialog.body-p', $odqWarn).safeHTML(dlgTexts.dlgFooterText);
 
         $('.fm-notification-block.full').safeHTML(
@@ -784,27 +789,62 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
             options = { custom: 1 };
         }
 
-        var maxStorage = bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0) +
-            ' (' + pro.maxPlan[2] + ' ' + l[17696] + ')';
+        const userStorage = quota.cstrg;
 
-        $('.body-p.long', $strgdlgBodyFull).safeHTML(l[22674].replace('%1', maxStorage).
-            replace('%2', bytesToSize(pro.maxPlan[3] * 1024 * 1024 * 1024, 0)));
+        const lowestRequiredPlan = pro.membershipPlans.find((plan) => {
+            const planLevel = plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
+            if (plan[pro.UTQA_RES_INDEX_MONTHS] === 12 || planLevel === u_attr.p) {
+                return false;
+            }
+            // return the first (lowest) plan with enough storage. Otherwise if reach last plan (flexi), return that
+            return (((plan[pro.UTQA_RES_INDEX_STORAGE] * pro.BYTES_PER_GB) > userStorage) || (planLevel === 101));
+        });
 
-        if (Object(u_attr).p) {
-            // update texts with "for free accounts" sentences removed.
+        let upgradeString;
+        isEuro = !lowestRequiredPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
 
-            $('.body-header', $strgdlgBodyFull).safeHTML(l[16360]);
+        const lowestPlanLevel = lowestRequiredPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
 
-            $('.no-achievements-bl .body-p', $strgdlgBodyAFull).safeHTML(l[16361]);
-            $('.achievements-bl .body-p', $strgdlgBodyAFull).safeHTML(l[16361] + ' ' + l[16314]);
+        // If user requires lowest available plan
+        if (lowestPlanLevel === pro.minPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL]) {
+            upgradeString = isEuro
+                ? l[16313]
+                : l.cloud_strg_upgrade_price_ast;
+            upgradeTo = 'min';
         }
+        // If user requires pro flexi
+        else if (lowestPlanLevel === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
+            upgradeString = l.over_storage_upgrade_flexi;
+            upgradeTo = 'flexi';
+        }
+        // User requires a regular plan
         else {
-            var minStorage = l[22669].replace('%1', pro.minPlan[5]).replace('%2', pro.minPlan[2] + ' ' + l[17696])
-                .replace('%3', bytesToSize(pro.minPlan[3] * 1024 * 1024 * 1024, 0));
-
-            $('.no-achievements-bl .body-p', $strgdlgBodyAFull).safeHTML(minStorage);
-            $('.achievements-bl .body-p', $strgdlgBodyAFull).safeHTML(minStorage + ' ' + l[16314]);
+            upgradeString = l.over_storage_upgrade_pro;
+            upgradeTo = 'regular';
         }
+
+        const planName = pro.getProPlanName(lowestPlanLevel);
+
+        const localPrice = isEuro
+            ? lowestRequiredPlan[pro.UTQA_RES_INDEX_PRICE]
+            : lowestRequiredPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
+
+        const localCurrency = isEuro
+            ? 'EUR'
+            : lowestRequiredPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
+
+        if (upgradeTo !== 'flexi') {
+            upgradeString = upgradeString.replace('%1', planName)
+                .replace('%2', formatCurrency(localPrice, localCurrency, 'narrowSymbol'))
+                .replace('%3', bytesToSize(lowestRequiredPlan[pro.UTQA_RES_INDEX_STORAGE] * pro.BYTES_PER_GB, 0))
+                .replace('%4', bytesToSize(lowestRequiredPlan[pro.UTQA_RES_INDEX_TRANSFER] * pro.BYTES_PER_GB, 0));
+        }
+
+        $('.body-p.main-text', $strgdlgBodyFull).text(upgradeString);
+        $('.body-p.main-text', $strgdlgBodyAFull).text(upgradeString);
+
+        const maxStorage = bytesToSize(pro.maxPlan[2] * pro.BYTES_PER_GB, 0) +
+            ' (' + pro.maxPlan[2] + ' ' + l[17696] + ')';
 
         var myOptions = Object(options);
         if (quota.isFull) {
@@ -812,6 +852,7 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
             $('.fm-main').addClass('fm-notification full');
             $('header h2', $strgdlgBodyFull).text(myOptions.title || l[16302]);
             $('.body-header', $strgdlgBodyFull).safeHTML(myOptions.body || l[16360]);
+            $headerFull.text(l[16360]);
         }
         else if (quota.isAlmostFull || myOptions.custom) {
             if (quota.isAlmostFull) {
@@ -876,10 +917,6 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
 
     }
 
-    if (u_type === 0) {
-        $('.get-bonuses', $strgdlg).addClass('disabled');
-    }
-
     var closeDialog = function() {
         $strgdlg.off('dialog-closed');
         window.closeDialog();
@@ -888,6 +925,9 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
 
     $strgdlg.rebind('dialog-closed', closeDialog);
 
+    $upgradeBtn.text(quota.isFull ? l.upgrade_now : l[433]);
+    $estimatedPriceText.toggleClass('hidden', isEuro || (upgradeTo !== 'min'));
+
     $('button', $strgdlg).rebind('click', function() {
         var $this = $(this);
         if ($this.hasClass('disabled')) {
@@ -895,26 +935,20 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
         }
         closeDialog();
 
-        if ($this.hasClass('choose-plan')) {
-            loadSubPage('pro');
-        }
-        else if ($this.hasClass('get-bonuses')) {
-            mega.achievem.achievementsListDialog();
-        }
+        window.mScrollTo = upgradeTo === 'flexi' ? 'flexi' : null;
+        loadSubPage('pro');
 
         return false;
     });
+
     $('button.js-close, button.skip', $strgdlg).rebind('click', closeDialog);
+
+    $('button.skip', $strgdlg).toggleClass('hidden', upgradeTo === 'min');
 
     $('.fm-notification-block .fm-notification-close')
         .rebind('click', function() {
             $('.fm-main').removeClass('fm-notification almost-full full');
             $.tresizer();
-        });
-
-    mega.achievem.enabled()
-        .done(function() {
-            $strgdlg.addClass('achievements');
         });
 
     clickURLs();
@@ -926,16 +960,13 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
         });
     }
 
-    $('a.gotorub').attr('href', '/fm/' + M.RubbishID)
+    $('a', $rubbishBinText).attr('href', '/fm/' + M.RubbishID)
         .rebind('click', function() {
             closeDialog();
             loadSubPage('fm/' + M.RubbishID);
             return false;
         });
 
-    if (Object(u_attr).p) {
-        $upgradeBtn.text(l[16386]);
-    }
 
     // if another dialog wasn't opened previously
     if (!prevState || Object(options).custom || quota === EPAYWALL) {

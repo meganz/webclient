@@ -1,6 +1,6 @@
 /**
  * Ion.Sound
- * version 3.1.0 Build 90
+ * version 3.2.0 Build 91
  * (c) 2016 Denis Ineshin
  * (c) 2021 MEGA Ltd.
  *
@@ -28,7 +28,9 @@
      * DISABLE for unsupported browsers
      */
 
-    if (typeof Audio !== "function" && typeof Audio !== "object") {
+    if (typeof Audio !== "function" && typeof Audio !== "object"
+        || !window.AudioContext || !Object(AudioContext.prototype).decodeAudioData) {
+
         const func = () => warn("HTML5 Audio is not supported in this browser");
         ion.sound = func;
         ion.sound.play = func;
@@ -60,10 +62,14 @@
         }
     };
 
-    const invoke = (method, name, options) => {
+    const invoke = tryCatch((method, name, options) => {
         if (name) {
-            if (sounds[name]) {
-                sounds[name][method](options);
+            const snd = sounds[name];
+            if (snd) {
+                if (method === 'play') {
+                    snd.tail = ++snd.head;
+                }
+                snd[method](options);
             }
             return;
         }
@@ -73,7 +79,7 @@
                 sounds[i][method](options);
             }
         }
-    };
+    });
 
     ion.sound = function(options) {
         extend(options, settings);
@@ -101,7 +107,7 @@
         }
     };
 
-    ion.sound.VERSION = "3.1.0";
+    ion.sound.VERSION = "3.2.0";
 
     ion.sound.preload = (name, options = {}) => invoke("init", name, {...options, preload: true});
 
@@ -157,6 +163,9 @@
             this.decoded = false;
             this.no_file = false;
             this.autoplay = false;
+
+            this.head = (Math.random() * Date.now()) >>> 15;
+            this.tail = this.head;
         }
 
         init(options) {
@@ -320,7 +329,7 @@
                 }
             }
 
-            if (this.no_file || !this.decoded) {
+            if (this.no_file || !this.decoded || this.head !== this.tail) {
                 return;
             }
 
@@ -355,6 +364,9 @@
             else if (this.streams[0]) {
                 this.streams[0].stop();
             }
+
+            this.head++;
+            this.autoplay = false;
         }
 
         pause(options) {

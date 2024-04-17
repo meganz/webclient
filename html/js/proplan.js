@@ -1409,6 +1409,12 @@ pro.proplan = {
  */
 function showLoginDialog(email, password) {
     'use strict';
+
+    if (window.googletag || mShowAds && mega.flags.ab_adse && (isPublicLink() || isPublicLinkV2())) {
+        window.location = '/login';
+        return false;
+    }
+
     var $dialog = $('.pro-login-dialog');
     var $inputs = $('input', $dialog);
     var $button = $('.top-dialog-login-button', $dialog);

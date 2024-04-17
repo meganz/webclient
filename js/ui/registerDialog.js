@@ -273,6 +273,22 @@
         var $inputs = $('input', $dialog);
         var $button = $('button:not(.js-close)', $dialog);
         var $password = $('input[type="password"]', $dialog);
+        var $createFreeHeader = $('header > p > h2', $dialog).removeClass('hidden');
+        var $content = $('.content', $dialog).removeClass('hidden');
+        var gtag = window.googletag || mShowAds && mega.flags.ab_adse && (isPublicLink() || isPublicLinkV2());
+
+        // Google ads tag is imported, do not allow user to register with popup
+        if (gtag) {
+            // For case it is overquota for smoother flow, show a message with just button first
+            if (options.title === l[17]) {
+                $createFreeHeader.addClass('hidden');
+                $content.addClass('hidden');
+            }
+            else {
+                window.location = '/register';
+                return false;
+            }
+        }
 
         // Controls events, close button etc
         if (options.controls) {
@@ -318,6 +334,10 @@
 
         // Init inputs events
         accountinputs.init($dialog);
+
+        if (gtag) {
+            $button.removeClass('disabled');
+        }
 
         if (M.chat) {
             $('aside .login-text', $dialog).removeClass('hidden');
@@ -383,6 +403,10 @@
         $button.rebind('click.proRegister', function() {
             var $this = $(this);
             if ($this.hasClass('disabled')) {
+                return false;
+            }
+            if (window.googletag || mShowAds && mega.flags.ab_adse && (isPublicLink() || isPublicLinkV2())) {
+                window.location = '/register';
                 return false;
             }
             doProRegister($dialog, aPromise);

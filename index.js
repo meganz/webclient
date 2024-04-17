@@ -2422,6 +2422,10 @@ function topmenuUI() {
             if (u_type === 0) {
                 mLogout();
             }
+            // Google ads tag is imported, do not allow user to login with popup
+            else if (window.googletag || mShowAds && mega.flags.ab_adse && (isPublicLink() || isPublicLinkV2())) {
+                window.location = '/login';
+            }
             else {
                 var c = $('.dropdown.top-login-popup', $topHeader).attr('class');
                 if (c && c.indexOf('hidden') > -1) {
@@ -3032,6 +3036,13 @@ function loadSubPage(tpage, event) {
     'use strict';
 
     tpage = getCleanSitePath(tpage);
+
+    // When there is google tag manager, we should redirect user to login/register page instead of loadSubPage.
+    if ((window.googletag || mShowAds && mega.flags.ab_adse && (isPublicLink() || isPublicLinkV2())) &&
+        tpage === 'login' || tpage === 'register' || tpage === 'regsiterb' || tpage === 'recovery') {
+        window.location = `/${tpage}`;
+        return;
+    }
 
     if ('rad' in mega) {
         mega.rad.log('NAV', [page, tpage, !!event]);

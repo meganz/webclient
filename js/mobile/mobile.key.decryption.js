@@ -74,7 +74,7 @@ mobile.keyDecryption = {
                     if (pfcol) {
                         newHash = `/collection/${publicHandle}#${key}`;
                     }
-                    else if (isPublickLinkV2(getSitePath())) {
+                    else if (isPublicLinkV2(getSitePath())) {
                         newHash = `${folderLink ? '/folder/' : '/file/'}${publicHandle}#${key}${selector || ''}`;
                     }
 

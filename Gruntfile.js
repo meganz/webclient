@@ -862,6 +862,14 @@ module.exports = function(grunt) {
                     require('htmlnano')({
                         removeEmptyAttributes: false,
                         sortAttributesWithLists: false,
+                        removeComments(comments) {
+                            const clean = comments.replace(/<!--[\S\s]*?-->/, '').trim();
+                            if (clean) {
+                                process.stderr.write(`WARNING: text-node surrounding comment: ${comments}\n`);
+                                return false;
+                            }
+                            return true;
+                        },
                         collapseWhitespace: process.env.DEBUG ? false : 'conservative'
                     })
                 ])

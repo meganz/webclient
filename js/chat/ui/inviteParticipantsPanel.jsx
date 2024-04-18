@@ -188,7 +188,7 @@ export class InviteParticipantsPanel extends MegaRenderMixin {
                                         ${inCall ? 'theme-dark-forced' : ''}
                                     `}
                                     label={l.copy_chat_link_invite /* `Copy invite` */}
-                                    icon="sprite-fm-mono icon-copy-2"
+                                    icon="sprite-fm-mono icon-square-copy"
                                     onClick={() => {
                                         delay('chat-event-inv-copy', () => eventlog(99967));
                                         copyToClipboard(

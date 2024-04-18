@@ -852,7 +852,7 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
             $('.fm-main').addClass('fm-notification full');
             $('header h2', $strgdlgBodyFull).text(myOptions.title || l[16302]);
             $('.body-header', $strgdlgBodyFull).safeHTML(myOptions.body || l[16360]);
-            $headerFull.text(l[16360]);
+            $headerFull.text(l.cloud_strg_100_percent_full);
         }
         else if (quota.isAlmostFull || myOptions.custom) {
             if (quota.isAlmostFull) {

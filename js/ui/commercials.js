@@ -558,7 +558,13 @@ lazy(mega, 'commercials', () => {
                     `/22060108601/${commID.toUpperCase()}`,
                     [comm.w, comm.h], slotWrapper.id).addService(googletag.pubads()
                 );
-                googletag.pubads().set('page_url', 'https://mega.nz/');
+                // If this is live or smoketest set page_url.
+                if (location.host === 'smoketest.mega.nz') {
+                    googletag.pubads().set('page_url', `https://smoketest.mega.nz/`);
+                }
+                else if (location.host === 'mega.nz') {
+                    googletag.pubads().set('page_url', `https://mega.nz/`);
+                }
                 handleCookies();
                 googletag.enableServices();
                 googletag.display(slotWrapper.id);

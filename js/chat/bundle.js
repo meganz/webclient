@@ -21208,7 +21208,7 @@ class InviteParticipantsPanel extends _mixins_js1__.w9 {
                                         ${inCall ? 'theme-dark-forced' : ''}
                                     `,
       label: l.copy_chat_link_invite,
-      icon: "sprite-fm-mono icon-copy-2",
+      icon: "sprite-fm-mono icon-square-copy",
       onClick: () => {
         delay('chat-event-inv-copy', () => eventlog(99967));
         copyToClipboard(this.getInviteBody(), l.invite_copied);

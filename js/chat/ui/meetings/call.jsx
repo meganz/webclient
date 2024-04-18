@@ -12,6 +12,7 @@ import Button from './button.jsx';
 import ModalDialogsUI from '../../../ui/modalDialogs.jsx';
 import { ParsedHTML } from '../../../ui/utils.jsx';
 import Link from "../link.jsx";
+import { InviteParticipantsPanel } from "../inviteParticipantsPanel.jsx";
 
 const NAMESPACE = 'meetings-call';
 export const EXPANDED_FLAG = 'in-call';
@@ -236,7 +237,8 @@ export default class Call extends MegaRenderMixin {
         onboardingRecording: false,
         recorder: undefined,
         recordingConsentDialog: false,
-        recordingConsented: false
+        recordingConsented: false,
+        invitePanel: false,
     };
 
     /**
@@ -611,8 +613,8 @@ export default class Call extends MegaRenderMixin {
             return;
         }
         this.handleModeChange(MODE.MAIN);
-        this.props.call.setPinnedCid(peer.clientId);
-        this.setState({ forcedLocal: peer.isLocal });
+        this.props.call.setPinnedCid(peer.clientId, true);
+        this.setState({ forcedLocal: peer.isLocal && peer.clientId === this.props.call.pinnedCid });
     };
 
     /**
@@ -703,6 +705,11 @@ export default class Call extends MegaRenderMixin {
             );
         }
     };
+
+    handleInvitePanelToggle() {
+        delay('chat-event-inv-call', () => eventlog(99962));
+        this.setState({ invitePanel: !this.state.invitePanel });
+    }
 
     /**
      * handleHoldToggle
@@ -809,6 +816,29 @@ export default class Call extends MegaRenderMixin {
             1
         );
     };
+
+    handleInviteOrAdd() {
+        const { chatRoom } = this.props;
+        if (chatRoom.type === 'group') {
+            return this.handleInviteToggle();
+        }
+        loadingDialog.show('fetchchatlink');
+        chatRoom.updatePublicHandle(false, false, true).catch(dump).always(() => {
+            loadingDialog.hide('fetchchatlink');
+            if (!this.isMounted()) {
+                return;
+            }
+            if (!chatRoom.iAmOperator() && chatRoom.options[MCO_FLAGS.OPEN_INVITE] && !chatRoom.publicLink) {
+                this.handleInviteToggle();
+            }
+            else if (chatRoom.type === 'public' && !chatRoom.topic) {
+                this.handleInviteToggle();
+            }
+            else {
+                this.handleInvitePanelToggle();
+            }
+        });
+    }
 
     renderRecordingControl = () => {
         const { recorder } = this.state;
@@ -960,7 +990,7 @@ export default class Call extends MegaRenderMixin {
         const {
             mode, view, sidebar, hovered, forcedLocal, invite, ephemeral, ephemeralAccounts, guest,
             offline, onboardingUI, onboardingRecording, everHadPeers, initialCallRinging, waitingRoomPeers, recorder,
-            recordingConsentDialog
+            recordingConsentDialog, invitePanel
         } = this.state;
         const { stayOnEnd } = call;
         const STREAM_PROPS = {
@@ -1013,6 +1043,7 @@ export default class Call extends MegaRenderMixin {
                         onSidebarClose={() => this.setState({ ...Call.STATE.DEFAULT })}
                         onDeleteMessage={onDeleteMessage}
                         onCallMinimize={this.handleCallMinimize}
+                        onInviteToggle={() => this.handleInviteOrAdd()}
                     />
                 }
 
@@ -1046,6 +1077,7 @@ export default class Call extends MegaRenderMixin {
                             sidebar={sidebar}
                             onChatToggle={this.handleChatToggle}
                             onParticipantsToggle={this.handleParticipantsToggle}
+                            onInviteToggle={() => this.handleInviteOrAdd()}
                         />
                     </>
                 }
@@ -1176,6 +1208,23 @@ export default class Call extends MegaRenderMixin {
                         }
                         onCallEnd={this.handleCallEnd}
                     />
+                }
+
+                {invitePanel &&
+                    <ModalDialogsUI.ModalDialog
+                        className="theme-dark-forced"
+                        onClose={() => {
+                            this.setState({ invitePanel: false });
+                        }}
+                        dialogName="chat-link-dialog"
+                        chatRoom={chatRoom}>
+                        <InviteParticipantsPanel
+                            chatRoom={chatRoom}
+                            onAddParticipants={() => {
+                                this.setState({ invitePanel: false }, () => this.handleInviteToggle());
+                            }}
+                        />
+                    </ModalDialogsUI.ModalDialog>
                 }
             </div>
         );

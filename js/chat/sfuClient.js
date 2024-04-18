@@ -984,6 +984,7 @@ class CallRecorder {
     constructor(sender, sink, videoHeight) {
         this.peerAudioInNodes = [];
         this.videoHeight = 720;
+        this.videoInput = null;
         this.recorder = null;
         this.localAv = -1;
         this.sender = sender;
@@ -1093,7 +1094,7 @@ class CallRecorder {
         catch (ex) {
             do {
                 if (window.d) {
-                    console.warn(recorder_kLogTag, "Can't convert input video track to recording video resolution, video file may get broken:", ex.message);
+                    console.warn(recorder_kLogTag, "Can't convert video input to recording resolution, video file will change resolution:", ex.message);
                 }
             } while (0);
         }
@@ -1103,7 +1104,11 @@ class CallRecorder {
         return this.videoTx.replaceTrack(cloned);
     }
     switchToLocalVideo() {
-        this._setVideoTrack((this.localAv & Av.Screen)
+        if ((this.localAv & Av.Video) === 0) {
+            this.switchToStaticVideo();
+            return;
+        }
+        this._setVideoTrack((this.localAv & Av.ScreenHiRes)
             ? this.sender.localScreenTrack()
             : this.sender.localCameraTrack());
     }
@@ -1112,16 +1117,18 @@ class CallRecorder {
             if (this.videoInput.releaseCb) {
                 this.videoInput.releaseCb();
             }
-            delete this.videoInput;
+            this.videoInput = null;
         }
         if (vTrack) {
             this.videoInput = { track: vTrack, releaseCb };
             this._setVideoTrack(vTrack);
         }
         else if (vTrack === 0) {
-            this.switchToLocalOrStaticVideo();
+            this.videoInput = vTrack;
+            this.switchToLocalVideo();
         }
         else if (vTrack === null) {
+            this.videoInput = vTrack;
             this.switchToStaticVideo();
         }
     }
@@ -1230,12 +1237,12 @@ class CallRecorder {
     isDestroyed() {
         return !this.videoRx;
     }
-    onLocalMediaChange(updateAv) {
+    onLocalMediaChange(forcedUpdateAv) {
         const av = this.sender.availAv;
         let change = (this.localAv === -1) ? (Av.Audio | Av.Video) : this.localAv ^ av;
         this.localAv = av;
-        if (updateAv) {
-            change |= updateAv;
+        if (forcedUpdateAv) {
+            change |= forcedUpdateAv;
         }
         if (change & Av.Audio) {
             if (av & Av.Audio) {
@@ -1245,16 +1252,13 @@ class CallRecorder {
                 this.stopRecordingLocalAudio();
             }
         }
-        if (!this.videoInput && (change & Av.Video)) {
-            this.switchToLocalOrStaticVideo();
-        }
-    }
-    switchToLocalOrStaticVideo() {
-        if ((this.localAv & Av.Video) === 0) {
-            this.switchToStaticVideo();
-        }
-        else {
-            this.switchToLocalVideo();
+        if (change & Av.Video) {
+            if (this.videoInput === 0) {
+                this.switchToLocalVideo();
+            }
+            else if (this.videoInput === null && !this.canvas) {
+                this.switchToStaticVideo();
+            }
         }
     }
     start() {
@@ -1270,7 +1274,7 @@ class CallRecorder {
 }
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = '07d3ab3c7e';
+const COMMIT_ID = '5ccc3661d0';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -1311,6 +1315,9 @@ var TxTrackIndex;
     TxTrackIndex[TxTrackIndex["kHiRes"] = 1] = "kHiRes";
     TxTrackIndex[TxTrackIndex["kAudio"] = 2] = "kAudio";
 })(TxTrackIndex || (TxTrackIndex = {}));
+const kAudioOutDeviceLsKey = "calls.audioOutId";
+const kMicDeviceLsKey = "calls.micId";
+const kCamDeviceLsKey = "calls.camId";
 class SfuClient {
     constructor(userId, app, callKey, options) {
         this.peers = new Map();
@@ -1337,6 +1344,7 @@ class SfuClient {
         this.maxPeers = 0;
         this.micAudioLevel = 0;
         this.tsMicAudioLevel = 0;
+        this._recordedVideoCid = null;
         if (!SfuClient.platformHasSupport()) {
             throw new Error("This browser does not support insertable streams");
         }
@@ -1356,6 +1364,7 @@ class SfuClient {
         this.cryptoWorker = new Worker(SfuClient.kWorkerUrl);
         this.cryptoWorker.addEventListener("message", this.onCryptoWorkerEvent.bind(this));
         this._svcDriver = new SvcDriver(this);
+        this.audioOutDeviceId = localStorage.getItem(kAudioOutDeviceLsKey);
         this._speakerDetector = new SpeakerDetector(this);
         this._statsRecorder = new StatsRecorder(this);
         this.micMuteMonitor = new MicMuteMonitor(this);
@@ -1733,6 +1742,7 @@ class SfuClient {
         this._statsRecorder.reset();
         this.micMuteMonitor.reinit();
         delete this._callJoinPermission;
+        delete this.callLimits;
     }
     createPeerConn() {
         let pc = this.rtcConn = new RTCPeerConnection({
@@ -1890,7 +1900,7 @@ class SfuClient {
         this.numInputAudioTracks = msg.na;
         this.moderators = msg.mods ? new Set(msg.mods) : undefined;
         this.speakApproval = !!msg.sr;
-        this.callDurationLimit = msg.ldur;
+        this.callLimits = msg.lim || {};
         this._fire("onConnected");
         const wr = msg.wr;
         if (wr) {
@@ -2065,7 +2075,7 @@ class SfuClient {
             }
         } while (0);
         if (gettingAudio) {
-            const micId = localStorage.getItem("calls.micId");
+            const micId = localStorage.getItem(kMicDeviceLsKey);
             const constraints = micId
                 ? Object.assign({ deviceId: micId }, SfuClient.kAudioCaptureOptions)
                 : SfuClient.kAudioCaptureOptions;
@@ -2107,7 +2117,7 @@ class SfuClient {
             }));
         }
         if (gettingCam) {
-            const camId = localStorage.getItem("calls.camId");
+            const camId = localStorage.getItem(kCamDeviceLsKey);
             const constraints = camId
                 ? Object.assign({ deviceId: camId }, SfuClient.kVideoCaptureOptions)
                 : SfuClient.kVideoCaptureOptions;
@@ -2358,6 +2368,15 @@ class SfuClient {
     get isRecording() {
         return !!this.callRecorder;
     }
+    /**
+     * @returns
+     * null if not currently recording
+     * 0 if recording local video
+     * peer CID if recording peer's video
+     */
+    get recordedVideoCid() {
+        return this.callRecorder ? this._recordedVideoCid : null;
+    }
     throwIfNotRecording() {
         if (!this.callRecorder) {
             throw new Error("Not recording");
@@ -2385,7 +2404,7 @@ class SfuClient {
         this._availAv &= ~Av.Recording;
         this._sendAvState();
     }
-    /** Can be called even if not recording, to avoid checks before each call
+    /** Can be called even if not recording, to avoid checks before each function call
      * @returns Whether recording to the specified peer was actually started, or recording was actually
      * stopped, in case cid is null
      */
@@ -2393,7 +2412,7 @@ class SfuClient {
         if (!this.callRecorder) {
             return false;
         }
-        if (cid === this.recForcedPeerCid) {
+        if (cid === this._recordedVideoCid) {
             do {
                 if (window.d) {
                     console.warn(client_kLogTag, `Already recording peer ${cid}`);
@@ -2401,12 +2420,11 @@ class SfuClient {
             } while (0);
             return true;
         }
+        this._recordedVideoCid = cid;
         if (cid === 0 || cid === null) {
-            delete this.recForcedPeerCid;
             this.callRecorder.setVideoInput(cid);
             return true;
         }
-        this.recForcedPeerCid = cid;
         const peer = this.peers.get(cid);
         if (!peer || !(peer.av & Av.HiResVideo)) {
             this.callRecorder.setVideoInput(null);
@@ -2421,12 +2439,12 @@ class SfuClient {
         return true;
     }
     _maybeResumeRecordingPeer(peer) {
-        const recCid = this.recForcedPeerCid;
+        const recCid = this._recordedVideoCid;
         if (!recCid || !this.callRecorder) {
             return false;
         }
         if (recCid === peer.prevCid) {
-            this.recForcedPeerCid = peer.cid; // peer reconnected, update recording cid
+            this._recordedVideoCid = peer.cid; // peer reconnected, update recording cid
         }
         else if (recCid !== peer.cid) {
             return false;
@@ -2536,13 +2554,36 @@ class SfuClient {
     muteAudio(mute) {
         return this._doMuteAudio(mute, false);
     }
-    _setInputDevice(lsKey, varName, deviceId, diffAv) {
+    static _persistMediaDeviceSelection(lsKey, deviceId) {
         if (deviceId) {
             localStorage.setItem(lsKey, deviceId);
         }
         else {
             localStorage.removeItem(lsKey);
         }
+    }
+    /** Set a mic device id in local storage to use as input in all subsequent sessions */
+    static persistMicDevice(deviceId) {
+        SfuClient._persistMediaDeviceSelection(kMicDeviceLsKey, deviceId);
+    }
+    static get micDeviceId() {
+        return localStorage.getItem(kMicDeviceLsKey);
+    }
+    static get camDeviceId() {
+        return localStorage.getItem(kCamDeviceLsKey);
+    }
+    static get audioOutDeviceId() {
+        return localStorage.getItem(kAudioOutDeviceLsKey);
+    }
+    /** Set a camera device id in local storage to use as input in all subsequent sessions */
+    static persistCamDevice(deviceId) {
+        SfuClient._persistMediaDeviceSelection(kCamDeviceLsKey, deviceId);
+    }
+    static persistAudioOutDevice(deviceId) {
+        SfuClient._persistMediaDeviceSelection(kAudioOutDeviceLsKey, deviceId);
+    }
+    _setInputDevice(lsKey, varName, deviceId, diffAv) {
+        SfuClient._persistMediaDeviceSelection(lsKey, deviceId);
         if (!this[varName]) {
             return;
         }
@@ -2559,24 +2600,65 @@ class SfuClient {
     static enumMediaDevices() {
         return navigator.mediaDevices.enumerateDevices()
             .then((devices) => {
-            const audio = [];
-            const video = [];
+            const audioIn = {};
+            const audioOut = {};
+            const videoIn = {};
             for (const device of devices) {
-                if (device.kind === "audioinput" && device.deviceId !== "default") {
-                    audio.push(device);
+                if (device.deviceId === "default") {
+                    continue;
                 }
-                else if (device.kind === "videoinput" && device.deviceId !== "default") {
-                    video.push(device);
+                const kind = device.kind;
+                let set;
+                if (kind === "audioinput") {
+                    set = audioIn;
                 }
+                else if (kind === "videoinput") {
+                    set = videoIn;
+                }
+                else if (kind === "audiooutput") {
+                    set = audioOut;
+                }
+                else {
+                    continue;
+                }
+                set[device.deviceId] = device.label;
             }
-            return { audioIn: audio, videoIn: video };
+            return { audioIn, audioOut, videoIn };
         });
     }
     setMicDevice(deviceId) {
-        return this._setInputDevice("calls.micId", "_audioTrack", deviceId, Av.Audio);
+        return this._setInputDevice(kMicDeviceLsKey, "_audioTrack", deviceId, Av.Audio);
     }
     setCameraDevice(deviceId) {
-        return this._setInputDevice("calls.camId", "_cameraTrack", deviceId, Av.Video);
+        return this._setInputDevice(kCamDeviceLsKey, "_cameraTrack", deviceId, Av.Video);
+    }
+    setAudioOutDevice(deviceId, noPersist) {
+        if (this.audioOutDeviceId === deviceId) {
+            return;
+        }
+        const sinkId = deviceId || "default"; // setSinkId doesn't accept null
+        const promises = [];
+        for (const peer of this.peers.values()) {
+            const ap = peer.audioPlayer;
+            if (!ap) {
+                continue;
+            }
+            promises.push(ap.playerElem.setSinkId(sinkId));
+        }
+        return Promise.all(promises)
+            .then(() => {
+            if (!noPersist) {
+                SfuClient.persistAudioOutDevice(deviceId);
+            }
+            this.audioOutDeviceId = deviceId;
+        }, (ex) => {
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "Audio output: Can't access specified device, falling back to default:", ex.msg || ex);
+                }
+            } while (0);
+            return ex;
+        });
     }
     async putOnHold() {
         await this._updateSentTracks(() => {
@@ -3064,6 +3146,12 @@ class SfuClient {
     msgWillEnd(msg) {
         this._fire("onCallAboutToEnd", msg.in);
     }
+    msgCallLimits(msg) {
+        delete msg.a;
+        Object.freeze(msg);
+        this.callLimits = msg;
+        this._fire("onCallLimitsUpdated");
+    }
     msgAv(msg) {
         let cid = msg.cid;
         this.assert(cid);
@@ -3441,6 +3529,7 @@ SfuClient.msgHandlerMap = {
     "KEY": SfuClient.prototype.msgKey,
     "BYE": SfuClient.prototype.msgBye,
     "WILL_END": SfuClient.prototype.msgWillEnd,
+    "CLIMITS": SfuClient.prototype.msgCallLimits,
     "WR_ALLOW": SfuClient.prototype.msgWrAllow,
     "WR_DENY": SfuClient.prototype.msgWrDeny,
     "WR_DUMP": SfuClient.prototype.msgWrDump,
@@ -3864,6 +3953,19 @@ class AudioPlayer {
         // connect track to a player
         const rx = this.receiver = slot.xponder.receiver;
         const player = this.playerElem = document.createElement("audio");
+        const client = peer.client;
+        const sinkId = client.audioOutDeviceId;
+        if (sinkId) {
+            player.setSinkId(sinkId)
+                .catch((ex) => {
+                do {
+                    if (window.d) {
+                        console.warn(client_kLogTag, "Can't access configured audio output device, falling back to default:", ex.message || ex);
+                    }
+                } while (0);
+                client.setAudioOutDevice(null, true);
+            });
+        }
         this.peer.client._speakerDetector.registerPeer(this);
         playerPlay(player, rx.track);
     }
@@ -4100,7 +4202,7 @@ class Peer {
         }
         return player;
     }
-    stopThumbVideo() {
+    destroyAllThumbPlayers() {
         for (const player of this.vThumbPlayers) {
             player.destroy();
         }
@@ -4139,7 +4241,7 @@ class Peer {
         }
         return player;
     }
-    _stopHiResVideo() {
+    destroyAllHiResPlayers() {
         for (const player of this.hiResPlayers) {
             player.destroy();
         }
@@ -4281,8 +4383,8 @@ class Peer {
     onAudioEnd() {
         if (this.audioPlayer) {
             this.audioPlayer.destroy(); // audioPlayer must exist, but just in case
+            delete this.audioPlayer;
         }
-        delete this.audioPlayer;
     }
     requestAudioLevel(cb) {
         this._onAudioLevel = cb; // need this saved in Peer, to survive between AudioPlayer instances
@@ -4714,7 +4816,7 @@ class PeerRecorderLink {
     onPlayerDestroy() { }
     onAvChange(av, oldAv) {
         const peer = this.player.peer;
-        if (peer.client.recForcedPeerCid !== peer.cid) {
+        if (peer.client.recordedVideoCid !== peer.cid) {
             return;
         }
         if (!(av & Av.HiResVideo)) {

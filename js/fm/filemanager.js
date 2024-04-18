@@ -1770,6 +1770,7 @@ FileManager.prototype.initContextUI = function() {
 
     $(c + '.sh4r1ng-item').rebind('click', function() {
         M.openSharingDialog($.selected[0]);
+        eventlog(500029);
     });
 
     $(`${c}.removeshare-item, ${c}.cd-removeshare-item`).rebind('click', (e) => {
@@ -4200,7 +4201,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                 if (n) {
                     if (max > i) {
                         html.push(
-                            '<div class="transfer-filetype-icon ' + fileIcon(n) + '"></div>' +
+                            '<div class="item-type-icon icon-' + fileIcon(n) + '-24"></div>' +
                             '<div class="tranfer-filetype-txt dragger-entry">' +
                             escapeHTML(n.name) + '</div>'
                         );
@@ -5114,7 +5115,8 @@ FileManager.prototype.cameraUploadUI = function() {
         }
 
         if (fmItem) {
-            fmItem.classList.add('folder-camera');
+            fmItem.classList.add('folder-camera', 'icon-folder-camera-uploads-90');
+            fmItem.classList.remove('icon-folder-90');
         }
     }
 };

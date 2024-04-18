@@ -58,7 +58,7 @@ class MegaMobileBanner extends MegaMobileComponent {
         this.xButton = new MegaMobileButton({
             parentNode: endBox,
             type: 'icon',
-            icon: 'sprite-mobile-fm-mono icon-x-thin-outline',
+            icon: 'sprite-mobile-fm-mono icon-dialog-close',
             iconSize: 24,
             componentClassname: 'text-icon'
         });
@@ -471,7 +471,7 @@ class MegaMobileBanner extends MegaMobileComponent {
         };
 
         mBroadcaster.addListener('pagechange', () => {
-            const isPub = isPublicLink() || isPublickLinkV2();
+            const isPub = isPublicLink() || isPublicLinkV2();
 
             if (is_fm() || isPub) {
                 mega.ui.alerts.removeClass('hidden');

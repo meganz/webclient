@@ -548,7 +548,7 @@
         if (pfid && this.currentrootid === this.RootID) {
             var target = '';
             var curLink = getSitePath();
-            if (isPublickLinkV2(curLink)) {
+            if (isPublicLinkV2(curLink)) {
                 if (this.currentdirid !== this.RootID) {
                     target = '/folder/' + this.currentdirid;
                 }

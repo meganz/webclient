@@ -6,6 +6,9 @@
     overflow: hidden;
     position: relative;
 }
+.rtl .fm-recents.container {
+    direction: rtl;
+}
 .fm-recents.header {
     font: var(--text-body1);
     border-bottom: 1px solid var(--stroke-grey-2);
@@ -13,9 +16,6 @@
 }
 .fm-recents.content {
     padding-bottom: 100px;
-}
-.rtl .fm-recents.content {
-    direction: rtl;
 }
 .fm-recents.scroll {
     height: 100%;
@@ -32,9 +32,6 @@
     position: relative;
     width: 100%;
     padding: 5px 0;
-}
-.fm-recents.content-row.group {
-    margin-top: -1px;
 }
 .fm-recents.content-row .content {
     margin-left: 48px;
@@ -61,52 +58,54 @@
 .fm-recents.date:first-child {
     padding-top: 21px;
 }
-.fm-recents .medium-file-icon {
+.fm-recents .item-type-icon-90 {
+    --icon-size: 48px;
     margin: 0 0 0 0;
     position: absolute;
-    left: 14px;
-    top: 8px;
+    left: 9px;
+    top: 3px;
 }
-.rtl .fm-recents .medium-file-icon {
-    right: 14px;
+.rtl .fm-recents .item-type-icon-90 {
+    right: 9px;
     left: auto;
 }
-.fm-recents .medium-file-icon.thumb {
-    background-image: none;
+.fm-recents .item-type-icon-90.thumb {
+    background: none;
 }
-.fm-recents .medium-file-icon.thumb img {
-    width: 100%;
-    height: 100%;
+.fm-recents .item-type-icon-90.thumb img {
+    border-radius: 2px;
+    height: 38px;
+    margin: 5px;
+    width: 38px;
 }
-.fm-recents .medium-file-icon.thumb.video .video-thumb-details {
+.fm-recents .item-type-icon-90.video.thumb .video-thumb-details {
+    --icon-size: 16px;
     align-items: center;
     display: flex;
     height: 100%;
     justify-content: center;
     left: 0;
     padding: 0;
+    position: absolute;
     top: 0;
     width: 100%;
 }
 .fm-recents .data-block-bg.video .video-thumb-details i {
     margin-top: -1px;
 }
-.fm-recents .medium-file-icon.double {
-    left: 14px;
-    top: 10px;
+.fm-recents .item-type-icon-90.double {
+    left: 9px;
+    top: 5px;
 }
-.rtl .fm-recents .medium-file-icon.double {
-    right: 14px;
+.rtl .fm-recents .item-type-icon-90.double {
+    right: 9px;
     left: auto;
 }
-.fm-recents.content-row.group .medium-file-icon {
-    top: 9px;
-}
-.fm-recents .medium-file-icon .medium-file-icon {
-    left: 6px;
+.fm-recents .item-type-icon-90 .item-type-icon-90 {
+    left: -6px;
     top: -6px;
 }
-.fm-recents .medium-file-icon .medium-file-icon {
+.fm-recents .item-type-icon-90 .item-type-icon-90 {
     right: 6px;
     left: auto;
 }
@@ -145,14 +144,14 @@
     overflow: hidden;
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
-    margin-bottom: 6px;
+    padding-bottom: 5px;
 }
 .fm-recents.breadcrumbs span {
     color: var(--text-color-low);
     font: var(--text-body2);
     display: inline-block;
     vertical-align: middle;
-    margin-top: 3px;
+    margin-top: 2px;
 }
 .fm-recents.breadcrumbs span.dot-separator {
     margin: 0 4px;
@@ -239,13 +238,6 @@
 .fm-recents.content-row.active.ui-selected .sprite-fm-mono.icon-options {
     opacity: 1;
 }
-.fm-recents .transfer-filetype-icon {
-    float: left;
-    position: static;
-}
-.fm-recents .transfer-filetype-icon.inbound-share {
-    background-position: -336px -877px;
-}
 .fm-recents.previews-wrapper {
     margin: 3px 0 0 -22px;
 }
@@ -304,11 +296,22 @@
 }
 .fm-recents .data-block-view,
 .fm-recents .data-block-bg,
-.fm-recents .data-block-bg.thumb .block-view-file-type,
 .fm-recents .data-block-view .data-block-bg.thumb img {
     width: 120px;
     height: 120px;
 }
+.fm-recents .data-block-view .item-type-icon-90 {
+    --icon-size: 80px;
+    margin: 19px;
+    position: static;
+}
+.fm-recents .data-block-view .thumb .item-type-icon-90,
+.fm-recents .data-block-view .thumb .item-type-icon-90 img {
+    height: 100%;
+    margin: 0;
+    width: 100%;
+}
+
 .fm-recents .link-button {
     float: left;
     margin: 5px 0 9px;
@@ -388,6 +391,10 @@
 .fm-recents.expanded .expand-collapse-toggle {
     transform: rotate(90deg);
 }
+.fm-recents.content-row.group.collapsed .content,
+.fm-recents.content-row.single .content {
+    margin-bottom: 1px;
+}
 .fm-recents.content-row.group.collapsed .content::after,
 .fm-recents.content-row.single .content::after {
     content: '';
@@ -395,7 +402,7 @@
     height: 1px;
     left: 8px;
     right: 8px;
-    bottom: -6px;
+    bottom: -7px;
     background: var(--surface-grey-2);
 }
 .fm-recents.content-row.single.child-note .content::after {

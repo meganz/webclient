@@ -554,7 +554,7 @@ class Minimized extends MegaRenderMixin {
                         ev.stopPropagation();
                         const callParticipants = chatRoom.getCallParticipants();
                         const doLeave = () =>
-                            hasHost(callParticipants) || callParticipants.length === 1 ?
+                            !chatRoom.iAmOperator() || hasHost(callParticipants) || callParticipants.length === 1 ?
                                 onLeave() :
                                 confirmLeave({
                                     title: l.assign_host_leave_call /* `Assign host to leave call` */,

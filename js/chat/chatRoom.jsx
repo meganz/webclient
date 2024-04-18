@@ -1232,9 +1232,13 @@ ChatRoom.prototype.destroy = function(notifyOtherDevices, noRedirect) {
  * Create a public handle of a chat
  * @param {Boolean} [remove] if specified, then it will delete the public chat link.
  * @param {Boolean} [cim] create chat link if missing
+ * @param {Boolean} [force] Clear any stored public link to ensure the API request is fired.
  * @returns {Promise<*>}
  */
-ChatRoom.prototype.updatePublicHandle = async function(remove, cim) {
+ChatRoom.prototype.updatePublicHandle = async function(remove, cim, force) {
+    if (force) {
+        this.publicLink = null;
+    }
     if (!remove && this.publicLink) {
         return this.publicLink;
     }

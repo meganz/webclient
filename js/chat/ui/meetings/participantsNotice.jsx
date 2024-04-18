@@ -1,9 +1,9 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../mixins';
 import Button from './button.jsx';
-import Call from './call.jsx';
 import {LocalVideoHiRes} from './videoNode.jsx';
 import { Emoji, ParsedHTML } from '../../../ui/utils.jsx';
+import { InviteParticipantsPanel } from "../inviteParticipantsPanel.jsx";
 
 export default class ParticipantsNotice extends MegaRenderMixin {
     static NAMESPACE = 'participants-notice';
@@ -84,7 +84,6 @@ export default class ParticipantsNotice extends MegaRenderMixin {
 
     renderUserWaiting = () => {
         const { chatRoom, onInviteToggle } = this.props;
-        const link = `${getBaseUrl()}/${chatRoom.publicLink}`;
 
         return (
             <div
@@ -102,27 +101,14 @@ export default class ParticipantsNotice extends MegaRenderMixin {
                     }
                 </div>
                 {chatRoom.isMeeting && chatRoom.publicLink &&
-                    <div className={`${ParticipantsNotice.NAMESPACE}-content`}>
-                        <h3>{l.copy_and_share /* `Copy this link to send your invite` */}</h3>
-                        <div className="mega-input with-icon box-style">
-                            <i className="sprite-fm-mono icon-link" />
-                            <input type="text" className="megaInputs" readOnly={true} defaultValue={link} />
-                        </div>
-                        <Button
-                            className="mega-button positive large copy-to-clipboard"
-                            onClick={() => copyToClipboard(link, l[7654])}>
-                            <span>{l[17835] /* `Copy Link` */}</span>
-                        </Button>
-                        {Call.isModerator(chatRoom, u_handle) &&
-                            <div className="peers-invite">
-                                <hr/>
-                                <Button
-                                    className="mega-button action"
-                                    onClick={onInviteToggle}>
-                                    {l.invite_from_contact_list /* `Or invite people form your contact list` */}
-                                </Button>
-                            </div>
-                        }
+                    <div className={`${ParticipantsNotice.NAMESPACE}-content-invite`}>
+                        <InviteParticipantsPanel
+                            chatRoom={chatRoom}
+                            disableLinkToggle={true}
+                            onAddParticipants={() => {
+                                this.setState({ inviteDialog: false }, () => onInviteToggle());
+                            }}
+                        />
                     </div>
                 }
             </div>

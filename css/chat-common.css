@@ -582,6 +582,13 @@
 .rtl .chat-dropdown .link-button.light span {
     text-align: right;
 }
+.chat-dropdown button.invite-dialog-btn {
+    margin: 6px 0;
+    --mask-color: var(--secondary-green);
+}
+.chat-dropdown button.invite-dialog-btn span {
+    font: var(--text-body1-bold);
+}
 .chat-shared-block {
     padding: 5px 0;
     position: relative;
@@ -608,9 +615,10 @@
     -webkit-animation: fadeinslide 0.2s forwards ease-in;
     animation: fadeinslide 0.2s forwards ease-in;
 }
-.chat-shared-block .medium-file-icon {
+.chat-shared-block .item-type-icon-90 {
+    --icon-size: 48px;
     float: left;
-    margin: 8px 0;
+    margin: 4px -6px;
 }
 .chat-shared-block .icon-or-thumb  .img-wrapper {
     display: none;
@@ -618,7 +626,7 @@
 .chat-shared-block .icon-or-thumb.thumb .img-wrapper {
     display: block;
 }
-.chat-shared-block .icon-or-thumb.thumb .medium-file-icon {
+.chat-shared-block .icon-or-thumb.thumb .item-type-icon-90 {
     display: none;
 }
 
@@ -697,12 +705,12 @@
     left: 0;
 }
 .chat-share-nav.body span {
+    --icon-size: 24px;
     display: inline-block;
     vertical-align: top;
     font-size: 13px;
     line-height: 18px;
     position: relative;
-    color: #333333;
 }
 .chat-share-nav.button {
     width: 24px;
@@ -748,7 +756,12 @@
 .chat-share-nav.body .txt {
     padding: 2px 0 0 6px;
 }
-.transfer-filetype-icon .transfer-filetype-icon {
+.chat-share-nav .item-type-icon {
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+.chat-share-nav .item-type-icon .item-type-icon {
     position: absolute;
     left: 3px;
     top: -2px;

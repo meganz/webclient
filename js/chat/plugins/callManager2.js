@@ -400,6 +400,25 @@
             super("clientId", undefined, call.chatRoom);
             this.call = call;
         }
+        find(cb) {
+            for (const key of this.keys()) {
+                const peer = this[key];
+                if (cb(peer)) {
+                    return peer;
+                }
+            }
+            return undefined;
+        }
+        findLast(cb) {
+            const keys = this.keys();
+            for (let i = keys.length - 1; i >= 0; i--) {
+                const peer = this[keys[i]];
+                if (cb(peer)) {
+                    return peer;
+                }
+            }
+            return undefined;
+        }
         addFakeDupStream() {
             var ids = this.keys();
             if (!ids || ids.length === 0) {
@@ -448,7 +467,7 @@
                 'localVideoStream': null,
                 'viewMode': null,
                 'speakerCid': null,
-                'pinnedCid': null,
+                'pinnedCid': null, // can be 0 - means pinned local video, and null - means nothing pinned
                 'activeVideoStreamsCnt': 0,
                 'ts': Date.now(),
                 'left': false
@@ -541,24 +560,45 @@
                 return;
             }
             const { peers, pinnedCid, speakerCid, localPeerStream, sfuClient } = this;
-            const speaker = peers[speakerCid];
-            const pinned = pinnedCid === 0 ? localPeerStream : peers[pinnedCid];
-            const activeStream =
-                pinned ||
-                Object.values(peers).findLast(p => p.isScreen) ||
-                (speaker && (speaker.av & Av.HiResVideo) ? speaker : null) ||
-                peers.getItem(0);
-
-            sfuClient.recordingSetVideoSource(
-                activeStream && (activeStream.av & Av.HiResVideo) ? activeStream.clientId : null
-            );
+            let src;
+            if (localPeerStream && localPeerStream.isScreen) {
+                src = localPeerStream;
+                tag = "local screen";
+            }
+            else if ((src = peers.findLast(p => p.isScreen))) {
+                tag = "peer screen";
+            }
+            // pinnedCid === 0 means the user pinned their local video
+            else if ((src = (pinnedCid === 0) ? localPeerStream : peers[pinnedCid])) {
+                tag = "pinned";
+            }
+            else if (((src = peers[speakerCid])) && (src.av & Av.HiResVideo)) {
+                tag = "active speaker";
+            }
+            else if ((src = peers.find(p => p.av & Av.HiResVideo))) {
+                tag = "fallback: first peer with video";
+            }
+            else if (localPeerStream && (localPeerStream.av & Av.Video)) {
+                src = localPeerStream;
+                tag = "fallback: local video";
+            }
+            else {
+                src = null;
+                tag = "fallback: no video";
+            }
+            const srcCid = src ? src.clientId : null;
+            if (srcCid !== sfuClient.recordedVideoCid) {
+                console.warn(`Recording: switching to video of cid ${srcCid} (${tag})`);
+                sfuClient.recordingSetVideoSource(srcCid);
+            }
         }
-
         onPeerAvChange(peer, av, oldAv) {
             const callManagerPeer = this.peers[peer.cid];
             assert(callManagerPeer);
             callManagerPeer.onAvChange(av, oldAv);
-            this.recordActiveStream();
+            if ((av ^ oldAv) & Av.Video) {
+                this.recordActiveStream();
+            }
             this.chatRoom.trigger('onPeerAvChange', peer);
         }
         onNoMicInput() {
@@ -769,7 +809,7 @@
                 delete this.callToutInt;
                 delete this.callToutEnd;
             }
-            if ($('.stay-dlg-subtext').is(':visible')) {
+            if ($('.mega-dialog .stay-dlg-subtext').is(':visible')) {
                 closeDialog();
             }
             if (this.callToutId) {
@@ -921,9 +961,15 @@
             this.av = this.sfuClient.availAv;
             if (avDiff & SfuClient.Av.Video) {
                 // we are managing the hi-res local player, which displays screen video if available
-                const vtrack = this.sfuClient.localScreenTrack() || this.sfuClient.localCameraTrack();
+                let vtrack = this.sfuClient.localScreenTrack();
+                 if (vtrack) {
+                    this.isScreen = true;
+                }
+                else {
+                    vtrack = this.sfuClient.localCameraTrack();
+                    this.isScreen = false;
+                }
                 if (vtrack) {
-                    this.isScreen = vtrack._isScreen;
                     if (!this.player) {
                         this.player = CallManager2.createVideoElement();
                     }
@@ -935,6 +981,7 @@
                     }
                     this.player = null;
                 }
+                this.call.recordActiveStream();
             }
             for (const cons of this.consumers) {
                 cons.onAvChange();

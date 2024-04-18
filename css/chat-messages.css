@@ -27,6 +27,12 @@
     flex: 0 0 auto;
     order: 1;
 }
+.chat-topic-buttons .share-meeting-button,
+.chat-topic-buttons .share-meeting-button:hover {
+    background: transparent;
+    box-shadow: none;
+    border: 1px solid var(--stroke-grey-2);
+}
 .chat-topic-info {
     align-items: center;
     display: flex;
@@ -493,14 +499,14 @@
     margin: 0 0 0 5px;
 }
 .message.shared-data .data-block-view.medium {
-    width: 126px;
+    width: 124px;
 }
 .message.shared-data .data-block-bg {
     border-radius: 8px;
 }
-.message.shared-data .block-view-file-type {
-    transform: translate(-50%, -50%);
-    margin: auto;
+.message.shared-data .item-type-icon-90 {
+    --icon-size: 96px;
+    margin: calc(50% - var(--icon-size) / 2);
 }
 .not-sent.message.body:not(.retrying) {
     background-color: var(--stroke-error);
@@ -867,7 +873,8 @@
     line-height: 34px;
     white-space: nowrap;
 }
-.richpreview.icon.block-view-file-type {
+.richpreview.icon.item-type-icon-90 {
+    --icon-size: 96px;
     float: left;
     margin: 0;
     margin-right: 14px;
@@ -877,11 +884,9 @@
     transform: none;
 }
 
-.richpreview.have-icon .block-view-file-type {
-    margin-top: 14px;
-    margin-left: 20px;
-    margin-bottom: 14px;
-    margin-right: 12px;
+.richpreview.have-icon .item-type-icon-90 {
+    --icon-size: 96px;
+    margin: 8px 14px;
 }
 
 .richpreview .main-loader {
@@ -1345,6 +1350,12 @@ body.theme-dark .message .audio-player {
 
 .message.schedule-message .schedule-description {
     margin-top: 8px;
+}
+
+.message.schedule-message .schedule-link-instruction {
+    color: var(--text-color-high);
+    font: var(--text-body1-bold);
+    padding-top: 8px;
 }
 
 .message.schedule-message .schedule-meeting-link {

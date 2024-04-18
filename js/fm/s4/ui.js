@@ -307,14 +307,14 @@ lazy(s4, 'ui', () => {
                     typeNode.textContent = l.s4_bucket_type;
 
                     // Set Bucket Icon
-                    if ((iconNode = domNode.querySelector('.transfer-filetype-icon'))) {
-                        iconNode.className = `transfer-filetype-icon folder ${fileIcon(n)}`;
+                    if ((iconNode = domNode.querySelector('.item-type-icon'))) {
+                        iconNode.className = `item-type-icon icon-${fileIcon(n)}-24 folder`;
                     }
                 }
-                else if ((iconNode = domNode.querySelector('.block-view-file-type'))) {
+                else if ((iconNode = domNode.querySelector('.item-type-icon-90'))) {
 
                     // Update block icon
-                    iconNode.className = `block-view-file-type folder ${fileIcon(n)}`;
+                    iconNode.className = `item-type-icon-90 icon-${fileIcon(n)}-90 folder ${fileIcon(n)}`;
                 }
             }
         }
@@ -719,8 +719,8 @@ lazy(s4, 'ui', () => {
                 });
 
                 $('header h2', $dialog).text(heading);
-                $('.transfer-filetype-icon', $dialog)
-                    .attr('class', `transfer-filetype-icon sprite-fm-mono ${icon}`);
+                $('.item-type-icon', $dialog)
+                    .attr('class', `item-type-icon icon-${icon}-24`);
                 $('button.js-close, .rename-dialog-button.cancel', $dialog)
                     .rebind('click.s4kd.rename.cancel', closeDialog);
 

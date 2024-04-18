@@ -754,8 +754,9 @@ mega.tpw = new function TransferProgressWidget() {
 
             $row.removeClass('complete error progress paused overquota').addClass('inqueue');
             $('.transfer-task-status', $row).text('');
-            $row.find('.transfer-filetype-icon').attr('class', 'transfer-filetype-icon')
-                .addClass(filetype(fName, true)[0].toLowerCase());
+            $('.item-type-icon', $row)
+                .attr('class', `item-type-icon icon-${fileIcon({name: fName})}-24`);
+
 
             if (entriesArray[r].zipid) {
                 $row.attr('zippo', 'y');

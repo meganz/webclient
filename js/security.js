@@ -1222,6 +1222,9 @@ security.login = {
 
         'use strict';
 
+        // Before key is stored on storage and can be accessible by the other tabs, notify to refresh the page.
+        watchdog.notify('beforelogin');
+
         // Set global values which are used everywhere
         u_k = masterKeyArray32;
         u_sid = temporarySessionIdBase64;
@@ -1360,6 +1363,8 @@ security.login = {
 
         // Remove all previous login data
         u_logout();
+
+        watchdog.notify('beforelogin');
 
         // Use localStorage if the user checked the Remember Me checkbox, otherwise use temporary sessionStorage
         u_storage = init_storage(security.login.rememberMe ? localStorage : sessionStorage);

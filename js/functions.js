@@ -996,12 +996,6 @@ async function mKeyDialog(ph, fl, keyr, selector) {
         mega.gallery.albumsRendered = false;
     }
 
-    $('.new-download-buttons').addClass('hidden');
-    $('.new-download-file-title').text(l[1199]);
-    $('.new-download-file-icon').addClass(fileIcon({
-        name: 'unknown.unknown'
-    }));
-
     $button.addClass('disabled').removeClass('active');
 
     M.safeShowDialog('dlkey-dialog', $dialog);
@@ -1053,7 +1047,7 @@ async function mKeyDialog(ph, fl, keyr, selector) {
 
                 var currLink = getSitePath();
 
-                if (isPublickLinkV2(currLink)) {
+                if (isPublicLinkV2(currLink)) {
                     newHash = `${(pfcol ? '/collection/' : fl ? '/folder/' : '/file/') + ph}#${key}${selector || ''}`;
                 }
 

@@ -616,14 +616,14 @@ lazy(mega, 'rewindUi', () => {
 
         updateNodeDisplay() {
             const icon = fileIcon(this.currentNode);
-            const folderIcon = this.sidebar.querySelector('.folder-info .folder-icon .transfer-filetype-icon');
+            const folderIcon = this.sidebar.querySelector('.folder-info .folder-icon .item-type-icon');
             if (this.currentIcon) {
                 folderIcon.classList.remove(this.currentIcon);
             }
 
             this.currentIcon = icon;
             if (folderIcon) {
-                folderIcon.classList.add(icon);
+                folderIcon.classList.add(`icon-${icon}-24`);
             }
             const folderNameElement = this.sidebar.querySelector('.folder-info .folder-name');
             folderNameElement.innerText = this.getNodeNameInfo(this.currentNode)[0];
@@ -1790,7 +1790,7 @@ lazy(mega, 'rewindUi', () => {
             }
             const template = this.getTemplate(false, true);
             const nameElement = template.querySelector('.folder-main label');
-            const iconElement = template.querySelector('.folder-main .folder-icon .transfer-filetype-icon');
+            const iconElement = template.querySelector('.folder-main .folder-icon .item-type-icon');
             const detailsElement = template.querySelector('.folder-details');
             const locationElement = detailsElement.querySelector('.folder-location');
             const locationSpanElement = locationElement.querySelector('span');
@@ -1814,7 +1814,7 @@ lazy(mega, 'rewindUi', () => {
             }
 
             nameElement.textContent = this.getNodeNameInfo(node)[0];
-            iconElement.classList.add(fileIcon(node));
+            iconElement.classList.add(`icon-${fileIcon(node)}-24`);
             template.dataset.id = node.h;
 
             if (this.selectedNodes[node.h]) {
@@ -1939,12 +1939,12 @@ lazy(mega, 'rewindUi', () => {
             const template = this.getTemplate(true);
             const pusherElement = template.querySelector('.folder-pusher');
             const nameElement = template.querySelector('.folder-main label');
-            const iconElement = template.querySelector('.folder-main .folder-icon .transfer-filetype-icon');
+            const iconElement = template.querySelector('.folder-main .folder-icon .item-type-icon');
             const checkboxElement = template.querySelector('.folder-main .select-checkbox');
             const checkboxInputElement = checkboxElement.querySelector('input');
 
             nameElement.textContent = this.getNodeNameInfo(node)[0];
-            iconElement.classList.add(fileIcon(node));
+            iconElement.classList.add(`icon-${fileIcon(node)}-24`);
             template.dataset.id = node.h;
 
             const selectStatus = this.selectedNodes[node.h];
@@ -2098,7 +2098,7 @@ lazy(mega, 'rewindUi', () => {
             const template = this.getTemplate();
             const pusherElement = template.querySelector('.folder-pusher');
             const nameElement = template.querySelector('.folder-main label');
-            const iconElement = template.querySelector('.folder-main .folder-icon .transfer-filetype-icon');
+            const iconElement = template.querySelector('.folder-main .folder-icon .item-type-icon');
             const detailsElement = template.querySelector('.folder-details');
             const detailsPusherElement = detailsElement.querySelector('.folder-pusher');
             const tsElement = detailsElement.querySelector('.folder-timestamp');
@@ -2141,7 +2141,7 @@ lazy(mega, 'rewindUi', () => {
             }
 
             nameElement.textContent = node.name;
-            iconElement.classList.add(fileIcon(node));
+            iconElement.classList.add(`icon-${fileIcon(node)}-24`);
             template.dataset.id = node.h;
 
             if (this.selectedNodes[node.h]) {

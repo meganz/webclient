@@ -62,7 +62,7 @@ mobile.conflictResolution = {
             }
 
             const infoBlockDiv = mCreateElement('div', {'class': 'info-block'}, [
-                mCreateElement('i', {'class': 'export-icon image'}),
+                mCreateElement('i', {'class': 'item-type-icon-90 file'}),
                 mCreateElement('div', {'class': 'info-txt file-name'}),
                 mCreateElement('div', {'class': 'info-props'}, [
                     mCreateElement('div', {'class': 'info-txt light-grey file-size'}),

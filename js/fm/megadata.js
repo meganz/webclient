@@ -210,6 +210,11 @@ function MegaData() {
     const safe = [
         'getTransferElements'
     ];
+
+    if (self.hashLogic && String(location.hash).startsWith('#test')) {
+        safe.push('accountData', 'getStorageQuota');
+    }
+
     for (let i = safe.length; i--;) {
         seal.delete(safe[i]);
     }

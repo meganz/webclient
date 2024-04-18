@@ -157,7 +157,7 @@
                                 </div>
                             </div>
                         </div>
-
+                        
                         <div class="megasync-slide slide1">
                             <div class="megasync-backup-bg"></div>
                             <div class="megasync-header">[$20758]</div>
@@ -507,7 +507,7 @@
 
                 <div class="text-editor-file-name">
                     <!-- TODO: replace by svg icon !-->
-                    <i class="transfer-filetype-icon text file"></i>
+                    <i class="item-type-icon icon-text-24"></i>
                     <span></span>
                 </div>
             </header>
@@ -1089,7 +1089,7 @@
         </div>
         <div class="fm-versioning pad">
             <div class="fm-versioning top-column">
-                <div class="medium-file-icon"></div>
+                <div class="item-type-icon-90"></div>
                 <div class="fm-versioning file-data">
                     <div class="fm-versioning file-name"></div>
                     <div class="fm-versioning file-path"></div>
@@ -1472,7 +1472,7 @@
         <section class="content">
             <div class="content-block">
                 <div class="create-folder-input-bl create-folder-wrapper">
-                    <i class="sprite-fm-uni icon-folder-24"></i>
+                    <i class="item-type-icon icon-folder-24"></i>
                     <input name="dialog-new-folder" type="text" value="" placeholder="[$157]" autofocus />
                 </div>
                 <div class="whitespaces-input-warning">
@@ -1766,7 +1766,7 @@
         <section class="content">
             <div class="content-block">
                 <div class="rename-input-bl">
-                    <i class="transfer-filetype-icon"></i>
+                    <i class="item-type-icon"></i>
                     <input name="dialog-rename" type="text" value="[$157]" />
                 </div>
                 <div class="whitespaces-input-warning">
@@ -1834,7 +1834,7 @@
                     <div class="summary-input summary-items correct-input scroll-auto unfold">
                         <div class="item-row-group">
                             <div class="item-row">
-                                <div class="transfer-filetype-icon generic file"></div>
+                                <div class="item-type-icon icon-generic-24"></div>
                                 <div class="summary-ff-name">[$5533]</div>
                                 <div class="delete-img icon"></div>
                                 <input class="summary-ff-name hidden" type="text" value="" placeholder="[$17506]" />
@@ -2798,7 +2798,7 @@
             <div class="content-block share-dialog-top">
                 <div class="share-dialog-top-body">
                     <div class="share-dialog-shared-item">
-                        <i class="item-type-icon sprite-fm-uni"></i>
+                        <i class="item-type-icon-90"></i>
                         <div class="share-dialog-folder-info-block">
                             <div class="share-dialog-folder-name"></div>
                             <div class="share-dialog-folder-info"></div>
@@ -4805,15 +4805,13 @@
 
         <header>
             <i class="graphic full sprite-fm-illustration img-dialog-overquota-storage"></i>
-            <h2 class="full">[$16360]</h2>
+            <h2 class="full"></h2>
             <h2 class="almost-full">[$16312]</h2>
         </header>
 
         <section class="content">
             <div class="content-block fm-dialog-body storage-dialog full dialog-bottom">
-                <div class="storage-dialog body-p long">
-                    [$16304]
-                </div>
+                <div class="storage-dialog body-p long main-text"></div>
                 <div class="odq-warning hidden">
                     <div class="odq-divider"></div>
                     <div class="odq-body">
@@ -4822,36 +4820,17 @@
                     </div>
                     <div class="odq-divider"></div>
                 </div>
+                <div class="storage-dialog body-p rubbish-text top-pad">
+                    <!-- Or delete some files and [A]empty your Rubbish bin[/A] to free up storage space. -->
+                    [$16306]
+                </div>
                 <div class="storage-dialog buttons-block">
                     <button class="mega-button positive large choose-plan">
                         <span>[$8696]</span>
                     </button>
                 </div>
-                <div class="full-extras">
-                    <div class="storage-dialog divider-txt">
-                        <span> [$174] </span>
-                    </div>
-                    <div class="storage-dialog no-achievements-bl">
-                        <!--div class="storage-dialog body-p medium">
-                            [$16306]
-                        </div-->
-                        <div class="storage-dialog body-p small">
-                            [$16306]
-                        </div>
-                    </div>
-                    <div class="storage-dialog achievements-bl">
-                        <div class="storage-dialog body-p">
-                            [$16308]
-                        </div>
-                        <div class="storage-dialog buttons-block">
-                            <button class="mega-button large get-bonuses">
-                                <span>[$16309]</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="storage-dialog body-p small top-pad">
-                        [$16310]
-                    </div>
+                <div class="estimated-price-text hidden">
+                    * [$18770]
                 </div>
             </div>
 
@@ -4875,35 +4854,25 @@
                         </div>
                     </div>
                 </div>
-                <div class="storage-dialog no-achievements-bl">
-                    <div class="storage-dialog body-p">
+                <div class="storage-dialog">
+                    <div class="storage-dialog body-p main-text">
                         [$16313]
                     </div>
-                    <div class="storage-dialog buttons-block">
-                        <button class="mega-button positive large choose-plan">
-                            <span>[$8696]</span>
-                        </button>
-                        <button class="mega-button large skip">
-                            <span>[$1379]</span>
-                        </button>
-                    </div>
-                </div>
-                <div class="storage-dialog achievements-bl">
-                    <div class="storage-dialog body-p">
-                        [$16313]
-                        [$16314]
+                    <div class="storage-dialog body-p rubbish-text top-pad">
+                        <!-- Or delete some files and [A]empty your Rubbish bin[/A] to free up storage space. -->
+                        [$16306]
                     </div>
                     <div class="storage-dialog buttons-block">
-                        <button class="mega-button large get-bonuses">
-                            <span>[$16309]</span>
+                        <button class="mega-button large skip hidden">
+                            <span>[$ok_button]</span>
                         </button>
                         <button class="mega-button positive large choose-plan">
                             <span>[$8696]</span>
                         </button>
                     </div>
-                </div>
-                <div class="storage-dialog body-p small top-pad">
-                    [$16306]
+                    <div class="estimated-price-text hidden">
+                        * [$18770]
+                    </div>
                 </div>
             </div>
         </section>
@@ -4951,7 +4920,7 @@
                         !-->
                     </div>
                     <div class="duplicate-conflict info-block">
-                        <div class="export-icon image"></div>
+                        <div class="item-type-icon-90 icon-image-90"></div>
                         <div class="duplicate-conflict file-info">
                             <div class="duplicate-conflict info-txt file-name">
                                 examplefilename.png
@@ -4981,7 +4950,7 @@
                         [$16491]
                     </div>
                     <div class="duplicate-conflict info-block">
-                        <div class="export-icon image"></div>
+                        <div class="item-type-icon-90 icon-image-90"></div>
                         <div class="duplicate-conflict file-info">
                             <div class="duplicate-conflict info-txt file-name">
                                 examplefilename.png
@@ -5011,8 +4980,8 @@
                         -->
                     </div>
                     <div class="duplicate-conflict info-block multiple-files">
-                        <div class="export-icon image"></div>
-                        <div class="export-icon image"></div>
+                        <div class="item-type-icon-90 icon-image-90"></div>
+                        <div class="item-type-icon-90 icon-image-90"></div>
                         <div class="duplicate-conflict file-info">
                             <div class="duplicate-conflict info-txt file-name">
                                 examplefilename.png
@@ -8518,7 +8487,7 @@
             <div class="content-block">
                 <div class="object-access-entry file-info inactive">
                     <div class="subtitle-txt">
-                        <span class="transfer-filetype-icon audio file"><img alt=""/></span>
+                        <span class="item-type-icon audio file"><img alt=""/></span>
                         <span class="file-name">Object 2</span>
                         <span class="file-size">20 MB</span>
                     </div>

@@ -93,12 +93,21 @@
                 width: 100%;
                 color: var(--text-color-medium);
             }
+
+            &.schedule-dialog-switch .sub-label {
+                width: calc(100% - 48px);
+            }
         }
 
         label,
         .schedule-label {
             cursor: pointer;
             color: var(--text-color-high);
+        }
+
+        i.icon-mega-logo {
+            top: 0;
+            transform: translate(-50%, -100%);
         }
     }
 

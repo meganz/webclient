@@ -25,6 +25,7 @@ import { isSameDay, isToday, isTomorrow } from './meetings/schedule/helpers.jsx'
 import { withHostsObserver } from './meetings/hostsObserver.jsx';
 import WaitingRoom from './meetings/waitingRoom/waitingRoom.jsx';
 import { renderEndConfirm, renderLeaveConfirm } from './meetings/streamControls';
+import { InviteParticipantsPanel } from "./inviteParticipantsPanel.jsx";
 
 const ENABLE_GROUP_CALLING_FLAG = true;
 const MAX_USERS_CHAT_PRIVATE = 100;
@@ -447,10 +448,10 @@ export class ConversationRightArea extends MegaRenderMixin {
         'requiresUpdateOnResize': true
     };
 
-    constructor(props) {
-        super(props);
-        this.state = { contactPickerDialog: false };
-    }
+    state = {
+        contactPickerDialog: false,
+        inviteDialog: false,
+    };
 
     customIsEventuallyVisible() {
         return this.props.chatRoom.isCurrentlyActive;
@@ -463,7 +464,7 @@ export class ConversationRightArea extends MegaRenderMixin {
 
     LeaveButton = withHostsObserver(
         ({ chatRoom, hasHost, confirmLeave, onLeave }) => {
-            const isDisabled = chatRoom.call || chatRoom.isReadOnly() || is_chatlink;
+            const isDisabled = chatRoom.call || is_chatlink || !chatRoom.iAmInRoom();
             const participants = chatRoom.getParticipantsExceptMe();
 
             return (
@@ -604,6 +605,38 @@ export class ConversationRightArea extends MegaRenderMixin {
                 );
         }
     };
+
+    handleAddParticipants() {
+        if (M.u.length > 1) {
+            if (allContactsInChat(excludedParticipants(this.props.chatRoom))) {
+                return msgDialog(
+                    `confirmationa:!^${l[8726]}!${l[82]}`,
+                    null,
+                    `${l.all_contacts_added}`,
+                    `${l.all_contacts_added_to_chat}`,
+                    (res) => {
+                        if (res) {
+                            contactAddDialog(null, false);
+                        }
+                    },
+                    1
+                );
+            }
+            return this.setState({ contactPickerDialog: true });
+        }
+        msgDialog( // new user adding a partcipant
+            `confirmationa:!^${l[8726]}!${l[82]}`,
+            null,
+            `${l.no_contacts}`,
+            `${l.no_contacts_text}`,
+            (resp) => {
+                if (resp) {
+                    contactAddDialog(null, false);
+                }
+            },
+            1
+        );
+    }
 
     renderPushSettingsButton() {
         const { pushSettingsValue, chatRoom, onPushSettingsToggled, onPushSettingsClicked } = this.props;
@@ -779,6 +812,41 @@ export class ConversationRightArea extends MegaRenderMixin {
             participantsList = (
                 <div>
                     {isReadOnlyElement}
+                    <Button
+                        className="mega-button action invite-dialog-btn"
+                        icon="sprite-fm-mono icon-user-plus-thin-outline"
+                        label={l[8726] /* `Invite` */}
+                        disabled={
+                            isGuest()
+                            || room.isReadOnly()
+                            || (
+                                !room.iAmOperator()
+                                && !room.publicLink
+                                && !room.options[MCO_FLAGS.OPEN_INVITE]
+                            )}
+                        onClick={() => {
+                            delay('chat-event-inv-rhp', () => eventlog(99963));
+                            if (room.type === 'group') {
+                                return this.handleAddParticipants();
+                            }
+                            loadingDialog.show('fetchchatlink');
+                            room.updatePublicHandle(false, false, true).catch(dump).always(() => {
+                                loadingDialog.hide('fetchchatlink');
+                                if (!this.isMounted()) {
+                                    return;
+                                }
+                                if (!room.iAmOperator() && room.options[MCO_FLAGS.OPEN_INVITE] && !room.publicLink) {
+                                    this.handleAddParticipants();
+                                }
+                                else if (room.type === 'public' && !room.topic) {
+                                    this.handleAddParticipants();
+                                }
+                                else {
+                                    this.setState({ inviteDialog: true });
+                                }
+                            });
+                        }}
+                    />
                     <ParticipantsList
                         ref={function(r) {
                             self.participantsListRef = r;
@@ -791,7 +859,7 @@ export class ConversationRightArea extends MegaRenderMixin {
             );
         }
 
-        const addParticipantBtn = (
+        const addParticipantBtn = room.type === 'private' && (
             <Button
                 className="link-button light"
                 icon="sprite-fm-mono icon-add-small"
@@ -953,10 +1021,14 @@ export class ConversationRightArea extends MegaRenderMixin {
                             })}
                             expandedPanel={{
                                 // [...] TODO: refactor
+                                // Old rules
                                 // Group chat -> `Chat Participants` expanded by default
-                                participants: (room.type === 'group' || room.type === 'public') && !isMeeting,
+                                // participants: (room.type === 'group' || room.type === 'public') && !isMeeting,
                                 // 1-on-1 chat or meeting -> default to `Options`
-                                options: room.type === 'private' || (isMeeting && !isRecurring),
+                                // options: room.type === 'private' || (isMeeting && !isRecurring),
+                                // All collapsed by default except for recurring meetings occurrences.
+                                participants: false,
+                                options: false,
                                 // Scheduled meeting (recurring)
                                 occurrences: isMeeting && scheduledMeeting && isRecurring
                             }}>
@@ -1067,24 +1139,17 @@ export class ConversationRightArea extends MegaRenderMixin {
                                         </div> :
                                         null
                                     }
-                                    {room.type === "public" ?
+                                    {room.type === 'public' && !room.isMeeting ?
                                         <div
                                             className={getChatLinkClass}
                                             onClick={e => {
                                                 if ($(e.target).closest('.disabled').length > 0) {
                                                     return false;
                                                 }
-                                                if (scheduledMeeting) {
-                                                    delay('chat-event-sm-share-meeting-link', () => eventlog(99924));
-                                                }
                                                 this.props.onGetManageChatLinkClicked();
                                             }}>
                                             <i className="sprite-fm-mono icon-link-filled"/>
-                                            <span>
-                                                {/* `Share meeting` || `Get chat link` || `Get meeting link` */}
-                                                {scheduledMeeting ? l.share_meeting_button
-                                                    : room.isMeeting ? l.meeting_get_link : l[20481]}
-                                            </span>
+                                            <span>{l[20481] /* `Get chat link */}</span>
                                         </div> :
                                         null
                                     }
@@ -1310,6 +1375,21 @@ export class ConversationRightArea extends MegaRenderMixin {
                         selectFooter={true}
                     />
                 )}
+                {this.state.inviteDialog &&
+                    <ModalDialogsUI.ModalDialog
+                        onClose={() => {
+                            this.setState({ inviteDialog: false });
+                        }}
+                        dialogName="chat-link-dialog"
+                        chatRoom={room}>
+                        <InviteParticipantsPanel
+                            chatRoom={room}
+                            onAddParticipants={() => {
+                                this.setState({ inviteDialog: false }, () => this.handleAddParticipants());
+                            }}
+                        />
+                    </ModalDialogsUI.ModalDialog>
+                }
             </div>
         );
     }
@@ -2537,6 +2617,13 @@ export class ConversationPanel extends MegaRenderMixin {
                             ${room.haveActiveCall() ? 'in-call' : ''}
                         `}>
                         <div className="chat-topic-buttons">
+                            {room.type === 'public' && room.isMeeting &&
+                                <Button
+                                    className="mega-button small share-meeting-button"
+                                    label={l.share_meeting_button /* `Share meeting` */}
+                                    onClick={() => this.setState({ chatLinkDialog: true }, () => eventlog(500230))}
+                                />
+                            }
                             <Button
                                 className="right"
                                 disableCheckingVisibility={true}

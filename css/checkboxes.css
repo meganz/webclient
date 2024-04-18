@@ -86,10 +86,10 @@
 
 .theme-light .checkboxMinimize::before,
 .theme-light-forced .checkboxMinimize::before {
-   background-image: url("../../images/sprites/fm-theme@light.svg#icon-checkbox-minimize");
+   background-image: url("../images/sprites/fm-theme@light.svg#icon-checkbox-minimize");
 }
 
 .theme-dark .checkboxMinimize::before,
 .theme-dark-forced .checkboxMinimize::before {
-   background-image: url("../../images/sprites/fm-theme@dark.svg#icon-checkbox-minimize");
+   background-image: url("../images/sprites/fm-theme@dark.svg#icon-checkbox-minimize");
 }

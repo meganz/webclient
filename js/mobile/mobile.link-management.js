@@ -466,14 +466,14 @@ mobile.linkManagement = {
         this.decKeyToggleContainer.append(decryptionKeyMessage, this.decKeyFieldText, decKeyInputField);
 
         this.$decKeyInput = new mega.ui.MegaInputs(
-            $(decKeyInputField).data('icon', 'sprite-mobile-fm-mono icon-copy-thin-outline')
+            $(decKeyInputField).data('icon', 'sprite-mobile-fm-mono icon-square-copy')
         );
 
         this.$decKeyInput.$wrapper.addClass('box-style dec-key hidden mobile');
 
         // Only copy text if icon is tapped
         this.$decKeyInput.$wrapper.rebind('tap', (e) => {
-            if (e.target.classList.contains('icon-copy-thin-outline')) {
+            if (e.target.classList.contains('icon-square-copy')) {
                 copyToClipboard(decKeyInputField.placeholder, l.mobile_link_dec_key_copied_toast_text);
             }
         });

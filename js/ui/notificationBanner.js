@@ -184,7 +184,7 @@ var notificationBanner = {
     showBanner() {
         'use strict';
 
-        const isValidBannerPage = !M.chat && M.currentdirid !== 'devices'
+        const isValidBannerPage = !M.chat && M.currentdirid !== 'refer'
             && !String(M.currentdirid).includes('account');
 
         if (isValidBannerPage) {

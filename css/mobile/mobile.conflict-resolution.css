@@ -56,7 +56,7 @@
     -webkit-margin-end: 16px;
 }
 
-.conflict-resolution .info-block .export-icon {
+.conflict-resolution .info-block i {
     --icon-size: 24px;
     background-size: 100%;
     grid-column: 1/2;

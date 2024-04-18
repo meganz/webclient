@@ -167,8 +167,7 @@ MegaData.prototype.filterBySearch = function (str) {
                         else {
                             color = ("00" + color.toString(16)).slice(-6);
 
-                            $this.find('.transfer-filetype-icon')
-                                .css('background-color', '#' + color);
+                            $('.item-type-icon', $this).css('background-color', '#' + color);
                         }
                     }
                 });

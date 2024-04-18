@@ -1596,6 +1596,7 @@ td.verification .contact-item {
     border-radius: 6px;
     box-sizing: border-box;
     background: var(--surface-grey-4);
+    overflow: hidden;
 }
 .profile-shared-folders .shared-with-me tbody tr:not(tr.ui-selected):hover::before {
     border: 1px solid var(--stroke-grey-2);
@@ -1703,6 +1704,9 @@ td.verification .contact-item {
 }
 .rtl .profile-shared-folders table.shared-with-me td.grid-url-header-nw {
     float: left;
+}
+.profile-shared-folders table.shared-with-me .item-type-icon-90 {
+    left: -6px;
 }
 .profile-shared-folders .contact-item-controls {
     display: block;

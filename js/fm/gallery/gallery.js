@@ -35,12 +35,12 @@ class GalleryNodeBlock {
 
         const spanMedia = document.createElement('span');
         this.spanEl.appendChild(spanMedia);
-        spanMedia.className = 'block-view-file-type';
+        spanMedia.className = 'item-type-icon-90';
         this.thumb = document.createElement('img');
         spanMedia.appendChild(this.thumb);
 
         if (this.isVideo) {
-            spanMedia.classList.add('video');
+            spanMedia.classList.add('icon-video-90');
             this.spanEl.classList.add('video');
 
             const div = document.createElement('div');
@@ -52,7 +52,7 @@ class GalleryNodeBlock {
             div.appendChild(spanTime);
         }
         else {
-            spanMedia.classList.add('image');
+            spanMedia.classList.add('icon-image-90');
         }
 
         const spanFav = document.createElement('span');

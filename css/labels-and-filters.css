@@ -60,7 +60,7 @@
 }
 .colour-label .shared-folder-info-block::after {
     right: 2px;
-    top: 13px;
+    top: 15px;
 }
 .rtl .colour-label .shared-folder-info-block::after {
     left: 2px;

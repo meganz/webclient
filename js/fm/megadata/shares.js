@@ -84,14 +84,13 @@ MegaData.prototype.openSharingDialog = function(target) {
         if (!M.d[h]) {
             await dbfetch.get(h);
         }
-        const {shares, name, td, tf} = M.getNodeByHandle(h);
+        const node = M.getNodeByHandle(h);
+        const {shares, name, td, tf} = node;
         assert(name);
 
         var shareKeys = Object.keys(shares || {});
 
-        // Temporary condition till all MIME icons are vector
-        // $('.item-type-icon', $dialog).attr('class', `item-type-icon sprite-fm-uni icon-${folderIcon}-90`);
-        $('.item-type-icon', $dialog).attr('class', `item-type-icon medium-file-icon ${fileIcon(M.d[h])}`);
+        $('.item-type-icon-90', $dialog).attr('class', `item-type-icon-90 icon-${folderIcon(node)}-90`);
 
         // This is shared folder, not just folder link
         if (shares && !(shares.EXP && shareKeys.length === 1) || M.ps[h]) {

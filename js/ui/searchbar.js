@@ -739,7 +739,7 @@
         const makeSearchResultItem = (node) => {
             const $item = $itemTemplate.clone();
             const $fileIconContainer = $('.dropdown-search-results-item-file-icon', $item);
-            const $fileIcon = $('.transfer-filetype-icon', $fileIconContainer);
+            const $fileIcon = $('.item-type-icon', $fileIconContainer);
             const $match = $('.txt-bold', $item);
             const $suffix = $('.suffix', $item);
             const $dir = $('.dropdown-search-results-item-location', $item);
@@ -769,7 +769,7 @@
             $match.text(match);
             $suffix.text(suffix);
             $dir.text(dir);
-            $fileIcon.addClass(fileIcon(node));
+            $fileIcon.addClass(`icon-${fileIcon(node)}-24`);
 
             if (thumbUri) {
                 const $imgNode = $('img', $fileIcon);
@@ -867,13 +867,13 @@
             const date = new Date(node.mtime * 1000);
 
             const $item = $itemTemplate.clone();
-            const $icon = $('.transfer-filetype-icon', $item);
+            const $icon = $('.item-type-icon', $item);
 
             $item.removeClass('dropdown-recently-opened-template hidden');
             $item.attr('data-id', handle);
             $item.attr('data-editable', editable);
 
-            $icon.addClass(iconClass);
+            $icon.addClass(`icon-${iconClass}-24`);
             $('.dropdown-recently-opened-item-filename', $item).text(filename);
             $('.dropdown-recently-opened-item-location', $item).text(parentName);
             $('.dropdown-recently-opened-item-time', $item).text(time2date(date.getTime() / 1000, 1));

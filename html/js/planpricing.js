@@ -686,13 +686,6 @@ lazy(pro, 'proplan2', () => {
 
         period = period || 12;
 
-        const ab_test_flag = mega.flags.ab_apmap;
-
-        // If user has ab_apmap flag, attach them to the experiment
-        if (typeof ab_test_flag !== 'undefined') {
-            api.req({a: 'abta', c: 'ab_apmap'});
-        }
-
         if (!pro.membershipPlans.length) {
             console.error('Plans couldnt be loaded.');
             return;
@@ -721,18 +714,11 @@ lazy(pro, 'proplan2', () => {
             }
 
             const planName = pro.getProPlanName(planNum);
-            // const priceIndex = period === 12 ? pro.UTQA_RES_INDEX_PRICE : pro.UTQA_RES_INDEX_MONTHLYBASEPRICE;
 
             const $planCard = $planCards.filter(`#pro${planNum}`);
             $planCard.removeClass('hidden');
 
             let planPrice = currentPlan[pro.UTQA_RES_INDEX_PRICE];
-            const includeNoDiscount = (period === 12 && ab_test_flag);
-
-            const planPriceNoDiscount = includeNoDiscount
-                ? 12 * currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE] * pro.conversionRate
-                : null;
-
             let priceCurrency = 'EUR';
 
             if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
@@ -744,40 +730,14 @@ lazy(pro, 'proplan2', () => {
             }
 
             const priceText = formatCurrency(planPrice, priceCurrency, 'narrowSymbol');
-            const noDiscountText = planPriceNoDiscount
-                ? formatCurrency(planPriceNoDiscount, priceCurrency, 'narrowSymbol')
-                : false;
-
-            const monthlyPriceText = includeNoDiscount
-                ? formatCurrency(planPrice / 12, priceCurrency, 'narrowSymbol')
-                : false;
 
             $('.pricing-plan-price span.vl', $planCard).text(priceText);
-
-            const $planPriceUnit = $('.pricing-plan-price-unit', $planCard);
-            if (includeNoDiscount) {
-                $planPriceUnit.text(priceCurrency + ' ' + l.pr_billed_yearly).addClass('billed-yearly');
-            }
-            else {
-                $planPriceUnit.text(priceCurrency + ' / ' +  periodText).removeClass('billed-yearly');
-            }
+            $('.pricing-plan-price-unit', $planCard).text(priceCurrency + ' / ' +  periodText);
 
             if (priceText) {
                 $planCard.toggleClass('long-currency1', priceText.length >= 9 && priceText.length <= 12);
                 $planCard.toggleClass('long-currency2', priceText.length >= 13 && priceText.length <= 16);
                 $planCard.toggleClass('long-currency3', priceText.length >= 17);
-            }
-            if (includeNoDiscount) {
-                const perMonthText = monthlyPriceText + '*';
-                $('.pricing-plan-only', $planCard).text(noDiscountText)
-                    .removeClass('hidden').addClass('strikethrough');
-                $('.pricing-plan-monthly ', $planCard).removeClass('hidden');
-                $('.pricing-plan-monthly span', $planCard).text(perMonthText).removeClass('hidden');
-
-            }
-            else {
-                $('.pricing-plan-monthly', $planCard).addClass('hidden');
-                $('.pricing-plan-only', $planCard).text(l.pr_only).removeClass('strikethrough');
             }
 
             // get the storage/bandwidth, then convert it to bytes (it comes in GB) to format.
@@ -808,13 +768,6 @@ lazy(pro, 'proplan2', () => {
 
             $('.pricing-plan-title', $planCard).text(planName);
             $('.pricing-plan-btn', $planCard).text(l.buy_plan.replace('%1', planName));
-
-            if (ab_test_flag) {
-                $('.pricing-pg.pick-period-container .period-note-txt span').addClass('bold');
-            }
-            else {
-                $('.pricing-pg.pick-period-container .period-note-txt span').removeClass('bold');
-            }
         }
 
         const $freeBanner = $('.pricing-pg.pricing-banner-container', $page);
@@ -1183,6 +1136,11 @@ lazy(pro, 'proplan2', () => {
             initFaq();
 
             loadingDialog.hide();
+
+            if (window.mScrollTo === 'flexi' && ProFlexiFound) {
+                $proflexiBlock[0].scrollIntoView({behavior: 'smooth'});
+                delete window.mScrollTo;
+            }
 
             if (window.nextPage === '1' && window.pickedPlan) {
 

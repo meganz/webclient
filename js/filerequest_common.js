@@ -3,7 +3,7 @@ lazy(mega, 'fileRequestCommon', () => {
     'use strict';
 
     const logger = new MegaLogger('common', null, MegaLogger.getLogger('FileRequest'));
-    const folderClass = 'file-request-folder';
+    const treeClass = 'file-request-folder';
 
     const ongoingRemoval = new Set();
     const dspOngoingRemoval = () => {
@@ -65,12 +65,13 @@ lazy(mega, 'fileRequestCommon', () => {
                 return false;
             }
 
-            const viewModeClass = M.viewmode ? 'span.block-view-file-type' : 'span.transfer-filetype-icon';
-            $(viewModeClass, $nodeId)
-                .addClass(folderClass);
+            const viewModeClass = M.viewmode ? 'span.item-type-icon-90' : 'span.item-type-icon';
+            const folderClass = M.viewmode ? 'icon-folder-public-90' : 'icon-folder-public-24';
+
+            $(viewModeClass, $nodeId).addClass(folderClass);
 
             if ($tree.length) {
-                $tree.addClass(folderClass);
+                $tree.addClass(treeClass);
             }
 
             if (d) {
@@ -97,13 +98,13 @@ lazy(mega, 'fileRequestCommon', () => {
             if (node && M.megaRender && M.megaRender.hasDOMNode(nodeId)) {
                 node = M.megaRender.getDOMNode(nodeId);
 
-                const viewModeClass = M.viewmode ? 'span.block-view-file-type' : 'span.transfer-filetype-icon';
-                $(viewModeClass, node)
-                    .removeClass(folderClass);
+                const viewModeClass = M.viewmode ? 'span.item-type-icon-90' : 'span.item-type-icon';
+                $(viewModeClass, node).removeClass('icon-folder-public-24 icon-folder-public-90')
+                    .addClass(M.viewmode ? 'icon-folder-90' : 'icon-folder-24');
             }
 
             $(`#treea_${nodeId} span.nw-fm-tree-folder`)
-                .removeClass(folderClass);
+                .removeClass(treeClass);
         }
     };
 

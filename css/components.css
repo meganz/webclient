@@ -114,9 +114,17 @@
     float: left;
     --mask-color: var(--stroke-main-inverted);
 }
-.btn-myfiles.active i:not(.icon-arrow-down),
-.btn-galleries.active i:not(.icon-arrow-down):not(.icon-link-small) {
+.btn-myfiles.active,
+.btn-galleries.active {
+    opacity: 1;
+}
+.btn-myfiles.active i:not(.icon-dropdown),
+.btn-galleries.active i:not(.icon-dropdown):not(.icon-link-small) {
     --mask-color: var(--secondary-blue);
+}
+.btn-myfiles.active i.icon-dropdown,
+.btn-galleries.active i.icon-dropdown {
+    --mask-color: var(--icon-active);
 }
 .rtl .btn-myfiles i,
 .rtl .btn-galleries i {
@@ -130,11 +138,7 @@
     cursor: pointer;
     color: var(--stroke-main-inverted);
     background-color: var(--stroke-grey-1);
-    box-shadow: 0 1px 4px 0 rgba(0,0,0,0.1);
-}
-.btn-myfiles.active,
-.btn-galleries.active {
-    opacity: 1;
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.1);
 }
 .btn-myfiles span,
 .btn-galleries span {
@@ -142,7 +146,7 @@
     margin-inline-end: 8px;
 }
 .lp-gallery .btn-galleries span {
-    width: 100%;
+    width: calc(100% - 40px);
 }
 
 .btn-galleries.subalbum-btn::after {
@@ -153,6 +157,10 @@
     right: -1px;
     background: var(--surface-tree-iconwrap);
     padding: 16px 16px 16px 4px;
+}
+
+.fm-other-tree-panel .btn-galleries.subalbum-btn::after {
+    right: -7px;
 }
 
 .rtl .btn-galleries.subalbum-btn::after {

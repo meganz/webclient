@@ -8,12 +8,7 @@
     width: var(--icon-size, 16px);
     height: var(--icon-size, 16px);
 }
-.sprite-fm-uni.icon-3d-24, .sprite-fm-uni-before.icon-3d-24-before::before, .sprite-fm-uni-after.icon-3d-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-3d-24");
-}
-.sprite-fm-uni.icon-3d-90, .sprite-fm-uni-before.icon-3d-90-before::before, .sprite-fm-uni-after.icon-3d-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-3d-90");
-}
+
 .sprite-fm-uni.icon-accounts, .sprite-fm-uni-before.icon-accounts-before::before, .sprite-fm-uni-after.icon-accounts-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-accounts");
 }
@@ -25,12 +20,6 @@
 }
 .sprite-fm-uni.icon-add-users, .sprite-fm-uni-before.icon-add-users-before::before, .sprite-fm-uni-after.icon-add-users-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-add-users");
-}
-.sprite-fm-uni.icon-aftereffects-24, .sprite-fm-uni-before.icon-aftereffects-24-before::before, .sprite-fm-uni-after.icon-aftereffects-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-aftereffects-24");
-}
-.sprite-fm-uni.icon-aftereffects-90, .sprite-fm-uni-before.icon-aftereffects-90-before::before, .sprite-fm-uni-after.icon-aftereffects-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-aftereffects-90");
 }
 .sprite-fm-uni.icon-amex, .sprite-fm-uni-before.icon-amex-before::before, .sprite-fm-uni-after.icon-amex-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-amex");
@@ -47,41 +36,17 @@
 .sprite-fm-uni.icon-audio, .sprite-fm-uni-before.icon-audio-before::before, .sprite-fm-uni-after.icon-audio-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-audio");
 }
-.sprite-fm-uni.icon-audio-24, .sprite-fm-uni-before.icon-audio-24-before::before, .sprite-fm-uni-after.icon-audio-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-audio-24");
-}
-.sprite-fm-uni.icon-audio-90, .sprite-fm-uni-before.icon-audio-90-before::before, .sprite-fm-uni-after.icon-audio-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-audio-90");
-}
 .sprite-fm-uni.icon-backup, .sprite-fm-uni-before.icon-backup-before::before, .sprite-fm-uni-after.icon-backup-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-backup");
 }
-.sprite-fm-uni.icon-backup-24, .sprite-fm-uni-before.icon-backup-24-before::before, .sprite-fm-uni-after.icon-backup-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-backup-24");
-}
-.sprite-fm-uni.icon-backup-90, .sprite-fm-uni-before.icon-backup-90-before::before, .sprite-fm-uni-after.icon-backup-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-backup-90");
-}
 .sprite-fm-uni.icon-backup-selected, .sprite-fm-uni-before.icon-backup-selected-before::before, .sprite-fm-uni-after.icon-backup-selected-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-backup-selected");
-}
-.sprite-fm-uni.icon-bucket-24, .sprite-fm-uni-before.icon-bucket-24-before::before, .sprite-fm-uni-after.icon-bucket-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-bucket-24");
-}
-.sprite-fm-uni.icon-bucket-90, .sprite-fm-uni-before.icon-bucket-90-before::before, .sprite-fm-uni-after.icon-bucket-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-bucket-90");
 }
 .sprite-fm-uni.icon-business, .sprite-fm-uni-before.icon-business-before::before, .sprite-fm-uni-after.icon-business-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-business");
 }
 .sprite-fm-uni.icon-business-selected, .sprite-fm-uni-before.icon-business-selected-before::before, .sprite-fm-uni-after.icon-business-selected-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-business-selected");
-}
-.sprite-fm-uni.icon-cad-24, .sprite-fm-uni-before.icon-cad-24-before::before, .sprite-fm-uni-after.icon-cad-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-cad-24");
-}
-.sprite-fm-uni.icon-cad-90, .sprite-fm-uni-before.icon-cad-90-before::before, .sprite-fm-uni-after.icon-cad-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-cad-90");
 }
 .sprite-fm-uni.icon-calendar, .sprite-fm-uni-before.icon-calendar-before::before, .sprite-fm-uni-after.icon-calendar-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-calendar");
@@ -121,12 +86,6 @@
 }
 .sprite-fm-uni.icon-clear-history, .sprite-fm-uni-before.icon-clear-history-before::before, .sprite-fm-uni-after.icon-clear-history-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-clear-history");
-}
-.sprite-fm-uni.icon-compressed-24, .sprite-fm-uni-before.icon-compressed-24-before::before, .sprite-fm-uni-after.icon-compressed-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-compressed-24");
-}
-.sprite-fm-uni.icon-compressed-90, .sprite-fm-uni-before.icon-compressed-90-before::before, .sprite-fm-uni-after.icon-compressed-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-compressed-90");
 }
 .sprite-fm-uni.icon-contact-add, .sprite-fm-uni-before.icon-contact-add-before::before, .sprite-fm-uni-after.icon-contact-add-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-contact-add");
@@ -182,12 +141,6 @@
 .sprite-fm-uni.icon-discover, .sprite-fm-uni-before.icon-discover-before::before, .sprite-fm-uni-after.icon-discover-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-discover");
 }
-.sprite-fm-uni.icon-dmg-24, .sprite-fm-uni-before.icon-dmg-24-before::before, .sprite-fm-uni-after.icon-dmg-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-dmg-24");
-}
-.sprite-fm-uni.icon-dmg-90, .sprite-fm-uni-before.icon-dmg-90-before::before, .sprite-fm-uni-after.icon-dmg-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-dmg-90");
-}
 .sprite-fm-uni.icon-document, .sprite-fm-uni-before.icon-document-before::before, .sprite-fm-uni-after.icon-document-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-document");
 }
@@ -203,30 +156,6 @@
 .sprite-fm-uni.icon-error, .sprite-fm-uni-before.icon-error-before::before, .sprite-fm-uni-after.icon-error-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-error");
 }
-.sprite-fm-uni.icon-ex-drive-24, .sprite-fm-uni-before.icon-ex-drive-24-before::before, .sprite-fm-uni-after.icon-ex-drive-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-ex-drive-24");
-}
-.sprite-fm-uni.icon-ex-drive-90, .sprite-fm-uni-before.icon-ex-drive-90-before::before, .sprite-fm-uni-after.icon-ex-drive-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-ex-drive-90");
-}
-.sprite-fm-uni.icon-excel-24, .sprite-fm-uni-before.icon-excel-24-before::before, .sprite-fm-uni-after.icon-excel-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-excel-24");
-}
-.sprite-fm-uni.icon-excel-90, .sprite-fm-uni-before.icon-excel-90-before::before, .sprite-fm-uni-after.icon-excel-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-excel-90");
-}
-.sprite-fm-uni.icon-executable-24, .sprite-fm-uni-before.icon-executable-24-before::before, .sprite-fm-uni-after.icon-executable-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-executable-24");
-}
-.sprite-fm-uni.icon-executable-90, .sprite-fm-uni-before.icon-executable-90-before::before, .sprite-fm-uni-after.icon-executable-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-executable-90");
-}
-.sprite-fm-uni.icon-experiencedesign-24, .sprite-fm-uni-before.icon-experiencedesign-24-before::before, .sprite-fm-uni-after.icon-experiencedesign-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-experiencedesign-24");
-}
-.sprite-fm-uni.icon-experiencedesign-90, .sprite-fm-uni-before.icon-experiencedesign-90-before::before, .sprite-fm-uni-after.icon-experiencedesign-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-experiencedesign-90");
-}
 .sprite-fm-uni.icon-facebook, .sprite-fm-uni-before.icon-facebook-before::before, .sprite-fm-uni-after.icon-facebook-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-facebook");
 }
@@ -239,56 +168,8 @@
 .sprite-fm-uni.icon-files-selected, .sprite-fm-uni-before.icon-files-selected-before::before, .sprite-fm-uni-after.icon-files-selected-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-files-selected");
 }
-.sprite-fm-uni.icon-folder-24, .sprite-fm-uni-before.icon-folder-24-before::before, .sprite-fm-uni-after.icon-folder-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-folder-24");
-}
-.sprite-fm-uni.icon-folder-90, .sprite-fm-uni-before.icon-folder-90-before::before, .sprite-fm-uni-after.icon-folder-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-folder-90");
-}
-.sprite-fm-uni.icon-folder-camera-uploads-24, .sprite-fm-uni-before.icon-folder-camera-uploads-24-before::before, .sprite-fm-uni-after.icon-folder-camera-uploads-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-folder-camera-uploads-24");
-}
-.sprite-fm-uni.icon-folder-camera-uploads-90, .sprite-fm-uni-before.icon-folder-camera-uploads-90-before::before, .sprite-fm-uni-after.icon-folder-camera-uploads-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-folder-camera-uploads-90");
-}
-.sprite-fm-uni.icon-folder-chat-24, .sprite-fm-uni-before.icon-folder-chat-24-before::before, .sprite-fm-uni-after.icon-folder-chat-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-folder-chat-24");
-}
-.sprite-fm-uni.icon-folder-chat-90, .sprite-fm-uni-before.icon-folder-chat-90-before::before, .sprite-fm-uni-after.icon-folder-chat-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-folder-chat-90");
-}
-.sprite-fm-uni.icon-folder-incoming-24, .sprite-fm-uni-before.icon-folder-incoming-24-before::before, .sprite-fm-uni-after.icon-folder-incoming-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-folder-incoming-24");
-}
-.sprite-fm-uni.icon-folder-incoming-90, .sprite-fm-uni-before.icon-folder-incoming-90-before::before, .sprite-fm-uni-after.icon-folder-incoming-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-folder-incoming-90");
-}
-.sprite-fm-uni.icon-folder-megadrop-24, .sprite-fm-uni-before.icon-folder-megadrop-24-before::before, .sprite-fm-uni-after.icon-folder-megadrop-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-folder-megadrop-24");
-}
-.sprite-fm-uni.icon-folder-megadrop-90, .sprite-fm-uni-before.icon-folder-megadrop-90-before::before, .sprite-fm-uni-after.icon-folder-megadrop-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-folder-megadrop-90");
-}
 .sprite-fm-uni.icon-folder-new, .sprite-fm-uni-before.icon-folder-new-before::before, .sprite-fm-uni-after.icon-folder-new-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-folder-new");
-}
-.sprite-fm-uni.icon-folder-outgoing-24, .sprite-fm-uni-before.icon-folder-outgoing-24-before::before, .sprite-fm-uni-after.icon-folder-outgoing-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-folder-outgoing-24");
-}
-.sprite-fm-uni.icon-folder-outgoing-90, .sprite-fm-uni-before.icon-folder-outgoing-90-before::before, .sprite-fm-uni-after.icon-folder-outgoing-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-folder-outgoing-90");
-}
-.sprite-fm-uni.icon-folder-public-24, .sprite-fm-uni-before.icon-folder-public-24-before::before, .sprite-fm-uni-after.icon-folder-public-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-folder-public-24");
-}
-.sprite-fm-uni.icon-folder-public-90, .sprite-fm-uni-before.icon-folder-public-90-before::before, .sprite-fm-uni-after.icon-folder-public-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-folder-public-90");
-}
-.sprite-fm-uni.icon-folder-sync-24, .sprite-fm-uni-before.icon-folder-sync-24-before::before, .sprite-fm-uni-after.icon-folder-sync-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-folder-sync-24");
-}
-.sprite-fm-uni.icon-folder-sync-90, .sprite-fm-uni-before.icon-folder-sync-90-before::before, .sprite-fm-uni-after.icon-folder-sync-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-folder-sync-90");
 }
 .sprite-fm-uni.icon-folder-upload, .sprite-fm-uni-before.icon-folder-upload-before::before, .sprite-fm-uni-after.icon-folder-upload-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-folder-upload");
@@ -296,23 +177,11 @@
 .sprite-fm-uni.icon-folder-upload-1, .sprite-fm-uni-before.icon-folder-upload-1-before::before, .sprite-fm-uni-after.icon-folder-upload-1-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-folder-upload-1");
 }
-.sprite-fm-uni.icon-font-24, .sprite-fm-uni-before.icon-font-24-before::before, .sprite-fm-uni-after.icon-font-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-font-24");
-}
-.sprite-fm-uni.icon-font-90, .sprite-fm-uni-before.icon-font-90-before::before, .sprite-fm-uni-after.icon-font-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-font-90");
-}
 .sprite-fm-uni.icon-gallery, .sprite-fm-uni-before.icon-gallery-before::before, .sprite-fm-uni-after.icon-gallery-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-gallery");
 }
 .sprite-fm-uni.icon-gallery-selected, .sprite-fm-uni-before.icon-gallery-selected-before::before, .sprite-fm-uni-after.icon-gallery-selected-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-gallery-selected");
-}
-.sprite-fm-uni.icon-generic-24, .sprite-fm-uni-before.icon-generic-24-before::before, .sprite-fm-uni-after.icon-generic-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-generic-24");
-}
-.sprite-fm-uni.icon-generic-90, .sprite-fm-uni-before.icon-generic-90-before::before, .sprite-fm-uni-after.icon-generic-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-generic-90");
 }
 .sprite-fm-uni.icon-gif-hover, .sprite-fm-uni-before.icon-gif-hover-before::before, .sprite-fm-uni-after.icon-gif-hover-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-gif-hover");
@@ -326,24 +195,6 @@
 .sprite-fm-uni.icon-home, .sprite-fm-uni-before.icon-home-before::before, .sprite-fm-uni-after.icon-home-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-home");
 }
-.sprite-fm-uni.icon-illustrator-24, .sprite-fm-uni-before.icon-illustrator-24-before::before, .sprite-fm-uni-after.icon-illustrator-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-illustrator-24");
-}
-.sprite-fm-uni.icon-illustrator-90, .sprite-fm-uni-before.icon-illustrator-90-before::before, .sprite-fm-uni-after.icon-illustrator-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-illustrator-90");
-}
-.sprite-fm-uni.icon-image-24, .sprite-fm-uni-before.icon-image-24-before::before, .sprite-fm-uni-after.icon-image-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-image-24");
-}
-.sprite-fm-uni.icon-image-90, .sprite-fm-uni-before.icon-image-90-before::before, .sprite-fm-uni-after.icon-image-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-image-90");
-}
-.sprite-fm-uni.icon-indesign-24, .sprite-fm-uni-before.icon-indesign-24-before::before, .sprite-fm-uni-after.icon-indesign-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-indesign-24");
-}
-.sprite-fm-uni.icon-indesign-90, .sprite-fm-uni-before.icon-indesign-90-before::before, .sprite-fm-uni-after.icon-indesign-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-indesign-90");
-}
 .sprite-fm-uni.icon-info, .sprite-fm-uni-before.icon-info-before::before, .sprite-fm-uni-after.icon-info-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-info");
 }
@@ -352,12 +203,6 @@
 }
 .sprite-fm-uni.icon-jcb, .sprite-fm-uni-before.icon-jcb-before::before, .sprite-fm-uni-after.icon-jcb-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-jcb");
-}
-.sprite-fm-uni.icon-keynote-24, .sprite-fm-uni-before.icon-keynote-24-before::before, .sprite-fm-uni-after.icon-keynote-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-keynote-24");
-}
-.sprite-fm-uni.icon-keynote-90, .sprite-fm-uni-before.icon-keynote-90-before::before, .sprite-fm-uni-after.icon-keynote-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-keynote-90");
 }
 .sprite-fm-uni.icon-link, .sprite-fm-uni-before.icon-link-before::before, .sprite-fm-uni-after.icon-link-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-link");
@@ -380,128 +225,14 @@
 .sprite-fm-uni.icon-mega-logo, .sprite-fm-uni-before.icon-mega-logo-before::before, .sprite-fm-uni-after.icon-mega-logo-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-mega-logo");
 }
-.sprite-fm-uni.icon-mobile-24, .sprite-fm-uni-before.icon-mobile-24-before::before, .sprite-fm-uni-after.icon-mobile-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-mobile-24");
-}
-.sprite-fm-uni.icon-mobile-90, .sprite-fm-uni-before.icon-mobile-90-before::before, .sprite-fm-uni-after.icon-mobile-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-mobile-90");
-}
-.sprite-fm-uni.icon-mobile-android-24, .sprite-fm-uni-before.icon-mobile-android-24-before::before, .sprite-fm-uni-after.icon-mobile-android-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-mobile-android-24");
-}
-.sprite-fm-uni.icon-mobile-android-90, .sprite-fm-uni-before.icon-mobile-android-90-before::before, .sprite-fm-uni-after.icon-mobile-android-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-mobile-android-90");
-}
-.sprite-fm-uni.icon-mobile-ios-24, .sprite-fm-uni-before.icon-mobile-ios-24-before::before, .sprite-fm-uni-after.icon-mobile-ios-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-mobile-ios-24");
-}
-.sprite-fm-uni.icon-mobile-ios-90, .sprite-fm-uni-before.icon-mobile-ios-90-before::before, .sprite-fm-uni-after.icon-mobile-ios-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-mobile-ios-90");
-}
 .sprite-fm-uni.icon-new, .sprite-fm-uni-before.icon-new-before::before, .sprite-fm-uni-after.icon-new-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-new");
-}
-.sprite-fm-uni.icon-numbers-24, .sprite-fm-uni-before.icon-numbers-24-before::before, .sprite-fm-uni-after.icon-numbers-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-numbers-24");
-}
-.sprite-fm-uni.icon-numbers-90, .sprite-fm-uni-before.icon-numbers-90-before::before, .sprite-fm-uni-after.icon-numbers-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-numbers-90");
-}
-.sprite-fm-uni.icon-open-folder-24, .sprite-fm-uni-before.icon-open-folder-24-before::before, .sprite-fm-uni-after.icon-open-folder-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-open-folder-24");
-}
-.sprite-fm-uni.icon-open-folder-camera-uploads-24, .sprite-fm-uni-before.icon-open-folder-camera-uploads-24-before::before, .sprite-fm-uni-after.icon-open-folder-camera-uploads-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-open-folder-camera-uploads-24");
-}
-.sprite-fm-uni.icon-open-folder-chat-24, .sprite-fm-uni-before.icon-open-folder-chat-24-before::before, .sprite-fm-uni-after.icon-open-folder-chat-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-open-folder-chat-24");
-}
-.sprite-fm-uni.icon-open-folder-incoming-24, .sprite-fm-uni-before.icon-open-folder-incoming-24-before::before, .sprite-fm-uni-after.icon-open-folder-incoming-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-open-folder-incoming-24");
-}
-.sprite-fm-uni.icon-open-folder-megadrop-24, .sprite-fm-uni-before.icon-open-folder-megadrop-24-before::before, .sprite-fm-uni-after.icon-open-folder-megadrop-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-open-folder-megadrop-24");
-}
-.sprite-fm-uni.icon-open-folder-outgoing-24, .sprite-fm-uni-before.icon-open-folder-outgoing-24-before::before, .sprite-fm-uni-after.icon-open-folder-outgoing-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-open-folder-outgoing-24");
-}
-.sprite-fm-uni.icon-open-folder-public-24, .sprite-fm-uni-before.icon-open-folder-public-24-before::before, .sprite-fm-uni-after.icon-open-folder-public-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-open-folder-public-24");
-}
-.sprite-fm-uni.icon-open-folder-sync-24, .sprite-fm-uni-before.icon-open-folder-sync-24-before::before, .sprite-fm-uni-after.icon-open-folder-sync-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-open-folder-sync-24");
-}
-.sprite-fm-uni.icon-open-office-24, .sprite-fm-uni-before.icon-open-office-24-before::before, .sprite-fm-uni-after.icon-open-office-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-open-office-24");
-}
-.sprite-fm-uni.icon-open-office-90, .sprite-fm-uni-before.icon-open-office-90-before::before, .sprite-fm-uni-after.icon-open-office-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-open-office-90");
-}
-.sprite-fm-uni.icon-open-rubbish-folder-24, .sprite-fm-uni-before.icon-open-rubbish-folder-24-before::before, .sprite-fm-uni-after.icon-open-rubbish-folder-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-open-rubbish-folder-24");
-}
-.sprite-fm-uni.icon-open-rubbish-folder-camera-uploads-24, .sprite-fm-uni-before.icon-open-rubbish-folder-camera-uploads-24-before::before, .sprite-fm-uni-after.icon-open-rubbish-folder-camera-uploads-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-open-rubbish-folder-camera-uploads-24");
-}
-.sprite-fm-uni.icon-open-rubbish-folder-chat-24, .sprite-fm-uni-before.icon-open-rubbish-folder-chat-24-before::before, .sprite-fm-uni-after.icon-open-rubbish-folder-chat-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-open-rubbish-folder-chat-24");
-}
-.sprite-fm-uni.icon-open-rubbish-folder-incoming-24, .sprite-fm-uni-before.icon-open-rubbish-folder-incoming-24-before::before, .sprite-fm-uni-after.icon-open-rubbish-folder-incoming-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-open-rubbish-folder-incoming-24");
-}
-.sprite-fm-uni.icon-open-rubbish-folder-megadrop-24, .sprite-fm-uni-before.icon-open-rubbish-folder-megadrop-24-before::before, .sprite-fm-uni-after.icon-open-rubbish-folder-megadrop-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-open-rubbish-folder-megadrop-24");
-}
-.sprite-fm-uni.icon-open-rubbish-folder-outgoing-24, .sprite-fm-uni-before.icon-open-rubbish-folder-outgoing-24-before::before, .sprite-fm-uni-after.icon-open-rubbish-folder-outgoing-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-open-rubbish-folder-outgoing-24");
-}
-.sprite-fm-uni.icon-open-rubbish-folder-public-24, .sprite-fm-uni-before.icon-open-rubbish-folder-public-24-before::before, .sprite-fm-uni-after.icon-open-rubbish-folder-public-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-open-rubbish-folder-public-24");
-}
-.sprite-fm-uni.icon-open-rubbish-folder-sync-24, .sprite-fm-uni-before.icon-open-rubbish-folder-sync-24-before::before, .sprite-fm-uni-after.icon-open-rubbish-folder-sync-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-open-rubbish-folder-sync-24");
 }
 .sprite-fm-uni.icon-owner, .sprite-fm-uni-before.icon-owner-before::before, .sprite-fm-uni-after.icon-owner-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-owner");
 }
-.sprite-fm-uni.icon-pages-24, .sprite-fm-uni-before.icon-pages-24-before::before, .sprite-fm-uni-after.icon-pages-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-pages-24");
-}
-.sprite-fm-uni.icon-pages-90, .sprite-fm-uni-before.icon-pages-90-before::before, .sprite-fm-uni-after.icon-pages-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-pages-90");
-}
 .sprite-fm-uni.icon-payment, .sprite-fm-uni-before.icon-payment-before::before, .sprite-fm-uni-after.icon-payment-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-payment");
-}
-.sprite-fm-uni.icon-pc-24, .sprite-fm-uni-before.icon-pc-24-before::before, .sprite-fm-uni-after.icon-pc-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-pc-24");
-}
-.sprite-fm-uni.icon-pc-90, .sprite-fm-uni-before.icon-pc-90-before::before, .sprite-fm-uni-after.icon-pc-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-pc-90");
-}
-.sprite-fm-uni.icon-pc-linux-24, .sprite-fm-uni-before.icon-pc-linux-24-before::before, .sprite-fm-uni-after.icon-pc-linux-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-pc-linux-24");
-}
-.sprite-fm-uni.icon-pc-linux-90, .sprite-fm-uni-before.icon-pc-linux-90-before::before, .sprite-fm-uni-after.icon-pc-linux-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-pc-linux-90");
-}
-.sprite-fm-uni.icon-pc-mac-24, .sprite-fm-uni-before.icon-pc-mac-24-before::before, .sprite-fm-uni-after.icon-pc-mac-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-pc-mac-24");
-}
-.sprite-fm-uni.icon-pc-mac-90, .sprite-fm-uni-before.icon-pc-mac-90-before::before, .sprite-fm-uni-after.icon-pc-mac-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-pc-mac-90");
-}
-.sprite-fm-uni.icon-pc-win-24, .sprite-fm-uni-before.icon-pc-win-24-before::before, .sprite-fm-uni-after.icon-pc-win-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-pc-win-24");
-}
-.sprite-fm-uni.icon-pc-win-90, .sprite-fm-uni-before.icon-pc-win-90-before::before, .sprite-fm-uni-after.icon-pc-win-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-pc-win-90");
-}
-.sprite-fm-uni.icon-pdf-24, .sprite-fm-uni-before.icon-pdf-24-before::before, .sprite-fm-uni-after.icon-pdf-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-pdf-24");
-}
-.sprite-fm-uni.icon-pdf-90, .sprite-fm-uni-before.icon-pdf-90-before::before, .sprite-fm-uni-after.icon-pdf-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-pdf-90");
 }
 .sprite-fm-uni.icon-pending-euro, .sprite-fm-uni-before.icon-pending-euro-before::before, .sprite-fm-uni-after.icon-pending-euro-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-pending-euro");
@@ -512,35 +243,11 @@
 .sprite-fm-uni.icon-photos, .sprite-fm-uni-before.icon-photos-before::before, .sprite-fm-uni-after.icon-photos-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-photos");
 }
-.sprite-fm-uni.icon-photoshop-24, .sprite-fm-uni-before.icon-photoshop-24-before::before, .sprite-fm-uni-after.icon-photoshop-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-photoshop-24");
-}
-.sprite-fm-uni.icon-photoshop-90, .sprite-fm-uni-before.icon-photoshop-90-before::before, .sprite-fm-uni-after.icon-photoshop-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-photoshop-90");
-}
 .sprite-fm-uni.icon-plan-expiry, .sprite-fm-uni-before.icon-plan-expiry-before::before, .sprite-fm-uni-after.icon-plan-expiry-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-plan-expiry");
 }
-.sprite-fm-uni.icon-powerpoint-24, .sprite-fm-uni-before.icon-powerpoint-24-before::before, .sprite-fm-uni-after.icon-powerpoint-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-powerpoint-24");
-}
-.sprite-fm-uni.icon-powerpoint-90, .sprite-fm-uni-before.icon-powerpoint-90-before::before, .sprite-fm-uni-after.icon-powerpoint-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-powerpoint-90");
-}
-.sprite-fm-uni.icon-premiere-24, .sprite-fm-uni-before.icon-premiere-24-before::before, .sprite-fm-uni-after.icon-premiere-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-premiere-24");
-}
-.sprite-fm-uni.icon-premiere-90, .sprite-fm-uni-before.icon-premiere-90-before::before, .sprite-fm-uni-after.icon-premiere-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-premiere-90");
-}
 .sprite-fm-uni.icon-question, .sprite-fm-uni-before.icon-question-before::before, .sprite-fm-uni-after.icon-question-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-question");
-}
-.sprite-fm-uni.icon-raw-24, .sprite-fm-uni-before.icon-raw-24-before::before, .sprite-fm-uni-after.icon-raw-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-raw-24");
-}
-.sprite-fm-uni.icon-raw-90, .sprite-fm-uni-before.icon-raw-90-before::before, .sprite-fm-uni-after.icon-raw-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-raw-90");
 }
 .sprite-fm-uni.icon-recovery-key, .sprite-fm-uni-before.icon-recovery-key-before::before, .sprite-fm-uni-after.icon-recovery-key-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-recovery-key");
@@ -550,54 +257,6 @@
 }
 .sprite-fm-uni.icon-rename, .sprite-fm-uni-before.icon-rename-before::before, .sprite-fm-uni-after.icon-rename-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-rename");
-}
-.sprite-fm-uni.icon-rubbish-folder-24, .sprite-fm-uni-before.icon-rubbish-folder-24-before::before, .sprite-fm-uni-after.icon-rubbish-folder-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-rubbish-folder-24");
-}
-.sprite-fm-uni.icon-rubbish-folder-90, .sprite-fm-uni-before.icon-rubbish-folder-90-before::before, .sprite-fm-uni-after.icon-rubbish-folder-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-rubbish-folder-90");
-}
-.sprite-fm-uni.icon-rubbish-folder-backup-90, .sprite-fm-uni-before.icon-rubbish-folder-backup-90-before::before, .sprite-fm-uni-after.icon-rubbish-folder-backup-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-rubbish-folder-backup-90");
-}
-.sprite-fm-uni.icon-rubbish-folder-camera-uploads-24, .sprite-fm-uni-before.icon-rubbish-folder-camera-uploads-24-before::before, .sprite-fm-uni-after.icon-rubbish-folder-camera-uploads-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-rubbish-folder-camera-uploads-24");
-}
-.sprite-fm-uni.icon-rubbish-folder-camera-uploads-90, .sprite-fm-uni-before.icon-rubbish-folder-camera-uploads-90-before::before, .sprite-fm-uni-after.icon-rubbish-folder-camera-uploads-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-rubbish-folder-camera-uploads-90");
-}
-.sprite-fm-uni.icon-rubbish-folder-chat-24, .sprite-fm-uni-before.icon-rubbish-folder-chat-24-before::before, .sprite-fm-uni-after.icon-rubbish-folder-chat-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-rubbish-folder-chat-24");
-}
-.sprite-fm-uni.icon-rubbish-folder-chat-90, .sprite-fm-uni-before.icon-rubbish-folder-chat-90-before::before, .sprite-fm-uni-after.icon-rubbish-folder-chat-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-rubbish-folder-chat-90");
-}
-.sprite-fm-uni.icon-rubbish-folder-incoming-24, .sprite-fm-uni-before.icon-rubbish-folder-incoming-24-before::before, .sprite-fm-uni-after.icon-rubbish-folder-incoming-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-rubbish-folder-incoming-24");
-}
-.sprite-fm-uni.icon-rubbish-folder-incoming-90, .sprite-fm-uni-before.icon-rubbish-folder-incoming-90-before::before, .sprite-fm-uni-after.icon-rubbish-folder-incoming-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-rubbish-folder-incoming-90");
-}
-.sprite-fm-uni.icon-rubbish-folder-megadrop-24, .sprite-fm-uni-before.icon-rubbish-folder-megadrop-24-before::before, .sprite-fm-uni-after.icon-rubbish-folder-megadrop-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-rubbish-folder-megadrop-24");
-}
-.sprite-fm-uni.icon-rubbish-folder-outgoing-24, .sprite-fm-uni-before.icon-rubbish-folder-outgoing-24-before::before, .sprite-fm-uni-after.icon-rubbish-folder-outgoing-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-rubbish-folder-outgoing-24");
-}
-.sprite-fm-uni.icon-rubbish-folder-outgoing-90, .sprite-fm-uni-before.icon-rubbish-folder-outgoing-90-before::before, .sprite-fm-uni-after.icon-rubbish-folder-outgoing-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-rubbish-folder-outgoing-90");
-}
-.sprite-fm-uni.icon-rubbish-folder-public-24, .sprite-fm-uni-before.icon-rubbish-folder-public-24-before::before, .sprite-fm-uni-after.icon-rubbish-folder-public-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-rubbish-folder-public-24");
-}
-.sprite-fm-uni.icon-rubbish-folder-public-90, .sprite-fm-uni-before.icon-rubbish-folder-public-90-before::before, .sprite-fm-uni-after.icon-rubbish-folder-public-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-rubbish-folder-public-90");
-}
-.sprite-fm-uni.icon-rubbish-folder-sync-24, .sprite-fm-uni-before.icon-rubbish-folder-sync-24-before::before, .sprite-fm-uni-after.icon-rubbish-folder-sync-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-rubbish-folder-sync-24");
-}
-.sprite-fm-uni.icon-rubbish-folder-sync-90, .sprite-fm-uni-before.icon-rubbish-folder-sync-90-before::before, .sprite-fm-uni-after.icon-rubbish-folder-sync-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-rubbish-folder-sync-90");
 }
 .sprite-fm-uni.icon-send-cloud-drive, .sprite-fm-uni-before.icon-send-cloud-drive-before::before, .sprite-fm-uni-after.icon-send-cloud-drive-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-send-cloud-drive");
@@ -620,18 +279,6 @@
 .sprite-fm-uni.icon-sidebar-collapse-right, .sprite-fm-uni-before.icon-sidebar-collapse-right-before::before, .sprite-fm-uni-after.icon-sidebar-collapse-right-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-sidebar-collapse-right");
 }
-.sprite-fm-uni.icon-sketch-24, .sprite-fm-uni-before.icon-sketch-24-before::before, .sprite-fm-uni-after.icon-sketch-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-sketch-24");
-}
-.sprite-fm-uni.icon-sketch-90, .sprite-fm-uni-before.icon-sketch-90-before::before, .sprite-fm-uni-after.icon-sketch-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-sketch-90");
-}
-.sprite-fm-uni.icon-spreadsheet-24, .sprite-fm-uni-before.icon-spreadsheet-24-before::before, .sprite-fm-uni-after.icon-spreadsheet-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-spreadsheet-24");
-}
-.sprite-fm-uni.icon-spreadsheet-90, .sprite-fm-uni-before.icon-spreadsheet-90-before::before, .sprite-fm-uni-after.icon-spreadsheet-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-spreadsheet-90");
-}
 .sprite-fm-uni.icon-storage-quota, .sprite-fm-uni-before.icon-storage-quota-before::before, .sprite-fm-uni-after.icon-storage-quota-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-storage-quota");
 }
@@ -644,20 +291,8 @@
 .sprite-fm-uni.icon-takedown, .sprite-fm-uni-before.icon-takedown-before::before, .sprite-fm-uni-after.icon-takedown-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-takedown");
 }
-.sprite-fm-uni.icon-text-24, .sprite-fm-uni-before.icon-text-24-before::before, .sprite-fm-uni-after.icon-text-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-text-24");
-}
-.sprite-fm-uni.icon-text-90, .sprite-fm-uni-before.icon-text-90-before::before, .sprite-fm-uni-after.icon-text-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-text-90");
-}
 .sprite-fm-uni.icon-threads, .sprite-fm-uni-before.icon-threads-before::before, .sprite-fm-uni-after.icon-threads-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-threads");
-}
-.sprite-fm-uni.icon-torrent-24, .sprite-fm-uni-before.icon-torrent-24-before::before, .sprite-fm-uni-after.icon-torrent-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-torrent-24");
-}
-.sprite-fm-uni.icon-torrent-90, .sprite-fm-uni-before.icon-torrent-90-before::before, .sprite-fm-uni-after.icon-torrent-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-torrent-90");
 }
 .sprite-fm-uni.icon-transfer-full-meter, .sprite-fm-uni-before.icon-transfer-full-meter-before::before, .sprite-fm-uni-after.icon-transfer-full-meter-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-transfer-full-meter");
@@ -680,29 +315,11 @@
 .sprite-fm-uni.icon-upgrade-to-pro, .sprite-fm-uni-before.icon-upgrade-to-pro-before::before, .sprite-fm-uni-after.icon-upgrade-to-pro-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-upgrade-to-pro");
 }
-.sprite-fm-uni.icon-url-24, .sprite-fm-uni-before.icon-url-24-before::before, .sprite-fm-uni-after.icon-url-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-url-24");
-}
-.sprite-fm-uni.icon-url-90, .sprite-fm-uni-before.icon-url-90-before::before, .sprite-fm-uni-after.icon-url-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-url-90");
-}
 .sprite-fm-uni.icon-users, .sprite-fm-uni-before.icon-users-before::before, .sprite-fm-uni-after.icon-users-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-users");
 }
-.sprite-fm-uni.icon-vector-24, .sprite-fm-uni-before.icon-vector-24-before::before, .sprite-fm-uni-after.icon-vector-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-vector-24");
-}
-.sprite-fm-uni.icon-vector-90, .sprite-fm-uni-before.icon-vector-90-before::before, .sprite-fm-uni-after.icon-vector-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-vector-90");
-}
 .sprite-fm-uni.icon-video, .sprite-fm-uni-before.icon-video-before::before, .sprite-fm-uni-after.icon-video-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-video");
-}
-.sprite-fm-uni.icon-video-24, .sprite-fm-uni-before.icon-video-24-before::before, .sprite-fm-uni-after.icon-video-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-video-24");
-}
-.sprite-fm-uni.icon-video-90, .sprite-fm-uni-before.icon-video-90-before::before, .sprite-fm-uni-after.icon-video-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-video-90");
 }
 .sprite-fm-uni.icon-visa, .sprite-fm-uni-before.icon-visa-before::before, .sprite-fm-uni-after.icon-visa-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-visa");
@@ -716,26 +333,8 @@
 .sprite-fm-uni.icon-weak-signal, .sprite-fm-uni-before.icon-weak-signal-before::before, .sprite-fm-uni-after.icon-weak-signal-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-weak-signal");
 }
-.sprite-fm-uni.icon-web-data-24, .sprite-fm-uni-before.icon-web-data-24-before::before, .sprite-fm-uni-after.icon-web-data-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-web-data-24");
-}
-.sprite-fm-uni.icon-web-data-90, .sprite-fm-uni-before.icon-web-data-90-before::before, .sprite-fm-uni-after.icon-web-data-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-web-data-90");
-}
-.sprite-fm-uni.icon-web-lang-24, .sprite-fm-uni-before.icon-web-lang-24-before::before, .sprite-fm-uni-after.icon-web-lang-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-web-lang-24");
-}
-.sprite-fm-uni.icon-web-lang-90, .sprite-fm-uni-before.icon-web-lang-90-before::before, .sprite-fm-uni-after.icon-web-lang-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-web-lang-90");
-}
 .sprite-fm-uni.icon-web-link, .sprite-fm-uni-before.icon-web-link-before::before, .sprite-fm-uni-after.icon-web-link-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-web-link");
-}
-.sprite-fm-uni.icon-word-24, .sprite-fm-uni-before.icon-word-24-before::before, .sprite-fm-uni-after.icon-word-24-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-word-24");
-}
-.sprite-fm-uni.icon-word-90, .sprite-fm-uni-before.icon-word-90-before::before, .sprite-fm-uni-after.icon-word-90-after::after {
-   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-word-90");
 }
 .sprite-fm-uni.icon-youtube, .sprite-fm-uni-before.icon-youtube-before::before, .sprite-fm-uni-after.icon-youtube-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-youtube");

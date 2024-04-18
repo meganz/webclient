@@ -36,7 +36,7 @@ mobile.recoveryLogout = {
             const copyButton = new MegaMobileButton({
                 parentNode: rkinput,
                 type: 'icon',
-                icon: 'sprite-mobile-fm-mono icon-copy-thin-outline',
+                icon: 'sprite-mobile-fm-mono icon-square-copy',
                 iconSize: 20,
                 componentClassname: 'text-icon'
             });

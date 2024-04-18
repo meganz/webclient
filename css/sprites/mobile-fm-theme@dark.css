@@ -8,6 +8,7 @@
     width: var(--icon-size, 16px);
     height: var(--icon-size, 16px);
 }
+
 .theme-dark .sprite-mobile-fm-theme.icon-loader-throbber-thin-outline, .theme-dark .sprite-mobile-fm-theme-before.icon-loader-throbber-thin-outline-before::before, .theme-dark .sprite-mobile-fm-theme-after.icon-loader-throbber-thin-outline-after::after,
 .theme-dark-forced .sprite-mobile-fm-theme.icon-loader-throbber-thin-outline, .theme-dark-forced .sprite-mobile-fm-theme-before.icon-loader-throbber-thin-outline-before::before, .theme-dark-forced .sprite-mobile-fm-theme-after.icon-loader-throbber-thin-outline-after::after {
    background-image: url("../../images/sprites/mobile-fm-theme@dark.svg#icon-loader-throbber-thin-outline");

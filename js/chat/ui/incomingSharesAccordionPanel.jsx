@@ -14,7 +14,7 @@ class SharedFolderItem extends MegaRenderMixin {
             onDoubleClick={function() {
                 M.openFolder(node.h);
             }}>
-            <div className={"medium-file-icon inbound-share"}></div>
+            <div className={"item-type-icon-90 icon-folder-incoming-90"}></div>
             <div className="chat-shared-info">
                 <span className="txt">{node.name}</span>
                 <span className="txt small">{fm_contains(node.tf, node.td)}</span>
@@ -99,8 +99,8 @@ class IncSharesAccordionPanel extends MegaRenderMixin {
                             <div className="chat-share-nav show-all" onClick={function() {
                                 M.openFolder(contactHandle);
                             }}>
-                                <span className="transfer-filetype-icon inbound-share">
-                                    <span className="transfer-filetype-icon inbound-share"></span>
+                                <span className="item-type-icon icon-folder-incoming-24">
+                                    <span className="item-type-icon icon-folder-incoming-24"></span>
                                 </span>
                                 <span className="txt">{l[19797] ? l[19797] : "Show All"}</span>
                             </div>

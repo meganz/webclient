@@ -146,6 +146,8 @@ function sharedUInode(nodeHandle, force) {
     var UiExportLink = new mega.UI.Share.ExportLink();
     var share = new mega.Share();
     var target;
+    const iconSize = M.viewmode ? 90 : 24;
+    const iconSpriteClass = `item-type-icon${M.viewmode ? '-90' : ''}`;
 
     // Is there a full share or pending share available
     if ((M.d[nodeHandle] && M.d[nodeHandle].shares) || M.ps[nodeHandle]) {
@@ -183,18 +185,16 @@ function sharedUInode(nodeHandle, force) {
 
     // t === 1, folder
     if (M.d[nodeHandle] && M.d[nodeHandle].t) {
-        const icon = fileIcon(M.d[nodeHandle]);
-        const className = M.viewmode ? 'block-view-file-type' : 'transfer-filetype-icon';
 
         target = document.getElementById(nodeHandle);
 
         if (target) {
 
             // Update right panel selected node with appropriate icon
-            target = target.querySelector(`.${className}`);
+            target = target.querySelector(`.${iconSpriteClass}`);
 
             if (target) {
-                target.setAttribute('class', `${className} folder ${icon}`);
+                target.className = `${iconSpriteClass} icon-${fileIcon(M.d[nodeHandle])}-${iconSize} folder`;
             }
         }
     }
@@ -214,10 +214,10 @@ function sharedUInode(nodeHandle, force) {
         if (target) {
 
             // Right panel
-            target = target.querySelector(M.viewmode ? '.block-view-file-type' : '.transfer-filetype-icon');
+            target = target.querySelector(`.${iconSpriteClass}`);
 
             if (target) {
-                target.classList.remove('folder-shared');
+                target.classList.replace((`icon-folder-outgoing-${iconSize}`), `icon-folder-${iconSize}`);
             }
         }
 
@@ -620,6 +620,7 @@ function fmtopUI() {
                 $fmShareButton.removeClass('hidden').rebind('click.shareFolder', () => {
                     $.selected = [n.h];
                     M.openSharingDialog($.selected[0]);
+                    eventlog(500034);
                     return false;
                 });
             }
@@ -804,7 +805,10 @@ function initTreeScroll() {
     var treeClass = 'js-myfiles-panel';
     var scrollBlock;
 
-    if (folderlink || M.currentTreeType !== 'cloud-drive') {
+    if (M.currentTreeType === 'gallery') {
+        treeClass = 'js-gallery-panel';
+    }
+    else if (folderlink || M.currentTreeType !== 'cloud-drive') {
         treeClass = 'js-other-tree-panel';
 
         $('.js-other-tree-panel .section-title')
@@ -1350,8 +1354,8 @@ function renameDialog() {
         $('header h2', $dialog).text(n.t ? n.s4 ? l.s4_bucket_rename : l[425] : l[426]);
         $input.val(n.name);
 
-        $('.transfer-filetype-icon', $dialog)
-            .attr('class', 'transfer-filetype-icon ' + fileIcon(n));
+        $('.item-type-icon', $dialog)
+            .attr('class', `item-type-icon icon-${fileIcon(n)}-24`);
 
         if (!n.t && ext.length > 0) {
             $input[0].selectionStart = 0;
@@ -2752,6 +2756,7 @@ function initShareDialog() {
                 var share = new mega.Share();
 
                 share.updateNodeShares();
+                eventlog(500037);
             });
         }
 
@@ -3659,7 +3664,7 @@ function sharedFolderUI() {
 
         $('.shared-details-block').prepend(
             '<div class="shared-top-details">'
-                + '<div class="shared-details-icon"></div>'
+                + '<i class="shared-details-icon item-type-icon-90 icon-folder-incoming-90"></i>'
                 + '<div class="shared-details-info-block">'
                     + '<div class="shared-details-pad">'
                         + '<div class="shared-details-folder-name">' + escapeHTML(folderName) + '</div>'

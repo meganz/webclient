@@ -111,13 +111,6 @@ var load_error_types = {
     file_load_error: 2
 };
 
-if (Object.fromEntries) {
-    if (is_karma) {
-        Object.freeze = echo;
-    }
-    Object.freeze(Object);
-}
-
 Object.defineProperties(self, {
     'freeze': {
         value: function freeze(obj) {
@@ -275,7 +268,7 @@ function getSitePath() {
         }
     }
 
-    if (isPublickLinkV2(document.location.pathname)) {
+    if (isPublicLinkV2(document.location.pathname)) {
         return document.location.pathname + document.location.hash;
     }
 
@@ -393,7 +386,7 @@ function isPublicLink(page) {
     return (page[0] === '!' || types[page.substr(0, 2)]) ? page : false;
 }
 
-function isPublickLinkV2(page) {
+function isPublicLinkV2(page) {
     'use strict';
     page = getCleanSitePath(page);
 
@@ -1017,6 +1010,19 @@ if (tmp.substr(0, 12) === 'sitetransfer') {
 }
 else if (tmp.substr(0, 4) === 'test') {
     hashLogic = true;
+    tmp = -0x8feed;
+}
+
+Object.defineProperty(self, 'mShowAds', {
+    value: (is_livesite || localStorage.gads) && !is_extension && !(localStorage.sid || sessionStorage.sid)
+});
+
+// eslint-disable-next-line es/no-object-fromentries
+if (Object.fromEntries && !self.mShowAds) {
+    if (is_karma || tmp === -0x8feed) {
+        Object.freeze = echo;
+    }
+    Object.freeze(Object);
 }
 
 if (!browserUpdate && is_extension)
@@ -1119,7 +1125,7 @@ else if ((page = isPublicLink(document.location.hash))) {
     // history.replaceState so that back button works in new URL paradigm
     history.replaceState({ subpage: page }, "", '#' + page);
 }
-else if (isPublickLinkV2(document.location.pathname)) {
+else if (isPublicLinkV2(document.location.pathname)) {
     page = getCleanSitePath();
     history.replaceState({ subpage: page }, "", '/' + page);
 
@@ -2793,6 +2799,8 @@ else if (!browserUpdate) {
 
     // Sprites
     jsl.push({f:'css/sprites/fm-uni@uni.css', n: 'fm_uni_css', j:2, w:30, c:1, d:1, cache:1});
+    jsl.push({f:'css/sprites/fm-mime@uni.css', n: 'fm_mime_css', j:2, w:30, c:1, d:1, cache:1});
+    jsl.push({f:'css/sprites/fm-mime-90@uni.css', n: 'fm_mime_90_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/sprites/fm-mono@mono.css', n: 'fm_mono_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/sprites/fm-theme@dark.css', n: 'fm_dark_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/sprites/fm-theme@light.css', n: 'fm_light_css', j:2, w:30, c:1, d:1, cache:1});
@@ -2975,6 +2983,7 @@ else if (!browserUpdate) {
 
         // Variables which can be used across all mobile stylesheets
         jsl.push({f:'css/vars/mobile-theme.css', n: 'vars_mobile_theme_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/vars/mobile-theme-auto.css', n: 'vars_mobile_theme_auto_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/mobile/mobile.dropdown.css', n: 'mobile_dropdown_css', j: 2, w: 1});
         jsl.push({f:'css/mobile/mobile.overlay.css', n: 'mobile_overlay_css', j:2, w:1});
         jsl.push({f:'css/mobile/mobile.sheet.css', n: 'mobile_sheet_css', j:2, w:30, c:1, d:1, cache:1});

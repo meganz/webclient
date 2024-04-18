@@ -422,9 +422,9 @@ async function setupSingleDownloadPage(res) {
             $fileinfoBlock.find('.small-txt').text(fileSize);
 
             $('.download.bar-filename').text(filename).attr('title', filename);
-            $('.bar-cell .download.bar-filesize').text(fileSize);
-            $('.info-block .block-view-file-type, .download .bar-cell .transfer-filetype-icon')
-                .addClass(fileIcon({ name: filename }));
+            // DO NOT CHANGE {name: filename} to dl_node as this will called before codec list is loaded
+            $('.info-block .item-type-icon-90').removeClass('icon-generic-90')
+                .addClass(`icon-${fileIcon({name: filename})}-90`);
 
             if (dlQueue.isPaused(dlmanager.getGID(fdl_queue_var))) {
                 $('.download.download-page').addClass('paused-transfer');
@@ -587,7 +587,6 @@ async function setupSingleDownloadPage(res) {
             return mKeyDialog(dlpage_ph, false, key)
                 .catch(() => {
                     $('.download.error-text.message').text(l[7427]).removeClass('hidden');
-                    $('.info-block .block-view-file-type').addClass(fileIcon({name: 'unknown'}));
                     $('.download.buttons-block, .download.checkbox-bl').addClass('hidden');
                     $('.js-file-info .download.info-txt').text('Unknown');
                 });
@@ -755,8 +754,7 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
         dl_queue[dl_queue_num].loaded = bytesloaded;
     }
 
-    if (!m)
-    {
+    if (!m) {
         $dowloadWrapper.removeClass('temporary-na');
         $('.download.progress-bar', $dowloadWrapper).width(perc + '%');
 

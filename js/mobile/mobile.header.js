@@ -263,7 +263,7 @@ class MegaMobileHeader extends MegaMobileComponent {
                 parentNode: subNode,
                 type: 'icon',
                 componentClassname: 'text-icon close',
-                icon: 'sprite-mobile-fm-mono icon-x-thin-solid',
+                icon: 'sprite-mobile-fm-mono icon-dialog-close',
                 iconSize: 24
             });
         }
@@ -350,7 +350,7 @@ class MegaMobileHeader extends MegaMobileComponent {
 
     update() {
 
-        const noTabletView = isPublicLink() || isPublickLinkV2() || page.startsWith('businesssignup')
+        const noTabletView = isPublicLink() || isPublicLinkV2() || page.startsWith('businesssignup')
             || page === 'keybackup';
 
         const _hide = () => {
@@ -439,7 +439,7 @@ class MegaMobileHeader extends MegaMobileComponent {
             parentNode: searchForm,
             type: 'icon',
             componentClassname: 'text-icon js-btnclearSearch hidden',
-            icon: 'sprite-mobile-fm-mono icon-x-thin-outline',
+            icon: 'sprite-mobile-fm-mono icon-close-component',
             iconSize: 16
         });
         clearSearchButton.domNode.type = 'button';

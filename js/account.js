@@ -303,7 +303,7 @@ function u_checklogin3a(res, ctx) {
                     return;
                 }
                 const page = getCleanSitePath();
-                const pubLink = isPublicLink(page) || isPublickLinkV2(page);
+                const pubLink = isPublicLink(page) || isPublicLinkV2(page);
                 if (pubLink) {
                     // Nor here.
                     return;

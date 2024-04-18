@@ -1,6 +1,35 @@
 /* ==================== *\
    Revamp Implementation
 \* ==================== */
+
+/* Default MIME thumb styling */
+
+.item-type-icon {
+    --icon-size: 24px;
+}
+
+.item-type-icon img {
+    background-color: var(--stroke-mid-grey);
+    border-radius: 2px;
+    height: 18px;
+    margin: 3px;
+    width: 18px;
+}
+
+.item-type-icon-90 {
+    --icon-size: 96px;
+}
+
+.data-block-bg img {
+    background: var(--image-background);
+    width: 100%;
+    height: 100%;
+    vertical-align: middle;
+    position: relative;
+}
+
+/* end of Default MIME thumb styling */
+
 /* icon sizes */
 .icon12 {
     --icon-size: 12px;

@@ -50,6 +50,18 @@
     -webkit-padding-end: 0;
     padding-inline-end: 0;
 }
+
+table.grid-table .inbound-share .sprite-fm-uni-after.icon-warning-after::after {
+    display: none;
+}
+table.grid-table .inbound-share.unverified-share .sprite-fm-uni-after.icon-warning-after::after {
+    display: inline-block;
+    right: -2px;
+    position: absolute;
+    --icon-size: 20px;
+    top: 0;
+}
+
 /* ============================ *\
     out-shared-grid-view - Wrapper
 \* ============================ */
@@ -237,6 +249,7 @@ table tr.ui-selected .grid-file-request-manage {
 .grid-table thead tr {
     width: 100%;
     background-color: var(--stroke-main);
+    box-sizing: border-box;
     position: relative;
     font-size: 0;
     white-space: nowrap;
@@ -450,6 +463,12 @@ table.grid-table {
     table-layout: fixed;
 }
 
+table.grid-table tr:empty {
+    border: 0;
+    display: block;
+    height: 0;
+}
+
 table.grid-table th:first-child,
 table.grid-table td:first-child {
     -webkit-padding-start: 12px;
@@ -466,6 +485,7 @@ table.grid-table td.space-maintainer-end,
 }
 
 table.grid-table td {
+    box-sizing: border-box;
     padding: 0;
     -webkit-padding-start: 5px;
     padding-inline-start: 5px;
@@ -479,8 +499,17 @@ table.grid-table td {
 table.grid-table td {
     border-bottom: 1px solid var(--stroke-grey-2);
 }
+
+table.grid-table .item-type-icon {
+    --icon-size: 24px;
+    left: 3px;
+    position: absolute;
+    top: 3px;
+}
+
 table.grid-table .tranfer-filetype-txt {
     left: 0;
+    line-height: inherit;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -694,13 +723,28 @@ table.fm tr {
     width: 100%;
 }
 
-table.fm .transfer-filetype-icon,
+table.fm .item-type-icon {
+    left: 3px;
+    position: absolute;
+}
+table.fm .item-type-icon,
 table.fm .versioning-indicator {
     top: 50%;
     transform: translateY(-50%);
 }
 table.fm .grid-url-arrow {
     margin-top: 0;
+}
+table.fm .thumb .item-type-icon {
+    background: none;
+}
+table.fm .thumb .item-type-icon img {
+    background-color: var(--stroke-mid-grey);
+    border-radius: 2px;
+    display: inline-block;
+    height: 18px;
+    margin: 3px;
+    width: 18px;
 }
 
 /* ======================================== *\
@@ -938,14 +982,11 @@ table.shared-with-me .avatar-wrapper {
     margin: 0;
 }
 
-table.shared-with-me .shared-folder-info-block {
-    padding-inline-start: 51px;
-    -webkit-padding-start: 51px;
-    font: var(--text-body2);
-    display: block;
-    box-sizing: border-box;
-    position: relative;
-    text-align: start;
+table.shared-with-me .item-type-icon-90 {
+    --icon-size: 48px;
+    left: 0;
+    position: absolute;
+    top: 4px;
 }
 
 table.shared-with-me .shared-folder-info-block .shared-folder-name {
@@ -1006,10 +1047,11 @@ table.shared-with-me .shared-folder-access {
     display: block;
 }
 table.shared-with-me .shared-folder-access i {
+    --icon-size: 22px;
     display: inline-block;
+    vertical-align: middle;
     margin-inline-end: 5px;
     -webkit-margin-end: 5px;
-    --icon-size: 22px;
 }
 table.shared-with-me .shared-folder-access span {
     display: inline-block;
@@ -1031,6 +1073,13 @@ table.shared-with-me .shared-folder-access span {
 table.out-shares td {
     z-index: 0;
     height: 56px;
+}
+
+table.out-shares .item-type-icon-90 {
+    --icon-size: 48px;
+    left: 0;
+    position: absolute;
+    top: 4px;
 }
 
 table.out-shares .shared-folder-info-block {
@@ -1086,11 +1135,7 @@ table.out-shares .fm-chat-users {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-/* Temporary fix to icon placement in MEGA Lite mode because we don't know the folder size */
-.mega-lite-mode table.out-shares .medium-file-icon.folder-shared {
-    position: absolute;
-    top: 10px;
-}
+
 /* Temporary fix to hide the size column in MEGA Lite mode because we don't know the folder size */
 .mega-lite-mode table.out-shares th:nth-child(4),
 .mega-lite-mode table.out-shares td:nth-child(4) {
@@ -1171,12 +1216,15 @@ table.out-shares .fm-chat-users {
     text-overflow: ellipsis;
     width: 100%;
     padding-left: 30px;
-    padding-top: 7px;
+    padding-top: 6px;
     box-sizing: border-box;
     display: block;
 }
-.transfer-table .transfer-filetype-icon {
-    margin: 4px 0 0 -1px;
+.transfer-table .item-type-icon {
+    --icon-size: 24px;
+    left: 2px;
+    position: absolute;
+    top: 4px;
 }
 .transfer-table .transfer-type {
     margin: 0 auto;

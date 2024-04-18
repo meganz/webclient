@@ -11,6 +11,14 @@
     padding-inline-end: 0;
 }
 
+.mega-dialog.share-dialog > header {
+    padding-bottom: 8px;
+}
+
+.mega-dialog.share-dialog .share-dialog-top {
+    padding: 0 42px;
+}
+
 .mega-dialog.share-dialog .share-dialog-top-body {
     padding-bottom: 16px;
     position: relative;
@@ -69,10 +77,11 @@
     vertical-align: middle;
 }
 
-.share-dialog-top-body .item-type-icon {
+.share-dialog-top-body .item-type-icon-90 {
     display: inline-block;
-    -webkit-margin-end: 12px;
-    margin-inline-end: 12px;
+    -webkit-margin-end: 8px;
+    margin-inline-end: 8px;
+    --icon-size: 48px;
     vertical-align: middle;
 }
 

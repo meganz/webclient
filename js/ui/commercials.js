@@ -502,8 +502,8 @@ lazy(mega, 'commercials', () => {
             $closeClone.rebind('click', () => {
                 commID = linkedSlots[commID] || [commID];
 
-                // Permanantly hide all linked comms if user is new and ad is external
-                const canCloseComms = u_attr && u_attr.na && comm.at === 2;
+                // Permanantly hide all linked comms if user is new
+                const canCloseComms = u_attr && u_attr.na;
                 hideComms(commID, canCloseComms);
                 if (canCloseComms) {
                     for (let i = 0; i < commID.length; i++) {

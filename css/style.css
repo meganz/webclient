@@ -12083,3 +12083,11 @@ body.megaChatDisabled .nw-fm-left-icon.conversations {
 .vertical-align-top {
     vertical-align: top;
 }
+
+/* Utility classes */
+
+.mega-gap-12 > *:not(:last-child) {
+    margin-bottom: 12px;
+}
+
+/* End utility classes */

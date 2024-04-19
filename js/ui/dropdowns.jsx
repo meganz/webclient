@@ -296,42 +296,46 @@ export class DropdownContactsSelector extends MegaRenderMixin {
         this.props.onSelectClicked();
     }
     render() {
-        var self = this;
-
-        return <Dropdown className={"popup contacts-search " + this.props.className + " tooltip-blur"}
-            active={this.props.active}
-            closeDropdown={this.props.closeDropdown}
-            ref={function(r) {
-                self.dropdownRef = r;
-            }}
-            positionMy={this.props.positionMy}
-            positionAt={this.props.positionAt}
-            arrowHeight={this.props.arrowHeight}
-            horizOffset={this.props.horizOffset}
-            vertOffset={this.props.vertOffset}
-            noArrow={true}
-        >
-            <ContactPickerWidget
-                onClose={this.props.closeDropdown}
-                onEventuallyUpdated={() => {
-                    self.dropdownRef?.doRerender();
-                }}
+        return (
+            <Dropdown
+                className={`
+                    popup contacts-search
+                    ${this.props.className}
+                    tooltip-blur
+                `}
                 active={this.props.active}
-                className="popup contacts-search tooltip-blur small-footer"
-                contacts={M.u}
-                selectFooter={this.props.selectFooter}
-                megaChat={this.props.megaChat}
-                exclude={this.props.exclude}
-                allowEmpty={this.props.allowEmpty}
-                multiple={this.props.multiple}
-                topButtons={this.props.topButtons}
-                showAddContact={this.props.showAddContact}
-                onSelectDone={this.props.onSelectDone}
-                multipleSelectedButtonLabel={this.props.multipleSelectedButtonLabel}
-                singleSelectedButtonLabel={this.props.singleSelectedButtonLabel}
-                nothingSelectedButtonLabel={this.props.nothingSelectedButtonLabel}
-            />
-        </Dropdown>;
+                closeDropdown={this.props.closeDropdown}
+                ref={ref => {
+                    this.dropdownRef = ref;
+                }}
+                positionMy={this.props.positionMy}
+                positionAt={this.props.positionAt}
+                arrowHeight={this.props.arrowHeight}
+                horizOffset={this.props.horizOffset}
+                vertOffset={this.props.vertOffset}
+                noArrow={true}>
+                <ContactPickerWidget
+                    onClose={this.props.closeDropdown}
+                    onEventuallyUpdated={() => this.dropdownRef?.doRerender()}
+                    active={this.props.active}
+                    className="popup contacts-search tooltip-blur small-footer"
+                    contacts={M.u}
+                    selectFooter={this.props.selectFooter}
+                    megaChat={this.props.megaChat}
+                    exclude={this.props.exclude}
+                    allowEmpty={this.props.allowEmpty}
+                    multiple={this.props.multiple}
+                    topButtons={this.props.topButtons}
+                    showAddContact={this.props.showAddContact}
+                    onAddContact={() => eventlog(500237)}
+                    onSelected={() => eventlog(500238)}
+                    onSelectDone={this.props.onSelectDone}
+                    multipleSelectedButtonLabel={this.props.multipleSelectedButtonLabel}
+                    singleSelectedButtonLabel={this.props.singleSelectedButtonLabel}
+                    nothingSelectedButtonLabel={this.props.nothingSelectedButtonLabel}
+                />
+            </Dropdown>
+        );
     }
 }
 

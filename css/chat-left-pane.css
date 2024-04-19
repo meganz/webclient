@@ -1820,9 +1820,12 @@ td.verification .contact-item {
     position: relative;
     font: var(--text-body1);
     color: var(--text-color-high);
-    margin-bottom: 4px;
-    margin-inline-start: 10px;
-    -webkit-margin-start: 10px;
+    margin-bottom: 13px;
+    margin-inline-start: 6px;
+}
+
+.lhp-action-buttons .new-chat-action {
+    padding: 8px;
 }
 
 .conversationsApp .lhp-action-buttons button.loading-sketch {
@@ -1855,9 +1858,9 @@ td.verification .contact-item {
     --mask-color: var(--secondary-green);
 }
 
-.conversationsApp .lhp-action-buttons i.icon-arrow-down {
-    --icon-size: 16px;
-    --mask-color: var(--icon-active);
+.conversationsApp .lhp-action-buttons i.dropdown-indicator {
+    padding: 1px 0 0;
+    --mask-color: var(--secondary-white);
 }
 
 .conversationsApp .conversations-empty {

@@ -6899,6 +6899,12 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.storage-dialog.almost-full .chart.progressbars span::after {
         background: var(--stroke-warning);
     }
+    .mega-dialog.storage-dialog.almost-full .chart.progressbars .left-chart span::after {
+        left: calc(49% - 1px);
+    }
+    .mega-dialog.storage-dialog.almost-full .chart.progressbars .right-chart span::after {
+        left: calc(48% - 3px);
+    }
     .mega-dialog.storage-dialog.almost-full .size-txt {
         color: var(--text-color-warning) !important;
     }

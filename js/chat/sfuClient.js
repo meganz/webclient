@@ -1274,7 +1274,7 @@ class CallRecorder {
 }
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = '5ccc3661d0';
+const COMMIT_ID = 'b53ed450a8';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -1439,6 +1439,9 @@ class SfuClient {
     }
     get haveBadNetwork() {
         return this._svcDriver.hasBadNetwork;
+    }
+    get activeSpeakerCid() {
+        return this._speakerDetector.currSpeakerCid;
     }
     willReconnect() {
         if (this._forcedDisconnect) {
@@ -2097,6 +2100,7 @@ class SfuClient {
                             console.warn(client_kLogTag, "Input audio track stopped (possibly device removed), re-requesting audio input...");
                         }
                     } while (0);
+                    self._fire("onMicDisconnect");
                     self._updateSentTracks(null, true);
                 };
             })
@@ -2600,9 +2604,9 @@ class SfuClient {
     static enumMediaDevices() {
         return navigator.mediaDevices.enumerateDevices()
             .then((devices) => {
-            const audioIn = {};
-            const audioOut = {};
-            const videoIn = {};
+            const audioIn = [];
+            const audioOut = [];
+            const videoIn = [];
             for (const device of devices) {
                 if (device.deviceId === "default") {
                     continue;
@@ -2621,7 +2625,7 @@ class SfuClient {
                 else {
                     continue;
                 }
-                set[device.deviceId] = device.label;
+                set.push({ id: device.deviceId, name: device.label });
             }
             return { audioIn, audioOut, videoIn };
         });
@@ -2819,7 +2823,7 @@ class SfuClient {
         else {
             do {
                 if (window.d) {
-                    console.warn(client_kLogTag, "Ingoring unknown packet", msg.a || JSON.stringify(msg));
+                    console.warn(client_kLogTag, "Ignoring unknown packet", msg.a || JSON.stringify(msg));
                 }
             } while (0);
         }
@@ -2896,8 +2900,9 @@ class SfuClient {
         this._setConnState(ConnState.kCallJoined);
         this.enableStats();
         this.setThumbVtrackResScale();
-        this.speakers = new Set(msg.speakers || undefined);
-        this.speakRequests = new Set(msg.spkrqs || undefined);
+        this.speakers = new Set(msg.speakers);
+        this.speakRequests = new Set(msg.spkrqs);
+        this.raisedHands = new Set(msg.rhands);
         if (msg.peers) {
             for (const peerInfo of msg.peers) {
                 new Peer(this, peerInfo, true);
@@ -3072,6 +3077,22 @@ class SfuClient {
             } while (0);
         }
         this._fire("onSpeakReqDel", msg.user);
+    }
+    raiseHand() {
+        this.send({ a: "RHAND" });
+    }
+    lowerHand() {
+        this.send({ a: "RHAND_DEL" });
+    }
+    msgRhandAdd(msg) {
+        const userid = msg.user || this.userId;
+        this.raisedHands.add(userid);
+        this._fire("onRaisedHandAdd", userid);
+    }
+    msgRhandDel(msg) {
+        const userid = msg.user || this.userId;
+        this.raisedHands.delete(userid);
+        this._fire("onRaisedHandDel", userid);
     }
     async msgMuted(msg) {
         if ((msg.av & Av.Audio) === 0) {
@@ -3362,7 +3383,9 @@ class SfuClient {
         let stats = await sender.getStats();
         for (let item of stats.values()) {
             if (item.type === "media-source") {
-                this.micMuteMonitor.onLevel(this.micAudioLevel = item.audioLevel);
+                const level = this.micAudioLevel = item.audioLevel;
+                this.tsMicAudioLevel = Date.now();
+                this.micMuteMonitor.onLevel(level);
                 return;
             }
         }
@@ -3523,6 +3546,8 @@ SfuClient.msgHandlerMap = {
     "SPEAKRQ_DEL": SfuClient.prototype.msgSpeakReqDel,
     "SPEAKER_ADD": SfuClient.prototype.msgSpeakerAdd,
     "SPEAKER_DEL": SfuClient.prototype.msgSpeakerDel,
+    "RHAND_ADD": SfuClient.prototype.msgRhandAdd,
+    "RHAND_DEL": SfuClient.prototype.msgRhandDel,
     "MOD_ADD": SfuClient.prototype.msgModAdd,
     "MOD_DEL": SfuClient.prototype.msgModDel,
     "MUTED": SfuClient.prototype.msgMuted,
@@ -4558,63 +4583,52 @@ class SpeakerDetector {
     constructor(client) {
         this.players = new Set();
         this.tsLastChange = 0;
+        this.currSpeakerCid = null;
+        // only notifies about live mic levels
         this._onTimerTick_passive = () => {
             for (const player of this.players) {
                 player.pollAudioLevel();
             }
         };
+        // notifies about live mic levels + monitors active speaker changes
         this._onTimerTick_active = () => {
             let maxLevel = SfuClient.kSpeakerVolThreshold;
-            let maxPlayer = null;
+            let maxLevelCid = null;
             for (const player of this.players) {
                 const level = player.pollAudioLevel(true);
                 if (level > maxLevel) {
                     maxLevel = level;
-                    maxPlayer = player;
+                    maxLevelCid = player.peer.cid;
                 }
-            }
-            if (!maxPlayer) {
-                return;
             }
             const now = Date.now();
             const client = this.client;
             const ourLevel = (now - client.tsMicAudioLevel < 1500) ? client.micAudioLevel : 0;
             if (ourLevel > maxLevel) {
-                maxPlayer = null;
+                maxLevelCid = 0;
             }
-            if (maxPlayer === this.currSpeaker) {
+            if (maxLevelCid === this.currSpeakerCid) {
                 return;
             }
             if (now - this.tsLastChange < SfuClient.kSpeakerChangeMinInterval) {
                 return;
             }
             this.tsLastChange = now;
-            const prev = this.currSpeaker ? this.currSpeaker.peer : null;
-            this.currSpeaker = maxPlayer;
-            if (maxPlayer) {
-                const peer = maxPlayer.peer;
-                do {
-                    if (window.d) {
-                        console.warn(client_kLogTag, "Active speaker changed to", peer.userId);
-                    }
-                } while (0);
-                this.client.assert(this.client.peers.get(peer.cid));
-                this.client.app.onActiveSpeakerChange(peer, prev);
-            }
-            else {
-                do {
-                    if (window.d) {
-                        console.warn(client_kLogTag, "Active speaker changed to us");
-                    }
-                } while (0);
-                this.client.app.onActiveSpeakerChange(null, prev);
-            }
+            const prev = this.currSpeakerCid;
+            this.currSpeakerCid = maxLevelCid;
+            do {
+                if (window.d) {
+                    console.warn(client_kLogTag, "Active speaker changed to", maxLevelCid);
+                }
+            } while (0);
+            client.app.onActiveSpeakerChange(maxLevelCid, prev);
         };
         this.client = client;
         this.enable(false);
     }
     enable(enable) {
         this.enabled = enable;
+        this.currSpeakerCid = null;
         if (!this.players.size) {
             return;
         }
@@ -4648,11 +4662,15 @@ class SpeakerDetector {
     }
     unregisterPeer(player) {
         this.players.delete(player);
-        if (this.currSpeaker === player) {
-            delete this.currSpeaker;
-        }
         if (!this.players.size) {
+            // we don't leave it polling the local mic level (in enabled mode), because it will compare it against
+            // the silence threshold, and will likely constantly switch between 0 and null
             this.deleteTimer();
+            const prev = this.currSpeakerCid;
+            this.currSpeakerCid = null;
+            if (this.enabled && prev !== null) {
+                this.client.app.onActiveSpeakerChange(null, prev);
+            }
         }
     }
 }

@@ -466,7 +466,7 @@
                 'av': null,
                 'localVideoStream': null,
                 'viewMode': null,
-                'speakerCid': null,
+                'speakerCid': null, // can be 0 - means us, and null - means nobody is the active speaker
                 'pinnedCid': null, // can be 0 - means pinned local video, and null - means nothing pinned
                 'activeVideoStreamsCnt': 0,
                 'ts': Date.now(),
@@ -544,35 +544,28 @@
             }
             this.recordActiveStream();
         }
-        onActiveSpeakerChange(newPeer/* , prevPeer */) {
-            if (newPeer) {
-                var peer = this.peers[newPeer.cid];
-                assert(peer);
-                this.speakerCid = newPeer.cid;
-            }
-            else {
-                this.speakerCid = null;
-            }
+        onActiveSpeakerChange(newSpeakerCid/* , prevSpeakerCid */) {
+            this.speakerCid = newSpeakerCid;
             this.recordActiveStream();
         }
         recordActiveStream() {
             if (!this.sfuClient.isRecording) {
                 return;
             }
-            const { peers, pinnedCid, speakerCid, localPeerStream, sfuClient } = this;
+            const { peers, pinnedCid, localPeerStream, sfuClient } = this;
             let src;
             if (localPeerStream && localPeerStream.isScreen) {
                 src = localPeerStream;
                 tag = "local screen";
             }
-            else if ((src = peers.findLast(p => p.isScreen))) {
-                tag = "peer screen";
-            }
             // pinnedCid === 0 means the user pinned their local video
             else if ((src = (pinnedCid === 0) ? localPeerStream : peers[pinnedCid])) {
                 tag = "pinned";
             }
-            else if (((src = peers[speakerCid])) && (src.av & Av.HiResVideo)) {
+            else if ((src = peers.findLast(p => p.isScreen))) {
+                tag = "peer screen";
+            }
+            else if ((src = this.getActiveSpeaker()) && (src.av & Av.HiResVideo)) {
                 tag = "active speaker";
             }
             else if ((src = peers.find(p => p.av & Av.HiResVideo))) {
@@ -722,14 +715,24 @@
             this.recordActiveStream();
         }
         getActiveStream() {
-            const clientId = this.pinnedCid || this.speakerCid;
-            if (clientId) {
-                return this.peers[clientId];
+            if (Number.isFinite(this.pinnedCid)) {
+                return this.pinnedCid === 0 ? this.localPeerStream : this.peers[this.pinnedCid];
             }
-            return this.peers.getItem(0);
+            else if (this.speakerCid) {
+                return this.peers[this.speakerCid];
+            }
+            else {
+                return this.peers.find((peer) => peer.av & Av.HiResVideo) || this.peers.getItem(0);
+            }
         }
         getLocalStream() {
             return this.localPeerStream;
+        }
+        getActiveSpeaker() {
+            if (this.speakerCid === null) {
+                return undefined;
+            }
+            return (this.speakerCid === 0) ? this.localPeerStream : this.peers[this.speakerCid];
         }
         onLocalMediaChange(diffAv) {
             this.av = this.sfuClient.availAv;

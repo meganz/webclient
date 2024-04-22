@@ -24392,7 +24392,7 @@ class Stream extends mixins.w9 {
         }
       }, external_React_default().createElement("div", null, l[22890])))));
     };
-    this.renderMiniMode = () => {
+    this.renderMiniMode = source => {
       const {
         call,
         mode,
@@ -24401,7 +24401,6 @@ class Stream extends mixins.w9 {
       if (call.sfuClient.isOnHold()) {
         return this.renderOnHoldVideoNode();
       }
-      const source = this.getStreamSource();
       const VideoClass = source.isLocal ? videoNode.bJ : videoNode.zu;
       return external_React_default().createElement(VideoClass, {
         chatRoom: this.props.chatRoom,
@@ -24497,11 +24496,12 @@ class Stream extends mixins.w9 {
         source: call.getLocalStream()
       })));
     }
+    const source = this.getStreamSource();
     return external_React_default().createElement("div", {
       ref: this.containerRef,
       className: `
                     ${NAMESPACE}
-                    ${this.getStreamSource().isStreaming() ? ratioClass : ''}
+                    ${source.isStreaming() ? ratioClass : ''}
                     ${IS_MINI_MODE ? 'mini' : ''}
                     ${minimized ? 'minimized' : ''}
                     ${this.state.options ? 'active' : ''}
@@ -24510,7 +24510,7 @@ class Stream extends mixins.w9 {
       onClick: ({
         target
       }) => minimized && target.classList.contains(`${NAMESPACE}-overlay`) && onCallExpand()
-    }, IS_MINI_MODE && this.renderMiniMode(), !IS_MINI_MODE && this.renderSelfView(), minimized && external_React_default().createElement(__Minimized, (0,esm_extends.A)({}, this.props, {
+    }, IS_MINI_MODE && this.renderMiniMode(source), !IS_MINI_MODE && this.renderSelfView(), minimized && external_React_default().createElement(__Minimized, (0,esm_extends.A)({}, this.props, {
       onOptionsToggle: this.handleOptionsToggle
     })));
   }
@@ -24852,6 +24852,7 @@ class ParticipantsBlock extends mixins.w9 {
                         local-stream-node
                         ${call.isSharingScreen() ? '' : 'local-stream-mirrored'}
                         ${forcedLocal ? 'active' : ''}
+                        ${call.speakerCid === 0 ? 'active-speaker' : ''}
                     `,
           simpletip: {
             ...SIMPLE_TIP,
@@ -25883,18 +25884,11 @@ class stream_Stream extends mixins.w9 {
         }));
       })));
     }
-    let source;
-    let VideoType;
-    if (forcedLocal) {
-      VideoType = videoNode.Cn;
-      source = call.getLocalStream();
-    } else {
-      VideoType = videoNode.zu;
-      source = call.getActiveStream();
-      if (!source) {
-        return null;
-      }
+    const source = call.getActiveStream();
+    if (!source) {
+      return null;
     }
+    const VideoType = source.isLocal ? videoNode.Cn : videoNode.zu;
     const videoNodeRef = external_React_default().createRef();
     return external_React_default().createElement(VideoType, {
       key: source.clientId,

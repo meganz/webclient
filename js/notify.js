@@ -38,6 +38,9 @@ var notify = {
     // The welcome dialog has been shown this session
     welcomeDialogShown: false,
 
+    // Whether the event for viewing the dynamic notifications has been sent
+    dynamicNotifsSeenEventSent: false,
+
     // Current dynamic notifications
     dynamicNotifs: {},
     lastSeenDynamic: undefined,
@@ -478,6 +481,17 @@ var notify = {
             else {
                 $elem.addClass('show');
                 notify.renderNotifications();
+
+                // Check if any dynamic notifications can be seen
+                const dynamicNotifIds = [];
+                for (const notif of $('.nt-dynamic-notification', notify.$popup)) {
+                    dynamicNotifIds.push($(notif).data('dynamic-id'));
+                }
+
+                // Send event to the API if any dynamic notifications can be seen
+                if (dynamicNotifIds.length) {
+                    notify.sendNotifSeenEvent(dynamicNotifIds);
+                }
             }
         });
     },
@@ -862,6 +876,7 @@ var notify = {
                 if (link) {
                     window.open(link, '_blank', 'noopener,noreferrer');
                 }
+                eventlog(500242, dynamicId | 0);
             }
         });
     },
@@ -1972,9 +1987,22 @@ var notify = {
             notifAdded = true;
 
             // Once the initial notifications have loaded, add the dynamic notification via the action packet system
-            notify.initialLoading.then(() => {
-                notify.notifyFromActionPacket(dynamicNotif);
-            }).catch(dump);
+            notify.initialLoading
+                .then(() => {
+                    notify.notifyFromActionPacket(dynamicNotif);
+
+                    // If the notification centre is open immediately after the page is loaded,
+                    // send an event to the API if any dynamic notifications can be seen
+                    if (!notify.dynamicNotifsSeenEventSent
+                            && !notify.$popup.hasClass('loading') &&
+                            notify.$popup.closest('.js-dropdown-notification').hasClass('show')) {
+                        notify.sendNotifSeenEvent(Object.keys(notify.dynamicNotifs));
+
+                        // Stop the event being sent more than once
+                        notify.dynamicNotifsSeenEventSent = true;
+                    }
+                })
+                .catch(dump);
         }
 
         if (notifAdded) {
@@ -1985,6 +2013,17 @@ var notify = {
                 notificationBanner.init();
             }
         }
+    },
+
+    /**
+     * If the notification centre is open immediately after the page is loaded,
+     * send an event to the API if any dynamic notifications can be seen
+     * @param {String} list List of dynamic notification ID's to send with the event
+     */
+    sendNotifSeenEvent(list) {
+        'use strict';
+
+        eventlog(500240, String(Array.isArray(list) ? list.map(Number).sort() : (list | 0)));
     },
 
     /**

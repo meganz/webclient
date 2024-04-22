@@ -16,6 +16,9 @@ var notificationBanner = {
     /** Whether the banner system has been inited or not */
     bannerInited: false,
 
+    /** Whether the event for dismissing the banner has been sent or not */
+    sendDismissedEvent: false,
+
     /**
      * Check if there are any banners that can be shown to the user, and set the last actioned
      * banner ID variable
@@ -55,13 +58,20 @@ var notificationBanner = {
                             this.addBroadcastListeners();
                         }
 
-                        this.showBanner();
+                        this.showBanner(true);
+
+                        // Add a handler to fix the layout if the window is resized
+                        $(window).rebind('resize.notifBanner', () => {
+                            this.updateFMContainerHeight(true);
+                        });
 
                         return true;
                     }
                 }
             }
         }
+
+        this.updateFMContainerHeight(false);
 
         delete this.currentNotification;
         return false;
@@ -129,7 +139,10 @@ var notificationBanner = {
                 this.markBannerAsActioned();
             }
         });
-        $('.close.js-close', this.$banner).rebind('click.bannerClose', () => this.markBannerAsActioned());
+        $('.close.js-close', this.$banner).rebind('click.bannerClose', () => {
+            this.sendDismissedEvent = true;
+            this.markBannerAsActioned();
+        });
 
         const $displayIcon = $('.display-icon', this.$banner).addClass('hidden');
 
@@ -179,9 +192,10 @@ var notificationBanner = {
 
     /**
      * Attempt to show the banner and toggle some classes if required
+     * @param {Boolean} [sendBannerShownEvent] Whether to send an event when the banner is shown.
      * @returns {void}
      */
-    showBanner() {
+    showBanner(sendBannerShownEvent) {
         'use strict';
 
         const isValidBannerPage = !M.chat && M.currentdirid !== 'refer'
@@ -189,10 +203,86 @@ var notificationBanner = {
 
         if (isValidBannerPage) {
             delay('update-banner-classes', () => {
+                const onDashboardPage =  M.currentdirid === 'dashboard';
+
                 this.$banner.removeClass('hidden')
-                    .toggleClass('no-max-width', M.currentdirid !== 'dashboard')
+                    .toggleClass('no-max-width', !onDashboardPage)
                     .toggleClass('extra-bottom-padding', $('.onboarding-control-panel').is(':visible'));
+
+                // Move the banner in the DOM if:
+                // (1) the user navigates to the dashboard page (banner must be fixed there), or
+                // (2) it has been moved before (move it back to its original position)
+                if (onDashboardPage) {
+                    this.$banner.insertBefore($('.widgets.content-block', '.fm-right-block.dashboard'));
+                }
+                else {
+                    this.$banner.insertAfter($('#topmenu'));
+                }
+
+                this.updateFMContainerHeight(true);
             }, 30);
+
+            if (sendBannerShownEvent) {
+                eventlog(500239, this.currentNotification.id | 0);
+            }
+        }
+    },
+
+    /**
+     * Resize the currently shown FM container to prevent the page contents being cut off at the bottom
+     *
+     * @param {Boolean} bannerShown if the banner is currently being shown
+     * @returns {void}
+     */
+    updateFMContainerHeight(bannerShown) {
+        'use strict';
+
+        if (M.currentdirid === 'dashboard') {
+            return;
+        }
+
+        let activeFMContainer = '.fm-right-files-block:not(.in-chat)';
+
+        if (M.currentdirid === 'recents') {
+            activeFMContainer = '.fm-recents.container';
+        }
+        else if (M.currentdirid === 'devices') {
+            activeFMContainer = '.fm-right-block.full-size';
+        }
+
+        if (bannerShown) {
+            if (M.currentdirid === 'albums') {
+                $('.albums-grid', '#albums-view').height(`calc(100vh - 97px - ${this.$banner.outerHeight()}px)`);
+            }
+            else {
+                $(activeFMContainer).height(`calc(100% - 48px - ${this.$banner.outerHeight()}px)`);
+
+                // If a gallery empty state is visible, add a scroller to it so the contents
+                // can be seen
+                const $emptySection = $('.fm-empty-section:not(.hidden)', $(activeFMContainer));
+
+                if (M.currentCustomView &&
+                        M.currentCustomView.type === 'gallery' &&
+                        !$emptySection.hasClass('hidden')) {
+                    Ps.initialize($emptySection[0]);
+                }
+            }
+        }
+        else {
+            // Remove any custom height styles set
+            $('.fm-right-files-block:not(.in-chat)').removeAttr('style');
+            $('.fm-right-block.dashboard').removeAttr('style');
+            $('.fm-recents.container').removeAttr('style');
+            $('.fm-right-block.full-size').removeAttr('style');
+            $('.albums-grid', '#albums-view').removeAttr('style');
+
+            // Remove any scrollbars added
+            const $emptySection = $('.fm-empty-section.ps');
+            if ($emptySection) {
+                Ps.destroy($emptySection[0]);
+            }
+
+            $(window).unbind('resize.notifBanner');
         }
     },
 
@@ -209,7 +299,7 @@ var notificationBanner = {
             // Hide the notifications banner while the page change is finishing up.
             this.$banner.addClass('hidden');
 
-            onIdle(() => this.showBanner());
+            onIdle(() => this.showBanner(false));
         });
 
         this.bannerMultiTabsListener = mBroadcaster.addListener('crossTab:closedBanner', (key) => {
@@ -231,6 +321,11 @@ var notificationBanner = {
             this.lastActionedBannerId = this.currentNotification.id;
         }
         this.$banner.addClass('hidden');
+
+        if (this.sendDismissedEvent) {
+            eventlog(500241, this.currentNotification.id | 0);
+            this.sendDismissedEvent = false;
+        }
 
         // If no more banners are available to be shown, remove the broadcast listeners and reset them
         if (!this.configureAndShowBanner()) {

@@ -3706,42 +3706,16 @@ async function prepareExportIo(dl) {
   throw new Error('Download methods are unsupported');
 }
 function prepareExportStreams(attachNodes, onEmpty) {
-  const CHUNK_SIZE = 1048576;
-  const nextChunk = async function (controller, handle, start, size) {
-    const fetched = await M.gfsfetch(handle, start, start + size).catch(ex => {
-      if (ex === EOVERQUOTA || Object(ex.target).status === 509) {
-        return controller.error(ex);
-      }
-    });
-    const input = fetched && fetched.buffer || new ArrayBuffer(0);
-    if (!fetched || !fetched.buffer) {
-      onEmpty(size);
-    }
-    controller.enqueue(new Uint8Array(input));
-  };
   return attachNodes.map(node => {
     return {
       name: node.name,
       lastModified: new Date((node.mtime || node.ts) * 1000),
-      input: new ReadableStream({
-        offset: 0,
-        start(controller) {
-          this.offset = Math.min(node.s, CHUNK_SIZE);
-          return nextChunk(controller, node.h, 0, this.offset);
-        },
-        pull(controller) {
-          if (this.offset >= node.s) {
-            controller.close();
-            return;
+      input: M.gfsfetch.getReadableStream(node, {
+        error(ex, n) {
+          if (d) {
+            console.error(`${n.h}: ${ex}`);
           }
-          if (node.s - this.offset >= CHUNK_SIZE) {
-            const chunk = nextChunk(controller, node.h, this.offset, CHUNK_SIZE);
-            this.offset += CHUNK_SIZE;
-            return chunk;
-          }
-          const chunk = nextChunk(controller, node.h, this.offset, node.s - this.offset);
-          this.offset = node.s;
-          return chunk;
+          onEmpty(n.s);
         }
       })
     };
@@ -5595,7 +5569,7 @@ ChatRoom.prototype.exportToFile = function () {
     const report = [String(ex && ex.message || ex).replace(/\s+/g, '').substring(0, 64)];
     report.unshift(report[0] === 'Aborted' ? 1 : 0);
     if (!report[0]) {
-      msgDialog('error', '', l.export_chat_failed, '', undefined, undefined, true);
+      msgDialog('error', '', l.export_chat_failed, '', undefined, 1);
     }
     eventlog(99875, JSON.stringify(report));
   }).finally(() => {
@@ -5683,14 +5657,13 @@ ChatRoom.prototype._exportChat = async function () {
         const read = await reader.read().catch(dump);
         if (!read) {
           reader.cancel().catch(ex => {
-            if (ex === EOVERQUOTA) {
-              dlmanager.showOverQuotaDialog();
-            } else {
-              msgDialog('error', '', l.export_chat_failed, '', undefined, undefined, true);
+            if (ex !== EOVERQUOTA) {
+              msgDialog('error', '', l.export_chat_failed, ex < 0 ? api_strerror(ex) : ex, undefined, 1);
             }
           });
           io.abort();
           delete this.exportIo;
+          loadingDialog.hideProgress();
           return;
         }
         if (read.done) {
@@ -5698,7 +5671,7 @@ ChatRoom.prototype._exportChat = async function () {
           io.download(zname);
           delete this.exportIo;
           if (failedCount) {
-            msgDialog('error', '', l.export_chat_failed, l.export_chat_partial_fail, undefined, undefined, true);
+            msgDialog('error', '', l.export_chat_failed, l.export_chat_partial_fail, undefined, 1);
           }
         } else {
           dl.done += read.value.byteLength;
@@ -13526,7 +13499,7 @@ class ConversationRightArea extends mixins.w9 {
       onClick: () => {
         this.props.onAttachFromComputerClicked();
       }
-    })))), this.renderPushSettingsButton(), room.type === 'private' ? null : external_React_default().createElement((external_React_default()).Fragment, null, room.scheduledMeeting && this.OptionsButton(waitingRoomButton), this.OptionsButton(openInviteButton), this.renderOptionsBanner(), AVseperator), mega.es2020 && external_React_default().createElement(buttons.$, {
+    })))), this.renderPushSettingsButton(), room.type === 'private' ? null : external_React_default().createElement((external_React_default()).Fragment, null, room.scheduledMeeting && this.OptionsButton(waitingRoomButton), this.OptionsButton(openInviteButton), this.renderOptionsBanner(), AVseperator), external_React_default().createElement(buttons.$, {
       className: "link-button light export-chat-button",
       disabled: room.messagesBuff.messages.length === 0 || room.exportIo,
       onClick: () => {

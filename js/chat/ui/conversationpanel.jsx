@@ -1242,7 +1242,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                             {AVseperator}
                                         </>
                                     }
-                                    {mega.es2020 && <Button
+                                    <Button
                                         className="link-button light export-chat-button"
                                         disabled={room.messagesBuff.messages.length === 0 || room.exportIo}
                                         onClick={() => {
@@ -1253,7 +1253,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                         <span>
                                             {room.isMeeting ? l.export_meeting_rhp : l.export_chat_rhp}
                                         </span>
-                                    </Button>}
+                                    </Button>
                                     <Button
                                         className="link-button light clear-history-button"
                                         disabled={dontShowTruncateButton || !room.members.hasOwnProperty(u_handle)}

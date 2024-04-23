@@ -16165,7 +16165,7 @@ class Recurring extends mixins.w9 {
       className: "green-notification cell text-cell"
     }, external_React_default().createElement("div", {
       className: "versioning-body-text"
-    }, l.recurring_monthdays_warning.replace('%n', monthDays[0]))))), external_React_default().createElement("div", {
+    }, mega.icu.format(l.recurring_monthdays_warning, monthDays[0]))))), external_React_default().createElement("div", {
       className: "recurring-label-wrap"
     }, external_React_default().createElement("div", {
       className: `

@@ -1074,7 +1074,7 @@ function affiliateUI() {
     }
 
     if (page === 'fm/refer') {
-        mobile.affiliate.initMainPage();
+        mobile.settings.account.referral.init();
     }
     else if (page === 'fm/refer/redeem') {
         mobile.affiliate.initRedeemPage();
@@ -1086,7 +1086,7 @@ function affiliateUI() {
         mobile.affiliate.initHistoryPage();
     }
     else if (page === 'fm/refer/distribution') {
-        mobile.affiliate.initDistributionPage();
+        mobile.settings.account.referralDistribution.init();
     }
     else {
         loadSubPage('fm/refer');

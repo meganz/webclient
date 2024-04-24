@@ -86,7 +86,7 @@ class MegaMobileOverlay extends MegaMobileComponent {
             }
 
             if (options.title) {
-                this.addTitle(options.title);
+                this.addTitle(options.title, options.titleType);
             }
             if (options.subtitle) {
                 this.addSubTitle(options.subtitle);
@@ -191,9 +191,9 @@ class MegaMobileOverlay extends MegaMobileComponent {
         this.domNode.name = name;
     }
 
-    addTitle(title) {
+    addTitle(title, titleType) {
         this.clearTitle();
-        const subNode = document.createElement('h1');
+        const subNode = document.createElement(titleType || 'h1');
         subNode.textContent = title;
         this.titleNode.appendChild(subNode);
     }

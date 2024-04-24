@@ -13,6 +13,7 @@
 
 .tab-container button.nav-elem {
     background-color: var(--color-button-secondary);
+    overflow: hidden;
 }
 
 .tab-container > * {
@@ -30,5 +31,10 @@
 .tab-container .active.nav-elem {
     background: var(--mobile-button-primary);
     border-radius: var(--mobile-border-radius-medium);
+}
+
+.tab-container .text-box-wrapper {
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 

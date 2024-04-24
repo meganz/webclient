@@ -1374,9 +1374,6 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace(/\[BR]/g, '<br/>');
     l[22796] = escapeHTML(l[22796]).replace('[A]', '<a href="/contact" class="clickurl" target="_blank">')
         .replace('[/A]', '</a>');
-    l[22882] = escapeHTML(l[22882]).replace('[A]', '<a class="clickurl" href="/pro">').replace('[/A]', '</a>')
-        .replace('[S]', '<span class="no-buisness">').replace('[/S]', '</span>')
-        .replace('[B]', '<b>').replace('[/B]', '</b>');
     l[22898] = escapeHTML(l[22898]).replace('[A]', '<a class="clickurl" href="https://mega.io/mobile" target="_blank">')
         .replace('[/A]', '</a>')
         .replace('[BR]', '<br>');
@@ -1933,6 +1930,8 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A]', '</a>');
 
     l.invite_subject_text = escapeHTML(encodeURIComponent(l.invite_subject_text));
+    l.available_commission_tip = escapeHTML(l.available_commission_tip)
+        .replace('[A]', '<a class="clickurl" href="/pro">').replace('[/A]', '</a>');
 
     l.etd_link_removed_body = escapeHTML(l.etd_link_removed_body)
         .replace('[A1]', `<a href="https://mega.io/terms" target="_blank">`)
@@ -1952,14 +1951,18 @@ mBroadcaster.once('boot_done', function populate_l() {
         15536, 16107, 16119, 16120, 16136, 16304, 16313, 16316, 16358, 16360, 16361, 16394, 18228, 18268, 18282,
         18284, 18285, 18286, 18287, 18289, 18290, 18291, 18294, 18295, 18296, 18297, 18298, 18302, 18303, 18304,
         18305, 18314, 18315, 18316, 18419, 19807, 19808, 19810, 19811, 19812, 19813, 19814, 19854, 19821, 20402,
-        20462, 20969, 20970, 20971, 20973, 22667, 22668, 22674, 22669, 22671, 22672, 22784, 22789, 22881, 22883,
+        20462, 20969, 20970, 20971, 20973, 22667, 22668, 22674, 22669, 22671, 22672, 22784, 22789,
         23351, 23524, 23534, 23296, 23299, 23304, 23819, 24077, 24097, 24099, 24139, 24540, 24542, 24543, 24544,
         24680, 24849, 24850,
 
         // Non numeric ids
         'bsn_calc_min_users',
         'pro_flexi_account_suspended_description',
-        'cannot_leave_share_content'
+        'cannot_leave_share_content',
+        'available_commission_tip',
+        'pending_commission_tip',
+        'commission_amount_tip',
+        'go_to_pro'
     ];
     for (let i = common.length; i--;) {
         var num = common[i];

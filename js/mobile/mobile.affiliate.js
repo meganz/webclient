@@ -1,35 +1,9 @@
 // Note: Referral Program is called as affiliate program at begining, so all systemic names are under word affiliate
 // i.e. affiliate === referral
 
+// Old page. Awaiting revamp
+
 mobile.affiliate = {
-
-    /**
-     * Initialise Main page
-     */
-    initMainPage: function() {
-
-        'use strict';
-
-        // If not logged in, return to the login page
-        if (typeof u_attr === 'undefined') {
-            loadSubPage('login');
-            return false;
-        }
-
-        // Cache selectors
-        var $page = $('.mobile.affiliate-page');
-
-        // Show the account page content
-        $page.removeClass('hidden');
-
-        loadingDialog.show('affiliateRefresh');
-
-        this.getMobileAffiliateData(function() {
-            mobile.affiliate.setCommissionIndexes($page);
-            mobile.affiliate.setTotalRedeemInfo($page);
-            mobile.affiliate.initMainPageButtons($page);
-        });
-    },
 
     getMobileAffiliateData: function(callback) {
 
@@ -49,143 +23,6 @@ mobile.affiliate = {
                 loadingDialog.hide('affiliateRefresh');
             });
         });
-    },
-
-    /**
-     * Main page. Init buttons.
-     */
-    initMainPageButtons: function($page) {
-
-        'use strict';
-
-        var $buttons = $('.mobile.button-block.clickable', $page);
-        var $redeemButton = $('.fm-green-button.redeem', $page);
-
-        /* Subsections buttons */
-        $buttons.rebind('tap', function() {
-            var $this = $(this);
-
-            if ($this.data('link')) {
-                loadSubPage('fm/refer/' + $this.data('link'));
-                return false;
-            }
-        });
-
-        // Redeem requires at least one payment history and available balance more than 50 euro
-        if (M.affiliate.redeemable && M.affiliate.balance.available >= 50 && M.affiliate.utpCount) {
-            $redeemButton.removeClass('disabled');
-        }
-        else {
-            $redeemButton.addClass('disabled');
-        }
-
-        /* Redeem button event */
-        $redeemButton.rebind('tap.redeemButton', function() {
-            var $this = $(this);
-
-            if (!$this.is('.disabled')) {
-                loadSubPage('/fm/refer/redeem/');
-            }
-
-            // Prevent double taps
-            return false;
-        });
-    },
-
-    /**
-     * Main page. Set commision indexes.
-     */
-    setCommissionIndexes: function($page) {
-
-        'use strict';
-
-        var $commissionBlocks = $('.affiliate-comission', $page);
-        var balance = M.affiliate.balance;
-        var currencyHtml = ' <span class="local-currency-code">' + balance.localCurrency + '</span>';
-        var localTotal;
-        var localPending;
-        var localAvailable;
-
-        if (balance.localCurrency === 'EUR') {
-
-            $('.euro', $commissionBlocks).addClass('hidden');
-
-            localTotal = formatCurrency(balance.localTotal);
-            localPending = formatCurrency(balance.localPending);
-            localAvailable = formatCurrency(balance.localAvailable);
-        }
-        else {
-            localTotal = formatCurrency(balance.localTotal, balance.localCurrency, 'number');
-            localPending = formatCurrency(balance.localPending, balance.localCurrency, 'number');
-            localAvailable = formatCurrency(balance.localAvailable, balance.localCurrency, 'number');
-
-            currencyHtml = ' <span class="currency">' + balance.localCurrency + '</span>';
-
-            $('.total.euro', $commissionBlocks)
-                .text(formatCurrency(balance.pending + balance.available));
-            $('.pending.euro', $commissionBlocks).text(formatCurrency(balance.pending));
-            $('.available.euro', $commissionBlocks).text(formatCurrency(balance.available));
-        }
-
-        $('.total.local', $commissionBlocks).safeHTML(localTotal + currencyHtml);
-        $('.pending.local', $commissionBlocks).safeHTML(localPending + currencyHtml);
-        $('.available.local', $commissionBlocks).safeHTML(localAvailable + currencyHtml);
-
-        $('.commission-info', $commissionBlocks).rebind('tap', function() {
-
-            var $overlay = $('.mobile.commission-overlay');
-
-            if (balance.localCurrency === 'EUR') {
-                $('.non-euro-only', $overlay).addClass('hidden');
-            }
-
-            if (u_attr.b || u_attr.pf) {
-                $('.no-buisness', $overlay).addClass('hidden');
-            }
-
-            $overlay.removeClass('hidden');
-            $page.addClass('hidden');
-
-            $('.fm-dialog-close', $overlay).rebind('tap', function() {
-                $overlay.addClass('hidden');
-                $page.removeClass('hidden');
-            });
-        });
-    },
-
-    /**
-     * Main page. Set total registrations and purchases.
-     */
-    setTotalRedeemInfo: function($page) {
-
-        'use strict';
-
-        // TODO: Set registrations and purchases
-        var $registrations = $('.mobile.affiliate-registration', $page);
-        var $purchases = $('.mobile.affiliate-purchases', $page);
-        var thisMonth = calculateCalendar('m');
-        var thisMonthRegCount = 0;
-        var thisMonthPurCount = 0;
-        var creditList = M.affiliate.creditList.active.concat(M.affiliate.creditList.pending);
-
-        M.affiliate.signupList.forEach(function(item) {
-            if (thisMonth.start <= item.ts && item.ts <= thisMonth.end) {
-                thisMonthRegCount++;
-            }
-        });
-
-        creditList.forEach(function(item) {
-            if (thisMonth.start <= item.gts && item.gts <= thisMonth.end) {
-                thisMonthPurCount++;
-            }
-        });
-
-        $('.mobile.affiliate-compare', $page).safeHTML(l[22700]);
-        $('.affiliate-number', $registrations).text(M.affiliate.signupList.length);
-        $('.affiliate-compare span', $registrations).text('+' + thisMonthRegCount);
-
-        $('.affiliate-number', $purchases).text(creditList.length);
-        $('.affiliate-compare span', $purchases).text('+' + thisMonthPurCount);
     },
 
     /**
@@ -597,7 +434,11 @@ mobile.affiliate = {
 
         var self = this;
 
-        Promise.all([M.affiliate.getRedemptionMethods(), M.affiliate.getBalance()]).then(function() {
+        Promise.all([
+            this.getMobileAffiliateData(),
+            M.affiliate.getRedemptionMethods(),
+            M.affiliate.getBalance()
+        ]).then(() => {
 
             // Cache selector
             self.$page = $('.fmholder:not(.hidden) .mobile.affiliate-redeem-page');
@@ -927,8 +768,9 @@ mobile.affiliate = {
         var $currencySelect = $('#affi-currency', $step3);
         var rdmReq = affiliateRedemption.requests;
         var selectedGWData = M.affiliate.redeemGateways[rdmReq.first.m];
-        var seletedGWDefaultData = selectedGWData.data.d;
-        var activeCountry = seletedGWDefaultData[0];
+        const seletedGWDefaultData = selectedGWData.data.d || [];
+        const activeCountry = affiliateRedemption.requests.first.cc || seletedGWDefaultData[0] ||
+            selectedGWData.data.cc[0];
 
         // Country Select
         var contentHtml = '';
@@ -954,7 +796,8 @@ mobile.affiliate = {
             $(this).prev().text(M.getCountryName(this.value));
         });
 
-        var activeCurrency = seletedGWDefaultData[1];
+        const activeCurrency = affiliateRedemption.requests.first.c || seletedGWDefaultData[1] ||
+            selectedGWData.data.$[0];
 
         // Country Select
         contentHtml = '';
@@ -1453,112 +1296,5 @@ mobile.affiliate = {
         });
 
         return $select;
-    },
-
-    /**
-     * Initialise affiliate Distribution page
-     */
-    initDistributionPage: function() {
-
-        'use strict';
-
-        // If not logged in, return to the login page
-        if (typeof u_attr === 'undefined') {
-            loadSubPage('login');
-            return false;
-        }
-
-        // Cache selector
-        var $page = $('.mobile.affiliate-distrib-page');
-
-        // Show the giude page content
-        $page.removeClass('hidden');
-
-        loadingDialog.show('affiliateRefresh');
-
-        this.getMobileAffiliateData(function() {
-            mobile.initBackButton($page, 'fm/refer/');
-            mobile.affiliate.initDistributionButtons($page);
-            mobile.affiliate.drawTable($page);
-        });
-    },
-
-    /**
-     * Guide page. Init buttons
-     */
-    initDistributionButtons: function($page) {
-
-        'use strict';
-
-        var $tabs = $('.tab-button', $page);
-
-        $tabs.rebind('tap', function() {
-            var $this = $(this);
-
-            if (!$this.hasClass('active') && $this.data('table')) {
-                $tabs.removeClass('active');
-                $this.addClass('active');
-                $('.content', $page).addClass('hidden');
-                $('.content.' + $this.data('table'), $page).removeClass('hidden');
-            }
-        });
-    },
-
-    /**
-     * Let's draw table with give data
-     * @returns {Void} void function
-     */
-    drawTable: function($page) {
-
-        'use strict';
-
-        var template =
-            '<div class="mobile fm-affiliate list-item">' +
-                '<div class="img-wrap"><img src="$countryImg" alt=""></div>' +
-                '$countryName <span class="num">$count</span>' +
-            '</div>';
-
-        var signupGeo = {};
-        var creditGeo = {};
-
-        M.affiliate.signupList.forEach(function(item) {
-            signupGeo[item.cc] = ++signupGeo[item.cc] || 1;
-        });
-
-        var creditList = M.affiliate.creditList.active.concat(M.affiliate.creditList.pending);
-
-        creditList.forEach(function(item) {
-            creditGeo[item.cc] = ++creditGeo[item.cc] || 1;
-        });
-
-        var _sortFunc = function(a, b) {
-            return signupGeo[b] - signupGeo[a];
-        };
-        var orderedSignupGeoKeys = Object.keys(signupGeo).sort(_sortFunc);
-        var orderedCreditGeoKeys = Object.keys(creditGeo).sort(_sortFunc);
-
-        var html = '';
-        var countList = signupGeo;
-
-        var _htmlFunc = function(item) {
-            var country = countrydetails(item);
-            html += template.replace('$countryImg', staticpath + 'images/flags/' + country.icon)
-                .replace('$countryName', country.name || 'Unknown').replace('$count', countList[item]);
-        };
-
-        orderedSignupGeoKeys.forEach(_htmlFunc);
-
-        if (html) {
-            $('.geo-dist-reg .list', $page).safeHTML(html);
-        }
-
-        html = '';
-        countList = creditGeo;
-
-        orderedCreditGeoKeys.forEach(_htmlFunc);
-
-        if (html) {
-            $('.geo-dist-pur .list', $page).safeHTML(html);
-        }
     }
 };

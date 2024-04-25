@@ -1137,6 +1137,11 @@ function closeDialog() {
 function closeMsg() {
     'use strict';
 
+    if ($.dialog && !(M.chat && $.dialog === 'onboardingDialog')) {
+        $('.mega-dialog').removeClass('arrange-to-back');
+        $('.mega-dialog-container.common-container').removeClass('arrange-to-back');
+    }
+
     delete $.msgDialog;
     mBroadcaster.sendMessage('msgdialog-closed');
 }

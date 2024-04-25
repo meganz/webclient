@@ -428,7 +428,7 @@ mega.ui.MegaInputs.prototype.underlinedText._strengthChecker = function() {
         $wrapper.safeAppend('<div class="account password-status hidden"></div>');
 
         // Strength Bar
-        if (is_mobile) {
+        if (is_mobile && $wrapper.hasClass('mobile')) {
             $wrapper.safeAppend('<div class="account-pass-lines">' +
                 '<div class="register-pass-status-line1"></div>' +
                 '<div class="register-pass-status-line2"></div>' +

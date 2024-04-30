@@ -279,10 +279,11 @@ class MobileMegaRender {
     }
 
     removeScrollEvent() {
-
-        this.megaList.listContainer.removeEventListener('scroll', this);
-        this.megaList.listContainer.removeEventListener('touchstart', this);
-        this.megaList.listContainer.removeEventListener('touchend', this);
+        if (this.megaList) {
+            this.megaList.listContainer.removeEventListener('scroll', this);
+            this.megaList.listContainer.removeEventListener('touchstart', this);
+            this.megaList.listContainer.removeEventListener('touchend', this);
+        }
     }
 
     get ready() {

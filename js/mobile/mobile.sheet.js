@@ -34,7 +34,8 @@ class MegaMobileSheet extends MegaMobileOverlay {
                 },
                 onTouchEnd: () => {
                     sheetElm.style.transform = '';
-                }
+                },
+                scrollNodes: { y: this.domNode.querySelector('.fm-scrolling') }
             });
 
             // For dialog like sheet should move more to close

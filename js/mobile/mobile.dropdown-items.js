@@ -16,7 +16,7 @@ class MegaMobileDropdownItemList {
 
         // Create the list items domNode early so we can reference it throughout
         // our code
-        this.listContainer = mCreateElement('ul', {'class': 'list-items'});
+        this.listContainer = mCreateElement('ul', {'class': 'list-items full-width'});
 
         // filter items with search term
         const _filterItems = (val) => {
@@ -47,7 +47,7 @@ class MegaMobileDropdownItemList {
         // if search field is required
         if (options.dropdownOptions.search) {
             this.searchNode = document.createElement('div');
-            this.searchNode.className = 'search-box-wrapper';
+            this.searchNode.className = 'search-box-wrapper full-width';
 
             const subNode = document.createElement('input');
             subNode.type = 'text';
@@ -74,7 +74,7 @@ class MegaMobileDropdownItemList {
                 this.searchList(_filterItems, e.target.value.trim()));
 
             // no results
-            this.noResults = mCreateElement('div', {'class': 'no-results hidden'}, [
+            this.noResults = mCreateElement('div', {'class': 'no-results full-width hidden'}, [
                 mCreateElement('h2', {}, [document.createTextNode(options.resultText.title || "")]),
                 mCreateElement('span', {}, [
                     document.createTextNode(options.resultText.caption || options.resultText || "")

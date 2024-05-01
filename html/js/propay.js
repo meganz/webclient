@@ -191,13 +191,7 @@ pro.propay = {
         }
 
         const proNumInt = parseInt(pageParts[1]);
-        const validProNums = [
-            pro.ACCOUNT_LEVEL_PRO_LITE,
-            pro.ACCOUNT_LEVEL_PRO_I,
-            pro.ACCOUNT_LEVEL_PRO_II,
-            pro.ACCOUNT_LEVEL_PRO_III,
-            pro.ACCOUNT_LEVEL_PRO_FLEXI
-        ];
+        const validProNums = pro.filter.simple.validPurchases;
 
         // If the Pro Flexi enabled (pf) flag is not on and they're trying to access the page, don't allow
         if (mega.flags && mega.flags.pf !== 1 && proNumInt === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
@@ -205,7 +199,7 @@ pro.propay = {
         }
 
         // Check the URL has propay_1 (PRO I) - propay_3 (PRO III), propay_4 (PRO Lite), propay_101 (Pro Flexi)
-        if (validProNums.includes(proNumInt)) {
+        if (validProNums.has(proNumInt)) {
 
             // Get the Pro number e.g. 2 then the name e.g. Pro I - III, Pro Lite, Pro Flexi etc
             pro.propay.planNum = proNumInt;

@@ -779,7 +779,7 @@ affiliateUI.redemptionDialog = {
 
         // Reset options for pro plan redemption
         affiliateRedemption.plan = {
-            chosenPlan: pro.minPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL],
+            chosenPlan: pro.filter.affMin[pro.UTQA_RES_INDEX_ACCOUNTLEVEL],
             planName: '',
             planStorage: -1,
             planQuota: -1,

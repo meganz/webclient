@@ -186,7 +186,7 @@ affiliateRedemption.__processBlock1 = function() {
     'use strict';
 
     // Update chosenPlan default to the min available pro plan, as it has now been created
-    const minPlanNum = pro.minPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
+    const minPlanNum = pro.filter.affMin[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
     affiliateRedemption.plan.chosenPlan = affiliateRedemption.plan.chosenPlan || minPlanNum;
 
     this.requests.first.m = $('.payment-type .radioOn input', this.$dialog).val() | 0;

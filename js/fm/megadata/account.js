@@ -789,16 +789,7 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
             options = { custom: 1 };
         }
 
-        const userStorage = quota.cstrg;
-
-        const lowestRequiredPlan = pro.membershipPlans.find((plan) => {
-            const planLevel = plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
-            if (plan[pro.UTQA_RES_INDEX_MONTHS] === 12 || planLevel === u_attr.p) {
-                return false;
-            }
-            // return the first (lowest) plan with enough storage. Otherwise if reach last plan (flexi), return that
-            return (((plan[pro.UTQA_RES_INDEX_STORAGE] * pro.BYTES_PER_GB) > userStorage) || (planLevel === 101));
-        });
+        const lowestRequiredPlan = pro.filter.lowestRequired(quota.cstrg, 'storageTransferDialogs');
 
         let upgradeString;
         isEuro = !lowestRequiredPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];

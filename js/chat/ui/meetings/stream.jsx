@@ -366,19 +366,11 @@ export default class Stream extends MegaRenderMixin {
         //  `Main` view
         // -------------------------------------------------------------------------
 
-        let source;
-        let VideoType;
-        if (forcedLocal) {
-            VideoType = LocalVideoHiRes;
-            source = call.getLocalStream();
+        const source = call.getActiveStream();
+        if (!source) {
+            return null;
         }
-        else {
-            VideoType = PeerVideoHiRes;
-            source = call.getActiveStream();
-            if (!source) {
-                return null;
-            }
-        }
+        const VideoType = source.isLocal ? LocalVideoHiRes : PeerVideoHiRes;
         const videoNodeRef = React.createRef();
         const setRef = node => {
             videoNodeRef.current = node;

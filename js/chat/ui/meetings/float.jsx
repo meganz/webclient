@@ -342,13 +342,12 @@ class Stream extends MegaRenderMixin {
         );
     };
 
-    renderMiniMode = () => {
+    renderMiniMode = (source) => {
         const { call, mode, onLoadedData } = this.props;
 
         if (call.sfuClient.isOnHold()) {
             return this.renderOnHoldVideoNode();
         }
-        const source = this.getStreamSource();
         const VideoClass = source.isLocal ? LocalVideoThumb : PeerVideoHiRes;
         return (
             <VideoClass
@@ -448,13 +447,13 @@ class Stream extends MegaRenderMixin {
                 </div>
             );
         }
-
+        const source = this.getStreamSource();
         return (
             <div
                 ref={this.containerRef}
                 className={`
                     ${NAMESPACE}
-                    ${this.getStreamSource().isStreaming() ? ratioClass : ''}
+                    ${source.isStreaming() ? ratioClass : ''}
                     ${IS_MINI_MODE ? 'mini' : ''}
                     ${minimized ? 'minimized' : ''}
                     ${this.state.options ? 'active' : ''}
@@ -470,7 +469,7 @@ class Stream extends MegaRenderMixin {
                     // `FloatingVideo` in **mini mode** is rendered when the call is minimized and displays the active
                     // speaker. The current user's video/screen sharing stream can be displayed in mini mode only when
                     // the current user is set as active speaker manually (`forcedLocal`).
-                    this.renderMiniMode()
+                    this.renderMiniMode(source)
                 }
                 {IS_SELF_VIEW &&
                     // `FloatingVideo` in **self view** is rendered only when the call is expanded, displaying

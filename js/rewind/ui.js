@@ -1685,13 +1685,11 @@ lazy(mega, 'rewindUi', () => {
                     for (let j = 0; j < childrenKeys.length; j++) {
                         const childHandle = childrenKeys[j];
                         const childNodeType = childrenDictionary[selectedHandle][childHandle];
-                        let childNode = null;
-                        if (childNodeType === NODE_CHILDREN_TYPE_FILE && (childNode = nodeDictionary[childHandle])) {
-                            childNode.rewind = true;
-                            childNode.path = this.getFullPathName(childNode.h, nodeDictionary, this.currentHandle);
-                            selectedNodes[childNode.h] = childNode;
-                        }
-                        else {
+                        const childNode = nodeDictionary[childHandle];
+                        childNode.rewind = true;
+                        childNode.path = this.getFullPathName(childNode.h, nodeDictionary, this.currentHandle);
+                        selectedNodes[childNode.h] = childNode;
+                        if (childNodeType !== NODE_CHILDREN_TYPE_FILE) {
                             addChildren(childHandle);
                         }
                     }
@@ -1714,49 +1712,89 @@ lazy(mega, 'rewindUi', () => {
 
                 if (selectedNodes) {
                     const selectedNodeValues = Object.values(selectedNodes);
-                    if (selectedNodeValues.length) {
-                        let zipName = null;
-                        let zip = false;
 
-                        if (selectedNodeValues.length === 1) {
-                            const firstSelectedKey = selectedHandleKeys[0];
-                            const firstSelectedNode = nodeDictionary[firstSelectedKey];
+                    // This will contain the parents in a sorted order
+                    // So that MegaSync always downloads the parent before the children
+                    const parentNodes = Object.create(null);
 
-                            if (firstSelectedNode && !firstSelectedNode.t) {
-                                zipName = selectedNodeValues[0].name;
-                                zip = false;
+                    const setParentNodes = (currNodeHandle) => {
+                        // Base case 1, we're at the cloud root, so we do not add
+                        if (!currNodeHandle || currNodeHandle === M.RootID) {
+                            return;
+                        }
+                        const currNode = mega.rewind.nodeDictionary[currNodeHandle];
+                        // Base case 2, we're at the selected rewind target folder, we add
+                        if (currNodeHandle === mega.rewindUi.sidebar.currentHandle) {
+                            parentNodes[currNodeHandle] = currNode;
+                        }
+                        // Recursive case, we need to traverse up the parents
+                        if (currNode.p) {
+                            setParentNodes(currNode.p);
+                            // After parent handles have been added, add the current node
+                            // We only add folder nodes
+                            if (currNode.t && !parentNodes[currNodeHandle]) {
+                                parentNodes[currNodeHandle] = currNode;
                             }
                         }
+                    };
 
-                        if (!zipName) {
-                            const firstSelectedKey = selectedHandleKeys[0];
-                            const firstSelectedNode = nodeDictionary[firstSelectedKey];
-
-                            if (firstSelectedKey === this.currentHandle) {
-                                zipName = firstSelectedNode.name;
-                                zip = true;
+                    megasync.isInstalled((err, is) => {
+                        if (!err || is) {
+                            for (const h in selectedNodes) {
+                                // Sort the parents
+                                setParentNodes(h);
                             }
-                            else if (firstSelectedNode) {
-                                const parentNode = nodeDictionary[firstSelectedNode.p];
-                                // eslint-disable-next-line max-depth
-                                if (parentNode && parentNode.name) {
-                                    zipName = parentNode.name;
-                                    zip = true;
+                            // Insert the sorted parents before the node list so they get downloaded by MegaSync first
+                            M.addDownload([...Object.values(parentNodes), ...selectedNodeValues]);
+                            return;
+                        }
+
+                        // If no MegaSync, use the archive zip download as a fallback
+                        if (selectedNodeValues.length) {
+                            let zipName = null;
+                            let zip = false;
+
+                            if (selectedNodeValues.length === 1) {
+                                const firstSelectedKey = selectedHandleKeys[0];
+                                const firstSelectedNode = nodeDictionary[firstSelectedKey];
+
+                                if (firstSelectedNode && !firstSelectedNode.t) {
+                                    zipName = selectedNodeValues[0].name;
+                                    zip = false;
                                 }
                             }
+
+                            if (!zipName) {
+                                const firstSelectedKey = selectedHandleKeys[0];
+                                const firstSelectedNode = nodeDictionary[firstSelectedKey];
+
+                                if (firstSelectedKey === this.currentHandle) {
+                                    zipName = firstSelectedNode.name;
+                                    zip = true;
+                                }
+                                else if (firstSelectedNode) {
+                                    const parentNode = nodeDictionary[firstSelectedNode.p];
+                                    // eslint-disable-next-line max-depth
+                                    if (parentNode && parentNode.name) {
+                                        zipName = parentNode.name;
+                                        zip = true;
+                                    }
+                                }
+                            }
+
+                            if (!zipName) {
+                                const zipHash = Math.random().toString(16).slice(-4);
+                                zipName = `Archive-${zipHash}`;
+                                zip = true;
+                            }
+
+                            M.addDownload(selectedNodeValues, zip, undefined, M.getSafeName(zipName));
+
+                            const eventData = [0, u_attr.p | 0, selectedNodeValues.length];
+                            delay('rewind:log-download', eventlog.bind(null, 500006, eventData));
                         }
 
-                        if (!zipName) {
-                            const zipHash = Math.random().toString(16).slice(-4);
-                            zipName = `Archive-${zipHash}`;
-                            zip = true;
-                        }
-
-                        M.addDownload(selectedNodeValues, zip, undefined, M.getSafeName(zipName));
-
-                        const eventData = [0, u_attr.p | 0, selectedNodeValues.length];
-                        delay('rewind:log-download', eventlog.bind(null, 500006, eventData));
-                    }
+                    });
                 }
             }
             console.timeEnd('rewind:index:download');

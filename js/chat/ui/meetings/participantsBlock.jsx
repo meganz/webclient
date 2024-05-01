@@ -32,6 +32,7 @@ export default class ParticipantsBlock extends MegaRenderMixin {
                         local-stream-node
                         ${call.isSharingScreen() ? '' : 'local-stream-mirrored'}
                         ${forcedLocal ? 'active' : ''}
+                        ${(call.speakerCid === 0) ? 'active-speaker' : ''}
                     `}
                     simpletip={{ ...SIMPLE_TIP, label: l[8885] }}
                     mode={mode}

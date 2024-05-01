@@ -2076,8 +2076,8 @@ accountUI.plan = {
             $options: null,
             $formContent: null,
             $selectReasonDialog: null,
+            $selectCanContactError: null,
             $invalidDetailsDialog: null,
-            $skipContinueButton: null,
             $continueButton: null,
             $textareaAndErrorDialog: null,
             $textarea: null,
@@ -2099,8 +2099,8 @@ accountUI.plan = {
                 this.$accountPageCancelButton = $('.btn-cancel-sub');
                 this.$formContent = this.$dialog.find('section.content');
                 this.$selectReasonDialog = this.$dialog.find('.error-banner.select-reason');
+                this.$selectCanContactError = $('.error-banner.select-can-contact', this.$dialog);
                 this.$invalidDetailsDialog = this.$dialog.find('.error-banner.invalid-details');
-                this.$skipContinueButton = this.$dialog.find('.skip-cancel-subscription');
                 this.$continueButton = this.$dialog.find('.cancel-subscription');
                 this.$textareaAndErrorDialog = this.$dialog.find('.textarea-and-banner');
                 this.$textarea = this.$dialog.find('textarea');
@@ -2127,7 +2127,7 @@ accountUI.plan = {
                 }
 
                 const $template = $('.cancel-subscription-radio-template', this.$dialog);
-                const $optionArea = $('.content-block form', this.$dialog);
+                const $optionArea = $('.content-block form.cancel-options', this.$dialog);
                 $optionArea.children('.built-option').remove();
 
                 for (let i = 0; i < optionArray.length; i++) {
@@ -2135,10 +2135,11 @@ accountUI.plan = {
                     $('#subcancel_div', $radio).removeAttr('id');
                     $('#subcancel', $radio).val(options[optionArray[i]]).removeAttr('id');
                     $('.radio-txt', $radio).text(l['cancel_sub_' + optionArray[i] + '_reason']);
-                    $('.content-block form', this.$dialog).safePrepend($radio.prop('outerHTML'));
+                    $optionArea.safePrepend($radio.prop('outerHTML'));
                 }
 
                 this.$options = this.$dialog.find('.label-wrap');
+                this.$allowContactOptions = $('.allow-contact-wrapper', this.$dialog);
 
                 // Show benefits dialog before cancellation dialog if user does not have Pro Flex or Business
                 if (!u_attr.pf && !u_attr.b) {
@@ -2162,11 +2163,11 @@ accountUI.plan = {
                 this.resetCancelSubscriptionForm();
                 this.checkReasonEnteredIsValid();
                 this.initClickReason();
+                this.initClickContactConfirm();
                 this.initCloseAndDontCancelButtons();
 
-                this.$continueButton.add(this.$skipContinueButton).rebind('click', (e) => {
-                    const $buttonClicked = $(e.currentTarget);
-                    this.sendSubCancelRequestToApi($buttonClicked.hasClass('skip-cancel-subscription'));
+                this.$continueButton.rebind('click', () => {
+                    this.sendSubCancelRequestToApi();
                 });
             },
 
@@ -2179,12 +2180,14 @@ accountUI.plan = {
                 'use strict';
 
                 this.$selectReasonDialog.addClass('hidden');
+                this.$selectCanContactError.addClass('hidden');
                 this.$invalidDetailsDialog.addClass('hidden');
                 this.$textareaAndErrorDialog.addClass('hidden');
-                this.$dialog.removeClass('textbox-open select-reason');
+                this.$dialog.removeClass('textbox-open error-select-reason error-select-contact');
                 this.$cancelReason.removeClass('error');
                 this.$textarea.val('');
                 $('.cancel-option', this.$options).addClass('radioOff').removeClass('radioOn');
+                $('.contact-option', this.$allowContactOptions).addClass('radioOff').removeClass('radioOn');
             },
 
             fillBenefits: async function($keepPlanBtn) {
@@ -2296,7 +2299,7 @@ accountUI.plan = {
                     $('.cancel-option', $option).addClass('radioOn').removeClass('radioOff');
 
                     this.$selectReasonDialog.addClass('hidden');
-                    this.$dialog.removeClass('select-reason');
+                    this.$dialog.removeClass('error-select-reason');
                     this.$textareaAndErrorDialog.toggleClass('hidden', !valueIsOtherOption);
                     this.$dialog.toggleClass('textbox-open', valueIsOtherOption);
 
@@ -2316,6 +2319,21 @@ accountUI.plan = {
                         this.$invalidDetailsDialog.addClass('hidden');
                         this.$textarea.trigger('blur');
                     }
+                });
+            },
+
+            initClickContactConfirm() {
+
+                'use strict';
+
+                this.$allowContactOptions.rebind('click', (e) => {
+
+                    const $option = $(e.currentTarget);
+                    $('.contact-option', this.$allowContactOptions).addClass('radioOff').removeClass('radioOn');
+                    $('.contact-option', $option).addClass('radioOn').removeClass('radioOff');
+
+                    this.$selectCanContactError.addClass('hidden');
+                    this.$dialog.removeClass('error-select-contact');
                 });
             },
 
@@ -2386,37 +2404,46 @@ accountUI.plan = {
             /**
              * Send the subscription cancellation request to the API
              */
-            sendSubCancelRequestToApi: function(skippedReason) {
+            sendSubCancelRequestToApi() {
                 'use strict';
 
-                var reason = 'No reason (user skipped the survey)';
+                let reason;
 
-                if (!skippedReason) {
-                    const $optionSelected = $('.cancel-option.radioOn', this.$options);
+                const $optionSelected = $('.cancel-option.radioOn', this.$options);
+                const isReasonSelected = $optionSelected.length;
 
-                    if (!($optionSelected.length)) {
+                const $selectedContactOption = $('.contact-option.radioOn', this.$allowContactOptions);
+                const isContactOptionSelected = $selectedContactOption.length;
+
+                if (!isReasonSelected || !isContactOptionSelected) {
+                    if (!isReasonSelected) {
                         this.$selectReasonDialog.removeClass('hidden');
-                        this.$dialog.addClass('select-reason');
+                        this.$dialog.addClass('error-select-reason');
+                    }
+                    if (!isContactOptionSelected) {
+                        this.$selectCanContactError.removeClass('hidden');
+                        this.$dialog.addClass('error-select-contact');
+                    }
+                    return;
+                }
+
+                const value = $('input', $optionSelected).val();
+                const radioText = $('.radio-txt', $optionSelected.parent()).text().trim();
+                const canContactUser = $('input', $selectedContactOption).val() | 0;
+
+                // The cancellation reason (r) sent to the API is the radio button text, or
+                // when the chosen option is "Other (please provide details)" it is
+                // what the user enters in the text field
+                if (value === "8") {
+                    reason = this.$textarea.val().trim();
+
+                    if (!reason.length || reason.length > 1000) {
+                        this.showTextareaError(!reason.length);
                         return;
                     }
-
-                    const value = $('input', $optionSelected).val();
-                    const radioText = $('.radio-txt', $optionSelected.parent()).text().trim();
-
-                    // The cancellation reason (r) sent to the API is the radio button text, or
-                    // when the chosen option is "Other (please provide details)" it is
-                    // what the user enters in the text field
-                    if (value === "8") {
-                        reason = this.$textarea.val().trim();
-
-                        if (!reason.length || reason.length > 1000) {
-                            this.showTextareaError(!reason.length);
-                            return;
-                        }
-                    }
-                    else {
-                        reason = value + ' - ' + radioText;
-                    }
+                }
+                else {
+                    reason = value + ' - ' + radioText;
                 }
 
                 // Hide the dialog and show loading spinner
@@ -2426,7 +2453,7 @@ accountUI.plan = {
 
                 // Setup standard request to 'cccs' = Credit Card Cancel Subscriptions
                 const requests = [
-                    { a: 'cccs', r: reason }
+                    { a: 'cccs', r: reason, cc: canContactUser}
                 ];
 
                 // If they were Pro Flexi, we need to also downgrade the user from Pro Flexi to Free

@@ -48,7 +48,10 @@ export default class Navigation extends MegaRenderMixin {
                         ${LeftPanel.NAMESPACE}-chats-tab
                         ${view === CHATS && routingSection === 'chat' ? 'active' : ''}
                     `}
-                    onClick={() => renderView(CHATS)}>
+                    onClick={() => {
+                        renderView(CHATS);
+                        eventlog(500233);
+                    }}>
                     <Button
                         unreadChats={unreadChats}
                         className={`${LeftPanel.NAMESPACE}-nav-button`}
@@ -67,7 +70,10 @@ export default class Navigation extends MegaRenderMixin {
                         ${LeftPanel.NAMESPACE}-meetings-tab
                         ${view === MEETINGS && routingSection === 'chat' ? 'active' : ''}
                     `}
-                    onClick={() => renderView(MEETINGS)}>
+                    onClick={() => {
+                        renderView(MEETINGS);
+                        eventlog(500234);
+                    }}>
                     <Button
                         unreadMeetings={unreadMeetings}
                         className={`${LeftPanel.NAMESPACE}-nav-button`}

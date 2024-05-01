@@ -3706,42 +3706,16 @@ async function prepareExportIo(dl) {
   throw new Error('Download methods are unsupported');
 }
 function prepareExportStreams(attachNodes, onEmpty) {
-  const CHUNK_SIZE = 1048576;
-  const nextChunk = async function (controller, handle, start, size) {
-    const fetched = await M.gfsfetch(handle, start, start + size).catch(ex => {
-      if (ex === EOVERQUOTA || Object(ex.target).status === 509) {
-        return controller.error(ex);
-      }
-    });
-    const input = fetched && fetched.buffer || new ArrayBuffer(0);
-    if (!fetched || !fetched.buffer) {
-      onEmpty(size);
-    }
-    controller.enqueue(new Uint8Array(input));
-  };
   return attachNodes.map(node => {
     return {
       name: node.name,
       lastModified: new Date((node.mtime || node.ts) * 1000),
-      input: new ReadableStream({
-        offset: 0,
-        start(controller) {
-          this.offset = Math.min(node.s, CHUNK_SIZE);
-          return nextChunk(controller, node.h, 0, this.offset);
-        },
-        pull(controller) {
-          if (this.offset >= node.s) {
-            controller.close();
-            return;
+      input: M.gfsfetch.getReadableStream(node, {
+        error(ex, n) {
+          if (d) {
+            console.error(`${n.h}: ${ex}`);
           }
-          if (node.s - this.offset >= CHUNK_SIZE) {
-            const chunk = nextChunk(controller, node.h, this.offset, CHUNK_SIZE);
-            this.offset += CHUNK_SIZE;
-            return chunk;
-          }
-          const chunk = nextChunk(controller, node.h, this.offset, node.s - this.offset);
-          this.offset = node.s;
-          return chunk;
+          onEmpty(n.s);
         }
       })
     };
@@ -5595,7 +5569,7 @@ ChatRoom.prototype.exportToFile = function () {
     const report = [String(ex && ex.message || ex).replace(/\s+/g, '').substring(0, 64)];
     report.unshift(report[0] === 'Aborted' ? 1 : 0);
     if (!report[0]) {
-      msgDialog('error', '', l.export_chat_failed, '', undefined, undefined, true);
+      msgDialog('error', '', l.export_chat_failed, '', undefined, 1);
     }
     eventlog(99875, JSON.stringify(report));
   }).finally(() => {
@@ -5683,14 +5657,13 @@ ChatRoom.prototype._exportChat = async function () {
         const read = await reader.read().catch(dump);
         if (!read) {
           reader.cancel().catch(ex => {
-            if (ex === EOVERQUOTA) {
-              dlmanager.showOverQuotaDialog();
-            } else {
-              msgDialog('error', '', l.export_chat_failed, '', undefined, undefined, true);
+            if (ex !== EOVERQUOTA) {
+              msgDialog('error', '', l.export_chat_failed, ex < 0 ? api_strerror(ex) : ex, undefined, 1);
             }
           });
           io.abort();
           delete this.exportIo;
+          loadingDialog.hideProgress();
           return;
         }
         if (read.done) {
@@ -5698,7 +5671,7 @@ ChatRoom.prototype._exportChat = async function () {
           io.download(zname);
           delete this.exportIo;
           if (failedCount) {
-            msgDialog('error', '', l.export_chat_failed, l.export_chat_partial_fail, undefined, undefined, true);
+            msgDialog('error', '', l.export_chat_failed, l.export_chat_partial_fail, undefined, 1);
           }
         } else {
           dl.done += read.value.byteLength;
@@ -8416,8 +8389,10 @@ class ContactPickerWidget extends _mixins1__.w9 {
       icon: "sprite-fm-mono icon-add-circle",
       label: l[71],
       onClick: () => {
+        var _this$props$onAddCont, _this$props;
         contactAddDialog();
         closeDropdowns();
+        (_this$props$onAddCont = (_this$props = this.props).onAddContact) == null || _this$props$onAddCont.call(_this$props);
       }
     })));
   }
@@ -13524,7 +13499,7 @@ class ConversationRightArea extends mixins.w9 {
       onClick: () => {
         this.props.onAttachFromComputerClicked();
       }
-    })))), this.renderPushSettingsButton(), room.type === 'private' ? null : external_React_default().createElement((external_React_default()).Fragment, null, room.scheduledMeeting && this.OptionsButton(waitingRoomButton), this.OptionsButton(openInviteButton), this.renderOptionsBanner(), AVseperator), mega.es2020 && external_React_default().createElement(buttons.$, {
+    })))), this.renderPushSettingsButton(), room.type === 'private' ? null : external_React_default().createElement((external_React_default()).Fragment, null, room.scheduledMeeting && this.OptionsButton(waitingRoomButton), this.OptionsButton(openInviteButton), this.renderOptionsBanner(), AVseperator), external_React_default().createElement(buttons.$, {
       className: "link-button light export-chat-button",
       disabled: room.messagesBuff.messages.length === 0 || room.exportIo,
       onClick: () => {
@@ -14880,7 +14855,7 @@ class EmptyConvPanel extends mixins.w9 {
     if (isMeeting) {
       return external_React_default().createElement(buttons.$, {
         className: "mega-button large positive",
-        label: l.create_meeting
+        label: l.new_meeting
       }, external_React_default().createElement(dropdowns.Dropdown, {
         className: "light",
         noArrow: "true",
@@ -15101,7 +15076,10 @@ class Start extends mixins.w9 {
       onClick: this.toggleEdit
     }, external_React_default().createElement("span", null, l[1342]))), external_React_default().createElement(meetings_button.A, {
       className: "mega-button positive large start-meeting-button",
-      onClick: this.startMeeting
+      onClick: () => {
+        this.startMeeting();
+        eventlog(500235);
+      }
     }, external_React_default().createElement("span", null, l[7315])), external_React_default().createElement(ui_link.A, {
       to: "https://mega.io/chatandmeetings",
       target: "_blank"
@@ -16187,7 +16165,7 @@ class Recurring extends mixins.w9 {
       className: "green-notification cell text-cell"
     }, external_React_default().createElement("div", {
       className: "versioning-body-text"
-    }, l.recurring_monthdays_warning.replace('%n', monthDays[0]))))), external_React_default().createElement("div", {
+    }, mega.icu.format(l.recurring_monthdays_warning, monthDays[0]))))), external_React_default().createElement("div", {
       className: "recurring-label-wrap"
     }, external_React_default().createElement("div", {
       className: `
@@ -17364,6 +17342,7 @@ class StartGroupChatWizard extends mixins.w9 {
       openInvite
     });
     this.props.onClose(this);
+    eventlog(500236);
   }
   render() {
     var self = this;
@@ -18357,7 +18336,10 @@ class Navigation extends mixins.w9 {
                         ${LeftPanel.NAMESPACE}-chats-tab
                         ${view === CHATS && routingSection === 'chat' ? 'active' : ''}
                     `,
-      onClick: () => renderView(CHATS)
+      onClick: () => {
+        renderView(CHATS);
+        eventlog(500233);
+      }
     }, external_React_default().createElement(buttons.$, {
       unreadChats: unreadChats,
       className: `${LeftPanel.NAMESPACE}-nav-button`,
@@ -18370,7 +18352,10 @@ class Navigation extends mixins.w9 {
                         ${LeftPanel.NAMESPACE}-meetings-tab
                         ${view === MEETINGS && routingSection === 'chat' ? 'active' : ''}
                     `,
-      onClick: () => renderView(MEETINGS)
+      onClick: () => {
+        renderView(MEETINGS);
+        eventlog(500234);
+      }
     }, external_React_default().createElement(buttons.$, {
       unreadMeetings: unreadMeetings,
       className: `${LeftPanel.NAMESPACE}-nav-button`,
@@ -18430,8 +18415,7 @@ class Actions extends mixins.w9 {
     }, view === LOADING && external_React_default().createElement(buttons.$, {
       className: "mega-button action loading-sketch"
     }, external_React_default().createElement("i", null), external_React_default().createElement("span", null)), view === CHATS && routingSection !== 'contacts' && external_React_default().createElement(buttons.$, {
-      className: "mega-button action",
-      icon: "sprite-fm-mono icon-add-circle",
+      className: "mega-button small positive new-chat-action",
       label: l.add_chat
     }, external_React_default().createElement(dropdowns.DropdownContactsSelector, {
       className: `
@@ -18454,11 +18438,10 @@ class Actions extends mixins.w9 {
       }],
       showAddContact: contactsPanel.A.hasContacts()
     })), view === MEETINGS && routingSection !== 'contacts' && external_React_default().createElement(buttons.$, {
-      className: "mega-button action",
-      icon: "sprite-fm-mono icon-add-circle",
-      label: l.create_meeting
+      className: "mega-button small positive",
+      label: l.new_meeting
     }, external_React_default().createElement("i", {
-      className: "sprite-fm-mono icon-arrow-down"
+      className: "dropdown-indicator sprite-fm-mono icon-arrow-down"
     }), external_React_default().createElement(dropdowns.Dropdown, {
       className: "light",
       noArrow: "true",
@@ -24409,7 +24392,7 @@ class Stream extends mixins.w9 {
         }
       }, external_React_default().createElement("div", null, l[22890])))));
     };
-    this.renderMiniMode = () => {
+    this.renderMiniMode = source => {
       const {
         call,
         mode,
@@ -24418,7 +24401,6 @@ class Stream extends mixins.w9 {
       if (call.sfuClient.isOnHold()) {
         return this.renderOnHoldVideoNode();
       }
-      const source = this.getStreamSource();
       const VideoClass = source.isLocal ? videoNode.bJ : videoNode.zu;
       return external_React_default().createElement(VideoClass, {
         chatRoom: this.props.chatRoom,
@@ -24514,11 +24496,12 @@ class Stream extends mixins.w9 {
         source: call.getLocalStream()
       })));
     }
+    const source = this.getStreamSource();
     return external_React_default().createElement("div", {
       ref: this.containerRef,
       className: `
                     ${NAMESPACE}
-                    ${this.getStreamSource().isStreaming() ? ratioClass : ''}
+                    ${source.isStreaming() ? ratioClass : ''}
                     ${IS_MINI_MODE ? 'mini' : ''}
                     ${minimized ? 'minimized' : ''}
                     ${this.state.options ? 'active' : ''}
@@ -24527,7 +24510,7 @@ class Stream extends mixins.w9 {
       onClick: ({
         target
       }) => minimized && target.classList.contains(`${NAMESPACE}-overlay`) && onCallExpand()
-    }, IS_MINI_MODE && this.renderMiniMode(), !IS_MINI_MODE && this.renderSelfView(), minimized && external_React_default().createElement(__Minimized, (0,esm_extends.A)({}, this.props, {
+    }, IS_MINI_MODE && this.renderMiniMode(source), !IS_MINI_MODE && this.renderSelfView(), minimized && external_React_default().createElement(__Minimized, (0,esm_extends.A)({}, this.props, {
       onOptionsToggle: this.handleOptionsToggle
     })));
   }
@@ -24869,6 +24852,7 @@ class ParticipantsBlock extends mixins.w9 {
                         local-stream-node
                         ${call.isSharingScreen() ? '' : 'local-stream-mirrored'}
                         ${forcedLocal ? 'active' : ''}
+                        ${call.speakerCid === 0 ? 'active-speaker' : ''}
                     `,
           simpletip: {
             ...SIMPLE_TIP,
@@ -25900,18 +25884,11 @@ class stream_Stream extends mixins.w9 {
         }));
       })));
     }
-    let source;
-    let VideoType;
-    if (forcedLocal) {
-      VideoType = videoNode.Cn;
-      source = call.getLocalStream();
-    } else {
-      VideoType = videoNode.zu;
-      source = call.getActiveStream();
-      if (!source) {
-        return null;
-      }
+    const source = call.getActiveStream();
+    if (!source) {
+      return null;
     }
+    const VideoType = source.isLocal ? videoNode.Cn : videoNode.zu;
     const videoNodeRef = external_React_default().createRef();
     return external_React_default().createElement(VideoType, {
       key: source.clientId,
@@ -31821,13 +31798,16 @@ class DropdownContactsSelector extends _chat_mixins1__.w9 {
     this.props.onSelectClicked();
   }
   render() {
-    var self = this;
     return React.createElement(Dropdown, {
-      className: "popup contacts-search " + this.props.className + " tooltip-blur",
+      className: `
+                    popup contacts-search
+                    ${this.props.className}
+                    tooltip-blur
+                `,
       active: this.props.active,
       closeDropdown: this.props.closeDropdown,
-      ref: function (r) {
-        self.dropdownRef = r;
+      ref: ref => {
+        this.dropdownRef = ref;
       },
       positionMy: this.props.positionMy,
       positionAt: this.props.positionAt,
@@ -31838,8 +31818,8 @@ class DropdownContactsSelector extends _chat_mixins1__.w9 {
     }, React.createElement(_chat_ui_contacts_jsx2__.ContactPickerWidget, {
       onClose: this.props.closeDropdown,
       onEventuallyUpdated: () => {
-        var _self$dropdownRef;
-        (_self$dropdownRef = self.dropdownRef) == null || _self$dropdownRef.doRerender();
+        var _this$dropdownRef;
+        return (_this$dropdownRef = this.dropdownRef) == null ? void 0 : _this$dropdownRef.doRerender();
       },
       active: this.props.active,
       className: "popup contacts-search tooltip-blur small-footer",
@@ -31851,6 +31831,8 @@ class DropdownContactsSelector extends _chat_mixins1__.w9 {
       multiple: this.props.multiple,
       topButtons: this.props.topButtons,
       showAddContact: this.props.showAddContact,
+      onAddContact: () => eventlog(500237),
+      onSelected: () => eventlog(500238),
       onSelectDone: this.props.onSelectDone,
       multipleSelectedButtonLabel: this.props.multipleSelectedButtonLabel,
       singleSelectedButtonLabel: this.props.singleSelectedButtonLabel,

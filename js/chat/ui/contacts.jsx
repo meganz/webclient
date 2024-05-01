@@ -1537,6 +1537,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                             onClick={() => {
                                 contactAddDialog();
                                 closeDropdowns();
+                                this.props.onAddContact?.();
                             }}
                         />
                     </div>

@@ -77,6 +77,7 @@ export class StartGroupChatWizard extends MegaRenderMixin {
             openInvite,
         });
         this.props.onClose(this);
+        eventlog(500236);
     }
     render() {
         var self = this;

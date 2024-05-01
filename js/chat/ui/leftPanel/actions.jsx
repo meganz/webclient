@@ -34,8 +34,7 @@ export default class Actions extends MegaRenderMixin {
                 }
                 {view === CHATS && routingSection !== 'contacts' &&
                     <Button
-                        className="mega-button action"
-                        icon="sprite-fm-mono icon-add-circle"
+                        className="mega-button small positive new-chat-action"
                         label={l.add_chat /* `New chat` */}>
                         <DropdownContactsSelector
                             className={`
@@ -65,10 +64,9 @@ export default class Actions extends MegaRenderMixin {
                 }
                 {view === MEETINGS && routingSection !== 'contacts' &&
                     <Button
-                        className="mega-button action"
-                        icon="sprite-fm-mono icon-add-circle"
-                        label={l.create_meeting /* `Create meeting` */}>
-                        <i className="sprite-fm-mono icon-arrow-down"/>
+                        className="mega-button small positive"
+                        label={l.new_meeting /* `New meeting` */}>
+                        <i className="dropdown-indicator sprite-fm-mono icon-arrow-down"/>
                         <Dropdown
                             className="light"
                             noArrow="true"

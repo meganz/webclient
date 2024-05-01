@@ -153,7 +153,10 @@ export class Start extends MegaRenderMixin {
                     </div>
                     <Button
                         className="mega-button positive large start-meeting-button"
-                        onClick={this.startMeeting}>
+                        onClick={() => {
+                            this.startMeeting();
+                            eventlog(500235);
+                        }}>
                         <span>{l[7315] /* `Start` */}</span>
                     </Button>
                     <Link to="https://mega.io/chatandmeetings" target="_blank">

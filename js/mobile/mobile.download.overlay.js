@@ -128,7 +128,7 @@ mobile.downloadOverlay = {
             id = `dl_${node.h}`;
         }
 
-        const container = mCreateElement('div', {'class': 'download-file-container'});
+        const container = mCreateElement('div', {'class': 'download-file-container full-width'});
 
         this.downloadTransfer = new MegaMobileTransferBlock({
             parentNode: container,

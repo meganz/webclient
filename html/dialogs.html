@@ -1515,7 +1515,7 @@
         <section class="content">
             <div class="content-block">
                 <div class="create-folder-input-bl create-file-wrapper">
-                    <i class="sprite-fm-uni icon-text-24"></i>
+                    <i class="item-type-icon icon-text-24"></i>
                     <input name="dialog-new-file" type="text" value="" placeholder="[$17506]" autofocus />
                 </div>
                 <div class="whitespaces-input-warning">
@@ -3785,8 +3785,8 @@
                     [$6996]
                 </div>
                 <div class="cancel-option-prompt">[$7005]</div>
-                <div class="error-banner select-reason hidden">[$select_cancel_sub_reason_error_msg]</div>
-                <form>
+                <div class="error-banner select-reason hidden">[$cancel_sub_no_opt_picked_mob]</div>
+                <form class="cancel-options mega-gap-12">
                     <div class="label-wrap">
                         <div class="cancel-option radioOff" id="subcancel8_div">
                             <input type="radio" id="subcancel8" class="cancel-option radioOff" value="8">
@@ -3804,6 +3804,26 @@
                 </form>
             </div>
         </section>
+        <section class="content">
+            <div class="content-block cancellation-contact">
+                <div class="cancel-option-prompt">[$cancel_sub_can_contact]</div>
+                <div class="error-banner select-can-contact hidden">[$cancel_sub_err_make_selection]</div>
+                <form class="allow-contact-options mega-gap-12">
+                    <div class="allow-contact-wrapper">
+                        <div class="contact-option radioOff" id="cancel_sub_contact_yes">
+                            <input type="radio" class="contact-option radioOff" value="1">
+                        </div>
+                        <div class="radio-txt">[$78]</div>
+                    </div>
+                    <div class="allow-contact-wrapper">
+                        <div class="contact-option radioOff" id="cancel_sub_contact_no">
+                            <input type="radio" class="contact-option radioOff" value="0">
+                        </div>
+                        <div class="radio-txt">[$79]</div>
+                    </div>
+                </form>
+            </div>
+        </section>
 
         <footer>
             <div class="footer-container">
@@ -3811,9 +3831,6 @@
                     <span>[$dont_cancel_sub_btn_label]</span>
                 </button>
                 <div class="cancel-buttons">
-                    <button class="mega-button skip-cancel-subscription">
-                        <span>[$skip_and_cancel_sub_btn_label]</span>
-                    </button>
                     <button class="mega-button positive cancel-subscription">
                         <span>[$cancel_sub_btn_label]</span>
                     </button>

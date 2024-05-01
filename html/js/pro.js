@@ -28,6 +28,9 @@ var pro = {
     UTQA_RES_INDEX_ITEMNUM: 11,
 
     /* Constants for special Pro levels */
+    ACCOUNT_LEVEL_STARTER: 11,
+    ACCOUNT_LEVEL_BASIC: 12,
+    ACCOUNT_LEVEL_ESSENTIAL: 13,
     ACCOUNT_LEVEL_PRO_LITE: 4,
     ACCOUNT_LEVEL_PRO_I: 1,
     ACCOUNT_LEVEL_PRO_II: 2,
@@ -164,6 +167,7 @@ var pro = {
                     pro.conversionRate = conversionRate;
                 })
                 .finally(() => {
+                    pro.filter.initPlanFilters();
                     // Run the callback function
                     loadedCallback();
                 });
@@ -290,19 +294,25 @@ var pro = {
 
         switch (planNum) {
             case 1:
-                return l[5819];          // Pro I
+                return l[5819];                 // Pro I
             case 2:
-                return l[6125];          // Pro II
+                return l[6125];                 // Pro II
             case 3:
-                return l[6126];          // Pro III
+                return l[6126];                 // Pro III
             case 4:
-                return l[8413];          // Pro Lite
+                return l[8413];                 // Pro Lite
+            case 11:
+                return l.plan_name_starter;     // Starter
+            case 12:
+                return l.plan_name_basic;       // Basic
+            case 13:
+                return l.plan_name_essential;   // Essential
             case 100:
-                return l[19530];         // Business
+                return l[19530];                // Business
             case 101:
-                return l.pro_flexi_name; // Pro Flexi
+                return l.pro_flexi_name;        // Pro Flexi
             default:
-                return l[1150];          // Free
+                return l[1150];                 // Free
         }
     },
 
@@ -435,5 +445,94 @@ var pro = {
             name: 'unknown',
             displayName: 'Unknown'
         };
-    }
+    },
+
+    // pro.filter will contain the filtering functions, filter types, and plans
+    filter: {
+
+        // plans contains the filtered plan arrays
+        plans: {},
+
+        initPlanFilters() {
+            'use strict';
+            const simpleFilter = Object.keys(pro.filter.simple);
+
+            // For monthly (1), yearly (12), and combined (23)
+            for (let i = 1; i < 24; i += 11) {
+                const months = i < 13 ? i : false;
+                const monthsTag = months
+                    ? months === 1 ? 'M' : 'Y'
+                    : '';
+
+                // Set up basic filters (is in account level group, and right num months)
+                for (let j = 0; j < simpleFilter.length; j += 1) {
+                    lazy(pro.filter.plans, simpleFilter[j] + monthsTag, () => pro.membershipPlans.filter((plan) => {
+                        if (months) {
+                            return pro.filter.simple[simpleFilter[j]].has(plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL])
+                                                                          && plan[pro.UTQA_RES_INDEX_MONTHS] === months;
+                        }
+                        return pro.filter.simple[simpleFilter[j]].has(plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL]);
+                    }));
+                }
+            }
+
+            lazy(pro.filter, 'affMin', () => {
+                const plans = pro.filter.plans.affPlansM;
+                let currentMin = plans[0];
+                for (let i = 1; i < plans.length; i++) {
+                    if (plans[i][pro.UTQA_RES_INDEX_STORAGE] < currentMin[pro.UTQA_RES_INDEX_STORAGE]) {
+                        currentMin = plans[i];
+                    }
+                }
+                return currentMin;
+            });
+        },
+
+        lowestRequired(userStorage, secondaryFilter) {
+            'use strict';
+            secondaryFilter = secondaryFilter || 'core';
+            const plans = pro.filter.plans[secondaryFilter + 'M'];
+            if (!plans) {
+                return;
+            }
+            return plans.find((plan) =>
+                (plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] !== u_attr.p)
+                && ((plan[pro.UTQA_RES_INDEX_STORAGE] * pro.BYTES_PER_GB) > userStorage)
+                || (plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === pro.ACCOUNT_LEVEL_PRO_FLEXI));
+        }
+    },
 };
+
+// These are intended to be used in a similar way to transifex strings
+// If 2 arrays are the same but have a different context, please keep them separate.
+// This is to make future updating as straighforward as possible.
+lazy(pro.filter, 'simple', () => {
+    'use strict';
+    return {
+
+        // validPurchases: 11, 12, 13, 4, 1, 2, 3, 101 - plans that are valid to purchase via propay_X
+        // Excludes any plans that are not directly purchasable at the url /propay_X. e.g., Business
+        validPurchases:
+            new Set([pro.ACCOUNT_LEVEL_STARTER, pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL,
+                     pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II,
+                     pro.ACCOUNT_LEVEL_PRO_III, pro.ACCOUNT_LEVEL_PRO_FLEXI]),
+
+        // all: 11, 12, 13, 4, 1, 2, 3, 101, 100 - all currently available plans
+        // Excludes any plans that the webclient is not yet ready to support.
+        all:
+            new Set([pro.ACCOUNT_LEVEL_STARTER, pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL,
+                     pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II,
+                     pro.ACCOUNT_LEVEL_PRO_III, pro.ACCOUNT_LEVEL_PRO_FLEXI, pro.ACCOUNT_LEVEL_BUSINESS]),
+
+        // storageTransferDialogs: 11, 12, 13, 4, 1, 2, 3, 101 - plans that should be shown in the storage
+        // and transfer upsell dialogs
+        storageTransferDialogs:
+            new Set([pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II,
+                     pro.ACCOUNT_LEVEL_PRO_III, pro.ACCOUNT_LEVEL_PRO_FLEXI]),
+
+        // affPlans: 4, 1, 2, 3 - plans that can show in the affiliate redeem section
+        affPlans:
+            new Set([pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II,
+                     pro.ACCOUNT_LEVEL_PRO_III])
+    };
+});

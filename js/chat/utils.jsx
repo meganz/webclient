@@ -46,46 +46,19 @@ export async function prepareExportIo(dl) {
 }
 
 export function prepareExportStreams(attachNodes, onEmpty) {
-    const CHUNK_SIZE = 1048576; // 1 MB
-    const nextChunk = async function(controller, handle, start, size) {
-        const fetched = await M.gfsfetch(handle, start, start + size).catch(ex => {
-            if (ex === EOVERQUOTA || Object(ex.target).status === 509) {
-                return controller.error(ex);
-            }
-        });
-
-        const input = fetched && fetched.buffer || new ArrayBuffer(0);
-        if (!fetched || !fetched.buffer) {
-            onEmpty(size);
-        }
-        controller.enqueue(new Uint8Array(input));
-    };
 
     return attachNodes.map(node => {
         return {
             name: node.name,
             lastModified: new Date((node.mtime || node.ts) * 1000),
-            input: new ReadableStream({
-                offset: 0,
-                start(controller) {
-                    this.offset = Math.min(node.s, CHUNK_SIZE);
-                    return nextChunk(controller, node.h, 0, this.offset);
-                },
-                pull(controller) {
-                    if (this.offset >= node.s) {
-                        controller.close();
-                        return;
+            input: M.gfsfetch.getReadableStream(node, {
+                error(ex, n) {
+                    if (d) {
+                        console.error(`${n.h}: ${ex}`);
                     }
-                    if (node.s - this.offset >= CHUNK_SIZE) {
-                        const chunk = nextChunk(controller, node.h, this.offset, CHUNK_SIZE);
-                        this.offset += CHUNK_SIZE;
-                        return chunk;
-                    }
-                    const chunk = nextChunk(controller, node.h, this.offset, node.s - this.offset);
-                    this.offset = node.s;
-                    return chunk;
-                },
-            }),
+                    onEmpty(n.s);
+                }
+            })
         };
     });
 }

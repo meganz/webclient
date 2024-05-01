@@ -588,7 +588,7 @@ MegaData.prototype.menuItems = async function menuItems() {
 
     // S4 Object Storage
     if ($.selected.length === 1 && sourceRoot === 's4') {
-        const s4Type = s4.kernel.getS4NodeType(selNode);
+        const s4Type = 'kernel' in s4 && s4.kernel.getS4NodeType(selNode);
 
         delete items['.open-cloud-item'];
 
@@ -597,7 +597,7 @@ MegaData.prototype.menuItems = async function menuItems() {
         }
 
         // Temporary block most of actions over the containers
-        if (s4Type === 'container') {
+        if (s4Type === 'container' || !s4Type) {
             delete items['.move-item'];
             delete items['.rename-item'];
             delete items['.add-star-item'];

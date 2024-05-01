@@ -181,7 +181,10 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
                                 t: node.t,
                                 h: node.h,
                                 p: node.p,
-                                n: base64urlencode(to8(M.getSafeName(node.name)))
+                                n: base64urlencode(to8(M.getSafeName(node.name))),
+                                ts: node.mtime || node.ts,
+                                k: a32_to_base64(node.k),
+                                rewind: node.rewind
                             });
                         }
                     }
@@ -202,7 +205,8 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
                         }
                         else { // it's object
                             addNodeToArray(files, nodes[k]);
-                            if (nodes[k].t) {
+                            if (nodes[k].t && !nodes[k].rewind) {
+                                // If its a rewind download, we need not add the children recursively here
                                 recursivelyLoadNodes(arr, Object.keys(M.c[nodes[k].h]));
                             }
                         }

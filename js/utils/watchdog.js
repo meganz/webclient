@@ -269,7 +269,12 @@ lazy(self, 'watchdog', () => Object.freeze({
             case 'setsid':
                 if (this.Strg.login === strg.origin && strg.data) {
                     const sid = strg.data;
-                    delay('watchdog:setsid', () => u_checklogin4(sid).dump('watchdog.setsid'), 750);
+                    delay('watchdog:setsid', () => u_checklogin4(sid).then(() => {
+                        if (dlid || folderlink || dlmanager.isDownloading) {
+                            return;
+                        }
+                        location.reload();
+                    }).dump('watchdog.setsid'), 750);
                     delete this.Strg.login;
                 }
                 break;

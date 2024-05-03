@@ -1934,6 +1934,14 @@ mBroadcaster.once('boot_done', function populate_l() {
 
     l.invite_subject_text = escapeHTML(encodeURIComponent(l.invite_subject_text));
 
+    l.etd_link_removed_body = escapeHTML(l.etd_link_removed_body)
+        .replace('[A1]', `<a href="https://mega.io/terms" target="_blank">`)
+        .replace('[/A1]', '</a>')
+        .replace('[A2]', `<a href="https://mega.io/takedown" target="_blank">`)
+        .replace('[/A2]', '</a>')
+        .replace('[P]', '<h3 class="sub-header">')
+        .replace('[/P]', '</h3>');
+
     const common = [
         15536, 16107, 16119, 16120, 16136, 16304, 16313, 16316, 16358, 16360, 16361, 16394, 18228, 18268, 18282,
         18284, 18285, 18286, 18287, 18289, 18290, 18291, 18294, 18295, 18296, 18297, 18298, 18302, 18303, 18304,

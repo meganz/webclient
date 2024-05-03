@@ -812,67 +812,62 @@ lazy(mega, 'rewind', () => {
                     }
                 };
 
-                // We get the first time as default
-                let startTimestamp = treeCache && treeCache.ts || 0;
-
-                if (startTimestamp === 0) {
-                    logger.warn('Rewind.loadActionPacket - Tree cache timestamp must not be 0', treeCache);
-                }
-
                 let order = (lastOrder || 0); // lastOrder is already incremented
                 const promiseSet = new Set();
                 let batchPromise = null;
 
-                for (const packet of packets) {
+                for (let i = 0; i < packets.length; i++) {
+                    const packet = packets[i];
                     if (!packet) {
                         // Since we set from 1, not 0, possibility of null value
                         continue;
                     }
+
                     const packetInfo = parsePacketData(packet, order);
+                    if (packetInfo.ts) {
+                    // Packets with no timestamp are discarded since packet date is unknown
+                        const packetTimestamp = packetInfo.ts;
+                        const actionPacket = packetInfo.d.a;
+                        const actionPacketCommand = actionPacket.a;
+                        const actionPacketFiles = packetInfo.d.f;
 
-                    // If no timestamp we use the previous one as default
-                    if (!packetInfo.ts && startTimestamp) {
-                        packetInfo.ts = startTimestamp;
-                    }
+                        // Handle packets
+                        const itemTimestamp = packetTimestamp;
+                        const actionDateInfo = getActionDate(itemTimestamp);
+                        const actionTimestamp = actionDateInfo[0];
+                        const actionDateString = actionDateInfo[1];
 
-                    const packetTimestamp = packetInfo.ts;
-                    const actionPacket = packetInfo.d.a;
-                    const actionPacketCommand = actionPacket.a;
-                    const actionPacketFiles = packetInfo.d.f;
+                        switch (actionPacketCommand) {
+                            case 'u':
+                                prepareDateData(actionDateString, dateData);
+                                this.handleUpdatePacket(
+                                    dateData, actionPacket, actionPacketFiles, actionDateString, itemTimestamp
+                                );
+                                break;
+                            case 't':
+                                // We make sure date data is available
+                                prepareDateData(actionDateString, dateData);
+                                this.handleTreePacket(
+                                    dateData, actionPacket, actionPacketFiles, actionDateString,
+                                    itemTimestamp, timestampInSeconds, actionTimestamp
+                                );
+                                break;
+                            case 'd':
+                                prepareDateData(actionDateString, dateData);
+                                this.handleDeletePacket(dateData, actionPacket, actionDateString, itemTimestamp);
+                                break;
+                        }
+                        // end handle packets
 
-                    // Handle packets
-                    const itemTimestamp = packetTimestamp;
-                    const actionDateInfo = getActionDate(itemTimestamp);
-                    const actionTimestamp = actionDateInfo[0];
-                    const actionDateString = actionDateInfo[1];
-
-                    switch (actionPacketCommand) {
-                        case 't':
-                            // We make sure date data is available
-                            prepareDateData(actionDateString, dateData);
-                            this.handleTreePacket(
-                                dateData, actionPacket, actionPacketFiles, actionDateString,
-                                itemTimestamp, timestampInSeconds, actionTimestamp
-                            );
-                            break;
-                        case 'd':
-                            prepareDateData(actionDateString, dateData);
-                            this.handleDeletePacket(dateData, actionPacket, actionDateString, itemTimestamp);
-                            break;
-                    }
-                    // end handle packets
-
-                    if (packetInfo.save) {
-                        delete packetInfo.save;
-                        batchPromise = mega.rewindStorage.saveActionPackets(cacheSequenceNumber, packetInfo);
-                        if (!promiseSet.has(batchPromise)) {
-                            promiseSet.add(batchPromise);
+                        if (packetInfo.save) {
+                            delete packetInfo.save;
+                            batchPromise = mega.rewindStorage.saveActionPackets(cacheSequenceNumber, packetInfo);
+                            if (!promiseSet.has(batchPromise)) {
+                                promiseSet.add(batchPromise);
+                            }
                         }
                     }
 
-                    // After we roll over, we just save the last timestamp to be used
-                    // if the next packet has no associated timestamp
-                    startTimestamp = packet.ts || startTimestamp;
                     order++;
                 }
 
@@ -910,6 +905,39 @@ lazy(mega, 'rewind', () => {
             }
         }
 
+        handleUpdatePacket(
+            dateData, actionPacket, actionPacketFiles, actionDateString, actionPacketTimestamp
+        ) {
+            const nodes = actionPacketFiles.map((file) => {
+                const node = this.nodeDictionary[file.h];
+                if (node) {
+                    file.p = node.p;
+                    file.t = node.t;
+                }
+                return file;
+            }).filter((file) => file.t !== undefined);
+
+            dateData[actionDateString].actions.push({
+                d: {
+                    a: actionPacket,
+                    f: nodes
+                },
+                ts: actionPacketTimestamp
+            });
+
+            for (let i = 0; i < nodes.length; i++) {
+                const node = nodes[i];
+                this.prepareNode(node, dateData[actionDateString].modified, false, true);
+                dateData[actionDateString].type[node.h] = TYPE_MODIFIED;
+
+                // Cleanup previous records (might be at top of hierarchy)
+                this.removeNode(node.h, this.nodeDictionary, this.nodeChildrenDictionary);
+
+                // Add it again for right mapping
+                this.prepareNode(node, this.nodeDictionary, this.nodeChildrenDictionary);
+            }
+        }
+
         // FIXME: Adjust later
         // eslint-disable-next-line complexity
         handleTreePacket(
@@ -925,7 +953,8 @@ lazy(mega, 'rewind', () => {
                 ts: actionPacketTimestamp
             });
 
-            for (const node of actionPacketFiles) {
+            for (let i = 0; i < actionPacketFiles.length; i++) {
+                const node = actionPacketFiles[i];
                 let existingNode = null;
                 if (node) {
                     existingNode = this.nodeDictionary[node.h];
@@ -1102,26 +1131,29 @@ lazy(mega, 'rewind', () => {
 
             for (let i = 0; i < sortedNodes.length; i++) {
                 const node = mega.rewind.nodeDictionary[sortedNodes[i]];
-                if (!timestampInSeconds || node.ts <= timestampInSeconds) {
-                    if (node.t && this.isTreeOpen(node.h)) {
-                        const result = this.getChildNodes({
-                            selectedHandle: node.h,
-                            currentLevel: currentLevel + 1
-                        });
-                        nodes.push(...result);
+                if (node) {
+                    if (!timestampInSeconds || node.ts <= timestampInSeconds) {
+                        if (node.t && this.isTreeOpen(node.h)) {
+                            const result = this.getChildNodes({
+                                selectedHandle: node.h,
+                                currentLevel: currentLevel + 1,
+                                ts,
+                            });
+                            nodes.push(...result);
+                        }
+                        else if (!node.fv) {
+                            nodes.push(node.h);
+                        }
                     }
-                    else if (!node.fv) {
-                        nodes.push(node.h);
-                    }
-                }
 
-                // Last item, save last element
-                if (i + 1 === sortedNodes.length) {
-                    // To be able to see the linked list
-                    // on where to stop looking for the end index
-                    currentNode.handleEnd = node.h;
-                    if (node.t) {
-                        currentNode.handleEndFolder = true;
+                    // Last item, save last element
+                    if (i + 1 === sortedNodes.length) {
+                        // To be able to see the linked list
+                        // on where to stop looking for the end index
+                        currentNode.handleEnd = node.h;
+                        if (node.t) {
+                            currentNode.handleEndFolder = true;
+                        }
                     }
                 }
             }
@@ -1138,6 +1170,10 @@ lazy(mega, 'rewind', () => {
                 if (useDictionary) {
                     nodeA = this.nodeDictionary[a];
                     nodeB = this.nodeDictionary[b];
+                }
+
+                if (!nodeA || !nodeB) {
+                    return -1;
                 }
 
                 if (nodeA.t > nodeB.t) {

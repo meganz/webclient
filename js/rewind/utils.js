@@ -332,9 +332,21 @@ lazy(mega, 'rewindUtils', () => {
 
             mega.rewindUtils.pending[packetIndex] = true;
             const promiseArray = mega.rewindUtils.packets[packetIndex][1];
+
+            const packet = {...mega.rewindUtils.packets[packetIndex][0]};
+            if (packet.a === 'u') {
+                packet.h = packet.n;
+                packet.a = packet.at;
+                delete packet.n;
+                delete packet.at;
+
+                crypto_decryptnode(packet);
+                promiseArray.push(Promise.resolve(packet));
+            }
+
             let nodes = [];
             if (promiseArray.length) {
-                nodes = await Promise.all(mega.rewindUtils.packets[packetIndex][1]);
+                nodes = await Promise.all(promiseArray);
             }
 
             // Awaited nodes
@@ -345,10 +357,18 @@ lazy(mega, 'rewindUtils', () => {
         }
 
         handleTimestamp(ts) {
+            const mismatch = ts.length - (mega.rewindUtils.packets.length - 1);
+            if (mismatch) {
+                logger.warn('RewindChunkPacketHandler.handleTimestamp - ts and packets length mismatch', mismatch);
+            }
+
             for (let i = 0; i < ts.length; i++) {
-                const index = i + 1;
-                if (mega.rewindUtils.packets[index]) {
-                    mega.rewindUtils.packets[index][3] = ts[i];
+                const packetIndex = i + 1;
+                if (packetIndex < mega.rewindUtils.packets.length) {
+                    const packet = mega.rewindUtils.packets[packetIndex];
+                    if (packet) {
+                        packet[3] = ts[i];
+                    }
                 }
             }
         }

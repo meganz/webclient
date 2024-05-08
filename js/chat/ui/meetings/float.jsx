@@ -3,7 +3,13 @@ import { compose, MegaRenderMixin } from '../../mixins';
 import utils, { ParsedHTML } from '../../../ui/utils.jsx';
 import Button from './button.jsx';
 import { MODE, VIEW } from './call.jsx';
-import { LocalVideoThumb, LocalVideoHiRes, PeerVideoHiRes, AudioLevelIndicator } from './videoNode.jsx';
+import {
+    LocalVideoThumb,
+    LocalVideoHiRes,
+    PeerVideoHiRes,
+    LocalVideoHiResCloned,
+    AudioLevelIndicator
+} from './videoNode.jsx';
 import FloatExtendedControls from './floatExtendedControls.jsx';
 import { withMicObserver } from './micObserver.jsx';
 import { withPermissionsObserver } from './permissionsObserver.jsx';
@@ -343,16 +349,20 @@ class Stream extends MegaRenderMixin {
     };
 
     renderMiniMode = (source) => {
-        const { call, mode, onLoadedData } = this.props;
+        const { call, mode, isPresenterNode, onLoadedData } = this.props;
 
         if (call.sfuClient.isOnHold()) {
             return this.renderOnHoldVideoNode();
         }
-        const VideoClass = source.isLocal ? LocalVideoThumb : PeerVideoHiRes;
+        let VideoClass = PeerVideoHiRes;
+        if (source.isLocal) {
+            VideoClass = isPresenterNode ? LocalVideoHiRes : LocalVideoThumb;
+        }
         return (
             <VideoClass
                 chatRoom={this.props.chatRoom}
                 mode={mode}
+                isPresenterNode={isPresenterNode}
                 onLoadedData={onLoadedData}
                 source={source} // ignored for LocalVideoHiRes
                 key={source}
@@ -361,19 +371,21 @@ class Stream extends MegaRenderMixin {
     };
 
     renderSelfView = () => {
-        const { isOnHold, minimized, onLoadedData, chatRoom } = this.props;
+        const { isOnHold, minimized, chatRoom, isPresenterNode, call, onLoadedData } = this.props;
         const { options } = this.state;
 
         if (isOnHold) {
             return this.renderOnHoldVideoNode();
         }
 
+        const VideoNode = call.isSharingScreen() ? LocalVideoHiResCloned : LocalVideoThumb;
         return (
             <>
-                <LocalVideoThumb
+                <VideoNode
                     isSelfOverlay={true}
                     minimized={minimized}
                     chatRoom={chatRoom}
+                    isPresenterNode={isPresenterNode}
                     onLoadedData={onLoadedData}
                 />
                 <div className={`${FloatingVideo.NAMESPACE}-self-overlay`}>
@@ -447,7 +459,7 @@ class Stream extends MegaRenderMixin {
                 </div>
             );
         }
-        const source = this.getStreamSource();
+        const source = this.getStreamSource() || call.getLocalStream();
         return (
             <div
                 ref={this.containerRef}

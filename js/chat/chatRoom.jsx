@@ -2256,7 +2256,7 @@ ChatRoom.prototype.subscribeForCallEvents = function() {
     });
     this.rebind('onCallPeerLeft.callManager', (e, data) => {
         const {call} = this;
-        if (
+        if (!call ||
             call.isDestroyed ||
             call.hasOtherParticipant() ||
             SfuClient.isTermCodeRetriable(data.reason)

@@ -45,7 +45,7 @@ export default class SidebarControls extends MegaRenderMixin {
                                 ${sidebar && view === VIEW.CHAT ? 'selected' : ''}
                                 ${isOnHold ? 'disabled' : ''}
                             `}
-                            icon={sidebar && view === VIEW.CHAT ? 'icon-chat-filled' : 'icon-message-chat-circle'}
+                            icon={sidebar && view === VIEW.CHAT ? 'icon-chat-filled' : 'icon-message-chat-circle-thin'}
                         />
                         <span className="control-label">{l.chat_call_button /* `Chat` */}</span>
                         {notifications > 0 &&

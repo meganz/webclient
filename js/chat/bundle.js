@@ -22454,7 +22454,7 @@ class SidebarControls extends mixins.w9 {
                                 ${sidebar && view === VIEW.CHAT ? 'selected' : ''}
                                 ${isOnHold ? 'disabled' : ''}
                             `,
-      icon: sidebar && view === VIEW.CHAT ? 'icon-chat-filled' : 'icon-message-chat-circle'
+      icon: sidebar && view === VIEW.CHAT ? 'icon-chat-filled' : 'icon-message-chat-circle-thin'
     }), external_React_default().createElement("span", {
       className: "control-label"
     }, l.chat_call_button), notifications > 0 && external_React_default().createElement("span", {

@@ -2364,6 +2364,10 @@ MegaData.prototype.favouriteDomUpdate = function(node, favState) {
 
         delay(`fav.dom-update.${node.h}`, () => {
 
+            if (M.currentrootid === 'shares') {
+                return;
+            }
+
             const domListNode = M.megaRender && M.megaRender.nodeMap[node.h] || document.getElementById(node.h);
 
             if (domListNode) {

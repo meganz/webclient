@@ -533,6 +533,11 @@ lazy(pro.filter, 'simple', () => {
         // affPlans: 4, 1, 2, 3 - plans that can show in the affiliate redeem section
         affPlans:
             new Set([pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II,
-                     pro.ACCOUNT_LEVEL_PRO_III])
+                     pro.ACCOUNT_LEVEL_PRO_III]),
+
+        // ninetyDayRewind: 11, 12, 13, 4 - plans that have up to 90 days rewind instead of up to 180 days
+        ninetyDayRewind:
+            new Set([pro.ACCOUNT_LEVEL_STARTER, pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL,
+                     pro.ACCOUNT_LEVEL_PRO_LITE]),
     };
 });

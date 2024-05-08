@@ -2210,6 +2210,8 @@ accountUI.plan = {
                         return;
                     }
 
+                    const $cancelDialog = this.$benefitsCancelDialog;
+
                     const duration = planDuration === '1 Y' ? 12 : 1;
 
                     const plan = pro.membershipPlans.find(plan =>
@@ -2221,13 +2223,15 @@ accountUI.plan = {
                     const proStorage = bytesToSize(plan[pro.UTQA_RES_INDEX_STORAGE] * 1073741824, 0);
                     const freeTransfer = l['1149'];
                     const proTransfer = bytesToSize(plan[pro.UTQA_RES_INDEX_TRANSFER] * 1073741824, 0);
-                    const $cancelDialog = this.$benefitsCancelDialog;
+                    const rewindTxt = mega.icu.format(l.pr_up_to_days, pro.filter.simple.ninetyDayRewind
+                        .has(plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL]) ? 90 : 180);
 
                     $('.pro-storage', $cancelDialog).text(proStorage);
                     $('.free-storage', $cancelDialog).text(freeStorage);
                     $('.pro-transfer', $cancelDialog).text(proTransfer);
                     $('.free-transfer', $cancelDialog).text(freeTransfer);
                     $('.plan-name', $cancelDialog).text(proPlanName);
+                    $('.rewind-pro', $cancelDialog).text(rewindTxt);
 
                     $('span', $keepPlanBtn)
                         .text(l.cancel_pro_keep_current_plan.replace('%1', pro.getProPlanName(subscription)));

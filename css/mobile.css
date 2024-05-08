@@ -2810,7 +2810,7 @@ div.checkboxOn {
     margin-bottom: 48px;
     margin-top: 48px;
 }
-.data-protection h1, .terms-of-service h1, .terms-general h1, .privacy-policy h1, .takedown-guidance h1, .contact-us h1, .resellers-page h1, .privacy-company h1 {
+.data-protection h1, .terms-of-service h1, .terms-general h1, .privacy-policy h1, .takedown-guidance h1, .contact-us h1, .resellers-page h1 {
     font-family: var(--text-font-family-second-semibold);
     font-size: 32px;
     color: #262F3B;
@@ -9194,9 +9194,6 @@ Thank You dialog
     .mobile .onboarding-suggestions .bottom-page.top-dark-info.medium {
         font-size: 24px;
         line-height: 36px;
-    }
-    .privacy-company h1 {
-        font-size: 25px;
     }
 }
 

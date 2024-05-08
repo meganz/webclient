@@ -174,27 +174,39 @@ export default class Recurring extends MegaRenderMixin {
         );
     }
 
+    IntervalSelect = () => {
+        const { interval, view } = this.state;
+        return <div className="mega-input inline recurring-interval">
+            <Select
+                name={`${Recurring.NAMESPACE}-interval`}
+                value={interval > 0 ? interval : 1}
+                icon={true}
+                options={[...Array(view === this.VIEWS.WEEKLY ? 52 : 12).keys()].map(value => {
+                    value += 1;
+                    return { value, label: value };
+                })}
+                onSelect={({ value }) => {
+                    this.setState({ interval: value === 1 ? 0 : value });
+                }}
+            />
+        </div>;
+    };
+
     renderIntervalControls() {
         const { view, interval } = this.state;
         return (
             <div className="recurring-field-row">
-                <span>{l.recur_rate}</span>
-                <div className="mega-input inline recurring-interval">
-                    <Select
-                        name={`${Recurring.NAMESPACE}-interval`}
-                        value={interval > 0 ? interval : 1}
-                        icon={true}
-                        options={[...Array(view === this.VIEWS.WEEKLY ? 52 : 12).keys()].map(value => {
-                            value += 1;
-                            return { value: value, label: value };
-                        })}
-                        onSelect={({ value }) => {
-                            this.setState({ interval: value === 1 ? 0 : value });
-                        }}
-                    />
-                </div>
-                {view === this.VIEWS.WEEKLY && <span>{mega.icu.format(l.plural_week, interval)}</span>}
-                {view === this.VIEWS.MONTHLY && <span>{mega.icu.format(l.plural_month, interval)}</span>}
+                {
+                    reactStringWrap(
+                        mega.icu.format(
+                            /* `Occurs every [S][/S] [month|week](s)` */
+                            view === this.VIEWS.MONTHLY ? l.recur_rate_monthly : l.recur_rate_weekly,
+                            interval > 0 ? interval : 1
+                        ),
+                        "[S]",
+                        this.IntervalSelect
+                    )
+                }
             </div>
         );
     }

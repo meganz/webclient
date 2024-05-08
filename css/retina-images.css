@@ -90,18 +90,6 @@
         background-image: url(../images/mega/register-big-sprite@2x.png);
         background-size: 200px auto;
     }
-    .terms-agent-info {
-        background-image: url(../images/mega/terms-icons@2x.png);
-        background-size: 14px auto;
-    }
-    .team-social-icon {
-        background-image: url(../images/mega/about-sprite@2x.png);
-        background-size: 72px auto;
-    }
-    .privacy-company-icon, .privacy-company-bott .st-quote-left, .privacy-company-bott .st-quote-right {
-        background-image: url(../images/mega/privacy-sprite@2x.png);
-        background-size: 130px auto;
-    }
     .widget-circle, .widget-arrows, .widget-icon, .widget-arrow {
         background-image: url(../images/mega/widget-progress@2x.png);
         background-size: 40px auto;
@@ -500,10 +488,5 @@
     .context-sprite, i.context-sprite {
         background-image: url(../images/mega/context-sprite@2x.png);
         background-size: 217px auto;
-    }
-
-    .bottom-page.about-sprite, i.bottom-page.about-sprite {
-        background-image: url(../images/mega/about-sprite@2x.png) !important;
-        background-size: 525px auto;
     }
 }

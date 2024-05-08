@@ -476,6 +476,11 @@
                 margin-top: 12px;
             }
 
+            .mega-dialog.dialog-template-message > header h3.sub-header {
+                margin: 12px 0;
+                color: var(--text-color-high);
+            }
+
             .mega-dialog.dialog-template-message > header h3.hidden ~ p {
                 color: var(--text-color-high);
                 margin-top: 0;

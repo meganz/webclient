@@ -378,6 +378,7 @@ button.small i.folder-with-loupe {
 }
 .download.error-content {
     padding-left: 105px;
+    max-width: 900px;
 }
 .download.error-description {
     color: var(--surface-main-inverted);
@@ -400,10 +401,19 @@ button.small i.folder-with-loupe {
     text-align: left;
     margin-bottom: 2px;
 }
+.download.error-list-item.no-list-style {
+    padding: 0;
+}
+.download.error-list-item.no-list-style h3 {
+    color: var(--secondary-red);
+}
 .download.error-list-item a, .download.error-list-item a:visited {
     color: var(--text-color-error);
 }
-.download.error-list-item::before {
+.download.error-list-item a.stop-it-now {
+    text-decoration: underline;
+}
+.download.error-list-item:not(.no-list-style)::before {
     display: block;
     content: '';
     position: absolute;

@@ -16,7 +16,7 @@ mobile.notFound = {
         const contentNode = document.createElement('div');
         contentNode.className = 'no-content';
 
-        const [title, icon, items, text] = this.getErrorMessage(e, contentNode);
+        const [title, icon, items, text] = Array.isArray(e) ? e : this.getErrorMessage(e, contentNode);
 
         // Build contentNode
         if (text) {
@@ -98,6 +98,11 @@ mobile.notFound = {
                 text = l.no_file_access_msg;
                 _setCenterClass();
             }
+            else if (message) {
+                title = message === l[23243] ? l[243] : l.etd_link_removed_title;
+                icon = 'icon sprite-mobile-fm-mono icon-alert-circle-thin-outline';
+                text = message;
+            }
             else {
                 _setGeneralError();
             }
@@ -114,13 +119,19 @@ mobile.notFound = {
             if (pfcol) {
                 title = l.album_broken_link_title;
                 contentNode.textContent = message || l.album_broken_link_text;
+                _setCenterClass();
+            }
+            else if (message) {
+                title = message === l[23243] ? l[243] : l.etd_link_removed_title;
+                icon = 'icon sprite-mobile-fm-mono icon-alert-circle-thin-outline';
+                text = message;
             }
             else {
                 title = l.no_folder_access_title;
                 contentNode.textContent = message || l.no_folder_access_msg;
+                _setCenterClass();
             }
 
-            _setCenterClass();
         }
 
         return [title, icon, items, text];

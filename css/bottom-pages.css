@@ -1,52 +1,4 @@
 /* Old bottom pages styling */
-.privacy-company h1 {
-    padding: 45px 0 20px 0;
-}
-.privacy-company-block {
-    padding: 35px 0;
-}
-.privacy-company-icon {
-    float: left;
-    width: 171px;
-    height: 120px;
-    background-image: url(../images/mega/privacy-sprite.png);
-    background-position: left top;
-    background-repeat: no-repeat;
-}
-.privacy-company-icon.lock {
-    background-position: left -204px;
-    height: 126px;
-}
-.privacy-company-icon.future {
-    background-position: left -404px;
-    height: 132px;
-}
-.privacy-company-txt {
-    margin-left: 171px;
-}
-.privacy-company-header {
-    font-size: 16px;
-    line-height: 20px;
-    letter-spacing: -0.1px;
-    color: #F0373B;
-    font-family: 'Open Sans Semibold Italic', Arial;
-    padding: 2px 0 0 0;
-}
-.privacy-company-txt p {
-    font-size: 14px;
-    color: #3F4646;
-    line-height: 26px;
-    margin: 0;
-    padding: 7px 0 9px 0;
-}
-.privacy-company-bott .st-quote-left, .privacy-company-bott .st-quote-right {
-    background-image: url(../images/mega/privacy-sprite.png);
-    background-position: -10px -650px;
-    background-repeat: no-repeat;
-}
-.privacy-company-bott .st-quote-right {
-    background-position: -70px -748px;
-}
 .copyrights-dispute-bottom {
     background: var(--surface-grey-1);
     margin-top: 24px;
@@ -2444,10 +2396,6 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
     background-size: 360px auto;
     background-repeat: no-repeat;
 }
-.bottom-page.about-sprite, i.bottom-page.about-sprite {
-    background-image: url(../images/mega/about-sprite.png);
-    background-repeat: no-repeat;
-}
 .bottom-page.large-icon.camera {
     background-position: 14px -3922px;
 }
@@ -2511,148 +2459,14 @@ body:not(.mobile) .bottom-page.top-dark-button:hover {
 .bottom-page.large-icon.add-user {
     background-position: -175px -2144px;
 }
-.bottom-page.icon-122 {
-    width: 122px;
-    height: 122px;
-    margin: 0 auto;
-}
-.bottom-page.icon-122.about-sprite.honesty {
-    background-position: -13px 10px;
-}
-.bottom-page.icon-122.about-sprite.respect {
-    background-position: -203px 10px;
-}
-.bottom-page.icon-122.about-sprite.tolerance {
-    background-position: -407px 10px;
-}
-.bottom-page.icon-122.about-sprite.hard-work {
-    background-position: -13px -193px;
-}
-.bottom-page.icon-122.about-sprite.flexibility {
-    background-position: -207px -193px;
-}
-.bottom-page.icon-122.about-sprite.teamwork {
-    background-position: -417px -183px;
-}
-.bottom-page.icon-122.about-sprite.geo1 {
-    background-position: 21px -1712px;
-}
-.bottom-page.icon-122.about-sprite.geo2 {
-    background-position: -129px -1712px;
-}
-.bottom-page.icon-122.about-sprite.geo3 {
-    background-position: -278px -1712px;
-}
-.bottom-page.icon-122.about-sprite.trips {
-    background-position: -5px -960px;
-}
-.bottom-page.icon-122.about-sprite.gear {
-    background-position: -210px -960px;
-}
-.bottom-page.icon-122.about-sprite.courses {
-    background-position: -402px -955px;
-}
 .bottom-page.icon-136 {
     width: 136px;
     height: 136px;
     margin: 0 auto;
 }
-.bottom-page.icon-136.about-sprite.snackbox {
-    background-position: 3px -365px;
-}
-.bottom-page.icon-136.about-sprite.chrismas {
-    background-position: -199px -365px;
-}
-.bottom-page.icon-136.about-sprite.cinema {
-    background-position: -399px -365px;
-}
-.bottom-page.icon-136.about-sprite.bbq {
-    background-position: 2px -559px;
-}
-.bottom-page.icon-136.about-sprite.birthday {
-    background-position: -202px -559px;
-}
-.bottom-page.icon-136.about-sprite.sport {
-    background-position: -410px -559px;
-}
 .bottom-page.icon-32 {
     width: 32px;
     height: 32px;
-}
-.icon-32.about-sprite.quote {
-    background-position: -26px -1918px;
-    display: inline-block;
-    vertical-align: top;
-    margin-left: -32px;
-}
-.icon-32.about-sprite.quote.close {
-    background-position: -98px -1918px;
-    margin: 0 -32px 0 0;
-}
-.italic-text .icon-32.about-sprite.quote {
-    background-position: -26px -1920px;
-}
-.italic-text .icon-32.about-sprite.quote.close {
-    background-position: -98px -1920px;
-}
-.ar .icon-32.about-sprite.quote, .it .icon-32.about-sprite.quote, .es .icon-32.about-sprite.quote, .fr .icon-32.about-sprite.quote, .ru .icon-32.about-sprite.quote {
-    background-position: -167px -1915px;
-    width: 22px;
-    margin: 0 0 0 -26px;
-}
-.ar .icon-32.about-sprite.quote.close, .it .icon-32.about-sprite.quote.close, .es .icon-32.about-sprite.quote.close, .fr .icon-32.about-sprite.quote.close, .ru .icon-32.about-sprite.quote.close {
-    background-position: -239px -1915px;
-    margin: 0 -26px 0 0;
-}
-.de .icon-32.about-sprite.quote, .nl .icon-32.about-sprite.quote, .pl .icon-32.about-sprite.quote, .ro .icon-32.about-sprite.quote {
-    background-position: -98px -1914px;
-    margin-top: 8px;
-    margin-bottom: -8px;
-}
-.de .italic-text .icon-32.about-sprite.quote, .nl .italic-text .icon-32.about-sprite.quote, .pl .italic-text .icon-32.about-sprite.quote, .ro .italic-text .icon-32.about-sprite.quote {
-    background-position: -98px -1916px;
-}
-.de .icon-32.about-sprite.quote.close {
-    background-position: -26px -1920px;
-    margin-top: 0;
-}
-.nl .icon-32.about-sprite.quote.close, .pl .icon-32.about-sprite.quote.close, .ro .icon-32.about-sprite.quote.close {
-    background-position: -98px -1920px;
-    margin-top: 0;
-}
-.icon-32.about-sprite.quote.small {
-    background-position: -17px -1315px;
-    background-size: 360px auto;
-    width: 24px;
-    height: 24px;
-    margin-left: -28px;
-}
-.icon-32.about-sprite.quote.small.close {
-    background-position: -66px -1316px;
-    margin-right: -32px;
-    margin-left: 4px;
-}
-.ar .icon-32.about-sprite.quote.small, .it .icon-32.about-sprite.quote.small, .es .icon-32.about-sprite.quote.small, .fr .icon-32.about-sprite.quote.small, .ru .icon-32.about-sprite.quote.small {
-    background-position: -167px -1920px;
-    background-size: 525px auto;
-    margin: 1px 0 0 -26px;
-}
-.ar .icon-32.about-sprite.quote.close.small, .it .icon-32.about-sprite.quote.close.small, .es .icon-32.about-sprite.quote.close.small, .fr .icon-32.about-sprite.quote.close.small, .ru .icon-32.about-sprite.quote.close.small {
-    background-position: -239px -1920px;
-    margin: 2px -26px 0 0;
-}
-.de .icon-32.about-sprite.quote.small, .nl .icon-32.about-sprite.quote.small, .pl .icon-32.about-sprite.quote.small, .ro .icon-32.about-sprite.quote.small {
-    background-position: -66px -1314px;
-    margin-top: 6px;
-    margin-bottom: -6px;
-}
-.de .icon-32.about-sprite.quote.close.small {
-    background-position: -17px -1314px;
-    margin-top: 0;
-}
-.nl .icon-32.about-sprite.quote.close.small, .pl .icon-32.about-sprite.quote.close.small, .ro .icon-32.about-sprite.quote.close.small {
-    background-position: -66px -1315px;
-    margin-top: 0;
 }
 .cropped-page .bottom-page.big-icon {
     width: 96px;
@@ -5261,24 +5075,6 @@ body:not(.mobile) .bottom-page.dropdown .dropdown-item:hover, .bottom-page.dropd
     }
     .bottom-page.left-cell.right-txt-align {
         text-align: center;
-    }
-    .privacy-company-icon {
-        float: none;
-        margin: 0 auto 30px auto;
-        width: 120px;
-    }
-    .privacy-company-icon:first-child {
-        margin-top: 10px;
-    }
-    .privacy-company-icon.future {
-        width: 132px;
-    }
-    .privacy-company-txt {
-        margin-left: 0;
-        text-align: center;
-    }
-    .privacy-company.new-bottom-pages {
-        padding-bottom: 20px;
     }
     .bottom-page.horizontal-centered-bl {
         display: block;

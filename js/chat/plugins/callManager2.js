@@ -17,7 +17,7 @@
         HD_PENDING: 4
     };
     const DOWNGRADING_QUALITY_INTRVL = 2000;
-    const NO_SIMUL_SCRSHARE_AND_CAMERA = true;
+    const NO_SIMUL_SCRSHARE_AND_CAMERA = false;
 
  /**                        ==== Overview of peer & local video rendering ====
  * The app creates a VideoNode-derived React component for each video it wants to display - for peers (PeerVideoThumb
@@ -105,6 +105,9 @@
         }
         get name() {
             return M.getNameByHandle(this.userHandle);
+        }
+        get hasScreen() {
+            return !!(this.av & Av.Screen);
         }
         setResState(newState) {
             this.resState = newState;
@@ -468,6 +471,7 @@
                 'viewMode': null,
                 'speakerCid': null, // can be 0 - means us, and null - means nobody is the active speaker
                 'pinnedCid': null, // can be 0 - means pinned local video, and null - means nothing pinned
+                'presenterStreams': new Set(),
                 'activeVideoStreamsCnt': 0,
                 'ts': Date.now(),
                 'left': false
@@ -509,7 +513,11 @@
             this.chatRoom.megaChat.trigger('sfuConnOpen');
         }
         onPeerJoined(sfuPeer, isInitial) {
-            new Peer(this, sfuPeer.userId, sfuPeer.cid, sfuPeer.av);
+            const appPeer = new Peer(this, sfuPeer.userId, sfuPeer.cid, sfuPeer.av);
+            if (appPeer.hasScreen) {
+                this.presenterStreams.add(sfuPeer.cid);
+                this.handlePeerScreenChange(sfuPeer.cid);
+            }
             if (!isInitial) {
                 this.chatRoom.trigger('onCallPeerJoined', sfuPeer.userId);
             }
@@ -527,6 +535,8 @@
             if (this.pinnedCid === peer.cid) {
                 this.pinnedCid = null;
             }
+            this.presenterStreams.delete(peer.cid);
+            this.handlePeerScreenChange(peer.cid);
 
             this.peers[peer.cid].destroy();
             this.chatRoom.trigger('onCallPeerLeft', { userHandle: peer.userId, reason });
@@ -588,6 +598,28 @@
         onPeerAvChange(peer, av, oldAv) {
             const callManagerPeer = this.peers[peer.cid];
             assert(callManagerPeer);
+            const oldScreen = callManagerPeer.hasScreen;
+            const oldScreenAndCam = callManagerPeer.hasScreenAndCam;
+            const newScreen = !!(av & Av.Screen);
+            const newScreenAndCam = !!(av & Av.Screen) && !!(av & Av.Camera);
+            const prevSize = this.presenterStreams.size;
+            if (newScreen) {
+                if (!oldScreen) {
+                    this.presenterStreams.add(peer.cid);
+                }
+            }
+            else if (oldScreen) {
+                this.presenterStreams.delete(peer.cid);
+            }
+            if (prevSize !== this.presenterStreams.size) {
+                this.handlePeerScreenChange(peer.cid);
+            }
+            // Trigger update on the state of the Call object after modifying presenterStreams. This will possibly
+            // switch the call view between thumbnail and main view mode
+            if (newScreen !== oldScreen || oldScreenAndCam !== newScreenAndCam) {
+                this.trackDataChange();
+             // console.warn("screen/cam: track data change");
+            }
             callManagerPeer.onAvChange(av, oldAv);
             if ((av ^ oldAv) & Av.Video) {
                 this.recordActiveStream();
@@ -736,6 +768,19 @@
         }
         onLocalMediaChange(diffAv) {
             this.av = this.sfuClient.availAv;
+            if (diffAv & Av.Screen) {
+                const prevSize = this.presenterStreams.size;
+                if (this.av & Av.Screen) {
+                    this.presenterStreams.add(u_handle);
+                }
+                else {
+                    this.presenterStreams.delete(u_handle);
+                }
+                if (prevSize !== this.presenterStreams.size) {
+                    this.handlePeerScreenChange(u_handle);
+                }
+                this.trackDataChange();
+            }
             this.localPeerStream.onAvChange(diffAv);
         }
         onLocalMediaError(errObj) {
@@ -758,6 +803,20 @@
         toggleScreenSharing() {
             if ((this.av & SfuClient.Av.Camera) && NO_SIMUL_SCRSHARE_AND_CAMERA) {
                 this.sfuClient.muteCamera(true);
+            }
+            if (!this.isSharingScreen() && this.presenterStreams.size) {
+                // The set tracks the order but needs to convert to an array to grab the latest presenter.
+                const latestPeer = this.peers[[...this.presenterStreams].pop()];
+                if (latestPeer) {
+                    return msgDialog(
+                        `confirmation:!^${l.takeover_presenter_scr_btn}!${l[82]}`,
+                        '',
+                        l.takeover_presenter_scr_title,
+                        l.takeover_presenter_text.replace('%s', escapeHTML(M.getNameByHandle(latestPeer.userHandle))),
+                        e => e && this.sfuClient.enableScreenshare(true),
+                        1
+                    );
+                }
             }
             this.sfuClient.enableScreenshare(!this.sfuClient.isSharingScreen());
         }
@@ -924,6 +983,21 @@
             }
             return false;
         }
+        handlePeerScreenChange(clientId) {
+            if (this.presenterStreams.has(clientId)) {
+                this.setPinnedCid(clientId === u_handle ? 0 : clientId);
+            }
+            else if (this.presenterStreams.size) {
+                // Only set if we are already forcing a presenter stream and there is another.
+                if (this.pinnedCid) {
+                    const nextPresenter = [...this.presenterStreams].pop();
+                    this.setPinnedCid(nextPresenter === u_handle ? 0 : nextPresenter);
+                }
+            }
+            else {
+                this.setPinnedCid(null);
+            }
+        }
     }
     class PlayerCtx { // implements IVideoPlayerGui
         constructor(call, player) {
@@ -996,8 +1070,11 @@
         get videoMuted() {
             return (this.sfuClient.availAv & Av.Video) === 0;
         }
+        get hasScreen() {
+            return !!(this.av & Av.Screen);
+        }
         get hasScreenAndCam() {
-            const av = this.sfuClient.availAv;
+            const { av } = this;
             return !!((av & Av.ScreenHiRes) && (av & Av.CameraLowRes));
         }
         registerConsumer(consumer) {

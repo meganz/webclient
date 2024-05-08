@@ -56,8 +56,6 @@ class MobileMegaRender {
             'grey': l[16229]
         };
 
-        window.addEventListener('resize', this);
-
         this.touching = false;
     }
 
@@ -65,6 +63,7 @@ class MobileMegaRender {
 
         this.removeScrollEvent();
         this.container.innerText = '';
+        window.removeEventListener('resize', this);
     }
 
     renderLayout(aUpdate, aNodeList) {
@@ -150,6 +149,8 @@ class MobileMegaRender {
         else {
             $(window).off("resize.createFillerNode");
         }
+
+        window.addEventListener('resize', this);
 
         if (this.logger) {
             console.timeEnd('MegaRender.renderLayout');

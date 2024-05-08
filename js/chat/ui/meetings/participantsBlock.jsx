@@ -1,15 +1,17 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../mixins.js';
-import { LocalVideoThumb, PeerVideoThumb } from './videoNode.jsx';
+import { LocalVideoHiResCloned, LocalVideoThumb, PeerVideoHiResCloned, PeerVideoThumb, PeerVideoThumbFixed }
+    from './videoNode.jsx';
 import Button from './button.jsx';
 import { MODE } from './call.jsx';
-import { chunkNodes, PAGINATION } from './stream.jsx';
+import { chunkNodes, filterAndSplitSources, PAGINATION } from './stream.jsx';
 
 const MAX_STREAMS_PER_PAGE = 10;
 const SIMPLE_TIP = { position: 'top', offset: 5, className: 'theme-dark-forced' };
 
 export default class ParticipantsBlock extends MegaRenderMixin {
     nodeMenuRef = React.createRef();
+    dupNodeMenuRef = React.createRef();
 
     state = {
         page: 0
@@ -18,20 +20,40 @@ export default class ParticipantsBlock extends MegaRenderMixin {
     movePage = direction =>
         this.setState(state => ({ page: direction === PAGINATION.NEXT ? state.page + 1 : state.page - 1 }));
 
-    renderLocalNode = () => {
-        const { call, peers, mode, chatRoom, forcedLocal, onSeparate, onSpeakerChange, onModeChange } = this.props;
+    renderLocalNode = (isPresenterNode) => {
+        const {
+            call, peers, mode, chatRoom, forcedLocal, presenterThumbSelected,
+            onSeparate, onSpeakerChange, onModeChange
+        } = this.props;
         const localStream = call.getLocalStream();
 
         if (localStream) {
             const IS_SPEAKER_VIEW = mode === MODE.MAIN && forcedLocal;
 
+            const VideoClass = isPresenterNode ? LocalVideoHiResCloned : LocalVideoThumb;
+            let isActive = false;
+            if (isPresenterNode) {
+                isActive = forcedLocal && !presenterThumbSelected;
+            }
+            else if (call.pinnedCid === 0 || forcedLocal) {
+                if (presenterThumbSelected) {
+                    isActive = !isPresenterNode;
+                }
+                else if (localStream.hasScreen) {
+                    isActive = isPresenterNode;
+                }
+                else {
+                    isActive = true;
+                }
+            }
+
             return (
-                <LocalVideoThumb
-                    key={u_handle}
+                <VideoClass
+                    key={`${u_handle}${isPresenterNode ? '_block' : ''}`}
                     className={`
                         local-stream-node
                         ${call.isSharingScreen() ? '' : 'local-stream-mirrored'}
-                        ${forcedLocal ? 'active' : ''}
+                        ${isActive ? 'active' : ''}
                         ${(call.speakerCid === 0) ? 'active-speaker' : ''}
                     `}
                     simpletip={{ ...SIMPLE_TIP, label: l[8885] }}
@@ -39,18 +61,21 @@ export default class ParticipantsBlock extends MegaRenderMixin {
                     chatRoom={chatRoom}
                     source={localStream}
                     localAudioMuted={!(call.av & SfuClient.Av.Audio)}
+                    isPresenterNode={isPresenterNode}
                     onClick={(source, ev) => {
-                        const nodeMenuRef = this.nodeMenuRef && this.nodeMenuRef.current;
+                        const nodeMenuRef = isPresenterNode ?
+                            this.nodeMenuRef && this.nodeMenuRef.current :
+                            this.dupNodeMenuRef && this.dupNodeMenuRef.current;
                         if (nodeMenuRef && nodeMenuRef.contains(ev.target)) {
                             ev.preventDefault();
                             ev.stopPropagation();
                             return;
                         }
-                        return onSpeakerChange(localStream);
+                        return onSpeakerChange(localStream, !isPresenterNode);
                     }}>
                     {peers?.length &&
                         <div
-                            ref={this.nodeMenuRef}
+                            ref={isPresenterNode ? this.nodeMenuRef : this.dupNodeMenuRef}
                             className="node-menu theme-dark-forced">
                             <div className="node-menu-toggle">
                                 <i className="sprite-fm-mono icon-options"/>
@@ -87,7 +112,7 @@ export default class ParticipantsBlock extends MegaRenderMixin {
                             </div>
                         </div>
                     }
-                </LocalVideoThumb>
+                </VideoClass>
             );
         }
 
@@ -100,30 +125,71 @@ export default class ParticipantsBlock extends MegaRenderMixin {
     }
 
     render() {
-        const { call, mode, peers, floatDetached, chatRoom, onSpeakerChange } = this.props;
+        const { call, mode, peers, floatDetached, chatRoom, presenterThumbSelected, onSpeakerChange } = this.props;
 
         if (peers && peers.length) {
-            // TODO: abstract/consolidate with the rest of the similar filtering/ordering instances
-            const filteredPeers = Object.values(peers).filter(p => p instanceof CallManager2.Peer);
-            const streaming =
-                [...filteredPeers.filter(p => p.isScreen), ...filteredPeers.filter(p => !p.videoMuted)];
-            const rest = filteredPeers.filter(p => !streaming.includes(p));
-            const $$PEER = peer => {
-                const isPinned = peer.isActive || peer.clientId === call.pinnedCid;
+            const { screen, video, rest } = filterAndSplitSources(peers, call);
+            const sources = [...screen, ...video, ...rest];
+
+            const $$PEER = (peer, i) => {
+                const { clientId, userHandle, hasScreenAndCam, hasScreen, isLocal } = peer;
+                if (
+                    screen.length
+                    && (screen[0].clientId === clientId || screen[0].isLocal && isLocal)
+                ) {
+                    screen.shift();
+                }
+                if (!(peer instanceof CallManager2.Peer)) {
+                    const isPresenterNode = screen.length && screen[0].isLocal;
+                    if (floatDetached && !isPresenterNode) {
+                        return;
+                    }
+                    return this.renderLocalNode(!floatDetached && isPresenterNode);
+                }
+                const presenterCid = screen.length && screen[0].clientId === clientId;
+                let PeerClass;
+                if (hasScreenAndCam) {
+                    PeerClass = presenterCid ? PeerVideoHiResCloned : PeerVideoThumbFixed;
+                }
+                else {
+                    PeerClass = PeerVideoThumb;
+                }
+                assert(!presenterCid || hasScreen);
+
                 const isActiveSpeaker = !peer.audioMuted && call.speakerCid === peer.clientId;
+                let isActive = false;
+                if (call.pinnedCid === clientId) {
+                    if (presenterThumbSelected) {
+                        isActive = !presenterCid;
+                    }
+                    else if (hasScreen) {
+                        isActive = presenterCid;
+                    }
+                    else {
+                        isActive = true;
+                    }
+                }
+                const name = M.getNameByHandle(userHandle);
                 return (
-                    <PeerVideoThumb
-                        key={`${peer.userHandle}--${peer.clientId}`}
+                    <PeerClass
+                        key={`${userHandle}-${i}-${clientId}`}
                         className={`
                             video-crop
-                            ${isPinned ? 'active' : ''}
+                            ${isActive ? 'active' : ''}
                             ${isActiveSpeaker ? 'active-speaker' : ''}
                         `}
-                        simpletip={{ ...SIMPLE_TIP, label: M.getNameByHandle(peer.userHandle) }}
+                        simpletip={{
+                            ...SIMPLE_TIP,
+                            label: presenterCid
+                                ? l.presenter_nail.replace('%s', name)
+                                : name
+                        }}
                         mode={mode}
                         chatRoom={chatRoom}
                         source={peer}
-                        onClick={onSpeakerChange}
+                        isPresenterNode={!!presenterCid}
+                        onSpeakerChange={node => onSpeakerChange(node, !presenterCid)}
+                        onClick={node => onSpeakerChange(node, !presenterCid)}
                     />
                 );
             };
@@ -132,23 +198,20 @@ export default class ParticipantsBlock extends MegaRenderMixin {
             // Default, i.e. videos aligned within single page grid.
             // ------------------------------------------------------
 
-            if (peers.length <= (floatDetached ? MAX_STREAMS_PER_PAGE : MAX_STREAMS_PER_PAGE - 1)) {
+            if (sources.length <= (floatDetached ? MAX_STREAMS_PER_PAGE : MAX_STREAMS_PER_PAGE - 1)) {
                 return (
                     <div className="stream-participants-block theme-dark-forced">
                         <div className="participants-container">
                             <div
                                 className={`
                                     participants-grid
-                                    ${floatDetached && peers.length === 1 || peers.length === 0 ? 'single-column' : ''}
+                                    ${
+                                        floatDetached && sources.length === 1 || sources.length === 0
+                                            ? 'single-column'
+                                            : ''
+                                    }
                                 `}>
-                                {floatDetached ?
-                                    [...streaming, ...rest].map(p => $$PEER(p)) :
-                                    <>
-                                        {streaming.map(p => $$PEER(p))}
-                                        {this.renderLocalNode()}
-                                        {rest.map(p => $$PEER(p))}
-                                    </>
-                                }
+                                {sources.map((p, i) => $$PEER(p, i))}
                             </div>
                         </div>
                     </div>
@@ -160,13 +223,7 @@ export default class ParticipantsBlock extends MegaRenderMixin {
             // ------------------------------------------------------------------------------
 
             const { page } = this.state;
-            const chunks =
-                chunkNodes(
-                    floatDetached ?
-                        [...streaming, ...rest] :
-                        [...streaming, Object.values(peers).find(p => !(p instanceof CallManager2.Peer)), ...rest],
-                    MAX_STREAMS_PER_PAGE
-                );
+            const chunks = chunkNodes(sources, MAX_STREAMS_PER_PAGE);
 
             return (
                 <div className="carousel">
@@ -195,12 +252,7 @@ export default class ParticipantsBlock extends MegaRenderMixin {
                                                     participants-grid
                                                     ${nodes.length === 1 ? 'single-column' : ''}
                                                 `}>
-                                                {nodes.map(peer => {
-                                                    if (peer instanceof CallManager2.Peer) {
-                                                        return $$PEER(peer);
-                                                    }
-                                                    return this.renderLocalNode();
-                                                })}
+                                                {nodes.map((peer, j) => $$PEER(peer, j + i * MAX_STREAMS_PER_PAGE))}
                                             </div>
                                             {page >= Object.values(chunks).length - 1 ?
                                                 null :

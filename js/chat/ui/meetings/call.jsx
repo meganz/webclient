@@ -239,6 +239,7 @@ export default class Call extends MegaRenderMixin {
         recordingConsentDialog: false,
         recordingConsented: false,
         invitePanel: false,
+        presenterThumbSelected: false,
     };
 
     /**
@@ -541,7 +542,7 @@ export default class Call extends MegaRenderMixin {
     handleCallMinimize = () => {
         const { call, peers, onCallMinimize } = this.props;
         const { mode, sidebar, view } = this.state;
-        const { callToutId, stayOnEnd } = call;
+        const { callToutId, stayOnEnd, presenterStreams } = call;
         // Cache previous state only when `Local` is not already minimized
         Call.STATE.PREVIOUS = mode !== MODE.MINI ? { mode, sidebar, view } : Call.STATE.PREVIOUS;
         const noPeers = () => {
@@ -552,7 +553,7 @@ export default class Call extends MegaRenderMixin {
         };
 
         return (
-            peers.length > 0 ?
+            peers.length > 0 || presenterStreams.has(u_handle) ?
                 // There are peers, i.e. other call participants -> render `Local` in `mini mode`
                 this.setState({ mode: MODE.MINI, sidebar: false }, () => {
                     onCallMinimize();
@@ -600,21 +601,38 @@ export default class Call extends MegaRenderMixin {
 
     /**
      * handleSpeakerChange
-     * @description Selects the pinned speaker when in `Main Mode`.
+     * @description Handles the selection of active speaker when in `Main Mode`.
      * @param {Peer} peer the peer whose stream to pin
+     * @param {boolean} [presenterThumbSelected] If the node being changed to should be the thumbnail of the presenter.
      * @see ParticipantsBlock
      * @see Local.renderOptionsDialog
      * @see VideoNodeMenu.Pin
      * @returns {void}
      */
 
-    handleSpeakerChange = peer => {
-        if (!peer) {
-            return;
+    handleSpeakerChange = (source, presenterThumbSelected) => {
+        if (source) {
+            this.handleModeChange(MODE.MAIN);
+            const sourceId = source.isLocal ? 0 : source.clientId;
+            if (sourceId !== this.props.call.pinnedCid) {
+                this.props.call.setPinnedCid(sourceId);
+            }
+            else {
+                this.props.call.setPinnedCid(
+                    sourceId,
+                    !source.hasScreen || presenterThumbSelected === this.state.presenterThumbSelected
+                );
+            }
+
+            const { pinnedCid } = this.props.call;
+            this.setState({
+                forcedLocal: !!(source.isLocal && pinnedCid !== null),
+                presenterThumbSelected: pinnedCid === null ? false : !!presenterThumbSelected && source.hasScreen,
+            });
         }
-        this.handleModeChange(MODE.MAIN);
-        this.props.call.setPinnedCid(peer.clientId, true);
-        this.setState({ forcedLocal: peer.isLocal && peer.clientId === this.props.call.pinnedCid });
+        else if (source === null) {
+            this.setState({ presenterThumbSelected: !!presenterThumbSelected });
+        }
     };
 
     /**
@@ -990,12 +1008,12 @@ export default class Call extends MegaRenderMixin {
         const {
             mode, view, sidebar, hovered, forcedLocal, invite, ephemeral, ephemeralAccounts, guest,
             offline, onboardingUI, onboardingRecording, everHadPeers, initialCallRinging, waitingRoomPeers, recorder,
-            recordingConsentDialog, invitePanel
+            recordingConsentDialog, invitePanel, presenterThumbSelected
         } = this.state;
         const { stayOnEnd } = call;
         const STREAM_PROPS = {
             mode, peers, sidebar, hovered, forcedLocal, call, view, chatRoom, parent, stayOnEnd,
-            everHadPeers, waitingRoomPeers, recorder,
+            everHadPeers, waitingRoomPeers, recorder, presenterThumbSelected,
             hasOtherParticipants: call.hasOtherParticipant(), isOnHold: call.sfuClient.isOnHold(),
             onSpeakerChange: this.handleSpeakerChange, onModeChange: this.handleModeChange,
             onInviteToggle: this.handleInviteToggle, onStayConfirm: this.handleStayConfirm

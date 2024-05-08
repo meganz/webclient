@@ -1,7 +1,7 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../mixins';
 import { MODE } from './call.jsx';
-import { PeerVideoHiRes, LocalVideoHiRes } from './videoNode.jsx';
+import { PeerVideoHiRes, LocalVideoHiRes, PeerVideoThumb, LocalVideoThumb, PeerVideoThumbFixed } from './videoNode.jsx';
 import FloatingVideo from './float.jsx';
 import ParticipantsNotice from './participantsNotice.jsx';
 import ChatToaster from "../chatToaster.jsx";
@@ -41,6 +41,54 @@ export const chunkNodes = (nodes, size) => {
         return chunked;
     }
     return null;
+};
+
+/**
+ * filterAndSplitSources
+ * @description Takes a collection of Peers and returns a collection that contains groups of streams meeting
+ * the criteria. Also injects the LocalPeerStream in the correct locations.
+ * screen: Includes Peers with the screen being shared
+ * video: Includes Peers with the video stream not muted
+ * rest: Includes Peers which are in no other category
+ * @param {Array|Object} sources collection of Peer client ids
+ * @param {Call} call The current call that the Peers are in.
+ * @returns {{screen: *[], video: *[], rest: *[]}}
+ */
+
+export const filterAndSplitSources = (sources, call) => {
+    const screen = [];
+    const video = [];
+    const rest = [];
+    for (const peer of Object.values(sources.toJS())) {
+        if (peer instanceof CallManager2.Peer) {
+            if (peer.hasScreen) {
+                screen.push(peer, peer);
+            }
+            else if (peer.videoMuted) {
+                rest.push(peer);
+            }
+            else {
+                video.push(peer);
+            }
+        }
+    }
+    const local = call.getLocalStream();
+    if (local.hasScreen) {
+        const presenters = [...call.presenterStreams];
+        if (presenters.pop() === u_handle) {
+            screen.unshift(local, local);
+        }
+        else {
+            screen.push(local, local);
+        }
+    }
+    else if (local.av & Av.Camera) {
+        video.unshift(local);
+    }
+    else {
+        rest.push(local);
+    }
+    return { screen, video, rest };
 };
 
 export default class Stream extends MegaRenderMixin {
@@ -122,7 +170,9 @@ export default class Stream extends MegaRenderMixin {
      */
 
     scaleNodes(columns, forced = false) {
-        const { peers, minimized, mode } = this.props;
+        const { peers, minimized, mode, call } = this.props;
+        const { screen, video, rest } = filterAndSplitSources(peers, call);
+        const sources = [...screen, ...video, ...rest];
         const container = this.containerRef.current;
         this.lastRescaledCache = forced ? null : this.lastRescaledCache;
 
@@ -138,11 +188,11 @@ export default class Stream extends MegaRenderMixin {
         let containerWidth = parentRef.offsetWidth;
         let containerHeight = parentRef.offsetHeight - extraVerticalMargin;
         const nodesPerPage = floatDetached ? streamsPerPage : streamsPerPage - 1;
-        const streamsInUI = peers.length > nodesPerPage ? Object.values(this.chunks)[page]?.nodes : peers;
+        const streamsInUI = sources.length > nodesPerPage ? Object.values(this.chunks)[page]?.nodes : sources;
 
         if (streamsInUI) {
             const streamCountInUI =
-                peers.length > nodesPerPage || floatDetached ? streamsInUI.length : streamsInUI.length + 1;
+                sources.length > nodesPerPage || floatDetached ? streamsInUI.length : streamsInUI.length + 1;
             let rows;
             if (mode === MODE.THUMBNAIL) {
                 columns = typeof columns === 'number' ? columns : this.getColumns(streamCountInUI);
@@ -211,13 +261,14 @@ export default class Stream extends MegaRenderMixin {
             call,
             forcedLocal,
             chatRoom,
-            onVideoDoubleClick
+            onVideoDoubleClick,
+            onModeChange,
         } = this.props;
         const { page, streamsPerPage, floatDetached } = this.state;
-        const filteredPeers = Object.values(peers).filter(p => p instanceof CallManager2.Peer);
-        const streaming =
-            [...filteredPeers.filter(p => p.isScreen), ...filteredPeers.filter(p => !p.videoMuted)];
-        const rest = filteredPeers.filter(p => !streaming.includes(p));
+        // Streams are split between screen sharing, video (camera), and non-streaming (rest/avatar)
+        //  Note: screen sharing users will be paired up with their avatar by filterAndSplitSources
+        const { screen, video, rest } = filterAndSplitSources(peers, call);
+        const sources = [...screen, ...video, ...rest];
 
         //
         //  `Thumbnail` view
@@ -230,67 +281,98 @@ export default class Stream extends MegaRenderMixin {
             // ------------------------------------------------------
 
             const nodesPerPage = floatDetached ? streamsPerPage : streamsPerPage - 1;
-            if (peers.length <= nodesPerPage) {
+            if (sources.length <= nodesPerPage) {
                 const $$PEER = (peer, i) => {
-                    const cacheKey = `${mode}_${peer.clientId}_${i}`;
-                    return (
-                        <PeerVideoHiRes
-                            key={cacheKey}
-                            mode={mode}
-                            chatRoom={chatRoom}
-                            menu={true}
-                            source={peer}
-                            onDoubleClick={(peer, e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                onVideoDoubleClick(peer);
-                            }}
-                            didMount={ref => {
-                                this.nodeRefs.push({ clientId: peer.clientId, cacheKey, ref });
-                                this.scaleNodes(undefined, true);
-                            }}
-                            willUnmount={() => {
-                                this.nodeRefs = this.nodeRefs.filter(
-                                    nodeRef => nodeRef.clientId !== peer.clientId
-                                );
-                            }}>
-                            {this.renderNodeMenu(peer)}
-                        </PeerVideoHiRes>
-                    );
-                };
-
-                return (
-                    floatDetached ?
-                        [...streaming, ...rest].map((p, i) => $$PEER(p, i)) :
-                        [
-                            ...streaming.map((p, i) => $$PEER(p, i)),
+                    const { clientId, hasScreenAndCam, hasScreen, isLocal } = peer;
+                    if (screen.length && (screen[0].clientId === clientId || screen[0].isLocal && isLocal)) {
+                        screen.shift();
+                    }
+                    if (!(peer instanceof CallManager2.Peer)) {
+                        const isPresenterNode = screen.length && screen[0].isLocal;
+                        if (floatDetached && !isPresenterNode) {
+                            return;
+                        }
+                        if (floatDetached || !isPresenterNode) {
+                            return <LocalVideoThumb
+                                key={`${mode}_thumb_${u_handle}`}
+                                chatRoom={chatRoom}
+                                isPresenterNode={false}
+                                source={peer}
+                                didMount={ref => {
+                                    this.nodeRefs.push({
+                                        clientId: u_handle,
+                                        cacheKey: `${mode}_${u_handle}_thumb`,
+                                        ref
+                                    });
+                                    this.scaleNodes(undefined, true);
+                                }}
+                                willUnmount={() => {
+                                    this.nodeRefs = this.nodeRefs.filter(
+                                        nodeRef => nodeRef.cacheKey !== `${mode}_${u_handle}_thumb`
+                                    );
+                                }}>
+                                {this.renderSelfViewMenu()}
+                            </LocalVideoThumb>;
+                        }
+                        return (
                             <LocalVideoHiRes
                                 key={`${mode}_${u_handle}`}
                                 chatRoom={chatRoom}
+                                isPresenterNode={isPresenterNode}
+                                source={isPresenterNode && peer}
                                 didMount={ref => {
                                     this.nodeRefs.push({ clientId: u_handle, cacheKey: `${mode}_${u_handle}`, ref });
                                     this.scaleNodes(undefined, true);
                                 }}
                                 willUnmount={() => {
-                                    this.nodeRefs = this.nodeRefs.filter(nodeRef => nodeRef.clientId !== u_handle);
+                                    this.nodeRefs = this.nodeRefs.filter(
+                                        nodeRef => nodeRef.cacheKey !== `${mode}_${u_handle}`
+                                    );
                                 }}>
-                                {this.renderSelfViewMenu()}
-                            </LocalVideoHiRes>,
-                            ...rest.map((p, i) => $$PEER(p, i))
-                        ]
-                );
+                                {hasScreen ? this.renderNodeMenu(peer, { isPresenterNode }) : this.renderSelfViewMenu()}
+                            </LocalVideoHiRes>
+                        );
+                    }
+                    // Only one of each peer should be treated as the 'presenter'. If it doesn't exist in the screen
+                    // array then the presenter node is already made or the user is not presenting.
+                    const presenterCid = screen.length && screen[0].clientId === clientId;
+                    let PeerClass = PeerVideoThumb;
+                    if (hasScreenAndCam) {
+                        PeerClass = presenterCid ? PeerVideoHiRes : PeerVideoThumbFixed;
+                    }
+                    const cacheKey = `${mode}_${clientId}_${i}`;
+                    return (
+                        <PeerClass
+                            key={cacheKey}
+                            mode={mode}
+                            chatRoom={chatRoom}
+                            menu={true}
+                            source={peer}
+                            isPresenterNode={!!presenterCid}
+                            onDoubleClick={(peer, e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                onVideoDoubleClick(peer, !presenterCid);
+                            }}
+                            didMount={ref => {
+                                this.nodeRefs.push({ clientId: presenterCid || clientId, cacheKey, ref });
+                            }}
+                            willUnmount={() => {
+                                this.nodeRefs = this.nodeRefs.filter(nodeRef => nodeRef.cacheKey !== cacheKey);
+                            }}>
+                            {this.renderNodeMenu(peer, { isPresenterNode: !!presenterCid })}
+                        </PeerClass>
+                    );
+                };
+
+                return sources.map((p, i) => $$PEER(p, i));
             }
 
             //
             // Carousel behavior with variable amount of pages, incl. previous/next behavior.
             // ------------------------------------------------------------------------------
 
-            this.chunks = chunkNodes(
-                floatDetached ?
-                    [...streaming, ...rest] :
-                    [...streaming, Object.values(peers).find(p => !(p instanceof CallManager2.Peer)), ...rest],
-                streamsPerPage
-            );
+            this.chunks = chunkNodes(sources, streamsPerPage);
             this.chunksLength = Object.values(this.chunks).length;
 
             return (
@@ -305,52 +387,117 @@ export default class Stream extends MegaRenderMixin {
                                         carousel-page
                                         ${i === page ? 'active' : ''}
                                     `}>
-                                    {nodes.map(peer => {
+                                    {nodes.map((peer, j) => {
+                                        const { clientId, hasScreenAndCam, hasScreen, isLocal } = peer;
+                                        if (
+                                            screen.length
+                                            && (screen[0].clientId === clientId || screen[0].isLocal && isLocal)
+                                        ) {
+                                            screen.shift();
+                                        }
                                         if (peer instanceof CallManager2.Peer) {
+                                            const presenterCid = screen.length && screen[0].clientId === clientId;
+                                            // Same as above but mindful of duplicate keys across different pages.
+                                            const cacheKey = `${mode}_${clientId}_${j + i * streamsPerPage}`;
+                                            let PeerClass = PeerVideoThumb;
+                                            if (hasScreenAndCam) {
+                                                PeerClass = presenterCid ? PeerVideoHiRes : PeerVideoThumbFixed;
+                                            }
                                             return (
-                                                <PeerVideoHiRes
-                                                    key={peer.clientId}
+                                                <PeerClass
+                                                    key={cacheKey}
+                                                    mode={mode}
                                                     source={peer}
                                                     chatRoom={chatRoom}
+                                                    isPresenterNode={!!presenterCid}
                                                     onDoubleClick={(peer, e) => {
                                                         e.preventDefault();
                                                         e.stopPropagation();
                                                         onVideoDoubleClick(peer);
                                                     }}
                                                     didMount={ref => {
-                                                        if (!this.nodeRefs[i]) {
-                                                            this.nodeRefs[i] = [];
+                                                        if (!this.nodeRefs[id]) {
+                                                            this.nodeRefs[id] = [];
                                                         }
-                                                        this.nodeRefs[i].push({ clientId: peer.clientId, ref });
+                                                        this.nodeRefs[id].push({
+                                                            clientId: presenterCid || clientId,
+                                                            ref,
+                                                            cacheKey
+                                                        });
                                                         this.scaleNodes(undefined, true);
                                                     }}
                                                     willUnmount={() => {
                                                         this.nodeRefs = this.nodeRefs.map(chunk =>
-                                                            chunk.filter(nodeRef => nodeRef.clientId !== peer.clientId)
+                                                            chunk.filter(
+                                                                nodeRef => nodeRef.cacheKey !== cacheKey
+                                                            )
                                                         );
                                                     }}>
-                                                    {this.renderNodeMenu(peer)}
-                                                </PeerVideoHiRes>
+                                                    {this.renderNodeMenu(peer, { isPresenterNode: !!presenterCid })}
+                                                </PeerClass>
                                             );
+                                        }
+                                        const isPresenterNode = screen.length && screen[0].isLocal;
+                                        if (floatDetached && !isPresenterNode) {
+                                            return null;
+                                        }
+                                        if (floatDetached || !isPresenterNode) {
+                                            return <LocalVideoThumb
+                                                key={`${mode}_thumb_${u_handle}`}
+                                                chatRoom={chatRoom}
+                                                source={peer}
+                                                isPresenterNode={false}
+                                                didMount={ref => {
+                                                    if (!this.nodeRefs[id]) {
+                                                        this.nodeRefs[id] = [];
+                                                    }
+                                                    this.nodeRefs[id].push({
+                                                        clientId: u_handle,
+                                                        cacheKey: `${mode}_${u_handle}_thumb`,
+                                                        ref
+                                                    });
+                                                    this.scaleNodes(undefined, true);
+                                                }}
+                                                willUnmount={() => {
+                                                    this.nodeRefs = this.nodeRefs.map(chunk =>
+                                                        chunk.filter(nodeRef =>
+                                                            nodeRef.cacheKey !== `${mode}_${u_handle}_thumb`
+                                                        )
+                                                    );
+                                                }}>
+                                                {this.renderSelfViewMenu()}
+                                            </LocalVideoThumb>;
                                         }
 
                                         return (
                                             <LocalVideoHiRes
                                                 key={`${mode}_${u_handle}`}
                                                 chatRoom={chatRoom}
+                                                isPresenterNode={isPresenterNode}
+                                                source={isPresenterNode && peer}
                                                 didMount={ref => {
-                                                    if (!this.nodeRefs[i]) {
-                                                        this.nodeRefs[i] = [];
+                                                    if (!this.nodeRefs[id]) {
+                                                        this.nodeRefs[id] = [];
                                                     }
-                                                    this.nodeRefs[i].push({ clientId: u_handle, ref });
+                                                    this.nodeRefs[id].push({
+                                                        clientId: u_handle,
+                                                        ref,
+                                                        cacheKey: `${mode}_${u_handle}`
+                                                    });
                                                     this.scaleNodes(undefined, true);
                                                 }}
                                                 willUnmount={() => {
                                                     this.nodeRefs = this.nodeRefs.map(chunk =>
-                                                        chunk.filter(nodeRef => nodeRef.clientId !== u_handle)
+                                                        chunk.filter(
+                                                            nodeRef => nodeRef.cacheKey !== `${mode}_${u_handle}`
+                                                        )
                                                     );
                                                 }}>
-                                                {this.renderNodeMenu(call.getLocalStream())}
+                                                {
+                                                    hasScreen ?
+                                                        this.renderNodeMenu(peer, { isPresenterNode }) :
+                                                        this.renderSelfViewMenu()
+                                                }
                                             </LocalVideoHiRes>
                                         );
                                     })}
@@ -381,11 +528,20 @@ export default class Stream extends MegaRenderMixin {
                 key={source.clientId}
                 chatRoom={chatRoom}
                 source={source}
+                isPresenterNode={source.hasScreen}
                 toggleFullScreen={() => {               // don't use onSpeakerChange, as it will cause a react update
                     call.setPinnedCid(source.clientId); // and unmount the fullscreen element, canceling the fullscreen
                 }}
+                onSpeakerChange={() => {
+                    onModeChange(MODE.THUMBNAIL);
+                }}
                 ref={setRef}>
-                {this.renderNodeMenu(source, {key: `${source.clientId}-main`, isMain: true, videoNodeRef})}
+                {this.renderNodeMenu(source, {
+                    key: `${source.clientId}-main`,
+                    isMain: true,
+                    videoNodeRef,
+                    isPresenterNode: source.hasScreen
+                })}
             </VideoType>
         );
     }
@@ -490,20 +646,26 @@ export default class Stream extends MegaRenderMixin {
             call, chatRoom, peers, stayOnEnd, everHadPeers, isOnHold, mode, hasOtherParticipants,
             onInviteToggle, onStayConfirm, onCallEnd
         } = this.props;
+        const { screen, video, rest } = filterAndSplitSources(peers, call);
+        const sources = [...screen, ...video, ...rest];
+        const showNotice = sources.length === 0
+            || !hasOtherParticipants && !call.presenterStreams.has(u_handle);
         const streamContainer = content =>
             <div
                 ref={this.containerRef}
                 // TODO: clean-up the className assignments re: `floatDetached`
                 className={`
                     ${NAMESPACE}-container
-                    ${peers.length === 0 || !hasOtherParticipants ? 'with-notice' : ''}
-                    ${peers.length === 1 && mode === MODE.THUMBNAIL && this.state.floatDetached ? 'single-stream' : ''}
-                    ${peers.length === 1 && mode === MODE.THUMBNAIL && !this.state.floatDetached ? 'dual-stream' : ''}
+                    ${showNotice ? 'with-notice' : ''}
+                    ${
+                        sources.length === 1 && mode === MODE.THUMBNAIL
+                            ? `${this.state.floatDetached ? 'single' : 'dual'}-stream` : ''
+                    }
                 `}>
                 {content}
             </div>;
 
-        if (peers.length === 0 || !hasOtherParticipants) {
+        if (showNotice) {
             return (
                 <ParticipantsNotice
                     call={call}
@@ -564,10 +726,25 @@ export default class Stream extends MegaRenderMixin {
 
     componentDidUpdate() {
         super.componentDidMount();
+        const { call, mode, forcedLocal, onSpeakerChange, onModeChange } = this.props;
         this.scaleNodes();
         // Move to previous page automatically on page removal
         if (this.chunksLength > 0 && this.state.page + 1 > this.chunksLength) {
             this.movePage(PAGINATION.PREV);
+        }
+        if (mode === MODE.THUMBNAIL && call.pinnedCid !== null) {
+            this.hasPresenter = true;
+            onSpeakerChange(call.getActiveStream());
+        }
+        else if (mode === MODE.MAIN && call.pinnedCid === null && !call.presenterStreams.size && this.hasPresenter) {
+            this.hasPresenter = false;
+            onModeChange(MODE.THUMBNAIL);
+        }
+        else if (mode === MODE.MAIN && forcedLocal && call.pinnedCid !== 0) {
+            onSpeakerChange(call.getActiveStream());
+        }
+        else if (!call.presenterStreams.size) {
+            this.hasPresenter = false;
         }
     }
 
@@ -645,6 +822,11 @@ export default class Stream extends MegaRenderMixin {
                     minimized={minimized}
                     sidebar={sidebar}
                     forcedLocal={forcedLocal}
+                    isPresenterNode={(
+                        mode === MODE.MINI && !forcedLocal
+                            ? call.getActiveStream()
+                            : call.getLocalStream()
+                    )?.hasScreen}
                     wrapperRef={this.wrapperRef}
                     waitingRoomPeers={waitingRoomPeers}
                     recorder={recorder}

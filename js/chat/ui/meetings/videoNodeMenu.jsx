@@ -122,10 +122,32 @@ export default class VideoNodeMenu extends MegaRenderMixin {
 
     render() {
         const { NAMESPACE } = VideoNodeMenu;
-        const { stream } = this.props;
+        const { stream, isPresenterNode, mode, onSpeakerChange, onModeChange } = this.props;
+        const { userHandle, clientId } = stream;
+
+        if (isPresenterNode) {
+            return (
+                <div className={`
+                    ${NAMESPACE}
+                    theme-dark-forced
+                    ${mode === MODE.THUMBNAIL ? '' : 'presenter'}
+                `}>
+                    <div className={`${NAMESPACE}-toggle`}>
+                        <Emoji>{l.presenter_nail.replace('%s', M.getNameByHandle(userHandle))}</Emoji>
+                        <i
+                            className={`sprite-fm-mono call-node-pin icon-pin${mode === MODE.MAIN ? '-off' : ''}`}
+                            onClick={() => mode === MODE.THUMBNAIL ?
+                                onSpeakerChange?.(stream) :
+                                onModeChange?.(MODE.THUMBNAIL)
+                            }
+                        />
+                    </div>
+                </div>
+            );
+        }
         const $$CONTROLS = { Contact, Pin, Privilege /* , ToggleCrop: this.ToggleCrop */};
 
-        if (stream.userHandle !== u_handle) {
+        if (userHandle !== u_handle) {
             return (
                 <div
                     className={`
@@ -133,14 +155,14 @@ export default class VideoNodeMenu extends MegaRenderMixin {
                         theme-dark-forced
                     `}>
                     <div className={`${NAMESPACE}-toggle`}>
-                        <Emoji>{M.getNameByHandle(stream.userHandle)}</Emoji>
+                        <Emoji>{M.getNameByHandle(userHandle)}</Emoji>
                         <i className="sprite-fm-mono icon-side-menu"/>
                     </div>
                     <div className={`${NAMESPACE}-content`}>
                         <ul>
                             {Object.values($$CONTROLS).map(($$CONTROL, i) =>
                                 <li
-                                    key={`${Object.keys($$CONTROLS)[i]}-${stream.clientId}-${stream.userHandle}`}>
+                                    key={`${Object.keys($$CONTROLS)[i]}-${clientId}-${userHandle}`}>
                                     <$$CONTROL {...this.props} />
                                 </li>
                             )}

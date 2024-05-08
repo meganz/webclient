@@ -228,6 +228,11 @@
   z-index: 2;
   width: max-content;
 }
+.node-menu i.call-node-pin.icon-pin,
+.node-menu i.call-node-pin.icon-pin-off {
+  --icon-size: 16px;
+  margin: 3px;
+}
 .node-menu:hover .node-menu-content {
   display: block;
 }

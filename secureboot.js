@@ -4091,7 +4091,7 @@ else if (!browserUpdate) {
                     p: page.substr(0, 5) === 'file/' ? page.substr(5, 8) : page.split('!')[1]
                 };
 
-                xhr(u_sid ? '&sid=' + u_sid : false, g, function(response) {
+                xhr(u_sid ? '&v=2&sid=' + u_sid : '&v=2', g, function(response) {
                     dl_res = Array.isArray(response) && response[0];
                 });
             }

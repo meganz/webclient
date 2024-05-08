@@ -91,15 +91,39 @@ async function setupSingleDownloadPage(res) {
         }
     }
     else if (res.err < 0) {
-        msg = l[23242];
+        const $msgbody = $('.deleted-user .error-list-item', $topBar);
+        const $msgtitle = $('.deleted-user .error-title', $topBar);
+        let title;
 
-        if (res.l !== 2) {
-            msg = l[23243];
+        if (res.l === 2) {
+            const link = 'https://www.stopitnow.org.uk/concerned-about-your-own-thoughts-or-behaviour/' +
+                'concerned-about-use-of-the-internet/self-help/understanding-the-behaviour/?utm_source=mega' +
+                '&utm_medium=banner&utm_campaign=mega_warning';
+
+            msg = `${l.etd_link_removed_body}<br><br>` +
+                `<a class="clickurl stop-it-now" href="${link}" target="_blank" data-eventid="500245">` +
+                    l.etd_link_removed_button +
+                `</a>`;
+            $msgbody.addClass('no-list-style');
+            title = l.etd_link_removed_title;
+
+            eventlog(500243);
         }
+        else {
+            msg = l[23243];
+            $msgbody.removeClass('no-list-style');
+            title = l[243];
+        }
+        $msgtitle.text(title);
         console.assert(res.u === 7);
 
         setTransferStatus(0, msg);
-        $('.deleted-user .error-list-item', $topBar.addClass('global-error not-available-user')).safeHTML(msg);
+        $topBar.addClass('global-error not-available-user');
+        $msgbody.safeHTML(msg);
+
+        if (is_mobile) {
+            msg = [title, 'icon sprite-mobile-fm-mono icon-alert-circle-thin-outline', false, msg];
+        }
     }
     else if (res.e === ETEMPUNAVAIL) {
         $('.download.download-page').addClass('global-error temporary-na');

@@ -37,6 +37,7 @@ class MegaGesture {
     _handletouchstart(ev) {
 
         this.action = null;
+        this.activeScroll = false;
 
         switch (ev.touches.length) {
 
@@ -185,7 +186,7 @@ class MegaGesture {
         }
 
         // Prevent swipting when scroll positions are not on block edges
-        if (scrollStart !== 0 && diff < 0
+        if (scrollStart > 0 && diff < 0
             || scrollSize > clientSize + Math.ceil(scrollStart + 1) && diff > 0) {
 
             this.action = 'onScroll';
@@ -200,13 +201,15 @@ class MegaGesture {
 
         this.touchDistance = Math.hypot(ft.clientX - st.clientX, ft.clientY - st.clientY);
 
+        // Prevent swipe gestures
+        this.action = 'pinchZoom';
+
         if (typeof this.options.onPinchZoom === 'function') {
 
             // Prevent native
             ev.preventDefault();
 
             this.options.onPinchZoom(ev, this.touchDistance / prevTouchDistance);
-            this.action = 'pinchZoom';
         }
     }
 
@@ -260,7 +263,7 @@ class MegaGesture {
         }
 
         this.action = null;
-        this.activeScroll = null;
+        this.activeScroll = false;
         this.touchDistance = 0;
     }
 

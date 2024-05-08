@@ -165,7 +165,7 @@ class VideoNode extends MegaRenderMixin {
 
     renderContent() {
         const source = this.source;
-        if (source.isStreaming()) { // (this.props.isPresenterNode || (source.av & Av.Camera)) {
+        if (this.props.isPresenterNode || (source.av & Av.Camera)) {
             return (
                 <div
                     ref={this.contRef}

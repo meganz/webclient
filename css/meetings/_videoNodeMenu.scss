@@ -7,6 +7,12 @@
     z-index: 2;
     width: max-content;
 
+    i.call-node-pin.icon-pin,
+    i.call-node-pin.icon-pin-off {
+        --icon-size: 16px;
+        margin: 3px;
+    }
+
     &:hover .node-menu-content {
         display: block;
     }

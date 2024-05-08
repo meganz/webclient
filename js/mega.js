@@ -3529,6 +3529,7 @@ function folderreqerr(c, e) {
 
     var title = (pfcol) ? l.album_broken_link_title : l[1043];
     var message = null;
+    var submessage = false;
 
     u_reset();
     loadingInitDialog.hide();
@@ -3539,10 +3540,25 @@ function folderreqerr(c, e) {
 
     if (typeof e === 'object' && e.err < 0) {
         if (e.u === 7) {
-            message = l[23242];
-
-            if (e.l !== 2) {
+            if (e.l === 2) {
+                const link = 'https://www.stopitnow.org.uk/concerned-about-your-own-thoughts-or-behaviour/' +
+                    'concerned-about-use-of-the-internet/self-help/understanding-the-behaviour/?utm_source=mega' +
+                    '&utm_medium=banner&utm_campaign=mega_warning';
+                message = l.etd_link_removed_title;
+                submessage = `${l.etd_link_removed_body}<br><br>` +
+                    `<a class="clickurl" href="${link}" target="_blank" data-eventid="500245">` +
+                        l.etd_link_removed_button +
+                    `</a>`;
+                eventlog(500243);
+                if (is_mobile) {
+                    message = [message, 'icon sprite-mobile-fm-mono icon-alert-circle-thin-outline', false, submessage];
+                }
+            }
+            else {
                 message = l[23243];
+                if (is_mobile) {
+                    message = [title, 'icon sprite-mobile-fm-mono icon-alert-circle-thin-outline', false, message];
+                }
             }
         }
         else {
@@ -3571,7 +3587,7 @@ function folderreqerr(c, e) {
             message = l[1044] + '<ul><li>' + l[1045] + '</li><li>' + l[247] + '</li><li>' + l[1046] + '</li>';
         }
 
-        msgDialog('warninga', title, message, false, function() {
+        msgDialog('warninga', title, message, submessage, () => {
 
             // If the user is logged-in, he'll be redirected to the cloud
             loadSubPage('login');

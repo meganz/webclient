@@ -37,6 +37,9 @@ class MegaMobileNode extends MegaMobileComponent {
             return;
         }
 
+        // Set lazy for previewable parameter
+        this.resetPreviewable();
+
         classNames.push(this.node.t === 1 ? 'folder' : 'file');
 
         if (this.versioned) {
@@ -172,8 +175,8 @@ class MegaMobileNode extends MegaMobileComponent {
                     return false;
                 }
 
-                // If this is an image, load the preview slideshow
-                if (isVideo || is_image2(this.node)) {
+                // If this is an previewable but not text, load the preview slideshow
+                if (this.previewable && this.previewable !== 'text') {
                     if (isVideo) {
                         $.autoplay = this.handle;
                     }
@@ -183,6 +186,25 @@ class MegaMobileNode extends MegaMobileComponent {
                     // Non Pre-viewable file
                     mega.ui.viewerOverlay.show(this.handle);
                 }
+            }
+
+            return false;
+        });
+    }
+
+    // Previewable states cannot really change normally, hence using lazy
+    resetPreviewable() {
+
+        lazy(this, 'previewable', () => {
+
+            if (is_video(this.node)) {
+                return 'video';
+            }
+            else if (is_image2(this.node)) {
+                return 'image';
+            }
+            else if (is_text(this.node)) {
+                return 'text';
             }
 
             return false;
@@ -237,8 +259,8 @@ class MegaMobileNode extends MegaMobileComponent {
         return this.linked && this.linked.down;
     }
 
-    get previewable() {
-        return is_video(this.node) || is_image2(this.node);
+    get rights() {
+        return M.getNodeRights(this.handle);
     }
 
     static updateLinkIcon(component) {
@@ -304,6 +326,9 @@ class MegaMobileNode extends MegaMobileComponent {
 
         if (_shouldUpdate('name')) {
             this.domNode.querySelector('.fm-item-name').textContent = this.name;
+
+            // Node name change may update previewable state
+            this.resetPreviewable();
         }
 
         if (_shouldUpdate('icon')) {

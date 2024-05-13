@@ -7064,7 +7064,8 @@ class ComposedTextArea extends mixins.w9 {
       noArrow: "true",
       positionMy: "left top",
       positionAt: "left bottom",
-      vertOffset: 4
+      vertOffset: 4,
+      wrapper: "#fmholder"
     }, external_React_default().createElement("div", {
       className: "dropdown info-txt"
     }, l[23753] ? l[23753] : "Send..."), external_React_default().createElement(dropdowns.DropdownItem, {
@@ -31941,7 +31942,7 @@ class Dropdown extends _chat_mixins1__.w9 {
         my: self.props.positionMy ? self.props.positionMy : "center top",
         at: self.props.positionAt ? self.props.positionAt : "center bottom",
         collision: this.props.collision || 'flipfit',
-        within: $container,
+        within: self.props.wrapper || $container,
         using: function (obj, info) {
           self.reposElementUsing(this, obj, info);
         }

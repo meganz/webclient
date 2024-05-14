@@ -133,6 +133,10 @@
 .theme-light-forced .sprite-fm-theme.icon-mic-disabled, .theme-light-forced .sprite-fm-theme-before.icon-mic-disabled-before::before, .theme-light-forced .sprite-fm-theme-after.icon-mic-disabled-after::after {
    background-image: url("../../images/sprites/fm-theme@light.svg#icon-mic-disabled");
 }
+.theme-light .sprite-fm-theme.icon-no-connection, .theme-light .sprite-fm-theme-before.icon-no-connection-before::before, .theme-light .sprite-fm-theme-after.icon-no-connection-after::after,
+.theme-light-forced .sprite-fm-theme.icon-no-connection, .theme-light-forced .sprite-fm-theme-before.icon-no-connection-before::before, .theme-light-forced .sprite-fm-theme-after.icon-no-connection-after::after {
+   background-image: url("../../images/sprites/fm-theme@light.svg#icon-no-connection");
+}
 .theme-light .sprite-fm-theme.icon-notifications, .theme-light .sprite-fm-theme-before.icon-notifications-before::before, .theme-light .sprite-fm-theme-after.icon-notifications-after::after,
 .theme-light-forced .sprite-fm-theme.icon-notifications, .theme-light-forced .sprite-fm-theme-before.icon-notifications-before::before, .theme-light-forced .sprite-fm-theme-after.icon-notifications-after::after {
    background-image: url("../../images/sprites/fm-theme@light.svg#icon-notifications");

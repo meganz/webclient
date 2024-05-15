@@ -587,8 +587,7 @@ export default class Stream extends MegaRenderMixin {
         return (
             <div className="node-menu theme-dark-forced">
                 <div className="node-menu-toggle">
-                    <Emoji>{M.getNameByHandle(u_handle)}</Emoji>
-                    <i className="sprite-fm-mono icon-side-menu"/>
+                    <i className="sprite-fm-mono icon-more-horizontal-thin-outline"/>
                 </div>
                 <div className="node-menu-content">
                     <ul>

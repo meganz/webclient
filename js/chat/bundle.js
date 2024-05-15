@@ -24927,7 +24927,7 @@ class ParticipantsBlock extends mixins.w9 {
         }, external_React_default().createElement("div", {
           className: "node-menu-toggle"
         }, external_React_default().createElement("i", {
-          className: "sprite-fm-mono icon-options"
+          className: "sprite-fm-mono icon-more-horizontal-thin-outline"
         })), external_React_default().createElement("div", {
           className: "node-menu-content"
         }, external_React_default().createElement("ul", null, external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.A, {
@@ -26168,8 +26168,8 @@ class stream_Stream extends mixins.w9 {
       className: "node-menu theme-dark-forced"
     }, external_React_default().createElement("div", {
       className: "node-menu-toggle"
-    }, external_React_default().createElement(utils.zT, null, M.getNameByHandle(u_handle)), external_React_default().createElement("i", {
-      className: "sprite-fm-mono icon-side-menu"
+    }, external_React_default().createElement("i", {
+      className: "sprite-fm-mono icon-more-horizontal-thin-outline"
     })), external_React_default().createElement("div", {
       className: "node-menu-content"
     }, external_React_default().createElement("ul", null, external_React_default().createElement("li", null, external_React_default().createElement(meetings_button.A, {
@@ -26709,6 +26709,8 @@ var react0 = __webpack_require__.n(react0__);
 var _mixins1__ = __webpack_require__(137);
 var _contacts_jsx2__ = __webpack_require__(251);
 var _call_jsx3__ = __webpack_require__(3);
+var _ui_utils4__ = __webpack_require__(314);
+
 
 
 
@@ -26865,7 +26867,8 @@ class VideoNode extends _mixins1__.w9 {
   renderStatus() {
     const {
       mode,
-      chatRoom
+      chatRoom,
+      isPresenterNode
     } = this.props;
     const {
       source
@@ -26882,12 +26885,18 @@ class VideoNode extends _mixins1__.w9 {
     }) => react0().createElement("div", {
       className: "video-node-status theme-dark-forced"
     }, children);
+    const name = react0().createElement("div", {
+      className: "video-status-name"
+    }, isPresenterNode ? react0().createElement(_ui_utils4__.zT, null, l.presenter_nail.replace('%s', M.getNameByHandle(userHandle))) : react0().createElement(_contacts_jsx2__.ContactAwareName, {
+      contact: M.u[userHandle],
+      emoji: true
+    }));
     if (isOnHold) {
-      return react0().createElement($$CONTAINER, null, this.getStatusIcon('icon-pause', l[23542].replace('%s', M.getNameByHandle(userHandle))));
+      return react0().createElement($$CONTAINER, null, name, this.getStatusIcon('icon-pause', l[23542].replace('%s', M.getNameByHandle(userHandle))));
     }
-    return react0().createElement((react0().Fragment), null, mode === _call_jsx3__.g.MAIN && _call_jsx3__.Ay.isModerator(chatRoom, userHandle) && this.getStatusIcon('icon-admin-outline call-role-icon', l[8875]), react0().createElement($$CONTAINER, null, react0().createElement(AudioLevelIndicator, {
+    return react0().createElement((react0().Fragment), null, mode === _call_jsx3__.g.MAIN && _call_jsx3__.Ay.isModerator(chatRoom, userHandle) && this.getStatusIcon('icon-admin-outline call-role-icon', l[8875]), react0().createElement($$CONTAINER, null, name, react0().createElement(AudioLevelIndicator, {
       source: source
-    }), sfuClient.haveBadNetwork ? this.getStatusIcon('icon-weak-signal', l.poor_connection) : null));
+    }), sfuClient.haveBadNetwork ? this.getStatusIcon('icon-call-offline', l.poor_connection) : null));
   }
   render() {
     const {
@@ -27379,7 +27388,7 @@ class VideoNodeMenu extends _mixins1__.w9 {
                 `
       }, react0().createElement("div", {
         className: `${NAMESPACE}-toggle`
-      }, react0().createElement(_ui_utils_jsx4__.zT, null, l.presenter_nail.replace('%s', M.getNameByHandle(userHandle))), react0().createElement("i", {
+      }, react0().createElement("i", {
         className: `sprite-fm-mono call-node-pin icon-pin${mode === _call_jsx3__.g.MAIN ? '-off' : ''}`,
         onClick: () => mode === _call_jsx3__.g.THUMBNAIL ? onSpeakerChange == null ? void 0 : onSpeakerChange(stream) : onModeChange == null ? void 0 : onModeChange(_call_jsx3__.g.THUMBNAIL)
       })));
@@ -27397,8 +27406,8 @@ class VideoNodeMenu extends _mixins1__.w9 {
                     `
       }, react0().createElement("div", {
         className: `${NAMESPACE}-toggle`
-      }, react0().createElement(_ui_utils_jsx4__.zT, null, M.getNameByHandle(userHandle)), react0().createElement("i", {
-        className: "sprite-fm-mono icon-side-menu"
+      }, react0().createElement("i", {
+        className: "sprite-fm-mono icon-more-horizontal-thin-outline"
       })), react0().createElement("div", {
         className: `${NAMESPACE}-content`
       }, react0().createElement("ul", null, Object.values($$CONTROLS).map(($$CONTROL, i) => react0().createElement("li", {

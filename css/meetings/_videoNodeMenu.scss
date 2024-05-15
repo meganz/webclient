@@ -1,7 +1,7 @@
 .node-menu {
     display: none;
     position: absolute;
-    top: 15px;
+    top: 8px;
     right: 8px;
     text-align: right;
     z-index: 2;
@@ -9,8 +9,8 @@
 
     i.call-node-pin.icon-pin,
     i.call-node-pin.icon-pin-off {
-        --icon-size: 16px;
-        margin: 3px;
+        --icon-size: 24px;
+        margin: 4px;
     }
 
     &:hover .node-menu-content {
@@ -19,8 +19,7 @@
 
     &-toggle {
         display: inline-block;
-        padding: 5px 0 5px 10px;
-        border-radius: 5px;
+        border-radius: 50%;
         font: var(--text-body1);
         background: var(--surface-black-bar);
         color: var(--text-color-high);
@@ -39,7 +38,7 @@
         }
 
         i {
-            --icon-size: 24px;
+            --icon-size: 32px;
             --mask-color: var(--icon-rest);
         }
     }

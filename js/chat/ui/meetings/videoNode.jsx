@@ -1,7 +1,8 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../mixins';
-import { Avatar } from '../contacts.jsx';
+import { Avatar, ContactAwareName } from '../contacts.jsx';
 import Call, { MODE } from './call.jsx';
+import { Emoji } from "../../../ui/utils";
 
 /** The class hiearachy of video components is the following:
                                     VideoNode
@@ -191,15 +192,24 @@ class VideoNode extends MegaRenderMixin {
     }
 
     renderStatus() {
-        const { mode, chatRoom } = this.props;
+        const { mode, chatRoom, isPresenterNode } = this.props;
         const { source } = this;
         const { sfuClient } = chatRoom.call;
         const { userHandle, isOnHold } = source;
         const $$CONTAINER = ({ children }) => <div className="video-node-status theme-dark-forced">{children}</div>;
 
+        const name = <div className="video-status-name">
+            {
+                isPresenterNode ?
+                    <Emoji>{l.presenter_nail.replace('%s', M.getNameByHandle(userHandle))}</Emoji> :
+                    <ContactAwareName contact={M.u[userHandle]} emoji={true}/>
+            }
+        </div>;
+
         if (isOnHold) {
             return (
                 <$$CONTAINER>
+                    {name}
                     {this.getStatusIcon('icon-pause', l[23542].replace('%s', M.getNameByHandle(userHandle)))}
                 </$$CONTAINER>
             );
@@ -214,12 +224,14 @@ class VideoNode extends MegaRenderMixin {
                     this.getStatusIcon('icon-admin-outline call-role-icon', l[8875])
                 }
                 <$$CONTAINER>
+                    {name}
                     <AudioLevelIndicator source={source} />
-                    {sfuClient.haveBadNetwork ? this.getStatusIcon('icon-weak-signal', l.poor_connection) : null}
+                    {sfuClient.haveBadNetwork ? this.getStatusIcon('icon-call-offline', l.poor_connection) : null}
                 </$$CONTAINER>
             </>
         );
     }
+
     render() {
         const {
             mode,

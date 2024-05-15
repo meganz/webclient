@@ -2458,7 +2458,7 @@ function topmenuUI() {
             //var languageName = ln[lang];
 
             // Init the top header change language button
-            $topChangeLangName.text(lang);
+            $topChangeLangName.text(getRemappedLangCode(lang));
             $topChangeLang.removeClass('hidden');
             $topChangeLang.rebind('click.changelang', function() {
 

@@ -133,7 +133,6 @@ export default class VideoNodeMenu extends MegaRenderMixin {
                     ${mode === MODE.THUMBNAIL ? '' : 'presenter'}
                 `}>
                     <div className={`${NAMESPACE}-toggle`}>
-                        <Emoji>{l.presenter_nail.replace('%s', M.getNameByHandle(userHandle))}</Emoji>
                         <i
                             className={`sprite-fm-mono call-node-pin icon-pin${mode === MODE.MAIN ? '-off' : ''}`}
                             onClick={() => mode === MODE.THUMBNAIL ?
@@ -155,8 +154,7 @@ export default class VideoNodeMenu extends MegaRenderMixin {
                         theme-dark-forced
                     `}>
                     <div className={`${NAMESPACE}-toggle`}>
-                        <Emoji>{M.getNameByHandle(userHandle)}</Emoji>
-                        <i className="sprite-fm-mono icon-side-menu"/>
+                        <i className="sprite-fm-mono icon-more-horizontal-thin-outline"/>
                     </div>
                     <div className={`${NAMESPACE}-content`}>
                         <ul>

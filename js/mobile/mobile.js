@@ -1290,6 +1290,7 @@ mega.gallery = {
             coverContainer.className = 'pcol-cover-container';
 
             const coverImg = document.createElement('i');
+            mega.ui.emptyState.hide(parentNode[0]);
 
             if (elCount) {
                 coverImg.className = 'loading-album-img sprite-mobile-fm-uni mime-image-solid';
@@ -1328,6 +1329,47 @@ mega.gallery = {
             coverContainer.appendChild(countTxt);
 
             parentNode.append(coverContainer);
+
+            delay('collection-render.attach-events', () => {
+                const megaListOptions = M.megaRender.getMListOptions ? M.megaRender.getMListOptions() : null;
+
+                if (megaListOptions) {
+                    const bottomBlock = document.querySelector('.bottom-block');
+                    const list = document.getElementById('file-manager-list-container');
+
+                    list.style.position = 'relative';
+                    list.style.paddingBottom = `${megaListOptions.bottomSpacing | 0}px`;
+
+                    const onScroll = () => {
+                        if (list.scrollTop >= bottomBlock.originalHeight) {
+                            bottomBlock.style.height = 0;
+                        }
+                        else if (list.scrollTop > 0) {
+                            bottomBlock.style.height = `${(bottomBlock.originalHeight - list.scrollTop) / 2}px`;
+                        }
+                        else {
+                            bottomBlock.style.height = `${bottomBlock.originalHeight}px`;
+                        }
+                    };
+
+                    const onResize = () => {
+                        bottomBlock.removeAttribute('style');
+
+                        onIdle(() => {
+                            bottomBlock.originalHeight = bottomBlock.offsetHeight;
+                            bottomBlock.style.height = `${bottomBlock.originalHeight}px`;
+                        });
+                    };
+
+                    list.addEventListener('scroll', onScroll);
+                    window.addEventListener('resize', onResize);
+
+                    mBroadcaster.addListener('beforepagechange', () => {
+                        list.removeEventListener('scroll', onScroll);
+                        window.removeEventListener('resize', onResize);
+                    });
+                }
+            });
         }
     }
 };

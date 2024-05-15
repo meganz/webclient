@@ -222,7 +222,7 @@
 .node-menu {
   display: none;
   position: absolute;
-  top: 15px;
+  top: 8px;
   right: 8px;
   text-align: right;
   z-index: 2;
@@ -230,16 +230,15 @@
 }
 .node-menu i.call-node-pin.icon-pin,
 .node-menu i.call-node-pin.icon-pin-off {
-  --icon-size: 16px;
-  margin: 3px;
+  --icon-size: 24px;
+  margin: 4px;
 }
 .node-menu:hover .node-menu-content {
   display: block;
 }
 .node-menu-toggle {
   display: inline-block;
-  padding: 5px 0 5px 10px;
-  border-radius: 5px;
+  border-radius: 50%;
   font: var(--text-body1);
   background: var(--surface-black-bar);
   color: var(--text-color-high);
@@ -256,7 +255,7 @@
   color: var(--text-color-medium);
 }
 .node-menu-toggle i {
-  --icon-size: 24px;
+  --icon-size: 32px;
   --mask-color: var(--icon-rest);
 }
 .node-menu-content {
@@ -450,21 +449,26 @@
 }
 .video-node-status {
   position: absolute;
-  bottom: 10px;
-  left: 10px;
+  bottom: 8px;
+  left: 8px;
+  max-width: calc(100% - 28px);
   color: var(--secondary-white);
   font-size: 9px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 8px;
+  display: flex;
+  height: 24px;
+  padding: 0 6px;
 }
 .video-node-status span {
   display: flex;
   align-items: center;
   justify-content: center;
   float: left;
-  width: 32px;
-  height: 32px;
   margin: 0 5px 0 0;
-  border-radius: 200px;
-  background: rgba(17, 17, 17, 0.8);
+}
+.video-node-status span:last-child {
+  margin-right: 0;
 }
 .video-node-status span i {
   overflow: hidden;
@@ -472,16 +476,32 @@
   --mask-color: var(--secondary-green);
   --icon-size: 16px;
 }
-.video-node-status span i.icon-mic-off-thin-outline {
-  --mask-color: var(--secondary-red);
-}
-.video-node-status span i.icon-weak-signal {
-  --mask-color: var(--icon-rest);
+.video-node-status span i.icon-mic-off-thin-outline, .video-node-status span i.icon-call-offline {
+  --mask-color: var(--icon-active);
 }
 .video-node-status span span {
   position: fixed;
   bottom: -9999px;
   visibility: hidden;
+}
+.video-node-status .video-status-name {
+  margin: auto 5px auto 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+.video-node-status .video-status-name span {
+  display: block;
+  font: var(--text-body1);
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-wrap: nowrap;
+  width: fit-content;
+}
+.video-node-status .video-status-name img.emoji {
+  height: 16px;
+  margin: 0;
+  width: 16px;
 }
 
 .stream .video-node-content .avatar-wrapper {
@@ -1426,7 +1446,7 @@ body.theme-dark .lhp-container .lhp-filter-tag {
 }
 .meetings-call .stream .stream-participants-block .participants-container {
   position: relative;
-  width: 252px;
+  width: 292px;
 }
 .meetings-call .stream .stream-participants-block .participants-container .participants-grid {
   display: grid;
@@ -1491,11 +1511,6 @@ body.rtl .meetings-call .stream .stream-participants-block .participants-contain
   left: unset;
   right: 5px;
 }
-.meetings-call .stream .stream-participants-block .participants-container .participants-grid .video-node-status span {
-  width: 28px;
-  height: 28px;
-  margin: 0 2px 0 0;
-}
 .meetings-call .stream .stream-participants-block .participants-container .participants-grid .video-node .call-role-icon {
   padding: 5px;
   --icon-size: 18px;
@@ -1534,7 +1549,7 @@ body.rtl .meetings-call .stream .stream-participants-block .participants-contain
 }
 .meetings-call .stream-wrapper.with-participants-block {
   float: left;
-  width: calc(100% - 270px);
+  width: calc(100% - 310px);
 }
 .meetings-call .stream-container {
   margin: auto;

@@ -7,7 +7,7 @@
 
     .participants-container {
         position: relative;
-        width: 252px;
+        width: 292px;
 
         .participants-grid {
             display: grid;
@@ -81,12 +81,6 @@
                     body.rtl & {
                         left: unset;
                         right: 5px;
-                    }
-
-                    span {
-                        width: 28px;
-                        height: 28px;
-                        margin: 0 2px 0 0;
                     }
                 }
 

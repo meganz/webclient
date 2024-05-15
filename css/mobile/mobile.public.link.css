@@ -25,8 +25,12 @@
 }
 
 .file-folder-view .no-content.folder-file,
-.pcol-cover-container p.album-count-txt {
+.pcol-cover-container {
     text-align: center;
+}
+
+.pcol-cover-container {
+    padding-top: 12px;
 }
 
 .file-folder-view .no-access,

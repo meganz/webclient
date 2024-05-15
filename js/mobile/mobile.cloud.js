@@ -21,7 +21,7 @@ mobile.cloud = {
 
         // If a public folder link
         if (pfid) {
-            if (M.v.length) {
+            if (M.v.length || pfcol) {
                 this.initFolderLinkBottomBar();
             }
 
@@ -144,13 +144,12 @@ mobile.cloud = {
 
         'use strict';
 
+        document.querySelector('.file-manager-block').classList.remove('hidden');
+
         if (pfcol) {
             mega.gallery.albums.initPublicAlbum($('.mobile.file-manager-block .fm-content .fm-list'));
         }
         else {
-
-            document.querySelector('.file-manager-block').classList.remove('hidden');
-
             if (M.v.length > 0) {
                 M.megaRender.renderLayout(update, M.v);
             }

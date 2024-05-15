@@ -2086,3 +2086,25 @@ function getTransifexLangCode() {
         default: return lang;
     }
 }
+
+/**
+ * Apply any remapping of internal language codes to what should be shown in the UI
+ *
+ * @param {string} [langCode] The two character language code used internally by webclient
+ * @returns {string} The two character language code that should be displayed to the user
+ */
+function getRemappedLangCode(langCode) {
+    'use strict';
+
+    langCode = langCode || lang;
+    const remaps = {
+        br: 'pt',
+        cn: 'sc',
+        ct: 'tc',
+    };
+
+    if (remaps[langCode]) {
+        return remaps[langCode];
+    }
+    return langCode;
+}

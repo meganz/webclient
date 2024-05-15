@@ -74,10 +74,12 @@
     -webkit-transition: opacity 200ms ease-in-out;
     transition: opacity 200ms ease-in-out;
 }
-.top-menu-item .top-menu-icon {
+.top-menu-item .top-menu-icon,
+.top-menu-item > .sprite-fm-mono {
     position: absolute;
     left: 22px;
     top: 4px;
+    --icon-size: 22px;
 }
 .top-menu-item .right-arrow {
     left: auto;

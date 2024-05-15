@@ -69,7 +69,12 @@ mobile.languageMenu = {
 
         // Cache selectors
         var $template = $('.top-menu-item.language-template').clone();
-        var $languageItemsContainer = $('.top-submenu.language-items');
+        var $languageItemsContainer = $('#startholder .top-submenu.language-items');
+
+        // If there are already language items in the container, do nothing
+        if ($languageItemsContainer.children().length > 1) {
+            return;
+        }
 
         // Remove the template class
         $template.removeClass('language-template');

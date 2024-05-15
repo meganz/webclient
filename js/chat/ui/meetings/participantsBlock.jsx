@@ -78,7 +78,7 @@ export default class ParticipantsBlock extends MegaRenderMixin {
                             ref={isPresenterNode ? this.nodeMenuRef : this.dupNodeMenuRef}
                             className="node-menu theme-dark-forced">
                             <div className="node-menu-toggle">
-                                <i className="sprite-fm-mono icon-options"/>
+                                <i className="sprite-fm-mono icon-more-horizontal-thin-outline"/>
                             </div>
                             <div className="node-menu-content">
                                 <ul>

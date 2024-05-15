@@ -644,7 +644,7 @@ var voucherDialog = {
 
             $storageAmount.text(bytesToSize(M.account.space, 0));
             $newStorageAmount.text(bytesToSize(newStorage, 0));
-            if (M.maf.storage.current) {
+            if (M.maf.storage && M.maf.storage.current) {
                 $currentAchievementsAmount.text(`+ ${bytesToSize(M.maf.storage.current, 0)}`);
                 $currentAchievementsAmount.removeClass('hidden');
             }

@@ -1221,6 +1221,9 @@ accountUI.account = {
         renderBirthMonth: nop,
         renderBirthDay: nop,
         renderCountry: nop
+    },
+    qrcode: {
+        render: nop
     }
 };
 contextMenu = {

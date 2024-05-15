@@ -467,7 +467,16 @@ ChatdIntegration.prototype._retrieveShardUrl = function(isPublic, chatIdOrHandle
     }
 
     const req = asyncApiReq(apiReq)
-        .then(([, res]) => {
+        .then((res) => {
+            if (Array.isArray(res)) {
+                console.assert(apiReq.a === 'mcurl', res);
+                console.assert(typeof res[1] === 'string', res);
+                res = res[1];
+            }
+            else {
+                console.assert(apiReq.a === 'mcphurl', res);
+                console.assert(typeof res === 'object' && res.url, res);
+            }
             assert(res && String(res.url || res).includes('://'));
             return res;
         })

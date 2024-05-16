@@ -249,6 +249,9 @@
 .sprite-fm-uni.icon-question, .sprite-fm-uni-before.icon-question-before::before, .sprite-fm-uni-after.icon-question-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-question");
 }
+.sprite-fm-uni.icon-raise-hand, .sprite-fm-uni-before.icon-raise-hand-before::before, .sprite-fm-uni-after.icon-raise-hand-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-raise-hand");
+}
 .sprite-fm-uni.icon-recovery-key, .sprite-fm-uni-before.icon-recovery-key-before::before, .sprite-fm-uni-after.icon-recovery-key-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-recovery-key");
 }

@@ -39,6 +39,7 @@
   "license": "proprietary",
   "private": true,
   "readmeFilename": "README.md",
+  "sideEffects": false,
   "dependencies": {
     "@babel/core": "7.24.5",
     "@babel/plugin-proposal-decorators": "7.24.1",

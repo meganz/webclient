@@ -354,8 +354,7 @@ mobile.uploadOverlay = {
 
         // Show/hide general action buttons
         if (manual === true) {
-            mega.ui.overlay.actionsNode.querySelector('.pauseAll').component.hide();
-            mega.ui.overlay.actionsNode.querySelector('.resumeAll').component.show();
+            this.showTransferControlButton(true, false);
         }
     },
 
@@ -381,8 +380,7 @@ mobile.uploadOverlay = {
 
         // Show/hide general action buttons
         if (manual === true) {
-            mega.ui.overlay.actionsNode.querySelector('.pauseAll').component.show();
-            mega.ui.overlay.actionsNode.querySelector('.resumeAll').component.hide();
+            this.showTransferControlButton(false, true);
         }
     },
 
@@ -408,14 +406,33 @@ mobile.uploadOverlay = {
                 }
             }
 
-            if (pauseCont === 0) {
-                mega.ui.overlay.actionsNode.querySelector('.pauseAll').component.hide();
-                mega.ui.overlay.actionsNode.querySelector('.resumeAll').component.show();
-            }
-            else if (resumeCont === 0) {
-                mega.ui.overlay.actionsNode.querySelector('.pauseAll').component.show();
-                mega.ui.overlay.actionsNode.querySelector('.resumeAll').component.hide();
-            }
+            this.showTransferControlButton(pauseCont === 0, resumeCont === 0);
+        }
+    },
+
+    /**
+    * Show Pause or Resume button
+    * @param {Boolean} resume Show Resume button
+    * @param {Boolean} pause Show Pause button
+    * @returns {void}
+    */
+    showTransferControlButton(resume, pause) {
+        'use strict';
+
+        const pauseButton = mega.ui.overlay.actionsNode.querySelector('.pauseAll');
+        const resumeButton = mega.ui.overlay.actionsNode.querySelector('.resumeAll');
+
+        if (!pauseButton || !resumeButton) {
+            return false;
+        }
+
+        if (resume) {
+            pauseButton.component.hide();
+            resumeButton.component.show();
+        }
+        else if (pause) {
+            pauseButton.component.show();
+            resumeButton.component.hide();
         }
     },
 

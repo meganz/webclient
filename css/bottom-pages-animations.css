@@ -185,7 +185,6 @@
     animation-fill-mode: forwards;
     perspective-origin: 50% 50%;
 }
-.
 .bottom-page.big-header.animated.start-animation .startpage.carousel.start-animation {
     -webkit-animation-name: show-features;
     -webkit-animation-duration: 0.6s;

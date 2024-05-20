@@ -3808,14 +3808,8 @@ div.checkboxOn {
     font-family: "source_sans_proregular", sans-serif;
     font-weight: normal;
 }
-.payment-address-dialog .grey-container-box .mobile.signin-input {
-    background-color: #F8F8F8;
-    box-sizing: border-box;
-    height: 48px;
-    margin: 0 20px 8px;
-    overflow: hidden;
-    padding: 9px 55px 0 12px;
-    position: relative;
+.payment-address-dialog .grey-container-box .container-box-block {
+    margin: 0 20px;
 }
 .payment-address-dialog .mobile.fm-icon.close {
     margin-top: 14px;
@@ -3824,9 +3818,9 @@ div.checkboxOn {
 }
 .payment-address-dialog .default-select {
     float: none;
-    margin: 0 20px 12px;
+    margin: 0 0 12px;
     min-width: 0;
-    width: calc(100% - 40px);
+    width: 100%;
 }
 .wire-transfer-dialog .grey-container-box {
     background-color: rgba(0, 191, 165, 0.02);

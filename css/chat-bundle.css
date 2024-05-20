@@ -524,7 +524,7 @@
   max-height: 9px;
   border-radius: 0 0 3px 3px;
   background: var(--secondary-green);
-  transition: height 200ms ease-in-out;
+  transition: height 100ms ease-out;
 }
 
 .float-video {

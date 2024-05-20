@@ -1001,7 +1001,10 @@ class CallRecorder {
     initAudio(peerTracks) {
         this.audioCtx = new AudioContext();
         this.audioMixer = this.audioCtx.createChannelMerger(peerTracks.length + 1);
-        this.audioDestNode = this.audioCtx.createMediaStreamDestination();
+        this.audioDestNode = new MediaStreamAudioDestinationNode(this.audioCtx, {
+            channelCount: 1,
+            channelCountMode: "explicit"
+        });
         this.audioMixer.connect(this.audioDestNode);
         this.updatePeerInputs(peerTracks);
     }
@@ -1274,7 +1277,7 @@ class CallRecorder {
 }
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = 'b53ed450a8';
+const COMMIT_ID = '1c9b788dce';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -2093,15 +2096,14 @@ class SfuClient {
                     if (self._audioTrack !== atrack) {
                         return;
                     }
-                    self._audioTrack = null;
                     atrack.onended = null;
                     do {
                         if (window.d) {
-                            console.warn(client_kLogTag, "Input audio track stopped (possibly device removed), re-requesting audio input...");
+                            console.warn(client_kLogTag, "Input audio track stopped: possibly device removed. Re-requesting audio input...");
                         }
                     } while (0);
-                    self._fire("onMicDisconnect");
-                    self._updateSentTracks(null, true);
+                    self._fire("onMicDisconnected");
+                    self._restartInputDevice("_audioTrack", Av.Audio);
                 };
             })
                 .catch(function (err) {
@@ -2131,6 +2133,19 @@ class SfuClient {
                 if (!vtrack) {
                     return Promise.reject("Local camera stream has no video track");
                 }
+                vtrack.onended = () => {
+                    if (self._cameraTrack !== vtrack) {
+                        return;
+                    }
+                    vtrack.onended = null;
+                    do {
+                        if (window.d) {
+                            console.warn(client_kLogTag, "Input camera track stopped: possibly device removed. Re-requesting camera input...");
+                        }
+                    } while (0);
+                    self._fire("onCameraDisconnected");
+                    self._restartInputDevice("_cameraTrack", Av.Video);
+                };
             })
                 .catch(function (err) {
                 self._muteCamera = true;
@@ -2586,46 +2601,51 @@ class SfuClient {
     static persistAudioOutDevice(deviceId) {
         SfuClient._persistMediaDeviceSelection(kAudioOutDeviceLsKey, deviceId);
     }
-    _setInputDevice(lsKey, varName, deviceId, diffAv) {
+    _setInputDevice(lsKey, trackPropName, deviceId, mediaAv) {
         SfuClient._persistMediaDeviceSelection(lsKey, deviceId);
-        if (!this[varName]) {
-            return;
-        }
+        return (this[trackPropName]) ? this._restartInputDevice(trackPropName, mediaAv) : Promise.resolve();
+    }
+    _restartInputDevice(varName, mediaAv) {
+        // If sending that type of media changes state (i.e. was sent, and now can't be sent because device went aaway
+        // and no more input devices for that media type, or vice versa), then updateSentTracks will take care of
+        // handling the change. If, however, we were and continue to be sending that media, but from a different input,
+        // we have to notify only locally: the GUI via onLocalMediaChange, and the recorder to switch to the input track
+        let prevState;
         return this._updateSentTracks(() => {
+            prevState = !!this[varName];
             this[varName] = null;
-        }, true)
+        }, false)
             .then(() => {
-            this._fire("onLocalMediaChange", diffAv);
-            if (this.callRecorder) {
-                this.callRecorder.onLocalMediaChange(diffAv);
+            if (!!this[varName] === prevState) {
+                this._fire("onLocalMediaChange", mediaAv);
+                if (this.callRecorder) {
+                    this.callRecorder.onLocalMediaChange(mediaAv);
+                }
             }
         });
     }
     static enumMediaDevices() {
         return navigator.mediaDevices.enumerateDevices()
             .then((devices) => {
-            const audioIn = [];
-            const audioOut = [];
-            const videoIn = [];
+            const audioIn = {};
+            const audioOut = {};
+            const videoIn = {};
             for (const device of devices) {
-                if (device.deviceId === "default") {
-                    continue;
-                }
                 const kind = device.kind;
-                let set;
+                let map;
                 if (kind === "audioinput") {
-                    set = audioIn;
+                    map = audioIn;
                 }
                 else if (kind === "videoinput") {
-                    set = videoIn;
+                    map = videoIn;
                 }
                 else if (kind === "audiooutput") {
-                    set = audioOut;
+                    map = audioOut;
                 }
                 else {
                     continue;
                 }
-                set.push({ id: device.deviceId, name: device.label });
+                map[map.default ? device.deviceId : "default"] = device.label;
             }
             return { audioIn, audioOut, videoIn };
         });
@@ -3979,6 +3999,8 @@ class AudioPlayer {
         const rx = this.receiver = slot.xponder.receiver;
         const player = this.playerElem = document.createElement("audio");
         const client = peer.client;
+        this.peer.client._speakerDetector.registerPeer(this);
+        playerPlay(player, rx.track); // it appears that setting the sinkId before calling play() has no effect
         const sinkId = client.audioOutDeviceId;
         if (sinkId) {
             player.setSinkId(sinkId)
@@ -3991,8 +4013,6 @@ class AudioPlayer {
                 client.setAudioOutDevice(null, true);
             });
         }
-        this.peer.client._speakerDetector.registerPeer(this);
-        playerPlay(player, rx.track);
     }
     pollAudioLevel(trackSlow) {
         if (!this.receiver) {

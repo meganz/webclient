@@ -990,7 +990,7 @@ export class ContactAwareComponent extends MegaRenderMixin {
             const chatHandle = is_chatlink.ph || (chatRoom && chatRoom.publicChatHandle);
 
             if (syncName) {
-                promises.push(M.syncUsersFullname(contactHandle, chatHandle));
+                promises.push(megaChat.plugins.userHelper.getUserName(contactHandle, chatHandle));
             }
 
             if (syncMail) {

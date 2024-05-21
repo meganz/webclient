@@ -3374,6 +3374,7 @@ else if (!browserUpdate) {
             'chat_reactions_js': {f:'js/chat/reactions.js', n: 'chat_reactions_js', j:1},
             'chat_messages_Js': {f:'js/chat/messages.js', n: 'chat_messages_Js', j:1},
             'presence2_js': {f:'js/chat/presence2.js', n: 'presence2_js', j:1},
+            'chatuserhelp_js': {f:'js/chat/plugins/chatUserHelper.js', n: 'chatuserhelp_js', j:1},
             // leave the bundle at the end.
             'chat_react_minified_js': {f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1}
         }

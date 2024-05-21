@@ -1,7 +1,7 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../../mixins.js';
-import { Emoji, ParsedHTML } from '../../../../ui/utils.jsx';
-import { Avatar } from '../../contacts.jsx';
+import { ParsedHTML } from '../../../../ui/utils.jsx';
+import { Avatar, ContactAwareName } from '../../contacts.jsx';
 import Button from '../button.jsx';
 import { PerfectScrollbar } from '../../../../ui/perfectScrollbar.jsx';
 
@@ -49,7 +49,7 @@ export default class Admit extends MegaRenderMixin {
                                     <Avatar contact={M.u[handle]} />
                                 </div>
                                 <div className="peer-name">
-                                    <Emoji>{M.getNameByHandle(handle)}</Emoji>
+                                    <ContactAwareName contact={M.u[handle]} emoji={true}/>
                                 </div>
                                 <div className="peer-controls">
                                     <this.Icon

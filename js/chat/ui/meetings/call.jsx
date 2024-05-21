@@ -507,12 +507,14 @@ export default class Call extends MegaRenderMixin {
             );
         });
         // --
-        chatRoom.rebind(`onMutedBy.${NAMESPACE}`, (ev, { cid }) =>
-            ChatToast.quick(
-                /* `You've been muted by %NAME` */
-                l.muted_by.replace('%NAME', nicknames.getNickname(this.props.peers[cid]))
-            )
-        );
+        chatRoom.rebind(`onMutedBy.${NAMESPACE}`, (ev, { cid }) => {
+            megaChat.plugins.userHelper.getUserNickname(this.props.peers[cid]).catch(dump).always(name => {
+                ChatToast.quick(
+                    /* `You've been muted by %NAME` */
+                    l.muted_by.replace('%NAME', name || '')
+                );
+            });
+        });
     };
 
     unbindCallEvents = () =>
@@ -872,7 +874,10 @@ export default class Call extends MegaRenderMixin {
 
         if (recorder) {
             const simpletip = {
-                'data-simpletip': l.host_recording.replace('%NAME', nicknames.getNickname(recorder)),
+                'data-simpletip': l.host_recording.replace(
+                    '%NAME',
+                    nicknames.getNickname(recorder) || megaChat.plugins.userHelper.SIMPLETIP_USER_LOADER
+                ),
                 'data-simpletipposition': 'top',
                 'data-simpletipoffset': 5,
                 'data-simpletip-class': 'theme-dark-forced'

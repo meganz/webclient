@@ -147,6 +147,12 @@ function reselect(n) {
         return String(h).replace(/[^\w-]/g, '');
     });
 
+    // Just scroll to file in mobile weblClient
+    if (is_mobile && n && $.selected.length) {
+        mobile.cloud.scrollToFile($.selected[0]);
+        return;
+    }
+
     if (window.selectionManager) {
         selectionManager.clear_selection();
     }
@@ -163,12 +169,7 @@ function reselect(n) {
         }
     }
 
-    if (n && is_mobile) {
-        if ($.selected.length) {
-            mobile.cloud.scrollToFile($.selected[0]);
-        }
-    }
-    else if (n) {
+    if (n) {
         let $el;
         let $scrollBlock;
 

@@ -1337,15 +1337,18 @@ ChatdIntegration.prototype._attachToChatRoom = promisify(function(resolve, rejec
                             false,
                             true
                         );
-
+                        return succeeded ? self.syncMessageContacts(msg) : Promise.resolve({ msg });
+                    })
+                    .then(({ succeeded, msg }) => {
                         if (succeeded) {
-                            mb.messagesBatchFromHistory.remove(msg.messageId);
+                            const { messagesBuff } = chatRoom;
+                            messagesBuff.messagesBatchFromHistory.remove(msg.messageId);
                             if (msgObject.pendingMessageId) {
-                                mb.messages.remove(msgObject.pendingMessageId);
+                                messagesBuff.messages.remove(msgObject.pendingMessageId);
                             }
                             msg.source = Message.SOURCE.CHATD;
                             self._parseMessage(chatRoom, msg);
-                            mb.messages.push(msg);
+                            messagesBuff.messages.push(msg);
                         }
                     })
                     .catch(function(ex) {
@@ -1980,6 +1983,41 @@ ChatdIntegration.prototype.deleteScheduledMeeting = async function(scheduledMeet
         });
     this.logger.info(`Removed scheduled meeting ${res}, chatId: ${chatId}`);
     return res;
+};
+
+/**
+ * Helper to load names for related users in the message
+ *
+ * @param {Message} msg The message instance
+ * @returns {Promise} Resolves with the message instance
+ */
+ChatdIntegration.prototype.syncMessageContacts = async function(msg) {
+    const contact = Message.getContactForMessage(msg);
+    const promises = [];
+    const chatHandle = is_chatlink.ph || (msg.chatRoom && msg.chatRoom.publicChatHandle);
+    if (contact && contact.c !== 1 && contact.u !== u_handle) {
+        promises.push(megaChat.plugins.userHelper.getUserName(contact, chatHandle));
+    }
+
+    if (msg.dialogType === 'alterParticipants') {
+        const { included, excluded } = msg.meta;
+        promises.push(
+            ...included.map(h => megaChat.plugins.userHelper.getUserName(h, chatHandle)),
+            ...excluded.map(h => megaChat.plugins.userHelper.getUserName(h, chatHandle))
+        );
+    }
+    else if (msg.dialogType === 'privilegeChange') {
+        const { targetUserId } = msg.meta;
+        promises.push(megaChat.plugins.userHelper.getUserName(targetUserId, chatHandle));
+    }
+    else if (msg.dialogType === 'remoteCallEnded') {
+        const { participants } = msg.meta;
+        promises.push(...participants.map(h => megaChat.plugins.userHelper.getUserName(h, chatHandle)));
+    }
+
+    await Promise.allSettled(promises);
+
+    return { succeeded: true, msg };
 };
 
 // decorate ALL functions which require shard to be available before executing

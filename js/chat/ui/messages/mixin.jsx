@@ -6,6 +6,7 @@ import {DropdownEmojiSelector} from "../../../ui/emojiDropdown.jsx";
 class ConversationMessageMixin extends ContactAwareComponent {
 
     attachRerenderCallbacks  = false;
+    _reactionContactHandles = [];
 
     constructor(props) {
         super(props);
@@ -85,7 +86,8 @@ class ConversationMessageMixin extends ContactAwareComponent {
         for (let i = 0; i < reactions.length; i++) {
             handles.push(...Object.keys(reactions[i]));
         }
-        return array.unique(handles);
+        this._reactionContactHandles = array.unique(handles);
+        return this._reactionContactHandles;
     }
 
     addContactListeners() {
@@ -106,6 +108,10 @@ class ConversationMessageMixin extends ContactAwareComponent {
                     addUser(handle in M.u && M.u[handle]);
                 }
             }
+        }
+
+        for (let i = this._reactionContactHandles.length; i--;) {
+            addUser(this._reactionContactHandles[i] in M.u && M.u[this._reactionContactHandles[i]]);
         }
 
         if (d > 3) {
@@ -316,14 +322,16 @@ class ConversationMessageMixin extends ContactAwareComponent {
                     ChatdIntegration._ensureContactExists(Object.keys(reaction));
 
                     var rKeys = Object.keys(reaction);
-                    for (var i = 0; i < rKeys.length; i++) {
-                        var uid = rKeys[i];
+                    for (let i = 0; i < rKeys.length; i++) {
+                        const uid = rKeys[i];
 
                         if (reaction[uid]) {
-                            var c = M.u[uid] || {};
-                            names.push(
-                                uid === u_handle ? (l[24071] || "You") : c.name ? c.name : c.m || "(missing name)"
-                            );
+                            if (uid === u_handle) {
+                                names.push(l[24071] || 'You');
+                            }
+                            else if (uid in M.u) {
+                                names.push(M.getNameByHandle(uid) || megaChat.plugins.userHelper.SIMPLETIP_USER_LOADER);
+                            }
                         }
 
                     }
@@ -422,7 +430,17 @@ class ConversationMessageMixin extends ContactAwareComponent {
             emojisImages.push(reactionBtn);
         }
 
-        return emojisImages ? <div className="reactions-bar" id="reactions-bar">
+        return emojisImages ? <div className="reactions-bar" id="reactions-bar" onMouseEnter={() => {
+            if (this._loadedReacts) {
+                return false;
+            }
+            this._loadedReacts = megaChat.plugins.userHelper.fetchAllNames(this._reactionContacts(), chatRoom)
+                .catch(dump)
+                .finally(() => {
+                    this._loadedReacts = true;
+                    this.safeForceUpdate();
+                });
+        }}>
             {emojisImages}
         </div> : null;
     }

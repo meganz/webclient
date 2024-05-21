@@ -210,7 +210,14 @@ class VideoNode extends MegaRenderMixin {
             return (
                 <$$CONTAINER>
                     {name}
-                    {this.getStatusIcon('icon-pause', l[23542].replace('%s', M.getNameByHandle(userHandle)))}
+                    {this.getStatusIcon(
+                        'icon-pause',
+                        l[23542].replace(
+                            '%s',
+                            M.getNameByHandle(userHandle) ||
+                            megaChat.plugins.userHelper.SIMPLETIP_USER_LOADER
+                        )
+                    )}
                 </$$CONTAINER>
             );
         }

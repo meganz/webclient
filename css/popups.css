@@ -563,3 +563,9 @@ body.tl .dropdown.body.popup.contacts-search {
 .dark-direct-tooltip.simpletip-tooltip.no-max-width {
     max-width: none;
 }
+.dark-direct-tooltip.simpletip-tooltip i.small-blue-spinner {
+    height: 16px;
+    position: relative;
+    top: 2px;
+    width: 16px;
+}

@@ -1590,7 +1590,8 @@ function Chat() {
       'chatStats': ChatStats,
       'geoLocationLinks': GeoLocationLinks,
       meetingsManager,
-      'chatOnboarding': ChatOnboarding
+      'chatOnboarding': ChatOnboarding,
+      'userHelper': ChatUserHelper
     },
     'chatNotificationOptions': {
       'textMessages': {
@@ -3503,7 +3504,7 @@ Chat.prototype.html = function (content) {
   if (content) {
     return this.plugins.emoticonsFilter.processHtmlMessage(escapeHTML(content));
   }
-  return null;
+  return '';
 };
 Chat.prototype.updateKeysInProtocolHandlers = function () {
   this.chats.forEach(r => {
@@ -6426,7 +6427,7 @@ class ContactAwareComponent extends MegaRenderMixin {
       const promises = [];
       const chatHandle = is_chatlink.ph || chatRoom && chatRoom.publicChatHandle;
       if (syncName) {
-        promises.push(M.syncUsersFullname(contactHandle, chatHandle));
+        promises.push(megaChat.plugins.userHelper.getUserName(contactHandle, chatHandle));
       }
       if (syncMail) {
         promises.push(M.syncContactEmail(contactHandle));
@@ -7571,7 +7572,11 @@ class Avatar extends _mixins1__.u9 {
     const extraProps = {};
     if (this.props.simpletip) {
       classes += " simpletip";
-      extraProps['data-simpletip'] = this.props.simpletip;
+      if (this.props.simpletip === true) {
+        extraProps['data-simpletip'] = M.getNameByHandle(contact.h || contact.u) || megaChat.plugins.userHelper.SIMPLETIP_USER_LOADER;
+      } else {
+        extraProps['data-simpletip'] = this.props.simpletip;
+      }
       if (this.props.simpletipWrapper) {
         extraProps['data-simpletipwrapper'] = this.props.simpletipWrapper;
       }
@@ -7811,7 +7816,7 @@ class ContactItem extends _mixins1__.u9 {
       chatRoom: this.props.chatRoom
     }), react0().createElement("div", {
       className: "user-card-data simpletip",
-      "data-simpletip": username,
+      "data-simpletip": username || megaChat.plugins.userHelper.SIMPLETIP_USER_LOADER,
       "data-simpletipposition": "top"
     }, react0().createElement(ContactButton, {
       noContextMenu: this.props.noContextMenu,
@@ -21535,7 +21540,10 @@ class Participant extends mixins.w9 {
       contact: M.u[handle]
     }), REaCt().createElement("div", {
       className: "name"
-    }, REaCt().createElement(utils.zT, null, handle === u_handle ? `${name} ${l.me}` : name), chatRoom.isMeeting && Call.isModerator(chatRoom, handle) && REaCt().createElement("span", null, REaCt().createElement("i", {
+    }, handle === u_handle ? REaCt().createElement(utils.zT, null, `${name} ${l.me}`) : REaCt().createElement(ui_contacts.ContactAwareName, {
+      contact: M.u[handle],
+      emoji: true
+    }), chatRoom.isMeeting && Call.isModerator(chatRoom, handle) && REaCt().createElement("span", null, REaCt().createElement("i", {
       className: `${this.baseIconClass} icon-admin-outline`
     }))), REaCt().createElement("div", {
       className: "status"
@@ -21566,7 +21574,9 @@ class Participant extends mixins.w9 {
       icon: "sprite-fm-mono icon-mic-off-thin-outline",
       onClick: () => {
         call.sfuClient.mutePeer(source.clientId);
-        ChatToast.quick(l.you_muted_peer.replace('%NAME', nicknames.getNickname(handle)));
+        megaChat.plugins.userHelper.getUserNickname(handle).catch(dump).always(name => {
+          ChatToast.quick(l.you_muted_peer.replace('%NAME', name || ''));
+        });
       }
     }, REaCt().createElement("span", null, l[16214]))), hasRelationship ? REaCt().createElement("li", null, REaCt().createElement(meetings_button.A, {
       icon: "sprite-fm-mono icon-chat",
@@ -21724,7 +21734,10 @@ class Participants extends mixins.w9 {
             contact
           }), REaCt().createElement("div", {
             className: "name"
-          }, REaCt().createElement(utils.zT, null, M.getNameByHandle(handle)), REaCt().createElement("span", {
+          }, REaCt().createElement(ui_contacts.ContactAwareName, {
+            contact: M.u[handle],
+            emoji: true
+          }), REaCt().createElement("span", {
             className: `
                                             user-card-presence
                                             ${megaChat.userPresenceToCssClass(contact.presence)}
@@ -22756,7 +22769,11 @@ class Call extends mixins.w9 {
       });
       chatRoom.rebind(`onMutedBy.${NAMESPACE}`, (ev, {
         cid
-      }) => ChatToast.quick(l.muted_by.replace('%NAME', nicknames.getNickname(this.props.peers[cid]))));
+      }) => {
+        megaChat.plugins.userHelper.getUserNickname(this.props.peers[cid]).catch(dump).always(name => {
+          ChatToast.quick(l.muted_by.replace('%NAME', name || ''));
+        });
+      });
     };
     this.unbindCallEvents = () => ['onCallPeerLeft', 'onCallPeerJoined', 'onCallLeft', 'wrOnUsersAllow', 'wrOnUsersEntered', 'wrOnUserLeft', 'alterUserPrivilege', 'onCallState', 'onRecordingStarted', 'onRecordingStopped'].map(event => this.props.chatRoom.off(`${event}.${NAMESPACE}`));
     this.handleCallMinimize = () => {
@@ -22963,7 +22980,7 @@ class Call extends mixins.w9 {
       }, children);
       if (recorder) {
         const simpletip = {
-          'data-simpletip': l.host_recording.replace('%NAME', nicknames.getNickname(recorder)),
+          'data-simpletip': l.host_recording.replace('%NAME', nicknames.getNickname(recorder) || megaChat.plugins.userHelper.SIMPLETIP_USER_LOADER),
           'data-simpletipposition': 'top',
           'data-simpletipoffset': 5,
           'data-simpletip-class': 'theme-dark-forced'
@@ -25024,6 +25041,12 @@ class ParticipantsBlock extends mixins.w9 {
           }
         }
         const name = M.getNameByHandle(userHandle);
+        let label = name;
+        if (presenterCid) {
+          label = name ? l.presenter_nail.replace('%s', name) : megaChat.plugins.userHelper.SIMPLETIP_USER_LOADER;
+        } else {
+          label = name || megaChat.plugins.userHelper.SIMPLETIP_USER_LOADER;
+        }
         return REaCt().createElement(PeerClass, {
           key: `${userHandle}-${i}-${clientId}`,
           className: `
@@ -25033,7 +25056,7 @@ class ParticipantsBlock extends mixins.w9 {
                         `,
           simpletip: {
             ...SIMPLE_TIP,
-            label: presenterCid ? l.presenter_nail.replace('%s', name) : name
+            label
           },
           mode,
           chatRoom,
@@ -25607,7 +25630,10 @@ class Admit extends mixins.w9 {
           contact: M.u[handle]
         })), REaCt().createElement("div", {
           className: "peer-name"
-        }, REaCt().createElement(utils.zT, null, M.getNameByHandle(handle))), REaCt().createElement("div", {
+        }, REaCt().createElement(contacts.ContactAwareName, {
+          contact: M.u[handle],
+          emoji: true
+        })), REaCt().createElement("div", {
           className: "peer-controls"
         }, REaCt().createElement(this.Icon, {
           icon: "icon-close-component",
@@ -26892,7 +26918,7 @@ class VideoNode extends _mixins1__.w9 {
       emoji: true
     }));
     if (isOnHold) {
-      return react0().createElement($$CONTAINER, null, name, this.getStatusIcon('icon-pause', l[23542].replace('%s', M.getNameByHandle(userHandle))));
+      return react0().createElement($$CONTAINER, null, name, this.getStatusIcon('icon-pause', l[23542].replace('%s', M.getNameByHandle(userHandle) || megaChat.plugins.userHelper.SIMPLETIP_USER_LOADER)));
     }
     return react0().createElement(react0().Fragment, null, mode === _call_jsx4__.g.MAIN && _call_jsx4__.Ay.isModerator(chatRoom, userHandle) && this.getStatusIcon('icon-admin-outline call-role-icon', l[8875]), react0().createElement($$CONTAINER, null, name, react0().createElement(AudioLevelIndicator, {
       source
@@ -28102,7 +28128,7 @@ class Local extends AbstractGenericMessage {
       return unique.map(handle => REaCt().createElement(ui_contacts.Avatar, {
         key: handle,
         contact: M.u[handle],
-        simpletip: handle in M.u && M.u[handle].name,
+        simpletip: true,
         className: "message avatar-wrapper small-rounded-avatar"
       }));
     }
@@ -30076,6 +30102,7 @@ class ConversationMessageMixin extends _mixins1__.u9 {
   constructor(props) {
     super(props);
     this.attachRerenderCallbacks = false;
+    this._reactionContactHandles = [];
     this.__cmmUpdateTickCount = 0;
     this._contactChangeListeners = false;
     this.onAfterRenderWasTriggered = false;
@@ -30136,7 +30163,8 @@ class ConversationMessageMixin extends _mixins1__.u9 {
     for (let i = 0; i < reactions.length; i++) {
       handles.push(...Object.keys(reactions[i]));
     }
-    return array.unique(handles);
+    this._reactionContactHandles = array.unique(handles);
+    return this._reactionContactHandles;
   }
   addContactListeners() {
     const users = this._contactChangeListeners || [];
@@ -30154,6 +30182,9 @@ class ConversationMessageMixin extends _mixins1__.u9 {
           addUser(handle in M.u && M.u[handle]);
         }
       }
+    }
+    for (let i = this._reactionContactHandles.length; i--;) {
+      addUser(this._reactionContactHandles[i] in M.u && M.u[this._reactionContactHandles[i]]);
     }
     if (d > 3) {
       console.warn('%s.addContactListeners', this.getReactId(), [this], users);
@@ -30327,8 +30358,11 @@ class ConversationMessageMixin extends _mixins1__.u9 {
         for (let i = 0; i < rKeys.length; i++) {
           const uid = rKeys[i];
           if (reaction[uid]) {
-            const c = M.u[uid] || {};
-            names.push(uid === u_handle ? l[24071] || "You" : c.name ? c.name : c.m || "(missing name)");
+            if (uid === u_handle) {
+              names.push(l[24071] || 'You');
+            } else if (uid in M.u) {
+              names.push(M.getNameByHandle(uid) || megaChat.plugins.userHelper.SIMPLETIP_USER_LOADER);
+            }
           }
         }
       }
@@ -30403,7 +30437,16 @@ class ConversationMessageMixin extends _mixins1__.u9 {
     }
     return emojisImages ? react0().createElement("div", {
       className: "reactions-bar",
-      id: "reactions-bar"
+      id: "reactions-bar",
+      onMouseEnter: () => {
+        if (this._loadedReacts) {
+          return false;
+        }
+        this._loadedReacts = megaChat.plugins.userHelper.fetchAllNames(this._reactionContacts(), chatRoom).catch(dump).finally(() => {
+          this._loadedReacts = true;
+          this.safeForceUpdate();
+        });
+      }
     }, emojisImages) : null;
   }
   getMessageActionButtons() {

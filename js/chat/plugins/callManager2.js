@@ -149,7 +149,14 @@
             if ((av ^ this.av) & Av.Recording) {
                 this.isRecording = !!(av & Av.Recording);
                 this.call.recorder = this.userHandle;
-                this.call.chatRoom.trigger(this.isRecording ? 'onRecordingStarted' : 'onRecordingStopped', this);
+                megaChat.plugins.userHelper.fetchAllNames([this.userHandle], this.call.chatRoom)
+                    .catch(dump)
+                    .finally(() => {
+                        this.call.chatRoom.trigger(
+                            this.isRecording ? 'onRecordingStarted' : 'onRecordingStopped',
+                            this
+                        );
+                    });
             }
             this.av = av;
             for (const cons of this.consumers) {
@@ -659,7 +666,9 @@
             this.chatRoom.trigger('wrOnJoinNotAllowed', this.callId);
         }
         wrOnUsersEntered(users) {
-            this.chatRoom.trigger('wrOnUsersEntered', users);
+            megaChat.plugins.userHelper.fetchAllNames(Object.keys(users), this.chatRoom).catch(dump).finally(() => {
+                this.chatRoom.trigger('wrOnUsersEntered', users);
+            });
         }
         wrOnUserLeft(user) {
             this.chatRoom.trigger('wrOnUserLeft', user);
@@ -668,7 +677,9 @@
             this.chatRoom.trigger('wrOnUsersAllow', [users]);
         }
         wrOnUserDump(users) {
-            this.chatRoom.trigger('wrOnUserDump', users);
+            megaChat.plugins.userHelper.fetchAllNames(Object.keys(users), this.chatRoom).catch(dump).finally(() => {
+                this.chatRoom.trigger('wrOnUserDump', users);
+            });
         }
         onModeratorAdd(user) {
             this.chatRoom.trigger('onModeratorAdd', user);

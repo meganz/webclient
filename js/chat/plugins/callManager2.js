@@ -570,7 +570,7 @@
                 return;
             }
             const { peers, pinnedCid, localPeerStream, sfuClient } = this;
-            let src;
+            let src, tag;
             if (localPeerStream && localPeerStream.isScreen) {
                 src = localPeerStream;
                 tag = "local screen";

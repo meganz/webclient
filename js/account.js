@@ -298,14 +298,8 @@ function u_checklogin3a(res, ctx) {
                 }
             })
             .then(() => {
-                if (!r || is_iframed || pfid) {
+                if (!r || is_iframed || pfid || isPublicLink()) {
                     // Nothing to do here.
-                    return;
-                }
-                const page = getCleanSitePath();
-                const pubLink = isPublicLink(page) || isPublicLinkV2(page);
-                if (pubLink) {
-                    // Nor here.
                     return;
                 }
 

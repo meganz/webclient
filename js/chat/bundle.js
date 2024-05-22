@@ -8602,6 +8602,9 @@ class ColumnContactName extends genericNodePropsComponent.B {
       className: "contact-item-email"
     }, this.props.nodeAdapter.props.node.m));
   }
+  static get label() {
+    return l[86];
+  }
   render() {
     const {
       nodeAdapter
@@ -8623,12 +8626,14 @@ class ColumnContactName extends genericNodePropsComponent.B {
 }
 ColumnContactName.sortable = true;
 ColumnContactName.id = "name";
-ColumnContactName.label = l[86];
 ColumnContactName.megatype = "name";
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactStatus.jsx
 
 
 class ColumnContactStatus extends genericNodePropsComponent.B {
+  static get label() {
+    return l[89];
+  }
   render() {
     const {
       nodeAdapter
@@ -8648,7 +8653,6 @@ class ColumnContactStatus extends genericNodePropsComponent.B {
 }
 ColumnContactStatus.sortable = true;
 ColumnContactStatus.id = "status";
-ColumnContactStatus.label = l[89];
 ColumnContactStatus.megatype = "status";
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactLastInteraction.jsx
 
@@ -8685,6 +8689,9 @@ class ColumnContactLastInteraction extends genericNodePropsComponent.B {
       return interaction ? time2last(interaction.time) : l[1051];
     };
   }
+  static get label() {
+    return l[5904];
+  }
   render() {
     const {
       nodeAdapter
@@ -8704,7 +8711,6 @@ class ColumnContactLastInteraction extends genericNodePropsComponent.B {
 }
 ColumnContactLastInteraction.sortable = true;
 ColumnContactLastInteraction.id = "interaction";
-ColumnContactLastInteraction.label = l[5904];
 ColumnContactLastInteraction.megatype = "interaction";
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactVerifiedStatus.jsx
 
@@ -9136,6 +9142,9 @@ class ContactList extends mixins.w9 {
 
 
 class ColumnContactRequestsEmail extends mixins.w9 {
+  static get label() {
+    return l[95];
+  }
   render() {
     const {
       nodeAdapter,
@@ -9157,12 +9166,14 @@ class ColumnContactRequestsEmail extends mixins.w9 {
 }
 ColumnContactRequestsEmail.sortable = true;
 ColumnContactRequestsEmail.id = "email";
-ColumnContactRequestsEmail.label = l[95];
 ColumnContactRequestsEmail.megatype = "email";
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactRequestsTs.jsx
 
 
 class ColumnContactRequestsTs extends mixins.w9 {
+  static get label() {
+    return l[19506];
+  }
   render() {
     const {
       nodeAdapter
@@ -9187,7 +9198,6 @@ class ColumnContactRequestsTs extends mixins.w9 {
 }
 ColumnContactRequestsTs.sortable = true;
 ColumnContactRequestsTs.id = "ts";
-ColumnContactRequestsTs.label = l[19506];
 ColumnContactRequestsTs.megatype = "ts";
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactRequestsRcvdBtns.jsx
 
@@ -9344,10 +9354,13 @@ ColumnContactRequestsSentBtns.megatype = "grid-url-header-nw contact-controls-co
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactRequestsRts.jsx
 
 
-class ColumnContactRequestsRts extends ColumnContactRequestsTs {}
+class ColumnContactRequestsRts extends ColumnContactRequestsTs {
+  static get label() {
+    return l[19506];
+  }
+}
 ColumnContactRequestsRts.sortable = true;
 ColumnContactRequestsRts.id = "rts";
-ColumnContactRequestsRts.label = l[19506];
 ColumnContactRequestsRts.megatype = "rts";
 ;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/sentRequests.jsx
 
@@ -9432,6 +9445,9 @@ const columnFavIcon = REQ_(161);
 
 
 class ColumnSharedFolderName extends genericNodePropsComponent.B {
+  static get label() {
+    return l[86];
+  }
   render() {
     const {
       nodeAdapter
@@ -9455,12 +9471,14 @@ class ColumnSharedFolderName extends genericNodePropsComponent.B {
 }
 ColumnSharedFolderName.sortable = true;
 ColumnSharedFolderName.id = "name";
-ColumnSharedFolderName.label = l[86];
 ColumnSharedFolderName.megatype = "name";
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnSharedFolderAccess.jsx
 
 
 class ColumnSharedFolderAccess extends genericNodePropsComponent.B {
+  static get label() {
+    return l[5906];
+  }
   render() {
     const {
       nodeAdapter
@@ -9480,7 +9498,6 @@ class ColumnSharedFolderAccess extends genericNodePropsComponent.B {
 }
 ColumnSharedFolderAccess.sortable = true;
 ColumnSharedFolderAccess.id = 'access';
-ColumnSharedFolderAccess.label = l[5906];
 ColumnSharedFolderAccess.megatype = 'access';
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnSharedFolderButtons.jsx
 
@@ -19691,12 +19708,20 @@ const API = {
   LIMIT: 50,
   OFFSET: 50
 };
-const LABELS = {
-  SEARCH: l[24025],
-  END_OF_RESULTS: l[24156],
-  NO_RESULTS: l[24050],
-  NOT_AVAILABLE: l[24512]
-};
+const LABELS = freeze({
+  get SEARCH() {
+    return l[24025];
+  },
+  get NO_RESULTS() {
+    return l[24050];
+  },
+  get NOT_AVAILABLE() {
+    return l[24512];
+  },
+  get END_OF_RESULTS() {
+    return l[24156];
+  }
+});
 class GifPanel extends mixins.w9 {
   constructor(...args) {
     super(...args);
@@ -33864,6 +33889,9 @@ class ColumnNodeName extends genericNodePropsComponent.B {
       src: null
     };
   }
+  static get label() {
+    return l[86];
+  }
   componentDidMount() {
     super.componentDidMount();
   }
@@ -33913,12 +33941,14 @@ class ColumnNodeName extends genericNodePropsComponent.B {
 }
 ColumnNodeName.sortable = true;
 ColumnNodeName.id = 'name';
-ColumnNodeName.label = l[86];
 ColumnNodeName.megatype = 'fname';
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnSize.jsx
 
 
 class ColumnSize extends genericNodePropsComponent.B {
+  static get label() {
+    return l[87];
+  }
   render() {
     const {
       nodeAdapter
@@ -33931,12 +33961,14 @@ class ColumnSize extends genericNodePropsComponent.B {
 }
 ColumnSize.sortable = true;
 ColumnSize.id = "size";
-ColumnSize.label = l[87];
 ColumnSize.megatype = "size";
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnTimeAdded.jsx
 
 
 class ColumnTimeAdded extends genericNodePropsComponent.B {
+  static get label() {
+    return l[16169];
+  }
   render() {
     const {
       nodeAdapter
@@ -33949,7 +33981,6 @@ class ColumnTimeAdded extends genericNodePropsComponent.B {
 }
 ColumnTimeAdded.sortable = true;
 ColumnTimeAdded.id = "ts";
-ColumnTimeAdded.label = l[16169];
 ColumnTimeAdded.megatype = "timeAd";
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnExtras.jsx
 
@@ -35516,13 +35547,15 @@ class ConfirmDialog extends mixins.w9 {
     }, self.props.children, dontShowCheckbox ? modalDialogs_React.createElement(ExtraFooterElement, null, dontShowCheckbox) : null);
   }
 }
-ConfirmDialog.defaultProps = {
-  'confirmLabel': l[6826],
-  'cancelLabel': l[82],
-  'dontShowAgainCheckbox': true,
-  'hideable': true,
-  'dialogType': 'message'
-};
+lazy(ConfirmDialog, 'defaultProps', () => {
+  return freeze({
+    'confirmLabel': l[6826],
+    'cancelLabel': l[82],
+    'dontShowAgainCheckbox': true,
+    'hideable': true,
+    'dialogType': 'message'
+  });
+});
 const modalDialogs = {
   ModalDialog,
   SelectContactDialog,

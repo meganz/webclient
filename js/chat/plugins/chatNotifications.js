@@ -51,7 +51,7 @@ var ChatNotifications = function(megaChat, options) {
                 'group': chatRoom.chatId,
                 'incrementCounter': true,
                 'anfFlag': 'chat_enabled',
-                'icon': useravatar.contact(userId, '', 'div', undefined),
+                'icon': useravatar.imgUrl(userId),
                 'params': {
                     'room': chatRoom,
                     'from': name || ''

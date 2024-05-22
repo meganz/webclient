@@ -306,9 +306,9 @@ mBroadcaster.once('boot_done', function() {
 mBroadcaster.once('startMega', tryCatch(() => {
     'use strict';
     const {mecmatst} = sessionStorage;
-    const {buildOlderThan10Days, eventlog = nop, is_karma} = window;
+    const {buildOlderThan10Days, eventlog = nop, is_karma, is_extension} = window;
 
-    if (is_karma) {
+    if (is_karma || is_extension !== false) {
         return;
     }
     scriptTest(

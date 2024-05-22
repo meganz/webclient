@@ -92,7 +92,6 @@ var loginFromEphemeral = {
             // If the user got logged-in when trying to register, let's migrate the ephemeral account
             if ($.ephNodes) {
 
-                passwordManager('#register_form');
                 showToast('megasync', l[8745]);
                 boot_auth(null, result);
 
@@ -180,9 +179,6 @@ function continueNewRegistration(result) {
     loadingDialog.hide();
 
     if (result === 0) {
-
-        // Setup the password manager
-        passwordManager($('#register_form'));
 
         $('.mega-dialog.registration-page-success').off('click');
 

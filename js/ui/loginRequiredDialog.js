@@ -81,12 +81,6 @@
     }
 
     function showLoginDialog(aPromise, options) {
-
-        if (window.googletag || mShowAds && mega.flags.ab_adse && (isPublicLink() || isPublicLinkV2())) {
-            window.location = '/login';
-            return false;
-        }
-
         var $dialog = $('.mega-dialog.pro-login-dialog');
         var $inputs = $('input', $dialog);
         var $button = $('.top-dialog-login-button', $dialog);
@@ -252,7 +246,6 @@
 
         // If successful result
         else if (result !== false && result >= 0) {
-            passwordManager('#form_login_header');
 
             u_type = result;
             u_checked = true;

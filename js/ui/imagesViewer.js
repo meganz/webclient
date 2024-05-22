@@ -2080,6 +2080,42 @@ var slideshowid;
         }
     }
 
+    const require = async(html, js, ...other) => {
+        const files = [html, ...other];
+
+        if (!self.is_extension) {
+            files.push(...js);
+        }
+        await M.require(...files);
+
+        const map = require.map[html];
+        html = translate(pages[html]);
+
+        for (let [k, v] of map) {
+            v = self.is_extension && js.includes(v) ? bootstaticpath + jsl2[v].f : window[v];
+
+            assert(!!v, `${l[16]}, ${k}`);
+
+            html = html.replace(k, v);
+        }
+
+        return html;
+    };
+    lazy(require, 'map', () => {
+        return freeze({
+            pdfviewer: new Map([
+                ['viewer.js', 'pdfviewerjs'],
+                ['viewer.css', 'pdfviewercss'],
+                ['../build/pdf.js', 'pdfjs2']
+            ]),
+            docxviewer: new Map([
+                ['docx.js', 'docxviewer_js'],
+                ['viewer.css', 'docxviewercss'],
+                ['docx-preview.js', 'docxpreview_js']
+            ])
+        });
+    });
+
     // a method to fetch scripts and files needed to run pdfviewer
     // and then excute them on iframe element [#pdfpreviewdiv1]
     function prepareAndViewPdfViewer(data) {
@@ -2102,11 +2138,7 @@ var slideshowid;
             }
         }
 
-        M.require('pdfjs2', 'pdfviewer', 'pdfviewercss', 'pdfviewerjs').then(() => {
-            const myPage = pages.pdfviewer
-                .replace('viewer.css', window.pdfviewercss)
-                .replace('../build/pdf.js', window.pdfjs2)
-                .replace('viewer.js', window.pdfviewerjs);
+        require('pdfviewer', ['pdfjs2', 'pdfviewerjs'], 'pdfviewercss').then((myPage) => {
             const id = 'pdfpreviewdiv1';
             const pdfIframe = document.getElementById(id);
             const newPdfIframe = document.createElement('iframe');
@@ -2136,7 +2168,7 @@ var slideshowid;
             });
             doc.close();
             _pdfSeen = true;
-        });
+        }).catch(tell);
     }
 
     function prepareAndViewDocxViewer(data) {
@@ -2156,11 +2188,7 @@ var slideshowid;
             return;
         }
 
-        M.require('docxpreview_js', 'docxviewer_js', 'docxviewer', 'docxviewercss').then(() => {
-            const myPage = translate(pages.docxviewer)
-                .replace('viewer.css', window.docxviewercss)
-                .replace('docx.js', window.docxviewer_js)
-                .replace('docx-preview.js', window.docxpreview_js);
+        require('docxviewer', ['docxpreview_js', 'docxviewer_js'], 'docxviewercss').then((myPage) => {
             const id = 'docxpreviewdiv1';
             const iframe = document.getElementById(id);
             const newIframe = document.createElement('iframe');
@@ -2202,7 +2230,7 @@ var slideshowid;
             });
             doc.close();
             _docxSeen = true;
-        });
+        }).catch(tell);
     }
 
     function previewsrc(id) {

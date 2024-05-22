@@ -294,13 +294,6 @@ lazy(self, 'watchdog', () => Object.freeze({
                 break;
             }
 
-            case 'beforelogin': {
-                if (window.googletag || mShowAds && mega.flags.ab_adse && (isPublicLink() || isPublicLinkV2())) {
-                    window.location.reload(true);
-                }
-                break;
-            }
-
             case 'createuser':
                 if (!M.hasPendingTransfers()) {
                     loadingDialog.show();

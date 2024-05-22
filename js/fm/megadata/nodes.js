@@ -324,6 +324,17 @@ MegaData.prototype.getPath = function(id) {
 };
 
 /**
+ * @param {String|MegaNode} node ufs-node [handle]
+ * @param {String} [sep] file/path separator
+ * @returns {string}
+ */
+MegaData.prototype.getNamedPath = function(node, sep) {
+    'use strict';
+
+    return this.getPath(node).map(h => this.getNameByHandle(h) || h).reverse().join(sep || '\u241c');
+};
+
+/**
  * Check entered path or id is a custom view like out-shares and public-links
  * If it is, return a set of object that contain detail of it.
  * If it is not, return false

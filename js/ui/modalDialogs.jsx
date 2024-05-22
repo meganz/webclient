@@ -355,16 +355,9 @@ class SelectContactDialog extends MegaRenderMixin {
             </ModalDialog>
         );
     }
-};
+}
 
 class ConfirmDialog extends MegaRenderMixin {
-    static defaultProps = {
-        'confirmLabel': l[6826],
-        'cancelLabel': l[82],
-        'dontShowAgainCheckbox': true,
-        'hideable': true,
-        'dialogType': 'message'
-    };
 
     static saveState(o) {
         let state = mega.config.get('xcod') >>> 0;
@@ -523,7 +516,17 @@ class ConfirmDialog extends MegaRenderMixin {
             </ModalDialog>
         );
     }
-};
+}
+
+lazy(ConfirmDialog, 'defaultProps', () => {
+    return freeze({
+        'confirmLabel': l[6826],
+        'cancelLabel': l[82],
+        'dontShowAgainCheckbox': true,
+        'hideable': true,
+        'dialogType': 'message'
+    });
+});
 
 export default {
     ModalDialog,

@@ -4,8 +4,11 @@ import {GenericNodePropsComponent} from "../genericNodePropsComponent";
 export class ColumnSize extends GenericNodePropsComponent {
     static sortable = true;
     static id = "size";
-    static label = l[87];
     static megatype = "size";
+
+    static get label() {
+        return l[87];
+    }
 
     render() {
         let {nodeAdapter} = this.props;

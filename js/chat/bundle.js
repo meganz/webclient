@@ -25439,9 +25439,18 @@ class StreamHead extends mixins.w9 {
         streamsPerPage,
         floatDetached,
         chunksLength,
+        call,
         onMovePage
       } = this.props;
-      if (mode === meetings_call.g.THUMBNAIL && peers && peers.length > (floatDetached ? streamsPerPage : streamsPerPage - 1)) {
+      if (mode !== meetings_call.g.THUMBNAIL || !peers) {
+        return null;
+      }
+      const {
+        screen,
+        video,
+        rest
+      } = filterAndSplitSources(peers, call);
+      if (screen.length + video.length + rest.length > (floatDetached ? streamsPerPage + 1 : streamsPerPage)) {
         return REaCt().createElement("div", {
           className: `${StreamHead.NAMESPACE}-pagination`
         }, REaCt().createElement(meetings_button.A, {
@@ -25855,7 +25864,18 @@ class stream_Stream extends mixins.w9 {
       video,
       rest
     } = filterAndSplitSources(peers, call);
-    const sources = [...screen, ...video, ...rest];
+    let presenter = false;
+    const sources = [...screen, ...video, ...rest].filter(source => {
+      if (!source.isLocal) {
+        return true;
+      }
+      if (source.hasScreen && !presenter) {
+        presenter = true;
+        return true;
+      }
+      return false;
+    });
+    presenter = false;
     const container = this.containerRef.current;
     this.lastRescaledCache = forced ? null : this.lastRescaledCache;
     if (minimized || !container) {
@@ -26023,6 +26043,14 @@ class stream_Stream extends mixins.w9 {
           }));
         };
         return sources.map((p, i) => $$PEER(p, i));
+      }
+      if (floatDetached) {
+        for (let i = 0; i < sources.length; i++) {
+          if (sources[i].isLocal) {
+            sources.splice(i, 1);
+            break;
+          }
+        }
       }
       this.chunks = chunkNodes(sources, streamsPerPage);
       this.chunksLength = Object.values(this.chunks).length;

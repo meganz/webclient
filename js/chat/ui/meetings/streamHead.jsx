@@ -4,7 +4,7 @@ import ModalDialogsUI from '../../../ui/modalDialogs.jsx';
 import Button from './button.jsx';
 import ModeSwitch from './modeSwitch.jsx';
 import { Emoji } from '../../../ui/utils.jsx';
-import { PAGINATION } from './stream.jsx';
+import { filterAndSplitSources, PAGINATION } from './stream.jsx';
 import { MODE } from './call.jsx';
 
 export default class StreamHead extends MegaRenderMixin {
@@ -189,9 +189,13 @@ export default class StreamHead extends MegaRenderMixin {
     };
 
     Pagination = () => {
-        const { mode, peers, page, streamsPerPage, floatDetached, chunksLength, onMovePage } = this.props;
+        const { mode, peers, page, streamsPerPage, floatDetached, chunksLength, call, onMovePage } = this.props;
+        if (mode !== MODE.THUMBNAIL || !peers) {
+            return null;
+        }
+        const { screen, video, rest } = filterAndSplitSources(peers, call);
 
-        if (mode === MODE.THUMBNAIL && peers && peers.length > (floatDetached ? streamsPerPage : streamsPerPage - 1)) {
+        if (screen.length + video.length + rest.length > (floatDetached ? streamsPerPage + 1 : streamsPerPage)) {
             return (
                 <div className={`${StreamHead.NAMESPACE}-pagination`}>
                     <Button

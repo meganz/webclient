@@ -170,6 +170,15 @@ export default class ParticipantsBlock extends MegaRenderMixin {
                     }
                 }
                 const name = M.getNameByHandle(userHandle);
+                let label = name;
+                if (presenterCid) {
+                    label = name ?
+                        l.presenter_nail.replace('%s', name) :
+                        megaChat.plugins.userHelper.SIMPLETIP_USER_LOADER;
+                }
+                else {
+                    label = name || megaChat.plugins.userHelper.SIMPLETIP_USER_LOADER;
+                }
                 return (
                     <PeerClass
                         key={`${userHandle}-${i}-${clientId}`}
@@ -180,9 +189,7 @@ export default class ParticipantsBlock extends MegaRenderMixin {
                         `}
                         simpletip={{
                             ...SIMPLE_TIP,
-                            label: presenterCid
-                                ? l.presenter_nail.replace('%s', name)
-                                : name
+                            label
                         }}
                         mode={mode}
                         chatRoom={chatRoom}

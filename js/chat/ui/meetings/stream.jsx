@@ -172,7 +172,19 @@ export default class Stream extends MegaRenderMixin {
     scaleNodes(columns, forced = false) {
         const { peers, minimized, mode, call } = this.props;
         const { screen, video, rest } = filterAndSplitSources(peers, call);
-        const sources = [...screen, ...video, ...rest];
+        // Calculations below expect only non-local peers. Screenshares of local node should be counted as they're dupes
+        let presenter = false;
+        const sources = [...screen, ...video, ...rest].filter((source) => {
+            if (!source.isLocal) {
+                return true;
+            }
+            if (source.hasScreen && !presenter) {
+                presenter = true;
+                return true;
+            }
+            return false;
+        });
+        presenter = false;
         const container = this.containerRef.current;
         this.lastRescaledCache = forced ? null : this.lastRescaledCache;
 
@@ -372,6 +384,14 @@ export default class Stream extends MegaRenderMixin {
             // Carousel behavior with variable amount of pages, incl. previous/next behavior.
             // ------------------------------------------------------------------------------
 
+            if (floatDetached) {
+                for (let i = 0; i < sources.length; i++) {
+                    if (sources[i].isLocal) {
+                        sources.splice(i, 1);
+                        break;
+                    }
+                }
+            }
             this.chunks = chunkNodes(sources, streamsPerPage);
             this.chunksLength = Object.values(this.chunks).length;
 

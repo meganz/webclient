@@ -174,7 +174,7 @@ export default class Local extends AbstractGenericMessage {
                 <Avatar
                     key={handle}
                     contact={M.u[handle]}
-                    simpletip={handle in M.u && M.u[handle].name}
+                    simpletip={true}
                     className="message avatar-wrapper small-rounded-avatar"
                 />
             );

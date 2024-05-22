@@ -571,7 +571,13 @@ export class Avatar extends ContactAwareComponent {
         var extraProps = {};
         if (this.props.simpletip) {
             classes += " simpletip";
-            extraProps['data-simpletip'] = this.props.simpletip;
+            if (this.props.simpletip === true) {
+                extraProps['data-simpletip'] = M.getNameByHandle(contact.h || contact.u) ||
+                    megaChat.plugins.userHelper.SIMPLETIP_USER_LOADER;
+            }
+            else {
+                extraProps['data-simpletip'] = this.props.simpletip;
+            }
             if (this.props.simpletipWrapper) {
                 extraProps['data-simpletipwrapper'] = this.props.simpletipWrapper;
             }
@@ -837,7 +843,7 @@ export class ContactItem extends ContactAwareComponent {
                 chatRoom={this.props.chatRoom} />
             <div
                 className="user-card-data simpletip"
-                data-simpletip={username}
+                data-simpletip={username || megaChat.plugins.userHelper.SIMPLETIP_USER_LOADER}
                 data-simpletipposition="top">
                 <ContactButton
                     noContextMenu={this.props.noContextMenu}

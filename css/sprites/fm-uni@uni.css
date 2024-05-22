@@ -114,6 +114,9 @@
 .sprite-fm-uni.icon-crest-pro-flexi, .sprite-fm-uni-before.icon-crest-pro-flexi-before::before, .sprite-fm-uni-after.icon-crest-pro-flexi-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-crest-pro-flexi");
 }
+.sprite-fm-uni.icon-crest-vpn, .sprite-fm-uni-before.icon-crest-vpn-before::before, .sprite-fm-uni-after.icon-crest-vpn-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-crest-vpn");
+}
 .sprite-fm-uni.icon-crests-business-details, .sprite-fm-uni-before.icon-crests-business-details-before::before, .sprite-fm-uni-after.icon-crests-business-details-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-crests-business-details");
 }
@@ -248,6 +251,9 @@
 }
 .sprite-fm-uni.icon-question, .sprite-fm-uni-before.icon-question-before::before, .sprite-fm-uni-after.icon-question-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-question");
+}
+.sprite-fm-uni.icon-raise-hand, .sprite-fm-uni-before.icon-raise-hand-before::before, .sprite-fm-uni-after.icon-raise-hand-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-raise-hand");
 }
 .sprite-fm-uni.icon-recovery-key, .sprite-fm-uni-before.icon-recovery-key-before::before, .sprite-fm-uni-after.icon-recovery-key-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-recovery-key");

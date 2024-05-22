@@ -644,7 +644,7 @@ var voucherDialog = {
 
             $storageAmount.text(bytesToSize(M.account.space, 0));
             $newStorageAmount.text(bytesToSize(newStorage, 0));
-            if (M.maf.storage.current) {
+            if (M.maf.storage && M.maf.storage.current) {
                 $currentAchievementsAmount.text(`+ ${bytesToSize(M.maf.storage.current, 0)}`);
                 $currentAchievementsAmount.removeClass('hidden');
             }
@@ -2007,6 +2007,8 @@ var addressDialog = {
         $errorMessage.addClass(is_mobile ? 'v-hidden' : 'hidden');
         $errorMessageContainers.addClass('hidden');
         $allInputs.removeClass('error');
+        $stateSelect.removeClass('error');
+        $countrySelect.removeClass('error');
 
         // Add red border around the missing fields
         $.each(fieldValues, function(fieldName, value) {

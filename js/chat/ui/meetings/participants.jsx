@@ -1,6 +1,6 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../mixins';
-import { Avatar } from '../contacts.jsx';
+import { Avatar, ContactAwareName } from '../contacts.jsx';
 import { PerfectScrollbar } from '../../../ui/perfectScrollbar.jsx';
 import Collapse from './collapse.jsx';
 import Call from './call.jsx';
@@ -47,7 +47,10 @@ class Participant extends MegaRenderMixin {
             <>
                 <Avatar contact={M.u[handle]}/>
                 <div className="name">
-                    <Emoji>{handle === u_handle ? `${name} ${l.me}` : name}</Emoji>
+                    {handle === u_handle ?
+                        <Emoji>{`${name} ${l.me}`}</Emoji> :
+                        <ContactAwareName contact={M.u[handle]} emoji={true}/>
+                    }
                     {chatRoom.isMeeting && Call.isModerator(chatRoom, handle) &&
                         <span>
                             <i className={`${this.baseIconClass} icon-admin-outline`}/>
@@ -93,10 +96,14 @@ class Participant extends MegaRenderMixin {
                                             icon="sprite-fm-mono icon-mic-off-thin-outline"
                                             onClick={() => {
                                                 call.sfuClient.mutePeer(source.clientId);
-                                                ChatToast.quick(
-                                                    /* `Muted by %NAME` */
-                                                    l.you_muted_peer.replace('%NAME', nicknames.getNickname(handle))
-                                                );
+                                                megaChat.plugins.userHelper.getUserNickname(handle)
+                                                    .catch(dump)
+                                                    .always(name => {
+                                                        ChatToast.quick(
+                                                            /* `Muted by %NAME` */
+                                                            l.you_muted_peer.replace('%NAME', name || '')
+                                                        );
+                                                    });
                                             }}>
                                             <span>{l[16214] /* `Mute` */}</span>
                                         </Button>
@@ -302,7 +309,7 @@ export default class Participants extends MegaRenderMixin {
                                 <li key={handle}>
                                     <Avatar contact={contact}/>
                                     <div className="name">
-                                        <Emoji>{M.getNameByHandle(handle)}</Emoji>
+                                        <ContactAwareName contact={M.u[handle]} emoji={true}/>
                                         <span
                                             className={`
                                             user-card-presence

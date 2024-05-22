@@ -126,7 +126,6 @@ class MegaGesture {
         return _getScrollableArea(xNode, yNode, ev.target);
     }
 
-
     _handleTwoTouchStart(ev) {
 
         this.xStart = null;
@@ -162,7 +161,7 @@ class MegaGesture {
 
     _handleScrollEvent(ev) {
 
-        if (this.action || !(this.activeScroll.x || this.activeScroll.y)) {
+        if (this.action || !(this.activeScroll && (this.activeScroll.x || this.activeScroll.y))) {
             return false;
         }
 

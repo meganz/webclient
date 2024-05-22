@@ -121,6 +121,7 @@ function Chat() {
             'geoLocationLinks': GeoLocationLinks,
             'meetingsManager': MeetingsManager,
             'chatOnboarding': ChatOnboarding,
+            'userHelper': ChatUserHelper,
         },
         'chatNotificationOptions':  {
             'textMessages': {
@@ -2934,7 +2935,7 @@ Chat.prototype.html = function(content) {
     if (content) {
         return this.plugins.emoticonsFilter.processHtmlMessage(escapeHTML(content));
     }
-    return null;
+    return '';
 };
 
 /**

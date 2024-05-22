@@ -83,12 +83,26 @@ describe("Initialization Unit Tests", function() {
         assert(blen('crossTab:master'), 'Should listen to cross-tab master ownership');
         // assert(blen('mediainfo:collect'), 'Should listen to collect mediainfo metadata');
 
+        // catch errors dispatching broadcast events (console.error addendum)
+        const repl = mStub(window, 'reportError', (ex) => {
+            repl.errors.add(ex && `${ex + '\n' + ex.stack}` || 'unknown-error');
+        });
+        repl.errors = new Set();
+        window.buildVersion.timestamp = Date.now();
+
         // Initialize core components
         mBroadcaster.sendMessage('boot_done');
 
         mBroadcaster.sendMessage('startMega');
         mBroadcaster.sendMessage('startMega:desktop');
 
+        if (repl.errors.size) {
+            for (const ex of repl.errors) {
+                dump(`\u{1F90C} Caught exception... ${ex} \u{1F691} \u{1F691}`);
+            }
+        }
+
+        expect(repl.errors.size).to.eql(0);
         expect(console.error.callCount).to.eql(0);
         _hideDebug();
 

@@ -2506,7 +2506,7 @@ export class ConversationPanel extends MegaRenderMixin {
                         pushSettingsValue={pushNotificationSettings.getDnd(this.props.chatRoom.chatId)}
                         occurrencesLoading={this.state.occurrencesLoading}
                         onStartCall={(mode) =>
-                            inProgressAlert()
+                            inProgressAlert(room.haveActiveCall(), room)
                                 .then(() => this.startCall(mode))
                                 .catch(() => d && console.warn('Already in a call.'))
                         }
@@ -2647,7 +2647,7 @@ export class ConversationPanel extends MegaRenderMixin {
                                     onClick={() =>
                                         startCallDisabled ?
                                             false :
-                                            inProgressAlert()
+                                            inProgressAlert(room.haveActiveCall(), room)
                                                 .then(() => this.startCall(TYPE.VIDEO))
                                                 .catch(() => d && console.warn('Already in a call.'))
                                     }
@@ -2670,7 +2670,7 @@ export class ConversationPanel extends MegaRenderMixin {
                                     onClick={() =>
                                         startCallDisabled ?
                                             false :
-                                            inProgressAlert()
+                                            inProgressAlert(room.haveActiveCall(), room)
                                                 .then(() => this.startCall(TYPE.AUDIO))
                                                 .catch(() => d && console.warn('Already in a call.'))
                                     }

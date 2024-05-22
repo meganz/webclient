@@ -833,7 +833,7 @@ pro.propay = {
         const selectedGatewayName = $('.payment-options-list input:checked', this.$page).val();
         const selectedProvider = pro.propay.allGateways.filter(val => {
             return (val.gatewayName === selectedGatewayName);
-        })[0];
+        })[0] || false;
 
         // Set text to subscribe or purchase
         var planIndex = $selectDurationOption.parent().attr('data-plan-index');
@@ -1268,7 +1268,10 @@ pro.propay = {
         'use strict';
 
         // Find the primary payment options
-        var $payOptions = $('.payment-options-list.primary .payment-method:not(.template)');
+        var $payOptions = $(
+            '.payment-options-list.primary .payment-method:not(.template)',
+            '.fmholder:not(.hidden)'
+        );
 
         // If they have a Pro balance, select the first option, otherwise select
         // the next payment option (usually API will have it ordered to be Visa)

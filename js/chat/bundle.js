@@ -14520,7 +14520,7 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
       messagesBuff: room.messagesBuff,
       pushSettingsValue: pushNotificationSettings.getDnd(this.props.chatRoom.chatId),
       occurrencesLoading: this.state.occurrencesLoading,
-      onStartCall: mode => (0,call.dQ)().then(() => this.startCall(mode)).catch(() => d && console.warn('Already in a call.')),
+      onStartCall: mode => (0,call.dQ)(room.haveActiveCall(), room).then(() => this.startCall(mode)).catch(() => d && console.warn('Already in a call.')),
       onAttachFromComputerClicked () {
         self.props.chatRoom.uploadFromComputer();
       },
@@ -14644,7 +14644,7 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
                                 `
     }, REaCt().createElement(buttons.$, {
       icon: "sprite-fm-mono icon-video-call-filled",
-      onClick: () => startCallDisabled ? false : (0,call.dQ)().then(() => this.startCall(call.ZE.VIDEO)).catch(() => d && console.warn('Already in a call.'))
+      onClick: () => startCallDisabled ? false : (0,call.dQ)(room.haveActiveCall(), room).then(() => this.startCall(call.ZE.VIDEO)).catch(() => d && console.warn('Already in a call.'))
     })), REaCt().createElement("div", {
       "data-simpletip": l.unsupported_browser_audio,
       "data-simpletipposition": "top",
@@ -14656,7 +14656,7 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
                                 `
     }, REaCt().createElement(buttons.$, {
       icon: "sprite-fm-mono icon-phone",
-      onClick: () => startCallDisabled ? false : (0,call.dQ)().then(() => this.startCall(call.ZE.AUDIO)).catch(() => d && console.warn('Already in a call.'))
+      onClick: () => startCallDisabled ? false : (0,call.dQ)(room.haveActiveCall(), room).then(() => this.startCall(call.ZE.AUDIO)).catch(() => d && console.warn('Already in a call.'))
     }))), topicInfo), REaCt().createElement("div", {
       ref: this.containerRef,
       className: `

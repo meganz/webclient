@@ -32689,7 +32689,7 @@ class DropdownEmojiSelector extends _chat_mixins0__.w9 {
         popupContents = React.createElement("div", {
           className: "loading"
         }, l[1514]);
-      } else if (self.state.isLoading === true && !self.data_emojiByCategory) {
+      } else if (this.state.isLoading || !this.data_emojiByCategory || !this.data_categories) {
         popupContents = React.createElement("div", {
           className: "loading"
         }, l[5533]);

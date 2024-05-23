@@ -1247,6 +1247,10 @@
     }
 }
 
+body.in-call .gif-panel .gif-panel-results {
+    column-count: 4;
+}
+
 .gif-panel .gif-panel-results .node-container {
     display: inline-block;
     width: 100%;

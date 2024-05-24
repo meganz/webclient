@@ -1277,7 +1277,7 @@ class CallRecorder {
 }
 
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = '1c9b788dce';
+const COMMIT_ID = '3d16a89541';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
@@ -1995,6 +1995,9 @@ class SfuClient {
         if (this.options.speak) {
             offerCmd.spk = 1;
         }
+        if (this.localRaisedHand) {
+            offerCmd.rh = 1;
+        }
         this.send(offerCmd);
     }
     makeKeyEncryptIv() {
@@ -2374,6 +2377,7 @@ class SfuClient {
                 console.log(client_kLogTag, "Starting call recording");
             }
         } while (0);
+        this._recordedVideoCid = null;
         if (!sink) {
             sink = new RecorderFileSink;
             await sink.init();
@@ -3099,9 +3103,11 @@ class SfuClient {
         this._fire("onSpeakReqDel", msg.user);
     }
     raiseHand() {
+        this.localRaisedHand = true;
         this.send({ a: "RHAND" });
     }
     lowerHand() {
+        this.localRaisedHand = false;
         this.send({ a: "RHAND_DEL" });
     }
     msgRhandAdd(msg) {

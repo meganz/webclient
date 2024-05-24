@@ -2129,7 +2129,7 @@ body.rtl .meetings-call .stream .stream-participants-block .participants-contain
   border-radius: 4px;
   width: 24px;
   height: 24px;
-  margin: 7px 0 0 0;
+  margin: 4px 0 0 0;
 }
 .meetings-call .sidebar-wrapper .sidebar .participants ul li .avatar-wrapper span {
   position: absolute;
@@ -2144,8 +2144,8 @@ body.rtl .meetings-call .stream .stream-participants-block .participants-contain
 }
 .meetings-call .sidebar-wrapper .sidebar .participants ul li .name {
   overflow: hidden;
-  width: calc(100% - 90px);
-  padding-top: 8px;
+  width: calc(100% - 140px);
+  padding-top: 6px;
   padding-inline-start: 10px;
 }
 body.rtl .meetings-call .sidebar-wrapper .sidebar .participants ul li .name {
@@ -2185,18 +2185,18 @@ body.rtl .meetings-call .sidebar-wrapper .sidebar .participants ul li .name span
   color: var(--text-color-low);
 }
 .meetings-call .sidebar-wrapper .sidebar .participants ul li .status {
-  display: flex;
-  align-items: center;
-  margin: 5px 0 0 auto;
+  margin: 7px 0 0 auto;
 }
 body.rtl .meetings-call .sidebar-wrapper .sidebar .participants ul li .status {
   float: left;
 }
 .meetings-call .sidebar-wrapper .sidebar .participants ul li .status .recording-status {
   display: block;
+  float: left;
   position: relative;
   width: 16px;
   height: 16px;
+  margin: 1px 0 0;
   border-radius: 200px;
   background: var(--secondary-red);
   animation: fadeInOutLoopSubtle 4s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
@@ -2214,7 +2214,8 @@ body.rtl .meetings-call .sidebar-wrapper .sidebar .participants ul li .status {
 }
 .meetings-call .sidebar-wrapper .sidebar .participants ul li .status i {
   position: relative;
-  display: inline-block;
+  display: block;
+  float: left;
   margin-inline-start: 10px;
   --icon-size: 18px;
   --mask-color: var(--secondary-green);
@@ -2223,9 +2224,7 @@ body.rtl .meetings-call .sidebar-wrapper .sidebar .participants ul li .status {
   --mask-color: var(--secondary-red);
 }
 .meetings-call .sidebar-wrapper .sidebar .participants ul li .participants-menu {
-  display: block;
-  text-align: right;
-  width: max-content;
+  float: left;
 }
 .meetings-call .sidebar-wrapper .sidebar .participants ul li .participants-menu:hover .participants-menu-content {
   display: block;
@@ -2251,6 +2250,7 @@ body.rtl .meetings-call .sidebar-wrapper .sidebar .participants ul li .status {
 .meetings-call .sidebar-wrapper .sidebar .participants ul li .participants-menu-toggle i {
   --icon-size: 24px;
   --mask-color: var(--icon-rest);
+  margin: -2px 0 0;
 }
 .meetings-call .sidebar-wrapper .sidebar .participants ul li .participants-menu-content {
   display: none;
@@ -4147,5 +4147,3 @@ body.theme-dark .meetings-recurring-content .mega-button.recurring-toggle-button
 .meetings-unsupported-container .unsupported-info ul li {
   /* [...] */
 }
-
-/*# sourceMappingURL=chat-bundle.css.map */

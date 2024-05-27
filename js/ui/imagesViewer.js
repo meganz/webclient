@@ -945,14 +945,41 @@ var slideshowid;
 
                 const container = this.domNode.querySelector(containerSelector);
 
-                this.onEdge = {
-                    top: container.scrollTop === 0,
-                    right: (container.scrollLeft + container.offsetWidth) / container.scrollWidth > 0.999,
-                    bottom: (container.scrollTop + container.offsetHeight) / container.scrollHeight > 0.999,
-                    left: container.scrollLeft === 0
-                };
+                if (containerSelector === '.img-wrap') {
+
+                    const img = container.querySelector('img.active');
+                    const style = getComputedStyle(img);
+                    const top = Math.abs(parseInt(style.top));
+                    const left = Math.abs(parseInt(style.left));
+                    const width = parseInt(style.width);
+                    const height = parseInt(style.height);
+
+                    this.onEdge = {
+                        top: top === 0,
+                        right: (left + container.offsetWidth) / width > 0.999,
+                        bottom: (top + container.offsetHeight) / height > 0.999,
+                        left: left === 0
+                    };
+                }
+                else {
+                    this.onEdge = {
+                        top: container.scrollTop === 0,
+                        right: (container.scrollLeft + container.offsetWidth) / container.scrollWidth > 0.999,
+                        bottom: (container.scrollTop + container.offsetHeight) / container.scrollHeight > 0.999,
+                        left: container.scrollLeft === 0
+                    };
+                }
+            },
+            onDragging: function(ev) {
+                // Stop tap to be triggered
+                ev.stopPropagation();
+                return;
             }
         };
+
+        if (name === 'iframeGesture') {
+            options.iframeDoc = elm.ownerDocument;
+        }
 
         options.onSwipeRight = options.onSwipeLeft = options.onSwipeDown = options.onSwipeUp = ev => {
             ev.preventDefault();

@@ -8,6 +8,7 @@
     background: var(--surface-grey-1);
     -webkit-padding-start: 4px;
     padding-inline-start: 4px;
+    transition: 200ms linear;
 }
 .rtl .gallery-view {
     direction: rtl;

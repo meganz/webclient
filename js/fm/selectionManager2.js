@@ -143,6 +143,10 @@ class SelectionManager2Base {
         if (scrollTo) {
             this.scrollToElementProxyMethod(nodeId);
         }
+
+        // If info panel is open change its attributes by current selected node
+        mega.ui.mInfoPanel.reRenderIfVisible($.selected);
+
         return nodeId;
     }
 
@@ -288,6 +292,9 @@ class SelectionManager2Base {
                             this.shiftFirst = current;
                         }
                     }
+
+                    // Rerender if info panel is visible when selecting node via shorcut
+                    mega.ui.mInfoPanel.reRenderIfVisible($.selected);
                 }
             }
         }
@@ -580,6 +587,11 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 if (unselectedId) {
                     // dont use 'this/self' but the current/global selectionManager
                     this.remove_from_selection(unselectedId , false);
+
+                    // Close node Info panel as nothing selected
+                    if (this.selected_list.length === 0) {
+                        mega.ui.mInfoPanel.closeIfOpen();
+                    }
                 }
             });
 
@@ -597,6 +609,10 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                     e.button === 0 && !e.shiftKey && !e.metaKey && !e.ctrlKey &&
                     !e.target.classList.contains('ps__rail-x') &&
                     !e.target.classList.contains('ps__rail-y')) {
+
+                    // Close node Info panel as nothing selected
+                    mega.ui.mInfoPanel.closeIfOpen();
+
                     this.clear_selection();
                 }
             });
@@ -718,6 +734,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             else {
                 this.selectionNotification(selectionSize, false, false);
             }
+
         }, 60);
 
         return res;
@@ -782,6 +799,8 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         if (currentNode) {
             this.selectionNotification(currentNode.tb);
         }
+
+        mega.ui.mInfoPanel.reRenderIfVisible($.selected);
     }
 
     /**

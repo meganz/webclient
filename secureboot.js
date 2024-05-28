@@ -2874,6 +2874,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/ui/dropdowns.js', n: 'dropdowns_js', j:1});
         jsl.push({f:'css/node-filter.css', n: 'nodefilter_css', j:2});
         jsl.push({f:'js/ui/node-filter.js', n: 'nodefilter_js', j:1});
+        jsl.push({f:'js/ui/info-panel.js', n: 'infopanel_js', j:1});
         jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
         jsl.push({f:'js/fm/affiliate.js', n: 'fm_affiliate_js', j: 1});
@@ -2924,6 +2925,7 @@ else if (!browserUpdate) {
 
         // CSS Revamp changes
         jsl.push({f:'css/components/fm-left-pane.css', n: 'components_fm_left_pane_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/components/info-panel.css', n: 'components_info_panel_css', j:2, w:30, c:1, d:1, cache:1});
 
         // `Meetings` UI styles
         jsl.push({f:'css/chat-bundle.css', n: 'meetings_css', j:2, w:30, c:1, d:1, cache:1});

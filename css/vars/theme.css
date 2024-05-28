@@ -198,6 +198,7 @@ html .theme-light-forced {
         --surface-highlight-1: rgba(250, 250, 250, var(--surface-alpha, 0.8));
         --surface-highlight-2: rgba(250, 250, 250, var(--surface-alpha, 0.4));
         --surface-inner-shadow: rgba(250, 250, 250, var(--surface-alpha, 0.6));
+        --surface-light-red: rgba(255, 234, 235, var(--surface-alpha, 1));
 
     /* strokes */
 

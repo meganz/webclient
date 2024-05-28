@@ -288,6 +288,10 @@
 
         $('#main-search-fake-form, #mini-search-fake-form', $topbar).rebind('submit.searchsubmit', function(e) {
             e.preventDefault();
+
+            // Close node Info panel as not applicable after searching
+            mega.ui.mInfoPanel.closeIfOpen();
+
             var val = $.trim($('.js-filesearcher', this).val());
 
             // if current page is search and value is empty result move to root.

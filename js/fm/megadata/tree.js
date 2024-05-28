@@ -1255,7 +1255,13 @@ MegaData.prototype.addTreeUI = function() {
             }
 
             $.hideTopMenu();
-            M.openFolder(id, e.ctrlKey);
+            M.openFolder(id, e.ctrlKey)
+                .then(() => {
+                    // If the side Info panel is visible, update the information in it
+                    if (!cv) {
+                        mega.ui.mInfoPanel.reRenderIfVisible([id]);
+                    }
+                });
         }
 
         return false;

@@ -374,12 +374,15 @@ RecentsRender.prototype.keySelectPrevNext = function(dir, shift) {
 
         if (shift) {
             this.appendSelected($nextFileToSelect);
-            $.selected.push(nextNodeId);
+            if ($.selected && !$.selected.includes(nextNodeId)) {
+                $.selected.push(nextNodeId);
+            }
         }
         else {
             this.markSelected($nextFileToSelect.add($nextFileToSelect.parents('.MegaDynamicListItem')));
             $.selected = [nextNodeId];
         }
+        mega.ui.mInfoPanel.reRenderIfVisible($.selected);
     }
 };
 
@@ -428,7 +431,9 @@ RecentsRender.prototype.keySelectUpDown = function(dir, shift) {
     if (shift) {
 
         this.appendSelected($nextItem.add($nextActionToSelect));
-        $.selected.push(nextID);
+        if ($.selected && !$.selected.includes(nextID)) {
+            $.selected.push(nextID);
+        }
     }
     else {
         this.markSelected($nextItem);
@@ -438,6 +443,7 @@ RecentsRender.prototype.keySelectUpDown = function(dir, shift) {
         }
         $.selected = [nextID];
     }
+    mega.ui.mInfoPanel.reRenderIfVisible($.selected);
 
     var itemIndex = this._dynamicList.items.indexOf($nextActionToSelect.data('action'));
 
@@ -891,12 +897,24 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
             .rebind('dblclick', () => {
                 self.markSelected();
                 $.hideContextMenu();
+
+                // Close node Info panel as it's not applicable when opening Preview
+                mega.ui.mInfoPanel.closeIfOpen();
+
                 // mega.ui.searchbar.recentlyOpened.addFile(node.h, false);
                 slideshow(node.h);
                 $.autoplay = node.h;
                 return false;
             })
-            .rebind('click', e => self._handleSelectionClick(e, node.h, $newThumb.add($newRow)))
+            .rebind('click', e => {
+
+                const result = self._handleSelectionClick(e, node.h, $newThumb.add($newRow));
+
+                // Update the Info panel if it's open once the selection is made
+                mega.ui.mInfoPanel.reRenderIfVisible($.selected);
+
+                return result;
+            })
             .rebind('contextmenu', e => {
                 if (!selectionManager.selected_list.includes(node.h)) {
                     selectionManager.clear_selection();
@@ -1142,6 +1160,7 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
         sm.clear_selection();
         sm.selected_list = action.map(n => n.h);
         sm.add_to_selection(sm.selected_list.pop(), false, true);
+        mega.ui.mInfoPanel.reRenderIfVisible($.selected);
         self.markSelected($newRow);
         $.hideTopMenu();
         return !!M.contextMenuUI(ev, 3);
@@ -1366,6 +1385,7 @@ RecentsRender.prototype._handleSelectionClick = function(e, handle, $element) {
     }
     if (handle) {
         selectionManager.add_to_selection(handle);
+        mega.ui.mInfoPanel.reRenderIfVisible($.selected);
     }
     return false;
 };

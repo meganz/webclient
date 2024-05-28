@@ -1859,8 +1859,9 @@ scparser.$finalize = async() => {
         loadavatars = [];
     }
 
-    if ($.dialog === 'properties') {
-        delay($.dialog, propertiesDialog.bind(this, 3));
+    // Update Info panel UI
+    if (!is_mobile) {
+        delay('infoPanel', mega.ui.mInfoPanel.reRenderIfVisible.bind(mega.ui.mInfoPanel, $.selected));
     }
 
     if (scsharesuiupd) {

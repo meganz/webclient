@@ -665,10 +665,10 @@ lazy(mega.ui, 'mInfoPanel', () => {
         // Get data for all the selected nodes
         const selectedNodes = getAllNodeData(selectedNodeHandles);
 
-        // If there is a node, make sure it's valid
+        // If there is a node, make sure it's valid, otherwise close the panel
         if (selectedNodeHandles.length === 1 && !selectedNodes[0]) {
             mega.ui.mInfoPanel.closeIfOpen();
-            return msgDialog('warninga', l[882], l[24196]);
+            return;
         }
 
         // If multiple nodes selected

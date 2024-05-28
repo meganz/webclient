@@ -393,6 +393,7 @@ table tr.ui-selected .grid-file-request-manage {
 .files-grid-view .grid-scrolling-table {
     padding-bottom: 6px;
     box-sizing: border-box;
+    transition: 200ms linear;
 }
 
 .files-grid-view.fm .column-settings {
@@ -406,6 +407,7 @@ table tr.ui-selected .grid-file-request-manage {
     top: 0;
     z-index: 209;
     cursor: pointer;
+    transition: 200ms linear;
 }
 .shared-details-block .files-grid-view.fm .column-settings {
     top: 14px;

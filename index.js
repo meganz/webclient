@@ -2686,6 +2686,9 @@ function topmenuUI() {
 
                 topMenu(1);
 
+                // Close node Info panel as not applicable after switching pages
+                mega.ui.mInfoPanel.closeIfOpen();
+
                 var subpage;
                 /*  TODO: Add bird when its done */
                 var subPages = [

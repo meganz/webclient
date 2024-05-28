@@ -60,7 +60,12 @@ export default class Attachment extends AbstractGenericMessage {
                             label={previewLabel}
                             icon={`sprite-fm-mono ${previewIcon}`}
                             disabled={mega.paywall}
-                            onClick={e => this.props.onPreviewStart(v, e)}
+                            onClick={(e) => {
+                                // Close node Info panel as not applicable after doing Preview
+                                mega.ui.mInfoPanel.closeIfOpen();
+
+                                this.props.onPreviewStart(v, e);
+                            }}
                         />
                     </span>;
             }
@@ -135,7 +140,7 @@ export default class Attachment extends AbstractGenericMessage {
                                         key="infoDialog"
                                         onClick={() => {
                                             $.selected = [v.h];
-                                            propertiesDialog();
+                                            mega.ui.mInfoPanel.initInfoPanel();
                                         }}
                                     />
                                 );
@@ -241,6 +246,10 @@ export default class Attachment extends AbstractGenericMessage {
                     className={"data-block-view medium " + noThumbPrev}
                     onClick={({target}) => {
                         if (isPreviewable && !target.classList.contains('tiny-button')) {
+
+                            // Close node Info panel as not applicable after doing Preview
+                            mega.ui.mInfoPanel.closeIfOpen();
+
                             this.props.onPreviewStart(v);
                         }
                     }}>
@@ -257,7 +266,12 @@ export default class Attachment extends AbstractGenericMessage {
 
                 if (isImage) {
                     thumbClass += " image";
-                    thumbOverlay = <div className="thumb-overlay" onClick={() => this.props.onPreviewStart(v)} />;
+                    thumbOverlay = <div className="thumb-overlay" onClick={() => {
+                        // Close node Info panel as it's not applicable when clicking to open Preview
+                        mega.ui.mInfoPanel.closeIfOpen();
+
+                        this.props.onPreviewStart(v);
+                    }} />;
                 }
                 else {
                     thumbClass = thumbClass + " video " + (
@@ -266,7 +280,15 @@ export default class Attachment extends AbstractGenericMessage {
                     thumbOverlay =
                         <div
                             className="thumb-overlay"
-                            onClick={() => isPreviewable && this.props.onPreviewStart(v)}>
+                            onClick={() => {
+                                if (isPreviewable) {
+
+                                    // Close node Info panel as it's not applicable when clicking to open Preview
+                                    mega.ui.mInfoPanel.closeIfOpen();
+
+                                    this.props.onPreviewStart(v);
+                                }
+                            }}>
                             {isPreviewable && (
                                 <div className="thumb-overlay-play">
                                     <div className="thumb-overlay-circle">

@@ -11,6 +11,9 @@
     cursor: text;
     -webkit-user-select: text;
 }
+.s4-info-header-blocks {
+    transition: 200ms linear;
+}
 .container-details-info,
 .bucket-details-info {
     background: var(--surface-grey-1);

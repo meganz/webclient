@@ -1,0 +1,279 @@
+/**
+ * These styles are for the new Info panel on the right of the Cloud Drive when Info is selected on a folder/file.
+ *
+ * File manager layout changes if class folder-file-info-panel is added to the body tag.
+ * NB: Based on a fixed panel width of 320px.
+ */
+:root {
+    --info-panel-width: 320px;
+}
+.info-panel-visible .folder-file-info-panel {
+    right: 0;
+}
+.info-panel-visible .files-grid-view .grid-scrolling-table,
+.info-panel-visible .out-shared-grid-view .grid-scrolling-table,
+.info-panel-visible .fm-blocks-view,
+.info-panel-visible .out-shared-blocks-view,
+.info-panel-visible .fm-blocks-view .file-block-scrolling,
+.info-panel-visible .out-shared-blocks-view .out-shared-blocks-scrolling,
+.info-panel-visible .shares-tabs-bl,
+.info-panel-visible .shared-blocks-scrolling {
+    max-width: calc(100% - var(--info-panel-width));
+}
+.info-panel-visible .files-grid-view .grid-scrolling-table.ps,
+.info-panel-visible .out-shared-grid-view .grid-scrolling-table.ps {
+    min-width: initial;
+}
+.info-panel-visible .selection-status-bar,
+.info-panel-visible .fm-right-files-block.emptied .fm-empty-section,
+.info-panel-visible .media-viewer-container,
+.info-panel-visible .section.conversations,
+.info-panel-visible .in-chat .meetings-call,
+.info-panel-visible .in-chat .stream-controls,
+.info-panel-visible .in-chat .stream-head,
+.info-panel-visible #albums-view {
+    width: calc(100% - var(--info-panel-width));
+}
+.info-panel-visible .fm-right-header .fm-header-buttons,
+.info-panel-visible .gallery-view,
+.info-panel-visible .notification-banner .banner-contents {
+    margin-right: var(--info-panel-width);
+}
+.info-panel-visible .files-grid-view.fm .column-settings {
+    right: var(--info-panel-width);
+}
+.info-panel-visible .fm-right-header .fm-breadcrumbs-block:not(.hidden) {
+    -webkit-padding-end: 48px;
+    padding-inline-end: 48px;
+    width: calc(100% - var(--info-panel-width));
+}
+.info-panel-visible .gallery-view .gallery-view-scrolling.ps {
+    min-width: initial;
+}
+.info-panel-visible .fm-notification-block,
+.info-panel-visible .onboarding-control-panel {
+    margin-right: 344px;
+}
+.info-panel-visible .shared-details-buttons {
+    right: var(--info-panel-width);
+}
+.info-panel-visible .shared-grid-view .grid-table {
+    margin: 0;
+    width: calc(100% - var(--info-panel-width));
+}
+.info-panel-visible .media-viewer button.gallery-btn.next {
+    right: var(--info-panel-width);
+    transition: none;
+}
+.info-panel-visible .media-viewer .play-pause-video-button {
+    left: calc(50% - 195px);
+}
+.info-panel-visible .media-viewer .play-video-button {
+    left: calc(50% - 200px);
+}
+.info-panel-visible .media-viewer .watch-again-button {
+    left: calc(50% - 228px);
+}
+.info-panel-visible .folder-file-info-panel.media-viewer-visible,
+.info-panel-visible .folder-file-info-panel.meetings-visible {
+    top: 0;
+}
+.info-panel-visible .backup-center.content-block,
+.info-panel-visible section.fm-recents,
+.info-panel-visible .s4-info-header-blocks {
+    margin-right: var(--info-panel-width);
+}
+.info-panel-visible .gallery-tabs-bl {
+    max-width: calc(100% - var(--info-panel-width));
+    min-width: 0;
+}
+.info-panel-visible .shared-blocks-scrolling {
+    min-width: calc(100% - var(--info-panel-width));
+}
+
+/* Right to left e.g. Arabic styles */
+.info-panel-visible.rtl .fm-filter-chips-wrapper {
+    margin-right: 360px;
+}
+.info-panel-visible.rtl .folder-file-info-panel .header-title,
+.info-panel-visible.rtl .folder-file-info-panel .info-data .description,
+.info-panel-visible.rtl .folder-file-info-panel .info-data .value {
+    direction: rtl;
+}
+.info-panel-visible.rtl .folder-file-info-panel .close {
+    left: 20px;
+    right: initial;
+}
+
+/* Gif panel position */
+.info-panel-visible .meetings-call .sidebar-wrapper
+.sidebar.chat-opened .chat-textarea-block .gif-panel-wrapper {
+    right: var(--info-panel-width);
+}
+
+/* Main styles for the folder/file Info panel */
+.folder-file-info-panel {
+    background-color: var(--surface-main);
+    height: 100%;
+    width: var(--info-panel-width);
+    position: absolute;
+    top: 55px;
+    right: calc(-1 * var(--info-panel-width));
+    z-index: 210;
+    border-left: 1px solid var(--divider-color);
+    transition: 200ms linear;
+}
+.folder-file-info-panel .close {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+.folder-file-info-panel .icon-dialog-close {
+    color: var(--text-color-higher);
+}
+.folder-file-info-panel .inner-container {
+    margin: 16px;
+}
+.folder-file-info-panel .header-title {
+    font-size: 16px;
+    font-weight: var(--text-font-family-semibold);
+    line-height: 24px;
+    color: var(--text-color-higher);
+    margin-top: 40px;
+    margin-bottom: 16px;
+}
+.folder-file-info-panel .icon-frame {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    background: var(--surface-grey-1);
+    height: 144px;
+    padding: 24px 0;
+    margin-bottom: 16px;
+    position: relative;
+}
+.folder-file-info-panel .icon-frame.shimmer {
+    background: linear-gradient(
+        90deg,
+        rgba(0, 0, 0, 0) 0%,
+        rgba(0, 0, 0, 0) 25%,
+        var(--surface-highlight-1) 35%,
+        var(--surface-highlight-1) 50%,
+        var(--surface-highlight-1) 65%,
+        rgba(0, 0, 0, 0) 75%,
+        rgba(0, 0, 0, 0) 100%
+    );
+    background-color: var(--surface-grey-6);
+    background-size: 1500% 100%;
+}
+.folder-file-info-panel .icon-frame .block-view-file-type {
+    top: 50%;
+}
+.folder-file-info-panel .icon-frame .block-view-file-type.img-thumb {
+    margin: -95px 0 0 -192px;
+    background: none;
+}
+.folder-file-info-panel .icon-frame .block-view-file-type.img-thumb img {
+    height: 192px;
+    width: 289px;
+    object-fit: cover;
+    object-position: center;
+}
+.folder-file-info-panel .info-data {
+    margin-bottom: 8px;
+}
+.folder-file-info-panel .info-data .description {
+    color: var(--text-color-medium);
+    font-size: 12px;
+    line-height: 18px;
+}
+.folder-file-info-panel .info-data .value {
+    color: var(--text-color-high);
+    font-size: 12px;
+    font-weight: var(--text-font-family-semibold);
+    line-height: 18px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.folder-file-info-panel .info-data .value.permissions-value {
+    display: inline-block;
+    line-height: 20px;
+    vertical-align: middle;
+}
+.folder-file-info-panel .info-data .permissions-icon {
+    display: inline-block;
+    --icon-size: 24px;
+    line-height: 18px;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+.folder-file-info-panel .video-thumb-details {
+    display: block;
+    top: unset;
+    left: 8px;
+    bottom: 8px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: var(--surface-highlight-1);
+}
+.folder-file-info-panel .info-data.path-section .value,
+.folder-file-info-panel .info-data.version-section span {
+    color: var(--text-color-info);
+}
+.folder-file-info-panel .info-data.path-section .path-value div {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.folder-file-info-panel .info-data.path-section span:hover {
+    text-decoration: underline;
+}
+.folder-file-info-panel .info-data.path-section span,
+.folder-file-info-panel .info-data.version-section span {
+    cursor: pointer;
+}
+.folder-file-info-panel .takedown-warning,
+.folder-file-info-panel .icon-takedown {
+    display: none;
+}
+
+/* Taken down styles */
+.folder-file-info-panel.taken-down .info-data.name-section .value {
+    color: var(--secondary-red);
+    display: inline-block;
+    line-height: 20px;
+    margin-left: 5px;
+    vertical-align: middle;
+}
+.folder-file-info-panel.taken-down .icon-takedown {
+    color: var(--secondary-red);
+    display: inline-block;
+    vertical-align: middle;
+}
+.folder-file-info-panel.taken-down .takedown-warning {
+    background-color: var(--surface-light-red);
+    border: 1px solid var(--secondary-red);
+    border-radius: 5px;
+    color: var(--secondary-red);
+    display: block;
+    margin: 10px 0;
+    padding: 5px;
+    text-align: center;
+}
+.folder-file-info-panel.taken-down .takedown-warning a {
+    color: var(--secondary-red);
+    text-decoration: underline;
+}
+
+/* Scroll for info details */
+.info-panel-scroll-block {
+    height: calc(100vh - 360px);
+}
+
+/* Undecryptable node */
+.folder-file-info-panel.undecryptable .value {
+    color: var(--secondary-orange) !important;
+}

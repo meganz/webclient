@@ -11763,6 +11763,7 @@ class Loading extends mixins.w9 {
     if ($.dialog) {
       closeDialog == null || closeDialog();
     }
+    mega.ui.mInfoPanel.closeIfOpen();
     (_notify = notify) == null || _notify.closePopup();
     (_alarm = alarm) == null || _alarm.hideAllWarningPopups();
     document.querySelectorAll('.js-dropdown-account').forEach(({
@@ -19090,7 +19091,6 @@ LeftPanel.NAMESPACE = 'lhp';
 
 
 
-
 const VIEWS = {
   CHATS: 0x00,
   MEETINGS: 0x01,
@@ -22797,6 +22797,7 @@ class Call extends mixins.w9 {
         sidebar,
         view
       } : Call.STATE.PREVIOUS;
+      mega.ui.mInfoPanel.closeIfOpen();
       return peers.length > 0 || presenterStreams.has(u_handle) ? this.setState({
         mode: MODE.MINI,
         sidebar: false
@@ -22811,6 +22812,7 @@ class Call extends mixins.w9 {
       })();
     };
     this.handleCallExpand = async () => {
+      mega.ui.mInfoPanel.closeIfOpen();
       return new Promise(resolve => {
         this.setState({
           ...Call.STATE.PREVIOUS
@@ -22921,6 +22923,7 @@ class Call extends mixins.w9 {
     };
     this.handleCallEnd = () => {
       let _this$props$call;
+      mega.ui.mInfoPanel.closeIfOpen();
       (_this$props$call = this.props.call) == null || _this$props$call.destroy(SfuClient.TermCode.kUserHangup);
     };
     this.handleEphemeralAdd = handle => handle && this.setState(state => ({
@@ -28486,7 +28489,10 @@ class Attachment extends AbstractGenericMessage {
           label: previewLabel,
           icon: `sprite-fm-mono ${previewIcon}`,
           disabled: mega.paywall,
-          onClick: e => this.props.onPreviewStart(v, e)
+          onClick: e => {
+            mega.ui.mInfoPanel.closeIfOpen();
+            this.props.onPreviewStart(v, e);
+          }
         }));
       }
       if (contact.u === u_handle) {
@@ -28550,7 +28556,7 @@ class Attachment extends AbstractGenericMessage {
                 key: "infoDialog",
                 onClick: () => {
                   $.selected = [v.h];
-                  propertiesDialog();
+                  mega.ui.mInfoPanel.initInfoPanel();
                 }
               }));
               this.props.onAddFavouriteButtons(v.h, firstGroupOfButtons);
@@ -28614,6 +28620,7 @@ class Attachment extends AbstractGenericMessage {
           target
         }) => {
           if (isPreviewable && !target.classList.contains('tiny-button')) {
+            mega.ui.mInfoPanel.closeIfOpen();
             this.props.onPreviewStart(v);
           }
         }
@@ -28630,13 +28637,21 @@ class Attachment extends AbstractGenericMessage {
           thumbClass += " image";
           thumbOverlay = REaCt().createElement("div", {
             className: "thumb-overlay",
-            onClick: () => this.props.onPreviewStart(v)
+            onClick: () => {
+              mega.ui.mInfoPanel.closeIfOpen();
+              this.props.onPreviewStart(v);
+            }
           });
         } else {
           thumbClass = `${thumbClass  } video ${  isPreviewable ? " previewable" : "non-previewable"}`;
           thumbOverlay = REaCt().createElement("div", {
             className: "thumb-overlay",
-            onClick: () => isPreviewable && this.props.onPreviewStart(v)
+            onClick: () => {
+              if (isPreviewable) {
+                mega.ui.mInfoPanel.closeIfOpen();
+                this.props.onPreviewStart(v);
+              }
+            }
           }, isPreviewable && REaCt().createElement("div", {
             className: "thumb-overlay-play"
           }, REaCt().createElement("div", {

@@ -886,6 +886,7 @@ lazy(mega, 'backupCenter', () => {
                     $currentFolder.addClass('active');
 
                     selectionManager.add_to_selection($currentFolder.attr('data-handle'));
+                    mega.ui.mInfoPanel.reRenderIfVisible($.selected);
                     this.selectedSync = {
                         'nodeHandle': $currentFolder.attr('data-handle'),
                         'id': $currentFolder.attr('data-id') || $currentFolder.attr('data-handle'),
@@ -913,6 +914,7 @@ lazy(mega, 'backupCenter', () => {
 
                     $currentDevice.addClass('active');
                     this.deviceCardStates[$currentDevice.attr('data-id')].selected = 'active ';
+                    mega.ui.mInfoPanel.reRenderIfVisible($.selected);
                 }
             });
 

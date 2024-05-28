@@ -25,6 +25,7 @@ export default class Loading extends MegaRenderMixin {
         if ($.dialog) {
             closeDialog?.();
         }
+        mega.ui.mInfoPanel.closeIfOpen();
         notify?.closePopup();
         alarm?.hideAllWarningPopups();
         document.querySelectorAll('.js-dropdown-account').forEach(({ classList }) =>

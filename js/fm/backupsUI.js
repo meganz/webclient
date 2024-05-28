@@ -1348,10 +1348,10 @@ lazy(mega, 'backupCenter', () => {
                 const deviceData = mega.backupCenter.data.find((dev) => dev.device === deviceId);
 
                 const deviceName = mega.backupCenter.dn[deviceId];
-                const deviceIconClass = deviceIcon(
+                const deviceIconClass = `icon-${deviceIcon(
                     deviceData.dua || deviceName,
                     deviceData.type
-                );
+                )}-90`;
 
                 M.safeShowDialog('device-rename-dialog', () => {
                     $dialog.removeClass('hidden').addClass('active');
@@ -1417,9 +1417,9 @@ lazy(mega, 'backupCenter', () => {
 
                 $input.val(deviceName);
 
-                $('.transfer-filetype-icon', $dialog)
+                $('.item-type-icon-90', $dialog)
                     .attr('class',
-                          `transfer-filetype-icon ${deviceIconClass}`
+                          `item-type-icon-90 ${deviceIconClass}`
                     );
 
                 $input.rebind('focus.deviceRenameDialog', () => {

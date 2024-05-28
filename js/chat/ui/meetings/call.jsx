@@ -553,6 +553,8 @@ export default class Call extends MegaRenderMixin {
                 onIdle(() => call.showTimeoutDialog());
             }
         };
+        // Close node info panel when open
+        mega.ui.mInfoPanel.closeIfOpen();
 
         return (
             peers.length > 0 || presenterStreams.has(u_handle) ?
@@ -576,6 +578,9 @@ export default class Call extends MegaRenderMixin {
      */
 
     handleCallExpand = async() => {
+        // Close node info panel when open
+        mega.ui.mInfoPanel.closeIfOpen();
+
         return new Promise((resolve) => {
             this.setState({ ...Call.STATE.PREVIOUS }, () => {
                 this.props.onCallExpand();
@@ -770,6 +775,8 @@ export default class Call extends MegaRenderMixin {
      */
 
     handleCallEnd = () => {
+        // Close node info panel when open
+        mega.ui.mInfoPanel.closeIfOpen();
         this.props.call?.destroy(SfuClient.TermCode.kUserHangup);
     };
 

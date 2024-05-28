@@ -1255,9 +1255,11 @@ MegaUtils.prototype.checkForDuplication = function(id) {
 mBroadcaster.addListener('mega:openfolder', SoonFc(300, function(id) {
     'use strict';
 
-    var dups = M.checkForDuplication(id);
-    if (dups && (dups.files || dups.folders)) {
-        var $bar = $('.fm-notification-block.duplicated-items-found').addClass('visible');
+    let dups = false;
+
+    // Show desktop notification
+    if (!is_mobile && (dups = M.checkForDuplication(id)) && (dups.files || dups.folders)) {
+        const $bar = $('.fm-notification-block.duplicated-items-found').addClass('visible');
 
         $('.fix-me-btn', $bar).rebind('click.df', function() {
             fileconflict.resolveExistedDuplication(dups, id);

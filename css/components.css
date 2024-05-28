@@ -9,6 +9,7 @@
     cursor: default;
     flex-shrink: 0;
     border-left: 2px solid var(--stroke-main);
+    transition: 200ms linear;
 }
 .rtl .selection-status-bar {
     display: rtl;

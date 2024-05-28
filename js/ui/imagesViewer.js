@@ -189,6 +189,10 @@ var slideshowid;
             if (is_mobile) {
                 mobile.appBanner.updateBanner(newShownHandle);
             }
+            else {
+                // Rerender info panel when moving to next/previous at slide show.
+                mega.ui.mInfoPanel.reRenderIfVisible([newShownHandle]);
+            }
         }
 
         slideshow_timereset();
@@ -327,7 +331,12 @@ var slideshowid;
         }
         else {
             $infoButton.addClass('hidden');
-            $optionButton.removeClass('hidden');
+
+            // Keep the Info panel option hidden on public links (but usable in regular Cloud Drive etc)
+            const currentSitePath = getSitePath();
+            if (!isPublicLink(currentSitePath) && !isPublicLinkV2(currentSitePath)) {
+                $optionButton.removeClass('hidden');
+            }
         }
 
     }
@@ -1306,13 +1315,22 @@ var slideshowid;
                     return false;
                 }
                 history.back();
+                mega.ui.mInfoPanel.closeIfOpen();
                 return false;
             });
+
+            // Keep the Info panel option hidden on public links (but usable in regular Cloud Drive etc)
+            const currentSitePath = getSitePath();
+            if (isPublicLink(currentSitePath) || isPublicLinkV2(currentSitePath)) {
+                $('.v-btn.options', $overlay).addClass('hidden');
+            }
 
             // Properties icon
             $('.context-menu .info, .v-btn.info', $overlay).rebind('click.media-viewer', () => {
                 $document.fullScreen(false);
-                propertiesDialog();
+                const node = M.getNodeByHandle(id);
+                $.selected = [node.h];
+                mega.ui.mInfoPanel.initInfoPanel();
                 return false;
             });
 

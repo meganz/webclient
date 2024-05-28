@@ -1,4 +1,3 @@
-import { hot } from 'react-hot-loader/root';
 import React from 'react';
 import { MegaRenderMixin } from '../mixins.js';
 import { ConversationPanels, EmptyConvPanel } from './conversationpanel.jsx';

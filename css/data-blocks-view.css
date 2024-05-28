@@ -23,6 +23,7 @@
     overflow: hidden;
     border-top: 1px solid var(--surface-grey-2);
     flex-grow: 1;
+    transition: 200ms linear;
 }
 
 .fm-right-files-block.emptied .fm-blocks-view:not(.shared-folder-content),

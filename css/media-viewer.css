@@ -9,6 +9,7 @@
             top: 0;
             width: 100%;
             z-index: 1000;
+            transition: 200ms linear;
         }
         .media-viewer {
             background: var(--surface-black);

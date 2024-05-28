@@ -768,6 +768,20 @@ lazy(mega, 'rewindUi', () => {
             return isOpenFolder;
         }
 
+        /**
+         * Method to just close it already
+         */
+        forceClose() {
+
+            if (this.sidebar) {
+                this.sidebar.classList.add('hidden');
+            }
+            if (this.parentContainer) {
+                this.parentContainer.classList.remove(activeContainerClass);
+            }
+            this.active = false;
+        }
+
         removeEventHandlers() {
             if (this.$closeButton) {
                 this.$closeButton.off('click.rewind');

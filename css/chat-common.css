@@ -4,6 +4,7 @@
 }
 .section.conversations {
     height: calc(100% - 48px);
+    transition: 200ms linear;
 }
 .section.conversations .fm-right-files-block {
     height: 100%;

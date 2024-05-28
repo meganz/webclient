@@ -62,7 +62,7 @@ lazy(mega.ui, 'mNodeFilter', () => {
                 {
                     icon: 'file',
                     label: l.filter_chip_type_documents,
-                    data: ['word'],
+                    data: ['word', 'text'],
                     eid: 99944
                 },
                 {

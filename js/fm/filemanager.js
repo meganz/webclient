@@ -1141,6 +1141,14 @@ FileManager.prototype.initFileManagerUI = function() {
             }
         }
 
+        // Close node Info panel if currently open as it's not applicable when switching to these areas
+        if (this.classList.contains('account') || this.classList.contains('dashboard') ||
+            this.classList.contains('conversations') || this.classList.contains('user-management') ||
+            this.classList.contains('transfers')) {
+
+            mega.ui.mInfoPanel.closeIfOpen();
+        }
+
         if (this.classList.contains('account') || this.classList.contains('dashboard')) {
             $.hideTopMenu();
 
@@ -2009,7 +2017,7 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.properties-item').rebind('click', function() {
-        propertiesDialog();
+        mega.ui.mInfoPanel.initInfoPanel();
     });
 
     $(c + '.device-rename-item').rebind('click', () => {
@@ -2462,6 +2470,10 @@ FileManager.prototype.initContextUI = function() {
         if (M.isInvalidUserStatus()) {
             return;
         }
+
+        // Close node Info panel as not needed immediately after opening Preview
+        mega.ui.mInfoPanel.closeIfOpen();
+
         closeDialog();
         slideshow($.selected[0]);
     });
@@ -2471,6 +2483,9 @@ FileManager.prototype.initContextUI = function() {
             return;
         }
         var n = $.selected[0];
+
+        // Close node Info panel as not needed immediately after opening Preview
+        mega.ui.mInfoPanel.closeIfOpen();
 
         closeDialog();
 
@@ -4242,6 +4257,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                 console.log('draggable.stop');
             }
             $.gridDragging = $.draggingClass = false;
+
             $('body').removeClass('dragging').removeClassWith("dndc-");
             var origin = $.draggerOrigin;
             setTimeout(function __onDragStop() {
@@ -4262,6 +4278,9 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         stop: () => {
             M.renderSearchBreadcrumbs();
             $.selecting = false;
+
+            // On drag stop and if the side Info panel is visible, update the information in it
+            mega.ui.mInfoPanel.reRenderIfVisible($.selected);
         },
         appendTo: $.selectddUIgrid
     });
@@ -4337,6 +4356,9 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                 $.hideTopMenu();
             }
 
+            // If the side Info panel is visible, update the information in it
+            mega.ui.mInfoPanel.reRenderIfVisible($.selected);
+
             return false;
         });
 
@@ -4345,7 +4367,6 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         $ddUIgrid.rebind('mousewheel.selectAndScroll', e => {
 
             if ($.selecting) {
-
                 delay('selectAndScroll', () => {
 
                     $ddUIgrid = $($.selectddUIgrid);
@@ -4403,6 +4424,10 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             if (is_video(n)) {
                 $.autoplay = h;
             }
+
+            // Close node Info panel as not needed immediately after opening Preview
+            mega.ui.mInfoPanel.closeIfOpen();
+
             slideshow(h);
         }
         else if (is_text(n)) {

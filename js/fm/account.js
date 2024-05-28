@@ -3923,7 +3923,7 @@ accountUI.transfers = {
                 'use strict';
 
                 // LITE/PRO account
-                if (u_attr.p && !u_attr.b) {
+                if (u_attr.p && !u_attr.b && !u_attr.pf) {
                     var bandwidthLimit = Math.round(account.servbw_limit | 0);
 
                     var $slider = $('#bandwidth-slider').slider({
@@ -3983,8 +3983,8 @@ accountUI.transfers = {
                     $('.slider-percentage-bl', accountUI.$contentBlock).removeClass('hidden');
                     $('.band-grn-noti', accountUI.$contentBlock).addClass('hidden');
                 }
-                // Business account
-                else if (u_attr.b) {
+                // Business account or Pro Flexi
+                else if (u_attr.b || u_attr.pf) {
                     $('.bandwith-settings', accountUI.$contentBlock).addClass('hidden');
                     $('.slider-percentage-bl', accountUI.$contentBlock).addClass('hidden');
                     $('.band-grn-noti', accountUI.$contentBlock).addClass('hidden');

@@ -11,7 +11,8 @@ mobile.cloud = {
         'use strict';
 
         // jQuery selectors
-        var $otherPages = $('> div:not(.hidden):not(.file-manager-block)', '#fmholder');
+        var $otherPages = $('> div:not(.hidden):not(.file-manager-block):not(.dark-overlay):not(.loading-spinner)',
+                            '#fmholder');
         var $excludes = $('.top-menu-popup, .mega-header, .mega-top-menu, .mobile-rack', mainlayout);
 
         // Render the file manager header, folders, files and footer

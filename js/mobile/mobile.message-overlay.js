@@ -256,7 +256,7 @@ mobile.messageOverlay = (() => {
          *       you have to set catch to prevent exception.
          *
          *
-         * @returns {undefined}
+         * @returns {Promise}
          */
         show: function(message, subMessage, icon, buttons, checkboxCallback, closeButton) {
 

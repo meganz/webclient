@@ -75,6 +75,10 @@ mega.textEditorUI = new function TextEditorUI() {
 
     const bindEventsListner = function() {
 
+        if (is_mobile) {
+            return;
+        }
+
         var changeListner = function() {
             $saveButton.removeClass('disabled');
             editor.off('change', changeListner);
@@ -155,7 +159,7 @@ mega.textEditorUI = new function TextEditorUI() {
 
         if (!editor) {
             editor = CodeMirror.fromTextArea($editorTextarea[0], {
-                lineNumbers: !is_mobile,
+                lineNumbers: true,
                 scrollbarStyle: "overlay",
                 autofocus: true,
                 lineWrapping: true,
@@ -166,7 +170,7 @@ mega.textEditorUI = new function TextEditorUI() {
         savedFileData = txt;
         editor.setValue(txt);
 
-        if (initialized) {
+        if (initialized || is_mobile) {
             // Nothing else to do.
             return;
         }
@@ -260,30 +264,13 @@ mega.textEditorUI = new function TextEditorUI() {
                 if (editor) {
                     $saveButton.addClass('disabled');
 
-                    const rights = M.getNodeRights(fileHandle);
-                    if (rights < 1) {
-                        $saveAsBtn.trigger('click');
-                        $saveButton.removeClass('disabled');
-                        return false;
-                    }
+                    const getSavedFile = fh => {
 
-                    loadingDialog.show('common', l[23131]);
-
-                    const getSavedFile = function(fh) {
-                        if (versionHandle) {
-                            mega.fileTextEditor.removeOldVersion(versionHandle);
-                            versionHandle = fh;
-                        }
-                        else if (M.d[fileHandle] && M.d[fileHandle].s === 0) {
-                            mega.fileTextEditor.removeOldVersion(fileHandle);
-                            fileHandle = fh;
-                            versionHandle = '';
-                        }
-                        else {
-                            versionHandle = fh;
+                        if (!fh) {
+                            $saveButton.removeClass('disabled');
                         }
 
-                        savedFileData = editor.getValue();
+                        mega.textEditorUI.getVersionedHandle(fh);
 
                         bindEventsListner();
 
@@ -298,37 +285,17 @@ mega.textEditorUI = new function TextEditorUI() {
                             mega.ui.searchbar.recentlyOpened.addFile(fh, true);
                         }
 
-                        loadingDialog.hide();
                         if (cb && typeof cb === 'function') {
                             cb();
                         }
                     };
 
-                    if (rights === 1 && M.getNodeRoot(fileHandle) === 'shares') {
-                        const name = fileconflict.findNewName(M.getSafeName(M.d[fileHandle].name), M.d[fileHandle].p);
-                        const val = editor.getValue();
-                        (
-                            val
-                                ? mega.fileTextEditor.saveFileAs(name, M.d[fileHandle].p, val)
-                                : M.addNewFile(name, M.d[fileHandle].p)
-                        )
-                            .then(getSavedFile)
-                            .catch(tell)
-                            .finally(() => {
-                                loadingDialog.hide();
-                            });
-                        return;
-                    }
-
-                    M.getStorageQuota().then(data => {
-                        if (data.isFull) {
+                    mega.textEditorUI.save(fileHandle, versionHandle, editor.getValue())
+                        .then(getSavedFile)
+                        .catch(tell)
+                        .finally(() => {
                             loadingDialog.hide('common');
-                            ulmanager.ulShowOverStorageQuotaDialog();
-                            return false;
-                        }
-                        mega.fileTextEditor.setFile(versionHandle || fileHandle, editor.getValue())
-                            .done(getSavedFile);
-                    });
+                        });
                 }
             }
         );
@@ -347,55 +314,18 @@ mega.textEditorUI = new function TextEditorUI() {
             }
         );
 
-        const _saveAsAction = (h, contents) => {
-
-            $.selected = Array.isArray(h) ? h : [h];
-            h = $.selected[0];
-
-            M.getStorageQuota().then(data => {
-                loadingDialog.hide();
-                if (data.isFull) {
-                    ulmanager.ulShowOverStorageQuotaDialog();
-                    return false;
-                }
-
-                mega.textEditorUI.setupEditor(M.d[h].name, contents || '', h);
-            });
-        };
-
         $('.file-menu .new-f', $menuBar).rebind(
             'click.txt-editor',
             function newFileMenuClick() {
                 validateAction(
                     l[22750],
                     l[22752],
-                    () => {
-                        // loadingDialog.show();
-                        openSaveAsDialog(
-                            {name: 'New file.txt'},
-                            '',
-                            _saveAsAction
-                        );
-                    }
+                    mega.textEditorUI.saveAs.bind(mega.textEditorUI, true)
                 );
             }
         );
 
-        $saveAsBtn.rebind(
-            'click.txt-editor',
-            function saveAsMenuClick() {
-                // loadingDialog.show();
-                var editedTxt = editor.getValue();
-                if (editedTxt === savedFileData) {
-                    editedTxt = null;
-                }
-                openSaveAsDialog(
-                    versionHandle || fileHandle,
-                    editedTxt,
-                    handle => _saveAsAction(handle, editedTxt || savedFileData)
-                );
-            }
-        );
+        $saveAsBtn.rebind('click.txt-editor', mega.textEditorUI.saveAs.bind(mega.textEditorUI, false));
 
         $('.file-menu .get-link-f', $menuBar).rebind(
             'click.txt-editor',
@@ -497,6 +427,103 @@ mega.textEditorUI = new function TextEditorUI() {
         );
     };
 
+    this.save = async(fh, vh, val) => {
+        const rights = M.getNodeRights(fh);
+        let res;
+        if (rights < 1) {
+            this.saveAs(fh);
+            return false;
+        }
+
+        loadingDialog.show('common', l[23131]);
+
+        if (rights === 1 && M.getNodeRoot(fh) === 'shares') {
+            const name = fileconflict.findNewName(M.getSafeName(M.d[fh].name), M.d[fh].p);
+            res = await Promise.resolve(
+                val
+                    ? mega.fileTextEditor.saveFileAs(name, M.d[fileHandle].p, val)
+                    : M.addNewFile(name, M.d[fileHandle].p)
+            ).catch(dump);
+
+            return res;
+        }
+
+        const data = await M.getStorageQuota();
+
+        if (data.isFull) {
+            loadingDialog.hide('common');
+            ulmanager.ulShowOverStorageQuotaDialog();
+            return false;
+        }
+        res = await Promise.resolve(mega.fileTextEditor.setFile(vh || fh, val)).catch(dump);
+        return res;
+    };
+
+    this.saveAs = n => {
+        // loadingDialog.show();
+        let node = {name: 'New file.txt'};
+        let contents = '';
+        let editedTxt;
+
+        if (typeof n === 'object') {
+            node = n;
+        }
+        else if (!n) {
+            editedTxt = editor.getValue();
+            if (editedTxt === savedFileData) {
+                editedTxt = null;
+            }
+
+            node = versionHandle || fileHandle;
+            contents = editedTxt;
+        }
+
+        openSaveAsDialog(
+            node,
+            contents,
+            async h => {
+
+                $.selected = Array.isArray(h) ? h : [h];
+                h = $.selected[0];
+                const data = await M.getStorageQuota().catch(dump);
+
+                loadingDialog.hide();
+
+                if (data.isFull) {
+                    ulmanager.ulShowOverStorageQuotaDialog();
+                    return false;
+                }
+
+                if (is_mobile) {
+                    mega.ui.viewerOverlay.show(h);
+                }
+                else {
+                    mega.textEditorUI.setupEditor(M.d[h].name, editedTxt || savedFileData, h);
+                }
+                return h;
+            }
+        );
+    };
+
+    this.getVersionedHandle = function(fh) {
+        if (versionHandle) {
+            mega.fileTextEditor.removeOldVersion(versionHandle);
+            versionHandle = fh;
+        }
+        else if (M.d[fileHandle] && M.d[fileHandle].s === 0) {
+            mega.fileTextEditor.removeOldVersion(fileHandle);
+            fileHandle = fh;
+            versionHandle = '';
+        }
+        else {
+            versionHandle = fh;
+        }
+
+        savedFileData = editor.getValue();
+
+        return [fileHandle, versionHandle];
+    };
+
     this.doClose = function() {
         if (editor) {
             editor.setValue('');
@@ -519,7 +546,7 @@ mega.textEditorUI = new function TextEditorUI() {
      * @returns {Void}              void
      */
     this.setupEditor = function(fName, txt, handle, isReadonly, $viewerContainer) {
-        M.require('codemirror_js', 'codemirrorscroll_js').done(() => {
+        return Promise.resolve(M.require('codemirror_js', 'codemirrorscroll_js')).then(() => {
             if ($viewerContainer) {
                 this.cleanup();
                 init(txt, $viewerContainer);
@@ -536,14 +563,6 @@ mega.textEditorUI = new function TextEditorUI() {
                         }
                     }, 60);
                 });
-
-                // For stopping showing keyboard on mobile browsers
-                if (is_mobile) {
-                    $('.CodeMirror-scroll', $editorContainer).rebind('click tap', () => {
-                        document.activeElement.blur();
-                        return false;
-                    });
-                }
             }
             else {
                 pushHistoryState();
@@ -578,9 +597,11 @@ mega.textEditorUI = new function TextEditorUI() {
                     $('footer .download-btn', $editorContainer).removeClass('hidden');
                 }
 
-                bindEventsListner();
-                $saveButton.addClass('disabled');
-                $('.text-editor-file-name span', $editorContainer).text(fName);
+                if (!is_mobile) {
+                    bindEventsListner();
+                    $saveButton.addClass('disabled');
+                    $('.text-editor-file-name span', $editorContainer).text(fName);
+                }
 
                 editor.focus();
             }
@@ -606,6 +627,8 @@ mega.textEditorUI = new function TextEditorUI() {
             else {
                 $getLink.removeClass('hidden');
             }
+
+            this.editor = editor;
         });
     };
 

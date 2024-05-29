@@ -31,10 +31,10 @@ class MobileNodeNameControl {
 
     /**
      * Show the sheet
-     * @param {String} nodeHandle {Optional} The node handle of the folder/file
+     * @param {String|Object} n {Optional} The node or node handle of the folder/file
      * @returns {void}
      */
-    show(nodeHandle) {
+    show(n, options) {
 
         const {nameInput, container, typeInfo} = this;
 
@@ -45,7 +45,7 @@ class MobileNodeNameControl {
         let nodeType = 1;
         let nodeName = '';
 
-        const node = M.d[nodeHandle];
+        const node = typeof n === 'object' ? n : M.d[n];
         if (node) {
             nodeName = node.name;
             nodeType = node.t;
@@ -79,7 +79,7 @@ class MobileNodeNameControl {
                     let selEnd = nodeName.length;
                     let tempIX;
                     if (!nodeType && (tempIX = nodeName.lastIndexOf('.')) > -1){
-                        selEnd = tempIX ;
+                        selEnd = tempIX;
                     }
                     nameInput.$input[0].selectionStart = 0;
                     nameInput.$input[0].selectionEnd = selEnd;
@@ -89,14 +89,14 @@ class MobileNodeNameControl {
             // This code is temporary due to iOS doesn't allow manual focus
             // if the code is executed from an asynchronous function
             if (!is_ios) {
-                nameInput.$input.trigger('focus');
+                onIdle(() => nameInput.$input.trigger('focus'));
             }
 
             const button = this.actionButton = new MegaMobileButton({
                 parentNode: mega.ui.sheet.actionsNode,
                 type: 'normal',
                 text: typeInfo.button,
-                disabled: true
+                disabled: !(options && options.noBtnDisable)
             });
 
             button.on('tap.action', () => {
@@ -105,7 +105,6 @@ class MobileNodeNameControl {
             });
 
             mega.ui.sheet.show();
-
         });
     }
 
@@ -294,7 +293,22 @@ mBroadcaster.once('fm:initialized', () => {
                         loadingDialog.hide();
                     });
             }
+        },
+        saveTextAs: {
+            placeholder: '',
+            selection: true,
+            name: 'mobile-save-as-text',
+            title: () => escapeHTML(l[22664]),
+            button: escapeHTML(l[776]),
+            empty: escapeHTML(l[8566]),
+            submit: newName => {
+                mega.ui.sheet.hide();
+
+                if (typeof mega.ui.saveTextAs.onSubmit === 'function') {
+                    mega.ui.saveTextAs.onSubmit(newName);
+                    delete mega.ui.saveTextAs.onSubmit;
+                }
+            }
         }
     };
-
 });

@@ -122,6 +122,21 @@ class MegaMobileContextMenu extends MegaMobileComponentGroup {
             mega.ui.contextMenu.getChild('.download-item').text = node.t === 1 ? l[864] : l[58];
         }
 
+        // This seem text editor context menu
+        if (mega.ui.viewerOverlay.mode === 'text') {
+
+            // and contents are changed, need to reset context menu items
+            if (mega.ui.viewerOverlay.confirmDiscard) {
+                items = {
+                    '.open-app': 1,
+                    '.save-text': 1,
+                    '.download-item': 1,
+                };
+            }
+
+            items['.save-as-text'] = 1;
+        }
+
         for (let i = keys.length; i--;) {
             const key = keys[i];
             const item = this.domNode.querySelector(key);
@@ -245,6 +260,54 @@ mBroadcaster.once('boot_done', () => {
                 mega.redirect('mega.io', 'dispute', false, false, false);
             }
         },
+        '.save-text': {
+            text: l[776],
+            icon: 'sprite-mobile-fm-mono icon-file-plus-02-thin-outline',
+            subMenu: false,
+            classNames: '',
+            onClick() {
+
+                document.activeElement.blur();
+
+                if (!validateUserAction()) {
+                    return false;
+                }
+
+                const vOverlay = mega.ui.viewerOverlay;
+                const fileHandle = vOverlay.nodeComponent.handle;
+
+                mega.textEditorUI.save(fileHandle, vOverlay.versionHandle, mega.textEditorUI.editor.getValue())
+                    .then(fh => {
+
+                        const handles = mega.textEditorUI.getVersionedHandle(fh);
+
+                        vOverlay.versionHandle = handles[1];
+                        vOverlay.setNode(handles[0]);
+
+                        delete vOverlay.confirmDiscard;
+
+                        vOverlay.bottomBar.actions[0].disabled = true;
+                    })
+                    .catch(tell)
+                    .finally(() => {
+                        loadingDialog.hide('common');
+                    });
+            }
+        },
+        '.save-as-text': {
+            text: l[22664],
+            icon: 'sprite-mobile-fm-mono icon-files-plus-thin-outline',
+            subMenu: false,
+            classNames: '',
+            onClick() {
+
+                if (!validateUserAction() || mega.ui.viewerOverlay.mode !== 'text') {
+                    return false;
+                }
+
+                mega.textEditorUI.saveAs();
+            }
+        },
         '.download-item': {
             text: l[58],
             icon: 'sprite-mobile-fm-mono icon-download-thin',
@@ -255,9 +318,23 @@ mBroadcaster.once('boot_done', () => {
                     return false;
                 }
 
-                eventlog(99915);
+                const _download = () => {
+                    eventlog(99915);
+                    mobile.downloadOverlay.startDownload(nodeHandle);
+                }
 
-                mobile.downloadOverlay.startDownload(nodeHandle);
+                if (mega.ui.viewerOverlay.confirmDiscard) {
+                    return mobile.messageOverlay.show(
+                        l[22750],
+                        l[22753],
+                        'sprite-mobile-fm-mono icon-alert-triangle-thin-outline warning',
+                        [l[78]],
+                        false,
+                        true
+                    ).then(_download).catch(nop);
+                }
+
+                _download();
             }
         },
         // Phase 2
@@ -498,7 +575,8 @@ mBroadcaster.once('boot_done', () => {
                 if (!validateUserAction()) {
                     return false;
                 }
-
+                mobile.nodeSelector.registerPreviousViewNode();
+                mega.ui.viewerOverlay.hide();
                 mobile.nodeSelector.show('move', nodeHandle);
             }
         },
@@ -511,7 +589,8 @@ mBroadcaster.once('boot_done', () => {
                 if (!validateUserAction()) {
                     return false;
                 }
-
+                mobile.nodeSelector.registerPreviousViewNode();
+                mega.ui.viewerOverlay.hide();
                 mobile.nodeSelector.show('copy', nodeHandle);
             }
         },

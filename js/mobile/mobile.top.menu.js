@@ -18,7 +18,12 @@ class MegaMobileTopMenu extends MegaMobileComponent {
             icon: 'sprite-fm-illustration-wide img-mega-logo',
             iconSize: 24
         });
-        megaLink.on('tap.home', () => {
+        megaLink.on('tap.home', async() => {
+
+            if (mega.ui.viewerOverlay.confirmDiscard && !await mega.ui.viewerOverlay.confirmDiscard()) {
+                return false;
+            }
+
             loadSubPage(u_attr ? 'fm' : 'start');
 
             if (mega.ui.topmenu.visible) {

@@ -24,10 +24,20 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
             icon: 'sprite-mobile-fm-mono icon-arrow-left-thin-outline',
             iconSize: 24
         });
-        backLink.on('tap.back', () => {
+        backLink.on('tap.back', async() => {
+
+            if (this.mode === 'text') {
+                document.activeElement.blur();
+            }
+
+            if (typeof this.confirmDiscard === 'function' && !await this.confirmDiscard()) {
+                return false;
+            }
+
             if (this.nodeComponent && this.nodeComponent.previewable) {
                 history.back();
             }
+
             this.hide();
         });
 
@@ -46,6 +56,10 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
 
                 this.trigger('pauseStreamer');
 
+                if (this.mode === 'text') {
+                    document.activeElement.blur();
+                }
+
                 mega.ui.contextMenu.show(this.nodeComponent.handle);
             }
             return false;
@@ -58,6 +72,21 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
                 event.preventDefault();
             }
         });
+    }
+
+    get mode() {
+
+        if (!this.visible) {
+            return false;
+        }
+        else if (this.nodeComponent.previewable) {
+            return this.nodeComponent.previewable;
+        }
+        else if (this.isInfo) {
+            return 'info';
+        }
+
+        return 'normal';
     }
 
     get visible() {
@@ -189,7 +218,12 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
         }
         window.removeEventListener('popstate', this._hide);
 
+        if (window.textEditorVisible) {
+            mega.textEditorUI.doClose();
+        }
+
         delete this._hide;
+        delete this.versionHandle;
         delete this.nodeComponent;
         delete this.isInfo;
     }
@@ -215,7 +249,7 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
      * @returns {void}
      */
     async updateContent(nodeHandle) {
-        const isPreviewable = this.nodeComponent.previewable && !this.isInfo;
+        const isPreviewable = !this.isInfo && this.nodeComponent.previewable;
         const isLink = this.nodeComponent.node.link;
         const downloadSupport = await MegaMobileViewOverlay.checkSupport(this.nodeComponent.node);
 
@@ -242,9 +276,10 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
         }
 
         // Hide context button
-        this.domNode.querySelector('.context-btn').classList.remove('hidden');
+        const textBlock = this.domNode.querySelector('.media-viewer-container .text-editor-container');
+        textBlock.classList.add('hidden');
 
-        if (isPreviewable) {
+        if (isPreviewable && isPreviewable !== 'text') {
             this.domNode.querySelector('.media-viewer-container .content').classList.remove('hidden');
             this.domNode.querySelector('.media-viewer-container .content-info').classList.add('hidden');
         }
@@ -267,6 +302,10 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
             if (this.isInfo) {
                 this.domNode.querySelector('.context-btn').classList.add('hidden');
                 this.domNode.querySelector('.video-controls').classList.add('hidden');
+            }
+            else {
+                this.domNode.querySelector('.context-btn').classList.remove('hidden');
+                this.domNode.querySelector('.video-controls').classList.remove('hidden');
             }
 
             // Set default
@@ -304,6 +343,59 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
                     M.renderPathBreadcrumbs(nodeHandle, true);
                 }
             }
+
+            if (isPreviewable === 'text') {
+
+                infoNode.classList.add('hidden');
+                textBlock.classList.remove('hidden');
+                const contentBlock = textBlock.querySelector('.content');
+                contentBlock.classList.add('v-hidden');
+                loadingDialog.show();
+
+                this.bottomBar.actions[0].disabled = true;
+
+                mega.fileTextEditor.getFile(nodeHandle)
+                    .then(data => 
+                        mega.textEditorUI.setupEditor(
+                            this.nodeComponent.name,
+                            data,
+                            nodeHandle,
+                            isLink
+                        )
+                    )
+                    .then(() => {
+
+                        contentBlock.classList.remove('v-hidden');
+
+                        const changeHandler = () => {
+                            this.confirmDiscard = () => mobile.messageOverlay.show(
+                                l.file_request_confirm_close_page,
+                                l.file_request_discard_changes,
+                                'sprite-mobile-fm-mono icon-alert-triangle-thin-outline warning',
+                                [l.file_request_discard_btn],
+                                false,
+                                true
+                            ).then(() => true).catch(() => false);
+
+                            this.bottomBar.actions[0].disabled = false;
+                        };
+
+                        this.versionHandle = '';
+
+                        mega.textEditorUI.editor.on('change', changeHandler);
+
+                        // Override for mobile version
+                        mega.textEditorUI.doClose = () => {
+                            mega.textEditorUI.editor.off('change', changeHandler);
+                            delete this.confirmDiscard;
+                            window.textEditorVisible = false;
+                        };
+                    })
+                    .catch(dump)
+                    .finally(() => {
+                        loadingDialog.hide();
+                    });
+            }
         }
     }
 
@@ -338,7 +430,7 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
      * Get actions depending of file parameters
      * @param {Boolean} downloadSupport File downloadable
      * @param {Boolean} isLink File Link
-     * @param {Boolean} isPreviewable File Previewable
+     * @param {String} isPreviewable File type of Previewable contents
      * @param {Boolean} isInfo File/folder information
      * @returns {Array} Array with applicable actions
      */
@@ -380,7 +472,9 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
 
             'slideshowButton': ['slideshow-button', 'icon-play-square-thin-outline', () => {
                 $('.media-viewer-container footer .v-btn.slideshow').trigger('click');
-            }]
+            }],
+
+            'saveTextButton': ['save-text-button', l[776], MegaMobileContextMenu.menuItems['.save-text'].onClick]
         };
 
         const shareBtn = M.currentrootid !== 'shares' && [buttons.sharelinkButton];
@@ -394,8 +488,32 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
         if (isInfo) {
             return shareBtn && [shareBtn];
         }
-        if (isPreviewable) {
+        if (isPreviewable && isPreviewable !== 'text') {
             return [shareBtn, [buttons.downloadButton, buttons.slideshowButton]];
+        }
+        if (isPreviewable === 'text' && this.nodeComponent.rights) {
+
+            const _origFunc = buttons.downloadButton[2];
+
+            buttons.downloadButton[2] = () => {
+
+                // If something is changed
+                if (this.confirmDiscard) {
+
+                    return mobile.messageOverlay.show(
+                        l[22750],
+                        l[22753],
+                        'sprite-mobile-fm-mono icon-alert-triangle-thin-outline warning',
+                        [l[78]],
+                        false,
+                        true
+                    ).then(_origFunc).catch(nop);
+                }
+
+                _origFunc();
+            };
+
+            return [[buttons.saveTextButton], [buttons.downloadButton]];
         }
         return [shareBtn, [buttons.downloadButton]];
     }

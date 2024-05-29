@@ -4384,11 +4384,12 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         let h = $(e.currentTarget).attr('id');
         const n = M.getNodeByHandle(h);
 
-        if (!n || M.getNodeShare(n).down) {
+        if (!n) {
+            return false;
+        }
+        else if (M.getNodeShare(n).down && n.t !== 1) {
             // Prevent to preview any kind of taken down files
-            if (n) {
-                contextMenuHandler.call(e.currentTarget, e);
-            }
+            contextMenuHandler.call(e.currentTarget, e);
             return false;
         }
 

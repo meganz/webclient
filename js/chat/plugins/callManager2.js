@@ -800,6 +800,20 @@
         onAudioSendDenied(msg) {
             this.chatRoom.trigger('onAudioSendDenied');
         }
+        onMicDisconnected() {
+            delay('call-mic-disconnect', () => {
+                const track = this.sfuClient.localAudioTrack();
+                if (!track) {
+                    return;
+                }
+                window.toaster.main.show({
+                    /* `Microphone switched to '%s'` */
+                    content: l.mic_switch_toast.replace('%s', track.label),
+                    icons: ['sprite-fm-mono icon-info'],
+                    classes: ['mic-change']
+                });
+            });
+        }
         toggleAudio() {
             this.sfuClient.muteAudio(!this.sfuClient.localAudioMuted());
             // when we are not a speaker, local audio track is never obtained, so the event is never fired

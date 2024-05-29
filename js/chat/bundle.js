@@ -1570,7 +1570,8 @@ function Chat() {
     CALL_LEFT: 'user_left_call',
     CALL_END: 'end_call',
     CALL_JOIN_WAITING: 'user_join_waiting',
-    RECONNECT: 'reconnecting'
+    RECONNECT: 'reconnecting',
+    SPEAKER_TEST: 'test_speaker'
   };
   this.options = {
     'delaySendMessageIfRoomNotAvailableTimeout': 3000,
@@ -1666,6 +1667,7 @@ function Chat() {
       'autoPurgeMaxMessagesPerRoom': 1024
     }
   };
+  this.SOUNDS.buffers = Object.create(null);
   this.plugins = {};
   self.filePicker = null;
   self._chatsAwaitingAps = {};
@@ -3605,6 +3607,30 @@ Chat.prototype.playSound = tryCatch((sound, options, stop) => {
   }
   return ion.sound.play(sound, options);
 });
+Chat.prototype.fetchSoundBuffer = async function (sound) {
+  if (this.SOUNDS.buffers[sound]) {
+    return this.SOUNDS.buffers[sound].slice();
+  }
+  let res = await M.xhr({
+    url: `${staticpath}sounds/${sound}.mp3`,
+    type: 'arraybuffer'
+  }).catch(() => {
+    console.warn('Failed to fetch sound .mp3 file', sound);
+  });
+  if (!res) {
+    res = await M.xhr({
+      url: `${staticpath}sounds/${sound}.ogg`,
+      type: 'arraybuffer'
+    }).catch(() => {
+      console.error('Failed to fetch sound .ogg file', sound);
+    });
+  }
+  if (!res) {
+    throw ENOENT;
+  }
+  this.SOUNDS.buffers[sound] = res.target.response.slice();
+  return res.target.response;
+};
 window.Chat = Chat;
 if (false) {}
 const chat = {
@@ -23022,7 +23048,6 @@ class Call extends mixins.w9 {
                         theme-dark-forced
                         call-action
                         round
-                        large
                         recording-start
                         ${isOnHold ? 'disabled' : ''}
                     `
@@ -23268,6 +23293,7 @@ class Call extends mixins.w9 {
       peers,
       chatRoom,
       recorder,
+      hovered,
       onRecordingToggle: () => this.setState({
         recorder: undefined
       }, () => call.sfuClient.recordingStop()),
@@ -26472,10 +26498,12 @@ const react0 = REQ_.n(react0__);
 const _mixins1__ = REQ_(137);
 const _button_jsx3__ = REQ_(959);
 const _stream_jsx4__ = REQ_(415);
-const _micObserver_jsx6__ = REQ_(772);
-const _permissionsObserver_jsx7__ = REQ_(542);
+const _micObserver_jsx7__ = REQ_(772);
+const _permissionsObserver_jsx8__ = REQ_(542);
 const _call_jsx5__ = REQ_(3);
 const _hostsObserver_jsx2__ = REQ_(972);
+const _ui_dropdowns_jsx6__ = REQ_(911);
+
 
 
 
@@ -26508,7 +26536,10 @@ class StreamControls extends _mixins1__.w9 {
     };
     this.state = {
       endCallOptions: false,
-      endCallPending: false
+      endCallPending: false,
+      devices: {},
+      audioSelectDropdown: false,
+      videoSelectDropdown: false
     };
     this.LeaveButton = (0,_hostsObserver_jsx2__.C)(({
       hasHost,
@@ -26535,9 +26566,28 @@ class StreamControls extends _mixins1__.w9 {
     });
     this.handleMousedown = ({
       target
-    }) => this.endContainerRef && this.endContainerRef.current && this.endContainerRef.current.contains(target) ? null : this.isMounted() && this.setState({
-      endCallOptions: false
-    });
+    }) => {
+      if (!this.isMounted()) {
+        return;
+      }
+      const state = {};
+      const {
+        audioSelectDropdown,
+        videoSelectDropdown
+      } = this.state;
+      const $target = $(target);
+      const isOpenerParent = (audioSelectDropdown || videoSelectDropdown) && $target.parents('.input-source-opener').length;
+      if (audioSelectDropdown && $target.parents('.audio-sources').length === 0 && !isOpenerParent) {
+        state.audioSelectDropdown = false;
+      }
+      if (videoSelectDropdown && $target.parents('.video-sources').length === 0 && !isOpenerParent) {
+        state.videoSelectDropdown = false;
+      }
+      if (!(this.endContainerRef && this.endContainerRef.current && this.endContainerRef.current.contains(target))) {
+        state.endCallOptions = false;
+      }
+      this.setState(state);
+    };
     this.renderDebug = () => {
       return react0().createElement("div", {
         className: "stream-debug",
@@ -26641,14 +26691,253 @@ class StreamControls extends _mixins1__.w9 {
         }
       }), react0().createElement("span", null, l.end_button));
     };
+    this.handleDeviceChange = () => {
+      this.micDefaultRenamed = false;
+      this.updateMediaDevices().always(devices => {
+        let _sfuClient$localAudio, _oldDevices$audioIn;
+        if (!this.isMounted()) {
+          return;
+        }
+        const {
+          devices: oldDevices
+        } = this.state;
+        const {
+          sfuClient,
+          av
+        } = this.props.call;
+        if (av & Av.Audio && !SfuClient.micDeviceId && ((_sfuClient$localAudio = sfuClient.localAudioTrack()) == null ? void 0 : _sfuClient$localAudio.getCapabilities().deviceId) === 'default' && oldDevices != null && (_oldDevices$audioIn = oldDevices.audioIn) != null && _oldDevices$audioIn.default && devices.audioIn.default && oldDevices.audioIn.default !== devices.audioIn.default) {
+          for (const [key, value] of Object.entries(devices.audioIn)) {
+            if (key !== 'default' && devices.audioIn.default.indexOf(value) > -1) {
+              sfuClient.setMicDevice(key).then(() => SfuClient.persistMicDevice(null));
+              break;
+            }
+          }
+        }
+        this.setState({
+          devices,
+          audioSelectDropdown: false,
+          videoSelectDropdown: false
+        });
+      });
+    };
+  }
+  renderSoundDropdown() {
+    const {
+      hovered,
+      call
+    } = this.props;
+    const {
+      micDeviceId,
+      audioOutDeviceId
+    } = SfuClient;
+    const {
+      audioIn = {},
+      audioOut = {}
+    } = this.state.devices;
+    let selectedIn;
+    const inTrack = call.sfuClient.localAudioTrack();
+    if (inTrack) {
+      const {
+        deviceId
+      } = inTrack.getCapabilities();
+      selectedIn = deviceId in audioIn ? deviceId : 'default';
+      if (deviceId === 'default' && inTrack.label !== audioIn.default) {
+        this.micDefaultRenamed = inTrack.label;
+      }
+    } else if (micDeviceId) {
+      selectedIn = micDeviceId in audioIn ? micDeviceId : 'default';
+    } else {
+      selectedIn = 'default';
+    }
+    if (this.micDefaultRenamed) {
+      audioIn.default = this.micDefaultRenamed;
+    }
+    let selectedOut;
+    let peerPlayer;
+    if (call.sfuClient.peers.size) {
+      peerPlayer = call.sfuClient.peers.values().next().audioPlayer;
+    }
+    if (peerPlayer && peerPlayer.playerElem && peerPlayer.playerElem.sinkId) {
+      const {
+        sinkId
+      } = peerPlayer.playerElem;
+      selectedOut = sinkId in audioOut ? sinkId : 'default';
+    } else if (audioOutDeviceId) {
+      selectedOut = audioOutDeviceId in audioOut ? audioOutDeviceId : 'default';
+    } else {
+      selectedOut = 'default';
+    }
+    const mics = Object.entries(audioIn).map(([id, name]) => {
+      return react0().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
+        key: id,
+        onClick: () => {
+          call.sfuClient.setMicDevice(id === 'default' ? null : id);
+          this.setState({
+            audioSelectDropdown: false
+          });
+        }
+      }, react0().createElement(react0().Fragment, null, react0().createElement("div", {
+        className: "av-device-name"
+      }, name), selectedIn === id && react0().createElement("i", {
+        className: "sprite-fm-mono icon-check-small-regular-outline"
+      })));
+    });
+    const speakers = Object.entries(audioOut).map(([id, name]) => {
+      return react0().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
+        key: id,
+        onClick: () => {
+          Promise.resolve(call.sfuClient.setAudioOutDevice(id === 'default' ? null : id)).catch(dump);
+          this.setState({
+            audioSelectDropdown: false
+          });
+        }
+      }, react0().createElement(react0().Fragment, null, react0().createElement("div", {
+        className: "av-device-name"
+      }, name), selectedOut === id && react0().createElement("i", {
+        className: "sprite-fm-mono icon-check-small-regular-outline"
+      })));
+    });
+    return react0().createElement(_ui_dropdowns_jsx6__.Dropdown, {
+      className: "input-sources audio-sources theme-dark-forced",
+      active: hovered,
+      noArrow: true,
+      positionMy: "center top",
+      positionAt: "center bottom",
+      horizOffset: -50,
+      vertOffset: 16,
+      closeDropdown: () => this.setState({
+        audioSelectDropdown: false
+      })
+    }, react0().createElement("div", {
+      className: "source-label"
+    }, l.microphone), mics.length ? mics : react0().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
+      label: l.no_mics
+    }), react0().createElement("hr", null), react0().createElement("div", {
+      className: "source-label"
+    }, l.speaker), speakers.length ? speakers : react0().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
+      label: l.no_speakers
+    }), react0().createElement("hr", null), react0().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
+      icon: "sprite-fm-mono icon-volume-max-small-regular-outline",
+      label: l.test_speaker,
+      disabled: speakers.length === 0,
+      onClick: () => {
+        delay('call-test-speaker', () => {
+          this.testAudioOut().catch(ex => {
+            console.error('Failed to test audio on the selected device', ex, audioOutDeviceId);
+          });
+        });
+      }
+    }));
+  }
+  renderVideoDropdown() {
+    const {
+      hovered,
+      call
+    } = this.props;
+    const {
+      videoIn = {}
+    } = this.state.devices;
+    const {
+      camDeviceId
+    } = SfuClient;
+    let selectedCam;
+    if (call.sfuClient.localCameraTrack()) {
+      const {
+        deviceId
+      } = call.sfuClient.localCameraTrack().getCapabilities();
+      selectedCam = deviceId in videoIn ? deviceId : 'default';
+    } else if (camDeviceId) {
+      selectedCam = camDeviceId in videoIn ? camDeviceId : 'default';
+    } else {
+      selectedCam = 'default';
+    }
+    const cameras = Object.entries(videoIn).map(([id, name]) => {
+      return react0().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
+        key: id,
+        onClick: () => {
+          call.sfuClient.setCameraDevice(id === 'default' ? null : id);
+          this.setState({
+            videoSelectDropdown: false
+          });
+        }
+      }, react0().createElement(react0().Fragment, null, react0().createElement("div", {
+        className: "av-device-name"
+      }, name), selectedCam === id && react0().createElement("i", {
+        className: "sprite-fm-mono icon-check-small-regular-outline"
+      })));
+    });
+    return react0().createElement(_ui_dropdowns_jsx6__.Dropdown, {
+      className: "input-sources video-sources theme-dark-forced",
+      active: hovered,
+      noArrow: true,
+      positionMy: "center top",
+      positionAt: "center bottom",
+      horizOffset: -50,
+      vertOffset: 16,
+      closeDropdown: () => this.setState({
+        videoSelectDropdown: false
+      })
+    }, react0().createElement("div", {
+      className: "source-label"
+    }, l.camera_button), cameras.length ? cameras : react0().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
+      label: l.no_cameras
+    }));
+  }
+  async updateMediaDevices() {
+    let devices = await SfuClient.enumMediaDevices().catch(dump);
+    devices = devices || {
+      audioIn: {},
+      audioOut: {},
+      videoIn: {}
+    };
+    const removeEmptyDevices = devices => {
+      for (const key of Object.keys(devices)) {
+        if (!key || !devices[key]) {
+          delete devices[key];
+        }
+      }
+    };
+    removeEmptyDevices(devices.audioIn);
+    removeEmptyDevices(devices.audioOut);
+    removeEmptyDevices(devices.videoIn);
+    if (devices.audioIn.communications) {
+      delete devices.audioIn.communications;
+    }
+    return devices;
+  }
+  async testAudioOut() {
+    if (!SfuClient.audioOutDeviceId) {
+      return megaChat.playSound(megaChat.SOUNDS.SPEAKER_TEST);
+    }
+    const currentDevices = await this.updateMediaDevices();
+    if (currentDevices.audioOut && !(SfuClient.audioOutDeviceId in currentDevices.audioOut)) {
+      return megaChat.playSound(megaChat.SOUNDS.SPEAKER_TEST);
+    }
+    const ctx = new AudioContext({
+      sinkId: SfuClient.audioOutDeviceId
+    });
+    if (ctx.state !== 'running') {
+      throw new Error('The audio context failed to start');
+    }
+    const soundBuffer = await megaChat.fetchSoundBuffer(megaChat.SOUNDS.SPEAKER_TEST);
+    const buffer = await ctx.decodeAudioData(soundBuffer);
+    const gain = ctx.createGain();
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(gain);
+    gain.connect(ctx.destination);
+    gain.gain.value = 0.07;
+    source.start();
   }
   componentWillUnmount() {
     super.componentWillUnmount();
     document.removeEventListener('mousedown', this.handleMousedown);
+    navigator.mediaDevices.removeEventListener('devicechange', this.handleDeviceChange);
   }
   componentDidMount() {
     super.componentDidMount();
     document.addEventListener('mousedown', this.handleMousedown);
+    navigator.mediaDevices.addEventListener('devicechange', this.handleDeviceChange);
   }
   render() {
     const {
@@ -26665,12 +26954,19 @@ class StreamControls extends _mixins1__.w9 {
       blocked,
       renderBlockedWarning
     } = this.props;
+    const {
+      audioSelectDropdown,
+      videoSelectDropdown
+    } = this.state;
     const avFlags = call.av;
     const isOnHold = avFlags & Av.onHold;
     return react0().createElement(react0().Fragment, null, blocked && renderBlockedWarning(), react0().createElement("div", {
       className: StreamControls.NAMESPACE
     }, d && localStorage.callDebug ? this.renderDebug() : '', react0().createElement("ul", null, react0().createElement("li", {
-      className: isOnHold ? 'disabled' : '',
+      className: `
+                                ${isOnHold ? 'disabled' : ''}
+                                with-input-selector
+                            `,
       onClick: () => {
         if (isOnHold) {
           return;
@@ -26688,8 +26984,32 @@ class StreamControls extends _mixins1__.w9 {
                                     ${avFlags & Av.Audio || isOnHold ? '' : 'with-fill'}
                                 `,
       icon: avFlags & Av.Audio ? 'icon-mic-thin-outline' : 'icon-mic-off-thin-outline'
-    }), react0().createElement("span", null, l.mic_button), signal ? null : renderSignalWarning(), hasToRenderPermissionsWarning(Av.Audio) ? renderPermissionsWarning(Av.Audio) : null), react0().createElement("li", {
-      className: isOnHold ? 'disabled' : '',
+    }), react0().createElement("span", null, l.mic_button), signal ? null : renderSignalWarning(), hasToRenderPermissionsWarning(Av.Audio) ? renderPermissionsWarning(Av.Audio) : null, react0().createElement("div", {
+      className: `input-source-opener button ${audioSelectDropdown ? 'active-dropdown' : ''}`,
+      onClick: ev => {
+        ev.stopPropagation();
+        if (this.state.audioSelectDropdown) {
+          return this.setState({
+            audioSelectDropdown: false
+          });
+        }
+        this.updateMediaDevices().always(devices => {
+          if (this.isMounted()) {
+            this.setState({
+              devices,
+              audioSelectDropdown: true,
+              videoSelectDropdown: false
+            });
+          }
+        });
+      }
+    }, react0().createElement("i", {
+      className: "sprite-fm-mono icon-arrow-up"
+    }))), audioSelectDropdown && this.renderSoundDropdown(), react0().createElement("li", {
+      className: `
+                                ${isOnHold ? 'disabled' : ''}
+                                with-input-selector
+                            `,
       onClick: () => {
         if (isOnHold) {
           return;
@@ -26707,7 +27027,28 @@ class StreamControls extends _mixins1__.w9 {
                                     ${avFlags & Av.Camera || isOnHold ? '' : 'with-fill'}
                                 `,
       icon: avFlags & Av.Camera ? 'icon-video-thin-outline' : 'icon-video-off-thin-outline'
-    }), react0().createElement("span", null, l.camera_button), hasToRenderPermissionsWarning(Av.Camera) ? renderPermissionsWarning(Av.Camera) : null), react0().createElement("li", {
+    }), react0().createElement("span", null, l.camera_button), hasToRenderPermissionsWarning(Av.Camera) ? renderPermissionsWarning(Av.Camera) : null, react0().createElement("div", {
+      className: `input-source-opener button ${videoSelectDropdown ? 'active-dropdown' : ''}`,
+      onClick: ev => {
+        ev.stopPropagation();
+        if (this.state.videoSelectDropdown) {
+          return this.setState({
+            videoSelectDropdown: false
+          });
+        }
+        this.updateMediaDevices().always(devices => {
+          if (this.isMounted()) {
+            this.setState({
+              devices,
+              audioSelectDropdown: false,
+              videoSelectDropdown: true
+            });
+          }
+        });
+      }
+    }, react0().createElement("i", {
+      className: "sprite-fm-mono icon-arrow-up"
+    }))), videoSelectDropdown && this.renderVideoDropdown(), react0().createElement("li", {
       className: isOnHold ? 'disabled' : '',
       onClick: () => {
         if (isOnHold) {
@@ -26743,7 +27084,7 @@ class StreamControls extends _mixins1__.w9 {
   }
 }
 StreamControls.NAMESPACE = 'stream-controls';
-const __WEBPACK_DEFAULT_EXPORT__ = (0,_mixins1__.Zz)(_micObserver_jsx6__.Q, _permissionsObserver_jsx7__.$)(StreamControls);
+const __WEBPACK_DEFAULT_EXPORT__ = (0,_mixins1__.Zz)(_micObserver_jsx7__.Q, _permissionsObserver_jsx8__.$)(StreamControls);
 
 },
 
@@ -35672,29 +36013,15 @@ module.exports = ReactDOM;
 REQ_.d(EXP_, {
 A: () => _applyDecoratedDescriptor
 });
-function _applyDecoratedDescriptor(target, property, decorators, descriptor, context) {
-  let desc = {};
-  Object.keys(descriptor).forEach((key) => {
-    desc[key] = descriptor[key];
-  });
-  desc.enumerable = !!desc.enumerable;
-  desc.configurable = !!desc.configurable;
-  if ('value' in desc || desc.initializer) {
-    desc.writable = true;
-  }
-  desc = decorators.slice().reverse().reduce((desc, decorator) => {
-    return decorator(target, property, desc) || desc;
-  }, desc);
-  if (context && desc.initializer !== void 0) {
-    desc.value = desc.initializer ? desc.initializer.call(context) : void 0;
-    desc.initializer = undefined;
-  }
-  if (desc.initializer === void 0) {
-    Object.defineProperty(target, property, desc);
-    desc = null;
-  }
-  return desc;
+function _applyDecoratedDescriptor(i, e, r, n, l) {
+  let a = {};
+  return Object.keys(n).forEach((i) => {
+    a[i] = n[i];
+  }), a.enumerable = !!a.enumerable, a.configurable = !!a.configurable, ("value" in a || a.initializer) && (a.writable = !0), a = r.slice().reverse().reduce((r, n) => {
+    return n(i, e, r) || r;
+  }, a), l && void 0 !== a.initializer && (a.value = a.initializer ? a.initializer.call(l) : void 0, a.initializer = void 0), void 0 === a.initializer && (Object.defineProperty(i, e, a), a = null), a;
 }
+
 
 },
 
@@ -35706,19 +36033,15 @@ REQ_.d(EXP_, {
 A: () => _extends
 });
 function _extends() {
-  _extends = Object.assign ? Object.assign.bind() : function (target) {
-    for (let i = 1; i < arguments.length; i++) {
-      const source = arguments[i];
-      for (const key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
+  return _extends = Object.assign ? Object.assign.bind() : function (n) {
+    for (let e = 1; e < arguments.length; e++) {
+      const t = arguments[e];
+      for (const r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]);
     }
-    return target;
-  };
-  return _extends.apply(this, arguments);
+    return n;
+  }, _extends.apply(null, arguments);
 }
+
 
 }
 

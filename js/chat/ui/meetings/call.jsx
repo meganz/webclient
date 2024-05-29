@@ -932,7 +932,6 @@ export default class Call extends MegaRenderMixin {
                         theme-dark-forced
                         call-action
                         round
-                        large
                         recording-start
                         ${isOnHold ? 'disabled' : ''}
                     `}>
@@ -1087,6 +1086,7 @@ export default class Call extends MegaRenderMixin {
                             peers={peers}
                             chatRoom={chatRoom}
                             recorder={recorder}
+                            hovered={hovered}
                             onRecordingToggle={() =>
                                 // TODO: method instead a prop
                                 this.setState({ recorder: undefined }, () => call.sfuClient.recordingStop())

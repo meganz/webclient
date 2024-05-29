@@ -4,7 +4,7 @@
 /******/ 	"use strict";
 /******/ 	// The require scope
 /******/ 	var __webpack_require__ = {};
-/******/ 	
+/******/
 /************************************************************************/
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
@@ -17,12 +17,12 @@
 /******/ 			}
 /******/ 		};
 /******/ 	})();
-/******/ 	
+/******/
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
 /******/ 	})();
-/******/ 	
+/******/
 /************************************************************************/
 var __webpack_exports__ = {};
 
@@ -2083,11 +2083,30 @@ class SfuClient {
                 console.log(client_kLogTag, "Getting local media...");
             }
         } while (0);
+        do {
+            if (window.d) {
+                console.log(client_kLogTag, "Device list:", await SfuClient.enumMediaDevices());
+            }
+        } while (0);
         if (gettingAudio) {
             const micId = localStorage.getItem(kMicDeviceLsKey);
-            const constraints = micId
-                ? Object.assign({ deviceId: micId }, SfuClient.kAudioCaptureOptions)
-                : SfuClient.kAudioCaptureOptions;
+            let constraints;
+            if (micId) {
+                constraints = Object.assign({ deviceId: micId }, SfuClient.kAudioCaptureOptions);
+                do {
+                    if (window.d) {
+                        console.log(client_kLogTag, `Requesting audio input with id '${micId}'...`);
+                    }
+                } while (0);
+            }
+            else {
+                constraints = SfuClient.kAudioCaptureOptions;
+                do {
+                    if (window.d) {
+                        console.log(client_kLogTag, "Requesting default audio input...");
+                    }
+                } while (0);
+            }
             promises.push(navigator.mediaDevices.getUserMedia({ audio: constraints })
                 .then(function (stream) {
                 let atrack = self._audioTrack = stream.getAudioTracks()[0];
@@ -2102,7 +2121,7 @@ class SfuClient {
                     atrack.onended = null;
                     do {
                         if (window.d) {
-                            console.warn(client_kLogTag, "Input audio track stopped: possibly device removed. Re-requesting audio input...");
+                            console.warn(client_kLogTag, `Input audio track '${atrack.label}' stopped: possibly device removed. Re-requesting audio input...`);
                         }
                     } while (0);
                     self._fire("onMicDisconnected");
@@ -2127,9 +2146,23 @@ class SfuClient {
         }
         if (gettingCam) {
             const camId = localStorage.getItem(kCamDeviceLsKey);
-            const constraints = camId
-                ? Object.assign({ deviceId: camId }, SfuClient.kVideoCaptureOptions)
-                : SfuClient.kVideoCaptureOptions;
+            let constraints;
+            if (camId) {
+                constraints = Object.assign({ deviceId: camId }, SfuClient.kVideoCaptureOptions);
+                do {
+                    if (window.d) {
+                        console.log(client_kLogTag, `Requesting video input with deviceId ${camId}...`);
+                    }
+                } while (0);
+            }
+            else {
+                constraints = SfuClient.kVideoCaptureOptions;
+                do {
+                    if (window.d) {
+                        console.log(client_kLogTag, "Requesting default video input...");
+                    }
+                } while (0);
+            }
             promises.push(navigator.mediaDevices.getUserMedia({ video: constraints })
                 .then(function (stream) {
                 let vtrack = self._cameraTrack = stream.getVideoTracks()[0];
@@ -2143,7 +2176,7 @@ class SfuClient {
                     vtrack.onended = null;
                     do {
                         if (window.d) {
-                            console.warn(client_kLogTag, "Input camera track stopped: possibly device removed. Re-requesting camera input...");
+                            console.warn(client_kLogTag, `Input video track ${vtrack.label} stopped: possibly device removed. Re-requesting camera input...`);
                         }
                     } while (0);
                     self._fire("onCameraDisconnected");

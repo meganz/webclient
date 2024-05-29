@@ -79,7 +79,8 @@ function Chat() {
         CALL_LEFT: 'user_left_call',
         CALL_END: 'end_call',
         CALL_JOIN_WAITING: 'user_join_waiting',
-        RECONNECT: 'reconnecting'
+        RECONNECT: 'reconnecting',
+        SPEAKER_TEST: 'test_speaker',
     };
 
     this.options = {
@@ -198,6 +199,7 @@ function Chat() {
             'autoPurgeMaxMessagesPerRoom': 1024
         }
     };
+    this.SOUNDS.buffers = Object.create(null);
 
     this.plugins = {};
 
@@ -3082,6 +3084,32 @@ Chat.prototype.playSound = tryCatch((sound, options, stop) => {
     }
     return ion.sound.play(sound, options);
 });
+
+/**
+ * Fetch an ArrayBuffer representation of the given sound.
+ *
+ * @param {string} sound The sound file to fetch the buffer of
+ * @returns {Promise} Resolves with the ArrayBuffer of the sound
+ * @see megaChat.SOUNDS
+ */
+Chat.prototype.fetchSoundBuffer = async function(sound) {
+    if (this.SOUNDS.buffers[sound]) {
+        return this.SOUNDS.buffers[sound].slice();
+    }
+    let res = await M.xhr({url: `${staticpath}sounds/${sound}.mp3`, type: 'arraybuffer'}).catch(() => {
+        console.warn('Failed to fetch sound .mp3 file', sound);
+    });
+    if (!res) {
+        res = await M.xhr({ url: `${staticpath}sounds/${sound}.ogg`, type: 'arraybuffer' }).catch(() => {
+            console.error('Failed to fetch sound .ogg file', sound);
+        });
+    }
+    if (!res) {
+        throw ENOENT;
+    }
+    this.SOUNDS.buffers[sound] = res.target.response.slice();
+    return res.target.response;
+};
 
 window.Chat = Chat;
 

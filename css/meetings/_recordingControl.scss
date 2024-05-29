@@ -18,25 +18,26 @@ div.recording-control {
 
     .record-label {
         display: block;
-        margin: 4px 0 0 0;
+        margin: 2px 0 0 0;
         font: var(--text-body2);
         color: var(--secondary-white);
         cursor: pointer;
     }
 
     .recording-start {
-        /* [...] */
+        width: 40px;
+        height: 40px;
 
         div {
-            width: 24px;
-            height: 24px;
+            width: 18px;
+            height: 18px;
             border-radius: 200px;
-            border: 3px solid var(--secondary-white);
+            border: 2px solid var(--secondary-white);
 
             i {
                 display: block;
-                width: 10px;
-                height: 10px;
+                width: 8px;
+                height: 8px;
                 background: var(--secondary-white);
                 border-radius: 200px;
             }

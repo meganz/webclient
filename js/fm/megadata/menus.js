@@ -426,7 +426,11 @@ MegaData.prototype.menuItems = async function menuItems() {
             delete items['.play-item'];
             delete items['.preview-item'];
             delete items['.edit-file-item'];
-            delete items['.open-item'];
+
+            if ($.selected.length > 1 || selNode.t !== 1) {
+                delete items['.open-item'];
+            }
+
             items['.dispute-item'] = 1;
         }
     }

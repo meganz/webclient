@@ -134,7 +134,13 @@ class MegaMobileContextMenu extends MegaMobileComponentGroup {
                 };
             }
 
-            items['.save-as-text'] = 1;
+            // if this is public link, remove save text feature
+            if (pfid || dlid || M.currentrootid === M.RubbishID) {
+                delete items['.save-text'];
+            }
+            else {
+                items['.save-as-text'] = 1;
+            }
         }
 
         for (let i = keys.length; i--;) {

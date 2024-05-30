@@ -3531,6 +3531,7 @@ lazy(MegaData.prototype, 'nodeShare', () => {
             }
             return;
         }
+        let updnode = false;
         debug(`Establishing node-share for ${h}`, s, [n]);
 
         if (typeof n.shares === 'undefined') {
@@ -3544,9 +3545,18 @@ lazy(MegaData.prototype, 'nodeShare', () => {
         }
         M.su[s.u][h] = 1;
 
+        // Restore Public link handle, we may do lose it from a move operation (d->t)
+        if (s.u === 'EXP' && !n.ph) {
+            n.ph = s.ph;
+            updnode = true;
+            debug('Restored lost public-handle...', s, n);
+        }
+
         if (n.t) {
             // update tree node flags
-            ufsc.addTreeNode(n);
+            if (!updnode) {
+                ufsc.addTreeNode(n);
+            }
         }
         else if (n.fa && s.u === 'EXP' && s.down) {
             debug('cleaning fa for taken-down node...', n.fa, [n], s);
@@ -3554,6 +3564,10 @@ lazy(MegaData.prototype, 'nodeShare', () => {
                 thumbnails.replace(n.h, null);
             }
             delete n.fa;
+            updnode = true;
+        }
+
+        if (updnode) {
             M.nodeUpdated(n);
         }
 

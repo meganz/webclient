@@ -149,6 +149,19 @@ class MobileSelectionRender extends MobileMegaRender {
                 buttonCondition: () =>
                     M.getNodeRights(M.currentdirid) && !M.isCircular(mobile.nodeSelector.selected, M.currentdirid)
             },
+            'saveTextTo': {
+                mode: 'folder',
+                submitText: l[776],
+                onSubmit: h => {
+
+                    mega.ui.saveTextAs.targetFolder = h;
+                    const origNode = M.getNodeByHandle(mobile.nodeSelector.selected);
+                    mega.ui.saveTextAs.show({name: origNode.name, t: origNode.t}, {noBtnDisable: true});
+                    return false;
+                },
+                tabs: moveCopyTabOpts,
+                buttonCondition: () => M.getNodeRights(M.currentdirid)
+            },
             'share': {
                 mode: 'file', // file mode is current not support in full as we only have design of folder mode.
                 submitText: l[60],
@@ -182,113 +195,135 @@ class MobileSelectionRender extends MobileMegaRender {
         };
     }
 }
+(mobile => {
 
-// Helper
-mobile.nodeSelector = {
+    'use strict';
 
-    active: false,
-    step: 0,
+    const _emitter = new MegaDataEmitter();
 
-    _popStateHandler: event => {
+    // Helper
+    mobile.nodeSelector = {
 
-        'use strict';
+        active: false,
+        step: 0,
+        on: _emitter.on,
+        one: _emitter.one,
+        off: _emitter.off,
+        trigger: _emitter.trigger,
+        rebind: _emitter.rebind,
 
-        if (event.state && !event.state.nodeSelector) {
-            mobile.nodeSelector.hide(false, true);
-        }
-    },
+        _popStateHandler: event => {
 
-    replaceHistory: function(page, state) {
-
-        'use strict';
-
-        const ns = mobile.nodeSelector;
-
-        // Note: NOT remove `/` on end of url param which used to trigger loadSubpage when selector visit origin folder
-        if (page === true) {
-            history.replaceState({subpage: state, nodeSelector: true}, '', `/fm/${ns.origin}/`);
-            ns.step--;
-        }
-        else {
-            history.pushState({subpage: page, nodeSelector: true}, '', `/fm/${ns.origin}/`);
-            ns.step++;
-        }
-    },
-
-    show: function(type, original, start) {
-
-        'use strict';
-
-        this.active = true;
-        this.origin = this.origin || M.currentdirid;
-        this.type = type;
-        this.step = 0;
-        this.selected = original;
-        this.selectedTree = M.getTreeHandles(this.selected);
-
-        start = start || M.RootID;
-
-        this.originalPHS = window.pushHistoryState;
-
-        window.pushHistoryState = this.replaceHistory;
-
-        if (this.origin === start) {
-            pushHistoryState(getCleanSitePath(), {nodeSelector: true});
-        }
-
-        window.addEventListener('popstate', this._popStateHandler);
-
-        mega.ui.header.closeButton.rebind('tap.close', () => {
-            this.hide();
-        });
-
-        M.openFolder(start, true).then(() => {
-
-            // When start page is same as current page, manually call update as loadSubpage will not trigger update.
-            if (page === `fm/${start}`) {
-                mega.ui.header.update();
+            if (event.state && !event.state.nodeSelector) {
+                mobile.nodeSelector.hide(false, true);
             }
-        });
-    },
+        },
 
-    hide: function(next, popstates) {
+        replaceHistory(page, state) {
 
-        'use strict';
+            const ns = mobile.nodeSelector;
 
-        if (!M.megaRender.selection) {
-
-            if (d) {
-                console.error('There is no active selection overlay to hide.');
+            // Note: DO NOT remove `/` on end of url param,
+            // which used to trigger loadSubpage when selector visit origin folder
+            if (page === true) {
+                history.replaceState({subpage: state, nodeSelector: true}, '', `/fm/${ns.origin}/`);
+                ns.step--;
             }
+            else {
+                history.pushState({subpage: page, nodeSelector: true}, '', `/fm/${ns.origin}/`);
+                ns.step++;
+            }
+        },
 
-            return;
-        }
+        show(type, original, start) {
 
-        window.removeEventListener('popstate', this._popStateHandler);
-        window.pushHistoryState = this.originalPHS;
-
-        // If this is not popstate event clear history stack
-        if (!popstates && this.step) {
-            history.go(this.step * -1);
+            this.active = true;
+            this.origin = this.origin || M.currentdirid;
+            this.type = type;
             this.step = 0;
-        }
-        this.active = false;
-        next = next || this.origin || M.RootID;
+            this.selected = original;
+            this.selectedTree = M.getTreeHandles(this.selected);
 
-        delete this.origin;
-        delete this.type;
-        delete this.selected;
-        delete this.selectedTree;
+            start = start || M.RootID;
 
-        onIdle(() => {
+            this.originalPHS = window.pushHistoryState;
 
-            M.openFolder(next, true).then(() => {
+            window.pushHistoryState = this.replaceHistory;
+
+            if (this.origin === start) {
+                pushHistoryState(getCleanSitePath(), {nodeSelector: true});
+            }
+
+            window.addEventListener('popstate', this._popStateHandler);
+
+            mega.ui.header.closeButton.rebind('tap.close', () => {
+                this.trigger('closeBtnClick');
+                this.hide();
+            });
+
+            M.openFolder(start, true).then(() => {
 
                 // When start page is same as current page, manually call update as loadSubpage will not trigger update.
-                if (page === `fm/${next}`) {
+                if (page === `fm/${start}`) {
                     mega.ui.header.update();
                 }
             });
-        });
-    }
-};
+        },
+
+        hide(next, popstates) {
+
+            if (!M.megaRender.selection) {
+
+                if (d) {
+                    console.error('There is no active selection overlay to hide.');
+                }
+
+                return;
+            }
+
+            window.removeEventListener('popstate', this._popStateHandler);
+            window.pushHistoryState = this.originalPHS;
+
+            // If this is not popstate event clear history stack
+            if (!popstates && this.step) {
+                history.go(this.step * -1);
+                this.step = 0;
+            }
+            this.active = false;
+            next = next || this.origin || M.RootID;
+
+            delete this.origin;
+            delete this.type;
+            delete this.selected;
+            delete this.selectedTree;
+
+            onIdle(() => {
+
+                M.openFolder(next, true).then(() => {
+
+                    // When start page is same as current page,
+                    // manually call update as loadSubpage will not trigger update.
+                    if (page === `fm/${next}`) {
+                        mega.ui.header.update();
+                    }
+                });
+            });
+
+            this.off('closeBtnClick');
+        },
+
+        // Register previous node for the case user cancel and need to go back.
+        registerPreviousViewNode() {
+
+            if (mega.ui.viewerOverlay.visible) {
+
+                const _prevHandle = mega.ui.viewerOverlay.nodeComponent.handle;
+
+                this.one('closeBtnClick.saveAsDialog', () => {
+                    onIdle(() => mega.ui.viewerOverlay.show(_prevHandle));
+                });
+            }
+        }
+    };
+})(window.mobile);
+

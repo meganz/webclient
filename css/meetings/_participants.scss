@@ -93,7 +93,7 @@
                 border-radius: 4px;
                 width: 24px;
                 height: 24px;
-                margin: 7px 0 0 0;
+                margin: 4px 0 0 0;
 
                 span {
                     position: absolute;
@@ -111,8 +111,8 @@
 
             .name {
                 overflow: hidden;
-                width: calc(100% - 90px);
-                padding-top: 8px;
+                width: calc(100% - 140px);
+                padding-top: 6px;
                 padding-inline-start: 10px;
 
                 body.rtl & {
@@ -161,9 +161,7 @@
             }
 
             .status {
-                display: flex;
-                align-items: center;
-                margin: 5px 0 0 auto;
+                margin: 7px 0 0 auto;
 
                 body.rtl & {
                     float: left;
@@ -171,9 +169,11 @@
 
                 .recording-status {
                     display: block;
+                    float: left;
                     position: relative;
                     width: 16px;
                     height: 16px;
+                    margin: 1px 0 0;
                     border-radius: 200px;
                     background: var(--secondary-red);
                     animation: fadeInOutLoopSubtle 4s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
@@ -193,7 +193,8 @@
 
                 i {
                     position: relative;
-                    display: inline-block;
+                    display: block;
+                    float: left;
                     margin-inline-start: 10px;
 
                     --icon-size: 18px;
@@ -205,9 +206,7 @@
 
             // TODO: duplicated code
             .participants-menu {
-                display: block;
-                text-align: right;
-                width: max-content;
+                float: left;
 
                 &:hover .participants-menu-content {
                     display: block;
@@ -236,6 +235,7 @@
                     i {
                         --icon-size: 24px;
                         --mask-color: var(--icon-rest);
+                        margin: -2px 0 0;
                     }
                 }
 

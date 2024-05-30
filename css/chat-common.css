@@ -4,6 +4,7 @@
 }
 .section.conversations {
     height: calc(100% - 48px);
+    transition: 200ms linear;
 }
 .section.conversations .fm-right-files-block {
     height: 100%;
@@ -1371,4 +1372,49 @@ button.fm-empty-button {
 }
 .mega-dialog.scheduled-description-dialog span {
     overflow-wrap: break-word;
+}
+.in-call .global-toast-container .toast-slot.mic-change {
+    position: relative;
+    top: -100px;
+}
+.dropdown.input-sources {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0 16px 8px;
+    position: absolute;
+    margin: 8px 0 0;
+    border-radius: 12px;
+    border: var(--context-menu-border);
+    background: var(--surface-main);
+    box-shadow: var(--dropdown-shadow);
+    width: 320px;
+}
+.dropdown.input-sources div {
+    width: 100%;
+}
+.dropdown.input-sources .dropdown-item {
+    padding: 0 4px;
+}
+.dropdown.input-sources .dropdown-item i {
+    float: right;
+    --icon-size: 16px;
+}
+.dropdown.input-sources hr {
+    --divider-color: var(--stroke-grey-2);
+}
+.dropdown.input-sources .dropdown-item span {
+    min-width: calc(100% - 16px);
+}
+.dropdown.input-sources div.source-label {
+    color: var(--text-color-high);
+    font: var(--text-body1);
+    margin: 16px 0 8px;
+    padding: 0 4px;
+}
+.dropdown.input-sources div.av-device-name {
+    display: inline-block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: calc(100% - 32px);
 }

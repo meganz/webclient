@@ -8,6 +8,7 @@
     margin: 0;
     display: flex;
     width: 100%;
+    transition: 200ms linear;
 }
 .shares-tabs-bl {
     padding: 14px 4px 0;

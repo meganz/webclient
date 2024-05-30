@@ -65,7 +65,50 @@ class MegaMobileFooter extends MegaMobileComponent {
                     }
                     mobile.createFolder.show();
                 }
-            }
+            },
+            {
+                text: l[23047],
+                icon: 'sprite-mobile-fm-mono icon-file-plus-02-thin-outline',
+                binding() {
+
+                    if (!validateUserAction()) {
+                        return false;
+                    }
+
+                    if (!mega.ui.saveTextAs) {
+                        mega.ui.saveTextAs = new MobileNodeNameControl({type: 'saveTextAs'});
+                    }
+
+                    mega.ui.saveTextAs.onSubmit = async nn => {
+
+                        loadingDialog.show('newTextFile');
+
+                        const {isFull} = await M.getStorageQuota();
+
+                        if (isFull) {
+                            ulmanager.ulShowOverStorageQuotaDialog();
+                            loadingDialog.hide('newTextFile');
+                            return false;
+                        }
+
+                        const nh = await Promise.resolve(M.addNewFile(nn, M.currentdirid)).catch(nop);
+
+                        if (nh) {
+
+                            const msg = escapeHTML(
+                                M.currentdirid === M.RootID ? l.mobile_save_as_toast_cloud : l.mobile_save_as_toast
+                            ).replace('%1', nn).replace('%2', M.d[M.currentdirid].name);
+
+                            mega.ui.viewerOverlay.show(nh);
+                            mega.ui.toast.show(msg, 4);
+                        }
+
+                        loadingDialog.hide('newTextFile');
+                    };
+
+                    mega.ui.saveTextAs.show({name: '.txt', t: 0});
+                }
+            },
         ];
         if (mega.flags.ab_ads) {
             mega.commercials.init();

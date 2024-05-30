@@ -514,7 +514,7 @@ export class DropdownEmojiSelector extends MegaRenderMixin {
             if (self.state.loadFailed === true) {
                 popupContents = <div className="loading">{l[1514]}</div>;
             }
-            else if (self.state.isLoading === true && !self.data_emojiByCategory) {
+            else if (this.state.isLoading || !this.data_emojiByCategory || !this.data_categories) {
                 popupContents = <div className="loading">{l[5533]}</div>;
             }
             else {

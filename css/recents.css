@@ -5,6 +5,7 @@
     height: calc(100% - 48px);
     overflow: hidden;
     position: relative;
+    transition: 200ms linear;
 }
 .rtl .fm-recents.container {
     direction: rtl;

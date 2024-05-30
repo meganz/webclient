@@ -11,7 +11,8 @@ mobile.cloud = {
         'use strict';
 
         // jQuery selectors
-        var $otherPages = $('> div:not(.hidden):not(.file-manager-block)', '#fmholder');
+        var $otherPages = $('> div:not(.hidden):not(.file-manager-block):not(.dark-overlay):not(.loading-spinner)',
+                            '#fmholder');
         var $excludes = $('.top-menu-popup, .mega-header, .mega-top-menu, .mobile-rack', mainlayout);
 
         // Render the file manager header, folders, files and footer
@@ -277,10 +278,11 @@ mobile.cloud = {
      */
     scrollToFile: function(handle, animationTime) {
         'use strict';
-        var elm = document.getElementById(handle);
 
         animationTime = animationTime === 0 ? 0 : (animationTime || 500);
-        $('.mobile.fm-scrolling').animate({scrollTop: elm && elm.offsetTop || 0}, animationTime);
+        $(`#${handle}`).closest('.megaList, .fm-scrolling').animate({
+            scrollTop: elm && elm.offsetTop || 0
+        }, animationTime);
     },
 
     /**

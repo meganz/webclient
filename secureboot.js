@@ -1,9 +1,7 @@
 // Release version information is replaced by the build scripts
 var buildVersion = { website: '', chrome: '', firefox: '', commit: '', timestamp: '', dateTime: '' };
 
-var m, tmp;
 var browserUpdate = 0;
-var apipath;
 var pageLoadTime;
 var silent_loading = false;
 var cookiesDisabled = false;
@@ -11,20 +9,21 @@ var storageQuotaError = false;
 var lastactive = new Date().getTime();
 var seqno = Math.ceil(Math.random()*1000000000);
 var staticpath = null;
-var cmsStaticPath = null;
 var defaultStaticPath = 'https://eu.static.mega.co.nz/4/';
-var defaultCMSStaticPath = 'https://eu.static.mega.co.nz/cms/';
 var ua = window.navigator.userAgent.toLowerCase();
 var uv = window.navigator.appVersion.toLowerCase();
 var storage_version = '1'; // clear localStorage when version doesn't match
 var contenterror = 0;
 var nocontentcheck = false;
 var l, d = false;
+var loginresponse, voucher, dl_res, gmf_res;
+var tmp, page, apipath, hashLogic, u_storage, u_sid;
 
 // Cache location.search parameters early as the URL may get rewritten later
 var locationSearchParams = location.search;
 
 var is_electron = false;
+var is_eplusplus = false;
 if (typeof process !== 'undefined') {
     var mll = process.moduleLoadList || [];
 
@@ -63,36 +62,13 @@ if (is_android && !is_huawei) {
         'jef-nx9', 'jny-lx2', 'lio-an00m', 'lio-l29', 'lio-n29', 'med-lx9', 'noh-an00', 'noh-lg', 'noh-nx9',
         'nop-an00', 'oce-an10', 'oce-an50', 'tas-l29', 'tet-an00'
     ];
-    for (m = tmp.length; m--;) {
+    for (var m = tmp.length; m--;) {
         if (ua.indexOf(tmp[m]) > 0) {
             is_huawei = tmp[m];
             break;
         }
     }
 }
-
-// @todo get rid of 'm' around the codebase!
-m = !!is_mobile;
-
-tmp = getCleanSitePath();
-var is_selenium = !ua.indexOf('mozilla/5.0 (selenium; ');
-var is_embed = String(location.pathname).substr(0, 6) === '/embed' || tmp.substr(0, 2) === 'E!';
-var is_drop = location.pathname === '/filerequest' || location.pathname === '/drop' || tmp.substr(0, 2) === 'D!';
-var is_megadrop = (tmp.substr(0, 9) === 'megadrop/' || tmp.substr(0, 12) === 'filerequest/') && tmp.split('/')[1];
-var is_iframed = is_embed || is_drop || is_megadrop;
-var is_karma = !is_iframed && /^localhost:987[6-9]/.test(window.top.location.host);
-
-var location_sub = document.location.href.substr(0, 16);
-var is_chrome_web_ext = location_sub === 'chrome-extension' || location_sub === 'ms-browser-exten';
-var is_firefox_web_ext = location_sub === 'moz-extension://';
-var is_extension = is_electron || is_chrome_web_ext || is_firefox_web_ext;
-var is_microsoft = /msie|edge|trident/i.test(ua);
-var is_bot = !is_extension && /bot|crawl/i.test(ua);
-var is_webcache = location.host === 'webcache.googleusercontent.com';
-var is_chatlink = tmp.substr(0, 5) === 'chat/' && tmp.replace(/[#?].*$/, '').split('/')[1];
-var is_livesite = location.host === 'mega.nz' || location.host === 'mega.io'
-    || location.host === 'smoketest.mega.nz' || is_extension;
-var is_eplusplus = false;
 
 var staticServerLoading = {
     loadFailuresOriginal: 0,        // Count of failures on the original static server (from any thread)
@@ -169,14 +145,104 @@ Object.defineProperties(self, {
     }
 });
 
+/**
+ * Check whether the provided `page` points to a public link
+ * @param {String} [page] optional page to check.
+ * @returns {String|Array|Boolean} page for v1, [public-handle, key] for v2+, or false
+ */
+function isPublicLink(page) {
+    'use strict';
+    var ptr = (page = getCleanSitePath(page)).split(/[^\w-]/).filter(String);
+
+    if (page[0] === '!') {
+
+        ptr.unshift('file');
+    }
+    else if (isPublicLink.upd[ptr[0]]) {
+
+        ptr[0] = isPublicLink.upd[ptr[0]];
+    }
+    else if (isPublicLink.v1[page.slice(0, 2)]) {
+
+        return page;
+    }
+
+    if (ptr.length > 1 && page.length > isPublicLink.v2[ptr[0]]) {
+
+        return Object.defineProperties(ptr.slice(1), {
+            dl: {
+                value: ptr[0] === 'file' || ptr[0] === 'embed'
+            },
+            pf: {
+                value: ptr[0] === 'folder' || ptr[0] === 'collection'
+            },
+            link: {
+                value: ptr[0] + '/' + ptr[1] + '#' + ptr[2] + (ptr.length > 3 ? '/' + ptr.slice(3).join('/') : '')
+            }
+        });
+    }
+
+    return false;
+}
+
+Object.defineProperties(isPublicLink, {
+    v1: {
+        value: {'F!': 1, 'P!': 1, 'E!': 1, 'D!': 1}
+    },
+    v2: {
+        value: {file: 6, folder: 8, embed: 7, chat: 6, collection: 12}
+    },
+    upd: {
+        value: {F: 'folder', E: 'embed', D: 'filerequest'}
+    }
+});
+
 try {
 // auto-shield
     freeze(freeze);
     freeze(lazy);
+
+    freeze(isPublicLink.v1);
+    freeze(isPublicLink.v2);
+    freeze(isPublicLink.upd);
+    freeze(isPublicLink);
+
+    delete String.prototype.big;
+    delete String.prototype.sup;
+    delete String.prototype.sub;
+    delete String.prototype.bold;
+    delete String.prototype.link;
+    delete String.prototype.blink;
+    delete String.prototype.small;
+    delete String.prototype.fixed;
+    delete String.prototype.anchor;
+    delete String.prototype.strike;
+    delete String.prototype.italics;
+    delete String.prototype.fontsize;
+    delete String.prototype.fontcolor;
 }
 catch (ex) {
     console.warn('unsecure browser environment...', ex);
 }
+
+tmp = document.location.href.substr(0, 16);
+var is_chrome_web_ext = tmp === 'chrome-extension' || tmp === 'ms-browser-exten';
+var is_firefox_web_ext = tmp === 'moz-extension://';
+var is_extension = hashLogic = is_electron || is_chrome_web_ext || is_firefox_web_ext;
+
+tmp = getCleanSitePath();
+var is_embed = tmp.substr(0, 6) === 'embed/' || tmp.substr(0, 2) === 'E!';
+var is_drop = tmp.substr(0, 12) === 'filerequest#' || tmp.substr(0, 4) === 'drop' || tmp.substr(0, 2) === 'D!';
+var is_megadrop = (tmp.substr(0, 9) === 'megadrop/' || tmp.substr(0, 12) === 'filerequest/') && tmp.split('/')[1];
+var is_chatlink = tmp.substr(0, 5) === 'chat/' && tmp.replace(/[#?].*$/, '').split('/')[1];
+var is_iframed = is_embed || is_drop || is_megadrop;
+var is_karma = !is_iframed && /^localhost:987[6-9]/.test(window.top.location.host);
+
+var is_microsoft = /msie|edge|trident/i.test(ua);
+var is_bot = !is_extension && /bot|crawl/i.test(ua);
+var is_webcache = location.host === 'webcache.googleusercontent.com';
+var is_livesite = location.host === 'mega.nz' || location.host === 'mega.io'
+    || location.host === 'smoketest.mega.nz' || is_extension;
 
 function getMobileStoreLink() {
     'use strict';
@@ -255,11 +321,6 @@ function openExternalLink(aExternalLink) {
 
 function getSitePath() {
     'use strict';
-    var hash = location.hash.replace('#', '');
-
-    if (hashLogic || isPublicLink(hash)) {
-        return '/' + hash;
-    }
 
     if (is_webcache) {
         var m = String(location.href).match(/mega\.nz\/([\w-]+)/);
@@ -268,11 +329,7 @@ function getSitePath() {
         }
     }
 
-    if (isPublicLinkV2(document.location.pathname)) {
-        return document.location.pathname + document.location.hash;
-    }
-
-    return hash && location.pathname.substr(0, 6) === '/chat/' ? location.pathname + '#' + hash : location.pathname;
+    return self.hashLogic ? '/' + location.hash.replace('#', '') : location.pathname + location.hash;
 }
 
 // remove dangling characters from the pathname/hash
@@ -377,23 +434,6 @@ function getCleanSitePath(path) {
     return path[0];
 }
 
-// Check whether the provided `page` points to a public link
-function isPublicLink(page) {
-    'use strict';
-    page = getCleanSitePath(page);
-
-    var types = {'F!': 1, 'P!': 1, 'E!': 1, 'D!': 1};
-    return (page[0] === '!' || types[page.substr(0, 2)]) ? page : false;
-}
-
-function isPublicLinkV2(page) {
-    'use strict';
-    page = getCleanSitePath(page);
-
-    var types = {file: 6, folder: 8, embed: 7, collection: 12};
-    return page.length > types[page.split('/')[0]];
-}
-
 // Safer wrapper around decodeURIComponent
 function mURIDecode(path) {
     path = String(path);
@@ -451,7 +491,7 @@ function geoStaticPath(cms) {
     }
     catch (ex) {}
 
-    return cms ? defaultCMSStaticPath : defaultStaticPath;
+    return defaultStaticPath;
 }
 
 var myURL = window.URL;
@@ -567,7 +607,6 @@ if (!browserUpdate) try
 
     if (location.host === 'smoketest.mega.nz') {
         staticpath = 'https://smoketest.static.mega.nz/4/';
-        cmsStaticPath = 'https://smoketest.static.mega.nz/cms/';
         defaultStaticPath = staticpath;
         d = 1;
         sessionStorage.rad = 1;
@@ -583,8 +622,6 @@ if (!browserUpdate) try
     }
 
     staticpath = localStorage.staticpath || staticpath || geoStaticPath(false);
-    cmsStaticPath = localStorage.cms || cmsStaticPath || geoStaticPath(true);
-
     apipath = localStorage.apipath || 'https://g.api.mega.co.nz/';
 
     // If dark mode flag is enabled, change styling
@@ -593,7 +630,7 @@ if (!browserUpdate) try
     }
 }
 catch(e) {
-    if (!m || !cookiesDisabled) {
+    if (!is_mobile || !cookiesDisabled) {
         var extraInfo = '';
         if (storageQuotaError) {
             extraInfo = "\n\nTip: We've detected this issue is likely caused by " +
@@ -973,11 +1010,6 @@ if (!window.AudioContext && window.webkitAudioContext) {
 // nb: can overflow..
 Object.defineProperty(window, 'mIncID', {value: 0, writable: true});
 
-var hashLogic = false;
-if (localStorage.hashLogic) hashLogic=true;
-if (localStorage.testMobileSite) is_mobile = m = true;
-if (typeof history == 'undefined') hashLogic=true;
-
 var bootstaticpath = staticpath;
 var urlrootfile = '';
 
@@ -989,13 +1021,15 @@ else if (is_karma) {
     nocontentcheck = true;
     bootstaticpath = 'base/';
 }
-
 // Disable hash checking if requested for development
 /*
 else if (localStorage.disablecontentcheck) {
     nocontentcheck = true;
 }
 //*/
+
+is_mobile = is_mobile || localStorage.testMobileSite;
+hashLogic = hashLogic || localStorage.hashLogic || typeof history == 'undefined';
 
 tmp = getCleanSitePath(location.hash || undefined);
 if (tmp.substr(0, 12) === 'sitetransfer') {
@@ -1054,7 +1088,8 @@ if (!browserUpdate && is_extension)
             tmp = typeof chrome.runtime.getManifest === 'function' && chrome.runtime.getManifest() || false;
 
             if (tmp.version === '109101.103.97') {
-                urlrootfile = 'webclient/index.html';
+                d = d > 0 ? d : 1;
+                urlrootfile = 'webclient/secure.html';
 
                 if (typeof chrome.runtime.getPackageDirectoryEntry === 'function') {
                     chrome.runtime.getPackageDirectoryEntry(function(root) {
@@ -1071,7 +1106,8 @@ if (!browserUpdate && is_extension)
             }
         }
 
-        bootstaticpath = chrome.extension.getURL(urlrootfile.split('/')[0] + '/');
+        Object.defineProperty(self, 'jj', {value: -1});
+        bootstaticpath = chrome.runtime.getURL(urlrootfile.split('/')[0] + '/');
     }
 
     if (localStorage.useBootStaticPath) {
@@ -1086,7 +1122,6 @@ if (!browserUpdate && is_extension)
     });
 }
 
-var page;
 window.redirect = ['about', 'achievements', 'android', 'bird', 'business', 'chrome', 'cmd', 'collaboration',
                    'contact', 'cookie', 'copyright', 'corporate', 'credits', 'desktop', 'dev',
                    'developers', 'dispute', 'doc', 'edge', 'extensions', 'firefox', 'gdpr', 'help', 'ios',
@@ -1116,23 +1151,12 @@ if (hashLogic) {
     // legacy support:
     page = getCleanSitePath(document.location.hash);
 }
-else if ((tmp = getSitePath()).substr(0, 6) === '/chat/') {
-    page = tmp.substr(1);
-    history.replaceState({subpage: page}, "", '/' + page);
-}
-else if ((page = isPublicLink(document.location.hash))) {
+else if ((page = isPublicLink())) {
     // folder or file link: always keep the hash URL to ensure that keys remain client side
     // history.replaceState so that back button works in new URL paradigm
-    history.replaceState({ subpage: page }, "", '#' + page);
-}
-else if (isPublicLinkV2(document.location.pathname)) {
-    page = getCleanSitePath();
-    history.replaceState({ subpage: page }, "", '/' + page);
-
-    if (is_embed) {
-        page = page.split(/[#/]/);
-        page = '!' + page[1] + '!' + page[2];
-    }
+    dl_res = !!page.dl;
+    page = page.link || page;
+    pushHistoryState(true, page);
 }
 else {
     if (document.location.hash.length > 0) {
@@ -1272,6 +1296,7 @@ function mCreateElement(aNode, aAttrs, aChildNodes, aTarget, aData) {
         }
 
         if (aNode.nodeName === 'SCRIPT') {
+            console.assert(self.is_extension === false, 'We cannot use blob-URIs under the browser extension.');
             aNode.src = aData;
         }
         else {
@@ -1282,23 +1307,9 @@ function mCreateElement(aNode, aAttrs, aChildNodes, aTarget, aData) {
     return aNode;
 }
 
-function mObjectURL(data, type)
-{
-    var blob;
-    try {
-        blob = new Blob( data, { type: type });
-    } catch(e) {
-        if (d) console.error(e);
-        if (!window.BlobBuilder) {
-            window.BlobBuilder = window.WebKitBlobBuilder || window.MozBlobBuilder || window.MSBlobBuilder;
-        }
-        if (window.BlobBuilder) {
-            var bb = new BlobBuilder();
-            bb.append(data.join("\n"));
-            blob = bb.getBlob(type);
-        }
-    }
-    return blob && URL.createObjectURL(blob);
+function mObjectURL(data, type) {
+    'use strict';
+    return URL.createObjectURL(new Blob(data, {type: type}));
 }
 
 /**
@@ -1787,17 +1798,6 @@ function init_storage ( storage ) {
     return storage;
 }
 
-if (typeof XDomainRequest !== 'undefined' && typeof ArrayBuffer === 'undefined') {
-    window.getxhr = function _getxhr() {
-        return new XDomainRequest();
-    };
-}
-else {
-    window.getxhr = function _getxhr() {
-        return new XMLHttpRequest();
-    };
-}
-
 /**
  * Logs errors when loading/verifying files. This will log once for a file load error on the regular static server
  * (after x retries of any file), log once for any error on the default static server (after x retries per file) and
@@ -1864,7 +1864,7 @@ function logStaticServerFailure(errorType, filename, staticPathToLog) {
     // Send log. NB: Not using staticpath global here, in case it changed in the main thread
     // and due to the onIdle timeout below it hasn't actually sent the log yet
     setTimeout(function() {
-        var xhr = getxhr();
+        var xhr = new XMLHttpRequest();
         xhr.open('POST', apipath + 'cs?id=0', true);
         xhr.send(
             JSON.stringify(
@@ -1942,58 +1942,38 @@ function siteLoadError(error, filename) {
     }, 2e3);
 }
 
-// Add manifest.json so this can be used on latest browsers.
-var tag=document.createElement('link');
-tag.rel = "manifest";
-tag.href = "/manifest.json";
-document.getElementsByTagName('head')[0].appendChild(tag);
-
-if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
-{
-    var tag=document.createElement('meta');
-    tag.name = "viewport";
+if (is_mobile) {
     // To avoid auto-zoom on iOS and firefox browsers
     // These browsers already support zoom
-    if (is_ios || ua.indexOf('firefox') > 0) {
-        tag.content = "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0";
-    }
-    else {
-        tag.content = "width=device-width, initial-scale=1";
-    }
-    document.getElementsByTagName('head')[0].appendChild(tag);
-    var tag=document.createElement('meta');
-    tag.name = "apple-mobile-web-app-capable";
-    tag.content = "yes";
-    document.getElementsByTagName('head')[0].appendChild(tag);
-    var tag=document.createElement('meta');
-    tag.name = "apple-mobile-web-app-status-bar-style";
-    tag.content = "black";
-    document.getElementsByTagName('head')[0].appendChild(tag);
-    var tag=document.createElement('link');
-    tag.rel = "apple-touch-icon-precomposed";
-    tag.sizes = "144x144";
-    tag.href = staticpath + "images/favicons/apple-touch-icon-144x144.png";
-    document.getElementsByTagName('head')[0].appendChild(tag);
-    var tag=document.createElement('link');
-    tag.rel = "apple-touch-icon-precomposed";
-    tag.sizes = "114x114";
-    tag.href = staticpath + "images/favicons/apple-touch-icon-114x114.png";
-    document.getElementsByTagName('head')[0].appendChild(tag);
-    var tag=document.createElement('link');
-    tag.rel = "apple-touch-icon-precomposed";
-    tag.sizes = "72x72";
-    tag.href = staticpath + "images/favicons/apple-touch-icon-72x72.png";
-    document.getElementsByTagName('head')[0].appendChild(tag);
-    var tag=document.createElement('link');
-    tag.rel = "apple-touch-icon-precomposed";
-    tag.href = staticpath + "images/favicons/apple-touch-icon-57x57.png";
-    document.getElementsByTagName('head')[0].appendChild(tag);
-    var tag=document.createElement('link');
-    tag.rel = "shortcut icon";
-    tag.type = "image/vnd.microsoft.icon";
-    tag.href = "https://mega.nz/favicon.ico";
-    document.getElementsByTagName('head')[0].appendChild(tag);
-    m=true;
+    mCreateElement('meta', {
+        name: 'viewport',
+        content: is_ios || ua.indexOf('firefox') > 0
+            ? "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
+            : "width=device-width, initial-scale=1"
+    }, 'head');
+
+    mCreateElement('meta', {
+        sizes: "72x72",
+        name: "apple-touch-icon-precomposed",
+        href: staticpath + "images/favicons/apple-touch-icon-72x72.png"
+    }, 'head');
+    mCreateElement('meta', {
+        sizes: "144x114",
+        name: "apple-touch-icon-precomposed",
+        href: staticpath + "images/favicons/apple-touch-icon-144x114.png"
+    }, 'head');
+    mCreateElement('meta', {
+        sizes: "144x144",
+        name: "apple-touch-icon-precomposed",
+        href: staticpath + "images/favicons/apple-touch-icon-144x144.png"
+    }, 'head');
+
+    mCreateElement('meta', {name: "apple-mobile-web-app-capable", content: "yes"}, 'head');
+    mCreateElement('meta', {name: "apple-mobile-web-app-status-bar-style", content: "black"}, 'head');
+}
+
+if (is_livesite && !is_extension) {
+    mCreateElement('link', {rel: "manifest", href: "/manifest.json"}, 'head');
 }
 
 if (is_ios) {
@@ -2014,7 +1994,7 @@ if (is_ios) {
     }
     tmp = undefined;
 
-    if (m) {
+    if (is_mobile) {
         // Prevent Safari's copy&paste bug..
         window.onhashchange = function() {
             location.reload();
@@ -2023,7 +2003,7 @@ if (is_ios) {
 }
 
 // Determine whether to show the legacy mobile page for these links so that they redirect back to the app
-var showLegacyMobilePage = m && (
+tmp = is_mobile && (
     page.substr(0, 9) === 'newsignup'
     || page.substr(0, 7) === 'account'
     || is_old_windows_phone && page.substr(0, 7) === 'confirm'
@@ -2034,7 +2014,7 @@ var showLegacyMobilePage = m && (
  * app if any cancel, verify, fm/ipc, newsignup, recover or account links are clicked in the app
  * because the new mobile site is not designed for those yet.
  */
-if (showLegacyMobilePage) {
+if (tmp) {
 
     var app;
     var android;
@@ -2275,7 +2255,7 @@ else if (!browserUpdate) {
 
                 if (!/SyntaxError|Script\serror/.test(dump.m)) {
                     onIdle(function() {
-                        var xhr = getxhr();
+                        var xhr = new XMLHttpRequest();
                         xhr.open('POST', apipath + 'cs?id=0', true);
                         xhr.send(
                             JSON.stringify(
@@ -2874,6 +2854,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/ui/dropdowns.js', n: 'dropdowns_js', j:1});
         jsl.push({f:'css/node-filter.css', n: 'nodefilter_css', j:2});
         jsl.push({f:'js/ui/node-filter.js', n: 'nodefilter_js', j:1});
+        jsl.push({f:'js/ui/info-panel.js', n: 'infopanel_js', j:1});
         jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
         jsl.push({f:'js/fm/affiliate.js', n: 'fm_affiliate_js', j: 1});
@@ -2924,6 +2905,7 @@ else if (!browserUpdate) {
 
         // CSS Revamp changes
         jsl.push({f:'css/components/fm-left-pane.css', n: 'components_fm_left_pane_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/components/info-panel.css', n: 'components_info_panel_css', j:2, w:30, c:1, d:1, cache:1});
 
         // `Meetings` UI styles
         jsl.push({f:'css/chat-bundle.css', n: 'meetings_css', j:2, w:30, c:1, d:1, cache:1});
@@ -3553,7 +3535,7 @@ else if (!browserUpdate) {
             if (jsl[i] && !jsl[i].text) {
                 jsl_total += jsl[i].w || 1;
 
-                if (jj) {
+                if (jj && (jj > 0 || jsl[i].j !== 2)) {
 
                     if (jsl[i].j === 1) {
                         jj_done = false;
@@ -3568,7 +3550,7 @@ else if (!browserUpdate) {
                     }
                 }
 
-                if (!jj || !jsl[i].j || jsl[i].j > 2) {
+                if (!jj || !jsl[i].j || jsl[i].j > 1 + (jj > 0)) {
                     jsl_done = false;
                 }
             }
@@ -3684,7 +3666,7 @@ else if (!browserUpdate) {
 
     function xhr_load(url,jsi,xhri)
     {
-        xhr_stack[xhri] = getxhr();
+        xhr_stack[xhri] = new XMLHttpRequest();
         xhr_stack[xhri].onload = function()
         {
             try {
@@ -3789,6 +3771,10 @@ else if (!browserUpdate) {
             })();
         });
 
+        if (is_extension) {
+            return jsl_start();
+        }
+
         scriptTest(
             'es6s =' +
             (is_embed || ' BigInt(Math.pow(2, 48)) << 16n === 18446744073709551616n') + // C67 E79 F68 O54 S14
@@ -3856,8 +3842,8 @@ else if (!browserUpdate) {
         var j2re1 = /(?:\.\.\/)+/g;
         var j2re2 = /\/en\//g;
         var j2tr2 = '/' + lang + '/';
-        var j4re = /url\(["']?images\/([^"')]+)["']?\)/g;
-        var j4tr = "url('" + staticpath + "images/pdfV/$1')";
+        var j4re = /url\(["'./]*(images\/[^"')]+)["']?\)/g;
+        var j4tr = "url('" + staticpath + "$1')";
 
         if (lang === 'en') {
             j2tr2 = 0;
@@ -3870,7 +3856,7 @@ else if (!browserUpdate) {
             {
                 jsar.push(jsl[i].text + '\n\n');
             }
-            else if ((jsl[i].j == 2) && (!jj))
+            else if (jsl[i].j === 2 && (!jj || jj < 0))
             {
                 if (tmp !== -23 && (tmp = document.getElementById('bootbottom'))) {
                     tmp.style.display = 'none';
@@ -3905,6 +3891,9 @@ else if (!browserUpdate) {
                         blobLink = mObjectURL([jsl[i].text.replace(j4re, j4tr)], 'text/css');
                     }
                     else {
+                        if (self.is_extension) {
+                            console.error("This won't work...", jsl[i].n);
+                        }
                         blobLink = mObjectURL([jsl[i].text], 'text/javascript');
                     }
                     window[jsl[i].n] = blobLink;
@@ -3935,28 +3924,30 @@ else if (!browserUpdate) {
 
             jsl[i].text = ' ';
         }
-        if (window.URL)
-        {
-            if (localStorage.makeCache && !cssCache) cssCache=cssar;
-            if (cssar.length)
-            {
-                mCreateElement('link', {type: 'text/css', rel: 'stylesheet'}, 'head', cssar);
+
+        if (cssar.length) {
+            mCreateElement('link', {type: 'text/css', rel: 'stylesheet'}, 'head', cssar);
+        }
+
+        if (jj) {
+            jsl_done = true;
+            boot_done();
+        }
+        else {
+            if (localStorage.makeCache && !cssCache) {
+                cssCache = cssar;
             }
             if (!jsl_done || jsar.length) {
                 jsar.push('jsl_done=true; boot_done();');
-            } else {
+            }
+            else {
                 boot_done();
             }
             if (jsar.length) {
                 addScript(jsar);
             }
-            jsar=undefined;
-            cssar=undefined;
-        }
-        else
-        {
-            jsl_done=true;
-            boot_done();
+            jsar = undefined;
+            cssar = undefined;
         }
     }
 
@@ -4009,14 +4000,13 @@ else if (!browserUpdate) {
         }
     }
 
-    var u_storage, loginresponse, u_sid, dl_res, voucher, gmf_res;
     u_storage = init_storage(localStorage.sid ? localStorage : sessionStorage);
 
     (function _crossTabSession(u_storage) {
         'use strict';
 
         var xhr = function(params, data, callback) {
-            var xhr = getxhr();
+            var xhr = new XMLHttpRequest();
             xhr.onloadend = function() {
                 var response = false;
 
@@ -4089,7 +4079,7 @@ else if (!browserUpdate) {
                 var g = {
                     a: 'g',
                     ad: 1,
-                    p: page.substr(0, 5) === 'file/' ? page.substr(5, 8) : page.split('!')[1]
+                    p: page.split(/[!#/]/)[1]
                 };
 
                 xhr(u_sid ? '&v=2&sid=' + u_sid : '&v=2', g, function(response) {
@@ -4174,7 +4164,6 @@ else if (!browserUpdate) {
 
         loginresponse = true;
         voucher = localStorage.voucher !== undefined || page.substr(0, 7) === 'voucher';
-        dl_res = page[0] === '!' || page[0] === 'E' && page[1] === '!' || page.substr(0, 5) === 'file/';
 
         if (localStorage === u_storage || is_iframed) {
             ack();
@@ -4280,7 +4269,7 @@ else if (!browserUpdate) {
 
         // announce the loading finish of relevant resources in jsl
         for (var i = 0; i < jsl.length; i++) {
-            if (!jj || !jsl[i].j || jsl[i].j > 2) {
+            if (!jj || !jsl[i].j || jsl[i].j > 1 + (jj > 0)) {
                 jsl_loaded[jsl[i].n] = 1;
             }
         }
@@ -4308,7 +4297,6 @@ else if (!browserUpdate) {
     }
 }
 
-/* jshint -W098 */
 /**
  * History API's pushState helper that takes into account whether we're running through an extension or public-link
  * @param {Object|String} page The page to change to, or an history's state object
@@ -4340,7 +4328,7 @@ function pushHistoryState(page, state) {
             console.warn('duplicate push state attempt.');
         }
 
-        history[method](state, '', (hashLogic || isPublicLink(page) ? '#' : '/') + page);
+        history[method](state, '', (self.hashLogic || page[1] === '!' ? '#' : '/') + page);
     }
     catch (ex) {
         console.warn(ex);
@@ -4354,6 +4342,7 @@ function pushHistoryState(page, state) {
  * owning function, to mitigate it use this function as follow: toArray.apply(null, arguments)
  *
  * @returns {Array}
+ * @deprecated
  */
 function toArray() {
     var len = arguments.length;

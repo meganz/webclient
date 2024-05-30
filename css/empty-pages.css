@@ -9,6 +9,7 @@
     text-align: center;
     flex-grow: 1;
     background: var(--surface-grey-1);
+    transition: 200ms linear;
 }
 .fm-empty-pad {
     margin: auto;

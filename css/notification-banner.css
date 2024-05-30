@@ -29,6 +29,7 @@
     border-radius: 16px;
     background-color: var(--surface-grey-1);
     width: 100%;
+    transition: 200ms linear;
 }
 
 .notification-banner .banner-contents,

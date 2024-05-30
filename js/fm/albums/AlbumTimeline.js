@@ -184,7 +184,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                     icon: 'info',
                     click: () => {
                         $.selected = selections;
-                        propertiesDialog();
+                        mega.ui.mInfoPanel.initInfoPanel();
                     }
                 },
                 {},

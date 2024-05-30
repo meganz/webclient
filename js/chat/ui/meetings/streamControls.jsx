@@ -6,6 +6,7 @@ import { withMicObserver } from './micObserver.jsx';
 import { withPermissionsObserver } from './permissionsObserver.jsx';
 import Call from './call.jsx';
 import { withHostsObserver } from './hostsObserver.jsx';
+import { Dropdown, DropdownItem } from "../../../ui/dropdowns.jsx";
 
 export const renderLeaveConfirm = (onConfirm, onRecordingToggle) =>
     msgDialog(
@@ -48,7 +49,10 @@ class StreamControls extends MegaRenderMixin {
 
     state = {
         endCallOptions: false,
-        endCallPending: false
+        endCallPending: false,
+        devices: {},
+        audioSelectDropdown: false,
+        videoSelectDropdown: false,
     };
 
     LeaveButton = withHostsObserver(
@@ -83,12 +87,26 @@ class StreamControls extends MegaRenderMixin {
         }
     );
 
-    handleMousedown = ({ target }) =>
-        this.endContainerRef &&
-        this.endContainerRef.current &&
-        this.endContainerRef.current.contains(target) ?
-            null :
-            this.isMounted() && this.setState({ endCallOptions: false });
+    handleMousedown = ({ target }) => {
+        if (!this.isMounted()) {
+            return;
+        }
+        const state = {};
+        const { audioSelectDropdown, videoSelectDropdown } = this.state;
+        const $target = $(target);
+        const isOpenerParent = (audioSelectDropdown || videoSelectDropdown) &&
+            $target.parents('.input-source-opener').length;
+        if (audioSelectDropdown && $target.parents('.audio-sources').length === 0 && !isOpenerParent) {
+            state.audioSelectDropdown = false;
+        }
+        if (videoSelectDropdown && $target.parents('.video-sources').length === 0 && !isOpenerParent) {
+            state.videoSelectDropdown = false;
+        }
+        if (!(this.endContainerRef && this.endContainerRef.current && this.endContainerRef.current.contains(target))) {
+            state.endCallOptions = false;
+        }
+        this.setState(state);
+    };
 
     renderDebug = () => {
         return (
@@ -199,14 +217,238 @@ class StreamControls extends MegaRenderMixin {
         );
     };
 
+    renderSoundDropdown() {
+        const { hovered, call } = this.props;
+        const { micDeviceId, audioOutDeviceId } = SfuClient;
+        const { audioIn = {}, audioOut = {} } = this.state.devices;
+        let selectedIn;
+        // For selected devices
+        // 1) Check the current active devices
+        // 2) Otherwise check if there is a previously selected device
+        // 3) Otherwise use the default device label.
+        const inTrack = call.sfuClient.localAudioTrack();
+        if (inTrack) {
+            const { deviceId } = inTrack.getCapabilities();
+            selectedIn = deviceId in audioIn ? deviceId : 'default';
+            if (deviceId === 'default' && inTrack.label !== audioIn.default) {
+                this.micDefaultRenamed = inTrack.label;
+            }
+        }
+        else if (micDeviceId) {
+            selectedIn = micDeviceId in audioIn ? micDeviceId : 'default';
+        }
+        else {
+            selectedIn = 'default';
+        }
+        if (this.micDefaultRenamed) {
+            audioIn.default = this.micDefaultRenamed;
+        }
+        let selectedOut;
+        let peerPlayer;
+        if (call.sfuClient.peers.size) {
+            peerPlayer = call.sfuClient.peers.values().next().audioPlayer;
+        }
+        if (peerPlayer && peerPlayer.playerElem && peerPlayer.playerElem.sinkId) {
+            const { sinkId } = peerPlayer.playerElem;
+            selectedOut = sinkId in audioOut ? sinkId : 'default';
+        }
+        else if (audioOutDeviceId) {
+            selectedOut = audioOutDeviceId in audioOut ? audioOutDeviceId : 'default';
+        }
+        else {
+            selectedOut = 'default';
+        }
+
+        const mics = Object.entries(audioIn).map(([id, name]) => {
+            return <DropdownItem
+                key={id}
+                onClick={() => {
+                    call.sfuClient.setMicDevice(id === 'default' ? null : id);
+                    this.setState({ audioSelectDropdown: false });
+                }}>
+                <>
+                    <div className="av-device-name">{name}</div>
+                    {selectedIn === id &&
+                        <i className="sprite-fm-mono icon-check-small-regular-outline"/>}
+                </>
+            </DropdownItem>;
+        });
+        const speakers = Object.entries(audioOut).map(([id, name]) => {
+            return <DropdownItem
+                key={id}
+                onClick={() => {
+                    Promise.resolve(call.sfuClient.setAudioOutDevice(id === 'default' ? null : id)).catch(dump);
+                    this.setState({ audioSelectDropdown: false });
+                }}>
+                <>
+                    <div className="av-device-name">{name}</div>
+                    {selectedOut === id &&
+                        <i className="sprite-fm-mono icon-check-small-regular-outline"/>}
+                </>
+            </DropdownItem>;
+        });
+
+        return <Dropdown
+            className="input-sources audio-sources theme-dark-forced"
+            active={hovered}
+            noArrow={true}
+            positionMy="center top"
+            positionAt="center bottom"
+            horizOffset={-50}
+            vertOffset={16}
+            closeDropdown={() => this.setState({ audioSelectDropdown: false })}>
+            <div className="source-label">{l.microphone}</div>
+            {mics.length ? mics : <DropdownItem label={l.no_mics}/>}
+            <hr/>
+            <div className="source-label">{l.speaker}</div>
+            {speakers.length ? speakers : <DropdownItem label={l.no_speakers}/>}
+            <hr/>
+            <DropdownItem
+                icon="sprite-fm-mono icon-volume-max-small-regular-outline"
+                label={l.test_speaker}
+                disabled={speakers.length === 0}
+                onClick={() => {
+                    delay('call-test-speaker', () => {
+                        this.testAudioOut().catch(ex => {
+                            console.error('Failed to test audio on the selected device', ex, audioOutDeviceId);
+                        });
+                    });
+                }}
+            />
+        </Dropdown>;
+    }
+
+    renderVideoDropdown() {
+        const { hovered, call } = this.props;
+        const { videoIn = {} } = this.state.devices;
+        const { camDeviceId } = SfuClient;
+        let selectedCam;
+        if (call.sfuClient.localCameraTrack()) {
+            const { deviceId } = call.sfuClient.localCameraTrack().getCapabilities();
+            selectedCam = deviceId in videoIn ? deviceId : 'default';
+        }
+        else if (camDeviceId) {
+            selectedCam = camDeviceId in videoIn ? camDeviceId : 'default';
+        }
+        else {
+            selectedCam = 'default';
+        }
+        const cameras = Object.entries(videoIn).map(([id, name]) => {
+            return <DropdownItem
+                key={id}
+                onClick={() => {
+                    call.sfuClient.setCameraDevice(id === 'default' ? null : id);
+                    this.setState({ videoSelectDropdown: false });
+                }}>
+                <>
+                    <div className="av-device-name">{name}</div>
+                    {selectedCam === id &&
+                        <i className="sprite-fm-mono icon-check-small-regular-outline"/>}
+                </>
+            </DropdownItem>;
+        });
+
+        return <Dropdown
+            className="input-sources video-sources theme-dark-forced"
+            active={hovered}
+            noArrow={true}
+            positionMy="center top"
+            positionAt="center bottom"
+            horizOffset={-50}
+            vertOffset={16}
+            closeDropdown={() => this.setState({ videoSelectDropdown: false })}>
+            <div className="source-label">{l.camera_button}</div>
+            {cameras.length ? cameras : <DropdownItem label={l.no_cameras}/>}
+        </Dropdown>;
+    }
+
+    async updateMediaDevices() {
+        let devices = await SfuClient.enumMediaDevices().catch(dump);
+        devices = devices || {
+            audioIn: {},
+            audioOut: {},
+            videoIn: {},
+        };
+        const removeEmptyDevices = (devices) => {
+            for (const key of Object.keys(devices)) {
+                if (!key || !devices[key]) {
+                    delete devices[key];
+                }
+            }
+        };
+        removeEmptyDevices(devices.audioIn);
+        removeEmptyDevices(devices.audioOut);
+        removeEmptyDevices(devices.videoIn);
+        if (devices.audioIn.communications) {
+            delete devices.audioIn.communications;
+        }
+        return devices;
+    }
+
+    async testAudioOut() {
+        if (!SfuClient.audioOutDeviceId) {
+            return megaChat.playSound(megaChat.SOUNDS.SPEAKER_TEST);
+        }
+        const currentDevices = await this.updateMediaDevices();
+        if (
+            currentDevices.audioOut && !(SfuClient.audioOutDeviceId in currentDevices.audioOut)
+        ) {
+            return megaChat.playSound(megaChat.SOUNDS.SPEAKER_TEST);
+        }
+        // eslint-disable-next-line compat/compat -- Redefined in secureboot
+        const ctx = new AudioContext({ sinkId: SfuClient.audioOutDeviceId });
+        if (ctx.state !== 'running') {
+            throw new Error('The audio context failed to start');
+        }
+        const soundBuffer = await megaChat.fetchSoundBuffer(megaChat.SOUNDS.SPEAKER_TEST);
+        const buffer = await ctx.decodeAudioData(soundBuffer);
+        const gain = ctx.createGain();
+        const source = ctx.createBufferSource();
+        source.buffer = buffer;
+        source.connect(gain);
+        gain.connect(ctx.destination);
+        gain.gain.value = 0.07;
+        source.start();
+    }
+
+    handleDeviceChange = () => {
+        this.micDefaultRenamed = false;
+        this.updateMediaDevices().always(devices => {
+            if (!this.isMounted()) {
+                return;
+            }
+            const { devices: oldDevices } = this.state;
+            const { sfuClient, av } = this.props.call;
+            // Handle the case where the default device label has changed but the track doesn't match
+            if (
+                (av & Av.Audio) &&
+                !SfuClient.micDeviceId &&
+                sfuClient.localAudioTrack()?.getCapabilities().deviceId === 'default' &&
+                oldDevices?.audioIn?.default &&
+                devices.audioIn.default &&
+                oldDevices.audioIn.default !== devices.audioIn.default
+            ) {
+                for (const [key, value] of Object.entries(devices.audioIn)) {
+                    if (key !== 'default' && devices.audioIn.default.indexOf(value) > -1) {
+                        sfuClient.setMicDevice(key).then(() => SfuClient.persistMicDevice(null));
+                        break;
+                    }
+                }
+            }
+            this.setState({ devices, audioSelectDropdown: false, videoSelectDropdown: false });
+        });
+    };
+
     componentWillUnmount() {
         super.componentWillUnmount();
         document.removeEventListener('mousedown', this.handleMousedown);
+        navigator.mediaDevices.removeEventListener('devicechange', this.handleDeviceChange);
     }
 
     componentDidMount() {
         super.componentDidMount();
         document.addEventListener('mousedown', this.handleMousedown);
+        navigator.mediaDevices.addEventListener('devicechange', this.handleDeviceChange);
     }
 
     render() {
@@ -214,6 +456,7 @@ class StreamControls extends MegaRenderMixin {
             call, signal, onAudioClick, onVideoClick, onScreenSharingClick, onHoldClick, renderSignalWarning,
             hasToRenderPermissionsWarning, renderPermissionsWarning, resetError, blocked, renderBlockedWarning
         } = this.props;
+        const { audioSelectDropdown, videoSelectDropdown } = this.state;
         const avFlags = call.av;
         const isOnHold = avFlags & Av.onHold;
 
@@ -228,7 +471,10 @@ class StreamControls extends MegaRenderMixin {
                     {d && localStorage.callDebug ? this.renderDebug() : ''}
                     <ul>
                         <li
-                            className={isOnHold ? 'disabled' : ''}
+                            className={`
+                                ${isOnHold ? 'disabled' : ''}
+                                with-input-selector
+                            `}
                             onClick={() => {
                                 if (isOnHold) {
                                     return;
@@ -250,9 +496,34 @@ class StreamControls extends MegaRenderMixin {
                             <span>{l.mic_button /* `Mic` */}</span>
                             {signal ? null : renderSignalWarning()}
                             {hasToRenderPermissionsWarning(Av.Audio) ? renderPermissionsWarning(Av.Audio) : null}
+                            <div
+                                className={`input-source-opener button ${audioSelectDropdown ? 'active-dropdown' : ''}`}
+                                onClick={ev => {
+                                    ev.stopPropagation();
+                                    if (this.state.audioSelectDropdown) {
+                                        return this.setState({
+                                            audioSelectDropdown: false,
+                                        });
+                                    }
+                                    this.updateMediaDevices().always(devices => {
+                                        if (this.isMounted()) {
+                                            this.setState({
+                                                devices,
+                                                audioSelectDropdown: true,
+                                                videoSelectDropdown: false,
+                                            });
+                                        }
+                                    });
+                                }}>
+                                <i className="sprite-fm-mono icon-arrow-up" />
+                            </div>
                         </li>
+                        {audioSelectDropdown && this.renderSoundDropdown()}
                         <li
-                            className={isOnHold ? 'disabled' : ''}
+                            className={`
+                                ${isOnHold ? 'disabled' : ''}
+                                with-input-selector
+                            `}
                             onClick={() => {
                                 if (isOnHold) {
                                     return;
@@ -273,7 +544,29 @@ class StreamControls extends MegaRenderMixin {
                             />
                             <span>{l.camera_button /* `Camera` */}</span>
                             {hasToRenderPermissionsWarning(Av.Camera) ? renderPermissionsWarning(Av.Camera) : null}
+                            <div
+                                className={`input-source-opener button ${videoSelectDropdown ? 'active-dropdown' : ''}`}
+                                onClick={ev => {
+                                    ev.stopPropagation();
+                                    if (this.state.videoSelectDropdown) {
+                                        return this.setState({
+                                            videoSelectDropdown: false,
+                                        });
+                                    }
+                                    this.updateMediaDevices().always(devices => {
+                                        if (this.isMounted()) {
+                                            this.setState({
+                                                devices,
+                                                audioSelectDropdown: false,
+                                                videoSelectDropdown: true,
+                                            });
+                                        }
+                                    });
+                                }}>
+                                <i className="sprite-fm-mono icon-arrow-up" />
+                            </div>
                         </li>
+                        {videoSelectDropdown && this.renderVideoDropdown()}
                         <li
                             className={isOnHold ? 'disabled' : ''}
                             onClick={() => {

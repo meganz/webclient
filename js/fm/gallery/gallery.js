@@ -1286,10 +1286,7 @@ class MegaGallery {
         }
         tryCatch(() => {
             galleryHeader.toggleClass('invisible', !M.v.length &&
-                (this.id === 'photos' || this.id === 'images' || this.id === 'videos' ||
-                M.fmTabState.photos.subpages.includes(this.id) ||
-                M.fmTabState.images.subpages.includes(this.id) ||
-                M.fmTabState.videos.subpages.includes(this.id)));
+                (this.id === 'photos' || this.id === 'images' || this.id === 'videos'));
         })();
     }
 
@@ -1319,6 +1316,9 @@ class MegaGallery {
             selectionManager.add_to_selection(h);
 
             $.hideContextMenu(e);
+
+            // If the side Info panel is visible, update the information in it
+            mega.ui.mInfoPanel.reRenderIfVisible($.selected);
 
             return false;
         });
@@ -1372,6 +1372,9 @@ class MegaGallery {
 
                     $.autoplay = h;
                 }
+
+                // Close node Info panel as it's not applicable when opening Preview
+                mega.ui.mInfoPanel.closeIfOpen();
 
                 this.inPreview = true;
                 slideshow(h, false);

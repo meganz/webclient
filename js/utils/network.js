@@ -354,7 +354,7 @@ function megaUtilsXHR(aURLOrOptions, aData) {
     aData = options.data || aData;
     method = options.method || (aData && 'POST') || 'GET';
 
-    xhr = getxhr();
+    xhr = new XMLHttpRequest();
 
     if (typeof options.prepare === 'function') {
         options.prepare(xhr);

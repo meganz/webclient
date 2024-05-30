@@ -5,8 +5,11 @@ import { ParsedHTML } from '../../../../utils';
 export class ColumnContactRequestsEmail extends MegaRenderMixin {
     static sortable = true;
     static id = "email";
-    static label = l[95];
     static megatype = "email";
+
+    static get label() {
+        return l[95];
+    }
 
     render() {
         const {nodeAdapter, currView} = this.props;

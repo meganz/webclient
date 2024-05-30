@@ -324,6 +324,17 @@ MegaData.prototype.getPath = function(id) {
 };
 
 /**
+ * @param {String|MegaNode} node ufs-node [handle]
+ * @param {String} [sep] file/path separator
+ * @returns {string}
+ */
+MegaData.prototype.getNamedPath = function(node, sep) {
+    'use strict';
+
+    return this.getPath(node).map(h => this.getNameByHandle(h) || h).reverse().join(sep || '\u241c');
+};
+
+/**
  * Check entered path or id is a custom view like out-shares and public-links
  * If it is, return a set of object that contain detail of it.
  * If it is not, return false
@@ -3520,6 +3531,7 @@ lazy(MegaData.prototype, 'nodeShare', () => {
             }
             return;
         }
+        let updnode = false;
         debug(`Establishing node-share for ${h}`, s, [n]);
 
         if (typeof n.shares === 'undefined') {
@@ -3533,9 +3545,18 @@ lazy(MegaData.prototype, 'nodeShare', () => {
         }
         M.su[s.u][h] = 1;
 
+        // Restore Public link handle, we may do lose it from a move operation (d->t)
+        if (s.u === 'EXP' && !n.ph) {
+            n.ph = s.ph;
+            updnode = true;
+            debug('Restored lost public-handle...', s, n);
+        }
+
         if (n.t) {
             // update tree node flags
-            ufsc.addTreeNode(n);
+            if (!updnode) {
+                ufsc.addTreeNode(n);
+            }
         }
         else if (n.fa && s.u === 'EXP' && s.down) {
             debug('cleaning fa for taken-down node...', n.fa, [n], s);
@@ -3543,6 +3564,10 @@ lazy(MegaData.prototype, 'nodeShare', () => {
                 thumbnails.replace(n.h, null);
             }
             delete n.fa;
+            updnode = true;
+        }
+
+        if (updnode) {
             M.nodeUpdated(n);
         }
 

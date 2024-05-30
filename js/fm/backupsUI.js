@@ -886,6 +886,7 @@ lazy(mega, 'backupCenter', () => {
                     $currentFolder.addClass('active');
 
                     selectionManager.add_to_selection($currentFolder.attr('data-handle'));
+                    mega.ui.mInfoPanel.reRenderIfVisible($.selected);
                     this.selectedSync = {
                         'nodeHandle': $currentFolder.attr('data-handle'),
                         'id': $currentFolder.attr('data-id') || $currentFolder.attr('data-handle'),
@@ -913,6 +914,7 @@ lazy(mega, 'backupCenter', () => {
 
                     $currentDevice.addClass('active');
                     this.deviceCardStates[$currentDevice.attr('data-id')].selected = 'active ';
+                    mega.ui.mInfoPanel.reRenderIfVisible($.selected);
                 }
             });
 
@@ -1348,10 +1350,10 @@ lazy(mega, 'backupCenter', () => {
                 const deviceData = mega.backupCenter.data.find((dev) => dev.device === deviceId);
 
                 const deviceName = mega.backupCenter.dn[deviceId];
-                const deviceIconClass = deviceIcon(
+                const deviceIconClass = `icon-${deviceIcon(
                     deviceData.dua || deviceName,
                     deviceData.type
-                );
+                )}-90`;
 
                 M.safeShowDialog('device-rename-dialog', () => {
                     $dialog.removeClass('hidden').addClass('active');
@@ -1417,9 +1419,9 @@ lazy(mega, 'backupCenter', () => {
 
                 $input.val(deviceName);
 
-                $('.transfer-filetype-icon', $dialog)
+                $('.item-type-icon-90', $dialog)
                     .attr('class',
-                          `transfer-filetype-icon ${deviceIconClass}`
+                          `item-type-icon-90 ${deviceIconClass}`
                     );
 
                 $input.rebind('focus.deviceRenameDialog', () => {

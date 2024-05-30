@@ -15,7 +15,7 @@
     }
 
     ul {
-        display: block;
+        display: flex;
         margin: 0;
         padding: 0;
         height: 100%;
@@ -23,8 +23,9 @@
 
         li {
             position: relative;
-            display: inline-block;
-            padding: 0 11px 0 11px;
+            display: flex;
+            flex-direction: column;
+            margin: 0 32px 0 0;
             cursor: pointer;
 
             &.disabled {
@@ -37,8 +38,15 @@
                 }
             }
 
+            &.with-input-selector {
+                margin-right: 32px;
+            }
+
             button {
+                width: 40px;
+                height: 40px;
                 cursor: pointer;
+                margin: auto;
 
                 &.with-fill {
                     background: var(--secondary-white);
@@ -65,9 +73,30 @@
 
             span {
                 display: block;
-                margin: 8px 0 0 0;
+                margin: 2px 0 0 0;
                 font: var(--text-body2);
                 color: var(--secondary-white);
+            }
+
+            .input-source-opener {
+                position: absolute;
+                top: 0;
+                right: -20px;
+                width: 16px;
+                height: 60px;
+                border-radius: 16px;
+
+                &:hover { background: #333; }
+                &:active { background: #444; }
+
+                i {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    --icon-size: 24px;
+                    --mask-color: var(--secondary-white);
+                }
             }
         }
     }
@@ -120,5 +149,42 @@
                 }
             }
         }
+    }
+}
+
+.input-sources {
+    &.expanded {
+        display: flex;
+    }
+
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 16px 20px;
+    display: none;
+    position: absolute;
+    margin: 8px 0 0 0;
+    border-radius: 12px;
+    border: var(--context-menu-border);
+    background: var(--surface-main);
+    box-shadow: var(--dropdown-shadow);
+    width: 320px;
+
+    button {
+        float: left;
+        padding: 0;
+        text-align: left;
+        border: 0;
+        font: var(--text-h3);
+        color: var(--secondary-white);
+        background: transparent;
+        cursor: pointer;
+        width: 100%;
+
+        i {
+            float: right;
+        }
+    }
+    hr {
+        width: 100%;
     }
 }

@@ -7,9 +7,11 @@ class MegaGesture {
         this.minSwipeDistanceX = options.minSwipeDistanceX || 250 / window.devicePixelRatio;
         this.minSwipeDistanceY = options.minSwipeDistanceY || 250 / window.devicePixelRatio;
 
+        const body = options.iframeDoc ? iframeDoc.body : document.body;
+
         this._rgOpt = {capture: true};
         this._registerGesture = () => {
-            document.body.removeEventListener('touchstart', this._registerGesture, this._rgOpt);
+            body.removeEventListener('touchstart', this._registerGesture, this._rgOpt);
 
             if (!this.domNode || !this.domNode.megaGesture) {
 
@@ -26,7 +28,7 @@ class MegaGesture {
                 }
             }
         };
-        document.body.addEventListener('touchstart', this._registerGesture, this._rgOpt);
+        body.addEventListener('touchstart', this._registerGesture, this._rgOpt);
     }
 
     // This is the handleEvent method, it will be called for each event listener
@@ -242,12 +244,18 @@ class MegaGesture {
             else if (xDiff < -this.minSwipeDistanceX) {
                 this.action = 'onSwipeRight';
             }
+            else if (Math.abs(xDiff) > 2 || Math.abs(yDiff) > 2) {
+                this.action = 'onDragging';
+            }
         }
         else if (yDiff > this.minSwipeDistanceY) {
             this.action = 'onSwipeUp';
         }
         else if (yDiff < -this.minSwipeDistanceY) {
             this.action = 'onSwipeDown';
+        }
+        else if (Math.abs(xDiff) > 2 || Math.abs(yDiff) > 2) {
+            this.action = 'onDragging';
         }
 
         this.xStart = null;

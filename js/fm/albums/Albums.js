@@ -3585,6 +3585,9 @@ lazy(mega.gallery, 'albums', () => {
         showAlbum(id) {
             this.initLayout();
 
+            // Close info panel when visiting album
+            mega.ui.mInfoPanel.closeIfOpen();
+
             if (M.isAlbumsPage(1)) {
                 this.showAllAlbums();
                 this.header.update();
@@ -3728,6 +3731,7 @@ lazy(mega.gallery, 'albums', () => {
                 'icon-album',
                 () => {
                     storeLastActiveTab();
+                    mega.ui.mInfoPanel.closeIfOpen();
 
                     if (!M.isAlbumsPage(1)) {
                         openMainPage();
@@ -3884,6 +3888,7 @@ lazy(mega.gallery, 'albums', () => {
             'icon-album',
             () => {
                 storeLastActiveTab();
+                mega.ui.mInfoPanel.closeIfOpen();
 
                 const nextFolder = 'albums/' + albumId;
 

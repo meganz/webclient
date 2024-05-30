@@ -65,25 +65,20 @@ mobile.keyDecryption = {
                 let key = dKey.value.trim();
 
                 if (key) {
+                    const fl = folderLink;
+                    const ph = publicHandle;
 
                     // Remove the !,# from the key which is exported from the export dialog
-                    key = key.replace('!', '').replace('#', '');
+                    key = key.split(/[^\w-]/)[0];
 
-                    let newHash = `${folderLink ? '/#F!' : '/#!'}${publicHandle}!${key}`;
+                    const path = `/${pfcol ? 'collection' : fl ? 'folder' : 'file'}/${ph}#${key}${selector || ''}`;
 
-                    if (pfcol) {
-                        newHash = `/collection/${publicHandle}#${key}`;
-                    }
-                    else if (isPublicLinkV2(getSitePath())) {
-                        newHash = `${folderLink ? '/folder/' : '/file/'}${publicHandle}#${key}${selector || ''}`;
-                    }
-
-                    if (getSitePath() === newHash) {
+                    if (getSitePath() === path) {
                         decryptionKeyInput.showError(`<i class="alert sprite-mobile-fm-mono
                             icon-alert-triangle-thin-outline"></i>${escapeHTML(l[16471])} ${escapeHTML(l[16472])}`);
                     }
                     else {
-                        loadSubPage(newHash);
+                        loadSubPage(path);
                     }
                 }
             }

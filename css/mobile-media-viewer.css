@@ -310,6 +310,33 @@
 
 /* End of Media viewer - Content info */
 
+/* Media viewer - Text editor */
+
+.mobile .media-viewer .text-editor-container {
+    position: relative;
+    overflow: hidden;
+    padding: 0;
+    text-align: start;
+}
+
+.mobile .media-viewer .text-editor-container .textviewer-block {
+    height: 100%;
+    width: 100%;
+    display: block;
+}
+
+.mobile .media-viewer .text-editor-container .textviewer-block .text-editor {
+    min-width: 0;
+    width: 100%;
+}
+
+.mobile .media-viewer .text-editor-container .textviewer-block .text-editor .content {
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* End of Media viewer - Text editor */
+
 /* Media viewer - Download page */
 
 .mobile .download-page .media-viewer .img-wrap {

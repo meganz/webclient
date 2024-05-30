@@ -1141,6 +1141,51 @@ function closeMsg() {
     mBroadcaster.sendMessage('msgdialog-closed');
 }
 
+function openSaveAsDialog(node, content, cb) {
+    'use strict';
+
+    mobile.nodeSelector.registerPreviousViewNode();
+    mega.ui.viewerOverlay.hide();
+    mobile.nodeSelector.show('saveTextTo', node);
+
+    if (!mega.ui.saveTextAs) {
+        mega.ui.saveTextAs = new MobileNodeNameControl({type: 'saveTextAs'});
+    }
+
+    mega.ui.saveTextAs.onSubmit = async nn => {
+
+        mobile.nodeSelector.hide();
+
+        loadingDialog.show('saveTextAs');
+
+        const {isFull} = await M.getStorageQuota();
+
+        if (isFull) {
+            ulmanager.ulShowOverStorageQuotaDialog();
+            return false;
+        }
+
+        const nh = await mega.fileTextEditor.saveFileAs(
+            nn,
+            mega.ui.saveTextAs.targetFolder,
+            content,
+            node
+        ).catch(tell);
+
+        if (nh && typeof cb === 'function') {
+            await cb(nh);
+
+            const msg = escapeHTML(
+                mega.ui.saveTextAs.targetFolder === M.RootID ? l.mobile_save_as_toast_cloud : l.mobile_save_as_toast
+            ).replace('%1', nn).replace('%2', M.d[mega.ui.saveTextAs.targetFolder].name);
+
+            mega.ui.toast.show(msg, 4);
+        }
+
+        loadingDialog.hide('saveTextAs');
+    };
+}
+
 window['selectFolder' + 'Dialog'] = () => Promise.resolve(M.RootID);
 
 mega.ui['showReg' + 'isterDialog'] = nop;

@@ -54,9 +54,13 @@ MegaMobileLink.bindEvent = function() {
         return;
     }
 
-    this.on('tap', () => {
-        if (this.disabled) {
+    this.on('tap', async() => {
+        if (this.disabled || mega.ui.viewerOverlay.confirmDiscard && !await mega.ui.viewerOverlay.confirmDiscard()) {
             return false;
+        }
+
+        if (window.textEditorVisible) {
+            mega.textEditorUI.doClose();
         }
 
         this.trigger('beforeRedirect');

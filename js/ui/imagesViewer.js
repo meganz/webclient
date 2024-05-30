@@ -189,6 +189,10 @@ var slideshowid;
             if (is_mobile) {
                 mobile.appBanner.updateBanner(newShownHandle);
             }
+            else {
+                // Rerender info panel when moving to next/previous at slide show.
+                mega.ui.mInfoPanel.reRenderIfVisible([newShownHandle]);
+            }
         }
 
         slideshow_timereset();
@@ -327,7 +331,12 @@ var slideshowid;
         }
         else {
             $infoButton.addClass('hidden');
-            $optionButton.removeClass('hidden');
+
+            // Keep the Info panel option hidden on public links (but usable in regular Cloud Drive etc)
+            const currentSitePath = getSitePath();
+            if (!isPublicLink(currentSitePath) && !isPublicLinkV2(currentSitePath)) {
+                $optionButton.removeClass('hidden');
+            }
         }
 
     }
@@ -936,14 +945,41 @@ var slideshowid;
 
                 const container = this.domNode.querySelector(containerSelector);
 
-                this.onEdge = {
-                    top: container.scrollTop === 0,
-                    right: (container.scrollLeft + container.offsetWidth) / container.scrollWidth > 0.999,
-                    bottom: (container.scrollTop + container.offsetHeight) / container.scrollHeight > 0.999,
-                    left: container.scrollLeft === 0
-                };
+                if (containerSelector === '.img-wrap') {
+
+                    const img = container.querySelector('img.active');
+                    const style = getComputedStyle(img);
+                    const top = Math.abs(parseInt(style.top));
+                    const left = Math.abs(parseInt(style.left));
+                    const width = parseInt(style.width);
+                    const height = parseInt(style.height);
+
+                    this.onEdge = {
+                        top: top === 0,
+                        right: (left + container.offsetWidth) / width > 0.999,
+                        bottom: (top + container.offsetHeight) / height > 0.999,
+                        left: left === 0
+                    };
+                }
+                else {
+                    this.onEdge = {
+                        top: container.scrollTop === 0,
+                        right: (container.scrollLeft + container.offsetWidth) / container.scrollWidth > 0.999,
+                        bottom: (container.scrollTop + container.offsetHeight) / container.scrollHeight > 0.999,
+                        left: container.scrollLeft === 0
+                    };
+                }
+            },
+            onDragging: function(ev) {
+                // Stop tap to be triggered
+                ev.stopPropagation();
+                return;
             }
         };
+
+        if (name === 'iframeGesture') {
+            options.iframeDoc = elm.ownerDocument;
+        }
 
         options.onSwipeRight = options.onSwipeLeft = options.onSwipeDown = options.onSwipeUp = ev => {
             ev.preventDefault();
@@ -1306,13 +1342,22 @@ var slideshowid;
                     return false;
                 }
                 history.back();
+                mega.ui.mInfoPanel.closeIfOpen();
                 return false;
             });
+
+            // Keep the Info panel option hidden on public links (but usable in regular Cloud Drive etc)
+            const currentSitePath = getSitePath();
+            if (isPublicLink(currentSitePath) || isPublicLinkV2(currentSitePath)) {
+                $('.v-btn.options', $overlay).addClass('hidden');
+            }
 
             // Properties icon
             $('.context-menu .info, .v-btn.info', $overlay).rebind('click.media-viewer', () => {
                 $document.fullScreen(false);
-                propertiesDialog();
+                const node = M.getNodeByHandle(id);
+                $.selected = [node.h];
+                mega.ui.mInfoPanel.initInfoPanel();
                 return false;
             });
 
@@ -2035,6 +2080,42 @@ var slideshowid;
         }
     }
 
+    const require = async(html, js, ...other) => {
+        const files = [html, ...other];
+
+        if (!self.is_extension) {
+            files.push(...js);
+        }
+        await M.require(...files);
+
+        const map = require.map[html];
+        html = translate(pages[html]);
+
+        for (let [k, v] of map) {
+            v = self.is_extension && js.includes(v) ? bootstaticpath + jsl2[v].f : window[v];
+
+            assert(!!v, `${l[16]}, ${k}`);
+
+            html = html.replace(k, v);
+        }
+
+        return html;
+    };
+    lazy(require, 'map', () => {
+        return freeze({
+            pdfviewer: new Map([
+                ['viewer.js', 'pdfviewerjs'],
+                ['viewer.css', 'pdfviewercss'],
+                ['../build/pdf.js', 'pdfjs2']
+            ]),
+            docxviewer: new Map([
+                ['docx.js', 'docxviewer_js'],
+                ['viewer.css', 'docxviewercss'],
+                ['docx-preview.js', 'docxpreview_js']
+            ])
+        });
+    });
+
     // a method to fetch scripts and files needed to run pdfviewer
     // and then excute them on iframe element [#pdfpreviewdiv1]
     function prepareAndViewPdfViewer(data) {
@@ -2057,11 +2138,7 @@ var slideshowid;
             }
         }
 
-        M.require('pdfjs2', 'pdfviewer', 'pdfviewercss', 'pdfviewerjs').then(() => {
-            const myPage = pages.pdfviewer
-                .replace('viewer.css', window.pdfviewercss)
-                .replace('../build/pdf.js', window.pdfjs2)
-                .replace('viewer.js', window.pdfviewerjs);
+        require('pdfviewer', ['pdfjs2', 'pdfviewerjs'], 'pdfviewercss').then((myPage) => {
             const id = 'pdfpreviewdiv1';
             const pdfIframe = document.getElementById(id);
             const newPdfIframe = document.createElement('iframe');
@@ -2091,7 +2168,7 @@ var slideshowid;
             });
             doc.close();
             _pdfSeen = true;
-        });
+        }).catch(tell);
     }
 
     function prepareAndViewDocxViewer(data) {
@@ -2111,11 +2188,7 @@ var slideshowid;
             return;
         }
 
-        M.require('docxpreview_js', 'docxviewer_js', 'docxviewer', 'docxviewercss').then(() => {
-            const myPage = translate(pages.docxviewer)
-                .replace('viewer.css', window.docxviewercss)
-                .replace('docx.js', window.docxviewer_js)
-                .replace('docx-preview.js', window.docxpreview_js);
+        require('docxviewer', ['docxpreview_js', 'docxviewer_js'], 'docxviewercss').then((myPage) => {
             const id = 'docxpreviewdiv1';
             const iframe = document.getElementById(id);
             const newIframe = document.createElement('iframe');
@@ -2157,7 +2230,7 @@ var slideshowid;
             });
             doc.close();
             _docxSeen = true;
-        });
+        }).catch(tell);
     }
 
     function previewsrc(id) {

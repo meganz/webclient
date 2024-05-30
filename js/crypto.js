@@ -444,7 +444,7 @@ function api_reportfailure(hostname, callback) {
         failxhr.abort();
     }
 
-    failxhr = getxhr();
+    failxhr = new XMLHttpRequest();
     failxhr.open('POST', apipath + 'pf?h', true);
     failxhr.callback = callback;
 
@@ -2177,7 +2177,7 @@ function api_fareq(res, ctx, xhr) {
         for (m = pp.length; m--;) {
             for (slot = 0;; slot++) {
                 if (!faxhrs[slot]) {
-                    faxhrs[slot] = getxhr();
+                    faxhrs[slot] = new XMLHttpRequest();
                     break;
                 }
 

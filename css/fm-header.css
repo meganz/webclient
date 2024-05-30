@@ -66,6 +66,7 @@
     display: flex;
     flex-direction: row-reverse;
     align-items: center;
+    transition: 200ms linear;
 }
 .fm-breadcrumbs-block {
     height: 36px;
@@ -94,6 +95,7 @@
     align-items: center;
     -webkit-padding-end: 24px;
     padding-inline-end: 24px;
+    transition: 200ms linear;
 }
 .fm-breadcrumbs {
     align-items: center;

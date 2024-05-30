@@ -1859,8 +1859,9 @@ scparser.$finalize = async() => {
         loadavatars = [];
     }
 
-    if ($.dialog === 'properties') {
-        delay($.dialog, propertiesDialog.bind(this, 3));
+    // Update Info panel UI
+    if (!is_mobile) {
+        delay('infoPanel', mega.ui.mInfoPanel.reRenderIfVisible.bind(mega.ui.mInfoPanel, $.selected));
     }
 
     if (scsharesuiupd) {
@@ -3872,27 +3873,36 @@ function loadfm_done(mDBload) {
     if (!pfid && u_type == 3) {
 
         // Ensure tree nodes consistency...
-        var tlen = Object.keys(M.tree[M.RootID] || {}).length;
-        var clen = Object.keys(M.c[M.RootID] || {}).filter(function(h) { return M.c[M.RootID][h] > 1 }).length;
+        const blk = {
+            t: Object.keys(M.tree[M.RootID] || {}),
+            c: Object.keys(M.c[M.RootID] || {}).filter((h) => M.c[M.RootID][h] > 1)
+        };
+        const {t: {length: tl}, c: {length: cl}} = blk;
 
-        if (tlen < clen) {
-            if (localStorage['treefixup$' + u_handle]) {
-                // The force reload attempt did not helped on getting tree nodes consistency back (?!)
-                eventlog(99696);
+        if (tl !== cl) {
+            const res = [];
+            const src = tl < cl ? 'c' : 't';
+            const dst = tl < cl ? 't' : 'c';
+
+            for (let i = blk[src].length; i--;) {
+                const h = blk[src][i];
+
+                if (!blk[dst].includes(h)) {
+                    const n = M.getNodeByHandle(h);
+
+                    if (!n.s4) {
+                        res.push({h, p: n.p, path: M.getNamedPath(h)});
+                    }
+                }
             }
-            else if ((Date.now() - parseInt(localStorage['treeic$' + u_handle] || 0)) < 864e6) {
-                // The user suffered again from inconsistent tree nodes within the
-                // last 10 days, we are not force reloading his account on this case.
-                eventlog(99697);
-            }
-            else {
-                // Force reload the account to get tree nodes consistency back...
-                localStorage['treeic$' + u_handle] = Date.now();
-                localStorage['treefixup$' + u_handle] = 1;
-                return fm_fullreload(0, 'tree-nodes');
+
+            if (res.length) {
+                console.group(`%cTREE NODES MISMATCH (${dst} < ${src})`, 'font-size:13px', [blk]);
+                console.table(res);
+                console.groupEnd();
+                eventlog(99696, JSON.stringify([1, res.length, tl, cl]));
             }
         }
-        delete localStorage['treefixup$' + u_handle];
 
         // load/initialise the authentication system
         authring.initAuthenticationSystem();

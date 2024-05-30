@@ -31,13 +31,8 @@ function init_page() {
         throw new Error('Unexpected access...');
     }
 
-    var tmp = String(page).split('!').map(function(s) {
-        return s.replace(/[^\w-]+/g, "");
-    });
-
-    var ph = tmp[1];
-    var key = tmp[2];
-    $.playbackOptions = tmp[3];
+    const [ph, key, opt] = isPublicLink(page);
+    $.playbackOptions = opt;
 
     var init = function(res) {
         init_embed(ph, key, res);

@@ -587,32 +587,16 @@ lazy(mega, 'commercials', () => {
         }
     };
 
-    const _destroyLogin = () => {
-        Object.defineProperties(window, {
-            api_getsid: {value: null, writable: false, configurable: false},
-            u_checklogin: {value: null, writable: false, configurable: false},
-            u_checklogin2: {value: null, writable: false, configurable: false},
-            u_checklogin3a: {value: null, writable: false, configurable: false},
-            u_checklogin4: {value: null, writable: false, configurable: false},
-            security: {value: null, writable: false, configurable: false},
-            u_login: {value: null, writable: false, configurable: false},
-            signin: {value: null, writable: false, configurable: false},
-            init_login: {value: null, writable: false, configurable: false},
-            api_createuser: {value: null, writable: false, configurable: false},
-            AccountRecoveryControl: {value: null, writable: false, configurable: false},
-        });
-    };
-
-    const handleCommType = (res) => {
+    const handleCommType = tryCatch((res) => {
         if (publicUser) {
+            window.onerror = dump;
+
             if (window.googletag) {
                 for (let i = 0; i < res.length; i++) {
                     createGoogleComm(res[i]);
                 }
             }
             else if (!window.buildOlderThan10Days) {
-
-                _destroyLogin();
 
                 const gpt = mCreateElement(
                     'script',
@@ -640,12 +624,12 @@ lazy(mega, 'commercials', () => {
                 }
             }
         }
-    };
+    });
 
     // Update current page, and get the comms that should be loaded
     const getComms = (getMobile, force) => {
 
-        publicUser = mShowAds && !u_attr && !u_handle && mega.flags.ab_adse && (isPublicLink() || isPublicLinkV2());
+        publicUser = mShowAds && !u_attr && !u_handle && mega.flags.ab_adse && isPublicLink();
 
         const stopUpdate = updateCurrentPage(getMobile);
 

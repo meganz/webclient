@@ -94,8 +94,6 @@ var signin = {
                 // Otherwise proceed with regular login
                 u_type = result;
 
-                passwordManager('#login_form');
-
                 if (login_next) {
                     loadSubPage(login_next);
                 }

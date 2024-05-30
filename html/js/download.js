@@ -778,7 +778,7 @@ function dlprogress(fileid, perc, bytesloaded, bytestotal,kbps, dl_queue_num)
         dl_queue[dl_queue_num].loaded = bytesloaded;
     }
 
-    if (!m) {
+    if (!is_mobile) {
         $dowloadWrapper.removeClass('temporary-na');
         $('.download.progress-bar', $dowloadWrapper).width(perc + '%');
 

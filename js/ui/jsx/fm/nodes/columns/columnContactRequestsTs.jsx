@@ -4,8 +4,11 @@ import {MegaRenderMixin} from "../../../../../chat/mixins";
 export class ColumnContactRequestsTs extends MegaRenderMixin {
     static sortable = true;
     static id = "ts";
-    static label = l[19506];
     static megatype = "ts";
+
+    static get label() {
+        return l[19506];
+    }
 
     render() {
         let {nodeAdapter} = this.props;

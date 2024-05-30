@@ -221,7 +221,7 @@ mBroadcaster.once('startMega', async() => {
     'use strict';
 
     console.group(`[DEBUG] ${new Date().toISOString()}`);
-    console.table({apipath, staticpath, bootstaticpath, cmsStaticPath, defaultStaticPath, defaultCMSStaticPath});
+    console.table({apipath, staticpath, bootstaticpath, defaultStaticPath});
     console.table(staticServerLoading);
 
     const data = {};

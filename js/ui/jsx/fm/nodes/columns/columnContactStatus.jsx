@@ -4,8 +4,11 @@ import {GenericNodePropsComponent} from "../genericNodePropsComponent";
 export class ColumnContactStatus extends GenericNodePropsComponent {
     static sortable = true;
     static id = "status";
-    static label = l[89];
     static megatype = "status";
+
+    static get label() {
+        return l[89];
+    }
 
     render() {
         let {nodeAdapter} = this.props;

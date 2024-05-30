@@ -1041,22 +1041,16 @@ async function mKeyDialog(ph, fl, keyr, selector) {
             if (key) {
 
                 // Remove the !,# from the key which is exported from the export dialog
-                key = key.replace('!', '').replace('#', '');
+                key = key.split(/[^\w-]/)[0];
 
-                var newHash = (fl ? '/#F!' : '/#!') + ph + '!' + key;
+                const path = `/${pfcol ? 'collection' : fl ? 'folder' : 'file'}/${ph}#${key}${selector || ''}`;
 
-                var currLink = getSitePath();
-
-                if (isPublicLinkV2(currLink)) {
-                    newHash = `${(pfcol ? '/collection/' : fl ? '/folder/' : '/file/') + ph}#${key}${selector || ''}`;
-                }
-
-                if (getSitePath() !== newHash) {
+                if (getSitePath() !== path) {
                     promise.resolve(key);
 
                     fm_hideoverlay();
                     $dialog.addClass('hidden');
-                    loadSubPage(newHash);
+                    loadSubPage(path);
 
                 }
             }
@@ -1758,79 +1752,6 @@ mBroadcaster.addListener('crossTab:master', function _setup() {
     };
 });
 
-/** prevent tabnabbing attacks */
-mBroadcaster.once('startMega', function() {
-    return;
-
-    if (!(window.chrome || window.safari || window.opr)) {
-        return;
-    }
-
-    // Check whether is safe to open a link through the native window.open
-    var isSafeTarget = function(link) {
-        link = String(link);
-
-        var allowed = [
-            getBaseUrl(),
-            getAppBaseUrl()
-        ];
-
-        var rv = allowed.some(function(v) {
-            return link.indexOf(v) === 0;
-        });
-
-        if (d) {
-            console.log('isSafeTarget', link, rv);
-        }
-
-        return rv || (location.hash.indexOf('fm/chat') === -1);
-    };
-
-    var open = window.open;
-    delete window.open;
-
-    // Replace the native window.open which will open unsafe links through a hidden iframe
-    Object.defineProperty(window, 'open', {
-        writable: false,
-        enumerable: true,
-        value: function(url) {
-            var link = document.createElement('a');
-            link.href = url;
-
-            if (isSafeTarget(link.href)) {
-                return open.apply(window, arguments);
-            }
-
-            var iframe = mCreateElement('iframe', {type: 'content', style: 'display:none'}, 'body');
-            var data = 'var win=window.open("' + escapeHTML(link) + '");if(win)win.opener = null;';
-            var doc = iframe.contentDocument || iframe.contentWindow.document;
-            var script = doc.createElement('script');
-            script.type = 'text/javascript';
-            script.src = mObjectURL([data], script.type);
-            script.onload = SoonFc(function() {
-                myURL.revokeObjectURL(script.src);
-                document.body.removeChild(iframe);
-            });
-            doc.body.appendChild(script);
-        }
-    });
-
-    // Catch clicks on links and forward them to window.open
-    document.documentElement.addEventListener('click', function(ev) {
-        var node = Object(ev.target);
-
-        if (node.nodeName === 'A' && node.href
-                && String(node.getAttribute('target')).toLowerCase() === '_blank'
-                && !isSafeTarget(node.href)) {
-
-            ev.stopPropagation();
-            ev.preventDefault();
-
-            window.open(node.href);
-        }
-    }, true);
-});
-
 /**
  * Simple alias that will return a random number in the range of: a < b
  *
@@ -1841,107 +1762,6 @@ mBroadcaster.once('startMega', function() {
 function rand_range(a, b) {
     return Math.random() * (b - a) + a;
 }
-
-/**
- * Invoke the password manager in Chrome.
- *
- * There are some requirements for this function work propertly:
- *
- *  1. The username/password needs to be in a <form/>
- *  2. The form needs to be filled and visible when this function is called
- *  3. After this function is called, within the next second the form needs to be gone
- *
- * As an example take a look at the `tooltiplogin.init()` function in `top-tooltip-login.js`.
- *
- * @param {String|Object} form jQuery selector of the form
- * @return {Boolean} Returns true if the password manager can be called.
- *
- */
-function passwordManager(form) {
-
-    'use strict';
-
-    var $form = $(form);
-
-    if ($form.length === 0) {
-        return false;
-    }
-
-    if (typeof history !== "object") {
-        return false;
-    }
-    $form.rebind('submit', function() {
-        setTimeout(function() {
-            var path = getSitePath();
-            history.replaceState({ success: true }, '', "index.html#" + document.location.hash.substr(1));
-            if (hashLogic || isPublicLink(path)) {
-                path = path.replace('/', '/#');
-
-                if (is_extension) {
-                    path = path.replace('/#', '/' + urlrootfile + '#');
-                }
-            }
-            history.replaceState({ success: true, subpage: getCleanSitePath(path) }, '', path);
-            $form.find('input').val('');
-        }, 1000);
-        return false;
-    });
-
-    // For trigger FF Password Manager, submit the form by making submit button and click it.
-    var submitButton = document.createElement("input");
-    submitButton.setAttribute("type", "submit");
-    submitButton.style.opacity = '0';
-
-    $form[0].appendChild(submitButton);
-
-    submitButton.click();
-
-    return true;
-}
-passwordManager.knownForms = Object.freeze({
-    '#form_login_header': {
-        usr: '#login-name',
-        pwd: '#login-password'
-    },
-    '#login_form': {
-        usr: '#login-name2',
-        pwd: '#login-password2'
-    },
-    '#register_form': {
-        usr: '#register-email',
-        pwd: '#register-password'
-    }
-});
-passwordManager.pickFormFields = function(form) {
-    var result = null;
-    var $form = $(form);
-
-    if ($form.length) {
-        if ($form.length !== 1) {
-            console.error('Unexpected form selector', form);
-        }
-        else {
-            form = passwordManager.knownForms[form];
-            if (form) {
-                result = {
-                    usr: $form.find(form.usr).val(),
-                    pwd: $form.find(form.pwd).val(),
-
-                    selector: {
-                        usr: form.usr,
-                        pwd: form.pwd
-                    }
-                };
-
-                if (!(result.usr && result.pwd)) {
-                    result = false;
-                }
-            }
-        }
-    }
-
-    return result;
-};
 
 /**
  * Check if the passed in element (DOMNode) is FULLY visible in the viewport.

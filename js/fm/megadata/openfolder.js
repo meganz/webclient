@@ -542,39 +542,31 @@
             }
         }
 
-        var newHashLocation = 'fm/' + this.currentdirid;
+        let path = `fm/${this.currentdirid}`;
 
         // If a folderlink, and entering a new folder.
         if (pfid && this.currentrootid === this.RootID) {
-            var target = '';
-            var curLink = getSitePath();
-            if (isPublicLinkV2(curLink)) {
-                if (this.currentdirid !== this.RootID) {
-                    target = '/folder/' + this.currentdirid;
-                }
-                else if ($.autoSelectNode) {
-                    var selectedNode = M.getNodeByHandle($.autoSelectNode);
-                    if (selectedNode && selectedNode.p) {
-                        target = '/folder/' + selectedNode.p;
-                    }
-                }
-                newHashLocation = 'folder/' + pfid + '#' + pfkey + target;
+            let target = '';
 
-                if (window.pfcol) {
-                    newHashLocation = newHashLocation.replace('folder/', 'collection/');
+            if (this.currentdirid !== this.RootID) {
+                target = `/folder/${this.currentdirid}`;
+            }
+            else if ($.autoSelectNode) {
+                const n = this.getNodeByHandle($.autoSelectNode);
+                if (n.p) {
+                    target = `/folder/${n.p}`;
                 }
             }
-            else {
-                if (this.currentdirid !== this.RootID) {
-                    target = '!' + this.currentdirid;
-                }
-                newHashLocation = 'F!' + pfid + '!' + pfkey + target;
+            path = `folder/${pfid}#${pfkey}${target}`;
+
+            if (window.pfcol) {
+                path = path.replace('folder/', 'collection/');
             }
-            this.lastSeenFolderLink = newHashLocation;
+            this.lastSeenFolderLink = path;
         }
 
-        if (getSitePath() !== '/' + newHashLocation && !this.chat) {
-            loadSubPage(newHashLocation);
+        if (!this.chat && getSitePath() !== `/${path}`) {
+            loadSubPage(path);
         }
 
         delay('render:search_breadcrumbs', () => M.renderSearchBreadcrumbs());
@@ -910,7 +902,7 @@
 
             fetchDBShares = true;
         }
-        else if (!this.d[id] && !dynPages[id] && (pfid || fetchDBNodes)) {
+        else if (!this.d[id] && !dynPages[id] && id !== 'transfers' && (pfid || fetchDBNodes)) {
 
             id = M.RootID;
         }

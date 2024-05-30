@@ -4,8 +4,11 @@ import {GenericNodePropsComponent} from "../genericNodePropsComponent";
 export class ColumnSharedFolderName extends GenericNodePropsComponent {
     static sortable = true;
     static id = "name";
-    static label = l[86];
     static megatype = "name";
+
+    static get label() {
+        return l[86];
+    }
 
     render() {
         let {nodeAdapter} = this.props;

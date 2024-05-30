@@ -5,7 +5,7 @@ function startMega() {
     mBroadcaster.sendMessage("startMega");
     if (!startMega.eventlog) {
         startMega.eventlog = 1;
-        var xhr = getxhr();
+        var xhr = new XMLHttpRequest();
         xhr.onloadend = console.debug.bind(console);
         xhr.open("POST", `${apipath}cs?id=0`, true);
         xhr.send(JSON.stringify([{a: 'log', e: 99690}]));

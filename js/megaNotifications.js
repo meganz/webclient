@@ -412,7 +412,11 @@
                 const body = typeof textMessage.body === 'function' ? textMessage.body(this, params) : textMessage.body;
                 let icon = typeof textMessage.icon === 'function' ? textMessage.icon(this, params) : textMessage.icon;
 
-                if (icon === null) {
+                if (!icon || typeof icon !== 'string') {
+                    icon = undefined;
+                }
+                else if (icon.includes('<') || !icon.includes('://')) {
+                    console.assert(false, 'Invalid Notification icon', icon);
                     icon = undefined;
                 }
 

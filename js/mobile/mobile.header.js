@@ -349,9 +349,7 @@ class MegaMobileHeader extends MegaMobileComponent {
     }
 
     update() {
-
-        const noTabletView = isPublicLink() || isPublicLinkV2() || page.startsWith('businesssignup')
-            || page === 'keybackup';
+        const noTabletView = isPublicLink() || page === 'keybackup' || page.startsWith('businesssignup');
 
         const _hide = () => {
 

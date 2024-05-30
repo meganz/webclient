@@ -5,8 +5,12 @@ import { GenericNodePropsComponent } from '../genericNodePropsComponent';
 export class ColumnNodeName extends GenericNodePropsComponent {
     static sortable = true;
     static id = 'name';
-    static label = l[86] /* `Name` */;
     static megatype = 'fname';
+
+    static get label() {
+        // Name
+        return l[86];
+    }
 
     state = {
         src: null

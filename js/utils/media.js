@@ -3265,7 +3265,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 resolve();
             }
             else {
-                var xhr = getxhr();
+                var xhr = new XMLHttpRequest();
                 var urlPath = is_extension ? '' : '/';
                 var memFile = urlPath + 'mediainfo.mem';
 

@@ -898,7 +898,7 @@ async function api_createuser(ctx, invitecode, invitename) {
         req.aff = mega.affid;
     }
 
-    watchdog.notify('createuser');
+    watchdog.notify('user-created');
     return api.screq(req, ctx);
 }
 

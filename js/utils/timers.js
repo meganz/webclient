@@ -305,6 +305,17 @@ lazy(self, 'tSleep', function tSleep() {
     };
 
     /**
+     * Helper around Promise.race()
+     * @param {Number} timeout in seconds, per {@link tSleep}
+     * @param {Promise[]} args promises to race against.
+     * @returns {Promise} eventual state of the first promise in the iterable to settle.
+     * @memberOf tSleep
+     */
+    tSleep.race = (timeout, ...args) => {
+        return Promise.race([tSleep(timeout), ...args]);
+    };
+
+    /**
      * Scheduler helper. This is similar to delay(), but without adding new setTimeout()s per call.
      * @param {Number} timeout in seconds (9s min recommended, to prevent unnecessary abort()s)
      * @param {Object|*} instance holder to attach private timer properties

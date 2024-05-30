@@ -63,16 +63,13 @@ describe("Initialization Unit Tests", function() {
         }
         catch (e) {}
 
-        var len = function(o) {
-            return Object.keys(o || {}).length;
-        };
         var blen = function(p) {
-            return len(mBroadcaster._topics[p]);
+            return mBroadcaster.hasListener(p);
         };
 
         // We must have boot_done listeners at least for:
         // api_reset(), watchdog.setup(), eventsCollect(), MegaData(), polyfills, and attrs.js
-        assert(blen('boot_done') > 5, 'Unexpected boot_done listeners...');
+        assert(blen('boot_done'), 'Unexpected boot_done listeners...');
 
         // We must have a bunch of listeners waiting for startMega() to get invoked...
         assert(blen('startMega'), 'Should listen to startMega()...');
@@ -80,7 +77,7 @@ describe("Initialization Unit Tests", function() {
 
         // Check for some others...
         assert(blen('closedialog'), 'safeShowDialog() should listen to closeDialog()');
-        assert(blen('crossTab:master'), 'Should listen to cross-tab master ownership');
+        assert(blen('crossTab:owner'), 'Should listen to cross-tab ownership');
         // assert(blen('mediainfo:collect'), 'Should listen to collect mediainfo metadata');
 
         // catch errors dispatching broadcast events (console.error addendum)

@@ -197,7 +197,7 @@ FMDB.prototype.init = async function(wipe) {
                 }
                 return sn;
             }
-            if (!mBroadcaster.crossTab.master || this.crashed) {
+            if (!mBroadcaster.crossTab.owner || this.crashed) {
 
                 throw new Error(`unusable (${this.crashed | 0})`);
             }
@@ -3100,7 +3100,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
          */
         async init() {
 
-            if (M.RootID || !mBroadcaster.crossTab.master) {
+            if (M.RootID || !mBroadcaster.crossTab.owner) {
                 // fetch the whole cloud on slave tabs..
                 return M.RootID || fmdb.get('f', (res) => emplace(res));
             }

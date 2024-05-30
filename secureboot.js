@@ -294,11 +294,9 @@ function openExternalLink(aExternalLink) {
         document.removeEventListener('visibilitychange', clearEvents);
         clearTimeout(window.appLnkInt);
         window.appLnkInt = undefined;
+        return 0xDEAD;
     };
-    var bpcListener = mBroadcaster.addListener('beforepagechange', function() {
-        clearEvents();
-        mBroadcaster.removeListener(bpcListener);
-    });
+    mBroadcaster.addListener('beforepagechange', clearEvents);
 
     // Clear events when changing the tab visibility
     clearEvents();
@@ -1318,399 +1316,15 @@ function mObjectURL(data, type) {
 /**
  * Events broadcaster
  * @name mBroadcaster
- * @global
+ * @private
  */
-(function(s, o) {
-    'use strict';
-    Object.defineProperty(s, 'mBroadcaster', {
-        value: o,
-        writable: false
-    });
-})(self, {
-    // @private
-    _topics: Object.create(null),
-
-    /**
-     * Add broadcast event listener.
-     * @param {String} topic A string representing the event type to listen for.
-     * @param {Object|Function} options Event options or function to invoke.
-     * @returns {String} The ID identifying the event
-     * @memberOf mBroadcaster
-     */
-    addListener: function mBroadcaster_addListener(topic, options) {
-        'use strict';
-
-        if (typeof options === 'function') {
-            options = {
-                callback : options
-            };
-        }
-        if (options.hasOwnProperty('handleEvent')) {
-            options = {
-                scope: options,
-                callback: options.handleEvent
-            };
-        }
-        if (typeof options.callback !== 'function') {
-            return false;
-        }
-
-        if (!this._topics[topic]) {
-            this._topics[topic] = Object.create(null);
-        }
-
-        var id = makeUUID();
-        this._topics[topic][id] = options;
-
-        //if (d) console.log('Adding broadcast listener', topic, id, options);
-
-        return id;
-    },
-
-    /**
-     * Check whether someone is listening for an event
-     * @param {String} topic A string representing the event type we may be listening for.
-     * @returns {Boolean}
-     */
-    hasListener: function mBroadcaster_hasListener(topic) {
-        'use strict';
-        return Boolean(this._topics[topic]);
-    },
-
-    /**
-     * Remove all broadcast events for an specific topic.
-     * @param {String} topic The string representing the event type we were listening for.
-     * @returns {Boolean} Whether the event was found.
-     * @memberOf mBroadcaster
-     */
-    removeListeners: function mBroadcaster_removeListeners(topic) {
-        'use strict';
-
-        if (this._topics[topic]) {
-            delete this._topics[topic];
-            return true;
-        }
-        return false;
-    },
-
-    /**
-     * Remove an specific event based on the ID given by addListener()
-     * @param {String} token The ID identifying the event.
-     * @param {EventListener} [listener] Optional DOM event listener.
-     * @returns {Boolean} Whether the event was found.
-     * @memberOf mBroadcaster
-     */
-    removeListener: function mBroadcaster_removeListenr(token, listener) {
-        'use strict';
-
-        // if (d) console.log('Removing broadcast listener', token);
-
-        if (listener) {
-            // Remove an EventListener interface.
-            var found;
-            for (var id in this._topics[token]) {
-                if (this._topics[token].hasOwnProperty(id)
-                    && this._topics[token][id].scope === listener) {
-
-                    found = id;
-                    break;
-                }
-            }
-
-            token = found;
-        }
-
-        for (var topic in this._topics) {
-            if (this._topics[topic][token]) {
-                delete this._topics[topic][token];
-                if (!Object.keys(this._topics[topic]).length) {
-                    delete this._topics[topic];
-                }
-                return true;
-            }
-        }
-        return false;
-    },
-
-    /**
-     * Send a broadcast event
-     * @param {String} topic A string representing the event type to notify.
-     * @returns {Boolean} Whether anyone were listening.
-     * @memberOf mBroadcaster
-     */
-    sendMessage: function mBroadcaster_sendMessage(topic) {
-        'use strict';
-
-        if (this._topics[topic]) {
-            var idr  = [];
-            var args = toArray.apply(null, arguments);
-            args.shift();
-
-            if (!args.length) {
-                args = [{type: topic}];
-            }
-
-            // if (d) console.log('Broadcasting ' + topic, args);
-
-            for (var id in this._topics[topic]) {
-                var ev = this._topics[topic][id], rc;
-                try {
-                    rc = ev.callback.apply(ev.scope, args);
-                } catch (ex) {
-                    console.error(ex);
-
-                    if (typeof reportError === 'function'
-                        && buildVersion.timestamp * 1000 + 8e7 > Date.now()) {
-
-                        reportError(ex);
-                    }
-                }
-                if (ev.once || rc === 0xDEAD)
-                    idr.push(id);
-            }
-            if (idr.length) {
-                for (var i = idr.length; i--;) {
-                    this.removeListener(idr[i]);
-                }
-            }
-
-            return true;
-        }
-
-        return false;
-    },
-
-    /**
-     * Wrapper around addListener() that will listen for the event just once.
-     * @param {String} topic A string representing the event type to listen for.
-     * @param {Function} callback The function to invoke
-     * @memberOf mBroadcaster
-     */
-    once: function mBroadcaster_once(topic, callback) {
-        'use strict';
-
-        this.addListener(topic, {
-            once : true,
-            callback : callback
-        });
-    },
-
-    crossTab: {
-        eTag: '$CTE$!_',
-
-        initialize: function crossTab_init(cb) {
-            var setup = function(ev) {
-                var msg = String(ev && ev.key).substr(this.eTag.length);
-                if (d) console.log('crossTab setup-event', msg, ev);
-                if (cb && (!ev || msg === 'pong')) {
-                    this.unlisten(setup);
-                    if (msg !== 'pong') {
-                        this.setMaster();
-                    } else {
-                        this.notify('ack-pong');
-                        delete localStorage[ev.key];
-                    }
-                    this.listen();
-                    if (d) {
-                        console.log('CROSSTAB COMMUNICATION INITIALIZED AS '
-                            + (this.master ? 'MASTER':'SLAVE'));
-
-                        console.log(String(ua));
-                        console.log(buildVersion);
-                        console.log(browserdetails(ua).prod + u_handle);
-                    }
-                    mBroadcaster.sendMessage('crossTab:setup', this.master);
-                    cb(this.master);
-                    cb = null;
-                }
-            }.bind(this);
-
-            if (this.handle) {
-                this.eTag = this.eTag.split(this.handle).shift();
-            }
-            this.slaves = [];
-            this.handle = u_handle;
-            this.eTag += u_handle + '!';
-
-            this.ctID = ~~(Math.random() * Date.now());
-            this.listen(setup);
-            this.notify('ping');
-
-            // if multiple tabs are reloaded/opened at the same time
-            // they would both see .ctInstances as === 0, so we need to increase this
-            // as earlier as possible, e.g. now.
-            localStorage.ctInstances = (parseInt(localStorage.ctInstances) || 0) + 1;
-
-            setTimeout(setup, parseInt(localStorage.ctInstances) === 1 ? 0 : 2100 + Math.floor(Math.random() * 900));
-        },
-
-        listen: function crossTab_listen(aListener) {
-            if (window.addEventListener) {
-                window.addEventListener('storage', aListener || this, false);
-            }
-            else if (window.attachEvent) {
-                if (!aListener) {
-                    aListener = this.__msie_listener = this.handleEvent.bind(this);
-                }
-                window.attachEvent('onstorage', aListener);
-            }
-        },
-
-        unlisten: function crossTab_unlisten(aListener) {
-            if (window.addEventListener) {
-                window.removeEventListener('storage', aListener || this, false);
-            }
-            else if (window.attachEvent) {
-                if (!aListener) {
-                    aListener = this.__msie_listener;
-                    delete this.__msie_listener;
-                }
-                window.detachEvent('onstorage', aListener);
-            }
-        },
-
-        leave: function crossTab_leave() {
-            if (this.ctID) {
-                var wasMaster = this.master;
-                if (wasMaster) {
-                    var current = parseInt(localStorage.ctInstances);
-                    if (current > 1) {
-                        // only decrease ctInstnaces if its > 1, so that we would never
-                        // get into a case when ctInstances is < 0
-                        localStorage.ctInstances--;
-                    }
-                    else {
-                        localStorage.ctInstances = 0;
-                    }
-                    localStorage['mCrossTabRef_' + u_handle] = this.master;
-                    delete this.master;
-                } else if (d) {
-                    console.log('crossTab leaving');
-                }
-
-                this.unlisten();
-                this.notify('leaving', {
-                    wasMaster: wasMaster || -1,
-                    newMaster: this.slaves[0]
-                });
-
-                mBroadcaster.sendMessage('crossTab:leave', wasMaster);
-                this.ctID = 0;
-            }
-        },
-
-        drain: function() {
-            'use strict';
-            if (typeof delay === 'function') {
-                var tag = this.eTag;
-                delay('crosstab:drain', function() {
-                    var entries = Object.keys(localStorage)
-                        .filter(function(k) {
-                            return k.startsWith(tag);
-                        });
-                    console.debug('Removing crossTab entries...', entries);
-
-                    for (var i = entries.length; i--;) {
-                        delete localStorage[entries[i]];
-                    }
-                }, 8e3);
-            }
-        },
-
-        notify: tryCatch(function crossTab_notify(msg, data) {
-            'use strict';
-            this.drain();
-            data = { origin: this.ctID, data: data, sid: ++mIncID };
-            localStorage.setItem(this.eTag + msg, JSON.stringify(data));
-            if (d) console.log('crossTab Notifying', this.eTag + msg, localStorage[this.eTag + msg]);
-        }),
-
-        setMaster: function crossTab_setMaster() {
-            this.master = (Math.random() * Date.now()).toString(36);
-
-            localStorage.ctInstances = (this.slaves.length + 1);
-            mBroadcaster.sendMessage('crossTab:master', this.master);
-            this.notify('pong');
-
-            // (function liveLoop(tag) {
-            // if (tag === mBroadcaster.crossTab.master) {
-            // localStorage['mCrossTabRef_' + u_handle] = Date.now();
-            // setTimeout(liveLoop, 6e3, tag);
-            // }
-            // })(this.master);
-        },
-
-        clear: function crossTab_clear() {
-            Object.keys(localStorage).forEach(function(key) {
-                if (key.substr(0,this.eTag.length) === this.eTag) {
-                    if (d) console.log('crossTab Removing ' + key);
-                    delete localStorage[key];
-                }
-            }.bind(this));
-        },
-
-        handleEvent: function crossTab_handleEvent(ev) {
-            if (d > 1) console.log('crossTab ' + ev.type + '-event', ev.key, ev.newValue, ev);
-
-            if (String(ev.key).indexOf(this.eTag) !== 0) {
-                return;
-            }
-            var msg = ev.key.substr(this.eTag.length),
-                strg = JSON.parse(ev.newValue ||'""');
-
-            if (!strg || strg.origin === this.ctID) {
-                if (d) console.log('Ignoring crossTab event', msg, strg);
-                return;
-            }
-
-            switch (msg) {
-                case 'ack-pong':
-                    if (!this.master || this.slaves.indexOf(strg.origin) >= 0) {
-                        break;
-                    }
-                    /* fallthrough */
-                case 'ping':
-                    this.slaves.push(strg.origin);
-                    if (this.master) {
-                        localStorage.ctInstances = (this.slaves.length + 1);
-                    }
-
-                    mBroadcaster.sendMessage('crossTab:slave', strg.origin);
-                    this.notify('pong');
-                    break;
-                case 'leaving':
-                    var idx = this.slaves.indexOf(strg.origin);
-                    if (idx !== -1) {
-                        this.slaves.splice(idx, 1);
-                        if (this.master) {
-                            localStorage.ctInstances = (this.slaves.length + 1);
-                        }
-                    }
-
-                    if (localStorage['mCrossTabRef_' + u_handle] === strg.data.wasMaster) {
-                        if (strg.data.newMaster === this.ctID) {
-                            if (d) {
-                                console.log('Taking crossTab-master ownership');
-                            }
-                            delete localStorage['mCrossTabRef_' + u_handle];
-                            this.setMaster();
-                        }
-                    }
-                default:
-                    mBroadcaster.sendMessage('crossTab:' + msg, strg);
-
-                    break;
-            }
-
-            delete localStorage[ev.key];
-        }
-    }
-});
-
-if (!is_karma) {
-    Object.freeze(mBroadcaster);
-}
-
+tmp = [];
+self.mBroadcaster = {
+    mbl: tmp,
+    once: Array.prototype.push.bind(tmp, true),
+    addListener: Array.prototype.push.bind(tmp, false)
+};
+tmp = 0;
 
 var sh = [];
 
@@ -2580,6 +2194,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
     jsl.push({f:'js/jquery-ui.extra.js', n: 'jquery_ui_extra_js', j:1});
 
+    jsl.push({f:'js/utils/broadcast.js', n: 'js_utils_broadcast_js', j: 1});
     jsl.push({f:'js/utils/polyfills.js', n: 'js_utils_polyfills_js', j: 1});
     jsl.push({f:'js/utils/api.js', n: 'js_utils_api_js', j: 1});
     jsl.push({f:'js/utils/browser.js', n: 'js_utils_browser_js', j: 1});
@@ -3167,6 +2782,7 @@ else if (!browserUpdate) {
         jsl.push({f:'html/js/embedplayer.js', n: 'embedplayer_js', j: 1, w: 4});
         jsl.push({f:'js/transfers/cloudraid.js', n: 'cloudraid_js', j: 1});
 
+        jsl.push({f:'js/utils/broadcast.js', n: 'js_utils_broadcast_js', j: 1});
         jsl.push({f:'js/utils/polyfills.js', n: 'js_utils_polyfills_js', j: 1});
         jsl.push({f:'js/utils/api.js', n: 'js_utils_api_js', j: 1});
         jsl.push({f:'js/utils/browser.js', n: 'js_utils_browser_js', j: 1});
@@ -4047,7 +3663,6 @@ else if (!browserUpdate) {
                 if (Array.isArray(result) && typeof result[0] === 'object') {
                     // Cache flags object
                     mega.apiMiscFlags = result[0];
-                    mBroadcaster.sendMessage('global-mega-flags');
                 }
                 else if (d) {
                     console.error('API request error, no flags given...', result);
@@ -4180,7 +3795,7 @@ else if (!browserUpdate) {
             var setLSItem = tryCatch(function(k, v) {
                 localStorage.setItem(k, JSON.stringify(v));
             });
-            var onStorageEvent = function(ev) {
+            window.addEventListener('storage', function(ev) {
                 if (ev.key === 'sb!sid') {
                     var value = JSON.parse(ev.newValue || '""');
 
@@ -4212,15 +3827,7 @@ else if (!browserUpdate) {
 
                     delete localStorage[ev.key];
                 }
-            };
-
-            if (window.addEventListener) {
-                window.addEventListener('storage', onStorageEvent, false);
-            }
-            else if (window.attachEvent) {
-                window.attachEvent('onstorage', onStorageEvent);
-            }
-            onStorageEvent = undefined;
+            });
 
             if (u_storage.sid) {
                 ack();

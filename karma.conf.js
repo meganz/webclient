@@ -42,6 +42,7 @@ module.exports = function(config) {
         'index.js',
         'nodedec.js',
         'js/vendor/megaLogger.js',
+        'js/utils/broadcast.js',
         'js/utils/polyfills.js',
         'js/utils/api.js',
         'js/utils/browser.js',

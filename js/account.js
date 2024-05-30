@@ -82,11 +82,7 @@ function u_checklogin2(ctx, ks) {
         ctx.checkloginresult(ctx, false);
     }
     else {
-        u_k = ks[0];
-        u_sid = ks[1];
-        api_setsid(u_sid);
-        u_storage.k = JSON.stringify(u_k);
-        u_storage.sid = u_sid;
+        security.persistAccountSession(...ks);
         u_checklogin3(ctx);
     }
 }
@@ -354,26 +350,21 @@ function u_checklogin3a(res, ctx) {
                     console.assert(!handle, 'FIXME: cross-tab already initialized.', handle, u_handle);
                     console.assert(!handle || handle === u_handle, 'Unmatched cross-tab handle', handle, u_handle);
 
-                    mBroadcaster.crossTab.initialize(() => ctx.checkloginresult(ctx, r));
+                    return mBroadcaster.crossTab.initialize();
                 }
                 else if ($.createanonuser === u_attr.u) {
                     delete $.createanonuser;
 
                     if (pfid) {
                         M.importWelcomePDF().catch(dump);
-                        ctx.checkloginresult(ctx, r);
                     }
                     else {
-                        M.importWelcomePDF()
-                            .catch(dump)
-                            .finally(() => {
-                                ctx.checkloginresult(ctx, r);
-                            });
+                        return M.importWelcomePDF().catch(dump);
                     }
                 }
-                else {
-                    ctx.checkloginresult(ctx, r);
-                }
+            })
+            .then(() => {
+                ctx.checkloginresult(ctx, r);
             })
             .catch((ex) => {
                 // This catch handler is meant to be reached on critical
@@ -483,9 +474,6 @@ function u_logout(logout) {
 
         if (logout !== -0xDEADF) {
             watchdog.notify('logout');
-        }
-        else {
-            watchdog.clear();
         }
 
         if (typeof slideshow === 'function') {

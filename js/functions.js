@@ -1566,7 +1566,8 @@ function mLogout(aCallback, force) {
 }
 
 // Initialize Rubbish-Bin Cleaning Scheduler
-mBroadcaster.addListener('crossTab:master', function _setup() {
+mBroadcaster.addListener('crossTab:owner', function _setup() {
+    'use strict';
     var RUBSCHED_WAITPROC =  20 * 1000;
     var RUBSCHED_IDLETIME =   4 * 1000;
     var timer, updId;

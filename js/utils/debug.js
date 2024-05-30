@@ -544,10 +544,9 @@ mBroadcaster.once('boot_done', function radSetup() {
     log('----');
     log('MEGA', `Starting RAD Session, ${new Date().toISOString()}`);
 
-    mBroadcaster.once('crossTab:setup', (master) => {
-        if (!master) {
-            const {ctID} = mBroadcaster.crossTab;
-            pfx = (ctID >>> 0).toString(36);
+    mBroadcaster.once('crossTab:setup', (owner) => {
+        if (!owner) {
+            pfx = mBroadcaster.crossTab.origin.toString(36);
 
             const buf = [...buffer];
             buffer.clear();
@@ -560,20 +559,19 @@ mBroadcaster.once('boot_done', function radSetup() {
         }
     });
 
-    mBroadcaster.addListener('crossTab:master', () => {
+    mBroadcaster.addListener('crossTab:owner', () => {
         if (pfx) {
             const pid = pfx;
-            const {master, slaves} = mBroadcaster.crossTab;
+            const {owner, actors} = mBroadcaster.crossTab;
             pfx = null;
-            log('CROSSTAB', `Ownership (was '${pid}'), ${master}<>${slaves.map(s => (s >>> 0).toString(36))}`);
+            log('CROSSTAB', `Ownership (was '${pid}'), (${owner})<>${actors.map(s => parseInt(s).toString(36))}`);
             flush().catch(dump);
         }
     });
 
-    mBroadcaster.addListener('crossTab:slave', (id) => {
-        const {master, slaves} = mBroadcaster.crossTab;
-        id = (id >>> 0).toString(36);
-        log('CROSSTAB', `New tab with id:${id}, ${master}<>${slaves.map(s => (s >>> 0).toString(36))}`);
+    mBroadcaster.addListener('crossTab:actor', (id) => {
+        const {owner, actors} = mBroadcaster.crossTab;
+        log('CROSSTAB', `New tab with id:${id.toString(36)}, (${owner})<>${actors.map(s => parseInt(s).toString(36))}`);
         flush().catch(dump);
     });
 

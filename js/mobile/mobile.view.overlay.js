@@ -352,7 +352,12 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
                 contentBlock.classList.add('v-hidden');
                 loadingDialog.show();
 
-                this.bottomBar.actions[0].disabled = true;
+                if (this.bottomBar) {
+                    this.bottomBar.actions[0].disabled = true;
+                }
+
+                const $contianer = dlid ? $('.js-text-viewer', textBlock) : undefined;
+                mega.textEditorUI.cleanup();
 
                 mega.fileTextEditor.getFile(nodeHandle)
                     .then(data => 
@@ -360,7 +365,8 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
                             this.nodeComponent.name,
                             data,
                             nodeHandle,
-                            isLink
+                            isLink,
+                            $contianer
                         )
                     )
                     .then(() => {

@@ -1051,7 +1051,8 @@
             $sharedMe.removeClass('hidden');
         }
 
-        if ('kernel' in s4 && M.tree.s4 && ($.copyDialog || $.moveDialog || $.selectFolderDialog)) {
+        if ('kernel' in s4 && M.tree.s4 &&
+            ($.copyDialog || $.moveDialog || $.selectFolderDialog && !$.fileRequestNew)) {
             $s4.removeClass('hidden');
         }
         else {

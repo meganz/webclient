@@ -334,7 +334,7 @@ var slideshowid;
 
             // Keep the Info panel option hidden on public links (but usable in regular Cloud Drive etc)
             const currentSitePath = getSitePath();
-            if (!isPublicLink(currentSitePath) && !isPublicLinkV2(currentSitePath)) {
+            if (!isPublicLink(currentSitePath)) {
                 $optionButton.removeClass('hidden');
             }
         }
@@ -1348,7 +1348,7 @@ var slideshowid;
 
             // Keep the Info panel option hidden on public links (but usable in regular Cloud Drive etc)
             const currentSitePath = getSitePath();
-            if (isPublicLink(currentSitePath) || isPublicLinkV2(currentSitePath)) {
+            if (isPublicLink(currentSitePath)) {
                 $('.v-btn.options', $overlay).addClass('hidden');
             }
 

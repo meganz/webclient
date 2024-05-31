@@ -642,7 +642,10 @@
         else if (id === 'backups') {
             id = this.BackupsId || this.RootID;
         }
-        else if (id === 'cloudroot' || id === 'fm' || id === this.InboxID) {
+        else if (id === 'inbox') {
+            id = this.InboxID;
+        }
+        else if (id === 'cloudroot' || id === 'fm' || id === this.InboxID && !window.vw) {
             id = this.RootID;
         }
         else if (id && id.substr(0, 4) === 'chat') {

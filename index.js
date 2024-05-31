@@ -3432,7 +3432,7 @@ mBroadcaster.addListener('update-api-search-params', async() => {
     }
 
     let qs = null;
-    const {apiut: ut, jid} = localStorage;
+    const {apiut: ut, jid, afo} = localStorage;
 
     if (mega.flags.jid && !localStorage.njt) {
         let j = jid || await M.getPersistentData('jid').catch(nop);
@@ -3446,6 +3446,11 @@ mBroadcaster.addListener('update-api-search-params', async() => {
     if (ut) {
 
         qs = {...qs, ut};
+    }
+
+    if (afo) {
+
+        qs = {...qs, ...JSON.parse(afo)};
     }
 
     api.recycleURLSearchParams('ut,j', qs);

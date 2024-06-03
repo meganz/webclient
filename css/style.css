@@ -2492,6 +2492,9 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-fm-left-icon:not(.transfers) .dark-tooltip {
     margin-top: 20px;
 }
+.nw-fm-left-icon .dark-tooltip {
+    pointer-events: none;
+}
 .nw-fm-left-icon.dashboard .dark-tooltip,
 .nw-fm-left-icon.transfers .dark-tooltip {
     margin-top: 0;

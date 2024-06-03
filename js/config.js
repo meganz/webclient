@@ -784,6 +784,15 @@
             if (toast) {
                 showToast('settings', toastText || l[16168]);
             }
+
+            if (key === 's4thumbs') {
+                if ('kernel' in s4) {
+                    s4.kernel.container.settings(null, {t: !!fmconfig.s4thumbs}).dump('s4thumbs');
+                }
+                else if (d) {
+                    console.error('Tried to change s4-settings, w/o kernel availability.');
+                }
+            }
         });
     };
 

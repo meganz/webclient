@@ -92,10 +92,10 @@ MegaData.prototype.buildSubMenu = function(id) {
     M.disableCircularTargets('#fi_');
 };
 
-MegaData.prototype.getSelectedSourceRoot = function(isSearch) {
+MegaData.prototype.getSelectedSourceRoot = function(isSearch, isTree) {
     'use strict';
 
-    let sourceRoot = isSearch || M.currentdirid === 'recents'
+    let sourceRoot = isTree || isSearch || M.currentdirid === 'recents'
         || M.currentdirid === 'public-links' || M.currentdirid === 'out-shares'
         ? M.getNodeRoot($.selected[0]) : M.currentrootid;
 
@@ -135,7 +135,7 @@ MegaData.prototype.checkSendToChat = function(isSearch, sourceRoot) {
  */
 // @todo make eslint happy..
 // eslint-disable-next-line complexity,sonarjs/cognitive-complexity
-MegaData.prototype.menuItems = async function menuItems() {
+MegaData.prototype.menuItems = async function menuItems(isTree) {
     "use strict";
 
     console.assert($.selected);
@@ -169,7 +169,7 @@ MegaData.prototype.menuItems = async function menuItems() {
     const items = Object.create(null);
     const isSearch = page.startsWith('fm/search');
     const selNode = M.getNodeByHandle($.selected[0]);
-    const sourceRoot = M.getSelectedSourceRoot(isSearch);
+    const sourceRoot = M.getSelectedSourceRoot(isSearch, isTree);
     let restrictedFolders = false;
     const isInShare = M.currentrootid === 'shares';
 
@@ -528,10 +528,9 @@ MegaData.prototype.menuItems = async function menuItems() {
         }
     }
 
-    if (M.currentdirid === 'file-requests') {
+    if (M.currentdirid === 'file-requests' && !isTree) {
         delete items['.move-item'];
         delete items['.copy-item'];
-        delete items['.open-cloud-item'];
         delete items['.open-in-location'];
         delete items['.getlink-item'];
         delete items['.embedcode-item'];
@@ -908,6 +907,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
         var id;
         var currNodeClass;
         var $currentTarget = $(e.currentTarget);
+        let isTree = false;
 
         // This event is context on selection bar
         if ($currentTarget.hasClass('js-statusbarbtn')) {
@@ -926,6 +926,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
             if (id.includes('treea_')) {
                 id = id.replace(/treea_+|(os_|pl_)/g, '');
                 eventlog(500036);
+                isTree = true;
             }
 
             // File manager breadcrumb path click
@@ -1152,7 +1153,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
                 }
             };
 
-            M.menuItems()
+            M.menuItems(isTree)
                 .then((items) => {
                     const $menuCMI = $(menuCMI);
 

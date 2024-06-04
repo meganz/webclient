@@ -187,6 +187,9 @@ export default class BrowserEntries extends MegaRenderMixin {
                 this.handleAttach();
             }
 
+            // Re-render selected node/s to info panel
+            mega.ui.mInfoPanel.reRenderIfVisible($.selected);
+
             // reset the quick finding feature vars if this was not a "quick find", e.g. charTyped was left empty.
             if (!charTyped) {
                 this.lastCharKeyPressed = false;
@@ -482,6 +485,9 @@ export default class BrowserEntries extends MegaRenderMixin {
             nodeAdapterProps={{
                 'onClick': (e, node) => {
                     this.onEntryClick(e, node);
+
+                    // Re-render selected node/s to info panel
+                    mega.ui.mInfoPanel.reRenderIfVisible($.selected);
                 },
                 'onDoubleClick': (e, node) => {
                     this.onEntryDoubleClick(e, node);

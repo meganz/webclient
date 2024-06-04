@@ -19134,6 +19134,7 @@ LeftPanel.NAMESPACE = 'lhp';
 
 
 
+
 const VIEWS = {
   CHATS: 0x00,
   MEETINGS: 0x01,
@@ -29511,7 +29512,7 @@ class MetaRichprevConfirmation extends metaRichpreviewConfirmation_ConversationM
     }, metaRichpreviewConfirmation_React.createElement("div", {
       className: "message richpreview img-wrapper"
     }, metaRichpreviewConfirmation_React.createElement("div", {
-      className: " message richpreview preview-confirmation sprite-fm-illustration img-chat-url-preview "
+      className: "\r message\r richpreview\r preview-confirmation\r sprite-fm-illustration\r img-chat-url-preview\r "
     })), metaRichpreviewConfirmation_React.createElement("div", {
       className: "message richpreview inner-wrapper"
     }, metaRichpreviewConfirmation_React.createElement("div", {
@@ -34137,6 +34138,7 @@ class BrowserEntries extends mixins.w9 {
       } else if (keyCode === KEYS.ENTER || e.metaKey && keyCode === KEYS.DOWN) {
         this.handleAttach();
       }
+      mega.ui.mInfoPanel.reRenderIfVisible($.selected);
       if (!charTyped) {
         this.lastCharKeyPressed = false;
         this.lastCharKeyIndex = -1;
@@ -34386,6 +34388,7 @@ class BrowserEntries extends mixins.w9 {
       nodeAdapterProps: {
         'onClick': (e, node) => {
           this.onEntryClick(e, node);
+          mega.ui.mInfoPanel.reRenderIfVisible($.selected);
         },
         'onDoubleClick': (e, node) => {
           this.onEntryDoubleClick(e, node);

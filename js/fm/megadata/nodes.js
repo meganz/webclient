@@ -959,19 +959,45 @@ MegaData.prototype.copyNodes = async function(cn, t, del, tree) {
         .then(({pkt, result}) => {
 
             if (del) {
+                let ops = 0;
                 const promises = [];
+                const sign = Symbol('skip');
 
                 for (let i = cn.length; i--;) {
-                    // must not update DB pre-API
-                    this.delNode(cn[i], true);
 
-                    if (!result[i]) {
-                        promises.push(api.screq({a: 'd', n: cn[i]}));
+                    if (result[i]) {
+                        console.error('copy failed, %s', cn[i], result[i]);
+                        promises.push(sign);
+                    }
+                    else {
+                        const req = {
+                            a: 'd',
+                            n: cn[i]
+                        };
+                        if (treetype(cn[i]) === 'inbox') {
+                            req.vw = 1;
+                        }
+                        ++ops;
+                        promises.push(api.screq(req));
                     }
                 }
 
-                if (promises.length) {
-                    Promise.all(promises).catch(dump);
+                if (ops) {
+                    Promise.allSettled(promises)
+                        .then((res) => {
+                            for (let i = res.length; i--;) {
+
+                                if (res[i].status === 'rejected') {
+                                    const reason = api_strerror(res[i].reason | 0);
+                                    const message = `${l[6949]}, ${this.getNamedPath(cn[i])}: ${reason}`;
+
+                                    console.error(message);
+                                    showToast('warning', message);
+                                }
+                            }
+                            dump(res);
+                        })
+                        .catch(tell);
                 }
             }
 

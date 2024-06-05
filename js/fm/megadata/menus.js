@@ -557,7 +557,10 @@ MegaData.prototype.menuItems = async function menuItems(isTree) {
         delete items['.add-star-item'];
         delete items['.colour-label-items'];
         delete items['.embedcode-item'];
-        delete items['.remove-item'];
+
+        if (!self.vw) {
+            delete items['.remove-item'];
+        }
 
         let cl = new mega.Share.ExportLink();
 

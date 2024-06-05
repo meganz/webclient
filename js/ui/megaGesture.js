@@ -7,7 +7,7 @@ class MegaGesture {
         this.minSwipeDistanceX = options.minSwipeDistanceX || 250 / window.devicePixelRatio;
         this.minSwipeDistanceY = options.minSwipeDistanceY || 250 / window.devicePixelRatio;
 
-        const body = options.iframeDoc ? iframeDoc.body : document.body;
+        const body = options.iframeDoc ? options.iframeDoc.body : document.body;
 
         this._rgOpt = {capture: true};
         this._registerGesture = () => {
@@ -15,7 +15,8 @@ class MegaGesture {
 
             if (!this.domNode || !this.domNode.megaGesture) {
 
-                if ((this.domNode = this.domNode || this.options.domNode || false).parentNode) {
+                if ((this.domNode = this.domNode || this.options.domNode || false).parentNode ||
+                     this.domNode === this.options.iframeDoc) {
 
                     this.domNode.addEventListener('touchend', this);
                     this.domNode.addEventListener('touchstart', this);

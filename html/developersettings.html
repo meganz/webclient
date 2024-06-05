@@ -96,10 +96,38 @@
                             </select>
                         </td>
                     </tr>
+                    <tr>
+                        <th>Block local currency</th>
+                        <td>
+                            <select class="developer-setting localstorage" name="blockLocal">
+                                <option value="">Allow local currency</option>
+                                <option value="1">Block local currency</option>
+                            </select>
+                        </td>
+                    </tr>
                 </table>
                 <button class="mega-button positive apply">
                     <span>Apply</span>
                 </button>
+
+                <h3>localStorage</h3>
+                <div class="misc-dev api-setting-item">
+                    <div>Set/Delete local storage items</div>
+                    <div>
+                        <div class="input-title">Item name:</div>
+                        <input class="name" />
+                    </div>
+                    <div>
+                        <div class="input-title">Item value:</div>
+                        <input class="value" />
+                    </div>
+                    <div class="button-container">
+                        <button class="mega-button positive set">Set</button>
+                        <button class="mega-button get">Get</button>
+                    </div>
+                    <div class="response"></div>
+                    <div class="info">Setting a name and no value will delete the item from localStorage</div>
+                </div>
 
                 <h3 class="logged-in section-title">User Attribute</h3>
                 <div class="logged-in user-attr-settings api-setting-item">

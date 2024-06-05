@@ -33,6 +33,7 @@
             'focusable': true,
             'closable': true,
             'closableByEsc': false,
+            'closableByOverlay': true,
             'expandable': true,
             'requiresOverlay': false,
             'defaultButtonStyle': true,
@@ -88,11 +89,6 @@
                 self.$dialog.removeClass('focused');
             });
         }
-        if (self.options.closable) {
-            $('button.js-close', self.$dialog).rebind('click.dialog' + self._getEventSuffix(), function() {
-                self.hide();
-            });
-        }
         if (self.options.expandable) {
             $(self.options.expandableButtonClass, self.$dialog).rebind('click.dialog' + self._getEventSuffix(), function() {
                 self.toggleExpandCollapse();
@@ -100,6 +96,15 @@
         }
         if (self.options.title) {
             $('header h2, header h3', self.$dialog).first().text(self.options.title);
+        }
+
+        if (self.options.closable) {
+            $('button.js-close', self.$dialog).rebind('click.dialog' + self._getEventSuffix(), () => {
+                self.hide();
+            });
+        }
+        else {
+            $('button.js-close', self.$dialog).addClass('hidden');
         }
 
         // link dialog size with the textareas when/if resized by the user using the native resize func
@@ -352,9 +357,13 @@
 
     Dialog.prototype._showOverlay = function() {
         var self = this;
-        $('.fm-dialog-overlay').rebind('click.dialog' + self.dialogIdx, function() {
-            self.hide();
-        });
+
+        if (self.options.closableByOverlay) {
+            $('.fm-dialog-overlay').rebind('click.dialog' + self.dialogIdx, () => {
+                self.hide();
+            });
+        }
+
         $('.fm-dialog-overlay').removeClass('hidden');
 
         if (is_mobile) {

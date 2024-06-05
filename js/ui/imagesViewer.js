@@ -901,7 +901,7 @@ var slideshowid;
     }
 
     // Mobile finger gesture
-    function slideshow_gesture(elm, type) {
+    function slideshow_gesture(h, elm, type) {
 
         // TODO: change to `!is_touchable` to support desktop touch device
         if (!is_mobile || !is_touchable || !mega.ui.viewerOverlay) {
@@ -933,7 +933,7 @@ var slideshowid;
             elm = elm.contentDocument;
         }
         else {
-            containerSelector = is_video(mega.ui.viewerOverlay.nodeComponent.node) ? '.video-block' : '.img-wrap';
+            containerSelector = is_video(M.getNodeByHandle(h)) ? '.video-block' : '.img-wrap';
             elm = elm.querySelector('.content');
         }
 
@@ -944,31 +944,33 @@ var slideshowid;
             onTouchStart: function() {
 
                 const container = this.domNode.querySelector(containerSelector);
+                const style = {
+                    top: container.scrollTop,
+                    left: container.scrollLeft,
+                    width: container.offsetWidth,
+                    height: container.offsetHeight
+                };
 
                 if (containerSelector === '.img-wrap') {
 
                     const img = container.querySelector('img.active');
-                    const style = getComputedStyle(img);
-                    const top = Math.abs(parseInt(style.top));
-                    const left = Math.abs(parseInt(style.left));
-                    const width = parseInt(style.width);
-                    const height = parseInt(style.height);
+                    const compstyle = img && getComputedStyle(img);
 
-                    this.onEdge = {
-                        top: top === 0,
-                        right: (left + container.offsetWidth) / width > 0.999,
-                        bottom: (top + container.offsetHeight) / height > 0.999,
-                        left: left === 0
-                    };
+                    if (compstyle && compstyle.position === 'absolute') {
+
+                        style.top = Math.abs(parseInt(compstyle.top));
+                        style.left = Math.abs(parseInt(compstyle.left));
+                        style.width = parseInt(compstyle.width);
+                        style.height = parseInt(compstyle.height);
+                    }
                 }
-                else {
-                    this.onEdge = {
-                        top: container.scrollTop === 0,
-                        right: (container.scrollLeft + container.offsetWidth) / container.scrollWidth > 0.999,
-                        bottom: (container.scrollTop + container.offsetHeight) / container.scrollHeight > 0.999,
-                        left: container.scrollLeft === 0
-                    };
-                }
+
+                this.onEdge = {
+                    top: style.top === 0,
+                    right: (style.left + container.offsetWidth) / style.width > 0.999,
+                    bottom: (style.top + container.offsetHeight) / style.height > 0.999,
+                    left: style.left === 0
+                };
             },
             onDragging: function(ev) {
                 // Stop tap to be triggered
@@ -978,7 +980,7 @@ var slideshowid;
         };
 
         if (name === 'iframeGesture') {
-            options.iframeDoc = elm.ownerDocument;
+            options.iframeDoc = elm;
         }
 
         options.onSwipeRight = options.onSwipeLeft = options.onSwipeDown = options.onSwipeUp = ev => {
@@ -1671,8 +1673,6 @@ var slideshowid;
         if (mega.ui.viewerOverlay) {
             mega.ui.viewerOverlay.show(id);
         }
-
-        slideshow_gesture($overlay[0]);
     }
 
     function slideshow_toggle_pause($button) {
@@ -2127,7 +2127,7 @@ var slideshowid;
             ev.initEvent("pdfjs-openfile.meganz", true);
             ev.data = data.buffer || data.src;
             elm.contentDocument.body.dispatchEvent(ev);
-            slideshow_gesture(elm, 'PDF');
+            slideshow_gesture(data.h, elm, 'PDF');
             return true;
         });
 
@@ -2180,7 +2180,7 @@ var slideshowid;
                 blob: data.blob
             };
             elem.contentDocument.dispatchEvent(ev);
-            slideshow_gesture(elem, 'DOCX');
+            slideshow_gesture(data.h, elem, 'DOCX');
         });
 
         if (_docxSeen) {
@@ -2283,6 +2283,8 @@ var slideshowid;
             eventlog(99819);
             return;
         }
+
+        tryCatch(() => slideshow_gesture(previews[id].h, $overlay[0]), self.reportError)();
 
         const isVideoStream = /^(?:audio|video)\//i.test(previews[id].type);
 

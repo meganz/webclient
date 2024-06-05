@@ -107,7 +107,8 @@ pro.propay = {
                     }
                     else {
                         loadSubPage('pro');
-                        reject(new Error('Selected plan does not have enough storage space'));
+                        reject(new Error('Selected plan does not have enough storage space; ' +
+                        `Or plan ${pro.getProPlanName(pro.propay.planNum)} (${pro.propay.planNum}) is not available`));
                     }
                 });
             });
@@ -132,7 +133,7 @@ pro.propay = {
         if (login_next && login_next.indexOf('discount') > -1) {
             login_next = false;
         }
-        if (pro.propay.planNum === 101) {
+        if (!pro.planInFilter(pro.propay.planNum, 'supportsGooglePlay')) {
             $('.bottom-page .bottom-page.stores-desc', this.$page).addClass('hidden');
         }
 
@@ -154,7 +155,7 @@ pro.propay = {
         // Initialise some extra stuff just for mobile
         if (is_mobile) {
             mobile.propay.init();
-            if ((discountInfo && discountInfo.pd) || (pro.propay.planNum === 101)) {
+            if ((discountInfo && discountInfo.pd) || !pro.planInFilter(pro.propay.planNum, 'supportsGooglePlay')) {
                 $('.mobile.external-payment-options', '.mobile.fm-content').addClass('hidden');
             }
         }
@@ -265,11 +266,10 @@ pro.propay = {
         }
 
         var tempGatewayOptions = gatewayOptions.filter(gate =>
-            (pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI &&
-            gate.supportsBusinessPlans === 1) ||
-            (pro.propay.planNum !== pro.ACCOUNT_LEVEL_PRO_FLEXI &&
-            (typeof gate.supportsIndividualPlans === 'undefined'
-            || gate.supportsIndividualPlans)));
+            (pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI && gate.supportsBusinessPlans === 1)
+            || (pro.propay.planNum !== pro.ACCOUNT_LEVEL_PRO_FLEXI
+                && (typeof gate.supportsIndividualPlans === 'undefined' || gate.supportsIndividualPlans))
+            && !(gate.minimumEURAmountSupported > pro.getPlanObj(pro.propay.planNum, 1).maxCorrPriceEuro));
 
         // if this user has a discount, clear gateways that are not supported.
         const discountInfo = pro.propay.getDiscount();
@@ -451,20 +451,8 @@ pro.propay = {
 
                 // Show amount they will save
                 if (numOfMonths === 12) {
-                    var discount;
-                    if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
-                        discount = discountSaveY || currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCYSAVE];
-                    }
-                    else {
-                        // Calculate the discount price (the current yearly price is 10 months worth)
-                        var priceOneMonth = (price / 10);
-                        var priceTenMonths = (priceOneMonth * 10);
-                        var priceTwelveMonths = (priceOneMonth * 12);
-                        discount = (priceTwelveMonths - priceTenMonths).toFixed(2);
-                        if (discountSaveY) {
-                            discount = discountSaveY;
-                        }
-                    }
+
+                    const discount = discountSaveY || pro.getPlanObj(currentPlan).yearlyDiscount;
 
                     $('.save-money', $durationOption).removeClass('hidden');
                     $('.save-money .amount', $durationOption).text(formatCurrency(discount, currency));
@@ -514,7 +502,12 @@ pro.propay = {
 
         // Otherwise pre-select the chosen period from previous page
 
-        const selectedPeriod = sessionStorage['pro.period'] || 12;
+        const selectedTab = sessionStorage['pro.pricingTab'];
+
+        const selectedPeriod = (selectedTab === 'pr-exc-offer-tab'
+            ? sessionStorage['pro.periodExc']
+            : sessionStorage['pro.period']) || 12;
+
         let $selectedOption = $(`.payment-duration[data-plan-months=${selectedPeriod}]`, $durationList);
 
         // Otherwise pre-select yearly payment (or monthly if plan is Pro Flexi)
@@ -648,19 +641,11 @@ pro.propay = {
         var localCurrency = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
         var euroPrice = formatCurrency(currentPlan[pro.UTQA_RES_INDEX_PRICE]);
 
-        // Get the current plan's bandwidth, then convert the number to 'x GBs' or 'x TBs'
-        var storageGigabytes = currentPlan[pro.UTQA_RES_INDEX_STORAGE];
-        var storageBytes = storageGigabytes * 1024 * 1024 * 1024;
-        var storageFormatted = numOfBytes(storageBytes, 0);
-        var storageSizeRounded = Math.round(storageFormatted.size);
-        var storageValue = storageSizeRounded + ' ' + storageFormatted.unit;
+        // Get the current plan's storage, formatted as 'x GBs' or 'x TBs', up to 3 decimal places
+        const storageValue = bytesToSize(currentPlan[pro.UTQA_RES_INDEX_STORAGE] * pro.BYTES_PER_GB, 3, 4);
 
-        // Get the current plan's bandwidth, then convert the number to 'x GBs' or 'x TBs'
-        var bandwidthGigabytes = currentPlan[pro.UTQA_RES_INDEX_TRANSFER];
-        var bandwidthBytes = bandwidthGigabytes * 1024 * 1024 * 1024;
-        var bandwidthFormatted = numOfBytes(bandwidthBytes, 0);
-        var bandwidthSizeRounded = Math.round(bandwidthFormatted.size);
-        var bandwidthValue = bandwidthSizeRounded + ' ' + bandwidthFormatted.unit;
+        // Get the current plan's bandwidth, formatted as 'x GBs' or 'x TBs', up to 3 decimal places
+        const bandwidthValue = bytesToSize(currentPlan[pro.UTQA_RES_INDEX_TRANSFER] * pro.BYTES_PER_GB, 3, 4);
 
         // Set selectors
         const $pricingBox = $('.pricing-page.plan', this.$page);
@@ -701,7 +686,10 @@ pro.propay = {
         $planName.text(pro.propay.planName);
 
         // Default to svg sprite icon format icon-crests-pro-x-details
-        let iconClass = `sprite-fm-uni icon-crests-pro-${pro.propay.planNum}-details`;
+        let iconClass = 'no-icon';
+        if (pro.filter.simple.hasIcon.has(pro.propay.planNum)) {
+            iconClass = `sprite-fm-uni icon-crests-pro-${pro.propay.planNum}-details`;
+        }
 
         // Special handling for PRO Lite (account level 4) and Pro Flexi (account level 101)
         if (pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_LITE) {
@@ -1129,7 +1117,7 @@ pro.propay = {
             }
 
             // Add hidden class if this payment method is not supported for this plan
-            if ((gatewayOpt.supportsExpensivePlans === 0) && (selectedPlanNum !== 4)) {
+            if ((gatewayOpt.supportsExpensivePlans === 0) && pro.filter.simple.supportsExpensive.has(selectedPlan)) {
                 $gateway.addClass('hidden');
                 $gateway.attr('title', l[7162]);
             }

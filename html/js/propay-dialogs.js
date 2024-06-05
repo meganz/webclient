@@ -1327,6 +1327,7 @@ var addressDialog = {
         var proPrice;
         var numOfMonths;
         var monthsWording;
+        let hasIcon = true;
 
         if (!is_mobile) {
             // Hide the warning message when the registerb dialog gets open each time.
@@ -1365,6 +1366,9 @@ var addressDialog = {
 
             // Get the selected Pro plan details
             proNum = selectedPackage[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
+            if (!pro.filter.simple.hasIcon.has(proNum)) {
+                hasIcon = false;
+            }
             proPlan = pro.getProPlanName(proNum);
             proPrice = selectedPackage[pro.UTQA_RES_INDEX_PRICE];
             numOfMonths = selectedPackage[pro.UTQA_RES_INDEX_MONTHS];
@@ -1458,8 +1462,8 @@ var addressDialog = {
 
 
         // Update template
-        this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4 pro101 business')
-            .addClass(proNum);
+        this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4 pro101 business no-icon')
+            .addClass(hasIcon ? proNum : 'no-icon');
         this.$dialog.find('.payment-plan-title').text(proPlan);
         this.$dialog.find('.payment-plan-txt .duration').text(monthsWording);
         this.proPrice = formatCurrency(proPrice);

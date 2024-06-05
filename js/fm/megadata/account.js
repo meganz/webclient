@@ -380,8 +380,19 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                 }
             }
 
+            const epsilon = 20971520; // E = 20MB
+
             tfsq.left = Math.max(tfsq.max - tfsq.used, 0);
-            tfsq.perc = Math.floor(tfsq.used * 100 / tfsq.max);
+
+            if (tfsq.left <= epsilon) {
+                tfsq.perc = 100;
+            }
+            else if (tfsq.left <= epsilon * 5) {
+                tfsq.perc = Math.round(tfsq.used * 100 / tfsq.max);
+            }
+            else {
+                tfsq.perc = Math.floor(tfsq.used * 100 / tfsq.max);
+            }
 
             M.account.tfsq = tfsq;
 

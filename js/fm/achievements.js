@@ -1033,12 +1033,12 @@ mega.achievem.parseAccountAchievements = function parseAccountAchievements() {
     storageCurrentValue += storageBaseQuota;
     transferCurrentValue += transferBaseQuota;
 
-    $('.plan-info > span', $bandwidthContent).text(bytesToSize(transferCurrentValue, 0));
+    $('.plan-info > span', $bandwidthContent).text(bytesToSize(transferCurrentValue, 3, 4));
     $('.settings-sub-bar', $bandwidthContent).css('width', transferProportion + '%');
     $('.base-quota-note span', $bandwidthContent).text(l[19992]
-        .replace('%1', bytesToSize(transferBaseQuota, 0)));
+        .replace('%1', bytesToSize(transferBaseQuota, 3, 4)));
     $('.achieve-quota-note span', $bandwidthContent).text(l[19993]
-        .replace('%1', bytesToSize(transferAchieveValue, 0)));
+        .replace('%1', bytesToSize(transferAchieveValue, 3, 4)));
 
     $('.plan-info > span', $storageContent).text(bytesToSize(storageCurrentValue, 0));
     $('.settings-sub-bar', $storageContent).css('width', storageProportion + '%');

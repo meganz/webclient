@@ -705,6 +705,10 @@ var ulmanager = {
             req.n[0].fa = file.ddfa;
         }
 
+        if (req.t === M.InboxID && self.vw) {
+            req.vw = 1;
+        }
+
         queueMicrotask(() => {
             for (var k in M.tfsdomqueue) {
                 if (k[0] === 'u') {

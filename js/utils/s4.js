@@ -971,6 +971,73 @@ lazy(s4, 'kernel', () => {
             return M.moveToRubbish([n.h]);
         },
 
+        /**
+         * Get/Set S4's Container settings
+         * @param {String|Array|*} [handle] container node handle, if omitted apply to all containers.
+         * @param {String|Object} [value] string, or an object with key/value pairs, if omitted get all settings.
+         * @returns {Promise<*>}
+         */
+        async settings(handle, value) {
+
+            if (!handle) {
+                handle = (await this.list()).filter((n) => n.managed).map((n) => n.handle);
+            }
+            if (!Array.isArray(handle)) {
+                handle = [handle];
+            }
+            handle = handle.map((h) => getS4NodeByHandle(h));
+
+            if (value) {
+                const promises = [];
+                const sanitize = (obj) => {
+                    if (typeof obj !== 'object') {
+                        return +obj | 0;
+                    }
+                    for (const k in obj) {
+
+                        if (k.length > 0 && k.length < 4) {
+
+                            obj[k] = sanitize(obj[k]);
+                        }
+                        else if (self.d) {
+
+                            logger.warn(`Ignoring invalid setting name... ${k}`);
+                        }
+                    }
+                    return obj;
+                };
+
+                if (typeof value !== 'object') {
+                    value = {[value]: true};
+                }
+                const obj = sanitize(Object.assign(Object.create(null), clone(value)));
+
+                for (let i = handle.length; i--;) {
+                    const s = clone(obj);
+                    const n = handle[i];
+                    const {s4, h} = n;
+
+                    if (s4.s) {
+                        for (const k in s) {
+                            if (s4.s[k] === s[k]) {
+                                logger.warn(`Ignoring existing setting '${k}' on container ${h}`);
+                                delete s[k];
+                            }
+                        }
+                    }
+
+                    if (Object.keys(s).length) {
+                        s4.s = {...s4.s, ...s};
+                        promises.push(updateS4Attribute(n, {s4}));
+                    }
+                }
+
+                await Promise.all(promises);
+            }
+
+            return handle.map((n) => ({[n.h]: clone(n.s4.s)}));
+        },
+
         access: freeze({
             async users(handle, enable) {
                 const n = getS4NodeByHandle(handle);

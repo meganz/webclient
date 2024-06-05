@@ -45,7 +45,6 @@
 .info-panel-visible .fm-right-header .fm-breadcrumbs-block:not(.hidden) {
     -webkit-padding-end: 48px;
     padding-inline-end: 48px;
-    width: calc(100% - var(--info-panel-width));
 }
 .info-panel-visible .gallery-view .gallery-view-scrolling.ps {
     min-width: initial;
@@ -276,4 +275,10 @@
 /* Undecryptable node */
 .folder-file-info-panel.undecryptable .value {
     color: var(--secondary-orange) !important;
+}
+
+/* Chat share nodes with contact */
+.info-panel-visible .profile-shared-folders .shared-with-me tbody tr {
+    display: inline-flex;
+    align-items: center;
 }

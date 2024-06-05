@@ -279,8 +279,10 @@ mobile.cloud = {
     scrollToFile: function(handle, animationTime) {
         'use strict';
 
+        const elm = document.getElementById(handle);
+
         animationTime = animationTime === 0 ? 0 : (animationTime || 500);
-        $(`#${handle}`).closest('.megaList, .fm-scrolling').animate({
+        $(elm).closest('.megaList, .fm-scrolling').animate({
             scrollTop: elm && elm.offsetTop || 0
         }, animationTime);
     },

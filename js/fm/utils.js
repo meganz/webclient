@@ -1302,6 +1302,18 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
             api_req({a: 'log', e: 99804, m: 'User tries to transfer a session from mega.co.nz.'});
 
             var toPage = String(urlParts[2] || 'fm').replace('#', '');
+
+            if (toPage.includes('?')) {
+                const pageParts = toPage.split('?');
+                toPage = pageParts[0];
+                for (let i = 1; i < pageParts.length; i++) {
+                    const queryParts = pageParts[i].split('=');
+                    if (queryParts[0] === 'tab') {
+                        window.mProTab = queryParts[1];
+                    }
+                }
+            }
+
             // If the user is already logged in here with the same account
             // we can avoid a lot and just take them to the correct page
             if (JSON.stringify(u_k) === JSON.stringify(urlParts[0])) {
@@ -1597,7 +1609,7 @@ MegaUtils.prototype.createLeftStorageBlockCaption = async function(container, st
                         res = res.base;
                     }
                     if (typeof res === 'number') {
-                        res = bytesToSize(res, 0);
+                        res = bytesToSize(res, 3, 4);
                     }
 
                     if (u_attr.p) {

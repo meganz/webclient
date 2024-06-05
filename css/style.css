@@ -12050,7 +12050,8 @@ body.megaChatDisabled .nw-fm-left-icon.conversations {
     outline: 2px solid red;
     border-radius: 4px;
 }
-.bottom-page.developer-settings .user-attr-settings.error {
+.bottom-page.developer-settings .user-attr-settings.error,
+.bottom-page.developer-settings .misc-dev.error {
     padding-top: 14px;
 }
 .bottom-page.developer-settings .error::before {

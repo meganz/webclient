@@ -4628,6 +4628,10 @@ body.de .mega-dialog.contact-picker-widget {
         display: inline-block;
         vertical-align: middle;
     }
+    .mega-dialog.payment-address-dialog .plan-icon.no-icon + .payment-plan-info {
+        --webkit-padding-start: 0;
+        padding-inline-start: 0;
+    }
     .mega-dialog.payment-address-dialog .plan-icon i {
         display: none;
         --icon-size: 60px;

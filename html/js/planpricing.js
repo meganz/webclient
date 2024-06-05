@@ -3,6 +3,7 @@ lazy(pro, 'proplan2', () => {
 
     let $page;
     let $planCards;
+    let $exclusivePlans;
     let $businessPlans;
     let $usersBusinessSlider;
     let $usersBusinessInput;
@@ -19,12 +20,49 @@ lazy(pro, 'proplan2', () => {
 
     let ProFlexiFound = false;
 
+    const getCurrentTab = () => {
+        return window.mProTab === 'exc'
+            ? 'pr-exc-offer-tab'
+            : sessionStorage['pro.pricingTab'] || 'pr-individual-tab';
+    };
+
+    let currentTab = getCurrentTab();
+
+    // Ensure that this is a boolean, as it will be used for toggleClass
+    let showExclusiveOffers = false;
+
+    const updateFeaturesTable = (excOfferTabSelected) => {
+        const $tableContainer = $('.pricing-pg.pricing-plans-compare-table-container', $page);
+        const $miniPlansHeader = $('.plans-table-header.pro-exc-offer', $tableContainer);
+
+        // Add/remove classes as appropriate
+        $('.pricing-plans-compare-table', $tableContainer).toggleClass('mini-plans', excOfferTabSelected);
+        $('.pricing-plans-compare-table-item.pro-flexi:not(.no-ads)', $tableContainer)
+            .toggleClass('hidden', excOfferTabSelected);
+        $('.pricing-plans-compare-table-item.pro-business:not(.no-ads)', $tableContainer)
+            .toggleClass('hidden', excOfferTabSelected);
+        $('.pricing-plans-compare-table-item.pro-exc-offer:not(.no-ads)', $tableContainer)
+            .toggleClass('hidden', !excOfferTabSelected);
+        $('.plans-table-header.pro-flexi, .plans-table-header.pro-business', $tableContainer)
+            .toggleClass('hidden', excOfferTabSelected);
+        $miniPlansHeader.toggleClass('hidden', !excOfferTabSelected);
+        $('.pricing-plans-compare-table-item.pro', $tableContainer).toggleClass('rb', !excOfferTabSelected);
+        $('button.experiment-button.pro', $tableContainer).toggleClass('primary', !excOfferTabSelected);
+        $('button.experiment-button.pro-exc-offer', $tableContainer).toggleClass('primary', excOfferTabSelected);
+
+        // Update Pro plans table column heading as appropriate
+        $('.plans-table-header.pro-plans span', $tableContainer).text(
+            excOfferTabSelected ? l.pr_pro_plans : l.pr_pro_i_to_iii
+        );
+    };
+
     const initTabHandlers = () => {
 
         const $tableContainer = $('.pricing-pg.pricing-plans-compare-table-container', $page);
         const $tabs = $('.individual-team-tab-container .tabs-module-block', $page);
 
-        const proDivsSelector = '.pricing-pg.pick-period-container, .pricing-pg.pro-plans-cards-container, ' +
+        const proDivsSelector = '.pricing-pg.pick-period-container:not(.exclusive-plans-container), ' +
+            '.pricing-pg.pro-plans-cards-container, ' +
             '.pricing-pg.pricing-estimation-note-container';
         const proDivsFree = '.pricing-pg.pricing-banner-container';
         const $proPlans = $(proDivsSelector, $page);
@@ -35,30 +73,62 @@ lazy(pro, 'proplan2', () => {
         const $footerSubTitle = $('.pricing-get-started-subtxt', $footerBanner);
         const $footerBtn = $('#tryMega', $footerBanner);
 
+        const $excPlansNotPeriod = $('.exclusive-plans-container:not(.pick-period-container)', $page);
+
         const setFooterBannerTxt = (title, subTitle, btnTxt) => {
             $footerTitle.text(title);
             $footerSubTitle.toggleClass('hidden', subTitle.length < 1).text(subTitle);
             $footerBtn.text(btnTxt);
         };
 
-
         const changeIndividualTeamTab = (target) => {
             $tabs.removeClass('selected');
             target.classList.add('selected');
 
-            const visibilityState = target.id === 'pr-individual-tab';
+            let isIndividual = target.id === 'pr-individual-tab';
+            const isBusinessTab = target.id === 'pr-business-tab';
+            let isExcOfferTab = target.id === 'pr-exc-offer-tab';
 
-            if ($businessPlans) {
-                $businessPlans.toggleClass('hidden', visibilityState);
+            if (!showExclusiveOffers && isExcOfferTab) {
+                isExcOfferTab = false;
+                isIndividual = true;
             }
-            $proPlans.toggleClass('hidden', !visibilityState);
+
+            if (showExclusiveOffers) {
+                updateFeaturesTable(isExcOfferTab);
+            }
+
+            $proPlans.addClass('hidden');
+            $businessPlans.addClass('hidden');
+            $exclusivePlans.addClass('hidden');
+            $page.removeClass('business individual exc-offer');
+
+            if ($businessPlans && isBusinessTab) {
+                $businessPlans.removeClass('hidden');
+                $page.addClass('business');
+            }
+            else if (isExcOfferTab) {
+                if (pro.filter.plans.excPlansM.length === pro.filter.plans.excPlansY.length) {
+                    $exclusivePlans.removeClass('hidden');
+                }
+                else {
+                    $excPlansNotPeriod.removeClass('hidden');
+                }
+                $page.addClass('exc-offer');
+            }
+            else {
+                $proPlans.removeClass('hidden');
+                $page.addClass('individual');
+            }
+
+            $('.pricing-pg.pricing-estimation-note-container', $page).toggleClass('business', isBusinessTab);
 
             $freeBanner.toggleClass(
                 'hidden',
-                !visibilityState || (typeof u_handle !== 'undefined' && !localStorage.keycomplete)
+                !isIndividual || (typeof u_handle !== 'undefined' && !localStorage.keycomplete)
             );
 
-            if (visibilityState) {
+            if (isIndividual) {
                 setFooterBannerTxt(l.pr_get_started_now, '', l.pr_try_mega);
             }
             else {
@@ -67,13 +137,20 @@ lazy(pro, 'proplan2', () => {
         };
 
         $tabs.rebind('click.pricing', function() {
+            changeIndividualTeamTab(this);
+
+            currentTab = this.id;
+            sessionStorage['pro.pricingTab'] = this.id;
+
             if (this.id === 'pr-individual-tab') {
                 delay('pricing.plan', eventlog.bind(null, is_mobile ? 99863 : 99862));
             }
-            else {
+            else if (this.id === 'pr-business-tab') {
                 delay('pricing.business', eventlog.bind(null, is_mobile ? 99865 : 99864));
             }
-            changeIndividualTeamTab(this);
+            else {
+                delay('pricing.exc-offer', eventlog.bind(null, is_mobile ? 500248 : 500247));
+            }
         });
 
         const idShift = is_mobile ? 0 : 1;
@@ -96,6 +173,19 @@ lazy(pro, 'proplan2', () => {
             $('.pricing-pg.pricing-business-plan-container', $page)[0].scrollIntoView({behavior: 'smooth'});
             delay('pricing.pro-business' + 99886, eventlog.bind(null, is_mobile ? 99886 : 99904));
         });
+
+        currentTab = getCurrentTab();
+        if (!showExclusiveOffers && currentTab === 'pr-exc-offer-tab') {
+            currentTab = 'pr-individual-tab';
+        }
+        changeIndividualTeamTab($(`#${currentTab}`, $page)[0]);
+
+        // Update the savedTab so that it will be set correctly when visited via /pro?tab=XXX
+        sessionStorage['pro.pricingTab'] = currentTab;
+
+        if (u_handle) {
+            delete window.mProTab;
+        }
     };
 
     const initPlansTabs = () => {
@@ -108,10 +198,6 @@ lazy(pro, 'proplan2', () => {
         const $buttonsNotFree = $('.pricing-plans-compare-table-item button:not(.free)', $tableContainer);
 
         $('.pricing-plans-compare-table-item button', $tableContainer).addClass('hidden');
-
-        // If user is logged in and has the flag ab_flag, add them to the experiment.
-        if (u_attr) {
-        }
 
         if (u_attr && !is_mobile) {
             $buttonsNotFree.removeClass('hidden');
@@ -163,8 +249,8 @@ lazy(pro, 'proplan2', () => {
         loadSubPage('propay_' + planId);
     };
 
-    const initBuyPlan = () => {
-        const $buyBtn = $('.pricing-plan-btn', $planCards);
+    const initBuyPlan = ($givenPlans) => {
+        const $buyBtn = $('.pricing-plan-btn', $givenPlans || $([...$planCards, ...$exclusivePlans]));
         const $freeBtns = $('#freeStart, #tryMega', $page);
 
         $buyBtn.rebind('click.pricing', function() {
@@ -330,12 +416,6 @@ lazy(pro, 'proplan2', () => {
      * Handler to init all sliders : Business, Flexi, Competitors
      * */
     const initSlidersEvents = () => {
-        const $compareMEGABox = $('.pricing-compare-cards.mega', $compareBox);
-        const $compareDPBox = $('.pricing-compare-cards.dp', $compareBox);
-        const $compareGDBox = $('.pricing-compare-cards.gd', $compareBox);
-        const $compareMEGA = $('.pricing-compare-cards-rate .vl', $compareMEGABox);
-        const $compareDP = $('.pricing-compare-cards-rate .vl', $compareDPBox);
-        const $compareGD = $('.pricing-compare-cards-rate .vl', $compareGDBox);
 
         const $flexStorageSlider = $('#storage-flex-slider', $proflexiBlock);
         const $flexTransSlider = $('#trans-flex-slider', $proflexiBlock);
@@ -353,10 +433,6 @@ lazy(pro, 'proplan2', () => {
             [51, 75, 101, 1000],
             [76, 100, 1001, 10000]
         ];
-
-        $compareMEGA.text(formatCurrency(1.56));
-        $compareDP.text(formatCurrency(5.50));
-        $compareGD.text(formatCurrency(3.70));
 
         const sliderEventHandler = (slider, ranges, $inputTxt) => {
             let val = slider.value;
@@ -554,7 +630,7 @@ lazy(pro, 'proplan2', () => {
 
     const initFaq = () => {
 
-        const $faqContainer = $('.pricing-pg.faq-container', $page);
+        const $faqContainer = $('.pricing-pg.faq-container', $page).removeClass('hidden');
         const $faqItemTemplate = $('.faq-qa.template', $faqContainer);
         const $faqContent = $('.faq-content', $faqContainer);
 
@@ -607,6 +683,22 @@ lazy(pro, 'proplan2', () => {
             });
         }
         $('.faq1 .faq-question', $faqContent).click();
+    };
+
+    const initCompare = () => {
+
+        $compareBox = $('.pricing-pg.pricing-compare-full-container', $page).removeClass('hidden');
+
+        const $compareMEGABox = $('.pricing-compare-cards.mega', $compareBox);
+        const $compareDPBox = $('.pricing-compare-cards.dp', $compareBox);
+        const $compareGDBox = $('.pricing-compare-cards.gd', $compareBox);
+        const $compareMEGA = $('.pricing-compare-cards-rate .vl', $compareMEGABox);
+        const $compareDP = $('.pricing-compare-cards-rate .vl', $compareDPBox);
+        const $compareGD = $('.pricing-compare-cards-rate .vl', $compareGDBox);
+
+        $compareMEGA.text(formatCurrency(1.56));
+        $compareDP.text(formatCurrency(5.50));
+        $compareGD.text(formatCurrency(3.70));
     };
 
     const initProFlexi = () => {
@@ -703,7 +795,7 @@ lazy(pro, 'proplan2', () => {
             const months = currentPlan[pro.UTQA_RES_INDEX_MONTHS];
             const planNum = currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
 
-
+            // ProFlexiFound is used to see if we should show pro flexi
             if (planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
                 ProFlexiFound = currentPlan;
                 continue;
@@ -793,8 +885,6 @@ lazy(pro, 'proplan2', () => {
 
             initProFlexi();
         }
-
-        $compareBox = $('.pricing-pg.pricing-compare-full-container', $page);
 
         // hide/show the asterisk and the note depending on local prices availability
         $('.ars', $planCards).toggleClass('hidden', localPriceInfo === 'EUR');
@@ -900,22 +990,32 @@ lazy(pro, 'proplan2', () => {
     };
 
     const initPeriodPickHandler = () => {
-        const $radioOptions = $('.pricing-pg.pick-period-container .pricing-radio-option', $page);
+        const $radioOptionsInd = $('.pricing-pg.pick-period-container.individual .pricing-radio-option', $page);
+        const $radioOptionsExc = $('.pricing-pg.pick-period-container.exclusive-plans-container .pricing-radio-option'
+            , $page);
+        const $allRadioOptions = $([...$radioOptionsInd, ...$radioOptionsExc]);
         const $strgFlexInput = $('#esti-storage', $proflexiBlock);
         const $transFlexInput = $('#esti-trans', $proflexiBlock);
 
         const preSelectedPeriod = (sessionStorage.getItem('pro.period') | 0) || 12;
+        const preSelectedPeriodExc = (sessionStorage.getItem('pro.periodExc') | 0) || 12;
 
         if (preSelectedPeriod === 12) {
-            $radioOptions.removeClass('selected');
-            $radioOptions.filter('[data-period="12"]').addClass('selected');
+            $radioOptionsInd.removeClass('selected');
+            $radioOptionsInd.filter('[data-period="12"]').addClass('selected');
+        }
+        if (preSelectedPeriodExc === 12) {
+            $radioOptionsExc.removeClass('selected');
+            $radioOptionsExc.filter('[data-period="12"]').addClass('selected');
         }
 
-        $radioOptions.rebind('click.pricing', function() {
-            $radioOptions.removeClass('selected');
+        $allRadioOptions.rebind('click.pricing', function() {
+            const $optionWrapper = $(this).closest('.pick-period-container');
+            const tabType = $optionWrapper.data('tabname');
+
+            $('.pricing-radio-option', $optionWrapper).removeClass('selected');
 
             this.classList.add('selected');
-            sessionStorage.setItem('pro.period', this.dataset.period);
 
             if (this.dataset.period === '12') {
                 delay('pricing.plan', eventlog.bind(null, is_mobile ? 99867 : 99866));
@@ -923,7 +1023,14 @@ lazy(pro, 'proplan2', () => {
             else {
                 delay('pricing.plan', eventlog.bind(null, is_mobile ? 99869 : 99868));
             }
-            fillPlansInfo(this.dataset.period | 0);
+            if (tabType === 'pro') {
+                sessionStorage.setItem('pro.period', this.dataset.period);
+                fillPlansInfo(this.dataset.period | 0);
+            }
+            else if (tabType === 'exclusive') {
+                sessionStorage.setItem('pro.periodExc', this.dataset.period);
+                pro.proplan2.fillExclusivePlanCards(this.dataset.period | 0);
+            }
             estimateFlexiPrice($strgFlexInput.val(), $transFlexInput.val());
 
             return false;
@@ -978,7 +1085,7 @@ lazy(pro, 'proplan2', () => {
             }
             // function to set card class, and txt for the header
             const setCardClassTxt = (id, cls, txt) => {
-                const $card = $planCards.filter(`#pro${id}`).addClass(cls);
+                const $card = $(`#pro${id}`, $page).addClass(cls);
                 if (txt) {
                     $('.pricing-plan-recommend', $card).text(txt);
                 }
@@ -989,8 +1096,8 @@ lazy(pro, 'proplan2', () => {
             if (pro.proplan2.storageData && pro.proplan2.storageData.used) {
                 const usedSpaceGB = pro.proplan2.storageData.used / 1073741824;
 
-                // get the plans for lite, pro1, pro2, pro3. and 1 month
-                const plans = pro.membershipPlans.filter(p => p[1] > 0 && p[1] < 5 && p[4] === 1);
+                // get the plan account levels for lite, pro1, pro2, pro3. and 1 month
+                const plans = pro.filter.plans.coreM;
 
                 // strangely no plans found --> set default
                 if (!plans.length) {
@@ -1003,9 +1110,14 @@ lazy(pro, 'proplan2', () => {
                 const planLevel = u_attr.p ? (u_attr.p <= 3 ? u_attr.p : 0) : -1;
 
                 for (const plan of plans) {
+                    // create plan objects from the account levels (all 1m, which is defaulted)
+                    const planObj = pro.getPlanObj(plan);
 
-                    const currPlanLevel = plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] <= 3
-                        ? plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] : 0;
+                    if (pro.filter.simple.excPlans.has(planObj.level)) {
+                        setCardClassTxt(planObj.level, 'exclusive-offer', 'Exclusive Offer');
+                    }
+
+                    const currPlanLevel = planObj.isIn('recommend', 'asLevel');
 
                     // if the plan offers less space than used OR same user's plan --> disable
                     if (plan[pro.UTQA_RES_INDEX_STORAGE] < usedSpaceGB) {
@@ -1089,7 +1201,7 @@ lazy(pro, 'proplan2', () => {
         // fill the info in all cards
         fillPlansInfo(sessionStorage.getItem('pro.period') | 0);
         updatePriceCards();
-        // initialize but buttons for plans and for the free
+        // initialize buy buttons for plans and for the free
         initBuyPlan();
     };
 
@@ -1122,9 +1234,25 @@ lazy(pro, 'proplan2', () => {
                 mega.ui.alerts.hide();
             }
 
+            showExclusiveOffers = !!pro.filter.miniMin;
+
             $page = $('.bottom-page.full-block', '.bottom-page.content.pricing-pg');
+            $exclusivePlans = $('.exclusive-plans-container', $page);
 
             delay('pricingpage.init', eventlog.bind(null, is_mobile ? 99936 : 99935));
+
+            // Check the user is allowed to see the low tier version of the pro page
+            // (i.e. if the lowest plan returned is a mini plan)
+            if (window.mProTab === 'exc') {
+                if (!u_handle) {
+                    // If not logged in, prompt them to do so
+                    showSignupPromptDialog();
+                }
+                else if (!showExclusiveOffers) {
+                    // Otherwise if the user isn't eligible, show a dialog telling the user this
+                    pro.updateLowTierProPage();
+                }
+            }
 
             initPlansCards();
             populateBusinessPlanData();
@@ -1134,6 +1262,15 @@ lazy(pro, 'proplan2', () => {
             initPlansTabs();
             initSocial();
             initFaq();
+            initCompare();
+
+            // Check the user is allowed to see the low tier version of the pro page
+            // (i.e. if the lowest plan returned is a mini plan)
+            if ((u_handle && window.mProTab === 'exc') || showExclusiveOffers) {
+                // Unhide and select exclusive offer tab
+                pro.proplan2.updateExcOffers();
+                $('.tabs-module-block#pr-exc-offer-tab', $page).removeClass('hidden');
+            }
 
             loadingDialog.hide();
 
@@ -1151,6 +1288,181 @@ lazy(pro, 'proplan2', () => {
 
                 showRegisterDialog();
             }
+        }
+
+        initLowTierPlanFeatureCells() {
+            // Do not init if mini plans are not visible to user
+            if (!showExclusiveOffers) {
+                return;
+            }
+
+            const $tableContainer = $('.pricing-pg.pricing-plans-compare-table-container', $page);
+            const $miniPlansHeader = $('.plans-table-header.pro-exc-offer', $tableContainer);
+
+            const miniPlanNum = pro.filter.miniMin[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
+            const planName = pro.getProPlanName(miniPlanNum);
+
+            // Populate mini plan title, and storage and transfer columns
+            $('span', $miniPlansHeader).text(l.pr_table_mini_plan.replace('%1', planName));
+            $('#table-strg-mini', $tableContainer).text(
+                bytesToSize(pro.minPlan[pro.UTQA_RES_INDEX_STORAGE] * 1073741824, 0)
+            );
+            $('#table-trans-mini', $tableContainer).text(
+                bytesToSize(pro.minPlan[pro.UTQA_RES_INDEX_TRANSFER] * 1073741824, 0)
+            );
+            $('#table-days-mini', $tableContainer).text(mega.icu.format(l.pr_up_to_days, 90));
+
+            // Set button link and text for mini plan button
+            $('button.pro-exc-offer', $tableContainer)
+                .text(l.buy_plan.replace('%1', planName))
+                .rebind('click', () => {
+                    delay('pricing.pro-exc-offer', eventlog.bind(null, is_mobile ? 500246 : 500244, miniPlanNum));
+
+                    loadSubPage(`propay_${miniPlanNum}`);
+                });
+        }
+
+        /**
+         * Initialize the pro cards for the exclusive offer plans
+         */
+        createExclusivePlanCards(force) {
+
+            // If children already created, don't recreate them as that would make the card empty
+            if ($('> .plans-cards-container > .exc-plan-card', $exclusivePlans).length && !force) {
+                return;
+            }
+
+            showExclusiveOffers = !!pro.filter.miniMin;
+
+            const plans = pro.filter.plans.excPlans;
+            const usedPlanLevels = [];
+            const $template = $('.template', $exclusivePlans);
+            $('.exc-plan-card', $exclusivePlans).remove();
+            for (let i = 0; i < plans.length; i++) {
+                const planObj = pro.getPlanObj(plans[i]);
+                if (usedPlanLevels.includes(planObj.level)) {
+                    continue;
+                }
+                usedPlanLevels.push(planObj.level);
+                const $planCard = $template.clone()
+                    .removeClass('template hidden').addClass('exc-plan-card').attr('id', 'pro' + planObj.level);
+
+                $('.plans-cards-container', $exclusivePlans).safeAppend($planCard.prop('outerHTML'));
+            }
+            if (window.mProTab === 'exc' && showExclusiveOffers) {
+                document.getElementById('pr-exc-offer-tab').click();
+                delete window.mProTab;
+            }
+            if (showExclusiveOffers) {
+                initBuyPlan($exclusivePlans);
+            }
+        }
+
+        /**
+         * Fills the exclusive offer plan cards with the currently available plans.
+         * @param {number} period - The number of months that is selected to show. If 0, default to 12
+         */
+        fillExclusivePlanCards(period) {
+
+            let plans = pro.filter.plans['excPlans' + (period === 1 ? 'M' : 'Y')];
+            let showDurationOptions = true;
+            $('.exc-plan-card', $exclusivePlans).addClass('hidden');
+
+            // If there are no plans of the duration, find any cards that are of the other duration and show them
+            // Also set the other period and hide the selector
+            if (!plans.length) {
+                plans = pro.filter.plans.excPlans;
+                if (plans.length) {
+                    period = period === 1 ? 12 : 1;
+                    $('.pick-period-container.exclusive-plans-container', $page).addClass('hidden');
+                    sessionStorage.setItem('pro.periodExc', period);
+                    showDurationOptions = false;
+                }
+            }
+
+            // If there are no plans of any duration, show no plans
+            if (!plans.length) {
+                return;
+            }
+            const periodText = period === 12 ? l[932] : l[931];
+
+            let planObj;
+            const saveOptions = [];
+
+            const updateCard = (planObj) => {
+                const $planCard = $(`#pro${planObj.level}`).removeClass('hidden');
+
+                saveOptions.push(planObj.saveUpTo);
+
+                // If no update is needed for the card, skip it. Also safely handle no plan being found
+                if (($planCard.data('period') === period) || !planObj) {
+                    return;
+                }
+
+                $planCard.data('period', period);
+                const priceText = formatCurrency(planObj.price, planObj.currency, 'narrowSymbol');
+                const storageTxt = l[23789].replace('%1', bytesToSize(planObj.storage, 3, 4));
+                const bandwidthTxt = l[23790].replace('%1', bytesToSize(planObj.transfer, 3, 4));
+
+                const $storageBox = $('.pricing-plan-storage', $planCard);
+                const $transferBox = $('.pricing-plan-trasfer', $planCard);
+                const $transferSubBox = $('.pricing-plan-trasfer-val', $transferBox);
+
+                const $featuresBox = $('.pricing-plan-features', $planCard);
+
+                $('.pricing-plan-title', $planCard).text(planObj.name);
+                $('.pricing-plan-price span.vl', $planCard).text(priceText);
+                $('.pricing-plan-price-unit', $planCard).text(planObj.currency + ' / ' + periodText);
+                $('.pricing-plan-storage', $planCard).text(storageTxt);
+
+                $('.features-title', $featuresBox).text(l.pr_includes);
+                $('.vpn span', $featuresBox).text(l.mega_vpn);
+                $('.meeting-limits span', $featuresBox).text(l.pr_no_meet_time_limits);
+                $('.meeting-participants span', $featuresBox).text(l.pr_unlimited_participants);
+
+                if (priceText) {
+                    $planCard.toggleClass('long-currency1', priceText.length >= 9 && priceText.length <= 12);
+                    $planCard.toggleClass('long-currency2', priceText.length >= 13 && priceText.length <= 16);
+                    $planCard.toggleClass('long-currency3', priceText.length >= 17);
+                }
+
+                if (storageTxt) {
+                    $storageBox.toggleClass('long-text', storageTxt.length >= 27 || bandwidthTxt.length >= 27);
+                    $transferBox.toggleClass('long-text', storageTxt.length >= 27 || bandwidthTxt.length >= 27);
+                }
+                if ($transferSubBox.length) {
+                    $transferSubBox.text(bandwidthTxt);
+                }
+                else {
+                    $transferBox.text(bandwidthTxt);
+                }
+                $('.pricing-plan-btn', $planCard).text(l.buy_plan.replace('%1', planObj.name));
+                if (pro.proplan2.storageData && pro.proplan2.storageData.used) {
+                    $planCard.toggleClass('disabled', planObj.storage < pro.proplan2.storageData.used);
+                }
+            };
+
+            for (let i = 0; i < plans.length; i++) {
+                planObj = pro.getPlanObj(plans[i]);
+                updateCard(planObj);
+            }
+
+            if (showDurationOptions) {
+                $('.period-note-txt', $exclusivePlans).text(l.pr_save_up_to.replace('%1', Math.max(...saveOptions)));
+            }
+
+            $('.ars', $exclusivePlans).toggleClass('hidden', !planObj.hasLocal);
+            $('.pricing-pg.pricing-estimation-note-container-exc', $page)
+                .toggleClass('hidden eu', !planObj.hasLocal);
+        }
+
+        updateExcOffers() {
+            showExclusiveOffers = !!pro.filter.miniMin;
+            this.initLowTierPlanFeatureCells();
+            this.createExclusivePlanCards(showExclusiveOffers);
+            this.fillExclusivePlanCards((sessionStorage.getItem('pro.periodExc') | 0) || 12);
+
+            $('#pr-exc-offer-tab', $page).toggleClass('hidden', !showExclusiveOffers);
         }
     };
 });

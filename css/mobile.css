@@ -496,12 +496,18 @@ ul, li {
     width: 100%;
     overflow: hidden;
     font-family: 'latoWeb';
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
 }
 .mobile.mega-dialog.park-account-dialog .mobile.inline-buttons {
     overflow: initial;
 }
-.mobile.inline-buttons .mobile.red-button, .mobile.inline-buttons .mobile.green-button, .mobile .unsub .btn {
+.mobile.inline-buttons .mobile.red-button {
     width: 50%;
+    margin-top: 0;
+}
+.mobile.inline-buttons .mobile.green-button, .mobile .unsub .btn {
     width: calc(50% - 4px);
     display: inline-block;
     height: 44px;
@@ -514,7 +520,10 @@ ul, li {
     overflow: hidden;
 }
 .mobile.inline-buttons .mobile.red-button.first, .mobile.inline-buttons .mobile.green-button.first   {
-    float: right;
+    order: 1;
+}
+.mobile.inline-buttons .mobile.red-button.second {
+    margin-right: 8px;
 }
 .mobile.inline-buttons .mobile.second, .mobile .unsub .default-white-button {
     float: left;
@@ -1074,7 +1083,7 @@ ul, li {
 .fmholder .mobile.main-block .mobile.content-row.first {
     height: 100%;
 }
-.mobile .commercial-footer-cd { 
+.mobile .commercial-footer-cd {
     display: flex;
     background-color: var(--mobile-page-background);
     z-index: 101;
@@ -7548,6 +7557,9 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     float: left;
     margin: 6px 0 0 5px;
 }
+.mobile.payment-address-dialog .plan-icon.no-icon + .payment-plan-info {
+    margin-left: 5px;
+}
 .mobile.payment-address-dialog .plan-icon i {
     display: none;
     float: left;
@@ -11789,7 +11801,7 @@ body.rtl .overlay-wrap {
         display: inherit;
         margin-top: 16px;
     }
-    .mobile .commercial-footer-cd { 
+    .mobile .commercial-footer-cd {
         width: 67%;
     }
     #fmholder:not(.selection-mode) .fm-block.file-manager-block.fol-commercials {
@@ -11805,7 +11817,7 @@ body.rtl .overlay-wrap {
     .fmholder .fm-list.grid-view .mega-node .fm-item-img i {
         --icon-size: 64px;
     }
-    .mobile .commercial-footer-cd { 
+    .mobile .commercial-footer-cd {
         width: 75%;
     }
     #fmholder:not(.selection-mode) .fm-block.file-manager-block.cd-commercials {

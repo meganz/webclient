@@ -97,12 +97,18 @@ var pro = {
                     var maxPlan = null;
                     var minPlan = null;
                     var lmbps = {};
+                    const allowLocal = localStorage.blockLocal !== '1';
+                    const blockedPlans = localStorage.blockPlans && localStorage.blockPlans.split(',');
 
                     const conversionRate = results[0].l.lc === "EUR" ? 1 : results[0].l.exch;
 
                     for (var i = 1; i < results.length; i++) {
 
                         let discount = 0;
+
+                        if (blockedPlans && blockedPlans.includes(String(results[i].al))) {
+                            continue;
+                        }
 
                         if (results[i].m === 1) {
                             lmbps[results[i].mbp] = results[i].lp;
@@ -143,12 +149,13 @@ var pro = {
                                 results[i].p / 100,     // price
                                 results[0].l.c,         // currency
                                 results[i].mbp / 100,   // monthly base price
-                                results[i].lp / 100,    // local price
-                                results[0].l.lc,        // local price currency
-                                discount / 100,         // local price save
+                                (allowLocal && results[i].lp / 100),    // local price
+                                (allowLocal && results[0].l.lc),        // local price currency
+                                (allowLocal && discount / 100),         // local price save
                                 results[i].it           // item (will be 0 for user)
                             ]);
                         }
+                        pro.planObjects.createPlanObject(plans[plans.length - 1]);
                         if (results[i].m === 1 && results[i].it !== 1) {
                             if (!maxPlan || maxPlan[2] < results[i]['s']) {
                                 maxPlan = plans[plans.length - 1];
@@ -167,7 +174,7 @@ var pro = {
                     pro.conversionRate = conversionRate;
                 })
                 .finally(() => {
-                    pro.filter.initPlanFilters();
+                    pro.initFilteredPlans();
                     // Run the callback function
                     loadedCallback();
                 });
@@ -447,52 +454,475 @@ var pro = {
         };
     },
 
-    // pro.filter will contain the filtering functions, filter types, and plans
-    filter: {
+    /**
+     * Update the pro page depending on if the user can see the "exclusive offer" tab
+     * (mini plans) or not.
+     *
+     * If they can, fill in the empty low tier plan feature table cells (plan title and
+     * storage and transfer quotas).
+     *
+     * Otherwise, delete the low tier plans flag, hide the "exclusive offer" tab and
+     * show the user a dialog/sheet.
+     *
+     * @param {Boolean} canSeeMiniPlans
+     * @returns {void}
+     */
+    updateLowTierProPage(canSeeMiniPlans) {
+        'use strict';
 
-        // plans contains the filtered plan arrays
-        plans: {},
+        if (canSeeMiniPlans) {
+            pro.proplan2.updateExcOffers();
+        }
+        else {
+            const showProPlansTab = () => {
+                delete window.mProTab;
 
-        initPlanFilters() {
-            'use strict';
-            const simpleFilter = Object.keys(pro.filter.simple);
+                $('.tabs-module-block#pr-exc-offer-tab', '.individual-team-tab-container').addClass('hidden');
+                $('.tabs-module-block#pr-individual-tab', '.individual-team-tab-container').trigger('click');
+            };
 
-            // For monthly (1), yearly (12), and combined (23)
-            for (let i = 1; i < 24; i += 11) {
-                const months = i < 13 ? i : false;
-                const monthsTag = months
-                    ? months === 1 ? 'M' : 'Y'
-                    : '';
-
-                // Set up basic filters (is in account level group, and right num months)
-                for (let j = 0; j < simpleFilter.length; j += 1) {
-                    lazy(pro.filter.plans, simpleFilter[j] + monthsTag, () => pro.membershipPlans.filter((plan) => {
-                        if (months) {
-                            return pro.filter.simple[simpleFilter[j]].has(plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL])
-                                                                          && plan[pro.UTQA_RES_INDEX_MONTHS] === months;
+            if (is_mobile) {
+                mega.ui.sheet.show({
+                    name: 'cannot-view-offer',
+                    type: 'modal',
+                    showClose: false,
+                    preventBgClosing: true,
+                    contents: l.cannot_view_offer,
+                    actions: [
+                        {
+                            type: 'normal',
+                            text: l[81], // OK
+                            onClick: () => {
+                                mega.ui.sheet.hide();
+                                showProPlansTab();
+                            }
                         }
-                        return pro.filter.simple[simpleFilter[j]].has(plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL]);
-                    }));
-                }
+                    ]
+                });
             }
+            else {
+                const cannotViewOfferDialog = new mega.ui.Dialog({
+                    'className': 'cannotviewoffer-dialog',
+                    'closable': false,
+                    'closableByOverlay': false,
+                    'focusable': false,
+                    'expandable': false,
+                    'requiresOverlay': true,
+                    'buttons': []
+                });
+                cannotViewOfferDialog.rebind('onBeforeShow', function() {
+                    $('header p', this.$dialog).text(l.cannot_view_offer);
 
-            lazy(pro.filter, 'affMin', () => {
-                const plans = pro.filter.plans.affPlansM;
-                let currentMin = plans[0];
-                for (let i = 1; i < plans.length; i++) {
-                    if (plans[i][pro.UTQA_RES_INDEX_STORAGE] < currentMin[pro.UTQA_RES_INDEX_STORAGE]) {
-                        currentMin = plans[i];
+                    $('button.ok-close', this.$dialog).rebind('click.closeDialog', () => {
+                        cannotViewOfferDialog.hide();
+                        showProPlansTab();
+                    });
+                });
+
+                cannotViewOfferDialog.show();
+            }
+        }
+    },
+
+    // These are indented to this level to keep the pro object cleaner, and they should not be directly accessed outside
+    // of functions in pro. pro.getPlanObj should be used to retreive them instead.
+    planObjects: {
+        planKeys: Object.create(null),
+        planTypes: Object.create(null),
+
+        createPlanObject(plan) {
+            'use strict';
+            const key = plan[pro.UTQA_RES_INDEX_ID] + plan[pro.UTQA_RES_INDEX_ITEMNUM];
+
+            lazy(pro.planObjects.planKeys, key, () => {
+
+                const thisPlan = {
+                    key,        // Plan key
+                    _saveUpTo: null,        // Stores the saveUpTo percentage of the plan, in case given by another plan
+                    _correlatedPlan: null,       // Stores the correlated plan, in case given by another plan
+                    _maxCorrPriceEur: null,
+                };
+
+                lazy(thisPlan, 'id', () => plan[pro.UTQA_RES_INDEX_ID]);
+                lazy(thisPlan, 'itemNum', () => plan[pro.UTQA_RES_INDEX_ITEMNUM]);
+                lazy(thisPlan, 'level', () => plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL]);
+                lazy(thisPlan, 'name', () => pro.getProPlanName(plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL]));
+                lazy(thisPlan, 'storage', () => plan[pro.UTQA_RES_INDEX_STORAGE] * pro.BYTES_PER_GB);
+                lazy(thisPlan, 'transfer', () => plan[pro.UTQA_RES_INDEX_TRANSFER] * pro.BYTES_PER_GB);
+                lazy(thisPlan, 'months', () => plan[pro.UTQA_RES_INDEX_MONTHS]);
+                lazy(thisPlan, 'price', () => plan[pro.UTQA_RES_INDEX_LOCALPRICE] || plan[pro.UTQA_RES_INDEX_PRICE]);
+                lazy(thisPlan, 'currency', () => {
+                    return plan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY] || plan[pro.UTQA_RES_INDEX_CURRENCY];
+                });
+                lazy(thisPlan, 'priceEuro', () => plan[pro.UTQA_RES_INDEX_PRICE]);
+                lazy(thisPlan, 'currencyEuro', () => plan[pro.UTQA_RES_INDEX_CURRENCY]);
+                lazy(thisPlan, 'save', () => plan[pro.UTQA_RES_INDEX_LOCALPRICESAVE] || false);
+                lazy(thisPlan, 'monthlyBasePrice', () => plan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE] || false);
+                lazy(thisPlan, 'hasLocal', () => !!plan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY]);
+
+                lazy(thisPlan, 'correlatedPlan', () => {
+                    if (thisPlan._correlatedPlan === null) {
+                        let correlatedPlan = false;
+                        const arrCorrPlan = pro.membershipPlans.find((searchPlan) => {
+                            return ((searchPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === thisPlan.level)
+                                && (searchPlan[pro.UTQA_RES_INDEX_MONTHS] !== thisPlan.months));
+                        });
+                        if (arrCorrPlan) {
+                            const planObj = pro.getPlanObj(arrCorrPlan);
+                            planObj._correlatedPlan = thisPlan;
+                            correlatedPlan = planObj;
+                        }
+                        thisPlan._correlatedPlan = correlatedPlan;
                     }
-                }
-                return currentMin;
+                    return thisPlan._correlatedPlan;
+                });
+
+                lazy(thisPlan, 'saveUpTo', () => {
+                    if (thisPlan._saveUpTo === null) {
+                        let saveUpTo = false;
+                        if (thisPlan.correlatedPlan) {
+                            const thisMonthlyPrice = thisPlan.price / thisPlan.months;
+                            const corrMonthlyPrice = thisPlan.correlatedPlan.price / thisPlan.correlatedPlan.months;
+                            saveUpTo = percentageDiff(thisMonthlyPrice, corrMonthlyPrice, 3);
+                            thisPlan.correlatedPlan._saveUpTo = saveUpTo;
+                        }
+                        thisPlan._saveUpTo = saveUpTo;
+                    }
+                    return thisPlan._saveUpTo;
+                });
+
+                lazy(thisPlan, 'maxCorrPriceEuro', () => {
+                    if (thisPlan._maxCorrPriceEur === null) {
+                        let maxCorrPrice = thisPlan.priceEuro;
+                        if (thisPlan.correlatedPlan) {
+                            maxCorrPrice = Math.max(thisPlan.priceEuro, thisPlan.correlatedPlan.priceEuro);
+                            thisPlan.correlatedPlan._maxCorrPriceEur = maxCorrPrice;
+                        }
+                        thisPlan._maxCorrPrice = maxCorrPrice;
+                    }
+                    return thisPlan._maxCorrPrice;
+                });
+
+                lazy(thisPlan, 'yearlyDiscount', () => {
+                    if (thisPlan.save) {
+                        return thisPlan.save;
+                    }
+                    if ((thisPlan.months === 1) || !thisPlan.correlatedPlan) {
+                        return false;
+                    }
+                    const baseYearly = thisPlan.correlatedPlan.price * 12;
+
+                    // Multiply by 100 and then divide by 100 to avoid floating point issues as JS hates decimals
+                    return (baseYearly * 100 - thisPlan.price * 100) / 100;
+                });
+
+                /**
+                 * Checks if the plan is in a filter, returns boolean or level of the plan in the filter.
+                 * @param {string} filter - The name of the filter to check
+                 * @param {?string} returnType - Desired return type. Will return boolean if not specified.
+                 * @returns {number | boolean} - Returns if the plan is in the filter,
+                 * as the level of the plan if specified, or as a boolean if not.
+                 */
+                thisPlan.isIn = (filter, returnType) => {
+                    if (returnType === 'asLevel') {
+                        return pro.filter.simple[filter].has(thisPlan.level) ? thisPlan.level : 0;
+                    }
+                    return pro.filter.simple[filter].has(thisPlan.level);
+                };
+
+                return thisPlan;
+
             });
         },
+    },
 
-        lowestRequired(userStorage, secondaryFilter) {
-            'use strict';
-            secondaryFilter = secondaryFilter || 'core';
+    initFilteredPlans() {
+        'use strict';
+        const pf = pro.filter;
+        const superFilterKeys = Object.keys(pf.superSet);
+
+        for (let i = 0; i < superFilterKeys.length; i++) {
+            const key = superFilterKeys[i];
+            const subsets = pf.superSet[key];
+            let allItems = [];
+
+            for (let j = 0; j < subsets.length; j++) {
+                allItems = ([...allItems, ...pf.simple[subsets[j]]]);
+            }
+
+            pf.simple[superFilterKeys[i]] = new Set(allItems);
+        }
+
+        const simpleFilterKeys = Object.keys(pf.simple);
+        const invertedFilterKeys = Object.keys(pf.inverted);
+
+        // If a non-simple filter has already been used, it will also already be in simple filters
+        const setUp = new Set();
+
+        // For monthly (1), yearly (12), and combined (23)
+        for (let i = 1; i < 24; i += 11) {
+            const months = i < 13 ? i : false;
+            const monthsTag = months
+                ? months === 1 ? 'M' : 'Y'
+                : '';
+
+
+            for (let j = 0; j < simpleFilterKeys.length; j++) {
+                setUp.add(simpleFilterKeys[j] + monthsTag);
+
+                // Set up basic plan sub-arrays (is in account level group, and right num months)
+                lazy(pf.plans, simpleFilterKeys[j] + monthsTag, () => pro.membershipPlans.filter((plan) => {
+                    if (months) {
+                        return pro.filter.simple[simpleFilterKeys[j]].has(plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL])
+                            && plan[pro.UTQA_RES_INDEX_MONTHS] === months;
+                    }
+                    return pro.filter.simple[simpleFilterKeys[j]].has(plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL]);
+                }));
+            }
+
+            for (let j = 0; j < invertedFilterKeys.length; j++) {
+                if (setUp.has(invertedFilterKeys[j] + monthsTag)) {
+                    continue;
+                }
+                setUp.add(invertedFilterKeys[j] + monthsTag);
+
+                // Set up inverted plan sub-arrays (is in all minus specified, correct num months(via allX))
+                lazy(pf.plans, invertedFilterKeys[j] + monthsTag, () =>
+                    pro.filter.plans[`all${monthsTag}`].filter((plan) =>
+                        pro.filter.simple[invertedFilterKeys[j]].has(plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL])
+                    )
+                );
+            }
+
+        }
+
+        lazy(pro.filter, 'affMin', () => {
+            const plans = pro.filter.plans.affPlans;
+            let currentMin = plans[0];
+            for (let i = 1; i < plans.length; i++) {
+                if (plans[i][pro.UTQA_RES_INDEX_STORAGE] < currentMin[pro.UTQA_RES_INDEX_STORAGE]) {
+                    currentMin = plans[i];
+                }
+            }
+            return currentMin;
+        });
+
+        lazy(pro.filter, 'miniMin', () => {
+            const plans = pro.filter.plans.miniPlans;
+            if (!plans.length) {
+                return false;
+            }
+            let currentMin = plans[0];
+            for (let i = 1; i < plans.length; i++) {
+                if (plans[i][pro.UTQA_RES_INDEX_STORAGE] < currentMin[pro.UTQA_RES_INDEX_STORAGE]) {
+                    currentMin = plans[i];
+                }
+            }
+            return currentMin;
+        });
+    },
+
+    /**
+     * Given a plan array, a plan key (id + itemnum), or the account level/number of months, returns objectified plan
+     * @param {Array | number} plan - takes in the full plan array, or the account level
+     * @param {number | string} [months = 1] - the number of months of the plan if account level is given
+     * @returns {Object | boolean} - returns the same plan but as an object, or false if none found
+     */
+    getPlanObj(plan, months) {
+        'use strict';
+        const {planTypes} = pro.planObjects;
+        months = (months |= 0) || 1;
+        let key;
+        let type;
+        if (typeof plan === 'number' || typeof plan === 'string') {
+            type = plan + '_' + months;
+            if (planTypes[type]) {
+                return planTypes[type];
+            }
+            plan = pro.membershipPlans.find((searchPlan) => {
+                return ((searchPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === +plan)
+                    && (searchPlan[pro.UTQA_RES_INDEX_MONTHS] === months));
+            });
+        }
+
+        if (typeof plan === 'object') {
+            key = plan[pro.UTQA_RES_INDEX_ID] + plan[pro.UTQA_RES_INDEX_ITEMNUM];
+        }
+        // If plan level and duration given, cache it as may be used again
+        if (type) {
+            planTypes[type] = pro.planObjects.planKeys[key];
+        }
+        return pro.planObjects.planKeys[key] || false;
+    },
+
+    /**
+     * When it is unknown what type we will receive for a plan, this function will always return the plan level as num
+     * @param {Array | Object | string | number} plan - The plan or plan level to return the plan level of
+     * @returns {number} - the plan level number
+     */
+    getPlanLevel(plan) {
+        'use strict';
+        if (typeof plan === 'number') {
+            return plan;
+        }
+        else if (Array.isArray(plan)) {
+            plan = plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
+        }
+        else if (typeof plan === 'object') {
+            plan = plan.level;
+        }
+        return plan | 0;
+    },
+
+    /**
+     * Checks if the given plan/plan level is in the given filter
+     * @param {Array | Object | string | number} plan
+     * @param {string} [filter = 'all'] filter - the filter to check the plan against
+     * @returns {boolean} - If the plan is in the filter
+     */
+    planInFilter(plan, filter) {
+        'use strict';
+        const filterSet = pro.filter.simple[filter || 'all'];
+        if (!filterSet) {
+            if (d) {
+                console.error('Invalid filter: ' + filter);
+            }
+            return false;
+        }
+        return filterSet.has(pro.getPlanLevel(plan));
+    }
+};
+
+/**
+ * Contains the filtering functions, filter types, and plans
+ * @property pro.filter
+ */
+lazy(pro, 'filter', () => {
+    'use strict';
+    const pf = {
+
+        // contains the filtered plan arrays
+        plans: Object.create(null),
+
+        // These are intended to be used in a similar way to transifex strings
+        // If 2 arrays are the same but have a different context, please keep them separate.
+        // This is to make future updating as straightforward as possible.
+        simple: {
+
+            // validPurchases: 11, 12, 13, 4, 1, 2, 3, 101 - plans that are valid to purchase via propay_X
+            // Excludes any plans that are not directly purchasable at the url /propay_X. e.g., Business
+            validPurchases:
+                new Set([
+                    pro.ACCOUNT_LEVEL_STARTER, pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL,
+                    pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II,
+                    pro.ACCOUNT_LEVEL_PRO_III, pro.ACCOUNT_LEVEL_PRO_FLEXI
+                ]),
+
+            // all: 11, 12, 13, 4, 1, 2, 3, 101, 100 - all currently available plans
+            // Excludes any plans that the webclient is not yet ready to support.
+            all:
+                new Set([
+                    pro.ACCOUNT_LEVEL_STARTER, pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL,
+                    pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II,
+                    pro.ACCOUNT_LEVEL_PRO_III, pro.ACCOUNT_LEVEL_PRO_FLEXI, pro.ACCOUNT_LEVEL_BUSINESS
+                ]),
+
+            // storageTransferDialogs: 11, 12, 13, 4, 1, 2, 3, 101 - plans that should be shown in the storage
+            // and transfer upsell dialogs
+            storageTransferDialogs:
+                new Set([
+                    pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II,
+                    pro.ACCOUNT_LEVEL_PRO_III, pro.ACCOUNT_LEVEL_PRO_FLEXI
+                ]),
+
+            // affPlans: 4, 1, 2, 3 - plans that can show in the affiliate redeem section
+            affPlans:
+                new Set([
+                    pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II,
+                    pro.ACCOUNT_LEVEL_PRO_III
+                ]),
+
+            // miniPlans: 11, 12, 13 - mini plans available to targeted users
+            miniPlans:
+                new Set([
+                    pro.ACCOUNT_LEVEL_STARTER, pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL
+                ]),
+
+            // ninetyDayRewind: 11, 12, 13, 4 - plans that have up to 90 days rewind instead of up to 180 days
+            ninetyDayRewind:
+                new Set([
+                    pro.ACCOUNT_LEVEL_STARTER, pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL,
+                    pro.ACCOUNT_LEVEL_PRO_LITE
+                ]),
+
+            // proPlans: 4, 1, 2, 3, 101 - plans that are in the group "pro"
+            proPlans:
+                new Set([
+                    pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II,
+                    pro.ACCOUNT_LEVEL_PRO_III, pro.ACCOUNT_LEVEL_PRO_FLEXI
+                ]),
+
+            // core 4, 1, 2, 3 - plans with a set amount of storage and transfer and are available to most or all users
+            core:
+                new Set([
+                    pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II,
+                    pro.ACCOUNT_LEVEL_PRO_III
+                ]),
+
+            // recommend: 1, 2, 3 - plans that are able to be recommended to users
+            recommend:
+                new Set([
+                    pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II, pro.ACCOUNT_LEVEL_PRO_III
+                ]),
+        },
+
+        // Sets of plans to invert (all plans minus specified plans), will then
+        // be added to pro.filter.simple, and plan arrays added to pro.filter.plans
+        inverted: {
+            // Plans that do not see the cancel benefits dialog
+            canSeeCancelBenefits:
+                new Set([
+                    pro.ACCOUNT_LEVEL_STARTER, pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL,
+                    pro.ACCOUNT_LEVEL_PRO_FLEXI, pro.ACCOUNT_LEVEL_BUSINESS
+                ]),
+
+            // Plans that do not have an icon to show
+            hasIcon:
+                new Set([
+                    pro.ACCOUNT_LEVEL_STARTER, pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL
+                ]),
+
+            supportsExpensive:
+                new Set([
+                    pro.ACCOUNT_LEVEL_STARTER, pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL,
+                    pro.ACCOUNT_LEVEL_PRO_LITE
+                ]),
+
+            supportsGooglePlay:
+                new Set([
+                    pro.ACCOUNT_LEVEL_STARTER, pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL,
+                    pro.ACCOUNT_LEVEL_PRO_FLEXI
+                ]),
+        },
+
+        superSet: {
+            // Plans that are exlusive offiers
+            excPlans: ['miniPlans'],
+
+            // Plans that have regular transfer and storage quota
+            regular: ['miniPlans', 'core'],
+        },
+
+        /**
+         * Finds the lowest monthly plan that can store the users data, excluding their current plan
+         * @param {number} userStorage - The users current storage in bytes
+         * @param {string} secondaryFilter - The subset of plans to choose lowest plan from
+         * @returns {Array|false} - An array item of the specific plan, or false if no plans found
+         */
+        lowestRequired(userStorage, secondaryFilter = 'all') {
             const plans = pro.filter.plans[secondaryFilter + 'M'];
             if (!plans) {
+                console.assert(pro.membershipPlans.length, 'Plans not loaded');
                 return;
             }
             return plans.find((plan) =>
@@ -500,44 +930,19 @@ var pro = {
                 && ((plan[pro.UTQA_RES_INDEX_STORAGE] * pro.BYTES_PER_GB) > userStorage)
                 || (plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === pro.ACCOUNT_LEVEL_PRO_FLEXI));
         }
-    },
-};
-
-// These are intended to be used in a similar way to transifex strings
-// If 2 arrays are the same but have a different context, please keep them separate.
-// This is to make future updating as straighforward as possible.
-lazy(pro.filter, 'simple', () => {
-    'use strict';
-    return {
-
-        // validPurchases: 11, 12, 13, 4, 1, 2, 3, 101 - plans that are valid to purchase via propay_X
-        // Excludes any plans that are not directly purchasable at the url /propay_X. e.g., Business
-        validPurchases:
-            new Set([pro.ACCOUNT_LEVEL_STARTER, pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL,
-                     pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II,
-                     pro.ACCOUNT_LEVEL_PRO_III, pro.ACCOUNT_LEVEL_PRO_FLEXI]),
-
-        // all: 11, 12, 13, 4, 1, 2, 3, 101, 100 - all currently available plans
-        // Excludes any plans that the webclient is not yet ready to support.
-        all:
-            new Set([pro.ACCOUNT_LEVEL_STARTER, pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL,
-                     pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II,
-                     pro.ACCOUNT_LEVEL_PRO_III, pro.ACCOUNT_LEVEL_PRO_FLEXI, pro.ACCOUNT_LEVEL_BUSINESS]),
-
-        // storageTransferDialogs: 11, 12, 13, 4, 1, 2, 3, 101 - plans that should be shown in the storage
-        // and transfer upsell dialogs
-        storageTransferDialogs:
-            new Set([pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II,
-                     pro.ACCOUNT_LEVEL_PRO_III, pro.ACCOUNT_LEVEL_PRO_FLEXI]),
-
-        // affPlans: 4, 1, 2, 3 - plans that can show in the affiliate redeem section
-        affPlans:
-            new Set([pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II,
-                     pro.ACCOUNT_LEVEL_PRO_III]),
-
-        // ninetyDayRewind: 11, 12, 13, 4 - plans that have up to 90 days rewind instead of up to 180 days
-        ninetyDayRewind:
-            new Set([pro.ACCOUNT_LEVEL_STARTER, pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL,
-                     pro.ACCOUNT_LEVEL_PRO_LITE]),
     };
+
+    const invertedFilterKeys = Object.keys(pf.inverted);
+
+    for (let j = 0; j < invertedFilterKeys.length; j++) {
+
+        lazy(pf.simple, invertedFilterKeys[j], () => {
+
+            return new Set([...pro.filter.simple.all].filter((id) =>
+                !pro.filter.inverted[invertedFilterKeys[j]].has(id)
+            ));
+        });
+    }
+
+    return Object.setPrototypeOf(pf, null);
 });

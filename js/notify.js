@@ -1476,18 +1476,13 @@ var notify = {
             }
 
             pro.loadMembershipPlans(() => {
-                const plan = pro.membershipPlans.find(currentPlan => {
-                    return currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === account.purchases[0][5]
-                        && currentPlan[pro.UTQA_RES_INDEX_MONTHS] === 1;
-                });
 
-                const transfer = plan[pro.UTQA_RES_INDEX_TRANSFER] * account.purchases[0][6] * 1024 * 1024 * 1024;
-                const storage = plan[pro.UTQA_RES_INDEX_STORAGE] *  1024 * 1024 * 1024;
+                const plan = pro.getPlanObj(account.purchases[0][5], account.purchases[0][6]);
 
-                $('header', $dialog).text(l.welcome_dialog_header.replace('%1', pro.getProPlanName(u_attr.p)));
+                $('header', $dialog).text(l.welcome_dialog_header.replace('%1', plan.name));
                 $('.more-quota .info-text', $dialog).text(l.welcome_dialog_quota_details
-                    .replace('%1', bytesToSize(storage, 0))
-                    .replace('%2', bytesToSize(transfer, 0)));
+                    .replace('%1', bytesToSize(plan.storage, 3, 4))
+                    .replace('%2', bytesToSize(plan.transfer, 3, 4)));
                 $('button', $dialog).rebind('click', () => {
                     closeDialog();
                 });

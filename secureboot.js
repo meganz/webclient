@@ -411,6 +411,9 @@ function getCleanSitePath(path) {
             if (path.lang && path.lang.length < 6) {
                 localStorage.lang = path.lang;
             }
+            if (path[0] === 'pro' && path.tab) {
+                window.mProTab = path.tab;
+            }
         }, false)();
 
         if (path.mt) {

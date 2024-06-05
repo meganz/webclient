@@ -39,6 +39,7 @@
         init: function() {
             this.$page = $('.bottom-page.developer-settings');
             this.initSettings();
+            this.initMiscLocalStorage();
             this.initApplyButton();
             this.initAPICommandSettings();
         },
@@ -76,6 +77,42 @@
                     localStorage.removeItem(itemKey);
                 }
             });
+        },
+
+        initMiscLocalStorage() {
+            const $otherDev = $('.misc-dev', this.$page);
+            const $buttons = $('button', $otherDev);
+            const $resText = $('.response', $otherDev);
+
+            $buttons.rebind('click', function() {
+
+                const isGet = $(this).hasClass('get');
+                const name = $('.name', $otherDev).val().trim();
+                const value = $('.value', $otherDev).val();
+                if (!name && !isGet) {
+                    $otherDev.addClass('error');
+                    return;
+                }
+                else if (!name) {
+                    $resText.text('No name provided');
+                    return;
+                }
+
+                $otherDev.removeClass('error');
+                if (isGet) {
+                    $resText.text(`localStorage.${name} = ${localStorage[name]}`);
+                    return;
+                }
+                if (!value) {
+                    delete localStorage[name];
+                    $resText.text(`Deleted localStorage.${name}`);
+                    return;
+                }
+
+                localStorage[name] = value;
+                $resText.text(`localStorage.${name} = ${value}`);
+            });
+
         },
 
         makeRequest(request, $buttons, setTo, id) {

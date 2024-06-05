@@ -1417,7 +1417,9 @@ function showLoginDialog(email, password) {
     var closeLoginDialog = function() {
         $('.fm-dialog-overlay').unbind('click.proDialog');
         $('button.js-close', $dialog).unbind('click.proDialog');
+
         closeDialog();
+
         return false;
     };
 
@@ -1427,8 +1429,14 @@ function showLoginDialog(email, password) {
         accountinputs.init($dialog);
 
         // controls
-        $('button.js-close', $dialog).rebind('click.proDialog', closeLoginDialog);
-        $('.fm-dialog-overlay').rebind('click.proDialog', closeLoginDialog);
+        const onLowTierProPg = page === 'pro' && window.mProTab;
+        if (onLowTierProPg) {
+            $('button.js-close', $dialog).addClass('hidden');
+        }
+        else {
+            $('button.js-close', $dialog).rebind('click.proDialog', closeLoginDialog);
+            $('.fm-dialog-overlay').rebind('click.proDialog', closeLoginDialog);
+        }
 
         $('.input-email', $dialog).val(email || '');
         $('.input-password', $dialog).val(password || '');
@@ -1555,6 +1563,26 @@ function completeProLogin(result) {
             var chatHash = getSitePath().replace("/chat/", "").split("#")[0];
             megaChat.loginOrRegisterBeforeJoining(chatHash);
         }
+        else if (page === "pro" && window.mProTab) {
+            closeDialog();
+
+            if (u_attr.b || u_attr.pf) {
+                // Load FM if user is a Business or Pro Flexi account (not allowed
+                // to see pro page)
+                loadSubPage('fm');
+            }
+            else {
+                loadingDialog.show();
+
+                // Update the pro page after login based on whether the user
+                // is allowed to see the low tier section of the pro page
+                pro.loadMembershipPlans(() => {
+                    pro.updateLowTierProPage(!!pro.filter.miniMin);
+
+                    loadingDialog.hide();
+                });
+            }
+        }
         else {
             // If no value was set on the discount promo page, find the plan they clicked on
             // before the login/register prompt popped up. Otherwise use the discount plan number.
@@ -1670,8 +1698,14 @@ var attemptingLoginOrRegister = false;
 var signupPromptDialog = null;
 var showSignupPromptDialog = function() {
 
+    const onLowTierProPg = page === 'pro' && window.mProTab;
+
     // If on mobile, show the mobile version
     if (is_mobile) {
+        // Set login_next to send the user to the low tier pro page once logged in
+        if (onLowTierProPg) {
+            login_next = 'pro';
+        }
         mobile.proSignupPrompt.init();
         return;
     }
@@ -1679,11 +1713,12 @@ var showSignupPromptDialog = function() {
     if (!signupPromptDialog) {
         signupPromptDialog = new mega.ui.Dialog({
             'className': 'loginrequired-dialog',
-            'closable': true,
+            'closable': !onLowTierProPg,
+            'closableByOverlay': !onLowTierProPg,
             'focusable': false,
             'expandable': false,
             'requiresOverlay': true,
-            'title': l[5841],
+            'title': onLowTierProPg ? l[1768] : l[5841],
             'buttons': []
         });
         signupPromptDialog.rebind('onBeforeShow', function() {
@@ -1691,7 +1726,7 @@ var showSignupPromptDialog = function() {
             this.$dialog.addClass('with-close-btn');
             // custom buttons, because of the styling
             $('header p', this.$dialog)
-                .safeHTML('@@', l[5842]);
+                .safeHTML('@@', onLowTierProPg ? l.log_in_to_continue : l[5842]);
 
             $('.pro-login', this.$dialog)
                 .rebind('click.loginrequired', function() {
@@ -1702,28 +1737,33 @@ var showSignupPromptDialog = function() {
                     return false;
                 });
 
-            $('.pro-register', this.$dialog)
-                .rebind('click.loginrequired', function() {
-                    delay('logindlg.register', eventlog.bind(null, 99860));
-                    attemptingLoginOrRegister = true;
-                    signupPromptDialog.hide();
+            if (onLowTierProPg) {
+                $('.pro-register', this.$dialog).addClass('hidden');
+            }
+            else {
+                $('.pro-register', this.$dialog)
+                    .rebind('click.loginrequired', () => {
+                        delay('logindlg.register', eventlog.bind(null, 99860));
+                        attemptingLoginOrRegister = true;
+                        signupPromptDialog.hide();
 
-                    if (!u_wasloggedin()) {
-                        showRegisterDialog();
-                    }
-                    else {
-                        var msg = l[8743];
-                        msgDialog('confirmation', l[1193], msg, null, function(res) {
-                            if (res) {
-                                showRegisterDialog();
-                            }
-                            else {
-                                showLoginDialog();
-                            }
-                        });
-                    }
-                    return false;
-                }).find('span').text(l[1076]);
+                        if (u_wasloggedin()) {
+                            var msg = l[8743];
+                            msgDialog('confirmation', l[1193], msg, null, res => {
+                                if (res) {
+                                    showRegisterDialog();
+                                }
+                                else {
+                                    showLoginDialog();
+                                }
+                            });
+                        }
+                        else {
+                            showRegisterDialog();
+                        }
+                        return false;
+                    });
+            }
 
             var $selectedPlan = $('.pricing-page.plan.selected', 'body');
 

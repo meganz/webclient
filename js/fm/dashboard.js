@@ -192,12 +192,15 @@ function dashboardUI(updProcess) {
                 }
             }
             else if (account.stype == 'O') {
+                const planExpiryString = pro.filter.simple.miniPlans.has(u_attr.p)
+                    ? l.plan_expires_on
+                    : l[20153];
                 // one-time or cancelled subscription
                 $('.account.left-pane.plan-date-val').text(time2date(account.expiry, 2));
 
                 // If user has nextplan, show infomative tooltip
                 if (account.nextplan) {
-                    $('.account.left-pane.plan-date-info').safeHTML(escapeHTML(l[20153]) +
+                    $('.account.left-pane.plan-date-info').safeHTML(escapeHTML(planExpiryString) +
                         '<div class="sprite-fm-mono icon-info-filled simpletip" ' +
                         'data-simpletip-class="center-align medium-width" data-simpletip="' +
                         escapeHTML(l[20965]) + '"></div>');
@@ -206,7 +209,7 @@ function dashboardUI(updProcess) {
                     $('.account.left-pane.plan-date-info').text(l[987]);
                 }
                 else {
-                    $('.account.left-pane.plan-date-info').text(l[20153]);
+                    $('.account.left-pane.plan-date-info').text(planExpiryString);
                 }
             }
 

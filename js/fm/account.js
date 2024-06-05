@@ -2142,7 +2142,7 @@ accountUI.plan = {
                 this.$allowContactOptions = $('.allow-contact-wrapper', this.$dialog);
 
                 // Show benefits dialog before cancellation dialog if user does not have Pro Flex or Business
-                if (!u_attr.pf && !u_attr.b) {
+                if (pro.filter.simple.canSeeCancelBenefits.has(u_attr.p)) {
                     this.displayBenefits();
                 }
                 else {
@@ -2733,14 +2733,14 @@ accountUI.plan = {
                     else if (proNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
                         planIcon = 'icon-crest-pro-flexi';
                     }
-                    else {
+                    else if (pro.filter.simple.hasIcon.has(proNum)) {
                         planIcon = 'icon-crest-pro-' + proNum;
                     }
 
                     // Render table row
                     html += '<tr>'
                         + '<td><div class="label-with-icon">'
-                        + '<i class="sprite-fm-uni ' + planIcon + '"></i>'
+                        + (planIcon ? '<i class="sprite-fm-uni ' + planIcon + '"></i>' : '')
                         + '<span> ' + item + '</span>'
                         + '</div></td>'
                         + '<td><span>' + dateTime + '</span></td>'

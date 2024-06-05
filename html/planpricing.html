@@ -16,35 +16,28 @@
             <div class="pricing-pg individual-team-tab-container">
                 <div class="pricing-pg tabs-module">
                     <div id ="pr-individual-tab" class="tabs-module-block selected">
-                        <div class="tabs-block-title">
-                            [$23778]
-                        </div>
-                        <div class="tabs-block-sub-title">
-                            [$pr_a_user]
-                        </div>
+                        <div class="tabs-block-title">[$pr_pro_plans_tab]</div>
                     </div>
                     <div id ="pr-business-tab" class="tabs-module-block" data-should-log="true">
-                        <div class="tabs-block-title">
-                            [$pr_team]
-                        </div>
-                        <div class="tabs-block-sub-title">
-                            [$pr_team_users]
-                        </div>
+                        <div class="tabs-block-title">[$19530]</div>
+                    </div>
+                    <div id ="pr-exc-offer-tab" class="tabs-module-block hidden">
+                        <div class="tabs-block-title">[$pr_exclusive_offer]</div>
                     </div>
                 </div>
             </div>
-            <div class="pricing-pg pick-period-container">
+            <div class="pricing-pg pick-period-container individual hidden" data-tabname="pro">
                 <div class="pricing-pg pick-period-module">
                     <!-- No need for native radio buttons, the challenges in design out-weights the benefits-->
                     <div class="pricing-radio-group">
                         <div class="pricing-radio-option selected" data-period="1">
-                            <div class="pricing-radio-btn" id="period-month"></div>
+                            <div class="pricing-radio-btn"></div>
                             <div class="pricing-radio-label">
                                 [$23779]
                             </div>
                         </div>
                         <div class="pricing-radio-option" data-period="12">
-                            <div class="pricing-radio-btn" id="period-year"></div>
+                            <div class="pricing-radio-btn"></div>
                             <div class="pricing-radio-label">
                                 [$23780]
                             </div>
@@ -58,7 +51,31 @@
                     </div>
                 </div>
             </div>
+            <div class="pricing-pg pick-period-container exclusive-plans-container hidden" data-tabname="exclusive">
+                <div class="pricing-pg pick-period-module">
+                    <!-- No need for native radio buttons, the challenges in design out-weights the benefits-->
+                    <div class="pricing-radio-group">
+                        <div class="pricing-radio-option selected" data-period="1">
+                            <div class="pricing-radio-btn"></div>
+                            <div class="pricing-radio-label">
+                                [$23779]
+                            </div>
+                        </div>
+                        <div class="pricing-radio-option" data-period="12">
+                            <div class="pricing-radio-btn"></div>
+                            <div class="pricing-radio-label">
+                                [$23780]
+                            </div>
+                        </div>
+                    </div>
 
+                </div>
+                <div class="pricing-pg period-note-container">
+                    <div class="period-note-txt">
+                        [$pr_save_tip]
+                    </div>
+                </div>
+            </div>
             <div class="pricing-pg pro-plans-cards-container">
                 <div class="pricing-pg plans-cards-container">
                     <div class="pricing-plan-card hidden" id="pro4">
@@ -115,7 +132,46 @@
                     </div>
                 </div>
             </div>
+            <!-- <div class="pricing-pg pro-plans-cards-container exclusive-plans-container"> -->
+                <!-- <div class="pricing-pg plans-cards-container"> -->
+
+            <div class="pricing-pg exclusive-plans-container">
+                <div class="pricing-pg plans-cards-container">
+                    <div class="pricing-plan-card template hidden">
+                        <div class="pricing-plan-recommend">[$pr_exclusive_offer]</div>
+                        <div class="pricing-plan-title"></div>
+                        <div class="pricing-plan-only">[$pr_only]</div>
+                        <div class="pricing-plan-price"><span class="vl"></span><span class="ars">*</span></div>
+                        <div class="pricing-plan-price-unit"></div>
+                        <div class="pricing-plan-storage"></div>
+                        <div class="pricing-plan-trasfer"></div>
+                        <div class="pricing-plan-features">
+                            <div class="features-title">[$pr_includes]</div>
+                            <div class="vpn">
+                                <i class="sprite-fm-mono icon-shield-thin-outline"></i>
+                                <span></span>
+                            </div>
+                            <div class="meeting-limits">
+                                <i class="sprite-fm-mono icon-video-thin-outline"></i>
+                                <span></span>
+                            </div>
+                            <div class="meeting-participants">
+                                <i class="sprite-fm-mono icon-users-thin-outline"></i>
+                                <span></span>
+                            </div>
+                        </div>
+                        <div class="pricing-plan-btn-container">
+                            <div class="pricing-plan-btn"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="pricing-pg pricing-estimation-note-container hidden">
+                <div class="pricing-estimation-note">
+                    *[$18770]
+                </div>
+            </div>
+            <div class="pricing-pg pricing-estimation-note-container-exc exclusive-plans-container hidden">
                 <div class="pricing-estimation-note">
                     *[$18770]
                 </div>
@@ -317,145 +373,173 @@
                         [$1150]
                         <button class="experiment-button hidden free">[$20556]</button>
                     </div>
-                    <div class="pricing-plans-compare-table-item plans-table-header x-bold line center">
-                        [$pr_pro_plans]
-                        <button class="experiment-button hidden pro">[$pr_table_button_see_pro]</button>
+                    <div class="pricing-plans-compare-table-item plans-table-header pro-exc-offer x-bold line center hidden">
+                        <span></span>
+                        <button class="experiment-button hidden pro-exc-offer"></button>
                     </div>
-                    <div class="pricing-plans-compare-table-item plans-table-header x-bold line center">
+                    <div class="pricing-plans-compare-table-item plans-table-header pro-plans x-bold line center">
+                        <span>[$pr_pro_i_to_iii]</span>
+                        <button class="experiment-button hidden pro primary">[$pr_table_button_see_pro]</button>
+                    </div>
+                    <div class="pricing-plans-compare-table-item plans-table-header pro-flexi x-bold line center">
                         [$pro_flexi_name]
                         <button class="experiment-button hidden pro-flexi">[$pr_table_button_buy_flexi]</button>
                     </div>
-                    <div class="pricing-plans-compare-table-item plans-table-header x-bold line center">
+                    <div class="pricing-plans-compare-table-item plans-table-header pro-business x-bold line center">
                         [$19530]
                         <button class="experiment-button hidden pro-business">[$buy_business]</button>
                     </div>
 
                     <!-- End of Header -->
+
                     <!-- Core features sections -->
                     <div class="pricing-plans-compare-table-item header">[$pr_core_features]</div>
 
                     <div class="pricing-plans-compare-table-item bold rb bg-gr">[$bsn_compare_users]</div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr">[$pr_a_user]</div>
-                    <div class="pricing-plans-compare-table-item center rb bg-gr">[$pr_a_user]</div>
-                    <div class="pricing-plans-compare-table-item center rb bg-gr">[$pr_a_user]</div>
-                    <div class="pricing-plans-compare-table-item center bg-gr">[$pr_3_users]</div>
+                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb bg-gr hidden">[$pr_a_user]</div>
+                    <div class="pricing-plans-compare-table-item pro center rb bg-gr">[$pr_a_user]</div>
+                    <div class="pricing-plans-compare-table-item pro-flexi center rb bg-gr">[$pr_a_user]</div>
+                    <div class="pricing-plans-compare-table-item pro-business center bg-gr">[$pr_3_users]</div>
 
                     <div class="pricing-plans-compare-table-item bold rb">[$495]</div>
                     <div id="table-strg-v" class="pricing-plans-compare-table-item center rb"></div>
-                    <div class="pricing-plans-compare-table-item center rb">[$pr_up_16]</div>
-                    <div class="pricing-plans-compare-table-item center rb">[$pr_flexible_3]</div>
-                    <div class="pricing-plans-compare-table-item center">[$pr_flexible_3]</div>
+                    <div id="table-strg-mini" class="pricing-plans-compare-table-item pro-exc-offer center rb hidden"></div>
+                    <div class="pricing-plans-compare-table-item pro center rb">[$pr_up_16]</div>
+                    <div class="pricing-plans-compare-table-item pro-flexi center rb">[$pr_flexible_3]</div>
+                    <div class="pricing-plans-compare-table-item pro-business center">[$pr_flexible_3]</div>
 
                     <div class="pricing-plans-compare-table-item bold rb bg-gr">[$18057]<i class="pricing-i-icon simpletip" data-simpletip="[$pr_trns_tip]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i></div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr">[$pr_limited]</div>
-                    <div class="pricing-plans-compare-table-item center rb bg-gr">[$pr_up_16]</div>
-                    <div class="pricing-plans-compare-table-item center rb bg-gr">[$pr_flexible_3]</div>
-                    <div class="pricing-plans-compare-table-item center bg-gr">[$pr_flexible_3]</div>
+                    <div id="table-trans-mini" class="pricing-plans-compare-table-item pro-exc-offer center rb bg-gr hidden"></div>
+                    <div class="pricing-plans-compare-table-item pro center rb bg-gr">[$pr_up_16]</div>
+                    <div class="pricing-plans-compare-table-item pro-flexi center rb bg-gr">[$pr_flexible_3]</div>
+                    <div class="pricing-plans-compare-table-item pro-business center bg-gr">[$pr_flexible_3]</div>
                     <!-- End of Core features sections -->
+
                     <!-- Sharing sections -->
                     <div class="pricing-plans-compare-table-item header">[$pr_sharing]</div>
 
                     <div class="pricing-plans-compare-table-item bold rb bg-gr">[$pr_secure_file]<i class="pricing-i-icon simpletip" data-simpletip="[$pr_tip_secure_sharing]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i></div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item center bg-gr"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb bg-gr hidden"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro center rb bg-gr"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-flexi center rb bg-gr"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-business center bg-gr"><i class="grey-small-check-tick"></i></div>
 
                     <div class="pricing-plans-compare-table-item bold rb">[$pr_pw_links]<i class="pricing-i-icon simpletip" data-simpletip="[$pr_tip_links_password]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i></div>
                     <div class="pricing-plans-compare-table-item center rb"><i class="minus-icon"></i></div>
-                    <div class="pricing-plans-compare-table-item center rb"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item center rb"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item center"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb hidden"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro center rb"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-flexi center rb"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-business center"><i class="grey-small-check-tick"></i></div>
 
                     <div class="pricing-plans-compare-table-item bold rb bg-gr">[$pr_link_expire]<i class="pricing-i-icon simpletip" data-simpletip="[$pr_tip_links_expiry]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i></div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="minus-icon"></i></div>
-                    <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item center bg-gr"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb bg-gr hidden"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro center rb bg-gr"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-flexi center rb bg-gr"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-business center bg-gr"><i class="grey-small-check-tick"></i></div>
 
                     <div class="pricing-plans-compare-table-item bold rb">[$pr_trns_share]<i class="pricing-i-icon simpletip" data-simpletip="[$pr_trns_share_tip]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i></div>
                     <div class="pricing-plans-compare-table-item center rb"><i class="minus-icon"></i></div>
-                    <div class="pricing-plans-compare-table-item center rb"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item center rb"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item center"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb hidden"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro center rb"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-flexi center rb"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-business center"><i class="grey-small-check-tick"></i></div>
                     <!-- End of Sharing sections -->
+
                     <!-- Data Protection sections -->
                     <div class="pricing-plans-compare-table-item header">[$pr_data_protect]</div>
 
                     <div class="pricing-plans-compare-table-item bold rb bg-gr">[$pr_file_versioning]<i class="pricing-i-icon simpletip" data-simpletip="[$pr_tip_file_versioning]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i></div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr">[$pr_100_version]</div>
-                    <div class="pricing-plans-compare-table-item center rb bg-gr">[$pr_100_version]</div>
-                    <div class="pricing-plans-compare-table-item center rb bg-gr">[$pr_100_version]</div>
-                    <div class="pricing-plans-compare-table-item center bg-gr">[$pr_100_version]</div>
+                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb bg-gr hidden">[$pr_100_version]</div>
+                    <div class="pricing-plans-compare-table-item pro center rb bg-gr">[$pr_100_version]</div>
+                    <div class="pricing-plans-compare-table-item pro-flexi center rb bg-gr">[$pr_100_version]</div>
+                    <div class="pricing-plans-compare-table-item pro-business center bg-gr">[$pr_100_version]</div>
 
                     <div class="pricing-plans-compare-table-item bold rb">[$automatic_backups]<i class="pricing-i-icon simpletip" data-simpletip="[$pr_tip_automatic_backups]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i></div>
                     <div class="pricing-plans-compare-table-item center rb"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item center rb"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item center rb"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item center"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb hidden"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro center rb"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-flexi center rb"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-business center"><i class="grey-small-check-tick"></i></div>
 
                     <div class="pricing-plans-compare-table-item bold rb bg-gr">[$pr_rewind]<i class="pricing-i-icon simpletip" data-simpletip="[$pr_rewind_tip]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i></div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr">[$pr_30_days]</div>
-                    <div class="pricing-plans-compare-table-item center rb bg-gr">[$pr_lite_90_days]<br />[$pr_I_III_365_days]</div>
-                    <div class="pricing-plans-compare-table-item center rb bg-gr">[$pr_365_days]</div>
-                    <div class="pricing-plans-compare-table-item center bg-gr">[$pr_365_days]</div>
+                    <div id="table-days-mini" class="pricing-plans-compare-table-item pro-exc-offer center rb bg-gr hidden"></div>
+                    <div class="pricing-plans-compare-table-item pro center rb bg-gr">[$pr_lite_90_days]<br />[$pr_I_III_365_days]</div>
+                    <div class="pricing-plans-compare-table-item pro-flexi center rb bg-gr">[$pr_365_days]</div>
+                    <div class="pricing-plans-compare-table-item pro-business center bg-gr">[$pr_365_days]</div>
                     <!-- End of Data Protection sections -->
+
                     <!-- Chat sections -->
                     <div class="pricing-plans-compare-table-item header">[$7997]</div>
 
                     <div class="pricing-plans-compare-table-item bold rb bg-gr">[$pr_secure_calls]</div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item center bg-gr"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb bg-gr hidden"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro center rb bg-gr"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-flexi center rb bg-gr"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-business center bg-gr"><i class="grey-small-check-tick"></i></div>
 
                     <div class="pricing-plans-compare-table-item bold rb">[$pr_private_msg]</div>
                     <div class="pricing-plans-compare-table-item center rb"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item center rb"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item center rb"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item center"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb hidden"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro center rb"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-flexi center rb"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-business center"><i class="grey-small-check-tick"></i></div>
 
                     <div class="pricing-plans-compare-table-item bold rb bg-gr">[$meetings]</div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item center bg-gr"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb bg-gr hidden"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro center rb bg-gr"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-flexi center rb bg-gr"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-business center bg-gr"><i class="grey-small-check-tick"></i></div>
 
                     <div class="pricing-plans-compare-table-item bold rb">[$pr_screen_sharing]</div>
                     <div class="pricing-plans-compare-table-item center rb"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item center rb"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item center rb"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item center"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb hidden"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro center rb"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-flexi center rb"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-business center"><i class="grey-small-check-tick"></i></div>
                     <!-- End of Chat sections -->
+
                     <!-- Admin sections -->
                     <div class="pricing-plans-compare-table-item header">[$pr_admin]</div>
 
                     <div class="pricing-plans-compare-table-item bold rb bg-gr">[$18677]<i class="pricing-i-icon simpletip" data-simpletip="[$pr_user_manage_tip]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i></div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="minus-icon"></i></div>
-                    <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="minus-icon"></i></div>
-                    <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="minus-icon"></i></div>
-                    <div class="pricing-plans-compare-table-item center bg-gr"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb bg-gr hidden"><i class="minus-icon"></i></div>
+                    <div class="pricing-plans-compare-table-item pro center rb bg-gr"><i class="minus-icon"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-flexi center rb bg-gr"><i class="minus-icon"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-business center bg-gr"><i class="grey-small-check-tick"></i></div>
                     <!-- End of Admin sections -->
+
                     <!-- Other sections -->
                     <div class="pricing-plans-compare-table-item header">[$pr_other]</div>
 
                     <div class="pricing-plans-compare-table-item bold rb bg-gr">[$pr_analytics]<i class="pricing-i-icon simpletip" data-simpletip="[$pr_analytics_tip]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i></div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="minus-icon"></i></div>
-                    <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="minus-icon"></i></div>
-                    <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item center bg-gr"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb bg-gr hidden"><i class="minus-icon"></i></div>
+                    <div class="pricing-plans-compare-table-item pro center rb bg-gr"><i class="minus-icon"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-flexi center rb bg-gr"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-business center bg-gr"><i class="grey-small-check-tick"></i></div>
 
                     <div class="pricing-plans-compare-table-item bold rb">[$pr_bin_clearing]<i class="pricing-i-icon simpletip" data-simpletip="[$pr_rubbis_bin_tip]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i></div>
                     <div class="pricing-plans-compare-table-item center rb">[$pr_up_30_days]</div>
-                    <div class="pricing-plans-compare-table-item center rb">[$pr_up_10_years]</div>
-                    <div class="pricing-plans-compare-table-item center rb">[$pr_up_10_years]</div>
-                    <div class="pricing-plans-compare-table-item center">[$pr_up_10_years]</div>
+                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb hidden">[$pr_up_10_years]</div>
+                    <div class="pricing-plans-compare-table-item pro center rb">[$pr_up_10_years]</div>
+                    <div class="pricing-plans-compare-table-item pro-flexi center rb">[$pr_up_10_years]</div>
+                    <div class="pricing-plans-compare-table-item pro-business center">[$pr_up_10_years]</div>
 
                     <div class="pricing-plans-compare-table-item bold rb bg-gr no-ads hidden">[$pr_ad_free]</div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr no-ads hidden"><i class="minus-icon"></i></div>
-                    <div class="pricing-plans-compare-table-item center rb bg-gr no-ads hidden"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item center rb bg-gr no-ads hidden"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item center bg-gr no-ads hidden"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb bg-gr no-ads hidden"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro center rb bg-gr no-ads hidden"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-flexi center rb bg-gr no-ads hidden"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-business center bg-gr no-ads hidden"><i class="grey-small-check-tick"></i></div>
                     <!-- End of Other sections -->
 
                 </div>
@@ -501,7 +585,7 @@
                 </div>
             </div>
 
-            <div class="pricing-pg pricing-compare-full-container">
+            <div class="pricing-pg pricing-compare-full-container hidden">
                 <div class="pricing-pg pricing-compare-container">
                     <div class="pricing-compare-title-slider-container">
                         <div class="pricing-compare-title">
@@ -728,7 +812,7 @@
             </div>
 
             <!-- FAQ section -->
-            <div class="pricing-pg faq-container">
+            <div class="pricing-pg faq-container hidden">
                 <div class="faq-qa template hidden">
                     <div class="faq-item-title">
                         <div class="faq-question"></div>

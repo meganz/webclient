@@ -365,7 +365,7 @@ function bytesToSize(bytes, precision, format) {
         resultUnit = s_b;
     }
 
-    // Format 4 will return bytes to precision, with trailing 0s
+    // Format 4 will return bytes to precision, without trailing 0s
     if (format === 4) {
         resultSize = parseFloat(resultSize);
     }
@@ -1175,6 +1175,29 @@ function percent_megatitle() {
         $ul_rchart.css('transform', 'rotate(180deg)');
         $ul_lchart.css('transform', 'rotate(' + (u_deg - 180) + 'deg)');
     }
+}
+
+/**
+ *
+ * @param {number} initial - The initial value
+ * @param {number} final - The final value
+ * @param {number} format - Binary flag for options (1: Force decreasing value, 2: Round down)
+ * @returns {number} - The percentage difference between the initial and final values.
+ */
+function percentageDiff(initial, final, format) {
+    'use strict';
+    const difference = Math.abs(final - initial);
+    let changeFrom = initial;
+    if (format & 1) { // Force decrease
+        changeFrom = Math.max(initial, final);
+    }
+
+    let change = (difference / changeFrom) * 100;
+
+    if (format & 2) { // Round down
+        change = Math.floor(change);
+    }
+    return change;
 }
 
 function moveCursortoToEnd(el) {

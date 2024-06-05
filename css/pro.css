@@ -772,6 +772,10 @@ body:not(.rtl) .plans-row .pricing-page.plan.hidden + .plan {
     height: 60px;
     width: 60px;
 }
+.payment-section .pricing-page.plan-icon.no-icon {
+    height: 0;
+    width: 0;
+}
 /* Green button for Create new account*/
 .pricing-page.plan .mega-button {
     margin: 12px 18px 36px;

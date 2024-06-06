@@ -1234,52 +1234,10 @@ FileManager.prototype.initFileManagerUI = function() {
         'minWidth': mega.flags.ab_ads ? 260 : 200,
         'maxWidth': 400,
         'persistanceKey': 'leftPaneWidth',
-        'handle': '.left-pane-drag-handle',
-        'pagechange': () => {
-            let {'cloud-drive': {subpages: myFiles} = false} = this.fmTabState;
-            myFiles = myFiles ? array.to.object([M.RootID, ...myFiles]) : false;
-
-            return function() {
-                let maxWidth = null;
-
-                if (!myFiles[M.currentrootid]) {
-                    maxWidth = 400;
-                }
-                this.setOption('maxWidth', maxWidth);
-            };
-        }
+        'handle': '.left-pane-drag-handle'
     });
 
-    $($.leftPaneResizable).rebind('resize.lhp', function() {
-        var w = lPane.width();
-        if ($.leftPaneResizable.options.maxWidth && w >= $.leftPaneResizable.options.maxWidth) {
-            $('.left-pane-drag-handle').css('cursor', 'w-resize');
-            $('body').css('cursor', 'w-resize');
-        }
-        else if (w <= $.leftPaneResizable.options.minWidth) {
-            $('.left-pane-drag-handle').css('cursor', 'e-resize');
-            $('body').css('cursor', 'e-resize');
-        }
-        else {
-            $('.left-pane-drag-handle').css('cursor', 'ew-resize');
-            $('body').css('cursor', 'ew-resize');
-        }
-
-        if (!this.element.hasClass('ui-resizable-resizing')) {
-            $('body').css('cursor', 'auto');
-        }
-
-        if (lPane.width() < $.leftPaneResizable.options.updateWidth + 60) {
-            lPane.addClass('small-left-panel');
-        }
-        else {
-            lPane.removeClass('small-left-panel');
-        }
-
-        $.tresizer();
-    });
-
-    $(window).rebind('resize.fmrh hashchange.fmrh', fm_resize_handler);
+    $(window).rebind('resize.fmrh hashchange.fmrh', SoonFc(65, fm_resize_handler));
 
     if (ua.details.os === "Apple") {
 
@@ -4815,6 +4773,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     }
 
     // Revamp Implementation End
+    FMResizablePane.refresh();
 
     if (d) {
         console.timeEnd('sectionUIOpen');

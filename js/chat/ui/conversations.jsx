@@ -165,23 +165,7 @@ class ConversationsApp extends MegaRenderMixin {
 
             $.leftPaneResizableChat = new FMResizablePane(megaChat.$leftPane, {
                 ...$.leftPaneResizable.options,
-                maxWidth: 400,
-                pagechange: () => function() {
-                    this.setWidth();
-                }
-            });
-
-            $($.leftPaneResizableChat).rebind('resize.clp', () => {
-                var w = megaChat.$leftPane.width();
-                if (w >= $.leftPaneResizableChat.options.maxWidth) {
-                    $('.left-pane-drag-handle').css('cursor', 'w-resize');
-                }
-                else if (w <= $.leftPaneResizableChat.options.minWidth) {
-                    $('.left-pane-drag-handle').css('cursor', 'e-resize');
-                }
-                else {
-                    $('.left-pane-drag-handle').css('cursor', 'we-resize');
-                }
+                maxWidth: 400
             });
         };
 

@@ -55,7 +55,7 @@ mobile.settings.fileManagement = Object.create(mobile.settingsHelper, {
             M.accountData(() => {
                 mega.config.fetch();
                 this.render();
-            }, false, true);
+            }, true, true);
         },
     },
 
@@ -80,16 +80,12 @@ mobile.settings.fileManagement = Object.create(mobile.settingsHelper, {
         value: function() {
             'use strict';
 
-            loadingDialog.show();
-
             for (const id in this.togglesComponents) {
                 if (this.togglesComponents.hasOwnProperty(id)) {
                     const toggleComponent = this.togglesComponents[id];
                     toggleComponent.setButtonState(!mega.config.get(toggleComponent.input.name));
                 }
             }
-
-            loadingDialog.hide();
         },
     }
 });

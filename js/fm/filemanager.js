@@ -5273,6 +5273,13 @@ FileManager.prototype.cameraUploadUI = function() {
             $('html, body').removeClass('overlayed');
             $('.fm-dialog-overlay').addClass('hidden');
             $('.mega-dialog:visible, .overlay:visible').addClass('hidden');
+
+            if (mega.ui.overlay && mega.ui.overlay.visible) {
+                mega.ui.overlay.hide();
+            }
+            if (mega.ui.sheet && mega.ui.sheet.visible) {
+                mega.ui.sheet.hide();
+            }
         }
     });
 

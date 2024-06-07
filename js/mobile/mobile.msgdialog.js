@@ -97,6 +97,11 @@ function msgDialog(type, title, msg, subMsg, callback, checkboxCallback) {
         },
         false
     );
+
+    if ($.dialog) {
+        $('.mega-dialog:not(#msgDialog)').addClass('arrange-to-back');
+        $('.mega-dialog-container.common-container').addClass('arrange-to-back');
+    }
 }
 
 function asyncMsgDialog(type, title, msg, subMsg, callback, checkboxCallback) {

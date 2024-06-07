@@ -734,21 +734,15 @@ var security = {
             }
             else {
                 $('.send-email', $dialog).rebind('click.ve', function() {
-                    $(this).unbind('click.ve').addClass('disabled');
                     api.req({a: 'era'}).then(({result}) => {
                         assert(result === 0);
-                        $('aside.status', $dialog).removeClass('hidden');
+                        showToast('info', l[16827]);
                     }).catch((ex) => {
-                        const contactPage = () => {
-                            mega.redirect('mega.io', 'contact', false, false, false);
-                        };
-                        $('aside.status', $dialog).addClass('hidden');
-
                         if (ex === ETEMPUNAVAIL) {
-                            msgDialog('warninga', l[135], l[23628], l[23629], contactPage);
+                            msgDialog('warningb', l[135], l.resend_email_error, l.resend_email_ten_min_error_info);
                         }
                         else {
-                            msgDialog('warninga', l[135], l[47], api_strerror(ex), contactPage);
+                            msgDialog('warningb', l[135], l[47], api_strerror(ex));
                         }
                     });
                     return false;

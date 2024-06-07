@@ -3437,7 +3437,7 @@ div.checkboxOn {
     width: 100%;
     height: 100%;
     position: fixed;
-    z-index: 1100;
+    z-index: 98;
     background: -moz-radial-gradient(center, ellipse cover, rgba(0,0,0,0.1) 0%, rgba(20,20,20,0.5) 100%);
     background: -webkit-gradient(radial, center center, 0px, center center, 100%, color-stop(0%, rgba(0,0,0,0.1)), color-stop(100%, rgba(20,20,20,0.5)));
     background: -webkit-radial-gradient(center, ellipse cover, rgba(0,0,0,0.1) 0%, rgba(20,20,20,0.5) 100%);
@@ -4521,7 +4521,8 @@ body.mobile {
     background-color: var(--mobile-page-background);
 }
 .main-layout.fm-overlay,
-.mega-overlay.active.arrange-to-back {
+.mega-overlay.active.arrange-to-back,
+.mega-dialog.arrange-to-back {
     filter: var(--mobile-background-blur-medium);
 }
 
@@ -9892,13 +9893,13 @@ code, c {
 }
 
 /* Mega Input Mobile */
-.mobile .mega-input.title-ontop input.strengthChecker {
+.mobile.mega-input.title-ontop input.strengthChecker {
     width: 100%;
 }
-.mobile .mega-input.title-ontop.with-icon input.strengthChecker {
+.mobile.mega-input.title-ontop.with-icon input.strengthChecker {
     width: calc(100% - 40px);
 }
-.mobile .mega-input.title-ontop.with-icon .account-pass-lines {
+.mobile.mega-input.title-ontop.with-icon .account-pass-lines {
     margin-top: 9px;
 }
 

@@ -159,3 +159,8 @@
         }
     }
 }
+
+&.with-timeout-banner .sidebar-wrapper .sidebar {
+    height: calc(100% - 200px);
+    margin-top: 16px;
+}

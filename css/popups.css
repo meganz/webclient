@@ -22,7 +22,7 @@ body.tl .dropdown.body.popup.contacts-search {
 }
 .popup.contact-picker-dialog {
     right: auto;
-    width: 420px;
+    width: 500px;
 }
 .popup.add-participant-selector .dropdown-white-arrow {
     top: -55px;
@@ -428,6 +428,20 @@ body.tl .dropdown.body.popup.contacts-search {
 }
 .contact-picker-dialog.add-participant-selector .horizontal-contacts-list {
     box-sizing: unset;
+}
+.contact-picker-dialog.add-participant-selector .picker-user-limit-banner {
+    background: var(--banner-background-warning);
+    border: 1px solid var(--banner-border-warning);
+    border-radius: 4px;
+    box-sizing: border-box;
+    color: var(--banner-text-warning);
+    padding: 2px 16px;
+    text-align: center;
+    margin: 16px 48px;
+}
+.contact-picker-dialog.add-participant-selector .picker-user-limit-banner a {
+    color: var(--banner-text-warning);
+    text-decoration: underline;
 }
 .add-participant-selector footer {
     padding: 24px;

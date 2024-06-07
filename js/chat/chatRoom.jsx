@@ -24,13 +24,14 @@ window.MCO_FLAGS = MCO_FLAGS;
  * @param {Boolean} isMeeting Is the chat a meeting
  * @param {Number} retentionTime Message retention length (0 = forever)
  * @param {Object} mcoFlags Flags related to calls/chat room (Open invite, speak request, waiting room)
+ * @param {String} organiser The user handle of the user who created the chat
  * @returns {ChatRoom}
  * @constructor
  *
  * @property {MessagesBuff} messagesBuff
  */
 var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl, noUI,
-                         publicChatHandle, publicChatKey, ck, isMeeting, retentionTime, mcoFlags
+                         publicChatHandle, publicChatKey, ck, isMeeting, retentionTime, mcoFlags, organiser
 ) {
     var self = this;
 
@@ -104,6 +105,8 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     });
 
     this.isMeeting = isMeeting;
+    // Only applies when the user joins a call and the SFU kicks them out due to the user limitation for free plans.
+    this.callUserLimited = false;
 
     this.members = Object.create(null);
 
@@ -132,6 +135,8 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     for (const flag of Object.values(MCO_FLAGS)) {
         this.options[flag] = mcoFlags[flag] || 0;
     }
+
+    this.organiser = organiser;
 
     this.setState(ChatRoom.STATE.INITIALIZED);
 
@@ -415,6 +420,16 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
                 self.activeCallIds.remove(activeCallId);
             }
         }
+    });
+
+    this.rebind(`onCallUserLimitExceeded.${chatId}`, () => {
+        if (this.callUserLimited) {
+            return;
+        }
+        (this.callUserLimited = tSleep(60)).always(() => {
+            this.callUserLimited = false;
+            this.trackDataChange();
+        });
     });
 
     this.membersSetFromApi = new ChatRoom.MembersSet(this);
@@ -2052,10 +2067,10 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function(audio,
     callId = callId || this.activeCallIds.keys()[0];
     return asyncApiReq({'a': 'mcmj', 'cid': this.chatId, "mid": callId})
         .then((r) => {
-            this.startOrJoinCall(callId, r.url, audio, video);
+            this.startOrJoinCall(callId, r.url, audio, video, r.organiser);
         });
 });
-ChatRoom.prototype.startOrJoinCall = function(callId, url, audio, video) {
+ChatRoom.prototype.startOrJoinCall = function(callId, url, audio, video, organiser) {
     tryCatch(() => {
         const call = this.call = megaChat.activeCall =
             megaChat.plugins.callManager2.createCall(
@@ -2064,6 +2079,7 @@ ChatRoom.prototype.startOrJoinCall = function(callId, url, audio, video) {
                 this.protocolHandler.chatMode === strongvelope.CHAT_MODE.PUBLIC &&
                 str_to_ab(this.protocolHandler.unifiedKey)
             );
+        call.setOrganiser(organiser);
         return call.connect(url, audio, video);
     }, ex => {
         this.call?.destroy();
@@ -2150,7 +2166,7 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function(audio
 
     return asyncApiReq(opts)
         .then(r => {
-            this.startOrJoinCall(r.callId, r.sfu, audio, video);
+            this.startOrJoinCall(r.callId, r.sfu, audio, video, r.organiser);
         })
         .catch(ex => {
             this.meetingsLoading = false;
@@ -2226,6 +2242,10 @@ ChatRoom.prototype.subscribeForCallEvents = function() {
         }
         this.meetingsLoading = false;
         this.activeCallIds.remove(data.callId);
+        if (this.callUserLimited) {
+            this.callUserLimited.abort();
+        }
+        this.callUserLimited = false;
         this.stopRinging(data.callId);
         this.callParticipantsUpdated();
     });
@@ -2562,6 +2582,11 @@ ChatRoom.prototype.callParticipantsUpdated = function(
         self.uniqueCallParts[callParts[i]] = true;
     }
 
+    if (this.callUserLimited && this.canJoinLimitedCall()) {
+        this.callUserLimited.abort();
+        this.callUserLimited = false;
+    }
+
     var msg = self.messagesBuff.getMessageById(msgId);
     msg && msg.wrappedChatDialogMessage && msg.wrappedChatDialogMessage.trackDataChange();
 
@@ -2870,6 +2895,18 @@ ChatRoom.prototype._exportChat = async function() {
         // Download the chat history.
         return M.saveAs(stringNodes, bufferName);
     }
+};
+
+/**
+ * Returns if the current user is able to join the current call (assuming free plan limitation is applied)
+ * Hosts can join as longs as there is any room, non-hosts will leave room for a host to join.
+ *
+ * @returns {*|boolean} If the user could join the current call.
+ */
+ChatRoom.prototype.canJoinLimitedCall = function() {
+    const callParts = this.getCallParticipants();
+    return this.iAmOperator() && callParts.length < CallManager2.CALL_USER_LIMIT
+        || callParts.length < CallManager2.CALL_USER_LIMIT - 1;
 };
 
 window.ChatRoom = ChatRoom;

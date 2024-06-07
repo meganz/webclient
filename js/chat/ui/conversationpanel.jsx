@@ -26,6 +26,7 @@ import { withHostsObserver } from './meetings/hostsObserver.jsx';
 import WaitingRoom from './meetings/waitingRoom/waitingRoom.jsx';
 import { renderEndConfirm, renderLeaveConfirm } from './meetings/streamControls';
 import { InviteParticipantsPanel } from "./inviteParticipantsPanel.jsx";
+import ChatOverlay, { ChatOverlays } from './chatOverlay.jsx';
 
 const ENABLE_GROUP_CALLING_FLAG = true;
 const MAX_USERS_CHAT_PRIVATE = 100;
@@ -221,6 +222,15 @@ export class JoinCallNotification extends MegaRenderMixin {
         if (!megaChat.hasSupportForCalls) {
             // `There is an active call in this room, but your browser does not support calls.`
             return <Alert type={Alert.TYPE.MEDIUM} content={l.active_call_not_supported} />;
+        }
+
+        if (chatRoom.callUserLimited && !chatRoom.canJoinLimitedCall()) {
+            /* `Cannot join, this call can only support 100 participants. Reach out to organiser for more info` */
+            return <div
+                className="call-user-limit-banner"
+                style={{ marginTop: offset }}>
+                {l.call_join_user_limit_banner}
+            </div>;
         }
 
         return (
@@ -1367,6 +1377,8 @@ export class ConversationRightArea extends MegaRenderMixin {
                             ? l.meeting_add_participant /* `Add to meeting` */
                             : l[8869] /* `Add to Group Conversation` */}
                         nothingSelectedButtonLabel={l[8870] /* `Select one or more contacts to continue` */}
+                        inviteWarningLabel={room.haveActiveCall()}
+                        chatRoom={room}
                         onSelectDone={selected => {
                             this.props.onAddParticipantSelected(selected);
                             this.setState({contactPickerDialog: false});
@@ -1422,7 +1434,8 @@ export class ConversationPanel extends MegaRenderMixin {
         invalidKeysBanner: null,
         descriptionDialog: false,
         occurrencesLoading: false,
-        waitingRoom: false
+        waitingRoom: false,
+        callUserLimit: false,
     };
 
     constructor(props) {
@@ -1603,6 +1616,15 @@ export class ConversationPanel extends MegaRenderMixin {
 
         chatRoom.rebind(`wrOnJoinAllowed.${this.getUniqueId()}`, () => {
             return this.isMounted() && this.setState({ waitingRoom: false });
+        });
+
+        chatRoom.rebind(`onCallUserLimitExceeded.${this.getUniqueId()}`, () => {
+            if (!this.isMounted()) {
+                return;
+            }
+            if (megaChat.initialChatId || is_eplusplus) {
+                this.setState({ callUserLimit: true });
+            }
         });
 
         // Waiting room link where the current user is already a participant -> join the room automatically and mount
@@ -2371,6 +2393,22 @@ export class ConversationPanel extends MegaRenderMixin {
                                 });
                             })
                         );
+                    }}
+                />
+            );
+        }
+
+        if (this.state.callUserLimit) {
+            return (
+                <ChatOverlay
+                    overlayType={ChatOverlays.PARTICIPANT_LIMIT}
+                    onClose={() => {
+                        if (is_eplusplus) {
+                            location.replace('https://mega.io');
+                        }
+                        else {
+                            this.setState({ callUserLimit: false });
+                        }
                     }}
                 />
             );

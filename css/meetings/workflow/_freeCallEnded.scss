@@ -1,0 +1,23 @@
+.free-call-ended-dlg {
+    width: 500px;
+
+    header {
+        .free-call-ended.graphic {
+            height: 96px;
+            width: 96px;
+            margin-bottom: 0;
+
+            img {
+                height: 96px;
+                width: 96px;
+            }
+        }
+    }
+    .content-block {
+        text-align: center;
+
+        h3 {
+            font: var(--text-h3-bold);
+        }
+    }
+}

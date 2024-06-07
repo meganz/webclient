@@ -4,6 +4,11 @@
 
     &.fluid {
         height: auto;
+        min-height: 606px;
+
+        .fm-dialog-body {
+            min-height: 436px;
+        }
     }
 
     &.with-confirmation-dialog {
@@ -155,6 +160,23 @@
 
         .footer-container {
             padding: 24px;
+        }
+    }
+
+    .schedule-upgrade-notice {
+        align-items: flex-start;
+        background: var(--surface-grey-1);
+        border-radius: 12px;
+        flex-direction: column;
+        padding: 24px;
+
+        h3 {
+            font: var(--text-h3-bold);
+            margin: 0 0 8px;
+        }
+
+        button {
+            margin-top: 16px;
         }
     }
 

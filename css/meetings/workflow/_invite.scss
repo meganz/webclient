@@ -1,5 +1,5 @@
 .invite-meeting {
-    width: 415px;
+    width: 500px;
 
     button {
         display: inline-block;
@@ -118,6 +118,23 @@
             transform: translateY(-50%);
             --icon-size: 24px;
             --mask-color: var(--icon-rest);
+        }
+    }
+
+    &-user-limit-banner {
+        background: var(--banner-background-warning);
+        border: 1px solid var(--banner-border-warning);
+        border-radius: 4px;
+        box-sizing: border-box;
+        color: var(--banner-text-warning);
+        padding: 2px 16px;
+        text-align: center;
+        width: 100%;
+        margin: 16px 0;
+
+        a.invite-limit-link {
+            color: var(--banner-text-warning);
+            text-decoration: underline;
         }
     }
 }

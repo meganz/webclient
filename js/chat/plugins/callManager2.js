@@ -503,6 +503,9 @@
             sfuClient.enableSpeakerDetector(true);
             return sfuClient.connect(url, this.callId, {isGroup: this.chatRoom.type !== "private"});
         }
+        setOrganiser(userHandle) {
+            this.organiser = userHandle;
+        }
 // SfuClient.IClientEventListener interface
         onServerError(errCode) {
             console.error('onServerError:', errCode);
@@ -701,6 +704,24 @@
             if (termCode === SfuClient.TermCode.kCallParticipantLimit) {
                 msgDialog('warningb', '', l[20200]);
             }
+            if (termCode === SfuClient.TermCode.kCallUserLimit) {
+                if (!is_eplusplus && !megaChat.initialChatId) {
+                    msgDialog(
+                        'error',
+                        '',
+                        /* `Cannot join` */
+                        l.join_call_user_limit_title,
+                        /* `Only 100 participants can join the call. Any additional participants will...` */
+                        l.invite_limit_banner_host,
+                        undefined,
+                        1
+                    );
+                }
+                this.chatRoom.trigger('onCallUserLimitExceeded');
+            }
+            if (termCode === SfuClient.TermCode.kCallDurLimit && this.organiser === u_handle) {
+                tSleep(1).then(() => megaChat.trigger('onCallTimeLimitExceeded'));
+            }
 
             if (termCode === SfuClient.TermCode.kNoMediaPath) {
                 msgDialog(
@@ -813,6 +834,19 @@
                     classes: ['mic-change']
                 });
             });
+        }
+        onCallAboutToEnd(endIn) {
+            // The call will time out after endIn seconds. Save the time.
+            this.callEndTime = Date.now() + endIn * 1000;
+            this.chatRoom.trigger('onCallEndTimeUpdated', this.callEndTime);
+        }
+        onCallLimitsUpdated() {
+            const { callLimits } = this.sfuClient;
+            if (this.callEndTime && (!callLimits || !callLimits.ldur)) {
+                this.callEndTime = 0;
+                this.chatRoom.trigger('onCallEndTimeUpdated', this.callEndTime);
+            }
+            this.trackDataChange();
         }
         toggleAudio() {
             this.sfuClient.muteAudio(!this.sfuClient.localAudioMuted());
@@ -1559,6 +1593,8 @@
     CallManager2.Call = Call;
     CallManager2.VIDEO_QUALITY = VIDEO_QUALITY;
     CallManager2.FORCE_LOWQ = !!localStorage.forceLowQuality;
+    // Note this should not be used in cases where there is an active call. Use sfuClient.callLimits.usr instead.
+    CallManager2.CALL_USER_LIMIT = 100;
     scope.CallManager2 = CallManager2;
 
 })(window);

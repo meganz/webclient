@@ -218,3 +218,8 @@
         }
     }
 }
+
+&.with-timeout-banner .stream-wrapper {
+    height: calc(100% - 200px);
+    padding-top: 102px;
+}

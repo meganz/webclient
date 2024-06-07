@@ -10,6 +10,7 @@ import { StartGroupChatWizard } from './startGroupChatWizard.jsx';
 import Call, { inProgressAlert } from './meetings/call.jsx';
 import ChatToaster from './chatToaster.jsx';
 import LeftPanel from './leftPanel/leftPanel.jsx';
+import { FreeCallEnded as FreeCallEndedDialog } from './meetings/workflow/freeCallEnded.jsx';
 
 export const VIEWS = {
     CHATS: 0x00,
@@ -31,6 +32,7 @@ class ConversationsApp extends MegaRenderMixin {
         startMeetingDialog: false,
         scheduleMeetingDialog: false,
         scheduleOccurrenceDialog: false,
+        freeCallEndedDialog: false,
         view: VIEWS.LOADING,
         callExpanded: false
     };
@@ -219,6 +221,10 @@ class ConversationsApp extends MegaRenderMixin {
                 this.renderView(view);
             }
         });
+
+        megaChat.rebind('onCallTimeLimitExceeded', () => {
+            this.setState({ freeCallEndedDialog: true });
+        });
     }
 
     componentWillUnmount() {
@@ -255,7 +261,7 @@ class ConversationsApp extends MegaRenderMixin {
         const { routingSection, chatUIFlags, currentlyOpenedChat, chats } = megaChat;
         const {
             view, startGroupChatDialog, startMeetingDialog, scheduleMeetingDialog, scheduleOccurrenceDialog,
-            leftPaneWidth, callExpanded
+            leftPaneWidth, callExpanded, freeCallEndedDialog
         } = this.state;
         const isEmpty =
             chats &&
@@ -356,6 +362,14 @@ class ConversationsApp extends MegaRenderMixin {
                             this.setState({ scheduleOccurrenceDialog: false }, () => {
                                 this.occurrenceRef = null;
                             });
+                        }}
+                    />
+                )}
+
+                {freeCallEndedDialog && (
+                    <FreeCallEndedDialog
+                        onClose={() => {
+                            this.setState({ freeCallEndedDialog: false });
                         }}
                     />
                 )}

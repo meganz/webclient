@@ -1,9 +1,10 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../../mixins.js';
-import { ParsedHTML } from '../../../../ui/utils.jsx';
+import { ParsedHTML, reactStringWrap } from '../../../../ui/utils.jsx';
 import { Avatar, ContactAwareName } from '../../contacts.jsx';
 import Button from '../button.jsx';
 import { PerfectScrollbar } from '../../../../ui/perfectScrollbar.jsx';
+import Link from "../../link";
 
 const NAMESPACE = 'admit';
 
@@ -13,6 +14,12 @@ export default class Admit extends MegaRenderMixin {
     state = {
         expanded: false
     };
+
+    get isUserLimited() {
+        const { call, chatRoom, peers } = this.props;
+        return call.sfuClient.callLimits && call.sfuClient.callLimits.usr &&
+            chatRoom.getCallParticipants().length + (peers ? peers.length : 0) > call.sfuClient.callLimits.usr;
+    }
 
     doAdmit = peers => this.props.call?.sfuClient?.wrAllowJoin([peers]);
 
@@ -32,14 +39,26 @@ export default class Admit extends MegaRenderMixin {
             onClick={onClick}
         />;
 
+    CallLimitBanner = ({ call }) =>
+        <div className={`${NAMESPACE}-user-limit-banner`}>
+            {
+                call.organiser === u_handle ?
+                    reactStringWrap(l.admit_limit_banner_organiser, '[A]', Link, { to: '/pro', target: '_blank' }) :
+                    l.admit_limit_banner_host
+            }
+        </div>;
+
     renderPeersList = () => {
-        const { peers } = this.props;
+        const { peers, call, chatRoom } = this.props;
+        const disableAdding = call.sfuClient.callLimits && call.sfuClient.callLimits.usr &&
+            chatRoom.getCallParticipants().length >= call.sfuClient.callLimits.usr;
 
         return (
             <PerfectScrollbar
                 ref={this.peersWaitingRef}
                 options={{ 'suppressScrollX': true }}>
                 <div className="peers-waiting">
+                    {this.isUserLimited && <this.CallLimitBanner call={call}/>}
                     {peers.map(handle => {
                         return (
                             <div
@@ -58,9 +77,9 @@ export default class Admit extends MegaRenderMixin {
                                         onClick={() => this.doDeny(handle)}
                                     />
                                     <this.Icon
-                                        icon="icon-check"
+                                        icon={`icon-check ${disableAdding ? 'disabled' : ''}`}
                                         label={l.wr_admit}
-                                        onClick={() => this.doAdmit(handle)}
+                                        onClick={() => !disableAdding && this.doAdmit(handle)}
                                     />
                                 </div>
                             </div>
@@ -76,6 +95,7 @@ export default class Admit extends MegaRenderMixin {
         const { expanded } = this.state;
 
         if (peers && peers.length) {
+            const disableAddAll = this.isUserLimited;
             return (
                 <>
                     <div className={`${NAMESPACE}-head`}>
@@ -88,6 +108,8 @@ export default class Admit extends MegaRenderMixin {
                             null
                         }
                     </div>
+
+                    {!expanded && disableAddAll && <this.CallLimitBanner call={call}/>}
 
                     {expanded &&
                         <div className={`${NAMESPACE}-content`}>
@@ -106,8 +128,8 @@ export default class Admit extends MegaRenderMixin {
                         }
                         <Button
                             peers={peers}
-                            className="mega-button positive theme-dark-forced"
-                            onClick={() => call.sfuClient.wrAllowJoin(peers)}>
+                            className={`mega-button positive theme-dark-forced ${disableAddAll ? 'disabled' : ''}`}
+                            onClick={() => !disableAddAll && call.sfuClient.wrAllowJoin(peers)}>
                             <span>{l.wr_admit_all}</span>
                         </Button>
                     </div>
@@ -119,8 +141,9 @@ export default class Admit extends MegaRenderMixin {
     };
 
     renderSinglePeerWaiting = () => {
-        const { peers } = this.props;
+        const { peers, call } = this.props;
         const peer = peers[0];
+        const disableAdding = this.isUserLimited;
 
         if (peer) {
             return (
@@ -129,6 +152,7 @@ export default class Admit extends MegaRenderMixin {
                         tag="h3"
                         content={l.wr_peer_waiting.replace('%s', megaChat.html(M.getNameByHandle(peer)))}
                     />
+                    {disableAdding && <this.CallLimitBanner call={call}/>}
                     <div className={`${NAMESPACE}-controls`}>
                         <Button
                             className="mega-button theme-dark-forced"
@@ -136,8 +160,8 @@ export default class Admit extends MegaRenderMixin {
                             <span>{l.wr_deny}</span>
                         </Button>
                         <Button
-                            className="mega-button positive theme-dark-forced"
-                            onClick={() => this.doAdmit(peer)}>
+                            className={`mega-button positive theme-dark-forced ${disableAdding ? 'disabled' : ''}`}
+                            onClick={() => !disableAdding && this.doAdmit(peer)}>
                             <span>{l.wr_admit}</span>
                         </Button>
                     </div>

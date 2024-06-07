@@ -61,6 +61,36 @@
             --mask-color: var(--secondary-white);
         }
     }
+
+    .call-time-limit-banner {
+        background: var(--banner-background-warning);
+        border: 1px solid var(--banner-border-warning);
+        border-radius: 4px;
+        box-sizing: border-box;
+        color: var(--banner-text-warning);
+        margin: 72px 16px 0;
+        padding: 4px 16px;
+        position: absolute;
+        text-align: center;
+        width: calc(100% - 32px);
+        z-index: 10;
+
+        .rtl & {
+            direction: rtl;
+        }
+
+        .call-limit-banner-action {
+            color: var(--banner-text-warning);
+            cursor: pointer;
+            float: right;
+            margin-inline-start: 24px;
+            -webkit-margin-start: 24px;
+
+            .rtl & {
+                float: left;
+            }
+        }
+    }
 }
 
 .local-stream-mirrored video {

@@ -101,7 +101,7 @@ export default class Join extends MegaRenderMixin {
                     <i
                         className={`
                             sprite-fm-illustration-wide
-                            ${document.body.classList.contains('theme-dark') ? 'mega-logo-dark' : 'img-mega-logo-light'}
+                            ${mega.ui.isDarkTheme() ? 'mega-logo-dark' : 'img-mega-logo-light'}
                         `}
                     />
                 </div>

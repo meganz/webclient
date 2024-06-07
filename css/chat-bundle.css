@@ -1294,6 +1294,51 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   color: var(--text-color-medium);
 }
 
+.chat-overlay {
+  align-items: center;
+  background: var(--surface-grey-1);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  z-index: 141;
+}
+.chat-overlay-head .chat-overlay-logo i {
+  display: block;
+  margin: 40px auto 0;
+  height: 55px;
+  width: 140px;
+  --width: 140px;
+}
+.chat-overlay-head h1 {
+  margin: 24px 0 0;
+  text-align: center;
+}
+.participants-limit .chat-overlay-head {
+  margin-top: 73px;
+}
+.chat-overlay-body {
+  margin: 88px 0 0;
+  text-align: center;
+}
+.chat-overlay-body button {
+  display: block;
+  min-height: 48px;
+  min-width: 139px;
+  margin: 32px auto 24px;
+  font: var(--text-h3);
+}
+.chat-overlay-body p {
+  font: var(--text-body1);
+  color: var(--text-color-medium);
+}
+.participants-limit .chat-overlay-body {
+  margin-top: 24px;
+}
+
 .meetings-call {
   position: fixed;
   top: 0;
@@ -1710,6 +1755,10 @@ body.rtl .meetings-call .stream .stream-participants-block .participants-contain
 .meetings-call .stream-toast-content .stream-toast-close {
   --icon-size: 20px;
   justify-content: center;
+}
+.meetings-call.with-timeout-banner .stream-wrapper {
+  height: calc(100% - 200px);
+  padding-top: 102px;
 }
 .meetings-call div.recording-control {
   position: absolute;
@@ -2650,6 +2699,10 @@ body.rtl .meetings-call .sidebar-wrapper .sidebar-head button.add {
   bottom: -9999px;
   visibility: hidden;
 }
+.meetings-call.with-timeout-banner .sidebar-wrapper .sidebar {
+  height: calc(100% - 200px);
+  margin-top: 16px;
+}
 .meetings-call button.call-action {
   background: transparent;
   box-shadow: none;
@@ -2662,6 +2715,32 @@ body.rtl .meetings-call .sidebar-wrapper .sidebar-head button.add {
   margin: 0 auto;
   --icon-size: 24px;
   --mask-color: var(--secondary-white);
+}
+.meetings-call .call-time-limit-banner {
+  background: var(--banner-background-warning);
+  border: 1px solid var(--banner-border-warning);
+  border-radius: 4px;
+  box-sizing: border-box;
+  color: var(--banner-text-warning);
+  margin: 72px 16px 0;
+  padding: 4px 16px;
+  position: absolute;
+  text-align: center;
+  width: calc(100% - 32px);
+  z-index: 10;
+}
+.rtl .meetings-call .call-time-limit-banner {
+  direction: rtl;
+}
+.meetings-call .call-time-limit-banner .call-limit-banner-action {
+  color: var(--banner-text-warning);
+  cursor: pointer;
+  float: right;
+  margin-inline-start: 24px;
+  -webkit-margin-start: 24px;
+}
+.rtl .meetings-call .call-time-limit-banner .call-limit-banner-action {
+  float: left;
 }
 
 .local-stream-mirrored video {
@@ -3193,7 +3272,7 @@ body.theme-dark .start-meeting-preview .preview-meeting {
 }
 
 .invite-meeting {
-  width: 415px;
+  width: 500px;
 }
 .invite-meeting button {
   display: inline-block;
@@ -3294,6 +3373,21 @@ body.theme-dark .start-meeting-preview .preview-meeting {
   --icon-size: 24px;
   --mask-color: var(--icon-rest);
 }
+.invite-meeting-user-limit-banner {
+  background: var(--banner-background-warning);
+  border: 1px solid var(--banner-border-warning);
+  border-radius: 4px;
+  box-sizing: border-box;
+  color: var(--banner-text-warning);
+  padding: 2px 16px;
+  text-align: center;
+  width: 100%;
+  margin: 16px 0;
+}
+.invite-meeting-user-limit-banner a.invite-limit-link {
+  color: var(--banner-text-warning);
+  text-decoration: underline;
+}
 
 .meetings-loading {
   position: fixed;
@@ -3381,6 +3475,9 @@ body.theme-dark .start-meeting-preview .preview-meeting {
   box-shadow: var(--dialog-shadow);
   z-index: 51;
 }
+.call-time-limit-banner ~ .stream .admit {
+  top: 106px;
+}
 .admit-wrapper {
   padding: 24px;
 }
@@ -3454,6 +3551,21 @@ body.theme-dark .start-meeting-preview .preview-meeting {
 }
 .admit-controls button {
   margin-inline-start: 8px;
+}
+.admit-user-limit-banner {
+  background: var(--banner-background-warning);
+  border: 1px solid var(--banner-border-warning);
+  border-radius: 4px;
+  box-sizing: border-box;
+  color: var(--banner-text-warning);
+  padding: 2px 16px;
+  text-align: center;
+  width: 100%;
+  margin-bottom: 16px;
+}
+.admit-user-limit-banner a {
+  color: var(--banner-text-warning);
+  text-decoration: underline;
 }
 
 .waiting-room {
@@ -3632,6 +3744,10 @@ body.theme-dark .start-meeting-preview .preview-meeting {
 }
 #schedule-dialog.fluid {
   height: auto;
+  min-height: 606px;
+}
+#schedule-dialog.fluid .fm-dialog-body {
+  min-height: 436px;
 }
 #schedule-dialog.with-confirmation-dialog {
   filter: blur(0.25em);
@@ -3755,6 +3871,20 @@ body.theme-dark #schedule-dialog .recurring-edit-banner a {
 }
 #schedule-dialog footer .footer-container {
   padding: 24px;
+}
+#schedule-dialog .schedule-upgrade-notice {
+  align-items: flex-start;
+  background: var(--surface-grey-1);
+  border-radius: 12px;
+  flex-direction: column;
+  padding: 24px;
+}
+#schedule-dialog .schedule-upgrade-notice h3 {
+  font: var(--text-h3-bold);
+  margin: 0 0 8px;
+}
+#schedule-dialog .schedule-upgrade-notice button {
+  margin-top: 16px;
 }
 #schedule-dialog .meetings-select {
   /* [...] */
@@ -4209,4 +4339,23 @@ body.theme-dark .meetings-recurring-content .mega-button.recurring-toggle-button
 }
 .meetings-unsupported-container .unsupported-info ul li {
   /* [...] */
+}
+
+.free-call-ended-dlg {
+  width: 500px;
+}
+.free-call-ended-dlg header .free-call-ended.graphic {
+  height: 96px;
+  width: 96px;
+  margin-bottom: 0;
+}
+.free-call-ended-dlg header .free-call-ended.graphic img {
+  height: 96px;
+  width: 96px;
+}
+.free-call-ended-dlg .content-block {
+  text-align: center;
+}
+.free-call-ended-dlg .content-block h3 {
+  font: var(--text-h3-bold);
 }

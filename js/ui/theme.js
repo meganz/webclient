@@ -68,6 +68,18 @@
         }
     };
 
+
+    /**
+     * Check if the dark mode theme is currently applied
+     *
+     * @returns {boolean} If the dark theme is applied
+     */
+    mega.ui.isDarkTheme = () => {
+        const {classList} = document.body;
+        return classList.contains('theme-dark') || classList.contains('theme-dark-forced');
+    };
+
+
     /**
      * Sets the current theme, by value.
      * Does not store the change to localStorage, purely presentational.

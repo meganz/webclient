@@ -1156,11 +1156,12 @@ Chat.prototype.renderMyStatus = SoonFc(Chat.prototype._renderMyStatus, 100);
  * @param {String} ck the chat key
  * @param {Boolean} isMeeting Is the chat a meeting
  * @param {Object} [mcoFlags] Flags set by mco requests for the room see MCO_FLAGS for options.
+ * @param {String} organiser The user handle of the user who created the chat
  * @return {String|ChatRoom|Promise}
  */
 
 Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUrl, setAsActive, chatHandle,
-                                   publicChatKey, ck, isMeeting, mcoFlags
+                                   publicChatKey, ck, isMeeting, mcoFlags, organiser
 ) {
     var self = this;
     var room = false;
@@ -1269,7 +1270,8 @@ Chat.prototype.openChat = function(userHandles, type, chatId, chatShard, chatdUr
         ck,
         isMeeting,
         0,
-        mcoFlags
+        mcoFlags,
+        organiser
     );
 
     self.chats.set(room.roomId, room);

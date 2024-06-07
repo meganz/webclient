@@ -546,6 +546,17 @@ export class Schedule extends MegaRenderMixin {
                         </div>
                     </Row>
 
+                    {
+                        !u_attr.p &&
+                        endDateTime - startDateTime > 36e5 &&
+                        <UpgradeNotice
+                            onUpgradeClicked={() => {
+                                this.props.onClose();
+                                loadSubPage('pro');
+                            }}
+                        />
+                    }
+
                     {/* --- */}
 
                     <Checkbox
@@ -968,5 +979,25 @@ const Footer = ({ isLoading, isEdit, topic, onSubmit }) => {
                 </Button>
             </div>
         </footer>
+    );
+};
+
+
+/**
+ * Upgrade notice for free users
+ *
+ * @returns {React.Element}
+ */
+export const UpgradeNotice = ({ onUpgradeClicked }) => {
+    return (
+        <Row className="schedule-upgrade-notice">
+            <h3>{l.schedule_limit_title}</h3>
+            <div>{l.schedule_limit_upgrade_features}</div>
+            <Button
+                className="mega-button positive"
+                onClick={onUpgradeClicked}>
+                <span>{l.upgrade_now}</span>
+            </Button>
+        </Row>
     );
 };

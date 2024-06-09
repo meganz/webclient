@@ -12154,3 +12154,13 @@ body.megaChatDisabled .nw-fm-left-icon.conversations {
 }
 
 /* End utility classes */
+
+/* Tablet devices */
+
+@media (orientation: portrait) and (pointer: coarse) {
+    #fmholder {
+        min-width: unset;
+    }
+}
+
+/* End of Tablet devices */

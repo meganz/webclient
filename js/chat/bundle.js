@@ -17482,7 +17482,7 @@ const Footer = ({
 const UpgradeNotice = ({
   onUpgradeClicked
 }) => {
-  return REaCt().createElement(Row, {
+  return !!mega.flags.ff_chmon && REaCt().createElement(Row, {
     className: "schedule-upgrade-notice"
   }, REaCt().createElement("h3", null, l.schedule_limit_title), REaCt().createElement("div", null, l.schedule_limit_upgrade_features), REaCt().createElement(meetings_button.A, {
     className: "mega-button positive",

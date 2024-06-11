@@ -2064,7 +2064,7 @@ FileManager.prototype.initContextUI = function() {
 
         mega.fileTextEditor.getFile(nodeHandle)
             .then((data) => {
-                mega.textEditorUI.setupEditor(M.d[nodeHandle].name, data, nodeHandle);
+                mega.textEditorUI.setupEditor(M.getNameByHandle(nodeHandle), data, nodeHandle);
             })
             .catch(dump)
             .finally(() => {

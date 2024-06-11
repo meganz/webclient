@@ -726,12 +726,26 @@ RecentsRender.prototype._renderFiles = function($newRow, action, actionId) {
         .rebind('click', function(e) {
             self.markSelected();
             $.hideContextMenu();
-            if (is_image(action[0]) || is_video(action[0]) === 1) {
+            if (is_image(action[0]) || is_video(action[0])) {
                 if (is_video(action[0])) {
                     $.autoplay = action[0].h;
                 }
                 slideshow(action[0].h);
-            } else {
+            }
+            else if (is_text(action[0])) {
+
+                loadingDialog.show();
+
+                mega.fileTextEditor.getFile(action[0].h)
+                    .then((data) => {
+                        mega.textEditorUI.setupEditor(action[0].name, data, action[0].h);
+                    })
+                    .catch(dump)
+                    .finally(() => {
+                        loadingDialog.hide();
+                    });
+            }
+            else {
                 $fileNameContainer.trigger({
                     type: 'contextmenu',
                     originalEvent: e.originalEvent

@@ -2185,7 +2185,7 @@ function logExportEvt(type, target) {
             };
 
             // If they have already checked the Don't show this again checkbox, just remove the link/s
-            if (mega.config.get('cslrem')) {
+            if (mega.config.get('nowarnpl')) {
                 confirmFunction();
                 return false;
             }
@@ -2195,7 +2195,7 @@ function logExportEvt(type, target) {
                 if (res) {
                     confirmFunction();
                 }
-            }, 'cslrem');
+            }, 'nowarnpl');
         });
 
         // Copy all links/keys to clipboard

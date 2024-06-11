@@ -40,6 +40,10 @@
     background-image: url("../../images/mobile/folder.png");
 }
 
+.mega-empty-states .image .icon.details {
+    background-image: url("../../images/mobile/details.png");
+}
+
 .mega-empty-states .image .icon.incoming-shares {
     background-image: url("../../images/mobile/incoming-shares.png");
 }

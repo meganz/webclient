@@ -962,7 +962,7 @@ ul, li {
     -webkit-overflow-scrolling: touch;
     display: flex;
     flex-direction: column;
-    z-index: 100;
+    z-index: 90;
 }
 .fm-scrolling.scroller-space > *:not(.full-width) {
     margin-inline-end: 12px;

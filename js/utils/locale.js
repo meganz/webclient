@@ -1151,8 +1151,6 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a href="https://mega.io/mobile" target="_blank" class="clickurl">')
         .replace('[/A]', '</a>');
     l[16301] = escapeHTML(l[16301]).replace('[S]', '<span class="quota-info-pr-txt-used">').replace('[/S]', '</span>');
-    l[16306] = escapeHTML(l[16306])
-        .replace('[A]', '<a href="/fm/rubbish" class="clickurl gotorub">').replace('[/A]', '</a>');
     l[16310] = escapeHTML(l[16310])
         .replace('[A]', '<a href="/fm/dashboard" class="clickurl dashboard-link">').replace('[/A]', '</a>');
     l[16317] = escapeHTML(l[16317]).replace('[S]', '<strong>').replace('[/S]', '</strong>');
@@ -1280,6 +1278,7 @@ mBroadcaster.once('boot_done', function populate_l() {
 
     // Mobile only
     if (is_mobile) {
+        l[16306] = escapeHTML(l[16306]).replace('[A]', '<span class="gotorub">').replace('[/A]', '</span>');
         l[20197] = escapeHTML(l[20197]).replace('[S1]', '<span class="used">').replace('[/S1]', '</span>\n')
             .replace('[S2]', '')
             .replace('[/S2]', '\n').replace('[S3]', '<span class="total">').replace('[/S3]', '</span>\n')
@@ -1288,6 +1287,8 @@ mBroadcaster.once('boot_done', function populate_l() {
     }
     else {
         // Desktop only
+        l[16306] = escapeHTML(l[16306])
+            .replace('[A]', '<a href="/fm/rubbish" class="clickurl gotorub">').replace('[/A]', '</a>');
         l[20197] = escapeHTML(l[20197]).replace('[S1]', '<span class="size-txt">').replace('[/S1]', '</span>')
             .replace('[S2]', '<span class="of-txt">').replace('[/S2]', '</span>\n')
             .replace('[S3]', '<span class="pecents-txt">').replace('[/S3]', '</span>\n<span class="gb-txt">GB</span>')
@@ -1756,7 +1757,7 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.estimated_price_text_min_50 = escapeHTML(l.estimated_price_text_min_50)
         .replace('[S]', '<span>').replace('[/S]', '</span>');
 
-    l.dl_limited_tq_non_user = escapeHTML(l.dl_limited_tq_non_user)
+    l.dl_limited_tq_mini = escapeHTML(l.dl_limited_tq_mini)
         .replace('[A]',
                  `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
         .replace('[/A]', '</a>')
@@ -1772,24 +1773,16 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[S2]', '<span class="get-more-quota">')
         .replace('[S3]', '<span class="learn-more">')
         .replace(/\[\/S\d]/g, '</span>');
-    l.dl_limited_tq_pro = escapeHTML(l.dl_limited_tq_pro)
-        .replace('[A]',
-                 `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
-        .replace('[/A]', '</a>')
-        .replace('[S1]', '<span>')
-        .replace('[S2]', '<span class="get-more-quota">')
-        .replace('[S3]', '<span class="learn-more">')
-        .replace(/\[\/S\d]/g, '</span>');
 
-    l.dl_tq_exceeded_non_user = escapeHTML(l.dl_tq_exceeded_non_user)
+    l.dl_tq_exceeded_mini = escapeHTML(l.dl_tq_exceeded_mini)
         .replace('[A]',
                  `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
         .replace('[/A]', '</a>')
         .replace('[S1]', '<span>')
         .replace('[S2]', '<span class="get-more-quota">')
-        .replace('[S3]', '<span>')
+        .replace('[S3]', '<span class="upgrade-option">')
         .replace('[S4]', '<span class="bullet-separator">')
-        .replace('[S5]', '<span>')
+        .replace('[S5]', '<span class="wait-option">')
         .replace('[S6]', '<span class="countdown hidden">')
         .replace('[S7]', '<span class="learn-more">')
         .replace(/\[\/S\d]/g, '</span>');
@@ -1799,9 +1792,9 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A]', '</a>')
         .replace('[S1]', '<span>')
         .replace('[S2]', '<span class="get-more-quota">')
-        .replace('[S3]', '<span>')
+        .replace('[S3]', '<span class="upgrade-option">')
         .replace('[S4]', '<span class="bullet-separator">')
-        .replace('[S5]', '<span>')
+        .replace('[S5]', '<span class="wait-option">')
         .replace('[S6]', '<span class="countdown hidden">')
         .replace('[S7]', '<span class="learn-more">')
         .replace(/\[\/S\d]/g, '</span>');
@@ -1810,16 +1803,25 @@ mBroadcaster.once('boot_done', function populate_l() {
                  `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
         .replace('[/A]', '</a>')
         .replace('[S1]', '<span>')
-        .replace('[S2]', '<span class="learn-more">')
+        .replace('[S2]', '<span>')
+        .replace('[S3]', '<span class="learn-more">')
+        .replace(/\[\/S\d]/g, '</span>');
+    l.dl_tq_exceeded_pro3 = escapeHTML(l.dl_tq_exceeded_pro3)
+        .replace('[A]',
+                 `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
+        .replace('[/A]', '</a>')
+        .replace('[S1]', '<span>')
+        .replace('[S2]', '<span>')
+        .replace('[S3]', '<span class="learn-more">')
         .replace(/\[\/S\d]/g, '</span>');
 
-    l.stream_media_tq_exceeded_non_user = escapeHTML(l.stream_media_tq_exceeded_non_user)
+    l.stream_media_tq_exceeded_mini = escapeHTML(l.stream_media_tq_exceeded_mini)
         .replace('[A]',
                  `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
         .replace('[/A]', '</a>')
         .replace('[S1]', '<span>')
         .replace('[S2]', '<span class="get-more-quota">')
-        .replace('[S3]', '<span>')
+        .replace('[S3]', '<span class="upgrade-option">')
         .replace('[S4]', '<span class="bullet-separator">')
         .replace('[S5]', '<span>')
         .replace('[S6]', '<span class="countdown hidden">')
@@ -1831,7 +1833,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A]', '</a>')
         .replace('[S1]', '<span>')
         .replace('[S2]', '<span class="get-more-quota">')
-        .replace('[S3]', '<span>')
+        .replace('[S3]', '<span class="upgrade-option">')
         .replace('[S4]', '<span class="bullet-separator">')
         .replace('[S5]', '<span>')
         .replace('[S6]', '<span class="countdown hidden">')
@@ -1842,7 +1844,58 @@ mBroadcaster.once('boot_done', function populate_l() {
                  `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
         .replace('[/A]', '</a>')
         .replace('[S1]', '<span>')
-        .replace('[S2]', '<span class="learn-more">')
+        .replace('[S2]', '<span class="get-more-quota">')
+        .replace('[S3]', '<span class="learn-more">')
+        .replace(/\[\/S\d]/g, '</span>');
+    l.stream_media_tq_exceeded_pro3 = escapeHTML(l.stream_media_tq_exceeded_pro3)
+        .replace('[A]',
+                 `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
+        .replace('[/A]', '</a>')
+        .replace('[S1]', '<span>')
+        .replace('[S2]', '<span class="get-more-quota">')
+        .replace('[S3]', '<span class="learn-more">')
+        .replace(/\[\/S\d]/g, '</span>');
+
+    l.streaming_tq_exc_mini_desktop = escapeHTML(l.streaming_tq_exc_mini_desktop)
+        .replace('[A]',
+                 `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
+        .replace('[/A]', '</a>')
+        .replace('[S1]', '<span>')
+        .replace('[S2]', '<span class="upgrade-option">')
+        .replace('[S3]', '<span>')
+        .replace('[S4]', '<span class="countdown hidden">')
+        .replace('[S5]', '<span class="learn-more">')
+        .replace(/\[\/S\d]/g, '</span>');
+    l.streaming_tq_exc_free_desktop = escapeHTML(l.streaming_tq_exc_free_desktop)
+        .replace('[A]',
+                 `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
+        .replace('[/A]', '</a>')
+        .replace('[S1]', '<span>')
+        .replace('[S2]', '<span class="upgrade-to-pro">')
+        .replace('[S3]', '<span>')
+        .replace('[S4]', '<span class="countdown hidden">')
+        .replace('[S5]', '<span class="learn-more">')
+        .replace(/\[\/S\d]/g, '</span>');
+
+    l.dl_tq_exc_mini_desktop = escapeHTML(l.dl_tq_exc_mini_desktop)
+        .replace('[A]',
+                 `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
+        .replace('[/A]', '</a>')
+        .replace('[S1]', '<span>')
+        .replace('[S2]', '<span class="upgrade-option">')
+        .replace('[S3]', '<span>')
+        .replace('[S4]', '<span class="countdown hidden">')
+        .replace('[S5]', '<span class="learn-more">')
+        .replace(/\[\/S\d]/g, '</span>');
+    l.dl_tq_exc_free_desktop = escapeHTML(l.dl_tq_exc_free_desktop)
+        .replace('[A]',
+                 `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
+        .replace('[/A]', '</a>')
+        .replace('[S1]', '<span>')
+        .replace('[S2]', '<span>')
+        .replace('[S3]', '<span>')
+        .replace('[S4]', '<span class="countdown hidden">')
+        .replace('[S5]', '<span class="learn-more">')
         .replace(/\[\/S\d]/g, '</span>');
 
     l.manage_link_export_link_text = escapeHTML(l.manage_link_export_link_text)

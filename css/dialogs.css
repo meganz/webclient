@@ -6359,22 +6359,28 @@ body.de .mega-dialog.contact-picker-widget {
 
 /* limited-bandwidth-dialog */
 
-    .mega-dialog.limited-bandwidth-dialog:not(.pro) {
-        width: 1200px;
+    .mega-dialog.limited-bandwidth-dialog {
+        width: 975px;
         max-width: calc(100% - 40px);
         max-height: calc(100% - 40px);
-        min-width: 700px;
         overflow: hidden;
     }
-    .mega-dialog.limited-bandwidth-dialog .radio-txt {
-        -webkit-padding-end: 0;
-        padding-inline-end: 0;
+    .mega-dialog.limited-bandwidth-dialog:not(.uploads).pro3,
+    .mega-dialog.limited-bandwidth-dialog:not(.uploads).pro-mini.no-cards {
+        width: 640px;
+    }
+    .mega-dialog.limited-bandwidth-dialog .dialog.header-before-icon {
+        font-family: var(--text-font-family-bold);
+        font-size: 20px;
+        line-height: 30px;
+        padding: 0 0 32px;
     }
     .mega-dialog.limited-bandwidth-dialog .pricing-page.radio-buttons {
-        margin: 0 12px 14px 0;
+        margin: 20px 0 16px;
         display: flex;
-        height: 28px;
+        height: 24px;
         float: right;
+        align-items: center;
     }
     .mega-dialog.limited-bandwidth-dialog .pricing-page.radio-buttons .radioOn,
     .mega-dialog.limited-bandwidth-dialog .pricing-page.radio-buttons .radioOff {
@@ -6383,413 +6389,273 @@ body.de .mega-dialog.contact-picker-widget {
     .rtl .mega-dialog.limited-bandwidth-dialog .pricing-page.radio-buttons {
         float: left;
     }
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.radio-buttons .save-yearly,
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-saving {
+        background-color: var(--label-red);
+        color: var(--text-color-white-high);
+        border-radius: 9px;
+        font-size: 12px;
+        line-height: 14px;
+        margin-inline-start: 8px;
+        -webkit-margin-start: 8px;
+        padding: 2px 8px 2px 9px;
+    }
     .mega-dialog.limited-bandwidth-dialog .pricing-page.local-currency-tip {
-        padding: 0;
-    }
-    .mega-dialog.limited-bandwidth-dialog .pricing-page.local-currency-tip:not(.hidden) {
         display: block;
+        padding-top: 20px;
     }
-    .mega-dialog.limited-bandwidth-dialog.pro .pricing-page.local-currency-tip {
-        display: none;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog-scroll-overlay {
-        border: 0;
-        position: absolute;
-        left: 0;
-        width: 100%;
-        margin: -12px 0 0 0;
-        height: 12px;
-        /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
-        background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);
-    }
-    .mega-dialog.limited-bandwidth-dialog.exceeded:not(.local-currency) .dialog-scroll-overlay {
-        display: none;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog-cards {
-        margin: 0;
-        -webkit-margin-end: -12px;
-        margin-inline-end: -12px;
-        overflow: auto;
-        min-height: 664px;
-    }
-    .mega-dialog.limited-bandwidth-dialog .scrollable {
+    .mega-dialog.limited-bandwidth-dialog .scrollable.ps {
         overflow: scroll;
         -webkit-overflow-scrolling: touch;
         position: relative;
         box-sizing: border-box;
         height: 100%;
-        border-top: 1px solid var(--stroke-grey-2);
-        border-bottom: 1px solid var(--stroke-grey-2);
     }
     .mega-dialog.limited-bandwidth-dialog .pricing-page.plans-block {
         border-top: 0;
         max-width: none;
     }
-    .mega-dialog.limited-bandwidth-dialog .registered,
-    .mega-dialog.limited-bandwidth-dialog.registered .not-registered,
-    .mega-dialog.limited-bandwidth-dialog .get-more-bonuses {
-        display: none;
-    }
-    .mega-dialog.limited-bandwidth-dialog.registered .registered {
-        display: block;
-    }
-    .mega-dialog.limited-bandwidth-dialog.registered button .registered {
+    .mega-dialog.limited-bandwidth-dialog:not(.uploads) .dialog.bottom-button {
         display: flex;
+        justify-content: center;
+        padding-top: 20px;
     }
-    .mega-dialog.limited-bandwidth-dialog.achievements .get-more-bonuses {
-        display: inline-flex;
+    .mega-dialog.limited-bandwidth-dialog.pro3 .dialog.bottom-button,
+    .mega-dialog.limited-bandwidth-dialog.pro-mini.no-cards .dialog.bottom-button {
+        padding-top: 24px;
     }
-    .mega-dialog.limited-bandwidth-dialog:not(.exceeded) .bottom-tips span {
-        display: inline-block;
+    .mega-dialog.limited-bandwidth-dialog.pro3 .dialog.bottom-button > *:not(:last-child),
+    .mega-dialog.limited-bandwidth-dialog.pro-mini.no-cards .dialog.bottom-button > *:not(:last-child) {
+        margin-inline-end: 8px;
+        -webkit-margin-end: 8px;
     }
-    .mega-dialog.limited-bandwidth-dialog .limited-bottom {
-        display: none;
+    .mega-dialog.limited-bandwidth-dialog:not(.uploads) .dialog.bottom-button button.dialog-action {
+        padding: 8px 12px;
     }
-    .mega-dialog.limited-bandwidth-dialog footer .footer-container.limited-bottom {
-        padding-bottom: 16px;
+    .mega-dialog.limited-bandwidth-dialog.pro3 .dialog.bottom-button button.dialog-action,
+    .mega-dialog.limited-bandwidth-dialog.pro3 .dialog.bottom-button button.upgrade,
+    .mega-dialog.limited-bandwidth-dialog.pro-mini.no-cards .dialog.bottom-button button.dialog-action,
+    .mega-dialog.limited-bandwidth-dialog.pro-mini.no-cards .dialog.bottom-button button.upgrade {
+        font-size: 16px;
+        line-height: 24px;
+        padding: 12px 24px;
     }
-    .local-currency .mega-dialog.limited-bandwidth-dialog .limited-bottom button.download {
-        margin-top: 20px;
-    }
-    .mega-dialog.limited-bandwidth-dialog:not(.exceeded) .dialog.limited-bottom {
-        display: flex;
-    }
-    .mega-dialog.limited-bandwidth-dialog aside {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 32px;
-    }
-    .mega-dialog.limited-bandwidth-dialog aside > div {
-        flex-basis: 20%;
-    }
-    .mega-dialog.limited-bandwidth-dialog aside > div:first-of-type {
-        text-align: start;
-    }
-    .mega-dialog.limited-bandwidth-dialog .bottom-tips {
-        flex-basis: auto;
-        margin: auto;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog.bottom-tips span {
-        display: inline-block;
-    }
-    .mega-dialog.limited-bandwidth-dialog.exceeded:not(.pro) .dialog.bottom-tips span {
-        display: inline-block;
-    }
-    .mega-dialog.limited-bandwidth-dialog.exceeded.pro .dialog.bottom-tips a {
-        margin-bottom: 8px;
+    .mega-dialog.limited-bandwidth-dialog .step1-block .radio-txt,
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-price,
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-feature,
+    .mega-dialog.limited-bandwidth-dialog section .content-block {
+        padding: 0;
     }
     .mega-dialog.limited-bandwidth-dialog .step1-block .radio-txt:first-of-type {
-        -webkit-margin-end: 24px;
-        margin-inline-end: 24px;
+        margin-inline-end: 32px;
+        -webkit-margin-end: 32px;
     }
-    .mega-dialog.limited-bandwidth-dialog .step1-block,
-    .mega-dialog.limited-bandwidth-dialog.exceeded:not(.pro) .limited-bl,
-    .mega-dialog.limited-bandwidth-dialog .big-104px-icon.full,
-    .mega-dialog.limited-bandwidth-dialog.exceeded .semi-huge-icon.almost-full,
     .mega-dialog.limited-bandwidth-dialog .dialog.header-before-icon.exceeded,
     .mega-dialog.limited-bandwidth-dialog.exceeded .dialog.header-before-icon.limited,
+    .mega-dialog.limited-bandwidth-dialog .limited-bottom,
     .mega-dialog.limited-bandwidth-dialog button.close,
-    .mega-dialog.limited-bandwidth-dialog button.upgrade.pro,
-    .mega-dialog.limited-bandwidth-dialog.exceeded.pro button.upgrade,
-    .mega-dialog.limited-bandwidth-dialog.exceeded.pro button.continue,
-    .mega-dialog.limited-bandwidth-dialog.exceeded.pro .dialog.p-after-icon,
-    .mega-dialog.limited-bandwidth-dialog .dialog.pro-exceeded-bl,
-    .mega-dialog.limited-bandwidth-dialog .dialog.transfer-slider,
-    .mega-dialog.limited-bandwidth-dialog .dialog.pro-exceeded-slider,
-    .mega-dialog.limited-bandwidth-dialog .semi-huge-icon.speedometer.full {
+    .mega-dialog.limited-bandwidth-dialog:not(.uploads) .transfer-overquota-txt,
+    .mega-dialog.limited-bandwidth-dialog.pro.exceeded:not(.no-cards) .dialog.bottom-button,
+    .mega-dialog.limited-bandwidth-dialog.uploads .messages p,
+    .mega-dialog.limited-bandwidth-dialog.uploads .bottom-button,
+    .mega-dialog.limited-bandwidth-dialog.exceeded .msg-prewarning,
+    .mega-dialog.limited-bandwidth-dialog.uploads .msg-prewarning,
+    .mega-dialog.limited-bandwidth-dialog:not(.pro3):not(.no-cards) section i.img-dialog-overquota-storage,
+    .mega-dialog.limited-bandwidth-dialog:not(.pro3):not(.no-cards) .dialog.bottom-button button.upgrade,
+    .mega-dialog.limited-bandwidth-dialog.pro3 .step1-block,
+    .mega-dialog.limited-bandwidth-dialog.pro3 .local-currency-tip,
+    .mega-dialog.limited-bandwidth-dialog:not(.pro-mini) .pricing-page.period-subtitle,
+    .mega-dialog.limited-bandwidth-dialog.pro-mini.no-cards .step1-block,
+    .mega-dialog.limited-bandwidth-dialog.pro-mini.no-cards .local-currency-tip {
         display: none;
     }
-    .mega-dialog.limited-bandwidth-dialog:not(.exceeded) .step1-block,
-    .mega-dialog.limited-bandwidth-dialog.exceeded:not(.pro) .step1-block,
+    .mega-dialog.limited-bandwidth-dialog .step1-block,
     .mega-dialog.limited-bandwidth-dialog.exceeded .dialog.header-before-icon.exceeded,
-    .mega-dialog.limited-bandwidth-dialog.exceeded button.close,
-    .mega-dialog.limited-bandwidth-dialog.pro.exceeded .dialog.pro-exceeded-bl,
-    .mega-dialog.limited-bandwidth-dialog.slider .dialog.pro-exceeded-slider {
+    .mega-dialog.limited-bandwidth-dialog.exceeded button.close {
         display: block;
     }
-    .mega-dialog.limited-bandwidth-dialog.exceeded:not(.pro) .semi-huge-iconspeedometer,
-    .mega-dialog.limited-bandwidth-dialog.exceeded.pro button.upgrade.pro,
-    .logged .mega-dialog.limited-bandwidth-dialog.exceeded:not(.pro):not(.achievements) .big-104px-icon.full,
-    .logged .mega-dialog.limited-bandwidth-dialog.exceeded.achievements:not(.pro) .semi-huge-icon.speedometer.full,
-    .not-logged .mega-dialog.limited-bandwidth-dialog.exceeded:not(.pro) .semi-huge-icon.speedometer.full {
+    .mega-dialog.limited-bandwidth-dialog.pro3 section i.img-dialog-overquota-storage,
+    .mega-dialog.limited-bandwidth-dialog.pro-mini.no-cards section i.img-dialog-overquota-storage,
+    .mega-dialog.limited-bandwidth-dialog.exceeded .msg-overquota span,
+    .mega-dialog.limited-bandwidth-dialog:not(.exceeded) .msg-prewarning > span {
         display: inline-block;
+    }
+    .mega-dialog.limited-bandwidth-dialog.exceeded .msg-overquota > span,
+    .mega-dialog.limited-bandwidth-dialog:not(.exceeded) .msg-prewarning > span:first-child {
+        width: 100%;
+    }
+    .mega-dialog.limited-bandwidth-dialog:not(.exceeded) .msg-prewarning > span:not(:first-child) {
+        width: unset;
+    }
+    .mega-dialog.limited-bandwidth-dialog span.learn-more a {
+        text-decoration: underline;
+    }
+    .mega-dialog.limited-bandwidth-dialog:not(.pro3) .msg-prewarning span.learn-more {
+        margin-inline-start: 4px;
+        -webkit-margin-start: 4px;
+    }
+    .mega-dialog.limited-bandwidth-dialog.pro3 span.learn-more,
+    .mega-dialog.limited-bandwidth-dialog.pro-mini.no-cards span.learn-more,
+    .mega-dialog.limited-bandwidth-dialog.pro-mini.no-cards span.upgrade-option {
+        margin-top: 24px;
     }
     .mega-dialog.limited-bandwidth-dialog .dialog.transfer-overquota-txt {
         font: var(--text-body1);
         color: var(--text-color-high);
-        margin: 0 0 16px;
-        box-sizing: border-box;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog.transfer-overquota-txt span {
-        font: var(--text-h3);
-        color: var(--text-color-high);
-        border-bottom: 2px solid #FF333A;
-        padding: 0 2px;
-    }
-    .mega-dialog.limited-bandwidth-dialog:not(.exceeded) .dialog.transfer-overquota-txt {
-        display: none;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog.overquota-bottom-bl {
-        display: none;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog.overquota-bott-bl {
-        display: none;
-    }
-    .not-logged .mega-dialog.limited-bandwidth-dialog.exceeded:not(.pro) .dialog.overquota-bott-bl,
-    .logged .mega-dialog.limited-bandwidth-dialog.exceeded.achievements:not(.pro) .dialog.overquota-bott-bl,
-    .not-logged .mega-dialog.limited-bandwidth-dialog:not(.exceeded) .dialog.overquota-bott-bl,
-    .logged .mega-dialog.limited-bandwidth-dialog:not(.exceeded).achievements .dialog.overquota-bott-bl {
-        display: table;
-        width: 100%;
-        box-shadow: 0 -1px 0 0 rgba(0,0,0,0.1);
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog.overquota-bott-txt,
-    .mega-dialog.limited-bandwidth-dialog .dialog.overquota-bott-buttons {
-        display: table-cell;
-        position: relative;
-        vertical-align: middle;
-        height: 104px;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog.overquota-bott-buttons {
-        width: 100px;
-        white-space: nowrap;
-        text-align: end;
-        -webkit-padding-end: 20px;
-        padding-inline-end: 20px;
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        box-sizing: border-box;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog.overquota-bott-txt i {
-        position: absolute;
-        left: 18px;
-        top: 50%;
-        margin: -34px 0 0 0;
-    }
-    .rtl .mega-dialog.limited-bandwidth-dialog .dialog.overquota-bott-txt i {
-        left: auto;
-        right: 18px;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog.overquota-bott-txt span {
-        display: none;
-        padding: 28px 0 28px 0;
-        -webkit-padding-end: 17px;
-        padding-inline-end: 17px;
-        -webkit-padding-start: 108px;
-        padding-inline-start: 108px;
-    }
-    .not-logged .mega-dialog.limited-bandwidth-dialog:not(.achievements) span.not-logged.no-achievements {
-        display: block;
-    }
-    .not-logged .mega-dialog.limited-bandwidth-dialog.achievements span.not-logged.achievements {
-        display: block;
-    }
-    .logged .mega-dialog.limited-bandwidth-dialog.achievements span.logged.achievements {
-        display: block;
-    }
-    .mega-dialog.limited-bandwidth-dialog .overquota-bott-buttons button {
-        display: none;
-        -webkit-margin-start: 9px;
-        margin-inline-start: 9px;
-    }
-    .not-logged .mega-dialog.limited-bandwidth-dialog:not(.achievements) .overquota-bott-buttons button.create-account,
-    .not-logged .mega-dialog.limited-bandwidth-dialog.exceeded .overquota-bott-buttons button.login,
-    .mega-dialog.limited-bandwidth-dialog.achievements .overquota-bott-buttons button.get-more-bonuses {
-        display: inline-block;
-    }
-    .logged .mega-dialog.limited-bandwidth-dialog.achievements .overquota-bott-buttons button .not-registered {
-        display: none;
-    }
-    .logged .mega-dialog.limited-bandwidth-dialog.achievements .overquota-bott-buttons button .registered {
-        display: block;
-    }
-    .mega-dialog.limited-bandwidth-dialog.hidden-bottom .dialog.overquota-bott-bl {
-        display: none !important;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog.transfer-overquota-txt span.countdown {
-        margin: 0 5px;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog.transfer-overquota-txt span span {
-        color: var(--text-color-medium);
-        border: 0;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog.transfer-plans {
-        padding: 8px 0 0 0;
-        white-space: nowrap;
-        margin: 0 -10px;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog.pro-exceeded-txt {
-        font: var(--text-body1);
-        color: var(--text-color-medium);
-        padding: 0 0 6px 0;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog.pro-exceeded-txt {
-        display: inline-block;
-    }
-    .mega-dialog.limited-bandwidth-dialog .account.chart-block {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 16px 0 24px;
-        text-align: start;
-        font: var(--text-h3);
-    }
-    .mega-dialog.limited-bandwidth-dialog .account.chart.body {
-        transform: none;
-    }
-    .mega-dialog.limited-bandwidth-dialog .account.chart.data {
         margin: 0;
-        -webkit-margin-start: 24px;
-        margin-inline-start: 24px;
-        left: 0;
+        box-sizing: border-box;
     }
-    .mega-dialog.limited-bandwidth-dialog:not(.exceeded) .dialog.big-buttons-block {
-        display: none;
+    .mega-dialog.limited-bandwidth-dialog.pro-mini .pricing-page.plans-row {
+        margin-top: 32px;
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: center;
     }
-    .mega-dialog.limited-bandwidth-dialog.exceeded.pro .dialog.big-buttons-block {
-        display: inline-block;
-        margin: 2px 0 10px 0;
-        padding: 16px 0 0 0;
-        text-align: start;
+    .mega-dialog.limited-bandwidth-dialog.pro-mini .pricing-page.plans-row > * {
+        border: 1px solid var(--surface-mid-grey);
     }
-    .mega-dialog.limited-bandwidth-dialog.exceeded.pro.slider .dialog.big-buttons-block {
-        margin: 2px 0 1px 0;
+    body:not(.rtl) .mega-dialog.limited-bandwidth-dialog:not(.pro-mini) .pricing-page.plans-row {
+        border-top: 1px solid var(--surface-mid-grey);
+        border-left: 1px solid var(--surface-mid-grey);
     }
-    .mega-dialog.limited-bandwidth-dialog.exceeded.pro .bandwidth .chart.data .perc-txt::before {
-        display: none;
+    body:not(.rtl) .mega-dialog.limited-bandwidth-dialog:not(.pro-mini) .pricing-page.plans-row > * {
+        border-bottom: 1px solid var(--surface-mid-grey);
+        border-right: 1px solid var(--surface-mid-grey);
     }
-    .mega-dialog.limited-bandwidth-dialog .bandwidth .perc-txt {
-        font: var(--text-body1);
+    .rtl .mega-dialog.limited-bandwidth-dialog:not(.pro-mini) .pricing-page.plans-row {
+        border-top: 1px solid var(--surface-mid-grey);
+        border-right: 1px solid var(--surface-mid-grey);
+    }
+    .rtl .mega-dialog.limited-bandwidth-dialog:not(.pro-mini) .pricing-page.plans-row > * {
+        border-bottom: 1px solid var(--surface-mid-grey);
+        border-left: 1px solid var(--surface-mid-grey);
+    }
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plans-row > * {
+        display: flex;
+        flex-direction: column;
+        text-align: unset;
+        padding: 24px;
+        height: 396px;
+    }
+    .mega-dialog.limited-bandwidth-dialog.pro-mini .pricing-page.plans-row > *:not(.starter) {
+        padding: 12px 16px 12px 24px;
+    }
+    .mega-dialog.limited-bandwidth-dialog.pro-mini .pricing-page.plans-row > * {
+        max-width: 275px;
+        flex-basis: 100%;
+    }
+    .mega-dialog.limited-bandwidth-dialog .plans-row .pricing-page.plan > *,
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-feature.strong *,
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-price > *,
+    .mega-dialog.limited-bandwidth-dialog section .content-block .messages > * {
         color: var(--text-color-high);
-        display: block;
-        height: auto;
-        position: absolute;
-        z-index: 11;
-        top: 50%;
-        left: 50%;
-        transform: translateX(-50%) translateY(-50%);
-    }
-    .mega-dialog.limited-bandwidth-dialog.exceeded.pro .chart.progressbars span::before {
-        background: var(--surface-error);
-    }
-    .mega-dialog.limited-bandwidth-dialog.pro.exceeded {
-        width: 724px;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog-slider-txt {
-        text-align: center;
-        font-size: 20px;
-        line-height: 25px;
-        margin: 22px auto 0 auto;
-        max-width: 504px;
-        position: relative;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog-slider-txt::before {
-        content: '';
-        display: block;
-        position: absolute;
-        width: 100%;
-        height: 1px;
-        background-color: rgba(0,0,0,0.1);
-        top: 13px;
-        left: 0;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog.pro-slider-description {
-        padding: 13px 0 0 0;
-        display: inline-block;
-    }
-    .mega-dialog.limited-bandwidth-dialog .bandwith-settings .slider.numbers.val2 {
-        -webkit-margin-start: 501px;
-        margin-inline-start: 501px;
-    }
-    .mega-dialog.limited-bandwidth-dialog .bandwith-settings {
-        direction: ltr;
-        margin: 48px auto 24px auto;
-    }
-    .mega-dialog.limited-bandwidth-dialog .ui-slider.ui-widget-content {
-        width: 100%;
-        margin: 15px auto 0 auto;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog-slider-txt span {
-        padding: 0 15px;
-        position: relative;
-        font: var(--text-h3);
-    }
-    .mega-dialog.limited-bandwidth-dialog.exceeded.pro.slider .radio-txt {
-        padding-top: 8px;
-    }
-    .mega-dialog.limited-bandwidth-dialog.exceeded.pro.slider .checkboxOff,
-    .mega-dialog.exceeded.pro.slider .checkboxOn {
-        margin-top: 10px;
-    }
-    .mega-dialog.limited-bandwidth-dialog.exceeded.uploads .transfer-overquota-txt,
-    .mega-dialog.limited-bandwidth-dialog.exceeded.uploads .msg-prewarning,
-    .mega-dialog.limited-bandwidth-dialog.exceeded.uploads .bottom-tips {
-        display: none;
-    }
-    .mega-dialog.limited-bandwidth-dialog.exceeded.uploads footer aside {
-        padding: 0;
-    }
-    .mega-dialog.limited-bandwidth-dialog .plans-row .pricing-page.plan {
-        border-color: var(--stroke-grey-2);
-    }
-    .mega-dialog.limited-bandwidth-dialog .plans-row .pricing-page.plan:not(.details) {
-        border-top: none;
-    }
-    body:not(.rtl) .mega-dialog.limited-bandwidth-dialog .plans-row .pricing-page.plan:first-child {
-        border-left: none;
-    }
-    .rtl .mega-dialog.limited-bandwidth-dialog .plans-row .pricing-page.plan:last-child {
-        border-left: none;
     }
     .mega-dialog.limited-bandwidth-dialog .pricing-page.plans-block {
         border-bottom: none;
     }
-    .mega-dialog.limited-bandwidth-dialog .pricing-page i {
-        position: absolute;
-        right: 10px;
-        top: 10px;
-        --icon-size: 16px;
-        transition: background-color 200ms ease-in-out;
-        --mask-color: var(--text-color-medium);
+    .mega-dialog.limited-bandwidth-dialog .plan-content {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        margin-top: unset;
     }
-    .mega-dialog.limited-bandwidth-dialog .pricing-page i:hover {
-        --mask-color: var(--text-color-high);
+    .mega-dialog.limited-bandwidth-dialog .plan-header-container,
+    .mega-dialog.limited-bandwidth-dialog .plan-content {
+        display: flex;
+        flex-direction: column;
     }
-    .rtl .mega-dialog.limited-bandwidth-dialog .pricing-page i {
-        right: auto;
-        left: 13px;
+    .mega-dialog.limited-bandwidth-dialog .plan-content {
+        flex: 1;
     }
-    .mega-dialog.limited-bandwidth-dialog .ui-slider .ui-slider-range {
-        background: var(--surface-error);
+    .mega-dialog.limited-bandwidth-dialog .title-and-saving {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
     }
-
+    .mega-dialog.limited-bandwidth-dialog .plan-header-container .pricing-page.plan-title,
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-price {
+        font-size: 24px;
+        line-height: 36px;
+    }
+    .mega-dialog.limited-bandwidth-dialog.pro-mini .plan:not(.starter) .pricing-page.plan-title,
+    .mega-dialog.limited-bandwidth-dialog.exceeded .msg-overquota span.countdown,
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-price > * {
+        font-family: var(--text-font-family-bold);
+    }
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-feature.storage {
+        padding: 32px 0 8px;
+    }
+    .mega-dialog.limited-bandwidth-dialog .plan-header-container,
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-feature.transfer {
+        padding-bottom: 40px;
+    }
+    .mega-dialog.limited-bandwidth-dialog.pro-mini .plan.starter .pricing-page.plan-feature.transfer {
+        padding-bottom: 64px;
+    }
+    .mega-dialog.limited-bandwidth-dialog.pro-mini .pricing-page.storage-and-transfer {
+        flex: 1;
+    }
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan .mega-button {
+        padding: 8px 12px;
+        min-width: unset;
+        display: flex;
+        margin: 0;
+        height: 0;
+        width: fit-content;
+        border: none;
+    }
+    .mega-dialog.limited-bandwidth-dialog .plan .mega-button.positive {
+        color: var(--text-green);
+        border: 1px solid #00BFA5;
+    }
     .mega-dialog.limited-bandwidth-dialog section {
-        flex-shrink: unset;
-        min-height: inherit;
+        padding: 40px 76.5px 30px;
     }
-
-    .mega-dialog.limited-bandwidth-dialog {
-        min-height: 300px;
+    .mega-dialog.limited-bandwidth-dialog.pro.exceeded section {
+        padding-bottom: 24px;
     }
-
-    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-info {
-        height: 130px;
+    .mega-dialog.limited-bandwidth-dialog.pro3 section {
+        padding: 40px 31.5px 80px;
     }
-
-    @media only screen and (max-height: 768px) {
-        .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-button {
-            margin: 12px 0 20px 0;
-        }
-        .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-info {
-            font-size: 14px;
-            line-height: 21px;
-        }
-        .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-label {
-            margin-bottom: 10px;
-        }
-        .mega-dialog.limited-bandwidth-dialog .dialog.transfer-overquota-txt {
-            padding-bottom: 8px;
-        }
+    .mega-dialog.limited-bandwidth-dialog.pro-mini.no-cards section {
+        padding: 40px 31.5px;
+    }
+    .mega-dialog.limited-bandwidth-dialog section .centered-content > :not(i):not(.step1-block),
+    .mega-dialog.limited-bandwidth-dialog section .plan-header-container .pricing-page.plan-title,
+    .mega-dialog.limited-bandwidth-dialog section .pricing-page.plan-content > :not(button),
+    .mega-dialog.limited-bandwidth-dialog.pro-mini section .pricing-page.period-subtitle,
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.local-currency-tip {
+        opacity: 0.7;
+    }
+    .mega-dialog.limited-bandwidth-dialog section * {
+        font-family: var(--text-font-family);
+    }
+    .mega-dialog.limited-bandwidth-dialog:not(.pro3):not(.no-cards) section .content-block .messages > *,
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-only,
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.currency-and-period,
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.monthly-price,
+    .mega-dialog.limited-bandwidth-dialog.pro-mini .pricing-page.period-subtitle,
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-feature {
+        font-size: 16px;
+        line-height: 24px;
+    }
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan .mega-button,
+    .mega-dialog.limited-bandwidth-dialog section .content-block .messages > * {
+        font-size: 14px;
+        line-height: 20px;
+    }
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-only,
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.currency-and-period > * {
+        color: var(--text-color-medium);
+    }
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-only.strikethrough {
+        text-decoration: line-through;
+    }
+    .mega-dialog.limited-bandwidth-dialog section i.img-dialog-overquota-storage {
+        width: 128px;
+        height: 90px;
+        margin-bottom: 32px;
     }
 
 /* end limited-bandwidth-dialog */

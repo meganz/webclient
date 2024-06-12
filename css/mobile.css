@@ -4101,35 +4101,52 @@ div.checkboxOn {
 .obq-sheet-contents {
     display: flex;
     flex-direction: column;
+    padding-bottom: 4px;
 }
 .obq-sheet-contents > *:not(:last-child) {
-    margin-bottom: 16px;
+    padding-bottom: 16px;
 }
-
+.obq-sheet-contents .blurb-text {
+    display: flex;
+    flex-direction: column;
+}
+.obq-sheet-contents .blurb-text > *:not(.upgrade-option):not(.bullet-separator):not(:last-child) {
+    padding-bottom: 8px;
+}
 .obq-sheet-contents .learn-more {
-    display: inherit;
-    margin-top: 16px;
+    padding-top: 8px;
 }
-.obq-sheet-contents.exceeded .get-more-quota {
-    display: inherit;
-    margin: 8px 0;
-}
-.obq-sheet-contents.exceeded .bullet-separator {
-    display: inherit;
-}
-
 .obq-sheet-contents .countdown {
     font-weight: var(--mobile-font-weight-bold);
-}
-.obq-sheet-contents .tb-used {
-    font: var(--mobile-font-caption-large-regular);
-    color: var(--mobile-text-secondary);
 }
 .obq-sheet-contents a {
     color: var(--mobile-link-primary);
     text-decoration: underline;
 }
 /* End of OBQ sheet dialog */
+
+/* Storage quota full/almost full dialog */
+.storage-dialog-contents,
+.storage-dialog-contents .title-and-percent-used {
+    display: flex;
+    flex-direction: column;
+}
+.storage-dialog-contents > *:not(:last-child),
+.storage-dialog-contents .title-and-percent-used > *:not(:last-child) {
+    padding-bottom: 16px;
+}
+.storage-dialog-contents .title-and-percent-used {
+    font: var(--mobile-font-heading-h2);
+}
+.storage-dialog-contents .disclaimer-text {
+    padding-top: 4px;
+    font: var(--mobile-font-caption-small-regular);
+}
+.storage-dialog-contents span.gotorub {
+    color: var(--mobile-link-primary);
+    text-decoration: underline;
+}
+/* End of Storage quota full/almost full dialog */
 
 .mobile.loginrequired-dialog {
     position: fixed;
@@ -11631,10 +11648,6 @@ body.rtl .overlay-wrap {
         margin-bottom: 24px;
     }
 
-    .obq-sheet-contents.limited .get-more-quota {
-        display: inherit;
-        margin-top: 16px;
-    }
     .mobile .commercial-footer-cd {
         width: 67%;
     }

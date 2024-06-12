@@ -4090,7 +4090,7 @@
         </footer>
     </div>
 
-    <!-- Dialog: limited-bandwidth-dialog-->
+    <!-- Dialog: limited-bandwidth-dialog -->
     <div class="mega-dialog dialog-template-action limited-bandwidth-dialog hidden"
          role="dialog"
          aria-label="Limited bandwidth dialog"
@@ -4100,96 +4100,31 @@
             <i class="sprite-fm-mono icon-dialog-close"></i>
         </button>
 
-        <header>
-        </header>
-
         <section class="content">
             <div class="content-block centered-content">
+                <i class="graphic full sprite-fm-illustration img-dialog-overquota-storage"></i>
+
                 <div class="dialog header-before-icon limited">[$16164]</div>
                 <div class="dialog header-before-icon exceeded">[$17]</div>
 
-                <p class="dialog p-after-icon msg-overquota">[$120]</p>
-                <p class="dialog p-after-icon msg-prewarning">
-                    [$17090]
-                </p>
-                <div class="dialog transfer-overquota-txt">[$7100]</div>
-                <div class="dialog pro-exceeded-bl">
-                    <div class="fm-account-blocks bandwidth">
-                        <div class="account chart-block">
-                            <div class="account chart body">
-                                <div class="account chart progressbars">
-                                    <div class="chart0 main-chart right-chart"><span></span></div>
-                                    <div class="chart0 main-chart left-chart"><span></span></div>
-                                </div>
-                                <span class="perc-txt"></span>
-                            </div>
-                            <div class="account chart data">
-                                <div class="fm-account-header"><span>[$16120]</span></div>
-                                <span class="size-txt">2.93 GB</span>
-                                <span class="of-txt">/</span>
-                                <span class="pecents-txt">15</span>
-                                <span class="gb-txt">GB</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="dialog pro-exceeded-txt">
-                        <span class="msg-overquota">[$17084]</span>
-                        <span class="msg-prewarning">[$16356]</span>
-                    </div>
+                <div class="messages">
+                    <p class="msg-overquota"></p>
+                    <p class="msg-prewarning"></p>
+                    <div class="dialog transfer-overquota-txt"></div>
                 </div>
 
-                <div class="dialog limited-bl">
-                    <div class="dialog big-buttons-block">
-                        <button class="mega-button large continue">
-                            <!-- [$6826] - Continue !-->
-                            <!-- [$8945] - Continue without account !-->
-                            <span class="registered">[$6826]</span>
-                            <span class="not-registered">[$8945]</span>
-                        </button>
-                        <button class="mega-button large upgrade">
-                            <!-- [$16353] - See our plans !-->
-                            <!-- [$8696] - Upgrade to PRO !-->
-                            <span>[$8696]</span>
-                        </button>
-                        <button class="mega-button positive large upgrade pro">
-                            <!-- [$16386] - Upgrade your PRO account !-->
-                            <span>[$16386]</span>
-                        </button>
-                    </div>
-
-                    <div class="dialog pro-exceeded-slider">
-                        <div class="dialog transfer-slider">
-                            <div class="dialog-slider-txt">
-                                <span>[$174]</span>
-                            </div>
-                        </div>
-                        <div class="dialog pro-slider-description">
-                            [$16388]
-                        </div>
-                        <div class="bandwith-settings">
-                            <div class="bandwidth-slider"></div>
-                            <div class="slider numbers-wrap">
-                                <div class="slider numbers"><span>0<small>%</small></span></div>
-                                <div class="slider numbers swapped"><span>100<small>%</small></span></div>
-                            </div>
-                            <div class="clear"></div>
-                        </div>
-                    </div>
-
-                    <div class="centered-checkbox dialog-bottom"></div>
-                </div>
                 <div class="step1-block">
-                    <div class="pricing-page radio-buttons individual-el right">
-                        <div class="radioOn">
-                            <input id="d-pro-monthly-payment" name="d-pro-payment-period" type="radio" class="radioOn megaInputs" value="1" checked>
+                    <div class="pricing-page radio-buttons individual-el right hidden">
+                        <div class="radioOff">
+                            <input id="d-pro-monthly-payment" name="d-pro-payment-period" type="radio" class="megaInputs radioOff" value="1">
                         </div>
                         <label class="radio-txt" for="d-pro-monthly-payment">[$23779]</label>
                         <div class="radioOff">
                             <input id="d-pro-yearly-payment" name="d-pro-payment-period" type="radio" class="megaInputs radioOff" value="12">
                         </div>
                         <label class="radio-txt" for="d-pro-yearly-payment">[$23780]</label>
+                        <div class="save-yearly">[$redemption_save_16_percent]</div>
                     </div>
-                    <div class="clear"></div>
                 </div>
             </div>
 
@@ -4197,276 +4132,46 @@
                 <div class="step1-block dialog-cards">
                     <div class="pricing-page plans-block">
                         <div class="pricing-page plans-row">
-                            <div class="pricing-page plan pro4 hidden" data-payment="4">
-                                <div class="pricing-page plan-label"></div>
-                                <div class="pricing-page plan-title"></div>
-                                <div class="pricing-page plan-info">
-                                    [$23950]
+                            <div class="pricing-page plan template hidden" data-payment=""> 
+                                <div class="pricing-page plan-header-container">
+                                    <div class="pricing-page title-and-saving">
+                                        <div class="pricing-page plan-title"></div>
+                                        <div class="pricing-page plan-saving hidden"></div>
+                                    </div>
+                                    <div class="pricing-page period-subtitle"></div>
                                 </div>
                                 <div class="pricing-page plan-content">
-                                    <div class="pricing-page plan-price">
-                                        <span class="price"></span><span class="asterisk">*</span>
+                                    <div class="pricing-page cost">
+                                        <div class="pricing-page plan-only"></div>
+                                        <div class="pricing-page plan-price">
+                                            <span class="price"></span><span>*</span>
+                                        </div>
+                                        <div class="pricing-page currency-and-period"></div>
+                                        <div class="pricing-page monthly-price hidden">([$bsn_page_plan_price])</div>
                                     </div>
-                                    <div class="pricing-page plan-currency"></div>
-                                    <div class="pricing-page plan-period">
-                                        /[$931]
-                                    </div>
-                                    <div class="pricing-page euro-price"></div>
-                                    <div class="clear"></div>
-                                    <div class="pricing-page plan-button">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="pricing-page plan pro1 hidden" data-payment="1">
-                                <div class="pricing-page plan-label">[$23948]</div>
-                                <div class="pricing-page plan-title">
-                                </div>
-                                <div class="pricing-page plan-info">
-                                    [$23949]
-                                </div>
-                                <div class="pricing-page plan-content">
-                                    <div class="pricing-page plan-price">
-                                        <span class="price"></span><span class="asterisk">*</span>
-                                    </div>
-                                    <div class="pricing-page plan-currency"></div>
-                                    <div class="pricing-page plan-period">
-                                        /[$931]
-                                    </div>
-                                    <div class="pricing-page euro-price"></div>
-                                    <div class="clear"></div>
-                                    <div class="pricing-page plan-button">
+                                    <div class="pricing-page storage-and-transfer">
+                                        <div class="pricing-page plan-feature storage strong">
+                                            <span>[$23789.s]</span>
+                                        </div>
+                                        <div class="pricing-page plan-feature transfer strong">
+                                            <span>[$23790.s]</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="pricing-page plan pro2 hidden" data-payment="2">
-                                <div class="pricing-page plan-label"></div>
-                                <div class="pricing-page plan-title">
-                                </div>
-                                <div class="pricing-page plan-info">
-                                    [$23952]
-                                </div>
-                                <div class="pricing-page plan-content">
-                                    <div class="pricing-page plan-price">
-                                        <span class="price"></span><span class="asterisk">*</span>
-                                    </div>
-                                    <div class="pricing-page plan-currency"></div>
-                                    <div class="pricing-page plan-period">
-                                        /[$931]
-                                    </div>
-                                    <div class="pricing-page euro-price"></div>
-                                    <div class="clear"></div>
-                                    <div class="pricing-page plan-button">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="pricing-page plan pro3 hidden" data-payment="3">
-                                <div class="pricing-page plan-label">[$506]</div>
-                                <div class="pricing-page plan-title">
-                                </div>
-                                <div class="pricing-page plan-info">
-                                    [$24066]
-                                </div>
-                                <div class="pricing-page plan-content">
-                                    <div class="pricing-page plan-price">
-                                        <span class="price"></span><span class="asterisk">*</span>
-                                    </div>
-                                    <div class="pricing-page plan-currency"></div>
-                                    <div class="pricing-page plan-period">
-                                        /[$931]
-                                    </div>
-                                    <div class="pricing-page euro-price"></div>
-                                    <div class="clear"></div>
-                                    <div class="pricing-page plan-button">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="pricing-page plans-row">
-                            <div class="pricing-page plan pro4 details hidden" data-payment="4">
-                                <div class="pricing-page plan-feature storage strong">
-                                    <span>[$23789.s]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23807]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature strong transfer">
-                                    <span>[$23790.s]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23808]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23791]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23792]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23793]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23799]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23958]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23801]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$24550]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$24032]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23803]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23804]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23959]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23806]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23956]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$24051]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                            </div>
-                            <div class="pricing-page plan pro1 details hidden" data-payment="1">
-                                <div class="pricing-page plan-feature storage strong">
-                                    <span>[$23789.s]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23807]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature strong transfer">
-                                    <span>[$23790.s]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23808]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23791]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23792]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23793]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23799]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23958]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23801]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$24550]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$24032]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23803]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23804]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23959]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23806]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23956]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$24051]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                            </div>
-                            <div class="pricing-page plan pro2 details hidden" data-payment="2">
-                                <div class="pricing-page plan-feature storage strong">
-                                    <span>[$23789.s]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23807]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature strong transfer">
-                                    <span>[$23790.s]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23808]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23791]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23792]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23793]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23799]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23958]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23801]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$24550]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$24032]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23803]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23804]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23959]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23806]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23956]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$24051]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                            </div>
-                            <div class="pricing-page plan pro3 details hidden" data-payment="3">
-                                <div class="pricing-page plan-feature storage strong">
-                                    <span>[$23789.s]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23807]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature strong transfer">
-                                    <span>[$23790.s]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23808]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23791]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23792]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23793]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23799]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23958]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23801]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$24550]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$24032]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23803]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23804]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23959]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23806]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23956]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$24051]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
+                                <button class="mega-button positive pricing-page plan-button"></button>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div class="condition pricing-page local-currency-tip">* [$18770]</div>
+
+            <div class="dialog bottom-button">
+                <button class="mega-button dialog-action"></button>
+                <button class="mega-button positive upgrade"></button>
             </div>
         </section>
-
-        <footer>
-            <div class="footer-container dialog limited-bottom">
-                <button class="mega-button large positive download continue-download">
-                    <div>
-                        <i class="sprite-fm-mono icon-download"></i>
-                    </div>
-                    <span>[$17091]</span>
-                </button>
-            </div>
-
-            <aside class="with-condition">
-                <div class="dialog limited-bottom">
-                    <div class="checkdiv checkboxOff">
-                        <input type="checkbox" name="limit-warning-checkbox" id="limit-warning-checkbox" class="checkboxOff">
-                    </div>
-                    <label for="limit-warning-checkbox" class="radio-txt">[$229]</label>
-                </div>
-                <div class="dialog bottom-tips">
-                    <span>[$16355]</span>
-                    <a>[$16354]</a>
-                </div>
-                <div class="dialog limited-bottom"></div>
-                <div class="condition pricing-page local-currency-tip">
-                    * [$18770]
-                </div>
-            </aside>
-        </footer>
     </div>
 
     <!-- Dialog: achievements-list-dialog -->

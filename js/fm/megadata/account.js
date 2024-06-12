@@ -761,6 +761,7 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
 
     let upgradeTo;
     let isEuro;
+    let lowestPlanLevel;
 
     if (quota === EPAYWALL) { // ODQ paywall
 
@@ -800,15 +801,15 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
             options = { custom: 1 };
         }
 
-        const lowestRequiredPlan = pro.filter.lowestRequired(quota.cstrg, 'storageTransferDialogs');
+        const lowestRequiredPlan = pro.filter.lowestRequired(quota.cstrg || '', 'storageTransferDialogs');
 
         let upgradeString;
         isEuro = !lowestRequiredPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
 
-        const lowestPlanLevel = lowestRequiredPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
+        lowestPlanLevel = lowestRequiredPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
 
-        // If user requires lowest available plan
-        if (lowestPlanLevel === pro.minPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL]) {
+        // If user requires lowest available plan (Pro Lite or a Mini plan)
+        if (pro.filter.simple.lowStorageQuotaPlans.has(lowestPlanLevel)) {
             upgradeString = isEuro
                 ? l[16313]
                 : l.cloud_strg_upgrade_price_ast;
@@ -937,7 +938,15 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
         }
         closeDialog();
 
-        window.mScrollTo = upgradeTo === 'flexi' ? 'flexi' : null;
+        if (lowestPlanLevel && pro.filter.simple.miniPlans.has(lowestPlanLevel)) {
+            // Show the user the exclusive offer section of the pro page
+            sessionStorage.mScrollTo = 'exc';
+        }
+        else if (upgradeTo === 'flexi') {
+            // Scroll to flexi section of pro page
+            sessionStorage.mScrollTo = 'flexi';
+        }
+
         loadSubPage('pro');
 
         return false;

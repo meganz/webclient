@@ -9,10 +9,12 @@ mobile.overBandwidthQuota = {
      * quota limit
      * @returns {undefined}
      */
-    show: function(quotaExceeded) {
+    show(quotaExceeded) {
         'use strict';
 
         this.quotaExceeded = quotaExceeded;
+        this.proPlanAttribute = Object(u_attr).p;
+        this.lowestPlanIsMini = false;
 
         const contentsDiv = document.createElement('div');
         contentsDiv.className =
@@ -22,89 +24,71 @@ mobile.overBandwidthQuota = {
         blurbDiv.className = 'blurb-text';
         contentsDiv.append(blurbDiv);
 
-        this.setSheetButtons();
+        pro.loadMembershipPlans(() => {
+            this.lowestPlanIsMini = pro.filter.simple.miniPlans.has(pro.minPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL]);
+            const miniPlanId = this.lowestPlanIsMini ? pro.filter.miniMin[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] : '';
 
-        let mediaType = 'dl';
-        const videoPreview = mega.ui.viewerOverlay.nodeComponent && is_video(mega.ui.viewerOverlay.nodeComponent.node);
-        if (!dlmanager.isDownloading &&
-            (dlmanager.isStreaming || videoPreview)) {
-            mediaType = 'stream_media';
-        }
+            this.setSheetButtons();
 
-        const quotaStatus = this.quotaExceeded ? 'tq_exceeded' : 'limited_tq';
+            let mediaType = 'dl';
+            const videoPreview = mega.ui.viewerOverlay.nodeComponent &&
+                is_video(mega.ui.viewerOverlay.nodeComponent.node);
+            this.isStreaming = !dlmanager.isDownloading && (dlmanager.isStreaming || videoPreview);
+            if (this.isStreaming) {
+                mediaType = 'stream_media';
+            }
 
-        const stringKey = `${mediaType}_${quotaStatus}`;
-        const sheetBlurb = u_attr ?
-            l[`${stringKey}${u_attr.p ? '_pro' : '_free'}`] :
-            l[`${stringKey}_non_user`];
+            const quotaStatus = this.quotaExceeded ? 'tq_exceeded' : 'limited_tq';
+            const level = miniPlanId ? 'mini' :
+                (this.proPlanAttribute ? (this.proPlanAttribute === 3 ? 'pro3' : 'pro') : 'free');
 
-        blurbDiv.append(parseHTML(sheetBlurb));
+            let string = l[`${mediaType}_${quotaStatus}_${level}`];
+            if (miniPlanId) {
+                string = string.replace(this.quotaExceeded ? '%2' : '%1', pro.getProPlanName(miniPlanId));
+            }
 
-        const countdown = blurbDiv.querySelector('.countdown');
+            blurbDiv.append(parseHTML(string));
 
-        if (countdown) {
-            dlmanager._overquotaInfo();
-        }
+            const countdown = blurbDiv.querySelector('.countdown');
 
-        if (this.quotaExceeded) {
-            localStorage.seenOverQuotaDialog = Date.now();
-            this.icon = 'icon-alert-triangle-thin-outline error-icon';
-            this.sheetTitle = l[17];
-        }
-        else {
-            localStorage.seenQuotaPreWarn = Date.now();
-            this.icon = 'icon-alert-circle-thin-outline warning-icon';
-            this.sheetTitle = l[16164];
-        }
+            if (countdown) {
+                dlmanager._overquotaInfo();
+            }
 
-        const sheetOptions = {
-            name: 'obq-mobile-dialog',
-            type: 'modal',
-            showClose: this.quotaExceeded,
-            preventBgClosing: !this.quotaExceeded,
-            icon: `sprite-mobile-fm-mono ${this.icon}`,
-            title: this.sheetTitle,
-            contents: [contentsDiv],
-            actions: this.sheetActions,
-            onShow: () => {
-                eventlog(this.quotaExceeded ? 99648 : 99617);
-                if (!this.quotaExceeded && !u_wasloggedin()) {
-                    eventlog(99646);
+            if (this.quotaExceeded) {
+                localStorage.seenOverQuotaDialog = Date.now();
+                this.icon = 'icon-alert-triangle-thin-outline error-icon';
+                this.sheetTitle = l[17];
+            }
+            else {
+                localStorage.seenQuotaPreWarn = Date.now();
+                this.icon = 'icon-alert-circle-thin-outline warning-icon';
+                this.sheetTitle = l[16164];
+            }
+
+            mega.ui.sheet.show({
+                name: 'obq-mobile-dialog',
+                type: 'modal',
+                showClose: this.quotaExceeded,
+                preventBgClosing: !this.quotaExceeded,
+                icon: `sprite-mobile-fm-mono ${this.icon}`,
+                title: this.sheetTitle,
+                contents: [contentsDiv],
+                actions: this.sheetActions,
+                onShow: () => {
+                    eventlog(this.quotaExceeded ? 99648 : 99617);
+                    if (!this.quotaExceeded && !u_wasloggedin()) {
+                        eventlog(99646);
+                    }
+                },
+                onClose: () => {
+                    this.closeSheet();
                 }
-            },
-            onClose: () => {
-                this.closeSheet();
-            }
-        };
-
-        if (Object(u_attr).p && this.quotaExceeded) {
-            if (M.account) {
-                // Force data retrieval from API
-                M.account.lastupdate = 0;
-            }
-            M.accountData((account) => {
-                var tfsQuotaLimit = bytesToSize(account.bw, 0).split('\u00A0');
-                var tfsQuotaUsed = account.downbw_used + M.account.servbw_used;
-                var perc = Math.min(100, Math.ceil(tfsQuotaUsed * 100 / account.bw));
-
-                const tbUsedDiv = document.createElement('div');
-                tbUsedDiv.className = 'tb-used';
-
-                tbUsedDiv.append(parseHTML(escapeHTML(l.tq_percent_used)
-                    .replace('%1', perc)
-                    .replace('%2', tfsQuotaLimit[0]))
-                );
-                contentsDiv.append(tbUsedDiv);
-
-                mega.ui.sheet.show(sheetOptions);
             });
-        }
-        else {
-            mega.ui.sheet.show(sheetOptions);
-        }
+        });
     },
 
-    closeSheet: function() {
+    closeSheet() {
         'use strict';
 
         if (dlmanager._overQuotaTimeLeftTick) {
@@ -114,13 +98,15 @@ mobile.overBandwidthQuota = {
         mega.ui.sheet.hide();
     },
 
-    setSheetButtons: function() {
+    setSheetButtons() {
         'use strict';
 
         const secondaryBtn = {
             type: 'normal',
             className: 'secondary',
-            text: this.quotaExceeded ? l.wait_for_free_tq_btn_text : l[6826],
+            text: this.quotaExceeded ?
+                l[this.proPlanAttribute ? 'ok_button' : 'wait_for_free_tq_btn_text'] :
+                l[6826],
             onClick: () => {
                 this.closeSheet();
                 if (!this.quotaExceeded && typeof dlmanager.onLimitedBandwidth === 'function') {
@@ -130,30 +116,29 @@ mobile.overBandwidthQuota = {
             }
         };
 
-        let primaryActionBtnText;
-        if (u_attr) {
-            primaryActionBtnText = u_attr.p ? l.buy_new_plan_btn_text : l[433];
-        }
-        else {
-            primaryActionBtnText = l.buy_plan_btn_text;
-        }
-
         const primaryBtn = {
             type: 'normal',
-            text: primaryActionBtnText,
+            text: !this.proPlanAttribute || this.proPlanAttribute === 3 ?
+                l[this.quotaExceeded ? 'upgrade_now' : 433] :
+                l.buy_another_plan,
             onClick: () => {
                 // Quota pre-warning / exceeded upgrade / buy plan button tapped
                 eventlog(this.quotaExceeded ? 99640 : 99643);
                 this.closeSheet();
                 // Hide the download overlay
                 mega.ui.overlay.hide();
+
+                // Load pro page
+                if (this.proPlanAttribute === 3) {
+                    sessionStorage.mScrollTo = 'flexi';
+                }
+                else if (this.lowestPlanIsMini) {
+                    sessionStorage.mScrollTo = 'exc';
+                }
                 loadSubPage('pro');
             }
         };
 
-        this.sheetActions = [primaryBtn];
-        if (!this.quotaExceeded || u_attr && !Object(u_attr).p) {
-            this.sheetActions.unshift(secondaryBtn);
-        }
+        this.sheetActions = [secondaryBtn, primaryBtn];
     },
 };

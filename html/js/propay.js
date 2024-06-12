@@ -500,13 +500,21 @@ pro.propay = {
             }
         }
 
-        // Otherwise pre-select the chosen period from previous page
+        // Otherwise pre-select the chosen period (from previous page, or storage / transfer
+        // quota dialog if a mini plan is shown there)
+        // TODO: Handle different durations from different locations in a tidy way
+        let selectedPeriod;
 
-        const selectedTab = sessionStorage['pro.pricingTab'];
-
-        const selectedPeriod = (selectedTab === 'pr-exc-offer-tab'
-            ? sessionStorage['pro.periodExc']
-            : sessionStorage['pro.period']) || 12;
+        if (sessionStorage.fromOverquotaPeriod) {
+            selectedPeriod = sessionStorage.fromOverquotaPeriod;
+            delete sessionStorage.fromOverquotaPeriod;
+        }
+        else {
+            const selectedTab = sessionStorage['pro.pricingTab'];
+            selectedPeriod = (selectedTab === 'pr-exc-offer-tab'
+                ? sessionStorage['pro.periodExc']
+                : sessionStorage['pro.period']) || 12;
+        }
 
         let $selectedOption = $(`.payment-duration[data-plan-months=${selectedPeriod}]`, $durationList);
 

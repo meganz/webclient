@@ -1257,6 +1257,11 @@ lazy(pro, 'proplan2', () => {
             initPlansCards();
             populateBusinessPlanData();
 
+            if (sessionStorage.mScrollTo === 'exc') {
+                window.mProTab = 'exc';
+                delete sessionStorage.mScrollTo;
+            }
+
             initTabHandlers();
             initPeriodPickHandler();
             initPlansTabs();
@@ -1274,9 +1279,9 @@ lazy(pro, 'proplan2', () => {
 
             loadingDialog.hide();
 
-            if (window.mScrollTo === 'flexi' && ProFlexiFound) {
+            if (sessionStorage.mScrollTo === 'flexi' && ProFlexiFound) {
                 $proflexiBlock[0].scrollIntoView({behavior: 'smooth'});
-                delete window.mScrollTo;
+                delete sessionStorage.mScrollTo;
             }
 
             if (window.nextPage === '1' && window.pickedPlan) {

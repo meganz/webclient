@@ -75,6 +75,11 @@
             else {
                 delete dlmanager.efq;
             }
+
+            if (data.streaming) {
+                dlmanager.isStreaming = true;
+            }
+
             dlmanager.showOverQuotaDialog(null, flags);
         }
     };

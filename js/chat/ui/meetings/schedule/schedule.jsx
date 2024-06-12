@@ -989,7 +989,7 @@ const Footer = ({ isLoading, isEdit, topic, onSubmit }) => {
  * @returns {React.Element}
  */
 export const UpgradeNotice = ({ onUpgradeClicked }) => {
-    return (
+    return !!mega.flags.ff_chmon && (
         <Row className="schedule-upgrade-notice">
             <h3>{l.schedule_limit_title}</h3>
             <div>{l.schedule_limit_upgrade_features}</div>

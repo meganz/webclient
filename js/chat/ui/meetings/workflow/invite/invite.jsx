@@ -8,6 +8,7 @@ import Search from './search.jsx';
 import Footer from './footer.jsx';
 import Nil from './nil.jsx';
 import Link from '../../../link.jsx';
+import { reactStringWrap } from "../../../../../ui/utils.jsx";
 
 export const HAS_CONTACTS = () => {
     const keys = M.u.keys();
@@ -242,13 +243,15 @@ export default class Invite extends MegaRenderMixin {
 
     render() {
         const { NAMESPACE } = Invite;
-        const { value, loading, selected, field, contactsInitial } = this.state;
-        const { chatRoom, onClose } = this.props;
+        const { value, loading, selected, contactsInitial } = this.state;
+        const { chatRoom, call, onClose } = this.props;
         const { isMeeting, publicLink } = chatRoom || {};
+        const callPartsLength = chatRoom.getCallParticipants().length;
 
         return (
             <ModalDialogsUI.ModalDialog
                 {...this.state}
+                callPartsLength={callPartsLength}
                 name={NAMESPACE}
                 className={`
                     ${NAMESPACE}
@@ -273,19 +276,6 @@ export default class Invite extends MegaRenderMixin {
                                     }>
                                     {!publicLink ? l[7006] /* `Loading...` */ : l[1394] /* `Copy link` */}
                                 </Button>
-                                <Link
-                                    className="view-link-control"
-                                    field={field}
-                                    onClick={() => this.setState({ field: !field })}>
-                                    {field ? l.collapse_meeting_link : l.expand_meeting_link}
-                                    <i className={`sprite-fm-mono ${field ? 'icon-arrow-up' : 'icon-arrow-down'}`}/>
-                                </Link>
-                                {field && publicLink && (
-                                    <div className="chat-link-input">
-                                        <i className="sprite-fm-mono icon-link"/>
-                                        <input type="text" readOnly={true} value={`${getBaseUrl()}/${publicLink}`}/>
-                                    </div>
-                                )}
                             </div>
                         </>
                     )}
@@ -296,6 +286,23 @@ export default class Invite extends MegaRenderMixin {
                             onChange={this.handleSearch}
                         />
                     )}
+                    {
+                        call.sfuClient.callLimits &&
+                        call.sfuClient.callLimits.usr &&
+                        callPartsLength >= call.sfuClient.callLimits.usr &&
+                        <div className={`${NAMESPACE}-user-limit-banner`}>
+                            {
+                                call.organiser === u_handle ?
+                                    reactStringWrap(
+                                        l.invite_limit_banner_organiser,
+                                        '[A]',
+                                        Link,
+                                        { to: '/pro', target: '_blank', className: 'invite-limit-link' }
+                                    ) :
+                                    l.invite_limit_banner_host
+                            }
+                        </div>
+                    }
                 </div>
                 <div className="fm-dialog-body">
                     <div className={`${NAMESPACE}-contacts`}>

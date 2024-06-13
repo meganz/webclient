@@ -289,16 +289,6 @@ function dashboardUI(updProcess) {
         $('.account.left-pane.reg-date-info').text(l[16128]);
         $('.account.left-pane.reg-date-val').text(time2date(u_attr.since, 2));
 
-        // left-panel responsive contents
-        var maxwidth = 0;
-        for (var i = 0; i < $('.account.left-pane.small-txt:visible').length; i++) {
-            var rowwidth = $('.account.left-pane.small-txt:visible').get(i).offsetWidth
-                + $('.account.left-pane.big-txt:visible').get(i).offsetWidth;
-            maxwidth = Math.max(maxwidth, rowwidth);
-        }
-        $.leftPaneResizable.options.updateWidth = maxwidth;
-        $($.leftPaneResizable).trigger('resize');
-
         const mBackupsNode = M.getNodeByHandle(M.BackupsId);
 
         // If not Business or Pro Flexi (i.e. regular account)
@@ -558,7 +548,7 @@ function dashboardUI(updProcess) {
         //    $('.account.widget.body.achievements').addClass('hidden');
         // }
 
-        onIdle(fm_resize_handler);
+        $.tresizer();
         initTreeScroll();
 
         // Init the dashboard content scroll, after we've fetched account data (in MEGA Lite this takes longer)

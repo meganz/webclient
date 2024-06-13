@@ -609,7 +609,8 @@ ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatIn
                 self.megaChat.publicChatKeys[publicChatHandle],
                 chatInfo.ck,
                 chatInfo.mr === 1,
-                mcoFlags
+                mcoFlags,
+                chatInfo.o
             );
             chatRoom = r[1];
             if (!chatRoom) {
@@ -824,6 +825,8 @@ ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatIn
                     chatRoom.trackDataChange();
                 }
             }
+
+            chatRoom.organiser = chatInfo.o;
 
             chatRoom.trackMemberUpdatesFromActionPacket(chatInfo, isMcf);
         }

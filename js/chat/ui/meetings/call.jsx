@@ -208,6 +208,8 @@ export default class Call extends MegaRenderMixin {
 
     flagMap = attribCache.bitMapsManager.exists('obv4') ? attribCache.bitMapsManager.get('obv4') : undefined;
 
+    timeoutBannerRef = React.createRef();
+
     /**
      * STATE
      * @description Object used for handling the default state, incl. storing the previous state on minimizing and
@@ -240,6 +242,8 @@ export default class Call extends MegaRenderMixin {
         recordingConsented: false,
         invitePanel: false,
         presenterThumbSelected: false,
+        timeoutBanner: false,
+        showTimeoutUpgrade: false,
     };
 
     /**
@@ -515,6 +519,25 @@ export default class Call extends MegaRenderMixin {
                 );
             });
         });
+
+        chatRoom.rebind(`onCallEndTimeUpdated.${NAMESPACE}`, ({ data }) => {
+            this.setState(
+                {
+                    timeoutBanner: !!data,
+                    showTimeoutUpgrade: (this.props.call.organiser === u_handle) && (data - Date.now() >= 120e3)
+                },
+                () => {
+                    if (this.state.timeoutBanner) {
+                        this.timeoutBannerInterval = this.timeoutBannerInterval ||
+                            setInterval(() => this.updateTimeoutDuration(), 1000);
+                    }
+                    else {
+                        clearInterval(this.timeoutBannerInterval);
+                        delete this.timeoutBannerInterval;
+                    }
+                }
+            );
+        });
     };
 
     unbindCallEvents = () =>
@@ -529,6 +552,7 @@ export default class Call extends MegaRenderMixin {
             'onCallState',
             'onRecordingStarted',
             'onRecordingStopped',
+            'onCallEndTimeUpdated',
         ]
             .map(event => this.props.chatRoom.off(`${event}.${NAMESPACE}`));
 
@@ -944,6 +968,70 @@ export default class Call extends MegaRenderMixin {
         );
     };
 
+    renderTimeLimitBanner() {
+        return (
+            <div className="call-time-limit-banner theme-dark-forced">
+                <span ref={this.timeoutBannerRef}>{this.timeoutString}</span>
+                <span
+                    className="call-limit-banner-action"
+                    onClick={() => {
+                        clearInterval(this.timeoutBannerInterval);
+                        delete this.timeoutBannerInterval;
+                        this.setState({ timeoutBanner: false });
+                    }}>
+                    {l[2005]}
+                </span>
+                {
+                    this.state.showTimeoutUpgrade &&
+                    <Link className="call-limit-banner-action" to="/pro" target="_blank">{l.upgrade_now}</Link>
+                }
+            </div>
+        );
+    }
+
+    get timeoutString() {
+        const { call } = this.props;
+        if (call.callEndTime === 0) {
+            return '';
+        }
+        const remainSeconds = Math.max(0, Math.ceil((call.callEndTime - Date.now()) / 1000));
+        if (call.organiser === u_handle) {
+            if (remainSeconds < 60) {
+                /* `# second(s) left in your free MEGA call. Wrap up your call to avoid disruption` */
+                return mega.icu.format(l.free_call_banner_organiser_ending_sec, remainSeconds);
+            }
+            if (remainSeconds <= 120) {
+                /* `# minute(s) left in your free MEGA call. Wrap up your call to avoid disruption` */
+                return mega.icu.format(l.free_call_banner_organiser_ending, Math.ceil(remainSeconds / 60));
+            }
+            /* `Your free call will end in # minute(s). Need more time? Check our plans` */
+            return mega.icu.format(l.free_call_banner_organiser_warning, Math.ceil(remainSeconds / 60));
+        }
+        if (remainSeconds < 60) {
+            /* `# second(s) left in this free MEGA call. Wrap up your call to avoid disruption` */
+            return mega.icu.format(l.free_call_banner_ending_sec, remainSeconds);
+        }
+        if (remainSeconds <= 120) {
+            /* `# minute(s) left in this free MEGA call. Wrap up your call to avoid disruption` */
+            return mega.icu.format(l.free_call_banner_ending, Math.ceil(remainSeconds / 60));
+        }
+        /* `This free call will end in # minute(s)` */
+        return mega.icu.format(l.free_call_banner_warning, Math.ceil(remainSeconds / 60));
+    }
+
+    updateTimeoutDuration() {
+        if (this.timeoutBannerRef) {
+            const { current } = this.timeoutBannerRef;
+            const newStr = this.timeoutString;
+            if (newStr && current && current.innerText !== newStr) {
+                current.innerText = newStr;
+            }
+            if (this.state.showTimeoutUpgrade && this.props.call.callEndTime - Date.now() <= 12e4) {
+                this.setState({ showTimeoutUpgrade: false });
+            }
+        }
+    }
+
     componentWillUnmount() {
         super.componentWillUnmount();
         const { minimized, willUnmount, chatRoom } = this.props;
@@ -963,6 +1051,10 @@ export default class Call extends MegaRenderMixin {
 
         if ($.dialog) {
             closeDialog();
+        }
+
+        if (this.timeoutBannerInterval) {
+            clearInterval(this.timeoutBannerInterval);
         }
 
         this.unbindCallEvents();
@@ -1019,7 +1111,7 @@ export default class Call extends MegaRenderMixin {
         const {
             mode, view, sidebar, hovered, forcedLocal, invite, ephemeral, ephemeralAccounts, guest,
             offline, onboardingUI, onboardingRecording, everHadPeers, initialCallRinging, waitingRoomPeers, recorder,
-            recordingConsentDialog, invitePanel, presenterThumbSelected
+            recordingConsentDialog, invitePanel, presenterThumbSelected, timeoutBanner
         } = this.state;
         const { stayOnEnd } = call;
         const STREAM_PROPS = {
@@ -1039,9 +1131,13 @@ export default class Call extends MegaRenderMixin {
                 className={`
                     meetings-call
                     ${minimized ? 'minimized' : ''}
+                    ${timeoutBanner ? 'with-timeout-banner' : ''}
                 `}
                 onMouseMove={onboardingUI || onboardingRecording ? null : this.handleMouseMove}
                 onMouseOut={onboardingUI || onboardingRecording ? null : this.handleMouseOut}>
+
+                {timeoutBanner && this.renderTimeLimitBanner()}
+
                 <Stream
                     {...STREAM_PROPS}
                     minimized={minimized}

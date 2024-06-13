@@ -165,16 +165,13 @@ export default class WaitingRoom extends MegaRenderMixin {
     };
 
     Head = ({ title }) => {
-        const hasDarkMode =
-            Object.values(document.body.classList).some(c => c === 'theme-dark' || c === 'theme-dark-forced');
-
         return (
             <div className={`${NAMESPACE}-head`}>
                 <div className={`${NAMESPACE}-logo`}>
                     <i
                         className={`
                         sprite-fm-illustration-wide
-                        ${hasDarkMode ? 'mega-logo-dark' : 'img-mega-logo-light'}
+                        ${mega.ui.isDarkTheme() ? 'mega-logo-dark' : 'img-mega-logo-light'}
                     `}
                     />
                 </div>

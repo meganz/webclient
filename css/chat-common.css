@@ -1418,3 +1418,16 @@ button.fm-empty-button {
     text-overflow: ellipsis;
     width: calc(100% - 32px);
 }
+
+.conversation-panel .call-user-limit-banner {
+    background: rgba(255, 153, 36, 1);
+    border-radius: 4px;
+    color: rgba(255, 255, 255, 1);
+    padding: 4px;
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    text-align: center;
+    width: calc(100% - 25px);
+    z-index: 120;
+}

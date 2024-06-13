@@ -831,8 +831,17 @@ lazy(pro, 'filter', () => {
             // and transfer upsell dialogs
             storageTransferDialogs:
                 new Set([
+                    pro.ACCOUNT_LEVEL_STARTER, pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL,
                     pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II,
                     pro.ACCOUNT_LEVEL_PRO_III, pro.ACCOUNT_LEVEL_PRO_FLEXI
+                ]),
+
+            // lowStorageQuotaPlans: 11, 12, 13, 4 - plans that should have their monthly price shown
+            // in the storage upsell dialogs
+            lowStorageQuotaPlans:
+                new Set([
+                    pro.ACCOUNT_LEVEL_STARTER, pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL,
+                    pro.ACCOUNT_LEVEL_PRO_LITE
                 ]),
 
             // affPlans: 4, 1, 2, 3 - plans that can show in the affiliate redeem section
@@ -874,6 +883,13 @@ lazy(pro, 'filter', () => {
                 new Set([
                     pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II, pro.ACCOUNT_LEVEL_PRO_III
                 ]),
+
+            // TODO: Make this dynamic instead of hardcoding the values. Cannot guarantee no changes in the future.
+            // yearlyMiniPlans: 12, 13 - mini plans available to targeted users which allow yearly subscriptions
+            yearlyMiniPlans:
+                new Set([
+                    pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL
+                ])
         },
 
         // Sets of plans to invert (all plans minus specified plans), will then
@@ -930,6 +946,7 @@ lazy(pro, 'filter', () => {
                 && ((plan[pro.UTQA_RES_INDEX_STORAGE] * pro.BYTES_PER_GB) > userStorage)
                 || (plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === pro.ACCOUNT_LEVEL_PRO_FLEXI));
         }
+
     };
 
     const invertedFilterKeys = Object.keys(pf.inverted);

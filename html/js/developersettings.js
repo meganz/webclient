@@ -80,6 +80,7 @@
         },
 
         initMiscLocalStorage() {
+            const dontChange = new Set(['sid', 'k', 'privk', 'v', 'handle', 'fmconfig', 'attr', 'link']);
             const $otherDev = $('.misc-dev', this.$page);
             const $buttons = $('button', $otherDev);
             const $resText = $('.response', $otherDev);
@@ -95,6 +96,10 @@
                 }
                 else if (!name) {
                     $resText.text('No name provided');
+                    return;
+                }
+                else if (dontChange.has(name)) {
+                    $resText.text('Cannot change this value');
                     return;
                 }
 
@@ -306,7 +311,7 @@
         },
 
         initAPICommandSettings() {
-            if (!u_attr) {
+            if (!u_attr || !d) {
                 $('.developer-settings-container > .logged-in', this.$page).addClass('hidden');
                 return;
             }

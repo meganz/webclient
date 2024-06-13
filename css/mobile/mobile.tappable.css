@@ -20,6 +20,7 @@ Components:
 Implemented styles:
 .nav-elem.disabled,
 .nav-elem.disabled:active
+.nav-elem.info-elem
 .nav-elem.primary
 .nav-elem.secondary
 .nav-elem.text-only
@@ -31,6 +32,12 @@ Implemented styles:
 /* Nav elem types */
 
 /* .nav-elem Semantic element */
+.nav-elem,
+.nav-elem.no-active:active {
+    color: var(--mobile-text-primary);
+    background: none;
+}
+
 .nav-elem,
 .nav-elem button,
 .nav-elem a {
@@ -121,7 +128,9 @@ overwriting the .disabled:active case (which should be faster).
 button-type elements.
  */
 button.nav-elem,
-.nav-elem.primary {
+.nav-elem.primary,
+button.nav-elem.no-active:active,
+.nav-elem.primary.no-active:active {
     color: var(--mobile-text-inverse);
     background: var(--mobile-button-primary);
 }
@@ -138,7 +147,8 @@ button.nav-elem,
     color: var(--mobile-text-inverse);
 }
 
-.nav-elem.secondary {
+.nav-elem.secondary,
+.nav-elem.secondary.no-active:active {
     background: var(--mobile-button-secondary);
     color: var(--mobile-text-primary);
 }
@@ -152,7 +162,8 @@ button.nav-elem,
     color: var(--mobile-text-primary);
 }
 
-.nav-elem.outline {
+.nav-elem.outline,
+.nav-elem.outline.no-active:active {
     background: none;
     border: solid 2px var(--mobile-button-outline);
     color: var(--mobile-button-outline);
@@ -169,7 +180,8 @@ button.nav-elem,
     color: var(--mobile-button-primary-pressed);
 }
 
-.nav-elem.destructive {
+.nav-elem.destructive,
+.nav-elem.destructive.no-active:active {
     background: var(--mobile-button-error);
     color: var(--mobile-text-on-color);
 }
@@ -182,20 +194,20 @@ button.nav-elem,
     background: var(--mobile-button-error-pressed);
     color: var(--mobile-text-on-color);
 }
-.nav-elem.no-active:active {
-    background: initial;
-    color: initial;
-}
 
 .nav-elem.text-only,
-.nav-elem.text-icon {
+.nav-elem.text-icon,
+.nav-elem.text-only.no-active:active,
+.nav-elem.text-icon.no-active:active {
     background: none;
     color: var(--mobile-text-primary);
-    text-decoration: underline;
-}
-.nav-elem.text-only.no-deco {
     text-decoration: none;
 }
+.nav-elem.text-only,
+.nav-elem.text-icon {
+    text-decoration: underline;
+}
+.nav-elem.text-only.no-deco,
 .nav-elem.full-width.text-icon,
 .nav-elem.full-width.text-only {
     text-decoration: none;
@@ -229,7 +241,30 @@ button.nav-elem,
     opacity: 1;
 }
 
+/* Information strechable element */
+
+.nav-elem.info-elem {
+    height: auto;
+    padding: 16px 24px;
+    width: 100%;
+}
+
+.nav-elem.info-elem .multi-text-box .sub-text {
+    font: var(--mobile-font-link-large-regular);
+    margin: 0;
+}
+
+/* Element data value to the right of the text */
+.nav-elem.info-elem > .data-value {
+    font: var(--mobile-font-link-large-semibold);
+    order: 90; /* Close to the end of the list for now */
+    margin: 0 8px;
+    margin-inline-start: auto;
+    -webkit-margin-start: auto;
+}
+
 /* Style added for toast component */
+
 .nav-elem.action-link {
     padding: 0;
     background: none;
@@ -296,10 +331,19 @@ button.nav-elem,
     margin-inline-start: auto;
     order: 100; /* Last in list */
     --icon-size: 16px; /* Default size */
+    --mask-color: var(--mobile-icon-secondary);
 }
 
 .nav-elem .left-icon {
     order: -1; /* First in list */
+}
+
+/* Tip icon to the right of the text */
+.nav-elem .tip-icon {
+    --mask-color: var(--mobile-icon-secondary);
+    order: 50; /* Mid in list */
+    margin-inline-start: -8px;
+    -webkit-margin-start: -8px;
 }
 
 .nav-elem i.loading {
@@ -316,13 +360,8 @@ button.nav-elem,
     align-items: flex-start;
 }
 
-.nav-elem .multi-text-box > *:not(:last-child) {
-    margin-bottom: 4px;
-}
-
 .nav-elem .multi-text-box .sub-text {
     color: var(--mobile-text-secondary);
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 17px;
+    font: var(--mobile-font-link-small-regular);
+    margin-top: 2px;
 }

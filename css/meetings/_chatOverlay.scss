@@ -1,0 +1,53 @@
+.chat-overlay {
+    align-items: center;
+    background: var(--surface-grey-1);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    z-index: 141;
+
+    &-head {
+        .chat-overlay-logo i {
+            display: block;
+            margin: 40px auto 0;
+            height: 55px;
+            width: 140px;
+            --width: 140px;
+        }
+
+        h1 {
+            margin: 24px 0 0;
+            text-align: center;
+        }
+
+        .participants-limit & {
+            margin-top: 73px;
+        }
+    }
+
+    &-body {
+        margin: 88px 0 0;
+        text-align: center;
+
+        button {
+            display: block;
+            min-height: 48px;
+            min-width: 139px;
+            margin: 32px auto 24px;
+            font: var(--text-h3);
+        }
+
+        p {
+            font: var(--text-body1);
+            color: var(--text-color-medium);
+        }
+
+        .participants-limit & {
+            margin-top: 24px;
+        }
+    }
+}

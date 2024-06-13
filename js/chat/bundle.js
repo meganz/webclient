@@ -15,8 +15,8 @@ const REaCt = REQ_.n(React_);
 // EXTERNAL MODULE: external "ReactDOM"
 const ReactDOM_ = REQ_(206);
 const ReactDOM = REQ_.n(ReactDOM_);
-// EXTERNAL MODULE: ./js/chat/ui/conversations.jsx + 17 modules
-const conversations = REQ_(120);
+// EXTERNAL MODULE: ./js/chat/ui/conversations.jsx + 18 modules
+const conversations = REQ_(631);
 ;// CONCATENATED MODULE: ./js/chat/chatRouting.jsx
 let _ChatRouting;
 class ChatRouting {
@@ -2300,7 +2300,7 @@ Chat.prototype._renderMyStatus = function () {
   }
 };
 Chat.prototype.renderMyStatus = SoonFc(Chat.prototype._renderMyStatus, 100);
-Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdUrl, setAsActive, chatHandle, publicChatKey, ck, isMeeting, mcoFlags) {
+Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdUrl, setAsActive, chatHandle, publicChatKey, ck, isMeeting, mcoFlags, organiser) {
   const self = this;
   let room = false;
   type = type || "private";
@@ -2372,7 +2372,7 @@ Chat.prototype.openChat = function (userHandles, type, chatId, chatShard, chatdU
     self.hideChat(self.currentlyOpenedChat);
     self.currentlyOpenedChat = null;
   }
-  room = new ChatRoom(self, roomId, type, userHandles, unixtime(), undefined, chatId, chatShard, chatdUrl, null, chatHandle, publicChatKey, ck, isMeeting, 0, mcoFlags);
+  room = new ChatRoom(self, roomId, type, userHandles, unixtime(), undefined, chatId, chatShard, chatdUrl, null, chatHandle, publicChatKey, ck, isMeeting, 0, mcoFlags, organiser);
   self.chats.set(room.roomId, room);
   if (setAsActive && !self.currentlyOpenedChat || self.currentlyOpenedChat === room.roomId) {
     room.setActive();
@@ -3764,7 +3764,7 @@ const MCO_FLAGS = {
 };
 window.RETENTION_FORMAT = RETENTION_FORMAT;
 window.MCO_FLAGS = MCO_FLAGS;
-const ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl, noUI, publicChatHandle, publicChatKey, ck, isMeeting, retentionTime, mcoFlags) {
+const ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl, noUI, publicChatHandle, publicChatKey, ck, isMeeting, retentionTime, mcoFlags, organiser) {
   const self = this;
   this.logger = MegaLogger.getLogger(`room[${  roomId  }]`, {}, megaChat.logger);
   this.megaChat = megaChat;
@@ -3823,6 +3823,7 @@ const ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, c
     megaChat.safeForceUpdate();
   });
   this.isMeeting = isMeeting;
+  this.callUserLimited = false;
   this.members = Object.create(null);
   Object.defineProperty(this.members, 'hasOwnProperty', {
     value(p) {
@@ -3843,6 +3844,7 @@ const ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, c
   for (const flag of Object.values(MCO_FLAGS)) {
     this.options[flag] = mcoFlags[flag] || 0;
   }
+  this.organiser = organiser;
   this.setState(ChatRoom.STATE.INITIALIZED);
   this.isCurrentlyActive = false;
   if (d) {
@@ -4041,6 +4043,15 @@ const ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, c
         self.activeCallIds.remove(activeCallId);
       }
     }
+  });
+  this.rebind(`onCallUserLimitExceeded.${chatId}`, () => {
+    if (this.callUserLimited) {
+      return;
+    }
+    (this.callUserLimited = tSleep(60)).always(() => {
+      this.callUserLimited = false;
+      this.trackDataChange();
+    });
   });
   this.membersSetFromApi = new ChatRoom.MembersSet(this);
   if (publicChatHandle) {
@@ -5078,12 +5089,13 @@ ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function (audio
     'cid': this.chatId,
     "mid": callId
   }).then(r => {
-    this.startOrJoinCall(callId, r.url, audio, video);
+    this.startOrJoinCall(callId, r.url, audio, video, r.organiser);
   });
 });
-ChatRoom.prototype.startOrJoinCall = function (callId, url, audio, video) {
+ChatRoom.prototype.startOrJoinCall = function (callId, url, audio, video, organiser) {
   tryCatch(() => {
     const call = this.call = megaChat.activeCall = megaChat.plugins.callManager2.createCall(this, callId, this.protocolHandler.chatMode === strongvelope.CHAT_MODE.PUBLIC && str_to_ab(this.protocolHandler.unifiedKey));
+    call.setOrganiser(organiser);
     return call.connect(url, audio, video);
   }, ex => {
     let _this$call;
@@ -5166,7 +5178,7 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function (audi
     opts.sfu = parseInt(localStorage.sfuId, 10);
   }
   return asyncApiReq(opts).then(r => {
-    this.startOrJoinCall(r.callId, r.sfu, audio, video);
+    this.startOrJoinCall(r.callId, r.sfu, audio, video, r.organiser);
   }).catch(ex => {
     this.meetingsLoading = false;
     this.logger.error(`Failed to start call: ${ex}`);
@@ -5229,6 +5241,10 @@ ChatRoom.prototype.subscribeForCallEvents = function () {
     }
     this.meetingsLoading = false;
     this.activeCallIds.remove(data.callId);
+    if (this.callUserLimited) {
+      this.callUserLimited.abort();
+    }
+    this.callUserLimited = false;
     this.stopRinging(data.callId);
     this.callParticipantsUpdated();
   });
@@ -5475,6 +5491,10 @@ ChatRoom.prototype.callParticipantsUpdated = function () {
   for (let i = 0; i < callParts.length; i++) {
     self.uniqueCallParts[callParts[i]] = true;
   }
+  if (this.callUserLimited && this.canJoinLimitedCall()) {
+    this.callUserLimited.abort();
+    this.callUserLimited = false;
+  }
   const msg = self.messagesBuff.getMessageById(msgId);
   msg && msg.wrappedChatDialogMessage && msg.wrappedChatDialogMessage.trackDataChange();
   self.trackDataChange();
@@ -5716,6 +5736,10 @@ ChatRoom.prototype._exportChat = async function () {
   } else {
     return M.saveAs(stringNodes, bufferName);
   }
+};
+ChatRoom.prototype.canJoinLimitedCall = function () {
+  const callParts = this.getCallParticipants();
+  return this.iAmOperator() && callParts.length < CallManager2.CALL_USER_LIMIT || callParts.length < CallManager2.CALL_USER_LIMIT - 1;
 };
 window.ChatRoom = ChatRoom;
 const chatRoom = {
@@ -7146,8 +7170,10 @@ const _ui_utils_jsx4__ = REQ_(314);
 const _ui_perfectScrollbar_jsx6__ = REQ_(486);
 const _ui_buttons_jsx3__ = REQ_(994);
 const _ui_dropdowns_jsx2__ = REQ_(911);
-const _contactsPanel_contactsPanel_jsx7__ = REQ_(173);
-const _ui_modalDialogs8__ = REQ_(318);
+const _contactsPanel_contactsPanel_jsx8__ = REQ_(173);
+const _ui_modalDialogs9__ = REQ_(318);
+const _link_jsx7__ = REQ_(280);
+
 
 
 
@@ -7914,6 +7940,23 @@ class ContactPickerWidget extends _mixins1__.w9 {
       }, $$list)));
     };
   }
+  renderInviteWarning() {
+    const {
+      chatRoom
+    } = this.props;
+    const {
+      activeCall
+    } = megaChat;
+    if (!activeCall || activeCall.chatRoom.chatId !== chatRoom.chatId || !activeCall.sfuClient.callLimits || !activeCall.sfuClient.callLimits.usr || chatRoom.getCallParticipants().length < activeCall.sfuClient.callLimits.usr) {
+      return null;
+    }
+    return react0().createElement("div", {
+      className: "picker-user-limit-banner"
+    }, activeCall.organiser === u_handle ? (0,_ui_utils_jsx4__.lI)(l.invite_limit_banner_organiser, '[A]', _link_jsx7__.A, {
+      to: '/pro',
+      target: '_blank'
+    }) : l.invite_limit_banner_host);
+  }
   componentDidMount() {
     super.componentDidMount();
     setContactLink(this.containerRef && this.containerRef.current);
@@ -8412,9 +8455,9 @@ class ContactPickerWidget extends _mixins1__.w9 {
       }
     }, react0().createElement("i", {
       className: "sprite-fm-mono icon-close-component"
-    }))), react0().createElement("div", {
+    })))), this.props.inviteWarningLabel && this.props.chatRoom && this.renderInviteWarning(), !this.props.readOnly && haveContacts && !this.props.hideSearch && react0().createElement("div", {
       className: "contacts-search-header-separator"
-    })), this.props.participantsList ? this.renderParticipantsList() : contactsList, selectFooter, _contactsPanel_contactsPanel_jsx7__.A.hasContacts() && this.props.showAddContact && react0().createElement("div", {
+    }), this.props.participantsList ? this.renderParticipantsList() : contactsList, selectFooter, _contactsPanel_contactsPanel_jsx8__.A.hasContacts() && this.props.showAddContact && react0().createElement("div", {
       className: "contacts-search-bottom"
     }, react0().createElement(_ui_buttons_jsx3__.$, {
       className: "mega-button action positive",
@@ -8457,10 +8500,12 @@ class ContactPickerDialog extends _mixins1__.w9 {
       nothingSelectedButtonLabel,
       selectFooter,
       singleSelectedButtonLabel,
+      inviteWarningLabel,
+      chatRoom,
       onClose,
       onSelectDone
     } = this.props;
-    return react0().createElement(_ui_modalDialogs8__.A.ModalDialog, {
+    return react0().createElement(_ui_modalDialogs9__.A.ModalDialog, {
       name,
       className: `${className} contact-picker-dialog contacts-search`,
       onClose
@@ -8476,6 +8521,8 @@ class ContactPickerDialog extends _mixins1__.w9 {
       nothingSelectedButtonLabel,
       selectFooter,
       singleSelectedButtonLabel,
+      inviteWarningLabel,
+      chatRoom,
       onClose,
       onSelectDone
     }));
@@ -9928,7 +9975,7 @@ ContactsPanel.getUserFingerprint = handle => {
 
 },
 
-697:
+438:
 (_, EXP_, REQ_) => {
 
 "use strict";
@@ -11932,7 +11979,7 @@ class Join extends mixins.w9 {
       }, REaCt().createElement("i", {
         className: `
                             sprite-fm-illustration-wide
-                            ${document.body.classList.contains('theme-dark') ? 'mega-logo-dark' : 'img-mega-logo-light'}
+                            ${mega.ui.isDarkTheme() ? 'mega-logo-dark' : 'img-mega-logo-light'}
                         `
       })), REaCt().createElement("h1", null, REaCt().createElement(utils.zT, null, l.you_have_invitation.replace('%1', (_this$props$chatRoom = this.props.chatRoom) == null ? void 0 : _this$props$chatRoom.topic))), isEphemeral() && REaCt().createElement("div", {
         className: "ephemeral-info"
@@ -12386,7 +12433,6 @@ class WaitingRoom extends mixins.w9 {
       title
     }) => {
       let _this$props$chatRoom3;
-      const hasDarkMode = Object.values(document.body.classList).some(c => c === 'theme-dark' || c === 'theme-dark-forced');
       return REaCt().createElement("div", {
         className: `${waitingRoom_NAMESPACE}-head`
       }, REaCt().createElement("div", {
@@ -12394,7 +12440,7 @@ class WaitingRoom extends mixins.w9 {
       }, REaCt().createElement("i", {
         className: `
                         sprite-fm-illustration-wide
-                        ${hasDarkMode ? 'mega-logo-dark' : 'img-mega-logo-light'}
+                        ${mega.ui.isDarkTheme() ? 'mega-logo-dark' : 'img-mega-logo-light'}
                     `
       })), REaCt().createElement("h1", {
         className: (megaChat.initialChatId || is_chatlink) && this.state.view !== VIEW.INTRO ? 'hidden' : ''
@@ -12624,10 +12670,64 @@ class WaitingRoom extends mixins.w9 {
 const streamControls = REQ_(489);
 // EXTERNAL MODULE: ./js/chat/ui/inviteParticipantsPanel.jsx
 const inviteParticipantsPanel = REQ_(815);
+;// CONCATENATED MODULE: ./js/chat/ui/chatOverlay.jsx
+
+
+
+
+const chatOverlay_NAMESPACE = 'chat-overlay';
+const ChatOverlays = {
+  PARTICIPANT_LIMIT: 'participants-limit'
+};
+class ChatOverlay extends mixins.w9 {
+  constructor(...args) {
+    super(...args);
+    this.MegaLogo = () => REaCt().createElement("div", {
+      className: `${chatOverlay_NAMESPACE}-logo`
+    }, REaCt().createElement("i", {
+      className: `sprite-fm-illustration-wide ${mega.ui.isDarkTheme() ? 'mega-logo-dark' : 'img-mega-logo-light'}`
+    }));
+  }
+  renderParticipantsLimit() {
+    return REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("div", {
+      className: `${chatOverlay_NAMESPACE}-head`
+    }, REaCt().createElement(this.MegaLogo, null), REaCt().createElement("h1", null, l.join_call_user_limit_title)), REaCt().createElement("div", {
+      className: `${chatOverlay_NAMESPACE}-body`
+    }, REaCt().createElement("p", null, l.call_join_user_limit_banner), REaCt().createElement(buttons.$, {
+      className: "mega-button positive",
+      onClick: () => {
+        let _this$props$onClose, _this$props;
+        (_this$props$onClose = (_this$props = this.props).onClose) == null || _this$props$onClose.call(_this$props);
+      }
+    }, l.call_link_user_limit_button)));
+  }
+  render() {
+    const {
+      overlayType
+    } = this.props;
+    let body = null;
+    if (overlayType === ChatOverlays.PARTICIPANT_LIMIT) {
+      body = this.renderParticipantsLimit();
+    }
+    if (!body) {
+      if (d) {
+        console.error('Invalid ChatOverlay', overlayType);
+      }
+      return null;
+    }
+    return REaCt().createElement(utils.Ay.RenderTo, {
+      element: document.body
+    }, REaCt().createElement("div", {
+      className: `${chatOverlay_NAMESPACE} ${overlayType}`
+    }, body));
+  }
+}
+
 ;// CONCATENATED MODULE: ./js/chat/ui/conversationpanel.jsx
 
 
 let conversationpanel_dec, _dec2, conversationpanel_class;
+
 
 
 
@@ -12827,6 +12927,14 @@ class JoinCallNotification extends mixins.w9 {
         type: Alert.TYPE.MEDIUM,
         content: l.active_call_not_supported
       });
+    }
+    if (chatRoom.callUserLimited && !chatRoom.canJoinLimitedCall()) {
+      return REaCt().createElement("div", {
+        className: "call-user-limit-banner",
+        style: {
+          marginTop: offset
+        }
+      }, l.call_join_user_limit_banner);
     }
     return REaCt().createElement("div", {
       className: "in-call-notif neutral join",
@@ -13629,6 +13737,8 @@ class ConversationRightArea extends mixins.w9 {
       singleSelectedButtonLabel: room.isMeeting ? l.meeting_add_participant : l[8869],
       multipleSelectedButtonLabel: room.isMeeting ? l.meeting_add_participant : l[8869],
       nothingSelectedButtonLabel: l[8870],
+      inviteWarningLabel: room.haveActiveCall(),
+      chatRoom: room,
       onSelectDone: selected => {
         this.props.onAddParticipantSelected(selected);
         this.setState({
@@ -13688,7 +13798,8 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
       invalidKeysBanner: null,
       descriptionDialog: false,
       occurrencesLoading: false,
-      waitingRoom: false
+      waitingRoom: false,
+      callUserLimit: false
     };
     const {
       chatRoom
@@ -13851,6 +13962,16 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
       return this.isMounted() && this.setState({
         waitingRoom: false
       });
+    });
+    chatRoom.rebind(`onCallUserLimitExceeded.${this.getUniqueId()}`, () => {
+      if (!this.isMounted()) {
+        return;
+      }
+      if (megaChat.initialChatId || is_eplusplus) {
+        this.setState({
+          callUserLimit: true
+        });
+      }
     });
     if (chatRoom.options.w) {
       chatRoom.rebind(`onMembersUpdated.${this.getUniqueId()}`, (ev, {
@@ -14470,6 +14591,20 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
         }
       });
     }
+    if (this.state.callUserLimit) {
+      return REaCt().createElement(ChatOverlay, {
+        overlayType: ChatOverlays.PARTICIPANT_LIMIT,
+        onClose: () => {
+          if (is_eplusplus) {
+            location.replace('https://mega.io');
+          } else {
+            this.setState({
+              callUserLimit: false
+            });
+          }
+        }
+      });
+    }
     const startCallDisabled = isStartCallDisabled(room) || room.iAmWaitingRoomPeer();
     return REaCt().createElement("div", {
       className: conversationPanelClasses,
@@ -14950,7 +15085,7 @@ function isStartCallDisabled(room) {
 
 },
 
-120:
+631:
 (_, EXP_, REQ_) => {
 
 "use strict";
@@ -14969,8 +15104,8 @@ const React_ = REQ_(594);
 const REaCt = REQ_.n(React_);
 // EXTERNAL MODULE: ./js/chat/mixins.js
 const mixins = REQ_(137);
-// EXTERNAL MODULE: ./js/chat/ui/conversationpanel.jsx + 14 modules
-const conversationpanel = REQ_(697);
+// EXTERNAL MODULE: ./js/chat/ui/conversationpanel.jsx + 15 modules
+const conversationpanel = REQ_(438);
 // EXTERNAL MODULE: ./js/chat/ui/contactsPanel/contactsPanel.jsx + 20 modules
 const contactsPanel = REQ_(173);
 // EXTERNAL MODULE: ./js/ui/modalDialogs.jsx + 1 modules
@@ -16567,7 +16702,12 @@ class Edit extends mixins.w9 {
         endDateTime: timestamp
       }),
       onBlur: timestamp => timestamp && this.onEndDateSelect(timestamp)
-    })))), REaCt().createElement("footer", null, REaCt().createElement("div", {
+    }))), !u_attr.p && endDateTime - startDateTime > 36e5 && REaCt().createElement(UpgradeNotice, {
+      onUpgradeClicked: () => {
+        onClose();
+        loadSubPage('pro');
+      }
+    })), REaCt().createElement("footer", null, REaCt().createElement("div", {
       className: "footer-container"
     }, REaCt().createElement(meetings_button.A, {
       className: "mega-button positive",
@@ -17026,7 +17166,12 @@ class Schedule extends mixins.w9 {
           endDateTime: timestamp
         }, this.onEndDateSelect);
       }
-    }))), REaCt().createElement(Checkbox, {
+    }))), !u_attr.p && endDateTime - startDateTime > 36e5 && REaCt().createElement(UpgradeNotice, {
+      onUpgradeClicked: () => {
+        this.props.onClose();
+        loadSubPage('pro');
+      }
+    }), REaCt().createElement(Checkbox, {
       name: "recurring",
       checked: recurring,
       label: l.schedule_recurring_label,
@@ -17333,6 +17478,16 @@ const Footer = ({
     onClick: () => !isLoading && onSubmit(),
     topic
   }, REaCt().createElement("span", null, isEdit ? l.update_meeting_button : l.schedule_meeting_button))));
+};
+const UpgradeNotice = ({
+  onUpgradeClicked
+}) => {
+  return !!mega.flags.ff_chmon && REaCt().createElement(Row, {
+    className: "schedule-upgrade-notice"
+  }, REaCt().createElement("h3", null, l.schedule_limit_title), REaCt().createElement("div", null, l.schedule_limit_upgrade_features), REaCt().createElement(meetings_button.A, {
+    className: "mega-button positive",
+    onClick: onUpgradeClicked
+  }, REaCt().createElement("span", null, l.upgrade_now)));
 };
 // EXTERNAL MODULE: ./js/ui/miniui.jsx
 const miniui = REQ_(818);
@@ -19121,7 +19276,60 @@ class LeftPanel extends mixins.w9 {
   }
 }
 LeftPanel.NAMESPACE = 'lhp';
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/freeCallEnded.jsx
+
+
+
+const NAMESPACE = 'free-call-ended-dlg';
+class FreeCallEnded extends mixins.w9 {
+  componentDidMount() {
+    super.componentDidMount();
+    M.safeShowDialog(NAMESPACE, () => {
+      if (!this.isMounted()) {
+        throw new Error(`${NAMESPACE} dialog: component ${NAMESPACE} not mounted.`);
+      }
+      return $(`#${NAMESPACE}`);
+    });
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    if ($.dialog === NAMESPACE) {
+      closeDialog();
+    }
+  }
+  render() {
+    const {
+      onClose
+    } = this.props;
+    return REaCt().createElement(modalDialogs.A.ModalDialog, {
+      className: "mega-dialog",
+      id: NAMESPACE,
+      onClose,
+      dialogType: "action",
+      dialogName: NAMESPACE
+    }, REaCt().createElement("header", null, REaCt().createElement("div", {
+      className: "free-call-ended graphic"
+    }, REaCt().createElement("img", {
+      src: `${staticpath}images/mega/chat-upgrade-rocket.png`
+    }))), REaCt().createElement("section", {
+      className: "content"
+    }, REaCt().createElement("div", {
+      className: "content-block"
+    }, REaCt().createElement("div", {
+      className: "dialog-body-text"
+    }, REaCt().createElement("h3", null, l.free_call_ended_dlg_text), REaCt().createElement("span", null, l.free_call_ended_dlg_subtext)))), REaCt().createElement("footer", null, REaCt().createElement("div", {
+      className: "footer-container"
+    }, REaCt().createElement("button", {
+      className: "mega-button positive large",
+      onClick: () => {
+        loadSubPage('pro');
+        onClose();
+      }
+    }, REaCt().createElement("span", null, l.upgrade_now)))));
+  }
+}
 ;// CONCATENATED MODULE: ./js/chat/ui/conversations.jsx
+
 
 
 
@@ -19154,6 +19362,7 @@ class ConversationsApp extends mixins.w9 {
       startMeetingDialog: false,
       scheduleMeetingDialog: false,
       scheduleOccurrenceDialog: false,
+      freeCallEndedDialog: false,
       view: VIEWS.LOADING,
       callExpanded: false
     };
@@ -19239,20 +19448,7 @@ class ConversationsApp extends mixins.w9 {
       megaChat.$leftPane = megaChat.$leftPane || $('.conversationsApp .fm-left-panel');
       $.leftPaneResizableChat = new FMResizablePane(megaChat.$leftPane, {
         ...$.leftPaneResizable.options,
-        maxWidth: 400,
-        pagechange: () => function () {
-          this.setWidth();
-        }
-      });
-      $($.leftPaneResizableChat).rebind('resize.clp', () => {
-        const w = megaChat.$leftPane.width();
-        if (w >= $.leftPaneResizableChat.options.maxWidth) {
-          $('.left-pane-drag-handle').css('cursor', 'w-resize');
-        } else if (w <= $.leftPaneResizableChat.options.minWidth) {
-          $('.left-pane-drag-handle').css('cursor', 'e-resize');
-        } else {
-          $('.left-pane-drag-handle').css('cursor', 'we-resize');
-        }
+        maxWidth: 400
       });
     };
     if (typeof $.leftPaneResizable === 'undefined') {
@@ -19285,6 +19481,11 @@ class ConversationsApp extends mixins.w9 {
       if (Object.values(VIEWS).includes(view)) {
         this.renderView(view);
       }
+    });
+    megaChat.rebind('onCallTimeLimitExceeded', () => {
+      this.setState({
+        freeCallEndedDialog: true
+      });
     });
   }
   componentWillUnmount() {
@@ -19335,7 +19536,8 @@ class ConversationsApp extends mixins.w9 {
       scheduleMeetingDialog,
       scheduleOccurrenceDialog,
       leftPaneWidth,
-      callExpanded
+      callExpanded,
+      freeCallEndedDialog
     } = this.state;
     const isEmpty = chats && chats.every(c => c.isArchived()) && routingSection === 'chat' && !currentlyOpenedChat && !is_chatlink;
     const isLoading = !currentlyOpenedChat && megaChat.allChatsHadInitialLoadedHistory() === false && routingSection !== 'contacts';
@@ -19424,6 +19626,12 @@ class ConversationsApp extends mixins.w9 {
           scheduleOccurrenceDialog: false
         }, () => {
           this.occurrenceRef = null;
+        });
+      }
+    }), freeCallEndedDialog && REaCt().createElement(FreeCallEnded, {
+      onClose: () => {
+        this.setState({
+          freeCallEndedDialog: false
         });
       }
     }), REaCt().createElement(LeftPanel, {
@@ -22140,6 +22348,7 @@ const ui_link = REQ_(280);
 
 
 
+
 const HAS_CONTACTS = () => {
   const keys = M.u.keys();
   for (let i = 0; i < keys.length; i++) {
@@ -22352,18 +22561,20 @@ class Invite extends mixins.w9 {
       value,
       loading,
       selected,
-      field,
       contactsInitial
     } = this.state;
     const {
       chatRoom,
+      call,
       onClose
     } = this.props;
     const {
       isMeeting,
       publicLink
     } = chatRoom || {};
+    const callPartsLength = chatRoom.getCallParticipants().length;
     return REaCt().createElement(modalDialogs.A.ModalDialog, (0,esm_extends.A)({}, this.state, {
+      callPartsLength,
       name: NAMESPACE,
       className: `
                     ${NAMESPACE}
@@ -22378,27 +22589,17 @@ class Invite extends mixins.w9 {
     }, REaCt().createElement(meetings_button.A, {
       className: `mega-button large positive ${publicLink ? '' : 'disabled'}`,
       onClick: () => publicLink && copyToClipboard(`${getBaseUrl()}/${publicLink}`, l[371])
-    }, !publicLink ? l[7006] : l[1394]), REaCt().createElement(ui_link.A, {
-      className: "view-link-control",
-      field,
-      onClick: () => this.setState({
-        field: !field
-      })
-    }, field ? l.collapse_meeting_link : l.expand_meeting_link, REaCt().createElement("i", {
-      className: `sprite-fm-mono ${field ? 'icon-arrow-up' : 'icon-arrow-down'}`
-    })), field && publicLink && REaCt().createElement("div", {
-      className: "chat-link-input"
-    }, REaCt().createElement("i", {
-      className: "sprite-fm-mono icon-link"
-    }), REaCt().createElement("input", {
-      type: "text",
-      readOnly: true,
-      value: `${getBaseUrl()}/${publicLink}`
-    })))), HAS_CONTACTS() && REaCt().createElement(Search, {
+    }, !publicLink ? l[7006] : l[1394]))), HAS_CONTACTS() && REaCt().createElement(Search, {
       value,
       placeholder: contactsInitial.length,
       onChange: this.handleSearch
-    })), REaCt().createElement("div", {
+    }), call.sfuClient.callLimits && call.sfuClient.callLimits.usr && callPartsLength >= call.sfuClient.callLimits.usr && REaCt().createElement("div", {
+      className: `${NAMESPACE}-user-limit-banner`
+    }, call.organiser === u_handle ? (0,utils.lI)(l.invite_limit_banner_organiser, '[A]', ui_link.A, {
+      to: '/pro',
+      target: '_blank',
+      className: 'invite-limit-link'
+    }) : l.invite_limit_banner_host)), REaCt().createElement("div", {
       className: "fm-dialog-body"
     }, REaCt().createElement("div", {
       className: `${NAMESPACE}-contacts`
@@ -22476,8 +22677,8 @@ class Offline extends mixins.w9 {
   }
 }
 Offline.NAMESPACE = 'reconnect-dialog';
-// EXTERNAL MODULE: ./js/chat/ui/conversationpanel.jsx + 14 modules
-const conversationpanel = REQ_(697);
+// EXTERNAL MODULE: ./js/chat/ui/conversationpanel.jsx + 15 modules
+const conversationpanel = REQ_(438);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/streamControls.jsx
 const streamControls = REQ_(489);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/sidebarControls.jsx
@@ -22676,6 +22877,7 @@ class Call extends mixins.w9 {
     this.offlineDelayed = undefined;
     this.callStartTimeout = undefined;
     this.flagMap = attribCache.bitMapsManager.exists('obv4') ? attribCache.bitMapsManager.get('obv4') : undefined;
+    this.timeoutBannerRef = REaCt().createRef();
     this.state = {
       mode: undefined,
       view: VIEW.PARTICIPANTS,
@@ -22696,7 +22898,9 @@ class Call extends mixins.w9 {
       recordingConsentDialog: false,
       recordingConsented: false,
       invitePanel: false,
-      presenterThumbSelected: false
+      presenterThumbSelected: false,
+      timeoutBanner: false,
+      showTimeoutUpgrade: false
     };
     this.handleRetryTimeout = () => {
       const {
@@ -22826,8 +23030,23 @@ class Call extends mixins.w9 {
           ChatToast.quick(l.muted_by.replace('%NAME', name || ''));
         });
       });
+      chatRoom.rebind(`onCallEndTimeUpdated.${NAMESPACE}`, ({
+        data
+      }) => {
+        this.setState({
+          timeoutBanner: !!data,
+          showTimeoutUpgrade: this.props.call.organiser === u_handle && data - Date.now() >= 120e3
+        }, () => {
+          if (this.state.timeoutBanner) {
+            this.timeoutBannerInterval = this.timeoutBannerInterval || setInterval(() => this.updateTimeoutDuration(), 1000);
+          } else {
+            clearInterval(this.timeoutBannerInterval);
+            delete this.timeoutBannerInterval;
+          }
+        });
+      });
     };
-    this.unbindCallEvents = () => ['onCallPeerLeft', 'onCallPeerJoined', 'onCallLeft', 'wrOnUsersAllow', 'wrOnUsersEntered', 'wrOnUserLeft', 'alterUserPrivilege', 'onCallState', 'onRecordingStarted', 'onRecordingStopped'].map(event => this.props.chatRoom.off(`${event}.${NAMESPACE}`));
+    this.unbindCallEvents = () => ['onCallPeerLeft', 'onCallPeerJoined', 'onCallLeft', 'wrOnUsersAllow', 'wrOnUsersEntered', 'wrOnUserLeft', 'alterUserPrivilege', 'onCallState', 'onRecordingStarted', 'onRecordingStopped', 'onCallEndTimeUpdated'].map(event => this.props.chatRoom.off(`${event}.${NAMESPACE}`));
     this.handleCallMinimize = () => {
       const {
         call,
@@ -23150,6 +23369,67 @@ class Call extends mixins.w9 {
       }
     });
   }
+  renderTimeLimitBanner() {
+    return REaCt().createElement("div", {
+      className: "call-time-limit-banner theme-dark-forced"
+    }, REaCt().createElement("span", {
+      ref: this.timeoutBannerRef
+    }, this.timeoutString), REaCt().createElement("span", {
+      className: "call-limit-banner-action",
+      onClick: () => {
+        clearInterval(this.timeoutBannerInterval);
+        delete this.timeoutBannerInterval;
+        this.setState({
+          timeoutBanner: false
+        });
+      }
+    }, l[2005]), this.state.showTimeoutUpgrade && REaCt().createElement(ui_link.A, {
+      className: "call-limit-banner-action",
+      to: "/pro",
+      target: "_blank"
+    }, l.upgrade_now));
+  }
+  get timeoutString() {
+    const {
+      call
+    } = this.props;
+    if (call.callEndTime === 0) {
+      return '';
+    }
+    const remainSeconds = Math.max(0, Math.ceil((call.callEndTime - Date.now()) / 1000));
+    if (call.organiser === u_handle) {
+      if (remainSeconds < 60) {
+        return mega.icu.format(l.free_call_banner_organiser_ending_sec, remainSeconds);
+      }
+      if (remainSeconds <= 120) {
+        return mega.icu.format(l.free_call_banner_organiser_ending, Math.ceil(remainSeconds / 60));
+      }
+      return mega.icu.format(l.free_call_banner_organiser_warning, Math.ceil(remainSeconds / 60));
+    }
+    if (remainSeconds < 60) {
+      return mega.icu.format(l.free_call_banner_ending_sec, remainSeconds);
+    }
+    if (remainSeconds <= 120) {
+      return mega.icu.format(l.free_call_banner_ending, Math.ceil(remainSeconds / 60));
+    }
+    return mega.icu.format(l.free_call_banner_warning, Math.ceil(remainSeconds / 60));
+  }
+  updateTimeoutDuration() {
+    if (this.timeoutBannerRef) {
+      const {
+        current
+      } = this.timeoutBannerRef;
+      const newStr = this.timeoutString;
+      if (newStr && current && current.innerText !== newStr) {
+        current.innerText = newStr;
+      }
+      if (this.state.showTimeoutUpgrade && this.props.call.callEndTime - Date.now() <= 12e4) {
+        this.setState({
+          showTimeoutUpgrade: false
+        });
+      }
+    }
+  }
   componentWillUnmount() {
     super.componentWillUnmount();
     const {
@@ -23169,6 +23449,9 @@ class Call extends mixins.w9 {
     delay.cancel('callOffline');
     if ($.dialog) {
       closeDialog();
+    }
+    if (this.timeoutBannerInterval) {
+      clearInterval(this.timeoutBannerInterval);
     }
     this.unbindCallEvents();
     willUnmount == null || willUnmount(minimized);
@@ -23250,7 +23533,8 @@ class Call extends mixins.w9 {
       recorder,
       recordingConsentDialog,
       invitePanel,
-      presenterThumbSelected
+      presenterThumbSelected,
+      timeoutBanner
     } = this.state;
     const {
       stayOnEnd
@@ -23281,10 +23565,11 @@ class Call extends mixins.w9 {
       className: `
                     meetings-call
                     ${minimized ? 'minimized' : ''}
+                    ${timeoutBanner ? 'with-timeout-banner' : ''}
                 `,
       onMouseMove: onboardingUI || onboardingRecording ? null : this.handleMouseMove,
       onMouseOut: onboardingUI || onboardingRecording ? null : this.handleMouseOut
-    }, REaCt().createElement(stream.Ay, (0,esm_extends.A)({}, STREAM_PROPS, {
+    }, timeoutBanner && this.renderTimeLimitBanner(), REaCt().createElement(stream.Ay, (0,esm_extends.A)({}, STREAM_PROPS, {
       minimized,
       ephemeralAccounts,
       onCallMinimize: this.handleCallMinimize,
@@ -25634,7 +25919,10 @@ StreamHead.EVENTS = {
 const contacts = REQ_(251);
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
 const perfectScrollbar = REQ_(486);
+// EXTERNAL MODULE: ./js/chat/ui/link.jsx
+const ui_link = REQ_(280);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/waitingRoom/admit.jsx
+
 
 
 
@@ -25673,10 +25961,21 @@ class Admit extends mixins.w9 {
       "data-simpletip-class": "theme-dark-forced",
       onClick
     });
+    this.CallLimitBanner = ({
+      call
+    }) => REaCt().createElement("div", {
+      className: `${NAMESPACE}-user-limit-banner`
+    }, call.organiser === u_handle ? (0,utils.lI)(l.admit_limit_banner_organiser, '[A]', ui_link.A, {
+      to: '/pro',
+      target: '_blank'
+    }) : l.admit_limit_banner_host);
     this.renderPeersList = () => {
       const {
-        peers
+        peers,
+        call,
+        chatRoom
       } = this.props;
+      const disableAdding = call.sfuClient.callLimits && call.sfuClient.callLimits.usr && chatRoom.getCallParticipants().length >= call.sfuClient.callLimits.usr;
       return REaCt().createElement(perfectScrollbar.O, {
         ref: this.peersWaitingRef,
         options: {
@@ -25684,7 +25983,9 @@ class Admit extends mixins.w9 {
         }
       }, REaCt().createElement("div", {
         className: "peers-waiting"
-      }, peers.map(handle => {
+      }, this.isUserLimited && REaCt().createElement(this.CallLimitBanner, {
+        call
+      }), peers.map(handle => {
         return REaCt().createElement("div", {
           key: handle,
           className: "peers-waiting-card"
@@ -25704,9 +26005,9 @@ class Admit extends mixins.w9 {
           label: l.wr_deny,
           onClick: () => this.doDeny(handle)
         }), REaCt().createElement(this.Icon, {
-          icon: "icon-check",
+          icon: `icon-check ${disableAdding ? 'disabled' : ''}`,
           label: l.wr_admit,
-          onClick: () => this.doAdmit(handle)
+          onClick: () => !disableAdding && this.doAdmit(handle)
         })));
       })));
     };
@@ -25719,6 +26020,7 @@ class Admit extends mixins.w9 {
         expanded
       } = this.state;
       if (peers && peers.length) {
+        const disableAddAll = this.isUserLimited;
         return REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("div", {
           className: `${NAMESPACE}-head`
         }, REaCt().createElement("h3", null, mega.icu.format(l.wr_peers_waiting, peers.length)), expanded ? REaCt().createElement(this.Icon, {
@@ -25726,7 +26028,9 @@ class Admit extends mixins.w9 {
           onClick: () => this.setState({
             expanded: false
           })
-        }) : null), expanded && REaCt().createElement("div", {
+        }) : null), !expanded && disableAddAll && REaCt().createElement(this.CallLimitBanner, {
+          call
+        }), expanded && REaCt().createElement("div", {
           className: `${NAMESPACE}-content`
         }, this.renderPeersList()), REaCt().createElement("div", {
           className: `${NAMESPACE}-controls`
@@ -25737,33 +26041,45 @@ class Admit extends mixins.w9 {
           })
         }, REaCt().createElement("span", null, l.wr_see_waiting)), REaCt().createElement(meetings_button.A, {
           peers,
-          className: "mega-button positive theme-dark-forced",
-          onClick: () => call.sfuClient.wrAllowJoin(peers)
+          className: `mega-button positive theme-dark-forced ${disableAddAll ? 'disabled' : ''}`,
+          onClick: () => !disableAddAll && call.sfuClient.wrAllowJoin(peers)
         }, REaCt().createElement("span", null, l.wr_admit_all))));
       }
       return null;
     };
     this.renderSinglePeerWaiting = () => {
       const {
-        peers
+        peers,
+        call
       } = this.props;
       const peer = peers[0];
+      const disableAdding = this.isUserLimited;
       if (peer) {
         return REaCt().createElement(REaCt().Fragment, null, REaCt().createElement(utils.P9, {
           tag: "h3",
           content: l.wr_peer_waiting.replace('%s', megaChat.html(M.getNameByHandle(peer)))
+        }), disableAdding && REaCt().createElement(this.CallLimitBanner, {
+          call
         }), REaCt().createElement("div", {
           className: `${NAMESPACE}-controls`
         }, REaCt().createElement(meetings_button.A, {
           className: "mega-button theme-dark-forced",
           onClick: () => this.doDeny(peer)
         }, REaCt().createElement("span", null, l.wr_deny)), REaCt().createElement(meetings_button.A, {
-          className: "mega-button positive theme-dark-forced",
-          onClick: () => this.doAdmit(peer)
+          className: `mega-button positive theme-dark-forced ${disableAdding ? 'disabled' : ''}`,
+          onClick: () => !disableAdding && this.doAdmit(peer)
         }, REaCt().createElement("span", null, l.wr_admit))));
       }
       return null;
     };
+  }
+  get isUserLimited() {
+    const {
+      call,
+      chatRoom,
+      peers
+    } = this.props;
+    return call.sfuClient.callLimits && call.sfuClient.callLimits.usr && chatRoom.getCallParticipants().length + (peers ? peers.length : 0) > call.sfuClient.callLimits.usr;
   }
   render() {
     const {
@@ -29512,7 +29828,7 @@ class MetaRichprevConfirmation extends metaRichpreviewConfirmation_ConversationM
     }, metaRichpreviewConfirmation_React.createElement("div", {
       className: "message richpreview img-wrapper"
     }, metaRichpreviewConfirmation_React.createElement("div", {
-      className: "\r message\r richpreview\r preview-confirmation\r sprite-fm-illustration\r img-chat-url-preview\r "
+      className: " message richpreview preview-confirmation sprite-fm-illustration img-chat-url-preview "
     })), metaRichpreviewConfirmation_React.createElement("div", {
       className: "message richpreview inner-wrapper"
     }, metaRichpreviewConfirmation_React.createElement("div", {
@@ -36154,7 +36470,7 @@ function _extends() {
 	// Load entry module and return exports
 	REQ_(326);
 	// This entry module is referenced by other modules so it can't be inlined
-	const EXP_ = REQ_(120);
+	const EXP_ = REQ_(631);
 	
 })()
 ;

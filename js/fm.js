@@ -4025,14 +4025,44 @@ function FMResizablePane(element, opts) {
     else if (opts.direction.length === 2) {
         size_attr = 'both';
     }
-    const broadcasts = [];
 
     self.destroy = function() {
+        $self.off();
         $element.data('fmresizable', null);
+    };
 
-        for (let i = broadcasts.length; i--;) {
-            mBroadcaster.removeListener(broadcasts[i]);
+    this.refresh = function(ev) {
+        const width = $element.width();
+
+        if (opts.maxWidth && width >= opts.maxWidth) {
+            $('.left-pane-drag-handle').css('cursor', 'w-resize');
+            $('body').css('cursor', 'w-resize');
         }
+        else if (width <= opts.minWidth) {
+            $('.left-pane-drag-handle').css('cursor', 'e-resize');
+            $('body').css('cursor', 'e-resize');
+        }
+        else {
+            $('.left-pane-drag-handle').css('cursor', 'ew-resize');
+            $('body').css('cursor', 'ew-resize');
+        }
+
+        if (!$element.hasClass('ui-resizable-resizing')) {
+            $('body').css('cursor', 'auto');
+        }
+
+        if (width < opts.updateWidth + 60) {
+            $element.addClass('small-left-panel');
+        }
+        else {
+            $element.removeClass('small-left-panel');
+        }
+
+        if (d > 1) {
+            console.warn([this], width);
+        }
+
+        return ev || $.tresizer();
     };
 
     this.setWidth = function(value) {
@@ -4048,6 +4078,8 @@ function FMResizablePane(element, opts) {
         if (value > 0) {
             $element.width(value);
         }
+
+        this.refresh();
     };
 
     this.setOption = function(key, value) {
@@ -4095,6 +4127,7 @@ function FMResizablePane(element, opts) {
                     $element.css(css_attrs);
 
                     if (opts.persistanceKey) {
+                        console.assert(opts.persistanceKey !== 'leftPaneWidth');
                         mega.config.set(opts.persistanceKey, css_attrs);
                     }
                 } else {
@@ -4106,12 +4139,12 @@ function FMResizablePane(element, opts) {
                     self["current_" + size_attr] = ui.size[size_attr];
                 }
 
-                $self.trigger('resize', [e, ui]);
+                delay('fm-resizable-pane:refresh', () => self.refresh(e, ui));
             },
             'stop': function(e, ui) {
+                $.tresizer();
                 $(self.element).removeClass('resizable-pane-active');
                 $self.trigger('resizestop', [e, ui]);
-                $(window).trigger('resize');
             }
         };
 
@@ -4124,23 +4157,32 @@ function FMResizablePane(element, opts) {
         $element.resizable(resizable_opts);
 
         $element.data('fmresizable', this);
-
-        if (opts.pagechange) {
-            const callback = tryCatch(opts.pagechange)();
-            delete opts.pagechange;
-
-            if (callback) {
-                const safeCallback = tryCatch(() => callback.call(self));
-
-                M.onFileManagerReady(() => {
-                    onIdle(safeCallback);
-                    broadcasts.push(mBroadcaster.addListener('pagechange', safeCallback));
-                });
-            }
-        }
     }
+
     return this;
 }
+
+/** @property FMResizablePane.refresh */
+lazy(FMResizablePane, 'refresh', () => {
+    'use strict';
+    // tells which sections are expandable beyond the usual 400px limit.
+    const expandable = tryCatch(() => {
+        const {'cloud-drive': {subpages} = false} = M.fmTabState;
+        return subpages && array.to.object([M.RootID, ...subpages]);
+    })() || false;
+
+    return tryCatch(() => {
+        // @todo revamp if we ever use other than '.fm-left-panel' for these
+        const cl = $('.fm-left-panel:visible').data('fmresizable');
+
+        if (cl) {
+
+            cl.setOption('maxWidth', expandable[M.currentrootid] ? null : 400);
+        }
+
+        return cl;
+    });
+});
 
 function initDownloadDesktopAppDialog() {
 

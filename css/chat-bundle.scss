@@ -7,6 +7,7 @@
 @import 'meetings/_chatToaster.scss';
 @import 'meetings/_leftPanel.scss';
 @import 'meetings/_inviteParticipantsPanel.scss';
+@import 'meetings/_chatOverlay.scss';
 
 // The main `Meetings` in-call container
 @import 'meetings/_call.scss';
@@ -24,3 +25,4 @@
 @import 'meetings/schedule/_datepicker.scss';
 @import 'meetings/schedule/_recurring.scss';
 @import 'meetings/workflow/_unsupported.scss';
+@import 'meetings/workflow/_freeCallEnded.scss';

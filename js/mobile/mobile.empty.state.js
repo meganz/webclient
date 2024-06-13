@@ -10,11 +10,12 @@ class MegaMobileEmptyState extends MegaMobileOverlay {
             name: 'empty-state',
             showClose: false,
             icon: state.icon,
+            title: state.title,
+            titleType: 'h2',
             contents: [state.contents]
         });
 
         this.domNode.classList.remove('hidden');
-        this.addTitle(state.title);
     }
 
     hide(container) {
@@ -23,13 +24,6 @@ class MegaMobileEmptyState extends MegaMobileOverlay {
         if (container) {
             container.classList.remove('hidden');
         }
-    }
-
-    addTitle(title) {
-        this.clearTitle();
-        const subNode = document.createElement('h2');
-        subNode.textContent = title;
-        this.titleNode.appendChild(subNode);
     }
 
     static init() {

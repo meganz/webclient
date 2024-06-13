@@ -135,6 +135,7 @@ var mobile = {
                             });
                         }
                         else if (mega.ui.sheet.name !== 'resume-download') { // don't proceed if resume dialog is open
+                            mobile.overStorageQuota.quotaInfo = data;
                             if (data.isFull) {
                                 mobile.overStorageQuota.show();
                             }
@@ -147,29 +148,24 @@ var mobile = {
                                     loadSubPage('pro');
                                 });
 
+                                const sheetContents = mobile.overStorageQuota.getSheetContents(false);
+
                                 mega.ui.sheet.show({
                                     name: 'almost-full-storage',
                                     type: 'modal',
                                     showClose: true,
                                     icon: 'sprite-mobile-fm-mono icon-alert-circle-thin-outline icon warning',
-                                    title: l.storage_almost_full,
-                                    contents: [l.storage_full_sheet_msg],
+                                    contents: [sheetContents],
                                     actions: [
                                         {
                                             type: 'normal',
-                                            text: l.earn_storage,
-                                            className: 'secondary',
-                                            onClick: () => {
-                                                mega.ui.sheet.hide();
-                                                loadSubPage('fm/account/achievements');
-                                            }
-                                        },
-                                        {
-                                            type: 'normal',
-                                            text: l.upgrade_now,
+                                            text: l[433],
                                             className: 'primary',
                                             onClick: () => {
                                                 mega.ui.sheet.hide();
+                                                if (mobile.overStorageQuota.advertiseFlexi) {
+                                                    sessionStorage.mScrollTo = 'flexi';
+                                                }
                                                 loadSubPage('pro');
                                             }
                                         }
@@ -1074,7 +1070,7 @@ function affiliateUI() {
     }
 
     if (page === 'fm/refer') {
-        mobile.affiliate.initMainPage();
+        mobile.settings.account.referral.init();
     }
     else if (page === 'fm/refer/redeem') {
         mobile.affiliate.initRedeemPage();
@@ -1086,7 +1082,7 @@ function affiliateUI() {
         mobile.affiliate.initHistoryPage();
     }
     else if (page === 'fm/refer/distribution') {
-        mobile.affiliate.initDistributionPage();
+        mobile.settings.account.referralDistribution.init();
     }
     else {
         loadSubPage('fm/refer');
@@ -1136,6 +1132,11 @@ function closeDialog() {
 /** slimmed down version adapted from fm.js's (desktop) closeMsg() */
 function closeMsg() {
     'use strict';
+
+    if ($.dialog && !(M.chat && $.dialog === 'onboardingDialog')) {
+        $('.mega-dialog').removeClass('arrange-to-back');
+        $('.mega-dialog-container.common-container').removeClass('arrange-to-back');
+    }
 
     delete $.msgDialog;
     mBroadcaster.sendMessage('msgdialog-closed');

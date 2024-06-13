@@ -431,24 +431,21 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
             }
 
             M.accountData(() => {
-                if (u_attr.p && M.account.stype === 'S') {
-                    // Get the date their subscription will renew, the payment type and gateway
+
+                // Check if we should show the Payment Card button (uq response)
+                if (payCardBtn && mobile.settings.account.paymentCard.validateUser(M.account)) {
+                    payCardBtn.show();
+                }
+
+                // Display the date their subscription will renew if known
+                if (cancelSubsBtn && u_attr.p && M.account.stype === 'S') {
                     const renewTimestamp = M.account.srenew.length > 0 ? M.account.srenew[0] : 0; // Timestamp
-                    const gatewayId = M.account.sgwids.length > 0 ? M.account.sgwids[0] : null; // Gateway ID
 
-                    // If Apple or Google subscription don't show payment card button
-                    if (gatewayId !== 2 && gatewayId !== 3) {
-                        payCardBtn.show();
+                    if (renewTimestamp > 0) {
+                        cancelSubsBtn.subtext = l.renews_on_cancel_btn.replace('%1', time2date(renewTimestamp, 1));
                     }
 
-                    if (!u_attr.b) {
-                        // Display the date their subscription will renew if known
-                        if (renewTimestamp > 0) {
-                            cancelSubsBtn.subtext = l.renews_on_cancel_btn.replace('%1', time2date(renewTimestamp, 1));
-                        }
-
-                        cancelSubsBtn.show();
-                    }
+                    cancelSubsBtn.show();
                 }
 
                 if (delAccountBtn) {

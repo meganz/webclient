@@ -10,6 +10,10 @@
     box-shadow: var(--dialog-shadow);
     z-index: 51;
 
+    .call-time-limit-banner ~ .stream & {
+        top: 106px;
+    }
+
     &-wrapper {
         padding: 24px;
 
@@ -91,6 +95,23 @@
 
         button {
             margin-inline-start: 8px;
+        }
+    }
+
+    &-user-limit-banner {
+        background: var(--banner-background-warning);
+        border: 1px solid var(--banner-border-warning);
+        border-radius: 4px;
+        box-sizing: border-box;
+        color: var(--banner-text-warning);
+        padding: 2px 16px;
+        text-align: center;
+        width: 100%;
+        margin-bottom: 16px;
+
+        a {
+            color: var(--banner-text-warning);
+            text-decoration: underline;
         }
     }
 }

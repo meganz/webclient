@@ -73,6 +73,12 @@ mobile.settings.account.paymentCard = new function() {
         }
     };
 
+    this.validateUser = (account) => {
+        return (u_attr.p || u_attr.b) && account && account.stype === 'S' && ((Array.isArray(account.sgw)
+            && account.sgw.includes('Stripe')) || (Array.isArray(account.sgwids)
+            && account.sgwids.includes((addressDialog || {}).gatewayId_stripe || 19)));
+    };
+
     this.init = function() {
         // the check of existence of needed data goes here
         // ..

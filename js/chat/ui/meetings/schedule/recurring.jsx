@@ -1,7 +1,7 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../../mixins';
 import Button from '../button.jsx';
-import { CloseDialog, Column, Row, Schedule } from './schedule.jsx';
+import { CloseDialog, Column, Row, Schedule, UpgradeNotice } from './schedule.jsx';
 import Datepicker from './datepicker.jsx';
 import Select from './select.jsx';
 import ModalDialogsUI from '../../../../ui/modalDialogs.jsx';
@@ -767,6 +767,18 @@ export class Edit extends MegaRenderMixin {
                             />
                         </div>
                     </Row>
+
+                    {
+                        !u_attr.p &&
+                        endDateTime - startDateTime > 36e5 &&
+                        <UpgradeNotice
+                            onUpgradeClicked={() => {
+                                onClose();
+                                loadSubPage('pro');
+                            }}
+                        />
+                    }
+
                 </div>
                 <footer>
                     <div className="footer-container">

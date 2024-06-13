@@ -440,14 +440,15 @@ pro.proplan = {
             }
 
             // Updte price and transfer values
-            pro.proplan.updateEachPriceBlock('P', $pricingBoxes, $dialog, parseInt(value));
+            pro.proplan.updateEachPriceBlock($dialog ? 'D' : 'P', $pricingBoxes, $dialog, parseInt(value));
 
             // Update the plan period text
             $pricePeriod.text('/' + monthOrYearWording);
         });
 
-        // Set monthly prices by default
-        $radioButtons.filter('input[value="1"]').trigger('click');
+        // Set yearly prices by default
+        const preSelectedPeriod = (sessionStorage.getItem('pro.period') | 0) || 12;
+        $radioButtons.filter(`input[value="${preSelectedPeriod}"]`).trigger('click');
     },
 
     /**
@@ -686,8 +687,10 @@ pro.proplan = {
         var classType = 1;
         var intl = mega.intl.number;
 
-        // If user is logged in get curent/next plan info
-        pro.proplan.updateCurrentPlanData($pricingBoxes);
+        // If user is logged in, and the page type is P, get curent/next plan info
+        if (pageType === 'P') {
+            pro.proplan.updateCurrentPlanData($pricingBoxes);
+        }
 
         // Save selected payment period
         sessionStorage.setItem('pro.period', period);
@@ -710,71 +713,114 @@ pro.proplan = {
                 priceIndex = pro.UTQA_RES_INDEX_PRICE;
             }
 
-            var $pricingBox = $pricingBoxes.filter('.pro' + planNum);
-            var $price = $('.plan-price .price', $pricingBox);
-            var $euroPrice = $('.pricing-page.euro-price', $pricingBox);
-            var $currncyAbbrev = $('.pricing-page.plan-currency', $pricingBoxes);
-            var $planName = $('.pricing-page.plan-title', $pricingBox);
-            var $planButton = $('.pricing-page.plan-button', $pricingBox);
-            var basePrice;
-            var baseCurrency;
-            $pricingBox.removeClass('hidden');
+            // Iterate over the filtered boxes (as some targeted low tier plan users
+            // will see the monthly and yearly plan cards at the same time)
+            var $filteredBoxes = $pricingBoxes.filter('.pro' + planNum);
+            for (var j = 0; j < $filteredBoxes.length; j++) {
+                var $currentBox = $($filteredBoxes[j]);
+                const isLowTierPlanBox = !!$currentBox.data('period');
+                const isYearlyLowTierPlanBox = $currentBox.data('period') === 12;
 
-            if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
-
-                // Calculate the base price in local currency
-                basePrice = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
-                baseCurrency = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
-
-                $currncyAbbrev.text(baseCurrency);
-                $euroPrice.text(formatCurrency(currentPlan[priceIndex]));
-
-                if (pageType === "P") {
-                    oneLocalPriceFound = true;
+                if (isYearlyLowTierPlanBox) {
+                    currentPlan = pro.membershipPlans[i + 1];
                 }
 
-                // Set localCurrency indicator
-                if ($dialog) {
-                    $dialog.addClass('local-currency');
+                var $price = $('.plan-price .price', $currentBox);
+                var $euroPrice = $('.pricing-page.euro-price', $currentBox);
+                var $currncyAbbrev = $('.pricing-page.plan-currency', $filteredBoxes);
+                var $planName = $('.pricing-page.plan-title', $currentBox);
+                var $planButton = $('.pricing-page.plan-button', $currentBox);
+                var basePrice;
+                var baseCurrency;
+                $currentBox.removeClass('hidden');
+
+                if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
+                    // Calculate the base price in local currency
+                    basePrice = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
+                    baseCurrency = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
+
+                    $currncyAbbrev.text(baseCurrency);
+                    $euroPrice.text(formatCurrency(currentPlan[priceIndex]));
+
+                    if (pageType === "P") {
+                        oneLocalPriceFound = true;
+                    }
+
+                    // Set localCurrency indicator
+                    if ($dialog) {
+                        $dialog.addClass('local-currency');
+                    }
                 }
+                else {
+                    // Calculate the base price
+                    basePrice = currentPlan[pro.UTQA_RES_INDEX_PRICE];
+                    baseCurrency = 'EUR';
+                }
+
+                // Calculate the monthly base price
+                var storageGigabytes = currentPlan[pro.UTQA_RES_INDEX_STORAGE];
+                var storageBytes = storageGigabytes * 1024 * 1024 * 1024;
+                var storageFormatted = numOfBytes(storageBytes, 0);
+                var storageSizeRounded = Math.round(storageFormatted.size);
+                var storageValue;
+
+                var bandwidthGigabytes = currentPlan[pro.UTQA_RES_INDEX_TRANSFER];
+                var bandwidthBytes = bandwidthGigabytes * 1024 * 1024 * 1024;
+
+                // Get bandwidth
+                const bandwidthValue = bytesToSize(bandwidthBytes, isYearlyLowTierPlanBox ? 1 : 0);
+
+                // Update the plan name
+                $planName.text(planName);
+
+                // Update the button label plan name if plan is not a current one
+                if (!$currentBox.first().is('.current')) {
+                    $planButton.first().text(l[23776].replace('%1', planName));
+                }
+
+                $price.text(formatCurrency(basePrice, baseCurrency, 'narrowSymbol'));
+
+                if (pageType === 'D') {
+                    const $onlySection = $('.pricing-page.plan-only', $currentBox);
+                    const $currencyAndPeriod = $('.pricing-page.currency-and-period', $currentBox);
+                    const periodIsYearly = period === 12 || isYearlyLowTierPlanBox;
+
+                    // TODO change strings to be "<currency> billed monthly/yearly" in future ticket
+                    const billingPeriodText = `${baseCurrency} / ${periodIsYearly ? l[932] : l[931]}`;
+                    const onlyText = l.pr_only;
+
+                    const price = 12 * currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE] * pro.conversionRate;
+                    // TODO re-enable in future ticket
+                    // const $monthlyPrice = $('.pricing-page.monthly-price', $currentBox)
+                    // .toggleClass('hidden', !periodIsYearly); // TODO unhide in HTML in future ticket
+                    // if (periodIsYearly) {
+                    //     onlyText = formatCurrency(price, baseCurrency, 'narrowSymbol');
+
+                    //     const perMonthPrice = formatCurrency(basePrice / 12, baseCurrency, 'narrowSymbol') + '*';
+                    //     $('span', $monthlyPrice).text(perMonthPrice);
+                    // }
+
+                    if (isLowTierPlanBox && pro.filter.simple.yearlyMiniPlans.has(planNum)) {
+                        const $periodSubTitle = $('.pricing-page.period-subtitle', $currentBox);
+                        $periodSubTitle.text(periodIsYearly ? l.yearly_unit : l[918]);
+
+                        if (periodIsYearly) {
+                            const savings = Math.floor((1 - (basePrice / price)) * 100);
+                            const savingsString = l.yearly_plan_saving.replace('%1', savings);
+                            $('.pricing-page.plan-saving', $currentBox).text(savingsString).removeClass('hidden');
+                        }
+                    }
+
+                    $onlySection.text(onlyText); // TODO toggle strikethrough class in future ticket
+                    $currencyAndPeriod.text(billingPeriodText);
+                }
+
+                // Get storage
+                storageValue = storageSizeRounded + ' ' + storageFormatted.unit;
+
+                // Update storage and bandwidth data
+                pro.proplan.updatePlanData($currentBox, storageValue, bandwidthValue, period);
             }
-            else {
-                // Calculate the base price
-                basePrice = currentPlan[pro.UTQA_RES_INDEX_PRICE];
-                baseCurrency = 'EUR';
-            }
-
-            // Calculate the monthly base price
-            var storageGigabytes = currentPlan[pro.UTQA_RES_INDEX_STORAGE];
-            var storageBytes = storageGigabytes * 1024 * 1024 * 1024;
-            var storageFormatted = numOfBytes(storageBytes, 0);
-            var storageSizeRounded = Math.round(storageFormatted.size);
-            var storageValue;
-
-            var bandwidthGigabytes = currentPlan[pro.UTQA_RES_INDEX_TRANSFER];
-            var bandwidthBytes = bandwidthGigabytes * 1024 * 1024 * 1024;
-            var bandwidthFormatted = numOfBytes(bandwidthBytes, 0);
-            var bandwidthSizeRounded = Math.round(bandwidthFormatted.size);
-            var bandwidthValue;
-
-            // Update the plan name
-            $planName.text(planName);
-
-            // Update the button label plan name if plan is not a current one
-            if (!$pricingBox.first().is('.current')) {
-                $planButton.first().text(l[23776].replace('%1', planName));
-            }
-
-            $price.text(formatCurrency(basePrice, baseCurrency, 'narrowSymbol'));
-
-            // Get storage
-            storageValue = storageSizeRounded + ' ' + storageFormatted.unit;
-
-            // Get bandwidth
-            bandwidthValue = bandwidthSizeRounded + ' ' + bandwidthFormatted.unit;
-
-            // Update storage and bandwidth data
-            pro.proplan.updatePlanData($pricingBox, storageValue, bandwidthValue, period);
         }
 
         return pageType === "P" ? [oneLocalPriceFound] : classType;
@@ -794,14 +840,14 @@ pro.proplan = {
         var bandwidthText = period === 1 ? l[23808] : l[24065];
 
         // Update storage
+        $('span span', $storageAmount).text(storageValue);
         if ($storageTip && $storageTip.attr('data-simpletip')) {
-            $('span span', $storageAmount).text(storageValue);
             $storageTip.attr('data-simpletip', l[23807].replace('%1', '[U]' + storageValue + '[/U]'));
         }
 
         // Update bandwidth
+        $('span span', $bandwidthAmount).text(bandwidthValue);
         if ($bandwidthTip && $bandwidthTip.data('simpletip')) {
-            $('span span', $bandwidthAmount).text(bandwidthValue);
             $bandwidthTip.attr('data-simpletip', bandwidthText.replace('%1', '[U]' + bandwidthValue + '[/U]'));
         }
     },

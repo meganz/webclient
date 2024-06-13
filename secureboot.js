@@ -3005,6 +3005,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/mobile/mobile.settings.css', n: 'mobile_settings_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile/mobile.settings.history.css', n: 'mobile_settings_history_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile/mobile.link-management.css', n: 'mobile_link_management_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+        jsl.push({f:'css/mobile/mobile.referral.css', n: 'mobile_referral_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-help.css', n: 'mobile_help_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-top-menu.css', n: 'mobile_top_menu_css',  j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-media-viewer.css', n: 'mobile_media_viewer_css', j:2,w:5,c:1,d:1,cache:1});
@@ -3069,6 +3070,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.dropdown-items.js', n: 'mobile_dropdownitem_js', j:1, w:1});
         jsl.push({f:'js/mobile/mobile.context.menu.js', n: 'mobile_context_menu_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.tappable.js', n: 'mobile_tappable_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.info-menu-item.js', n: 'mobile_info_menu_item_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.link.js', n: 'mobile_link_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.button.js', n: 'mobile_button_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.checkbox.js', n: 'mobile_checkbox_js', j: 1, w:1});
@@ -3105,6 +3107,8 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/settings/backupRecovery.js', n: 'mobile_backup_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/settings/fileManagement.js', n: 'mobile_file_management_js', j: 1, w:1});
         jsl.push({f:'js/mobile/settings/notifications.js', n: 'mobile_account_notifications_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/settings/referral.js', n: 'mobile_referral_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/settings/referralDistribution.js', n: 'mobile_referral_distribution_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/settings/termsPolicies.js', n: 'mobile_terms_policies_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/settings/twofactorSettings.js', n: 'mobile_twofactor_settings_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.msgdialog.js', n: 'mobile_msgdialog_js', j: 1, w:1});

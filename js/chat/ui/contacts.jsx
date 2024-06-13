@@ -1,12 +1,13 @@
 import React from 'react';
 import {ContactAwareComponent} from '../mixins';
 import {MegaRenderMixin} from '../mixins';
-import { Emoji, ParsedHTML, OFlowEmoji } from '../../ui/utils.jsx';
+import { Emoji, ParsedHTML, OFlowEmoji, reactStringWrap } from '../../ui/utils.jsx';
 import { PerfectScrollbar } from '../../ui/perfectScrollbar.jsx';
 import { Button } from '../../ui/buttons.jsx';
 import { Dropdown, DropdownItem } from '../../ui/dropdowns.jsx';
 import ContactsPanel from './contactsPanel/contactsPanel.jsx';
 import ModalDialogs from "../../ui/modalDialogs";
+import Link from "./link.jsx";
 
 export const MAX_FREQUENTS = 3;
 
@@ -930,6 +931,29 @@ export class ContactPickerWidget extends MegaRenderMixin {
         );
     };
 
+    renderInviteWarning() {
+        const { chatRoom } = this.props;
+        const { activeCall } = megaChat;
+        // Check if the active call is in the current chat and if it exceeds the free plan limitation.
+        if (
+            !activeCall
+            || activeCall.chatRoom.chatId !== chatRoom.chatId
+            || !activeCall.sfuClient.callLimits
+            || !activeCall.sfuClient.callLimits.usr
+            || chatRoom.getCallParticipants().length < activeCall.sfuClient.callLimits.usr
+        ) {
+            return null;
+        }
+
+        return <div className="picker-user-limit-banner">
+            {
+                activeCall.organiser === u_handle ?
+                    reactStringWrap(l.invite_limit_banner_organiser, '[A]', Link, { to: '/pro', target: '_blank' }) :
+                    l.invite_limit_banner_host
+            }
+        </div>;
+    }
+
     componentDidMount() {
         super.componentDidMount();
         setContactLink(this.containerRef && this.containerRef.current);
@@ -1529,9 +1553,12 @@ export class ContactPickerWidget extends MegaRenderMixin {
                                 <i className="sprite-fm-mono icon-close-component"/>
                             </div>
                         </div>
-                        <div className="contacts-search-header-separator" />
                     </>
                 )}
+                {this.props.inviteWarningLabel && this.props.chatRoom && this.renderInviteWarning()}
+                {!this.props.readOnly && haveContacts && !this.props.hideSearch &&
+                    <div className="contacts-search-header-separator"/>
+                }
                 {this.props.participantsList ? this.renderParticipantsList() : contactsList}
                 {selectFooter}
                 {ContactsPanel.hasContacts() && this.props.showAddContact && (
@@ -1566,6 +1593,8 @@ export class ContactPickerDialog extends MegaRenderMixin {
             nothingSelectedButtonLabel,
             selectFooter,
             singleSelectedButtonLabel,
+            inviteWarningLabel,
+            chatRoom,
             onClose,
             onSelectDone,
         } = this.props;
@@ -1586,6 +1615,8 @@ export class ContactPickerDialog extends MegaRenderMixin {
                 nothingSelectedButtonLabel={nothingSelectedButtonLabel}
                 selectFooter={selectFooter}
                 singleSelectedButtonLabel={singleSelectedButtonLabel}
+                inviteWarningLabel={inviteWarningLabel}
+                chatRoom={chatRoom}
                 onClose={onClose}
                 onSelectDone={onSelectDone}
             />

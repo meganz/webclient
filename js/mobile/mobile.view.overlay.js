@@ -471,7 +471,7 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
                         return false;
                     }
                     this.trigger('pauseStreamer');
-                    mobile.linkManagement.showOverlay(this.nodeComponent.handle);
+                    mobile.linkManagement.checkCopyRightAndGetLink(this.nodeComponent.handle);
                     return false;
                 }
             ],

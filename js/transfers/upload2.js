@@ -120,10 +120,11 @@ var ulmanager = {
             // Hide loading dialog as from new text file
             loadingDialog.phide();
 
-            $dialog.removeClass('registered achievements pro slider').addClass('uploads exceeded');
+            $dialog.removeClass('achievements pro3 pro pro-mini no-cards').addClass('uploads exceeded');
             $('.header-before-icon.exceeded', $dialog).text(l[19135]);
             $('.pricing-page.plan .plan-button', $dialog).rebind('click', function() {
                 eventlog(99700, true);
+                sessionStorage.fromOverquotaPeriod = $(this).parent().data('period');
                 open(getAppBaseUrl() + '#propay_' + $(this).closest('.plan').data('payment'));
                 return false;
             });
@@ -133,12 +134,6 @@ var ulmanager = {
 
                     ulmanager.ulHideOverStorageQuotaDialog();
                 });
-
-            // Change overquotaa text
-            $('.p-after-icon.msg-overquota', $dialog).text(is_mobile ?
-                l[22673].replace('%1', bytesToSize(pro.maxPlan[2] * 1024 * 1024 * 1024, 0))
-                    .replace('%2', bytesToSize(pro.maxPlan[3] * 1024 * 1024 * 1024, 0))
-                : l[19136]);
 
             // Load the membership plans
             dlmanager.setPlanPrices($dialog);

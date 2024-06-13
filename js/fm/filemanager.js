@@ -4773,7 +4773,9 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     }
 
     // Revamp Implementation End
-    FMResizablePane.refresh();
+    if (!is_mobile) {
+        FMResizablePane.refresh();
+    }
 
     if (d) {
         console.timeEnd('sectionUIOpen');

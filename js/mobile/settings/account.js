@@ -438,7 +438,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
                 }
 
                 // Display the date their subscription will renew if known
-                if (cancelSubsBtn && u_attr.p && M.account.stype === 'S') {
+                if (cancelSubsBtn && !u_attr.b && M.account.stype === 'S') {
                     const renewTimestamp = M.account.srenew.length > 0 ? M.account.srenew[0] : 0; // Timestamp
 
                     if (renewTimestamp > 0) {

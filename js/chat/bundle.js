@@ -4847,7 +4847,8 @@ ChatRoom.prototype._attachNodes = mutex('chatroom-attach-nodes', function _(reso
             fa: n.fa,
             ts: n.ts,
             hash: n.hash,
-            name
+            name,
+            des: n.des
           }]));
         }
       }
@@ -29238,7 +29239,7 @@ class Attachment extends AbstractGenericMessage {
                 label: l[6859],
                 key: "infoDialog",
                 onClick: () => {
-                  $.selected = [v.h];
+                  $.selected = [v.ch];
                   mega.ui.mInfoPanel.initInfoPanel();
                 }
               }));

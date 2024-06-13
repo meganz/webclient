@@ -40,6 +40,9 @@ lazy(mega.ui, 'mInfoPanel', () => {
         $('.current-version-value', $container).text('');
         $('.prev-version-section', $container).addClass('hidden');
         $('.prev-version-value', $container).text('');
+        $('.node-description-section', $container).addClass('hidden');
+        $('.node-description-section .descCounter', $container).addClass('hidden');
+        $('.node-description-section', $container).removeClass('readonly');
 
         $container.removeClass('taken-down');
         $container.removeClass('undecryptable');
@@ -125,12 +128,18 @@ lazy(mega.ui, 'mInfoPanel', () => {
 
     /**
      * From the selected node handle, get the path to the node
-     * @param {String} nodeHandle node handle
+     * @param {String} node node
      * @returns {String} folder/file path
      */
-    function getPath(nodeHandle) {
+    function getPath(node) {
 
-        const pathItems = M.getPath(nodeHandle);
+        const pathItems = M.getPath(node.h);
+
+        // return false when no path found
+        if (pathItems && !pathItems.length) {
+            return false;
+        }
+
         const path = document.createElement('div');
 
         // Reverse order so the root node is first
@@ -398,7 +407,135 @@ lazy(mega.ui, 'mInfoPanel', () => {
             return getSelectedFolderAndFileCount(selectedNodes);
         }
 
-        return M.getNameByHandle(selectedNodes);
+        return selectedNodes[0].ch ? selectedNodes[0].name : M.getNameByHandle(selectedNodes);
+    }
+
+    /**
+     * Render node description
+     * @param {MegaNode} node selected node
+     * @returns {undefined}
+     */
+    function renderNodeDescription(node) {
+
+        // Hide for S4 nodes
+        const isS4 = 'kernel' in s4 && s4.kernel.getS4NodeType(node.h);
+
+        if (M.RootID === node.h && !folderlink || node.devid || isS4) {
+            return;
+        }
+
+        // Node description
+        const $section = $(`.node-description-section.${mega.flags.ab_ndes ? 'top' : 'bottom'}`, $container);
+        $section.removeClass('hidden');
+        const $descInput = $('.node-description-textarea textarea', $section);
+        const $descCounter = $('.descCounter', $section);
+        const $descCounterVal = $('span', $descCounter);
+        const description = from8(node.des || '');
+
+        $descInput.attr('placeholder', l.info_panel_description_add);
+
+        const descriptionEventHandler = () => {
+
+            // Changing description length counter
+            $descInput.rebind('input.nodeDescription', (e) => {
+                $descCounterVal.text($(e.currentTarget).val().length);
+            });
+
+            // Save description when hit enter
+            $descInput.rebind('keydown.nodeDescription', (e) => {
+                e.stopPropagation();
+                const key = e.keyCode || e.which;
+
+                $descCounter.removeClass('hidden');
+
+                if (key === 13 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
+                    e.currentTarget.blur();
+                }
+            });
+
+            // Save description upon unfocus/blur
+            $descInput.rebind('blur.nodeDescription', (e) => {
+                // Saving node description
+                const $descValue = $(e.currentTarget).val();
+                const prevDesc = description;
+
+                // Skipped if no changes/Description length max 300 char/Document focus
+                if (prevDesc !== $descValue && $descValue.length <= 300 && document.hasFocus()) {
+                    M.setNodeDescription(node.h, to8($descValue))
+                        .then(() => {
+                            if (prevDesc === '') {
+                                showToast('info', l.info_panel_description_added);
+                                if (mega.flags.ab_ndes) {
+                                    // Top position node description added event log
+                                    eventlog(500252);
+                                }
+                                else {
+                                    // Bottom position node description added event log
+                                    eventlog(500253);
+                                }
+                            }
+                            else {
+                                showToast('info', l.info_panel_description_updated);
+                            }
+                        })
+                        .catch(dump);
+                }
+
+                if ($descValue === '') {
+                    $descCounter.addClass('hidden');
+                }
+            });
+
+            // For styling the mega textarea
+            $('.node-description-textarea > *', $section)
+                .focus((e)=> {
+                    const $currTarget = $(e.currentTarget);
+                    $currTarget.closest('.node-description.mega-textarea').addClass('active');
+                    $currTarget.attr("spellcheck", "true");
+                    if (mega.flags.ab_ndes) {
+                        // Top position node description focus event log
+                        eventlog(500250);
+                    }
+                    else {
+                        // Bottom position node description focus event log
+                        eventlog(500251);
+                    }
+                })
+                .blur((e) => {
+                    const $currTarget = $(e.currentTarget);
+                    $currTarget.closest('.node-description.mega-textarea').removeClass('active');
+                    $currTarget.attr("spellcheck", "false");
+                });
+        };
+
+        // Fill node description text area
+        if (description) {
+            $descInput.val(description);
+            $descCounterVal.text(description.length);
+            $descCounter.removeClass('hidden');
+        }
+        else {
+            $descInput.val('');
+            $descCounter.addClass('hidden');
+        }
+
+        // Apply scrollbar to the textarea
+        initTextareaScrolling($descInput);
+
+        if (M.getNodeRights(node.h) < 2 || M.currentrootid === M.RubbishID ||
+            folderlink || M.getNodeRoot(node.h) === M.InboxID || node.ch) {
+            $descInput.attr('disabled','disabled');
+            $descInput.attr('placeholder', l.info_panel_description_empty);
+            $('.descPermission', $section).removeClass('hidden');
+            $('.descPermission span', $section).text(l[55]);  // Read-only
+            $section.addClass('readonly');
+        }
+        else {
+            $('.descPermission', $section).addClass('hidden');
+            $descInput.removeAttr('disabled');
+            descriptionEventHandler();
+            $section.removeClass('readonly');
+        }
     }
 
     /**
@@ -645,7 +782,6 @@ lazy(mega.ui, 'mInfoPanel', () => {
      */
     function renderInfo(selectedNodeHandles) {
 
-        let nodeHandle;
         let node;
         let nodeType;
         let containsText;
@@ -678,12 +814,11 @@ lazy(mega.ui, 'mInfoPanel', () => {
         }
         else {
             // Single node selected
-            nodeHandle = selectedNodeHandles[0];
             node = selectedNodes[0];
 
             // Get single node data
             nodeType = node.t ? l[1049] : filetype(node, 0);
-            path = getPath(nodeHandle);
+            path = getPath(node);
             dateAdded = getDate(node.ts);
             lastModified = getDate(node.mtime);
             isUndecrypted = missingkeys[node.h];
@@ -764,6 +899,8 @@ lazy(mega.ui, 'mInfoPanel', () => {
         // If just one node selected, show the Name label (just showing the # of files/folders instead for multiple)
         if (selectedNodeHandles.length === 1) {
             $('.name-section .description', $container).removeClass('hidden');
+
+            renderNodeDescription(node);
         }
 
         // Render icons/thumbnails as applicable

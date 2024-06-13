@@ -3030,6 +3030,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             && !$.msgDialog
             && !$('.fm-new-folder').hasClass('active')
             && !$('.top-search-bl').hasClass('active')
+            && !$('.node-description.mega-textarea', 'body').hasClass('active')
         ) {
             $.selected = s.filter(h => !M.getNodeShare(h).down);
 

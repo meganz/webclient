@@ -1357,8 +1357,8 @@ var slideshowid;
             // Properties icon
             $('.context-menu .info, .v-btn.info', $overlay).rebind('click.media-viewer', () => {
                 $document.fullScreen(false);
-                const node = M.getNodeByHandle(id);
-                $.selected = [node.h];
+                // Use original ID to render info from chats
+                $.selected = [id];
                 mega.ui.mInfoPanel.initInfoPanel();
                 return false;
             });

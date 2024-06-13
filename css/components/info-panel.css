@@ -277,6 +277,50 @@
     color: var(--secondary-orange) !important;
 }
 
+/* Node description */
+.folder-file-info-panel .node-description.mega-textarea {
+    margin-top: 0;
+}
+.folder-file-info-panel .node-description textarea {
+    padding: 8px 4px 8px 16px;
+    min-height: 36px;
+}
+.folder-file-info-panel .node-description .textarea-clone {
+    padding: 8px 4px 8px 16px;
+    min-height: 36px;
+}
+.folder-file-info-panel .node-description.mega-textarea .textarea-scroll {
+    margin: 0;
+    border-radius: 4px;
+    max-height: 118px;
+}
+.folder-file-info-panel .node-description.mega-textarea.active {
+    border-radius: 4px;
+    border: 1px solid #2BA6DE;
+}
+.folder-file-info-panel .node-description.active textarea {
+    border-radius: 4px;
+    border: 1px solid #2BA6DE;
+}
+.folder-file-info-panel .node-description-section .descCounter,
+.folder-file-info-panel .node-description-section .descPermission {
+    font-size: 12px;
+    display: inline-block;
+}
+.folder-file-info-panel .node-description-section .status {
+    display: flex;
+    justify-content: flex-end;
+}
+.folder-file-info-panel .node-description-section.readonly .status {
+    justify-content: flex-start;
+}
+.folder-file-info-panel .node-description-section .descCounter {
+    margin-inline-start: auto;
+}
+.folder-file-info-panel .info-panel-scroll-block.ps--active-y .node-description-section {
+    margin-inline-end: 12px;
+}
+
 /* Chat share nodes with contact */
 .info-panel-visible .profile-shared-folders .shared-with-me tbody tr {
     display: inline-flex;

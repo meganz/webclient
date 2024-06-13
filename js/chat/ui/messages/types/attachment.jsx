@@ -139,7 +139,7 @@ export default class Attachment extends AbstractGenericMessage {
                                         label={l[6859] /* `Info` */}
                                         key="infoDialog"
                                         onClick={() => {
-                                            $.selected = [v.h];
+                                            $.selected = [v.ch];
                                             mega.ui.mInfoPanel.initInfoPanel();
                                         }}
                                     />

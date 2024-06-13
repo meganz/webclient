@@ -1709,7 +1709,7 @@ ChatRoom.prototype._attachNodes = mutex('chatroom-attach-nodes', function _(reso
                         Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT +
                         JSON.stringify([
                             {
-                                h: n.h, k: n.k, t: n.t, s: n.s, fa: n.fa, ts: n.ts, hash: n.hash, name
+                                h: n.h, k: n.k, t: n.t, s: n.s, fa: n.fa, ts: n.ts, hash: n.hash, name, des: n.des
                             }
                         ])
                     );

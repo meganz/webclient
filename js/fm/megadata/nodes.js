@@ -4743,3 +4743,31 @@ lazy(MegaData.prototype, 'myChatFilesFolder', () => {
         }
     });
 });
+
+/**
+ * Set node description attribute
+ * @param {MegaNode|Object|String} itemHandle node handle
+ * @param {String} newItemDescription node description text
+ * @returns {Promise} promise
+ */
+MegaData.prototype.setNodeDescription = async function(itemHandle, newItemDescription) {
+    'use strict';
+    const n = this.getNodeByHandle(itemHandle);
+
+    if (d) {
+        console.assert(!n || n.des !== newItemDescription, 'Unneeded set description invoked.');
+    }
+
+    if (n && n.des !== newItemDescription) {
+        const prop = {des: newItemDescription};
+
+        // TODO S4
+
+        // Save also to other version of the node
+        if (n.tvf) {
+            fileversioning.descriptionVersions(n.h, newItemDescription);
+        }
+
+        return api.setNodeAttributes(n, prop);
+    }
+};

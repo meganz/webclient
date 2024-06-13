@@ -654,6 +654,9 @@ var ulmanager = {
             if (r.lbl) {
                 n.lbl = r.lbl;
             }
+            if (r.des) {
+                n.des = r.des;
+            }
         }
 
         var req_type = 'p';

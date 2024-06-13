@@ -145,6 +145,11 @@ mega.ui.MegaInputs.prototype.underlinedText._init = function() {
         // Insert error message block
         $wrapper.safeAppend('<div class="message-container mega-banner"></div>');
 
+        // Add some class to wrapper
+        if ($input.data('wrapper-class')) {
+            $wrapper.addClass($input.data('wrapper-class'));
+        }
+
         // Half size
         this.underlinedText._halfSize.call(this);
 
@@ -156,11 +161,6 @@ mega.ui.MegaInputs.prototype.underlinedText._init = function() {
 
         // With icon or prefix (e.g. currency)
         this.underlinedText._withIconOrPrefix.call(this);
-
-        // Add some class to wrapper
-        if ($input.data('wrapper-class')) {
-            $wrapper.addClass($input.data('wrapper-class'));
-        }
 
         // Add special class for textarea with auto height
         if (this.options.autoHeight) {

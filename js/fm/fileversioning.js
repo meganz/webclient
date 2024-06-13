@@ -164,6 +164,23 @@ var versiondialogid;
         },
 
         /**
+         * set/remove description on all previous versions of a file.
+         * @param {String} h file handle.
+         * @param {String} desc description string/text
+         * @returns {Promise} promise
+         */
+        descriptionVersions(h, desc) {
+            return fileversioning.getAllVersions(h)
+                .then((versions) => {
+                    const promises = [];
+                    for (let i = 1; i < versions.length; i++) {
+                        promises.push(api.setNodeAttributes(versions[i], {des: desc}));
+                    }
+                    return Promise.allSettled(promises);
+                });
+        },
+
+        /**
          * update file versioning setting.
          */
         updateVersionInfo: function () {
@@ -240,6 +257,10 @@ var versiondialogid;
 
                 if (file.lbl) {
                     n.lbl = file.lbl;
+                }
+
+                if (file.des) {
+                    n.des = file.des;
                 }
 
                 var ea = ab_to_base64(crypto_makeattr(n));

@@ -850,7 +850,7 @@
             fetchDBNodes = true;
             id = cv.nodeID;
         }
-        else if (String(id).length === 11) {
+        else if (String(id).length === 11 && !id.includes('/')) {
             if (M.u[id] && id !== u_handle) {
                 loadSubPage('fm/chat/contacts/' + id);
             }

@@ -269,6 +269,53 @@
         return h;
     };
 
+    // deferred page handlers
+    const pipe = freeze({
+        sink: freeze({
+            account() {
+                accountUI();
+            },
+            dashboard() {
+                dashboardUI();
+            },
+            devices() {
+                if (mega.backupCenter) {
+                    return mega.backupCenter.openSection();
+                }
+                M.openFolder('fm');
+            },
+            recents() {
+                openRecents();
+            },
+            refer() {
+                affiliateUI();
+            },
+            transfers() {
+                console.assert(M.v && M.v.length === 0, 'view list must be empty');
+            }
+        }),
+
+        thrown(ex) {
+            self.reportError(ex);
+            return M.openFolder('fm');
+        },
+
+        has(id) {
+            if (this.sink[id]) {
+                return this.sink[id];
+            }
+            const p = Object.keys(this.sink);
+
+            for (let i = p.length; i--;) {
+
+                if (id.startsWith(p[i])) {
+
+                    return this.sink[p[i]];
+                }
+            }
+        }
+    });
+
     /**
      * Invoke M.openFolder() completion.
      *
@@ -589,7 +636,7 @@
      * @returns {Promise} fulfilled on completion
      */
     MegaData.prototype.openFolder = async function(id, force) {
-        let isFirstOpen, fetchDBNodes, fetchDBShares;
+        let isFirstOpen, fetchDBNodes, fetchDBShares, sink;
 
         document.documentElement.classList.remove('wait-cursor');
 
@@ -703,6 +750,7 @@
         }
         else if (id && id.substr(0, 15) === 'user-management') {
 
+            // @todo move elsewhere, likely within one of those business files.
             M.onFileManagerReady(() => {
 
                 M.onSectionUIOpen('user-management');
@@ -768,23 +816,6 @@
         else if (id === 'file-requests') {
             id = 'file-requests';
         }
-        else if (id && id.substr(0, 7) === 'account') {
-            M.onFileManagerReady(accountUI);
-        }
-        else if (!is_mobile && id && id.substr(0, 7) === 'devices') {
-            M.onFileManagerReady(() => {
-                mega.backupCenter.openSection();
-            });
-        }
-        else if (id && id.substr(0, 9) === 'dashboard') {
-            M.onFileManagerReady(() => dashboardUI());
-        }
-        else if (id && id.substr(0, 7) === 'recents') {
-            M.onFileManagerReady(openRecents);
-        }
-        else if (id && id.substr(0, 5) === 'refer') {
-            M.onFileManagerReady(affiliateUI);
-        }
         else if (id && id.substr(0, 7) === 'search/') {
             this.search = true;
         }
@@ -831,12 +862,17 @@
         else if (id && id.startsWith('albums')) {
             this.albums = true;
         }
-        else if (id !== 'transfers') {
+        else {
             if (id && id.substr(0, 9) === 'versions/') {
                 id = id.substr(9);
             }
             if (!id) {
                 id = this.RootID;
+            }
+            else if ((sink = pipe.has(id))) {
+                if (d) {
+                    console.info(`Using deferred sink for ${id}...`);
+                }
             }
             else if (!this.d[id] || this.d[id].t && !this.c[id]) {
                 fetchDBNodes = !id || id.length !== 8 ? -1 : !!window.fmdb;
@@ -858,6 +894,11 @@
                 if (M.currentdirid !== id) {
                     return;
                 }
+
+                if (sink) {
+                    tryCatch(sink, pipe.thrown)(id);
+                }
+
                 if ($.autoSelectNode) {
                     $.selected = [$.autoSelectNode];
                     delete $.autoSelectNode;
@@ -905,7 +946,7 @@
 
             fetchDBShares = true;
         }
-        else if (!this.d[id] && !dynPages[id] && id !== 'transfers' && (pfid || fetchDBNodes)) {
+        else if (!this.d[id] && !dynPages[id] && !sink && (pfid || fetchDBNodes)) {
 
             id = M.RootID;
         }

@@ -297,7 +297,13 @@ export default class Invite extends MegaRenderMixin {
                                         l.invite_limit_banner_organiser,
                                         '[A]',
                                         Link,
-                                        { to: '/pro', target: '_blank', className: 'invite-limit-link' }
+                                        {
+                                            className: 'invite-limit-link',
+                                            onClick() {
+                                                window.open(`${getBaseUrl()}/pro`, '_blank', 'noopener,noreferrer');
+                                                eventlog(500260);
+                                            }
+                                        }
                                     ) :
                                     l.invite_limit_banner_host
                             }

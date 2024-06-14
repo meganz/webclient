@@ -948,7 +948,12 @@ export class ContactPickerWidget extends MegaRenderMixin {
         return <div className="picker-user-limit-banner">
             {
                 activeCall.organiser === u_handle ?
-                    reactStringWrap(l.invite_limit_banner_organiser, '[A]', Link, { to: '/pro', target: '_blank' }) :
+                    reactStringWrap(l.invite_limit_banner_organiser, '[A]', Link, {
+                        onClick() {
+                            window.open(`${getBaseUrl()}/pro`, '_blank', 'noopener,noreferrer');
+                            eventlog(500263);
+                        }
+                    }) :
                     l.invite_limit_banner_host
             }
         </div>;

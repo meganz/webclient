@@ -775,6 +775,7 @@ export class Edit extends MegaRenderMixin {
                             onUpgradeClicked={() => {
                                 onClose();
                                 loadSubPage('pro');
+                                eventlog(500257);
                             }}
                         />
                     }

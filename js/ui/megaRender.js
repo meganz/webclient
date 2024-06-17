@@ -924,7 +924,13 @@
                         props.classNames.push('undecryptable');
                         props.name = aNode.t ? l[8686] : l[8687];
                         props.tooltip.push(M.getUndecryptedLabel(aNode));
+
+                        if (self.nullkeys && self.nullkeys[aHandle]) {
+                            props.classNames.push('undecryptable-zk');
+                        }
                     }
+
+                    props.inv411d = 1;
                 }
 
                 props.icon = `icon-${itemIcon}-24`;
@@ -1124,7 +1130,9 @@
                     aTemplate.classList.add(`highlight${aNode.vhl}`);
                 }
 
-                if (this.viewmode || String(aProperties.name).length > 78 || aProperties.playtime !== undefined) {
+                if (!aProperties.inv411d
+                    && (this.viewmode || String(aProperties.name).length > 78 || aProperties.playtime !== undefined)) {
+
                     if (aProperties.width) {
                         title.push(aProperties.width + 'x' + aProperties.height + ' @' + aProperties.fps + 'fps');
                     }

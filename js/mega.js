@@ -29,6 +29,13 @@ Object.defineProperties(window, {
     // Time to wait (in seconds) when applying backpressure
     BACKPRESSURE_WAIT_TIME: {
         value: 420 / 1000
+    },
+    allownullkeys: {
+        get() {
+            "use strict";
+            localStorage.allownullkeys = 1;
+            return M.reload();
+        }
     }
 });
 

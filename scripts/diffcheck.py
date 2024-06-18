@@ -586,7 +586,8 @@ def reduce_validator(file_line_mapping, **extra):
                           'any new functions must be moved elsewhere.'.format(file_path))
             # continue
 
-        lines = []
+        worker_upd = False if file_path.find('nodedec.js') >= 0 else None
+
         with open(file_path, 'r') as fd:
             # Check line lengths in file.
             line_number = 0
@@ -595,7 +596,10 @@ def reduce_validator(file_line_mapping, **extra):
                 if line_number not in line_set:
                     # Not a changed line.
                     continue
-                line_length = len(line)
+
+                # Analyse worker files.
+                if worker_upd is False and line.find('WORKER_VERSION =') > 0:
+                    worker_upd = True
 
                 # Analyse CSS files...
                 if file_extension == '.css':
@@ -606,6 +610,10 @@ def reduce_validator(file_line_mapping, **extra):
                 if file_extension == '.html':
                     fatal += inspecthtml(file_path, line_number, line, result)
                     continue
+
+        if worker_upd is False:
+            fatal += 1
+            result.append('Must update worker version in {}.'.format(file_path))
 
     # Add the number of errors and return in a nicely formatted way.
     error_count = len(result) - 1

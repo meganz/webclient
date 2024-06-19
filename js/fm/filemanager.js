@@ -1017,7 +1017,7 @@ FileManager.prototype.initFileManagerUI = function() {
     var self = this;
 
     if (!this.fmTabState || this.fmTabState['cloud-drive'].root !== M.RootID) {
-        this.fmTabState = {
+        this.fmTabState = freeze({
             'cloud-drive': { // My-files
                 root: M.RootID,
                 prev: null,
@@ -1062,7 +1062,15 @@ FileManager.prototype.initFileManagerUI = function() {
             'rubbish-bin':     {root: M.RubbishID, prev: null},
             'backup-center':   {root: 'devices', prev: null},
             'file-requests':   {root: 'file-requests',    prev: null}
-        };
+        });
+
+        this.fmTabPages = deepFreeze(
+            Object.entries(this.fmTabState)
+                .reduce((o, [k, v]) => {
+                    o[k] = {[k]: -2, [v.root]: -1, ...array.to.object(v.subpages || [])};
+                    return o;
+                }, Object.create(null))
+        );
     }
 
     var isMegaSyncTransfer = true;
@@ -4782,7 +4790,8 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     }
 
     // Revamp Implementation End
-    if (!is_mobile) {
+
+    if (self.FMResizablePane) {
         FMResizablePane.refresh();
     }
 

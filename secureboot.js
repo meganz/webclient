@@ -1946,15 +1946,6 @@ function siteLoadError(error, filename) {
 }
 
 if (is_mobile) {
-    // To avoid auto-zoom on iOS and firefox browsers
-    // These browsers already support zoom
-    mCreateElement('meta', {
-        name: 'viewport',
-        content: is_ios || ua.indexOf('firefox') > 0
-            ? "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
-            : "width=device-width, initial-scale=1"
-    }, 'head');
-
     mCreateElement('meta', {
         sizes: "72x72",
         name: "apple-touch-icon-precomposed",
@@ -2004,6 +1995,16 @@ if (is_ios) {
         };
     }
 }
+
+// Viewport meta.
+// Disable user-scalable to avoid auto-zoom on iOS and firefox browsers (?)
+// These browsers already support zoom
+mCreateElement('meta', {
+    name: 'viewport',
+    content: 'width=device-width, initial-scale=1, maximum-scale=1, ' +
+        (!is_mobile || is_ios || ua.indexOf('firefox') > 0 ? 'user-scalable=0, ' : '') +
+        'interactive-widget=resizes-content'
+}, 'head');
 
 // Determine whether to show the legacy mobile page for these links so that they redirect back to the app
 tmp = is_mobile && (

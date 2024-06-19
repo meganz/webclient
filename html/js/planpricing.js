@@ -224,6 +224,12 @@ lazy(pro, 'proplan2', () => {
 
         // set 20GB text for the storage value in the comparison table.
         $('#table-strg-v', $tableContainer).text(bytesToSize(20 * 1073741824, 0));
+
+        // Set 100 for the maximum number of participants in a free tier meeting.
+        $('#meet-up-to-participants', $tableContainer).text(l.pr_meet_up_to_participants.replace('%1', 100));
+
+        // Set 1 hour for the maximum duration of a free tier meeting.
+        $('#meet-up-to-duration', $tableContainer).text(mega.icu.format(l.pr_meet_up_to_duration, 1));
     };
 
     const moveToBuyStep = (planId) => {

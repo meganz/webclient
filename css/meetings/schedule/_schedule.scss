@@ -180,6 +180,21 @@
         }
     }
 
+    .unencrypted-warning-row {
+        margin: -8px 0 32px;
+        &.with-topic-err {
+            top: 16px;
+        }
+
+        .unencrypted-warning {
+            display: flex;
+            font: var(--text-body2);
+            i {
+                margin: auto 8px auto 0;
+            }
+        }
+    }
+
     @import '_select.scss';
     @import '_invite.scss';
 }

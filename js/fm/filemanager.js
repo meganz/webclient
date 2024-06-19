@@ -1017,7 +1017,7 @@ FileManager.prototype.initFileManagerUI = function() {
     var self = this;
 
     if (!this.fmTabState || this.fmTabState['cloud-drive'].root !== M.RootID) {
-        this.fmTabState = {
+        this.fmTabState = freeze({
             'cloud-drive': { // My-files
                 root: M.RootID,
                 prev: null,
@@ -1062,7 +1062,15 @@ FileManager.prototype.initFileManagerUI = function() {
             'rubbish-bin':     {root: M.RubbishID, prev: null},
             'backup-center':   {root: 'devices', prev: null},
             'file-requests':   {root: 'file-requests',    prev: null}
-        };
+        });
+
+        this.fmTabPages = deepFreeze(
+            Object.entries(this.fmTabState)
+                .reduce((o, [k, v]) => {
+                    o[k] = {[k]: -2, [v.root]: -1, ...array.to.object(v.subpages || [])};
+                    return o;
+                }, Object.create(null))
+        );
     }
 
     var isMegaSyncTransfer = true;
@@ -1690,18 +1698,26 @@ FileManager.prototype.initContextUI = function() {
                 }
             }
             else {
-                let subtitle = l.plink_remove_dlg_text_mixed;
-                if (files > 0 && folders === 0) {
-                    subtitle = mega.icu.format(l.plink_remove_dlg_text_file, files);
+                // Pluralise dialog text
+                const linkCount = folders + files;
+                const msg = mega.icu.format(l.remove_link_question, linkCount);
+                const cancelButtonText = l.dont_remove;
+                const confirmButtonText = l['83'];
+
+                // Use message about removal of 'items' for when both files and folders are selected
+                let subMsg = l.remove_link_confirmation_mix_items;
+
+                // Change message to folder/s or file/s depending on number of files and folders
+                if (folders === 0) {
+                    subMsg = mega.icu.format(l.remove_link_confirmation_files_only, files);
                 }
-                else if (files === 0 && folders > 0) {
-                    subtitle = mega.icu.format(l.plink_remove_dlg_text_folder, folders);
+                else if (files === 0) {
+                    subMsg = mega.icu.format(l.remove_link_confirmation_folders_only, folders);
                 }
-                const title = mega.icu.format(l.plink_remove_dlg_title, handles.length);
-                if (media) {
-                    subtitle += `<br><br>${l[17824]}`;
-                }
-                msgDialog('confirmation', '', title, subtitle, removeLink, 'nowarnpl');
+
+                // Show confirmation dialog
+                msgDialog(`*confirmation:!^${confirmButtonText}!${cancelButtonText}`, null, msg, subMsg, removeLink,
+                    'nowarnpl');
             }
         }
 
@@ -4774,7 +4790,8 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     }
 
     // Revamp Implementation End
-    if (!is_mobile) {
+
+    if (self.FMResizablePane) {
         FMResizablePane.refresh();
     }
 

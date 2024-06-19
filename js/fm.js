@@ -4162,26 +4162,21 @@ function FMResizablePane(element, opts) {
     return this;
 }
 
-/** @property FMResizablePane.refresh */
-lazy(FMResizablePane, 'refresh', () => {
-    'use strict';
-    // tells which sections are expandable beyond the usual 400px limit.
-    const expandable = tryCatch(() => {
-        const {'cloud-drive': {subpages} = false} = M.fmTabState;
-        return subpages && array.to.object([M.RootID, ...subpages]);
-    })() || false;
+Object.defineProperty(FMResizablePane, 'refresh', {
+    value() {
+        'use strict';
+        if (M.fmTabPages) {
+            // @todo revamp if we ever use other than '.fm-left-panel' for these
+            const cl = $('.fm-left-panel:visible').data('fmresizable');
 
-    return tryCatch(() => {
-        // @todo revamp if we ever use other than '.fm-left-panel' for these
-        const cl = $('.fm-left-panel:visible').data('fmresizable');
+            if (cl) {
 
-        if (cl) {
+                cl.setOption('maxWidth', M.fmTabPages['cloud-drive'][M.currentrootid] ? null : 400);
+            }
 
-            cl.setOption('maxWidth', expandable[M.currentrootid] ? null : 400);
+            return cl;
         }
-
-        return cl;
-    });
+    }
 });
 
 function initDownloadDesktopAppDialog() {

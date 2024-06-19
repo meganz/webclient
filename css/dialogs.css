@@ -11783,9 +11783,8 @@ body.de .mega-dialog.contact-picker-widget {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    width: 360px;
-    margin: 32px;
-    margin: 32px 9px 32px 32px;
+    margin: 32px 9px 75px 32px;
+    max-width: 600px;
 }
 .mega-dialog.upgrade-welcome-dialog .upgrade-welcome-content-left .welcome-dialog.content {
     display: flex;

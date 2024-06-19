@@ -490,6 +490,16 @@ export class Schedule extends MegaRenderMixin {
                         onChange={this.onTopicChange}
                     />
 
+                    <Row className={`unencrypted-warning-row ${topicInvalid ? 'with-topic-err' : ''}`}>
+                        <Column/>
+                        <Column>
+                            <div className="unencrypted-warning">
+                                <i className="sprite-fm-mono icon-info"/>
+                                <span>{l.schedule_encryption_note /* `MEGA can see your meeting name...` */}</span>
+                            </div>
+                        </Column>
+                    </Row>
+
                     {/* --- */}
 
                     <Row className="start-aligned">
@@ -553,6 +563,7 @@ export class Schedule extends MegaRenderMixin {
                             onUpgradeClicked={() => {
                                 this.props.onClose();
                                 loadSubPage('pro');
+                                eventlog(500258);
                             }}
                         />
                     }

@@ -2232,6 +2232,10 @@ accountUI.plan = {
                     $('.free-transfer', $cancelDialog).text(freeTransfer);
                     $('.plan-name', $cancelDialog).text(proPlanName);
                     $('.rewind-pro', $cancelDialog).text(rewindTxt);
+                    $('.rewind-free', $cancelDialog).text(mega.icu.format(l.days_chat_history_plural, 30));
+                    $('.meet-participants', $cancelDialog).text(l.pr_meet_up_to_participants.replace('%1', 100));
+                    $('.meet-duration', $cancelDialog).text(mega.icu.format(l.pr_meet_up_to_duration, 1));
+
 
                     $('span', $keepPlanBtn)
                         .text(l.cancel_pro_keep_current_plan.replace('%1', pro.getProPlanName(subscription)));

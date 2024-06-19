@@ -563,6 +563,7 @@ export class Schedule extends MegaRenderMixin {
                             onUpgradeClicked={() => {
                                 this.props.onClose();
                                 loadSubPage('pro');
+                                eventlog(500258);
                             }}
                         />
                     }

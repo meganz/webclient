@@ -983,7 +983,14 @@ export default class Call extends MegaRenderMixin {
                 </span>
                 {
                     this.state.showTimeoutUpgrade &&
-                    <Link className="call-limit-banner-action" to="/pro" target="_blank">{l.upgrade_now}</Link>
+                    <Link
+                        className="call-limit-banner-action"
+                        onClick={() => {
+                            window.open(`${getBaseUrl()}/pro`, '_blank', 'noopener,noreferrer');
+                            eventlog(500262);
+                        }}>
+                        {l.upgrade_now}
+                    </Link>
                 }
             </div>
         );

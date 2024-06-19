@@ -7954,8 +7954,10 @@ class ContactPickerWidget extends _mixins1__.w9 {
     return react0().createElement("div", {
       className: "picker-user-limit-banner"
     }, activeCall.organiser === u_handle ? (0,_ui_utils_jsx4__.lI)(l.invite_limit_banner_organiser, '[A]', _link_jsx7__.A, {
-      to: '/pro',
-      target: '_blank'
+      onClick() {
+        window.open(`${getBaseUrl()}/pro`, '_blank', 'noopener,noreferrer');
+        eventlog(500263);
+      }
     }) : l.invite_limit_banner_host);
   }
   componentDidMount() {
@@ -16707,6 +16709,7 @@ class Edit extends mixins.w9 {
       onUpgradeClicked: () => {
         onClose();
         loadSubPage('pro');
+        eventlog(500257);
       }
     })), REaCt().createElement("footer", null, REaCt().createElement("div", {
       className: "footer-container"
@@ -17177,6 +17180,7 @@ class Schedule extends mixins.w9 {
       onUpgradeClicked: () => {
         this.props.onClose();
         loadSubPage('pro');
+        eventlog(500258);
       }
     }), REaCt().createElement(Checkbox, {
       name: "recurring",
@@ -19330,6 +19334,7 @@ class FreeCallEnded extends mixins.w9 {
       className: "mega-button positive large",
       onClick: () => {
         loadSubPage('pro');
+        eventlog(500261);
         onClose();
       }
     }, REaCt().createElement("span", null, l.upgrade_now)))));
@@ -22603,9 +22608,11 @@ class Invite extends mixins.w9 {
     }), call.sfuClient.callLimits && call.sfuClient.callLimits.usr && callPartsLength >= call.sfuClient.callLimits.usr && REaCt().createElement("div", {
       className: `${NAMESPACE}-user-limit-banner`
     }, call.organiser === u_handle ? (0,utils.lI)(l.invite_limit_banner_organiser, '[A]', ui_link.A, {
-      to: '/pro',
-      target: '_blank',
-      className: 'invite-limit-link'
+      className: 'invite-limit-link',
+      onClick() {
+        window.open(`${getBaseUrl()}/pro`, '_blank', 'noopener,noreferrer');
+        eventlog(500260);
+      }
     }) : l.invite_limit_banner_host)), REaCt().createElement("div", {
       className: "fm-dialog-body"
     }, REaCt().createElement("div", {
@@ -23392,8 +23399,10 @@ class Call extends mixins.w9 {
       }
     }, l[2005]), this.state.showTimeoutUpgrade && REaCt().createElement(ui_link.A, {
       className: "call-limit-banner-action",
-      to: "/pro",
-      target: "_blank"
+      onClick: () => {
+        window.open(`${getBaseUrl()}/pro`, '_blank', 'noopener,noreferrer');
+        eventlog(500262);
+      }
     }, l.upgrade_now));
   }
   get timeoutString() {
@@ -25973,8 +25982,10 @@ class Admit extends mixins.w9 {
     }) => REaCt().createElement("div", {
       className: `${NAMESPACE}-user-limit-banner`
     }, call.organiser === u_handle ? (0,utils.lI)(l.admit_limit_banner_organiser, '[A]', ui_link.A, {
-      to: '/pro',
-      target: '_blank'
+      onClick() {
+        window.open(`${getBaseUrl()}/pro`, '_blank', 'noopener,noreferrer');
+        eventlog(500259);
+      }
     }) : l.admit_limit_banner_host);
     this.renderPeersList = () => {
       const {

@@ -56,6 +56,7 @@ export class FreeCallEnded extends MegaRenderMixin {
                         className="mega-button positive large"
                         onClick={() => {
                             loadSubPage('pro');
+                            eventlog(500261);
                             onClose();
                         }}>
                         <span>{l.upgrade_now}</span>

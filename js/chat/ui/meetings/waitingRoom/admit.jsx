@@ -43,7 +43,12 @@ export default class Admit extends MegaRenderMixin {
         <div className={`${NAMESPACE}-user-limit-banner`}>
             {
                 call.organiser === u_handle ?
-                    reactStringWrap(l.admit_limit_banner_organiser, '[A]', Link, { to: '/pro', target: '_blank' }) :
+                    reactStringWrap(l.admit_limit_banner_organiser, '[A]', Link, {
+                        onClick() {
+                            window.open(`${getBaseUrl()}/pro`, '_blank', 'noopener,noreferrer');
+                            eventlog(500259);
+                        }
+                    }) :
                     l.admit_limit_banner_host
             }
         </div>;

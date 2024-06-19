@@ -2325,6 +2325,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     width: 256px;
     z-index: 20;
     max-width: calc(100% - 600px);
+    padding-right: 10px;
 }
 .rtl .fm-left-panel {
     direction: rtl;
@@ -9082,12 +9083,27 @@ div.camera-bottom-txt {
 .left-pane-drag-handle {
     cursor: ew-resize;
     position: absolute;
-    width: 4px;
+    width: 10px;
     z-index: 999;
     box-sizing: border-box;
     right: 0;
     left: auto !important;
     height: 100%;
+}
+.left-pane-drag-handle::after {
+    border-left: 2px solid var(--stroke-mid-grey);
+    border-right: 2px solid var(--stroke-mid-grey);
+    display: block;
+    content: '';
+    width: 2px;
+    height: 16px;
+    position: relative;
+    top: 50%;
+    left: 2px;
+    transform: translateY(-50%);
+}
+.rtl .left-pane-drag-handle::after {
+    right: 2px;
 }
 /**
  * Random CSS. TODO move css to correct place

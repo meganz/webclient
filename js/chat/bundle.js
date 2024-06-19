@@ -17103,6 +17103,12 @@ class Schedule extends mixins.w9 {
       }),
       onChange: this.onTopicChange
     }), REaCt().createElement(Row, {
+      className: `unencrypted-warning-row ${topicInvalid ? 'with-topic-err' : ''}`
+    }, REaCt().createElement(Column, null), REaCt().createElement(Column, null, REaCt().createElement("div", {
+      className: "unencrypted-warning"
+    }, REaCt().createElement("i", {
+      className: "sprite-fm-mono icon-info"
+    }), REaCt().createElement("span", null, l.schedule_encryption_note)))), REaCt().createElement(Row, {
       className: "start-aligned"
     }, REaCt().createElement(Column, null, REaCt().createElement("i", {
       className: "sprite-fm-mono icon-recents-filled"

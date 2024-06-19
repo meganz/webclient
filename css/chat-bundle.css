@@ -3886,6 +3886,19 @@ body.theme-dark #schedule-dialog .recurring-edit-banner a {
 #schedule-dialog .schedule-upgrade-notice button {
   margin-top: 16px;
 }
+#schedule-dialog .unencrypted-warning-row {
+  margin: -8px 0 32px;
+}
+#schedule-dialog .unencrypted-warning-row.with-topic-err {
+  top: 16px;
+}
+#schedule-dialog .unencrypted-warning-row .unencrypted-warning {
+  display: flex;
+  font: var(--text-body2);
+}
+#schedule-dialog .unencrypted-warning-row .unencrypted-warning i {
+  margin: auto 8px auto 0;
+}
 #schedule-dialog .meetings-select {
   /* [...] */
 }

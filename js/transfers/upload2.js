@@ -1099,7 +1099,7 @@ var ulmanager = {
         var n;
         var uq = File.ul;
 
-        const skipIdentical = fmconfig.ul_skipIdentical || File.file.chatid;
+        const skipIdentical = (fmconfig.ul_skipIdentical | 0) || File.file.chatid;
         if (identical && skipIdentical) {
             // If attaching to chat apply apps behaviour and use the existing node.
             n = identical;

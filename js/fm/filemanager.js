@@ -320,6 +320,7 @@ FileManager.prototype.initFileManagerUI = function() {
             || $.dialog === 'fingerprint-dialog'
             || $.dialog === 'fingerprint-admin-dlg'
             || $.dialog === 'meetings-schedule-dialog'
+            || $.dialog === 'upgrade-to-pro-dialog'
             || String($.dialog).startsWith('verify-email')
             || String($.dialog).startsWith('s4-managed')
             || localStorage.awaitingConfirmationAccount) {

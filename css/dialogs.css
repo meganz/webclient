@@ -11842,3 +11842,104 @@ body.de .mega-dialog.contact-picker-widget {
 }
 
 /* Welcome dialog end */
+
+/* Upgrade to pro dialog start */
+.mega-dialog.upgrade-to-pro-dialog {
+    width: 600px;
+}
+.mega-dialog.upgrade-to-pro-dialog .content {
+    width: 495px;
+    margin: 0 auto;
+}
+.mega-dialog.upgrade-to-pro-dialog .content .dialog-title-and-description {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 16px;
+}
+.mega-dialog.upgrade-to-pro-dialog .content .image-container i.image {
+    width: 168px;
+    height: 168px;
+    background-size: 168px;
+}
+.mega-dialog.upgrade-to-pro-dialog .content .dialog-title-and-description > *:not(:last-child) {
+    margin-bottom: 8px;
+}
+.mega-dialog.upgrade-to-pro-dialog .content .dialog-title-and-description .upgrade-to-pro-dialog-title {
+    font: var(--text-h2-bold);
+    color: var(--text-color-high);
+    line-height: 24px;
+    padding-top: 40px;
+}
+.mega-dialog.upgrade-to-pro-dialog .content .dialog-title-and-description .upgrade-to-pro-dialog-description {
+    font: var(--text-h3);
+    padding: 0 16px;
+    text-align: center;
+}
+.mega-dialog.upgrade-to-pro-dialog .content .tabs {
+    display: flex;
+    flex-direction: row;
+    align-self: center;
+    padding: 48px 0 24px;
+    font: var(--text-body2);
+}
+.mega-dialog.upgrade-to-pro-dialog .content .tabs > *:not(:last-child) {
+    margin-inline-end: 16px;
+    -webkit-margin-end: 16px;
+}
+.mega-dialog.upgrade-to-pro-dialog .content .tabs .tab {
+    cursor: pointer;
+}
+.mega-dialog.upgrade-to-pro-dialog .content .tabs .tab.active {
+    color: var(--text-color-high);
+    border-bottom: 2px solid var(--secondary-red);
+    font: var(--text-body2-bold);
+}
+.mega-dialog.upgrade-to-pro-dialog .content .info-container {
+    display: flex;
+    flex-direction: row;
+    padding-bottom: 10px;
+}
+.mega-dialog.upgrade-to-pro-dialog .content .info-container > *:not(:last-child) {
+    margin-inline-end: 32px;
+    -webkit-margin-end: 32px;
+}
+.mega-dialog.upgrade-to-pro-dialog .content .info-container .title-and-blurb {
+    display: flex;
+    flex-direction: column;
+    font: var(--text-h3);
+}
+.mega-dialog.upgrade-to-pro-dialog .content .info-container .title-and-blurb > *:not(:last-child) {
+    margin-bottom: 8px;
+}
+.mega-dialog.upgrade-to-pro-dialog .content .info-container .title-and-blurb .title {
+    font: var(--text-h3-bold);
+    color: var(--text-color-high);
+}
+.mega-dialog.upgrade-to-pro-dialog .content .price-disclaimer {
+    padding: 2px 0 24px;
+    font: var(--text-body2-bold);
+    opacity: 0.7;
+    text-align: center;
+}
+.mega-dialog.upgrade-to-pro-dialog footer {
+    background-color: var(--surface-grey-1);
+    display: flex;
+    flex-direction: row;
+    padding: 13px 26px;
+}
+.mega-dialog.upgrade-to-pro-dialog footer > *:not(:last-child) {
+    margin-inline-end: 12px;
+    -webkit-margin-end: 12px;
+}
+.mega-dialog.upgrade-to-pro-dialog footer .mega-button {
+    padding: 6px 12px;
+}
+.mega-dialog.upgrade-to-pro-dialog footer button.upgrade {
+    margin: 0;
+}
+.mega-dialog.upgrade-to-pro-dialog .content .image-container i.image.animation,
+.mega-dialog.upgrade-to-pro-dialog .content .info-container .title-and-blurb > *.animation {
+    animation: top-fade-in 0.5s;
+}
+/* Upgrade to pro dialog end */

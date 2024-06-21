@@ -1630,12 +1630,13 @@ function completeProLogin(result) {
                 });
             }
         }
+        else if (page.startsWith('propay_')) {
+            closeDialog();
+            pro.propay.init();
+        }
         else {
-            // If no value was set on the discount promo page, find the plan they clicked on
-            // before the login/register prompt popped up. Otherwise use the discount plan number.
-            const continuePlanNum = sessionStorage.getItem('discountPromoContinuePlanNum');
-            const proNum = (continuePlanNum === null ? pro.proplan2.selectedPlan ||
-                $('.pricing-page.plan.selected').data('payment') : continuePlanNum) | 0;
+            // Find the plan they clicked on in /pro before the login/register prompt popped up
+            const proNum = (pro.proplan2.selectedPlan || $('.pricing-page.plan.selected').data('payment')) | 0;
 
             loadingDialog.show();
 
@@ -1722,11 +1723,13 @@ function showRegisterDialog(aPromise) {
                     security.register.cacheRegistrationData(registerData);
                 }
 
-                // If no value was set on the discount promo page, find the plan they clicked on
-                // before the login/register prompt popped up. Otherwise use the discount plan number.
-                const continuePlanNum = sessionStorage.getItem('discountPromoContinuePlanNum');
-                var proNum = continuePlanNum === null ? pro.proplan2.selectedPlan ||
-                    $('.pricing-page.plan.selected').data('payment') : continuePlanNum;
+                if (page.startsWith('propay_')) {
+                    pro.propay.init();
+                    return;
+                }
+
+                // Find the plan they clicked on in /pro before the login/register prompt popped up
+                var proNum = pro.proplan2.selectedPlan || $('.pricing-page.plan.selected').data('payment');
 
                 // Load the Pro payment page (step 2) now that the account has been created
                 loadSubPage('propay_' + proNum);

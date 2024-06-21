@@ -1053,7 +1053,7 @@ scparser.$add('t', function(a, scnodes) {
     }
 
     // notification logic
-    if (fminitialized && !pfid && a.ou && a.ou !== u_handle
+    if (fminitialized && !pfid && a.ou !== u_handle
         && rootNode && rootNode.p && !rootNode.su) {
 
         const targetid = rootNode.p;
@@ -1069,7 +1069,7 @@ scparser.$add('t', function(a, scnodes) {
         }
 
         notify.notifyFromActionPacket({
-            a: 'put',
+            a: a.ou ? 'put' : 'puu',
             n: targetid,
             u: a.ou,
             f: pnodes
@@ -1470,7 +1470,7 @@ scparser.$add('d', function(a) {
     if ($.selected && ($.selected[0] === a.n)) {
         $.selected = [];
     }
-    if (!pfid) {
+    if (!pfid && a.ou) {
         scparser.$notify(a);
     }
     if (!is_mobile) {

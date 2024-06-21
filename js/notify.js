@@ -107,17 +107,31 @@ var notify = {
                             // incoming pending contact
                             userHandle = notification.p;
                         }
+                        else if (!userHandle && type === 'puu') {
+                            // public upload user
+                            // - TBD.
+                        }
 
                         // Add notifications to list
-                        notify.notifications.push({
+                        const newNotification = {
                             data: notification, // The full notification object
                             id: id,
                             seen: seen,
                             timeDelta: timeDelta,
                             timestamp: timestamp,
                             type: type,
-                            userHandle: userHandle
-                        });
+                            userHandle,
+                        };
+
+                        if (type === 'puu') {
+                            newNotification.allDataItems = [notification.h];
+                            if (!notify.combinePuuNotifications(newNotification)) {
+                                notify.notifications.push(newNotification);
+                            }
+                        }
+                        else {
+                            notify.notifications.push(newNotification);
+                        }
                     }
                 }
 
@@ -170,6 +184,10 @@ var notify = {
         if (newNotification.type === 'put' && String(newNotification.userHandle).length === 11) {
 
             this.getUserEmailByTheirHandle(newNotification.userHandle);
+        }
+
+        if (newNotification.type === 'puu') {
+            newNotification.allDataItems = actionPacket.f.map((e) => e.h);
         }
 
         // Combines the current new notification with the previous one if it meets certain criteria
@@ -259,10 +277,63 @@ var notify = {
                 if (action === 2 && !mega.notif.has('contacts_fcracpt')) {
                     return true;
                 }
+                break;
+
+            case 'puu':
+                if (mega.notif.has('cloud_upload')) {
+                    return true;
+                }
+                break;
+
             default:
                 break;
         }
         return false;
+    },
+
+    combinePuuNotifications(currentNotification) {
+        'use strict';
+
+        const previousNotification = notify.notifications[notify.notifications.length - 1];
+        if (!(currentNotification && previousNotification)) {
+            return false;
+        }
+
+        // This function is currently only needed for 'puu' notifications
+        if (currentNotification.type !== 'puu' || previousNotification.type !== 'puu') {
+            return false;
+        }
+
+        // The userHandle will be the name of the uploader in puu requests
+        const previousNotificationHandle = previousNotification.userHandle;
+        const currentNotificationHandle = currentNotification.userHandle;
+        if (currentNotificationHandle !== previousNotificationHandle) {
+            return false;
+        }
+
+        // Make sure that neither notification has been deleted
+        const previousNotificationNode = M.d[previousNotification.data.h];
+        const currentNotificationNode = M.d[currentNotification.data.h];
+        if (!previousNotificationNode || !currentNotificationNode) {
+            return false;
+        }
+
+        // Make sure that both notifications are going into the same folder
+        if (previousNotificationNode.p !== currentNotificationNode.p) {
+            return false;
+        }
+
+        if (previousNotification.seen !== currentNotification.seen) {
+            return false;
+        }
+
+        // If there is a gap of over 5 minutes between notifications, do not combine them
+        if (currentNotification.timestamp - previousNotification.timestamp > 300) {
+            return false;
+        }
+
+        previousNotification.allDataItems.push(currentNotification.data.h);
+        return true;
     },
 
     /**
@@ -298,8 +369,9 @@ var notify = {
             return false;
         }
 
-        // we only for now combine "put" and "d" (del)
-        if (currentNotification.type !== 'put' && currentNotification.type !== 'd') {
+        // We only for now combine "put", "d" (del), and "puu" (file request upload)
+        if (currentNotification.type !== 'put' && currentNotification.type !== 'd'
+                && currentNotification.type !== 'puu') {
             notify.notifications.unshift(currentNotification);
             return false;
         }
@@ -341,6 +413,24 @@ var notify = {
             // Replace the current notification's nodes with the combined nodes
             currentNotification.data.f = combinedNotificationNodes;
 
+        }
+        else if (currentNotification.type === 'puu') {
+            if (previousNotificationParentHandle !== currentNotificationParentHandle){
+                notify.notifications.unshift(currentNotification);
+                return false;
+            }
+            if (previousNotification.data.pou !== currentNotification.data.pou) {
+                notify.notifications.unshift(currentNotification);
+                return false;
+            }
+            if (previousNotification.seen !== currentNotification.seen) {
+                notify.notifications.unshift(currentNotification);
+                return false;
+            }
+            const combinedNotificationNodes = previousNotification.allDataItems
+                .concat(currentNotificationNodes.map((e) => e.h));
+            currentNotification.data.f = combinedNotificationNodes;
+            currentNotification.allDataItems = combinedNotificationNodes;
         }
         else { // it's 'd'
 
@@ -728,17 +818,14 @@ var notify = {
             // (because they clicked on a notification within the popup)
             notify.closePopup();
 
-
-
             // Open the folder
             M.openFolder(folderId)
-                .always(() => {
+                .then(() => {
+                    const {allDataItems, data: {f}} = notify.notifications.find(elem => elem.id === notificationID);
 
-                    const notificationData = notify.notifications.find(elem => elem.id === notificationID);
-                    $.selected = notificationData.data.f && notificationData.data.f.map((elem) => elem.h);
-
-                    reselect(true);
-                });
+                    M.addSelectedNodes(allDataItems || f && f.map((n) => n.h) || [], true);
+                })
+                .catch(dump);
         });
     },
 
@@ -895,9 +982,11 @@ var notify = {
         var date = time2last(notification.timestamp);
         var data = notification.data;
         var userHandle = notification.userHandle;
-        const customIconNotifications = ['psts', 'pses', 'ph', 'dynamic'];   // Payment & Takedown notification types
         var userEmail = l[7381];    // Unknown
         var avatar = '';
+
+        // Payment & Takedown notification types, file-request upload type
+        const customIconNotifications = ['psts', 'pses', 'ph', 'puu', 'dynamic'];
 
         // If a contact action packet
         if (typeof userHandle !== 'string') {
@@ -993,6 +1082,8 @@ var notify = {
                 }
                 return notify.renderScheduled($notificationHtml, notification);
             }
+            case 'puu':
+                return notify.renderFileRequestUpload($notificationHtml, notification);
             default:
                 return false;   // If it's a notification type we do not recognise yet
         }
@@ -1733,6 +1824,51 @@ var notify = {
             $new.text(now);
         }
         $notificationHtml.addClass('nt-schedule-meet').attr('data-chatid', chatRoom.chatId);
+        return $notificationHtml;
+    },
+
+    renderFileRequestUpload($notificationHtml, notification) {
+        'use strict';
+
+        const fileHandle = notification.data.h || notification.allDataItems[0].h;
+        const fileNode = M.d[fileHandle] || {};
+        const folderHandle = fileNode.p || notification.data.n;
+
+        // File has likely been deleted
+        if (!folderHandle) {
+            return false;
+        }
+        const folderNode = M.d[folderHandle];
+        const folderName = folderNode.name ? notify.shortenNodeName(folderNode.name) : false;
+
+        let title;
+        let header;
+
+        const numberOfFiles = notification.allDataItems.length;
+        const uploader = notification.userHandle;
+
+        if (uploader) {
+            title = mega.icu.format(l.file_request_notification, numberOfFiles)
+                .replace('%1', uploader).replace('%2', folderName);
+            header = uploader;
+        }
+        else {
+            title = mega.icu.format(l.file_request_notification_nameless, numberOfFiles).replace('%1', folderName);
+            header = l.file_request_notification_header;
+        }
+
+        const $iconHtml = this.$popup.find('.file-request-notification.template').clone().removeClass('hidden');
+
+        $('.notification-info', $notificationHtml).text(title);
+        $notificationHtml.attr('data-folder-id', folderNode.h);
+        $notificationHtml.addClass('nt-new-files nt-file-request clickable');
+        $('.notification-username', $notificationHtml).text(header);
+        $('.notification-avatar', $notificationHtml)
+            .removeClass('hidden')
+            .safePrepend($iconHtml.prop('outerHTML'));
+        $('.notification-icon', $notificationHtml).addClass('hidden');
+        $('.notification-avatar-icon', $notificationHtml).addClass('hidden');
+
         return $notificationHtml;
     },
 

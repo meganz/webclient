@@ -726,6 +726,11 @@ label span.black {
 .nt-schedule-meet .notification-avatar-icon i.camera {
     display: block;
 }
+.nt-file-request .notification-avatar .file-request-notification {
+    width: 40px;
+    height: 40px;
+    margin: 2px -4px;
+}
 .nt-schedule-meet .notification-avatar-icon i,
 .nt-new-files .notification-avatar-icon i {
     --mask-color: var(--secondary-green);

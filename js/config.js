@@ -942,7 +942,14 @@
                                 let len = grp.length;
 
                                 while (len--) {
-                                    this.set(grp[len]);
+
+                                    // Cloud_UPLOAD/file-request is inverted, so this will 'set' it
+                                    if (grp[len] === 'CLOUD_UPLOAD') {
+                                        this.unset(grp[len]);
+                                    }
+                                    else {
+                                        this.set(grp[len]);
+                                    }
                                 }
                             });
                     }
@@ -972,6 +979,6 @@
 
 })({
     chat: ['ENABLED'],
-    cloud: ['ENABLED', 'NEWSHARE', 'DELSHARE', 'NEWFILES'],
+    cloud: ['ENABLED', 'NEWSHARE', 'DELSHARE', 'NEWFILES', 'UPLOAD'],
     contacts: ['ENABLED', 'FCRIN', 'FCRACPT', 'FCRDEL']
 });

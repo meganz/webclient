@@ -656,6 +656,10 @@ accountUI.inputs = {
             var self = this;
             var $switch = $(identifier, $container);
 
+            if ($switch.attr('id') === 'file-request'){
+                currentValue = !currentValue;
+            }
+
             if ((currentValue && !$switch.hasClass('toggle-on'))
                 || (!currentValue && $switch.hasClass('toggle-on'))) {
                 this.toggle(identifier, $container);
@@ -667,7 +671,7 @@ accountUI.inputs = {
 
             $switch.rebind('click.switch', function() {
 
-                var val = $switch.hasClass('toggle-on');
+                const val = $switch.hasClass('toggle-on');
 
                 if (typeof onClickCb === 'function') {
                     onClickCb(val).done(function() {
@@ -685,7 +689,7 @@ accountUI.inputs = {
             'use strict';
 
             var $switch = $(identifier, $container);
-            var newVal;
+            let newVal;
 
             if ($switch.hasClass('toggle-on')) {
                 $switch.removeClass('toggle-on');
@@ -696,6 +700,7 @@ accountUI.inputs = {
                 newVal = 1;
             }
 
+            newVal = $switch.attr('id') === 'file-request' ? 1 - newVal : newVal;
             $switch.trigger('update.accessibility');
 
             if (typeof onChangeCb === 'function') {
@@ -2932,7 +2937,10 @@ accountUI.notifications = {
                     var $this = $(this);
                     var $section = $this.closest('.switch-container');
                     var sectionName = accountUI.notifications.getSectionName($section);
-                    var notifChange = val ? mega.notif.set : mega.notif.unset;
+
+                    const invert = $this.attr('name') === 'upload' ? !val : val;
+                    const notifChange = invert ? mega.notif.set : mega.notif.unset;
+
                     notifChange($this.attr('name'), sectionName);
 
                     (val ? $.fn.addClass : $.fn.removeClass).apply($this, ['toggle-on']);

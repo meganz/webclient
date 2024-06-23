@@ -2520,7 +2520,7 @@ Chat.prototype.openChatAndAttachNodes = async function(targets, nodes, silent) {
         .then((room) => {
             return room.attachNodes(nodes)
                 .then((res) => {
-                    if (res !== EBLOCKED) {
+                    if (res !== EBLOCKED && res !== ENOENT) {
                         return room;
                     }
                 });

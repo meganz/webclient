@@ -60,7 +60,11 @@
 
         &.guest {
             overflow: hidden;
-            height: calc(100% - 320px);
+            height: calc(100% - 416px);
+
+            &.with-chat-participants {
+                height: calc(100% - 348px);
+            }
         }
 
         &.with-chat-participants {

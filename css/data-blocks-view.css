@@ -188,8 +188,10 @@
 .data-block-view .file-status-icon.icon-versions-previous {
     --mask-color: var(--icon-rest);
 }
+
+.undecryptable-zk .file-status-icon.icon-info,
 .data-block-view .file-status-icon.icon-takedown {
-    --mask-color: var(--secondary-red);
+    --mask-color: var(--secondary-red) !important;
 }
 .data-block-view .file-status-icon.icon-info {
     --mask-color: var(--secondary-orange);
@@ -340,11 +342,11 @@
 }
 .shared-blocks-view .data-block-view .item-type-icon-90,
 .out-shared-blocks-view .data-block-view .item-type-icon-90 {
-    margin: 48px auto; 
+    margin: 48px auto;
 }
 .shared-blocks-view .data-block-view .thumb .item-type-icon-90,
 .out-shared-blocks-view .data-block-view .thumb .item-type-icon-90 {
-    margin: 0; 
+    margin: 0;
 }
 .shared-blocks-view .data-block-view .data-block-bg,
 .out-shared-blocks-view .data-block-view .data-block-bg {

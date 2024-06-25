@@ -26,7 +26,7 @@ describe("Fakebroadcaster Unit Test", function() {
         done();
     });
 
-    it("3 tabs (master and 2 slaves) are properly set up", function(done) {
+    it("3 tabs (owner and two actors) are properly set up", function(done) {
         var tab1 = CreateNewFakeBroadcaster("tab1");
         var tab2 = CreateNewFakeBroadcaster("tab2");
         var tab3 = CreateNewFakeBroadcaster("tab3");
@@ -34,24 +34,24 @@ describe("Fakebroadcaster Unit Test", function() {
         connector.addTab(tab1);
         connector.addTab(tab2);
         connector.addTab(tab3);
-        connector.setMaster(tab1);
+        connector.takeOwnership(tab1);
 
-        expect(connector.master).to.equal(tab1.id);
+        expect(connector.owner).to.equal(tab1.id);
 
-        expect(tab1.crossTab.master).to.equal(tab1.id);
-        expect(JSON.stringify(tab1.crossTab.slaves)).to.eql(JSON.stringify([tab2.id, tab3.id]));
+        expect(tab1.crossTab.owner).to.equal(tab1.id);
+        expect(JSON.stringify(tab1.crossTab.actors)).to.eql(JSON.stringify([tab2.id, tab3.id]));
 
-        expect(tab2.crossTab.master).to.equal(undefined);
-        expect(JSON.stringify(tab2.crossTab.slaves)).to.eql(JSON.stringify([]));
+        expect(tab2.crossTab.owner).to.equal(undefined);
+        expect(JSON.stringify(tab2.crossTab.actors)).to.eql(JSON.stringify([]));
 
-        expect(tab3.crossTab.master).to.equal(undefined);
-        expect(JSON.stringify(tab3.crossTab.slaves)).to.eql(JSON.stringify([]));
+        expect(tab3.crossTab.owner).to.equal(undefined);
+        expect(JSON.stringify(tab3.crossTab.actors)).to.eql(JSON.stringify([]));
 
         done();
     });
 
 
-    it("3 tabs (master and a slave) can communicate (notify) with each other", function(done) {
+    it("3 tabs (owner and an actor) can communicate (notify) with each other", function(done) {
         var tab1 = CreateNewFakeBroadcaster("tab1");
         var tab2 = CreateNewFakeBroadcaster("tab2");
         var tab3 = CreateNewFakeBroadcaster("tab3");
@@ -59,9 +59,9 @@ describe("Fakebroadcaster Unit Test", function() {
         connector.addTab(tab1);
         connector.addTab(tab2);
         connector.addTab(tab3);
-        connector.setMaster(tab1);
+        connector.takeOwnership(tab1);
 
-        expect(connector.master).to.equal(tab1.id);
+        expect(connector.owner).to.equal(tab1.id);
 
         // tab2 -> tab1
         var eventHandlerCalled = false;
@@ -99,13 +99,13 @@ describe("Fakebroadcaster Unit Test", function() {
         done();
     });
 
-    it("2 tabs (master and a slave) can query each other", function(done) {
+    it("2 tabs (owner and an actor) can query each other", function(done) {
         var tab1 = CreateNewFakeBroadcaster("tab1");
         var tab2 = CreateNewFakeBroadcaster("tab2");
         var connector = new FakeBroadcastersConnector();
         connector.addTab(tab1);
         connector.addTab(tab2);
-        connector.setMaster(tab1);
+        connector.takeOwnership(tab1);
 
         // tab2 -> tab1
         tab1.addListener("watchdog:Q!hellothere", function(args) {
@@ -121,15 +121,15 @@ describe("Fakebroadcaster Unit Test", function() {
 
 
         // tab 1 -> tab2
-        tab2.addListener("watchdog:Q!hellothereFromMaster", function(args) {
+        tab2.addListener("watchdog:Q!hellothereFromOwner", function(args) {
             var token = args.data.reply;
-            replyToQuery(tab2.watchdog, token, "Q!hellothereFromMaster", "hi master!");
+            replyToQuery(tab2.watchdog, token, "Q!hellothereFromOwner", "hi owner!");
             assert(args.origin == "tab1", 'invalid origin.');
         });
 
 
-        var result2 = tab1.watchdog.query("hellothereFromMaster", {"hello": "world"});
-        ph.expectPromiseToBeResolved(result2, ["hi master!"], 'hello there query from master');
+        var result2 = tab1.watchdog.query("hellothereFromOwner", {"hello": "world"});
+        ph.expectPromiseToBeResolved(result2, ["hi owner!"], 'hello there query from owner');
 
         ph.testWaitForAllPromises(done);
     });

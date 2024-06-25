@@ -254,8 +254,8 @@ function init_login() {
     });
 
     $button.rebind('click.initlogin', function() {
-        delay('loginevlog', () => eventlog(99796));
         pagelogin();
+        eventlog(99796);
     });
 
     if (self.InitFileDrag) {

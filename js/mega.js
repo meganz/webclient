@@ -1674,7 +1674,7 @@ scparser.mcpc = scparser.mcc = function (a) {
     }
     else {
         console.error('unable to parse mcc packet');
-        const {master, slaves} = mBroadcaster.crossTab;
+        const {owner, actors} = mBroadcaster.crossTab;
         eventlog(
             99779,
             JSON.stringify([
@@ -1683,8 +1683,8 @@ scparser.mcpc = scparser.mcc = function (a) {
                 sessionStorage.updateRequiredBy | 0,
                 loadfm.chatmcf === null ? 'null' : typeof loadfm.chatmcf,
                 u_type | 0,
-                (!!master) | 0,
-                Object(slaves).length | 0
+                (!!owner) | 0,
+                Object(actors).length | 0
             ])
         );
     }
@@ -2587,7 +2587,7 @@ async function fetchfm(sn) {
     if (!localStorage.force) {
         payload.ca = 1;
     }
-    else if (mBroadcaster.crossTab.master) {
+    else if (mBroadcaster.crossTab.owner) {
         delete localStorage.force;
     }
 
@@ -2767,7 +2767,7 @@ function dbfetchfm(residual) {
                 loadReport('procNodes');
             }
 
-            if (!mBroadcaster.crossTab.master && window.fmdb) {
+            if (!mBroadcaster.crossTab.owner && window.fmdb) {
                 // on a secondary tab, prevent writing to DB once we have read its contents
                 fmdb.crashed = 666;
                 fmdb.pending = [[]];
@@ -3998,7 +3998,7 @@ function loadfm_done(mDBload) {
                 }
             });
 
-            if (mBroadcaster.crossTab.master && !mega.loadReport.sent) {
+            if (mBroadcaster.crossTab.owner && !mega.loadReport.sent) {
                 mega.loadReport.sent = true;
 
                 var r = mega.loadReport;
@@ -4028,7 +4028,7 @@ function loadfm_done(mDBload) {
                     decWorkerPool.ok && decWorkerPool.length || -666,
                     r.ttlb | 0, // time to last byte
                     r.ttfm | 0, // time to fm since ttlb
-                    u_type === 3 ? (mBroadcaster.crossTab.master ? 1 : 0) : -1, // master, or slave tab?
+                    u_type === 3 ? (mBroadcaster.crossTab.owner ? 1 : 0) : -1, // master, or slave tab?
                     r.pn1, r.pn2, r.pn3, r.pn4, r.pn5, // procNodes steps
                     Object.keys(M.tree || {}).length, // total tree nodes
                     r.invisibleTime | 0, // time spent as background tab

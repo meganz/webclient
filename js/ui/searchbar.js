@@ -1,6 +1,8 @@
-/* Functions which initialise and control the search bars at the top of every page
+/**
+ * @file Functions which initialise and control the search bars at the top of every page
+ * @property mega.ui.searchbar
  */
-(function(scope) {
+lazy(mega.ui, 'searchbar', () => {
     'use strict';
 
     let $topbar;
@@ -36,11 +38,11 @@
         /**
          * Saves current terms
          *
-         * @return {undefined}
+         * @return {Promise}
          */
-        save: async function() {
-            if (u_handle) {
-                await M.setPersistentData(`${u_handle}!rs`, tlvstore.encrypt([...this.terms]));
+        async save() {
+            if (u_type > 0) {
+                return M.setPersistentData(`${u_handle}!rs`, tlvstore.encrypt([...this.terms]));
             }
         },
 
@@ -48,9 +50,9 @@
          * Adds a search term to the list of search terms
          *
          * @param {string} term The search term
-         * @return {undefined}
+         * @return {Promise}
          */
-        addTerm: function(term) {
+        async addTerm(term) {
             // Delete the term if it exists
             this.terms.delete(term);
             // Append the term (to make recent terms appear first)
@@ -59,33 +61,32 @@
                 const [firstTerm] = this.terms;
                 this.terms.delete(firstTerm);
             }
-            this.save();
+            return this.save();
         },
 
         /**
          * Delete a search term from the list of search terms
          *
          * @param {string} term The search term
-         * @return {undefined}
+         * @return {Promise}
          */
-        deleteTerm: function(term) {
+        async deleteTerm(term) {
             this.terms.delete(term);
-            this.save();
             this.update(true);
+            return this.save();
         },
 
         /**
          * Clears the list of search terms
          *
          * @param {boolean} skipUpdate Is the view refreshed after clear
-         * @return {undefined}
+         * @return {Promise}
          */
-        clear: async function(skipUpdate = false) {
+        async clear(skipUpdate = false) {
             this.terms.clear();
-            await M.delPersistentData(`${u_handle}!rs`);
-            if (!skipUpdate) {
-                this.update(true);
-            }
+
+            return M.delPersistentData(`${u_handle}!rs`)
+                .finally(() => !skipUpdate && this.update(true));
         },
 
         /**
@@ -93,7 +94,7 @@
          *
          * @return {undefined}
          */
-        init: async function() {
+        async init() {
             return this.refresh();
         },
 
@@ -102,14 +103,21 @@
          *
          * @return {(undefined|Promise)} Returns a promise if logged in and things were fetched, otherwise undefined
          */
-        refresh: async function() {
-            if (this.terms.size === 0 && u_handle) {
-                return M.getPersistentData(`${u_handle}!rs`).then(recentlySearched => {
-                    this.terms = new Set(Object.values(tlvstore.decrypt(recentlySearched)));
-                }).catch(() => {
-                    // empty state already exists, no need to initialize
-                    this.save();
-                });
+        async refresh() {
+            if (this.terms.size === 0 && u_type > 0) {
+                return M.getPersistentData(`${u_handle}!rs`)
+                    .then((recentlySearched) => {
+
+                        this.terms = new Set(Object.values(tlvstore.decrypt(recentlySearched)));
+                    })
+                    .catch((ex) => {
+                        if (d && ex !== ENOENT) {
+                            console.error(ex);
+                        }
+
+                        // empty state already exists, no need to initialize
+                        return this.save();
+                    });
             }
         },
 
@@ -119,7 +127,7 @@
          * @param {boolean} hasDeletedOrCleared Check if updating after a delete or clear
          * @return {undefined}
          */
-        update: function(hasDeletedOrCleared = false) {
+        update(hasDeletedOrCleared = false) {
             removeVisibilityListeners();
             renderUpdatedDropdown(hasDeletedOrCleared);
             addVisibilityListeners();
@@ -151,8 +159,8 @@
          *
          * @return {undefined}
          */
-        init: function() {
-            this.refresh();
+        init() {
+            return this.refresh();
         },
 
         /**
@@ -163,7 +171,7 @@
          *
          * @return {undefined}
          */
-        addFile: function(handle, isEditable) {
+        addFile(handle, isEditable) {
 
             // If we are in a public folder, or if not logged in, do not add the file
             if (is_mobile || folderlink || !u_handle) {
@@ -189,26 +197,28 @@
                     this.files.delete(first_handle);
                 }
 
-                this.save();
+                return this.save();
             }
         },
 
         /**
          * Repopulates recently opened files array from persistent storage
          *
-         * @return {(undefined|Promise)} Returns a promise if logged in and things were fetched, otherwise undefined
+         * @return {Promise} Returns a promise if logged in and things were fetched.
          */
-        refresh: async function() {
-            if (!u_handle) {
-                return;
+        async refresh() {
+            if (u_type > 0) {
+                await M.getPersistentData(`${u_handle}!ro`)
+                    .then((recentlyOpened) => {
+                        this.files = new Map(JSON.parse(tlvstore.decrypt(recentlyOpened)).map((v) => [v.h, v]));
+                    })
+                    .catch(nop);
+
+                // If we are in a public folder, we skip the node fetching
+                if (!pfid) {
+                    return this.fetchNodes();
+                }
             }
-            await M.getPersistentData(`${u_handle}!ro`).then(async(recentlyOpened) => {
-                this.files = new Map(JSON.parse(tlvstore.decrypt(recentlyOpened))
-                    .map((v) => {
-                        return [v.h, v];
-                    }));
-            }).catch(nop);
-            return this.fetchNodes();
         },
 
         /**
@@ -216,9 +226,9 @@
          *
          * @return {undefined}
          */
-        clear: async function() {
+        async clear() {
             this.files = new Map();
-            await M.delPersistentData(`${u_handle}!ro`);
+            return M.delPersistentData(`${u_handle}!ro`);
         },
 
         /**
@@ -226,31 +236,21 @@
          *
          * @return {undefined}
          */
-        save: function() {
-            if (!u_handle) {
-                return;
+        async save() {
+            if (u_type > 0) {
+                const data = tlvstore.encrypt(JSON.stringify([...recentlyOpened.files.values()]));
+
+                return M.setPersistentData(`${u_handle}!ro`, data);
             }
-            M.setPersistentData(`${u_handle}!ro`,
-                                tlvstore.encrypt(
-                                    JSON.stringify(
-                                        [...recentlyOpened.files.values()]
-                                    )
-                                )
-            );
         },
         /**
          * Checks if any node is missing in memory, fetches them, deletes if not available anymore
          *
          * @return {(undefined|Promise)} Returns a Promise if not a public link & things fetched. Otherwise undefined.
          */
-        fetchNodes: async function() {
-
-            // If we are in a public folder, we skip the node fetching
-            if (folderlink) {
-                return;
-            }
-
+        async fetchNodes() {
             const toFetch = [...this.files.keys()].filter(h => !M.getNodeByHandle(h));
+
             return dbfetch.acquire(toFetch).always(()=>{
                 let anyDeleted = false;
                 for (const h of this.files.keys()) {
@@ -262,8 +262,9 @@
                         anyDeleted = true;
                     }
                 }
+
                 if (anyDeleted) {
-                    this.save();
+                    return this.save();
                 }
             });
         },
@@ -281,8 +282,7 @@
 
         refreshSearch(currentPage);
 
-        recentlySearched.init();
-        recentlyOpened.init();
+        Promise.all([recentlySearched.init(), recentlyOpened.init()]).catch(dump);
 
         showEmptyState = recentlySearched.terms.size !== 0;
 
@@ -300,7 +300,7 @@
                 loadSubPage(window.page.slice(0, window.page.indexOf('/search')));
             }
             else if (val.length >= 2 || !asciionly(val)) {
-                M.fmSearchNodes(val).then(function() {
+                M.fmSearchNodes(val).then(() => {
                     if (!M.search) {
                         mega.ui.mNodeFilter.resetFilterSelections();
                     }
@@ -368,7 +368,7 @@
         addDropdownEventListeners();
 
         // Mini search bar
-        $('.topbar-mini-search', $topbar).rebind('click.mini-searchbar', function() {
+        $('.topbar-mini-search', $topbar).rebind('click.mini-searchbar', () => {
             const $miniSearch = $('.mini-search', $topbar);
             $miniSearch.addClass('highlighted active');
             setTimeout(() => $('.mini-search input', $topbar).trigger('focus'), 350);
@@ -384,7 +384,7 @@
                 }
             });
 
-        $('.mini-search .topbar-mini-search-close', $topbar).rebind('click.close-mini-searchbar', function() {
+        $('.mini-search .topbar-mini-search-close', $topbar).rebind('click.close-mini-searchbar', () => {
             closeMiniSearch();
         });
 
@@ -484,6 +484,9 @@
      * @return {undefined}
      */
     function refreshSearch(page) {
+        if (!$topbar) {
+            return initSearch(page);
+        }
         page = page || window.page;
 
         showCorrectSearch(page);
@@ -562,17 +565,14 @@
         if (folderlink) {
             return;
         }
-
-        await recentlySearched.refresh();
-        await recentlyOpened.refresh();
-
+        await Promise.all([recentlySearched.refresh(), recentlyOpened.refresh()]);
 
         const hideRecents = mega.config.get('showRecents') !== 1;
         const noRecentlySearched = recentlySearched.terms.size === 0;
         const noRecentlyOpened = recentlyOpened.files.size === 0;
         const noRecentActivity = noRecentlySearched && noRecentlyOpened;
 
-        clearRecentMemoryIfRequired(hideRecents, noRecentActivity);
+        clearRecentMemoryIfRequired(hideRecents, noRecentActivity).catch(dump);
 
         // If we came from a delete/clear operation and there is no recent activity left to show,
         // Set the show empty state flag
@@ -624,12 +624,11 @@
     *
     * @param {boolean} hideRecents - Flag indicating if recent items should be hidden. Fetch this before passing.
     * @param {boolean} noRecentActivity - Flag indicating if there's no recent activity.
-    * @return {void}
+     * @return {Promise}
     */
-    function clearRecentMemoryIfRequired(hideRecents, noRecentActivity) {
+    async function clearRecentMemoryIfRequired(hideRecents, noRecentActivity) {
         if (hideRecents && !noRecentActivity) {
-            recentlySearched.clear(false);
-            recentlyOpened.clear();
+            return Promise.all([recentlySearched.clear(), recentlyOpened.clear()]);
         }
     }
 
@@ -941,19 +940,18 @@
         }
     }
 
-    mBroadcaster.once('fm:initialized', () => {
-        initSearch();
-    });
-
-    // export
-    scope.mega = scope.mega || {};
-    scope.mega.ui = scope.mega.ui || {};
-    scope.mega.ui.searchbar = {
+    /** @class mega.ui.searchbar */
+    return freeze({
         init: initSearch,
         refresh: refreshSearch,
         closeMiniSearch,
         recentlySearched,
         recentlyOpened,
         addDropdownEventListeners,
-    };
-})(window);
+    });
+});
+
+mBroadcaster.once('fm:initialized', () => {
+    'use strict';
+    mega.ui.searchbar.init();
+});

@@ -2027,7 +2027,7 @@ ChatRoom.prototype.hasInvalidKeys = function() {
             !this.ck || (this.ck && this.ck.length !== 32)
         ) {
             console.error('Error instantiating room/call -- missing `unifiedKey`/malformed `ck` for public chat.');
-            const { master, slaves } = mBroadcaster.crossTab;
+            const {owner, actors} = mBroadcaster.crossTab;
             eventlog(
                 99751,
                 JSON.stringify([
@@ -2040,8 +2040,8 @@ ChatRoom.prototype.hasInvalidKeys = function() {
                     String(unifiedKey || '').length | 0,
                     typeof this.ck,
                     String(this.ck).length | 0,
-                    (!!master) | 0,
-                    Object(slaves).length | 0
+                    (!!owner) | 0,
+                    Object(actors).length | 0
                 ])
             );
             return true;

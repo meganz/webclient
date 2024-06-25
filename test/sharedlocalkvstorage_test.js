@@ -326,7 +326,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
             });
     });
 
-    it("basic single master set -> get item test", function(done) {
+    it("basic single owner set -> get item test", function(done) {
         var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test3");
         dropOnFinished(kvStorage);
         kvStorage.setItem('test', 'test123').dumpToConsole("test=test123");
@@ -336,7 +336,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
         promiseHelpers.testWaitForAllPromises(done);
     });
 
-    it("basic single master set -> remove -> {getItem - fail, removeItem - fail} test", function(done) {
+    it("basic single owner set -> remove -> {getItem - fail, removeItem - fail} test", function(done) {
         var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test4");
         dropOnFinished(kvStorage);
 
@@ -350,7 +350,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
     });
 
 
-    it("basic single master - open -> set -> close -> get (persistence test)", function(done) {
+    it("basic single owner - open -> set -> close -> get (persistence test)", function(done) {
         var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test5");
         kvStorage.setItem('test', 'test123')
             .done(function() {
@@ -370,7 +370,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
     });
 
 
-    it("comprehensive single master test", function(done) {
+    it("comprehensive single owner test", function(done) {
         var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test6");
         dropOnFinished(kvStorage);
 
@@ -407,7 +407,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
 
     });
 
-    it("basic single master test - clear (async)", function(done) {
+    it("basic single owner test - clear (async)", function(done) {
         var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test7");
 
         dropOnFinished(kvStorage);
@@ -427,7 +427,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
             });
     });
 
-    it("basic single master test - clear (sync)", function(done) {
+    it("basic single owner test - clear (sync)", function(done) {
         var kvStorage = new SharedLocalKVStorage.Utils.DexieStorage("test8");
 
         dropOnFinished(kvStorage);
@@ -456,12 +456,11 @@ describe("SharedLocalKVStorage Unit Test", function() {
     });
 
 
-
-    it("basic test for SharedLocalKVStorage, using 1 master", function(done) {
+    it("basic test for SharedLocalKVStorage, using one owner", function(done) {
         var connector = new FakeBroadcastersConnector();
         var broadcaster = CreateNewFakeBroadcaster("tab1");
         connector.addTab(broadcaster);
-        connector.setMaster("tab1");
+        connector.takeOwnership("tab1");
 
         var sharedLocalKvInstance = new SharedLocalKVStorage("test9", false, broadcaster);
 
@@ -496,7 +495,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
             });
     });
 
-    it("basic, cross tab SharedLocalKVStorage, using 3 tabs - 1 master and 2 slaves", function(done) {
+    it("basic, cross tab SharedLocalKVStorage, using 3 tabs - 1 owner and 2 actors", function(done) {
         var connector = new FakeBroadcastersConnector();
         var broadcaster1 = CreateNewFakeBroadcaster("tab1");
         connector.addTab(broadcaster1);
@@ -508,7 +507,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
         var broadcaster3 = CreateNewFakeBroadcaster("tab3");
         connector.addTab(broadcaster3);
 
-        connector.setMaster("tab1");
+        connector.takeOwnership("tab1");
 
         var sharedLocalKvInstance1 = new SharedLocalKVStorage("test10", false, broadcaster1);
 
@@ -520,17 +519,17 @@ describe("SharedLocalKVStorage Unit Test", function() {
 
         assert(
             sharedLocalKvInstance1.persistAdapter instanceof SharedLocalKVStorage.Utils.DexieStorage,
-            'master tab (tab1) is not using the expected persist adapter!'
+            'owner tab (tab1) is not using the expected persist adapter!'
         );
 
         assert(
             sharedLocalKvInstance2.persistAdapter === false,
-            'slave tab (tab2) is not using the expected persist adapter!'
+            'actor tab (tab2) is not using the expected persist adapter!'
         );
 
         assert(
             sharedLocalKvInstance3.persistAdapter === false,
-            'slave tab (tab3) is not using the expected persist adapter!'
+            'actor tab (tab3) is not using the expected persist adapter!'
         );
 
         dropOnFinished(sharedLocalKvInstance1);
@@ -575,7 +574,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
             })
     });
 
-    it("basic, cross tab SharedLocalKVStorage - removeItem, using 3 tabs - 1 master and 2 slaves", function(done) {
+    it("basic, cross tab SharedLocalKVStorage - removeItem, using 3 tabs - 1 owner and 2 actors", function(done) {
         var connector = new FakeBroadcastersConnector();
         var broadcaster1 = CreateNewFakeBroadcaster("tab1");
         connector.addTab(broadcaster1);
@@ -587,7 +586,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
         var broadcaster3 = CreateNewFakeBroadcaster("tab3");
         connector.addTab(broadcaster3);
 
-        connector.setMaster("tab1");
+        connector.takeOwnership("tab1");
 
         var sharedLocalKvInstance1 = new SharedLocalKVStorage("test11", false, broadcaster1);
 
@@ -599,17 +598,17 @@ describe("SharedLocalKVStorage Unit Test", function() {
 
         assert(
             sharedLocalKvInstance1.persistAdapter instanceof SharedLocalKVStorage.Utils.DexieStorage,
-            'master tab (tab1) is not using the expected persist adapter!'
+            'owner tab (tab1) is not using the expected persist adapter!'
         );
 
         assert(
             sharedLocalKvInstance2.persistAdapter === false,
-            'slave tab (tab2) is not using the expected persist adapter!'
+            'actor tab (tab2) is not using the expected persist adapter!'
         );
 
         assert(
             sharedLocalKvInstance3.persistAdapter === false,
-            'slave tab (tab3) is not using the expected persist adapter!'
+            'actor tab (tab3) is not using the expected persist adapter!'
         );
 
         var expectAllValsToBeUndefined = function(k) {
@@ -687,7 +686,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
             })
     });
 
-    it("basic, cross tab SharedLocalKVStorage - eachPrefix, using 3 tabs - 1 master and 2 slaves", function(done) {
+    it("basic, cross tab SharedLocalKVStorage - eachPrefix, using 3 tabs - 1 owner and 2 actors", function(done) {
         var connector = new FakeBroadcastersConnector();
         var broadcaster1 = CreateNewFakeBroadcaster("tab1");
         connector.addTab(broadcaster1);
@@ -699,7 +698,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
         var broadcaster3 = CreateNewFakeBroadcaster("tab3");
         connector.addTab(broadcaster3);
 
-        connector.setMaster("tab1");
+        connector.takeOwnership("tab1");
 
         var sharedLocalKvInstance1 = new SharedLocalKVStorage("test12", false, broadcaster1);
 
@@ -792,7 +791,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
         pq.tick();
     });
 
-    it("1 master, 2 slaves, one of the slaves becomes a master", function(done) {
+    it("1 owner, 2 actors, one of the actors becomes a owner", function(done) {
         var connector = new FakeBroadcastersConnector();
         var broadcaster1 = CreateNewFakeBroadcaster("tab1");
         connector.addTab(broadcaster1);
@@ -804,7 +803,7 @@ describe("SharedLocalKVStorage Unit Test", function() {
         var broadcaster3 = CreateNewFakeBroadcaster("tab3");
         connector.addTab(broadcaster3);
 
-        connector.setMaster("tab1");
+        connector.takeOwnership("tab1");
 
         var sharedLocalKvInstance1 = new SharedLocalKVStorage("test13", false, broadcaster1);
 
@@ -864,8 +863,8 @@ describe("SharedLocalKVStorage Unit Test", function() {
                         broadcaster1.destroy();
 
                         assert(
-                            !!sharedLocalKvInstance2.broadcaster.crossTab.master,
-                            'tab2 was not set as master as expected.'
+                            !!sharedLocalKvInstance2.broadcaster.crossTab.owner,
+                            'tab2 was not set as owner as expected.'
                         );
 
                         // close the db so that the unit test can delete/drop the db on finish

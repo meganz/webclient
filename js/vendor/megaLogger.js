@@ -84,7 +84,7 @@
      */
     function MegaLogger(name, options, parentLogger) {
         Object.defineProperty(this, 'options', {
-            value: Object.assign(Object.create(null), MegaLogger.DEFAULT_OPTIONS, options)
+            value: Object.assign(Object.create(null), MegaLogger.DEFAULT_OPTIONS, Object(parentLogger).options, options)
         });
         Object.defineProperty(this, 'parent', {value: parentLogger && new WeakRef(parentLogger)});
         Object.defineProperty(this, 'name', typeof name === 'function' ? {get: name} : {value: name});
@@ -217,9 +217,11 @@
             }
             return MegaLogger.LEVELS.INFO;
         },
+        'showLogLevelTag': true,
         'adaptiveTextColor': false,
         'throwOnAssertFail': false,
         'captureLastLogLine': false,
+        'supColorStyle': 'padding-left:2px;padding-right:3px;border-radius:5px',
         /**
          * Warning: This will use tons of CPU because of the trick of
          * JSON.serialize/.stringify we are using for dereferencing
@@ -302,40 +304,42 @@
         }
 
         if (this.isEnabled()) {
-            var logDate;
-            var logLine;
-            var logStyle = "";
-            var logSeparator = ' \u00B7 ';
-            var logPath = this.getLoggerPath();
-            var levelName = _intToLevel[level] || "unknown";
+            let logStyle = "";
+            const logLine = [];
+            const logSeparator = '\u00B7';
+            const logPath = this.getLoggerPath();
+            const levelName = _intToLevel[level] || "unknown";
 
             if (options.printDate !== false) {
-                logDate = options.dateFormatter(new Date());
-                if (logDate && logPath) {
-                    logDate += logSeparator;
+                const logDate = options.dateFormatter(new Date());
+                if (logDate) {
+                    logLine.push(logDate, logSeparator);
                 }
             }
+            logLine.push(logPath, logSeparator);
 
-            logLine = (logDate || '') + logPath + logSeparator + levelName;
+            if (options.showLogLevelTag) {
+                logLine.push(levelName);
+            }
 
             // Append the first argument as long it's a string to support substitutions
             if (typeof args[0] === 'string') {
-                logLine += ' ' + args.shift();
+                logLine.push(args.shift());
             }
 
             if (options.colorsEnabled) {
                 const bg = options.levelColors[levelName];
                 const tc = options.adaptiveTextColor && getYIQThreshold(bg) > 127 ? '000' : 'fff';
-                logStyle = `color:#${tc}; background-color: ${bg}; padding-left: 1px; padding-right: 1px;`;
-                logLine = `%c${logLine}`;
+                logStyle = `color:#${tc}; background-color: ${bg};${options.supColorStyle || ''}`;
+                logLine[0] = `%c${logLine[0]}`;
             }
 
-            args = [logLine, logStyle, ...args];
+            args = [logLine.join(' '), logStyle, ...args];
             if (options.dereferenceObjects) {
                 args = JSON.parse(JSON.stringify(args));
             }
             if (options.captureLastLogLine) {
-                this.lastLogLine = [logLine, logStyle];
+                this.lastLogLine = [args[0], logStyle];
             }
 
             options.transport(level, args);
@@ -349,7 +353,12 @@
                 }
 
                 // remove everything up to the level (inc. and trailing space)
-                args[0] = args[0].substr(args[0].indexOf(levelName) + levelName.length + 1);
+                if (options.showLogLevelTag) {
+                    args[0] = args[0].slice(args[0].indexOf(levelName) + levelName.length + 1);
+                }
+                else {
+                    args[0] = args[0].slice(args[0].lastIndexOf(logSeparator) + logSeparator.length + 1);
+                }
 
                 // if a single item, send it as-is
                 if (args.length === 1) {

@@ -767,6 +767,48 @@ var security = {
             mega.ui.MegaInputs($inputs);
             return $dialog;
         });
+    },
+
+    /**
+     * Persist account session data into WebStorage.
+     * @param {Array} masterKeyArray32 The unencrypted Master Key
+     * @param {String} decryptedSessionIdBase64 The decrypted Session ID as a Base64 string
+     * @param {Array} [decodedPrivateRsaKey] The decoded RSA Private Key as an array of parts
+     * @returns {undefined}
+     */
+    persistAccountSession(masterKeyArray32, decryptedSessionIdBase64, decodedPrivateRsaKey) {
+        'use strict';
+        const temp = security.login.rememberMe === false && !localStorage.sid;
+        assert(Array.isArray(masterKeyArray32) && masterKeyArray32.length === 4);
+
+        // tell whether this computer was ever logged
+        localStorage.wasloggedin = true;
+
+        // Before key is stored on storage and can be accessible by the other tabs, notify it.
+        watchdog.notify('beforelogin');
+
+        // Use localStorage if the user checked the Remember Me checkbox, otherwise use temporary sessionStorage
+        u_storage = init_storage(temp ? sessionStorage : localStorage);
+
+        // Set global values which are used everywhere
+        u_k = masterKeyArray32;
+        u_sid = decryptedSessionIdBase64;
+        u_k_aes = new sjcl.cipher.aes(masterKeyArray32);
+
+        // Store the Master Key and Session ID
+        u_storage.k = JSON.stringify(masterKeyArray32);
+        u_storage.sid = decryptedSessionIdBase64;
+
+        // Store the RSA private key
+        if (decodedPrivateRsaKey) {
+            u_storage.privk = base64urlencode(crypto_encodeprivkey(decodedPrivateRsaKey));
+        }
+
+        // Notify other tabs
+        watchdog.notify('login', [temp && masterKeyArray32, decryptedSessionIdBase64, temp && u_storage.privk]);
+
+        // Set the Session ID for future API requests
+        api.setSID(u_sid);
     }
 };
 
@@ -1213,24 +1255,9 @@ security.login = {
      * @param {String} temporarySessionIdBase64 The temporary session ID send from the API
      */
     skipToGenerateRsaKeys: function(masterKeyArray32, temporarySessionIdBase64) {
-
         'use strict';
 
-        // Before key is stored on storage and can be accessible by the other tabs, notify to refresh the page.
-        watchdog.notify('beforelogin');
-
-        // Set global values which are used everywhere
-        u_k = masterKeyArray32;
-        u_sid = temporarySessionIdBase64;
-        u_k_aes = new sjcl.cipher.aes(masterKeyArray32);
-        watchdog.notify('login', [!security.login.rememberMe && masterKeyArray32, temporarySessionIdBase64]);
-
-        // Set the Session ID for future API requests
-        api_setsid(temporarySessionIdBase64);
-
-        // Set to localStorage as well
-        u_storage.k = JSON.stringify(masterKeyArray32);
-        u_storage.sid = temporarySessionIdBase64;
+        security.persistAccountSession(masterKeyArray32, temporarySessionIdBase64);
 
         // Redirect to key generation page
         loadSubPage('key');
@@ -1348,33 +1375,11 @@ security.login = {
             return false;
         }
 
-        // Set variables
-        var masterKeyArray32 = keyAndSessionData[0];
-        var decryptedSessionIdBase64 = keyAndSessionData[1];
-        var decodedPrivateRsaKey = keyAndSessionData[2];
-
-        // Set flag
-        localStorage.wasloggedin = true;
-
         // Remove all previous login data
         u_logout();
 
-        watchdog.notify('beforelogin');
-
-        // Use localStorage if the user checked the Remember Me checkbox, otherwise use temporary sessionStorage
-        u_storage = init_storage(security.login.rememberMe ? localStorage : sessionStorage);
-
-        // Store the Master Key and Session ID
-        u_storage.k = JSON.stringify(masterKeyArray32);
-        u_storage.sid = decryptedSessionIdBase64;
-
-        // Notify other tabs of login
-        watchdog.notify('login', [!security.login.rememberMe && masterKeyArray32, decryptedSessionIdBase64]);
-
-        // Store the RSA private key
-        if (decodedPrivateRsaKey) {
-            u_storage.privk = base64urlencode(crypto_encodeprivkey(decodedPrivateRsaKey));
-        }
+        // Set variables
+        security.persistAccountSession(...keyAndSessionData);
 
         // Cleanup temporary login variables
         security.login.email = null;

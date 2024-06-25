@@ -26,7 +26,7 @@ var Chatd = function(userId, megaChat, options) {
         self.chatdPersist = new ChatdPersist(self);
     }
     else {
-        mBroadcaster.once('crossTab:master', () => {
+        mBroadcaster.once('crossTab:owner', () => {
             if (d) {
                 console.info('Got cross-tab ownership, initializing ChatdPersist...');
             }
@@ -3207,7 +3207,7 @@ Chatd.Messages.prototype.discard = function(messagekey, notify) {
             keyid: self.sendingbuf[num][Chatd.MsgField.KEYID],
             message: self.sendingbuf[num][Chatd.MsgField.MESSAGE]
         });
-        watchdog.notify('chat_event', {
+        watchdog.notify('chat-event', {
             chatId: base64urlencode(self.chatId),
             userId: base64urlencode(self.sendingbuf[num][Chatd.MsgField.USERID]),
             messageId: base64urlencode(self.sendingbuf[num][Chatd.MsgField.MSGID]),

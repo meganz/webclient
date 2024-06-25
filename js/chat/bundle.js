@@ -5063,10 +5063,10 @@ ChatRoom.prototype.hasInvalidKeys = function () {
     if (!unifiedKey || unifiedKey && unifiedKey.length !== 16 || !this.ck || this.ck && this.ck.length !== 32) {
       console.error('Error instantiating room/call -- missing `unifiedKey`/malformed `ck` for public chat.');
       const {
-        master,
-        slaves
+        owner,
+        actors
       } = mBroadcaster.crossTab;
-      eventlog(99751, JSON.stringify([1, buildVersion.website || 'dev', String(this.chatId).length | 0, this.type | 0, this.isMeeting | 0, typeof unifiedKey, String(unifiedKey || '').length | 0, typeof this.ck, String(this.ck).length | 0, !!master | 0, Object(slaves).length | 0]));
+      eventlog(99751, JSON.stringify([1, buildVersion.website || 'dev', String(this.chatId).length | 0, this.type | 0, this.isMeeting | 0, typeof unifiedKey, String(unifiedKey || '').length | 0, typeof this.ck, String(this.ck).length | 0, !!owner | 0, Object(actors).length | 0]));
       return true;
     }
   }

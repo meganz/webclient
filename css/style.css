@@ -2408,16 +2408,15 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     width: 48px;
     height: 48px;
     content: '';
-    opacity: 1;
     position: absolute;
+}
+.nw-fm-left-icon.active::before {
+    content: '\00a0'; /* SVG rendering issue fix for Safari */
 }
 .nw-fm-left-icon:not(.photos).active {
     background-color: var(--stroke-black);
 }
 .nw-fm-left-icon.active .nav-icon-label {
-    opacity: 1;
-}
-.nw-fm-left-icon:hover::before, .nw-fm-left-icon.active::before {
     opacity: 1;
 }
 .nw-fm-left-icon:hover {

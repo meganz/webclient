@@ -1309,7 +1309,7 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
                 for (let i = 1; i < pageParts.length; i++) {
                     const queryParts = pageParts[i].split('=');
                     if (queryParts[0] === 'tab') {
-                        window.mProTab = queryParts[1];
+                        window.mProTab = queryParts[1].split('/')[0];
                     }
                 }
             }

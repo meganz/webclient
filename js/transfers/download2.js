@@ -1753,8 +1753,13 @@ var dlmanager = {
             let type = isStreaming ? 'stream_media' : 'dl';
 
             if (flags & dlmanager.LMT_ISPRO) {
-                const plan = flags & dlmanager.LMT_PRO3 ? 'pro3' : 'pro';
-                $overQuotaMsg.safeAppend(l[`${type}_tq_exceeded_${plan}`]);
+                if (miniPlanId && (miniPlanId === u_attr.p) && !isStreaming) {
+                    $overQuotaMsg.safeAppend(l.dl_tq_exceeded_more_mini.replace('%1', planName));
+                }
+                else {
+                    const plan = flags & dlmanager.LMT_PRO3 ? 'pro3' : 'pro';
+                    $overQuotaMsg.safeAppend(l[`${type}_tq_exceeded_${plan}`]);
+                }
             }
             else {
                 const level = miniPlanId ? 'mini' : 'free';

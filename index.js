@@ -3347,6 +3347,11 @@ mBroadcaster.once('boot_done', () => {
     if (!u_sid) {
         mBroadcaster.sendMessage(mega.flags ? 'global-mega-flags' : 'update-api-search-params');
     }
+    else if (self.loginresponse === EBLOCKED) {
+        window.startMega = window.eventlog = dump;
+        api.setSID(u_sid);
+        return api.send('ug');
+    }
 
     // ---------------------------------------------------------------------
 

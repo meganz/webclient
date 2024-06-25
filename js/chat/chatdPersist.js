@@ -48,7 +48,7 @@
      * @returns {Boolean}
      */
     ChatdPersist.isMasterTab = function() {
-        return !!mBroadcaster.crossTab.master;
+        return !!mBroadcaster.crossTab.owner;
     };
 
     /**

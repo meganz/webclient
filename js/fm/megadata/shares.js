@@ -359,6 +359,10 @@ MegaData.prototype.initAddByEmailComponent = function(alreadyAddedContacts) {
 MegaData.prototype.getUndecryptedLabel = function(node) {
     'use strict';
 
+    if (self.nullkeys && self.nullkeys[node.h]) {
+        return l.allownullkeys_tooltip;
+    }
+
     const isShared = M.getNodeRoot(node.p) !== M.RootID;
 
     if (node.t) {

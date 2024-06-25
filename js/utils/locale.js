@@ -1757,6 +1757,7 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.estimated_price_text_min_50 = escapeHTML(l.estimated_price_text_min_50)
         .replace('[S]', '<span>').replace('[/S]', '</span>');
 
+    // TODO: Combine all of these limited dl strings to be done at once in a new array?
     l.dl_limited_tq_mini = escapeHTML(l.dl_limited_tq_mini)
         .replace('[A]',
                  `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
@@ -1896,6 +1897,14 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[S3]', '<span>')
         .replace('[S4]', '<span class="countdown hidden">')
         .replace('[S5]', '<span class="learn-more">')
+        .replace(/\[\/S\d]/g, '</span>');
+    l.dl_tq_exceeded_more_mini = escapeHTML(l.dl_tq_exceeded_more_mini)
+        .replace('[A]',
+                 `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
+        .replace('[/A]', '</a>')
+        .replace('[S1]', '<span>')
+        .replace('[S2]', '<span>')
+        .replace('[S3]', '<span>')
         .replace(/\[\/S\d]/g, '</span>');
 
     l.manage_link_export_link_text = escapeHTML(l.manage_link_export_link_text)

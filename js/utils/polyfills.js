@@ -103,6 +103,17 @@ if (Object.fromEntries === undefined) {
     });
 }
 
+/**
+if (Object.hasOwn === undefined) {
+    Object.defineProperty(Object, 'hasOwn', {
+        value(o, p) {
+            'use strict';
+            return Object.hasOwnProperty.call(o, p);
+        }
+    });
+}
+/**/
+
 (() => {
     'use strict';
     Promise.prototype.always = function(fc) {

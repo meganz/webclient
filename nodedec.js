@@ -261,11 +261,11 @@ function crypto_decryptnode(n) {
                     // localStorage.allownullkeys for users who were using a bad client and still need their files.
                     if (!self.allowNullKeys) {
                         const invalidFileKey =
+                            k.length === 4 && k[0] === 0 && k[1] === 0 && k[2] === 0 && k[3] === 0 ||
                             k.length === 8 && k[0] === k[4] && k[1] === k[5] && k[2] === k[6] && k[3] === k[7];
 
                         if (invalidFileKey) {
 
-                            // @todo check for folders and revamp
                             // eslint-disable-next-line max-depth
                             if (d) {
                                 nkey.add(n.h);
@@ -278,6 +278,11 @@ function crypto_decryptnode(n) {
                             }
 
                             k = false;
+                        }
+
+                        if (invalidFileKey && self.nullkeys) {
+
+                            self.nullkeys[n.h] = 1;
                         }
                     }
                 }
@@ -987,7 +992,7 @@ lazy(self, 'decWorkerPool', function decWorkerPool() {
     /** @class decWorkerPool */
     return new class extends Array {
         get url() {
-            const WORKER_VERSION = 4;
+            const WORKER_VERSION = 5;
             return `${window.is_extension || window.is_karma ? '' : '/'}nodedec.js?v=${WORKER_VERSION}`;
         }
 

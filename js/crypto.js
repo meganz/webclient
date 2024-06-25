@@ -898,7 +898,7 @@ async function api_createuser(ctx, invitecode, invitename) {
         req.aff = mega.affid;
     }
 
-    watchdog.notify('createuser');
+    watchdog.notify('user-created');
     return api.screq(req, ctx);
 }
 
@@ -2596,6 +2596,7 @@ function crypto_node_rsa2aes() {
 //   decrypt the node without assistance from the share owner
 // FIXME: update missingkeys/sharemissing for all undecryptable nodes whose
 // share path changed (whenever shares are added, removed or nodes are moved)
+var nullkeys       = Object.create(null);  // nodes containing invalid all-0 AES key
 var missingkeys    = Object.create(null);  // { node handle : { share handle : true } }
 var sharemissing   = Object.create(null);  // { share handle : { node handle : true } }
 var newmissingkeys = false;
@@ -2609,6 +2610,9 @@ function crypto_reportmissingkey(n) {
 
         if (!missingkeys[n.h]) {
             missingkeys[n.h] = Object.create(null);
+            change = true;
+        }
+        else if (nullkeys[n.h]) {
             change = true;
         }
 
@@ -2630,9 +2634,18 @@ function crypto_reportmissingkey(n) {
             newmissingkeys = true;
 
             if (fmdb) {
+                const d = Object.create(null);
+                const s = Object.keys(missingkeys[n.h]);
+                if (s.length) {
+                    if (nullkeys[n.h]) {
+                        d.z = 1;
+                    }
+                    d.s = s;
+                }
+
                 fmdb.add('mk', {
                     h: n.h,
-                    d: {s: Object.keys(missingkeys[n.h])}
+                    d
                 });
             }
 
@@ -2732,11 +2745,6 @@ async function crypto_reqmissingkeys() {
 function crypto_missingkeysfromdb(r) {
     'use strict';
 
-    // FIXME: remove the following line
-    if (!r.length || !r[0].s) {
-        return;
-    }
-
     for (var i = r.length; i--;) {
         if (!missingkeys[r[i].h]) {
             missingkeys[r[i].h] = Object.create(null);
@@ -2750,6 +2758,10 @@ function crypto_missingkeysfromdb(r) {
                 }
                 sharemissing[r[i].s[j]][r[i].h] = true;
             }
+        }
+
+        if (r[i].z) {
+            nullkeys[r[i].h] = 1;
         }
     }
 }

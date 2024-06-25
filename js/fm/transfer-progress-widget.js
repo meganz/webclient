@@ -531,8 +531,9 @@ mega.tpw = new function TransferProgressWidget() {
             else if (page !== 'securechat' && page.indexOf('chat') === -1 && !isMinimizedByUser) {
                 $('.transfer-progress-icon.tpw-c-e.expand', $rowsHeader).click();
             }
-
         }
+
+        return 0xDEAD;
     };
 
     mBroadcaster.addListener('pagechange', () => {

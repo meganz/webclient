@@ -1909,6 +1909,7 @@ function topbarUI(holderId) {
     if (!topbar) {
         return;
     }
+    onIdle(() => mega.ui.searchbar.refresh());
 
     topbarUITogglePresence(topbar);
 
@@ -1948,13 +1949,6 @@ function topbarUI(holderId) {
 
     if (u_type && u_attr && u_attr.email && (element = topbar.querySelector('.email'))) {
         $(element).text(u_attr.email).attr('data-simpletip', u_attr.email);
-    }
-
-    if (holderId === 'fmholder') {
-        window.mega.ui.searchbar.refresh();
-    }
-    else {
-        window.mega.ui.searchbar.init();
     }
 
     // Initialise the Back to MEGA button (only shown if in MEGA Lite mode)
@@ -3351,7 +3345,12 @@ mBroadcaster.once('boot_done', () => {
     }
 
     if (!u_sid) {
-        mBroadcaster.sendMessage('update-api-search-params');
+        mBroadcaster.sendMessage(mega.flags ? 'global-mega-flags' : 'update-api-search-params');
+    }
+    else if (self.loginresponse === EBLOCKED) {
+        window.startMega = window.eventlog = dump;
+        api.setSID(u_sid);
+        return api.send('ug');
     }
 
     // ---------------------------------------------------------------------
@@ -3397,6 +3396,8 @@ mBroadcaster.addListener('fm:initialized', () => {
             notify.addDynamicNotifications().catch(dump);
         }
     });
+
+    return 0xDEAD;
 });
 
 // After open folder call, check if we should restore any previously opened preview node.
@@ -3417,6 +3418,8 @@ mBroadcaster.once('mega:openfolder', () => {
     if (u_type > 2) {
         initMegaIoIframe(true);
     }
+
+    return 0xDEAD;
 });
 
 mBroadcaster.addListener('global-mega-flags', () => {

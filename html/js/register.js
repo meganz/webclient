@@ -354,8 +354,8 @@ function init_register() {
         if ($(this).hasClass('disabled')) {
             return false;
         }
-        delay('createaccevlog', () => eventlog(99809));
         pageregister();
+        eventlog(99809);
     });
 
     $button.rebind('keydown.initregister', function (e) {

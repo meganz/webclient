@@ -794,7 +794,7 @@ MegaUtils.prototype.logoutAbortTransfers = function megaUtilsLogoutAbortTransfer
 
             msgDialog('confirmation', l[967], hasTransferMsg + ' ' + l[507] + '?', false, function(doIt) {
                 if (doIt) {
-                    watchdog.notify("abort_trans");
+                    watchdog.notify("abort-transfers");
                     var targetPromise = M.abortTransfers(true);
                     promise.linkDoneAndFailTo(targetPromise);
                 }
@@ -807,11 +807,11 @@ MegaUtils.prototype.logoutAbortTransfers = function megaUtilsLogoutAbortTransfer
 
     if (u_type === 0) {
         // if it's in ephemeral session
-        watchdog.notify("abort_trans");
+        watchdog.notify("abort-transfers");
         var targetPromise = M.abortTransfers(true);
         promise.linkDoneAndFailTo(targetPromise);
     } else {
-        watchdog.query("transing").always(function (res) {
+        watchdog.query("transfers").always((res) => {
             if (!res.length) {
                 // if it's in normal session with a single tab
                 logoutAbort();
@@ -1309,7 +1309,7 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
                 for (let i = 1; i < pageParts.length; i++) {
                     const queryParts = pageParts[i].split('=');
                     if (queryParts[0] === 'tab') {
-                        window.mProTab = queryParts[1];
+                        window.mProTab = queryParts[1].split('/')[0];
                     }
                 }
             }

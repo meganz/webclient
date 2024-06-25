@@ -540,6 +540,16 @@ table.grid-table .undecryptable .tranfer-filetype-txt,
 .undecryptable .propreties-dark-txt {
     color: var(--secondary-orange) !important;
 }
+
+table.grid-table .undecryptable-zk .tranfer-filetype-txt,
+.undecryptable-zk .file-block-title,
+.undecryptable-zk .nw-fm-tree-folder,
+.undecryptable-zk .shared-folder-name,
+.undecryptable-zk .shared-folder-info,
+.undecryptable-zk .propreties-dark-txt {
+    color: var(--secondary-red) !important;
+}
+
 table.grid-table .ver-col-container {
     line-height: 30px;
 }
@@ -644,7 +654,8 @@ table.grid-table .grid-status-icon.icon-info {
     --mask-color: var(--secondary-orange);
 }
 
-table.grid-table .grid-status-icon.icon-takedown {
+table.grid-table .grid-status-icon.icon-takedown,
+table.grid-table .undecryptable-zk .grid-status-icon.icon-info {
     --mask-color: var(--secondary-red);
 }
 

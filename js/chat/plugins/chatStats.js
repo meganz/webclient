@@ -24,7 +24,7 @@
             'cc': navigator.hardwareConcurrency | 0, // cpu cores
             'slt': pageLoadTime, // secureboot's resources load time
             'ws': workers && workers.length || -666,
-            'ms': u_type === 3 ? (mBroadcaster.crossTab.master ? 1 : 0) : -1, // master, or slave tab?
+            'ms': u_type === 3 ? mBroadcaster.crossTab.owner ? 1 : 0 : -1, // owner, or actor tab?
         };
 
         options = options || {};
@@ -152,7 +152,7 @@
         var self = this;
 
 
-        if (!mBroadcaster.crossTab.master) {
+        if (!mBroadcaster.crossTab.owner) {
             return;
         }
 

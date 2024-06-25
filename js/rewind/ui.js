@@ -203,6 +203,14 @@ lazy(mega, 'rewindUi', () => {
                     monthsShort: MONTHS_SHORT_LIST
                 },
                 onRenderCell: (date, cellType, oldHtml) => {
+
+                    const getHourDifference = (previousDate) => {
+                        const currentDate = new Date();
+                        const previousDateObj = new Date(previousDate);
+                        const timeDifference = currentDate - previousDateObj;
+                        return Math.floor(timeDifference / (1000 * 60 * 60));
+                    };
+
                     let cellContent = `<span class="cell-value">${oldHtml}</span>`;
                     let cellClasses = '';
                     let disabledCellContent = null;
@@ -231,7 +239,19 @@ lazy(mega, 'rewindUi', () => {
                         hasRecord = typeof record !== 'undefined';
                         isDisabled = isBeforeActivationDate || date < mega.rewind.lastRewindableDate;
 
-                        if (hasRecord) {
+                        // API delay is currently 8 hours
+                        const apiDelayElapsed = getHourDifference(date) > 8;
+
+                        if (hasRecord && !apiDelayElapsed) {
+                            // Keep the indicator dot, but don't show the tooltip if data has not matured
+                            cellClasses += ' -has-value-';
+                            cellContent = `<span 
+                                class="cell-value">
+                                ${oldHtml}
+                            </span>`;
+                            cellContent += '<span class="indicator-dot"></span>';
+                        }
+                        else if (hasRecord) {
                             cellClasses += ' -has-value-';
 
                             // TODO: Use the record from snapshot/tree cache
@@ -845,6 +865,8 @@ lazy(mega, 'rewindUi', () => {
 
             // First of all handlers to detect if focused was set or not
             // We stop the propagation through immediate handlers (not the ancestors)
+            // Remove filters
+            /*
             this.$filterSelectButton.rebind('click.rewind', (e) => {
                 const $target = $(e.target);
                 if (this.$filterSelectButton.hasClass('focused') &&
@@ -908,6 +930,7 @@ lazy(mega, 'rewindUi', () => {
 
                 this.filterSelectUpdateView(optionValue);
             });
+            */
 
             this.$contentFolder.on('click.rewind', '.select-checkbox', this.onClickListCheckbox.bind(this));
             this.$contentFolder.on('click.rewind', '.folder-option', this.showContextMenu.bind(this));
@@ -1114,9 +1137,12 @@ lazy(mega, 'rewindUi', () => {
                 this.folderList = null;
             }
 
+            // Remove filters
+            /*
             if (date) {
                 this.updateFilterLabel(date, 0, true);
             }
+            */
 
             if (!isOpenFolder) {
                 this.$contentLoading.removeClass('hidden');
@@ -1158,9 +1184,12 @@ lazy(mega, 'rewindUi', () => {
                 }
             }
 
+            // Remove filters
+            /*
             if (date) {
                 this.updateFilterLabel(date, totalFiles);
             }
+            */
 
             this.isListLoading = false;
         }

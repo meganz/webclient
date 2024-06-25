@@ -380,8 +380,8 @@ function u_checklogin3a(res, ctx) {
 async function u_checklogin4(sid) {
     'use strict';
 
-    console.assert(!u_sid || u_type, `Unexpected state (${u_type}) <> ${!!u_sid}:${!!sid}:${sid === u_sid}`);
     console.assert(u_storage === localStorage || u_storage === sessionStorage);
+    console.assert(!u_sid || u_type || sid === u_sid, `hiccup (${u_type}) <> ${!!u_sid}:${!!sid}:${sid === u_sid}`);
 
     u_storage.sid = u_sid = sid;
     api_setsid(u_sid || false);

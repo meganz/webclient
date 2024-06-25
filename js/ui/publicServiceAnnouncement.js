@@ -71,13 +71,10 @@ var psa = {
 
         // Only show the announcement if they have not seen the current announcement.
         // The localStorage.alwaysShowPsa is a test variable to force show the PSA
-        if ((psa.lastSeenPsaId < psa.currentPsa.id) || (localStorage.alwaysShowPsa === '1')) {
+        if ((psa.lastSeenPsaId < psa.currentPsa.id || localStorage.alwaysShowPsa === '1')
+            && psa.prefillAnnouncementDetails()) {
 
-            if (psa.prefillAnnouncementDetails()) {
-                psa.showAnnouncement();
-                psa.addCloseButtonHandler();
-                psa.addMoreInfoButtonHandler();
-            }
+            psa.showAnnouncement();
         }
         else {
             // If they viewed the site while not logged in, then logged in with
@@ -217,6 +214,10 @@ var psa = {
         // Show the announcement
         document.body.classList.add('psa-notification');
         bannerNode.classList.remove('hidden');
+
+        // Bind Learn more and Close button evts
+        psa.addCloseButtonHandler();
+        psa.addMoreInfoButtonHandler();
 
         // Currently being shown
         psa.visible = true;

@@ -106,7 +106,7 @@
                 value: Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
             });
 
-            if (!(self.d > -2)) {
+            if (!(self.d > 2)) {
                 Object.defineProperty(this, 'debug', {value: false});
             }
             this.onmessageerror = reportError;

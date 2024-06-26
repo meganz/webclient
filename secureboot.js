@@ -2314,6 +2314,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/ui/registerDialog.js', n: 'registerdialog_js', j:1,w:1});
         jsl.push({f:'js/ui/keySignatureWarningDialog.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/ui/feedbackDialog.js', n: 'feedbackdialogui_js', j:1,w:1});
+        jsl.push({f:'js/ui/forcedUpgradeProDialog.js', n: 'forcedupgradeprodialog_js', j:1,w:1});
         jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
         jsl.push({f:'js/ui/toast.js', n: 'toast_js', j:1,w:1});
         jsl.push({f:'js/ui/top-tooltip-login.js', n: 'top-tooltip-login', j:1});

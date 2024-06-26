@@ -2009,6 +2009,11 @@ mBroadcaster.once('boot_done', function populate_l() {
 
     l.pr_save_up_to = escapeHTML(l.pr_save_up_to).replace('[S]', '').replace('[/S]', '');
 
+    l.view_upgrade_pro_dialog_desc = escapeHTML(l.view_upgrade_pro_dialog_desc)
+        .replace('[S1]', '<span class="monthly-price">')
+        .replace('[S2]', '<span class="asterisk hidden">')
+        .replace(/\[\/S\d]/g, '</span>');
+
     const common = [
         15536, 16107, 16119, 16120, 16136, 16304, 16313, 16316, 16358, 16360, 16361, 16394, 18228, 18268, 18282,
         18284, 18285, 18286, 18287, 18289, 18290, 18291, 18294, 18295, 18296, 18297, 18298, 18302, 18303, 18304,

@@ -1061,6 +1061,7 @@ function init_page() {
         else {
             init_register();
         }
+        eventlog(500272);
     }
     else if ((page.substr(0, 9) === 'registerb')) { // business register
         getUAOParameter(page, 'registerb');

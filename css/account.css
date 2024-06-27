@@ -605,10 +605,28 @@ button.loading .loader {
     width: 456px;
     overflow: hidden;
     position: relative;
-    margin: 48px 0 0;
+    margin-top: 60px;
 }
 .login-slide-block {
-    margin-top: 0;
+    margin-top: 48px;
+}
+.trusted-users-section {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    color: var(--text-color-black-higher);
+    font-family: var(--text-font-family-second-regular);
+    font-size: 36px;
+    line-height: 36px;
+}
+.trusted-users-section .users-value {
+    color: rgba(255, 51, 58, 1);
+    font-family: var(--text-font-family-second-bold);
+    font-size: 68px;
+    line-height: 83px;
+}
+.trusted-users-section .users-worldwide {
+    align-self: flex-end;
 }
 .register-slide-block h2, .login-slide-block h2 {
     font-weight: 300;

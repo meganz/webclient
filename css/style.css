@@ -5062,8 +5062,11 @@ span.orange {
     margin-left: 520px;
 }
 .sign .main-right-block {
-    padding-top: 116px;
+    padding-top: 155px;
     margin-left: 560px;
+}
+.sign .login .main-right-block {
+    padding-top: 68px;
 }
 h3.main-italic-header {
     font-size: 19px;

@@ -166,10 +166,10 @@ lazy(mega, 'rewindUi', () => {
             this.$contentFolderOptions = $('.folder-list.list-options', this.$contentFolder);
             this.$contentFolderList = $('.folder-list.list-content', this.$contentFolder);
             this.$contentDownload = $('.folder-download', this.$contentFolder);
-            this.$contentDownloadCaption = $('.folder-download-caption', this.$contentDownload);
             this.$contentLoading = $('.content-loading', this.$sidebarContent);
             this.$contentLoadingProgress = $('.progress', this.$contentLoading);
             this.$downloadButton = $('.js-download', this.$contentDownload);
+            this.$upgradeButton = $('.upgrade-purchase-button', this.$contentDownload);
             this.$restoreButton = $('.js-rewind', this.sidebar);
             this.$contextMenu = $('.dropdown.body.context', document.body);
             this.$infoButton = $('.dropdown-item.properties-item-rewind', this.$contextMenu);
@@ -388,21 +388,23 @@ lazy(mega, 'rewindUi', () => {
             this.$datepicker.val('');
             this.initializeDatepicker();
 
-            const upgradeSectionData = mega.rewind.getRewindContentUpgradeData();
+            const rewindDescriptionData = mega.rewind.getRewindDescriptionData();
+            const upgradeSectionData = mega.rewind.getUpgradeSectionData();
 
             this.$contentUpgradeTitle = $('.upgrade-title', this.$contentUpgrade);
+            this.$contentRewindDescription = $('.rewind-description', this.$contentUpgrade);
             this.$contentUpgradeDescription = $('.upgrade-description', this.$contentUpgrade);
             this.$contentUpgradePurchaseButton = $('.upgrade-purchase-button', this.$contentUpgrade);
-            this.$contentUpgradeNote = $('.upgrade-note', this.$contentUpgrade);
 
-            this.$contentUpgradeTitle.text(upgradeSectionData.title);
-            this.$contentUpgradeDescription.safeHTML(upgradeSectionData.description);
+            this.$contentUpgradeTitle.text(rewindDescriptionData.title);
+            this.$contentRewindDescription.safeHTML(rewindDescriptionData.description);
+            if (upgradeSectionData) {
+                this.$contentUpgradeDescription.safeHTML(upgradeSectionData);
+            }
             this.$contentUpgradePurchaseButton.addClass('hidden');
-            this.$contentUpgradeNote.addClass('hidden');
 
-            if (upgradeSectionData.hasUpgrade) {
+            if (rewindDescriptionData.hasUpgrade) {
                 this.$contentUpgradePurchaseButton.removeClass('hidden');
-                this.$contentUpgradeNote.removeClass('hidden');
             }
 
             this.$contentUpgrade.removeClass('hidden');
@@ -626,10 +628,6 @@ lazy(mega, 'rewindUi', () => {
             return time2date(date.getTime() / 1000, 18);
         }
 
-        formatDownloadCaptionDate(date) {
-            return time2date(date.getTime() / 1000, 2);
-        }
-
         nodeUpdated() {
             this.close();
         }
@@ -834,6 +832,22 @@ lazy(mega, 'rewindUi', () => {
             this.$contentLoadingProgress.text(formatPercentage(progress / 100));
         }
 
+        // There can be multiple places from which user can begin the upgrade flow
+        addUpgradeActionHandler(domNode) {
+            if (!domNode || typeof domNode !== 'object') {
+                return;
+            }
+            domNode.rebind('click.rewind', () => {
+                const eventData = this.getUpgradeEventData(LOCATION_LANDING);
+                if (eventData) {
+                    delay('rewind:upgrade-click', eventlog.bind(null, 500002, eventData));
+                    mega.rewind.saveLastUpgradeClick();
+                }
+
+                loadSubPage('pro');
+            });
+        }
+
         addEventHandlers() {
             this.$closeButton.rebind('click.rewind', () => {
                 this.close();
@@ -853,15 +867,7 @@ lazy(mega, 'rewindUi', () => {
                 return false;
             });
 
-            this.$contentUpgradePurchaseButton.rebind('click.rewind', () => {
-                const eventData = this.getUpgradeEventData(LOCATION_LANDING);
-                if (eventData) {
-                    delay('rewind:upgrade-click', eventlog.bind(null, 500002, eventData));
-                    mega.rewind.saveLastUpgradeClick();
-                }
-
-                loadSubPage('pro');
-            });
+            this.addUpgradeActionHandler(this.$upgradeButton);
 
             // First of all handlers to detect if focused was set or not
             // We stop the propagation through immediate handlers (not the ancestors)
@@ -1475,10 +1481,17 @@ lazy(mega, 'rewindUi', () => {
             if (this.hasSelectedNodes()) {
                 this.$contentDownload.removeClass('hidden');
 
-                const formattedInfo = `${l.rewind_folder_download_caption
-                    .replace('%1', this.formatDownloadCaptionDate(this.selectedDate))}`;
+                // Check user account tier
+                const {accountType, ACCOUNT_TYPE_FREE} = mega.rewind;
 
-                this.$contentDownloadCaption.text(formattedInfo);
+                if (accountType === ACCOUNT_TYPE_FREE) {
+                    this.$upgradeButton.removeClass('hidden');
+                    this.$downloadButton.addClass('hidden');
+                }
+                else {
+                    this.$upgradeButton.addClass('hidden');
+                    this.$downloadButton.removeClass('hidden');
+                }
             }
             else {
                 this.$contentDownload.addClass('hidden');

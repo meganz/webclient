@@ -129,6 +129,7 @@ lazy(mega, 'rewind', () => {
 
             this.ACCOUNT_TYPE_FREE = ACCOUNT_TYPE_FREE;
             this.ACCOUNT_TYPE_PRO_LITE = ACCOUNT_TYPE_PRO_LITE;
+            this.ACCOUNT_TYPE_PRO = ACCOUNT_TYPE_PRO;
 
             this.clear();
             this.changeLog = null;
@@ -455,19 +456,20 @@ lazy(mega, 'rewind', () => {
             return currentDate;
         }
 
-        getRewindContentUpgradeData() {
+        getRewindDescriptionData() {
             let hasUpgrade = true;
             const title = l.rewind_upg_header;
-            let description = l.rewind_upg_content_free;
+            let description = l.rewind_select_date_free;
 
             switch (this.accountType) {
                 case ACCOUNT_TYPE_PRO_LITE:
-                    description = l.rewind_upg_content_pro_lite;
+                    // description = l.rewind_upg_content_pro_lite;
+                    description = l.rewind_select_date_pro_lite;
                     break;
                 case ACCOUNT_TYPE_PRO:
                 case ACCOUNT_TYPE_PRO_FLEXI:
                 case ACCOUNT_TYPE_BUSINESS:
-                    description = l.rewind_upg_content_pro_flexi;
+                    description = l.rewind_select_date_pro;
                     hasUpgrade = false;
                     break;
             }
@@ -479,6 +481,18 @@ lazy(mega, 'rewind', () => {
             };
         }
 
+        getUpgradeSectionData() {
+            let upgradeInfoText = l.rewind_upgrade_info_text;
+            switch (this.accountType) {
+                case ACCOUNT_TYPE_PRO:
+                case ACCOUNT_TYPE_PRO_FLEXI:
+                case ACCOUNT_TYPE_BUSINESS:
+                    upgradeInfoText = false;
+                    break;
+            }
+            return upgradeInfoText;
+        }
+
         getDatepickerOverlayContent(type) {
             let description = null;
             switch (this.accountType) {
@@ -487,9 +501,6 @@ lazy(mega, 'rewind', () => {
                     break;
                 case ACCOUNT_TYPE_PRO_LITE:
                     description = l.rewind_datepicker_overlay_pro_lite_days;
-                    if (type !== mega.rewindUi.DATEPICKER_VIEW_TYPE_DAYS) {
-                        description = l.rewind_datepicker_overlay_pro_lite_months;
-                    }
                     break;
             }
 
@@ -1709,9 +1720,6 @@ lazy(mega, 'rewind', () => {
 
         // eslint-disable-next-line complexity
         feedSizeData(node) {
-            if (!node.p) {
-                return;
-            }
 
             const nodeParentHandle = node.p || '';
             const nodeHandle = node.h;

@@ -6981,7 +6981,6 @@ textarea.mobile.support-text-field {
     float: initial;
 }
 .bottom-page .forgot-password-page .mobile.fm-header {
-    position: fixed;
     background-color: #fff;
 }
 body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mobile .main-block.my-account-page.no-scroll {

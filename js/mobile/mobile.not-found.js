@@ -95,7 +95,7 @@ mobile.notFound = {
             else if (error === EEXPIRED) {
                 title = l.no_file_access_title;
                 icon = 'no-access-file';
-                text = l.no_file_access_msg;
+                text = l[20856]; // Your link has expired
                 _setCenterClass();
             }
             else if (message) {
@@ -119,6 +119,11 @@ mobile.notFound = {
             if (pfcol) {
                 title = l.album_broken_link_title;
                 contentNode.textContent = message || l.album_broken_link_text;
+                _setCenterClass();
+            }
+            else if (error === EEXPIRED) {
+                title = l.no_folder_access_title;
+                text = l[20856]; // Your link has expired
                 _setCenterClass();
             }
             else if (message) {

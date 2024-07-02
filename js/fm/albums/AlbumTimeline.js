@@ -35,6 +35,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
             const isCoverChangeable = !filterFn
                 && selections.length === 1
                 && (!at.c || eIds[at.c] !== selections[0]);
+            const onlyPlayableVideosSelected = selections.every((h) => !!is_video(M.d[h]));
 
             for (let i = 0; i < selections.length; i++) {
                 if (scope.isPreviewable(M.d[selections[i]])) {
@@ -43,7 +44,16 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                 }
             }
 
-            if (scope.nodesAllowSlideshow(nodes)) {
+            if (onlyPlayableVideosSelected) {
+                options.push({
+                    label: l.album_play_video,
+                    icon: 'video-call-filled',
+                    click: () => {
+                        scope.playSlideshow(albumId, false, true);
+                    }
+                });
+            }
+            else if (scope.nodesAllowSlideshow(nodes)) {
                 options.push({
                     label: l.album_play_slideshow,
                     icon: 'play-square',
@@ -131,8 +141,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
             const options = [];
 
             const hasImageSelected = selections.some(h => !!scope.isImage(M.d[h]));
-            const onlyPlayableVideosSelected = selections.every((h) => !!(scope.isVideo(M.d[h])
-                && scope.isVideo(M.d[h]).isPreviewable && MediaAttribute.getMediaType(M.d[h])));
+            const onlyPlayableVideosSelected = selections.every((h) => !!is_video(M.d[h]));
 
             if (hasImageSelected) {
                 options.push({

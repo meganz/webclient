@@ -1066,10 +1066,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
             const previewItem = $menuCMI.filter('.preview-item');
             const playItem = $menuCMI.filter('.play-item');
             const importItem = $menuCMI.filter('.import-item');
-            const onlyPlayableVideosSelected = selections.every((h) => {
-                const vid = mega.gallery.isVideo(M.d[h]);
-                return !!(vid && vid.isPreviewable && MediaAttribute.getMediaType(M.d[h]));
-            });
+            const onlyPlayableVideosSelected = selections.every((h) => !!is_video(M.d[h]));
             const allowSlideshow = oneImageSelected
                 && mega.gallery.nodesAllowSlideshow(mega.gallery.albums.store[M.d[pfid].id].nodes);
 

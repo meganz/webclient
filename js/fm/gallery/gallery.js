@@ -1362,10 +1362,10 @@ class MegaGallery {
 
             if (this.mode === 'a') {
                 const h = $eTarget.attr('id');
-                const n = M.d[h] || {};
+                const isVideo = e.currentTarget.nodeBlock.isVideo;
 
-                if (e.currentTarget.nodeBlock.isVideo) {
-                    if (!e.currentTarget.nodeBlock.isVideo.isPreviewable || !MediaAttribute.getMediaType(n)) {
+                if (isVideo) {
+                    if (!isVideo.isVideo) {
                         M.addDownload([h]);
                         return;
                     }

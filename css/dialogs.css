@@ -10705,9 +10705,21 @@ body.de .mega-dialog.contact-picker-widget {
 
 /* payment-stripe-success/failure-dialog */
 
-    .mega-dialog.payment-stripe-success-dialog,
-    .mega-dialog.payment-stripe-failure-dialog {
+    .mega-dialog.payment-stripe-success-dialog {
         width: 400px;
+    }
+
+    .mega-dialog.payment-stripe-failure-dialog {
+        width: 538px;
+    }
+    .mega-dialog.payment-stripe-failure-dialog > header {
+        padding-bottom: 24px;
+    }
+    .mega-dialog.payment-stripe-failure-dialog > header .graphic {
+        margin-bottom: 34px;
+    }
+    .mega-dialog.payment-stripe-failure-dialog h2 {
+        font: var(--text-h2-bold);
     }
 
     .mega-dialog.payment-stripe-success-dialog .content-block,

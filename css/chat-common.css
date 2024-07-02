@@ -23,6 +23,7 @@
 .chat-content-block {
     height: 100%;
     position: relative;
+    z-index: 0;
 }
 .chat-content-block,
 .chat-content-block .chat-topic-block,

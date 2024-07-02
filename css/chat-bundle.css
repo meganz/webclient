@@ -2211,7 +2211,10 @@ body.rtl .meetings-call .stream .stream-participants-block .participants-contain
 }
 .meetings-call .sidebar-wrapper .sidebar .participants-list.guest {
   overflow: hidden;
-  height: calc(100% - 320px);
+  height: calc(100% - 416px);
+}
+.meetings-call .sidebar-wrapper .sidebar .participants-list.guest.with-chat-participants {
+  height: calc(100% - 348px);
 }
 .meetings-call .sidebar-wrapper .sidebar .participants-list.with-chat-participants {
   /* [...] */

@@ -409,6 +409,9 @@ function getCleanSitePath(path) {
             if (path.lang && path.lang.length < 6) {
                 localStorage.lang = path.lang;
             }
+            if (path.cjevent) {
+                sessionStorage.cjevent = path.cjevent;
+            }
             if (path[0] === 'pro' && path.tab) {
                 window.mProTab = path.tab;
             }
@@ -2314,6 +2317,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/ui/registerDialog.js', n: 'registerdialog_js', j:1,w:1});
         jsl.push({f:'js/ui/keySignatureWarningDialog.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/ui/feedbackDialog.js', n: 'feedbackdialogui_js', j:1,w:1});
+        jsl.push({f:'js/ui/forcedUpgradeProDialog.js', n: 'forcedupgradeprodialog_js', j:1,w:1});
         jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
         jsl.push({f:'js/ui/toast.js', n: 'toast_js', j:1,w:1});
         jsl.push({f:'js/ui/top-tooltip-login.js', n: 'top-tooltip-login', j:1});
@@ -2562,6 +2566,7 @@ else if (!browserUpdate) {
     jsl.push({f:'html/js/megasync.js', n: 'megasync_js', j: 1});
     jsl.push({f:'js/fm/linkinfohelper.js', n: 'fm_linkinfohelper_js', j: 1});
     jsl.push({f:'js/fm/affiliatedata.js', n: 'fm_affiliatedata_js', j: 1});
+    jsl.push({f:'js/eaffiliate.js', n: 'eaffiliate_js', j: 1});
     jsl.push({f:'js/fm/affiliateRedemption.js', n: 'fm_affiliateredemption_js', j: 1});
     jsl.push({f:'js/ui/megaGesture.js', n: 'mega_gesture_js', j: 1, w:1});
 
@@ -2862,9 +2867,7 @@ else if (!browserUpdate) {
         'mediainfo': {f:'js/vendor/mediainfo.js', n: 'mediainfo', j:1},
         'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1},
         'redeem': {f:'html/redeem.html', n: 'redeem', j:0},
-        'discountpromo': {f:'html/discountpromo.html', n: 'discountpromo', j:0},
         'discountpromo_js': {f:'html/js/discountpromo.js', n: 'discountpromo_js', j:1},
-        'discountpromo_css': {f:'css/discountpromo.css', n:'discountpromo_css', j:2},
         'unsub': {f:'html/unsub.html', n: 'unsub', j:0},
         'unsub_js': {f:'html/js/unsub.js', n: 'unsub_js', j:1},
         'redeem_js': {f:'html/js/redeem.js', n: 'redeem_js', j:1},
@@ -3001,8 +3004,8 @@ else if (!browserUpdate) {
         'F!': ['folderlink_css'],
         'folder': ['folderlink_css'],
         'collection': ['folderlink_css'],
-        'discountpromo': ['discountpromo', 'discountpromo_js', 'discountpromo_css'],
-        's': ['discountpromo', 'discountpromo_js', 'discountpromo_css'], // Short URL for 'sale' e.g. /s/blackfriday
+        'discountpromo': ['discountpromo_js'],
+        's': ['discountpromo_js'], // Short URL for 'sale' e.g. /s/blackfriday
         'disputenotice': ['disputenotice', 'copyright_js'],
         'support': ['support_js', 'support'],
         'recover': ['reset', 'reset_js'],

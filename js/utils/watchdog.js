@@ -318,9 +318,17 @@ lazy(self, 'watchdog', () => {
                     case 'transfers':
                         value = M.hasPendingTransfers();
                         break;
+
+                    case 'rad-flush':
+                        value = 'rad' in mega && mega.rad.flush().always(nop);
+                        break;
                 }
 
-                this.notify('Q!Rep!y', {query, value, token: payload.reply});
+                Promise.resolve(value)
+                    .then((value) => {
+                        this.notify('Q!Rep!y', {query, value, token: payload.reply});
+                    })
+                    .catch(dump);
             }
         }
     });

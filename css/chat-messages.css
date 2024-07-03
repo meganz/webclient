@@ -79,10 +79,8 @@
     text-overflow: ellipsis;
     overflow: hidden;
 }
-.chat-topic-text i.icon-repeat {
+.chat-topic-text i.recurring-meeting {
     margin: 0 0 0 8px;
-    line-height: 18px;
-    --icon-size: 20px;
     --mask-color: var(--icon-rest);
 }
 .chat-topic-text span.small {

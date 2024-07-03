@@ -629,6 +629,12 @@ mBroadcaster.once('boot_done', function radSetup() {
             export: async(save = true, compress = true) => {
                 const chunks = [];
                 const filename = `rad-${new Date().toISOString().replace(/\D/g, '')}.log`;
+
+                // @todo this will dump a mumbo-jumbo of entries not chronologically sorted, fix me!
+                console.info('Flushing cross-tab entries...');
+                await flush();
+                await watchdog.query('rad-flush', 2e3).catch(dump);
+
                 console.info(`RAD Export to "${filename}"`);
 
                 const db = await flush();

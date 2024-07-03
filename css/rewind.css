@@ -499,28 +499,25 @@ body.theme-dark .rewind-datepicker-calendar .datepicker--cell.-current- {
     margin-bottom: 8px;
 }
 
+.sidebar .sidebar-container .sidebar-content .content-upgrade .rewind-description {
+    font: var(--text-body2);
+    margin-bottom: 18px;
+    width: 304px;
+}
+
 .sidebar .sidebar-container .sidebar-content .content-upgrade .upgrade-description {
     color: var(--text-color-medium);
     font: var(--text-body2);
     margin-bottom: 32px;
+    width: 304px;
 }
 
-.sidebar .sidebar-container .sidebar-content .content-upgrade .upgrade-description a {
+.sidebar .sidebar-container .sidebar-content .content-upgrade .upgrade-description a,
+.sidebar .sidebar-container .sidebar-content .content-upgrade .rewind-description a {
     color: var(--radio-border-active);
-    font: var(--text-body2-bold);
+    font: var(--text-body2);
+    font-weight: 700;
     text-decoration: underline;
-    font-family: var(--text-font-family-bold);
-}
-
-.sidebar .sidebar-container .sidebar-content .content-upgrade .upgrade-purchase-button {
-    font: var(--text-body1);
-    padding: 8px 12px;
-    width: 144px;
-}
-
-.sidebar .sidebar-container .sidebar-content .content-upgrade .upgrade-note {
-    margin-top: auto;
-    padding-top: 32px;
 }
 
 .sidebar .sidebar-container .sidebar-content .content-empty .empty-folder i {
@@ -717,7 +714,7 @@ body.theme-dark .rewind-datepicker-calendar .datepicker--cell.-current- {
 .sidebar .sidebar-container .sidebar-content .content-folder .folder-download {
     background: var(--surface-main);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-    height: 116px;
+    height: 84px;
     display: flex;
     margin: auto -18px -16px;
     padding: 16px;
@@ -725,7 +722,7 @@ body.theme-dark .rewind-datepicker-calendar .datepicker--cell.-current- {
 }
 
 .sidebar .sidebar-container .sidebar-content .content-folder .folder-download button {
-    margin: auto 24px 16px auto;
+    margin: auto 24px auto auto;
     font: var(--text-body1);
 }
 

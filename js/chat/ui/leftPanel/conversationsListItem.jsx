@@ -80,12 +80,15 @@ export default class ConversationsListItem extends MegaRenderMixin {
 
     getScheduledDateTime() {
         const { scheduledMeeting } = this.props.chatRoom;
+
         if (scheduledMeeting) {
-            const { isRecurring, nextOccurrenceStart } = scheduledMeeting;
-            if (isRecurring) {
-                return { date: time2date(nextOccurrenceStart / 1000, 19), time: toLocaleTime(nextOccurrenceStart) };
-            }
-            return { date: time2date(nextOccurrenceStart / 1000, 19), time: toLocaleTime(nextOccurrenceStart) };
+            const { nextOccurrenceStart, nextOccurrenceEnd } = scheduledMeeting;
+
+            return {
+                date: time2date(nextOccurrenceStart / 1000, 19),
+                startTime: toLocaleTime(nextOccurrenceStart),
+                endTime: toLocaleTime(nextOccurrenceEnd)
+            };
         }
     }
 
@@ -144,9 +147,12 @@ export default class ConversationsListItem extends MegaRenderMixin {
 
         var notificationItems = [];
         if (chatRoom.havePendingCall() && chatRoom.state !== ChatRoom.STATE.LEFT) {
-            notificationItems.push(<i
-                className={"tiny-icon " + (chatRoom.isCurrentlyActive ? "blue" : "white") + "-handset"}
-                key="callIcon"/>);
+            notificationItems.push(
+                <i
+                    className="tiny-icon white-handset"
+                    key="callIcon"
+                />
+            );
         }
         if (unreadCount > 0) {
             notificationItems.push(
@@ -233,7 +239,7 @@ export default class ConversationsListItem extends MegaRenderMixin {
 
         const { scheduledMeeting, isMeeting } = chatRoom;
         const isUpcoming = scheduledMeeting && scheduledMeeting.isUpcoming;
-        const { date, time } = this.getScheduledDateTime() || {};
+        const { startTime, endTime } = this.getScheduledDateTime() || {};
 
         return (
             <li
@@ -244,7 +250,7 @@ export default class ConversationsListItem extends MegaRenderMixin {
                 `}
                 data-room-id={roomId}
                 data-jid={contactId}
-                onClick={ev => this.props.onConversationClick(ev)}>
+                onClick={ev => this.props.onConversationClick?.(ev) || loadSubPage(chatRoom.getRoomUrl(false))}>
                 <div className="conversation-avatar">
                     {(chatRoom.type === 'group' || chatRoom.type === 'public') &&
                         <div
@@ -282,7 +288,7 @@ export default class ConversationsListItem extends MegaRenderMixin {
                                 null
                             }
                             {scheduledMeeting && scheduledMeeting.isUpcoming && scheduledMeeting.isRecurring &&
-                                <i className="sprite-fm-mono icon-repeat" />
+                                <i className="sprite-fm-mono icon-repeat-thin-solid" />
                             }
                         </div>
                     </div>
@@ -290,10 +296,11 @@ export default class ConversationsListItem extends MegaRenderMixin {
                     {isUpcoming ?
                         <div className="conversation-message-info">
                             <div className="conversation-scheduled-data">
-                                <span>{date}</span>
+                                <span>{startTime}</span>
+                                <span>&nbsp; - &nbsp;</span>
+                                <span>{endTime}</span>
                             </div>
                             <div className="conversation-scheduled-data">
-                                <span>{time}</span>
                                 {notificationItems.length > 0 ?
                                     <div
                                         className={`

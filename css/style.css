@@ -482,21 +482,33 @@ label span.black {
     height: 18px;
     margin: -6px 0 0;
     max-width: 100%;
-    min-width: 18px;
-    overflow: hidden;
+    min-width: 24px;
     padding: 0 3px;
     position: relative;
     text-align: center;
     text-overflow: ellipsis;
 }
 .nw-fm-left-icon.conversations .new-messages-indicator {
-    background-color: #2BA6DE;
+    top: 29px;
+    right: 4px;
 }
 
 .new-messages-indicator .chat-pending-call {
-    margin-top: -1px;
     display: block;
     float: left;
+    width: 18px;
+    height: 16px;
+    border-radius: 200px;
+    background-color: #2BA6DE;
+}
+.new-messages-indicator .chat-unread-count {
+    display: block;
+    width: 8px;
+    height: 8px;
+    margin: -10px 0 0 4px;
+    border-radius: 200px;
+    text-indent: -9999px;
+    background: var(--secondary-red);
 }
 .notification-num {
     display: inline-block;
@@ -5062,8 +5074,11 @@ span.orange {
     margin-left: 520px;
 }
 .sign .main-right-block {
-    padding-top: 116px;
+    padding-top: 155px;
     margin-left: 560px;
+}
+.sign .login .main-right-block {
+    padding-top: 68px;
 }
 h3.main-italic-header {
     font-size: 19px;

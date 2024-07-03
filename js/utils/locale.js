@@ -2009,6 +2009,28 @@ mBroadcaster.once('boot_done', function populate_l() {
 
     l.pr_save_up_to = escapeHTML(l.pr_save_up_to).replace('[S]', '').replace('[/S]', '');
 
+    l.view_upgrade_pro_dialog_desc = escapeHTML(l.view_upgrade_pro_dialog_desc)
+        .replace('[S1]', '<span class="monthly-price">')
+        .replace('[S2]', '<span class="asterisk hidden">')
+        .replace(/\[\/S\d]/g, '</span>');
+
+    l.trusted_users_worldwide = escapeHTML(l.trusted_users_worldwide)
+        .replace('[S1]', '<span>')
+        .replace('[S2]', '<span class="users-value">')
+        .replace('[S3]', '<span class="users-worldwide">')
+        .replace(/\[\/S\d]/g, '</span>');
+
+    l.rewind_select_date_pro = escapeHTML(l.rewind_select_date_pro)
+        .replace('[BR]', '<br />')
+        .replace('[A]', `<a ${rewindLinkAttr} href="${rewindHelpLink}">`)
+        .replace('[/A]', '</a>');
+
+    l.rewind_upgrade_info_text = escapeHTML(l.rewind_upgrade_info_text)
+        .replace('[A1]', '<a class="rewind-sidebar-upgrade-action clickurl" href="/pro">')
+        .replace('[/A1]', '</a>')
+        .replace('[A2]', `<a ${rewindLinkAttr} href="${rewindHelpLink}">`)
+        .replace('[/A2]', '</a>');
+
     const common = [
         15536, 16107, 16119, 16120, 16136, 16304, 16313, 16316, 16358, 16360, 16361, 16394, 18228, 18268, 18282,
         18284, 18285, 18286, 18287, 18289, 18290, 18291, 18294, 18295, 18296, 18297, 18298, 18302, 18303, 18304,

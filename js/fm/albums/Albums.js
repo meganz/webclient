@@ -3160,7 +3160,7 @@ lazy(mega.gallery, 'albums', () => {
                     delay('render:in_album_node_preview', () => {
                         const isVideo = scope.isVideo(cell.el.ref.node);
 
-                        if (isVideo && (!isVideo.isPreviewable || !MediaAttribute.getMediaType(cell.el.ref.node))) {
+                        if (isVideo && !isVideo.isVideo) {
                             scope.reportDownload();
                             M.addDownload([h]);
                         }

@@ -541,6 +541,7 @@ var pro = {
                     _saveUpTo: null,        // Stores the saveUpTo percentage of the plan, in case given by another plan
                     _correlatedPlan: null,       // Stores the correlated plan, in case given by another plan
                     _maxCorrPriceEur: null,
+                    planArray: plan,
                 };
 
                 lazy(thisPlan, 'id', () => plan[pro.UTQA_RES_INDEX_ID]);

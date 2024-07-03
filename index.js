@@ -1061,6 +1061,7 @@ function init_page() {
         else {
             init_register();
         }
+        eventlog(500272);
     }
     else if ((page.substr(0, 9) === 'registerb')) { // business register
         getUAOParameter(page, 'registerb');
@@ -1553,7 +1554,6 @@ function init_page() {
     // New multi-discount handling with discount promotion page e.g.
     // /discountpromoJ2iPNEWqiTM-yhsuGkOToh or short sale URLs e.g. /s/blackfriday
     else if (page.substr(0, 13) === 'discountpromo' || page.substr(0, 2) === 's/') {
-        parsepage(pages.discountpromo);
         return new DiscountPromo();
     }
 

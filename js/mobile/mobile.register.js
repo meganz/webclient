@@ -549,6 +549,16 @@ mobile.register.new = {
                 // Continue to the Pro payment page
                 loadSubPage('propay_' + planNum);
             }
+            // If they were on a page and asked to login or register before accessing, return to that page
+            else if (login_next) {
+                if (typeof login_next === 'function') {
+                    return login_next();
+                }
+
+                const nextPageAfterLogin = login_next;
+                login_next = false;
+                loadSubPage(nextPageAfterLogin);
+            }
             else {
                 // Otherwise show the signup email confirmation screen
                 mobile.register.showConfirmEmailScreen(registrationVars);

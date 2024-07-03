@@ -39,6 +39,9 @@ pro.propay = {
     /** The user's subscription payment gateway id */
     userSubsGatewayId: null,
 
+    /** @var Dialog Log in / register dialog displayed when not signed in */
+    accountRequiredDialog: null,
+
     /**
      * Initialises the page and functionality
      */
@@ -80,12 +83,11 @@ pro.propay = {
         // Preload loading/transferring/processing animation
         pro.propay.preloadAnimation();
 
-        // If somehow the user reached the Pro Pay page (step 2) and they're not logged in, go back to the Pro Plan
-        // selection page (step 1). Also, ephemeral accounts (not registered at all but have a few files in the cloud
+        // Ephemeral accounts (accounts not registered at all but have a few files in the cloud
         // drive) are *not* allowed to reach the Pro Pay page as we can't track their payment (no email address).
         // Accounts that have registered but have not confirmed their email address yet *are* allowed to reach the Pro
-        // Pay page e.g. if they registered on the Pro Plan selection page page first (this gets more conversions).
-        if (u_type === false || (u_type === 0 && typeof localStorage.awaitingConfirmationAccount === 'undefined')) {
+        // Pay page e.g. if they registered on the Pro Plan selection page first (this gets more conversions).
+        if (u_type === 0 && typeof localStorage.awaitingConfirmationAccount === 'undefined') {
             loadSubPage('pro');
             return;
         }
@@ -94,6 +96,54 @@ pro.propay = {
         if (!pro.propay.setProPlanFromUrl()) {
             loadSubPage('pro');
             return;
+        }
+
+        // Update header text with plan
+        $selectedPlanName.text(pro.propay.planName);
+
+        let discountInfo = pro.propay.getDiscount();
+        if (discountInfo && discountInfo.used) {
+            delete mega.discountCode;
+            delete mega.discountInfo;
+            discountInfo = null;
+        }
+
+        // Apply discount info if applicable
+        if (discountInfo && discountInfo.pd) {
+            const discountTitle = discountInfo.m === 12 ? l[24680]
+                : (discountInfo.m === 1 ? l[24849] : l[24850]);
+            $('.top-header.plan-title', this.$page).safeHTML(discountTitle
+                .replace('%1', escapeHTML(pro.propay.planName))
+                .replace('%2', formatPercentage(discountInfo.pd / 100)));
+            $('.stores-desc', this.$page).addClass('hidden');
+        }
+
+        if (!pro.planInFilter(pro.propay.planNum, 'supportsGooglePlay')) {
+            $('.bottom-page .bottom-page.stores-desc', this.$page).addClass('hidden');
+        }
+
+        // Show loading spinner because some stuff may not be rendered properly yet
+        loadingDialog.show('propayReady');
+
+        // Initialise some extra stuff just for mobile
+        if (is_mobile) {
+            mobile.propay.init();
+            if ((discountInfo && discountInfo.pd) || !pro.planInFilter(pro.propay.planNum, 'supportsGooglePlay')) {
+                $('.mobile.external-payment-options', '.mobile.fm-content').addClass('hidden');
+            }
+        }
+
+        // If the user is not logged in, show the login / register dialog
+        if (u_type === false) {
+            loadingDialog.hide('propayReady');
+            pro.propay.showAccountRequiredDialog();
+
+            // login / register action while on /propay_x will recall init()
+            return;
+        }
+
+        if (discountInfo) {
+            mega.discountInfo.used = true;
         }
 
         // If the user does has more stored than the current plan offers, go back to Pro page
@@ -114,29 +164,6 @@ pro.propay = {
             });
         });
 
-        // Update header text with plan
-        $selectedPlanName.text(pro.propay.planName);
-        let discountInfo = pro.propay.getDiscount();
-        if (discountInfo && discountInfo.pd && !discountInfo.used) {
-            const discountTitle = discountInfo.m === 12 ? l[24680]
-                : (discountInfo.m === 1 ? l[24849] : l[24850]);
-            $('.top-header.plan-title', this.$page).safeHTML(discountTitle
-                .replace('%1', pro.propay.planName)
-                .replace('%2', formatPercentage(discountInfo.pd / 100)));
-            $('.stores-desc', this.$page).addClass('hidden');
-            discountInfo.used = 1;
-        }
-        else if (discountInfo && discountInfo.used) {
-            delete mega.discountInfo;
-            discountInfo = false;
-        }
-        if (login_next && login_next.indexOf('discount') > -1) {
-            login_next = false;
-        }
-        if (!pro.planInFilter(pro.propay.planNum, 'supportsGooglePlay')) {
-            $('.bottom-page .bottom-page.stores-desc', this.$page).addClass('hidden');
-        }
-
         // Initialise the main purchase button
         $purchaseButton.rebind('click.purchase', () => {
             if (is_mobile) {
@@ -148,17 +175,6 @@ pro.propay = {
         });
 
         clickURLs();
-
-        // Show loading spinner because some stuff may not be rendered properly yet
-        loadingDialog.show('propayReady');
-
-        // Initialise some extra stuff just for mobile
-        if (is_mobile) {
-            mobile.propay.init();
-            if ((discountInfo && discountInfo.pd) || !pro.planInFilter(pro.propay.planNum, 'supportsGooglePlay')) {
-                $('.mobile.external-payment-options', '.mobile.fm-content').addClass('hidden');
-            }
-        }
 
         // Load payment plans
         pro.loadMembershipPlans(function() {
@@ -1885,7 +1901,60 @@ pro.propay = {
                 });
             }
         }
-    }
+    },
+
+    showAccountRequiredDialog() {
+        'use strict';
+
+        if (is_mobile) {
+            login_next = page;
+            mobile.proSignupPrompt.init();
+            return;
+        }
+
+        if (!pro.propay.accountRequiredDialog) {
+            pro.propay.accountRequiredDialog = new mega.ui.Dialog({
+                className: 'loginrequired-dialog',
+                closable: false,
+                closableByOverlay: false,
+                focusable: false,
+                expandable: false,
+                requiresOverlay: true,
+                title: l[5841],
+            });
+
+            const $dialog = pro.propay.accountRequiredDialog.$dialog;
+
+            $('.pro-login', $dialog).rebind('click.loginrequired', () => {
+                pro.propay.accountRequiredDialog.hide();
+                showLoginDialog();
+                return false;
+            });
+
+            $('header p', $dialog).text(l[5842]);
+
+            $('.pro-register', $dialog).rebind('click.loginrequired', () => {
+                pro.propay.accountRequiredDialog.hide();
+                if (u_wasloggedin()) {
+                    var msg = l[8743];
+                    msgDialog('confirmation', l[1193], msg, null, res => {
+                        if (res) {
+                            showRegisterDialog();
+                        }
+                        else {
+                            showLoginDialog();
+                        }
+                    });
+                }
+                else {
+                    showRegisterDialog();
+                }
+                return false;
+            });
+        }
+
+        this.accountRequiredDialog.show();
+    },
 };
 mBroadcaster.once('login2', () => {
     'use strict';

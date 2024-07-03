@@ -703,6 +703,7 @@ pro.proplan = {
             var planNum = currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
             var planName = pro.getProPlanName(planNum);
             var priceIndex = pro.UTQA_RES_INDEX_MONTHLYBASEPRICE;
+            let planObj = pro.getPlanObj(currentPlan);
 
             // Skip if data differs from selected period
             if (months !== period) {
@@ -722,7 +723,8 @@ pro.proplan = {
                 const isYearlyLowTierPlanBox = $currentBox.data('period') === 12;
 
                 if (isYearlyLowTierPlanBox) {
-                    currentPlan = pro.membershipPlans[i + 1];
+                    planObj = planObj.correlatedPlan;
+                    currentPlan = planObj.planArray;
                 }
 
                 var $price = $('.plan-price .price', $currentBox);
@@ -789,14 +791,14 @@ pro.proplan = {
                     const billingPeriodText = `${baseCurrency} / ${periodIsYearly ? l[932] : l[931]}`;
                     const onlyText = l.pr_only;
 
-                    const price = 12 * currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE] * pro.conversionRate;
                     // TODO re-enable in future ticket
                     // const $monthlyPrice = $('.pricing-page.monthly-price', $currentBox)
                     // .toggleClass('hidden', !periodIsYearly); // TODO unhide in HTML in future ticket
                     // if (periodIsYearly) {
                     //     onlyText = formatCurrency(price, baseCurrency, 'narrowSymbol');
 
-                    //     const perMonthPrice = formatCurrency(basePrice / 12, baseCurrency, 'narrowSymbol') + '*';
+                    //     const perMonthPrice = formatCurrency(
+                    //         planObj.correlatedPlan.price, baseCurrency, 'narrowSymbol') + '*';
                     //     $('span', $monthlyPrice).text(perMonthPrice);
                     // }
 
@@ -804,9 +806,8 @@ pro.proplan = {
                         const $periodSubTitle = $('.pricing-page.period-subtitle', $currentBox);
                         $periodSubTitle.text(periodIsYearly ? l.yearly_unit : l[918]);
 
-                        if (periodIsYearly) {
-                            const savings = Math.floor((1 - (basePrice / price)) * 100);
-                            const savingsString = l.yearly_plan_saving.replace('%1', savings);
+                        if (periodIsYearly && planObj.saveUpTo) {
+                            const savingsString = l.yearly_plan_saving.replace('%1', planObj.saveUpTo);
                             $('.pricing-page.plan-saving', $currentBox).text(savingsString).removeClass('hidden');
                         }
                     }

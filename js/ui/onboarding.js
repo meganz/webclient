@@ -309,7 +309,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                             dialogTitle: l.onboard_megachat_dlg6_title,
                             dialogDesc: l.onboard_megachat_dlg6_text,
                             targetElmClass: `.conversationsApp .lhp-conversations ul.conversations-pane
-                                             li.upcoming-conversation:first-child`,
+                                             li.upcoming-conversation.active`,
                             targetElmPosition: 'right',
                             markComplete: true,
                             ignoreBgClick: '.conversationsApp',
@@ -382,7 +382,7 @@ mBroadcaster.addListener('fm:initialized', () => {
                             dialogTitle: l.onboard_megachat_dlg9_title,
                             dialogDesc: '',
                             targetElmClass:
-                                `.conversationsApp .lhp-conversations .conversations-category.category-past`,
+                                `.conversationsApp .lhp-conversations .category-past`,
                             targetElmPosition: 'right',
                             ignoreBgClick: '.conversationsApp',
                             markComplete: true,

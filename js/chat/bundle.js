@@ -15,8 +15,8 @@ const REaCt = REQ_.n(React_);
 // EXTERNAL MODULE: external "ReactDOM"
 const ReactDOM_ = REQ_(206);
 const ReactDOM = REQ_.n(ReactDOM_);
-// EXTERNAL MODULE: ./js/chat/ui/conversations.jsx + 18 modules
-const conversations = REQ_(631);
+// EXTERNAL MODULE: ./js/chat/ui/conversations.jsx + 19 modules
+const conversations = REQ_(18);
 ;// CONCATENATED MODULE: ./js/chat/chatRouting.jsx
 let _ChatRouting;
 class ChatRouting {
@@ -2125,9 +2125,9 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function () {
     });
   }
   let unreadCount = 0;
-  const notifications = {
-    chats: 0,
-    meetings: 0
+  const notificationsCount = {
+    unreadChats: 0,
+    unreadMeetings: 0
   };
   let havePendingCall = false;
   self.chats.forEach(chatRoom => {
@@ -2137,7 +2137,7 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function () {
     const unreads = parseInt(chatRoom.messagesBuff.getUnreadCount(), 10);
     unreadCount += unreads;
     if (unreads) {
-      notifications[chatRoom.isMeeting ? 'meetings' : 'chats'] += unreads;
+      notificationsCount[chatRoom.isMeeting ? 'unreadMeetings' : 'unreadChats'] += unreads;
     }
     if (!havePendingCall && chatRoom.havePendingCall() && chatRoom.uniqueCallParts && !chatRoom.uniqueCallParts[u_handle]) {
       havePendingCall = true;
@@ -2148,7 +2148,6 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function () {
   if (havePendingCall) {
     haveContents = true;
     $('.new-messages-indicator .chat-pending-call').removeClass('hidden');
-    $('.new-messages-indicator .chat-pending-call').removeClass('call-exists');
   } else {
     $('.new-messages-indicator .chat-pending-call').addClass('hidden').removeClass("call-exists");
   }
@@ -2164,9 +2163,9 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function () {
       tryCatch(() => self.favico.badge(unreadCount))();
     });
   }
-  if (!this._lastNotifications || this._lastNotifications.chats !== notifications.chats || this._lastNotifications.meetings !== notifications.meetings) {
-    this._lastNotifications = notifications;
-    megaChat.trigger('onUnreadCountUpdate', notifications);
+  if (!this._lastNotifications || this._lastNotifications.unreadChats !== notificationsCount.unreadChats || this._lastNotifications.unreadMeetings !== notificationsCount.unreadMeetings) {
+    this._lastNotifications = notificationsCount;
+    megaChat.trigger('onUnreadCountUpdate', notificationsCount);
   }
   if (unreadCount && (unreadCount === "9+" || unreadCount > 0)) {
     haveContents = true;
@@ -14538,7 +14537,7 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
       }, REaCt().createElement("span", {
         className: "txt"
       }, REaCt().createElement(utils.zT, null, room.getRoomTitle()), isUpcoming && isRecurring && REaCt().createElement("i", {
-        className: "sprite-fm-mono icon-repeat"
+        className: "sprite-fm-mono recurring-meeting icon-repeat-thin-solid"
       })), REaCt().createElement("span", {
         className: "txt small"
       }, is_chatlink && isUpcoming && !isRecurring ? this.renderUpcomingInfo() : REaCt().createElement(ui_contacts.MembersAmount, {
@@ -15067,13 +15066,19 @@ class EmptyConvPanel extends mixins.w9 {
     });
   }
   render() {
+    const {
+      isMeeting
+    } = this.props;
     return REaCt().createElement("div", {
       className: "conversations-empty"
     }, REaCt().createElement("div", {
       className: "conversations-empty-content"
     }, REaCt().createElement("i", {
-      className: "sprite-fm-mono icon-chat-filled"
-    }), this.props.isMeeting ? REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("h1", null, l.start_meeting), REaCt().createElement("p", null, l.onboard_megachat_dlg3_text)) : REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("h1", null, l.start_chat), REaCt().createElement("p", null, l.onboard_megachat_dlg2_text)), this.renderActions()));
+      className: `
+                            sprite-fm-mono
+                            ${isMeeting ? 'icon-video-call-filled' : 'icon-chat-filled'}
+                        `
+    }), isMeeting ? REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("h1", null, l.start_meeting), REaCt().createElement("p", null, l.meetings_text_empty)) : REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("h1", null, l.start_chat), REaCt().createElement("p", null, l.onboard_megachat_dlg2_text)), this.renderActions()));
   }
 }
 function isStartCallDisabled(room) {
@@ -15088,7 +15093,7 @@ function isStartCallDisabled(room) {
 
 },
 
-631:
+18:
 (_, EXP_, REQ_) => {
 
 "use strict";
@@ -18503,107 +18508,65 @@ const buttons = REQ_(994);
 
 
 
-
-class Navigation extends mixins.w9 {
-  constructor(props) {
-    super(props);
-    this.state = {
-      unreadChats: 0,
-      unreadMeetings: 0,
-      contactRequests: 0
-    };
-    this.state.contactRequests = Object.keys(M.ipc).length;
+const Navigation = ({
+  view,
+  views: {
+    CHATS,
+    MEETINGS
+  },
+  routingSection,
+  unreadChats,
+  unreadMeetings,
+  contactRequests,
+  renderView
+}) => REaCt().createElement("div", {
+  className: `${NAMESPACE}-nav`
+}, REaCt().createElement("div", {
+  className: `
+                    ${NAMESPACE}-nav-container
+                    ${NAMESPACE}-chats-tab
+                    ${view === CHATS && routingSection === 'chat' ? 'active' : ''}
+                `,
+  onClick: () => {
+    renderView(CHATS);
+    eventlog(500233);
   }
-  componentWillUnmount() {
-    super.componentWillUnmount();
-    megaChat.unbind(`onUnreadCountUpdate.${LeftPanel.NAMESPACE}`);
-    if (this.contactRequestsListener) {
-      mBroadcaster.removeListener(this.contactRequestsListener);
-    }
+}, REaCt().createElement(buttons.$, {
+  unreadChats,
+  className: `${NAMESPACE}-nav-button`,
+  icon: "sprite-fm-mono icon-chat-filled"
+}, !!unreadChats && REaCt().createElement("div", {
+  className: "notifications-count"
+})), REaCt().createElement("span", null, l.chats)), REaCt().createElement("div", {
+  className: `
+                    ${NAMESPACE}-nav-container
+                    ${NAMESPACE}-meetings-tab
+                    ${view === MEETINGS && routingSection === 'chat' ? 'active' : ''}
+                `,
+  onClick: () => {
+    renderView(MEETINGS);
+    eventlog(500234);
   }
-  componentDidMount() {
-    super.componentDidMount();
-    megaChat.rebind(`onUnreadCountUpdate.${LeftPanel.NAMESPACE}`, (ev, notifications) => {
-      this.setState({
-        unreadChats: notifications.chats,
-        unreadMeetings: notifications.meetings
-      });
-    });
-    this.contactRequestsListener = mBroadcaster.addListener('fmViewUpdate:ipc', () => {
-      this.setState({
-        contactRequests: Object.keys(M.ipc).length
-      });
-    });
-  }
-  render() {
-    const {
-      view,
-      views,
-      routingSection,
-      renderView
-    } = this.props;
-    const {
-      CHATS,
-      MEETINGS
-    } = views;
-    const {
-      unreadChats,
-      unreadMeetings,
-      contactRequests
-    } = this.state;
-    return REaCt().createElement("div", {
-      className: `${LeftPanel.NAMESPACE}-nav`
-    }, REaCt().createElement("div", {
-      className: `
-                        ${LeftPanel.NAMESPACE}-nav-container
-                        ${LeftPanel.NAMESPACE}-chats-tab
-                        ${view === CHATS && routingSection === 'chat' ? 'active' : ''}
+}, REaCt().createElement(buttons.$, {
+  unreadMeetings,
+  className: `${NAMESPACE}-nav-button`,
+  icon: "sprite-fm-mono icon-video-call-filled"
+}, !!unreadMeetings && REaCt().createElement("div", {
+  className: "notifications-count"
+})), REaCt().createElement("span", null, l.meetings)), is_eplusplus || is_chatlink ? null : REaCt().createElement("div", {
+  className: `
+                        ${NAMESPACE}-nav-container
+                        ${NAMESPACE}-contacts-tab
+                        ${routingSection === 'contacts' ? 'active' : ''}
                     `,
-      onClick: () => {
-        renderView(CHATS);
-        eventlog(500233);
-      }
-    }, REaCt().createElement(buttons.$, {
-      unreadChats,
-      className: `${LeftPanel.NAMESPACE}-nav-button`,
-      icon: "sprite-fm-mono icon-chat-filled"
-    }, !!unreadChats && REaCt().createElement("div", {
-      className: "notifications-count"
-    }, REaCt().createElement("span", null, unreadChats > 9 ? '9+' : unreadChats))), REaCt().createElement("span", null, l.chats)), REaCt().createElement("div", {
-      className: `
-                        ${LeftPanel.NAMESPACE}-nav-container
-                        ${LeftPanel.NAMESPACE}-meetings-tab
-                        ${view === MEETINGS && routingSection === 'chat' ? 'active' : ''}
-                    `,
-      onClick: () => {
-        renderView(MEETINGS);
-        eventlog(500234);
-      }
-    }, REaCt().createElement(buttons.$, {
-      unreadMeetings,
-      className: `${LeftPanel.NAMESPACE}-nav-button`,
-      icon: "sprite-fm-mono icon-video-call-filled"
-    }, !!unreadMeetings && REaCt().createElement("div", {
-      className: "notifications-count"
-    }, REaCt().createElement("span", null, unreadMeetings > 9 ? '9+' : unreadMeetings))), REaCt().createElement("span", null, l.meetings)), is_eplusplus || is_chatlink ? null : REaCt().createElement("div", {
-      className: `
-                            ${LeftPanel.NAMESPACE}-nav-container
-                            ${LeftPanel.NAMESPACE}-contacts-tab
-                            ${routingSection === 'contacts' ? 'active' : ''}
-                        `,
-      onClick: () => loadSubPage('fm/chat/contacts')
-    }, REaCt().createElement(buttons.$, {
-      className: `${LeftPanel.NAMESPACE}-nav-button`,
-      contactRequests,
-      icon: "sprite-fm-mono icon-contacts"
-    }, !!contactRequests && REaCt().createElement("div", {
-      className: `
-                                        notifications-count
-                                        ${contactRequests > 99 ? 'large' : ''}
-                                    `
-    }, REaCt().createElement("span", null, contactRequests))), REaCt().createElement("span", null, l[165])));
-  }
-}
+  onClick: () => loadSubPage('fm/chat/contacts')
+}, REaCt().createElement(buttons.$, {
+  className: `${NAMESPACE}-nav-button`,
+  contactRequests,
+  icon: "sprite-fm-mono icon-contacts"
+}, !!contactRequests && REaCt().createElement("div", {
+  className: "notifications-count"
+})), REaCt().createElement("span", null, l[165])));
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
 const dropdowns = REQ_(911);
 ;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/actions.jsx
@@ -18634,17 +18597,17 @@ class Actions extends mixins.w9 {
       return null;
     }
     return REaCt().createElement("div", {
-      className: `${LeftPanel.NAMESPACE}-action-buttons`
+      className: `${NAMESPACE}-action-buttons`
     }, view === LOADING && REaCt().createElement(buttons.$, {
       className: "mega-button action loading-sketch"
-    }, REaCt().createElement("i", null), REaCt().createElement("span", null)), view === CHATS && routingSection !== 'contacts' && REaCt().createElement(buttons.$, {
+    }, REaCt().createElement("i", null), REaCt().createElement("span", null)), view === CHATS && routingSection !== 'contacts' && REaCt().createElement(REaCt().Fragment, null, REaCt().createElement(buttons.$, {
       className: "mega-button small positive new-chat-action",
       label: l.add_chat
     }, REaCt().createElement(dropdowns.DropdownContactsSelector, {
       className: `
-                                main-start-chat-dropdown
-                                ${LeftPanel.NAMESPACE}-contact-selector
-                            `,
+                                    main-start-chat-dropdown
+                                    ${NAMESPACE}-contact-selector
+                                `,
       onSelectDone: selected => {
         if (selected.length === 1) {
           return megaChat.createAndShowPrivateRoom(selected[0]).then(room => room.setActive());
@@ -18660,28 +18623,7 @@ class Actions extends mixins.w9 {
         onClick: createGroupChat
       }],
       showAddContact: contactsPanel.A.hasContacts()
-    })), view === MEETINGS && routingSection !== 'contacts' && REaCt().createElement(buttons.$, {
-      className: "mega-button small positive",
-      label: l.new_meeting
-    }, REaCt().createElement("i", {
-      className: "dropdown-indicator sprite-fm-mono icon-arrow-down"
-    }), REaCt().createElement(dropdowns.Dropdown, {
-      className: "light",
-      noArrow: "true",
-      vertOffset: 4,
-      positionMy: "left top",
-      positionAt: "left bottom"
-    }, REaCt().createElement(dropdowns.DropdownItem, {
-      className: "link-button",
-      icon: "sprite-fm-mono icon-video-plus",
-      label: l.new_meeting_start,
-      onClick: startMeeting
-    }), REaCt().createElement("hr", null), REaCt().createElement(dropdowns.DropdownItem, {
-      className: "link-button",
-      icon: "sprite-fm-mono icon-calendar2",
-      label: l.schedule_meeting_start,
-      onClick: scheduleMeeting
-    }))), routingSection !== 'contacts' && REaCt().createElement("div", {
+    })), REaCt().createElement("div", {
       className: "lhp-filter"
     }, REaCt().createElement("div", {
       className: "lhp-filter-control"
@@ -18710,9 +18652,29 @@ class Actions extends mixins.w9 {
       onClick: () => onFilter(FILTER.UNREAD)
     }, REaCt().createElement("span", null, l.filter_unread), REaCt().createElement("i", {
       className: "sprite-fm-mono icon-close-component"
-    })))), routingSection === 'contacts' && REaCt().createElement(buttons.$, {
-      className: "mega-button action",
-      icon: "sprite-fm-mono icon-add-circle",
+    }))))), view === MEETINGS && routingSection !== 'contacts' && REaCt().createElement(buttons.$, {
+      className: "mega-button small positive new-meeting-action",
+      label: l.new_meeting
+    }, REaCt().createElement("i", {
+      className: "dropdown-indicator sprite-fm-mono icon-arrow-down"
+    }), REaCt().createElement(dropdowns.Dropdown, {
+      className: "light",
+      noArrow: "true",
+      vertOffset: 4,
+      positionMy: "left top",
+      positionAt: "left bottom"
+    }, REaCt().createElement(dropdowns.DropdownItem, {
+      className: "link-button",
+      icon: "sprite-fm-mono icon-video-plus",
+      label: l.new_meeting_start,
+      onClick: startMeeting
+    }), REaCt().createElement("hr", null), REaCt().createElement(dropdowns.DropdownItem, {
+      className: "link-button",
+      icon: "sprite-fm-mono icon-calendar2",
+      label: l.schedule_meeting_start,
+      onClick: scheduleMeeting
+    }))), routingSection === 'contacts' && REaCt().createElement(buttons.$, {
+      className: "mega-button small positive",
       label: l[71],
       onClick: () => contactAddDialog()
     }));
@@ -18800,18 +18762,13 @@ const ConversationsListItem = (_dec = utils.Ay.SoonFcWrap(40, true), _dec2 = (0,
     } = this.props.chatRoom;
     if (scheduledMeeting) {
       const {
-        isRecurring,
-        nextOccurrenceStart
+        nextOccurrenceStart,
+        nextOccurrenceEnd
       } = scheduledMeeting;
-      if (isRecurring) {
-        return {
-          date: time2date(nextOccurrenceStart / 1000, 19),
-          time: toLocaleTime(nextOccurrenceStart)
-        };
-      }
       return {
         date: time2date(nextOccurrenceStart / 1000, 19),
-        time: toLocaleTime(nextOccurrenceStart)
+        startTime: toLocaleTime(nextOccurrenceStart),
+        endTime: toLocaleTime(nextOccurrenceEnd)
       };
     }
   }
@@ -18856,7 +18813,7 @@ const ConversationsListItem = (_dec = utils.Ay.SoonFcWrap(40, true), _dec2 = (0,
     const notificationItems = [];
     if (chatRoom.havePendingCall() && chatRoom.state !== ChatRoom.STATE.LEFT) {
       notificationItems.push(REaCt().createElement("i", {
-        className: `tiny-icon ${  chatRoom.isCurrentlyActive ? "blue" : "white"  }-handset`,
+        className: "tiny-icon white-handset",
         key: "callIcon"
       }));
     }
@@ -18917,8 +18874,8 @@ const ConversationsListItem = (_dec = utils.Ay.SoonFcWrap(40, true), _dec2 = (0,
     } = chatRoom;
     const isUpcoming = scheduledMeeting && scheduledMeeting.isUpcoming;
     const {
-      date,
-      time
+      startTime,
+      endTime
     } = this.getScheduledDateTime() || {};
     return REaCt().createElement("li", {
       id,
@@ -18928,7 +18885,10 @@ const ConversationsListItem = (_dec = utils.Ay.SoonFcWrap(40, true), _dec2 = (0,
                 `,
       "data-room-id": roomId,
       "data-jid": contactId,
-      onClick: ev => this.props.onConversationClick(ev)
+      onClick: ev => {
+        let _this$props$onConvers, _this$props;
+        return ((_this$props$onConvers = (_this$props = this.props).onConversationClick) == null ? void 0 : _this$props$onConvers.call(_this$props, ev)) || loadSubPage(chatRoom.getRoomUrl(false));
+      }
     }, REaCt().createElement("div", {
       className: "conversation-avatar"
     }, (chatRoom.type === 'group' || chatRoom.type === 'public') && REaCt().createElement("div", {
@@ -18956,16 +18916,16 @@ const ConversationsListItem = (_dec = utils.Ay.SoonFcWrap(40, true), _dec2 = (0,
       className: "sprite-fm-uni icon-ekr-key simpletip",
       "data-simpletip": l[20935]
     }) : null, scheduledMeeting && scheduledMeeting.isUpcoming && scheduledMeeting.isRecurring && REaCt().createElement("i", {
-      className: "sprite-fm-mono icon-repeat"
+      className: "sprite-fm-mono icon-repeat-thin-solid"
     }))), REaCt().createElement("div", {
       className: "clear"
     }), isUpcoming ? REaCt().createElement("div", {
       className: "conversation-message-info"
     }, REaCt().createElement("div", {
       className: "conversation-scheduled-data"
-    }, REaCt().createElement("span", null, date)), REaCt().createElement("div", {
+    }, REaCt().createElement("span", null, startTime), REaCt().createElement("span", null, "\xA0 - \xA0"), REaCt().createElement("span", null, endTime)), REaCt().createElement("div", {
       className: "conversation-scheduled-data"
-    }, REaCt().createElement("span", null, time), notificationItems.length > 0 ? REaCt().createElement("div", {
+    }, notificationItems.length > 0 ? REaCt().createElement("div", {
       className: `
                                             unread-messages
                                             items-${notificationItems.length}
@@ -18985,6 +18945,318 @@ const ConversationsListItem = (_dec = utils.Ay.SoonFcWrap(40, true), _dec2 = (0,
   }
 }, (0,applyDecoratedDescriptor.A)(_class.prototype, "eventuallyScrollTo", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "eventuallyScrollTo"), _class.prototype), (0,applyDecoratedDescriptor.A)(_class.prototype, "render", [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, "render"), _class.prototype), _class);
 
+;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/conversationsList.jsx
+
+
+
+
+
+
+
+
+const ConversationsList = ({
+  conversations,
+  className,
+  children
+}) => REaCt().createElement(perfectScrollbar.O, {
+  className: "chat-lp-scroll-area",
+  didMount: (id, ref) => {
+    megaChat.$chatTreePanePs = [...megaChat.$chatTreePanePs, {
+      id,
+      ref
+    }];
+  },
+  willUnmount: id => {
+    megaChat.$chatTreePanePs = megaChat.$chatTreePanePs.filter(ref => ref.id !== id);
+  },
+  conversations
+}, REaCt().createElement("ul", {
+  className: `
+                conversations-pane
+                ${className || ''}
+            `
+}, children || conversations.map(chatRoom => chatRoom.roomId && REaCt().createElement(ConversationsListItem, {
+  key: chatRoom.roomId,
+  chatRoom
+}))));
+const Chats = ({
+  conversations,
+  onArchivedClicked,
+  filter
+}) => {
+  conversations = Object.values(conversations || {}).filter(c => !c.isMeeting && c.isDisplayable() && (!filter || filter === FILTER.UNREAD && c.messagesBuff.getUnreadCount() > 0 || filter === FILTER.MUTED && c.isMuted())).sort(M.sortObjFn(c => c.lastActivity || c.ctime, -1));
+  return REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("div", {
+    className: "conversations-holder"
+  }, filter ? null : REaCt().createElement("div", {
+    className: "conversations-category"
+  }, REaCt().createElement("span", null, l.filter_heading__recent)), conversations && conversations.length ? REaCt().createElement(ConversationsList, {
+    conversations
+  }) : REaCt().createElement("div", {
+    className: `
+                            ${NAMESPACE}-nil
+                            ${filter ? `${NAMESPACE}-nil--chats` : ''}
+                        `
+  }, filter ? REaCt().createElement(REaCt().Fragment, null, filter === FILTER.MUTED && REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("i", {
+    className: "sprite-fm-mono icon-notification-off-filled"
+  }), REaCt().createElement("h3", null, l.filter_nil__muted_chats)), filter === FILTER.UNREAD && REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("i", {
+    className: "sprite-fm-mono icon-eye-thin-solid"
+  }), REaCt().createElement("h3", null, l.filter_nil__unread_messages))) : REaCt().createElement("span", null, l.no_chats_lhp))), REaCt().createElement("div", {
+    className: `${NAMESPACE}-bottom`
+  }, REaCt().createElement("div", {
+    className: `${NAMESPACE}-bottom-control`
+  }, REaCt().createElement("div", {
+    className: "conversations-category",
+    onClick: onArchivedClicked
+  }, REaCt().createElement("span", null, l.filter_archived__chats), REaCt().createElement("i", {
+    className: "sprite-fm-mono icon-arrow-right"
+  })))));
+};
+const Archived = ({
+  conversations,
+  archivedUnmounting,
+  onClose
+}) => {
+  const archivedChats = Object.values(conversations || {}).filter(c => !c.isMeeting && c.isArchived()).sort(M.sortObjFn(c => c.lastActivity || c.ctime, -1));
+  return REaCt().createElement("div", {
+    className: `
+                ${NAMESPACE}-archived
+                ${archivedUnmounting ? 'with-unmount-animation' : ''}
+            `
+  }, REaCt().createElement("div", {
+    className: `${NAMESPACE}-archived-head`
+  }, REaCt().createElement(meetings_button.A, {
+    className: "mega-button round",
+    icon: "sprite-fm-mono icon-arrow-left-regular-outline",
+    onClick: onClose
+  }), REaCt().createElement("h2", null, l.filter_archived__chats)), REaCt().createElement("div", {
+    className: `${NAMESPACE}-archived-content`
+  }, archivedChats && archivedChats.length ? REaCt().createElement(ConversationsList, {
+    conversations: archivedChats
+  }) : REaCt().createElement("div", {
+    className: `${NAMESPACE}-archived-empty`
+  }, REaCt().createElement("i", {
+    className: "sprite-fm-mono icon-archive"
+  }), REaCt().createElement("h3", null, l.filter_archived__nil_chats))));
+};
+class Meetings extends mixins.w9 {
+  constructor(props) {
+    let _megaChat$getCurrentM;
+    super(props);
+    this.TABS = {
+      UPCOMING: 0x00,
+      PAST: 0x01
+    };
+    this.ongoingRef = REaCt().createRef();
+    this.navigationRef = REaCt().createRef();
+    this.state = {
+      tab: this.TABS.UPCOMING
+    };
+    this.Navigation = ({
+      conversations
+    }) => {
+      const {
+        UPCOMING,
+        PAST
+      } = this.TABS;
+      const {
+        tab
+      } = this.state;
+      const unreadMeetings = Object.values(conversations || {}).reduce((acc, curr) => {
+        if (curr.isDisplayable() && curr.isMeeting && curr.messagesBuff.getUnreadCount()) {
+          let _curr$scheduledMeetin;
+          acc[(_curr$scheduledMeetin = curr.scheduledMeeting) != null && _curr$scheduledMeetin.isUpcoming ? UPCOMING : PAST]++;
+        }
+        return acc;
+      }, {
+        [UPCOMING]: 0,
+        [PAST]: 0
+      });
+      return REaCt().createElement("div", {
+        ref: this.navigationRef,
+        className: `
+                    ${NAMESPACE}-meetings--navigation
+                    ${this.props.leftPaneWidth < 230 ? 'narrow-width' : ''}
+                `
+      }, REaCt().createElement(meetings_button.A, {
+        converstaions: conversations,
+        className: `
+                        mega-button
+                        action
+                        ${tab === UPCOMING ? 'is-active' : ''}
+                    `,
+        onClick: () => this.setState({
+          tab: UPCOMING
+        })
+      }, REaCt().createElement("span", null, l.meetings_tab_upcoming, !!unreadMeetings[UPCOMING] && REaCt().createElement("div", {
+        className: "notification-indication"
+      }))), REaCt().createElement(meetings_button.A, {
+        converstaions: conversations,
+        className: `
+                        mega-button
+                        action
+                        ${tab === PAST ? 'is-active' : ''}
+                        category-past
+                    `,
+        onClick: () => this.setState({
+          tab: PAST
+        }, () => eventlog(500254))
+      }, REaCt().createElement("span", null, l.meetings_tab_past, !!unreadMeetings[PAST] && REaCt().createElement("div", {
+        className: "notification-indication"
+      }))));
+    };
+    this.Holder = ({
+      heading,
+      categoryName,
+      className,
+      children
+    }) => REaCt().createElement("div", {
+      className: `
+                conversations-holder
+                ${className || ''}
+            `
+    }, REaCt().createElement("div", {
+      className: `
+                    conversations-category
+                    ${categoryName ? `category-${categoryName}` : ''}
+                `
+    }, heading && REaCt().createElement("span", null, heading)), children);
+    this.Ongoing = ({
+      ongoingMeetings
+    }) => ongoingMeetings != null && ongoingMeetings.length ? REaCt().createElement("div", {
+      ref: this.ongoingRef,
+      className: `${NAMESPACE}-meetings--ongoing`
+    }, REaCt().createElement("strong", null, l.happening_now), REaCt().createElement(ConversationsList, {
+      conversations: ongoingMeetings
+    })) : null;
+    this.Upcoming = () => {
+      const upcomingMeetings = Object.values(this.props.conversations || {}).filter(c => {
+        return c.isDisplayable() && c.isMeeting && c.scheduledMeeting && c.scheduledMeeting.isUpcoming && !c.havePendingCall();
+      }).sort((a, b) => a.scheduledMeeting.nextOccurrenceStart - b.scheduledMeeting.nextOccurrenceStart || a.ctime - b.ctime);
+      const nextOccurrences = upcomingMeetings.reduce((nextOccurrences, chatRoom) => {
+        const {
+          nextOccurrenceStart
+        } = chatRoom.scheduledMeeting;
+        if ((0,helpers.cK)(nextOccurrenceStart)) {
+          nextOccurrences.today.push(chatRoom);
+        } else if ((0,helpers.ef)(nextOccurrenceStart)) {
+          nextOccurrences.tomorrow.push(chatRoom);
+        } else {
+          const date = time2date(nextOccurrenceStart / 1000, 19);
+          if (!nextOccurrences.rest[date]) {
+            nextOccurrences.rest[date] = [];
+          }
+          nextOccurrences.rest[date].push(chatRoom);
+        }
+        return nextOccurrences;
+      }, {
+        today: [],
+        tomorrow: [],
+        rest: {}
+      });
+      const upcomingItem = chatRoom => REaCt().createElement(ConversationsListItem, {
+        key: chatRoom.roomId,
+        chatRoom
+      });
+      return REaCt().createElement(this.Holder, {
+        categoryName: "upcoming"
+      }, upcomingMeetings && upcomingMeetings.length ? REaCt().createElement(ConversationsList, {
+        conversations: upcomingMeetings
+      }, nextOccurrences.today && nextOccurrences.today.length ? REaCt().createElement("div", {
+        className: "conversations-group"
+      }, REaCt().createElement("div", {
+        className: "conversations-category category--label"
+      }, REaCt().createElement("span", null, l.upcoming__today)), nextOccurrences.today.map(upcomingItem)) : null, nextOccurrences.tomorrow && nextOccurrences.tomorrow.length ? REaCt().createElement("div", {
+        className: "conversations-group"
+      }, REaCt().createElement("div", {
+        className: "conversations-category category--label"
+      }, REaCt().createElement("span", null, l.upcoming__tomorrow)), nextOccurrences.tomorrow.map(upcomingItem)) : null, Object.keys(nextOccurrences.rest).length ? Object.keys(nextOccurrences.rest).map(date => REaCt().createElement("div", {
+        key: date,
+        className: "conversations-group"
+      }, REaCt().createElement("div", {
+        className: "conversations-category category--label"
+      }, REaCt().createElement("span", null, date)), nextOccurrences.rest[date].map(upcomingItem))) : null) : REaCt().createElement("div", {
+        className: `${NAMESPACE}-nil`
+      }, REaCt().createElement("i", {
+        className: "sprite-fm-mono icon-calendar-plus-thin-solid"
+      }), REaCt().createElement("span", null, l.meetings_upcoming_nil)));
+    };
+    this.Past = () => {
+      const conversations = Object.values(this.props.conversations || {});
+      const pastMeetings = conversations.filter(c => c.isMeeting && c.isDisplayable() && (!c.scheduledMeeting || c.scheduledMeeting.isCanceled || c.scheduledMeeting.isPast) && !c.havePendingCall()).sort(M.sortObjFn(c => c.lastActivity || c.ctime, -1));
+      const archivedMeetings = conversations.filter(c => c.isMeeting && c.isArchived()).sort(M.sortObjFn(c => c.lastActivity || c.ctime, -1));
+      return REaCt().createElement(this.Holder, {
+        categoryName: "past"
+      }, REaCt().createElement(ConversationsList, {
+        conversations: pastMeetings
+      }, pastMeetings.length ? pastMeetings.map(chatRoom => chatRoom.roomId && REaCt().createElement(ConversationsListItem, {
+        key: chatRoom.roomId,
+        chatRoom
+      })) : REaCt().createElement("div", {
+        className: `
+                                ${NAMESPACE}-nil
+                                ${archivedMeetings.length ? 'half-sized' : ''}
+                            `
+      }, REaCt().createElement("strong", null, l.meetings_past_nil_heading), REaCt().createElement("i", {
+        className: "sprite-fm-mono icon-video-thin-solid"
+      }), REaCt().createElement("span", null, l.meetings_past_nil)), archivedMeetings.length ? REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("div", {
+        className: "archived-separator"
+      }), REaCt().createElement("div", {
+        className: "conversations-category category--label"
+      }, REaCt().createElement("span", null, l.meetings_label_archived)), archivedMeetings.map(chatRoom => chatRoom.roomId && REaCt().createElement(ConversationsListItem, {
+        key: chatRoom.roomId,
+        chatRoom
+      }))) : null));
+    };
+    this.getContainerStyles = ongoingMeetings => {
+      if (ongoingMeetings != null && ongoingMeetings.length) {
+        let _this$ongoingRef, _this$navigationRef;
+        const ongoingHeight = (_this$ongoingRef = this.ongoingRef) == null || (_this$ongoingRef = _this$ongoingRef.current) == null ? void 0 : _this$ongoingRef.clientHeight;
+        const navigationHeight = (_this$navigationRef = this.navigationRef) == null || (_this$navigationRef = _this$navigationRef.current) == null ? void 0 : _this$navigationRef.clientHeight;
+        return {
+          style: {
+            maxHeight: `calc(100% - ${ongoingHeight + navigationHeight + 30}px)`
+          }
+        };
+      }
+      return null;
+    };
+    this.state.tab = this.TABS[(_megaChat$getCurrentM = megaChat.getCurrentMeeting()) != null && _megaChat$getCurrentM.isPast ? 'PAST' : 'UPCOMING'];
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    megaChat.off(`${megaChat.plugins.meetingsManager.EVENTS.OCCURRENCES_UPDATE}.${this.getUniqueId()}`);
+  }
+  componentDidMount() {
+    super.componentDidMount();
+    megaChat.rebind(`${megaChat.plugins.meetingsManager.EVENTS.OCCURRENCES_UPDATE}.${this.getUniqueId()}`, () => this.safeForceUpdate());
+    megaChat.rebind(megaChat.plugins.meetingsManager.EVENTS.INITIALIZE, () => this.setState({
+      tab: this.TABS.UPCOMING
+    }));
+  }
+  render() {
+    const {
+      UPCOMING,
+      PAST
+    } = this.TABS;
+    const {
+      tab
+    } = this.state;
+    const ongoingMeetings = Object.values(this.props.conversations || {}).filter(c => c.isDisplayable() && c.isMeeting && c.havePendingCall());
+    return REaCt().createElement("div", {
+      className: `${NAMESPACE}-meetings`
+    }, REaCt().createElement(this.Ongoing, {
+      ongoingMeetings
+    }), REaCt().createElement(this.Navigation, {
+      conversations: this.props.conversations
+    }), REaCt().createElement("div", (0,esm_extends.A)({
+      className: `
+                        ${NAMESPACE}-meetings--content
+                        ${tab === UPCOMING ? 'is-upcoming' : ''}
+                        ${tab === PAST ? 'is-past' : ''}
+                    `
+    }, this.getContainerStyles(ongoingMeetings)), tab === UPCOMING && REaCt().createElement(this.Upcoming, null), tab === PAST && REaCt().createElement(this.Past, null)));
+  }
+}
 ;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/leftPanel.jsx
 
 
@@ -18993,16 +19265,10 @@ const ConversationsListItem = (_dec = utils.Ay.SoonFcWrap(40, true), _dec2 = (0,
 
 
 
-
-
+const NAMESPACE = 'lhp';
 const FILTER = {
   MUTED: 'muted',
   UNREAD: 'unread'
-};
-const CONVERSATION_TYPES = {
-  UPCOMING: 'upcoming',
-  PAST: 'past',
-  ARCHIVED: 'archive'
 };
 class LeftPanel extends mixins.w9 {
   constructor(props) {
@@ -19011,7 +19277,10 @@ class LeftPanel extends mixins.w9 {
       updated: 0,
       archived: false,
       archivedUnmounting: false,
-      filter: ''
+      filter: '',
+      unreadChats: 0,
+      unreadMeetings: 0,
+      contactRequests: 0
     };
     this.toggleFilter = filter => {
       this.setState(state => ({
@@ -19023,6 +19292,7 @@ class LeftPanel extends mixins.w9 {
       });
     };
     this.doUpdate = this.doUpdate.bind(this);
+    this.state.contactRequests = Object.keys(M.ipc).length;
   }
   customIsEventuallyVisible() {
     return M.chat;
@@ -19030,75 +19300,7 @@ class LeftPanel extends mixins.w9 {
   doUpdate() {
     return this.isComponentVisible() && document.visibilityState === 'visible' && this.setState(state => ({
       updated: ++state.updated
-    }), () => this.forceUpdate());
-  }
-  renderConversationsList(conversations) {
-    const {
-      view,
-      views
-    } = this.props;
-    return REaCt().createElement(perfectScrollbar.O, {
-      className: "chat-lp-scroll-area",
-      didMount: (id, ref) => {
-        megaChat.$chatTreePanePs = [...megaChat.$chatTreePanePs, {
-          id,
-          ref
-        }];
-      },
-      willUnmount: id => {
-        megaChat.$chatTreePanePs = megaChat.$chatTreePanePs.filter(ref => ref.id !== id);
-      },
-      conversations
-    }, REaCt().createElement("ul", {
-      className: `
-                        conversations-pane
-                        ${view === views.MEETINGS ? '' : 'with-offset'}
-                    `
-    }, conversations.map(chatRoom => {
-      if (chatRoom.roomId) {
-        return REaCt().createElement(ConversationsListItem, {
-          key: chatRoom.roomId,
-          chatRoom,
-          contact: M.u[chatRoom.getParticipantsExceptMe()[0]] || null,
-          messages: chatRoom.messagesBuff,
-          onConversationClick: () => loadSubPage(chatRoom.getRoomUrl(false))
-        });
-      }
-      return null;
-    })));
-  }
-  renderArchived() {
-    const {
-      view,
-      views
-    } = this.props;
-    const {
-      NAMESPACE
-    } = LeftPanel;
-    const archivedConversations = this.getConversations(CONVERSATION_TYPES.ARCHIVED);
-    return REaCt().createElement("div", {
-      className: `
-                    ${NAMESPACE}-archived
-                    ${this.state.archivedUnmounting ? 'is-unmounting' : ''}
-                `
-    }, REaCt().createElement("div", {
-      className: `${NAMESPACE}-archived-head`
-    }, REaCt().createElement(meetings_button.A, {
-      className: "mega-button round",
-      icon: "sprite-fm-mono icon-arrow-left-regular-outline",
-      onClick: () => this.setState({
-        archivedUnmounting: true
-      }, () => setTimeout(() => this.setState({
-        archivedUnmounting: false,
-        archived: false
-      }), 300))
-    }), REaCt().createElement("h2", null, view === views.CHATS ? l.filter_archived__chats : '', view === views.MEETINGS ? l.filter_archived__meetings : '')), REaCt().createElement("div", {
-      className: `${NAMESPACE}-archived-content`
-    }, archivedConversations && archivedConversations.length ? this.renderConversationsList(archivedConversations) : REaCt().createElement("div", {
-      className: `${NAMESPACE}-archived-empty`
-    }, REaCt().createElement("i", {
-      className: "sprite-fm-mono icon-archive"
-    }), REaCt().createElement("h3", null, view === views.CHATS ? l.filter_archived__nil_chats : '', view === views.MEETINGS ? l.filter_archived__nil_meetings : ''))));
+    }), () => this.safeForceUpdate());
   }
   renderLoading() {
     return REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("span", {
@@ -19125,94 +19327,28 @@ class LeftPanel extends mixins.w9 {
       }))));
     })));
   }
-  renderChats() {
-    const {
-      NAMESPACE
-    } = LeftPanel;
-    const {
-      filter
-    } = this.state;
-    const recentChats = this.filterConversations(CONVERSATION_TYPES.PAST);
-    return REaCt().createElement("div", {
-      className: "conversations-holder"
-    }, filter ? null : REaCt().createElement("div", {
-      className: "conversations-category"
-    }, REaCt().createElement("span", null, l.filter_heading__recent)), recentChats && recentChats.length ? this.renderConversationsList(recentChats) : REaCt().createElement("div", {
-      className: `
-                            ${NAMESPACE}-nil
-                            ${filter ? `${NAMESPACE}-nil--chats` : ''}
-                        `
-    }, filter ? REaCt().createElement(REaCt().Fragment, null, filter === FILTER.MUTED && REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("i", {
-      className: "sprite-fm-mono icon-notification-off-filled"
-    }), REaCt().createElement("h3", null, l.filter_nil__muted_chats)), filter === FILTER.UNREAD && REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("i", {
-      className: "sprite-fm-mono icon-eye-thin-solid"
-    }), REaCt().createElement("h3", null, l.filter_nil__unread_messages))) : REaCt().createElement("span", null, l.no_chats_lhp)));
-  }
-  renderMeetings() {
-    const {
-      NAMESPACE
-    } = LeftPanel;
-    const {
-      filter
-    } = this.state;
-    const upcomingConversations = this.filterConversations(CONVERSATION_TYPES.UPCOMING);
-    const pastConversations = this.filterConversations(CONVERSATION_TYPES.PAST);
-    const $$HOLDER = (heading, content, categoryName) => REaCt().createElement("div", {
-      className: "conversations-holder"
-    }, REaCt().createElement("div", {
-      className: `conversations-category category-${categoryName}`
-    }, REaCt().createElement("span", null, heading)), content);
-    return REaCt().createElement(REaCt().Fragment, null, $$HOLDER(l.filter_heading__upcoming, upcomingConversations && upcomingConversations.length ? this.renderConversationsList(upcomingConversations) : REaCt().createElement("div", {
-      className: `${NAMESPACE}-nil`
-    }, filter ? REaCt().createElement(REaCt().Fragment, null, filter === FILTER.MUTED && REaCt().createElement("span", null, l.filter_nil__muted_upcoming), filter === FILTER.UNREAD && REaCt().createElement("span", null, l.filter_nil__unread_upcoming)) : REaCt().createElement("span", null, l.filter_nil__meetings_upcoming)), 'upcoming'), $$HOLDER(l.filter_heading__recent, pastConversations && pastConversations.length ? this.renderConversationsList(pastConversations) : REaCt().createElement("div", {
-      className: `${NAMESPACE}-nil`
-    }, filter ? REaCt().createElement(REaCt().Fragment, null, filter === FILTER.MUTED && REaCt().createElement("span", null, l.filter_nil__muted_recent), filter === FILTER.UNREAD && REaCt().createElement("span", null, l.filter_nil__unread_recent)) : REaCt().createElement("span", null, l.filter_nil__meetings_recent)), 'past'));
-  }
-  getConversations(type) {
-    const {
-      UPCOMING,
-      PAST,
-      ARCHIVED
-    } = CONVERSATION_TYPES;
-    let {
-      view,
-      views,
-      conversations
-    } = this.props;
-    conversations = Object.values(conversations);
-    switch (type) {
-      case UPCOMING:
-        return conversations.filter(c => c.isDisplayable() && c.isMeeting && c.scheduledMeeting && c.scheduledMeeting.isUpcoming).sort((a, b) => {
-          return a.scheduledMeeting.nextOccurrenceStart - b.scheduledMeeting.nextOccurrenceStart || a.ctime - b.ctime;
-        });
-      case PAST:
-        return conversations.filter(c => c.isDisplayable() && (view === views.MEETINGS ? c.isMeeting : !c.isMeeting) && (!c.scheduledMeeting || c.scheduledMeeting.isCanceled || c.scheduledMeeting.isPast)).sort(M.sortObjFn(c => c.lastActivity || c.ctime, -1));
-      case ARCHIVED:
-        return conversations.filter(c => c.isArchived() && (view === views.MEETINGS ? c.isMeeting : !c.isMeeting)).sort(M.sortObjFn(c => c.lastActivity || c.ctime, -1));
-    }
-  }
-  filterConversations(type) {
-    const {
-      filter
-    } = this.state;
-    const conversations = this.getConversations(type);
-    switch (filter) {
-      case FILTER.UNREAD:
-        return conversations.filter(c => c.messagesBuff.getUnreadCount() > 0);
-      case FILTER.MUTED:
-        return conversations.filter(c => c.isMuted());
-      default:
-        return conversations;
-    }
-  }
   componentWillUnmount() {
     super.componentWillUnmount();
     clearInterval(this.backgroundUpdateInterval);
+    megaChat.unbind(`onUnreadCountUpdate.${NAMESPACE}`);
+    mBroadcaster.removeListener(this.contactRequestsListener);
     document.removeEventListener('visibilitychange', this.doUpdate);
   }
   componentDidMount() {
     super.componentDidMount();
     this.doUpdate();
+    megaChat.rebind(`onUnreadCountUpdate.${NAMESPACE}`, (ev, {
+      unreadChats,
+      unreadMeetings
+    }) => {
+      this.setState({
+        unreadChats,
+        unreadMeetings
+      }, () => this.safeForceUpdate());
+    });
+    this.contactRequestsListener = mBroadcaster.addListener('fmViewUpdate:ipc', () => this.setState({
+      contactRequests: Object.keys(M.ipc).length
+    }));
     this.backgroundUpdateInterval = setInterval(this.doUpdate, 600000);
     document.addEventListener('visibilitychange', this.doUpdate);
   }
@@ -19220,6 +19356,7 @@ class LeftPanel extends mixins.w9 {
     const {
       view,
       views,
+      conversations,
       routingSection,
       leftPaneWidth,
       renderView,
@@ -19227,9 +19364,6 @@ class LeftPanel extends mixins.w9 {
       scheduleMeeting,
       createGroupChat
     } = this.props;
-    const {
-      NAMESPACE
-    } = LeftPanel;
     const {
       CHATS,
       MEETINGS,
@@ -19247,10 +19381,13 @@ class LeftPanel extends mixins.w9 {
       width: leftPaneWidth
     }), REaCt().createElement("div", {
       className: "left-pane-drag-handle"
-    }), this.state.archived ? this.renderArchived() : REaCt().createElement(REaCt().Fragment, null, REaCt().createElement(SearchPanel, null), REaCt().createElement(Navigation, {
+    }), REaCt().createElement(SearchPanel, null), REaCt().createElement(Navigation, {
       view,
       views,
       routingSection,
+      unreadChats: this.state.unreadChats,
+      unreadMeetings: this.state.unreadMeetings,
+      contactRequests: this.state.contactRequests,
       renderView: view => this.setState({
         filter: false
       }, () => renderView(view))
@@ -19263,48 +19400,55 @@ class LeftPanel extends mixins.w9 {
       scheduleMeeting,
       createGroupChat,
       onFilter: this.toggleFilter
+    }), this.state.archived && REaCt().createElement(Archived, {
+      conversations,
+      archivedUnmounting: this.state.archivedUnmounting,
+      onClose: () => this.setState({
+        archivedUnmounting: true
+      }, () => tSleep(0.3).then(() => this.setState({
+        archivedUnmounting: false,
+        archived: false
+      })))
     }), REaCt().createElement("div", {
       className: `
-                                ${NAMESPACE}-conversations
-                                ${view === MEETINGS ? 'meetings-view' : ''}
-                                ${view === CHATS ? 'chats-view' : ''}
-                                conversations
-                                content-panel
-                                active
-                            `
-    }, view === LOADING ? this.renderLoading() : REaCt().createElement(REaCt().Fragment, null, view === MEETINGS && this.renderMeetings(), view === CHATS && this.renderChats(), REaCt().createElement("div", {
-      className: `${NAMESPACE}-bottom`
-    }, REaCt().createElement("div", {
-      className: `${NAMESPACE}-bottom-control`
-    }, REaCt().createElement("div", {
-      className: "conversations-category",
-      onClick: () => this.setState({
-        archived: true
+                        ${NAMESPACE}-conversations
+                        ${view === MEETINGS ? 'meetings-view' : ''}
+                        ${view === CHATS ? 'chats-view' : ''}
+                        conversations
+                        content-panel
+                        active
+                    `
+    }, view === LOADING ? this.renderLoading() : REaCt().createElement(REaCt().Fragment, null, view === MEETINGS && REaCt().createElement(Meetings, {
+      conversations,
+      leftPaneWidth
+    }), view === CHATS && REaCt().createElement(Chats, {
+      conversations,
+      filter: this.state.filter,
+      onArchivedClicked: () => this.setState({
+        archived: true,
+        filter: false
       })
-    }, REaCt().createElement("span", null, view === CHATS ? l.filter_archived__chats : l.filter_archived__meetings), REaCt().createElement("i", {
-      className: "sprite-fm-mono icon-arrow-right"
-    }))))))));
+    }))));
   }
 }
-LeftPanel.NAMESPACE = 'lhp';
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/freeCallEnded.jsx
 
 
 
-const NAMESPACE = 'free-call-ended-dlg';
+const freeCallEnded_NAMESPACE = 'free-call-ended-dlg';
 class FreeCallEnded extends mixins.w9 {
   componentDidMount() {
     super.componentDidMount();
-    M.safeShowDialog(NAMESPACE, () => {
+    M.safeShowDialog(freeCallEnded_NAMESPACE, () => {
       if (!this.isMounted()) {
-        throw new Error(`${NAMESPACE} dialog: component ${NAMESPACE} not mounted.`);
+        throw new Error(`${freeCallEnded_NAMESPACE} dialog: component ${freeCallEnded_NAMESPACE} not mounted.`);
       }
-      return $(`#${NAMESPACE}`);
+      return $(`#${freeCallEnded_NAMESPACE}`);
     });
   }
   componentWillUnmount() {
     super.componentWillUnmount();
-    if ($.dialog === NAMESPACE) {
+    if ($.dialog === freeCallEnded_NAMESPACE) {
       closeDialog();
     }
   }
@@ -19314,10 +19458,10 @@ class FreeCallEnded extends mixins.w9 {
     } = this.props;
     return REaCt().createElement(modalDialogs.A.ModalDialog, {
       className: "mega-dialog",
-      id: NAMESPACE,
+      id: freeCallEnded_NAMESPACE,
       onClose,
       dialogType: "action",
-      dialogName: NAMESPACE
+      dialogName: freeCallEnded_NAMESPACE
     }, REaCt().createElement("header", null, REaCt().createElement("div", {
       className: "free-call-ended graphic"
     }, REaCt().createElement("img", {
@@ -19658,7 +19802,7 @@ class ConversationsApp extends mixins.w9 {
         this.setState({
           scheduleMeetingDialog: true
         });
-        delay(`chat-event-sm-button-main`, () => eventlog(99918));
+        delay('chat-event-sm-button-main', () => eventlog(99918));
       },
       createGroupChat: () => this.setState({
         startGroupChatDialog: true
@@ -36488,7 +36632,7 @@ function _extends() {
 	// Load entry module and return exports
 	REQ_(326);
 	// This entry module is referenced by other modules so it can't be inlined
-	const EXP_ = REQ_(631);
+	const EXP_ = REQ_(18);
 	
 })()
 ;

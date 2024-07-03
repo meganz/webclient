@@ -1059,6 +1059,8 @@ body div:has(+ div.dropdown.body.button-group-menu:hover) .float-video .float-vi
   height: 100%;
   padding-right: 10px;
   animation: fadeInAnimation 350ms ease-out;
+  z-index: 130;
+  background: var(--surface-grey-2);
 }
 @keyframes fadeInAnimation {
   from {
@@ -1073,7 +1075,7 @@ body div:has(+ div.dropdown.body.button-group-menu:hover) .float-video .float-vi
 .lhp-container .lhp-archived:hover .lhp-archived-head {
   border-bottom: 2px solid var(--stroke-main);
 }
-.lhp-container .lhp-archived.is-unmounting {
+.lhp-container .lhp-archived.with-unmount-animation {
   right: -150px;
   opacity: 0;
   transition: all 350ms ease-in-out;
@@ -1215,6 +1217,148 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   --icon-size: 24px;
   --mask-color: var(--icon-rest);
   cursor: pointer;
+}
+.lhp-container .lhp-meetings {
+  width: 100%;
+  height: 100%;
+}
+.lhp-container .lhp-meetings--navigation {
+  display: flex;
+  justify-content: space-evenly;
+  border-bottom: 1px solid var(--stroke-mid-grey);
+}
+.lhp-container .lhp-meetings--navigation .mega-button.action {
+  flex: 1;
+  margin: 0;
+  padding: 0 0 10px;
+  border-bottom: 4px solid transparent;
+  border-radius: unset;
+  font: var(--text-body1);
+  text-align: center;
+  color: var(--text-color-medium);
+}
+.lhp-container .lhp-meetings--navigation .mega-button.action:hover {
+  background: transparent;
+  color: var(--text-color-higher);
+}
+.lhp-container .lhp-meetings--navigation .mega-button.action.is-active {
+  font: var(--text-body1-bold);
+  color: var(--text-color-higher);
+  border-bottom: 4px solid var(--stroke-info);
+}
+.lhp-container .lhp-meetings--navigation .mega-button.action .notification-indication {
+  min-width: 6px;
+  height: 6px;
+  margin: 8px 6px 0 6px;
+  background: var(--secondary-red);
+  border-radius: 200px;
+}
+.lhp-container .lhp-meetings--navigation.narrow-width .mega-button.action {
+  font: var(--text-body2-bold);
+}
+.lhp-container .lhp-meetings--navigation.narrow-width .mega-button.action .notification-indication {
+  margin-top: 6px;
+}
+.lhp-container .lhp-meetings--ongoing {
+  margin: 0 0 10px;
+}
+.lhp-container .lhp-meetings--ongoing strong {
+  padding: 0 0 3px 8px;
+  font: var(--text-body1-bold);
+  color: var(--text-color-high);
+}
+.lhp-container .lhp-meetings--ongoing li {
+  margin-right: 0;
+}
+.lhp-container .lhp-meetings--ongoing li .date-time-wrapper .date-time {
+  display: none;
+}
+.lhp-container .lhp-meetings--content {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  align-content: flex-start;
+  width: 100%;
+  height: 100%;
+  background-color: var(--stroke-grey-2);
+  max-height: calc(100% - 60px);
+}
+.lhp-container .lhp-meetings--content.is-upcoming {
+  /* [...] */
+}
+.lhp-container .lhp-meetings--content.is-past {
+  margin: 10px 0 0;
+}
+.lhp-container .lhp-meetings--content .conversations-holder {
+  margin: 0;
+  height: 100%;
+}
+.lhp-container .lhp-meetings--content .conversations-holder .conversations-group {
+  margin: 0 14px 14px 6px;
+  padding: 0 0 11px 0;
+  border-bottom: 1px solid var(--stroke-mid-grey);
+}
+.lhp-container .lhp-meetings--content .conversations-holder .conversations-group:last-child {
+  margin-bottom: 0;
+  border-color: transparent;
+}
+.lhp-container .lhp-meetings--content .conversations-holder .conversations-category {
+  font: var(--text-body1-bold);
+  color: var(--text-color-high);
+}
+.lhp-container .lhp-meetings--content .conversations-holder .lhp-nil {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin: 143px 0;
+  text-align: center;
+}
+.lhp-container .lhp-meetings--content .conversations-holder .lhp-nil.half-sized {
+  margin: 0 0 22px;
+}
+.lhp-container .lhp-meetings--content .conversations-holder .lhp-nil.half-sized strong {
+  margin: -4px 0 24px 0;
+  align-self: baseline;
+  font: var(--text-body1-bold);
+  color: var(--text-color-high);
+}
+.lhp-container .lhp-meetings--content .conversations-holder .lhp-nil span {
+  display: block;
+  margin: 17px 0 0;
+  font: var(--text-h3);
+  color: var(--text-color-medium);
+}
+.lhp-container .lhp-meetings--content .conversations-holder .lhp-nil i {
+  --icon-size: 64px;
+  --mask-color: var(--icon-inactive);
+}
+.lhp-container .lhp-meetings .conversations-pane {
+  overflow: hidden;
+}
+.lhp-container .lhp-meetings .conversations-pane li {
+  /* [...] */
+}
+.lhp-container .lhp-meetings .conversations-pane li.upcoming-conversation {
+  margin-right: 0;
+}
+.lhp-container .lhp-meetings .conversations-pane li .conversation-avatar {
+  display: none;
+}
+.lhp-container .lhp-meetings .conversations-pane li .conversation-data {
+  width: 100%;
+}
+.lhp-container .lhp-meetings .conversations-pane .archived-separator {
+  overflow: hidden;
+  width: calc(100% - 22px);
+  height: 1px;
+  margin: 16px 0 16px 8px;
+  background: var(--stroke-mid-grey);
+}
+.lhp-container .lhp-meetings .conversations-pane .conversations-category.category--label {
+  margin: 9px 0 8px 2px;
 }
 
 .invite-panel {

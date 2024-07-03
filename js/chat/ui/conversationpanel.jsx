@@ -2334,7 +2334,9 @@ export class ConversationPanel extends MegaRenderMixin {
                     <div className="chat-topic-text">
                         <span className="txt">
                             <Emoji>{room.getRoomTitle()}</Emoji>
-                            {isUpcoming && isRecurring && <i className="sprite-fm-mono icon-repeat" />}
+                            {isUpcoming && isRecurring &&
+                                <i className="sprite-fm-mono recurring-meeting icon-repeat-thin-solid" />
+                            }
                         </span>
                         <span className="txt small">
                             {is_chatlink && isUpcoming && !isRecurring ?
@@ -3056,14 +3058,21 @@ export class EmptyConvPanel extends MegaRenderMixin {
     }
 
     render() {
+        const { isMeeting } = this.props;
+
         return (
             <div className="conversations-empty">
                 <div className="conversations-empty-content">
-                    <i className="sprite-fm-mono icon-chat-filled" />
-                    {this.props.isMeeting ?
+                    <i
+                        className={`
+                            sprite-fm-mono
+                            ${isMeeting ? 'icon-video-call-filled' : 'icon-chat-filled'}
+                        `}
+                    />
+                    {isMeeting ?
                         <>
                             <h1>{l.start_meeting /* `Start a meeting` */}</h1>
-                            <p>{l.onboard_megachat_dlg3_text}</p>
+                            <p>{l.meetings_text_empty}</p>
                         </> :
                         <>
                             <h1>{l.start_chat /* `Start chatting now` */}</h1>

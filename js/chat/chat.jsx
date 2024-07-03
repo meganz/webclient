@@ -824,14 +824,13 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
     }
     // update the "global" conversation tab unread counter
     var unreadCount = 0;
-    const notifications = {
-        chats: 0,
-        meetings: 0
+    const notificationsCount = {
+        unreadChats: 0,
+        unreadMeetings: 0
     };
 
 
     var havePendingCall = false;
-    var haveCall = false;
     self.chats.forEach(chatRoom => {
         if (chatRoom.isArchived() || chatRoom.state === ChatRoom.STATE.LEFT) {
             return;
@@ -841,7 +840,7 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
         unreadCount += unreads;
 
         if (unreads) {
-            notifications[chatRoom.isMeeting ? 'meetings' : 'chats'] += unreads;
+            notificationsCount[chatRoom.isMeeting ? 'unreadMeetings' : 'unreadChats'] += unreads;
         }
 
         if (
@@ -863,13 +862,6 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
         haveContents = true;
         $('.new-messages-indicator .chat-pending-call')
             .removeClass('hidden');
-
-        if (haveCall) {
-            $('.new-messages-indicator .chat-pending-call').addClass('call-exists');
-        }
-        else {
-            $('.new-messages-indicator .chat-pending-call').removeClass('call-exists');
-        }
     }
     else {
         $('.new-messages-indicator .chat-pending-call')
@@ -897,11 +889,11 @@ Chat.prototype.updateSectionUnreadCount = SoonFc(function() {
 
     if (
         !this._lastNotifications ||
-        this._lastNotifications.chats !== notifications.chats ||
-        this._lastNotifications.meetings !== notifications.meetings
+        this._lastNotifications.unreadChats !== notificationsCount.unreadChats ||
+        this._lastNotifications.unreadMeetings !== notificationsCount.unreadMeetings
     ) {
-        this._lastNotifications = notifications;
-        megaChat.trigger('onUnreadCountUpdate', notifications);
+        this._lastNotifications = notificationsCount;
+        megaChat.trigger('onUnreadCountUpdate', notificationsCount);
     }
 
     if (unreadCount && (unreadCount === "9+" || unreadCount > 0)) {

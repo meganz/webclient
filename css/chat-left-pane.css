@@ -61,9 +61,6 @@
     padding: 6px 0 0;
     list-style-type: none;
 }
-.conversations-pane.with-offset {
-    padding-bottom: 40px;
-}
 .conversations-pane.loading-sketch {
     width: 100%;
     animation: fadeInOutLoopSubtle 2s linear infinite;
@@ -212,9 +209,6 @@
     max-width: 26px;
     display: flex;
 }
-.conversation-data-top .conversation-data-badges i.icon-repeat {
-    --icon-size: 20px;
-}
 .conversation-data-top .date-time {
     align-self: flex-end;
     flex: 1 0;
@@ -333,7 +327,6 @@
     font: var(--text-caption);
 }
 .conversations-pane li.active .unread-messages {
-    background-color: white;
     color: #2BA6DE;
 }
 .conversations-pane li .items-2 .tiny-icon.white-handset,
@@ -1751,7 +1744,7 @@ td.verification .contact-item {
     display: flex;
     align-items: center;
     justify-content: space-evenly;
-    margin: 26px 0 8px;
+    margin: 31px 0 23px;
     text-align: center;
 }
 
@@ -1788,10 +1781,10 @@ td.verification .contact-item {
 
 .conversationsApp .lhp-nav-container .notifications-count {
     position: absolute;
-    top: -4px;
+    top: 3px;
     right: -4px;
-    width: 16px;
-    height: 16px;
+    width: 6px;
+    height: 6px;
     border-radius: 200px;
     box-sizing: border-box;
     background: var(--secondary-red);
@@ -1820,12 +1813,17 @@ td.verification .contact-item {
     position: relative;
     font: var(--text-body1);
     color: var(--text-color-high);
-    margin-bottom: 13px;
+    margin-bottom: 19px;
     margin-inline-start: 6px;
 }
 
-.lhp-action-buttons .new-chat-action {
-    padding: 8px;
+.conversationsApp .lhp-action-buttons button {
+    --outer-padding: 2px;
+    padding: 6px;
+}
+
+.conversationsApp .lhp-action-buttons .new-meeting-action {
+    padding: 2px;
 }
 
 .conversationsApp .lhp-action-buttons button.loading-sketch {
@@ -1899,6 +1897,7 @@ td.verification .contact-item {
     height: 95%;
 }
 
+/*
 .lhp-conversations.meetings-view .conversations-holder {
     max-height: 46%;
 }
@@ -1909,6 +1908,7 @@ td.verification .contact-item {
         margin: 0 0 25px;
     }
 }
+*/
 
 .lhp-conversations .conversations-category {
     display: flex;

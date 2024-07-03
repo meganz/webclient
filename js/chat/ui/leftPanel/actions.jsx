@@ -3,7 +3,7 @@ import { MegaRenderMixin } from '../../mixins.js';
 import { Button } from '../../../ui/buttons.jsx';
 import { Dropdown, DropdownContactsSelector, DropdownItem } from '../../../ui/dropdowns.jsx';
 import ContactsPanel from '../contactsPanel/contactsPanel.jsx';
-import LeftPanel, { FILTER } from './leftPanel.jsx';
+import { FILTER, NAMESPACE } from './leftPanel.jsx';
 
 export default class Actions extends MegaRenderMixin {
     render() {
@@ -24,7 +24,7 @@ export default class Actions extends MegaRenderMixin {
         }
 
         return (
-            <div className={`${LeftPanel.NAMESPACE}-action-buttons`}>
+            <div className={`${NAMESPACE}-action-buttons`}>
                 {view === LOADING &&
                     <Button
                         className="mega-button action loading-sketch">
@@ -32,39 +32,94 @@ export default class Actions extends MegaRenderMixin {
                         <span />
                     </Button>
                 }
+
                 {view === CHATS && routingSection !== 'contacts' &&
-                    <Button
-                        className="mega-button small positive new-chat-action"
-                        label={l.add_chat /* `New chat` */}>
-                        <DropdownContactsSelector
-                            className={`
-                                main-start-chat-dropdown
-                                ${LeftPanel.NAMESPACE}-contact-selector
-                            `}
-                            onSelectDone={selected => {
-                                if (selected.length === 1) {
-                                    return megaChat.createAndShowPrivateRoom(selected[0])
-                                        .then(room => room.setActive());
-                                }
-                                megaChat.createAndShowGroupRoomFor(selected);
-                            }}
-                            multiple={false}
-                            horizOffset={70}
-                            topButtons={[
-                                {
-                                    key: 'newGroupChat',
-                                    title: l[19483] /* `New group chat` */,
-                                    icon: 'sprite-fm-mono icon-chat-filled',
-                                    onClick: createGroupChat
-                                }
-                            ]}
-                            showAddContact={ContactsPanel.hasContacts()}
-                        />
-                    </Button>
+                    <>
+                        <Button
+                            className="mega-button small positive new-chat-action"
+                            label={l.add_chat /* `New chat` */}>
+                            <DropdownContactsSelector
+                                className={`
+                                    main-start-chat-dropdown
+                                    ${NAMESPACE}-contact-selector
+                                `}
+                                onSelectDone={selected => {
+                                    if (selected.length === 1) {
+                                        return megaChat.createAndShowPrivateRoom(selected[0])
+                                            .then(room => room.setActive());
+                                    }
+                                    megaChat.createAndShowGroupRoomFor(selected);
+                                }}
+                                multiple={false}
+                                horizOffset={70}
+                                topButtons={[
+                                    {
+                                        key: 'newGroupChat',
+                                        title: l[19483] /* `New group chat` */,
+                                        icon: 'sprite-fm-mono icon-chat-filled',
+                                        onClick: createGroupChat
+                                    }
+                                ]}
+                                showAddContact={ContactsPanel.hasContacts()}
+                            />
+                        </Button>
+                        <div className="lhp-filter">
+                            <div className="lhp-filter-control">
+                                <Button icon="sprite-fm-mono icon-sort-thin-solid">
+                                    <Dropdown
+                                        className="light"
+                                        noArrow="true">
+                                        <DropdownItem
+                                            className="link-button"
+                                            icon="sprite-fm-mono icon-eye-reveal"
+                                            label={l.filter_unread /* `Unread messages` */}
+                                            onClick={() => onFilter(FILTER.UNREAD)}
+                                        />
+                                        <DropdownItem
+                                            className="link-button"
+                                            icon="sprite-fm-mono icon-notification-off"
+                                            label={
+                                                view === MEETINGS ?
+                                                    l.filter_muted__meetings /* `Muted meetings` */ :
+                                                    l.filter_muted__chats /* `Muted chats` */
+                                            }
+                                            onClick={() => onFilter(FILTER.MUTED)}
+                                        />
+                                    </Dropdown>
+                                </Button>
+                            </div>
+                            {filter &&
+                                <>
+                                    {filter === FILTER.MUTED &&
+                                        <div
+                                            className="lhp-filter-tag"
+                                            onClick={() => onFilter(FILTER.MUTED)}>
+                                            <span>
+                                                {view === MEETINGS ?
+                                                    l.filter_muted__meetings /* `Muted meetings` */ :
+                                                    l.filter_muted__chats /* `Muted chats` */
+                                                }
+                                            </span>
+                                            <i className="sprite-fm-mono icon-close-component" />
+                                        </div>
+                                    }
+                                    {filter === FILTER.UNREAD &&
+                                        <div
+                                            className="lhp-filter-tag"
+                                            onClick={() => onFilter(FILTER.UNREAD)}>
+                                            <span>{l.filter_unread /* `Unread messages` */}</span>
+                                            <i className="sprite-fm-mono icon-close-component" />
+                                        </div>
+                                    }
+                                </>
+                            }
+                        </div>
+                    </>
                 }
+
                 {view === MEETINGS && routingSection !== 'contacts' &&
                     <Button
-                        className="mega-button small positive"
+                        className="mega-button small positive new-meeting-action"
                         label={l.new_meeting /* `New meeting` */}>
                         <i className="dropdown-indicator sprite-fm-mono icon-arrow-down"/>
                         <Dropdown
@@ -89,63 +144,10 @@ export default class Actions extends MegaRenderMixin {
                         </Dropdown>
                     </Button>
                 }
-                {routingSection !== 'contacts' &&
-                    <div className="lhp-filter">
-                        <div className="lhp-filter-control">
-                            <Button icon="sprite-fm-mono icon-sort-thin-solid">
-                                <Dropdown
-                                    className="light"
-                                    noArrow="true">
-                                    <DropdownItem
-                                        className="link-button"
-                                        icon="sprite-fm-mono icon-eye-reveal"
-                                        label={l.filter_unread /* `Unread messages` */}
-                                        onClick={() => onFilter(FILTER.UNREAD)}
-                                    />
-                                    <DropdownItem
-                                        className="link-button"
-                                        icon="sprite-fm-mono icon-notification-off"
-                                        label={
-                                            view === MEETINGS ?
-                                                l.filter_muted__meetings /* `Muted meetings` */ :
-                                                l.filter_muted__chats /* `Muted chats` */
-                                        }
-                                        onClick={() => onFilter(FILTER.MUTED)}
-                                    />
-                                </Dropdown>
-                            </Button>
-                        </div>
-                        {filter &&
-                            <>
-                                {filter === FILTER.MUTED &&
-                                    <div
-                                        className="lhp-filter-tag"
-                                        onClick={() => onFilter(FILTER.MUTED)}>
-                                        <span>
-                                            {view === MEETINGS ?
-                                                l.filter_muted__meetings /* `Muted meetings` */ :
-                                                l.filter_muted__chats /* `Muted chats` */
-                                            }
-                                        </span>
-                                        <i className="sprite-fm-mono icon-close-component" />
-                                    </div>
-                                }
-                                {filter === FILTER.UNREAD &&
-                                    <div
-                                        className="lhp-filter-tag"
-                                        onClick={() => onFilter(FILTER.UNREAD)}>
-                                        <span>{l.filter_unread /* `Unread messages` */}</span>
-                                        <i className="sprite-fm-mono icon-close-component" />
-                                    </div>
-                                }
-                            </>
-                        }
-                    </div>
-                }
+
                 {routingSection === 'contacts' &&
                     <Button
-                        className="mega-button action"
-                        icon="sprite-fm-mono icon-add-circle"
+                        className="mega-button small positive"
                         label={l[71] /* `Add contact` */}
                         onClick={() => contactAddDialog()}
                     />

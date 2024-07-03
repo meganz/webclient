@@ -803,6 +803,12 @@ lazy(mega.ui, 'mInfoPanel', () => {
 
         // If there is a node, make sure it's valid, otherwise close the panel
         if (selectedNodeHandles.length === 1 && !selectedNodes[0]) {
+
+            // For Devices page, show Warning: 'The folder does not exist'
+            if (page === 'fm/devices') {
+                return msgDialog('warninga', l[882], l[24196]);
+            }
+
             mega.ui.mInfoPanel.closeIfOpen();
             return;
         }

@@ -23,6 +23,11 @@
     };
     const DEBUG = window.d > 2;
 
+    // Attribute types (scope)
+    ns.PUBLIC = 1;
+    ns.PRIVATE = -1;
+    ns.PRIVATE_UNENCRYPTED = -2;
+
     /**
      * Assemble property name on Mega API.
      *
@@ -1798,4 +1803,3 @@
     ns = undefined;
 
 })(self);
-

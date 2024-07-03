@@ -409,6 +409,9 @@ function getCleanSitePath(path) {
             if (path.lang && path.lang.length < 6) {
                 localStorage.lang = path.lang;
             }
+            if (path.cjevent) {
+                sessionStorage.cjevent = path.cjevent;
+            }
             if (path[0] === 'pro' && path.tab) {
                 window.mProTab = path.tab;
             }
@@ -2563,6 +2566,7 @@ else if (!browserUpdate) {
     jsl.push({f:'html/js/megasync.js', n: 'megasync_js', j: 1});
     jsl.push({f:'js/fm/linkinfohelper.js', n: 'fm_linkinfohelper_js', j: 1});
     jsl.push({f:'js/fm/affiliatedata.js', n: 'fm_affiliatedata_js', j: 1});
+    jsl.push({f:'js/eaffiliate.js', n: 'eaffiliate_js', j: 1});
     jsl.push({f:'js/fm/affiliateRedemption.js', n: 'fm_affiliateredemption_js', j: 1});
     jsl.push({f:'js/ui/megaGesture.js', n: 'mega_gesture_js', j: 1, w:1});
 

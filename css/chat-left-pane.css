@@ -808,14 +808,6 @@ li.active .call-duration i {
     float: right;
 }
 
-.result-table .result-table-row.message:nth-child(odd) {
-    /* [...] */
-}
-
-.result-table .result-table-row.message span {
-    /* [...] */
-}
-
 .result-table .result-table-row.message span.title {
     overflow: hidden;
     float: left;
@@ -1893,22 +1885,13 @@ td.verification .contact-item {
     margin: 0 0 20px;
 }
 
+.lhp-conversations.chats-view .conversations-pane {
+    padding-bottom: 30px;
+}
+
 .lhp-conversations.chats-view .conversations-holder {
     height: 95%;
 }
-
-/*
-.lhp-conversations.meetings-view .conversations-holder {
-    max-height: 46%;
-}
-
-@media only screen and (max-height: 750px) {
-    .lhp-conversations.meetings-view .conversations-holder {
-        max-height: 42%;
-        margin: 0 0 25px;
-    }
-}
-*/
 
 .lhp-conversations .conversations-category {
     display: flex;

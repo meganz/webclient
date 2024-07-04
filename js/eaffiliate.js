@@ -1,4 +1,4 @@
-mBroadcaster.once('startMega', async() => {
+mBroadcaster.once('startMega', () => {
     'use strict';
 
     const provider = 1; // CJ (one for now...)
@@ -72,14 +72,14 @@ mBroadcaster.once('startMega', async() => {
         delete sessionStorage.cjevent;
 
         if ('csp' in window) {
-            await csp.init();
+            csp.init().then(() => {
+                // @todo shall we force showing the dialog, when the user may previously dismissed granting 'analyze'?..
 
-            // @todo shall we force showing the dialog, when the user may previously dismissed granting 'analyze'?..
-
-            if (csp.has('analyze') && sessionStorage.eAff) {
-                localStorage.eAff = sessionStorage.eAff;
-                delete sessionStorage.eAff;
-            }
+                if (csp.has('analyze') && sessionStorage.eAff) {
+                    localStorage.eAff = sessionStorage.eAff;
+                    delete sessionStorage.eAff;
+                }
+            });
         }
         else if (d) {
             console.warn('CSP unexpectedly not available');
@@ -87,11 +87,11 @@ mBroadcaster.once('startMega', async() => {
     }
 
     if (!u_type) {
-        await mBroadcaster.when('login2');
-    }
-
-    const data = getEvent();
-    if (data) {
-        setAttr(data);
+        mBroadcaster.once('login2', () => {
+            const data = getEvent();
+            if (data) {
+                setAttr(data);
+            }
+        });
     }
 });

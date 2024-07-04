@@ -1915,17 +1915,24 @@ pro.propay = {
         if (!pro.propay.accountRequiredDialog) {
             pro.propay.accountRequiredDialog = new mega.ui.Dialog({
                 className: 'loginrequired-dialog',
-                closable: false,
-                closableByOverlay: false,
                 focusable: false,
                 expandable: false,
                 requiresOverlay: true,
                 title: l[5841],
             });
+        }
+        else {
+            pro.propay.accountRequiredDialog.visible = false; // Allow it to go through the show() motions again
+        }
 
+        pro.propay.accountRequiredDialog.bind('onBeforeShow', () => {
             const $dialog = pro.propay.accountRequiredDialog.$dialog;
 
+            $dialog.addClass('with-close-btn');
+
+            let loginProceed = false;
             $('.pro-login', $dialog).rebind('click.loginrequired', () => {
+                loginProceed = true;
                 pro.propay.accountRequiredDialog.hide();
                 showLoginDialog();
                 return false;
@@ -1934,6 +1941,7 @@ pro.propay = {
             $('header p', $dialog).text(l[5842]);
 
             $('.pro-register', $dialog).rebind('click.loginrequired', () => {
+                loginProceed = true;
                 pro.propay.accountRequiredDialog.hide();
                 if (u_wasloggedin()) {
                     var msg = l[8743];
@@ -1951,9 +1959,15 @@ pro.propay = {
                 }
                 return false;
             });
-        }
 
-        this.accountRequiredDialog.show();
+            pro.propay.accountRequiredDialog.rebind('onHide', () => {
+                if (!loginProceed) {
+                    loadSubPage('pro');
+                }
+            });
+        });
+
+        pro.propay.accountRequiredDialog.show();
     },
 };
 mBroadcaster.once('login2', () => {

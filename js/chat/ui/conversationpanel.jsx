@@ -1,5 +1,5 @@
 import React from 'react';
-import utils, { Emoji, ParsedHTML } from './../../ui/utils.jsx';
+import utils, { Emoji, ParsedHTML, reactStringWrap } from './../../ui/utils.jsx';
 import { MegaRenderMixin, timing } from '../mixins.js';
 import { Button } from '../../ui/buttons.jsx';
 import ModalDialogsUI from './../../ui/modalDialogs.jsx';
@@ -27,6 +27,7 @@ import WaitingRoom from './meetings/waitingRoom/waitingRoom.jsx';
 import { renderEndConfirm, renderLeaveConfirm } from './meetings/streamControls';
 import { InviteParticipantsPanel } from "./inviteParticipantsPanel.jsx";
 import ChatOverlay, { ChatOverlays } from './chatOverlay.jsx';
+import Link from "./link.jsx";
 
 const ENABLE_GROUP_CALLING_FLAG = true;
 const MAX_USERS_CHAT_PRIVATE = 100;
@@ -3018,68 +3019,140 @@ export class ConversationPanels extends MegaRenderMixin {
 }
 
 export class EmptyConvPanel extends MegaRenderMixin {
-    renderActions() {
-        const { isMeeting, onNewChat, onStartMeeting, onScheduleMeeting } = this.props;
 
-        if (isMeeting) {
-            return (
-                <Button
-                    className="mega-button large positive"
-                    label={l.new_meeting /* `New meeting` */}>
-                    <Dropdown
-                        className="light"
-                        noArrow="true"
-                        vertOffset={4}>
-                        <DropdownItem
-                            className="link-button"
-                            icon="sprite-fm-mono icon-video-plus"
-                            label={l.new_meeting_start /* `Start meeting now` */}
-                            onClick={onStartMeeting}
-                        />
-                        <hr/>
-                        <DropdownItem
-                            className="link-button"
-                            icon="sprite-fm-mono icon-calendar2"
-                            label={l.schedule_meeting_start /* `Schedule meeting` */}
-                            onClick={onScheduleMeeting}
-                        />
-                    </Dropdown>
-                </Button>
-            );
-        }
+    state = {
+        linkData: '',
+    };
 
-        return (
-            <Button
-                className="mega-button large positive"
-                label={l.add_chat /* `New chat` */}
-                onClick={onNewChat}
-            />
-        );
+    componentDidMount() {
+        super.componentDidMount();
+        (
+            M.account && M.account.contactLink ?
+                Promise.resolve(M.account.contactLink) :
+                api.send('clc')
+        )
+            .then(res => {
+                if (this.isMounted() && typeof res === 'string') {
+                    const prefix = res.startsWith('C!') ? '' : 'C!';
+                    this.setState({ linkData: `${getBaseUrl()}/${prefix}${res}` });
+                }
+            })
+            .catch(dump);
     }
 
-    render() {
-        const { isMeeting } = this.props;
+    Tile = ({ title, desc, imgClass, buttonPrimary, buttonSecondary, onClickPrimary, onClickSecondary }) =>
+        <div className="conversations-empty-tile">
+            <span className={`chat-tile-img ${imgClass}`} />
+            <div className="tile-content">
+                <h2>{title}</h2>
+                <div>{desc}</div>
+                <Button
+                    className="mega-button positive"
+                    label={buttonPrimary}
+                    onClick={onClickPrimary}
+                />
+                {
+                    buttonSecondary &&
+                    <Button
+                        className="mega-button action positive"
+                        icon="sprite-fm-mono icon-link"
+                        label={buttonSecondary}
+                        onClick={onClickSecondary}
+                    />
+                }
+            </div>
+        </div>;
 
+    render() {
+        const { isMeeting, onNewChat, onStartMeeting, onScheduleMeeting } = this.props;
+        const { linkData } = this.state;
         return (
             <div className="conversations-empty">
+                <div className="conversations-empty-header">
+                    <h1>{
+                        isMeeting ?
+                            l.meetings_empty_header : /* `Get together with MEGA meetings` */
+                            l.chat_empty_header /* `Keep in touch with MEGA chat` */
+                    }</h1>
+                    <h3>
+                        {reactStringWrap(
+                            isMeeting ?
+                                l.meetings_empty_subheader : /* `Voice and video calls, protected with...` */
+                                l.chat_empty_subheader, /* `Direct messaging, group chats and calling anyone, on...` */
+                            '[A]',
+                            Link,
+                            {
+                                onClick: () => {
+                                    window.open('https://mega.io/chatandmeetings', '_blank', 'noopener,noreferrer');
+                                    eventlog(this.props.isMeeting ? 500281 : 500280);
+                                }
+                            }
+                        )}
+                    </h3>
+                </div>
                 <div className="conversations-empty-content">
-                    <i
-                        className={`
-                            sprite-fm-mono
-                            ${isMeeting ? 'icon-video-call-filled' : 'icon-chat-filled'}
-                        `}
+                    <this.Tile
+                        title={
+                            isMeeting ?
+                                l.meetings_empty_calls_head : /* `Video call with anyone` */
+                                l.invite_friend_btn /* `Invite a friend` */
+                        }
+                        desc={
+                            isMeeting ?
+                                l.meetings_empty_calls_desc : /* `Start a meeting now, and invite anyone to join...` */
+                                l.chat_empty_contact_desc /* `Add friends and family and get 5 GB of free cloud...` */
+                        }
+                        imgClass={isMeeting ? 'empty-meetings-call' : 'empty-chat-contacts'}
+                        buttonPrimary={
+                            isMeeting ?
+                                l.new_meeting_start : /* `Start meeting now` */
+                                l[71] /* `Add contact` */
+                        }
+                        buttonSecondary={!isMeeting && linkData && l.copy_contact_link_btn}
+                        onClickPrimary={() => {
+                            if (isMeeting) {
+                                onStartMeeting();
+                                eventlog(500275);
+                            }
+                            else {
+                                contactAddDialog();
+                                eventlog(500276);
+                            }
+                        }}
+                        onClickSecondary={() => {
+                            /* `Copied to clipboard` */
+                            copyToClipboard(linkData, `${l[371]}<span class="link-text">${linkData}</span>`);
+                            delay('chat-event-copy-contact-link', () => eventlog(500277));
+                        }}
                     />
-                    {isMeeting ?
-                        <>
-                            <h1>{l.start_meeting /* `Start a meeting` */}</h1>
-                            <p>{l.meetings_text_empty}</p>
-                        </> :
-                        <>
-                            <h1>{l.start_chat /* `Start chatting now` */}</h1>
-                            <p>{l.onboard_megachat_dlg2_text}</p>
-                        </>
-                    }
-                    {this.renderActions()}
+                    <this.Tile
+                        title={
+                            isMeeting ?
+                                l.meetings_empty_schedule_head /* `Plan a meeting` */
+                                : l.chat_empty_add_chat_header /* `Start chatting` */
+                        }
+                        desc={
+                            isMeeting ?
+                                l.meetings_empty_schedule_desc : /* `Schedule one-off or recurring meetings, ...` */
+                                l.chat_empty_add_chat_desc /* `Anyone with a link can join your chat, ...` */
+                        }
+                        imgClass={isMeeting ? 'empty-meetings-schedule' : 'empty-chat-new'}
+                        buttonPrimary={
+                            isMeeting ?
+                                l.schedule_meeting_start : /* `Schedule meeting` */
+                                l.add_chat /* `New chat` */
+                        }
+                        onClickPrimary={() => {
+                            if (isMeeting) {
+                                onScheduleMeeting();
+                                eventlog(500278);
+                            }
+                            else {
+                                onNewChat();
+                                eventlog(500279);
+                            }
+                        }}
+                    />
                 </div>
             </div>
         );

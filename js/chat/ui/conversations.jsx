@@ -11,6 +11,7 @@ import Call, { inProgressAlert } from './meetings/call.jsx';
 import ChatToaster from './chatToaster.jsx';
 import LeftPanel from './leftPanel/leftPanel.jsx';
 import { FreeCallEnded as FreeCallEndedDialog } from './meetings/workflow/freeCallEnded.jsx';
+import ContactSelectorDialog from "./contactSelectorDialog";
 
 export const VIEWS = {
     CHATS: 0x00,
@@ -33,6 +34,7 @@ class ConversationsApp extends MegaRenderMixin {
         scheduleMeetingDialog: false,
         scheduleOccurrenceDialog: false,
         freeCallEndedDialog: false,
+        contactSelectorDialog: false,
         view: VIEWS.LOADING,
         callExpanded: false
     };
@@ -245,7 +247,7 @@ class ConversationsApp extends MegaRenderMixin {
         const { routingSection, chatUIFlags, currentlyOpenedChat, chats } = megaChat;
         const {
             view, startGroupChatDialog, startMeetingDialog, scheduleMeetingDialog, scheduleOccurrenceDialog,
-            leftPaneWidth, callExpanded, freeCallEndedDialog
+            leftPaneWidth, callExpanded, freeCallEndedDialog, contactSelectorDialog
         } = this.state;
         const isEmpty =
             chats &&
@@ -273,7 +275,7 @@ class ConversationsApp extends MegaRenderMixin {
                 {!isLoading && isEmpty &&
                     <EmptyConvPanel
                         isMeeting={view === MEETINGS}
-                        onNewChat={() => this.setState({ startGroupChatDialog: true })}
+                        onNewChat={() => this.setState({ contactSelectorDialog: true })}
                         onStartMeeting={() => this.startMeeting()}
                         onScheduleMeeting={() => this.setState({ scheduleMeetingDialog: true })}
                     />
@@ -305,6 +307,34 @@ class ConversationsApp extends MegaRenderMixin {
             <div
                 key="conversationsApp"
                 className="conversationsApp">
+
+                {contactSelectorDialog && (
+                    <ContactSelectorDialog
+                        className={`main-start-chat-dropdown ${LeftPanel.NAMESPACE}-contact-selector`}
+                        multiple={false}
+                        topButtons={[
+                            {
+                                key: 'newGroupChat',
+                                title: l[19483] /* `New group chat` */,
+                                icon: 'sprite-fm-mono icon-chat-filled',
+                                onClick: () => this.setState({
+                                    startGroupChatDialog: true,
+                                    contactSelectorDialog: false
+                                })
+                            }
+                        ]}
+                        showAddContact={ContactsPanel.hasContacts()}
+                        onClose={() => this.setState({ contactSelectorDialog: false })}
+                        onSelectDone={selected => {
+                            if (selected.length === 1) {
+                                return megaChat.createAndShowPrivateRoom(selected[0])
+                                    .then(room => room.setActive());
+                            }
+                            megaChat.createAndShowGroupRoomFor(selected);
+                        }}
+                    />
+                )}
+
                 {startGroupChatDialog && (
                     <StartGroupChatWizard
                         name="start-group-chat"
@@ -370,7 +400,7 @@ class ConversationsApp extends MegaRenderMixin {
                         this.setState({ scheduleMeetingDialog: true });
                         delay('chat-event-sm-button-main', () => eventlog(99918));
                     }}
-                    createGroupChat={() => this.setState({ startGroupChatDialog: true })}
+                    createNewChat={() => this.setState({ contactSelectorDialog: true })}
                 />
 
                 {rightPane}

@@ -1,8 +1,7 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../mixins.js';
 import { Button } from '../../../ui/buttons.jsx';
-import { Dropdown, DropdownContactsSelector, DropdownItem } from '../../../ui/dropdowns.jsx';
-import ContactsPanel from '../contactsPanel/contactsPanel.jsx';
+import { Dropdown, DropdownItem } from '../../../ui/dropdowns.jsx';
 import { FILTER, NAMESPACE } from './leftPanel.jsx';
 
 export default class Actions extends MegaRenderMixin {
@@ -14,7 +13,7 @@ export default class Actions extends MegaRenderMixin {
             routingSection,
             startMeeting,
             scheduleMeeting,
-            createGroupChat,
+            createNewChat,
             onFilter
         } = this.props;
         const { CHATS, MEETINGS, LOADING } = views;
@@ -37,32 +36,9 @@ export default class Actions extends MegaRenderMixin {
                     <>
                         <Button
                             className="mega-button small positive new-chat-action"
-                            label={l.add_chat /* `New chat` */}>
-                            <DropdownContactsSelector
-                                className={`
-                                    main-start-chat-dropdown
-                                    ${NAMESPACE}-contact-selector
-                                `}
-                                onSelectDone={selected => {
-                                    if (selected.length === 1) {
-                                        return megaChat.createAndShowPrivateRoom(selected[0])
-                                            .then(room => room.setActive());
-                                    }
-                                    megaChat.createAndShowGroupRoomFor(selected);
-                                }}
-                                multiple={false}
-                                horizOffset={70}
-                                topButtons={[
-                                    {
-                                        key: 'newGroupChat',
-                                        title: l[19483] /* `New group chat` */,
-                                        icon: 'sprite-fm-mono icon-chat-filled',
-                                        onClick: createGroupChat
-                                    }
-                                ]}
-                                showAddContact={ContactsPanel.hasContacts()}
-                            />
-                        </Button>
+                            label={l.add_chat /* `New chat` */}
+                            onClick={createNewChat}
+                        />
                         <div className="lhp-filter">
                             <div className="lhp-filter-control">
                                 <Button icon="sprite-fm-mono icon-sort-thin-solid">

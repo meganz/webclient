@@ -3577,8 +3577,11 @@ function folderreqerr(c, e) {
     // If desktop site show "Folder link unavailable" dialog
     parsepage(pages.placeholder);
 
+    // Make sure error code is an integer
+    const errorCode = parseInt(e);
+
     if (!is_mobile) {
-        if (parseInt(e) === EARGS) {
+        if (errorCode === EARGS) {
             if (pfcol) {
                 title = l.album_broken_link_title;
                 message = l.album_broken_link_text;
@@ -3587,6 +3590,9 @@ function folderreqerr(c, e) {
                 title = l[20198];
                 message = l[20199];
             }
+        }
+        else if (errorCode === EEXPIRED) {
+            message = l[20856]; // Your link has expired
         }
         else if (pfcol) {
             message = l.album_broken_link_text;

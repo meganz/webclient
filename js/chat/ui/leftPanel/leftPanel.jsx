@@ -108,7 +108,7 @@ export default class LeftPanel extends MegaRenderMixin {
             renderView,
             startMeeting,
             scheduleMeeting,
-            createGroupChat
+            createNewChat
         } = this.props;
         const { CHATS, MEETINGS, LOADING } = views;
 
@@ -143,7 +143,7 @@ export default class LeftPanel extends MegaRenderMixin {
                     routingSection={routingSection}
                     startMeeting={startMeeting}
                     scheduleMeeting={scheduleMeeting}
-                    createGroupChat={createGroupChat}
+                    createNewChat={createNewChat}
                     onFilter={this.toggleFilter}
                 />
 

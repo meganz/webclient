@@ -121,7 +121,6 @@ export class Start extends MegaRenderMixin {
                 name={NAMESPACE}
                 className={NAMESPACE}
                 stopKeyPropagation={editing}
-                noCloseOnClickOutside={true}
                 onClose={() => this.props.onClose()}>
                 <div className={`${NAMESPACE}-preview`}>
                     <Preview

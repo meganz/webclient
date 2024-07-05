@@ -19196,7 +19196,7 @@ class Meetings extends mixins.w9 {
                                 ${NAMESPACE}-nil
                                 ${archivedMeetings.length ? 'half-sized' : ''}
                             `
-      }, REaCt().createElement("strong", null, l.meetings_past_nil_heading), REaCt().createElement("i", {
+      }, archivedMeetings.length ? REaCt().createElement("strong", null, l.meetings_past_nil_heading) : null, REaCt().createElement("i", {
         className: "sprite-fm-mono icon-video-thin-solid"
       }), REaCt().createElement("span", null, l.meetings_past_nil)), archivedMeetings.length ? REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("div", {
         className: "archived-separator"
@@ -19229,8 +19229,8 @@ class Meetings extends mixins.w9 {
   componentDidMount() {
     super.componentDidMount();
     megaChat.rebind(`${megaChat.plugins.meetingsManager.EVENTS.OCCURRENCES_UPDATE}.${this.getUniqueId()}`, () => this.safeForceUpdate());
-    megaChat.rebind(megaChat.plugins.meetingsManager.EVENTS.INITIALIZE, () => this.setState({
-      tab: this.TABS.UPCOMING
+    megaChat.rebind(megaChat.plugins.meetingsManager.EVENTS.INITIALIZE, (ev, scheduledMeeting) => this.isMounted() && this.setState({
+      tab: this.TABS[scheduledMeeting != null && scheduledMeeting.isPast ? 'PAST' : 'UPCOMING']
     }));
   }
   render() {

@@ -335,7 +335,10 @@ export class Meetings extends MegaRenderMixin {
                                 ${NAMESPACE}-nil
                                 ${archivedMeetings.length ? 'half-sized' : ''}
                             `}>
-                            <strong>{l.meetings_past_nil_heading /* `Past meetings` */}</strong>
+                            {archivedMeetings.length ?
+                                <strong>{l.meetings_past_nil_heading /* `Past meetings` */}</strong> :
+                                null
+                            }
                             <i className="sprite-fm-mono icon-video-thin-solid" />
                             <span>{l.meetings_past_nil}</span>
                         </div>
@@ -388,7 +391,9 @@ export class Meetings extends MegaRenderMixin {
         );
         megaChat.rebind(
             megaChat.plugins.meetingsManager.EVENTS.INITIALIZE,
-            () => this.setState({ tab: this.TABS.UPCOMING })
+            (ev, scheduledMeeting) =>
+                this.isMounted() &&
+                this.setState({ tab: this.TABS[scheduledMeeting?.isPast ? 'PAST' : 'UPCOMING'] })
         );
     }
 

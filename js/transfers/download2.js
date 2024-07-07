@@ -189,6 +189,7 @@ var dlmanager = {
         if (ua.details.brand === 'FxiOS'
             || ua.details.brand === 'CriOS'
             || ua.details.browser === 'Opera'
+            || ua.details.browser === 'MiuiBrowser'
             || ua.details.browser === 'SamsungBrowser') {
 
             return false;

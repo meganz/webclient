@@ -218,14 +218,7 @@ UFSSizeCache.prototype.addToDB = function(n) {
  */
 UFSSizeCache.prototype.addTreeNode = function(n, ignoreDB) {
     'use strict';
-    var p = n.su ? 'shares' : n.p;
-
-    if (n.s4 && n.p === M.RootID) {
-        p = 's4';
-    }
-    else if (M.tree.s4 && M.tree.s4[n.h]) {
-        delete M.tree.s4[n.h];
-    }
+    const p = n.s4 && M.getS4NodeType(n) === 'container' ? 's4' : n.su ? 'shares' : n.p;
 
     if (!M.tree[p]) {
         M.tree[p] = Object.create(null);
@@ -253,12 +246,13 @@ UFSSizeCache.prototype.addTreeNode = function(n, ignoreDB) {
         if (M.getNodeShare(n).down === 1)                            tmp.t |= M.IS_TAKENDOWN;
     }
 
-    if (p === 's4') {
-        tmp.s4 = Object.create(null);
-    }
-
-    if (n.su) {
-        tmp.su = n.su;
+    if (n.su || p === 's4') {
+        if (n.su) {
+            tmp.su = n.su;
+        }
+        else {
+            tmp.t |= M.IS_S4CRT;
+        }
 
         if (!M.tree[n.p]) {
             M.tree[n.p] = Object.create(null);

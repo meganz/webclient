@@ -241,11 +241,12 @@
                                 name = n.name || '';
                                 typeClass = n.t && 'folder' || '';
 
-                                if (n.s4 && n.p === this.RootID) {
+                                const s4type = n.s4 && M.getS4NodeType(n);
+                                if (s4type === 'container') {
                                     name = l.obj_storage;
                                     typeClass = 's4-object-storage';
                                 }
-                                else if (this.d[n.p] && this.d[n.p].s4 && this.d[n.p].p === this.RootID) {
+                                else if (s4type === 'bucket') {
                                     typeClass = 's4-buckets';
                                 }
                             }

@@ -139,7 +139,7 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
         }
         stype = "rubbish-bin";
     }
-    else if ('utils' in s4 && (n.h === 's4' || n.s4 && n.p === M.RootID)) {
+    else if (n.h === 's4' && 'utils' in s4) {
         s4.utils.renderContainerTree(dialog);
         stype = 's4';
     }
@@ -278,7 +278,7 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
             containsc = this.tree[curItemHandle] || '';
             name = folders[idx].name;
 
-            if (folders[idx].s4 && folders[idx].p === M.RootID) {
+            if (folders[idx].t & M.IS_S4CRT) {
                 continue;
             }
 

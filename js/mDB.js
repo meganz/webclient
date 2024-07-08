@@ -1617,14 +1617,12 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
         await this.invalidate(1);
     }
     else if (p.length) {
-        const s = new Set();
 
         // prepare to request missing nodes.
         for (let x, i = r.length; i--;) {
             const n = r[i];
 
             if ((x = p.indexOf(n.h)) >= 0) {
-                s.add(n.p);
                 p.splice(x, 1);
             }
 
@@ -1632,13 +1630,6 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
                 p.splice(x, 1);
             }
         }
-
-        for (let i = r.length; i--;) {
-            if (s.has(r[i].h)) {
-                s.delete(r[i].h);
-            }
-        }
-        p.push(...s);
 
         if (p.length) {
             await api.tree(p);

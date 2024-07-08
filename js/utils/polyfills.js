@@ -396,7 +396,7 @@ class IWeakSet extends Set {
     }
     delete(obj) {
         for (const ref of super.values()) {
-            if (ref.deref() === obj) {
+            if (obj === ref || ref.deref() === obj) {
                 super.delete(ref);
                 return true;
             }
@@ -427,6 +427,43 @@ class IWeakSet extends Set {
     }
     get [Symbol.toStringTag]() {
         return 'IWeakSet';
+    }
+}
+
+class IWeakMap extends IWeakSet {
+    constructor() {
+        super();
+        Object.defineProperty(this, 'wm', {value: new WeakMap});
+    }
+    set(key, value) {
+        super.add(key);
+        this.wm.set(key, value);
+        return this;
+    }
+    get(key) {
+        return this.wm.get(key);
+    }
+    has(key) {
+        return this.wm.has(key);
+    }
+    delete(key) {
+        super.delete(key);
+        return this.wm.delete(key);
+    }
+    *[Symbol.iterator]() {
+        for (const ref of super.values()) {
+            const key = ref.deref();
+            if (!key) {
+                super.delete(ref);
+            }
+            else if (this.wm.has(key)) {
+                const value = [key, this.wm.get(key)];
+                yield value;
+            }
+        }
+    }
+    get [Symbol.toStringTag]() {
+        return 'IWeakMap';
     }
 }
 
@@ -647,16 +684,13 @@ Object.freeze(mutex);
 
 /** @property mega.promise */
 Object.defineProperty(mega, 'promise', {
-    get: function() {
+    get() {
         'use strict';
-        let rej, res;
-        const promise = new Promise((resolve, reject) => {
-            rej = reject;
-            res = resolve;
+        const {promise, resolve, reject} = Promise.withResolvers();
+        return Object.defineProperties(promise, {
+            reject: {value: reject},
+            resolve: {value: resolve}
         });
-        Object.defineProperty(promise, 'reject', {value: rej});
-        Object.defineProperty(promise, 'resolve', {value: res});
-        return  Object.freeze(promise);
     }
 });
 
@@ -732,24 +766,24 @@ if (!self.is_karma && self.LockManager && navigator.locks instanceof self.LockMa
         return function(...args) {
             // console.warn(`mutex-lock.${name}`, args);
             return navigator.locks.request(`mega-mutex:${name}`, async() => {
-                return new Promise((resolve, reject) => {
-                    Promise.resolve(handler.apply(this, [resolve, reject, ...args])).catch(reject);
-                });
+                const {promise, resolve, reject} = Promise.withResolvers();
+                Promise.resolve(handler.apply(this, [resolve, reject, ...args])).catch(reject);
+                return promise;
             });
         };
     };
     self.mutex.lock = async(name) => {
         'use strict';
-        const locker = mega.promise;
+        const {promise, resolve: lockResolver} = Promise.withResolvers();
         navigator.locks.request(`mega-mutex-lock:${name}`, async() => {
-            const helder = mega.promise;
-            const unlock = async() => helder.resolve();
+            const {promise, resolve} = Promise.withResolvers();
+            const unlock = async() => resolve();
             // @todo this could lead to deadlocks, but just like the former mutex.lock()..
             // locker.finally(unlock);
-            locker.resolve(unlock);
-            return helder;
+            lockResolver(unlock);
+            return promise;
         });
-        return locker;
+        return promise;
     };
 }
 else if (!navigator.locks) {

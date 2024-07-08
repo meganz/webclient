@@ -288,12 +288,20 @@ class MEGAPIRequest {
         this.residual = false;
         this.response = null;
         this.status = 0;
+        this.symb = 0;
         this.timer = false;
         this.totalBytes = -1;
         this.url = null;
     }
 
     abort() {
+        if (this.cancelled) {
+            if (self.d) {
+                this.logger.warn('This channel is already aborted...', this);
+                this.logger.assert(Object.isFrozen(this));
+            }
+            return;
+        }
         const queue = [...this.queue, ...this.inflight || []];
 
         if (d) {
@@ -318,7 +326,7 @@ class MEGAPIRequest {
         MEGAException.assert(!this.cancelled);
         let flush = false;
 
-        if (data.type === 'string' || data.type === 'array' || data.custom) {
+        if (data.type === 'string' || data.type === 'array' || data.options.symb & 1) {
             await this.flush();
             flush = true;
         }
@@ -490,9 +498,9 @@ class MEGAPIRequest {
         let {queryString, service} = this;
 
         if (queue.length === 1) {
-            const {custom, options, type} = queue[0];
+            const {options, type} = queue[0];
 
-            if (custom) {
+            if (options.symb & MEGAPIRequest.SYMB_CUSTOMREQUEST) {
                 let {queryString: qs} = options;
 
                 if (qs) {
@@ -518,9 +526,49 @@ class MEGAPIRequest {
                 this.url += '&bc=1';
                 this.rawreq = JSON.stringify(queue[0].payload);
             }
+            this.symb |= queue[0].options.symb;
         }
         else {
-            this.rawreq = JSON.stringify(queue.map(e => e.payload));
+            raw = [];
+            for (let i = 0; i < queue.length; ++i) {
+                raw.push(queue[i].payload);
+                this.symb |= queue[i].options.symb;
+            }
+            this.rawreq = JSON.stringify(raw);
+        }
+    }
+
+    notifyUpstreamFailure(error) {
+        for (let i = this.inflight.length; !this.cancelled && i--;) {
+            const {options, payload, reject} = this.inflight[i];
+
+            if (typeof options.notifyUpstreamFailure === 'function') {
+                let res = tryCatch(options.notifyUpstreamFailure)(error, payload, i, this.inflight.length);
+
+                if (res === EROLLEDBACK || res === EEXPIRED) {
+                    if (self.d) {
+                        this.logger.warn('Inflight request trap(%d)', res, payload);
+                    }
+
+                    if (res === EROLLEDBACK) {
+
+                        if (this.inflight.length < 2) {
+
+                            this.abort();
+                        }
+                        else {
+                            reject(res);
+                            res = EEXPIRED;
+                            this.inflight.splice(i, 1);
+                        }
+                    }
+
+                    if (res === EEXPIRED) {
+
+                        this.createRequestURL(this.inflight);
+                    }
+                }
+            }
         }
     }
 
@@ -532,6 +580,11 @@ class MEGAPIRequest {
         if (typeof res === 'number') {
             if (self.d) {
                 this.logger.warn(`API Request Error ${res}`);
+            }
+
+            if (this.symb && !this.cancelled && this.inflight) {
+
+                this.notifyUpstreamFailure(res);
             }
 
             if (!this.cancelled) {
@@ -816,6 +869,11 @@ class MEGAPIRequest {
 
 mWebLockWrap(MEGAPIRequest.prototype, 'enqueue');
 
+Object.defineProperties(MEGAPIRequest, {
+    SYMB_CUSTOMREQUEST: {value: 1 << 0},
+    SYMB_NOTIFYFAILURE: {value: 1 << 1}
+});
+
 Object.defineProperty(MEGADeferredController, Symbol.species, {
     get() {
         'use strict';
@@ -884,8 +942,7 @@ class MEGAKeepAliveStream {
             this.connect(url);
         }
 
-        window.addEventListener('online', this);
-        window.addEventListener('offline', this);
+        self.enotconn.register(this);
     }
 
     get [Symbol.toStringTag]() {
@@ -928,8 +985,7 @@ class MEGAKeepAliveStream {
             this.abort(reason);
             this.options = null;
 
-            window.removeEventListener('online', this);
-            window.removeEventListener('offline', this);
+            self.enotconn.unregister(this);
 
             const keys = Reflect.ownKeys(this);
             for (let i = keys.length; i--;) {
@@ -1060,6 +1116,10 @@ class MEGAKeepAliveStream {
                 }
                 if (!signal.aborted) {
                     this.abort(ex.message);
+
+                    if (!this.destroyed) {
+                        self.enotconn.register(this, ex);
+                    }
                 }
             })
             .finally(() => {
@@ -1086,6 +1146,7 @@ class MEGAKeepAliveStream {
         if (navigator.onLine === false) {
             return;
         }
+        self.enotconn.register(this);
 
         if (!backoff) {
             if (this.status === 200) {
@@ -1251,6 +1312,7 @@ lazy(self, 'api', () => {
         [6, 'cs']
     ];
     const apixs = [];
+    const catchup = new Set();
     const inflight = new Map();
     const observers = new MapSet();
     const seenTreeFetch = new Set();
@@ -1294,6 +1356,16 @@ lazy(self, 'api', () => {
         }
         else if (d) {
             logger[st === '.' ? 'info' : 'warn']('SC connection is not ready, per st=%s', st || null);
+        }
+    };
+
+    // Set globally-accessed last-seen sequence-tag
+    const mSetLastSt = (st) => {
+        if (st !== lastst) {
+            if (self.d > 1) {
+                logger.warn('Updating last-st, %s -> %s', lastst, st);
+            }
+            lastst = typeof st === 'string' && st || lastst;
         }
     };
 
@@ -1506,6 +1578,27 @@ lazy(self, 'api', () => {
         return navigator.locks.request(`${logger.name}.${id}`, callback);
     };
 
+    const getChannelInstance = (ch) => {
+        let res = apixs[ch];
+
+        if (!(res instanceof MEGAPIRequest)) {
+            if (self.d) {
+                logger.error('invalid channel...', ch);
+            }
+            throw new MEGAException(`Invalid API Channel`, ch, 'IndexSizeError');
+        }
+
+        if (res.cancelled) {
+            if (self.d) {
+                logger.warn(`Hot-swapping cancelled API channel #${ch}...`);
+            }
+            api.reset(ch);
+            res = apixs[ch];
+        }
+
+        return res;
+    };
+
     // -----------------------------------------------------------------------------------\
     // -----------------------------------------------------------------------------------/
     // Public API.
@@ -1521,7 +1614,7 @@ lazy(self, 'api', () => {
             const options = Object.assign({channel: channel | 0}, defaults, channel);
 
             await lock(options.channel);
-            const instance = apixs[options.channel];
+            const instance = getChannelInstance(options.channel);
 
             let type = typeof payload;
             type = type === 'object' && Array.isArray(payload) ? 'array' : type;
@@ -1555,9 +1648,16 @@ lazy(self, 'api', () => {
                         handler: mStCommandHandler(instance, pid)
                     });
                 }
-                const custom = Boolean(options.apipath || options.queryString);
 
-                instance.enqueue({type, payload, custom, options, resolve, reject}).catch(reject);
+                options.symb = 0;
+                if (options.apipath || options.queryString) {
+                    options.symb |= MEGAPIRequest.SYMB_CUSTOMREQUEST;
+                }
+                if (options.notifyUpstreamFailure) {
+                    options.symb |= MEGAPIRequest.SYMB_NOTIFYFAILURE;
+                }
+
+                instance.enqueue({type, payload, options, resolve, reject}).catch(reject);
             });
 
             if (trial.dedup) {
@@ -1651,35 +1751,28 @@ lazy(self, 'api', () => {
                 const pending = [...pendingTreeFetch];
                 pendingTreeFetch.clear();
 
-                // @todo ensure we won't store into "seen" a node we may need again (e.g. deleted/restored)
-
-                const payload = [];
+                const payload = {a: 'f', r: 1, inc: 1, n: []};
                 for (let i = pending.length; i--;) {
                     const n = pending[i];
 
                     if (!seenTreeFetch.has(n) && (!M.d[n] || M.d[n].t && !M.c[n])) {
 
+                        payload.n.push(n);
                         seenTreeFetch.add(n);
-                        payload.push({a: 'f', r: 1, inc: 1, n});
                     }
                 }
 
-                while (payload.length) {
+                if (payload.n.length) {
+                    if (d) {
+                        logger.info('Requesting %d tree nodes...', payload.n.length);
+                    }
                     const res = await this.req(payload, 4).catch(echo);
-                    const val = Number(res);
 
-                    if (val === EROLLEDBACK) {
-                        if (self.d) {
-                            logger.warn('Rolling back command#%d/%d', res.index, payload.length, res.result);
-                        }
-                        payload.splice(res.index, 1);
+                    if (typeof res === 'number' && res < 0 && res !== EACCESS) {
+                        throw res;
                     }
-                    else {
-                        if (val < 0) {
-                            throw val;
-                        }
-                        return res;
-                    }
+
+                    return res;
                 }
             });
         },
@@ -1720,7 +1813,7 @@ lazy(self, 'api', () => {
             else if (q.resolve) {
 
                 if (pr.st === currst) {
-                    lastst = currst;
+                    mSetLastSt(currst);
                 }
 
                 q.pkt.push(pr);
@@ -2214,38 +2307,41 @@ lazy(self, 'api', () => {
         /**
          * Catch up (await) sequence-tag.
          * @param {String|Object} pkt to expect
+         * @param {*} [ft] fast-track mode - speed up packet retrieval, no cross-tab await
          * @returns {Promise<Object>|*} packet
          */
-        catchup(pkt) {
-            let store = inflight.get('catchup');
-            let fire = (f, v) => f(v);
+        catchup(pkt, ft) {
+            const ack = async(cb, st) => {
+                if (!ft) {
+                    await tSleep.race(49, watchdog.query('ST(catchup)', 'await', false, {st})).catch(dump);
+                }
+                cb(st);
+            };
+            let fire = ack;
 
             if (d) {
                 const st = pkt.st || pkt;
 
                 fire = (f, v) => {
                     logger.info('Catchup completed, %s -> %s', st, v);
-                    f(v);
+                    ack(f, v).catch((ex) => reportError(ex, f(v)));
                 };
 
-                if (store || !pkt.st) {
-                    logger.warn('Catching up st=%s', st);
+                if (!pkt.st) {
+                    logger.warn('Catching up st=%s, ft=%d', st, ft | 0);
                 }
             }
 
             if (typeof pkt !== 'string') {
+                mSetLastSt(pkt.st);
 
-                if (store) {
-                    for (const pending of store) {
+                if (catchup.size) {
+                    for (const pending of catchup) {
                         const {st, resolve} = pending;
 
                         if (pkt.st >= st) {
                             fire(resolve, pkt.st);
-                            store.delete(pending);
-
-                            if (!store.size) {
-                                inflight.remove('catchup');
-                            }
+                            catchup.delete(pending);
                             break;
                         }
                     }
@@ -2254,13 +2350,15 @@ lazy(self, 'api', () => {
             }
 
             return new Promise((resolve) => {
-                if (pkt >= currst) {
+                if (lastst >= pkt || !isScRunning()) {
                     return fire(resolve, pkt);
                 }
-                if (!store) {
-                    inflight.set('catchup', store = new Set());
+                catchup.add({st: pkt, resolve});
+
+                if (ft) {
+                    // accelerate retrieval of action-packets, if any.
+                    getsc(true);
                 }
-                store.add({st: pkt, resolve});
             });
         },
 

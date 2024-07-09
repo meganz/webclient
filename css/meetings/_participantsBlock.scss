@@ -5,15 +5,31 @@
     margin: -10px 0 0 0;
     height: 100%;
 
+    @include small-screen {
+        position: absolute;
+        top: 50%;
+        right: 20px;
+        transform: translateY(-50%);
+        margin: -20px 0 0 0;
+    }
+
     .participants-container {
         position: relative;
         width: 292px;
+
+        @include small-screen {
+            width: 212px;
+        }
 
         .participants-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-gap: 8px;
             width: 100%;
+
+            @include small-screen {
+                grid-gap: 4px;
+            }
 
             &.single-column { grid-template-columns: 1fr; }
 
@@ -107,6 +123,13 @@
             border: 0 none;
             cursor: pointer;
             z-index: 900;
+
+            @include small-screen {
+                position: absolute;
+
+                &.carousel-button-prev { top: -44px; }
+                &.carousel-button-next { bottom: -44px; }
+            }
 
             i {
                 --mask-color: var(--icon-rest);

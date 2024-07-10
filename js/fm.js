@@ -1107,7 +1107,7 @@ function FMShortcuts() {
             op = op === 'cut' && dir === M.currentdirid ? 'copy' : op;
 
             if (op === "copy") {
-                M.copyNodes(handles, M.currentdirid).catch(tell);
+                M.copyNodes(handles, M.currentdirid).catch((ex) => ex !== EBLOCKED && tell(ex));
             }
             else if (op === "cut") {
                 M.moveNodes(handles, M.currentdirid).catch(tell);

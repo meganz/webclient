@@ -90,7 +90,7 @@ class MobileSelectionRender extends MobileMegaRender {
 
                     // selection action
                     M.copyNodes([selected], h, false)
-                        .catch(tell)
+                        .catch((ex) => ex !== EBLOCKED && tell(ex))
                         .then(res => {
                             if (res && res.length) {
                                 const sn = M.getNodeByHandle(res[0]);

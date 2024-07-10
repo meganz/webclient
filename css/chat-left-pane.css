@@ -250,12 +250,13 @@
     text-overflow: ellipsis;
 }
 .conversation-scheduled-data:first-child {
-    width: calc(100% - 55px);
+    width: 100%;
 }
 .conversation-scheduled-data:last-child {
     display: flex;
     justify-content: flex-end;
     text-align: right;
+    width: 20px;
 }
 .conversation-message.unread {
     font-family: var(--text-font-family-semibold);

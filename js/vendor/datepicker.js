@@ -803,7 +803,7 @@
                         // If calendar is in date picking mode, calculate the top normally
                         // Datepicker usually has 5 rows, so no adjustments are necessary
                         top = dims.top - selfDims.height - offset;
-                        
+
                         // If datepicker has 6 rows, increase the gap (example: December 2023)
                         if (selfDims.height >= 330) top = top - offset/7;
 
@@ -1246,9 +1246,6 @@
             if (code == 27) {
                 this.hide();
             }
-
-            this.update();
-            this._triggerOnChange();
         },
 
         _onKeyUp: function (e) {

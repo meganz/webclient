@@ -49,7 +49,10 @@ export const Navigation =
                         ${NAMESPACE}-contacts-tab
                         ${routingSection === 'contacts' ? 'active' : ''}
                     `}
-                    onClick={() => loadSubPage('fm/chat/contacts')}>
+                    onClick={() => {
+                        loadSubPage('fm/chat/contacts');
+                        eventlog(500296);
+                    }}>
                     <Button
                         className={`${NAMESPACE}-nav-button`}
                         contactRequests={contactRequests}

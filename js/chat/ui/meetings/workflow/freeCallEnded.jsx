@@ -13,7 +13,7 @@ export class FreeCallEnded extends MegaRenderMixin {
             if (!this.isMounted()) {
                 throw new Error(`${NAMESPACE} dialog: component ${NAMESPACE} not mounted.`);
             }
-
+            eventlog(500295);
             return $(`#${NAMESPACE}`);
         });
     }

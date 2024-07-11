@@ -33,6 +33,10 @@
         &.with-participants-block {
             float: left;
             width: calc(100% - 310px);
+
+            @include small-screen {
+                width: calc(100% - 230px);
+            }
         }
     }
 
@@ -159,6 +163,10 @@
 .carousel {
     float: left;
     height: 100%;
+
+    @include small-screen {
+        float: right;
+    }
 
     &-container {
         width: 100%;

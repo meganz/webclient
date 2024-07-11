@@ -1480,16 +1480,16 @@ var notify = {
      * @returns {Object} The HTML to be rendered for the notification
      */
     renderPayment: function($notificationHtml, notification) {
-        if (!notification.seen
-                && !notify.welcomeDialogShown
-                && !(u_attr.pf || u_attr.b)
-                && (u_attr['^!welDlg'] | 0) === 1) {
-            // Show the welcome dialog to the user
-            notify.createNewUserDialog(notification);
-            notify.welcomeDialogShown = true;
 
-            // Set ^!welDlg to 2 (user has seen welcome dialog)
-            mega.attr.set('welDlg', 2, -2, true);
+        // If user has not seen the welcome dialog before, show it and set ^!welDlg to 2 (seen)
+        if (!notification.seen && !(u_attr.pf || u_attr.b)) {
+            mega.attr.get(u_handle, 'welDlg', -2, 1, (res) => {
+                if ((res | 0) === 1) {
+                    notify.createNewUserDialog(notification);
+                    notify.welcomeDialogShown = true;
+                    mega.attr.set('welDlg', 2, -2, true);
+                }
+            }).catch(dump);
         }
 
         var proLevel = notification.data.p;

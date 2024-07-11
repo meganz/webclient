@@ -250,12 +250,13 @@
     text-overflow: ellipsis;
 }
 .conversation-scheduled-data:first-child {
-    width: calc(100% - 55px);
+    width: 100%;
 }
 .conversation-scheduled-data:last-child {
     display: flex;
     justify-content: flex-end;
     text-align: right;
+    width: 20px;
 }
 .conversation-message.unread {
     font-family: var(--text-font-family-semibold);
@@ -806,14 +807,6 @@ li.active .call-duration i {
 
 .rtl .result-table .result-table-row.message .message-result-avatar {
     float: right;
-}
-
-.result-table .result-table-row.message:nth-child(odd) {
-    /* [...] */
-}
-
-.result-table .result-table-row.message span {
-    /* [...] */
 }
 
 .result-table .result-table-row.message span.title {
@@ -1869,21 +1862,116 @@ td.verification .contact-item {
     height: 100%;
     display: flex;
     align-items: center;
-    justify-content: center;
     text-align: center;
     font: var(--text-body1);
     z-index: 120;
     background: var(--surface-main);
+    flex-direction: column;
+    padding-top: 72px;
+}
+
+.conversationsApp .conversations-empty .conversations-empty-header h1 {
+    font: var(--text-h1-bold);
+}
+.conversationsApp .conversations-empty .conversations-empty-header h3 {
+    color: var(--text-color-high);
+}
+.conversationsApp .conversations-empty .conversations-empty-header a {
+    color: var(--text-color-info);
+    text-decoration: underline;
 }
 
 .conversationsApp .conversations-empty-content {
     overflow: hidden;
+    display: flex;
+    justify-content: center;
+    padding: 4px 0;
+    width: 100%;
+}
+.conversationsApp .conversations-empty .conversations-empty-tile {
+    border-radius: 12px;
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.1);
+    height: 430px;
     width: 400px;
 }
+body.theme-dark .conversationsApp .conversations-empty .conversations-empty-tile {
+    box-shadow: 0 1px 4px 0 rgba(255, 255, 255, 0.1);
+}
+.conversationsApp .conversations-empty .conversations-empty-tile:last-child {
+    margin-left: 24px;
+}
 
-.conversationsApp .conversations-empty-content i {
-    --icon-size: 120px;
-    --mask-color: var(--icon-inactive);
+@media only screen and (min-height: 1080px) {
+    .conversationsApp .conversations-empty .conversations-empty-tile {
+        height: 450px;
+    }
+}
+
+@media only screen and (min-width: 1920px) {
+    .conversationsApp .conversations-empty .conversations-empty-tile {
+        width: 500px;
+    }
+}
+.conversationsApp .conversations-empty .chat-tile-img {
+    display: block;
+    width: 100%;
+    height: 150px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-color: var(--surface-grey-1);
+    background-origin: content-box;
+    border-radius: 12px 12px 0 0;
+    padding-top: 22px;
+}
+.conversationsApp .conversations-empty .chat-tile-img.empty-chat-contacts {
+    background-image: url("../images/mega/empty-chat-contacts.png");
+}
+.conversationsApp .conversations-empty .chat-tile-img.empty-chat-new {
+    background-image: url("../images/mega/empty-chat-new.png");
+}
+.conversationsApp .conversations-empty .chat-tile-img.empty-meetings-call {
+    background-image: url("../images/mega/empty-meetings-call.png");
+}
+.conversationsApp .conversations-empty .chat-tile-img.empty-meetings-schedule {
+    background-image: url("../images/mega/empty-meetings-schedule.png");
+}
+body.theme-dark .conversationsApp .conversations-empty .chat-tile-img.empty-chat-contacts {
+    background-image: url("../images/mega/empty-chat-contacts-dark.png");
+}
+body.theme-dark .conversationsApp .conversations-empty .chat-tile-img.empty-chat-new {
+    background-image: url("../images/mega/empty-chat-new-dark.png");
+}
+body.theme-dark .conversationsApp .conversations-empty .chat-tile-img.empty-meetings-call {
+    background-image: url("../images/mega/empty-meetings-call-dark.png");
+}
+body.theme-dark .conversationsApp .conversations-empty .chat-tile-img.empty-meetings-schedule {
+    background-image: url("../images/mega/empty-meetings-schedule-dark.png");
+}
+.conversationsApp .conversations-empty-tile .tile-content {
+    display: flex;
+    flex-direction: column;
+    padding: 0 16px;
+}
+.conversationsApp .conversations-empty-tile .tile-content h2 {
+    font: var(--text-h2-bold);
+    margin: 16px 0 12px;
+}
+.conversationsApp .conversations-empty-tile .tile-content button {
+    align-self: center;
+    margin-top: 24px;
+    padding: 6px 12px;
+}
+.conversationsApp .conversations-empty-tile .tile-content button.action {
+    margin-top: 16px;
+    margin-inline-end: 0;
+    padding: 4px 6px;
+    -webkit-margin-end: 0;
+}
+.conversationsApp .conversations-empty-tile .tile-content button.action i {
+    margin-right: 8px;
+    --icon-size: 24px;
+    --mask-color: var(--secondary-green);
 }
 
 /* --- */
@@ -1893,22 +1981,13 @@ td.verification .contact-item {
     margin: 0 0 20px;
 }
 
+.lhp-conversations.chats-view .conversations-pane {
+    padding-bottom: 30px;
+}
+
 .lhp-conversations.chats-view .conversations-holder {
     height: 95%;
 }
-
-/*
-.lhp-conversations.meetings-view .conversations-holder {
-    max-height: 46%;
-}
-
-@media only screen and (max-height: 750px) {
-    .lhp-conversations.meetings-view .conversations-holder {
-        max-height: 42%;
-        margin: 0 0 25px;
-    }
-}
-*/
 
 .lhp-conversations .conversations-category {
     display: flex;

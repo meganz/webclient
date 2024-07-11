@@ -102,7 +102,7 @@ mobile.settings.notifications = Object.create(mobile.settingsHelper, {
 
             M.accountData(() => {
                 this.render();
-            }, false, true);
+            }, true, true);
 
             eventlog(99805);
         },
@@ -174,8 +174,6 @@ mobile.settings.notifications = Object.create(mobile.settingsHelper, {
         value: function(initial) {
             'use strict';
 
-            loadingDialog.show();
-
             // Load the enotify settings
             mega.enotif.all().then((enotifStates) => {
                 for (const id in this.togglesComponents) {
@@ -188,8 +186,6 @@ mobile.settings.notifications = Object.create(mobile.settingsHelper, {
                 if (initial) {
                     this.setToggleAllStatus();
                 }
-
-                loadingDialog.hide();
             });
         },
     }

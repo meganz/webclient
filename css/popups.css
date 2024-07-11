@@ -1,18 +1,25 @@
 /* Search contacts popup */
+.mega-dialog.popup.contacts-search,
 .dropdown.body.popup.contacts-search {
     width: 420px;
     padding: 0;
     border-radius: 24px;
 }
+.mega-dialog.popup.contacts-search.main-start-chat-dropdown,
 .dropdown.body.popup.contacts-search.main-start-chat-dropdown {
     height: 602px;
 }
+body.it .mega-dialog.popup.contacts-search,
+body.br .mega-dialog.popup.contacts-search,
+body.fr .mega-dialog.popup.contacts-search,
+body.id .mega-dialog.popup.contacts-search,
 body.it .dropdown.body.popup.contacts-search,
 body.br .dropdown.body.popup.contacts-search,
 body.fr .dropdown.body.popup.contacts-search,
 body.id .dropdown.body.popup.contacts-search {
     width: 456px;
 }
+body.tl .mega-dialog.popup.contacts-search,
 body.tl .dropdown.body.popup.contacts-search {
     width: 480px;
 }

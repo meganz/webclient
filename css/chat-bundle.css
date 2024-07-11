@@ -1634,9 +1634,23 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   margin: -10px 0 0 0;
   height: 100%;
 }
+@media only screen and (max-height: 760px) {
+  .meetings-call .stream .stream-participants-block {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    margin: -20px 0 0 0;
+  }
+}
 .meetings-call .stream .stream-participants-block .participants-container {
   position: relative;
   width: 292px;
+}
+@media only screen and (max-height: 760px) {
+  .meetings-call .stream .stream-participants-block .participants-container {
+    width: 212px;
+  }
 }
 .meetings-call .stream .stream-participants-block .participants-container .participants-grid {
   display: grid;
@@ -1644,6 +1658,11 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   grid-gap: 8px;
   width: 100%;
   /* TODO: look into `.video-node` re: replicate and unify */
+}
+@media only screen and (max-height: 760px) {
+  .meetings-call .stream .stream-participants-block .participants-container .participants-grid {
+    grid-gap: 4px;
+  }
 }
 .meetings-call .stream .stream-participants-block .participants-container .participants-grid.single-column {
   grid-template-columns: 1fr;
@@ -1721,6 +1740,17 @@ body.rtl .meetings-call .stream .stream-participants-block .participants-contain
   cursor: pointer;
   z-index: 900;
 }
+@media only screen and (max-height: 760px) {
+  .meetings-call .stream .stream-participants-block .participants-container button.carousel-control {
+    position: absolute;
+  }
+  .meetings-call .stream .stream-participants-block .participants-container button.carousel-control.carousel-button-prev {
+    top: -44px;
+  }
+  .meetings-call .stream .stream-participants-block .participants-container button.carousel-control.carousel-button-next {
+    bottom: -44px;
+  }
+}
 .meetings-call .stream .stream-participants-block .participants-container button.carousel-control i {
   --mask-color: var(--icon-rest);
   --icon-size: 44px;
@@ -1740,6 +1770,11 @@ body.rtl .meetings-call .stream .stream-participants-block .participants-contain
 .meetings-call .stream-wrapper.with-participants-block {
   float: left;
   width: calc(100% - 310px);
+}
+@media only screen and (max-height: 760px) {
+  .meetings-call .stream-wrapper.with-participants-block {
+    width: calc(100% - 230px);
+  }
 }
 .meetings-call .stream-container {
   margin: auto;
@@ -1850,6 +1885,11 @@ body.rtl .meetings-call .stream .stream-participants-block .participants-contain
 .meetings-call .carousel {
   float: left;
   height: 100%;
+}
+@media only screen and (max-height: 760px) {
+  .meetings-call .carousel {
+    float: right;
+  }
 }
 .meetings-call .carousel-container {
   width: 100%;
@@ -2003,10 +2043,11 @@ body.rtl .meetings-call .stream .stream-participants-block .participants-contain
   justify-content: center;
   position: absolute;
   bottom: -250px;
-  padding: 0 0 14px 0;
+  padding: 22px 0 14px 0;
   width: 100%;
   text-align: center;
   transition: opacity 500ms ease-in-out, bottom 500ms ease-in-out;
+  background: #222;
   z-index: 12;
 }
 .overlayed .meetings-call .stream-controls {
@@ -4520,3 +4561,5 @@ body.theme-dark .meetings-recurring-content .mega-button.recurring-toggle-button
 .free-call-ended-dlg .content-block h3 {
   font: var(--text-h3-bold);
 }
+
+/*# sourceMappingURL=chat-bundle.css.map */

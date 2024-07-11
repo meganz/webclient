@@ -4,10 +4,11 @@
     justify-content: center;
     position: absolute;
     bottom: -250px;
-    padding: 0 0 14px 0;
+    padding: 22px 0 14px 0;
     width: 100%;
     text-align: center;
     transition: opacity 500ms ease-in-out, bottom 500ms ease-in-out;
+    background: #222;
     z-index: 12;
 
     .overlayed & {

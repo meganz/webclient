@@ -81,9 +81,15 @@ async function setupSingleDownloadPage(res) {
         setTransferStatus(0, l[243]);
     }
     else if (typeof res === 'number' && res < 0) {
-        if (res === -2) {
+        if (res === EARGS) {
             $('.download.download-page').addClass('global-error invalid-url');
             setTransferStatus(0, l[20198]);
+        }
+        else if (res === EEXPIRED) {
+            // Your link has expired
+            $('.download.download-page').addClass('global-error invalid-url');
+            $('.download.error-list-item').text(l[20856]);
+            setTransferStatus(0, l[20856]);
         }
         else {
             $('.download.download-page').addClass('global-error na-some-reason');

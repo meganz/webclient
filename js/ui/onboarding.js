@@ -500,10 +500,8 @@ mBroadcaster.addListener('fm:initialized', () => {
         }
 
         init() {
-
             // This section is completed let move on.
-            if (!this.map || this.isComplete) {
-
+            if (!this.map || this.isComplete || isPublicLink()) {
                 $('.onboarding-control-panel').addClass('hidden');
 
                 return;

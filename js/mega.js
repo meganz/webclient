@@ -4489,3 +4489,16 @@ mBroadcaster.once('boot_done', function() {
         }
     });
 });
+
+mega.commercials = Object.create(null);
+mega.commercials.init = nop;
+mega.commercials.createMobileBottomBarSlots = nop;
+mega.commercials.updateOverlays = nop;
+mega.commercials.mobileFmTabHander = nop;
+mega.commercials.updateCommCookies = nop;
+mega.commercials.getComms = nop;
+
+mega.commercials.addCommsToBottomBar = (node) => {
+    'use strict';
+    return node;
+};

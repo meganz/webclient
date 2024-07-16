@@ -2871,9 +2871,6 @@ else if (!browserUpdate) {
         'unsub': {f:'html/unsub.html', n: 'unsub', j:0},
         'unsub_js': {f:'html/js/unsub.js', n: 'unsub_js', j:1},
         'redeem_js': {f:'html/js/redeem.js', n: 'redeem_js', j:1},
-        'nzipp': {f:'html/nzipp.html', n: 'nzipp', j:0},
-        'nzipp_js': {f:'html/js/nzipp.js', n: 'nzipp_js', j:1},
-        'nzipp_css': {f:'css/nzipp.css', n: 'nzipp_css', j:2},
         'pdfjs2': {f:'js/vendor/pdf.js', n: 'pdfjs2', j:4 },
         'pdfviewer': {f:'html/pdf.viewer.html', n: 'pdfviewer', j:0 },
         'pdfviewercss': {f:'css/pdf.viewer.css', n: 'pdfviewercss', j:4 },
@@ -3013,8 +3010,6 @@ else if (!browserUpdate) {
         'unsub': ['unsub', 'unsub_js'],
         'developersettings': ['developersettings', 'developersettings_js'],
         'filerequest': ['filerequest', 'filerequest_upload_js'],
-        'nzippmember': ['nzipp', 'nzipp_js', 'nzipp_css'],
-        'nziphotographer': ['nzipp', 'nzipp_js', 'nzipp_css'],
         'special': ['special', 'special_js', 'special_css']
     };
 

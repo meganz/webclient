@@ -12903,6 +12903,7 @@ class StartMeetingNotification extends mixins.w9 {
         marginTop: offset
       },
       onClick: () => {
+        eventlog(500288);
         if (chatRoom.options.w && !chatRoom.iAmOperator()) {
           return onWaitingRoomJoin();
         }
@@ -14826,7 +14827,7 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
                                 `
     }, REaCt().createElement(buttons.$, {
       icon: "sprite-fm-mono icon-video-call-filled",
-      onClick: () => startCallDisabled ? false : (0,call.dQ)(room.haveActiveCall(), room).then(() => this.startCall(call.ZE.VIDEO)).catch(() => d && console.warn('Already in a call.'))
+      onClick: () => startCallDisabled ? false : (0,call.dQ)(room.haveActiveCall(), room).then(() => this.startCall(call.ZE.VIDEO)).catch(() => d && console.warn('Already in a call.')).then(() => room.isMeeting ? eventlog(500289) : eventlog(500290))
     })), REaCt().createElement("div", {
       "data-simpletip": l.unsupported_browser_audio,
       "data-simpletipposition": "top",
@@ -14838,7 +14839,7 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
                                 `
     }, REaCt().createElement(buttons.$, {
       icon: "sprite-fm-mono icon-phone",
-      onClick: () => startCallDisabled ? false : (0,call.dQ)(room.haveActiveCall(), room).then(() => this.startCall(call.ZE.AUDIO)).catch(() => d && console.warn('Already in a call.'))
+      onClick: () => startCallDisabled ? false : (0,call.dQ)(room.haveActiveCall(), room).then(() => this.startCall(call.ZE.AUDIO)).catch(() => d && console.warn('Already in a call.')).then(() => room.isMeeting ? eventlog(500291) : eventlog(500292))
     }))), topicInfo), REaCt().createElement("div", {
       ref: this.containerRef,
       className: `
@@ -17291,14 +17292,21 @@ class Schedule extends mixins.w9 {
       isLoading,
       onToggle: waitingRoom => {
         let _this$props$chatRoom2;
-        return (_this$props$chatRoom2 = this.props.chatRoom) != null && _this$props$chatRoom2.havePendingCall() ? null : this.handleToggle(waitingRoom);
+        if ((_this$props$chatRoom2 = this.props.chatRoom) != null && _this$props$chatRoom2.havePendingCall()) {
+          return;
+        }
+        this.handleToggle(waitingRoom);
+        delay('chat-event-sm-waiting-room', () => eventlog(500297));
       }
     }), REaCt().createElement(Checkbox, {
       name: "openInvite",
       checked: openInvite,
       label: l.open_invite_desc,
       isLoading,
-      onToggle: this.handleToggle
+      onToggle: ev => {
+        this.handleToggle(ev);
+        delay('chat-event-sm-open-invite', () => eventlog(500298));
+      }
     }), waitingRoom && openInvite ? REaCt().createElement(Row, null, REaCt().createElement("div", {
       className: "schedule-dialog-banner warn"
     }, REaCt().createElement(utils.P9, null, l.waiting_room_invite.replace('[A]', `<a
@@ -18608,7 +18616,10 @@ const Navigation = ({
                         ${NAMESPACE}-contacts-tab
                         ${routingSection === 'contacts' ? 'active' : ''}
                     `,
-  onClick: () => loadSubPage('fm/chat/contacts')
+  onClick: () => {
+    loadSubPage('fm/chat/contacts');
+    eventlog(500296);
+  }
 }, REaCt().createElement(buttons.$, {
   className: `${NAMESPACE}-nav-button`,
   contactRequests,
@@ -18651,7 +18662,10 @@ class Actions extends mixins.w9 {
     }, REaCt().createElement("i", null), REaCt().createElement("span", null)), view === CHATS && routingSection !== 'contacts' && REaCt().createElement(REaCt().Fragment, null, REaCt().createElement(buttons.$, {
       className: "mega-button small positive new-chat-action",
       label: l.add_chat,
-      onClick: createNewChat
+      onClick: () => {
+        createNewChat();
+        eventlog(500284);
+      }
     }), REaCt().createElement("div", {
       className: "lhp-filter"
     }, REaCt().createElement("div", {
@@ -18705,7 +18719,10 @@ class Actions extends mixins.w9 {
     }))), routingSection === 'contacts' && REaCt().createElement(buttons.$, {
       className: "mega-button small positive",
       label: l[71],
-      onClick: () => contactAddDialog()
+      onClick: () => {
+        contactAddDialog();
+        eventlog(500285);
+      }
     }));
   }
 }
@@ -19472,6 +19489,7 @@ class FreeCallEnded extends mixins.w9 {
       if (!this.isMounted()) {
         throw new Error(`${freeCallEnded_NAMESPACE} dialog: component ${freeCallEnded_NAMESPACE} not mounted.`);
       }
+      eventlog(500295);
       return $(`#${freeCallEnded_NAMESPACE}`);
     });
   }
@@ -19934,7 +19952,10 @@ class ConversationsApp extends mixins.w9 {
       conversations: chats,
       leftPaneWidth,
       renderView: view => this.renderView(view),
-      startMeeting: () => this.startMeeting(),
+      startMeeting: () => {
+        this.startMeeting();
+        eventlog(500293);
+      },
       scheduleMeeting: () => {
         this.setState({
           scheduleMeetingDialog: true
@@ -23505,8 +23526,14 @@ class Call extends mixins.w9 {
     };
     this.handleRecordingToggle = () => {
       const {
-        call
+        call,
+        chatRoom
       } = this.props;
+      if (chatRoom.isMeeting) {
+        eventlog(500286);
+      } else {
+        eventlog(500287);
+      }
       if (this.state.recorder) {
         return msgDialog(`confirmation:!^${l.stop_recording_dialog_cta}!${l.stop_recording_nop_dialog_cta}`, undefined, l.stop_recording_dialog_heading, l.stop_recording_dialog_body, cb => cb && this.setState({
           recorder: undefined
@@ -26202,7 +26229,10 @@ class StreamHead extends mixins.w9 {
         label: l.minimize
       },
       icon: "icon-call-min-mode",
-      onClick: onCallMinimize
+      onClick: () => {
+        onCallMinimize();
+        eventlog(500305);
+      }
     }, REaCt().createElement("div", null, l.minimize)))));
   }
 }
@@ -27584,16 +27614,17 @@ class StreamControls extends _mixins1__.w9 {
     const {
       call,
       signal,
-      onAudioClick,
-      onVideoClick,
-      onScreenSharingClick,
-      onHoldClick,
+      chatRoom,
       renderSignalWarning,
       hasToRenderPermissionsWarning,
       renderPermissionsWarning,
       resetError,
       blocked,
-      renderBlockedWarning
+      renderBlockedWarning,
+      onAudioClick,
+      onVideoClick,
+      onScreenSharingClick,
+      onHoldClick
     } = this.props;
     const {
       audioSelectDropdown,
@@ -27629,6 +27660,11 @@ class StreamControls extends _mixins1__.w9 {
       className: `input-source-opener button ${audioSelectDropdown ? 'active-dropdown' : ''}`,
       onClick: ev => {
         ev.stopPropagation();
+        if (chatRoom.isMeeting) {
+          eventlog(500299);
+        } else {
+          eventlog(500300);
+        }
         if (this.state.audioSelectDropdown) {
           return this.setState({
             audioSelectDropdown: false
@@ -27672,6 +27708,11 @@ class StreamControls extends _mixins1__.w9 {
       className: `input-source-opener button ${videoSelectDropdown ? 'active-dropdown' : ''}`,
       onClick: ev => {
         ev.stopPropagation();
+        if (chatRoom.isMeeting) {
+          eventlog(500301);
+        } else {
+          eventlog(500302);
+        }
         if (this.state.videoSelectDropdown) {
           return this.setState({
             videoSelectDropdown: false
@@ -27697,6 +27738,11 @@ class StreamControls extends _mixins1__.w9 {
         }
         resetError(Av.Screen);
         onScreenSharingClick();
+        if (chatRoom.isMeeting) {
+          eventlog(500303);
+        } else {
+          eventlog(500304);
+        }
       }
     }, react0().createElement(_button_jsx3__.A, {
       key: "screen-sharing",

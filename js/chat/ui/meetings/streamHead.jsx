@@ -309,7 +309,10 @@ export default class StreamHead extends MegaRenderMixin {
                             className="head-control"
                             simpletip={{ ...SIMPLETIP, label: l.minimize /* `Minimize` */}}
                             icon="icon-call-min-mode"
-                            onClick={onCallMinimize}>
+                            onClick={() => {
+                                onCallMinimize();
+                                eventlog(500305);
+                            }}>
                             <div>{l.minimize /* `Minimize` */}</div>
                         </Button>
                     </div>

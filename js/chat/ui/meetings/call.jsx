@@ -827,7 +827,13 @@ export default class Call extends MegaRenderMixin {
     };
 
     handleRecordingToggle = () => {
-        const { call } = this.props;
+        const { call, chatRoom } = this.props;
+        if (chatRoom.isMeeting) {
+            eventlog(500286);
+        }
+        else {
+            eventlog(500287);
+        }
 
         if (this.state.recorder) {
             return (

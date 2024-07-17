@@ -395,7 +395,10 @@ class ConversationsApp extends MegaRenderMixin {
                     conversations={chats}
                     leftPaneWidth={leftPaneWidth}
                     renderView={view => this.renderView(view)}
-                    startMeeting={() => this.startMeeting()}
+                    startMeeting={() => {
+                        this.startMeeting();
+                        eventlog(500293);
+                    }}
                     scheduleMeeting={() => {
                         this.setState({ scheduleMeetingDialog: true });
                         delay('chat-event-sm-button-main', () => eventlog(99918));

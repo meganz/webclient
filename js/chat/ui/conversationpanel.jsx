@@ -197,6 +197,7 @@ class StartMeetingNotification extends MegaRenderMixin {
                 className="in-call-notif neutral start"
                 style={{ marginTop: offset }}
                 onClick={() => {
+                    eventlog(500288);
                     if (chatRoom.options.w && !chatRoom.iAmOperator()) {
                         return onWaitingRoomJoin();
                     }
@@ -2691,6 +2692,7 @@ export class ConversationPanel extends MegaRenderMixin {
                                             inProgressAlert(room.haveActiveCall(), room)
                                                 .then(() => this.startCall(TYPE.VIDEO))
                                                 .catch(() => d && console.warn('Already in a call.'))
+                                                .then(() => room.isMeeting ? eventlog(500289) : eventlog(500290))
                                     }
                                 />
                             </div>
@@ -2714,6 +2716,7 @@ export class ConversationPanel extends MegaRenderMixin {
                                             inProgressAlert(room.haveActiveCall(), room)
                                                 .then(() => this.startCall(TYPE.AUDIO))
                                                 .catch(() => d && console.warn('Already in a call.'))
+                                                .then(() => room.isMeeting ? eventlog(500291) : eventlog(500292))
                                     }
                                 />
                             </div>

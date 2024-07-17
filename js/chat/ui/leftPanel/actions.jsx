@@ -37,7 +37,10 @@ export default class Actions extends MegaRenderMixin {
                         <Button
                             className="mega-button small positive new-chat-action"
                             label={l.add_chat /* `New chat` */}
-                            onClick={createNewChat}
+                            onClick={() => {
+                                createNewChat();
+                                eventlog(500284);
+                            }}
                         />
                         <div className="lhp-filter">
                             <div className="lhp-filter-control">
@@ -125,7 +128,10 @@ export default class Actions extends MegaRenderMixin {
                     <Button
                         className="mega-button small positive"
                         label={l[71] /* `Add contact` */}
-                        onClick={() => contactAddDialog()}
+                        onClick={() => {
+                            contactAddDialog();
+                            eventlog(500285);
+                        }}
                     />
                 }
             </div>

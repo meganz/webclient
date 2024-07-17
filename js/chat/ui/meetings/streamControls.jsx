@@ -453,8 +453,9 @@ class StreamControls extends MegaRenderMixin {
 
     render() {
         const {
-            call, signal, onAudioClick, onVideoClick, onScreenSharingClick, onHoldClick, renderSignalWarning,
-            hasToRenderPermissionsWarning, renderPermissionsWarning, resetError, blocked, renderBlockedWarning
+            call, signal, chatRoom, renderSignalWarning, hasToRenderPermissionsWarning, renderPermissionsWarning,
+            resetError, blocked, renderBlockedWarning,
+            onAudioClick, onVideoClick, onScreenSharingClick, onHoldClick,
         } = this.props;
         const { audioSelectDropdown, videoSelectDropdown } = this.state;
         const avFlags = call.av;
@@ -500,6 +501,13 @@ class StreamControls extends MegaRenderMixin {
                                 className={`input-source-opener button ${audioSelectDropdown ? 'active-dropdown' : ''}`}
                                 onClick={ev => {
                                     ev.stopPropagation();
+                                    if (chatRoom.isMeeting) {
+                                        eventlog(500299);
+                                    }
+                                    else {
+                                        eventlog(500300);
+                                    }
+
                                     if (this.state.audioSelectDropdown) {
                                         return this.setState({
                                             audioSelectDropdown: false,
@@ -548,6 +556,12 @@ class StreamControls extends MegaRenderMixin {
                                 className={`input-source-opener button ${videoSelectDropdown ? 'active-dropdown' : ''}`}
                                 onClick={ev => {
                                     ev.stopPropagation();
+                                    if (chatRoom.isMeeting) {
+                                        eventlog(500301);
+                                    }
+                                    else {
+                                        eventlog(500302);
+                                    }
                                     if (this.state.videoSelectDropdown) {
                                         return this.setState({
                                             videoSelectDropdown: false,
@@ -575,6 +589,12 @@ class StreamControls extends MegaRenderMixin {
                                 }
                                 resetError(Av.Screen);
                                 onScreenSharingClick();
+                                if (chatRoom.isMeeting) {
+                                    eventlog(500303);
+                                }
+                                else {
+                                    eventlog(500304);
+                                }
                             }}>
                             <Button
                                 key="screen-sharing"

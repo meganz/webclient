@@ -11,6 +11,15 @@
         display: none;
     }
 
+    &.with-active-element {
+        /* [...] */
+
+        .stream-controls,
+        .sidebar-controls,
+        .recording-control { bottom: 0; }
+        .stream-head { top: 0; }
+    }
+
     &-onboarding {
         /* [...] */
 

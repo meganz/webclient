@@ -26,7 +26,8 @@ export default class StreamHead extends MegaRenderMixin {
     state = {
         dialog: false,
         duration: undefined,
-        banner: false
+        banner: false,
+        modeSwitch: false,
     };
 
     get fullscreen() {
@@ -240,8 +241,16 @@ export default class StreamHead extends MegaRenderMixin {
 
     render() {
         const { NAMESPACE } = StreamHead;
+        const {
+            mode,
+            streamsPerPage,
+            chatRoom,
+            onStreamsPerPageChange,
+            onCallMinimize,
+            onModeChange,
+            setActiveElement
+        } = this.props;
         const { dialog } = this.state;
-        const { mode, streamsPerPage, chatRoom, onStreamsPerPageChange, onCallMinimize, onModeChange } = this.props;
         const SIMPLETIP = { position: 'bottom', offset: 5, className: 'theme-dark-forced' };
 
         //
@@ -251,10 +260,7 @@ export default class StreamHead extends MegaRenderMixin {
         return (
             <div
                 ref={this.headRef}
-                className={`
-                    ${NAMESPACE}
-                    ${dialog ? 'active' : ''}
-                `}>
+                className={`${NAMESPACE}`}>
                 {dialog && <this.Dialog />}
                 <div className={`${NAMESPACE}-content theme-dark-forced`}>
                     <div className={`${NAMESPACE}-info`}>
@@ -272,7 +278,9 @@ export default class StreamHead extends MegaRenderMixin {
                             onClick={() =>
                                 chatRoom.isMeeting &&
                                 chatRoom.publicLink &&
-                                this.setState({ dialog: !dialog, banner: false })
+                                this.setState({ dialog: !dialog, banner: false }, () =>
+                                    setActiveElement(this.state.dialog)
+                                )
                             }>
                             <Emoji>{chatRoom.getRoomTitle()}</Emoji>
                             {chatRoom.isMeeting && chatRoom.publicLink && (
@@ -292,6 +300,7 @@ export default class StreamHead extends MegaRenderMixin {
                             streamsPerPage={streamsPerPage}
                             onStreamsPerPageChange={onStreamsPerPageChange}
                             onModeChange={onModeChange}
+                            setActiveElement={setActiveElement}
                         />
                         <Button
                             className="head-control"
@@ -309,7 +318,10 @@ export default class StreamHead extends MegaRenderMixin {
                             className="head-control"
                             simpletip={{ ...SIMPLETIP, label: l.minimize /* `Minimize` */}}
                             icon="icon-call-min-mode"
-                            onClick={onCallMinimize}>
+                            onClick={() => {
+                                onCallMinimize();
+                                eventlog(500305);
+                            }}>
                             <div>{l.minimize /* `Minimize` */}</div>
                         </Button>
                     </div>

@@ -2015,7 +2015,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace(/\[\/S\d]/g, '</span>');
 
     l.trusted_users_worldwide = escapeHTML(l.trusted_users_worldwide)
-        .replace('[S1]', '<span>')
+        .replace('[S1]', '<span class="trusted-by">')
         .replace('[S2]', '<span class="users-value">')
         .replace('[S3]', '<span class="users-worldwide">')
         .replace(/\[\/S\d]/g, '</span>');

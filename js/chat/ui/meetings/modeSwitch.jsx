@@ -15,16 +15,24 @@ export default class ModeSwitch extends MegaRenderMixin {
         settings: false
     };
 
-    handleMousedown = ({ target }) =>
-        this.containerRef &&
-        this.containerRef.current &&
-        this.containerRef.current.contains(target) ? null : this.doClose();
+    handleMousedown = ({ target }) => {
+        if (this.state.expanded || this.state.settings) {
+            return this.containerRef?.current?.contains(target) ? null : this.doClose();
+        }
+    };
 
     handleKeydown = ({ keyCode }) => keyCode && keyCode === 27 /* ESC */ && this.doClose();
 
-    doClose = () => this.isMounted() && this.setState({ expanded: false, settings: false });
+    doClose = () =>
+        this.isMounted() &&
+        this.setState({ expanded: false, settings: false }, () => this.props.setActiveElement(this.state.expanded));
 
-    doToggle = () => this.isMounted() && this.setState(state => ({ expanded: !state.expanded }));
+    doToggle = () =>
+        this.isMounted() &&
+        this.setState(
+            state => ({ expanded: !state.expanded }),
+            () => this.props.setActiveElement(this.state.expanded || this.state.settings)
+        );
 
     setStreamsPerPage = streamsPerPage => {
         if (streamsPerPage) {

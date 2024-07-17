@@ -53,6 +53,7 @@ class StreamControls extends MegaRenderMixin {
         devices: {},
         audioSelectDropdown: false,
         videoSelectDropdown: false,
+        loading: false
     };
 
     LeaveButton = withHostsObserver(
@@ -87,6 +88,11 @@ class StreamControls extends MegaRenderMixin {
         }
     );
 
+    setActiveElement = () =>
+        this.props.setActiveElement(
+            this.state.audioSelectDropdown || this.state.videoSelectDropdown || this.state.endCallOptions
+        );
+
     handleMousedown = ({ target }) => {
         if (!this.isMounted()) {
             return;
@@ -105,7 +111,7 @@ class StreamControls extends MegaRenderMixin {
         if (!(this.endContainerRef && this.endContainerRef.current && this.endContainerRef.current.contains(target))) {
             state.endCallOptions = false;
         }
-        this.setState(state);
+        this.setState(state, this.setActiveElement);
     };
 
     renderDebug = () => {
@@ -188,9 +194,12 @@ class StreamControls extends MegaRenderMixin {
                     // see `renderEndCallOptions`
                     if (chatRoom.type !== 'private' && peers.length && Call.isModerator(chatRoom, u_handle)) {
                         return (
-                            this.setState(state => ({ endCallOptions: !state.endCallOptions }), () =>
-                                this.endButtonRef && $(this.endButtonRef.current).trigger('simpletipClose')
-                            )
+                            this.setState(state => ({ endCallOptions: !state.endCallOptions }), () => {
+                                if (this.endButtonRef) {
+                                    $(this.endButtonRef.current).trigger('simpletipClose');
+                                }
+                                this.setActiveElement();
+                            })
                         );
                     }
 
@@ -218,7 +227,7 @@ class StreamControls extends MegaRenderMixin {
     };
 
     renderSoundDropdown() {
-        const { hovered, call } = this.props;
+        const { call } = this.props;
         const { micDeviceId, audioOutDeviceId } = SfuClient;
         const { audioIn = {}, audioOut = {} } = this.state.devices;
         let selectedIn;
@@ -264,7 +273,7 @@ class StreamControls extends MegaRenderMixin {
                 key={id}
                 onClick={() => {
                     call.sfuClient.setMicDevice(id === 'default' ? null : id);
-                    this.setState({ audioSelectDropdown: false });
+                    this.setState({ audioSelectDropdown: false }, this.setActiveElement);
                 }}>
                 <>
                     <div className="av-device-name">{name}</div>
@@ -278,7 +287,7 @@ class StreamControls extends MegaRenderMixin {
                 key={id}
                 onClick={() => {
                     Promise.resolve(call.sfuClient.setAudioOutDevice(id === 'default' ? null : id)).catch(dump);
-                    this.setState({ audioSelectDropdown: false });
+                    this.setState({ audioSelectDropdown: false }, this.setActiveElement);
                 }}>
                 <>
                     <div className="av-device-name">{name}</div>
@@ -290,13 +299,13 @@ class StreamControls extends MegaRenderMixin {
 
         return <Dropdown
             className="input-sources audio-sources theme-dark-forced"
-            active={hovered}
+            active={true}
             noArrow={true}
             positionMy="center top"
             positionAt="center bottom"
             horizOffset={-50}
             vertOffset={16}
-            closeDropdown={() => this.setState({ audioSelectDropdown: false })}>
+            closeDropdown={() => this.setState({ audioSelectDropdown: false }, this.setActiveElement)}>
             <div className="source-label">{l.microphone}</div>
             {mics.length ? mics : <DropdownItem label={l.no_mics}/>}
             <hr/>
@@ -319,7 +328,7 @@ class StreamControls extends MegaRenderMixin {
     }
 
     renderVideoDropdown() {
-        const { hovered, call } = this.props;
+        const { call } = this.props;
         const { videoIn = {} } = this.state.devices;
         const { camDeviceId } = SfuClient;
         let selectedCam;
@@ -338,7 +347,7 @@ class StreamControls extends MegaRenderMixin {
                 key={id}
                 onClick={() => {
                     call.sfuClient.setCameraDevice(id === 'default' ? null : id);
-                    this.setState({ videoSelectDropdown: false });
+                    this.setState({ videoSelectDropdown: false }, this.setActiveElement);
                 }}>
                 <>
                     <div className="av-device-name">{name}</div>
@@ -350,17 +359,54 @@ class StreamControls extends MegaRenderMixin {
 
         return <Dropdown
             className="input-sources video-sources theme-dark-forced"
-            active={hovered}
+            active={true}
             noArrow={true}
             positionMy="center top"
             positionAt="center bottom"
             horizOffset={-50}
             vertOffset={16}
-            closeDropdown={() => this.setState({ videoSelectDropdown: false })}>
+            closeDropdown={() => this.setState({ videoSelectDropdown: false }, this.setActiveElement)}>
             <div className="source-label">{l.camera_button}</div>
             {cameras.length ? cameras : <DropdownItem label={l.no_cameras}/>}
         </Dropdown>;
     }
+
+    renderSourceOpener = ({ type, eventId }) => {
+        return (
+            <div
+                className={`
+                    input-source-opener
+                    button
+                    ${this.state[type] ? 'active-dropdown' : ''}
+                `}
+                onClick={async ev => {
+                    ev.stopPropagation();
+                    this.setState(
+                        () => ({ loading: true }),
+                        async() => {
+                            const devices = await this.updateMediaDevices();
+                            const updated = JSON.stringify(devices) !== JSON.stringify(this.state.devices);
+                            this.setState(
+                                state => ({
+                                    loading: false,
+                                    audioSelectDropdown: false,
+                                    videoSelectDropdown: false,
+                                    devices: updated ? devices : this.state.devices,
+                                    [type]: !state[type]
+                                }),
+                                () => {
+                                    const { audioSelectDropdown, videoSelectDropdown } = this.state;
+                                    this.props.setActiveElement(audioSelectDropdown || videoSelectDropdown);
+                                    eventlog(eventId);
+                                }
+                            );
+                        }
+                    );
+                }}>
+                <i className="sprite-fm-mono icon-arrow-up" />
+            </div>
+        );
+    };
 
     async updateMediaDevices() {
         let devices = await SfuClient.enumMediaDevices().catch(dump);
@@ -435,7 +481,7 @@ class StreamControls extends MegaRenderMixin {
                     }
                 }
             }
-            this.setState({ devices, audioSelectDropdown: false, videoSelectDropdown: false });
+            this.setState({ devices, audioSelectDropdown: false, videoSelectDropdown: false }, this.setActiveElement);
         });
     };
 
@@ -453,8 +499,9 @@ class StreamControls extends MegaRenderMixin {
 
     render() {
         const {
-            call, signal, onAudioClick, onVideoClick, onScreenSharingClick, onHoldClick, renderSignalWarning,
-            hasToRenderPermissionsWarning, renderPermissionsWarning, resetError, blocked, renderBlockedWarning
+            call, signal, chatRoom, renderSignalWarning, hasToRenderPermissionsWarning, renderPermissionsWarning,
+            resetError, blocked, renderBlockedWarning,
+            onAudioClick, onVideoClick, onScreenSharingClick, onHoldClick,
         } = this.props;
         const { audioSelectDropdown, videoSelectDropdown } = this.state;
         const avFlags = call.av;
@@ -467,7 +514,8 @@ class StreamControls extends MegaRenderMixin {
         return (
             <>
                 {blocked && renderBlockedWarning()}
-                <div className={StreamControls.NAMESPACE}>
+                <div
+                    className={StreamControls.NAMESPACE}>
                     {d && localStorage.callDebug ? this.renderDebug() : ''}
                     <ul>
                         <li
@@ -496,27 +544,10 @@ class StreamControls extends MegaRenderMixin {
                             <span>{l.mic_button /* `Mic` */}</span>
                             {signal ? null : renderSignalWarning()}
                             {hasToRenderPermissionsWarning(Av.Audio) ? renderPermissionsWarning(Av.Audio) : null}
-                            <div
-                                className={`input-source-opener button ${audioSelectDropdown ? 'active-dropdown' : ''}`}
-                                onClick={ev => {
-                                    ev.stopPropagation();
-                                    if (this.state.audioSelectDropdown) {
-                                        return this.setState({
-                                            audioSelectDropdown: false,
-                                        });
-                                    }
-                                    this.updateMediaDevices().always(devices => {
-                                        if (this.isMounted()) {
-                                            this.setState({
-                                                devices,
-                                                audioSelectDropdown: true,
-                                                videoSelectDropdown: false,
-                                            });
-                                        }
-                                    });
-                                }}>
-                                <i className="sprite-fm-mono icon-arrow-up" />
-                            </div>
+                            {this.renderSourceOpener({
+                                type: 'audioSelectDropdown',
+                                eventId: chatRoom.isMeeting ? 500299 : 500300
+                            })}
                         </li>
                         {audioSelectDropdown && this.renderSoundDropdown()}
                         <li
@@ -544,27 +575,10 @@ class StreamControls extends MegaRenderMixin {
                             />
                             <span>{l.camera_button /* `Camera` */}</span>
                             {hasToRenderPermissionsWarning(Av.Camera) ? renderPermissionsWarning(Av.Camera) : null}
-                            <div
-                                className={`input-source-opener button ${videoSelectDropdown ? 'active-dropdown' : ''}`}
-                                onClick={ev => {
-                                    ev.stopPropagation();
-                                    if (this.state.videoSelectDropdown) {
-                                        return this.setState({
-                                            videoSelectDropdown: false,
-                                        });
-                                    }
-                                    this.updateMediaDevices().always(devices => {
-                                        if (this.isMounted()) {
-                                            this.setState({
-                                                devices,
-                                                audioSelectDropdown: false,
-                                                videoSelectDropdown: true,
-                                            });
-                                        }
-                                    });
-                                }}>
-                                <i className="sprite-fm-mono icon-arrow-up" />
-                            </div>
+                            {this.renderSourceOpener({
+                                type: 'videoSelectDropdown',
+                                eventId: chatRoom.isMeeting ? 500301 : 500302
+                            })}
                         </li>
                         {videoSelectDropdown && this.renderVideoDropdown()}
                         <li
@@ -575,6 +589,12 @@ class StreamControls extends MegaRenderMixin {
                                 }
                                 resetError(Av.Screen);
                                 onScreenSharingClick();
+                                if (chatRoom.isMeeting) {
+                                    eventlog(500303);
+                                }
+                                else {
+                                    eventlog(500304);
+                                }
                             }}>
                             <Button
                                 key="screen-sharing"

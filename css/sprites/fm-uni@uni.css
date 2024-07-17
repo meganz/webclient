@@ -24,6 +24,9 @@
 .sprite-fm-uni.icon-amex, .sprite-fm-uni-before.icon-amex-before::before, .sprite-fm-uni-after.icon-amex-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-amex");
 }
+.sprite-fm-uni.icon-android, .sprite-fm-uni-before.icon-android-before::before, .sprite-fm-uni-after.icon-android-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-android");
+}
 .sprite-fm-uni.icon-archive, .sprite-fm-uni-before.icon-archive-before::before, .sprite-fm-uni-after.icon-archive-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-archive");
 }
@@ -341,6 +344,9 @@
 }
 .sprite-fm-uni.icon-web-link, .sprite-fm-uni-before.icon-web-link-before::before, .sprite-fm-uni-after.icon-web-link-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-web-link");
+}
+.sprite-fm-uni.icon-windows, .sprite-fm-uni-before.icon-windows-before::before, .sprite-fm-uni-after.icon-windows-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-windows");
 }
 .sprite-fm-uni.icon-youtube, .sprite-fm-uni-before.icon-youtube-before::before, .sprite-fm-uni-after.icon-youtube-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-youtube");

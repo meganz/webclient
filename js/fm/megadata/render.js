@@ -187,31 +187,22 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
             };
 
             $('.shared-details-info-block .grid-url-arrow').rebind('click.sharesui', function(e) {
+
                 const $this = $(this);
                 prepareShareMenuHandler(e);
+
                 if ($this.hasClass('active')) {
                     $this.removeClass('active');
                     $.hideContextMenu();
-
-                    $.selected = savedUserSelection || [];
-                    savedUserSelection = false;
-
-                    if (window.selectionManager) {
-                        return selectionManager.reinitialize();
-                    }
                 }
                 else {
+                    // Close Info panel as no longer applicable (they clicked on the parent folder context menu)
+                    mega.ui.mInfoPanel.closeIfOpen();
                     $.hideContextMenu();
 
-                    // Replace the selection to the parent node
-                    if (window.selectionManager) {
-                        savedUserSelection = selectionManager.get_selected();
-                        selectionManager.resetTo(M.currentdirid);
-                    }
-                    else {
-                        savedUserSelection = $.selected;
-                        $.selected = [M.currentdirid];
-                    }
+                    // Set selection to the parent share dir so the context menu can Download/Copy/Info on the parent
+                    selectionManager.resetTo(M.currentdirid);
+
                     M.contextMenuUI(e, 1);
                     $this.addClass('active');
                 }

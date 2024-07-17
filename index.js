@@ -1414,10 +1414,6 @@ function init_page() {
     else if (page === 'nas') {
         mega.redirect('mega.io', 'nas', false, false);
     }
-    else if (page === 'nzippmember' || page === 'nziphotographer') {
-        parsepage(pages.nzipp);
-        nzippCampaign.init();
-    }
     else if (page === 'refer') {
         mega.redirect('mega.io', 'refer', false, false);
     }
@@ -2688,7 +2684,7 @@ function topmenuUI() {
                     'chatandmeetings', 'cmd', 'collaboration', 'contact', 'cookie', 'copyright',
                     'corporate', 'credits', 'desktop', 'developers', 'dispute', 'doc',
                     'extensions', 'keybackup', 'login', 'media', 'mega', 'megabackup', 'mobile',
-                    'mobileapp', 'nas', 'nziphotographer', 'nzippmember', 'objectstorage',
+                    'mobileapp', 'nas', 'objectstorage',
                     'privacy', 'pro', 'register', 'reliability', 'resellers', 'sdk',
                     'securechat', 'security', 'share', 'sitemap', 'sourcecode', 'special',
                     'start', 'storage', 'support', 'syncing', 'takedown', 'terms', 'transparency'

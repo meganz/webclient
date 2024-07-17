@@ -646,9 +646,13 @@ export class Schedule extends MegaRenderMixin {
                         label={l.waiting_room /* `Waiting room` */}
                         subLabel={l.waiting_room_info /* `Only users admitted by the host can join the call.` */}
                         isLoading={isLoading}
-                        onToggle={waitingRoom =>
-                            this.props.chatRoom?.havePendingCall() ? null : this.handleToggle(waitingRoom)
-                        }
+                        onToggle={waitingRoom => {
+                            if (this.props.chatRoom?.havePendingCall()) {
+                                return;
+                            }
+                            this.handleToggle(waitingRoom);
+                            delay('chat-event-sm-waiting-room', () => eventlog(500297));
+                        }}
                     />
 
                     {/* --- */}
@@ -658,7 +662,10 @@ export class Schedule extends MegaRenderMixin {
                         checked={openInvite}
                         label={l.open_invite_desc /* `Allow non-hosts to add participants` */}
                         isLoading={isLoading}
-                        onToggle={this.handleToggle}
+                        onToggle={(ev) => {
+                            this.handleToggle(ev);
+                            delay('chat-event-sm-open-invite', () => eventlog(500298));
+                        }}
                     />
 
                     {/* --- */}

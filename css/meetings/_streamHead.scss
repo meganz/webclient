@@ -13,8 +13,6 @@
     transition: opacity 500ms ease-in-out, top 500ms ease-in-out;
     z-index: 13;
 
-    &.active { top: 0; }
-
     &-content {
         display: flex;
         justify-content: space-between;

@@ -1226,6 +1226,9 @@ FileManager.prototype.initFileManagerUI = function() {
 
                 M.openFolder(targetFolder, true);
 
+                if (tab.root === 'chat') {
+                    delay('chat-event-gen-nav', () => eventlog(500294));
+                }
                 break;
             }
         }

@@ -32,11 +32,18 @@ mobile.rubbishBin = {
         }
         else {
             // Delete the file
-            let res =  await fmremove([nodeHandle]);
-            res = res[0][node.t ? 1 : 0];
-            res = res && res.status === 'fulfilled' ? res.value.length : 0;
+            const result =  await fmremove([nodeHandle]);
+            let links = 0;
 
-            mobile.rubbishBin.showCompleteMessage(node, res);
+            // Count the number of deleted public links
+            for (const res of result[0]) {
+                if (res && res.status === 'fulfilled' && res.value) {
+                    links = res.value.length;
+                    break;
+                }
+            }
+
+            mobile.rubbishBin.showCompleteMessage(node, links);
         }
 
         loadingDialog.hide();

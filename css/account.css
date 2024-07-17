@@ -616,19 +616,25 @@ button.loading .loader {
     width: fit-content;
     color: var(--text-color-black-higher);
     font-family: var(--text-font-family-second-regular);
-    font-size: 36px;
+    font-size: 30px;
     line-height: 36px;
+    margin: 120px auto 0;
+}
+.trusted-users-section .trusted-by {
+    align-self: flex-start;
 }
 .trusted-users-section .users-value {
     color: rgba(255, 51, 58, 1);
     font-family: var(--text-font-family-second-bold);
-    font-size: 68px;
-    line-height: 83px;
+    font-size: 54px;
+    line-height: 65px;
 }
 .trusted-users-section .users-worldwide {
     align-self: flex-end;
 }
 .register-slide-block h2, .login-slide-block h2 {
+    display: flex;
+    flex-direction: column;
     font-weight: 300;
     font-family: 'LatoWebLight','source_sans_proregular', Arial;
     margin: 32px 0 20px 0;
@@ -659,6 +665,9 @@ button.loading .loader {
 }
 .register-slide-wrapper[data-slide="3"] {
     left: -913px;
+}
+.register-slide-wrapper[data-slide="4"] {
+    left: -1370px;
 }
 .register-slide .slider-ctrl-button {
     position: absolute;

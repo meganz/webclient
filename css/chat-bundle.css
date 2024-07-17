@@ -117,9 +117,6 @@
   transition: opacity 500ms ease-in-out, top 500ms ease-in-out;
   z-index: 13;
 }
-.stream-head.active {
-  top: 0;
-}
 .stream-head-content {
   display: flex;
   justify-content: space-between;
@@ -1498,6 +1495,17 @@ body.theme-dark .lhp-container .lhp-filter-tag {
 }
 .meetings-call.minimized {
   display: none;
+}
+.meetings-call.with-active-element {
+  /* [...] */
+}
+.meetings-call.with-active-element .stream-controls,
+.meetings-call.with-active-element .sidebar-controls,
+.meetings-call.with-active-element .recording-control {
+  bottom: 0;
+}
+.meetings-call.with-active-element .stream-head {
+  top: 0;
 }
 .meetings-call-onboarding {
   /* [...] */

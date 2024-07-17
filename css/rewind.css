@@ -314,7 +314,7 @@ body.theme-dark .rewind-datepicker-calendar .datepicker--cell.-current- {
     position: relative;
 }
 
-.dark-direct-tooltip.simpletip-tooltip i.tooltip-arrow {
+.rewind-calendar-tooltip.dark-direct-tooltip.simpletip-tooltip i.tooltip-arrow {
     --mask-color: var(--surface-grey-1);
 }
 

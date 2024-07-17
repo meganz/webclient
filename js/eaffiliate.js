@@ -86,12 +86,16 @@ mBroadcaster.once('startMega', () => {
         }
     }
 
+    const data = getEvent();
+    if (!data) {
+        return;
+    }
     if (!u_type) {
         mBroadcaster.once('login2', () => {
-            const data = getEvent();
-            if (data) {
-                setAttr(data);
-            }
+            setAttr(data);
         });
+    }
+    else {
+        setAttr(data);
     }
 });

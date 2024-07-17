@@ -512,6 +512,8 @@ lazy(mega.ui, 'searchbar', () => {
      * @return {undefined}
      */
     function showCorrectSearch(page) {
+
+        const $topbar = $('#startholder .js-topbar, #fmholder .js-topbar');
         const $miniSearch = $('.mini-search', $topbar);
         const $mainSearch = $('.searcher-wrapper .js-topbar-searcher', $topbar);
 

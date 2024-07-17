@@ -772,7 +772,7 @@ export default class Stream extends MegaRenderMixin {
         const {
             mode, call, chatRoom, minimized, peers, sidebar, hovered, forcedLocal, view, isOnHold, waitingRoomPeers,
             recorder, onRecordingToggle, onCallMinimize, onCallExpand, onModeChange, onAudioClick, onVideoClick,
-            onCallEnd, onScreenSharingClick, onHoldClick, onSpeakerChange
+            onCallEnd, onScreenSharingClick, onHoldClick, onSpeakerChange, setActiveElement
         } = this.props;
 
         return (
@@ -826,6 +826,7 @@ export default class Stream extends MegaRenderMixin {
                             onModeChange={onModeChange}
                             onStreamsPerPageChange={streamsPerPage => this.setState({ streamsPerPage })}
                             onMovePage={direction => this.movePage(direction)}
+                            setActiveElement={setActiveElement}
                         />
                     </>
                 }

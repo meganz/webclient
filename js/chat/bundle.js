@@ -23216,7 +23216,8 @@ class Call extends mixins.w9 {
       invitePanel: false,
       presenterThumbSelected: false,
       timeoutBanner: false,
-      showTimeoutUpgrade: false
+      showTimeoutUpgrade: false,
+      activeElement: false
     };
     this.handleRetryTimeout = () => {
       const {
@@ -23622,6 +23623,9 @@ class Call extends mixins.w9 {
         className: "record-label"
       }, l.record_start_button));
     };
+    this.setActiveElement = activeElement => this.setState({
+      activeElement
+    });
     const {
       SOUNDS
     } = megaChat;
@@ -23858,7 +23862,8 @@ class Call extends mixins.w9 {
       recordingConsentDialog,
       invitePanel,
       presenterThumbSelected,
-      timeoutBanner
+      timeoutBanner,
+      activeElement
     } = this.state;
     const {
       stayOnEnd
@@ -23878,6 +23883,7 @@ class Call extends mixins.w9 {
       waitingRoomPeers,
       recorder,
       presenterThumbSelected,
+      activeElement,
       hasOtherParticipants: call.hasOtherParticipant(),
       isOnHold: call.sfuClient.isOnHold(),
       onSpeakerChange: this.handleSpeakerChange,
@@ -23890,6 +23896,7 @@ class Call extends mixins.w9 {
                     meetings-call
                     ${minimized ? 'minimized' : ''}
                     ${timeoutBanner ? 'with-timeout-banner' : ''}
+                    ${activeElement ? 'with-active-element' : ''}
                 `,
       onMouseMove: onboardingUI || onboardingRecording ? null : this.handleMouseMove,
       onMouseOut: onboardingUI || onboardingRecording ? null : this.handleMouseOut
@@ -23909,7 +23916,8 @@ class Call extends mixins.w9 {
       onVideoClick: () => call.toggleVideo(),
       onScreenSharingClick: this.handleScreenSharingToggle,
       onHoldClick: this.handleHoldToggle,
-      onVideoDoubleClick: this.handleSpeakerChange
+      onVideoDoubleClick: this.handleSpeakerChange,
+      setActiveElement: this.setActiveElement
     })), sidebar && REaCt().createElement(Sidebar, (0,esm_extends.A)({}, STREAM_PROPS, {
       guest,
       initialCallRinging,
@@ -23937,7 +23945,8 @@ class Call extends mixins.w9 {
       onScreenSharingClick: this.handleScreenSharingToggle,
       onCallEnd: this.handleCallEnd,
       onStreamToggle: this.handleStreamToggle,
-      onHoldClick: this.handleHoldToggle
+      onHoldClick: this.handleHoldToggle,
+      setActiveElement: this.setActiveElement
     }), REaCt().createElement(SidebarControls, {
       call,
       chatRoom,
@@ -25807,17 +25816,22 @@ class ModeSwitch extends mixins.w9 {
     };
     this.handleMousedown = ({
       target
-    }) => this.containerRef && this.containerRef.current && this.containerRef.current.contains(target) ? null : this.doClose();
+    }) => {
+      if (this.state.expanded || this.state.settings) {
+        let _this$containerRef;
+        return (_this$containerRef = this.containerRef) != null && (_this$containerRef = _this$containerRef.current) != null && _this$containerRef.contains(target) ? null : this.doClose();
+      }
+    };
     this.handleKeydown = ({
       keyCode
     }) => keyCode && keyCode === 27 && this.doClose();
     this.doClose = () => this.isMounted() && this.setState({
       expanded: false,
       settings: false
-    });
+    }, () => this.props.setActiveElement(this.state.expanded));
     this.doToggle = () => this.isMounted() && this.setState(state => ({
       expanded: !state.expanded
-    }));
+    }), () => this.props.setActiveElement(this.state.expanded || this.state.settings));
     this.setStreamsPerPage = streamsPerPage => {
       if (streamsPerPage) {
         let _this$props$onStreams, _this$props;
@@ -26002,7 +26016,8 @@ class StreamHead extends mixins.w9 {
     this.state = {
       dialog: false,
       duration: undefined,
-      banner: false
+      banner: false,
+      modeSwitch: false
     };
     this.updateDurationDOM = () => {
       if (this.durationRef) {
@@ -26164,16 +26179,17 @@ class StreamHead extends mixins.w9 {
       NAMESPACE
     } = StreamHead;
     const {
-      dialog
-    } = this.state;
-    const {
       mode,
       streamsPerPage,
       chatRoom,
       onStreamsPerPageChange,
       onCallMinimize,
-      onModeChange
+      onModeChange,
+      setActiveElement
     } = this.props;
+    const {
+      dialog
+    } = this.state;
     const SIMPLETIP = {
       position: 'bottom',
       offset: 5,
@@ -26181,10 +26197,7 @@ class StreamHead extends mixins.w9 {
     };
     return REaCt().createElement("div", {
       ref: this.headRef,
-      className: `
-                    ${NAMESPACE}
-                    ${dialog ? 'active' : ''}
-                `
+      className: `${NAMESPACE}`
     }, dialog && REaCt().createElement(this.Dialog, null), REaCt().createElement("div", {
       className: `${NAMESPACE}-content theme-dark-forced`
     }, REaCt().createElement("div", {
@@ -26201,7 +26214,7 @@ class StreamHead extends mixins.w9 {
       onClick: () => chatRoom.isMeeting && chatRoom.publicLink && this.setState({
         dialog: !dialog,
         banner: false
-      })
+      }, () => setActiveElement(this.state.dialog))
     }, REaCt().createElement(utils.zT, null, chatRoom.getRoomTitle()), chatRoom.isMeeting && chatRoom.publicLink && REaCt().createElement("i", {
       className: `
                                         sprite-fm-mono
@@ -26213,7 +26226,8 @@ class StreamHead extends mixins.w9 {
       mode,
       streamsPerPage,
       onStreamsPerPageChange,
-      onModeChange
+      onModeChange,
+      setActiveElement
     }), REaCt().createElement(meetings_button.A, {
       className: "head-control",
       simpletip: {
@@ -27081,7 +27095,8 @@ class stream_Stream extends mixins.w9 {
       onCallEnd,
       onScreenSharingClick,
       onHoldClick,
-      onSpeakerChange
+      onSpeakerChange,
+      setActiveElement
     } = this.props;
     return REaCt().createElement("div", {
       ref: this.wrapperRef,
@@ -27119,7 +27134,8 @@ class stream_Stream extends mixins.w9 {
       onStreamsPerPageChange: streamsPerPage => this.setState({
         streamsPerPage
       }),
-      onMovePage: direction => this.movePage(direction)
+      onMovePage: direction => this.movePage(direction),
+      setActiveElement
     })), REaCt().createElement(FloatingVideo, {
       call,
       peers,
@@ -27210,7 +27226,8 @@ class StreamControls extends _mixins1__.w9 {
       endCallPending: false,
       devices: {},
       audioSelectDropdown: false,
-      videoSelectDropdown: false
+      videoSelectDropdown: false,
+      loading: false
     };
     this.LeaveButton = (0,_hostsObserver_jsx2__.C)(({
       hasHost,
@@ -27235,6 +27252,7 @@ class StreamControls extends _mixins1__.w9 {
         }
       }, react0().createElement("span", null, l.leave));
     });
+    this.setActiveElement = () => this.props.setActiveElement(this.state.audioSelectDropdown || this.state.videoSelectDropdown || this.state.endCallOptions);
     this.handleMousedown = ({
       target
     }) => {
@@ -27257,7 +27275,7 @@ class StreamControls extends _mixins1__.w9 {
       if (!(this.endContainerRef && this.endContainerRef.current && this.endContainerRef.current.contains(target))) {
         state.endCallOptions = false;
       }
-      this.setState(state);
+      this.setState(state, this.setActiveElement);
     };
     this.renderDebug = () => {
       return react0().createElement("div", {
@@ -27343,7 +27361,12 @@ class StreamControls extends _mixins1__.w9 {
           if (chatRoom.type !== 'private' && peers.length && _call_jsx5__.Ay.isModerator(chatRoom, u_handle)) {
             return this.setState(state => ({
               endCallOptions: !state.endCallOptions
-            }), () => this.endButtonRef && $(this.endButtonRef.current).trigger('simpletipClose'));
+            }), () => {
+              if (this.endButtonRef) {
+                $(this.endButtonRef.current).trigger('simpletipClose');
+              }
+              this.setActiveElement();
+            });
           }
           if (recorder && recorder === u_handle) {
             return chatRoom.type === 'private' ? renderEndConfirm(onCallEnd, onRecordingToggle) : renderLeaveConfirm(onCallEnd, onRecordingToggle);
@@ -27361,6 +27384,43 @@ class StreamControls extends _mixins1__.w9 {
           this.endButtonRef = button.buttonRef;
         }
       }), react0().createElement("span", null, l.end_button));
+    };
+    this.renderSourceOpener = ({
+      type,
+      eventId
+    }) => {
+      return react0().createElement("div", {
+        className: `
+                    input-source-opener
+                    button
+                    ${this.state[type] ? 'active-dropdown' : ''}
+                `,
+        onClick: async ev => {
+          ev.stopPropagation();
+          this.setState(() => ({
+            loading: true
+          }), async () => {
+            const devices = await this.updateMediaDevices();
+            const updated = JSON.stringify(devices) !== JSON.stringify(this.state.devices);
+            this.setState(state => ({
+              loading: false,
+              audioSelectDropdown: false,
+              videoSelectDropdown: false,
+              devices: updated ? devices : this.state.devices,
+              [type]: !state[type]
+            }), () => {
+              const {
+                audioSelectDropdown,
+                videoSelectDropdown
+              } = this.state;
+              this.props.setActiveElement(audioSelectDropdown || videoSelectDropdown);
+              eventlog(eventId);
+            });
+          });
+        }
+      }, react0().createElement("i", {
+        className: "sprite-fm-mono icon-arrow-up"
+      }));
     };
     this.handleDeviceChange = () => {
       this.micDefaultRenamed = false;
@@ -27388,13 +27448,12 @@ class StreamControls extends _mixins1__.w9 {
           devices,
           audioSelectDropdown: false,
           videoSelectDropdown: false
-        });
+        }, this.setActiveElement);
       });
     };
   }
   renderSoundDropdown() {
     const {
-      hovered,
       call
     } = this.props;
     const {
@@ -27445,7 +27504,7 @@ class StreamControls extends _mixins1__.w9 {
           call.sfuClient.setMicDevice(id === 'default' ? null : id);
           this.setState({
             audioSelectDropdown: false
-          });
+          }, this.setActiveElement);
         }
       }, react0().createElement(react0().Fragment, null, react0().createElement("div", {
         className: "av-device-name"
@@ -27460,7 +27519,7 @@ class StreamControls extends _mixins1__.w9 {
           Promise.resolve(call.sfuClient.setAudioOutDevice(id === 'default' ? null : id)).catch(dump);
           this.setState({
             audioSelectDropdown: false
-          });
+          }, this.setActiveElement);
         }
       }, react0().createElement(react0().Fragment, null, react0().createElement("div", {
         className: "av-device-name"
@@ -27470,7 +27529,7 @@ class StreamControls extends _mixins1__.w9 {
     });
     return react0().createElement(_ui_dropdowns_jsx6__.Dropdown, {
       className: "input-sources audio-sources theme-dark-forced",
-      active: hovered,
+      active: true,
       noArrow: true,
       positionMy: "center top",
       positionAt: "center bottom",
@@ -27478,7 +27537,7 @@ class StreamControls extends _mixins1__.w9 {
       vertOffset: 16,
       closeDropdown: () => this.setState({
         audioSelectDropdown: false
-      })
+      }, this.setActiveElement)
     }, react0().createElement("div", {
       className: "source-label"
     }, l.microphone), mics.length ? mics : react0().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
@@ -27502,7 +27561,6 @@ class StreamControls extends _mixins1__.w9 {
   }
   renderVideoDropdown() {
     const {
-      hovered,
       call
     } = this.props;
     const {
@@ -27529,7 +27587,7 @@ class StreamControls extends _mixins1__.w9 {
           call.sfuClient.setCameraDevice(id === 'default' ? null : id);
           this.setState({
             videoSelectDropdown: false
-          });
+          }, this.setActiveElement);
         }
       }, react0().createElement(react0().Fragment, null, react0().createElement("div", {
         className: "av-device-name"
@@ -27539,7 +27597,7 @@ class StreamControls extends _mixins1__.w9 {
     });
     return react0().createElement(_ui_dropdowns_jsx6__.Dropdown, {
       className: "input-sources video-sources theme-dark-forced",
-      active: hovered,
+      active: true,
       noArrow: true,
       positionMy: "center top",
       positionAt: "center bottom",
@@ -27547,7 +27605,7 @@ class StreamControls extends _mixins1__.w9 {
       vertOffset: 16,
       closeDropdown: () => this.setState({
         videoSelectDropdown: false
-      })
+      }, this.setActiveElement)
     }, react0().createElement("div", {
       className: "source-label"
     }, l.camera_button), cameras.length ? cameras : react0().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
@@ -27656,33 +27714,10 @@ class StreamControls extends _mixins1__.w9 {
                                     ${avFlags & Av.Audio || isOnHold ? '' : 'with-fill'}
                                 `,
       icon: avFlags & Av.Audio ? 'icon-mic-thin-outline' : 'icon-mic-off-thin-outline'
-    }), react0().createElement("span", null, l.mic_button), signal ? null : renderSignalWarning(), hasToRenderPermissionsWarning(Av.Audio) ? renderPermissionsWarning(Av.Audio) : null, react0().createElement("div", {
-      className: `input-source-opener button ${audioSelectDropdown ? 'active-dropdown' : ''}`,
-      onClick: ev => {
-        ev.stopPropagation();
-        if (chatRoom.isMeeting) {
-          eventlog(500299);
-        } else {
-          eventlog(500300);
-        }
-        if (this.state.audioSelectDropdown) {
-          return this.setState({
-            audioSelectDropdown: false
-          });
-        }
-        this.updateMediaDevices().always(devices => {
-          if (this.isMounted()) {
-            this.setState({
-              devices,
-              audioSelectDropdown: true,
-              videoSelectDropdown: false
-            });
-          }
-        });
-      }
-    }, react0().createElement("i", {
-      className: "sprite-fm-mono icon-arrow-up"
-    }))), audioSelectDropdown && this.renderSoundDropdown(), react0().createElement("li", {
+    }), react0().createElement("span", null, l.mic_button), signal ? null : renderSignalWarning(), hasToRenderPermissionsWarning(Av.Audio) ? renderPermissionsWarning(Av.Audio) : null, this.renderSourceOpener({
+      type: 'audioSelectDropdown',
+      eventId: chatRoom.isMeeting ? 500299 : 500300
+    })), audioSelectDropdown && this.renderSoundDropdown(), react0().createElement("li", {
       className: `
                                 ${isOnHold ? 'disabled' : ''}
                                 with-input-selector
@@ -27704,33 +27739,10 @@ class StreamControls extends _mixins1__.w9 {
                                     ${avFlags & Av.Camera || isOnHold ? '' : 'with-fill'}
                                 `,
       icon: avFlags & Av.Camera ? 'icon-video-thin-outline' : 'icon-video-off-thin-outline'
-    }), react0().createElement("span", null, l.camera_button), hasToRenderPermissionsWarning(Av.Camera) ? renderPermissionsWarning(Av.Camera) : null, react0().createElement("div", {
-      className: `input-source-opener button ${videoSelectDropdown ? 'active-dropdown' : ''}`,
-      onClick: ev => {
-        ev.stopPropagation();
-        if (chatRoom.isMeeting) {
-          eventlog(500301);
-        } else {
-          eventlog(500302);
-        }
-        if (this.state.videoSelectDropdown) {
-          return this.setState({
-            videoSelectDropdown: false
-          });
-        }
-        this.updateMediaDevices().always(devices => {
-          if (this.isMounted()) {
-            this.setState({
-              devices,
-              audioSelectDropdown: false,
-              videoSelectDropdown: true
-            });
-          }
-        });
-      }
-    }, react0().createElement("i", {
-      className: "sprite-fm-mono icon-arrow-up"
-    }))), videoSelectDropdown && this.renderVideoDropdown(), react0().createElement("li", {
+    }), react0().createElement("span", null, l.camera_button), hasToRenderPermissionsWarning(Av.Camera) ? renderPermissionsWarning(Av.Camera) : null, this.renderSourceOpener({
+      type: 'videoSelectDropdown',
+      eventId: chatRoom.isMeeting ? 500301 : 500302
+    })), videoSelectDropdown && this.renderVideoDropdown(), react0().createElement("li", {
       className: isOnHold ? 'disabled' : '',
       onClick: () => {
         if (isOnHold) {

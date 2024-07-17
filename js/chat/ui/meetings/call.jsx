@@ -244,6 +244,7 @@ export default class Call extends MegaRenderMixin {
         presenterThumbSelected: false,
         timeoutBanner: false,
         showTimeoutUpgrade: false,
+        activeElement: false
     };
 
     /**
@@ -1045,6 +1046,8 @@ export default class Call extends MegaRenderMixin {
         }
     }
 
+    setActiveElement = activeElement => this.setState({ activeElement });
+
     componentWillUnmount() {
         super.componentWillUnmount();
         const { minimized, willUnmount, chatRoom } = this.props;
@@ -1124,12 +1127,12 @@ export default class Call extends MegaRenderMixin {
         const {
             mode, view, sidebar, hovered, forcedLocal, invite, ephemeral, ephemeralAccounts, guest,
             offline, onboardingUI, onboardingRecording, everHadPeers, initialCallRinging, waitingRoomPeers, recorder,
-            recordingConsentDialog, invitePanel, presenterThumbSelected, timeoutBanner
+            recordingConsentDialog, invitePanel, presenterThumbSelected, timeoutBanner, activeElement
         } = this.state;
         const { stayOnEnd } = call;
         const STREAM_PROPS = {
             mode, peers, sidebar, hovered, forcedLocal, call, view, chatRoom, parent, stayOnEnd,
-            everHadPeers, waitingRoomPeers, recorder, presenterThumbSelected,
+            everHadPeers, waitingRoomPeers, recorder, presenterThumbSelected, activeElement,
             hasOtherParticipants: call.hasOtherParticipant(), isOnHold: call.sfuClient.isOnHold(),
             onSpeakerChange: this.handleSpeakerChange, onModeChange: this.handleModeChange,
             onInviteToggle: this.handleInviteToggle, onStayConfirm: this.handleStayConfirm
@@ -1145,6 +1148,7 @@ export default class Call extends MegaRenderMixin {
                     meetings-call
                     ${minimized ? 'minimized' : ''}
                     ${timeoutBanner ? 'with-timeout-banner' : ''}
+                    ${activeElement ? 'with-active-element' : ''}
                 `}
                 onMouseMove={onboardingUI || onboardingRecording ? null : this.handleMouseMove}
                 onMouseOut={onboardingUI || onboardingRecording ? null : this.handleMouseOut}>
@@ -1170,6 +1174,7 @@ export default class Call extends MegaRenderMixin {
                     onScreenSharingClick={this.handleScreenSharingToggle}
                     onHoldClick={this.handleHoldToggle}
                     onVideoDoubleClick={this.handleSpeakerChange}
+                    setActiveElement={this.setActiveElement}
                 />
 
                 {sidebar &&
@@ -1206,6 +1211,7 @@ export default class Call extends MegaRenderMixin {
                             onCallEnd={this.handleCallEnd}
                             onStreamToggle={this.handleStreamToggle}
                             onHoldClick={this.handleHoldToggle}
+                            setActiveElement={this.setActiveElement}
                         />
                         <SidebarControls
                             call={call}

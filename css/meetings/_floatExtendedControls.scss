@@ -55,3 +55,6 @@ body div:has(.float-video:hover) + .dropdown.body.button-group-menu,
 body div:has(+ div.dropdown.body.button-group-menu:hover) .float-video .float-video-overlay {
     display: block;
 }
+body div:has(+ div.dropdown.body.button-group-menu:hover) .float-video .video-node .video-node-status {
+    bottom: 64px;
+}

@@ -22080,17 +22080,26 @@ const videoNode = REQ_(414);
 
 
 class Participant extends mixins.w9 {
-  constructor(...args) {
-    super(...args);
+  constructor(props) {
+    super(props);
+    this.raisedHandListener = undefined;
     this.baseIconClass = 'sprite-fm-mono';
+    this.state = {
+      raisedHandPeers: []
+    };
+    this.state.raisedHandPeers = this.props.raisedHandPeers || [];
   }
   componentDidMount() {
     super.componentDidMount();
     this.props.source.registerConsumer(this);
+    this.raisedHandListener = mBroadcaster.addListener('meetings:raisedHand', raisedHandPeers => this.setState({
+      raisedHandPeers
+    }, () => this.safeForceUpdate()));
   }
   componentWillUnmount() {
     super.componentWillUnmount();
     this.props.source.deregisterConsumer(this);
+    mBroadcaster.removeListener(this.raisedHandListener);
   }
   onAvChange() {
     this.safeForceUpdate();
@@ -22110,7 +22119,11 @@ class Participant extends mixins.w9 {
       onModeChange
     } = this.props;
     const hasRelationship = contactsPanel.A.hasRelationship(contact);
-    return REaCt().createElement(REaCt().Fragment, null, REaCt().createElement(ui_contacts.Avatar, {
+    return REaCt().createElement(REaCt().Fragment, null, this.state.raisedHandPeers.includes(handle) ? REaCt().createElement("div", {
+      className: "participant-signifier"
+    }, REaCt().createElement("i", {
+      className: "sprite-fm-uni icon-raise-hand"
+    })) : REaCt().createElement(ui_contacts.Avatar, {
       contact: M.u[handle]
     }), REaCt().createElement("div", {
       className: "name"
@@ -22242,38 +22255,36 @@ class Participants extends mixins.w9 {
         call,
         mode,
         chatRoom,
-        peers,
         recorder,
+        raisedHandPeers,
         onCallMinimize,
         onSpeakerChange,
         onModeChange
       } = this.props;
-      return REaCt().createElement("ul", null, REaCt().createElement("li", null, REaCt().createElement(Participant, {
-        call,
-        mode,
-        chatRoom,
-        source: call.getLocalStream(),
-        handle: u_handle,
-        name: M.getNameByHandle(u_handle),
-        recorder,
-        onCallMinimize,
-        onSpeakerChange,
-        onModeChange
-      })), peers.map(peer => REaCt().createElement("li", {
-        key: `${peer.clientId}-${peer.userHandle}`
+      const peers = Object.values(this.props.peers);
+      const $$PEER = peer => peer && REaCt().createElement("li", {
+        key: `${peer.clientId || ''}-${peer.userHandle}`
       }, REaCt().createElement(Participant, {
         call,
         mode,
         chatRoom,
-        source: peer,
-        contact: M.u[peer.userHandle],
-        handle: peer.userHandle,
-        name: peer.name,
+        source: peer.userHandle ? peer : call.getLocalStream(),
+        contact: M.u[peer.userHandle] || undefined,
+        handle: peer.userHandle || u_handle,
+        name: peer.name || M.getNameByHandle(u_handle),
         recorder,
+        raisedHandPeers,
         onCallMinimize,
         onSpeakerChange,
         onModeChange
-      }))));
+      }));
+      let $$RAISED = [];
+      for (const userHandle of call.sfuClient.raisedHands) {
+        const peer = peers.find(p => (p.userHandle || p.localPeerStream.userHandle) === userHandle);
+        $$RAISED = [...$$RAISED, $$PEER(peer)];
+      }
+      const $$REST = peers.filter(p => ![...call.sfuClient.raisedHands].includes(p.userHandle || p.localPeerStream.userHandle)).sort((a, b) => !!a.userHandle - !!b.userHandle).map(peer => $$PEER(peer));
+      return REaCt().createElement("ul", null, $$RAISED, $$REST);
     };
     this.getChatParticipants = () => {
       const {
@@ -22336,7 +22347,8 @@ class Participants extends mixins.w9 {
     };
     this.renderParticipantsList = () => {
       const {
-        filter
+        filter,
+        raisedHandPeers
       } = this.state;
       return REaCt().createElement("div", {
         className: `
@@ -22346,6 +22358,7 @@ class Participants extends mixins.w9 {
                 `
       }, REaCt().createElement(perfectScrollbar.O, {
         filter,
+        raisedHandPeers,
         options: {
           'suppressScrollX': true
         }
@@ -22513,6 +22526,7 @@ class Sidebar extends mixins.w9 {
         chatRoom,
         guest,
         recorder,
+        raisedHandPeers,
         onInviteToggle,
         onCallMinimize,
         onSpeakerChange,
@@ -22530,6 +22544,7 @@ class Sidebar extends mixins.w9 {
         chatRoom,
         guest,
         recorder,
+        raisedHandPeers,
         onInviteToggle,
         onCallMinimize,
         onSpeakerChange,
@@ -23064,7 +23079,12 @@ class SidebarControls extends mixins.w9 {
     }), REaCt().createElement("span", {
       className: "control-label"
     }, l.participants_call_button), REaCt().createElement("span", {
-      className: "notification-badge participants-count theme-dark-forced"
+      className: `
+                                notification-badge
+                                participants-count
+                                theme-dark-forced
+                                ${npeers + 1 > 99 ? 'large' : ''}
+                            `
     }, npeers + 1))));
   }
 }
@@ -23207,9 +23227,11 @@ class Call extends mixins.w9 {
       everHadPeers: false,
       guest: isGuest(),
       waitingRoomPeers: [],
+      raisedHandPeers: [],
       initialCallRinging: false,
       onboardingUI: false,
       onboardingRecording: false,
+      onboardingRaise: false,
       recorder: undefined,
       recordingConsentDialog: false,
       recordingConsented: false,
@@ -23236,7 +23258,8 @@ class Call extends mixins.w9 {
         this.pCallTimer = null;
       }
       this.setState({
-        offline: false
+        offline: false,
+        raisedHandPeers: [...this.props.call.sfuClient.raisedHands]
       });
     };
     this.customIsEventuallyVisible = () => true;
@@ -23362,8 +23385,50 @@ class Call extends mixins.w9 {
           }
         });
       });
+      chatRoom.rebind(`onRaisedHandAdd.${NAMESPACE}`, (ev, {
+        userHandle
+      }) => this.isMounted() && this.setState(state => ({
+        raisedHandPeers: [...state.raisedHandPeers, userHandle]
+      }), () => {
+        const {
+          raisedHandPeers
+        } = this.state;
+        if (userHandle !== u_handle && !this.props.minimized) {
+          window.toaster.main.hideAll();
+          toaster.main.show({
+            buttons: [{
+              text: l[16797],
+              onClick: () => {
+                window.toaster.main.hideAll();
+                this.setState({
+                  sidebar: true,
+                  view: VIEW.PARTICIPANTS
+                });
+              }
+            }],
+            classes: ['theme-dark-forced', 'call-toast'],
+            icons: ['sprite-fm-uni icon-raise-hand'],
+            timeout: 10e3,
+            content: raisedHandPeers.length > 2 ? mega.icu.format(l.raise_peers_raised, raisedHandPeers.length) : (raisedHandPeers.length === 1 ? l.raise_peer_raised : l.raise_two_raised).replace('%s', M.getNameByHandle(raisedHandPeers[0]))
+          });
+        }
+        mBroadcaster.sendMessage('meetings:raisedHand', raisedHandPeers);
+      }));
+      chatRoom.rebind(`onRaisedHandDel.${NAMESPACE}`, (ev, {
+        userHandle
+      }) => this.isMounted() && this.setState(state => ({
+        raisedHandPeers: state.raisedHandPeers.filter(h => h !== userHandle)
+      }), () => {
+        const {
+          raisedHandPeers
+        } = this.state;
+        if (!raisedHandPeers.length) {
+          window.toaster.main.hideAll();
+        }
+        mBroadcaster.sendMessage('meetings:raisedHand', raisedHandPeers);
+      }));
     };
-    this.unbindCallEvents = () => ['onCallPeerLeft', 'onCallPeerJoined', 'onCallLeft', 'wrOnUsersAllow', 'wrOnUsersEntered', 'wrOnUserLeft', 'alterUserPrivilege', 'onCallState', 'onRecordingStarted', 'onRecordingStopped', 'onCallEndTimeUpdated'].map(event => this.props.chatRoom.off(`${event}.${NAMESPACE}`));
+    this.unbindCallEvents = () => ['onCallPeerLeft', 'onCallPeerJoined', 'onCallLeft', 'wrOnUsersAllow', 'wrOnUsersEntered', 'wrOnUserLeft', 'alterUserPrivilege', 'onCallState', 'onRecordingStarted', 'onRecordingStopped', 'onCallEndTimeUpdated', 'onRaisedHandAdd', 'onRaisedHandDel'].map(event => this.props.chatRoom.off(`${event}.${NAMESPACE}`));
     this.handleCallMinimize = () => {
       const {
         call,
@@ -23385,15 +23450,19 @@ class Call extends mixins.w9 {
         sidebar,
         view
       } : Call.STATE.PREVIOUS;
+      const doMinimize = () => {
+        onCallMinimize();
+        window.toaster.main.hideAll();
+      };
       mega.ui.mInfoPanel.closeIfOpen();
       return peers.length > 0 || presenterStreams.has(u_handle) ? this.setState({
         mode: MODE.MINI,
         sidebar: false
       }, () => {
-        onCallMinimize();
+        doMinimize();
         call.setViewMode(MODE.MINI);
       }) : (() => {
-        onCallMinimize();
+        doMinimize();
         if (typeof callToutId !== 'undefined' && !stayOnEnd) {
           onIdle(() => call.showTimeoutDialog());
         }
@@ -23460,7 +23529,10 @@ class Call extends mixins.w9 {
         view: VIEW.CHAT
       });
     };
-    this.handleParticipantsToggle = () => {
+    this.handleParticipantsToggle = forceOpen => {
+      if (forceOpen !== true) {
+        forceOpen = false;
+      }
       if (this.state.sidebar && this.state.view === VIEW.CHAT) {
         return this.setState({
           sidebar: true,
@@ -23468,7 +23540,7 @@ class Call extends mixins.w9 {
         });
       }
       return this.setState({
-        sidebar: !this.state.sidebar,
+        sidebar: forceOpen ? true : !this.state.sidebar,
         view: VIEW.PARTICIPANTS
       });
     };
@@ -23631,10 +23703,7 @@ class Call extends mixins.w9 {
     } = megaChat;
     [SOUNDS.RECONNECT, SOUNDS.CALL_END, SOUNDS.CALL_JOIN_WAITING].map(sound => ion.sound.preload(sound));
     this.state.mode = props.call.viewMode;
-    this.state.onboardingUI = this.state.hovered = this.flagMap && !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_UI);
-    if (!this.state.onboardingUI) {
-      this.state.onboardingRecording = this.state.hovered = this.flagMap && !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_RECORDING);
-    }
+    this.setOnboarding();
     this.handleMouseMove = this.handleMouseMove.bind(this);
     this.handleMouseOut = this.handleMouseOut.bind(this);
   }
@@ -23665,6 +23734,15 @@ class Call extends mixins.w9 {
           offline: true
         });
       });
+    }
+  }
+  setOnboarding() {
+    this.state.onboardingUI = this.state.hovered = this.flagMap && !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_UI);
+    if (!this.state.onboardingUI) {
+      this.state.onboardingRecording = this.state.hovered = this.flagMap && !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_RECORDING);
+    }
+    if (!this.state.onboardingUI && !this.state.onboardingRecording) {
+      this.state.onboardingRaise = this.state.hovered = this.flagMap && !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_RAISE);
     }
   }
   handleInvitePanelToggle() {
@@ -23798,7 +23876,7 @@ class Call extends mixins.w9 {
         this.handleCallMinimize();
       }
     });
-    chatRoom.megaChat.rebind(`sfuConnOpen.${NAMESPACE}`, this.handleCallOnline);
+    chatRoom.megaChat.rebind(`sfuConnOpen.${NAMESPACE}`, () => this.handleCallOnline());
     chatRoom.megaChat.rebind(`sfuConnClose.${NAMESPACE}`, () => this.handleCallOffline());
     chatRoom.rebind(`onCallState.${NAMESPACE}`, (ev, {
       arg
@@ -23855,10 +23933,12 @@ class Call extends mixins.w9 {
       offline,
       onboardingUI,
       onboardingRecording,
+      onboardingRaise,
       everHadPeers,
       initialCallRinging,
       waitingRoomPeers,
       recorder,
+      raisedHandPeers,
       recordingConsentDialog,
       invitePanel,
       presenterThumbSelected,
@@ -23883,6 +23963,7 @@ class Call extends mixins.w9 {
       waitingRoomPeers,
       recorder,
       presenterThumbSelected,
+      raisedHandPeers,
       activeElement,
       hasOtherParticipants: call.hasOtherParticipant(),
       isOnHold: call.sfuClient.isOnHold(),
@@ -23891,6 +23972,7 @@ class Call extends mixins.w9 {
       onInviteToggle: this.handleInviteToggle,
       onStayConfirm: this.handleStayConfirm
     };
+    const hasOnboarding = onboardingUI || onboardingRecording || onboardingRaise;
     return REaCt().createElement("div", {
       className: `
                     meetings-call
@@ -23898,8 +23980,8 @@ class Call extends mixins.w9 {
                     ${timeoutBanner ? 'with-timeout-banner' : ''}
                     ${activeElement ? 'with-active-element' : ''}
                 `,
-      onMouseMove: onboardingUI || onboardingRecording ? null : this.handleMouseMove,
-      onMouseOut: onboardingUI || onboardingRecording ? null : this.handleMouseOut
+      onMouseMove: hasOnboarding ? null : this.handleMouseMove,
+      onMouseOut: hasOnboarding ? null : this.handleMouseOut
     }, timeoutBanner && this.renderTimeLimitBanner(), REaCt().createElement(stream.Ay, (0,esm_extends.A)({}, STREAM_PROPS, {
       minimized,
       ephemeralAccounts,
@@ -23937,6 +24019,17 @@ class Call extends mixins.w9 {
       chatRoom,
       recorder,
       hovered,
+      raisedHandPeers,
+      onboardingRaise,
+      onOnboardingRaiseDismiss: () => {
+        this.setState({
+          onboardingRaise: false,
+          hovered: false
+        }, () => {
+          this.flagMap.setSync(OBV4_FLAGS.CHAT_CALL_RAISE, 1);
+          this.flagMap.safeCommit();
+        });
+      },
       onRecordingToggle: () => this.setState({
         recorder: undefined
       }, () => call.sfuClient.recordingStop()),
@@ -24004,10 +24097,13 @@ class Call extends mixins.w9 {
       onClick: () => {
         this.setState({
           onboardingUI: false,
-          onboardingRecording: !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_RECORDING)
+          onboardingRecording: chatRoom.iAmOperator() && !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_RECORDING)
         }, () => {
           this.flagMap.setSync(OBV4_FLAGS.CHAT_CALL_UI, 1);
           this.flagMap.safeCommit();
+          this.setState({
+            onboardingRaise: !this.state.onboardingRecording && !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_RAISE)
+          });
         });
       }
     }, REaCt().createElement("span", null, l.ok_button)))))), onboardingRecording && Call.isModerator(chatRoom, u_handle) && REaCt().createElement("div", {
@@ -24038,7 +24134,7 @@ class Call extends mixins.w9 {
       onClick: () => {
         this.setState({
           onboardingRecording: false,
-          hovered: false
+          onboardingRaise: true
         }, () => {
           this.flagMap.setSync(OBV4_FLAGS.CHAT_CALL_RECORDING, 1);
           this.flagMap.safeCommit();
@@ -24787,7 +24883,7 @@ class FloatExtendedControls extends mixins.w9 {
       noArrow: true,
       positionAt: "center top",
       collision: "none",
-      vertOffset: 90,
+      vertOffset: -90,
       ref: r => {
         this.dropdownRef = r;
       },
@@ -24855,35 +24951,14 @@ class FloatingVideo extends mixins.w9 {
     super(...args);
     this.collapseListener = null;
     this.state = {
-      collapsed: false,
-      ratio: undefined
-    };
-    this.gcd = (width, height) => {
-      return height === 0 ? width : this.gcd(height, width % height);
-    };
-    this.getRatio = (width, height) => {
-      return `${width / this.gcd(width, height)}:${height / this.gcd(width, height)}`;
-    };
-    this.getRatioClass = () => {
-      const {
-        ratio
-      } = this.state;
-      return ratio ? `ratio-${ratio.replace(':', '-')}` : '';
+      collapsed: false
     };
     this.toggleCollapsedMode = () => {
       return this.setState(state => ({
         collapsed: !state.collapsed
       }));
     };
-    this.onLoadedData = ev => {
-      const {
-        videoWidth,
-        videoHeight
-      } = ev.target;
-      this.setState({
-        ratio: this.getRatio(videoWidth, videoHeight)
-      });
-    };
+    this.onLoadedData = () => {};
   }
   componentWillUnmount() {
     super.componentWillUnmount();
@@ -24907,7 +24982,6 @@ class FloatingVideo extends mixins.w9 {
     }
     const STREAM_PROPS = {
       ...this.props,
-      ratioClass: this.getRatioClass(),
       collapsed: this.state.collapsed,
       toggleCollapsedMode: this.toggleCollapsedMode,
       onLoadedData: this.onLoadedData
@@ -25111,6 +25185,7 @@ class Stream extends mixins.w9 {
       const {
         call,
         mode,
+        minimized,
         isPresenterNode,
         onLoadedData
       } = this.props;
@@ -25124,6 +25199,7 @@ class Stream extends mixins.w9 {
       return REaCt().createElement(VideoClass, {
         chatRoom: this.props.chatRoom,
         mode,
+        minimized,
         isPresenterNode,
         onLoadedData,
         source,
@@ -25133,6 +25209,7 @@ class Stream extends mixins.w9 {
     this.renderSelfView = () => {
       const {
         isOnHold,
+        raisedHandPeers,
         minimized,
         chatRoom,
         isPresenterNode,
@@ -25148,6 +25225,7 @@ class Stream extends mixins.w9 {
       const VideoNode = call.isSharingScreen() ? videoNode.Vm : videoNode.bJ;
       return REaCt().createElement(REaCt().Fragment, null, REaCt().createElement(VideoNode, {
         isSelfOverlay: true,
+        raisedHandPeers,
         minimized,
         chatRoom,
         isPresenterNode,
@@ -25196,7 +25274,6 @@ class Stream extends mixins.w9 {
       mode,
       minimized,
       sidebar,
-      ratioClass,
       collapsed,
       toggleCollapsedMode,
       onCallExpand
@@ -25225,7 +25302,6 @@ class Stream extends mixins.w9 {
       ref: this.containerRef,
       className: `
                     ${NAMESPACE}
-                    ${source.isStreaming() ? ratioClass : ''}
                     ${IS_MINI_MODE ? 'mini' : ''}
                     ${minimized ? 'minimized' : ''}
                     ${this.state.options ? 'active' : ''}
@@ -25248,9 +25324,13 @@ class Minimized extends mixins.w9 {
       className: 'theme-dark-forced'
     };
     this.waitingPeersListener = undefined;
+    this.raisedHandListener = undefined;
     this.state = {
       unread: 0,
-      waitingRoomPeers: []
+      waitingRoomPeers: [],
+      raisedHandPeers: [],
+      hideWrList: false,
+      hideHandsList: false
     };
     this.isActive = type => {
       return this.props.call.av & type;
@@ -25379,36 +25459,93 @@ class Minimized extends mixins.w9 {
         className: `${FloatingVideo.NAMESPACE}-fade`
       }));
     };
-    this.renderPeersWaiting = () => {
+    this.renderPeersList = () => {
       const {
-        waitingRoomPeers
+        onCallExpand,
+        onParticipantsToggle,
+        onWrListToggle
+      } = this.props;
+      const {
+        waitingRoomPeers,
+        raisedHandPeers,
+        hideHandsList,
+        hideWrList
       } = this.state;
+      if (hideHandsList && hideWrList) {
+        return null;
+      }
+      const showRaised = hideHandsList || !hideWrList && waitingRoomPeers.length ? false : !!raisedHandPeers.length;
+      if (!showRaised && hideWrList) {
+        return null;
+      }
+      const showButton = !showRaised || showRaised && raisedHandPeers.length > 1;
       return REaCt().createElement("div", {
         className: `
                     ${FloatingVideo.NAMESPACE}-alert
+                    alert--waiting-peers
                     theme-dark-forced
                 `,
-        onClick: this.props.onCallExpand
-      }, waitingRoomPeers.length > 1 ? mega.icu.format(l.wr_peers_waiting, waitingRoomPeers.length) : REaCt().createElement(utils.P9, {
+        onClick: onCallExpand
+      }, REaCt().createElement(meetings_button.A, {
+        className: "close js-close",
+        icon: "sprite-fm-mono icon-dialog-close",
+        hideWrList,
+        hideHandsList,
+        onClick: ev => {
+          ev.stopPropagation();
+          this.setState({
+            hideHandsList: hideWrList || showRaised,
+            hideWrList: true
+          });
+        }
+      }), REaCt().createElement("div", {
+        className: `alert-label ${showButton ? '' : 'label-only'}`
+      }, showRaised && REaCt().createElement("i", {
+        className: "sprite-fm-uni icon-raise-hand"
+      }), !hideWrList && !!waitingRoomPeers.length && mega.icu.format(l.wr_peers_waiting, waitingRoomPeers.length), showRaised && (raisedHandPeers.length > 1 ? mega.icu.format(l.raise_peers_raised, raisedHandPeers.length) : REaCt().createElement(utils.P9, {
         tag: "span",
-        content: l.wr_peer_waiting.replace('%s', megaChat.html(M.getNameByHandle(waitingRoomPeers[0])))
-      }));
+        content: l.raise_peer_raised.replace('%s', megaChat.html(M.getNameByHandle(raisedHandPeers[0])))
+      }))), showButton && REaCt().createElement(meetings_button.A, {
+        className: "show-people",
+        label: showRaised ? l[16797] : l.wr_see_waiting,
+        onClick: ev => {
+          ev.stopPropagation();
+          const promise = onCallExpand().catch(dump);
+          if (showRaised) {
+            promise.then(() => onParticipantsToggle(true));
+          } else if (waitingRoomPeers.length > 1) {
+            promise.then(() => onWrListToggle(true));
+          }
+        }
+      }, showRaised ? l[16797] : l.wr_see_waiting));
     };
     this.state.waitingRoomPeers = this.props.waitingRoomPeers || [];
+    this.state.raisedHandPeers = this.props.raisedHandPeers || [];
   }
   componentDidMount() {
     super.componentDidMount();
     this.getUnread();
     this.waitingPeersListener = mBroadcaster.addListener('meetings:peersWaiting', waitingRoomPeers => this.setState({
-      waitingRoomPeers
+      waitingRoomPeers,
+      hideWrList: false,
+      hideHandsList: false
     }, () => this.safeForceUpdate()));
+    this.raisedHandListener = mBroadcaster.addListener('meetings:raisedHand', raisedHandPeers => this.setState({
+      raisedHandPeers,
+      hideWrList: false,
+      hideHandsList: false
+    }, () => this.safeForceUpdate()));
+    ['onCallPeerJoined', 'onCallPeerLeft'].map(event => this.props.chatRoom.rebind(`${event}.${Minimized.NAMESPACE}`, (ev, {
+      userHandle
+    }) => this.isMounted() && this.setState(state => ({
+      raisedHandPeers: state.raisedHandPeers.includes(userHandle) ? state.raisedHandPeers.filter(h => h !== userHandle) : [...this.props.call.sfuClient.raisedHands]
+    }), this.safeForceUpdate)));
   }
   componentWillUnmount() {
     super.componentWillUnmount();
     this.props.chatRoom.unbind(Minimized.UNREAD_EVENT);
-    if (this.waitingPeersListener) {
-      mBroadcaster.removeListener(this.waitingPeersListener);
-    }
+    [this.waitingPeersListener, this.raisedHandListener].map(listener => mBroadcaster.removeListener(listener));
+    ['onCallPeerJoined', 'onCallPeerLeft'].map(event => this.props.chatRoom.off(`${event}.${Minimized.NAMESPACE}`));
   }
   render() {
     const {
@@ -25416,6 +25553,7 @@ class Minimized extends mixins.w9 {
     } = this.props;
     const {
       unread,
+      raisedHandPeers,
       waitingRoomPeers
     } = this.state;
     return REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("div", {
@@ -25426,12 +25564,12 @@ class Minimized extends mixins.w9 {
         label: l.expand_mini_call
       },
       className: "mega-button theme-light-forced action small expand",
-      icon: "sprite-fm-mono icon-call-expand-mode",
+      icon: "sprite-fm-mono icon-fullscreen-enter",
       onClick: ev => {
         ev.stopPropagation();
         onCallExpand();
       }
-    }), this.renderStreamControls()), waitingRoomPeers && waitingRoomPeers.length ? this.renderPeersWaiting() : null, unread ? REaCt().createElement("div", {
+    }), this.renderStreamControls()), waitingRoomPeers && waitingRoomPeers.length || raisedHandPeers && raisedHandPeers.length ? this.renderPeersList() : null, unread ? REaCt().createElement("div", {
       className: `${FloatingVideo.NAMESPACE}-notifications`
     }, REaCt().createElement(meetings_button.A, {
       className: "mega-button round large chat-control",
@@ -25562,6 +25700,7 @@ class ParticipantsBlock extends mixins.w9 {
         call,
         peers,
         mode,
+        raisedHandPeers,
         chatRoom,
         forcedLocal,
         presenterThumbSelected,
@@ -25598,6 +25737,7 @@ class ParticipantsBlock extends mixins.w9 {
             label: l[8885]
           },
           mode,
+          raisedHandPeers,
           chatRoom,
           source: localStream,
           localAudioMuted: !(call.av & SfuClient.Av.Audio),
@@ -25666,6 +25806,7 @@ class ParticipantsBlock extends mixins.w9 {
       peers,
       floatDetached,
       chatRoom,
+      raisedHandPeers,
       presenterThumbSelected,
       onSpeakerChange
     } = this.props;
@@ -25731,6 +25872,7 @@ class ParticipantsBlock extends mixins.w9 {
             ...SIMPLE_TIP,
             label
           },
+          raisedHandPeers,
           mode,
           chatRoom,
           source: peer,
@@ -26357,20 +26499,17 @@ class Admit extends mixins.w9 {
     this.renderMultiplePeersWaiting = () => {
       const {
         call,
-        peers
+        peers,
+        expanded,
+        onWrListToggle
       } = this.props;
-      const {
-        expanded
-      } = this.state;
       if (peers && peers.length) {
         const disableAddAll = this.isUserLimited;
         return REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("div", {
           className: `${NAMESPACE}-head`
         }, REaCt().createElement("h3", null, mega.icu.format(l.wr_peers_waiting, peers.length)), expanded ? REaCt().createElement(this.Icon, {
           icon: "icon-arrow-up",
-          onClick: () => this.setState({
-            expanded: false
-          })
+          onClick: () => onWrListToggle(false)
         }) : null), !expanded && disableAddAll && REaCt().createElement(this.CallLimitBanner, {
           call
         }), expanded && REaCt().createElement("div", {
@@ -26379,9 +26518,7 @@ class Admit extends mixins.w9 {
           className: `${NAMESPACE}-controls`
         }, expanded ? null : REaCt().createElement(meetings_button.A, {
           className: "mega-button theme-dark-forced",
-          onClick: () => this.setState({
-            expanded: true
-          })
+          onClick: () => onWrListToggle(true)
         }, REaCt().createElement("span", null, l.wr_see_waiting)), REaCt().createElement(meetings_button.A, {
           peers,
           className: `mega-button positive theme-dark-forced ${disableAddAll ? 'disabled' : ''}`,
@@ -26534,12 +26671,18 @@ class stream_Stream extends mixins.w9 {
       page: 0,
       overlayed: false,
       streamsPerPage: STREAMS_PER_PAGE.MED,
-      floatDetached: false
+      floatDetached: false,
+      wrToggled: false
     };
     this.toggleFloatDetachment = () => {
       this.setState(state => ({
         floatDetached: !state.floatDetached
       }));
+    };
+    this.toggleWaitingRoomList = state => {
+      this.setState({
+        wrToggled: state
+      });
     };
   }
   movePage(direction) {
@@ -26651,7 +26794,7 @@ class stream_Stream extends mixins.w9 {
       mode,
       peers,
       call,
-      forcedLocal,
+      raisedHandPeers,
       chatRoom,
       onVideoDoubleClick,
       onModeChange
@@ -26690,6 +26833,7 @@ class stream_Stream extends mixins.w9 {
                 key: `${mode}_thumb_${u_handle}`,
                 chatRoom,
                 isPresenterNode: false,
+                raisedHandPeers,
                 source: peer,
                 didMount: ref => {
                   this.nodeRefs.push({
@@ -26709,6 +26853,7 @@ class stream_Stream extends mixins.w9 {
               chatRoom,
               isPresenterNode,
               source: isPresenterNode && peer,
+              raisedHandPeers,
               didMount: ref => {
                 this.nodeRefs.push({
                   clientId: u_handle,
@@ -26736,6 +26881,7 @@ class stream_Stream extends mixins.w9 {
             chatRoom,
             menu: true,
             source: peer,
+            raisedHandPeers,
             isPresenterNode: !!presenterCid,
             onDoubleClick: (peer, e) => {
               e.preventDefault();
@@ -26806,6 +26952,7 @@ class stream_Stream extends mixins.w9 {
               source: peer,
               chatRoom,
               isPresenterNode: !!presenterCid,
+              raisedHandPeers,
               onDoubleClick: (peer, e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -26858,6 +27005,7 @@ class stream_Stream extends mixins.w9 {
           return REaCt().createElement(videoNode.Cn, {
             key: `${mode}_${u_handle}`,
             chatRoom,
+            raisedHandPeers,
             isPresenterNode,
             source: isPresenterNode && peer,
             didMount: ref => {
@@ -26889,6 +27037,7 @@ class stream_Stream extends mixins.w9 {
     return REaCt().createElement(VideoType, {
       key: source.clientId,
       chatRoom,
+      raisedHandPeers,
       source,
       isPresenterNode: source.hasScreen,
       toggleFullScreen: () => {
@@ -27071,7 +27220,8 @@ class stream_Stream extends mixins.w9 {
       overlayed,
       page,
       streamsPerPage,
-      floatDetached
+      floatDetached,
+      wrToggled
     } = this.state;
     const {
       mode,
@@ -27086,6 +27236,7 @@ class stream_Stream extends mixins.w9 {
       isOnHold,
       waitingRoomPeers,
       recorder,
+      raisedHandPeers,
       onRecordingToggle,
       onCallMinimize,
       onCallExpand,
@@ -27096,6 +27247,7 @@ class stream_Stream extends mixins.w9 {
       onScreenSharingClick,
       onHoldClick,
       onSpeakerChange,
+      onParticipantsToggle,
       setActiveElement
     } = this.props;
     return REaCt().createElement("div", {
@@ -27108,7 +27260,9 @@ class stream_Stream extends mixins.w9 {
     }, waitingRoomPeers && waitingRoomPeers.length ? REaCt().createElement(Admit, {
       chatRoom,
       call,
-      peers: waitingRoomPeers
+      peers: waitingRoomPeers,
+      expanded: wrToggled,
+      onWrListToggle: this.toggleWaitingRoomList
     }) : null, this.renderToaster(), minimized ? null : REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("div", {
       className: `
                                 ${stream_NAMESPACE}-wrapper
@@ -27151,6 +27305,7 @@ class stream_Stream extends mixins.w9 {
       wrapperRef: this.wrapperRef,
       waitingRoomPeers,
       recorder,
+      raisedHandPeers,
       onRecordingToggle,
       onAudioClick,
       onVideoClick,
@@ -27164,7 +27319,9 @@ class stream_Stream extends mixins.w9 {
       },
       onSpeakerChange,
       onModeChange,
-      onHoldClick
+      onHoldClick,
+      onParticipantsToggle,
+      onWrListToggle: this.toggleWaitingRoomList
     }));
   }
 }
@@ -27378,7 +27535,7 @@ class StreamControls extends _mixins1__.w9 {
           ...this.SIMPLETIP,
           label: l[5884]
         },
-        className: "mega-button theme-dark-forced round negative end-call",
+        className: "mega-button theme-dark-forced round negative end-call call-action",
         icon: "icon-phone-02",
         didMount: button => {
           this.endButtonRef = button.buttonRef;
@@ -27450,6 +27607,64 @@ class StreamControls extends _mixins1__.w9 {
           videoSelectDropdown: false
         }, this.setActiveElement);
       });
+    };
+    this.renderOnboardingRaise = () => {
+      const {
+        chatRoom,
+        onOnboardingRaiseDismiss
+      } = this.props;
+      return react0().createElement("div", {
+        className: "meetings-call-onboarding"
+      }, react0().createElement("div", {
+        className: "mega-dialog mega-onboarding-dialog dialog-template-message onboarding-raise",
+        id: "ob-dialog",
+        role: "dialog",
+        "aria-labelledby": "ob-dialog-title",
+        "aria-modal": "true"
+      }, react0().createElement("i", {
+        className: "sprite-fm-mono icon-tooltip-arrow tooltip-arrow bottom",
+        id: "ob-dialog-arrow"
+      }), react0().createElement("header", null, react0().createElement("div", null, react0().createElement("h2", {
+        id: "ob-dialog-title"
+      }, l.raise_onboarding_title), react0().createElement("p", {
+        id: "ob-dialog-text"
+      }, chatRoom.isMeeting ? l.raise_onboarding_body : l.raise_onboarding_group_body))), react0().createElement("footer", null, react0().createElement("div", {
+        className: "footer-container"
+      }, react0().createElement("button", {
+        className: "mega-button js-next small theme-light-forced",
+        onClick: onOnboardingRaiseDismiss
+      }, react0().createElement("span", null, l.ok_button))))));
+    };
+    this.renderRaiseButton = () => {
+      const {
+        call,
+        raisedHandPeers,
+        onboardingRaise
+      } = this.props;
+      const isOnHold = call.av & Av.onHold;
+      const hasRaisedHand = raisedHandPeers.includes(u_handle);
+      return react0().createElement("li", {
+        className: isOnHold ? 'disabled' : ''
+      }, onboardingRaise && this.renderOnboardingRaise(), react0().createElement(_button_jsx3__.A, {
+        className: `
+                        mega-button
+                        theme-light-forced
+                        call-action
+                        round
+                        ${isOnHold ? 'disabled' : ''}
+                        ${hasRaisedHand ? 'with-fill' : ''}
+                    `,
+        icon: "icon-raise-hand",
+        onClick: isOnHold ? null : () => {
+          if (hasRaisedHand) {
+            call.sfuClient.lowerHand();
+            eventlog(500311);
+            return;
+          }
+          call.sfuClient.raiseHand();
+          eventlog(500249);
+        }
+      }), react0().createElement("span", null, l.raise_button));
     };
   }
   renderSoundDropdown() {
@@ -27757,7 +27972,6 @@ class StreamControls extends _mixins1__.w9 {
         }
       }
     }, react0().createElement(_button_jsx3__.A, {
-      key: "screen-sharing",
       className: `
                                     mega-button
                                     theme-light-forced
@@ -27767,10 +27981,9 @@ class StreamControls extends _mixins1__.w9 {
                                     ${avFlags & Av.Screen ? 'with-fill' : ''}
                                 `,
       icon: avFlags & Av.Screen ? 'icon-monitor-off' : 'icon-monitor'
-    }), react0().createElement("span", null, avFlags & Av.Screen ? l.screenshare_stop_button : l.screenshare_button), hasToRenderPermissionsWarning(Av.Screen) ? renderPermissionsWarning(Av.Screen, this) : null), react0().createElement("li", {
+    }), react0().createElement("span", null, avFlags & Av.Screen ? l.screenshare_stop_button : l.screenshare_button), hasToRenderPermissionsWarning(Av.Screen) ? renderPermissionsWarning(Av.Screen, this) : null), chatRoom.type === 'private' ? null : this.renderRaiseButton(), react0().createElement("li", {
       onClick: onHoldClick
     }, react0().createElement(_button_jsx3__.A, {
-      key: "call-hold",
       className: `
                                     mega-button
                                     theme-light-forced
@@ -27819,7 +28032,12 @@ class VideoNode extends _mixins1__.w9 {
     this.contRef = react0().createRef();
     this.audioLevelRef = react0().createRef();
     this.statsHudRef = react0().createRef();
+    this.raisedHandListener = undefined;
+    this.state = {
+      raisedHandPeers: []
+    };
     this.source = source;
+    this.state.raisedHandPeers = this.props.raisedHandPeers || [];
   }
   componentDidMount() {
     let _this$props$didMount, _this$props, _this$nodeRef;
@@ -27827,6 +28045,9 @@ class VideoNode extends _mixins1__.w9 {
     this.source.registerConsumer(this);
     (_this$props$didMount = (_this$props = this.props).didMount) == null || _this$props$didMount.call(_this$props, (_this$nodeRef = this.nodeRef) == null ? void 0 : _this$nodeRef.current);
     this.requestVideo(true);
+    this.raisedHandListener = mBroadcaster.addListener('meetings:raisedHand', raisedHandPeers => this.setState({
+      raisedHandPeers
+    }, () => this.safeForceUpdate()));
   }
   onVisibilityChange(isVisible) {
     this.requestVideo(isVisible);
@@ -27881,6 +28102,7 @@ class VideoNode extends _mixins1__.w9 {
     delete this.video;
     this.detachVideoElemHandlers();
     this.source.deregisterConsumer(this);
+    mBroadcaster.removeListener(this.raisedHandListener);
     if (this.props.willUnmount) {
       this.props.willUnmount();
     }
@@ -27958,15 +28180,18 @@ class VideoNode extends _mixins1__.w9 {
       "data-simpletipoffset": "5",
       "data-simpletip": label
     }, react0().createElement("i", {
-      className: `sprite-fm-mono ${icon}`
+      className: icon
     }));
   }
   renderStatus() {
     const {
-      mode,
       chatRoom,
-      isPresenterNode
+      isPresenterNode,
+      minimized
     } = this.props;
+    const {
+      raisedHandPeers
+    } = this.state;
     const {
       source
     } = this;
@@ -27989,16 +28214,17 @@ class VideoNode extends _mixins1__.w9 {
       emoji: true
     }));
     if (isOnHold) {
-      return react0().createElement($$CONTAINER, null, name, this.getStatusIcon('icon-pause', l[23542].replace('%s', M.getNameByHandle(userHandle) || megaChat.plugins.userHelper.SIMPLETIP_USER_LOADER)));
+      return react0().createElement($$CONTAINER, null, name, this.getStatusIcon('sprite-fm-mono icon-pause', l[23542].replace('%s', M.getNameByHandle(userHandle) || megaChat.plugins.userHelper.SIMPLETIP_USER_LOADER)));
     }
-    return react0().createElement(react0().Fragment, null, mode === _call_jsx4__.g.MAIN && _call_jsx4__.Ay.isModerator(chatRoom, userHandle) && this.getStatusIcon('icon-admin-outline call-role-icon', l[8875]), react0().createElement($$CONTAINER, null, name, react0().createElement(AudioLevelIndicator, {
+    return react0().createElement(react0().Fragment, null, !minimized && react0().createElement("div", {
+      className: "stream-signifiers"
+    }, raisedHandPeers && raisedHandPeers.length && raisedHandPeers.includes(userHandle) ? this.getStatusIcon('sprite-fm-uni stream-signifier-icon icon-raise-hand') : null), react0().createElement($$CONTAINER, null, name, react0().createElement(AudioLevelIndicator, {
       source
-    }), sfuClient.haveBadNetwork ? this.getStatusIcon('icon-call-offline', l.poor_connection) : null));
+    }), sfuClient.haveBadNetwork ? this.getStatusIcon('sprite-fm-mono icon-call-offline', l.poor_connection) : null));
   }
   render() {
     const {
       mode,
-      minimized,
       chatRoom,
       simpletip,
       className,
@@ -28035,7 +28261,7 @@ class VideoNode extends _mixins1__.w9 {
       onClick: evt => onClick == null ? void 0 : onClick(source, evt)
     }, source && react0().createElement(react0().Fragment, null, children || null, react0().createElement("div", {
       className: "video-node-content"
-    }, CallManager2.Call.VIDEO_DEBUG_MODE ? this.renderVideoDebugMode() : null, this.renderContent(), mode === _call_jsx4__.g.MINI || minimized ? null : this.renderStatus())));
+    }, CallManager2.Call.VIDEO_DEBUG_MODE ? this.renderVideoDebugMode() : null, this.renderContent(), this.renderStatus())));
   }
 }
 class DynVideo extends VideoNode {
@@ -28335,7 +28561,7 @@ class AudioLevelIndicator extends react0().Component {
     }, react0().createElement("i", {
       className: `
                         sprite-fm-mono
-                        ${audioMuted ? 'icon-mic-off-thin-outline inactive' : 'icon-mic-thin-outline'}
+                        ${audioMuted ? 'icon-mic-off-thin-outline inactive' : 'icon-mic-thin-outline speaker-indicator'}
                     `
     }, audioMuted ? null : react0().createElement("div", {
       ref: this.indicatorRef,

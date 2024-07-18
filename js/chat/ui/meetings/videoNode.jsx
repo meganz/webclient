@@ -36,6 +36,11 @@ class VideoNode extends MegaRenderMixin {
     contRef = React.createRef();
     audioLevelRef = React.createRef();
     statsHudRef = React.createRef();
+    raisedHandListener = undefined;
+
+    state = {
+        raisedHandPeers: []
+    };
 
     /*
         Methods and properties that descendants must implement:
@@ -47,6 +52,7 @@ class VideoNode extends MegaRenderMixin {
     constructor(props, source) {
         super(props);
         this.source = source;
+        this.state.raisedHandPeers = this.props.raisedHandPeers || [];
     }
 
     componentDidMount() {
@@ -54,6 +60,12 @@ class VideoNode extends MegaRenderMixin {
         this.source.registerConsumer(this);
         this.props.didMount?.(this.nodeRef?.current);
         this.requestVideo(true);
+        // [...] TODO: higher-order component
+        this.raisedHandListener =
+            mBroadcaster.addListener(
+                'meetings:raisedHand',
+                raisedHandPeers => this.setState({ raisedHandPeers }, () => this.safeForceUpdate())
+            );
     }
 
     onVisibilityChange(isVisible) {
@@ -72,6 +84,7 @@ class VideoNode extends MegaRenderMixin {
         // force re-request if video stream changed
         this.safeForceUpdate();
     }
+
     displayVideoElement(video, container) {
         this.attachVideoElemHandlers(video);
         this.video = video;
@@ -107,11 +120,13 @@ class VideoNode extends MegaRenderMixin {
         };
         video._snSetup = true;
     }
+
     componentWillUnmount() {
         super.componentWillUnmount();
         delete this.video;
         this.detachVideoElemHandlers();
         this.source.deregisterConsumer(this);
+        mBroadcaster.removeListener(this.raisedHandListener);
         if (this.props.willUnmount) {
             this.props.willUnmount();
         }
@@ -126,15 +141,19 @@ class VideoNode extends MegaRenderMixin {
         video.ondblclick = null;
         delete video._snSetup;
     }
+
     isVideoCropped() {
         return this.video?.classList.contains("video-crop");
     }
+
     cropVideo() {
         this.video?.classList.add("video-crop");
     }
+
     uncropVideo() {
         this.video?.classList.remove("video-crop");
     }
+
     displayStats(stats) {
         const elem = this.statsHudRef.current;
         if (!elem) {
@@ -186,13 +205,14 @@ class VideoNode extends MegaRenderMixin {
                 data-simpletipposition="top"
                 data-simpletipoffset="5"
                 data-simpletip={label}>
-                <i className={`sprite-fm-mono ${icon}`} />
+                <i className={icon} />
             </span>
         );
     }
 
     renderStatus() {
-        const { mode, chatRoom, isPresenterNode } = this.props;
+        const { chatRoom, isPresenterNode, minimized } = this.props;
+        const { raisedHandPeers } = this.state;
         const { source } = this;
         const { sfuClient } = chatRoom.call;
         const { userHandle, isOnHold } = source;
@@ -211,7 +231,7 @@ class VideoNode extends MegaRenderMixin {
                 <$$CONTAINER>
                     {name}
                     {this.getStatusIcon(
-                        'icon-pause',
+                        'sprite-fm-mono icon-pause',
                         l[23542].replace(
                             '%s',
                             M.getNameByHandle(userHandle) ||
@@ -224,16 +244,19 @@ class VideoNode extends MegaRenderMixin {
 
         return (
             <>
-                {
-                    // If in `Main` mode and the participant is a moderator -- show icon in the top-right corner
-                    mode === MODE.MAIN &&
-                    Call.isModerator(chatRoom, userHandle) &&
-                    this.getStatusIcon('icon-admin-outline call-role-icon', l[8875])
-                }
+                {!minimized && <div className="stream-signifiers">
+                    {raisedHandPeers && raisedHandPeers.length && raisedHandPeers.includes(userHandle) ?
+                        this.getStatusIcon('sprite-fm-uni stream-signifier-icon icon-raise-hand') :
+                        null
+                    }
+                </div>}
                 <$$CONTAINER>
                     {name}
                     <AudioLevelIndicator source={source} />
-                    {sfuClient.haveBadNetwork ? this.getStatusIcon('icon-call-offline', l.poor_connection) : null}
+                    {sfuClient.haveBadNetwork ?
+                        this.getStatusIcon('sprite-fm-mono icon-call-offline', l.poor_connection) :
+                        null
+                    }
                 </$$CONTAINER>
             </>
         );
@@ -242,7 +265,6 @@ class VideoNode extends MegaRenderMixin {
     render() {
         const {
             mode,
-            minimized,
             chatRoom,
             simpletip,
             className,
@@ -280,7 +302,7 @@ class VideoNode extends MegaRenderMixin {
                         <div className="video-node-content">
                             {CallManager2.Call.VIDEO_DEBUG_MODE ? this.renderVideoDebugMode() : null}
                             {this.renderContent()}
-                            {mode === MODE.MINI || minimized ? null : this.renderStatus()}
+                            {this.renderStatus()}
                         </div>
                     </>
                 }
@@ -606,12 +628,15 @@ export class AudioLevelIndicator extends React.Component {
         this.indicatorRef = React.createRef();
         this.updateAudioLevel = this.updateAudioLevel.bind(this);
     }
+
     componentDidMount() {
         this.source.registerVuLevelConsumer(this);
     }
+
     componentWillUnmount() {
         this.source.unregisterVuLevelConsumer(this);
     }
+
     updateAudioLevel(level) {
         const levelInd = this.indicatorRef.current;
         if (!levelInd) {
@@ -623,8 +648,10 @@ export class AudioLevelIndicator extends React.Component {
         }
         levelInd.style.height = `${level + 10}%`;
     }
+
     render() {
         const { audioMuted } = this.source;
+
         return (
             <span
                 className="simpletip"
@@ -635,7 +662,7 @@ export class AudioLevelIndicator extends React.Component {
                 <i
                     className={`
                         sprite-fm-mono
-                        ${audioMuted ? 'icon-mic-off-thin-outline inactive' : 'icon-mic-thin-outline'}
+                        ${audioMuted ? 'icon-mic-off-thin-outline inactive' : 'icon-mic-thin-outline speaker-indicator'}
                     `}>
                     {audioMuted ? null : <div ref={this.indicatorRef} className="mic-fill"/>}
                 </i>

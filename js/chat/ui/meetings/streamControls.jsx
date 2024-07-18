@@ -215,7 +215,7 @@ class StreamControls extends MegaRenderMixin {
                 {this.renderEndCallOptions()}
                 <Button
                     simpletip={{ ...this.SIMPLETIP, label: l[5884] /* `End call` */ }}
-                    className="mega-button theme-dark-forced round negative end-call"
+                    className="mega-button theme-dark-forced round negative end-call call-action"
                     icon="icon-phone-02"
                     didMount={button => {
                         this.endButtonRef = button.buttonRef;
@@ -485,6 +485,77 @@ class StreamControls extends MegaRenderMixin {
         });
     };
 
+    renderOnboardingRaise = () => {
+        const { chatRoom, onOnboardingRaiseDismiss } = this.props;
+
+        return (
+            <div className="meetings-call-onboarding">
+                <div
+                    className="mega-dialog mega-onboarding-dialog dialog-template-message onboarding-raise"
+                    id="ob-dialog"
+                    role="dialog"
+                    aria-labelledby="ob-dialog-title"
+                    aria-modal="true">
+                    <i
+                        className="sprite-fm-mono icon-tooltip-arrow tooltip-arrow bottom" id="ob-dialog-arrow"
+                    />
+                    <header>
+                        <div>
+                            <h2 id="ob-dialog-title">{l.raise_onboarding_title}</h2>
+                            <p id="ob-dialog-text">
+                                {chatRoom.isMeeting ? l.raise_onboarding_body : l.raise_onboarding_group_body}
+                            </p>
+                        </div>
+                    </header>
+                    <footer>
+                        <div className="footer-container">
+                            <button
+                                className="mega-button js-next small theme-light-forced"
+                                onClick={onOnboardingRaiseDismiss}>
+                                <span>{l.ok_button /* `OK, got it` */}</span>
+                            </button>
+                        </div>
+                    </footer>
+                </div>
+            </div>
+        );
+    };
+
+    renderRaiseButton = () => {
+        const { call, raisedHandPeers, onboardingRaise } = this.props;
+        const isOnHold = call.av & Av.onHold;
+        const hasRaisedHand = raisedHandPeers.includes(u_handle);
+
+        return (
+            <li className={isOnHold ? 'disabled' : ''}>
+                {onboardingRaise && this.renderOnboardingRaise()}
+                <Button
+                    className={`
+                        mega-button
+                        theme-light-forced
+                        call-action
+                        round
+                        ${isOnHold ? 'disabled' : ''}
+                        ${hasRaisedHand ? 'with-fill' : ''}
+                    `}
+                    icon="icon-raise-hand"
+                    onClick={
+                        isOnHold ? null : () => {
+                            if (hasRaisedHand) {
+                                call.sfuClient.lowerHand();
+                                eventlog(500311);
+                                return;
+                            }
+                            call.sfuClient.raiseHand();
+                            eventlog(500249);
+                        }
+                    }
+                />
+                <span>{l.raise_button /* `Raise` */}</span>
+            </li>
+        );
+    };
+
     componentWillUnmount() {
         super.componentWillUnmount();
         document.removeEventListener('mousedown', this.handleMousedown);
@@ -500,8 +571,7 @@ class StreamControls extends MegaRenderMixin {
     render() {
         const {
             call, signal, chatRoom, renderSignalWarning, hasToRenderPermissionsWarning, renderPermissionsWarning,
-            resetError, blocked, renderBlockedWarning,
-            onAudioClick, onVideoClick, onScreenSharingClick, onHoldClick,
+            resetError, blocked, renderBlockedWarning, onAudioClick, onVideoClick, onScreenSharingClick, onHoldClick
         } = this.props;
         const { audioSelectDropdown, videoSelectDropdown } = this.state;
         const avFlags = call.av;
@@ -597,7 +667,6 @@ class StreamControls extends MegaRenderMixin {
                                 }
                             }}>
                             <Button
-                                key="screen-sharing"
                                 className={`
                                     mega-button
                                     theme-light-forced
@@ -619,9 +688,9 @@ class StreamControls extends MegaRenderMixin {
                                 null
                             }
                         </li>
+                        {chatRoom.type === 'private' ? null : this.renderRaiseButton()}
                         <li onClick={onHoldClick}>
                             <Button
-                                key="call-hold"
                                 className={`
                                     mega-button
                                     theme-light-forced

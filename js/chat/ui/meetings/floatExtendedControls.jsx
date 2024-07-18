@@ -32,7 +32,7 @@ export default class FloatExtendedControls extends MegaRenderMixin {
                     noArrow={true}
                     positionAt="center top"
                     collision="none"
-                    vertOffset={90}
+                    vertOffset={-90}
                     ref={r => {
                         this.dropdownRef = r;
                     }}

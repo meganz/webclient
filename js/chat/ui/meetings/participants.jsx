@@ -11,16 +11,33 @@ import { Pin, Privilege } from './videoNodeMenu.jsx';
 import { AudioLevelIndicator } from './videoNode.jsx';
 
 class Participant extends MegaRenderMixin {
+    raisedHandListener = undefined;
     baseIconClass = 'sprite-fm-mono';
+
+    state = {
+        raisedHandPeers: []
+    };
+
+    constructor(props) {
+        super(props);
+        this.state.raisedHandPeers = this.props.raisedHandPeers || [];
+    }
 
     componentDidMount() {
         super.componentDidMount();
         this.props.source.registerConsumer(this);
+        // [...] TODO: higher-order component
+        this.raisedHandListener =
+            mBroadcaster.addListener(
+                'meetings:raisedHand',
+                raisedHandPeers => this.setState({ raisedHandPeers }, () => this.safeForceUpdate())
+            );
     }
 
     componentWillUnmount() {
         super.componentWillUnmount();
         this.props.source.deregisterConsumer(this);
+        mBroadcaster.removeListener(this.raisedHandListener);
     }
 
     onAvChange() {
@@ -45,7 +62,12 @@ class Participant extends MegaRenderMixin {
 
         return (
             <>
-                <Avatar contact={M.u[handle]}/>
+                {this.state.raisedHandPeers.includes(handle) ?
+                    <div className="participant-signifier">
+                        <i className="sprite-fm-uni icon-raise-hand" />
+                    </div> :
+                    <Avatar contact={M.u[handle]}/>
+                }
                 <div className="name">
                     {handle === u_handle ?
                         <Emoji>{`${name} ${l.me}`}</Emoji> :
@@ -229,41 +251,51 @@ export default class Participants extends MegaRenderMixin {
     };
 
     getCallParticipants = () => {
-        const { call, mode, chatRoom, peers, recorder, onCallMinimize, onSpeakerChange, onModeChange } = this.props;
+        const {
+            call,
+            mode,
+            chatRoom,
+            recorder,
+            raisedHandPeers,
+            onCallMinimize,
+            onSpeakerChange,
+            onModeChange
+        } = this.props;
+        const peers = Object.values(this.props.peers);
+        const $$PEER = peer =>
+            peer &&
+            <li key={`${peer.clientId || ''}-${peer.userHandle}`}>
+                <Participant
+                    call={call}
+                    mode={mode}
+                    chatRoom={chatRoom}
+                    source={peer.userHandle ? peer : call.getLocalStream()}
+                    contact={M.u[peer.userHandle] || undefined}
+                    handle={peer.userHandle || u_handle}
+                    name={peer.name || M.getNameByHandle(u_handle)}
+                    recorder={recorder}
+                    raisedHandPeers={raisedHandPeers}
+                    onCallMinimize={onCallMinimize}
+                    onSpeakerChange={onSpeakerChange}
+                    onModeChange={onModeChange}
+                />
+            </li>;
+
+        let $$RAISED = [];
+        for (const userHandle of call.sfuClient.raisedHands) {
+            const peer = peers.find(p => (p.userHandle || p.localPeerStream.userHandle) === userHandle);
+            $$RAISED = [...$$RAISED, $$PEER(peer)];
+        }
+
+        const $$REST = peers
+            .filter(p => ![...call.sfuClient.raisedHands].includes(p.userHandle || p.localPeerStream.userHandle))
+            .sort((a, b) => !!a.userHandle - !!b.userHandle)
+            .map(peer => $$PEER(peer));
 
         return (
             <ul>
-                <li>
-                    <Participant
-                        call={call}
-                        mode={mode}
-                        chatRoom={chatRoom}
-                        source={call.getLocalStream()}
-                        handle={u_handle}
-                        name={M.getNameByHandle(u_handle)}
-                        recorder={recorder}
-                        onCallMinimize={onCallMinimize}
-                        onSpeakerChange={onSpeakerChange}
-                        onModeChange={onModeChange}
-                    />
-                </li>
-                {peers.map(peer =>
-                    <li key={`${peer.clientId}-${peer.userHandle}`}>
-                        <Participant
-                            call={call}
-                            mode={mode}
-                            chatRoom={chatRoom}
-                            source={peer}
-                            contact={M.u[peer.userHandle]}
-                            handle={peer.userHandle}
-                            name={peer.name}
-                            recorder={recorder}
-                            onCallMinimize={onCallMinimize}
-                            onSpeakerChange={onSpeakerChange}
-                            onModeChange={onModeChange}
-                        />
-                    </li>
-                )}
+                {$$RAISED}
+                {$$REST}
             </ul>
         );
     };
@@ -352,7 +384,7 @@ export default class Participants extends MegaRenderMixin {
     };
 
     renderParticipantsList = () => {
-        const { filter } = this.state;
+        const { filter, raisedHandPeers } = this.state;
 
         return (
             <div
@@ -363,6 +395,7 @@ export default class Participants extends MegaRenderMixin {
                 `}>
                 <PerfectScrollbar
                     filter={filter}
+                    raisedHandPeers={raisedHandPeers}
                     options={{ 'suppressScrollX': true }}>
                     {filter === this.FILTER.IN_CALL ? this.getCallParticipants() : this.getChatParticipants()}
                 </PerfectScrollbar>

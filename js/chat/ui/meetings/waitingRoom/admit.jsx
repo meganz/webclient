@@ -96,8 +96,7 @@ export default class Admit extends MegaRenderMixin {
     };
 
     renderMultiplePeersWaiting = () => {
-        const { call, peers } = this.props;
-        const { expanded } = this.state;
+        const { call, peers, expanded, onWrListToggle } = this.props;
 
         if (peers && peers.length) {
             const disableAddAll = this.isUserLimited;
@@ -108,7 +107,7 @@ export default class Admit extends MegaRenderMixin {
                         {expanded ?
                             <this.Icon
                                 icon="icon-arrow-up"
-                                onClick={() => this.setState({ expanded: false })}
+                                onClick={() => onWrListToggle(false)}
                             /> :
                             null
                         }
@@ -127,7 +126,7 @@ export default class Admit extends MegaRenderMixin {
                             null :
                             <Button
                                 className="mega-button theme-dark-forced"
-                                onClick={() => this.setState({ expanded: true })}>
+                                onClick={() => onWrListToggle(true)}>
                                 <span>{l.wr_see_waiting}</span>
                             </Button>
                         }

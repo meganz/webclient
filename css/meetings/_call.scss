@@ -43,6 +43,20 @@
                 }
             }
 
+            &.onboarding-raise {
+                left: 50%;
+                bottom: calc(100% + 24px);
+                transform: translateX(-50%);
+                width: 448px;
+                text-align: left;
+
+                span {
+                    margin: 0 var(--horizontal-padding);
+                    font: var(--text-font-family);
+                    color: inherit;
+                }
+            }
+
             h2 {
                 font: var(--text-h2-bold);
             }
@@ -158,4 +172,11 @@
             background-size: 16px 16px;
         }
     }
+}
+
+.call-toast {
+    position: absolute;
+    left: 50%;
+    bottom: 94px;
+    transform: translateX(-50%);
 }

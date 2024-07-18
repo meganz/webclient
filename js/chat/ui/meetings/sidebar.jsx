@@ -40,7 +40,7 @@ export default class Sidebar extends MegaRenderMixin {
 
     renderParticipantsView = () => {
         const {
-            call, mode, peers, initialCallRinging, chatRoom, guest, recorder, onInviteToggle,
+            call, mode, peers, initialCallRinging, chatRoom, guest, recorder, raisedHandPeers, onInviteToggle,
             onCallMinimize, onSpeakerChange, onModeChange
         } = this.props;
         const withInvite = inviteAllowed(chatRoom);
@@ -57,6 +57,7 @@ export default class Sidebar extends MegaRenderMixin {
                     chatRoom={chatRoom}
                     guest={guest}
                     recorder={recorder}
+                    raisedHandPeers={raisedHandPeers}
                     onInviteToggle={onInviteToggle}
                     onCallMinimize={onCallMinimize}
                     onSpeakerChange={onSpeakerChange}

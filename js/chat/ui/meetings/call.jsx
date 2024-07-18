@@ -234,9 +234,11 @@ export default class Call extends MegaRenderMixin {
         everHadPeers: false,
         guest: isGuest(),
         waitingRoomPeers: [],
+        raisedHandPeers: [],
         initialCallRinging: false,
         onboardingUI: false,
         onboardingRecording: false,
+        onboardingRaise: false,
         recorder: undefined,
         recordingConsentDialog: false,
         recordingConsented: false,
@@ -290,12 +292,7 @@ export default class Call extends MegaRenderMixin {
         const { SOUNDS } = megaChat;
         [SOUNDS.RECONNECT, SOUNDS.CALL_END, SOUNDS.CALL_JOIN_WAITING].map(sound => ion.sound.preload(sound));
         this.state.mode = props.call.viewMode;
-        // TODO: refactor and transition to `ChatOnboarding`
-        this.state.onboardingUI = this.state.hovered = this.flagMap && !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_UI);
-        if (!this.state.onboardingUI) {
-            this.state.onboardingRecording = this.state.hovered =
-                this.flagMap && !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_RECORDING);
-        }
+        this.setOnboarding();
         this.handleMouseMove = this.handleMouseMove.bind(this);
         this.handleMouseOut = this.handleMouseOut.bind(this);
     }
@@ -366,7 +363,8 @@ export default class Call extends MegaRenderMixin {
 
     /**
      * handleCallOnline
-     * @description Invoked after coming back online. Resets the `offline` state if it was already set.
+     * @description Invoked on join and after coming back online. Resets the `offline` state if it was already set,
+     * populates the list of peers with raised hands (if any).
      * @see Offline
      */
 
@@ -375,11 +373,25 @@ export default class Call extends MegaRenderMixin {
             this.pCallTimer.abort();
             this.pCallTimer = null;
         }
-        this.setState({ offline: false });
+        this.setState({ offline: false, raisedHandPeers: [...this.props.call.sfuClient.raisedHands] });
     };
 
     // Force as always visible.
     customIsEventuallyVisible = () => true;
+
+    setOnboarding() {
+        // TODO: refactor and transition to `ChatOnboarding`
+        this.state.onboardingUI =
+            this.state.hovered = this.flagMap && !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_UI);
+        if (!this.state.onboardingUI) {
+            this.state.onboardingRecording = this.state.hovered =
+                this.flagMap && !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_RECORDING);
+        }
+        if (!this.state.onboardingUI && !this.state.onboardingRecording) {
+            this.state.onboardingRaise = this.state.hovered =
+                this.flagMap && !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_RAISE);
+        }
+    }
 
     /**
      * bindCallEvents
@@ -511,7 +523,9 @@ export default class Call extends MegaRenderMixin {
                     )
             );
         });
+
         // --
+
         chatRoom.rebind(`onMutedBy.${NAMESPACE}`, (ev, { cid }) => {
             megaChat.plugins.userHelper.getUserNickname(this.props.peers[cid]).catch(dump).always(name => {
                 ChatToast.quick(
@@ -520,6 +534,8 @@ export default class Call extends MegaRenderMixin {
                 );
             });
         });
+
+        // --
 
         chatRoom.rebind(`onCallEndTimeUpdated.${NAMESPACE}`, ({ data }) => {
             this.setState(
@@ -539,6 +555,50 @@ export default class Call extends MegaRenderMixin {
                 }
             );
         });
+
+        // --
+
+        chatRoom.rebind(`onRaisedHandAdd.${NAMESPACE}`, (ev, { userHandle }) =>
+            this.isMounted() &&
+            this.setState(state => ({ raisedHandPeers: [...state.raisedHandPeers, userHandle] }), () => {
+                const { raisedHandPeers } = this.state;
+                if (userHandle !== u_handle && !this.props.minimized) {
+                    window.toaster.main.hideAll();
+                    toaster.main.show({
+                        buttons: [{
+                            text: l[16797] /* `View` */,
+                            onClick: () => {
+                                window.toaster.main.hideAll();
+                                this.setState({ sidebar: true, view: VIEW.PARTICIPANTS });
+                            }
+                        }],
+                        classes: ['theme-dark-forced', 'call-toast'],
+                        icons: ['sprite-fm-uni icon-raise-hand'],
+                        timeout: 10e3,
+                        content: raisedHandPeers.length > 2 ?
+                            // `N` people raised their hand
+                            mega.icu.format(l.raise_peers_raised, raisedHandPeers.length) :
+                            // `${NAME} raised their hand` || `${NAME} and 1 other raised their hand`
+                            (raisedHandPeers.length === 1 ? l.raise_peer_raised : l.raise_two_raised)
+                                .replace('%s', M.getNameByHandle(raisedHandPeers[0]))
+                    });
+                }
+                // [...] TODO: abstract into HOC, consumed in `participants.jsx`,`float.jsx`, `videoNode.jsx`
+                mBroadcaster.sendMessage('meetings:raisedHand', raisedHandPeers);
+            })
+        );
+
+        chatRoom.rebind(`onRaisedHandDel.${NAMESPACE}`, (ev, { userHandle }) =>
+            this.isMounted() &&
+            this.setState(state => ({ raisedHandPeers: state.raisedHandPeers.filter(h => h !== userHandle) }), () => {
+                const { raisedHandPeers } = this.state;
+                if (!raisedHandPeers.length) {
+                    window.toaster.main.hideAll();
+                }
+                // [...] TODO: abstract into HOC, consumed in `participants.jsx`,`float.jsx`, `videoNode.jsx`
+                mBroadcaster.sendMessage('meetings:raisedHand', raisedHandPeers);
+            })
+        );
     };
 
     unbindCallEvents = () =>
@@ -554,6 +614,8 @@ export default class Call extends MegaRenderMixin {
             'onRecordingStarted',
             'onRecordingStopped',
             'onCallEndTimeUpdated',
+            'onRaisedHandAdd',
+            'onRaisedHandDel',
         ]
             .map(event => this.props.chatRoom.off(`${event}.${NAMESPACE}`));
 
@@ -572,11 +634,9 @@ export default class Call extends MegaRenderMixin {
         const { callToutId, stayOnEnd, presenterStreams } = call;
         // Cache previous state only when `Local` is not already minimized
         Call.STATE.PREVIOUS = mode !== MODE.MINI ? { mode, sidebar, view } : Call.STATE.PREVIOUS;
-        const noPeers = () => {
+        const doMinimize = () => {
             onCallMinimize();
-            if (typeof callToutId !== 'undefined' && !stayOnEnd) {
-                onIdle(() => call.showTimeoutDialog());
-            }
+            window.toaster.main.hideAll();
         };
         // Close node info panel when open
         mega.ui.mInfoPanel.closeIfOpen();
@@ -585,11 +645,16 @@ export default class Call extends MegaRenderMixin {
             peers.length > 0 || presenterStreams.has(u_handle) ?
                 // There are peers, i.e. other call participants -> render `Local` in `mini mode`
                 this.setState({ mode: MODE.MINI, sidebar: false }, () => {
-                    onCallMinimize();
+                    doMinimize();
                     call.setViewMode(MODE.MINI);
                 }) :
-                // The call has one participant only (i.e. me) -> render `Local` in `self-view` mode
-                noPeers()
+                (() => {
+                    doMinimize();
+                    // The call has one participant only (i.e. me) -> render `Local` in `self-view` mode
+                    if (typeof callToutId !== 'undefined' && !stayOnEnd) {
+                        onIdle(() => call.showTimeoutDialog());
+                    }
+                })()
         );
     };
 
@@ -701,14 +766,18 @@ export default class Call extends MegaRenderMixin {
      * @description Toggles the participants list in the `Sidebar`.
      * @see Sidebar.renderParticipantsView
      * @see SidebarControls
+     * @param [forceOpen] If the sidebar should be forced open on VIEW.PARTICIPANTS
      * @returns {void}
      */
 
-    handleParticipantsToggle = () => {
+    handleParticipantsToggle = (forceOpen) => {
+        if (forceOpen !== true) {
+            forceOpen = false;
+        }
         if (this.state.sidebar && this.state.view === VIEW.CHAT) {
             return this.setState({ sidebar: true, view: VIEW.PARTICIPANTS });
         }
-        return this.setState({ sidebar: !this.state.sidebar, view: VIEW.PARTICIPANTS });
+        return this.setState({ sidebar: forceOpen ? true : !this.state.sidebar, view: VIEW.PARTICIPANTS });
     };
 
     /**
@@ -1091,7 +1160,7 @@ export default class Call extends MegaRenderMixin {
             }
         });
 
-        chatRoom.megaChat.rebind(`sfuConnOpen.${NAMESPACE}`, this.handleCallOnline);
+        chatRoom.megaChat.rebind(`sfuConnOpen.${NAMESPACE}`, () => this.handleCallOnline());
         chatRoom.megaChat.rebind(`sfuConnClose.${NAMESPACE}`, () => this.handleCallOffline());
         chatRoom.rebind(`onCallState.${NAMESPACE}`, (ev, { arg }) => this.setState({ initialCallRinging: arg }));
         const {tresizer} = $;
@@ -1126,17 +1195,19 @@ export default class Call extends MegaRenderMixin {
         const { minimized, peers, call, chatRoom, parent, onDeleteMessage } = this.props;
         const {
             mode, view, sidebar, hovered, forcedLocal, invite, ephemeral, ephemeralAccounts, guest,
-            offline, onboardingUI, onboardingRecording, everHadPeers, initialCallRinging, waitingRoomPeers, recorder,
-            recordingConsentDialog, invitePanel, presenterThumbSelected, timeoutBanner, activeElement
+            offline, onboardingUI, onboardingRecording, onboardingRaise, everHadPeers, initialCallRinging,
+            waitingRoomPeers, recorder, raisedHandPeers, recordingConsentDialog, invitePanel, presenterThumbSelected,
+            timeoutBanner, activeElement
         } = this.state;
         const { stayOnEnd } = call;
         const STREAM_PROPS = {
             mode, peers, sidebar, hovered, forcedLocal, call, view, chatRoom, parent, stayOnEnd,
-            everHadPeers, waitingRoomPeers, recorder, presenterThumbSelected, activeElement,
+            everHadPeers, waitingRoomPeers, recorder, presenterThumbSelected, raisedHandPeers, activeElement,
             hasOtherParticipants: call.hasOtherParticipant(), isOnHold: call.sfuClient.isOnHold(),
             onSpeakerChange: this.handleSpeakerChange, onModeChange: this.handleModeChange,
             onInviteToggle: this.handleInviteToggle, onStayConfirm: this.handleStayConfirm
         };
+        const hasOnboarding = onboardingUI || onboardingRecording || onboardingRaise;
 
         //
         // `Call`
@@ -1150,8 +1221,8 @@ export default class Call extends MegaRenderMixin {
                     ${timeoutBanner ? 'with-timeout-banner' : ''}
                     ${activeElement ? 'with-active-element' : ''}
                 `}
-                onMouseMove={onboardingUI || onboardingRecording ? null : this.handleMouseMove}
-                onMouseOut={onboardingUI || onboardingRecording ? null : this.handleMouseOut}>
+                onMouseMove={hasOnboarding ? null : this.handleMouseMove}
+                onMouseOut={hasOnboarding ? null : this.handleMouseOut}>
 
                 {timeoutBanner && this.renderTimeLimitBanner()}
 
@@ -1201,6 +1272,14 @@ export default class Call extends MegaRenderMixin {
                             chatRoom={chatRoom}
                             recorder={recorder}
                             hovered={hovered}
+                            raisedHandPeers={raisedHandPeers}
+                            onboardingRaise={onboardingRaise}
+                            onOnboardingRaiseDismiss={() => {
+                                this.setState({ onboardingRaise: false, hovered: false }, () => {
+                                    this.flagMap.setSync(OBV4_FLAGS.CHAT_CALL_RAISE, 1);
+                                    this.flagMap.safeCommit();
+                                });
+                            }}
                             onRecordingToggle={() =>
                                 // TODO: method instead a prop
                                 this.setState({ recorder: undefined }, () => call.sfuClient.recordingStop())
@@ -1280,15 +1359,23 @@ export default class Call extends MegaRenderMixin {
                                     <button
                                         className="mega-button js-next small theme-light-forced"
                                         onClick={() => {
+                                            // TODO: refactor and transition to `ChatOnboarding`,
+                                            // see `setOnboarding`
                                             this.setState(
                                                 {
                                                     onboardingUI: false,
                                                     onboardingRecording:
+                                                        chatRoom.iAmOperator() &&
                                                         !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_RECORDING)
                                                 },
                                                 () => {
                                                     this.flagMap.setSync(OBV4_FLAGS.CHAT_CALL_UI, 1);
                                                     this.flagMap.safeCommit();
+                                                    this.setState({
+                                                        onboardingRaise:
+                                                            !this.state.onboardingRecording &&
+                                                            !this.flagMap.getSync(OBV4_FLAGS.CHAT_CALL_RAISE)
+                                                    });
                                                 }
                                             );
                                         }}>
@@ -1329,7 +1416,10 @@ export default class Call extends MegaRenderMixin {
                                     <button
                                         className="mega-button js-next small theme-light-forced"
                                         onClick={() => {
-                                            this.setState({ onboardingRecording: false, hovered: false }, () => {
+                                            this.setState({
+                                                onboardingRecording: false,
+                                                onboardingRaise: true
+                                            }, () => {
                                                 this.flagMap.setSync(OBV4_FLAGS.CHAT_CALL_RECORDING, 1);
                                                 this.flagMap.safeCommit();
                                             });

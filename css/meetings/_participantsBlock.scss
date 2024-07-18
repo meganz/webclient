@@ -98,12 +98,26 @@
                         left: unset;
                         right: 5px;
                     }
+
+                    span {
+                        margin: 0 2px 0 0;
+                    }
                 }
 
-                .call-role-icon {
-                    padding: 5px;
-                    --icon-size: 18px;
-                    --mask-color: var(--secondary-white);
+                .stream-signifiers {
+                    top: 6px;
+                    left: 6px;
+
+                    .stream-signifier-icon {
+                        --icon-size: 18px;
+                        --mask-color: var(--icon-rest);
+                    }
+
+                    span {
+                        width: 24px;
+                        height: 24px;
+                        margin-inline-end: 2px;
+                    }
                 }
 
                 .loading-icon {

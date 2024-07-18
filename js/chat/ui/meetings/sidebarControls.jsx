@@ -71,7 +71,15 @@ export default class SidebarControls extends MegaRenderMixin {
                             }
                         />
                         <span className="control-label">{l.participants_call_button /* `Participants` */}</span>
-                        <span className="notification-badge participants-count theme-dark-forced">{npeers + 1}</span>
+                        <span
+                            className={`
+                                notification-badge
+                                participants-count
+                                theme-dark-forced
+                                ${npeers + 1 > 99 ? 'large' : ''}
+                            `}>
+                            {npeers + 1}
+                        </span>
                     </li>
                 </ul>
             </div>

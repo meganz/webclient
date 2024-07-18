@@ -690,6 +690,12 @@
         onMutedBy(cid) {
             this.chatRoom.trigger('onMutedBy', { cid });
         }
+        onRaisedHandAdd(userHandle) {
+            this.chatRoom.trigger('onRaisedHandAdd', { userHandle });
+        }
+        onRaisedHandDel(userHandle) {
+            this.chatRoom.trigger('onRaisedHandDel', { userHandle });
+        }
 // == end SfuClientIClientEventListener interface
         handleDisconnect(termCode) {
             console.assert(termCode !== undefined, "handleDisconnect: termCode is undefined");

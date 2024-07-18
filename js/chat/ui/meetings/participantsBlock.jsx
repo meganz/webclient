@@ -22,8 +22,16 @@ export default class ParticipantsBlock extends MegaRenderMixin {
 
     renderLocalNode = (isPresenterNode) => {
         const {
-            call, peers, mode, chatRoom, forcedLocal, presenterThumbSelected,
-            onSeparate, onSpeakerChange, onModeChange
+            call,
+            peers,
+            mode,
+            raisedHandPeers,
+            chatRoom,
+            forcedLocal,
+            presenterThumbSelected,
+            onSeparate,
+            onSpeakerChange,
+            onModeChange
         } = this.props;
         const localStream = call.getLocalStream();
 
@@ -58,6 +66,7 @@ export default class ParticipantsBlock extends MegaRenderMixin {
                     `}
                     simpletip={{ ...SIMPLE_TIP, label: l[8885] }}
                     mode={mode}
+                    raisedHandPeers={raisedHandPeers}
                     chatRoom={chatRoom}
                     source={localStream}
                     localAudioMuted={!(call.av & SfuClient.Av.Audio)}
@@ -125,7 +134,16 @@ export default class ParticipantsBlock extends MegaRenderMixin {
     }
 
     render() {
-        const { call, mode, peers, floatDetached, chatRoom, presenterThumbSelected, onSpeakerChange } = this.props;
+        const {
+            call,
+            mode,
+            peers,
+            floatDetached,
+            chatRoom,
+            raisedHandPeers,
+            presenterThumbSelected,
+            onSpeakerChange
+        } = this.props;
 
         if (peers && peers.length) {
             const { screen, video, rest } = filterAndSplitSources(peers, call);
@@ -191,6 +209,7 @@ export default class ParticipantsBlock extends MegaRenderMixin {
                             ...SIMPLE_TIP,
                             label
                         }}
+                        raisedHandPeers={raisedHandPeers}
                         mode={mode}
                         chatRoom={chatRoom}
                         source={peer}
@@ -281,6 +300,7 @@ export default class ParticipantsBlock extends MegaRenderMixin {
 
         return null;
     }
+
     onScroll = (chunks, evt) => {
         const { page } = this.state;
         if (evt.deltaY < 0) {

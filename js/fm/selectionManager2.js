@@ -421,7 +421,14 @@ class SelectionManager2Base {
 
         // Very first node start shift + select
         if (!this.shiftFirst) {
-            this.shiftFirst = $.selected[0];
+            if ($.selected && $.selected[0]) {
+                this.shiftFirst = $.selected[0];
+            }
+            else {
+                // always select very first node of shift if $.selected is empty, following Windows explorer behaviour
+                this.shiftFirst = currentViewIds[0];
+                current_idx = 0;
+            }
         }
 
         if (current_idx !== -1 && last_idx !== -1) {

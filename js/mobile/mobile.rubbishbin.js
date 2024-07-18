@@ -36,10 +36,12 @@ mobile.rubbishBin = {
             let links = 0;
 
             // Count the number of deleted public links
-            for (const res of result[0]) {
-                if (res && res.status === 'fulfilled' && res.value) {
-                    links = res.value.length;
-                    break;
+            if (typeof result[0] === 'object') {
+                for (const res of result[0]) {
+                    if (res && res.status === 'fulfilled' && res.value) {
+                        links = res.value.length;
+                        break;
+                    }
                 }
             }
 

@@ -2060,7 +2060,7 @@ var slideshowid;
     }
 
     function isThumbnailMissing(n) {
-        return !M.chat && (!n.fa || n.fa.indexOf(':0*') < 0);
+        return !M.chat && (!n.fa || !n.fa.includes(':0*')) && M.shouldCreateThumbnail(n.p);
     }
 
     function createNodeThumbnail(n, ab) {

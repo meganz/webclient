@@ -1150,16 +1150,7 @@ FileManager.prototype.initFileManagerUI = function() {
             }
         }
 
-        // Close node Info panel if currently open as it's not applicable when switching to these areas
-        if (this.classList.contains('account') || this.classList.contains('dashboard') ||
-            this.classList.contains('conversations') || this.classList.contains('user-management') ||
-            this.classList.contains('transfers')) {
-
-            mega.ui.mInfoPanel.closeIfOpen();
-        }
-
         if (this.classList.contains('account') || this.classList.contains('dashboard')) {
-            $.hideTopMenu();
 
             if (u_type === 0) {
                 if (this.classList.contains('account')) {
@@ -4454,6 +4445,18 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     }
     if ($.hideContextMenu) {
         $.hideContextMenu();
+    }
+
+    // Close node Info panel if currently open as it's not applicable when switching to these areas
+    if (id === 'account' || id === 'dashboard' || id === 'conversations'
+        || id === 'user-management' || id === 'transfers') {
+
+        mega.ui.mInfoPanel.closeIfOpen();
+
+        // Hide top menus
+        if (id === 'account' || id === 'dashboard') {
+            $.hideTopMenu();
+        }
     }
 
     $('.nw-fm-left-icon', $fmholder).removeClass('active');

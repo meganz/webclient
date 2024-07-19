@@ -2003,6 +2003,14 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[P]', '<h3 class="sub-header">')
         .replace('[/P]', '</h3>');
 
+    l.s4_s3_prefix_example = escapeHTML(l.s4_s3_prefix_example)
+        .replace(/\[S]/g, '<span>')
+        .replace(/\[\/S]/g, '</span>');
+
+    l.s4_iam_prefix_example = escapeHTML(l.s4_iam_prefix_example)
+        .replace(/\[S]/g, '<span>')
+        .replace(/\[\/S]/g, '</span>');
+
     l.content_removed = escapeHTML(l.content_removed)
         .replace('[A]', '<a class="clickurl" href="https://mega.io/takedown" target="_blank">')
         .replace('[/A]', '</a>');

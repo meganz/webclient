@@ -1194,6 +1194,25 @@
                                 <div class="sub-title" data-scrollto="sound-notifications">[$sound_notifications]</div>
                             </div>
                         </div>
+                        <div class="settings-button slide-in-out ts-500 closed s4 hidden">
+                            <div class="head-title">
+                                <i class="sprite-fm-mono icon-arrow-right expand"></i>
+                                <i class="sprite-fm-mono icon-object-storage"></i>
+                                <span>[$obj_storage]</span>
+                            </div>
+                            <div class="sub-menu slide-item">
+                                <div class="sub-title" data-scrollto="endpoints">[$s4_endpoints_header]</div>
+                            </div>
+                            <div class="sub-menu slide-item">
+                                <div class="sub-title" data-scrollto="access-keys">[$s4_access_keys]</div>
+                            </div>
+                            <div class="sub-menu slide-item hidden">
+                                <div class="sub-title" data-scrollto="thumb-preview">[$s4_thumb_preview]</div>
+                            </div>
+                            <div class="sub-menu slide-item hidden">
+                                <div class="sub-title" data-scrollto="out-opts">[$s4_out_opts]</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="commercial-wrapper hidden" id="commercial-wrapper-webdashsl"></div>
@@ -1419,7 +1438,14 @@
                         <span>[$file_request_action_create]</span>
                     </button>
 
-                    <button class="mega-button no-hover action fm-s4-new-bucket js-s4-new-bucket hidden" title="Create new bucket">
+                    <button class="mega-button no-hover action fm-s4-settings js-s4-settings hidden" title="[$823]">
+                        <div>
+                            <i class="sprite-fm-mono icon-settings-outline icon-blue"></i>
+                        </div>
+                        <span>[$823]</span>
+                    </button>
+
+                    <button class="mega-button no-hover action fm-s4-new-bucket js-s4-new-bucket hidden" title="[$s4_create_bkt]">
                         <div>
                             <i class="sprite-fm-mono icon-add-circle icon-green"></i>
                         </div>
@@ -4552,6 +4578,7 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Hear a sound when someone joins or leaves a call. -->
                     <div class="account data-block sound-notifications">
                         <div class="settings-left-block">
                             <div class="title-txt">[$sound_notifications]</div>
@@ -4566,8 +4593,84 @@
                         </div>
                     </div>
                 </div>
+
+                 <!-- S4 object storage settings. -->
+                <div class="fm-account-s4 fm-account-sections hidden">
+                    <div class="account settings-banner s4-specs-banner">
+                        <div class="settings-banner-cell first-block">
+                            <i class="light-icon"></i>
+                        </div>
+                        <div class="settings-banner-cell second-block">
+                           <div class="title-txt">[$s4_specs_banner]</div>
+                        </div>
+                        <div class="settings-banner-cell last-block">
+                            <button class="mega-button show-s4-specs">
+                                <span>[$8742]</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="account data-block endpoints">
+                        <div class="settings-left-block">
+                            <div class="title-txt">[$s4_endpoints_header]</div>
+                        </div>
+                        <div class="settings-right-block">
+                            <div class="settings-sub-section">
+                                <div class="full-sized">
+                                    <div class="settings-body-txt">[$s4_available_endpoints]</div>
+                                    <table class="secondary-table"></table>
+                                    <div class="settings-body-txt bold">[$s4_endpoints_prefix_info]</div>
+                                    <ul></ul>
+                                    <div class="settings-body-txt">[$s4_endpoints_info]</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="account data-block access-keys">
+                        <div class="settings-left-block">
+                            <div class="title-txt">[$s4_access_keys]</div>
+                        </div>
+                        <div class="settings-right-block">
+                            <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$s4_manage_access_keys]</div>
+                                <button class="mega-button manage-s4-keys">
+                                    <span>[$s4_manage_keys]</span>
+                                </button>
+                                <div class="content-txt">[$s4_key_create_explain] </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="account data-block thumb-preview hidden">
+                        <div class="settings-left-block">
+                            <div class="title-txt">[$s4_thumb_preview]</div>
+                        </div>
+                        <div class="settings-right-block">
+                            <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$s4_enable_thumb_preview]</div>
+                                <div class="mega-switch s4-thumb-switch">
+                                    <div class="mega-feature-switch no-trans-init"></div>
+                                </div>
+                                <div class="content-txt">
+                                    [$s4_thumb_preview_info]
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="account data-block out-opts hidden">
+                        <div class="settings-left-block">
+                            <div class="title-txt">[$s4_obj_storage_opt_out]</div>
+                        </div>
+                        <div class="settings-right-block">
+                            <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$s4_disable_obj_storage]</div>
+                                <button class="mega-button negative disable-obj-storage">
+                                    <span>[$s4_disable_obj_storage_btn]</span>
+                                </button>
+                                <div class="content-txt">[$s4_opt_out_info]</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <!-- Hear a sound when someone joins or leaves a call. -->
         </section>
 
         <!-- Backup center - Backups section !-->

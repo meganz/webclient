@@ -25,7 +25,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
     var thumbHandler;
     var onPreviewRetry;
 
-    if (window.omitthumb) {
+    if (!M.shouldCreateThumbnail(file && file.target || node && node.p)) {
         console.warn('Omitting thumb creation on purpose...', arguments);
         mBroadcaster.sendMessage('fa:error', id, 'omitthumb', false, 2);
         return Promise.resolve();

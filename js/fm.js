@@ -630,7 +630,7 @@ function fmtopUI() {
     $('.shares-tab-lnk.active', $sharesTabBlock).removeClass('active');
     $('.gallery-tab-lnk.active', $galleryTabBlock).removeClass('active');
 
-    $('.fm-s4-new-bucket, .fm-s4-new-key, .fm-s4-new-user, .fm-s4-new-group', $header)
+    $('.fm-s4-settings, .fm-s4-new-bucket, .fm-s4-new-key, .fm-s4-new-user, .fm-s4-new-group', $header)
         .addClass('hidden');
 
     $('.fm-clearbin-button,.fm-add-user,.fm-new-folder,.fm-file-upload,.fm-folder-upload,.fm-uploads')
@@ -746,7 +746,7 @@ function fmtopUI() {
         else if (M.currentrootid === 's4') {
             const {subType, original} = M.currentCustomView;
             if (subType === 'container') {
-                $('.fm-s4-new-bucket').removeClass('hidden');
+                $('.fm-s4-new-bucket, .fm-s4-settings', '.fm-header-buttons').removeClass('hidden');
             }
             else if (subType === 'bucket') {
                 $('.fm-new-folder').removeClass('hidden');

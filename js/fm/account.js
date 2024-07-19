@@ -220,6 +220,16 @@ accountUI.renderAccountPage = function(account) {
 
             accountUI.calls.init();
             break;
+
+        case '/fm/account/s4':
+            if (!accountUI.s4 || !u_attr.s4) {
+                loadSubPage('fm/account');
+                return false;
+            }
+            $('.fm-account-s4').removeClass('hidden');
+            sectionClass = 's4';
+            accountUI.s4.init();
+            break;
         default:
 
             // This is the main entry point for users who just had upgraded their accounts
@@ -733,6 +743,12 @@ accountUI.leftPane = {
             $menuItems.filter('.reseller').removeClass('hidden');
         }
 
+        // Show S4 settings
+        if (u_attr.s4) {
+            // Show reseller button on naviation
+            $menuItems.filter('.s4').removeClass('hidden');
+        }
+
         if (accountUI.plan.paymentCard.validateUser(M.account)) {
             $('.acc-setting-menu-card-info', $menuItems).removeClass('hidden');
         }
@@ -772,6 +788,8 @@ accountUI.leftPane = {
                 return 'fm/account/reseller';
             case $section.hasClass('calls'):
                 return 'fm/account/calls';
+            case $section.hasClass('s4'):
+                return 'fm/account/s4';
             default:
                 return 'fm/account';
         }
@@ -4800,5 +4818,114 @@ accountUI.calls = {
                 }
             );
         }
+    }
+};
+
+/**
+ * S4 Object storage settings
+ */
+accountUI.s4 = {
+
+    $container: null,
+
+    init() {
+        'use strict';
+
+        if ((this.$container = ('.fm-account-s4', accountUI.$contentBlock)).length === 0) {
+            return false;
+        }
+
+        this.renderEndpointsData();
+        this.bindEvents();
+    },
+
+    renderEndpointsData() {
+        'use strict';
+
+        // Static endpoints data for now
+        const endpoints = [
+            [
+                'eu-central-1.s4.mega.io',
+                l.location_amsterdam
+            ],
+            [
+                'ca-central-1.s4.mega.io',
+                l.location_montreal
+            ],
+            [
+                'ca-west-1.s4.mega.io',
+                l.location_vancouver
+            ]
+        ];
+
+        const tableNode = this.$container[0].querySelector('.secondary-table');
+        const tipsNode = this.$container[0].querySelector('ul');
+        let rowNode = null;
+
+        tableNode.textContent = '';
+        tipsNode.textContent = '';
+
+        // Create table header
+        rowNode = mCreateElement('tr', undefined, tableNode);
+        mCreateElement('th', undefined, rowNode).textContent = l.s4_endpoint_header;
+        mCreateElement('th', undefined, rowNode).textContent = l[17818];
+        mCreateElement('th', undefined, rowNode);
+
+        // Create enpoint rows
+        for (const item of endpoints) {
+            let subNode = null;
+
+            // Create table header
+            rowNode = mCreateElement('tr', undefined, tableNode);
+            subNode = mCreateElement('td', undefined, rowNode);
+            mCreateElement('a', { class: 'settings-lnk' }, subNode).textContent = item[0];
+            mCreateElement('td', undefined, rowNode).textContent = item[1];
+            subNode = mCreateElement('td', undefined, rowNode);
+
+            // Create copy to clipboard button
+            subNode = mCreateElement('button', {
+                'class': 'mega-button small action copy',
+                'data-url': item[0]
+            }, subNode);
+            mCreateElement('i', { class: 'sprite-fm-mono icon-copy' }, subNode);
+        }
+
+        // Fill URL exapmles in the tips
+        mCreateElement('li', undefined, tipsNode).append(parseHTML(
+            l.s4_s3_prefix_example.replace('%1', `s3.${endpoints[0][0]}`)
+        ));
+        mCreateElement('li', undefined, tipsNode).append(parseHTML(
+            l.s4_iam_prefix_example.replace('%1', `iam.${endpoints[0][0]}`)
+        ));
+    },
+
+    bindEvents() {
+        'use strict';
+
+        // Specs button evt in top banner
+        $('.show-s4-specs', this.$container).rebind('click.openSpecs', () => {
+            window.open('https://github.com/meganz/s4-specs', '_blank', 'noopener,noreferrer');
+        });
+
+        // Manage keys button in Access keys section
+        $('.manage-s4-keys', this.$container).rebind('click.openKeys', () => {
+            const cn = 'utils' in s4 && s4.utils.getContainersList();
+            loadSubPage(cn.length ? `fm/${cn[0].h}/keys` : 'fm');
+        });
+
+        // Copy to clipboard buttons in Endpoints section
+        $('.mega-button.copy', this.$container).rebind('click.copyUrl', (e) => {
+            copyToClipboard(e.currentTarget.dataset.url, l.s4_endpoint_copied, 'hidden');
+        });
+
+        // Enable thumb previews switcher in thumb previews
+        accountUI.inputs.switch.init(
+            '.s4-thumb-switch',
+            this.$container,
+            mega.config.get('s4thumbs'),
+            (val) => {
+                mega.config.setn('s4thumbs', val ? 1 : undefined);
+            }
+        );
     }
 };

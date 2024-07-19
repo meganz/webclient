@@ -113,7 +113,7 @@
         xb1: [
             // do NOT change the order, add new entries at the tail UP TO 31, and 8 per row.
             'cws', 'ctt', 'viewmode', 'dbDropOnLogout', 'dlThroughMEGAsync', 'sdss', 'tpp', 'ulddd',
-            'cbvm', 'mgvm', 'uiviewmode', 'uisorting', 'uidateformat', 'skipsmsbanner', 'skipDelWarning', 'rsv1',
+            'cbvm', 'mgvm', 'uiviewmode', 'uisorting', 'uidateformat', 'skipsmsbanner', 'skipDelWarning', 's4thumbs',
             'nowarnpl', 'zip64n', 'callemptytout', 'callinout', 'showHideChat', 'showRecents', 'nocallsup', 'cslrem',
             'rsv2', 'noSubfolderMd'
         ]

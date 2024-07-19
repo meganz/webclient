@@ -512,6 +512,9 @@ lazy(s4, 'ui', () => {
                     this.renderList(subType, n);
                 }
             }
+            $('.js-s4-settings', this.$fmBlock).rebind('click.open-settings', () => {
+                loadSubPage('fm/account/s4');
+            });
             $('.js-s4-new-bucket', this.$fmBlock).rebind('click.create-bucket', () => {
                 this.showDialog(s4.buckets.dialogs.create);
             });

@@ -641,7 +641,7 @@ lazy(MegaData.prototype, 'confirmNodesAtLocation', () => {
 
             if (n) {
                 const p = M.getNodeByHandle(n.p);
-                const ps4t = p.s4 && s4.kernel.getS4NodeType(p);
+                const ps4t = p.s4 && 'kernel' in s4 && s4.kernel.getS4NodeType(p);
 
                 if (n.s4) {
                     if (d) {
@@ -2015,7 +2015,7 @@ MegaData.prototype.rename = async function(itemHandle, newItemName) {
         const prop = {name: newItemName};
 
         if (n.s4) {
-            const res = s4.kernel.validateForeignAction('rename', {node: n, ...prop});
+            const res = 'kernel' in s4 && s4.kernel.validateForeignAction('rename', {node: n, ...prop});
 
             if (res) {
                 if (res instanceof Promise) {
@@ -3258,7 +3258,7 @@ MegaData.prototype.createFolder = promisify(function(resolve, reject, target, na
         }
 
         const n = {...attrs, name};
-        if (M.d[target].s4) {
+        if (M.d[target].s4 && 'kernel' in s4) {
             s4.kernel.setNodeAttributesByRef(target, n);
         }
 
@@ -4680,6 +4680,24 @@ MegaData.prototype.preparePublicSetImport = function(pfid, data) {
     }
 
     data.push('<pfcol>');
+};
+
+/**
+ * Check whether we can generate thumbnails for nodes going into specific folders/sections.
+ * @param {String} [target] folder node, or current folder if unspecified
+ * @returns {Boolean}
+ */
+MegaData.prototype.shouldCreateThumbnail = function(target) {
+    'use strict';
+
+    // @todo: Fix after the proxy server changes are released.
+    if (self.omitthumb !== false) {
+        return !self.omitthumb;
+    }
+
+    target = target || this.currentCustomView.nodeID || this.currentdirid || this.lastSeenCloudFolder;
+
+    return fmconfig.s4thumbs === 1 || this.getNodeRoot(target) !== 's4';
 };
 
 /**

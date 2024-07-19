@@ -8,6 +8,7 @@ export default class Invite extends MegaRenderMixin {
 
     containerRef = React.createRef();
     wrapperRef = React.createRef();
+    inputRef = React.createRef();
 
     state = {
         value: '',
@@ -89,7 +90,7 @@ export default class Invite extends MegaRenderMixin {
         this.setState({ value, contacts, frequents }, () => this.reinitializeWrapper());
     }
 
-    handleSelect(userHandle, expanded = false) {
+    handleSelect({ userHandle, expanded = false }) {
         this.setState(
             state => ({
                 value: '',
@@ -102,6 +103,7 @@ export default class Invite extends MegaRenderMixin {
                 // TODO: rebuild directly within this `setState` call
                 this.buildContactsList();
                 this.reinitializeWrapper();
+                this.inputRef.current?.focus();
             });
     }
 
@@ -115,7 +117,7 @@ export default class Invite extends MegaRenderMixin {
                         key={contact.u}
                         className="invite-section-item"
                         onClick={() => {
-                            this.handleSelect(contact.u);
+                            this.handleSelect({ userHandle: contact.u, expanded: true });
                         }}>
                         <Avatar contact={contact}/>
                         <div className="invite-item-data">
@@ -192,9 +194,7 @@ export default class Invite extends MegaRenderMixin {
                                         <ContactAwareName contact={M.u[handle]} overflow={true} />
                                         <i
                                             className="sprite-fm-mono icon-close-component"
-                                            onClick={() => {
-                                                this.handleSelect(handle);
-                                            }}
+                                            onClick={() => this.handleSelect({ userHandle: handle })}
                                         />
                                     </div>
                                 </li>
@@ -202,6 +202,7 @@ export default class Invite extends MegaRenderMixin {
                         })}
                         <li className="token-input-input-token-mega">
                             <input
+                                ref={this.inputRef}
                                 type="text"
                                 name="participants"
                                 className={`${Invite.NAMESPACE}-input`}
@@ -210,7 +211,7 @@ export default class Invite extends MegaRenderMixin {
                                     selected.length ? '' : l.schedule_participant_input /* `Add participants` */
                                 }
                                 value={value}
-                                onFocus={() => this.setState({ expanded: true })}
+                                onClick={() => this.setState({ expanded: true })}
                                 onChange={this.handleSearch}
                                 onKeyDown={({ target, keyCode }) => {
                                     const { selected } = this.state;
@@ -218,7 +219,7 @@ export default class Invite extends MegaRenderMixin {
                                         keyCode === 8 /* Backspace */ &&
                                         target.value === '' &&
                                         selected.length &&
-                                        this.handleSelect(selected[selected.length - 1], true)
+                                        this.handleSelect({ userHandle: selected[selected.length - 1] })
                                     );
                                 }}
                             />

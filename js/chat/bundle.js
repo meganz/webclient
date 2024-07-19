@@ -15354,6 +15354,7 @@ class Invite extends mixins.w9 {
     super(props);
     this.containerRef = REaCt().createRef();
     this.wrapperRef = REaCt().createRef();
+    this.inputRef = REaCt().createRef();
     this.state = {
       value: '',
       expanded: false,
@@ -15427,15 +15428,20 @@ class Invite extends mixins.w9 {
       frequents
     }, () => this.reinitializeWrapper());
   }
-  handleSelect(userHandle, expanded = false) {
+  handleSelect({
+    userHandle,
+    expanded = false
+  }) {
     this.setState(state => ({
       value: '',
       expanded,
       selected: state.selected.includes(userHandle) ? state.selected.filter(c => c !== userHandle) : [...state.selected, userHandle]
     }), () => {
+      let _this$inputRef$curren;
       this.props.onSelect(this.state.selected);
       this.buildContactsList();
       this.reinitializeWrapper();
+      (_this$inputRef$curren = this.inputRef.current) == null || _this$inputRef$curren.focus();
     });
   }
   getFilteredContacts(contacts) {
@@ -15446,7 +15452,10 @@ class Invite extends mixins.w9 {
           key: contact.u,
           className: "invite-section-item",
           onClick: () => {
-            this.handleSelect(contact.u);
+            this.handleSelect({
+              userHandle: contact.u,
+              expanded: true
+            });
           }
         }, REaCt().createElement(ui_contacts.Avatar, {
           contact
@@ -15535,20 +15544,21 @@ class Invite extends mixins.w9 {
         overflow: true
       }), REaCt().createElement("i", {
         className: "sprite-fm-mono icon-close-component",
-        onClick: () => {
-          this.handleSelect(handle);
-        }
+        onClick: () => this.handleSelect({
+          userHandle: handle
+        })
       })));
     }), REaCt().createElement("li", {
       className: "token-input-input-token-mega"
     }, REaCt().createElement("input", {
+      ref: this.inputRef,
       type: "text",
       name: "participants",
       className: `${Invite.NAMESPACE}-input`,
       autoComplete: "off",
       placeholder: selected.length ? '' : l.schedule_participant_input,
       value,
-      onFocus: () => this.setState({
+      onClick: () => this.setState({
         expanded: true
       }),
       onChange: this.handleSearch,
@@ -15559,7 +15569,9 @@ class Invite extends mixins.w9 {
         const {
           selected
         } = this.state;
-        return keyCode === 8 && target.value === '' && selected.length && this.handleSelect(selected[selected.length - 1], true);
+        return keyCode === 8 && target.value === '' && selected.length && this.handleSelect({
+          userHandle: selected[selected.length - 1]
+        });
       }
     })))), loading ? null : REaCt().createElement("div", {
       className: `mega-input-dropdown ${expanded ? '' : 'hidden'}`

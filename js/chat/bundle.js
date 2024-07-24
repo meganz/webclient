@@ -26685,7 +26685,7 @@ class stream_Stream extends mixins.w9 {
           if (hasScreenAndCam) {
             PeerClass = presenterCid ? videoNode.zu : videoNode.Qs;
           }
-          const cacheKey = `${mode}_${clientId}_${i}`;
+          const cacheKey = `${mode}_${clientId}_${i}_${hasScreenAndCam ? 1 : 0}`;
           return REaCt().createElement(PeerClass, {
             key: cacheKey,
             mode,
@@ -26751,7 +26751,7 @@ class stream_Stream extends mixins.w9 {
           }
           if (peer instanceof CallManager2.Peer) {
             const presenterCid = screen.length && screen[0].clientId === clientId;
-            const cacheKey = `${mode}_${clientId}_${j + i * streamsPerPage}`;
+            const cacheKey = `${mode}_${clientId}_${j + i * streamsPerPage}_${hasScreenAndCam ? 1 : 0}`;
             let PeerClass = videoNode.au;
             if (hasScreenAndCam) {
               PeerClass = presenterCid ? videoNode.zu : videoNode.Qs;

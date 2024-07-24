@@ -359,7 +359,7 @@ export default class Stream extends MegaRenderMixin {
                     if (hasScreenAndCam) {
                         PeerClass = presenterCid ? PeerVideoHiRes : PeerVideoThumbFixed;
                     }
-                    const cacheKey = `${mode}_${clientId}_${i}`;
+                    const cacheKey = `${mode}_${clientId}_${i}_${hasScreenAndCam ? 1 : 0}`;
                     return (
                         <PeerClass
                             key={cacheKey}
@@ -426,7 +426,9 @@ export default class Stream extends MegaRenderMixin {
                                         if (peer instanceof CallManager2.Peer) {
                                             const presenterCid = screen.length && screen[0].clientId === clientId;
                                             // Same as above but mindful of duplicate keys across different pages.
-                                            const cacheKey = `${mode}_${clientId}_${j + i * streamsPerPage}`;
+                                            const cacheKey = `${mode}_${clientId}_${j + i * streamsPerPage}_${
+                                                hasScreenAndCam ? 1 : 0
+                                            }`;
                                             let PeerClass = PeerVideoThumb;
                                             if (hasScreenAndCam) {
                                                 PeerClass = presenterCid ? PeerVideoHiRes : PeerVideoThumbFixed;

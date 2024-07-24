@@ -1016,29 +1016,18 @@ li.active .call-duration i {
     --icon-size: 24px;
     --mask-color: var(--secondary-green);
 }
-
+.contacts-table {
+    table-layout: fixed;
+}
 .contacts-table tbody tr {
     overflow: hidden;
-}
-
-.contacts-table tr:hover .contact-item-controls,
-.contacts-table tr.ui-selected .contact-item-controls,
-.contacts-table tr.active .contact-item-controls {
-    display: block;
-    margin: 0 10px 0 0;
-}
-.rtl .contacts-table tr:hover .contact-item-controls,
-.rtl .contacts-table tr.ui-selected .contact-item-controls,
-.rtl .contacts-table tr.active .contact-item-controls {
-    display: block;
-    margin: unset;
 }
 .contacts-table th {
     position: relative;
     width: 18%;
 }
 .contacts-table th.name {
-    width: 25%;
+    width: 28%;
 }
 .contacts-table.requests-table th {
     width: 18%;
@@ -1106,12 +1095,6 @@ li.active .call-duration i {
 }
 td.verification .contact-item {
     width: 100%;
-}
-
-@media only screen and (width <= 1170px) {
-    .rtl .contacts-table .contact-item-user {
-        width: 180px;
-    }
 }
 
 .contacts-table .contact-item-status,

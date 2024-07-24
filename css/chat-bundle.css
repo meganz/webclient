@@ -2299,6 +2299,41 @@ body.rtl .meetings-call .stream .stream-participants-block .participants-contain
   font: var(--text-body1);
   visibility: visible;
 }
+.meetings-call .stream-controls .mic-muted-tip {
+  background: var(--surface-grey-1);
+  border-radius: 6px;
+  bottom: calc(100% + 24px);
+  color: var(--text-color-medium);
+  display: flex;
+  font: var(--text-body1);
+  left: 50%;
+  padding: 8px 12px;
+  position: absolute;
+  text-wrap: nowrap;
+  transform: translateX(-50%);
+}
+.meetings-call .stream-controls .mic-muted-tip i {
+  bottom: -8px;
+  height: 16px;
+  left: calc(50% - 12px);
+  position: absolute;
+  --icon-size: 24px;
+  --mask-color: var(--surface-grey-1);
+}
+.meetings-call .stream-controls .mic-muted-tip span {
+  color: var(--text-color-high);
+  font: var(--text-body1-bold);
+  margin: 0;
+}
+.meetings-call .stream-controls .mic-muted-tip button {
+  background: none;
+  border: none;
+  color: var(--text-color-success);
+  font: var(--text-body1-bold);
+  padding: 0;
+  margin-inline-start: 4px;
+  -webkit-margin-start: 4px;
+}
 .meetings-call .sidebar-controls {
   display: flex;
   justify-content: flex-end;

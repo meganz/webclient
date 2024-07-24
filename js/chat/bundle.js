@@ -27939,11 +27939,17 @@ class StreamControls extends _mixins1__.w9 {
     super.componentWillUnmount();
     document.removeEventListener('mousedown', this.handleMousedown);
     navigator.mediaDevices.removeEventListener('devicechange', this.handleDeviceChange);
+    this.props.chatRoom.off(`onLocalSpeechDetected.${StreamControls.NAMESPACE}`);
   }
   componentDidMount() {
     super.componentDidMount();
     document.addEventListener('mousedown', this.handleMousedown);
     navigator.mediaDevices.addEventListener('devicechange', this.handleDeviceChange);
+    this.props.chatRoom.rebind(`onLocalSpeechDetected.${StreamControls.NAMESPACE}`, () => {
+      this.setState({
+        localMicDetected: true
+      });
+    });
   }
   render() {
     const {
@@ -27963,7 +27969,8 @@ class StreamControls extends _mixins1__.w9 {
     } = this.props;
     const {
       audioSelectDropdown,
-      videoSelectDropdown
+      videoSelectDropdown,
+      localMicDetected
     } = this.state;
     const avFlags = call.av;
     const isOnHold = avFlags & Av.onHold;
@@ -27980,8 +27987,29 @@ class StreamControls extends _mixins1__.w9 {
         }
         resetError(Av.Audio);
         onAudioClick();
+        if (!(avFlags & Av.Audio)) {
+          this.setState({
+            localMicDetected: false
+          });
+        }
       }
-    }, react0().createElement(_button_jsx3__.A, {
+    }, localMicDetected && react0().createElement("div", {
+      className: "mic-muted-tip theme-light-forced",
+      onClick: e => {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, react0().createElement("span", null, l.mic_still_muted), react0().createElement(_button_jsx3__.A, {
+      className: "mic-muted-tip-btn",
+      onClick: () => {
+        this.setState({
+          localMicDetected: false
+        });
+        eventlog(500509);
+      }
+    }, l[148]), react0().createElement("i", {
+      className: "sprite-fm-mono icon-tooltip-arrow tooltip-arrow bottom"
+    })), react0().createElement(_button_jsx3__.A, {
       className: `
                                     mega-button
                                     theme-light-forced

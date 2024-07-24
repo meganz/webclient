@@ -28,10 +28,11 @@ var __webpack_exports__ = {};
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  S: () => (/* binding */ ConnState)
+  S: () => (/* binding */ ConnState),
+  Z_: () => (/* binding */ SfuClient)
 });
 
-// UNUSED EXPORTS: CallJoinPermission, ScreenShareType, SfuClient
+// UNUSED EXPORTS: AudioPlayer, CallJoinPermission, ScreenShareType
 
 ;// CONCATENATED MODULE: ../shared/termCodes.ts
 var TermCode;
@@ -940,6 +941,257 @@ SvcDriver.kMaxTxQualityIndex = SvcDriver.TxQuality.length - 1;
 SvcDriver.kDefaultTxQualityIndex = 3;
 SvcDriver.kScreenCaptureHeight = SvcDriver.TxQuality[SvcDriver.kMaxTxQualityIndex].scr.height;
 
+;// CONCATENATED MODULE: ./speak.ts
+
+const speak_kLogTag = "SpeakDetector:";
+;
+class SpeakerDetector {
+    constructor(client) {
+        this.players = new Set();
+        this.mutedSpeakDetectDisabled = false;
+        this.tsLastChange = 0;
+        this.currSpeakerCid = null;
+        this.tickCtr = 0;
+        this.onTimerTick_fast = () => {
+            if (this.selfSpeakDetector.poll()) {
+                this.selfSpeakDetector.stop();
+                this.updateTimer();
+                this.client._fire("onLocalSpeechDetected");
+            }
+            ;
+            if ((this.tickCtr & 3 /* Period.kSlowTickCtrMask */) === 0) {
+                this.tickCtr = 1;
+                this.onTimerTick_slow();
+            }
+            else {
+                this.tickCtr++;
+            }
+        };
+        this.onTimerTick_slow = () => {
+            if (!this.enabled) {
+                // only notifies about live mic levels
+                for (const player of this.players) {
+                    player.pollAudioLevel();
+                }
+                return;
+            }
+            // notifies about live mic levels + monitors active speaker changes
+            let maxLevel = SpeakerDetector.kSpeakerVolThreshold;
+            let maxLevelCid = null;
+            for (const player of this.players) {
+                const level = player.pollAudioLevel(true);
+                if (level > maxLevel) {
+                    maxLevel = level;
+                    maxLevelCid = player.peer.cid;
+                }
+            }
+            const now = Date.now();
+            const client = this.client;
+            const ourLevel = (now - client.tsMicAudioLevel < 1500) ? client.micAudioLevel : 0;
+            if (ourLevel > maxLevel) {
+                maxLevelCid = 0;
+            }
+            if (maxLevelCid === this.currSpeakerCid) {
+                return;
+            }
+            if (now - this.tsLastChange < SpeakerDetector.kSpeakerChangeMinInterval) {
+                return;
+            }
+            this.tsLastChange = now;
+            const prev = this.currSpeakerCid;
+            this.currSpeakerCid = maxLevelCid;
+            do {
+                if (window.d) {
+                    console.warn(speak_kLogTag, "Active speaker changed to", maxLevelCid);
+                }
+            } while (0);
+            client.app.onActiveSpeakerChange(maxLevelCid, prev);
+        };
+        this.client = client;
+        this.selfSpeakDetector = new MicSpeechDetector(client);
+        this.enable(false);
+    }
+    enable(enable) {
+        this.enabled = enable;
+        this.currSpeakerCid = null;
+    }
+    updateTimer() {
+        this.deleteTimer();
+        if (!this.selfSpeakDetector.stopped && this.client.localAudioMuted()) {
+            this.doStartTimer(this.onTimerTick_fast, 50 /* Period.kFastTick */);
+        }
+        else {
+            this.doStartTimer(this.onTimerTick_slow, 200 /* Period.kSlowTick */);
+        }
+    }
+    doStartTimer(cb, msInterval) {
+        if (SfuClient.speakDetectorUseSetTimeout) {
+            const timerFunc = () => {
+                cb();
+                this.timer = setTimeout(timerFunc, msInterval);
+            };
+            this.timer = setTimeout(timerFunc, msInterval);
+        }
+        else {
+            this.timer = setInterval(cb, msInterval);
+        }
+    }
+    deleteTimer() {
+        if (!this.timer) {
+            return;
+        }
+        (SfuClient.speakDetectorUseSetTimeout ? clearTimeout : clearInterval)(this.timer);
+        delete this.timer;
+    }
+    registerPeer(player) {
+        this.players.add(player);
+        if (!this.timer) {
+            this.enable(this.enabled);
+        }
+    }
+    unregisterPeer(player) {
+        this.players.delete(player);
+        if (!this.players.size) {
+            // we don't leave it polling the local mic level (in enabled mode), because it will compare it against
+            // the silence threshold, and will likely constantly switch between 0 and null
+            this.deleteTimer();
+            const prev = this.currSpeakerCid;
+            this.currSpeakerCid = null;
+            if (this.enabled && prev !== null) {
+                this.client.app.onActiveSpeakerChange(null, prev);
+            }
+        }
+    }
+    onMicMute() {
+        if (this.client.localAudioMuted()) {
+            this.selfSpeakDetector.attachToClientAudioInput();
+        }
+        else {
+            this.selfSpeakDetector.stop();
+        }
+        this.updateTimer();
+    }
+    destroy() {
+        this.deleteTimer();
+        this.selfSpeakDetector.destroy();
+    }
+}
+SpeakerDetector.kSpeakerVolThreshold = 0.001;
+SpeakerDetector.kSpeakerChangeMinInterval = 4000;
+class MicSpeechDetector {
+    constructor(client) {
+        this.client = client;
+        this.ctx = null;
+        this.srcNode = null;
+        this.fftNode = null;
+        this.avgFill = 0;
+        this.currentlySpeaking = false;
+        this.tsLastEvent = 0;
+        this.tsLastSpeakEnd = 0;
+        this.wordCtr = 0;
+        this.fftResult = new Uint8Array(64 /* Config.kFftBandCount */);
+    }
+    get stopped() {
+        return this.ctx === null;
+    }
+    stop() {
+        if (!this.ctx) {
+            return;
+        }
+        this.srcNode.disconnect(this.fftNode);
+        this.fftNode = this.srcNode = null;
+        this.ctx.close();
+        this.ctx = null;
+    }
+    destroy() {
+        this.stop();
+    }
+    attachToClientAudioInput() {
+        if (this.ctx) {
+            do {
+                if (window.d) {
+                    console.warn(speak_kLogTag, "Already attached");
+                }
+            } while (0);
+            return;
+        }
+        const atrack = this.client.localAudioTrack();
+        if (!atrack) {
+            do {
+                if (window.d) {
+                    console.warn(speak_kLogTag, "Can't attach - client has no audio track");
+                }
+            } while (0);
+            return;
+        }
+        this.ctx = new AudioContext;
+        this.srcNode = this.ctx.createMediaStreamSource(new MediaStream([atrack]));
+        const fftNode = this.fftNode = this.ctx.createAnalyser();
+        fftNode.fftSize = 1024 /* Config.kFftSize */;
+        fftNode.channelCount = 1;
+        fftNode.smoothingTimeConstant = 0.0;
+        this.srcNode.connect(fftNode);
+        this.reset();
+    }
+    reset() {
+        this.avgFill = this.tsLastEvent = this.tsLastSpeakEnd = this.wordCtr = 0;
+        this.currentlySpeaking = false;
+    }
+    poll() {
+        if (!this.fftNode) {
+            return;
+        }
+        this.fftNode.getByteFrequencyData(this.fftResult);
+        let avgAmpl = 0;
+        let max = 0;
+        let maxBand = -1;
+        const fft = this.fftResult;
+        const fftLen = fft.length;
+        for (let i = 0; i < fftLen; i++) {
+            const ampl = fft[i];
+            avgAmpl += ampl;
+            if (ampl > max) {
+                max = ampl;
+                maxBand = i;
+            }
+        }
+        avgAmpl /= fft.length;
+        if (max) {
+            const fill = avgAmpl / max;
+            this.avgFill = (this.avgFill * 3 + fill) / 4;
+        }
+        // console.warn(`${avgAmpl.toFixed()}, ${this.avgFill.toFixed(1)}`);
+        return this.addLevel(maxBand <= 11 /* Config.kMaxPeakBand */ && avgAmpl > 80 /* Config.kMinAvgAmpl */
+            && this.avgFill > 0.4 /* Config.kMinAvgFill */ ? avgAmpl : 0);
+    }
+    addLevel(level) {
+        if (level === 0) {
+            if (this.currentlySpeaking) { // stop speak
+                this.currentlySpeaking = false;
+                const now = Date.now();
+                const speakDur = now - this.tsLastEvent;
+                this.tsLastEvent = now;
+                // console.log(`${this.wordCtr} (${speakDur})`);
+                if (speakDur > 100 /* Config.kSpeakMinDur */ && speakDur < 600 /* Config.kSpeakMaxDur */) {
+                    this.tsLastSpeakEnd = now;
+                    return (++this.wordCtr >= 2 /* Config.kMinSeqWords */);
+                }
+            }
+            else {
+                if (Date.now() - this.tsLastSpeakEnd > 1500 /* Config.kSilenceToWordCntReset */) {
+                    this.wordCtr = 0;
+                }
+            }
+        }
+        else {
+            if (!this.currentlySpeaking) { // start speak
+                this.currentlySpeaking = true;
+                this.tsLastEvent = Date.now();
+            }
+        }
+    }
+}
+
 ;// CONCATENATED MODULE: ./recordingLogo.ts
 //export default const kLogoImageBlobUrl = "data:image/svg+xml,%3Csvg xml:space='preserve' width='362' height='361.39999' viewBox='0 0 362 361.39998' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23d9272e' d='M 180.7,0 C 80.9,0 0,80.9 0,180.7 c 0,99.8 80.9,180.7 180.7,180.7 99.8,0 180.7,-80.9 180.7,-180.7 C 361.4,80.9 280.5,0 180.7,0 Z m 93.8,244.6 c 0,3.1 -2.5,5.6 -5.6,5.6 h -23.6 c -3.1,0 -5.6,-2.5 -5.6,-5.6 v -72.7 c 0,-0.6 -0.7,-0.9 -1.2,-0.5 l -50,50 c -4.3,4.3 -11.4,4.3 -15.7,0 l -50,-50 c -0.4,-0.4 -1.2,-0.1 -1.2,0.5 v 72.7 c 0,3.1 -2.5,5.6 -5.6,5.6 H 92.4 c -3.1,0 -5.6,-2.5 -5.6,-5.6 V 116.8 c 0,-3.1 2.5,-5.6 5.6,-5.6 h 16.2 c 2.9,0 5.8,1.2 7.9,3.3 l 62.2,62.2 c 1.1,1.1 2.8,1.1 3.9,0 l 62.2,-62.2 c 2.1,-2.1 4.9,-3.3 7.9,-3.3 h 16.2 c 3.1,0 5.6,2.5 5.6,5.6 z' id='path2' /%3E%3C/svg%3E%0A";
 const kLogoImageBlobUrl = "data:image/svg+xml,%3Csvg width='400' height='400' viewBox='0 0 105.83333 105.83333' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3Cellipse style='fill:%23d9272e;stroke:%23d9272e;stroke-width:0.3;image-rendering:optimizeQuality' cx='52.916664' cy='52.916668' rx='52.766827' ry='52.766823' /%3E%3Cpath fill='%232c2b2b' d='M 71.754659,33.510404 53.517721,51.730323 c -0.322518,0.322218 -0.820956,0.322218 -1.143473,0 L 34.10799,33.510404 c -0.615717,-0.615142 -1.436672,-0.966652 -2.316267,-0.966652 h -4.749814 c -0.908914,0 -1.641911,0.732313 -1.641911,1.640379 v 37.465075 c 0,0.908067 0.732997,1.640378 1.641911,1.640378 h 6.919481 c 0.908916,0 1.641911,-0.732311 1.641911,-1.640378 V 50.353577 c 0,-0.175755 0.205239,-0.263633 0.351838,-0.146462 l 14.659918,14.646237 c 1.260753,1.259576 3.342462,1.259576 4.603214,0 L 69.878189,50.207115 c 0.117279,-0.117171 0.351838,-0.02929 0.351838,0.146462 v 21.295629 c 0,0.908067 0.732996,1.640378 1.64191,1.640378 h 6.919482 c 0.908915,0 1.641911,-0.732311 1.641911,-1.640378 V 34.184131 c 0,-0.908066 -0.732996,-1.640379 -1.641911,-1.640379 h -4.749813 c -0.850276,0.02929 -1.671231,0.35151 -2.286947,0.966652 z' style='fill:%23ffffff;stroke-width:0.293061' /%3E%3C/svg%3E%0A";
@@ -1169,14 +1421,6 @@ class CallRecorder {
         let tsPrev = Date.now();
         this.staticVideoRefreshTimer = setInterval(() => {
             this.canvas.getContext('2d').fillRect(0, 0, 1, 1);
-            /*
-            const now = Date.now();
-            const period = now - tsPrev;
-            tsPrev = now;
-            if (period > 70) {
-                LOGW("recorder: slow draw:", period);
-            }
-            */
         }, 60);
         const staticVtrack = this.canvas.captureStream(20).getVideoTracks()[0];
         do {
@@ -1276,12 +1520,15 @@ class CallRecorder {
     }
 }
 
+
 ;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = '3d16a89541';
+const COMMIT_ID = 'dd31ff5b28';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
 ;// CONCATENATED MODULE: ./client.ts
 /* Mega SFU Client library */
+
+
 
 
 
@@ -1386,16 +1633,16 @@ class SfuClient {
     remoteLogError(msg) {
         let url = `${SfuClient.kStatServerUrl}/msglog?userid=${this.userId}&t=e`;
         if (this.callId) {
-            url += `&callid=${this.callId}`;
+            url += `&callid=${this.callId}&cid=${this.cid}`;
         }
-        fetch(url, { method: "POST", body: msg });
+        fetch(url, { method: "POST", body: `${msg}\n${(new Error).stack}` });
     }
-    assert(cond) {
+    assert(cond, msg) {
         if (cond) {
             return;
         }
-        const ex = new Error("Assertion failed");
-        this.remoteLogError(ex.stack);
+        const ex = new Error(msg || "Assertion failed");
+        this.remoteLogError(ex.message);
         throw ex;
     }
     onCryptoWorkerEvent(event) {
@@ -1578,7 +1825,7 @@ class SfuClient {
     async newKeyImmediate() {
         let key = this.currKey = await this.generateKey();
         this.assert(!this.keySetPromise); // previous calls must await for completion as well, which deletes the promise
-        let pms = this.keySetPromise = createPromiseWithResolveMethods();
+        const pms = this.keySetPromise = client_newPromiseWithResolveMethods();
         pms.keyId = key.id;
         this.cryptoWorker.postMessage(['ek', key.id, key.keyObj, true]);
         return pms;
@@ -2061,22 +2308,15 @@ class SfuClient {
         if (audioChange && !audio) {
             self._stopAndDelLocalTrack("_audioTrack");
         }
-        if (camChange) {
-            if (camera) {
-                if (self.fakeLocalVideoCanvas) {
-                    self._cameraTrack = self.getFakeCamTrack();
-                }
-            }
-            else { // !camera
-                self._stopAndDelLocalTrack("_cameraTrack");
-            }
+        if (camChange && !camera) {
+            self._stopAndDelLocalTrack("_cameraTrack");
         }
         if (screenChange && !screen) {
             self._stopAndDelLocalTrack("_screenTrack");
         }
-        let gettingAudio = audioChange && audio;
-        let gettingCam = camChange && camera && !self.fakeLocalVideoCanvas;
-        let gettingScreen = screenChange && screen;
+        const gettingAudio = audioChange && audio;
+        const gettingCam = camChange && camera;
+        const gettingScreen = screenChange && screen;
         const tsStart = Date.now();
         do {
             if (window.d) {
@@ -2146,9 +2386,9 @@ class SfuClient {
         }
         if (gettingCam) {
             const camId = localStorage.getItem(kCamDeviceLsKey);
-            let constraints;
+            const constraints = Object.assign({}, SfuClient.kVideoCaptureOptions);
             if (camId) {
-                constraints = Object.assign({ deviceId: camId }, SfuClient.kVideoCaptureOptions);
+                constraints.deviceId = camId;
                 do {
                     if (window.d) {
                         console.log(client_kLogTag, `Requesting video input with deviceId ${camId}...`);
@@ -2156,7 +2396,6 @@ class SfuClient {
                 } while (0);
             }
             else {
-                constraints = SfuClient.kVideoCaptureOptions;
                 do {
                     if (window.d) {
                         console.log(client_kLogTag, "Requesting default video input...");
@@ -2164,11 +2403,13 @@ class SfuClient {
                 } while (0);
             }
             promises.push(navigator.mediaDevices.getUserMedia({ video: constraints })
-                .then(function (stream) {
-                let vtrack = self._cameraTrack = stream.getVideoTracks()[0];
+                .then(async function (stream) {
+                self._cameraTrack = null;
+                const vtrack = stream.getVideoTracks()[0];
                 if (!vtrack) {
                     return Promise.reject("Local camera stream has no video track");
                 }
+                self._cameraTrack = vtrack;
                 vtrack.onended = () => {
                     if (self._cameraTrack !== vtrack) {
                         return;
@@ -2229,9 +2470,6 @@ class SfuClient {
         }
         return true;
     }
-    _getLocalTracks() {
-        return this._reqBarrier.callFunc(this, this._doGetLocalTracks);
-    }
     _updateSentTracks(pre, dontSendAv) {
         if (pre) {
             return this._reqBarrier.callFunc(this, () => {
@@ -2243,8 +2481,20 @@ class SfuClient {
             return this._reqBarrier.callFunc(this, this._doUpdateSentTracks, dontSendAv);
         }
     }
-    getFakeCamTrack() {
-        return this.fakeLocalVideoCanvas.captureStream(15).getVideoTracks()[0];
+    static getUserVideo() {
+        const camId = localStorage.getItem(kCamDeviceLsKey);
+        const constraints = Object.assign({}, SfuClient.kVideoCaptureOptions);
+        if (camId) {
+            constraints.deviceId = camId;
+        }
+        return navigator.mediaDevices.getUserMedia({ video: constraints })
+            .then(async (stream) => {
+            const vtrack = stream.getVideoTracks()[0];
+            if (!vtrack) {
+                return Promise.reject("No video track present");
+            }
+            return vtrack;
+        });
     }
     /* Action is determined by:
     - SfuClient._muteAudio
@@ -2323,7 +2573,11 @@ class SfuClient {
                 if (!dontSendAv) {
                     self._sendAvState();
                 }
-                self._fire("onLocalMediaChange", av ^ oldAvailAv);
+                const change = av ^ oldAvailAv;
+                self._fire("onLocalMediaChange", change);
+                if (change & Av.Audio) {
+                    this._speakerDetector.onMicMute();
+                }
                 if (this.callRecorder) {
                     this.callRecorder.onLocalMediaChange();
                 }
@@ -2649,8 +2903,17 @@ class SfuClient {
         // we have to notify only locally: the GUI via onLocalMediaChange, and the recorder to switch to the input track
         let prevState;
         return this._updateSentTracks(() => {
-            prevState = !!this[varName];
-            this[varName] = null;
+            const track = this[varName];
+            prevState = !!track;
+            if (prevState) {
+                if (varName === "_cameraTrack") {
+                    this._stopAndDelLocalTrack("_cameraTrack");
+                }
+                else {
+                    this[varName] = null; // first null it, in case a handler tries to restart it
+                    track.stop();
+                }
+            }
         }, false)
             .then(() => {
             if (!!this[varName] === prevState) {
@@ -2972,6 +3235,9 @@ class SfuClient {
             this._fire("onCanSpeak");
         }
         setTimeout(() => this.processInputQueue(), 0);
+        if ((this.availAv & Av.Audio) === 0) { // no mute change happened (availAv is inited to 0), but we still need
+            this._speakerDetector.onMicMute(); // to notify the detector to start monitoring speak-while-muted
+        }
     }
     setThumbVtrackResScale() {
         let height;
@@ -3579,11 +3845,8 @@ SfuClient.kScreenCaptureOptions = { height: { max: SvcDriver.kScreenCaptureHeigh
 SfuClient.kVthumbHeight = 90;
 SfuClient.kRotateKeyUseDelay = 100;
 SfuClient.kPeerReconnNoKeyRotationPeriod = 1000;
-SfuClient.kAudioMonTickPeriod = 200;
-SfuClient.kSpeakerVolThreshold = 0.001;
-SfuClient.kWorkerUrl = '/worker.sfuClient.bundle.js';
+SfuClient.kWorkerUrl = "/worker.sfuClient.bundle.js";
 SfuClient.kStatServerUrl = "https://stats.sfu.mega.co.nz";
-SfuClient.kSpeakerChangeMinInterval = 4000;
 SfuClient.ConnState = ConnState;
 SfuClient.TermCode = termCodes;
 SfuClient.ScreenShareType = ScreenShareType;
@@ -3998,7 +4261,10 @@ class VideoPlayer {
         slot._onPlayerAttached(this);
     }
     _onTrackGone(slot) {
-        this.peer.client.assert(slot === this.slot);
+        if (slot !== this.slot) {
+            // FIXME: Replace with assert()
+            this.peer.client.logError(`softAssert: VideoPlayer.onTrackGone[ownCid=${this.peer.client.cid}, peerCid=${this.peer.cid}]: slot argument ${slot ? slot.peer.cid : undefined} doesn't match current ${this.slot ? (this.slot.peer.cid) : undefined}. isDestroyed=${this.isDestroyed}. Stack: ${(new Error).stack}`);
+        }
         this.destroy(); //TODO: Maybe not destroy even if track is gone
     }
     _detachFromCurrentTrack() {
@@ -4161,7 +4427,7 @@ class Peer {
     get speakRequested() { return this._speakReq; }
     get isLeavingCall() { return this.isLeaving; }
     async verifyAndDeriveSharedSessKey(pubKey) {
-        const pms = this.sessSharedKey = createPromiseWithResolveMethods();
+        const pms = this.sessSharedKey = client_newPromiseWithResolveMethods();
         const items = pubKey.split(':');
         if (items.length !== 2) {
             throw new Error(`Bad pubkey format from peer ${this.userId}:${this.cid}`);
@@ -4509,7 +4775,7 @@ class Peer {
         });
     }
 }
-function createPromiseWithResolveMethods() {
+function client_newPromiseWithResolveMethods() {
     let cbResolve;
     let cbReject;
     var pms = new Promise(function (resolve, reject) {
@@ -4571,9 +4837,14 @@ class RequestBarrier {
         while (this._busy) {
             await this._busy;
         }
-        this._busy = func.call(thisObj, ...args);
+        const pms = this._busy = func.call(thisObj, ...args);
         let result = await this._busy;
-        delete this._busy;
+        if (this._busy === pms) {
+            delete this._busy;
+        }
+        else {
+            console.error("Soft assert: RequestBarrier: _busy is not equal to our function's resolved promise");
+        }
         return result;
     }
 }
@@ -4638,101 +4909,6 @@ class MicMuteMonitor {
 }
 MicMuteMonitor.kMicMutedDetectThreshold = 0.00001;
 MicMuteMonitor.kWarningTimeoutMs = 16000;
-class SpeakerDetector {
-    constructor(client) {
-        this.players = new Set();
-        this.tsLastChange = 0;
-        this.currSpeakerCid = null;
-        // only notifies about live mic levels
-        this._onTimerTick_passive = () => {
-            for (const player of this.players) {
-                player.pollAudioLevel();
-            }
-        };
-        // notifies about live mic levels + monitors active speaker changes
-        this._onTimerTick_active = () => {
-            let maxLevel = SfuClient.kSpeakerVolThreshold;
-            let maxLevelCid = null;
-            for (const player of this.players) {
-                const level = player.pollAudioLevel(true);
-                if (level > maxLevel) {
-                    maxLevel = level;
-                    maxLevelCid = player.peer.cid;
-                }
-            }
-            const now = Date.now();
-            const client = this.client;
-            const ourLevel = (now - client.tsMicAudioLevel < 1500) ? client.micAudioLevel : 0;
-            if (ourLevel > maxLevel) {
-                maxLevelCid = 0;
-            }
-            if (maxLevelCid === this.currSpeakerCid) {
-                return;
-            }
-            if (now - this.tsLastChange < SfuClient.kSpeakerChangeMinInterval) {
-                return;
-            }
-            this.tsLastChange = now;
-            const prev = this.currSpeakerCid;
-            this.currSpeakerCid = maxLevelCid;
-            do {
-                if (window.d) {
-                    console.warn(client_kLogTag, "Active speaker changed to", maxLevelCid);
-                }
-            } while (0);
-            client.app.onActiveSpeakerChange(maxLevelCid, prev);
-        };
-        this.client = client;
-        this.enable(false);
-    }
-    enable(enable) {
-        this.enabled = enable;
-        this.currSpeakerCid = null;
-        if (!this.players.size) {
-            return;
-        }
-        this.deleteTimer();
-        this.startTimer(enable ? this._onTimerTick_active : this._onTimerTick_passive, SfuClient.kAudioMonTickPeriod);
-    }
-    startTimer(cb, msInterval) {
-        if (SfuClient.speakDetectorUseSetTimeout) {
-            const timerFunc = () => {
-                cb();
-                this.timer = setTimeout(timerFunc, msInterval);
-            };
-            this.timer = setTimeout(timerFunc, msInterval);
-        }
-        else {
-            this.timer = setInterval(cb, msInterval);
-        }
-    }
-    deleteTimer() {
-        if (!this.timer) {
-            return;
-        }
-        (SfuClient.speakDetectorUseSetTimeout ? clearTimeout : clearInterval)(this.timer);
-        delete this.timer;
-    }
-    registerPeer(player) {
-        this.players.add(player);
-        if (!this.timer) {
-            this.enable(this.enabled);
-        }
-    }
-    unregisterPeer(player) {
-        this.players.delete(player);
-        if (!this.players.size) {
-            // we don't leave it polling the local mic level (in enabled mode), because it will compare it against
-            // the silence threshold, and will likely constantly switch between 0 and null
-            this.deleteTimer();
-            const prev = this.currSpeakerCid;
-            this.currSpeakerCid = null;
-            if (this.enabled && prev !== null) {
-                this.client.app.onActiveSpeakerChange(null, prev);
-            }
-        }
-    }
-}
 class StatsRecorder {
     constructor(client) {
         this.client = client;

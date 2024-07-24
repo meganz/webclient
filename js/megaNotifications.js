@@ -415,7 +415,8 @@
                 if (!icon || typeof icon !== 'string') {
                     icon = undefined;
                 }
-                else if (icon.includes('<') || !icon.includes('://')) {
+                else if (icon.includes('<') || !icon.includes('://') && !icon.startsWith('data:')) {
+                    // Invalid if it is html, or not one of: URL, blob URL, data URL.
                     console.assert(false, 'Invalid Notification icon', icon);
                     icon = undefined;
                 }

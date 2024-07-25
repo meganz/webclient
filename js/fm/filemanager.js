@@ -4451,7 +4451,9 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     if (id === 'account' || id === 'dashboard' || id === 'conversations'
         || id === 'user-management' || id === 'transfers') {
 
-        mega.ui.mInfoPanel.closeIfOpen();
+        if (mega.ui.mInfoPanel) {
+            mega.ui.mInfoPanel.closeIfOpen();
+        }
 
         // Hide top menus
         if (id === 'account' || id === 'dashboard') {

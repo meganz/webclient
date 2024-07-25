@@ -24,6 +24,7 @@ window.OBV4_FLAGS = {
     CHAT_FEEDBACK_NEW: 'obmcfn',
     CHAT_CALL_UI: 'obmcui',
     CHAT_CALL_RECORDING: 'obmcrec',
+    CHAT_CALL_RAISE: 'obmcrai',
     // New onboarding flags to be added at the end of this object. Don't change the order!!!!
 };
 

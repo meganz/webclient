@@ -24,29 +24,29 @@ export default class FloatingVideo extends MegaRenderMixin {
 
     state = {
         collapsed: false,
-        ratio: undefined
     };
 
-    gcd = (width, height) => {
-        return height === 0 ? width : this.gcd(height, width % height);
-    };
-
-    getRatio = (width, height) => {
-        return `${width / this.gcd(width, height)}:${height / this.gcd(width, height)}`;
-    };
-
-    getRatioClass = () => {
-        const { ratio } = this.state;
-        return ratio ? `ratio-${ratio.replace(':', '-')}` : '';
-    };
+    // Historic adaptive ratio class behaviour
+    // gcd = (width, height) => {
+    //     return height === 0 ? width : this.gcd(height, width % height);
+    // };
+    //
+    // getRatio = (width, height) => {
+    //     return `${width / this.gcd(width, height)}:${height / this.gcd(width, height)}`;
+    // };
+    //
+    // getRatioClass = () => {
+    //     const { ratio } = this.state;
+    //     return ratio ? `ratio-${ratio.replace(':', '-')}` : '';
+    // };
 
     toggleCollapsedMode = () => {
         return this.setState(state => ({ collapsed: !state.collapsed }));
     };
 
     onLoadedData = ev => {
-        const { videoWidth, videoHeight } = ev.target;
-        this.setState({ ratio: this.getRatio(videoWidth, videoHeight) });
+        // const { videoWidth, videoHeight } = ev.target;
+        // this.setState({ ratio: this.getRatio(videoWidth, videoHeight) });
     };
 
     componentWillUnmount() {
@@ -74,7 +74,6 @@ export default class FloatingVideo extends MegaRenderMixin {
 
         const STREAM_PROPS = {
             ...this.props,
-            ratioClass: this.getRatioClass(),
             collapsed: this.state.collapsed,
             toggleCollapsedMode: this.toggleCollapsedMode,
             onLoadedData: this.onLoadedData
@@ -349,7 +348,7 @@ class Stream extends MegaRenderMixin {
     };
 
     renderMiniMode = (source) => {
-        const { call, mode, isPresenterNode, onLoadedData } = this.props;
+        const { call, mode, minimized, isPresenterNode, onLoadedData } = this.props;
 
         if (call.sfuClient.isOnHold()) {
             return this.renderOnHoldVideoNode();
@@ -362,6 +361,7 @@ class Stream extends MegaRenderMixin {
             <VideoClass
                 chatRoom={this.props.chatRoom}
                 mode={mode}
+                minimized={minimized}
                 isPresenterNode={isPresenterNode}
                 onLoadedData={onLoadedData}
                 source={source} // ignored for LocalVideoHiRes
@@ -371,7 +371,7 @@ class Stream extends MegaRenderMixin {
     };
 
     renderSelfView = () => {
-        const { isOnHold, minimized, chatRoom, isPresenterNode, call, onLoadedData } = this.props;
+        const { isOnHold, raisedHandPeers, minimized, chatRoom, isPresenterNode, call, onLoadedData } = this.props;
         const { options } = this.state;
 
         if (isOnHold) {
@@ -383,6 +383,7 @@ class Stream extends MegaRenderMixin {
             <>
                 <VideoNode
                     isSelfOverlay={true}
+                    raisedHandPeers={raisedHandPeers}
                     minimized={minimized}
                     chatRoom={chatRoom}
                     isPresenterNode={isPresenterNode}
@@ -437,7 +438,7 @@ class Stream extends MegaRenderMixin {
 
     render() {
         const { NAMESPACE, POSITION_MODIFIER } = FloatingVideo;
-        const { call, mode, minimized, sidebar, ratioClass, collapsed, toggleCollapsedMode, onCallExpand } = this.props;
+        const { call, mode, minimized, sidebar, collapsed, toggleCollapsedMode, onCallExpand } = this.props;
         const IS_MINI_MODE = mode === MODE.MINI;
         const IS_SELF_VIEW = !IS_MINI_MODE;
 
@@ -465,7 +466,6 @@ class Stream extends MegaRenderMixin {
                 ref={this.containerRef}
                 className={`
                     ${NAMESPACE}
-                    ${source.isStreaming() ? ratioClass : ''}
                     ${IS_MINI_MODE ? 'mini' : ''}
                     ${minimized ? 'minimized' : ''}
                     ${this.state.options ? 'active' : ''}
@@ -502,15 +502,20 @@ class Minimized extends MegaRenderMixin {
 
     SIMPLETIP_PROPS = { position: 'top', offset: 5, className: 'theme-dark-forced' };
     waitingPeersListener = undefined;
+    raisedHandListener = undefined;
 
     state = {
         unread: 0,
-        waitingRoomPeers: []
+        waitingRoomPeers: [],
+        raisedHandPeers: [],
+        hideWrList: false,
+        hideHandsList: false,
     };
 
     constructor(props) {
         super(props);
         this.state.waitingRoomPeers = this.props.waitingRoomPeers || [];
+        this.state.raisedHandPeers = this.props.raisedHandPeers || [];
     }
 
     isActive = type => {
@@ -662,25 +667,70 @@ class Minimized extends MegaRenderMixin {
         );
     };
 
-    renderPeersWaiting = () => {
-        const { waitingRoomPeers } = this.state;
+    renderPeersList = () => {
+        const { onCallExpand, onParticipantsToggle, onWrListToggle } = this.props;
+        const { waitingRoomPeers, raisedHandPeers, hideHandsList, hideWrList } = this.state;
+        if (hideHandsList && hideWrList) {
+            return null;
+        }
+        const showRaised = hideHandsList || !hideWrList && waitingRoomPeers.length ? false : !!raisedHandPeers.length;
+        if (!showRaised && hideWrList) {
+            return null;
+        }
+        const showButton = !showRaised || showRaised && raisedHandPeers.length > 1;
 
         return (
             <div
                 className={`
                     ${FloatingVideo.NAMESPACE}-alert
+                    alert--waiting-peers
                     theme-dark-forced
                 `}
-                onClick={this.props.onCallExpand}>
-                {waitingRoomPeers.length > 1 ?
-                    mega.icu.format(l.wr_peers_waiting, waitingRoomPeers.length) :
-                    <ParsedHTML
-                        tag="span"
-                        content={
-                            l.wr_peer_waiting.replace('%s', megaChat.html(M.getNameByHandle(waitingRoomPeers[0])))
+                onClick={onCallExpand}>
+                <Button
+                    className="close js-close"
+                    icon="sprite-fm-mono icon-dialog-close"
+                    hideWrList={hideWrList}
+                    hideHandsList={hideHandsList}
+                    onClick={ev => {
+                        ev.stopPropagation();
+                        this.setState({
+                            hideHandsList: hideWrList || showRaised,
+                            hideWrList: true,
+                        });
+                    }}
+                />
+                <div className={`alert-label ${showButton ? '' : 'label-only'}`}>
+                    {showRaised && <i className="sprite-fm-uni icon-raise-hand"/>}
+                    {!hideWrList && !!waitingRoomPeers.length &&
+                        mega.icu.format(l.wr_peers_waiting, waitingRoomPeers.length)}
+                    {showRaised && (
+                        raisedHandPeers.length > 1 ?
+                            mega.icu.format(l.raise_peers_raised, raisedHandPeers.length) :
+                            <ParsedHTML
+                                tag="span"
+                                content={
+                                    l.raise_peer_raised
+                                        .replace('%s', megaChat.html(M.getNameByHandle(raisedHandPeers[0])))
+                                }
+                            />
+                    )}
+                </div>
+                {showButton && <Button
+                    className="show-people"
+                    label={showRaised ? l[16797] : l.wr_see_waiting}
+                    onClick={ev => {
+                        ev.stopPropagation();
+                        const promise = onCallExpand().catch(dump);
+                        if (showRaised) {
+                            promise.then(() => onParticipantsToggle(true));
                         }
-                    />
-                }
+                        else if (waitingRoomPeers.length > 1) {
+                            promise.then(() => onWrListToggle(true));
+                        }
+                    }}>
+                    {showRaised ? l[16797] : l.wr_see_waiting}
+                </Button>}
             </div>
         );
     };
@@ -688,23 +738,55 @@ class Minimized extends MegaRenderMixin {
     componentDidMount() {
         super.componentDidMount();
         this.getUnread();
-        this.waitingPeersListener = mBroadcaster.addListener(
-            'meetings:peersWaiting',
-            waitingRoomPeers => this.setState({ waitingRoomPeers }, () => this.safeForceUpdate())
+
+        this.waitingPeersListener =
+            mBroadcaster.addListener(
+                'meetings:peersWaiting',
+                waitingRoomPeers => this.setState({
+                    waitingRoomPeers,
+                    hideWrList: false,
+                    hideHandsList: false
+                }, () => this.safeForceUpdate())
+            );
+
+        // [...] TODO: higher-order component
+        this.raisedHandListener =
+            mBroadcaster.addListener(
+                'meetings:raisedHand',
+                raisedHandPeers => this.setState({
+                    raisedHandPeers,
+                    hideWrList: false,
+                    hideHandsList: false
+                }, () => this.safeForceUpdate())
+            );
+
+        // --
+
+        ['onCallPeerJoined', 'onCallPeerLeft'].map(event =>
+            this.props.chatRoom.rebind(`${event}.${Minimized.NAMESPACE}`, (ev, { userHandle }) =>
+                this.isMounted() &&
+                this.setState(
+                    state => ({
+                        raisedHandPeers: state.raisedHandPeers.includes(userHandle) ?
+                            state.raisedHandPeers.filter(h => h !== userHandle) :
+                            [...this.props.call.sfuClient.raisedHands]
+                    }),
+                    this.safeForceUpdate
+                )
+            )
         );
     }
 
     componentWillUnmount() {
         super.componentWillUnmount();
         this.props.chatRoom.unbind(Minimized.UNREAD_EVENT);
-        if (this.waitingPeersListener) {
-            mBroadcaster.removeListener(this.waitingPeersListener);
-        }
+        [this.waitingPeersListener, this.raisedHandListener].map(listener => mBroadcaster.removeListener(listener));
+        ['onCallPeerJoined', 'onCallPeerLeft'].map(event => this.props.chatRoom.off(`${event}.${Minimized.NAMESPACE}`));
     }
 
     render() {
         const { onCallExpand } = this.props;
-        const { unread, waitingRoomPeers } = this.state;
+        const { unread, raisedHandPeers, waitingRoomPeers } = this.state;
 
         return (
             <>
@@ -712,7 +794,7 @@ class Minimized extends MegaRenderMixin {
                     <Button
                         simpletip={{ ...this.SIMPLETIP_PROPS, label: l.expand_mini_call /* Expand */ }}
                         className="mega-button theme-light-forced action small expand"
-                        icon="sprite-fm-mono icon-call-expand-mode"
+                        icon="sprite-fm-mono icon-fullscreen-enter"
                         onClick={ev => {
                             ev.stopPropagation();
                             onCallExpand();
@@ -720,7 +802,11 @@ class Minimized extends MegaRenderMixin {
                     />
                     {this.renderStreamControls()}
                 </div>
-                {waitingRoomPeers && waitingRoomPeers.length ? this.renderPeersWaiting() : null}
+                {
+                    (waitingRoomPeers && waitingRoomPeers.length || raisedHandPeers && raisedHandPeers.length) ?
+                        this.renderPeersList() :
+                        null
+                }
                 {unread ?
                     <div className={`${FloatingVideo.NAMESPACE}-notifications`}>
                         <Button

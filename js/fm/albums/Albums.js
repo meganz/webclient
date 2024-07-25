@@ -357,10 +357,14 @@ lazy(mega.gallery, 'albums', () => {
 
     /**
      * @param {HTMLElement} el DOM element to apply PerfectScroll to
+     * @param {Boolean} isEmpty Whether the Album list or Album content page is empty or not
      * @returns {void}
      */
-    const applyPs = (el) => {
-        if (el.classList.contains('ps')) {
+    const applyPs = (el, isEmpty = false) => {
+        if (isEmpty) {
+            Ps.destroy(el);
+        }
+        else if (el.classList.contains('ps')) {
             Ps.update(el);
         }
         else {
@@ -3260,6 +3264,10 @@ lazy(mega.gallery, 'albums', () => {
                 }
                 this.header.el.classList.toggle('invisible', isEmpty && !M.v.length);
             }
+
+            delay('render:update_albums_grid', () => {
+                applyPs(this.el, isEmpty);
+            });
         }
 
         refresh() {
@@ -3347,7 +3355,7 @@ lazy(mega.gallery, 'albums', () => {
             this.updateGridState(albumsCount);
 
             delay('render:albums_grid', () => {
-                applyPs(this.el);
+                applyPs(this.el, !albumsCount);
 
                 MegaGallery.addThumbnails(thumbBlocks);
 

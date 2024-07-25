@@ -25,14 +25,14 @@
         .participants-count {
             display: block;
             float: left;
-            width: 15px;
             height: 15px;
-            margin: 3px 0 0 10px;
+            margin: 1px 0 0 10px;
+            padding: 2px 4px;
             border-radius: 4px;
             text-align: center;
             font: var(--text-body2);
             line-height: 16px;
-            background: var(--secondary-blue);
+            background: var(--surface-mid-grey);
             color: var(--secondary-white);
         }
     }

@@ -105,7 +105,8 @@ export default class Stream extends MegaRenderMixin {
         page: 0,
         overlayed: false,
         streamsPerPage: STREAMS_PER_PAGE.MED,
-        floatDetached: false
+        floatDetached: false,
+        wrToggled: false,
     };
 
     /**
@@ -118,6 +119,10 @@ export default class Stream extends MegaRenderMixin {
 
     toggleFloatDetachment = () => {
         this.setState(state => ({ floatDetached: !state.floatDetached }));
+    };
+
+    toggleWaitingRoomList = (state) => {
+        this.setState({ wrToggled: state });
     };
 
     /**
@@ -271,7 +276,7 @@ export default class Stream extends MegaRenderMixin {
             mode,
             peers,
             call,
-            forcedLocal,
+            raisedHandPeers,
             chatRoom,
             onVideoDoubleClick,
             onModeChange,
@@ -309,6 +314,7 @@ export default class Stream extends MegaRenderMixin {
                                 key={`${mode}_thumb_${u_handle}`}
                                 chatRoom={chatRoom}
                                 isPresenterNode={false}
+                                raisedHandPeers={raisedHandPeers}
                                 source={peer}
                                 didMount={ref => {
                                     this.nodeRefs.push({
@@ -332,6 +338,7 @@ export default class Stream extends MegaRenderMixin {
                                 chatRoom={chatRoom}
                                 isPresenterNode={isPresenterNode}
                                 source={isPresenterNode && peer}
+                                raisedHandPeers={raisedHandPeers}
                                 didMount={ref => {
                                     this.nodeRefs.push({ clientId: u_handle, cacheKey: `${mode}_${u_handle}`, ref });
                                     this.scaleNodes(undefined, true);
@@ -352,7 +359,7 @@ export default class Stream extends MegaRenderMixin {
                     if (hasScreenAndCam) {
                         PeerClass = presenterCid ? PeerVideoHiRes : PeerVideoThumbFixed;
                     }
-                    const cacheKey = `${mode}_${clientId}_${i}`;
+                    const cacheKey = `${mode}_${clientId}_${i}_${hasScreenAndCam ? 1 : 0}`;
                     return (
                         <PeerClass
                             key={cacheKey}
@@ -360,6 +367,7 @@ export default class Stream extends MegaRenderMixin {
                             chatRoom={chatRoom}
                             menu={true}
                             source={peer}
+                            raisedHandPeers={raisedHandPeers}
                             isPresenterNode={!!presenterCid}
                             onDoubleClick={(peer, e) => {
                                 e.preventDefault();
@@ -418,7 +426,9 @@ export default class Stream extends MegaRenderMixin {
                                         if (peer instanceof CallManager2.Peer) {
                                             const presenterCid = screen.length && screen[0].clientId === clientId;
                                             // Same as above but mindful of duplicate keys across different pages.
-                                            const cacheKey = `${mode}_${clientId}_${j + i * streamsPerPage}`;
+                                            const cacheKey = `${mode}_${clientId}_${j + i * streamsPerPage}_${
+                                                hasScreenAndCam ? 1 : 0
+                                            }`;
                                             let PeerClass = PeerVideoThumb;
                                             if (hasScreenAndCam) {
                                                 PeerClass = presenterCid ? PeerVideoHiRes : PeerVideoThumbFixed;
@@ -430,6 +440,7 @@ export default class Stream extends MegaRenderMixin {
                                                     source={peer}
                                                     chatRoom={chatRoom}
                                                     isPresenterNode={!!presenterCid}
+                                                    raisedHandPeers={raisedHandPeers}
                                                     onDoubleClick={(peer, e) => {
                                                         e.preventDefault();
                                                         e.stopPropagation();
@@ -493,6 +504,7 @@ export default class Stream extends MegaRenderMixin {
                                             <LocalVideoHiRes
                                                 key={`${mode}_${u_handle}`}
                                                 chatRoom={chatRoom}
+                                                raisedHandPeers={raisedHandPeers}
                                                 isPresenterNode={isPresenterNode}
                                                 source={isPresenterNode && peer}
                                                 didMount={ref => {
@@ -547,6 +559,7 @@ export default class Stream extends MegaRenderMixin {
             <VideoType
                 key={source.clientId}
                 chatRoom={chatRoom}
+                raisedHandPeers={raisedHandPeers}
                 source={source}
                 isPresenterNode={source.hasScreen}
                 toggleFullScreen={() => {               // don't use onSpeakerChange, as it will cause a react update
@@ -768,11 +781,12 @@ export default class Stream extends MegaRenderMixin {
     }
 
     render() {
-        const { overlayed, page, streamsPerPage, floatDetached } = this.state;
+        const { overlayed, page, streamsPerPage, floatDetached, wrToggled } = this.state;
         const {
             mode, call, chatRoom, minimized, peers, sidebar, hovered, forcedLocal, view, isOnHold, waitingRoomPeers,
-            recorder, onRecordingToggle, onCallMinimize, onCallExpand, onModeChange, onAudioClick, onVideoClick,
-            onCallEnd, onScreenSharingClick, onHoldClick, onSpeakerChange, setActiveElement
+            recorder, raisedHandPeers, onRecordingToggle, onCallMinimize, onCallExpand, onModeChange, onAudioClick,
+            onVideoClick, onCallEnd, onScreenSharingClick, onHoldClick, onSpeakerChange, onParticipantsToggle,
+            setActiveElement
         } = this.props;
 
         return (
@@ -788,6 +802,8 @@ export default class Stream extends MegaRenderMixin {
                         chatRoom={chatRoom}
                         call={call}
                         peers={waitingRoomPeers}
+                        expanded={wrToggled}
+                        onWrListToggle={this.toggleWaitingRoomList}
                     /> :
                     null
                 }
@@ -850,6 +866,7 @@ export default class Stream extends MegaRenderMixin {
                     wrapperRef={this.wrapperRef}
                     waitingRoomPeers={waitingRoomPeers}
                     recorder={recorder}
+                    raisedHandPeers={raisedHandPeers}
                     onRecordingToggle={onRecordingToggle}
                     onAudioClick={onAudioClick}
                     onVideoClick={onVideoClick}
@@ -864,6 +881,8 @@ export default class Stream extends MegaRenderMixin {
                     onSpeakerChange={onSpeakerChange}
                     onModeChange={onModeChange}
                     onHoldClick={onHoldClick}
+                    onParticipantsToggle={onParticipantsToggle}
+                    onWrListToggle={this.toggleWaitingRoomList}
                 />
             </div>
         );

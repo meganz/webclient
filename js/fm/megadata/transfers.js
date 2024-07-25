@@ -784,6 +784,10 @@ MegaData.prototype.dlerror = function(dl, error) {
 
                 if (error === EOVERQUOTA) {
                     $tr.find('.transfer-status').addClass('overquota');
+
+                    if (page === 'fm/dashboard') {
+                        delay('obq-update.dashboard', () => dashboardUI());
+                    }
                 }
             }
 

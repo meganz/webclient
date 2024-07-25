@@ -97,7 +97,7 @@
                 border-radius: 4px;
                 width: 24px;
                 height: 24px;
-                margin: 4px 0 0 0;
+                margin: 7px 0 0 0;
 
                 span {
                     position: absolute;
@@ -113,10 +113,24 @@
                 }
             }
 
+            .participant-signifier {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 24px;
+                height: 24px;
+                margin: 6px 0 0 0;
+
+                i {
+                    margin: 1px 0 0;
+                    --icon-size: 24px;
+                }
+            }
+
             .name {
                 overflow: hidden;
-                width: calc(100% - 140px);
-                padding-top: 6px;
+                width: calc(100% - 90px);
+                padding-top: 8px;
                 padding-inline-start: 10px;
 
                 body.rtl & {
@@ -140,12 +154,12 @@
                     }
 
                     &.user-card-presence {
-                      margin: 7px 2px 0 5px;
+                        margin: 7px 2px 0 5px;
                     }
 
                     i {
                         display: block;
-                        margin: 0;
+                        margin: 2px;
                         --icon-size: 18px;
                         --mask-color: var(--icon-rest);
                     }
@@ -165,7 +179,9 @@
             }
 
             .status {
-                margin: 7px 0 0 auto;
+                display: flex;
+                align-items: center;
+                margin: 5px 0 0 auto;
 
                 body.rtl & {
                     float: left;
@@ -177,7 +193,7 @@
                     position: relative;
                     width: 16px;
                     height: 16px;
-                    margin: 1px 0 0;
+                    margin: -2px 0 0;
                     border-radius: 200px;
                     background: var(--secondary-red);
                     animation: fadeInOutLoopSubtle 4s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
@@ -199,12 +215,17 @@
                     position: relative;
                     display: block;
                     float: left;
-                    margin-inline-start: 10px;
+                    margin: -1px 0px 0 16px;
+                    --icon-size: 16px;
+                    --mask-color: var(--icon-inactive);
 
-                    --icon-size: 18px;
-                    --mask-color: var(--secondary-green);
+                    &.speaker-indicator { --mask-color: var(--secondary-green); }
+                    &.inactive { --mask-color: var(--icon-rest); }
+                }
 
-                    &.inactive { --mask-color: var(--secondary-red); }
+                .mic-fill {
+                    bottom: 6px;
+                    max-height: 9px;
                 }
             }
 
@@ -239,7 +260,6 @@
                     i {
                         --icon-size: 24px;
                         --mask-color: var(--icon-rest);
-                        margin: -2px 0 0;
                     }
                 }
 

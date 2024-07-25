@@ -806,6 +806,7 @@ var dlmanager = {
                         || ctx.object.preview === -1
                     )
                     && res.s > minSize
+                    && M.shouldCreateThumbnail(dl.h)
                     && !sessionStorage.gOOMtrap) {
 
                     const image = is_image(attr.n);

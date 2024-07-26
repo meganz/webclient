@@ -251,7 +251,12 @@ lazy(mega, 'rewind', () => {
                 return ACCOUNT_TYPE_BUSINESS;
             }
 
-            if (u_attr.p === pro.ACCOUNT_LEVEL_PRO_LITE) {
+            if ([
+                pro.ACCOUNT_LEVEL_STARTER,
+                pro.ACCOUNT_LEVEL_BASIC,
+                pro.ACCOUNT_LEVEL_ESSENTIAL,
+                pro.ACCOUNT_LEVEL_PRO_LITE
+            ].includes(u_attr.p)) {
                 return ACCOUNT_TYPE_PRO_LITE;
             }
 

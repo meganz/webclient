@@ -1757,25 +1757,13 @@ MegaData.prototype.showTransferToast = function showTransferToast(t_type, t_leng
         // Upload message
         if (t_type === 'u') {
             // Plural message
-            if (t_length > 1) {
-                text.textContent = l[12480].replace('%1', t_length);
-            }
-            // Singular message
-            else {
-                text.textContent = l[7223];
-            }
+            text.textContent = mega.icu.format(l.transfer_toast_added_ul, t_length);
         }
         // Download message
         else {
             icons = ['download'];
             // Plural message
-            if (t_length > 1) {
-                text.textContent = l[12481].replace('%1', t_length);
-            }
-            // Singular message
-            else {
-                text.textContent = l[7222];
-            }
+            text.textContent = mega.icu.format(l.transfer_toast_added_dl, t_length);
         }
 
         // Add (paused) to the message

@@ -394,7 +394,7 @@ pro.proplan = {
         if ($savePercs.length && $saveArrow.length) {
 
             // Set text to "save" block
-            $savePercs.safeHTML(l[16649]);
+            $savePercs.safeHTML(l.save_percent);
             $('span', $savePercs).text(formatPercentage(0.16));
 
             savePercsReposition = function() {

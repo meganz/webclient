@@ -1163,6 +1163,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
 
     l[16649] = escapeHTML(l[16649]).replace('%1', '<span class="amount">10.00</span>');
+    l.save_percent = escapeHTML(l.save_percent).replace('%1', '<span class="amount">10%</span>');
     l[16501] = escapeHTML(l[16501]).replace('[A1]', '<a class="red" href="mailto:support@mega.nz">')
         .replace('[/A1]', '</a>')
         .replace(

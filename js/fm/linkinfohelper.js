@@ -187,6 +187,7 @@ LinkInfoHelper.prototype.retrieve = async function() {
         if (window.is_chatlink && is_chatlink.pnh === this.node_handle) {
             this.info.ncm = is_chatlink.ncm;
             this.info.ct = is_chatlink.ct;
+            this.info.mr = is_chatlink.mr;
             this._promise = Promise.resolve();
             return ready();
         }

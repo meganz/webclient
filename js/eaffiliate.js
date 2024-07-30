@@ -2,7 +2,7 @@ mBroadcaster.once('startMega', () => {
     'use strict';
 
     const provider = 1; // CJ (one for now...)
-    const validPeriod = 86400 * 28; // event ID valid for 28 days (in seconds)
+    const validPeriod = 86400 * 30; // event ID valid for 30 days (in seconds)
 
     const parse = tryCatch((v) => JSON.parse(v));
 

@@ -1796,7 +1796,7 @@ var dlmanager = {
             const $monthlyCard = $pricingBoxTemplate.clone(true).appendTo($pricingBoxTemplate.parent());
             $monthlyCard
                 .removeClass('template')
-                .addClass(`pro${miniPlanId}`)
+                .addClass(`pro${miniPlanId} duration1`)
                 .toggleClass('starter', miniPlanId === pro.ACCOUNT_LEVEL_STARTER)
                 .attr('data-payment', miniPlanId)
                 .attr('data-period', 1);
@@ -1805,7 +1805,7 @@ var dlmanager = {
                 const $yearlyCard = $pricingBoxTemplate.clone(true).appendTo($pricingBoxTemplate.parent());
                 $yearlyCard
                     .removeClass('template')
-                    .addClass(`pro${miniPlanId}`)
+                    .addClass(`pro${miniPlanId} duration12`)
                     .attr('data-payment', miniPlanId)
                     .attr('data-period', 12);
 
@@ -1827,8 +1827,9 @@ var dlmanager = {
         var $pricingBoxes = $('.plan', $dialog);
 
         // Set yearly prices by default if not showing mini plan cards
-        const preSelectedPeriod = lowestPlanIsMini ? 1 : ((sessionStorage.getItem('pro.period') | 0) || 12);
-        pro.proplan.updateEachPriceBlock("D", $pricingBoxes, $dialog, preSelectedPeriod);
+        const preSelectedPeriod = lowestPlanIsMini ? 0 : ((sessionStorage.getItem('pro.period') | 0) || 12);
+        const planType = lowestPlanIsMini ? 'miniPlans' : 'core';
+        pro.proplan.updateEachPriceBlock("D", $pricingBoxes, $dialog, preSelectedPeriod, planType);
     },
 
     setPlanPrices($dialog, showDialogCb) {

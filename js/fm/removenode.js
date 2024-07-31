@@ -80,9 +80,18 @@ function removeUInode(h, parent) {
             // Remove folder and subfolders
             $('#treeli_' + h).remove();
             if (!hasItems) {
-
                 __markEmptied();
-                $('.fm-empty-trashbin').removeClass('hidden');
+
+                // If they have permanently removed all files from the search results screen, show empty search
+                if (M.search) {
+                    $('.fm-search-count').text(mega.icu.format(l.search_results_count, 0));
+                    $('.fm-empty-search').removeClass('hidden');
+                    $('.fm-right-files-block:not(.in-chat) .search-bottom-wrapper').addClass('hidden');
+                }
+                else {
+                    $('.fm-empty-trashbin').removeClass('hidden');
+                }
+
                 $('.fm-clearbin-button').addClass('hidden');
             }
             break;
@@ -160,7 +169,16 @@ function removeUInode(h, parent) {
                         $('.fm-empty-outgoing').removeClass('hidden');
                     }
                     else if (M.currentdirid !== 'public-links' && M.currentdirid !== 'file-requests') {
-                        $('.fm-empty-folder').removeClass('hidden');
+
+                        // If they have removed all files from the search results screen, show empty search
+                        if (M.search) {
+                            $('.fm-search-count').text(mega.icu.format(l.search_results_count, 0));
+                            $('.fm-empty-search').removeClass('hidden');
+                            $('.fm-right-files-block:not(.in-chat) .search-bottom-wrapper').addClass('hidden');
+                        }
+                        else {
+                            $('.fm-empty-folder').removeClass('hidden');
+                        }
                     }
                 }
                 $('.grid-table.fm tbody tr').remove();

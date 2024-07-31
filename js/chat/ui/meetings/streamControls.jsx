@@ -688,7 +688,7 @@ class StreamControls extends MegaRenderMixin {
                                 null
                             }
                         </li>
-                        {!localStorage.raiseHand || chatRoom.type === 'private' ? null : this.renderRaiseButton()}
+                        {chatRoom.type === 'private' ? null : this.renderRaiseButton()}
                         <li onClick={onHoldClick}>
                             <Button
                                 className={`

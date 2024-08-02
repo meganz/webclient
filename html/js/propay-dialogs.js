@@ -1481,6 +1481,14 @@ var addressDialog = {
         this.postCodeMegaInput = new mega.ui.MegaInputs($('.postcode', this.$dialog));
         this.taxCodeMegaInput = new mega.ui.MegaInputs($('.taxcode', this.$dialog));
 
+        this.firstNameMegaInput.$input.rebind('focus.logFnEvent', () => eventlog(500450));
+        this.lastNameMegaInput.$input.rebind('focus.logLnEvent', () => eventlog(500451));
+        this.addressMegaInput.$input.rebind('focus.logAddEvent', () => eventlog(500452));
+        this.address2MegaInput.$input.rebind('focus.logAdd2Event', () => eventlog(500453));
+        this.cityMegaInput.$input.rebind('focus.logCityEvent', () => eventlog(500454));
+        this.postCodeMegaInput.$input.rebind('focus.logPcEvent', () => eventlog(500455));
+        this.taxCodeMegaInput.$input.rebind('focus.logTaxEvent', () => eventlog(500456));
+
         if (!is_mobile) {
             // Keep the ps scrollbar block code after remove the hidden class from the dialog
             // so that it shows the scrollbar initially
@@ -1599,7 +1607,9 @@ var addressDialog = {
         // Initialise the selectmenu
         this.bindPaymentSelectEvents($countriesSelect);
 
-        $countriesSelect.removeClass('disabled').removeAttr('disabled');
+        $countriesSelect
+            .rebind('click.logEvent', () => eventlog(500449))
+            .removeClass('disabled').removeAttr('disabled');
     },
 
     /**
@@ -1741,8 +1751,8 @@ var addressDialog = {
 
         // Add the click handler to redirect off site
         this.$dialog.find('.payment-buy-now').rebind('click', function() {
-
             addressDialog.validateAndPay();
+            eventlog(500458);
         });
     },
 
@@ -1926,6 +1936,9 @@ var addressDialog = {
             else {
                 self.$rememberDetailsCheckbox.addClass('checkboxOn').removeClass('checkboxOff');
             }
+
+            eventlog(500457);
+
             return false;
         });
     },
@@ -1957,6 +1970,8 @@ var addressDialog = {
                     loadSubPage('repay');
                 }
             }
+
+            eventlog(500459);
         });
     },
 

@@ -137,7 +137,8 @@
 .lp-storage-usage {
     position: relative;
 }
-.lp-storage-usage .lp-storage-information-popup {
+.lp-storage-usage .lp-storage-information-popup,
+.lp-storage-usage .lp-storage-limit-popup {
     position: absolute;
     display: none;
     bottom: 120%;
@@ -151,7 +152,17 @@
     text-align: center;
     color: var(--text-color-high-inverted);
 }
-.lp-storage-usage .lp-storage-information-popup::after {
+.lp-storage-usage .lp-storage-limit-popup {
+    width: 205px;
+    max-width: unset;
+    bottom: 150%;
+    left: 93%;
+}
+.rtl .lp-storage-usage .lp-storage-limit-popup {
+    left: 60%;
+}
+.lp-storage-usage .lp-storage-information-popup::after,
+.lp-storage-usage .lp-storage-limit-popup::after {
     content: '';
     position: absolute;
     left: 0;
@@ -164,7 +175,17 @@
     border-left: 15px solid transparent;
     border-right: 15px solid transparent;
 }
-.lp-storage-usage .lp-storage-information-popup.hovered {
+.rtl .lp-storage-usage .lp-storage-limit-popup::after {
+    margin-right: 87%;
+}
+.lp-storage-usage .lp-storage-limit-popup::after {
+    bottom: -7px;
+    border-top: 8px solid var(--surface-grey-1-inverted);
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+}
+.lp-storage-usage .lp-storage-information-popup.hovered,
+.lp-storage-usage .lp-storage-limit-popup.hovered {
     display: flex;
 }
 .lp-storage-usage .storage-usage-panel.hidden {
@@ -172,15 +193,32 @@
 }
 .lp-storage-usage .storage-usage-panel .title-block {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
+    align-items: center;
     margin-bottom: 6px;
+}
+.lp-storage-usage .storage-usage-panel .title-block .text-and-tooltip {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.storage-usage-panel .title-block .text-and-tooltip .storage-limit-icon {
+    width: 16px;
+    height: 18px;
+    margin-inline-start: 4px;
+    -webkit-margin-start: 4px;
+    cursor: pointer;
+    color: var(--icon-rest);
 }
 .lp-storage-usage .storage-usage-panel .title-block .plan-wrapper {
     display: flex;
     align-items: center;
     gap: 4px;
 }
-.lp-storage-usage .storage-usage-panel .title-block .plan {
+.lp-storage-usage .storage-usage-panel .title-block .plan,
+.lp-storage-usage .storage-usage-panel .title-block .storage-txt {
     color: var(--stroke-main-inverted);
     font: var(--text-body2);
     line-height: 18px;
@@ -209,6 +247,10 @@
 .storage-usage-panel .info {
     position: relative;
     font: var(--text-body2);
+}
+.storage-usage-panel .info button.secondary {
+    width: 100%;
+    justify-content: center;
 }
 .storage-usage-panel .loader.loading {
     animation: rotate 2.5s infinite linear;

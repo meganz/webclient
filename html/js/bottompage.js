@@ -134,6 +134,9 @@ var bottompage = {
             $cs.removeClass('hidden').rebind('click.csp', function() {
                 if (!this.classList.contains('top-menu-item')) {
                     csp.trigger().dump('csp.trigger');
+
+                    eventlog(500414);
+
                     return false;
                 }
             });
@@ -361,6 +364,14 @@ var bottompage = {
             subMenuPos();
 
             $(window).rebind('resize.pagesmenu', SoonFc(90, subMenuPos));
+
+            // Log an event if the Platforms or Features submenu is opened
+            if ($this.hasClass('platforms')) {
+                eventlog(500355);
+            }
+            else if ($this.hasClass('features')) {
+                eventlog(500356);
+            }
 
             // Close pages submenu by click outside of submenu
             $content.rebind('mousedown.closepmenu', function(e) {

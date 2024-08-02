@@ -455,6 +455,39 @@ var pro = {
     },
 
     /**
+     * Returns the event ID for the payment method.
+     *
+     * @param {String} gatewayCode The code of the gateway/provider from the API
+     * @returns {Number} the event ID to log clicks against.
+     */
+    getPaymentEventId: (gatewayCode) => {
+        'use strict';
+
+        switch (gatewayCode) {
+            case 'ecpVI': // Visa - ECP
+            case 'stripeVI': // Visa - Stripe
+                return 500359;
+            case 'ecpMC': // Mastercard - ECP
+            case 'stripeMC': // Mastercard - Stripe
+                return 500360;
+            case 'stripeAE': // American Express - Stripe
+                return 500361;
+            case 'stripeJC': // JCB - Stripe
+                return 500362;
+            case 'stripeUP': // China UnionPay - Stripe
+                return 500363;
+            case 'Stripe': // Stripe
+                return 500364;
+            case 'bitcoin': // Bitcoin
+                return 500365;
+            case 'voucher': // Voucher code
+                return 500366;
+            default: // return 500374 if a particular gateway isn't tied to an event ID
+                return 500374;
+        }
+    },
+
+    /**
      * Update the pro page depending on if the user can see the "exclusive offer" tab
      * (mini plans) or not.
      *

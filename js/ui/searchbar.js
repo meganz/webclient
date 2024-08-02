@@ -372,6 +372,7 @@ lazy(mega.ui, 'searchbar', () => {
             const $miniSearch = $('.mini-search', $topbar);
             $miniSearch.addClass('highlighted active');
             setTimeout(() => $('.mini-search input', $topbar).trigger('focus'), 350);
+            eventlog(500321);
         });
 
         $('.mini-search input', $topbar)

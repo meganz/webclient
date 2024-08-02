@@ -1940,6 +1940,7 @@ accountUI.plan = {
                                 $subscriptionBlock.removeClass('hidden');
                                 $cancelSubscriptionButton.rebind('click', function() {
                                     accountUI.plan.accountType.cancelSubscriptionDialog.init();
+                                    eventlog(500416);
                                 });
                             }
                         }
@@ -2191,6 +2192,7 @@ accountUI.plan = {
 
                 this.$continueButton.rebind('click', () => {
                     this.sendSubCancelRequestToApi();
+                    eventlog(500421);
                 });
             },
 
@@ -2241,7 +2243,7 @@ accountUI.plan = {
                         (plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === subscription)
                         && (plan[pro.UTQA_RES_INDEX_MONTHS] === duration));
 
-                    const proPlanName = pro.getProPlanName(subscription);
+                    this.proPlanName = pro.getProPlanName(subscription);
                     const freeStorage = bytesToSize(20 * 1024 * 1024 * 1024, 0);
                     const proStorage = bytesToSize(plan[pro.UTQA_RES_INDEX_STORAGE] * 1073741824, 0);
                     const freeTransfer = l['1149'];
@@ -2253,7 +2255,7 @@ accountUI.plan = {
                     $('.free-storage', $cancelDialog).text(freeStorage);
                     $('.pro-transfer', $cancelDialog).text(proTransfer);
                     $('.free-transfer', $cancelDialog).text(freeTransfer);
-                    $('.plan-name', $cancelDialog).text(proPlanName);
+                    $('.plan-name', $cancelDialog).text(this.proPlanName);
                     $('.rewind-pro', $cancelDialog).text(rewindTxt);
                     $('.rewind-free', $cancelDialog).text(mega.icu.format(l.days_chat_history_plural, 30));
                     $('.meet-participants', $cancelDialog).text(l.pr_meet_up_to_participants.replace('%1', 100));
@@ -2279,17 +2281,20 @@ accountUI.plan = {
                 const $continueBtn = $('.js-continue', $benefitsCancelDialog);
                 const $keepPlanBtn = $('.js-keep-plan', $benefitsCancelDialog);
 
-                const closeBenefits = () => {
+                const closeBenefits = (eventId, planNameInMsg) => {
                     $benefitsCancelDialog.addClass('hidden');
                     $backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+
+                    eventlog(eventId, planNameInMsg ? this.proPlanName : '');
                 };
 
-                $closeBtn.rebind('click', closeBenefits);
-                $keepPlanBtn.rebind('click', closeBenefits);
+                $closeBtn.rebind('click.logEvent', () => closeBenefits(500419, false));
+                $keepPlanBtn.rebind('click.logEvent', () => closeBenefits(500418, true));
 
                 $continueBtn.rebind('click', () => {
                     $benefitsCancelDialog.addClass('hidden');
                     $dialog.removeClass('hidden');
+                    eventlog(500417);
                 });
                 loadingDialog.show();
                 pro.loadMembershipPlans(() => {
@@ -2308,11 +2313,15 @@ accountUI.plan = {
 
                 var self = this;
 
-                // Close main dialog
-                self.$dialog.find('button.dont-cancel, button.js-close').rebind('click', () => {
+                const closeSurvey = (eventId) => {
                     self.$dialog.addClass('hidden');
                     self.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
-                });
+                    eventlog(eventId);
+                };
+
+                // Close main dialog
+                $('button.dont-cancel', self.$dialog).rebind('click.logEvent', () => closeSurvey(500420));
+                $('button.js-close', self.$dialog).rebind('click.logEvent', () => closeSurvey(500422));
             },
 
             /**
@@ -2323,11 +2332,16 @@ accountUI.plan = {
 
                 this.$options.rebind('click', (e) => {
                     const $option = $(e.currentTarget);
+                    const $cancelOption = $('.cancel-option', $option);
                     const value = $('input', $option).val();
                     const valueIsOtherOption = value === "8";
 
+                    if (!$cancelOption.hasClass('radioOn')) {
+                        eventlog(500423);
+                    }
+
                     $('.cancel-option', this.$options).addClass('radioOff').removeClass('radioOn');
-                    $('.cancel-option', $option).addClass('radioOn').removeClass('radioOff');
+                    $cancelOption.addClass('radioOn').removeClass('radioOff');
 
                     this.$selectReasonDialog.addClass('hidden');
                     this.$dialog.removeClass('error-select-reason');
@@ -2360,8 +2374,15 @@ accountUI.plan = {
                 this.$allowContactOptions.rebind('click', (e) => {
 
                     const $option = $(e.currentTarget);
+                    const $contactOption = $('.contact-option', $option);
+
+                    if (!$contactOption.hasClass('radioOn')) {
+                        const eventId = $('input', $option).val() === '1' ? 500424 : 500425;
+                        eventlog(eventId);
+                    }
+
                     $('.contact-option', this.$allowContactOptions).addClass('radioOff').removeClass('radioOn');
-                    $('.contact-option', $option).addClass('radioOn').removeClass('radioOff');
+                    $contactOption.addClass('radioOn').removeClass('radioOff');
 
                     this.$selectCanContactError.addClass('hidden');
                     this.$dialog.removeClass('error-select-contact');
@@ -3184,6 +3205,7 @@ accountUI.security = {
             // Button on main Account page to backup their master key
             $('.fm-account-security .backup-master-key').rebind('click', function() {
                 M.showRecoveryKeyDialog(2);
+                eventlog(500313);
             });
         }
     },

@@ -1597,6 +1597,8 @@ MegaUtils.prototype.createLeftStorageBlockCaption = async function(container, st
     let checked = false;
     const $storageBlock = $(container);
     const $popup = $('.js-lp-storage-information-popup', $storageBlock.parent()).removeClass('hidden');
+    const $storageLimitIcon = $('.storage-limit-icon', $storageBlock);
+    const $storageLimitPopup = $('.lp-storage-limit-popup', $storageBlock);
 
     $storageBlock.rebind('mouseenter.storage-usage', () => {
         if (!checked) {
@@ -1622,12 +1624,35 @@ MegaUtils.prototype.createLeftStorageBlockCaption = async function(container, st
                 });
         }
 
-        delay('storage-information-popup', () => $popup.addClass('hovered'), 1e3);
+        delay('storage-information-popup-mouseenter', () => {
+            if (!$storageLimitIcon.is(':hover')) {
+                $popup.addClass('hovered');
+            }
+        }, 1e3);
     });
 
     $storageBlock.rebind('mouseleave.storage-usage', () => {
-        delay.cancel('storage-information-popup');
+        delay.cancel('storage-information-popup-mouseenter');
+        delay.cancel('storage-information-popup-mouseleave');
         $popup.removeClass('hovered');
+        $storageLimitPopup.removeClass('hovered');
+    });
+
+    $storageLimitIcon.rebind('mouseenter.storage-limit', () => {
+        delay('storage-limit-popup-mouseenter', () => {
+            $storageLimitPopup.addClass('hovered');
+            $popup.removeClass('hovered');
+        }, 1e3);
+    });
+
+    $storageLimitIcon.rebind('mouseleave.storage-limit', () => {
+        delay.cancel('storage-limit-popup-mouseenter');
+        $storageLimitPopup.removeClass('hovered');
+        delay('storage-information-popup-mouseleave', () => {
+            if ($storageBlock.is(':hover')) {
+                $popup.addClass('hovered');
+            }
+        }, 1e3);
     });
 };
 
@@ -1691,16 +1716,54 @@ MegaUtils.prototype.checkLeftStorageBlock = async function(data) {
     // Show only space_used for Business and Pro Flexi accounts
     if (u_attr && (u_attr.b || u_attr.pf)) {
         storageHtml = `<span class="lp-sq-used">${space_used}</span>`;
-        storageBlock.querySelector('.js-storagegraph').classList.add('hidden');
         storageBlock.querySelector('.js-lpbtn[data-link="upgrade"]').classList.add('hidden');
     }
     else {
         storageHtml = l[1607].replace('%1', `<span class="lp-sq-used">${space_used}</span>`)
             .replace('%2', `<span class="lp-sq-max">${space}</span>`);
+        storageBlock.querySelector('.js-storagegraph').classList.remove('hidden');
+        $('.js-storagegraph span', storageBlock).outerWidth(`${percent}%`);
+    }
+
+    const storageIsAlmostFullOrFull = isAlmostFull || isFull;
+
+    // Unhide certain elements if the fmpup (FM / Photos upgrade point) flag is set,
+    // but not for Business or Pro Flexi users as the UI doesn't change for them
+    if (mega.flags.ab_fmpup && !u_attr.b && !u_attr.pf) {
+        const $upgradeBtn = $('.info button.secondary', storageBlock);
+        const $storageLimitIcon = $('.storage-limit-icon', storageBlock);
+
+        const _sendEvent = (eventId) => {
+            // Send eventlog and a message with the tab the user was on
+            // (Drive / Photos) when they clicked the buttons
+            const isDriveTabSelected = M.currentTreeType === 'cloud-drive';
+            const eventMessage = `${isDriveTabSelected ? 'Drive' : 'Photos'} tab selected`;
+
+            eventlog(eventId, eventMessage);
+        };
+
+        $upgradeBtn.removeClass('hidden').rebind('click.sendEvent', () => _sendEvent(500282));
+        storageBlock.querySelector('.text-and-tooltip').classList.remove('hidden');
+
+        if (storageIsAlmostFullOrFull) {
+            $storageLimitIcon.removeClass('hidden').rebind('click.sendEvent', () => {
+                _sendEvent(500283);
+
+                const hcArticleURL = 'https://help.mega.io/plans-storage/space-storage/storage-exceeded';
+                window.open(hcArticleURL, '_blank', 'noopener noreferrer');
+            });
+        }
+        storageBlock.querySelector('.info .storage-txt').classList.add('hidden');
+    }
+    else {
+        if (!u_attr.b && !u_attr.pf) {
+            storageBlock.querySelector('.title-block .js-lpbtn[data-link="upgrade"]')
+                .classList.remove('hidden');
+        }
+        storageBlock.querySelector('.title-block .storage-txt').classList.add('hidden');
     }
 
     $('.storage-txt', storageBlock).safeHTML(storageHtml);
-    $('.js-storagegraph span', storageBlock).outerWidth(`${percent}%`);
 
     if (loaderSpinner) {
         loaderSpinner.remove();

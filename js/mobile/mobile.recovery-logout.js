@@ -190,7 +190,10 @@ mBroadcaster.once('startMega', () => {
             showClose: true,
             icon: 'bell',
             title: l.logout_before,
-            contents: [mobile.recoveryLogout.init()]
+            contents: [mobile.recoveryLogout.init()],
+            onClose: () => {
+                eventlog(500318);
+            }
         });
     };
 

@@ -582,6 +582,8 @@ var notify = {
                 if (dynamicNotifIds.length) {
                     notify.sendNotifSeenEvent(dynamicNotifIds);
                 }
+
+                eventlog(500322);
             }
         });
     },
@@ -779,6 +781,9 @@ var notify = {
         if (this.$popup.closest('.js-dropdown-notification').hasClass('show')) {
             notify.dynamicNotifCountdown.startTimer();
         }
+
+        // Send event whenever a notification is clicked
+        $('a.notification-item', this.$popup).rebind('click.logNotifEvent', () => eventlog(500461));
     },
 
     /**
@@ -796,9 +801,14 @@ var notify = {
             } else {
                 msgDialog('info', '', l[20427]);
             }
+
+            eventlog(500462);
         });
         clickURLs();
-        $('a.clickurl', this.$popup).rebind('click.notif', () => notify.closePopup());
+        $('a.clickurl', this.$popup).rebind('click.notif', () => {
+            eventlog(500462);
+            notify.closePopup();
+        });
     },
 
     /**
@@ -826,6 +836,8 @@ var notify = {
                     M.addSelectedNodes(allDataItems || f && f.map((n) => n.h) || [], true);
                 })
                 .catch(dump);
+
+            eventlog(500463);
         });
     },
 
@@ -852,6 +864,8 @@ var notify = {
                         reselect(true);
                     });
             }
+
+            eventlog(500464);
         });
     },
 
@@ -877,6 +891,8 @@ var notify = {
                     );
                 }
             });
+
+            eventlog(500465);
         });
     },
 
@@ -894,6 +910,8 @@ var notify = {
 
             // Redirect to pro page
             loadSubPage('pro');
+
+            eventlog(500466);
         });
     },
 
@@ -921,6 +939,8 @@ var notify = {
             // Mark all notifications as seen and close the popup
             // (because they clicked on a notification within the popup)
             notify.closePopup();
+
+            eventlog(500467);
         });
     },
 
@@ -948,6 +968,8 @@ var notify = {
                         megaChat.chats[chatId].trigger('openSchedDescDialog');
                     }, 1500);
                 }
+
+                eventlog(500468);
             }
         });
     },

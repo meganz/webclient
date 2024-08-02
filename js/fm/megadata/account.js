@@ -564,6 +564,8 @@ MegaData.prototype.showRecoveryKeyDialog = function(version) {
 
             // Show toast message.
             showToast('recoveryKey', l[8922]);
+
+            eventlog(500314);
         });
 
         // Automatically select all string when key is clicked.

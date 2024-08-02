@@ -187,6 +187,9 @@ pro.propay = {
                 proceed.then(async () => {
                     await pro.propay.loadPaymentGatewayOptions();
                     loadingDialog.hide('propayReady');
+
+                    const propayPageVisitEventId = pro.propay.getPropayPageEventId(pro.propay.planNum);
+                    eventlog(propayPageVisitEventId);
                 }).catch((ex) => {
                     console.error(ex);
                 });
@@ -226,6 +229,36 @@ pro.propay = {
         }
 
         return false;
+    },
+
+    /**
+     * Get the event ID to log for the propay_x page visit
+     * @param {Number} planNum The plan number e.g. 1, 2, 3, 4, 11, 12, 13, 101
+     * @returns {Number} The event ID to log the propay_x page visit against
+     */
+    getPropayPageEventId: (planNum) => {
+        'use strict';
+
+        switch (planNum) {
+            case 1:     // Pro I
+                return 500440;
+            case 2:     // Pro II
+                return 500441;
+            case 3:     // Pro III
+                return 500442;
+            case 4:     // Pro Lite
+                return 500439;
+            case 11:    // Starter
+                return 500436;
+            case 12:    // Basic
+                return 500437;
+            case 13:    // Essential
+                return 500438;
+            case 101:   // Pro Flexi
+                return 500443;
+            default:
+                return null;
+        }
     },
 
     /**
@@ -539,6 +572,9 @@ pro.propay = {
             $selectedOption = $('.payment-duration:not(.template)', $durationList).last();
         }
 
+        const eventId = parseInt(selectedPeriod) === 1 ? 500367 : 500368;
+        eventlog(eventId, pro.propay.planName);
+
         $('input', $selectedOption).prop('checked', true);
         $('.membership-radio', $selectedOption).addClass('checked');
         $('.membership-radio-label', $selectedOption).addClass('checked');
@@ -625,6 +661,14 @@ pro.propay = {
                 return;
             }
             var planIndex = $this.attr('data-plan-index');
+            const planMonths = $this.attr('data-plan-months');
+
+            const $input = $('input', $this);
+
+            if (!$input.prop('checked')) {
+                const eventId = parseInt(planMonths) === 1 ? 500369 : 500370;
+                eventlog(eventId, pro.propay.planName);
+            }
 
             // Remove checked state on the other buttons
             $('.membership-radio', $durationOptions).removeClass('checked');
@@ -634,7 +678,7 @@ pro.propay = {
             // Add checked state to just to the clicked one
             $('.membership-radio', $this).addClass('checked');
             $('.membership-radio-label', $this).addClass('checked');
-            $('input', $this).prop('checked', true);
+            $input.prop('checked', true);
 
             // Update the main price and wording for one-time or recurring
             pro.propay.updateMainPrice(planIndex);
@@ -1154,7 +1198,7 @@ pro.propay = {
             }
 
             // Create a radio button with icon for each payment gateway
-            $gateway.removeClass('template');
+            $gateway.removeClass('template').attr('eventid', pro.getPaymentEventId(gatewayName));
             $('input', $gateway).attr('name', gatewayName);
             $('input', $gateway).attr('id', gatewayName);
             $('input', $gateway).val(gatewayName);
@@ -1205,13 +1249,19 @@ pro.propay = {
                 return false;
             }
 
+            const $input = $('input', $this);
+
+            if (!$input.prop('checked')) {
+                eventlog($this.attr('eventid'), pro.propay.planName);
+            }
+
             // Remove checked state from all radio inputs
             $('.membership-radio', $paymentOptionsList).removeClass('checked');
             $('.provider-details', $paymentOptionsList).removeClass('checked');
             $('input', $paymentOptionsList).prop('checked', false);
 
             // Add checked state for this radio button
-            $('input', $this).prop('checked', true);
+            $input.prop('checked', true);
             $('.membership-radio', $this).addClass('checked');
             $('.provider-details', $this).addClass('checked');
 

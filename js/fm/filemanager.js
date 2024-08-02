@@ -1168,6 +1168,8 @@ FileManager.prototype.initFileManagerUI = function() {
                 }
                 self.fmTabState.dashboard.prev = null;
                 loadSubPage('fm/dashboard');
+
+                eventlog(500445);
             }
             else {
                 loadSubPage('fm/account');
@@ -1217,9 +1219,19 @@ FileManager.prototype.initFileManagerUI = function() {
 
                 M.openFolder(targetFolder, true);
 
-                if (tab.root === 'chat') {
+                if (tab.root === M.RootID) {
+                    eventlog(500446);
+                }
+                else if (tab.root === 'photos') {
+                    eventlog(500447);
+                }
+                else if (tab.root === 'chat') {
                     delay('chat-event-gen-nav', () => eventlog(500294));
                 }
+                else if (tab.root === 'devices') {
+                    eventlog(500448);
+                }
+
                 break;
             }
         }

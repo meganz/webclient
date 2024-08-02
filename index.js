@@ -1070,6 +1070,8 @@ function init_page() {
         document.body.classList.add('business');
         var regBusiness = new BusinessRegister();
         regBusiness.initPage();
+
+        eventlog(500444);
     }
     else if (!is_mobile && page === 'fm/account/history') {
         $.scrollIntoSection = '.session-history';
@@ -1953,7 +1955,9 @@ function topbarUI(holderId) {
     }
 
     $('.js-topbaravatar, .js-activity-status', topbar).rebind('click', function() {
-        const $wrap = $(this).closest('.js-dropdown-account');
+        const $clickedItem = $(this);
+
+        const $wrap = $clickedItem.closest('.js-dropdown-account');
         const $btn = $('.downloadmega', $wrap).parent();
         if (!$btn.hasClass('sync-checked')) {
             megasync.isInstalled((err, is) => {
@@ -1995,6 +1999,11 @@ function topbarUI(holderId) {
             else {
                 accountEmail.classList.remove('simpletip');
             }
+
+            // Only send event on avatar click
+            if ($clickedItem.hasClass('js-topbaravatar')) {
+                eventlog(500323);
+            }
         }
     });
 
@@ -2002,12 +2011,15 @@ function topbarUI(holderId) {
 
         if (this.classList.contains('settings')) {
             loadSubPage('fm/account');
+            eventlog(500325);
         }
         else if (this.classList.contains('achievements')) {
             mega.achievem.achievementsListDialog();
+            eventlog(500326);
         }
         else if (this.classList.contains('logout')) {
             mLogout();
+            eventlog(500329);
         }
         else if (this.classList.contains('feedback')) {
             mega.config.set('rvonbrddl', 1);
@@ -2016,6 +2028,7 @@ function topbarUI(holderId) {
                 '_blank',
                 'noopener,noreferrer'
             );
+            eventlog(500328);
         }
         var dropdown = document.getElementsByClassName('js-dropdown-account');
 
@@ -2581,6 +2594,7 @@ function topmenuUI() {
 
     $headerDownloadMega.rebind('click.downloadmega', function() {
         mega.redirect('mega.io', 'desktop', false, false, false);
+        eventlog(500327);
     });
 
     // try individual button in business mode
@@ -2607,11 +2621,13 @@ function topmenuUI() {
         }
     });
 
-    $('.js-more-menu, .top-icon.menu', '.fmholder').rebind('click.openmenu', function() {
+    $('.js-more-menu', '.fmholder').rebind('click.openmenu', () => {
         if ($.liTooltipTimer) {
             clearTimeout($.liTooltipTimer);
         }
         topMenu();
+
+        eventlog(500324);
     });
 
     $('.close', $topMenu).rebind('click.closemenu', function() {
@@ -2717,6 +2733,7 @@ function topmenuUI() {
                 }
                 else if (!is_mobile && subpage === 'keybackup') {
                     M.showRecoveryKeyDialog(2);
+                    eventlog(500312);
                 }
                 else if (subpage === 'cookie' && mega.flags.ab_adse) {
                     window.open(`${getBaseUrl()}/cookie`, '_blank', 'noopener,noreferrer');
@@ -2834,6 +2851,7 @@ function topmenuUI() {
     $('.logo, .logo-full', '.top-head, .fm-main, .bar-table').rebind('click', () => {
         if (typeof loadingInitDialog === 'undefined' || !loadingInitDialog.active) {
             loadSubPage(u_type ? 'fm' : 'start');
+            eventlog(500353);
         }
     });
 

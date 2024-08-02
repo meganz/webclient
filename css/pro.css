@@ -2057,6 +2057,19 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
 .dialog-input-title-ontop:not(.birth).active input::placeholder{
    opacity: 0;
 }
+.payment-success-cloak {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: white;
+    z-index: 201;
+}
+.payment-success-cloak i {
+    --icon-size: 86px;
+    color: var(--secondary-green);
+}
 
 /* Retina images */
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {

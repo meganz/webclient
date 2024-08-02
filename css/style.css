@@ -2144,7 +2144,8 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .astropay-payment-reminder .plan-icon.pro3 i.pro3,
 .astropay-payment-reminder .plan-icon.pro4 i.pro4,      /* Pro Lite */
 .astropay-payment-reminder .plan-icon.pro101 i.pro101,  /* Pro Flexi */
-.astropay-payment-reminder .plan-icon.business i.business {
+.astropay-payment-reminder .plan-icon.business i.business,
+.astropay-payment-reminder .plan-icon.feature i.feature {
     display: block;
 }
 .warning-icon.sprite-fm-illustration.img-dialog-business-expiry {
@@ -12186,6 +12187,10 @@ body.megaChatDisabled .nw-fm-left-icon.conversations {
 
 .mega-gap-12 > *:not(:last-child) {
     margin-bottom: 12px;
+}
+a.pr-faded-link {
+    text-decoration: underline;
+    color: var(--color-copy-secondary);
 }
 
 /* End utility classes */

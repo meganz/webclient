@@ -26,6 +26,12 @@ var pro = {
     UTQA_RES_INDEX_LOCALPRICECURRENCY: 9,
     UTQA_RES_INDEX_LOCALPRICECURRENCYSAVE: 10,
     UTQA_RES_INDEX_ITEMNUM: 11,
+    //
+    //
+    // These slots are used by flexi, documentation needed for correct naming
+    //
+    //
+    UTQA_RES_INDEX_EXTRAS: 16,
 
     /* Constants for special Pro levels */
     ACCOUNT_LEVEL_STARTER: 11,
@@ -37,6 +43,12 @@ var pro = {
     ACCOUNT_LEVEL_PRO_III: 3,
     ACCOUNT_LEVEL_PRO_FLEXI: 101,
     ACCOUNT_LEVEL_BUSINESS: 100,
+
+    /* Account levels for features. If new combinations are added, please make the order in the name alphabetical */
+    ACCOUNT_LEVEL_FEATURE: 99999,
+    ACCOUNT_LEVEL_FEATURE_VPN: 100000,  // VPN
+    ACCOUNT_LEVEL_FEATURE_PWM: 100001,  // Password Manager
+    ACCOUNT_LEVEL_FEATURE_P_V: 100002,  // Combination of VPN and Password Manager
 
     /* Account statuses for Business and Pro Flexi accounts */
     ACCOUNT_STATUS_EXPIRED: -1,
@@ -74,7 +86,7 @@ var pro = {
         }
         else {
             // Get the membership plans.
-            const payload = {a: 'utqa', nf: 2, p: 1};
+            const payload = {a: 'utqa', nf: 2, p: 1, ft: 1};
 
             await api.req({a: 'uq', pro: 1, gc: 1})
                 .then(({result: {balance}}) => {
@@ -117,6 +129,15 @@ var pro = {
                             discount = lmbps[results[i].mbp] * results[i].m - results[i].lp;
                         }
 
+                        results[i].f = results[i].f || false;
+                        if (results[i].al === pro.ACCOUNT_LEVEL_FEATURE) {
+                            if (!results[i].f) {
+                                console.error('Feature level plan without features given from API', results[i]);
+                                continue;
+                            }
+                            results[i].al += pro.getStandaloneBits(results[i].f);
+                        }
+
                         // If this is Pro Flexi, the data is structured similarly to business, so set that manually
                         if (results[i].al === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
                             plans.push([
@@ -135,7 +156,10 @@ var pro = {
                                 results[i].bd.sto.p / 100,  // extra storage rate
                                 results[i].bd.sto.lp / 100, // extra storage local rate
                                 results[i].bd.trns.p / 100,  // extra transfer rate
-                                results[i].bd.trns.lp / 100  // extra transfer local rate
+                                results[i].bd.trns.lp / 100,    // extra transfer local rate
+                                {                       // Extra information about the plan from API, such as features
+                                    f: results[i].f,    // Features object, or false if none
+                                },
                             ]);
                         }
                         else {
@@ -152,7 +176,14 @@ var pro = {
                                 (allowLocal && results[i].lp / 100),    // local price
                                 (allowLocal && results[0].l.lc),        // local price currency
                                 (allowLocal && discount / 100),         // local price save
-                                results[i].it           // item (will be 0 for user)
+                                results[i].it,          // item (will be 0 for user)
+                                undefined,              // Slot used by flexi only
+                                undefined,              // Slot used by flexi only
+                                undefined,              // Slot used by flexi only
+                                undefined,              // Slot used by flexi only
+                                {                       // Extra information about the plan from API, such as features
+                                    f: results[i].f,    // Features object, or false if none
+                                },
                             ]);
                         }
                         pro.planObjects.createPlanObject(plans[plans.length - 1]);
@@ -318,6 +349,8 @@ var pro = {
                 return l[19530];                // Business
             case 101:
                 return l.pro_flexi_name;        // Pro Flexi
+            case pro.ACCOUNT_LEVEL_FEATURE_VPN: // 100000
+                return l.mega_vpn;              // VPN
             default:
                 return l[1150];                 // Free
         }
@@ -824,7 +857,24 @@ var pro = {
             return false;
         }
         return filterSet.has(pro.getPlanLevel(plan));
-    }
+    },
+
+    /**
+     * Takes an object and returns the number representation of the bitfield of the features. Unique per feature set
+     * @param {Object} features - The object containing the features
+     * @returns {number} - The standalone bits
+     */
+    getStandaloneBits(features) {
+        'use strict';
+        if (!features || typeof features !== 'object') {
+            console.assert(!d, `Invalid features object given to getStandaloneBits: ${features}`);
+            return 0;
+        }
+        const featureNames = Object.keys(features);
+        return featureNames.reduce((featureBits, feature) => {
+            return featureBits | pro.bfStandalone[feature.toUpperCase()];
+        }, 0);
+    },
 };
 
 /**
@@ -851,6 +901,10 @@ lazy(pro, 'filter', () => {
                     pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II,
                     pro.ACCOUNT_LEVEL_PRO_III, pro.ACCOUNT_LEVEL_PRO_FLEXI
                 ]),
+
+            validFeatures: new Set([
+                pro.ACCOUNT_LEVEL_FEATURE_VPN
+            ]),
 
             // all: 11, 12, 13, 4, 1, 2, 3, 101, 100 - all currently available plans
             // Excludes any plans that the webclient is not yet ready to support.
@@ -996,4 +1050,11 @@ lazy(pro, 'filter', () => {
     }
 
     return Object.setPrototypeOf(pf, null);
+});
+
+/** @property pro.bfStandalone */
+lazy(pro, 'bfStandalone', () => {
+    'use strict';
+    // do not change the order, add new entries at the tail.
+    return freeze(makeEnum(['VPN', 'PWM']));
 });

@@ -7589,7 +7589,8 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
 .mobile.payment-address-dialog .plan-icon.pro3 i.pro3,
 .mobile.payment-address-dialog .plan-icon.pro4 i.pro4,
 .mobile.payment-address-dialog .plan-icon.pro101 i.pro101,
-.mobile.payment-address-dialog .plan-icon.business i.business {
+.mobile.payment-address-dialog .plan-icon.business i.business,
+.mobile.payment-address-dialog .plan-icon.feature i.feature {
     display: block;
 }
 
@@ -9834,7 +9835,8 @@ code, c {
 .voucher-info-redeem .plan-icon.pro3 i.pro3,
 .voucher-info-redeem .plan-icon.pro4 i.pro4,
 .voucher-info-redeem .plan-icon.pro101 i.pro101,
-.voucher-info-redeem .plan-icon.business i.business {
+.voucher-info-redeem .plan-icon.business i.business,
+.voucher-info-redeem .plan-icon.feature i.feature {
     display: inline-block;
 }
 .voucher-logo .v-separator {

@@ -2196,6 +2196,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/vendor/megaLogger.js', n: 'megaLogger_js', j:1});
     jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
     jsl.push({f:'js/jquery-ui.extra.js', n: 'jquery_ui_extra_js', j:1});
+    jsl.push({f:'js/vendor/twemoji.noutf.js', n: 'twemoji_js', j:1});
 
     jsl.push({f:'js/utils/broadcast.js', n: 'js_utils_broadcast_js', j: 1});
     jsl.push({f:'js/utils/polyfills.js', n: 'js_utils_polyfills_js', j: 1});
@@ -2370,6 +2371,9 @@ else if (!browserUpdate) {
     jsl.push({f:'html/js/propay-dialogs.js', n: 'propay_js', j:1});
     jsl.push({f:'js/states-countries.js', n: 'states_countries_js', j:1});
 
+    // Plan pages for features
+    jsl.push({f:'html/js/planpricing/vpn-pricing.js', n: 'vpn_pricing_js', j:1});
+
     jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
     jsl.push({f:'js/fm/achievements.js', n: 'achievements_js', j:1, w:5});
     jsl.push({f:'js/fm/fileversioning.js', n: 'fm_fileversioning_js', j:1});
@@ -2423,6 +2427,7 @@ else if (!browserUpdate) {
     jsl.push({f:'css/video-player.css', n: 'video_player_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/animations.css', n: 'animations_css', j:2, w:30, c:1, d:1, cache:1});
+    jsl.push({f:'css/ui/mcomponents.css', n: 'm_components_css', j:2,w:5,c:1,d:1,cache:1});
 
     // Megalist
     jsl.push({f:'js/vendor/megalist.js', n: 'megalist_js', j:1, w:5});
@@ -2436,7 +2441,6 @@ else if (!browserUpdate) {
         jsl.push({f:'css/components.css', n: 'components_css', j:2, w:30, c:1, d:1, cache:1});
 
         // MComponents
-        jsl.push({f:'css/ui/mcomponents.css', n: 'm_components_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'js/ui/mcomponents/classes/MComponent.js', n: 'm_component_js', j:1});
         jsl.push({f:'js/ui/mcomponents/classes/MButton.js', n: 'm_button_js', j:1});
         jsl.push({f:'js/ui/mcomponents/classes/MCheckbox.js', n: 'm_checkbox_js', j:1});
@@ -2471,6 +2475,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
         jsl.push({f:'js/ui/sms.js', n: 'sms_js', j: 1, w: 1});
         jsl.push({f:'js/fm/account.js', n: 'fm_account_js', j:1});
+        jsl.push({f:'js/fm/account-plan.js', n: 'fm_account_plan_js', j:1});
         jsl.push({f:'js/fm/account-change-password.js', n: 'fm_account_change_password_js', j:1});
         jsl.push({f:'js/fm/account-change-email.js', n: 'fm_account_change_email_js', j:1});
         jsl.push({f:'js/fm/dialogs.js', n: 'fm_dialogs_js', j:1});
@@ -2749,6 +2754,8 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.appbanner.js', n: 'mobile_app_banner_js', j: 1, w: 1});
         jsl.push({f:'js/chat/strongvelope.js', n: 'strongvelope_js', j: 1, w: 3});
         jsl.push({f:'js/mobile/mobile.promo.banner.js', n: 'mobile_promo_banner_js', j: 1, w:1});
+
+        jsl.push({f:'js/ui/mcomponents/classes/MDialogMobile.js', n: 'mobile_m_dialog_mobile_js', j:1});
     }
 
     jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
@@ -2951,7 +2958,6 @@ else if (!browserUpdate) {
             'reactdom_js': {f:'js/vendor/react-dom.js', n: 'reactdom_js', j:1},
             'keepalive_js': {f:'js/keepAlive.js', n: 'keepalive_js', j:1},
             'meganotifications_js': {f:'js/megaNotifications.js', n: 'meganotifications_js', j:1},
-            'twemoji_js': {f:'js/vendor/twemoji.noutf.js', n: 'twemoji_js', j:1},
             'ionsound_js': {f:'js/vendor/ion.sound.js', n: 'ionsound_js', j:1},
             'favico_js': {f:'js/vendor/favico.js', n: 'favico_js', j:1},
             'autolinker_js': {f:'js/vendor/autolinker.js', n: 'autolinker_js', j:1},

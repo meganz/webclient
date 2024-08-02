@@ -616,7 +616,14 @@ var voucherDialog = {
         var newTransfer = pro.propay.selectedProPackage[3] * Math.pow(1024, 3);
 
         // Update template
-        this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4').addClass('pro' + proNum);
+        const $planIcon = this.$dialog.find('.plan-icon');
+        $planIcon.removeClass('pro1 pro2 pro3 pro4 feature').addClass('pro' + proNum);
+
+        if (proNum === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
+            $planIcon.addClass('feature');
+            $('i.feature', $planIcon).attr('class', 'feature sprite-fm-uni icon-crest-vpn');
+        }
+
         this.$dialog.find('.voucher-plan-title').text(proPlan);
         this.$dialog.find('.voucher-plan-txt .duration').text(monthsWording);
         this.$dialog.find('.voucher-plan-price .price').text(formatCurrency(proPrice));
@@ -1462,8 +1469,20 @@ var addressDialog = {
 
 
         // Update template
-        this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4 pro101 business no-icon')
-            .addClass(hasIcon ? proNum : 'no-icon');
+        const $planIcon = this.$dialog.find('.plan-icon');
+        $planIcon.removeClass('pro1 pro2 pro3 pro4 pro101 business feature');
+
+        if (this.proNum === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
+            $planIcon.addClass('feature');
+            $('i.feature', $planIcon).attr('class', 'feature sprite-fm-uni icon-crest-vpn');
+        }
+        else if (hasIcon) {
+            $planIcon.addClass(proNum);
+        }
+        else {
+            $planIcon.addClass('no-icon');
+        }
+
         this.$dialog.find('.payment-plan-title').text(proPlan);
         this.$dialog.find('.payment-plan-txt .duration').text(monthsWording);
         this.proPrice = formatCurrency(proPrice);
@@ -2153,6 +2172,44 @@ var addressDialog = {
         window.location = url + '?lang=' + lang;
     },
 
+    /**
+     * Showing the infinite cloak after the payment has been made
+     * @param {String} titleTxt Success title
+     * @param {String} msgTxt Success text
+     * @param {String} btnTxt Success button text
+     * @param {Function} callback Success callback
+     * @returns {void}
+     */
+    showSuccessCloak(titleTxt, msgTxt, btnTxt, callback) {
+        'use strict';
+
+        const div = document.createElement('div');
+        const icon = document.createElement('i');
+        const title = document.createElement('p');
+        const text = document.createElement('p');
+
+        title.className = 'font-h3-bold my-4';
+        text.className = 'mb-10 mt-0';
+        div.className = 'payment-success-cloak flex flex-column justify-center items-center';
+        icon.className = 'sprite-fm-mono icon-check-circle-thin-outline';
+        title.textContent = titleTxt;
+        text.textContent = msgTxt;
+
+        div.appendChild(icon);
+        div.appendChild(title);
+        div.appendChild(text);
+
+        const button = new MButton(
+            btnTxt,
+            null,
+            callback,
+            'mega-button large positive'
+        );
+
+        div.appendChild(button.el);
+        document.body.appendChild(div);
+    },
+
     stripePaymentChecker: function(saleId) {
         'use strict';
         addressDialog.stripeCheckerCounter++;
@@ -2174,25 +2231,41 @@ var addressDialog = {
                 if (typeof result === 'string') {
                     // success
                     const $stripeDialog = $('.payment-stripe-dialog');
-                    const $stripeSuccessDialog = $('.payment-stripe-success-dialog');
                     const $stripeIframe = $('iframe#stripe-widget', $stripeDialog);
 
-                    // If this is newly created business account, it then requires verification
-                    if (addressDialog.userInfo && !addressDialog.userInfo.isUpgrade) {
-                        $('.success-desc', $stripeSuccessDialog).safeHTML(l[25081]);
-                        $('button.js-close, .btn-close-dialog', $stripeSuccessDialog).addClass('hidden');
+                    if (parseInt(pro.propay.planNum) === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
+                        this.showSuccessCloak(
+                            l[6961],
+                            l.vpn_purchase_success_txt.replace('%1', u_attr.email || ''),
+                            l.vpn_goto,
+                            () => {
+                                mega.redirect('mega.io', 'vpn#downloadapps', false, false);
+                            }
+                        );
+
+                        pro.propay.hideLoadingOverlay();
                     }
                     else {
-                        $('button.js-close, .btn-close-dialog', $stripeSuccessDialog)
-                            .removeClass('hidden')
-                            .rebind('click.stripeDlg', closeDialog);
+                        const $stripeSuccessDialog = $('.payment-stripe-success-dialog');
 
-                        delay('reload:stripe', pro.redirectToSite, 4000);
+                        // If this is newly created business account, it then requires verification
+                        if (addressDialog.userInfo && !addressDialog.userInfo.isUpgrade) {
+                            $('.success-desc', $stripeSuccessDialog).safeHTML(l[25081]);
+                            $('button.js-close, .btn-close-dialog', $stripeSuccessDialog).addClass('hidden');
+                        }
+                        else {
+                            $('button.js-close, .btn-close-dialog', $stripeSuccessDialog)
+                                .removeClass('hidden')
+                                .rebind('click.stripeDlg', closeDialog);
+
+                            delay('reload:stripe', pro.redirectToSite, 4000);
+                        }
+
+                        M.safeShowDialog('stripe-pay-success', $stripeSuccessDialog);
                     }
 
                     $stripeIframe.remove();
                     $stripeDialog.addClass('hidden');
-                    M.safeShowDialog('stripe-pay-success', $stripeSuccessDialog);
                 }
 
             })

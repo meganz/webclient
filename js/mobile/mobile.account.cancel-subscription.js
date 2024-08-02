@@ -269,7 +269,13 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
                 componentClassname: 'block primary'
             });
             cancelSubBtn.on('tap', () => {
-                this.sendSubCancelRequestToApi();
+                const subscription = Array.isArray(account.plans)
+                    && account.plans[0].subid
+                    && Array.isArray(account.subs)
+                    && account.subs.find(({ id }) => id === account.plans[0].subid)
+                    || null;
+
+                this.sendSubCancelRequestToApi(subscription && subscription.id || null);
             });
 
             const dontCancelBtn = new MegaMobileButton({
@@ -291,10 +297,11 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
      * The r request value is sent in the format '<reason-number> - <reason>' if the 'Other'
      * option isn't chosen. If it is, then r will be the textarea input.
      *
+     * @param {String} [subscriptionId] The ID of the subscription to cancel
      * @returns {undefined}
      */
     sendSubCancelRequestToApi: {
-        value: function() {
+        value(subscriptionId) {
             'use strict';
 
             let reason = this.otherReasonTextArea.$input.val();
@@ -320,9 +327,12 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
             }
 
             // Setup standard request to 'cccs' = Credit Card Cancel Subscriptions
-            const requests = [
-                { a: 'cccs', r: reason }
-            ];
+            const ccReq = { a: 'cccs', r: reason };
+            const requests = [ccReq];
+
+            if (subscriptionId) {
+                ccReq.sub = subscriptionId;
+            }
 
             // If they were Pro Flexi, we need to also downgrade the user from Pro Flexi to Free
             if (u_attr && u_attr.pf) {

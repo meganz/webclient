@@ -385,8 +385,10 @@ pro.propay = {
                 return 500438;
             case 101:   // Pro Flexi
                 return 500443;
-            default:
-                return null;
+            case 100000: // VPN
+                return 500472;
+            default:    // Other plan
+                return 500473;
         }
     },
 

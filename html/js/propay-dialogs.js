@@ -1323,7 +1323,9 @@ var addressDialog = {
     showDialog: function() {
 
         // Cache DOM reference for lookup in other functions
-        this.$dialog = $('.payment-address-dialog');
+        const dialogParent = is_mobile ? '#startholder' : 'section.mega-dialog-container';
+        this.$dialog = $('.payment-address-dialog', dialogParent);
+
         this.$backgroundOverlay = $('.fm-dialog-overlay');
         this.$propayPage = $('.payment-section', '.fmholder');
 

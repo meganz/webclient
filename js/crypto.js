@@ -1238,9 +1238,13 @@ async function api_setshare(node, targets, sharenodes) {
     };
 
     for (let i = req.s.length; i--;) {
+        if (req.s[i].rsk) {
+            delete req.s[i].rsk;
+            newkey = -1;
+        }
         if (typeof req.s[i].r !== 'undefined') {
             if (mega.keyMgr.secure) {
-                newkey = mega.keyMgr.hasNewShareKey(node);
+                newkey = newkey || mega.keyMgr.hasNewShareKey(node);
 
                 // dummy key/handleauth - FIXME: remove
                 req.ok = a32_to_base64([0, 0, 0, 0]);

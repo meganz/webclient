@@ -2621,13 +2621,15 @@ function topmenuUI() {
         }
     });
 
-    $('.js-more-menu', '.fmholder').rebind('click.openmenu', () => {
+    $('.js-more-menu, .top-icon.menu', '.fmholder').rebind('click.openmenu', () => {
         if ($.liTooltipTimer) {
             clearTimeout($.liTooltipTimer);
         }
         topMenu();
 
-        eventlog(500324);
+        if (!is_mobile) {
+            eventlog(500324);
+        }
     });
 
     $('.close', $topMenu).rebind('click.closemenu', function() {

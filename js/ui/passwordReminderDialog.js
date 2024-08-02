@@ -235,6 +235,9 @@
 
         $(this.getCloseButton()).rebind(is_mobile ? 'tap.prd' : 'click.prd', () => {
             self.dismiss();
+            if (!is_mobile) {
+                eventlog(500318);
+            }
             return false;
         });
 
@@ -250,12 +253,12 @@
             undefined,
             function(newState) {
                 if (newState === true) {
-                    eventlog(500024);
                     self.passwordReminderAttribute.dontShowAgain = 1;
                 }
                 else {
                     self.passwordReminderAttribute.dontShowAgain = 0;
                 }
+                eventlog(500024, newState ? 'checked' : 'unchecked');
             },
             self.passwordReminderAttribute.dontShowAgain === 1
         );
@@ -335,7 +338,9 @@
 
     PasswordReminderDialog.prototype.completeOnConfirmClicked = function(derivedEncryptionKeyArray32) {
 
-        if (checkMyPassword(derivedEncryptionKeyArray32)) {
+        const correctPassword = checkMyPassword(derivedEncryptionKeyArray32);
+
+        if (correctPassword) {
             if (this.dialog) {
                 this.dialog.classList.add('accepted');
             }
@@ -370,6 +375,8 @@
                 this.exportButton.classList.add('red-button');
             }
         }
+
+        eventlog(correctPassword ? 500319 : 500320);
     };
 
     PasswordReminderDialog.prototype.onSkipClicked = function(element, evt) {
@@ -628,6 +635,7 @@
             }
             $(this).removeAttr('readonly');
             $(this).attr('autocomplete', 'section-off' + rand_range(1, 123244) + ' off disabled nope no none');
+            eventlog(500317);
         });
         this.passwordField.classList.remove('hidden');
         this.passwordField.value = "";

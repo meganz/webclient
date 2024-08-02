@@ -14,10 +14,16 @@ function init_backup() {
         $(this).select();
     });
 
-    $('.backup-download-button').rebind('click', u_savekey);
+    $('.backup-download-button').rebind('click', () => {
+        u_savekey();
+        eventlog(500315);
+    });
 
     if (is_extension || M.execCommandUsable()) {
-        $('.backup-input-button').rebind('click', u_exportkey);
+        $('.backup-input-button').rebind('click', () => {
+            u_exportkey();
+            eventlog(500316);
+        });
     }
     else {
         // hide copy to clipboard otherwise

@@ -19,12 +19,12 @@ lazy(pro, 'proplan2', () => {
     let $totalFlexPriceCurr;
 
     let ProFlexiFound = false;
+    let VpnPlanFound = false;
 
-    const getCurrentTab = () => {
-        return window.mProTab === 'exc'
-            ? 'pr-exc-offer-tab'
-            : sessionStorage['pro.pricingTab'] || 'pr-individual-tab';
-    };
+    const getCurrentTab = () => window.mProTab === 'exc' && 'pr-exc-offer-tab'
+        || window.mProTab === 'vpn' && 'pr-vpn-tab'
+        || sessionStorage['pro.pricingTab']
+        || 'pr-individual-tab';
 
     let currentTab = getCurrentTab();
 
@@ -56,6 +56,39 @@ lazy(pro, 'proplan2', () => {
         );
     };
 
+    /**
+     * Checks whether account has got a feature enabled
+     * @param {String} featureKey The name of the feature to check
+     * @returns {Array<String|Number>|Boolean}
+     */
+    const getUserFeature = (featureKey) => !!u_attr
+        && Array.isArray(u_attr.features)
+        && u_attr.features.find(([, f]) => f === featureKey)
+        || false;
+
+    const moveToBuyStep = (planId) => {
+        pro.proplan2.selectedPlan = planId;
+
+        if (!u_handle) {
+            showSignupPromptDialog();
+            return false;
+        }
+        // If they're ephemeral but awaiting email confirmation,
+        // let them continue to choose a plan and pay
+        else if (isEphemeral() && !localStorage.awaitingConfirmationAccount) {
+            showRegisterDialog();
+            return false;
+        }
+
+        // If they clicked the plan immediately after completing registration,
+        // set the flag so it can be logged
+        if (localStorage.keycomplete) {
+            pro.propay.planChosenAfterRegistration = true;
+        }
+
+        loadSubPage('propay_' + planId);
+    };
+
     const initTabHandlers = () => {
 
         const $tableContainer = $('.pricing-pg.pricing-plans-compare-table-container', $page);
@@ -74,6 +107,7 @@ lazy(pro, 'proplan2', () => {
         const $footerBtn = $('#tryMega', $footerBanner);
 
         const $excPlansNotPeriod = $('.exclusive-plans-container:not(.pick-period-container)', $page);
+        const $excPlansPeriod = $('.exclusive-plans-container.pick-period-container', $page);
 
         const setFooterBannerTxt = (title, subTitle, btnTxt) => {
             $footerTitle.text(title);
@@ -85,54 +119,47 @@ lazy(pro, 'proplan2', () => {
             $tabs.removeClass('selected');
             target.classList.add('selected');
 
-            let isIndividual = target.id === 'pr-individual-tab';
-            const isBusinessTab = target.id === 'pr-business-tab';
-            let isExcOfferTab = target.id === 'pr-exc-offer-tab';
+            // 0 - Indidivual, 1 - Business, 2 - Exclusive Offers, 3 - VPN
+            let tab = 0;
 
-            if (!showExclusiveOffers && isExcOfferTab) {
-                isExcOfferTab = false;
-                isIndividual = true;
+            if (target.id === 'pr-business-tab') {
+                tab = 1; // Bus
+            }
+            else if (target.id === 'pr-exc-offer-tab' && showExclusiveOffers) {
+                tab = 2; // Exc or Ind
+            }
+            else if (target.id === 'pr-vpn-tab') {
+                tab = 3; // VPN
             }
 
-            if (showExclusiveOffers) {
-                updateFeaturesTable(isExcOfferTab);
-            }
+            updateFeaturesTable(tab === 2);
 
-            $proPlans.addClass('hidden');
-            $businessPlans.addClass('hidden');
-            $exclusivePlans.addClass('hidden');
-            $page.removeClass('business individual exc-offer');
+            $proPlans.toggleClass('hidden', !!tab);
+            $businessPlans.toggleClass('hidden', tab !== 1);
+            $excPlansNotPeriod.toggleClass('hidden', tab !== 2);
+            $excPlansPeriod.toggleClass('hidden', tab !== 2
+                || !(pro.filter.plans.excPlansM.length === pro.filter.plans.excPlansY.length));
 
-            if ($businessPlans && isBusinessTab) {
-                $businessPlans.removeClass('hidden');
-                $page.addClass('business');
-            }
-            else if (isExcOfferTab) {
-                if (pro.filter.plans.excPlansM.length === pro.filter.plans.excPlansY.length) {
-                    $exclusivePlans.removeClass('hidden');
-                }
-                else {
-                    $excPlansNotPeriod.removeClass('hidden');
-                }
-                $page.addClass('exc-offer');
+            if (tab === 3 && VpnPlanFound) {
+                pro.proplan2.vpn.renderPricingPage(VpnPlanFound, $page, moveToBuyStep);
+                $('.pricing-pg.pricing-vpn-plan-container', $page).removeClass('hidden');
             }
             else {
-                $proPlans.removeClass('hidden');
-                $page.addClass('individual');
+                $('.pricing-pg.pricing-vpn-plan-container', $page).addClass('hidden');
             }
 
-            $('.pricing-pg.pricing-estimation-note-container', $page).toggleClass('business', isBusinessTab);
+            $('.pricing-pg.pricing-estimation-note-container', $page).toggleClass('business', tab === 1);
 
             $freeBanner.toggleClass(
                 'hidden',
-                !isIndividual || (typeof u_handle !== 'undefined' && !localStorage.keycomplete)
+                !!tab || (typeof u_handle !== 'undefined' && !localStorage.keycomplete)
             );
 
-            if (isIndividual) {
-                setFooterBannerTxt(l.pr_get_started_now, '', l.pr_try_mega);
+            if (tab === 1) {
+                setFooterBannerTxt(l.pr_business_started, l.pr_easily_add, l[24549]);
             }
             else {
-                setFooterBannerTxt(l.pr_business_started, l.pr_easily_add, l[24549]);
+                setFooterBannerTxt(l.pr_get_started_now, '', l.pr_try_mega);
             }
         };
 
@@ -142,14 +169,22 @@ lazy(pro, 'proplan2', () => {
             currentTab = this.id;
             sessionStorage['pro.pricingTab'] = this.id;
 
-            if (this.id === 'pr-individual-tab') {
-                delay('pricing.plan', eventlog.bind(null, is_mobile ? 99863 : 99862));
-            }
-            else if (this.id === 'pr-business-tab') {
-                delay('pricing.business', eventlog.bind(null, is_mobile ? 99865 : 99864));
-            }
-            else {
-                delay('pricing.exc-offer', eventlog.bind(null, is_mobile ? 500248 : 500247));
+            switch (this.id) {
+                case 'pr-individual-tab':
+                    delay('pricing.plan', eventlog.bind(null, is_mobile ? 99863 : 99862));
+                    break;
+                case 'pr-business-tab':
+                    delay('pricing.business', eventlog.bind(null, is_mobile ? 99865 : 99864));
+                    break;
+                case 'pr-vpn-tab':
+                    delay('pricing.vpn', eventlog.bind(null, is_mobile ? 500160 : 500161));
+                    break;
+                case 'pr-exc-offer-tab':
+                    delay('pricing.exc-offer', eventlog.bind(null, is_mobile ? 500248 : 500247));
+                    break;
+                default:
+                    delay('pricing.default', eventlog.bind(null, is_mobile ? 500256 : 500255));
+                    break;
             }
         });
 
@@ -179,6 +214,8 @@ lazy(pro, 'proplan2', () => {
             currentTab = 'pr-individual-tab';
         }
         changeIndividualTeamTab($(`#${currentTab}`, $page)[0]);
+
+        eventlog(500337, currentTab);
 
         // Update the savedTab so that it will be set correctly when visited via /pro?tab=XXX
         sessionStorage['pro.pricingTab'] = currentTab;
@@ -230,29 +267,6 @@ lazy(pro, 'proplan2', () => {
 
         // Set 1 hour for the maximum duration of a free tier meeting.
         $('#meet-up-to-duration', $tableContainer).text(mega.icu.format(l.pr_meet_up_to_duration, 1));
-    };
-
-    const moveToBuyStep = (planId) => {
-        pro.proplan2.selectedPlan = planId;
-
-        if (!u_handle) {
-            showSignupPromptDialog();
-            return false;
-        }
-        // If they're ephemeral but awaiting email confirmation,
-        // let them continue to choose a plan and pay
-        else if (isEphemeral() && !localStorage.awaitingConfirmationAccount) {
-            showRegisterDialog();
-            return false;
-        }
-
-        // If they clicked the plan immediately after completing registration,
-        // set the flag so it can be logged
-        if (localStorage.keycomplete) {
-            pro.propay.planChosenAfterRegistration = true;
-        }
-
-        loadSubPage('propay_' + planId);
     };
 
     const initBuyPlan = ($givenPlans) => {
@@ -482,30 +496,38 @@ lazy(pro, 'proplan2', () => {
         sliderEventHandler($flexStorageSlider[0]);
         sliderEventHandler($flexTransSlider[0]);
 
+        const _sliderMovedEventCb = (eventId) => {
+            eventlog(eventId, true);
+        };
 
         $usersBusinessSlider.rebind('input.pricing', function() {
             sliderEventHandler(this, symmetricRanges, $usersBusinessInput);
             estimateBussPrice($usersBusinessInput.val(), $strgBusinessInput.val(), $trsBusinessInput.val());
+            _sliderMovedEventCb(500335);
         });
 
         $strgBusinessSlider.rebind('input.pricing', function() {
             sliderEventHandler(this, asymmetricRanges, $strgBusinessInput);
             estimateBussPrice($usersBusinessInput.val(), $strgBusinessInput.val(), $trsBusinessInput.val());
+            _sliderMovedEventCb(500333);
         });
 
         $trsBusinessSlider.rebind('input.pricing', function() {
             sliderEventHandler(this, asymmetricRanges, $trsBusinessInput);
             estimateBussPrice($usersBusinessInput.val(), $strgBusinessInput.val(), $trsBusinessInput.val());
+            _sliderMovedEventCb(500334);
         });
 
         $flexStorageSlider.rebind('input.pricing', function() {
             sliderEventHandler(this, asymmetricRanges, $strgFlexInput);
             estimateFlexiPrice($strgFlexInput.val(), $transFlexInput.val());
+            _sliderMovedEventCb(500343);
         });
 
         $flexTransSlider.rebind('input.pricing', function() {
             sliderEventHandler(this, asymmetricRanges, $transFlexInput);
             estimateFlexiPrice($strgFlexInput.val(), $transFlexInput.val());
+            _sliderMovedEventCb(500344);
         });
 
         const fromValueToRange = (ranges, val) => {
@@ -575,6 +597,12 @@ lazy(pro, 'proplan2', () => {
             estimateFlexiPrice($strgFlexInput.val(), $transFlexInput.val());
         });
 
+        $usersBusinessInput.rebind('focus.pricing', () => eventlog(500332));
+        $strgBusinessInput.rebind('focus.pricing', () => eventlog(500330));
+        $trsBusinessInput.rebind('focus.pricing', () => eventlog(500331));
+        $strgFlexInput.rebind('focus.pricing', () => eventlog(500341));
+        $transFlexInput.rebind('focus.pricing', () => eventlog(500342));
+
         estimateFlexiPrice($strgFlexInput.val(), $transFlexInput.val());
 
     };
@@ -643,27 +671,33 @@ lazy(pro, 'proplan2', () => {
         const faqQuestions = {
             'faq1': {
                 question: l.pricing_page_faq_question_1,
-                answer: [l.pricing_page_faq_answer_1]
+                answer: [l.pricing_page_faq_answer_1],
+                eventId: 500345,
             },
             'faq2': {
                 question: l.pricing_page_faq_question_2,
-                answer: [l.pricing_page_faq_answer_2]
+                answer: [l.pricing_page_faq_answer_2],
+                eventId: 500347,
             },
             'faq3': {
                 question: l.pricing_page_faq_question_3,
-                answer: [l.pricing_page_faq_answer_3]
+                answer: [l.pricing_page_faq_answer_3],
+                eventId: 500348,
             },
             'faq4': {
                 question: l.pricing_page_faq_question_4,
-                answer: [l.pricing_page_faq_answer_4, l.pricing_page_faq_answer_4_2]
+                answer: [l.pricing_page_faq_answer_4, l.pricing_page_faq_answer_4_2],
+                eventId: 500350,
             },
             'faq5': {
                 question: l.pricing_page_faq_question_5,
-                answer: [l.pricing_page_faq_answer_5]
+                answer: [l.pricing_page_faq_answer_5],
+                eventId: 500351,
             },
             'faq6': {
                 question: l.pricing_page_faq_question_6,
-                answer: [l.pricing_page_faq_answer_6, l.pricing_page_faq_answer_6_2]
+                answer: [l.pricing_page_faq_answer_6, l.pricing_page_faq_answer_6_2],
+                eventId: 500352,
             },
         };
 
@@ -674,7 +708,14 @@ lazy(pro, 'proplan2', () => {
             $('.faq-question', $faqItem).text(faqQuestions[faq].question);
             for (let i = 0; i < faqQuestions[faq].answer.length; i++) {
                 const $answerPart = $answerPartTemplate.clone().safeHTML(faqQuestions[faq].answer[i]);
-                $('.faq-item-answer', $faqItem).safeAppend($answerPart.prop('outerHTML'));
+                const isFirstFaq = faq === 'faq1';
+
+                $('.faq-item-answer', $faqItem)
+                    .safeAppend($answerPart.prop('outerHTML'))
+                    .toggleClass('hidden', !isFirstFaq);
+                $('.faq-item-title i', $faqItem)
+                    .toggleClass('minus-icon', isFirstFaq)
+                    .toggleClass('grey-medium-plus small-icon', !isFirstFaq);
             }
 
             $faqContent.safeAppend($faqItem.prop('outerHTML'));
@@ -686,9 +727,11 @@ lazy(pro, 'proplan2', () => {
                 }
                 $('.faq-item-answer', $qaRebind).toggleClass('hidden');
                 $('.faq-item-title i', $qaRebind).toggleClass(['minus-icon', 'grey-medium-plus', 'small-icon']);
+
+                const visibility = $('.faq-item-answer', $qaRebind).hasClass('hidden') ? 'hidden' : 'shown';
+                eventlog(faqQuestions[faq].eventId, `${faq} ${visibility}`);
             });
         }
-        $('.faq1 .faq-question', $faqContent).click();
     };
 
     const initCompare = () => {
@@ -776,6 +819,7 @@ lazy(pro, 'proplan2', () => {
 
         $buyBtn.rebind('click.pricing', () => {
             moveToBuyStep(planNum);
+            eventlog(500340);
         });
 
     };
@@ -804,6 +848,11 @@ lazy(pro, 'proplan2', () => {
             // ProFlexiFound is used to see if we should show pro flexi
             if (planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
                 ProFlexiFound = currentPlan;
+                continue;
+            }
+
+            if (planNum === pro.ACCOUNT_LEVEL_FEATURE_VPN && currentPlan[pro.UTQA_RES_INDEX_MONTHS] === 1) {
+                VpnPlanFound = currentPlan;
                 continue;
             }
 
@@ -887,6 +936,7 @@ lazy(pro, 'proplan2', () => {
             $('#try-flexi', $planCards).rebind('click.pricing', () => {
                 // behavior not supported in Safari.
                 $proflexiBlock[0].scrollIntoView({ behavior: "smooth" });
+                eventlog(500338);
             });
 
             initProFlexi();
@@ -1211,6 +1261,34 @@ lazy(pro, 'proplan2', () => {
         initBuyPlan();
     };
 
+    /**
+     * Check if the user scrolls down to a certain point on the page and log an event if so
+     */
+    const initScrollObserver = tryCatch(() => {
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 1
+        };
+
+        // Check if the user is scrolling down or up
+        let previousY = 0;
+
+        const _onObserve = (observable) => {
+            const { isIntersecting, boundingClientRect } = observable[0];
+
+            if (isIntersecting && previousY >= boundingClientRect.y) {
+                eventlog(500336);
+            }
+            previousY = boundingClientRect.y;
+        };
+
+        const proScrollObserver = new IntersectionObserver(
+            (observables) => _onObserve(observables),
+            observerOptions
+        );
+        proScrollObserver.observe($('.pricing-plans-compare-table-show', $page)[0]);
+    });
 
     return new class {
 
@@ -1274,6 +1352,7 @@ lazy(pro, 'proplan2', () => {
             initSocial();
             initFaq();
             initCompare();
+            initScrollObserver();
 
             // Check the user is allowed to see the low tier version of the pro page
             // (i.e. if the lowest plan returned is a mini plan)
@@ -1299,6 +1378,10 @@ lazy(pro, 'proplan2', () => {
 
                 showRegisterDialog();
             }
+        }
+
+        getUserFeature(feature) {
+            return getUserFeature(feature);
         }
 
         initLowTierPlanFeatureCells() {
@@ -1463,8 +1546,11 @@ lazy(pro, 'proplan2', () => {
             }
 
             $('.ars', $exclusivePlans).toggleClass('hidden', !planObj.hasLocal);
-            $('.pricing-pg.pricing-estimation-note-container-exc', $page)
-                .toggleClass('hidden eu', !planObj.hasLocal);
+
+            const $note = $('.pricing-pg.pricing-estimation-note-container-exc', $page);
+
+            $note.toggleClass('eu', !planObj.hasLocal);
+            $note.toggleClass('hidden', !planObj.hasLocal || !$('#pr-exc-offer-tab', $page).hasClass('selected'));
         }
 
         updateExcOffers() {

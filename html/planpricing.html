@@ -18,6 +18,9 @@
                     <div id ="pr-individual-tab" class="tabs-module-block selected">
                         <div class="tabs-block-title">[$pr_pro_plans_tab]</div>
                     </div>
+                    <div id ="pr-vpn-tab" class="tabs-module-block">
+                        <div class="tabs-block-title">[$mega_vpn]</div>
+                    </div>
                     <div id ="pr-business-tab" class="tabs-module-block" data-should-log="true">
                         <div class="tabs-block-title">[$19530]</div>
                     </div>
@@ -51,6 +54,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="pricing-pg pick-period-container exclusive-plans-container hidden" data-tabname="exclusive">
                 <div class="pricing-pg pick-period-module">
                     <!-- No need for native radio buttons, the challenges in design out-weights the benefits-->
@@ -86,6 +90,21 @@
                         <div class="pricing-plan-price-unit"></div>
                         <div class="pricing-plan-storage"></div>
                         <div class="pricing-plan-trasfer"></div>
+                        <div class="pricing-plan-features">
+                            <div class="features-title">[$pr_includes]</div>
+                            <div class="vpn">
+                                <i class="sprite-fm-mono icon-shield-thin-outline"></i>
+                                <span>[$mega_vpn]</span>
+                            </div>
+                            <div class="meeting-limits">
+                                <i class="sprite-fm-mono icon-video-thin-outline"></i>
+                                <span>[$pr_no_meet_time_limits]</span>
+                            </div>
+                            <div class="meeting-participants">
+                                <i class="sprite-fm-mono icon-users-thin-outline"></i>
+                                <span>[$pr_unlimited_participants]</span>
+                            </div>
+                        </div>
                         <div class="pricing-plan-btn-container">
                             <div class="pricing-plan-btn"></div>
                         </div>
@@ -98,6 +117,21 @@
                         <div class="pricing-plan-price-unit"></div>
                         <div class="pricing-plan-storage"></div>
                         <div class="pricing-plan-trasfer"></div>
+                        <div class="pricing-plan-features">
+                            <div class="features-title">[$pr_includes]</div>
+                            <div class="vpn">
+                                <i class="sprite-fm-mono icon-shield-thin-outline"></i>
+                                <span>[$mega_vpn]</span>
+                            </div>
+                            <div class="meeting-limits">
+                                <i class="sprite-fm-mono icon-video-thin-outline"></i>
+                                <span>[$pr_no_meet_time_limits]</span>
+                            </div>
+                            <div class="meeting-participants">
+                                <i class="sprite-fm-mono icon-users-thin-outline"></i>
+                                <span>[$pr_unlimited_participants]</span>
+                            </div>
+                        </div>
                         <div class="pricing-plan-btn-container">
                             <div class="pricing-plan-btn"></div>
                         </div>
@@ -110,6 +144,21 @@
                         <div class="pricing-plan-price-unit"></div>
                         <div class="pricing-plan-storage"></div>
                         <div class="pricing-plan-trasfer"></div>
+                        <div class="pricing-plan-features">
+                            <div class="features-title">[$pr_includes]</div>
+                            <div class="vpn">
+                                <i class="sprite-fm-mono icon-shield-thin-outline"></i>
+                                <span>[$mega_vpn]</span>
+                            </div>
+                            <div class="meeting-limits">
+                                <i class="sprite-fm-mono icon-video-thin-outline"></i>
+                                <span>[$pr_no_meet_time_limits]</span>
+                            </div>
+                            <div class="meeting-participants">
+                                <i class="sprite-fm-mono icon-users-thin-outline"></i>
+                                <span>[$pr_unlimited_participants]</span>
+                            </div>
+                        </div>
                         <div class="pricing-plan-btn-container">
                             <div class="pricing-plan-btn"></div>
                         </div>
@@ -122,9 +171,23 @@
                         <div class="pricing-plan-price-unit"></div>
                         <div class="pricing-plan-storage"></div>
                         <div class="pricing-plan-trasfer">
-                            <div class="pricing-plan-trasfer-val">
+                            <div class="pricing-plan-trasfer-val"></div>
+                        </div>
+                        <div class="pricing-plan-features">
+                            <div class="features-title">[$pr_includes]</div>
+                            <div class="vpn">
+                                <i class="sprite-fm-mono icon-shield-thin-outline"></i>
+                                <span>[$mega_vpn]</span>
                             </div>
-                            <div class="pricing-plan-more hidden">[$pr_more] <span id="try-flexi">[$pr_try_flexi]</span></div>
+                            <div class="meeting-limits">
+                                <i class="sprite-fm-mono icon-video-thin-outline"></i>
+                                <span>[$pr_no_meet_time_limits]</span>
+                            </div>
+                            <div class="meeting-participants">
+                                <i class="sprite-fm-mono icon-users-thin-outline"></i>
+                                <span>[$pr_unlimited_participants]</span>
+                            </div>
+                            <div class="pricing-plan-more hidden">[$pr_more]&nbsp;<span id="try-flexi">[$pr_try_flexi]</span></div>
                         </div>
                         <div class="pricing-plan-btn-container">
                             <div class="pricing-plan-btn"></div>
@@ -134,6 +197,9 @@
             </div>
             <!-- <div class="pricing-pg pro-plans-cards-container exclusive-plans-container"> -->
                 <!-- <div class="pricing-pg plans-cards-container"> -->
+
+            <!-- VPN info is being populated dynamically -->
+            <div class="pricing-pg pricing-vpn-plan-container pb-16 hidden"></div>
 
             <div class="pricing-pg exclusive-plans-container">
                 <div class="pricing-pg plans-cards-container">
@@ -227,6 +293,17 @@
                                         <div class="business-base"></div>
                                     </div>
                                     <div class="pricing-plan-trasfer"></div>
+                                    <div class="pricing-plan-features">
+                                        <div class="features-title">[$pr_includes]</div>
+                                        <div class="meeting-limits">
+                                            <i class="sprite-fm-mono icon-video-thin-outline"></i>
+                                            <span>[$pr_no_meet_time_limits]</span>
+                                        </div>
+                                        <div class="meeting-participants">
+                                            <i class="sprite-fm-mono icon-users-thin-outline"></i>
+                                            <span>[$pr_unlimited_participants]</span>
+                                        </div>
+                                    </div>
                                     <div class="pricing-plan-btn-container">
                                         <div class="pricing-plan-btn" id="buyBusiness">[$buy_business]</div>
                                     </div>
@@ -698,7 +775,22 @@
                                     <div class="pricing-plan-storage"></div>
                                     <div class="pricing-plan-trasfer">
                                         <div class="ex-desc"></div>
-                                        <a class="learn-more-flexi" rel="noreferrer" target="_blank" href="[$mega_help_host]/plans-storage/space-storage/pay-as-you-go">[$pr_flexi_learn_more]</a>
+                                        <a class="learn-more-flexi clickurl" rel="noreferrer" target="_blank" href="[$mega_help_host]/plans-storage/space-storage/pay-as-you-go" data-eventid="500339">[$pr_flexi_learn_more]</a>
+                                    </div>
+                                    <div class="pricing-plan-features">
+                                        <div class="features-title">[$pr_includes]</div>
+                                        <div class="vpn">
+                                            <i class="sprite-fm-mono icon-shield-thin-outline"></i>
+                                            <span>[$mega_vpn]</span>
+                                        </div>
+                                        <div class="meeting-limits">
+                                            <i class="sprite-fm-mono icon-video-thin-outline"></i>
+                                            <span>[$pr_no_meet_time_limits]</span>
+                                        </div>
+                                        <div class="meeting-participants">
+                                            <i class="sprite-fm-mono icon-users-thin-outline"></i>
+                                            <span>[$pr_unlimited_participants]</span>
+                                        </div>
                                     </div>
                                     <div class="pricing-plan-btn-container">
                                         <div class="pricing-plan-btn"></div>

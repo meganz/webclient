@@ -1,14 +1,27 @@
 class MDialog extends MComponent {
     /**
      * @param {Object.<String, any>} data An enclosing data object
-     * @param {Boolean|{label: String, callback: Function?, classes: String}} data.ok
-     * @param {Boolean|{label: String, callback: Function?, classes: String}} data.cancel
+     * @param {Boolean|Function|{label: String, callback: Function?, classes: String}} data.ok OK dialog data
+     * @param {Boolean|Function|{label: String, callback: Function?, classes: String}} data.cancel Cancel dialog data
      * @param {String} [data.dialogClasses] Additional classes for dialog
+     * @param {String} [data.titleClasses] Additional classes for dialog
      * @param {String} [data.contentClasses] Additional classes for dialog content
-     * @param {String} [data.leftIcon] Classes for the side icon on the left
-     * @param {Function} [onclose] Callback to trigger when the dialog is closed
+     * @param {String} [data.icon] Classes for the side icon on the left
+     * @param {Function} [data.onclose] Callback to trigger when the dialog is closed
+     * @param {Boolean} [data.dialogName] Unique name for the dialog
+     * @param {Function} [data.setContent] Default content function
      */
-    constructor({ ok, cancel, dialogClasses, contentClasses, leftIcon, onclose, doNotShowCheckboxText, dialogName }) {
+    constructor({
+        ok,
+        cancel,
+        dialogClasses,
+        contentClasses,
+        icon,
+        onclose,
+        dialogName,
+        setContent,
+        titleClasses
+    }) {
         super('section.mega-dialog-container:not(.common-container)', false);
 
         this._ok = ok;
@@ -16,20 +29,21 @@ class MDialog extends MComponent {
         this._contentClasses = contentClasses;
 
         this._title = document.createElement('h3');
-        this._title.className = 'text-ellipsis';
+        this._title.className = `text-ellipsis ${titleClasses || ''}`;
 
         this.onclose = onclose;
-
-        this._doNotShowCheckboxText = doNotShowCheckboxText;
-
         this._dialogName = dialogName || 'm-dialog';
 
-        if (leftIcon) {
-            this.leftIcon = document.createElement('i');
-            this.leftIcon.className = 'icon-left ' + leftIcon;
+        if (icon) {
+            this.icon = document.createElement('i');
+            this.icon.className = `icon-left ${icon}`;
         }
 
         this.appendCss(dialogClasses);
+
+        if (setContent) {
+            setContent.call(this);
+        }
     }
 
     get slot() {
@@ -57,9 +71,11 @@ class MDialog extends MComponent {
     /**
      * @param {Function(any):boolean} getFn
      * @param {Function(any):void} setFn
+     * @param {String} [doNotShowCheckboxText]
      * @returns {void}
      */
-    addConfirmationCheckbox(getFn, setFn) {
+    addConfirmationCheckbox(getFn, setFn, doNotShowCheckboxText) {
+        this._doNotShowCheckboxText = doNotShowCheckboxText || l[229];
         this._doNotShowGetFn = getFn;
         this._doNotShowSetFn = setFn;
     }
@@ -78,12 +94,18 @@ class MDialog extends MComponent {
         this.el.className = 'mega-dialog m-dialog dialog-template-main';
     }
 
-    triggerCancelAction() {
-        if (typeof this._cancel === 'function') {
-            this._cancel();
-        }
-        else if (this._cancel.callback) {
-            this._cancel.callback();
+    /**
+     * @param {Boolean|Number|String} status Additional value to distinguish different cancellation flows
+     * @returns {void}
+     */
+    triggerCancelAction(status) {
+        if (this._cancel) {
+            if (typeof this._cancel === 'function') {
+                this._cancel(status);
+            }
+            else if (this._cancel.callback) {
+                this._cancel.callback(status);
+            }
         }
 
         this.hide();
@@ -147,8 +169,8 @@ class MDialog extends MComponent {
             this._contentWrapper.appendChild(this._slot);
         }
 
-        if (this.leftIcon) {
-            this.el.prepend(this.leftIcon);
+        if (this.icon) {
+            this.el.prepend(this.icon);
             this.el.classList.add('with-icon');
             this._contentWrapper.classList.add('px-6');
 
@@ -218,13 +240,17 @@ class MDialog extends MComponent {
         this.el.appendChild(content);
 
         this._contentWrapper = document.createElement('div');
-        this._contentWrapper.className = (typeof this._contentClasses === 'string') ? this._contentClasses : '';
+
+        if (typeof this._contentClasses === 'string') {
+            this._contentWrapper.className = this._contentClasses;
+        }
+
         content.appendChild(this._contentWrapper);
 
         this.attachEvent(
             'click.dialog.close',
             () => {
-                this.triggerCancelAction();
+                this.triggerCancelAction(false);
             },
             null,
             closeBtn
@@ -257,7 +283,7 @@ class MDialog extends MComponent {
 
         if (this._ok) {
             this.okBtn = new MButton(
-                this._ok.label || l[1596],
+                this._ok.label || l[81],
                 null,
                 async() => {
                     let result = true;
@@ -307,7 +333,7 @@ class MDialog extends MComponent {
             this._aside.className = 'align-start with-condition';
 
             this._doNotShowCheckbox = new MCheckbox({
-                label: this._doNotShowCheckboxText || l[229],
+                label: this._doNotShowCheckboxText,
                 id: 'do-not-show-again-confirmation',
                 checked: !!this._doNotShowGetFn && this._doNotShowGetFn()
             });

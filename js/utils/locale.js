@@ -1122,16 +1122,21 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[10631] = escapeHTML(l[10631])
         .replace('[A]', '<a href="https://mega.io/terms/#Refunds" target="_blank" rel="noopener noreferrer">')
         .replace('[/A]', '</a>');
+
+    const propayLinksAttr = 'target="_blank" class="clickurl" rel="noopener noreferrer"';
+    const recurringPaymentsLink = 'https://mega.io/terms#RecurringPaidSubscriptions';
+    const cancelSubLink = 'https://help.mega.io/plans-storage/payments-billing/cancel-subscription';
     l[10630] = escapeHTML(l[10630])
         .replace('[A1]',
-                 `<a target="_blank" href="https://mega.io/terms#RecurringPaidSubscriptions">`)
+                 `<a ${propayLinksAttr} href="${recurringPaymentsLink}" data-eventid="500371">`)
         .replace('[A2]',
-                 `<a target="_blank" href="https://mega.io/terms#Refunds">`)
+                 `<a ${propayLinksAttr} href="https://mega.io/terms#Refunds" data-eventid="500372">`)
         .replace('[A3]',
-                 `<a target="_blank" href="https://help.mega.io/plans-storage/payments-billing/cancel-subscription">`)
+                 `<a ${propayLinksAttr} href="${cancelSubLink}" data-eventid="500373">`)
         .replace(/\[\/A\d]/g, '</a>');
+
     l[10634] = escapeHTML(l[10634])
-        .replace('[A]', '<a href="https://mega.nz/support" target="_blank" rel="noopener noreferrer">')
+        .replace('[A]', `<a href="https://mega.nz/support" ${propayLinksAttr} data-eventid="500460">`)
         .replace('[/A]', '</a>');
 
     l[10635] = escapeHTML(l[10635]).replace('[B]', '<b>').replace('[/B]', '</b>');
@@ -1163,6 +1168,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
 
     l[16649] = escapeHTML(l[16649]).replace('%1', '<span class="amount">10.00</span>');
+    l.save_percent = escapeHTML(l.save_percent).replace('%1', '<span class="amount">10%</span>');
     l[16501] = escapeHTML(l[16501]).replace('[A1]', '<a class="red" href="mailto:support@mega.nz">')
         .replace('[/A1]', '</a>')
         .replace(
@@ -1927,13 +1933,16 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A]', '</a>')
         .replace('[BR]', '<br><br>');
     l.blocked_rsn_copyright = escapeHTML(l.blocked_rsn_copyright).replace('[BR]', '<br><br>');
+
     const faqLink = 'https://help.mega.io/plans-storage/space-storage/transfer-quota';
+    const faqLinkAttr = 'target="_blank" class="clickurl" rel="noopener noreferrer"';
     l.pricing_page_faq_answer_1 = escapeHTML(l.pricing_page_faq_answer_1)
-        .replace('[A]', `<a href="${faqLink}" target="_blank" rel="noopener noreferrer">`)
+        .replace('[A]', `<a ${faqLinkAttr} href="${faqLink}" data-eventid="500346">`)
         .replace('[/A]', '</a>');
     l.pricing_page_faq_answer_3 = escapeHTML(l.pricing_page_faq_answer_3)
-        .replace('[A]', `<a href="${faqLink}" target="_blank" rel="noopener noreferrer">`)
+        .replace('[A]', `<a ${faqLinkAttr} href="${faqLink}" data-eventid="500349">`)
         .replace('[/A]', '</a>');
+
     const welcDialogURL = '/fm/account/plan/purchase-history';
     l.welcome_dialog_active_check = escapeHTML(l.welcome_dialog_active_check)
         .replace('[A]', `<a class="clickurl" href="${welcDialogURL}" target="_self" rel="noopener noreferrer">`)

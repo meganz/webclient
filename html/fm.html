@@ -717,52 +717,6 @@
                             <i class="sprite-fm-mono icon-transfer-filled icon24"></i>
                         </div>
                     </div>
-                    <div class="dropdown body popup dropdown-arrow transfer-widget left-arrow hidden">
-                        <i class="dropdown-white-arrow"></i>
-                        <div class="fm-dialog-close small"></div>
-
-                        <div class="transfer-widget body">
-                            <div class="transfer-widget transfer-block download hidden">
-                                <i class="small-icon green-arrow"></i>
-                                <span class="item-type-icon audio file"></span>
-                                <span class="tranfer-filetype-txt"></span>
-                                <!--file.name-->
-                                <div class="transfer-widget progress">
-                                    <span></span>
-                                </div>
-                                <div class="transfer-widget info-block left">
-                                    <span class="current dark"></span>
-                                    <span class="of">[$5528]</span>
-                                    <span class="number dark"></span>
-                                </div>
-                                <div class="transfer-widget info-block right">
-                                    <span class="speed dark"></span>
-                                    <span class="speed-txt"></span>
-                                </div>
-                                <div class="clear"></div>
-                            </div>
-
-                            <div class="transfer-widget transfer-block upload hidden">
-                                <i class="small-icon blue-arrow left"></i>
-                                <span class="item-type-icon audio file"></span>
-                                <span class="tranfer-filetype-txt"></span>
-                                <!--file.name-->
-                                <div class="transfer-widget progress">
-                                    <span></span>
-                                </div>
-                                <div class="transfer-widget info-block left">
-                                    <span class="current dark"></span>
-                                    <span class="of">[$5528]</span>
-                                    <span class="number dark"></span>
-                                </div>
-                                <div class="transfer-widget info-block right">
-                                    <span class="speed dark"></span>
-                                    <span class="speed-txt"></span>
-                                </div>
-                                <div class="clear"></div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </nav>
@@ -922,17 +876,25 @@
                     <div class="title-block">
                         <div class="plan"></div>
 
-                        <button class="btn-link js-lpbtn" data-link="upgrade">
+                        <button class="btn-link js-lpbtn hidden" data-link="upgrade">
                             [$24686]
                         </button>
+                        <div class="text-and-tooltip hidden">
+                            <div class="storage-txt"></div>
+                            <i class="icon sprite-fm-mono icon-info storage-limit-icon hidden"></i>
+                            <div class="lp-storage-limit-popup">[$storage_limit_tooltip]</div>
+                        </div>
                     </div>
 
-                    <div class="storage-graph js-storagegraph">
+                    <div class="storage-graph js-storagegraph hidden">
                         <span></span>
                     </div>
                     <div class="info">
                         <div class="loader menus-sprite loading"></div>
-                        <div class="storage-txt" ></div>
+                        <div class="storage-txt"></div>
+                        <button class="mega-button secondary js-lpbtn hidden" data-link="upgrade">
+                            [$24686]
+                        </button>
                     </div>
                 </div>
                 <div class="js-lp-storage-information-popup lp-storage-information-popup hidden"></div>
@@ -1031,6 +993,7 @@
                             <i class="pro4 sprite-fm-uni icon-crests-lite-details"></i><!-- Acct Level 4 (PRO Lite) -->
                             <i class="pro101 sprite-fm-uni icon-crests-pro-flexi-details"></i><!-- Act lvl 101 (Pro Flexi) -->
                             <i class="business sprite-fm-uni icon-crests-business-details"></i>
+                            <i class="feature"></i>
                         </div>
                         <div class="account membership-plan"></div>
                     </div>
@@ -3542,68 +3505,76 @@
                             <div class="title-txt">[$17022]</div>
                         </div>
                         <div class="settings-right-block accounttype">
-                            <div class="settings-sub-section">
-                                <div class="subtitle-txt">[$16166]</div>
-                                <div class="account plan-info accounttype">
-                                    <span></span>
+                            <div class="plan-details">
+                                <div class="settings-sub-section">
+                                    <div class="subtitle-txt">[$16166]</div>
+                                    <div class="account plan-info accounttype">
+                                        <span></span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="settings-sub-section acc-storage-space">
-                                <div class="subtitle-txt">[$798]</div>
-                                <div class="account plan-info storage">
-                                    <span></span>
+                                <div class="settings-sub-section pro-extras hidden">
+                                    <div class="subtitle-txt">[$extras_plan_title]</div>
+                                    <div class="account plan-info">
+                                        <span>[$pro_extras_vpn]</span>
+                                    </div>
                                 </div>
-                                <div class="bars-container storage">
-                                    <div class="bars-content">
-                                        <div class="settings-bar">
-                                            <div class="settings-sub-bar"></div>
-                                        </div>
-                                        <div class="quota-note base-quota-note">
-                                            <i></i><span></span>
-                                        </div>
-                                        <div class="quota-note achieve-quota-note">
-                                             <i></i><span></span>
+                                <div class="settings-sub-section acc-storage-space">
+                                    <div class="subtitle-txt">[$798]</div>
+                                    <div class="account plan-info storage">
+                                        <span></span>
+                                    </div>
+                                    <div class="bars-container storage">
+                                        <div class="bars-content">
+                                            <div class="settings-bar">
+                                                <div class="settings-sub-bar"></div>
+                                            </div>
+                                            <div class="quota-note base-quota-note">
+                                                <i></i><span></span>
+                                            </div>
+                                            <div class="quota-note achieve-quota-note">
+                                                <i></i><span></span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="settings-sub-section acc-bandwidth-vol hidden">
-                                <div class="subtitle-txt short-title">[$16122]</div>
-                                <div class="account plan-info bandwidth">
-                                    <span></span>
-                                </div>
-                                <div class="bars-container bandwidth">
-                                    <div class="bars-content">
-                                        <div class="settings-bar">
-                                            <div class="settings-sub-bar"></div>
-                                        </div>
-                                        <div class="quota-note base-quota-note">
-                                             <i></i><span></span>
-                                        </div>
-                                        <div class="quota-note achieve-quota-note">
-                                             <i></i><span></span>
+                                <div class="settings-sub-section acc-bandwidth-vol hidden">
+                                    <div class="subtitle-txt short-title">[$16122]</div>
+                                    <div class="account plan-info bandwidth">
+                                        <span></span>
+                                    </div>
+                                    <div class="bars-container bandwidth">
+                                        <div class="bars-content">
+                                            <div class="settings-bar">
+                                                <div class="settings-sub-bar"></div>
+                                            </div>
+                                            <div class="quota-note base-quota-note">
+                                                <i></i><span></span>
+                                            </div>
+                                            <div class="quota-note achieve-quota-note">
+                                                <i></i><span></span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="settings-sub-section acc-renew-date-info ">
-                                <div class="subtitle-txt expiry-txt">[$7354]</div>
-                                <div class="account plan-info expiry">
-                                    <span class="red">September 1st 2013</span>
+                                <div class="settings-sub-section acc-renew-date-info ">
+                                    <div class="subtitle-txt expiry-txt">[$7354]</div>
+                                    <div class="account plan-info expiry">
+                                        <span class="red">September 1st 2013</span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="settings-sub-section sub-container subscription justify-end  border hidden">
-                                <button class="mega-button btn-cancel-sub">
-                                    <span>[$sub_cancellation_btn_label]</span>
-                                </button>
-                            </div>
-                            <div class="settings-sub-section justify-end">
-                                <button class="mega-button right btn-achievements">
-                                    <span>[$16117]</span>
-                                </button>
-                                <button class="mega-button positive upgrade-to-pro">
-                                    <span>[$5549]</span>
-                                </button>
+                                <div class="settings-sub-section sub-container subscription justify-end  border hidden">
+                                    <button class="mega-button btn-cancel-sub">
+                                        <span>[$sub_cancellation_btn_label]</span>
+                                    </button>
+                                </div>
+                                <div class="settings-sub-section justify-end">
+                                    <button class="mega-button right btn-achievements">
+                                        <span>[$16117]</span>
+                                    </button>
+                                    <button class="mega-button positive upgrade-to-pro">
+                                        <span>[$5549]</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

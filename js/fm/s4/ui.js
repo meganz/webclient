@@ -650,22 +650,8 @@ lazy(s4, 'ui', () => {
         }
 
         getInvalidNodeNameError(n, name) {
-            name = name || n.name;
-            const type = s4.kernel.getS4NodeType(n.h);
-
-            if (type === 'bucket') {
-                if (!name) {
-                    return l.s4_bucket_empty_error;
-                }
-
-                const maxLength = 63;
-                if (name.length > maxLength) {
-                    return l.s4_bucket_max_length_error.replace('%s', maxLength);
-                }
-
-                if (!s4.kernel.isValidBucketName(name)) {
-                    return l.s4_bucket_not_allowed_chars_error;
-                }
+            if (s4.kernel.getS4NodeType(n.h) === 'bucket' && !s4.kernel.isValidBucketName(name || n.name)) {
+                return l.s4_invalid_bucket_name;
             }
         }
 

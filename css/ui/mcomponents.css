@@ -84,6 +84,10 @@
     margin-left: auto;
     margin-right: auto;
 }
+.my-1 {
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+}
 .p-3 {
     padding: 0.75rem;
 }
@@ -101,6 +105,9 @@
 }
 .pb-6 {
     padding-bottom: 1.5rem;
+}
+.pb-16 {
+    padding-bottom: 4rem;
 }
 .pr-28 {
     padding-right: 7rem;
@@ -127,9 +134,17 @@
     padding-left: 1.5rem;
     padding-right: 1.5rem;
 }
+.px-8 {
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
 .px-12 {
     padding-left: 3rem;
     padding-right: 3rem;
+}
+.px-def {
+    padding-left: var(--left-padding);
+    padding-right: var(--right-padding);;
 }
 .py-1 {
     padding-top: 0.25rem;
@@ -143,12 +158,21 @@
     padding-top: 1.5rem;
     padding-bottom: 1.5rem;
 }
-.py-10 {
-    padding-top: 2.5rem;
-    padding-bottom: 2.5rem;
+.py-16 {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+}
+.w-5 {
+    width: 1.25rem;
+}
+.w-20 {
+    width: 5rem;
 }
 .w-80 {
     width: 20rem;
+}
+.-top-8 {
+    top: -2rem;
 }
 .bottom-0 {
     bottom: 0;
@@ -278,8 +302,17 @@ body.rtl .m-dropdown-item i.ml-3 {
 .text-color-high {
     color: var(--text-color-high);
 }
+.text-color-faded {
+    color: var(--color-copy-secondary);
+}
 .font-body-1 {
     font: var(--text-body1);
+}
+.font-body-2 {
+    font: var(--text-copy-medium-pricing);
+}
+.font-title-h2 {
+    font: var(--text-h2-pricing);
 }
 .icon-size-3 {
     --icon-size: 12px;
@@ -328,6 +361,9 @@ body.rtl .mega-dialog.m-dialog.with-icon {
 }
 .m-dialog-overlay {
     animation: fadein 0.3s ease;
+}
+.grid {
+    display: grid;
 }
 .grid-3-cols {
     grid-template-columns: repeat(3, minmax(0, 1fr));

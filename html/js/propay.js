@@ -77,7 +77,7 @@ pro.propay = {
         // Cache current Pro Payment page selector
         this.$page = $('.payment-section', '#startholder');
 
-        const $selectedPlanName = $('.top-header.plan-title .plan-name', this.$page);
+        const $selectedPlanTitle = $('.top-header.plan-title', this.$page);
         const $purchaseButton = $('button.purchase', this.$page);
 
         // Preload loading/transferring/processing animation
@@ -99,7 +99,12 @@ pro.propay = {
         }
 
         // Update header text with plan
-        $selectedPlanName.text(pro.propay.planName);
+        if (pro.propay.planNum === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
+            $selectedPlanTitle.text(pro.propay.planName);
+        }
+        else {
+            $('.plan-name', $selectedPlanTitle).text(pro.propay.planName);
+        }
 
         let discountInfo = pro.propay.getDiscount();
         if (discountInfo && discountInfo.used) {
@@ -185,6 +190,73 @@ pro.propay = {
                 // Load payment providers and do the rest of the rendering if the selected plan
                 // has enough storage. Otherwuse do not proceed with rendering the page.
                 proceed.then(async () => {
+                    let vpnBlockerText = false;
+
+                    /** @todo this should be an actual 'plan has-feature' check */
+                    const isVpnPlan = pro.propay.planNum === pro.ACCOUNT_LEVEL_FEATURE_VPN;
+                    const hasVpnAlready = pro.proplan2.getUserFeature('vpn');
+
+                    // VPN related warnings
+                    if (isVpnPlan || hasVpnAlready) {
+                        const isProUser = u_attr && u_attr.p && !u_attr.b;
+
+                        if (isProUser && isVpnPlan) {
+                            vpnBlockerText = escapeHTML(l.vpn_is_attached_text)
+                                .replace('[A1]', '<a href="https://mega.io/vpn">')
+                                .replace('[A2]', '<a href="https://mega.io/pricing">')
+                                .replace(/\[\/A[12]]/g, '</a>');
+                        }
+                        else if (!isProUser && hasVpnAlready) {
+                            if (pro.filter.simple.validPurchases.has(pro.propay.planNum)) {
+                                loadingDialog.hide('propayReady');
+                                const status = await pro.propay.vpnFeatureConfirmation();
+
+                                if (status === 2) { // The user refused to proceed
+                                    loadSubPage('pro');
+                                    return;
+                                }
+
+                                loadingDialog.show('propayReady');
+                            }
+                            else if (isVpnPlan) {
+                                vpnBlockerText = escapeHTML(l.vpn_added_text)
+                                    .replace('[A1]', '<a href="https://mega.io/vpn">')
+                                    .replace('[A2]', '<a href="https://mega.nz/fm/account/plan">')
+                                    .replace(/\[\/A[12]]/g, '</a>');
+                            }
+                        }
+
+                        if (vpnBlockerText) {
+                            const dialog = new MDialog({
+                                ok: {
+                                    label: l[81]
+                                },
+                                onclose: () => {
+                                    loadSubPage('pro');
+                                },
+                                titleClasses: 'pt-4',
+                                setContent() {
+                                    this.title = l.vpn_added_title;
+
+                                    if (is_mobile) {
+                                        this.slot = parseHTML(vpnBlockerText);
+                                    }
+                                    else {
+                                        const slot = document.createElement('p');
+                                        slot.className = 'px-12 information';
+                                        $(slot).safeHTML(vpnBlockerText);
+                                        this.slot = slot;
+                                    }
+                                }
+                            });
+
+                            loadingDialog.hide('propayReady');
+                            dialog.show();
+
+                            return;
+                        }
+                    }
+
                     await pro.propay.loadPaymentGatewayOptions();
                     loadingDialog.hide('propayReady');
 
@@ -194,6 +266,59 @@ pro.propay = {
                     console.error(ex);
                 });
             });
+        });
+    },
+
+    /**
+     * @returns {Promise<0|1|2>} // Returns 0 if the feature is not enabled, 1 if OK clicked and 2 if Cancel clicked
+     */
+    vpnFeatureConfirmation: () => {
+        'use strict';
+
+        return new Promise((resolve) => {
+            if (pro.proplan2.getUserFeature('vpn')) {
+                const dialog = new MDialog({
+                    ok: {
+                        label: l[507],
+                        callback: () => {
+                            resolve(1);
+                            return true;
+                        }
+                    },
+                    onclose: () => {
+                        resolve(2);
+                    },
+                    cancel: {
+                        label: l[82],
+                        callback: () => {
+                            resolve(2);
+                        }
+                    },
+                    titleClasses: 'pt-4',
+                    setContent() {
+                        this.title = l.vpn_added_title;
+                        const helpUrl = 'https://help.mega.io/plans-storage/payments-billing/cancel-subscription';
+                        const text = escapeHTML(l.vpn_to_disable_text)
+                            .replace('[A]', `<a href="${helpUrl}" target="_blank">`)
+                            .replace('[/A]', '</a>');
+
+                        if (is_mobile) {
+                            this.slot = parseHTML(text);
+                        }
+                        else {
+                            const slot = document.createElement('p');
+                            slot.className = 'px-12';
+                            $(slot).safeHTML(text);
+                            this.slot = slot;
+                        }
+                    }
+                });
+
+                dialog.show();
+            }
+            else {
+                resolve(0);
+            }
         });
     },
 
@@ -211,15 +336,19 @@ pro.propay = {
         }
 
         const proNumInt = parseInt(pageParts[1]);
-        const validProNums = pro.filter.simple.validPurchases;
 
         // If the Pro Flexi enabled (pf) flag is not on and they're trying to access the page, don't allow
         if (mega.flags && mega.flags.pf !== 1 && proNumInt === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
             return false;
         }
 
-        // Check the URL has propay_1 (PRO I) - propay_3 (PRO III), propay_4 (PRO Lite), propay_101 (Pro Flexi)
-        if (validProNums.has(proNumInt)) {
+        const validNums = new Set([
+            ...pro.filter.simple.validPurchases,
+            ...pro.filter.simple.validFeatures
+        ]);
+
+        // Check the URL has propay_XXX format
+        if (validNums.has(proNumInt)) {
 
             // Get the Pro number e.g. 2 then the name e.g. Pro I - III, Pro Lite, Pro Flexi etc
             pro.propay.planNum = proNumInt;
@@ -318,7 +447,8 @@ pro.propay = {
             (pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI && gate.supportsBusinessPlans === 1)
             || (pro.propay.planNum !== pro.ACCOUNT_LEVEL_PRO_FLEXI
                 && (typeof gate.supportsIndividualPlans === 'undefined' || gate.supportsIndividualPlans))
-            && !(gate.minimumEURAmountSupported > pro.getPlanObj(pro.propay.planNum, 1).maxCorrPriceEuro));
+            && !(gate.minimumEURAmountSupported > pro.getPlanObj(pro.propay.planNum, 1).maxCorrPriceEuro)
+            && (!!gate.gatewayId || !pro.filter.simple.validFeatures.has(pro.propay.planNum)));
 
         // if this user has a discount, clear gateways that are not supported.
         const discountInfo = pro.propay.getDiscount();
@@ -755,16 +885,21 @@ pro.propay = {
 
         // Default to svg sprite icon format icon-crests-pro-x-details
         let iconClass = 'no-icon';
-        if (pro.filter.simple.hasIcon.has(pro.propay.planNum)) {
-            iconClass = `sprite-fm-uni icon-crests-pro-${pro.propay.planNum}-details`;
-        }
 
-        // Special handling for PRO Lite (account level 4) and Pro Flexi (account level 101)
         if (pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_LITE) {
             iconClass = 'sprite-fm-uni icon-crests-lite-details';
         }
+        else if (pro.propay.planNum === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
+            iconClass = 'sprite-fm-uni icon-crest-vpn';
+
+            $storageAmount.text(l.pr_vpn_text1);
+            $bandwidthAmount.text(l.pr_vpn_text2);
+        }
         else if (pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
             iconClass = 'sprite-fm-uni icon-crests-pro-flexi-details';
+        }
+        else if (pro.filter.simple.hasIcon.has(pro.propay.planNum)) {
+            iconClass = `sprite-fm-uni icon-crests-pro-${pro.propay.planNum}-details`;
         }
 
         // Add svg icon class (for desktop and mobile)

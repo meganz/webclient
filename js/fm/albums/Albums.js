@@ -968,8 +968,7 @@ lazy(mega.gallery, 'albums', () => {
                     label: l[82]
                 },
                 dialogClasses: null,
-                leftIcon: 'sprite-fm-uni icon-question icon-size-16',
-                doNotShowCheckboxText: l.do_not_show_this_again
+                icon: 'sprite-fm-uni icon-question icon-size-16'
             });
 
             this.setContent(albumIds);
@@ -981,7 +980,9 @@ lazy(mega.gallery, 'albums', () => {
                     if (val !== currentVal) {
                         mega.config.setn('nowarnpl', val ? 1 : undefined);
                     }
-                }
+                },
+                l.do_not_show_this_again
+
             );
         }
 
@@ -1763,7 +1764,7 @@ lazy(mega.gallery, 'albums', () => {
                 },
                 cancel: true,
                 dialogClasses: null,
-                leftIcon: 'warning sprite-fm-uni icon-warning icon-size-16'
+                icon: 'warning sprite-fm-uni icon-warning icon-size-16'
             });
 
             this.setContent(isMultiple);
@@ -1794,7 +1795,7 @@ lazy(mega.gallery, 'albums', () => {
                     label: l.remove_album_elements_cancel
                 },
                 dialogClasses: null,
-                leftIcon: 'warning sprite-fm-uni icon-warning icon-size-16'
+                icon: 'warning sprite-fm-uni icon-warning icon-size-16'
             });
 
             this.setContent(handles);

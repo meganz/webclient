@@ -1008,7 +1008,7 @@ var notify = {
         var avatar = '';
 
         // Payment & Takedown notification types, file-request upload type
-        const customIconNotifications = ['psts', 'pses', 'ph', 'puu', 'dynamic'];
+        const customIconNotifications = ['psts', 'pses', 'ph', 'puu', 'dynamic', 'psts_v2'];
 
         // If a contact action packet
         if (typeof userHandle !== 'string') {
@@ -1091,6 +1091,7 @@ var notify = {
             case 'put':
                 return notify.renderNewSharedNodes($notificationHtml, notification, userEmail);
             case 'psts':
+            case 'psts_v2':
                 return notify.renderPayment($notificationHtml, notification);
             case 'pses':
                 return notify.renderPaymentReminder($notificationHtml, notification);
@@ -1515,6 +1516,11 @@ var notify = {
         }
 
         var proLevel = notification.data.p;
+
+        if (proLevel === pro.ACCOUNT_LEVEL_FEATURE) {
+            proLevel += pro.getStandaloneBits(notification.data.f);
+        }
+
         var proPlan = pro.getProPlanName(proLevel);
         var success = (notification.data.r === 's') ? true : false;
         var header = l[1230];   // Payment info
@@ -1570,11 +1576,18 @@ var notify = {
                 return plansEndingAfterSubscription;
             };
 
+            const newPlanLevel = account.purchases[0][5];
+
             // If a user is currently on a higher tier plan than their new plan, inform them that the new plan
             // will be active after their current plan expires
-            if (account.purchases[0][5] !== u_attr.p) {
+            if (newPlanLevel !== u_attr.p) {
+                // No need to show any dialog when a user purchases a feature
+                if (newPlanLevel === pro.ACCOUNT_LEVEL_FEATURE) {
+                    return;
+                }
+
+                const newPlan = pro.getProPlanName(newPlanLevel);
                 const currentPlan = pro.getProPlanName(u_attr.p);
-                const newPlan = pro.getProPlanName(account.purchases[0][5]);
                 const plansEndingAfterPurchase = getPlansEndingAfterPurchase();
                 const bodyText = plansEndingAfterPurchase < 2
                     ? l.welcome_dialog_active_until
@@ -1583,14 +1596,14 @@ var notify = {
                           l.welcome_dialog_thanks_for_sub.replace('%1', newPlan),
                           bodyText
                               .replace('%1', currentPlan)
-                              .replace('%3', time2date(purchaseEndTime || account.srenew, 1))
+                              .replace('%3', time2date(purchaseEndTime || account.srenew[0], 1))
                               .replace('%2', newPlan));
                 return;
             }
 
             pro.loadMembershipPlans(() => {
 
-                const plan = pro.getPlanObj(account.purchases[0][5], account.purchases[0][6]);
+                const plan = pro.getPlanObj(newPlanLevel, account.purchases[0][6]);
 
                 $('header', $dialog).text(l.welcome_dialog_header.replace('%1', plan.name));
                 $('.more-quota .info-text', $dialog).text(l.welcome_dialog_quota_details

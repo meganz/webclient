@@ -730,6 +730,20 @@ scparser.$add = function(type, handler) {
     }
 };
 
+/**
+ * @param {[String[]]} types Multiple packet types to register
+ * @param {Function} handler Handler to associate with the packet types
+ */
+scparser.$bulkAdd = (types, handler) => {
+    'use strict';
+
+    let i = types.length;
+
+    while (--i >= 0) {
+        scparser.$add(types[i], handler);
+    }
+};
+
 scparser.$helper.c = function(a) {
     // contact notification
     process_u(a.u);
@@ -1518,7 +1532,7 @@ scparser.$add('usc', function() {
 });
 
 // Payment received
-scparser.$add('psts', function(a) {
+scparser.$bulkAdd(['psts', 'psts_v2'], function(a) {
     'use strict';
 
     onIdle(() => {

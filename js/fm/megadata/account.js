@@ -55,7 +55,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
 
     /** DO NOT place any sendAPIRequest() call before, this 'uq' MUST BE the FIRST one */
 
-    sendAPIRequest({a: 'uq', strg: 1, xfer: 1, pro: 1, v: 1, b}, (res) => {
+    sendAPIRequest({a: 'uq', strg: 1, xfer: 1, pro: 1, v: 2, b}, (res) => {
         Object.assign(account, res);
 
         account.type = res.utype;
@@ -72,7 +72,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
         account.isAlmostFull = res.cstrg / res.mstrg >= res.uslw / 10000;
 
         // Business base/extra quotas:
-        if (res.utype === pro.ACCOUNT_LEVEL_BUSINESS || res.utype === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
+        if (u_attr.p === pro.ACCOUNT_LEVEL_BUSINESS || u_attr.p === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
             account.space_bus_base = res.b ? res.b.bstrg : undefined; // unit TB
             account.space_bus_ext = res.b ? res.b.estrg : undefined; // unit TB
             account.tfsq_bus_base = res.b ? res.b.bxfer : undefined; // unit TB
@@ -139,7 +139,7 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
 
     // Get (f)ull payment history
     // [[payment id, timestamp, price paid, currency, payment gateway id, payment plan id, num of months purchased]]
-    sendAPIRequest({a: 'utp', f: 1}, true, (res) => {
+    sendAPIRequest({a: 'utp', f: 3, v: 2}, true, (res) => {
         if (!Array.isArray(res)) {
             res = [];
         }
@@ -255,6 +255,39 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                     }
 
                     account.downbw_used += bwu;
+                }
+
+                if (Array.isArray(uqres.plans)) {
+                    account.plans = uqres.plans;
+                    account.subs = Array.isArray(uqres.subs) && uqres.subs || [];
+
+                    if (account.plans.length) { // Backward compatibility to uq:v1 based on the first active plan
+                        const { al, expires, features, subid } = account.plans[0]; // Active plan details
+
+                        // Excluding feature plans
+                        if (al !== pro.ACCOUNT_LEVEL_FEATURE) {
+                            const sub = account.subs.find(({ id }) => id === subid);
+                            const hasSub = !!sub;
+
+                            account.slevel = al;
+                            account.snext = hasSub && sub.next || expires || 0;
+                            account.sfeature = features;
+                            account.stype = hasSub && sub.type || 'O';
+                            account.scycle = hasSub && sub.cycle || '';
+                            account.smixed = 0;
+                            account.utype = u_attr.p;
+                            account.srenew = [account.snext];
+                            account.expiry = account.expiry || account.snext;
+
+                            [account.sgw, account.sgwids] = account.subs.reduce(
+                                ([g, i], { gw, gwid }) => [
+                                    g.push(gw) && g,
+                                    i.push(gwid) && i
+                                ],
+                                [[], [], []]
+                            );
+                        }
+                    }
                 }
             }
 

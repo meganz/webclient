@@ -4641,7 +4641,8 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.payment-address-dialog .plan-icon.pro3 i.pro3,
     .mega-dialog.payment-address-dialog .plan-icon.pro4 i.pro4,
     .mega-dialog.payment-address-dialog .plan-icon.pro101 i.pro101,
-    .mega-dialog.payment-address-dialog .plan-icon.business i.business {
+    .mega-dialog.payment-address-dialog .plan-icon.business i.business,
+    .mega-dialog.payment-address-dialog .plan-icon.feature i.feature {
         display: block;
     }
     .mega-dialog.payment-address-dialog .payment-plan-info {
@@ -5618,7 +5619,8 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.bitcoin-invoice-dialog .plan-icon.pro2 i.pro2,
     .mega-dialog.bitcoin-invoice-dialog .plan-icon.pro3 i.pro3,
     .mega-dialog.bitcoin-invoice-dialog .plan-icon.pro4 i.pro4,
-    .mega-dialog.bitcoin-invoice-dialog .plan-icon.business i.business {
+    .mega-dialog.bitcoin-invoice-dialog .plan-icon.business i.business,
+    .mega-dialog.bitcoin-invoice-dialog .plan-icon.feature i.feature {
         display: block;
     }
     .mega-dialog.bitcoin-invoice-dialog .invoice-date-time {
@@ -6087,7 +6089,8 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.voucher-dialog .plan-icon.pro2 i.pro2,
     .mega-dialog.voucher-dialog .plan-icon.pro3 i.pro3,
     .mega-dialog.voucher-dialog .plan-icon.pro4 i.pro4,
-    .mega-dialog.voucher-dialog .plan-icon.business i.business {
+    .mega-dialog.voucher-dialog .plan-icon.business i.business,
+    .mega-dialog.voucher-dialog .plan-icon.feature i.feature {
         display: block;
     }
     .mega-dialog.voucher-dialog .voucher-plan-info {
@@ -8754,7 +8757,8 @@ body.de .mega-dialog.contact-picker-widget {
         .mega-dialog.voucher-info-redeem .plan-icon.pro3 i.pro3,
         .mega-dialog.voucher-info-redeem .plan-icon.pro4 i.pro4,
         .mega-dialog.voucher-info-redeem .plan-icon.pro101 i.pro101,
-        .mega-dialog.voucher-info-redeem .plan-icon.business i.business {
+        .mega-dialog.voucher-info-redeem .plan-icon.business i.business,
+        .mega-dialog.voucher-info-redeem .plan-icon.feature i.feature {
             display: block;
         }
         .mega-dialog.voucher-info-redeem .voucher-logo .v-separator {
@@ -10392,7 +10396,8 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.payment-dialog .plan-icon.pro2 i.pro2,
     .mega-dialog.payment-dialog .plan-icon.pro3 i.pro3,
     .mega-dialog.payment-dialog .plan-icon.pro4 i.pro4,
-    .mega-dialog.payment-dialog .plan-icon.business i.business {
+    .mega-dialog.payment-dialog .plan-icon.business i.business,
+    .mega-dialog.payment-dialog .plan-icon.feature i.feature {
         display: block;
     }
     .mega-dialog.payment-dialog .payment-plan-info {
@@ -10576,7 +10581,8 @@ body.de .mega-dialog.contact-picker-widget {
     .voucher-redeem-dialog .plan-icon.pro2 i.pro2,
     .voucher-redeem-dialog .plan-icon.pro3 i.pro3,
     .voucher-redeem-dialog .plan-icon.pro4 i.pro4,
-    .voucher-redeem-dialog .plan-icon.business i.business {
+    .voucher-redeem-dialog .plan-icon.business i.business,
+    .voucher-redeem-dialog .plan-icon.feature i.feature {
         display: block;
     }
 

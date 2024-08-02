@@ -239,6 +239,16 @@
 .account.data-block + .data-block:not(.hidden) {
     border-top: 1px solid  var(--stroke-grey-2);
 }
+.account.data-block.account-type .settings-right-block {
+    padding: 0;
+}
+.account.data-block.account-type .settings-right-block > div {
+    background: var(--surface-grey-3);
+    border: 2px solid var(--stroke-grey-2);
+    border-radius: 12px;
+    padding: 0 24px;
+    margin: 35px 0;
+}
 .settings-sub-section {
     align-items: center;
     box-sizing: border-box;
@@ -252,8 +262,15 @@
     width: 100%;
 }
 .settings-sub-section:not(.hidden) ~ .settings-sub-section {
-    border-top: 1px solid var(--stroke-grey-2);
+    border-top: 1px solid;
 }
+.theme-light .settings-sub-section:not(.hidden) {
+    border-color: var(--stroke-grey-2);
+}
+.theme-dark .settings-sub-section:not(.hidden) {
+    border-color: var(--stroke-mid-grey);
+}
+
 .settings-sub-section.sub-container:not(.hidden) {
     border: 0;
     padding-top: 0;

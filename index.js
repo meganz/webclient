@@ -2268,11 +2268,11 @@ function topmenuUI() {
 
         // If Pro Flexi, hide the Upgrade button and Pricing link
         if (u_attr.pf) {
+            $menuPricingItem.addClass('hidden');
+
             if (u_attr.pf.s === pro.ACCOUNT_STATUS_ENABLED) {
                 $menuUpgradeAccount.addClass('hidden');
-                $menuPricingItem.addClass('hidden');
             }
-
             // If Pro Flexi Expired or in Grace Period, show the Reactive button and Pricing link
             else if (is_mobile) {
                 $('.upgrade-your-account', $topMenu).text(l.reactivate_account_short);
@@ -2353,12 +2353,13 @@ function topmenuUI() {
             $menuUpgradeAccount.addClass('hidden');
 
             if (u_attr.b.s !== -1) {
-
                 $headerAchievements.addClass('hidden');
-
-                // Hide Pricing menu item for Business sub accounts and admin expired
-                $menuPricingItem.addClass('hidden');
             }
+
+            // Hide Pricing menu item for any Business account
+            // (admin / sub user; active / deactivated / grace period)
+            $menuPricingItem.addClass('hidden');
+
             document.body.classList.add('business-user');
 
             // If Business Expired or in Grace Period, and this is the business master account,
@@ -2621,13 +2622,15 @@ function topmenuUI() {
         }
     });
 
-    $('.js-more-menu', '.fmholder').rebind('click.openmenu', () => {
+    $('.js-more-menu, .top-icon.menu', '.fmholder').rebind('click.openmenu', () => {
         if ($.liTooltipTimer) {
             clearTimeout($.liTooltipTimer);
         }
         topMenu();
 
-        eventlog(500324);
+        if (!is_mobile) {
+            eventlog(500324);
+        }
     });
 
     $('.close', $topMenu).rebind('click.closemenu', function() {

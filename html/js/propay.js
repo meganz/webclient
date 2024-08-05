@@ -895,7 +895,7 @@ pro.propay = {
             iconClass = 'sprite-fm-uni icon-crest-vpn';
 
             $storageAmount.text(l.pr_vpn_text1);
-            $bandwidthAmount.text(l.pr_vpn_text2);
+            $bandwidthAmount.text(l.vpn_choose_title3);
         }
         else if (pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
             iconClass = 'sprite-fm-uni icon-crests-pro-flexi-details';

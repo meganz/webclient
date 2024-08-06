@@ -101,7 +101,7 @@ export default class ChatRouting {
                 room.show();
                 args.route.location = room.getRoomUrl();
             }
-            else if (!roomId || roomId === u_handle || roomId.length !== 11) {
+            else if (!roomId || roomId === u_handle || roomId.length !== 11 && !is_chatlink) {
                 ChatRouting.gPageHandlers.redirect(args.route, 'fm/chat').then(resolve).catch(reject);
                 resolve = null;
             }
@@ -134,8 +134,8 @@ export default class ChatRouting {
                         // and this reached back again for it? if so, catch it and invoke openCustomView(notFound) (?)
 
 
-                        if (ex === ENOENT && megaChat.publicChatKeys[roomId]) {
-                            msgDialog('warninga', l[20641], l[20642], 0, () => {
+                        if (ex === ENOENT || ex === EBLOCKED && megaChat.publicChatKeys[roomId]) {
+                            msgDialog('warninga', '', l[20641], l[20642], () => {
                                 loadSubPage(is_chatlink ? 'start' : 'fm/chat', event);
                             });
                         }

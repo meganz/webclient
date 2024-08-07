@@ -11624,7 +11624,7 @@ class ChatlinkDialog extends mixins.w9 {
       newTopic,
       link
     } = this.state;
-    const closeButton = REaCt().createElement("button", {
+    const closeButton = this.loading ? null : REaCt().createElement("button", {
       key: "close",
       className: "mega-button negative links-button",
       onClick: this.onClose

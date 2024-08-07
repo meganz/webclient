@@ -17,6 +17,7 @@ var mobile = {
         Object.defineProperty(ctx, 'search' + 'Path', {value});
         Object.defineProperty(ctx, 'abort' + 'Transfers', {value});
         Object.defineProperty(ctx, 'init' + 'UIKeyEvents', {value});
+        Object.defineProperty(ctx, 'onSecti' + 'onUIOpen', {value});
 
         Object.defineProperty(ctx, 'initFile' + 'ManagerUI', {
             value: function() {

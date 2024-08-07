@@ -50,11 +50,7 @@ mobile.chatlink = {
                 this.linkInfo.getInfo()
                     .then((res) => {
                         if (res.mr) {
-                            $('p', $overlay)
-                                .text(
-                                    'Install MEGA app to start a meeting. '
-                                    + 'Receive 20 GB of secure and private cloud storage for free.'
-                                );
+                            $('p', $overlay).text(`${l.mobile_meeting_link_tip} ${l.free_plan_bonus_info}`);
                         }
                         if (res.topic) {
                             $('h2.topic', $overlay).safeHTML(megaChat.html(res.topic) || '');
@@ -65,6 +61,9 @@ mobile.chatlink = {
                     })
                     .catch(dump);
             });
+
+        // Hide loader together with other desktop preview block
+        $('.chat-links-preview', '.fmholder').addClass('hidden');
 
         // Show the overlay
         $overlay.removeClass('hidden');

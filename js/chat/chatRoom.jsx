@@ -1626,28 +1626,21 @@ ChatRoom.prototype._sendMessageToTransport = function(messageObject) {
  * @param users {Array}
  * @private
  */
-ChatRoom.prototype._sendNodes = function(nodeids, users) {
-    var promises = [];
-    var self = this;
-
-    if (self.type === "public") {
-        nodeids.forEach(function (nodeId) {
-            promises.push(
-                asyncApiReq({'a': 'mcga', 'n': nodeId, 'u': strongvelope.COMMANDER, 'id': self.chatId, 'v': Chatd.VERSION})
-            );
-        });
+ChatRoom.prototype._sendNodes = async function(nodeids, users) {
+    const u = this.type === 'public' ? [strongvelope.COMMANDER] : users;
+    const promises = nodeids.map(nodeId => asyncApiReq({a: 'mcga', n: [nodeId], u, id: this.chatId, v: Chatd.VERSION}));
+    const res = await Promise.allSettled(promises);
+    const sent = [];
+    for (let i = res.length; i--;) {
+        if (res[i].status === 'fulfilled') {
+            sent.push(nodeids[i]);
+        }
     }
-    else {
-        users.forEach(function (uh) {
-            nodeids.forEach(function (nodeId) {
-                promises.push(
-                    asyncApiReq({'a': 'mcga', 'n': nodeId, 'u': uh, 'id': self.chatId, 'v': Chatd.VERSION})
-                );
-            });
-        });
+    if (!sent.length) {
+        throw ENOENT;
     }
 
-    return Promise.allSettled(promises);
+    return sent;
 };
 
 
@@ -1695,10 +1688,10 @@ ChatRoom.prototype._attachNodes = mutex('chatroom-attach-nodes', function _(reso
     var attach = (nodes) => {
         console.assert(self.type === 'public' || users.length, 'No users to send to?!');
 
-        return this._sendNodes(nodes, users).then(() => {
-            for (var i = nodes.length; i--;) {
-                const n = nmap[nodes[i]] || M.getNodeByHandle(nodes[i]);
-                console.assert(n.h, `Node not found... ${nodes[i]}`);
+        return this._sendNodes(nodes, users).then((res) => {
+            for (let i = res.length; i--;) {
+                const n = nmap[res[i]] || M.getNodeByHandle(res[i]);
+                console.assert(n.h, `Node not found... ${res[i]}`);
 
                 if (n.h) {
                     const name = names && (names[n.hash] || names[n.h]) || n.name;
@@ -1728,6 +1721,10 @@ ChatRoom.prototype._attachNodes = mutex('chatroom-attach-nodes', function _(reso
         if (ex === EBLOCKED) {
             // User didn't want to revoke FR.
             result = ex;
+        }
+        else if (ex === ENOENT) {
+            // Nothing to attach
+            result = result || ex;
         }
         else if (d) {
             _.logger.error(ex);

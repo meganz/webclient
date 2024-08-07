@@ -3210,7 +3210,7 @@ Chat.prototype.openChatAndAttachNodes = async function (targets, nodes, silent) 
   }
   const attachNodes = roomId => this.smartOpenChat(roomId).then(room => {
     return room.attachNodes(nodes).then(res => {
-      if (res !== EBLOCKED) {
+      if (res !== EBLOCKED && res !== ENOENT) {
         return room;
       }
     });
@@ -4774,33 +4774,26 @@ ChatRoom.prototype._sendMessageToTransport = function (messageObject) {
   megaChat.trigger('onPostBeforeSendMessage', messageObject);
   return megaChat.plugins.chatdIntegration.sendMessage(self, messageObject);
 };
-ChatRoom.prototype._sendNodes = function (nodeids, users) {
-  const promises = [];
-  const self = this;
-  if (self.type === "public") {
-    nodeids.forEach((nodeId) => {
-      promises.push(asyncApiReq({
-        'a': 'mcga',
-        'n': nodeId,
-        'u': strongvelope.COMMANDER,
-        'id': self.chatId,
-        'v': Chatd.VERSION
-      }));
-    });
-  } else {
-    users.forEach((uh) => {
-      nodeids.forEach((nodeId) => {
-        promises.push(asyncApiReq({
-          'a': 'mcga',
-          'n': nodeId,
-          'u': uh,
-          'id': self.chatId,
-          'v': Chatd.VERSION
-        }));
-      });
-    });
+ChatRoom.prototype._sendNodes = async function (nodeids, users) {
+  const u = this.type === 'public' ? [strongvelope.COMMANDER] : users;
+  const promises = nodeids.map(nodeId => asyncApiReq({
+    a: 'mcga',
+    n: [nodeId],
+    u,
+    id: this.chatId,
+    v: Chatd.VERSION
+  }));
+  const res = await Promise.allSettled(promises);
+  const sent = [];
+  for (let i = res.length; i--;) {
+    if (res[i].status === 'fulfilled') {
+      sent.push(nodeids[i]);
+    }
   }
-  return Promise.allSettled(promises);
+  if (!sent.length) {
+    throw ENOENT;
+  }
+  return sent;
 };
 ChatRoom.prototype.attachNodes = async function (nodes, names) {
   if (!Array.isArray(nodes)) {
@@ -4832,10 +4825,10 @@ ChatRoom.prototype._attachNodes = mutex('chatroom-attach-nodes', function _(reso
   const members = self.getParticipantsExceptMe();
   const attach = nodes => {
     console.assert(self.type === 'public' || users.length, 'No users to send to?!');
-    return this._sendNodes(nodes, users).then(() => {
-      for (let i = nodes.length; i--;) {
-        const n = nmap[nodes[i]] || M.getNodeByHandle(nodes[i]);
-        console.assert(n.h, `Node not found... ${nodes[i]}`);
+    return this._sendNodes(nodes, users).then(res => {
+      for (let i = res.length; i--;) {
+        const n = nmap[res[i]] || M.getNodeByHandle(res[i]);
+        console.assert(n.h, `Node not found... ${res[i]}`);
         if (n.h) {
           const name = names && (names[n.hash] || names[n.h]) || n.name;
           self.sendMessage(Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT + Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT + JSON.stringify([{
@@ -4862,6 +4855,8 @@ ChatRoom.prototype._attachNodes = mutex('chatroom-attach-nodes', function _(reso
   const fail = function (ex) {
     if (ex === EBLOCKED) {
       result = ex;
+    } else if (ex === ENOENT) {
+      result = result || ex;
     } else if (d) {
       _.logger.error(ex);
     }

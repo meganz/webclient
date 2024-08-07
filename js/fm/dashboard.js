@@ -159,6 +159,7 @@ function dashboardUI(updProcess) {
 
             $('.more-bonuses', $achWidget).rebind('click', function() {
                 mega.achievem.achievementsListDialog();
+                eventlog(500475);
             });
         }
         else {
@@ -283,6 +284,7 @@ function dashboardUI(updProcess) {
             }
             else {
                 loadSubPage('pro');
+                eventlog(500474);
             }
         });
 
@@ -611,6 +613,7 @@ dashboardUI.renderReferralWidget = function() {
                 // Referral widget button
                 $('button.referral-program', $referralWidget).rebind('click.refer', () => {
                     loadSubPage('/fm/refer');
+                    eventlog(500476);
                 });
             }
         }).catch(ex => {

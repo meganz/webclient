@@ -3210,7 +3210,7 @@ Chat.prototype.openChatAndAttachNodes = async function (targets, nodes, silent) 
   }
   const attachNodes = roomId => this.smartOpenChat(roomId).then(room => {
     return room.attachNodes(nodes).then(res => {
-      if (res !== EBLOCKED) {
+      if (res !== EBLOCKED && res !== ENOENT) {
         return room;
       }
     });
@@ -4774,33 +4774,26 @@ ChatRoom.prototype._sendMessageToTransport = function (messageObject) {
   megaChat.trigger('onPostBeforeSendMessage', messageObject);
   return megaChat.plugins.chatdIntegration.sendMessage(self, messageObject);
 };
-ChatRoom.prototype._sendNodes = function (nodeids, users) {
-  const promises = [];
-  const self = this;
-  if (self.type === "public") {
-    nodeids.forEach((nodeId) => {
-      promises.push(asyncApiReq({
-        'a': 'mcga',
-        'n': nodeId,
-        'u': strongvelope.COMMANDER,
-        'id': self.chatId,
-        'v': Chatd.VERSION
-      }));
-    });
-  } else {
-    users.forEach((uh) => {
-      nodeids.forEach((nodeId) => {
-        promises.push(asyncApiReq({
-          'a': 'mcga',
-          'n': nodeId,
-          'u': uh,
-          'id': self.chatId,
-          'v': Chatd.VERSION
-        }));
-      });
-    });
+ChatRoom.prototype._sendNodes = async function (nodeids, users) {
+  const u = this.type === 'public' ? [strongvelope.COMMANDER] : users;
+  const promises = nodeids.map(nodeId => asyncApiReq({
+    a: 'mcga',
+    n: [nodeId],
+    u,
+    id: this.chatId,
+    v: Chatd.VERSION
+  }));
+  const res = await Promise.allSettled(promises);
+  const sent = [];
+  for (let i = res.length; i--;) {
+    if (res[i].status === 'fulfilled') {
+      sent.push(nodeids[i]);
+    }
   }
-  return Promise.allSettled(promises);
+  if (!sent.length) {
+    throw ENOENT;
+  }
+  return sent;
 };
 ChatRoom.prototype.attachNodes = async function (nodes, names) {
   if (!Array.isArray(nodes)) {
@@ -4832,10 +4825,10 @@ ChatRoom.prototype._attachNodes = mutex('chatroom-attach-nodes', function _(reso
   const members = self.getParticipantsExceptMe();
   const attach = nodes => {
     console.assert(self.type === 'public' || users.length, 'No users to send to?!');
-    return this._sendNodes(nodes, users).then(() => {
-      for (let i = nodes.length; i--;) {
-        const n = nmap[nodes[i]] || M.getNodeByHandle(nodes[i]);
-        console.assert(n.h, `Node not found... ${nodes[i]}`);
+    return this._sendNodes(nodes, users).then(res => {
+      for (let i = res.length; i--;) {
+        const n = nmap[res[i]] || M.getNodeByHandle(res[i]);
+        console.assert(n.h, `Node not found... ${res[i]}`);
         if (n.h) {
           const name = names && (names[n.hash] || names[n.h]) || n.name;
           self.sendMessage(Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT + Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT + JSON.stringify([{
@@ -4862,6 +4855,8 @@ ChatRoom.prototype._attachNodes = mutex('chatroom-attach-nodes', function _(reso
   const fail = function (ex) {
     if (ex === EBLOCKED) {
       result = ex;
+    } else if (ex === ENOENT) {
+      result = result || ex;
     } else if (d) {
       _.logger.error(ex);
     }
@@ -7507,8 +7502,31 @@ ContactPresence.defaultProps = {
   'skipQueuedUpdatesOnResize': true
 };
 class LastActivity extends _mixins1__.u9 {
+  constructor(...args) {
+    super(...args);
+    this.lastActivityInterval = undefined;
+    this.state = {
+      updated: 0
+    };
+    this.doUpdate = () => this.isComponentVisible() && document.visibilityState === 'visible' && this.setState(state => ({
+      updated: ++state.updated
+    }));
+  }
   attachRerenderCallbacks() {
     this._attachRerenderCbContacts(['ats', 'lastGreen', 'presence']);
+  }
+  shouldComponentUpdate() {
+    return true;
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    clearInterval(this.lastActivityInterval);
+    document.removeEventListener('visibilitychange', this.doUpdate);
+  }
+  componentDidMount() {
+    super.componentDidMount();
+    this.lastActivityInterval = setInterval(this.doUpdate, 6e4);
+    document.addEventListener('visibilitychange', this.doUpdate);
   }
   render() {
     const {
@@ -7522,7 +7540,7 @@ class LastActivity extends _mixins1__.u9 {
     const SECONDS = new Date().getTime() / 1000 - lastActivity;
     const timeToLast = SECONDS > 3888000 ? l[20673] : time2last(lastActivity, true);
     const hasActivityStatus = showLastGreen && contact.presence <= 2 && lastActivity;
-    return react0().createElement("span", null, hasActivityStatus ? (l[19994] || "Last seen %s").replace("%s", timeToLast) : M.onlineStatusClass(contact.presence)[0]);
+    return react0().createElement("span", null, hasActivityStatus ? (l[19994] || 'Last seen %s').replace('%s', timeToLast) : M.onlineStatusClass(contact.presence)[0]);
   }
 }
 class ContactAwareName extends _mixins1__.u9 {
@@ -9046,6 +9064,7 @@ ColumnContactButtons.megatype = "grid-url-header-nw";
 class ContactList extends mixins.w9 {
   constructor(props) {
     super(props);
+    this.lastInteractionInterval = undefined;
     this.contextMenuRefs = [];
     this.state = {
       selected: [],
@@ -9057,6 +9076,7 @@ class ContactList extends mixins.w9 {
     this.onHighlighted = this.onHighlighted.bind(this);
     this.onExpand = this.onExpand.bind(this);
     this.onAttachClicked = this.onAttachClicked.bind(this);
+    this.getLastInteractions = this.getLastInteractions.bind(this);
   }
   getLastInteractions() {
     const {
@@ -9110,10 +9130,6 @@ class ContactList extends mixins.w9 {
       }, () => $$REF.onClick(ev));
     }
   }
-  componentDidMount() {
-    super.componentDidMount();
-    this.getLastInteractions();
-  }
   onSelected(handle) {
     this.setState({
       'selected': handle
@@ -9131,6 +9147,15 @@ class ContactList extends mixins.w9 {
     if (this.state.selected[0]) {
       this.onExpand(this.state.selected[0]);
     }
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    clearInterval(this.lastInteractionInterval);
+  }
+  componentDidMount() {
+    super.componentDidMount();
+    this.getLastInteractions();
+    this.lastInteractionInterval = setInterval(this.getLastInteractions, 6e4);
   }
   render() {
     const {
@@ -24454,7 +24479,10 @@ const errors = {
   browser: 'NotAllowedError: Permission denied',
   system: 'NotAllowedError: Permission denied by system',
   dismissed: 'NotAllowedError: Permission dismissed',
-  nil: 'NotFoundError: Requested device not found'
+  nil: 'NotFoundError: Requested device not found',
+  sharedCam: 'NotReadableError: Could not start video source',
+  sharedMic: 'NotReadableError: Could not start audio source',
+  sharedGeneric: 'NotReadableError: Device in use'
 };
 const isUserActionError = error => {
   return error && error === errors.browser;
@@ -24467,7 +24495,7 @@ const withPermissionsObserver = Component => {
       this.observer = `onLocalMediaError.${this.namespace}`;
       this.childRef = undefined;
       this.platform = ua.details.os;
-      this.helpURL = `${l.mega_help_host}/chats-meetings/meetings/enable-camera-mic-browser-system-permission`;
+      this.helpURL = `${l.mega_help_host}/chats-meetings/meetings/enable-audio-video-call-permissions`;
       this.macURI = 'x-apple.systempreferences:com.apple.preference.security';
       this.winURI = 'ms-settings';
       this.CONTENT = {
@@ -24504,6 +24532,16 @@ const withPermissionsObserver = Component => {
           nil: {
             title: l.no_mic_detected_title,
             info: l.no_mic_detected_info,
+            buttons: [{
+              key: 'ok',
+              label: l.ok_button,
+              className: 'positive',
+              onClick: () => this.closePermissionsDialog(Av.Audio)
+            }]
+          },
+          shared: {
+            title: l.no_mic_title,
+            info: l.shared_mic_err_info.replace('[A]', `<a href="${this.helpURL}" target="_blank" class="clickurl">`).replace('[/A]', '</a>'),
             buttons: [{
               key: 'ok',
               label: l.ok_button,
@@ -24551,6 +24589,16 @@ const withPermissionsObserver = Component => {
               className: 'positive',
               onClick: () => this.closePermissionsDialog(Av.Camera)
             }]
+          },
+          shared: {
+            title: l.no_camera_title,
+            info: l.shared_cam_err_info.replace('[A]', `<a href="${this.helpURL}" target="_blank" class="clickurl">`).replace('[/A]', '</a>'),
+            buttons: [{
+              key: 'ok',
+              label: l.ok_button,
+              className: 'positive',
+              onClick: () => this.closePermissionsDialog(Av.Camera)
+            }]
           }
         },
         [Av.Screen]: {
@@ -24587,18 +24635,25 @@ const withPermissionsObserver = Component => {
         const {
           browser,
           system,
-          nil
+          nil,
+          sharedCam,
+          sharedMic,
+          sharedGeneric
         } = errors;
         return {
           [Av.Audio]: {
             ...errMic === browser && CONTENT[Av.Audio].browser,
             ...errMic === system && CONTENT[Av.Audio].system,
-            ...errMic === nil && CONTENT[Av.Audio].nil
+            ...errMic === nil && CONTENT[Av.Audio].nil,
+            ...errMic === sharedMic && CONTENT[Av.Audio].shared,
+            ...errMic === sharedGeneric && CONTENT[Av.Audio].shared
           },
           [Av.Camera]: {
             ...errCamera === browser && CONTENT[Av.Camera].browser,
             ...errCamera === system && CONTENT[Av.Camera].system,
-            ...errCamera === nil && CONTENT[Av.Camera].nil
+            ...errCamera === nil && CONTENT[Av.Camera].nil,
+            ...errCamera === sharedCam && CONTENT[Av.Camera].shared,
+            ...errCamera === sharedGeneric && CONTENT[Av.Camera].shared
           },
           [Av.Screen]: CONTENT[Av.Screen]
         };
@@ -24673,7 +24728,7 @@ const withPermissionsObserver = Component => {
         className: "info-container"
       }, react0().createElement("h3", {
         id: "msgDialog-title"
-      }, title), cover && react0().createElement("div", {
+      }, title || l[47]), cover && react0().createElement("div", {
         className: "permissions-warning-cover"
       }, react0().createElement("span", {
         className: cover

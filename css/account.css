@@ -620,17 +620,11 @@ button.loading .loader {
     line-height: 36px;
     margin: 120px auto 0;
 }
-.trusted-users-section .trusted-by {
-    align-self: flex-start;
-}
 .trusted-users-section .users-value {
     color: rgba(255, 51, 58, 1);
     font-family: var(--text-font-family-second-bold);
     font-size: 54px;
     line-height: 65px;
-}
-.trusted-users-section .users-worldwide {
-    align-self: flex-end;
 }
 .register-slide-block h2, .login-slide-block h2 {
     display: flex;
@@ -704,4 +698,5 @@ button.loading .loader {
     display: inline-block;
     width: 100%;
     vertical-align: top;
+    white-space: normal;
 }

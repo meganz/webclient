@@ -7,7 +7,10 @@ const errors = {
     browser: 'NotAllowedError: Permission denied',
     system: 'NotAllowedError: Permission denied by system',
     dismissed: 'NotAllowedError: Permission dismissed',
-    nil: 'NotFoundError: Requested device not found'
+    nil: 'NotFoundError: Requested device not found',
+    sharedCam: 'NotReadableError: Could not start video source',
+    sharedMic: 'NotReadableError: Could not start audio source',
+    sharedGeneric: 'NotReadableError: Device in use',
 };
 
 const isUserActionError = error => {
@@ -21,7 +24,7 @@ export const withPermissionsObserver = Component => {
         childRef = undefined;
 
         platform = ua.details.os;
-        helpURL = `${l.mega_help_host}/chats-meetings/meetings/enable-camera-mic-browser-system-permission`;
+        helpURL = `${l.mega_help_host}/chats-meetings/meetings/enable-audio-video-call-permissions`;
         macURI = 'x-apple.systempreferences:com.apple.preference.security';
         winURI = 'ms-settings';
 
@@ -76,6 +79,18 @@ export const withPermissionsObserver = Component => {
                 nil: {
                     title: l.no_mic_detected_title,
                     info: l.no_mic_detected_info,
+                    buttons: [{
+                        key: 'ok',
+                        label: l.ok_button,
+                        className: 'positive',
+                        onClick: () => this.closePermissionsDialog(Av.Audio)
+                    }]
+                },
+                shared: {
+                    title: l.no_mic_title,
+                    info: l.shared_mic_err_info
+                        .replace('[A]', `<a href="${this.helpURL}" target="_blank" class="clickurl">`)
+                        .replace('[/A]', '</a>'),
                     buttons: [{
                         key: 'ok',
                         label: l.ok_button,
@@ -142,6 +157,18 @@ export const withPermissionsObserver = Component => {
                         className: 'positive',
                         onClick: () => this.closePermissionsDialog(Av.Camera)
                     }]
+                },
+                shared: {
+                    title: l.no_camera_title,
+                    info: l.shared_cam_err_info
+                        .replace('[A]', `<a href="${this.helpURL}" target="_blank" class="clickurl">`)
+                        .replace('[/A]', '</a>'),
+                    buttons: [{
+                        key: 'ok',
+                        label: l.ok_button,
+                        className: 'positive',
+                        onClick: () => this.closePermissionsDialog(Av.Camera)
+                    }]
                 }
             },
 
@@ -187,18 +214,22 @@ export const withPermissionsObserver = Component => {
         getPermissionsDialogContent = () => {
             const { CONTENT, state } = this;
             const { errMic, errCamera } = state;
-            const { browser, system, nil } = errors;
+            const { browser, system, nil, sharedCam, sharedMic, sharedGeneric } = errors;
 
             return {
                 [Av.Audio]: {
                     ...errMic === browser && CONTENT[Av.Audio].browser,
                     ...errMic === system && CONTENT[Av.Audio].system,
                     ...errMic === nil && CONTENT[Av.Audio].nil,
+                    ...errMic === sharedMic && CONTENT[Av.Audio].shared,
+                    ...errMic === sharedGeneric && CONTENT[Av.Audio].shared,
                 },
                 [Av.Camera]: {
                     ...errCamera === browser && CONTENT[Av.Camera].browser,
                     ...errCamera === system && CONTENT[Av.Camera].system,
                     ...errCamera === nil && CONTENT[Av.Camera].nil,
+                    ...errCamera === sharedCam && CONTENT[Av.Camera].shared,
+                    ...errCamera === sharedGeneric && CONTENT[Av.Camera].shared,
                 },
                 [Av.Screen]: CONTENT[Av.Screen]
             };
@@ -269,7 +300,7 @@ export const withPermissionsObserver = Component => {
                             </div>
                         }
                         <div className="info-container">
-                            <h3 id="msgDialog-title">{title}</h3>
+                            <h3 id="msgDialog-title">{title || l[47]}</h3>
                             {cover &&
                                 <div className="permissions-warning-cover">
                                     <span className={cover}/>

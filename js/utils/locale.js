@@ -1353,11 +1353,20 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[22074] = escapeHTML(l[22074]).replace('[S]', '<span class="purchase">').replace('[/S]', '</span>');
     l[22077] = escapeHTML(l[22077]).replace('[S]', '<span class="green strong">').replace('[S]', '</span>');
     l[22248] = escapeHTML(l[22248]).replace(/\[S]/g, '<strong>').replace(/\[\/S]/g, '</strong>');
+    l[22667] = escapeHTML(l[22667])
+        .replace(/\[S]/g, '<span>').replace(/\[\/S]/g, '</span>')
+        .replace('[A]', '<a class="clickurl" href="/pro" data-eventid="500491">')
+        .replace('[/A]', '</a>');
+    l[22668] = escapeHTML(l[22668])
+        .replace(/\[S]/g, '<span>').replace(/\[\/S]/g, '</span>')
+        .replace('[A]', '<a class="clickurl" href="/pro" data-eventid="500490">')
+        .replace('[/A]', '</a>');
     l[22685] = escapeHTML(l[22685]).replace('[B]', '<strong>').replace('[/B]', '</strong>');
     l[22687] = escapeHTML(l[22687]).replace('[B]', '<strong>').replace('[/B]', '</strong>');
     l[22688] = escapeHTML(l[22688]).replace('[B]', '<strong>').replace('[/B]', '</strong>');
     l[22689] = escapeHTML(l[22689]).replace('[B]', '<strong>').replace('[/B]', '</strong>');
-    l[22696] = escapeHTML(l[22696]).replace('[A]', '<a class="clickurl" href="/pro">').replace('[/A]', '</a>')
+    l[22696] = escapeHTML(l[22696])
+        .replace('[A]', '<a class="clickurl" href="/pro" data-eventid="500481">').replace('[/A]', '</a>')
         .replace('[S]', '<span class="no-buisness">').replace('[/S]', '</span>');
     l[22700] = escapeHTML(l[22700]).replace('[S]', '<i class="sprite-fm-mono icon-up"></i><span>')
         .replace('[/S]', '</span>').replace('%1', '');
@@ -1506,7 +1515,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a target="_blank" class="green-link" href="https://blog.mega.io">')
         .replace('[/A]', '</a>');
     l.achievem_dialogfootertext = escapeHTML(l.achievem_dialogfootertext)
-        .replace('[A]', '<a href="/pro" class="clickurl">')
+        .replace('[A]', '<a href="/pro" class="clickurl" data-eventid="500480">')
         .replace('[/A]', '</a>');
     l.achievem_pagedesc = escapeHTML(l.achievem_pagedesc)
         .replace('[S]', '<span>')
@@ -2052,7 +2061,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         15536, 16107, 16119, 16120, 16136, 16304, 16313, 16316, 16358, 16360, 16361, 16394, 18228, 18268, 18282,
         18284, 18285, 18286, 18287, 18289, 18290, 18291, 18294, 18295, 18296, 18297, 18298, 18302, 18303, 18304,
         18305, 18314, 18315, 18316, 18419, 19807, 19808, 19810, 19811, 19812, 19813, 19814, 19854, 19821, 20402,
-        20462, 20969, 20970, 20971, 20973, 22667, 22668, 22674, 22669, 22671, 22672, 22784, 22789,
+        20462, 20969, 20970, 20971, 20973, 22674, 22669, 22671, 22672, 22784, 22789,
         23351, 23524, 23534, 23296, 23299, 23304, 23819, 24077, 24097, 24099, 24139, 24540, 24542, 24543, 24544,
         24680, 24849, 24850,
 

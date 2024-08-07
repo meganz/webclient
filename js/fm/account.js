@@ -279,10 +279,27 @@ accountUI.general = {
             }
             else {
                 loadSubPage('pro');
+
+                const $clickedButton = $(this);
+
+                if ($clickedButton.hasClass('bandwidth-upgrade')) {
+                    eventlog(500488);
+                }
+                else if ($clickedButton.hasClass('rubbish-upgrade')) {
+                    eventlog(500487);
+                }
+                else if ($clickedButton.hasClass('plan-details-upgrade')) {
+                    eventlog(500484);
+                }
+                else {
+                    eventlog(500482);
+                }
             }
         });
 
         $('.download-sync', accountUI.$contentBlock).rebind('click', function() {
+
+            eventlog(500489);
 
             var pf = navigator.platform.toUpperCase();
 

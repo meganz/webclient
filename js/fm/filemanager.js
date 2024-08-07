@@ -5025,6 +5025,7 @@ FileManager.prototype.initLeftPanel = function() {
         }
         else if (link === 'upgrade') {
             loadSubPage('pro');
+            eventlog(500477);
         }
         else if (M.isGalleryPage(link)) {
 

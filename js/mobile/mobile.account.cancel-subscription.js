@@ -63,25 +63,11 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
 
             this.reasonNumber = '';
             this.reasonString = '';
+            this.canContactUser = '';
 
             this.addCancelSubInfo();
-            this.createRadioOptions();
-
-            this.inlineAlert = mobile.inline.alert.create({
-                parentNode: this.domNode,
-                componentClassname: 'select-reason error hidden',
-                text: l.cancel_sub_no_opt_picked_mob,
-                icon: 'sprite-mobile-fm-mono icon-alert-triangle-thin-outline',
-                closeButton: false
-            });
-
-            const textarea = document.createElement('textarea');
-            textarea.maxLength = 1000;
-            textarea.className = 'reason-field textArea clearButton lengthChecker no-title-top';
-            this.domNode.appendChild(textarea);
-
-            this.otherReasonTextArea = new mega.ui.MegaInputs($(textarea));
-            this.otherReasonTextArea.$wrapper.addClass('box-style fixed-width mobile hidden');
+            this.createReasonRadioOptions();
+            this.createConsentRadioOptions();
 
             this.createBottomButtons();
 
@@ -105,8 +91,18 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
                 this.reasonString = '';
             }
 
-            if (this.inlineAlert.visible) {
-                this.inlineAlert.hide();
+            if (this.inlineReasonAlert.visible) {
+                this.inlineReasonAlert.hide();
+            }
+
+            if (this.canContactUser.length) {
+                this.consentOptionGroup.value = '';
+                this.consentOptionGroup.getChild([this.canContactUser]).checked = false;
+                this.canContactUser = '';
+            }
+
+            if (this.inlineConsentAlert.visible) {
+                this.inlineConsentAlert.hide();
             }
 
             this.otherReasonTextArea.hideError();
@@ -144,11 +140,11 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
     },
 
     /**
-     * Create the survey options (radio buttons) for the page.
+     * Create the cancellation reason options (radio buttons) for the page.
      *
      * @returns {undefined}
      */
-    createRadioOptions: {
+    createReasonRadioOptions: {
         value: function() {
             'use strict';
 
@@ -204,7 +200,21 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
                     value: 7,
                     checked: false,
                     otherOption: false
-                }
+                },
+                {
+                    parentNode: radioOptions,
+                    label: l.cancel_sub_cant_afford_reason,
+                    value: 9,
+                    checked: false,
+                    otherOption: false
+                },
+                {
+                    parentNode: radioOptions,
+                    label: l.cancel_sub_no_sub_reason,
+                    value: 10,
+                    checked: false,
+                    otherOption: false
+                },
             ];
 
             for (let i = options.length - 1; i > 0; i--) {
@@ -227,7 +237,9 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
                 onChange: (e) => {
                     this.reasonNumber = e.currentTarget.value;
 
-                    const selectedRadioBtnOptions = options[this.reasonNumber - 1];
+                    const selectedRadioBtnOptions = options.filter((option) => {
+                        return option.value === parseInt(this.reasonNumber);
+                    })[0];
 
                     const otherOptionChosen = selectedRadioBtnOptions.otherOption;
                     this.reasonString = otherOptionChosen ? '' : selectedRadioBtnOptions.label;
@@ -241,10 +253,83 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
                         }, 30);
                     }
 
-                    if (this.inlineAlert.visible) {
-                        this.inlineAlert.hide();
+                    if (this.inlineReasonAlert.visible) {
+                        this.inlineReasonAlert.hide();
                     }
                 }
+            });
+
+            this.inlineReasonAlert = mobile.inline.alert.create({
+                parentNode: this.domNode,
+                componentClassname: 'select-reason error hidden',
+                text: l.cancel_sub_no_opt_picked_mob,
+                icon: 'sprite-mobile-fm-mono icon-alert-triangle-thin-outline',
+                closeButton: false
+            });
+
+            this.domNode.append(radioOptions);
+
+            const textarea = document.createElement('textarea');
+            textarea.maxLength = 1000;
+            textarea.className = 'reason-field textArea clearButton lengthChecker no-title-top';
+            this.domNode.appendChild(textarea);
+
+            this.otherReasonTextArea = new mega.ui.MegaInputs($(textarea));
+            this.otherReasonTextArea.$wrapper.addClass('box-style fixed-width mobile hidden');
+        }
+    },
+
+    /**
+     * Create the email consent options (radio buttons) for the page.
+     *
+     * @returns {undefined}
+     */
+    createConsentRadioOptions: {
+        value() {
+            'use strict';
+
+            const radioOptions = document.createElement('div');
+            radioOptions.className = 'consent-options';
+
+            const options = [
+                {
+                    parentNode: radioOptions,
+                    label: l[78],
+                    value: 1,
+                    checked: false,
+                },
+                {
+                    parentNode: radioOptions,
+                    label: l[79],
+                    value: 0,
+                    checked: false,
+                },
+            ];
+
+            this.consentOptionGroup = new MegaMobileRadioGroup({
+                name: 'email-consent',
+                radios: options,
+                align: 'left',
+                onChange: (e) => {
+                    this.canContactUser = e.currentTarget.value;
+
+                    if (this.inlineConsentAlert.visible) {
+                        this.inlineConsentAlert.hide();
+                    }
+                }
+            });
+
+            const cancelSubPrompt = document.createElement('div');
+            cancelSubPrompt.className = 'email-consent-prompt';
+            cancelSubPrompt.textContent = l.cancel_sub_can_contact;
+            this.domNode.appendChild(cancelSubPrompt);
+
+            this.inlineConsentAlert = mobile.inline.alert.create({
+                parentNode: this.domNode,
+                componentClassname: 'select-consent-ans error hidden',
+                text: l.cancel_sub_err_make_selection,
+                icon: 'sprite-mobile-fm-mono icon-alert-triangle-thin-outline',
+                closeButton: false
             });
 
             this.domNode.append(radioOptions);
@@ -307,8 +392,13 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
             let reason = this.otherReasonTextArea.$input.val();
             const reasonStringIsEmpty = !!this.reasonString;
 
-            if (!this.reasonNumber) {
-                this.inlineAlert.show();
+            if (!this.reasonNumber || !this.canContactUser.length) {
+                if (!this.reasonNumber) {
+                    this.inlineReasonAlert.show();
+                }
+                if (!this.canContactUser.length) {
+                    this.inlineConsentAlert.show();
+                }
 
                 return;
             }
@@ -327,7 +417,7 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
             }
 
             // Setup standard request to 'cccs' = Credit Card Cancel Subscriptions
-            const ccReq = { a: 'cccs', r: reason };
+            const ccReq = { a: 'cccs', r: reason, cc: this.canContactUser };
             const requests = [ccReq];
 
             if (subscriptionId) {

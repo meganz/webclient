@@ -567,6 +567,7 @@ accountUI.plan = {
 
             $('.btn-achievements', accountUI.$contentBlock).rebind('click', () => {
                 mega.achievem.achievementsListDialog();
+                eventlog(500483);
             });
         },
 
@@ -625,7 +626,9 @@ accountUI.plan = {
                     lack_of_features: 4,
                     switching_provider: 5,
                     difficult_to_use: 6,
-                    poor_support: 7
+                    poor_support: 7,
+                    cant_afford: 9,
+                    no_sub: 10,
                 };
 
                 // Shuffle the options
@@ -656,17 +659,12 @@ accountUI.plan = {
                 }
                 else {
                     this.$dialog.removeClass('hidden');
+                    this.initUpdateDialogScrolling(this.$formContent);
                 }
                 this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
 
                 // Init textarea scrolling
                 initTextareaScrolling($('.cancel-textarea textarea', this.$dialog));
-
-                // Init section scrolling
-                if (this.$formContent.is('.ps')) {
-                    this.$formContent.scrollTop(0);
-                    Ps.destroy(this.$formContent[0]);
-                }
 
                 // Init functionality
                 this.resetCancelSubscriptionForm();
@@ -679,6 +677,20 @@ accountUI.plan = {
                     this.sendSubCancelRequestToApi(subscription && subscription.id || null);
                     eventlog(500421);
                 });
+            },
+
+            /**
+             * Initialise or update the scrollbar for the cancellation survey form
+             */
+            initUpdateDialogScrolling: ($formContent) => {
+                'use strict';
+
+                if ($formContent.is('.ps')) {
+                    $formContent.scrollTop(0);
+                }
+                else {
+                    Ps.initialize($formContent[0]);
+                }
             },
 
             /**
@@ -761,7 +773,7 @@ accountUI.plan = {
 
                 'use strict';
 
-                const {$benefitsCancelDialog, $dialog, $backgroundOverlay} = this;
+                const {$benefitsCancelDialog, $dialog, $backgroundOverlay, $formContent} = this;
 
                 const $closeBtn = $('.js-close', $benefitsCancelDialog);
                 const $continueBtn = $('.js-continue', $benefitsCancelDialog);
@@ -780,6 +792,7 @@ accountUI.plan = {
                 $continueBtn.rebind('click', () => {
                     $benefitsCancelDialog.addClass('hidden');
                     $dialog.removeClass('hidden');
+                    this.initUpdateDialogScrolling($formContent);
                     eventlog(500417);
                 });
                 loadingDialog.show();
@@ -836,18 +849,12 @@ accountUI.plan = {
                     this.$dialog.toggleClass('textbox-open', valueIsOtherOption);
 
                     if (valueIsOtherOption) {
-                        Ps.initialize(this.$formContent[0]);
                         this.$invalidDetailsDialog.toggleClass('hidden', !(this.$cancelReason.hasClass('error')));
 
                         this.$formContent.scrollTop(this.$formContent.height());
                         this.$textarea.trigger('focus');
                     }
                     else {
-                        if (this.$formContent.is('.ps')) {
-                            this.$formContent.scrollTop(0);
-                            Ps.destroy(this.$formContent[0]);
-                        }
-
                         this.$invalidDetailsDialog.addClass('hidden');
                         this.$textarea.trigger('blur');
                     }
@@ -1141,14 +1148,16 @@ accountUI.plan = {
             $('.redeem-voucher', accountUI.$contentBlock).rebind('click', function() {
                 var $this = $(this);
                 if ($this.attr('class').indexOf('active') === -1) {
-                    $('.fm-account-overlay').fadeIn(100);
+                    $('.fm-account-overlay').removeClass('hidden');
                     $this.addClass('active');
                     $('.fm-voucher-popup').removeClass('hidden');
+
+                    eventlog(500486);
 
                     $('.fm-account-overlay, .fm-purchase-voucher, .fm-voucher-button')
                         .add('.fm-voucher-popup button.js-close')
                         .rebind('click.closeDialog', () => {
-                            $('.fm-account-overlay').fadeOut(100);
+                            $('.fm-account-overlay').addClass('hidden');
                             $('.redeem-voucher').removeClass('active');
                             $('.fm-voucher-popup').addClass('hidden');
                         });
@@ -1198,6 +1207,7 @@ accountUI.plan = {
 
             $('.fm-purchase-voucher, button.topup').rebind('click', () => {
                 mega.redirect('mega.io', 'resellers', false, false, false);
+                eventlog(500485);
             });
         }
     },

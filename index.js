@@ -2752,6 +2752,9 @@ function topmenuUI() {
                     if (is_mobile && subpage === 'keybackup') {
                         eventlog(99853);
                     }
+                    if (subpage === 'pro') {
+                        eventlog(500479);
+                    }
 
                     loadSubPage(moveTo[subpage] || subpage);
                 }
@@ -2793,6 +2796,9 @@ function topmenuUI() {
     $menuUpgradeAccount.rebind('click.openpricing', function() {
         if (is_mobile) {
             eventlog(99851);
+        }
+        else {
+            eventlog(500478);
         }
 
         topMenu(1);

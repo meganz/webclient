@@ -984,6 +984,8 @@ MegaData.prototype.showOverStorageQuota = function(quota, options) {
 
         loadSubPage('pro');
 
+        eventlog(quota.isFull ? 500493 : 500492);
+
         return false;
     });
 

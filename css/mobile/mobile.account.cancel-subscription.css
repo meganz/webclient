@@ -11,7 +11,8 @@
     color: var(--mobile-text-secondary);
 }
 
-.cancel-subscription-survey .cancel-sub-prompt {
+.cancel-subscription-survey .cancel-sub-prompt,
+.cancel-subscription-survey .email-consent-prompt {
     margin: 16px 0;
     font: var(--mobile-font-heading-h3);
     color: var(--mobile-text-primary);
@@ -45,6 +46,10 @@
 
 .cancel-subscription-survey .mobile.mega-input.box-style {
     margin-bottom: 22px;
+}
+
+.cancel-subscription-survey .mobile.mega-input .message-container {
+    top: 148px;
 }
 
 @media only screen and (min-width: 769px) {

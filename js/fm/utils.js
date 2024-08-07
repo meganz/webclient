@@ -1742,7 +1742,11 @@ MegaUtils.prototype.checkLeftStorageBlock = async function(data) {
             eventlog(eventId, eventMessage);
         };
 
-        $upgradeBtn.removeClass('hidden').rebind('click.sendEvent', () => _sendEvent(500282));
+        $upgradeBtn.removeClass('hidden').rebind('click.sendEvent', () => {
+            _sendEvent(500282);
+            loadSubPage('pro');
+        });
+
         storageBlock.querySelector('.text-and-tooltip').classList.remove('hidden');
 
         if (storageIsAlmostFullOrFull) {

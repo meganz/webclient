@@ -414,12 +414,39 @@ export class ContactPresence extends MegaRenderMixin {
 };
 
 export class LastActivity extends ContactAwareComponent {
+    lastActivityInterval = undefined;
+
     attachRerenderCallbacks() {
         this._attachRerenderCbContacts([
             'ats',
             'lastGreen',
             'presence',
         ]);
+    }
+
+    state = {
+        updated: 0
+    };
+
+    shouldComponentUpdate() {
+        return true;
+    }
+
+    doUpdate = () =>
+        this.isComponentVisible() &&
+        document.visibilityState === 'visible' &&
+        this.setState(state => ({ updated: ++state.updated }));
+
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        clearInterval(this.lastActivityInterval);
+        document.removeEventListener('visibilitychange', this.doUpdate);
+    }
+
+    componentDidMount() {
+        super.componentDidMount();
+        this.lastActivityInterval = setInterval(this.doUpdate, 6e4 /* 1 min */);
+        document.addEventListener('visibilitychange', this.doUpdate);
     }
 
     render() {
@@ -438,7 +465,7 @@ export class LastActivity extends ContactAwareComponent {
         return (
             <span>
                 {hasActivityStatus ?
-                    (l[19994] || "Last seen %s").replace("%s", timeToLast) :
+                    (l[19994] || 'Last seen %s').replace('%s', timeToLast) :
                     M.onlineStatusClass(contact.presence)[0]}
             </span>
         );

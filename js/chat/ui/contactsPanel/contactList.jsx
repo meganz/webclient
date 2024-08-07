@@ -9,7 +9,9 @@ import {ColumnContactVerifiedStatus} from "../../../ui/jsx/fm/nodes/columns/colu
 import {ColumnContactButtons} from "../../../ui/jsx/fm/nodes/columns/columnContactButtons.jsx";
 
 export default class ContactList extends MegaRenderMixin {
+    lastInteractionInterval = undefined;
     contextMenuRefs = [];
+
     state = {
         selected: [],
         searchValue: null,
@@ -24,6 +26,7 @@ export default class ContactList extends MegaRenderMixin {
         this.onHighlighted = this.onHighlighted.bind(this);
         this.onExpand = this.onExpand.bind(this);
         this.onAttachClicked = this.onAttachClicked.bind(this);
+        this.getLastInteractions = this.getLastInteractions.bind(this);
     }
 
     /**
@@ -97,28 +100,37 @@ export default class ContactList extends MegaRenderMixin {
                 $$REF.onClick(ev)
             );
         }
-    };
-
-
-    componentDidMount() {
-        super.componentDidMount();
-        this.getLastInteractions();
     }
 
     onSelected(handle) {
         this.setState({'selected': handle});
     }
+
     onHighlighted(handle) {
         this.setState({'highlighted': handle});
     }
+
     onExpand(handle) {
         loadSubPage('/fm/chat/contacts/' + handle);
     }
+
     onAttachClicked() {
         if (this.state.selected[0]) {
             this.onExpand(this.state.selected[0]);
         }
     }
+
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        clearInterval(this.lastInteractionInterval);
+    }
+
+    componentDidMount() {
+        super.componentDidMount();
+        this.getLastInteractions();
+        this.lastInteractionInterval = setInterval(this.getLastInteractions, 6e4 /* 1 min */);
+    }
+
     render() {
         const { contacts } = this.props;
 

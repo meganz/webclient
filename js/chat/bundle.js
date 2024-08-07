@@ -7502,8 +7502,31 @@ ContactPresence.defaultProps = {
   'skipQueuedUpdatesOnResize': true
 };
 class LastActivity extends _mixins1__.u9 {
+  constructor(...args) {
+    super(...args);
+    this.lastActivityInterval = undefined;
+    this.state = {
+      updated: 0
+    };
+    this.doUpdate = () => this.isComponentVisible() && document.visibilityState === 'visible' && this.setState(state => ({
+      updated: ++state.updated
+    }));
+  }
   attachRerenderCallbacks() {
     this._attachRerenderCbContacts(['ats', 'lastGreen', 'presence']);
+  }
+  shouldComponentUpdate() {
+    return true;
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    clearInterval(this.lastActivityInterval);
+    document.removeEventListener('visibilitychange', this.doUpdate);
+  }
+  componentDidMount() {
+    super.componentDidMount();
+    this.lastActivityInterval = setInterval(this.doUpdate, 6e4);
+    document.addEventListener('visibilitychange', this.doUpdate);
   }
   render() {
     const {
@@ -7517,7 +7540,7 @@ class LastActivity extends _mixins1__.u9 {
     const SECONDS = new Date().getTime() / 1000 - lastActivity;
     const timeToLast = SECONDS > 3888000 ? l[20673] : time2last(lastActivity, true);
     const hasActivityStatus = showLastGreen && contact.presence <= 2 && lastActivity;
-    return react0().createElement("span", null, hasActivityStatus ? (l[19994] || "Last seen %s").replace("%s", timeToLast) : M.onlineStatusClass(contact.presence)[0]);
+    return react0().createElement("span", null, hasActivityStatus ? (l[19994] || 'Last seen %s').replace('%s', timeToLast) : M.onlineStatusClass(contact.presence)[0]);
   }
 }
 class ContactAwareName extends _mixins1__.u9 {
@@ -9041,6 +9064,7 @@ ColumnContactButtons.megatype = "grid-url-header-nw";
 class ContactList extends mixins.w9 {
   constructor(props) {
     super(props);
+    this.lastInteractionInterval = undefined;
     this.contextMenuRefs = [];
     this.state = {
       selected: [],
@@ -9052,6 +9076,7 @@ class ContactList extends mixins.w9 {
     this.onHighlighted = this.onHighlighted.bind(this);
     this.onExpand = this.onExpand.bind(this);
     this.onAttachClicked = this.onAttachClicked.bind(this);
+    this.getLastInteractions = this.getLastInteractions.bind(this);
   }
   getLastInteractions() {
     const {
@@ -9105,10 +9130,6 @@ class ContactList extends mixins.w9 {
       }, () => $$REF.onClick(ev));
     }
   }
-  componentDidMount() {
-    super.componentDidMount();
-    this.getLastInteractions();
-  }
   onSelected(handle) {
     this.setState({
       'selected': handle
@@ -9126,6 +9147,15 @@ class ContactList extends mixins.w9 {
     if (this.state.selected[0]) {
       this.onExpand(this.state.selected[0]);
     }
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    clearInterval(this.lastInteractionInterval);
+  }
+  componentDidMount() {
+    super.componentDidMount();
+    this.getLastInteractions();
+    this.lastInteractionInterval = setInterval(this.getLastInteractions, 6e4);
   }
   render() {
     const {

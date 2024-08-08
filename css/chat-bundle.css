@@ -2299,39 +2299,6 @@ body.rtl .meetings-call .stream .stream-participants-block .participants-contain
   font: var(--text-body1);
   visibility: visible;
 }
-.meetings-call .input-sources {
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 16px 20px;
-  display: none;
-  position: absolute;
-  margin: 8px 0 0 0;
-  border-radius: 12px;
-  border: var(--context-menu-border);
-  background: var(--surface-main);
-  box-shadow: var(--dropdown-shadow);
-  width: 320px;
-}
-.meetings-call .input-sources.expanded {
-  display: flex;
-}
-.meetings-call .input-sources button {
-  float: left;
-  padding: 0;
-  text-align: left;
-  border: 0;
-  font: var(--text-h3);
-  color: var(--secondary-white);
-  background: transparent;
-  cursor: pointer;
-  width: 100%;
-}
-.meetings-call .input-sources button i {
-  float: right;
-}
-.meetings-call .input-sources hr {
-  width: 100%;
-}
 .meetings-call .sidebar-controls {
   display: flex;
   justify-content: flex-end;

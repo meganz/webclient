@@ -1439,7 +1439,7 @@ security.login = {
 
         // Check for suspended account
         if (result === EBLOCKED) {
-            msgDialog('warninga', l[6789], l[730]);
+            msgDialog('warninga', l[6789], api_strerror(result));
             return true;
         }
 

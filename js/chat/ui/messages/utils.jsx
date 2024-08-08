@@ -46,7 +46,7 @@ var getMessageString;
                 'remoteCallStarted': l[5888],
                 'call-started': l[5888].replace("[X]", "[[[X]]]"),
                 'alterParticipants': undefined,
-                'privilegeChange': l[8915],
+                'privilegeChange': undefined,
                 'truncated': l[8905],
             };
             _sanitizeStrings(MESSAGE_STRINGS);

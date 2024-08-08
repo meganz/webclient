@@ -55,15 +55,6 @@ export class DropdownEmojiSelector extends MegaRenderMixin {
             'totalScrollHeight': 302,
             'numberOfEmojisPerRow': 9
         };
-        /*
-         "PEOPLE": l[8016],
-         "NATURE": l[8017],
-         "FOOD & DRINK": l[8018],
-         "CELEBRATION": l[8019],
-         "ACTIVITY": l[8020],
-         "TRAVEL & PLACES": l[8021],
-         "OBJECTS & SYMBOLS": l[8022]
-         */
         this.categoryLabels = {
             'frequently_used': l[17737],
             'people': l[8016],

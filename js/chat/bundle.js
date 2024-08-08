@@ -1608,15 +1608,6 @@ function Chat() {
             return l.notif_body_incoming_msg_group.replace('%1', params.from).replace('%2', params.roomTitle);
           }
         },
-        'incoming-attachment': {
-          title: l.notif_title_incoming_attch,
-          'icon' (notificationObj) {
-            return notificationObj.options.icon;
-          },
-          'body' (notificationObj, params) {
-            return mega.icu.format(l.notif_body_incoming_attch, params.attachmentsCount).replace('%s', params.from);
-          }
-        },
         'incoming-voice-video-call': {
           'title': l[17878] || "Incoming call",
           'icon' (notificationObj) {
@@ -1624,15 +1615,6 @@ function Chat() {
           },
           'body' (notificationObj, params) {
             return l[5893].replace('[X]', params.from);
-          }
-        },
-        'call-terminated': {
-          title: l.notif_title_call_term,
-          'icon' (notificationObj) {
-            return notificationObj.options.icon;
-          },
-          'body' (notificationObj, params) {
-            return l[5889].replace('[X]', params.from);
           }
         },
         'screen-share-error': {
@@ -29326,7 +29308,7 @@ let getMessageString;
         'remoteCallStarted': l[5888],
         'call-started': l[5888].replace("[X]", "[[[X]]]"),
         'alterParticipants': undefined,
-        'privilegeChange': l[8915],
+        'privilegeChange': undefined,
         'truncated': l[8905]
       };
       _sanitizeStrings(MESSAGE_STRINGS);

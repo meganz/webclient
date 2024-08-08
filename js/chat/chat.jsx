@@ -142,17 +142,6 @@ function Chat() {
                             .replace('%2', params.roomTitle);
                     }
                 },
-                'incoming-attachment': {
-                    title: l.notif_title_incoming_attch, /* `Incoming attachment` */
-                    'icon': function(notificationObj) {
-                        return notificationObj.options.icon;
-                    },
-                    'body': function(notificationObj, params) {
-                        /* `%s shared (a/#) file(s)`*/
-                        return mega.icu.format(l.notif_body_incoming_attch, params.attachmentsCount)
-                            .replace('%s', params.from);
-                    }
-                },
                 'incoming-voice-video-call': {
                     'title': l[17878] || "Incoming call",
                     'icon': function(notificationObj) {
@@ -160,15 +149,6 @@ function Chat() {
                     },
                     'body': function(notificationObj, params) {
                         return l[5893].replace('[X]', params.from); // You have an incoming call from [X].
-                    }
-                },
-                'call-terminated': {
-                    title: l.notif_title_call_term, /* `Call terminated` */
-                    'icon': function(notificationObj) {
-                        return notificationObj.options.icon;
-                    },
-                    'body': function(notificationObj, params) {
-                        return l[5889].replace('[X]', params.from); // Call with [X] ended.
                     }
                 },
                 'screen-share-error': {

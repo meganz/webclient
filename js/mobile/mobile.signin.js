@@ -351,7 +351,7 @@ mobile.signin.new = {
             security.login.rememberMe = false;
 
             if (result === EBLOCKED) {
-                msgDialog('warninga', l[6789], l[730]);
+                msgDialog('warninga', l[6789], api_strerror(result));
             }
             else if (result !== false && result >= 0) {
                 u_type = result;

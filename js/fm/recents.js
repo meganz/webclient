@@ -634,7 +634,7 @@ RecentsRender.prototype.generateRow = function (action, actionId) {
     // var date = new Date(action.ts * 1000 || 0);
     // $newRow.find(".file-data .time").text(this._shortTimeFormatter.format(date));
     // $newRow.find(".file-data .uploaded-on-message.dark-direct-tooltip span").text(
-    //     (action.action !== "added" ? l[19942] : l[19941])
+    //     (action.action !== "added" ?)
     //         .replace('%1', acc_time2date(action.ts, true))
     //         .replace('%2', this._fullTimeFormatter.format(date))
     // );

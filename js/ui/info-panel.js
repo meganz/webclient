@@ -738,7 +738,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
 
         // If there are taken down nodes within the currently selected nodes, update the display to show that
         if (isTakenDown) {
-            const warningText = mega.icu.format(l.item_subject_to_takedown, selectedNodes.length);
+            const warningText = selectedNodes.length > 1 ? l.items_subject_to_takedown : l.item_subject_to_takedown;
             $('.takedown-warning', $container).text(warningText);
             $container.addClass('taken-down');
         }

@@ -23428,7 +23428,7 @@ class Call extends mixins.w9 {
             classes: ['theme-dark-forced', 'call-toast'],
             icons: ['sprite-fm-uni icon-raise-hand'],
             timeout: 10e3,
-            content: raisedHandPeers.length > 2 ? mega.icu.format(l.raise_peers_raised, raisedHandPeers.length) : (raisedHandPeers.length === 1 ? l.raise_peer_raised : mega.icu.format(l.raise_two_raised, raisedHandPeers.length - 1)).replace('%s', M.getNameByHandle(raisedHandPeers[0]))
+            content: raisedHandPeers.length > 2 ? raisedHandPeers.includes(u_handle) ? mega.icu.format(l.raise_self_peers_raised, raisedHandPeers.length - 1) : mega.icu.format(l.raise_peers_raised, raisedHandPeers.length) : (raisedHandPeers.length === 1 ? l.raise_peer_raised : mega.icu.format(raisedHandPeers.includes(u_handle) ? l.raise_self_peers_raised : l.raise_two_raised, raisedHandPeers.length - 1)).replace('%s', M.getNameByHandle(raisedHandPeers[0]))
           });
         }
         mBroadcaster.sendMessage('meetings:raisedHand', raisedHandPeers);
@@ -25551,9 +25551,9 @@ class Minimized extends mixins.w9 {
         className: `alert-label ${showButton ? '' : 'label-only'}`
       }, showRaised && REaCt().createElement("i", {
         className: "sprite-fm-uni icon-raise-hand"
-      }), !hideWrList && !!waitingRoomPeers.length && mega.icu.format(l.wr_peers_waiting, waitingRoomPeers.length), showRaised && (raisedHandPeers.length > 1 ? mega.icu.format(l.raise_peers_raised, raisedHandPeers.length) : REaCt().createElement(utils.P9, {
+      }), !hideWrList && !!waitingRoomPeers.length && mega.icu.format(l.wr_peers_waiting, waitingRoomPeers.length), showRaised && (raisedHandPeers.length > 1 ? raisedHandPeers.includes(u_handle) ? mega.icu.format(l.raise_self_peers_raised, raisedHandPeers.length - 1) : mega.icu.format(l.raise_peers_raised, raisedHandPeers.length) : REaCt().createElement(utils.P9, {
         tag: "span",
-        content: l.raise_peer_raised.replace('%s', megaChat.html(M.getNameByHandle(raisedHandPeers[0])))
+        content: raisedHandPeers[0] === u_handle ? l.raise_self_raised : l.raise_peer_raised.replace('%s', megaChat.html(M.getNameByHandle(raisedHandPeers[0])))
       }))), showButton && REaCt().createElement(meetings_button.A, {
         className: "show-people",
         label: showRaised ? l[16797] : l.wr_see_waiting,

@@ -824,11 +824,11 @@ FileManager.prototype.initFileManagerUI = function() {
             $('#fmholder').css('cursor', 'col-resize');
         });
 
-        $fmholder.rebind('mouseup.colresize', function() {
+        $(document).rebind('mouseup.colresize', () => {
             M.columnsWidth.makeNameColumnStatic();
-            $('#fmholder').css('cursor', '');
-            $fmholder.off('mouseup.colresize');
+            $fmholder.css('cursor', '');
             $fmholder.off('mousemove.colresize');
+            $(document).off('mouseup.colresize');
         });
     });
 

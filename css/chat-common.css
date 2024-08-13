@@ -397,6 +397,11 @@
     padding-left: 10px;
     overflow: hidden;
     height: 32px;
+    line-height: 32px;
+    margin-inline-end: 15px;
+    -webkit-margin-end: 15px;
+    padding-inline-end: 0;
+    -webkit-padding-end: 0;
 }
 .chat-heading-area {
     height: 36px;

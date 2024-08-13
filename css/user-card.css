@@ -143,20 +143,15 @@ button.user-card-name:hover {
     display: block;
 }
 .group-chat .chat-contacts-list .user-card-presence {
-    margin-inline-start: 8px;
-    -webkit-margin-start: 8px;
-    margin-top: 7px;
-    margin-bottom: 5px;
+    margin: 7px 8px 5px;
 }
 .group-chat .chat-contacts-list .user-card-name, .right-chat-contact-card .user-card-name {
     display: inline-block;
-    max-width: calc(100% - 40px);
+    max-width: calc(100% - 46px);
     padding-top: 6px;
 }
 .chat-contacts-list .user-card-data .audio-call {
-    margin-top: 5px;
-    display: block;
-    float: right;
+    display: inline-block;
 }
 .chat-contacts-list .user-card-data .audio-call i {
     --icon-size: 24px;

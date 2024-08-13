@@ -117,6 +117,9 @@
     display: table-row;
     border-top: 1px solid var(--stroke-grey-2);
 }
+.cookie-dialog .settings-row[data-type="::all"] {
+    border-top: none;
+}
 .cookie-dialog .settings-row.hidden {
     display: none;
 }

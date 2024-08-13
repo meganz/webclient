@@ -747,7 +747,7 @@ export default class Call extends MegaRenderMixin {
 
     handleModeChange = mode => {
         this.props.call.setViewMode(mode);
-        this.setState({ mode, sidebar: false, forcedLocal: false });
+        this.setState({ mode, forcedLocal: false });
     };
 
     /**

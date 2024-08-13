@@ -23533,7 +23533,6 @@ class Call extends mixins.w9 {
       this.props.call.setViewMode(mode);
       this.setState({
         mode,
-        sidebar: false,
         forcedLocal: false
       });
     };

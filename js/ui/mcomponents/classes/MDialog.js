@@ -89,6 +89,15 @@ class MDialog extends MComponent {
         this._actionTitle.textContent = text;
     }
 
+    /**
+     * Filling the button underneath the dialog
+     * @param {MButton} button MButton to fill with
+     * @returns {void}
+     */
+    set actionButton(button) {
+        this._actionTitle.appendChild(button.el);
+    }
+
     buildElement() {
         this.el = document.createElement('div');
         this.el.className = 'mega-dialog m-dialog dialog-template-main';

@@ -1859,7 +1859,9 @@ lazy(mega.gallery, 'albums', () => {
                             }
                             else {
                                 scope.albums.tree.setPendingButton(value);
-                                scope.albums.grid.setPendingCell(value);
+                                if (scope.albums.grid) {
+                                    scope.albums.grid.setPendingCell(value);
+                                }
                                 pendingName = value;
 
                                 timemarks.albumCreateNamed = Date.now();
@@ -1875,7 +1877,8 @@ lazy(mega.gallery, 'albums', () => {
                                 );
 
                                 mega.sets.add(value)
-                                    .then(() => {
+                                    .then((res) => {
+                                        this.albumId = res.id;
                                         this.hide();
                                     })
                                     .catch(() => {
@@ -1895,7 +1898,7 @@ lazy(mega.gallery, 'albums', () => {
                     scope.reinitiateEvents();
 
                     if (closeFn) {
-                        queueMicrotask(closeFn);
+                        queueMicrotask(() => closeFn(this.albumId));
                     }
                 }
             });
@@ -2123,6 +2126,158 @@ lazy(mega.gallery, 'albums', () => {
                 [l.empty_album_instruction_2, 'sprite-fm-mono icon-mobile'],
                 [l.empty_album_instruction_3, 'sprite-fm-mono icon-pc']
             ]);
+        }
+    }
+
+    class NoAlbums extends MEmptyPad {
+        constructor() {
+            super();
+            this.setContents();
+        }
+
+        setContents() {
+            this.el.className = 'empty-albums-list-wrapper';
+            this.el.appendChild(MEmptyPad.createIcon('sprite-fm-mono icon-album icon-size-14'));
+            this.el.appendChild(MEmptyPad.createTxt(l.no_albums, 'fm-empty-cloud-txt empty-albums-title'));
+        }
+    }
+
+    class AddToAlbumDialog extends MDialog {
+        constructor(handle, selections) {
+            super({
+                ok: {
+                    label: l.add_to_album_ok,
+                    callback: () => {
+                        const selections = Object.keys(this.selections);
+
+                        for (let i = 0; i < selections.length; i++) {
+                            const album = scope.albums.store[selections[i]];
+                            mega.sets.elements.add(handle, album.id, album.k).catch(dump);
+                        }
+
+                        toaster.main.show({
+                            icons: ['sprite-fm-mono icon-check-small-regular-outline green-check-circle'],
+                            content: selections.length > 1
+                                ? mega.icu.format(l.added_item_to_albums, selections.length)
+                                : l.added_item_to_album.replace('%s', scope.albums.store[selections[0]].label)
+                        });
+                    }
+                },
+                cancel: false,
+                dialogClasses: 'add-to-album-dialog',
+                contentClasses: 'border-top border-bottom'
+            });
+
+            this.handle = handle;
+            this.selections = selections || Object.create(null);
+            this.setContent();
+            this._title.classList.add('text-center');
+        }
+
+        setContent() {
+            this.title = l.add_to_album;
+            this.slot = document.createElement('div');
+            this.slot.className = 'relative';
+        }
+
+        updateSelectedCount() {
+            if (Object.keys(this.selections).length) {
+                this.enable();
+            }
+            else {
+                this.disable();
+            }
+        }
+
+        onMDialogShown() {
+            this.keys = Object.keys(scope.albums.store).filter(k => k.length !== predefinedKeyLength);
+
+            this.updateSelectedCount();
+
+            this.actionButton = new MButton(
+                l.new_album,
+                'sprite-fm-mono icon-add-circle icon-green icon-size-6',
+                () => {
+                    this.hide();
+                    const dialog = new AlbumNameDialog(
+                        null,
+                        null,
+                        (albumId) => {
+                            if (albumId) {
+                                this.selections[albumId] = true;
+                            }
+                            scope.albums.addToAlbum(this.handle, this.selections);
+                        }
+                    );
+                    dialog.show();
+                },
+                'mega-button no-hover action fm-new-folder pl-0'
+            );
+
+            if (this.keys.length) {
+                const container = document.createElement('div');
+                container.className = 'albums-list-container h-60';
+                const list = document.createElement('div');
+                list.className = 'albums-list';
+                container.appendChild(list);
+
+                const nodeBlocks = [];
+
+                for (let i = 0; i < this.keys.length; i++) {
+                    const album = scope.albums.store[this.keys[i]];
+                    const checkbox = new MCheckbox({
+                        label: album.label,
+                        id: album.id,
+                        checked: this.selections[album.id],
+                        classes: 'album-item h-10 px-5 flex items-center',
+                        labelClasses: 'radio-txt cursor-pointer px-2 max-w-full album-txt',
+                    });
+                    const cell = document.createElement('div');
+                    cell.className = 'albums-grid-cell flex flex-column justify-center items-center size-8 rounded';
+                    const setThumb = (dataUrl) => {
+                        cell.style.backgroundImage = 'url(\'' + dataUrl + '\')';
+                        cell.style.backgroundColor = 'white';
+                        scope.unsetShimmering(cell);
+                    };
+                    if (album.nodes.length) {
+                        nodeBlocks.push({el: cell, node: album.node || album.nodes[0], setThumb});
+                    }
+                    else {
+                        cell.classList.add('album-placeholder');
+                        const icon = document.createElement('i');
+                        icon.className = 'sprite-fm-mono icon-album';
+                        cell.appendChild(icon);
+                    }
+                    checkbox.beforeLabel = cell;
+                    if (album.p) {
+                        const icon = document.createElement('i');
+                        icon.className = 'sprite-fm-mono icon-link-small icon-size-6 ml-auto';
+                        checkbox.afterLabel = icon;
+                    }
+                    checkbox.onChange = (checked) => {
+                        if (checked) {
+                            this.selections[album.id] = true;
+                        }
+                        else {
+                            delete this.selections[album.id];
+                        }
+                        this.updateSelectedCount();
+                    };
+                    list.appendChild(checkbox.el);
+                }
+
+                this.slot.appendChild(container);
+                applyPs(container);
+
+                MegaGallery.addThumbnails(nodeBlocks);
+            }
+            else {
+                const container = document.createElement('div');
+                container.className = 'empty-albums-list-container h-60';
+                container.appendChild(new NoAlbums().el);
+
+                this.slot.appendChild(container);
+            }
         }
     }
 
@@ -3974,7 +4129,9 @@ lazy(mega.gallery, 'albums', () => {
                     const isExisting = !!album;
 
                     if (isPending) {
-                        this.grid.clearPendingCell();
+                        if (this.grid) {
+                            this.grid.clearPendingCell();
+                        }
                         this.tree.clearPendingButton();
                         pendingName = '';
                     }
@@ -4192,8 +4349,9 @@ lazy(mega.gallery, 'albums', () => {
                 document.querySelector('.js-lp-gallery.lp-gallery .js-gallery-panel .lp-content-wrap-wrap');
             const isAlbums = M.isAlbumsPage();
             const isGallery = M.isGalleryPage();
+            const isMediaDiscovery = M.isMediaDiscoveryPage();
 
-            if ((!isAlbums && !isGallery) || !gallerySidebar) {
+            if ((!isAlbums && !isGallery && !(isMediaDiscovery && !folderlink)) || !gallerySidebar) {
                 // It is either not a Gallery page or dom is broken
                 return;
             }
@@ -5165,6 +5323,11 @@ lazy(mega.gallery, 'albums', () => {
                 .finally(() => {
                     loadingDialog.hide('MegaAlbumsRemoveShare');
                 });
+        }
+
+        addToAlbum(handle, selections) {
+            const dialog = new AddToAlbumDialog(handle, selections);
+            dialog.show();
         }
     }
 

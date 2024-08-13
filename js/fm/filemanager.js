@@ -2525,6 +2525,10 @@ FileManager.prototype.initContextUI = function() {
         $('.transfer-table tr.ui-selected').removeClass('ui-selected');
     });
 
+    $(`${c}.add-to-album`).rebind('click.add-to-album', () => {
+        mega.gallery.albums.addToAlbum($.selected[0]);
+    });
+
     $(`${c}.new-bucket-item`)
         .rebind('click.createBucket', () => s4.ui.showDialog(s4.buckets.dialogs.create));
 
@@ -4450,6 +4454,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     var tmpId;
     var $fmholder = $('#fmholder', 'body');
     const isAlbums = M.isAlbumsPage();
+    const isMediaDiscovery = M.isMediaDiscoveryPage();
 
     if (d) {
         console.group('sectionUIOpen', id, folderlink);
@@ -4777,6 +4782,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         || isAlbums
         || M.isDynPage(id)
         || mega.gallery.sections[id]
+        || (isMediaDiscovery && !folderlink)
         || id === 'file-requests'
     ) {
         M.initLeftPanel();
@@ -4934,6 +4940,7 @@ FileManager.prototype.initLeftPanel = function() {
     const isGallery = M.isGalleryPage();
     const isDiscovery = isGallery && M.currentCustomView.prefixPath === 'discovery/';
     const isAlbums = M.isAlbumsPage();
+    const isMediaDiscovery = M.isMediaDiscoveryPage();
 
     let elements = document.getElementsByClassName('js-lpbtn');
 
@@ -4951,7 +4958,7 @@ FileManager.prototype.initLeftPanel = function() {
         elements[j].classList.remove('hidden');
     }
 
-    if ((isGallery || isAlbums) && mega.gallery.albums) {
+    if ((isGallery || isAlbums || isMediaDiscovery && !folderlink) && mega.gallery.albums) {
         mega.gallery.albums.init();
     }
 

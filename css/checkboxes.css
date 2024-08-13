@@ -60,6 +60,18 @@
 .small.checkboxOn::before {
     background-position: -35px -446px;
 }
+.album-item .checkboxOn::before {
+    content: "";
+    background-image: none;
+    position: absolute;
+    left: 5px;
+    top: 1px;
+    width: 4px;
+    height: 10px;
+    border: solid var(--surface-highlight-1);
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+}
 .checkbox-block {
     display: flex;
 }

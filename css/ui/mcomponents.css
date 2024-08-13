@@ -42,6 +42,9 @@
     opacity: 1;
     transform: scale(1, 1);
 }
+.ml-auto {
+    margin-left: auto;
+}
 .ml-1 {
     margin-left: 0.25rem;
 }
@@ -130,6 +133,10 @@
     padding-left: 0.75rem;
     padding-right: 0.75rem;
 }
+.px-5 {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+}
 .px-6 {
     padding-left: 1.5rem;
     padding-right: 1.5rem;
@@ -170,6 +177,16 @@
 }
 .w-80 {
     width: 20rem;
+}
+.h-10 {
+    height: 2.5rem;
+}
+.h-60 {
+    height: 15rem;
+}
+.size-8 {
+    width: 2rem;
+    height: 2rem;
 }
 .-top-8 {
     top: -2rem;
@@ -323,6 +340,9 @@ body.rtl .m-dropdown-item i.ml-3 {
 .icon-size-6 {
     --icon-size: 24px;
 }
+.icon-size-14 {
+    --icon-size: 56px;
+}
 .icon-size-16 {
     --icon-size: 64px;
 }
@@ -383,6 +403,14 @@ body.rtl .mega-dialog.m-dialog.with-icon {
 i.text-color-medium {
     --mask-color: var(--text-color-medium);
 }
+i.green-check-circle {
+    --mask-color: var(--secondary-white);
+    background: var(--checkbox-fill-active);
+    border-radius: 100%;
+}
+.toast-rack .green-check-circle {
+    --icon-size: 16px;
+}
 .rotating {
     animation: rotate 0.8s infinite linear;
 }
@@ -415,6 +443,9 @@ i.text-color-medium {
 }
 .bg-surface-main {
     background: var(--surface-main);
+}
+.rounded {
+    border-radius: 0.25rem;
 }
 .rounded-2xl {
     border-radius: 1rem;

@@ -6,8 +6,10 @@ class MCheckbox extends MComponent {
      * @param {String} data.name Input name
      * @param {String} data.label Label for the checkbox
      * @param {String} [data.classes] Additional classes to add
+     * @param {String} [data.labelClasses] Classes for label
      * @param {Boolean} [data.checked] Whether checked or not on init
      * @param {Boolean} [data.passive] Whether checkbox should or shouldn't change state on click right away
+     * @param {Boolean} [data.disabled] Whether checkbox is disabled or not
      */
     constructor({
         label,
@@ -15,6 +17,7 @@ class MCheckbox extends MComponent {
         name,
         checked,
         classes,
+        labelClasses,
         disabled,
         passive
     }) {
@@ -24,6 +27,9 @@ class MCheckbox extends MComponent {
 
         if (label) {
             this.label = label;
+            if (labelClasses) {
+                this.labelEl.className = labelClasses;
+            }
         }
 
         this.appendCss(classes);
@@ -89,6 +95,25 @@ class MCheckbox extends MComponent {
         }
 
         this.labelEl.textContent = label;
+    }
+
+    /**
+     * Filling the element before the label
+     * @param {Element} element Element to set
+     */
+    set beforeLabel(element) {
+        this.beforeLabelEl = element;
+        this.labelEl.htmlFor = this.inputEl.id;
+        this.el.insertBefore(element, this.labelEl);
+    }
+
+    /**
+     * Filling the element after the label
+     * @param {Element} element Element to set
+     */
+    set afterLabel(element) {
+        this.afterLabelEl = element;
+        this.el.appendChild(element);
     }
 
     buildElement() {

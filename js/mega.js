@@ -4247,7 +4247,7 @@ function fm_thumbnails(mode, nodeList, callback)
         : (n) => elementIsVisible(document.getElementById(n.h));
 
     const setSrcAttribute = (n, uri) => {
-        if (isVisible(n)) {
+        if (isVisible(n) && !M.gallery) {
             uri = uri || thumbnails.get(n.fa);
 
             if (uri) {

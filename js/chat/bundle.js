@@ -23421,7 +23421,7 @@ class Call extends mixins.w9 {
             classes: ['theme-dark-forced', 'call-toast'],
             icons: ['sprite-fm-uni icon-raise-hand'],
             timeout: 10e3,
-            content: raisedHandPeers.length > 2 ? mega.icu.format(l.raise_peers_raised, raisedHandPeers.length) : (raisedHandPeers.length === 1 ? l.raise_peer_raised : l.raise_two_raised).replace('%s', M.getNameByHandle(raisedHandPeers[0]))
+            content: raisedHandPeers.length > 2 ? mega.icu.format(l.raise_peers_raised, raisedHandPeers.length) : (raisedHandPeers.length === 1 ? l.raise_peer_raised : mega.icu.format(l.raise_two_raised, raisedHandPeers.length - 1)).replace('%s', M.getNameByHandle(raisedHandPeers[0]))
           });
         }
         mBroadcaster.sendMessage('meetings:raisedHand', raisedHandPeers);

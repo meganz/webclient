@@ -579,7 +579,11 @@ export default class Call extends MegaRenderMixin {
                             // `N` people raised their hand
                             mega.icu.format(l.raise_peers_raised, raisedHandPeers.length) :
                             // `${NAME} raised their hand` || `${NAME} and 1 other raised their hand`
-                            (raisedHandPeers.length === 1 ? l.raise_peer_raised : l.raise_two_raised)
+                            (
+                                raisedHandPeers.length === 1 ?
+                                    l.raise_peer_raised :
+                                    mega.icu.format(l.raise_two_raised, raisedHandPeers.length - 1)
+                            )
                                 .replace('%s', M.getNameByHandle(raisedHandPeers[0]))
                     });
                 }

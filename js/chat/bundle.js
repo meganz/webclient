@@ -21176,7 +21176,7 @@ const HistoryPanel = (_dec = (0,mixins.hG)(450, true), _class = class HistoryPan
       const $messages = $('.js-messages-scroll-area', $container);
       const $textarea = $('.chat-textarea-block', $container);
       const $sidebar = $('.sidebar', $container);
-      const scrollBlockHeight = parseInt($container.outerHeight(), 10) - parseInt($textarea.outerHeight(), 10) - 20;
+      const scrollBlockHeight = parseInt($sidebar.outerHeight(), 10) - parseInt($textarea.outerHeight(), 10) - 72;
       if ($sidebar.hasClass('chat-opened') && scrollBlockHeight !== $messages.outerHeight()) {
         $messages.css('height', scrollBlockHeight);
         self.refreshUI(true);

@@ -17,7 +17,8 @@
 
     .in-call {
         display: flex;
-        align-items: end;
+        align-items: start;
+        margin-top: 52px;
 
         .message.body {
             padding: 3px 15px 0 10px;

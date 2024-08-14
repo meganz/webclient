@@ -204,9 +204,9 @@ export default class HistoryPanel extends MegaRenderMixin {
             const $textarea = $('.chat-textarea-block', $container);
             const $sidebar = $('.sidebar', $container);
             const scrollBlockHeight =
-                parseInt($container.outerHeight(), 10) -
+                parseInt($sidebar.outerHeight(), 10) -
                 parseInt($textarea.outerHeight(), 10) -
-                20;
+                72;
 
             if ($sidebar.hasClass('chat-opened') && scrollBlockHeight !== $messages.outerHeight()) {
                 $messages.css('height', scrollBlockHeight);

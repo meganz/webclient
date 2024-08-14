@@ -2712,7 +2712,7 @@ FileManager.prototype.createFolderUI = function() {
     });
 
     $('.create-new-folder input').rebind('keyup.create-new-f', function(e) {
-        ltWSpaceWarning.check({type: 1});
+        ltWSpaceWarning.check();
         $('.create-new-folder').addClass('filled-input');
         if ($(this).val() === '') {
             $('.create-new-folder').removeClass('filled-input');

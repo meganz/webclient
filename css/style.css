@@ -3268,10 +3268,9 @@ input.summary-ff-name.error {
 .device-rename-input-bl i,
 .create-folder-input-bl i,
 .create-album-input-bl i {
-    width: 24px;
+    --icon-size: 24px;
     position: absolute;
     left: 8px;
-    height: 24px;
     top: 6px;
     background-repeat: no-repeat;
 }

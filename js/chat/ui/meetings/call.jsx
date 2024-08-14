@@ -576,13 +576,22 @@ export default class Call extends MegaRenderMixin {
                         icons: ['sprite-fm-uni icon-raise-hand'],
                         timeout: 10e3,
                         content: raisedHandPeers.length > 2 ?
-                            // `N` people raised their hand
-                            mega.icu.format(l.raise_peers_raised, raisedHandPeers.length) :
-                            // `${NAME} raised their hand` || `${NAME} and 1 other raised their hand`
+                            // `N` people raised their hand || You and `N` people raised their hand
+                            (
+                                raisedHandPeers.includes(u_handle) ?
+                                    mega.icu.format(l.raise_self_peers_raised, raisedHandPeers.length - 1) :
+                                    mega.icu.format(l.raise_peers_raised, raisedHandPeers.length)
+                            ) :
+                            // `${NAME} raised their hand` || `${NAME} and 1 other raised their hand` ||
+                            // `You and 1 other raised their hand`
                             (
                                 raisedHandPeers.length === 1 ?
                                     l.raise_peer_raised :
-                                    mega.icu.format(l.raise_two_raised, raisedHandPeers.length - 1)
+                                    mega.icu.format(
+                                        raisedHandPeers.includes(u_handle) ?
+                                            l.raise_self_peers_raised : l.raise_two_raised,
+                                        raisedHandPeers.length - 1
+                                    )
                             )
                                 .replace('%s', M.getNameByHandle(raisedHandPeers[0]))
                     });

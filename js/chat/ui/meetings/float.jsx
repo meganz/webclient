@@ -706,12 +706,18 @@ class Minimized extends MegaRenderMixin {
                         mega.icu.format(l.wr_peers_waiting, waitingRoomPeers.length)}
                     {showRaised && (
                         raisedHandPeers.length > 1 ?
-                            mega.icu.format(l.raise_peers_raised, raisedHandPeers.length) :
+                            (
+                                raisedHandPeers.includes(u_handle) ?
+                                    mega.icu.format(l.raise_self_peers_raised, raisedHandPeers.length - 1) :
+                                    mega.icu.format(l.raise_peers_raised, raisedHandPeers.length)
+                            ) :
                             <ParsedHTML
                                 tag="span"
                                 content={
-                                    l.raise_peer_raised
-                                        .replace('%s', megaChat.html(M.getNameByHandle(raisedHandPeers[0])))
+                                    raisedHandPeers[0] === u_handle ?
+                                        l.raise_self_raised :
+                                        l.raise_peer_raised
+                                            .replace('%s', megaChat.html(M.getNameByHandle(raisedHandPeers[0])))
                                 }
                             />
                     )}

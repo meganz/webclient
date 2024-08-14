@@ -23942,6 +23942,7 @@ class Call extends mixins.w9 {
     didMount == null || didMount();
   }
   render() {
+    let _ref;
     const {
       minimized,
       peers,
@@ -23998,6 +23999,7 @@ class Call extends mixins.w9 {
       activeElement,
       hasOtherParticipants: call.hasOtherParticipant(),
       isOnHold: call.sfuClient.isOnHold(),
+      isFloatingPresenter: (_ref = mode === MODE.MINI && !forcedLocal ? call.getActiveStream() : call.getLocalStream()) == null ? void 0 : _ref.hasScreen,
       onSpeakerChange: this.handleSpeakerChange,
       onModeChange: this.handleModeChange,
       onInviteToggle: this.handleInviteToggle,
@@ -27233,7 +27235,7 @@ class stream_Stream extends mixins.w9 {
     });
   }
   specShouldComponentUpdate(nextProps) {
-    if (nextProps.minimized !== this.props.minimized || nextProps.mode !== this.props.mode) {
+    if (nextProps.minimized !== this.props.minimized || nextProps.mode !== this.props.mode || nextProps.isFloatingPresenter !== this.props.isFloatingPresenter) {
       return true;
     }
     return null;
@@ -27275,7 +27277,6 @@ class stream_Stream extends mixins.w9 {
     }
   }
   render() {
-    let _ref;
     const {
       overlayed,
       page,
@@ -27297,6 +27298,7 @@ class stream_Stream extends mixins.w9 {
       waitingRoomPeers,
       recorder,
       raisedHandPeers,
+      isFloatingPresenter,
       onRecordingToggle,
       onCallMinimize,
       onCallExpand,
@@ -27361,7 +27363,7 @@ class stream_Stream extends mixins.w9 {
       minimized,
       sidebar,
       forcedLocal,
-      isPresenterNode: (_ref = mode === meetings_call.g.MINI && !forcedLocal ? call.getActiveStream() : call.getLocalStream()) == null ? void 0 : _ref.hasScreen,
+      isPresenterNode: isFloatingPresenter,
       wrapperRef: this.wrapperRef,
       waitingRoomPeers,
       recorder,

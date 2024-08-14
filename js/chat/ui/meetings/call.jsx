@@ -1218,6 +1218,8 @@ export default class Call extends MegaRenderMixin {
             mode, peers, sidebar, hovered: hasOnboarding || hovered, forcedLocal, call, view, chatRoom, parent,
             stayOnEnd, everHadPeers, waitingRoomPeers, recorder, presenterThumbSelected, raisedHandPeers, activeElement,
             hasOtherParticipants: call.hasOtherParticipant(), isOnHold: call.sfuClient.isOnHold(),
+            isFloatingPresenter: (mode === MODE.MINI && !forcedLocal ? call.getActiveStream() : call.getLocalStream())
+                ?.hasScreen,
             onSpeakerChange: this.handleSpeakerChange, onModeChange: this.handleModeChange,
             onInviteToggle: this.handleInviteToggle, onStayConfirm: this.handleStayConfirm
         };

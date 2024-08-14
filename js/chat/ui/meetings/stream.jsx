@@ -737,7 +737,11 @@ export default class Stream extends MegaRenderMixin {
     }
 
     specShouldComponentUpdate(nextProps) {
-        if (nextProps.minimized !== this.props.minimized || nextProps.mode !== this.props.mode) {
+        if (
+            nextProps.minimized !== this.props.minimized
+            || nextProps.mode !== this.props.mode
+            || nextProps.isFloatingPresenter !== this.props.isFloatingPresenter
+        ) {
             return true;
         }
         return null;
@@ -784,9 +788,9 @@ export default class Stream extends MegaRenderMixin {
         const { overlayed, page, streamsPerPage, floatDetached, wrToggled } = this.state;
         const {
             mode, call, chatRoom, minimized, peers, sidebar, hovered, forcedLocal, view, isOnHold, waitingRoomPeers,
-            recorder, raisedHandPeers, onRecordingToggle, onCallMinimize, onCallExpand, onModeChange, onAudioClick,
-            onVideoClick, onCallEnd, onScreenSharingClick, onHoldClick, onSpeakerChange, onParticipantsToggle,
-            setActiveElement
+            recorder, raisedHandPeers, isFloatingPresenter, onRecordingToggle, onCallMinimize, onCallExpand,
+            onModeChange, onAudioClick, onVideoClick, onCallEnd, onScreenSharingClick, onHoldClick, onSpeakerChange,
+            onParticipantsToggle, setActiveElement
         } = this.props;
 
         return (
@@ -858,11 +862,7 @@ export default class Stream extends MegaRenderMixin {
                     minimized={minimized}
                     sidebar={sidebar}
                     forcedLocal={forcedLocal}
-                    isPresenterNode={(
-                        mode === MODE.MINI && !forcedLocal
-                            ? call.getActiveStream()
-                            : call.getLocalStream()
-                    )?.hasScreen}
+                    isPresenterNode={isFloatingPresenter}
                     wrapperRef={this.wrapperRef}
                     waitingRoomPeers={waitingRoomPeers}
                     recorder={recorder}

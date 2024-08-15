@@ -824,11 +824,11 @@ FileManager.prototype.initFileManagerUI = function() {
             $('#fmholder').css('cursor', 'col-resize');
         });
 
-        $fmholder.rebind('mouseup.colresize', function() {
+        $(document).rebind('mouseup.colresize', () => {
             M.columnsWidth.makeNameColumnStatic();
-            $('#fmholder').css('cursor', '');
-            $fmholder.off('mouseup.colresize');
+            $fmholder.css('cursor', '');
             $fmholder.off('mousemove.colresize');
+            $(document).off('mouseup.colresize');
         });
     });
 
@@ -2523,6 +2523,10 @@ FileManager.prototype.initContextUI = function() {
             $(window).trigger('resize');
         });
         $('.transfer-table tr.ui-selected').removeClass('ui-selected');
+    });
+
+    $(`${c}.add-to-album`).rebind('click.add-to-album', () => {
+        mega.gallery.albums.addToAlbum($.selected[0]);
     });
 
     $(`${c}.new-bucket-item`)
@@ -4450,6 +4454,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     var tmpId;
     var $fmholder = $('#fmholder', 'body');
     const isAlbums = M.isAlbumsPage();
+    const isMediaDiscovery = M.isMediaDiscoveryPage();
 
     if (d) {
         console.group('sectionUIOpen', id, folderlink);
@@ -4777,6 +4782,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         || isAlbums
         || M.isDynPage(id)
         || mega.gallery.sections[id]
+        || (isMediaDiscovery && !folderlink)
         || id === 'file-requests'
     ) {
         M.initLeftPanel();
@@ -4934,6 +4940,7 @@ FileManager.prototype.initLeftPanel = function() {
     const isGallery = M.isGalleryPage();
     const isDiscovery = isGallery && M.currentCustomView.prefixPath === 'discovery/';
     const isAlbums = M.isAlbumsPage();
+    const isMediaDiscovery = M.isMediaDiscoveryPage();
 
     let elements = document.getElementsByClassName('js-lpbtn');
 
@@ -4951,7 +4958,7 @@ FileManager.prototype.initLeftPanel = function() {
         elements[j].classList.remove('hidden');
     }
 
-    if ((isGallery || isAlbums) && mega.gallery.albums) {
+    if ((isGallery || isAlbums || isMediaDiscovery && !folderlink) && mega.gallery.albums) {
         mega.gallery.albums.init();
     }
 
@@ -5142,8 +5149,10 @@ FileManager.prototype.cameraUploadUI = function() {
         }
 
         if (fmItem) {
-            fmItem.classList.add('folder-camera', 'icon-folder-camera-uploads-90');
-            fmItem.classList.remove('icon-folder-90');
+
+            const postfix = M.viewmode ? '90' : '24';
+            fmItem.classList.remove(`icon-folder-${postfix}`);
+            fmItem.classList.add('folder-camera', `icon-folder-camera-uploads-${postfix}`);
         }
     }
 };

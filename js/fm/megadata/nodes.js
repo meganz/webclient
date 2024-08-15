@@ -512,7 +512,7 @@ MegaData.prototype.isGalleryPage = function(path) {
 };
 
 /**
- * Checking if is the page is in Gallery section
+ * Checking if is the page is in Albums section
  * @param {Number} [type] Type to check the page against:
  * 0 - Any album,
  * 1 - Albums main index page
@@ -537,6 +537,19 @@ MegaData.prototype.isAlbumsPage = function(type, path) {
         || (type === 1 && path === 'albums')
         || (type === 2 && path.startsWith('albums/'))
         || false;
+};
+
+/**
+ * Checking if is the page is in Media discovery section
+ * @param {String} [path] Path to check or this.currentdirid
+ * @returns {Boolean}
+ */
+MegaData.prototype.isMediaDiscoveryPage = function(path) {
+    'use strict';
+
+    path = String(path || this.currentdirid);
+
+    return M.gallery && (pfid && !pfcol || path !== M.RootID && M.currentrootid === M.RootID);
 };
 
 /**
@@ -4755,8 +4768,10 @@ lazy(MegaData.prototype, 'myChatFilesFolder', () => {
             }
 
             if (fmItem) {
-                fmItem.classList.add('folder-chat', 'icon-folder-chat-90');
-                fmItem.classList.remove('icon-folder-90');
+
+                const postfix = M.viewmode ? '90' : '24';
+                fmItem.classList.remove(`icon-folder-${postfix}`);
+                fmItem.classList.add('folder-chat', `icon-folder-chat-${postfix}`);
             }
         }
     });

@@ -364,6 +364,10 @@ MegaData.prototype.menuItems = async function menuItems(isTree) {
     }
     items['.refresh-item'] = 1;
 
+    if (M.gallery) {
+        items['.add-to-album'] = 1;
+    }
+
     if (folderlink) {
         delete items['.copy-item'];
         delete items['.add-star-item'];
@@ -371,6 +375,7 @@ MegaData.prototype.menuItems = async function menuItems(isTree) {
         delete items['.colour-label-items'];
         delete items['.properties-versions'];
         delete items['.clearprevious-versions'];
+        delete items['.add-to-album'];
 
         items['.import-item'] = 1;
         items['.getlink-item'] = 1;

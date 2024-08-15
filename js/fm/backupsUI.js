@@ -55,7 +55,7 @@ lazy(mega, 'backupCenter', () => {
         // The whole account was reloaded, missed updates could not have been applied in an orderly fashion.
         '27': l.err_reloaded_acc,
         // Unable to figure out some node correspondence.
-        '28': l.err_n_correspondence,
+        '28': l[47],
         // Backup externally modified.
         '29': l.err_externally_modified,
         // Backup source path not below drive path.
@@ -1298,7 +1298,7 @@ lazy(mega, 'backupCenter', () => {
 
                 // Show Number of backups
                 mCreateElement('span', {'class': 'high'}, foldersInfoNode).textContent =
-                    foldersNumber === 1 ? l[834] : l[832].replace('[X]', foldersNumber);
+                    mega.icu.format(l.folder_count, foldersNumber);
 
                 // Show Warning icon if any folder have issues
                 if (syncStatuses.disabledSyncs) {

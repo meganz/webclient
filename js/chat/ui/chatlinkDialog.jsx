@@ -89,13 +89,14 @@ export class ChatlinkDialog extends MegaRenderMixin {
     render() {
         const { chatRoom } = this.props;
         const { newTopic, link } = this.state;
-        const closeButton =
+        const closeButton = this.loading ? null : (
             <button
                 key="close"
                 className="mega-button negative links-button"
                 onClick={this.onClose}>
                 <span>{l[148] /* `Close` */}</span>
-            </button>;
+            </button>
+        );
         const publicLinkDetails = chatRoom.isMeeting ? l.meeting_link_details : l[20644];
 
         return (

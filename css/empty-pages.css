@@ -43,6 +43,9 @@
     font: var(--text-h0);
     margin-top: 8px;
 }
+.add-to-album-dialog .fm-empty-cloud-txt {
+    color: var(--text-color-medium);
+}
 .fm-empty-cloud-txt.empty-md-title {
     font-weight: bold;
 }

@@ -727,6 +727,9 @@
 .albums-grid-cell.album-placeholder {
     background-color: var(--surface-grey-2);
 }
+.albums-grid-cell.rounded {
+    border-radius: 0.25rem;
+}
 body.rtl .albums-grid-cell > div:not(.flex-row) {
     text-align: right;
 }
@@ -1144,6 +1147,33 @@ body.rtl .js-lp-gallery .btn-galleries.expansion-btn:not(.expansion-btn-open) i.
     background: var(--surface-main);
     padding-bottom: 26px;
     margin-top: -1rem;
+}
+.albums-list {
+    display: grid;
+    gap: 12px;
+}
+.album-txt {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    max-width: 297px;
+    color: var(--text-color-high);
+}
+.empty-albums-list-container {
+    text-align: center;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+}
+.empty-albums-list-wrapper {
+    margin: auto;
+    gap: 8px;
+}
+.add-to-album-dialog .empty-albums-title {
+    margin-top: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 20px;
 }
 
 @-moz-document url-prefix() {

@@ -2952,6 +2952,17 @@ body.de .mega-dialog.contact-picker-widget {
 
 /* end create-file-dialog and create-folder-dialog */
 
+/* add-to-album-dialog */
+
+    .mega-dialog.add-to-album-dialog {
+        width: 420px;
+    }
+    .add-to-album-dialog .icon-album {
+        --mask-color: var(--surface-mid-grey);
+    }
+
+/* end add-to-album-dialog */
+
 /* fm-picker-dialog */
 
     .mega-dialog.fm-picker-dialog {

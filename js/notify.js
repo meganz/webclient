@@ -1223,10 +1223,6 @@ var notify = {
             className = 'nt-contact-deleted';
             title = l[7144];        // Account has been deleted/deactivated
         }
-        else if (action === 3) {
-            className = 'nt-contact-request-blocked';
-            title = l[7143];        // Blocked you as a contact
-        }
 
         // Populate other template information
         $notificationHtml.addClass(className);

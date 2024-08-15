@@ -1608,15 +1608,6 @@ function Chat() {
             return l.notif_body_incoming_msg_group.replace('%1', params.from).replace('%2', params.roomTitle);
           }
         },
-        'incoming-attachment': {
-          title: l.notif_title_incoming_attch,
-          'icon' (notificationObj) {
-            return notificationObj.options.icon;
-          },
-          'body' (notificationObj, params) {
-            return mega.icu.format(l.notif_body_incoming_attch, params.attachmentsCount).replace('%s', params.from);
-          }
-        },
         'incoming-voice-video-call': {
           'title': l[17878] || "Incoming call",
           'icon' (notificationObj) {
@@ -1624,15 +1615,6 @@ function Chat() {
           },
           'body' (notificationObj, params) {
             return l[5893].replace('[X]', params.from);
-          }
-        },
-        'call-terminated': {
-          title: l.notif_title_call_term,
-          'icon' (notificationObj) {
-            return notificationObj.options.icon;
-          },
-          'body' (notificationObj, params) {
-            return l[5889].replace('[X]', params.from);
           }
         },
         'screen-share-error': {
@@ -11642,7 +11624,7 @@ class ChatlinkDialog extends mixins.w9 {
       newTopic,
       link
     } = this.state;
-    const closeButton = REaCt().createElement("button", {
+    const closeButton = this.loading ? null : REaCt().createElement("button", {
       key: "close",
       className: "mega-button negative links-button",
       onClick: this.onClose
@@ -21194,7 +21176,7 @@ const HistoryPanel = (_dec = (0,mixins.hG)(450, true), _class = class HistoryPan
       const $messages = $('.js-messages-scroll-area', $container);
       const $textarea = $('.chat-textarea-block', $container);
       const $sidebar = $('.sidebar', $container);
-      const scrollBlockHeight = parseInt($container.outerHeight(), 10) - parseInt($textarea.outerHeight(), 10) - 20;
+      const scrollBlockHeight = parseInt($sidebar.outerHeight(), 10) - parseInt($textarea.outerHeight(), 10) - 72;
       if ($sidebar.hasClass('chat-opened') && scrollBlockHeight !== $messages.outerHeight()) {
         $messages.css('height', scrollBlockHeight);
         self.refreshUI(true);
@@ -23446,7 +23428,7 @@ class Call extends mixins.w9 {
             classes: ['theme-dark-forced', 'call-toast'],
             icons: ['sprite-fm-uni icon-raise-hand'],
             timeout: 10e3,
-            content: raisedHandPeers.length > 2 ? mega.icu.format(l.raise_peers_raised, raisedHandPeers.length) : (raisedHandPeers.length === 1 ? l.raise_peer_raised : l.raise_two_raised).replace('%s', M.getNameByHandle(raisedHandPeers[0]))
+            content: raisedHandPeers.length > 2 ? raisedHandPeers.includes(u_handle) ? mega.icu.format(l.raise_self_peers_raised, raisedHandPeers.length - 1) : mega.icu.format(l.raise_peers_raised, raisedHandPeers.length) : (raisedHandPeers.length === 1 ? l.raise_peer_raised : mega.icu.format(raisedHandPeers.includes(u_handle) ? l.raise_self_peers_raised : l.raise_two_raised, raisedHandPeers.length - 1)).replace('%s', M.getNameByHandle(raisedHandPeers[0]))
           });
         }
         mBroadcaster.sendMessage('meetings:raisedHand', raisedHandPeers);
@@ -25569,9 +25551,9 @@ class Minimized extends mixins.w9 {
         className: `alert-label ${showButton ? '' : 'label-only'}`
       }, showRaised && REaCt().createElement("i", {
         className: "sprite-fm-uni icon-raise-hand"
-      }), !hideWrList && !!waitingRoomPeers.length && mega.icu.format(l.wr_peers_waiting, waitingRoomPeers.length), showRaised && (raisedHandPeers.length > 1 ? mega.icu.format(l.raise_peers_raised, raisedHandPeers.length) : REaCt().createElement(utils.P9, {
+      }), !hideWrList && !!waitingRoomPeers.length && mega.icu.format(l.wr_peers_waiting, waitingRoomPeers.length), showRaised && (raisedHandPeers.length > 1 ? raisedHandPeers.includes(u_handle) ? mega.icu.format(l.raise_self_peers_raised, raisedHandPeers.length - 1) : mega.icu.format(l.raise_peers_raised, raisedHandPeers.length) : REaCt().createElement(utils.P9, {
         tag: "span",
-        content: l.raise_peer_raised.replace('%s', megaChat.html(M.getNameByHandle(raisedHandPeers[0])))
+        content: raisedHandPeers[0] === u_handle ? l.raise_self_raised : l.raise_peer_raised.replace('%s', megaChat.html(M.getNameByHandle(raisedHandPeers[0])))
       }))), showButton && REaCt().createElement(meetings_button.A, {
         className: "show-people",
         label: showRaised ? l[16797] : l.wr_see_waiting,
@@ -29326,7 +29308,7 @@ let getMessageString;
         'remoteCallStarted': l[5888],
         'call-started': l[5888].replace("[X]", "[[[X]]]"),
         'alterParticipants': undefined,
-        'privilegeChange': l[8915],
+        'privilegeChange': undefined,
         'truncated': l[8905]
       };
       _sanitizeStrings(MESSAGE_STRINGS);

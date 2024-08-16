@@ -3857,6 +3857,13 @@ const ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, c
       }
     }
     if (self.lastActivity && self.lastActivity >= ts) {
+      if (msg.deleted) {
+        const {
+          delay,
+          ts
+        } = self.messagesBuff.getLastMessageFromServer();
+        self.lastActivity = delay || ts;
+      }
       return;
     }
     self.lastActivity = ts;

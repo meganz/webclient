@@ -187,8 +187,12 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
                 contactForMessage.ats = ts;
             }
         }
-
         if (self.lastActivity && self.lastActivity >= ts) {
+            if (msg.deleted) {
+                const { delay, ts } = self.messagesBuff.getLastMessageFromServer();
+                self.lastActivity = delay || ts;
+            }
+
             // this is an old message, DON'T update the lastActivity.
             return;
         }

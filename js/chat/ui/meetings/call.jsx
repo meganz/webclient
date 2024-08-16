@@ -1200,14 +1200,14 @@ export default class Call extends MegaRenderMixin {
             timeoutBanner, activeElement
         } = this.state;
         const { stayOnEnd } = call;
+        const hasOnboarding = onboardingUI || onboardingRecording || onboardingRaise;
         const STREAM_PROPS = {
-            mode, peers, sidebar, hovered, forcedLocal, call, view, chatRoom, parent, stayOnEnd,
-            everHadPeers, waitingRoomPeers, recorder, presenterThumbSelected, raisedHandPeers, activeElement,
+            mode, peers, sidebar, hovered: hasOnboarding || hovered, forcedLocal, call, view, chatRoom, parent,
+            stayOnEnd, everHadPeers, waitingRoomPeers, recorder, presenterThumbSelected, raisedHandPeers, activeElement,
             hasOtherParticipants: call.hasOtherParticipant(), isOnHold: call.sfuClient.isOnHold(),
             onSpeakerChange: this.handleSpeakerChange, onModeChange: this.handleModeChange,
             onInviteToggle: this.handleInviteToggle, onStayConfirm: this.handleStayConfirm
         };
-        const hasOnboarding = onboardingUI || onboardingRecording || onboardingRaise;
 
         //
         // `Call`

@@ -23967,11 +23967,12 @@ class Call extends mixins.w9 {
     const {
       stayOnEnd
     } = call;
+    const hasOnboarding = onboardingUI || onboardingRecording || onboardingRaise;
     const STREAM_PROPS = {
       mode,
       peers,
       sidebar,
-      hovered,
+      hovered: hasOnboarding || hovered,
       forcedLocal,
       call,
       view,
@@ -23991,7 +23992,6 @@ class Call extends mixins.w9 {
       onInviteToggle: this.handleInviteToggle,
       onStayConfirm: this.handleStayConfirm
     };
-    const hasOnboarding = onboardingUI || onboardingRecording || onboardingRaise;
     return REaCt().createElement("div", {
       className: `
                     meetings-call

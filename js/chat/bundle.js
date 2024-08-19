@@ -27993,8 +27993,8 @@ class StreamControls extends _mixins1__.w9 {
         this.setState({
           muteSpeak: false
         }, () => {
-          eventlog(500509);
           this.setActiveElement();
+          eventlog(500509);
         });
       }
     }, l[148]), react0().createElement("i", {

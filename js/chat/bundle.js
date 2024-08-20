@@ -15705,7 +15705,13 @@ class Datepicker extends mixins.w9 {
       onBlur: ev => onBlur == null ? void 0 : onBlur(ev)
     }), REaCt().createElement("i", {
       className: "sprite-fm-mono icon-calendar1",
-      onClick: () => this.datepicker && this.datepicker.show()
+      onClick: () => {
+        if (this.datepicker) {
+          let _this$inputRef$curren;
+          this.datepicker.show();
+          (_this$inputRef$curren = this.inputRef.current) == null || _this$inputRef$curren.focus();
+        }
+      }
     })));
   }
 }

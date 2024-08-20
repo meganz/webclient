@@ -116,7 +116,12 @@ export default class Datepicker extends MegaRenderMixin {
                     />
                     <i
                         className="sprite-fm-mono icon-calendar1"
-                        onClick={() => this.datepicker && this.datepicker.show()}
+                        onClick={() => {
+                            if (this.datepicker) {
+                                this.datepicker.show();
+                                this.inputRef.current?.focus();
+                            }
+                        }}
                     />
                 </div>
             </div>

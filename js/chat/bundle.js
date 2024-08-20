@@ -13525,7 +13525,6 @@ class ConversationRightArea extends mixins.w9 {
     }, REaCt().createElement("div", {
       className: `
                             chat-right-pad
-                            ${room.haveActiveCall() ? 'in-call' : ''}
                         `
     }, REaCt().createElement(Accordion, (0,esm_extends.A)({}, this.state, {
       chatRoom: room,
@@ -14815,7 +14814,6 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
       className: `
                             chat-topic-block
                             ${topicBlockClass}
-                            ${room.haveActiveCall() ? 'in-call' : ''}
                         `
     }, REaCt().createElement("div", {
       className: "chat-topic-buttons"

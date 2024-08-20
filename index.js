@@ -3358,11 +3358,13 @@ mBroadcaster.once('boot_done', () => {
         });
     }
 
-    onIdle(() => {
+    onIdle(function _() {
         // Initialise the Public Service Announcement system if loaded
         if (typeof psa !== 'undefined') {
+            psa.fetchedPsa = false;
             psa.init().catch(dump.bind(null, 'psa'));
         }
+        return u_sid || mBroadcaster.once('login', _);
     });
 
     onIdle(async() => {

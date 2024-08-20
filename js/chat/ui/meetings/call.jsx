@@ -803,7 +803,7 @@ export default class Call extends MegaRenderMixin {
      */
 
     handleInviteToggle = () => {
-        if (M.u.length > 1) {
+        if (Object.values(M.u.toJS()).some(u => u.c === 1)) {
             const participants = excludedParticipants(this.props.chatRoom);
 
             if (allContactsInChat(participants)) {

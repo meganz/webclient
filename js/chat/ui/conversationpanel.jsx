@@ -1017,7 +1017,6 @@ export class ConversationRightArea extends MegaRenderMixin {
                     <div
                         className={`
                             chat-right-pad
-                            ${room.haveActiveCall() ? 'in-call' : ''}
                         `}>
                         <Accordion
                             {...this.state}
@@ -2656,7 +2655,6 @@ export class ConversationPanel extends MegaRenderMixin {
                         className={`
                             chat-topic-block
                             ${topicBlockClass}
-                            ${room.haveActiveCall() ? 'in-call' : ''}
                         `}>
                         <div className="chat-topic-buttons">
                             {room.type === 'public' && room.isMeeting &&

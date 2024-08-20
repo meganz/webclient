@@ -619,7 +619,7 @@ export class ConversationRightArea extends MegaRenderMixin {
     };
 
     handleAddParticipants() {
-        if (M.u.length > 1) {
+        if (Object.values(M.u.toJS()).some(u => u.c === 1)) {
             if (allContactsInChat(excludedParticipants(this.props.chatRoom))) {
                 return msgDialog(
                     `confirmationa:!^${l[8726]}!${l[82]}`,
@@ -879,7 +879,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                 disabled={isGuest() || room.isReadOnly() || !(room.iAmOperator()
                     || room.type !== 'private' && room.options[MCO_FLAGS.OPEN_INVITE])}
                 onClick={() =>
-                    M.u.length > 1 ?
+                    Object.values(M.u.toJS()).some(u => u.c === 1) ?
                         !allContactsInChat(exParticipants)
                             ? this.setState({ contactPickerDialog: true }) :
                             msgDialog(

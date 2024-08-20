@@ -13223,7 +13223,7 @@ class ConversationRightArea extends mixins.w9 {
                                 class="ulickurl">`).replace('[/A]', '</a>'))) : null;
   }
   handleAddParticipants() {
-    if (M.u.length > 1) {
+    if (Object.values(M.u.toJS()).some(u => u.c === 1)) {
       if (allContactsInChat(excludedParticipants(this.props.chatRoom))) {
         return msgDialog(`confirmationa:!^${l[8726]}!${l[82]}`, null, `${l.all_contacts_added}`, `${l.all_contacts_added_to_chat}`, res => {
           if (res) {
@@ -13415,7 +13415,7 @@ class ConversationRightArea extends mixins.w9 {
       icon: "sprite-fm-mono icon-add-small",
       label: l[8007],
       disabled: (0,call.P)() || room.isReadOnly() || !(room.iAmOperator() || room.type !== 'private' && room.options[MCO_FLAGS.OPEN_INVITE]),
-      onClick: () => M.u.length > 1 ? !allContactsInChat(exParticipants) ? this.setState({
+      onClick: () => Object.values(M.u.toJS()).some(u => u.c === 1) ? !allContactsInChat(exParticipants) ? this.setState({
         contactPickerDialog: true
       }) : msgDialog(`confirmationa:!^${l[8726]}!${l[82]}`, null, `${l.all_contacts_added}`, `${l.all_contacts_added_to_chat}`, res => {
         if (res) {
@@ -23564,7 +23564,7 @@ class Call extends mixins.w9 {
       });
     };
     this.handleInviteToggle = () => {
-      if (M.u.length > 1) {
+      if (Object.values(M.u.toJS()).some(u => u.c === 1)) {
         const participants = (0,conversationpanel.zV)(this.props.chatRoom);
         if ((0,conversationpanel.e4)(participants)) {
           msgDialog(`confirmationa:!^${l[8726]}!${l[82]}`, null, `${l.all_contacts_added}`, `${l.all_contacts_added_to_chat}`, res => {

@@ -1529,6 +1529,7 @@ td.verification .contact-item {
 .profile-shared-folders .dialog-empty-block {
     height: 100%;
     background: transparent;
+    margin-top: 34px;
 }
 
 .profile-shared-folders .dialog-empty-pad {

@@ -854,6 +854,10 @@
             }
             this.trackDataChange();
         }
+        onLocalSpeechDetected() {
+            this.chatRoom.trigger('onLocalSpeechDetected');
+            eventlog(500508);
+        }
         toggleAudio() {
             this.sfuClient.muteAudio(!this.sfuClient.localAudioMuted());
             // when we are not a speaker, local audio track is never obtained, so the event is never fired

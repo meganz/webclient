@@ -167,6 +167,17 @@ if (Object.hasOwn === undefined) {
         };
     }
 
+    if (Promise.withResolvers === undefined) {
+        Promise.withResolvers = function() {
+            let resolve, reject;
+            const promise = new Promise((res, rej) => {
+                reject = rej;
+                resolve = res;
+            });
+            return {promise, resolve, reject};
+        };
+    }
+
     if (!Array.prototype.flat) {
         const reduce = Array.prototype.reduce;
         const concat = Array.prototype.concat.bind([]);

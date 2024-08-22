@@ -1416,8 +1416,6 @@ var addressDialog = {
             numOfMonths = this.businessPlan.m;
             this.numOfMonths = numOfMonths;
 
-            // auto renew is mandatory in business
-            this.$dialog.find('.payment-buy-now span').text(l[6172]);
             // recurring is mandatory in business
             this.$dialog.find('.payment-plan-txt .recurring').text(`(${l[6965]})`);
         }

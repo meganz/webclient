@@ -909,7 +909,7 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
     font-size: 14px;
     line-height: 20px;
     color: var(--text-color-medium);
-    padding: 20px 0 0;
+    padding: 20px 0 16px;
     text-align: center;
     display: none;
     box-sizing: border-box;
@@ -1759,11 +1759,11 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
     margin: 0 320px 0 50px;
     position: relative;
 }
-.third-section .payment-page.info-block {
-    float: left;
+.payment-section .mega-button.purchase {
+    margin: 32px 0 0;
 }
-.bottom-page.third-section .mega-button.purchase {
-    float: right;
+.payment-section:not(.mobile) .mega-button.purchase {
+    margin-left: -50px;
 }
 .payment-page.info-block .provider-details {
     color: var(--text-color-high);
@@ -1875,6 +1875,9 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
     display: block;
     font-size: 9px;
 }
+.payment-section:not(.local-currency) .bottom-page.grey-block {
+    padding-bottom: 64px;
+}
 .payment-section .bottom-page.horizontal-centered-bl.mid-wide {
     max-width: 1300px;
 }
@@ -1947,13 +1950,6 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
 .payment-period .loading-placeholder-text {
     display: inline-block;
     margin-top: 25px;
-}
-.payment-instructions {
-    color: #555;
-    font-size: 14px;
-    line-height: 28px;
-    max-width: 470px;
-    float: left;
 }
 .reg-st5-info-icon {
     width: 32px;
@@ -2456,9 +2452,6 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
         float: none;
         display: inline-block;
         margin: 40px 0 20px 0;
-    }
-    .payment-instructions {
-        max-width: none;
     }
     .payment-page.info-block .payment-method {
         width: 50%;

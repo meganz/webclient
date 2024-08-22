@@ -4810,7 +4810,7 @@ body.de .mega-dialog.contact-picker-widget {
     }
     .mega-dialog.payment-address-dialog .footer-container {
         flex-direction: column;
-        align-items: center;
+        align-items: flex-end;
     }
     .mega-dialog.payment-address-dialog .footer-container .button {
         display: flex;

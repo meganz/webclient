@@ -1017,7 +1017,6 @@ pro.propay = {
             return false;
         }
 
-        var $paymentDialog = $('.payment-dialog', 'body');
         var $paymentAddressDialog = $('.payment-address-dialog', 'body');
         var $numbers;
 
@@ -1044,8 +1043,6 @@ pro.propay = {
         const recurringEnabled = selectedProvider.supportsRecurring;
 
         // Set text
-        var subscribeOrPurchase = (recurringEnabled) ? l[23675] : l[6190];
-        var subscribeOrPurchaseInstruction = (recurringEnabled) ? l[22074] : l[7996];
         var recurringOrNonRecurring = (recurringEnabled) ? '(' + l[6965] + ')' : l[6941];
         var recurringMonthlyOrAnnuallyMessage = (numOfMonths === 1) ? l[10628] : l[10629];
         var autoRenewMonthOrYearQuestion = (numOfMonths === 1) ? l[10638] : l[10639];
@@ -1209,12 +1206,8 @@ pro.propay = {
         }
 
         // Update depending on recurring or one off payment
-        $('button.purchase span', this.$page).text(subscribeOrPurchase);
-        $(is_mobile ? '.payment-info' : '.payment-instructions', this.$page).safeHTML(subscribeOrPurchaseInstruction);
         $('.choose-renewal .duration-text', this.$page).text(autoRenewMonthOrYearQuestion);
         $('.charge-information', this.$page).text(chargeInfoDuration);
-        $('.payment-buy-now span', $paymentDialog).text(subscribeOrPurchase);
-        $('.payment-buy-now span', $paymentAddressDialog).text(subscribeOrPurchase);
     },
 
     /**

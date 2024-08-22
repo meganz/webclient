@@ -1560,12 +1560,8 @@ function Chat() {
   this.publicChatKeys = Object.create(null);
   this.SOUNDS = {
     ALERT: 'alert_info_message',
-    ERROR: 'error_message',
     INCOMING_MSG: 'incoming_chat_message',
-    INCOMING_CONTACT: 'incoming_contact_request',
-    INCOMING_FILE: 'incoming_file_transfer',
     INCOMING_CALL: 'incoming_voice_video_call',
-    HANG_OUT: 'hang_out',
     CALL_JOIN: 'user_join_call',
     CALL_LEFT: 'user_left_call',
     CALL_END: 'end_call',

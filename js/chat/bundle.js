@@ -3857,6 +3857,13 @@ const ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, c
       }
     }
     if (self.lastActivity && self.lastActivity >= ts) {
+      if (msg.deleted) {
+        const {
+          delay,
+          ts
+        } = self.messagesBuff.getLastMessageFromServer();
+        self.lastActivity = delay || ts;
+      }
       return;
     }
     self.lastActivity = ts;
@@ -13223,7 +13230,7 @@ class ConversationRightArea extends mixins.w9 {
                                 class="ulickurl">`).replace('[/A]', '</a>'))) : null;
   }
   handleAddParticipants() {
-    if (M.u.length > 1) {
+    if (Object.values(M.u.toJS()).some(u => u.c === 1)) {
       if (allContactsInChat(excludedParticipants(this.props.chatRoom))) {
         return msgDialog(`confirmationa:!^${l[8726]}!${l[82]}`, null, `${l.all_contacts_added}`, `${l.all_contacts_added_to_chat}`, res => {
           if (res) {
@@ -13415,7 +13422,7 @@ class ConversationRightArea extends mixins.w9 {
       icon: "sprite-fm-mono icon-add-small",
       label: l[8007],
       disabled: (0,call.P)() || room.isReadOnly() || !(room.iAmOperator() || room.type !== 'private' && room.options[MCO_FLAGS.OPEN_INVITE]),
-      onClick: () => M.u.length > 1 ? !allContactsInChat(exParticipants) ? this.setState({
+      onClick: () => Object.values(M.u.toJS()).some(u => u.c === 1) ? !allContactsInChat(exParticipants) ? this.setState({
         contactPickerDialog: true
       }) : msgDialog(`confirmationa:!^${l[8726]}!${l[82]}`, null, `${l.all_contacts_added}`, `${l.all_contacts_added_to_chat}`, res => {
         if (res) {
@@ -13518,7 +13525,6 @@ class ConversationRightArea extends mixins.w9 {
     }, REaCt().createElement("div", {
       className: `
                             chat-right-pad
-                            ${room.haveActiveCall() ? 'in-call' : ''}
                         `
     }, REaCt().createElement(Accordion, (0,esm_extends.A)({}, this.state, {
       chatRoom: room,
@@ -14808,7 +14814,6 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
       className: `
                             chat-topic-block
                             ${topicBlockClass}
-                            ${room.haveActiveCall() ? 'in-call' : ''}
                         `
     }, REaCt().createElement("div", {
       className: "chat-topic-buttons"
@@ -15698,7 +15703,13 @@ class Datepicker extends mixins.w9 {
       onBlur: ev => onBlur == null ? void 0 : onBlur(ev)
     }), REaCt().createElement("i", {
       className: "sprite-fm-mono icon-calendar1",
-      onClick: () => this.datepicker && this.datepicker.show()
+      onClick: () => {
+        if (this.datepicker) {
+          let _this$inputRef$curren;
+          this.datepicker.show();
+          (_this$inputRef$curren = this.inputRef.current) == null || _this$inputRef$curren.focus();
+        }
+      }
     })));
   }
 }
@@ -23533,7 +23544,6 @@ class Call extends mixins.w9 {
       this.props.call.setViewMode(mode);
       this.setState({
         mode,
-        sidebar: false,
         forcedLocal: false
       });
     };
@@ -23564,7 +23574,7 @@ class Call extends mixins.w9 {
       });
     };
     this.handleInviteToggle = () => {
-      if (M.u.length > 1) {
+      if (Object.values(M.u.toJS()).some(u => u.c === 1)) {
         const participants = (0,conversationpanel.zV)(this.props.chatRoom);
         if ((0,conversationpanel.e4)(participants)) {
           msgDialog(`confirmationa:!^${l[8726]}!${l[82]}`, null, `${l.all_contacts_added}`, `${l.all_contacts_added_to_chat}`, res => {
@@ -23931,6 +23941,7 @@ class Call extends mixins.w9 {
     didMount == null || didMount();
   }
   render() {
+    let _ref;
     const {
       minimized,
       peers,
@@ -23967,11 +23978,12 @@ class Call extends mixins.w9 {
     const {
       stayOnEnd
     } = call;
+    const hasOnboarding = onboardingUI || onboardingRecording || onboardingRaise;
     const STREAM_PROPS = {
       mode,
       peers,
       sidebar,
-      hovered,
+      hovered: hasOnboarding || hovered,
       forcedLocal,
       call,
       view,
@@ -23986,12 +23998,12 @@ class Call extends mixins.w9 {
       activeElement,
       hasOtherParticipants: call.hasOtherParticipant(),
       isOnHold: call.sfuClient.isOnHold(),
+      isFloatingPresenter: (_ref = mode === MODE.MINI && !forcedLocal ? call.getActiveStream() : call.getLocalStream()) == null ? void 0 : _ref.hasScreen,
       onSpeakerChange: this.handleSpeakerChange,
       onModeChange: this.handleModeChange,
       onInviteToggle: this.handleInviteToggle,
       onStayConfirm: this.handleStayConfirm
     };
-    const hasOnboarding = onboardingUI || onboardingRecording || onboardingRaise;
     return REaCt().createElement("div", {
       className: `
                     meetings-call
@@ -27222,7 +27234,7 @@ class stream_Stream extends mixins.w9 {
     });
   }
   specShouldComponentUpdate(nextProps) {
-    if (nextProps.minimized !== this.props.minimized || nextProps.mode !== this.props.mode) {
+    if (nextProps.minimized !== this.props.minimized || nextProps.mode !== this.props.mode || nextProps.isFloatingPresenter !== this.props.isFloatingPresenter) {
       return true;
     }
     return null;
@@ -27264,7 +27276,6 @@ class stream_Stream extends mixins.w9 {
     }
   }
   render() {
-    let _ref;
     const {
       overlayed,
       page,
@@ -27286,6 +27297,7 @@ class stream_Stream extends mixins.w9 {
       waitingRoomPeers,
       recorder,
       raisedHandPeers,
+      isFloatingPresenter,
       onRecordingToggle,
       onCallMinimize,
       onCallExpand,
@@ -27350,7 +27362,7 @@ class stream_Stream extends mixins.w9 {
       minimized,
       sidebar,
       forcedLocal,
-      isPresenterNode: (_ref = mode === meetings_call.g.MINI && !forcedLocal ? call.getActiveStream() : call.getLocalStream()) == null ? void 0 : _ref.hasScreen,
+      isPresenterNode: isFloatingPresenter,
       wrapperRef: this.wrapperRef,
       waitingRoomPeers,
       recorder,
@@ -27926,11 +27938,17 @@ class StreamControls extends _mixins1__.w9 {
     super.componentWillUnmount();
     document.removeEventListener('mousedown', this.handleMousedown);
     navigator.mediaDevices.removeEventListener('devicechange', this.handleDeviceChange);
+    this.props.chatRoom.off(`onLocalSpeechDetected.${StreamControls.NAMESPACE}`);
   }
   componentDidMount() {
     super.componentDidMount();
     document.addEventListener('mousedown', this.handleMousedown);
     navigator.mediaDevices.addEventListener('devicechange', this.handleDeviceChange);
+    this.props.chatRoom.rebind(`onLocalSpeechDetected.${StreamControls.NAMESPACE}`, () => {
+      this.setState({
+        localMicDetected: true
+      });
+    });
   }
   render() {
     const {
@@ -27950,7 +27968,8 @@ class StreamControls extends _mixins1__.w9 {
     } = this.props;
     const {
       audioSelectDropdown,
-      videoSelectDropdown
+      videoSelectDropdown,
+      localMicDetected
     } = this.state;
     const avFlags = call.av;
     const isOnHold = avFlags & Av.onHold;
@@ -27967,8 +27986,29 @@ class StreamControls extends _mixins1__.w9 {
         }
         resetError(Av.Audio);
         onAudioClick();
+        if (!(avFlags & Av.Audio)) {
+          this.setState({
+            localMicDetected: false
+          });
+        }
       }
-    }, react0().createElement(_button_jsx3__.A, {
+    }, localMicDetected && react0().createElement("div", {
+      className: "mic-muted-tip theme-light-forced",
+      onClick: e => {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    }, react0().createElement("span", null, l.mic_still_muted), react0().createElement(_button_jsx3__.A, {
+      className: "mic-muted-tip-btn",
+      onClick: () => {
+        this.setState({
+          localMicDetected: false
+        });
+        eventlog(500509);
+      }
+    }, l[148]), react0().createElement("i", {
+      className: "sprite-fm-mono icon-tooltip-arrow tooltip-arrow bottom"
+    })), react0().createElement(_button_jsx3__.A, {
       className: `
                                     mega-button
                                     theme-light-forced

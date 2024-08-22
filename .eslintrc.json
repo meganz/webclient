@@ -38,6 +38,7 @@
             "navigator.locks",
             "Object.fromEntries",
             "Promise.allSettled",
+            "Promise.withResolvers",
             "queueMicrotask",
             "reportError",
             "requestIdleCallback",

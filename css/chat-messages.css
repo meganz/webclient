@@ -19,10 +19,6 @@
 .chat-topic-block .emoji:first-child {
     margin-left: 0;
 }
-.chat-topic-block.in-call {
-    margin-right: 255px;
-    border-right: 1px solid var(--divider-color);
-}
 .chat-topic-buttons {
     flex: 0 0 auto;
     order: 1;

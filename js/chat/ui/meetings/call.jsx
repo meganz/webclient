@@ -756,7 +756,7 @@ export default class Call extends MegaRenderMixin {
 
     handleModeChange = mode => {
         this.props.call.setViewMode(mode);
-        this.setState({ mode, sidebar: false, forcedLocal: false });
+        this.setState({ mode, forcedLocal: false });
     };
 
     /**
@@ -803,7 +803,7 @@ export default class Call extends MegaRenderMixin {
      */
 
     handleInviteToggle = () => {
-        if (M.u.length > 1) {
+        if (Object.values(M.u.toJS()).some(u => u.c === 1)) {
             const participants = excludedParticipants(this.props.chatRoom);
 
             if (allContactsInChat(participants)) {
@@ -1213,14 +1213,16 @@ export default class Call extends MegaRenderMixin {
             timeoutBanner, activeElement
         } = this.state;
         const { stayOnEnd } = call;
+        const hasOnboarding = onboardingUI || onboardingRecording || onboardingRaise;
         const STREAM_PROPS = {
-            mode, peers, sidebar, hovered, forcedLocal, call, view, chatRoom, parent, stayOnEnd,
-            everHadPeers, waitingRoomPeers, recorder, presenterThumbSelected, raisedHandPeers, activeElement,
+            mode, peers, sidebar, hovered: hasOnboarding || hovered, forcedLocal, call, view, chatRoom, parent,
+            stayOnEnd, everHadPeers, waitingRoomPeers, recorder, presenterThumbSelected, raisedHandPeers, activeElement,
             hasOtherParticipants: call.hasOtherParticipant(), isOnHold: call.sfuClient.isOnHold(),
+            isFloatingPresenter: (mode === MODE.MINI && !forcedLocal ? call.getActiveStream() : call.getLocalStream())
+                ?.hasScreen,
             onSpeakerChange: this.handleSpeakerChange, onModeChange: this.handleModeChange,
             onInviteToggle: this.handleInviteToggle, onStayConfirm: this.handleStayConfirm
         };
-        const hasOnboarding = onboardingUI || onboardingRecording || onboardingRaise;
 
         //
         // `Call`

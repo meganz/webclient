@@ -66,6 +66,14 @@ class MegaGesture {
 
         // Set real scroll nodes if `options.scrollNodes` is passed
         this.activeScroll = this._getActiveScrollNodes(ev);
+
+        if (ev.target.tagName === 'INPUT' && ev.target.type === 'range') {
+            this.action = 'onRangeInput';
+        }
+
+        if (ev.target.classList.contains('ignore-gesture') || ev.target.closest('.ignore-gesture')) {
+            this.action = 'ignore';
+        }
     }
 
     _getActiveScrollNodes(ev) {

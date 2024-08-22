@@ -89,9 +89,6 @@
     height: 100%;
     box-sizing: border-box;
 }
-.chat-right-pad.in-call {
-    padding-top: 0;
-}
 .chat-right-head {
     clear: both;
     padding: 4px 16px 24px 16px;

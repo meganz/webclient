@@ -6,6 +6,42 @@ mBroadcaster.once('startMega', () => {
 
     const parse = tryCatch((v) => JSON.parse(v));
 
+    for (const type of ['uTagUTM', 'uTagMTM']) {
+        if (window[type]) {
+            sessionStorage[type] = JSON.stringify({
+                ts: unixtime(),
+                tags: window[type],
+            });
+        }
+    }
+
+    if (sessionStorage.uTagUTM || sessionStorage.uTagMTM) {
+        csp.init().then(() => {
+            if ('csp' in window && csp.has('analyze')) {
+                if (sessionStorage.uTagUTM) {
+                    localStorage.uTagUTM = sessionStorage.uTagUTM;
+                    delete sessionStorage.uTagUTM;
+                }
+
+                if (sessionStorage.uTagMTM) {
+                    localStorage.uTagMTM = sessionStorage.uTagMTM;
+                    delete sessionStorage.uTagMTM;
+                }
+            }
+        });
+    }
+
+    for (const type of ['uTagUTM', 'uTagMTM']) {
+        const storage = localStorage[type] ? localStorage : sessionStorage;
+        if (storage[type]) {
+            const tag = parse(storage[type]);
+
+            if (!tag.ts || unixtime() - tag.ts > 86400 * 90) {
+                delete storage[type];
+            }
+        }
+    }
+
     /**
      * Try to get the event from web storage. If the event doesn't exist or
      * is older than the valid period, return null.

@@ -583,7 +583,7 @@ def has_locked_msgs(is_prod):
         print("SUCCESS ... checking for Locked strings in PROD. None found")
     return False
 
-def lock_resource(branch_resource_name, keys, branch, update_time = 0):
+def lock_resource(branch_resource_name, keys, branch, update_time = 0, char_limits = {}):
     url = BASE_URL + "/resource_strings?filter[resource]=" + PROJECT_ID + ":r:" + branch_resource_name
     languages = get_languages()
     if languages:
@@ -619,6 +619,8 @@ def lock_resource(branch_resource_name, keys, branch, update_time = 0):
                                                 "type": "resource_strings"
                                             }
                                         }
+                                if key["attributes"]["key"] in char_limits:
+                                    payload["data"]["attributes"]["character_limit"] = char_limits[key["attributes"]["key"]]
                                 string_codes.append({'url': updateUrl, 'payload': payload})
 
                     def transifex_patch_strings(url, request):
@@ -770,6 +772,7 @@ def main():
             # Pull branch resource file, then merge with new strings in file
             print("Downloading latest branch resource strings...")
             branch_resource_strings = download_languages(branch_resource_name, ["en"])
+            char_limits = {}
             if branch_resource_strings:
                 branch_resource_strings = branch_resource_strings['en']
                 for key, value in new_strings.items():
@@ -779,6 +782,12 @@ def main():
                         branch_resource_strings[key] = value
             else:
                 branch_resource_strings = new_strings
+            for key, value in branch_resource_strings.items():
+                if "char_limit" in value:
+                    if value["char_limit"] > 0:
+                        char_limits[key] = value["char_limit"]
+                    del value["char_limit"]
+
             now = int(datetime.datetime.now(datetime.timezone.utc).timestamp()) - 30
             # Push new string to the branch resource file
             print("Pushing new strings to branch resource file... ")
@@ -804,7 +813,7 @@ def main():
             success = send_upload_request(url, payload)
             if success:
                 print("Locking resource")
-                lock_resource(branch_resource_name, new_strings.keys(), args.branch, now)
+                lock_resource(branch_resource_name, new_strings.keys(), args.branch, now, char_limits)
                 print("Completed")
         print("~ Import completed ~")
         print("")

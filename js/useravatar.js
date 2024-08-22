@@ -46,6 +46,7 @@ var useravatar = (function() {
         var $template = $('#avatar-svg').clone().removeClass('hidden')
             .find('svg').addClass('color' + s.colorIndex).end()
             .find('text').text(s.letters).end();
+        $('circle', $template).eq(1).attr('fill', `url('#color${s.colorIndex}')`);
 
         $template = window.btoa(to8($template.html()));
 

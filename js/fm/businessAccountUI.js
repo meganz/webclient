@@ -1450,8 +1450,13 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
 
         totalStorage = rootTotal + rubbishTotal + outshareTotal + inshareTotal + backupsTotal;
 
+        // Get Object storgae size and reduce cloud drive size if needed
+        const { ts: s4Total = 0 } = 'utils' in s4 && s4.utils.getStorageData() || {};
+        rootTotal -= s4Total;
+
         const totalStorageFormatted = numOfBytes(totalStorage, 2);
         const rootTotalFormatted = numOfBytes(rootTotal, 2);
+        const s4TotalFormatted = numOfBytes(s4Total, 2);
         const rubbishTotalFormatted = numOfBytes(rubbishTotal, 2);
         const inshareTotalFormatted = numOfBytes(inshareTotal, 2);
         const outshareTotalFormatted = numOfBytes(outshareTotal, 2);
@@ -1461,6 +1466,9 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
         let rootPercentage = rootTotal / totalStorage;
         rootPercentage = Number.isNaN(rootPercentage) ? 0 : rootPercentage;
         rootPercentage = Math.round(Number.parseFloat(rootPercentage * 100).toFixed(2));
+
+        let s4Percentage = s4Total / totalStorage || 0;
+        s4Percentage = Math.round(Number.parseFloat(s4Percentage * 100).toFixed(2));
 
         let insharePercentage = inshareTotal / totalStorage;
         insharePercentage = Number.isNaN(insharePercentage) ? 0 : insharePercentage;
@@ -1480,6 +1488,7 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
 
         const digitClassMap = ["one-digit", "two-digits", "three-digits"];
         const cloudNodeDigitClass = digitClassMap[String(rootPercentage).length - 1];
+        const s4NodeDigitClass = digitClassMap[String(s4Percentage).length - 1];
         const inshareNodeDigitClass = digitClassMap[String(insharePercentage).length - 1];
         const rubbishNodeDigitClass = digitClassMap[String(rubbishPercentage).length - 1];
         const outshareNodeDigitClass = digitClassMap[String(outsharePercentage).length - 1];
@@ -1514,6 +1523,18 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
             $('.storage-division-container.inshare-node', $storageAnalysisPie).addClass('hidden');
         }
 
+        // Show Object storage is available
+        if (u_attr.s4) {
+            $('.storage-division-container.s4-node', $storageAnalysisPie).removeClass('hidden');
+            $('.storage-division-container.s4-node .storage-division-num', $storageAnalysisPie)
+                .text(s4TotalFormatted.size + ' ' + s4TotalFormatted.unit);
+            $('.storage-division-container.s4-node .storage-division-per', $storageAnalysisPie)
+                .text(`${s4Percentage}%`).addClass(s4NodeDigitClass);
+        }
+        else {
+            $('.storage-division-container.s4-node', $storageAnalysisPie).addClass('hidden');
+        }
+
         // Show the storage pie chart and data analysis panel
         $storageAnalysisPie.removeClass('hidden');
 
@@ -1539,6 +1560,7 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
             const style = getComputedStyle(document.body);
             const colors = [
                 style.getPropertyValue('--label-red').trim(),
+                style.getPropertyValue('--label-blue').trim(),
                 style.getPropertyValue('--label-orange').trim(),
                 style.getPropertyValue('--label-purple').trim(),
                 style.getPropertyValue('--label-green').trim(),
@@ -1546,6 +1568,7 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
             ];
             const hoverColors = [
                 style.getPropertyValue('--label-red-hover').trim(),
+                style.getPropertyValue('--label-blue-hover').trim(),
                 style.getPropertyValue('--label-orange-hover').trim(),
                 style.getPropertyValue('--label-purple-hover').trim(),
                 style.getPropertyValue('--label-green-hover').trim(),
@@ -1555,7 +1578,7 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
                 type: 'doughnut',
                 data: {
                     datasets: [{
-                        data: [rootTotal, outshareTotal, inshareTotal, backupsTotal, rubbishTotal],
+                        data: [rootTotal, s4Total, outshareTotal, inshareTotal, backupsTotal, rubbishTotal],
                         backgroundColor: colors,
                         hoverBackgroundColor: hoverColors,
                         hoverBorderColor: 'rgb(0, 0, 0, 0.2)',
@@ -1564,6 +1587,7 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
                     // These labels appear in the legend and in the tooltips when hovering different arcs
                     labels: [
                         l[164],
+                        l.obj_storage,
                         l[19187],
                         l[16770],
                         l.restricted_folder_button,
@@ -1593,17 +1617,20 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
                 .rebind('click.subuser', function chartLegendClickHandler(e) {
                     const $me = $(this);
                     let ix = 0;
-                    if ($me.hasClass('inbox-node')) {
+                    if ($me.hasClass('s4-node')) {
                         ix = 1;
                     }
-                    else if ($me.hasClass('inshare-node')) {
+                    if ($me.hasClass('inbox-node')) {
                         ix = 2;
                     }
-                    else if ($me.hasClass('backups-node')) {
+                    else if ($me.hasClass('inshare-node')) {
                         ix = 3;
                     }
-                    else if ($me.hasClass('rubbish-node')) {
+                    else if ($me.hasClass('backups-node')) {
                         ix = 4;
+                    }
+                    else if ($me.hasClass('rubbish-node')) {
+                        ix = 5;
                     }
 
                     if ($me.hasClass('disabled')) {

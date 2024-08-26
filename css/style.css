@@ -10560,6 +10560,10 @@ body.megaChatDisabled .nw-fm-left-icon.conversations {
     background-color: var(--label-red);
 }
 
+.storage-division-per.s4-color {
+    background-color: var(--label-blue);
+}
+
 .storage-division-per.inbox-color {
     background-color: var(--label-orange);
 }
@@ -11892,11 +11896,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations {
 .business-dashboard .subaccount-view-used-data {
     padding: 24px;
     box-sizing: border-box;
-}
-
-.business-dashboard .subaccount-view-used-data .used-storage-info.ba-pub-links,
-.business-dashboard .subaccount-view-used-data .used-storage-info.ba-pub-links td {
-    cursor: pointer;
 }
 
 .content-panel.business-dashboard .intro-info.active, .content-panel.dashboard .intro-info.active{

@@ -2549,6 +2549,16 @@ function topmenuUI() {
             }
         }
 
+        if (!e || !c || c && c.includes('fmdb-loader')) {
+            elements = document.getElementsByClassName('js-dropdown-rewind-progress');
+
+            for (i = elements.length; i--;) {
+                if (!elements[i].classList.contains('active') || e && e.target.closest('.topbar-links')) {
+                    elements[i].classList.remove('show');
+                }
+            }
+        }
+
         if (!e || (!e.target.closest('.js-dropdown-notification') &&
             ((c && c.indexOf('js-topbarnotification') === -1) || !c))) {
             notify.closePopup();

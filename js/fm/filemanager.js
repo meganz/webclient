@@ -3853,6 +3853,7 @@ FileManager.prototype.addGridUI = function(refresh) {
     }
     else if (this.v.length) {
         $('.files-grid-view.fm', '.fmholder').removeClass('hidden');
+
         $('.files-grid-view.fm', '.fmholder')
             .removeClass('out-shares-view public-links-view file-requests-view');
 

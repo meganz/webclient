@@ -721,6 +721,11 @@ body.theme-dark .rewind-datepicker-calendar .datepicker--cell.-current- {
     flex-direction: column;
 }
 
+.sidebar .sidebar-container .sidebar-content .content-folder .folder-download .rewind-download-restore-button-container {
+    display: flex;    
+    margin: auto 24px 16px auto;
+}
+
 .sidebar .sidebar-container .sidebar-content .content-folder .folder-download button {
     margin: auto 24px auto auto;
     font: var(--text-body1);
@@ -757,4 +762,85 @@ body.theme-dark .rewind-datepicker-calendar .datepicker--cell.-current- {
     height: 128px;
     width: 128px;
     flex-shrink: 0;
+}
+
+.fm-rewind-progress-section {
+    position: absolute;
+    top: 48px;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 220;
+    align-items: center;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    flex-grow: 1;
+    background: var(--surface-grey-1);
+}
+
+.fm-rewind-progress-section .content {
+    margin: auto;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    color: var(--text-color-high);
+}
+
+.fm-rewind-progress-section .image {
+    background-image: url("../images/mega/rewind/mega-main.png");
+    background-size: 248px auto;
+    background-repeat: no-repeat;
+    height: 248px;
+    width: 248px;
+    margin-bottom: 24px;
+    flex-shrink: 0;
+}
+
+.fm-rewind-progress-section .title {
+    font: var(--text-h0);
+}
+
+.fm-rewind-progress-section .message {
+    font: var(--text-body1);
+    margin-top: 8px;
+}
+
+.fm-rewind-progress-section span.medium-color {
+    color: var(--text-color-medium);
+}
+
+.dropdown.rewind-progress .content {
+    margin: auto;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    color: var(--text-color-high);
+}
+
+.dropdown.rewind-progress .content .in-progress {
+    --mask-color: var(--secondary-blue);
+    --icon-size: 24px;
+    color: var(--text-color-info);
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.dropdown.rewind-progress .content .text {
+    text-align: left;
+}
+
+.dropdown.rewind-progress .content .text .title {
+    font: var(--text-body1);
+    max-width: 320px;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.dropdown.rewind-progress .content .text .message {
+    color: var(--text-color-medium);
+    font: var(--text-body2);
 }

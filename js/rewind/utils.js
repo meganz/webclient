@@ -425,6 +425,299 @@ lazy(mega, 'rewindUtils', () => {
         }
     }
 
+    /**
+     * Handles the rewinding and reinstatement of data.
+     */
+    class RewindReinstateHandler {
+        constructor() {
+            this.init();
+        }
+
+        init() {
+            this.toBeRestored = [];
+            this.restored = Object.create(null);
+            this.freshNodes = Object.create(null);
+            this.selectedNodes = [];
+            this.inProgress = false;
+            this.stats = Object.create(null);
+        }
+
+        /**
+         * Asynchronously restores a single node to under a specified parent (target).
+         * This function will make the requests to the API as well as populate the `restored` list
+         * @param {string} handle - The handle of the node to be restored.
+         * @param {string} target - The handle of the parent under which the node will be restored.
+         * @returns {Promise<void>} A promise that resolves when the node is successfully restored.
+         */
+        async restoreSingleNode(handle, target) {
+
+            if (this.restored[handle] || !target) {
+                return;
+            }
+
+            // Change target to the restored folder
+            if (this.restored[target]) {
+                target = this.restored[target];
+            }
+
+            const n = mega.rewind.persist.nodeDictionary[handle];
+
+            let oldVersion;
+
+            // Assume target always exists
+            if (M.c[target]) {
+                for (const h in M.c[target]) {
+                    // Check if both are files/folders with matching names
+                    if ((h === n.h || M.d[h] && M.d[h].name === n.name) && n.t === M.d[h].t) {
+                        // If its a file, version it
+                        if (!M.d[h].t) {
+                            oldVersion = h;
+                            this.restored[n.h] = h;
+                            this.stats.versioned = (this.stats.versioned || 0) + 1;
+                            break;
+                        }
+                        // Ensure that folders are not duplicated
+                        this.restored[n.h] = h;
+                        return;
+                    }
+                }
+            }
+
+            const req = {
+                a: 'pd',
+                v: 3,
+                sm: 1,
+                t: target,
+                n: [{
+                    k: a32_to_base64(encrypt_key(u_k_aes, n.k)),
+                    a: ab_to_base64(crypto_makeattr(n)),
+                    h: n.h,
+                    t: n.t
+                }]
+            };
+
+            // Use current timestamp (time of restoration) as the last modified time
+            if (!n.t) {
+                req.n[0].mtime = Math.floor(Date.now() / 1000);
+            }
+
+            if (oldVersion) {
+                req.n[0].ov = oldVersion;
+            }
+
+            const sn = M.getShareNodesSync(target, null, true);
+            if (sn.length) {
+                req.cr = crypto_makecr([n], sn, false);
+                req.cr[1][0] = req.n[0].h;
+            }
+
+            const statProp = req.n[0].t ? 'dirs' : 'files';
+
+            return api.screq(req).then(res => {
+                this.restored[handle] = res.handle;
+                this.stats[statProp] = (this.stats[statProp] || 0) + 1;
+                return res.handle;
+            });
+        }
+
+        /**
+         * Adds parents of a node to the restoration list.
+         * @param {string} handle - The handle of the node whose parents are to be added.
+         * @returns {Promise<void>} A promise that resolves when all the parents are added to the restoration list.
+         */
+        async addParentsToRestoreList(handle) {
+            // Cloud root can exist in the selection, we do not restore the cloud node's parents
+            if (!handle) {
+                return;
+            }
+
+            // Running rewind on a folder means that the folder always exists
+            if (handle === mega.rewind.selectedHandle) {
+                this.restored[handle] = handle;
+                return;
+            }
+
+            const node = mega.rewind.persist.nodeDictionary[handle];
+            let parentHandle = node && node.p;
+
+            // If the node to be restored is the cloud drive root, we do nothing
+            if (!parentHandle || typeof parentHandle !== 'string') {
+                return;
+            }
+
+            // Populate M.d with the node so we can check its existence
+            if (!M.d[handle]) {
+                await dbfetch.acquire(handle);
+            }
+
+            // Check if the parent exists, if it does, add it to the restored map
+            if (M.d[parentHandle]
+                && !this.freshNodes[parentHandle]
+                && M.d[parentHandle].p === mega.rewind.persist.nodeDictionary[parentHandle].p) {
+
+                this.restored[parentHandle] = parentHandle;
+
+                // Restore the folder name
+                const previousName = mega.rewind.persist.nodeDictionary[parentHandle].name;
+                if (M.d[parentHandle].name !== previousName) {
+                    M.rename(parentHandle, previousName).catch(tell);
+                }
+            }
+
+            // Or if the node has already been restored, we change the current working
+            // parent handle to the new one
+            else if (this.restored[parentHandle]) {
+                parentHandle = this.restored[parentHandle];
+            }
+
+            // Parent doesn't exist, and it has not been restored, so add it to the restore list
+            else {
+                this.freshNodes[parentHandle] = 1;
+                await this.addParentsToRestoreList(parentHandle);
+            }
+
+            // Add current node
+            if (!this.toBeRestored.includes(handle)) {
+                this.toBeRestored.unshift(handle);
+            }
+
+            // Mark current node as fresh if parent is fresh
+            if (this.freshNodes[parentHandle]) {
+                this.freshNodes[handle] = 1;
+            }
+        }
+
+        /**
+         * Adds children of a node to the restoration list.
+         * @param {string} handle - The handle of the node whose children are to be added.
+         * @returns {void}
+         */
+        addChildrenToRestoreList(handle) {
+
+            const children = mega.rewind.persist.nodeChildrenDictionary[handle];
+
+            if (!children) {
+                return;
+            }
+
+            for (const [h, type] of Object.entries(children)) {
+                // Add the handle to the list for restoring
+                if (!this.toBeRestored.includes(h)) {
+                    this.toBeRestored.push(h);
+                }
+
+                // If the node is a folder, perform a recursive call
+                else if (type === 2) {
+                    this.addChildrenToRestoreList(h);
+                }
+            }
+        }
+
+        /**
+         * Sorts handles in-place by depth
+         * @param {string[]} handles - An array of handles of the nodes to be sorted.
+         * @param {Object} dict - The node dictionary, object where keys are handles and values are node properties.
+         *                        We can also use `M.d` or `mega.rewind.nodeDictionary` here.
+         * @param {string} [rootHandle=M.RootID] - The handle of the root node. Defaults to M.RootID if not provided.
+         *                                         This does not need to be the Cloud drive root, just an anchor point.
+         * @returns {void}
+         */
+        _sortHandlesByDepth(handles, dict, rootHandle = M.RootID) {
+            const depthMap = Object.create(null);
+
+            for (let i = 0; i < handles.length; i++) {
+                let node = dict[handles[i]];
+                let depth = 0;
+                while (node && node.h !== rootHandle && node.p) {
+                    depth++;
+                    node = dict[node.p];
+                }
+                depthMap[handles[i]] = depth;
+            }
+
+            handles.sort((h1, h2) => depthMap[h1] - depthMap[h2]);
+        }
+
+        /**
+        * Asynchronously restores nodes based on provided handles.
+        * @param {string[]} handles - An array of handles for the nodes to be restored.
+        * @param {Function} progressCallback - A callback to track progress.
+        *                                      It takes a normalized value (completed / totalCount) as a parameter.
+        * @returns {Promise<void>} - A promise that resolves when all nodes are restored.
+        */
+        async restoreNodes(handles, progressCallback) {
+
+            console.log("[RewindReinstateHandler] Restore started");
+
+            this.inProgress = true;
+
+            loadingDialog.show();
+
+            this.toBeRestored = typeof handles === 'string' ? [handles] : handles;
+            this.restored = Object.create(null);
+
+            loadingDialog.hide();
+
+            // If any subtree is collapsed, we add the hidden nodes to be restored as well
+            const partials = Object.values(mega.rewind.persist.selectedNodesPartial).flatMap(o => Object.keys(o));
+
+            if (partials.length) {
+                this.toBeRestored.push(...partials);
+            }
+
+            // We sort the handles by depth, needed for partial selections
+            this._sortHandlesByDepth(handles, mega.rewind.persist.nodeDictionary, mega.rewind.persist.selectedHandle);
+
+            // Do a traversal along the parents for each node and restore if parent is missing
+            let idx = 0;
+            while (idx < this.toBeRestored.length) {
+                const currentHandle = this.toBeRestored[idx];
+                await this.addParentsToRestoreList(currentHandle);
+                // `1` refers to a fully selected node, add its children in case its subtree is collapsed
+                // If the node is not in `selectedNodes`, we added this to the restore list
+                if (mega.rewind.persist.nodeDictionary[currentHandle].t
+                    && (!mega.rewind.persist.selectedNodes[currentHandle]
+                        || mega.rewind.persist.selectedNodes[currentHandle] === 1)) {
+
+                    this.addChildrenToRestoreList(currentHandle);
+                }
+                idx++;
+            }
+
+            this.toBeRestored = [...new Set(this.toBeRestored)];
+
+            // Finally, reinstate the nodes
+            for (let i = 0; i < this.toBeRestored.length; i++) {
+
+                const h = this.toBeRestored[i];
+                const target = mega.rewind.persist.nodeDictionary[h].p;
+                await this.restoreSingleNode(h, target).catch(ex => {
+                    this.inProgress = false;
+                    throw ex;
+                });
+
+                if (progressCallback && typeof progressCallback === 'function') {
+                    progressCallback((i + 1) / this.toBeRestored.length);
+                }
+            }
+
+            this.inProgress = false;
+
+            const statStr = JSON.stringify([this.stats.files | 0,
+                                            this.stats.dirs | 0,
+                                            this.stats.versioned | 0]);
+            // Cleanup
+            this.toBeRestored = [];
+            this.restored = Object.create(null);
+            this.freshNodes = Object.create(null);
+            this.stats = Object.create(null);
+
+            delay('rewind:log-reinstate-successful', eventlog.bind(null, 500471, statStr));
+
+            console.log("[RewindReinstateHandler] Restore finished!");
+        }
+    }
+
     return new class RewindUtils {
         constructor() {
             this.init();
@@ -433,6 +726,7 @@ lazy(mega, 'rewindUtils', () => {
         init() {
             lazy(this, 'tree', () => new RewindChunkTreeHandler());
             lazy(this, 'packet', () => new RewindChunkPacketHandler());
+            lazy(this, 'reinstate', () => new RewindReinstateHandler());
 
             this.queue = Object.create(null);
             this.inflight = Object.create(null);
@@ -528,20 +822,6 @@ lazy(mega, 'rewindUtils', () => {
 
                 mega.rewind.addNodeFromWorker(data);
             }
-        }
-
-        restoreNode(handles) {
-
-            if (typeof handles === 'string') {
-                handles = [handles];
-            }
-
-            const payload = {
-                a: 'rw',
-                h: handles
-            };
-
-            return api.req(payload).then(({result}) => result);
         }
 
         async checkRequestDone(apiId, progressSource, fromPacket) {

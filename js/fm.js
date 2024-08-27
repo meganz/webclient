@@ -1649,7 +1649,8 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
             assert(
                 checkboxSetting === 'cslrem'
                 || checkboxSetting === 'nowarnpl'
-                || checkboxSetting === 'skipDelWarning', checkboxSetting);
+                || checkboxSetting === 'skipDelWarning'
+                || checkboxSetting === 'rwReinstate', checkboxSetting);
 
             $('#msgDialog .checkbox-block .checkdiv,' +
                 '#msgDialog .checkbox-block input')

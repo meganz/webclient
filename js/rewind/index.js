@@ -57,6 +57,13 @@ lazy(mega, 'rewind', () => {
             this.$rewindButton.off(clickEventNamespace).on(clickEventNamespace, () => {
 
                 if (M.isInvalidUserStatus()) {
+                    eventlog(500469);
+                    return;
+                }
+
+                if (mega.rewindUtils.reinstate.inProgress) {
+                    eventlog(500469);
+                    M.openFolder(mega.rewind.selectedHandle, true);
                     return;
                 }
 
@@ -106,10 +113,12 @@ lazy(mega, 'rewind', () => {
 
                 if (redirect) {
                     mega.rewind.folderRedirect = selectedHandle;
+                    eventlog(500469);
                     M.openFolder(redirectFolderHandle, true);
                     return;
                 }
 
+                eventlog(500469);
                 mega.rewind.openSidebar(null, selectedHandle)
                     .then(() => {
                         const eventData = mega.rewind.getOpenSidebarEventData(selectedHandle);
@@ -1665,6 +1674,11 @@ lazy(mega, 'rewind', () => {
                 }, 0);
 
                 if (type === -1 && done) {
+                    totalProgress = 100;
+                }
+
+                if (totalProgress > 100) {
+                    delay('rewind:datafetch-percent-over-100', eventlog.bind(null, 500523));
                     totalProgress = 100;
                 }
 

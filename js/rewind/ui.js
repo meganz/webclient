@@ -73,6 +73,8 @@ lazy(mega, 'rewindUi', () => {
             this.$downloadUpgradeDialog = null;
             this.firstSelect = false;
             this.firstSelectLookup = false;
+            this.rewindOptions = Object.create(null);
+            this.openFolderListener = null;
 
             /** @property RewindSidebar.template */
             lazy(this, 'template', () => {
@@ -104,6 +106,9 @@ lazy(mega, 'rewindUi', () => {
             const previousHandle = this.currentHandle;
             this.currentNode = {...node};
             this.currentHandle = selectedHandle;
+
+            // SAT-1023
+            this.forceShowRewindButton = false;
 
             // Move to rewind index
             if (!this.firstSelectLookup) {
@@ -168,12 +173,22 @@ lazy(mega, 'rewindUi', () => {
             this.$contentDownload = $('.folder-download', this.$contentFolder);
             this.$contentLoading = $('.content-loading', this.$sidebarContent);
             this.$contentLoadingProgress = $('.progress', this.$contentLoading);
-            this.$downloadButton = $('.js-download', this.$contentDownload);
-            this.$upgradeButton = $('.upgrade-purchase-button', this.$contentDownload);
+            this.$upgradeButton = $('.upgrade-purchase-button', this.sidebar);
             this.$restoreButton = $('.js-rewind', this.sidebar);
             this.$contextMenu = $('.dropdown.body.context', document.body);
             this.$infoButton = $('.dropdown-item.properties-item-rewind', this.$contextMenu);
             this.$openFolderButton = $('.dropdown-item.open-item-rewind', this.$contextMenu);
+            this.$fmHeaderButtons = $('.fm-header-buttons', '.fm-right-files-block');
+
+
+            this.beforePageChangeListener = null;
+            this.$rewindProgressSection = $('.fm-rewind-progress-section', '.fm-right-files-block');
+            this.$rewindProgressTopBar = $('.js-dropdown-rewind-progress', '.topbar-links');
+            this.$onboardingControlPanel = $('.onboarding-control-panel', '.fm-right-files-block.visible-notification');
+            if (this.$onboardingControlPanel.hasClass('hidden')) {
+                this.$onboardingControlPanel = false;
+            }
+            this.$loader = $('.fmdb-loader', '.topbar');
 
             this.$contentEmpty.addClass('hidden');
             this.$contentTreeCacheEmpty.addClass('hidden');
@@ -188,6 +203,7 @@ lazy(mega, 'rewindUi', () => {
                 classes: 'rewind-datepicker-calendar',
                 dateFormat: 'mm/dd/yyyy',
                 minDate: REWIND_ACTIVATION_DATE,
+                maxDate: new Date(),
                 disableNavWhenOutOfRange: true,
                 startDate: null,
                 prevHtml: '<i class="sprite-fm-mono icon-arrow-right"></i>',
@@ -338,6 +354,8 @@ lazy(mega, 'rewindUi', () => {
                         return;
                     }
 
+                    this.resetPersist();
+
                     this.displayList(date);
 
                     const getDayDifference = (previousDate) => {
@@ -349,13 +367,13 @@ lazy(mega, 'rewindUi', () => {
 
                     const dayDifference = getDayDifference(date);
                     if (!this.firstSelect) {
-                        delay('rewind:log-first-select', eventlog.bind(null, 500003, [0, u_attr.p | 0, dayDifference]));
+                        eventlog(500003, [0, u_attr.p | 0, dayDifference]);
                         this.firstSelect = true;
                         this.firstSelectLookup = true;
                         mega.attr.set(`rws`, { ts: `${Date.now()}`, d: `${dayDifference}` }, false, true);
                     }
 
-                    delay('rewind:log-select', eventlog.bind(null, 500005, [0, u_attr.p | 0, dayDifference]));
+                    eventlog(500005, JSON.stringify([0, u_attr.p | 0, dayDifference]));
                 },
                 onShow: (context) => {
                     this.adjustDatepicker();
@@ -408,6 +426,7 @@ lazy(mega, 'rewindUi', () => {
             }
 
             this.$contentUpgrade.removeClass('hidden');
+            this.$upgradeLink = $('.rewind-sidebar-upgrade-action', this.sidebar);
 
             // Filter button
             this.$filterSelectButton = $('.filter-select-button', this.sidebar);
@@ -437,6 +456,22 @@ lazy(mega, 'rewindUi', () => {
 
                 this.displayList(this.selectedDate, isOpenFolder);
             }
+        }
+
+        resetPersist() {
+            // Previous persisting values are irrelevant for the newly selected date
+            delete mega.rewind.persist;
+
+            lazy(mega.rewind, 'persist', () => ({
+                selectedHandle: mega.rewind.selectedHandle,
+                nodesToRestore: this.rewindOptions.selectedKeys,
+                dateToRestore: this.rewindOptions.restoreDate,
+                dateToRestoreObj: this.rewindOptions.restoreDateObj,
+                nodeDictionary: mega.rewind.nodeDictionary,
+                nodeChildrenDictionary: mega.rewind.nodeChildrenDictionary,
+                selectedNodes: this.selectedNodes,
+                selectedNodesPartial: this.selectedNodesPartial
+            }));
         }
 
         addDatepickerOverlay(type) {
@@ -833,7 +868,7 @@ lazy(mega, 'rewindUi', () => {
         }
 
         // There can be multiple places from which user can begin the upgrade flow
-        addUpgradeActionHandler(domNode) {
+        addUpgradeActionHandler(domNode, isLink) {
             if (!domNode || typeof domNode !== 'object') {
                 return;
             }
@@ -843,8 +878,9 @@ lazy(mega, 'rewindUi', () => {
                     delay('rewind:upgrade-click', eventlog.bind(null, 500002, eventData));
                     mega.rewind.saveLastUpgradeClick();
                 }
-
-                loadSubPage('pro');
+                if (!isLink) {
+                    loadSubPage('pro');
+                }
             });
         }
 
@@ -868,6 +904,7 @@ lazy(mega, 'rewindUi', () => {
             });
 
             this.addUpgradeActionHandler(this.$upgradeButton);
+            this.addUpgradeActionHandler(this.$upgradeLink, true);
 
             // First of all handlers to detect if focused was set or not
             // We stop the propagation through immediate handlers (not the ancestors)
@@ -938,10 +975,10 @@ lazy(mega, 'rewindUi', () => {
             });
             */
 
-            this.$contentFolder.on('click.rewind', '.select-checkbox', this.onClickListCheckbox.bind(this));
+            // SAT-1023
+            // this.$contentFolder.on('click.rewind', '.select-checkbox', this.onClickListCheckbox.bind(this));
             this.$contentFolder.on('click.rewind', '.folder-option', this.showContextMenu.bind(this));
             this.$contentFolder.on('click.rewind', '.toggle-section', this.onClickListToggleSection.bind(this));
-            this.$downloadButton.rebind('click.rewind', this.onClickDownload.bind(this));
             this.$restoreButton.rebind('click.rewind', this.onClickRestore.bind(this));
 
             this.$infoButton.rebind('click.rewind', () => {
@@ -1178,15 +1215,19 @@ lazy(mega, 'rewindUi', () => {
             if (totalFiles === 0 && totalDirectories === 0) {
                 this.$contentEmpty.removeClass('hidden');
                 this.$contentFolder.addClass('hidden');
+                // SAT-1023
+                this.forceShowRewindButton = false;
             }
             else {
                 this.prepareListView({ts: date.getTime()});
                 if (this.isEmptyList()) {
                     this.$contentFolder.addClass('hidden');
                     this.$contentEmpty.removeClass('hidden');
+                    this.forceShowRewindButton = false;
                 }
                 else {
                     this.$contentFolder.removeClass('hidden');
+                    this.forceShowRewindButton = true;
                 }
             }
 
@@ -1198,6 +1239,15 @@ lazy(mega, 'rewindUi', () => {
             */
 
             this.isListLoading = false;
+
+            // SAT-1023
+            // Manually trigger the selection at Rewind root & toggle download/rewind panel
+            //
+            if (this.forceShowRewindButton) {
+                this.selectTreeCheckbox(this.currentHandle);
+                this.toggleDownloadPanel();
+            }
+            //
         }
 
         isEmptyList() {
@@ -1234,6 +1284,12 @@ lazy(mega, 'rewindUi', () => {
             if (this.isEmptyList()) {
                 this.$contentFolder.addClass('hidden');
                 this.$contentEmpty.removeClass('hidden');
+            }
+            // SAT-1023
+            // Manual triggers for when any filter is selected
+            if (this.forceShowRewindButton) {
+                this.selectedNodes[this.currentHandle] = TREE_SELECT;
+                this.toggleDownloadPanel();
             }
         }
 
@@ -1457,9 +1513,12 @@ lazy(mega, 'rewindUi', () => {
                 delete this.selectedNodes[handle];
             }
 
-            this.adjustCheckbox(handle, isSelected, status);
+            // SAT-1023
+            // this.adjustCheckbox(handle, isSelected, status);
         }
 
+        // SAT-1023
+        /*
         adjustCheckbox(handle, isSelected, toggleDownload = true) {
             const $folderItem = $(`.folder-item[data-id="${handle}"]`, this.$contentFolder);
             const $checkboxParent = $('.select-checkbox', $folderItem);
@@ -1476,9 +1535,14 @@ lazy(mega, 'rewindUi', () => {
                 this.toggleDownloadPanel();
             }
         }
+        */
 
         toggleDownloadPanel() {
             if (this.hasSelectedNodes()) {
+
+                // SAT-1023
+                this.$contentFolder.removeClass('hidden');
+                //
                 this.$contentDownload.removeClass('hidden');
 
                 // Check user account tier
@@ -1486,11 +1550,11 @@ lazy(mega, 'rewindUi', () => {
 
                 if (accountType === ACCOUNT_TYPE_FREE) {
                     this.$upgradeButton.removeClass('hidden');
-                    this.$downloadButton.addClass('hidden');
+                    this.$restoreButton.addClass('hidden');
                 }
                 else {
                     this.$upgradeButton.addClass('hidden');
-                    this.$downloadButton.removeClass('hidden');
+                    this.$restoreButton.removeClass('hidden');
                 }
             }
             else {
@@ -1540,13 +1604,17 @@ lazy(mega, 'rewindUi', () => {
                         delete this.selectedNodes[currentHandle];
                     }
 
-                    this.adjustCheckbox(currentHandle, isSelected, false);
+                    // SAT-1023
+                    // this.adjustCheckbox(currentHandle, isSelected, false);
                 });
             }
 
             // Check ancestors
+            // SAT-1023
+            /*
             this.adjustAncestorsCheckbox(node);
             this.adjustCheckbox(handle, isSelected);
+            */
         }
 
         adjustAncestorsCheckbox(node) {
@@ -1584,7 +1652,8 @@ lazy(mega, 'rewindUi', () => {
                     delete this.selectedNodes[n.h];
                 }
 
-                this.adjustCheckbox(n.h, this.selectedNodes[n.h], false);
+                // SAT-1023
+                // this.adjustCheckbox(n.h, this.selectedNodes[n.h], false);
             }
         }
 
@@ -1782,6 +1851,8 @@ lazy(mega, 'rewindUi', () => {
                         // Base case 2, we're at the selected rewind target folder, we add
                         if (currNodeHandle === mega.rewindUi.sidebar.currentHandle) {
                             parentNodes[currNodeHandle] = currNode;
+                            parentNodes[currNodeHandle].rewind = true;
+                            return;
                         }
                         // Recursive case, we need to traverse up the parents
                         if (currNode.p) {
@@ -1790,6 +1861,7 @@ lazy(mega, 'rewindUi', () => {
                             // We only add folder nodes
                             if (currNode.t && !parentNodes[currNodeHandle]) {
                                 parentNodes[currNodeHandle] = currNode;
+                                parentNodes[currNodeHandle].rewind = true;
                             }
                         }
                     };
@@ -1857,20 +1929,321 @@ lazy(mega, 'rewindUi', () => {
             return false;
         }
 
-        // FIXME: This is for testing at the moment
-        onClickRestore() {
-            const selectedNodes = {...this.selectedNodes};
-            const selectedKeys = Object.keys(selectedNodes);
-
-            if (!selectedKeys.length) {
-                return;
+        /**
+         * Show restore progress dialogs
+         * @returns {void}
+         */
+        showRestoreProgress() {
+            if (M.getPath(M.currentdirid).includes(mega.rewind.persist.selectedHandle)) {
+                if (this.$rewindProgressSection) {
+                    this.$rewindProgressSection.removeClass('hidden');
+                }
+                if (this.$fmHeaderButtons) {
+                    this.$fmHeaderButtons.addClass('hidden');
+                }
+                if (this.$onboardingControlPanel) {
+                    this.$onboardingControlPanel.addClass('hidden');
+                }
             }
+            else {
+                if (this.$rewindProgressSection) {
+                    this.$rewindProgressSection.addClass('hidden');
+                }
+                if (this.$fmHeaderButtons) {
+                    this.$fmHeaderButtons.removeClass('hidden');
+                }
+                if (this.$onboardingControlPanel) {
+                    this.$onboardingControlPanel.removeClass('hidden');
+                }
+            }
+        }
 
-            this.$restoreButton.addClass('disabled');
-            mega.rewindUtils.restoreNode(selectedKeys).then(() => {
-                this.$restoreButton.removeClass('disabled');
-                logger.info('Successfully restored file', selectedKeys);
+        /**
+         * Hide restore progress dialogs
+         * @returns {void}
+         */
+        hideRestoreProgress() {
+            if (this.$rewindProgressSection) {
+                this.$rewindProgressSection.addClass('hidden');
+            }
+            if (this.$rewindProgressTopBar) {
+                this.$rewindProgressTopBar.removeClass('show');
+            }
+            if (this.$fmHeaderButtons) {
+                this.$fmHeaderButtons.removeClass('hidden');
+            }
+            if (this.$onboardingControlPanel) {
+                this.$onboardingControlPanel.removeClass('hidden');
+            }
+        }
+
+        /**
+         * Update restore progress dialogs visibility
+         * @returns {void}
+         */
+        updateRestoreProgress() {
+            if (mega.rewindUtils.reinstate.inProgress) {
+                this.showRestoreProgress();
+            }
+            else {
+                this.hideRestoreProgress();
+            }
+        }
+
+        /**
+         * Shows restore progress dialog in case rewind in progress and
+         * last visited page is the current folder being rewound
+         * @returns {void}
+         */
+        updateRestoreDialogProgress() {
+            if (mega.rewindUtils.reinstate.inProgress
+                && window.page === `fm/${mega.rewind.persist.selectedHandle}`) {
+
+                this.$rewindProgressTopBar.removeClass('hidden');
+                this.$rewindProgressTopBar.addClass('show active');
+            }
+            else {
+                this.$rewindProgressTopBar.addClass('hidden');
+                this.$rewindProgressTopBar.removeClass('show active');
+            }
+        }
+
+        addDialogProgEventListeners() {
+            this.$loader = $('.fmdb-loader', '.topbar');
+            this.$loader.addClass('pointer-c');
+            this.$loader.rebind('click.rewind', () => {
+                this.$rewindProgressTopBar.removeClass('hidden');
+                this.$rewindProgressTopBar.toggleClass('show active');
             });
+        }
+
+        /**
+         * Handles "restore" process progress UI
+         * Passed as parameter in mega.rewindUtils.restoreNodes
+         * @param {number} progress - decimal number between 0 and 1 representing the progress of the process
+         * @returns {void}
+         */
+        handleRestoreProgress(progress) {
+            if (!progress) {
+                mLoadingSpinner.show('rewind-restore');
+
+                if (!this.beforePageChangeListener) {
+                    this.beforePageChangeListener = mBroadcaster.addListener(
+                        'beforepagechange',
+                        this.updateRestoreDialogProgress.bind(this)
+                    );
+                }
+
+                $('.title', this.$rewindProgressSection).safeHTML(
+                    mega.rewindUi.progressTranslations.section.title(0)
+                );
+
+                $('.message', this.$rewindProgressSection).safeHTML(
+                    mega.rewindUi.progressTranslations.section.message(this.selectedDate)
+                );
+
+                const {h, name} = mega.rewindUi.sidebar.currentNode;
+                const nodeName = h === M.RootID ? l[164] : name;
+
+                $('.title', this.$rewindProgressTopBar).safeHTML(
+                    mega.rewindUi.progressTranslations.topBar.title(nodeName)
+                );
+
+                $('.message', this.$rewindProgressTopBar).safeHTML(
+                    mega.rewindUi.progressTranslations.topBar.message(0)
+                );
+
+                this.addDialogProgEventListeners();
+
+                this.showRestoreProgress();
+            }
+            else if (progress === 1) {
+                mLoadingSpinner.hide('rewind-restore');
+                this.$loader.off('click.rewind');
+                this.$loader.removeClass('pointer-c');
+
+                if (this.beforePageChangeListener) {
+                    mBroadcaster.removeListener(this.beforePageChangeListener);
+                }
+
+                this.hideRestoreProgress();
+            }
+            else {
+                this.showRestoreProgress();
+                let percentage = Math.round(progress * 100);
+
+                if (percentage > 100) {
+                    delay('rewind:reinstate-percent-over-100', eventlog.bind(null, 500524));
+                    percentage = 100;
+                }
+
+                $('.title', this.$rewindProgressSection).safeHTML(
+                    mega.rewindUi.progressTranslations.section.title(percentage)
+                );
+                $('.message', this.$rewindProgressTopBar).safeHTML(
+                    mega.rewindUi.progressTranslations.topBar.message(percentage)
+                );
+            }
+        }
+
+        onClickRestore() {
+
+            delay('rewind:log-reinstate-button-clicked', eventlog.bind(null, 500470));
+
+            const skipRewindConfirmation = mega.config.get('rwReinstate');
+
+            const selDate = new Date(mega.rewindUi.sidebar.selectedDate
+                                    || mega.rewind.persist.dateToRestore);
+
+            this.rewindOptions = {
+                folderName: M.d[mega.rewind.selectedHandle].name || l[164],
+                restoreDate: time2date(selDate / 1000, 2),
+                restoreDateObj: selDate,
+                selectedKeys: Object.keys(this.selectedNodes)
+            };
+
+            const proceedWithReinstate = () => {
+                if (mega.rewind.accountType === mega.rewind.ACCOUNT_TYPE_FREE) {
+                    this.showDownloadUpgradeDialog();
+                    return;
+                }
+
+                if (!this.rewindOptions.selectedKeys.length) {
+                    return;
+                }
+
+                // Repair some properties for retry
+                if (mega.rewind.persist && mega.rewind.persist.dateToRestore) {
+                    mega.rewindUi.sidebar.selectedDate = mega.rewind.persist.dateToRestore;
+                    const dateObj = mega.rewind.persist.dateToRestoreObj;
+                    this.rewindOptions.restoreDate = time2date(dateObj / 1000, 2);
+                    this.selectedDate = dateObj;
+                }
+
+                console.time('rewind:index:restore');
+                this.$restoreButton.addClass('disabled');
+
+                this.handleRestoreProgress(0);
+
+                this.openFolderListener = mBroadcaster.addListener('beforepagechange', () => {
+                    if (mega.rewindUi && mega.rewindUi.sidebar) {
+                        mega.rewindUi.sidebar.updateRestoreProgress();
+                        mega.rewindUi.sidebar.addDialogProgEventListeners();
+                    }
+                });
+
+                mega.rewindUtils.reinstate.restoreNodes(mega.rewind.persist.nodesToRestore,
+                                                        this.handleRestoreProgress.bind(this))
+                    .then((res) => {
+
+                        logger.info('Successfully restored.', res, mega.rewind.persist.nodesToRestore);
+                        toaster.main.show({
+                            icons: ['sprite-fm-uni icon-check-circle'],
+                            content: l.rewind_success_message
+                                .replace('%1', this.rewindOptions.folderName)
+                                .replace('%2', this.rewindOptions.restoreDate)
+                        });
+
+                        // Reset persisting values if rewind is successful
+                        this.resetPersist();
+
+                        // Cleanup
+                        this.rewindOptions = Object.create(null);
+                    })
+                    .catch((ex) => {
+                        logger.error('Failed to restore!', ex, mega.rewind.persist.nodesToRestore);
+                        let dlg;
+                        // When `length` is 2, we one node to restore,
+                        // as rewind root is also part of the `toBeRestored` list
+                        const multiple = mega.rewindUtils.reinstate.toBeRestored.length > 2;
+
+                        // Rewind-specific error messages
+                        switch (ex) {
+                            case -2:
+                            case -9:
+                                dlg = {
+                                    // Malformed attributes
+                                    type: `warningb:!^${l[1364]}!${l[82]}`,
+                                    title: l.rw_err_invalid_request_title,
+                                    msg: l.rw_err_invalid_request_message,
+                                    onClickPrimary: () => {
+                                        this.onClickRestore();
+                                    }
+                                };
+                                break;
+                            case -11:
+                                dlg = {
+                                    // EACCESS
+                                    type: `error:!^${l[148]}!${l[18148]}`,
+                                    title: multiple
+                                        ? l.rw_err_access_error_title_more
+                                        : l.rw_err_access_error_title_one,
+                                    msg: multiple
+                                        ? l.rw_err_access_error_message_more
+                                        : l.rw_err_access_error_message_one,
+                                    onClickSecondary: () => {
+                                        mega.redirect('mega.io', 'contact', false, false, false);
+                                    }
+                                };
+                                break;
+                            case -3:
+                                dlg = {
+                                    // Network/API error
+                                    type: `warningb:!^${l[1364]}!${l[82]}`,
+                                    title: l.rw_err_network_error_title,
+                                    msg: multiple
+                                        ? l.rw_err_network_error_message_more
+                                        : l.rw_err_network_error_message_one
+                                };
+                                break;
+                            default:
+                                // Use generic error handling as fallback
+                                tell(ex);
+                        }
+
+                        if (dlg) {
+
+                            // TODO: COPY NODE DICTIONARY AND OTHER PROPERTIES FOR PRESERVING ACROSS NAVIGATIONS
+
+                            msgDialog(dlg.type, false, dlg.title, dlg.msg, (action) => {
+                                if (action !== null) {
+                                    if (action && typeof dlg.onClickSecondary === 'function') {
+                                        dlg.onClickSecondary();
+                                    }
+                                    else if (!action && typeof dlg.onClickPrimary === 'function') {
+                                        dlg.onClickPrimary();
+                                    }
+
+                                    return;
+                                }
+                                // Reset if we choose to not retry
+                                this.resetPersist();
+                            }, 1);
+                        }
+                    })
+                    .finally(() => {
+                        this.handleRestoreProgress(1);
+                        mBroadcaster.removeListener(this.openFolderListener);
+                        console.timeEnd('rewind:index:restore');
+                        this.$restoreButton.removeClass('disabled');
+                    });
+                return false;
+            };
+
+            if (skipRewindConfirmation) {
+                proceedWithReinstate();
+            }
+            else {
+                const desc = l.rewind_confirmation_dialog_button_confirm
+                    .replace('[B]', '<b>').replace('[/B]', '</b>')
+                    .replace('%1', this.rewindOptions.restoreDate);
+
+                msgDialog(`confirmation:!^${l.rewind}!${l[82]}`, "", l.rewind_folder, desc, (proceed)=>{
+                    if (proceed) {
+                        proceedWithReinstate();
+                    }
+                }, 'rwReinstate');
+            }
 
             return false;
         }
@@ -1891,8 +2264,9 @@ lazy(mega, 'rewindUi', () => {
             const tsElement = detailsElement.querySelector('.folder-timestamp');
             const tsIconElement = tsElement.querySelector('i');
             const tsLabelElement = tsElement.querySelector('span');
-            const checkboxElement = template.querySelector('.folder-main .select-checkbox');
-            const checkboxInputElement = checkboxElement.querySelector('input');
+            // SAT-1023
+            // const checkboxElement = template.querySelector('.folder-main .select-checkbox');
+            // const checkboxInputElement = checkboxElement.querySelector('input');
 
             if (type !== TYPE_NONE) {
                 detailsElement.classList.remove('hidden');
@@ -1911,11 +2285,12 @@ lazy(mega, 'rewindUi', () => {
             iconElement.classList.add(`icon-${fileIcon(node)}-24`);
             template.dataset.id = node.h;
 
-            if (this.selectedNodes[node.h]) {
-                checkboxElement.classList.remove('checkboxOff');
-                checkboxElement.classList.add('checkboxOn');
-                checkboxInputElement.checked = true;
-            }
+            // SAT-1023
+            // if (this.selectedNodes[node.h]) {
+            //     checkboxElement.classList.remove('checkboxOff');
+            //     checkboxElement.classList.add('checkboxOn');
+            //     checkboxInputElement.checked = true;
+            // }
 
             return template;
         }
@@ -2034,13 +2409,18 @@ lazy(mega, 'rewindUi', () => {
             const pusherElement = template.querySelector('.folder-pusher');
             const nameElement = template.querySelector('.folder-main label');
             const iconElement = template.querySelector('.folder-main .folder-icon .item-type-icon');
+            // SAT-1023
+            /*
             const checkboxElement = template.querySelector('.folder-main .select-checkbox');
             const checkboxInputElement = checkboxElement.querySelector('input');
+            */
 
             nameElement.textContent = this.getNodeNameInfo(node)[0];
             iconElement.classList.add(`icon-${fileIcon(node)}-24`);
             template.dataset.id = node.h;
 
+            // SAT-1023
+            /*
             const selectStatus = this.selectedNodes[node.h];
             if (selectStatus === TREE_SELECT) {
                 checkboxElement.classList.remove('checkboxOff');
@@ -2052,6 +2432,7 @@ lazy(mega, 'rewindUi', () => {
                 checkboxElement.classList.remove('checkboxOn');
                 checkboxElement.classList.add('checkboxMinimize');
             }
+            */
 
             const nodeLevel = mega.rewind.nodeTreeDictionary[node.p];
             if (nodeLevel) {
@@ -2088,7 +2469,8 @@ lazy(mega, 'rewindUi', () => {
                     const currentNode = mega.rewind.nodeDictionary[currentHandle];
                     if (this.selectedNodes[currentNode.p] === TREE_SELECT) {
                         this.selectedNodes[currentHandle] = TREE_SELECT;
-                        this.adjustCheckbox(currentHandle, TREE_SELECT, false);
+                        // SAT-1023
+                        // this.adjustCheckbox(currentHandle, TREE_SELECT, false);
                     }
                 }
 
@@ -2198,8 +2580,11 @@ lazy(mega, 'rewindUi', () => {
             const tsElement = detailsElement.querySelector('.folder-timestamp');
             const tsIconElement = tsElement.querySelector('i');
             const tsLabelElement = tsElement.querySelector('span');
+            // SAT-1023
+            /*
             const checkboxElement = template.querySelector('.folder-main .select-checkbox');
             const checkboxInputElement = checkboxElement.querySelector('input');
+            */
 
             const nodeDateData = mega.rewind.dateData &&
                 mega.rewind.dateData[this.selectedDateString] &&
@@ -2238,11 +2623,14 @@ lazy(mega, 'rewindUi', () => {
             iconElement.classList.add(`icon-${fileIcon(node)}-24`);
             template.dataset.id = node.h;
 
+            // SAT-1023
+            /*
             if (this.selectedNodes[node.h]) {
                 checkboxElement.classList.remove('checkboxOff');
                 checkboxElement.classList.add('checkboxOn');
                 checkboxInputElement.checked = true;
             }
+            */
 
             const nodeLevel = mega.rewind.nodeTreeDictionary[node.lp || node.p];
             if (nodeLevel) {
@@ -2399,6 +2787,46 @@ lazy(mega, 'rewindUi', () => {
         init() {
             lazy(this, 'sidebar', () => new RewindSidebar);
             lazy(this, 'DATEPICKER_VIEW_TYPE_DAYS', () => DATEPICKER_VIEW_TYPE_DAYS);
+            lazy(this, 'progressTranslations', () => {
+
+                const progPercentage = escapeHTML(l.rewind_restore_progress_percentage)
+                    .replace('[STEXT]', '<span>')
+                    .replace('[/STEXT]', '</span>')
+                    .replace('[SPERCENTAGE]', '<span class="percentage">')
+                    .replace('[/SPERCENTAGE]', '</span>');
+
+                const progDate = escapeHTML(l.rewind_restore_progress_date)
+                    .replace('[STEXT]', '<span class="medium-color">')
+                    .replace('[/STEXT]', '</span>');
+
+                const dialogProgPercentage = escapeHTML(l.rewind_restore_dialog_progress_percentage)
+                    .replace('[STEXT]', '<span>')
+                    .replace('[/STEXT]', '</span>')
+                    .replace('[SPERCENTAGE]', '<span class="percentage">')
+                    .replace('[/SPERCENTAGE]', '</span>');
+
+                return {
+                    section: {
+                        title: (progress) => {
+                            return progPercentage.replace('%1', progress);
+                        },
+                        message: (date) => {
+                            return progDate.replace(
+                                '[SDATE/]',
+                                `<span class="date">${time2date(date.getTime() / 1000, 2)}</span>`
+                            );
+                        }
+                    },
+                    topBar: {
+                        title: (nodeName) => {
+                            return `<span>${nodeName}</span>`;
+                        },
+                        message: (progress) => {
+                            return dialogProgPercentage.replace('%1', progress);
+                        }
+                    }
+                };
+            });
         }
     };
 });

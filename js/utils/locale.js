@@ -1838,7 +1838,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A]', '</a>');
 
     l.rewind_upgrade_info_text = escapeHTML(l.rewind_upgrade_info_text)
-        .replace('[A1]', '<a class="rewind-sidebar-upgrade-action clickurl" href="/pro">')
+        .replace('[A1]', '<a class="rewind-sidebar-upgrade-action" href="/pro">')
         .replace('[/A1]', '</a>')
         .replace('[A2]', `<a ${rewindLinkAttr} href="${rewindHelpLink}">`)
         .replace('[/A2]', '</a>');

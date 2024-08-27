@@ -662,8 +662,11 @@ lazy(s4, 'ui', () => {
 
                 const $input = $('input', $dialog).trigger('focus').val(item.name);
 
-                $('.rename-dialog-button.rename', $dialog).rebind('click.s4kd.rename', () => {
-                    const name = $input.val().trim();
+                const ltWSpaceWarning = new InputFloatWarning($dialog);
+                ltWSpaceWarning.hide().check({name: item.name, ms: 0});
+
+                $('.rename-dialog-button.rename', $dialog).rebind('click.rename', () => {
+                    const name = $input.val();
 
                     if (item.name === name) {
                         closeDialog();
@@ -708,8 +711,8 @@ lazy(s4, 'ui', () => {
                 });
 
                 $('header h2', $dialog).text(heading);
-                $('.item-type-icon', $dialog)
-                    .attr('class', `item-type-icon icon-${icon}-24`);
+                $('.input-icon', $dialog)
+                    .attr('class', `input-icon sprite-fm-mono ${icon}`);
                 $('button.js-close, .rename-dialog-button.cancel', $dialog)
                     .rebind('click.s4kd.rename.cancel', closeDialog);
 
@@ -720,6 +723,10 @@ lazy(s4, 'ui', () => {
                     else if (ev.keyCode === 27) {
                         closeDialog();
                     }
+                });
+
+                $input.rebind('keyup.rename-f', () => {
+                    ltWSpaceWarning.check(true);
                 });
 
                 return $dialog;

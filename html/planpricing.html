@@ -29,7 +29,7 @@
                     </div>
                 </div>
             </div>
-            <div class="pricing-pg pick-period-container individual hidden" data-tabname="pro">
+            <div class="pricing-pg pick-period-container individual tab-ctrl-ind hidden" data-tabname="pro">
                 <div class="pricing-pg pick-period-module">
                     <!-- No need for native radio buttons, the challenges in design out-weights the benefits-->
                     <div class="pricing-radio-group">
@@ -49,38 +49,15 @@
 
                 </div>
                 <div class="pricing-pg period-note-container">
-                    <div class="period-note-txt">
+                    <div class="period-note-txt tab-ctrl-ind">
+                        [$pr_save_tip]
+                    </div>
+                    <div class="period-note-txt tab-ctrl-exc">
                         [$pr_save_tip]
                     </div>
                 </div>
             </div>
-
-            <div class="pricing-pg pick-period-container exclusive-plans-container hidden" data-tabname="exclusive">
-                <div class="pricing-pg pick-period-module">
-                    <!-- No need for native radio buttons, the challenges in design out-weights the benefits-->
-                    <div class="pricing-radio-group">
-                        <div class="pricing-radio-option selected" data-period="1">
-                            <div class="pricing-radio-btn"></div>
-                            <div class="pricing-radio-label">
-                                [$23779]
-                            </div>
-                        </div>
-                        <div class="pricing-radio-option" data-period="12">
-                            <div class="pricing-radio-btn"></div>
-                            <div class="pricing-radio-label">
-                                [$23780]
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <div class="pricing-pg period-note-container">
-                    <div class="period-note-txt">
-                        [$pr_save_tip]
-                    </div>
-                </div>
-            </div>
-            <div class="pricing-pg pro-plans-cards-container">
+            <div class="pricing-pg pro-plans-cards-container tab-ctrl-ind card-container">
                 <div class="pricing-pg plans-cards-container">
                     <div class="pricing-plan-card hidden" id="pro4">
                         <div class="pricing-plan-recommend">[$pr_popular]</div>
@@ -195,13 +172,11 @@
                     </div>
                 </div>
             </div>
-            <!-- <div class="pricing-pg pro-plans-cards-container exclusive-plans-container"> -->
-                <!-- <div class="pricing-pg plans-cards-container"> -->
 
             <!-- VPN info is being populated dynamically -->
-            <div class="pricing-pg pricing-vpn-plan-container pb-16 hidden"></div>
+            <div class="card-container pricing-pg pricing-vpn-plan-container pb-16 hidden tab-ctrl-vpn"></div>
 
-            <div class="pricing-pg exclusive-plans-container">
+            <div class="pricing-pg exclusive-plans-container card-container tab-ctrl-exc hidden">
                 <div class="pricing-pg plans-cards-container">
                     <div class="pricing-plan-card template hidden">
                         <div class="pricing-plan-recommend">[$pr_exclusive_offer]</div>
@@ -232,12 +207,12 @@
                     </div>
                 </div>
             </div>
-            <div class="pricing-pg pricing-estimation-note-container hidden">
+            <div class="pricing-pg pricing-estimation-note-container tab-ctrl-ind hidden">
                 <div class="pricing-estimation-note">
                     *[$18770]
                 </div>
             </div>
-            <div class="pricing-pg pricing-estimation-note-container-exc exclusive-plans-container hidden">
+            <div class="pricing-pg pricing-estimation-note-container-exc exclusive-plans-container tab-ctrl-exc hidden">
                 <div class="pricing-estimation-note">
                     *[$18770]
                 </div>
@@ -277,7 +252,7 @@
                 </div>
             </div>
 
-            <div class="pricing-pg pricing-business-plan-container hidden">
+            <div class="pricing-pg pricing-business-plan-container tab-ctrl-bus card-container hidden">
                 <div class="pricing-flexi-block-contianer">
                     <div class="pricing-flexi-block-card-contianer">
                         <div class="pricing-pg plans-cards-container">
@@ -448,14 +423,15 @@
                     <div class="pricing-plans-compare-table-item light line plans-table-header">[$pr_account_type]</div>
                     <div class="pricing-plans-compare-table-item plans-table-header free x-bold line center">
                         [$1150]
-                        <button class="experiment-button hidden free">[$20556]</button>
+                        <button class="experiment-button free">[$20556]</button>
                     </div>
-                    <div class="pricing-plans-compare-table-item plans-table-header pro-exc-offer x-bold line center hidden">
+                    <div class="pricing-plans-compare-table-item plans-table-header pro-exc-offer tab-ctrl-exc x-bold line center hidden">
                         <span></span>
-                        <button class="experiment-button hidden pro-exc-offer"></button>
+                        <button class="experiment-button tab-ctrl-exc pro-exc-offer hidden"></button>
                     </div>
                     <div class="pricing-plans-compare-table-item plans-table-header pro-plans x-bold line center">
-                        <span>[$pr_pro_i_to_iii]</span>
+                        <span class="tab-ctrl-exc-inv">[$pr_pro_i_to_iii]</span>
+                        <span class="tab-ctrl-exc hidden">[$pr_pro_plans]</span>
                         <button class="experiment-button hidden pro primary">[$pr_table_button_see_pro]</button>
                     </div>
                     <div class="pricing-plans-compare-table-item plans-table-header pro-flexi x-bold line center">
@@ -474,21 +450,21 @@
 
                     <div class="pricing-plans-compare-table-item bold rb bg-gr">[$bsn_compare_users]</div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr">[$pr_a_user]</div>
-                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb bg-gr hidden">[$pr_a_user]</div>
+                    <div class="pricing-plans-compare-table-item tab-ctrl-exc center rb bg-gr hidden">[$pr_a_user]</div>
                     <div class="pricing-plans-compare-table-item pro center rb bg-gr">[$pr_a_user]</div>
                     <div class="pricing-plans-compare-table-item pro-flexi center rb bg-gr">[$pr_a_user]</div>
                     <div class="pricing-plans-compare-table-item pro-business center bg-gr">[$pr_3_users]</div>
 
                     <div class="pricing-plans-compare-table-item bold rb">[$495]</div>
                     <div id="table-strg-v" class="pricing-plans-compare-table-item center rb"></div>
-                    <div id="table-strg-mini" class="pricing-plans-compare-table-item pro-exc-offer center rb hidden"></div>
+                    <div id="table-strg-mini" class="pricing-plans-compare-table-item tab-ctrl-exc center rb hidden"></div>
                     <div class="pricing-plans-compare-table-item pro center rb">[$pr_up_16]</div>
                     <div class="pricing-plans-compare-table-item pro-flexi center rb">[$pr_flexible_3]</div>
                     <div class="pricing-plans-compare-table-item pro-business center">[$pr_flexible_3]</div>
 
                     <div class="pricing-plans-compare-table-item bold rb bg-gr">[$18057]<i class="pricing-i-icon simpletip" data-simpletip="[$pr_trns_tip]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i></div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr">[$pr_limited]</div>
-                    <div id="table-trans-mini" class="pricing-plans-compare-table-item pro-exc-offer center rb bg-gr hidden"></div>
+                    <div id="table-trans-mini" class="pricing-plans-compare-table-item tab-ctrl-exc center rb bg-gr hidden"></div>
                     <div class="pricing-plans-compare-table-item pro center rb bg-gr">[$pr_up_16]</div>
                     <div class="pricing-plans-compare-table-item pro-flexi center rb bg-gr">[$pr_flexible_3]</div>
                     <div class="pricing-plans-compare-table-item pro-business center bg-gr">[$pr_flexible_3]</div>
@@ -499,28 +475,28 @@
 
                     <div class="pricing-plans-compare-table-item bold rb bg-gr">[$pr_secure_file]<i class="pricing-i-icon simpletip" data-simpletip="[$pr_tip_secure_sharing]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i></div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb bg-gr hidden"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item tab-ctrl-exc center rb bg-gr hidden"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro center rb bg-gr"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro-flexi center rb bg-gr"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro-business center bg-gr"><i class="grey-small-check-tick"></i></div>
 
                     <div class="pricing-plans-compare-table-item bold rb">[$pr_pw_links]<i class="pricing-i-icon simpletip" data-simpletip="[$pr_tip_links_password]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i></div>
                     <div class="pricing-plans-compare-table-item center rb"><i class="minus-icon"></i></div>
-                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb hidden"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item tab-ctrl-exc center rb hidden"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro center rb"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro-flexi center rb"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro-business center"><i class="grey-small-check-tick"></i></div>
 
                     <div class="pricing-plans-compare-table-item bold rb bg-gr">[$pr_link_expire]<i class="pricing-i-icon simpletip" data-simpletip="[$pr_tip_links_expiry]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i></div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="minus-icon"></i></div>
-                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb bg-gr hidden"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item tab-ctrl-exc center rb bg-gr hidden"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro center rb bg-gr"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro-flexi center rb bg-gr"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro-business center bg-gr"><i class="grey-small-check-tick"></i></div>
 
                     <div class="pricing-plans-compare-table-item bold rb">[$pr_trns_share]<i class="pricing-i-icon simpletip" data-simpletip="[$pr_trns_share_tip]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i></div>
                     <div class="pricing-plans-compare-table-item center rb"><i class="minus-icon"></i></div>
-                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb hidden"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item tab-ctrl-exc center rb hidden"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro center rb"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro-flexi center rb"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro-business center"><i class="grey-small-check-tick"></i></div>
@@ -531,21 +507,21 @@
 
                     <div class="pricing-plans-compare-table-item bold rb bg-gr">[$pr_file_versioning]<i class="pricing-i-icon simpletip" data-simpletip="[$pr_tip_file_versioning]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i></div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr">[$pr_100_version]</div>
-                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb bg-gr hidden">[$pr_100_version]</div>
+                    <div class="pricing-plans-compare-table-item tab-ctrl-exc center rb bg-gr hidden">[$pr_100_version]</div>
                     <div class="pricing-plans-compare-table-item pro center rb bg-gr">[$pr_100_version]</div>
                     <div class="pricing-plans-compare-table-item pro-flexi center rb bg-gr">[$pr_100_version]</div>
                     <div class="pricing-plans-compare-table-item pro-business center bg-gr">[$pr_100_version]</div>
 
                     <div class="pricing-plans-compare-table-item bold rb">[$automatic_backups]<i class="pricing-i-icon simpletip" data-simpletip="[$pr_tip_automatic_backups]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i></div>
                     <div class="pricing-plans-compare-table-item center rb"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb hidden"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item tab-ctrl-exc center rb hidden"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro center rb"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro-flexi center rb"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro-business center"><i class="grey-small-check-tick"></i></div>
 
                     <div class="pricing-plans-compare-table-item bold rb bg-gr">[$pr_rewind]<i class="pricing-i-icon simpletip" data-simpletip="[$pr_rewind_tip]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i></div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr">[$pr_30_days]</div>
-                    <div id="table-days-mini" class="pricing-plans-compare-table-item pro-exc-offer center rb bg-gr hidden"></div>
+                    <div id="table-days-mini" class="pricing-plans-compare-table-item tab-ctrl-exc center rb bg-gr hidden"></div>
                     <div class="pricing-plans-compare-table-item pro center rb bg-gr">[$pr_lite_90_days]<br />[$pr_I_III_365_days]</div>
                     <div class="pricing-plans-compare-table-item pro-flexi center rb bg-gr">[$pr_365_days]</div>
                     <div class="pricing-plans-compare-table-item pro-business center bg-gr">[$pr_365_days]</div>
@@ -556,35 +532,35 @@
 
                     <div class="pricing-plans-compare-table-item bold rb bg-gr">[$pr_secure_calls]</div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb bg-gr hidden"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item tab-ctrl-exc center rb bg-gr hidden"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro center rb bg-gr"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro-flexi center rb bg-gr"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro-business center bg-gr"><i class="grey-small-check-tick"></i></div>
 
                     <div class="pricing-plans-compare-table-item bold rb">[$pr_private_msg]</div>
                     <div class="pricing-plans-compare-table-item center rb"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb hidden"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item tab-ctrl-exc center rb hidden"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro center rb"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro-flexi center rb"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro-business center"><i class="grey-small-check-tick"></i></div>
 
                     <div class="pricing-plans-compare-table-item bold rb bg-gr">[$pr_call_meet_duration]</div>
                     <div id="meet-up-to-duration" class="pricing-plans-compare-table-item center rb bg-gr"></div>
-                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb bg-gr hidden">[$7094]</div>
+                    <div class="pricing-plans-compare-table-item tab-ctrl-exc center rb bg-gr hidden">[$7094]</div>
                     <div class="pricing-plans-compare-table-item pro center rb bg-gr">[$7094]</div>
                     <div class="pricing-plans-compare-table-item pro-flexi center rb bg-gr">[$7094]</div>
                     <div class="pricing-plans-compare-table-item pro-business center bg-gr">[$7094]</div>
 
                     <div class="pricing-plans-compare-table-item bold rb">[$pr_call_meet_participants]</div>
                     <div id="meet-up-to-participants" class="pricing-plans-compare-table-item center rb"></div>
-                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb hidden">[$7094]</div>
+                    <div class="pricing-plans-compare-table-item tab-ctrl-exc center rb hidden">[$7094]</div>
                     <div class="pricing-plans-compare-table-item pro center rb">[$7094]</div>
                     <div class="pricing-plans-compare-table-item pro-flexi center rb">[$7094]</div>
                     <div class="pricing-plans-compare-table-item pro-business center">[$7094]</div>
 
                     <div class="pricing-plans-compare-table-item bold rb bg-gr">[$pr_screen_sharing]</div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="grey-small-check-tick"></i></div>
-                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb bg-gr hidden"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item tab-ctrl-exc center rb bg-gr hidden"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro center rb bg-gr"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro-flexi center rb bg-gr"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro-business center bg-gr"><i class="grey-small-check-tick"></i></div>
@@ -596,7 +572,7 @@
 
                     <div class="pricing-plans-compare-table-item bold rb bg-gr">[$pr_vpn_access]</div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="minus-icon"></i></div>
-                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb bg-gr"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item tab-ctrl-exc center rb bg-gr hidden"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro center rb bg-gr"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro-flexi center bg-gr"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro-business center bg-gr"><i class="minus-icon"></i></div>
@@ -607,7 +583,7 @@
 
                     <div class="pricing-plans-compare-table-item bold rb bg-gr">[$18677]<i class="pricing-i-icon simpletip" data-simpletip="[$pr_user_manage_tip]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i></div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="minus-icon"></i></div>
-                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb bg-gr hidden"><i class="minus-icon"></i></div>
+                    <div class="pricing-plans-compare-table-item tab-ctrl-exc center rb bg-gr hidden"><i class="minus-icon"></i></div>
                     <div class="pricing-plans-compare-table-item pro center rb bg-gr"><i class="minus-icon"></i></div>
                     <div class="pricing-plans-compare-table-item pro-flexi center rb bg-gr"><i class="minus-icon"></i></div>
                     <div class="pricing-plans-compare-table-item pro-business center bg-gr"><i class="grey-small-check-tick"></i></div>
@@ -618,21 +594,21 @@
 
                     <div class="pricing-plans-compare-table-item bold rb bg-gr">[$pr_analytics]<i class="pricing-i-icon simpletip" data-simpletip="[$pr_analytics_tip]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i></div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="minus-icon"></i></div>
-                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb bg-gr hidden"><i class="minus-icon"></i></div>
+                    <div class="pricing-plans-compare-table-item tab-ctrl-exc center rb bg-gr hidden"><i class="minus-icon"></i></div>
                     <div class="pricing-plans-compare-table-item pro center rb bg-gr"><i class="minus-icon"></i></div>
                     <div class="pricing-plans-compare-table-item pro-flexi center rb bg-gr"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro-business center bg-gr"><i class="grey-small-check-tick"></i></div>
 
                     <div class="pricing-plans-compare-table-item bold rb">[$pr_bin_clearing]<i class="pricing-i-icon simpletip" data-simpletip="[$pr_rubbis_bin_tip]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i></div>
                     <div class="pricing-plans-compare-table-item center rb">[$pr_up_30_days]</div>
-                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb hidden">[$pr_up_10_years]</div>
+                    <div class="pricing-plans-compare-table-item tab-ctrl-exc center rb hidden">[$pr_up_10_years]</div>
                     <div class="pricing-plans-compare-table-item pro center rb">[$pr_up_10_years]</div>
                     <div class="pricing-plans-compare-table-item pro-flexi center rb">[$pr_up_10_years]</div>
                     <div class="pricing-plans-compare-table-item pro-business center">[$pr_up_10_years]</div>
 
                     <div class="pricing-plans-compare-table-item bold rb bg-gr no-ads hidden">[$pr_ad_free]</div>
                     <div class="pricing-plans-compare-table-item center rb bg-gr no-ads hidden"><i class="minus-icon"></i></div>
-                    <div class="pricing-plans-compare-table-item pro-exc-offer center rb bg-gr no-ads hidden"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item tab-ctrl-exc center rb bg-gr no-ads hidden"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro center rb bg-gr no-ads hidden"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro-flexi center rb bg-gr no-ads hidden"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro-business center bg-gr no-ads hidden"><i class="grey-small-check-tick"></i></div>
@@ -681,7 +657,7 @@
                 </div>
             </div>
 
-            <div class="pricing-pg pricing-compare-full-container hidden">
+            <div class="pricing-pg pricing-compare-full-container hidden tab-ctrl-exc-inv">
                 <div class="pricing-pg pricing-compare-container">
                     <div class="pricing-compare-title-slider-container">
                         <div class="pricing-compare-title">
@@ -758,7 +734,7 @@
                 </div>
             </div>
 
-            <div class="pricing-pg pricing-flexi-container hidden">
+            <div class="pricing-pg pricing-flexi-container hidden tab-ctrl-exc-inv">
                 <div class="pricing-flexi-title">
                     [$pr_get_flexiable]
                 </div>
@@ -923,7 +899,7 @@
             </div>
 
             <!-- FAQ section -->
-            <div class="pricing-pg faq-container hidden">
+            <div class="pricing-pg faq-container hidden tab-ctrl-exc-inv">
                 <div class="faq-qa template hidden">
                     <div class="faq-item-title">
                         <div class="faq-question"></div>

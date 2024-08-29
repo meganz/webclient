@@ -112,6 +112,8 @@ lazy(pro.proplan2, 'vpn', () => {
                     $(createEl(['pricing-flexi-block-card-note', 'text-center'], `*${l[18770]}`)).prop('outerHTML')
                 );
             }
+
+            return $('.pricing-plan-card-wrapper', $vpnContainer);
         }
     };
 });

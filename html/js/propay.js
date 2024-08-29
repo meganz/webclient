@@ -445,12 +445,33 @@ pro.propay = {
             return false;
         }
 
-        var tempGatewayOptions = gatewayOptions.filter(gate =>
-            (pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI && gate.supportsBusinessPlans === 1)
-            || (pro.propay.planNum !== pro.ACCOUNT_LEVEL_PRO_FLEXI
-                && (typeof gate.supportsIndividualPlans === 'undefined' || gate.supportsIndividualPlans))
-            && !(gate.minimumEURAmountSupported > pro.getPlanObj(pro.propay.planNum, 1).maxCorrPriceEuro)
-            && (!!gate.gatewayId || !pro.filter.simple.validFeatures.has(pro.propay.planNum)));
+        const checkGateway = (gate) => {
+            // If plan is flexi and the gateway doesn't support business(and flexi)
+            if (pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
+                if (gate.supportsBusinessPlans !== 1) {
+                    return false;
+                }
+            }
+            // If plan is not flexi and the gateway doesn't support individual plans
+            else if (typeof gate.supportsIndividualPlans !== 'undefined' && !gate.supportsIndividualPlans) {
+                return false;
+            }
+
+            // Exclude voucher from list of VPN gateways (TODO: Request a flag from API instead of using gatewayId)
+            if (!gate.gatewayId && pro.filter.simple.validFeatures.has(pro.propay.planNum)) {
+                return false;
+            }
+
+            // If the gateway has a required price, and it is more than the plans max price
+            if (gate.minimumEURAmountSupported > pro.getPlanObj(pro.propay.planNum, 1).maxCorrPriceEuro) {
+                return false;
+            }
+
+            // Gateway supports the current plan
+            return gate;
+        };
+
+        var tempGatewayOptions = gatewayOptions.filter(checkGateway);
 
         // if this user has a discount, clear gateways that are not supported.
         const discountInfo = pro.propay.getDiscount();
@@ -691,10 +712,7 @@ pro.propay = {
             delete sessionStorage.fromOverquotaPeriod;
         }
         else {
-            const selectedTab = sessionStorage['pro.pricingTab'];
-            selectedPeriod = (selectedTab === 'pr-exc-offer-tab'
-                ? sessionStorage['pro.periodExc']
-                : sessionStorage['pro.period']) || 12;
+            selectedPeriod = (sessionStorage['pro.period'] | 0) || 12;
         }
 
         let $selectedOption = $(`.payment-duration[data-plan-months=${selectedPeriod}]`, $durationList);

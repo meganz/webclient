@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" pointer-events="none" width="120" height="120">
+    <defs>
+        <linearGradient id="color1" gradientTransform="rotate(45)">
+            <stop offset="0%" stop-color="rgba(85, 210, 240, 1)"></stop>
+            <stop offset="100%" stop-color="rgba(43, 166, 222, 1)"></stop>
+        </linearGradient>
+        <linearGradient id="color2" gradientTransform="rotate(45)">
+            <stop offset="0%" stop-color="rgba(188, 32, 134, 1)"></stop>
+            <stop offset="100%" stop-color="rgba(136, 14, 79, 1)"></stop>
+        </linearGradient>
+        <linearGradient id="color3" gradientTransform="rotate(45)">
+            <stop offset="0%" stop-color="rgba(255, 210, 0, 1)"></stop>
+            <stop offset="100%" stop-color="rgba(255, 165, 0, 1)"></stop>
+        </linearGradient>
+        <linearGradient id="color4" gradientTransform="rotate(45)">
+            <stop offset="0%" stop-color="rgba(95, 219, 0, 1)"></stop>
+            <stop offset="100%" stop-color="rgba(49, 181, 0, 1)"></stop>
+        </linearGradient>
+        <linearGradient id="color5" gradientTransform="rotate(45)">
+            <stop offset="0%" stop-color="rgba(0, 189, 178, 1)"></stop>
+            <stop offset="100%" stop-color="rgba(0, 137, 123, 1)"></stop>
+        </linearGradient>
+        <linearGradient id="color6" gradientTransform="rotate(45)">
+            <stop offset="0%" stop-color="rgba(255, 167, 0, 1)"></stop>
+            <stop offset="100%" stop-color="rgba(255, 111, 0, 1)"></stop>
+        </linearGradient>
+        <linearGradient id="color7" gradientTransform="rotate(45)">
+            <stop offset="0%" stop-color="rgba(228, 38, 155, 1)"></stop>
+            <stop offset="100%" stop-color="rgba(197, 17, 98, 1)"></stop>
+        </linearGradient>
+        <linearGradient id="color8" gradientTransform="rotate(45)">
+            <stop offset="0%" stop-color="rgba(255, 98, 108, 1)"></stop>
+            <stop offset="100%" stop-color="rgba(255, 51, 58, 1)"></stop>
+        </linearGradient>
+        <linearGradient id="color9" gradientTransform="rotate(45)">
+            <stop offset="0%" stop-color="rgba(255, 137, 137, 1)"></stop>
+            <stop offset="100%" stop-color="rgba(255, 82, 82, 1)"></stop>
+        </linearGradient>
+        <linearGradient id="color10" gradientTransform="rotate(45)">
+            <stop offset="0%" stop-color="rgba(154, 234, 255, 1)"></stop>
+            <stop offset="100%" stop-color="rgba(97, 210, 255, 1)"></stop>
+        </linearGradient>
+        <linearGradient id="color11" gradientTransform="rotate(45)">
+            <stop offset="0%" stop-color="rgba(0, 213, 226, 1)"></stop>
+            <stop offset="100%" stop-color="rgba(0, 172, 193, 1)"></stop>
+        </linearGradient>
+        <linearGradient id="color12" gradientTransform="rotate(45)">
+            <stop offset="0%" stop-color="rgba(255, 235, 0, 1)"></stop>
+            <stop offset="100%" stop-color="rgba(255, 211, 0, 1)"></stop>
+        </linearGradient>
+    </defs>
+    <circle cx="50%" cy="50%" r="60" fill="rgb(255, 255, 255)" stroke="transparent" stroke-width="1"></circle>
+    <circle cx="50%" cy="50%" r="58" fill="url('#color1')" stroke="transparent" stroke-width="1"></circle>
+    <text text-anchor="middle"
+          y="50%" x="50%"
+          dy="0.35em"
+          pointer-events="auto"
+          fill="#ffffff"
+          style="
+                font-family: 'Open Sans', Arial, Helvetica, sans-serif;
+                font-weight: 400;
+                font-size: 60px;">
+        C
+    </text>
+</svg>

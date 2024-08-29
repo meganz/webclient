@@ -6756,11 +6756,11 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 }
 .search-bottom-wrapper {
     background-color: var(--stroke-grey-2);
+    border-left: 2px solid var(--stroke-main);
     height: 64px;
     z-index: 12;
     width: 100%;
     align-items: center;
-    display: none;
     padding: 0 20px;
     box-sizing: border-box;
     width: 100%;
@@ -6776,12 +6776,6 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     width: 100%;
     overflow: hidden;
 }
-.search .search-bottom-wrapper {
-    display: flex;
-}
-.search .search-bottom-wrapper.hidden {
-    display: none;
-}
 .empty-search-bottom-menu {
     position: absolute;
     bottom: 0;
@@ -6792,15 +6786,6 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     background-color: var(--stroke-grey-2);
     height: 30px;
     margin-left: 2px;
-}
-.search .file-block-scrolling,
-.select .file-block-scrolling,
-.select .shared-blocks-scrolling,
-.select .out-shared-blocks-scrolling {
-    height: 100%;
-    height: -webkit-calc(100% - 35px);
-    height: -moz-calc(100% - 35px);
-    height: calc(100% - 35px);
 }
 .lpxf {
     font-size: 17px !important;

@@ -196,84 +196,87 @@
      * @return {undefined}
      */
     MegaData.prototype.renderSearchBreadcrumbs = function() {
-        const block = document.querySelector('.fm-main .fm-right-files-block:not(.in-chat)');
+        const scope = document.querySelector('.fm-right-files-block .search-bottom-wrapper');
+
+        if (!scope) {
+            return;
+        }
 
         if (this.currentdirid && this.currentdirid.substr(0, 7) === 'search/') {
-            if (block) {
-                block.classList.remove('search-multi');
-            }
-            if (self.selectionManager && selectionManager.selected_list.length > 0) {
-                block.classList.add('search');
 
-                const scope = block.querySelector('.search-bottom-wrapper');
-                scope.classList.remove('hidden');
-                const items = this.getPath(selectionManager.selected_list[0]);
+            const showBreadcrumbs = () => {
+                // Show Breadcrumbs bar instead of Selection bar only when 1 item is selected
+                if (self.selectionManager && selectionManager.selected_list.length === 1) {
 
-                const dictionary = handle => {
-                    let id = '';
-                    let typeClass = '';
-                    let name = '';
+                    const items = this.getPath(selectionManager.selected_list[0]);
+                    const dictionary = handle => {
+                        let id = '';
+                        let typeClass = '';
+                        let name = '';
 
-                    if (handle.length === 11 && this.u[handle]) {
-                        id = handle;
-                        typeClass = 'contacts-item';
-                        name = this.u[handle].m;
-                    }
-                    else if (handle === this.RootID && !folderlink) {
-                        id = this.RootID;
-                        typeClass = 'cloud-drive';
-                        name = l[164];
-                    }
-                    else if (handle === this.RubbishID) {
-                        id = this.RubbishID;
-                        typeClass = 'recycle-item';
-                        name = l[168];
-                    }
-                    else if (this.BackupsId && handle === this.BackupsId) {
-                        id = this.BackupsId;
-                        typeClass = 'backups';
-                        name = l.restricted_folder_button;
-                    }
-                    else {
-                        const n = this.d[handle];
-                        if (n) {
-                            id = n.h;
-                            name = n.name || '';
-                            typeClass = n.t && 'folder' || '';
+                        if (handle.length === 11 && this.u[handle]) {
+                            id = handle;
+                            typeClass = 'contacts-item';
+                            name = this.u[handle].m;
+                        }
+                        else if (handle === this.RootID && !folderlink) {
+                            id = this.RootID;
+                            typeClass = 'cloud-drive';
+                            name = l[164];
+                        }
+                        else if (handle === this.RubbishID) {
+                            id = this.RubbishID;
+                            typeClass = 'recycle-item';
+                            name = l[168];
+                        }
+                        else if (this.BackupsId && handle === this.BackupsId) {
+                            id = this.BackupsId;
+                            typeClass = 'backups';
+                            name = l.restricted_folder_button;
+                        }
+                        else {
+                            const n = this.d[handle];
+                            if (n) {
+                                id = n.h;
+                                name = n.name || '';
+                                typeClass = n.t && 'folder' || '';
 
-                            if (n.s4 && n.p === this.RootID) {
-                                name = l.obj_storage;
-                                typeClass = 's4-object-storage';
-                            }
-                            else if (this.d[n.p] && this.d[n.p].s4 && this.d[n.p].p === this.RootID) {
-                                typeClass = 's4-buckets';
+                                if (n.s4 && n.p === this.RootID) {
+                                    name = l.obj_storage;
+                                    typeClass = 's4-object-storage';
+                                }
+                                else if (this.d[n.p] && this.d[n.p].s4 && this.d[n.p].p === this.RootID) {
+                                    typeClass = 's4-buckets';
+                                }
                             }
                         }
-                    }
 
-                    return {
-                        id,
-                        typeClass,
-                        name
+                        return {
+                            id,
+                            typeClass,
+                            name
+                        };
                     };
-                };
 
-                if (selectionManager.selected_list.length === 1) {
+                    scope.classList.remove('hidden');
+                    selectionManager.hideSelectionBar();
+                    selectionManager.scrollToElementProxyMethod(selectionManager.last_selected);
+
                     this.renderBreadcrumbs(items, scope, dictionary, id => {
                         breadcrumbClickHandler.call(this, id);
                     });
                 }
                 else {
                     scope.classList.add('hidden');
-                    block.classList.add('search-multi');
                 }
+            };
 
-                return;
-            }
+            // Toggle search bar and selection bar with delay
+            // Delay to allow the user to double click on item without it's position change
+            delay('renderSearchBreadcrumbs', showBreadcrumbs, 180);
         }
-
-        if (block) {
-            block.classList.remove('search');
+        else {
+            scope.classList.add('hidden');
         }
     };
 

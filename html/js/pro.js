@@ -59,6 +59,9 @@ var pro = {
     BYTES_PER_GB: 1024 * 1024 * 1024,
     BYTES_PER_TB: 1024 * 1024 * 1024 * 1024,
 
+    // Plans that have a single duration. {key: planAccountLevel, value: durationAvailable}
+    singleDurationPlans: Object.create(null),
+
     /**
      * Determines if a Business or Pro Flexi account is expired or in grace period
      * @param {Number} accountStatus The account status e.g. from u_attr.b.s (Business) or u_attr.pf.s (Pro Flexi)
@@ -109,6 +112,8 @@ var pro = {
                     var maxPlan = null;
                     var minPlan = null;
                     var lmbps = {};
+                    const durationsChecked = new Set();
+
                     const allowLocal = localStorage.blockLocal !== '1';
                     const blockedPlans = localStorage.blockPlans && localStorage.blockPlans.split(',');
 
@@ -136,6 +141,17 @@ var pro = {
                                 continue;
                             }
                             results[i].al += pro.getStandaloneBits(results[i].f);
+                        }
+
+                        // Check if the plan only has a single duration
+                        const planDuration = results[i].m;
+                        const planLevel = results[i].al;
+                        if (durationsChecked.has(planLevel)) {
+                            delete pro.singleDurationPlans[planLevel];
+                        }
+                        else {
+                            pro.singleDurationPlans[planLevel] = planDuration;
+                            durationsChecked.add(planLevel);
                         }
 
                         // If this is Pro Flexi, the data is structured similarly to business, so set that manually
@@ -203,6 +219,9 @@ var pro = {
                     pro.maxPlan = maxPlan;
                     pro.minPlan = minPlan;
                     pro.conversionRate = conversionRate;
+                    pro.filter.dynamic.singleDurationPlans = new Set(
+                        // Sets are made from numbers, so convert the keys back to numbers
+                        Object.keys(pro.singleDurationPlans).map(level => level | 0));
                 })
                 .finally(() => {
                     pro.initFilteredPlans();
@@ -537,7 +556,7 @@ var pro = {
         'use strict';
 
         if (canSeeMiniPlans) {
-            pro.proplan2.updateExcOffers();
+            pro.proplan2.updateTabs();
         }
         else {
             const showProPlansTab = () => {
@@ -722,6 +741,7 @@ var pro = {
 
         const simpleFilterKeys = Object.keys(pf.simple);
         const invertedFilterKeys = Object.keys(pf.inverted);
+        const dynamicFilterKeys = Object.keys(pf.dynamic);
 
         // If a non-simple filter has already been used, it will also already be in simple filters
         const setUp = new Set();
@@ -761,8 +781,35 @@ var pro = {
                 );
             }
 
+            // TODO: Create all filters in a loop as they work the same. Will have large testing scope.
+            for (let j = 0; j < dynamicFilterKeys.length; j++) {
+                if (setUp.has(dynamicFilterKeys[j] + monthsTag)) {
+                    continue;
+                }
+                setUp.add(dynamicFilterKeys[j] + monthsTag);
+
+                lazy(pf.plans, dynamicFilterKeys[j] + monthsTag, () =>
+                    pro.filter.simple[`all${monthsTag}`].filter((plan) =>
+                        pro.filter.dynamic[dynamicFilterKeys[j]](plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL])
+                    )
+                );
+            }
         }
 
+        const getMinStoragePlan = (plans) => {
+            if (!plans || !plans.length) {
+                return false;
+            }
+            let currentMin = plans[0];
+            for (let i = 1; i < plans.length; i++) {
+                if (plans[i][pro.UTQA_RES_INDEX_STORAGE] < currentMin[pro.UTQA_RES_INDEX_STORAGE]) {
+                    currentMin = plans[i];
+                }
+            }
+            return currentMin;
+        };
+
+        // TODO: Update Min lazys to use getMinStoragePlan, when it will not require extra QA to do so
         lazy(pro.filter, 'affMin', () => {
             const plans = pro.filter.plans.affPlans;
             let currentMin = plans[0];
@@ -786,6 +833,11 @@ var pro = {
                 }
             }
             return currentMin;
+        });
+
+        lazy(pro.filter, 'excMin', () => {
+            const plans = pro.filter.plans.excTab;
+            return getMinStoragePlan(plans);
         });
     },
 
@@ -977,7 +1029,21 @@ lazy(pro, 'filter', () => {
             yearlyMiniPlans:
                 new Set([
                     pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL
-                ])
+                ]),
+
+            // Plans that can show on the pricing page that come under the exclusive offers tab
+            excTab: new Set([
+                pro.ACCOUNT_LEVEL_STARTER, pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL,
+            ]),
+            // Plans that can show on the pricing page that come under the exclusive offers tab
+            proTab: new Set([
+                pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II,
+                pro.ACCOUNT_LEVEL_PRO_III,
+            ]),
+            // Plans that can show on the pricing page that come under the MEGA VPN tab
+            vpnTab: new Set([
+                pro.ACCOUNT_LEVEL_FEATURE_VPN,
+            ]),
         },
 
         // Sets of plans to invert (all plans minus specified plans), will then
@@ -1017,6 +1083,12 @@ lazy(pro, 'filter', () => {
             regular: ['miniPlans', 'core'],
         },
 
+        // Plan sets that will be created dynamically given result of UTQA
+        dynamic: {
+            // Plans that only have one duration
+            singleDurationPlans: new Set(),
+        },
+
         /**
          * Finds the lowest monthly plan that can store the users data, excluding their current plan
          * @param {number} userStorage - The users current storage in bytes
@@ -1038,6 +1110,7 @@ lazy(pro, 'filter', () => {
     };
 
     const invertedFilterKeys = Object.keys(pf.inverted);
+    const dynamicFilterKeys = Object.keys(pf.dynamic);
 
     for (let j = 0; j < invertedFilterKeys.length; j++) {
 
@@ -1047,6 +1120,11 @@ lazy(pro, 'filter', () => {
                 !pro.filter.inverted[invertedFilterKeys[j]].has(id)
             ));
         });
+    }
+
+    // Add the dynamic filters to the simple filter. Lazy as they are not ready on init.
+    for (let j = 0; j < dynamicFilterKeys.length; j++) {
+        lazy(pf.simple, dynamicFilterKeys[j], () => pf.dynamic[dynamicFilterKeys[j]]);
     }
 
     return Object.setPrototypeOf(pf, null);

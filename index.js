@@ -105,6 +105,8 @@ mBroadcaster.once('startMega:desktop', function() {
             delete pages[p[i]];
         }
     }
+    $('#avatar-svg').safeAppend(pages.contact_avatar);
+    delete pages.contact_avatar;
 });
 
 function startMega() {

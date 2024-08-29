@@ -461,7 +461,7 @@
             $div.safeHTML(rowHtml);
 
             const ltWSpaceWarning = new InputFloatWarning($dialog);
-            ltWSpaceWarning.check({type: 0, name: names[$.nodeSaveAs.h], ms: 0});
+            ltWSpaceWarning.check({name: names[$.nodeSaveAs.h], ms: 0});
 
             $('#f-name-input', $div).rebind('keydown.saveas', function(e) {
                 if (e.which === 13 || e.keyCode === 13) {
@@ -469,7 +469,7 @@
                 }
             });
             $('#f-name-input', $div).rebind('keyup.saveas', () => {
-                ltWSpaceWarning.check({type: 0});
+                ltWSpaceWarning.check();
             });
             if ($.saveAsDialog) {
                 $('#f-name-input', $dialog).focus();

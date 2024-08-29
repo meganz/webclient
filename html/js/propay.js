@@ -445,12 +445,33 @@ pro.propay = {
             return false;
         }
 
-        var tempGatewayOptions = gatewayOptions.filter(gate =>
-            (pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI && gate.supportsBusinessPlans === 1)
-            || (pro.propay.planNum !== pro.ACCOUNT_LEVEL_PRO_FLEXI
-                && (typeof gate.supportsIndividualPlans === 'undefined' || gate.supportsIndividualPlans))
-            && !(gate.minimumEURAmountSupported > pro.getPlanObj(pro.propay.planNum, 1).maxCorrPriceEuro)
-            && (!!gate.gatewayId || !pro.filter.simple.validFeatures.has(pro.propay.planNum)));
+        const checkGateway = (gate) => {
+            // If plan is flexi and the gateway doesn't support business(and flexi)
+            if (pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
+                if (gate.supportsBusinessPlans !== 1) {
+                    return false;
+                }
+            }
+            // If plan is not flexi and the gateway doesn't support individual plans
+            else if (typeof gate.supportsIndividualPlans !== 'undefined' && !gate.supportsIndividualPlans) {
+                return false;
+            }
+
+            // Exclude voucher from list of VPN gateways (TODO: Request a flag from API instead of using gatewayId)
+            if (!gate.gatewayId && pro.filter.simple.validFeatures.has(pro.propay.planNum)) {
+                return false;
+            }
+
+            // If the gateway has a required price, and it is more than the plans max price
+            if (gate.minimumEURAmountSupported > pro.getPlanObj(pro.propay.planNum, 1).maxCorrPriceEuro) {
+                return false;
+            }
+
+            // Gateway supports the current plan
+            return gate;
+        };
+
+        var tempGatewayOptions = gatewayOptions.filter(checkGateway);
 
         // if this user has a discount, clear gateways that are not supported.
         const discountInfo = pro.propay.getDiscount();
@@ -691,10 +712,7 @@ pro.propay = {
             delete sessionStorage.fromOverquotaPeriod;
         }
         else {
-            const selectedTab = sessionStorage['pro.pricingTab'];
-            selectedPeriod = (selectedTab === 'pr-exc-offer-tab'
-                ? sessionStorage['pro.periodExc']
-                : sessionStorage['pro.period']) || 12;
+            selectedPeriod = (sessionStorage['pro.period'] | 0) || 12;
         }
 
         let $selectedOption = $(`.payment-duration[data-plan-months=${selectedPeriod}]`, $durationList);
@@ -1017,7 +1035,6 @@ pro.propay = {
             return false;
         }
 
-        var $paymentDialog = $('.payment-dialog', 'body');
         var $paymentAddressDialog = $('.payment-address-dialog', 'body');
         var $numbers;
 
@@ -1044,8 +1061,6 @@ pro.propay = {
         const recurringEnabled = selectedProvider.supportsRecurring;
 
         // Set text
-        var subscribeOrPurchase = (recurringEnabled) ? l[23675] : l[6190];
-        var subscribeOrPurchaseInstruction = (recurringEnabled) ? l[22074] : l[7996];
         var recurringOrNonRecurring = (recurringEnabled) ? '(' + l[6965] + ')' : l[6941];
         var recurringMonthlyOrAnnuallyMessage = (numOfMonths === 1) ? l[10628] : l[10629];
         var autoRenewMonthOrYearQuestion = (numOfMonths === 1) ? l[10638] : l[10639];
@@ -1209,12 +1224,8 @@ pro.propay = {
         }
 
         // Update depending on recurring or one off payment
-        $('button.purchase span', this.$page).text(subscribeOrPurchase);
-        $(is_mobile ? '.payment-info' : '.payment-instructions', this.$page).safeHTML(subscribeOrPurchaseInstruction);
         $('.choose-renewal .duration-text', this.$page).text(autoRenewMonthOrYearQuestion);
         $('.charge-information', this.$page).text(chargeInfoDuration);
-        $('.payment-buy-now span', $paymentDialog).text(subscribeOrPurchase);
-        $('.payment-buy-now span', $paymentAddressDialog).text(subscribeOrPurchase);
     },
 
     /**

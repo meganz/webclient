@@ -99,15 +99,6 @@
     user-select: text;
     -webkit-user-select: text;
 }
-.bottom-page.pricing-pg .full-block.exc-offer .pricing-flexi-container,
-.bottom-page.pricing-pg .full-block.exc-offer .pricing-compare-full-container,
-.bottom-page.pricing-pg .full-block.exc-offer .faq-container{
-    display: none;
-}
-.bottom-page.pricing-pg .full-block.business .pricing-estimation-note-container-exc,
-.bottom-page.pricing-pg .full-block.individual .pricing-estimation-note-container-exc {
-    display: none;
-}
 .pricing-pg .pricing-pg.hero-section {
     padding-top: 118px;
 }
@@ -826,14 +817,10 @@ i.pricing-i-icon {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
 }
-.pricing-pg.pricing-plans-compare-table-container .pricing-plans-compare-table.mini-plans {
+.pricing-pg.pricing-plans-compare-table-container.cols-4 .pricing-plans-compare-table {
     grid-template-columns: repeat(4, 1fr);
 }
-.pricing-pg.pricing-plans-compare-table-container .pricing-plans-compare-table.mini-plans .pro-business,
-.pricing-pg.pricing-plans-compare-table-container .pricing-plans-compare-table.mini-plans .pro-flexi {
-    display: none;
-}
-.pricing-pg.pricing-plans-compare-table-container .pricing-plans-compare-table:not(.mini-plans) .pro-exc-offer {
+.pricing-pg .pricing-plans-compare-table-container:not(.show-comms) .pricing-plans-compare-table .no-ads {
     display: none;
 }
 .pricing-plans-compare-table .pricing-plans-compare-table-item {

@@ -2446,6 +2446,9 @@ accountUI.fileManagement = {
 
         // Public Links
         this.publicLinks.render();
+
+        // Rewind
+        this.rewind.render();
     },
 
     versioning: {
@@ -2846,6 +2849,21 @@ accountUI.fileManagement = {
             );
         }
     },
+
+    rewind: {
+        render() {
+            'use strict';
+
+            var showRewindConfirmId = '#rwReinstate';
+
+            accountUI.inputs.switch.init(
+                showRewindConfirmId,
+                $(showRewindConfirmId, accountUI.$contentBlock).parent(),
+                !mega.config.get('rwReinstate'),
+                val => mega.config.setn('rwReinstate', val ^ 1)
+            );
+        }
+    }
 };
 
 accountUI.transfers = {

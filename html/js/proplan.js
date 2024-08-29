@@ -1621,7 +1621,7 @@ function completeProLogin(result) {
                 // Update the pro page after login based on whether the user
                 // is allowed to see the low tier section of the pro page
                 pro.loadMembershipPlans(() => {
-                    pro.updateLowTierProPage(!!pro.filter.miniMin);
+                    pro.updateLowTierProPage(!!pro.filter.excMin);
 
                     loadingDialog.hide();
                 });

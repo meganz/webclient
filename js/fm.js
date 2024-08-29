@@ -1249,16 +1249,15 @@ function InputFloatWarning($container, options) {
 
     /**
      * Display e.g. LT white-spaces warning if input value contains leading/trailing white-spaces
-     * @param {Number} type file: 0, folder: 1
      * @param {String} name {optional} Name to check, if not provided, container input value will used
      * @param {Number} ms {optional} Timeout in milliseconds. If not provided, default timeout
      * @returns {InputFloatWarning} this instance
      */
-    this.check = ({type, name, ms = 1000}) => {
+    this.check = ({name, ms = 1000} = {}) => {
         // delay function sets default value if given timeout is 0. Workaround: set "ms" to 1 when 0 is given
         delay(this.id, () => {
             const validator = InputFloatWarning.validator[this.options.namespace];
-            const msg = validator(name || $('input', this.$container).val(), type);
+            const msg = validator(name || $('input', this.$container).val());
             return msg ? this.show(msg) : this.hide();
         }, ms > 0 ? ms : 1);
 
@@ -1272,9 +1271,9 @@ function InputFloatWarning($container, options) {
 lazy(InputFloatWarning, 'validator', () => {
     'use strict';
     const obj = {
-        'whitespaces': (value, type) => {
+        'whitespaces': (value) => {
             if (typeof value !== 'undefined' && value.length !== value.trim().length) {
-                return type ? l.whitespaces_on_foldername : l.whitespaces_on_filename;
+                return l.whitespaces_on_name;
             }
             return false;
         }
@@ -1288,11 +1287,11 @@ function renameDialog() {
 
     if ($.selected.length > 0) {
         var n = M.d[$.selected[0]] || false;
-        var nodeType = n.t;// file: 0, folder: 1
         var ext = fileext(n.name);
         var $dialog = $('.mega-dialog.rename-dialog');
         var $input = $('input', $dialog);
         var errMsg = '';
+        const s4Folder = n.t && n.s4;
 
         M.safeShowDialog('rename', function() {
             $dialog.removeClass('hidden').addClass('active');
@@ -1301,11 +1300,11 @@ function renameDialog() {
         });
 
         const ltWSpaceWarning = new InputFloatWarning($dialog);
-        ltWSpaceWarning.hide().check({type: nodeType, name: n.name, ms: 0});
+        ltWSpaceWarning.hide().check({name: n.name, ms: 0});
 
         $('button.js-close, .rename-dialog-button.cancel', $dialog).rebind('click', closeDialog);
 
-        $('.rename-dialog-button.rename').rebind('click', function() {
+        $('.rename-dialog-button.rename').rebind('click.rename', () => {
             if ($dialog.hasClass('active')) {
                 var value = $input.val();
                 errMsg = '';
@@ -1314,18 +1313,18 @@ function renameDialog() {
                     if (!value.trim()) {
                         errMsg = l[5744];
                     }
-                    else if (M.isSafeName(value)) {
+                    else if (s4Folder || M.isSafeName(value)) {
                         var targetFolder = n.p;
                         if (duplicated(value, targetFolder)) {
                             errMsg = l[23219];
                         }
-                        else if (!n.s4 || !(errMsg = s4.ui.getInvalidNodeNameError(n, value))) {
+                        else if (!s4Folder || !(errMsg = s4.ui.getInvalidNodeNameError(n, value))) {
 
                             M.rename(n.h, value).catch(tell);
                         }
                     }
                     else if (value.length > 250) {
-                        errMsg = nodeType === 1 ? l.LongName : l.LongName1;
+                        errMsg = n.t === 1 ? l.LongName : l.LongName1;
                     }
                     else {
                         errMsg = l[24708];
@@ -1351,11 +1350,12 @@ function renameDialog() {
             }
         });
 
-        $('header h2', $dialog).text(n.t ? n.s4 ? l.s4_bucket_rename : l[425] : l[426]);
+        $('header h2', $dialog)
+            .text(n.t ? s4Folder ? l.s4_bucket_rename : l[425] : l[426]);
         $input.val(n.name);
 
-        $('.item-type-icon', $dialog)
-            .attr('class', `item-type-icon icon-${fileIcon(n)}-24`);
+        $('.input-icon', $dialog)
+            .attr('class', `input-icon item-type-icon icon-${fileIcon(n)}-24`);
 
         if (!n.t && ext.length > 0) {
             $input[0].selectionStart = 0;
@@ -1396,7 +1396,9 @@ function renameDialog() {
         });
 
         $input.rebind('keyup.rename-f', () => {
-            ltWSpaceWarning.check({type: nodeType});
+            if (!s4Folder) {
+                ltWSpaceWarning.check();
+            }
         });
     }
 }
@@ -1647,7 +1649,8 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
             assert(
                 checkboxSetting === 'cslrem'
                 || checkboxSetting === 'nowarnpl'
-                || checkboxSetting === 'skipDelWarning', checkboxSetting);
+                || checkboxSetting === 'skipDelWarning'
+                || checkboxSetting === 'rwReinstate', checkboxSetting);
 
             $('#msgDialog .checkbox-block .checkdiv,' +
                 '#msgDialog .checkbox-block input')
@@ -3146,7 +3149,7 @@ function createFolderDialog(close) {
     });
 
     $input.rebind('keyup', function(e) {
-        ltWSpaceWarning.check({type: 1});
+        ltWSpaceWarning.check();
         if ($input.val() === '' || $input.val() === l[157]) {
             $dialog.removeClass('active');
         }
@@ -3318,7 +3321,7 @@ function createFileDialog(close, action, params) {
     });
 
     $input.rebind('keyup.fileDialog', function() {
-        ltWSpaceWarning.check({type: 0});
+        ltWSpaceWarning.check();
         if ($input.val() === '' || $input.val() === l[17506]) {
             $dialog.removeClass('active');
         }

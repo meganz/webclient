@@ -505,7 +505,7 @@
     <div class="dropdown-section">
         <a class="dropdown-item s4-policy-copy-arn">
             <i class="sprite-fm-mono icon-copy"></i>
-            <span>[$63]</span>
+            <span>[$s4_copy_arn]</span>
         </a>
     </div>
 
@@ -598,7 +598,7 @@
         </a>
         <a class="dropdown-item s4-user-rename">
             <i class="sprite-fm-mono icon-rename"></i>
-            <span>[$s4_user_rename]</span>
+            <span>[$61]</span>
         </a>
         <hr />
     </div>
@@ -621,14 +621,14 @@
         </a>
         <a class="dropdown-item s4-group-rename">
             <i class="sprite-fm-mono icon-rename"></i>
-            <span>Rename group</span>
+            <span>[$61]</span>
         </a>
         <hr />
     </div>
     <div class="dropdown-section">
         <a class="dropdown-item s4-group-delete">
             <i class="sprite-fm-mono icon-bin"></i>
-            <span>Delete</span>
+            <span>[$1730]</span>
         </a>
     </div>
 </div>
@@ -1828,6 +1828,13 @@
                         <div class="fm-empty-s4-groups-title">[$s4_group_create_empty]</div>
                         <div class="fm-empty-s4-groups-message">[$s4_group_empty_msg]</div>
                     </div>
+                </div>
+            </div>
+            <div class="fm-rewind-progress-section hidden">
+                <div class="content">
+                    <div class="image"></div>
+                    <div class="title"></div>
+                    <div class="message"></div>
                 </div>
             </div>
             <div class="files-grid-view fm hidden">
@@ -4196,6 +4203,12 @@
                             <div class="settings-sub-section">
                                 <div class="subtitle-txt">[$remove_link_show_again]</div>
                                 <div class="mega-switch toggle-on" id="nowarnpl">
+                                    <div class="mega-feature-switch no-trans-init"></div>
+                                </div>
+                            </div>
+                            <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$rewind_confirm_account_setting_label]</div>
+                                <div class="mega-switch toggle-on" id="rwReinstate">
                                     <div class="mega-feature-switch no-trans-init"></div>
                                 </div>
                             </div>

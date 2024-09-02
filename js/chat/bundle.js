@@ -80,7 +80,7 @@ class ChatRouting {
       if (room) {
         room.show();
         args.route.location = room.getRoomUrl();
-      } else if (!roomId || roomId === u_handle || roomId.length !== 11) {
+      } else if (!roomId || roomId === u_handle || roomId.length !== 11 && !is_chatlink) {
         ChatRouting.gPageHandlers.redirect(args.route, 'fm/chat').then(resolve).catch(reject);
         resolve = null;
       } else if (section === 'p') {
@@ -98,8 +98,8 @@ class ChatRouting {
             return EEXPIRED;
           }
           megaChat.cleanup(true);
-          if (ex === ENOENT && megaChat.publicChatKeys[roomId]) {
-            msgDialog('warninga', l[20641], l[20642], 0, () => {
+          if (ex === ENOENT || ex === EBLOCKED && megaChat.publicChatKeys[roomId]) {
+            msgDialog('warninga', '', l[20641], l[20642], () => {
               loadSubPage(is_chatlink ? 'start' : 'fm/chat', event);
             });
           } else {

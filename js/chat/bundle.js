@@ -3927,7 +3927,7 @@ const ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, c
         if (eventData.userId === u_handle) {
           Object.keys(self.members).forEach((userId) => {
             self.protocolHandler.removeParticipant(userId);
-            delete self.members[userId];
+            self.members[userId] = userId === u_handle ? ChatRoom.MembersSet.PRIVILEGE_STATE.LEFT : ChatRoom.MembersSet.PRIVILEGE_STATE.READONLY;
           });
         } else {
           self.protocolHandler.removeParticipant(eventData.userId);
@@ -11059,7 +11059,7 @@ class ParticipantsListInner extends mixins.w9 {
     if (!room) {
       return null;
     }
-    if (!room.isCurrentlyActive && room._leaving !== true) {
+    if (!room.isCurrentlyActive) {
       return false;
     }
     const contacts = room.getParticipantsExceptMe();

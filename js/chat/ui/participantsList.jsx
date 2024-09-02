@@ -167,7 +167,7 @@ class ParticipantsListInner extends MegaRenderMixin {
             // destroyed
             return null;
         }
-        if (!room.isCurrentlyActive && room._leaving !== true) {
+        if (!room.isCurrentlyActive) {
             // save some memory/DOM
             return false;
         }

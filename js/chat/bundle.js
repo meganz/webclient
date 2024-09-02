@@ -10670,6 +10670,12 @@ class HistoryRetentionDialog extends React_.Component {
         timeRange: this.filterTimeRange(prevState.timeRange, selectedTimeFormat)
       }));
     };
+    this.handleOnTimeCheck = e => {
+      const checkingValue = e.type === 'paste' ? e.clipboardData.getData('text') : e.key;
+      if (e.keyCode !== 8 && isNaN(checkingValue)) {
+        e.preventDefault();
+      }
+    };
     this.handleOnTimeChange = e => {
       const timeValue = e.target.value;
       this.setState(prevState => ({
@@ -10689,7 +10695,7 @@ class HistoryRetentionDialog extends React_.Component {
   hasInput() {
     return this.state.timeRange && parseInt(this.state.timeRange, 10) >= 1;
   }
-  getDefaultValue(selectedTimeFormat) {
+  getMaxTimeRange(selectedTimeFormat) {
     switch (selectedTimeFormat) {
       case chat_chatRoom.RETENTION_FORMAT.HOURS:
         return LIMIT.HOURS;
@@ -10702,7 +10708,7 @@ class HistoryRetentionDialog extends React_.Component {
     }
   }
   getParsedLabel(label, timeRange) {
-    timeRange = timeRange ? parseInt(timeRange, 10) : this.getDefaultValue(label);
+    timeRange = timeRange ? parseInt(timeRange, 10) : this.getMaxTimeRange(label);
     switch (label) {
       case chat_chatRoom.RETENTION_FORMAT.HOURS:
         return mega.icu.format(l.plural_hour, timeRange);
@@ -10722,17 +10728,7 @@ class HistoryRetentionDialog extends React_.Component {
     if (timeRange === 0 || isNaN(timeRange)) {
       return '';
     }
-    switch (selectedTimeFormat) {
-      case chat_chatRoom.RETENTION_FORMAT.HOURS:
-        return timeRange > LIMIT.HOURS ? LIMIT.HOURS : timeRange;
-      case chat_chatRoom.RETENTION_FORMAT.DAYS:
-        return timeRange > LIMIT.DAYS ? LIMIT.DAYS : timeRange;
-      case chat_chatRoom.RETENTION_FORMAT.WEEKS:
-        return timeRange > LIMIT.WEEKS ? LIMIT.WEEKS : timeRange;
-      case chat_chatRoom.RETENTION_FORMAT.MONTHS:
-        return timeRange > LIMIT.MONTHS ? LIMIT.MONTHS : timeRange;
-    }
-    return timeRange;
+    return Math.min(this.getMaxTimeRange(selectedTimeFormat), timeRange);
   }
   handleOnSubmit(e) {
     if (!this.hasInput()) {
@@ -10820,13 +10816,15 @@ class HistoryRetentionDialog extends React_.Component {
       type: "number",
       min: "0",
       step: "1",
+      max: this.getMaxTimeRange(selectedTimeFormat),
       className: "form-section-time",
-      placeholder: this.getDefaultValue(selectedTimeFormat),
+      placeholder: this.getMaxTimeRange(selectedTimeFormat),
       ref: this.inputRef,
       autoFocus: true,
       value: timeRange,
       onChange: this.handleOnTimeChange,
-      onKeyDown: e => (e.key === '-' || e.key === '+' || e.key === 'e') && e.preventDefault()
+      onKeyPress: this.handleOnTimeCheck,
+      onPaste: this.handleOnTimeCheck
     })), REaCt().createElement("div", {
       className: "form-section"
     }, REaCt().createElement("div", {

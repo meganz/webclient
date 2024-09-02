@@ -35,7 +35,7 @@ export class HistoryRetentionDialog extends Component {
         return this.state.timeRange && parseInt(this.state.timeRange, 10) >= 1;
     };
 
-    getDefaultValue(selectedTimeFormat) {
+    getMaxTimeRange(selectedTimeFormat) {
         switch (selectedTimeFormat) {
             case RETENTION_FORMAT.HOURS:
                 return LIMIT.HOURS;
@@ -49,7 +49,7 @@ export class HistoryRetentionDialog extends Component {
     }
 
     getParsedLabel(label, timeRange) {
-        timeRange = timeRange ? parseInt(timeRange, 10) : this.getDefaultValue(label);
+        timeRange = timeRange ? parseInt(timeRange, 10) : this.getMaxTimeRange(label);
         switch (label) {
             case RETENTION_FORMAT.HOURS:
                 /* `hour(s)` || `# hour(s)` */
@@ -83,17 +83,16 @@ export class HistoryRetentionDialog extends Component {
         if (timeRange === 0 || isNaN(timeRange)) {
             return '';
         }
-        switch (selectedTimeFormat) {
-            case RETENTION_FORMAT.HOURS:
-                return timeRange > LIMIT.HOURS ? LIMIT.HOURS : timeRange;
-            case RETENTION_FORMAT.DAYS:
-                return timeRange > LIMIT.DAYS ? LIMIT.DAYS : timeRange;
-            case RETENTION_FORMAT.WEEKS:
-                return timeRange > LIMIT.WEEKS ? LIMIT.WEEKS : timeRange;
-            case RETENTION_FORMAT.MONTHS:
-                return timeRange > LIMIT.MONTHS ? LIMIT.MONTHS : timeRange;
+        return Math.min(this.getMaxTimeRange(selectedTimeFormat), timeRange);
+    }
+
+    handleOnTimeCheck = e => {
+
+        // Firefox fix bug on allowing strings on input type number applies to Webkit also
+        const checkingValue = e.type === 'paste' ? e.clipboardData.getData('text') : e.key;
+        if (e.keyCode !== 8 && isNaN(checkingValue)) {
+            e.preventDefault();
         }
-        return timeRange;
     }
 
     handleOnTimeChange = e => {
@@ -194,13 +193,15 @@ export class HistoryRetentionDialog extends Component {
                                 type="number"
                                 min="0"
                                 step="1"
+                                max={this.getMaxTimeRange(selectedTimeFormat)}
                                 className="form-section-time"
-                                placeholder={this.getDefaultValue(selectedTimeFormat)}
+                                placeholder={this.getMaxTimeRange(selectedTimeFormat)}
                                 ref={this.inputRef}
                                 autoFocus={true}
                                 value={timeRange}
                                 onChange={this.handleOnTimeChange}
-                                onKeyDown={e => (e.key === '-' || e.key === '+' || e.key === 'e') && e.preventDefault()}
+                                onKeyPress={this.handleOnTimeCheck}
+                                onPaste={this.handleOnTimeCheck}
                             />
                         </div>
                         <div className="form-section">

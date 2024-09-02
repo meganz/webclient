@@ -27441,7 +27441,8 @@ class StreamControls extends _mixins1__.w9 {
       devices: {},
       audioSelectDropdown: false,
       videoSelectDropdown: false,
-      loading: false
+      loading: false,
+      muteSpeak: false
     };
     this.LeaveButton = (0,_hostsObserver_jsx2__.C)(({
       hasHost,
@@ -27466,7 +27467,7 @@ class StreamControls extends _mixins1__.w9 {
         }
       }, react0().createElement("span", null, l.leave));
     });
-    this.setActiveElement = () => this.props.setActiveElement(this.state.audioSelectDropdown || this.state.videoSelectDropdown || this.state.endCallOptions);
+    this.setActiveElement = forced => this.props.setActiveElement(forced || this.state.audioSelectDropdown || this.state.videoSelectDropdown || this.state.endCallOptions);
     this.handleMousedown = ({
       target
     }) => {
@@ -27940,11 +27941,9 @@ class StreamControls extends _mixins1__.w9 {
     super.componentDidMount();
     document.addEventListener('mousedown', this.handleMousedown);
     navigator.mediaDevices.addEventListener('devicechange', this.handleDeviceChange);
-    this.props.chatRoom.rebind(`onLocalSpeechDetected.${StreamControls.NAMESPACE}`, () => {
-      this.setState({
-        localMicDetected: true
-      });
-    });
+    this.props.chatRoom.rebind(`onLocalSpeechDetected.${StreamControls.NAMESPACE}`, () => this.setState({
+      muteSpeak: true
+    }, () => this.setActiveElement(true)));
   }
   render() {
     const {
@@ -27965,7 +27964,7 @@ class StreamControls extends _mixins1__.w9 {
     const {
       audioSelectDropdown,
       videoSelectDropdown,
-      localMicDetected
+      muteSpeak
     } = this.state;
     const avFlags = call.av;
     const isOnHold = avFlags & Av.onHold;
@@ -27976,31 +27975,24 @@ class StreamControls extends _mixins1__.w9 {
                                 ${isOnHold ? 'disabled' : ''}
                                 with-input-selector
                             `,
-      onClick: () => {
-        if (isOnHold) {
-          return;
-        }
+      onClick: () => isOnHold ? null : this.setState({
+        muteSpeak: false
+      }, () => {
         resetError(Av.Audio);
         onAudioClick();
-        if (!(avFlags & Av.Audio)) {
-          this.setState({
-            localMicDetected: false
-          });
-        }
-      }
-    }, localMicDetected && react0().createElement("div", {
+      })
+    }, muteSpeak && react0().createElement("div", {
       className: "mic-muted-tip theme-light-forced",
-      onClick: e => {
-        e.preventDefault();
-        e.stopPropagation();
-      }
+      onClick: ev => ev.stopPropagation()
     }, react0().createElement("span", null, l.mic_still_muted), react0().createElement(_button_jsx3__.A, {
       className: "mic-muted-tip-btn",
       onClick: () => {
         this.setState({
-          localMicDetected: false
+          muteSpeak: false
+        }, () => {
+          eventlog(500509);
+          this.setActiveElement();
         });
-        eventlog(500509);
       }
     }, l[148]), react0().createElement("i", {
       className: "sprite-fm-mono icon-tooltip-arrow tooltip-arrow bottom"

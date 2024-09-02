@@ -53,7 +53,8 @@ class StreamControls extends MegaRenderMixin {
         devices: {},
         audioSelectDropdown: false,
         videoSelectDropdown: false,
-        loading: false
+        loading: false,
+        muteSpeak: false
     };
 
     LeaveButton = withHostsObserver(
@@ -88,9 +89,12 @@ class StreamControls extends MegaRenderMixin {
         }
     );
 
-    setActiveElement = () =>
+    setActiveElement = forced =>
         this.props.setActiveElement(
-            this.state.audioSelectDropdown || this.state.videoSelectDropdown || this.state.endCallOptions
+            forced ||
+            this.state.audioSelectDropdown ||
+            this.state.videoSelectDropdown ||
+            this.state.endCallOptions
         );
 
     handleMousedown = ({ target }) => {
@@ -567,9 +571,10 @@ class StreamControls extends MegaRenderMixin {
         super.componentDidMount();
         document.addEventListener('mousedown', this.handleMousedown);
         navigator.mediaDevices.addEventListener('devicechange', this.handleDeviceChange);
-        this.props.chatRoom.rebind(`onLocalSpeechDetected.${StreamControls.NAMESPACE}`, () => {
-            this.setState({ localMicDetected: true });
-        });
+        this.props.chatRoom.rebind(
+            `onLocalSpeechDetected.${StreamControls.NAMESPACE}`,
+            () => this.setState({ muteSpeak: true }, () => this.setActiveElement(true))
+        );
     }
 
     render() {
@@ -577,7 +582,7 @@ class StreamControls extends MegaRenderMixin {
             call, signal, chatRoom, renderSignalWarning, hasToRenderPermissionsWarning, renderPermissionsWarning,
             resetError, blocked, renderBlockedWarning, onAudioClick, onVideoClick, onScreenSharingClick, onHoldClick
         } = this.props;
-        const { audioSelectDropdown, videoSelectDropdown, localMicDetected } = this.state;
+        const { audioSelectDropdown, videoSelectDropdown, muteSpeak } = this.state;
         const avFlags = call.av;
         const isOnHold = avFlags & Av.onHold;
 
@@ -597,31 +602,32 @@ class StreamControls extends MegaRenderMixin {
                                 ${isOnHold ? 'disabled' : ''}
                                 with-input-selector
                             `}
-                            onClick={() => {
-                                if (isOnHold) {
-                                    return;
-                                }
-                                resetError(Av.Audio);
-                                onAudioClick();
-                                if (!(avFlags & Av.Audio)) {
-                                    this.setState({ localMicDetected: false });
-                                }
-                            }}>
-                            {localMicDetected && <div className="mic-muted-tip theme-light-forced" onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                            }}>
-                                <span>{l.mic_still_muted /* `Your mic is still muted.` */}</span>
-                                <Button
-                                    className="mic-muted-tip-btn"
-                                    onClick={() => {
-                                        this.setState({ localMicDetected: false });
-                                        eventlog(500509);
-                                    }}>
-                                    {l[148]}
-                                </Button>
-                                <i className="sprite-fm-mono icon-tooltip-arrow tooltip-arrow bottom" />
-                            </div>}
+                            onClick={() =>
+                                isOnHold ?
+                                    null :
+                                    this.setState({ muteSpeak: false }, () => {
+                                        resetError(Av.Audio);
+                                        onAudioClick();
+                                    })
+                            }>
+                            {muteSpeak &&
+                                <div
+                                    className="mic-muted-tip theme-light-forced"
+                                    onClick={ev => ev.stopPropagation()}>
+                                    <span>{l.mic_still_muted /* `Your mic is still muted.` */}</span>
+                                    <Button
+                                        className="mic-muted-tip-btn"
+                                        onClick={() => {
+                                            this.setState({ muteSpeak: false }, () => {
+                                                this.setActiveElement();
+                                                eventlog(500509);
+                                            });
+                                        }}>
+                                        {l[148] /* `Close` */}
+                                    </Button>
+                                    <i className="sprite-fm-mono icon-tooltip-arrow tooltip-arrow bottom" />
+                                </div>
+                            }
                             <Button
                                 className={`
                                     mega-button

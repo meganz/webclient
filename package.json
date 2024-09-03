@@ -30,7 +30,7 @@
   ],
   "browserslist": [
     "Chrome >= 67",
-    "Firefox >= 68",
+    "Firefox >= 78",
     "Safari >= 14.0",
     "Opera > 54",
     "Edge > 78"

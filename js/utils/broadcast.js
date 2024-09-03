@@ -111,6 +111,8 @@
             }
             this.onmessageerror = reportError;
 
+            this.dispatchEvent = tryCatch(this.dispatchEvent, reportError);
+
             /** @property MEGABroadcastChannel.logger */
             lazy(this, 'logger', () => {
                 const tag = this.origin.toString(36);

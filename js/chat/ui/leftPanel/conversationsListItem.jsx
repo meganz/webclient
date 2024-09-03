@@ -1,7 +1,7 @@
 import React from 'react';
 import { MegaRenderMixin, timing } from '../../mixins';
 import utils, { OFlowParsedHTML, ParsedHTML } from '../../../ui/utils.jsx';
-import { Avatar } from '../contacts.jsx';
+import { Avatar, ContactPresence } from '../contacts.jsx';
 
 export default class ConversationsListItem extends MegaRenderMixin {
 
@@ -279,10 +279,7 @@ export default class ConversationsListItem extends MegaRenderMixin {
                             }
                         </div>
                         <div className="conversation-data-badges">
-                            {chatRoom.type === 'private' ?
-                                <span className={`user-card-presence ${presenceClass}`} /> :
-                                null
-                            }
+                            {chatRoom.type === 'private' ? <ContactPresence contact={contact} /> : null}
                             {chatRoom.type === 'group' || chatRoom.type === 'private' ?
                                 <i className="sprite-fm-uni icon-ekr-key simpletip" data-simpletip={l[20935]} /> :
                                 null

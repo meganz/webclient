@@ -1,9 +1,10 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../mixins.js';
+import { MegaRenderMixin, compose } from '../../mixins.js';
 import SearchPanel from '../searchPanel/searchPanel.jsx';
 import { Navigation } from './navigation.jsx';
 import Actions from './actions.jsx';
 import { Chats, Meetings, Archived } from './conversationsList.jsx';
+import { withUpdateObserver } from '../updateObserver.jsx';
 
 export const NAMESPACE = 'lhp';
 
@@ -12,9 +13,8 @@ export const FILTER = {
     UNREAD: 'unread'
 };
 
-export default class LeftPanel extends MegaRenderMixin {
+class LeftPanel extends MegaRenderMixin {
     state =  {
-        updated: 0,
         archived: false,
         archivedUnmounting: false,
         filter: '',
@@ -25,20 +25,11 @@ export default class LeftPanel extends MegaRenderMixin {
 
     constructor(props) {
         super(props);
-        this.doUpdate = this.doUpdate.bind(this);
         this.state.contactRequests = Object.keys(M.ipc).length;
     }
 
     customIsEventuallyVisible() {
         return M.chat;
-    }
-
-    doUpdate() {
-        return (
-            this.isComponentVisible() &&
-            document.visibilityState === 'visible' &&
-            this.setState(state => ({ updated: ++state.updated }), () => this.safeForceUpdate())
-        );
     }
 
     toggleFilter = (filter) => {
@@ -76,15 +67,12 @@ export default class LeftPanel extends MegaRenderMixin {
 
     componentWillUnmount() {
         super.componentWillUnmount();
-        clearInterval(this.backgroundUpdateInterval);
         megaChat.unbind(`onUnreadCountUpdate.${NAMESPACE}`);
         mBroadcaster.removeListener(this.contactRequestsListener);
-        document.removeEventListener('visibilitychange', this.doUpdate);
     }
 
     componentDidMount() {
         super.componentDidMount();
-        this.doUpdate();
         megaChat.rebind(
             `onUnreadCountUpdate.${NAMESPACE}`,
             (ev, { unreadChats, unreadMeetings }) => {
@@ -94,8 +82,6 @@ export default class LeftPanel extends MegaRenderMixin {
         this.contactRequestsListener = mBroadcaster.addListener('fmViewUpdate:ipc', () =>
             this.setState({ contactRequests: Object.keys(M.ipc).length })
         );
-        this.backgroundUpdateInterval = setInterval(this.doUpdate, 6e4 * 10 /* 10 min */);
-        document.addEventListener('visibilitychange', this.doUpdate);
     }
 
     render() {
@@ -193,3 +179,5 @@ export default class LeftPanel extends MegaRenderMixin {
         );
     }
 }
+
+export default compose(withUpdateObserver)(LeftPanel);

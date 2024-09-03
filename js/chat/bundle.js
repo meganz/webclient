@@ -6052,7 +6052,8 @@ const MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 =
       if (node) {
         this.__intersectionVisibility = false;
         onIdle(() => {
-          this.__intersectionObserverInstance = new IntersectionObserver(([entry]) => {
+          this.__intersectionObserverInstance = new IntersectionObserver(entries => {
+            const entry = entries.pop();
             if (entry.intersectionRatio < 0.2 && !entry.isIntersecting) {
               this.__intersectionVisibility = false;
             } else {
@@ -7151,17 +7152,19 @@ LastActivity: () => LastActivity,
 MAX_FREQUENTS: () => MAX_FREQUENTS,
 MembersAmount: () => MembersAmount
 });
-const _extends5__ = REQ_(168);
+const _extends6__ = REQ_(168);
 const react0__ = REQ_(594);
 const react0 = REQ_.n(react0__);
 const _mixins1__ = REQ_(137);
-const _ui_utils_jsx4__ = REQ_(314);
-const _ui_perfectScrollbar_jsx6__ = REQ_(486);
+const _ui_utils_jsx5__ = REQ_(314);
+const _ui_perfectScrollbar_jsx7__ = REQ_(486);
 const _ui_buttons_jsx3__ = REQ_(994);
 const _ui_dropdowns_jsx2__ = REQ_(911);
-const _contactsPanel_contactsPanel_jsx8__ = REQ_(173);
-const _ui_modalDialogs9__ = REQ_(318);
-const _link_jsx7__ = REQ_(280);
+const _contactsPanel_contactsPanel_jsx9__ = REQ_(173);
+const _ui_modalDialogs10__ = REQ_(318);
+const _link_jsx8__ = REQ_(280);
+const _updateObserver_jsx4__ = REQ_(501);
+
 
 
 
@@ -7480,47 +7483,32 @@ class ContactPresence extends _mixins1__.w9 {
     this.addDataStructListenerForProperties(this.props.contact, ['presence']);
   }
   render() {
-    const {contact} = this.props;
-    const className = this.props.className || '';
+    const {
+      contact,
+      className
+    } = this.props;
     if (!contact || !contact.c) {
       return null;
     }
-    const pres = megaChat.userPresenceToCssClass(contact.presence);
     return react0().createElement("div", {
-      className: `user-card-presence ${pres} ${className}`
+      className: `
+                    user-card-presence
+                    ${megaChat.userPresenceToCssClass(contact.presence)}
+                    ${className || ''}
+                `
     });
   }
 }
 ContactPresence.defaultProps = {
-  'manualDataChangeTracking': true,
-  'skipQueuedUpdatesOnResize': true
+  manualDataChangeTracking: true,
+  skipQueuedUpdatesOnResize: true
 };
-class LastActivity extends _mixins1__.u9 {
-  constructor(...args) {
-    super(...args);
-    this.lastActivityInterval = undefined;
-    this.state = {
-      updated: 0
-    };
-    this.doUpdate = () => this.isComponentVisible() && document.visibilityState === 'visible' && this.setState(state => ({
-      updated: ++state.updated
-    }));
-  }
+const LastActivity = (0,_mixins1__.Zz)(_updateObserver_jsx4__.Y)((() => class LastActivity extends _mixins1__.u9 {
   attachRerenderCallbacks() {
     this._attachRerenderCbContacts(['ats', 'lastGreen', 'presence']);
   }
   shouldComponentUpdate() {
     return true;
-  }
-  componentWillUnmount() {
-    super.componentWillUnmount();
-    clearInterval(this.lastActivityInterval);
-    document.removeEventListener('visibilitychange', this.doUpdate);
-  }
-  componentDidMount() {
-    super.componentDidMount();
-    this.lastActivityInterval = setInterval(this.doUpdate, 6e4);
-    document.addEventListener('visibilitychange', this.doUpdate);
   }
   render() {
     const {
@@ -7531,12 +7519,12 @@ class LastActivity extends _mixins1__.u9 {
       return null;
     }
     const lastActivity = !contact.ats || contact.lastGreen > contact.ats ? contact.lastGreen : contact.ats;
-    const SECONDS = new Date().getTime() / 1000 - lastActivity;
+    const SECONDS = Date.now() / 1000 - lastActivity;
     const timeToLast = SECONDS > 3888000 ? l[20673] : time2last(lastActivity, true);
     const hasActivityStatus = showLastGreen && contact.presence <= 2 && lastActivity;
     return react0().createElement("span", null, hasActivityStatus ? (l[19994] || 'Last seen %s').replace('%s', timeToLast) : M.onlineStatusClass(contact.presence)[0]);
   }
-}
+})());
 class ContactAwareName extends _mixins1__.u9 {
   render() {
     const {
@@ -7549,7 +7537,7 @@ class ContactAwareName extends _mixins1__.u9 {
     }
     const name = M.getNameByHandle(contact.u || contact.h);
     if (emoji || overflow) {
-      const EmojiComponent = overflow ? _ui_utils_jsx4__.sp : _ui_utils_jsx4__.zT;
+      const EmojiComponent = overflow ? _ui_utils_jsx5__.sp : _ui_utils_jsx5__.zT;
       return react0().createElement(EmojiComponent, this.props, name);
     }
     return react0().createElement("span", null, name);
@@ -7655,7 +7643,7 @@ class Avatar extends _mixins1__.u9 {
       }
     }
     if (avatarMeta.type === "image") {
-      displayedAvatar = react0().createElement("div", (0,_extends5__.A)({
+      displayedAvatar = react0().createElement("div", (0,_extends6__.A)({
         className: classes,
         style: this.props.style
       }, extraProps, {
@@ -7673,7 +7661,7 @@ class Avatar extends _mixins1__.u9 {
       if (isLoading) {
         classes += " default-bg";
       }
-      displayedAvatar = react0().createElement("div", (0,_extends5__.A)({
+      displayedAvatar = react0().createElement("div", (0,_extends6__.A)({
         className: classes,
         style: this.props.style
       }, extraProps, {
@@ -7730,7 +7718,7 @@ class ContactCard extends _mixins1__.u9 {
     if (contact.u === u_handle) {
       username += ` (${  escapeHTML(l[8885])  })`;
     }
-    let escapedUsername = react0().createElement(_ui_utils_jsx4__.sp, null, username);
+    let escapedUsername = react0().createElement(_ui_utils_jsx5__.sp, null, username);
     const dropdowns = this.props.dropdowns ? this.props.dropdowns : [];
     const noContextMenu = this.props.noContextMenu ? this.props.noContextMenu : "";
     const noContextButton = this.props.noContextButton ? this.props.noContextButton : "";
@@ -7763,7 +7751,7 @@ class ContactCard extends _mixins1__.u9 {
           });
         }
         if (matches.length > 0) {
-          escapedUsername = react0().createElement(_ui_utils_jsx4__.P9, null, megaChat.highlight(megaChat.html(username), matches, true));
+          escapedUsername = react0().createElement(_ui_utils_jsx5__.P9, null, megaChat.highlight(megaChat.html(username), matches, true));
         }
       }
       if (emailTooltips) {
@@ -7886,7 +7874,7 @@ class ContactItem extends _mixins1__.u9 {
       noContextMenu: this.props.noContextMenu,
       contact,
       className: "light",
-      label: react0().createElement(_ui_utils_jsx4__.zT, null, username),
+      label: react0().createElement(_ui_utils_jsx5__.zT, null, username),
       chatRoom: this.props.chatRoom
     })));
   }
@@ -7939,7 +7927,7 @@ class ContactPickerWidget extends _mixins1__.w9 {
           }
         });
       });
-      return react0().createElement(_ui_perfectScrollbar_jsx6__.O, {
+      return react0().createElement(_ui_perfectScrollbar_jsx7__.O, {
         className: "contacts-search-scroll",
         selected,
         contacts
@@ -7964,7 +7952,7 @@ class ContactPickerWidget extends _mixins1__.w9 {
     }
     return react0().createElement("div", {
       className: "picker-user-limit-banner"
-    }, activeCall.organiser === u_handle ? (0,_ui_utils_jsx4__.lI)(l.invite_limit_banner_organiser, '[A]', _link_jsx7__.A, {
+    }, activeCall.organiser === u_handle ? (0,_ui_utils_jsx5__.lI)(l.invite_limit_banner_organiser, '[A]', _link_jsx8__.A, {
       onClick() {
         window.open(`${getBaseUrl()}/pro`, '_blank', 'noopener,noreferrer');
         eventlog(500263);
@@ -8223,7 +8211,7 @@ class ContactPickerWidget extends _mixins1__.w9 {
         }
         multipleContacts = react0().createElement("div", {
           className: "horizontal-contacts-list"
-        }, react0().createElement(_ui_perfectScrollbar_jsx6__.O, {
+        }, react0().createElement(_ui_perfectScrollbar_jsx7__.O, {
           className: "perfectScrollbarContainer selected-contact-block horizontal-only",
           selected: this.state.selected,
           ref (psSelected) {
@@ -8331,7 +8319,7 @@ class ContactPickerWidget extends _mixins1__.w9 {
           }, l[19115])));
         }
       } else {
-        contactsList = react0().createElement(_ui_perfectScrollbar_jsx6__.O, {
+        contactsList = react0().createElement(_ui_perfectScrollbar_jsx7__.O, {
           ref: ref => {
             self.searchContactsScroll = ref;
           },
@@ -8398,7 +8386,7 @@ class ContactPickerWidget extends _mixins1__.w9 {
                     `
       }, react0().createElement("i", {
         className: "sprite-fm-mono icon-link-circle"
-      }), react0().createElement(_ui_utils_jsx4__.P9, null, l[19111])));
+      }), react0().createElement(_ui_utils_jsx5__.P9, null, l[19111])));
       extraClasses += " no-contacts";
     }
     const totalContactsNum = contacts.length + frequentContacts.length;
@@ -8471,7 +8459,7 @@ class ContactPickerWidget extends _mixins1__.w9 {
       className: "sprite-fm-mono icon-close-component"
     })))), this.props.inviteWarningLabel && this.props.chatRoom && this.renderInviteWarning(), !this.props.readOnly && haveContacts && !this.props.hideSearch && react0().createElement("div", {
       className: "contacts-search-header-separator"
-    }), this.props.participantsList ? this.renderParticipantsList() : contactsList, selectFooter, _contactsPanel_contactsPanel_jsx8__.A.hasContacts() && this.props.showAddContact && react0().createElement("div", {
+    }), this.props.participantsList ? this.renderParticipantsList() : contactsList, selectFooter, _contactsPanel_contactsPanel_jsx9__.A.hasContacts() && this.props.showAddContact && react0().createElement("div", {
       className: "contacts-search-bottom"
     }, react0().createElement(_ui_buttons_jsx3__.$, {
       className: "mega-button action positive",
@@ -8519,7 +8507,7 @@ class ContactPickerDialog extends _mixins1__.w9 {
       onClose,
       onSelectDone
     } = this.props;
-    return react0().createElement(_ui_modalDialogs9__.A.ModalDialog, {
+    return react0().createElement(_ui_modalDialogs10__.A.ModalDialog, {
       name,
       className: `${className} contact-picker-dialog contacts-search`,
       onClose
@@ -9045,7 +9033,10 @@ ColumnContactButtons.sortable = false;
 ColumnContactButtons.id = "grid-url-header-nw";
 ColumnContactButtons.label = "";
 ColumnContactButtons.megatype = "grid-url-header-nw";
+// EXTERNAL MODULE: ./js/chat/ui/updateObserver.jsx
+const updateObserver = REQ_(501);
 ;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/contactList.jsx
+
 
 
 
@@ -9058,7 +9049,6 @@ ColumnContactButtons.megatype = "grid-url-header-nw";
 class ContactList extends mixins.w9 {
   constructor(props) {
     super(props);
-    this.lastInteractionInterval = undefined;
     this.contextMenuRefs = [];
     this.state = {
       selected: [],
@@ -9142,14 +9132,9 @@ class ContactList extends mixins.w9 {
       this.onExpand(this.state.selected[0]);
     }
   }
-  componentWillUnmount() {
-    super.componentWillUnmount();
-    clearInterval(this.lastInteractionInterval);
-  }
   componentDidMount() {
     super.componentDidMount();
     this.getLastInteractions();
-    this.lastInteractionInterval = setInterval(this.getLastInteractions, 6e4);
   }
   render() {
     const {
@@ -9159,7 +9144,7 @@ class ContactList extends mixins.w9 {
       return REaCt().createElement("div", {
         className: "contacts-list"
       }, REaCt().createElement(fmView.A, {
-        dataSource: this.props.contacts,
+        dataSource: contacts,
         customFilterFn: r => {
           return r.c === 1;
         },
@@ -9178,7 +9163,7 @@ class ContactList extends mixins.w9 {
         listAdapterColumns: [ColumnContactName, ColumnContactStatus, [ColumnContactLastInteraction, {
           interactions: this.state.interactions
         }], [ColumnContactVerifiedStatus, {
-          contacts: this.props.contacts
+          contacts
         }], [ColumnContactButtons, {
           onContextMenuRef: (handle, node) => {
             this.contextMenuRefs[handle] = node;
@@ -9205,6 +9190,9 @@ class ContactList extends mixins.w9 {
     });
   }
 }
+ContactList.updateListener = 'getLastInteractions';
+ContactList.updateInterval = 6e4;
+const contactList = (0,mixins.Zz)(updateObserver.Y)(ContactList);
 ;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactRequestsEmail.jsx
 
 
@@ -9883,7 +9871,7 @@ class ContactsPanel extends mixins.w9 {
       } = this;
       switch (view) {
         case ContactsPanel.VIEW.CONTACTS:
-          return REaCt().createElement(ContactList, {
+          return REaCt().createElement(contactList, {
             contacts
           });
         case ContactsPanel.VIEW.PROFILE:
@@ -18863,7 +18851,6 @@ const ConversationsListItem = (_dec = utils.Ay.SoonFcWrap(40, true), _dec2 = (0,
     }
     let nameClassString = "user-card-name conversation-name selectable-txt";
     let contactId;
-    let presenceClass;
     let id;
     let contact;
     if (chatRoom.type === "private") {
@@ -18873,16 +18860,14 @@ const ConversationsListItem = (_dec = utils.Ay.SoonFcWrap(40, true), _dec2 = (0,
       }
       contact = M.u[handle];
       id = `conversation_${  htmlentities(contact.u)}`;
-      presenceClass = chatRoom.megaChat.userPresenceToCssClass(contact.presence);
+      chatRoom.megaChat.userPresenceToCssClass(contact.presence);
     } else if (chatRoom.type === "group") {
       contactId = roomId;
       id = `conversation_${  contactId}`;
-      presenceClass = 'group';
       classString += ' groupchat';
     } else if (chatRoom.type === "public") {
       contactId = roomId;
       id = `conversation_${  contactId}`;
-      presenceClass = 'group';
       classString += ' groupchat public';
     } else {
       return `unknown room type: ${  chatRoom.roomId}`;
@@ -18989,8 +18974,8 @@ const ConversationsListItem = (_dec = utils.Ay.SoonFcWrap(40, true), _dec2 = (0,
       className: "sprite-fm-mono icon-notification-off-filled muted-conversation-icon"
     }) : null), REaCt().createElement("div", {
       className: "conversation-data-badges"
-    }, chatRoom.type === 'private' ? REaCt().createElement("span", {
-      className: `user-card-presence ${presenceClass}`
+    }, chatRoom.type === 'private' ? REaCt().createElement(ui_contacts.ContactPresence, {
+      contact
     }) : null, chatRoom.type === 'group' || chatRoom.type === 'private' ? REaCt().createElement("i", {
       className: "sprite-fm-uni icon-ekr-key simpletip",
       "data-simpletip": l[20935]
@@ -19336,7 +19321,10 @@ class Meetings extends mixins.w9 {
     }, this.getContainerStyles(ongoingMeetings)), tab === UPCOMING && REaCt().createElement(this.Upcoming, null), tab === PAST && REaCt().createElement(this.Past, null)));
   }
 }
+// EXTERNAL MODULE: ./js/chat/ui/updateObserver.jsx
+const updateObserver = REQ_(501);
 ;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/leftPanel.jsx
+
 
 
 
@@ -19353,7 +19341,6 @@ class LeftPanel extends mixins.w9 {
   constructor(props) {
     super(props);
     this.state = {
-      updated: 0,
       archived: false,
       archivedUnmounting: false,
       filter: '',
@@ -19370,16 +19357,10 @@ class LeftPanel extends mixins.w9 {
         }) => ref.reinitialise == null ? void 0 : ref.reinitialise());
       });
     };
-    this.doUpdate = this.doUpdate.bind(this);
     this.state.contactRequests = Object.keys(M.ipc).length;
   }
   customIsEventuallyVisible() {
     return M.chat;
-  }
-  doUpdate() {
-    return this.isComponentVisible() && document.visibilityState === 'visible' && this.setState(state => ({
-      updated: ++state.updated
-    }), () => this.safeForceUpdate());
   }
   renderLoading() {
     return REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("span", {
@@ -19408,14 +19389,11 @@ class LeftPanel extends mixins.w9 {
   }
   componentWillUnmount() {
     super.componentWillUnmount();
-    clearInterval(this.backgroundUpdateInterval);
     megaChat.unbind(`onUnreadCountUpdate.${NAMESPACE}`);
     mBroadcaster.removeListener(this.contactRequestsListener);
-    document.removeEventListener('visibilitychange', this.doUpdate);
   }
   componentDidMount() {
     super.componentDidMount();
-    this.doUpdate();
     megaChat.rebind(`onUnreadCountUpdate.${NAMESPACE}`, (ev, {
       unreadChats,
       unreadMeetings
@@ -19428,8 +19406,6 @@ class LeftPanel extends mixins.w9 {
     this.contactRequestsListener = mBroadcaster.addListener('fmViewUpdate:ipc', () => this.setState({
       contactRequests: Object.keys(M.ipc).length
     }));
-    this.backgroundUpdateInterval = setInterval(this.doUpdate, 600000);
-    document.addEventListener('visibilitychange', this.doUpdate);
   }
   render() {
     const {
@@ -19510,6 +19486,7 @@ class LeftPanel extends mixins.w9 {
     }))));
   }
 }
+const leftPanel = (0,mixins.Zz)(updateObserver.Y)(LeftPanel);
 ;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/freeCallEnded.jsx
 
 
@@ -19910,7 +19887,7 @@ class ConversationsApp extends mixins.w9 {
       key: "conversationsApp",
       className: "conversationsApp"
     }, contactSelectorDialog && REaCt().createElement(ContactSelectorDialog, {
-      className: `main-start-chat-dropdown ${LeftPanel.NAMESPACE}-contact-selector`,
+      className: `main-start-chat-dropdown ${leftPanel.NAMESPACE}-contact-selector`,
       multiple: false,
       topButtons: [{
         key: 'newGroupChat',
@@ -19978,7 +19955,7 @@ class ConversationsApp extends mixins.w9 {
           freeCallEndedDialog: false
         });
       }
-    }), REaCt().createElement(LeftPanel, {
+    }), REaCt().createElement(leftPanel, {
       view,
       views: VIEWS,
       routingSection,
@@ -33059,6 +33036,54 @@ const TypingArea = (_dec = (0,mixins.hG)(54, true), _class = class TypingArea ex
     }))), buttons);
   }
 }, (0,applyDecoratedDescriptor.A)(_class.prototype, "handleWindowResize", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "handleWindowResize"), _class.prototype), _class);
+
+},
+
+501:
+(_, EXP_, REQ_) => {
+
+"use strict";
+REQ_.d(EXP_, {
+Y: () => withUpdateObserver
+});
+const _extends2__ = REQ_(168);
+const react0__ = REQ_(594);
+const react0 = REQ_.n(react0__);
+const _mixins_js1__ = REQ_(137);
+
+
+
+const withUpdateObserver = Component => class extends _mixins_js1__.w9 {
+  constructor(...args) {
+    super(...args);
+    this.updateInterval = 600000;
+    this.instanceRef = react0().createRef();
+    this.intervalRef = undefined;
+    this.state = {
+      updated: 0
+    };
+    this.updateListener = () => {
+      return this.isComponentVisible() && document.visibilityState === 'visible' && this.setState(state => ({
+        updated: ++state.updated
+      }), () => this.safeForceUpdate());
+    };
+  }
+  componentWillUnmount() {
+    super.componentWillUnmount();
+    document.removeEventListener('visibilitychange', this.updateListener);
+    clearInterval(this.intervalRef);
+  }
+  componentDidMount() {
+    super.componentDidMount();
+    document.addEventListener('visibilitychange', this.updateListener);
+    this.intervalRef = setInterval(this.instanceRef.current[Component.updateListener] || this.updateListener, Component.updateInterval || this.updateInterval);
+  }
+  render() {
+    return react0().createElement(Component, (0,_extends2__.A)({
+      ref: this.instanceRef
+    }, this.props));
+  }
+};
 
 },
 

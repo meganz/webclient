@@ -423,6 +423,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             for (const activeCallId of self.activeCallIds.keys()) {
                 self.activeCallIds.remove(activeCallId);
             }
+            megaChat.updateSectionUnreadCount();
         }
     });
 
@@ -1166,6 +1167,7 @@ ChatRoom.prototype.leave = function(notify) {
         for (const activeCallId of this.activeCallIds.keys()) {
             this.activeCallIds.remove(activeCallId);
         }
+        megaChat.updateSectionUnreadCount();
     }
 };
 
@@ -2202,6 +2204,7 @@ ChatRoom.prototype.subscribeForCallEvents = function() {
             }
         }
 
+        megaChat.updateSectionUnreadCount();
         this.callParticipantsUpdated();
     });
     this.rebind("onChatdPeerLeftCall.callManager", (e, data) => {
@@ -2249,6 +2252,7 @@ ChatRoom.prototype.subscribeForCallEvents = function() {
         this.callUserLimited = false;
         this.stopRinging(data.callId);
         this.callParticipantsUpdated();
+        megaChat.updateSectionUnreadCount();
     });
     this.rebind('onCallState.callManager', function(e, data) {
         const ac = this.activeCallIds[data.callId];
@@ -2261,6 +2265,7 @@ ChatRoom.prototype.subscribeForCallEvents = function() {
     this.rebind('onRoomDisconnected.callManager', function() {
         this.activeCallIds.clear(); // av: Added this to complement the explicit handling of chatd call events
         // Keep the current call active when online, but chatd got disconnected
+        megaChat.updateSectionUnreadCount();
         if (navigator.onLine) {
             return;
         }

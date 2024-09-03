@@ -719,6 +719,43 @@
         },
 
         /**
+         * Find folder node by name.
+         * @param {String} target The target to lookup at
+         * @param {String} name The folder name to check against
+         * @returns {Object} The found node
+         */
+        getFolderByName(target, name) {
+            const t = M.c[target];
+
+            if (t) {
+                if (!keepBothState[target]) {
+                    keepBothState[target] = Object.create(null);
+                }
+                if (!keepBothState[target]['~/.folders.db']) {
+                    const store = keepBothState[target]['~/.folders.db'] = Object.create(null);
+
+                    for (const h in t) {
+                        if (t[h] > 1) {
+                            const n = M.d[h];
+                            if (n && n.name) {
+                                store[n.name] = n;
+                            }
+                        }
+                    }
+
+                    queueMicrotask(() => {
+                        if (keepBothState[target]) {
+                            delete keepBothState[target]['~/.folders.db'];
+                        }
+                    });
+                }
+                return keepBothState[target]['~/.folders.db'][name];
+            }
+
+            return false;
+        },
+
+        /**
          * Locate file in the upload queue
          * @param {String} target The target to lookup at
          * @param {String} name The name to check against

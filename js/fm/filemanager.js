@@ -331,8 +331,8 @@ FileManager.prototype.initFileManagerUI = function() {
         });
         $.hideContextMenu();
 
-        if (is_eplusplus && megaChatIsReady && megaChat.activeCall) {
-            // In call permissions dialog may have been shown. Don't leave the call UI.
+        if (is_eplusplus && megaChatIsReady && M.chat) {
+            // e++ in chat so don't navigate away.
             return;
         }
 

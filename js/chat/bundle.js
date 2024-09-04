@@ -392,7 +392,7 @@ class ScheduledMeeting {
     return !!this.canceled;
   }
   get isUpcoming() {
-    return !this.isCanceled && !this.isPast;
+    return !this.isCanceled && !this.isPast && this.chatRoom.members[u_handle] >= 0;
   }
   get isRecurring() {
     return !!this.recurring;
@@ -410,6 +410,9 @@ class ScheduledMeeting {
     return this.isRoot ? null : this.megaChat.plugins.meetingsManager.getMeetingById(this.parentId);
   }
   setNextOccurrence() {
+    if (!this.didFetchOccurrences) {
+      return;
+    }
     const upcomingOccurrences = Object.values(this.occurrences).filter(o => o.isUpcoming);
     if (!upcomingOccurrences || !upcomingOccurrences.length) {
       this.isPast = this.isRecurring || this.end < Date.now();
@@ -446,6 +449,7 @@ class ScheduledMeeting {
       delete req.cid;
     }
     const occurrences = await asyncApiReq(req);
+    this.didFetchOccurrences = true;
     if (Array.isArray(occurrences)) {
       if (!options) {
         this.occurrences.clear();

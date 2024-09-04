@@ -220,7 +220,12 @@ accountUI.renderAccountPage = function(account) {
 
             accountUI.calls.init();
             break;
+        case '/fm/account/vpn':
+            $('.fm-account-vpn', accountUI.$contentBlock).removeClass('hidden');
+            sectionClass = 'vpn';
 
+            accountUI.vpn.init();
+            break;
         case '/fm/account/s4':
             if (!accountUI.s4 || !u_attr.s4) {
                 loadSubPage('fm/account');
@@ -807,6 +812,8 @@ accountUI.leftPane = {
                 return 'fm/account/calls';
             case $section.hasClass('s4'):
                 return 'fm/account/s4';
+            case $section.hasClass('vpn'):
+                return 'fm/account/vpn';
             default:
                 return 'fm/account';
         }
@@ -3911,5 +3918,14 @@ accountUI.s4 = {
                 mega.config.setn('s4thumbs', val ? 1 : undefined);
             }
         );
+    }
+};
+
+accountUI.vpn = {
+    init() {
+        'use strict';
+
+        this.vpnPage = this.vpnPage || new VpnPage();
+        this.vpnPage.show();
     }
 };

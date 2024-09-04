@@ -102,6 +102,28 @@ lazy(s4, 'utils', () => {
         },
 
         /**
+         * Getting containers size and objects/folders number
+         * @returns {Object} object
+         * @memberOf s4
+         */
+        getStorageData() {
+            const cn = this.getContainersList();
+            const data = {
+                ts: 0,
+                tf:  0,
+                td: cn.length
+            };
+
+            for (let i = 0; i < cn.length; i++) {
+                data.ts += cn[i].tb;
+                data.tf += cn[i].tf;
+                data.td += cn[i].td;
+            }
+
+            return data;
+        },
+
+        /**
          * Getting special path for S4 subpages except Container.
          * Unlike M.getPath, when this function used for bucket sub-folders, it returns
          * path only what url contains, not complete tree path for the current folder.

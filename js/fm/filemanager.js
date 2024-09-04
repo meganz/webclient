@@ -441,6 +441,17 @@ FileManager.prototype.initFileManagerUI = function() {
         if (type == 1) {
             // tree dropped:
             c = $(e.target).attr('class');
+
+            // If this is a tree item but it is overflowed from container
+            if (c && c.includes('nw-fm-tree-item')) {
+                const treeBound = document.querySelector('.js-myfiles-panel').getBoundingClientRect();
+
+                if (ui.offset.top < treeBound.top || ui.offset.top > treeBound.bottom ||
+                    ui.offset.left > treeBound.right || ui.offset.top > treeBound.bottom) {
+                    $(e.target).removeClass('dragover');
+                    return false;
+                }
+            }
             if (c && c.indexOf('nw-fm-left-icon') > -1) {
                 dd = 'nw-fm-left-icon';
                 if (a === 'drop') {

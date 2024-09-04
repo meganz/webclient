@@ -16707,6 +16707,10 @@ class Edit extends mixins.w9 {
     if (callExpanded || overlayed) {
       dialogClasses.push('hidden');
     }
+    const withUpgrade = !u_attr.p && endDateTime - startDateTime > 36e5;
+    if (withUpgrade) {
+      dialogClasses.push('upgrade');
+    }
     return REaCt().createElement(modalDialogs.A.ModalDialog, (0,esm_extends.A)({}, this.state, {
       id: Schedule.NAMESPACE,
       className: dialogClasses.join(' '),
@@ -16781,7 +16785,7 @@ class Edit extends mixins.w9 {
         endDateTime: timestamp
       }),
       onBlur: timestamp => timestamp && this.onEndDateSelect(timestamp)
-    }))), !u_attr.p && endDateTime - startDateTime > 36e5 && REaCt().createElement(UpgradeNotice, {
+    }))), withUpgrade && REaCt().createElement(UpgradeNotice, {
       onUpgradeClicked: () => {
         onClose();
         loadSubPage('pro');

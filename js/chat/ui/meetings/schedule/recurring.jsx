@@ -695,6 +695,10 @@ export class Edit extends MegaRenderMixin {
         if (callExpanded || overlayed) {
             dialogClasses.push('hidden');
         }
+        const withUpgrade = !u_attr.p && endDateTime - startDateTime > 36e5;
+        if (withUpgrade) {
+            dialogClasses.push('upgrade');
+        }
 
         return (
             <ModalDialogsUI.ModalDialog
@@ -769,8 +773,7 @@ export class Edit extends MegaRenderMixin {
                     </Row>
 
                     {
-                        !u_attr.p &&
-                        endDateTime - startDateTime > 36e5 &&
+                        withUpgrade &&
                         <UpgradeNotice
                             onUpgradeClicked={() => {
                                 onClose();

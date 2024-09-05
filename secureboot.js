@@ -2529,6 +2529,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/context-menu.css', n: 'context_menu_css', j:2, w:5, c:1, d:1, cache:1});
         jsl.push({f:'css/tables.css', n: 'tables_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/recents.css', n: 'recents_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/vpn.css', n: 'vpn_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/transfer-widget.css', n: 'transfer_widget_css', j:2, w:30, c:1, d:1, cache:1});
 
         // CSS Revamp changes
@@ -3407,6 +3408,7 @@ else if (!browserUpdate) {
         scriptTest(
             'es6s =' +
             (is_embed || ' BigInt(Math.pow(2, 48)) << 16n === 18446744073709551616n') + // C67 E79 F68 O54 S14
+            ' && "\u044b \u0432".match(/\\p{L}+/gu)[1] === "\u0432"' + // C64 E79 F78 O51 S11
             ' && (Array.prototype.values === Array.prototype[Symbol.iterator])' + // C66 E12 F60 O53 S9
             ' && (function *(a=1,){yield a})(2).next().value === 2', // C58 E14 F52 O45 S10
             function(error) {

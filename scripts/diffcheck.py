@@ -384,12 +384,12 @@ def reduce_htmlhint(file_line_mapping, **extra):
     result = ['\nHTMLHint output:\n================']
 
     for line in output:
-        if line.find('Config loaded:') != -1 or line.find('linearGradient') > 0:
-            continue
+        if line.find('Config loaded:') != -1:
+            continue;
         result.append(line)
 
     # Add the number of errors and return in a nicely formatted way.
-    return re.sub('\n+', '\n', '\n\n'.join(result).rstrip()), len(result) > 6
+    return re.sub('\n+', '\n', '\n\n'.join(result).rstrip()), 1
 
 def copypaste_detector(file_line_mapping):
     report = []

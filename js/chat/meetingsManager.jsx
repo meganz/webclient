@@ -123,7 +123,7 @@ class ScheduledMeeting {
     }
 
     get isUpcoming() {
-        return !this.isCanceled && !this.isPast;
+        return !this.isCanceled && !this.isPast && this.chatRoom.members[u_handle] >= 0;
     }
 
     get isRecurring() {
@@ -146,6 +146,9 @@ class ScheduledMeeting {
     }
 
     setNextOccurrence() {
+        if (!this.didFetchOccurrences) {
+            return;
+        }
         const upcomingOccurrences = Object.values(this.occurrences).filter(o => o.isUpcoming);
 
         if (!upcomingOccurrences || !upcomingOccurrences.length) {
@@ -177,6 +180,7 @@ class ScheduledMeeting {
         }
 
         const occurrences = await asyncApiReq(req);
+        this.didFetchOccurrences = true;
         if (Array.isArray(occurrences)) {
             if (!options) {
                 this.occurrences.clear();

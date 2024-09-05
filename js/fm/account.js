@@ -220,7 +220,12 @@ accountUI.renderAccountPage = function(account) {
 
             accountUI.calls.init();
             break;
+        case '/fm/account/vpn':
+            $('.fm-account-vpn', accountUI.$contentBlock).removeClass('hidden');
+            sectionClass = 'vpn';
 
+            accountUI.vpn.init();
+            break;
         case '/fm/account/s4':
             if (!accountUI.s4 || !u_attr.s4) {
                 loadSubPage('fm/account');
@@ -807,6 +812,8 @@ accountUI.leftPane = {
                 return 'fm/account/calls';
             case $section.hasClass('s4'):
                 return 'fm/account/s4';
+            case $section.hasClass('vpn'):
+                return 'fm/account/vpn';
             default:
                 return 'fm/account';
         }
@@ -2648,37 +2655,46 @@ accountUI.fileManagement = {
 
             'use strict';
 
-            $('.rubsched_textopt', accountUI.$contentBlock).rebind('click.rs blur.rs keypress.rs', function(e) {
+            $('.rubsched_textopt', accountUI.$contentBlock).rebind('click.rs blur.rs keypress.rs paste.rs', function(e){
+
+                // Firefox fix bug on allowing strings on input type number applies to Webkit also
+                if (this.id === 'rad14_opt' && (e.type === 'paste' || e.type === 'keypress') &&
+                    isNaN(e.type === 'paste' ? e.originalEvent.clipboardData.getData('text') : e.key)) {
+                    return false;
+                }
 
                 // Do not save value until user leave input or click Enter button
                 if (e.which && e.which !== 13) {
                     return;
                 }
 
-                var curVal = parseInt($(this).val()) | 0;
-                var maxVal;
+                if ($(this).val().length !== 0) {
 
-                if (this.id === 'rad14_opt') { // For days option
-                    var minVal = 7;
-                    maxVal = u_attr.p ? Math.pow(2, 53) : 30;
-                    curVal = Math.min(Math.max(curVal, minVal), maxVal);
-                    var rad14_optString = mega.icu.format(l.clear_rub_bin_days, curVal);
-                    var rad14_optArray = rad14_optString.split(/\[A]|\[\/A]/);
-                    curVal = rad14_optArray[1];
-                    $('#rad14_opt_txt_1', accountUI.$contentBlock).text(rad14_optArray[0]);
-                    $('#rad14_opt_txt_2', accountUI.$contentBlock).text(rad14_optArray[2]);
+                    var curVal = parseInt($(this).val()) | 0;
+                    var maxVal;
+
+                    if (this.id === 'rad14_opt') { // For days option
+                        var minVal = 7;
+                        maxVal = u_attr.p ? Math.pow(2, 53) : 30;
+                        curVal = Math.min(Math.max(curVal, minVal), maxVal);
+                        var rad14_optString = mega.icu.format(l.clear_rub_bin_days, curVal);
+                        var rad14_optArray = rad14_optString.split(/\[A]|\[\/A]/);
+                        curVal = rad14_optArray[1];
+                        $('#rad14_opt_txt_1', accountUI.$contentBlock).text(rad14_optArray[0]);
+                        $('#rad14_opt_txt_2', accountUI.$contentBlock).text(rad14_optArray[2]);
+                    }
+
+                    if (this.id === 'rad15_opt') { // For size option
+                        // Max value cannot be over current account's total storage space.
+                        maxVal = account.space / Math.pow(1024, 3);
+                        curVal = Math.min(curVal, maxVal);
+                    }
+
+                    $(this).val(curVal);
+
+                    var id = String(this.id).split('_')[0];
+                    mega.config.setn('rubsched', `${id.substr(3)}:${curVal}`);
                 }
-
-                if (this.id === 'rad15_opt') { // For size option
-                    // Max value cannot be over current account's total storage space.
-                    maxVal = account.space / Math.pow(1024, 3);
-                    curVal = Math.min(curVal, maxVal);
-                }
-
-                $(this).val(curVal);
-
-                var id = String(this.id).split('_')[0];
-                mega.config.setn('rubsched', id.substr(3) + ':' + curVal);
             });
         }
     },
@@ -3241,7 +3257,15 @@ accountUI.contactAndChat = {
                             // hours + minutes -> seconds || default to 300 seconds as min
                             .reduce((a, b) => a + b) || 300
                     )
-                );
+                ).rebind('keypress.dashboard paste.dashboard', e => {
+
+                    // Firefox fix bug on allowing strings on input type number applies to Webkit also
+                    const checkingValue = e.type === 'paste' ? e.originalEvent.clipboardData.getData('text') : e.key;
+
+                    if (isNaN(checkingValue)) {
+                        return false;
+                    }
+                });
             }
         },
     },
@@ -3894,5 +3918,14 @@ accountUI.s4 = {
                 mega.config.setn('s4thumbs', val ? 1 : undefined);
             }
         );
+    }
+};
+
+accountUI.vpn = {
+    init() {
+        'use strict';
+
+        this.vpnPage = this.vpnPage || new VpnPage();
+        this.vpnPage.show();
     }
 };

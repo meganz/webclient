@@ -80,7 +80,7 @@ class ChatRouting {
       if (room) {
         room.show();
         args.route.location = room.getRoomUrl();
-      } else if (!roomId || roomId === u_handle || roomId.length !== 11) {
+      } else if (!roomId || roomId === u_handle || roomId.length !== 11 && !is_chatlink) {
         ChatRouting.gPageHandlers.redirect(args.route, 'fm/chat').then(resolve).catch(reject);
         resolve = null;
       } else if (section === 'p') {
@@ -98,8 +98,8 @@ class ChatRouting {
             return EEXPIRED;
           }
           megaChat.cleanup(true);
-          if (ex === ENOENT && megaChat.publicChatKeys[roomId]) {
-            msgDialog('warninga', l[20641], l[20642], 0, () => {
+          if (ex === ENOENT || ex === EBLOCKED && megaChat.publicChatKeys[roomId]) {
+            msgDialog('warninga', '', l[20641], l[20642], () => {
               loadSubPage(is_chatlink ? 'start' : 'fm/chat', event);
             });
           } else {
@@ -392,7 +392,7 @@ class ScheduledMeeting {
     return !!this.canceled;
   }
   get isUpcoming() {
-    return !this.isCanceled && !this.isPast;
+    return !this.isCanceled && !this.isPast && this.chatRoom.members[u_handle] >= 0;
   }
   get isRecurring() {
     return !!this.recurring;
@@ -410,6 +410,9 @@ class ScheduledMeeting {
     return this.isRoot ? null : this.megaChat.plugins.meetingsManager.getMeetingById(this.parentId);
   }
   setNextOccurrence() {
+    if (!this.didFetchOccurrences) {
+      return;
+    }
     const upcomingOccurrences = Object.values(this.occurrences).filter(o => o.isUpcoming);
     if (!upcomingOccurrences || !upcomingOccurrences.length) {
       this.isPast = this.isRecurring || this.end < Date.now();
@@ -446,6 +449,7 @@ class ScheduledMeeting {
       delete req.cid;
     }
     const occurrences = await asyncApiReq(req);
+    this.didFetchOccurrences = true;
     if (Array.isArray(occurrences)) {
       if (!options) {
         this.occurrences.clear();
@@ -4026,6 +4030,7 @@ const ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, c
       for (const activeCallId of self.activeCallIds.keys()) {
         self.activeCallIds.remove(activeCallId);
       }
+      megaChat.updateSectionUnreadCount();
     }
   });
   this.rebind(`onCallUserLimitExceeded.${chatId}`, () => {
@@ -4462,6 +4467,7 @@ ChatRoom.prototype.leave = function (notify) {
     for (const activeCallId of this.activeCallIds.keys()) {
       this.activeCallIds.remove(activeCallId);
     }
+    megaChat.updateSectionUnreadCount();
   }
 };
 ChatRoom.prototype.archive = function () {
@@ -5181,6 +5187,7 @@ ChatRoom.prototype.subscribeForCallEvents = function () {
         });
       }
     }
+    megaChat.updateSectionUnreadCount();
     this.callParticipantsUpdated();
   });
   this.rebind("onChatdPeerLeftCall.callManager", (e, data) => {
@@ -5227,6 +5234,7 @@ ChatRoom.prototype.subscribeForCallEvents = function () {
     this.callUserLimited = false;
     this.stopRinging(data.callId);
     this.callParticipantsUpdated();
+    megaChat.updateSectionUnreadCount();
   });
   this.rebind('onCallState.callManager', function (e, data) {
     const ac = this.activeCallIds[data.callId];
@@ -5238,6 +5246,7 @@ ChatRoom.prototype.subscribeForCallEvents = function () {
   });
   this.rebind('onRoomDisconnected.callManager', function () {
     this.activeCallIds.clear();
+    megaChat.updateSectionUnreadCount();
     if (navigator.onLine) {
       return;
     }
@@ -10670,6 +10679,12 @@ class HistoryRetentionDialog extends React_.Component {
         timeRange: this.filterTimeRange(prevState.timeRange, selectedTimeFormat)
       }));
     };
+    this.handleOnTimeCheck = e => {
+      const checkingValue = e.type === 'paste' ? e.clipboardData.getData('text') : e.key;
+      if (e.keyCode !== 8 && isNaN(checkingValue)) {
+        e.preventDefault();
+      }
+    };
     this.handleOnTimeChange = e => {
       const timeValue = e.target.value;
       this.setState(prevState => ({
@@ -10689,7 +10704,7 @@ class HistoryRetentionDialog extends React_.Component {
   hasInput() {
     return this.state.timeRange && parseInt(this.state.timeRange, 10) >= 1;
   }
-  getDefaultValue(selectedTimeFormat) {
+  getMaxTimeRange(selectedTimeFormat) {
     switch (selectedTimeFormat) {
       case chat_chatRoom.RETENTION_FORMAT.HOURS:
         return LIMIT.HOURS;
@@ -10702,7 +10717,7 @@ class HistoryRetentionDialog extends React_.Component {
     }
   }
   getParsedLabel(label, timeRange) {
-    timeRange = timeRange ? parseInt(timeRange, 10) : this.getDefaultValue(label);
+    timeRange = timeRange ? parseInt(timeRange, 10) : this.getMaxTimeRange(label);
     switch (label) {
       case chat_chatRoom.RETENTION_FORMAT.HOURS:
         return mega.icu.format(l.plural_hour, timeRange);
@@ -10722,17 +10737,7 @@ class HistoryRetentionDialog extends React_.Component {
     if (timeRange === 0 || isNaN(timeRange)) {
       return '';
     }
-    switch (selectedTimeFormat) {
-      case chat_chatRoom.RETENTION_FORMAT.HOURS:
-        return timeRange > LIMIT.HOURS ? LIMIT.HOURS : timeRange;
-      case chat_chatRoom.RETENTION_FORMAT.DAYS:
-        return timeRange > LIMIT.DAYS ? LIMIT.DAYS : timeRange;
-      case chat_chatRoom.RETENTION_FORMAT.WEEKS:
-        return timeRange > LIMIT.WEEKS ? LIMIT.WEEKS : timeRange;
-      case chat_chatRoom.RETENTION_FORMAT.MONTHS:
-        return timeRange > LIMIT.MONTHS ? LIMIT.MONTHS : timeRange;
-    }
-    return timeRange;
+    return Math.min(this.getMaxTimeRange(selectedTimeFormat), timeRange);
   }
   handleOnSubmit(e) {
     if (!this.hasInput()) {
@@ -10820,13 +10825,15 @@ class HistoryRetentionDialog extends React_.Component {
       type: "number",
       min: "0",
       step: "1",
+      max: this.getMaxTimeRange(selectedTimeFormat),
       className: "form-section-time",
-      placeholder: this.getDefaultValue(selectedTimeFormat),
+      placeholder: this.getMaxTimeRange(selectedTimeFormat),
       ref: this.inputRef,
       autoFocus: true,
       value: timeRange,
       onChange: this.handleOnTimeChange,
-      onKeyDown: e => (e.key === '-' || e.key === '+' || e.key === 'e') && e.preventDefault()
+      onKeyPress: this.handleOnTimeCheck,
+      onPaste: this.handleOnTimeCheck
     })), REaCt().createElement("div", {
       className: "form-section"
     }, REaCt().createElement("div", {
@@ -27441,7 +27448,8 @@ class StreamControls extends _mixins1__.w9 {
       devices: {},
       audioSelectDropdown: false,
       videoSelectDropdown: false,
-      loading: false
+      loading: false,
+      muteSpeak: false
     };
     this.LeaveButton = (0,_hostsObserver_jsx2__.C)(({
       hasHost,
@@ -27466,7 +27474,7 @@ class StreamControls extends _mixins1__.w9 {
         }
       }, react0().createElement("span", null, l.leave));
     });
-    this.setActiveElement = () => this.props.setActiveElement(this.state.audioSelectDropdown || this.state.videoSelectDropdown || this.state.endCallOptions);
+    this.setActiveElement = forced => this.props.setActiveElement(forced || this.state.audioSelectDropdown || this.state.videoSelectDropdown || this.state.endCallOptions);
     this.handleMousedown = ({
       target
     }) => {
@@ -27940,11 +27948,9 @@ class StreamControls extends _mixins1__.w9 {
     super.componentDidMount();
     document.addEventListener('mousedown', this.handleMousedown);
     navigator.mediaDevices.addEventListener('devicechange', this.handleDeviceChange);
-    this.props.chatRoom.rebind(`onLocalSpeechDetected.${StreamControls.NAMESPACE}`, () => {
-      this.setState({
-        localMicDetected: true
-      });
-    });
+    this.props.chatRoom.rebind(`onLocalSpeechDetected.${StreamControls.NAMESPACE}`, () => this.setState({
+      muteSpeak: true
+    }, () => this.setActiveElement(true)));
   }
   render() {
     const {
@@ -27965,7 +27971,7 @@ class StreamControls extends _mixins1__.w9 {
     const {
       audioSelectDropdown,
       videoSelectDropdown,
-      localMicDetected
+      muteSpeak
     } = this.state;
     const avFlags = call.av;
     const isOnHold = avFlags & Av.onHold;
@@ -27976,31 +27982,24 @@ class StreamControls extends _mixins1__.w9 {
                                 ${isOnHold ? 'disabled' : ''}
                                 with-input-selector
                             `,
-      onClick: () => {
-        if (isOnHold) {
-          return;
-        }
+      onClick: () => isOnHold ? null : this.setState({
+        muteSpeak: false
+      }, () => {
         resetError(Av.Audio);
         onAudioClick();
-        if (!(avFlags & Av.Audio)) {
-          this.setState({
-            localMicDetected: false
-          });
-        }
-      }
-    }, localMicDetected && react0().createElement("div", {
+      })
+    }, muteSpeak && react0().createElement("div", {
       className: "mic-muted-tip theme-light-forced",
-      onClick: e => {
-        e.preventDefault();
-        e.stopPropagation();
-      }
+      onClick: ev => ev.stopPropagation()
     }, react0().createElement("span", null, l.mic_still_muted), react0().createElement(_button_jsx3__.A, {
       className: "mic-muted-tip-btn",
       onClick: () => {
         this.setState({
-          localMicDetected: false
+          muteSpeak: false
+        }, () => {
+          this.setActiveElement();
+          eventlog(500509);
         });
-        eventlog(500509);
       }
     }, l[148]), react0().createElement("i", {
       className: "sprite-fm-mono icon-tooltip-arrow tooltip-arrow bottom"

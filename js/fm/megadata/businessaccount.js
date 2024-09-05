@@ -529,8 +529,9 @@ BusinessAccount.prototype.getQuotaUsageReport = function (forceUpdate, fromToDat
                     mega.buinsessAccount.quotaReport[repDay] = res[repDay];
                 }
                 if (Array.isArray(res) && res.length === 0) {
-                    // Empty result still needs to create an entry to show the graph.
-                    mega.buinsessAccount.quotaReport[ctx.context.dates.fromDate] = Object.create(null);
+                    // Empty result still needs to create an entry if missing to show the graph.
+                    mega.buinsessAccount.quotaReport[ctx.context.dates.fromDate] =
+                        mega.buinsessAccount.quotaReport[ctx.context.dates.fromDate] || Object.create(null);
                 }
 
                 var orderedDates = Object.keys(mega.buinsessAccount.quotaReport);

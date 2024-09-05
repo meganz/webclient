@@ -1,10 +1,3 @@
-.search .file-block-scrolling,
-.select .file-block-scrolling,
-.select .shared-blocks-scrolling,
-.select .out-shared-blocks-scrolling {
-    height: 100%;
-}
-
 .fm-blocks-view,
 .fm-blocks-view.shared-view,
 .shared-details-block,

@@ -626,8 +626,16 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         }
     }
 
-    scrollToElementProxyMethod(nodeHandle) {
+    updateScrollBar() {
+        if (M.megaRender && M.megaRender.megaList) {
+            M.megaRender.megaList.resized();
+        }
+        else {
+            initPerfectScrollbar($(this._get_selectable_container()).closest('.ps'));
+        }
+    }
 
+    scrollToElementProxyMethod(nodeHandle) {
         if (M.megaRender && M.megaRender.megaList) {
             M.megaRender.megaList.scrollToItem(nodeHandle);
         }
@@ -741,8 +749,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             else {
                 this.selectionNotification(selectionSize, false, false);
             }
-
-        }, 60);
+        }, 180);
 
         return res;
     }
@@ -864,13 +871,6 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
             this.showSelectionBar(notificationText, itemsNum, itemsTotalSize, totalNodes);
 
-            if (M.megaRender && M.megaRender.megaList) {
-                M.megaRender.megaList.resized();
-            }
-            else {
-                initPerfectScrollbar($(this._get_selectable_container()).closest('.ps'));
-            }
-
             if (scrollTo) {
                 this.scrollToElementProxyMethod(this.last_selected);
             }
@@ -904,32 +904,13 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
         this.vSelectionBar = $('b', $selectionBar).get(0);
 
-        if (this.currentdirid === "out-shares") {
-            scrollBarYClass = M.viewmode ? '.out-shared-blocks-scrolling.ps--active-y' :
-                '.out-shared-grid-view .grid-scrolling-table.ps--active-y';
-        }
-        else if (this.currentdirid === "shares") {
-            scrollBarYClass = M.viewmode ? '.shared-blocks-scrolling.ps--active-y' :
-                '.shared-grid-view .grid-scrolling-table.ps--active-y';
-        }
-        else {
-            scrollBarYClass = (M.viewmode === 1) ?
-                '.file-block-scrolling.ps--active-y' : '.grid-scrolling-table.ps--active-y';
-        }
-
         if (
             (!M.gallery || M.isAlbumsPage())
-            && (this.currentdirid.substr(0, 7) !== 'search/' || this.selected_list.length > 0)
+            && (this.currentdirid.substr(0, 7) !== 'search/' || this.selected_list.length > 1)
         ) {
             $selectionBar.removeClass('hidden');
-        }
-
-        const scrollBarY = document.querySelector(scrollBarYClass);
-        if (scrollBarY && (scrollBarY.scrollHeight - scrollBarY.scrollTop - scrollBarY.clientHeight) < 37) {
-            requestAnimationFrame(() => {
-                scrollBarY.scrollTop = scrollBarY.scrollHeight;
-                initPerfectScrollbar();
-            });
+            this.updateScrollBar();
+            this.scrollToElementProxyMethod(this.last_selected);
         }
 
         this.showRequiredLinks();
@@ -940,24 +921,16 @@ class SelectionManager2_DOM extends SelectionManager2Base {
      */
     hideSelectionBar() {
 
-        let selectionBar = document.getElementsByClassName('selection-status-bar').item(0);
+        const selectionBar = document.querySelector('.selection-status-bar');
 
         if (selectionBar) {
             selectionBar.classList.add('hidden');
         }
-        const block = document.querySelector('.search-multi');
-        if (block) {
-            block.classList.remove('search-multi');
-        }
+
         this.selected_totalSize = 0;
         this.vSelectionBar = null;
 
-        if (M.megaRender && M.megaRender.megaList) {
-            M.megaRender.megaList.resized();
-        }
-        else {
-            initPerfectScrollbar($(this._get_selectable_container()).closest('.ps'));
-        }
+        this.updateScrollBar();
     }
 
     /**

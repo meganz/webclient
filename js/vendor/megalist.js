@@ -505,6 +505,9 @@
                 }
                 this._scrollIsInitialized = true;
             }
+            else {
+                Ps.update(this.listContainer, this.options.perfectScrollOptions);
+            }
         }
     };
 

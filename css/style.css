@@ -1616,36 +1616,11 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     top: 2px;
     right: 12px;
 }
-.nw-fm-tree-item:hover, .nw-fm-tree-item.hovered {
-    background-color: rgba(217,0,7,0.2);
-    color: white;
-}
 .nw-fm-tree-item.disabled, .dropdown-item.disabled, .nw-conversations-item.disabled {
     filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50);
     -moz-opacity: 0.5;
     -khtml-opacity: 0.5;
     opacity: 0.5;
-}
-.nw-fm-tree-item.dragover {
-    background-color: rgba(217,0,7,0.3);
-}
-.shared-with-me .nw-fm-tree-item:hover, .out-shares .nw-fm-tree-item:hover, .public-links .nw-fm-tree-item:hover, .shared-with-me .nw-fm-tree-item.hovered, .out-shares .nw-fm-tree-item.hovered, .public-links .nw-fm-tree-item.hovered {
-    background-color: rgba(255,179,0,0.3);
-}
-.shared-with-me .nw-fm-tree-item.selected, .out-shares .nw-fm-tree-item.selected, .public-links .nw-fm-tree-item.selected {
-    background-color: rgba(255,179,0,0.5);
-}
-.shared-with-me .nw-fm-tree-item.dragover, .out-shares .nw-fm-tree-item.dragover, .public-links .nw-fm-tree-item.dragoved {
-    background-color: rgba(255,179,0,0.4);
-}
-.rubbish-bin .nw-fm-tree-item:hover, .rubbish-bin .nw-fm-tree-item.hovered {
-    background-color: rgba(39,183,0,0.3);
-}
-.rubbish-bin .nw-fm-tree-item.selected {
-    background-color: rgba(39,183,0,0.6);
-}
-.rubbish-bin .nw-fm-tree-item.dragover {
-    background-color: rgba(39,183,0,0.4);
 }
 .fm-tree-panel li,
 .mega-dialog .fm-picker-dialog-tree-panel li,
@@ -6756,11 +6731,11 @@ div.new-bottom-pages li, div.new-bottom-pages p {
 }
 .search-bottom-wrapper {
     background-color: var(--stroke-grey-2);
+    border-left: 2px solid var(--stroke-main);
     height: 64px;
     z-index: 12;
     width: 100%;
     align-items: center;
-    display: none;
     padding: 0 20px;
     box-sizing: border-box;
     width: 100%;
@@ -6776,12 +6751,6 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     width: 100%;
     overflow: hidden;
 }
-.search .search-bottom-wrapper {
-    display: flex;
-}
-.search .search-bottom-wrapper.hidden {
-    display: none;
-}
 .empty-search-bottom-menu {
     position: absolute;
     bottom: 0;
@@ -6792,15 +6761,6 @@ div.new-bottom-pages li, div.new-bottom-pages p {
     background-color: var(--stroke-grey-2);
     height: 30px;
     margin-left: 2px;
-}
-.search .file-block-scrolling,
-.select .file-block-scrolling,
-.select .shared-blocks-scrolling,
-.select .out-shared-blocks-scrolling {
-    height: 100%;
-    height: -webkit-calc(100% - 35px);
-    height: -moz-calc(100% - 35px);
-    height: calc(100% - 35px);
 }
 .lpxf {
     font-size: 17px !important;
@@ -10575,6 +10535,10 @@ body.megaChatDisabled .nw-fm-left-icon.conversations {
     background-color: var(--label-red);
 }
 
+.storage-division-per.s4-color {
+    background-color: var(--label-blue);
+}
+
 .storage-division-per.inbox-color {
     background-color: var(--label-orange);
 }
@@ -11907,11 +11871,6 @@ body.megaChatDisabled .nw-fm-left-icon.conversations {
 .business-dashboard .subaccount-view-used-data {
     padding: 24px;
     box-sizing: border-box;
-}
-
-.business-dashboard .subaccount-view-used-data .used-storage-info.ba-pub-links,
-.business-dashboard .subaccount-view-used-data .used-storage-info.ba-pub-links td {
-    cursor: pointer;
 }
 
 .content-panel.business-dashboard .intro-info.active, .content-panel.dashboard .intro-info.active{

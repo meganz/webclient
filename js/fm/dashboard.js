@@ -468,9 +468,16 @@ function dashboardUI(updProcess) {
 
             const rubbishSize = account.stats[M.RubbishID].bytes;
 
-            var folderNumText = ffNumText(account.stats[M.RootID].folders, 'folder');
-            var fileNumText = ffNumText(account.stats[M.RootID].files, 'file');
-            $('.ba-root .ff-occupy', $dataStats).text(bytesToSize(account.stats[M.RootID].bytes, 2));
+            // Get Object storage size and reduce cloud drive data if needed
+            const {
+                ts: s4Total = 0,
+                tf: s4FileCnt = 0,
+                td: s4FolderCnt = 0
+            } = 'utils' in s4 && s4.utils.getStorageData() || {};
+
+            var folderNumText = ffNumText(account.stats[M.RootID].folders - s4FolderCnt, 'folder');
+            var fileNumText = ffNumText(account.stats[M.RootID].files - s4FileCnt, 'file');
+            $('.ba-root .ff-occupy', $dataStats).text(bytesToSize(account.stats[M.RootID].bytes - s4Total, 2));
             $('.ba-root .folder-number', $dataStats).text(folderNumText);
             $('.ba-root .file-number', $dataStats).text(fileNumText);
 
@@ -497,6 +504,15 @@ function dashboardUI(updProcess) {
             $('.ba-pub-links .ff-occupy', $dataStats).text(bytesToSize(account.stats.links.bytes, 2));
             $('.ba-pub-links .folder-number', $dataStats).text(folderNumText);
             $('.ba-pub-links .file-number', $dataStats).text(fileNumText);
+
+            // Show Object storage and fill in the size
+            if (u_attr.s4) {
+                $('.ba-s4', $dataStats).removeClass('hidden');
+                $('.ba-s4 .ff-occupy', $dataStats).text(bytesToSize(s4Total, 2));
+            }
+            else {
+                $('.ba-s4', $dataStats).addClass('hidden');
+            }
 
             if (mBackupsNode) {
                 $('.js-backups-el', '.business-dashboard').removeClass('hidden');
@@ -535,8 +551,13 @@ function dashboardUI(updProcess) {
                 loadSubPage('fm/account/file-management');
             });
 
-            $('.business-dashboard .used-storage-info.ba-pub-links').rebind('click.suba', function() {
+            $('.used-storage-info.ba-pub-links .links-s', '.business-dashboard').rebind('click.suba', () => {
                 loadSubPage('fm/links');
+            });
+
+            $('.used-storage-info.ba-s4 .object-storage', '.business-dashboard').rebind('click.openS4', () => {
+                const cn = 'utils' in s4 && s4.utils.getContainersList();
+                loadSubPage(cn.length ? `fm/${cn[0].h}` : 'fm');
             });
 
             fileNumText = ffNumText(verFiles, 'file');

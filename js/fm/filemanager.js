@@ -331,8 +331,8 @@ FileManager.prototype.initFileManagerUI = function() {
         });
         $.hideContextMenu();
 
-        if (is_eplusplus && megaChatIsReady && megaChat.activeCall) {
-            // In call permissions dialog may have been shown. Don't leave the call UI.
+        if (is_eplusplus && megaChatIsReady && M.chat) {
+            // e++ in chat so don't navigate away.
             return;
         }
 
@@ -441,6 +441,17 @@ FileManager.prototype.initFileManagerUI = function() {
         if (type == 1) {
             // tree dropped:
             c = $(e.target).attr('class');
+
+            // If this is a tree item but it is overflowed from container
+            if (c && c.includes('nw-fm-tree-item')) {
+                const treeBound = document.querySelector('.js-myfiles-panel').getBoundingClientRect();
+
+                if (ui.offset.top < treeBound.top || ui.offset.top > treeBound.bottom ||
+                    ui.offset.left > treeBound.right || ui.offset.top > treeBound.bottom) {
+                    $(e.target).removeClass('dragover');
+                    return false;
+                }
+            }
             if (c && c.indexOf('nw-fm-left-icon') > -1) {
                 dd = 'nw-fm-left-icon';
                 if (a === 'drop') {
@@ -980,7 +991,7 @@ FileManager.prototype.initFileManagerUI = function() {
         }
         var $target = $(e.target);
         var exclude = '.upgradelink, .campaign-logo, .resellerbuy, .linkified, '
-            + 'a.red, a.mailto, a.top-social-button, .notif-help';
+            + 'a.red, a.mailto, a.top-social-button, .notif-help, .vpn-link';
 
         if ($target.attr('type') !== 'file'
             && !$target.is(exclude)

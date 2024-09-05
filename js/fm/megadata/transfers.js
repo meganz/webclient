@@ -1292,7 +1292,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
 
         for (var i = folders.length; i--;) {
             var name = folders[i];
-            var found = fileconflict.getNodeByName(target, name);
+            const found = fileconflict.getFolderByName(target, name);
 
             if (found) {
                 conflicts.push([{t: 1, name: name}, found]);

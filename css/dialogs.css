@@ -6482,6 +6482,8 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.limited-bandwidth-dialog:not(.pro3):not(.no-cards) .dialog.bottom-button button.upgrade,
     .mega-dialog.limited-bandwidth-dialog.pro3 .step1-block,
     .mega-dialog.limited-bandwidth-dialog.pro3 .local-currency-tip,
+    .mega-dialog.limited-bandwidth-dialog:not(.local-currency) .local-currency-tip,
+    .mega-dialog.limited-bandwidth-dialog:not(.local-currency) .ast,
     .mega-dialog.limited-bandwidth-dialog:not(.pro-mini) .pricing-page.period-subtitle,
     .mega-dialog.limited-bandwidth-dialog.pro-mini.no-cards .step1-block,
     .mega-dialog.limited-bandwidth-dialog.pro-mini.no-cards .local-currency-tip {

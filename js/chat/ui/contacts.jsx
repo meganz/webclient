@@ -1,5 +1,5 @@
 import React from 'react';
-import {ContactAwareComponent} from '../mixins';
+import { compose, ContactAwareComponent } from '../mixins';
 import {MegaRenderMixin} from '../mixins';
 import { Emoji, ParsedHTML, OFlowEmoji, reactStringWrap } from '../../ui/utils.jsx';
 import { PerfectScrollbar } from '../../ui/perfectScrollbar.jsx';
@@ -8,6 +8,7 @@ import { Dropdown, DropdownItem } from '../../ui/dropdowns.jsx';
 import ContactsPanel from './contactsPanel/contactsPanel.jsx';
 import ModalDialogs from "../../ui/modalDialogs";
 import Link from "./link.jsx";
+import { withUpdateObserver } from './updateObserver.jsx';
 
 export const MAX_FREQUENTS = 3;
 
@@ -384,93 +385,76 @@ export class ContactVerified extends MegaRenderMixin {
 
         return null;
     }
-};
+}
 
 export class ContactPresence extends MegaRenderMixin {
     static defaultProps = {
-        'manualDataChangeTracking': true,
-        'skipQueuedUpdatesOnResize': true
-    }
+        manualDataChangeTracking: true,
+        skipQueuedUpdatesOnResize: true
+    };
 
     attachRerenderCallbacks() {
         this.addDataStructListenerForProperties(this.props.contact, ['presence']);
     }
 
     render() {
-        var contact = this.props.contact;
-        var className = this.props.className || '';
+        const { contact, className } = this.props;
 
         if (!contact || !contact.c) {
             return null;
         }
 
-        const pres = megaChat.userPresenceToCssClass(contact.presence);
-
         return (
-            <div className={`user-card-presence ${pres} ${className}`}>
-            </div>
-        );
-    }
-};
-
-export class LastActivity extends ContactAwareComponent {
-    lastActivityInterval = undefined;
-
-    attachRerenderCallbacks() {
-        this._attachRerenderCbContacts([
-            'ats',
-            'lastGreen',
-            'presence',
-        ]);
-    }
-
-    state = {
-        updated: 0
-    };
-
-    shouldComponentUpdate() {
-        return true;
-    }
-
-    doUpdate = () =>
-        this.isComponentVisible() &&
-        document.visibilityState === 'visible' &&
-        this.setState(state => ({ updated: ++state.updated }));
-
-    componentWillUnmount() {
-        super.componentWillUnmount();
-        clearInterval(this.lastActivityInterval);
-        document.removeEventListener('visibilitychange', this.doUpdate);
-    }
-
-    componentDidMount() {
-        super.componentDidMount();
-        this.lastActivityInterval = setInterval(this.doUpdate, 6e4 /* 1 min */);
-        document.addEventListener('visibilitychange', this.doUpdate);
-    }
-
-    render() {
-        const { contact, showLastGreen } = this.props;
-
-        if (!contact) {
-            return null;
-        }
-
-        const lastActivity = !contact.ats || contact.lastGreen > contact.ats ? contact.lastGreen : contact.ats;
-        const SECONDS = new Date().getTime() / 1000 - lastActivity;
-        const FORTY_FIVE_DAYS = 3888000; // seconds
-        const timeToLast = SECONDS > FORTY_FIVE_DAYS ? l[20673] : time2last(lastActivity, true);
-        const hasActivityStatus = showLastGreen && contact.presence <= 2 && lastActivity;
-
-        return (
-            <span>
-                {hasActivityStatus ?
-                    (l[19994] || 'Last seen %s').replace('%s', timeToLast) :
-                    M.onlineStatusClass(contact.presence)[0]}
-            </span>
+            <div
+                className={`
+                    user-card-presence
+                    ${megaChat.userPresenceToCssClass(contact.presence)}
+                    ${className || ''}
+                `}
+            />
         );
     }
 }
+
+export const LastActivity = compose(withUpdateObserver)(
+    (() =>
+        class LastActivity extends ContactAwareComponent {
+            attachRerenderCallbacks() {
+                this._attachRerenderCbContacts([
+                    'ats',
+                    'lastGreen',
+                    'presence',
+                ]);
+            }
+
+            shouldComponentUpdate() {
+                return true;
+            }
+
+            render() {
+                const { contact, showLastGreen } = this.props;
+
+                if (!contact) {
+                    return null;
+                }
+
+                const lastActivity = !contact.ats || contact.lastGreen > contact.ats ? contact.lastGreen : contact.ats;
+                const SECONDS = Date.now() / 1000 - lastActivity;
+                const FORTY_FIVE_DAYS = 3888000; // seconds
+                const timeToLast = SECONDS > FORTY_FIVE_DAYS ? l[20673] : time2last(lastActivity, true);
+                const hasActivityStatus = showLastGreen && contact.presence <= 2 && lastActivity;
+
+                return (
+                    <span>
+                        {hasActivityStatus ?
+                            (l[19994] || 'Last seen %s').replace('%s', timeToLast) :
+                            M.onlineStatusClass(contact.presence)[0]
+                        }
+                    </span>
+                );
+            }
+        })()
+);
 
 export class ContactAwareName extends ContactAwareComponent {
     render() {

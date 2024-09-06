@@ -395,7 +395,9 @@ export class MegaRenderMixin extends React.Component {
                     // bug in IntersectionObserver, that caused the intersection observer to not fire the initial
                     // visibility call once its initialized
                     this.__intersectionObserverInstance = new IntersectionObserver(
-                        ([entry]) => {
+                        (entries) => {
+                            // IntersectionObserver may queue events. Check the latest.
+                            const entry = entries.pop();
                             if (entry.intersectionRatio < 0.2 && !entry.isIntersecting) {
                                 this.__intersectionVisibility = false;
                             }

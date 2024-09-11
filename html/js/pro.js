@@ -1093,16 +1093,19 @@ lazy(pro, 'filter', () => {
          * Finds the lowest monthly plan that can store the users data, excluding their current plan
          * @param {number} userStorage - The users current storage in bytes
          * @param {string} secondaryFilter - The subset of plans to choose lowest plan from
+         * @param {?boolean} ignoreUserLevel - Allow a plan of the users current level to be returned
          * @returns {Array|false} - An array item of the specific plan, or false if no plans found
          */
-        lowestRequired(userStorage, secondaryFilter = 'all') {
+        lowestRequired(userStorage, secondaryFilter, ignoreUserLevel) {
+            secondaryFilter = secondaryFilter || 'all';
             const plans = pro.filter.plans[secondaryFilter + 'M'];
             if (!plans) {
                 console.assert(pro.membershipPlans.length, 'Plans not loaded');
                 return;
             }
             return plans.find((plan) =>
-                (plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] !== u_attr.p)
+                (ignoreUserLevel
+                    || (plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] !== u_attr.p))
                 && ((plan[pro.UTQA_RES_INDEX_STORAGE] * pro.BYTES_PER_GB) > userStorage)
                 || (plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === pro.ACCOUNT_LEVEL_PRO_FLEXI));
         }

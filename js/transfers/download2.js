@@ -1832,7 +1832,7 @@ var dlmanager = {
         pro.proplan.updateEachPriceBlock("D", $pricingBoxes, $dialog, preSelectedPeriod, planType);
     },
 
-    setPlanPrices($dialog, showDialogCb) {
+    setPlanPrices($dialog, showDialogCb, ignoreStorageReq) {
         'use strict';
 
         var $scrollBlock = $('.scrollable', $dialog);
@@ -1845,8 +1845,11 @@ var dlmanager = {
 
             const slideshowPreview = slideshowid && is_video(M.getNodeByHandle(slideshowid));
             const isStreaming = !dlmanager.isDownloading && (dlmanager.isStreaming || slideshowPreview);
+            const requiredQuota = ignoreStorageReq ? 0 : (M.account.mstrg || 0);
 
-            const lowestPlanIsMini = pro.filter.simple.miniPlans.has(pro.minPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL]);
+            const lowestRequiredMiniPlan = pro.filter.lowestRequired(requiredQuota, 'miniPlans', ignoreStorageReq);
+            const lowestPlanIsMini = !!lowestRequiredMiniPlan;
+
             let miniPlanId;
             if (lowestPlanIsMini) {
                 $dialog.addClass('pro-mini');
@@ -1854,7 +1857,7 @@ var dlmanager = {
                 if (isStreaming) {
                     $dialog.addClass('no-cards');
                 }
-                miniPlanId = lowestPlanIsMini ? pro.filter.miniMin[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] : '';
+                miniPlanId = lowestPlanIsMini ? lowestRequiredMiniPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] : '';
             }
 
             // Update the blurb text of the dialog
@@ -1950,7 +1953,7 @@ var dlmanager = {
 
                 return $dialog;
             });
-        });
+        }, true);
     },
 
     showOverQuotaDialog: function DM_quotaDialog(dlTask, flags) {
@@ -2023,7 +2026,7 @@ var dlmanager = {
 
                 return $dialog;
             });
-        });
+        }, true);
     },
 
     doCloseModal(overlayEvent, $dialog) {

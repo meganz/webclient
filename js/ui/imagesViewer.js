@@ -1321,7 +1321,7 @@ var slideshowid;
                     }
                 }
                 else if ((e.keyCode === 8 || e.key === 'Backspace') && !isDownloadPage && !$.copyDialog
-                        && !$.dialog && !$.msgDialog) {
+                        && !$.dialog && !$.msgDialog && !mega.ui.mInfoPanel.isOpen()) {
                     history.back();
                     return false;
                 }

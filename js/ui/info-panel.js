@@ -41,7 +41,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
         $('.prev-version-section', $container).addClass('hidden');
         $('.prev-version-value', $container).text('');
         $('.node-description-section', $container).addClass('hidden');
-        $('.node-description-section .descCounter', $container).addClass('hidden');
+        $('.node-description-section .desc-counter', $container).addClass('hidden');
         $('.node-description-section', $container).removeClass('readonly');
 
         $container.removeClass('taken-down');
@@ -384,15 +384,22 @@ lazy(mega.ui, 'mInfoPanel', () => {
      * Initialise or update the side panel's vertical scroll block (if the content gets too long)
      * @returns {undefined}
      */
-    function initOrUpdateScrollBlock() {
+    function initOrUpdateScrollBlock(node) {
 
         const scrollBlock = $('.info-panel-scroll-block', $container);
 
-        if (scrollBlock.is('.ps')) {
+        if (node && mega.ui.mInfoPanel.previousValue.handle === node.h && scrollBlock.is('.ps')) {
+            // Do nothing
+        }
+        else if (scrollBlock.is('.ps')) {
             Ps.update(scrollBlock[0]);
         }
         else {
             Ps.initialize(scrollBlock[0]);
+        }
+
+        if (node && node.h) {
+            mega.ui.mInfoPanel.previousValue.set(node.h);
         }
     }
 
@@ -410,6 +417,13 @@ lazy(mega.ui, 'mInfoPanel', () => {
         return selectedNodes[0].ch ? selectedNodes[0].name : M.getNameByHandle(selectedNodes);
     }
 
+    function hideFeature(node) {
+
+        // Hide for S4 nodes
+        const isS4 = 'kernel' in s4 && s4.kernel.getS4NodeType(node.h);
+        return M.RootID === node.h && !folderlink || node.devid || isS4;
+    }
+
     /**
      * Render node description
      * @param {MegaNode} node selected node
@@ -417,10 +431,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
      */
     function renderNodeDescription(node) {
 
-        // Hide for S4 nodes
-        const isS4 = 'kernel' in s4 && s4.kernel.getS4NodeType(node.h);
-
-        if (M.RootID === node.h && !folderlink || node.devid || isS4) {
+        if (hideFeature(node)) {
             return;
         }
 
@@ -428,9 +439,10 @@ lazy(mega.ui, 'mInfoPanel', () => {
         const $section = $(`.node-description-section.${mega.flags.ab_ndes ? 'top' : 'bottom'}`, $container);
         $section.removeClass('hidden');
         const $descInput = $('.node-description-textarea textarea', $section);
-        const $descCounter = $('.descCounter', $section);
+        const $descCounter = $('.desc-counter', $section);
         const $descCounterVal = $('span', $descCounter);
-        const description = from8(node.des || '');
+        const $descPermission = $('.desc-permission', $section);
+        const description = node.des;
 
         $descInput.attr('placeholder', l.info_panel_description_add);
 
@@ -461,7 +473,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
 
                 // Skipped if no changes/Description length max 300 char/Document focus
                 if (prevDesc !== $descValue && $descValue.length <= 300 && document.hasFocus()) {
-                    M.setNodeDescription(node.h, to8($descValue))
+                    M.setNodeDescription(node.h, $descValue)
                         .then(() => {
                             if (prevDesc === '') {
                                 showToast('info', l.info_panel_description_added);
@@ -523,19 +535,565 @@ lazy(mega.ui, 'mInfoPanel', () => {
         initTextareaScrolling($descInput);
 
         if (M.getNodeRights(node.h) < 2 || M.currentrootid === M.RubbishID ||
-            folderlink || M.getNodeRoot(node.h) === M.InboxID || node.ch) {
+            folderlink || M.getNodeRoot(node.h) === M.InboxID || node.ch ||
+            M.getNodeRoot(node.h) === M.RubbishID) {
             $descInput.attr('disabled','disabled');
             $descInput.attr('placeholder', l.info_panel_description_empty);
-            $('.descPermission', $section).removeClass('hidden');
-            $('.descPermission span', $section).text(l[55]);  // Read-only
+            $descPermission.removeClass('hidden');
+            $('span', $descPermission).text(l[55]);  // Read-only
             $section.addClass('readonly');
         }
         else {
-            $('.descPermission', $section).addClass('hidden');
+            $descPermission.addClass('hidden');
             $descInput.removeAttr('disabled');
             descriptionEventHandler();
             $section.removeClass('readonly');
         }
+    }
+
+    /**
+     * Render node tags
+     * @param {MegaNode} nodes selected nodes
+     * @returns {undefined}
+     */
+    function renderTags(nodes) {
+        const $section = $(`.node-tags-section`, $container);
+        const $inputContainer = $('.mega-input', $section);
+        const $dropDownBody = $('.dropdown-body', $section);
+        const $inputTag = $('.node-tags-input', $inputContainer);
+        const $nodeChips =  $('.node-tags-chips', $section);
+        const $errorBanner = $('.message-container', $inputContainer);
+        const $nodeTagsDropdown = $('.node-tags-dropdown', $section);
+        const $clearInputTag = $('.js-btnClearTags', $inputContainer);
+        const $tagCloseIcons = $('.node-tag-chip .icon-dialog-close', $section);
+        const $tagsLbl = $('.description',  $section);
+        const $emptyTags = $('.empty-tags', $section);
+        const $parentScrollBlock = $('.info-panel-scroll-block', $container);
+        const { tagsDB } = mega.ui.mInfoPanel;
+
+        const isShares = M.currentrootid === 'shares' || selectedNodesIsShared(nodes);
+        let readOnly = false;
+        let arrSimilar = [];
+
+        if (hideFeature(nodes[0])) {
+            $section.addClass('hidden');
+            return;
+        }
+
+        $section.removeClass('hidden');
+        $('.node-tag-chip', $nodeChips).remove();
+        $dropDownBody.addClass('hidden');
+        $nodeTagsDropdown.removeClass('hidden top bottom');
+        $tagCloseIcons.removeClass('hidden');
+        $inputTag.removeClass('disabled').removeAttr('disabled');
+        $inputTag.val('');
+        $tagsLbl.removeClass('pro-only');
+        $nodeChips.removeClass('hidden');
+        $emptyTags.addClass('hidden');
+        $clearInputTag.addClass('hidden');
+
+        // If the A/B test flag is not enabled (or localStorage test flag) then hide the whole UI for tags
+        if (!mega.flags.ab_cntag && !localStorage.tagsFeatureEnabled || isShares) {
+            $section.addClass('hidden');
+            return;
+        }
+        else if (u_attr && !u_attr.p) {
+            // Otherwise, the tags feature is enabled by flag, but if they are not a Pro/Business account we will
+            // disable functionality for adding/updating/removing of tags. We will still show existing tags though.
+            $tagsLbl.addClass('pro-only');
+
+            if (selectedNodesHaveTags(nodes)) {
+                $nodeTagsDropdown.addClass('hidden');
+                $tagCloseIcons.addClass('hidden');
+            }
+            else {
+                // No existing tags, so hide completely
+                $nodeTagsDropdown.addClass('hidden');
+                $nodeChips.addClass('hidden');
+            }
+            // On PRO options click, go to the Pro page
+            $('.pro-only', $section).rebind('click.openpro', () => {
+                window.open(`${getBaseUrl()}/pro`, '_blank', 'noopener,noreferrer');
+            });
+        }
+
+        // Check if node is read only
+        function isReadOnly(node) {
+            return node && M.getNodeRights(node.h) < 2 || M.currentrootid === M.RubbishID ||
+            folderlink || M.getNodeRoot(node.h) === M.InboxID || node.ch ||
+            !u_handle || M.getNodeRoot(node.h) === M.RubbishID;
+        }
+
+        // Check if the node is read only
+        if (nodes && isReadOnly(nodes[0])) {
+            $nodeTagsDropdown.addClass('hidden');
+            readOnly = true;
+        }
+        else {
+            tagsDB.init();
+        }
+
+        /**
+         * Check if the selected nodes have tags or not
+         * @param {Array} nodes The selected nodes
+         * @returns {Boolean} Returns true if the nodes have tags
+         */
+        function selectedNodesHaveTags(nodes) {
+            for (let i = nodes.length; i--;) {
+                if (nodes[i].tags) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /**
+         * Check if the selected nodes is shared or backups node
+         * @param {Array} nodes The selected nodes
+         * @returns {Boolean} Returns true if the nodes have tags
+         */
+        function selectedNodesIsShared(nodes) {
+            for (let i = nodes.length; i--;) {
+                if (sharer(nodes[i]) ||
+                    M.BackupsId && M.getNodeRoot(nodes[i]) === M.getNodeByHandle(M.BackupsId).p) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        function showError(error) {
+            $inputContainer.addClass('error');
+            $errorBanner.text(error);
+            $nodeTagsDropdown.removeClass('active');
+        }
+
+        function hideError() {
+            $inputContainer.removeClass('error medium small');
+            $errorBanner.text('');
+        }
+
+        // Get all tags in current nodes
+        function getAllTags() {
+            return nodes.map((n) => n.tags || []).flat();
+        }
+
+        // Check validity of tag
+        function validateTag(tag) {
+            const cleanTag = tag.replace('#', '');
+            if (cleanTag && cleanTag !== '') {
+                // Check the validity of the tag string
+                // \p{L} - any kind of letter from any language
+                // \p{M} - a character intended to be combined with another character
+                // \d - digits
+                const isLetterOrNumber = new RegExp('^[\\d\\p{L}\\p{M}]+$', 'u');
+                if (!isLetterOrNumber.test(cleanTag)) {
+                    $inputContainer.addClass("medium");
+                    // Invalid character for tags error message is shown
+                    eventlog(500309);
+                    return l.info_panel_tags_error_invalid_char;
+                }
+                else if (cleanTag.length > 32) {
+                    $inputContainer.addClass("small");
+                    // Invalid character for tags error message is shown
+                    eventlog(500308);
+                    return l.info_panel_tags_error_maxchar;
+                }
+            }
+            return false;
+        }
+
+        // Remove tag
+        function removeTagEvent() {
+            $('.js-btnDeleteTag', $nodeChips).rebind('mousedown.deleteTag', (e) => {
+                const $parent = $(e.currentTarget).closest('.node-tag-chip');
+                let tagText = $('span', $parent).text();
+                tagText = tagText.replace('#', '');
+
+                function remove() {
+                    $(e.currentTarget).addClass('hidden');
+                    tagsDB.set(tagText, nodes.map(n => n.h), true);
+                    return M.setNodeTag(nodes, tagText, true).catch(tell);
+                }
+
+                if (!is_mobile && u_attr && (u_attr.b || u_attr.pf)) {
+                    forBusinessProFlex((valid) => valid && remove());
+                }
+                else {
+                    remove();
+                }
+
+            });
+        }
+
+        // Validate request if user plan is expired
+        function forBusinessProFlex(cb) {
+
+            // Make sure the files are loaded
+            M.require('businessAcc_js', 'businessAccUI_js').done(() => {
+                var busUI = new BusinessAccountUI();
+
+                if (u_attr.b && u_attr.b.s === pro.ACCOUNT_STATUS_EXPIRED ||
+                    u_attr.pf && u_attr.pf.s === pro.ACCOUNT_STATUS_EXPIRED) {
+
+                    let msg = '';
+
+                    // If Business master account or Pro Flexi
+                    if (u_attr.b && u_attr.b.m) {
+                        msg = l[24431];
+                    }
+                    else if (u_attr.pf) {
+                        msg = l.pro_flexi_expired_banner;
+                    }
+                    else {
+                        // Otherwise Business sub-user
+                        msg = l[20462];
+                    }
+
+                    $('.fm-notification-block.expired-business', 'body').safeHTML(`<span>${msg}</span>`)
+                        .addClass('visible');
+                    clickURLs();
+
+                    const isMaster = u_attr.b && u_attr.b.m || u_attr.pf;
+                    return busUI.showExpiredDialog(isMaster);
+                }
+                return cb(true);
+            });
+        }
+
+        // Save tag
+        function saveTag(value) {
+            const invalid = validateTag(value);
+
+            if (invalid) {
+                showError(invalid);
+                return;
+            }
+
+            if ($('.node-tag-chip', $section).length === 10 || getAllTags().length === nodes.length * 10) {
+                $inputContainer.addClass("small");
+                // Max amount of tags error message is shown
+                showError(l.info_panel_tags_error_max_tag);
+                errorState();
+                eventlog(500310);
+                return;
+            }
+
+            let tag = value.replace('#', '');
+
+            if (isExisting(tag)) {
+                $inputTag.val('');
+                $inputTag.blur();
+                return;
+            }
+
+            if (tag && u_attr.p && !isShares) {
+                tag = tag.toLowerCase();
+                const validNodes = nodes.filter((n) => !isReadOnly(n) && (!n.tags || n.tags.length < 10));
+                $inputTag.addClass('disabled').attr('disabled', 'disabled');
+                $clearInputTag.addClass('hidden');
+                M.setNodeTag(validNodes, tag).catch(tell);
+
+                tagsDB.set(tag, validNodes.map(n => n.h));
+                removeTagEvent();
+                $inputTag.blur();
+            }
+        }
+
+        // Find out if tag is existing to the list
+        function isExisting(tag) {
+            const validTag = tag;
+            if (nodes.length > 1) {
+                return arrSimilar.length && arrSimilar.includes(validTag);
+            }
+
+            return (nodes[0].tags || []).includes(validTag);
+
+        }
+
+
+        function addTagUI(tag) {
+            // Adding tag into info panel tag list
+            if (tag) {
+                const $section = $(`.node-tags-section`, $container);
+                const $nodeChips =  $('.node-tags-chips', $section);
+                const $tagItem = $('.node-tag-chip-template', $section).clone();
+
+                $tagItem.removeClass('hidden node-tag-chip-template');
+                $tagItem.addClass('node-tag-chip');
+                $('span', $tagItem).text(`#${tag}`);
+
+                if (readOnly) {
+                    $('.js-btnDeleteTag', $tagItem).addClass('hidden');
+                }
+
+                $nodeChips.safeAppend($tagItem.prop('outerHTML'));
+            }
+        }
+
+        // Render existing tags singe or multiple nodes
+        function renderTagList() {
+            if (nodes.length === 1 && nodes[0].tags && nodes[0].tags.length) {
+                const tags = nodes[0].tags;
+                for (let i = tags.length; i--;) {
+                    addTagUI(tags[i]);
+                }
+            }
+            else if (nodes.length > 1) {
+                const nodesTags = [];
+                for (let i = nodes.length; i--;) {
+                    if (nodes[i].tags) {
+                        nodesTags.push(nodes[i].tags);
+                    }
+                }
+
+                if (nodes.length === nodesTags.length) {
+                    arrSimilar = similar(nodesTags);
+                    for (let i = arrSimilar.length; i--;) {
+                        addTagUI(arrSimilar[i]);
+                    }
+                }
+            }
+
+            isReadOnlyUI();
+        }
+
+        // Check if the tags is read only
+        function isReadOnlyUI() {
+            if (readOnly && !nodes[0].tags || readOnly && nodes[0].tags
+                && nodes[0].tags.length === 0 || readOnly && !arrSimilar.length && nodes.length > 1) {
+                if (nodes.length > 1) {
+                    $emptyTags.text(l.info_panel_tags_empty_multiple);
+                }
+                else {
+                    $emptyTags.text(l.info_panel_tags_empty);
+                }
+                $emptyTags.removeClass('hidden');
+            }
+        }
+
+        // Check similar tags between selected nodes
+        function similar(arrs) {
+            return arrs.shift().filter(v =>
+                arrs.every(subArray => subArray.some(e => e === v)));
+        }
+
+        // Render dropdown items includes sugggest to input current tag
+        function renderDropdownItem(value) {
+            let position = 'top';
+
+            if (nodes.length > 1) {
+                position = 'bottom';
+            }
+
+            const $renderDropDown = $(`.dropdown-body.${position}`, $section);
+            $dropDownBody.empty();
+            $nodeTagsDropdown.addClass(position);
+            const offset = $section.offset().top;
+            let existingArr = Array.from(tagsDB.t.keys());
+            $nodeTagsDropdown.css('top', position === 'top' ? offset - 60 : offset);
+
+            if (nodes[0].tags && nodes[0].tags.length) {
+                const currTagsArr = nodes.length > 1 ? arrSimilar : nodes[0].tags;
+                existingArr = existingArr.filter(t => !currTagsArr.includes(t));
+            }
+
+            const makeTagItem = () => {
+                const $item = $('.dropdown-item.dropdown-content-template', $section).clone();
+                $item.removeClass('hidden dropdown-content-template');
+                $item.addClass('dropdown-content-add');
+                return $item;
+            };
+
+            const createSuggestion = (val) => {
+                if (val) {
+                    existingArr = existingArr.filter(t => t.includes(val.replace('#', '')));
+                    (existingArr || []).sort((a, b) =>  M.compareStrings(a, b, -1));
+                }
+
+                const $suggestions = $('.suggestions-template', $section).clone();
+                $suggestions.removeClass('hidden suggestions-template');
+                $suggestions.addClass('suggestion-sb');
+
+                for (let i = existingArr.length - 1; i >= 0 ; i--) {
+                    const item = makeTagItem();
+                    const tagText = $('.node-tags-add', item);
+                    tagText.addClass('suggest');
+                    tagText.safeAppend(`<span>${existingArr[i]}</span>`);
+                    $suggestions.safeAppend(item.prop('outerHTML'));
+                }
+
+                if (position === 'top') {
+                    const currLen = existingArr.length < 5 ? existingArr.length : 5;
+                    $nodeTagsDropdown.css('top', offset - (60 + currLen * 30));
+                }
+
+                $renderDropDown.safeAppend($suggestions.prop('outerHTML'));
+
+                // Initialize scroll bar
+                const $scrollBlock = $('.suggestion-sb', $renderDropDown);
+                Ps.initialize($scrollBlock[0]);
+            };
+
+            // Render dropdown items | existing
+            if (value && value.length >= 2) {
+
+                const $addItem = makeTagItem();
+                const addTagText = $('.node-tags-add', $addItem);
+                // Add translation
+                $addItem.addClass('current');
+                addTagText.safeAppend(l.info_panel_tags_add.replace('%s', `<span>${value}</span>`));
+
+                if (position === 'bottom') {
+                    $renderDropDown.safeAppend($addItem.prop('outerHTML'));
+                    createSuggestion(value);
+                }
+                else {
+                    createSuggestion(value);
+                    $renderDropDown.safeAppend($addItem.prop('outerHTML'));
+                }
+
+                $renderDropDown.removeClass('hidden');
+            }
+            // Render tags help
+            else {
+                const $item = $('.dropdown-content-template-tips', $section).clone();
+                $item.removeClass('hidden dropdown-content-template-tips');
+                $renderDropDown.safeAppend($item.prop('outerHTML'));
+                $renderDropDown.removeClass('hidden');
+            }
+
+            $('.dropdown-content-add', $renderDropDown).rebind('mousedown.addTag', (e) => {
+                const $el = $(e.currentTarget);
+
+                if ($el.hasClass('current')) {
+                    saveTag($inputTag.val());
+                }
+                else {
+                    saveTag($('span', $(e.currentTarget)).text());
+                }
+                // User clicks on the "Add #<tag> tag" option from the dropdown menu
+                eventlog(500307);
+            });
+        }
+
+        function errorState() {
+            $dropDownBody.empty();
+            $nodeTagsDropdown.removeClass('top');
+            $nodeTagsDropdown.removeClass('bottom');
+        }
+
+        // Changing description length counter
+        $inputTag.rebind('input.nodeTags', (e) => {
+            let tagValue = $(e.currentTarget).val();
+
+            if (tagValue[0] !== '#' || tagValue.includes('#')) {
+                tagValue = `#${tagValue.replace(/#/g, '').toLowerCase()}`;
+                $(e.currentTarget).val(tagValue);
+            }
+            if (tagValue.length > 1 && !validateTag(tagValue)) {
+                renderDropdown($(e.currentTarget));
+            }
+        });
+
+        $inputTag.rebind('keydown.nodeTags', (e) => {
+            const key = e.keyCode || e.which;
+
+            // Todo multiple tags same input comma separator tags
+            if (key === 51 && e.shiftKey) {
+                e.preventDefault();
+            }
+
+            // Handle enter
+            if (key === 13 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
+                e.stopPropagation();
+                return saveTag($(e.currentTarget).val());
+            }
+        });
+
+        $inputTag.rebind('keyup.nodeTags', (e) => {
+            const tagValue = $(e.currentTarget).val();
+            const invalid = validateTag(tagValue);
+            const key = e.keyCode || e.which;
+
+            if (key === 13 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
+                return;
+            }
+
+            if (invalid) {
+                showError(invalid);
+                errorState();
+                return false;
+
+            }
+
+            hideError();
+            renderDropdown($(e.currentTarget));
+        });
+
+        function renderDropdown(inputTag) {
+            inputTag.closest('.node-tags-dropdown').addClass('active');
+            hideError();
+            renderDropdownItem(inputTag.val());
+        }
+
+        // Clear input
+        $clearInputTag.rebind('mousedown.clearTags', (e) => {
+            e.preventDefault();
+
+            hideError();
+            $inputTag.val('#');
+            $inputTag.focus();
+        });
+
+        $inputTag
+            .focus((e)=> {
+                const $currTarget = $(e.currentTarget);
+                $('.node-tags-tips', $section).removeClass('hidden');
+                $clearInputTag.removeClass('hidden');
+
+                // Hash tag tbd add multiple tags
+                if ($currTarget.val().length === 0) {
+                    $(e.currentTarget).val('#');
+                }
+                const invalid = validateTag($currTarget.val());
+
+                if (invalid) {
+                    showError(invalid);
+                }
+                else {
+                    renderDropdown($currTarget);
+                }
+
+                if ($parentScrollBlock.is('.ps')) {
+                    Ps.disable($parentScrollBlock[0]);
+                }
+
+                // User focus on the Node Tags field
+                eventlog(500306);
+            })
+            .blur((e) => {
+                e.preventDefault();
+                const $currTarget = $(e.currentTarget);
+                $currTarget.closest('.node-tags-dropdown').removeClass('active');
+
+                if ($currTarget.val().length <= 1) {
+                    $currTarget.val('');
+                    $clearInputTag.addClass('hidden');
+                }
+
+                if ($parentScrollBlock.is('.ps')) {
+                    Ps.enable($parentScrollBlock[0]);
+                }
+
+                errorState();
+            });
+
+        renderTagList();
+        removeTagEvent();
+        hideError();
     }
 
     /**
@@ -840,7 +1398,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
 
         // Reset previous state
         resetToDefault();
-        initOrUpdateScrollBlock();
+        initOrUpdateScrollBlock(node);
 
         // Get data
         const panelTitle = getPanelTitle(selectedNodes);
@@ -921,6 +1479,9 @@ lazy(mega.ui, 'mInfoPanel', () => {
         // Check if media viewer or meeting call ui is active
         checkCurrentView();
 
+        // Node tags
+        renderTags(selectedNodes);
+
         // If the rewind sidebar is visible we need to hide it (no room for both sidebars on the screen)
         if (mega.rewindUi && mega.rewindUi.sidebar.active) {
             mega.rewindUi.sidebar.forceClose();
@@ -964,10 +1525,8 @@ lazy(mega.ui, 'mInfoPanel', () => {
          */
         reRenderIfVisible(selectedNodes) {
 
-            const isOpen = $('body').hasClass(visibleClass);
-
             // If it's already visible, render the selected node information (no need for resizes etc)
-            if (isOpen && selectedNodes && selectedNodes.length > 0) {
+            if (this.isOpen() && selectedNodes && selectedNodes.length > 0) {
                 renderInfo(selectedNodes);
             }
         },
@@ -978,11 +1537,94 @@ lazy(mega.ui, 'mInfoPanel', () => {
          */
         closeIfOpen() {
 
-            const isOpen = $('body').hasClass(visibleClass);
-
             // If it's already visible, close the panel
-            if (isOpen) {
+            if (this.isOpen()) {
                 $('body').removeClass(visibleClass);
+
+                const $section = $(`.node-tags-section`, $container);
+                const $nodeTagsDropdown = $('.node-tags-dropdown', $section);
+
+                if ($nodeTagsDropdown.hasClass('active')) {
+                    $nodeTagsDropdown.removeClass('active');
+                    $('.node-tags-input', $section).blur();
+                }
+
+                mega.ui.mInfoPanel.previousValue.set(null);
+            }
+        },
+
+        /**
+         * Check info panel if it's currently visible
+         * @returns {Boolean} is panel open
+         */
+        isOpen() {
+            return $('body').hasClass(visibleClass);
+        },
+        previousValue: {
+            handle: null,
+            set(n) {
+                this.handle = n;
+                return n;
+            }
+        },
+        tagsDB: {
+            t: false,
+            /**
+             * Update Tags DB
+             * @param {MegaNode} oldattr Old node attribute
+             * @param {MegaNode} node Updated
+             * @returns {undefined}
+             */
+            update(oldattr, node) {
+                const diff = array.diff(oldattr.tags || [], node.tags || []);
+                if (diff.added.length) {
+                    this.set(diff.added[0], [node.h]);
+                }
+                if (diff.removed.length) {
+                    this.set(diff.removed[0], [node.h], true);
+                }
+            },
+            /**
+             * Add / Remove tag from the memory
+             * @param {String} tag tag text
+             * @param {Array} handles array of node handles
+             * @param {Boolean} isRemove is delete process
+             * @returns {undefined}
+             */
+            set(tag, handles, isRemove) {
+                if (isRemove) {
+                    const tagSet = this.t.get(tag);
+                    if (handles && tagSet) {
+                        for (let i = 0; i < handles.length; i++) {
+                            tagSet.delete(handles[i]);
+                            if (tagSet.size === 0) {
+                                this.t.delete(tag);
+                            }
+                        }
+                    }
+                }
+                else {
+                    for (let i = 0; i < handles.length; i++) {
+                        this.t.set(tag, handles[i]);
+                    }
+                }
+            },
+            async init() {
+                if (!this.t) {
+                    this.t = new MapSet();
+                    return fmdb.get('f')
+                        .then(nodes => {
+                            for (let i = nodes.length; i--;) {
+                                const n = nodes[i];
+                                if (n.tags) {
+                                    for (let j = n.tags.length; j--;) {
+                                        this.t.set(n.tags[j], n.h);
+                                    }
+                                }
+                            }
+
+                        });
+                }
             }
         }
     });

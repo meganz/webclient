@@ -373,6 +373,9 @@ function crypto_makeattr(n, nn) {
     else if (n.mtime) {
         ar.t = n.mtime;
     }
+    if (n.tags) {
+        ar.t = `${n.tags}`;
+    }
     if (n.fav | 0) {
         ar.fav = n.fav | 0;
     }
@@ -414,9 +417,9 @@ function crypto_makeattr(n, nn) {
 function crypto_clearattr(n) {
     // derived node attr directory, see crypto_procattr()
     const dattrs = [
-        'ar', 'devid', 'drvid', 'f', 'fav', 'gps',
+        'ar', 'des', 'devid', 'drvid', 'f', 'fav', 'gps',
         'hash', 'lbl', 'mtime', 'name',
-        'rr', 's4', 'sds', 'des'
+        'rr', 's4', 'tags', 'sds'
     ];
     const old = {};
 
@@ -451,10 +454,16 @@ function crypto_procattr(n, key) {
             }
 
             if (typeof o.t != 'undefined') {
-                n.mtime = o.t;
+                if (typeof o.t === 'string') {
+                    n.tags = o.t.split(',');
+                }
+                else {
+                    n.mtime = o.t;
+                }
                 delete o.t;
             }
-            else if (n.hash) {
+
+            if (n.hash) {
                 var h = base64urldecode(n.hash);
                 var i = h.charCodeAt(16);
                 if (i <= 4) { // FIXME: change to 5 before the year 2106
@@ -992,7 +1001,7 @@ lazy(self, 'decWorkerPool', function decWorkerPool() {
     /** @class decWorkerPool */
     return new class extends Array {
         get url() {
-            const WORKER_VERSION = 5;
+            const WORKER_VERSION = 6;
             return `${window.is_extension || window.is_karma ? '' : '/'}nodedec.js?v=${WORKER_VERSION}`;
         }
 

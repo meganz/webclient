@@ -4,10 +4,12 @@
 
     &.fluid {
         height: auto;
-        min-height: 606px;
+        &.upgrade {
+            min-height: 606px;
 
-        .fm-dialog-body {
-            min-height: 436px;
+            .fm-dialog-body {
+                min-height: 436px;
+            }
         }
     }
 

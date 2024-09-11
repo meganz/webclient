@@ -4876,7 +4876,7 @@ ChatRoom.prototype._attachNodes = mutex('chatroom-attach-nodes', function _(reso
       }
     }
     let op = send;
-    if (!n.ch && (n.u !== u_handle || M.getNodeRoot(n.h) === 'shares')) {
+    if (n.u !== u_handle || M.getNodeRoot(n.h) === 'shares') {
       op = copy;
     }
     op[n.h] = 1;

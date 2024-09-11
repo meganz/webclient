@@ -287,8 +287,10 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
                     Object.keys(self.members).forEach(function(userId) {
                         // remove group participant in strongvelope
                         self.protocolHandler.removeParticipant(userId);
-                        // also remove from our list
-                        delete self.members[userId];
+                        // Mark all users as read-only and self as left. Same as loading state when left
+                        self.members[userId] = userId === u_handle ?
+                            ChatRoom.MembersSet.PRIVILEGE_STATE.LEFT :
+                            ChatRoom.MembersSet.PRIVILEGE_STATE.READONLY;
                     });
                 }
                 else {

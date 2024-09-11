@@ -512,6 +512,8 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                 return;
             }
 
+            this._winWidth = window.innerWidth;
+            this._winHeight = window.innerHeight;
             this.setCellSize();
 
             this.dynamicList = new MegaDynamicList(this.el, {
@@ -1184,14 +1186,18 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
         }
 
         onResize() {
-            if (this.dynamicList) {
-                this.setCellSize();
+            if (this._winWidth === window.innerWidth && this._winHeight === window.innerHeight || !this.dynamicList) {
+                return;
+            }
 
-                const keys = Object.keys(this.dynamicList._currentlyRendered);
+            this.setCellSize();
+            this._winWidth = window.innerWidth;
+            this._winHeight = window.innerHeight;
 
-                for (let i = 0; i < keys.length; i++) {
-                    this.dynamicList.itemChanged(keys[i]);
-                }
+            const keys = Object.keys(this.dynamicList._currentlyRendered);
+
+            for (let i = 0; i < keys.length; i++) {
+                this.dynamicList.itemChanged(keys[i]);
             }
         }
 
@@ -1234,10 +1240,12 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
                 for (let i = 0; i < list.length; i++) {
                     const tCell = this.getCachedCell(list[i]);
-                    const preSize = tCell.naturalSize || 0;
 
                     tCell.el.style.width = sizePx;
                     tCell.el.style.height = sizePx;
+                    tCell.el.style.backgroundImage = null;
+                    tCell.el.style.backgroundColor = null;
+
                     scope.setShimmering(tCell.el);
 
                     if (this.showMonthLabel && !i && monthLabel) {
@@ -1257,10 +1265,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                     fillAlbumTimelineCell(tCell.el);
 
                     tCell.el.ref.el = tCell.el;
-
-                    if (parseFloat(preSize) < parseFloat(tCell.el.style.width)) {
-                        toFetchAttributes.push(tCell.el.ref);
-                    }
+                    toFetchAttributes.push(tCell.el.ref);
                 }
             }
 

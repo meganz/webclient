@@ -181,6 +181,23 @@ var versiondialogid;
         },
 
         /**
+         * set/remove tags on all previous versions of a file.
+         * @param {String} h file handle.
+         * @param {Object} prop tags
+         * @returns {Promise} promise
+         */
+        tagVersions(h, prop) {
+            return fileversioning.getAllVersions(h)
+                .then((versions) => {
+                    const promises = [];
+                    for (let i = 1; i < versions.length; i++) {
+                        promises.push(api.setNodeAttributes(versions[i], prop));
+                    }
+                    return Promise.allSettled(promises);
+                });
+        },
+
+        /**
          * update file versioning setting.
          */
         updateVersionInfo: function () {
@@ -261,6 +278,10 @@ var versiondialogid;
 
                 if (file.des) {
                     n.des = file.des;
+                }
+
+                if (file.tags) {
+                    n.tags = file.tags;
                 }
 
                 var ea = ab_to_base64(crypto_makeattr(n));

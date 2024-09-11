@@ -657,6 +657,9 @@ var ulmanager = {
             if (r.des) {
                 n.des = r.des;
             }
+            if (r.tags) {
+                n.tags = r.tags;
+            }
         }
 
         var req_type = 'p';

@@ -1447,6 +1447,9 @@ scparser.$add('u', function(a) {
                 if (M.dyh) {
                     M.dyh('check-node-update', n, oldattr);
                 }
+                if (oldattr.tags !== n.tags) {
+                    mega.ui.mInfoPanel.tagsDB.update(oldattr, n);
+                }
             }
 
             // save modified node

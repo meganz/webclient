@@ -1727,9 +1727,9 @@ MegaUtils.prototype.checkLeftStorageBlock = async function(data) {
 
     const storageIsAlmostFullOrFull = isAlmostFull || isFull;
 
-    // Unhide certain elements if the fmpup (FM / Photos upgrade point) flag is set,
-    // but not for Business or Pro Flexi users as the UI doesn't change for them
-    if (mega.flags.ab_fmpup && !u_attr.b && !u_attr.pf) {
+    // Check if user (not a Business or Pro Flexi one) is in the fmpup (FM / Photos upgrade point)
+    // variant group and change the upgrade point UI if so
+    if (!u_attr.b && !u_attr.pf && this.isInExperiment('fmpup')) {
         const $upgradeBtn = $('.info button.secondary', storageBlock);
         const $storageLimitIcon = $('.storage-limit-icon', storageBlock);
 
@@ -2635,6 +2635,32 @@ MegaUtils.prototype.agreedToCopyrightWarning = function() {
         return true;
     }
 
+    return false;
+};
+
+/**
+ * Check if the user is part of / eligible for a particular experiment.
+ *
+ * @param {String} flag The experiment flag to check against (e.g. fupd).
+ * @returns {Boolean} value.
+ */
+MegaUtils.prototype.isInExperiment = function(flag) {
+    'use strict';
+
+    // Check against the feature flag first
+    if (typeof mega.flags[`ff_${flag}`] !== 'undefined') {
+        return mega.flags[`ff_${flag}`];
+    }
+
+    // Then, check the AB flag is set and if it is, commit the user to their experiment group
+    if (mega.flags[`ab_${flag}`] > 0) {
+        api.req({'a': 'abta', c: `ab_${flag}`}).catch(dump);
+
+        // User is in a variant group if flag value is greater than 0
+        return true;
+    }
+
+    // If neither flag is set
     return false;
 };
 

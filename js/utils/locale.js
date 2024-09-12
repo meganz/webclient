@@ -1764,6 +1764,9 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', `<a ${rewindLinkAttr} href="${rewindHelpLink}">`)
         .replace('[/A]', '</a>')
         .replace('[BR]', '<br />');
+    l.new_feature_rewind_learn_more = escapeHTML(l.new_feature_rewind_learn_more)
+        .replace('[A]', `<a ${rewindLinkAttr} href="${rewindHelpLink}">`)
+        .replace('[/A]', '</a>');
 
     l.two_fa_download_app = escapeHTML(l.two_fa_download_app)
         .replace('[A]', '<a href="">')

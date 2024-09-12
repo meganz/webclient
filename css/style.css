@@ -2701,7 +2701,8 @@ body.loading .light-overlay {
 .fm-notification-block.mega-lite-mode-warning {
     background-color: var(--label-orange);
 }
-.fm-notification-block.business-next-tier {
+.fm-notification-block.business-next-tier,
+.fm-notification-block.new-feature-rewind-notification {
     background-color: var(--label-blue);
 }
 .fm-notification-block.grace-business.visible span span,
@@ -2751,6 +2752,28 @@ body.loading .light-overlay {
 }
 .fm-notification-block.payment-card-status .banner-title{
     font: var(--text-body1-bold);
+}
+
+.rubbish-bin.visible-notification .fm-notification-block.new-feature-rewind-notification {
+    display: flex;
+}
+
+.rtl .new-feature-rewind-notification {
+    direction: rtl;
+}
+
+.new-feature-rewind-notification {
+    justify-content: space-between;
+    align-items: center;
+}
+
+.new-feature-rewind-notification .learn-more {
+    display: flex;
+    align-items: center;
+}
+
+.new-feature-rewind-notification .learn-more span {
+    margin: 0 8px;
 }
 /* End of FM notification */
 

@@ -1857,7 +1857,7 @@ function init_page() {
         else {
             // For regular webclient we replace the whole URL
             // and preserve search parameters as the replace will reload memory.
-            window.location.replace('/login' + locationSearchParams);
+            window.location.replace((u_type === false ? '/login' : '/fm') + locationSearchParams);
         }
     }
 

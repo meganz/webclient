@@ -1598,6 +1598,11 @@
         video.oncontextmenu = () => false;
         return video;
     };
+    CallManager2.prototype.destroy = function() {
+        for (const call of Object.values(this.calls)) {
+            call.destroy();
+        }
+    };
     CallManager2.Peers = Peers;
     CallManager2.Peer = Peer;
     CallManager2.Call = Call;

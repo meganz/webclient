@@ -11,6 +11,10 @@
                     "NOT /emailverify/*",
                     "NOT /#emailverify/*",
                     "NOT /dont-deploy/*",
+                    "NOT /propay_*",
+                    "NOT /linux/*",
+                    "NOT /MEGAsync*",
+                    "NOT /MEGAvpn*",
                     "*"
                 ]
             },
@@ -25,6 +29,10 @@
                     "NOT /#pwrevert*",
                     "NOT /pwrevert*",
                     "NOT /dont-deploy/*",
+                    "NOT /propay_*",
+                    "NOT /linux/*",
+                    "NOT /MEGAsync*",
+                    "NOT /MEGAvpn*",
                     "*"
                 ]
             },
@@ -39,6 +47,10 @@
                     "NOT /#pwrevert*",
                     "NOT /pwrevert*",
                     "NOT /dont-deploy/*",
+                    "NOT /propay_*",
+                    "NOT /linux/*",
+                    "NOT /MEGAsync*",
+                    "NOT /MEGAvpn*",
                     "*"
                 ]
             }

@@ -271,14 +271,18 @@ class ForcedUpgradeProDialog {
 
     /**
      * Check if the forced upgrade pro dialog can be shown to the user. Do not show this dialog if:
-     * 1. the user registered in the last two days, or
-     * 2. it is too early for them to see it again (based on the ^!fudnxt user attribute -
+     * 1. the user is not part of / eligible for the experiment
+     * 2. the user registered in the last two days, or
+     * 3. it is too early for them to see it again (based on the ^!fudnxt user attribute -
      * forced upgrade dialog next (show time)) and their storage quota isn't in the yellow or red
      * (almost full / full) state
      *
      * @returns {Promise} true if the forced upgrade pro dialog can be shown to the user, false if not
      */
     async canShowDialog() {
+        // Check if user is part of / eligible for the experiment
+        const isInExperiment = M.isInExperiment('fupd');
+
         // Get end of the day after registration (registration day + 1 at 23:59:59)
         const endOfDayAfterRegistering = new Date(this.registeredDate.getTime() + 86400 * 1000);
         endOfDayAfterRegistering.setHours(23,59,59,59);
@@ -293,7 +297,7 @@ class ForcedUpgradeProDialog {
             return this.currentTime >= nextDialogShowTime;
         }
 
-        return !registeredLastTwoDays && this.storagePct < 90;
+        return isInExperiment && !registeredLastTwoDays && this.storagePct < 90;
     }
 
     /**
@@ -332,8 +336,8 @@ mBroadcaster.once('fm:initialized', () => {
         || String(M.currentdirid).includes('devices')
         || folderlink;
 
-    // Also do not show on mobile web, to paid users, or if AB flag isn't set to the variant value (1)
-    if (isInvalidDialogPage || is_mobile || u_attr.p || u_attr.pf || u_attr.b || !mega.flags.ab_fupd) {
+    // Also do not show on mobile web or to paid users
+    if (isInvalidDialogPage || is_mobile || u_attr.p || u_attr.pf || u_attr.b) {
         return;
     }
 

@@ -2144,6 +2144,7 @@ async function fm_fullreload(light, logMsg) {
     // nuke w/sc connection
     getsc.stop(-1, 'full-reload');
     window.getsc = nop;
+    getsc.stop = nop;
     getsc.validate = nop;
 
     return Promise.allSettled([

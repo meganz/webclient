@@ -1843,6 +1843,14 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A2]', `<a ${rewindLinkAttr} href="${rewindHelpLink}">`)
         .replace('[/A2]', '</a>');
 
+    l.stripe_card_declined_error = escapeHTML(l.stripe_card_declined_error)
+        .replace('[A]', '<a href="https://help.mega.io/plans-storage/payments-billing/why-is-my-card-being-declined">')
+        .replace('[/A]', '</a>');
+
+    l.stripe_generic_decline_error = escapeHTML(l.stripe_generic_decline_error)
+        .replace('[A]', '<a href="mailto:support@mega.nz">')
+        .replace('[/A]', '</a>');
+
     const common = [
         15536, 16119, 16120, 16313, 16316, 16360, 18228, 18268, 18282,
         18284, 18285, 18286, 18287, 18289, 18290, 18291, 18294, 18295, 18296, 18297, 18298, 18302, 18303, 18304,

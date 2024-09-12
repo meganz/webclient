@@ -1857,7 +1857,7 @@ function init_page() {
         else {
             // For regular webclient we replace the whole URL
             // and preserve search parameters as the replace will reload memory.
-            window.location.replace('/login' + locationSearchParams);
+            window.location.replace((u_type === false ? '/login' : '/fm') + locationSearchParams);
         }
     }
 
@@ -2087,7 +2087,7 @@ function topmenuUI() {
     var $menuPricingItem = $('.top-menu-item.pro', $topMenu);
     const $menuAchievementsItem = $('.top-menu-item.achievements', $topMenu);
     var $menuBackupItem = $('.top-menu-item.backup', $topMenu);
-    var $menuAffiliateItem = $('.top-menu-item.affiliate', $topMenu);
+    var $menuReferItem = $('.top-menu-item.refer', $topMenu);
     var $menuFeedbackItem = $('.top-menu-item.feedback', $topMenu);
     var $menuUserinfo = $('.top-menu-account-info', $menuLoggedBlock);
     var $menuUsername = $('.name', $menuUserinfo);
@@ -2119,7 +2119,7 @@ function topmenuUI() {
     $menuLogoutButton.addClass('hidden');
     $menuAuthButtons.addClass('hidden');
     $menuRefreshItem.addClass('hidden');
-    $menuAffiliateItem.addClass('hidden');
+    $menuReferItem.addClass('hidden');
     $menuUsername.addClass('hidden');
     $menuUpgradeAccount.removeClass('hidden');
     $menuAvatar.removeClass('presence');
@@ -2206,7 +2206,7 @@ function topmenuUI() {
     }
 
     if (mega.flags.refpr) {
-        $menuAffiliateItem.removeClass('hidden');
+        $menuReferItem.removeClass('hidden');
     }
 
     // Show language in top menu
@@ -2719,20 +2719,19 @@ function topmenuUI() {
                     'privacy', 'pro', 'register', 'reliability', 'resellers', 'sdk',
                     'securechat', 'security', 'share', 'sitemap', 'sourcecode', 'special',
                     'start', 'storage', 'support', 'syncing', 'takedown', 'terms', 'transparency',
-                    'individuals', 'freelancers', 'small-business', 'vpn', 'media-files', 'vpn-terms'
+                    'refer', 'individuals', 'freelancers', 'small-business', 'vpn', 'media-files', 'vpn-terms'
                 ];
                 const ioPages = [
                     'about', 'achievements', 'affiliate', 'bug-bounty', 'business',
                     'chatandmeetings', 'cmd', 'collaboration', 'contact', 'cookie', 'copyright',
                     'corporate', 'desktop', 'developers', 'dispute', 'doc', 'extensions', 'media',
                     'megabackup', 'mobile', 'mobileapp', 'nas', 'objectstorage', 'privacy',
-                    'reliability', 'resellers', 'sdk', 'securechat', 'security', 'share',
+                    'refer', 'reliability', 'resellers', 'sdk', 'securechat', 'security', 'share',
                     'sourcecode', 'storage', 'syncing', 'takedown', 'terms', 'transparency', 'individuals',
                     'freelancers', 'small-business', 'vpn', 'media-files' , 'vpn-terms'
                 ];
                 var moveTo = {
                     account: 'fm/account',
-                    affiliate: 'refer',
                     corporate: 'media',
                     collaboration: 'share',
                     securechat: 'chatandmeetings',

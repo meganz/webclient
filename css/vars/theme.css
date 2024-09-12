@@ -97,6 +97,9 @@ body,
                 --text-color-white-medium: rgba(255, 255, 255, 0.7);
                 --text-color-white-low: rgba(255, 255, 255, 0.4);
 
+            /* blue */
+                --text-color-blue: rgba(43, 166, 222, 1);
+
         /* font family */
 
             --text-font-family: "LatoWeb", sans-serif;

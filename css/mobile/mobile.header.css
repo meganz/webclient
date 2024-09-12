@@ -6,7 +6,7 @@
     width: 100%;
     height: auto;
     background: var(--mobile-page-background);
-    z-index: 100;
+    z-index: 95;
     overflow: hidden;
 }
 

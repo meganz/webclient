@@ -726,6 +726,11 @@ pro.proplan = {
 
             const $currentBox = $pricingBoxes.filter(desiredBoxClass).removeClass('hidden');
 
+            // Skip if the current box doesn't exist
+            if (!$currentBox.length) {
+                continue;
+            }
+
             var $price = $('.plan-price .price', $currentBox);
             var $euroPrice = $('.pricing-page.euro-price', $currentBox);
             var $currncyAbbrev = $('.pricing-page.plan-currency', $currentBox);

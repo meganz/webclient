@@ -6482,6 +6482,8 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.limited-bandwidth-dialog:not(.pro3):not(.no-cards) .dialog.bottom-button button.upgrade,
     .mega-dialog.limited-bandwidth-dialog.pro3 .step1-block,
     .mega-dialog.limited-bandwidth-dialog.pro3 .local-currency-tip,
+    .mega-dialog.limited-bandwidth-dialog:not(.local-currency) .local-currency-tip,
+    .mega-dialog.limited-bandwidth-dialog:not(.local-currency) .ast,
     .mega-dialog.limited-bandwidth-dialog:not(.pro-mini) .pricing-page.period-subtitle,
     .mega-dialog.limited-bandwidth-dialog.pro-mini.no-cards .step1-block,
     .mega-dialog.limited-bandwidth-dialog.pro-mini.no-cards .local-currency-tip {
@@ -10703,9 +10705,21 @@ body.de .mega-dialog.contact-picker-widget {
 
 /* payment-stripe-success/failure-dialog */
 
-    .mega-dialog.payment-stripe-success-dialog,
-    .mega-dialog.payment-stripe-failure-dialog {
+    .mega-dialog.payment-stripe-success-dialog {
         width: 400px;
+    }
+
+    .mega-dialog.payment-stripe-failure-dialog {
+        width: 538px;
+    }
+    .mega-dialog.payment-stripe-failure-dialog > header {
+        padding-bottom: 24px;
+    }
+    .mega-dialog.payment-stripe-failure-dialog > header .graphic {
+        margin-bottom: 34px;
+    }
+    .mega-dialog.payment-stripe-failure-dialog h2 {
+        font: var(--text-h2-bold);
     }
 
     .mega-dialog.payment-stripe-success-dialog .content-block,

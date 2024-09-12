@@ -4804,3 +4804,59 @@ MegaData.prototype.setNodeDescription = async function(itemHandle, newItemDescri
         return api.setNodeAttributes(n, prop);
     }
 };
+
+/**
+ * Set node tags attribute
+ * @param {MegaNode|Object|String} handles node handle
+ * @param {String} newItemTag node tag text
+ * @param {Boolean} isRemove remove tag
+ * @returns {Promise} promises
+ */
+MegaData.prototype.setNodeTag = async function(handles, newItemTag, isRemove) {
+    'use strict';
+
+    if (typeof newItemTag !== 'string' || !newItemTag.length) {
+        return;
+    }
+
+    if (!Array.isArray(handles)) {
+        handles = [handles];
+    }
+    const promises = [];
+
+    for (let i = handles.length; i--;) {
+        const n = this.getNodeByHandle(handles[i].h);
+
+        if (n) {
+            let prop;
+
+            if (isRemove) {
+                if (n.tags && n.tags.includes(newItemTag)) {
+                    prop = 1;
+                    array.remove(n.tags, newItemTag);
+                }
+            }
+            else if (!n.tags || !n.tags.includes(newItemTag)) {
+                if (!n.tags) {
+                    n.tags = [];
+                }
+                prop = 1;
+                n.tags.push(newItemTag);
+            }
+
+            if (prop) {
+                prop = {tags: n.tags.length ? [...n.tags] : undefined};
+
+                // TODO S4
+                // TODO Save/Delete also to other version of the node
+                if (n.tvf) {
+                    fileversioning.tagVersions(n.h, prop).catch(reportError);
+                }
+
+                promises.push(api.setNodeAttributes(n, prop));
+            }
+        }
+    }
+
+    return Promise.all(promises);
+};

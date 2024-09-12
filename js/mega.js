@@ -1447,6 +1447,9 @@ scparser.$add('u', function(a) {
                 if (M.dyh) {
                     M.dyh('check-node-update', n, oldattr);
                 }
+                if (oldattr.tags !== n.tags) {
+                    mega.ui.mInfoPanel.tagsDB.update(oldattr, n);
+                }
             }
 
             // save modified node
@@ -2141,6 +2144,7 @@ async function fm_fullreload(light, logMsg) {
     // nuke w/sc connection
     getsc.stop(-1, 'full-reload');
     window.getsc = nop;
+    getsc.stop = nop;
     getsc.validate = nop;
 
     return Promise.allSettled([

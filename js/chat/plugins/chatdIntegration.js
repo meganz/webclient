@@ -745,7 +745,6 @@ ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatIn
                     chatInfo.n.forEach(function(v) {
                         if (v.p === -1) {
                             excluded.push(v.u);
-                            delete chatRoom.members[v.u];
                             if (v.u === u_handle) {
                                 if (typeof(chatRoom.megaChat.plugins.presencedIntegration) !== 'undefined') {
                                     Object.keys(chatRoom.members).forEach(function(user_handle) {
@@ -756,7 +755,10 @@ ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatIn
                                                 chatRoom
                                             );
                                         }
-                                        delete chatRoom.members[user_handle];
+                                        // Mark all users as read-only and self as left. Same as loading state when left
+                                        chatRoom.members[user_handle] = user_handle === u_handle ?
+                                            ChatRoom.MembersSet.PRIVILEGE_STATE.LEFT :
+                                            ChatRoom.MembersSet.PRIVILEGE_STATE.READONLY;
                                     });
                                 }
                                 const { scheduledMeeting } = chatRoom;
@@ -766,6 +768,7 @@ ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatIn
                                 chatRoom.leave(false);
                             }
                             else {
+                                delete chatRoom.members[v.u];
                                 // someone else left the room
                                 if (
                                     !(M.u[v.u] && M.u[v.u].c) &&

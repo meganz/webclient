@@ -2310,19 +2310,41 @@ var addressDialog = {
                 }
             });
 
-            $('.stripe-error', $stripeFailureDialog).text(error || '');
+            $('.stripe-error', $stripeFailureDialog).safeHTML(error || '');
 
             if (addressDialog.stripeSaleId === 'EDIT') {
                 $((is_mobile ? '.fail-head' : '.payment-stripe-failure-dialog-title'), $stripeFailureDialog)
                     .text(l.payment_gw_update_fail);
-                $('.err-txt', $stripeFailureDialog).safeHTML(l.payment_gw_update_fail_desc
-                    .replace('[A]', '<a href="mailto:support@mega.nz">')
-                    .replace('[/A]', '</a>'));
             }
 
             $stripeIframe.remove();
             closeStripeDialog();
             M.safeShowDialog('stripe-pay-failure', $stripeFailureDialog);
+        };
+
+        const getErrorText = (failData) => {
+            // failData[2] = error code from megapay
+            // failData[3] = decline code (if it exists) from megapay
+            if (typeof failData === 'object') {
+                if (failData[3] === 'insufficient_funds') { // Insufficient funds
+                    return l.stripe_insufficient_funds_error;
+                }
+                if (failData[3] === 'generic_decline') { // Generic error
+                    return l.stripe_generic_decline_error;
+                }
+                if (failData[2] === 'incorrect_cvc') { // Incorrect security code
+                    return l.stripe_incorrect_cvc_error;
+                }
+                if (failData[2] === 'card_declined') { // Declined
+                    return l.stripe_card_declined_error;
+                }
+
+                // Return result.error.message from megapay if the above checks fail
+                return failData[1];
+            }
+
+            // Return the card declined error if failData isn't an object or is empty
+            return l.stripe_card_declined_error;
         };
 
         if (event && event.origin === addressDialog.gatewayOrigin && event.data) {
@@ -2348,7 +2370,7 @@ var addressDialog = {
                 return;
             }
             if (event.data.startsWith('payfail^')) {
-                failHandle(event.data.split('^')[1]);
+                failHandle(getErrorText(event.data.split('^')));
             }
             else if (event.data === 'paysuccess') {
 
@@ -2380,7 +2402,7 @@ var addressDialog = {
             else if (event.data.startsWith('action^')) {
                 const destURL = event.data.split('^')[1] || '';
                 if (!destURL) {
-                    failHandle();
+                    failHandle(getErrorText());
                 }
                 else {
                     window.location = destURL;

@@ -287,8 +287,10 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
                     Object.keys(self.members).forEach(function(userId) {
                         // remove group participant in strongvelope
                         self.protocolHandler.removeParticipant(userId);
-                        // also remove from our list
-                        delete self.members[userId];
+                        // Mark all users as read-only and self as left. Same as loading state when left
+                        self.members[userId] = userId === u_handle ?
+                            ChatRoom.MembersSet.PRIVILEGE_STATE.LEFT :
+                            ChatRoom.MembersSet.PRIVILEGE_STATE.READONLY;
                     });
                 }
                 else {
@@ -1767,7 +1769,7 @@ ChatRoom.prototype._attachNodes = mutex('chatroom-attach-nodes', function _(reso
         }
 
         let op = send;
-        if (!n.ch && (n.u !== u_handle || M.getNodeRoot(n.h) === 'shares')) {
+        if (n.u !== u_handle || M.getNodeRoot(n.h) === 'shares') {
             op = copy;
         }
 

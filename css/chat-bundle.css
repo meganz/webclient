@@ -4040,9 +4040,11 @@ body.theme-dark .start-meeting-preview .preview-meeting {
 }
 #schedule-dialog.fluid {
   height: auto;
+}
+#schedule-dialog.fluid.upgrade {
   min-height: 606px;
 }
-#schedule-dialog.fluid .fm-dialog-body {
+#schedule-dialog.fluid.upgrade .fm-dialog-body {
   min-height: 436px;
 }
 #schedule-dialog.with-confirmation-dialog {

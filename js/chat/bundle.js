@@ -124,6 +124,9 @@ class ChatRouting {
     if (location.substr(0, 13) === "chat/contacts") {
       location = `fm/${  location}`;
     }
+    if (location === 'chat') {
+      location = 'fm/chat';
+    }
     history[method]({
       subpage: location
     }, "", (hashLogic ? '#' : '/') + location);

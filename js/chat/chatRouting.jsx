@@ -172,6 +172,10 @@ export default class ChatRouting {
             // ensure that chat/contacts is always opened with fm/ prefix
             location = "fm/" + location;
         }
+        if (location === 'chat') {
+            // ensure that /chat ends up on and fm route.
+            location = 'fm/chat';
+        }
 
         history[method]({subpage: location}, "", (hashLogic ? '#' : '/') + location);
         mBroadcaster.sendMessage('pagechange', page);

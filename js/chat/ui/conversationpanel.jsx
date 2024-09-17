@@ -61,7 +61,7 @@ class EndCallButton extends MegaRenderMixin {
                     persistent={true}
                     onClick={() => {
                         const doLeave = () =>
-                            hasHost(chatRoom.getCallParticipants()) ?
+                            hasHost(chatRoom.call ? chatRoom.call.peers.map(a => a.userHandle) : []) ?
                                 onLeave() :
                                 confirmLeave({
                                     title: l.assign_host_leave_call /* `Assign host to leave call` */,

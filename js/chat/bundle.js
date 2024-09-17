@@ -12783,7 +12783,7 @@ class EndCallButton extends mixins.w9 {
         label: l.leave,
         persistent: true,
         onClick: () => {
-          const doLeave = () => hasHost(chatRoom.getCallParticipants()) ? onLeave() : confirmLeave({
+          const doLeave = () => hasHost(chatRoom.call ? chatRoom.call.peers.map(a => a.userHandle) : []) ? onLeave() : confirmLeave({
             title: l.assign_host_leave_call,
             body: l.assign_host_leave_call_details,
             cta: l.assign_host_button,
@@ -24230,7 +24230,7 @@ const withHostsObserver = Component => {
         dialog: false,
         selected: []
       };
-      this.hasHost = participants => participants.some(handle => this.props.chatRoom.members[handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR && handle !== u_handle);
+      this.hasHost = participants => participants.some(handle => this.props.chatRoom.members[handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR);
       this.toggleDialog = () => {
         this.setState(state => ({
           dialog: !state.dialog,
@@ -25432,7 +25432,7 @@ class Minimized extends mixins.w9 {
           onClick: ev => {
             ev.stopPropagation();
             const callParticipants = chatRoom.getCallParticipants();
-            const doLeave = () => !chatRoom.iAmOperator() || hasHost(callParticipants) || callParticipants.length === 1 ? onLeave() : confirmLeave({
+            const doLeave = () => !chatRoom.iAmOperator() || hasHost(chatRoom.call ? chatRoom.call.peers.map(a => a.userHandle) : []) || callParticipants.length === 1 ? onLeave() : confirmLeave({
               title: l.assign_host_leave_call,
               body: l.assign_host_leave_call_details,
               cta: l.assign_host_button,
@@ -27438,7 +27438,7 @@ class StreamControls extends _mixins1__.w9 {
       confirmLeave,
       onLeave
     }) => {
-      const doLeave = () => hasHost(chatRoom.getCallParticipants()) ? onLeave() : confirmLeave({
+      const doLeave = () => hasHost(chatRoom.call ? chatRoom.call.peers.map(a => a.userHandle) : []) ? onLeave() : confirmLeave({
         title: l.assign_host_leave_call,
         body: l.assign_host_leave_call_details,
         cta: l.assign_host_button,

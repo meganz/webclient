@@ -60,7 +60,7 @@ class StreamControls extends MegaRenderMixin {
     LeaveButton = withHostsObserver(
         ({ hasHost, chatRoom, confirmLeave, onLeave }) => {
             const doLeave = () =>
-                hasHost(chatRoom.getCallParticipants()) ?
+                hasHost(chatRoom.call ? chatRoom.call.peers.map(a => a.userHandle) : []) ?
                     // Leave the call directly w/o any further actions if
                     // there are other hosts already present in the call.
                     onLeave() :

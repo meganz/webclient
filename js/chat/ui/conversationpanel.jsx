@@ -713,6 +713,11 @@ export class ConversationRightArea extends MegaRenderMixin {
                 this.safeForceUpdate();
             }
         });
+        megaChat.rebind(`onPrepareIncomingCallDialog.${this.getUniqueId()}`, () => {
+            if (this.isMounted() && this.state.inviteDialog) {
+                this.setState({ inviteDialog: false });
+            }
+        });
     }
 
     render() {

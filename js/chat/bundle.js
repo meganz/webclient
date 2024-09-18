@@ -13285,6 +13285,13 @@ class ConversationRightArea extends mixins.w9 {
         this.safeForceUpdate();
       }
     });
+    megaChat.rebind(`onPrepareIncomingCallDialog.${this.getUniqueId()}`, () => {
+      if (this.isMounted() && this.state.inviteDialog) {
+        this.setState({
+          inviteDialog: false
+        });
+      }
+    });
   }
   render() {
     const self = this;
@@ -16577,7 +16584,7 @@ class Edit extends mixins.w9 {
     this.occurrenceRef = null;
     this.datepickerRefs = [];
     this.interval = ChatRoom.SCHEDULED_MEETINGS_INTERVAL;
-    this.incomingCallListener = 'onIncomingCall.recurringEdit';
+    this.incomingCallListener = 'onPrepareIncomingCallDialog.recurringEdit';
     this.state = {
       startDateTime: undefined,
       endDateTime: undefined,
@@ -16651,10 +16658,8 @@ class Edit extends mixins.w9 {
       if (!this.isMounted()) {
         throw Error(`Edit dialog: component not mounted.`);
       }
-      megaChat.rebind(this.incomingCallListener, ({
-        data
-      }) => {
-        if (this.isMounted() && !is_chatlink && pushNotificationSettings.isAllowedForChatId(data[0].chatId)) {
+      megaChat.rebind(this.incomingCallListener, () => {
+        if (this.isMounted()) {
           this.setState({
             overlayed: true,
             closeDialog: false
@@ -16837,7 +16842,7 @@ class Schedule extends mixins.w9 {
     this.scheduledMeetingRef = null;
     this.localStreamRef = '.float-video';
     this.datepickerRefs = [];
-    this.incomingCallListener = 'onIncomingCall.scheduleDialog';
+    this.incomingCallListener = 'onPrepareIncomingCallDialog.scheduleDialog';
     this.ringingStoppedListener = 'onRingingStopped.scheduleDialog';
     this.interval = ChatRoom.SCHEDULED_MEETINGS_INTERVAL;
     this.nearestHalfHour = (0,helpers.i_)();
@@ -17100,8 +17105,8 @@ class Schedule extends mixins.w9 {
           return false;
         }
       });
-      megaChat.rebind(this.incomingCallListener, (e, chatRoom) => {
-        if (!is_chatlink && pushNotificationSettings.isAllowedForChatId(chatRoom.chatId)) {
+      megaChat.rebind(this.incomingCallListener, () => {
+        if (this.isMounted()) {
           this.setState({
             overlayed: true,
             closeDialog: false

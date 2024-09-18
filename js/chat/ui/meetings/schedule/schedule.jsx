@@ -19,7 +19,7 @@ export class Schedule extends MegaRenderMixin {
     localStreamRef = '.float-video';
     datepickerRefs = [];
 
-    incomingCallListener = 'onIncomingCall.scheduleDialog';
+    incomingCallListener = 'onPrepareIncomingCallDialog.scheduleDialog';
     ringingStoppedListener = 'onRingingStopped.scheduleDialog';
 
     interval = ChatRoom.SCHEDULED_MEETINGS_INTERVAL;
@@ -407,8 +407,8 @@ export class Schedule extends MegaRenderMixin {
 
             // Manually handle the stacking of dialogs when receiving incoming call -- mark `Schedule` as overlayed,
             // if the incoming call dialog is shown
-            megaChat.rebind(this.incomingCallListener, (e, chatRoom) => {
-                if (!is_chatlink && pushNotificationSettings.isAllowedForChatId(chatRoom.chatId)) {
+            megaChat.rebind(this.incomingCallListener, () => {
+                if (this.isMounted()) {
                     this.setState({ overlayed: true, closeDialog: false });
                     // Clear when ringing stops.
                     megaChat.plugins.callManager2.rebind(this.ringingStoppedListener, () => {

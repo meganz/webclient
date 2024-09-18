@@ -41,6 +41,7 @@ var ChatNotifications = function(megaChat, options) {
         if (!name) {
             name = await megaChat.plugins.userHelper.getUserName(userId).catch(dump);
         }
+        megaChat.trigger('onPrepareIncomingCallDialog', chatRoom);
 
         const notification = this.notifications.notify(
             'incoming-voice-video-call',

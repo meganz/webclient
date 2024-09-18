@@ -49,9 +49,16 @@ Message._mockupNonLoadedMessage = function(msgId, msg, orderValueIfNotFound) {
     }
 };
 
+/**
+ * Text message content for dialogType messages.
+ * WARNING does not guarantee the return value is sanitised. Use megaChat.html(), escapeHTML(), etc...
+ *
+ * @param {Message|ChatDialogMessage} message The message to generate content for
+ * @returns {boolean|string} The message content
+ */
 // @todo complexity
 // eslint-disable-next-line complexity
-Message._getTextContentsForDialogType = function(message, rawContent) {
+Message._getTextContentsForDialogType = function(message) {
     'use strict';
     if (
         !message.textContents ||
@@ -71,9 +78,6 @@ Message._getTextContentsForDialogType = function(message, rawContent) {
         var contactName = "";
         if (contact) {
             contactName = M.getNameByHandle(contact.u);
-            if (rawContent !== 0xBADF) {
-                contactName = escapeHTML(contactName);
-            }
         }
 
         if (message.dialogType === "privilegeChange" && message.meta) {
@@ -119,9 +123,6 @@ Message._getTextContentsForDialogType = function(message, rawContent) {
                             : l.meeting_mgmt_user_added; /* `%1 joined the meeting by invitation from %2.` */
                     }
                     let otherName = M.getNameByHandle(otherContact.h);
-                    if (rawContent !== 0xBADF) {
-                        otherName = escapeHTML(otherName);
-                    }
                     textMessage = textMessage.replace('%1', otherName);
                     if (!isSelfJoin) {
                         textMessage = textMessage.replace('%2', contactName);
@@ -135,7 +136,7 @@ Message._getTextContentsForDialogType = function(message, rawContent) {
         else if (message.dialogType === "topicChange") {
             textMessage = l[9081].replace(
                 "%s",
-                '"' + rawContent === 0xBADF ? message.meta.topic : escapeHTML(message.meta.topic) + '"'
+                `"${message.meta.topic}"`
             );
         }
         else if (message.dialogType === "remoteCallStarted") {
@@ -147,7 +148,7 @@ Message._getTextContentsForDialogType = function(message, rawContent) {
 
             if (textMessage.splice) {
                 textMessage =
-                    CallManager2._getMltiStrTxtCntsForMsg(message, textMessage, undefined, undefined, rawContent);
+                    CallManager2._getMltiStrTxtCntsForMsg(message, textMessage, undefined, undefined);
             }
             else {
                 textMessage = textMessage.replace("[X]", contactName);
@@ -202,7 +203,7 @@ Message._getTextContentsForDialogType = function(message, rawContent) {
 
             if (textMessage.splice) {
                 textMessage =
-                    CallManager2._getMltiStrTxtCntsForMsg(message, textMessage, undefined, undefined, rawContent);
+                    CallManager2._getMltiStrTxtCntsForMsg(message, textMessage, undefined, undefined);
             }
             else {
                 textMessage = textMessage.replace("[X]", contactName);
@@ -213,7 +214,7 @@ Message._getTextContentsForDialogType = function(message, rawContent) {
             textMessage = ScheduleMetaChange.getTitleText(message.meta);
         }
         else if (textMessage.splice) {
-            textMessage = CallManager2._getMltiStrTxtCntsForMsg(message, textMessage, undefined, undefined, rawContent);
+            textMessage = CallManager2._getMltiStrTxtCntsForMsg(message, textMessage, undefined, undefined);
         }
         else {
             textMessage = textMessage.replace("[X]", contactName);
@@ -2431,7 +2432,7 @@ MessagesBuff.prototype.getRenderableSummary = function(lastMessage, rawContent) 
             renderableSummary = lastMessage.getMessageRetentionSummary();
         }
         else if (!lastMessage.textContents && lastMessage.dialogType) {
-            renderableSummary = Message._getTextContentsForDialogType(lastMessage, rawContent);
+            renderableSummary = Message._getTextContentsForDialogType(lastMessage);
         }
         else {
             renderableSummary = lastMessage.textContents;

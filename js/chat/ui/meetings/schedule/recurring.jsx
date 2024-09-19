@@ -578,7 +578,7 @@ export class Edit extends MegaRenderMixin {
     datepickerRefs = [];
 
     interval = ChatRoom.SCHEDULED_MEETINGS_INTERVAL;
-    incomingCallListener = 'onIncomingCall.recurringEdit';
+    incomingCallListener = 'onPrepareIncomingCallDialog.recurringEdit';
 
     state = {
         startDateTime: undefined,
@@ -649,13 +649,9 @@ export class Edit extends MegaRenderMixin {
                 throw Error(`Edit dialog: component not mounted.`);
             }
 
-            megaChat.rebind(this.incomingCallListener, ({ data }) => {
+            megaChat.rebind(this.incomingCallListener, () => {
                 // If the incoming call dialog will show mark this as overlayed.
-                if (
-                    this.isMounted()
-                    && !is_chatlink
-                    && pushNotificationSettings.isAllowedForChatId(data[0].chatId)
-                ) {
+                if (this.isMounted()) {
                     this.setState({ overlayed: true, closeDialog: false });
                     // Clear when ringing stops.
                     megaChat.plugins.callManager2.rebind('onRingingStopped.recurringEdit', () => {

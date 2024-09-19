@@ -587,7 +587,6 @@
     color: var(--text-color-medium);
     display: block;
     margin: 8px;
-    text-transform: uppercase;
 }
 .dark .dropdown-color-txt {
     color: #FFFFFF;

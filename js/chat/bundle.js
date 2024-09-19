@@ -12265,6 +12265,7 @@ class Alert extends mixins.w9 {
       className,
       content,
       children,
+      offset,
       onClose
     } = this.props;
     if (content || children) {
@@ -12274,7 +12275,10 @@ class Alert extends mixins.w9 {
                         ${NAMESPACE}
                         ${type ? `${NAMESPACE}-${type}` : ''}
                         ${className || ''}
-                    `
+                    `,
+        style: offset ? {
+          marginTop: `${offset}px`
+        } : undefined
       }, REaCt().createElement("div", {
         className: `${NAMESPACE}-content`
       }, content || children), onClose && REaCt().createElement("span", {
@@ -12766,6 +12770,7 @@ let conversationpanel_dec, _dec2, conversationpanel_class;
 
 const ENABLE_GROUP_CALLING_FLAG = true;
 const MAX_USERS_CHAT_PRIVATE = 100;
+const ALERTS_BASE_OFFSET = 4;
 class EndCallButton extends mixins.w9 {
   constructor(...args) {
     super(...args);
@@ -12783,7 +12788,7 @@ class EndCallButton extends mixins.w9 {
         label: l.leave,
         persistent: true,
         onClick: () => {
-          const doLeave = () => hasHost(chatRoom.getCallParticipants()) ? onLeave() : confirmLeave({
+          const doLeave = () => hasHost(chatRoom.call ? chatRoom.call.peers.map(a => a.userHandle) : []) ? onLeave() : confirmLeave({
             title: l.assign_host_leave_call,
             body: l.assign_host_leave_call_details,
             cta: l.assign_host_button,
@@ -12926,13 +12931,20 @@ class JoinCallNotification extends mixins.w9 {
   render() {
     const {
       chatRoom,
-      offset
+      offset,
+      rhpCollapsed
     } = this.props;
     if (chatRoom.call) {
       return null;
     }
     if (!megaChat.hasSupportForCalls) {
       return REaCt().createElement(Alert, {
+        className: `
+                    ${rhpCollapsed ? 'full-span' : ''}
+                    ${offset === ALERTS_BASE_OFFSET ? 'single-alert' : ''}
+                    unsupported-call-alert-progress
+                `,
+        offset: offset === ALERTS_BASE_OFFSET ? 0 : offset,
         type: Alert.TYPE.MEDIUM,
         content: l.active_call_not_supported
       });
@@ -13283,6 +13295,13 @@ class ConversationRightArea extends mixins.w9 {
     megaChat.rebind(`${megaChat.plugins.meetingsManager.EVENTS.OCCURRENCES_UPDATE}.${this.getUniqueId()}`, () => {
       if (this.isMounted()) {
         this.safeForceUpdate();
+      }
+    });
+    megaChat.rebind(`onPrepareIncomingCallDialog.${this.getUniqueId()}`, () => {
+      if (this.isMounted() && this.state.inviteDialog) {
+        this.setState({
+          inviteDialog: false
+        });
       }
     });
   }
@@ -14851,6 +14870,11 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
                         `
     }, this.state.hasInvalidKeys && this.state.invalidKeysBanner && REaCt().createElement(Alert, {
       type: Alert.TYPE.HIGH,
+      className: `
+                                    ${megaChat.chatUIFlags.convPanelCollapse ? 'full-span' : ''}
+                                    ${this.props.offset === ALERTS_BASE_OFFSET ? 'single-alert' : ''}
+                                `,
+      offset: this.props.offset === ALERTS_BASE_OFFSET ? 0 : this.props.offset,
       content: REaCt().createElement(REaCt().Fragment, null, l.chat_key_failed_banner.split('[A]')[0], REaCt().createElement("a", {
         onClick: () => M.reload()
       }, l.chat_key_failed_banner.substring(l.chat_key_failed_banner.indexOf('[A]') + 3, l.chat_key_failed_banner.indexOf('[/A]'))), l.chat_key_failed_banner.split('[/A]')[1]),
@@ -14865,7 +14889,7 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
         this.historyPanel = historyPanel;
       },
       onDeleteClicked: msg => this.handleDeleteDialog(msg)
-    })), !is_chatlink && room.state !== ChatRoom.STATE.LEFT && navigator.onLine && room.scheduledMeeting && !room.isArchived() && !isStartCallDisabled(room) ? REaCt().createElement(StartMeetingNotification, {
+    })), !is_chatlink && room.state !== ChatRoom.STATE.LEFT && navigator.onLine && room.scheduledMeeting && !room.isArchived() && !this.state.hasInvalidKeys && !isStartCallDisabled(room) ? REaCt().createElement(StartMeetingNotification, {
       chatRoom: room,
       offset: this.props.offset,
       onWaitingRoomJoin: () => this.setState({
@@ -14874,7 +14898,8 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
       onStartCall: mode => {
         return isStartCallDisabled(room) ? null : (0,call.dQ)(true, room).then(() => this.startCall(mode, true)).catch(ex => d && console.warn(`Already in a call. ${ex}`));
       }
-    }) : null, !is_chatlink && room.state !== ChatRoom.STATE.LEFT && (room.havePendingGroupCall() || room.havePendingCall()) && navigator.onLine ? REaCt().createElement(JoinCallNotification, {
+    }) : null, !is_chatlink && room.state !== ChatRoom.STATE.LEFT && (room.havePendingGroupCall() || room.havePendingCall()) && !this.state.hasInvalidKeys && navigator.onLine ? REaCt().createElement(JoinCallNotification, {
+      rhpCollapsed: megaChat.chatUIFlags.convPanelCollapse,
       chatRoom: room,
       offset: this.props.offset
     }) : null, room.isAnonymous() ? REaCt().createElement("div", {
@@ -14906,14 +14931,13 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
 class ConversationPanels extends mixins.w9 {
   constructor(props) {
     super(props);
-    this.alertsOffset = 4;
     this.notificationListener = 'meetings:notificationPermissions';
     this.notificationGranted = undefined;
     this.notificationHelpURL = `${l.mega_help_host}/chats-meetings/meetings/enable-notification-browser-system-permission`;
     this.state = {
       supportAlert: undefined,
       notificationsPermissions: undefined,
-      alertsOffset: this.alertsOffset
+      alertsOffset: ALERTS_BASE_OFFSET
     };
     this.closeSupportAlert = () => this.setState({
       supportAlert: false
@@ -14934,8 +14958,11 @@ class ConversationPanels extends mixins.w9 {
                     ${megaChat.chatUIFlags.convPanelCollapse ? 'full-span' : ''}
                     ${this.props.isEmpty ? 'empty-state' : ''}
                 `,
+      ref: ref => {
+        this.notifPendingRef = ref;
+      },
       onTransition: ref => this.setState({
-        alertsOffset: ref ? ref.current.offsetHeight : this.alertsOffset
+        alertsOffset: ref ? ref.current.offsetHeight : ALERTS_BASE_OFFSET
       }),
       onClose: () => {
         this.setState({
@@ -14965,8 +14992,11 @@ class ConversationPanels extends mixins.w9 {
                     ${megaChat.chatUIFlags.convPanelCollapse ? 'full-span' : ''}
                     ${this.props.isEmpty ? 'empty-state' : ''}
                 `,
+      ref: ref => {
+        this.notifBlockedRef = ref;
+      },
       onTransition: ref => this.setState({
-        alertsOffset: ref ? ref.current.offsetHeight : this.alertsOffset
+        alertsOffset: ref ? ref.current.offsetHeight : ALERTS_BASE_OFFSET
       }),
       onClose: () => this.setState({
         notificationsPermissions: undefined
@@ -14994,6 +15024,30 @@ class ConversationPanels extends mixins.w9 {
     mBroadcaster.addListener(this.notificationListener, notificationsPermissions => this.isMounted() && this.setState({
       notificationsPermissions
     }));
+    window.addEventListener('resize', () => {
+      delay('conv-panels-resize', () => {
+        if (!M.chat || !this.isMounted()) {
+          return;
+        }
+        const {
+          alertsOffset
+        } = this.state;
+        if (alertsOffset !== ALERTS_BASE_OFFSET) {
+          let _this$notifBlockedRef, _this$notifPendingRef, _this$noSupportRef;
+          const state = {};
+          if ((_this$notifBlockedRef = this.notifBlockedRef) != null && _this$notifBlockedRef.current) {
+            state.alertsOffset = this.notifBlockedRef.current.offsetHeight;
+          } else if ((_this$notifPendingRef = this.notifPendingRef) != null && _this$notifPendingRef.current) {
+            state.alertsOffset = this.notifPendingRef.current.offsetHeight;
+          } else if ((_this$noSupportRef = this.noSupportRef) != null && _this$noSupportRef.current) {
+            state.alertsOffset = this.noSupportRef.current.offsetHeight;
+          }
+          if (state.alertsOffset !== alertsOffset) {
+            this.setState(state);
+          }
+        }
+      });
+    });
   }
   render() {
     const {
@@ -15015,8 +15069,15 @@ class ConversationPanels extends mixins.w9 {
       className: `
                                 ${megaChat.chatUIFlags.convPanelCollapse ? 'full-span' : ''}
                                 ${isEmpty ? 'empty-state' : ''}
+                                unsupported-call-alert
                             `,
       content: call.Ay.getUnsupportedBrowserMessage(),
+      ref: ref => {
+        this.noSupportRef = ref;
+      },
+      onTransition: ref => this.setState({
+        alertsOffset: ref ? ref.current.offsetHeight : ALERTS_BASE_OFFSET
+      }),
       onClose: this.closeSupportAlert
     }), megaChat.chats.map(chatRoom => {
       if (chatRoom.isCurrentlyActive || now - chatRoom.lastShownInUI < 900000) {
@@ -16577,7 +16638,7 @@ class Edit extends mixins.w9 {
     this.occurrenceRef = null;
     this.datepickerRefs = [];
     this.interval = ChatRoom.SCHEDULED_MEETINGS_INTERVAL;
-    this.incomingCallListener = 'onIncomingCall.recurringEdit';
+    this.incomingCallListener = 'onPrepareIncomingCallDialog.recurringEdit';
     this.state = {
       startDateTime: undefined,
       endDateTime: undefined,
@@ -16651,10 +16712,8 @@ class Edit extends mixins.w9 {
       if (!this.isMounted()) {
         throw Error(`Edit dialog: component not mounted.`);
       }
-      megaChat.rebind(this.incomingCallListener, ({
-        data
-      }) => {
-        if (this.isMounted() && !is_chatlink && pushNotificationSettings.isAllowedForChatId(data[0].chatId)) {
+      megaChat.rebind(this.incomingCallListener, () => {
+        if (this.isMounted()) {
           this.setState({
             overlayed: true,
             closeDialog: false
@@ -16837,7 +16896,7 @@ class Schedule extends mixins.w9 {
     this.scheduledMeetingRef = null;
     this.localStreamRef = '.float-video';
     this.datepickerRefs = [];
-    this.incomingCallListener = 'onIncomingCall.scheduleDialog';
+    this.incomingCallListener = 'onPrepareIncomingCallDialog.scheduleDialog';
     this.ringingStoppedListener = 'onRingingStopped.scheduleDialog';
     this.interval = ChatRoom.SCHEDULED_MEETINGS_INTERVAL;
     this.nearestHalfHour = (0,helpers.i_)();
@@ -17100,8 +17159,8 @@ class Schedule extends mixins.w9 {
           return false;
         }
       });
-      megaChat.rebind(this.incomingCallListener, (e, chatRoom) => {
-        if (!is_chatlink && pushNotificationSettings.isAllowedForChatId(chatRoom.chatId)) {
+      megaChat.rebind(this.incomingCallListener, () => {
+        if (this.isMounted()) {
           this.setState({
             overlayed: true,
             closeDialog: false
@@ -24230,7 +24289,7 @@ const withHostsObserver = Component => {
         dialog: false,
         selected: []
       };
-      this.hasHost = participants => participants.some(handle => this.props.chatRoom.members[handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR && handle !== u_handle);
+      this.hasHost = participants => participants.some(handle => this.props.chatRoom.members[handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR);
       this.toggleDialog = () => {
         this.setState(state => ({
           dialog: !state.dialog,
@@ -25432,7 +25491,7 @@ class Minimized extends mixins.w9 {
           onClick: ev => {
             ev.stopPropagation();
             const callParticipants = chatRoom.getCallParticipants();
-            const doLeave = () => !chatRoom.iAmOperator() || hasHost(callParticipants) || callParticipants.length === 1 ? onLeave() : confirmLeave({
+            const doLeave = () => !chatRoom.iAmOperator() || hasHost(chatRoom.call ? chatRoom.call.peers.map(a => a.userHandle) : []) || callParticipants.length === 1 ? onLeave() : confirmLeave({
               title: l.assign_host_leave_call,
               body: l.assign_host_leave_call_details,
               cta: l.assign_host_button,
@@ -27438,7 +27497,7 @@ class StreamControls extends _mixins1__.w9 {
       confirmLeave,
       onLeave
     }) => {
-      const doLeave = () => hasHost(chatRoom.getCallParticipants()) ? onLeave() : confirmLeave({
+      const doLeave = () => hasHost(chatRoom.call ? chatRoom.call.peers.map(a => a.userHandle) : []) ? onLeave() : confirmLeave({
         title: l.assign_host_leave_call,
         body: l.assign_host_leave_call_details,
         cta: l.assign_host_button,

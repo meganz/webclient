@@ -14,8 +14,7 @@ export const withHostsObserver = Component => {
 
             hasHost = participants =>
                 participants.some(handle =>
-                    this.props.chatRoom.members[handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR &&
-                    handle !== u_handle
+                    this.props.chatRoom.members[handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR
                 );
 
             toggleDialog = () => {

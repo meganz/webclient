@@ -928,12 +928,12 @@ FileManager.prototype.initFileManagerUI = function() {
         $('.dropdown-search').addClass('hidden');
         $('.nw-sorting-menu').addClass('hidden');
         $('.colour-sorting-menu').addClass('hidden');
-        $('.nw-tree-panel-arrows').removeClass('active');
-        $('.nw-fm-tree-item').removeClass('dragover');
+        $('.nw-tree-panel-arrows.active').removeClass('active');
+        $('.nw-fm-tree-item.dragover').removeClass('dragover');
         $('.nw-fm-tree-item.hovered').removeClass('hovered');
-        $('.data-block-view .file-settings-icon').removeClass('active');
-        $('.column-settings.overlap').removeClass('c-opened');
-        $('.js-statusbarbtn.options').removeClass('c-opened');
+        $('.data-block-view .file-settings-icon.active').removeClass('active');
+        $('.column-settings.overlap.c-opened').removeClass('c-opened');
+        $('.js-statusbarbtn.options.c-opened').removeClass('c-opened');
 
         const $jqe = $('.shared-details-info-block .fm-share-download');
         if ($jqe.hasClass('active')) {

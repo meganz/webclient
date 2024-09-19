@@ -1447,7 +1447,7 @@ scparser.$add('u', function(a) {
                 if (M.dyh) {
                     M.dyh('check-node-update', n, oldattr);
                 }
-                if (oldattr.tags !== n.tags) {
+                if (oldattr.tags !== n.tags && mega.ui.mInfoPanel) {
                     mega.ui.mInfoPanel.tagsDB.update(oldattr, n);
                 }
             }
@@ -4425,7 +4425,6 @@ function fm_thumbnails(mode, nodeList, callback)
         console.timeEnd('fm_thumbnails');
     }
 }
-
 
 mBroadcaster.once('boot_done', function() {
     "use strict";

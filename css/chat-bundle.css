@@ -3984,6 +3984,7 @@ body.theme-dark .start-meeting-preview .preview-meeting {
   border-radius: 12px;
   background: var(--secondary-orange);
   z-index: 120;
+  transition: width 200ms ease-in-out;
 }
 .meetings-alert-light {
   background: var(--secondary-blue);
@@ -3997,12 +3998,19 @@ body.theme-dark .start-meeting-preview .preview-meeting {
 .meetings-alert-high {
   background: var(--secondary-red);
 }
+.messages-block .meetings-alert {
+  top: 12px;
+  width: calc(100% - 25px);
+}
 .meetings-alert.empty-state {
   top: 5px;
   width: calc(100% - 18px);
 }
 .meetings-alert.full-span {
   width: calc(100% - 18px);
+}
+.meetings-alert.single-alert {
+  top: 8px;
 }
 .meetings-alert-content {
   padding: 12px 40px 12px 12px;
@@ -4032,6 +4040,9 @@ body.theme-dark .start-meeting-preview .preview-meeting {
   display: block;
   --icon-size: 24px;
   --mask-color: var(--secondary-white);
+}
+.meetings-alert.unsupported-call-alert:has(~ .conversation-panel:not(.hidden) .unsupported-call-alert-progress) {
+  display: none;
 }
 
 #schedule-dialog {

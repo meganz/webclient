@@ -31,6 +31,7 @@ import Link from "./link.jsx";
 
 const ENABLE_GROUP_CALLING_FLAG = true;
 const MAX_USERS_CHAT_PRIVATE = 100;
+const ALERTS_BASE_OFFSET = 4;
 
 class EndCallButton extends MegaRenderMixin {
     IS_MODERATOR = Call.isModerator(this.props.chatRoom, u_handle);
@@ -215,7 +216,7 @@ export class JoinCallNotification extends MegaRenderMixin {
     }
 
     render() {
-        const { chatRoom, offset } = this.props;
+        const { chatRoom, offset, rhpCollapsed } = this.props;
 
         if (chatRoom.call) {
             return null;
@@ -223,7 +224,16 @@ export class JoinCallNotification extends MegaRenderMixin {
 
         if (!megaChat.hasSupportForCalls) {
             // `There is an active call in this room, but your browser does not support calls.`
-            return <Alert type={Alert.TYPE.MEDIUM} content={l.active_call_not_supported} />;
+            return <Alert
+                className={`
+                    ${rhpCollapsed ? 'full-span' : ''}
+                    ${offset === ALERTS_BASE_OFFSET ? 'single-alert' : ''}
+                    unsupported-call-alert-progress
+                `}
+                offset={offset === ALERTS_BASE_OFFSET ? 0 : offset}
+                type={Alert.TYPE.MEDIUM}
+                content={l.active_call_not_supported}
+            />;
         }
 
         if (chatRoom.callUserLimited && !chatRoom.canJoinLimitedCall()) {
@@ -2732,6 +2742,11 @@ export class ConversationPanel extends MegaRenderMixin {
                             /* `Unable to join the chat. Reload MEGA Chat and try again. [A]Reload MEGA Chat[/A]` */
                             <Alert
                                 type={Alert.TYPE.HIGH}
+                                className={`
+                                    ${megaChat.chatUIFlags.convPanelCollapse ? 'full-span' : ''}
+                                    ${this.props.offset === ALERTS_BASE_OFFSET ? 'single-alert' : ''}
+                                `}
+                                offset={this.props.offset === ALERTS_BASE_OFFSET ? 0 : this.props.offset}
                                 content={
                                     <>
                                         {l.chat_key_failed_banner.split('[A]')[0]}
@@ -2765,6 +2780,7 @@ export class ConversationPanel extends MegaRenderMixin {
                             navigator.onLine &&
                             room.scheduledMeeting &&
                             !room.isArchived() &&
+                            !this.state.hasInvalidKeys &&
                             !isStartCallDisabled(room) ?
                                 <StartMeetingNotification
                                     chatRoom={room}
@@ -2785,8 +2801,10 @@ export class ConversationPanel extends MegaRenderMixin {
                             !is_chatlink &&
                             room.state !== ChatRoom.STATE.LEFT &&
                             (room.havePendingGroupCall() || room.havePendingCall()) &&
+                            !this.state.hasInvalidKeys &&
                             navigator.onLine ?
                                 <JoinCallNotification
+                                    rhpCollapsed={megaChat.chatUIFlags.convPanelCollapse}
                                     chatRoom={room}
                                     offset={this.props.offset}
                                 /> :
@@ -2841,7 +2859,6 @@ export class ConversationPanel extends MegaRenderMixin {
 }
 
 export class ConversationPanels extends MegaRenderMixin {
-    alertsOffset = 4;
     notificationListener = 'meetings:notificationPermissions';
     notificationGranted = undefined;
     notificationHelpURL =
@@ -2850,7 +2867,7 @@ export class ConversationPanels extends MegaRenderMixin {
     state = {
         supportAlert: undefined,
         notificationsPermissions: undefined,
-        alertsOffset: this.alertsOffset
+        alertsOffset: ALERTS_BASE_OFFSET
     };
 
     constructor(props) {
@@ -2882,8 +2899,11 @@ export class ConversationPanels extends MegaRenderMixin {
                     ${megaChat.chatUIFlags.convPanelCollapse ? 'full-span' : ''}
                     ${this.props.isEmpty ? 'empty-state' : ''}
                 `}
+                ref={ref => {
+                    this.notifPendingRef = ref;
+                }}
                 onTransition={ref =>
-                    this.setState({ alertsOffset: ref ? ref.current.offsetHeight : this.alertsOffset })
+                    this.setState({ alertsOffset: ref ? ref.current.offsetHeight : ALERTS_BASE_OFFSET })
                 }
                 onClose={() => {
                     this.setState({ notificationsPermissions: undefined }, () => {
@@ -2928,8 +2948,11 @@ export class ConversationPanels extends MegaRenderMixin {
                     ${megaChat.chatUIFlags.convPanelCollapse ? 'full-span' : ''}
                     ${this.props.isEmpty ? 'empty-state' : ''}
                 `}
+                ref={ref => {
+                    this.notifBlockedRef = ref;
+                }}
                 onTransition={ref =>
-                    this.setState({ alertsOffset: ref ? ref.current.offsetHeight : this.alertsOffset })
+                    this.setState({ alertsOffset: ref ? ref.current.offsetHeight : ALERTS_BASE_OFFSET })
                 }
                 onClose={() => this.setState({ notificationsPermissions: undefined })}>
                 <ParsedHTML
@@ -2965,6 +2988,30 @@ export class ConversationPanels extends MegaRenderMixin {
         mBroadcaster.addListener(this.notificationListener, notificationsPermissions =>
             this.isMounted() && this.setState({ notificationsPermissions })
         );
+        window.addEventListener('resize', () => {
+            delay('conv-panels-resize', () => {
+                if (!M.chat || !this.isMounted()) {
+                    return;
+                }
+
+                const { alertsOffset } = this.state;
+                if (alertsOffset !== ALERTS_BASE_OFFSET) {
+                    const state = {};
+                    if (this.notifBlockedRef?.current) {
+                        state.alertsOffset = this.notifBlockedRef.current.offsetHeight;
+                    }
+                    else if (this.notifPendingRef?.current) {
+                        state.alertsOffset = this.notifPendingRef.current.offsetHeight;
+                    }
+                    else if (this.noSupportRef?.current) {
+                        state.alertsOffset = this.noSupportRef.current.offsetHeight;
+                    }
+                    if (state.alertsOffset !== alertsOffset) {
+                        this.setState(state);
+                    }
+                }
+            });
+        });
     }
 
     render() {
@@ -2990,8 +3037,17 @@ export class ConversationPanels extends MegaRenderMixin {
                             className={`
                                 ${megaChat.chatUIFlags.convPanelCollapse ? 'full-span' : ''}
                                 ${isEmpty ? 'empty-state' : ''}
+                                unsupported-call-alert
                             `}
                             content={Call.getUnsupportedBrowserMessage()}
+                            ref={ref => {
+                                this.noSupportRef = ref;
+                            }}
+                            onTransition={ref =>
+                                this.setState({
+                                    alertsOffset: ref ? ref.current.offsetHeight : ALERTS_BASE_OFFSET
+                                })
+                            }
                             onClose={this.closeSupportAlert}
                         />
                 }

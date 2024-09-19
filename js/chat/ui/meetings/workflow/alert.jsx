@@ -29,7 +29,7 @@ export default class Alert extends MegaRenderMixin {
     }
 
     render() {
-        const { type, className, content, children, onClose } = this.props;
+        const { type, className, content, children, offset, onClose } = this.props;
 
         if (content || children) {
             return (
@@ -39,7 +39,8 @@ export default class Alert extends MegaRenderMixin {
                         ${NAMESPACE}
                         ${type ? `${NAMESPACE}-${type}` : ''}
                         ${className || ''}
-                    `}>
+                    `}
+                    style={offset ? { marginTop: `${offset}px` } : undefined}>
                     <div className={`${NAMESPACE}-content`}>{content || children}</div>
                     {onClose &&
                         <span

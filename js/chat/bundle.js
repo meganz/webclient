@@ -23482,7 +23482,23 @@ class Call extends mixins.w9 {
             classes: ['theme-dark-forced', 'call-toast'],
             icons: ['sprite-fm-uni icon-raise-hand'],
             timeout: 10e3,
-            content: raisedHandPeers.length > 2 ? raisedHandPeers.includes(u_handle) ? mega.icu.format(l.raise_self_peers_raised, raisedHandPeers.length - 1) : mega.icu.format(l.raise_peers_raised, raisedHandPeers.length) : (raisedHandPeers.length === 1 ? l.raise_peer_raised : mega.icu.format(raisedHandPeers.includes(u_handle) ? l.raise_self_peers_raised : l.raise_two_raised, raisedHandPeers.length - 1)).replace('%s', M.getNameByHandle(raisedHandPeers[0]))
+            content: (() => {
+              const peerName = M.getNameByHandle(raisedHandPeers[0]);
+              const peersCount = raisedHandPeers.length;
+              const withCurrentPeer = raisedHandPeers.includes(u_handle);
+              const CONTENT = {
+                1: () => l.raise_peer_raised.replace('%s', peerName),
+                2: () => {
+                  const message = withCurrentPeer ? l.raise_self_peers_raised : l.raise_two_raised;
+                  return mega.icu.format(message, peersCount - 1).replace('%s', peerName);
+                },
+                rest: () => {
+                  const message = withCurrentPeer ? l.raise_self_peers_raised : l.raise_peers_raised;
+                  return mega.icu.format(message, withCurrentPeer ? peersCount - 1 : peersCount);
+                }
+              };
+              return (CONTENT[peersCount] || CONTENT.rest)();
+            })()
           });
         }
         mBroadcaster.sendMessage('meetings:raisedHand', raisedHandPeers);
@@ -23920,9 +23936,7 @@ class Call extends mixins.w9 {
     chatRoom.megaChat.off(`onSpeakerChange.${NAMESPACE}`);
     chatRoom.megaChat.off(`onPeerAvChange.${NAMESPACE}`);
     mBroadcaster.removeListener(this.ephemeralAddListener);
-    if (this.pageChangeListener) {
-      mBroadcaster.removeListener(this.pageChangeListener);
-    }
+    mBroadcaster.removeListener(this.pageChangeListener);
     clearTimeout(this.callStartTimeout);
     delay.cancel('callOffline');
     if ($.dialog) {
@@ -23931,6 +23945,7 @@ class Call extends mixins.w9 {
     if (this.timeoutBannerInterval) {
       clearInterval(this.timeoutBannerInterval);
     }
+    window.toaster.main.hideAll();
     this.unbindCallEvents();
     willUnmount == null || willUnmount(minimized);
   }

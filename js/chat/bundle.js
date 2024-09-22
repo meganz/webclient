@@ -17,7 +17,7 @@ const ReactDOM_ = REQ_(206);
 const ReactDOM = REQ_.n(ReactDOM_);
 // EXTERNAL MODULE: ./js/chat/ui/conversations.jsx + 20 modules
 const conversations = REQ_(823);
-;// ./js/chat/chatRouting.jsx
+;// CONCATENATED MODULE: ./js/chat/chatRouting.jsx
 let _ChatRouting;
 class ChatRouting {
   constructor(megaChatInstance) {
@@ -275,7 +275,7 @@ ChatRouting.gPageHandlers = {
 const scheduleMetaChange = REQ_(757);
 // EXTERNAL MODULE: ./js/chat/chatRoom.jsx + 1 modules
 const chat_chatRoom = REQ_(553);
-;// ./js/chat/meetingsManager.jsx
+;// CONCATENATED MODULE: ./js/chat/meetingsManager.jsx
 
 
 class Occurrence {
@@ -1201,7 +1201,7 @@ window.MeetingsManager = MeetingsManager;
 const applyDecoratedDescriptor = REQ_(793);
 // EXTERNAL MODULE: ./js/chat/mixins.js
 const mixins = REQ_(137);
-;// ./js/chat/chatOnboarding.jsx
+;// CONCATENATED MODULE: ./js/chat/chatOnboarding.jsx
 
 let _dec, _class;
 
@@ -1517,7 +1517,7 @@ const ChatOnboarding = (_dec = (0,mixins.hG)(1000), _class = class ChatOnboardin
 
 // EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 11 modules
 const call = REQ_(3);
-;// ./js/chat/chat.jsx
+;// CONCATENATED MODULE: ./js/chat/chat.jsx
 
 
 
@@ -3666,7 +3666,7 @@ REQ_.d(EXP_, {
   "default": () => chatRoom
 });
 
-;// ./js/chat/utils.jsx
+;// CONCATENATED MODULE: ./js/chat/utils.jsx
 async function prepareExportIo(dl) {
   const {
     zname,
@@ -3729,7 +3729,7 @@ function prepareExportStreams(attachNodes, onEmpty) {
     };
   });
 }
-;// ./js/chat/chatRoom.jsx
+;// CONCATENATED MODULE: ./js/chat/chatRoom.jsx
 
 const RETENTION_FORMAT = {
   HOURS: 'hour',
@@ -6912,7 +6912,7 @@ const React_ = REQ_(594);
 const REaCt = REQ_.n(React_);
 // EXTERNAL MODULE: ./js/chat/mixins.js
 const mixins = REQ_(137);
-;// ./js/chat/ui/whosTyping.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/whosTyping.jsx
 const React = REQ_(594);
 
 class WhosTyping extends mixins.w9 {
@@ -7029,7 +7029,7 @@ const typingArea = REQ_(795);
 const buttons = REQ_(994);
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
 const dropdowns = REQ_(911);
-;// ./js/chat/ui/composedTextArea.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/composedTextArea.jsx
 
 
 
@@ -8550,7 +8550,7 @@ const REaCt = REQ_.n(React_);
 const mixins = REQ_(137);
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
 const buttons = REQ_(994);
-;// ./js/chat/ui/contactsPanel/navigation.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/navigation.jsx
 
 
 
@@ -8599,7 +8599,7 @@ class Navigation extends mixins.w9 {
 }
 // EXTERNAL MODULE: ./js/ui/utils.jsx
 const utils = REQ_(314);
-;// ./js/chat/ui/contactsPanel/nil.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/nil.jsx
 
 
 
@@ -8639,7 +8639,7 @@ const fmView = REQ_(701);
 const contacts = REQ_(251);
 // EXTERNAL MODULE: ./js/ui/jsx/fm/nodes/genericNodePropsComponent.jsx + 1 modules
 const genericNodePropsComponent = REQ_(984);
-;// ./js/ui/jsx/fm/nodes/columns/columnContactName.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactName.jsx
 
 
 
@@ -8676,7 +8676,7 @@ class ColumnContactName extends genericNodePropsComponent.B {
 ColumnContactName.sortable = true;
 ColumnContactName.id = "name";
 ColumnContactName.megatype = "name";
-;// ./js/ui/jsx/fm/nodes/columns/columnContactStatus.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactStatus.jsx
 
 
 class ColumnContactStatus extends genericNodePropsComponent.B {
@@ -8703,7 +8703,7 @@ class ColumnContactStatus extends genericNodePropsComponent.B {
 ColumnContactStatus.sortable = true;
 ColumnContactStatus.id = "status";
 ColumnContactStatus.megatype = "status";
-;// ./js/ui/jsx/fm/nodes/columns/columnContactLastInteraction.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactLastInteraction.jsx
 
 
 class ColumnContactLastInteraction extends genericNodePropsComponent.B {
@@ -8761,7 +8761,7 @@ class ColumnContactLastInteraction extends genericNodePropsComponent.B {
 ColumnContactLastInteraction.sortable = true;
 ColumnContactLastInteraction.id = "interaction";
 ColumnContactLastInteraction.megatype = "interaction";
-;// ./js/ui/jsx/fm/nodes/columns/columnContactVerifiedStatus.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactVerifiedStatus.jsx
 
 
 
@@ -8814,7 +8814,7 @@ ColumnContactVerifiedStatus.verifiedLabel = REaCt().createElement("div", {
 const dropdowns = REQ_(911);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 11 modules
 const call = REQ_(3);
-;// ./js/chat/ui/contactsPanel/contextMenu.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/contextMenu.jsx
 
 
 
@@ -8957,7 +8957,7 @@ class ContextMenu extends mixins.w9 {
     }));
   }
 }
-;// ./js/ui/jsx/fm/nodes/columns/columnContactButtons.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactButtons.jsx
 
 
 
@@ -9035,7 +9035,7 @@ ColumnContactButtons.label = "";
 ColumnContactButtons.megatype = "grid-url-header-nw";
 // EXTERNAL MODULE: ./js/chat/ui/updateObserver.jsx
 const updateObserver = REQ_(501);
-;// ./js/chat/ui/contactsPanel/contactList.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/contactList.jsx
 
 
 
@@ -9193,7 +9193,7 @@ class ContactList extends mixins.w9 {
 ContactList.updateListener = 'getLastInteractions';
 ContactList.updateInterval = 6e4;
 const contactList = (0,mixins.Zz)(updateObserver.Y)(ContactList);
-;// ./js/ui/jsx/fm/nodes/columns/columnContactRequestsEmail.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactRequestsEmail.jsx
 
 
 
@@ -9223,7 +9223,7 @@ class ColumnContactRequestsEmail extends mixins.w9 {
 ColumnContactRequestsEmail.sortable = true;
 ColumnContactRequestsEmail.id = "email";
 ColumnContactRequestsEmail.megatype = "email";
-;// ./js/ui/jsx/fm/nodes/columns/columnContactRequestsTs.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactRequestsTs.jsx
 
 
 class ColumnContactRequestsTs extends mixins.w9 {
@@ -9255,7 +9255,7 @@ class ColumnContactRequestsTs extends mixins.w9 {
 ColumnContactRequestsTs.sortable = true;
 ColumnContactRequestsTs.id = "ts";
 ColumnContactRequestsTs.megatype = "ts";
-;// ./js/ui/jsx/fm/nodes/columns/columnContactRequestsRcvdBtns.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactRequestsRcvdBtns.jsx
 
 
 
@@ -9294,7 +9294,7 @@ ColumnContactRequestsRcvdBtns.sortable = true;
 ColumnContactRequestsRcvdBtns.id = "grid-url-header-nw";
 ColumnContactRequestsRcvdBtns.label = "";
 ColumnContactRequestsRcvdBtns.megatype = "grid-url-header-nw contact-controls-container";
-;// ./js/chat/ui/contactsPanel/receivedRequests.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/receivedRequests.jsx
 
 
 
@@ -9366,7 +9366,7 @@ class ReceivedRequests extends mixins.w9 {
     }, this.drawReceivedRequests());
   }
 }
-;// ./js/ui/jsx/fm/nodes/columns/columnContactRequestsSentBtns.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactRequestsSentBtns.jsx
 
 
 
@@ -9407,7 +9407,7 @@ ColumnContactRequestsSentBtns.sortable = true;
 ColumnContactRequestsSentBtns.id = "grid-url-header-nw";
 ColumnContactRequestsSentBtns.label = "";
 ColumnContactRequestsSentBtns.megatype = "grid-url-header-nw contact-controls-container";
-;// ./js/ui/jsx/fm/nodes/columns/columnContactRequestsRts.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactRequestsRts.jsx
 
 
 class ColumnContactRequestsRts extends ColumnContactRequestsTs {
@@ -9418,7 +9418,7 @@ class ColumnContactRequestsRts extends ColumnContactRequestsTs {
 ColumnContactRequestsRts.sortable = true;
 ColumnContactRequestsRts.id = "rts";
 ColumnContactRequestsRts.megatype = "rts";
-;// ./js/chat/ui/contactsPanel/sentRequests.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/sentRequests.jsx
 
 
 
@@ -9497,7 +9497,7 @@ class SentRequests extends mixins.w9 {
 }
 // EXTERNAL MODULE: ./js/ui/jsx/fm/nodes/columns/columnFavIcon.jsx
 const columnFavIcon = REQ_(161);
-;// ./js/ui/jsx/fm/nodes/columns/columnSharedFolderName.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnSharedFolderName.jsx
 
 
 class ColumnSharedFolderName extends genericNodePropsComponent.B {
@@ -9528,7 +9528,7 @@ class ColumnSharedFolderName extends genericNodePropsComponent.B {
 ColumnSharedFolderName.sortable = true;
 ColumnSharedFolderName.id = "name";
 ColumnSharedFolderName.megatype = "name";
-;// ./js/ui/jsx/fm/nodes/columns/columnSharedFolderAccess.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnSharedFolderAccess.jsx
 
 
 class ColumnSharedFolderAccess extends genericNodePropsComponent.B {
@@ -9555,7 +9555,7 @@ class ColumnSharedFolderAccess extends genericNodePropsComponent.B {
 ColumnSharedFolderAccess.sortable = true;
 ColumnSharedFolderAccess.id = 'access';
 ColumnSharedFolderAccess.megatype = 'access';
-;// ./js/ui/jsx/fm/nodes/columns/columnSharedFolderButtons.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnSharedFolderButtons.jsx
 
 
 
@@ -9603,7 +9603,7 @@ ColumnSharedFolderButtons.label = "";
 ColumnSharedFolderButtons.megatype = "grid-url-header-nw";
 // EXTERNAL MODULE: ./js/chat/ui/link.jsx
 const ui_link = REQ_(280);
-;// ./js/chat/ui/contactsPanel/contactProfile.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/contactProfile.jsx
 
 
 
@@ -9808,7 +9808,7 @@ class ContactProfile extends mixins.w9 {
     return null;
   }
 }
-;// ./js/chat/ui/contactsPanel/contactsPanel.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/contactsPanel.jsx
 
 
 
@@ -10014,7 +10014,7 @@ const mixins = REQ_(137);
 const buttons = REQ_(994);
 // EXTERNAL MODULE: ./js/ui/modalDialogs.jsx + 1 modules
 const modalDialogs = REQ_(318);
-;// ./js/ui/jsx/fm/viewModeSelector.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/viewModeSelector.jsx
 
 
 class ViewModeSelector extends mixins.w9 {
@@ -10045,7 +10045,7 @@ ViewModeSelector.VIEW_MODE = {
   "GRID": 1,
   "LIST": undefined
 };
-;// ./js/ui/jsx/fm/breadcrumbs.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/breadcrumbs.jsx
 
 
 class Breadcrumbs extends mixins.w9 {
@@ -10231,7 +10231,7 @@ class Breadcrumbs extends mixins.w9 {
 }
 // EXTERNAL MODULE: ./js/ui/jsx/fm/fmView.jsx + 10 modules
 const fmView = REQ_(701);
-;// ./js/ui/cloudBrowserModalDialog.jsx
+;// CONCATENATED MODULE: ./js/ui/cloudBrowserModalDialog.jsx
 
 
 
@@ -10640,7 +10640,7 @@ const cloudBrowserModalDialog = {
 };
 // EXTERNAL MODULE: ./js/chat/chatRoom.jsx + 1 modules
 const chat_chatRoom = REQ_(553);
-;// ./js/ui/historyRetentionDialog.jsx
+;// CONCATENATED MODULE: ./js/ui/historyRetentionDialog.jsx
 
 
 
@@ -10866,7 +10866,7 @@ const dropdowns = REQ_(911);
 const ui_contacts = REQ_(251);
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
 const perfectScrollbar = REQ_(486);
-;// ./js/ui/accordion.jsx
+;// CONCATENATED MODULE: ./js/ui/accordion.jsx
 const React = REQ_(594);
 
 class AccordionPanel extends mixins.w9 {
@@ -10933,7 +10933,7 @@ class Accordion extends mixins.w9 {
   }
 }
 
-;// ./js/chat/ui/participantsList.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/participantsList.jsx
 
 
 const DropdownsUI = REQ_(911);
@@ -11194,7 +11194,7 @@ ParticipantsListInner.defaultProps = {
 
 // EXTERNAL MODULE: ./js/chat/ui/messages/generic.jsx + 14 modules
 const generic = REQ_(890);
-;// ./js/chat/ui/sharedFilesAccordionPanel.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/sharedFilesAccordionPanel.jsx
 
 let _dec, _class;
 const sharedFilesAccordionPanel_React = REQ_(594);
@@ -11410,7 +11410,7 @@ const SharedFilesAccordionPanel = (_dec = utils.Ay.SoonFcWrap(350), _class = cla
   }
 }, (0,applyDecoratedDescriptor.A)(_class.prototype, "eventuallyRenderThumbnails", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "eventuallyRenderThumbnails"), _class.prototype), _class);
 
-;// ./js/chat/ui/incomingSharesAccordionPanel.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/incomingSharesAccordionPanel.jsx
 const incomingSharesAccordionPanel_React = REQ_(594);
 
 class SharedFolderItem extends mixins.w9 {
@@ -11536,7 +11536,7 @@ class IncSharesAccordionPanel extends mixins.w9 {
   }
 }
 
-;// ./js/chat/ui/chatlinkDialog.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/chatlinkDialog.jsx
 
 
 
@@ -11729,7 +11729,7 @@ ChatlinkDialog.defaultProps = {
   disableCheckingVisibility: true
 };
 ChatlinkDialog.NAMESPACE = 'chat-link-dialog';
-;// ./js/chat/ui/pushSettingsDialog.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/pushSettingsDialog.jsx
 
 let _PushSettingsDialog;
 
@@ -11800,7 +11800,7 @@ const call = REQ_(3);
 const historyPanel = REQ_(814);
 // EXTERNAL MODULE: ./js/chat/ui/composedTextArea.jsx + 1 modules
 const composedTextArea = REQ_(77);
-;// ./js/chat/ui/meetings/workflow/loading.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/loading.jsx
 
 
 class Loading extends mixins.w9 {
@@ -11907,7 +11907,7 @@ const meetings_button = REQ_(959);
 const preview = REQ_(485);
 // EXTERNAL MODULE: ./js/chat/ui/link.jsx
 const ui_link = REQ_(280);
-;// ./js/chat/ui/meetings/workflow/join.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/join.jsx
 
 
 
@@ -12235,7 +12235,7 @@ Join.VIEW = {
   ACCOUNT: 2,
   UNSUPPORTED: 4
 };
-;// ./js/chat/ui/meetings/workflow/alert.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/alert.jsx
 
 
 const NAMESPACE = 'meetings-alert';
@@ -12301,7 +12301,7 @@ Alert.TYPE = {
 const helpers = REQ_(110);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/hostsObserver.jsx
 const hostsObserver = REQ_(972);
-;// ./js/chat/ui/meetings/waitingRoom/waitingRoom.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/waitingRoom/waitingRoom.jsx
 
 
 
@@ -12681,7 +12681,7 @@ class WaitingRoom extends mixins.w9 {
 const streamControls = REQ_(489);
 // EXTERNAL MODULE: ./js/chat/ui/inviteParticipantsPanel.jsx
 const inviteParticipantsPanel = REQ_(815);
-;// ./js/chat/ui/chatOverlay.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/chatOverlay.jsx
 
 
 
@@ -12734,7 +12734,7 @@ class ChatOverlay extends mixins.w9 {
   }
 }
 
-;// ./js/chat/ui/conversationpanel.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/conversationpanel.jsx
 
 
 let conversationpanel_dec, _dec2, conversationpanel_class;
@@ -15241,7 +15241,7 @@ const preview = REQ_(485);
 const ui_link = REQ_(280);
 // EXTERNAL MODULE: ./js/ui/utils.jsx
 const utils = REQ_(314);
-;// ./js/chat/ui/meetings/workflow/start.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/start.jsx
 
 let _Start;
 
@@ -15408,7 +15408,7 @@ Start.STREAMS = {
 const perfectScrollbar = REQ_(486);
 // EXTERNAL MODULE: ./js/chat/ui/contacts.jsx
 const ui_contacts = REQ_(251);
-;// ./js/chat/ui/meetings/schedule/invite.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/invite.jsx
 
 
 
@@ -15645,7 +15645,7 @@ class Invite extends mixins.w9 {
 Invite.NAMESPACE = 'meetings-invite';
 // EXTERNAL MODULE: ./js/chat/ui/meetings/schedule/helpers.jsx
 const helpers = REQ_(110);
-;// ./js/chat/ui/meetings/schedule/datepicker.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/datepicker.jsx
 
 
 class Datepicker extends mixins.w9 {
@@ -15766,7 +15766,7 @@ class Datepicker extends mixins.w9 {
   }
 }
 Datepicker.NAMESPACE = 'meetings-datepicker';
-;// ./js/chat/ui/meetings/schedule/select.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/select.jsx
 
 
 
@@ -15955,7 +15955,7 @@ class Select extends mixins.w9 {
   }
 }
 Select.NAMESPACE = 'meetings-select';
-;// ./js/chat/ui/meetings/schedule/datetime.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/datetime.jsx
 
 
 
@@ -16054,7 +16054,7 @@ class DateTime extends mixins.w9 {
     }));
   }
 }
-;// ./js/chat/ui/meetings/schedule/recurring.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/recurring.jsx
 
 
 
@@ -16084,62 +16084,36 @@ class Recurring extends mixins.w9 {
     this.WEEK_DAYS = {
       MONDAY: {
         value: 1,
-        label: l.schedule_day_control_mon,
-        name: l.schedule_occur_mon
+        label: l.schedule_day_control_mon
       },
       TUESDAY: {
         value: 2,
-        label: l.schedule_day_control_tue,
-        name: l.schedule_occur_tue
+        label: l.schedule_day_control_tue
       },
       WEDNESDAY: {
         value: 3,
-        label: l.schedule_day_control_wed,
-        name: l.schedule_occur_wed
+        label: l.schedule_day_control_wed
       },
       THURSDAY: {
         value: 4,
-        label: l.schedule_day_control_thu,
-        name: l.schedule_occur_thu
+        label: l.schedule_day_control_thu
       },
       FRIDAY: {
         value: 5,
-        label: l.schedule_day_control_fri,
-        name: l.schedule_occur_fri
+        label: l.schedule_day_control_fri
       },
       SATURDAY: {
         value: 6,
-        label: l.schedule_day_control_sat,
-        name: l.schedule_occur_sat
+        label: l.schedule_day_control_sat
       },
       SUNDAY: {
         value: 7,
-        label: l.schedule_day_control_sun,
-        name: l.schedule_occur_sun
+        label: l.schedule_day_control_sun
       }
     };
-    this.OFFSETS = {
-      FIRST: {
-        value: 1,
-        label: l.recurring_frequency_offset_first
-      },
-      SECOND: {
-        value: 2,
-        label: l.recurring_frequency_offset_second
-      },
-      THIRD: {
-        value: 3,
-        label: l.recurring_frequency_offset_third
-      },
-      FOURTH: {
-        value: 4,
-        label: l.recurring_frequency_offset_fourth
-      },
-      FIFTH: {
-        value: 5,
-        label: l.recurring_frequency_offset_fifth
-      }
-    };
+    this.OFFSETS = [[l.recur_freq_offset_first_mon || '[A]first[/A][B]Monday[/B]', l.recur_freq_offset_first_tue || '[A]first[/A][B]Tuesday[/B]', l.recur_freq_offset_first_wed || '[A]first[/A][B]Wednesday[/B]', l.recur_freq_offset_first_thu || '[A]first[/A][B]Thursday[/B]', l.recur_freq_offset_first_fri || '[A]first[/A][B]Friday[/B]', l.recur_freq_offset_first_sat || '[A]first[/A][B]Saturday[/B]', l.recur_freq_offset_first_sun || '[A]first[/A][B]Sunday[/B]'], [l.recur_freq_offset_second_mon || '[A]second[/A][B]Monday[/B]', l.recur_freq_offset_second_tue || '[A]second[/A][B]Tuesday[/B]', l.recur_freq_offset_second_wed || '[A]second[/A][B]Wednesday[/B]', l.recur_freq_offset_second_thu || '[A]second[/A][B]Thursday[/B]', l.recur_freq_offset_second_fri || '[A]second[/A][B]Friday[/B]', l.recur_freq_offset_second_sat || '[A]second[/A][B]Saturday[/B]', l.recur_freq_offset_second_sun || '[A]second[/A][B]Sunday[/B]'], [l.recur_freq_offset_third_mon || '[A]third[/A][B]Monday[/B]', l.recur_freq_offset_third_tue || '[A]third[/A][B]Tuesday[/B]', l.recur_freq_offset_third_wed || '[A]third[/A][B]Wednesday[/B]', l.recur_freq_offset_third_thu || '[A]third[/A][B]Thursday[/B]', l.recur_freq_offset_third_fri || '[A]third[/A][B]Friday[/B]', l.recur_freq_offset_third_sat || '[A]third[/A][B]Saturday[/B]', l.recur_freq_offset_third_sun || '[A]third[/A][B]Sunday[/B]'], [l.recur_freq_offset_fourth_mon || '[A]fourth[/A][B]Monday[/B]', l.recur_freq_offset_fourth_tue || '[A]fourth[/A][B]Tuesday[/B]', l.recur_freq_offset_fourth_wed || '[A]fourth[/A][B]Wednesday[/B]', l.recur_freq_offset_fourth_thu || '[A]fourth[/A][B]Thursday[/B]', l.recur_freq_offset_fourth_fri || '[A]fourth[/A][B]Friday[/B]', l.recur_freq_offset_fourth_sat || '[A]fourth[/A][B]Saturday[/B]', l.recur_freq_offset_fourth_sun || '[A]fourth[/A][B]Sunday[/B]'], [l.recur_freq_offset_fifth_mon || '[A]fifth[/A][B]Monday[/B]', l.recur_freq_offset_fifth_tue || '[A]fifth[/A][B]Tuesday[/B]', l.recur_freq_offset_fifth_wed || '[A]fifth[/A][B]Wednesday[/B]', l.recur_freq_offset_fifth_thu || '[A]fifth[/A][B]Thursday[/B]', l.recur_freq_offset_fifth_fri || '[A]fifth[/A][B]Friday[/B]', l.recur_freq_offset_fifth_sat || '[A]fifth[/A][B]Saturday[/B]', l.recur_freq_offset_fifth_sun || '[A]fifth[/A][B]Sunday[/B]']];
+    this.OFFSET_POS_REGEX = /\[A]([^[]+)\[\/A]/;
+    this.OFFSET_DAY_REGEX = /\[B]([^[]+)\[\/B]/;
     this.MONTH_RULES = {
       DAY: 'day',
       OFFSET: 'offset'
@@ -16157,8 +16131,8 @@ class Recurring extends mixins.w9 {
       monthRule: this.MONTH_RULES.DAY,
       monthDays: [this.initialMonthDay],
       offset: {
-        value: this.OFFSETS.FIRST.value,
-        weekDay: this.WEEK_DAYS.MONDAY.value
+        value: 1,
+        weekDay: 1
       },
       monthDaysWarning: this.initialMonthDay > 28
     };
@@ -16167,6 +16141,56 @@ class Recurring extends mixins.w9 {
       frequency,
       ...state
     });
+    this.MonthDaySelect = ({
+      offset
+    }) => {
+      const dayIdx = (offset && offset.weekDay || 1) - 1;
+      const posIdx = (offset && offset.value || 1) - 1;
+      const dayValues = this.OFFSETS[posIdx].map((part, idx) => ({
+        value: idx + 1,
+        label: this.OFFSET_DAY_REGEX.exec(part)[1]
+      }));
+      const posValues = [];
+      for (let i = 0; i < this.OFFSETS.length; i++) {
+        posValues.push({
+          value: i + 1,
+          label: this.OFFSET_POS_REGEX.exec(this.OFFSETS[i][dayIdx])[1]
+        });
+      }
+      const posFirst = this.OFFSETS[posIdx][dayIdx].indexOf('[A]') < this.OFFSETS[posIdx][dayIdx].indexOf('[B]');
+      const pos = REaCt().createElement(Select, {
+        name: "recurring-offset-value",
+        className: "inline",
+        icon: true,
+        value: posValues[posIdx].label,
+        options: posValues,
+        onSelect: option => {
+          this.setState(state => ({
+            monthRule: this.MONTH_RULES.OFFSET,
+            offset: {
+              value: option.value,
+              weekDay: state.offset.weekDay || this.WEEK_DAYS.MONDAY.value
+            }
+          }));
+        }
+      });
+      return REaCt().createElement(REaCt().Fragment, null, posFirst && pos, REaCt().createElement(Select, {
+        name: "recurring-offset-day",
+        className: "inline",
+        icon: true,
+        value: dayValues[dayIdx].label,
+        options: dayValues,
+        onSelect: option => {
+          this.setState(state => ({
+            monthRule: this.MONTH_RULES.OFFSET,
+            offset: {
+              value: state.offset.value || 1,
+              weekDay: option.value
+            }
+          }));
+        }
+      }), !posFirst && pos);
+    };
     this.IntervalSelect = () => {
       const {
         interval,
@@ -16514,42 +16538,8 @@ class Recurring extends mixins.w9 {
                                     `
     })), REaCt().createElement("div", {
       className: "radio-txt"
-    }, REaCt().createElement(Select, {
-      name: "recurring-offset-value",
-      className: "inline",
-      icon: true,
-      value: offset && offset.value && Object.values(this.OFFSETS).find(o => o.value === offset.value).label || this.OFFSETS.FIRST.label,
-      options: Object.values(this.OFFSETS),
-      onSelect: option => {
-        this.setState(state => ({
-          monthRule: this.MONTH_RULES.OFFSET,
-          offset: {
-            value: option.value,
-            weekDay: state.offset.weekDay || this.WEEK_DAYS.MONDAY.value
-          }
-        }));
-      }
-    }), REaCt().createElement(Select, {
-      name: "recurring-offset-day",
-      className: "inline",
-      icon: true,
-      value: offset && offset.weekDay && Object.values(this.WEEK_DAYS).find(o => o.value === offset.weekDay).name || this.WEEK_DAYS.MONDAY.name,
-      options: Object.values(this.WEEK_DAYS).map(({
-        value,
-        name
-      }) => ({
-        value,
-        label: name
-      })),
-      onSelect: option => {
-        this.setState(state => ({
-          monthRule: this.MONTH_RULES.OFFSET,
-          offset: {
-            value: state.offset.value || this.OFFSETS.FIRST.value,
-            weekDay: option.value
-          }
-        }));
-      }
+    }, REaCt().createElement(this.MonthDaySelect, {
+      offset
     }))))), this.renderEndControls());
   }
   renderNavigation(view) {
@@ -16875,7 +16865,7 @@ class Edit extends mixins.w9 {
 }
 // EXTERNAL MODULE: ./js/chat/chatRoom.jsx + 1 modules
 const chat_chatRoom = REQ_(553);
-;// ./js/chat/ui/meetings/schedule/schedule.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/schedule.jsx
 
 let _Schedule;
 
@@ -17648,7 +17638,7 @@ const UpgradeNotice = ({
 };
 // EXTERNAL MODULE: ./js/ui/miniui.jsx
 const miniui = REQ_(818);
-;// ./js/chat/ui/startGroupChatWizard.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/startGroupChatWizard.jsx
 const React = REQ_(594);
 
 
@@ -17984,7 +17974,7 @@ const startGroupChatWizard = {
 const call = REQ_(3);
 // EXTERNAL MODULE: ./js/chat/ui/chatToaster.jsx
 const chatToaster = REQ_(424);
-;// ./js/chat/ui/searchPanel/resultTable.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/searchPanel/resultTable.jsx
 
 
 class ResultTable extends mixins.w9 {
@@ -18000,7 +17990,7 @@ class ResultTable extends mixins.w9 {
     }, heading) : null, children);
   }
 }
-;// ./js/chat/ui/searchPanel/resultRow.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/searchPanel/resultRow.jsx
 
 
 
@@ -18245,7 +18235,7 @@ class ResultRow extends mixins.w9 {
     });
   }
 }
-;// ./js/chat/ui/searchPanel/resultContainer.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/searchPanel/resultContainer.jsx
 
 
 
@@ -18345,7 +18335,7 @@ class ResultContainer extends mixins.w9 {
     return this.renderResults(results, status, isFirstQuery, onSearchMessages);
   }
 }
-;// ./js/chat/ui/searchPanel/searchField.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/searchPanel/searchField.jsx
 let _SearchField;
 
 
@@ -18460,7 +18450,7 @@ SearchField.select = () => {
 SearchField.focus = () => _SearchField.inputRef && _SearchField.inputRef.current && _SearchField.inputRef.current.focus();
 SearchField.hasValue = () => _SearchField.inputRef && _SearchField.inputRef.current && !!_SearchField.inputRef.current.value.length;
 SearchField.isVisible = () => _SearchField.inputRef && _SearchField.inputRef.current && elementIsVisible(_SearchField.inputRef.current);
-;// ./js/chat/ui/searchPanel/searchPanel.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/searchPanel/searchPanel.jsx
 
 
 
@@ -18645,7 +18635,7 @@ class SearchPanel extends mixins.w9 {
 }
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
 const buttons = REQ_(994);
-;// ./js/chat/ui/leftPanel/navigation.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/navigation.jsx
 
 
 
@@ -18713,7 +18703,7 @@ const Navigation = ({
 })), REaCt().createElement("span", null, l[165])));
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
 const dropdowns = REQ_(911);
-;// ./js/chat/ui/leftPanel/actions.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/actions.jsx
 
 
 
@@ -18812,7 +18802,7 @@ class Actions extends mixins.w9 {
 }
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
 const applyDecoratedDescriptor = REQ_(793);
-;// ./js/chat/ui/leftPanel/conversationsListItem.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/conversationsListItem.jsx
 
 let _dec, _dec2, _class;
 
@@ -19072,7 +19062,7 @@ const ConversationsListItem = (_dec = utils.Ay.SoonFcWrap(40, true), _dec2 = (0,
   }
 }, (0,applyDecoratedDescriptor.A)(_class.prototype, "eventuallyScrollTo", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "eventuallyScrollTo"), _class.prototype), (0,applyDecoratedDescriptor.A)(_class.prototype, "render", [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, "render"), _class.prototype), _class);
 
-;// ./js/chat/ui/leftPanel/conversationsList.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/conversationsList.jsx
 
 
 
@@ -19386,7 +19376,7 @@ class Meetings extends mixins.w9 {
 }
 // EXTERNAL MODULE: ./js/chat/ui/updateObserver.jsx
 const updateObserver = REQ_(501);
-;// ./js/chat/ui/leftPanel/leftPanel.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/leftPanel.jsx
 
 
 
@@ -19550,7 +19540,7 @@ class LeftPanel extends mixins.w9 {
   }
 }
 const leftPanel = (0,mixins.Zz)(updateObserver.Y)(LeftPanel);
-;// ./js/chat/ui/meetings/workflow/freeCallEnded.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/freeCallEnded.jsx
 
 
 
@@ -19604,7 +19594,7 @@ class FreeCallEnded extends mixins.w9 {
     }, REaCt().createElement("span", null, l.upgrade_now)))));
   }
 }
-;// ./js/chat/ui/contactSelectorDialog.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/contactSelectorDialog.jsx
 
 
 
@@ -19687,7 +19677,7 @@ class ContactSelectorDialog extends mixins.w9 {
 ContactSelectorDialog.defaultProps = {
   requiresUpdateOnResize: true
 };
-;// ./js/chat/ui/conversations.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/conversations.jsx
 
 
 
@@ -20067,7 +20057,7 @@ const REaCt = REQ_.n(React_);
 const mixins = REQ_(137);
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
 const perfectScrollbar = REQ_(486);
-;// ./js/chat/ui/gifPanel/searchField.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/gifPanel/searchField.jsx
 let _SearchField;
 
 
@@ -20112,7 +20102,7 @@ _SearchField = SearchField;
 SearchField.inputRef = REaCt().createRef();
 SearchField.focus = () => _SearchField.inputRef && _SearchField.inputRef.current && _SearchField.inputRef.current.focus();
 SearchField.hasValue = () => _SearchField.inputRef && _SearchField.inputRef.current && !!_SearchField.inputRef.current.value.length;
-;// ./js/chat/ui/gifPanel/result.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/gifPanel/result.jsx
 
 
 
@@ -20156,7 +20146,7 @@ class Result extends mixins.w9 {
     }, REaCt().createElement("span", null, title)));
   }
 }
-;// ./js/chat/ui/gifPanel/resultContainer.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/gifPanel/resultContainer.jsx
 
 
 
@@ -20281,7 +20271,7 @@ class ResultContainer extends mixins.w9 {
     return null;
   }
 }
-;// ./js/chat/ui/gifPanel/gifPanel.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/gifPanel/gifPanel.jsx
 
 
 
@@ -20542,7 +20532,7 @@ const REaCt = REQ_.n(React_);
 const mixins = REQ_(137);
 // EXTERNAL MODULE: ./js/ui/utils.jsx
 const utils = REQ_(314);
-;// ./js/chat/ui/messages/alterParticipants.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/alterParticipants.jsx
 const React = REQ_(594);
 const ContactsUI = REQ_(251);
 const ConversationMessageMixin = REQ_(446).M;
@@ -20648,7 +20638,7 @@ class AltPartsConvMessage extends ConversationMessageMixin {
   }
 }
 
-;// ./js/chat/ui/messages/truncated.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/truncated.jsx
 const truncated_React = REQ_(594);
 const truncated_ContactsUI = REQ_(251);
 const truncated_ConversationMessageMixin = REQ_(446).M;
@@ -20703,7 +20693,7 @@ class TruncatedMessage extends truncated_ConversationMessageMixin {
   }
 }
 
-;// ./js/chat/ui/messages/privilegeChange.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/privilegeChange.jsx
 const privilegeChange_React = REQ_(594);
 const privilegeChange_ContactsUI = REQ_(251);
 const privilegeChange_ConversationMessageMixin = REQ_(446).M;
@@ -20775,7 +20765,7 @@ class PrivilegeChange extends privilegeChange_ConversationMessageMixin {
   }
 }
 
-;// ./js/chat/ui/messages/topicChange.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/topicChange.jsx
 const topicChange_React = REQ_(594);
 const topicChange_ContactsUI = REQ_(251);
 const topicChange_ConversationMessageMixin = REQ_(446).M;
@@ -20828,7 +20818,7 @@ class TopicChange extends topicChange_ConversationMessageMixin {
   }
 }
 
-;// ./js/chat/ui/messages/closeOpenMode.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/closeOpenMode.jsx
 const closeOpenMode_React = REQ_(594);
 const closeOpenMode_ContactsUI = REQ_(251);
 const closeOpenMode_ConversationMessageMixin = REQ_(446).M;
@@ -20879,7 +20869,7 @@ class CloseOpenModeMessage extends closeOpenMode_ConversationMessageMixin {
   }
 }
 
-;// ./js/chat/ui/messages/chatHandle.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/chatHandle.jsx
 const chatHandle_React = REQ_(594);
 const chatHandle_ContactsUI = REQ_(251);
 const chatHandle_ConversationMessageMixin = REQ_(446).M;
@@ -20938,7 +20928,7 @@ const perfectScrollbar = REQ_(486);
 const mixin = REQ_(446);
 // EXTERNAL MODULE: ./js/chat/ui/contacts.jsx
 const contacts = REQ_(251);
-;// ./js/chat/ui/messages/retentionChange.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/retentionChange.jsx
 
 
 
@@ -20974,7 +20964,7 @@ class RetentionChange extends mixin.M {
 const call = REQ_(3);
 // EXTERNAL MODULE: ./js/chat/ui/messages/scheduleMetaChange.jsx
 const scheduleMetaChange = REQ_(757);
-;// ./js/chat/ui/historyPanel.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/historyPanel.jsx
 
 let _dec, _class;
 
@@ -22093,7 +22083,7 @@ const historyPanel = REQ_(814);
 const ui_contacts = REQ_(251);
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
 const perfectScrollbar = REQ_(486);
-;// ./js/chat/ui/meetings/collapse.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/collapse.jsx
 
 
 class Collapse extends mixins.w9 {
@@ -22139,7 +22129,7 @@ const contactsPanel = REQ_(173);
 const videoNodeMenu = REQ_(539);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/videoNode.jsx
 const videoNode = REQ_(414);
-;// ./js/chat/ui/meetings/participants.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/participants.jsx
 
 
 
@@ -22532,7 +22522,7 @@ class Participants extends mixins.w9 {
     }), this.renderParticipantsList())) : this.renderParticipantsList());
   }
 }
-;// ./js/chat/ui/meetings/guest.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/guest.jsx
 
 
 
@@ -22569,7 +22559,7 @@ class Guest extends mixins.w9 {
     }, l[968])));
   }
 }
-;// ./js/chat/ui/meetings/sidebar.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/sidebar.jsx
 
 
 
@@ -22681,7 +22671,7 @@ class Sidebar extends mixins.w9 {
 }
 // EXTERNAL MODULE: ./js/ui/modalDialogs.jsx + 1 modules
 const modalDialogs = REQ_(318);
-;// ./js/chat/ui/meetings/workflow/invite/search.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/invite/search.jsx
 let _Search;
 
 
@@ -22712,7 +22702,7 @@ Search.inputRef = REaCt().createRef();
 Search.focus = () => {
   return _Search.inputRef && _Search.inputRef.current && _Search.inputRef.current.focus();
 };
-;// ./js/chat/ui/meetings/workflow/invite/footer.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/invite/footer.jsx
 
 
 
@@ -22738,7 +22728,7 @@ class Footer extends mixins.w9 {
     }, l.add)));
   }
 }
-;// ./js/chat/ui/meetings/workflow/invite/nil.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/invite/nil.jsx
 
 
 
@@ -22753,7 +22743,7 @@ class Nil extends mixins.w9 {
 }
 // EXTERNAL MODULE: ./js/chat/ui/link.jsx
 const ui_link = REQ_(280);
-;// ./js/chat/ui/meetings/workflow/invite/invite.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/invite/invite.jsx
 
 
 
@@ -23030,7 +23020,7 @@ class Invite extends mixins.w9 {
   }
 }
 Invite.NAMESPACE = 'invite-meeting';
-;// ./js/chat/ui/meetings/workflow/ephemeral.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/ephemeral.jsx
 
 
 
@@ -23065,7 +23055,7 @@ class Ephemeral extends mixins.w9 {
   }
 }
 Ephemeral.NAMESPACE = 'ephemeral-dialog';
-;// ./js/chat/ui/meetings/offline.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/offline.jsx
 
 
 
@@ -23100,7 +23090,7 @@ Offline.NAMESPACE = 'reconnect-dialog';
 const conversationpanel = REQ_(438);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/streamControls.jsx
 const streamControls = REQ_(489);
-;// ./js/chat/ui/meetings/sidebarControls.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/sidebarControls.jsx
 
 
 
@@ -23178,7 +23168,7 @@ class SidebarControls extends mixins.w9 {
 }
 // EXTERNAL MODULE: ./js/chat/ui/inviteParticipantsPanel.jsx
 const inviteParticipantsPanel = REQ_(815);
-;// ./js/chat/ui/meetings/call.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/call.jsx
 
 
 
@@ -24978,7 +24968,7 @@ const meetings_button = REQ_(959);
 const dropdowns = REQ_(911);
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
 const buttons = REQ_(994);
-;// ./js/chat/ui/meetings/floatExtendedControls.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/floatExtendedControls.jsx
 
 
 
@@ -25067,7 +25057,7 @@ const permissionsObserver = REQ_(542);
 const hostsObserver = REQ_(972);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/streamControls.jsx
 const streamControls = REQ_(489);
-;// ./js/chat/ui/meetings/float.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/float.jsx
 
 
 
@@ -25716,7 +25706,7 @@ Minimized.UNREAD_EVENT = 'onUnreadCountUpdate.localStreamNotifications';
 const __Minimized = (0,mixins.Zz)(micObserver.Q, permissionsObserver.$)(Minimized);
 // EXTERNAL MODULE: ./js/chat/ui/inviteParticipantsPanel.jsx
 const inviteParticipantsPanel = REQ_(815);
-;// ./js/chat/ui/meetings/participantsNotice.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/participantsNotice.jsx
 
 
 
@@ -25805,7 +25795,7 @@ class ParticipantsNotice extends mixins.w9 {
 ParticipantsNotice.NAMESPACE = 'participants-notice';
 // EXTERNAL MODULE: ./js/chat/ui/chatToaster.jsx
 const chatToaster = REQ_(424);
-;// ./js/chat/ui/meetings/participantsBlock.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/participantsBlock.jsx
 
 
 
@@ -26076,7 +26066,7 @@ class ParticipantsBlock extends mixins.w9 {
 const videoNodeMenu = REQ_(539);
 // EXTERNAL MODULE: ./js/ui/modalDialogs.jsx + 1 modules
 const modalDialogs = REQ_(318);
-;// ./js/chat/ui/meetings/modeSwitch.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/modeSwitch.jsx
 
 
 
@@ -26270,7 +26260,7 @@ class ModeSwitch extends mixins.w9 {
 }
 ModeSwitch.NAMESPACE = 'modeSwitch';
 ModeSwitch.BASE_CLASS = 'mode';
-;// ./js/chat/ui/meetings/streamHead.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/streamHead.jsx
 
 
 
@@ -26538,7 +26528,7 @@ const contacts = REQ_(251);
 const perfectScrollbar = REQ_(486);
 // EXTERNAL MODULE: ./js/chat/ui/link.jsx
 const ui_link = REQ_(280);
-;// ./js/chat/ui/meetings/waitingRoom/admit.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/waitingRoom/admit.jsx
 
 
 
@@ -26713,7 +26703,7 @@ class Admit extends mixins.w9 {
     return null;
   }
 }
-;// ./js/chat/ui/meetings/stream.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/meetings/stream.jsx
 
 
 
@@ -29302,7 +29292,7 @@ const mixin = REQ_(446);
 const ui_contacts = REQ_(251);
 // EXTERNAL MODULE: ./js/ui/utils.jsx
 const utils = REQ_(314);
-;// ./js/chat/ui/messages/abstractGenericMessage.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/abstractGenericMessage.jsx
 
 
 
@@ -29371,7 +29361,7 @@ class AbstractGenericMessage extends mixin.M {
     }, this.getTimestampAsString()), !hideActionButtons && this.getMessageActionButtons && this.renderMessageActionButtons(this.getMessageActionButtons()), this.getContents && this.getContents(), hideActionButtons ? null : this.getEmojisImages()));
   }
 }
-;// ./js/chat/ui/messages/utils.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/utils.jsx
 let getMessageString;
 (function () {
   let MESSAGE_STRINGS;
@@ -29448,7 +29438,7 @@ mega.ui = mega.ui || {};
 mega.ui.chat = mega.ui.chat || {};
 mega.ui.chat.getMessageString = getMessageString;
 
-;// ./js/chat/ui/messages/types/local.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/types/local.jsx
 
 
 
@@ -29689,7 +29679,7 @@ class Local extends AbstractGenericMessage {
 const dropdowns = REQ_(911);
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
 const buttons = REQ_(994);
-;// ./js/chat/ui/messages/types/contact.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/types/contact.jsx
 
 
 
@@ -29855,7 +29845,7 @@ class Contact extends AbstractGenericMessage {
     }, contacts);
   }
 }
-;// ./js/chat/ui/messages/types/attachment.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/types/attachment.jsx
 
 
 
@@ -30117,7 +30107,7 @@ class Attachment extends AbstractGenericMessage {
 }
 // EXTERNAL MODULE: ./js/chat/mixins.js
 const mixins = REQ_(137);
-;// ./js/chat/ui/messages/types/partials/audioPlayer.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/types/partials/audioPlayer.jsx
 
 
 class AudioPlayer extends mixins.w9 {
@@ -30287,7 +30277,7 @@ class AudioPlayer extends mixins.w9 {
     }));
   }
 }
-;// ./js/chat/ui/messages/types/partials/audioContainer.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/types/partials/audioContainer.jsx
 
 
 
@@ -30360,7 +30350,7 @@ AudioContainer.defaultProps = {
   h: null,
   mime: null
 };
-;// ./js/chat/ui/messages/types/voiceClip.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/types/voiceClip.jsx
 
 
 
@@ -30417,7 +30407,7 @@ class VoiceClip extends AbstractGenericMessage {
     return REaCt().createElement(REaCt().Fragment, null, this.props.message.getState() === Message.STATE.NOT_SENT ? null : this._getActionButtons(), this._getAudioContainer());
   }
 }
-;// ./js/chat/ui/messages/types/partials/metaRichpreview.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/types/partials/metaRichpreview.jsx
 const React = REQ_(594);
 const ConversationMessageMixin = REQ_(446).M;
 const MetaRichPreviewLoading = REQ_(707).a;
@@ -30510,7 +30500,7 @@ class MetaRichpreview extends ConversationMessageMixin {
   }
 }
 
-;// ./js/chat/ui/messages/types/partials/metaRichpreviewConfirmation.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/types/partials/metaRichpreviewConfirmation.jsx
 const metaRichpreviewConfirmation_React = REQ_(594);
 const metaRichpreviewConfirmation_ConversationMessageMixin = REQ_(446).M;
 class MetaRichprevConfirmation extends metaRichpreviewConfirmation_ConversationMessageMixin {
@@ -30587,7 +30577,7 @@ class MetaRichprevConfirmation extends metaRichpreviewConfirmation_ConversationM
   }
 }
 
-;// ./js/chat/ui/messages/types/partials/geoLocation.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/types/partials/geoLocation.jsx
 
 function GeoLocation(props) {
   const {
@@ -30636,7 +30626,7 @@ function GeoLocation(props) {
 const geoLocation = GeoLocation;
 // EXTERNAL MODULE: ./js/chat/ui/messages/types/partials/metaRichPreviewLoading.jsx
 const metaRichPreviewLoading = REQ_(707);
-;// ./js/chat/ui/messages/types/partials/metaRichpreviewMegaLinks.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/types/partials/metaRichpreviewMegaLinks.jsx
 
 
 
@@ -30804,7 +30794,7 @@ class MetaRichpreviewMegaLinks extends mixin.M {
 const typingArea = REQ_(795);
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
 const perfectScrollbar = REQ_(486);
-;// ./js/chat/ui/messages/types/text.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/types/text.jsx
 
 
 
@@ -31074,7 +31064,7 @@ class Text extends AbstractGenericMessage {
 }
 // EXTERNAL MODULE: ./js/chat/ui/gifPanel/gifPanel.jsx + 3 modules
 const gifPanel = REQ_(691);
-;// ./js/chat/ui/messages/types/giphy.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/types/giphy.jsx
 
 
 
@@ -31175,7 +31165,7 @@ class Giphy extends AbstractGenericMessage {
     });
   }
 }
-;// ./js/chat/ui/messages/generic.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/messages/generic.jsx
 
 
 
@@ -32259,7 +32249,7 @@ const mixins = REQ_(137);
 const emojiDropdown = REQ_(844);
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
 const ui_buttons = REQ_(994);
-;// ./js/chat/ui/emojiAutocomplete.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/emojiAutocomplete.jsx
 
 const React = REQ_(594);
 
@@ -32478,7 +32468,7 @@ EmojiAutocomplete.defaultProps = {
 const gifPanel = REQ_(691);
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
 const perfectScrollbar = REQ_(486);
-;// ./js/chat/ui/typingArea.jsx
+;// CONCATENATED MODULE: ./js/chat/ui/typingArea.jsx
 
 let _dec, _class;
 
@@ -34238,7 +34228,7 @@ const esm_extends = REQ_(168);
 const applyDecoratedDescriptor = REQ_(793);
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
 const perfectScrollbar = REQ_(486);
-;// ./js/ui/jsx/megaList/megaList2.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/megaList/megaList2.jsx
 
 
 let _dec, _class;
@@ -34580,7 +34570,7 @@ const MegaList2 = (_dec = (0,mixins.hG)(30, true), _class = class MegaList2 exte
 }, (0,applyDecoratedDescriptor.A)(_class.prototype, "onPsUserScroll", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "onPsUserScroll"), _class.prototype), _class);
 // EXTERNAL MODULE: ./js/ui/jsx/fm/nodes/genericNodePropsComponent.jsx + 1 modules
 const genericNodePropsComponent = REQ_(984);
-;// ./js/ui/jsx/fm/nodes/genericGrid.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/genericGrid.jsx
 
 
 class GenericGrid extends genericNodePropsComponent.B {
@@ -34652,7 +34642,7 @@ class GenericGrid extends genericNodePropsComponent.B {
     }, this.nodeProps.title));
   }
 }
-;// ./js/ui/jsx/fm/nodes/genericTable.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/genericTable.jsx
 
 
 
@@ -34753,7 +34743,7 @@ class GenericTable extends genericNodePropsComponent.B {
     }, columns);
   }
 }
-;// ./js/ui/jsx/megaList/adapters.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/megaList/adapters.jsx
 
 
 class GenericListAdapter extends mixins.w9 {
@@ -34824,7 +34814,7 @@ Table.itemsPerRow = 1;
 Table.containerClassName = "grid-scrolling-table megaListContainer";
 // EXTERNAL MODULE: ./js/ui/jsx/fm/nodes/columns/columnFavIcon.jsx
 const columnFavIcon = REQ_(161);
-;// ./js/ui/tooltips.jsx
+;// CONCATENATED MODULE: ./js/ui/tooltips.jsx
 const React = REQ_(594);
 
 class Handler extends mixins.w9 {
@@ -34980,7 +34970,7 @@ const tooltips = {
   Handler,
   Contents
 };
-;// ./js/ui/jsx/fm/nodes/columns/columnNodeName.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnNodeName.jsx
 
 
 
@@ -35044,7 +35034,7 @@ class ColumnNodeName extends genericNodePropsComponent.B {
 ColumnNodeName.sortable = true;
 ColumnNodeName.id = 'name';
 ColumnNodeName.megatype = 'fname';
-;// ./js/ui/jsx/fm/nodes/columns/columnSize.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnSize.jsx
 
 
 class ColumnSize extends genericNodePropsComponent.B {
@@ -35064,7 +35054,7 @@ class ColumnSize extends genericNodePropsComponent.B {
 ColumnSize.sortable = true;
 ColumnSize.id = "size";
 ColumnSize.megatype = "size";
-;// ./js/ui/jsx/fm/nodes/columns/columnTimeAdded.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnTimeAdded.jsx
 
 
 class ColumnTimeAdded extends genericNodePropsComponent.B {
@@ -35084,7 +35074,7 @@ class ColumnTimeAdded extends genericNodePropsComponent.B {
 ColumnTimeAdded.sortable = true;
 ColumnTimeAdded.id = "ts";
 ColumnTimeAdded.megatype = "timeAd";
-;// ./js/ui/jsx/fm/nodes/columns/columnExtras.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnExtras.jsx
 
 
 class ColumnExtras extends genericNodePropsComponent.B {
@@ -35106,7 +35096,7 @@ ColumnExtras.id = "extras";
 ColumnExtras.label = "";
 ColumnExtras.megatype = "extras";
 ColumnExtras.headerClassName = "grid-url-header";
-;// ./js/ui/jsx/fm/browserEntries.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/browserEntries.jsx
 
 
 
@@ -35532,7 +35522,7 @@ BrowserEntries.defaultProps = {
   'hideable': true,
   'requiresUpdateOnResize': true
 };
-;// ./js/ui/jsx/fm/fmView.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/fmView.jsx
 
 
 
@@ -35938,7 +35928,7 @@ REQ_.d(EXP_, {
 
 // EXTERNAL MODULE: ./js/chat/mixins.js
 const mixins = REQ_(137);
-;// ./js/ui/jsx/fm/nodes/nodeProperties.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/nodeProperties.jsx
 class NodeProperties {
   static get(node, changeListener) {
     assert(node.h, 'missing handle for node');
@@ -36115,7 +36105,7 @@ NodeProperties.MAX_CACHE_SIZE = 100;
 if (d) {
   window.NodeProperties = NodeProperties;
 }
-;// ./js/ui/jsx/fm/nodes/genericNodePropsComponent.jsx
+;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/genericNodePropsComponent.jsx
 
 
 class GenericNodePropsComponent extends mixins.w9 {
@@ -36218,7 +36208,7 @@ REQ_.d(EXP_, {
 const utils = REQ_(314);
 // EXTERNAL MODULE: ./js/chat/mixins.js
 const mixins = REQ_(137);
-;// ./js/ui/forms.jsx
+;// CONCATENATED MODULE: ./js/ui/forms.jsx
 const React = REQ_(594);
 
 class Checkbox extends mixins.w9 {
@@ -36268,7 +36258,7 @@ class Checkbox extends mixins.w9 {
 const ui_forms = {
   Checkbox
 };
-;// ./js/ui/modalDialogs.jsx
+;// CONCATENATED MODULE: ./js/ui/modalDialogs.jsx
 const modalDialogs_React = REQ_(594);
 
 

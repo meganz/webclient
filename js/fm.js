@@ -669,6 +669,18 @@ function fmtopUI() {
         if (M.v.length) {
             $('.fm-clearbin-button').removeClass('hidden');
         }
+
+        const $rewindNotification = $('.fm-notification-block.new-feature-rewind-notification');
+        if (mega.config.get('dsmRubRwd')) {
+            $rewindNotification.addClass('hidden');
+        }
+        else {
+            $('.fm-notification-close', $rewindNotification).rebind('click', () => {
+                mega.config.set('dsmRubRwd', 1);
+                $rewindNotification.addClass('hidden');
+            });
+        }
+
         $('.fm-right-files-block').addClass('rubbish-bin visible-notification');
     }
     else {

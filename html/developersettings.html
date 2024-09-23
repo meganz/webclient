@@ -14,7 +14,8 @@
                                 <option value="https://staging4.api.mega.co.nz/">staging4.api.mega.co.nz</option>
                                 <option value="https://g.api.mega.co.nz/">g.api.mega.co.nz</option>
                                 <option value="https://eu.api.mega.co.nz/">eu.api.mega.co.nz</option>
-                                <option value="https://api-sandbox3.developers.mega.co.nz/">api-sandbox3.developers.mega.co.nz</option>
+                                <option value="https://api-sandbox3.developers.mega.co.nz/">
+                                    api-sandbox3.developers.mega.co.nz</option>
                             </select>
                         </td>
                     </tr>
@@ -23,11 +24,11 @@
                         <td>
                             <select class="developer-setting localstorage" name="staticpath">
                                 <option value="">Default</option>
-                                <option value="https://eu.static.mega.co.nz/3/">Europe</option>
-                                <option value="https://nz.static.mega.co.nz/3/">New Zealand</option>
-                                <option value="https://na.static.mega.co.nz/3/">North America</option>
-                                <option value="https://sg.static.mega.co.nz/3/">Singapore</option>
-                                <option value="https://smoketest.static.mega.nz/3/">Smoketest</option>
+                                <option value="https://eu.static.mega.co.nz/4/">Europe</option>
+                                <option value="https://nz.static.mega.co.nz/4/">New Zealand</option>
+                                <option value="https://na.static.mega.co.nz/4/">North America</option>
+                                <option value="https://sg.static.mega.co.nz/4/">Singapore</option>
+                                <option value="https://smoketest.static.mega.nz/4/">Smoketest</option>
                             </select>
                         </td>
                     </tr>
@@ -86,8 +87,205 @@
                             </select>
                         </td>
                     </tr>
+                    <tr>
+                        <th>Default page dev</th>
+                        <td>
+                            <select class="developer-setting localstorage" name="devSettDefault">
+                                <option value="">Disabled</option>
+                                <option value="1">Enabled (May cause issues for this window)</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Block local currency</th>
+                        <td>
+                            <select class="developer-setting localstorage" name="blockLocal">
+                                <option value="">Allow local currency</option>
+                                <option value="1">Block local currency</option>
+                            </select>
+                        </td>
+                    </tr>
                 </table>
                 <button class="mega-button positive apply">
+                    <span>Apply</span>
+                </button>
+
+                <h3 class="logged-in">localStorage</h3>
+                <div class="misc-dev api-setting-item logged-in">
+                    <div>Set/Delete local storage items</div>
+                    <div>
+                        <div class="input-title">Item name:</div>
+                        <input class="name" />
+                    </div>
+                    <div>
+                        <div class="input-title">Item value:</div>
+                        <input class="value" />
+                    </div>
+                    <div class="button-container">
+                        <button class="mega-button positive set">Set</button>
+                        <button class="mega-button get">Get</button>
+                    </div>
+                    <div class="response"></div>
+                    <div class="info">Setting a name and no value will delete the item from localStorage</div>
+                </div>
+
+                <h3 class="logged-in section-title">User Attribute</h3>
+                <div class="logged-in user-attr-settings api-setting-item">
+                    <div class="user-attr-name">
+                        <div class="input-title">Attribute name:</div>
+                        <input class="user-attr-name entry-item">
+                    </div>
+                    <div>
+                        <div class="input-title">Attribute value:</div>
+                        <input class="user-attr-value entry-item">
+                    </div>
+                    <div class="advanced-wrapper">
+                        <div>
+                            <select class="user-attr-public-type entry-item">
+                                <option value="-2">Private non encrypted (^)</option>
+                                <option value="-1">System</option>
+                                <option value="true">Public (+)</option>
+                                <option value="false">Private encrypted (*)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <select class="user-attr-is-historic entry-item">
+                                <option value="0">Historic</option>
+                                <option value="1" selected="selected">Non-historic (!)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="user-att-buttons button-container">
+                        <button class="set mega-button positive"><span>Set</span></button>
+                        <button class="get mega-button"><span>Get</span></button>
+                    </div>
+                    <div class="response"></div>
+                </div>
+
+                <h3 class="logged-in section-title">Misc</h3>
+                <div class="logged-in misc">
+                    <div class="api-setting-item target-wrapper ">
+                        <div>Target Account
+                        </div>
+                        <input class="target-account large-input" />
+                        <div class="response"></div>
+                        <div class="info">
+                            The target account must be one of your own accounts. Applies only to the below settings
+                        </div>
+                    </div>
+                    <div class="api-setting-item set-used-transfer">
+                        <div class="title">Set used transfer quota</div>
+                        <div>
+                            <input class="value" type="text" />
+                            <select class="dropdown">
+                                <option value="0">B</option>
+                                <option value="1">KB</option>
+                                <option value="2">MB</option>
+                                <option value="3" selected="selected">GB</option>
+                                <option value="4">TB</option>
+                            </select>
+                        </div>
+                        <div class="">
+                            <div class="current-info current-used"></div>
+                            <div class="current-info current-empty"></div>
+                            <div class="current-info current-max"></div>
+                            <div class="current-info response"></div>
+                        </div>
+                        <button class="mega-button positive set"><span>Set</span></button>
+                        <div class="info">
+                            The target account must be Pro. There is currently an issue with this command
+                            where the value is incorrectly set when closer to the max limit. Repeated setting will get
+                            closer
+                        </div>
+                    </div>
+                    <div class="api-setting-item set-business-status">
+                        <div class="title">Set Business status</div>
+                        <div class="status-input large-input">
+                            <span>Set to:</span>
+                            <select class="dropdown" name="bs">
+                                <option value="-1">Expired (-1)</option>
+                                <option value="0" selected="selected">
+                                    Clear override and reset to payment status (0)
+                                </option>
+                                <option value="1">Active (1)</option>
+                                <option value="2">Grace period (2)</option>
+                            </select>
+                        </div>
+                        <button class="mega-button positive set"><span>Set</span></button>
+                        <div class="response"></div>
+                        <div class="info">The target account must have Business</div>
+                    </div>
+                    <div class="api-setting-item set-pro-flexi-status">
+                        <div class="title">Set Pro Flexi status</div>
+                        <div class="status-input large-input">
+                            <span>Set to:</span>
+                            <select class="dropdown" name="pfs">
+                                <option value="-1">Expired (-1)</option>
+                                <option value="0" selected="selected">
+                                    Clear override and reset to payment status (0)
+                                </option>
+                                <option value="1">Active for 1 month (1)</option>
+                                <option value="2">Grace period (2)</option>
+                            </select>
+                        </div>
+                        <button class="mega-button positive set"><span>Set</span></button>
+                        <div class="response"></div>
+                        <div class="info">The target account must have Pro Flexi</div>
+                    </div>
+                    <div class="api-setting-item set-user-status">
+                        <div class="title">Set User status</div>
+                        <div class="status-input large-input">
+                            <span>Set to:</span>
+                            <select class="dropdown" name="us">
+                                <option value="0">Enabled (0)</option>
+                                <option value="2">Suspended (Generic) (2)</option>
+                                <option value="3">Suspended (For payment, but not used) (3)</option>
+                                <option value="4">Suspended (Copyright complaint) (4)</option>
+                                <option value="5">Suspended (Admin full disable) (5)</option>
+                                <option value="6">Suspended (Admin partial disable) (6)</option>
+                                <option value="7">Suspended (Emergency Takedown) (7)</option>
+                                <option value="8">Suspended (Until SMS verified) (8)</option>
+                                <option value="9">Suspended (Until Email Verified) (9)</option>
+                            </select>
+                        </div>
+                        <button class="mega-button positive set"><span>Set</span></button>
+                        <div class="response"></div>
+                    </div>
+                    <div class="api-setting-item ab-group-set">
+                        <div class="title">AB Group set</div>
+                        <div>
+                            <div class="input-title">Flag name: ab_</div>
+                            <input class="ab-flag-name">
+                        </div>
+                        <div>
+                            <div class="input-title">Value to set:</div>
+                            <input type="number" class="ab-flag-value">
+                        </div>
+                        <div class="button-container">
+                            <button class="mega-button positive set"><span>Set</span></button>
+                            <button class="mega-button get"><span>Get</span></button>
+                        </div>
+                        <div class="response"></div>
+                    </div>
+                    <div class="api-setting-item adv-odq-warning-state api-setting-item">
+                        <button class="mega-button title  simple-button" name="aodq">Advance ODQ Warning State</button>
+                        <div class="response"></div>
+                        <div class="info">
+                            The target account must be in the RED stoplight stage. Step 4 turns on the paywall
+                        </div>
+                    </div>
+                    <div class="api-setting-item force-reload api-setting-item">
+                        <button class="mega-button title  simple-button" name="fr">Force Reload</button>
+                        <div class="response"></div>
+                    </div>
+                    <div class="api-setting-item remove-password-manager-attribute api-setting-item">
+                        <button class="mega-button title  simple-button" name="pwmhd">
+                            Remove password manager attribute
+                        </button>
+                        <div class="response"></div>
+                    </div>
+                </div>
+                <button class="logged-in mega-button positive apply">
                     <span>Apply</span>
                 </button>
             </div>

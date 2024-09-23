@@ -1,0 +1,17 @@
+version: '3.0'
+volumes:
+    mega_webclient_node_modules_cache:
+services:
+  mega-webclient:
+    container_name: mega-webclient
+    build:
+      context: ../../
+      dockerfile: ./contrib/docker/Dockerfile
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - type: bind
+        source: ../../
+        target: /var/www/html
+      - mega_webclient_node_modules_cache:/var/www/html/node_modules

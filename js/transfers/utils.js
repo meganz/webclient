@@ -48,7 +48,7 @@ function setTransferStatus(dl, status, ethrow, lock, fatalError) {
 
             if (is_mobile && lock !== 2 && dl) {
                 mobile.downloadOverlay.close();
-                mobile.messageOverlay.show(status);
+                mobile.downloadOverlay.handleFatalError(dl, status);
             }
         }
 
@@ -103,7 +103,11 @@ function dlFatalError(dl, error, ethrow, lock) {
             // ^ Let's stop logging Incognito issues, they are too common and we do have fallback logic anyway
             // Also stop obsolete browsers (e.g. attempting to use FlashIO, sigh) from logging errors
             if (!window.Incognito && mega.es2019 && !/^[\d\s,.]+$/.test(error)) {
-                srvlog('dlFatalError: ' + error.substr(0, 72));
+                // srvlog('dlFatalError: ' + error.substr(0, 72));
+                // @todo fix the Incognito flag.
+                if (d) {
+                    dlmanager.logger.warn(`dlFatalError: ${error}`, dl);
+                }
             }
         }
     });
@@ -188,7 +192,8 @@ function condenseMacs(macs, key) {
 function chksum(buf) {
     var l, c, d;
 
-    if (have_ab) {
+    // eslint-disable-next-line no-constant-condition
+    if (1) {
         var ll;
 
         c = new Uint32Array(3);
@@ -220,18 +225,6 @@ function chksum(buf) {
             while (ll--) c[ll] ^= d[ll];
         }
     }
-    else {
-        c = Array(12);
-
-        for (l = 12; l--;) {
-            c[l] = 0;
-        }
-
-        for (l = buf.length; l--;) {
-            c[l % 12] ^= buf.charCodeAt(l);
-        }
-
-    }
 
     for (d = '', l = 0; l < 12; l++) {
         d += String.fromCharCode(c[l]);
@@ -239,68 +232,6 @@ function chksum(buf) {
 
     return d;
 }
-
-function setupTransferAnalysis() {
-    if ($.mTransferAnalysis || 1) {
-        return;
-    }
-    var PROC_INTERVAL = 4.2 * 60 * 1000;
-    var logger = MegaLogger.getLogger('TransferAnalysis');
-
-    var prev = {},
-        tlen = {},
-        time = {},
-        chunks = {};
-    $.mTransferAnalysis = setInterval(function() {
-        if (uldl_hold || dlmanager.isOverQuota) {
-            prev = {};
-        }
-        else if ($.transferprogress) {
-            var tp = $.transferprogress;
-
-            for (var i in tp) {
-                if (tp.hasOwnProperty(i)) {
-                    var currentlyTransfered = tp[i][0];
-                    var totalToBeTransfered = tp[i][1];
-                    var currenTransferSpeed = tp[i][2];
-
-                    var finished = (currentlyTransfered === totalToBeTransfered);
-
-                    if (finished) {
-                        logger.info('Transfer "%s" has finished. \uD83D\uDC4D', i);
-                        continue;
-                    }
-
-                    var transfer = Object(GlobalProgress[i]);
-
-                    if (transfer.paused || !transfer.started) {
-                        logger.info('Transfer "%s" is not active.', i, transfer);
-                        continue;
-                    }
-
-                    if (prev[i] && prev[i] === currentlyTransfered) {
-                        var type = (i[0] === 'u'
-                            ? 'Upload'
-                            : (i[0] === 'z' ? 'ZIP' : 'Download'));
-
-                        srvlog(type + ' transfer seems stuck.');
-
-                        logger.warn('Transfer "%s" had no progress for the last minutes...', i, transfer);
-                    }
-                    else {
-                        logger.info('Transfer "%s" is in progress... %d% completed', i,
-                            Math.floor(currentlyTransfered / totalToBeTransfered * 100));
-
-                        time[i] = Date.now();
-                        tlen[i] = Math.max(tlen[i] | 0, currentlyTransfered);
-                        prev[i] = currentlyTransfered;
-                    }
-                }
-            }
-        }
-    }, PROC_INTERVAL);
-}
-
 
 (function __FileFingerprint(scope) {
     'use strict';
@@ -386,7 +317,6 @@ function setupTransferAnalysis() {
 
             var size = file.size;
             var reader = new FileReader();
-            reader.ab = !reader.readAsBinaryString;
             reader.errorCount = 0;
 
             crc32table = scope.crc32table || (scope.crc32table = makeCRCTable());
@@ -436,16 +366,11 @@ function setupTransferAnalysis() {
                         setTimeout(readBlock.bind(null, blob, callback), 4e3);
                     }
                     else {
-                        onIdle(callback.bind(null, reader.ab ? ab_to_str(target.result) : target.result));
+                        callback(target.result);
                     }
                 }, reject);
 
-                if (reader.ab) {
-                    reader.readAsArrayBuffer(blob);
-                }
-                else {
-                    reader.readAsBinaryString(blob);
-                }
+                reader.readAsBinaryString(blob);
             };
 
             if (size <= 8192) {

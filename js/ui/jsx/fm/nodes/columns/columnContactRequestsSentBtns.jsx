@@ -19,7 +19,7 @@ export class ColumnContactRequestsSentBtns extends MegaRenderMixin {
         let {node} = nodeAdapter.props;
 
         return <td megatype={ColumnContactRequestsSentBtns.megatype} className={ColumnContactRequestsSentBtns.megatype}>
-            <div className="contact-item-controls">
+            <div className="contact-item-controls contact-request-sent">
                 {!node.dts && this.reinviteAllowed(node.rts) &&
                 <Button
                     className="mega-button action"

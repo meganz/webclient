@@ -22,7 +22,7 @@ function initPerfectScrollbar($scrollBlock, options) {
             }
 
             Ps.initialize($scrollBlock[i], {
-                'handlers': ['click-rail', 'drag-scrollbar', 'wheel', 'touch'],
+                'handlers': ['click-rail', 'drag-thumb', 'wheel', 'touch'],
                 'minScrollbarLength': 20,
                 ...options
             });
@@ -147,6 +147,12 @@ function reselect(n) {
         return String(h).replace(/[^\w-]/g, '');
     });
 
+    // Just scroll to file in mobile weblClient
+    if (is_mobile && n && $.selected.length) {
+        mobile.cloud.scrollToFile($.selected[0]);
+        return;
+    }
+
     if (window.selectionManager) {
         selectionManager.clear_selection();
     }
@@ -163,12 +169,7 @@ function reselect(n) {
         }
     }
 
-    if (n && is_mobile) {
-        if ($.selected.length) {
-            mobile.cloud.scrollToFile($.selected[0]);
-        }
-    }
-    else if (n) {
+    if (n) {
         let $el;
         let $scrollBlock;
 
@@ -186,3 +187,60 @@ function reselect(n) {
         }
     }
 }
+
+Object.defineProperty(self, 'Ps', {value: freeze({
+    initialize(node, opts) {
+
+        'use strict';
+
+        if (!node) {
+            return;
+        }
+
+        if (node.Ps) {
+            node.Ps.destroy();
+        }
+
+        node.Ps = new PerfectScrollbar(node, opts);
+    },
+    update(node) {
+
+        'use strict';
+
+        if (node && node.Ps) {
+
+            const _getXnY = () => node.classList.contains('ps--active-x') && node.classList.contains('ps--active-y');
+            const prevXnY = _getXnY();
+
+            node.Ps.update();
+
+            if (_getXnY() !== prevXnY) {
+                node.Ps.update();
+            }
+        }
+    },
+    destroy(node) {
+
+        'use strict';
+
+        if (node && node.Ps) {
+            node.Ps.destroy();
+        }
+    },
+    enable(node) {
+
+        'use strict';
+
+        if (node) {
+            node.classList.remove('ps-disabled');
+        }
+    },
+    disable(node) {
+
+        'use strict';
+
+        if (node) {
+            node.classList.add('ps-disabled');
+        }
+    },
+})});

@@ -139,6 +139,9 @@
 .mega-dialog-container.common-container.arrange-to-back {
     z-index: 1000;
 }
+.mobile .mega-dialog-container.common-container.arrange-to-back {
+    z-index: inherit;
+}
 
 .dialog-sprite, i.dialog-sprite,
 .ui-datepicker-prev, .ui-datepicker-next
@@ -268,133 +271,68 @@
 }
 
 /* Email verification required */
-.mega-dialog.verify-email {
-    max-width: 360px;
-}
-.mega-dialog.verify-email .header {
-    background: var(--surface-error);
-    border-radius: 23px 23px 0 0;
-}
-.mobile .mega-dialog.verify-email .header {
-    border-radius: 0;
-}
 .mega-dialog.verify-email .content-block {
     text-align: center;
 }
-.mega-dialog.verify-email .content-block .text:first-child {
-    margin-top: 16px;
-}
 .mega-dialog.verify-email .content-block .text {
-    color: var(--text-color-high);
     margin-bottom: 16px;
-}
-.mega-dialog.verify-email .content-block .header-text {
-    margin-bottom: 4px;
 }
 .mega-dialog.verify-email .content-block .text strong {
     font-family: var(--text-font-family-semibold);
 }
-.mega-dialog.verify-email .content-block .text.small {
-    font: var(--text-body2);
-    margin-bottom: 8px;
-}
-.mega-dialog.verify-email .content-block .text.red {
-    color: var(--text-color-error);
+.mega-dialog.dialog-template-action.verify-email > header .graphic {
+    height: 79px;
     margin-bottom: 0;
-    cursor: pointer;
-    position: relative;
 }
-.mega-dialog.verify-email .locked-account {
-    width: 72px;
-    --width: 72px;
-    height: 72px;
-    margin: 0 auto 16px auto;
+.mobile .mega-dialog.verify-email * {
+    font-family: var(--mobile-font-family-main);
 }
-.mega-dialog.verify-email .dropdown.body {
-    width: 320px;
-    bottom: 29px;
-    left: 50%;
-    margin: 0 0 0 -160px;
-    border-radius: 24px;
-    padding: 24px;
-    visibility: hidden;
-    position: absolute;
-    opacity: 0;
-    transition: opacity 200ms ease-in-out, visibility 200ms ease-in-out;
-    cursor: default;
+.mobile .mega-dialog.verify-email .content-block .text strong {
+    font: var(--mobile-font-copy-semibold);
 }
-.verify-email.content-block .text.red .dropdown.body::after {
-    content: "";
-    bottom: -10px;
-    left: 0;
-    height: 34px;
-    position: absolute;
+.mobile .mega-dialog.verify-email > header .graphic {
+    background-image: url("../images/mobile/warning-3d.png");
+    background-size: contain;
+    width: 96px;
+    height: 96px;
+}
+.mobile .mega-dialog.verify-email > header h2 {
+    font: var(--mobile-font-heading-h1);
+    text-align: left;
+}
+.mobile .mega-dialog.verify-email .content-block {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-copy-regular);
+    text-align: left;
+}
+.mobile .mega-dialog.verify-email .mega-button {
+    border-radius: var(--mobile-border-radius-medium);
+    max-width: var(--mobile-elem-max-width);
     width: 100%;
+    font: var(--mobile-font-link-large-regular);
 }
-.verify-email.content-block .text.red:hover .dropdown.body {
-    visibility: visible;
-    opacity: 1;
+.mobile .mega-dialog.verify-email footer button.positive {
+    background: var(--mobile-button-primary);
+    color: var(--mobile-text-inverse);
 }
-h3.verify-email.header-txt {
-    font: var(--text-h3);
-    color: var(--text-color-high);
-    margin: 0 0 12px;
+.mobile .mega-dialog.verify-email footer button.positive span {
+    font-weight: var(--mobile-font-weight-semibold);
 }
-.verify-email .dropdown.body .text:last-child {
+.mobile .mega-dialog.dialog-template-action.verify-email > header {
+    padding: 24px 24px 16px;
+}
+.mobile .mega-dialog.dialog-template-action.verify-email > header .graphic {
+    margin: 0 0 24px;
+}
+.mobile .mega-dialog.dialog-template-action.verify-email .content-block {
+    padding: 0 24px;
+}
+.mobile .mega-dialog.dialog-template-action.verify-email > footer .footer-container {
+    justify-content: flex-start;
+    padding: 8px 24px 24px;
+}
+.mobile .mega-dialog.dialog-template-action.verify-email > footer button.large {
     margin: 0;
-}
-.mobile .mega-dialog.verify-email {
-    max-width: 100%;
-}
-.mobile .mega-dialog.verify-email .footer-container,
-.mobile .mega-dialog.verify-email-login-to-account .footer-container,
-.mobile .mega-dialog.verify-email-set-new-pass .footer-container {
-    padding: 16px 0;
-    justify-content: center;
-}
-.mobile .verify-email.content-block {
-    padding: 19px 20px 0 20px;
-}
-.mobile .verify-email.header {
-    height: auto;
-    padding-top: 24px;
-}
-.mobile .verify-email.header-txt {
-    padding-bottom: 12px;
-    padding-top: 0;
-}
-.mobile .verify-email.content-block .text {
-    margin-bottom: 15px;
-}
-.mobile .verify-email.content-block .text.red {
-    margin-bottom: 20px;
-}
-.mobile .verify-email .dropdown.body {
-    width: 100%;
-    margin-left: -50%;
-}
-.mobile .verify-email.content-block .text.red {
-    position: static;
-}
-.mobile .verify-email .dropdown.body {
-    max-width: 100%;
-    max-width: -webkit-calc(100% - 60px);
-    max-width: -moz-calc(100% - 60px);
-    max-width: calc(100% - 60px);
-    max-height: 100%;
-    max-height: -webkit-calc(100% - 60px);
-    max-height: -moz-calc(100% - 60px);
-    max-height: calc(100% - 60px);
-    -webkit-transform: translate(-50%, -50%);
-    -moz-transform: translate(-50%, -50%);
-    -ms-transform: translate(-50%, -50%);
-    -o-transform: translate(-50%, -50%);
-    transform: translate(-50%, -50%);
-    margin: 0;
-    top: 50%;
-    max-height: none;
-    height: auto;
-    bottom: auto !important;
 }
 /* end of Email verification required */
 
@@ -461,7 +399,7 @@ h3.verify-email.header-txt {
     align-items: center;
     left: 0;
     top: 0;
-    z-index: 1300;
+    z-index: 100;
     pointer-events: none;
 }
 
@@ -471,7 +409,8 @@ h3.verify-email.header-txt {
 
 .mobile .mega-dialog {
     position: absolute;
-    background: #fff;
+    background: var(--mobile-page-background);
+    z-index: 99;
 }
 
 .mobile .mega-dialog:not(.fullsize-on-mobile) {
@@ -480,6 +419,10 @@ h3.verify-email.header-txt {
 
 .mobile .mega-dialog.fullsize-on-mobile {
     border-radius: 0;
+}
+
+.mobile .mega-dialog .content-block {
+    background: var(--mobile-page-background);
 }
 
 .mobile .mega-dialog footer {
@@ -545,7 +488,6 @@ h3.verify-email.header-txt {
 
     .mobile .verify-email-login-to-account header h2 {
         font-size: 16px;
-        color: #333;
         text-align: center;
         line-height: 24px;
         margin-bottom: 0;
@@ -570,7 +512,6 @@ h3.verify-email.header-txt {
 
     .mobile .verify-email-set-new-pass header h2 {
         font-size: 16px;
-        color: #333;
         text-align: center;
         line-height: 24px;
         margin-bottom: 0;
@@ -587,5 +528,10 @@ h3.verify-email.header-txt {
 @media only screen and (max-height: 600px) {
     .mega-dialog > section {
         flex-shrink: 0;
+    }
+
+    /* Exclude chat dialogs */
+    .fm-modal-dialog .mega-dialog > section {
+        flex-shrink: unset;
     }
 }

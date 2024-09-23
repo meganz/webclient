@@ -22,11 +22,30 @@ class MButton extends MComponent {
             this.setLeftIcon(leftIcon);
         }
 
-        if (additionalClasses) {
-            this.el.classList.add(...additionalClasses.split(' '));
+        this.appendCss(additionalClasses);
+        this._loading = false;
+    }
+
+    /**
+     * @param {Boolean} status Whether to truncate the overlapping text or not
+     */
+    set truncateOverflowText(status) {
+        if (!this.textSpan) {
+            return;
         }
 
-        this._loading = false;
+        const truncateClasses = ['text-ellipsis', 'w-full'];
+
+        if (status === true) {
+            this.textSpan.classList.add(...truncateClasses);
+        }
+        else {
+            this.textSpan.classList.remove(...truncateClasses);
+        }
+    }
+
+    get label() {
+        return this.textSpan ? this.textSpan.textContent : '';
     }
 
     /**
@@ -35,7 +54,7 @@ class MButton extends MComponent {
     set label(label) {
         if (!this.textSpan) {
             this.textSpan = document.createElement('span');
-            this.el.append(this.textSpan);
+            this.el.appendChild(this.textSpan);
         }
 
         this.textSpan.textContent = label;
@@ -58,7 +77,7 @@ class MButton extends MComponent {
 
             this.loadingEl = document.createElement('i');
             this.loadingEl.className = 'sprite-fm-theme icon-loading-spinner mx-auto rotating';
-            this.el.append(this.loadingEl);
+            this.el.appendChild(this.loadingEl);
 
             this.disable();
         }
@@ -68,7 +87,7 @@ class MButton extends MComponent {
             }
 
             if (this.textSpan) {
-                this.el.append(this.textSpan);
+                this.el.appendChild(this.textSpan);
             }
 
             this.el.style.width = null;
@@ -103,7 +122,7 @@ class MButton extends MComponent {
         this.leftIcon.className = 'sprite-fm-mono ' + icon;
 
         const div = document.createElement('div');
-        div.append(this.leftIcon);
+        div.appendChild(this.leftIcon);
 
         this.el.prepend(div);
     }

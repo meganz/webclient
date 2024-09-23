@@ -447,7 +447,7 @@
         for (var i = low; i < high; i++) {
             var id = this.items[i];
             if (!this._currentlyRendered[id]) {
-                this._currentlyRendered[id] = this.options.itemRenderFunction(id);
+                this._currentlyRendered[id] = this.options.itemRenderFunction(id, i);
                 this._currentlyRendered[id].classList.add("MegaDynamicListItem");
                 var afterTarget;
                 if (this._currentlyRendered[this.items[i - 1]]) {
@@ -544,7 +544,7 @@
 
     MegaDynamicList.prototype.throttledOnScroll = function(e) {
         var self = this;
-        delay('megalist:scroll:' + this.listId, function() {
+        delay('megadynamiclist:scroll:' + this.listId, function() {
             if (self._isUserScroll === true && self.listContainer === e.target) {
                 if (self.options.enableUserScrollEvent) {
                     self.trigger('onUserScroll', e);
@@ -579,7 +579,7 @@
             self.resized();
         });
 
-        $(document).rebind('ps-scroll-y.ps' + ns, self.throttledOnScroll.bind(self));
+        $('.ps').rebind('ps-scroll-y.ps' + ns, self.throttledOnScroll.bind(self));
     };
 
     /**
@@ -591,7 +591,7 @@
         var ns = this._generateEventNamespace();
 
         $(window).off("resize." + ns);
-        $(document).off('ps-scroll-y.ps' + ns);
+        $('.ps').off('ps-scroll-y.ps' + ns);
     };
 
     /**
@@ -610,6 +610,10 @@
             position = 0;
         } else {
             position = this.items.indexOf(after) + 1;
+        }
+        
+        if (Array.isArray(id) === false) {
+            id = [id];
         }
 
         [].splice.apply(this.items, [position, 0].concat(id));

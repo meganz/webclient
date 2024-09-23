@@ -55,6 +55,10 @@ export class EmojiAutocomplete extends MegaRenderMixin {
             }
 
             var selected = $.isNumeric(self.state.selected) ? self.state.selected : 0;
+            if (document.body.classList.contains('rtl') && (key === 37 || key === 39)) {
+                // Swap left and right when rtl.
+                key = key === 37 ? 39 : 37;
+            }
 
             var handled = false;
             if (!e.shiftKey && (key === 37 || key === 38)) {
@@ -217,11 +221,11 @@ export class EmojiAutocomplete extends MegaRenderMixin {
         this.found = found;
 
         if (!found || found.length === 0) {
-            setTimeout(function() {
+            queueMicrotask(() => {
                 // onCancel may need to do a .setState on parent component, so need to run it in a separate
                 // thread/stack
                 self.props.onCancel();
-            }, 0);
+            });
             return null;
         }
 

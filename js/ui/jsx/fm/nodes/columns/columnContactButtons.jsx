@@ -43,37 +43,15 @@ export class ColumnContactButtons extends GenericNodePropsComponent {
                     />
                     <Button
                         className="mega-button action simpletip"
-                        icon="sprite-fm-mono icon-video-call-filled"
-                        attrs={{
-                            'data-simpletip': !megaChat.hasSupportForCalls ?
-                                l.unsupported_browser_video : l[5897]
-                                /* `Your browser doesn't support video calls. Please try a different one!`
-                                : `Start Video Call` */ }}
-                        disabled={!navigator.onLine || !megaChat.hasSupportForCalls}
-                        onClick={() =>
-                            inProgressAlert()
-                                .then(() =>
-                                    megaChat.createAndShowPrivateRoom(handle)
-                                        .then(room => {
-                                            room.setActive();
-                                            room.startVideoCall();
-                                        })
-                                )
-                                .catch(() => d && console.warn('Already in a call.'))
-
-                        }
-                    />
-                    <Button
-                        className="mega-button action simpletip"
                         icon="sprite-fm-mono icon-chat"
                         attrs={{ 'data-simpletip': l[8632] }}
                         onClick={() => loadSubPage('fm/chat/p/' + handle)}
                     />
                     <Button
                         className="mega-button action simpletip"
-                        icon="sprite-fm-mono icon-folder-outgoing-share"
-                        attrs={{ 'data-simpletip': l[5631] }}
-                        onClick={() => openCopyShareDialog(handle)}
+                        icon="sprite-fm-mono icon-send-files"
+                        attrs={{ 'data-simpletip': l[6834] }}
+                        onClick={() => megaChat.openChatAndSendFilesDialog(handle)}
                     />
                     <Button
                         ref={node => {

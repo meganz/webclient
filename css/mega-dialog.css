@@ -14,8 +14,9 @@
          * low visual impact dialog (banner) - 1090
          * normal dialog - 1115
          * modal dialog - 1200
+         * message dialog - 1201
          * message dialog container when account loading - 1215
-         * arranged back dialog - 900
+         * arranged back dialog and overlay - 900
          * normal dialog container - 1111
          * common dialog container - 1300
          * common dialog container in arrage back status - 1000
@@ -35,13 +36,24 @@
             z-index: 1111;
         }
 
-        .mega-dialog-container.msg-dialog-container,
+        .mega-dialog-container.msg-dialog-container {
+            z-index: 1116;
+        }
         .fm-modal-dialog {
             z-index: 1115;
         }
 
+        .mega-dialog.dialog-template-message {
+            z-index: 1201;
+        }
+
         .loading .mega-dialog-container.msg-dialog-container {
             z-index: 1215;
+        }
+
+        .mega-dialog.arrange-to-back,
+        div.overlay.arrange-to-back {
+            z-index: 900;
         }
 
         .mega-dialog-container > *,
@@ -457,10 +469,16 @@
 
             .mega-dialog.dialog-template-message > header h3 {
                 text-align: start;
+                word-break: break-word;
             }
 
             .mega-dialog.dialog-template-message > header p {
                 margin-top: 12px;
+            }
+
+            .mega-dialog.dialog-template-message > header h3.sub-header {
+                margin: 12px 0;
+                color: var(--text-color-high);
             }
 
             .mega-dialog.dialog-template-message > header h3.hidden ~ p {

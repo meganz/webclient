@@ -6,6 +6,8 @@ import {MegaRenderMixin, SoonFcWrap} from "../chat/mixins";
  * @type {*|Function}
  */
 export class PerfectScrollbar extends MegaRenderMixin {
+    ref = React.createRef();
+
     static defaultProps = {
         className: "perfectScrollbarContainer",
         requiresUpdateOnResize: true
@@ -77,7 +79,7 @@ export class PerfectScrollbar extends MegaRenderMixin {
 
 
         var options = Object.assign({}, {
-            'handlers': ['click-rail', 'drag-scrollbar', 'keyboard', 'wheel', 'touch', 'selection'],
+            'handlers': ['click-rail', 'drag-thumb', 'keyboard', 'wheel', 'touch'],
             'minScrollbarLength': 20
         }, self.props.options);
 
@@ -117,6 +119,7 @@ export class PerfectScrollbar extends MegaRenderMixin {
         });
         self.onResize();
         this.attachAnimationEvents();
+        this.props.didMount?.(this.getUniqueId(), this);
     }
     componentWillUnmount() {
         super.componentWillUnmount();
@@ -127,6 +130,7 @@ export class PerfectScrollbar extends MegaRenderMixin {
         $elem.parents('.have-animation')
             .unbind('animationend' + ns +' webkitAnimationEnd' + ns + ' oAnimationEnd' + ns);
 
+        this.props.willUnmount?.(this.getUniqueId(), this);
     }
     attachAnimationEvents() {
         // var self = this;
@@ -343,11 +347,14 @@ export class PerfectScrollbar extends MegaRenderMixin {
         return !chatRoom || chatRoom.isCurrentlyActive;
     }
     render() {
-        var self = this;
+        const { style, className, children } = this.props;
         return (
-            <div style={this.props.style} className={this.props.className}>
-                {self.props.children}
+            <div
+                ref={this.ref}
+                style={style}
+                className={className}>
+                {children}
             </div>
         );
     }
-};
+}

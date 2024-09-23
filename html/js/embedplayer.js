@@ -31,13 +31,8 @@ function init_page() {
         throw new Error('Unexpected access...');
     }
 
-    var tmp = String(page).split('!').map(function(s) {
-        return s.replace(/[^\w-]+/g, "");
-    });
-
-    var ph = tmp[1];
-    var key = tmp[2];
-    $.playbackOptions = tmp[3];
+    const [ph, key, opt] = isPublicLink(page);
+    $.playbackOptions = opt;
 
     var init = function(res) {
         init_embed(ph, key, res);
@@ -47,7 +42,9 @@ function init_page() {
         init(dl_res);
     }
     else {
-        api_req({a: 'g', p: ph}, {callback: init});
+        api.req({a: 'g', p: ph})
+            .then((p) => init(p.result))
+            .catch(init);
     }
 }
 
@@ -103,7 +100,7 @@ function init_embed(ph, key, g) {
             open(getAppBaseUrl());
         });
 
-        $('.embedcode-item, .getlink-item, .share-generic').rebind('click', function() {
+        $('.embedcode-item, .getlink-item, .share').rebind('click', function() {
             var playing = false;
             var timeoffset = 0;
             var $block = $('.sharefile-block');
@@ -117,8 +114,8 @@ function init_embed(ph, key, g) {
                 $wrapper.removeClass('share-option');
             });
 
-            $('.sharefile-buttons .copy', $block).rebind('click', function() {
-                var content = String($('.tab-content', $block).text());
+            $('.copy', $block).rebind('click', function() {
+                let content = String(this.previousElementSibling.querySelectorAll('.tab-content')[0].textContent);
                 if (playing && document.getElementById('timecheckbox').checked) {
                     content = content.replace(/[!/][\w-]{8}[!#][^"]+/, '$&!' + timeoffset + 's');
                 }
@@ -132,17 +129,9 @@ function init_embed(ph, key, g) {
 
             (function _() {
                 $('.tab-link', $block).removeClass('active').rebind('click', _);
-
-                if ($(this).is('.getlink-item, .share-link')) {
-                    $('.tab-link.share-link', $block).addClass('active');
-                    $('.tab-content', $block).text(url.replace('/embed', '/' + (mega.flags.nlfe ? 'file' : '')));
-                    $('.sharefile-settings', $block).addClass('hidden');
-                }
-                else {
-                    $('.tab-link.share-embed-code', $block).addClass('active');
-                    $('.tab-content', $block).text(embed.replace('%', url));
-                    $('.sharefile-settings', $block).removeClass('hidden');
-                }
+                $('.share-link .tab-content', $block)
+                    .text(url.replace('/embed', '/' + (mega.flags.nlfe ? 'file' : '')));
+                $('.embed-code .tab-content', $block).text(embed.replace('%', url));
             }).call(this);
 
             if (node.stream) {
@@ -267,14 +256,14 @@ function topmenuUI() {
             .parent().find('i').addClass('hidden').end()
             .find('.login-text').text(name);
 
-        api_req({"a": "uga", "u": u_handle, "ua": "+a"}, {
-            callback: tryCatch(function(res) {
+        api.req({"a": "uga", "u": u_handle, "ua": "+a"})
+            .then(({result: res}) => {
                 var src = res.length > 5 && mObjectURL([base64_to_ab(res)], 'image/jpeg');
                 if (src) {
                     $avatarwrapper.safeHTML('<img src="@@"/>', src);
                 }
             })
-        });
+            .catch(nop);
     }
     else {
         $('.useravatar').addClass('hidden');
@@ -323,22 +312,14 @@ mBroadcaster.once('startMega', function() {
     loadingDialog = {show: dummy, hide: dummy};
 
     M = Object.create(null);
+    M.d = Object.create(null);
     M.xhr = megaUtilsXHR;
     M.gfsfetch = megaUtilsGFSFetch;
     M.getStack = function() {
         return String(new Error().stack);
     };
     M.hasPendingTransfers = dummy;
-    M.req = promisify(function(resolve, reject, params, ch) {
-        api_req(typeof params === 'string' ? {a: params} : params, {
-            callback: function(res) {
-                if (typeof res === 'number' && res < 0) {
-                    return reject(res);
-                }
-                resolve(res);
-            }
-        }, ch | 0);
-    });
+    M.getNodeByHandle = (h) => Object(M.d[h]);
 
     dlmanager = Object.create(null);
     dlmanager._quotaTasks = [];
@@ -459,6 +440,12 @@ mBroadcaster.once('startMega', function() {
     window.LRUMegaDexie = {
         create() {
             return {error: -1};
+        }
+    };
+    window.MEGAException = DOMException;
+    window.MEGAException.assert = window.assert = (e, ...a) => {
+        if (!e) {
+            throw new MEGAException(...a);
         }
     };
 });

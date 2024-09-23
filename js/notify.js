@@ -23,6 +23,9 @@ var notify = {
     $popupIcon: null,
     $popupNum: null,
 
+    /** Promise of if the intial notifications have loaded */
+    initialLoading: false,
+
     /** A flag for if the initial loading of notifications is complete */
     initialLoadComplete: false,
 
@@ -31,6 +34,16 @@ var notify = {
 
     /** Temp list of accepted contact requests */
     acceptedContactRequests: [],
+
+    // The welcome dialog has been shown this session
+    welcomeDialogShown: false,
+
+    // Whether the event for viewing the dynamic notifications has been sent
+    dynamicNotifsSeenEventSent: false,
+
+    // Current dynamic notifications
+    dynamicNotifs: {},
+    lastSeenDynamic: undefined,
 
     /**
      * Initialise the notifications system
@@ -58,13 +71,11 @@ var notify = {
         notify.notifications = [];
 
         // Call API to fetch the most recent notifications
-        api_req('c=' + notify.numOfNotifications, {
-            callback: function(result) {
+        notify.initialLoading = api.req(`c=${this.numOfNotifications}`, 3)
+            .then(({result}) => {
 
                 // Check it wasn't a negative number error response
-                if (typeof result !== 'object') {
-                    return false;
-                }
+                assert(typeof result === 'object');
 
                 // Get the current UNIX timestamp and the last time delta (the last time the user saw a notification)
                 var currentTime = unixtime();
@@ -96,17 +107,31 @@ var notify = {
                             // incoming pending contact
                             userHandle = notification.p;
                         }
+                        else if (!userHandle && type === 'puu') {
+                            // public upload user
+                            // - TBD.
+                        }
 
                         // Add notifications to list
-                        notify.notifications.push({
+                        const newNotification = {
                             data: notification, // The full notification object
                             id: id,
                             seen: seen,
                             timeDelta: timeDelta,
                             timestamp: timestamp,
                             type: type,
-                            userHandle: userHandle
-                        });
+                            userHandle,
+                        };
+
+                        if (type === 'puu') {
+                            newNotification.allDataItems = [notification.h];
+                            if (!notify.combinePuuNotifications(newNotification)) {
+                                notify.notifications.push(newNotification);
+                            }
+                        }
+                        else {
+                            notify.notifications.push(newNotification);
+                        }
                     }
                 }
 
@@ -121,15 +146,16 @@ var notify = {
                 if (!notify.$popup.hasClass('hidden')) {
                     notify.renderNotifications();
                 }
-            }
-        }, 3);  // Channel 3
+            })
+            .catch(dump);
     },
 
     /**
      * Adds a notification from an Action Packet
      * @param {Object} actionPacket The action packet object
      */
-    notifyFromActionPacket: function(actionPacket) {
+    notifyFromActionPacket: async function(actionPacket) {
+        'use strict';
 
         // We should not show notifications if we haven't yet done the initial notifications load yet
         if (!notify.initialLoadComplete || notify.isUnwantedNotification(actionPacket)) {
@@ -140,9 +166,9 @@ var notify = {
         var newNotification = {
             data: actionPacket,                             // The action packet
             id: makeid(10),                                 // Make random ID
-            seen: false,                                    // New notification, so mark as unread
+            seen: actionPacket.seen || false,                                  // New notification, so mark as unread
             timeDelta: 0,                                   // Time since notification was sent
-            timestamp: unixtime(),                          // Get the current timestamps in seconds
+            timestamp: actionPacket.timestamp || unixtime(),                   // Get the current timestamps in seconds
             type: actionPacket.a,                           // Type of notification e.g. share
             userHandle: actionPacket.u || actionPacket.ou   // User handle e.g. new share from this user
         };
@@ -155,12 +181,13 @@ var notify = {
         // some sharing scenarios where a user is part of a share then another user adds files to the share but they
         // are not contacts with that other user so the local state has no information about them and would display a
         // broken notification if the email is not known.
-        if (newNotification.type === 'put' && !this.getUserEmailByTheirHandle(newNotification.userHandle)) {
-            console.assert(newNotification.userHandle && newNotification.userHandle.length === 11);
+        if (newNotification.type === 'put' && String(newNotification.userHandle).length === 11) {
 
-            // Once the email is fetched it will re-call the notifyFromActionPacket function with the same actionPacket
-            notify.fetchUserEmailFromApi(newNotification.userHandle, actionPacket);
-            return false;
+            this.getUserEmailByTheirHandle(newNotification.userHandle);
+        }
+
+        if (newNotification.type === 'puu') {
+            newNotification.allDataItems = actionPacket.f.map((e) => e.h);
         }
 
         // Combines the current new notification with the previous one if it meets certain criteria
@@ -176,28 +203,6 @@ var notify = {
     },
 
     /**
-     * Fetches the user's email address from the API based on the user handle
-     * @param {String} userHandle The user handle to fetch the email address for e.g. 555wupYjkMU
-     * @param {Object} actionPacket An action packet which will be resent to the notifyFromActionPacket function after
-     *                              the user's email has been returned. An example 'put' action packet for testing is:
-     *                              {"a":"put","n":"U8oHEL7Q","u":"555wupYjkMU","f":[{"h":"F5QQSDJR","t":0}]}
-     */
-    fetchUserEmailFromApi: function(userHandle, actionPacket) {
-
-        'use strict';
-
-        // Make User Get Email (uge) request to get the user's email address from the user handle
-        M.req({a: 'uge', 'u': userHandle}).done(function(result) {
-
-            // Update the local state with the user's email
-            notify.userEmails[userHandle] = result;
-
-            // Re-call the notify function with the action packet now that the email has been stored
-            notify.notifyFromActionPacket(actionPacket);
-        });
-    },
-
-    /**
      * Check whether we should omit a notification.
      * @param {Object} notification
      * @returns {Boolean}
@@ -205,6 +210,10 @@ var notify = {
     isUnwantedNotification: function(notification) {
 
         var action;
+
+        if (notification.dn) {
+            return true;
+        }
 
         switch (notification.a || notification.t) {
             case 'put':
@@ -268,10 +277,63 @@ var notify = {
                 if (action === 2 && !mega.notif.has('contacts_fcracpt')) {
                     return true;
                 }
+                break;
+
+            case 'puu':
+                if (mega.notif.has('cloud_upload')) {
+                    return true;
+                }
+                break;
+
             default:
                 break;
         }
         return false;
+    },
+
+    combinePuuNotifications(currentNotification) {
+        'use strict';
+
+        const previousNotification = notify.notifications[notify.notifications.length - 1];
+        if (!(currentNotification && previousNotification)) {
+            return false;
+        }
+
+        // This function is currently only needed for 'puu' notifications
+        if (currentNotification.type !== 'puu' || previousNotification.type !== 'puu') {
+            return false;
+        }
+
+        // The userHandle will be the name of the uploader in puu requests
+        const previousNotificationHandle = previousNotification.userHandle;
+        const currentNotificationHandle = currentNotification.userHandle;
+        if (currentNotificationHandle !== previousNotificationHandle) {
+            return false;
+        }
+
+        // Make sure that neither notification has been deleted
+        const previousNotificationNode = M.d[previousNotification.data.h];
+        const currentNotificationNode = M.d[currentNotification.data.h];
+        if (!previousNotificationNode || !currentNotificationNode) {
+            return false;
+        }
+
+        // Make sure that both notifications are going into the same folder
+        if (previousNotificationNode.p !== currentNotificationNode.p) {
+            return false;
+        }
+
+        if (previousNotification.seen !== currentNotification.seen) {
+            return false;
+        }
+
+        // If there is a gap of over 5 minutes between notifications, do not combine them
+        if (currentNotification.timestamp - previousNotification.timestamp > 300) {
+            return false;
+        }
+
+        previousNotification.allDataItems.push(currentNotification.data.h);
+        return true;
     },
 
     /**
@@ -307,8 +369,9 @@ var notify = {
             return false;
         }
 
-        // we only for now combine "put" and "d" (del)
-        if (currentNotification.type !== 'put' && currentNotification.type !== 'd') {
+        // We only for now combine "put", "d" (del), and "puu" (file request upload)
+        if (currentNotification.type !== 'put' && currentNotification.type !== 'd'
+                && currentNotification.type !== 'puu') {
             notify.notifications.unshift(currentNotification);
             return false;
         }
@@ -351,6 +414,24 @@ var notify = {
             currentNotification.data.f = combinedNotificationNodes;
 
         }
+        else if (currentNotification.type === 'puu') {
+            if (previousNotificationParentHandle !== currentNotificationParentHandle){
+                notify.notifications.unshift(currentNotification);
+                return false;
+            }
+            if (previousNotification.data.pou !== currentNotification.data.pou) {
+                notify.notifications.unshift(currentNotification);
+                return false;
+            }
+            if (previousNotification.seen !== currentNotification.seen) {
+                notify.notifications.unshift(currentNotification);
+                return false;
+            }
+            const combinedNotificationNodes = previousNotification.allDataItems
+                .concat(currentNotificationNodes.map((e) => e.h));
+            currentNotification.data.f = combinedNotificationNodes;
+            currentNotification.allDataItems = combinedNotificationNodes;
+        }
         else { // it's 'd'
 
             if (!Array.isArray(previousNotificationParentHandle)) {
@@ -379,7 +460,29 @@ var notify = {
 
             // If it hasn't been seen yet increment the count
             if (notify.notifications[i].seen === false) {
-                newNotifications++;
+                // Don't count chat notifications until chat has loaded and can verify them.
+                if (notify.notifications[i].type === 'mcsmp') {
+                    const { data } = notify.notifications[i];
+                    if (megaChatIsReady) {
+                        const res = notify.getScheduledNotifOrReject(data);
+                        if (
+                            res !== false
+                            && (res === 0 || !(res.mode === ScheduleMetaChange.MODE.CREATED && data.ou === u_handle))
+                        ) {
+                            newNotifications++;
+                        }
+                    }
+                }
+                else if (notify.notifications[i].type === 'dynamic') {
+                    // Do not count expired promotions, if they have an expiration date
+                    if ((!notify.notifications[i].data.e || notify.notifications[i].data.e >= unixtime())
+                        && notify.notifications[i].data.id > this.lastSeenDynamic) {
+                        newNotifications++;
+                    }
+                }
+                else {
+                    newNotifications++;
+                }
             }
         }
 
@@ -409,9 +512,21 @@ var notify = {
 
         'use strict';
 
+        let newMaxDynamic = false;
+
         // Loop through the notifications and mark them as seen (read)
         for (var i = 0; i < notify.notifications.length; i++) {
+            if (notify.notifications[i].type === 'dynamic') {
+                const newId = notify.notifications[i].data.id;
+                if (newId > this.lastSeenDynamic) {
+                    newMaxDynamic = true;
+                    this.lastSeenDynamic = newId;
+                }
+            }
             notify.notifications[i].seen = true;
+        }
+        if (newMaxDynamic) {
+            mega.attr.set('lnotif', String(this.lastSeenDynamic), -2, true);
         }
 
         // Hide red circle with number of new notifications
@@ -424,7 +539,7 @@ var notify = {
         // Send 'set last acknowledged' API request to inform it which notifications have been seen
         // up to this point then they won't show these notifications as new next time they are fetched
         if (!remote) {
-            api_req({ a: 'sla', i: requesti });
+            api.screq('sla').catch(dump);
         }
     },
 
@@ -456,6 +571,19 @@ var notify = {
             else {
                 $elem.addClass('show');
                 notify.renderNotifications();
+
+                // Check if any dynamic notifications can be seen
+                const dynamicNotifIds = [];
+                for (const notif of $('.nt-dynamic-notification', notify.$popup)) {
+                    dynamicNotifIds.push($(notif).data('dynamic-id'));
+                }
+
+                // Send event to the API if any dynamic notifications can be seen
+                if (dynamicNotifIds.length) {
+                    notify.sendNotifSeenEvent(dynamicNotifIds);
+                }
+
+                eventlog(500322);
             }
         });
     },
@@ -472,22 +600,38 @@ var notify = {
             this.$popup.closest('.js-dropdown-notification').removeClass('show');
             notify.markAllNotificationsAsSeen();
         }
+        notify.dynamicNotifCountdown.removeDynamicNotifCountdown();
     },
 
     /**
-     * Sort the notifications so the most recent ones appear first in the popup
+     * Sort dynamic notifications to be at the top sorted by id, then other notifications by timestamp
      */
     sortNotificationsByMostRecent: function() {
-
         notify.notifications.sort(function(notificationA, notificationB) {
 
-            if (notificationA.timestamp > notificationB.timestamp) {
-                return -1;
-            }
-            else if (notificationA.timestamp < notificationB.timestamp) {
-                return 1;
+            if (notificationA.type === 'dynamic' || notificationB.type === 'dynamic') {
+                if (notificationB.type !== 'dynamic') {
+                    return -1;
+                }
+                else if (notificationA.type !== 'dynamic') {
+                    return 1;
+                }
+
+                if (notificationA.data.id > notificationB.data.id) {
+                    return -1;
+                }
+                else if (notificationA.data.id < notificationB.data.id) {
+                    return 1;
+                }
+                return 0;
             }
             else {
+                if (notificationA.timestamp > notificationB.timestamp) {
+                    return -1;
+                }
+                else if (notificationA.timestamp < notificationB.timestamp) {
+                    return 1;
+                }
                 return 0;
             }
         });
@@ -515,13 +659,44 @@ var notify = {
     },
 
     /**
-     * Retrieve the email associated to an user by his/their handle.
-     * @param {String} userHandle the
-     * @returns {Object} or false if not found.
+     * Retrieve the email associated to a user by his/their handle or from the optional notification data
+     * @param {String} userHandle the user handle to fetch the email for
+     * @param {Object} [data] Optional the notification data
+     * @param {boolean} [skipFetch] Optional to not use this function to sync the user data
+     * @returns {string|false} The email if found or false if fetching data (or skipped by skipFetch)
      */
-    getUserEmailByTheirHandle: function(userHandle) {
+    getUserEmailByTheirHandle: function(userHandle, data, skipFetch) {
         'use strict';
-        return M.getUserByHandle(userHandle).m || this.userEmails[userHandle] || false;
+        if (typeof userHandle !== 'string' || userHandle.length !== 11) {
+            return l[7381];
+        }
+        if (typeof this.userEmails[userHandle] === 'string' && this.userEmails[userHandle]) {
+            // Previously found and not an empty string.
+            return this.userEmails[userHandle];
+        }
+        const userEmail = M.getUserByHandle(userHandle).m;
+        if (userEmail) {
+            // Found in M.u
+            return userEmail;
+        }
+        if (data && data.m) {
+            // Found on notification data
+            return data.m;
+        }
+        if (skipFetch || (this.userEmails[userHandle] instanceof Promise)) {
+            return false;
+        }
+        // Fetch data from API
+        M.setUser(userHandle);
+        const promises = [
+            M.syncUsersFullname(userHandle),
+            M.syncContactEmail(userHandle, true)
+        ];
+        this.userEmails[userHandle] = Promise.allSettled(promises)
+            .then(() => {
+                this.userEmails[userHandle] = M.getUserByHandle(userHandle).m;
+            });
+        return false;
     },
 
     /**
@@ -583,7 +758,7 @@ var notify = {
         }
 
         // Update the list of notifications
-        notify.$popup.find('.notification-scr-list').append(allNotificationsHtml);
+        notify.$popup.find('.notification-scr-list').safeAppend(allNotificationsHtml);
         notify.$popup.removeClass('empty loading');
 
         // Add scrolling for the notifications
@@ -599,6 +774,16 @@ var notify = {
         notify.initPaymentReminderClickHandler();
         notify.initAcceptContactClickHandler();
         notify.initSettingsClickHander();
+        notify.initScheduledClickHandler();
+        notify.initDynamicClickHandler();
+
+        // Initialise countdown timer for dynamic notifications with expiry dates
+        if (this.$popup.closest('.js-dropdown-notification').hasClass('show')) {
+            notify.dynamicNotifCountdown.startTimer();
+        }
+
+        // Send event whenever a notification is clicked
+        $('a.notification-item', this.$popup).rebind('click.logNotifEvent', () => eventlog(500461));
     },
 
     /**
@@ -616,9 +801,14 @@ var notify = {
             } else {
                 msgDialog('info', '', l[20427]);
             }
+
+            eventlog(500462);
         });
         clickURLs();
-        $('a.clickurl', this.$popup).rebind('click.notif', () => notify.closePopup());
+        $('a.clickurl', this.$popup).rebind('click.notif', () => {
+            eventlog(500462);
+            notify.closePopup();
+        });
     },
 
     /**
@@ -638,17 +828,16 @@ var notify = {
             // (because they clicked on a notification within the popup)
             notify.closePopup();
 
-
-
             // Open the folder
             M.openFolder(folderId)
-                .always(() => {
+                .then(() => {
+                    const {allDataItems, data: {f}} = notify.notifications.find(elem => elem.id === notificationID);
 
-                    const notificationData = notify.notifications.find(elem => elem.id === notificationID);
-                    $.selected = notificationData.data.f && notificationData.data.f.map((elem) => elem.h);
+                    M.addSelectedNodes(allDataItems || f && f.map((n) => n.h) || [], true);
+                })
+                .catch(dump);
 
-                    reselect(true);
-                });
+            eventlog(500463);
         });
     },
 
@@ -675,6 +864,8 @@ var notify = {
                         reselect(true);
                     });
             }
+
+            eventlog(500464);
         });
     },
 
@@ -700,6 +891,8 @@ var notify = {
                     );
                 }
             });
+
+            eventlog(500465);
         });
     },
 
@@ -717,6 +910,8 @@ var notify = {
 
             // Redirect to pro page
             loadSubPage('pro');
+
+            eventlog(500466);
         });
     },
 
@@ -732,9 +927,10 @@ var notify = {
             var pendingContactId = $this.attr('data-pending-contact-id');
 
             // Send the User Pending Contact Action (upca) API 2.0 request to accept the request
-            M.acceptPendingContactRequest(pendingContactId).fail(() => {
-                notify.acceptedContactRequests.splice(notify.acceptedContactRequests.indexOf(pendingContactId), 1);
-            });
+            M.acceptPendingContactRequest(pendingContactId)
+                .catch(() => {
+                    notify.acceptedContactRequests.splice(notify.acceptedContactRequests.indexOf(pendingContactId), 1);
+                });
 
             // Show the Accepted icon and text
             $this.closest('.notification-item').addClass('accepted');
@@ -743,6 +939,8 @@ var notify = {
             // Mark all notifications as seen and close the popup
             // (because they clicked on a notification within the popup)
             notify.closePopup();
+
+            eventlog(500467);
         });
     },
 
@@ -755,6 +953,40 @@ var notify = {
         $('button.settings', this.$popup).rebind('click.notifications', () => {
             notify.closePopup();
             loadSubPage('fm/account/notifications');
+        });
+    },
+
+    initScheduledClickHandler: () => {
+        'use strict';
+        $('.nt-schedule-meet', this.$popup).rebind('click.notifications', e => {
+            const chatId = $(e.currentTarget).attr('data-chatid');
+            if (chatId) {
+                notify.closePopup();
+                loadSubPage(`fm/chat/${chatId}`);
+                if ($(e.currentTarget).attr('data-desc') === '1') {
+                    delay(`showSchedDescDialog-${chatId}`, () => {
+                        megaChat.chats[chatId].trigger('openSchedDescDialog');
+                    }, 1500);
+                }
+
+                eventlog(500468);
+            }
+        });
+    },
+
+    initDynamicClickHandler: () => {
+        'use strict';
+        $('.nt-dynamic-notification', this.$popup).rebind('click.notifications', e => {
+            const dynamicId = $(e.currentTarget).attr('data-dynamic-id');
+            const ctaButton = notify.dynamicNotifs[dynamicId].cta1 || notify.dynamicNotifs[dynamicId].cta2;
+            if (ctaButton && ctaButton.link) {
+                notify.closePopup();
+                const link = ctaButton.link;
+                if (link) {
+                    window.open(link, '_blank', 'noopener,noreferrer');
+                }
+                eventlog(500242, dynamicId | 0);
+            }
         });
     },
 
@@ -772,9 +1004,11 @@ var notify = {
         var date = time2last(notification.timestamp);
         var data = notification.data;
         var userHandle = notification.userHandle;
-        var customIconNotifications = ['psts', 'pses', 'ph'];   // Payment & Takedown notification types
         var userEmail = l[7381];    // Unknown
         var avatar = '';
+
+        // Payment & Takedown notification types, file-request upload type
+        const customIconNotifications = ['psts', 'pses', 'ph', 'puu', 'dynamic', 'psts_v2'];
 
         // If a contact action packet
         if (typeof userHandle !== 'string') {
@@ -792,7 +1026,14 @@ var notify = {
         // or if it was populated partially locally (i.e from chat, without email)
         // or if the notification is closed account notification, M.u cannot be exist, so just using attached email.
         if (userEmail === l[7381]) {
-            userEmail = this.getUserEmailByTheirHandle(userHandle) || data && data.m || userEmail;
+            let email = data && data.m;
+            if (userHandle) {
+                email = this.getUserEmailByTheirHandle(userHandle, data);
+                if (!email) {
+                    return false; // Fetching user attributes...
+                }
+            }
+            userEmail = email || userEmail;
         }
 
         // If the notification is not one of the custom ones, generate an avatar from the user information
@@ -850,11 +1091,22 @@ var notify = {
             case 'put':
                 return notify.renderNewSharedNodes($notificationHtml, notification, userEmail);
             case 'psts':
+            case 'psts_v2':
                 return notify.renderPayment($notificationHtml, notification);
             case 'pses':
                 return notify.renderPaymentReminder($notificationHtml, notification);
             case 'ph':
                 return notify.renderTakedown($notificationHtml, notification);
+            case 'dynamic':
+                return notify.renderDynamic($notificationHtml, notification);
+            case 'mcsmp': {
+                if (!window.megaChat || !window.megaChat.is_initialized) {
+                    return false;
+                }
+                return notify.renderScheduled($notificationHtml, notification);
+            }
+            case 'puu':
+                return notify.renderFileRequestUpload($notificationHtml, notification);
             default:
                 return false;   // If it's a notification type we do not recognise yet
         }
@@ -970,10 +1222,6 @@ var notify = {
         else if (action === 2) {
             className = 'nt-contact-deleted';
             title = l[7144];        // Account has been deleted/deactivated
-        }
-        else if (action === 3) {
-            className = 'nt-contact-request-blocked';
-            title = l[7143];        // Blocked you as a contact
         }
 
         // Populate other template information
@@ -1252,7 +1500,23 @@ var notify = {
      */
     renderPayment: function($notificationHtml, notification) {
 
+        // If user has not seen the welcome dialog before, show it and set ^!welDlg to 2 (seen)
+        if (!notification.seen && !(u_attr.pf || u_attr.b)) {
+            mega.attr.get(u_handle, 'welDlg', -2, 1, (res) => {
+                if ((res | 0) === 1) {
+                    notify.createNewUserDialog(notification);
+                    notify.welcomeDialogShown = true;
+                    mega.attr.set('welDlg', 2, -2, true);
+                }
+            }).catch(dump);
+        }
+
         var proLevel = notification.data.p;
+
+        if (proLevel === pro.ACCOUNT_LEVEL_FEATURE) {
+            proLevel += pro.getStandaloneBits(notification.data.f);
+        }
+
         var proPlan = pro.getProPlanName(proLevel);
         var success = (notification.data.r === 's') ? true : false;
         var header = l[1230];   // Payment info
@@ -1274,6 +1538,80 @@ var notify = {
 
         return $notificationHtml;
     },
+
+    createNewUserDialog: tryCatch(() => {
+        'use strict';
+
+        const $dialog = $('.mega-dialog-container .upgrade-welcome-dialog');
+
+        M.accountData((account) => {
+
+            account.purchases.sort((a, b) => {
+                if (a[1] < b[1]) {
+                    return 1;
+                }
+                return -1;
+            });
+
+            let purchaseEndTime;
+            const getPlansEndingAfterPurchase = () => {
+                let plansEndingAfterSubscription = 0;
+                account.purchases.forEach(purchase => {
+                    const days = purchase[6] === 1
+                        ? 32
+                        : purchase[6] === 12
+                            ? 367
+                            : purchase[6] * 31;
+                    const purchaseEnd = days * 86400 + purchase[1];
+
+                    if (((Date.now() / 1000) < purchaseEnd) && ((u_attr.p % 4) <= purchase[5])) {
+                        purchaseEndTime = purchaseEnd;
+                        plansEndingAfterSubscription++;
+                    }
+                });
+                return plansEndingAfterSubscription;
+            };
+
+            const newPlanLevel = account.purchases[0][5];
+
+            // If a user is currently on a higher tier plan than their new plan, inform them that the new plan
+            // will be active after their current plan expires
+            if (newPlanLevel !== u_attr.p) {
+                // No need to show any dialog when a user purchases a feature
+                if (newPlanLevel === pro.ACCOUNT_LEVEL_FEATURE) {
+                    return;
+                }
+
+                const newPlan = pro.getProPlanName(newPlanLevel);
+                const currentPlan = pro.getProPlanName(u_attr.p);
+                const plansEndingAfterPurchase = getPlansEndingAfterPurchase();
+                const bodyText = plansEndingAfterPurchase < 2
+                    ? l.welcome_dialog_active_until
+                    : l.welcome_dialog_active_check;
+                msgDialog('warninga', '',
+                          l.welcome_dialog_thanks_for_sub.replace('%1', newPlan),
+                          bodyText
+                              .replace('%1', currentPlan)
+                              .replace('%3', time2date(purchaseEndTime || account.srenew[0], 1))
+                              .replace('%2', newPlan));
+                return;
+            }
+
+            pro.loadMembershipPlans(() => {
+
+                const plan = pro.getPlanObj(newPlanLevel, account.purchases[0][6]);
+
+                $('header', $dialog).text(l.welcome_dialog_header.replace('%1', plan.name));
+                $('.more-quota .info-text', $dialog).text(l.welcome_dialog_quota_details
+                    .replace('%1', bytesToSize(plan.storage, 3, 4))
+                    .replace('%2', bytesToSize(plan.transfer, 3, 4)));
+                $('button', $dialog).rebind('click', () => {
+                    closeDialog();
+                });
+                M.safeShowDialog('upgrade-welcome-dialog', $dialog);
+            });
+        });
+    }),
 
     /**
      * Process payment reminder notification to remind them their PRO plan is due for renewal.
@@ -1332,13 +1670,13 @@ var notify = {
         var handle = notification.data.h;
         var node = M.d[handle] || {};
         var name = (node.name) ? '(' + notify.shortenNodeName(node.name) + ')' : '';
-        var type = (node.t === 0) ? l[5557] : l[5561];
 
         // Takedown notice
         // Your publicly shared %1 (%2) has been taken down.
         if (notification.data.down === 1) {
             header = l[8521];
-            title = l[8522].replace('%1', type).replace('(%2)', name);
+            title = (node.t === 0) ? l.publicly_shared_file_taken_down.replace('%1', name)
+                : l.publicly_shared_folder_taken_down.replace('%1', name);
             cssClass = 'nt-takedown-notification';
         }
 
@@ -1346,7 +1684,8 @@ var notify = {
         // Your taken down %1 (%2) has been reinstated.
         else if (notification.data.down === 0) {
             header = l[8524];
-            title = l[8523].replace('%1', type).replace('(%2)', name);
+            title = (node.t === 0) ? l.taken_down_file_reinstated.replace('%1', name)
+                : l.taken_down_folder_reinstated.replace('%1', name);
             cssClass = 'nt-takedown-reinstated-notification';
         }
         else {
@@ -1360,6 +1699,351 @@ var notify = {
         $notificationHtml.find('.notification-info').text(title);
         $notificationHtml.find('.notification-username').text(header);
         $notificationHtml.attr('data-folder-or-file-id', handle);
+
+        return $notificationHtml;
+    },
+
+    getScheduledNotifOrReject(data) {
+        'use strict';
+
+        const chatRoom = megaChat.chats[data.cid];
+        if (!chatRoom) {
+            return false;
+        }
+
+        if (data && data.cs && Array.isArray(data.cs.c) && $.len(data.cs) === 1 && data.cs.c[1] === 0) {
+            // Only change we see is that the meeting is no longer cancelled so ignore it.
+            return false;
+        }
+        const meta = megaChat.plugins.meetingsManager.getFormattingMeta(data.id, data, chatRoom);
+        if (meta.ap || meta.gone) {
+            // If the ap flag is set the occurrence state is not known.
+            // A future render should be able to get past this step when all occurrences are known
+            // If the gone flag is set then the occurrence no longer exists so skip it.
+            return meta.gone ? false : 0;
+        }
+
+        const { MODE } = ScheduleMetaChange;
+
+        if (meta.occurrence && meta.mode === MODE.CANCELLED && !$.len(meta.timeRules)) {
+            const meeting = megaChat.plugins.meetingsManager.getMeetingOrOccurrenceParent(meta.handle);
+            if (!meeting) {
+                return false;
+            }
+            const occurrences = meeting.getOccurrencesById(meta.handle);
+            if (!occurrences) {
+                return false;
+            }
+            meta.timeRules.startTime = Math.floor(occurrences[0].start / 1000);
+            meta.timeRules.endTime = Math.floor(occurrences[0].end / 1000);
+        }
+
+        return meta;
+    },
+
+    renderScheduled: function($notificationHtml, notification) {
+        'use strict';
+        const { data } = notification;
+
+        const meta = this.getScheduledNotifOrReject(data);
+        if (!meta) {
+            return false;
+        }
+
+        const chatRoom = megaChat.chats[data.cid];
+        let now;
+        let prev;
+        const { MODE } = ScheduleMetaChange;
+        if (meta.mode === MODE.CREATED && data.ou === u_handle) {
+            return false;
+        }
+
+        if (meta.timeRules.startTime && meta.timeRules.endTime) {
+            const prevMode = meta.mode;
+            if (!meta.recurring && prevMode !== MODE.CANCELLED) {
+                // Fake the mode for one-off meetings to get the correct time string.
+                meta.mode = MODE.EDITED;
+            }
+            [now, prev] = megaChat.plugins.meetingsManager.getOccurrenceStrings(meta);
+            meta.mode = prevMode;
+        }
+
+        const $notifBody = $('.notification-scheduled-body', $notificationHtml);
+        $notifBody.removeClass('hidden');
+        const $notifLabel = $('.notification-content .notification-info', $notificationHtml).eq(0);
+
+        const { NOTIF_TITLES } = megaChat.plugins.meetingsManager;
+        let showTitle = true;
+
+        const titleSelect = (core) => {
+            const occurrenceKey = meta.occurrence ? 'occur' : 'all';
+            if (meta.mode === MODE.CREATED) {
+                return core.inv;
+            }
+            else if (meta.mode === MODE.EDITED) {
+                let string = '';
+                let diffCounter = 0;
+                if (
+                    meta.prevTiming
+                    && (
+                        meta.timeRules.startTime !== meta.prevTiming.startTime
+                        || meta.timeRules.endTime !== meta.prevTiming.endTime
+                        || (
+                            meta.recurring
+                            && !megaChat.plugins.meetingsManager.areMetaObjectsSame(meta.timeRules, meta.prevTiming)
+                        )
+                    )
+                    || (meta.occurrence && meta.mode !== MODE.CANCELLED)
+                ) {
+                    string = core.time[occurrenceKey];
+                    diffCounter++;
+                }
+                if (meta.topicChange) {
+                    string = core.name.update.replace('%1', meta.oldTopic).replace('%s', meta.topic);
+                    diffCounter++;
+                    showTitle = false;
+                }
+                if (meta.description) {
+                    string = core.desc.update;
+                    diffCounter++;
+                    $notificationHtml.attr('data-desc', diffCounter);
+                }
+                if (meta.converted) {
+                    string = core.convert;
+                }
+                else if (diffCounter > 1) {
+                    string = core.multi;
+                    now = false;
+                    prev = false;
+                    showTitle = true;
+                }
+                return string;
+            }
+            return core.cancel[occurrenceKey];
+        };
+
+        if (meta.mode === MODE.CREATED) {
+            let email = this.getUserEmailByTheirHandle(data.ou);
+            if (email) {
+                const avatar = useravatar.contact(email);
+                if (avatar) {
+                    const $avatar = $('.notification-avatar', $notificationHtml).removeClass('hidden');
+                    $avatar.empty();
+                    $avatar.safePrepend(avatar);
+                }
+                email = this.getDisplayName(email);
+                $('.notification-username', $notificationHtml).text(email);
+            }
+        }
+
+        $notifLabel.text(titleSelect(meta.recurring ? NOTIF_TITLES.recur : NOTIF_TITLES.once));
+        const $title = $('.notification-scheduled-title', $notifBody);
+
+        if (showTitle) {
+            $title.text(chatRoom.topic).removeClass('hidden');
+        }
+
+        const $prev = $('.notification-scheduled-prev', $notifBody);
+        const $new = $('.notification-scheduled-occurrence', $notifBody);
+
+        if (prev && !(meta.occurrence && meta.mode === MODE.CANCELLED)) {
+            $prev.removeClass('hidden');
+            $('s', $prev).text(prev);
+        }
+        if (now) {
+            $new.removeClass('hidden');
+            $new.text(now);
+        }
+        $notificationHtml.addClass('nt-schedule-meet').attr('data-chatid', chatRoom.chatId);
+        return $notificationHtml;
+    },
+
+    renderFileRequestUpload($notificationHtml, notification) {
+        'use strict';
+
+        const fileHandle = notification.data.h || notification.allDataItems[0].h;
+        const fileNode = M.d[fileHandle] || {};
+        const folderHandle = fileNode.p || notification.data.n;
+
+        // File has likely been deleted
+        if (!folderHandle) {
+            return false;
+        }
+        const folderNode = M.d[folderHandle];
+        const folderName = folderNode.name ? notify.shortenNodeName(folderNode.name) : false;
+
+        let title;
+        let header;
+
+        const numberOfFiles = notification.allDataItems.length;
+        const uploader = notification.userHandle;
+
+        if (uploader) {
+            title = mega.icu.format(l.file_request_notification, numberOfFiles)
+                .replace('%1', uploader).replace('%2', folderName);
+            header = uploader;
+        }
+        else {
+            title = mega.icu.format(l.file_request_notification_nameless, numberOfFiles).replace('%1', folderName);
+            header = l.file_request_notification_header;
+        }
+
+        const $iconHtml = this.$popup.find('.file-request-notification.template').clone().removeClass('hidden');
+
+        $('.notification-info', $notificationHtml).text(title);
+        $notificationHtml.attr('data-folder-id', folderNode.h);
+        $notificationHtml.addClass('nt-new-files nt-file-request clickable');
+        $('.notification-username', $notificationHtml).text(header);
+        $('.notification-avatar', $notificationHtml)
+            .removeClass('hidden')
+            .safePrepend($iconHtml.prop('outerHTML'));
+        $('.notification-icon', $notificationHtml).addClass('hidden');
+        $('.notification-avatar-icon', $notificationHtml).addClass('hidden');
+
+        return $notificationHtml;
+    },
+
+    // This object handles the countdown timer for dynamic notifications with < 1h remaining.
+    // There will likely only ever be one, however it is possible to have
+    // any number of active notifications requiring a countdown.
+    dynamicNotifCountdown: {
+
+        countDownNotifs: {},
+        keys: [],
+
+        addNotifToCounter(id, expiry) {
+            'use strict';
+            this.countDownNotifs[id] = {
+                $expText: undefined,
+                expiry,
+            };
+        },
+
+        removeNotifFromCounter(id) {
+            'use strict';
+            delete this.countDownNotifs[id];
+            this.keys = Object.keys(this.countDownNotifs);
+            if (!this.keys.length) {
+                this.removeDynamicNotifCountdown();
+            }
+        },
+
+        disableClick(id) {
+            'use strict';
+            const $notification = $(`#dynamic-notif-${id}`, notify.$popup).off('click.notifications');
+            $('button', $notification).addClass('disabled');
+        },
+
+        // Re-check the current items in the countdown timer, and make sure that it is running
+        startTimer() {
+            'use strict';
+
+            this.keys = Object.keys(this.countDownNotifs);
+            if (!this.keys.length) {
+                return;
+            }
+
+            for (const key of this.keys) {
+                this.countDownNotifs[key].$expText = $(`#dynamic-notif-${key} .notification-date`, notify.$popup);
+            }
+
+            if (!this.countdown) {
+                this.countdown = setInterval(() => {
+                    const currentTime = unixtime();
+                    for (const key of this.keys) {
+                        const remaining = this.countDownNotifs[key].expiry - currentTime;
+                        this.countDownNotifs[key].$expText
+                            .text(time2offerExpire(remaining, true));
+                        if (remaining <= 0) {
+                            // Close the notification banner if the one currently shown has expired
+                            if (notificationBanner.currentNotification &&
+                                notificationBanner.currentNotification.id === parseInt(key)) {
+                                // Notify any other tabs a banner has closed
+                                mBroadcaster.crossTab.notify('closedBanner', parseInt(key));
+
+                                notificationBanner.updateBanner(true);
+                            }
+
+                            this.removeNotifFromCounter(key);
+                            this.disableClick(key);
+                        }
+                    }
+                }, 1000);
+            }
+        },
+
+        removeDynamicNotifCountdown() {
+            'use strict';
+            if (this.countdown) {
+                clearInterval(this.countdown);
+                delete this.countdown;
+            }
+        }
+    },
+
+    /**
+     * Takes in an object and creates a dynamic notification object based on what the object contains.
+     * @param {Object} $notificationHtml jQuery object of the notification template HTML
+     * @param {Object} notification The notification object. Must have: title(t), description(d) and id(id)
+     * May have: expiry date(e), cta button {link: string, text: string}, image details (img, dsp), flags (sb)
+     * @returns {Object|false} The HTML to be rendered for the notification
+     */
+    renderDynamic($notificationHtml, notification) {
+        'use strict';
+
+        const {data} = notification;
+        if (!data.t || !data.d || !data.id) {
+            return;
+        }
+
+        if (data.e) {
+            // If the notification is expired, do not show it.
+            const remaining = data.e - unixtime();
+            if (remaining <= 0) {
+                return false;
+            }
+            else if (remaining <= 3600) {
+                notify.dynamicNotifCountdown.addNotifToCounter(data.id, data.e);
+            }
+            const offerExpiryText = time2offerExpire(data.e);
+            $('.notification-date', $notificationHtml)
+                .text(offerExpiryText)
+                .addClass(remaining <= 3600 ? 'red' : '');
+        }
+
+        const ctaButton = data.cta1 || data.cta2;
+        if (ctaButton && ctaButton.link) {
+            const $ctas = $('.cta-buttons', $notificationHtml)
+                .removeClass('hidden')
+                .addClass(data.cta1 ? 'positive' : '');
+            const $button = $('button', $ctas).toggleClass('positive', !!data.cta1);
+            $('span', $button).text(ctaButton.text);
+        }
+        if (data.dsp && data.img) {
+            let failed = 0;
+            const retina = (window.devicePixelRatio > 1) ? '@2x' : '';
+            const imagePath = staticpath + 'images/mega/psa/' + data.img + '@2x.png';
+
+            $('.dynamic-image', $notificationHtml)
+                .attr('src', imagePath)
+                .removeClass('hidden')
+                .rebind('error', function() {
+                    // If it failed once it will likely keep failing, prevent infinite loop
+                    if (failed) {
+                        $(this).addClass('hidden');
+                        return;
+                    }
+                    $(this).attr('src', data.dsp + data.img + retina + '.png');
+                    failed = 1;
+                });
+        }
+
+        $('.notification-info', $notificationHtml).text(data.d);
+        $('.notification-username', $notificationHtml).text(data.t);
+        $('.notification-promo', $notificationHtml).removeClass('hidden');
+        $notificationHtml.addClass('nt-dynamic-notification');
+        $notificationHtml.attr('data-dynamic-id', data.id);
+        $notificationHtml.attr('id', 'dynamic-notif-' + data.id);
 
         return $notificationHtml;
     },
@@ -1417,5 +2101,134 @@ var notify = {
 
         // Escape and return
         return displayName;
+    },
+
+    /**
+     * Adds an array of dynamic notifications to the current notifications via the action packet system
+     * First await that the initial notifications have loaded, otherwise the notifyFromActionPacket call will be blocked
+     */
+    async addDynamicNotifications() {
+        'use strict';
+
+        // Make Get Notification (gnotif) API request
+        const {result} = await api.req({a: 'gnotif'});
+        let notifAdded = false;
+
+        if (typeof this.lastSeenDynamic === 'undefined') {
+            this.lastSeenDynamic
+                = parseInt(await Promise.resolve(mega.attr.get(u_handle, 'lnotif', -2, true)).catch(nop)) | 0;
+        }
+
+        for (let i = 0; i < result.length; i++) {
+            const givenNotif = result[i];
+
+            if (notify.dynamicNotifs[givenNotif.id]) {
+                continue;
+            }
+
+            const dynamicNotif = {
+                ...givenNotif,
+                a: 'dynamic',
+                timestamp: givenNotif.e || givenNotif.s,
+                seen: givenNotif.id <= this.lastSeenDynamic
+            };
+
+            // Decode title, description and CTA button texts
+            dynamicNotif.t = from8(b64decode(dynamicNotif.t));
+            dynamicNotif.d = from8(b64decode(dynamicNotif.d));
+            if (dynamicNotif.cta1) {
+                dynamicNotif.cta1.text = from8(b64decode(dynamicNotif.cta1.text));
+            }
+            if (dynamicNotif.cta2) {
+                dynamicNotif.cta2.text = from8(b64decode(dynamicNotif.cta2.text));
+            }
+
+            // Store the notification so that its variables can be easily accessed
+            notify.dynamicNotifs[dynamicNotif.id] = dynamicNotif;
+
+            notifAdded = true;
+
+            // Once the initial notifications have loaded, add the dynamic notification via the action packet system
+            notify.initialLoading
+                .then(() => {
+                    notify.notifyFromActionPacket(dynamicNotif);
+
+                    // If the notification centre is open immediately after the page is loaded,
+                    // send an event to the API if any dynamic notifications can be seen
+                    if (!notify.dynamicNotifsSeenEventSent
+                            && !notify.$popup.hasClass('loading') &&
+                            notify.$popup.closest('.js-dropdown-notification').hasClass('show')) {
+                        notify.sendNotifSeenEvent(Object.keys(notify.dynamicNotifs));
+
+                        // Stop the event being sent more than once
+                        notify.dynamicNotifsSeenEventSent = true;
+                    }
+                })
+                .catch(dump);
+        }
+
+        if (notifAdded) {
+            if (notificationBanner.bannerInited) {
+                notificationBanner.updateBanner(false);
+            }
+            else {
+                notificationBanner.init();
+            }
+        }
+    },
+
+    /**
+     * If the notification centre is open immediately after the page is loaded,
+     * send an event to the API if any dynamic notifications can be seen
+     * @param {String} list List of dynamic notification ID's to send with the event
+     */
+    sendNotifSeenEvent(list) {
+        'use strict';
+
+        eventlog(500240, String(Array.isArray(list) ? list.map(Number).sort() : (list | 0)));
+    },
+
+    /**
+     * Check if the 'notifs' user attribute has been updated (e.g. after redeeming a promo notification,
+     * which should remove that notification ID from u_attr.notifs), and update the dynamic notifications
+     * and banner as appropriate
+     */
+    checkForNotifUpdates() {
+        'use strict';
+
+        if (!notificationBanner.bannerInited) {
+            return;
+        }
+
+        // Compare notifs user attribute value (list) to cached notifications list
+        const cachedNotifList = Object.keys(notify.dynamicNotifs).map(Number);
+        const newNotifList = u_attr.notifs;
+
+        if (cachedNotifList.length !== newNotifList.length) {
+            if (newNotifList.length > cachedNotifList.length) {
+                // If there's a new notification add it
+                notify.addDynamicNotifications().catch(dump);
+            }
+            else {
+                // Otherwise delete the missing notification(s) which should never be shown again
+                const notifListDiffs = cachedNotifList.filter(elem => !newNotifList.includes(elem));
+                for (const id of notifListDiffs) {
+                    delete notify.dynamicNotifs[id];
+                    notify.notifications.splice(
+                        notify.notifications.findIndex(elem => elem.data.id === id), 1
+                    );
+
+                    // Update the notification banner if the one currently being shown is no longer valid
+                    if (notificationBanner.currentNotification.id === id) {
+                        notificationBanner.updateBanner(true);
+                    }
+                }
+
+                // If the popup is open, re-render the notifications
+                if (!notify.$popup.hasClass('hidden')) {
+                    notify.renderNotifications();
+                }
+            }
+        }
     }
 };

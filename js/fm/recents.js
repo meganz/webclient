@@ -86,9 +86,6 @@ function RecentsRender() {
 
     var self = this;
 
-    // Init Dependencies
-    M.initShortcutsAndSelection(this.$container);
-
     // Default click handlers
     this.$container.rebind("click contextmenu", function(e) {
         $.hideTopMenu(e);
@@ -121,9 +118,6 @@ RecentsRender.prototype.render = function(limit, until, forceInit) {
 
     M.viewmode = 1;
     M.v = this._view;
-    if (!this._rendered) {
-        loadingDialog.show();
-    }
     this.currentLimit = limit || this._defaultRangeLimit;
     this.currentUntil = until || this._defaultRangeTimestamp;
 
@@ -141,13 +135,23 @@ RecentsRender.prototype.render = function(limit, until, forceInit) {
         this.clearSelected();
     }
 
+    if (!this._showRecents) {
+        return this._initialRender([]);
+    }
+
+    if (!this._rendered) {
+        loadingDialog.show();
+    }
+    M.initShortcutsAndSelection(this.$container);
+
     M.getRecentActionsList(this.currentLimit, this.currentUntil).then(function(actions) {
         self.getMaxFitOnScreen(true);
         console.time('recents:render');
         self._injectDates(actions);
         if (!self._rendered || !self._dynamicList || forceInit) {
             self._initialRender(actions);
-        } else {
+        }
+        else {
             self._updateState(actions);
         }
         loadingDialog.hide();
@@ -199,7 +203,7 @@ RecentsRender.prototype._initialRender = function(actions) {
             'onResize': function() { return self.thottledResize(); },
             'onScroll': function() { return self.onScroll(); },
             'perfectScrollOptions': {
-                'handlers': ['click-rail', 'drag-scrollbar', 'wheel', 'touch'],
+                'handlers': ['click-rail', 'drag-thumb', 'wheel', 'touch'],
                 'minScrollbarLength': 20
             },
             'viewPortBuffer': 50
@@ -370,12 +374,15 @@ RecentsRender.prototype.keySelectPrevNext = function(dir, shift) {
 
         if (shift) {
             this.appendSelected($nextFileToSelect);
-            $.selected.push(nextNodeId);
+            if ($.selected && !$.selected.includes(nextNodeId)) {
+                $.selected.push(nextNodeId);
+            }
         }
         else {
             this.markSelected($nextFileToSelect.add($nextFileToSelect.parents('.MegaDynamicListItem')));
             $.selected = [nextNodeId];
         }
+        mega.ui.mInfoPanel.reRenderIfVisible($.selected);
     }
 };
 
@@ -424,7 +431,9 @@ RecentsRender.prototype.keySelectUpDown = function(dir, shift) {
     if (shift) {
 
         this.appendSelected($nextItem.add($nextActionToSelect));
-        $.selected.push(nextID);
+        if ($.selected && !$.selected.includes(nextID)) {
+            $.selected.push(nextID);
+        }
     }
     else {
         this.markSelected($nextItem);
@@ -434,6 +443,7 @@ RecentsRender.prototype.keySelectUpDown = function(dir, shift) {
         }
         $.selected = [nextID];
     }
+    mega.ui.mInfoPanel.reRenderIfVisible($.selected);
 
     var itemIndex = this._dynamicList.items.indexOf($nextActionToSelect.data('action'));
 
@@ -501,7 +511,7 @@ RecentsRender.prototype.populateBreadCrumb = function($container, action) {
     else if (action.outshare) {
         iconFolderType = "icon-folder-outgoing-share";
     }
-    $container.append('<i class="sprite-fm-mono ' + iconFolderType + '"></i>');
+    $container.safeAppend('<i class="js-path-icon sprite-fm-mono ' + iconFolderType + '"></i>');
 
     var pathTooltip = '';
     for (var k = action.path.length; k--;) {
@@ -572,10 +582,10 @@ RecentsRender.prototype.handleByUserHandle = function($newRow, action) {
 RecentsRender.prototype.handleInOutShareState = function($newRow, action) {
     'use strict';
 
-    $newRow.find(".transfer-filetype-icon")
-        .removeClass('hidden')
-        .addClass(action.outshare ? "folder-shared" : "inbound-share");
-    $newRow.find(".in-out-tooltip span")
+    $('.js-path-icon', $newRow)
+        .removeClass('hidden icon-folder icon-folder-outgoing-share icon-folder-incoming-share')
+        .addClass(action.outshare ? 'icon-folder-outgoing-share' : 'icon-folder-incoming-share');
+    $('.in-out-tooltip span', $newRow)
         .text(action.outshare ? l[5543] : l[5542]);
 };
 
@@ -624,7 +634,7 @@ RecentsRender.prototype.generateRow = function (action, actionId) {
     // var date = new Date(action.ts * 1000 || 0);
     // $newRow.find(".file-data .time").text(this._shortTimeFormatter.format(date));
     // $newRow.find(".file-data .uploaded-on-message.dark-direct-tooltip span").text(
-    //     (action.action !== "added" ? l[19942] : l[19941])
+    //     (action.action !== "added" ?)
     //         .replace('%1', acc_time2date(action.ts, true))
     //         .replace('%2', this._fullTimeFormatter.format(date))
     // );
@@ -665,11 +675,11 @@ RecentsRender.prototype._renderFiles = function($newRow, action, actionId) {
     var self = this;
     var isCreated = action.action === "added";
     var isOtherUser = action.user !== u_handle;
-    var $icon = $(".medium-file-icon", $newRow);
+    var $icon = $('.item-type-icon-90', $newRow);
     var iconClass = fileIcon(action[0]);
 
     // handle icon
-    $icon.addClass(iconClass);
+    $icon.addClass(`${iconClass.includes('video') ? 'video ' : ''}icon-${iconClass}-90`);
 
     if (action.length === 1 && (iconClass === 'image' && is_image2(action[0]) ||
         iconClass === 'video' && is_video(action[0]) || iconClass === 'pdf')) {
@@ -716,12 +726,26 @@ RecentsRender.prototype._renderFiles = function($newRow, action, actionId) {
         .rebind('click', function(e) {
             self.markSelected();
             $.hideContextMenu();
-            if (is_image(action[0]) || is_video(action[0]) === 1) {
+            if (is_image(action[0]) || is_video(action[0])) {
                 if (is_video(action[0])) {
                     $.autoplay = action[0].h;
                 }
                 slideshow(action[0].h);
-            } else {
+            }
+            else if (is_text(action[0])) {
+
+                loadingDialog.show();
+
+                mega.fileTextEditor.getFile(action[0].h)
+                    .then((data) => {
+                        mega.textEditorUI.setupEditor(action[0].name, data, action[0].h);
+                    })
+                    .catch(dump)
+                    .finally(() => {
+                        loadingDialog.hide();
+                    });
+            }
+            else {
                 $fileNameContainer.trigger({
                     type: 'contextmenu',
                     originalEvent: e.originalEvent
@@ -873,6 +897,7 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
     var videos = mediaCounts.videos;
     var images = mediaCounts.images;
     var pdfs = mediaCounts.pdfs;
+    var docxs = mediaCounts.docxs;
 
     $newRow.addClass('media expanded');
 
@@ -886,11 +911,24 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
             .rebind('dblclick', () => {
                 self.markSelected();
                 $.hideContextMenu();
+
+                // Close node Info panel as it's not applicable when opening Preview
+                mega.ui.mInfoPanel.closeIfOpen();
+
+                // mega.ui.searchbar.recentlyOpened.addFile(node.h, false);
                 slideshow(node.h);
                 $.autoplay = node.h;
                 return false;
             })
-            .rebind('click', e => self._handleSelectionClick(e, node.h, $newThumb.add($newRow)))
+            .rebind('click', e => {
+
+                const result = self._handleSelectionClick(e, node.h, $newThumb.add($newRow));
+
+                // Update the Info panel if it's open once the selection is made
+                mega.ui.mInfoPanel.reRenderIfVisible($.selected);
+
+                return result;
+            })
             .rebind('contextmenu', e => {
                 if (!selectionManager.selected_list.includes(node.h)) {
                     selectionManager.clear_selection();
@@ -915,16 +953,14 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
         }
         node.seen = true;
 
+        $('.item-type-icon-90', $newThumb).addClass(`icon-${fileIcon(node)}-90`);
+
         if (is_video(node)) {
-            $(".block-view-file-type", $newThumb).removeClass("image").addClass("video");
-            $(".data-block-bg", $newThumb).addClass("video");
+            $('.data-block-bg', $newThumb).addClass('video');
             node = MediaAttribute(node, node.k);
             if (node && node.data && node.data.playtime) {
                 $('.video-thumb-details span', $newThumb).text(secondsToTimeShort(node.data.playtime));
             }
-        }
-        else if (fileIcon(node) === 'pdf') {
-            $(".block-view-file-type", $newThumb).removeClass("image").addClass("pdf");
         }
 
         if (node.fav) {
@@ -1016,7 +1052,7 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
 
     const makeTitle = function() {
 
-        const numOfFiles = images + videos + pdfs;
+        const numOfFiles = images + videos + pdfs + docxs;
         const titleString = mega.icu.format(l.file_count, numOfFiles);
 
         return '<span class="title number-of-files">' + titleString + '</span>';
@@ -1035,25 +1071,42 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
         });
 
     // Set the media block icons according to media content.
-    var $rearIcon = $newRow.find(".medium-file-icon.double");
-    var $frontIcon = $newRow.find(".medium-file-icon.double .medium-file-icon");
-    if (images === 0) {
-        $frontIcon.removeClass("image").addClass("video");
+    let fIcon;
+    let rIcon;
+
+    if (images) {
+        fIcon = rIcon = 'image';
+        if (videos) {
+            rIcon = 'video';
+        }
+        else if (pdfs) {
+            rIcon = 'pdf';
+        }
+        else if (docxs) {
+            rIcon = 'word';
+        }
+    }
+    else if (videos) {
+        fIcon = rIcon = 'video';
+        if (pdfs) {
+            rIcon = 'pdf';
+        }
+        else if (docxs) {
+            rIcon = 'word';
+        }
+    }
+    else if (pdfs) {
+        fIcon = rIcon = 'pdf';
+        if (docxs) {
+            rIcon = 'word';
+        }
+    }
+    else if (docxs) {
+        fIcon = rIcon = 'word';
     }
 
-    if (videos === 0) {
-        $frontIcon.removeClass('video').addClass('pdf');
-    }
-    else {
-        $rearIcon.removeClass("image").addClass("video");
-    }
-
-    if (pdfs === 0) {
-        $frontIcon.removeClass('pdf').addClass('image');
-    }
-    else {
-        $rearIcon.removeClass("image").addClass("pdf");
-    }
+    const $rearIcon = $('.item-type-icon-90.double', $newRow).addClass(`icon-${rIcon}-90`);
+    $('.item-type-icon-90', $rearIcon).addClass(`icon-${fIcon}-90`);
 
     // Attach resize listener to the image block.
     self._resizeListeners.push(function() {
@@ -1121,6 +1174,7 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
         sm.clear_selection();
         sm.selected_list = action.map(n => n.h);
         sm.add_to_selection(sm.selected_list.pop(), false, true);
+        mega.ui.mInfoPanel.reRenderIfVisible($.selected);
         self.markSelected($newRow);
         $.hideTopMenu();
         return !!M.contextMenuUI(ev, 3);
@@ -1157,7 +1211,8 @@ RecentsRender.prototype._countMedia = function(action) {
     var counts = {
         images: 0,
         videos: 0,
-        pdfs: 0
+        pdfs: 0,
+        docxs: 0
     };
 
     for (var idx = action.length; idx--;) {
@@ -1171,6 +1226,9 @@ RecentsRender.prototype._countMedia = function(action) {
         }
         else if (fileIcon(n) === 'pdf') {
             counts.pdfs++;
+        }
+        else if (fileIcon(n) === 'word') {
+            counts.docxs++;
         }
         else if (d) {
             console.warn('What is this?...', n);
@@ -1240,7 +1298,33 @@ RecentsRender.prototype._getConfigShow = function() {
  */
 RecentsRender.prototype._setConfigShow = function(val) {
     'use strict';
-    mega.config.setn('showRecents', val);
+    mega.config.set('showRecents', val ? 1 : undefined);
+    if (!val) {
+        mega.ui.searchbar.recentlyOpened.clear();
+        mega.ui.searchbar.recentlySearched.clear();
+    }
+    queueMicrotask(() => {
+        this.checkStatusChange(1);
+    });
+};
+
+/**
+ * Check status change.
+ */
+RecentsRender.prototype.checkStatusChange = function(force) {
+    'use strict';
+    let res = false;
+
+    if (force || this.hasConfigChanged()) {
+        this.onConfigChange();
+
+        res = page.includes('fm/recents');
+        if (res++) {
+            openRecents();
+        }
+    }
+
+    return res;
 };
 
 /**
@@ -1315,6 +1399,7 @@ RecentsRender.prototype._handleSelectionClick = function(e, handle, $element) {
     }
     if (handle) {
         selectionManager.add_to_selection(handle);
+        mega.ui.mInfoPanel.reRenderIfVisible($.selected);
     }
     return false;
 };

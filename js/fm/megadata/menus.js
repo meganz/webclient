@@ -73,11 +73,7 @@ MegaData.prototype.buildSubMenu = function(id) {
                 classes += ' shared-folder-item';
                 iconClass = 'icon-folder-outgoing-share';
             }
-            else if (
-                mega.fileRequestCommon.storage.cache.puHandle[fid]
-                && mega.fileRequestCommon.storage.cache.puHandle[fid].s !== 1
-                && mega.fileRequestCommon.storage.cache.puHandle[fid].p
-            ) {
+            else if (mega.fileRequest.publicFolderExists(fid)) {
                 classes += ' file-request-folder';
                 iconClass = 'icon-folder-mega-drop';
             }
@@ -96,81 +92,14 @@ MegaData.prototype.buildSubMenu = function(id) {
     M.disableCircularTargets('#fi_');
 };
 
-/**
- * Build an array of context-menu items to show for the selected node
- * @returns {MegaPromise}
- */
-MegaData.prototype.menuItems = function menuItems() {
-    "use strict";
-
-    var rrnodes = [];
-    var promise = new MegaPromise();
-    var nodes = ($.selected || []).concat();
-
-    for (var i = nodes.length; i--;) {
-        var n = M.d[nodes[i]];
-
-        if (n) {
-
-            nodes.splice(i, 1);
-
-            if (n.rr && M.getNodeRoot(n.h) === M.RubbishID) {
-                rrnodes.push(n.rr);
-            }
-            // else we can delete .rr and api_setattr
-        }
-    }
-    nodes = nodes.concat(rrnodes);
-
-    var checkMegaSync = function _checkMegaSync(preparedItems) {
-        $('.dropdown-item.download-item')
-            .addClass('contains-submenu sprite-fm-mono-after icon-arrow-right-after');
-        $('.dropdown-item.download-item').removeClass('msync-found');
-
-        if (window.useMegaSync === 2 || window.useMegaSync === 3) {
-            $('.dropdown-item.download-item')
-                .removeClass('contains-submenu sprite-fm-mono-after icon-arrow-right-after');
-            $('.dropdown-item.download-item').addClass('msync-found');
-            if (window.useMegaSync === 2 && $.selected.length === 1 && M.d[$.selected[0]].t === 1
-                && M.getNodeRoot($.selected[0]) !== M.InboxID) {
-                var addItemAndResolvePromise = function _addItemAndResolvePromise(error, response) {
-                    if (!error && response === 0) {
-                        preparedItems['.syncmegasync-item'] = 1;
-                    }
-                    promise.resolve(preparedItems);
-                };
-                megasync.syncPossible($.selected[0], addItemAndResolvePromise);
-            }
-            else {
-                promise.resolve(preparedItems);
-            }
-        }
-        else {
-            promise.resolve(preparedItems);
-        }
-    }
-
-    if (nodes.length) {
-        dbfetch.geta(nodes)
-            .always(function () {
-                var preparedItems = M.menuItemsSync();
-                checkMegaSync(preparedItems);
-            });
-    }
-    else {
-        checkMegaSync(M.menuItemsSync());
-    }
-
-    return promise;
-};
-
-MegaData.prototype.getSelectedSourceRoot = function(isSearch) {
-
+MegaData.prototype.getSelectedSourceRoot = function(isSearch, isTree) {
     'use strict';
 
-    let sourceRoot = isSearch || M.currentdirid === 'recents' ? M.getNodeRoot($.selected[0]) : M.currentrootid;
+    let sourceRoot = isTree || isSearch || M.currentdirid === 'recents'
+        || M.currentdirid === 'public-links' || M.currentdirid === 'out-shares'
+        ? M.getNodeRoot($.selected[0]) : M.currentrootid;
 
-    if (sourceRoot === 'public-links' || sourceRoot === 'out-shares' || sourceRoot === 'file-requests') {
+    if (sourceRoot === 'file-requests') {
         sourceRoot = M.RootID;
     }
 
@@ -178,7 +107,6 @@ MegaData.prototype.getSelectedSourceRoot = function(isSearch) {
 };
 
 MegaData.prototype.checkSendToChat = function(isSearch, sourceRoot) {
-
     'use strict';
 
     // view send to chat if all selected items are files
@@ -187,10 +115,11 @@ MegaData.prototype.checkSendToChat = function(isSearch, sourceRoot) {
         for (let i = $.selected.length; i--;) {
 
             let n = M.d[$.selected[i]];
-            let nRoot = isSearch ? (n.u === u_handle && M.getNodeRoot($.selected[i])) : sourceRoot;
+            const nRoot = isSearch ? n && n.u === u_handle && M.getNodeRoot($.selected[i]) : sourceRoot;
 
-            if (!n || n.t && (nRoot !== M.RootID && nRoot !== M.InboxID && !M.isDynPage(nRoot))
-                || nRoot === M.RubbishID) {
+            if (!n || n.t && (nRoot !== M.RootID && nRoot !== M.InboxID && nRoot !== 's4'
+                && !M.isDynPage(nRoot)) || nRoot === M.RubbishID) {
+
                 return false;
             }
         }
@@ -199,19 +128,50 @@ MegaData.prototype.checkSendToChat = function(isSearch, sourceRoot) {
     return false;
 };
 
+
 /**
  * Build an array of context-menu items to show for the selected node
- * @returns {Object}
+ * @returns {Promise}
  */
-MegaData.prototype.menuItemsSync = function menuItemsSync() {
+// @todo make eslint happy..
+// eslint-disable-next-line complexity,sonarjs/cognitive-complexity
+MegaData.prototype.menuItems = async function menuItems(isTree) {
     "use strict";
 
-    var n;
-    var items = Object.create(null);
-    var selNode = M.d[$.selected[0]] || false;
+    console.assert($.selected);
+    if (!$.selected) {
+        $.selected = [];
+    }
+
+    const restore = new Set();
+    const nodes = [...$.selected];
+
+    for (let i = nodes.length; i--;) {
+        const h = nodes[i] || !1;
+        const n = M.getNodeByHandle(h);
+
+        if (n || h.length !== 8) {
+            nodes.splice(i, 1);
+
+            if (n.rr && M.getNodeRoot(n.h) === M.RubbishID) {
+                restore.add(n.rr);
+            }
+            // else we can delete .rr and api_setattr
+        }
+    }
+    nodes.push(...restore);
+
+    if (nodes.length) {
+        await dbfetch.geta(nodes).catch(dump);
+    }
+
+    let n;
+    const items = Object.create(null);
     const isSearch = page.startsWith('fm/search');
-    const sourceRoot = M.getSelectedSourceRoot(isSearch);
+    const selNode = M.getNodeByHandle($.selected[0]);
+    const sourceRoot = M.getSelectedSourceRoot(isSearch, isTree);
     let restrictedFolders = false;
+    const isInShare = M.currentrootid === 'shares';
 
     if (selNode && selNode.su && !M.d[selNode.p]) {
         items['.leaveshare-item'] = 1;
@@ -223,11 +183,13 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
 
     if (selNode && $.selected.length === 1) {
         if (selNode.t) {
-            if (M.currentdirid !== selNode.h) {
+            if (M.currentdirid !== selNode.h && !is_mobile) {
                 items['.open-item'] = 1;
             }
 
-            if ((sourceRoot === M.RootID || M.isDynPage(M.currentrootid)) && !folderlink) {
+            if ((sourceRoot === M.RootID || sourceRoot === 's4'
+                || M.isDynPage(M.currentrootid)) && !folderlink) {
+
                 let exp = false;
                 const shares = this.getNodeShareUsers(selNode);
 
@@ -237,6 +199,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                         exp = selNode.shares.EXP;
                     }
                 }
+
                 items['.sh4r1ng-item'] = 1;
 
                 if (shares.length || M.ps[selNode.h]) {
@@ -245,10 +208,14 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
                 else if (!exp && !shared.is(selNode.h)) {
 
                     if (mega.fileRequest.publicFolderExists(selNode.h)) {
-                        const fileRequestPageClass =
-                            M.currentrootid === 'file-requests'
-                                ? '.file-request-page'
-                                : ':not(.file-request-page)';
+                        let fileRequestPageClass = '';
+
+                        if (!is_mobile) {
+                            fileRequestPageClass =
+                                M.currentrootid === 'file-requests'
+                                    ? '.file-request-page'
+                                    : ':not(.file-request-page)';
+                        }
 
                         items[`.file-request-manage${fileRequestPageClass}`] = 1;
                         items[`.file-request-copy-link${fileRequestPageClass}`] = 1;
@@ -263,6 +230,11 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
             // If the selected folder contains any versioning show clear version
             if (selNode.tvf && M.getNodeRights(selNode.h) > 1) {
                 items['.clearprevious-versions'] = 1;
+            }
+
+            // This is just to make sure the source root is on the cloud drive
+            if (mega.rewind && sourceRoot === M.RootID && !!mega.rewind.contextMenu) {
+                items['.rewind-item'] = 1;
             }
         }
         else {
@@ -292,20 +264,45 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
             }
         }
 
-        if (M.currentCustomView || M.currentdirid.startsWith('search/')) {
+        if (M.currentCustomView || M.currentdirid && M.currentdirid.startsWith('search/')) {
             items['.open-cloud-item'] = 1;
+            if (folderlink) {
+                items['.open-in-location'] = 1;
+            }
+            else {
+                items['.open-cloud-item'] = 1;
+            }
         }
 
         if (M.getNodeRights(selNode.h) > 1) {
             items['.rename-item'] = 1;
-            items['.add-star-item'] = 1;
             items['.colour-label-items'] = 1;
 
-            if (M.isFavourite(selNode.h)) {
-                $('.add-star-item').safeHTML('<i class="sprite-fm-mono icon-favourite-removed"></i>@@', l[5872]);
-            }
-            else {
-                $('.add-star-item').safeHTML('<i class="sprite-fm-mono icon-favourite"></i>@@', l[5871]);
+            if (!isInShare) {
+                items['.add-star-item'] = 1;
+
+                if (M.isFavourite(selNode.h)) {
+
+                    if (is_mobile) {
+
+                        const fav = mega.ui.contextMenu.getChild('.add-star-item');
+                        fav.text = l[5872];
+                        fav.icon = 'sprite-mobile-fm-mono icon-heart-broken-thin-outline';
+                    }
+                    else {
+                        $('.add-star-item').safeHTML('<i class="sprite-fm-mono icon-favourite-removed"></i>@@',
+                                                     l[5872]);
+                    }
+                }
+                else if (is_mobile) {
+
+                    const fav = mega.ui.contextMenu.getChild('.add-star-item');
+                    fav.text = l[5871];
+                    fav.icon = 'sprite-mobile-fm-mono icon-heart-thin-outline';
+                }
+                else {
+                    $('.add-star-item').safeHTML('<i class="sprite-fm-mono icon-favourite"></i>@@', l[5871]);
+                }
             }
 
             M.colourLabelcmUpdate(selNode.h);
@@ -317,13 +314,20 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         else if (items['.edit-file-item']) {
             $('.dropdown-item.edit-file-item span').text(l[16797]);
         }
+
+        if (selNode.vhl) {
+            items['.vhl-item'] = 1;
+        }
     }
 
     // Allow to mark as Favourite/Labeled from multi-selection
     if ($.selected.length > 1) {
-        items['.add-star-item'] = 1;
         items['.colour-label-items'] = 1;
-        let allAreFavourite = true;
+        let allAreFavourite = !isInShare;
+
+        if (!isInShare) {
+            items['.add-star-item'] = 1;
+        }
 
         for (let i = 0; i < $.selected.length; i++) {
 
@@ -360,6 +364,10 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
     }
     items['.refresh-item'] = 1;
 
+    if (M.gallery) {
+        items['.add-to-album'] = 1;
+    }
+
     if (folderlink) {
         delete items['.copy-item'];
         delete items['.add-star-item'];
@@ -367,11 +375,17 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         delete items['.colour-label-items'];
         delete items['.properties-versions'];
         delete items['.clearprevious-versions'];
+        delete items['.add-to-album'];
+
         items['.import-item'] = 1;
         items['.getlink-item'] = 1;
+
+        if (selNode.vhl || !selNode.t && self.d && localStorage.compli) {
+            items['.vhl-item'] = 1;
+        }
     }
 
-    if (M.currentCustomView.type === 'gallery') {
+    if (M.isGalleryPage()) {
 
         items['.open-cloud-item'] = 1;
 
@@ -386,17 +400,12 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         delete items['.embedcode-item'];
         delete items['.properties-versions'];
         delete items['.clearprevious-versions'];
+        delete items['.open-in-location'];
     }
 
-    if (selNode.t && !folderlink && M.currentrootid !== M.RubbishID &&
-        M.currentrootid !== 'out-shares' && M.currentrootid !== 'shares' &&
-        M.currentrootid !== 'public-links' && M.currentdirid !== 'recents' &&
-        $.selected.length === 1 &&
-        (M.currentCustomView.type !== 'gallery' || selNode.h !== M.currentCustomView.nodeID)) {
-        items['.open-gallery'] = 1;
-    }
+    if ((sourceRoot === M.RootID
+         || sourceRoot === 's4' || M.isDynPage(M.currentrootid)) && !folderlink) {
 
-    if ((sourceRoot === M.RootID || M.isDynPage(M.currentrootid)) && !folderlink) {
         items['.move-item'] = 1;
         items['.getlink-item'] = 1;
 
@@ -422,8 +431,11 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
             delete items['.play-item'];
             delete items['.preview-item'];
             delete items['.edit-file-item'];
-            delete items['.open-gallery'];
-            delete items['.open-item'];
+
+            if ($.selected.length > 1 || selNode.t !== 1) {
+                delete items['.open-item'];
+            }
+
             items['.dispute-item'] = 1;
         }
     }
@@ -434,6 +446,8 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         delete items['.copy-item'];
         delete items['.rename-item'];
         delete items['.add-star-item'];
+        delete items['.download-item'];
+        delete items['.zipdownload-item'];
         delete items['.colour-label-items'];
         delete items['.properties-versions'];
         delete items['.clearprevious-versions'];
@@ -441,7 +455,7 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         for (var j = $.selected.length; j--;) {
             n = M.getNodeByHandle($.selected[j]);
 
-            if (M.getNodeRoot(n.h) === M.RubbishID) {
+            if (n.rr && M.getNodeRoot(n.h) === M.RubbishID) {
                 items['.revert-item'] = 1;
             }
             else if (items['.revert-item']) {
@@ -504,16 +518,25 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         }
     }
 
-    if (!folderlink && M.getNodeRoot(selNode.p) === M.RubbishID) {
-        delete items['.download-item'];
-        delete items['.zipdownload-item'];
+    const {useMegaSync} = window;
+    const $didi = $('.dropdown-item.download-item');
+    $didi.addClass('contains-submenu sprite-fm-mono-after icon-arrow-right-after').removeClass('msync-found');
+
+    if (useMegaSync === 2 || useMegaSync === 3) {
+        $didi.removeClass('contains-submenu sprite-fm-mono-after icon-arrow-right-after').addClass('msync-found');
+
+        if (useMegaSync === 2 && $.selected.length === 1 && selNode.t) {
+            const {error, response} = await megasync.syncPossibleA(selNode.h).catch(dump) || false;
+            if (!error && response === 0) {
+                items['.syncmegasync-item'] = 1;
+            }
+        }
     }
 
-    if (M.currentdirid === 'file-requests') {
+    if (M.currentdirid === 'file-requests' && !isTree) {
         delete items['.move-item'];
         delete items['.copy-item'];
-        delete items['.open-gallery'];
-        delete items['.open-cloud-item'];
+        delete items['.open-in-location'];
         delete items['.getlink-item'];
         delete items['.embedcode-item'];
         delete items['.removelink-item'];
@@ -521,18 +544,28 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
         delete items['.send-to-contact-item'];
     }
 
+    // If in MEGA Lite mode, temporarily hide any Download, Copy and Manage Share options while in the Shared area
+    if (mega.lite.inLiteMode && (M.currentrootid === 'shares' || M.currentrootid === 'out-shares')) {
+        delete items['.download-item'];
+        delete items['.copy-item'];
+        delete items['.sh4r1ng-item'];
+        delete items['.remove-item'];
+    }
+
     if (restrictedFolders || $.selected.length === 1
-        && M.getNodeRoot($.selected[0]) === M.InboxID) {
+        && sourceRoot === M.InboxID) {
 
         delete items['.open-cloud-item'];
+        delete items['.open-in-location'];
         delete items['.move-item'];
         delete items['.rename-item'];
         delete items['.add-star-item'];
         delete items['.colour-label-items'];
         delete items['.embedcode-item'];
-        delete items['.properties-versions'];
-        delete items['.clearprevious-versions'];
-        delete items['.remove-item'];
+
+        if (!self.vw) {
+            delete items['.remove-item'];
+        }
 
         let cl = new mega.Share.ExportLink();
 
@@ -561,6 +594,36 @@ MegaData.prototype.menuItemsSync = function menuItemsSync() {
             if (M.getNodeShareUsers(selNode, 'EXP').length || M.ps[selNode]) {
                 items['.removeshare-item'] = 1;
             }
+        }
+    }
+
+    // S4 Object Storage
+    if ($.selected.length === 1 && sourceRoot === 's4') {
+        const s4Type = 'kernel' in s4 && s4.kernel.getS4NodeType(selNode);
+
+        delete items['.open-cloud-item'];
+
+        if (M.currentCustomView.type !== 's4' || M.currentdirid.startsWith('search/')) {
+            items['.open-s4-item'] = 1;
+        }
+
+        // Temporary block most of actions over the containers
+        if (s4Type === 'container' || !s4Type) {
+            delete items['.move-item'];
+            delete items['.rename-item'];
+            delete items['.add-star-item'];
+            delete items['.colour-label-items'];
+            delete items['.embedcode-item'];
+            delete items['.properties-versions'];
+            delete items['.clearprevious-versions'];
+            delete items['.remove-item'];
+        }
+        else if (s4Type === 'bucket') {
+            delete items['.properties-item'];
+            items['.settings-item'] = 1;
+        }
+        else if (s4Type === 'object') {
+            items['.managepuburl-item'] = 1;
         }
     }
 
@@ -643,6 +706,39 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
     $.hideContextMenu(e);
     $contactDetails.addClass('hidden');
 
+    /**
+     * Adding context menu for share folder while you're on it
+     * @param {Object} n node
+     * @returns {void}
+     */
+    var shareContextMenu = function(n) {
+        // Hide shares context menu for root id, out shares and S4
+        const hideFrom = !['s4', 'out-shares', 'shares', 'file-requests'].includes(M.currentrootid)
+            && M.RootID !== M.currentdirid;
+
+        if (hideFrom) {
+            $.selected = [n.h];
+
+            $(menuCMI).filter('.cd-send-to-contact-item').removeClass('hidden');
+            $(menuCMI).filter('.cd-getlink-item').removeClass('hidden');
+            $(menuCMI).filter('.cd-sh4r1ng-item').removeClass('hidden');
+
+            onIdle(() => M.setContextMenuShareText());
+            onIdle(() => M.setContextMenuGetLinkText());
+        }
+
+        var cl = new mega.Share();
+        var hasExportLink = cl.hasExportLink(n.h);
+
+        if (hideFrom && hasExportLink) {
+            $(menuCMI).filter('.cd-removelink-item').removeClass('hidden');
+        }
+
+        if (hideFrom && M.getNodeShareUsers(n.h, 'EXP').length || M.ps[n.h]) {
+            $(menuCMI).filter('.cd-removeshare-item').removeClass('hidden');
+        }
+    };
+
     // Used when right click is occured outside item, on empty canvas
     if (ll === 2) {
         // to init megaSync, as the user may click of file/folder upload
@@ -663,13 +759,19 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
             // Enable upload item menu for clould-drive, don't show it for rubbish and rest of crew
 
             const nodeRights = M.getNodeRights(M.currentCustomView.nodeID || M.currentdirid);
+            const h = M.currentdirid.split('/').pop();
+            const n = M.getNodeByHandle(h);
+            const nodeRoot = M.getNodeRoot(h);
 
             if (nodeRights && M.currentrootid !== M.RubbishID && M.currentrootid !== M.InboxID
-                && M.getNodeRoot(M.currentdirid.split('/').pop()) !== M.InboxID) {
+                && nodeRoot !== M.InboxID) {
 
                 if (M.currentrootid === 'contacts') {
                     $(menuCMI).filter('.addcontact-item').removeClass('hidden');
                     ignoreGrideExtras = true;
+                }
+                else if (n.s4 && 'kernel' in s4 && s4.kernel.getS4NodeType(n) === 'container') {
+                    $(menuCMI).filter('.new-bucket-item').removeClass('hidden');
                 }
                 else {
                     $(menuCMI).filter('.fileupload-item,.newfolder-item').removeClass('hidden');
@@ -678,8 +780,22 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
                         $(menuCMI).filter('.newfile-item').removeClass('hidden');
                     }
 
-                    if (is_chrome_firefox & 2 || 'webkitdirectory' in document.createElement('input')) {
+                    if ($.hasWebKitDirectorySupport === undefined) {
+                        $.hasWebKitDirectorySupport = 'webkitdirectory' in document.createElement('input');
+                    }
+
+                    if ($.hasWebKitDirectorySupport) {
                         $(menuCMI).filter('.folderupload-item').removeClass('hidden');
+                    }
+
+                    if (nodeRoot !== 's4' && mega.rewind && !!mega.rewind.contextMenu
+                        && mega.rewind.permittedRoots[M.currentrootid]) {
+                        $(menuCMI).filter('.rewind-item').removeClass('hidden');
+                    }
+                    // Flag added for share folder while on it at context menu
+                    if (mega.flags.ab_ctxmenu_shares) {
+                        shareContextMenu(n);
+                        eventlog(500035);
                     }
                 }
                 itemsViewed = true;
@@ -730,7 +846,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
 
         asyncShow = true;
         M.menuItems()
-            .done(function(items) {
+            .then((items) => {
 
                 delete items['.download-item'];
                 delete items['.zipdownload-item'];
@@ -751,7 +867,8 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
                 }
 
                 onIdle(showContextMenu);
-            });
+            })
+            .catch(dump);
     }
     else if (ll === 7) { // Columns selection menu
         if (M && M.columnsWidth && M.columnsWidth.cloud) {
@@ -783,13 +900,12 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
         $(menuCMI).addClass('hidden');
 
         asyncShow = true;
-
-        M.menuItems().done(() => {
-
-            $(menuCMI).filter(items).removeClass('hidden');
-
-            onIdle(showContextMenu);
-        });
+        M.menuItems()
+            .then(() => {
+                onIdle(showContextMenu);
+                $(menuCMI).filter(items).removeClass('hidden');
+            })
+            .catch(dump);
     }
     else if (ll) {// Click on item
 
@@ -799,6 +915,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
         var id;
         var currNodeClass;
         var $currentTarget = $(e.currentTarget);
+        let isTree = false;
 
         // This event is context on selection bar
         if ($currentTarget.hasClass('js-statusbarbtn')) {
@@ -816,6 +933,8 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
             // File manager left panel click
             if (id.includes('treea_')) {
                 id = id.replace(/treea_+|(os_|pl_)/g, '');
+                eventlog(500036);
+                isTree = true;
             }
 
             // File manager breadcrumb path click
@@ -838,9 +957,10 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
             flt = '.remove-contact, .share-folder-item, .set-nickname';
 
             // Add .send-files-item to show Send files item
-            if (!window.megaChatIsDisabled) {
+            if (window.megaChatIsReady) {
                 flt += ',.startchat-item, .send-files-item';
-                if (megaChat && megaChat.hasSupportForCalls) {
+
+                if (megaChat.hasSupportForCalls) {
                     flt += ',.startaudiovideo-item';
                 }
             }
@@ -906,11 +1026,16 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
         else if (currNodeClass && (currNodeClass.indexOf('cloud-drive') > -1
             || currNodeClass.indexOf('folder-link') > -1)) {
             flt = '.properties-item';
+
             if (folderlink) {
                 flt += ',.import-item';
             }
             else {
                 flt += ',.findupes-item';
+
+                if (mega.rewind && !!mega.rewind.contextMenu) {
+                    flt += ',.rewind-item';
+                }
             }
             if (M.v.length && folderlink) {
                 flt += ',.zipdownload-item,.download-item';
@@ -936,16 +1061,108 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
             e.preventDefault();
             return false;
         }
+        else if (pfcol) {
+            const $menuCMI = $(menuCMI);
+            const albums = mega.gallery.albums;
+            const selections = Object.keys(albums.grid.timeline.selections);
+            const oneImageSelected = selections.length === 1 && !!mega.gallery.isImage(M.d[selections[0]]);
+            const hasImageSelected = selections.some((h) => !!mega.gallery.isImage(M.d[h]));
+            const slideshowItem = $menuCMI.filter('.play-slideshow');
+            const previewItem = $menuCMI.filter('.preview-item');
+            const playItem = $menuCMI.filter('.play-item');
+            const importItem = $menuCMI.filter('.import-item');
+            const onlyPlayableVideosSelected = selections.every((h) => !!is_video(M.d[h]));
+            const allowSlideshow = oneImageSelected
+                && mega.gallery.nodesAllowSlideshow(mega.gallery.albums.store[M.d[pfid].id].nodes);
+
+            slideshowItem.toggleClass('hidden', !allowSlideshow);
+            previewItem.toggleClass('hidden', !hasImageSelected);
+            $menuCMI.filter('.properties-item').removeClass('hidden');
+            importItem.removeClass('hidden');
+
+            $.selected = selections;
+
+            $('span', playItem).text(l.album_play_video);
+            $('span', importItem).text(u_type ? l.context_menu_import : l.btn_imptomega);
+
+            playItem.toggleClass('hidden', !onlyPlayableVideosSelected);
+        }
         else if (currNodeClass
             && (currNodeClass.includes('data-block-view') || currNodeClass.includes('folder'))
             || String(id).length === 8) {
 
             asyncShow = true;
-            M.menuItems()
-                .done(function(items) {
-                    var $menuCMI = $(menuCMI);
+            const updateUIPerItems = ($menuCMI, items) => {
+                if (items['.getlink-item']) {
+                    onIdle(() => M.setContextMenuGetLinkText());
+                }
+                if (items['.sh4r1ng-item']) {
+                    onIdle(() => M.setContextMenuShareText());
+                }
 
-                    for (var item in items) {
+                if (items['.play-item']) {
+                    var $playItem = $menuCMI.filter('.play-item');
+
+                    if (is_audio(M.d[id])) {
+                        $('i', $playItem).removeClass('icon-video-call-filled').addClass('icon-play-small');
+                        $('span', $playItem).text(l[17828]);
+                    }
+                    else {
+                        $('i', $playItem).removeClass('icon-play-small').addClass('icon-video-call-filled');
+                        $('span', $playItem).text(l[16275]);
+                    }
+                }
+
+                if (items['.remove-item']) {
+                    $('span', $menuCMI.filter('.remove-item')).text(M.getSelectedRemoveLabel($.selected));
+                }
+
+                if (items['.import-item']) {
+                    const $importItem = $menuCMI.filter('.import-item');
+
+                    if (u_type) {
+                        $('i', $importItem)
+                            .removeClass('icon-mega-thin-outline')
+                            .addClass('icon-upload-to-cloud-drive');
+
+                        $('span', $importItem).text(l.context_menu_import);
+                    }
+                    else {
+                        $('i', $importItem)
+                            .removeClass('icon-upload-to-cloud-drive')
+                            .addClass('icon-mega-thin-outline');
+
+                        $('span', $importItem).text(l.btn_imptomega);
+                    }
+                }
+
+                if (items['.open-item']) {
+                    const $openItem = $menuCMI.filter('.open-item');
+                    const n = M.getNodeByHandle(id);
+
+                    if (n.s4 && 'kernel' in s4 && s4.kernel.getS4NodeType(n) === 'bucket') {
+                        $('i', $openItem).removeClass('icon-folder-open').addClass('icon-bucket');
+                    }
+                    else {
+                        $('i', $openItem).removeClass('icon-bucket').addClass('icon-folder-open');
+                    }
+                }
+
+                // We know the rewind-item is already active and passed the check
+                // We need to check the 2nd time if the source of event is on right location
+                if (items['.rewind-item']) {
+                    const fromCloudDriveTree = $currentTarget.closest('.js-myfile-tree-panel').length;
+                    if (!fromCloudDriveTree && M.currentrootid !== M.RootID) {
+                        $menuCMI.filter('.rewind-item').addClass('hidden');
+                    }
+                }
+            };
+
+            M.menuItems(isTree)
+                .then((items) => {
+                    const $menuCMI = $(menuCMI);
+
+                    for (const item in items) {
                         $menuCMI.filter(item).removeClass('hidden');
                     }
 
@@ -967,28 +1184,15 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
                         $menuCMI.filter('.send-to-contact-item').addClass('hidden');
                     }
                     else {
-                        if (items['.getlink-item']) {
-                            onIdle(() => M.setContextMenuGetLinkText());
-                        }
-                        if (items['.sh4r1ng-item']) {
-                            onIdle(() => M.setContextMenuShareText());
-                        }
+                        updateUIPerItems($menuCMI, items);
+                    }
 
-                        if (items['.play-item']) {
-                            var $playItem = $menuCMI.filter('.play-item');
+                    if (M.getNodeByHandle(id).su) {
+                        const ed = authring.getContactAuthenticated(M.d[id].su, 'Ed25519');
 
-                            if (is_audio(M.d[id])) {
-                                $('i', $playItem).removeClass('icon-video-call-filled').addClass('icon-play-small');
-                                $('span', $playItem).text(l[17828]);
-                            }
-                            else {
-                                $('i', $playItem).removeClass('icon-play-small').addClass('icon-video-call-filled');
-                                $('span', $playItem).text(l[16275]);
-                            }
-                        }
-
-                        if (items['.remove-item']) {
-                            $('span', $menuCMI.filter('.remove-item')).text(M.getSelectedRemoveLabel($.selected));
+                        if (!(ed && ed.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON) &&
+                            M.currentdirid !== `chat/contacts/${M.d[id].su}`) {
+                            $menuCMI.filter('.verify-credential').removeClass('hidden');
                         }
                     }
 
@@ -1004,7 +1208,8 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
                     }
 
                     onIdle(showContextMenu);
-                });
+                })
+                .catch(dump);
         }
         else {
             return false;
@@ -1042,22 +1247,41 @@ MegaData.prototype.setContextMenuGetLinkText = function() {
         }
     }
 
+    // Toggle manage link class for a/b testing purposes
+    const cdGetLinkToggle = (func) => {
+        const el = document.querySelector('.dropdown.body .cd-getlink-item');
+
+        if (el && !is_mobile) {
+            el.classList[func]('manage-link');
+        }
+    };
+
     // If all the selected nodes have existing public links, set text to 'Manage links' or 'Manage link'
     if (numOfSelectedNodes === numOfExistingPublicLinks) {
         getLinkText = numOfSelectedNodes > 1 ? l[17520] : l[6909];
+        cdGetLinkToggle('add');
     }
     else {
-        // Otherwise change text to 'Get links' or 'Get link' if there are selected nodes without links
-        getLinkText = (numOfSelectedNodes > 1) ? l[8734] : l[59];
+        // Otherwise change text to 'Share links' or 'Share link' if there are selected nodes without links
+        getLinkText = mega.icu.format(l.share_link, numOfSelectedNodes);
+        cdGetLinkToggle('remove');
     }
 
     // If there are multiple nodes with existing links selected, set text to 'Remove links', otherwise 'Remove link'
-    var removeLinkText = (numOfExistingPublicLinks > 1) ? l[8735] : l[6821];
+    const removeLinkText = numOfExistingPublicLinks > 1 ? l[8735] : l[6821];
 
     // Set the text for the 'Get/Update link/s' and 'Remove link/s' context menu items
-    var $contextMenu = $('.dropdown.body');
-    $contextMenu.find('.getlink-item span').text(getLinkText);
-    $contextMenu.find('.removelink-item span').text(removeLinkText);
+    if (is_mobile) {
+
+        mega.ui.contextMenu.getChild('.getlink-item').text = getLinkText;
+        mega.ui.contextMenu.getChild('.removelink-item').text = removeLinkText;
+    }
+    else {
+        document.querySelector('.dropdown.body .getlink-item span').textContent = getLinkText;
+        document.querySelector('.dropdown.body .removelink-item span').textContent = removeLinkText;
+        document.querySelector('.dropdown.body .cd-getlink-item span').textContent = getLinkText;
+        document.querySelector('.dropdown.body .cd-removelink-item span').textContent = removeLinkText;
+    }
 };
 
 /**
@@ -1068,16 +1292,57 @@ MegaData.prototype.setContextMenuGetLinkText = function() {
 MegaData.prototype.setContextMenuShareText = function() {
     'use strict';
 
-    const selectedNode = M.d[$.selected[0]] || false;
+    const n = M.d[$.selected[0]] || false;
+    const isS4Bucket = n.s4 && 'kernel' in s4 && s4.kernel.getS4NodeType(n) === 'bucket';
     let getLinkText = M.currentrootid === M.InboxID
         || M.getNodeRoot($.selected[0]) === M.InboxID ? l.read_only_share : l[5631];
+    let getLinkIcon = 'sprite-mobile-fm-mono icon-share-thin-outline';
+    let manageIcon = 'icon-folder-outgoing-share';
+    let removeIcon = 'icon-folder-remove-share';
+    const cdShareItem = document.querySelector('.dropdown.body .cd-sh4r1ng-item');
 
-    // If the node has shares or pending shares, set to 'Manage share', else, 'Share folder'
-    if (selectedNode && M.getNodeShareUsers(selectedNode, 'EXP').length || M.ps[selectedNode]) {
-        getLinkText = l.manage_share;
+    if (isS4Bucket) {
+        getLinkText = l.s4_share_bucket;
+        manageIcon = 'icon-bucket-outgoing-share';
+        removeIcon = 'icon-bucket-remove-share';
     }
 
-    $('.sh4r1ng-item span', '.dropdown.body').text(getLinkText);
+    // Toggle manage share class for a/b testing purposes
+    const cdShareToggle = (func) => {
+        if (cdShareItem && !is_mobile) {
+            cdShareItem.classList[func]('manage-share');
+        }
+    };
+
+    // If the node has shares or pending shares, set to 'Manage share', else, 'Share folder'
+    if (n && M.getNodeShareUsers(n, 'EXP').length || M.ps[n]) {
+        getLinkText = l.manage_share;
+        getLinkIcon = 'sprite-mobile-fm-mono icon-settings-thin-outline';
+        cdShareToggle('add');
+    }
+    else {
+        cdShareToggle('remove');
+    }
+
+    if (is_mobile) {
+
+        const shareBtn = mega.ui.contextMenu.getChild('.sh4r1ng-item');
+        shareBtn.text = getLinkText;
+        shareBtn.icon = getLinkIcon;
+    }
+    else {
+
+        const shareItem = document.querySelector('.dropdown.body .sh4r1ng-item');
+        const removeItem = document.querySelector('.dropdown.body .removeshare-item');
+        const cdRemoveItem = document.querySelector('.dropdown.body .cd-removeshare-item');
+
+        cdShareItem.querySelector('span').textContent = getLinkText;
+        cdShareItem.querySelector('i').className = `sprite-fm-mono ${manageIcon}`;
+        shareItem.querySelector('span').textContent = getLinkText;
+        shareItem.querySelector('i').className = `sprite-fm-mono ${manageIcon}`;
+        removeItem.querySelector('i').className = `sprite-fm-mono ${removeIcon}`;
+        cdRemoveItem.querySelector('i').className = `sprite-fm-mono ${removeIcon}`;
+    }
 };
 
 /**

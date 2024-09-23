@@ -17,12 +17,150 @@
         </button>
     </div>
 
+    <div class="fm-import-download-buttons hidden">
+        <div class="folder-link-btns-container">
+            <div class="merge-mega-button download">
+                <button class="mega-button positive fm-download-as-zip">
+                    <span>[$58]</span>
+                </button>
+
+                <div class="download-dropdown">
+                    <button class="mega-button positive icon square">
+                        <i class="sprite-fm-mono icon-arrow-down"></i>
+                    </button>
+                    <div class="download-dropdown-content">
+                        <div>
+                            <a class="fm-download-as-zip">
+                                <i class="sprite-fm-mono icon-download"></i>
+                                <span>[$folder_link_download]</span>
+                            </a>
+                            <a class="fm-megasync-download">
+                                <i class="sprite-fm-mono icon-session-history"></i>
+                                <span>[$btn_dlwitdeskapp]</span>
+                                <i class="sprite-fm-mono icon-question-filled simpletip" data-simpletip="[$tooltip_why_desktop_app]" data-simpletip-class="large-width center-align"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="mega-button fm-import-to-cloudrive">
+                <span>[$btn_imptomega]</span>
+            </button>
+        </div>
+    </div>
+
     <div class="searcher-wrapper">
         <div class="topbar-searcher js-topbar-searcher">
+        <!-- This div contains three dropdown sections -->
+            <div class="dropdown-search hidden">
+                <!-- EMPTY STATE - Show when recents are disabled/no recents exist -->
+                <div class="dropdown-no-recents dropdown-section hidden">
+                    <i class="dropdown-no-recents-icon sprite-fm-mono icon-clock-rotate"></i>
+                    <div class="dropdown-no-recents-content">
+                        <div class="dropdown-no-recents-content-header">
+                            [$searchbar_dropdown_recents_empty_heading]
+                        </div>
+                        <div class="dropdown-no-recents-content-text">
+                            [$searchbar_dropdown_recents_empty_body]
+                        </div>
+                    </div>
+                </div>
+                <div class="dropdown-recents dropdown-section">
+                    <!-- Recently Searched section -->
+                    <div class="dropdown-section dropdown-recently-searched-wrapper">
+                        <div class="dropdown-recently-searched dropdown-section-item">
+                            <!-- Every section has a header -->
+                            <div class="dropdown-section-header">
+                                <div class="dropdown-section-header-contents">
+                                    <div class="dropdown-section-header-text">
+                                        [$recently_searched]
+                                    </div>
+                                    <a class="dropdown-section-clear js-dropdownClearRecentlySearched">
+                                        [$clear_all]
+                                    </a>
+                                </div>
+                            </div>
+                            <!-- Every section has a body -->
+                            <div class="dropdown-section-body">
+                                <!-- Recently Searched Terms - dynamically populated -->
+                            </div>
+                            <!-- Dummy template for each item in body -->
+                            <a class="dropdown-recently-searched-item dropdown-section-body-item dropdown-recently-searched-template hidden">
+                                <div class="dropdown-recently-searched-item-text"></div>
+                                <i class="sprite-fm-mono icon-dialog-close dropdown-recent-item-delete-icon"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Recently Opened section -->
+                    <div class="dropdown-section dropdown-recently-opened-wrapper hidden">
+                        <div class="dropdown-recently-opened dropdown-section-item">
+                            <!-- Every section has a header -->
+                            <div class="dropdown-section-header">
+                                <div class="dropdown-section-header-contents">
+                                    <div class="dropdown-section-header-text">
+                                        [$recently_opened_files]
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Every section has a body -->
+                            <div class="dropdown-section-body">
+                                <!-- Recently Opened Files - dynamically populated -->
+                            </div>
+                            <!-- Dummy template for each item in body -->
+                            <a class="dropdown-recently-opened-item dropdown-section-body-item dropdown-recently-opened-template hidden">
+                                <div class="dropdown-item-file dropdown-recently-opened-file">
+                                    <div class="dropdown-recently-opened-item-file-icon">
+                                        <span class="item-type-icon file">
+                                            <img>
+                                        </span>
+                                    </div>
+                                    <div class="dropdown-recently-opened-item-filename"></div>
+                                </div>
+                                <div class="dropdown-recently-opened-item-location dropdown-item-text-medium"></div>
+                                <div class="dropdown-recently-opened-item-time dropdown-item-text-medium"></div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Search Results section -->
+                <div class="dropdown-results dropdown-section hidden">
+                    <div class="dropdown-search-results dropdown-section-item">
+                        <!-- Every section has a header -->
+                        <div class="dropdown-section-header">
+                            <div class="dropdown-section-header-contents">
+                                <div class="dropdown-section-header-text">
+                                    [$searchbar_result_label]
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Every section has a body -->
+                        <div class="dropdown-section-body">
+                                <!-- Suggestion search result - dynamically populated -->
+                        </div>
+                        <!-- Template for search result item -->
+                        <a class="dropdown-search-results-item dropdown-section-body-item dropdown-search-results-item-template hidden">
+                            <div class="dropdown-item-file dropdown-search-results-file">
+                                <div class="dropdown-search-results-item-file-icon">
+                                    <span class="item-type-icon">
+                                        <img>
+                                    </span>
+                                </div>
+                                <div class="dropdown-search-results-item-filename">
+                                    <span class="prefix"></span>
+                                    <span class="txt-bold"></span>
+                                    <span class="suffix"></span>
+                                </div>
+                            </div>
+                            <div class="dropdown-search-results-item-location dropdown-item-text-medium"></div>
+                        </a>
+                    </div>
+                </div>
+                <div class="search-loader hidden"></div>
+            </div>
             <form autocomplete="disabled" id="main-search-fake-form">
                 <i class="search-icon sprite-fm-mono icon-preview-reveal"></i>
                 <input type="text" placeholder="[$102]" autocomplete="disabled" class="js-filesearcher" spellcheck="false" />
-                <button class="js-btnclearSearch hidden" type="button"><i class="sprite-fm-mono icon-dialog-close"></i></button>
+                <button class="js-btnclearSearch" type="button"><i class="sprite-fm-mono icon-dialog-close"></i></button>
             </form>
         </div>
     </div>
@@ -193,7 +331,6 @@
                                 <br>
                                 [$15536]
                             </p>
-                            <p class="description-legacy-extension hidden">[$17549]</p>
 
                     </div>
                     <div class="fm-notifications-bottom">
@@ -223,6 +360,18 @@
             </div>
         </div>
 
+        <div class="dropdown js-dropdown-rewind-progress hidden">
+            <div class="dropdown body popup dropdown-content dropdown-arrow js-topbar-rewind-progress rewind-progress">
+                <div class="content">
+                    <i class="sprite-fm-mono icon-sync in-progress"></i>
+                    <div class="text">
+                        <div class="title"></div>
+                        <div class="message"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="dropdown js-dropdown-notification hidden">
             <button class="btn-icon notification js-topbarnotification js-top-buttons">
                 <i class="sprite-fm-theme icon-notifications"></i><span class="js-notification-num icon-badge">99+</span>
@@ -235,6 +384,7 @@
                     </div>
                     <div class="notification-scroll">
                         <div class="notification-scr-list">
+                            <div class="item-type-icon-90 icon-folder-public-90 file-request-notification template hidden"></div>
                             <a class="notification-item template">
                                 <span class="notification-status-icon">
                                     <span class="notification-status"></span>
@@ -245,22 +395,41 @@
                                             <i class="cross sprite-fm-mono icon-remove"></i>
                                             <i class="exclamation sprite-fm-mono icon-exclamation-filled"></i>
                                             <i class="contact sprite-fm-mono icon-user-circle-filled"></i>
+                                            <i class="camera sprite-fm-mono icon-meeting-notification"></i>
                                         </span>
                                     </span>
                                     <span class="notification-icon hidden">
                                         <i class="sprite-fm-uni icon-payment payment-icon"></i>
                                         <i class="sprite-fm-uni icon-check-circle reinstated-icon"></i>
                                         <i class="sprite-fm-uni icon-takedown takedown-icon"></i>
+                                        <i class="sprite-fm-uni icon-mega-logo dynamic-icon"></i>
                                     </span>
                                     <span class="notification-type">
                                         <span class="notification-content">
+                                            <span class="notification-promo hidden">
+                                                <span class="promo-text">[$notif_limited_time_offer]</span>
+                                                <span class="promo-icon">[$notif_promo]</span>
+                                            </span>
                                             <span class="notification-username"></span>
                                             <span class="notification-info"></span>
                                         </span>
+                                        <img class="hidden dynamic-image" />
                                         <span class="notification-request-buttons hidden">
                                             <button class="mega-button notifications-button accept">
                                                 <span>[$5856]</span>
                                             </button>
+                                        </span>
+                                        <span class="cta-buttons hidden">
+                                            <button class="mega-button notifications-button">
+                                                <span></span>
+                                            </button>
+                                        </span>
+                                        <span class="notification-scheduled-body hidden">
+                                            <span class="notification-scheduled-title hidden"></span>
+                                            <span class="notification-scheduled-prev hidden">
+                                                <s></s>
+                                            </span>
+                                            <span class="notification-scheduled-occurrence hidden"></span>
                                         </span>
                                         <span class="notification-date"></span>
                                         <span class="notification-accepted-bl">
@@ -290,6 +459,10 @@
                 </div>
             </div>
         </div>
+
+        <button class="mega-button back-to-mega-button js-back-to-mega-button">
+            <span>[$back_to_mega]</span>
+        </button>
 
         <div class="dropdown account js-dropdown-account">
             <button class="btn-icon js-topbaravatar">
@@ -357,6 +530,9 @@
                             <li class="no-red-dot"><button class="js-accountbtn achievements">[$16117]</button></li>
                             <li class="no-red-dot"><button class="js-accountbtn downloadmega">[$1913]</button></li>
                             <li class="separator no-red-dot"></li>
+                            <li class="no-red-dot">
+                                <button class="js-accountbtn feedback highlight">[$join_survey_share_opinion]</button>
+                            </li>
                             <li class="no-red-dot"><button class="js-accountbtn logout">[$967]</button></li>
                         </ul>
                     </div>
@@ -423,7 +599,7 @@
                     <div class="clear"></div>
                 </div>
                 <div class="plan"></div>
-                <div class="storage">
+                <div class="storage hidden">
                     <span></span>
                 </div>
                 <div class="loader sprite-fm-uni icon-loading"></div>
@@ -439,6 +615,10 @@
                 <div class="top-menu-item account">
                     <i class="sprite-fm-mono icon-settings"></i>
                     <span>[$823]</span>
+                </div>
+                <div class="top-menu-item infinity-item hidden">
+                    <i class="sprite-fm-mono icon-admin-outline"></i>
+                    <span></span>
                 </div>
             </div>
 
@@ -460,79 +640,111 @@
 
             <div class="top-menu-divider hidden"></div>
 
+            <!-- Products -->
+            <div class="top-menu-item submenu-item">
+                <i class="sprite-fm-mono icon-features"></i>
+                <span>[$footer_heading_products]</span>
+                <i class="sprite-fm-mono icon-arrow-right right-arrow"></i>
+            </div>
+            <div class="top-submenu">
+                <div class="top-menu-item storage">[$footer_item_cloud_storage]</div>
+                <div class="top-menu-item objectstorage">[$footer_item_object_storage]</div>
+                <div class="top-menu-item vpn">[$pr_vpn_title]</div>
+                <div class="top-menu-item syncing">[$footer_item_sync]</div>
+                <div class="top-menu-item megabackup">[$ft_backup_tab]</div>
+                <div class="top-menu-item share">[$footer_item_share]</div>
+                <div class="top-menu-item media-files">[$footer_item_media_files]</div>
+                <div class="top-menu-item chatandmeetings">[$footer_item_chat_meetings]</div>
+                <div class="top-menu-item business">[$19530]</div>
+            </div>
+            <!-- Solutions -->
+            <div class="top-menu-item submenu-item">
+                <i class="sprite-fm-mono icon-lightbulb-small-regular-outline"></i>
+                <span>[$footer_heading_solutions]</span>
+                <i class="sprite-fm-mono icon-arrow-right right-arrow"></i>
+            </div>
+            <div class="top-submenu">
+                <div class="top-menu-item individuals">[$footer_item_individuals]</div>
+                <div class="top-menu-item freelancers">[$footer_item_freelancers]</div>
+                <div class="top-menu-item small-business">[$footer_item_small_business]</div>
+            </div>
+            <!-- Platforms -->
             <div class="top-menu-item submenu-item">
                 <i class="sprite-fm-mono icon-platforms"></i>
                 <span>[$23327]</span>
                 <i class="sprite-fm-mono icon-arrow-right right-arrow"></i>
             </div>
             <div class="top-submenu">
-                <div class="top-menu-item desktop">[$19639]</div>
-                <div class="top-menu-item mobile">[$19682]</div>
+                <div class="top-menu-item mobile">[$955]</div>
+                <div class="top-menu-item desktop">[$1626]</div>
                 <div class="top-menu-item extensions">[$16603]</div>
-                <div class="top-menu-item cmd">MEGA CMD</div>
-                <div class="top-menu-item bird hidden">MEGAbird</div>
-                <div class="top-menu-item nas">[$24478]</div>
+                <div class="top-menu-item cmd">[$footer_item_cmd]</div>
+                <div class="top-menu-item nas">[$footer_item_cmd_for_nas]</div>
             </div>
+            <!-- Plans -->
             <div class="top-menu-item submenu-item">
-                <i class="sprite-fm-mono icon-features"></i>
-                <span>[$23377]</span>
+                <i class="sprite-fm-mono icon-plan"></i>
+                <span>[$footer_heading_plans]</span>
                 <i class="sprite-fm-mono icon-arrow-right right-arrow"></i>
             </div>
             <div class="top-submenu">
-                <div class="top-menu-item storage">[$24401]</div>
-                <div class="top-menu-item objectstorage">[$ri_s4_tab]</div>
-                <div class="top-menu-item megabackup">[$ft_backup_tab]</div>
-                <div class="top-menu-item security">[$7337]</div>
-                <div class="top-menu-item collaboration">[$24367]</div>
-                <div class="top-menu-item securechat">[$24432]</div>
+                <div class="top-menu-item pro">[$1361]</div>
+                <div class="top-menu-item achievements">[$16117]</div>
+                <div class="top-menu-item refer">[$22682]</div>
             </div>
+            <!-- Resources -->
+            <div class="top-menu-item submenu-item">
+                <i class="sprite-fm-mono icon-developers"></i>
+                <span>[$footer_heading_resources]</span>
+                <i class="sprite-fm-mono icon-arrow-right right-arrow"></i>
+            </div>
+            <div class="top-submenu">
+                <div class="top-menu-item blog blogarticle">[$389]</div>
+                <div class="top-menu-item security">[$footer_item_security_privacy]</div>
+                <div class="top-menu-item reliability">[$23064]</div>
+                <div class="top-menu-item developers">[$392]</div>
+                <div class="top-menu-item resellers">[$391]</div>
+                <div class="top-menu-item affiliate">[$menu_item_affiliate]</div>
+            </div>
+            <!-- Help -->
+            <div class="top-menu-item submenu-item">
+                <i class="sprite-fm-mono icon-support"></i>
+                <span>[$footer_heading_help]</span>
+                <i class="sprite-fm-mono icon-arrow-right right-arrow"></i>
+            </div>
+            <div class="top-submenu">
+                <div class="top-menu-item help">[$384]</div>
+                <div class="top-menu-item contact">[$399]</div>
+                <div class="top-menu-item bug-bounty">[$footer_item_bug_bounties]</div>
+                <div class="top-menu-item support">[$383]</div>
+            </div>
+            <!-- Company -->
             <div class="top-menu-item submenu-item">
                 <i class="sprite-fm-mono icon-company"></i>
                 <span>[$23328]</span>
                 <i class="sprite-fm-mono icon-arrow-right right-arrow"></i>
             </div>
             <div class="top-submenu">
-                <div class="top-menu-item about">[$16112]</div>
-                <div class="top-menu-item pro">[$1361]</div>
-                <div class="top-menu-item affiliate">[$22682]</div>
-                <div class="top-menu-item blog blogarticle">[$389]</div>
-                <div class="top-menu-item corporate">[$24093]</div>
-                <div class="top-menu-item achievements">[$16117]</div>
+                <div class="top-menu-item about">[$396]</div>
+                <div class="top-menu-item careers">[$23063]</div>
+                <div class="top-menu-item media">[$16645]</div>
             </div>
-            <div class="top-menu-item submenu-item">
-                <i class="sprite-fm-mono icon-support"></i>
-                <span>[$383]</span>
-                <i class="sprite-fm-mono icon-arrow-right right-arrow"></i>
-            </div>
-            <div class="top-submenu">
-                <div class="top-menu-item help">[$384]</div>
-                <div class="top-menu-item contact">[$399]</div>
-                <div class="top-menu-item support">[$24616]</div>
-                <div class="top-menu-item feedback hidden">[$1356]</div>
-            </div>
-            <div class="top-menu-item submenu-item">
-                <i class="sprite-fm-mono icon-developers"></i>
-                <span>[$392]</span>
-                <i class="sprite-fm-mono icon-arrow-right right-arrow"></i>
-            </div>
-            <div class="top-submenu">
-                <div class="top-menu-item sourcecode">[$7411]</div>
-                <div class="top-menu-item sdk">[$962]</div>
-                <div class="top-menu-item doc">[$963]</div>
-            </div>
+            <!-- Legal -->
             <div class="top-menu-item submenu-item">
                 <i class="sprite-fm-mono icon-legal-policies"></i>
-                <span>[$16114]</span>
+                <span>[$518]</span>
                 <i class="sprite-fm-mono icon-arrow-right right-arrow"></i>
             </div>
             <div class="top-submenu">
                 <div class="top-menu-item terms">[$385]</div>
+                <div class="top-menu-item vpn-terms">[$footer_item_vpn_toc]</div>
                 <div class="top-menu-item privacy">[$386]</div>
                 <div class="top-menu-item copyright">[$387]</div>
                 <div class="top-menu-item takedown">[$966]</div>
                 <div class="top-menu-item transparency">[$22681]</div>
                 <div class="top-menu-item cookie">[$24629]</div>
                 <div class="top-menu-item cookies-settings">[$24644]</div>
+                <div class="top-menu-item dispute">[$footer_item_dispute]</div>
             </div>
 
             <div class="top-menu-divider"></div>
@@ -668,13 +880,13 @@
 
                     <!-- add progress/complete/error/inqueue/pause and upload/download to transfer-task-row -->
                     <div class="transfer-task-row upload sprite-fm-mono progress">
-                        <span class="transfer-filetype-icon image"></span>
+                        <span class="item-type-icon icon-image-24"></span>
                         <div class="transfer-filetype-txt">example image name loooo oooo.png</div>
                         <div class="transfer-task-status">1.3 MB/s</div>
                         <i class="sprite-fm-theme icon-loading-spinner"></i>
                         <div class="transfer-task-actions">
                             <button class="btn-icon transfer-progress-btn pause">
-                                <i class="transfer-progress-icon sprite-fm-mono simpletip pause" data-simpletip="" data-simpletipposition="top"></i>
+                                <i class="transfer-progress-icon sprite-fm-mono simpletip pause" data-simpletipoffset="5" data-simpletipposition="top" data-simpletipwrapper=".transfer-progress.tpw"></i>
                             </button>
                         </div>
                         <div class="transfer-progress-bar">

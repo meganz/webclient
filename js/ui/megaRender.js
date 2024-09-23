@@ -15,7 +15,7 @@
                         '<span class="grid-status-icon sprite-fm-mono icon-dot"></span>' +
                     '</td>' +
                     '<td megatype="fname">' +
-                        '<span class="transfer-filetype-icon"><img/></span>' +
+                        '<span class="item-type-icon"><img/></span>' +
                         '<span class="tranfer-filetype-txt"></span>' +
                     '</td>' +
                     '<td megatype="label" class="label"></td>' +
@@ -25,6 +25,9 @@
                     '<td megatype="timeMd" class="time md"></td>' +
                     '<td megatype="versions" class="hd-versions"></td>' +
                     '<td megatype="playtime" class="playtime"></td>' +
+                    '<td megatype="fileLoc" class="fileLoc">' +
+                        '<span class="grid-file-location"></span>' +
+                    '</td>' +
                     '<td megatype="extras" class="grid-url-field own-data">' +
                         '<a class="grid-url-arrow"><i class="sprite-fm-mono icon-options"></i></a>' +
                         '<span class="versioning-indicator">' +
@@ -46,7 +49,7 @@
                         '</span>' +
                         '<i class="sprite-fm-mono icon-link"></i>' +
                     '</span>' +
-                    '<span class="block-view-file-type"><img/></span>' +
+                    '<span class="item-type-icon-90"><img/></span>' +
                     '<span class="file-settings-icon"><i class="sprite-fm-mono icon-options"></i></span>' +
                     '<div class="video-thumb-details">' +
                         '<i class="sprite-fm-mono icon-play"></i>' +
@@ -61,11 +64,12 @@
             // List view mode
             '<table>' +
                 '<tr>' +
+                    '<td></td>' +
                     '<td>' +
-                        '<span class="grid-status-icon sprite-fm-mono icon-dot"></span>' +
-                    '</td>' +
-                    '<td>' +
-                        '<div class="shared-folder-icon"></div>' +
+                        '<div ' +
+                            'class="item-type-icon-90 icon-folder-incoming-90 sprite-fm-uni-after icon-warning-after"' +
+                        '>' +
+                        '</div>' +
                         '<div class="shared-folder-info-block">' +
                             '<div class="shared-folder-name"></div>' +
                             '<div class="shared-folder-info"></div>' +
@@ -74,9 +78,8 @@
                     '<td>' +
                         '<div class="fm-chat-user-info todo-star ustatus">' +
                             '<div class="todo-fm-chat-user-star"></div>' +
-                            '<div class="fm-chat-user"></div>' +
-                            '<div class="nw-contact-status"></div>' +
-                            '<div class="fm-chat-user-status"></div>' +
+                            '<div class="fm-chat-user"><span></span><div class="nw-contact-status"></div></div>' +
+                            '<div class="fm-user-verification"><span></span></div>' +
                             '<div class="clear"></div>' +
                         '</div>' +
                     '</td>' +
@@ -100,7 +103,7 @@
                        '<span class="file-status-icon indicator sprite-fm-mono"></span>' +
                        '<span class="shared-folder-access indicator sprite-fm-mono"></span>' +
                     '</span>' +
-                    '<span class="block-view-file-type"></span>' +
+                    '<span class="item-type-icon-90 icon-folder-incoming-90"></span>' +
                     '<span class="file-settings-icon"><i class="sprite-fm-mono icon-options"></i></span>' +
                     '<div class="video-thumb-details">' +
                         '<i class="sprite-fm-mono icon-play"></i>' +
@@ -110,6 +113,7 @@
                 '<span class="shared-folder-info-block">' +
                     '<span class="shared-folder-name"></span>' +
                     '<span class="shared-folder-info"></span>' +
+                    '<div class="fm-user-verification"><span></span></div>' +
                 '</span>' +
             '</a>'
         ],
@@ -118,11 +122,11 @@
             // List view mode
             '<table>' +
                 '<tr>' +
-                    '<td width="30">' +
+                    '<td width="50">' +
                         '<span class="grid-status-icon sprite-fm-mono icon-dot"></span>' +
                     '</td>' +
                     '<td>' +
-                        '<div class="shared-folder-icon medium-file-icon folder-shared"></div>' +
+                        '<div class="item-type-icon-90 icon-folder-outgoing-90"></div>' +
                         '<div class="shared-folder-info-block">' +
                             '<div class="shared-folder-name"></div>' +
                             '<div class="shared-folder-info"></div>' +
@@ -153,7 +157,7 @@
                     '<span class="data-block-indicators">' +
                        '<span class="file-status-icon indicator sprite-fm-mono"></span>' +
                     '</span>' +
-                    '<span class="block-view-file-type"></span>' +
+                    '<span class="item-type-icon-90 icon-folder-outgoing-90"></span>' +
                     '<span class="file-settings-icon"><i class="sprite-fm-mono icon-options"></i></span>' +
                     '<div class="video-thumb-details">' +
                         '<i class="sprite-fm-mono icon-play"></i>' +
@@ -176,7 +180,7 @@
                         '<span class="grid-status-icon sprite-fm-mono icon-dot"></span>' +
                     '</td>' +
                     '<td megatype="fname">' +
-                        '<span class="transfer-filetype-icon"><img/></span>' +
+                        '<span class="item-type-icon"><img/></span>' +
                         '<span class="tranfer-filetype-txt"></span>' +
                     '</td>' +
                     '<td megatype="label" class="label"></td>' +
@@ -186,6 +190,9 @@
                     '<td megatype="timeMd" class="time md"></td>' +
                     '<td megatype="versions" class="hd-versions"></td>' +
                     '<td megatype="playtime" class="playtime"></td>' +
+                    '<td megatype="fileLoc" class="fileLoc">' +
+                        '<span class="grid-file-location"></span>' +
+                    '</td>' +
                     '<td megatype="extras" class="grid-url-field own-data">' +
                         '<a class="grid-url-arrow"><i class="sprite-fm-mono icon-options"></i></a>' +
                         '<span class="versioning-indicator">' +
@@ -210,7 +217,7 @@
                         '</span>' +
                         '<i class="sprite-fm-mono icon-link"></i>' +
                     '</span>' +
-                    '<span class="block-view-file-type"><img/></span>' +
+                    '<span class="item-type-icon-90"><img/></span>' +
                     '<span class="file-settings-icon"><i class="sprite-fm-mono icon-options"></i></span>' +
                     '<div class="video-thumb-details">' +
                         '<i class="sprite-fm-mono icon-play"></i>' +
@@ -219,6 +226,24 @@
                 '</span>' +
                 '<span class="file-block-title"></span>' +
             '</a>'
+        ],
+
+        'subtitles': [
+            // List view mode
+            '<table>' +
+                '<tr>' +
+                    '<td class="space-maintainer-start"></td>' +
+                    '<td megatype="fname">' +
+                        '<span class="item-type-icon"><img/></span>' +
+                        '<span class="tranfer-filetype-txt"></span>' +
+                    '</td>' +
+                    '<td megatype="size" class="size"></td>' +
+                    '<td megatype="timeAd" class="time ad"></td>' +
+                    '<td megatype="location" class="location">' +
+                        '<span class="simpletip simpletip-breadcrumb block w-full text-ellipsis"></span>' +
+                    '</td>' +
+                '</tr>' +
+            '</table>'
         ]
     };
 
@@ -238,6 +263,9 @@
         'file-requests': [
             '.grid-table.fm',
             '.fm-blocks-view.fm .file-block-scrolling',
+        ],
+        'subtitles': [
+            '.mega-dialog .grid-table'
         ]
     };
 
@@ -283,18 +311,6 @@
         }
     });
 
-    // Creates a new frozen object
-    var freeze = function(obj) {
-        var tmp = Object.create(null);
-
-        Object.keys(obj)
-            .forEach(function(name) {
-                tmp[name] = obj[name];
-            });
-
-        return Object.freeze(tmp);
-    };
-
     // Define object properties
     var define = function(target, property, value) {
         Object.defineProperty(target, property, {
@@ -313,7 +329,6 @@
         var location = 'default';
 
         if (M.currentdirid === 'shares') {
-
             section = 'shares';
         }
         else if (M.currentdirid === 'out-shares') {
@@ -321,6 +336,12 @@
         }
         else if (M.currentrootid === 'file-requests') {
             section = 'file-requests';
+        }
+        else if (typeof aViewMode === 'string') {
+            section = aViewMode;
+
+            // For now, only lists are landing here, no need to set to 1
+            aViewMode = 0;
         }
         if (section === 'cloud-drive') {
 
@@ -404,7 +425,7 @@
 
                 sharedFolderUI();
 
-                $('.grid-table tbody tr').remove();
+                $('.grid-table tbody tr').not('.conversationsApp .grid-table tbody tr').remove();
                 $('.file-block-scrolling a').remove();
                 $('.shared-blocks-scrolling a').remove();
                 $('.out-shared-blocks-scrolling a').remove();
@@ -433,7 +454,9 @@
                     $('.fm-empty-trashbin').removeClass('hidden');
                     $('.fm-clearbin-button').addClass('hidden');
                 }
-                else if (String(M.currentdirid).substr(0, 7) === 'search/') {
+                else if (String(M.currentdirid).substr(0, 7) === 'search/'
+                        || mega.ui.mNodeFilter.selectedFilters
+                        && M.currentrootid !== 'shares') {
                     $('.fm-empty-search').removeClass('hidden');
                 }
                 else if (M.currentdirid === M.RootID && folderlink) {
@@ -492,7 +515,7 @@
                         M.emptySharefolderUI(aListSelector);
                     }
                 }
-                else if (M.currentCustomView.type === 'gallery') {
+                else if (M.isGalleryPage()) {
                     const pagetype = M.currentdirid === M.currentCustomView.nodeID ? M.currentdirid : 'discovery';
 
                     $(`.fm-empty-${pagetype}`).removeClass('hidden');
@@ -720,6 +743,10 @@
                 const node = this.nodeMap[aHandle];
                 delete this.nodeMap[aHandle];
 
+                if (this.unverifiedShare && node.classList.contains('unverified-share')) {
+                    this.unverifiedShare--;
+                }
+
                 if (aRemove) {
                     node.remove();
                 }
@@ -849,12 +876,18 @@
             '*': function(aNode, aHandle, aExtendedInfo) {
                 const props = {classNames: []};
                 const share = M.getNodeShare(aNode);
+                let itemIcon = fileIcon(aNode);
 
                 if (aNode.su) {
                     props.classNames.push('inbound-share');
                 }
 
-                if (aNode.t) {
+                if (aNode.s4 && M.getS4NodeType(aNode) === 'bucket') {
+                    props.type = l.s4_bucket_type;
+                    props.classNames.push('folder');
+                    props.size = bytesToSize(aNode.tb || 0);
+                }
+                else if (aNode.t) {
                     props.type = l[1049];
                     props.classNames.push('folder');
                     props.size = bytesToSize(aNode.tb || 0);
@@ -871,10 +904,9 @@
                 }
 
                 props.name = aNode.name;
-                props.icon = fileIcon(aNode);
 
                 if (missingkeys[aHandle] || share.down) {
-                    props.icon = 'generic';
+                    itemIcon = aNode.t ? 'folder' : 'generic';
                     props.type = l[7381];// i.e. 'unknown'
 
                     props.tooltip = [];
@@ -890,17 +922,19 @@
                     if (missingkeys[aHandle]) {
                         props.undecryptable = true;
                         props.classNames.push('undecryptable');
+                        props.name = aNode.t ? l[8686] : l[8687];
+                        props.tooltip.push(M.getUndecryptedLabel(aNode));
 
-                        if (aNode.t) {
-                            props.name = l[8686];// i.e. 'undecrypted folder'
-                            props.tooltip.push(l[8595]);
-                        }
-                        else {
-                            props.name = l[8687];// i.e. 'undecrypted file'
-                            props.tooltip.push(l[8602]);
+                        if (self.nullkeys && self.nullkeys[aHandle]) {
+                            props.classNames.push('undecryptable-zk');
                         }
                     }
+
+                    props.inv411d = 1;
                 }
+
+                props.icon = `icon-${itemIcon}-24`;
+                props.blockIcon = `icon-${itemIcon}-90`;
 
                 if (aExtendedInfo !== false) {
 
@@ -928,6 +962,16 @@
                         props.classNames.push(colourLabel);
                         props.labelC = this.labelsColors[colourLabel];
                     }
+                }
+                if (aNode.su) {
+                    props.parentName = l[5542];
+                }
+                else if (aNode.p === M.RubbishID) {
+                    props.parentName = l[167];
+                }
+                else {
+                    const pHandle = M.getNodeByHandle(aNode.p);
+                    props.parentName = M.getNameByHandle(pHandle);
                 }
 
                 return props;
@@ -1015,6 +1059,7 @@
                     }
                 }
 
+                props.icon = fileIcon(aNode);
                 props.userNames = props.userNames.sort();
                 props.lastSharedAt = time2date(props.lastSharedAt);
                 props.folderSize = bytesToSize(aNode.tb + (aNode.tvb || 0));
@@ -1059,7 +1104,7 @@
                 const isBackup = this.location === 'backups'
                     || this.location === 'mixed-content' && M.getNodeRoot(aNode.h) === M.InboxID;
 
-                if (aNode.fav && !folderlink && this.location !== 'trashcan') {
+                if (aNode.fav && !folderlink && this.location !== 'trashcan' && M.currentrootid !== 'shares') {
                     elm = aTemplate.querySelector(this.viewmode ? '.file-status-icon' : '.grid-status-icon');
                     elm.classList.add('icon-favourite-filled');
                     elm.classList.remove('icon-dot');
@@ -1073,7 +1118,7 @@
                     }
                 }
 
-                if (!aNode.t && aNode.tvf && !isBackup) {
+                if (!aNode.t && aNode.tvf) {
                     aTemplate.classList.add('versioning');
                     var vTemplate = aTemplate.querySelector('.hd-versions');
                     if (vTemplate) {
@@ -1081,7 +1126,13 @@
                     }
                 }
 
-                if (this.viewmode || String(aProperties.name).length > 78 || aProperties.playtime !== undefined) {
+                if (aNode.vhl) {
+                    aTemplate.classList.add(`highlight${aNode.vhl}`);
+                }
+
+                if (!aProperties.inv411d
+                    && (this.viewmode || String(aProperties.name).length > 78 || aProperties.playtime !== undefined)) {
+
                     if (aProperties.width) {
                         title.push(aProperties.width + 'x' + aProperties.height + ' @' + aProperties.fps + 'fps');
                     }
@@ -1098,11 +1149,9 @@
                 title = title.join(' ');
 
                 if (this.viewmode) {
-                    tmp = aTemplate.querySelector('.block-view-file-type');
+                    tmp = aTemplate.querySelector('.item-type-icon-90');
 
-                    if (aProperties.icon) {
-                        tmp.classList.add(aProperties.icon);
-                    }
+                    tmp.classList.add(aProperties.blockIcon);
 
                     if (aProperties.playtime !== undefined) {
                         aTemplate.querySelector('.data-block-bg').classList.add('video');
@@ -1129,6 +1178,7 @@
                     aTemplate.querySelector('.type').textContent = aProperties.type;
                     aTemplate.querySelector('.time').textContent = aProperties.time;
                     aTemplate.querySelector('.time.md').textContent = aProperties.mTime;
+                    aTemplate.querySelector('.fileLoc span').textContent = aProperties.parentName;
                     aTemplate.querySelector('.label').textContent = aProperties.labelC || '';
 
                     tmp = aTemplate.querySelector('.tranfer-filetype-txt');
@@ -1137,7 +1187,12 @@
                         tmp.setAttribute('title', title);
                     }
 
-                    tmp = aTemplate.querySelector('.transfer-filetype-icon');
+                    tmp = aTemplate.querySelector('.item-type-icon');
+
+                    // Public URL Access for S4 Bucket or Object
+                    if (M.currentrootid === 's4' && s4.ui) {
+                        aTemplate = s4.ui.updateNodePublicAccess(aNode, aTemplate);
+                    }
 
                     if (aProperties.icon) {
                         tmp.classList.add(aProperties.icon);
@@ -1177,20 +1232,6 @@
                 return aTemplate;
             },
             'shares': function(aNode, aProperties, aTemplate) {
-
-                let elm;
-
-                if (!this.viewmode) {
-                    elm = aTemplate.querySelector(this.viewmode ? '.file-status-icon' : '.grid-status-icon');
-                    elm.classList.add(aProperties.accessRightsClass);
-                }
-
-                if (aNode.fav && !folderlink) {
-                    elm = elm || aTemplate.querySelector(this.viewmode ? '.file-status-icon' : '.grid-status-icon');
-                    elm.classList.add('icon-favourite-filled');
-                    elm.classList.remove('icon-dot');
-                }
-
                 aTemplate.querySelector('.shared-folder-name').textContent = aProperties.name;
 
                 var tmp = aTemplate.querySelector('.shared-folder-access');
@@ -1204,9 +1245,7 @@
 
                 if (this.viewmode) {
 
-                    if (aProperties.icon) {
-                        aTemplate.querySelector('.block-view-file-type').classList.add(aProperties.icon);
-                    }
+                    aTemplate.querySelector('.item-type-icon-90').classList.add(aProperties.blockIcon);
                     tmp.classList.add(aProperties.accessRightsIcon);
 
                     aTemplate.querySelector('.shared-folder-info')
@@ -1227,13 +1266,7 @@
                         tmp.classList.add(aProperties.onlineStatus[1]);
                     }
 
-                    tmp = aTemplate.querySelector('.fm-chat-user-status');
-                    tmp.classList.add(aProperties.userHandle);
-                    if (aProperties.onlineStatus) {
-                        tmp.textContent = aProperties.onlineStatus[0];
-                    }
-
-                    aTemplate.querySelector('.fm-chat-user').textContent = aProperties.userName;
+                    aTemplate.querySelector('.fm-chat-user span').textContent = aProperties.userName;
                     aTemplate.querySelector('.shared-folder-info').textContent = aProperties.shareInfo;
                     aTemplate.querySelector('.shared-folder-size').textContent = aProperties.folderSize;
 
@@ -1241,6 +1274,24 @@
                         aTemplate.setAttribute('title', aProperties.name);
                     }
 
+                }
+
+                const contactVerification = mega.keyMgr.getWarningValue('cv') | 0;
+                tmp = aTemplate.querySelector('.fm-user-verification span');
+
+                if (contactVerification) {
+                    const ed = aNode.su && authring.getContactAuthenticated(aNode.su, 'Ed25519');
+
+                    if (!(ed && ed.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON)) {
+                        aTemplate.classList.add('unverified-share');
+                        this.unverifiedShare = (this.unverifiedShare || 0) + 1;
+                        tmp.textContent = l.verify_credentials;
+                    }
+
+                    aTemplate.classList.add('cv-on');
+                }
+                else {
+                    aTemplate.classList.remove('cv-on');
                 }
 
                 return aTemplate;
@@ -1263,6 +1314,8 @@
                 aTemplate.querySelector('.shared-folder-name').textContent = aProperties.name;
 
                 if (this.viewmode) {
+                    elm = aTemplate.querySelector('.item-type-icon-90');
+
                     if (aProperties.avatars) {
 
                         var avatarElement;
@@ -1288,9 +1341,8 @@
 
                     }
 
-
-                    if (aProperties.icon) {
-                        aTemplate.querySelector('.block-view-file-type').classList.add(aProperties.icon);
+                    if (aProperties.blockIcon) {
+                        aTemplate.querySelector('.item-type-icon-90').classList.add(aProperties.blockIcon);
                     }
 
                     if (String(aProperties.name).length > 20) {
@@ -1324,6 +1376,10 @@
                     if (String(aProperties.name).length > 78) {
                         aTemplate.setAttribute('title', aProperties.name);
                     }
+
+                    if (aProperties.icon) {
+                        aTemplate.querySelector('.item-type-icon-90').classList.add(aProperties.icon);
+                    }
                 }
 
                 return aTemplate;
@@ -1331,18 +1387,58 @@
             'file-requests': function(aNode, aProperties, aTemplate) {
                 const renderTemplate = this.builders['cloud-drive'].call(this, aNode, aProperties, aTemplate);
 
-                if (aNode.t && mega.fileRequestCommon.storage.isPresent(aNode.h)) {
-                    const manageIcon = renderTemplate
-                        .querySelector('.grid-file-request-manage');
+                if (aNode.t && mega.fileRequest.publicFolderExists(aNode.h)) {
+                    const manageIcon = renderTemplate.querySelector('.grid-file-request-manage');
 
                     if (manageIcon) {
-                        manageIcon
-                            .classList
-                            .remove('hidden');
+                        manageIcon.classList.remove('hidden');
                     }
                 }
 
                 return renderTemplate;
+            },
+            'subtitles': function(aNode, aProperties, aTemplate) {
+                let tmp;
+                let title = [];
+
+                if (String(aProperties.name).length > 78) {
+                    if (aProperties.width) {
+                        title.push(`${aProperties.width}x${aProperties.height} @${aProperties.fps}fps`);
+                    }
+                    if (aProperties.codecs) {
+                        title.push(aProperties.codecs);
+                    }
+                    if (aNode.s) {
+                        title.push(bytesToSize(aNode.s, 0));
+                    }
+                    if (aProperties.name) {
+                        title.push(aProperties.name);
+                    }
+                }
+                title = title.join(' ');
+
+                if (aProperties.size !== undefined) {
+                    aTemplate.querySelector('.size').textContent = aProperties.size;
+                }
+                aTemplate.querySelector('.time').textContent = aProperties.time;
+                aTemplate.querySelector('.location span').textContent =
+                    aNode.p === M.RootID ? l[164] : M.d[aNode.p].name;
+
+                tmp = aTemplate.querySelector('.tranfer-filetype-txt');
+                tmp.textContent = aProperties.name;
+                if (title) {
+                    tmp.setAttribute('title', title);
+                }
+
+                tmp = aTemplate.querySelector('.item-type-icon');
+
+                if (aProperties.icon) {
+                    tmp.classList.add(aProperties.icon);
+                }
+
+                this.addClasses(tmp, aProperties.classNames);
+
+                return aTemplate;
             }
         }),
 
@@ -1411,7 +1507,7 @@
                                 M.rmSetupUIDelayed(911);
                             },
                             'perfectScrollOptions': {
-                                'handlers': ['click-rail', 'drag-scrollbar', 'wheel', 'touch'],
+                                'handlers': ['click-rail', 'drag-thumb', 'wheel', 'touch'],
                                 'minScrollbarLength': 20
                             },
                         };

@@ -114,10 +114,6 @@
         width: 100%;
     }
 
-    .mega-button.action {
-        padding: 4px var(--outer-padding);
-    }
-
     .mega-button.icon {
         height: var(--height);
         min-width: var(--height);
@@ -158,6 +154,12 @@
 
     /* text */
     /* spans within spans should not be formatted to allow concatenation of translations */
+
+        .selectable-txt .mega-button,
+        .selectable-txt .mega-button > * {
+            user-select: none !important;
+            -webkit-user-select: none !important;
+        }
 
         .mega-button > span {
             display: inline-flex;
@@ -289,6 +291,13 @@
         text-overflow: ellipsis;
         min-width: 0;
         overflow: hidden;
+        -webkit-margin-end: 16px;
+        margin-inline-end: 16px;
+        padding: 4px var(--outer-padding);
+    }
+
+    .mega-button.pl-0 {
+        padding-left: 0;
     }
 
     /* branded colours */

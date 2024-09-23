@@ -20,7 +20,6 @@ function BusinessAccount() {
 BusinessAccount.prototype.addSubAccount = function (subEmail, subFName, subLName, optionals, isProtectLink) {
     "use strict";
     var operationPromise = new MegaPromise();
-    var mySelf = this;
 
     if (!isValidEmail(subEmail)) {
         // promise reject/resolve will return: success,errorCode,errorDesc
@@ -155,27 +154,23 @@ BusinessAccount.prototype.editSubAccount =
         request.lp = 1;
     }
 
-        api_req(
-            request,
-            {
-                callback: function(res) {
-                    if ($.isNumeric(res)) {
-                        operationPromise.reject(0, res, 'API returned error');
-                    }
-                    else if (typeof res === 'string') {
-                        operationPromise.resolve(1, null, request); // user edit succeeded
-                    }
-                    else if (typeof res === 'object') {
-                        operationPromise.resolve(1, res, request); // user edit involved email change
-                    }
-                    else {
-                        operationPromise.reject(0, 4, 'API returned error, ret=' + res);
-                        if (d) {
-                            console.error('API returned error, ret=' + res);
-                        }
-                    }
-                }
+        api.screq(request)
+            .then(({result}) => {
+                const type = typeof result;
+                assert(type === 'string' || type === 'object', `Unexpected response ${type}:${result}`);
 
+                if (type === 'string') {
+                    operationPromise.resolve(1, null, request); // user edit succeeded
+                }
+                else {
+                    operationPromise.resolve(1, result, request); // user edit involved email change
+                }
+            })
+            .catch((ex) => {
+                if (d) {
+                    console.error('upsub failed', ex);
+                }
+                operationPromise.reject(0, parseInt(ex) || 4, `API returned error, ${ex}`);
             });
 
     return operationPromise;
@@ -265,42 +260,138 @@ BusinessAccount.prototype.activateSubAccount = function (subUserHandle) {
 };
 
 /**
+ * Get Shared Key
+ * @param {String} myPrivate    Private Cu25519 (me)
+ * @param {String} theirPublic  Public Cu25519 (them)
+ * @param {String} data         Data payload
+ */
+BusinessAccount.prototype.getSharedKey = function(myPrivate, theirPublic, data) {
+    'use strict';
+
+    if (!theirPublic || !myPrivate) {
+        console.error('Fatal: trying to get shared key without prior verification. Not expected reach');
+        return false;
+    }
+
+    const prvCuBytes = asmCrypto.string_to_bytes(myPrivate);
+    const pubCuBytes = asmCrypto.string_to_bytes(theirPublic);
+    const sharedSecret = nacl.scalarMult(prvCuBytes, pubCuBytes);
+
+    //// now let's calculate the cryptographic hash
+    //// Hashing an empty data with shared secret as a key is sufficient.
+    //// In chat context, they used a static data and a hashed secret.
+    //// I will use dynamic data, which will harden the challenge, and I will inherit the repeated hash approach.
+    const hashBytes = asmCrypto.HMAC_SHA256.bytes(data, asmCrypto.HMAC_SHA256.bytes(sharedSecret, ''));
+
+    // convert to string to take the first 16 characters as the key.
+    // we cant do that on bytes.
+    const keyString = asmCrypto.bytes_to_string(hashBytes).substring(0, 16);
+
+    return asmCrypto.string_to_bytes(keyString);
+};
+
+BusinessAccount.prototype.encryptKey = function() {
+    'use strict';
+
+    if (!u_attr || !u_attr.b || u_attr.b.m || !u_attr.b.mu[0]) {
+        throw new SecurityError('Trying to encrypt key in an invalid account state.');
+    }
+
+    if (!pubCu25519[u_attr.b.mu[0]]) {
+        throw new SecurityError('Trying to encrypt key without prior or invalid verification.');
+    }
+
+    if (!u_attr.prCu255) {
+        throw new SecurityError('Trying to encrypt key without having the Cu25519 private key available.');
+    }
+
+    const msgString = a32_to_str(u_k);
+    const msgBytes = asmCrypto.string_to_bytes(msgString);
+
+    const cryptoHash = this.getSharedKey(u_attr.prCu255, pubCu25519[u_attr.b.mu[0]], u_handle);
+
+    const EncMsg = asmCrypto.AES_ECB.encrypt(msgBytes, cryptoHash, false);
+
+    return asmCrypto.bytes_to_string(EncMsg);
+};
+
+
+/**
+ * Decrypt the mk for the sub-user using k2
+ * @param {String} key          The mk (k2) after b64 decode
+ * @param {any} userHandle      subuser's handle
+ */
+BusinessAccount.prototype.decryptKey = function(key, userHandle) {
+    'use strict';
+
+    if (!u_attr || !u_attr.b || !u_attr.b.m || !key || !userHandle) {
+        console.error('Error: trying to decrypt key in an invalid case');
+        return false;
+    }
+    if (!pubCu25519[userHandle]) {
+        console.error('Fatal: trying to decrypt key without prior verification. Not expected reach');
+        return false;
+    }
+
+    const msgBytes = asmCrypto.string_to_bytes(key);
+    const cryptoHash = (this || mega.buinsessController)
+        .getSharedKey(u_attr.prCu255, pubCu25519[userHandle], userHandle);
+    const decMsg = asmCrypto.AES_ECB.decrypt(msgBytes, cryptoHash, false);
+
+    return asmCrypto.bytes_to_string(decMsg);
+
+};
+
+/**
+ * Function that send the master-key of the sub-user to Master
+ * Encrypted using Ed25519
+ * @returns {Promise}               Operation result
+ */
+BusinessAccount.prototype.sendSubMKey = async function() {
+    'use strict';
+
+    if (!u_attr || !u_attr.b || u_attr.b.m || !u_attr.b.mu[0]) {
+        throw new SecurityError('Invalid business attributes.');
+    }
+
+    const encryptedMKey = this.encryptKey();
+    assert(encryptedMKey && encryptedMKey.length, 'Encrypting submaster-k failed');
+
+    const b64Encoded = base64urlencode(encryptedMKey);
+    assert(b64Encoded && b64Encoded.length, 'Encoding submaster-k failed');
+
+    const request = {
+        "a": "up",          // update attributes
+        "mk2": b64Encoded   // master-key encrypted
+    };
+
+    return api.screq(request)
+        .then(({result}) => {
+            assert(typeof result === 'string', `Invalid API Response...${result}`);
+
+            return mega.attr.remove('gmk', -2, 0).catch(reportError);
+        });
+};
+
+/**
  * Function to get the master key of a sub user in business account
  * @param {String} subUserHandle    sub user handle to get the master key of
  * @returns {Promise}               Resolves operation result
  */
-BusinessAccount.prototype.getSubAccountMKey = function (subUserHandle) {
+BusinessAccount.prototype.getSubAccountMKey = async function(subUserHandle) {
     "use strict";
-    var operationPromise = new MegaPromise();
-    if (!subUserHandle || subUserHandle.length !== 11) {
-        return operationPromise.reject(0, 5, 'invalid U_HANDLE');
-    }
-    if (!M.suba[subUserHandle]) {
-        return operationPromise.reject(0, 7, 'u_handle is not a sub-user');
-    }
+    assert(subUserHandle && subUserHandle.length === 11 && M.suba[subUserHandle], `Invalid handle, ${subUserHandle}`);
 
     var request = {
         "a": "sbu", // business sub account operation
         "aa": "k", // get master-key operation
         "u": subUserHandle // user handle to get key of
     };
+    const {result} = await api.req(request);
 
-    api_req(request, {
-        callback: function (res) {
-            if ($.isNumeric(res)) {
-                operationPromise.reject(0, res, 'API returned error');
-            }
-            else if (typeof res === 'object') {
-                operationPromise.resolve(1, res); // sub-user master-key
-            }
-            else {
-                operationPromise.reject(0, 4, 'API returned error, ret=' + res);
-            }
-        }
+    assert(typeof result === 'object' && 'k' in result, `Unexpected 'sub' response, ${result}`);
 
-    });
-
-    return operationPromise;
+    return result;
 };
 
 /**
@@ -437,6 +528,11 @@ BusinessAccount.prototype.getQuotaUsageReport = function (forceUpdate, fromToDat
                 for (var repDay in res) {
                     mega.buinsessAccount.quotaReport[repDay] = res[repDay];
                 }
+                if (Array.isArray(res) && res.length === 0) {
+                    // Empty result still needs to create an entry if missing to show the graph.
+                    mega.buinsessAccount.quotaReport[ctx.context.dates.fromDate] =
+                        mega.buinsessAccount.quotaReport[ctx.context.dates.fromDate] || Object.create(null);
+                }
 
                 var orderedDates = Object.keys(mega.buinsessAccount.quotaReport);
                 orderedDates.sort();
@@ -513,7 +609,8 @@ BusinessAccount.prototype.getQuotaUsage = function (forceUpdate) {
 
     var request = {
         "a": "sbu", // business sub account operation
-        "aa": "q" // get quota info
+        "aa": "q", // get quota info
+        ps: 1, // Split links and shares data.
     };
 
     api_req(request, {
@@ -593,9 +690,6 @@ BusinessAccount.prototype.parseSUBA = function (suba, ignoreDB, fireUIEvent) {
 BusinessAccount.prototype.isBusinessMasterAcc = function () {
     "use strict";
     if ((u_attr && u_attr.b && u_attr.b.m) || (M.suba && M.suba.length)) {
-        if (u_attr.b.s === -1) { // expired
-            return false;
-        }
         return true;
     }
     return false;
@@ -686,24 +780,18 @@ BusinessAccount.prototype.getSignupCodeInfo = function (signupCode) {
 
 /**
  * copying the sub-user decrypted tree to master user root
- * @param {Array} treeObj               sub-user tree decrypted
+ * @param {Array} tree               sub-user tree decrypted
  * @param {String} folderName           name of the folder to create in master's root
  * @param {Function} progressCallback   optional callback function for progress reporting
  * @returns {Promise}                   resolves if operation succeeded
  */
-BusinessAccount.prototype.copySubUserTreeToMasterRoot = function (treeObj, folderName, progressCallback) {
+BusinessAccount.prototype.copySubUserTreeToMasterRoot = async function(tree, folderName, progressCallback) {
     "use strict";
-    var operationPromise = new MegaPromise();
+    const createAttribute = tryCatch((n, nn) => ab_to_base64(crypto_makeattr(n, nn)));
 
-    if (!treeObj || !treeObj.length) {
-        return operationPromise.reject(0, 10, 'sub-user tree is empty or invalid');
-    }
-    if (!folderName) {
-        return operationPromise.reject(0, 12, 'folder name is not valid');
-    }
-    if (!M.RootID) {
-        return operationPromise.reject(0, 11, 'Master user root could not be found');
-    }
+    assert(tree && tree.length, 'sub-user tree is empty or invalid');
+    assert(folderName && folderName.length > 3, 'folder name is not valid');
+    assert(M.RootID, 'Master user root could not be found');
 
     var fNode = { name: folderName };
     var attr = ab_to_base64(crypto_makeattr(fNode));
@@ -726,134 +814,77 @@ BusinessAccount.prototype.copySubUserTreeToMasterRoot = function (treeObj, folde
     if (progressCallback) {
         progressCallback(33);
     }
+    const {handle, packet: {scnodes}} = await api.screq({a: 'p', t: M.RootID, n: foldersToCreate});
 
-    var request = {
-        "a": "p",
-        "t": M.RootID,
-        "n": foldersToCreate,
-        "i": requesti
-    };
+    if (progressCallback) {
+        progressCallback(42);
+    }
 
-    // since cloud root cant be shared, no need to do below check
+    var treeToCopy = [];
+    var opSize = 0;
+    var rootParentsMap = Object.create(null);
+    var copyHeads = Object.create(null);
 
-    // var sn = M.getShareNodesSync(M.RootID);
-    // if (sn.length) {
-    //    request.cr = crypto_makecr([fNode], sn, false);
-    //    request.cr[1][0] = 'xxxxxxxx';
-    // }
+    for (let h = 0; h < tree.length; h++) {
+        const originalNode = tree[h];
 
-    api_req(request, {
-        callback: function subUserFolderCreateApiResultHandler(res) {
-            if (progressCallback) {
-                progressCallback(38);
+        if (originalNode.t > 1) {
+            if (originalNode.t === 4) { // rubbish
+                rootParentsMap[originalNode.h] = scnodes[2].h;
             }
-
-            if (res && typeof res === 'object') {
-                if (!res.f || !res.f.length || res.f.length !== 3) {
-                    return operationPromise.reject(0, res, 'Empty returned created folders Node');
-                }
-
-                for (var ix = 0; ix < 3; ix++) {
-                    var n = res.f[ix];
-
-                    if (!n || typeof n !== 'object' || typeof n.h !== 'string' || n.h.length !== 8) {
-                        return operationPromise.reject(0, res, 'Empty returned Node');
-                    }
-                    M.addNode(n);
-                    ufsc.addNode(n);
-                }
-
-                if (progressCallback) {
-                    progressCallback(42);
-                }
-
-                var copyPromise = new MegaPromise();
-                var treeToCopy = [];
-                var opSize = 0;
-                var rootParentsMap = Object.create(null);
-                var copyHeads = Object.create(null);
-
-                for (var h = 0; h < treeObj.length; h++) {
-                    var originalNode = treeObj[h];
-
-                    if (originalNode.t > 1) {
-                        if (originalNode.t === 4) { // rubbish
-                            rootParentsMap[originalNode.h] = res.f[2].h;
-                        }
-                        else { // cloud (originalNode.t === 2) or anything else
-                            rootParentsMap[originalNode.h] = res.f[1].h;
-                        }
-                        continue;
-                    }
-
-                    var newNode = {};
-
-                    if (!originalNode.t) {
-                        newNode.k = originalNode.k;
-                        opSize += originalNode.s || 0;
-                    }
-
-                    newNode.a = ab_to_base64(crypto_makeattr(originalNode, newNode));
-                    newNode.h = originalNode.h;
-                    newNode.p = originalNode.p;
-                    newNode.t = originalNode.t;
-                    // if (newNode.p === treeObj[0].h) {
-                    //    delete newNode.p;
-                    // }
-                    if (rootParentsMap[newNode.p]) {
-                        newNode.newTarget = rootParentsMap[newNode.p];
-                        delete newNode.p;
-                        copyHeads[newNode.h] = newNode.newTarget;
-                    }
-                    else {
-                        if (copyHeads[newNode.p]) {
-                            newNode.newTarget = copyHeads[newNode.p];
-                            copyHeads[newNode.h] = newNode.newTarget;
-                        }
-                    }
-
-                    treeToCopy.push(newNode);
-                    if (progressCallback) {
-                        progressCallback(42 + Math.floor((50 / treeObj.length) * (h + 1)));
-                    }
-                }
-                treeToCopy.opSize = opSize;
-
-
-
-
-                M.copyNodes(treeToCopy, n.h, false, copyPromise, treeToCopy, true);
-                // treeObj.shift();
-                // M.copyNodes(treeObj, n.h, false, copyPromise, treeObj);
-
-                copyPromise.fail(function (err) {
-                    operationPromise.reject(0, err, 'copying failed');
-                });
-
-                copyPromise.done(function (results) {
-                    if (progressCallback) {
-                        progressCallback(96);
-                    }
-                    operationPromise.resolve(1, results);
-                });
+            else { // cloud (originalNode.t === 2) or anything else
+                rootParentsMap[originalNode.h] = scnodes[1].h;
             }
-            else {
-                operationPromise.reject(0, res, 'API returned error');
-            }
+            continue;
         }
-    });
 
-    return operationPromise;
+        const newNode = {};
+
+        if (!originalNode.t) {
+            newNode.k = originalNode.k;
+            opSize += originalNode.s || 0;
+        }
+
+        if (!(newNode.a = createAttribute(originalNode, newNode))) {
+
+            console.warn(`Failed to create attribute for node ${originalNode.h}, ignoring...`);
+            continue;
+        }
+        newNode.h = originalNode.h;
+        newNode.p = originalNode.p;
+        newNode.t = originalNode.t;
+
+        if (rootParentsMap[newNode.p]) {
+            newNode.newTarget = rootParentsMap[newNode.p];
+            delete newNode.p;
+            copyHeads[newNode.h] = newNode.newTarget;
+        }
+        else if (copyHeads[newNode.p]) {
+            newNode.newTarget = copyHeads[newNode.p];
+            copyHeads[newNode.h] = newNode.newTarget;
+        }
+
+        treeToCopy.push(newNode);
+        if (progressCallback) {
+            progressCallback(42 + Math.floor(50 / tree.length * (h + 1)));
+        }
+    }
+    treeToCopy.opSize = opSize;
+
+    await M.copyNodes(treeToCopy, handle, false, treeToCopy);
+
+    return M.getNodeByHandle(handle);
 };
 
 
 /**
  * decrypt the sub-user tree using the passed key
- * @param {Array} theTree   sub-user tree as an array of nodes
- * @param {String} key      sub-user's master key
- * @returns {Object}        if succeeded, contains .tree attribute and .errors .warn
+ * @param {Array} theTree        sub-user tree as an array of nodes
+ * @param {String} key           sub-user's master key
+ * @param {String} subUserHandle sub-user's handle, if passed master key is K2 version
+ * @returns {Object}             if succeeded, contains .tree attribute and .errors .warn
  */
-BusinessAccount.prototype.decrypteSubUserTree = function (theTree, key) {
+BusinessAccount.prototype.decrypteSubUserTree = function(theTree, key, subUserHandle) {
     "use strict";
 
     if (!theTree || !theTree.ok0) {
@@ -872,12 +903,18 @@ BusinessAccount.prototype.decrypteSubUserTree = function (theTree, key) {
         return null;
     }
 
-    var business_privk = crypto_decodeprivkey(a32_to_str(decrypt_key(u_k_aes, base64_to_a32(u_attr.b.bprivk))));
+    let subUserKey = null;
+    const t = base64urldecode(key);
 
-    var t = base64urldecode(key);
-    // var dKey = crypto_rsadecrypt(t, u_privk);
-    var dKey = crypto_rsadecrypt(t, business_privk);
-    var subUserKey = new sjcl.cipher.aes(str_to_a32(dKey.substr(0, 16)));
+    if (!subUserHandle) {
+        const business_privk = crypto_decodeprivkey(a32_to_str(decrypt_key(u_k_aes, base64_to_a32(u_attr.b.bprivk))));
+        const dKey = crypto_rsadecrypt(t, business_privk);
+        subUserKey = new sjcl.cipher.aes(str_to_a32(dKey.substr(0, 16)));
+    }
+    else {
+        const dKey = this.decryptKey(t, subUserHandle);
+        subUserKey = new sjcl.cipher.aes(str_to_a32(dKey));
+    }
 
     // loading sharing keys, as out-shares will be sent with sharing keys (instead of owner node key)
     var subUserShareKeys = Object.create(null);
@@ -988,16 +1025,10 @@ BusinessAccount.prototype.decrypteSubUserTree = function (theTree, key) {
  * @param {String} subUserHandle    Handle of a sub-user
  * @returns {Promise}               resolve if the operation succeeded
  */
-BusinessAccount.prototype.getSubUserTree = function (subUserHandle) {
+BusinessAccount.prototype.getSubUserTree = async function(subUserHandle) {
     "use strict";
-    var operationPromise = new MegaPromise();
 
-    if (!subUserHandle || subUserHandle.length !== 11) {
-        return operationPromise.reject(0, 5, 'invalid U_HANDLE');
-    }
-    if (!M.suba[subUserHandle]) {
-        return operationPromise.reject(0, 7, 'u_handle is not a sub-user');
-    }
+    assert(subUserHandle && subUserHandle.length === 11 && M.suba[subUserHandle], `Invalid handle, ${subUserHandle}`);
 
     // getting sub-user tree
     var request = {
@@ -1006,19 +1037,11 @@ BusinessAccount.prototype.getSubUserTree = function (subUserHandle) {
         "r": 1, // recursive
         "c": 1 // don't get extra data (contacts, sub-users ...etc)
     };
+    const {result} = await api.req(request);
 
-    api_req(request, {
-        callback: function (res) {
-            if (typeof res === 'object') {
-                operationPromise.resolve(1, res); // sub-user tree
-            }
-            else {
-                operationPromise.reject(0, res, 'API returned error');
-            }
-        }
-    });
+    assert(typeof result === 'object' && 'ok0' in result, `Unexpected 'fsub' response, ${result}`);
 
-    return operationPromise;
+    return result;
 };
 
 
@@ -1132,121 +1155,61 @@ BusinessAccount.prototype.getListOfPaymentGateways = function (forceUpdate) {
 /**
  * a function to get the business account plan (only 1). as the UI is not ready to handle more than 1 plan
  * @param {Boolean} forceUpdate         force updating from API
+ * @param {Boolean} [flexI]             Get the Pro Flexi plan.
  * @returns {Promise}                   resolves when we get the answer
  */
-BusinessAccount.prototype.getBusinessPlanInfo = function(forceUpdate) {
+BusinessAccount.prototype.getBusinessPlanInfo = async function(forceUpdate, flexI) {
     "use strict";
-    var operationPromise = new MegaPromise();
 
-    if (!forceUpdate) {
-        if (mega.buinsessAccount && mega.buinsessAccount.cachedBusinessPlan) {
-            var currTime = new Date().getTime();
+    if (!forceUpdate && !flexI) {
+        const {cachedBusinessPlan: {timestamp} = false} = mega.buinsessAccount || !1;
 
-            if (mega.buinsessAccount.cachedBusinessPlan.timestamp &&
-                (currTime - mega.buinsessAccount.cachedBusinessPlan.timestamp) < this.invoiceListUpdateFreq) {
-                return operationPromise.resolve(1, mega.buinsessAccount.cachedBusinessPlan);
-            }
+        if (Date.now() - timestamp < this.invoiceListUpdateFreq) {
+            return mega.buinsessAccount.cachedBusinessPlan;
         }
     }
 
-    var request = {
+    const request = {
         a: 'utqa',  // get a list of plans
         nf: 2,      // extended format
         b: 1        // also show business plans
     };
 
-    api_req(request, {
-        callback: function (res) {
+    if (flexI) {
+        // get the Pro Flex-i plan
+        request.p = 1;
+    }
 
-            if ($.isNumeric(res)) {
-                operationPromise.reject(0, res, 'API returned error');
-            }
-            else if (typeof res === 'object') {
-                var currTime = new Date().getTime();
-                mega.buinsessAccount = mega.buinsessAccount || Object.create(null);
-                var businessPlan = Object.create(null);
-                businessPlan.timestamp = currTime;
-                for (var h = 0; h < res.length; h++) {
-                    if (res[h].it) {
-                        businessPlan = res[h];
-                        businessPlan.bd.us.lp /= 100;
-                        businessPlan.bd.us.p /= 100;
-                        businessPlan.bd.trns.lp /= 100;
-                        businessPlan.bd.trns.p /= 100;
-                        businessPlan.bd.sto.lp /= 100;
-                        businessPlan.bd.sto.p /= 100;
-                        businessPlan.timestamp = currTime;
-                        businessPlan.l = res[0].l;
-                        businessPlan.c = res[0].l.c;
-                        break;
+    return api.req(request)
+        .then(({result}) => {
+
+            for (let h = 0; h < result.length; h++) {
+                const {it, al} = result[h];
+                const match = flexI ? al === pro.ACCOUNT_LEVEL_PRO_FLEXI : !!it;
+
+                if (match) {
+                    const plan = result[h];
+                    plan.bd.us.lp /= 100;
+                    plan.bd.us.p /= 100;
+                    plan.bd.trns.lp /= 100;
+                    plan.bd.trns.p /= 100;
+                    plan.bd.sto.lp /= 100;
+                    plan.bd.sto.p /= 100;
+                    plan.l = result[0].l;
+                    plan.c = result[0].l.c;
+                    plan.timestamp = Date.now();
+
+                    if (!flexI) {
+                        mega.buinsessAccount = mega.buinsessAccount || Object.create(null);
+                        mega.buinsessAccount.cachedBusinessPlan = plan;
                     }
+
+                    return plan;
                 }
-                mega.buinsessAccount.cachedBusinessPlan = businessPlan;
-
-                operationPromise.resolve(1, businessPlan); // payment gateways list
             }
-            else {
-                operationPromise.reject(0, 4, 'API returned error, ret=' + res);
-            }
-        }
-    });
 
-    return operationPromise;
-};
-
-/**
- * A function to get the Pro Flexi account plan (similar structure to getBusinessPlanInfo). Used by /repay flow
- * @returns {Promise} resolves when we get the answer
- */
-BusinessAccount.prototype.getProFlexiPlanInfo = function() {
-    "use strict";
-
-    // eslint-disable-next-line local-rules/hints
-    const operationPromise = new MegaPromise();
-    const request = {
-        a: 'utqa',  // get a list of plans
-        nf: 2,      // extended format
-        b: 1,       // also show business plans
-        p: 1        // get the Pro Flexi plan
-    };
-
-    api_req(request, {
-        callback: function(res) {
-
-            if ($.isNumeric(res)) {
-                operationPromise.reject(0, res, 'API returned error');
-            }
-            else if (typeof res === 'object') {
-                const currTime = Date.now();
-                let plan = Object.create(null);
-
-                plan.timestamp = currTime;
-                for (let h = 0; h < res.length; h++) {
-
-                    if (res[h].al === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
-                        plan = res[h];
-                        plan.bd.us.lp /= 100;
-                        plan.bd.us.p /= 100;
-                        plan.bd.trns.lp /= 100;
-                        plan.bd.trns.p /= 100;
-                        plan.bd.sto.lp /= 100;
-                        plan.bd.sto.p /= 100;
-                        plan.timestamp = currTime;
-                        plan.l = res[0].l;
-                        plan.c = res[0].l.c;
-                        break;
-                    }
-                }
-
-                operationPromise.resolve(1, plan); // payment gateways list
-            }
-            else {
-                operationPromise.reject(0, 4, 'API returned error, ret=' + res);
-            }
-        }
-    });
-
-    return operationPromise;
+            throw new MEGAException('Business plan not found.', {request, result}, 'NotFoundError');
+        });
 };
 
 /**
@@ -1335,24 +1298,19 @@ BusinessAccount.prototype.setMasterUserAttributes =
             request_upb['%nbusers'] = base64urlencode(to8(nbusers)); // nb of users
         }
         if (isUpgrade && u_attr && u_attr.b && u_attr.b.m && u_attr.b.bu && u_attr.b.s === -1) {
-            api_req(request_upb, {
-                callback: function(res) {
-                    if ($.isNumeric(res)) {
-                        operationPromise.reject(0, res, 'API returned error');
-                    }
-                    else if (typeof res === 'string') {
-                        operationPromise.resolve(1, res); // update success
-                    }
-                    else {
-                        operationPromise.reject(0, 4, 'API returned error, ret=' + res);
-                    }
-                }
-            });
+            api.screq(request_upb)
+                .then(({result}) => {
+                    assert(typeof result === 'string', `Unexpected response ${result}`);
+                    operationPromise.resolve(1, result); // update success
+                })
+                .catch((ex) => {
+                    operationPromise.reject(0, ex, `API returned error, ${ex}`);
+                });
         }
         else {
             var businessKey = mySelf.creatBusinessAccountMasterKey();
             crypto_rsagenkey(false)
-                .then(function(businessRSA) {
+                .then((businessRSA) => {
 
                     request_upb.k = a32_to_base64(encrypt_key(u_k_aes, businessKey));
                     request_upb.pubk = base64urlencode(crypto_encodepubkey(businessRSA));
@@ -1360,65 +1318,67 @@ BusinessAccount.prototype.setMasterUserAttributes =
                         encrypt_key(u_k_aes, str_to_a32(crypto_encodeprivkey(businessRSA)))
                     );
 
-                    if (!isUpgrade) {
+                    /* const keyPair = nacl.sign.keyPair();
+                    const b_privEd25519 = asmCrypto.bytes_to_string(keyPair.secretKey.subarray(0, 32));
+                    const b_pubEd25519 = asmCrypto.bytes_to_string(keyPair.publicKey);
+                    const b_k_aes = new sjcl.cipher.aes(businessKey);
+                    const enc_b_priv = a32_to_base64(encrypt_key(b_k_aes, str_to_a32(b_privEd25519)));
+                    const enc_b_pub = base64urlencode(b_pubEd25519);
 
-                        security.deriveKeysFromPassword(pass, u_k,
-                            function(clientRandomValueBytes, encryptedMasterKeyArray32, hashedAuthenticationKeyBytes) {
+                    request_upb['%prv25519'] = enc_b_priv;
+                    request_upb['+pub25519'] = enc_b_pub;
+                    */
 
-                                // Encode parameters to Base64 before sending to the API
-                                var sendEmailRequestParams = {
-                                    a: 'uc2',
-                                    n: base64urlencode(to8(fname + ' ' + lname)),    // Name (used just for the email)
-                                    m: base64urlencode(email),                               // Email
-                                    crv: ab_to_base64(clientRandomValueBytes),               // Client Random Value
-                                    k: a32_to_base64(encryptedMasterKeyArray32),             // Encrypted Master Key
-                                    hak: ab_to_base64(hashedAuthenticationKeyBytes),      // Hashed Authentication Key
-                                    v: 2                                                  // Version of this protocol
-                                };
+                    if (isUpgrade) {
+                        return api.screq(request_upb)
+                            .then(({result}) => {
+                                assert(typeof result === 'string', `Unexpected response ${result}`);
+                                operationPromise.resolve(1, result); // update success
+                            })
+                            .catch((ex) => {
+                                operationPromise.reject(0, ex, `API returned error, ${ex}`);
+                            });
+                    }
 
-                                api_req([request_upb, sendEmailRequestParams], {
-                                    callback: function(res1, ctx, queue, res) {
-                                        if ($.isNumeric(res)) {
-                                            operationPromise.reject(0, res, 'API returned error');
-                                        }
-                                        else if (!Array.isArray(res)) {
-                                            operationPromise.reject(0, res, 'API returned error');
-                                        }
-                                        else if (res.length !== 2) {
-                                            operationPromise.reject(0, res, 'API returned error');
-                                        }
-                                        else if (typeof res[0] !== 'string' || res[1] !== 0) {
-                                            operationPromise.reject(0, res, 'API returned error');
-                                        }
-                                        else {
-                                            security.register.sendAdditionalInformation(fname, lname);
-                                            operationPromise.resolve(1, res); // user handle
-                                        }
+                    return security.deriveKeysFromPassword(pass, u_k)
+                        .then(({clientRandomValueBytes, encryptedMasterKeyArray32, hashedAuthenticationKeyBytes}) => {
+
+                            // Encode parameters to Base64 before sending to the API
+                            const sendEmailRequestParams = {
+                                a: 'uc2',
+                                n: base64urlencode(to8(`${fname} ${lname}`)),    // Name (used just for the email)
+                                m: base64urlencode(email),                       // Email
+                                crv: ab_to_base64(clientRandomValueBytes),       // Client Random Value
+                                k: a32_to_base64(encryptedMasterKeyArray32),     // Encrypted Master Key
+                                hak: ab_to_base64(hashedAuthenticationKeyBytes), // Hashed Authentication Key
+                                v: 2                                             // Version of this protocol
+                            };
+
+                            return api.screq([request_upb, sendEmailRequestParams])
+                                .then(({batch: res}) => {
+                                    const [{result: u_h}, {result: uc2r}] = res;
+
+                                    if (d) {
+                                        console.debug('upb/uc2 combo', res);
                                     }
 
+                                    if (typeof u_h !== 'string' || uc2r !== 0) {
+                                        operationPromise.reject(0, res, 'API returned error');
+                                    }
+                                    else {
+                                        security.register.sendAdditionalInformation(fname, lname);
+                                        operationPromise.resolve(1, u_h); // user handle
+                                    }
+                                })
+                                .catch((ex) => {
+                                    if (d) {
+                                        console.warn('upb/uc2 combo error', ex);
+                                    }
+                                    operationPromise.reject(0, ex, 'API returned error');
                                 });
-
-
-                            }
-                        );
-                    }
-                    else {
-                        api_req(request_upb, {
-                            callback: function(res) {
-                                if ($.isNumeric(res)) {
-                                    operationPromise.reject(0, res, 'API returned error');
-                                }
-                                else if (typeof res === 'string') {
-                                    operationPromise.resolve(1, res); // update success
-                                }
-                                else {
-                                    operationPromise.reject(0, 4, 'API returned error, ret=' + res);
-                                }
-                            }
                         });
-                    }
-                }
-            );
+                })
+                .catch(tell);
         }
 
         return operationPromise;
@@ -1447,19 +1407,14 @@ BusinessAccount.prototype.updateBusinessAttrs = function (attrs) {
         request[attrs[k].key] = base64urlencode(to8(attrs[k].val));
     }
 
-    api_req(request, {
-        callback: function (res) {
-            if ($.isNumeric(res)) {
-                operationPromise.reject(0, res, 'API returned error');
-            }
-            else if (typeof res === 'string') {
-                operationPromise.resolve(1, res); // update success
-            }
-            else {
-                operationPromise.reject(0, 4, 'API returned error, ret=' + res);
-            }
-        }
-    });
+    api.screq(request)
+        .then(({result}) => {
+            assert(typeof result === 'string', `Unexpected response ${result}`);
+            operationPromise.resolve(1, result); // update success
+        })
+        .catch((ex) => {
+            operationPromise.reject(0, 4, `API returned error, ${ex}`);
+        });
 
     return operationPromise;
 };
@@ -1471,16 +1426,10 @@ BusinessAccount.prototype.updateBusinessAttrs = function (attrs) {
  * @param {Object} businessPlan     business plan details
  * @return {Promise}                resolve with the result
  */
-BusinessAccount.prototype.doPaymentWithAPI = function (payDetails,businessPlan) {
+BusinessAccount.prototype.doPaymentWithAPI = async function(payDetails, businessPlan) {
     "use strict";
-    var operationPromise = new MegaPromise();
-
-    if (!payDetails) {
-        return operationPromise.reject(0, 11, 'Empty payment details');
-    }
-    if (!businessPlan) {
-        return operationPromise.reject(0, 12, 'Empty business plan details');
-    }
+    assert(payDetails, 'Empty payment details');
+    assert(businessPlan, 'Empty business plan details');
 
     var boughtItemPrice = businessPlan.totalPrice;
 
@@ -1507,60 +1456,37 @@ BusinessAccount.prototype.doPaymentWithAPI = function (payDetails,businessPlan) 
     if (mega.uaoref) {
         request.uao = escapeHTML(mega.uaoref);
     }
+    const salesIDs = [];
+    const {pastInvoice = false, totalUsers, usedGatewayId, currInvoice} = businessPlan;
 
-    var utcApiCallback = function(res) {
-        if ($.isNumeric(res) && res < 0) {
-            operationPromise.reject(0, res, 'API returned error');
-        }
-        else {
-            var salesIDs = [res];
+    // We need to make the uts request to add multiple sale IDs for Business,
+    // also for Pro Flexi (if there is previous invoice to be added to the total)
+    if (totalUsers > 0 || u_attr.pf && currInvoice.et > 0) {
 
-            if (businessPlan.pastInvoice && businessPlan.pastInvoice.si
-                && businessPlan.pastInvoice.si !== res) {
-                salesIDs.push(businessPlan.pastInvoice.si);
-            }
-
-            var utcRequest = {
-                a: 'utc',                   // User Transaction Complete
-                s: salesIDs,                // Sale ID
-                m: businessPlan.usedGatewayId || addressDialog.gatewayId, // Gateway number
-                bq: 0,                      // Log for bandwidth quota triggered
-                extra: payDetails           // Extra information for the specific gateway
-            };
-
-            api_req(utcRequest, {
-                callback: function(res) {
-                    if ($.isNumeric(res) && res < 0) {
-                        operationPromise.reject(0, res, 'API returned error');
-                    }
-                    else if (!res.EUR) {
-                        operationPromise.reject(0, res, 'API returned error');
-                    }
-                    else if (typeof res.EUR === 'object' && !res.EUR.url) {
-                        operationPromise.reject(0, res, 'API returned error');
-                    }
-                    else {
-                        operationPromise.resolve(1, res, salesIDs[0]); // ready of redirection
-                    }
-                }
-
-            });
-        }
-    };
-
-    if (businessPlan.totalUsers > 0) {
-        api_req(request, {
-            callback: utcApiCallback
-        });
-    }
-    else if (businessPlan.pastInvoice && businessPlan.pastInvoice.si) {
-        utcApiCallback(businessPlan.pastInvoice.si);
+        salesIDs.push((await api.screq(request)).result);
     }
     else {
-        return operationPromise.reject(0, 20, 'Not valid paying(repaying) arguments');
+        assert(pastInvoice.si, 'Invalid payment parameters.');
     }
 
-    return operationPromise;
+    if (pastInvoice.si && !salesIDs.includes(pastInvoice.si)) {
+
+        salesIDs.push(pastInvoice.si);
+    }
+
+    const utcRequest = {
+        a: 'utc',                   // User Transaction Complete
+        s: salesIDs,                // Sale ID
+        m: usedGatewayId || addressDialog.gatewayId, // Gateway number
+        bq: 0,                      // Log for bandwidth quota triggered
+        extra: payDetails           // Extra information for the specific gateway
+    };
+
+    const {result} = await api.screq(utcRequest);
+
+    assert(result && result.EUR, 'Invalid API Response.');
+
+    return {result, saleId: salesIDs[0]};
 };
 
 /**
@@ -1684,7 +1610,7 @@ BusinessAccount.prototype.updateSubUserInfo = function (subuserHandle, changedAt
         considereAttrs.push('lastname', 'firstname');
     }
 
-    var attrFetched = function (res, ctx) {
+    var attrFetched = function(res, ctx) {
 
         if (typeof res !== 'number') {
             if (ctx.ua === "e") {
@@ -1741,77 +1667,49 @@ BusinessAccount.prototype.updateSubUserInfo = function (subuserHandle, changedAt
 };
 
 
-BusinessAccount.prototype.resetSubUserPassword = function(subuserHandle, password) {
+BusinessAccount.prototype.resetSubUserPassword = async function(subuserHandle, password) {
     "use strict";
-    var operationPromise = new MegaPromise();
+    assert(subuserHandle, 'Empty sub-user handle');
+    assert(password && password.length > 9, 'Empty password/or not long enough');
+    assert(window.u_attr && u_attr.b && u_attr.b.bprivk, 'Broken master account status');
 
-    if (!subuserHandle) {
-        return operationPromise.reject(0, 11, 'Empty sub-user handle');
+    const {k, k2} = await this.getSubAccountMKey(subuserHandle);
+
+    assert(k2 || k, 'Failed to get/decrypt subuser key');
+
+    const request = {
+        "a": "upsub",
+        "su": subuserHandle // user handle
+    };
+    let subUserKey;
+    if (k) {
+        const business_privk = crypto_decodeprivkey(a32_to_str(decrypt_key(u_k_aes, base64_to_a32(u_attr.b.bprivk))));
+        subUserKey = str_to_a32(crypto_rsadecrypt(base64urldecode(k), business_privk).substr(0, 16));
     }
-    if (!password || password.length < 10) {
-        return operationPromise.reject(0, 60, 'Empty password/or not long enough');
-    }
-    if (!u_attr || !u_attr.b || !u_attr.b.bprivk) {
-        return operationPromise.reject(0, 62, 'Broken master account status');
+    else {
+        subUserKey = str_to_a32(this.decryptKey(base64urldecode(k2), subuserHandle));
     }
 
-    var getmKey = this.getSubAccountMKey(subuserHandle);
+    const {
+        clientRandomValueBytes,
+        encryptedMasterKeyArray32,
+        hashedAuthenticationKeyBytes
+    } = await security.deriveKeysFromPassword(password, subUserKey);
 
-    getmKey.fail(
-        function(c, r, t) {
-            operationPromise.reject(c, r, t);
-        });
+    // Convert to Base64
+    const encryptedMasterKeyBase64 = a32_to_base64(encryptedMasterKeyArray32);
+    const hashedAuthenticationKeyBase64 = ab_to_base64(hashedAuthenticationKeyBytes);
+    const clientRandomValueBase64 = ab_to_base64(clientRandomValueBytes);
 
-    // // //
-    // // //
-    getmKey.done(
-        function resetSubPass(c, sub_key) {
-            var request = {
-                "a": "upsub",
-                "su": subuserHandle // user handle
-            };
+    request.k = encryptedMasterKeyBase64;
+    request.uh = hashedAuthenticationKeyBase64;
+    request.crv = clientRandomValueBase64;
 
+    // Send API request to change password
+    const {result} = await api.screq(request);
 
-            var business_privk =
-                crypto_decodeprivkey(a32_to_str(decrypt_key(u_k_aes, base64_to_a32(u_attr.b.bprivk))));
-
-            var _t = base64urldecode(sub_key.k);
-
-            var dKey = crypto_rsadecrypt(_t, business_privk);
-            var subUserKey = str_to_a32(dKey.substr(0, 16));
-
-
-            security.deriveKeysFromPassword(password, subUserKey,
-                function(clientRandomValueBytes, encryptedMasterKeyArray32, hashedAuthenticationKeyBytes) {
-
-                    // Convert to Base64
-                    var encryptedMasterKeyBase64 = a32_to_base64(encryptedMasterKeyArray32);
-                    var hashedAuthenticationKeyBase64 = ab_to_base64(hashedAuthenticationKeyBytes);
-                    var clientRandomValueBase64 = ab_to_base64(clientRandomValueBytes);
-                    var saltBase64 = ab_to_base64(security.createSalt(clientRandomValueBytes));
-
-                    request.k = encryptedMasterKeyBase64;
-                    request.uh = hashedAuthenticationKeyBase64;
-                    request.crv = clientRandomValueBase64;
-
-                    // Send API request to change password
-                    api_req(request, {
-                        callback: function(result) {
-
-                            if (result) {
-                                operationPromise.resolve(1);
-                            }
-                            else {
-                                operationPromise.reject(0, 61, 'API refused password change');
-                            }
-                        }
-                    });
-                }
-            );
-
-        });
-
-    return operationPromise;
+    assert(typeof result === 'string' && result.length === 11, `Unexpected 'upsub' response, ${result}`);
+    return result;
 };
 
 

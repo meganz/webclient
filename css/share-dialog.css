@@ -11,6 +11,14 @@
     padding-inline-end: 0;
 }
 
+.mega-dialog.share-dialog > header {
+    padding-bottom: 8px;
+}
+
+.mega-dialog.share-dialog .share-dialog-top {
+    padding: 0 42px;
+}
+
 .mega-dialog.share-dialog .share-dialog-top-body {
     padding-bottom: 16px;
     position: relative;
@@ -69,10 +77,11 @@
     vertical-align: middle;
 }
 
-.share-dialog-top-body .item-type-icon {
+.share-dialog-top-body .item-type-icon-90 {
     display: inline-block;
-    -webkit-margin-end: 12px;
-    margin-inline-end: 12px;
+    -webkit-margin-end: 8px;
+    margin-inline-end: 8px;
+    --icon-size: 48px;
     vertical-align: middle;
 }
 
@@ -130,6 +139,25 @@
     display: inline-block;
     vertical-align: middle;
     width: 428px;
+    min-width: 0;
+    -webkit-margin-end: auto;
+    margin-inline-end: auto;
+}
+
+.share-dialog-access-node .access-node-contact-verify {
+    display: none;
+}
+
+.share-dialog-access-node.unverified-contact .access-node-contact-verify {
+    display: inline-block;
+}
+
+.share-dialog-access-node.unverified-contact .access-node-contact-verify .contact-verify {
+    text-decoration: underline;
+    cursor: pointer;
+    color: var(--label-blue);
+    white-space: nowrap;
+    margin-inline-start: 16px;
 }
 
 .share-dialog-access-node .access-node-avatar {
@@ -224,8 +252,21 @@
     justify-content: center;
     margin: 6px 0 0;
     padding: 2px 8px;
-    text-align: center;
+    text-align: start;
     width: calc(100% - 48px);
+}
+
+.mega-dialog.share-dialog .mega-banner.contact-verify-warning {
+    margin-bottom: 16px;
+}
+
+.mega-dialog.share-dialog .mega-banner.contact-verify-notification {
+    margin-bottom: 33px;
+}
+.mega-dialog.share-dialog .mega-banner.contact-verify-notification .contact-verification-settings {
+    display: inline-block;
+    cursor: pointer;
+    text-decoration: underline;
 }
 
 .mega-dialog.share-dialog .warning-template span {
@@ -387,7 +428,7 @@
     max-width: calc(100% - 10px);
 }
 
-.mega-dialog.share-add-dialog .horizontal-contacts-list div.ps > .ps__scrollbar-x-rail > .ps__scrollbar-x {
+.mega-dialog.share-add-dialog .horizontal-contacts-list div.ps > .ps__rail-x > .ps__thumb-x {
     border-radius: 2px;
     height: 4px;
     bottom: 2px;

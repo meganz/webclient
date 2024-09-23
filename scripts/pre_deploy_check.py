@@ -37,8 +37,7 @@ def _get_entries(path, result_files, file_types, ignore_files,
     for item in entries:
         item_path = os.path.normpath(os.path.join(path, item))
         if os.path.isfile(item_path):
-            if (item.split('.')[-1] in file_types
-                and item_path not in ignore_files):
+            if item.split('.')[-1] in file_types and item_path not in ignore_files:
                 result_files.append(item_path)
         elif os.path.isdir(item_path):
             if path == '.' and check_dirs and item not in check_dirs:
@@ -98,7 +97,7 @@ def analyse_files_for_special_chars(filename):
                 for column, character in enumerate(line):
                     code = ord(character)
                     if code >= 128:
-                        logging.warn(u'File {}, line {}, column {}:'
+                        logging.warning(u'File {}, line {}, column {}:'
                                      ' special character {} ({})'
                                      .format(filename, linenumber,
                                              column, character, code))
@@ -121,19 +120,19 @@ def check_translation_strings():
     try:
         lang_strings = json.load(open('lang/en.json'))
     except:
-        logging.warn('lang/en.json file not found, run scripts/lang.sh')
+        logging.warning('lang/en.json file not found, run scripts/lang.sh')
         return test_fail
     lang_strings['0'] = ''
 
     # Check all HTML files.
-    lang_placeholder = re.compile(r'\[\$(\w+)\]', re.MULTILINE)
+    lang_placeholder = re.compile(r'\[\$(\w+)]', re.MULTILINE)
     html_files = glob.glob('html/*.html')
     for html_file in html_files:
         content = open(html_file).read()
         placeholders = lang_placeholder.findall(content)
         for item in placeholders:
             if item not in lang_strings:
-                logging.warn('Cannot find string ID {} in {}'.
+                logging.warning('Cannot find string ID {} in {}'.
                              format(item, html_file))
                 test_fail = True
 

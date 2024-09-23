@@ -31,7 +31,7 @@ var SharedLocalKVStorage = function(name, manualFlush, broadcaster) {
     self.name = name;
     self.manualFlush = manualFlush;
 
-    const id = broadcaster.id || broadcaster.crossTab && broadcaster.crossTab.ctID;
+    const id = broadcaster.id || broadcaster.crossTab && broadcaster.crossTab.origin.toString(36);
     self.logger = new MegaLogger(`SharedLocalKVStorage[${name}:${id}]`);
     self.debug = window.d > 0 && d;
 
@@ -44,7 +44,7 @@ var SharedLocalKVStorage = function(name, manualFlush, broadcaster) {
 
     Object.defineProperty(this, 'isMaster', {
         get: function() {
-            return !!self.broadcaster.crossTab.master;
+            return !!self.broadcaster.crossTab.owner;
         },
         set: function() {
             throw new Error(".isMaster is read only!");
@@ -120,7 +120,7 @@ SharedLocalKVStorage.prototype._setupPersistance = function() {
         `watchdog:Q!slkv_clear_${this.name}`,
         `watchdog:Q!slkv_destroy_${this.name}`,
         'watchdog:slkv_mchanged_' + self.name,
-        'crossTab:master'
+        'crossTab:owner'
     ].forEach(function(k) {
         if (self._listeners[k]) {
             self.broadcaster.removeListener(self._listeners[k]);
@@ -132,7 +132,7 @@ SharedLocalKVStorage.prototype._setupPersistance = function() {
 
     var listenersMap = {};
 
-    if (self.broadcaster.crossTab.master) {
+    if (self.broadcaster.crossTab.owner) {
         // i'm the cross tab master
         self.persistAdapter = new SharedLocalKVStorage.Utils.DexieStorage(
             self.name,
@@ -227,12 +227,12 @@ SharedLocalKVStorage.prototype._setupPersistance = function() {
         self.persistAdapter = false;
 
         listenersMap["watchdog:slkv_mchanged_" + self.name] = function(args) {
-            if (args.data.meta.origin !== self.wdog.wdID) {
+            if (args.data.meta.origin !== self.wdog.origin) {
                 self.triggerOnChange(args.data.k, args.data.v);
             }
         };
 
-        listenersMap['crossTab:master'] = function(args) {
+        listenersMap['crossTab:owner'] = () => {
             // .setMaster was locally called.
             if (!self.persistAdapter) {
                 self._setupPersistance();
@@ -258,19 +258,18 @@ SharedLocalKVStorage.prototype._initPersistance = function() {
     }
 
     this._leavingListener = this.broadcaster.addListener('crossTab:leaving', ({origin, data}) => {
-        const {wasMaster, newMaster} = data;
-        const didMasterLeave = wasMaster && wasMaster !== -1;
-        const didBecomeMaster = didMasterLeave && newMaster === this.broadcaster.crossTab.ctID;
+        const didOwnerLeave = !!data.owner;
+        const didBecomeOwner = didOwnerLeave && data.election === this.broadcaster.crossTab.origin;
 
         if (this.debug) {
-            const msg = `Tab '${(origin >>> 0).toString(36)}' leaved, checking ownership...`;
-            this.logger.log(msg, {didMasterLeave, didBecomeMaster, origin}, data);
+            const msg = `Tab '${origin.toString(36)}' leaved, checking ownership...`;
+            this.logger.log(msg, {didOwnerLeave, didBecomeOwner, origin}, data);
         }
 
         // master had changed?
-        if (didMasterLeave) {
-            if (didBecomeMaster) {
-                console.assert(this.broadcaster.crossTab.master, 'I was expecting to be master...');
+        if (didOwnerLeave) {
+            if (didBecomeOwner) {
+                console.assert(this.broadcaster.crossTab.owner, 'I was expecting to become owner...');
                 if (!this.persistAdapter) {
                     this._setupPersistance();
                 }
@@ -307,7 +306,7 @@ SharedLocalKVStorage.prototype._initPersistance = function() {
 SharedLocalKVStorage.prototype.getItem = function(k) {
     var self = this;
 
-    if (self.broadcaster.crossTab.master) {
+    if (self.broadcaster.crossTab.owner) {
         return this.persistAdapter.getItem(k);
     }
     else {
@@ -335,7 +334,7 @@ SharedLocalKVStorage.prototype.getItem = function(k) {
 SharedLocalKVStorage.prototype.eachPrefixItem = function __SLKVEachItem(pfx, each) {
     'use strict';
 
-    if (this.broadcaster.crossTab.master) {
+    if (this.broadcaster.crossTab.owner) {
         return this.persistAdapter.eachPrefixItem(pfx, each);
     }
 
@@ -365,7 +364,7 @@ SharedLocalKVStorage.prototype.dump = function(prefix) {
 SharedLocalKVStorage.prototype.keys = function(prefix) {
     var self = this;
 
-    if (self.broadcaster.crossTab.master) {
+    if (self.broadcaster.crossTab.owner) {
         return self.persistAdapter.keys(prefix);
     }
     else {
@@ -400,7 +399,7 @@ SharedLocalKVStorage.prototype.keys = function(prefix) {
 SharedLocalKVStorage.prototype.setItem = function(k, v, meta) {
     'use strict';
     var self = this;
-    if (self.broadcaster.crossTab.master) {
+    if (self.broadcaster.crossTab.owner) {
         var fn = "setItem";
         if (typeof v === 'undefined') {
             fn = "removeItem";
@@ -409,7 +408,7 @@ SharedLocalKVStorage.prototype.setItem = function(k, v, meta) {
         if (!meta) {
             // if triggered locally, by the master, there is no 'meta', so lets add our wdID
             meta = {
-                'origin': self.wdog.wdID
+                'origin': self.wdog.origin
             };
         }
         else {
@@ -418,7 +417,9 @@ SharedLocalKVStorage.prototype.setItem = function(k, v, meta) {
         }
         // Notify via watchdog that there was a change!
         // doing it immediately (and not after .done), because of Chrome's delay of indexedDB operations
-        self.wdog.notify("slkv_mchanged_" + self.name, {'k': k, 'v': v, 'meta': meta});
+        if (self.broadcaster.crossTab.peers) {
+            this.wdog.notify(`slkv_mchanged_${self.name}`, {k, v, meta});
+        }
 
         return self.persistAdapter[fn](k, v);
     }
@@ -442,7 +443,7 @@ SharedLocalKVStorage.prototype.setItem = function(k, v, meta) {
 
 SharedLocalKVStorage.prototype.removeItem = function(k, meta) {
     var self = this;
-    if (self.broadcaster.crossTab.master) {
+    if (self.broadcaster.crossTab.owner) {
         return self.setItem(k, undefined, meta);
     }
     else {
@@ -474,7 +475,7 @@ SharedLocalKVStorage.prototype.clear = function() {
         this.logger.warn('Cleaning instance...', [this]);
     }
 
-    if (this.broadcaster.crossTab.master) {
+    if (this.broadcaster.crossTab.owner) {
         return this.persistAdapter.clear();
     }
 
@@ -501,7 +502,7 @@ SharedLocalKVStorage.prototype.destroy = function() {
         self.off(`onChange.logger${self.name}`);
     }
 
-    if (self.broadcaster.crossTab.master) {
+    if (self.broadcaster.crossTab.owner) {
         return this.persistAdapter.destroy();
     }
 
@@ -550,7 +551,7 @@ SharedLocalKVStorage.Utils.lazyInitCall = function(proto, method, master, fn) {
         master = true;
     }
     proto[method] = function __SLKVLazyInitCall(...args) {
-        if (master && !mBroadcaster.crossTab.master) {
+        if (master && !mBroadcaster.crossTab.owner) {
             // the method shall dealt with it.
             return fn.apply(this, arguments);
         }
@@ -588,13 +589,13 @@ SharedLocalKVStorage.Utils._requiresMutex = function SLKVMutexWrapper(origFunc, 
             mutex.lock(name)
                 .then((unlock) => {
                     const wrap = (dsp) => (arg) => {
-                        if (d > 1) {
+                        if (d > 3) {
                             this.logger.warn('Releasing lock(%s) from %s...', name, methodName);
                             console.timeEnd(name);
                         }
                         unlock().then(() => dsp(arg)).catch(reject);
                     };
-                    if (d > 1) {
+                    if (d > 3) {
                         this.logger.warn('Lock(%s) acquired for %s...', name, methodName, [this, ...args]);
                         console.time(name);
                     }

@@ -211,7 +211,7 @@
      */
     function startOldLogin(email, password, pinCode, rememberMe) {
 
-        postLogin(email, password, pinCode, rememberMe, completeLogin);
+        postLogin(email, password, pinCode, rememberMe).then(completeLogin).catch(tell);
     }
 
     /**
@@ -246,7 +246,6 @@
 
         // If successful result
         else if (result !== false && result >= 0) {
-            passwordManager('#form_login_header');
 
             u_type = result;
             u_checked = true;

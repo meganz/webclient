@@ -21,6 +21,37 @@ function ui_keycomplete() {
     $('.key2').addClass('hidden');
     $('.key3').removeClass('hidden');
 
+    // Sets the "Hide Recent Activity" toggle in Settings to `OFF` by default
+    mBroadcaster.once('fm:initialized', () => {
+        // The value for `showRecents` is `undefined` when toggle is `ON`
+        mega.config.set('showRecents', 1);
+    });
+
+    const campaignTagger = () => {
+        const parse = tryCatch((v) => JSON.parse(v));
+
+        let utm = localStorage.uTagUTM || sessionStorage.uTagUTM;
+        if (utm) {
+            utm = parse(utm).tags;
+        }
+
+        let mtm = localStorage.uTagMTM || sessionStorage.uTagMTM;
+        if (mtm) {
+            mtm = parse(mtm).tags;
+        }
+
+        if (utm || mtm) {
+            const payload = JSON.stringify({ ...utm, ...mtm });
+            eventlog(500510, payload);
+
+            delete localStorage.uTagUTM;
+            delete localStorage.uTagMTM;
+            delete sessionStorage.uTagUTM;
+            delete sessionStorage.uTagMTM;
+        }
+    };
+    onIdle(campaignTagger);
+
     if ((typeof (u_attr.p) !== 'undefined') && (u_attr.p >= 1 && u_attr.p <= 4)) {
         loadSubPage('fm');
     }

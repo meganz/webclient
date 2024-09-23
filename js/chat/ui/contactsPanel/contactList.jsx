@@ -1,13 +1,18 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../mixins';
+import { MegaRenderMixin, compose } from '../../mixins';
 import Nil from './nil.jsx';
 import FMView from "../../../ui/jsx/fm/fmView.jsx";
-import {ColumnContactName} from "../../../ui/jsx/fm/nodes/columns/columnContactName.jsx";
-import {ColumnContactStatus} from "../../../ui/jsx/fm/nodes/columns/columnContactStatus.jsx";
-import {ColumnContactLastInteraction} from "../../../ui/jsx/fm/nodes/columns/columnContactLastInteraction.jsx";
-import {ColumnContactButtons} from "../../../ui/jsx/fm/nodes/columns/columnContactButtons.jsx";
+import { ColumnContactName } from "../../../ui/jsx/fm/nodes/columns/columnContactName.jsx";
+import { ColumnContactStatus } from "../../../ui/jsx/fm/nodes/columns/columnContactStatus.jsx";
+import { ColumnContactLastInteraction } from "../../../ui/jsx/fm/nodes/columns/columnContactLastInteraction.jsx";
+import { ColumnContactVerifiedStatus } from "../../../ui/jsx/fm/nodes/columns/columnContactVerifiedStatus.jsx";
+import { ColumnContactButtons } from "../../../ui/jsx/fm/nodes/columns/columnContactButtons.jsx";
+import { withUpdateObserver } from '../updateObserver.jsx';
 
-export default class ContactList extends MegaRenderMixin {
+class ContactList extends MegaRenderMixin {
+    static updateListener = 'getLastInteractions';
+    static updateInterval = 6e4 /* 1 min */;
+
     contextMenuRefs = [];
 
     state = {
@@ -24,6 +29,7 @@ export default class ContactList extends MegaRenderMixin {
         this.onHighlighted = this.onHighlighted.bind(this);
         this.onExpand = this.onExpand.bind(this);
         this.onAttachClicked = this.onAttachClicked.bind(this);
+        this.getLastInteractions = this.getLastInteractions.bind(this);
     }
 
     /**
@@ -97,28 +103,31 @@ export default class ContactList extends MegaRenderMixin {
                 $$REF.onClick(ev)
             );
         }
-    };
+    }
 
+    onSelected(handle) {
+        this.setState({'selected': handle});
+    }
+
+    onHighlighted(handle) {
+        this.setState({'highlighted': handle});
+    }
+
+    onExpand(handle) {
+        loadSubPage('/fm/chat/contacts/' + handle);
+    }
+
+    onAttachClicked() {
+        if (this.state.selected[0]) {
+            this.onExpand(this.state.selected[0]);
+        }
+    }
 
     componentDidMount() {
         super.componentDidMount();
         this.getLastInteractions();
     }
 
-    onSelected(handle) {
-        this.setState({'selected': handle});
-    }
-    onHighlighted(handle) {
-        this.setState({'highlighted': handle});
-    }
-    onExpand(handle) {
-        loadSubPage('/fm/chat/contacts/' + handle);
-    }
-    onAttachClicked() {
-        if (this.state.selected[0]) {
-            this.onExpand(this.state.selected[0]);
-        }
-    }
     render() {
         const { contacts } = this.props;
 
@@ -126,7 +135,7 @@ export default class ContactList extends MegaRenderMixin {
             return (
                 <div className="contacts-list">
                     <FMView
-                        dataSource={this.props.contacts}
+                        dataSource={contacts}
                         customFilterFn={(r) => {
                             return r.c === 1;
                         }}
@@ -148,6 +157,7 @@ export default class ContactList extends MegaRenderMixin {
                             [ColumnContactLastInteraction, {
                                 interactions: this.state.interactions
                             }],
+                            [ColumnContactVerifiedStatus, { contacts }],
                             [ColumnContactButtons, {
                                 onContextMenuRef: (handle, node) => {
                                     this.contextMenuRefs[handle] = node;
@@ -163,7 +173,6 @@ export default class ContactList extends MegaRenderMixin {
                         initialSortBy={[
                             'status', 'asc'
                         ]}
-
                         /* fmconfig.sortmodes integration/support */
                         fmConfigSortEnabled={true}
                         fmConfigSortId="contacts"
@@ -176,3 +185,5 @@ export default class ContactList extends MegaRenderMixin {
         return <Nil title={l[5737] /* `No Contacts` */} />;
     }
 }
+
+export default compose(withUpdateObserver)(ContactList);

@@ -1,15 +1,17 @@
 class MContextMenu extends MComponent {
     /**
-     * @param {HTMLElement|String} target DOM object or query selector to the DOM object
+     * @param {HTMLElement|String?} target DOM object or query selector to the DOM object
+     * @param {Boolean} [ignoreOutsideClick] Whether to react to the clicks outside or not
      */
-    constructor(target) {
+    constructor(target, ignoreOutsideClick = false) {
         super(target, false);
         this.isShowing = false;
+        this.ignoreOutsideClick = ignoreOutsideClick;
     }
 
     buildElement() {
         this.el = document.createElement('div');
-        this.el.className = 'dropdown body context m-context';
+        this.el.className = 'dropdown body context m-context-menu tooltip-popin';
     }
 
     /**
@@ -29,11 +31,7 @@ class MContextMenu extends MComponent {
     show(x, y, proposeX, proposeY) {
         this.isShowing = true;
 
-        if (!this.el) {
-            this.buildElement();
-        }
-
-        document.body.append(this.el);
+        document.body.appendChild(this.el);
 
         if (Number.isNaN(parseInt(x)) || Number.isNaN(parseInt(y))) {
             this.setPositionByTarget();
@@ -42,22 +40,29 @@ class MContextMenu extends MComponent {
             this.setPositionByCoordinates(x, y, proposeX, proposeY);
         }
 
-        this.disposeOutsideClick = MComponent.listen(document, 'mousedown', ({ target }) => {
-            while (target) {
-                if (target.parentNode && target.classList.contains('m-context')) {
-                    break;
+        if (!this.ignoreOutsideClick) {
+            this.disposeOutsideClick = MComponent.listen(document, 'mousedown', ({ target }) => {
+                while (target) {
+                    if (target.parentNode && target.classList.contains('m-context-menu')) {
+                        break;
+                    }
+
+                    target = target.parentNode;
                 }
 
-                target = target.parentNode;
-            }
-
-            if (!target) {
-                this.hide(true);
-            }
-        });
+                if (!target) {
+                    this.hide(true);
+                }
+            });
+        }
 
         this.pageChangeListener = mBroadcaster.addListener('beforepagechange', () => {
-            this.hide();
+            if (this.ignorePageNavigationOnce) {
+                this.ignorePageNavigationOnce = false;
+            }
+            else {
+                this.hide();
+            }
         });
 
         this.toggleScrolls(false);
@@ -85,7 +90,7 @@ class MContextMenu extends MComponent {
         }
 
         if (hideSiblings) {
-            const siblingMenus = document.body.querySelectorAll(':scope > div.m-context');
+            const siblingMenus = document.body.querySelectorAll(':scope > div.m-context-menu');
 
             for (let i = 0; i < siblingMenus.length; i++) {
                 const el = siblingMenus[i];
@@ -151,6 +156,10 @@ class MContextMenu extends MComponent {
 
         if (this._minWidth > 0) {
             this.el.style.minWidth = this._minWidth + 'px';
+        }
+
+        if (locale === 'ar') {
+            this.el.style.left = `${rect.right - this.el.getBoundingClientRect().width}px`;
         }
     }
 }

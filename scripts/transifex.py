@@ -16,22 +16,21 @@ Requirements:
 This script will work with both Python 2.7 as well as 3.x.
 """
 
-import copy, json, os, sys, re, subprocess, time, io, random, argparse, datetime
-from threading import Thread
+import argparse
+import datetime
+import io
+import json
+import os
+import random
+import re
+import subprocess
+import sys
+import time
 from collections import OrderedDict
 from functools import cmp_to_key
-version = sys.version_info.major
-if version == 2:
-    from urllib2 import Request, urlopen, install_opener, build_opener, HTTPRedirectHandler, HTTPError
-else:
-    from urllib.request import Request, urlopen, install_opener, build_opener, HTTPRedirectHandler
-    from urllib.error import HTTPError
-
-base_url = None
-organisation_id = None
-project_id = None
-resource_slug = None
-transifex_token = None
+from threading import Thread
+from urllib.error import HTTPError
+from urllib.request import Request, urlopen, install_opener, build_opener, HTTPRedirectHandler
 
 base_url = os.getenv('TRANSIFEX_BASE_URL')
 organisation_id = os.getenv('TRANSIFEX_ORGANISATION')
@@ -60,8 +59,8 @@ if os.path.exists(config_file):
     transifex_bot_url = transifex_config.get('TRANSIFEX_BOT_URL') or transifex_bot_url
 
 if not base_url or not organisation_id or not project_id or not resource_slug or not transifex_token:
-     print("ERROR: Incomplete Transifex settings.")
-     sys.exit(1)
+    print("ERROR: Incomplete Transifex settings.")
+    sys.exit(1)
 
 BASE_URL = base_url
 RESOURCE = resource_slug
@@ -94,12 +93,12 @@ def sanitise_string(string, convert_quotes, escape_tag):
 
     # Quotes
     quotes = [
-        ['"(.+)"',       u"\u201c\g<1>\u201d"],           # Enclosing double quotes
-        ["(\W)'(.+)'",   u"\g<1>\u2018\g<2>\u2019"],      # Enclosing single quotes
-        ["(\w)'",        u"\g<1>\u2019"],                 # Remaining single quote
+        [r'"(.+)"',      r"“\g<1>”"],       # Enclosing double quotes
+        [r"(\W)'(.+)'",  r"\g<1>‘\g<2>’"],  # Enclosing single quotes
+        [r"(\w)'",       r"\g<1>’"],        # Remaining single quote
     ]
 
-    replacements = [["\.\.\.", u"\u2026"]]
+    replacements = [[r"\.\.\.", "…"]]
 
     if convert_quotes:
         replacements = replacements + quotes
@@ -173,7 +172,7 @@ language_cache = None
 
 def get_languages():
     global language_cache
-    if language_cache != None:
+    if language_cache is not None:
         return language_cache
     try:
         url = BASE_URL + "/projects/" + PROJECT_ID + "/languages"
@@ -294,7 +293,7 @@ def download_languages(resource, lang = []):
             try:
                 content = json.loads(e.read().decode('utf8'))
                 print_error(content['errors'])
-            except JSONDecodeError as e2:
+            except json.JSONDecodeError:
                 print('ERROR: Unable to read error download message')
             finally:
                 return False
@@ -316,12 +315,8 @@ def get_branch_resource_name(is_upload = False, is_force = False, is_override = 
     if branch_name in ["master", "develop"]:
         if is_upload:
             if is_override:
-                version = sys.version_info.major
                 input_note = "WARNING: This command will update main resource file. Type \"YES\" to proceed: "
-                if version == 2:
-                    user_input = raw_input(input_note)
-                else:
-                    user_input = input(input_note)
+                user_input = input(input_note)
                 if user_input == "YES":
                     branch_resource_name = "prod"
                 else:
@@ -346,12 +341,8 @@ def get_branch_resource_name(is_upload = False, is_force = False, is_override = 
                 print("")
                 return False
             if is_force:
-                version = sys.version_info.major
                 input_note = "WARNING: Only create an empty branch resource if sub-branches will be made for this branch in future. Type \"YES\" to proceed: "
-                if version == 2:
-                    user_input = raw_input(input_note)
-                else:
-                    user_input = input(input_note)
+                user_input = input(input_note)
                 if user_input != "YES":
                     return "skip_force"
             print("Creating new resource... ")
@@ -441,8 +432,10 @@ def merge_language(main, branch):
             main[code][key] = data
     print("Completed.")
 
-def string_validation(new_strings):
+def string_validation(new_strings, en_strings):
+    branch_name = subprocess.check_output(['git', 'symbolic-ref', '--short','-q','HEAD'], universal_newlines=True).strip()
     valid_strings = True
+    to_remove = []
     for key, data in new_strings.items():
         if 'string' not in data:
             print('ERROR: String with key {} has no string.'.format(key))
@@ -450,15 +443,41 @@ def string_validation(new_strings):
         elif 'developer_comment' not in data:
             print('ERROR: String with key {} has no developer comment.'.format(key))
             valid_strings = False
-        elif re.sub('\s', '', key) == '':
+        elif re.sub(r'\s', '', key) == '':
             print('ERROR: A string key is empty')
             valid_strings = False
-        elif re.sub('\s', '', data['string']) == '' and re.sub('\s', '', data['developer_comment']) != '':
+        elif re.sub(r'\s', '', data['string']) == '' and re.sub(r'\s', '', data['developer_comment']) != '':
             print('ERROR: String with key {} has no string content'.format(key))
             valid_strings = False
+        elif len(data['developer_comment']) and 'hotfix' not in branch_name.lower() and re.search(r"^[A-Z]{2,4}-\d+:", data['developer_comment']) is None:
+            print('ERROR: Developer comment for string with key {} does not start with a JIRA ticket id e.g: WEB-16334: Comment content'.format(key))
+            valid_strings = False
         else:
-            new_strings[key]['string'] = sanitise_string(data['string'], True, False)
-            print('Accepted: String with key {} is valid.'.format(key))
+            sanitised = sanitise_string(data['string'], True, False)
+            should_add = True
+            if sanitised != "":
+                for en_key, en_data in en_strings.items():
+                    if en_data["string"] == sanitised:
+                        print("WARNING: A string with the same content as " + key + " already exists: " + en_key + " = " + sanitised)
+                        print("If the string has the same context consider using it instead.")
+                        # May find multiple strings so warn for all until the user rejects or there are no more to check.
+                        note = "Do you want to add a duplicate? (Y/N): "
+                        user_input = input(note)
+                        if user_input.lower()[0:1] == "y":
+                            should_add = True
+                        else:
+                            should_add = False
+                            break
+
+            if should_add:
+                new_strings[key]['string'] = sanitised
+                print('Accepted: String with key {} is valid.'.format(key))
+            else:
+                to_remove.append(key)
+    for key in to_remove:
+        new_strings.pop(key)
+    if valid_strings and len(new_strings) == 0:
+        valid_strings = False
     return valid_strings
 
 def validate_strings(key_value_pairs):
@@ -466,15 +485,15 @@ def validate_strings(key_value_pairs):
     duplicated_keys = []
     for key, value in key_value_pairs:
         if key in strings:
-           duplicated_keys.append(key)
+            duplicated_keys.append(key)
         else:
-           strings[key] = value
+            strings[key] = value
     if len(duplicated_keys) > 0:
         print('ERROR: Duplicated key: {}'.format(", ".join(duplicated_keys)))
         sys.exit(1)
     return strings
 
-def get_update(filename):
+def get_update(filename, en_strings):
     new_strings = False
     try:
         new_file = open(filename, "r")
@@ -486,7 +505,7 @@ def get_update(filename):
 
     if new_strings:
         print("New string(s) file found! Checking validity...")
-        if not string_validation(new_strings):
+        if not string_validation(new_strings, en_strings):
             print("ERROR: Invalid new string(s).")
             sys.exit(1)
         else:
@@ -497,8 +516,7 @@ def get_update(filename):
         return False
 
 def has_locked_msgs(is_prod):
-
-    if is_prod != True:
+    if not is_prod:
         return False
 
     from datetime import datetime, timedelta
@@ -507,7 +525,7 @@ def has_locked_msgs(is_prod):
 
     print("Started checking for Locked strings in PROD in past 3 weeks ..... " + checkDateStr)
 
-    url = BASE_URL + "/resource_strings?filter[resource]=" + PROJECT_ID + ":r:prod&filter[tags][all]=*"
+    url = BASE_URL + "/resource_strings?filter[resource]=" + PROJECT_ID + ":r:prod&filter[tags][any]=*"
     url += "&filter[strings_date_modified][gte]=" + checkDateStr
 
     languages = get_languages()
@@ -521,7 +539,7 @@ def has_locked_msgs(is_prod):
     flaggedStrings=[]
     pageNB = 1
 
-    while nextPage != None:
+    while nextPage is not None:
         print("Page check for tags ", pageNB)
         pageNB+=1
 
@@ -531,9 +549,13 @@ def has_locked_msgs(is_prod):
             response = urlopen(request)
             if response.code == 200:
                 content = json.loads(response.read().decode("utf8"))
-                tagedStrings = content["data"]
-                for string in tagedStrings:
+                taggedStrings = content["data"]
+                for string in taggedStrings:
                     if(string["attributes"] and string["attributes"]["tags"]):
+                        if "old_string" in string["attributes"]["tags"]:
+                            continue
+                        if "lock_allowed" in string["attributes"]["tags"]:
+                            continue
                         for strTag in string["attributes"]["tags"]:
                             if strTag in lockingTag:
                                 flaggedStrings.append(string["attributes"]["key"])
@@ -551,7 +573,7 @@ def has_locked_msgs(is_prod):
             content = json.loads(e.read().decode("utf8"))
             print_error(content["errors"])
             if len(flaggedStrings) > 0 :
-                    print("Found tagged string till the EXCEPTION got raised: ", flaggedStrings)
+                print("Found tagged string till the EXCEPTION got raised: ", flaggedStrings)
             sys.exit(1)
 
     if len(flaggedStrings) > 0 :
@@ -561,11 +583,14 @@ def has_locked_msgs(is_prod):
         print("SUCCESS ... checking for Locked strings in PROD. None found")
     return False
 
-def lock_resource(branch_resource_name, keys, update_time = 0):
+def lock_resource(branch_resource_name, keys, branch, update_time = 0, char_limits = {}):
     url = BASE_URL + "/resource_strings?filter[resource]=" + PROJECT_ID + ":r:" + branch_resource_name
     languages = get_languages()
     if languages:
         lockedTags = ["do_not_translate"]
+        if branch:
+            lockedTags.append('feature-in-feature')
+            lockedTags.append('locked')
         for language in languages:
             lockedTags.append("locked_" + language["attributes"]["code"])
         while url != 0:
@@ -579,7 +604,7 @@ def lock_resource(branch_resource_name, keys, update_time = 0):
                     for key in content['data']:
                         if key["attributes"]["key"] in keys:
                             mod_time = datetime.datetime.strptime(key["attributes"]["strings_datetime_modified"], "%Y-%m-%dT%H:%M:%SZ")
-                            if int(mod_time.replace(tzinfo=datetime.timezone.utc).timestamp()) >= update_time
+                            if int(mod_time.replace(tzinfo=datetime.timezone.utc).timestamp()) >= update_time:
                                 updateUrl = BASE_URL + "/resource_strings/" + key['id']
                                 stringTags = key["attributes"]["tags"]
                                 for tag in lockedTags:
@@ -594,6 +619,8 @@ def lock_resource(branch_resource_name, keys, update_time = 0):
                                                 "type": "resource_strings"
                                             }
                                         }
+                                if key["attributes"]["key"] in char_limits:
+                                    payload["data"]["attributes"]["character_limit"] = char_limits[key["attributes"]["key"]]
                                 string_codes.append({'url': updateUrl, 'payload': payload})
 
                     def transifex_patch_strings(url, request):
@@ -622,7 +649,7 @@ def lock_resource(branch_resource_name, keys, update_time = 0):
                     content = json.loads(e.read().decode('utf8'))
                     print_error(content['errors'])
                     return False
-            if content["links"]["next"] != None:
+            if content["links"]["next"] is not None:
                 url = content["links"]["next"]
 
 def pruning():
@@ -699,26 +726,35 @@ def main():
     parser.add_argument("-u", "--update", nargs="?", help="Parse new strings in a JSON file and update branch resource file", type=str, const="update")
     parser.add_argument("-fp", "--filepath", nargs="?", help="Custom file path for updating resource file", type=str)
     parser.add_argument("-c", "--clean", nargs="?", help="Activate pruning", const=True)
+    parser.add_argument("-br", "--branch", nargs="?", help="Optional git branch with strings to merge with the current branch file", type=str)
     args = parser.parse_args()
     if args.clean:
         pruning()
     if args.production:
         is_prod = args.production
-    elif args.language != None and len(args.language) > 0:
+    elif args.language is not None and len(args.language) > 0:
         try:
             languages = args.language[0].split(",")
         except:
             print("Invalid language arguments")
             sys.exit(1)
-    elif args.update != None:
+
+    print("~ Export started ~")
+    print("Fetching Main Language Files...")
+    lang = download_languages(RESOURCE, languages)
+    if not lang:
+        print("Failed to fetch main language files.")
+        sys.exit(1)
+
+    if args.update is not None:
         print("~ Import started ~")
         filepath = os.path.dirname(os.path.abspath(__file__)) + "/../lang/strings.json"
-        if args.filepath != None:
+        if args.filepath is not None:
             filepath = args.filepath
         is_force = args.update == "force"
         is_override = args.update == "override_production"
 
-        new_strings = get_update(filepath)
+        new_strings = get_update(filepath, lang["en"])
         if new_strings:
             is_force = False
 
@@ -736,6 +772,7 @@ def main():
             # Pull branch resource file, then merge with new strings in file
             print("Downloading latest branch resource strings...")
             branch_resource_strings = download_languages(branch_resource_name, ["en"])
+            char_limits = {}
             if branch_resource_strings:
                 branch_resource_strings = branch_resource_strings['en']
                 for key, value in new_strings.items():
@@ -745,6 +782,12 @@ def main():
                         branch_resource_strings[key] = value
             else:
                 branch_resource_strings = new_strings
+            for key, value in branch_resource_strings.items():
+                if "char_limit" in value:
+                    if value["char_limit"] > 0:
+                        char_limits[key] = value["char_limit"]
+                    del value["char_limit"]
+
             now = int(datetime.datetime.now(datetime.timezone.utc).timestamp()) - 30
             # Push new string to the branch resource file
             print("Pushing new strings to branch resource file... ")
@@ -770,28 +813,42 @@ def main():
             success = send_upload_request(url, payload)
             if success:
                 print("Locking resource")
-                lock_resource(branch_resource_name, new_strings.keys(), now)
+                lock_resource(branch_resource_name, new_strings.keys(), args.branch, now, char_limits)
                 print("Completed")
         print("~ Import completed ~")
         print("")
 
-    print("~ Export started ~")
-    print("Fetching Main Language Files...")
-    lang = download_languages(RESOURCE, languages)
-    if not lang:
-        print("Failed to fetch main language files.")
-        sys.exit(1)
-
     print("")
     if not branch_resource_name:
         branch_resource_name = get_branch_resource_name()
-    if not is_prod and branch_resource_name and branch_resource_name != "prod" and fetch_branch:
-        print("Fetching Branch Language Files...")
-        lang_branch = download_languages(branch_resource_name, languages)
-        if lang_branch:
-            merge_language(lang, lang_branch)
-        else:
-            print("Failed to fetch branch language files.")
+    if not is_prod and (branch_resource_name and branch_resource_name != "prod" and fetch_branch or args.branch):
+        if branch_resource_name and branch_resource_name != "prod" and fetch_branch:
+            print("Fetching Branch Language Files...")
+            lang_branch = download_languages(branch_resource_name, languages)
+            if lang_branch:
+                merge_language(lang, lang_branch)
+            else:
+                print("Failed to fetch branch language files.")
+        if args.branch:
+            print("Fetching additional specified resource")
+            other_resource = RESOURCE + "-" + re.sub('[^A-Za-z0-9]+', '', args.branch)
+            if other_resource in ["master", "develop", branch_resource_name]:
+                print("Specified resource is already included in the language files")
+            else:
+                try:
+                    url = BASE_URL + "/resources/" + PROJECT_ID + ":r:" + other_resource
+                    request = Request(url, headers=HEADER)
+                    response = urlopen(request)
+                    if response.code == 200:
+                        lang_other = download_languages(other_resource, languages)
+                        if lang_other:
+                            merge_language(lang, lang_other)
+                        else:
+                            print("Failed to fetch additional specified resource")
+                    else:
+                        print("Failed to check if resource exists")
+                except HTTPError:
+                    print("Failed to find additional resource")
         print("")
     else:
         merge_language(lang, lang)
@@ -807,4 +864,4 @@ def main():
 try:
     main()
 except KeyboardInterrupt:
-    os._exit(1)
+    sys.exit(1)

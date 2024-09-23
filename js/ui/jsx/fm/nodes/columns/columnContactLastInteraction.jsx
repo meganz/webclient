@@ -4,15 +4,18 @@ import {GenericNodePropsComponent} from "../genericNodePropsComponent";
 export class ColumnContactLastInteraction extends GenericNodePropsComponent {
     static sortable = true;
     static id = "interaction";
-    static label = l[5904];
     static megatype = "interaction";
+
+    static get label() {
+        return l[5904];
+    }
+
     /**
      * getLastInteractionIcon
      * @description Retrieves icon based on the last interaction type.
      * @param {string} handle The contact handle
      * @returns {JSX.Element}
      */
-
     getLastInteractionIcon = handle => {
         const {interactions} = this.props;
         const interaction = interactions[handle];

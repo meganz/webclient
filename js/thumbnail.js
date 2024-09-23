@@ -25,7 +25,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
     var thumbHandler;
     var onPreviewRetry;
 
-    if (window.omitthumb) {
+    if (!M.shouldCreateThumbnail(file && file.target || node && node.p)) {
         console.warn('Omitting thumb creation on purpose...', arguments);
         mBroadcaster.sendMessage('fa:error', id, 'omitthumb', false, 2);
         return Promise.resolve();
@@ -90,6 +90,9 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
 
         if (thumbHandler) {
             const res = await thumbHandler(buffer);
+            if (!res) {
+                throw new Error(`Thumbnail-handler failed for ${(n || file || !1).name}`);
+            }
             source = res.buffer || res;
         }
         else if (isRawImage) {
@@ -131,6 +134,7 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         return {thumbnail, preview};
     };
 
+    let timer;
     let typeGuess;
     const ext = fileext(file && file.name || n.name);
     return (async() => {
@@ -175,6 +179,10 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
             debug(`Source guessed to be ${typeGuess}...`, [source]);
         }
 
+        (timer = tSleep(120))
+            .then(() => webgl.sendTimeoutError())
+            .catch(dump);
+
         const res = store(await webgl.worker('scissor', {source, createPreview, createThumbnail}));
 
         if (d) {
@@ -190,16 +198,27 @@ function createthumbnail(file, aes, id, imagedata, node, opt) {
         sendToPreview(node);
         mBroadcaster.sendMessage('fa:error', id, ex, false, 2);
 
+        if (String(ex && ex.message || ex).includes('Thumbnail-handler')) {
+            // @todo mute above debug() if too noisy..
+            return;
+        }
+        webgl.gLastError = ex;
+
         if (!window.pfid && canStoreAttr && String(typeGuess).startsWith('image/')) {
             eventlog(99665, JSON.stringify([
-                2,
+                3,
                 ext,
                 typeGuess,
-                String(ex && ex.message || ex).split('\n')[0].substr(0, 64),
+                String(ex && ex.message || ex).split('\n')[0].substr(0, 98),
                 fa.includes(':8*') && String(MediaAttribute.getCodecStrings(n)) || 'na'
             ]));
         }
         throw new MEGAException(ex, imagedata || file);
+    }).finally(() => {
+        if (timer) {
+            tryCatch(() => timer.abort())();
+            timer = null;
+        }
     });
 }
 

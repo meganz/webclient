@@ -1,0 +1,30 @@
+/* Context menu styles */
+.context-menu-item .nav-elem span {
+    font: var(--mobile-font-copy-regular);
+    color: var(--mobile-text-primary);
+}
+.context-menu-item button {
+    padding: 0;
+    text-align: start;
+}
+.context-menu-container menu {
+    padding: 0;
+    margin: 0;
+}
+.context-menu.title {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+.context-menu .fm-item-info {
+    white-space: nowrap;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    margin-inline-start: 15px;
+    -webkit-margin-start: 15px;
+}
+.sheet .context-menu-container {
+    padding-inline-end: 16px;
+    -webkit-padding-end: 16px;
+}

@@ -3,25 +3,6 @@
  * @desc This is the only file where we're allowed to extend native prototypes, as required for polyfills.
  *//* eslint-disable no-extend-native */
 
-/** document.hasFocus polyfill */
-mBroadcaster.once('startMega', function() {
-    if (typeof document.hasFocus !== 'function') {
-        var hasFocus = true;
-
-        $(window)
-            .bind('focus', function() {
-                hasFocus = true;
-            })
-            .bind('blur', function() {
-                hasFocus = false;
-            });
-
-        document.hasFocus = function() {
-            return hasFocus;
-        };
-    }
-});
-
 /** document.exitFullScreen polyfill */
 mBroadcaster.once('startMega', function() {
     'use strict';
@@ -29,109 +10,6 @@ mBroadcaster.once('startMega', function() {
     if (typeof document.exitFullscreen !== 'function') {
         document.exitFullscreen = document.mozCancelFullScreen
             || document.webkitCancelFullScreen || document.msExitFullscreen || function() {};
-    }
-});
-
-mBroadcaster.once('startMega', tryCatch(function() {
-    'use strict';
-
-    // FIXME: this is a silly polyfill for our exact needs atm..
-    if (window.Intl && !Intl.NumberFormat.prototype.formatToParts) {
-        Intl.NumberFormat.prototype.formatToParts = function(n) {
-            var result;
-
-            tryCatch(function() {
-                result = Number(n).toLocaleString(getCountryAndLocales().locales).match(/(\d+)(\D)(\d+)/);
-            }, function() {
-                result = Number(n).toLocaleString().match(/(\d+)(\D)(\d+)/);
-            })();
-
-            if (!result || result.length !== 4) {
-                result = [NaN, NaN, '.', NaN];
-            }
-
-            return [
-                {type: "integer", value: result[1]},
-                {type: "decimal", value: result[2]},
-                {type: "fraction", value: result[3]}
-            ];
-        };
-    }
-}, false));
-
-mBroadcaster.once('startMega', function() {
-    "use strict";
-
-    // ArrayBuffer & Uint8Array slice polyfill based on:
-    // https://github.com/ttaubert/node-arraybuffer-slice
-    // (c) 2014 Tim Taubert <tim[a]timtaubert.de>
-    // arraybuffer-slice may be freely distributed under the MIT license.
-
-    function clamp(val, length) {
-        val = (val | 0) || 0;
-
-        if (val < 0) {
-            return Math.max(val + length, 0);
-        }
-
-        return Math.min(val, length);
-    }
-
-    if (!ArrayBuffer.prototype.slice) {
-        Object.defineProperty(ArrayBuffer.prototype, 'slice', {
-            writable: true,
-            configurable: true,
-            value: function(from, to) {
-                var length = this.byteLength;
-                var begin = clamp(from, length);
-                var end = length;
-
-                if (to !== undefined) {
-                    end = clamp(to, length);
-                }
-
-                if (begin > end) {
-                    return new ArrayBuffer(0);
-                }
-
-                var num = end - begin;
-                var target = new ArrayBuffer(num);
-                var targetArray = new Uint8Array(target);
-
-                var sourceArray = new Uint8Array(this, begin, num);
-                targetArray.set(sourceArray);
-
-                return target;
-            }
-        });
-    }
-
-    if (!Uint8Array.prototype.slice) {
-        Object.defineProperty(Uint8Array.prototype, 'slice', {
-            writable: true,
-            configurable: true,
-            value: function(from, to) {
-                return new Uint8Array(this.buffer.slice(from, to));
-            }
-        });
-    }
-
-    if (typeof Uint8Array.prototype.copyWithin !== 'function') {
-        Uint8Array.prototype.copyWithin = function(target, start, end) {
-            return Array.prototype.copyWithin.call(this, target, start,  end);
-        };
-    }
-});
-
-mBroadcaster.once('boot_done', function() {
-    'use strict';
-
-    if (typeof window.devicePixelRatio === 'undefined') {
-        Object.defineProperty(window, 'devicePixelRatio', {
-            get: function() {
-                return (screen.deviceXDPI / screen.logicalXDPI) || 1;
-            }
-        });
     }
 });
 
@@ -170,6 +48,72 @@ if (typeof window.queueMicrotask !== "function") {
     };
 }
 
+if (typeof window.reportError !== "function") {
+
+    window.reportError = (exception) => {
+        'use strict';
+        queueMicrotask(() => {
+            // reach window.onerror
+            throw exception;
+        });
+    };
+}
+
+if (typeof structuredClone !== 'function') {
+
+    lazy(self, 'structuredClone', () => {
+        'use strict';
+        console.warn('Using weak structuredClone() method...', ua.details.prod);
+        return window.Dexie && Dexie.deepClone || window.clone;
+    });
+}
+
+if (typeof requestIdleCallback !== 'function') {
+
+    Object.defineProperties(self, {
+        requestIdleCallback: {
+            value(handler) {
+                'use strict';
+                const startTime = performance.now();
+                return gSetTimeout(() => {
+                    handler({
+                        didTimeout: false,
+                        timeRemaining() {
+                            return Math.max(0, 50.0 - (performance.now() - startTime));
+                        }
+                    });
+                }, 1);
+            }
+        },
+        cancelIdleCallback: {
+            value(id) {
+                'use strict';
+                gClearTimeout(id);
+            }
+        }
+    });
+}
+
+if (Object.fromEntries === undefined) {
+    Object.defineProperty(Object, 'fromEntries', {
+        value(iter) {
+            'use strict';
+            return [...iter].reduce((obj, [k, v]) => ({...obj, [k]: v}), {});
+        }
+    });
+}
+
+/**
+if (Object.hasOwn === undefined) {
+    Object.defineProperty(Object, 'hasOwn', {
+        value(o, p) {
+            'use strict';
+            return Object.hasOwnProperty.call(o, p);
+        }
+    });
+}
+/**/
+
 (() => {
     'use strict';
     Promise.prototype.always = function(fc) {
@@ -181,9 +125,23 @@ if (typeof window.queueMicrotask !== "function") {
             .catch(console.warn.bind(console, tag || 'FAIL'));
         return this;
     };
+    Promise.lock = function({name, resolve, reject, handler}) {
+        const rack = [[resolve], [reject || dump]];
 
-    // @todo remove once Fx60 is upgraded on Jenkins
+        const wrap = (type, i) => (a0) => {
+            type = rack[type];
+            i = type.length;
+            while (i--) {
+                type[i](a0);
+            }
+        };
+        const push = (type, callback) => wrap(type, rack[type].push(callback));
+
+        return mutex(name, (resolve, reject, a0) => handler(push(0, resolve), push(1, reject), a0));
+    };
+
     if (Promise.prototype.finally === undefined) {
+        // this must actually only be needed for the embed-player.
         Promise.prototype.finally = function(cb) {
             return this.then(
                 (res) => Promise.resolve(cb()).then(() => res),
@@ -209,14 +167,16 @@ if (typeof window.queueMicrotask !== "function") {
         };
     }
 
-    Object.defineProperty(Set.prototype, 'first', {
-        get: function first() {
-            for (const item of this) {
-                return item;
-            }
-            return false;
-        }
-    });
+    if (Promise.withResolvers === undefined) {
+        Promise.withResolvers = function() {
+            let resolve, reject;
+            const promise = new Promise((res, rej) => {
+                reject = rej;
+                resolve = res;
+            });
+            return {promise, resolve, reject};
+        };
+    }
 
     if (!Array.prototype.flat) {
         const reduce = Array.prototype.reduce;
@@ -230,7 +190,127 @@ if (typeof window.queueMicrotask !== "function") {
             }
         });
     }
+
+    if (!Array.prototype.flatMap) {
+        Object.defineProperty(Array.prototype, 'flatMap', {
+            configurable: !!window.is_karma,
+            value(cb, s) {
+                return this.map(cb.bind(s || this)).flat();
+            }
+        });
+    }
+
+    if (!Array.prototype.findLast) {
+        Object.defineProperty(Array.prototype, 'findLast', {
+            configurable: !!window.is_karma,
+            value(callback) {
+                for (let i = this.length; i--;) {
+                    if (callback(this[i], i, this)) {
+                        return this[i];
+                    }
+                }
+            }
+        });
+    }
 })();
+
+mBroadcaster.once('boot_done', tryCatch(() => {
+    'use strict';
+    // Based on code from https://github.com/yume-chan/ya-webadb/
+    // @todo Remove once we bump to Safari 15+
+
+    if (!DataView.prototype.setBigUint64) {
+        const UINT32_SHIFT = BigInt(32);
+
+        Object.defineProperties(DataView.prototype, {
+            setBigUint64: {
+                value(offset, value, le) {
+                    const hi = Number(value >> UINT32_SHIFT);
+                    const lo = Number(BigInt.asUintN(32, value));
+                    const [h, l] = le ? [4, 0] : [0, 4];
+
+                    this.setUint32(offset + h, hi, le);
+                    this.setUint32(offset + l, lo, le);
+                }
+            },
+            setBigInt64: {
+                value(offset, value, le) {
+                    const hi = Number(value >> UINT32_SHIFT);
+                    const lo = Number(BigInt.asUintN(32, value));
+                    const [h, l] = le ? [4, 0] : [0, 4];
+
+                    this.setInt32(offset + h, hi, le);
+                    this.setUint32(offset + l, lo, le);
+                }
+            },
+            getBigUint64: {
+                value(offset, le) {
+                    const bem = Number(!le);
+                    const lem = Number(!!le);
+
+                    const hi = this.getUint32(offset, le);
+                    const lo = this.getUint32(offset + 4, le);
+
+                    return BigInt(hi * bem + lo * lem) << UINT32_SHIFT | BigInt(hi * lem + lo * bem);
+                }
+            },
+            getBigInt64: {
+                value(offset, le) {
+                    const bem = Number(!le);
+                    const lem = Number(!!le);
+
+                    const hi = BigInt(this.getInt32(offset, le) * bem + this.getInt32(offset + 4, le) * lem);
+                    const lo = BigInt(this.getUint32(offset, le) * lem + this.getUint32(offset + 4, le) * bem);
+
+                    return hi << UINT32_SHIFT | lo;
+                }
+            }
+        });
+    }
+}));
+
+mBroadcaster.once('boot_done', tryCatch(() => {
+    'use strict';
+    if (!window.ReadableStream) {
+        console.error('ReadableStream is not available.');
+        return;
+    }
+
+    // https://github.com/whatwg/streams/issues/1019
+    if (!Object.hasOwnProperty.call(ReadableStream.prototype, 'arrayBuffer')) {
+        let shim = async function() {
+            return new Response(this).arrayBuffer();
+        };
+        if ('WebStreamsPolyfill' in window) {
+            if (window.ReadableStream !== window.WebStreamsPolyfill.ReadableStream) {
+                console.error('Unexpected ReadableStream instance.');
+                return;
+            }
+
+            shim = async function() {
+                let size = 0;
+                const chunks = [];
+                for await (const chunk of this) {
+                    chunks.push(chunk);
+                    size += chunk.byteLength;
+                }
+                const res = new Uint8Array(size);
+
+                for (let i = 0, offset = 0; i < chunks.length; ++i) {
+                    res.set(chunks[i], offset);
+                    offset += chunks[i].byteLength;
+                }
+                chunks.length = 0;
+                return res.buffer;
+            };
+        }
+        Object.defineProperty(ReadableStream.prototype, 'arrayBuffer', {
+            value: shim,
+            writable: true,
+            configurable: true
+        });
+    }
+}));
 
 mBroadcaster.once('boot_done', function() {
     'use strict';
@@ -247,23 +327,27 @@ mBroadcaster.once('boot_done', function() {
 
 mBroadcaster.once('startMega', tryCatch(() => {
     'use strict';
-    const {buildOlderThan10Days, eventlog} = window;
+    const {mecmatst} = sessionStorage;
+    const {buildOlderThan10Days, eventlog = nop, is_karma, is_extension} = window;
 
-    if (buildOlderThan10Days || !eventlog || sessionStorage.mecmatst) {
+    if (is_karma || is_extension !== false) {
         return;
     }
-    sessionStorage.mecmatst = 1;
-
     scriptTest(
         'megaecmastest = window.foo?.bar ?? -1',
         (error) => {
             if (error || window.megaecmastest !== -1) {
-                return eventlog(99777, JSON.stringify([1, 1]));
+                return mecmatst || eventlog(99777, JSON.stringify([1, 1]));
             }
 
             delete window.megaecmastest;
             Object.defineProperty(mega, 'es2020', {value: true});
         });
+
+    if (buildOlderThan10Days || mecmatst) {
+        return;
+    }
+    sessionStorage.mecmatst = 1;
 
     if (typeof BigInt === 'undefined') {
         eventlog(99778, JSON.stringify([1, 2]));
@@ -351,7 +435,7 @@ class LRUMap extends Map {
     constructor(capacity = 250, notifier = null) {
         super();
         Object.defineProperty(this, 'capacity', {value: capacity});
-        Object.defineProperty(this, 'notifier', {value: notifier || self.d > 0 && dump.bind(null, [this])});
+        Object.defineProperty(this, 'notifier', {value: notifier || self.d > 1 && dump.bind(null, [this])});
     }
     get(key) {
         if (super.has(key)) {
@@ -374,8 +458,45 @@ class LRUMap extends Map {
         }
         super.set(key, value);
     }
+
     get [Symbol.toStringTag]() {
         return 'LRUMap';
+    }
+}
+
+class LRULapse extends LRUMap {
+    constructor(seconds = 8, capacity = 15, notifier = null) {
+        super(capacity, notifier);
+        Object.defineProperty(this, 'lapse', {value: seconds});
+    }
+
+    get [Symbol.toStringTag]() {
+        return 'LRULapse';
+    }
+
+    has(key) {
+        if (super.has(key)) {
+            const {lapse} = super.get(key);
+
+            if (lapse > Date.now()) {
+                return true;
+            }
+
+            super.delete(key);
+            return false;
+        }
+    }
+
+    get(key) {
+        // xxx: we shall require has() always precedes a call to
+        // get(), otherwise we will unnecessarily invoke it twice.
+        if (super.has(key)) {
+            return super.get(key).value;
+        }
+    }
+
+    set(key, value, lapse) {
+        return super.set(key, {value, lapse: Date.now() + (lapse || this.lapse) * 1e3});
     }
 }
 
@@ -552,6 +673,143 @@ tryCatch((mock) => {
     }
 });
 
+/** @function window.deepFreeze */
+lazy(self, 'deepFreeze', () => {
+    'use strict';
+    let refs = null;
+    const freeze = tryCatch((o) => self.freeze(o));
+    const TypedArray = Object.getPrototypeOf(Uint16Array);
+    const innerDeepFreeze = (obj) => {
+        if (!obj || typeof obj !== 'object' && typeof obj !== 'function' || refs.has(obj)) {
+
+            return obj;
+        }
+        refs.add(obj);
+
+        if (!Object.isExtensible(obj) || obj instanceof TypedArray) {
+
+            return obj;
+        }
+
+        if (Array.isArray(obj)) {
+
+            for (let i = obj.length; i--;) {
+
+                obj[i] = innerDeepFreeze(obj[i]);
+            }
+        }
+        else {
+            const ownKeys = Reflect.ownKeys(obj);
+
+            for (let i = ownKeys.length; i--;) {
+                const p = ownKeys[i];
+
+                if (Reflect.getOwnPropertyDescriptor(obj, p).value) {
+
+                    innerDeepFreeze(obj[p]);
+                }
+            }
+        }
+
+        return freeze(obj) || obj;
+    };
+
+    return (obj) => {
+        refs = new WeakSet();
+        const rv = tryCatch(innerDeepFreeze)(obj);
+        refs = null;
+        return rv || false;
+    };
+});
+
 // }}} END: Helpers, with direct dependency on polyfills or latest ECMAScript
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
+
+if (!self.is_karma && self.LockManager && navigator.locks instanceof self.LockManager) {
+    self.mutex = (name, handler) => {
+        'use strict';
+        return function(...args) {
+            // console.warn(`mutex-lock.${name}`, args);
+            return navigator.locks.request(`mega-mutex:${name}`, async() => {
+                return new Promise((resolve, reject) => {
+                    Promise.resolve(handler.apply(this, [resolve, reject, ...args])).catch(reject);
+                });
+            });
+        };
+    };
+    self.mutex.lock = async(name) => {
+        'use strict';
+        const locker = mega.promise;
+        navigator.locks.request(`mega-mutex-lock:${name}`, async() => {
+            const helder = mega.promise;
+            const unlock = async() => helder.resolve();
+            // @todo this could lead to deadlocks, but just like the former mutex.lock()..
+            // locker.finally(unlock);
+            locker.resolve(unlock);
+            return helder;
+        });
+        return locker;
+    };
+}
+else if (!navigator.locks) {
+    // Web Locks API Shim.
+    Object.defineProperty(navigator, 'locks', {
+        value: freeze({
+            async query() {
+                'use strict';
+                const held = [];
+                const pending = [];
+                const add = (where, name) => where.push({clientId: requesti, mode: 'exclusive', name});
+
+                for (const name in mutex.queue) {
+                    add(held, name);
+                    for (let i = mutex.queue[name].length; i--;) {
+                        add(pending, name);
+                    }
+                }
+                return {held, pending};
+            },
+
+            async request(name, callback) {
+                'use strict';
+                assert(typeof callback === 'function', 'The options parameter is not supported.');
+                return mutex(`web-lock:${name}`, (resolve, reject) => {
+                    // navigator.locks.query().dump('l.query')
+                    Promise.resolve(callback()).then(resolve).catch(reject);
+                })();
+            }
+        })
+    });
+}
+
+function mWebLockWrap(proto, method, name) {
+    'use strict';
+
+    const func = proto[method];
+    const ident = name || makeUUID();
+
+    proto[method] = async function(...args) {
+        const name = this.__ident_0 || ident;
+
+        // eslint-disable-next-line compat/compat
+        return navigator.locks.request(name, async(lock) => {
+            if (d > 1) {
+                console.debug(`web-lock '${name}' acquired...`, lock, args);
+            }
+            return func.apply(this, args);
+        });
+    };
+}
+
+tryCatch(() => {
+    'use strict';
+
+    if (self.is_karma) {
+        Object.freeze = echo;
+    }
+    if (!self.mShowAds) {
+        Object.freeze(Object);
+    }
+
+}, false)();

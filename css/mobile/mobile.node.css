@@ -1,0 +1,247 @@
+/* List view */
+.fm-list {
+    height: 100%;
+    overflow-y: scroll;
+}
+.mobile.fm-block {
+    background: var(--mobile-page-background);
+}
+.fm-list .megaList-content {
+    margin: 0 24px;
+}
+.mega-node.fm-item {
+    display: grid;
+    align-items: center;
+    padding: 12px 0;
+    grid-template-columns: 40px auto 40px;
+    grid-template-rows: repeat(auto-fill, 20px);
+    white-space: nowrap;
+    overflow: hidden;
+    height: 40px;
+}
+.mega-node .mobile.fm-item-img {
+    grid-row: 1/4;
+    grid-column: 1/2;
+}
+.fm-item-img i {
+    --icon-size: 24px;
+}
+.mobile.fm-item-name {
+    font: var(--mobile-font-caption-large-semibold);
+    color: var(--mobile-text-primary);
+    text-overflow: ellipsis;
+    overflow: hidden;
+    grid-row: 1/2;
+    grid-column: 2/3;
+    max-width: 100%;
+}
+.taken-down .mobile.fm-item-name {
+    color: var(--mobile-text-error);
+}
+.undecryptable .mobile.fm-item-name {
+    color: var(--mobile-support-warning);
+}
+.mobile.props > .colour-label,
+.context-menu-item.colour-label-items .colour-label {
+    border-radius: 50%;
+    width: 10px;
+    height: 10px;
+    margin: 7px;
+}
+.context-menu-item.colour-label-items .colour-label.right-icon {
+    -webkit-margin-start: auto;
+    margin-inline-start: auto;
+}
+.mega-node.thumb .mobile.colour-label {
+    border: 1px solid var(--mobile-surface-1);
+}
+.mobile.colour-label.blue {
+    background-color: var(--label-blue);
+}
+.mobile.colour-label.orange {
+    background-color: var(--label-orange);
+}
+.mobile.colour-label.yellow {
+    background-color: var(--label-yellow);
+}
+.mobile.colour-label.green {
+    background-color: var(--label-green);
+}
+.mobile.colour-label.red {
+    background-color: var(--label-red);
+}
+.mobile.colour-label.purple {
+    background-color: var(--label-purple);
+}
+.mobile.colour-label.grey {
+    background-color: var(--label-grey);
+}
+.mobile.num-files {
+    font: var(--mobile-font-caption-small-regular);
+    color: var(--mobile-text-secondary);
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+.mobile.props {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    overflow: hidden;
+    grid-row: 2/3;
+    grid-column: 2/3;
+}
+.mobile.props > * {
+    margin-inline-end: 4px;
+    -webkit-margin-end: 4px;
+}
+.mobile.file-size {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    font: var(--mobile-font-caption-small-regular);
+    color: var(--mobile-text-secondary);
+}
+.mobile.props .icon {
+    --icon-size: 16px;
+    color: var(--mobile-icon-secondary);
+}
+.mega-node .context-btn {
+    grid-row: 1/4;
+    grid-column: 3/4;
+    padding: 0 6px;
+}
+.mobile.icon-takedown {
+    --mask-color: var(--mobile-text-error);
+}
+.mobile.icon-takedown,
+.mobile.icon-link,
+.mobile.icon-favourite,
+.mobile.colour-label {
+    display: none;
+}
+.taken-down .mobile.icon-takedown,
+.linked .mobile.icon-link,
+.favourited .mobile.icon-favourite,
+.mobile.colour-label.red,
+.mobile.colour-label.orange,
+.mobile.colour-label.yellow,
+.mobile.colour-label.green,
+.mobile.colour-label.blue,
+.mobile.colour-label.purple,
+.mobile.colour-label.grey {
+    display: block;
+}
+
+/* Grid view */
+.grid-view.megaListContainer .megaList-content {
+    display: flex;
+    flex-wrap: wrap;
+}
+.grid-view.megaListContainer .megaList-content > div:first-child,
+.grid-view.megaListContainer .megaList-content > div:last-child {
+    width: 100%;
+}
+.grid-view .mega-node.fm-item {
+    padding: 0;
+    height: 130px;
+    margin: 12px;
+    width: 124px;
+    flex: 1 1 124px;
+    justify-items: center;
+    grid-template-rows: 28px auto 28px;
+    border-radius: 6px;
+}
+.grid-view.bigger-node .mega-node.fm-item {
+    height: 150px;
+    width: 155px;
+    flex-basis: 155px;
+    overflow: hidden;
+}
+.fm-list .mega-node.fm-item.fm-filler-item {
+    margin-top: 0;
+    margin-bottom: 0;
+    height: 0;
+    padding: 0;
+}
+.grid-view .mobile.fm-item-name {
+    font: var(--mobile-font-caption-small-semibold);
+    text-align: center;
+    grid-row: 3/4;
+    grid-column: 1/4;
+    padding: 0 6px;
+    box-sizing: border-box;
+    height: 100%;
+    align-self: end;
+    line-height: 28px;
+}
+.grid-view .mobile.fm-item-img {
+    grid-row: 2/3;
+    grid-column: 2/3;
+}
+.grid-view .mega-node .fm-item-img i {
+    --icon-size: 48px;
+}
+.grid-view .mega-node.thumb .fm-item-img i,
+.mega-node .fm-item-img img {
+    display: none;
+}
+.grid-view .mega-node.thumb .mobile.fm-item-img {
+    grid-row: 1/3;
+    grid-column: 1/4;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    z-index: -1;
+    align-self: start;
+}
+.grid-view .mega-node.thumb .fm-item-img img {
+    display: block;
+    width: 100%;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    transform: translateY(-50%);
+    z-index: -1;
+}
+.grid-view .mobile.props {
+    width: 100%;
+    grid-row: 1/2;
+    grid-column: 1/3;
+    padding-inline-start: 6px;
+    -webkit-padding-start: 6px;
+    justify-self: start;
+    align-self: end;
+}
+.grid-view .mobile.props:last-child {
+    justify-content: end;
+}
+.grid-view .mega-node .context-btn {
+    margin-inline-start: auto;
+    grid-row: 1/2;
+    grid-column: 1/4;
+    align-self: end;
+}
+.grid-view .mobile.num-files,
+.grid-view .mobile.file-size {
+    display: none;
+}
+.grid-view .mobile.props > .colour-label {
+    margin-inline-end: 11px;
+    -webkit-margin-end: 11px;
+}
+.grid-view .mobile.props > i:not(.colour-label) {
+    padding: 4px;
+}
+.grid-view .mobile.props > i:not(.colour-label),
+.grid-view .open-context-menu > i {
+    border-radius: var(--mobile-border-radius-circle);
+    color: var(--mobile-icon-secondary);
+    background-color: var(--mobile-surface-node-icon-background);
+}
+
+@media only screen and (min-width: 768px) {
+    .grid-view .mega-node .fm-item-img i {
+        --icon-size: 56px;
+    }
+}

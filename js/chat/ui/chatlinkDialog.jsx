@@ -9,6 +9,8 @@ export class ChatlinkDialog extends MegaRenderMixin {
         disableCheckingVisibility: true
     }
 
+    static NAMESPACE = 'chat-link-dialog';
+
     constructor(props) {
         super(props);
         this.state = {
@@ -17,55 +19,37 @@ export class ChatlinkDialog extends MegaRenderMixin {
         };
     }
 
-    onPopupDidMount = $node => {
-        this.$popupNode = $node;
-    };
-
     componentWillMount() {
         this.retrieveChatLink();
     }
 
-    retrieveChatLink = () => {
+    retrieveChatLink() {
         const { chatRoom } = this.props;
         if (!chatRoom.topic) {
             delete this.loading;
             return;
         }
 
-        this.loading = chatRoom.updatePublicHandle(undefined)
+        this.loading = chatRoom.updatePublicHandle(false, true)
             .always(() => {
-                if (chatRoom.publicLink) {
-                    this.setState({ 'link': getBaseUrl() + '/' + chatRoom.publicLink });
-                }
-                else {
-                    this.setState({ link: l[20660] /* `No chat link available.` */ });
+                this.loading = false;
+
+                if (this.isMounted()) {
+                    if (chatRoom.publicLink) {
+                        this.setState({'link': `${getBaseUrl()}/${chatRoom.publicLink}`});
+                    }
+                    else {
+                        this.setState({link: l[20660] /* `No chat link available.` */});
+                    }
                 }
             });
-    };
+    }
 
     componentDidUpdate() {
         const { chatRoom } = this.props;
         if (!this.loading && chatRoom.topic) {
             this.retrieveChatLink();
         }
-
-        // Setup toast notification
-        this.toastTxt = l[7654] /* `1 link was copied to the clipboard` */;
-
-        if (!this.$popupNode) {
-            return;
-        }
-
-        const $node = this.$popupNode;
-        const $copyButton = $('.copy-to-clipboard', $node);
-
-        $copyButton.rebind('click', () => {
-            copyToClipboard(this.state.link, this.toastTxt);
-            return false;
-        });
-
-        // Setup the copy to clipboard buttons
-        $('span', $copyButton).text(l[1990] /* `Copy` */);
     }
 
     onClose = () => {
@@ -84,21 +68,45 @@ export class ChatlinkDialog extends MegaRenderMixin {
         }
     };
 
+    componentDidMount() {
+        super.componentDidMount();
+        M.safeShowDialog(ChatlinkDialog.NAMESPACE, () => {
+            if (!this.isMounted()) {
+                throw new Error(`${ChatlinkDialog.NAMESPACE} dialog: component not mounted.`);
+            }
+
+            return $(`#${ChatlinkDialog.NAMESPACE}`);
+        });
+    }
+
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        if ($.dialog === ChatlinkDialog.NAMESPACE) {
+            closeDialog();
+        }
+    }
+
     render() {
         const { chatRoom } = this.props;
         const { newTopic, link } = this.state;
-        const closeButton =
+        const closeButton = this.loading ? null : (
             <button
                 key="close"
                 className="mega-button negative links-button"
                 onClick={this.onClose}>
                 <span>{l[148] /* `Close` */}</span>
-            </button>;
+            </button>
+        );
+        const publicLinkDetails = chatRoom.isMeeting ? l.meeting_link_details : l[20644];
 
         return (
             <ModalDialogsUI.ModalDialog
                 {...this.state}
-                title={chatRoom.iAmOperator() && !chatRoom.topic ? l[9080] /* `Rename Group` */ : ''}
+                id={ChatlinkDialog.NAMESPACE}
+                title={chatRoom.iAmOperator() && !chatRoom.topic
+                    ? chatRoom.isMeeting
+                        ? l.rename_meeting /* `Rename Meeting` */
+                        : l[9080] /* `Rename Group` */ : ''}
                 className={`
                     chat-rename-dialog
                     export-chat-links-dialog
@@ -133,7 +141,12 @@ export class ChatlinkDialog extends MegaRenderMixin {
                     </section> :
                     <>
                         <header>
-                            <i className="sprite-fm-uni icon-chat-group"/>
+                            {chatRoom.isMeeting ?
+                                <div className="chat-topic-icon meeting-icon">
+                                    <i className="sprite-fm-mono icon-video-call-filled"/>
+                                </div> :
+                                <i className="sprite-fm-uni icon-chat-group"/>
+                            }
                             <h2 id="chat-link-dialog-title">
                                 <Emoji>{chatRoom.getRoomTitle()}</Emoji>
                             </h2>
@@ -145,11 +158,10 @@ export class ChatlinkDialog extends MegaRenderMixin {
                                     <input
                                         type="text"
                                         readOnly={true}
-                                        value={!chatRoom.topic ? l[20660] /* `No chat link available.` */ : link}
+                                        value={this.loading ? l[5533] : !chatRoom.topic ? l[20660] : link}
                                     />
                                 </div>
-                                {/* `People can join your group by using this link.` */}
-                                <div className="info">{chatRoom.publicLink ? l[20644] : null}</div>
+                                <div className="info">{chatRoom.publicLink ? publicLinkDetails : null}</div>
                             </div>
                         </section>
                     </>
@@ -163,13 +175,15 @@ export class ChatlinkDialog extends MegaRenderMixin {
                                 className={`
                                     mega-button
                                     links-button
-                                    ${this.loading && this.loading.state() === 'pending' ? 'disabled' : ''}
+                                    ${this.loading ? 'disabled' : ''}
                                 `}
                                 onClick={() => {
                                     chatRoom.updatePublicHandle(1);
                                     this.onClose();
                                 }}>
-                                <span>{l[20487] /* `Delete chat link` */}</span>
+                                <span>
+                                    {chatRoom.isMeeting ? l.meeting_link_delete : l[20487] /* `Delete chat link` */}
+                                </span>
                             </button>
                         }
 
@@ -180,8 +194,14 @@ export class ChatlinkDialog extends MegaRenderMixin {
                                         mega-button
                                         positive
                                         copy-to-clipboard
-                                        ${this.loading && this.loading.state() === 'pending' ? 'disabled' : ''}
-                                    `}>
+                                        ${this.loading ? 'disabled' : ''}
+                                    `}
+                                    onClick={() => {
+                                        copyToClipboard(link, l[7654] /* `1 link was copied to the clipboard` */);
+                                        if (chatRoom.isMeeting) {
+                                            eventlog(500231);
+                                        }
+                                    }}>
                                     <span>{l[63] /* `Copy` */}</span>
                                 </button> :
                                 closeButton :

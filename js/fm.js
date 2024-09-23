@@ -50,11 +50,11 @@ function addNewContact($addButton, cd) {
             var currentContactsEmails = [];
 
             var pushAsAddedEmails = function() {
-                if (currentContactsEmails.indexOf(email) === -1) {
+                if (!currentContactsEmails.includes(email) && !M.findOutgoingPendingContactIdByEmail(email)) {
                     // if invitation is sent, push as added Emails.
-                    promises.push(M.inviteContact(M.u[u_handle].m, email, emailText).done(function(res) {
-                        addedEmails.push(res);
-                    }));
+                    promises.push(
+                        M.inviteContact(M.u[u_handle].m, email, emailText).then((res) => addedEmails.push(res))
+                    );
                 }
             };
 
@@ -86,7 +86,10 @@ function addNewContact($addButton, cd) {
             }
 
             // after all process is done, and there is added email(s), show invitation sent dialog.
-            MegaPromise.allDone(promises).always(function() {
+            Promise.allSettled(promises).always(() => {
+                const shareFolderName = $.dialog === 'share'
+                    && $('.share-dialog-folder-name', '.mega-dialog.share-dialog').text();
+
                 if (addedEmails.length > 0) {
                     title = mega.icu.format(l.contacts_invited_title, addedEmails.length);
                     msg = addedEmails.length === 1 ? l[5898] : l[5899];
@@ -102,6 +105,10 @@ function addNewContact($addButton, cd) {
                 }
 
                 loadingDialog.phide();
+
+                if (shareFolderName) {
+                    showToast('view', l.share_folder_toast.replace('%1', shareFolderName));
+                }
 
                 promise.resolve();
             });
@@ -119,8 +126,19 @@ function addNewContact($addButton, cd) {
  *
  * Handle shared/export link icons in Cloud Drive
  * @param {String} nodeHandle selected node id
+ * @param {*} [force] no delay
  */
-function sharedUInode(nodeHandle) {
+// eslint-disable-next-line complexity
+function sharedUInode(nodeHandle, force) {
+    'use strict';
+
+    if (!fminitialized) {
+        return;
+    }
+
+    if (!force) {
+        return delay(`sharedUInode:${nodeHandle}`, () => sharedUInode(nodeHandle, true), 666);
+    }
 
     var oShares;
     var bExportLink = false;
@@ -128,16 +146,8 @@ function sharedUInode(nodeHandle) {
     var UiExportLink = new mega.UI.Share.ExportLink();
     var share = new mega.Share();
     var target;
-
-    if (!fminitialized) {
-        if (d) {
-            UiExportLink.logger.warn('Skipping sharedUInode call...');
-        }
-        return;
-    }
-    if (d) {
-        UiExportLink.logger.debug('Entering sharedUInode...');
-    }
+    const iconSize = M.viewmode ? 90 : 24;
+    const iconSpriteClass = `item-type-icon${M.viewmode ? '-90' : ''}`;
 
     // Is there a full share or pending share available
     if ((M.d[nodeHandle] && M.d[nodeHandle].shares) || M.ps[nodeHandle]) {
@@ -175,18 +185,16 @@ function sharedUInode(nodeHandle) {
 
     // t === 1, folder
     if (M.d[nodeHandle] && M.d[nodeHandle].t) {
-        const icon = fileIcon(M.d[nodeHandle]);
-        const className = M.viewmode ? 'block-view-file-type' : 'transfer-filetype-icon';
 
         target = document.getElementById(nodeHandle);
 
         if (target) {
 
             // Update right panel selected node with appropriate icon
-            target = target.querySelector(`.${className}`);
+            target = target.querySelector(`.${iconSpriteClass}`);
 
             if (target) {
-                target.setAttribute('class', `${className} folder ${icon}`);
+                target.className = `${iconSpriteClass} icon-${fileIcon(M.d[nodeHandle])}-${iconSize} folder`;
             }
         }
     }
@@ -206,10 +214,10 @@ function sharedUInode(nodeHandle) {
         if (target) {
 
             // Right panel
-            target = target.querySelector(M.viewmode ? '.block-view-file-type' : '.transfer-filetype-icon');
+            target = target.querySelector(`.${iconSpriteClass}`);
 
             if (target) {
-                target.classList.remove('folder-shared');
+                target.classList.replace((`icon-folder-outgoing-${iconSize}`), `icon-folder-${iconSize}`);
             }
         }
 
@@ -288,16 +296,11 @@ function initAddDialogMultiInputPlugin() {
                     itemNum = itemNum + 1;
                 }
 
-                if (itemNum > 1) {
+                if (itemNum > 0) {
                     $addButtonSpan.text(mega.icu.format(l[19113], itemNum));
                     $addButton.removeClass('hidden');
                 }
-                else if (itemNum === 1) {
-                    $addButtonSpan.text(l[19112]);
-                    $addButton.removeClass('hidden');
-                }
                 else {
-                    $addButtonSpan.text(l[19112]);
                     $addButton.addClass('hidden');
                 }
 
@@ -308,12 +311,7 @@ function initAddDialogMultiInputPlugin() {
             var itemNum = $inputTokens.length;
 
             if (itemNum === 0) {
-                $addButtonSpan.text(l[19112]);
                 $addButton.addClass('hidden');
-            }
-            else if (itemNum === 1) {
-                $addButtonSpan.text(l[19112]);
-                $addButton.removeClass('hidden');
             }
             else {
                 var $multiInput = $scope.find('.multiple-input');
@@ -334,12 +332,7 @@ function initAddDialogMultiInputPlugin() {
             itemNum = $inputTokens.length;
 
             if (itemNum === 0) {
-                $addButtonSpan.text(l[148]);
                 $addButton.addClass('hidden');
-            }
-            else if (itemNum === 1) {
-                $addButtonSpan.text(l[19112]);
-                $addButton.removeClass('hidden');
             }
             else {
                 $addButtonSpan.text(mega.icu.format(l[19113], itemNum));
@@ -436,16 +429,16 @@ function setContactLink($container) {
         $publicLink.attr('data-lnk', 'https://mega.nz/' + contactPrefix + M.account.contactLink);
     }
     else {
-        api_req({ a: 'clc' }, {
-            callback: function(res) {
+        api.send('clc')
+            .then((res) => {
                 if (typeof res === 'string') {
-                    contactPrefix =  res.match('^C!') ? '' : 'C!';
+                    contactPrefix = res.match('^C!') ? '' : 'C!';
                     res = 'https://mega.nz/' + contactPrefix + res;
                     $publicLink.attr('data-lnk', res);
                     mBroadcaster.sendMessage('contact:setContactLink', res);
                 }
-            }
-        });
+            })
+            .catch(tell);
     }
 
     $publicLink.rebind('mouseout.publiclnk', function() {
@@ -547,7 +540,7 @@ function contactAddDialog(close, dontWarnBusiness) {
         $('.add-contact-multiple-input input', $d).trigger("focus");
     });
 
-    $('.add-user-popup-button span', $d).text(l[19112]);
+    $('.add-user-popup-button span', $d).text(mega.icu.format(l[19113], 1));
     $('.add-user-popup-button', $d).addClass('hidden');
 
     if (u_attr && u_attr.b) {
@@ -609,9 +602,36 @@ function fmtopUI() {
     var $sharesTabBlock = $('.shares-tabs-bl');
     var $galleryTabBlock = $('.gallery-tabs-bl');
     const $galleryTabLink = $('.gallery-tab-lnk');
+    const $header = $('.fm-right-header', '.fmholder');
+    const $fmShareButton = $('.fm-share-folder').off('click.shareFolder').addClass('hidden');
+
+    if ($fmShareButton.length) {
+        // Show share button unless for root id, out shares, s4, etc
+        const pages = ['s4', 'out-shares', 'shares', 'file-requests', 'faves', M.RubbishID];
+        const dirPages = [M.BackupsId, M.RootID, M.currentrootid];
+        const showButton = !pages.includes(M.currentrootid) && !dirPages.includes(M.currentdirid)
+            && M.currentrootid !== (M.BackupsId && M.getNodeByHandle(M.BackupsId).p);
+
+        if (showButton) {
+            const h = String(M.currentdirid).split('/').pop();
+            const n = M.getNodeByHandle(h);
+
+            if (M.getNodeRights(n.h) > 1) {
+                $fmShareButton.removeClass('hidden').rebind('click.shareFolder', () => {
+                    $.selected = [n.h];
+                    M.openSharingDialog($.selected[0]);
+                    eventlog(500034);
+                    return false;
+                });
+            }
+        }
+    }
 
     $('.shares-tab-lnk.active', $sharesTabBlock).removeClass('active');
     $('.gallery-tab-lnk.active', $galleryTabBlock).removeClass('active');
+
+    $('.fm-s4-settings, .fm-s4-new-bucket, .fm-s4-new-key, .fm-s4-new-user, .fm-s4-new-group', $header)
+        .addClass('hidden');
 
     $('.fm-clearbin-button,.fm-add-user,.fm-new-folder,.fm-file-upload,.fm-folder-upload,.fm-uploads')
         .add('.fm-new-shared-folder,.fm-new-link')
@@ -632,10 +652,12 @@ function fmtopUI() {
         $('.fm-new-folder').removeClass('hidden');
         $('.fm-file-upload').removeClass('hidden');
         $('.fm-uploads').removeClass('hidden');
-        if ((is_chrome_firefox & 2) || 'webkitdirectory' in document.createElement('input')) {
-            $('.fm-folder-upload').removeClass('hidden');
+
+        if ($.hasWebKitDirectorySupport === undefined) {
+            $.hasWebKitDirectorySupport = 'webkitdirectory' in document.createElement('input');
         }
-        else if (ua.details.engine === 'Gecko') {
+
+        if ($.hasWebKitDirectorySupport) {
             $('.fm-folder-upload').removeClass('hidden');
         }
         else {
@@ -654,6 +676,9 @@ function fmtopUI() {
             if (d) {
                 console.log('Inbox');
             }
+        }
+        else if (M.isDynPage(M.currentdirid)) {
+            $('.fm-right-files-block').addClass('visible-notification');
         }
         else if (M.currentrootid === 'shares') {
 
@@ -703,8 +728,7 @@ function fmtopUI() {
                 showUploadBlock();
             }
         }
-        else if (M.currentCustomView.type === 'gallery') {
-
+        else if (M.isGalleryPage()) {
             $galleryTabBlock.removeClass('hidden');
 
             if (M.currentdirid === 'favourites') {
@@ -719,6 +743,37 @@ function fmtopUI() {
                 $(`.gallery-tab-lnk-${mega.gallery[M.currentdirid].mode}`, $galleryTabBlock).addClass('active');
             }
         }
+        else if (M.currentrootid === 's4') {
+            const {subType, original} = M.currentCustomView;
+            if (subType === 'container') {
+                $('.fm-s4-new-bucket, .fm-s4-settings', '.fm-header-buttons').removeClass('hidden');
+            }
+            else if (subType === 'bucket') {
+                $('.fm-new-folder').removeClass('hidden');
+                $('.fm-uploads').removeClass('hidden');
+                $('.fm-file-upload').removeClass('hidden');
+                $('.fm-folder-upload').removeClass('hidden');
+            }
+            else if (subType === 'keys') {
+                $('.fm-files-view-icon').addClass('hidden');
+                $('.fm-s4-new-key').removeClass('hidden');
+            }
+            else if (subType === 'policies') {
+                $('.fm-files-view-icon').addClass('hidden');
+            }
+            else if (subType === 'users') {
+                $('.fm-files-view-icon').addClass('hidden');
+                if (original.endsWith('users')) {
+                    $('.fm-s4-new-user').removeClass('hidden');
+                }
+            }
+            else if (subType === 'groups') {
+                $('.fm-files-view-icon').addClass('hidden');
+                if (original.endsWith('groups')) {
+                    $('.fm-s4-new-group').removeClass('hidden');
+                }
+            }
+        }
         else if (String(M.currentdirid).length === 8
             && M.getNodeRights(M.currentdirid) > 0) {
 
@@ -727,12 +782,17 @@ function fmtopUI() {
         }
     }
     $('.fm-clearbin-button').rebind('click', function() {
+        if (M.isInvalidUserStatus()) {
+            return;
+        }
+
         doClearbin(true);
     });
 
     if (M.currentrootid === 'file-requests') {
         mega.fileRequest.rebindTopMenuCreateIcon();
     }
+    $.tresizer();
 }
 
 /**
@@ -745,9 +805,18 @@ function initTreeScroll() {
     var treeClass = 'js-myfiles-panel';
     var scrollBlock;
 
-    if (folderlink || M.currentTreeType !== 'cloud-drive') {
+    if (M.currentTreeType === 'gallery') {
+        treeClass = 'js-gallery-panel';
+    }
+    else if (folderlink || M.currentTreeType !== 'cloud-drive') {
         treeClass = 'js-other-tree-panel';
-        $('.js-other-tree-panel .section-title', fmholder).text(folderlink ? l.folderlink_lp_title : l[24682]);
+
+        $('.js-other-tree-panel .section-title')
+            .text(
+                folderlink
+                    ? (pfcol ? l.shared_album : l.folderlink_lp_title)
+                    : l[24682]
+            );
     }
 
     scrollBlock = document.getElementsByClassName(treeClass).item(0);
@@ -803,8 +872,9 @@ function doClearbin(all) {
     "use strict";
 
     msgDialog('clear-bin', l[14], l[15], l[1007], function(e) {
+
         if (e) {
-            M.clearRubbish(all);
+            M.clearRubbish(all).catch(dump);
         }
     });
 }
@@ -919,6 +989,9 @@ function avatarDialog(close) {
                 mega.attr.set('a', ab_to_base64(data), true, false);
                 useravatar.setUserAvatar(u_handle, data, this.outputFormat);
 
+                // Update mega.io about the new avatar change
+                initMegaIoIframe(true);
+
                 $('.fm-account-avatar').safeHTML(useravatar.contact(u_handle, '', 'div', false));
                 $('.fm-avatar').safeHTML(useravatar.contact(u_handle));
                 avatarDialog(1);
@@ -942,6 +1015,10 @@ function avatarDialog(close) {
         msgDialog('confirmation', 'confirm-remove-avatar', l[18699], l[6973], function(response) {
             if (response){
                 mega.attr.set('a', "none", true, false);
+
+                // Update mega.io about the new avatar change
+                initMegaIoIframe(true);
+
                 avatarDialog(1);
             }
         });
@@ -971,7 +1048,7 @@ function FMShortcuts() {
             !selectionManager ||
             M.currentrootid === 'chat' || // prevent shortcut for chat
             M.currentrootid === undefined || // prevent shortcut for file transfer, dashboard, settings
-            M.currentCustomView.type === 'gallery'
+            M.isGalleryPage()
         ) {
             return true;
         }
@@ -991,7 +1068,7 @@ function FMShortcuts() {
         var charTyped = String.fromCharCode(charCode).toLowerCase();
 
         if (charTyped === "a" && (e.ctrlKey || e.metaKey)) {
-            if (typeof selectionManager != 'undefined' && selectionManager) {
+            if (typeof selectionManager != 'undefined' && selectionManager && !M.gallery && !M.isAlbumsPage()) {
                 selectionManager.select_all();
             }
             return false; // stop prop.
@@ -1030,10 +1107,10 @@ function FMShortcuts() {
             op = op === 'cut' && dir === M.currentdirid ? 'copy' : op;
 
             if (op === "copy") {
-                M.copyNodes(handles, M.currentdirid);
+                M.copyNodes(handles, M.currentdirid).catch((ex) => ex !== EBLOCKED && tell(ex));
             }
             else if (op === "cut") {
-                M.moveNodes(handles, M.currentdirid);
+                M.moveNodes(handles, M.currentdirid).catch(tell);
                 current_operation = null;
             }
 
@@ -1043,7 +1120,7 @@ function FMShortcuts() {
             charCode === 8 &&
             !isShareRoot
         ) {
-            if (M.isInvalidUserStatus()) {
+            if (M.isInvalidUserStatus() || $.msgDialog === 'remove') {
                 return;
             }
 
@@ -1107,30 +1184,26 @@ function fm_showoverlay() {
 }
 
 /**
- * Looking for a already existing name of URL (M.v)
+ * Search for an existing node name
  * @param {String} value New file/folder name
- * @param {String} target {optional}Target handle to check the duplication inside. if not provided M.v will be used
+ * @param {String} [target] Target folder to check for duplication. If not provided, M.v will be used.
+ * @returns {Boolean} Whether it does exist.
  */
 function duplicated(value, target) {
     "use strict";
     if (!target) {
-        var items = M.v.filter(function (item) {
-            return item.name === value;
-        });
-
-        return items.length !== 0;
+        return M.v.some((n) => n.name === value);
     }
-    else {
-        if (M.c[target]) {
-            // Check if a folder/file with the same name already exists.
-            for (var handle in M.c[target]) {
-                if (M.d[handle] && M.d[handle].name === value) {
-                    return true;
-                }
+
+    if (M.c[target]) {
+        for (const handle in M.c[target]) {
+            if (M.d[handle] && M.d[handle].name === value) {
+                return true;
             }
         }
-        return false;
     }
+
+    return false;
 }
 
 /**
@@ -1176,16 +1249,15 @@ function InputFloatWarning($container, options) {
 
     /**
      * Display e.g. LT white-spaces warning if input value contains leading/trailing white-spaces
-     * @param {Number} type file: 0, folder: 1
      * @param {String} name {optional} Name to check, if not provided, container input value will used
      * @param {Number} ms {optional} Timeout in milliseconds. If not provided, default timeout
      * @returns {InputFloatWarning} this instance
      */
-    this.check = ({type, name, ms = 1000}) => {
+    this.check = ({name, ms = 1000} = {}) => {
         // delay function sets default value if given timeout is 0. Workaround: set "ms" to 1 when 0 is given
         delay(this.id, () => {
             const validator = InputFloatWarning.validator[this.options.namespace];
-            const msg = validator(name || $('input', this.$container).val(), type);
+            const msg = validator(name || $('input', this.$container).val());
             return msg ? this.show(msg) : this.hide();
         }, ms > 0 ? ms : 1);
 
@@ -1199,9 +1271,9 @@ function InputFloatWarning($container, options) {
 lazy(InputFloatWarning, 'validator', () => {
     'use strict';
     const obj = {
-        'whitespaces': (value, type) => {
+        'whitespaces': (value) => {
             if (typeof value !== 'undefined' && value.length !== value.trim().length) {
-                return type ? l.whitespaces_on_foldername : l.whitespaces_on_filename;
+                return l.whitespaces_on_name;
             }
             return false;
         }
@@ -1215,11 +1287,11 @@ function renameDialog() {
 
     if ($.selected.length > 0) {
         var n = M.d[$.selected[0]] || false;
-        var nodeType = n.t;// file: 0, folder: 1
         var ext = fileext(n.name);
         var $dialog = $('.mega-dialog.rename-dialog');
         var $input = $('input', $dialog);
         var errMsg = '';
+        const s4Folder = n.t && n.s4;
 
         M.safeShowDialog('rename', function() {
             $dialog.removeClass('hidden').addClass('active');
@@ -1228,11 +1300,11 @@ function renameDialog() {
         });
 
         const ltWSpaceWarning = new InputFloatWarning($dialog);
-        ltWSpaceWarning.hide().check({type: nodeType, name: n.name, ms: 0});
+        ltWSpaceWarning.hide().check({name: n.name, ms: 0});
 
         $('button.js-close, .rename-dialog-button.cancel', $dialog).rebind('click', closeDialog);
 
-        $('.rename-dialog-button.rename').rebind('click', function() {
+        $('.rename-dialog-button.rename').rebind('click.rename', () => {
             if ($dialog.hasClass('active')) {
                 var value = $input.val();
                 errMsg = '';
@@ -1241,24 +1313,25 @@ function renameDialog() {
                     if (!value.trim()) {
                         errMsg = l[5744];
                     }
-                    else if (M.isSafeName(value)) {
+                    else if (s4Folder || M.isSafeName(value)) {
                         var targetFolder = n.p;
                         if (duplicated(value, targetFolder)) {
                             errMsg = l[23219];
                         }
-                        else {
-                            M.rename(n.h, value);
+                        else if (!s4Folder || !(errMsg = s4.ui.getInvalidNodeNameError(n, value))) {
+
+                            M.rename(n.h, value).catch(tell);
                         }
                     }
                     else if (value.length > 250) {
-                        errMsg = nodeType === 1 ? l.LongName : l.LongName1;
+                        errMsg = n.t === 1 ? l.LongName : l.LongName1;
                     }
                     else {
                         errMsg = l[24708];
                     }
 
                     if (errMsg) {
-                        $dialog.find('.duplicated-input-warning span').text(errMsg);
+                        $('.duplicated-input-warning span', $dialog).safeHTML(errMsg);
                         $dialog.addClass('duplicate');
                         $input.addClass('error');
 
@@ -1277,11 +1350,12 @@ function renameDialog() {
             }
         });
 
-        $('header h2', $dialog).text(n.t ? l[425] : l[426]);
+        $('header h2', $dialog)
+            .text(n.t ? s4Folder ? l.s4_bucket_rename : l[425] : l[426]);
         $input.val(n.name);
 
-        $('.transfer-filetype-icon', $dialog)
-            .attr('class', 'transfer-filetype-icon ' + fileIcon(n));
+        $('.input-icon', $dialog)
+            .attr('class', `input-icon item-type-icon icon-${fileIcon(n)}-24`);
 
         if (!n.t && ext.length > 0) {
             $input[0].selectionStart = 0;
@@ -1306,13 +1380,13 @@ function renameDialog() {
             $dialog.removeClass('focused');
         });
 
-        $input.rebind('keydown', function (event) {
+        $input.rebind('keydown', (event) => {
             // distingushing only keydown evet, then checking if it's Enter in order to preform the action'
             if (event.keyCode === 13) { // Enter
                 $('.rename-dialog-button.rename').click();
                 return;
             }
-            else if (event.keyCode === 27){ // ESC
+            else if (event.keyCode === 27) { // ESC
                 closeDialog();
             }
             else {
@@ -1322,7 +1396,9 @@ function renameDialog() {
         });
 
         $input.rebind('keyup.rename-f', () => {
-            ltWSpaceWarning.check({type: nodeType});
+            if (!s4Folder) {
+                ltWSpaceWarning.check();
+            }
         });
     }
 }
@@ -1332,16 +1408,29 @@ function renameDialog() {
  * @param {String} type Dialog type. May also contain button labels: "remove:!^$Cancel!Delete"
  * @param {String} title Header text
  * @param {String} msg Main information text
- * @param {String} submsg Addition text (Optional)
- * @param {Function} callback The function to invoke on button click
- * @param {Boolean|String} checkboxSetting Show "Do not show again" block if True
+ * @param {String} [submsg] Addition text (Optional)
+ * @param {Function} [callback] The function to invoke on button click
+ * @param {Boolean|String} [checkboxSetting] Show "Do not show again" block if True
  * @returns {void}
  */
 // eslint-disable-next-line complexity, sonarjs/cognitive-complexity
 function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
     'use strict';
-    var doneButton  = l[81];
-    var extraButton = String(type).split(':');
+    let negate = false;
+    let doneButton = l.ok_button;
+    let showCloseButton = checkboxSetting === 1;
+
+    type = String(type);
+    if (type[0] === '*') {
+        type = type.slice(1);
+        showCloseButton = true;
+    }
+    if (type[0] === '-') {
+        type = type.slice(1);
+        negate = true;
+    }
+    let extraButton = type.split(':');
+
     if (extraButton.length === 1) {
         extraButton = null;
     }
@@ -1361,8 +1450,8 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
             }
         }
     }
-    if (d) {
-        console.assert(!$.warningCallback, 'Check this out...');
+    if (d && $.warningCallback) {
+        console.warn(`There is another dialog open!.. ${$.msgDialog}, ${$.warningCallback}`);
     }
     $.msgDialog = type;
     $.warningCallback = typeof callback === 'function' && ((res) => onIdle(callback.bind(null, res, null)));
@@ -1374,7 +1463,8 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
     $dialog.parent().addClass('msg-dialog-container');
     $('#msgDialog aside').addClass('hidden');
 
-    if (checkboxSetting === 1) {
+    // Show the top right close (x) button
+    if (showCloseButton) {
         $dialog.addClass('with-close-btn');
     }
 
@@ -1474,7 +1564,7 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
                 `<button class="mega-button confirm ${checkboxSetting === 1 ? 'positive' : ''}">
                     <span>@@</span>
                 </button>`,
-                l[81]
+                l.ok_button
             );
 
             // eslint-disable-next-line sonarjs/no-identical-functions
@@ -1500,16 +1590,18 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
         }
     }
     else if (type === 'confirmationa' || type === 'confirmation' || type === 'remove') {
-        if (doneButton === l[81]) {
+        if (doneButton === l.ok_button) {
             doneButton = false;
         }
+
+        negate = negate || doneButton === l[23737];
         $('#msgDialog footer .footer-container')
             .safeHTML(
                 `<div class="space-between">
                     <button class="mega-button cancel">
                         <span>@@</span>
                     </button>
-                    <button class="mega-button ${doneButton === l[23737] ? 'negative' : 'positive'} confirm">
+                    <button class="mega-button ${negate ? 'negative' : 'positive'} confirm">
                         <span>@@</span>
                     </button>
                 </div>`,
@@ -1523,7 +1615,7 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
                             id="confirmation-checkbox" class="checkboxOff">
                     </div>
                     <label for="confirmation-checkbox" class="radio-txt">@@</label>
-                </div>`, l[229]);
+                </div>`, l.do_not_show_this_again);
         $('#msgDialog aside').removeClass('hidden');
 
         // eslint-disable-next-line sonarjs/no-identical-functions
@@ -1554,6 +1646,12 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
 
         checkboxSetting = checkboxSetting === 1 ? null : checkboxSetting;
         if (checkboxSetting) {
+            assert(
+                checkboxSetting === 'cslrem'
+                || checkboxSetting === 'nowarnpl'
+                || checkboxSetting === 'skipDelWarning'
+                || checkboxSetting === 'rwReinstate', checkboxSetting);
+
             $('#msgDialog .checkbox-block .checkdiv,' +
                 '#msgDialog .checkbox-block input')
                     .removeClass('checkboxOn').addClass('checkboxOff');
@@ -1696,6 +1794,17 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
     }
 }
 
+// eslint-disable-next-line strict -- see {@link msgDialog}
+function asyncMsgDialog(...args) {
+    return new Promise((resolve, reject) => {
+        const callback = args[4] || echo;
+        args[4] = tryCatch((value) => {
+            Promise.resolve(callback(value)).then(resolve).catch(reject);
+        }, reject);
+        msgDialog(...args);
+    });
+}
+
 function closeMsg() {
     var $dialog = $('#msgDialog').addClass('hidden');
     $dialog.parent().removeClass('msg-dialog-container');
@@ -1720,12 +1829,19 @@ function closeMsg() {
  */
 function openContactInfoLink(contactLink) {
     var $dialog = $('.mega-dialog.qr-contact');
-    var QRContactDialogPrepare = function QRContactDialogPrepare(em, fullname, ctHandle) {
+    var QRContactDialogPrepare = function QRContactDialogPrepare(em, fullname, ctHandle, avatar) {
         $('.qr-contact-name', $dialog).text(fullname);
         $('.qr-contact-email', $dialog).text(em);
 
-        var curAvatar = useravatar.contact(em, 'small-rounded-avatar square');
-        $('.avatar-container-qr-contact', $dialog).html(curAvatar);
+        if (avatar && avatar.length > 5) {
+            useravatar.setUserAvatar(em, base64_to_ab(avatar));
+
+            avatar = `<div class="avatar-wrapper small-rounded-avatar"><img src="${avatars[em].url}"></div>`;
+        }
+        else {
+            avatar = useravatar.contact(em, 'small-rounded-avatar square');
+        }
+        $('.avatar-container-qr-contact', $dialog).safeHTML(avatar);
 
         var contactStatus = 1;
         if (u_handle) {
@@ -1782,28 +1898,24 @@ function openContactInfoLink(contactLink) {
                 return loadSubPage('login');
             });
         }
-        $dialog.removeClass('hidden');
     };
-    $('button.js-close', $dialog)
-        .rebind('click', function () {
-            closeDialog();
-            return false;
-        });
-    var req = { a: 'clg', cl: contactLink };
-    api_req(req, {
-        callback: function (res, ctx) {
-            if (typeof res === 'object') {
-                M.safeShowDialog('qr-contact', function () {
-                    QRContactDialogPrepare(res.e, res.fn + ' ' + res.ln, res.h);
-                    return $dialog;
-                });
 
-            }
-            else {
-                msgDialog('warningb', l[8531], l[17865]);
-            }
-        }
-    });
+
+    api.req({a: 'clg', cl: contactLink})
+        .then(({result}) => {
+
+            M.safeShowDialog('qr-contact', () => {
+                QRContactDialogPrepare(result.e, `${result.fn || ''} ${result.ln || ''}`, result.h, result['+a']);
+
+                $('button.js-close', $dialog).rebind('click', () => loadSubPage('fm'));
+                return $dialog.removeClass('hidden');
+            });
+
+        })
+        .catch((ex) => {
+            console.error(ex);
+            msgDialog('warningb', l[8531], l[17865]);
+        });
 }
 
 /**
@@ -1814,7 +1926,7 @@ function openContactInfoLink(contactLink) {
  */
 function shareDialogContentCheck() {
 
-    var dc = '.mega-dialog.share-dialog';
+    var dc = document.querySelector('.mega-dialog.share-dialog');
     var itemsNum = $('.share-dialog-access-list .share-dialog-access-node', dc).length;
     var $doneBtn = $('.done-share', dc);
     var $removeBtn = $('.remove-share', dc);
@@ -1839,6 +1951,38 @@ function shareDialogContentCheck() {
     else {
         $doneBtn.addClass('disabled');
     }
+
+    if (!dc) {
+        return;
+    }
+
+    const cvw = dc.querySelector('.contact-verify-warning');
+    const cvn = dc.querySelector('.contact-verify-notification');
+
+    cvw.classList.add('hidden');
+    cvn.classList.add('hidden');
+
+    const cv = mega.keyMgr.getWarningValue('cv') !== false;
+
+    if (!cv && u_attr.since < 1697184000 && !mega.keyMgr.getWarningValue('cvb')) {
+        cvn.classList.remove('hidden');
+        // Set warning value for contact verificaiton banner
+        mega.keyMgr.setWarningValue('cvb', '1');
+        const cvnText = cvn.querySelector('span');
+        $(cvnText).safeHTML(
+            escapeHTML(l.contact_verification_notif_banner)
+                .replace(
+                    '[D]',
+                    '<div class="contact-verification-settings">'
+                )
+                .replace('[/D]', '</div>')
+        );
+    }
+
+    // if any unverified contact
+    if (cv && dc.querySelector('.unverified-contact')) {
+        cvw.classList.remove('hidden');
+    }
 }
 
 /**
@@ -1861,25 +2005,32 @@ function renderContactRowContent(userEmail, type, id, av, userName, permClass) {
         presence = M.onlineStatusClass(M.d[id].presence === 'unavailable' ? 1 : M.d[id].presence)[1];
     }
 
-    let ownerClass = '';
+    let extraClass = '';
     if (type === '1') {
         userName += ` (${l[8885]})`;
         permClass = 'owner';
-        ownerClass = ' owner';
+        extraClass = ' owner';
     }
     else if (type === '2') {
         userName = l.contact_request_pending.replace('%1', userName);
     }
+    else if (mega.keyMgr.getWarningValue('cv') === '1') {
+        const ed = authring.getContactAuthenticated(id, 'Ed25519');
 
-    html =  `<div class="share-dialog-access-node${ownerClass}" id="${id}">
+        if (!(ed && ed.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON)) {
+            extraClass += ' unverified-contact';
+        }
+    }
+
+    html =  `<div class="share-dialog-access-node${extraClass}" id="${id}">
                 <div class="access-node-info-block">
                     ${av}
                     <div class="access-node-username">
                         ${htmlentities(userName)}
                     </div>
-                    <div class="access-node-status ustatus ${id} ${presence}">
-                        <div class="nw-contact-status"></div>
-                    </div>
+                </div>
+                <div class="access-node-contact-verify">
+                    <div class='contact-verify'>${l.verify_credentials}</div>
                 </div>
                 <div class="access-node-permission-wrapper">
                     <button
@@ -2006,7 +2157,7 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
     'use strict';
     var rowId = '',
         html = '',
-        av =  useravatar.contact(email, 'access-node-avatar'),
+        av =  useravatar.contact(userHandle || email, 'access-node-avatar'),
         perm = '',
         permissionLevel = 0;
 
@@ -2015,7 +2166,9 @@ function generateShareDialogRow(displayNameOrEmail, email, shareRights, userHand
     }
 
     // Restore the latest changed permission
-    if ($.changedPermissions[userHandle]) {
+    if ($.changedPermissions
+        && $.changedPermissions[userHandle]) {
+
         permissionLevel = $.changedPermissions[userHandle].r;
     }
 
@@ -2192,6 +2345,19 @@ function shareDialogAccessListBinds() {
     $('.share-dialog-access-list', $shareDialog).rebind('scroll.closeMenu', () => {
         hideShareDialogPermMenu();
     });
+
+    $('.access-node-contact-verify .contact-verify', $shareDialog).rebind('click', function() {
+
+        const contact = this.closest('.unverified-contact');
+
+        if (contact) {
+            fingerprintDialog(this.closest('.unverified-contact').id);
+        }
+    });
+
+    $('.contact-verification-settings', $shareDialog).rebind('click', () => {
+        M.openFolder('account/contact-chats/contact-verification-settings', true);
+    });
 }
 
 /**
@@ -2364,7 +2530,9 @@ function initShareDialogMultiInput(alreadyAddedContacts) {
                     scrollToElement($scrollBlock, $listedItemEle);
                 }
 
-                if ($.contactPickerSelected.indexOf($listedItemHandle) === -1) {
+                if ($.contactPickerSelected
+                    && !$.contactPickerSelected.includes($listedItemHandle)) {
+
                     $listedItemEle.trigger('click');
                 }
 
@@ -2387,13 +2555,13 @@ function initShareDialogMultiInput(alreadyAddedContacts) {
             var newEmailsNum = $newEmails.length;
             var noNewContacts = true;
 
-            setTimeout(function() {
+            onIdle(() => {
                 $('.token-input-input-token-mega input', $scope).trigger("blur");
-            }, 0);
+            });
 
             for (var i = 0; i < newEmailsNum; i++) {
                 var newEmail = $($newEmails[i]).contents().eq(1).text();
-                if (typeof M.findOutgoingPendingContactIdByEmail(newEmail) === 'undefined') {
+                if (!M.findOutgoingPendingContactIdByEmail(newEmail)) {
                     noNewContacts = false;
                     break;
                 }
@@ -2406,11 +2574,13 @@ function initShareDialogMultiInput(alreadyAddedContacts) {
             }
 
             // If no new email is in multiInput box and contact picker, disable the button
-            if (JSON.stringify(clone($.contactPickerSelected).sort()) === JSON.stringify(alreadyAddedContacts.sort())
-                && newEmailsNum === 0) {
-                $('.add-share', $scope).addClass('disabled');
-            }
+            if (newEmailsNum === 0) {
+                const sel = $.contactPickerSelected;
 
+                if (Array.isArray(sel) && JSON.stringify(sel.sort()) === JSON.stringify(alreadyAddedContacts.sort())) {
+                    $('.add-share', $scope).addClass('disabled');
+                }
+            }
         }
     });
 }
@@ -2422,7 +2592,7 @@ function renderShareDialogAccessList() {
     "use strict";
 
     const $shareDialog = $('.mega-dialog.share-dialog', '.mega-dialog-container');
-    const $warning = $('.mega-banner', $shareDialog);
+    const $warning = $('.mega-banner', $shareDialog).eq(2);
     let readonly = false;
 
     // Remove all contacts from the access list
@@ -2482,10 +2652,9 @@ function initShareDialog() {
     });
 
     // Change the permission for the specific contact or group
-    // eslint-disable-next-line complexity
     $('.share-dialog-permissions-menu .option', $dialog).rebind('click', function(e) {
         var $this = $(this);
-        var shares = M.d[$.selected[0]].shares;
+        const {shares} = M.getNodeByHandle($.selected[0]);
         var newPermLevel = checkMultiInputPermission($this);
         var newPerm = sharedPermissionLevel(newPermLevel[0]);
         var $selectedContact =  $('.share-dialog-access-node.active', $dialog);
@@ -2590,6 +2759,7 @@ function initShareDialog() {
                 var share = new mega.Share();
 
                 share.updateNodeShares();
+                eventlog(500037);
             });
         }
 
@@ -2737,6 +2907,12 @@ function closeDialog(ev) {
     else if ($.dialog === 'share-add') {
         $('.mega-dialog.share-add-dialog').addClass('hidden');
     }
+    else if ($.dialog === 'fingerprint-dialog' && document.querySelector('.share-dialog.arrange-to-back')) {
+        document.querySelector('.fingerprint-dialog').classList.add('hidden');
+    }
+    else if ($.dialog === 'fingerprint-admin-dlg' && window.closeDlgMute) {
+        return false;
+    }
     else {
         if ($.dialog === 'properties') {
             propertiesDialog(2);
@@ -2785,7 +2961,6 @@ function closeDialog(ev) {
         delete $.saveToDialogCb;
         delete $.saveToDialogNode;
         delete $.saveToDialog;
-        delete $.selectFolderCallback;
         delete $.chatAttachmentShare;
 
         if ($.saveToDialogPromise) {
@@ -2798,8 +2973,9 @@ function closeDialog(ev) {
             delete $.saveToDialogPromise;
         }
 
-        if ($(ev && ev.target).is('.fm-dialog-overlay, .dialog-cancel-button, .fm-dialog-close')) {
+        if (ev && $(ev.target).is('.fm-dialog-overlay, .fm-dialog-close')) {
             delete $.onImportCopyNodes;
+            delete $.albumImport;
         }
 
         if ($.msgDialog) {
@@ -2807,7 +2983,18 @@ function closeDialog(ev) {
                 onIdle($.warningCallback.bind(null, null));
                 $.warningCallback = null;
             }
-            delete $.msgDialog;
+            closeMsg();
+        }
+        if ($.dialog === 'onboardingDialog') {
+            if (
+                mega.ui.onboarding.$hotSpotNode
+                && mega.ui.onboarding.$hotSpotNode.hasClass('onboarding-hotspot-animation-rect')
+            ) {
+                mega.ui.onboarding.$hotSpotNode.removeClass('onboarding-hotspot-animation-rect');
+            }
+            if (M.chat) {
+                megaChat.plugins.chatOnboarding.occurrenceDialogShown = false;
+            }
         }
     }
     $('.mega-dialog, .overlay.arrange-to-back, .mega-dialog-container.common-container').removeClass('arrange-to-back');
@@ -2826,10 +3013,6 @@ function closeDialog(ev) {
     }
     else if ($.dialog !== 'terms') {
         delete $.mcImport;
-    }
-
-    if ($.dialog === 'selectFolder') {
-        delete $.selectFolderCallback;
     }
 
     if (typeof redeem !== 'undefined' && redeem.$dialog) {
@@ -2853,9 +3036,6 @@ function closeDialog(ev) {
         // the createfolder dialog was closed
         // eslint-disable-next-line local-rules/hints
         $.dialog = $.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog;
-
-        $('.mega-dialog').addClass('arrange-to-back');
-        $('.mega-dialog.fm-picker-dialog').removeClass('arrange-to-back');
     }
 
     if ($.shareDialog) {
@@ -2926,34 +3106,34 @@ function createFolderDialog(close) {
         loadingDialog.pshow();
 
         M.createFolder(target, v)
-            .then(function(h) {
+            .then((h) => {
                 if (d) {
                     console.log('Created new folder %s->%s', target, h);
                 }
-                loadingDialog.phide();
+                createFolderDialog(1);
 
                 if (awaitingPromise) {
                     // dispatch an awaiting promise expecting to perform its own action instead of the default one
-                    awaitingPromise.resolve(h);
+                    queueMicrotask(() => awaitingPromise.resolve(h));
+                    return awaitingPromise;
                 }
-                else {
-                    // By default auto-select the newly created folder as long no awaiting promise
-                    M.openFolder(Object(M.d[h]).p || target)
-                        .always(function() {
-                            $.selected = [h];
-                            reselect(1);
-                        });
-                }
-                createFolderDialog(1);
-            })
-            .catch(function(ex) {
-                loadingDialog.phide();
 
+                // By default, auto-select the newly created folder as long no awaiting promise
+                return M.openFolder(Object(M.d[h]).p || target)
+                    .always(() => {
+                        $.selected = [h];
+                        reselect(1);
+                    });
+            })
+            .catch((ex) => {
                 msgDialog('warninga', l[135], l[47], ex < 0 ? api_strerror(ex) : ex, function() {
                     if (awaitingPromise) {
                         awaitingPromise.reject(ex);
                     }
                 });
+            })
+            .finally(() => {
+                loadingDialog.phide();
             });
     };
 
@@ -2969,7 +3149,7 @@ function createFolderDialog(close) {
     });
 
     $input.rebind('keyup', function(e) {
-        ltWSpaceWarning.check({type: 1});
+        ltWSpaceWarning.check();
         if ($input.val() === '' || $input.val() === l[157]) {
             $dialog.removeClass('active');
         }
@@ -3141,7 +3321,7 @@ function createFileDialog(close, action, params) {
     });
 
     $input.rebind('keyup.fileDialog', function() {
-        ltWSpaceWarning.check({type: 0});
+        ltWSpaceWarning.check();
         if ($input.val() === '' || $input.val() === l[17506]) {
             $dialog.removeClass('active');
         }
@@ -3307,8 +3487,7 @@ function savecomplete(id)
 {
     $('.mega-dialog.download-dialog').addClass('hidden');
     fm_hideoverlay();
-    if (!$.dialog)
-        $('#dlswf_' + id).remove();
+
     var dl = dlmanager.getDownloadByHandle(id);
     if (dl) {
         M.dlcomplete(dl);
@@ -3488,7 +3667,7 @@ function sharedFolderUI() {
 
         $('.shared-details-block').prepend(
             '<div class="shared-top-details">'
-                + '<div class="shared-details-icon"></div>'
+                + '<i class="shared-details-icon item-type-icon-90 icon-folder-incoming-90"></i>'
                 + '<div class="shared-details-info-block">'
                     + '<div class="shared-details-pad">'
                         + '<div class="shared-details-folder-name">' + escapeHTML(folderName) + '</div>'
@@ -3523,6 +3702,15 @@ function sharedFolderUI() {
             + '</div>');
 
         $(rightPanelView).addClass('shared-folder-content');
+
+        if (mega.keyMgr.getWarningValue('cv') === '1') {
+            const ed = authring.getContactAuthenticated(ownersHandle, 'Ed25519');
+
+            if (!(ed && ed.method >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON)) {
+                $('.shared-details-block .shared-details-icon')
+                    .addClass('sprite-fm-uni-after icon-warning-after');
+            }
+        }
 
         if (M.d[M.currentdirid] !== nodeData || M.d[nodeData.p]) {
             // hide leave-share under non-root shares
@@ -3592,47 +3780,95 @@ function enableVerifyFingerprintsButton(userHandle) {
     });
 }
 
-function fingerprintDialog(userid) {
-
-    // Add log to see how often they open the verify dialog
-    api_req({ a: 'log', e: 99601, m: 'Fingerprint verify dialog opened' });
+function fingerprintDialog(userid, isAdminVerify, callback) {
+    'use strict';
 
     userid = userid.u || userid;
-    var user = M.u[userid];
+    const user = M.u[userid];
     if (!user || !user.u) {
-        return;
+        return -5;
     }
 
-    var $dialog = $('.fingerprint-dialog');
-    var closeFngrPrntDialog = function() {
+    if (d) {
+        console.warn('fingerprint-dialog', user.h, [user], isAdminVerify, [callback]);
+    }
+
+    // Add log to see how often they open the verify dialog
+    eventlog(99601, !!isAdminVerify);
+
+    const $dialog = $('.fingerprint-dialog');
+
+    $dialog.toggleClass('e-modal', isAdminVerify === null);
+    $dialog.toggleClass('admin-verify', isAdminVerify === true);
+    let titleTxt = l.verify_credentials;
+    let subTitleTxt = l.contact_ver_dialog_content;
+    let approveBtnTxt = l.mark_as_verified;
+    let credentialsTitle = l[6780];
+    let listenerToken = null;
+    window.closeDlgMute = null;
+
+    if (isAdminVerify) {
+        titleTxt = l.bus_admin_ver;
+        subTitleTxt = l.bus_admin_ver_sub;
+        approveBtnTxt = l[1960];
+        credentialsTitle = l.bus_admin_cred;
+        listenerToken = mBroadcaster.addListener('mega:openfolder', {
+            callback: () => {
+                fingerprintDialog(u_attr.b.mu[0], true);
+            },
+            once: true
+        });
+        window.closeDlgMute = true;
+    }
+
+    $('header h2', $dialog).text(titleTxt);
+    $('.content-block p.sub-title-txt', $dialog).text(subTitleTxt);
+    $('.footer-container .dialog-approve-button span', $dialog).text(approveBtnTxt);
+    $('.fingerprint-code .contact-fingerprint-title', $dialog).text(credentialsTitle);
+
+    const closeFngrPrntDialog = () => {
+        window.closeDlgMute = null;
         closeDialog();
         $('button.js-close', $dialog).off('click');
         $('.dialog-approve-button').off('click');
         $('.dialog-skip-button').off('click');
-        mega.ui.CredentialsWarningDialog.rendernext();
+        if (!isAdminVerify) {
+            callback = callback || mega.ui.CredentialsWarningDialog.rendernext;
+            callback(userid);
+        }
+        else {
+            const bus = new BusinessAccount();
+            bus.sendSubMKey()
+                .then(() => {
+                    mBroadcaster.removeListener(listenerToken);
+                })
+                .catch(tell);
+        }
     };
 
-    $dialog.find('.fingerprint-avatar').empty()
+    $('.fingerprint-avatar', $dialog).empty()
         .append($(useravatar.contact(userid, 'semi-mid-avatar')));
 
-    $dialog.find('.contact-details-user-name')
+    $('.contact-details-user-name', $dialog)
         .text(M.getNameByHandle(user.u)) // escape HTML things
         .end()
         .find('.contact-details-email')
         .text(user.m); // escape HTML things
 
-    $dialog.find('.fingerprint-txt').empty();
-    userFingerprint(u_handle, function(fprint) {
-        var target = $('.fingerprint-bott-txt .fingerprint-txt');
+    $('.fingerprint-txt', $dialog).empty();
+
+    userFingerprint(u_handle, (fprint) => {
+        const target = $('.fingerprint-bott-txt .fingerprint-txt');
         fprint.forEach(function(v) {
             $('<span>').text(v).appendTo(target);
         });
     });
 
-    userFingerprint(user, function(fprint) {
-        var offset = 0;
+    userFingerprint(user, (fprint) => {
+        let offset = 0;
         $dialog.find('.fingerprint-code .fingerprint-txt').each(function() {
-            var that = $(this);
+            let that = $(this);
+
             fprint.slice(offset, offset + 5).forEach(function(v) {
                 $('<span>').text(v).appendTo(that);
                 offset++;
@@ -3640,11 +3876,14 @@ function fingerprintDialog(userid) {
         });
     });
 
-    $('button.js-close', $dialog).rebind('click', function() {
+    $('button.js-close, .dialog-skip-button', $dialog).rebind('click', function() {
+        if (isAdminVerify) {
+            return;
+        }
         closeFngrPrntDialog();
     });
 
-    $('.dialog-approve-button').rebind('click', function() {
+    $('.dialog-approve-button', $dialog).rebind('click', () => {
 
         // Add log to see how often they verify the fingerprints
         api_req({ a: 'log', e: 99602, m: 'Fingerprint verification approved' });
@@ -3652,11 +3891,9 @@ function fingerprintDialog(userid) {
         const promises = [];
         loadingDialog.show();
 
-        if (!authring.getContactAuthenticated(userid, 'Cu25519')) {
-            delete pubCu25519[userid];
-            promises.push(crypt.getPubCu25519(userid));
+        if (!authring.getContactAuthenticated(userid, 'Cu25519') || !pubCu25519[userid]) {
+            promises.push(crypt.getPubCu25519(userid, true));
         }
-
         // Generate fingerprint
         promises.push(crypt.getFingerprintEd25519(userid, 'string'));
 
@@ -3682,6 +3919,34 @@ function fingerprintDialog(userid) {
 
                 if (M.u[userid]) {
                     M.u[userid].trackDataChange(M.u[userid], "fingerprint");
+
+                    if (M.currentdirid === 'shares' && M.c[userid]) {
+
+                        for (const h in M.c[userid]) {
+                            if (M.megaRender) {
+                                M.megaRender.revokeDOMNode(h, true);
+                            }
+                        }
+
+                        M.renderMain(true);
+                    }
+                    else if (M.c[userid] && M.c[userid][M.currentdirid]) {
+                        $('.shared-details-icon').removeClass('icon-warning-after sprite-fm-uni-after');
+                        $('.' + userid).addClass('verified');
+                    }
+
+                    if ($.dialog === 'share') {
+
+                        const contact = document.querySelector(`.share-dialog-access-list [id="${userid}"]`);
+
+                        if (contact) {
+
+                            contact.classList.remove('unverified-contact');
+                            contact.querySelector('.avatar-wrapper').classList.add('verified');
+                        }
+
+                        shareDialogContentCheck();
+                    }
                 }
             })
             .catch((ex) => {
@@ -3703,11 +3968,7 @@ function fingerprintDialog(userid) {
             });
     });
 
-    $('.dialog-skip-button').rebind('click', function() {
-        closeFngrPrntDialog();
-    });
-
-    M.safeShowDialog('fingerprint-dialog', $dialog);
+    M.safeShowDialog(isAdminVerify ? 'fingerprint-admin-dlg' : 'fingerprint-dialog', $dialog);
 }
 
 /**
@@ -3767,14 +4028,44 @@ function FMResizablePane(element, opts) {
     else if (opts.direction.length === 2) {
         size_attr = 'both';
     }
-    const broadcasts = [];
 
     self.destroy = function() {
+        $self.off();
         $element.data('fmresizable', null);
+    };
 
-        for (let i = broadcasts.length; i--;) {
-            mBroadcaster.removeListener(broadcasts[i]);
+    this.refresh = function(ev) {
+        const width = $element.width();
+
+        if (opts.maxWidth && width >= opts.maxWidth) {
+            $('.left-pane-drag-handle').css('cursor', 'w-resize');
+            $('body').css('cursor', 'w-resize');
         }
+        else if (width <= opts.minWidth) {
+            $('.left-pane-drag-handle').css('cursor', 'e-resize');
+            $('body').css('cursor', 'e-resize');
+        }
+        else {
+            $('.left-pane-drag-handle').css('cursor', 'ew-resize');
+            $('body').css('cursor', 'ew-resize');
+        }
+
+        if (!$element.hasClass('ui-resizable-resizing')) {
+            $('body').css('cursor', 'auto');
+        }
+
+        if (width < opts.updateWidth + 60) {
+            $element.addClass('small-left-panel');
+        }
+        else {
+            $element.removeClass('small-left-panel');
+        }
+
+        if (d > 1) {
+            console.warn([this], width);
+        }
+
+        return ev || $.tresizer();
     };
 
     this.setWidth = function(value) {
@@ -3790,6 +4081,8 @@ function FMResizablePane(element, opts) {
         if (value > 0) {
             $element.width(value);
         }
+
+        this.refresh();
     };
 
     this.setOption = function(key, value) {
@@ -3837,6 +4130,7 @@ function FMResizablePane(element, opts) {
                     $element.css(css_attrs);
 
                     if (opts.persistanceKey) {
+                        console.assert(opts.persistanceKey !== 'leftPaneWidth');
                         mega.config.set(opts.persistanceKey, css_attrs);
                     }
                 } else {
@@ -3848,12 +4142,12 @@ function FMResizablePane(element, opts) {
                     self["current_" + size_attr] = ui.size[size_attr];
                 }
 
-                $self.trigger('resize', [e, ui]);
+                delay('fm-resizable-pane:refresh', () => self.refresh(e, ui));
             },
             'stop': function(e, ui) {
+                $.tresizer();
                 $(self.element).removeClass('resizable-pane-active');
                 $self.trigger('resizestop', [e, ui]);
-                $(window).trigger('resize');
             }
         };
 
@@ -3866,23 +4160,27 @@ function FMResizablePane(element, opts) {
         $element.resizable(resizable_opts);
 
         $element.data('fmresizable', this);
-
-        if (opts.pagechange) {
-            const callback = tryCatch(opts.pagechange)();
-            delete opts.pagechange;
-
-            if (callback) {
-                const safeCallback = tryCatch(() => callback.call(self));
-
-                M.onFileManagerReady(() => {
-                    onIdle(safeCallback);
-                    broadcasts.push(mBroadcaster.addListener('pagechange', safeCallback));
-                });
-            }
-        }
     }
+
     return this;
 }
+
+Object.defineProperty(FMResizablePane, 'refresh', {
+    value() {
+        'use strict';
+        if (M.fmTabPages) {
+            // @todo revamp if we ever use other than '.fm-left-panel' for these
+            const cl = $('.fm-left-panel:visible').data('fmresizable');
+
+            if (cl) {
+
+                cl.setOption('maxWidth', M.fmTabPages['cloud-drive'][M.currentrootid] ? null : 400);
+            }
+
+            return cl;
+        }
+    }
+});
 
 function initDownloadDesktopAppDialog() {
 
@@ -3904,7 +4202,7 @@ function initDownloadDesktopAppDialog() {
                 break;
             case "Linux":
                 $('aside', $dialog).addClass('hidden');
-                loadSubPage('/desktop');
+                mega.redirect('mega.io', '/desktop', false, false, false);
                 break;
         }
     });

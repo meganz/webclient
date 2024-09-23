@@ -33,6 +33,36 @@
  *                    id="register-lastname-registerpage2"
  *                    placeholder="[$7345]"
  *                    maxlength="40" />`
+ * - Clear button - simple extension of adding clear button on right side of input
+ *      Class: `clearButton`
+ *      Example: `<input class="underlinedText clearButton"/>`
+ *
+ * - Copy to clipboard button - simple extension of adding Copy to clipboard button on right side of input
+ *      Class: `copyButton`
+ *      Example: `<input class="underlinedText copyButton"/>`
+ *      Options once MegaInput init:
+ *          Pass `copyToastText` on options once MegaInput if custom text in "Copied to clipboard" toast is required
+ *
+ *              `var megaInput = new mega.ui.MegaInputs($input, {
+ *                  copyToastText: l.value_copied
+ *              });`
+ *
+ * - Text area with automatic height. Increase/decrease the text area in height depending on the amount of text.
+ *      wrapperClass: `textarea auto-height`
+ *      Example: `<input class="underlinedText copyButton" data-wrapper-class="textarea auto-height"/>`
+ *      Options once MegaInput init:
+ *          Pass `autoHeight` on options once MegaInput init
+ *          Pass `maxHeight` on options once MegaInput init if you need to stop increasing it by height at some point
+ *
+ *              `var megaInput = new mega.ui.MegaInputs($input, {
+ *                  autoHeight: true,
+ *                  maxHeight: 140,
+ *              });`
+ *
+ * - Length Checker - Show number of characters entered below input field if it has a limit (no-of-chars / limit)
+ *      Class: `lengthChecker`
+ *      Example: `<input class="underlinedText lengthChecker" type="text" name="register-name" id="register-name"
+ *          placeholder="[$195]" maxlength="1000" />`
  */
 mega.ui.MegaInputs.prototype.underlinedText = function() {
 
@@ -74,7 +104,7 @@ mega.ui.MegaInputs.prototype.underlinedText._init = function() {
     // If it is already a megaInput, html preparation does not required anymore.
     if (!$input.hasClass('megaInputs')) {
 
-        const hasTitle = $input.attr('title') || $input.attr('placeholder');
+        const hasTitle = !$input.hasClass('no-title-top') && ($input.attr('title') || $input.attr('placeholder'));
         const wrapperClass = hasTitle ? 'title-ontop' : '';
 
         // Wrap it with another div for styling and animation
@@ -115,18 +145,26 @@ mega.ui.MegaInputs.prototype.underlinedText._init = function() {
         // Insert error message block
         $wrapper.safeAppend('<div class="message-container mega-banner"></div>');
 
+        // Add some class to wrapper
+        if ($input.data('wrapper-class')) {
+            $wrapper.addClass($input.data('wrapper-class'));
+        }
+
         // Half size
         this.underlinedText._halfSize.call(this);
 
         // Insert password strength checker
         this.underlinedText._strengthChecker.call(this);
 
+        // Insert input length checker
+        this.textArea._lengthChecker.call(this);
+
         // With icon or prefix (e.g. currency)
         this.underlinedText._withIconOrPrefix.call(this);
 
-        // Add some class to wrapper
-        if ($input.data('wrapper-class')) {
-            $wrapper.addClass($input.data('wrapper-class'));
+        // Add special class for textarea with auto height
+        if (this.options.autoHeight) {
+            $wrapper.addClass('textarea auto-height');
         }
     }
 };
@@ -139,11 +177,21 @@ mega.ui.MegaInputs.prototype.underlinedText._bindEvent = function() {
 
     $input.rebind('focus.underlinedText', function() {
         $(this).parent().addClass('active');
+
+        if ($(this).hasClass('clearButton') && $(this).val()) {
+            const $clearBtn = $('.clear-input', $(this).parent());
+            $clearBtn.removeClass('hidden');
+        }
     });
 
     $input.rebind('blur.underlinedText change.underlinedText', function() {
 
         var $this = $(this);
+
+        if ($this.hasClass('clearButton')) {
+            const $clearBtn = $('.clear-input', $this.parent());
+            $clearBtn.addClass('hidden');
+        }
 
         if ($this.val()) {
             $this.parent().addClass('valued');
@@ -157,9 +205,35 @@ mega.ui.MegaInputs.prototype.underlinedText._bindEvent = function() {
     // Hide error upon input changes
     var self = this;
 
+    // Textarea with auto height
+    if (this.options.autoHeight) {
+        $input.rebind('input.autoHeight', (e) => {
+            e.target.style.height = 0;
+            e.target.style.height = `${this.options.maxHeight && parseInt(this.options.maxHeight) <=
+                e.target.scrollHeight ? this.options.maxHeight : e.target.scrollHeight}px`;
+        });
+    }
+
     if (!$input.hasClass('strengthChecker')) {
         $input.rebind('input.underlinedText', function() {
             self.hideError();
+        });
+    }
+
+    if (is_mobile) {
+
+        $(window).rebind('resize.megaInputs', () => {
+
+            const $inputs = $('.megaInputs', '.mega-input.msg');
+
+            for (let i = $inputs.length; i--;) {
+
+                const megaInput = $($inputs[i]).data('MegaInputs');
+
+                if (megaInput) {
+                    self.underlinedText._botSpaceCalc.call(megaInput);
+                }
+            }
         });
     }
 };
@@ -203,21 +277,15 @@ mega.ui.MegaInputs.prototype.underlinedText._updateShowHideErrorAndMessage = fun
         else if (msg) {
             var $wrapper = this.$input.parent();
             var $msgContainer = $wrapper.find('.message-container');
-            var extraSpace = 9;
 
             if (fix) {
                 $wrapper.addClass('fix-msg');
                 this.fixMessage = msg;
-                extraSpace = 4;
             }
 
             $wrapper.addClass('msg');
             $msgContainer.safeHTML(msg);
-            if (this.origBotSpace === undefined) {
-                this.origBotSpace = this.origBotSpace || parseInt($wrapper.css('margin-bottom'));
-            }
-
-            $wrapper.css('margin-bottom', this.origBotSpace + $msgContainer.outerHeight() + extraSpace);
+            this.underlinedText._botSpaceCalc.call(this);
         }
     };
 
@@ -272,22 +340,66 @@ mega.ui.MegaInputs.prototype.underlinedText._withIconOrPrefix = function() {
     var $input = this.$input;
     var $wrapper = this.$wrapper;
 
+    // Copy to clipboard button
+    if ($input.hasClass('copyButton')) {
+
+        $wrapper.safeAppend(`<i class="${mega.ui.sprites.mono} icon-square-copy copy-input-value"></i>`);
+
+        const $copyBtn = $('.copy-input-value', $wrapper);
+
+        $copyBtn.rebind('click.copyInputValue tap.copyInputValue', () => {
+            copyToClipboard(
+                $input.val(),
+                escapeHTML(this.options.copyToastText) ||  l[371]
+            );
+            return false;
+        });
+    }
+
+    if ($input.hasClass('clearButton')) {
+
+        $wrapper.safeAppend(
+            `<i class="${mega.ui.sprites.mono} icon-close-component clear-input"></i>`
+        );
+
+        const $clearBtn = $('.clear-input', $wrapper);
+
+        $clearBtn.rebind('click.clearInput tap.clearInput', () => {
+            if ($input.hasClass('errored')) {
+                this.hideError();
+            }
+            this.setValue('');
+            $input.trigger('focus');
+        });
+
+        $input.rebind('keyup.clearInput input.clearInput change.clearInput', function() {
+            $clearBtn[this.value.length ? 'removeClass' : 'addClass']('hidden');
+        });
+
+        if (!$input.val()) {
+            $clearBtn.addClass('hidden');
+        }
+    }
+
     if (this.type === 'password') {
 
-        $wrapper.safeAppend('<i class="sprite-fm-mono icon-eye-reveal pass-visible"></i>');
+        const iconSprite = mega.ui.sprites.mono;
+        const showTextIcon = 'icon-eye-reveal';
+        const hideTextIcon = 'icon-eye-hidden';
+
+        $wrapper.safeAppend(`<i class="${iconSprite} ${showTextIcon} pass-visible"></i>`);
 
         $('.pass-visible', $wrapper).rebind('click.togglePassV', function() {
 
-            if (this.classList.contains('icon-eye-reveal')) {
-
+            if (this.classList.contains(showTextIcon)) {
                 $input.attr('type', 'text');
-                this.classList.remove('icon-eye-reveal');
-                this.classList.add('icon-eye-hidden');
+                this.classList.remove(showTextIcon);
+                this.classList.add(hideTextIcon);
             }
             else {
                 $input.attr('type', 'password');
-                this.classList.add('icon-eye-reveal');
-                this.classList.remove('icon-eye-hidden');
+                this.classList.add(showTextIcon);
+                this.classList.remove(hideTextIcon);
             }
         });
     }
@@ -316,9 +428,20 @@ mega.ui.MegaInputs.prototype.underlinedText._strengthChecker = function() {
         $wrapper.safeAppend('<div class="account password-status hidden"></div>');
 
         // Strength Bar
-        $wrapper.safeAppend('<div class="account-pass-lines">' +
-            '<div class="register-pass-status-line"></div>' +
-        '</div>');
+        if (is_mobile && $wrapper.hasClass('mobile')) {
+            $wrapper.safeAppend('<div class="account-pass-lines">' +
+                '<div class="register-pass-status-line1"></div>' +
+                '<div class="register-pass-status-line2"></div>' +
+                '<div class="register-pass-status-line3"></div>' +
+                '<div class="register-pass-status-line4"></div>' +
+                '<div class="register-pass-status-line5"></div>' +
+            '</div>');
+        }
+        else {
+            $wrapper.safeAppend('<div class="account-pass-lines">' +
+                '<div class="register-pass-status-line"></div>' +
+            '</div>');
+        }
 
         // Loading icon for zxcvbn.
         $wrapper.safeAppend('<div class="register-loading-icon">' +
@@ -340,15 +463,35 @@ mega.ui.MegaInputs.prototype.underlinedText._strengthChecker = function() {
 
                 var $passStatus = $wrapper.find('.password-status');
                 var $passStatusBar = $wrapper.find('.account-pass-lines');
+                var $messageContainer = $('.message-container', $wrapper);
 
-                $passStatus.add($passStatusBar).removeClass('good1 good2 good3 good4 good5 checked');
+                $passStatus
+                    .add($passStatusBar)
+                    .add($messageContainer)
+                    .removeClass('good1 good2 good3 good4 good5 checked');
 
                 var strength = classifyPassword($(this).val());
 
                 if (typeof strength === 'object') {
 
                     $passStatus.addClass(strength.className + ' checked').text(strength.string1);
-                    $input.data('MegaInputs').showMessage(strength.string2);
+                    if (is_mobile) {
+                        $messageContainer.addClass(strength.className);
+
+                        let alert = '<i class="alert sprite-mobile-fm-mono icon-info-thin-outline"></i>';
+                        if (strength.className === 'good3') {
+                            alert = '<i class="alert sprite-mobile-fm-mono icon-alert-circle-thin-outline"></i>';
+                        }
+                        else if (strength.className === 'good4' || strength.className === 'good5') {
+                            alert = '<i class="alert sprite-mobile-fm-mono icon-check-circle-thin-outline"></i>';
+                        }
+                        $input.data('MegaInputs').showMessage(
+                            `${alert} <span>${strength.string2}</span>`
+                        );
+                    }
+                    else {
+                        $input.data('MegaInputs').showMessage(strength.string2);
+                    }
 
                     $passStatusBar.addClass(strength.className);
                 }
@@ -372,6 +515,66 @@ mega.ui.MegaInputs.prototype.underlinedText._strengthChecker = function() {
         }
 
         $wrapper.addClass('strengthChecker');
+    }
+};
+
+mega.ui.MegaInputs.prototype.underlinedText._botSpaceCalc = function() {
+
+    'use strict';
+
+    var $wrapper = this.$input.parent();
+
+    if ($wrapper.hasClass('msg')) {
+        if (this.origBotSpace === undefined) {
+            this.origBotSpace = parseInt($wrapper.css('margin-bottom'));
+        }
+
+        $wrapper.css('margin-bottom',
+                     this.origBotSpace
+                     + $('.message-container', $wrapper).outerHeight()
+                     + ($wrapper.hasClass('fix-msg') ? 4 : 9));
+    }
+};
+
+mega.ui.MegaInputs.prototype.underlinedText._lengthChecker = function() {
+
+    'use strict';
+
+    var $input = this.$input;
+    var $wrapper = this.$wrapper;
+
+    const maxLength = $input.attr('maxlength');
+
+    if ($input.hasClass('lengthChecker') && maxLength) {
+
+        // Length section
+        $wrapper.safeAppend('<div class="length-check hidden">' +
+            '<span class="chars-used"></span>' +
+            `<span class="char-limit">/${maxLength}</span>` +
+        '</div>');
+
+        const $lengthCheck = $('.length-check', $wrapper);
+
+        if ($input.val().length) {
+            $lengthCheck.removeClass('hidden');
+            $('.chars-used', $lengthCheck).text($input.val().length);
+        }
+
+        $input.rebind('keyup.lengthChecker input.lengthChecker change.lengthChecker', (e) => {
+
+            if (e.keyCode === 13) {
+                return false;
+            }
+
+            this.hideError();
+
+            const inputSize = $input.val().length;
+
+            $lengthCheck.toggleClass('hidden', !inputSize);
+
+            const $charsUsed = $('.chars-used', $wrapper);
+            $charsUsed.text(inputSize);
+        });
     }
 };
 
@@ -411,7 +614,6 @@ mega.ui.MegaInputs.prototype.underlinedText._extendedFunctions = function() {
             this.$input.prev().addClass('no-trans');
         }
 
-        this.hideError();
         mega.ui.MegaInputs.prototype.setValue.call(this, value);
 
         onIdle(function() {

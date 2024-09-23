@@ -19,6 +19,7 @@ var BABEL_LOADER_OPTIONS = {
     ],
     presets: [
         ['@babel/preset-env',  {
+            "debug": true,
             "loose": true,
             "exclude": [
                 "@babel/plugin-transform-parameters",
@@ -102,8 +103,8 @@ var webpackConfigs = {
             app: entryPoints
         },
         performance: {
-            maxAssetSize: 1222333,
-            maxEntrypointSize: 1222333
+            maxAssetSize: 1666999,
+            maxEntrypointSize: 1666999
         },
         output: {
             path: __dirname + "/",
@@ -134,7 +135,9 @@ var webpackConfigs = {
         },
         optimization: {
             // We no not want to minimize our code.
-            minimize: false
+            minimize: false,
+            sideEffects: true,
+            usedExports: true,
         },
         externals: {
             "jquery": "jQuery",

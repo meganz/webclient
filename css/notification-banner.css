@@ -1,0 +1,81 @@
+/**
+ * CSS for the desktop Notification Banner
+ */
+.notification-banner {
+    display: flex;
+    height: fit-content;
+    padding: 0 24px 16px;
+    margin: 0 auto;
+    max-width: 988px;
+    box-sizing: border-box;
+    position: relative;
+    top: 16px;
+}
+.notification-banner.no-max-width {
+    max-width: unset;
+}
+.notification-banner.extra-bottom-padding {
+    padding-bottom: 24px;
+}
+
+.notification-banner .display-icon {
+    width: 32px;
+    height: 32px;
+    padding: 8px;
+}
+
+.notification-banner .banner-contents {
+    padding: 16px 14px 16px 20px;
+    border-radius: 16px;
+    background-color: var(--surface-grey-1);
+    width: 100%;
+    transition: 200ms linear;
+}
+
+.notification-banner .banner-contents,
+.notification-banner .banner-contents .info-and-buttons,
+.notification-banner .banner-contents .info-and-buttons .buttons,
+.notification-banner .banner-contents .info-and-buttons .buttons .cta-buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.notification-banner .banner-contents > *:not(:last-child),
+.notification-banner .banner-contents .info-and-buttons > *:not(:last-child) {
+    margin-inline-end: 12px;
+    -webkit-margin-end: 12px;
+}
+
+.notification-banner .banner-contents .info-and-buttons .buttons .cta-buttons > :last-child {
+    margin-inline-start: 12px;
+    -webkit-margin-start: 12px;
+}
+
+.notification-banner .banner-contents .info-and-buttons {
+    justify-content: space-between;
+    flex: 1;
+}
+
+.notification-banner .banner-contents .info-and-buttons .info .title {
+    font-family: var(--text-font-family-bold);
+    font-size: 14px;
+    line-height: 20px;
+}
+
+.notification-banner .banner-contents .info-and-buttons .info > * {
+    color: var(--text-color-high);
+}
+
+.notification-banner .banner-contents .info-and-buttons .buttons > *:not(:last-child) {
+    margin-inline-end: 24px;
+    -webkit-margin-end: 24px;
+}
+
+.notification-banner .banner-contents .info-and-buttons .buttons .cta-buttons > * {
+    min-width: unset;
+}
+
+.notification-banner .banner-contents .info-and-buttons .buttons .mega-button.close {
+    align-self: baseline;
+}

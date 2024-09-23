@@ -4,6 +4,10 @@ import {Button} from "../../../ui/buttons.jsx";
 import {DropdownEmojiSelector} from "../../../ui/emojiDropdown.jsx";
 
 class ConversationMessageMixin extends ContactAwareComponent {
+
+    attachRerenderCallbacks  = false;
+    _reactionContactHandles = [];
+
     constructor(props) {
         super(props);
         this.__cmmUpdateTickCount = 0;
@@ -14,8 +18,6 @@ class ConversationMessageMixin extends ContactAwareComponent {
         lazy(this, '__cmmId', () => {
             return this.getUniqueId() + '--' + String(Math.random()).slice(-7);
         });
-
-
 
         this._emojiOnActiveStateChange = this._emojiOnActiveStateChange.bind(this);
         this.emojiSelected = this.emojiSelected.bind(this);
@@ -28,7 +30,9 @@ class ConversationMessageMixin extends ContactAwareComponent {
             && msg.isSentOrReceived()
             && !Object.hasOwnProperty.call(msg, 'reacts')) {
 
-            msg.reacts.forceLoad().then(nop).catch(dump.bind(null, 'reactions.load.' + msg.messageId));
+            msg.reacts.forceLoad().then(() => {
+                this.addContactListenerIfMissing(this._reactionContacts());
+            }).catch(dump.bind(null, `reactions.load.${msg.messageId}`));
         }
     }
 
@@ -63,7 +67,7 @@ class ConversationMessageMixin extends ContactAwareComponent {
     removeContactListeners() {
         const users = this._contactChangeListeners;
 
-        if (d > 1) {
+        if (d > 3) {
             console.warn('%s.removeContactListeners', this.getReactId(), [this], users);
         }
 
@@ -72,6 +76,18 @@ class ConversationMessageMixin extends ContactAwareComponent {
         }
 
         this._contactChangeListeners = false;
+    }
+
+    _reactionContacts() {
+        const { message } = this.props;
+        const { reacts } = message;
+        const handles = [];
+        const reactions = Object.values(reacts.reactions);
+        for (let i = 0; i < reactions.length; i++) {
+            handles.push(...Object.keys(reactions[i]));
+        }
+        this._reactionContactHandles = array.unique(handles);
+        return this._reactionContactHandles;
     }
 
     addContactListeners() {
@@ -94,7 +110,11 @@ class ConversationMessageMixin extends ContactAwareComponent {
             }
         }
 
-        if (d > 1) {
+        for (let i = this._reactionContactHandles.length; i--;) {
+            addUser(this._reactionContactHandles[i] in M.u && M.u[this._reactionContactHandles[i]]);
+        }
+
+        if (d > 3) {
             console.warn('%s.addContactListeners', this.getReactId(), [this], users);
         }
 
@@ -102,6 +122,34 @@ class ConversationMessageMixin extends ContactAwareComponent {
             users[i].addChangeListener(this);
         }
         this._contactChangeListeners = users;
+    }
+
+    addContactListenerIfMissing(contacts) {
+        if (!this._contactChangeListeners) {
+            // Unmounted or not shown (race).
+            return false;
+        }
+        if (!Array.isArray(contacts)) {
+            contacts = [contacts];
+        }
+        const added = [];
+
+        for (let i = 0; i < contacts.length; i++) {
+            const user = M.u[contacts[i]];
+            if (user && !this._contactChangeListeners.includes(user)) {
+                this._contactChangeListeners.push(user);
+                user.addChangeListener(this);
+                added.push(user.h);
+            }
+        }
+        if (d > 1) {
+            console.warn('%s.addContactListenerIfMissing', this.getReactId(), [this], added);
+        }
+    }
+
+    eventuallyUpdate() {
+        super.eventuallyUpdate();
+        this.__cmmUpdateTickCount = -2;
     }
 
     handleChangeEvent(x, z, k) {
@@ -112,10 +160,21 @@ class ConversationMessageMixin extends ContactAwareComponent {
         }
         // console.warn('xyz', this.__cmmUpdateTickCount, this.__cmmId, [this]);
 
-        delay(this.__cmmId, () => {
-            this.eventuallyUpdate();
-            this.__cmmUpdateTickCount = -2;
-        }, ++this.__cmmUpdateTickCount > 5 ? -1 : 90);
+        if (this.isComponentEventuallyVisible()) {
+
+            if (++this.__cmmUpdateTickCount > 5) {
+
+                this.eventuallyUpdate();
+                delay.cancel(this.__cmmId);
+            }
+            else {
+
+                delay(this.__cmmId, () => this.eventuallyUpdate(), 90);
+            }
+        }
+        else {
+            this._requiresUpdateOnResize = true;
+        }
     }
 
     componentWillUnmount() {
@@ -263,14 +322,16 @@ class ConversationMessageMixin extends ContactAwareComponent {
                     ChatdIntegration._ensureContactExists(Object.keys(reaction));
 
                     var rKeys = Object.keys(reaction);
-                    for (var i = 0; i < rKeys.length; i++) {
-                        var uid = rKeys[i];
+                    for (let i = 0; i < rKeys.length; i++) {
+                        const uid = rKeys[i];
 
                         if (reaction[uid]) {
-                            var c = M.u[uid] || {};
-                            names.push(
-                                uid === u_handle ? (l[24071] || "You") : c.name ? c.name : c.m || "(missing name)"
-                            );
+                            if (uid === u_handle) {
+                                names.push(l[24071] || 'You');
+                            }
+                            else if (uid in M.u) {
+                                names.push(M.getNameByHandle(uid) || megaChat.plugins.userHelper.SIMPLETIP_USER_LOADER);
+                            }
                         }
 
                     }
@@ -369,7 +430,17 @@ class ConversationMessageMixin extends ContactAwareComponent {
             emojisImages.push(reactionBtn);
         }
 
-        return emojisImages ? <div className="reactions-bar" id="reactions-bar">
+        return emojisImages ? <div className="reactions-bar" id="reactions-bar" onMouseEnter={() => {
+            if (this._loadedReacts) {
+                return false;
+            }
+            this._loadedReacts = megaChat.plugins.userHelper.fetchAllNames(this._reactionContacts(), chatRoom)
+                .catch(dump)
+                .finally(() => {
+                    this._loadedReacts = true;
+                    this.safeForceUpdate();
+                });
+        }}>
             {emojisImages}
         </div> : null;
     }

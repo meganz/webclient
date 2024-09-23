@@ -113,6 +113,7 @@ accountUI.renderAccountPage = function(account) {
         }
         else {
             id = `${accountRootUrl}/${urlPart0}`;
+            id = id.replace(/\W+$/, '');
             subSectionId = urlPart1;
         }
     }
@@ -219,6 +220,21 @@ accountUI.renderAccountPage = function(account) {
 
             accountUI.calls.init();
             break;
+        case '/fm/account/vpn':
+            $('.fm-account-vpn', accountUI.$contentBlock).removeClass('hidden');
+            sectionClass = 'vpn';
+
+            accountUI.vpn.init();
+            break;
+        case '/fm/account/s4':
+            if (!accountUI.s4 || !u_attr.s4) {
+                loadSubPage('fm/account');
+                return false;
+            }
+            $('.fm-account-s4').removeClass('hidden');
+            sectionClass = 's4';
+            accountUI.s4.init();
+            break;
         default:
 
             // This is the main entry point for users who just had upgraded their accounts
@@ -268,16 +284,33 @@ accountUI.general = {
             }
             else {
                 loadSubPage('pro');
+
+                const $clickedButton = $(this);
+
+                if ($clickedButton.hasClass('bandwidth-upgrade')) {
+                    eventlog(500488);
+                }
+                else if ($clickedButton.hasClass('rubbish-upgrade')) {
+                    eventlog(500487);
+                }
+                else if ($clickedButton.hasClass('plan-details-upgrade')) {
+                    eventlog(500484);
+                }
+                else {
+                    eventlog(500482);
+                }
             }
         });
 
         $('.download-sync', accountUI.$contentBlock).rebind('click', function() {
 
+            eventlog(500489);
+
             var pf = navigator.platform.toUpperCase();
 
             // If this is Linux send them to desktop page to select linux type
             if (pf.indexOf('LINUX') > -1) {
-                loadSubPage('desktop');
+                mega.redirect('mega.io', 'desktop', false, false, false);
             }
             // else directly give link of the file.
             else {
@@ -340,10 +373,10 @@ accountUI.general = {
             }
 
             // Maximum bandwidth
-            var b2 = bytesToSize(account.tfsq.max, 0).split(' ');
+            var b2 = bytesToSize(account.tfsq.max, 0).split('\u00A0');
             var usedB = bytesToSize(account.tfsq.used);
             $('.chart.data .size-txt', $bandwidthChart).text(usedB);
-            $('.chart.data .pecents-txt', $bandwidthChart).text(bytesToSize(account.tfsq.max, 0));
+            $('.chart.data .pecents-txt', $bandwidthChart).text(bytesToSize(account.tfsq.max, 3, 4));
             $('.chart.data .of-txt', $bandwidthChart).text('/');
             $('.account.chart.data', $bandwidthChart).removeClass('hidden');
             if ((u_attr.p || account.tfsq.ach) && b2[0] > 0) {
@@ -478,19 +511,26 @@ accountUI.general = {
         // Show Membership plan
         $('.account .plan-icon', $dashboardPane).removeClass('pro1 pro2 pro3 pro4 pro100 pro101 free');
 
-        if (u_attr.p) {
+        // Default is Free (proNum undefined)
+        let proNum = u_attr.p;
+        let planClass = 'free';
+        let planText = l[1150];
 
-            // LITE/PRO account
-            var planNum = u_attr.p;
-            var planText = pro.getProPlanName(planNum);
+        // If Business or Pro Flexi, always show the icon & name (even if expired, which is when u_attr.p is undefined)
+        if (u_attr.b || u_attr.pf) {
+            proNum = u_attr.b ? pro.ACCOUNT_LEVEL_BUSINESS : pro.ACCOUNT_LEVEL_PRO_FLEXI;
+            planClass = 'pro' + proNum;
+            planText = pro.getProPlanName(proNum);
+        }
 
-            $('.account.membership-plan', $dashboardPane).text(planText);
-            $('.account .plan-icon', $dashboardPane).addClass('pro' + planNum);
+        // Otherwise if it's an active Pro account
+        else if (proNum) {
+            planClass = 'pro' + proNum;
+            planText = pro.getProPlanName(proNum);
         }
-        else {
-            $('.account .plan-icon', $dashboardPane).addClass('free');
-            $('.account.membership-plan', $dashboardPane).text(l[1150]);
-        }
+
+        $('.account .plan-icon', $dashboardPane).addClass(planClass);
+        $('.account.membership-plan', $dashboardPane).text(planText);
 
         // update avatar
         $('.fm-account-avatar', $fmContent).safeHTML(useravatar.contact(u_handle, '', 'div', false));
@@ -648,6 +688,10 @@ accountUI.inputs = {
             var self = this;
             var $switch = $(identifier, $container);
 
+            if ($switch.attr('id') === 'file-request'){
+                currentValue = !currentValue;
+            }
+
             if ((currentValue && !$switch.hasClass('toggle-on'))
                 || (!currentValue && $switch.hasClass('toggle-on'))) {
                 this.toggle(identifier, $container);
@@ -659,7 +703,7 @@ accountUI.inputs = {
 
             $switch.rebind('click.switch', function() {
 
-                var val = $switch.hasClass('toggle-on');
+                const val = $switch.hasClass('toggle-on');
 
                 if (typeof onClickCb === 'function') {
                     onClickCb(val).done(function() {
@@ -677,7 +721,7 @@ accountUI.inputs = {
             'use strict';
 
             var $switch = $(identifier, $container);
-            var newVal;
+            let newVal;
 
             if ($switch.hasClass('toggle-on')) {
                 $switch.removeClass('toggle-on');
@@ -688,6 +732,7 @@ accountUI.inputs = {
                 newVal = 1;
             }
 
+            newVal = $switch.attr('id') === 'file-request' ? 1 - newVal : newVal;
             $switch.trigger('update.accessibility');
 
             if (typeof onChangeCb === 'function') {
@@ -718,6 +763,12 @@ accountUI.leftPane = {
         if (M.account.reseller) {
             // Show reseller button on naviation
             $menuItems.filter('.reseller').removeClass('hidden');
+        }
+
+        // Show S4 settings
+        if (u_attr.s4) {
+            // Show reseller button on naviation
+            $menuItems.filter('.s4').removeClass('hidden');
         }
 
         if (accountUI.plan.paymentCard.validateUser(M.account)) {
@@ -759,6 +810,10 @@ accountUI.leftPane = {
                 return 'fm/account/reseller';
             case $section.hasClass('calls'):
                 return 'fm/account/calls';
+            case $section.hasClass('s4'):
+                return 'fm/account/s4';
+            case $section.hasClass('vpn'):
+                return 'fm/account/vpn';
             default:
                 return 'fm/account';
         }
@@ -1134,7 +1189,11 @@ accountUI.account = {
                     $removeNumberButton.rebind('click.gsmremove', () => {
                         msgDialog('confirmation', '', l[23425], l[23426], answer => {
                             if (answer) {
-                                accountUI.account.profiles.removePhoneNumber(true).catch(dump);
+                                accountUI.account.profiles.removePhoneNumber()
+                                    .then(() => {
+                                        msgDialog('info', '', l[23427]);
+                                    })
+                                    .catch(dump);
                             }
                         });
                     });
@@ -1177,45 +1236,25 @@ accountUI.account = {
          * Send remove command to API, and update UI if needed
          * @param {Boolean} showSuccessMsg      Show message dialog on success
          */
-        removePhoneNumber: promisify((resolve, reject, showSuccessMsg) => {
-
+        async removePhoneNumber() {
             'use strict';
+            const res = await api.req({a: 'smsr'}).catch(echo);
 
-            // lock UI
-            loadingDialog.show();
+            if (res && res.result === 0) {
+                // success
+                // no APs, we need to rely on this response.
+                delete u_attr.smsv;
 
-            api_req(
-                { a: 'smsr' },
-                {
-                    callback: tryCatch(res => {
-                        // Unlock UI regardless of the result
-                        loadingDialog.hide();
-                        if (res === 0) {
-                            // success
-                            // no APs, we need to rely on this response.
-                            delete u_attr.smsv;
+                // update only relevant sections in UI
+                accountUI.account.profiles.renderPhoneBanner();
+                accountUI.account.profiles.renderPhoneDetails();
+            }
+            else {
+                msgDialog('warningb', '', l[23428], `${res < 0 ? api_strerror(res) : res}`);
 
-                            // update only relevant sections in UI
-                            accountUI.account.profiles.renderPhoneBanner();
-                            accountUI.account.profiles.renderPhoneDetails();
-
-                            if (showSuccessMsg) {
-                                msgDialog('info', '', l[23427]);
-                            }
-                            resolve();
-                        }
-                        else {
-                            msgDialog('warningb', '', l[23428]);
-                            reject(res);
-                        }
-                    }, () => {
-                        loadingDialog.hide();
-                        msgDialog('warningb', '', l[23428]);
-                        reject('Failed to remove the phone number.');
-                    })
-                }
-            );
-        }),
+                throw new MEGAException(l[23428], res);
+            }
+        },
 
         resetProfileForm: function() {
 
@@ -1438,8 +1477,8 @@ accountUI.account = {
                 };
 
                 if (checkUpdated()) {
-                    api_req(userAttrRequest, {
-                        callback: function (res) {
+                    api.screq(userAttrRequest)
+                        .then(({result: res}) => {
                             if (res === u_handle) {
                                 $('.user-name').text(u_attr.name);
                                 $('.name', '.account-dialog').text(u_attr.fullname)
@@ -1450,8 +1489,8 @@ accountUI.account = {
                                 // update file request username for existing folder
                                 mega.fileRequest.onUpdateUserName(u_attr.fullname);
                             }
-                        }
-                    });
+                        })
+                        .catch(tell);
                 }
 
                 // Reset current Internationalization API usage upon save.
@@ -1519,13 +1558,12 @@ accountUI.account = {
                             .add('.qr-block', accountUI.account.qrcode.$QRSettings)
                             .parent().removeClass('closed');
 
-                        api_req({ a: 'clc' }, {
-                            myAccount: account,
-                            callback: function (res, ctx) {
-                                ctx.myAccount.contactLink = typeof res === 'string' ? 'C!' + res : '';
+                        api.send('clc')
+                            .then((res) => {
+                                account.contactLink = typeof res === 'string' ? `C!${res}` : '';
                                 accountUI.account.qrcode.render(M.account);
-                            }
-                        });
+                            })
+                            .catch(dump);
                     }
                     else {
                         $('.access-qr-container', accountUI.account.qrcode.$QRSettings)
@@ -1592,7 +1630,7 @@ accountUI.account = {
                 $('.copy-qr-link', this.$QRSettings).removeClass('hidden');
                 $('.qr-dlg-cpy-lnk', this.$QRSettings).rebind('click', function() {
                     var links = $.trim($(this).next('.qr-http-link').text());
-                    var toastTxt = l[7654];
+                    var toastTxt = l[1642];
                     copyToClipboard(links, toastTxt);
                 });
             }
@@ -1609,34 +1647,20 @@ accountUI.account = {
 
                 if (regenQR) {
                     loadingDialog.show();
-                    var delQR = {
-                        a: 'cld',
-                        cl: M.account.contactLink.substring(2, M.account.contactLink.length)
-                    };
-                    var reGenQR = { a: 'clc' };
 
-                    api_req(delQR, {
-                        callback: function (res) {
-                            if (res === 0) { // success
-                                api_req(reGenQR, {
-                                    callback: function (res2) {
-                                        if (typeof res2 !== 'string') {
-                                            res2 = '';
-                                        }
-                                        else {
-                                            res2 = 'C!' + res2;
-                                        }
-                                        M.account.contactLink = res2;
-                                        accountUI.account.qrcode.render(M.account);
-                                        loadingDialog.hide();
-                                    }
-                                });
-                            }
-                            else {
-                                loadingDialog.hide();
-                            }
-                        }
-                    });
+                    api.req({a: 'cld', cl: M.account.contactLink.substring(2)})
+                        .then(({result}) => {
+                            assert(result === 0);
+                            return api.send('clc');
+                        })
+                        .then((res) => {
+                            M.account.contactLink = typeof res === 'string' ? `C!${res}` : '';
+                            accountUI.account.qrcode.render(M.account);
+                        })
+                        .catch(dump)
+                        .finally(() => {
+                            loadingDialog.hide();
+                        });
                 }
             });
         }
@@ -1678,7 +1702,7 @@ accountUI.account = {
                 u_attr['^!webtheme'] || 0,
                 function(val) {
                     mega.attr.set('webtheme', val, -2, 1);
-                    mega.ui.theme.set(val);
+                    mega.ui.setTheme(val);
                 }
             );
 
@@ -1765,7 +1789,7 @@ accountUI.account = {
 
                             // Check for invalid 2FA code
                             if (res === EFAILED || res === EEXPIRED) {
-                                msgDialog('warninga', l[135], l[19216]);
+                                msgDialog('warninga', l[135], l[19192]);
                             }
 
                             // Check for incorrect email
@@ -1789,798 +1813,21 @@ accountUI.account = {
                 msgDialog('confirmation', l[6181], confirmMessage, false, function(event) {
                     if (event) {
 
-                        loadingDialog.show();
-
                         // Check if 2FA is enabled on their account
-                        twofactor.isEnabledForAccount(function(result) {
+                        twofactor.isEnabledForAccount()
+                            .then((result) => {
 
-                            loadingDialog.hide();
+                                // If 2FA is enabled on their account
+                                if (result) {
 
-                            // If 2FA is enabled on their account
-                            if (result) {
-
-                                // Show the verify 2FA dialog to collect the user's PIN
-                                twofactor.verifyActionDialog.init(function(twoFactorPin) {
-                                    continueCancelAccount(twoFactorPin);
-                                });
-                            }
-                            else {
-                                continueCancelAccount(null);
-                            }
-                        });
+                                    // Show the verify 2FA dialog to collect the user's PIN
+                                    return twofactor.verifyActionDialog.init();
+                                }
+                            })
+                            .then((twoFactorPin) => continueCancelAccount(twoFactorPin || null))
+                            .catch((ex) => ex !== EBLOCKED && tell(ex));
                     }
                 });
-            });
-        }
-    }
-};
-
-accountUI.plan = {
-
-    init: function(account) {
-
-        "use strict";
-
-        const $planContent = $('.fm-account-plan.fm-account-sections', accountUI.$contentBlock);
-
-        // Plan - Account type
-        this.accountType.render(account);
-        this.accountType.bindEvents();
-
-        // Plan - Account Balance
-        this.balance.render(account);
-        this.balance.bindEvents();
-
-        // Plan - History
-        this.history.renderPurchase(account);
-        this.history.renderTransaction(account);
-        this.history.bindEvents(account);
-
-        // Plan - Payment card
-        this.paymentCard.init(account, $planContent);
-
-        // check if business account
-        if (u_attr && u_attr.b) {
-            if (!u_attr.b.m || u_attr.b.s === -1) {
-                $('.acc-storage-space', $planContent).addClass('hidden');
-                $('.acc-bandwidth-vol', $planContent).addClass('hidden');
-            }
-            $('.btn-achievements', $planContent).addClass('hidden');
-            $('.data-block.account-balance', $planContent).addClass('hidden');
-            $('.acc-setting-menu-balance-acc', '.content-panel.account').addClass('hidden');
-            if (!u_attr.b.m || u_attr.b.s !== -1) {
-                $('.upgrade-to-pro', $planContent).addClass('hidden');
-            }
-        }
-
-        // If Pro Flexi, hide the Upgrade Account button and Account Balance section on the Plan page
-        if (u_attr && u_attr.pf) {
-            $('.upgrade-to-pro', $planContent).addClass('hidden');
-            $('.data-block.account-balance', $planContent).addClass('hidden');
-        }
-    },
-
-    accountType: {
-
-        render: function(account) {
-
-            'use strict';
-
-            var $planContent = $('.data-block.account-type', accountUI.$contentBlock);
-
-            var renderSubscription = function _renderSubscription() {
-                // Get the date their subscription will renew
-                var timestamp = (account.srenew.length > 0) ? account.srenew[0] : 0; // Timestamp e.g. 1493337569
-                var paymentType = (account.sgw.length > 0) ? account.sgw[0] : ''; // Credit Card etc
-                var gatewayId = (account.sgwids.length > 0) ? account.sgwids[0] : null; // Gateway ID e.g. 15, etc
-
-                if (paymentType.indexOf('Credit Card') === 0) {
-                    paymentType = paymentType.replace('Credit Card', l[6952]);
-                }
-
-                // Display the date their subscription will renew if known
-                if (timestamp > 0) {
-                    var dateString = time2date(timestamp, 2);
-
-                    // Use format: 14 March 2015 - Credit Card
-                    paymentType = dateString + ' - ' + paymentType;
-
-                    // Change placeholder 'Expires on' to 'Renews'
-                    $('.subtitle-txt.expiry-txt', $planContent).text(l[6971]);
-                    $('.account.plan-info.expiry', $planContent).text(paymentType);
-                }
-                else {
-                    // Otherwise show nothing
-                    $('.account.plan-info.expiry', $planContent).text('');
-                    $('.subtitle-txt.expiry-txt', $planContent).text('');
-                }
-
-                var $subscriptionBlock = $('.sub-container.subscription', $planContent);
-                var $cancelSubscriptionButton = $('.btn-cancel-sub', $subscriptionBlock);
-                var $achievementsButton = $('.btn-achievements', $planContent);
-
-                if (!M.maf){
-                    $achievementsButton.addClass('hidden');
-                }
-
-                // If Apple or Google subscription (see pro.getPaymentGatewayName function for codes)
-                if ((gatewayId === 2) || (gatewayId === 3)) {
-
-                    // Tell them they need to cancel their plan off-site and don't show the feedback dialog
-                    $subscriptionBlock.removeClass('hidden');
-                    $cancelSubscriptionButton.rebind('click', function() {
-                        msgDialog('warninga', l[7179], l[16501]);
-                    });
-                }
-
-                // Otherwise if ECP, Sabadell, or Stripe
-                else if (gatewayId === 16 || gatewayId === 17 || gatewayId === 19) {
-
-                    // Check if there are any active subscriptions
-                    // ccqns = Credit Card Query Number of Subscriptions
-                    api_req({ a: 'ccqns' }, {
-                        callback: function(numOfSubscriptions) {
-
-                            // If there is an active subscription
-                            if (numOfSubscriptions > 0) {
-
-                                // Show cancel button and show cancellation dialog
-                                $subscriptionBlock.removeClass('hidden');
-                                $cancelSubscriptionButton.rebind('click', function() {
-                                    accountUI.plan.accountType.cancelSubscriptionDialog.init();
-                                });
-                            }
-                        }
-                    });
-                }
-            };
-
-            if (u_attr.p) {
-
-                // LITE/PRO account
-                var planNum = u_attr.p;
-                var planText = pro.getProPlanName(planNum);
-
-                // if this is p=100 business
-                if (planNum === pro.ACCOUNT_LEVEL_BUSINESS) {
-                    $('.account.plan-info.accounttype', $planContent).addClass('business');
-                    $('.fm-account-plan .acc-renew-date-info', $planContent).removeClass('border');
-                }
-                else {
-                    $('.account.plan-info.accounttype', $planContent).removeClass('business');
-                    $('.fm-account-plan .acc-renew-date-info', $planContent).addClass('border');
-                }
-
-                // Account type
-                $('.account.plan-info.accounttype span', $planContent).text(planText);
-                $('.account .plan-icon', $planContent).addClass('pro' + planNum);
-
-                // Subscription
-                if (account.stype === 'S') {
-                    renderSubscription();
-                }
-                else if (account.stype === 'O') {
-
-                    var expiryTimestamp = account.nextplan ? account.nextplan.t : account.expiry;
-
-                    // one-time or cancelled subscription
-                    $('.subtitle-txt.expiry-txt', $planContent).text(l[987]);
-                    $('.account.plan-info.expiry span', $planContent).text(time2date(expiryTimestamp, 2));
-                    $('.sub-container.subscription', $planContent).addClass('hidden');
-                }
-
-                $('.account.plan-info.bandwidth', $planContent).parent().removeClass('hidden');
-            }
-            else {
-                // free account:
-                $('.account.plan-info.accounttype span', $planContent).text(l[1150]);
-                $('.account .plan-icon', $planContent).addClass('free');
-                $('.account.plan-info.expiry', $planContent).text(l[436]);
-                $('.sub-container.subscription', $planContent).addClass('hidden');
-                if (account.mxfer) {
-                    $('.account.plan-info.bandwidth', $planContent).parent().removeClass('hidden');
-                }
-                else {
-                    $('.account.plan-info.bandwidth', $planContent).parent().addClass('hidden');
-                }
-            }
-
-            /* achievements */
-            if (!account.maf ||
-                (u_attr.p === pro.ACCOUNT_LEVEL_BUSINESS && u_attr.b && u_attr.b.m) ||
-                (u_attr.p === pro.ACCOUNT_LEVEL_PRO_FLEXI && u_attr.pf)) {
-
-                $('.btn-achievements', $planContent).addClass('hidden');
-
-                // If active Business master account or active Pro Flexi account
-                if ((u_attr.p === pro.ACCOUNT_LEVEL_BUSINESS && u_attr.b && u_attr.b.m) ||
-                    (u_attr.p === pro.ACCOUNT_LEVEL_PRO_FLEXI && u_attr.pf)) {
-
-                    // Debug code ...
-                    if (d && localStorage.debugNewPrice) {
-                        M.account.space_bus_base = 3;
-                        M.account.space_bus_ext = 2;
-                        M.account.tfsq_bus_base = 3;
-                        M.account.tfsq_bus_ext = 1;
-                        M.account.tfsq_bus_used = 3848290697216; // 3.5 TB
-                        M.account.space_bus_used = 4617948836659; // 4.2 TB
-                    }
-                    // END Debug code
-
-                    const renderBars = (used, base, extra, $container, msg, $overall) => {
-                        let spaceTxt = `${bytesToSize(used)}`;
-                        let baseTxt = spaceTxt;
-                        let storageConsume = used / 1048576; // MB
-                        let storageQuota = (base || 3) * 1048576; // MB
-                        let extraTxt = l[5816].replace('[X]', base || 3);
-
-                        if (base) {
-
-                            spaceTxt += `/${l[5816]
-                                .replace('[X]', base + (extra || 0))}`;
-
-                            if (extra) {
-                                storageConsume = base;
-                                storageQuota = base + extra;
-                                baseTxt = extraTxt;
-                                extraTxt = msg.replace('%1', extra);
-                            }
-                        }
-
-                        $('.settings-sub-bar', $container)
-                            .css('width', `${100 - storageConsume * 100 / storageQuota}%`);
-                        $('.base-quota-note span', $container).text(baseTxt);
-                        $('.achieve-quota-note span', $container).text(extraTxt);
-                        $overall.text(spaceTxt);
-                    };
-
-                    const $storageContent = $('.acc-storage-space', $planContent);
-                    const $bandwidthContent = $('.acc-bandwidth-vol', $planContent);
-
-                    renderBars(M.account.space_bus_used || M.account.space_used, M.account.space_bus_base,
-                               M.account.space_bus_ext, $storageContent, l.additional_storage,
-                               $('.plan-info.storage > span', $planContent));
-
-                    renderBars(M.account.tfsq_bus_used || M.account.tfsq.used, M.account.tfsq_bus_base,
-                               M.account.tfsq_bus_ext, $bandwidthContent, l.additional_transfer,
-                               $('.plan-info.bandwidth > span', $planContent));
-
-                    $('.bars-container', $planContent).removeClass('hidden');
-                }
-                else {
-                    $('.plan-info.storage > span', $planContent).text(bytesToSize(M.account.space, 0));
-                    $('.plan-info.bandwidth > span', $planContent).text(bytesToSize(M.account.tfsq.max, 0));
-                    $('.bars-container', $planContent).addClass('hidden');
-                }
-            }
-            else {
-                mega.achievem.parseAccountAchievements();
-            }
-        },
-
-        bindEvents: function() {
-
-            "use strict";
-
-            $('.btn-achievements', accountUI.$contentBlock).rebind('click', function() {
-                mega.achievem.achievementsListDialog();
-            });
-        },
-
-        /**
-         * Dialog to cancel subscriptions
-         */
-        cancelSubscriptionDialog: {
-
-            $backgroundOverlay: null,
-            $dialog: null,
-            $dialogSuccess: null,
-            $accountPageCancelButton: null,
-            $continueButton: null,
-            $cancelReason: null,
-            $expiryTextBlock: null,
-            $expiryDateBlock: null,
-
-            /**
-             * Initialise the dialog
-             */
-            init: function() {
-
-                'use strict';
-
-                // Cache some selectors
-                this.$dialog = $('.cancel-subscription-st1');
-                this.$dialogSuccess = $('.cancel-subscription-st2');
-                this.$accountPageCancelButton = $('.btn-cancel-sub');
-                this.$continueButton = this.$dialog.find('.continue-cancel-subscription');
-                this.$cancelReason = this.$dialog.find('.cancel-textarea textarea');
-                this.$backgroundOverlay = $('.fm-dialog-overlay');
-                this.$expiryTextBlock = $('.account.plan-info.expiry-txt');
-                this.$expiryDateBlock = $('.account.plan-info.expiry');
-
-                // Show the dialog
-                this.$dialog.removeClass('hidden');
-                this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
-
-                // Init textarea scrolling
-                initTextareaScrolling($('.cancel-textarea textarea', this.$dialog));
-
-                // Init functionality
-                this.enableButtonWhenReasonEntered();
-                this.initSendingReasonToApi();
-                this.initCloseAndBackButtons();
-            },
-
-            /**
-             * Close the dialog when either the close or back buttons are clicked
-             */
-            initCloseAndBackButtons: function() {
-
-                'use strict';
-
-                var self = this;
-
-                // Close main dialog
-                this.$dialog.find('button.cancel, button.js-close').rebind('click', function() {
-                    self.$dialog.addClass('hidden');
-                    self.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
-                });
-
-                // Prevent clicking on the background overlay which closes it unintentionally
-                self.$backgroundOverlay.rebind('click', function(event) {
-                    event.stopPropagation();
-                });
-            },
-
-            /**
-             * Close success dialog
-             */
-            initCloseButtonSuccessDialog: function() {
-
-                'use strict';
-
-                var self = this;
-
-                this.$dialogSuccess.find('button.js-close').rebind('click', function() {
-                    self.$dialogSuccess.addClass('hidden');
-                    self.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
-                });
-            },
-
-            /**
-             * Make sure text has been entered before making the button available
-             */
-            enableButtonWhenReasonEntered: function() {
-
-                'use strict';
-
-                var self = this;
-
-                this.$cancelReason.rebind('keyup', function() {
-
-                    // Trim for spaces
-                    var reason = $(this).val();
-                    reason = $.trim(reason);
-
-                    // Make sure at least 1 character
-                    if (reason.length > 0) {
-                        self.$continueButton.removeClass('disabled');
-                    }
-                    else {
-                        self.$continueButton.addClass('disabled');
-                    }
-                });
-            },
-
-            /**
-             * Send the cancellation reason
-             */
-            initSendingReasonToApi: function() {
-
-                'use strict';
-
-                var self = this;
-
-                this.$continueButton.rebind('click', function() {
-
-                    // Get the cancellation reason
-                    var reason = self.$cancelReason.val();
-
-                    // Hide the dialog and show loading spinner
-                    self.$dialog.addClass('hidden');
-                    self.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
-                    loadingDialog.show();
-
-                    // Setup standard request to 'cccs' = Credit Card Cancel Subscriptions
-                    const requests = [
-                        { a: 'cccs', r: reason }
-                    ];
-
-                    // If they were Pro Flexi, we need to also downgrade the user from Pro Flexi to Free
-                    if (u_attr && u_attr.pf) {
-                        requests.push({ a: 'urpf' });
-                    }
-
-                    // Cancel the subscription/s
-                    api_req(requests, {
-                        callback: function() {
-
-                            // Hide loading dialog and cancel subscription button on account page, set expiry date
-                            loadingDialog.hide();
-                            self.$accountPageCancelButton.addClass('hidden');
-                            self.$expiryTextBlock.text(l[987]);
-                            self.$expiryDateBlock
-                                .safeHTML('<span class="red">@@</span>',
-                                    time2date(account.expiry, 2));
-
-                            // Show success dialog
-                            self.$dialogSuccess.removeClass('hidden');
-                            self.$backgroundOverlay.removeClass('hidden');
-                            self.$backgroundOverlay.addClass('payment-dialog-overlay');
-                            self.initCloseButtonSuccessDialog();
-
-                            // Reset account cache so all account data will be refetched
-                            // and re-render the account page UI
-                            M.account.lastupdate = 0;
-                            accountUI();
-                        }
-                    });
-                });
-            }
-        }
-    },
-
-    paymentCard: {
-
-        $paymentSection: null,
-
-        validateCardResponse: function(res) {
-            'use strict';
-            return res && (res.gw === (addressDialog || {}).gatewayId_stripe || 19) && res.brand && res.last4
-                && res.exp_month && res.exp_year;
-        },
-
-        validateUser: function(account) {
-            'use strict';
-            return (u_attr.p || u_attr.b) && account.stype === 'S'
-                && ((Array.isArray(account.sgw) && account.sgw.includes('Stripe'))
-                    || (Array.isArray(account.sgwids)
-                        && account.sgwids.includes((addressDialog || {}).gatewayId_stripe || 19)));
-        },
-
-        init: function(account, $planSection) {
-            'use strict';
-
-            this.$paymentSection = $('.account.account-card-info', $planSection);
-
-            const hideCardSection = () => {
-                this.$paymentSection.addClass('hidden');
-
-                $('.settings-button .acc-setting-menu-card-info', '.content-panel.account')
-                    .addClass('hidden');
-            };
-
-            // check if we should show the section (uq response)
-            if (this.validateUser(account)) {
-
-                api_req({ a: 'cci' }, {
-                    callback: (res) => {
-                        if (typeof res === 'object' && this.validateCardResponse(res)) {
-                            return this.render(res);
-                        }
-
-                        hideCardSection();
-                    }
-                });
-            }
-            else {
-                hideCardSection();
-            }
-        },
-
-        render: function(cardInfo) {
-            'use strict';
-
-            if (cardInfo && this.$paymentSection) {
-
-
-                if (cardInfo.brand === 'visa') {
-
-                    this.$paymentSection.addClass('visa').removeClass('mc');
-                    $('.payment-card-icon i', this.$paymentSection)
-                        .removeClass('sprite-fm-uni icon-mastercard-border');
-
-                }
-                else if (cardInfo.brand === 'mastercard') {
-
-                    this.$paymentSection.addClass('mc').removeClass('visa');
-                    $('.payment-card-icon i', this.$paymentSection).addClass('sprite-fm-uni icon-mastercard-border');
-
-                }
-                else {
-                    this.$paymentSection.removeClass('visa mc');
-                }
-
-                $('.payment-card-nb .payment-card-digits', this.$paymentSection).text(cardInfo.last4);
-                $('.payment-card-expiry .payment-card-expiry-val', this.$paymentSection)
-                    .text(`${String(cardInfo.exp_month).padStart(2, '0')}/${String(cardInfo.exp_year).substr(-2)}`);
-
-                $('.payment-card-bottom a.payment-card-edit', this.$paymentSection).rebind('click', () => {
-
-                    loadingDialog.show();
-
-                    api_req({ a: 'gw19_ccc' }, {
-                        callback: (res) => {
-                            loadingDialog.hide();
-
-                            if ($.isNumeric(res)) {
-                                msgDialog('warninga', '', l.edit_card_error.replace('%1', res), l.edit_card_error_des);
-                            }
-                            else if (typeof res === 'string') {
-                                addressDialog.processUtcResult(
-                                    {
-                                        EUR: res,
-                                        edit: true
-                                    },
-                                    true
-                                );
-                            }
-                        }
-                    });
-                });
-
-                this.$paymentSection.removeClass('hidden');
-            }
-        }
-
-    },
-
-    balance: {
-
-        render: function(account) {
-
-            "use strict";
-
-            $('.account.plan-info.balance span', accountUI.$contentBlock).safeHTML(
-                '&euro; @@',
-                mega.intl.number.format(account.balance[0][0])
-            );
-        },
-
-        bindEvents: function() {
-
-            "use strict";
-
-            var self = this;
-
-            $('.redeem-voucher', accountUI.$contentBlock).rebind('click', function() {
-                var $this = $(this);
-                if ($this.attr('class').indexOf('active') === -1) {
-                    $('.fm-account-overlay').fadeIn(100);
-                    $this.addClass('active');
-                    $('.fm-voucher-popup').removeClass('hidden');
-
-                    $('.fm-account-overlay, .fm-purchase-voucher, .fm-voucher-button')
-                        .add('.fm-voucher-popup button.js-close')
-                        .rebind('click.closeDialog', function() {
-                            $('.fm-account-overlay').fadeOut(100);
-                            $('.redeem-voucher').removeClass('active');
-                            $('.fm-voucher-popup').addClass('hidden');
-                        });
-                }
-                else {
-                    $('.fm-account-overlay').fadeOut(200);
-                    $this.removeClass('active');
-                    $('.fm-voucher-popup').addClass('hidden');
-                }
-            });
-
-            $('.fm-voucher-button').rebind('click.voucherBtnClick', function() {
-                var $input = $('.fm-voucher-body input');
-                var code = $input.val();
-
-                $input.val('');
-                loadingDialog.show();
-                $('.fm-voucher-popup').addClass('hidden');
-
-                M.require('redeem_js')
-                    .then(function() {
-                        return redeem.redeemVoucher(code);
-                    })
-                    .then(function() {
-                        Object(M.account).lastupdate = 0;
-                        onIdle(accountUI);
-                    })
-                    .catch(function(ex) {
-                        loadingDialog.hide();
-                        if (ex) {
-                            if (ex === ETOOMANY) {
-                                ex = l.redeem_etoomany;
-                            }
-                            msgDialog('warninga', l[135], l[47], ex);
-                        }
-                    });
-            });
-
-            $('.fm-purchase-voucher, button.topup').rebind('click', function() {
-                loadSubPage('resellers');
-            });
-        }
-    },
-
-    history: {
-
-        renderPurchase: function(account) {
-
-            'use strict';
-
-            var $purchaseSelect = $('.dropdown-input.purchases', accountUI.$contentBlock);
-
-            if (!$.purchaselimit) {
-                $.purchaselimit = 10;
-            }
-
-            $('span', $purchaseSelect).text(mega.icu.format(l[469], $.purchaselimit));
-            $('.purchase10-', $purchaseSelect).text(mega.icu.format(l[469], 10));
-            $('.purchase100-', $purchaseSelect).text(mega.icu.format(l[469], 100));
-            $('.purchase250-', $purchaseSelect).text(mega.icu.format(l[469], 250));
-
-            M.account.purchases.sort(function(a, b) {
-                if (a[1] < b[1]) {
-                    return 1;
-                }
-                else {
-                    return -1;
-                }
-            });
-
-            $('.data-table.purchases tr', accountUI.$contentBlock).remove();
-            var html = '<tr><th>' + l[476] + '</th><th>' + l[475] +
-                '</th><th>' + l[477] + '</th><th>' + l[478] + '</th></tr>';
-            if (account.purchases.length) {
-
-                // Render every purchase made into Purchase History on Account page
-                $(account.purchases).each(function(index, purchaseTransaction) {
-
-                    if (index === $.purchaselimit) {
-                        return false;// Break the loop
-                    }
-
-                    // Set payment method
-                    const paymentMethodId = purchaseTransaction[4];
-                    const paymentMethod = pro.getPaymentGatewayName(paymentMethodId).displayName;
-
-                    // Set Date/Time, Item (plan purchased), Amount, Payment Method
-                    const dateTime = time2date(purchaseTransaction[1]);
-                    const price = formatCurrency(purchaseTransaction[2], 'EUR', 'narrowSymbol');
-                    const proNum = purchaseTransaction[5];
-                    let planIcon;
-                    const numOfMonths = purchaseTransaction[6];
-                    const monthWording = numOfMonths === 1 ? l[931] : l[6788];
-                    const item = `${pro.getProPlanName(proNum)} (${numOfMonths} ${monthWording})`;
-
-                    if (proNum === pro.ACCOUNT_LEVEL_PRO_LITE) {
-                        planIcon = 'icon-crest-lite';
-                    }
-                    else if (proNum === pro.ACCOUNT_LEVEL_BUSINESS) {
-                        planIcon = 'icon-crest-business';
-                    }
-                    else if (proNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
-                        planIcon = 'icon-crest-pro-flexi';
-                    }
-                    else {
-                        planIcon = 'icon-crest-pro-' + proNum;
-                    }
-
-                    // Render table row
-                    html += '<tr>'
-                        + '<td><div class="label-with-icon">'
-                        + '<i class="sprite-fm-uni ' + planIcon + '"></i>'
-                        + '<span> ' + item + '</span>'
-                        + '</div></td>'
-                        + '<td><span>' + dateTime + '</span></td>'
-                        + '<td><span>' + escapeHTML(price) + '</span></td>'
-                        + '<td><span>' + paymentMethod + '</span></td>'
-                        + '</tr>';
-                });
-            }
-            else {
-                html += '<tr><td colspan="4" class="data-table-empty"><span>' + l[20140] + '</span></td></tr>';
-            }
-
-            $('.data-table.purchases', accountUI.$contentBlock).safeHTML(html);
-        },
-
-        renderTransaction: function(account) {
-
-            'use strict';
-
-            var $transactionSelect = $('.dropdown-input.transactions', accountUI.$contentBlock);
-
-            if (!$.transactionlimit) {
-                $.transactionlimit = 10;
-            }
-
-            $('span', $transactionSelect).text(mega.icu.format(l[471], $.transactionlimit));
-            $('.transaction10-', $transactionSelect).text(mega.icu.format(l[471], 10));
-            $('.transaction100-', $transactionSelect).text(mega.icu.format(l[471], 100));
-            $('.transaction250-', $transactionSelect).text(mega.icu.format(l[471], 250));
-
-            M.account.transactions.sort(function(a, b) {
-                if (a[1] < b[1]) {
-                    return 1;
-                }
-                else {
-                    return -1;
-                }
-            });
-
-            $('.data-table.transactions tr', accountUI.$contentBlock).remove();
-            var html = '<tr><th>' + l[475] + '</th><th>' + l[484] +
-                '</th><th>' + l[485] + '</th><th>' + l[486] + '</th></tr>';
-            if (account.transactions.length) {
-                var intl = mega.intl.number;
-                $(account.transactions).each(function(i, el) {
-
-                    if (i === $.transactionlimit) {
-                        return false;
-                    }
-
-                    var credit = '';
-                    var debit = '';
-
-                    if (el[2] > 0) {
-                        credit = '<span class="green-label">&euro;' + escapeHTML(intl.format(el[2])) + '</span>';
-                    }
-                    else {
-                        debit = '<span class="red-label">&euro;' + escapeHTML(intl.format(el[2])) + '</span>';
-                    }
-                    html += '<tr><td>' + time2date(el[1]) + '</td><td>' + htmlentities(el[0]) + '</td><td>'
-                        + credit + '</td><td>' + debit + '</td></tr>';
-                });
-            }
-            else {
-                html += '<tr><td colspan="4" class="data-table-empty">' + l[20140] + '</td></tr>';
-            }
-
-            $('.data-table.transactions', accountUI.$contentBlock).safeHTML(html);
-        },
-
-        bindEvents: function() {
-
-            'use strict';
-
-            var $planSection = $('.fm-account-plan', accountUI.$contentBlock);
-            var $planSelects = $('.dropdown-input', $planSection);
-
-            // Bind Dropdowns events
-            bindDropdownEvents($planSelects);
-
-            $('.mega-input-dropdown .option', $planSection).rebind('click.accountSection', function() {
-
-                var c = $(this).attr('class') ? $(this).attr('class') : '';
-
-                if (c.indexOf('purchase10-') > -1) {
-                    $.purchaselimit = 10;
-                }
-                else if (c.indexOf('purchase100-') > -1) {
-                    $.purchaselimit = 100;
-                }
-                else if (c.indexOf('purchase250-') > -1) {
-                    $.purchaselimit = 250;
-                }
-
-                if (c.indexOf('transaction10-') > -1) {
-                    $.transactionlimit = 10;
-                }
-                else if (c.indexOf('transaction100-') > -1) {
-                    $.transactionlimit = 100;
-                }
-                else if (c.indexOf('transaction250-') > -1) {
-                    $.transactionlimit = 250;
-                }
-
-                accountUI();
             });
         }
     }
@@ -2588,11 +1835,19 @@ accountUI.plan = {
 
 accountUI.notifications = {
 
+    helpURL: 'chats-meetings/meetings/enable-notification-browser-system-permission',
+    permissions: {
+        granted: 'granted',
+        denied: 'denied',
+        pending: 'default'
+    },
+
     init: function() {
 
         'use strict';
 
         this.render();
+        this.handleChatNotifications();
     },
 
     render: function() {
@@ -2612,34 +1867,38 @@ accountUI.notifications = {
         }
 
         // Handle account notification switches
-        var $notifictionContent = $('.fm-account-notifications', accountUI.$contentBlock);
-        var $NToggleAll = $('.account-notification .mega-switch.toggle-all', $notifictionContent);
-        var $NToggle = $('.account-notification .switch-container .mega-switch', $notifictionContent);
+        const { notif } = mega;
+        const $notificationContent = $('.fm-account-notifications', accountUI.$contentBlock);
+        const $NToggleAll = $('.account-notification .mega-switch.toggle-all', $notificationContent);
+        const $NToggle = $('.account-notification .switch-container .mega-switch', $notificationContent);
 
-        // Toggle Individual Notifications
-        $NToggle.each(function() {
-            var $this = $(this);
-            var $section = $this.closest('.switch-container');
-            var sectionName = accountUI.notifications.getSectionName($section);
+        // Toggle individual notifications
+        for (let i = $NToggle.length; i--;) {
+            const el = $NToggle[i];
+            const sectionEl = $(el).closest('.switch-container');
+            const section = accountUI.notifications.getSectionName(sectionEl);
 
             accountUI.inputs.switch.init(
-                '#' + this.id,
-                $section,
-                mega.notif.has($this.attr('name'), sectionName),
-                function(val) {
-
-                    var notifChange = val ? mega.notif.set : mega.notif.unset;
-                    notifChange($this.attr('name'), sectionName);
+                `#${el.id}`,
+                sectionEl,
+                notif.has(el.getAttribute('name'), section),
+                val => {
+                    notif[val ? 'set' : 'unset'](el.getAttribute('name'), section);
 
                     if (val) {
                         $NToggleAll.addClass('toggle-on');
-                    } else {
+                        if (section === 'chat') {
+                            this.renderNotification();
+                        }
+                    }
+                    else {
                         ($NToggle.hasClass('toggle-on') ? $.fn.addClass : $.fn.removeClass)
                             .apply($NToggleAll, ['toggle-on']);
                     }
                     $NToggleAll.trigger('update.accessibility');
-                });
-        });
+                }
+            );
+        }
 
         // Toggle All Notifications
         accountUI.inputs.switch.init(
@@ -2651,7 +1910,10 @@ accountUI.notifications = {
                     var $this = $(this);
                     var $section = $this.closest('.switch-container');
                     var sectionName = accountUI.notifications.getSectionName($section);
-                    var notifChange = val ? mega.notif.set : mega.notif.unset;
+
+                    const invert = $this.attr('name') === 'upload' ? !val : val;
+                    const notifChange = invert ? mega.notif.set : mega.notif.unset;
+
                     notifChange($this.attr('name'), sectionName);
 
                     (val ? $.fn.addClass : $.fn.removeClass).apply($this, ['toggle-on']);
@@ -2666,8 +1928,8 @@ accountUI.notifications = {
         }
 
         // Handle email notification switches.
-        var $EToggleAll = $('.email-notification .mega-switch.toggle-all', $notifictionContent);
-        var $EToggle = $('.email-notification .switch-container .mega-switch', $notifictionContent);
+        var $EToggleAll = $('.email-notification .mega-switch.toggle-all', $notificationContent);
+        var $EToggle = $('.email-notification .switch-container .mega-switch', $notificationContent);
 
         mega.enotif.all().then(function(enotifStates) {
             // Toggle Individual Emails
@@ -2702,7 +1964,7 @@ accountUI.notifications = {
             );
 
             if (accountUI.plan.paymentCard.validateUser(M.account)) {
-                $('.switch-container.card-exp-switch', $notifictionContent).removeClass('hidden');
+                $('.switch-container.card-exp-switch', $notificationContent).removeClass('hidden');
             }
 
             // Hide the loading screen.
@@ -2723,6 +1985,113 @@ accountUI.notifications = {
         });
         return String(section).split('-').shift();
 
+    },
+
+    renderNotification() {
+        'use strict';
+        return new Notification(l.notification_granted_title, { body: l.notification_granted_body });
+    },
+
+    onPermissionsGranted() {
+        'use strict';
+        msgDialog(
+            'info',
+            '',
+            l.notifications_permissions_granted_title,
+            l.notifications_permissions_granted_info
+                .replace(
+                    '[A]',
+                    `<a href="${l.mega_help_host}/${this.helpURL}" target="_blank" class="clickurl">`
+                )
+                .replace('[/A]', '</a>')
+        );
+        this.renderNotification();
+    },
+
+    requestPermission() {
+        'use strict';
+        Notification.requestPermission()
+            .then(permission => {
+                if (permission === this.permissions.granted) {
+                    this.onPermissionsGranted();
+                }
+                mBroadcaster.sendMessage('meetings:notificationPermissions', permission);
+            })
+            .then(() => this.handleChatNotifications())
+            .catch(ex => d && console.warn(`Failed to retrieve permissions: ${ex}`));
+    },
+
+    handleChatNotifications() {
+        'use strict';
+
+        const $container = $('.switch-container.chat', accountUI.$contentBlock);
+        const $banner = $('.chat-permissions-banner', $container);
+        const $body = $('.versioning-body-text', $banner);
+
+        if (window.Notification && mega.notif.has('enabled', 'chat')) {
+            const { permission } = Notification;
+            const { granted, denied, pending } = this.permissions;
+            Object.values(this.permissions).forEach(p => $banner.removeClass(`permission--${p}`));
+
+            // Toggle the inline browser permissions banner based
+            // on the current browser permissions state
+            switch (true) {
+                case permission === granted:
+                    $body.safeHTML(
+                        l.notification_settings_granted
+                            .replace(
+                                '[A]',
+                                `<a
+                                    href="${l.mega_help_host}/${this.helpURL}"
+                                    target="_blank"
+                                    class="clickurl notif-help">
+                                `
+                            )
+                            .replace('[/A]', '</a>')
+                    );
+                    $banner.addClass(`permission--${granted}`);
+                    break;
+                case permission === denied:
+                    $body.safeHTML(
+                        l.notifications_permissions_denied_info
+                            .replace(
+                                '[A]',
+                                `<a
+                                    href="${l.mega_help_host}/${this.helpURL}"
+                                    target="_blank"
+                                    class="clickurl notif-help">
+                                `
+                            )
+                            .replace('[/A]', '</a>')
+                    );
+                    $banner.addClass(`permission--${denied} warning-template`);
+                    break;
+                default:
+                    $body.safeHTML(
+                        l.notification_settings_pending
+                            .replace(
+                                '[1]',
+                                `<a
+                                    href="${l.mega_help_host}/${this.helpURL}"
+                                    target="_blank"
+                                    class="clickurl notif-help">
+                                `
+                            )
+                            .replace('[/1]', '</a>')
+                            .replace('[2]', '<a href="#" class="request-notification-permissions">')
+                            .replace('[/2]', '</a>')
+                    );
+                    $('.request-notification-permissions', $banner).rebind('click', () => this.requestPermission());
+                    $banner.addClass(`permission--${pending}`);
+                    break;
+            }
+
+            return $banner.removeClass('hidden');
+        }
+
+        // Don't display the browser permissions banner if
+        // `Chat notifications` are disabled
+        return $banner.addClass('hidden');
     }
 };
 
@@ -2770,6 +2139,7 @@ accountUI.security = {
             // Button on main Account page to backup their master key
             $('.fm-account-security .backup-master-key').rebind('click', function() {
                 M.showRecoveryKeyDialog(2);
+                eventlog(500313);
             });
         }
     },
@@ -2882,8 +2252,8 @@ accountUI.security = {
                         loadingDialog.show();
                         var $activeSessionsRows = $('.active-session-txt', $securitySection).parents('tr');
                         // Expire all sessions but not the current one
-                        api_req({a: 'usr', ko: 1}, {
-                            callback: function() {
+                        api.screq({a: 'usr', ko: 1})
+                            .then(() => {
                                 M.account = null;
                                 /* clear account cache */
                                 $('.settings-logout', $activeSessionsRows).remove();
@@ -2891,8 +2261,7 @@ accountUI.security = {
                                     .removeClass('active-session-txt').addClass('expired-session-txt').text(l[25016]);
                                 $('.fm-close-all-sessions', $securitySection).addClass('hidden');
                                 loadingDialog.hide();
-                            }
-                        });
+                            });
                     }
                 });
             });
@@ -2911,16 +2280,15 @@ accountUI.security = {
                      * remove a session Id from the current user,
                      * usually other than the current session
                      */
-                    api_req({a: 'usr', s: [sessionId]}, {
-                        callback: function() {
+                    api.screq({a: 'usr', s: [sessionId]})
+                        .then(() => {
                             M.account = null;
                             /* clear account cache */
                             $this.find('.settings-logout').remove();
                             $this.find('.active-session-txt').removeClass('active-session-txt')
                                 .addClass('expired-session-txt').text(l[25016]);
                             loadingDialog.hide();
-                        }
-                    });
+                        });
                 }
             });
 
@@ -3062,14 +2430,32 @@ accountUI.fileManagement = {
         // User Interface
         this.userInterface.render();
 
+        // Subfolder media discovery
+        this.subfolderMediaDiscovery.render();
+
         // Hide Recents
         this.hideRecents.render();
 
         // Drag and Drop
         this.dragAndDrop.render();
 
+        // Delete confirmation
+        this.delConfirm.render();
+
+        // Password reminder dialog
+        this.passReminder.render();
+
+        // Chat related dialogs (multiple option but share attribute)
+        this.chatDialogs.render();
+
+        // Pro expiry
+        this.proExpiry.render();
+
         // Public Links
         this.publicLinks.render();
+
+        // Rewind
+        this.rewind.render();
     },
 
     versioning: {
@@ -3077,6 +2463,12 @@ accountUI.fileManagement = {
         render: function() {
 
             'use strict';
+
+            // Temporarily hide versioning settings due to it not working correctly in MEGA Lite mode
+            if (mega.lite.inLiteMode) {
+                $('.js-file-version-settings', accountUI.$contentBlock).addClass('hidden');
+                return false;
+            }
 
             // Update versioning info
             var setVersioningAttr = function(val) {
@@ -3122,27 +2514,25 @@ accountUI.fileManagement = {
 
             $('#delete-all-versions', accountUI.$contentBlock).rebind('click', function() {
 
-                if (!$(this).hasClass('disabled')) {
-                    if (M.isInvalidUserStatus()) {
-                        return;
-                    }
-                    msgDialog('remove', l[1003], l[17581], l[1007], function(e) {
-
-                        if (e) {
-                            loadingDialog.show();
-                            var req = {a: 'dv'};
-                            api_req(req, {
-                                callback: function(res) {
-                                    if (res === 0) {
-                                        M.accountData(function() {
-                                            fileversioning.updateVersionInfo();
-                                        }, false, true);
-                                    }
-                                }
-                            });
-                        }
-                    });
+                if ($(this).hasClass('disabled') || M.isInvalidUserStatus()) {
+                    return;
                 }
+
+                msgDialog('remove', l[1003], l[17581], l[1007], (e) => {
+
+                    if (e) {
+                        mLoadingSpinner.show('delete-all-versions', l[17147]);
+
+                        api.screq({a: 'dv'})
+                            .then(() => {
+                                M.accountData(() => fileversioning.updateVersionInfo(), false, true);
+                            })
+                            .catch(dump)
+                            .finally(() => {
+                                mLoadingSpinner.hide('delete-all-versions');
+                            });
+                    }
+                });
             });
         }
     },
@@ -3265,37 +2655,46 @@ accountUI.fileManagement = {
 
             'use strict';
 
-            $('.rubsched_textopt', accountUI.$contentBlock).rebind('click.rs blur.rs keypress.rs', function(e) {
+            $('.rubsched_textopt', accountUI.$contentBlock).rebind('click.rs blur.rs keypress.rs paste.rs', function(e){
+
+                // Firefox fix bug on allowing strings on input type number applies to Webkit also
+                if (this.id === 'rad14_opt' && (e.type === 'paste' || e.type === 'keypress') &&
+                    isNaN(e.type === 'paste' ? e.originalEvent.clipboardData.getData('text') : e.key)) {
+                    return false;
+                }
 
                 // Do not save value until user leave input or click Enter button
                 if (e.which && e.which !== 13) {
                     return;
                 }
 
-                var curVal = parseInt($(this).val()) | 0;
-                var maxVal;
+                if ($(this).val().length !== 0) {
 
-                if (this.id === 'rad14_opt') { // For days option
-                    var minVal = 7;
-                    maxVal = u_attr.p ? Math.pow(2, 53) : 30;
-                    curVal = Math.min(Math.max(curVal, minVal), maxVal);
-                    var rad14_optString = mega.icu.format(l.clear_rub_bin_days, curVal);
-                    var rad14_optArray = rad14_optString.split(/\[A]|\[\/A]/);
-                    curVal = rad14_optArray[1];
-                    $('#rad14_opt_txt_1', accountUI.$contentBlock).text(rad14_optArray[0]);
-                    $('#rad14_opt_txt_2', accountUI.$contentBlock).text(rad14_optArray[2]);
+                    var curVal = parseInt($(this).val()) | 0;
+                    var maxVal;
+
+                    if (this.id === 'rad14_opt') { // For days option
+                        var minVal = 7;
+                        maxVal = u_attr.p ? Math.pow(2, 53) : 30;
+                        curVal = Math.min(Math.max(curVal, minVal), maxVal);
+                        var rad14_optString = mega.icu.format(l.clear_rub_bin_days, curVal);
+                        var rad14_optArray = rad14_optString.split(/\[A]|\[\/A]/);
+                        curVal = rad14_optArray[1];
+                        $('#rad14_opt_txt_1', accountUI.$contentBlock).text(rad14_optArray[0]);
+                        $('#rad14_opt_txt_2', accountUI.$contentBlock).text(rad14_optArray[2]);
+                    }
+
+                    if (this.id === 'rad15_opt') { // For size option
+                        // Max value cannot be over current account's total storage space.
+                        maxVal = account.space / Math.pow(1024, 3);
+                        curVal = Math.min(curVal, maxVal);
+                    }
+
+                    $(this).val(curVal);
+
+                    var id = String(this.id).split('_')[0];
+                    mega.config.setn('rubsched', `${id.substr(3)}:${curVal}`);
                 }
-
-                if (this.id === 'rad15_opt') { // For size option
-                    // Max value cannot be over current account's total storage space.
-                    maxVal = account.space / Math.pow(1024, 3);
-                    curVal = Math.min(curVal, maxVal);
-                }
-
-                $(this).val(curVal);
-
-                var id = String(this.id).split('_')[0];
-                mega.config.setn('rubsched', id.substr(3) + ':' + curVal);
             });
         }
     },
@@ -3321,6 +2720,21 @@ accountUI.fileManagement = {
         }
     },
 
+    subfolderMediaDiscovery: {
+        render: function() {
+            'use strict';
+
+            accountUI.inputs.switch.init(
+                '#subfolder-media-discovery',
+                $('#subfolder-media-discovery', accountUI.$contentBlock).parent(),
+                !mega.config.get('noSubfolderMd'),
+                (val) => {
+                    mega.config.setn('noSubfolderMd', val ? undefined : 1);
+                }
+            );
+        }
+    },
+
     hideRecents: {
         render: function() {
             'use strict';
@@ -3329,7 +2743,17 @@ accountUI.fileManagement = {
                 '#hide-recents',
                 $('#hide-recents', accountUI.$contentBlock).parent(),
                 !mega.config.get('showRecents'),
-                (val) => mega.config.setn('showRecents', val ? undefined : 1));
+                (val) => {
+                    val = val ? undefined : 1;
+
+                    if (M.recentsRender) {
+                        showToast('settings', l[16168]);
+                        M.recentsRender._setConfigShow(val);
+                    }
+                    else {
+                        mega.config.setn('showRecents', val);
+                    }
+                });
         }
     },
 
@@ -3348,6 +2772,85 @@ accountUI.fileManagement = {
         }
     },
 
+    delConfirm: {
+
+        render: function() {
+            'use strict';
+
+            accountUI.inputs.switch.init(
+                '#skipDelWarning',
+                $('#skipDelWarning', accountUI.$contentBlock).parent(),
+                !mega.config.get('skipDelWarning'),
+                val => mega.config.setn('skipDelWarning', val ? undefined : 1)
+            );
+        }
+    },
+
+    passReminder: {
+
+        render: function() {
+            'use strict';
+
+            accountUI.inputs.switch.init(
+                '#prd',
+                $('#prd', accountUI.$contentBlock).parent(),
+                !mega.ui.passwordReminderDialog.passwordReminderAttribute.dontShowAgain,
+                val => {
+                    mega.ui.passwordReminderDialog.passwordReminderAttribute.dontShowAgain = val ^ 1;
+                    showToast('settings', l[16168]);
+                });
+        }
+    },
+
+    chatDialogs: {
+
+        render: function() {
+            'use strict';
+
+            const $switches = $('.dialog-options .chat-dialog', accountUI.$contentBlock);
+            const rawVal = mega.config.get('xcod');
+            const _set = (id, val, subtype) => {
+
+                if (val) {
+                    mega.config.setn('xcod', mega.config.get(id) & ~(1 << subtype));
+                }
+                else {
+                    mega.config.setn('xcod', mega.config.get(id) | 1 << subtype);
+                }
+            };
+
+            for (let i = $switches.length; i--;) {
+
+                const elm = $switches[i];
+                const [id, subtype] = elm.id.split('-');
+                const currVal = rawVal >> subtype & 1;
+
+                accountUI.inputs.switch.init(
+                    '.mega-switch',
+                    $(elm).parent(),
+                    !currVal,
+                    val => _set(id, val, subtype)
+                );
+            }
+        }
+    },
+
+    proExpiry: {
+
+        render: async function() {
+            'use strict';
+
+            accountUI.inputs.switch.init(
+                '#hideProExpired',
+                $('#hideProExpired', accountUI.$contentBlock).parent(),
+                (await Promise.resolve(mega.attr.get(u_handle, 'hideProExpired', false, true)).catch(() => []))[0] ^ 1,
+                val => {
+                    mega.attr.set('hideProExpired', val ? '0' : '1', false, true);
+                    showToast('settings', l[16168]);
+                });
+        }
+    },
+
     publicLinks: {
         render: function() {
             'use strict';
@@ -3357,12 +2860,26 @@ accountUI.fileManagement = {
             accountUI.inputs.switch.init(
                 warnplinkId,
                 $(warnplinkId, accountUI.$contentBlock).parent(),
-                mega.config.get('nowarnpl'),
-                (val) => {
-                    mega.config.setn('nowarnpl', val);
-                });
+                !mega.config.get('nowarnpl'),
+                val => mega.config.setn('nowarnpl', val ^ 1)
+            );
         }
     },
+
+    rewind: {
+        render() {
+            'use strict';
+
+            var showRewindConfirmId = '#rwReinstate';
+
+            accountUI.inputs.switch.init(
+                showRewindConfirmId,
+                $(showRewindConfirmId, accountUI.$contentBlock).parent(),
+                !mega.config.get('rwReinstate'),
+                val => mega.config.setn('rwReinstate', val ^ 1)
+            );
+        }
+    }
 };
 
 accountUI.transfers = {
@@ -3384,12 +2901,33 @@ accountUI.transfers = {
 
         // Transfer Tools - Megasync
         this.transferTools.megasync.render();
-
-        // Download folder setting for PaleMoon ext
-        this.addDownloadFolderSetting();
     },
 
     uploadAndDownload: {
+
+        setSlider($container, sliderSelector, sliderOptions) {
+            'use strict';
+
+            const wrap = $('.slider.numbers-wrap', $container).get(0);
+            const template = wrap.firstElementChild.cloneNode(true);
+
+            wrap.textContent = '';
+            for (let i = 0; i < sliderOptions.max;) {
+                const elm = template.cloneNode(true);
+                wrap.appendChild(elm);
+                elm.querySelector('span').textContent = ++i;
+            }
+
+            const $slider = $(sliderSelector, $container).slider(sliderOptions);
+
+            $('.ui-slider-handle', $slider)
+                .addClass('sprite-fm-mono icon-arrow-left sprite-fm-mono-after icon-arrow-right-after');
+
+            $('.numbers.active', $container).removeClass('active');
+            $(`.numbers:nth-child(${$slider.slider('value')})`, $container).addClass('active');
+
+            return $slider;
+        },
 
         bandwidth: {
 
@@ -3398,7 +2936,7 @@ accountUI.transfers = {
                 'use strict';
 
                 // LITE/PRO account
-                if (u_attr.p && !u_attr.b) {
+                if (u_attr.p && !u_attr.b && !u_attr.pf) {
                     var bandwidthLimit = Math.round(account.servbw_limit | 0);
 
                     var $slider = $('#bandwidth-slider').slider({
@@ -3458,8 +2996,8 @@ accountUI.transfers = {
                     $('.slider-percentage-bl', accountUI.$contentBlock).removeClass('hidden');
                     $('.band-grn-noti', accountUI.$contentBlock).addClass('hidden');
                 }
-                // Business account
-                else if (u_attr.b) {
+                // Business account or Pro Flexi
+                else if (u_attr.b || u_attr.pf) {
                     $('.bandwith-settings', accountUI.$contentBlock).addClass('hidden');
                     $('.slider-percentage-bl', accountUI.$contentBlock).addClass('hidden');
                     $('.band-grn-noti', accountUI.$contentBlock).addClass('hidden');
@@ -3470,14 +3008,12 @@ accountUI.transfers = {
         upload: {
 
             render: function() {
-
                 'use strict';
 
                 var $uploadSettings = $('.upload-settings', accountUI.$contentBlock);
 
-                // Parallel upload slider
-                var $slider = $('#slider-range-max', $uploadSettings).slider({
-                    min: 1, max: 6, range: "min", value: fmconfig.ul_maxSlots || 4,
+                accountUI.transfers.uploadAndDownload.setSlider($uploadSettings, '#slider-range-max', {
+                    min: 1, max: 8, range: "min", value: fmconfig.ul_maxSlots || 4,
                     change: function(e, ui) {
                         if (M.currentdirid === 'account/transfers' && ui.value !== fmconfig.ul_maxSlots) {
                             mega.config.setn('ul_maxSlots', ui.value);
@@ -3490,13 +3026,6 @@ accountUI.transfers = {
                             .addClass('active');
                     }
                 });
-
-                $('.ui-slider-handle', $slider).addClass('sprite-fm-mono icon-arrow-left ' +
-                    'sprite-fm-mono-after icon-arrow-right-after');
-
-                $('.numbers.active', $uploadSettings).removeClass('active');
-                $(' .numbers:nth-child(' + $slider.slider('value') + ')', $uploadSettings)
-                    .addClass('active');
             },
         },
 
@@ -3508,9 +3037,8 @@ accountUI.transfers = {
 
                 var $downloadSettings = $('.download-settings', accountUI.$contentBlock);
 
-                // Parallel download slider
-                var $slider = $('#slider-range-max2', $downloadSettings).slider({
-                    min: 1, max: 6, range: "min", value: fmconfig.dl_maxSlots || 4,
+                accountUI.transfers.uploadAndDownload.setSlider($downloadSettings, '#slider-range-max2', {
+                    min: 1, max: 12, range: "min", value: fmconfig.dl_maxSlots || 4,
                     change: function(e, ui) {
                         if (M.currentdirid === 'account/transfers' && ui.value !== fmconfig.dl_maxSlots) {
                             mega.config.setn('dl_maxSlots', ui.value);
@@ -3523,13 +3051,6 @@ accountUI.transfers = {
                             .addClass('active');
                     }
                 });
-
-                $('.ui-slider-handle', $slider).addClass('sprite-fm-mono icon-arrow-left ' +
-                    'sprite-fm-mono-after icon-arrow-right-after');
-
-                $('.numbers.active', $downloadSettings).removeClass('active');
-                $('.numbers:nth-child(' + $slider.slider('value') + ')', $downloadSettings)
-                    .addClass('active');
             }
         }
     },
@@ -3568,33 +3089,6 @@ accountUI.transfers = {
                     }
                 });
             }
-        }
-    },
-
-    addDownloadFolderSetting: function() {
-
-        'use strict';
-
-        if (is_chrome_firefox && !$('#acc_dls_folder', accountUI.$contentBlock).length) {
-            $('.fm-account-transfers').safeAppend(
-                '<div class="account data-block">' +
-                '<div class="settings-left-block">' +
-                '<div id="acc_dls_folder">' +
-                '<div class="fm-account-header">Downloads folder:</div></div></div>' +
-                '<div class="settings-right-block"><div class="settings-sub-section">' +
-                '<input type="button" value="Browse..." style="-moz-appearance:' +
-                'button;margin-right:12px;cursor:pointer" />' +
-                '</div></div></div>');
-            var fld = mozGetDownloadsFolder();
-            $('#acc_dls_folder', accountUI.$contentBlock).safeAppend($('<span/>').text(fld && fld.path));
-            $('#acc_dls_folder input', accountUI.$contentBlock).click(function() {
-
-                var fs = mozFilePicker(0, 2);
-                if (fs) {
-                    mozSetDownloadsFolder(fs);
-                    $(this).next().text(fs.path);
-                }
-            });
         }
     }
 };
@@ -3645,6 +3139,7 @@ accountUI.contactAndChat = {
         this.chatList.render();
         this.richURL.render();
         this.dnd.render();
+        this.contactVerification.render();
     },
 
     status: {
@@ -3762,7 +3257,15 @@ accountUI.contactAndChat = {
                             // hours + minutes -> seconds || default to 300 seconds as min
                             .reduce((a, b) => a + b) || 300
                     )
-                );
+                ).rebind('keypress.dashboard paste.dashboard', e => {
+
+                    // Firefox fix bug on allowing strings on input type number applies to Webkit also
+                    const checkingValue = e.type === 'paste' ? e.originalEvent.clipboardData.getData('text') : e.key;
+
+                    if (isNaN(checkingValue)) {
+                        return false;
+                    }
+                });
             }
         },
     },
@@ -3771,14 +3274,14 @@ accountUI.contactAndChat = {
 
         render: function() {
             'use strict';
-            const curr = mega.config.get('showHideChat');
+            const curr = mega.config.get('showHideChat') | 0;
 
             accountUI.inputs.radioCard.init(
                 '.card',
                 $('.card', accountUI.$contentBlock).parent(),
-                typeof curr === 'undefined' ? 0 : 1,
+                curr,
                 (val) => {
-                    mega.config.setn('showHideChat', val);
+                    mega.config.setn('showHideChat', val | 0 || undefined);
                 }
             );
         }
@@ -4071,6 +3574,27 @@ accountUI.contactAndChat = {
             });
         }
     },
+
+    contactVerification: {
+
+        render: function() {
+
+            'use strict';
+
+            const cv = mega.keyMgr.getWarningValue('cv') | 0;
+            const $sectionContainerChat = $('.fm-account-contact-chats', accountUI.$contentBlock);
+
+            accountUI.inputs.switch.init(
+                '#contact-verification-toggle',
+                $('#contact-verification-toggle', $sectionContainerChat).parent(),
+                cv,
+                val => {
+                    mega.keyMgr.setWarningValue('cv', !!val).catch(dump);
+                    showToast('settings', l[16168]);
+                }
+            );
+        }
+    }
 };
 
 accountUI.reseller = {
@@ -4285,5 +3809,123 @@ accountUI.calls = {
                 }
             );
         }
+    }
+};
+
+/**
+ * S4 Object storage settings
+ */
+accountUI.s4 = {
+
+    $container: null,
+
+    init() {
+        'use strict';
+
+        if ((this.$container = ('.fm-account-s4', accountUI.$contentBlock)).length === 0) {
+            return false;
+        }
+
+        this.renderEndpointsData();
+        this.bindEvents();
+    },
+
+    renderEndpointsData() {
+        'use strict';
+
+        // Static endpoints data for now
+        const endpoints = [
+            [
+                'eu-central-1.s4.mega.io',
+                l.location_amsterdam
+            ],
+            [
+                'ca-central-1.s4.mega.io',
+                l.location_montreal
+            ],
+            [
+                'ca-west-1.s4.mega.io',
+                l.location_vancouver
+            ]
+        ];
+
+        const tableNode = this.$container[0].querySelector('.secondary-table');
+        const tipsNode = this.$container[0].querySelector('ul');
+        let rowNode = null;
+
+        tableNode.textContent = '';
+        tipsNode.textContent = '';
+
+        // Create table header
+        rowNode = mCreateElement('tr', undefined, tableNode);
+        mCreateElement('th', undefined, rowNode).textContent = l.s4_endpoint_header;
+        mCreateElement('th', undefined, rowNode).textContent = l[17818];
+        mCreateElement('th', undefined, rowNode);
+
+        // Create enpoint rows
+        for (const item of endpoints) {
+            let subNode = null;
+
+            // Create table header
+            rowNode = mCreateElement('tr', undefined, tableNode);
+            subNode = mCreateElement('td', undefined, rowNode);
+            mCreateElement('a', { class: 'settings-lnk' }, subNode).textContent = item[0];
+            mCreateElement('td', undefined, rowNode).textContent = item[1];
+            subNode = mCreateElement('td', undefined, rowNode);
+
+            // Create copy to clipboard button
+            subNode = mCreateElement('button', {
+                'class': 'mega-button small action copy',
+                'data-url': item[0]
+            }, subNode);
+            mCreateElement('i', { class: 'sprite-fm-mono icon-copy' }, subNode);
+        }
+
+        // Fill URL exapmles in the tips
+        mCreateElement('li', undefined, tipsNode).append(parseHTML(
+            l.s4_s3_prefix_example.replace('%1', `s3.${endpoints[0][0]}`)
+        ));
+        mCreateElement('li', undefined, tipsNode).append(parseHTML(
+            l.s4_iam_prefix_example.replace('%1', `iam.${endpoints[0][0]}`)
+        ));
+    },
+
+    bindEvents() {
+        'use strict';
+
+        // Specs button evt in top banner
+        $('.show-s4-specs', this.$container).rebind('click.openSpecs', () => {
+            window.open('https://github.com/meganz/s4-specs', '_blank', 'noopener,noreferrer');
+        });
+
+        // Manage keys button in Access keys section
+        $('.manage-s4-keys', this.$container).rebind('click.openKeys', () => {
+            const cn = 'utils' in s4 && s4.utils.getContainersList();
+            loadSubPage(cn.length ? `fm/${cn[0].h}/keys` : 'fm');
+        });
+
+        // Copy to clipboard buttons in Endpoints section
+        $('.mega-button.copy', this.$container).rebind('click.copyUrl', (e) => {
+            copyToClipboard(e.currentTarget.dataset.url, l.s4_endpoint_copied, 'hidden');
+        });
+
+        // Enable thumb previews switcher in thumb previews
+        accountUI.inputs.switch.init(
+            '.s4-thumb-switch',
+            this.$container,
+            mega.config.get('s4thumbs'),
+            (val) => {
+                mega.config.setn('s4thumbs', val ? 1 : undefined);
+            }
+        );
+    }
+};
+
+accountUI.vpn = {
+    init() {
+        'use strict';
+
+        this.vpnPage = this.vpnPage || new VpnPage();
+        this.vpnPage.show();
     }
 };

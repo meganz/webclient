@@ -1,0 +1,92 @@
+.file-folder-view {
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    overflow-x: visible;
+    overflow-y: scroll;
+    max-width: var(--mobile-page-max-width);
+    margin: 0 auto;
+}
+
+.file-folder-view.main-content {
+    align-items: center;
+    text-align: center;
+}
+
+.file-folder-view.main-content > *:not(:last-child) {
+    margin-bottom: 16px;
+}
+
+.file-folder-view .no-content {
+    font: var(--mobile-font-copy-regular);
+    color: var(--mobile-text-primary);
+    text-align: left;
+    align-self: stretch;
+}
+
+.file-folder-view .no-content.folder-file,
+.pcol-cover-container {
+    text-align: center;
+}
+
+.pcol-cover-container {
+    padding-top: 12px;
+}
+
+.file-folder-view .no-access,
+.pcol-cover-container i.empty-album-img,
+.pcol-cover-container i.loading-album-img {
+    height: 96px;
+    width: 96px;
+    background-size: contain;
+    border-radius: 4px;
+}
+
+.file-folder-view .no-content a {
+    color: var(--mobile-link-primary);
+    text-decoration: underline;
+}
+
+.pcol-cover-container i.loading-album-img.cover-loading {
+    filter: grayscale(100%);
+    opacity: 0.3;
+}
+
+.file-folder-view .no-access.no-access-folder,
+.pcol-cover-container i.empty-album-img {
+    background-image: url("../../images/mobile/folder.png");
+}
+
+.file-folder-view .no-access.no-access-file {
+    background-image: url("../../images/mobile/file.png");
+}
+
+.file-folder-view .no-access.no-access-album {
+    background-image: url("../../images/mobile/album.png");
+}
+
+.file-folder-view .no-access.icon {
+    background-image: none;
+    --icon-size: 96px;
+    color: var(--mobile-support-error);
+}
+
+.file-folder-view .no-content ul {
+    padding-left: 30px;
+}
+
+.file-folder-view .no-content li {
+    list-style: disc;
+    font: var(--mobile-font-copy-regular);
+}
+
+.mobile.decrypt-button.nav-elem.normal {
+    max-width: var(--mobile-elem-max-width);
+    width: 100%;
+    min-height: 48px;
+}
+
+.decryption-msg {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-copy-regular);
+}

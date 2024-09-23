@@ -11,16 +11,9 @@ var versiondialogid;
          * @return It returns a list of handles of all the versions if everything works fine,
          * otherwise it returns list with current version.
          */
-        getAllVersions: function(h) {
-            var pms = new MegaPromise();
-
-            dbfetch.tree([h], -1)
-                .always(function() {
-                    var versions = fileversioning.getAllVersionsSync(h);
-                    pms.resolve(versions);
-                });
-
-            return pms;
+        async getAllVersions(h) {
+            await dbfetch.tree([h], -1).catch(dump);
+            return this.getAllVersionsSync(h);
         },
 
         /**
@@ -30,7 +23,7 @@ var versiondialogid;
          *         otherwise it returns list with current version.
          */
         getAllVersionsSync: function(h) {
-            return this.getVersionHandles(h, true).map(h => M.d[h]);
+            return this.getVersionHandles(h, true).map(h => M.d[h]).filter(Boolean);
         },
 
         /**
@@ -125,17 +118,15 @@ var versiondialogid;
 
         /**
          * delete all previous versions of a file.
-         * @param {hanlde} h file hanle.
+         * @param {String} h ufs-node handle
+         * @returns {Promise<*>}
          */
         clearPreviousVersions: function (h) {
-            fileversioning.getAllVersions(h).done(
-                function(versions) {
-                    var previousVersion = (versions && versions.length > 1) ? versions[1] : false;
+            return fileversioning.getAllVersions(h)
+                .then((versions) => {
+                    var previousVersion = versions && versions.length > 1 ? versions[1] : false;
                     if (previousVersion) {
-                        api_req({
-                                    a: 'd',
-                                    n: previousVersion.h
-                                });
+                        return api.screq({a: 'd', n: previousVersion.h});
                     }
                 });
         },
@@ -146,15 +137,13 @@ var versiondialogid;
          * @param {Number} newFavState Favourites state 0 or 1
          */
         favouriteVersions: function (h, newFavState) {
-            fileversioning.getAllVersions(h).done(
-                function(versions) {
-                    for (var i = 1; i < versions.length; i++) {
-                        versions[i].fav = newFavState | 0;
-                        if (!versions[i].fav) {
-                            delete versions[i].fav;
-                        }
-                        api_setattr(versions[i], mRandomToken('fav'));
+            return fileversioning.getAllVersions(h)
+                .then((versions) => {
+                    const promises = [];
+                    for (let i = 1; i < versions.length; i++) {
+                        promises.push(api.setNodeAttributes(versions[i], {fav: newFavState | 0}));
                     }
+                    return Promise.allSettled(promises);
                 });
         },
 
@@ -164,15 +153,47 @@ var versiondialogid;
          * @param {Number} labelId Numeric value of label
          */
         labelVersions: function (h, labelId) {
-            fileversioning.getAllVersions(h).done(
-                function(versions) {
-                    for (var i = 1; i < versions.length; i++) {
-                        versions[i].lbl = labelId | 0;
-                        if (!versions[i].lbl) {
-                            delete versions[i].lbl;
-                        }
-                        api_setattr(versions[i], mRandomToken('lbl'));
+            return fileversioning.getAllVersions(h)
+                .then((versions) => {
+                    const promises = [];
+                    for (let i = 1; i < versions.length; i++) {
+                        promises.push(api.setNodeAttributes(versions[i], {lbl: labelId | 0}));
                     }
+                    return Promise.allSettled(promises);
+                });
+        },
+
+        /**
+         * set/remove description on all previous versions of a file.
+         * @param {String} h file handle.
+         * @param {String} desc description string/text
+         * @returns {Promise} promise
+         */
+        descriptionVersions(h, desc) {
+            return fileversioning.getAllVersions(h)
+                .then((versions) => {
+                    const promises = [];
+                    for (let i = 1; i < versions.length; i++) {
+                        promises.push(api.setNodeAttributes(versions[i], {des: desc}));
+                    }
+                    return Promise.allSettled(promises);
+                });
+        },
+
+        /**
+         * set/remove tags on all previous versions of a file.
+         * @param {String} h file handle.
+         * @param {Object} prop tags
+         * @returns {Promise} promise
+         */
+        tagVersions(h, prop) {
+            return fileversioning.getAllVersions(h)
+                .then((versions) => {
+                    const promises = [];
+                    for (let i = 1; i < versions.length; i++) {
+                        promises.push(api.setNodeAttributes(versions[i], prop));
+                    }
+                    return Promise.allSettled(promises);
                 });
         },
 
@@ -255,9 +276,17 @@ var versiondialogid;
                     n.lbl = file.lbl;
                 }
 
+                if (file.des) {
+                    n.des = file.des;
+                }
+
+                if (file.tags) {
+                    n.tags = file.tags;
+                }
+
                 var ea = ab_to_base64(crypto_makeattr(n));
                 var dir = M.d[current_node].p || M.RootID;
-                var share = M.getShareNodesSync(dir);
+                var share = M.getShareNodesSync(dir, null, true);
                 var req = {
                     a: 'p',
                     t: dir,
@@ -266,6 +295,7 @@ var versiondialogid;
                         t: 0,
                         a: ea,
                         k: a32_to_base64(encrypt_key(u_k_aes, file.k)),
+                        fa: file.fa,
                         ov: current_node
                     }]
                 };
@@ -288,14 +318,13 @@ var versiondialogid;
                     revertedNode.t = n.t;
                     req.cr = crypto_makecr([revertedNode], share, false);
                 }
-                api_req(req, {
-                    callback: function(res) {
-                        if (typeof res === 'object' && res.f) {
-                            selectionManager.clear_selection();
-                            selectionManager.add_to_selection(res.f[0].h);
-                        }
-                    }
-                });
+
+                api.screq(req)
+                    .then(({handle}) => {
+                        $.selected = [handle];
+                        reselect();
+                    })
+                    .catch(dump);
             };
 
             var fillVersionList = function(versionList) {
@@ -309,6 +338,8 @@ var versiondialogid;
                     var curTimeMarker;
                     var msgDate = new Date(v.ts * 1000 || 0);
                     var iso = (msgDate.toISOString());
+                    const isCurrentVersion = i === 0;
+
                     if (todayOrYesterday(iso)) {
                         // if in last 2 days, use the time2lastSeparator
                         curTimeMarker = time2lastSeparator(iso);
@@ -337,7 +368,7 @@ var versiondialogid;
                         }
                     }
 
-                    var mostRecentHtml = (i === 0) ? '<span class="current">(' + l[17149] + ')</span>' : '';
+                    var mostRecentHtml = isCurrentVersion ? '<span class="current">(' + l[17149] + ')</span>' : '';
                     var activeClass  = current_sel_version.includes(v.h) ? 'active' : '';
                     var downBtnHtml =
                         `<div class="mega-button small action download-file simpletip"
@@ -389,10 +420,19 @@ var versiondialogid;
                                 <i class="sprite-fm-mono icon-bin disabled nonclickable"></i>
                             </div>`;
                     }
+
+                    // If from backup
+                    if (M.getNodeRoot(v.h) === M.InboxID) {
+                        revertBtnHtml = ``;
+                        if (isCurrentVersion) {
+                            deleteBtnHtml = ``;
+                        }
+                    }
+
                     html += // <!-- File Data Row !-->
                             `<tr class="fm-versioning file-info-row ${activeClass}" id=v_${v.h}>
                                 <td class="fm-versioning file-icon">
-                                    <div class="medium-file-icon ${fileIcon({name : v.name})}"></div>
+                                    <div class="item-type-icon-90 icon-${fileIcon({name : v.name})}-90"></div>
                                 </td>
                                 <td class="fm-versioning file-data">
                                     <div class="fm-versioning file-name">
@@ -461,7 +501,11 @@ var versiondialogid;
                 else if (a2[i] === M.RubbishID) {
                     name = l[167];
                 }
-                else if (a2[i] === 'messages' || a2[i] === M.InboxID) {
+                else if (M.BackupsId && a2[i] === M.BackupsId) {
+                    name = l.restricted_folder_button;
+                    hasArrow = false;
+                }
+                else if (a2[i] === 'messages') {
                     name = l[166];
                 }
                 else {
@@ -471,12 +515,15 @@ var versiondialogid;
                         hasArrow = true;
                     }
                 }
-                name = htmlentities(name);
-                pathHtml =
-                    `<span>
-                        ${hasArrow ? '<i class="sprite-fm-mono icon-arrow-right"></i>' : ''}
-                        <span class="simpletip" data-simpletip="${name}">${name}</span>
-                    </span>` + pathHtml;
+
+                if (name) {
+                    name = htmlentities(name);
+                    pathHtml =
+                        `<span>
+                            ${hasArrow ? '<i class="sprite-fm-mono icon-arrow-right"></i>' : ''}
+                            <span class="simpletip" data-simpletip="${name}">${name}</span>
+                        </span>` + pathHtml;
+                }
             }
 
             var refreshHeader = function(fileHandle) {
@@ -485,16 +532,19 @@ var versiondialogid;
                 const $rvtBtn = $('button.js-revert', headerSelect);
                 const $delBtn = $('button.js-delete', headerSelect);
                 const $clrBtn = $('button.js-clear-previous', headerSelect);
+                const topNodeHandle = fileversioning.getTopNodeSync(fileHandle);
 
                 if (current_sel_version.length > 1
-                    || current_sel_version[0] === fileversioning.getTopNodeSync(fileHandle)
-                    || nodeData && nodeData.r < 2) {
+                    || current_sel_version[0] === topNodeHandle
+                    || nodeData && nodeData.r < 2
+                ) {
 
                     $rvtBtn.addClass("disabled nonclickable");
                 }
                 else {
                     $rvtBtn.removeClass("disabled nonclickable");
                 }
+
                 if (nodeData && (nodeData.r < 2)) {
                     $delBtn.addClass("disabled nonclickable");
                     $clrBtn.addClass("disabled nonclickable");
@@ -514,21 +564,29 @@ var versiondialogid;
                     }
                 }
 
+                // If from backup
+                if (M.getNodeRoot(fileHandle) === M.InboxID) {
+                    $rvtBtn.addClass("disabled nonclickable");
+                    if (current_sel_version.includes(topNodeHandle)) {
+                        $delBtn.addClass("disabled nonclickable");
+                    }
+                }
+
                 var f = M.d[fileHandle];
                 var fnamehtml = '<span>' + htmlentities(f.name);
 
                 $('.fm-versioning .header .pad .top-column .file-data .file-name').html(fnamehtml);
 
-                $('.fm-versioning .header .pad .top-column .medium-file-icon')
-                    .attr('class', 'medium-file-icon')
-                    .addClass(fileIcon({'name':f.name}));
+                $('.fm-versioning .header .pad .top-column .item-type-icon-90')
+                    .attr('class', `item-type-icon-90 icon-${fileIcon({'name':f.name})}-90`);
 
             };
             var fnamehtml = '<span>' + htmlentities(f.name);
 
             $('.fm-versioning .header .pad .top-column .file-data .file-name').html(fnamehtml);
             $('.fm-versioning .header .pad .top-column .file-data .file-path').html(pathHtml);
-            $('.fm-versioning .header .pad .top-column .medium-file-icon').addClass(fileIcon({'name':f.name}));
+            $('.fm-versioning .header .pad .top-column .item-type-icon-90')
+                .addClass(`icon-${fileIcon({'name':f.name})}-90`);
 
             $('.fm-versioning .pad .top-column button.js-download').rebind('click', () => {
                 M.addDownload(current_sel_version);
@@ -539,24 +597,15 @@ var versiondialogid;
                     if (M.isInvalidUserStatus()) {
                         return;
                     }
-
                     $('.fm-versioning.overlay').addClass('arrange-to-back');
-                    var apiReq = function(handles) {
-                        for (let i = handles.length; i--;) {
-                            api_req({
-                                a: 'd',
-                                n: handles[i],
-                                v: 1
-                            });
-                        }
-                    };
+
                     if (!$(this).hasClass('disabled')) {
 
                         const msg = mega.icu.format(l[13750], current_sel_version.length);
 
                         msgDialog('remove', l[1003], msg, l[1007], e => {
                             if (e) {
-                                apiReq(current_sel_version);
+                                api.screq(current_sel_version.map((n) => ({n, a: 'd', v: 1}))).catch(dump);
                                 current_sel_version = [];
                             }
                             $('.fm-versioning.overlay').removeClass('arrange-to-back');
@@ -578,8 +627,8 @@ var versiondialogid;
                 fileversioning.previewFile(current_sel_version[0]);
             });
 
-            fileversioning.getAllVersions(fh).done(
-                function(versions) {
+            fileversioning.getAllVersions(fh)
+                .then((versions) => {
                     var vh = fillVersionList(versions);
                     const $scrollBlock = $('.fm-versioning.scroll-bl', '.fm-versioning .body');
 
@@ -640,15 +689,8 @@ var versiondialogid;
                         if (M.isInvalidUserStatus()) {
                             return;
                         }
-
-                        var apiReq = function(handle) {
-                            api_req({a: 'd',
-                                     n: handle,
-                                     v: 1
-                                    });
-                        };
-                        var self = this;
                         if (!$(this).hasClass('disabled')) {
+                            const n = this.id.substr(4);
 
                             if (e.shiftKey && current_sel_version.length > 0) {
                                 $('.fm-versioning .body .file-info-row').removeClass('active');
@@ -658,8 +700,8 @@ var versiondialogid;
                             $('.fm-versioning.overlay').addClass('arrange-to-back');
                             msgDialog('remove', l[1003], mega.icu.format(l[13750], 1), l[1007], e => {
                                 if (e) {
-                                    apiReq(self.id.substring(4));
                                     current_sel_version = [];
+                                    api.screq({a: 'd', n, v: 1}).catch(dump);
                                 }
                                 $('.fm-versioning.overlay').removeClass('arrange-to-back');
                             });
@@ -775,7 +817,7 @@ var versiondialogid;
                     .fail(loadingDialog.hide);
             }
             else if (is_video(M.d[previewHandle]) || is_image2(M.d[previewHandle])) {
-                fileversioning.getAllVersions(versionHandle).done((res) => {
+                fileversioning.getAllVersions(versionHandle).then((res) => {
                     fileversioning.closeFileVersioningDialog(versionHandle);
                     if (is_video(M.d[previewHandle])) {
                         $.autoplay = previewHandle;

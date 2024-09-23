@@ -41,27 +41,27 @@
  *          creating ZIPs with several small files.
  */
 function CacheIO(dl_id, dl) {
-    var IO, u8buf, logger,
-        offsetI = 0,
-        offsetO = 0,
-        __max_chunk_size = 32 * 0x100000;
+    'use strict';
+
+    let IO;
+    let u8buf;
+    let logger;
+    let offsetI = 0;
+    let offsetO = 0;
+    let __max_chunk_size = 48 * 0x100000;
 
     if (d) {
         console.log('Creating new CacheIO instance', dl_id, dl);
     }
 
     function PUSH(done, buffer) {
-        var neuter = false;
         if (!buffer) {
             buffer = u8buf.subarray(0, offsetI);
-            neuter = ((typeof FirefoxIO !== 'undefined') && dlMethod === FirefoxIO);
         }
-        var abLen = buffer.byteLength;
-        IO.write(buffer, offsetO, done);
-        if (neuter) {
-            u8buf = new Uint8Array(__max_chunk_size);
-        }
-        offsetO += abLen;
+        const pos = offsetO;
+        offsetO += buffer.byteLength;
+
+        IO.write(buffer, pos, done);
     }
 
     function FILL(buffer) {
@@ -75,7 +75,7 @@ function CacheIO(dl_id, dl) {
         }
 
         if (offsetI + buffer.byteLength > __max_chunk_size) {
-            function next() {
+            const next = () => {
                 if (next.write) {
                     next.write();
                     next.write = 0;
@@ -86,7 +86,7 @@ function CacheIO(dl_id, dl) {
                     }
                     next.done();
                 }
-            }
+            };
             next.done = done;
 
             if (offsetI) {
@@ -100,23 +100,22 @@ function CacheIO(dl_id, dl) {
                 };
 
                 if (!offsetI) {
-                    Soon(next);
+                    queueMicrotask(next);
                 }
             }
             offsetI = 0;
         }
         else {
             FILL(buffer);
-            Soon(done);
+            done();
         }
     };
 
-    this.download = function(name, path) {
+    this.download = function(...args) {
         function finish() {
             IO.download.apply(IO, args);
             u8buf = undefined;
         }
-        var args = arguments;
 
         if (offsetI) {
             PUSH(finish);

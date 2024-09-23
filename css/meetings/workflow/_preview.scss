@@ -5,7 +5,8 @@
     height: 100%;
     background: #333;
 
-    body.theme-dark & {
+    body.theme-dark &,
+    .theme-dark-forced & {
         background: #000;
     }
 
@@ -76,36 +77,50 @@
     }
 
     &-controls {
+        display: flex;
+        justify-content: center;
         position: absolute;
-        left: 50%;
-        bottom: 24px;
-        transform: translateX(-50%);
+        bottom: 0;
+        width: 100%;
+        padding: 8px 0;
         z-index: 2;
+        background: rgba(0, 0, 0, 0.3);
 
         .preview-control-wrapper {
-            display: inline-block;
             position: relative;
             width: 70px;
-            padding: 0 11px 0 11px;
             box-sizing: border-box;
+            text-align: center;
         }
 
-        button {
+        button.preview-meeting-control {
             display: inline;
+            background: transparent;
+            box-shadow: none;
 
-            &:first-child { margin-right: 32px; }
+            &:hover {
+                background: #333;
+            }
+
+            &.with-fill {
+                background: var(--secondary-white);
+
+                i { --mask-color: var(--icon-active); }
+            }
 
             i {
                 margin: 0 auto;
-                --icon-size: 32px;
-                --mask-color: var(--icon-active);
+                --icon-size: 24px;
+                --mask-color: var(--secondary-white);
             }
+        }
 
-            span {
-                position: fixed;
-                bottom: -9999px;
-                visibility: hidden;
-            }
+        span {
+            display: block;
+            margin: 6px 0 0 0;
+            font: var(--text-body2);
+            color: var(--secondary-white);
         }
     }
 }
+

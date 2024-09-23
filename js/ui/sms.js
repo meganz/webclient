@@ -24,6 +24,12 @@ var sms = {
             $closeButton.rebind('click', () => {
                 $dialog.addClass('hidden');
                 $background.addClass('hidden');
+
+                // This dialog is also used on the /smsdialog page, but if they used the Close/Not Now buttons on this
+                // page they would be left with a blank background, so instead we load /login (or /fm if logged in).
+                if (page === 'smsdialog') {
+                    loadSubPage('login');
+                }
             });
         }
     },
@@ -195,7 +201,6 @@ sms.phoneInput = {
         $verifyIcon.removeClass('hidden');
         $verifySuccessIcon.addClass('hidden');
         $('aside.js-verify-success-page', $dialog).addClass('hidden');
-        loadingInitDialog.hide('force');
     },
 
     /**
@@ -302,11 +307,12 @@ sms.phoneInput = {
             const stripedPhNum = M.stripPhoneNumber(countryCallCode, phoneInputEntered);
             const formattedPhoneNumber = `+${countryCallCode}${stripedPhNum}`;
             const validateResult = M.validatePhoneNumber(phoneInputEntered, countryCallCode);
+            const checkOldNum = u_attr ? formattedPhoneNumber === u_attr.smsv : false;
 
             // If the fields are completed enable the button
             if ($countrySelect.length && $countrySelect.attr('data-country-iso-code').length > 1
                 && validateResult
-                && formattedPhoneNumber !== u_attr.smsv) {
+                && !checkOldNum) {
                 $sendButton.removeClass('disabled');
             }
             else {
@@ -383,7 +389,7 @@ sms.phoneInput = {
             var countryCode = $selectedOption.attr('data-country-iso-code');
 
             // Prepare request
-            var apiRequest = { a: 'smss', n: validatedFormattedPhoneNumber };
+            var apiRequest = {a: 'smss', n: validatedFormattedPhoneNumber};
 
             // Add debug mode to test reset of the phone number so can be re-used (staging API only)
             if (localStorage.smsDebugMode) {
@@ -436,14 +442,12 @@ sms.phoneInput = {
                 return false;
             }
 
-            if (u_attr.smsv === undefined) {
+            if (u_attr === undefined || u_attr.smsv === undefined) {
                 sendSMSToPhone();
             }
             else {
                 // If it's to modify the phone number, have to remove the existing one firstly
-                accountUI.account.profiles.removePhoneNumber(false).then(() => {
-                    sendSMSToPhone();
-                }).catch(dump);
+                accountUI.account.profiles.removePhoneNumber().then(sendSMSToPhone).catch(dump);
             }
         });
     }
@@ -606,60 +610,60 @@ sms.verifyCode = {
             var successMessage = l[20220].replace('%1', phoneNumber);
 
             // Send code to the API for verification
-            api_req({ a: 'smsv', c: verificationCode }, {
-                callback: function(result) {
+            api.send({a: 'smsv', c: verificationCode})
+                .then(() => {
+
+                    // Hide the current page
+                    sms.verifyCode.$dialog.addClass('hidden');
+                    sms.verifyCode.$background.addClass('hidden');
+                    sms.verifyCode.$page.addClass('hidden');
+
+                    // If they were suspended when they started the process
+                    if (sms.isSuspended) {
+
+                        // Show a success dialog then load their account after
+                        msgDialog('info', l[18280], successMessage, false, () => {
+
+                            // Reset flag
+                            sms.isSuspended = false;
+
+                            // Set the message and phone number to show on the login page
+                            login_txt = successMessage + ' ' + l[20392];
+
+                            // Log out the partially logged in account and reload page
+                            u_logout().then(() => location.reload());
+                        });
+                    }
+                    else {
+                        // Show achievement success dialog
+                        sms.verifySuccess.init();
+                    }
+                })
+                .catch((ex) => {
 
                     // Check for errors
-                    if (result === EACCESS) {
+                    if (ex === EACCESS) {
                         $warningMessage.addClass('visible').text(l[20223]);
                         $verifyButton.addClass('disabled');
                     }
-                    else if (result === EEXPIRED) {
+                    else if (ex === EEXPIRED) {
                         $warningMessage.addClass('visible').text(l[20224]);
                         $verifyButton.addClass('disabled');
                     }
-                    else if (result === EFAILED) {
+                    else if (ex === EFAILED) {
                         $warningMessage.addClass('visible').text(l[20225]);
                         $verifyButton.addClass('disabled');
                     }
-                    else if (result === EEXIST || result === ENOENT) {
+                    else if (ex === EEXIST || ex === ENOENT) {
                         $warningMessage.addClass('visible').text(l[20226]);
                         $verifyButton.addClass('disabled');
                     }
-                    else if (result < 0) {
+                    else {
+                        console.error(ex);
                         $warningMessage.addClass('visible').text(l[47]);  // Oops, something went wrong...
                         $verifyButton.addClass('disabled');
                     }
-                    else {
-                        // Hide the current page
-                        sms.verifyCode.$dialog.addClass('hidden');
-                        sms.verifyCode.$background.addClass('hidden');
-                        sms.verifyCode.$page.addClass('hidden');
-
-                        // If they were suspended when they started the process
-                        if (sms.isSuspended) {
-
-                            // Show a success dialog then load their account after
-                            msgDialog('info', l[18280], successMessage, false, function() {
-
-                                // Reset flag
-                                sms.isSuspended = false;
-
-                                // Set the message and phone number to show on the login page
-                                login_txt = successMessage + ' ' + l[20392];
-
-                                // Log out the partially logged in account and
-                                u_logout(true);
-                                loadSubPage('login');
-                            });
-                        }
-                        else {
-                            // Show achievement success dialog
-                            sms.verifySuccess.init();
-                        }
-                    }
-                }
-            });
+                });
         });
     }
 };

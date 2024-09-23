@@ -4,18 +4,19 @@
     justify-content: center;
     position: absolute;
     bottom: -250px;
-    padding: 0 0 24px 0;
+    padding: 22px 0 14px 0;
     width: 100%;
     text-align: center;
     transition: opacity 500ms ease-in-out, bottom 500ms ease-in-out;
-    z-index: 11;
+    background: #222;
+    z-index: 12;
 
     .overlayed & {
         bottom: 0;
     }
 
     ul {
-        display: block;
+        display: flex;
         margin: 0;
         padding: 0;
         height: 100%;
@@ -23,29 +24,79 @@
 
         li {
             position: relative;
-            display: inline-block;
-            padding: 0 11px 0 11px;
+            display: flex;
+            flex-direction: column;
+            margin: 0 32px 0 0;
+            cursor: pointer;
 
-            button {
+            &.disabled {
+                /* [...] */
+
+                button {
+                    /* [...] */
+
+                    span { color: var(--text-color-low); }
+                }
+            }
+
+            &.with-input-selector {
+                margin-right: 32px;
+            }
+
+            button.call-action {
+                width: 40px;
+                height: 40px;
                 cursor: pointer;
+                margin: auto;
+
+                &.with-fill {
+                    background: var(--secondary-white);
+                    i { --mask-color: var(--icon-active); }
+                }
 
                 &.end-call {
+                    background: #FF333A;
                     color: var(--text-color-high);
+                    box-shadow: none;
+                    &:hover { background: #FF6560; }
 
                     i { --mask-color: var(--secondary-white); }
                 }
 
+
                 i {
                     display: block;
                     margin: 0 auto;
-                    --icon-size: 32px;
-                    --mask-color: var(--icon-active);
+                    --icon-size: 24px;
+                    --mask-color: var(--secondary-white);
                 }
+            }
 
-                span {
-                    position: fixed;
-                    bottom: -9999px;
-                    visibility: hidden;
+            span {
+                display: block;
+                margin: 2px 0 0 0;
+                font: var(--text-body2);
+                color: var(--secondary-white);
+            }
+
+            .input-source-opener {
+                position: absolute;
+                top: 0;
+                right: -20px;
+                width: 16px;
+                height: 60px;
+                border-radius: 16px;
+
+                &:hover { background: #333; }
+                &:active { background: #444; }
+
+                i {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    --icon-size: 24px;
+                    --mask-color: var(--secondary-white);
                 }
             }
         }
@@ -93,9 +144,47 @@
                 span {
                     position: relative;
                     bottom: auto;
+                    margin: 0;
+                    font: var(--text-body1);
                     visibility: visible;
                 }
             }
+        }
+    }
+
+    .mic-muted-tip {
+        background: var(--surface-grey-1);
+        border-radius: 6px;
+        bottom: calc(100% + 24px);
+        color: var(--text-color-medium);
+        display: flex;
+        font: var(--text-body1);
+        left: 50%;
+        padding: 8px 12px;
+        position: absolute;
+        text-wrap: nowrap;
+        transform: translateX(-50%);
+        i {
+            bottom: -8px;
+            height: 16px;
+            left: calc(50% - 12px);
+            position: absolute;
+            --icon-size: 24px;
+            --mask-color: var(--surface-grey-1);
+        }
+        span {
+            color: var(--text-color-high);
+            font: var(--text-body1-bold);
+            margin: 0;
+        }
+        button {
+            background: none;
+            border: none;
+            color: var(--text-color-success);
+            font: var(--text-body1-bold);
+            padding: 0;
+            margin-inline-start: 4px;
+            -webkit-margin-start: 4px;
         }
     }
 }

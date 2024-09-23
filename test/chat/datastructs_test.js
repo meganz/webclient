@@ -2,6 +2,14 @@ describe("Mega Data Structs Test", function() {
 
     var DEBUG_MODE = false;
 
+    const _delay = (f) => {
+
+        // per delay() usage in MegaDataMap._enqueueChangeListenersDsp
+        const timeout = 40 << 2;
+
+        delay(`mdm:cl:dsp-${++mIncID}`, f, timeout);
+    };
+
     var waitForChangeListener = function(map) {
         var promise = new MegaPromise();
         map.addChangeListener(function() {
@@ -34,7 +42,7 @@ describe("Mega Data Structs Test", function() {
         obj.addChangeListener(changeListenerCb);
 
         obj.u = 123;
-        setTimeout(function() {
+        _delay(function() {
             expect(listenerWasCalled).to.eql(1);
             expect(obj._dataChangeIndex).to.eql(1);
             done();
@@ -87,7 +95,7 @@ describe("Mega Data Structs Test", function() {
         objMap.addChangeListener(changeListenerCb);
 
         obj1.u = 123;
-        setTimeout(function() {
+        _delay(function() {
             expect(listenerWasCalled).to.eql(2, 'listener called unexpected number of times');
             expect(obj1._dataChangeIndex).to.eql(1, 'unexpected obj1 change index [b]');
             expect(obj2._dataChangeIndex).to.eql(0, 'unexpected obj2 change index [b]');
@@ -99,7 +107,7 @@ describe("Mega Data Structs Test", function() {
 
             obj2.u = 321;
 
-            setTimeout(function() {
+            _delay(function() {
                 expect(listenerWasCalled).to.eql(false, 'listener called unexpectedly');
                 expect(obj1._dataChangeIndex).to.eql(1, 'unexpected obj1 change index [c]');
                 expect(obj2._dataChangeIndex).to.eql(1, 'unexpected obj2 change index [c]');
@@ -272,7 +280,7 @@ describe("Mega Data Structs Test", function() {
             tmp.trackDataChange();
         }
 
-        setTimeout(function() {
+        _delay(function() {
             expect(stack.length).to.eql(11);
             expect(stack.join('|')).to.eql('46|51|52|53|54|55|56|47|48|49|50');
             done();
@@ -306,7 +314,7 @@ describe("Mega Data Structs Test", function() {
         expect(stack.join('|')).to.eql('e13|e13|e13|e1b4|e18|e18|e18|e18|e19|e10');
 
         var testPropagation = function(event) {
-            var trap = mRandomToken('evz');
+            var trap = Math.random().toString(36).slice(-7);
             var type = event.type;
             obj.one(type, function(ev) {
                 expect(ev.type).to.eql(type);

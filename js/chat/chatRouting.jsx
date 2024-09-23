@@ -59,6 +59,10 @@ export default class ChatRouting {
         if (args[0] === 'chat') {
             args.shift();
         }
+        if (args[0] && args[0].length > 8 && args[0].substring(0, 8) === 'contacts') {
+            location = location.replace(args[0], 'contacts');
+            args[0] = 'contacts';
+        }
 
         const [section] = args;
         const {megaChat} = this;
@@ -97,7 +101,7 @@ export default class ChatRouting {
                 room.show();
                 args.route.location = room.getRoomUrl();
             }
-            else if (!roomId || roomId === u_handle) {
+            else if (!roomId || roomId === u_handle || roomId.length !== 11 && !is_chatlink) {
                 ChatRouting.gPageHandlers.redirect(args.route, 'fm/chat').then(resolve).catch(reject);
                 resolve = null;
             }
@@ -130,8 +134,8 @@ export default class ChatRouting {
                         // and this reached back again for it? if so, catch it and invoke openCustomView(notFound) (?)
 
 
-                        if (ex === ENOENT && megaChat.publicChatKeys[roomId]) {
-                            msgDialog('warninga', l[20641], l[20642], 0, () => {
+                        if (ex === ENOENT || ex === EBLOCKED && megaChat.publicChatKeys[roomId]) {
+                            msgDialog('warninga', '', l[20641], l[20642], () => {
                                 loadSubPage(is_chatlink ? 'start' : 'fm/chat', event);
                             });
                         }
@@ -191,7 +195,6 @@ export default class ChatRouting {
     reinitAndOpenExistingChat(chatId, publicChatHandle = false, cbBeforeOpen = undefined) {
         const chatUrl = "fm/chat/c/" + chatId;
         publicChatHandle = publicChatHandle || megaChat.initialPubChatHandle;
-        const meetingDialogClosed = megaChat.meetingDialogClosed;
         megaChat.destroy();
         is_chatlink = false;
 
@@ -202,7 +205,6 @@ export default class ChatRouting {
                 .always(() => {
                     megaChat.initialPubChatHandle = publicChatHandle;
                     megaChat.initialChatId = chatId;
-                    megaChat.meetingDialogClosed = meetingDialogClosed;
 
                     const next = () => {
                         mBroadcaster.once('pagechange', () => {
@@ -252,7 +254,6 @@ export default class ChatRouting {
     }
     reinitAndJoinPublicChat(chatId, initialPubChatHandle, publicChatKey) {
         initialPubChatHandle = initialPubChatHandle || megaChat.initialPubChatHandle;
-        const meetingDialogClosed = megaChat.meetingDialogClosed;
         megaChat.destroy();
         is_chatlink = false;
 
@@ -263,7 +264,6 @@ export default class ChatRouting {
                 .then(() => {
                     megaChat.initialPubChatHandle = initialPubChatHandle;
                     megaChat.initialChatId = chatId;
-                    megaChat.meetingDialogClosed = meetingDialogClosed;
 
                     // generate key for mciphReq
                     const mciphReq = megaChat.plugins.chatdIntegration.getMciphReqFromHandleAndKey(
@@ -307,22 +307,17 @@ export default class ChatRouting {
                     };
                     join();
 
-
-                    M.req(mciphReq)
-                        .then(() => {
+                    asyncApiReq(mciphReq).then(join).catch((ex) => {
+                        if (ex === EEXIST) {
+                            // already in the room.
                             join();
-                        })
-                        .catch((ex) => {
-                            if (ex === -12) {
-                                // already in the room.
-                                join();
-                            }
-                            else {
-                                loadingDialog.phide();
-                                console.error("Bad response for mciphReq:", mciphReq, ex);
-                                rej(ex);
-                            }
-                        });
+                        }
+                        else {
+                            loadingDialog.phide();
+                            console.error("Bad response for mciphReq:", mciphReq, ex);
+                            rej(ex);
+                        }
+                    });
                 });
         });
     }

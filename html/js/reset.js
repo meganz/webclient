@@ -193,32 +193,16 @@ function recovery_reset_pw() {
         return false;
     }
 
-    loadingDialog.show();
-
     // Perform the Master Key re-encryption with a new password
-    security.resetKey(recoverycode, base64_to_a32(recoverykey), recoveryemail, password, function(responseCode) {
+    security.resetKey(recoverycode, base64_to_a32(recoverykey), recoveryemail, password)
+        .then(() => {
 
-        loadingDialog.hide();
-
-        if (responseCode === 0) {
-            msgDialog('info', l[1955], l[1981], '', function() {
+            msgDialog('info', l[1955], l[1981], '', () => {
                 login_email = recoveryemail;
                 loadSubPage('login');
             });
-        }
-        else if (responseCode === EKEY) {
-            msgDialog('warningb', l[1977], l[1978]);
-            $('.recover-block.error').removeClass('hidden');
-        }
-        else if (responseCode === EBLOCKED) {
-            msgDialog('warningb', l[1979], l[1980]);
-        }
-        else if (responseCode === EEXPIRED || responseCode === ENOENT) {
-            msgDialog('warninga', l[1966], l[1967], '', function() {
-                loadSubPage('login');
-            });
-        }
-    });
+        })
+        .catch(tell);
 }
 
 
@@ -229,34 +213,13 @@ function verify_key(key) {
 
     recoverykey = key;
 
-    loadingDialog.show();
-
     // Change the password, re-encrypt the Master Key and send the encrypted key to the server
-    security.resetKey(recoverycode, base64_to_a32(recoverykey), recoveryemail, null, function(responseCode) {
-
-        if (responseCode === 0) {
+    security.resetKey(recoverycode, base64_to_a32(recoverykey), recoveryemail)
+        .then(() => {
             $('.recover-block').addClass('hidden');
             $('.recover-block.success').removeClass('hidden');
-        }
-
-        // If EKEY - invalid master key
-        else if (responseCode === EKEY) {
-            msgDialog('warningb', l[1977], l[1978]);
-            // $('.recover-block.error').removeClass('hidden');
-        }
-        else if (responseCode === EBLOCKED) {
-            msgDialog('warningb', l[1979], l[1980]);
-        }
-
-        // If ENOENT - invalid or already used code_from_email or if EEXPIRED - valid, but expired code_from_email
-        else if (responseCode === EEXPIRED || responseCode === ENOENT) {
-            msgDialog('warninga', l[1966], l[1967], '', function() {
-                loadSubPage('login');
-            });
-        }
-
-        loadingDialog.hide();
-    });
+        })
+        .catch(tell);
 }
 
 function init_reset_pw() {

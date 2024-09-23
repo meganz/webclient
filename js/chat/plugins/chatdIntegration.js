@@ -101,7 +101,7 @@ var ChatdIntegration = function(megaChat) {
             ChatdIntegration._ensureKeysAreLoaded(undefined, participants)
         );
 
-        var _createChat = function() {
+        var _createChat = () => {
             var invited_users = [];
             contactHashes.forEach(function(contactHash) {
                 var entry = {
@@ -130,21 +130,18 @@ var ChatdIntegration = function(megaChat) {
                     (chatMode === strongvelope.CHAT_MODE.PUBLIC)
                 );
             }
-            // Speak Request, Open Invite, Waiting room
-            const { sr, oi, w } = opts;
 
             const reqi = String(rand(6e10));
-
-            var mccPacket = {
-                'a': 'mcc',
-                'g': 1,
-                'u': invited_users,
-                'm': chatMode === strongvelope.CHAT_MODE.PUBLIC ? 1 : 0,
-                'v': Chatd.VERSION,
-                'i': reqi,
-                sr,
-                w,
-                oi,
+            const mccPacket = {
+                a: 'mcc',
+                g: 1,
+                u: invited_users,
+                m: chatMode === strongvelope.CHAT_MODE.PUBLIC ? 1 : 0,
+                v: Chatd.VERSION,
+                i: reqi,
+                w: opts.waitingRoom,
+                oi: opts.openInvite,
+                sm: opts.scheduledMeeting
             };
 
             if (opts.isMeeting) {
@@ -152,7 +149,7 @@ var ChatdIntegration = function(megaChat) {
             }
 
             if (topic) {
-                mccPacket['ct'] = topic;
+                mccPacket.ct = topic;
             }
 
             if (chatMode === strongvelope.CHAT_MODE.PUBLIC) {
@@ -162,10 +159,11 @@ var ChatdIntegration = function(megaChat) {
             }
             megaChat._chatsAwaitingAps[reqi] = opts;
             asyncApiReq(mccPacket)
-                .fail(function() {
-                    self.logger.error(
+                .catch(ex => {
+                    this.logger.error(
                         "Failed to retrieve chatd ID from API, while trying to create a new room, mccReq:",
-                        mccPacket
+                        mccPacket,
+                        ex
                     );
                 });
         };
@@ -216,37 +214,6 @@ ChatdIntegration.decryptMessageHelper = async function(message, chatRoom) {
 
     assert(decrypted, `Message can not be decrypted! ${roomId}:${userId}`);
     return decrypted;
-};
-
-ChatdIntegration.prototype.updateChatPublicHandle = function(h, d, callback) {
-    var self = this;
-    var req = {a: "mcph", "id": h, v: Chatd.VERSION};
-    if (d) {
-        req['d'] = 1;
-    }
-
-    return asyncApiReq(req)
-        .done(function(r) {
-            var chatRoom = self.megaChat.chats[h];
-            if (d) {
-                chatRoom.publicLink = null;
-            }
-            else {
-                chatRoom.publicLink = 'chat/' + r + '#' + chatRoom.protocolHandler.getUnifiedKey();
-            }
-
-            if (callback) {
-                callback();
-            }
-        })
-        .fail(function() {
-            var chatRoom = self.megaChat.chats[h];
-            chatRoom.publicLink = null;
-            if (callback) {
-                callback();
-            }
-        });
-
 };
 
 ChatdIntegration.prototype.requiresUpdate = function(source) {
@@ -405,6 +372,7 @@ ChatdIntegration.prototype._finalizeMcurlResponseHandling = function(ret, chatIn
             'ck',
             'mr',
             'callId',
+            'w',
         ];
         for (var i = 0; i < keys.length; i++) {
             if (typeof(ret[keys[i]]) !== 'undefined') {
@@ -430,6 +398,10 @@ ChatdIntegration.prototype._finalizeMcurlResponseHandling = function(ret, chatIn
 
         if (chatRoom && self.megaChat.publicChatKeys[publicChatHandle]) {
             chatRoom.publicChatKey = self.megaChat.publicChatKeys[publicChatHandle];
+        }
+
+        if (Array.isArray(ret.sm)) {
+            processMCSM(ret.sm, true);
         }
 
         // feed the chat link info in is_chatlink, since thats where its stored now
@@ -494,14 +466,26 @@ ChatdIntegration.prototype._retrieveShardUrl = function(isPublic, chatIdOrHandle
         this.logger.warn('Retrieving Shard URL...', apiReq);
     }
 
-    var req = asyncApiReq(apiReq);
+    const req = asyncApiReq(apiReq)
+        .then((res) => {
+            if (Array.isArray(res)) {
+                console.assert(apiReq.a === 'mcurl', res);
+                console.assert(typeof res[1] === 'string', res);
+                res = res[1];
+            }
+            else {
+                console.assert(apiReq.a === 'mcphurl', res);
+                console.assert(typeof res === 'object' && res.url, res);
+            }
+            assert(res && String(res.url || res).includes('://'));
+            return res;
+        })
+        .finally(() => {
+            delete this.mcUrlInflightRequest[chatShard];
+        });
 
     if (chatShard !== undefined) {
-        var self = this;
-        self.mcUrlInflightRequest[chatShard] = req;
-        req.always(function() {
-            delete self.mcUrlInflightRequest[chatShard];
-        });
+        this.mcUrlInflightRequest[chatShard] = req;
     }
 
     return req;
@@ -625,7 +609,8 @@ ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatIn
                 self.megaChat.publicChatKeys[publicChatHandle],
                 chatInfo.ck,
                 chatInfo.mr === 1,
-                mcoFlags
+                mcoFlags,
+                chatInfo.o
             );
             chatRoom = r[1];
             if (!chatRoom) {
@@ -687,24 +672,20 @@ ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatIn
                 };
 
                 createTimeoutPromise(validate1, 500, 10000)
-                    .then(function() {
+                    .then(() => {
                         if (setAsActive.createChatLink === true) {
                             createTimeoutPromise(validate2, 300, 2000)
-                                .always(function() {
+                                .always(() => {
+                                    if (chatRoom.isMeeting) {
+                                        chatRoom.updatePublicHandle(false, true);
+                                        return chatRoom.scheduledMeeting ? null : chatRoom.trigger('onNewMeetingReady');
+                                    }
                                     chatRoom.trigger('showGetChatLinkDialog');
-                                    affiliateUI.registeredDialog.show();
-                                });
-                        }
-                        else if (setAsActive.createChatLink === 2) {
-                            createTimeoutPromise(validate2, 300, 2000)
-                                .always(function() {
-                                    chatRoom.updatePublicHandle();
-                                    chatRoom.trigger('onNewMeetingReady');
                                 });
                         }
                     })
-                    .catch(function(ex) {
-                        self.logger.warn("Timed out waiting for protocolHandler, room title not set.", ex);
+                    .catch(ex => {
+                        this.logger.warn("Timed out waiting for protocolHandler, room title not set.", ex);
                     });
             }
 
@@ -764,7 +745,6 @@ ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatIn
                     chatInfo.n.forEach(function(v) {
                         if (v.p === -1) {
                             excluded.push(v.u);
-                            delete chatRoom.members[v.u];
                             if (v.u === u_handle) {
                                 if (typeof(chatRoom.megaChat.plugins.presencedIntegration) !== 'undefined') {
                                     Object.keys(chatRoom.members).forEach(function(user_handle) {
@@ -775,15 +755,23 @@ ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatIn
                                                 chatRoom
                                             );
                                         }
-                                        delete chatRoom.members[user_handle];
+                                        // Mark all users as read-only and self as left. Same as loading state when left
+                                        chatRoom.members[user_handle] = user_handle === u_handle ?
+                                            ChatRoom.MembersSet.PRIVILEGE_STATE.LEFT :
+                                            ChatRoom.MembersSet.PRIVILEGE_STATE.READONLY;
                                     });
+                                }
+                                const { scheduledMeeting } = chatRoom;
+                                if (scheduledMeeting) {
+                                    megaChat.trigger(megaChat.plugins.meetingsManager.EVENTS.LEAVE, scheduledMeeting);
                                 }
                                 chatRoom.leave(false);
                             }
                             else {
+                                delete chatRoom.members[v.u];
                                 // someone else left the room
                                 if (
-                                    !M.u[v.u].c &&
+                                    !(M.u[v.u] && M.u[v.u].c) &&
                                     typeof(chatRoom.megaChat.plugins.presencedIntegration) !== 'undefined'
                                 ) {
                                     chatRoom.megaChat.plugins.presencedIntegration.eventuallyRemovePeer(
@@ -841,9 +829,11 @@ ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatIn
                 }
             }
 
+            chatRoom.organiser = chatInfo.o;
+
             chatRoom.trackMemberUpdatesFromActionPacket(chatInfo, isMcf);
         }
-        self.decryptTopic(chatRoom);
+        self.decryptTopic(chatRoom).catch(dump);
 
         if (d) {
             console.timeEnd('chatdint:openchat:finish:' + chatId);
@@ -1242,12 +1232,7 @@ ChatdIntegration.prototype._attachToChatRoom = promisify(function(resolve, rejec
                     var participants = chatRoom.protocolHandler.getTrackedParticipants();
                     participants.add(h);
 
-                    var promises = [];
-                    promises.push(
-                        ChatdIntegration._ensureKeysAreLoaded(undefined, participants, chatRoom.publicChatHandle)
-                    );
-                    var _runInvitedWithTopic = function() {
-
+                    ChatdIntegration._ensureKeysAreLoaded(0, participants, chatRoom.publicChatHandle).then(() => {
                         var topic = chatRoom.protocolHandler.embeddedEncryptTo(
                             chatRoom.topic,
                             strongvelope.MESSAGE_TYPES.TOPIC_CHANGE,
@@ -1265,33 +1250,28 @@ ChatdIntegration.prototype._attachToChatRoom = promisify(function(resolve, rejec
                                     chatKeyEncoded && chatKeyEncoded.length === 32,
                                     'onAddUserRequest: invalid chat key passed.'
                                 );
-                                asyncApiReq({
-                                    "a":"mci",
-                                    "id":chatRoom.chatId,
+
+                                return asyncApiReq({
+                                    "a": "mci",
+                                    "id": chatRoom.chatId,
                                     "u": h,
                                     "p": 2,
-                                    "ct":base64urlencode(topic),
-                                    "ck":chatKeyEncoded,
+                                    "ct": base64urlencode(topic),
+                                    "ck": chatKeyEncoded,
                                     "v": Chatd.VERSION
                                 });
                             }
-                            else {
-                                asyncApiReq({
-                                    "a":"mci",
-                                    "id":chatRoom.chatId,
-                                    "u": h,
-                                    "p": 2,
-                                    "ct":base64urlencode(topic),
-                                    "v": Chatd.VERSION
-                                });
-                            }
+
+                            return asyncApiReq({
+                                "a": "mci",
+                                "id": chatRoom.chatId,
+                                "u": h,
+                                "p": 2,
+                                "ct": base64urlencode(topic),
+                                "v": Chatd.VERSION
+                            });
                         }
-                    };
-                    MegaPromise.allDone(promises).done(
-                        function () {
-                            _runInvitedWithTopic();
-                        }
-                    );
+                    }).catch(dump);
                 }
                 else {
                     var req = {
@@ -1312,7 +1292,7 @@ ChatdIntegration.prototype._attachToChatRoom = promisify(function(resolve, rejec
                         req.ck = chatKeyEncoded;
                     }
 
-                    asyncApiReq(req);
+                    asyncApiReq(req).catch(dump);
                 }
             });
         });
@@ -1363,15 +1343,18 @@ ChatdIntegration.prototype._attachToChatRoom = promisify(function(resolve, rejec
                             false,
                             true
                         );
-
+                        return succeeded ? self.syncMessageContacts(msg) : Promise.resolve({ msg });
+                    })
+                    .then(({ succeeded, msg }) => {
                         if (succeeded) {
-                            mb.messagesBatchFromHistory.remove(msg.messageId);
+                            const { messagesBuff } = chatRoom;
+                            messagesBuff.messagesBatchFromHistory.remove(msg.messageId);
                             if (msgObject.pendingMessageId) {
-                                mb.messages.remove(msgObject.pendingMessageId);
+                                messagesBuff.messages.remove(msgObject.pendingMessageId);
                             }
                             msg.source = Message.SOURCE.CHATD;
                             self._parseMessage(chatRoom, msg);
-                            mb.messages.push(msg);
+                            messagesBuff.messages.push(msg);
                         }
                     })
                     .catch(function(ex) {
@@ -1451,7 +1434,7 @@ ChatdIntegration.prototype._attachToChatRoom = promisify(function(resolve, rejec
                     chatRoom.protocolHandler.unifiedKey = base64urldecode(chatRoom.publicChatKey);
                 }
                 else {
-                    self.decryptTopic(chatRoom);
+                    self.decryptTopic(chatRoom).catch(dump);
                 }
                 self.join(chatRoom);
                 delete chatRoom.strongvelopeSetupPromises;
@@ -1540,7 +1523,8 @@ ChatdIntegration.prototype._processDecryptedMessage = function(
             if (decryptedResult.payload && decryptedResult.payload.length > 0) {
                 msgInstance.meta = {
                     userId: decryptedResult.sender,
-                    topic: decryptedResult.payload
+                    topic: decryptedResult.payload,
+                    isScheduled: !!msgInstance.chatRoom.scheduledMeeting
                 };
                 msgInstance.dialogType = "topicChange";
 
@@ -1607,6 +1591,11 @@ ChatdIntegration.prototype._processDecryptedMessage = function(
                 retentionTime: Chatd.unpack32le(decryptedResult.payload),
             };
         }
+        else if (decryptedResult.type === strongvelope.MESSAGE_TYPES.SCHEDULE_MEET) {
+            msgInstance.dialogType = 'scheduleMeta';
+            msgInstance.meta = megaChat.plugins.meetingsManager
+                .getFormattingMeta(decryptedResult.handle, decryptedResult, chatRoom);
+        }
         else {
             self.logger.error("Could not decrypt: ", decryptedResult);
             return false;
@@ -1638,68 +1627,47 @@ ChatdIntegration.prototype._processDecryptedMessage = function(
 };
 
 ChatdIntegration.prototype.decryptTopic = function(chatRoom) {
-    var self = this;
-    if (!chatRoom.ct) {
-        return MegaPromise.reject(false);
-    }
+    return this._decryptTopicHelper(chatRoom)
+        .catch((ex) => {
+            const {logger, gotRsaFailure} = chatRoom.protocolHandler.setError(ex);
 
-    return new MegaPromise(function(resolve, reject) {
-        if (!chatRoom.protocolHandler) {
-            ChatdIntegration._waitForProtocolHandler(chatRoom, () => {
-                self.decryptTopic(chatRoom).then(resolve).catch(reject);
-            });
-            return;
-        }
-
-        var parsedMessage = strongvelope._parseMessageContent(base64urldecode(chatRoom.ct));
-
-        ChatdIntegration._ensureKeysAreLoaded(undefined, [parsedMessage.invitor], chatRoom.publicChatHandle)
-            .then(function() {
-                return chatRoom.protocolHandler.decryptFrom(base64urldecode(chatRoom.ct));
-            })
-            .then(function(decryptedCT) {
-                chatRoom.topic = decryptedCT.payload;
-                resolve();
-            })
-            .catch((ex) => {
-                const {logger, gotRsaFailure} = chatRoom.protocolHandler.setError(ex);
-
-                if (d && !gotRsaFailure || d > 2) {
-                    if (gotRsaFailure) {
-                        logger.debug('Could not decrypt topic.', ex);
-                    }
-                    else {
-                        self.logger.warn(
-                            `Could not decrypt topic in room ${chatRoom.chatId}`,
-                            localStorage.debugSignatureInvalid && parsedMessage,
-                            ex
-                        );
-                    }
+            if (d && !gotRsaFailure || d > 2) {
+                if (gotRsaFailure) {
+                    logger.debug('Could not decrypt topic.', ex);
                 }
-                reject(ex);
-            });
-    });
+                else {
+                    this.logger.warn(`Could not decrypt topic in room ${chatRoom.chatId}`, ex);
+                }
+            }
+            throw ex;
+        });
 };
 
-ChatdIntegration.prototype.decryptUnifiedkey = function(chatRoom) {
-    var self = this;
-    return new MegaPromise(function(resolve, reject) {
-        if (!chatRoom.protocolHandler) {
-            return reject(false);
+ChatdIntegration.prototype._decryptTopicHelper = async function(chatRoom) {
+    if (!chatRoom.ct) {
+        if (d > 2) {
+            this.logger.warn(`Premature decryptTopic() invocation for chat-room ${chatRoom.chatId}`);
         }
-        var parsedKey = strongvelope.unpackKey(base64urldecode(chatRoom.ck));
+        return;
+    }
+    if (!chatRoom.protocolHandler) {
+        await ChatdIntegration._waitForProtocolHandler(chatRoom);
+    }
+    const parsedMessage = strongvelope._parseMessageContent(base64urldecode(chatRoom.ct));
+    await ChatdIntegration._ensureKeysAreLoaded(undefined, [parsedMessage.invitor], chatRoom.publicChatHandle);
+    const decryptedCT = await Promise.resolve(chatRoom.protocolHandler.decryptFrom(base64urldecode(chatRoom.ct)));
 
-        ChatdIntegration._ensureKeysAreLoaded(undefined, [parsedKey.sender], chatRoom.publicChatHandle)
-            .then(function() {
-                var decryptedKeys = chatRoom.protocolHandler._decryptKeysFrom(parsedKey.senderKey, parsedKey.sender);
-                chatRoom.protocolHandler.unifiedKey = decryptedKeys[0];
-                resolve();
-            })
-            .catch(function(e) {
-                self.logger.error("Could not get unified key: ", e);
-                reject(e);
-            });
-    });
+    chatRoom.topic = decryptedCT.payload;
+};
+
+ChatdIntegration.prototype.decryptUnifiedkey = async function(chatRoom) {
+    assert(chatRoom.protocolHandler, `Protocol-handler does not exists for chat-room ${chatRoom.chatId}`);
+
+    const parsedKey = strongvelope.unpackKey(base64urldecode(chatRoom.ck));
+    await ChatdIntegration._ensureKeysAreLoaded(undefined, [parsedKey.sender], chatRoom.publicChatHandle);
+    const decryptedKeys = chatRoom.protocolHandler._decryptKeysFrom(parsedKey.senderKey, parsedKey.sender);
+
+    chatRoom.protocolHandler.unifiedKey = decryptedKeys[0];
 };
 
 /** chatd related commands **/
@@ -1927,6 +1895,135 @@ ChatdIntegration.prototype.handleLeave = function(room) {
 
 ChatdIntegration.prototype.destroy = function() {
     mBroadcaster.removeListener(this.mBApListener);
+};
+
+ChatdIntegration.prototype.updateScheduledMeeting = async function(options, scheduledMeetingId, chatId) {
+    const { timezone, startDateTime, endDateTime, topic, description, sendInvite, recurring } = options;
+    const { encodeData } = megaChat.plugins.meetingsManager;
+    const scheduledMeeting = megaChat.plugins.meetingsManager.getMeetingById(scheduledMeetingId);
+
+    options.f = sendInvite ? 0x01 : 0x00;
+    if (!scheduledMeeting.isSameAsOpts(options)) {
+        let ct = scheduledMeeting.chatRoom.ct;
+        if (topic !== scheduledMeeting.chatRoom.getRoomTitle()) {
+            const { protocolHandler, type } = scheduledMeeting.chatRoom;
+            const participants = protocolHandler.getTrackedParticipants();
+            await ChatdIntegration._ensureKeysAreLoaded(undefined, participants);
+            ct = ChatRoom.encryptTopic(protocolHandler, topic, participants, type === 'public') || undefined;
+        }
+        const res = await asyncApiReq({
+            a: 'mcsmp',
+            id: scheduledMeetingId,
+            cid: chatId,
+            tz: encodeData(timezone),
+            s: startDateTime / 1000,
+            e: endDateTime / 1000,
+            t: encodeData(topic),
+            d: encodeData(description) || '',
+            f: sendInvite ? 0x01 : 0x00,
+            // [...] TODO: refactor, clean-up, unify w/ `createMeeting`
+            ...recurring && {
+                r: {
+                    f: recurring.frequency,
+                    wd: recurring.weekDays,
+                    md: recurring.monthDays,
+                    mwd: recurring.offset,
+                    ...recurring.end && { u: recurring.end / 1000 },
+                    ...recurring.interval && { i: recurring.interval }
+                }
+            },
+            ct,
+        }).catch(ex => {
+            this.logger.error(
+                `Failed to update scheduled meeting ${scheduledMeetingId}, chatId: ${chatId}, error: ${ex}`
+            );
+            throw ex;
+        });
+        this.logger.info(`Updated scheduled meeting ${res}, chatId: ${chatId}`);
+        return res;
+    }
+};
+
+ChatdIntegration.prototype.cancelScheduledMeeting = async function(scheduledMeeting, chatId) {
+    const { encodeData } = megaChat.plugins.meetingsManager;
+    const res = await asyncApiReq({
+        a: 'mcsmp',
+        id: scheduledMeeting.id,
+        cid: chatId,
+        tz: encodeData(scheduledMeeting.timezone),
+        s: scheduledMeeting.start / 1000,
+        e: scheduledMeeting.end / 1000,
+        t: encodeData(scheduledMeeting.title),
+        d: encodeData(scheduledMeeting.description) || '',
+        c: 1,
+        f: scheduledMeeting.flags,
+        ...scheduledMeeting.recurring && {
+            r: {
+                f: scheduledMeeting.recurring.frequency,
+                wd: scheduledMeeting.recurring.weekDays,
+                md: scheduledMeeting.recurring.monthDays,
+                // TODO: refactor re: tuple format, helper
+                mwd: scheduledMeeting.recurring.offset && Object.keys(scheduledMeeting.recurring.offset).length ?
+                    [[scheduledMeeting.recurring.offset.value, scheduledMeeting.recurring.offset.weekDay]] :
+                    [],
+                ...scheduledMeeting.recurring.end && { u: scheduledMeeting.recurring.end / 1000 },
+                ...scheduledMeeting.recurring.interval && { i: scheduledMeeting.recurring.interval }
+            }
+        }
+    })
+        .catch(ex => {
+            this.logger.error(
+                `Failed to cancel scheduled meeting ${scheduledMeeting.id}, chatId: ${chatId}, error: ${ex}`
+            );
+            throw ex;
+        });
+    this.logger.info(`Canceled scheduled meeting ${res}, chatId: ${chatId}`);
+    return res;
+};
+
+ChatdIntegration.prototype.deleteScheduledMeeting = async function(scheduledMeetingId, chatId) {
+    const res = await asyncApiReq({ a: 'mcsmr', id: scheduledMeetingId, i: chatId })
+        .catch(ex => {
+            this.logger.error(`Failed to cancel remove meeting ${scheduledMeetingId}, chatId: ${chatId}, error: ${ex}`);
+            throw ex;
+        });
+    this.logger.info(`Removed scheduled meeting ${res}, chatId: ${chatId}`);
+    return res;
+};
+
+/**
+ * Helper to load names for related users in the message
+ *
+ * @param {Message} msg The message instance
+ * @returns {Promise} Resolves with the message instance
+ */
+ChatdIntegration.prototype.syncMessageContacts = async function(msg) {
+    const contact = Message.getContactForMessage(msg);
+    const promises = [];
+    const chatHandle = is_chatlink.ph || (msg.chatRoom && msg.chatRoom.publicChatHandle);
+    if (contact && contact.c !== 1 && contact.u !== u_handle) {
+        promises.push(megaChat.plugins.userHelper.getUserName(contact, chatHandle));
+    }
+
+    if (msg.dialogType === 'alterParticipants') {
+        const { included, excluded } = msg.meta;
+        promises.push(
+            ...included.map(h => megaChat.plugins.userHelper.getUserName(h, chatHandle)),
+            ...excluded.map(h => megaChat.plugins.userHelper.getUserName(h, chatHandle))
+        );
+    }
+    else if (msg.dialogType === 'privilegeChange') {
+        const { targetUserId } = msg.meta;
+        promises.push(megaChat.plugins.userHelper.getUserName(targetUserId, chatHandle));
+    }
+    else if (msg.dialogType === 'remoteCallEnded') {
+        const { participants } = msg.meta;
+        promises.push(...participants.map(h => megaChat.plugins.userHelper.getUserName(h, chatHandle)));
+    }
+
+    await Promise.allSettled(promises);
+
+    return { succeeded: true, msg };
 };
 
 // decorate ALL functions which require shard to be available before executing

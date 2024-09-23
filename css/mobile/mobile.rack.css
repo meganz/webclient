@@ -1,0 +1,119 @@
+/*
+CSS and styling for mobile racks.
+
+Racks are constructed in the following way:
+<div mobile-rack>
+    <div mobile-slot>
+        <!-- Component boundary -->
+        <Component
+    </div>
+    ...n
+</div>
+ */
+
+/*
+Mobile racks.
+ */
+.mobile-rack {
+    --slot-gap: 0;
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    box-sizing: border-box;
+    z-index: 101;
+    pointer-events: none;
+    transition: bottom 0.25s ease-in, top 0.25s ease-in;
+}
+
+/*
+This covers the case of transitions for racks that descend from the top/bottom.
+DEFAULT: bottom
+ */
+.mobile-rack,
+.mobile-rack.bottom {
+    top: auto;
+    bottom: 0;
+    flex-flow: column-reverse nowrap;
+}
+.mobile-rack.top {
+    top: 0;
+    bottom: auto;
+}
+
+/*
+Rack slots.
+ */
+
+/* Flexbox uses margin to position itself. This adjusts the margin & height
+in order to pseudo-animate flexbox controlled elements.
+
+NB: The "slot" animation is there to animate the other flexbox items, not
+the actual notification itself. It is responsible for it's pos: relative
+transition.
+
+Using max-height is a workaround. Ideally we would use height: auto -> 0
+ */
+.mobile-rack .mobile-slot {
+    transition: max-height 1s linear, opacity 1s ease-in;
+    max-height: 310px;
+    width: 100%;
+    margin: calc(1/2 * var(--slot-gap)) 0;
+}
+
+/* Flow animation */
+.mobile-rack.flow-up .mobile-slot.close,
+.mobile-rack.flow-down .mobile-slot.close {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+}
+
+/* Disappearing animation */
+.mobile-rack.disappear .mobile-slot {
+    transition: max-height 1s linear, opacity 1s ease-in;
+}
+.mobile-rack.disappear .mobile-slot.close {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+}
+
+/* Remove the margin once the animation has completed. */
+.mobile-rack.disappear .mobile-slot.close.non-blocking {
+    margin: 0;
+}
+
+/*
+Slot inners
+*/
+.mobile-rack .mobile-slot .mobile-inner {
+    position: relative;
+    pointer-events: auto;
+    transition: opacity 1s ease-in;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.mobile-rack.disappear .mobile-slot.close .mobile-inner {
+    opacity: 0;
+    top: 0;
+    overflow: hidden;
+}
+
+/* Flow up/down used for alert notifications, not toasts */
+.mobile-rack.flow-up .mobile-slot .mobile-inner,
+.mobile-rack.flow-down .mobile-slot .mobile-inner {
+    overflow: hidden;
+    top: 0;
+    transition: top 4s ease-in;
+}
+.mobile-rack.flow-down .mobile-slot.close .mobile-inner {
+    top: 100vh;
+    overflow: visible;
+}
+.mobile-rack.flow-up .mobile-slot.close .mobile-inner {
+    top: -100vh;
+    overflow: visible;
+}

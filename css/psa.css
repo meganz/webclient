@@ -1,143 +1,104 @@
 /**
  * CSS for the Public Service Announcement for desktop and mobile
  */
-.bottom-info.body {
-    background: #ffffff;
+
+/* Desktop */
+
+.psa-holder .anouncement {
+    --icon-size: 24px;
     background: linear-gradient(to bottom, #ffffff 0%, #eeeeee 100%);
-    border-top: 1px solid rgba(0,0,0,0.05);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
     bottom: 0;
     box-sizing: border-box;
-    display: none;
-    font-family: LatoWeb, Arial, sans-serif;
-    padding: 16px;
+    display: flex;
+    padding: 24px;
     position: fixed;
     width: 100%;
     z-index: 1400;
 }
-.notification .bottom-info.body {
-    display: table;
-}
-.notification .fmholder {
-    height: 100%;
-    height: -webkit-calc(100% -120px);
-    height: -moz-calc(100% - 120px);
-    height: calc(100% - 120px);
-}
-.notification .st-main-block {
-    height: 100%;
-    height: -webkit-calc(100% + 52px);
-    height: -moz-calc(100% + 52px);
-    height: calc(100% + 52px);
-}
-.notification .st-full-block {
-    padding: 20px 0 50px 0;
-}
-.bottom-info.body::before {
-    background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.05) 100%);
-    content: "";
-    display: block;
-    position: absolute;
-    width: 100%;
-    height: 8px;
-    top: -8px;
-    left: 0;
-}
-.bottom-info.content {
-    display: table;
-    margin: 0 auto;
-}
-.bottom-info.column {
-    display: table-cell;
-    vertical-align: middle;
-    box-sizing: border-box;
-    padding: 0 50px 0 24px;
-    font-size: 0;
-    line-height: 0;
-    height: 70px;
-}
-.bottom-info.column:first-child, .bottom-info.column:last-child {
-    width: 66px;
-    padding: 0;
-}
-.bottom-info.column:last-child {
-    white-space: nowrap;
-}
-.bottom-info.display-icon {
-    width: 128px;
-    height: 128px;
-}
-.bottom-info.content h4 {
-    color: #667;
-    font-size: 18px;
-    line-height: 23px;
-    font-family: LatoWeb, Arial, sans-serif;
-    font-weight: normal;
-    padding: 0;
-    margin: 0;
-}
-.bottom-info.content .messageA {
-    color: #999;
-    font-size: 14px;
-    line-height: 18px;
-    margin: 5px 0 0 0;
-}
-button.bottom-info {
-    box-sizing: border-box;
-    border: 1px solid rgba(0,0,0,0.05);
-    border-radius: 3px;
-    background: linear-gradient(180deg, #FFFFFF 0%, #FCFCFC 100%);
-    box-shadow: 0 1px 2px 0 rgba(0,0,0,0.15);
-    color: var(--text-color-black-medium);
-    cursor: pointer;
-    display: inline-block;
-    font-family: 'source_sans_proregular', sans-serif;
-    font-size: 14px;
-    line-height: 18px;
-    padding: 8px 25px;
-    margin: 15px 0 0 0;
-}
-button.bottom-info:hover {
-    background-color: #686565;
-}
-.bottom-info.fm-dialog-close {
-    background-image: url(../images/mega/dialog-sprite.png);
-    cursor: pointer;
-    height: 30px;
-    width: 30px;
-    background-position: -53px -4825px;
-    background-repeat: no-repeat;
-    position: absolute;
-    right: 10px;
-    top: 11px;
-    -webkit-transition: opacity 200ms ease-in-out;
-    transition: opacity 200ms ease-in-out;
-    opacity: 0.5;
-    z-index: 10;
+
+.psa-holder .anouncement .content-box {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    -webkit-margin-start: 0;
+    margin-inline-start: 0;
+	padding: 0 24px;
 }
 
-/* Mobile tweaks */
-.mobile.notification .fmholder {
-    height: 100%;
+/* Gap for all content child elems */
+
+.psa-holder .anouncement .content-box > * {
+    margin-top: 8px;
 }
-.mobile.bottom-info.display-icon {
-    width: 64px;
-    height: 64px;
+
+.psa-holder .anouncement .content-box > *:empty,
+.psa-holder .anouncement .content-box > *:first-child {
+    margin-top: 0;
 }
-.mobile.bottom-info.fm-dialog-close {
-    left: initial;
-    right: 3px;
-    top: 5px;
+
+/* Component attribute styles */
+
+.psa-holder .anouncement .title-text {
+    color: var(--text-color-high);
+    font: var(--text-h3);
+    width: 100%;
+}
+
+.psa-holder .anouncement .message-text {
+    color: var(--text-color-medium);
+    font: var(--text-body1);
+}
+
+.psa-holder .anouncement img {
+    height: 128px;
+    width: 128px;
+    -webkit-margin-start: auto;
+    margin-inline-start: auto;
+}
+
+.psa-holder .anouncement .content-box .mega-button {
+    margin-top: 16px;
+}
+
+.psa-holder .anouncement .mega-button.icon {
     margin: 0;
 }
-.mobile.bottom-info.content h4 {
-    font-size: 16px;
+
+/* end of Desktop */
+
+/* Mobile */
+
+.mobile .psa-holder {
+    grid-row: 1 / 2;
 }
-.mobile.bottom-info.content .messageA {
-    font-size: 14px;
+
+.mobile .psa-holder .anouncement .content-box {
+    flex-flow: row wrap;
 }
-.mobile.bottom-info.body {
-    bottom: 0;
+
+/* Component attribute styles */
+
+.mobile .psa-holder .anouncement .message-text {
+    -webkit-padding-end: 8px;
+    padding-inline-end: 8px;
 }
-.mobile.bottom-info.column.text-column {
-    padding: 0 24px 0 24px;
+
+.mobile .psa-holder .anouncement .action-link span {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-copy-bold);
+    text-decoration: underline;
 }
+
+.mobile .psa-holder .anouncement .mega-button.icon {
+     --mask-color: var(--mobile-text-primary);
+}
+
+/* Queue advertisement banners if PSA is visible */
+
+.psa-notification .mega-component.banner.advertisement {
+    display: none;
+}
+
+/* end of Mobile */

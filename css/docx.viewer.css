@@ -1,0 +1,14 @@
+html {
+    transform-origin: 0 0;
+    height: 100%;
+    background: gray;
+}
+body {
+    margin: 0;
+}
+section.docx {
+    max-width: 100%;
+}
+body.scaled #docx-container {
+    display: inline-flex;
+}

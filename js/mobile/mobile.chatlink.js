@@ -47,26 +47,23 @@ mobile.chatlink = {
 
         init_chat(0x104DF11E5)
             .always(() => {
-                this.retrieved = this.linkInfo.getInfo();
-                this.retrieved.done((result) => {
-
-                    if (result.mr) {
-                        $('p', $overlay)
-                            .text(
-                                'Install MEGA app to start a meeting. '
-                                + 'Receive 20 GB of secure and private cloud storage for free.'
-                            );
-                    }
-                    if (result.topic) {
-                        const topic = megaChat.plugins.emoticonsFilter
-                            .processHtmlMessage(htmlentities(result.topic || ""));
-                        $('h2.topic', $overlay).safeHTML(topic);
-                    }
-                    if (result.ncm) {
-                        $('.members', $overlay).text(mega.icu.format(l[20233], result.ncm));
-                    }
-                })
+                this.linkInfo.getInfo()
+                    .then((res) => {
+                        if (res.mr) {
+                            $('p', $overlay).text(`${l.mobile_meeting_link_tip} ${l.free_plan_bonus_info}`);
+                        }
+                        if (res.topic) {
+                            $('h2.topic', $overlay).safeHTML(megaChat.html(res.topic) || '');
+                        }
+                        if (res.ncm) {
+                            $('.members', $overlay).text(mega.icu.format(l[20233], res.ncm));
+                        }
+                    })
+                    .catch(dump);
             });
+
+        // Hide loader together with other desktop preview block
+        $('.chat-links-preview', '.fmholder').addClass('hidden');
 
         // Show the overlay
         $overlay.removeClass('hidden');

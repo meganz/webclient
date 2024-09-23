@@ -5,20 +5,17 @@
     ],
     "ignoreFiles": ["css/chat-bundle.css"],
     "rules": {
-        "indentation": null,
         "declaration-no-important": null,
         "rule-empty-line-before": null,
         "no-descending-specificity": null,
-        "color-hex-case": null,
         "color-hex-length": null,
         "custom-property-empty-line-before": null,
         "declaration-empty-line-before": null,
         "selector-class-pattern": null,
         "no-irregular-whitespace": true,
-        "no-missing-end-of-source-newline": true,
-        "max-empty-lines": 2,
         "property-disallowed-list": [ "text-transform" ],
         "selector-not-notation": "simple",
+        "media-feature-range-notation": "prefix",
         "length-zero-no-unit": [
             true,
             {
@@ -42,14 +39,9 @@
                     "css-gradients",
                     "css-masks",
                     "multicolumn",
-                    "css-sticky"
+                    "css-sticky",
+                    "intrinsic-width"
                 ],
-                "severity": "warning"
-            }
-        ],
-        "selector-list-comma-newline-after": [
-            "always",
-            {
                 "severity": "error"
             }
         ],
@@ -71,38 +63,8 @@
                 "severity": "warning"
             }
         ],
-        "function-comma-space-after": [
-            "always",
-            {
-                "severity": "warning"
-            }
-        ],
         "no-duplicate-selectors": [
             true,
-            {
-                "severity": "warning"
-            }
-        ],
-        "declaration-colon-space-after": [
-            "always",
-            {
-                "severity": "warning"
-            }
-        ],
-        "value-list-comma-space-after": [
-            "always",
-            {
-                "severity": "warning"
-            }
-        ],
-        "block-opening-brace-space-before": [
-            "always",
-            {
-                "severity": "warning"
-            }
-        ],
-        "max-line-length": [
-            120,
             {
                 "severity": "warning"
             }
@@ -116,7 +78,12 @@
         "value-no-vendor-prefix": [
             true,
             {
-                "ignoreValues": ["sticky"]
+                "ignoreValues": [
+                    "sticky",
+                    "max-content",
+                    "box",
+                    "fill-available"
+                ]
             }
         ],
         "property-no-vendor-prefix": [

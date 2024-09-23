@@ -1,100 +1,197 @@
 /**
- * Functionality for the mobile Invite Friends page
+ * Functionality for the mobile Invite Friends page (fm/account/invite-friends)
  */
-mobile.achieve.invites = {
+mobile.achieve.invites = Object.create(mobile.settingsHelper, {
 
     /**
-     * jQuery selector for this page
-     */
-    $page: null,
-    successful: [],
-    alreadySent: [],
-    alreadyReceived: [],
-    existOrOwn: [],
+     * Initialise the Invite Friends page
+    */
+    init: {
+        value: function() {
+            'use strict';
 
-    /**
-     * Initialise the page
-     */
-    init: function() {
+            // If not logged in, return to the login page
+            if (typeof u_attr === 'undefined') {
+                loadSubPage('login');
+                return false;
+            }
 
-        'use strict';
+            // Add a server log
+            eventlog(99674);
 
-        // If not logged in, return to the login page
-        if (typeof u_attr === 'undefined') {
-            loadSubPage('login');
-            return false;
+            if (this.domNode) {
+                this.emailsMegaInput.setValue('');
+                this.inlineAlert.hide();
+                this.inlineAlert.text = '';
+                this.inviteButton.disabled = false;
+
+                this.show();
+                this.showInputMessage();
+                return true;
+            }
+
+            this.domNode = this.generatePage('invite-friends-page');
+
+            // Initialise functionality
+            this.createElements();
+            this.show();
+            this.showInputMessage();
         }
-
-        // Cache selector
-        this.$page = $('.mobile.achievements-invite-friends-page');
-
-        // Initialise functionality
-        this.fetchAndDisplayData();
-
-        // Initialise back button to go back to the Achievements
-        mobile.initBackButton(this.$page, 'fm/account/achievements/');
-
-        // Initialise the top menu
-        topmenuUI();
-
-        // Show the account page content
-        this.$page.removeClass('hidden');
-
-        // Add a server log
-        api_req({ a: 'log', e: 99674, m: 'Mobile web Invite Friends page accessed' });
     },
 
     /**
-     * Fetch account data from the API and then initialise functionality
+     * Create the core elements of the page
      */
-    fetchAndDisplayData: function() {
+    createElements: {
+        value: function() {
+            'use strict';
 
-        'use strict';
+            this.domNode.classList.add('default-form');
 
-        // Show a loading dialog while the data is fetched from the API
-        loadingDialog.show();
+            const rewardInfo = document.createElement('div');
+            rewardInfo.className = 'reward-info';
+            rewardInfo.textContent = l.invite_friend_reward_blurb;
+            this.domNode.append(rewardInfo);
 
-        // Fetch all account data from the API
-        M.accountData(function() {
+            // How it works button
+            const howItWorksBtn = new MegaMobileButton({
+                type: 'text',
+                componentClassname: 'text-icon how-it-works',
+                text: l[1070],
+                parentNode: this.domNode
+            });
+            howItWorksBtn.on('tap', () => {
+                const contentsDiv = document.createElement('div');
+                contentsDiv.className = 'how-it-works-contents';
+                contentsDiv.append(parseHTML(l.how_it_works_blurb.replace('%1', 5)));
 
-            // Hide the loading dialog after request completes
-            loadingDialog.hide();
+                mega.ui.sheet.show({
+                    name: 'invite-friends-how-it-works',
+                    type: 'modalLeft',
+                    showClose: true,
+                    title: l[1070],
+                    contents: [contentsDiv],
+                    actions: [
+                        {
+                            type: 'normal',
+                            text: l.ok_button,
+                            onClick: () => {
+                                mega.ui.sheet.hide();
+                            }
+                        }
+                    ]
+                });
+            });
 
-            // Initialise events and display data
-            mobile.achieve.invites.initKeyupFunctionality();
-            mobile.achieve.invites.initInviteButton();
-            mobile.achieve.invites.initHowItWorksButton();
-            mobile.achieve.updateInviteFriendsText(mobile.achieve.invites.$page);
-        });
+            // Form elements
+            const formNode = mCreateElement('div', {'class': 'fixed-width'}, this.domNode);
+
+            // Input field for emails
+            const emailsInput = document.createElement('textarea');
+            emailsInput.title = l.enter_friends_emails;
+            emailsInput.className = 'email-input-field underlinedText';
+            emailsInput.dataset.wrapperClass = 'box-style mobile';
+            emailsInput.name = 'email-input-field';
+
+            formNode.append(emailsInput);
+
+            this.emailsMegaInput = new mega.ui.MegaInputs($(emailsInput), {
+                autoHeight: true,
+                maxHeight: 120
+            });
+
+            this.emailsMegaInput.$input.rebind('keyup.addEmail input.addEmail', () => {
+                // Check for invalid emails
+                this.inviteButton.disabled = false;
+                this.validateInput(false);
+            });
+
+            // Invite button
+            this.inviteButton = new MegaMobileButton({
+                parentNode: formNode,
+                text: l[8726],
+                type: 'normal',
+                componentClassname: 'invite-btn block'
+            });
+            this.inviteButton.on('tap', () => {
+                this.validateInput(true);
+            });
+
+            // Inline alert
+            this.inlineAlert = mobile.inline.alert.create({
+                parentNode: formNode,
+                componentClassname: 'sent-invites warning hidden',
+                title: l.invite_sent,
+                icon: 'sprite-mobile-fm-mono icon-alert-circle-thin-outline',
+                iconSize: '24',
+                closeButton: true
+            });
+        }
     },
 
     /**
-     * Initialises keyup/blur functionality on the email input field to check the email as it's being entered
+     * Show the helper message
      */
-    initKeyupFunctionality: function() {
+    showInputMessage: {
+        value: function() {
+            'use strict';
 
-        'use strict';
+            this.emailsMegaInput.hideError();
 
-        // Cache selectors
-        var $emailInput = mobile.achieve.invites.$page.find('.email-input');
-        var $emailWarning = mobile.achieve.invites.$page.find('.email-warning-block');
-        var $emailWarningInvalid = mobile.achieve.invites.$page.find('.email-warning-block.invalid');
-        var $emailWarningOwnEmail = mobile.achieve.invites.$page.find('.email-warning-block.own-email');
-        var $successMessageBlock = mobile.achieve.invites.$page.find('.success-message-block');
-        var $inviteButton = mobile.achieve.invites.$page.find('.invite-button');
+            const alertIcon = 'sprite-mobile-fm-mono icon-help-circle-thin-outline';
+            this.emailsMegaInput.showMessage(
+                `<i class='${alertIcon}'></i>${escapeHTML(l.how_to_add_friends)}`
+            );
+        }
+    },
 
-        // On keyup or clicking out of the email text field
-        $emailInput.off('keyup blur').on('keyup blur', function() {
+    /**
+     * Return the email element for the errored email list or inline alert list.
+     *
+     * @param {String} email
+     * @param {Boolean} stringFormat Whether to return the element as a string or a DOM element
+     */
+    getEmailElement: {
+        value: function(email, stringFormat) {
+            'use strict';
 
-            var ownEmail = false;
-            var invalidEmails = [];
-            var emailInputValue = $.trim($emailInput.val());
+            if (stringFormat) {
+                return `<div class='email'> ${escapeHTML(email)} </div>`;
+            }
 
-            $emailWarning.addClass('hidden');
-            $successMessageBlock.addClass('hidden');
+            const emailDiv = document.createElement('div');
+            emailDiv.className = 'email';
+            emailDiv.textContent = email;
+
+            return emailDiv;
+        }
+    },
+
+    /**
+     * Validate the email(s) entered by the user
+     *
+     * @param {Boolean} sendToApi Whether to send the email request(s) to the API or not
+     */
+    validateInput: {
+        value: function(sendToApi) {
+            'use strict';
+
+            let emailInputValue = this.emailsMegaInput.$input.val().trim().toLowerCase();
+
+            if (sendToApi) {
+                this.emailsMegaInput.$input.blur();
+            }
 
             if (emailInputValue === '') {
-                $inviteButton.removeClass('active');
+                if (sendToApi) {
+                    const alertIcon = 'alert sprite-mobile-fm-mono icon-alert-triangle-thin-outline';
+                    this.emailsMegaInput.showError(
+                        `<i class='${alertIcon}'></i> ${escapeHTML(l.enter_valid_email)}`
+                    );
+                }
+                else {
+                    this.showInputMessage();
+                }
                 return false;
             }
 
@@ -103,136 +200,77 @@ mobile.achieve.invites = {
                 emailInputValue = emailInputValue.slice(0, -1);
             }
 
-            var emails = emailInputValue.split(',');
+            const emails = emailInputValue.split(',');
 
-            $.each(emails, function(index, email) {
+            const emailPromises = [];
+            let invalidEmailHtml = '';
+            let successToastShown = false;
 
-                // Trim whitespace from the ends of the email entered
-                var trimmedEmail = $.trim(email);
+            for (const email of emails) {
+                const trimmedEmail = email.trim();
 
-                if (trimmedEmail === '' || !isValidEmail(trimmedEmail)) {
-                    invalidEmails.push(email);
+                if (trimmedEmail === '' || !isValidEmail(trimmedEmail) || trimmedEmail === u_attr.email) {
+                    invalidEmailHtml += this.getEmailElement(trimmedEmail, true);
+
+                    // Prevent the user from submitting their invite list
+                    this.inviteButton.disabled = true;
                 }
-
-                if (u_attr.email.toLowerCase() === trimmedEmail.toLowerCase()) {
-                    ownEmail = true;
+                else if (sendToApi) {
+                    // Send email request
+                    emailPromises.push(this.requestSendEmail(trimmedEmail));
                 }
-            });
+            }
 
-            $inviteButton.addClass('active');
+            if (sendToApi) {
+                // Show loading dialog while emails are being sent
+                loadingDialog.show();
 
-            if (invalidEmails.length > 0) {
-                var $emailWarningInvalidColon = $emailWarningInvalid.find('.multi');
-                var $emailWarningInvalidContents = $emailWarningInvalid.find('.warning-contents');
+                Promise.allSettled(emailPromises).then((result) => {
+                    this.emailsMegaInput.setValue('');
+                    this.showInputMessage();
+                    this.inlineAlert.text = '';
+                    this.inlineAlert.hide();
 
-                $emailWarningInvalid.removeClass('hidden');
-                $inviteButton.removeClass('active');
+                    for (const res of result) {
+                        const code = res.value[0];
+                        const email = res.value[1];
 
-                if (emails.length > 1) {
-                    $emailWarningInvalidColon.removeClass('hidden');
-                    $emailWarningInvalidContents.safeHTML(invalidEmails.join(',<br>'));
-                }
-                else if (emails.length === 1) {
-                    $emailWarningInvalidColon.addClass('hidden');
-                    $emailWarningInvalidContents.text('');
-                }
+                        if (code === 0 && !successToastShown) {
+                            mega.ui.toast.show(l.invite_sent_toast, 6);
+                            successToastShown = true;
+                        }
+                        else if (code === -12) {
+                            this.inlineAlert.show();
+
+                            this.inlineAlert.text = this.getEmailElement(
+                                `${this.inlineAlert.text}${email}\n`, false
+                            );
+                        }
+                    }
+
+                    loadingDialog.hide();
+                });
+            }
+
+            if (this.inviteButton.disabled) {
+                this.emailsMegaInput.hideMessage();
+
+                const alertIcon = 'alert sprite-mobile-fm-mono icon-alert-triangle-thin-outline';
+                const emailListDiv = emails.length > 1 ?
+                    `<div class='email-list'> ${invalidEmailHtml} <div>` :
+                    '';
+
+                this.emailsMegaInput.showError(
+                    `<i class='${alertIcon}'></i>` +
+                    `<div class='message-and-emails'>` +
+                        mega.icu.format(l.invalid_emails_error, emails.length).replace('%1', emailListDiv) +
+                    '</div>'
+                );
             }
             else {
-                $emailWarningInvalid.addClass('hidden');
+                this.showInputMessage();
             }
-
-            if (ownEmail) {
-                $emailWarningOwnEmail.removeClass('hidden');
-                $inviteButton.removeClass('active');
-            }
-            else {
-                $emailWarningOwnEmail.addClass('hidden');
-            }
-        });
-    },
-
-    /**
-     * Initialises the Invite button to send an invite to the user
-     */
-    initInviteButton: function() {
-
-        'use strict';
-
-        // Cache selectors
-        var self = this;
-        var $emailInput = mobile.achieve.invites.$page.find('.email-input');
-        var $emailWarning = mobile.achieve.invites.$page.find('.email-warning-block');
-        var $emailWarningSent = mobile.achieve.invites.$page.find('.email-warning-block.already-sent');
-        var $emailWarningReceived = mobile.achieve.invites.$page.find('.email-warning-block.already-received');
-        var $emailWarningExist = mobile.achieve.invites.$page.find('.email-warning-block.already-exist');
-        var $successMessageBlock = mobile.achieve.invites.$page.find('.success-message-block');
-        var $inviteButton = mobile.achieve.invites.$page.find('.invite-button');
-
-        // On clicking/tapping the Invite button
-        $inviteButton.off('tap').on('tap', function() {
-
-            // Ignore taping on loading.
-            if ($(this).hasClass('loading') || !$(this).hasClass('active')) {
-                return false;
-            }
-
-            // Trim whitespace from the ends of the email entered
-            var emails = $emailInput.val().split(',');
-            var emailPromises = [];
-
-            $.each(emails, function(index, email) {
-
-                var trimmedEmail = $.trim(email);
-
-                // If the email is invalid, show the email warning, grey out the button and don't send to the API
-                if (trimmedEmail === '' || !isValidEmail(trimmedEmail)) {
-                    $emailWarning.removeClass('hidden');
-                    $inviteButton.removeClass('active');
-                    return false;
-                }
-
-                // Hide the button text and show a loading spinner instead
-                $inviteButton.addClass('loading');
-
-                // Send email request
-                emailPromises.push(self.requestSendEmail(trimmedEmail));
-            });
-
-            MegaPromise.allDone(emailPromises).done(function() {
-
-                // Hide the loading spinner
-                $inviteButton.removeClass('loading');
-
-                // Invite already sent to that user
-                if (self.alreadySent.length > 0) {
-                    $emailWarningSent.removeClass('hidden');
-                    $emailWarningSent.find('.warning-contents').safeHTML(self.alreadySent.join(',<br>'));
-                }
-
-                // User already sent you an invitation
-                if (self.alreadyReceived.length > 0) {
-                    $emailWarningReceived.removeClass('hidden');
-                    $emailWarningReceived.find('.warning-contents').safeHTML(self.alreadyReceived.join(',<br>'));
-                }
-
-                // User already exists or owner
-                if (self.existOrOwn.length > 0) {
-                    $emailWarningExist.removeClass('hidden');
-                    $emailWarningExist.find('.warning-contents').safeHTML(self.existOrOwn.join(',<br>'));
-                }
-
-                // If successful, show success, and clear the email
-                if (self.successful.length > 0) {
-                    $successMessageBlock.removeClass('hidden');
-                    $emailInput.val('');
-                }
-
-                self.successful = [];
-                self.alreadySent = [];
-                self.alreadyReceived = [];
-                self.existOrOwn = [];
-            });
-        });
+        }
     },
 
     /**
@@ -240,50 +278,31 @@ mobile.achieve.invites = {
      * @param {String} trimmedEmail Trimmed email to send invitation email.
      * @return {MegaPromise}
      */
-    requestSendEmail: function(trimmedEmail) {
+    requestSendEmail: {
+        value: function(trimmedEmail) {
+            'use strict';
 
-        'use strict';
+            // Make an invite API request
+            return api.screq({a: 'upc', e: u_attr.email, u: trimmedEmail, msg: l[5878], aa: 'a'})
+                .then(({result}) => {
+                    assert(result === 0 || typeof result === 'object' && result.p);
 
-        var self = this;
-        var promise = new MegaPromise();
-
-        // Make an invite API request
-        api_req({ a: 'upc', e: u_attr.email, u: trimmedEmail, msg: l[5878], aa: 'a', i: requesti }, {
-            callback: function(response) {
-
-                // Check for error codes
-                if (response === -12) {
-                    self.alreadySent.push(trimmedEmail);
-                }
-                else if (response === -10) {
-                    self.alreadyReceived.push(trimmedEmail);
-                }
-                else if (response === -2) {
-                    self.existOrOwn.push(trimmedEmail);
-                }
-                else if (response === 0 || typeof response === 'object' && response.p) {
-                    self.successful.push(trimmedEmail);
-                }
-                promise.resolve();
-            }
-        });
-
-        return promise;
+                    // Return 0 so successful invite toast can be shown
+                    return [0];
+                })
+                .catch((ex) => {
+                    // Check for error codes
+                    // 2: trimmedEmail is own one (handled on keyup event)
+                    // 10: user already sent you a contact request
+                    // 12: trimmedEmail exists in user's contacts list or sent requests list
+                    if (ex === -10 || ex === -12) {
+                        // Return error code and email address for it to be added to invite sent inline alert
+                        return [ex, trimmedEmail];
+                    }
+                    else if (d) {
+                        console.error('Unexpected result...', ex);
+                    }
+                });
+        }
     },
-
-    /**
-     * Initialise the How it Works button to go to an informational page about how the invites work
-     */
-    initHowItWorksButton: function() {
-
-        'use strict';
-
-        // On button click/tap
-        mobile.achieve.invites.$page.find('.how-it-works-block').off('tap').on('tap', function() {
-
-            // Render the How it works page
-            loadSubPage('fm/account/invites/how-it-works');
-            return false;
-        });
-    }
-};
+});

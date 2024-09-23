@@ -13,6 +13,11 @@ async function megaUtilsGFSFetch(aData, aStartOffset, aEndOffset, aProgress) {
         aData = await megaUtilsGFSFetch.getTicketData(aData);
     }
 
+    if (aStartOffset === undefined) {
+        aEndOffset = -1;
+        aStartOffset = 0;
+    }
+
     aEndOffset = parseInt(aEndOffset);
     aStartOffset = parseInt(aStartOffset);
 
@@ -82,12 +87,26 @@ async function megaUtilsGFSFetch(aData, aStartOffset, aEndOffset, aProgress) {
 
 megaUtilsGFSFetch.getTicket = (aData) => {
     'use strict';
-    let key, handle;
-    const req = {a: 'g', g: 1, ssl: use_ssl};
+    let key, n, handle;
+    const payload = {a: 'g', v: 2, g: 1, ssl: use_ssl};
+    const options = {
+        channel: pfid ? 1 : 0
+    };
 
     // If a ufs-node's handle provided
     if (String(aData).length === 8) {
         handle = aData;
+    }
+    else if (aData.customRequest) {
+        payload.a = aData.customRequest;
+        handle = aData.dl_id;
+        n = aData;
+    }
+    else if (typeof aData === 'object') {
+        // if a download-instance provided.
+        handle = aData.dl_id;
+        n = aData.nauth && aData;
+        key = aData.ph && aData.key;
     }
     else {
         // if a public-link provided, eg #!<handle>!<key>
@@ -100,39 +119,56 @@ megaUtilsGFSFetch.getTicket = (aData) => {
     }
 
     if (key) {
-        req.p = handle;
+        payload.p = handle;
     }
     else {
-        req.n = handle;
-        key = M.getNodeByHandle(handle).k;
+        payload.n = handle;
+        key = (n = n || M.getNodeByHandle(handle)).k;
     }
 
     if (!handle || !Array.isArray(key) || key.length !== 8) {
         return {error: EARGS};
     }
 
-    if (window.fetchStreamSupport) {
-        // can handle CloudRAID downloads.
-        req.v = 2;
-    }
-
     // IF this is an anonymous chat OR a chat that I'm not a part of
     if (M.chat && megaChatIsReady) {
-        megaChat.eventuallyAddDldTicketToReq(req);
+        megaChat.eventuallyAddDldTicketToReq(payload);
     }
 
-    return {req, key, handle};
+    if (self.d && String(apipath).includes('staging')) {
+        const s = sessionStorage;
+        if (s.dltfefq || s.dltflimit) {
+            payload.f = [s.dltfefq | 0, s.dltflimit | 0];
+        }
+    }
+
+    if ((n = n || M.getNodeByHandle(handle))) {
+        const {foreign: f, nauth: a} = n;
+
+        if (a && (!pfid || f)) {
+            // options.queryString = `n=${n.nauth}`;
+            payload.enp = a;
+        }
+        if (f) {
+            options.channel = 6;
+        }
+    }
+
+    return {payload, key, handle, options};
 };
 
 megaUtilsGFSFetch.getTicketData = async(aData) => {
     'use strict';
-    const {req, key, handle, error} = megaUtilsGFSFetch.getTicket(aData);
-    if (error) {
-        return Promise.reject(error);
+
+    if (typeof aData === 'object') {
+        aData.dlTicketData = false;
     }
-    const res = await M.req(req, window.pfid ? 1 : 0);
+    const {payload, options, key, handle, error} = megaUtilsGFSFetch.getTicket(aData);
+    const res = error || (await api.req(payload, options)).result;
 
     if (typeof res === 'object' && res.g) {
+        let error = !!res.d;
+
         res.key = key;
         res.handle = handle;
 
@@ -141,21 +177,152 @@ megaUtilsGFSFetch.getTicketData = async(aData) => {
             res.g = Object.values(res.g);
 
             if (res.g[0] < 0) {
-                res.e = res.e || res.g[0];
+                error = res.g[0];
             }
         }
+        res.e = res.e || error || !res.g;
 
         if (!res.e) {
             delete dlmanager.efq;
             if (res.efq) {
                 dlmanager.efq = true;
             }
+            if (typeof aData === 'object') {
+                aData.dlTicketData = res;
+            }
             return res;
         }
     }
 
-    return Promise.reject(res && res.e || res);
+    throw res && res.e || res || EINTERNAL;
 };
+
+megaUtilsGFSFetch.roundOffsetBoundary = (value, min, max) => {
+    'use strict';
+    return value > max ? max : value <= min ? min : min * Math.floor(value / min);
+};
+
+megaUtilsGFSFetch.getOffsets = (length) => {
+    'use strict';
+    let offset = 0;
+    const res = [];
+    const KiB = 0x1ffec;
+    const MiB = 0x100000;
+
+    for (let i = 1; i < 9 && offset < length - i * KiB; ++i) {
+        const end = i * KiB;
+        res.push([offset, end]);
+        offset += end;
+    }
+    const size = megaUtilsGFSFetch.roundOffsetBoundary(length >> 4, MiB, MiB << 4);
+
+    while (offset < length) {
+        const end = Math.min(size, Math.floor((length - offset) / MiB + 1) * MiB);
+        res.push([offset, end]);
+        offset += end;
+    }
+
+    offset = res[res.length - 1];
+    if (length - offset[0] > 0) {
+        offset[1] = length - offset[0];
+    }
+
+    return res.reverse();
+};
+
+/**
+ * @param {Blob|MegaNode} file a Blob, File or MegaNode instance.
+ * @param {Number} [start] offset to start retrieving data from
+ * @param {Number} [end] retrieve data until this offset
+ * @returns {Promise<Uint8Array>}
+ */
+megaUtilsGFSFetch.managed = async(file, start, end) => {
+    'use strict';
+
+    if (self.dlmanager && dlmanager.isOverQuota) {
+        // @todo check dependants and do this on megaUtilsGFSFetch()
+        throw EOVERQUOTA;
+    }
+    const payload = typeof file.seen === 'object' && file.seen || file.link || file.h || file;
+
+    return megaUtilsGFSFetch(payload, start, start + end)
+        .catch((ex) => {
+            const {status} = ex && ex.target || false;
+
+            switch (status) {
+                case 0:
+                    ex = EAGAIN;
+                    break;
+                case 403:
+                    file.seen = -1;
+                    return megaUtilsGFSFetch.managed(file, start, end);
+                case 509:
+                    ex = EOVERQUOTA;
+                    break;
+            }
+
+            if (ex === EOVERQUOTA && self.dlmanager && !dlmanager.isOverQuota) {
+                dlmanager.showOverQuotaDialog();
+            }
+
+            throw ex;
+        });
+};
+
+/**
+ * @param {Blob|MegaNode} file a Blob, File or MegaNode instance.
+ * @param {*} [options] guess it.
+ */
+megaUtilsGFSFetch.getReadableStream = (file, options) => {
+    'use strict';
+    let offsets, size;
+
+    options = options || Object.create(null);
+
+    return new ReadableStream({
+        async start(controller) {
+            if (!((size = parseInt(file.size || file.s)) > 0)) {
+                return controller.close();
+            }
+            offsets = megaUtilsGFSFetch.getOffsets(size);
+            return this.pull(controller);
+        },
+        async pull(controller) {
+            if (!offsets.length) {
+                controller.close();
+                return;
+            }
+            const [start, end] = offsets.pop();
+
+            // @todo fire more parallel downloads per stream regardless of queueing strategy(?)
+            let chunk = await megaUtilsGFSFetch.managed(file, start, end)
+                .catch((ex) => {
+                    if (ex === EOVERQUOTA) {
+                        controller.error(ex);
+                    }
+                    return ex;
+                });
+
+            if (chunk instanceof Uint8Array && chunk.byteLength > 0) {
+
+                if (options.progress) {
+                    options.progress((start + end) / size * 100, file);
+                }
+                file.seen = chunk.payload;
+            }
+            else {
+                if (options.error) {
+                    options.error(chunk, file, controller);
+                }
+                chunk = new Uint8Array(0);
+            }
+
+            controller.enqueue(chunk);
+        }
+    }, options.queuingStrategy);
+};
+
+freeze(megaUtilsGFSFetch);
 
 /**
  * Promise-based XHR request
@@ -187,7 +354,7 @@ function megaUtilsXHR(aURLOrOptions, aData) {
     aData = options.data || aData;
     method = options.method || (aData && 'POST') || 'GET';
 
-    xhr = getxhr();
+    xhr = new XMLHttpRequest();
 
     if (typeof options.prepare === 'function') {
         options.prepare(xhr);
@@ -235,10 +402,6 @@ function megaUtilsXHR(aURLOrOptions, aData) {
             options.beforeSend(xhr);
         }
 
-        if (is_chrome_firefox) {
-            xhr.setRequestHeader('Origin', getBaseUrl(), false);
-        }
-
         xhr.send(aData);
     }
     catch (ex) {
@@ -269,11 +432,18 @@ function eventlog(id, msg, once) {
     'use strict';
 
     if ((id = parseInt(id)) >= 99600) {
-        var req = {a: 'log', e: id};
+        const req = {a: 'log', e: id};
+        const {jid} = mega.flags;
 
         if (msg === true) {
             once = true;
             msg = 0;
+        }
+
+        if (jid) {
+            req.v = mega.viewID;
+            req.j = localStorage.jid || jid;
+            req.ms = Date.now();
         }
 
         if (msg) {
@@ -289,7 +459,7 @@ function eventlog(id, msg, once) {
 
         if (!once || !eventlog.sent[id]) {
             eventlog.sent[id] = [Date.now(), M.getStack()];
-            api_req(req);
+            return api.req(req).catch((ex) => dump(id, ex));
         }
     }
     else {

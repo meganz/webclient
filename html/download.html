@@ -2,6 +2,10 @@
     ((TOP))
     <div class="download-content download download-page">
 
+        <div id="commercial-close-button" class="commercial-close-button hidden">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </div>
+
         <section class="download-grid js-download-scroll-panel">
 
                 <div class="download main-pad">
@@ -13,54 +17,120 @@
                                     <video id="video" data-autoplayvideo="false" data-playvideoonclick="false"></video>
 
                                     <div class="download play-video-button">
-                                        <i class="sprite-fm-mono icon-play"></i>
+                                        <i class="sprite-fm-mono icon-play-regular-solid"></i>
                                     </div>
+
+                                    <div class="play-pause-video-button hidden">
+                                        <i class="sprite-fm-mono icon-play-regular-solid"></i>
+                                    </div>
+
+                                    <div class="watch-again-button hidden">
+                                        <i class="sprite-fm-mono icon-rotate-ccw-small-regular-outline"></i>
+                                        <span>[$video_player_watch_again]</span>
+                                    </div>
+
+                                    <div class="watch-again-button-overlay"></div>
 
                                     <div class="bouncing-loader viewer-pending hidden">
                                         <span></span><span></span><span></span>
                                     </div>
+
+                                    <div class="loader-grad hidden">
+                                        <i class="sprite-fm-mono icon-loader-grad-small-regular-outline"></i>
+                                    </div>
+
+                                    <div class="loader-grad-overlay"></div>
                                 </section>
 
                                 <footer>
                                     <nav class="viewer-bars video-controls hidden" data-state="hidden">
-                                        <ul class="bar">
-                                                <li>
-                                                <button class="v-btn playpause" aria-label="[[play pause]]" data-state="play">
-                                                    <!-- Active state: .icon-pause -->
-                                                    <i class="sprite-fm-mono icon-play"></i>
-                                                </button>
-                                            </li>
-                                            <li class="vol-wrapper">
-                                                <button class="v-btn mute" data-state="mute" aria-label="[[volume]]">
-                                                    <!-- Active state: .icon-volume-muted -->
-                                                    <i class="sprite-fm-mono icon-volume"></i>
-                                                </button>
-                                                <div class="video-vol-range">
-                                                    <div class="volume-bar"><span></span></div>
-                                                </div>
-                                            </li>
-                                            <li>
-                                                <div class="video-timing current">
-                                                    00:00
-                                                </div>
-                                            </li>
-                                        </ul>
                                         <div class="video-progress-block">
                                             <div class="video-progress-bar">
                                                 <div class="video-time-bar"></div>
+                                                <div class="video-expected-time-bar">
+                                                    <div class="video-progress-time">
+                                                        00:00
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                         <ul class="bar">
                                             <li>
+                                                <div class="playpause-wrapper">
+                                                    <button class="v-btn playpause" aria-label="[[play pause]]" data-state="play">
+                                                        <!-- Active state: .icon-pause !-->
+                                                        <i class="sprite-fm-mono icon-play-small-regular-outline"></i>
+                                                    </button>
+                                                    <div class="tooltip">
+                                                        [$video_player_play]
+                                                    </div>
+                                                </div>
+                                                <div class="vol-wrapper">
+                                                    <button class="v-btn mute" data-state="mute" aria-label="[[volume]]">
+                                                        <!-- Active state: .icon-volume-muted !-->
+                                                        <i class="sprite-fm-mono icon-volume-max-small-regular-outline"></i>
+                                                    </button>
+                                                    <div class="video-vol-range">
+                                                        <div class="volume-bar"><span></span></div>
+                                                    </div>
+                                                    <div class="tooltip">
+                                                        [$video_player_mute]
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="timing">
+                                                <div class="video-timing current">
+                                                    00:00
+                                                </div>
+                                                <div>
+                                                    /
+                                                </div>
                                                 <div class="video-timing duration">
                                                     00:00
                                                 </div>
                                             </li>
                                             <li>
-                                                <button class="v-btn fs" aria-label="[[fullscreen]]" data-state="go-fullscreen">
-                                                    <!-- Active state: .icon-fullscreen-leave -->
-                                                    <i class="sprite-fm-mono icon-fullscreen-enter"></i>
-                                                </button>
+                                                <div class="speed-wrapper">
+                                                    <button class="v-btn speed" aria-label="[[speed]]" data-state="speed">
+                                                        <i class="sprite-fm-mono icon-playback-1x-small-regular-outline"></i>
+                                                    </button>
+                                                    <div class="tooltip">
+                                                        [$video_player_playback_speed]
+                                                    </div>
+                                                </div>
+                                                <div class="repeat-wrapper">
+                                                    <button class="v-btn repeat" aria-label="[[repeat]]" data-state="repeat">
+                                                        <i class="sprite-fm-mono icon-repeat-one-small-regular-solid"></i>
+                                                    </button>
+                                                    <div class="tooltip">
+                                                        [$video_player_repeat]
+                                                    </div>
+                                                </div>
+                                                <div class="subtitles-wrapper">
+                                                    <button class="v-btn subtitles" aria-label="[[subtitles]]" data-state="subtitles">
+                                                        <i class="sprite-fm-mono icon-subtitles-02-small-regular-outline"></i>
+                                                    </button>
+                                                    <div class="tooltip">
+                                                        [$video_player_subtitles]
+                                                    </div>
+                                                </div>
+                                                <div class="settings-wrapper">
+                                                    <button class="v-btn settings" aria-label="[[settings]]" data-state="settings">
+                                                        <i class="sprite-fm-mono icon-settings-02-small-regular-outline"></i>
+                                                    </button>
+                                                    <div class="tooltip">
+                                                        [$823]
+                                                    </div>
+                                                </div>
+                                                <div class="fs-wrapper">
+                                                    <button class="v-btn fs" aria-label="[[fullscreen]]" data-state="go-fullscreen">
+                                                        <!-- Active state: .icon-fullscreen-leave !-->
+                                                        <i class="sprite-fm-mono icon-maximize-02-small-regular-outline"></i>
+                                                    </button>
+                                                    <div class="tooltip">
+                                                        [$video_player_fullscreen]
+                                                    </div>
+                                                </div>
                                             </li>
                                         </ul>
                                     </nav>
@@ -80,6 +150,82 @@
                                     <div class="video-progress-bar vad" title="">
                                         <div class="video-time-bar"></div>
                                     </div>
+
+                                    <template id="media-viewer-speed-menu">
+                                        <nav class="context-menu playback-speed options-menu avoid-bottom" aria-expanded="false">
+                                            <ul>
+                                                <li>
+                                                    <div class="title">[$video_player_playback_speed]</div>
+                                                </li>
+                                                <li>
+                                                    <button class="05x">
+                                                        <span>[$video_player_speed_0.5x]</span>
+                                                        <i class="sprite-fm-mono icon-active icon-check-small-regular-outline hidden"></i>
+                                                    </button>
+                                                </li>
+                                                <li>
+                                                    <button class="1x">
+                                                        <span>[$video_player_speed_1x]</span>
+                                                        <i class="sprite-fm-mono icon-active icon-check-small-regular-outline"></i>
+                                                    </button>
+                                                </li>
+                                                <li>
+                                                    <button class="15x">
+                                                        <span>[$video_player_speed_1.5x]</span>
+                                                        <i class="sprite-fm-mono icon-active icon-check-small-regular-outline hidden"></i>
+                                                    </button>
+                                                </li>
+                                                <li>
+                                                    <button class="2x">
+                                                        <span>[$video_player_speed_2x]</span>
+                                                        <i class="sprite-fm-mono icon-active icon-check-small-regular-outline hidden"></i>
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </nav>
+                                    </template>
+                                    <template id="media-viewer-video-settings-menu">
+                                        <nav class="context-menu settings options-menu avoid-bottom" aria-expanded="false">
+                                            <ul>
+                                                <li>
+                                                    <div class="settings-wrapper">
+                                                        <span>[$video_player_brightness]</span>
+                                                        <div class="settings-range">
+                                                            <span>0</span>
+                                                            <div class="settings-bar brightness-bar"><span></span></div>
+                                                            <div class="value">50</div>
+                                                            <span>100</span>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="settings-wrapper">
+                                                        <span>[$video_player_contrast]</span>
+                                                        <div class="settings-range">
+                                                            <span>0</span>
+                                                            <div class="settings-bar contrast-bar"><span></span></div>
+                                                            <div class="value">50</div>
+                                                            <span>100</span>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="settings-wrapper">
+                                                        <span>[$video_player_saturation]</span>
+                                                        <div class="settings-range">
+                                                            <span>0</span>
+                                                            <div class="settings-bar saturate-bar"><span></span></div>
+                                                            <div class="value">50</div>
+                                                            <span>100</span>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <button class="reset-all invisible">[$video_player_reset_all]</button>
+                                                </li>
+                                            </ul>
+                                        </nav>
+                                    </template>
                                 </footer>
                             </div>
                         </div>
@@ -90,7 +236,7 @@
                                 <section class="content js-textview">
                                     <textarea class="txtar"></textarea>
                                 </section>
-                                <div class="block-view-file-type text js-text-viewer-icon hidden"></div>
+                                <div class="item-type-icon-90 icon-text-90 js-text-viewer-icon hidden"></div>
                             </div>
                             <div class="bouncing-loader viewer-pending hidden">
                                 <span></span><span></span><span></span>
@@ -103,7 +249,7 @@
 
                         <div class="download info-block">
                             <div class="file-type-wrapper">
-                                <div class="block-view-file-type"></div>
+                                <div class="item-type-icon-90 icon-generic-90"></div>
                             </div>
                             <div class="download thumb-block">
                                 <img />
@@ -147,7 +293,7 @@
                                                     <a class="js-megasync-download">
                                                         <i class="sprite-fm-mono icon-session-history"></i>
                                                         <span>[$btn_dlwitdeskapp]</span>
-                                                        <i class="sprite-fm-mono icon-question-filled js-megasync-qus"></i>
+                                                        <i class="sprite-fm-mono icon-question-filled simpletip" data-simpletip="[$tooltip_why_desktop_app]" data-simpletip-class="large-width center-align"></i>
                                                     </a>
                                                 </div>
                                             </div>
@@ -265,6 +411,10 @@
                             <div class="clear"></div>
                         </div>
                     </div>
+
+                    <div class="commercial-wrapper hidden" id="commercial-wrapper-webfilinkb"></div>
+                    <div class="commercial-wrapper hidden" id="commercial-wrapper-webfilinkbs"></div>
+
                 </div>
 
                 <div class="download error-text message hidden">

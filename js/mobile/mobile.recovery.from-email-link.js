@@ -51,13 +51,13 @@ mobile.recovery.fromEmailLink = {
 
                     // If the recovery link has expired, show an error
                     if (result === EEXPIRED) {
-                        mobile.messageOverlay.show(l[1966], l[1967], function() {
+                        mobile.messageOverlay.show(l[1966], l[1967]).then(() => {
                             loadSubPage('recovery');
                         });
                     }
                     else {
                         // Otherwise show a generic invalid link error
-                        mobile.messageOverlay.show(l[1968], l[1969], function() {
+                        mobile.messageOverlay.show(l[1968], l[1969]).then(() => {
                             loadSubPage('recovery');
                         });
                     }
@@ -85,7 +85,6 @@ mobile.recovery.fromEmailLink = {
                     else if (result[0] === 10) {
 
                         if (u_type || u_type === 0) {
-                            debugger;
 
                             msgDialog("warninga", '', l[22818], '', function() {
                                 loadSubPage('fm');

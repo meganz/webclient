@@ -134,17 +134,17 @@
 }
 
 /* Icons after span or input (Usually dropdown its dropdown arrow or three dots) */
-.mega-input > input + i,
-.mega-input > span + i {
+.mega-input > input ~ i,
+.mega-input > span ~ i {
     --mask-color: var(--icon-inactive);
     margin: 0;
     -webkit-margin-end: 3px;
     margin-inline-end: 3px;
 }
-.mega-input:hover > input + i,
-.mega-input:hover > span + i,
-.mega-input.active > input + i,
-.mega-input.active > span + i {
+.mega-input:hover > input ~ i,
+.mega-input:hover > span ~ i,
+.mega-input.active > input ~ i,
+.mega-input.active > span ~ i {
     --mask-color: var(--icon-rest);
 }
 
@@ -185,6 +185,11 @@
     -webkit-margin-start: 8px;
     margin-inline-start: 8px;
 }
+.mega-input.box-style > input ~ i {
+    margin: 0;
+    -webkit-margin-end: 8px;
+    margin-inline-end: 8px;
+}
 .mega-input.box-style .mega-input-dropdown {
     top: -6px;
 }
@@ -217,6 +222,13 @@
     position: relative;
     width: 100%;
 }
+.mega-input.box-style.textarea.auto-height {
+    padding: 4px 0;
+}
+.mega-input.box-style.textarea.auto-height textarea {
+    min-height: 24px;
+    height: 24px;
+}
 
 /* Text input style (transparent without borders) */
 .mega-input.dropdown-input.text-style {
@@ -228,8 +240,8 @@
 .mega-input.text-style::before {
     display: none;
 }
-.mega-input.text-style > input + i,
-.mega-input.text-style > span + i {
+.mega-input.text-style > input ~ i,
+.mega-input.text-style > span ~ i {
     --mask-color: var(--icon-active);
     -webkit-margin-end: 0;
     margin-inline-end: 0;
@@ -399,7 +411,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-.mega-input-dropdown .option:hover,
+.mega-input-dropdown .option:not(.disabled):hover,
 .mega-input-dropdown .option.active {
     --mask-color: var(--icon-active);
     background: var(--button-hover);
@@ -467,6 +479,12 @@
     color: var(--banner-text-warning);
     border-color: var(--banner-border-warning);
     background: var(--banner-background-warning);
+}
+.mega-input.error .message-container a,
+.mega-input.error .message-container a:link,
+.mega-input.error .message-container a:visited {
+    color: inherit;
+    text-decoration: underline;
 }
 .mega-input.msg .message-container,
 .mega-input.fix-msg .message-container {
@@ -619,4 +637,209 @@
     line-height: 0;
     margin: 8px 0;
     max-height: 80px;
+}
+
+/* Mobile Revamp Version */
+.mobile.mega-input {
+    padding: 1px;
+}
+.mobile.mega-input::before {
+    display: none;
+}
+.mobile.mega-input.box-style {
+    width: 100%;
+    border-radius: var(--mobile-border-radius-medium);
+    height: 47px;
+    border: 1px solid var(--mobile-border-strong);
+    background: var(--mobile-page-background);
+}
+.mobile.mega-input.box-style.fixed-width {
+    max-width: var(--mobile-elem-max-width);
+}
+.mobile.mega-input.box-style.active {
+    border-color: var(--mobile-border-strong-selected);
+}
+.mobile.mega-input.box-style.warning {
+    border-color: var(--mobile-support-warning);
+}
+.mobile.mega-input.box-style.error {
+    border-color: var(--mobile-support-error);
+}
+.mobile.mega-input.box-style.readonly {
+    background: var(--mobile-button-disabled);
+    border-color: var(--mobile-border-disabled);
+}
+.mobile.mega-input.box-style.readonly input.megaInputs {
+    color: var(--mobile-text-disabled);
+}
+.mobile.mega-input.box-style input,
+.mobile.mega-input input::placeholder {
+    font: var(--mobile-font-input-regular);
+    color: var(--mobile-text-placeholder);
+    -webkit-opacity: 1;
+}
+.mobile.mega-input.error .message-container,
+.mobile.mega-input-wrapper.error .message-container {
+    color: var(--mobile-support-error);
+}
+.mobile.mega-input.msg-left .message-container {
+    text-align: left;
+}
+.mobile.mega-input.error .message-container i {
+    margin-inline-end: 8px;
+    -webkit-margin-end: 8px;
+    vertical-align: text-bottom;
+}
+.mobile.mega-input input.megaInputs:not(:placeholder-shown) {
+    color: var(--mobile-text-primary);
+}
+.mobile.mega-input.title-ontop {
+    margin: 36px 0 16px;
+}
+.mobile.mega-input > i,
+.mobile.mega-input:hover > i,
+.mobile.mega-input.active > i {
+    --icon-size: 20px;
+    --mask-color: var(--mobile-icon-secondary);
+    opacity: 1;
+}
+.mobile.mega-input input {
+    padding: 14px 12px;
+    box-sizing: border-box;
+}
+.mobile.mega-input.title-ontop.box-style .mega-input-title {
+    font: var(--mobile-font-caption-large-bold);
+    padding-inline-start: 0;
+    -webkit-padding-start: 0;
+    color: var(--mobile-text-primary);
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    top: -24px;
+}
+.mobile.mega-input .message-container {
+    font: var(--mobile-font-caption-large-regular);
+    border: 0;
+    background: none;
+    text-align: start;
+    top: 51px;
+}
+.mobile.mega-input.warning .message-container {
+    color: var(--mobile-text-warning);
+    display: flex;
+}
+.mobile.mega-input.error .message-container {
+    color: var(--mobile-text-error);
+    display: flex;
+}
+.mobile.mega-input.error .message-container .alert,
+.mobile.mega-input.msg .message-container i {
+    display: inline-block;
+    vertical-align: top;
+    margin-top: 3px;
+    -webkit-margin-end: 8px;
+    margin-inline-end: 8px;
+}
+.mobile.mega-input .length-check {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-large-regular);
+    margin-top: 2px;
+}
+
+/* Mobile textarea */
+
+.mobile.mega-input.textarea {
+    padding: 14px 12px;
+    width: 100%;
+    height: 142px;
+    resize: none;
+    align-items: flex-start;
+}
+
+.mobile.mega-input.textarea textarea {
+    font: var(--mobile-font-copy-regular);
+    color: var(--mobile-text-primary);
+    overflow: hidden;
+    padding: 0;
+    height: 100%;
+    white-space: pre-wrap;
+}
+
+.mobile.mega-input.textarea textarea::placeholder {
+    font: var(--mobile-font-copy-regular);
+}
+
+.mobile.mega-input.textarea i {
+    margin-inline-end: 0;
+    -webkit-margin-end: 0;
+}
+
+/* Textarea with auto height */
+
+.mobile.mega-input.textarea.box-style.auto-height {
+    align-items: center;
+    height: auto;
+    min-height: 47px;
+    padding: 9px 6px;
+}
+
+.mobile.mega-input.textarea.box-style.auto-height textarea {
+    display: block;
+    height: 24px;
+    overflow: auto;
+    padding: 0 6px;
+    min-height: 24px;
+}
+
+.mobile.mega-input.textarea.box-style.auto-height textarea ~ i {
+    margin: 0;
+    margin-inline-end: 6px;
+    -webkit-margin-end: 6px;
+}
+
+.mobile.mega-input.textarea.box-style.auto-height .message-container {
+    top: calc(100% + 6px);
+}
+
+/* End of Mobile textarea */
+
+.mobile.mega-input.strengthChecker.msg:not(.error) {
+    border-color: var(--stroke-mid-grey);
+}
+
+.mobile.mega-input.strengthChecker.msg.active:not(.error) {
+    border-color: var(--mobile-border-strong-selected);
+}
+
+.mobile.mega-input.strengthChecker.msg:not(.error) .message-container {
+    color: var(--mobile-text-secondary);
+    display: flex;
+}
+
+.mobile.mega-input.strengthChecker .account-pass-lines {
+    position: absolute;
+    top: 52px;
+    background: none;
+    width: 100%;
+}
+
+.mobile.mega-input.strengthChecker .message-container {
+    top: 60px;
+}
+
+.mobile.mega-input.strengthChecker:not(.error) .good1.message-container i,
+.mobile.mega-input.strengthChecker:not(.error) .good2.message-container i {
+    color: var(--mobile-support-error);
+}
+
+.mobile.mega-input.strengthChecker:not(.error) .good3.message-container i {
+    color: var(--mobile-support-warning);
+}
+
+.mobile.mega-input.strengthChecker:not(.error) .good4.message-container i,
+.mobile.mega-input.strengthChecker:not(.error) .good5.message-container i {
+    color: var(--mobile-support-success);
 }

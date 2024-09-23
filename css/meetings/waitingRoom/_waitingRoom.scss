@@ -1,0 +1,133 @@
+@import '_admit.scss';
+
+.waiting-room {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    position: fixed;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--surface-grey-1);
+    z-index: 141;
+
+    &--await,
+    &--redirect {
+        justify-content: center;
+        top: 0;
+    }
+
+    &--chatlink-landing {
+        justify-content: normal;
+
+        .waiting-room-head {
+            margin: 80px 0 0;
+        }
+    }
+
+    /* --- */
+
+    @mixin small-screen {
+        @media only screen and (max-height: 600px) {
+            @content;
+        }
+    }
+
+    /* TODO: unify w/ `Join` */
+    &-head {
+        /* [...] */
+
+        .waiting-room-logo {
+            /* [...] */
+
+            i {
+                display: block;
+                margin: 40px auto 0;
+                width: 195px;
+                height: 65px;
+                --width: 195px;
+            }
+        }
+
+        h1 {
+            margin: 24px 0 0 0;
+
+            @include small-screen {
+                font: var(--text-h2);
+                margin-top: 14px;
+                margin-bottom: 18px;
+            }
+        }
+    }
+
+    /* --- */
+
+    .card {
+        /* [...] */
+
+        &.fit-spacing {
+            margin: 0;
+        }
+
+        &-body {
+            /* [...] */
+
+            @include small-screen {
+                position: relative;
+                top: auto;
+                margin: 12px 0 0 0;
+                transform: none;
+            }
+
+            h2 {
+                margin: 0;
+            }
+
+            button.waiting-room-leave {
+                display: block;
+                margin: 20px auto 0;
+                border: 0 none;
+                font: var(--text-body1);
+                color: var(--secondary-red);
+                background: transparent;
+                cursor: pointer;
+
+                i {
+                    margin: 0 4px;
+                    --icon-size: 21px;
+                }
+            }
+
+            .card-fields {
+                margin: 30px 0 34px 0;
+
+                @include small-screen {
+                    margin: 0 0 14px 0;
+                }
+            }
+        }
+    }
+
+    &-schedule {
+        display: flex;
+        justify-content: center;
+        margin: 8px 0 14px;
+
+        span {
+            display: block;
+            float: left;
+            margin: 0 2px 0;
+            color: var(--text-color-medium);
+        }
+    }
+
+    &-message {
+        width: 80%;
+        margin: 14px auto;
+        padding: 2px 0;
+        border-radius: 3px;
+        background: var(--banner-background-info);
+        box-shadow: 0 0 0 1px var(--banner-border-info);
+        color: var(--banner-text-info);
+    }
+}

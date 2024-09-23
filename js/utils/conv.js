@@ -39,12 +39,7 @@
      * @memberOf array
      */
     array.unique = function(input) {
-        return input.reduce(function(out, value) {
-            if (out.indexOf(value) < 0) {
-                out.push(value);
-            }
-            return out;
-        }, []);
+        return [...new Set(input)];
     };
 
     /**
@@ -345,6 +340,37 @@ function hex2bin(hex) {
     global.UH64 = UH64;
 
 })(self);
+
+(() => {
+    'use strict';
+    /**
+     * Utility functions to convert ufs-node's handles from/to their decimal number representation.
+     */
+
+    Object.defineProperties(mega, {
+        hton: {
+            value(h, pad = 15) {
+                let res = 0;
+
+                for (let s = base64urldecode(h), i = s.length; i--;) {
+                    res = res * 256 + s.charCodeAt(i);
+                }
+                return pad ? String(res).padStart(pad, '0') : res;
+            }
+        },
+        ntoh: {
+            value(n) {
+                let s = '';
+                while (n > 1) {
+                    s += String.fromCharCode(n & 255);
+                    n /= 256;
+                }
+                return base64urlencode(s);
+            }
+        }
+    });
+
+})();
 
 
 /**

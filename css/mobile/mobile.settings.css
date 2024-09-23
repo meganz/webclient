@@ -1,0 +1,358 @@
+/* Settings page nodes */
+.mega-mobile-settings {
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.mega-mobile-settings .mega-component span {
+   font: var(--mobile-font-link-large-regular);
+}
+
+.mega-mobile-settings .settings-heading {
+    font: var(--mobile-font-heading-h2);
+    padding: 24px;
+    margin: 0;
+}
+
+.mega-mobile-settings a.primary-link,
+.mega-mobile-settings a.primary-link:link,
+.mega-mobile-settings a.primary-link:visited,
+.mega-mobile-settings a.primary-link:hover,
+.mega-mobile-settings a.primary-link:active {
+    color: var(--mobile-link-primary);
+    text-decoration: underline;
+}
+
+/* Settings form */
+
+.mega-mobile-settings.default-form {
+    color: var(--text-color-high);
+    font: var(--mobile-font-copy-regular);
+    padding: 0 24px 24px;
+}
+
+.mega-mobile-settings .fixed-width,
+.mega-mobile-settings.default-form.fixed-width {
+    max-width: var(--mobile-elem-max-width);
+    width: 100%;
+}
+
+.mega-mobile-settings.default-form h1.form-title {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-heading-h1);
+    margin: 0 0 16px;
+}
+
+.mega-mobile-settings.default-form .form-info {
+    padding: 0 0 4px;
+}
+
+.mega-mobile-settings.default-form p {
+    margin: 0;
+    padding: 8px 0;
+}
+
+.mega-mobile-settings.default-form p:first-child {
+    padding-top: 0;   
+}
+
+/* Settings form. Inputs */
+
+.mega-mobile-settings.default-form .form-elements {
+    display: flex;
+    flex-direction: column;
+}
+
+.mega-mobile-settings.default-form .mobile.mega-input.box-style {
+    margin: 12px 0;
+}
+
+.mega-mobile-settings.default-form .mobile.mega-input.title-ontop {
+    margin: 32px 0 12px;
+}
+
+.mega-mobile-settings.default-form .mobile.mega-input .message-container i {
+    margin-bottom: 2px;
+    margin-top: 2px;
+}
+
+.mega-mobile-settings.default-form .nav-elem.button.block {
+    height: 47px;
+    margin: 12px 0;
+}
+
+.mega-mobile-settings.default-form .nav-elem.button.block:last-child {
+    margin-bottom: 0;
+}
+
+/* Settings form. Overlay */
+
+.mega-overlay .mega-mobile-settings.default-form {
+    padding: 0;
+}
+
+/* End of Settings  form */
+
+/* Settings page */
+
+.mega-mobile-settings.default-page {
+    padding: 0 24px 24px;
+}
+
+.mega-mobile-settings.default-page > * {
+    font: var(--mobile-font-copy-regular);
+}
+
+.mega-mobile-settings.default-page .mobile-settings-content {
+    width: 100%;
+}
+
+.mega-mobile-settings.default-page .mobile-settings-content > *:empty {
+    display: none;
+}
+
+.mega-mobile-settings.default-page .mobile-settings-result,
+.mega-mobile-settings.default-page .mobile-settings-info {
+    color: var(--mobile-text-secondary);
+}
+
+.mega-mobile-settings.default-page .mobile-settings-result.bold-style {
+    font: var(--mobile-font-heading-h3);
+}
+
+.mega-mobile-settings.default-page .mobile-settings-prompt {
+    font: var(--mobile-font-heading-h3);
+    color: var(--mobile-text-primary);
+}
+
+.mega-mobile-settings.default-page .mobile-settings-content > *,
+.mega-mobile-settings.default-page .mobile-settings-form .mobile-settings-prompt {
+    margin-bottom: 16px;
+}
+
+.mega-mobile-settings.default-page .mobile-settings-info ul {
+    margin: 0 16px;
+}
+
+.mega-mobile-settings.default-page .mobile-settings-info li {
+    list-style-type: initial;
+    padding-left: 5px;
+}
+
+.mega-mobile-settings.default-page .mobile-settings-info li:not(:last-child),
+.mega-mobile-settings.default-page .mobile-settings-info p:not(:last-child) {
+    padding-bottom: 12px;
+}
+
+.mega-mobile-settings.default-page .mobile-settings-info p {
+    margin: 0;
+}
+
+.mega-mobile-settings.default-page .mega-component.banner {
+    max-width: 382px;
+}
+
+.mega-mobile-settings.default-page .mega-component.banner .content-box {
+    flex-flow: initial;
+}
+
+.mega-mobile-settings.default-page .mega-radio-button .radio-wrapper {
+    background: none;
+    border: 2px solid var(--mobile-selection-control);
+}
+
+.mega-mobile-settings.default-page .mega-radio-button .radio-action {
+    flex: 1;
+}
+
+.mega-mobile-settings.default-page .mobile-settings-buttons {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.mega-mobile-settings.default-page .nav-elem.button {
+    height: 47px;
+    margin: 12px 0 0;
+}
+
+/* End of Settings  page */
+
+body.bottom-pages .fmholder {
+    grid: initial;
+}
+
+.mobile .two-factor-page .two-factor-heading,
+.mobile .two-factor-page .two-factor-body-text {
+    text-align: left;
+}
+
+/* 2FA setup in Settings */
+
+.mega-mobile-settings.two-factor-settings .settings-step {
+    width: 100%;
+}
+
+.mega-mobile-settings.two-factor-settings .tab-container {
+    margin: 24px 0;
+}
+
+.mega-mobile-settings.two-factor-settings p {
+    padding: 0;
+    margin: 16px 0 0;
+}
+
+.mega-mobile-settings.two-factor-settings p + a {
+    display: inline-block;
+    margin: 16px 0 0;
+}
+
+.mega-mobile-settings.two-factor-settings h2 + p {
+    margin: 8px 0;
+}
+
+.mega-mobile-settings.two-factor-settings .two-factor-tabs span {
+    font: var(--mobile-font-caption-large-regular);
+}
+
+.mega-mobile-settings.two-factor-settings .two-factor-tab-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.mega-mobile-settings.two-factor-settings .qr-code-img {
+    line-height: 0;
+    margin: 12px 0 18px;
+    max-width: var(--mobile-elem-max-width);
+    text-align: center;
+}
+
+.mega-mobile-settings.two-factor-settings .qr-code-img canvas {
+    outline: white 4px solid;
+}
+
+.mega-sheet .fm-scrolling.scroller-space div.two-fa-app-links {
+    margin: 24px 0 0;
+}
+
+.mega-sheet .two-fa-app-links .nav-elem.button {
+    padding: 0;
+}
+
+/* End of 2FA setup in Settings */
+
+/* 2FA confirmation of actions in Settings */
+
+.mega-mobile-settings.two-factor-verification .code-container {
+    border: 0;
+    display: flex;
+    justify-content: space-between;
+    margin: 12px 0 0;
+    padding: 0;
+    position: relative;
+    width: 100%;
+}
+
+.mega-mobile-settings.two-factor-verification .code-container input {
+    appearance: textfield;
+    padding-left: 0;
+    padding-right: 0;
+    text-align: center;
+}
+
+.mega-mobile-settings.two-factor-verification .code-container input::-webkit-outer-spin-button,
+.mega-mobile-settings.two-factor-verification .code-container input::-webkit-inner-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
+.mega-mobile-settings.two-factor-verification .mobile.mega-input.box-style {
+    margin: 0 0 12px;
+    max-width: 40px;
+    min-width: 12px;
+    position: static;
+}
+
+.mega-mobile-settings.two-factor-verification .success .mobile.mega-input.box-style {
+    border-color: var(--mobile-support-success);
+}
+
+.mega-mobile-settings.two-factor-verification .error .mobile.mega-input.box-style {
+    border-color: var(--mobile-support-error);
+}
+
+/* End of 2FA confirmation of actions in Settings */
+
+/* TODO: Remove when old mobile have been redone */
+
+.mobile.old-page {
+    background-color: #fff;
+}
+
+.mobile .old-page,
+.mobile .main-block,
+.mobile .my-account-page {
+    grid-row: -2/-1;
+    grid-column: -2/-1;
+}
+
+.mobile .affiliate-guide-page,
+.mobile .affiliate-history-page,
+.mobile .affiliate-page {
+    background: #F5F6F7;
+}
+
+.mobile .affiliate-redeem-page {
+    height: 100%;
+    overflow: auto;
+}
+
+.mobile.context-menu-container .fm-icon {
+    display: inline-block;
+    margin: 0 8px;
+    vertical-align: middle;
+}
+
+/* End of TODO: Remove when old mobile have been redone */
+
+/* Mobile Web Revamp responsive styles */
+
+@media only screen and (min-width: 750px), only screen and (orientation: landscape) {
+
+/* Settings form */
+
+.mega-mobile-settings.default-form h1.form-title {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-heading-h2);
+    margin-top: 8px;
+}
+
+.mega-overlay .mega-mobile-settings.default-form.fixed-width {
+    margin: 0 auto;
+}
+    
+/* End of Settings form */
+
+/* 2FA setup in Settings */
+
+.mega-mobile-settings.two-factor-settings .qr-code-img {
+    text-align: start;
+}
+
+/* End of 2FA setup in Settings */
+
+}
+
+@media only screen and (min-width: 420px) {
+
+/* 2FA confirmation of actions in Settings */
+
+.mega-mobile-settings.two-factor-verification .mobile.mega-input.box-style {
+    max-width: 48px;
+}
+
+/* End of 2FA confirmation of actions in Settings */
+
+}

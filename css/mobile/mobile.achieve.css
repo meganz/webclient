@@ -1,0 +1,49 @@
+.achievements-page {
+    padding: 0 24px 24px;
+    max-width: var(--mobile-page-max-width);
+}
+
+.achievements-page > * {
+    font: var(--mobile-font-copy-regular);
+    color: var(--mobile-text-primary);
+}
+
+.achievements-page .nav-elem {
+    height: auto;
+    padding: 0;
+}
+
+.achievements-page .invite-friends-cta {
+    margin: 24px 0;
+}
+
+.achievements-page .nav-elem i.left-icon.not-achieved,
+.achievements-page .nav-elem i.left-icon.expired {
+    color: var(--mobile-icon-disabled);
+}
+.achievements-page .nav-elem i.left-icon.active {
+    color: var(--mobile-support-success);
+}
+
+.achievements-page .nav-elem.full-width > *:not(:last-child) {
+    margin-inline-end: 12px;
+    -webkit-margin-end: 12px;
+}
+
+.achievements-page .links {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+.achievements-page .links > *:not(:last-child) {
+    margin-bottom: 32px;
+}
+
+.achievements-page .more-storage-prompt {
+    margin-top: 24px;
+}
+
+.achievements-page .more-storage-prompt a {
+    color: var(--mobile-link-primary);
+    text-decoration: underline;
+}

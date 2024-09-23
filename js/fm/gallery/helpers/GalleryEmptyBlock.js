@@ -42,7 +42,7 @@ class GalleryEmptyBlock {
                 this._child = new GalleryEmptyFavourites(this.el);
                 break;
             default:
-                if (M.currentrootid === 'discovery') {
+                if (M.currentrootid === 'discovery' || M.gallery) {
                     this._child = new GalleryEmptyDiscovery(this.el);
                 }
                 break;

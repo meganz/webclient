@@ -1,0 +1,55 @@
+.meetings-select {
+    /* [...] */
+
+    &.plain .mega-input::before {
+        border: 0 none;
+    }
+
+    &.inline {
+        float: left;
+        margin: 0 8px 0 0;
+
+        .mega-input {
+            width: auto;
+            margin-top: -8px;
+        }
+    }
+
+    &-input {
+        display: none;
+    }
+
+    .mega-input {
+        position: relative;
+        min-width: 52px;
+
+        &.typeable {
+            /* [...] */
+
+            &:before {
+                cursor: default;
+            }
+
+            input {
+                display: block;
+                position: relative;
+                width: 65px;
+                height: auto;
+                text-align: center;
+            }
+        }
+
+        .mega-input-dropdown {
+            position: absolute;
+            top: 100%;
+            left: auto;
+            right: 0;
+            height: 220px;
+
+            body.rtl & {
+                left: 0;
+                right: auto;
+            }
+        }
+    }
+}

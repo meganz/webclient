@@ -33,7 +33,7 @@ class MTabs extends MComponent {
             const tab = new MTab(label, click);
 
             this._tabs.push(tab);
-            this.el.append(tab.el);
+            this.el.appendChild(tab.el);
         }
     }
 

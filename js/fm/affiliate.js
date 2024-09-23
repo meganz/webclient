@@ -267,9 +267,11 @@ affiliateUI.referralUrlDialog = {
         if (is_extension || M.execCommandUsable()) {
             $copyBtn.removeClass('hidden');
             $copyBtn.rebind('click.copy-to-clipboard', function() {
-                var links = $.trim($urlBlock.text());
-                var toastTxt = l[7654];
-                copyToClipboard(links, toastTxt);
+                if (!$copyBtn.hasClass('disabled')){
+                    const links = $.trim($urlBlock.text());
+                    const toastTxt = l[7654];
+                    copyToClipboard(links, toastTxt);
+                }
             });
         }
         else {
@@ -320,7 +322,7 @@ affiliateUI.referralUrlDialog = {
         'use strict';
 
         var val = $('.url-input', this.$dialog).val();
-        var baseUrl = getBaseUrl();
+        var baseUrl = 'https://mega.io';
         var baseUrlRegExp = new RegExp(baseUrl, 'ig');
 
         if (!val) {
@@ -350,14 +352,17 @@ affiliateUI.referralUrlDialog = {
 
         var targetPage = $('.page-names .active', this.$dialog).data('page');
         var $urlBlock = $('.url', this.$dialog);
+        const $copyBtn = $('.copy-button', this.$dialog);
 
         $('.custom-block', this.$dialog).removeClass('error');
 
         if (clear) {
             $urlBlock.empty();
             $('.url-input', this.$dialog).val('');
+            $copyBtn.addClass('disabled');
             return Promise.resolve();
         }
+        $copyBtn.removeClass('disabled');
 
         if (targetPage === 'start') {
             targetPage = '';
@@ -374,7 +379,8 @@ affiliateUI.referralUrlDialog = {
         }
 
         return M.affiliate.getURL(targetPage).then(function(url) {
-            var urlWithoutAfftag = getBaseUrl() + (targetPage === '' ? '' : '/' + targetPage);
+            const urlWithoutAfftag = targetPage === 'help' ? l.mega_help_host
+                : `https://mega.io/${targetPage}`;
             $urlBlock.safeHTML(url.replace(urlWithoutAfftag, '<span>' + urlWithoutAfftag + '</span>'));
         });
     },
@@ -584,7 +590,7 @@ affiliateUI.commissionIndex = {
 
         $('.commission-block.available .price', this.$block).safeHTML(localAvailable + currencyHtml);
 
-        if (u_attr.b) {
+        if (u_attr.b || u_attr.pf) {
             $('.no-buisness', this.$block).addClass('hidden');
         }
 
@@ -629,7 +635,39 @@ affiliateUI.redemptionDialog = {
         M.affiliate.getRedemptionMethods().then(function() {
 
             self.displaySteps();
-            $('.available-comission span', self.$dialog).text(formatCurrency(balance.available));
+
+            const euro = formatCurrency(balance.available);
+
+            const $availableComissionTemplates = $('.templates .available-comission-template', self.$dialog);
+            const $euroTemplate = $('.available-commission-euro', $availableComissionTemplates)
+                .clone()
+                .removeClass('hidden');
+            const $localTemplate = $('.available-commission-local', $availableComissionTemplates)
+                .clone()
+                .removeClass('hidden');
+            const $availableComissionArea = $('.available-comission-quota span', self.$dialog).empty();
+            const $availableBitcoinArea = $('.available-comission-bitcoin span', self.$dialog).empty();
+
+            $euroTemplate.text(euro);
+
+            if (balance.localCurrency && balance.localCurrency !== 'EUR') {
+                const local = balance.localCurrency + ' ' +
+                    formatCurrency(balance.localAvailable, balance.localCurrency, 'narrowSymbol') + '* ';
+                $localTemplate.text(local);
+                $availableComissionArea
+                    .safeAppend($localTemplate.prop('outerHTML'))
+                    .safeAppend($euroTemplate.prop('outerHTML'));
+            }
+            else {
+                $('.affiliate-redeem.local-info span', self.$dialog).addClass('hidden');
+                $localTemplate.text(euro + '*');
+                $availableComissionArea.safeAppend($localTemplate.prop('outerHTML'));
+            }
+
+            $availableBitcoinArea.safeAppend($localTemplate.text(euro).prop('outerHTML'));
+
+
+
 
             self.bindDialogEvents();
 
@@ -645,14 +683,9 @@ affiliateUI.redemptionDialog = {
         });
     },
 
-    showSumitted: function() {
+    showSubmitted: function() {
 
         'use strict';
-
-        var $dialog = $('.mega-dialog.affiliate-request');
-        var message = affiliateRedemption.requests.first.m === 2 ? l[23364] : l[23365];
-
-        $('.status-message', $dialog).text(message);
 
         var __closeSubmitted = function() {
 
@@ -660,13 +693,13 @@ affiliateUI.redemptionDialog = {
             $('.fm-dialog-overlay').off('click.redemptionSubmittedClose');
 
             // After closing the dialog, refresh balance and history
-            Promise.all([M.affiliate.getBalance(), M.affiliate.getRedemptionHistory()]).then(function() {
+            Promise.all([M.affiliate.getBalance(), M.affiliate.getRedemptionHistory()]).then(() => {
 
                 affiliateUI.commissionIndex.init();
                 affiliateUI.redemptionHistory.updateList();
                 affiliateUI.redemptionHistory.drawTable();
                 affiliateUI.redemptionHistory.bindEvents();
-            }).catch(function(ex) {
+            }).catch((ex) => {
 
                 if (d) {
                     console.error('Update redmeption page failed: ', ex);
@@ -676,6 +709,27 @@ affiliateUI.redemptionDialog = {
             });
         };
 
+        let $dialog;
+
+        if (affiliateRedemption.requests.first.m === 0) {
+            $dialog = $('.mega-dialog.affiliate-request-quota', self.$dialog);
+            const {m, s, t} = this.getFormattedPlanData(true);
+
+            $('.plan-name', $dialog)
+                .text(l.redemption_confirmation_pro_plan_name.replace('%1', affiliateRedemption.plan.planName));
+            $('.plan-storage', $dialog).text(l.redemption_confirmation_pro_storage.replace('%1', s));
+            $('.plan-quota', $dialog).text(l.redemption_confirmation_pro_transfer.replace('%1', t));
+            $('.plan-duration', $dialog).text(l.redemption_confirmation_pro_duration.replace('%1', m));
+            $('.affiliate-redeem .summary-wrap .pro-price .plan-info', $dialog).addClass('hidden');
+            $('affiliate-redeem .summary-wrap .pro-price .euro', this.$dialog).addClass('hidden');
+        }
+        else {
+            $dialog = $('.mega-dialog.affiliate-request.bitcoin', self.$dialog);
+            const message = affiliateRedemption.requests.first.m === 2 ? l[23364] : l[23365];
+
+            $('.status-message', $dialog).text(message);
+
+        }
         // Bind OK and close buttons
         $('button', $dialog).rebind('click', __closeSubmitted);
         $('.fm-dialog-overlay').rebind('click.redemptionSubmittedClose', __closeSubmitted);
@@ -721,6 +775,17 @@ affiliateUI.redemptionDialog = {
         // $('#affiliate-redemption-amount', this.$dialog).attr('data-currencyValue', M.affiliate.balance.available);
         $('.checkdiv.checkboxOn', this.$dialog).removeClass('checkboxOn').addClass('checkboxOff');
         $('.save-data-tip', this.$dialog).addClass('hidden');
+        $('.dropdown-item-save', this.$dialog).addClass('hidden');
+
+        // Reset options for pro plan redemption
+        affiliateRedemption.plan = {
+            chosenPlan: pro.filter.affMin[pro.UTQA_RES_INDEX_ACCOUNTLEVEL],
+            planName: '',
+            planStorage: -1,
+            planQuota: -1,
+            planDuration: undefined,
+            planPriceRedeem: -1,
+        };
 
         affiliateRedemption.reset();
     },
@@ -756,8 +821,7 @@ affiliateUI.redemptionDialog = {
 
                 // This is end of flow lets close the dialog and show submitted dialog
                 if (affiliateRedemption.currentStep === 5) {
-
-                    self.showSumitted();
+                    self.showSubmitted();
                     self.hide(true);
                 }
                 else {
@@ -769,20 +833,27 @@ affiliateUI.redemptionDialog = {
                     affiliateRedemption.currentStep++;
                     self.displaySteps();
                 }
+
+                // For MEGAquota redemption skip to step 4
+                if ([2, 3].includes(affiliateRedemption.currentStep) && affiliateRedemption.requests.first.m === 0){
+                    affiliateRedemption.currentStep += (4 - affiliateRedemption.currentStep);  // skip to step 4
+                    self.displaySteps();
+                }
             });
         });
 
         $('.prev-btn', this.$dialog).rebind('click', function() {
 
             affiliateRedemption.currentStep--;
-            self.displaySteps();
 
             // For Bitcoin payment skip step 3
             if (affiliateRedemption.currentStep === 3 && affiliateRedemption.requests.first.m === 2) {
-
                 affiliateRedemption.currentStep--;
-                self.displaySteps();
             }
+            else if ([2, 3, 4].includes(affiliateRedemption.currentStep) && affiliateRedemption.requests.first.m === 0){
+                affiliateRedemption.currentStep = 1;
+            }
+            self.displaySteps();
 
             // If this arrive step 2 again, clear country, currency, and dynamic inputs
             if (affiliateRedemption.currentStep === 2) {
@@ -808,13 +879,51 @@ affiliateUI.redemptionDialog = {
         $('button.js-close', this.$dialog).rebind('click', this.hide.bind(this, false));
         $('.fm-dialog-overlay').rebind('click.redemptionClose', this.hide.bind(this, false));
 
+        // Step 0
+        const $step0 = $('.cells.step0', this.$dialog);
+
+        const $template = $('.affiliate-payment-template', $step0);
+        const $wrapper = $('.affiliate-redeem .payment-type-wrapper', $step0);
+        $wrapper.empty();
+
+        // Generate redemption options based on given gateways
+        let tickFirstRadio = true;
+        const radioText = {0: l.redemption_method_pro_plan, 2: l[6802]};
+        for (const type in M.affiliate.redeemGateways) {
+            const $clone = $template.clone();
+            $clone.children('.radioOff').children().attr('id', 'affiliate-payment-type' + type).val(type);
+            $clone.children('label').attr('for', 'affiliate-payment-type' + type).text(radioText[type]);
+            $clone.removeClass('hidden affiliate-payment-template');
+
+            // Make sure first radio option is ticked (Pro plan redemption if it is in gateways)
+            if (tickFirstRadio) {
+                $clone.children('.radioOff').removeClass('radioOff').addClass('radioOn');
+                tickFirstRadio = false;
+            }
+            $wrapper.safeAppend($clone.prop('outerHTML'));
+        }
+
+        $('.payment-type input', $step0).rebind('change.selectMethodType', function() {
+            $('.radioOn', $step0).removeClass('radioOn').addClass('radioOff');
+            $(this).parent().addClass('radioOn').removeClass('radioOff');
+            $nextbtn.removeClass('disabled');
+        });
+
         // Step 1
         var $step1 = $('.cells.step1', this.$dialog);
-        var $amount = $('#affiliate-redemption-amount', $step1);
+
+        const $amount = $('#affiliate-redemption-amount', $step1);
+        $amount.trigger('input').trigger('blur');
+
+
+        $('.withdraw-txt a', $step1).rebind('click.changeMethod', () => {
+            affiliateRedemption.currentStep = 0;
+            self.displaySteps();
+            return false;
+        });
 
         $amount.rebind('input', function() {
-
-            var activeMethodMin = M.affiliate.redeemGateways[$('.payment-type .radioOn input', $step1).val()].min || 50;
+            var activeMethodMin = M.affiliate.redeemGateways[$('.payment-type .radioOn input', $step0).val()].min || 50;
             const megaInput = $(this).data('MegaInputs');
             if (megaInput) {
                 megaInput.hideError();
@@ -824,7 +933,7 @@ affiliateUI.redemptionDialog = {
             if (val >= activeMethodMin && val <= balance.available) {
                 $nextbtn.removeClass('disabled');
             }
-            else {
+            else if (affiliateRedemption.currentStep > 0) {
                 $nextbtn.addClass('disabled');
             }
         });
@@ -832,7 +941,7 @@ affiliateUI.redemptionDialog = {
         $amount.rebind('blur', function() {
 
             var $this = $(this);
-            var activeMethodMin = M.affiliate.redeemGateways[$('.payment-type .radioOn input', $step1).val()].min || 50;
+            var activeMethodMin = M.affiliate.redeemGateways[$('.payment-type .radioOn input', $step0).val()].min || 50;
 
             const megaInput = $(this).data('MegaInputs');
             const val = megaInput ? megaInput.getValue() : 0;
@@ -857,12 +966,6 @@ affiliateUI.redemptionDialog = {
             $amount.val(balance.available).trigger('input').trigger('blur');
         });
 
-        $('.payment-type input', $step1).rebind('change.selectMethodType', function() {
-
-            $('.radioOn', $step1).removeClass('radioOn').addClass('radioOff');
-            $(this).parent().addClass('radioOn').removeClass('radioOff');
-            $amount.trigger('input').trigger('blur');
-        });
 
         // Step 2
         var $step2 = $('.cells.step2', this.$dialog);
@@ -870,7 +973,7 @@ affiliateUI.redemptionDialog = {
 
         $('.withdraw-txt a', $step2).rebind('click.changeMethod', function() {
 
-            affiliateRedemption.currentStep--;
+            affiliateRedemption.currentStep = 0;
             self.displaySteps();
 
             return false;
@@ -1027,23 +1130,48 @@ affiliateUI.redemptionDialog = {
                 __hideSaveDataTip();
             }
         });
+
+        // Step 4
+
+        var $step4 = $('.cells.step4', this.$dialog);
+
+        $('.withdraw-txt a', $step4).rebind('click.changeMethod', () => {
+
+            affiliateRedemption.currentStep = 0;
+            self.displaySteps();
+
+            return false;
+        });
     },
 
     displaySteps: function() {
 
         'use strict';
 
+        // If user has a Pro Flexi or Business account, go straight to bitcoin redemption step1
+        if (affiliateRedemption.currentStep === 0
+                && (u_attr.p === pro.ACCOUNT_LEVEL_BUSINESS || u_attr.p === pro.ACCOUNT_LEVEL_PRO_FLEXI)){
+            affiliateRedemption.currentStep = 1;
+            affiliateRedemption.requests.first.m = 2;
+        }
+
+
         // Show and hide contents
         $('.cells.left', this.$dialog).addClass('hidden');
-        var $prevBtn = $('.prev-btn', this.$dialog);
-        var $nextBtn = $('.next-btn', this.$dialog);
-        var buttonText = {1: l[7348], 2: l[427], 3: l[23367], 4: l[23368]};
-        var $currentStep = $('.cells.step' + affiliateRedemption.currentStep, this.$dialog);
+        const $prevBtn = $('.prev-btn', this.$dialog);
+        const $nextBtn = $('.next-btn', this.$dialog);
+        const buttonText = {0: l[556], 1: l[7348], 2: l[427], 3: l[23367], 4: l[23368]};
+        const buttonTextQuota = {0: l[556], 1: l[556], 2: l[427], 3: l[23367], 4: l[23368]};
+
+        const $currentStep = $('.cells.step' + affiliateRedemption.currentStep, this.$dialog);
 
         affiliateRedemption.$step = $currentStep.removeClass('hidden');
 
         // Show and hide prev button
-        if (affiliateRedemption.currentStep > 1) {
+        if (affiliateRedemption.currentStep === 1 && affiliateRedemption.requests.first.m === 2){
+            $prevBtn.addClass('hidden');
+        }
+        else if (affiliateRedemption.currentStep > 0) {
             $prevBtn.removeClass('hidden');
         }
         else {
@@ -1051,7 +1179,7 @@ affiliateUI.redemptionDialog = {
         }
 
         // Timer relates
-        if (affiliateRedemption.currentStep > 2) {
+        if (affiliateRedemption.currentStep > 2 && affiliateRedemption.requests.first.m !== 0) {
             affiliateRedemption.startTimer();
         }
         else {
@@ -1059,7 +1187,8 @@ affiliateUI.redemptionDialog = {
         }
 
         this['displayStep' + affiliateRedemption.currentStep]();
-        $('span', $nextBtn).text(buttonText[affiliateRedemption.currentStep]);
+        const textToAdd = affiliateRedemption.requests.first.m === 0 ? buttonTextQuota : buttonText;
+        $('span', $nextBtn).text(textToAdd[affiliateRedemption.currentStep]);
 
         var $cellContent = $('.cell-content', $currentStep);
 
@@ -1073,50 +1202,532 @@ affiliateUI.redemptionDialog = {
         }
     },
 
+    displayStep0: function() {
+
+        'use strict';
+
+        $('.next-btn', this.$dialog).removeClass('wide disabled').addClass('small');
+        $('.cells.right', this.$dialog).addClass('hidden');
+        this.$dialog.addClass('dialog-small').removeClass('disabled');
+    },
+
     displayStep1: function() {
 
         'use strict';
 
-        var $amountInput = $('#affiliate-redemption-amount', this.$dialog);
-        var megaInput = $amountInput.data('MegaInputs') || new mega.ui.MegaInputs($amountInput, {
-            onShowError: function(msg) {
-                $('.amount-message-container', this.$dialog).removeClass('hidden');
-                $('.amount-message-container', this.$dialog).text(msg);
-            },
-            onHideError: function() {
-                $('.amount-message-container', this.$dialog).addClass('hidden');
-            }
-        });
-        var amountValue = megaInput.getValue();
 
-        // Summary table update
-        $('.requested.price .euro', this.$dialog).addClass('hidden').text('------');
-        $('.requested.price .local', this.$dialog).text(amountValue ? formatCurrency(amountValue) : '------');
-        $('.fee.price .euro', this.$dialog).addClass('hidden').text('------');
-        $('.fee.price .local', this.$dialog).text('------');
-        $('.received.price .euro', this.$dialog).addClass('hidden').text('------');
-        $('.received.price .local', this.$dialog).text('------');
-        $('.local-info', this.$dialog).addClass('hidden');
+        const $nextBtn = $('.next-btn', this.$dialog).removeClass('wide');
+        $('.cells.right', this.$dialog).removeClass('hidden');
+        $('.plan-select-message', this.$dialog).addClass('hidden');
+        this.$dialog.removeClass('dialog-small');
+        const $bitcoinSummary = $('.cells.right.bitcoin', this.$dialog);
+        const $megaquotaSummary = $('.cells.right.megaquota', this.$dialog);
+        const $planRadios = $('.affiliate-redeem.plan-selection-wrapper', this.$dialog);
 
-        megaInput.hideError();
+        if (affiliateRedemption.requests.first.m === 0){
+            $megaquotaSummary.removeClass('hidden');
+            $bitcoinSummary.addClass('hidden');
+            $planRadios.removeClass('hidden');
 
-        // Show the method option if api returns gateway data
-        for (var type in M.affiliate.redeemGateways) {
+            this.handleProPlans();
+        }
+        else {
+            $bitcoinSummary.removeClass('hidden').addClass('small step1');
+            $megaquotaSummary.addClass('hidden');
+            $planRadios.addClass('hidden');
+            $nextBtn.removeClass('small');
 
-            if (M.affiliate.redeemGateways.hasOwnProperty(type)) {
-
-                $('#affiliate-payment-type' + type, this.$dialog)
-                    .parents('.payment-type-wrapper').removeClass('hidden');
+            if (u_attr.p === pro.ACCOUNT_LEVEL_BUSINESS || u_attr.p === pro.ACCOUNT_LEVEL_PRO_FLEXI){
+                $('.cells.left .affiliate-redeem.withdraw-txt a', this.$dialog).addClass('hidden');
             }
         }
+
+        const currentPlan = affiliateRedemption.requests.first.m; // 2 = BTC, 0 = MEGAquota
+
+        let $currentStep = $('.cells.step1', this.$dialog);
+
+        if (currentPlan === 0){
+            $currentStep.addClass('hidden');
+            $currentStep = $('.cells.step1.megaquota', this.$dialog);
+            $currentStep.removeClass('hidden');
+        }
+        else {
+            const $amountInput = $('#affiliate-redemption-amount', this.$dialog);
+            const $amountMessage = $('.amount-message-container', this.$dialog);
+            const megaInput = $amountInput.data('MegaInputs') || new mega.ui.MegaInputs($amountInput, {
+                onShowError: function(msg) {
+                    $amountMessage.removeClass('hidden').text(msg);
+                },
+                onHideError: function() {
+                    $amountMessage.addClass('hidden');
+
+                }
+            });
+            const amountValue = megaInput.getValue();
+            const method = affiliateRedemption.requests.first.m;
+            const minValue = M.affiliate.redeemGateways[method].min || 50;
+            if ((amountValue < minValue) || (amountValue > M.affiliate.balance.available) || !amountValue) {
+                $nextBtn.addClass('disabled');
+            }
+            else {
+                $nextBtn.removeClass('disabled');
+            }
+
+            // Summary table update
+            $('.requested.price .euro', this.$dialog).addClass('hidden').text('------');
+            $('.requested.price .local', this.$dialog).text(amountValue ? formatCurrency(amountValue) : '------');
+            $('.fee.price .euro', this.$dialog).addClass('hidden').text('------');
+            $('.fee.price .local', this.$dialog).text('------');
+            $('.received.price .euro', this.$dialog).addClass('hidden').text('------');
+            $('.received.price .local', this.$dialog).text('------');
+
+            megaInput.hideError();
+        }
+
+        // Method text
+        $('.withdraw-txt .method-chosen', $currentStep)
+            .text(affiliateRedemption.getMethodString(affiliateRedemption.requests.first.m));
+
     },
+
+    handleProPlans: function() {
+
+        'use strict';
+
+        const updateRadioButtons = (selection) => {
+            const options = [4, 1, 2, 3];
+            for (const currentOption of options) {
+                const $currentRadio = $(`#redemptionOption${currentOption}.megaquota-option`, this.$dialog);
+                const $button = $currentRadio.children('.green-active');
+                $button.removeClass('radioOn radioOff');
+                if (selection === currentOption) {
+                    $button.addClass('radioOn');
+                }
+                else {
+                    $button.addClass('radioOff');
+                }
+            }
+            const monthsOptions = ['Claim all commission'];
+            for (let i = 1; i <= 24; i++){
+                monthsOptions.push(i);
+            }
+            affiliateRedemption.plan.chosenPlan = selection;
+            const defaultMonths = affiliateRedemption.plan.planDuration || l.duration;
+            affiliateUI.redemptionDialog.__renderDropdown('redemption-plans', monthsOptions,
+                                                          defaultMonths, this.$dialog);
+        };
+
+        const fetchPlansData = () => {
+
+            const $proPlanOptionTemplate = $('.megaquota-option-template', this.$dialog);
+            const $proPlanOptionArea = $('.megaquota-options-wrapper', this.$dialog);
+            $('.megaquota-option', $proPlanOptionArea).remove();
+
+            const acceptedPlans = new Set([4, 1, 2, 3]); // [pro lite, pro 1, pro 2, pro 3]
+            for (const currentPlan of pro.membershipPlans) {
+
+                const storageFormatted = bytesToSize(currentPlan[pro.UTQA_RES_INDEX_STORAGE] * 1073741824, 0);
+                const storageTxt = l[23789].replace('%1', storageFormatted);
+                const bandwidthFormatted = bytesToSize(currentPlan[pro.UTQA_RES_INDEX_TRANSFER] * 1073741824, 0);
+                const bandwidthTxt = l[23790].replace('%1', bandwidthFormatted);
+
+                const planNum = currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
+                const months = currentPlan[pro.UTQA_RES_INDEX_MONTHS];
+
+                // There is a 12 month and 1 month version for each plan,
+                // check that it's the one month version so no duplicate plans shown
+                if (acceptedPlans.has(planNum) && months === 1){
+                    const $clone = $proPlanOptionTemplate.clone();
+
+                    const planName = pro.getProPlanName(planNum);
+                    const id = `redemptionOption${planNum}`;
+
+                    $clone.children('.megaquota-option-label').children('.meqaquota-option-name')
+                        .text(planName);
+                    $clone.children('.megaquota-option-label').children('.meqaquota-option-information')
+                        .text(storageTxt + ' / ' + bandwidthTxt);
+
+                    $clone.removeClass('hidden template').addClass('megaquota-option');
+                    $clone.attr('id', id);
+
+                    $proPlanOptionArea.safeAppend($clone.prop('outerHTML'));
+                    $proPlanOptionArea.children('#' + id).rebind('click', () => {
+                        updateRadioButtons(planNum);
+                        this.updateQuotaSummaryTable(planNum);
+                    });
+                }
+            }
+
+        };
+
+        fetchPlansData();
+        updateRadioButtons(affiliateRedemption.plan.chosenPlan);
+    },
+
+    getFormattedPlanData : (shortform, data) => {
+
+        'use strict';
+
+        shortform = shortform || false;
+
+        // a: amount, la: localAmount, f: fee, lf: localFee, c: currency, m: months, s: storageQuota, t: transferQuota
+        const {a, la, f, lf, c, m, s, t} = data === undefined
+            ? affiliateRedemption.req1res[0]
+            : data;
+
+        let monthsTxt = formatCurrency(m, c, 'number', 3);
+        monthsTxt = mega.icu.format(l[922], monthsTxt);
+
+        // shortform ? n TB : n TB transfer quota
+
+        const storageFormatted = bytesToSize(s * 1073741825, 3, 4);
+        const storageTxt = shortform ? storageFormatted : l[23789].replace('%1', storageFormatted);
+        const bandwidthFormatted = bytesToSize(t * 1073741824, 3, 4);
+        const bandwidthTxt = shortform ? bandwidthFormatted : l[23790].replace('%1', bandwidthFormatted);
+
+        return {
+            a: formatCurrency(a, 'EUR', 'narrowSymbol'),
+            la: formatCurrency(la, c, 'narrowSymbol'),
+            f: formatCurrency(f),
+            lf: formatCurrency(lf),
+            c: c || 'EUR',
+            m: monthsTxt,
+            s: storageTxt,
+            t: bandwidthTxt,
+        };
+    },
+
+    getCurrentPlanInfo : (selection) => {
+
+        'use strict';
+
+        const planInfo = {
+            previousPlanNum : -1,
+            planNum : -1,
+            monthlyPrice : 0,
+            yearlyPrice : 0,
+            monthlyPriceEuros: 0,
+            yearlyPriceEuros : 0,
+            claimAllCommission : false,
+            transferQuota : 0,
+            storageQuota : 0,
+            currency: '',
+        };
+
+        for (const currentPlan of pro.membershipPlans) {
+
+            const months = currentPlan[pro.UTQA_RES_INDEX_MONTHS];
+            const planNum = currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
+
+            planInfo.previousPlanNum = planInfo.planNum;
+            planInfo.planNum = planNum;
+
+            if (planNum === selection && months === 1) {
+                planInfo.monthlyPrice = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
+                planInfo.monthlyPriceEuros = currentPlan[pro.UTQA_RES_INDEX_PRICE];
+                planInfo.transferQuota = currentPlan[pro.UTQA_RES_INDEX_TRANSFER];
+            }
+            else if (planNum === selection && months === 12){
+                planInfo.yearlyPrice = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
+                planInfo.yearlyPriceEuros = currentPlan[pro.UTQA_RES_INDEX_PRICE];
+            }
+            if (planInfo.planNum === selection && planInfo.planNum === planInfo.previousPlanNum
+                && planInfo.planNum !== -1 && planInfo.previousPlanNum !== -1){
+                planInfo.storageQuota = currentPlan[pro.UTQA_RES_INDEX_STORAGE];
+                planInfo.currency = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
+                break;
+            }
+        }
+        return planInfo;
+    },
+
+    updateQuotaSummaryTable : (selection) => {
+
+        'use strict';
+
+        const calculateClaimAllMonths = (availableAmount, pricePerYear, pricePerMonth) => {
+            let months = 0;
+            let counter = 0;
+            while (availableAmount >= pricePerYear && counter <= 100){
+                availableAmount -= pricePerYear;
+                months += 12;
+                counter++;
+            }
+            months += (availableAmount / pricePerMonth);
+            return months;
+        };
+
+        affiliateRedemption.plan.chosenPlan = selection || affiliateRedemption.plan.chosenPlan;
+
+        const $summaryTable = $('.quota-summary', this.$dialog);
+        const $dropdown = $('.duration-dropdown', this.$dialog);
+        const $planSelectMessage = $('.plan-select-message', this.$dialog);
+        const $dialogWindow = $('.mega-dialog.affiliate-redeem.dialog-template-tool', self.$dialog);
+
+        let numMonths;
+
+        numMonths = $('.option.active', $dropdown).data('type');
+        if (numMonths) {
+            $('.redemption-duration-base', $dropdown).removeClass('redemption-duration-default');
+            $('.mega-input-title', $dropdown).removeClass('hidden');
+        }
+        else {
+            $('.duration-dropdown .redemption-duration-base', this.$dialog).addClass('redemption-duration-default');
+            $('.mega-input-title', $dropdown).addClass('hidden');
+        }
+
+        // reset table
+        if (!selection || !numMonths) {
+            $('.pro-plan .plan-info', $summaryTable).text('-');
+            $('.pro-storage .plan-info', $summaryTable).text('-');
+            $('.pro-quota .plan-info', $summaryTable).text('-');
+            $('.pro-duration .plan-info', $summaryTable).text('-');
+            $('.affiliate-redeem .summary-wrap .pro-price .plan-info', this.$dialog)
+                .text(formatCurrency('', M.affiliate.balance.localCurrency, 'narrowSymbol').replace('NaN', '-'));
+            $('.affiliate-redeem .summary-wrap .pro-price .euro', this.$dialog).addClass('hidden');
+            $('.next-btn', this.$dialog).addClass('disabled');
+            $('.insufficient-quota-warning', this.$dialog).addClass('hidden');
+            $planSelectMessage.removeClass('hidden insufficient-quota-warning').addClass('under-price-warning')
+                .text(l.redemption_cost_too_low);
+            return;
+        }
+
+        const planInfo = affiliateUI.redemptionDialog.getCurrentPlanInfo(selection, numMonths);
+
+        if (numMonths === 'Claim all commission'){
+            const claimAllMonths = calculateClaimAllMonths(
+                M.affiliate.balance.available, planInfo.yearlyPriceEuros, planInfo.monthlyPriceEuros);
+            planInfo.claimAllCommission = true;
+            numMonths = claimAllMonths;
+        }
+
+        const planName = pro.getProPlanName(planInfo.planNum);
+
+        const monthsCost = planInfo.monthlyPrice * (numMonths % 12);
+        const yearsCost = planInfo.yearlyPrice * Math.floor(numMonths / 12);
+
+        const monthsCostEuros = planInfo.monthlyPriceEuros * (numMonths % 12);
+        const yearsCostEuros = planInfo.yearlyPriceEuros * Math.floor(numMonths / 12);
+
+        let totalCost;
+        let totalCostEuros;
+        if (planInfo.claimAllCommission){
+            totalCost = M.affiliate.balance.localAvailable;
+            totalCostEuros = M.affiliate.balance.available;
+        }
+        else {
+            totalCost = monthsCost + yearsCost;
+            totalCostEuros = monthsCostEuros + yearsCostEuros;
+        }
+
+        // If the plan is too low cost, reset the table to empty, and warn the user
+        // Otherwise remove the warning
+        if (totalCostEuros < 49.95) {
+            $planSelectMessage.removeClass('hidden insufficient-quota-warning').addClass('under-price-warning')
+                .text(l.redemption_cost_too_low);
+            affiliateUI.redemptionDialog.updateQuotaSummaryTable();
+            return;
+        }
+        $planSelectMessage.addClass('hidden');
+
+        totalCostEuros = totalCostEuros.toFixed(8);
+        totalCost = (totalCostEuros * pro.conversionRate).toFixed(8);
+
+        const dataToFormat = {
+            a: totalCostEuros,
+            la: totalCost,
+            f: 0,
+            lf: 0,
+            c: planInfo.currency,
+            m: numMonths,
+            s: planInfo.storageQuota,
+            t: planInfo.transferQuota * numMonths
+        };
+
+        const {a, la, m, s, t, c} = affiliateUI.redemptionDialog.getFormattedPlanData(true, dataToFormat);
+
+        $('.pro-plan .plan-info', $summaryTable).text(planName);
+        $('.pro-storage .plan-info', $summaryTable).text(s);
+        $('.pro-quota .plan-info', $summaryTable).text(t);
+        $('.pro-duration .plan-info', $summaryTable).text(m);
+        if (!c || c === 'EUR') {
+            $('.affiliate-redeem .summary-wrap .pro-price .plan-info', this.$dialog).text(a + '*');
+            $('.affiliate-redeem .summary-wrap .pro-price .euro', this.$dialog).addClass('hidden');
+        }
+        else {
+            $('.affiliate-redeem .summary-wrap .pro-price .plan-info', this.$dialog).text(la + '*');
+            $('.affiliate-redeem .summary-wrap .pro-price .euro', this.$dialog).text(a).removeClass('hidden');
+        }
+
+        affiliateRedemption.plan.planName = planName;
+        affiliateRedemption.plan.planPriceRedeem = totalCostEuros;
+
+
+        const $nextBtn = $('.next-btn', this.$dialog);
+
+        const cost = affiliateRedemption.plan.planPriceRedeem;
+        const method = affiliateRedemption.requests.first.m;
+        const minValue = M.affiliate.redeemGateways[method].min || 50;
+
+        if (affiliateRedemption.plan.chosenPlan !== -1 && numMonths
+            && cost >= minValue && cost <= M.affiliate.balance.available){
+            $nextBtn.removeClass('disabled');
+        }
+        else {
+            $nextBtn.addClass('disabled');
+        }
+        if (cost > M.affiliate.balance.available){
+            $planSelectMessage.removeClass('hidden under-price-warning').addClass('insufficient-quota-warning')
+                .text(l.redemption_insufficient_available_commission);
+        }
+        else {
+            $planSelectMessage.addClass('hidden');
+        }
+    },
+
+    durationDropdownHandler: function($select) {
+
+        'use strict';
+
+        const $dropdownItem = $('.option', $select);
+        $dropdownItem.rebind('click.inputDropdown', function() {
+
+            const $this = $(this);
+
+            if ($this.hasClass('disabled')) {
+                return;
+            }
+
+            const months = parseInt($this.data('type'));
+
+            $select.removeClass('error');
+            const $item = $('> span', $select);
+            $dropdownItem.removeClass('active').removeAttr('data-state');
+            $this.addClass('active').attr('data-state', 'active');
+            const $dropdownSave = $('.dropdown-item-save', $item);
+            const newText = $('.dropdown-item-text', $this).text();
+            if (months % 12 === 0) {
+                $dropdownSave.removeClass('hidden');
+            }
+            else {
+                $dropdownSave.addClass('hidden');
+            }
+            $('.dropdown-text', $item).text(newText);
+            $item.removeClass('placeholder');
+            $this.trigger('change');
+        });
+    },
+
+    calculatePrice : function(months, monthlyPrice, yearlyPrice) {
+
+        'use strict';
+
+        const monthsCost = monthlyPrice * (months % 12);
+        const yearsCost = yearlyPrice * Math.floor(months / 12);
+        return monthsCost + yearsCost;
+    },
+
+    setActive : function(type, activeItem, $dropdown, $currentStep) {
+
+        'use strict';
+
+        if (type === 'redemption-plans') {
+            this.durationDropdownHandler($dropdown);
+            let currentText;
+            if (activeItem === 'Claim all commission') {
+                currentText = l.redemption_claim_max_months;
+            }
+            else if (parseInt(activeItem)) {
+                currentText = mega.icu.format(l[922], activeItem);
+            }
+            else {
+                currentText = activeItem;
+                currentText = parseInt(activeItem) ? mega.icu.format(l[922], activeItem) : activeItem;
+            }
+            this.updateQuotaSummaryTable(affiliateRedemption.plan.chosenPlan);
+            $('#affi-' + type + ' > span span.dropdown-text', $currentStep).text(currentText);
+        }
+        else {
+            $('#affi-' + type + ' > span', $currentStep)
+                .text(type === 'country' ? M.getCountryName(activeItem) : activeItem);
+        }
+    },
+
+    __renderDropdown : function(type, list, activeItem, $currentStep) {
+
+        'use strict';
+
+        const $selectItemTemplate = $('.templates .dropdown-templates .select-item-template', this.$dialog);
+        const $dropdown = $('#affi-' + type, $currentStep);
+
+        let planInfo;
+        let monthlyPrice;
+        let yearlyPrice;
+
+        if (type === 'redemption-plans') {
+            $('.duration-dropdown', this.$dialog).rebind("change", () => {
+                const chosenDuration = $('.option.active', '.duration-dropdown').data('type');
+                affiliateRedemption.plan.planDuration = chosenDuration.toString();
+                this.updateQuotaSummaryTable(affiliateRedemption.plan.chosenPlan);
+            });
+            $('.dropdown-scroll', $dropdown).empty();
+            planInfo = this.getCurrentPlanInfo(affiliateRedemption.plan.chosenPlan);
+            monthlyPrice = planInfo.monthlyPriceEuros || 0;
+            yearlyPrice = planInfo.yearlyPriceEuros || 0;
+            const price = this.calculatePrice(activeItem, monthlyPrice, yearlyPrice);
+            if ((isNaN(price) || price < 49.95) && affiliateRedemption.plan.planDuration !== 'Claim all commission'){
+                activeItem = l.duration;
+                affiliateRedemption.plan.planDuration = undefined;
+            }
+        }
+
+        $('.mega-input-dropdown', $currentStep).addClass('hidden');
+
+        for (let i = 0; i < list.length; i++) {
+
+            const $clone = $selectItemTemplate.clone().removeClass('select-item-template');
+            $clone.remove();
+
+            const item = escapeHTML(list[i]);
+            let displayName;
+            if (type === 'country'){
+                displayName = M.getCountryName(item);
+            }
+            else if (type === 'redemption-plans'){
+
+                const cost = this.calculatePrice(i, monthlyPrice, yearlyPrice);
+
+                displayName = item === 'Claim all commission'
+                    ? l.redemption_claim_max_months
+                    : mega.icu.format(l[922], item);
+                if (item % 12 === 0){
+                    $clone.children('.dropdown-item-save').removeClass('hidden').text(l.redemption_save_16_percent);
+                }
+                if (cost < 49.95 && item !== 'Claim all commission') {
+                    $clone.addClass('disabled');
+                }
+            }
+            else {
+                displayName = item;
+            }
+            const state = item === activeItem ? 'active' : '';
+            $clone.attr({"data-type": item, "data-state": state});
+            $clone.children('.dropdown-item-text').text(displayName);
+            $clone.addClass(state);
+            $('.dropdown-scroll', $dropdown).safeAppend($clone.prop('outerHTML'));
+        }
+
+        bindDropdownEvents($dropdown);
+        this.setActive(type, activeItem, $dropdown, $currentStep);
+    },
+
 
     displayStep2: function() {
 
         'use strict';
 
         var $currentStep = $('.cells.step2', this.$dialog);
-        var selectItemTemplate = '<div class="option %3" data-state="%4" data-type="%1">%2</div>';
+        $('.cells.right.bitcoin', this.$dialog).removeClass('step1');
 
         // Method text
         $('.withdraw-txt .method-chosen', $currentStep)
@@ -1130,7 +1741,6 @@ affiliateUI.redemptionDialog = {
         $('.fee.price .local', this.$dialog).text('------');
         $('.received.price .euro', this.$dialog).addClass('hidden').text('------');
         $('.received.price .local', this.$dialog).text('------');
-        $('.local-info', this.$dialog).addClass('hidden');
 
         // Country and currency
         var selectedGWData = M.affiliate.redeemGateways[affiliateRedemption.requests.first.m];
@@ -1140,33 +1750,9 @@ affiliateUI.redemptionDialog = {
         var activeCurrency = affiliateRedemption.requests.first.c || seletedGWDefaultData[1] ||
             selectedGWData.data.$[0];
 
-        var __renderDropdown = function(type, list, activeItem) {
+        this.__renderDropdown('country', selectedGWData.data.cc, activeCountry, $currentStep);
+        this.__renderDropdown('currency', selectedGWData.data.$, activeCurrency, $currentStep);
 
-            var $dropdown = $('#affi-' + type, $currentStep);
-            var contentHtml = '';
-
-            $('.mega-input-dropdown', $currentStep).addClass('hidden');
-
-            for (var i = 0; i < list.length; i++) {
-
-                var item = escapeHTML(list[i]);
-                var displayName = type === 'country' ? M.getCountryName(item) : item;
-                var state = item === activeItem ? 'active' : '';
-
-                contentHtml += selectItemTemplate.replace('%1', item).replace('%2', displayName)
-                    .replace('%3', state).replace('%4', state);
-            }
-
-            $('.dropdown-scroll', $dropdown).safeHTML(contentHtml);
-
-            bindDropdownEvents($('#affi-' + type, $currentStep));
-
-            $('#affi-' + type + ' > span', $currentStep)
-                .text(type === 'country' ? M.getCountryName(activeItem) : activeItem);
-        };
-
-        __renderDropdown('country', selectedGWData.data.cc, activeCountry);
-        __renderDropdown('currency', selectedGWData.data.$, activeCurrency);
 
         // If this is bitcoin redemption
         if (affiliateRedemption.requests.first.m === 2) {
@@ -1208,8 +1794,6 @@ affiliateUI.redemptionDialog = {
         var req1 = affiliateRedemption.requests.first;
         var req1res = affiliateRedemption.req1res[0];
 
-        $('.local-info', this.$dialog).addClass('hidden');
-
         // Summary table update
         if (req1.c !== 'EUR') {
             $('.requested.price .euro', this.$dialog).removeClass('hidden')
@@ -1218,7 +1802,6 @@ affiliateUI.redemptionDialog = {
                 .text(`(${formatCurrency(req1res.f)})`);
             $('.received.price .euro', this.$dialog).removeClass('hidden')
                 .text(`(${formatCurrency(affiliateRedemption.requests.first.p - req1res.f)})`);
-            $('.local-info', this.$dialog).removeClass('hidden');
         }
 
         if (affiliateRedemption.requests.first.m === 2) {
@@ -1301,7 +1884,6 @@ affiliateUI.redemptionDialog = {
 
                 var html = '';
                 var safeArgs = [];
-
                 for (var i = 0; i < accTypes.length; i++) {
                     html += selectItemTemplate;
                     safeArgs.push(accTypes[i][0], accTypes[i][0], i, accTypes[i][1]);
@@ -1343,14 +1925,63 @@ affiliateUI.redemptionDialog = {
 
         'use strict';
 
+        if (affiliateRedemption.requests.first.m === 0) {
+            $('.next-btn', this.$dialog).addClass('wide');
+        }
+        else {
+            $('.next-btn', this.$dialog).removeClass('small');
+        }
+        const $summaryTable = $('.quota-summary', this.$dialog);
+
         var $currentStep = $('.cells.step4', this.$dialog);
+
         var firstRequest = affiliateRedemption.requests.first;
         var req1res = affiliateRedemption.req1res[0];
 
-        if (firstRequest.m === 2 && (req1res.lf / req1res.la) > 0.1) {
+        if (firstRequest.m === 0) {
+            $('.bitcoin', $currentStep).addClass('hidden');
+            $('.megaquota', $currentStep).removeClass('hidden');
 
+            const $warning1 = $('.affiliate-redeem .selected-plan-warning1', this.$dialog);
+            const $warning2 = $('.affiliate-redeem .selected-plan-warning2', this.$dialog);
+            const $warning3 = $('.affiliate-redeem .selected-plan-warning3', this.$dialog);
+            const newPlan = affiliateRedemption.plan.chosenPlan;
+            $warning1.addClass('hidden');
+            $warning2.addClass('hidden');
+            $warning3.addClass('hidden');
+            if (u_attr.p === newPlan){
+                $warning3.removeClass('hidden');
+            }
+            else if (u_attr.p % 4 > newPlan % 4){
+                $warning2.removeClass('hidden');
+            }
+            else if (u_attr.p % 4 < newPlan % 4) {
+                $warning1.removeClass('hidden');
+            }
+
+            const planName = pro.getProPlanName(affiliateRedemption.plan.chosenPlan);
+
+            const {a, la, m, s, t} = this.getFormattedPlanData(true);
+
+            const $euroArea = $('.affiliate-redeem .summary-wrap .pro-price .euro', this.$dialog);
+
+            $('.pro-plan .plan-info', $summaryTable).text(planName);
+            $('.pro-storage .plan-info', $summaryTable).text(s);
+            $('.pro-quota .plan-info', $summaryTable).text(t);
+            $('.pro-duration .plan-info', $summaryTable).text(m);
+            $('.affiliate-redeem .summary-wrap .pro-price .plan-info', this.$dialog).text(la + '*');
+            if (affiliateRedemption.req1res[0].c === 'EUR'){
+                $euroArea.addClass('hidden');
+            }
+            else {
+                $euroArea.text(a).removeClass('hidden');
+            }
+
+        }
+        else if (firstRequest.m === 2 && (req1res.lf / req1res.la) > 0.1){
+            $('.bitcoin', $currentStep).removeClass('hidden');
+            $('.megaquota', $currentStep).addClass('hidden');
             $('.fm-dialog-overlay').off('click.redemptionClose');
-
             msgDialog('warningb:!^' + l[78] + '!' + l[79], '', l[24964], l[24965], reject => {
 
                 if (reject) {
@@ -1360,7 +1991,9 @@ affiliateUI.redemptionDialog = {
                     $('.fm-dialog-overlay').rebind('click.redemptionClose', this.hide.bind(this, false));
                 }
             });
+
         }
+        $('.email', $currentStep).text(u_attr.email);
 
         affiliateRedemption.redemptionAccountDetails($currentStep, firstRequest.m);
 
@@ -1696,11 +2329,12 @@ affiliateUI.redemptionHistory = {
                 $('.expanded', $table).removeClass('expanded');
 
                 var rid = $this.data('rid');
+                const state = $this.data('state');
 
                 // After scrolling animation and loading is finihsed expand the item.
-                M.affiliate.getRedemptionDetail(rid).then(function(res) {
+                M.affiliate.getRedemptionDetail(rid, state).then((res) => {
 
-                    affiliateRedemption.fillBasicHistoryInfo($detailBlock, res);
+                    affiliateRedemption.fillBasicHistoryInfo($detailBlock, res, state);
                     affiliateRedemption.redemptionAccountDetails($detailBlock, res.gw, res);
 
                     $table.addClass('expanded-item');
@@ -1797,14 +2431,23 @@ affiliateUI.redemptionHistory = {
             for (var i = 0; i < this.list.length; i++) {
 
                 var item = this.list[i];
-                var itemStatus = affiliateRedemption.getRedemptionStatus(item.s);
+                let proSuccessful;
+                if (item.gw === 0) {
+                    if (item.hasOwnProperty('state')) {
+                        proSuccessful = item.state === 4;
+                    }
+                    else {
+                        proSuccessful = item.s === 4;
+                    }
+                }
+                var itemStatus = affiliateRedemption.getRedemptionStatus(item.s, proSuccessful);
                 var la = parseFloat(item.la);
 
                 // Filling item data for the summary part
                 var $itemSummary = $itemSummaryTemplate.clone().removeClass('hidden template')
                     .addClass(itemStatus.class);
 
-                $('.receipt', $itemSummary).text(item.ridd);
+                $('.receipt', $itemSummary).text(item.ridd || item.rid);
                 $('.date', $itemSummary).text(time2date(item.ts, 1));
                 $('.method', $itemSummary).text(affiliateRedemption.getMethodString(item.gw));
                 if (item.c === 'XBT') {
@@ -1814,7 +2457,7 @@ affiliateUI.redemptionHistory = {
                     $('.amount', $itemSummary).text(formatCurrency(la, item.c, 'code'));
                 }
                 $('.status span', $itemSummary).addClass(itemStatus.c).text(itemStatus.s);
-                $('.link', $itemSummary).attr('data-rid', item.rid);
+                $('.link', $itemSummary).attr('data-rid', item.rid).attr('data-state', item.s);
 
                 // Lets prefill details part to reduce looping
                 var $itemDetail = $itemDetailTemplate.clone().removeClass('template');
@@ -2157,7 +2800,28 @@ affiliateUI.purchaseIndex = {
         this.$purchaseChartBlock = $('.mega-data-box.purchase', affiliateUI.$body);
 
         this.count();
-        this.drawChart();
+    },
+
+    getPlans: function(updatePurchaseIndex) {
+
+        'use strict';
+
+        // Set r: 1 so that pro-lite will also be shown
+        const payload = {a: 'utqa', nf: 2, p: 1, r: 1};
+        api_req(payload, {
+            callback: function(results) {
+
+                const plans = [];
+
+                for (var i = 1; i < results.length; i++) {
+                    plans.push([
+                        results[i].id,
+                        results[i].al,
+                    ]);
+                }
+                updatePurchaseIndex(plans);
+            }
+        });
     },
 
     /**
@@ -2177,42 +2841,53 @@ affiliateUI.purchaseIndex = {
         this.monthCount = 0;
         this.countedData = {};
 
-        pro.membershipPlans.forEach(function(item) {
-            proPlanIDMap[item[0]] = item[1];
-        });
+        const updatePurchaseIndex = (plans) => {
 
-        creditList.forEach(function(item) {
-            if (thisMonth.start <= item.gts && item.gts <= thisMonth.end) {
-                self.monthCount++;
-            }
+            plans.forEach((item) => {
+                proPlanIDMap[item[0]] = item[1];
+            });
 
-            if (item.b) {
-                self.countedData.b = ++self.countedData.b || 1;
-            }
-            else {
-                var index = proPlanIDMap[item.si];
-                self.countedData[index] = ++self.countedData[index] || 1;
-            }
-        });
+            creditList.forEach((item) => {
+                if (thisMonth.start <= item.gts && item.gts <= thisMonth.end) {
+                    self.monthCount++;
+                }
 
-        $('.affiliate-total-pur', this.$purchaseChartBlock).text(this.totalCount);
-        $('.charts-head .compare span', this.$purchaseChartBlock).text(this.monthCount);
+                const index = proPlanIDMap[item.si];
+                if (item.b && index !== 101) {
+                    self.countedData.b = ++self.countedData.b || 1;
+                }
+                else {
+                    self.countedData[index] = ++self.countedData[index] || 1;
+                }
+            });
 
-        $('.list-item.prol .label', this.$purchaseChartBlock)
-            .text(formatPercentage(this.countedData[4] / this.totalCount || 0));
-        $('.list-item.prol .num', this.$purchaseChartBlock).text(this.countedData[4] || 0);
-        $('.list-item.pro1 .label', this.$purchaseChartBlock)
-            .text(formatPercentage(this.countedData[1] / this.totalCount || 0));
-        $('.list-item.pro1 .num', this.$purchaseChartBlock).text(this.countedData[1] || 0);
-        $('.list-item.pro2 .label', this.$purchaseChartBlock)
-            .text(formatPercentage(this.countedData[2] / this.totalCount || 0));
-        $('.list-item.pro2 .num', this.$purchaseChartBlock).text(this.countedData[2] || 0);
-        $('.list-item.pro3 .label', this.$purchaseChartBlock)
-            .text(formatPercentage(this.countedData[3] / this.totalCount || 0));
-        $('.list-item.pro3 .num', this.$purchaseChartBlock).text(this.countedData[3] || 0);
-        $('.list-item.business .label', this.$purchaseChartBlock)
-            .text(formatPercentage(this.countedData.b / this.totalCount || 0));
-        $('.list-item.business .num', this.$purchaseChartBlock).text(this.countedData.b || 0);
+            $('.affiliate-total-pur', this.$purchaseChartBlock).text(this.totalCount);
+            $('.charts-head .compare span', this.$purchaseChartBlock).text(this.monthCount);
+
+            $('.list-item.prol .label', this.$purchaseChartBlock)
+                .text(formatPercentage(this.countedData[4] / this.totalCount || 0));
+            $('.list-item.prol .num', this.$purchaseChartBlock).text(this.countedData[4] || 0);
+            $('.list-item.pro1 .label', this.$purchaseChartBlock)
+                .text(formatPercentage(this.countedData[1] / this.totalCount || 0));
+            $('.list-item.pro1 .num', this.$purchaseChartBlock).text(this.countedData[1] || 0);
+            $('.list-item.pro2 .label', this.$purchaseChartBlock)
+                .text(formatPercentage(this.countedData[2] / this.totalCount || 0));
+            $('.list-item.pro2 .num', this.$purchaseChartBlock).text(this.countedData[2] || 0);
+            $('.list-item.pro3 .label', this.$purchaseChartBlock)
+                .text(formatPercentage(this.countedData[3] / this.totalCount || 0));
+            $('.list-item.pro3 .num', this.$purchaseChartBlock).text(this.countedData[3] || 0);
+            $('.list-item.pro101 .label', this.$purchaseChartBlock)
+                .text(formatPercentage(this.countedData[101] / this.totalCount || 0));
+            $('.list-item.pro101 .num', this.$purchaseChartBlock).text(this.countedData[101] || 0);
+            $('.list-item.business .label', this.$purchaseChartBlock)
+                .text(formatPercentage(this.countedData.b / this.totalCount || 0));
+            $('.list-item.business .num', this.$purchaseChartBlock).text(this.countedData.b || 0);
+
+            affiliateUI.purchaseIndex.drawChart();
+        };
+
+        // Needs to use a version of the membership plans that includes the pro-lite plan
+        affiliateUI.purchaseIndex.getPlans(updatePurchaseIndex);
     },
 
     /**
@@ -2239,6 +2914,7 @@ affiliateUI.purchaseIndex = {
                         this.countedData[1],
                         this.countedData[2],
                         this.countedData[3],
+                        this.countedData[101],
                         this.countedData.b,
                         $.isEmptyObject(this.countedData) ? 1  : 0
                     ],
@@ -2248,6 +2924,7 @@ affiliateUI.purchaseIndex = {
                         $ctx.css('--label-red'),
                         $ctx.css('--label-purple'),
                         $ctx.css('--label-blue'),
+                        $ctx.css('--label-green'),
                         $ctx.css('--surface-grey-2')
                     ],
                     borderWidth: 0

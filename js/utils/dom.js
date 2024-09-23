@@ -32,7 +32,17 @@ function parseHTML(markup) {
 
     markup = String(markup).replace(/<!--[\S\s]*?-->/g, '');
 
-    var dumb = {'SCRIPT': 1, 'STYLE': 1, 'SVG': 1, 'XML': 1, 'OBJECT': 1, 'IFRAME': 1, 'EMBED': 1, 'MARQUEE': 1};
+    const dumb = {
+        'SCRIPT': 1,
+        'STYLE': 1,
+        'SVG': 1,
+        'XML': 1,
+        'OBJECT': 1,
+        'IFRAME': 1,
+        'EMBED': 1,
+        'MARQUEE': 1,
+        'META': 1
+    };
 
     $.parseHTML(markup, doc)
         .forEach((node) => {
@@ -224,3 +234,159 @@ function domAttributeForEach(node, callback) {
 
     return false;
 }
+
+/**
+ * Parses an XML fragment into a plain object.
+ * @param {XMLDocument|Element} xml document
+ * @param {String} [name] element name
+ * @returns {Object} the one
+ */
+function xmlParser(xml, name) {
+    'use strict';
+    if (!xml.children.length) {
+        return xmlParser.value(name, xml.textContent);
+    }
+    const res = Object.create(null);
+    const {safePropertyName} = xmlParser;
+
+    for (let i = 0; i < xml.children.length; ++i) {
+        const element = xml.children[i];
+        const name = safePropertyName(element.nodeName);
+        const children = xmlParser(element, name);
+
+        if (res[name]) {
+            if (!Array.isArray(res[name])) {
+                res[name] = [res[name]];
+            }
+            res[name].push(children);
+        }
+        else {
+            res[name] = children;
+        }
+    }
+
+    return freeze(res);
+}
+
+/** @property xmlParser.fromString */
+lazy(xmlParser, 'fromString', () => {
+    const parser = new DOMParser();
+    return (str) => {
+        const doc = parser.parseFromString(str || '<empty/>', 'application/xml');
+        const elm = doc.documentElement;
+        const err = doc.querySelector('parsererror') || elm.nodeName === 'Error' && xmlParser(elm);
+
+        if (err) {
+            const message = String(err.textContent || err.message || err);
+            throw new MEGAException(message, err, err.code || 'SyntaxError');
+        }
+        return xmlParser(elm);
+    };
+});
+
+/** @property xmlParser.fromJSON */
+lazy(xmlParser, 'fromJSON', () => {
+    const {safePropertyName} = xmlParser;
+
+    return (str, nc) => JSON.parse(str, function(key, value) {
+
+        if (value) {
+
+            if (Array.isArray(value)) {
+                value = [...new Set(value[Symbol.iterator] ? value : Array.from(value))];
+            }
+            else if (typeof value === 'object') {
+                value = freeze(value);
+            }
+        }
+
+        if (Object.getPrototypeOf(this)) {
+            Object.setPrototypeOf(this, null);
+        }
+
+        if (key) {
+            const prop = safePropertyName(key, nc);
+
+            if (prop !== key) {
+
+                this[prop] = value;
+                return;
+            }
+        }
+
+        return value;
+    });
+});
+
+/** @property xmlParser.safePropertyName */
+lazy(xmlParser, 'safePropertyName', () => {
+    const invalid = new Set(['prototype', ...Reflect.ownKeys(Object.prototype)]);
+
+    return (p, nc) => {
+        let name = typeof p === 'string' && (nc ? p : p.replace(/^[A-Z]/, (v) => v.toLowerCase()));
+
+        if (!name || name[0] === '_' || invalid.has(name)) {
+            console.error('Found restricted property name on payload...', p);
+            name = Symbol.for(`(invalid):~~${p}`);
+        }
+
+        return name;
+    };
+});
+
+/** @property xmlParser.value */
+lazy(xmlParser, 'value', () => {
+    const map = freeze({
+        'null': null,
+        'true': true,
+        'false': false
+    });
+
+    return (key, value) => {
+        let res = map[value];
+        if (res !== undefined) {
+            return res;
+        }
+
+        res = parseFloat(value);
+        if (res === Number(value) && Number.isFinite(res)) {
+            return res;
+        }
+
+        // if (key && key.endsWith('Date')) {
+        //     value = Date.parse(value);
+        // }
+
+        return value;
+    };
+});
+
+/** @property xmlParser.fetch */
+Object.defineProperty(xmlParser, 'fetch', {
+    value: async function xmlParserFetch(...args) {
+        if (self.d) {
+            console.info('Sending XML-Fetch request...', ...args);
+        }
+        let res = await fetch(...args);
+        const headers = Object.create(null);
+        const status = `${res.status} ${res.statusText}`;
+
+        for (const [k, v] of res.headers) {
+            headers[k.toLowerCase()] = v;
+        }
+        const text = await res.text();
+
+        res = Object.assign(
+            Object.create(null),
+            xmlParser[headers['content-type'] === 'application/json' ? 'fromJSON' : 'fromString'](text)
+        );
+
+        Object.defineProperties(res, {
+            [Symbol.for('status')]: {value: status},
+            [Symbol.for('response')]: {value: text},
+            [Symbol.for('response-headers')]: {value: freeze(headers)}
+        });
+
+        return freeze(res);
+    }
+});

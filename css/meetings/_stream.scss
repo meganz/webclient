@@ -4,35 +4,59 @@
     }
 }
 
-
 .stream {
     position: relative;
     float: left;
-    width: calc(100% - 300px);
+    width: calc(100% - 345px);
     height: 100%;
     background: #222;
+
+    &.full { width: 100%; }
+
+    &.hovered ~ .stream-controls,
+    &.hovered ~ .sidebar-controls,
+    &.hovered ~ .recording-control { bottom: 0; }
+    &.hovered .stream-head { top: 0; }
+
+    @import '_participantsNotice.scss';
+    @import '_participantsBlock.scss';
 
     &-wrapper{
         display: grid;
         position: relative;
-        width: 100%;
+        width: calc(100% - 32px);
         height: calc(100% - 160px);
+        margin: 0 auto;
         padding-top: 64px;
         padding-bottom: 96px;
+
+        &.with-participants-block {
+            float: left;
+            width: calc(100% - 310px);
+
+            @include small-screen {
+                width: calc(100% - 230px);
+            }
+        }
     }
-
-    &.full { width: 100%; }
-
-    &.hovered .stream-controls { bottom: 0; }
-    &.hovered .sidebar-controls { right: 24px; }
-    &.hovered .stream-head, .stream-head.active { top: 0; }
-
-    @import '_streamControls.scss';
-    @import '_sidebarControls.scss';
-    @import '_participantsNotice.scss';
 
     &-container {
         margin: auto;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+
+        &.single-stream {
+            height: 100%;
+            @media only screen and (max-width: 900px) { height: auto; }
+        }
+
+        &.dual-stream {
+            height: 60%;
+            @media only screen and (max-width: 1100px) { height: auto; }
+        }
     }
 
     .with-notice {
@@ -40,6 +64,7 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
+        height: auto;
         z-index: 11;
     }
 
@@ -119,6 +144,7 @@
         width: 100%;
         z-index: 10;
     }
+
     .on-hold-overlay {
         z-index: 10;
         width: 100%;
@@ -135,8 +161,12 @@
 // --------------------------------------------------------------------
 
 .carousel {
-    width: 100%;
+    float: left;
     height: 100%;
+
+    @include small-screen {
+        float: right;
+    }
 
     &-container {
         width: 100%;
@@ -153,90 +183,13 @@
             transition: transform 500ms, opacity 800ms, z-index 500ms;
 
             &.active {
-                display: block;
                 position: relative;
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
                 z-index: 900;
             }
         }
-    }
-}
-
-.carousel-button-prev,
-.carousel-button-next {
-    position: absolute;
-    top: 50%;
-    width: 96px;
-    height: 96px;
-    transform: translateY(-50%);
-    border-radius: 200px;
-    background: rgba(0, 0, 0, 0.4);
-    border: 0 none;
-    cursor: pointer;
-    z-index: 1;
-    opacity: 0.6;
-    transition: opacity 500ms ease-in-out;
-
-    &:hover {
-        opacity: 1;
-    }
-
-    &:hover div {
-        display: block;
-    }
-
-    @include small-screen {
-        top: auto;
-        bottom: 322px;
-        width: 56px;
-        height: 56px;
-        transform: none;
-    }
-
-    i {
-        display: block;
-        margin: 0 auto;
-        --icon-size: 48px;
-        --mask-color: var(--icon-rest);
-
-        @include small-screen {
-            --icon-size: 28px;
-        }
-    }
-
-    span {
-        position: fixed;
-        bottom: -9999px;
-        visibility: hidden;
-    }
-
-    div {
-        display: none;
-        position: absolute;
-        left: 50%;
-        bottom: -30px;
-        padding: 3px 6px;
-        transform: translateX(-50%);
-        border-radius: 4px;
-        font: var(--text-body2);
-        color: var(--secondary-white);
-        background-color: rgba(0, 0, 0, 0.4);
-
-        @include small-screen {
-            top: -32px;
-            bottom: auto;
-        }
-    }
-}
-
-.carousel-button-prev {
-    left: 8px;
-}
-
-.carousel-button-next {
-    right: 8px;
-
-    @include small-screen {
-        right: 21px;
     }
 }
 
@@ -272,4 +225,9 @@
             justify-content: center;
         }
     }
+}
+
+&.with-timeout-banner .stream-wrapper {
+    height: calc(100% - 200px);
+    padding-top: 102px;
 }

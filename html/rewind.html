@@ -1,0 +1,172 @@
+<div class="sidebar-container">
+    <div class="sidebar-header">
+        <button class="close-sidebar" aria-label="Close">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+        <div class="folder-details">
+            <div class="folder-label">
+                [$rewind_folder_details_label]
+            </div>
+            <div class="folder-info">
+                <div class="folder-icon">
+                    <span class="item-type-icon"><img></span>
+                </div>
+                <div class="folder-name">
+                </div>
+                <div class="folder-close-placeholder">
+                </div>
+            </div>
+            <div class="folder-beta">
+                [$rewind_beta_tag]
+            </div>
+        </div>
+        <div class="folder-history">
+            <div class="history-label">
+                [$rewind_datepicker_label]
+            </div>
+            <div class="history-datepicker">
+                <div class="datepicker-container">
+                    <input 
+                        class="datepicker-date"
+                        readonly />
+                    <div class="datepicker-icon">
+                        <i class="sprite-fm-mono icon-calendar2"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="folder-filter">
+            <div class="filter-select">
+                <div class="mega-input dropdown-input filter-select-button disabled">
+                    <span class="filter-label">
+                    </span>
+                    <i class="sprite-fm-mono icon-dropdown2 filter-icon hidden"></i>
+                    <div class="mega-input-dropdown hidden">
+                        <div class="dropdown-scroll">
+                            <div class="option" data-value="all">
+                                <div class="radioOn radio"></div>
+                                <span class="option-label"></span>
+                            </div>
+                            <hr class="separator" />
+                            <div class="label">
+                                [$rewind_folder_filter_select_show_label]:
+                            </div>
+                            <div class="option" data-value="added">
+                                <div class="radioOff radio"></div>
+                                <i class="sprite-fm-mono icon-add-filled item-added item-icon"></i>
+                                <span class="option-label"></span>
+                            </div>
+                            <div class="option" data-value="modified">
+                                <div class="radioOff radio"></div>
+                                <i class="sprite-fm-mono icon-changed item-modified item-icon"></i>
+                                <span class="option-label"></span>
+                            </div>
+                            <div class="option" data-value="removed">
+                                <div class="radioOff radio"></div>
+                                <i class="sprite-fm-mono icon-removed item-removed item-icon"></i>
+                                <span class="option-label"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="sidebar-content">
+        <div class="content-upgrade content-item hidden">
+            <div class="upgrade-main-image"></div>
+            <div class="upgrade-title"></div>
+            <div class="rewind-description"></div>
+            <div class="upgrade-description">
+            </div>
+        </div>
+        <div class="content-empty content-item hidden">
+            <div class="empty-folder">
+                <i class="sprite-fm-mono icon-folder-filled"></i>
+            </div>
+            <div class="empty-label">[$empty_download_dlg_title]</div>
+        </div>
+        <div class="content-tree-cache-empty content-item hidden">
+            <div class="empty-folder">
+                <i class="sprite-fm-mono icon-folder-time-filled"></i>
+            </div>
+            <div class="empty-title">[$rewind_empty_tree_cache_title]</div>
+            <div class="empty-description">[$rewind_empty_tree_cache_desc]</div>
+        </div>
+        <div class="content-loading content-item hidden">
+            <div class="loading-gif"></div>
+            <div class="progress"></div>
+        </div>
+        <div class="content-folder content-item">
+            <div class="folder-list list-content">
+            </div>
+            <div class="folder-download hidden">
+                <button class="mega-button positive upgrade-purchase-button hidden">
+                    <span>[$rewind_upgrade_to_restore]</span>
+                </button>
+                <button class="mega-button positive js-rewind">
+                    <span>[$rewind]</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<template id="rewind-filter-list-file">
+    <div class="folder-item">
+        <div class="folder-main">
+            <div class="folder-pusher"></div>
+            <div class="folder-icon">
+                <span class="item-type-icon"><img></span>
+            </div>
+            <label></label>
+        </div>
+        <div class="folder-details">
+            <div class="folder-spacer"></div>
+            <div class="folder-location">
+                <i class="sprite-fm-mono icon-folder"></i>
+                <span></span>
+            </div>
+            <div class="separator">
+                <i class="sprite-fm-mono icon-dot"></i>
+            </div>
+            <div class="folder-timestamp">
+                <i class="sprite-fm-mono"></i>
+                <span></span>
+            </div>
+        </div>
+    </div>
+</template>
+<template id="rewind-list-file">
+    <div class="folder-item">
+        <div class="folder-main">
+            <div class="folder-pusher"></div>
+            <div class="dropdown-spacer"></div>
+            <div class="folder-icon">
+                <span class="item-type-icon"><img></span>
+            </div>
+            <label></label>
+        </div>
+        <div class="folder-details hidden">
+            <div class="folder-pusher"></div>
+            <div class="dropdown-spacer"></div>
+            <div class="folder-spacer"></div>
+            <div class="folder-timestamp">
+                <i class="sprite-fm-mono"></i>
+                <span></span>
+            </div>
+        </div>
+    </div>
+</template>
+<template id="rewind-list-folder">
+    <div class="folder-item">
+        <div class="folder-main">
+            <div class="folder-pusher"></div>
+            <i class="sprite-fm-mono icon-dropdown2 toggle-section"></i>
+            <div class="folder-icon">
+                <span class="item-type-icon"><img></span>
+            </div>
+            <label></label>
+        </div>
+    </div>
+</template>

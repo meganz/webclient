@@ -8,6 +8,7 @@ import Search from './search.jsx';
 import Footer from './footer.jsx';
 import Nil from './nil.jsx';
 import Link from '../../../link.jsx';
+import { reactStringWrap } from "../../../../../ui/utils.jsx";
 
 export const HAS_CONTACTS = () => {
     const keys = M.u.keys();
@@ -97,9 +98,14 @@ export default class Invite extends MegaRenderMixin {
 
     handleAdd = () => {
         const { selected } = this.state;
-        const { chatRoom, onClose } = this.props;
+        const { call, chatRoom, onClose } = this.props;
 
         if (selected.length > 0) {
+            // Waiting rooms -- allow the invited peer to join the call immediately without having them go through
+            // the waiting room list.
+            if (chatRoom.options.w) {
+                call?.sfuClient?.wrAllowJoin(selected);
+            }
             chatRoom?.trigger('onAddUserRequest', [selected]);
             onClose?.();
         }
@@ -230,37 +236,22 @@ export default class Invite extends MegaRenderMixin {
         );
     };
 
-    getPublicLink = () => {
-        const { chatRoom } = this.props;
-        if (chatRoom && chatRoom.isMeeting) {
-            chatRoom.updatePublicHandle(
-                undefined,
-                () => {
-                    if (this.isMounted()) {
-                        this.setState({
-                            link: chatRoom.publicLink ? `${getBaseUrl()}/${chatRoom.publicLink}` : l[20660]
-                        });
-                    }
-                }
-            );
-        }
-    };
-
     componentDidMount() {
         super.componentDidMount();
         this.getFrequentContacts();
-        this.getPublicLink();
     }
 
     render() {
         const { NAMESPACE } = Invite;
-        const { link, value, loading, selected, field, contactsInitial } = this.state;
-        const { chatRoom, onClose } = this.props;
-        const IS_MEETING = chatRoom && chatRoom.isMeeting;
+        const { value, loading, selected, contactsInitial } = this.state;
+        const { chatRoom, call, onClose } = this.props;
+        const { isMeeting, publicLink } = chatRoom || {};
+        const callPartsLength = chatRoom.getCallParticipants().length;
 
         return (
             <ModalDialogsUI.ModalDialog
                 {...this.state}
+                callPartsLength={callPartsLength}
                 name={NAMESPACE}
                 className={`
                     ${NAMESPACE}
@@ -269,29 +260,22 @@ export default class Invite extends MegaRenderMixin {
                 hideOverlay={true}
                 onClose={onClose}>
                 <div className={`${NAMESPACE}-head`}>
-                    <h2>{IS_MEETING ? l.invite_participants /* `Invite participants` */ : l[8726] /* `Invite` */}</h2>
-                    {IS_MEETING && (
+                    <h2>{isMeeting ? l.invite_participants /* `Invite participants` */ : l[8726] /* `Invite` */}</h2>
+                    {isMeeting && publicLink && (
                         <>
                             <p>{l.copy_and_share /* `Copy this link to send your invite` */}</p>
                             <div className="link-input-container">
                                 <Button
-                                    className={`mega-button large positive ${link ? '' : 'disabled'}`}
-                                    onClick={() => link && copyToClipboard(link, l[371] /* `Copied to clipboard` */)}>
-                                    {!link ? l[7006] /* `Loading...` */ : l[1394] /* `Copy link` */}
+                                    className={`mega-button large positive ${publicLink ? '' : 'disabled'}`}
+                                    onClick={() =>
+                                        publicLink &&
+                                        copyToClipboard(
+                                            `${getBaseUrl()}/${publicLink}`,
+                                            l[371] /* `Copied to clipboard` */
+                                        )
+                                    }>
+                                    {!publicLink ? l[7006] /* `Loading...` */ : l[1394] /* `Copy link` */}
                                 </Button>
-                                <Link
-                                    className="view-link-control"
-                                    field={field}
-                                    onClick={() => this.setState({ field: !field })}>
-                                    {field ? l.collapse_meeting_link : l.expand_meeting_link}
-                                    <i className={`sprite-fm-mono ${field ? 'icon-arrow-up' : 'icon-arrow-down'}`} />
-                                </Link>
-                                {field && link && (
-                                    <div className="chat-link-input">
-                                        <i className="sprite-fm-mono icon-link"/>
-                                        <input type="text" readOnly={true} value={link}/>
-                                    </div>
-                                )}
                             </div>
                         </>
                     )}
@@ -302,6 +286,29 @@ export default class Invite extends MegaRenderMixin {
                             onChange={this.handleSearch}
                         />
                     )}
+                    {
+                        call.sfuClient.callLimits &&
+                        call.sfuClient.callLimits.usr &&
+                        callPartsLength >= call.sfuClient.callLimits.usr &&
+                        <div className={`${NAMESPACE}-user-limit-banner`}>
+                            {
+                                call.organiser === u_handle ?
+                                    reactStringWrap(
+                                        l.invite_limit_banner_organiser,
+                                        '[A]',
+                                        Link,
+                                        {
+                                            className: 'invite-limit-link',
+                                            onClick() {
+                                                window.open(`${getBaseUrl()}/pro`, '_blank', 'noopener,noreferrer');
+                                                eventlog(500260);
+                                            }
+                                        }
+                                    ) :
+                                    l.invite_limit_banner_host
+                            }
+                        </div>
+                    }
                 </div>
                 <div className="fm-dialog-body">
                     <div className={`${NAMESPACE}-contacts`}>

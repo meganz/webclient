@@ -55,7 +55,7 @@ lazy(mega, 'backupCenter', () => {
         // The whole account was reloaded, missed updates could not have been applied in an orderly fashion.
         '27': l.err_reloaded_acc,
         // Unable to figure out some node correspondence.
-        '28': l.err_n_correspondence,
+        '28': l[47],
         // Backup externally modified.
         '29': l.err_externally_modified,
         // Backup source path not below drive path.
@@ -125,9 +125,7 @@ lazy(mega, 'backupCenter', () => {
 
                 mCreateElement('i', {
                     'class': 'sprite-fm-uni icon-hazard simpletip',
-                    'data-simpletip': l.offline_device_tip.includes('{count}') ? // Temp solution for missing string
-                        mega.icu.format(l.offline_device_tip, daysNum).replace('{count}', daysNum) :
-                        l.offline_device_tip,
+                    'data-simpletip': mega.icu.format(l.offline_device_tip, daysNum),
                     'data-simpletipposition': 'top',
                     'data-simpletipoffset': 2
                 }, statusParentNode);
@@ -271,7 +269,8 @@ lazy(mega, 'backupCenter', () => {
                         device: res[i].d,
                         handle: res[i].t === 5 && n.p ? n.p : '', // Set parent node handle if it's a Backup folder
                         folders: [res[i]],
-                        type: res[i].t
+                        type: res[i].t,
+                        dua: res[i].dua
                     });
                 }
             }
@@ -288,7 +287,7 @@ lazy(mega, 'backupCenter', () => {
 
             this.lastupdate = Date.now();
 
-            const res = await M.req('sf');
+            const {result: res} = await api.req({a: 'sf'});
 
             if (d) {
                 console.log('Backup/sync folders API response: sf ->');
@@ -337,7 +336,7 @@ lazy(mega, 'backupCenter', () => {
                                         return false;
                                     }
                                     open(
-                                        megasync.getMegaSyncUrl() || `${getAppBaseUrl()}#sync`,
+                                        megasync.getMegaSyncUrl() || 'https://mega.io/desktop',
                                         '_blank',
                                         'noopener,noreferrer'
                                     );
@@ -384,10 +383,10 @@ lazy(mega, 'backupCenter', () => {
 
             // If `id` is not a folder handle, stop the sync/backup
             if (id && id !== h) {
-                const res = await M.req({a: 'sr', id: id});
+                const {result} = await api.req({a: 'sr', id: id});
 
                 if (d) {
-                    console.log(`Remove backup/sync response: sr -> ${res}`);
+                    console.log(`Remove backup/sync response: sr -> ${result}`);
                 }
             }
 
@@ -395,8 +394,8 @@ lazy(mega, 'backupCenter', () => {
 
                 // Set `sds` attr to make sure that SDK will try to clear heartbeat record too
                 if (id && id !== h) {
-                    node.sds = node.sds ? node.sds += `,${id}:8` : `${id}:8`;
-                    await api_setattr(node, mRandomToken('sds'));
+                    const sds = node.sds ? `${node.sds},${id}:8` : `${id}:8`;
+                    await api.setNodeAttributes(node, {sds});
                 }
 
                 // Backup/stopped backup folder
@@ -405,7 +404,7 @@ lazy(mega, 'backupCenter', () => {
                     // Move backup to target folder
                     if (target) {
 
-                        await M.moveNodes([h], target, true, 3);
+                        await M.moveNodes([h], target, 3);
                     }
                     // Remove
                     else {
@@ -499,7 +498,6 @@ lazy(mega, 'backupCenter', () => {
             $changePathButton.addClass('disabled');
             $confirmButton.addClass('disabled');
             $input.val(inputValue);
-            $.mcselected = '';
 
             $closeButton.rebind('click.closeDialog', () => {
 
@@ -532,26 +530,18 @@ lazy(mega, 'backupCenter', () => {
 
                 closeDialog();
 
-                selectFolderDialog(async() => {
-                    closeDialog();
-                    target = M.RootID;
-                    inputValue = ``;
-                    M.safeShowDialog('stop-backup', $backupDialog);
+                selectFolderDialog('move')
+                    .then((folder) => {
+                        folder = folder || target;
 
-                    if ($.mcselected) {
-
-                        target = $.mcselected;
-                        await dbfetch.geta([target]);
-                    }
-
-                    const path = M.getPath(target).reverse();
-
-                    for (let i = 0; i < path.length; i++) {
-
-                        inputValue += path[i] === M.RootID ? `${l[18051]}/` : `${M.d[path[i]].name}/`;
-                    }
-                    $input.val(inputValue);
-                }, 'move');
+                        M.safeShowDialog('stop-backup', $backupDialog);
+                        return folder === M.RootID ? folder : dbfetch.get(folder).then(() => folder);
+                    })
+                    .then((folder) => {
+                        target = folder;
+                        $input.val(M.getPath(folder).reverse().map(h => M.getNameByHandle(h)).join('/'));
+                    })
+                    .catch(tell);
             });
 
             $confirmButton.rebind('click.stopBackup', (e) => {
@@ -563,15 +553,11 @@ lazy(mega, 'backupCenter', () => {
 
                 const deleteFolder = $('input:checked', $radioWrappers).val();
 
-                loadingDialog.pshow();
                 closeDialog();
-                $.mcselected = '';
+                loadingDialog.pshow();
 
                 this.stopSync(this.selectedSync.id, this.selectedSync.nodeHandle, deleteFolder !== '1' && target)
-                    .then(nop)
-                    .catch((ex) => {
-                        msgDialog('warninga', l[135], l[47], ex);
-                    })
+                    .catch(tell)
                     .finally(() => {
 
                         loadingDialog.phide();
@@ -842,7 +828,7 @@ lazy(mega, 'backupCenter', () => {
             // If target is device card
             else if ($deviceCard.length === 1) {
 
-                menuItems = '.properties-item';
+                menuItems = '.properties-item, .device-rename-item';
 
                 // "Show in Cloud drive" for Backups only
                 if ($deviceCard.attr('data-handle') && M.d[$deviceCard.attr('data-handle')]) {
@@ -900,6 +886,7 @@ lazy(mega, 'backupCenter', () => {
                     $currentFolder.addClass('active');
 
                     selectionManager.add_to_selection($currentFolder.attr('data-handle'));
+                    mega.ui.mInfoPanel.reRenderIfVisible($.selected);
                     this.selectedSync = {
                         'nodeHandle': $currentFolder.attr('data-handle'),
                         'id': $currentFolder.attr('data-id') || $currentFolder.attr('data-handle'),
@@ -927,6 +914,7 @@ lazy(mega, 'backupCenter', () => {
 
                     $currentDevice.addClass('active');
                     this.deviceCardStates[$currentDevice.attr('data-id')].selected = 'active ';
+                    mega.ui.mInfoPanel.reRenderIfVisible($.selected);
                 }
             });
 
@@ -1206,7 +1194,7 @@ lazy(mega, 'backupCenter', () => {
                 mCreateElement('i', {
                     'class': 'sprite-fm-mono warning icon-disable'
                 }, statusParentNode);
-                mCreateElement('span', {'class': 'warning'}, statusParentNode).textContent = l[7070];
+                mCreateElement('span', {'class': 'warning'}, statusParentNode).textContent = l.backup_disabled_by_user;
 
                 if (!isDeviceCard) {
 
@@ -1248,6 +1236,7 @@ lazy(mega, 'backupCenter', () => {
                 const foldersNumber = this.data[i].folders.length;
                 const savedDeviceStates = this.deviceCardStates[this.data[i].device] || {};
                 let deviceState = '';
+                let deviceUserAgent = '';
                 let deviceName = '';
                 let deviceNode = null;
                 let headerNode = null;
@@ -1288,10 +1277,12 @@ lazy(mega, 'backupCenter', () => {
 
                 // Get device name
                 deviceName = this.getDeviceName(this.data[i].device, this.data[i].type, n);
+                deviceUserAgent = this.data[i].dua;
 
                 // Show Device icon
+                const dIcon = deviceIcon(deviceUserAgent || deviceName, this.data[i].type);
                 mCreateElement('i', {
-                    'class':`medium-file-icon ${deviceIcon(deviceName, this.data[i].type)}`
+                    'class':`medium-file-icon item-type-icon-90 icon-${dIcon}-90`
                 }, nameNode);
 
                 // Show Device name
@@ -1307,7 +1298,7 @@ lazy(mega, 'backupCenter', () => {
 
                 // Show Number of backups
                 mCreateElement('span', {'class': 'high'}, foldersInfoNode).textContent =
-                    foldersNumber === 1 ? l[834] : l[832].replace('[X]', foldersNumber);
+                    mega.icu.format(l.folder_count, foldersNumber);
 
                 // Show Warning icon if any folder have issues
                 if (syncStatuses.disabledSyncs) {
@@ -1343,6 +1334,121 @@ lazy(mega, 'backupCenter', () => {
             }
         }
 
+        // Device rename dialog
+        renameDialog() {
+
+            const $deviceEl = $('.backup-body.active', this.$contentBlock);
+            const deviceId = $deviceEl.data('id');
+
+            if (deviceId) {
+
+                var $dialog = $('.mega-dialog.device-rename-dialog');
+                var $input = $('input', $dialog);
+                var errMsg = '';
+                const maxDeviceNameLength = 32;
+
+                const deviceData = mega.backupCenter.data.find((dev) => dev.device === deviceId);
+
+                const deviceName = mega.backupCenter.dn[deviceId];
+                const deviceIconClass = `icon-${deviceIcon(
+                    deviceData.dua || deviceName,
+                    deviceData.type
+                )}-90`;
+
+                M.safeShowDialog('device-rename-dialog', () => {
+                    $dialog.removeClass('hidden').addClass('active');
+                    $input.trigger("focus");
+                    return $dialog;
+                });
+
+                $('button.js-close, .device-rename-dialog-button.cancel', $dialog)
+                    .rebind('click.dialogClose', closeDialog);
+
+                $('.device-rename-dialog-button.rename', $dialog).rebind('click.dialogRename', () => {
+                    if ($dialog.hasClass('active')) {
+
+                        var value = $input.val();
+                        errMsg = '';
+
+                        if (deviceName && deviceName !== value) {
+
+                            value = value.trim();
+
+                            if (!value) {
+                                errMsg = l.device_rename_dialog_warning_empty;
+                            }
+                            else if (M.isSafeName(value) && value.length <= maxDeviceNameLength) {
+
+                                if (Object.values(mega.backupCenter.dn).includes(value)) {
+                                    errMsg = l.device_rename_dialog_warning_duplicate;
+                                }
+                                else {
+                                    mega.backupCenter.dn[deviceId] = value;
+                                    loadingDialog.show();
+                                    mega.attr.set('dn', mega.attr.encodeObjectValues(mega.backupCenter.dn), false, true)
+                                        .then(() => mega.backupCenter.renderContent(true))
+                                        .catch(tell)
+                                        .finally(() => loadingDialog.hide());
+                                }
+                            }
+                            else if (value.length > 32) {
+                                errMsg = mega.icu.format(l.device_rename_dialog_warning_length, maxDeviceNameLength);
+                            }
+                            else {
+                                errMsg = l[24708];
+                            }
+
+                            if (errMsg) {
+                                $('.duplicated-input-warning span', $dialog).safeHTML(errMsg);
+                                $dialog.addClass('duplicate');
+                                $input.addClass('error');
+
+                                setTimeout(() => {
+                                    $dialog.removeClass('duplicate');
+                                    $input.removeClass('error');
+
+                                    $input.trigger("focus");
+                                }, 2000);
+
+                                return;
+                            }
+                        }
+                        closeDialog();
+                    }
+                });
+
+                $input.val(deviceName);
+
+                $('.item-type-icon-90', $dialog)
+                    .attr('class',
+                          `item-type-icon-90 ${deviceIconClass}`
+                    );
+
+                $input.rebind('focus.deviceRenameDialog', () => {
+                    $dialog.addClass('focused');
+                });
+
+                $input.rebind('blur.deviceRenameDialog', () => {
+                    $dialog.removeClass('focused');
+                });
+
+                $input.rebind('keydown.deviceRenameDialog', (event) => {
+                    // distingushing only keydown evet, then checking if it's Enter in order to preform the action'
+                    if (event.keyCode === 13) { // Enter
+                        $('.device-rename-dialog-button.rename', $dialog).click();
+                    }
+                    else if (event.keyCode === 27) { // ESC
+                        closeDialog();
+                    }
+                    else {
+                        $dialog.removeClass('duplicate').addClass('active');
+                        $input.removeClass('error');
+                    }
+                });
+
+            }
+        }
+
         /**
          * Populate folder list
          * @param {Object} deviceNode An Element Object, representing Device card element
@@ -1368,6 +1474,7 @@ lazy(mega, 'backupCenter', () => {
                 tableHeaderNode = mCreateElement('tr', undefined, tableNode);
                 mCreateElement('th', undefined, tableHeaderNode); // Folder name without label
                 mCreateElement('th', undefined, tableHeaderNode).textContent = l[488]; // Status
+                mCreateElement('th', undefined, tableHeaderNode).textContent = l[93]; // Type
                 mCreateElement('th', undefined, tableHeaderNode)
                     .textContent = l.last_updated_label; // 'Last updated'
                 mCreateElement('th', undefined, tableHeaderNode)
@@ -1387,7 +1494,8 @@ lazy(mega, 'backupCenter', () => {
                     decodedFolderName.bn : n.name;
                 const isSelected = folder.id && folder.id === this.selectedSync.id
                         || folder.h === this.selectedSync.id;
-                let icon = '';
+                let icon = 'icon-folder-24';
+                let type = '';
 
                 // Create new table if > 10 folders for pages navigator
                 if (foldersCounter === 10) {
@@ -1409,17 +1517,23 @@ lazy(mega, 'backupCenter', () => {
                 }, tableNode);
 
                 if (folder.id && folder.t === 5) {
-                    icon = ' folder-backup';
+                    icon = 'icon-folder-backup-24 folder-backup';
+                    type = l[20606];
                 }
-                else if (folder.id && folder.t !== 3 && folder.t !== 4) {
-                    icon = ' folder-sync';
+                else if (folder.id && folder.t === 3) {
+                    icon = 'icon-folder-camera-uploads-24 folder-camera';
+                    type = l.camera_uploads;
+                }
+                else if (folder.id && folder.t !== 4) {
+                    icon = 'icon-folder-sync-24 folder-sync';
+                    type = l[17621];
                 }
 
                 // Show folder name
                 folderCellNode = mCreateElement('td', undefined, folderRowNode);
                 folderInfoNode = mCreateElement('div', {'class': 'item-name'}, folderCellNode);
                 // sprite-fm-uni icon-folder-24 for vector
-                mCreateElement('i', {'class': `transfer-filetype-icon folder ${icon}`}, folderInfoNode);
+                mCreateElement('i', {'class': `item-type-icon ${icon}`}, folderInfoNode);
                 mCreateElement('span', {
                     'title': this.decodeFolderData(folder.l).lf || ''
                 }, folderInfoNode).textContent = folderName;
@@ -1430,6 +1544,12 @@ lazy(mega, 'backupCenter', () => {
 
                 // Show sync status
                 this.setSyncStatus(syncStatus, folderInfoNode);
+
+                // Create Type cell
+                folderCellNode = mCreateElement('td', undefined, folderRowNode);
+
+                // Show Used storage
+                folderCellNode.textContent = type;
 
                 // Create Last Updated cell
                 folderCellNode = mCreateElement('td', undefined, folderRowNode);
@@ -1479,7 +1599,7 @@ lazy(mega, 'backupCenter', () => {
             // Open mobile apps page
             $('.mobile a', this.$emptyBlock).rebind('click.openMobile', (e) => {
                 e.preventDefault();
-                loadSubPage('mobile');
+                mega.redirect('mega.io', 'mobile', false, false, false);
             });
         }
 

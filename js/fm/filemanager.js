@@ -18,6 +18,8 @@ function FileManager() {
     this.columnsWidth.cloud.versions = { max: 180, min: 130, curr: 130, viewed: false };
     this.columnsWidth.cloud.playtime = { max: 180, min: 130, curr: 130, viewed: false };
     this.columnsWidth.cloud.extras = { max: 140, min: 93, curr: 93, viewed: true };
+    this.columnsWidth.cloud.accessCtrl = { max: 180, min: 130, curr: 130, viewed: true };
+    this.columnsWidth.cloud.fileLoc = { max: 180, min: 130, curr: 130, viewed: false };
 
     this.columnsWidth.makeNameColumnStatic = function() {
 
@@ -94,32 +96,38 @@ FileManager.prototype.constructor = FileManager;
 
 FileManager.prototype.showExpiredBusiness = function() {
     'use strict';
-    M.require('businessAcc_js', 'businessAccUI_js').done(function() {
-        var business_ui = new BusinessAccountUI();
-        business_ui.showExpiredDialog(u_attr.b.m);
+    M.require('businessAcc_js', 'businessAccUI_js').done(() => {
+        const isMaster = u_attr.b && u_attr.b.m || u_attr.pf;
+        const business_ui = new BusinessAccountUI();
+        business_ui.showExpiredDialog(isMaster);
     });
 };
 
 /** Check if this is a business expired account, or ODW paywall. */
 FileManager.prototype.isInvalidUserStatus = function() {
     'use strict';
+    let res = false;
+
     if (mega.paywall) {
-        if (u_attr.b && u_attr.b.s === -1) {
+        if ((u_attr.b && u_attr.b.s === -1) || (u_attr.pf && u_attr.pf.s === -1)) {
             if ($.hideContextMenu) {
                 $.hideContextMenu();
             }
             M.showExpiredBusiness();
-            return true;
+            res = true;
         }
-        if (u_attr.uspw) {
+        else if (u_attr.uspw) {
             if ($.hideContextMenu) {
                 $.hideContextMenu();
             }
-            M.showOverStorageQuota(EPAYWALL);
-            return true;
+            M.showOverStorageQuota(EPAYWALL).catch(dump);
+            res = true;
         }
     }
-    return false;
+    if (res) {
+        window.onerror = null;
+    }
+    return res;
 };
 
 /**
@@ -127,11 +135,8 @@ FileManager.prototype.isInvalidUserStatus = function() {
  * @details Former renderfm()
  * @returns {MegaPromise}
  */
-FileManager.prototype.initFileManager = function() {
+FileManager.prototype.initFileManager = async function() {
     "use strict";
-
-    var promise = new MegaPromise();
-    var tpromise;
 
     if (d) {
         console.time('renderfm');
@@ -139,44 +144,119 @@ FileManager.prototype.initFileManager = function() {
 
     this.initFileManagerUI();
     this.sortByName();
+    this.renderTree();
 
-    if (is_mobile) {
-        tpromise = MegaPromise.resolve();
-    }
-    else {
-        tpromise = this.renderTree();
-        tpromise.always(function() {
-            delay('render:path_breadcrumbs', () => M.renderPathBreadcrumbs());
-        });
+    const $treesub = $(`#treesub_${M.RootID}`);
+    if (!$treesub.hasClass('opened')) {
+        $treesub.addClass('opened');
     }
 
-    tpromise
-        .always(function() {
-            var $treesub = $('#treesub_' + M.RootID);
-            if (!$treesub.hasClass('opened')) {
-                $treesub.addClass('opened');
+    const path = $.autoSelectNode && M.getNodeByHandle($.autoSelectNode).p || M.currentdirid || getLandingPage();
+
+    if (!pfid && !is_mobile && u_type) {
+        const s4e = u_attr.s4;
+        const pTag = 's4-setup';
+
+        if (d) {
+            console.assert(!window[pTag], 'S4 Setup already ongoing...');
+        }
+
+        if (s4e && !window[pTag]) {
+            const hold = !!this.getNodeByHandle(path.slice(0, 8)).s4;
+            window[pTag] = Date.now();
+
+            const s4load =
+                Promise.allSettled([this.getPersistentData(pTag), this.require('s4')])
+                    .then(([{value}]) => {
+                        this.setPersistentData(pTag, Date.now()).catch(dump);
+
+                        const cnt = Object.keys(this.c[this.RootID] || {})
+                            .map((h) => this.d[h]).filter((n) => n && n.s4);
+
+                        const res = [cnt, value];
+                        return cnt.length && value ? dbfetch.geta(cnt.map(n => n.h)).then(() => res) : res;
+                    })
+                    .then(([cnt, pending]) => {
+                        const promises = [];
+
+                        if (pending) {
+                            if (d) {
+                                pending = new Date(pending).toISOString();
+                                console.warn('Previous S4 Container creation did not complete.', pending);
+                            }
+
+                            while (cnt.length) {
+                                const n = cnt.pop();
+
+                                if (Object.keys(this.c[n.h] || {}).length) {
+                                    cnt.push(n);
+                                    if (d) {
+                                        console.error(`S4 Container ${n.h} is not empty.`, cnt);
+                                    }
+                                    break;
+                                }
+
+                                promises.push(
+                                    api.setNodeAttributes(n, {name: `${pTag}.lost&found`})
+                                        .then(() => this.moveToRubbish([n.h]))
+                                );
+                            }
+                        }
+
+                        if (!cnt.length) {
+                            return Promise.allSettled(promises)
+                                .then(() => s4.kernel.container.create(true));
+                        }
+                    })
+                    .then(() => {
+                        window[pTag] = null;
+                        this.delPersistentData(pTag).dump(pTag);
+                        $('.js-s4-tree-panel').removeClass('hidden');
+                        return this.buildtree({h: 's4'}, this.buildtree.FORCE_REBUILD);
+                    })
+                    .catch((ex) => {
+                        reportError(ex);
+                        if (hold) {
+                            throw ex;
+                        }
+                    });
+
+            if (hold) {
+                // We're (re)loading over a s4-page, hold it up.
+                await s4load;
             }
+        }
 
-            var path = $.autoSelectNode && M.getNodeByHandle($.autoSelectNode).p || M.currentdirid || getLandingPage();
+        if (mega.rewindEnabled) {
 
-            if (path) {
-                mBroadcaster.once('fm:initialized', SoonFc(fmLeftMenuUI));
-            }
-
-            M.openFolder(path, true)
-                .always(function() {
-                    if (megaChatIsReady) {
-                        megaChat.renderMyStatus();
-                    }
-
+            Promise.resolve(M.require('rewind'))
+                .then(() => {
                     if (d) {
-                        console.timeEnd('renderfm');
+                        console.info('REWIND Initialized.', [mega.rewind]);
                     }
-
-                    promise.resolve.apply(promise, arguments);
+                })
+                .catch((ex) => {
+                    reportError(ex);
+                    delete mega.rewind;
                 });
-        });
-    return promise;
+        }
+    }
+
+    if (path) {
+        this.onFileManagerReady(fmLeftMenuUI);
+    }
+
+    const res = await this.openFolder(path, true);
+
+    if (megaChatIsReady) {
+        megaChat.renderMyStatus();
+    }
+
+    if (d) {
+        console.timeEnd('renderfm');
+    }
+
+    return res;
 };
 
 /**
@@ -194,7 +274,7 @@ FileManager.prototype.onFileManagerReady = function(ifMaster, callback) {
 
     callback = (function(callback) {
         return function() {
-            if (!ifMaster || mBroadcaster.crossTab.master) {
+            if (!ifMaster || mBroadcaster.crossTab.owner) {
                 onIdle(callback);
             }
         };
@@ -234,18 +314,27 @@ FileManager.prototype.initFileManagerUI = function() {
             || $.dialog === 'discount-offer'
             || $.dialog === 'voucher-info-dlg'
             || $.dialog === "chat-incoming-call"
-            || $.dialog === 'onboardingDialog'
             || $.dialog === 'stripe-pay'
             || $.dialog === 'start-meeting-dialog'
+            || $.dialog === 'meetings-call-consent'
+            || $.dialog === 'fingerprint-dialog'
+            || $.dialog === 'fingerprint-admin-dlg'
+            || $.dialog === 'meetings-schedule-dialog'
+            || $.dialog === 'upgrade-to-pro-dialog'
             || String($.dialog).startsWith('verify-email')
+            || String($.dialog).startsWith('s4-managed')
             || localStorage.awaitingConfirmationAccount) {
-
             return false;
         }
         showLoseChangesWarning().done(function() {
             closeDialog(ev);
         });
         $.hideContextMenu();
+
+        if (is_eplusplus && megaChatIsReady && M.chat) {
+            // e++ in chat so don't navigate away.
+            return;
+        }
 
         // For ephemeral session redirect to 'fm' page
         // if user clicks overlay instead Yes/No or close icon 'x'
@@ -290,17 +379,10 @@ FileManager.prototype.initFileManagerUI = function() {
                     }
                 });
             }
-
-            // reposition click hint, if opened
-            if (mega.cttHintTimer) {
-                M.showClickHint(true);
-            }
             $.tresizer();
         });
 
-        if (!M.tree[M.RootID]) {
-            $('button.l-pane-visibility').trigger('click');
-        }
+        $('button.l-pane-visibility').trigger('click');
     }
     else {
         $('.nw-fm-left-icons-panel .logo').addClass('hidden');
@@ -310,9 +392,9 @@ FileManager.prototype.initFileManagerUI = function() {
 
     $.doDD = function(e, ui, a, type) {
 
-        // Prevent drop behavior for the `Local` component
-        // See: ui/meetings/local.jsx
-        if (ui.helper.hasClass('local-stream')) {
+        // Prevent drop behavior for the `FloatingVideo` component
+        // See: ui/meetings/float.jsx
+        if (ui.helper.hasClass('float-video') || !$(ui.draggable).hasClass('ui-draggable')) {
             return;
         }
 
@@ -329,11 +411,11 @@ FileManager.prototype.initFileManagerUI = function() {
 
         var c = $(ui.draggable).attr('class');
         var t, ids, dd;
-
+        let id;
 
         if (c && c.indexOf('nw-fm-tree-item') > -1) {
             // tree dragged:
-            var id = $(ui.draggable).attr('id');
+            id = $(ui.draggable).attr('id');
             if (id.indexOf('treea_') > -1) {
                 ids = [id.replace('treea_', '')];
             }
@@ -349,7 +431,7 @@ FileManager.prototype.initFileManagerUI = function() {
         }
 
         // Checks selected/dragseleted items has folder on it
-        const hasFolder = ids.some((id) => M.getNodeByHandle(id).t);
+        const hasFolder = ids && ids.some((id) => M.getNodeByHandle(id).t);
 
         // Workaround a problem where we get over[1] -> over[2] -> out[1]
         if (a === 'out' && $.currentOver !== $(e.target).attr('id')) {
@@ -358,7 +440,18 @@ FileManager.prototype.initFileManagerUI = function() {
 
         if (type == 1) {
             // tree dropped:
-            var c = $(e.target).attr('class');
+            c = $(e.target).attr('class');
+
+            // If this is a tree item but it is overflowed from container
+            if (c && c.includes('nw-fm-tree-item')) {
+                const treeBound = document.querySelector('.js-myfiles-panel').getBoundingClientRect();
+
+                if (ui.offset.top < treeBound.top || ui.offset.top > treeBound.bottom ||
+                    ui.offset.left > treeBound.right || ui.offset.top > treeBound.bottom) {
+                    $(e.target).removeClass('dragover');
+                    return false;
+                }
+            }
             if (c && c.indexOf('nw-fm-left-icon') > -1) {
                 dd = 'nw-fm-left-icon';
                 if (a === 'drop') {
@@ -377,6 +470,17 @@ FileManager.prototype.initFileManagerUI = function() {
                 if (c.indexOf('cloud-drive') > -1) {
                     // Drag and drop to the cloud drive in the file manager left panel
                     t = M.RootID;
+                }
+                else if (c.includes('s4') && M.tree.s4) {
+                    const cn = s4.utils.getContainersList();
+
+                    // Drag and drop folder to the only container or skip
+                    if (cn.length === 1 && M.isFolder(ids)) {
+                        t = cn[0].h;
+                    }
+                    else {
+                        dd = 'noop';
+                    }
                 }
                 else if (c.indexOf('rubbish-bin') > -1) {
                     // Drag and drop to the rubbish bin in the file manager left panel
@@ -403,7 +507,7 @@ FileManager.prototype.initFileManagerUI = function() {
                 }
             }
             else {
-                var t = $(e.target).attr('id');
+                t = $(e.target).attr('id');
                 if (t && t.indexOf('treea_') > -1) {
                     t = t.replace('treea_', '');
                 }
@@ -417,7 +521,7 @@ FileManager.prototype.initFileManagerUI = function() {
         }
         else {
             // grid dropped:
-            var c = $(e.target).attr('class');
+            c = $(e.target).attr('class');
             if (c && c.indexOf('folder') > -1) {
                 t = $(e.target).attr('id');
             }
@@ -446,7 +550,7 @@ FileManager.prototype.initFileManagerUI = function() {
             // if (a !== 'noop') $('.dragger-block').addClass('drag');
         }
         else if (a === 'over') {
-            var id = $(e.target).attr('id');
+            id = $(e.target).attr('id');
             if (!id) {
                 $(e.target).uniqueId();
                 id = $(e.target).attr('id');
@@ -460,7 +564,7 @@ FileManager.prototype.initFileManagerUI = function() {
                         h = id.replace('treea_', '');
                     }
                     else {
-                        var c = $(id).attr('class');
+                        c = $(id).attr('class');
                         if (c && c.indexOf('cloud-drive-item') > -1) {
                             h = M.RootID;
                         }
@@ -493,7 +597,7 @@ FileManager.prototype.initFileManagerUI = function() {
                 $.draggingClass = ('dndc-download');
             }
             else if (dd === 'nw-fm-left-icon') {
-                var c = '' + $(e.target).attr('class');
+                c = String($(e.target).attr('class'));
 
                 $.draggingClass = ('dndc-warning');
                 if (c.indexOf('rubbish-bin') > -1) {
@@ -533,7 +637,8 @@ FileManager.prototype.initFileManagerUI = function() {
                 $.draggingClass = ('dndc-to-conversations');
             }
             else {
-                $.draggingClass = M.d[t] ? 'dndc-warning' : 'dndc-move';
+                const {type} = M.isCustomView(t) || {};
+                $.draggingClass = M.d[t] || type === 's4' ? 'dndc-warning' : 'dndc-move';
             }
 
             $('body').addClass($.draggingClass);
@@ -556,7 +661,7 @@ FileManager.prototype.initFileManagerUI = function() {
                 // drop over a chat window
                 var currentRoom = megaChat.getCurrentRoom();
                 assert(currentRoom, 'Current room missing - this drop action should be impossible.');
-                currentRoom.attachNodes(ids);
+                currentRoom.attachNodes(ids).catch(dump);
             }
             else if (dd === 'move') {
                 nRevert();
@@ -571,8 +676,9 @@ FileManager.prototype.initFileManagerUI = function() {
                         }
                     }
                     else {
+                        loadingDialog.pshow();
                         M.moveNodes($.moveids, $.movet)
-                            .done(function(moves) {
+                            .then((moves) => {
                                 if (moves
                                     && M.currentdirid !== 'out-shares'
                                     && M.currentdirid !== 'public-links'
@@ -580,7 +686,15 @@ FileManager.prototype.initFileManagerUI = function() {
                                     && String(M.currentdirid).split("/")[0] !== "search") {
                                     $ddelm.remove();
                                 }
-                            });
+                            })
+                            .catch((ex) => {
+                                if (ex !== EBLOCKED) {
+                                    // user canceled file-conflict dialog.
+                                    tell(ex);
+                                }
+                            })
+                            .finally(() => loadingDialog.phide());
+
                         if (window.selectionManager) {
                             selectionManager.resetTo($.movet);
                         }
@@ -591,22 +705,22 @@ FileManager.prototype.initFileManagerUI = function() {
                 nRevert();
                 $.copyids = ids;
                 $.copyt = t;
-                setTimeout(function() {
-                    M.copyNodes($.copyids, $.copyt, (dd === 'copydel'), new MegaPromise())
-                        .done(function() {
+                setTimeout(() => {
+                    M.copyNodes($.copyids, $.copyt, dd === 'copydel')
+                        .then(() => {
 
                             // Update files count...
                             if (M.currentdirid === 'shares' && !M.viewmode) {
                                 M.openFolder('shares', 1);
                             }
                         })
-                        .fail(function(error) {
-                            if (error === EOVERQUOTA) {
+                        .catch((ex) => {
+                            if (ex === EOVERQUOTA) {
                                 return msgDialog('warninga', l[135], l[8435]);
                             }
                             // Tell the user there was an error unless he cancelled the file-conflict dialog
-                            if (error !== EINCOMPLETE) {
-                                msgDialog('warninga', l[135], l[47], api_strerror(error));
+                            if (ex !== EINCOMPLETE) {
+                                tell(ex);
                             }
                         });
                 }, 50);
@@ -650,6 +764,7 @@ FileManager.prototype.initFileManagerUI = function() {
         var ALLOWED_CLASSES = [
             'contact-details-user-name',
             'contact-details-email',
+            'js-selectable-text',
             'nw-conversations-name'
         ];
         var ALLOWED_PARENTS =
@@ -664,7 +779,7 @@ FileManager.prototype.initFileManagerUI = function() {
         }
 
         for (var i = ALLOWED_CLASSES.length; i--;) {
-            if (target.classList.contains(ALLOWED_CLASSES[i])) {
+            if (target.classList && target.classList.contains(ALLOWED_CLASSES[i])) {
                 return;
             }
         }
@@ -720,15 +835,15 @@ FileManager.prototype.initFileManagerUI = function() {
             $('#fmholder').css('cursor', 'col-resize');
         });
 
-        $fmholder.rebind('mouseup.colresize', function() {
+        $(document).rebind('mouseup.colresize', () => {
             M.columnsWidth.makeNameColumnStatic();
-            $('#fmholder').css('cursor', '');
-            $fmholder.off('mouseup.colresize');
+            $fmholder.css('cursor', '');
             $fmholder.off('mousemove.colresize');
+            $(document).off('mouseup.colresize');
         });
     });
 
-    $fmholder
+    $('.ps', $fmholder)
         .rebind('ps-scroll-left.fm-x-scroll ps-scroll-right.fm-x-scroll', function(e) {
             if (!e || !e.target) {
                 console.warn('no scroll event info...!');
@@ -744,7 +859,8 @@ FileManager.prototype.initFileManagerUI = function() {
     $('.fm-files-view-icon').rebind('click', function() {
         $.hideContextMenu();
 
-        var viewValue = $(this).hasClass('listing-view') ? 0 : 1;
+        const viewIcon = $(this);
+        var viewValue = viewIcon.hasClass('media-view') ? 2 : viewIcon.hasClass('listing-view') ? 0 : 1;
 
         if (fmconfig.uiviewmode | 0) {
             mega.config.set('viewmode', viewValue);
@@ -752,13 +868,18 @@ FileManager.prototype.initFileManagerUI = function() {
         else {
             fmviewmode(M.currentdirid, viewValue);
         }
+        $('.fm-files-view-icon').removeClass('active');
 
-        if (folderlink && M.currentdirid.substr(0, 6) === 'search') {
+        if (folderlink && String(M.currentdirid).startsWith('search')) {
             M.viewmode = viewValue;
             M.renderMain();
         }
         else {
             M.openFolder(M.currentdirid, true).then(reselect.bind(null, 1));
+        }
+
+        if (viewValue === 2 && mega.ui.mNodeFilter) {
+            mega.ui.mNodeFilter.resetFilterSelections();
         }
 
         return false;
@@ -767,9 +888,16 @@ FileManager.prototype.initFileManagerUI = function() {
     $('.fm-folder-upload, .fm-file-upload').rebind('click', (element) => {
         $.hideContextMenu();
         if (element.currentTarget.classList.contains('fm-folder-upload')) {
+
+            // Log that User clicks on Upload folder button
+            eventlog(500009);
+
             $('#fileselect2').click();
         }
         else {
+            // Log that User clicks on Upload file button
+            eventlog(500011);
+
             $('#fileselect1').click();
         }
     });
@@ -782,7 +910,7 @@ FileManager.prototype.initFileManagerUI = function() {
 
             a = event.target.parentNode;
             currentNodeClass = event.target.classList;
-            if (!currentNodeClass.length) {
+            if (a && !currentNodeClass.length) {
                 currentNodeClass = a.classList;
             }
             if (currentNodeClass && currentNodeClass.contains('dropdown')
@@ -797,15 +925,15 @@ FileManager.prototype.initFileManagerUI = function() {
                 $('.breadcrumb-dropdown').removeClass('active');
             }
         }
-
+        $('.dropdown-search').addClass('hidden');
         $('.nw-sorting-menu').addClass('hidden');
         $('.colour-sorting-menu').addClass('hidden');
-        $('.nw-tree-panel-arrows').removeClass('active');
-        $('.nw-fm-tree-item').removeClass('dragover');
+        $('.nw-tree-panel-arrows.active').removeClass('active');
+        $('.nw-fm-tree-item.dragover').removeClass('dragover');
         $('.nw-fm-tree-item.hovered').removeClass('hovered');
-        $('.data-block-view .file-settings-icon').removeClass('active');
-        $('.column-settings.overlap').removeClass('c-opened');
-        $('.js-statusbarbtn.options').removeClass('c-opened');
+        $('.data-block-view .file-settings-icon.active').removeClass('active');
+        $('.column-settings.overlap.c-opened').removeClass('c-opened');
+        $('.js-statusbarbtn.options.c-opened').removeClass('c-opened');
 
         const $jqe = $('.shared-details-info-block .fm-share-download');
         if ($jqe.hasClass('active')) {
@@ -862,7 +990,8 @@ FileManager.prototype.initFileManagerUI = function() {
             return;
         }
         var $target = $(e.target);
-        var exclude = '.upgradelink, .campaign-logo, .resellerbuy, .linkified, a.red, a.mailto, a.top-social-button';
+        var exclude = '.upgradelink, .campaign-logo, .resellerbuy, .linkified, '
+            + 'a.red, a.mailto, a.top-social-button, .notif-help, .vpn-link';
 
         if ($target.attr('type') !== 'file'
             && !$target.is(exclude)
@@ -900,7 +1029,7 @@ FileManager.prototype.initFileManagerUI = function() {
     var self = this;
 
     if (!this.fmTabState || this.fmTabState['cloud-drive'].root !== M.RootID) {
-        this.fmTabState = {
+        this.fmTabState = freeze({
             'cloud-drive': { // My-files
                 root: M.RootID,
                 prev: null,
@@ -945,10 +1074,19 @@ FileManager.prototype.initFileManagerUI = function() {
             'rubbish-bin':     {root: M.RubbishID, prev: null},
             'backup-center':   {root: 'devices', prev: null},
             'file-requests':   {root: 'file-requests',    prev: null}
-        };
+        });
+
+        this.fmTabPages = deepFreeze(
+            Object.entries(this.fmTabState)
+                .reduce((o, [k, v]) => {
+                    o[k] = {[k]: -2, [v.root]: -1, ...array.to.object(v.subpages || [])};
+                    return o;
+                }, Object.create(null))
+        );
     }
 
     var isMegaSyncTransfer = true;
+
     $('.js-fm-tab').rebind('click.fmTabState', function() {
         treesearch = false;
         var clickedClass = this.className;
@@ -998,8 +1136,11 @@ FileManager.prototype.initFileManagerUI = function() {
         var activeTab = self.fmTabState[activeClass];
 
         if (activeTab) {
-            if (activeTab.root === M.currentrootid || activeTab.root === 'chat' ||
-                activeTab.subpages && activeTab.subpages.indexOf(M.currentrootid || M.currentdirid) !== -1) {
+            if (activeTab.root === M.currentrootid
+                || activeTab.root === 'chat'
+                || M.isAlbumsPage()
+                || activeTab.subpages && activeTab.subpages.includes(M.currentrootid || M.currentdirid)
+            ) {
                 activeTab.prev = M.currentdirid;
                 M.lastActiveTab = activeClass;
             }
@@ -1021,7 +1162,6 @@ FileManager.prototype.initFileManagerUI = function() {
         }
 
         if (this.classList.contains('account') || this.classList.contains('dashboard')) {
-            $.hideTopMenu();
 
             if (u_type === 0) {
                 if (this.classList.contains('account')) {
@@ -1039,6 +1179,8 @@ FileManager.prototype.initFileManagerUI = function() {
                 }
                 self.fmTabState.dashboard.prev = null;
                 loadSubPage('fm/dashboard');
+
+                eventlog(500445);
             }
             else {
                 loadSubPage('fm/account');
@@ -1046,9 +1188,16 @@ FileManager.prototype.initFileManagerUI = function() {
             return false;
         }
 
+        const isGalleryRedirect = this.dataset.locationPref
+            && (M.isAlbumsPage() || M.isGalleryPage() || this.matches('.nw-fm-left-icon.gallery'));
+
         for (var tab in self.fmTabState) {
             if (~clickedClass.indexOf(tab)) {
                 tab = self.fmTabState[tab];
+
+                if (tab.root === 'transfers' && pfcol) {
+                    break;
+                }
 
                 var targetFolder = null;
 
@@ -1057,7 +1206,7 @@ FileManager.prototype.initFileManagerUI = function() {
                 }
                 // Clicked on the currently active tab, should open the root (e.g. go back)
                 else if (clickedClass.indexOf(activeClass) !== -1) {
-                    targetFolder = tab.root;
+                    targetFolder = (isGalleryRedirect) ? this.dataset.locationPref : tab.root;
 
                     // special case handling for the chat, re-render current conversation
                     if (
@@ -1072,11 +1221,27 @@ FileManager.prototype.initFileManagerUI = function() {
                     (tab.subpages && tab.subpages.indexOf(tab.prev) > -1))) {
                     targetFolder = tab.prev;
                 }
+                else if (isGalleryRedirect) {
+                    targetFolder = this.dataset.locationPref;
+                }
                 else {
                     targetFolder = tab.root;
                 }
 
                 M.openFolder(targetFolder, true);
+
+                if (tab.root === M.RootID) {
+                    eventlog(500446);
+                }
+                else if (tab.root === 'photos') {
+                    eventlog(500447);
+                }
+                else if (tab.root === 'chat') {
+                    delay('chat-event-gen-nav', () => eventlog(500294));
+                }
+                else if (tab.root === 'devices') {
+                    eventlog(500448);
+                }
 
                 break;
             }
@@ -1092,61 +1257,19 @@ FileManager.prototype.initFileManagerUI = function() {
     const lPane = $('.fm-left-panel').filter(":not(.chat-lp-body)");
     $.leftPaneResizable = new FMResizablePane(lPane, {
         'direction': 'e',
-        'minWidth': 200,
+        'minWidth': mega.flags.ab_ads ? 260 : 200,
         'maxWidth': 400,
         'persistanceKey': 'leftPaneWidth',
-        'handle': '.left-pane-drag-handle',
-        'pagechange': () => {
-            let {'cloud-drive': {subpages: myFiles} = false} = this.fmTabState;
-            myFiles = myFiles ? array.to.object([M.RootID, ...myFiles]) : false;
-
-            return function() {
-                let maxWidth = null;
-
-                if (!myFiles[M.currentrootid]) {
-                    maxWidth = 400;
-                }
-                this.setOption('maxWidth', maxWidth);
-            };
-        }
+        'handle': '.left-pane-drag-handle'
     });
 
-    $($.leftPaneResizable).rebind('resize.lhp', function() {
-        var w = lPane.width();
-        if ($.leftPaneResizable.options.maxWidth && w >= $.leftPaneResizable.options.maxWidth) {
-            $('.left-pane-drag-handle').css('cursor', 'w-resize');
-            $('body').css('cursor', 'w-resize');
-        }
-        else if (w <= $.leftPaneResizable.options.minWidth) {
-            $('.left-pane-drag-handle').css('cursor', 'e-resize');
-            $('body').css('cursor', 'e-resize');
-        }
-        else {
-            $('.left-pane-drag-handle').css('cursor', 'ew-resize');
-            $('body').css('cursor', 'ew-resize');
-        }
-
-        if (!this.element.hasClass('ui-resizable-resizing')) {
-            $('body').css('cursor', 'auto');
-        }
-
-        if (lPane.width() < $.leftPaneResizable.options.updateWidth + 60) {
-            lPane.addClass('small-left-panel');
-        }
-        else {
-            lPane.removeClass('small-left-panel');
-        }
-
-        $.tresizer();
-    });
-
-    $(window).rebind('resize.fmrh hashchange.fmrh', fm_resize_handler);
+    $(window).rebind('resize.fmrh hashchange.fmrh', SoonFc(65, fm_resize_handler));
 
     if (ua.details.os === "Apple") {
 
-        $(window).rebind('blur.ps-unfocus', function() {
+        $(window).rebind('blur.ps-unfocus', () => {
 
-            $(document).rebind('ps-scroll-y.ps-unfocus', function(e) {
+            $('.ps').rebind('ps-scroll-y.ps-unfocus', e => {
 
                 $(e.target).addClass('ps-outfocused-scrolling');
 
@@ -1162,7 +1285,7 @@ FileManager.prototype.initFileManagerUI = function() {
 
         $(window).rebind('focus.ps-unfocus', function() {
 
-            $(document).off('ps-scroll-y.ps-unfocus');
+            $('.ps').off('ps-scroll-y.ps-unfocus');
         });
     }
 
@@ -1194,6 +1317,14 @@ FileManager.prototype.initShortcutsAndSelection = function(container, aUpdate, r
             // do not retain selected nodes unless re-rendering the same view
             $.selected = [];
         }
+        // or re-rendering the same view but previous view is media discovery view
+        else if (!M.gallery && !$('#gallery-view').hasClass('hidden')) {
+            for (let i = $.selected.length - 1; i >= 0; i--) {
+                if (!M.v.includes(M.d[$.selected[i]])) {
+                    $.selected.splice(i, 1);
+                }
+            }
+        }
 
         /**
          * (Re)Init the selectionManager, because the .selectable() is reinitialized and we need to
@@ -1219,7 +1350,7 @@ FileManager.prototype.initShortcutsAndSelection = function(container, aUpdate, r
  * @returns {MegaPromise}
  */
 // eslint-disable-next-line complexity
-FileManager.prototype.updFileManagerUI = promisify(function(resolve) {
+FileManager.prototype.updFileManagerUI = async function() {
     "use strict";
 
     var treebuild = Object.create(null);
@@ -1237,8 +1368,16 @@ FileManager.prototype.updFileManagerUI = promisify(function(resolve) {
     };
 
     if (d) {
-        console.debug('updFileManagerUI for %d nodes.', newnodes.length);
+        console.warn('updFileManagerUI for %d nodes.', newnodes.length);
         console.time('rendernew');
+    }
+
+    const view = Object.create(null);
+    view[this.currentdirid] = 1;
+    view[this.currentCustomView.nodeID] = 1;
+
+    if (this.currentdirid === 'file-requests') {
+        Object.assign(view, mega.fileRequest.getPuHandleList());
     }
 
     for (var i = newnodes.length; i--;) {
@@ -1253,11 +1392,10 @@ FileManager.prototype.updFileManagerUI = promisify(function(resolve) {
         if (newNode.p && newNode.t) {
             treebuild[newNode.p] = 1;
         }
-        if (newNode.p === this.currentdirid
-            || newNode.h === this.currentdirid
+
+        if (view[newNode.p] || view[newNode.h]
             || newNode.su && this.currentdirid === 'shares'
-            || newNode.p === this.currentCustomView.nodeID
-            || newNode.h === this.currentCustomView.nodeID) {
+            || newNode.shares && this.currentdirid === 'out-shares') {
 
             UImain = true;
 
@@ -1266,7 +1404,8 @@ FileManager.prototype.updFileManagerUI = promisify(function(resolve) {
                 selnode = newNode.h;
             }
         }
-        if (!newpath && document.getElementById('path_' + newNode.h)) {
+
+        if (!newpath && document.getElementById(`path_${newNode.h}`)) {
             newpath = true;
         }
     }
@@ -1294,8 +1433,8 @@ FileManager.prototype.updFileManagerUI = promisify(function(resolve) {
         console.log('rendernew.stat', newcontact, newshare, UImain, newpath);
         console.log('rendernew.tree', Object.keys(treebuild));
     }
+    let renderPromise = null;
 
-    var renderPromise = MegaPromise.resolve();
     if (UImain) {
         if (UItree || this.v.length) {
             var emptyBeforeUpd = !M.v.length;
@@ -1316,88 +1455,84 @@ FileManager.prototype.updFileManagerUI = promisify(function(resolve) {
 
     if (UItree) {
         if (this.currentrootid === 'shares') {
-            renderPromise = this.renderTree();
+            this.renderTree();
         }
         else if (this.currentCustomView) {
             this.addTreeUIDelayed(90);
         }
 
         if (this.currentdirid === 'shares' && !this.viewmode) {
-            // @TODO deprecate MegaPromise.pipe()!
-            renderPromise.pipe(function() {
-                return M.openFolder('shares', 1);
+
+            renderPromise = Promise.resolve(renderPromise)
+                .then(() => this.openFolder('shares', true));
+        }
+    }
+
+    newnodes = [];
+    if (renderPromise) {
+        await renderPromise;
+    }
+
+    if (UItree && this.nodeRemovalUIRefresh.pending !== this.currentdirid) {
+        this.onTreeUIOpen(this.currentdirid);
+    }
+
+    if (newcontact) {
+        useravatar.refresh().catch(dump);
+
+        if (megaChatIsReady) {
+            megaChat.renderMyStatus();
+        }
+    }
+    if (newshare) {
+        M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+    }
+    if (newpath) {
+        delay('render:path_breadcrumbs', () => M.renderPathBreadcrumbs());
+    }
+
+    if (UImain === M.currentdirid) {
+        if (selnode) {
+            onIdle(() => {
+                $.selected = [selnode];
+                reselect(1);
             });
         }
 
-        renderPromise.always(function() {
-            if (M.nodeRemovalUIRefresh.pending !== M.currentdirid) {
-                M.onTreeUIOpen(M.currentdirid);
+        if (window.selectionManager) {
+            // update the total count of nodes
+            var tmp = selectionManager.vSelectionBar;
+            if (tmp) {
+                var mm = String(tmp.textContent).split('/').map(Number);
+                tmp.textContent = mm[0] + ' / ' + M.v.length;
             }
-        });
+        }
+
     }
 
-    renderPromise.always(function() {
-        if (newcontact) {
-            M.avatars();
+    if (u_type === 0) {
+        // Show "ephemeral session warning"
+        topmenuUI();
+    }
 
-            if (megaChatIsReady) {
-                megaChat.renderMyStatus();
-            }
+    delay('dashboard:upd', () => {
+        if (M.currentdirid === 'dashboard') {
+            dashboardUI(true);
         }
-        if (newshare) {
-            M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+        else if (UImain === M.currentdirid) {
+            delay('rendernew:mediainfo:collect', () => {
+                mBroadcaster.sendMessage('mediainfo:collect');
+                $.tresizer();
+            }, 3200);
         }
-        if (newpath) {
-            delay('render:path_breadcrumbs', () => M.renderPathBreadcrumbs());
-        }
+    }, 2000);
 
-        if (UImain === M.currentdirid) {
-            if (selnode) {
-                Soon(function() {
-                    $.selected = [selnode];
-                    reselect(1);
-                });
-            }
+    mBroadcaster.sendMessage('updFileManagerUI');
 
-            if (window.selectionManager) {
-                // update the total count of nodes
-                var tmp = selectionManager.vSelectionBar;
-                if (tmp) {
-                    var mm = String(tmp.textContent).split('/').map(Number);
-                    tmp.textContent = mm[0] + ' / ' + M.v.length;
-                }
-            }
-
-        }
-
-        if (u_type === 0) {
-            // Show "ephemeral session warning"
-            topmenuUI();
-        }
-
-        delay('dashboard:upd', function() {
-            if (M.currentdirid === 'dashboard') {
-                dashboardUI(true);
-            }
-            else if (UImain === M.currentdirid) {
-                delay('rendernew:mediainfo:collect', function() {
-                    mBroadcaster.sendMessage('mediainfo:collect');
-                    $.tresizer();
-                }, 3200);
-            }
-        }, 2000);
-
-        mBroadcaster.sendMessage('updFileManagerUI');
-
-        if (d) {
-            console.timeEnd('rendernew');
-        }
-
-        resolve();
-    });
-
-    newnodes = [];
-});
+    if (d) {
+        console.timeEnd('rendernew');
+    }
+};
 
 /**
  * Initialize context-menu related user interface
@@ -1444,12 +1579,24 @@ FileManager.prototype.initContextUI = function() {
 
             $this.addClass('opened');
         }
+
+        // If MEGA Lite mode and the selection contains a folder, hide the regular download option (only zip allowed),
+        // otherwise this throws an error about downloading an empty folder then downloads as a zip anyway.
+        if (mega.lite.inLiteMode && mega.lite.containsFolderInSelection($.selected)) {
+            $(c + '.download-standart-item').addClass('hidden');
+            return false;
+        }
+
+        // Make standard download option visible for files (and folders in regular mode)
+        $(c + '.download-standart-item').removeClass('hidden');
     });
 
     var safeMoveNodes = function() {
         if (!$(this).hasClass('disabled')) {
             $.hideContextMenu();
-            M.safeMoveNodes(String($(this).attr('id')).replace('fi_', ''));
+            mLoadingSpinner.show('safeMoveNodes');
+            M.safeMoveNodes(String($(this).attr('id')).replace('fi_', '')).catch(dump)
+                .finally(() => mLoadingSpinner.hide('safeMoveNodes'));
         }
         return false;
     };
@@ -1462,6 +1609,12 @@ FileManager.prototype.initContextUI = function() {
 
     $(c + '.download-item').rebind('click', function() {
         var c = this.className;
+
+        // If MEGA Lite mode and attempting to download a folder(s) by clicking on the Download item, disable the click
+        if (mega.lite.inLiteMode && mega.lite.containsFolderInSelection($.selected)) {
+            return false;
+        }
+
         if (c && (c.indexOf('contains-submenu') > -1 || c.indexOf('msync-found') > -1)) {
             M.addDownload($.selected);
         }
@@ -1501,9 +1654,46 @@ FileManager.prototype.initContextUI = function() {
         $.hideContextMenu();
     });
 
-    $(c + '.getlink-item, ' + c + '.embedcode-item').rebind('click', this.getLinkAction);
+    $(c + '.getlink-item, ' + c + '.embedcode-item, ' + c + '.cd-getlink-item').rebind('click', function(e) {
 
-    $(c + '.removelink-item').rebind('click', function() {
+        if (e.shiftKey && (e.ctrlKey || e.metaKey)) {
+            $('button', $('#link-hidden-repair-proc').removeClass('hidden'))
+                .rebind('click', () => {
+                    const p = [];
+
+                    for (const elm of document.querySelectorAll('.export-links-dialog .item')) {
+                        const n = M.getNodeByHandle(elm.dataset.nodeHandle);
+                        if (n.t) {
+                            p.push(api_setshare(n.h, [{u: 'EXP', r: 0, rsk: 1}]));
+                        }
+                    }
+
+                    if (p.length) {
+                        loadingDialog.show('rsk', l[1141]);
+                        Promise.all(p).catch(tell).finally(() => loadingDialog.hide('rsk'));
+                    }
+                });
+        }
+        else {
+            $('#link-hidden-repair-proc').addClass('hidden').off();
+        }
+
+        M.getLinkAction.call(this);
+
+        if ($(e.currentTarget).hasClass('cd-getlink-item')) {
+            if ($(e.currentTarget).hasClass('manage-link')) {
+                // event log for manage link/s
+                eventlog(500030);
+            }
+            else {
+                // event log for share link
+                eventlog(500028);
+            }
+        }
+
+    });
+
+    $(c + '.removelink-item, ' + c + '.cd-removelink-item').rebind('click', (e) => {
         // check if this is a business expired account
         if (M.isInvalidUserStatus()) {
             return;
@@ -1548,19 +1738,31 @@ FileManager.prototype.initContextUI = function() {
                 }
             }
             else {
-                let subtitle = l.plink_remove_dlg_text_mixed;
-                if (files > 0 && folders === 0) {
-                    subtitle = mega.icu.format(l.plink_remove_dlg_text_file, files);
+                // Pluralise dialog text
+                const linkCount = folders + files;
+                const msg = mega.icu.format(l.remove_link_question, linkCount);
+                const cancelButtonText = l.dont_remove;
+                const confirmButtonText = l['83'];
+
+                // Use message about removal of 'items' for when both files and folders are selected
+                let subMsg = l.remove_link_confirmation_mix_items;
+
+                // Change message to folder/s or file/s depending on number of files and folders
+                if (folders === 0) {
+                    subMsg = mega.icu.format(l.remove_link_confirmation_files_only, files);
                 }
-                else if (files === 0 && folders > 0) {
-                    subtitle = mega.icu.format(l.plink_remove_dlg_text_folder, folders);
+                else if (files === 0) {
+                    subMsg = mega.icu.format(l.remove_link_confirmation_folders_only, folders);
                 }
-                const title = mega.icu.format(l.plink_remove_dlg_title, handles.length);
-                if (media) {
-                    subtitle += `<br><br>${l[17824]}`;
-                }
-                msgDialog('confirmation', '', title, subtitle, removeLink, 'nowarnpl');
+
+                // Show confirmation dialog
+                msgDialog(`*confirmation:!^${confirmButtonText}!${cancelButtonText}`, null, msg, subMsg, removeLink,
+                    'nowarnpl');
             }
+        }
+
+        if ($(e.currentTarget).hasClass('cd-removelink-item')) {
+            eventlog(500031);
         }
     });
 
@@ -1577,7 +1779,7 @@ FileManager.prototype.initContextUI = function() {
                 break;
             }
         }
-        loadSubPage('dispute');
+        mega.redirect('mega.io', 'dispute', false, false, false);
     });
 
     $(c + '.rename-item').rebind('click', function() {
@@ -1589,22 +1791,37 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.sh4r1ng-item').rebind('click', function() {
-        M.openSharingDialog();
+        M.openSharingDialog($.selected[0]);
+        eventlog(500029);
     });
 
-    $(`${c}.removeshare-item`).rebind('click', () => {
+    $(`${c}.removeshare-item, ${c}.cd-removeshare-item`).rebind('click', (e) => {
         if (M.isInvalidUserStatus()) {
             return;
         }
 
         msgDialog(`remove:!^${l[23737]}!${l[82]}`, '', l.remove_share_title, l.remove_share_msg, res => {
             if (res) {
-                loadingDialog.show();
-                new mega.Share().removeSharesFromSelected().always(() => {
-                    loadingDialog.hide();
-                });
+                new mega.Share().removeSharesFromSelected().dump('remove-share');
             }
         }, 1);
+
+        if ($(e.currentTarget).hasClass('cd-removeshare-item')) {
+            eventlog(500033);
+        }
+    });
+
+    $(c + '.cd-sh4r1ng-item').rebind('click', (e) => {
+        M.openSharingDialog($.selected[0]);
+
+        if ($(e.currentTarget).hasClass('manage-share')) {
+            // event log for manage folder
+            eventlog(500032);
+        }
+        else {
+            // event log for share folder
+            eventlog(500029);
+        }
     });
 
     // Move Dialog
@@ -1616,15 +1833,27 @@ FileManager.prototype.initContextUI = function() {
         if (M.isInvalidUserStatus()) {
             return;
         }
-        loadingDialog.pshow();
-        M.revertRubbishNodes($.selected).always(loadingDialog.phide.bind(loadingDialog));
+        mLoadingSpinner.show('restore-nodes');
+        M.revertRubbishNodes($.selected)
+            .catch((ex) => {
+                if (ex !== EBLOCKED) {
+                    // user canceled file-conflict dialog.
+                    tell(ex);
+                }
+            })
+            .finally(() => mLoadingSpinner.hide('restore-nodes'));
     });
 
     $(c + '.import-item').rebind('click', function() {
         if (M.isInvalidUserStatus()) {
             return;
         }
-        eventlog(99767);
+
+        if (pfcol) {
+            $.selected = Object.keys(mega.gallery.albums.grid.timeline.selections);
+        }
+
+        eventlog(pfcol ? 99832 : 99767);
         ASSERT(folderlink, 'Import needs to be used in folder links.');
 
         M.importFolderLinkNodes($.selected);
@@ -1767,9 +1996,14 @@ FileManager.prototype.initContextUI = function() {
         if (M.isInvalidUserStatus()) {
             return;
         }
+        const errHandler = ex => {
+            if (ex === EMASTERONLY) {
+                msgDialog('warningb', '', l.err_bus_sub_leave_share_dlg_title, l.err_bus_sub_leave_share_dlg_text);
+            }
+        };
 
         for (let i = 0; i < $.selected.length; i++) {
-            M.leaveShare($.selected[i]).catch(dump);
+            M.leaveShare($.selected[i]).catch(errHandler);
         }
     });
 
@@ -1797,8 +2031,33 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(c + '.properties-item').rebind('click', function() {
-        propertiesDialog();
+        mega.ui.mInfoPanel.initInfoPanel();
     });
+
+    $(c + '.device-rename-item').rebind('click', () => {
+        mega.backupCenter.renameDialog();
+    });
+
+    if (pfid) {
+        $(`${c}.vhl-item`).rebind('click', () => {
+            for (let i = $.selected.length; i--;) {
+                let n = M.d[$.selected[i]];
+                if (n) {
+                    if ((n.vhl |= 1) > 3) {
+                        n.vhl = 0;
+                    }
+                    $(`#${n.h}`).removeClassWith('highlight').addClass(`highlight${++n.vhl}`);
+
+                    while ((n = M.d[n.p])) {
+                        if (!n.vhl) {
+                            n.vhl = 1;
+                        }
+                    }
+                }
+            }
+            M.clearSelectedNodes();
+        });
+    }
 
     // eslint-disable-next-line local-rules/jquery-scopes
     $(c + '.edit-file-item').rebind('click', function() {
@@ -1817,14 +2076,14 @@ FileManager.prototype.initContextUI = function() {
 
         loadingDialog.show('common', l[23130]);
 
-        mega.fileTextEditor.getFile(nodeHandle).done(
-            function(data) {
+        mega.fileTextEditor.getFile(nodeHandle)
+            .then((data) => {
+                mega.textEditorUI.setupEditor(M.getNameByHandle(nodeHandle), data, nodeHandle);
+            })
+            .catch(dump)
+            .finally(() => {
                 loadingDialog.hide();
-                mega.textEditorUI.setupEditor(M.d[nodeHandle].name, data, nodeHandle);
-            }
-        ).fail(function() {
-            loadingDialog.hide();
-        });
+            });
     });
 
     $(c + '.properties-versions').rebind('click', function() {
@@ -1942,8 +2201,13 @@ FileManager.prototype.initContextUI = function() {
         M.favourite($.selected, newFavState);
     });
 
-    $(c + '.send-to-contact-item').rebind('click', function () {
+    $(`${c}.send-to-contact-item, ${c}.cd-send-to-contact-item`).rebind('click', (ev) => {
         openCopyDialog('conversations');
+
+        if ($(ev.currentTarget).hasClass('cd-send-to-contact-item')) {
+            // eveng log for send contact folder
+            eventlog(500027);
+        }
     });
 
     $('.submenu.labels .dropdown-colour-item').rebind('click', function() {
@@ -2099,16 +2363,22 @@ FileManager.prototype.initContextUI = function() {
         ) {
             target = M.currentrootid + '/' + target;
         }
+        else if (M.dyh) {
+            target = M.dyh('folder-id', target);
+        }
         $('.js-lpbtn').removeClass('active');
         M.openFolder(target);
     });
+
+    $(c + '.verify-credential').rebind('click', () => fingerprintDialog(M.d[$.selected[0]].su));
 
     $(`${c}.open-gallery`).rebind('click', () => {
         var target = $.selected[0];
         M.openFolder(`discovery/${target}`);
     });
 
-    $(c + '.open-cloud-item').rebind('click', function() {
+    $(`${c}.open-cloud-item, ${c}.open-in-location, ${c}.open-s4-item`)
+        .rebind('click.openItem', () => {
 
         const node = M.d[$.selected[0]];
 
@@ -2152,23 +2422,17 @@ FileManager.prototype.initContextUI = function() {
             return false;
         }
 
-        selectFolderDialog(async() => {
-
-            closeDialog();
-            loadingDialog.pshow();
-
-            mega.backupCenter.stopSync(
-                undefined, mega.backupCenter.selectedSync.nodeHandle, $.mcselected
-            )
-                .then(nop)
-                .catch((ex) => {
-                    msgDialog('warninga', l[135], l[47], ex);
-                })
-                .finally(() => {
-
-                    loadingDialog.phide();
-                });
-        }, 'move');
+        selectFolderDialog('move')
+            .then((target) => {
+                if (target) {
+                    loadingDialog.pshow();
+                    return mega.backupCenter.stopSync(undefined, mega.backupCenter.selectedSync.nodeHandle, target);
+                }
+            })
+            .catch(tell)
+            .finally(() => {
+                loadingDialog.phide();
+            });
     });
 
     $(`${c}.remove-backup-item`).rebind('click.removeBckp', () => {
@@ -2220,6 +2484,10 @@ FileManager.prototype.initContextUI = function() {
         if (M.isInvalidUserStatus()) {
             return;
         }
+
+        // Close node Info panel as not needed immediately after opening Preview
+        mega.ui.mInfoPanel.closeIfOpen();
+
         closeDialog();
         slideshow($.selected[0]);
     });
@@ -2229,6 +2497,9 @@ FileManager.prototype.initContextUI = function() {
             return;
         }
         var n = $.selected[0];
+
+        // Close node Info panel as not needed immediately after opening Preview
+        mega.ui.mInfoPanel.closeIfOpen();
 
         closeDialog();
 
@@ -2241,27 +2512,6 @@ FileManager.prototype.initContextUI = function() {
             return;
         }
         doClearbin(true);
-    });
-
-    $(c + '.move-up').rebind('click', function() {
-        $('.transfer-table tr.ui-selected')
-            .attrs('id')
-            .map(function(id) {
-                fm_tfsmove(id, -1);
-            });
-        $('.transfer-table tr.ui-selected').removeClass('ui-selected');
-        delay('fm_tfsupdate', fm_tfsupdate);
-    });
-
-    $(c + '.move-down').rebind('click', function() {
-        $('.transfer-table tr.ui-selected')
-            .attrs('id')
-            .reverse()
-            .map(function(id) {
-                fm_tfsmove(id, 1);
-            });
-        $('.transfer-table tr.ui-selected').removeClass('ui-selected');
-        delay('fm_tfsupdate', fm_tfsupdate);
     });
 
     $(c + '.transfer-play, ' + c + '.transfer-pause').rebind('click', function() {
@@ -2308,8 +2558,49 @@ FileManager.prototype.initContextUI = function() {
         $('.transfer-table tr.ui-selected').removeClass('ui-selected');
     });
 
-    if (sessionStorage.folderLinkImport || $.onImportCopyNodes) {
-        onIdle(M.importFolderLinkNodes.bind(M, false));
+    $(`${c}.add-to-album`).rebind('click.add-to-album', () => {
+        mega.gallery.albums.addToAlbum($.selected[0]);
+    });
+
+    $(`${c}.new-bucket-item`)
+        .rebind('click.createBucket', () => s4.ui.showDialog(s4.buckets.dialogs.create));
+
+    $(`${c}.settings-item`)
+        .rebind('click.showSettings', () => s4.ui.showDialog(s4.buckets.dialogs.settings, M.d[$.selected[0]]));
+
+    $(`${c}.managepuburl-item`)
+        .rebind('click.managePA', () => s4.ui.showDialog(s4.objects.dialogs.access, M.d[$.selected[0]]));
+
+    if (window.pfcol) {
+        $(`${c}.play-slideshow, ${c}.preview-item, ${c}.play-item`).rebind('click', function() {
+            if (M.isInvalidUserStatus()) {
+                return;
+            }
+
+            closeDialog();
+            mega.gallery.playSlideshow(
+                mega.gallery.getAlbumIdFromPath(),
+                this.classList.contains('play-slideshow'),
+                this.classList.contains('play-item')
+            );
+        });
+    }
+
+    if (mega.keyMgr.version) {
+
+        queueMicrotask(() => {
+
+            this.fireKeyMgrDependantActions().catch(dump);
+        });
+    }
+};
+
+FileManager.prototype.fireKeyMgrDependantActions = async function() {
+    'use strict';
+
+    if (sessionStorage.folderLinkImport || ($.onImportCopyNodes && !$.onImportCopyNodes.opSize)) {
+
+        await M.importFolderLinkNodes(false);
     }
 };
 
@@ -2320,6 +2611,10 @@ FileManager.prototype.createFolderUI = function() {
     const ltWSpaceWarning = new InputFloatWarning($inputWrapper);
 
     var doCreateFolder = function() {
+
+        // Log that Create button clicked within the Create folder dialog
+        eventlog(500008);
+
         var $input = $('input', $inputWrapper);
         var name = $input.val();
         var errorMsg = '';
@@ -2334,11 +2629,11 @@ FileManager.prototype.createFolderUI = function() {
             errorMsg = l[23219];
         }
 
-        if (errorMsg !== '') {
+        if (errorMsg) {
             $('.duplicated-input-warning span', $inputWrapper).text(errorMsg);
             $inputWrapper.addClass('duplicate');
 
-            setTimeout(function () {
+            setTimeout(() => {
                 $inputWrapper.removeClass('duplicate');
                 $input.removeClass('error');
                 $input.trigger("focus");
@@ -2347,19 +2642,30 @@ FileManager.prototype.createFolderUI = function() {
             return;
         }
 
-        loadingDialog.pshow();
+        $input.val('');
+        $('.fm-new-folder').removeClass('active');
+        $('.create-new-folder').addClass('hidden');
+
+        mLoadingSpinner.show('create-folder');
         var currentdirid = M.currentCustomView.nodeID || M.currentdirid;
 
         M.createFolder(currentdirid, name)
-            .then(function(h) {
+            .then((h) => {
+                const ok = typeof h === 'string' && h.length === 8;
+
                 if (d) {
                     console.log('Created new folder %s->%s.', currentdirid, h);
+                    console.assert(ok, `Invalid createFolder result ${h}`, h);
                 }
-                loadingDialog.phide();
+                if (ok) {
+                    // @todo the previously created folder is leaved selected, FIXME
+                    $.selected = [h];
+                    reselect(1);
+                }
             })
-            .catch(function(ex) {
-                loadingDialog.phide();
-                msgDialog('warninga', l[135], l[47], ex < 0 ? api_strerror(ex) : ex);
+            .catch(tell)
+            .finally(() => {
+                mLoadingSpinner.hide('create-folder');
             });
 
         return false;
@@ -2372,6 +2678,9 @@ FileManager.prototype.createFolderUI = function() {
         }
 
         ltWSpaceWarning.hide();
+
+        // Log that top menu Create folder clicked
+        eventlog(500007);
 
         var $me = $(this);
         var $nFolderDialog = $('.create-new-folder', 'body').removeClass('filled-input');
@@ -2436,7 +2745,7 @@ FileManager.prototype.createFolderUI = function() {
     });
 
     $('.create-new-folder input').rebind('keyup.create-new-f', function(e) {
-        ltWSpaceWarning.check({type: 1});
+        ltWSpaceWarning.check();
         $('.create-new-folder').addClass('filled-input');
         if ($(this).val() === '') {
             $('.create-new-folder').removeClass('filled-input');
@@ -2464,11 +2773,15 @@ FileManager.prototype.createFolderUI = function() {
             ephemeralDialog(l[997]);
         }
         else {
-            openNewSharedFolderDialog();
+            openNewSharedFolderDialog().catch(dump);
         }
     });
 
     $('.fm-new-link').rebind('click', function() {
+        if (M.isInvalidUserStatus()) {
+            return;
+        }
+
         if (u_type === 0) {
             ephemeralDialog(l[1005]);
         }
@@ -2620,7 +2933,7 @@ FileManager.prototype.initUIKeyEvents = function() {
     "use strict";
 
     $(window).rebind('keydown.uikeyevents', function(e) {
-        if ((M.chat && !$.dialog) || M.currentCustomView.type === 'albums') {
+        if ((M.chat && !$.dialog) || M.isAlbumsPage()) {
             return true;
         }
 
@@ -2744,12 +3057,12 @@ FileManager.prototype.initUIKeyEvents = function() {
             s.length > 0 &&
             !$.dialog &&
             (M.getNodeRights(M.currentdirid) > 1 || M.currentCustomView) &&
-            M.currentCustomView.type !== 'gallery' &&
+            !M.isGalleryPage() &&
             M.currentrootid !== M.InboxID &&
             M.currentdirid !== 'devices'
         ) {
             const nodes = s.filter(h => !M.d[h] || M.getNodeRoot(M.d[h].h) !== M.InboxID);
-            if (M.isInvalidUserStatus()) {
+            if (M.isInvalidUserStatus() || $.msgDialog === 'remove') {
                 return;
             }
 
@@ -2777,6 +3090,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             && !$.msgDialog
             && !$('.fm-new-folder').hasClass('active')
             && !$('.top-search-bl').hasClass('active')
+            && !$('.node-description.mega-textarea', 'body').hasClass('active')
         ) {
             $.selected = s.filter(h => !M.getNodeShare(h).down);
 
@@ -2831,7 +3145,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             topMenu(1);
         }
         else if (e.keyCode == 27 && $.dialog) {
-            if ($.dialog === 'share-add' || $.dialog === 'share') {
+            if ($.dialog === 'share-add' || $.dialog === 'share' || $.dialog === 'meetings-schedule-dialog') {
                 return false;
             }
             closeDialog();
@@ -2848,7 +3162,9 @@ FileManager.prototype.initUIKeyEvents = function() {
                 $.warningCallback = null;
             }
         }
-        else if (e.keyCode === 13 && ($.msgDialog === 'confirmation' || $.msgDialog === 'remove')) {
+        else if (e.keyCode === 13 && ($.msgDialog === 'confirmation' || $.msgDialog === 'remove' ||
+            (($.msgDialog === 'warninga' || $.msgDialog === 'warningb' || $.msgDialog === 'info' ||
+            $.msgDialog === 'error') && $('#msgDialog .mega-button').length === 1))) {
             closeMsg();
             if ($.warningCallback) {
                 $.warningCallback(true);
@@ -2870,7 +3186,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             e.keyCode == 65 &&
             e.ctrlKey &&
             !$.dialog &&
-            M.currentCustomView.type !== 'gallery'
+            !M.isGalleryPage()
         ) {
             if (is_transfers_or_accounts) {
                 return;
@@ -3007,9 +3323,10 @@ FileManager.prototype.addTransferPanelUI = function() {
 
     $.transferHeader = function(tfse) {
         tfse = tfse || M.getTransferElements();
-        var domTableEmptyTxt = tfse.domTableEmptyTxt;
-        var domScrollingTable = tfse.domScrollingTable;
-        var domTable = tfse.domTable;
+        if (!tfse) {
+            return;
+        }
+        const {domTableEmptyTxt, domScrollingTable, domTable} = tfse;
         tfse = undefined;
 
         // Show/Hide header if there is no items in transfer list
@@ -3276,8 +3593,7 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         $('.files-menu.context .dropdown-item.sort-timeAd span').safeHTML(dateLabel);
     }
 
-    $('.fm-files-view-icon.block-view').addClass('active');
-    $('.fm-files-view-icon.listing-view').removeClass('active');
+    $('.fm-files-view-icon').removeClass('active').filter('.block-view').addClass('active');
     $('.shared-grid-view').addClass('hidden');
     $('.out-shared-grid-view').addClass('hidden');
     $('.files-grid-view.fm').addClass('hidden');
@@ -3298,13 +3614,13 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         initPerfectScrollbar($(viewModeClass));
     }
     // user management ui update is handled in Business Account classes.
-    else if (this.v.length && M.currentCustomView.type !== 'gallery') {
+    else if (this.v.length && !M.isGalleryPage()) {
 
-        $('.fm-blocks-view.fm').removeClass('hidden');
-        $('.fm-blocks-view.fm').removeClass('out-shares-view public-links-view file-requests-view');
+        $('.fm-blocks-view.fm', '.fmholder')
+            .removeClass('hidden out-shares-view public-links-view file-requests-view s4-view');
 
         if (this.currentCustomView) {
-            $('.fm-blocks-view.fm').addClass(this.currentCustomView.type + '-view');
+            $('.fm-blocks-view.fm', '.fmholder').addClass(`${this.currentCustomView.type}-view`);
         }
 
         if (!aQuiet) {
@@ -3312,9 +3628,11 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         }
     }
 
-    $('.fm-blocks-view, .fm-empty-cloud, .fm-empty-folder,.shared-blocks-view, .out-shared-blocks-view')
+    $('.fm-blocks-view, .fm-empty-cloud, .fm-empty-folder,' +
+        '.shared-blocks-view, .out-shared-blocks-view, .fm-empty-s4-bucket')
         .rebind('contextmenu.fm', function(e) {
-            if (page === "fm/links") { // Remove context menu option from filtered view
+            // Remove context menu option from filtered view and media discovery view
+            if (page === "fm/links" || M.gallery) {
                 return false;
             }
             $(this).find('.data-block-view').removeClass('ui-selected');
@@ -3397,7 +3715,7 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
         $.selectddUIgrid = '.out-shared-blocks-scrolling';
         $.selectddUIitem = 'a';
     }
-    else if (M.currentCustomView.type === 'gallery') {
+    else if (M.isGalleryPage()) {
         $.selectddUIgrid = '.gallery-view';
     }
     else {
@@ -3414,7 +3732,7 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
 FileManager.prototype.addGridUI = function(refresh) {
     "use strict";
 
-    if (this.chat) {
+    if (this.chat || this.gallery) {
         return;
     }
     if (d) {
@@ -3440,8 +3758,7 @@ FileManager.prototype.addGridUI = function(refresh) {
 
     // $.gridDragging=false;
     $.gridLastSelected = false;
-    $('.fm-files-view-icon.listing-view').addClass('active');
-    $('.fm-files-view-icon.block-view').removeClass('active');
+    $('.fm-files-view-icon').removeClass('active').filter('.listing-view').addClass('active');
 
     $.gridHeader = function() {
         if (folderlink) {
@@ -3451,6 +3768,8 @@ FileManager.prototype.addGridUI = function(refresh) {
             M.columnsWidth.cloud.fav.disabled = true;
             M.columnsWidth.cloud.label.viewed = false;
             M.columnsWidth.cloud.label.disabled = true;
+            M.columnsWidth.cloud.accessCtrl.viewed = false;
+            M.columnsWidth.cloud.accessCtrl.disabled = true;
         }
         else {
             if (M.columnsWidth.cloud.fav.disabled) {
@@ -3466,17 +3785,65 @@ FileManager.prototype.addGridUI = function(refresh) {
             var storedColumnsPreferences = mega.config.get('fmColPrefs');
             if (storedColumnsPreferences !== undefined) {
                 var prefs = getFMColPrefs(storedColumnsPreferences);
+                const cgMenu = new Set(['fav', 'fname', 'size', 'type', 'timeAd', 'extras', 'accessCtrl', 'playtime']);
                 for (var colPref in prefs) {
                     if (Object.prototype.hasOwnProperty.call(prefs, colPref)) {
                         M.columnsWidth.cloud[colPref].viewed =
                             prefs[colPref] > 0;
                     }
+                    if (cgMenu.has(colPref)) {
+                        M.columnsWidth.cloud[colPref].disabled = false;
+                    }
+                }
+            }
+            else {
+                // restore default columns (to show/hide columns)
+                const defaultColumnShow = new Set(['fav', 'fname', 'size', 'type', 'timeAd', 'extras', 'accessCtrl']);
+                const defaultColumnHidden = new Set(['label', 'timeMd', 'versions', 'playtime', 'fileLoc']);
+                for (const col in M.columnsWidth.cloud) {
+                    if (defaultColumnShow.has(col)) {
+                        M.columnsWidth.cloud[col].viewed = true;
+                        M.columnsWidth.cloud[col].disabled = false;
+                    }
+                    else if (defaultColumnHidden.has(col)) {
+                        M.columnsWidth.cloud[col].viewed = false;
+                        if (col === 'playtime') {
+                            M.columnsWidth.cloud[col].disabled = false;
+                        }
+                    }
                 }
             }
 
-            if (M.currentrootid === M.RubbishID) {
+            if (String(M.currentdirid).startsWith('search')) {
+                // modified column to show for /search (Added link location dir)
+                const searchCol = new Set(['fav', 'fname', 'size', 'timeMd', 'fileLoc', 'extras']);
+                for (const col in M.columnsWidth.cloud) {
+                    if (searchCol.has(col)) {
+                        M.columnsWidth.cloud[col].viewed = true;
+                        M.columnsWidth.cloud[col].disabled = false;
+                    }
+                    else {
+                        M.columnsWidth.cloud[col].viewed = false;
+                        M.columnsWidth.cloud[col].disabled = true;
+                    }
+                }
+            }
+
+            if (
+                M.currentrootid === M.RubbishID
+                || M.currentrootid === 'shares'
+            ) {
                 M.columnsWidth.cloud.fav.disabled = true;
                 M.columnsWidth.cloud.fav.viewed = false;
+            }
+
+            if (M.currentrootid === 's4' && M.d[M.currentdirid.split('/').pop()]) {
+                M.columnsWidth.cloud.accessCtrl.viewed = true;
+                M.columnsWidth.cloud.accessCtrl.disabled = false;
+            }
+            else {
+                M.columnsWidth.cloud.accessCtrl.viewed = false;
+                M.columnsWidth.cloud.accessCtrl.disabled = true;
             }
         }
 
@@ -3518,20 +3885,23 @@ FileManager.prototype.addGridUI = function(refresh) {
         initPerfectScrollbar($(viewModeClass, '.shared-details-block'));
     }
     else if (this.v.length) {
-        $('.files-grid-view.fm').removeClass('hidden');
-        $('.files-grid-view.fm').removeClass('out-shares-view public-links-view file-requests-view');
+        $('.files-grid-view.fm', '.fmholder').removeClass('hidden');
+
+        $('.files-grid-view.fm', '.fmholder')
+            .removeClass('out-shares-view public-links-view file-requests-view');
 
         if (this.currentCustomView) {
-            if (this.currentCustomView.type === 'gallery'
-                || this.currentCustomView.type === 'albums') {
-                $('.files-grid-view.fm').addClass('hidden');
+            if (M.isGalleryPage() || M.isAlbumsPage()) {
+                $('.files-grid-view.fm', '.fmholder').addClass('hidden');
             }
             else {
-                $('.files-grid-view.fm').addClass(this.currentCustomView.type + '-view');
+                $('.files-grid-view.fm', '.fmholder')
+                    .addClass(`${this.currentCustomView.type}-view`);
             }
         }
         else {
-            $('.files-grid-view.fm').removeClass('out-shares-view public-links-view');
+            $('.files-grid-view.fm', '.fmholder')
+                .removeClass('out-shares-view public-links-view s4-view');
         }
 
         $.gridHeader();
@@ -3543,9 +3913,10 @@ FileManager.prototype.addGridUI = function(refresh) {
     $('.grid-url-arrow').show();
     $('.grid-url-header').text('');
 
-    $('.files-grid-view.fm .grid-scrolling-table,.files-grid-view.fm .file-block-scrolling,' +
-        '.fm-empty-cloud,.fm-empty-folder,.fm.shared-folder-content').rebind('contextmenu.fm', e => {
-        if (page === "fm/links" && page === "fm/faves") { // Remove context menu option from filtered view
+    $('.files-grid-view.fm .grid-scrolling-table,.files-grid-view.fm .file-block-scrolling,.fm-empty-cloud,' +
+        '.fm-empty-folder,.fm.shared-folder-content, .fm-empty-s4-bucket').rebind('contextmenu.fm', e => {
+        // Remove context menu option from filtered view and media discovery view
+        if (page === "fm/links" && page === "fm/faves" || M.gallery) {
             return false;
         }
             $('.fm-blocks-view .data-block-view').removeClass('ui-selected');
@@ -3713,13 +4084,24 @@ FileManager.prototype.addGridUI = function(refresh) {
         }
     });
 
+    $('.grid-table .grid-file-location').rebind('click.fileLocation', (e) => {
+        const h = $(e.target).closest('tr').attr('id');
+        const node = M.getNodeByHandle(h);
+
+        // Incoming Shares section if shared folder doesn't have parent
+        const target = node.su && (!node.p || !M.d[node.p]) ? 'shares' : node.p;
+        M.openFolder(target).then(() => {
+            selectionManager.add_to_selection(node.h, true);
+        });
+    });
+
     if (this.currentdirid === 'shares') {
         $.selectddUIgrid = '.shared-grid-view .grid-scrolling-table';
     }
     else if (this.currentdirid === 'out-shares') {
         $.selectddUIgrid = '.out-shared-grid-view .grid-scrolling-table';
     }
-    else if (M.currentCustomView.type === 'gallery') {
+    else if (M.isGalleryPage()) {
         $.selectddUIgrid = '.gallery-view';
     }
     else {
@@ -3805,7 +4187,8 @@ FileManager.prototype.getDDhelper = function getDDhelper() {
 FileManager.prototype.addSelectDragDropUI = function(refresh) {
     "use strict";
 
-    if (this.currentdirid && (this.currentdirid.substr(0, 7) === 'account' || M.currentCustomView.type === 'gallery')) {
+    if (this.currentdirid &&
+        (this.currentdirid.substr(0, 7) === 'account' || M.isGalleryPage())) {
         return false;
     }
 
@@ -3853,7 +4236,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                 if (n) {
                     if (max > i) {
                         html.push(
-                            '<div class="transfer-filetype-icon ' + fileIcon(n) + '"></div>' +
+                            '<div class="item-type-icon icon-' + fileIcon(n) + '-24"></div>' +
                             '<div class="tranfer-filetype-txt dragger-entry">' +
                             escapeHTML(n.name) + '</div>'
                         );
@@ -3894,6 +4277,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                 console.log('draggable.stop');
             }
             $.gridDragging = $.draggingClass = false;
+
             $('body').removeClass('dragging').removeClassWith("dndc-");
             var origin = $.draggerOrigin;
             setTimeout(function __onDragStop() {
@@ -3905,7 +4289,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
 
     $ddUIgrid.selectable({
         filter: $.selectddUIitem,
-        cancel: '.ps__scrollbar-y-rail, .ps__scrollbar-x-rail, thead',
+        cancel: '.ps__rail-y, .ps__rail-x, thead',
         start: e => {
             $.hideContextMenu(e);
             $.hideTopMenu();
@@ -3914,6 +4298,9 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         stop: () => {
             M.renderSearchBreadcrumbs();
             $.selecting = false;
+
+            // On drag stop and if the side Info panel is visible, update the information in it
+            mega.ui.mInfoPanel.reRenderIfVisible($.selected);
         },
         appendTo: $.selectddUIgrid
     });
@@ -3946,7 +4333,6 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
 
         M.renderSearchBreadcrumbs();
         $.hideTopMenu();
-        M.hideClickHint();
 
         return !!M.contextMenuUI(e, 1);
     };
@@ -3983,17 +4369,15 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                 $.gridLastSelected = this;
                 selectionManager.add_to_selection($this.attr('id'));
             }
-
-            if (!mega.cttHintTimer) {
-                M.showClickHint();
-            }
-
             M.renderSearchBreadcrumbs();
             $.hideContextMenu(e);
 
             if ($.hideTopMenu) {
                 $.hideTopMenu();
             }
+
+            // If the side Info panel is visible, update the information in it
+            mega.ui.mInfoPanel.reRenderIfVisible($.selected);
 
             return false;
         });
@@ -4003,7 +4387,6 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         $ddUIgrid.rebind('mousewheel.selectAndScroll', e => {
 
             if ($.selecting) {
-
                 delay('selectAndScroll', () => {
 
                     $ddUIgrid = $($.selectddUIgrid);
@@ -4021,11 +4404,12 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         let h = $(e.currentTarget).attr('id');
         const n = M.getNodeByHandle(h);
 
-        if (!n || M.getNodeShare(n).down) {
+        if (!n) {
+            return false;
+        }
+        else if (M.getNodeShare(n).down && n.t !== 1) {
             // Prevent to preview any kind of taken down files
-            if (n) {
-                contextMenuHandler.call(e.currentTarget, e);
-            }
+            contextMenuHandler.call(e.currentTarget, e);
             return false;
         }
 
@@ -4052,12 +4436,19 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             ) {
                 h = M.currentrootid + '/' + h;
             }
+            else if (M.dyh) {
+                h = M.dyh('folder-id', h);
+            }
             M.openFolder(h);
         }
         else if (is_image2(n) || is_video(n)) {
             if (is_video(n)) {
                 $.autoplay = h;
             }
+
+            // Close node Info panel as not needed immediately after opening Preview
+            mega.ui.mInfoPanel.closeIfOpen();
+
             slideshow(h);
         }
         else if (is_text(n)) {
@@ -4072,7 +4463,6 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
         else {
             M.addDownload([h]);
         }
-        M.hideClickHint();
     });
 
     if (!refresh) {
@@ -4097,13 +4487,29 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
     var tmpId;
     var $fmholder = $('#fmholder', 'body');
-    const isAlbums = M.currentCustomView.type === 'albums';
+    const isAlbums = M.isAlbumsPage();
+    const isMediaDiscovery = M.isMediaDiscoveryPage();
 
     if (d) {
-        console.log('sectionUIopen', id, folderlink);
+        console.group('sectionUIOpen', id, folderlink);
+        console.time('sectionUIOpen');
     }
     if ($.hideContextMenu) {
         $.hideContextMenu();
+    }
+
+    // Close node Info panel if currently open as it's not applicable when switching to these areas
+    if (id === 'account' || id === 'dashboard' || id === 'conversations'
+        || id === 'user-management' || id === 'transfers') {
+
+        if (mega.ui.mInfoPanel) {
+            mega.ui.mInfoPanel.closeIfOpen();
+        }
+
+        // Hide top menus
+        if (id === 'account' || id === 'dashboard') {
+            $.hideTopMenu();
+        }
     }
 
     $('.nw-fm-left-icon', $fmholder).removeClass('active');
@@ -4126,9 +4532,6 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     switch (id) {
         case 'opc':
         case 'ipc':
-        case 'devices':
-            tmpId = 'backup-center';
-            break;
         case 'recents':
         case 'search':
         case 'shared-with-me':
@@ -4136,8 +4539,12 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         case 'public-links':
         case 'backups':
         case 'rubbish-bin':
+        case 's4':
         case 'file-requests':
             tmpId = 'cloud-drive';
+            break;
+        case 'devices':
+            tmpId = 'backup-center';
             break;
         case 'affiliate':
             tmpId = 'dashboard';
@@ -4183,14 +4590,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
 
     this.currentTreeType = M.treePanelType();
 
-    if (tmpId === 'cloud-drive' || tmpId === 'gallery') {
-        $('.nw-fm-left-icon.gallery', $fmholder).removeClass('hidden');
-    }
-    else {
-        $('.nw-fm-left-icon.gallery', $fmholder).addClass('hidden');
-    }
-
-    $('.fm.fm-right-header, .fm-bottom-right-buttons', $fmholder).addClass('hidden');
+    $('.fm.fm-right-header, .fm-import-download-buttons, .gallery-tabs-bl', $fmholder).addClass('hidden');
     $('.fm-import-to-cloudrive, .fm-download-as-zip', $fmholder).off('click');
 
     $fmholder.removeClass('affiliate-program');
@@ -4224,26 +4624,46 @@ FileManager.prototype.onSectionUIOpen = function(id) {
             }
 
             // Remove import and download buttons from the search result.
-            if (M.currentdirid.substr(0, 6) !== 'search') {
-                $('.fm-import-to-cloudrive span', $fmholder)
-                    .text(M.currentdirid === M.RootID ? l.folder_link_import_all : l.folder_link_import);
-                $('.fm-download-as-zip span', $fmholder)
-                    .text(M.currentdirid === M.RootID ? l.folder_link_download_all : l.folder_link_download);
-                $('.fm-bottom-right-buttons', $fmholder).removeClass('hidden');
+            if (!String(M.currentdirid).startsWith('search')) {
+                const $btnWrap = $('.fm-import-download-buttons', $fmholder).removeClass('hidden');
 
-                $('.fm-import-to-cloudrive, .fm-download-as-zip', $fmholder).rebind('click', function() {
-                    const c = $(this).attr('class');
+                megasync.isInstalled((err, is) => {
 
-                    if (c.indexOf('fm-import-to-cloudrive') > -1) {
-                        eventlog(M.currentdirid === M.RootID ? 99765 : 99763);
-                        // Import the current folder, could be the root or sub folder
-                        M.importFolderLinkNodes([M.currentdirid]);
+                    if (!err || is) {
+
+                        $('.merge-mega-button', $btnWrap).removeClass('merge-mega-button');
+                        $('.download-dropdown', $btnWrap).addClass('hidden');
                     }
-                    else if (c.indexOf('fm-download-as-zip') > -1) {
-                        eventlog(M.currentdirid === M.RootID ? 99766 : 99764);
-                        // Download the current folder, could be the root or sub folder
-                        M.addDownload([M.currentdirid], true);
-                    }
+                });
+
+                $('.fm-import-to-cloudrive', $btnWrap).rebind('click', () => {
+                    eventlog(pfcol ? 99831 : 99765);
+                    // Import the current folder, could be the root or sub folder
+                    M.importFolderLinkNodes([M.RootID]);
+                });
+
+                $('.fm-download-as-zip', $btnWrap).rebind('click', () => {
+
+                    eventlog(pfcol ? 99954 : 99766);
+                    // Download the current folder, could be the root or sub folder
+                    M.addDownload([M.RootID], true);
+                });
+
+                $('.fm-megasync-download', $btnWrap).rebind('click', () => {
+
+                    loadingDialog.show();
+                    megasync.isInstalled((err, is) => {
+
+                        loadingDialog.hide();
+
+                        if (fmconfig.dlThroughMEGAsync && (!err || is)) {
+                            $('.megasync-overlay').removeClass('downloading');
+                            M.addDownload([M.RootID]);
+                        }
+                        else {
+                            dlmanager.showMEGASyncOverlay();
+                        }
+                    });
                 });
             }
         }
@@ -4255,7 +4675,7 @@ FileManager.prototype.onSectionUIOpen = function(id) {
             $('.fm-right-header-user-management').removeClass('hidden');
             M.hideEmptyGrids();
         }
-        else if (M.isCustomView(id).type === 'gallery' || isAlbums) {
+        else if (M.isGalleryPage(id) || isAlbums) {
             $('.fm-right-header').addClass('hidden');
             $('.fm-right-header-user-management').addClass('hidden');
         }
@@ -4279,7 +4699,9 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         id !== 'public-links' &&
         !String(M.currentdirid).includes('public-links') &&
         id !== 'file-requests' &&
-        !String(M.currentdirid).includes('file-requests')
+        !String(M.currentdirid).includes('file-requests') &&
+        id !== 's4' &&
+        M.currentrootid !== 's4'
     ) {
         $('.files-grid-view.fm').addClass('hidden');
         $('.fm-blocks-view.fm').addClass('hidden');
@@ -4303,23 +4725,24 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         $('.out-shared-grid-view').addClass('hidden');
     }
 
-    if (id !== 'shared-with-me' && id !== 'out-shares') {
+    if (id !== 'shared-with-me' && id !== 'out-shares' || M.search) {
         $('.shares-tabs-bl').addClass('hidden');
     }
 
-    if (tmpId !== 'gallery' || isAlbums) {
+    if (!M.gallery || isAlbums) {
         $('.gallery-view').addClass('hidden');
     }
 
-    if (M.previousdirid && M.previousdirid.startsWith('albums')) {
-        if (M.currentCustomView.type === 'gallery') {
+    if (M.previousdirid && M.isAlbumsPage(0, M.previousdirid)
+        || !$('#albums-view', $('.fm-right-files-block')).hasClass('hidden')) {
+        if (M.isGalleryPage()) {
             mega.gallery.albums.disposeInteractions();
         }
         else if (isAlbums && mega.gallery.albums && mega.gallery.albums.grid) {
             mega.gallery.albums.grid.clear();
         }
         else {
-            $('.albums-view', $('.fm-right-files-block')).addClass('hidden');
+            $('#albums-view', $('.fm-right-files-block')).addClass('hidden');
 
             if (mega.gallery.albums) {
                 mega.gallery.albums.disposeAll();
@@ -4389,9 +4812,11 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         || id === 'rubbish-bin'
         || id === 'recents'
         || id === 'discovery'
+        || id === 's4'
         || isAlbums
         || M.isDynPage(id)
         || mega.gallery.sections[id]
+        || (isMediaDiscovery && !folderlink)
         || id === 'file-requests'
     ) {
         M.initLeftPanel();
@@ -4426,6 +4851,15 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     }
 
     // Revamp Implementation End
+
+    if (self.FMResizablePane) {
+        FMResizablePane.refresh();
+    }
+
+    if (d) {
+        console.timeEnd('sectionUIOpen');
+        console.groupEnd();
+    }
 };
 
 
@@ -4456,13 +4890,7 @@ FileManager.prototype.getLinkAction = function() {
 
             msgDialog('confirmation', l[1003], fldName, l[18229], function(e) {
                 if (e) {
-                    mega.fileRequest
-                        .removeList(mdList, true)
-                        .then(() => {
-                            showDialog();
-                        }).catch((ex) => {
-                            return dump(ex);
-                        });
+                    mega.fileRequest.removeList(mdList, true).then(showDialog).catch(dump);
                 }
             });
         }
@@ -4478,9 +4906,18 @@ FileManager.prototype.getLinkAction = function() {
 FileManager.prototype.initStatusBarLinks = function() {
     "use strict";
 
-    $('.js-statusbarbtn').rebind('click', function(e){
-        if (this.classList.contains('download')) {
-            if (M.currentCustomView.type === 'albums') {
+    // Set hover text to Share link or Share links depending on number selected
+    const linkHoverText = mega.icu.format(l.share_link, $.selected.length);
+    const $selectionStatusBar = $('.selection-status-bar');
+
+    $('.js-statusbarbtn.link', $selectionStatusBar).attr('data-simpletip', linkHoverText);
+    $('.js-statusbarbtn', $selectionStatusBar).rebind('click', function(e) {
+        const isMegaList = M.dyh ? M.dyh('is-mega-list') : true;
+        if (!isMegaList) {
+            M.dyh('init-status-bar-links', e, this.classList);
+        }
+        else if (this.classList.contains('download')) {
+            if (M.isAlbumsPage()) {
                 mega.gallery.albums.downloadSelectedElements();
             }
             else {
@@ -4488,7 +4925,7 @@ FileManager.prototype.initStatusBarLinks = function() {
             }
         }
         else if (this.classList.contains('share')) {
-            M.openSharingDialog();
+            M.openSharingDialog($.selected[0]);
         }
         else if (this.classList.contains('sendto')) {
             openCopyDialog('conversations');
@@ -4506,18 +4943,17 @@ FileManager.prototype.initStatusBarLinks = function() {
             fmremove();
         }
         else if (this.classList.contains('options')) {
-
             if (this.classList.contains('c-opened')) {
-
                 this.classList.remove('c-opened');
                 $.hideContextMenu();
                 return false;
             }
+
             M.contextMenuUI(e, 1);
             this.classList.add('c-opened');
         }
         else if (this.classList.contains('preview')) {
-            if (M.currentCustomView.type === 'albums') {
+            if (M.isAlbumsPage()) {
                 mega.gallery.albums.previewSelectedElements();
             }
             else {
@@ -4525,7 +4961,7 @@ FileManager.prototype.initStatusBarLinks = function() {
             }
         }
         else if (this.classList.contains('delete-from-album')) {
-            mega.gallery.albums.removeSelectedElements();
+            mega.gallery.albums.requestAlbumElementsRemoval();
         }
 
         return false;
@@ -4535,9 +4971,10 @@ FileManager.prototype.initStatusBarLinks = function() {
 FileManager.prototype.initLeftPanel = function() {
     'use strict';
 
-    const isGallery = M.currentCustomView.type === 'gallery';
+    const isGallery = M.isGalleryPage();
     const isDiscovery = isGallery && M.currentCustomView.prefixPath === 'discovery/';
-    const isAlbums = M.currentCustomView.type === 'albums';
+    const isAlbums = M.isAlbumsPage();
+    const isMediaDiscovery = M.isMediaDiscoveryPage();
 
     let elements = document.getElementsByClassName('js-lpbtn');
 
@@ -4555,11 +4992,11 @@ FileManager.prototype.initLeftPanel = function() {
         elements[j].classList.remove('hidden');
     }
 
-    if ((isGallery || isAlbums) && mega.gallery.albums) {
+    if ((isGallery || isAlbums || isMediaDiscovery && !folderlink) && mega.gallery.albums) {
         mega.gallery.albums.init();
     }
 
-    document.getElementsByClassName('js-lp-storage-usage')[0].classList.remove('hidden');
+    $('.js-lp-storage-usage').removeClass('hidden');
 
     this.checkLeftStorageBlock();
 
@@ -4587,8 +5024,19 @@ FileManager.prototype.initLeftPanel = function() {
     else if (M.isDynPage(M.currentdirid)) {
         $(`.js-lpbtn[data-link="${M.currentdirid}"]`, '.js-myfiles-panel').addClass('active');
     }
-    else if (isGallery && mega.gallery.sections[M.currentdirid]) {
+    else if (isGallery && mega.gallery.sections[M.currentdirid]) { // If gallery and is not Discovery
         $(`.js-lpbtn[data-link="${mega.gallery.sections[M.currentdirid].root}"]`).addClass('active');
+    }
+    else if (M.currentrootid === 's4' && M.currentCustomView.subType === 'container') {
+        $('.js-lpbtn[data-link="s4"]').addClass('active');
+    }
+
+    if (u_attr) {
+        const galleryBtn = document.querySelector('.nw-fm-left-icon.gallery');
+
+        if (galleryBtn && (!galleryBtn.dataset.locationPref || isGallery)) {
+            mega.gallery.updateButtonsStates(elements, galleryBtn);
+        }
     }
 
     $('.js-lpbtn').rebind('click.openSubTab', function(e) {
@@ -4618,21 +5066,45 @@ FileManager.prototype.initLeftPanel = function() {
         }
         else if (link === 'upgrade') {
             loadSubPage('pro');
+            eventlog(500477);
         }
-        else if (M.isCustomView(link).type === 'gallery') {
+        else if (M.isGalleryPage(link)) {
 
             onIdle(() => {
-
                 const gallery = mega.gallery[link];
 
-                if (gallery && link === M.previousdirid) {
-
+                if (gallery && link === M.previousdirid && link !== M.currentdirid) {
                     gallery.mode = false;
                     gallery.setMode('a', 1);
                 }
             });
         }
+        else if (link === 's4' && 'ui' in s4) {
+            const $eTarget = $(this);
+            const $s4ContentPanel = $('.content-panel.s4', '.js-myfiles-panel');
+
+            if (M.dyh && M.dyh('is-section', 'container') || $(e.target).hasClass('js-cloudtree-expander')) {
+                $eTarget.toggleClass('collapse');
+                if ($s4ContentPanel.hasClass('collapse')) {
+                    $s4ContentPanel.removeClass('collapse');
+                    M.addTreeUIDelayed();
+                }
+                else {
+                    $s4ContentPanel.addClass('collapse');
+                }
+            }
+            else {
+                s4.ui.renderRoot();
+            }
+        }
     });
+
+    if (M.currentrootid === 's4') {
+        // Auto expand the tree pane if access any component pages of s4
+        $('.js-lpbtn.js-s4-btn', '.js-myfiles-panel').removeClass('collapse');
+        $('.content-panel.s4', '.js-myfiles-panel').removeClass('collapse');
+        M.addTreeUIDelayed();
+    }
 };
 
 
@@ -4711,7 +5183,10 @@ FileManager.prototype.cameraUploadUI = function() {
         }
 
         if (fmItem) {
-            fmItem.classList.add('folder-camera');
+
+            const postfix = M.viewmode ? '90' : '24';
+            fmItem.classList.remove(`icon-folder-${postfix}`);
+            fmItem.classList.add('folder-camera', `icon-folder-camera-uploads-${postfix}`);
         }
     }
 };
@@ -4730,7 +5205,7 @@ FileManager.prototype.cameraUploadUI = function() {
         register: ['terms'],
         selectFolder: ['createfolder'],
         saveAs: ['createfolder'],
-        share: ['share-add'],
+        share: ['share-add', 'fingerprint-dialog'],
         'stripe-pay': ['stripe-pay-success', 'stripe-pay-failure']
     };
 
@@ -4802,9 +5277,9 @@ FileManager.prototype.cameraUploadUI = function() {
                     }
 
                     if (!$dialog.is('#ob-dialog')) {
-                        // arrange to back any non-controlled dialogs,
+                        // arrange to back any non-controlled dialogs except message dialog,
                         // this class will be removed on the next closeDialog()
-                        $('.mega-dialog:visible, .overlay:visible').addClass('arrange-to-back');
+                        $('.mega-dialog:not(#msgDialog):visible, .overlay:visible').addClass('arrange-to-back');
                         fm_showoverlay();
                     }
                     $dialog.removeClass('hidden arrange-to-back');
@@ -4842,7 +5317,16 @@ FileManager.prototype.cameraUploadUI = function() {
             $('html, body').removeClass('overlayed');
             $('.fm-dialog-overlay').addClass('hidden');
             $('.mega-dialog:visible, .overlay:visible').addClass('hidden');
+
+            if (mega.ui.overlay && mega.ui.overlay.visible) {
+                mega.ui.overlay.hide();
+            }
+            if (mega.ui.sheet && mega.ui.sheet.visible) {
+                mega.ui.sheet.hide();
+            }
         }
     });
 
 })(self);
+
+Object.freeze(FileManager.prototype);

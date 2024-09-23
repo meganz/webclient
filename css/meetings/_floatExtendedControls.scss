@@ -1,0 +1,60 @@
+.stream-controls,
+.float-video-controls {
+    .button-group {
+        position: relative;
+
+        .info-indicator {
+            position: absolute;
+            top: -1px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            border-radius: 200px;
+
+            &.active { background: #88FF5B; }
+
+            &.warn {
+                background: var(--surface-black);
+
+                i {
+                    --icon-size: 24px;
+                    --mask-color: var(--secondary-orange);
+                }
+            }
+        }
+    }
+}
+
+.dropdown.body.button-group-menu {
+    display: none;
+    z-index: 1126;
+
+    &:hover {
+        display: block;
+    }
+
+    div.button {
+        display: flex;
+        --icon-size: 24px;
+        font: var(--text-body-1);
+        padding: 2px 4px;
+
+        div {
+            margin-inline-end: 8px;
+            -webkit-margin-end: 8px;
+        }
+
+        span {
+            margin: auto 0;
+        }
+    }
+}
+
+// Hover on the dropdown or on the floating stream should show the dropdown + overlay.
+body div:has(.float-video:hover) + .dropdown.body.button-group-menu,
+body div:has(+ div.dropdown.body.button-group-menu:hover) .float-video .float-video-overlay {
+    display: block;
+}
+body div:has(+ div.dropdown.body.button-group-menu:hover) .float-video .video-node .video-node-status {
+    bottom: 64px;
+}

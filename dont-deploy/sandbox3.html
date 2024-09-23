@@ -143,8 +143,16 @@
         // Disable the cryptographic hash verification logic.
         localStorage.dd = '1';
 
-        // Set the static path
-        //localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
+        // Set the static path to the current host if requested
+        // Useful if testing https://mega.nz on a beta server and using /etc/hosts to override the real ip
+        if (window.location.search.indexOf('staticpath=currenthost') > -1) {
+            localStorage.staticpath = window.location.protocol + "//" + devhost + pathSuffix + "/";
+            localStorage.defaultstaticpath = localStorage.staticpath;
+
+            // For this to work, also uncomment block in secureboot.js with comment:
+            // "Disable hash checking if requested for development"
+            localStorage.disablecontentcheck = '1';
+        }
 
         // Turn on full debugging.
         localStorage.d = '1'; // Using console.*

@@ -1,39 +1,86 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../mixins.js';
+import { MegaRenderMixin, compose } from '../../mixins.js';
 import SearchPanel from '../searchPanel/searchPanel.jsx';
-import { PerfectScrollbar } from '../../../ui/perfectScrollbar.jsx';
-import Navigation from './navigation.jsx';
+import { Navigation } from './navigation.jsx';
 import Actions from './actions.jsx';
-import { ConversationsList } from './conversationsList.jsx';
-import Toggle, { TogglePanel } from './toggle.jsx';
+import { Chats, Meetings, Archived } from './conversationsList.jsx';
+import { withUpdateObserver } from '../updateObserver.jsx';
 
-export default class LeftPanel extends MegaRenderMixin {
-    static NAMESPACE = 'lhp';
+export const NAMESPACE = 'lhp';
 
-    renderConversations(archived = false) {
-        const { view, views, renderView } = this.props;
-        const conversations = Object.values(this.props.conversations)
-            .filter(c =>
-                (view === views.MEETINGS ? c.isMeeting : !c.isMeeting) &&
-                c[archived ? 'isArchived' : 'isDisplayable']()
-            );
+export const FILTER = {
+    MUTED: 'muted',
+    UNREAD: 'unread'
+};
 
+class LeftPanel extends MegaRenderMixin {
+    state =  {
+        archived: false,
+        archivedUnmounting: false,
+        filter: '',
+        unreadChats: 0,
+        unreadMeetings: 0,
+        contactRequests: 0
+    };
+
+    constructor(props) {
+        super(props);
+        this.state.contactRequests = Object.keys(M.ipc).length;
+    }
+
+    customIsEventuallyVisible() {
+        return M.chat;
+    }
+
+    toggleFilter = (filter) => {
+        this.setState(state => ({ filter: state.filter === filter ? '' : filter }), () => {
+            Object.values(megaChat.$chatTreePanePs).map(({ ref }) => ref.reinitialise?.());
+        });
+    };
+
+    renderLoading() {
         return (
-            <PerfectScrollbar
-                className="chat-lp-scroll-area"
-                ref={ref => {
-                    megaChat.$chatTreePanePs = ref;
-                }}
-                view={view}
-                conversations={conversations}>
-                <ConversationsList
-                    isArchived={archived}
-                    view={view}
-                    views={views}
-                    conversations={conversations}
-                    onConversationClick={chatRoom => renderView(chatRoom.isMeeting ? views.MEETINGS : views.CHATS)}
-                />
-            </PerfectScrollbar>
+            <>
+                <span className="heading loading-sketch" />
+                <ul className="conversations-pane loading-sketch">
+                    {Array.from({ length: this.props.conversations.length }, (el, i) => {
+                        return (
+                            <li key={i}>
+                                <div className="conversation-avatar">
+                                    <div className="chat-topic-icon" />
+                                </div>
+                                <div className="conversation-data">
+                                    <div className="conversation-data-top" />
+                                    <div className="conversation-message-info">
+                                        <div className="conversation-message" />
+                                    </div>
+                                </div>
+                            </li>
+                        );
+                    })}
+                </ul>
+            </>
+        );
+    }
+
+    // --
+
+    componentWillUnmount() {
+        super.componentWillUnmount();
+        megaChat.unbind(`onUnreadCountUpdate.${NAMESPACE}`);
+        mBroadcaster.removeListener(this.contactRequestsListener);
+    }
+
+    componentDidMount() {
+        super.componentDidMount();
+        megaChat.rebind(
+            `onUnreadCountUpdate.${NAMESPACE}`,
+            (ev, { unreadChats, unreadMeetings }) => {
+                this.setState({ unreadChats, unreadMeetings }, () => this.safeForceUpdate());
+            }
+        );
+        this.contactRequestsListener = mBroadcaster.addListener('fmViewUpdate:ipc', () =>
+            this.setState({ contactRequests: Object.keys(M.ipc).length })
         );
     }
 
@@ -41,67 +88,96 @@ export default class LeftPanel extends MegaRenderMixin {
         const {
             view,
             views,
-            routingSection,
             conversations,
+            routingSection,
             leftPaneWidth,
             renderView,
             startMeeting,
-            createGroupChat
+            scheduleMeeting,
+            createNewChat
         } = this.props;
-        const IS_LOADING = view === views.LOADING;
+        const { CHATS, MEETINGS, LOADING } = views;
 
         return (
             <div
                 className={`
                     fm-left-panel
                     chat-lp-body
+                    ${NAMESPACE}-container
                     ${is_chatlink && 'hidden' || ''}
                     ${megaChat._joinDialogIsShown && 'hidden' || ''}
                 `}
                 {...(leftPaneWidth && { width: leftPaneWidth })}>
                 <div className="left-pane-drag-handle"/>
+
                 <SearchPanel/>
 
                 <Navigation
                     view={view}
                     views={views}
                     routingSection={routingSection}
-                    renderView={renderView}
+                    unreadChats={this.state.unreadChats}
+                    unreadMeetings={this.state.unreadMeetings}
+                    contactRequests={this.state.contactRequests}
+                    renderView={view => this.setState({ filter: false }, () => renderView(view))}
                 />
 
                 <Actions
                     view={view}
                     views={views}
+                    filter={this.state.filter}
                     routingSection={routingSection}
                     startMeeting={startMeeting}
-                    createGroupChat={createGroupChat}
+                    scheduleMeeting={scheduleMeeting}
+                    createNewChat={createNewChat}
+                    onFilter={this.toggleFilter}
                 />
+
+                {this.state.archived &&
+                    <Archived
+                        conversations={conversations}
+                        archivedUnmounting={this.state.archivedUnmounting}
+                        onClose={() =>
+                            this.setState({ archivedUnmounting: true }, () =>
+                                tSleep(0.3).then(() =>
+                                    this.setState({ archivedUnmounting: false, archived: false })
+                                )
+                            )
+                        }
+                    />
+                }
 
                 <div
                     className={`
-                        ${LeftPanel.NAMESPACE}-conversations
+                        ${NAMESPACE}-conversations
+                        ${view === MEETINGS ? 'meetings-view' : ''}
+                        ${view === CHATS ? 'chats-view' : ''}
                         conversations
                         content-panel
                         active
                     `}>
-                    <Toggle
-                        view={view}
-                        loading={IS_LOADING}
-                        conversations={conversations}
-                        expanded="one">
-                        <TogglePanel
-                            key="one"
-                            heading={!IS_LOADING && (view === views.CHATS ? l.contacts_and_groups : l.past_meetings)}>
-                            {this.renderConversations()}
-                        </TogglePanel>
-                        <TogglePanel
-                            key="two"
-                            heading={!IS_LOADING && l[19067] /* `Archived` */}>
-                            {this.renderConversations(true)}
-                        </TogglePanel>
-                    </Toggle>
+                    {view === LOADING ?
+                        this.renderLoading() :
+                        <>
+                            {view === MEETINGS &&
+                                <Meetings
+                                    conversations={conversations}
+                                    leftPaneWidth={leftPaneWidth}
+                                />
+                            }
+                            {view === CHATS &&
+                                <Chats
+                                    conversations={conversations}
+                                    filter={this.state.filter}
+                                    onArchivedClicked={() => this.setState({ archived: true, filter: false })}
+                                />
+                            }
+                        </>
+                    }
                 </div>
             </div>
         );
     }
 }
+
+export default compose(withUpdateObserver)(LeftPanel);

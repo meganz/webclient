@@ -38,22 +38,14 @@ MegaData.prototype.doFallbackSort = function(a, b, d) {
         return (a.ts < b.ts ? -1 : 1) * d;
     }
 
-    if (this.collator) {
-        return this.collator.compare(a.h, b.h) * d;
-    }
-
-    return String(a.h).localeCompare(String(b.h)) * d;
+    return this.compareStrings(a.h, b.h, d);
 };
 
 MegaData.prototype.doFallbackSortWithName = function(a, b, d) {
     'use strict';
 
     if (a.name !== b.name) {
-        if (this.collator) {
-            return this.collator.compare(a.name, b.name) * d;
-        }
-
-        return String(a.name).localeCompare(String(b.name)) * d;
+        return this.compareStrings(a.name, b.name, d);
     }
 
     return M.doFallbackSort(a, b, d);
@@ -79,30 +71,14 @@ MegaData.prototype.getSortByNameFn = function() {
 MegaData.prototype.getSortByNameFn2 = function(d) {
     'use strict';
 
-    if (typeof Intl !== 'undefined' && Intl.Collator) {
-        var intl = this.collator || new Intl.Collator('co', {numeric: true});
+    return (a, b) => {
+        const nameA = a.nickname ? `${a.nickname} ${a.name}` : a.name;
+        const nameB = b.nickname ? `${b.nickname} ${b.name}` : b.name;
 
-        return function(a, b) {
-
-            var nameA = (a.nickname) ? a.nickname + ' (' + a.name + ')' : a.name;
-            var nameB = (b.nickname) ? b.nickname + ' (' + b.name + ')' : b.name;
-
-            if (nameA !== nameB) {
-                return intl.compare(nameA, nameB) * d;
-            }
-
-            return M.doFallbackSort(a, b, d);
-        };
-    }
-
-    return function(a, b) {
-        if (typeof a.name === 'string' && typeof b.name === 'string') {
-
-            var nameA = (a.nickname) ? a.nickname + ' (' + a.name + ')' : a.name;
-            var nameB = (b.nickname) ? b.nickname + ' (' + b.name + ')' : b.name;
-
-            return nameA.localeCompare(nameB) * d;
+        if (nameA !== nameB) {
+            return this.compareStrings(nameA, nameB, d);
         }
+
         return M.doFallbackSort(a, b, d);
     };
 };
@@ -118,17 +94,9 @@ MegaData.prototype.sortByName = function(d) {
 MegaData.prototype.getSortByEmail = function() {
     "use strict";
 
-    if (typeof Intl !== 'undefined' && Intl.Collator) {
-        var intl = new Intl.Collator('co', {numeric: true});
-
-        return function(a, b, d) {
-            return intl.compare(a.m, b.m) * d;
-        };
-    }
-
     return function(a, b, d) {
         if (typeof a.m === 'string' && typeof b.m === 'string') {
-            return a.m.localeCompare(b.m) * d;
+            return M.compareStrings(a.m, b.m, d);
         }
         return -1;
     };
@@ -147,7 +115,7 @@ MegaData.prototype.sortByModTime = function(d) {
     this.sort();
 };
 
-MegaData.prototype.sortByModTimeFn = () => {
+MegaData.prototype.sortByModTimeFn = function() {
 
     "use strict";
 
@@ -168,7 +136,7 @@ MegaData.prototype.sortByModTimeFn = () => {
     };
 };
 
-MegaData.prototype.sortByModTimeFn2 = () => {
+MegaData.prototype.sortByModTimeFn2 = function() {
     'use strict';
 
     return (a, b, d) => {
@@ -180,6 +148,20 @@ MegaData.prototype.sortByModTimeFn2 = () => {
         }
 
         return M.doFallbackSortWithName(a, b, d);
+    };
+};
+
+MegaData.prototype.sortByModTimeFn3 = function() {
+    'use strict';
+
+    return (a, b, d) => {
+        const timeA = a.mtime || a.ts || 0;
+        const timeB = b.mtime || b.ts || 0;
+
+        if (timeA && timeB && timeA !== timeB) {
+            return timeA < timeB ? -d : d;
+        }
+        return this.compareStrings(a.h, b.h, d);
     };
 };
 
@@ -345,8 +327,12 @@ MegaData.prototype.sortByOwner = function(d) {
 
         if (typeof usera.name === 'string' && typeof userb.name === 'string') {
 
-            var namea = usera.name === userb.name ? usera.name + a.su : usera.name;
-            var nameb = usera.name === userb.name ? userb.name + b.su : userb.name;
+            // If nickname exist, use nickname for sorting
+            var namea = usera.nickname || usera.name;
+            var nameb = userb.nickname || userb.name;
+
+            namea = namea === nameb ? namea + a.su : namea;
+            nameb = namea === nameb ? nameb + b.su : nameb;
 
             return namea.localeCompare(nameb) * d;
         }
@@ -555,9 +541,35 @@ MegaData.prototype.sortByInteraction = function(d) {
     this.sort();
 };
 
+MegaData.prototype.getSortByVerificationFn = function() {
+    'use strict';
+
+    return function(a, b, d) {
+        const a_verifyState = (u_authring.Ed25519[a.h] || {}).method
+                                >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON;
+        const b_verifyState = (u_authring.Ed25519[b.h] || {}).method
+                                >= authring.AUTHENTICATION_METHOD.FINGERPRINT_COMPARISON;
+        if (a_verifyState < b_verifyState) {
+            return -1 * Number(d);
+        }
+        else if (a_verifyState >= b_verifyState) {
+            return 1 * Number(d);
+        }
+    };
+};
+
+MegaData.prototype.getSortByVerification = function(d) {
+    'use strict';
+
+    this.sortfn = this.getSortByVerificationFn();
+    this.sortd = d;
+    this.sort();
+};
+
 MegaData.prototype.doSort = function(n, d) {
     "use strict";
     $('.grid-table thead .arrow').removeClass('asc desc');
+    $('.dropdown-section.sort-by .sprite-fm-mono.sort-arrow').removeClass('icon-up icon-down');
     $('.files-menu.context .submenu.sorting .dropdown-item.sort-grid-item').removeClass('selected');
 
     const sortIconClassPrefix = 'icon-';
@@ -577,6 +589,12 @@ MegaData.prototype.doSort = function(n, d) {
     n = String(n).replace(/\W/g, '');
 
     $('.arrow.' + n + ':not(.is-chat)').addClass(arrowDirection);
+    if (n === "name") {
+        $('#name-sort-arrow.sprite-fm-mono.sort-arrow').addClass(sortIconClassPrefix + sortIconAddClass);
+    }
+    else if (n === "label") {
+        $('#label-sort-arrow.sprite-fm-mono.sort-arrow').addClass(sortIconClassPrefix + sortIconAddClass);
+    }
 
     const sortItemPrefix = '.dropdown-item.sort-grid-item.sort-';
     let subMenuSortClass = '';

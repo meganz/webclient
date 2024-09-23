@@ -1,3 +1,5 @@
+/* eslint-disable strict, no-empty-function, no-useless-concat */
+
 /**
  * Root namespace for the mobile web site, contains common variables and functions
  */
@@ -6,112 +8,359 @@ var mobile = {
     /** The base path for images */
     imagePath: staticpath + 'images/mobile/extensions/',
 
-    /**
-     * Toast timer, reset if new toast comes in.
-     */
-    toastTimer: null,
+    shim(ctx) {
 
-    /**
-     * Load the `mobile.html` page and initialize the main menu.
-     */
-    initDOM: function() {
-        'use strict';
-        parsepage(pages['mobile']);
-        topmenuUI();
-    },
-
-    /**
-     * Show a simple toast message and hide it after 3 seconds
-     * @param {String} message The message to show
-     * @param {String} position Optional flag to show the position at the top, by default it shows at the bottom
-     * @param {int} timeout Optional, optional timeout in miliseconds
-     */
-    showToast: function(message, position, timeout) {
-        'use strict';
-        mobile.renderToast($('.mobile.toast-notification.info'), message, position, timeout);
-    },
-
-    /**
-     * Show a green success toast.
-     * @param message
-     * @param position
-     * @param timeout Optional, optional timeout in miliseconds
-     */
-    showSuccessToast: function(message, position, timeout, clickCallback) {
         'use strict';
 
-        var $toast = $('.mobile.toast-notification.alert');
-        $toast.removeClass("error").addClass("success");
-        mobile.renderToast($toast, message, position, timeout, clickCallback);
-    },
+        const value = () => MegaPromise.resolve();
 
-    /**
-     * Show red error toast.
-     * @param message
-     * @param position
-     * @param {int} timeout Optional, optional timeout in miliseconds
-     */
-    showErrorToast: function(message, position, timeout, clickCallback) {
-        'use strict';
+        Object.defineProperty(ctx, 'search' + 'Path', {value});
+        Object.defineProperty(ctx, 'abort' + 'Transfers', {value});
+        Object.defineProperty(ctx, 'init' + 'UIKeyEvents', {value});
+        Object.defineProperty(ctx, 'onSecti' + 'onUIOpen', {value});
 
-        var $toast = $('.mobile.toast-notification.alert');
-        $toast.removeClass("success").addClass("error");
-        mobile.renderToast($toast, message, position, timeout, clickCallback);
-    },
+        Object.defineProperty(ctx, 'initFile' + 'ManagerUI', {
+            value: function() {
 
-    /**
-     * Render a specific toast notification.
-     * @param $toastNotification
-     * @param message
-     * @param position
-     * @param timeout int 0 = never close.
-     */
-    renderToast: function($toastNotification, message, position, timeout, clickCallback) {
-        'use strict';
+                MegaMobileHeader.init();
+                MegaMobileFooter.init();
+                MegaMobileEmptyState.init();
+                MegaMobileViewOverlay.init();
 
-        // Set the message and show the notification
-        $toastNotification.find(".message-body").text(message);
-        $toastNotification.removeClass('hidden').addClass('active');
+                if (typeof window.InitFileDrag === 'function') {
+                    window.InitFileDrag();
+                    delete window.InitFileDrag;
+                }
+            }
+        });
+        mobile.uploadOverlay.shim(ctx);
 
-        // Show the toast notification at the top of the page (useful if the keyboard is open and blocking the bottom)
-        if (position === 'top') {
-            $toastNotification.addClass('top');
+        Object.defineProperty(ctx, 'addWeb' + 'Download', {
+            value: function(nodes) {
+                // @see filesystem.js/abortAndStartOver
+                if (d) {
+                    console.assert(Array.isArray(nodes) && nodes.length === 1 && arguments.length === 1, 'bogus usage');
+                }
+                M.resetUploadDownload();
+                later(() => {
+                    mobile.downloadOverlay.startDownload(nodes[0]);
+                });
+            }
+        });
+
+        Object.defineProperty(ctx, 'show' + 'OverStorageQuota', {
+            async value(data, options) {
+                // only one call in M.checkGoingOverStorageQuota is expecting a promise
+                if (options) {
+                    // cannot complete the action
+                    delay('cannot-complete-action', () => {
+                        mega.ui.sheet.show({
+                            name: 'going-over-storage',
+                            type: 'modal',
+                            showClose: true,
+                            icon: 'sprite-mobile-fm-mono icon-alert-triangle-thin-outline icon error',
+                            title: l.cannot_complete_action,
+                            contents: [l.cannot_complete_action_msg],
+                            actions: [
+                                {
+                                    type: 'normal',
+                                    text: l[433],
+                                    className: 'primary',
+                                    onClick: () => {
+                                        mega.ui.sheet.hide();
+                                        loadSubPage('pro');
+                                    }
+                                }
+                            ]
+                        });
+                    }, 50);
+
+                    return Promise.reject();
+                }
+
+                if (data && (data === EPAYWALL || (data.isFull && Object(u_attr).uspw))) {
+                    data = Object.create(null);
+                    data.isFull = data.isAlmostFull = data.EPAYWALL = true;
+                }
+
+                if (data.isAlmostFull) {
+                    ulmanager.ulOverStorageQuota = true;
+
+                    var action = function() {
+                        if (data.EPAYWALL) {
+                            if (!M.account) {
+                                M.accountData(() => {
+                                    action();
+                                });
+
+                                return;
+                            }
+
+                            var overlayTexts = odqPaywallDialogTexts(u_attr || {}, M.account);
+                            const bannerMsg = overlayTexts.fmBannerText
+                                .replace('<a href="/pro" class="clickurl">', '<strong>').replace('</a>', '</strong>')
+                                .replace('<span>', '').replace('</span>', '');
+
+                            const banner = mobile.banner.show('', parseHTML(bannerMsg), '', 'error',
+                                                              false, undefined, true);
+                            banner.on('cta', () => loadSubPage('pro'));
+
+                            mega.ui.sheet.hide();
+
+                            const inlineAd = mobile.inline.alert.create({
+                                parentNode: mega.ui.sheet.contentNode,
+                                componentClassname : 'error',
+                                icon: 'sprite-mobile-fm-mono icon-alert-triangle-thin-outline',
+                                text: parseHTML(overlayTexts.dlgFooterText.replace(/span/g, 'strong')),
+                                closeButton: false
+                            });
+
+                            mega.ui.sheet.show({
+                                name: 'full-storage-data-risk',
+                                type: 'modal',
+                                showClose: true,
+                                icon: 'sprite-mobile-fm-mono icon-alert-triangle-thin-outline error',
+                                title: l[16360],
+                                contents: [overlayTexts.dialogText, inlineAd.domNode],
+                                actions: [
+                                    {
+                                        type: 'normal',
+                                        text: l.upgrade_now,
+                                        className: '',
+                                        onClick: () => {
+                                            mega.ui.sheet.hide();
+                                            loadSubPage('pro');
+                                        }
+                                    }
+                                ]
+                            });
+                        }
+                        else if (mega.ui.sheet.name !== 'resume-download') { // don't proceed if resume dialog is open
+                            mobile.overStorageQuota.quotaInfo = data;
+                            if (data.isFull) {
+                                mobile.overStorageQuota.show();
+                            }
+                            else {
+                                ulmanager.ulOverStorageQuota = false;
+                                const banner = mobile.banner.show(
+                                    l.storage_almost_full, l.storage_almost_full_msg, l.upgrade_now, 'warning', true);
+                                banner.on('cta', () => {
+                                    mega.ui.sheet.hide();
+                                    loadSubPage('pro');
+                                });
+
+                                const sheetContents = mobile.overStorageQuota.getSheetContents(false);
+
+                                mega.ui.sheet.show({
+                                    name: 'almost-full-storage',
+                                    type: 'modal',
+                                    showClose: true,
+                                    icon: 'sprite-mobile-fm-mono icon-alert-circle-thin-outline icon warning',
+                                    contents: [sheetContents],
+                                    actions: [
+                                        {
+                                            type: 'normal',
+                                            text: l[433],
+                                            className: 'primary',
+                                            onClick: () => {
+                                                mega.ui.sheet.hide();
+                                                if (mobile.overStorageQuota.advertiseFlexi) {
+                                                    sessionStorage.mScrollTo = 'flexi';
+                                                }
+                                                loadSubPage('pro');
+                                            }
+                                        }
+                                    ]
+                                });
+                            }
+                        }
+                    };
+
+                    if (!pro.membershipPlans || !pro.membershipPlans.length) {
+                        pro.loadMembershipPlans(action);
+                    }
+                    else {
+                        action();
+                    }
+                }
+            }
+        });
+
+        Object.defineProperty(ctx, 'render' + 'Main', {
+            value: function(aUpdate) {
+
+                if (d) {
+                    console.time('renderMain');
+                }
+
+                if (!aUpdate) {
+                    if (this.megaRender) {
+                        this.megaRender.destroy();
+                    }
+
+                    // Clear startholder - temp. fix until startholder pages are revamped
+                    document.getElementById('startholder').textContent = '';
+
+                    const render = mobile.nodeSelector.active ? MobileSelectionRender : MobileMegaRender;
+
+                    this.megaRender = new render();
+                }
+                else if (!this.megaRender) {
+
+                    console.timeEnd('renderMain');
+                    return;
+                }
+
+                if (aUpdate) {
+                    mobile.cloud.renderUpdate();
+                }
+                else {
+                    mobile.cloud.renderLayout();
+                }
+
+                if (M.v.length) {
+                    fm_thumbnails();
+                }
+
+                if (d) {
+                    console.timeEnd('renderMain');
+                }
+
+                return true;
+            }
+        });
+
+        Object.defineProperty(ctx, 'updFile' + 'ManagerUI', {value: mobile.updFileManagerUI});
+        Object.defineProperty(ctx, 'onFolderSize' + 'ChangeUIUpdate', {value: mobile.onFolderSizeChangeUIUpdate});
+
+        Object.defineProperty(ctx, 'favourite' + 'DomUpdate', {
+            value: function(node) {
+
+                const component = MegaMobileNode.getNodeComponentByHandle(node.h);
+
+                if (component) {
+                    component.update('fav');
+                }
+
+                const {n} = M.sortmode || {};
+
+                if (node.p === M.currentdirid && n === 'fav') {
+
+                    const domNode = M.megaRender && M.megaRender.nodeMap[node.h] || document.getElementById(node.h);
+
+                    this.updateDomNodePosition(node, domNode);
+                }
+            }
+        });
+
+        Object.defineProperty(ctx, 'labelDo' + 'mUpdate', {
+            value: function(h) {
+
+                const component = MegaMobileNode.getNodeComponentByHandle(h);
+                const node = M.d[h] || false;
+
+                if (component) {
+                    component.update('lbl');
+                }
+
+                const {n} = M.sortmode || {};
+
+                if (node.p === M.currentdirid && n === 'label') {
+
+                    const domNode = M.megaRender && M.megaRender.nodeMap[h] || document.getElementById(h);
+
+                    this.updateDomNodePosition(node, domNode);
+                }
+            }
+        });
+
+        Object.defineProperty(ctx, 'onRename' + 'UIUpdate', {
+            value: function(h) {
+
+                const component = MegaMobileNode.getNodeComponentByHandle(h);
+                const node = M.d[h] || false;
+
+                if (component) {
+                    component.update('name');
+                }
+
+                const {n} = M.sortmode || {};
+
+                if (node.p === M.currentdirid && n === 'name') {
+
+                    const domNode = M.megaRender && M.megaRender.nodeMap[h] || document.getElementById(h);
+
+                    this.updateDomNodePosition(node, domNode);
+                }
+            }
+        });
+
+        // Trimmed version of doSort that only save sorting
+        Object.defineProperty(ctx, 'doS' + 'ort', {
+            value: function(n, d) {
+
+                this.sortmode = {n: n, d: d};
+
+                if (typeof this.sortRules[n] === 'function') {
+                    this.sortRules[n](d);
+
+                    if (this.fmsorting) {
+                        mega.config.set('sorting', this.sortmode);
+                    }
+                    else {
+                        fmsortmode(this.currentdirid, n, d);
+                    }
+                }
+                else if (d) {
+                    console.warn("Cannot sort by " + n);
+                }
+            }
+        });
+        Object.defineProperty(ctx, 'show' + 'PaymentCardBanner', {
+            value: function(status) {
+
+                if (!status) {
+                    return;
+                }
+
+                let bannerTitle;
+                let bannerDialog = u_attr && u_attr.b ? l.payment_card_update_details_b : l.payment_card_update_details;
+
+                // Expires next month (only show after the 15th of the current month)
+                if (status === 'expNextM') {
+                    bannerTitle = l.payment_card_exp_nxt_mnth;
+                }
+                // Expires this month
+                else if (status === 'expThisM') {
+                    bannerTitle = l.payment_card_almost_exp;
+                }
+                // Expired
+                else if (status === 'exp') {
+                    bannerTitle = l.payment_card_exp_b_title;
+                    bannerDialog = u_attr && u_attr.b ? l.payment_card_at_risk_b : l.payment_card_at_risk;
+                }
+
+                const banner = mobile.banner.show(
+                    bannerTitle,
+                    bannerDialog,
+                    l.update_card,
+                    status === 'exp' ? 'error' : 'warning',
+                    false);
+                banner.on('cta', () => loadSubPage('fm/account/paymentcard'));
+            }
+        });
+
+        Object.defineProperty(ctx, 'checkLe' + 'ftStorageBlock', {value: nop});
+
+        const tf = [
+            "renderTree", "buildtree", "initTreePanelSorting",
+            "treePanelType", "addTreeUI", "addTreeUIDelayed", "onTreeUIExpand", "onTreeUIOpen",
+            "treeSortUI", "treeFilterUI"
+        ];
+
+        for (let i = tf.length; i--;) {
+            Object.defineProperty(ctx, tf[i], {value});
         }
-
-        if (mobile.toastTimer !== null) {
-            clearTimeout(mobile.toastTimer);
-            mobile.toastTimer = null;
-        }
-
-        if (timeout === undefined || timeout === null || timeout < 0) {
-            timeout = 3000;
-        }
-
-        if (timeout > 0) {
-            // After 3 seconds, hide the notification
-            mobile.toastTimer = setTimeout(function () {
-                mobile.closeToast($toastNotification);
-            }, timeout);
-        }
-
-        $toastNotification.off('tap');
-        if (clickCallback instanceof Function) {
-            $toastNotification.on('tap', clickCallback);
-        }
-    },
-
-    /**
-     * Close a toast notification.
-     * @param $toastNotification (optional, if ommited will close all toasts).
-     */
-    closeToast: function($toastNotification) {
-        'use strict';
-
-        if ($toastNotification === undefined) {
-            $toastNotification = $(".mobile.toast-notification");
-        }
-
-        $toastNotification.addClass('hidden').removeClass('active top');
     },
 
     /**
@@ -167,27 +416,6 @@ var mobile = {
             }
 
             // Prevent double taps
-            return false;
-        });
-    },
-
-    /**
-     * Shows and initialises the up button on click/tap event handler
-     * @param {Object} $upButton jQuery selector for the up button
-     */
-    showAndInitUpButton: function($upButton) {
-
-        'use strict';
-
-        // Show the button
-        $upButton.removeClass('hidden');
-
-        // On click of the up button
-        $upButton.off('tap').on('tap', function() {
-            // Go up a directory.
-            if (M.currentdirid !== M.RootID && M.currentdirid !== M.RubbishID) {
-                M.openFolder(M.getNodeParent(M.currentdirid));
-            }
             return false;
         });
     },
@@ -269,67 +497,12 @@ var mobile = {
                 }
             }
             else {
-                window.open('/terms', '_blank');
+                mega.redirect('mega.io', '/terms', false, false, false);
             }
 
             // Prevent double clicks
             return false;
         });
-    },
-
-    /**
-     * Initialize a toggle switch in mobile web.
-     * @param $container
-     * @param startingValue
-     * @param onChange
-     */
-    initSwitch: function ($container, startingValue, onChange) {
-        'use strict';
-
-        var self = this;
-
-        // Set inital state.
-        this.setSwitch($container, startingValue);
-
-        // Handle change event.
-        $container.off('tap').on('tap', function () {
-            var newState = self.toggleSwitch($container);
-            if (typeof onChange === 'function') {
-                onChange(newState);
-            }
-            return false;
-        });
-    },
-
-    /**
-     * Toggle a feature toggle switch to the opposite state.
-     * @param $container
-     */
-    toggleSwitch: function($container) {
-        'use strict';
-
-        if ($container.hasClass('toggle-on')) {
-            $container.removeClass('toggle-on');
-            return 0;
-        } else {
-            $container.addClass('toggle-on');
-            return 1;
-        }
-    },
-
-    /**
-     * Set a feature toggle switch to a given state.
-     * @param $container
-     * @param state
-     */
-    setSwitch: function($container, state) {
-        'use strict';
-
-        if (state) {
-            $container.addClass('toggle-on');
-        } else {
-            $container.removeClass('toggle-on');
-        }
     },
 
     /**
@@ -363,14 +536,15 @@ var mobile = {
         'use strict';
 
         var $otherPages = $('#fmholder > div:not(.top-menu-popup)');
-        var $cloudDrive = $('.mobile.file-manager-block');
+        var $excludes = $('.mobile.file-manager-block, .mobile.top-menu-popup, .mega-header, .mega-top-menu, '
+            + '.mobile-rack' , '#mainlayout');
 
         // If logged in
         if (typeof u_attr !== 'undefined') {
 
-            // Hide other pages that may be showing and show the Cloud Drive
+            // Hide other pages that may be showing and show the cloud drive and necessary pages
             $otherPages.addClass('hidden');
-            $cloudDrive.removeClass('hidden');
+            $excludes.removeClass('hidden');
 
             // Open the root cloud folder
             loadSubPage('fm');
@@ -436,43 +610,6 @@ var mobile = {
     },
 
     /**
-     * Enable the Password Change/Update button if the fields are complete and correct
-     * @param {Object} $page The jQuery selector for the current page
-     */
-    initPasswordFieldsKeyupEvent: function($page) {
-
-        'use strict';
-
-        var $passwordField = $page.find('.password-input');
-        var $confirmPasswordField = $page.find('.password-confirm-input');
-        var $button = $page.find('.update-password-button');
-        var $allFields = $passwordField.add($confirmPasswordField);
-
-        // Add keyup event to the input fields
-        $allFields.rebind('keyup.buttonenable', function(event) {
-
-            var password = $passwordField.val();
-            var confirmPassword = $confirmPasswordField.val();
-
-            // Change the button to red to enable it if they have entered something in all the fields
-            if (password.length > 0 && confirmPassword.length > 0) {
-
-                // Activate the button
-                $button.addClass('active');
-
-                // If the Enter key is pressed try updating
-                if (event.which === 13) {
-                    $button.trigger('tap');
-                }
-            }
-            else {
-                // Grey it out if they have not completed one of the fields
-                $button.removeClass('active');
-            }
-        });
-    },
-
-    /**
      * Load the ZXCVBN password strength estimator library
      * @param {Object} $page The jQuery selector for the current page
      */
@@ -483,7 +620,7 @@ var mobile = {
         // Make sure the library is loaded
         if (typeof zxcvbn === 'undefined') {
 
-            // Show loading spinner
+            // Show loading spinner (for mobile web)
             var $loader = $page.find('.estimator-loading-icon').addClass('loading');
 
             // On completion of loading, hide the loading spinner
@@ -564,11 +701,17 @@ var mobile = {
             if (this.classList.contains('icon-eye-reveal')) {
 
                 $('input[type="password"]', this.parentNode).attr('type', 'text');
+                if ($('input', this.parentNode).attr('style')) {
+                    $('input', this.parentNode).attr('style', '-webkit-text-security: none;');
+                }
                 this.classList.remove('icon-eye-reveal');
                 this.classList.add('icon-eye-hidden');
             }
             else {
                 $('input[type="text"]', this.parentNode).attr('type', 'password');
+                if ($('input', this.parentNode).attr('style')) {
+                    $('input', this.parentNode).attr('style', '-webkit-text-security: disc;');
+                }
                 this.classList.add('icon-eye-reveal');
                 this.classList.remove('icon-eye-hidden');
             }
@@ -605,7 +748,7 @@ var mobile = {
 
             if (this.value.length === parseInt($(this).attr('maxlength'))
                 && ((e.keyCode >= 48 && e.keyCode <= 57)
-                || (e.keyCode >= 96 && e.keyCode <= 105))
+                    || (e.keyCode >= 96 && e.keyCode <= 105))
                 || e.keyCode === 69) {
                 e.preventDefault();
             }
@@ -622,48 +765,19 @@ var mobile = {
             console.time('rendernew');
         }
 
-        var countUpdNodes = {};
-        var promises = [];
-        var seenByCountUpd = {};
-
-        const _setCountUpdNode = async(node) => {
-
-            if (!M.d[node.p]) {
-                await dbfetch.acquire(node.p);
-            }
-
-            var parents = M.getPath(node.h);
-            var pIndex = parents.indexOf(M.currentdirid);
-            var pInCurrentView = parents[--pIndex];
-
-            if (pIndex > -1 && !countUpdNodes[pInCurrentView]) {
-                countUpdNodes[pInCurrentView] = M.d[pInCurrentView];
-            }
-        };
-
         for (var i = newnodes.length; i--;) {
 
             var newNode = newnodes[i];
 
-            if (newNode.p === this.currentdirid || newNode.h === this.currentdirid) {
-                UImain = M.v.length || !mobile.uploadOverlay.uploading;
-            }
-
-            if (!seenByCountUpd[newNode.p]) {
-
-                seenByCountUpd[newNode.p] = 1;
-                promises.push(_setCountUpdNode(newNode));
+            if (newNode.p === this.currentdirid
+                || newNode.h === this.currentdirid
+                || newNode.su && this.currentdirid === 'shares'
+                || newNode.p === this.currentCustomView.nodeID
+                || newNode.h === this.currentCustomView.nodeID
+            ) {
+                UImain = M.v.length || !ulmanager.isUploading;
             }
         }
-
-        Promise.allSettled(promises).always(function() {
-
-            countUpdNodes = Object.values(countUpdNodes);
-
-            if (countUpdNodes.length) {
-                mobile.cloud.countAndUpdateSubFolderTotals(countUpdNodes);
-            }
-        });
 
         var masterPromise = new MegaPromise();
 
@@ -677,7 +791,7 @@ var mobile = {
         if (UImain) {
             if (M.v.length) {
                 var emptyBeforeUpd = M.v.length === 0;
-                M.filterByParent(M.currentdirid);
+                M.filterByParent(this.currentCustomView.nodeID || M.currentdirid);
                 M.sort();
                 M.renderMain(!emptyBeforeUpd);
             }
@@ -704,124 +818,15 @@ var mobile = {
         return masterPromise;
     },
 
-    /**
-     * Init Button Scroll
-     * @param {Object} $content The jQuery selector for the current page
-     * @param {String} topBlock The class declaring top block, where button will change from up to down way
-     * @param {String} blockEndScroll The class for block which height will be used to decide the end of page
-     * @returns {void}
-     */
-    initButtonScroll: function($content, topBlock, blockEndScroll) {
+    onFolderSizeChangeUIUpdate(node) {
         'use strict';
 
-        var scrollableBlock = 'body.mobile .fmholder';
-        var startAnimation = 'start-animation';
-        // Init top-block animations
-        setTimeout(() => {
-            $content.addClass(startAnimation);
-        }, 700);
-
-        var isVisibleBlock = function($row) {
-            if ($row.length === 0) {
-                return false;
-            }
-
-            var $window = $(window);
-            var elementTop = $row.offset().top;
-            var elementBottom = elementTop + $row.outerHeight();
-            var viewportTop = $window.scrollTop();
-            var viewportBottom = viewportTop + $window.outerHeight();
-
-            return elementBottom - 100 > viewportTop && elementTop < viewportBottom;
-        };
-
-        var showAnimated = function($content) {
-            var $blocks = $('.animated, .fadein', $content);
-
-            for (var i = $blocks.length - 1; i >= 0; i--) {
-
-                var $block = $($blocks[i]);
-
-                if (isVisibleBlock($block)) {
-                    if (!$block.hasClass(startAnimation)) {
-                        $block.addClass(startAnimation);
-                    }
-                }
-                else if ($block.hasClass(startAnimation)) {
-                    $block.removeClass(startAnimation);
-                }
-            }
-        };
-
-        $(scrollableBlock).add(window).rebind('scroll.mobile-scroll', () => {
-            var $scrollTop = $('.scroll-to-top', $content);
-            showAnimated();
-
-            if (isVisibleBlock($(topBlock, $content))) {
-                $scrollTop.removeClass('up');
-            }
-            else {
-                $scrollTop.addClass('up');
-            }
-        });
-
-        // Init Scroll to Top button event
-        $('.scroll-to-top:visible', $content).rebind('click.scroll', function() {
-
-            if ($(this).hasClass('up')) {
-                $(scrollableBlock).animate({
-                    scrollTop: 0
-                }, 1600);
-            }
-            else {
-                $(scrollableBlock).animate({
-                    scrollTop: $(blockEndScroll, $content).outerHeight()
-                }, 1600);
-            }
-        });
+        var p = this.viewmode === 0 && this.currentdirid || false;
+        if (p && String(p).slice(-8) === node.p || M.currentCustomView) {
+            mobile.cloud.countAndUpdateSubFolderTotals(node);
+        }
     }
 };
-
-mBroadcaster.once('fm:initialized', function () {
-    'use strict';
-
-    var $banner;
-    if (u_attr && u_attr.b) {
-        if (u_attr.b.m) {
-            var msg = '';
-
-            if (u_attr.b.s === -1) { // expired
-                if (u_attr.b.m) {
-                    msg = l[24431];
-                }
-                else {
-                    msg = l[20462];
-                }
-
-                $banner = mobile.alertBanner.showError(msg);
-                $banner.$alertBanner.addClass('business');
-                $banner.$alertBanner.off('tap').on('tap', function() { loadSubPage('registerb'); });
-            }
-            else if (u_attr.b.s === 2) { // grace
-                if (u_attr.b.m) {
-                    msg = l[20650].replace(/\[S\]/g, '<span>').replace(/\[\/S\]/g, '</span>')
-                        .replace('[A]', '<a href="/registerb" class="clickurl">').replace('[/A]', '</a>');
-                    $banner = mobile.alertBanner.showWarning(msg);
-                    $banner.$alertBanner.addClass('business');
-                    $banner.$alertBanner.off('tap').on('tap', function() { loadSubPage('registerb'); });
-                }
-            }
-        }
-        else { // not master user
-            if (u_attr.b.s === -1) { // expired
-                $banner = mobile.alertBanner.showError(l[20462]);
-                $banner.$alertBanner.addClass('business');
-                $banner.$alertBanner.off('tap').on('tap', function() { loadSubPage('registerb'); });
-            }
-        }
-
-    }
-});
 
 mBroadcaster.once('startMega:mobile', function() {
     'use strict';
@@ -851,18 +856,6 @@ mBroadcaster.once('startMega:mobile', function() {
         }
         setBodyClass();
 
-        if (dlmanager.isOverQuota) {
-            onIdle(function() {
-                var $dialog = $('.limited-bandwidth-dialog');
-
-                if (mobile.orientation === 'landscape') {
-                    $('.speedometer.full', $dialog).removeClass('big-104px-icon');
-                }
-                else {
-                    $('.speedometer.full', $dialog).addClass('big-104px-icon');
-                }
-            });
-        }
         mBroadcaster.sendMessage('orientationchange', mobile.orientation);
     });
 
@@ -886,7 +879,6 @@ mBroadcaster.once('startMega:mobile', function() {
 /**
  * Some stubs to prevent exceptions in action packet processing because not all files are loaded for mobile
  */
-/* eslint-disable strict */
 
 mega.tpw = {
     addDownloadUpload: function() {},
@@ -909,18 +901,10 @@ mega.tpw = {
     clearRows: function() {}
 };
 
-var nicknames = {
-    cache: {},
-    // eslint-disable-next-line no-empty-function
-    getNickname: function() {},
-    getNicknameAndName: function() {},
-    decryptAndCacheNicknames: function() {},
-    updateNicknamesFromActionPacket: function() {}
-};
-
 var notify = {
     init: function() {},
-    notifyFromActionPacket: function() {},
+    async notifyFromActionPacket() {
+    },
     countAndShowNewNotifications: function() {},
     closePopup: function() {},
     markAllNotificationsAsSeen: function() {}
@@ -949,35 +933,160 @@ var alarm = {
 function accountUI() {
     'use strict';
 
-    const notificationURL = 'fm/account/notifications';
-    const filemanagementURL = 'fm/account/file-management';
+    if (!fminitialized || !u_type || !page.startsWith('fm/account')) {
+        return loadSubPage('start');
+    }
 
-    if (fminitialized && u_type && page.startsWith(notificationURL)) {
-        if (page === notificationURL) {
-            mobile.initDOM();
-            mobile.account.notifications.init();
+    const fmBlock = document.querySelector('#fmholder .file-manager-block');
+    if (fmBlock) {
+        fmBlock.classList.add('hidden');
+    }
+    mega.ui.emptyState.hide();
+
+    if (mobile.settingsHelper && mobile.settingsHelper.currentPage) {
+        mobile.settingsHelper.currentPage.hide();
+    }
+
+    // Subpath to reduce processing
+    const subpath = page.substr(11);
+
+    mega.ui.toast.rack.removeClass('above-fab', 'above-btn', 'above-actions');
+
+    if (page === 'fm/account/settings') {
+        mobile.settings.init();
+    }
+    else if (page === 'fm/account') {
+        mobile.settings.account.init();
+    }
+    else if (subpath === 'invites/how-it-works') {
+        loadSubPage('fm/account/invite-friends', 'override');
+    }
+    else if (subpath === 'invites') {
+        mobile.achieve.inviteBonuses.init();
+    }
+    else if (subpath === 'invite-friends') {
+        mobile.achieve.invites.init();
+    }
+    else if (page === 'fm/refer') {
+        mobile.achieve.referrals.init();
+    }
+    else if (subpath === 'achievements') {
+        mobile.achieve.init();
+    }
+    else if (subpath === 'history') {
+        loadSubPage('fm/account/security/session-history', 'override');
+    }
+    else if (subpath === 'security/session-history') {
+        mobile.settings.history.init();
+        mega.ui.toast.rack.addClass('above-btn');
+    }
+    else if (subpath === 'paymentcard') {
+        mobile.settings.account.paymentCard.init();
+    }
+    else if (subpath === 'security/change-password' || subpath === 'email-and-pass') {
+        mobile.settings.account.changePassword.init();
+    }
+    else if (subpath === 'security/change-email') {
+        mobile.settings.account.changeEmail.init();
+    }
+    else if (subpath.startsWith('security/verify')) {
+        mobile.settings.account.verifyEmail.init();
+    }
+    else if (subpath === 'delete') {
+        mobile.settings.account.deleteAccount.init();
+    }
+    else if (subpath.startsWith('delete/verify')) {
+        mobile.settings.account.verifyDelete.init();
+    }
+    else if (subpath === 'notifications') {
+        mobile.settings.notifications.init();
+    }
+    else if (subpath.startsWith('notifications')) {
+        loadSubPage('fm/account/notifications', 'override');
+    }
+    else if (subpath === 'file-management') {
+        mobile.settings.fileManagement.init();
+    }
+    else if (subpath === 'support') {
+        mobile.settings.support.init();
+    }
+    else if (subpath === 'about') {
+        mobile.settings.about.init();
+    }
+    else if (subpath === 'security') {
+        mobile.settings.privacyAndSecurity.init();
+    }
+    else if (subpath === 'security/backup-key') {
+        mobile.settings.backupRecovery.init();
+    }
+    else if (subpath === 'security/lost-auth-device') {
+        mobile.settings.account.lostAuthDevice.init();
+    }
+    else if (subpath === 'security/two-factor-authentication') {
+        mobile.settings.account.twofactorSettings.init();
+    }
+    else if (subpath.startsWith('sms')) {
+
+        if (subpath.includes('add-phone-suspended')) {
+            mobile.sms.phoneInput.init();
+        }
+        else if (subpath.includes('verify-code')) {
+            mobile.sms.verifyCode.init();
+        }
+        else if (subpath.includes('verify-success')) {
+            mobile.sms.verifySuccess.init();
+        }
+        else if (subpath.includes('phone-achievement-intro')) {
+            mobile.sms.achievement.init();
         }
         else {
-            loadSubPage(notificationURL);
+            mobile.sms.phoneInput.init();
         }
     }
-    else if (fminitialized && u_type && page.startsWith(filemanagementURL)) {
-        if (page === filemanagementURL) {
-            mobile.initDOM();
-            mobile.account.filemanagement.init();
-        }
-        else {
-            loadSubPage(filemanagementURL);
-        }
+    else if (subpath.includes('terms-policies')) {
+        mobile.terms.init();
     }
-    else if (fminitialized && u_type && page === 'fm/account/security/session-history') {
-        loadSubPage('fm/account/history');
+    else if (page === 'fm/account/plan') {
+        loadSubPage('fm/account');
     }
-    else if (fminitialized && u_type && page === 'fm/account/security/backup-key') {
-        loadSubPage('keybackup');
+    else if (page === 'fm/account/cancel') {
+        mobile.settings.account.cancelSubscription.checkSubStatus();
     }
     else {
-        loadSubPage('fm/account');
+        loadSubPage('fm/account/settings');
+    }
+}
+
+function affiliateUI() {
+
+    'use strict';
+
+    if (!fminitialized || !u_type || !page.startsWith('fm/refer')) {
+        return loadSubPage('start');
+    }
+
+    document.getElementsByClassName('file-manager-block')[0].classList.add('hidden');
+    if (mobile.settingsHelper && mobile.settingsHelper.currentPage) {
+        mobile.settingsHelper.currentPage.hide();
+    }
+
+    if (page === 'fm/refer') {
+        mobile.settings.account.referral.init();
+    }
+    else if (page === 'fm/refer/redeem') {
+        mobile.affiliate.initRedeemPage();
+    }
+    else if (page === 'fm/refer/guide') {
+        mobile.affiliate.initGuidePage();
+    }
+    else if (page === 'fm/refer/history') {
+        mobile.affiliate.initHistoryPage();
+    }
+    else if (page === 'fm/refer/distribution') {
+        mobile.settings.account.referralDistribution.init();
+    }
+    else {
+        loadSubPage('fm/refer');
     }
 }
 
@@ -986,33 +1095,10 @@ accountUI.session = {
 
         'use strict';
 
-        mobile.account.history.fetchSessionHistory();
+        mobile.settings.history.updateCallback();
+        mobile.settings.account.updateCallback();
     }
 };
-
-function msgDialog(type, title, msg, submsg, callback, checkbox) {
-    'use strict';
-
-    // Some webclient calls require callback to return the selected option as a boolean. Hence two callbacks.
-    // Call the mobile version
-    mobile.messageOverlay.show(
-        msg,
-        submsg,
-        function() {
-            if (typeof callback === 'function') {
-                callback(true);
-            }
-        },
-        function() {
-            if (typeof callback === 'function') {
-                callback(false);
-            }
-        },
-        undefined,
-        undefined,
-        checkbox
-    );
-}
 
 function fm_showoverlay() {
     'use strict';
@@ -1044,7 +1130,66 @@ function closeDialog() {
     mBroadcaster.sendMessage('closedialog');
 }
 
-// eslint-disable-next-line no-useless-concat
+/** slimmed down version adapted from fm.js's (desktop) closeMsg() */
+function closeMsg() {
+    'use strict';
+
+    if ($.dialog && !(M.chat && $.dialog === 'onboardingDialog')) {
+        $('.mega-dialog').removeClass('arrange-to-back');
+        $('.mega-dialog-container.common-container').removeClass('arrange-to-back');
+    }
+
+    delete $.msgDialog;
+    mBroadcaster.sendMessage('msgdialog-closed');
+}
+
+function openSaveAsDialog(node, content, cb) {
+    'use strict';
+
+    mobile.nodeSelector.registerPreviousViewNode();
+    mega.ui.viewerOverlay.hide();
+    mobile.nodeSelector.show('saveTextTo', node);
+
+    if (!mega.ui.saveTextAs) {
+        mega.ui.saveTextAs = new MobileNodeNameControl({type: 'saveTextAs'});
+    }
+
+    mega.ui.saveTextAs.onSubmit = async nn => {
+
+        mobile.nodeSelector.hide();
+
+        loadingDialog.show('saveTextAs');
+
+        const {isFull} = await M.getStorageQuota();
+
+        if (isFull) {
+            ulmanager.ulShowOverStorageQuotaDialog();
+            return false;
+        }
+
+        const nh = await mega.fileTextEditor.saveFileAs(
+            nn,
+            mega.ui.saveTextAs.targetFolder,
+            content,
+            node
+        ).catch(tell);
+
+        if (nh && typeof cb === 'function') {
+            await cb(nh);
+
+            const msg = escapeHTML(
+                mega.ui.saveTextAs.targetFolder === M.RootID ? l.mobile_save_as_toast_cloud : l.mobile_save_as_toast
+            ).replace('%1', nn).replace('%2', M.d[mega.ui.saveTextAs.targetFolder].name);
+
+            mega.ui.toast.show(msg, 4);
+        }
+
+        loadingDialog.hide('saveTextAs');
+    };
+}
+
+window['selectFolder' + 'Dialog'] = () => Promise.resolve(M.RootID);
+
 mega.ui['showReg' + 'isterDialog'] = nop;
 
 /**
@@ -1057,63 +1202,11 @@ mega.ui.sendSignupLinkDialog = function(accountData) {
 
     parsepage(pages['mobile']);
     mobile.register.showConfirmEmailScreen(accountData);
-    topmenuUI();
-};
-
-mega.ui.theme = {
-    setWithUA: nop
 };
 
 mega.loadReport = {};
 var previews = {};
 var preqs = Object.create(null); // FIXME: mobile needs to use preqs[] to prevent dupe requests sent to API!
-
-function fm_tfsupdate() {
-    'use strict';
-    var overlay = document.querySelector('.mobile.upload-overlay');
-    if (!overlay) {
-        return;
-    }
-
-    var table = overlay.querySelector('.mobile-transfer-table');
-
-    if (M.pendingTransfers) {
-        // Move completed transfers to the bottom
-        var domCompleted = table.querySelectorAll('tr.transfer-completed');
-        var completedLen = domCompleted.length;
-        if (completedLen) {
-            var first = domCompleted[0];
-            var last = domCompleted[completedLen - 1];
-
-            if (!first.previousElementSibling || last.nextElementSibling) {
-                var parent = first.parentNode;
-                while (completedLen--) {
-                    parent.appendChild(domCompleted[completedLen]);
-                }
-            }
-        }
-    }
-
-    M.pendingTransfers = table.querySelectorAll('tr:not(.transfer-completed)').length;
-
-    if (M.pendingTransfers && ul_queue.length > 1) {
-        var val = ul_queue.length - M.pendingTransfers + 1;
-
-        overlay.classList.add('see-all');
-        overlay.querySelector('.ul-status-header span')
-            .textContent = l[1155] + ' ' + String(l[1607]).replace('%1', val).replace('%2', ul_queue.length);
-    }
-
-    var speed = 0;
-    for (var p in GlobalProgress) {
-        if (p[0] === 'u') {
-            speed += GlobalProgress[p].speed | 0;
-        }
-    }
-
-    overlay.querySelector('.folders-files-text')
-        .textContent = String(mega.icu.format(l[23182], M.pendingTransfers).replace('%s', bytesToSize(speed, 1)));
-}
 
 function removeUInode(nodeHandle, parentHandle) {
 
@@ -1144,24 +1237,41 @@ function openRecents() {
     loadSubPage('fm');
 }
 
+function sharedUInode(nodeHandle) {
+    // t === 1, folder
+    if (M.d[nodeHandle] && M.d[nodeHandle].t && M.megaRender) {
+        const node = MegaMobileNode.getNodeComponentByHandle(nodeHandle);
+
+        if (node) {
+            node.update('icon');
+        }
+    }
+}
+
 /* eslint-disable strict, no-empty-function */
 
 // Not required for mobile
 function fmtopUI() {}
 function fmLeftMenuUI() {}
-function sharedUInode() {}
 function addToMultiInputDropDownList() {}
 function removeFromMultiInputDDL() {}
 function slideshow_handle() {}
 function dashboardUI() {}
-function affiliateUI() {}
 function galleryUI() {}
+function fm_resize_handler() {}
+function fm_tfsupdate() {}
+function fingerprintDialog() {}
 accountUI.account = {
-    renderBirthYear: function() {},
-    renderBirthMonth: function() {},
-    renderBirthDay: function() {},
-    renderCountry: function() {},
-    renderRubsched: function() {},
+    profiles: {
+        bindEvents: nop,
+        renderBirthYear: nop,
+        renderBirthMonth: nop,
+        renderBirthDay: nop,
+        renderCountry: nop
+    },
+    qrcode: {
+        render: nop
+    }
 };
 contextMenu = {
     create: nop,
@@ -1175,36 +1285,217 @@ mega.gallery = {
     sections: {},
     secKeys: {},
     showEmpty: nop,
+    updateButtonsStates: nop,
+    removeDbActionCache: nop,
+    isGalleryNode: nop,
     emptyBlock: null,
     albumsRendered: false,
+    publicSet: Object.create(null),
     albums: {
         grid: null,
         store: {},
-        tree: null
+        tree: null,
+        disposeAll: nop,
+        initPublicAlbum: (parentNode) => {
+            const {at, e} = M.d[M.RootID];
+            const setAttr = tryCatch(() => tlvstore.decrypt(at, true, base64_to_a32(pfkey)))();
+
+            if (!setAttr) {
+                if (d) {
+                    console.error('Could not fetch public set data...', e, at);
+                }
+
+                loadSubPage('login');
+                return;
+            }
+
+            const setNodes = [];
+            const isCoverSpecified = !!setAttr.c;
+            let coverNode = null;
+
+            if (Array.isArray(e)) {
+                for (let i = 0; i < e.length; i++) {
+                    const {id, h} = e[i];
+                    const n = M.d[h];
+
+                    if (n) {
+                        setNodes.push(n);
+
+                        if (isCoverSpecified && !coverNode && id === setAttr.c) {
+                            coverNode = n;
+                        }
+                    }
+                }
+            }
+
+            const elCount = setNodes.length;
+
+            if (!coverNode && elCount) {
+                const sort = M.sortByModTimeFn3();
+                setNodes.sort((a, b) => sort(a, b, -1));
+                coverNode = setNodes[0];
+            }
+
+            const coverContainer = document.createElement('div');
+            coverContainer.className = 'pcol-cover-container';
+
+            const coverImg = document.createElement('i');
+            mega.ui.emptyState.hide(parentNode[0]);
+
+            if (elCount) {
+                coverImg.className = 'loading-album-img sprite-mobile-fm-uni mime-image-solid';
+
+                api_getfileattr(
+                    { [coverNode.h]: coverNode },
+                    0,
+                    async(ctx, key, ab) => {
+                        if (ab === 0xDEAD || !ab.byteLength) {
+                            dump('Cannot generate the cover...');
+                            return;
+                        }
+
+                        // const blob = await webgl.getDynamicThumbnail(ab, { ats: 1 }).catch(dump);
+                        const url = tryCatch(() => mObjectURL([ab], ab.type || 'image/jpeg'))();
+
+                        if (!url) {
+                            dump('Cannot generate the cover image...');
+                            return;
+                        }
+
+                        coverImg.classList.remove('shimmer');
+                        coverImg.style.backgroundImage = `url(${url})`;
+                    }
+                );
+            }
+            else {
+                coverImg.className = 'empty-album-img';
+            }
+
+            const countTxt = document.createElement('p');
+            countTxt.className = 'album-count-txt';
+            countTxt.textContent = mega.icu.format(l.album_items_count, elCount);
+
+            coverContainer.appendChild(coverImg);
+            coverContainer.appendChild(countTxt);
+
+            parentNode.append(coverContainer);
+
+            delay('collection-render.attach-events', () => {
+                const megaListOptions = M.megaRender.getMListOptions ? M.megaRender.getMListOptions() : null;
+
+                if (megaListOptions) {
+                    const bottomBlock = document.querySelector('.bottom-block');
+                    const list = document.getElementById('file-manager-list-container');
+
+                    list.style.position = 'relative';
+                    list.style.paddingBottom = `${megaListOptions.bottomSpacing | 0}px`;
+
+                    const onScroll = () => {
+                        if (list.scrollTop >= bottomBlock.originalHeight) {
+                            bottomBlock.style.height = 0;
+                        }
+                        else if (list.scrollTop > 0) {
+                            bottomBlock.style.height = `${(bottomBlock.originalHeight - list.scrollTop) / 2}px`;
+                        }
+                        else {
+                            bottomBlock.style.height = `${bottomBlock.originalHeight}px`;
+                        }
+                    };
+
+                    const onResize = () => {
+                        bottomBlock.removeAttribute('style');
+
+                        onIdle(() => {
+                            bottomBlock.originalHeight = bottomBlock.offsetHeight;
+                            bottomBlock.style.height = `${bottomBlock.originalHeight}px`;
+                        });
+                    };
+
+                    list.addEventListener('scroll', onScroll);
+                    window.addEventListener('resize', onResize);
+
+                    mBroadcaster.addListener('beforepagechange', () => {
+                        list.removeEventListener('scroll', onScroll);
+                        window.removeEventListener('resize', onResize);
+                    });
+                }
+            });
+        }
     }
 };
 
 /** Global function to be used in mobile mode, checking if the action can be taken by the user.
  * It checks the user validity (Expired business, or ODQ Paywall)
- * @param   {Boolean} hideContext   Hide context menu
- * @returns {Boolean}               True if the caller can proceed. False if not
+ * @returns {Boolean} True if the caller can proceed. False if not
  */
-function validateUserAction(hideContext) {
+function validateUserAction() {
     if (mega.paywall) {
         if (u_attr.b && u_attr.b.s === -1) {
             if (u_attr.b.m) {
-                msgDialog('warningb', '', l[20401], l[20402]);
+                mega.ui.sheet.show({
+                    name: 'bmaster-user-expired',
+                    type: 'modal',
+                    showClose: true,
+                    icon: 'sprite-mobile-fm-mono icon-alert-triangle-thin-outline icon error',
+                    title: l[20401],
+                    contents: [parseHTML(l[20402])],
+                    actions: [
+                        {
+                            type: 'normal',
+                            text: l[20403],
+                            className: 'primary',
+                            onClick: () => {
+                                mega.ui.sheet.hide();
+                                loadSubPage('repay');
+                            }
+                        }
+                    ]
+                });
             }
             else {
-                msgDialog('warningb', '', l[20462], l[20463]);
+                mega.ui.sheet.show({
+                    name: 'bsub-user-expired',
+                    type: 'modal',
+                    showClose: true,
+                    icon: 'sprite-mobile-fm-mono icon-alert-triangle-thin-outline icon error',
+                    title: l.bsub_user_account_exp_title,
+                    contents: [l.bsub_user_account_exp_msg],
+                    actions: [
+                        {
+                            type: 'normal',
+                            text: l[81],
+                            className: 'primary',
+                            onClick: () => mega.ui.sheet.hide()
+                        }
+                    ]
+                });
             }
             return false;
         }
+        else if (u_attr && u_attr.pf && u_attr.pf.s === -1) {
+            mega.ui.sheet.show({
+                name: 'pro-flexi-suspended',
+                type: 'modal',
+                showClose: true,
+                icon: 'sprite-mobile-fm-mono icon-alert-triangle-thin-outline icon error',
+                title: l.pro_flexi_account_suspended_title,
+                contents: [parseHTML(l.pro_flexi_account_suspended_description)],
+                actions: [
+                    {
+                        type: 'normal',
+                        text: l.pay_and_reactivate,
+                        className: 'primary',
+                        onClick: () => {
+                            mega.ui.sheet.hide();
+                            loadSubPage('repay');
+                        }
+                    }
+                ]
+            });
+            return false;
+        }
         else if (u_attr.uspw) {
-            if (hideContext) {
-                mobile.cloud.contextMenu.hide();
-            }
-            M.showOverStorageQuota(EPAYWALL);
+            M.showOverStorageQuota(EPAYWALL).catch(dump);
             return false;
         }
     }

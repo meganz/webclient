@@ -49,7 +49,17 @@ Message._mockupNonLoadedMessage = function(msgId, msg, orderValueIfNotFound) {
     }
 };
 
+/**
+ * Text message content for dialogType messages.
+ * WARNING does not guarantee the return value is sanitised. Use megaChat.html(), escapeHTML(), etc...
+ *
+ * @param {Message|ChatDialogMessage} message The message to generate content for
+ * @returns {boolean|string} The message content
+ */
+// @todo complexity
+// eslint-disable-next-line complexity
 Message._getTextContentsForDialogType = function(message) {
+    'use strict';
     if (
         !message.textContents ||
         (
@@ -58,15 +68,16 @@ Message._getTextContentsForDialogType = function(message) {
         )
     ) {
         var textMessage = mega.ui.chat.getMessageString(
-                message.type || message.dialogType,
-                message.chatRoom.type === "group" || message.chatRoom.type === "public"
-            ) || "";
+            message.type || message.dialogType,
+            message.chatRoom.type === "group" || message.chatRoom.type === "public",
+            message.chatRoom.isMeeting
+        ) || "";
 
         // if is an array.
         var contact = Message.getContactForMessage(message);
         var contactName = "";
         if (contact) {
-            contactName = htmlentities(M.getNameByHandle(contact.u));
+            contactName = M.getNameByHandle(contact.u);
         }
 
         if (message.dialogType === "privilegeChange" && message.meta) {
@@ -87,19 +98,35 @@ Message._getTextContentsForDialogType = function(message) {
                 otherContact = M.u[message.meta.excluded[0]];
                 if (otherContact) {
                     if (otherContact.u === contact.u) {
-                        textMessage = l[8908];
+                        textMessage = message.chatRoom.isMeeting
+                            ? l.meeting_mgmt_left /* `Left the meeting.` */
+                            : l[8908] /* `Left the group chat.` */;
                     }
                     else {
-                        textMessage = l[8906].replace("%s", contactName);
+                        textMessage = (message.chatRoom.isMeeting
+                            ? l.meeting_mgmt_kicked /* `Was removed from the meeting by %s.` */
+                            : l[8906] /* `Was removed from the group chat by %s.` */)
+                            .replace("%s", contactName);
                     }
                 }
             }
             else if (message.meta.included && message.meta.included.length > 0) {
                 otherContact = M.u[message.meta.included[0]];
                 if (contact && otherContact) {
-                    textMessage = (contact.u === otherContact.u) ?
-                        l[23756] :
-                        l[8907].replace("%s", contactName);
+                    const isSelfJoin = contact.u === otherContact.u;
+                    textMessage = isSelfJoin
+                        ? l[23756] /* `%1 joined the group chat.` */
+                        : l[8907]; /* `%1 joined the group chat by invitation from %2.` */
+                    if (message.chatRoom.isMeeting) {
+                        textMessage = isSelfJoin
+                            ? l.meeting_mgmt_user_joined /* `%1 joined the meeting.` */
+                            : l.meeting_mgmt_user_added; /* `%1 joined the meeting by invitation from %2.` */
+                    }
+                    let otherName = M.getNameByHandle(otherContact.h);
+                    textMessage = textMessage.replace('%1', otherName);
+                    if (!isSelfJoin) {
+                        textMessage = textMessage.replace('%2', contactName);
+                    }
                 }
             }
             else {
@@ -109,17 +136,19 @@ Message._getTextContentsForDialogType = function(message) {
         else if (message.dialogType === "topicChange") {
             textMessage = l[9081].replace(
                 "%s",
-                '"' + htmlentities(message.meta.topic) + '"'
+                `"${message.meta.topic}"`
             );
         }
         else if (message.dialogType === "remoteCallStarted") {
             textMessage = mega.ui.chat.getMessageString(
                 "call-started",
-                message.chatRoom.type === "group" || message.chatRoom.type === "public"
+                message.chatRoom.type === "group" || message.chatRoom.type === "public",
+                message.chatRoom.isMeeting
             );
 
             if (textMessage.splice) {
-                textMessage = CallManager2._getMltiStrTxtCntsForMsg(message, textMessage);
+                textMessage =
+                    CallManager2._getMltiStrTxtCntsForMsg(message, textMessage, undefined, undefined);
             }
             else {
                 textMessage = textMessage.replace("[X]", contactName);
@@ -138,31 +167,32 @@ Message._getTextContentsForDialogType = function(message) {
             var meta = message.meta;
 
             var isGroupOrPublic = message.chatRoom.type === "group" || message.chatRoom.type === "public";
+            const { isMeeting } = message.chatRoom;
             if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.CALL_ENDED || (
                 meta.reason === CallManager2.CALL_END_REMOTE_REASON.FAILED && meta.duration >= 5
             )) {
-                textMessage = mega.ui.chat.getMessageString("call-ended", isGroupOrPublic);
+                textMessage = mega.ui.chat.getMessageString("call-ended", isGroupOrPublic, isMeeting);
             }
             else if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.REJECTED) {
-                textMessage = mega.ui.chat.getMessageString("call-rejected", isGroupOrPublic);
+                textMessage = mega.ui.chat.getMessageString("call-rejected", isGroupOrPublic, isMeeting);
             }
             else if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.CANCELED && contact.u === u_handle) {
-                textMessage = mega.ui.chat.getMessageString("call-canceled", isGroupOrPublic);
+                textMessage = mega.ui.chat.getMessageString("call-canceled", isGroupOrPublic, isMeeting);
             }
             else if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.CANCELED && contact.u !== u_handle) {
-                textMessage = mega.ui.chat.getMessageString("call-missed", isGroupOrPublic);
+                textMessage = mega.ui.chat.getMessageString("call-missed", isGroupOrPublic, isMeeting);
             }
             else if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.NO_ANSWER && contact.u !== u_handle) {
-                textMessage = mega.ui.chat.getMessageString("call-missed", isGroupOrPublic);
+                textMessage = mega.ui.chat.getMessageString("call-missed", isGroupOrPublic, isMeeting);
             }
             else if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.NO_ANSWER && contact.u === u_handle) {
-                textMessage = mega.ui.chat.getMessageString("call-timeout", isGroupOrPublic);
+                textMessage = mega.ui.chat.getMessageString("call-timeout", isGroupOrPublic, isMeeting);
             }
             else if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.FAILED) {
-                textMessage = mega.ui.chat.getMessageString("call-failed", isGroupOrPublic);
+                textMessage = mega.ui.chat.getMessageString("call-failed", isGroupOrPublic, isMeeting);
             }
             else if (meta.reason === CallManager2.CALL_END_REMOTE_REASON.CALL_ENDED_BY_MODERATOR) {
-                textMessage = mega.ui.chat.getMessageString("call-ended", isGroupOrPublic);
+                textMessage = mega.ui.chat.getMessageString("call-ended", isGroupOrPublic, isMeeting);
             }
             else {
                 if (d) {
@@ -172,15 +202,19 @@ Message._getTextContentsForDialogType = function(message) {
 
 
             if (textMessage.splice) {
-                textMessage = CallManager2._getMltiStrTxtCntsForMsg(message, textMessage);
+                textMessage =
+                    CallManager2._getMltiStrTxtCntsForMsg(message, textMessage, undefined, undefined);
             }
             else {
                 textMessage = textMessage.replace("[X]", contactName);
                 textMessage = textMessage.replace("%s", contactName);
             }
         }
+        else if (message.dialogType === 'scheduleMeta') {
+            textMessage = ScheduleMetaChange.getTitleText(message.meta);
+        }
         else if (textMessage.splice) {
-            textMessage = CallManager2._getMltiStrTxtCntsForMsg(message, textMessage);
+            textMessage = CallManager2._getMltiStrTxtCntsForMsg(message, textMessage, undefined, undefined);
         }
         else {
             textMessage = textMessage.replace("[X]", contactName);
@@ -1103,6 +1137,8 @@ function MessagesBuff(chatRoom, chatdInt) {
                 self.$sharedFilesLoading.resolve();
                 delete self.$sharedFilesLoading;
             }
+            delete self.expectedMessagesCount;
+            delete self.requestedMessagesCount;
         }
         else {
             requestedMessagesCount = self.requestedMessagesCount || Chatd.MESSAGE_HISTORY_LOAD_COUNT_INITIAL;
@@ -1124,7 +1160,7 @@ function MessagesBuff(chatRoom, chatdInt) {
                 self.retrievedAllMessages = true;
             }
             else if (
-                self.expectedMessagesCount
+                self.expectedMessagesCount > 0
             ) {
                 self.haveMessages = true;
                 // if the expectedMessagesCount is not 0 and < requested, then...chatd/idb returned < then the
@@ -1841,10 +1877,13 @@ MessagesBuff.prototype.retrieveSharedFilesHistory = async function(len) {
     var self = this;
     len = parseInt(len) || 32;
 
+    if (this.$sharedFilesLoading || this.$isDecryptingSharedFiles) {
+        return d > 1 && this.logger.warn('Already retrieving shared files...');
+    }
+
     if (d > 1) {
         this.logger.warn('Retrieving %s shared files...', len, this.haveMoreSharedFiles);
     }
-    // @todo prevent concurrent calls
 
     await Promise.all([
         this.$msgsHistoryLoading,
@@ -2378,12 +2417,12 @@ MessagesBuff.prototype.getLowHighIds = function(returnNumsInsteadOfIds) {
 };
 
 // eslint-disable-next-line complexity
-MessagesBuff.prototype.getRenderableSummary = function(lastMessage) {
+MessagesBuff.prototype.getRenderableSummary = function(lastMessage, rawContent) {
     "use strict";
 
-    var renderableSummary;
-    if (lastMessage.renderableSummary) {
-        renderableSummary = lastMessage.renderableSummary;
+    let renderableSummary;
+    if (lastMessage._renderableSummary && rawContent !== 0xBADF) {
+        renderableSummary = lastMessage._renderableSummary;
     }
     else {
         if (lastMessage.isManagement && lastMessage.isManagement()) {
@@ -2398,40 +2437,43 @@ MessagesBuff.prototype.getRenderableSummary = function(lastMessage) {
         else {
             renderableSummary = lastMessage.textContents;
         }
-        renderableSummary = renderableSummary && escapeHTML(renderableSummary, true) || '';
+        if (rawContent !== 0xBADF) {
+            renderableSummary = renderableSummary && escapeHTML(renderableSummary, true) || '';
 
-        var escapeUnescapeArgs = [
-            {'type': 'onPreBeforeRenderMessage', 'textOnly': true},
-            {'message': {'textContents': renderableSummary}},
-            ['textContents', 'messageHtml'],
-            'messageHtml'
-        ];
+            const escapeUnescapeArgs = [
+                {'type': 'onPreBeforeRenderMessage', 'textOnly': true},
+                {'message': {'textContents': renderableSummary}},
+                ['textContents', 'messageHtml'],
+                'messageHtml'
+            ];
 
-        megaChat.plugins.btRtfFilter.escapeAndProcessMessage(
-            escapeUnescapeArgs[0],
-            escapeUnescapeArgs[1],
-            escapeUnescapeArgs[2],
-            escapeUnescapeArgs[3]
-        );
-        renderableSummary = escapeUnescapeArgs[1].message.textContents;
+            megaChat.plugins.btRtfFilter.escapeAndProcessMessage(
+                escapeUnescapeArgs[0],
+                escapeUnescapeArgs[1],
+                escapeUnescapeArgs[2],
+                escapeUnescapeArgs[3]
+            );
+            renderableSummary = escapeUnescapeArgs[1].message.textContents;
 
-        renderableSummary = megaChat.plugins.emoticonsFilter.processHtmlMessage(renderableSummary);
-        renderableSummary = megaChat.plugins.rtfFilter.processStripRtfFromMessage(renderableSummary);
+            renderableSummary = megaChat.plugins.emoticonsFilter.processHtmlMessage(renderableSummary);
+            renderableSummary = megaChat.plugins.rtfFilter.processStripRtfFromMessage(renderableSummary);
 
-        escapeUnescapeArgs[1].message.messageHtml = renderableSummary;
+            escapeUnescapeArgs[1].message.messageHtml = renderableSummary;
 
-        escapeUnescapeArgs[0].type = "onPostBeforeRenderMessage";
+            escapeUnescapeArgs[0].type = "onPostBeforeRenderMessage";
 
-        renderableSummary = megaChat.plugins.btRtfFilter.unescapeAndProcessMessage(
-            escapeUnescapeArgs[0],
-            escapeUnescapeArgs[1],
-            escapeUnescapeArgs[2],
-            escapeUnescapeArgs[3]
-        );
+            renderableSummary = megaChat.plugins.btRtfFilter.unescapeAndProcessMessage(
+                escapeUnescapeArgs[0],
+                escapeUnescapeArgs[1],
+                escapeUnescapeArgs[2],
+                escapeUnescapeArgs[3]
+            );
 
-        renderableSummary = renderableSummary || "";
-        renderableSummary = renderableSummary.replace("<br/>", "\n").split("\n");
-        renderableSummary = renderableSummary.length > 1 ? renderableSummary[0] + "..." : renderableSummary[0];
+            renderableSummary = renderableSummary || "";
+            renderableSummary = renderableSummary.replace("<br/>", "\n").split("\n");
+            renderableSummary = renderableSummary.length > 1 ? renderableSummary[0] + "..." : renderableSummary[0];
+            lastMessage._renderableSummary = renderableSummary;
+        }
     }
 
     var author;
@@ -2458,7 +2500,9 @@ MessagesBuff.prototype.getRenderableSummary = function(lastMessage) {
                 renderableSummary = l[19285] + " " + renderableSummary;
             }
             else {
-                var name = megaChat.html(M.getNameByHandle(author.u));
+                const name = rawContent === 0xBADF
+                    ? M.getNameByHandle(author.u)
+                    : megaChat.html(M.getNameByHandle(author.u));
                 if (name) {
                     renderableSummary = l.user_message_preview.replace('%NAME', name).replace('%s', renderableSummary);
                 }
@@ -2851,4 +2895,38 @@ MessagesBuff.prototype.onReactionSn = async function(eventData) {
 MessagesBuff.prototype.onReactionReject = function(eventData) {
     "use strict";
     Reactions.clearQueuedReactionsForChat(eventData.chatId, eventData.msgId);
+};
+
+MessagesBuff.prototype.getExportContent = function(media) {
+    'use strict';
+    // NB: Will only export the content that is loaded into memory.
+    const data = {
+        stringNodes: [],
+        attachNodes: [],
+    };
+
+    const nameList = handles => handles.map(h => M.getNameByHandle(h));
+    const emojiString = l[24069].replace(/\[G]/g, '').replace(/\[\/G]/g, '');
+    this.messages.forEach(msg => {
+        const content = [time2date(msg.delay), this.getRenderableSummary(msg, 0xBADF)];
+        if (media && msg.hasAttachments()) {
+            const nodes = msg.getAttachmentMeta().filter(n => {
+                const share = M.getNodeShare(n);
+                return !share || !share.down;
+            });
+            if (nodes.length) {
+                data.attachNodes.push(...nodes);
+            }
+        }
+        if (msg.reacts && $.len(msg.reacts.reactions)) {
+            for (const [emoji, handles] of Object.entries(msg.reacts.reactions)) {
+                content.push(mega.utils.trans.listToString(
+                    nameList(Object.keys(handles)),
+                    emojiString.replace('%s2', emoji)
+                ));
+            }
+        }
+        data.stringNodes.push(content.join('; '));
+    });
+    return data;
 };

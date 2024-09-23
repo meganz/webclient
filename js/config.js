@@ -71,11 +71,11 @@
         }
 
         cfg.xs1 = stringify(
-            (cfg.chatAvPaneHeight & 0xfff) << 20 | (cfg.font_size & 15) << 12 | cfg.leftPaneWidth & 0xfff
+            (cfg.obVer & 0xfff) << 20 | (cfg.font_size & 15) << 12 | cfg.leftPaneWidth & 0xfff
         );
         delete cfg.font_size;
         delete cfg.leftPaneWidth;
-        delete cfg.chatAvPaneHeight;
+        delete cfg.obVer;
 
         let s = cfg.ul_maxSpeed;
         s = s / 1024 << 1 | (s < 0 ? 1 : 0);
@@ -100,6 +100,7 @@
             delete cfg.viewmodes;
         }
         shrink.sorta(cfg);
+        shrink.cleanup(cfg);
 
         if (d) {
             console.timeEnd('fmconfig.shrink');
@@ -107,24 +108,36 @@
         return cfg;
     };
 
-    shrink.bitdef = Object.assign(Object.create(null), {
+    shrink.bitdef = freeze({
         v04: ['rvonbrddl', 'rvonbrdfd', 'rvonbrdas'],
-        obv4: [
-            'obcd', 'obcduf', 'obcdmyf', 'obcdda', 'obmc', 'obmclp', 'obmccp', 'obmcmp',
-            'obmcco', 'obmcnw', 'obrev'
-        ],
         xb1: [
             // do NOT change the order, add new entries at the tail UP TO 31, and 8 per row.
             'cws', 'ctt', 'viewmode', 'dbDropOnLogout', 'dlThroughMEGAsync', 'sdss', 'tpp', 'ulddd',
-            'cbvm', 'mgvm', 'uiviewmode', 'uisorting', 'uidateformat', 'skipsmsbanner', 'skipDelWarning', 'rsv1',
-            'nowarnpl', 'zip64n', 'callemptytout', 'callinout', 'showHideChat', 'showRecents', 'nocallsup'
+            'cbvm', 'mgvm', 'uiviewmode', 'uisorting', 'uidateformat', 'skipsmsbanner', 'skipDelWarning', 's4thumbs',
+            'nowarnpl', 'zip64n', 'callemptytout', 'callinout', 'showHideChat', 'showRecents', 'nocallsup', 'cslrem',
+            'rsv2', 'noSubfolderMd', 'rwReinstate'
         ]
     });
+    shrink.zero = new Set([...Object.keys(shrink.bitdef), 'xs1', 'xs2', 'xs3', 'xs4', 'xs5']);
+
+    shrink.cleanup = (cfg) => {
+
+        for (const key in cfg) {
+            const value = cfg[key];
+
+            if (!value || value === '0' && shrink.zero.has(key)) {
+                if (d) {
+                    logger.info('Skipping zero value for "%s"', key);
+                }
+                delete cfg[key];
+            }
+        }
+    };
 
     shrink.tree = (nodes) => {
         let v = '';
         const tn = Object.keys(parse(nodes) || {});
-        const pfx = {'o': '1', 'p': '2'};
+        const pfx = freeze({'o': '1', 'p': '2'});
 
         for (let i = 0; i < tn.length; ++i) {
             const k = tn[i];
@@ -203,7 +216,7 @@
         if (config.xs1) {
             config.font_size = config.xs1 >> 12 & 15;
             config.leftPaneWidth = config.xs1 & 0xfff;
-            config.chatAvPaneHeight = 0;
+            config.obVer = config.xs1 >> 20;
         }
 
         if (config.xs2) {
@@ -242,8 +255,8 @@
     };
 
     stretch.tree = (xtn) => {
-        const t = {};
-        const p = {'0': '', '1': 'os_', '2': 'pl_'};
+        const t = Object.create(null);
+        const p = freeze({'0': '', '1': 'os_', '2': 'pl_'});
 
         for (let i = 0; i < xtn.length; i += 7) {
             t[p[xtn[i]] + base64urlencode(xtn.substr(i + 1, 6))] = 1;
@@ -252,7 +265,7 @@
     };
 
     stretch.views = (xvm) => {
-        const v = {};
+        const v = Object.create(null);
 
         for (let i = 0; i < xvm.length;) {
             let b = xvm.charCodeAt(i);
@@ -267,14 +280,13 @@
     };
 
     stretch.sorta = (config) => {
-        let tmp;
-        let xsm = config.xsm;
+        const {xsm} = config;
         const rules = shrink.sorta.rules = shrink.sorta.rules || Object.keys(M.sortRules || {});
 
-        tmp = xsm.charCodeAt(0);
+        let tmp = xsm.charCodeAt(0);
         config.sorting = {n: rules[tmp >> 1], d: tmp & 1 ? -1 : 1};
 
-        tmp = {};
+        tmp = Object.create(null);
         for (let i = 1; i < xsm.length;) {
             const a = xsm.charCodeAt(i);
             const b = xsm.charCodeAt(i + 1);
@@ -290,11 +302,11 @@
 
     // sanitize fmconfig
     const filter = async(fmconfig) => {
-        const config = {};
-        const nodeType = {viewmodes: 1, sortmodes: 1, treenodes: 1};
+        const config = Object.create(null);
+        const nodeType = freeze({viewmodes: 1, sortmodes: 1, treenodes: 1});
         const nTreeFilter = await filter.tree(fmconfig, nodeType);
 
-        for (let key in fmconfig) {
+        for (const key in fmconfig) {
             if (hasOwn(fmconfig, key)) {
                 let value = fmconfig[key];
 
@@ -319,8 +331,9 @@
 
                 config[key] = typeof value === 'string' ? value : stringify(value);
 
-                if (d) {
-                    console.assert(config[key] && config[key].length > 0);
+                if (!(config[key] && config[key].length > 0 && config[key].length < 65535)) {
+                    logger.info('Skipping "%s" with invalid value...', key);
+                    delete config[key];
                 }
             }
         }
@@ -359,7 +372,8 @@
         };
 
         return (tree) => {
-            const result = {};
+            const result = Object.create(null);
+
             for (let handle in tree) {
                 if (hasOwn(tree, handle)
                     && handle.substr(0, 7) !== 'search/'
@@ -392,7 +406,7 @@
         const config = await filter(fmconfig).catch(dump);
 
         tryCatch(data => {
-            data = JSON.stringify(data);
+            data = `\x1f${tlvstore.encode(data, false)}`;
             if (data.length > 262144) {
                 logger.warn('fmconfig became larger than 256KB', data.length);
             }
@@ -478,25 +492,24 @@
             logger.debug('remote syncing completed.', attr);
         }
         else {
-            attr = mega.attr.set('fmconfig', config, false, true);
+            attr = mega.attr.set2(null, 'fmconfig', config, false, true);
         }
 
         localStorage[tag] = hash;
-        const promise = Promise.resolve(attr).catch(nop);
+        timer = Promise.resolve(attr)
+            .catch(dump)
+            .then(() => {
+                timer = 0;
+            });
 
-        timer = promise;
-        promise.then(function() {
-            timer = 0;
-        });
-
-        return exit(await promise);
+        return exit(await timer);
     });
 
     // issue fmconfig persistence upon change.
     const push = () => {
         if (u_type > 2) {
             // through a timer to prevent floods
-            timer = delay('fmconfig:store', store, 2600);
+            timer = delay('fmconfig:store', () => store().catch(dump), 2600);
         }
         else {
             timer = null;
@@ -514,10 +527,8 @@
             ulQueue.setSize(fmconfig.ul_maxSlots);
         }
 
-        // quick&dirty(tm) hack, change me whenever we rewrite the underlying logic..
-        let dlSlots = $.tapioca ? 1 : fmconfig.dl_maxSlots;
-        if (dlSlots) {
-            dlQueue.setSize(dlSlots);
+        if (fmconfig.dl_maxSlots) {
+            dlQueue.setSize(fmconfig.dl_maxSlots);
         }
 
         if (fmconfig.font_size && !document.body.classList.contains('fontsize' + fmconfig.font_size)) {
@@ -541,11 +552,12 @@
     };
 
     refresh.ui = () => {
-        if (M.recentsRender && M.recentsRender.hasConfigChanged()) {
-            M.recentsRender.onConfigChange();
-            if (page.includes('fm/recents')) {
-                openRecents();
-            }
+        if (M.recentsRender) {
+            M.recentsRender.checkStatusChange();
+        }
+
+        if (fmconfig.webtheme !== undefined) {
+            mega.ui.setTheme(fmconfig.webtheme);
         }
 
         if (M.account && page.indexOf('fm/account') > -1) {
@@ -553,10 +565,10 @@
                 accountUI.renderAccountPage(M.account);
             }
             else if (page === 'fm/account/notifications') {
-                mobile.account.notifications.render();
+                mobile.settings.notifications.render();
             }
             else if (page === 'fm/account/file-management') {
-                mobile.account.filemanagement.render();
+                mobile.settings.fileManagement.render();
             }
 
             return;
@@ -591,12 +603,21 @@
             else {
                 logger.debug('Setting value for key "%s"', key, value);
 
-                if (String(stringify(value)).length > 1024) {
-                    logger.warn('Attempting to store more than 1KB for %s...', key);
+                if (String(stringify(value)).length > 3072) {
+                    logger.warn('Attempting to store more than 3KB for %s...', key);
                 }
+            }
+        }
 
-                console.assert(typeof value !== 'boolean', 'Invalid value type for ' + key);
-                console.assert(typeof key === 'string' && /^\w{2,17}$/.test(key), 'Invalid key ' + key);
+        if (typeof value === 'boolean') {
+            logger.warn(`Invalid boolean value for ${key}`);
+            value = +value;
+        }
+        if (typeof key !== 'string' || !/^[a-z]\w{1,16}$/.test(key)) {
+            logger.error(`Invalid config property key: ${key}`);
+
+            if (value !== undefined) {
+                return false;
             }
         }
 
@@ -617,6 +638,13 @@
 
     // Initialize fmconfig.
     const setup = (config) => {
+        if (config) {
+            const proto = Object.getPrototypeOf(config);
+            if (proto !== null && proto !== Object.prototype) {
+                logger.warn('Starting afresh with new config store...', config);
+                config = null;
+            }
+        }
         config = stretch(Object.assign(Object.create(null), config));
 
         delete window.fmconfig;
@@ -634,9 +662,15 @@
 
         moveLegacySettings();
 
-        // eslint-disable-next-line guard-for-in
-        for (let key in fmconfig) {
+        for (const key in fmconfig) {
             let value = fmconfig[key];
+
+            if (key.includes('firefox')
+                || key.startsWith('confirmModal_')) {
+
+                mega.config.remove(key);
+                continue;
+            }
 
             if (typeof value === 'string') {
                 value = parse(fmconfig[key]);
@@ -644,12 +678,6 @@
                 if (value === undefined) {
                     value = fmconfig[key];
                 }
-            }
-
-            // @todo remove in 4 months
-            if (key.startsWith('confirmModal_')) {
-                mega.config.remove(key);
-                continue;
             }
 
             mega.config.set(key, value);
@@ -678,8 +706,21 @@
     };
 
     /**
+     * Sync settings whenever logging in under a folder-link.
+     * @return {Promise<void>}
+     */
+    ns.sync = async function() {
+        const old = freeze({...window.fmconfig});
+        await this.fetch();
+
+        this.set('viewmodes', {...fmconfig.viewmodes, ...old.viewmodes});
+        this.set('sortmodes', {...fmconfig.sortmodes, ...old.sortmodes});
+        this.set('treenodes', {...fmconfig.treenodes, ...old.treenodes});
+    };
+
+    /**
      * Flush any pending fmconfig storage
-     * @returns {MegaPromise}
+     * @returns {Promise}
      */
     ns.flush = async function() {
         if (timer) {
@@ -743,6 +784,15 @@
             if (toast) {
                 showToast('settings', toastText || l[16168]);
             }
+
+            if (key === 's4thumbs') {
+                if ('kernel' in s4) {
+                    s4.kernel.container.settings(null, {t: !!fmconfig.s4thumbs}).dump('s4thumbs');
+                }
+                else if (d) {
+                    console.error('Tried to change s4-settings, w/o kernel availability.');
+                }
+            }
         });
     };
 
@@ -805,8 +855,22 @@
         });
     };
 
-    mBroadcaster.once('startMega', function() {
-        setup(parse(sessionStorage.fmconfig || localStorage.fmconfig));
+    mBroadcaster.once('startMega', () => {
+        const cfg = tryCatch(() => {
+            const value = sessionStorage.fmconfig || localStorage.fmconfig;
+            if (value) {
+                switch (value[0]) {
+                    case '{':
+                        return parse(value);
+                    case '\x1F':
+                        return tlvstore.decode(value.slice(1), false);
+                    default:
+                        logger.error('Unsupported local config type...', [value]);
+                }
+            }
+        })();
+
+        setup(cfg);
     });
 
     if (is_karma) {
@@ -878,7 +942,14 @@
                                 let len = grp.length;
 
                                 while (len--) {
-                                    this.set(grp[len]);
+
+                                    // Cloud_UPLOAD/file-request is inverted, so this will 'set' it
+                                    if (grp[len] === 'CLOUD_UPLOAD') {
+                                        this.unset(grp[len]);
+                                    }
+                                    else {
+                                        this.set(grp[len]);
+                                    }
                                 }
                             });
                     }
@@ -908,6 +979,6 @@
 
 })({
     chat: ['ENABLED'],
-    cloud: ['ENABLED', 'NEWSHARE', 'DELSHARE', 'NEWFILES'],
+    cloud: ['ENABLED', 'NEWSHARE', 'DELSHARE', 'NEWFILES', 'UPLOAD'],
     contacts: ['ENABLED', 'FCRIN', 'FCRACPT', 'FCRDEL']
 });

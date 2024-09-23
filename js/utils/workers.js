@@ -17,26 +17,24 @@ function CreateWorkers(url, message, size) {
     var wid = url + '!' + makeUUID();
 
     var terminator = function() {
-        delay('createworkers:terminator:' + wid,
-            function cwt() {
-                var kills = 0;
-                var now = Date.now();
+        tSleep.schedule(130, worker, () => {
+            let kills = 0;
+            const now = Date.now();
 
-                for (var i = worker.length; i--;) {
-                    if (worker[i] && !worker[i].busy && (now - worker[i].tts) > 12e4) {
-                        worker[i].terminate();
-                        worker[i] = null;
-                        kills++;
-                    }
+            for (let i = worker.length; i--;) {
+                if (worker[i] && !worker[i].busy && now - worker[i].tts > 4e4) {
+                    tryCatch(() => worker[i].terminate())();
+                    worker[i] = null;
+                    kills++;
                 }
+            }
 
-                if (kills) {
-                    onIdle(function() {
-                        mBroadcaster.sendMessage('createworkers:terminated', kills);
-                    });
-                }
-            },
-            13e4);
+            if (kills) {
+                onIdle(() => {
+                    mBroadcaster.sendMessage('createworkers:terminated', kills);
+                });
+            }
+        });
     };
 
     var handler = function(id) {
@@ -45,14 +43,18 @@ function CreateWorkers(url, message, size) {
                 if (d > 1) {
                     console.debug('[%s] Worker #%s finished...', wid, id);
                 }
+
                 worker[id].onerror = null;
                 worker[id].context = null;
                 worker[id].busy = false;
                 worker[id].tts = Date.now();
                 terminator();
+
                 /* release worker */
-                instances[id](r);
+                const done = instances[id];
                 instances[id] = null;
+
+                done(r);
             });
         }
     };
@@ -62,7 +64,6 @@ function CreateWorkers(url, message, size) {
             console.error(wid, ex);
         }
         msgDialog('warninga', l[47], '' + ex, l[20858]);
-        throw ex;
     };
 
     var create = function(i) {
@@ -81,7 +82,7 @@ function CreateWorkers(url, message, size) {
                 // this should not happens, onerror shall be reached instead, if some fancy browser does it fix this!
                 return false;
             }
-            workerLoadFailure(e);
+            return workerLoadFailure(e);
         }
 
         w.id = i;
@@ -136,16 +137,15 @@ function CreateWorkers(url, message, size) {
             console.warn('[%s] Worker #%s error on %s:%d, %s.',
                 wid, i, ex.filename || 0, ex.lineno | 0, ex.message || 'Failed to load', ex, task);
 
-            try {
-                worker[i].terminate();
-            }
-            catch (e) {}
+            tryCatch(() => worker[i].terminate())();
             worker[i] = instances[i] = null;
 
             if ((backoff | 0) < 100) {
                 backoff = 200;
             }
-            setTimeout(_.bind(self, task, done), Math.min(8e3, backoff <<= 1));
+            tSleep(Math.min(8e3, backoff <<= 1) / 1e3)
+                .then(() => _(task, done))
+                .catch(dump);
         };
 
         if (d > 1) {

@@ -1,3 +1,85 @@
+/* region mega.io */
+
+class ExpandableComponent {
+    constructor($expandableElement) {
+        this.$expandable = $expandableElement;
+    }
+
+    isExpanded() {
+        return this.$expandable.hasClass('expanded');
+    }
+
+    expand() {
+        this.$expandable.addClass('expanded');
+    }
+
+    contract() {
+        this.$expandable.removeClass('expanded');
+    }
+
+    toggle() {
+        if (this.isExpanded()) {
+            this.contract();
+        }
+        else {
+            this.expand();
+        }
+    }
+}
+
+class AccordionComponent extends ExpandableComponent {
+    constructor($accordionElement) {
+        super($accordionElement);
+
+        this.transitionOptions = {
+            easing: 'swing',
+            duration: 200,
+            complete: () => {
+                // Reset to automatic height for resize responsiveness
+                this.$drawer.height('auto');
+            },
+        };
+
+        this.$expandable.data('js-object', this);
+
+        this.$drawer = $('.accordion-content', this.$expandable);
+        this.$drawer.slideUp(0);
+
+        $('.accordion-toggle', this.$expandable).rebind('click.accordion-toggle', () => {
+            this.$expandable.siblings('.accordion').each((i, element) => {
+                const accordion = $(element).data('js-object');
+                if (accordion.isExpanded()) {
+                    accordion.contract();
+                }
+            });
+
+            this.toggle();
+        });
+    }
+
+    setTransitionOptions(newOptions) {
+        this.transitionOptions = Object.assign(this.transitionOptions, newOptions);
+    }
+
+    expand() {
+        super.expand();
+        this.$drawer.stop().animate({
+            height: 'show',
+            opacity: 'show',
+        }, this.transitionOptions);
+    }
+
+    contract() {
+        super.contract();
+        this.$drawer.stop().animate({
+            height: 'hide',
+            opacity: 'hide',
+        }, this.transitionOptions);
+    }
+}
+
+/* endregion */
+
 /**
  * Bottom pages functionality
  */
@@ -11,34 +93,14 @@ var bottompage = {
         "use strict";
 
         var $content = $('.bottom-page.scroll-block', '.fmholder');
+        bottompage.$footer = $('.bottom-page footer.bottom-menu', '.fmholder');
 
         // Unbind sliders events
         $(window).unbind('resize.sliderResize');
 
-        if (page.substr(0, 9) === 'corporate') {
-            $('body').addClass('old');
-            scrollMenu();
-        }
-        else {
-            $('body').removeClass('old');
-        }
-
         // Init animations
         if ($content.hasClass('animated-page')) {
             bottompage.initAnimations($content);
-        }
-
-        // Init Slider for business page
-        if (page === 'business') {
-            bottompage.initSlider();
-        }
-        if (u_attr && u_attr.b && u_attr.b.s !== -1) {
-            $('.bottom-menu.body .resellerlink', $content).addClass('hidden');
-            $('.bottom-menu.body .pro-link', $content).addClass('hidden');
-        }
-        else {
-            $('.bottom-menu.body .resellerlink', $content).removeClass('hidden');
-            $('.bottom-menu.body .pro-link', $content).removeClass('hidden');
         }
 
         // Insert variables with replaced browser names
@@ -72,6 +134,9 @@ var bottompage = {
             $cs.removeClass('hidden').rebind('click.csp', function() {
                 if (!this.classList.contains('top-menu-item')) {
                     csp.trigger().dump('csp.trigger');
+
+                    eventlog(500414);
+
                     return false;
                 }
             });
@@ -88,6 +153,11 @@ var bottompage = {
         // Show/hide Referral Program and Pricing menu items for different account types
         bottompage.changeMenuItemsList($content);
         localeImages($content);
+
+        bottompage.mobileAccordions = [];
+        for (const element of $('.accordion', bottompage.$footer)) {
+            bottompage.mobileAccordions.push(new AccordionComponent($(element)));
+        }
     },
 
     /**
@@ -96,34 +166,33 @@ var bottompage = {
     changeMenuItemsList: function($content) {
         "use strict";
 
-        var $bottomMenu = $('.bottom-menu.body', $content);
         var $pagesMenu = $('.pages-menu.body', $content);
 
         // Show/Hide Affiliate program link in bottom menu
         if (mega.flags.refpr) {
-            $('a.link.affiliate', $bottomMenu).removeClass('hidden');
+            $('a.link.affiliate', bottompage.$footer).removeClass('hidden');
         }
         else {
-            $('a.link.affiliate', $bottomMenu).addClass('hidden');
+            $('a.link.affiliate', bottompage.$footer).addClass('hidden');
         }
 
         // Hide Pricing link for current Business or Pro Flexi accounts
         if ((u_attr && u_attr.b && u_attr.b.s !== pro.ACCOUNT_STATUS_EXPIRED) ||
             (u_attr && u_attr.pf && u_attr.pf.s !== pro.ACCOUNT_STATUS_EXPIRED)) {
-            $('a.link.pro', $bottomMenu).addClass('hidden');
+            $('a.link.pro', bottompage.$footer).addClass('hidden');
             $('.pages-menu.link.pro', $pagesMenu).addClass('hidden');
         }
         else {
-            $('a.link.pro', $bottomMenu).removeClass('hidden');
+            $('a.link.pro', bottompage.$footer).removeClass('hidden');
             $('.pages-menu.link.pro', $pagesMenu).removeClass('hidden');
         }
 
         if (u_type && (!mega.flags.ach || Object(window.u_attr).b)) {
             // Hide Achievements link for an non-achievement account and business account
-            $('a.link.achievements', $bottomMenu).addClass('hidden');
+            $('a.link.achievements', bottompage.$footer).addClass('hidden');
         }
         else {
-            $('a.link.achievements', $bottomMenu).removeClass('hidden');
+            $('a.link.achievements', bottompage.$footer).removeClass('hidden');
         }
     },
 
@@ -277,7 +346,7 @@ var bottompage = {
                 return false;
             }
 
-            function subMenuPos() {
+            const subMenuPos = tryCatch(() => {
                 var $this = $('.submenu-item.active', $topMenu);
                 var $submenu = $this.next('.submenu');
 
@@ -287,16 +356,22 @@ var bottompage = {
                     at: "center bottom",
                     collision: "fit"
                 });
-            }
+            });
 
             closePagesSubMenu();
             $this.addClass('active');
             $submenu.addClass('active');
             subMenuPos();
 
-            $(window).rebind('resize.pagesmenu', function() {
-                subMenuPos();
-            });
+            $(window).rebind('resize.pagesmenu', SoonFc(90, subMenuPos));
+
+            // Log an event if the Platforms or Features submenu is opened
+            if ($this.hasClass('platforms')) {
+                eventlog(500355);
+            }
+            else if ($this.hasClass('features')) {
+                eventlog(500356);
+            }
 
             // Close pages submenu by click outside of submenu
             $content.rebind('mousedown.closepmenu', function(e) {
@@ -496,52 +571,6 @@ var bottompage = {
 
         $(window).rebind('resize.sliderResize', () => {
             this.initSliderEvents($sliderSection, $scrollBlock, $slides, passing);
-        });
-    },
-
-    initSlider: function() {
-
-        "use strict";
-
-        var $slider = $('.bottom-page.slider-body');
-
-        $('.slider-button, .slider-dot-button', $slider).rebind('click', function() {
-            var $this = $(this);
-            var $buttons;
-            var activeSlide;
-            var newSlide;
-
-            if (!$this.hasClass('active')) {
-                $buttons = $('.slider-button, .slider-dot-button', $slider);
-                activeSlide = $('.slider-button.active', $slider).attr('data-num');
-                newSlide = $this.attr('data-num');
-
-                $buttons.removeClass('active');
-                $buttons.filter('.slide' + newSlide).addClass('active');
-                $slider.removeClass('slide' + activeSlide).addClass('slide' + newSlide);
-            }
-        });
-
-        $('.slider-ctrl-button', $slider).rebind('click', function() {
-            var $this = $(this);
-            var $buttons = $('.slider-button, .slider-dot-button', $slider);
-            var activeSlide = parseInt($('.slider-button.active', $slider).attr('data-num'));
-            var slidesNum = $('.slider-button', $slider).length;
-            var newSlide;
-
-            if ($this.hasClass('prev') && activeSlide > 1) {
-                newSlide = activeSlide - 1;
-            }
-            else if ($this.hasClass('next') && activeSlide < slidesNum) {
-                newSlide = activeSlide + 1;
-            }
-            else {
-                return false;
-            }
-
-            $buttons.removeClass('active');
-            $buttons.filter('.slide' + newSlide).addClass('active');
-            $slider.removeClass('slide' + activeSlide).addClass('slide' + newSlide);
         });
     },
 

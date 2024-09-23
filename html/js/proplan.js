@@ -171,6 +171,8 @@ pro.proplan = {
                 // events log range from 99780 --> 99783
                 // Pro1, Pro2, Pro3, Lite
                 delay('pricing.plan', eventlog.bind(null, 99779 + planType));
+
+                delay('pricing.plan', eventlog.bind(null, 99775 + planType));
             }
 
             // Continue to Step 2
@@ -247,9 +249,6 @@ pro.proplan = {
 
         // If not logged in, show the login/register prompt
         if (!u_handle) {
-            if (typeof page !== 'undefined' && page !== 'chat') {
-                megaAnalytics.log('pro', 'loginreq');
-            }
             showSignupPromptDialog();
             return false;
         }
@@ -395,7 +394,7 @@ pro.proplan = {
         if ($savePercs.length && $saveArrow.length) {
 
             // Set text to "save" block
-            $savePercs.safeHTML(l[16649]);
+            $savePercs.safeHTML(l.save_percent);
             $('span', $savePercs).text(formatPercentage(0.16));
 
             savePercsReposition = function() {
@@ -441,14 +440,15 @@ pro.proplan = {
             }
 
             // Updte price and transfer values
-            pro.proplan.updateEachPriceBlock('P', $pricingBoxes, $dialog, parseInt(value));
+            pro.proplan.updateEachPriceBlock($dialog ? 'D' : 'P', $pricingBoxes, $dialog, parseInt(value));
 
             // Update the plan period text
             $pricePeriod.text('/' + monthOrYearWording);
         });
 
-        // Set monthly prices by default
-        $radioButtons.filter('input[value="1"]').trigger('click');
+        // Set yearly prices by default
+        const preSelectedPeriod = (sessionStorage.getItem('pro.period') | 0) || 12;
+        $radioButtons.filter(`input[value="${preSelectedPeriod}"]`).trigger('click');
     },
 
     /**
@@ -678,7 +678,7 @@ pro.proplan = {
     /**
      * Update each pricing block with details from the API
      */
-    updateEachPriceBlock: function(pageType, $pricingBoxes, $dialog, period) {
+    updateEachPriceBlock(pageType, $pricingBoxes, $dialog, period) {
         "use strict";
 
         var euroSign = '\u20ac';
@@ -687,11 +687,16 @@ pro.proplan = {
         var classType = 1;
         var intl = mega.intl.number;
 
-        // If user is logged in get curent/next plan info
-        pro.proplan.updateCurrentPlanData($pricingBoxes);
+        // If user is logged in, and the page type is P, get curent/next plan info
+        if (pageType === 'P') {
+            pro.proplan.updateCurrentPlanData($pricingBoxes);
+        }
 
         // Save selected payment period
         sessionStorage.setItem('pro.period', period);
+
+        // If no period is given, we are showing all mini plans regardless of duration
+        const multipleDurations = !period;
 
         for (var i = 0, length = pro.membershipPlans.length; i < length; i++) {
 
@@ -701,29 +706,41 @@ pro.proplan = {
             var planNum = currentPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
             var planName = pro.getProPlanName(planNum);
             var priceIndex = pro.UTQA_RES_INDEX_MONTHLYBASEPRICE;
+            let saveUpTo;
 
-            // Skip if data differs from selected period
-            if (months !== period) {
+            // Skip if data differs from selected period, unless it is mini plans
+            if ((months !== period) && !multipleDurations) {
                 continue;
             }
             // Set yearly variable index
             else if (months === 12) {
                 priceIndex = pro.UTQA_RES_INDEX_PRICE;
+                const price = currentPlan[pro.UTQA_RES_INDEX_PRICE];
+                const twelveMonthPrice = currentPlan[pro.UTQA_RES_INDEX_MONTHLYBASEPRICE] * months;
+                saveUpTo = percentageDiff(price, twelveMonthPrice, 3);
             }
 
-            var $pricingBox = $pricingBoxes.filter('.pro' + planNum);
-            var $price = $('.plan-price .price', $pricingBox);
-            var $euroPrice = $('.pricing-page.euro-price', $pricingBox);
-            var $currncyAbbrev = $('.pricing-page.plan-currency', $pricingBoxes);
-            var $planName = $('.pricing-page.plan-title', $pricingBox);
-            var $planButton = $('.pricing-page.plan-button', $pricingBox);
+            const desiredBoxClass = '.pro' + planNum + (multipleDurations
+                ? '.duration' + months
+                : '');
+
+            const $currentBox = $pricingBoxes.filter(desiredBoxClass).removeClass('hidden');
+
+            // Skip if the current box doesn't exist
+            if (!$currentBox.length) {
+                continue;
+            }
+
+            var $price = $('.plan-price .price', $currentBox);
+            var $euroPrice = $('.pricing-page.euro-price', $currentBox);
+            var $currncyAbbrev = $('.pricing-page.plan-currency', $currentBox);
+            var $planName = $('.pricing-page.plan-title', $currentBox);
+            var $planButton = $('.pricing-page.plan-button', $currentBox);
             var basePrice;
             var baseCurrency;
-            $pricingBox.removeClass('hidden');
+            $currentBox.removeClass('hidden');
 
             if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
-
-                // Calculate the base price in local currency
                 basePrice = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE];
                 baseCurrency = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
 
@@ -754,28 +771,59 @@ pro.proplan = {
 
             var bandwidthGigabytes = currentPlan[pro.UTQA_RES_INDEX_TRANSFER];
             var bandwidthBytes = bandwidthGigabytes * 1024 * 1024 * 1024;
-            var bandwidthFormatted = numOfBytes(bandwidthBytes, 0);
-            var bandwidthSizeRounded = Math.round(bandwidthFormatted.size);
-            var bandwidthValue;
+
+            // Get bandwidth
+            const bandwidthValue = bytesToSize(bandwidthBytes, 3, 4);
 
             // Update the plan name
             $planName.text(planName);
 
             // Update the button label plan name if plan is not a current one
-            if (!$pricingBox.first().is('.current')) {
+            if (!$currentBox.first().is('.current')) {
                 $planButton.first().text(l[23776].replace('%1', planName));
             }
 
             $price.text(formatCurrency(basePrice, baseCurrency, 'narrowSymbol'));
 
+            if (pageType === 'D') {
+                const $onlySection = $('.pricing-page.plan-only', $currentBox);
+                const $currencyAndPeriod = $('.pricing-page.currency-and-period', $currentBox);
+                const periodIsYearly = months === 12;
+
+                // TODO change strings to be "<currency> billed monthly/yearly" in future ticket
+                const billingPeriodText = `${baseCurrency} / ${periodIsYearly ? l[932] : l[931]}`;
+                const onlyText = l.pr_only;
+
+                // TODO re-enable in future ticket
+                // const $monthlyPrice = $('.pricing-page.monthly-price', $currentBox)
+                // .toggleClass('hidden', !periodIsYearly); // TODO unhide in HTML in future ticket
+                // if (periodIsYearly) {
+                //     onlyText = formatCurrency(price, baseCurrency, 'narrowSymbol');
+
+                //     const perMonthPrice = formatCurrency(
+                //         planObj.correlatedPlan.price, baseCurrency, 'narrowSymbol') + '*';
+                //     $('span', $monthlyPrice).text(perMonthPrice);
+                // }
+
+                // TODO: Make yearlyMiniPlans calculated instead of hardcoded
+                if (pro.filter.simple.yearlyMiniPlans.has(planNum)) {
+                    const $periodSubTitle = $('.pricing-page.period-subtitle', $currentBox);
+                    $periodSubTitle.text(periodIsYearly ? l.yearly_unit : l[918]);
+                    if (saveUpTo) {
+                        const savingsString = l.yearly_plan_saving.replace('%1', saveUpTo);
+                        $('.pricing-page.plan-saving', $currentBox).text(savingsString).removeClass('hidden');
+                    }
+                }
+
+                $onlySection.text(onlyText); // TODO toggle strikethrough class in future ticket
+                $currencyAndPeriod.text(billingPeriodText);
+            }
+
             // Get storage
             storageValue = storageSizeRounded + ' ' + storageFormatted.unit;
 
-            // Get bandwidth
-            bandwidthValue = bandwidthSizeRounded + ' ' + bandwidthFormatted.unit;
-
             // Update storage and bandwidth data
-            pro.proplan.updatePlanData($pricingBox, storageValue, bandwidthValue, period);
+            pro.proplan.updatePlanData($currentBox, storageValue, bandwidthValue, period);
         }
 
         return pageType === "P" ? [oneLocalPriceFound] : classType;
@@ -795,14 +843,14 @@ pro.proplan = {
         var bandwidthText = period === 1 ? l[23808] : l[24065];
 
         // Update storage
+        $('span span', $storageAmount).text(storageValue);
         if ($storageTip && $storageTip.attr('data-simpletip')) {
-            $('span span', $storageAmount).text(storageValue);
             $storageTip.attr('data-simpletip', l[23807].replace('%1', '[U]' + storageValue + '[/U]'));
         }
 
         // Update bandwidth
+        $('span span', $bandwidthAmount).text(bandwidthValue);
         if ($bandwidthTip && $bandwidthTip.data('simpletip')) {
-            $('span span', $bandwidthAmount).text(bandwidthValue);
             $bandwidthTip.attr('data-simpletip', bandwidthText.replace('%1', '[U]' + bandwidthValue + '[/U]'));
         }
     },
@@ -1017,11 +1065,10 @@ pro.proplan = {
         }
         loadingDialog.show();
         delete mega.discountInfo;
-        M.req({ a: 'dci', dc: mega.discountCode }).then((res) => {
+        api.req({a: 'dci', dc: mega.discountCode}).then(({result: res}) => {
             loadingDialog.hide();
             if (res && res.al && res.pd) {
-                mega.discountInfo = res;
-                mega.discountInfo.dc = mega.discountCode;
+                DiscountPromo.storeDiscountInfo(res);
                 return loadSubPage('propay_' + res.al);
             }
             msgDialog('warninga', l[135], l[24674], false, () => {
@@ -1078,7 +1125,8 @@ pro.proplan = {
         M.require('businessAcc_js').done(function afterLoadingBusinessClass() {
             const business = new BusinessAccount();
 
-            business.getBusinessPlanInfo(false).done(function planInfoReceived(st, info) {
+            // eslint-disable-next-line complexity
+            business.getBusinessPlanInfo(false).then((info) => {
 
                 pro.proplan.businessPlanData = info;
 
@@ -1418,7 +1466,9 @@ function showLoginDialog(email, password) {
     var closeLoginDialog = function() {
         $('.fm-dialog-overlay').unbind('click.proDialog');
         $('button.js-close', $dialog).unbind('click.proDialog');
+
         closeDialog();
+
         return false;
     };
 
@@ -1428,8 +1478,14 @@ function showLoginDialog(email, password) {
         accountinputs.init($dialog);
 
         // controls
-        $('button.js-close', $dialog).rebind('click.proDialog', closeLoginDialog);
-        $('.fm-dialog-overlay').rebind('click.proDialog', closeLoginDialog);
+        const onLowTierProPg = page === 'pro' && window.mProTab;
+        if (onLowTierProPg) {
+            $('button.js-close', $dialog).addClass('hidden');
+        }
+        else {
+            $('button.js-close', $dialog).rebind('click.proDialog', closeLoginDialog);
+            $('.fm-dialog-overlay').rebind('click.proDialog', closeLoginDialog);
+        }
 
         $('.input-email', $dialog).val(email || '');
         $('.input-password', $dialog).val(password || '');
@@ -1470,10 +1526,6 @@ function showLoginDialog(email, password) {
 
 var doProLogin = function($dialog) {
 
-    if (typeof page !== 'undefined' && page !== 'chat') {
-        megaAnalytics.log('pro', 'doLogin');
-    }
-
     loadingDialog.show();
 
     var $formWrapper = $dialog.find('form');
@@ -1512,10 +1564,8 @@ var doProLogin = function($dialog) {
  * @param {Boolean} rememberMe Whether the user clicked the Remember me checkbox or not
  */
 function startOldProLogin(email, password, pinCode, rememberMe) {
-
     'use strict';
-
-    postLogin(email, password, pinCode, rememberMe, completeProLogin);
+    postLogin(email, password, pinCode, rememberMe).then(completeProLogin).catch(tell);
 }
 
 /**
@@ -1552,7 +1602,6 @@ function completeProLogin(result) {
 
     // If successful result
     else if (result !== false && result >= 0) {
-        passwordManager('#form_login_header');
 
         $emailField.val('').blur();
         $passwordField.val('').blur();
@@ -1563,18 +1612,58 @@ function completeProLogin(result) {
             var chatHash = getSitePath().replace("/chat/", "").split("#")[0];
             megaChat.loginOrRegisterBeforeJoining(chatHash);
         }
-        else {
-            // If no value was set on the discount promo page, find the plan they clicked on
-            // before the login/register prompt popped up. Otherwise use the discount plan number.
-            const continuePlanNum = sessionStorage.getItem('discountPromoContinuePlanNum');
-            const proNum = continuePlanNum === null ? pro.proplan2.selectedPlan ||
-                $('.pricing-page.plan.selected').data('payment') : continuePlanNum;
+        else if (page === "pro" && window.mProTab) {
+            closeDialog();
 
-            // Load the Pro payment page (step 2) now that they have logged in
-            loadSubPage('propay_' + proNum);
+            if (u_attr.b || u_attr.pf) {
+                // Load FM if user is a Business or Pro Flexi account (not allowed
+                // to see pro page)
+                loadSubPage('fm');
+            }
+            else {
+                loadingDialog.show();
+
+                // Update the pro page after login based on whether the user
+                // is allowed to see the low tier section of the pro page
+                pro.loadMembershipPlans(() => {
+                    pro.updateLowTierProPage(!!pro.filter.excMin);
+
+                    loadingDialog.hide();
+                });
+            }
+        }
+        else if (page.startsWith('propay_')) {
+            closeDialog();
+            pro.propay.init();
+        }
+        else {
+            // Find the plan they clicked on in /pro before the login/register prompt popped up
+            const proNum = (pro.proplan2.selectedPlan || $('.pricing-page.plan.selected').data('payment')) | 0;
+
+            loadingDialog.show();
+
+            // Load the Pro payment page (step 2) if the plan that the user is attempting
+            // to purchase has enough storage quota for their currently stored data.
+            M.getStorageQuota().then((storage) => {
+                closeDialog();
+                checkPlanStorage(storage.used, proNum).then((res) => {
+                    loadingDialog.hide();
+                    if (res) {
+                        loadSubPage(`propay_${proNum}`);
+                    }
+                    else {
+                        msgDialog('warninga', l[135],
+                                  l.warn_head_not_enough_storage, l.warn_body_not_enough_storage, () => {
+                                      loadSubPage('pro');
+                                      pro.proplan2.initPage();
+                                  });
+                    }
+                });
+            });
         }
     }
     else {
+        fm_showoverlay();
         $emailField.megaInputsShowError();
         $passwordField.megaInputsShowError(l[7431]);
 
@@ -1590,21 +1679,34 @@ function completeProLogin(result) {
     }
 }
 
+async function checkPlanStorage(currentStored, planNum) {
+    'use strict';
+
+    if (
+        // If the user is purchasing a Pro Flexi account, they will be able to get extra storage
+        planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI
+        // If the user is purchasing a VPN plan, they do not need to check storage quota
+        || planNum === pro.ACCOUNT_LEVEL_FEATURE_VPN
+    ) {
+        return true;
+    }
+
+    return pro.loadMembershipPlans().then(() => {
+        const plan = pro.membershipPlans.find(plan => {
+            return plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === planNum;
+        });
+        if (!plan) {
+            return false;
+        }
+        return plan[pro.UTQA_RES_INDEX_STORAGE] * 1024 * 1024 * 1024 >= currentStored;
+    });
+}
+
 function showRegisterDialog(aPromise) {
     'use strict';
 
-    if (typeof page !== 'undefined' && page !== 'chat') {
-        megaAnalytics.log("pro", "regDialog");
-    }
-
     mega.ui.showRegisterDialog({
         title: l[5840],
-
-        onCreatingAccount: function() {
-            if (typeof page !== 'undefined' && page !== 'chat') {
-                megaAnalytics.log("pro", "doRegister");
-            }
-        },
 
         onLoginAttemptFailed: function(registerData) {
             msgDialog('warninga:' + l[171], l[1578], l[218], null, function(e) {
@@ -1628,11 +1730,13 @@ function showRegisterDialog(aPromise) {
                     security.register.cacheRegistrationData(registerData);
                 }
 
-                // If no value was set on the discount promo page, find the plan they clicked on
-                // before the login/register prompt popped up. Otherwise use the discount plan number.
-                const continuePlanNum = sessionStorage.getItem('discountPromoContinuePlanNum');
-                var proNum = continuePlanNum === null ? pro.proplan2.selectedPlan ||
-                    $('.pricing-page.plan.selected').data('payment') : continuePlanNum;
+                if (page.startsWith('propay_')) {
+                    pro.propay.init();
+                    return;
+                }
+
+                // Find the plan they clicked on in /pro before the login/register prompt popped up
+                var proNum = pro.proplan2.selectedPlan || $('.pricing-page.plan.selected').data('payment');
 
                 // Load the Pro payment page (step 2) now that the account has been created
                 loadSubPage('propay_' + proNum);
@@ -1645,11 +1749,20 @@ function showRegisterDialog(aPromise) {
     }, aPromise);
 }
 
+// Flag to check if (not logged in) user has clicked Login / Register when selecting a pricing plan
+var attemptingLoginOrRegister = false;
+
 var signupPromptDialog = null;
 var showSignupPromptDialog = function() {
 
+    const onLowTierProPg = page === 'pro' && window.mProTab;
+
     // If on mobile, show the mobile version
     if (is_mobile) {
+        // Set login_next to send the user to the low tier pro page once logged in
+        if (onLowTierProPg) {
+            login_next = 'pro';
+        }
         mobile.proSignupPrompt.init();
         return;
     }
@@ -1657,11 +1770,12 @@ var showSignupPromptDialog = function() {
     if (!signupPromptDialog) {
         signupPromptDialog = new mega.ui.Dialog({
             'className': 'loginrequired-dialog',
-            'closable': true,
+            'closable': !onLowTierProPg,
+            'closableByOverlay': !onLowTierProPg,
             'focusable': false,
             'expandable': false,
             'requiresOverlay': true,
-            'title': l[5841],
+            'title': onLowTierProPg ? l[1768] : l[5841],
             'buttons': []
         });
         signupPromptDialog.rebind('onBeforeShow', function() {
@@ -1669,35 +1783,44 @@ var showSignupPromptDialog = function() {
             this.$dialog.addClass('with-close-btn');
             // custom buttons, because of the styling
             $('header p', this.$dialog)
-                .safeHTML('@@', l[5842]);
+                .safeHTML('@@', onLowTierProPg ? l.log_in_to_continue : l[5842]);
 
             $('.pro-login', this.$dialog)
                 .rebind('click.loginrequired', function() {
+                    delay('logindlg.login', eventlog.bind(null, 99859));
+                    attemptingLoginOrRegister = true;
                     signupPromptDialog.hide();
                     showLoginDialog();
                     return false;
                 });
 
-            $('.pro-register', this.$dialog)
-                .rebind('click.loginrequired', function() {
-                    signupPromptDialog.hide();
+            if (onLowTierProPg) {
+                $('.pro-register', this.$dialog).addClass('hidden');
+            }
+            else {
+                $('.pro-register', this.$dialog)
+                    .rebind('click.loginrequired', () => {
+                        delay('logindlg.register', eventlog.bind(null, 99860));
+                        attemptingLoginOrRegister = true;
+                        signupPromptDialog.hide();
 
-                    if (!u_wasloggedin()) {
-                        showRegisterDialog();
-                    }
-                    else {
-                        var msg = l[8743];
-                        msgDialog('confirmation', l[1193], msg, null, function(res) {
-                            if (res) {
-                                showRegisterDialog();
-                            }
-                            else {
-                                showLoginDialog();
-                            }
-                        });
-                    }
-                    return false;
-                }).find('span').text(l[1076]);
+                        if (u_wasloggedin()) {
+                            var msg = l[8743];
+                            msgDialog('confirmation', l[1193], msg, null, res => {
+                                if (res) {
+                                    showRegisterDialog();
+                                }
+                                else {
+                                    showLoginDialog();
+                                }
+                            });
+                        }
+                        else {
+                            showRegisterDialog();
+                        }
+                        return false;
+                    });
+            }
 
             var $selectedPlan = $('.pricing-page.plan.selected', 'body');
 
@@ -1705,6 +1828,12 @@ var showSignupPromptDialog = function() {
         });
 
         signupPromptDialog.rebind('onHide', function() {
+
+            // If login/register was pressed, do not trigger a close event
+            if (!attemptingLoginOrRegister) {
+                delay('logindlg.close', eventlog.bind(null, 99861));
+            }
+
             this.$dialog.removeClass('with-close-btn');
 
             // Set default icon
@@ -1712,5 +1841,6 @@ var showSignupPromptDialog = function() {
         });
     }
 
+    attemptingLoginOrRegister = false;
     signupPromptDialog.show();
 };

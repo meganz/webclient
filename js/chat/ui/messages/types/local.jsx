@@ -123,7 +123,7 @@ export default class Local extends AbstractGenericMessage {
     _getText() {
         const { message } = this.props;
         const IS_GROUP = this._roomIsGroup();
-        let messageText = getMessageString(message.type, IS_GROUP);
+        let messageText = getMessageString(message.type, IS_GROUP, message.chatRoom.isMeeting);
 
         if (!messageText) {
             return console.error(`Message with type: ${message.type} -- no text string defined. Message: ${message}`);
@@ -134,6 +134,7 @@ export default class Local extends AbstractGenericMessage {
             messageText.splice ? messageText : [messageText],
             true
         );
+        messageText = megaChat.html(messageText);
 
         message.textContents = String(messageText)
             .replace("[[", "<span class=\"bold\">")
@@ -173,7 +174,7 @@ export default class Local extends AbstractGenericMessage {
                 <Avatar
                     key={handle}
                     contact={M.u[handle]}
-                    simpletip={handle in M.u && M.u[handle].name}
+                    simpletip={true}
                     className="message avatar-wrapper small-rounded-avatar"
                 />
             );

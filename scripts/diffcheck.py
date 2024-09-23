@@ -115,7 +115,7 @@ def get_commits_in_branch(current_branch=None):
         current_branch = get_current_branch()
 
     if current_branch in protected_branches:
-        logging.warn('In protected branch ({})'.format(current_branch))
+        logging.warning(f'In protected branch ({current_branch})')
         return -1, 0
 
     commits = int(run_git_command('rev-list --no-merges --count {}..{}'.format(BASE_BRANCH, current_branch)).decode('utf8'))
@@ -139,6 +139,13 @@ def pick_files_to_test(file_line_mapping, extensions=None, exclude=None):
 
     # logging.info(files_to_test)
     return files_to_test
+
+file_cache = {}
+def read_file(file_path):
+    if file_path not in file_cache:
+        with open(file_path) as file:
+            file_cache[file_path] = file.read().split('\n')
+    return file_cache[file_path]
 
 def reduce_eslint(file_line_mapping, **extra):
     """
@@ -251,7 +258,7 @@ def reduce_stylelint(file_line_mapping, **extra):
     warnings = 0
     output = None
     try:
-        output = subprocess.check_output(command.split())
+        output = subprocess.check_output(command.split(), stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as ex:
         # StyleLint found something, so it has returned an error code.
         # But we still want the output in the same fashion.
@@ -272,26 +279,47 @@ def reduce_stylelint(file_line_mapping, **extra):
     result = ['\nStyleLint output:\n=================\n']
     cmdout_expression = re.compile(r'(.+): line (\d+), col \d+, .+')
     warning_result = []
+    warning_rules = r'"(?:css-logical-props|css-overflow)"'
+
+    def is_warn_content(filename, lineno, error):
+        if error.find('"css-overflow"') > 0:
+            return 0 if read_file(filename)[lineno - 1].find('clip') > 0 else 2
+
+        return 1
+
     for line in output:
         parse_result = cmdout_expression.findall(line)
         # Check if we've got a relevant line.
         if parse_result:
             file_name, line_no = parse_result[0][0], int(parse_result[0][1])
-            file_name = tuple(re.split(PATH_SPLITTER, file_name))
+            file_name_t = tuple(re.split(PATH_SPLITTER, file_name))
             # Check if the line is part of our selection list, or if a css syntax
             # error happened within a file since that will halt further parsing
-            if line_no in file_line_mapping[file_name] or re.search(r'CssSyntaxError', line):
+            if line_no in file_line_mapping[file_name_t] or re.search(r'CssSyntaxError', line):
+                do_warn = False
+
                 if re.search(r': line \d+, col \d+, warning - ', line):
-                    warnings += 1
+                    do_warn = True
+                else:
                     # plugin/no-unsupported-browser-features is too verbose
                     # with e.g. Chrome 58,59,60,61,62,63,64,65,66,67,68,69
                     if re.search(r'Unexpected browser feature', line):
-                        line = re.sub(r'(\w+ \d+)(,\d+)+,(\d+)', r'\1-\3', line)
+                        line = re.sub(r'(\w+ [\d.]+)(,[\d.-]+)+,([\d.]+)', r'\1-\3', line)
+                        if re.search(warning_rules, line):
+                            wt = is_warn_content(file_name, line_no, line)
+                            if wt > 1:
+                                continue
+                            if wt > 0:
+                                do_warn = True
+                                line = re.sub(', error -', ', warning -', line)
+
+                if do_warn:
+                    warnings += 1
                     warning_result.append(line)
                 else:
                     result.append(line)
 
-    result = result + warning_result;
+    result = result + warning_result
 
     # Add the number of errors and return in a nicely formatted way.
     error_count = len(result) - 1
@@ -349,7 +377,7 @@ def reduce_htmlhint(file_line_mapping, **extra):
         return '*** HTMLHint: {} ***'.format(ex), 0
     output = strip_ansi_codes(output.decode('utf8')).rstrip().split('\n')
 
-    if re.search('Scanned \d+ files, no errors found', output[-1]):
+    if re.search(r'Scanned \d+ files, no errors found', output[-1]):
         return '', 0
 
     # Go through output and collect only relevant lines to the result.
@@ -467,12 +495,13 @@ def inspecthtml(file, ln, line, result):
     indent = ' ' * (len(file)+len(str(ln))+3)
 
     # check for hidden-less fm-dialogs
-    match = re.search(r'fm-dialog[\s"\']', line)
+    match = re.search(r'mega-dialog[\s"\']', line)
     if match and not re.search(r'hidden[\'"\s]', line):
         fatal += 1
-        result.append('{}:{}: {}\n{}^ Missing hidden class on fm-dialog.'.format(file, ln, line, indent))
-    if match and not re.search(r'=["\']fm-dialog', line):
-        result.append('{}:{}: {}\n{}^ for consistency, fm-dialog shall be placed as the first class.'.format(file, ln, line, indent))
+        result.append('{}:{}: {}\n{}^ Missing hidden class on mega-dialog.'.format(file, ln, line, indent))
+    if match and not re.search(r'=["\']mega-dialog', line):
+        msg = '{}:{}: {}\n{}^ for consistency, mega-dialog shall be placed as the first class.'
+        result.append(msg.format(file, ln, line, indent))
 
     # check for relative URLs without 'clickurl' class
     match = re.search(r'href\s*=\s*["\']?/', line)
@@ -528,10 +557,11 @@ def reduce_validator(file_line_mapping, **extra):
         file_path = os.path.join(*filename)
         file_extension = os.path.splitext(file_path)[-1]
 
-        if not any([n in file_path for n in special_chars_exclude]):
+        if not any([n in file_path for n in special_chars_exclude]) and file_extension not in ['.py', '.sh']:
             if analyse_files_for_special_chars(file_path, result):
                 fatal += 1
                 # break
+
         # Ignore known custom made files
         if file_path in config.VALIDATOR_IGNORE_FILES:
             continue
@@ -556,7 +586,8 @@ def reduce_validator(file_line_mapping, **extra):
                           'any new functions must be moved elsewhere.'.format(file_path))
             # continue
 
-        lines = []
+        worker_upd = False if file_path.find('nodedec.js') >= 0 else None
+
         with open(file_path, 'r') as fd:
             # Check line lengths in file.
             line_number = 0
@@ -565,7 +596,10 @@ def reduce_validator(file_line_mapping, **extra):
                 if line_number not in line_set:
                     # Not a changed line.
                     continue
-                line_length = len(line)
+
+                # Analyse worker files.
+                if worker_upd is False and line.find('WORKER_VERSION =') > 0:
+                    worker_upd = True
 
                 # Analyse CSS files...
                 if file_extension == '.css':
@@ -576,6 +610,10 @@ def reduce_validator(file_line_mapping, **extra):
                 if file_extension == '.html':
                     fatal += inspecthtml(file_path, line_number, line, result)
                     continue
+
+        if worker_upd is False:
+            fatal += 1
+            result.append('Must update worker version in {}.'.format(file_path))
 
     # Add the number of errors and return in a nicely formatted way.
     error_count = len(result) - 1

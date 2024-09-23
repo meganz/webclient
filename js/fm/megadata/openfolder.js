@@ -269,6 +269,53 @@
         return h;
     };
 
+    // deferred page handlers
+    const pipe = freeze({
+        sink: freeze({
+            account() {
+                accountUI();
+            },
+            dashboard() {
+                dashboardUI();
+            },
+            devices() {
+                if (mega.backupCenter) {
+                    return mega.backupCenter.openSection();
+                }
+                M.openFolder('fm');
+            },
+            recents() {
+                openRecents();
+            },
+            refer() {
+                affiliateUI();
+            },
+            transfers() {
+                console.assert(M.v && M.v.length === 0, 'view list must be empty');
+            }
+        }),
+
+        thrown(ex) {
+            self.reportError(ex);
+            return M.openFolder('fm');
+        },
+
+        has(id) {
+            if (this.sink[id]) {
+                return this.sink[id];
+            }
+            const p = Object.keys(this.sink);
+
+            for (let i = p.length; i--;) {
+
+                if (id.startsWith(p[i])) {
+
+                    return this.sink[p[i]];
+                }
+            }
+        }
+    });
+
     /**
      * Invoke M.openFolder() completion.
      *
@@ -312,10 +359,53 @@
         if (this.currentrootid === this.RootID) {
             this.lastSeenCloudFolder = this.currentdirid;
         }
+        else if (this.currentrootid === 's4') {
+            let target = id;
+
+            if (!('kernel' in s4 && (target = s4.utils.validateS4Url(id)))) {
+                console.error('invalid code-path...');
+                return this.openFolder('fm').catch(dump);
+            }
+
+            if (target !== id) {
+                this.currentdirid = id = target;
+                this.currentCustomView = this.isCustomView(id);
+            }
+
+            // Render S4 section / S4 FM header
+            queueMicrotask(() => s4.ui.render());
+        }
+
+        const $fmRightFilesBlock = $('.fm-right-files-block');
+        const $fmRightHeader = $('.fm-right-header', $fmRightFilesBlock);
+        const $resultsCount = $('.fm-search-count', $fmRightHeader).addClass('hidden');
 
         $('.nw-fm-tree-item.opened').removeClass('opened');
         $('.fm-notification-block.duplicated-items-found').removeClass('visible');
-        $('.fm-right-header .fm-breadcrumbs-wrapper').removeClass('hidden');
+        $('.fm-breadcrumbs-wrapper, .column-settings.overlap', $fmRightFilesBlock).removeClass('hidden');
+
+        if (folderlink && !pfcol || id !== M.RootID && M.currentrootid === M.RootID) {
+            this.gallery = 0;
+            if ((fmconfig.uiviewmode | 0) && fmconfig.viewmode === 2 ||
+                typeof fmconfig.viewmodes !== 'undefined' && typeof fmconfig.viewmodes[id] !== 'undefined'
+                && fmconfig.viewmodes[id] === 2) {
+                this.gallery = 1;
+            }
+            $('.fm-files-view-icon').filter('.media-view').removeClass('hidden');
+        }
+        else {
+            $('.fm-files-view-icon').filter('.media-view').addClass('hidden');
+        }
+
+        if (mega.ui.mNodeFilter) {
+            // XXX: Do not reset the filter selections if navigated to the same location.
+            let stash = this.previousdirid === this.currentdirid;
+
+            if (!stash && this.previousdirid) {
+                stash = this.search && String(this.previousdirid).substr(0, 6) === 'search';
+            }
+            mega.ui.mNodeFilter.resetFilterSelections(stash);
+        }
 
         if (id === undefined && folderlink) {
             // Error reading shared folder link! (Eg, server gave a -11 (EACCESS) error)
@@ -324,10 +414,12 @@
         }
         // Skip M.renderMain and clear folder nodes for sections without viewmode switchers
         else if (this.chat || !id ||
+            (this.gallery && (!is_mobile || !pfcol)) ||
             id.substr(0, 7) === 'account' ||
             id.substr(0, 7) === 'devices' ||
             id.substr(0, 9) === 'dashboard' ||
-            id.substr(0, 15) === 'user-management') {
+            id.substr(0, 15) === 'user-management' ||
+            id.substr(0, 5) === 'refer') {
 
             this.v = [];
             delay.cancel('rmSetupUI');
@@ -336,18 +428,22 @@
                 // Remove shares-specific UI.
                 sharedFolderUI();
             }
+
+            if (this.gallery) {
+                queueMicrotask(() => {
+                    galleryUI(this.gallery > 1 && this.currentCustomView.nodeID);
+                });
+            }
         }
         else {
-
-            $('.fm-right-files-block').removeClass('hidden');
 
             if (d) {
                 console.time('time for rendering');
             }
 
-            if (id === 'transfers'
-                || this.currentCustomView.type === 'gallery'
-                || this.currentCustomView.type === 'albums') {
+            $fmRightFilesBlock.removeClass('hidden');
+
+            if (id === 'transfers') {
                 this.v = [];
             }
             else if ($.ofShowNoFolders) {
@@ -375,7 +471,10 @@
             }
             else if (id.substr(0, 6) === 'search') {
                 this.filterBySearch(this.currentdirid);
-                $('.fm-right-header .fm-breadcrumbs-wrapper').addClass('hidden');
+                $('.fm-breadcrumbs-wrapper', $fmRightHeader).addClass('hidden');
+                $('.column-settings.overlap').addClass('hidden');
+                $resultsCount.removeClass('hidden');
+                $resultsCount.text(mega.icu.format(l.search_results_count, M.v.length));
             }
             else if (this.currentCustomView) {
                 this.filterByParent(this.currentCustomView.nodeID);
@@ -390,6 +489,7 @@
             if (id.substr(0, 9) !== 'transfers') {
                 this.labelFilterBlockUI();
             }
+
 
             var viewmode = 0;// 0 is list view, 1 block view
             if (this.overrideViewMode !== undefined) {
@@ -420,6 +520,11 @@
             }
             this.viewmode = viewmode;
 
+            // Default to Thumbnail View When Media Discovery View Not Available
+            if (this.viewmode === 2) {
+                this.viewmode = 1;
+            }
+
             if (is_mobile) {
                 // Ignore sort modes set in desktop until that is supported in mobile...
                 // this.overrideSortMode = this.overrideSortMode || ['name', 1];
@@ -438,7 +543,6 @@
             else {
                 this.doSort('name', 1);
             }
-
             this.renderMain();
 
             if (fminitialized && !is_mobile) {
@@ -466,7 +570,7 @@
                     treeid = treeid.split('/')[0];
                 }
 
-                if ($('#treea_' + treeid).length === 0) {
+                if (!document.getElementById(`treea_${treeid}`)) {
                     n = this.d[nodeid];
                     if (n && n.p) {
                         M.onTreeUIOpen(prefixPath + n.p, false, true);
@@ -485,35 +589,31 @@
             }
         }
 
-        var newHashLocation = 'fm/' + this.currentdirid;
+        let path = `fm/${this.currentdirid}`;
 
         // If a folderlink, and entering a new folder.
         if (pfid && this.currentrootid === this.RootID) {
-            var target = '';
-            var curLink = getSitePath();
-            if (isPublickLinkV2(curLink)) {
-                if (this.currentdirid !== this.RootID) {
-                    target = '/folder/' + this.currentdirid;
-                }
-                else if ($.autoSelectNode) {
-                    var selectedNode = M.getNodeByHandle($.autoSelectNode);
-                    if (selectedNode && selectedNode.p) {
-                        target = '/folder/' + selectedNode.p;
-                    }
-                }
-                newHashLocation = 'folder/' + pfid + '#' + pfkey + target;
+            let target = '';
+
+            if (this.currentdirid !== this.RootID) {
+                target = `/folder/${this.currentdirid}`;
             }
-            else {
-                if (this.currentdirid !== this.RootID) {
-                    target = '!' + this.currentdirid;
+            else if ($.autoSelectNode) {
+                const n = this.getNodeByHandle($.autoSelectNode);
+                if (n.p) {
+                    target = `/folder/${n.p}`;
                 }
-                newHashLocation = 'F!' + pfid + '!' + pfkey + target;
             }
-            this.lastSeenFolderLink = newHashLocation;
+            path = `folder/${pfid}#${pfkey}${target}`;
+
+            if (window.pfcol) {
+                path = path.replace('folder/', 'collection/');
+            }
+            this.lastSeenFolderLink = path;
         }
 
-        if (getSitePath() !== '/' + newHashLocation && !this.chat) {
-            loadSubPage(newHashLocation);
+        if (!this.chat && getSitePath() !== `/${path}`) {
+            loadSubPage(path);
         }
 
         delay('render:search_breadcrumbs', () => M.renderSearchBreadcrumbs());
@@ -533,16 +633,12 @@
      *
      * @param {String}  id      The folder id
      * @param {Boolean} [force] If that folder is already open, re-render it
-     * @returns {MegaPromise} fulfilled on completion
+     * @returns {Promise} fulfilled on completion
      */
-    MegaData.prototype.openFolder = function(id, force) {
-        var fetchdbnodes;
-        var fetchshares;
-        var firstopen;
-        var cv = M.isCustomView(id);
+    MegaData.prototype.openFolder = async function(id, force) {
+        let isFirstOpen, fetchDBNodes, fetchDBShares, sink;
 
         document.documentElement.classList.remove('wait-cursor');
-        $('.fm-files-view-icon').removeClass('hidden');
 
         if (d) {
             console.warn('openFolder(%s, %s), currentdir=%s, fmloaded=%s',
@@ -551,30 +647,52 @@
 
         if (!loadfm.loaded) {
             console.error('Internal error, do not call openFolder before the cloud finished loading.');
-            return MegaPromise.reject(EACCESS);
+            throw EACCESS;
         }
 
         if (!fminitialized) {
-            firstopen = true;
+            isFirstOpen = true;
         }
         else if (id && id === this.currentdirid && !force) {
             // Do nothing if same path is chosen
-            return MegaPromise.resolve(EEXIST);
+            return EEXIST;
         }
+        let cv = this.isCustomView(id);
 
-        $('.fm-right-account-block, .fm-right-block, .gallery-tabs-bl').addClass('hidden');
+        const $viewIcons =
+            $(`.fm-files-view-icon${pfid ? '' : ':not(.media-view)'}`)
+                .removeClass('hidden');
+        $('.fm-right-account-block, .fm-right-block, .fm-filter-chips-wrapper').addClass('hidden');
 
         this.chat = false;
         this.search = false;
         this.recents = false;
+        this.albums = false;
+
+        if (
+            this.gallery
+            && (
+                mega.gallery.sections[id]
+                || (pfid && $viewIcons.filter('.media-view').hasClass('active'))
+            )
+        ) {
+            // @todo call completion (?)
+            $('.gallery-tabs-bl', '.fm-right-files-block').removeClass('hidden');
+        }
+        else {
+            this.gallery = false;
+        }
 
         if (id === 'rubbish') {
             id = this.RubbishID;
         }
-        else if (id === 'backups' && this.BackupsId) {
-            id = this.BackupsId;
+        else if (id === 'backups') {
+            id = this.BackupsId || this.RootID;
         }
-        else if (id === 'cloudroot' || id === this.InboxID) {
+        else if (id === 'inbox') {
+            id = this.InboxID;
+        }
+        else if (id === 'cloudroot' || id === 'fm' || id === this.InboxID && !window.vw) {
             id = this.RootID;
         }
         else if (id && id.substr(0, 4) === 'chat') {
@@ -586,10 +704,10 @@
                 var self = this;
                 this.chat = true;
 
-                return new MegaPromise(function(resolve, reject) {
-                    _openFolderCompletion.call(self, id, firstopen);
+                return new Promise((resolve, reject) => {
+                    _openFolderCompletion.call(self, id, isFirstOpen);
 
-                    if (firstopen) {
+                    if (isFirstOpen) {
                         // do not wait for the chat to load on the first call
                         resolve(id);
                     }
@@ -632,6 +750,7 @@
         }
         else if (id && id.substr(0, 15) === 'user-management') {
 
+            // @todo move elsewhere, likely within one of those business files.
             M.onFileManagerReady(() => {
 
                 M.onSectionUIOpen('user-management');
@@ -640,6 +759,10 @@
                 M.require('businessAcc_js', 'businessAccUI_js').done(() => {
 
                     if (!new BusinessAccount().isBusinessMasterAcc()) {
+                        return M.openFolder('cloudroot');
+                    }
+                    const subPage = id.replace('/', '').split('user-management')[1];
+                    if (u_attr.b.s === -1 && !(subPage && subPage === 'account')) {
                         return M.openFolder('cloudroot');
                     }
 
@@ -654,7 +777,7 @@
                     else if (usersM.isRedrawNeeded(M.suba, usersM.business.previousSubList)) {
                         usersM.viewSubAccountListUI(undefined, undefined, true);
                     }
-                    var subPage = id.replace('/', '').split('user-management')[1];
+
                     if (subPage && subPage.length > 2) {
                         if (subPage === 'account') {
                             usersM.viewBusinessAccountPage();
@@ -693,43 +816,28 @@
         else if (id === 'file-requests') {
             id = 'file-requests';
         }
-        else if (id && id.substr(0, 7) === 'account') {
-            M.onFileManagerReady(accountUI);
-        }
-        else if (!is_mobile && id && id.substr(0, 7) === 'devices') {
-            M.onFileManagerReady(() => {
-                mega.backupCenter.openSection();
-            });
-        }
-        else if (id && id.substr(0, 9) === 'dashboard') {
-            M.onFileManagerReady(() => dashboardUI());
-        }
-        else if (id && id.substr(0, 7) === 'recents') {
-            M.onFileManagerReady(openRecents);
-        }
-        else if (id && id.substr(0, 9) === 'refer') {
-            M.onFileManagerReady(affiliateUI);
-        }
         else if (id && id.substr(0, 7) === 'search/') {
             this.search = true;
         }
         else if (id && id.substr(0, 10) === 'discovery/') {
-            if (cv.nodeID === M.RootID) {
+            if (cv.nodeID === M.RootID || cv.nodeID === M.RubbishID || !M.d[cv.nodeID]) {
                 // Preventing MD on root folder
                 return M.openFolder('cloudroot');
             }
 
-            fetchdbnodes = true;
+            fetchDBNodes = true;
             id = cv.nodeID;
 
-            M.onFileManagerReady(() => {
-                galleryUI(cv.nodeID || '');
-            });
+            this.gallery = 2;
         }
-        else if (cv.type === 'gallery') {
-            M.onFileManagerReady(() => {
-                galleryUI();
-            });
+        else if (cv.type === 'gallery' || window.pfcol) {
+            this.albums = 1;
+            this.gallery = 1;
+        }
+        else if (cv.type === 's4') {
+
+            id = cv.nodeID;
+            fetchDBNodes = ['container', 'bucket'].includes(cv.subType) && id.length === 8;
         }
         else if (
             id &&
@@ -739,28 +847,35 @@
                 id.substr(0, 14) === 'file-requests/'
             )
         ) {
-            fetchdbnodes = true;
+            fetchDBNodes = true;
             id = cv.nodeID;
         }
-        else if (String(id).length === 11) {
+        else if (String(id).length === 11 && !id.includes('/')) {
             if (M.u[id] && id !== u_handle) {
                 loadSubPage('fm/chat/contacts/' + id);
             }
             else {
                 loadSubPage('fm/chat/contacts');
             }
-            return MegaPromise.reject(ENOENT);
-
+            return EAGAIN;
         }
-        else if (id !== 'transfers') {
+        else if (id && id.startsWith('albums')) {
+            this.albums = true;
+        }
+        else {
             if (id && id.substr(0, 9) === 'versions/') {
                 id = id.substr(9);
             }
             if (!id) {
                 id = this.RootID;
             }
+            else if ((sink = pipe.has(id))) {
+                if (d) {
+                    console.info(`Using deferred sink for ${id}...`);
+                }
+            }
             else if (!this.d[id] || this.d[id].t && !this.c[id]) {
-                fetchdbnodes = !!window.fmdb;
+                fetchDBNodes = !id || id.length !== 8 ? -1 : !!window.fmdb;
             }
         }
 
@@ -768,59 +883,22 @@
             megaChat.cleanup();
         }
 
-        let {promise} = mega;
-        var finish = function() {
-            _openFolderCompletion.call(M, id = cv.original || id, firstopen);
-
-            if (promise) {
-                promise.resolve(id);
-            }
-        };
-        var loadend = function() {
-            // Check this is valid custom view page. If not head to it's root page.
-            if (cv && !M.getPath(cv.original).length) {
-                cv = M.isCustomView(cv.type);
-                if (!cv) {
-                    id = M.RootID;
-                }
-            }
-            else if (M.getPath(id).pop() === 'shares') {
-                fetchshares = true;
-            }
-            else if (!M.d[id] && (pfid || fetchdbnodes)) {
-                id = M.RootID;
-            }
-
-            if (fetchshares) {
-                var handles = Object.keys(M.c.shares || {});
-                for (var i = handles.length; i--;) {
-                    if (M.d[handles[i]]) {
-                        handles.splice(i, 1);
-                    }
-                }
-                dbfetch.geta(handles)
-                    .always(function() {
-                        if (!$.inSharesRebuild) {
-                            $.inSharesRebuild = Date.now();
-                            M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
-                        }
-                        finish();
-                    });
-                return;
-            }
-
-            finish();
-        };
-
-        promise.then((h) => {
+        const {promise} = mega;
+        const masterPromise = promise.then((h) => {
             if (d) {
                 console.warn('openFolder completed for %s, currentdir=%s', maph(id), maph(M.currentdirid));
                 console.assert(String(id).endsWith(h));
             }
+
             delay(`mega:openfolder!${id}`, () => {
                 if (M.currentdirid !== id) {
                     return;
                 }
+
+                if (sink) {
+                    tryCatch(sink, pipe.thrown)(id);
+                }
+
                 if ($.autoSelectNode) {
                     $.selected = [$.autoSelectNode];
                     delete $.autoSelectNode;
@@ -829,35 +907,91 @@
                 mBroadcaster.sendMessage('mega:openfolder', id);
                 $.tresizer();
             }, 90);
-        }).catch(dump);
-        const masterPromise = promise;
 
-        fetchdbnodes = fetchdbnodes || dbfetch.isLoading(id);
+            return h;
+        });
 
-        if (fetchdbnodes || $.ofShowNoFolders) {
-            var tp;
-            var stream = fminitialized && !is_mobile;
+        fetchDBNodes = fetchDBNodes || dbfetch.isLoading(id);
+
+        if (fetchDBNodes > 0 || $.ofShowNoFolders) {
 
             if ($.ofShowNoFolders) {
-                tp = dbfetch.tree([id]);
+                if (fmdb) {
+                    await dbfetch.tree([id]);
+                }
             }
-            else if (dynPages[id]) {
-                tp = {always: finish};
+            else if (id && !dynPages[id]) {
+                const stream = fminitialized && !is_mobile;
+
+                if (stream) {
+                    // eslint-disable-next-line local-rules/open -- not a window.open() call.
+                    await dbfetch.open(id, promise).catch(dump);
+                }
+                else if (!this.d[id] || this.d[id].t && !this.c[id]) {
+
+                    await dbfetch.get(id);
+                }
             }
-            else if (stream) {
-                tp = dbfetch.open(id, promise);
-                promise = null;
+        }
+
+        // Check this is valid custom view page. If not, head to its root page.
+        if (cv && !M.getPath(cv.original).length) {
+            cv = M.isCustomView(cv.type);
+
+            if (!cv) {
+                id = M.RootID;
             }
-            else {
-                tp = dbfetch.get(id);
+        }
+        else if (M.getPath(id).pop() === 'shares') {
+
+            fetchDBShares = true;
+        }
+        else if (!this.d[id] && !dynPages[id] && !sink && (pfid || fetchDBNodes)) {
+
+            id = M.RootID;
+        }
+
+        if (fetchDBShares) {
+            const handles = Object.keys(M.c.shares || {});
+
+            for (let i = handles.length; i--;) {
+                if (M.d[handles[i]]) {
+                    handles.splice(i, 1);
+                }
             }
 
-            tp.always(loadend);
-        }
-        else {
-            loadend();
+            if (handles.length) {
+                if (mega.infinity && !$.inSharesRebuild) {
+                    // @todo validate which nodes are legit to query here
+                    loadingDialog.show();
+                }
+                await dbfetch.geta(handles).catch(dump);
+            }
+
+            if (!$.inSharesRebuild) {
+                $.inSharesRebuild = Date.now();
+
+                queueMicrotask(() => {
+                    mega.keyMgr.decryptInShares()
+                        .then(() => {
+                            return this.showContactVerificationDialog();
+                        })
+                        .catch(dump);
+                });
+                M.buildtree({h: 'shares'}, M.buildtree.FORCE_REBUILD);
+            }
         }
 
+        // In MEGA Lite mode, remove this temporary class
+        if (mega.lite.inLiteMode) {
+            $('.files-grid-view.fm').removeClass('mega-lite-hidden');
+        }
+
+        _openFolderCompletion.call(this, id = cv.original || id, isFirstOpen);
+
+        onIdle(() => {
+            promise.resolve(id);
+        });
         return masterPromise;
     };
 

@@ -160,9 +160,9 @@ RoomSearch.prototype.fetchMoreHistory = function() {
     assert(this.state === SearchState.kInProgress);
     this._isFetchingHistory = true;
     // console.warn(self.room.chatId +": Requesting more history");
-    setTimeout(() => {
+    requestAnimationFrame(() => {
         this.room.messagesBuff.retrieveChatHistory(64);
-    }, 128 /* give some CPU time for the main UI thread to do "real-time"-like updates */);
+    });
 };
 
 RoomSearch.prototype.onHistoryFetched = function() {
@@ -450,32 +450,6 @@ ChatSearch.prototype.setupLogger = function() {
     const opts = {
         minLogLevel: function() {
             return MegaLogger.LEVELS.DEBUG;
-        },
-        transport: function(level, args) {
-            let fn;
-            const levels = MegaLogger.LEVELS;
-            switch (level) {
-                case levels.ERROR:
-                case levels.CRITICAL:
-                    fn = "error";
-                    break;
-                case levels.DEBUG:
-                    fn = "debug";
-                    break;
-                case levels.LOG:
-                    fn = "log";
-                    break;
-                case levels.INFO:
-                    fn = "info";
-                    break;
-                case levels.WARN:
-                    fn = "warn";
-                    break;
-                default:
-                    fn = "log";
-                    break;
-            }
-            console[fn].apply(console, args);
         }
     };
     this.logger = new MegaLogger('ChatSearch', opts);

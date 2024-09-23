@@ -438,7 +438,7 @@ MegaDataMap.prototype._enqueueChangeListenersDsp = function(args) {
 MegaDataMap.prototype._dispatchChangeListeners = function(args) {
     var listeners = this._dataChangeListeners;
 
-    if (d > 1) {
+    if (d > 3) {
         console.debug('%s: dispatching %s awaiting listeners', this, listeners.length, [this]);
     }
     this._dataChangeIndex++;
@@ -990,6 +990,7 @@ function MegaDataBitMap(name, isPub, keys) {
     this._data = new Uint8Array(keys.length);
     this._updatedMask = new Uint8Array(keys.length);
     this._version = null;
+    this._commitProc = 0;
 
     attribCache.bitMapsManager.register(name, this);
 
@@ -1066,6 +1067,7 @@ MegaDataBitMap.prototype.commited = function() {
  * @param {Number} v Can be either 0 or 1
  * @param {Boolean} ignoreDataChange If true, would not trigger a change event
  * @param {Number} defaultVal By default, the default value is supposed to be 0, but any other value can be passed here
+ * @returns {Promise|void} The Promise resolves when the value is set in the MegaDataBitMap.
  */
 MegaDataBitMap.prototype.set = function(key, v, ignoreDataChange, defaultVal) {
     if (typeof(v) !== 'number' && v !== 1 && v !== 0) {
@@ -1073,7 +1075,7 @@ MegaDataBitMap.prototype.set = function(key, v, ignoreDataChange, defaultVal) {
         return;
     }
 
-    this._readyPromise.then(() => {
+    return this._readyPromise.then(() => {
         this.setSync(key, v, ignoreDataChange, defaultVal);
     });
 };
@@ -1184,6 +1186,12 @@ MegaDataBitMap.prototype.mergeFrom = function(str, requiresCommit) {
             }
         }
     }
+    if (!requiresCommit && this._commitProc) {
+        if (this._commitProc === 2) {
+            onIdle(() => this.safeCommit());
+        }
+        this._commitProc = 0;
+    }
 
     // resize if needed.
     if (this._keys.length > targetLength) {
@@ -1212,12 +1220,16 @@ MegaDataBitMap.prototype.maskToString = function() {
 };
 
 /**
- * Convert to a 0 and 1 string (separated by ",")
+ * Convert to a 0 and 1 string (separated by ",") including key names.
  *
  * @returns {String}
  */
 MegaDataBitMap.prototype.toDebugString = function() {
-    return this._data.toString();
+    const res = [];
+    for (let i = 0; i < this._data.length; i++) {
+        res.push(`${this._keys[i]} -> ${this._data[i]}`);
+    }
+    return res.join(', ');
 };
 
 /**
@@ -1256,49 +1268,45 @@ MegaDataBitMap.prototype.isPublic = function() {
  *
  * @returns {Promise}
  */
-MegaDataBitMap.prototype.commit = function() {
-    this._commitPromise = this._commitPromise || new Promise((resolve, reject) => {
-        delay(`mdbm-commit${this.name}`, () => {
-            if (!this._updatedMask.includes(1)) {
-                delete this._commitPromise;
-                return resolve(false);
-            }
-
-            const attributeFullName = `${this.isPublic() ? '+' : '^'}!${this.name}`;
-            const cacheKey = `${u_handle}_${attributeFullName}`;
-            attribCache.setItem(cacheKey, JSON.stringify([this.toString(), 0]));
-            api_req(
-                {
-                    a: 'usma',
-                    n: attributeFullName,
-                    ua: this.toString(),
-                    m: this.maskToString()
-                },
-                {
-                    callback: (response) => {
-                        if (typeof response === 'number') {
-                            reject(response);
-                        }
-                        else {
-                            if (response.ua && response.ua !== this.toString()) {
-                                this.mergeFrom(base64urldecode(response.ua));
-                                attribCache.setItem(cacheKey, JSON.stringify([this.toString(), 0]));
-                            }
-                            if (response.v) {
-                                this.setVersion(response.v);
-                            }
-                            this.commited();
-                            resolve(response);
-                        }
-                        delete this._commitPromise;
+MegaDataBitMap.prototype.commit = mutex('mdbm-commit', function(resolve, reject) {
+    if (!this._updatedMask.includes(1)) {
+        return resolve(false);
+    }
+    if (this._commitProc) {
+        this._commitProc = 2;
+        return resolve(2);
+    }
+    const n = `${this.isPublic() ? '+' : '^'}!${this.name}`;
+    const m = this.maskToString();
+    const cacheKey = `${u_handle}_${n}`;
+    attribCache.setItem(cacheKey, JSON.stringify([this.toString(), 0]));
+    this._commitProc = 1;
+    this.commited();
+    api_req(
+        {
+            a: 'usma',
+            n,
+            ua: this.toString(),
+            m,
+        },
+        {
+            callback: (response) => {
+                if (typeof response === 'number') {
+                    // There was an error so resume the mask state
+                    const maskString = base64urldecode(m);
+                    for (let i = 0; i < maskString.length; i++) {
+                        this._updatedMask[i] = this._updatedMask[i] || maskString.charCodeAt(i);
                     }
+                    reject(response);
                 }
-            );
-        }, 100);
-    });
-
-    return this._commitPromise;
-};
+                else {
+                    // Action packet will update this data structure.
+                    resolve(response);
+                }
+            }
+        }
+    );
+});
 
 /**
  * Commit the MegaDataBitMap with basic handling of the resulting promise
@@ -1306,10 +1314,6 @@ MegaDataBitMap.prototype.commit = function() {
  * @returns {void} void
  */
 MegaDataBitMap.prototype.safeCommit = function() {
-    if (this._commitPromise) {
-        // Already committing
-        return;
-    }
     this.commit().then(nop).catch(dump);
 };
 
@@ -1637,7 +1641,7 @@ Object.defineProperty(global, 'MegaDataBitMap', {value: MegaDataBitMap});
 Object.defineProperty(global, 'MegaDataBitMapManager', {value: MegaDataBitMapManager});
 
 if (d) {
-    if (d > 1) {
+    if (d > 2) {
         _timing(MegaDataMap);
         _timing(MegaDataObject);
         _timing(MegaDataEmitter);

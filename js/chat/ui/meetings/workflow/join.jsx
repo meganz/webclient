@@ -5,7 +5,6 @@ import utils, { Emoji, ParsedHTML } from '../../../../ui/utils.jsx';
 import Button from '../button.jsx';
 import Preview from './preview.jsx';
 import HistoryPanel from "../../historyPanel.jsx";
-import MeetingsCallEndedDialog from '../meetingsCallEndedDialog.jsx';
 import Link from '../../link.jsx';
 
 export default class Join extends MegaRenderMixin {
@@ -23,7 +22,7 @@ export default class Join extends MegaRenderMixin {
         view: Join.VIEW.INITIAL,
         firstName: '',
         lastName: '',
-        previewAudio: false,
+        previewAudio: true,
         previewVideo: false,
         ephemeralDialog: false
     };
@@ -60,17 +59,15 @@ export default class Join extends MegaRenderMixin {
         megaChat.destroy();
         return mega.ui.sendSignupLinkDialog(JSON.parse(localStorage.awaitingConfirmationAccount), () => {
             delete localStorage.awaitingConfirmationAccount;
-            u_logout(true);
-            location.reload();
+            u_logout(true).then(() => location.reload());
         });
     };
 
     Ephemeral = () => {
         const onCancel = () => this.setState({ ephemeralDialog: false });
         const onConfirm = () => {
-            u_logout(true);
+            u_logout(true).then(() => location.reload());
             sessionStorage.guestForced = true;
-            location.reload();
         };
         const msgFragments = l.ephemeral_data_lost.split(/\[A]|\[\/A]/);
 
@@ -104,7 +101,7 @@ export default class Join extends MegaRenderMixin {
                     <i
                         className={`
                             sprite-fm-illustration-wide
-                            ${document.body.classList.contains('theme-dark') ? 'mega-logo-dark' : 'img-mega-logo-light'}
+                            ${mega.ui.isDarkTheme() ? 'mega-logo-dark' : 'img-mega-logo-light'}
                         `}
                     />
                 </div>
@@ -238,21 +235,29 @@ export default class Join extends MegaRenderMixin {
         );
     };
 
-    Card = ({ children }) =>
-        <div className="card">
-            <div className="card-body">
-                {children}
-                <div>
-                    <Link to="/securechat">{l.how_meetings_work /* `Learn more about MEGA Meetings` */}</Link>
+    Card = ({ children }) => {
+        const { previewAudio, previewVideo } = this.state;
+        return (
+            <div className="card">
+                <div className="card-body">
+                    {children}
+                    <div>
+                        <Link to="https://mega.io/chatandmeetings" target="_blank">
+                            {l.how_meetings_work /* `Learn more about MEGA Meetings` */}
+                        </Link>
+                    </div>
+                </div>
+                <div className="card-preview">
+                    <Preview
+                        audio={previewAudio}
+                        video={previewVideo}
+                        context={Join.NAMESPACE}
+                        onToggle={(audio, video) => this.setState({ previewAudio: audio, previewVideo: video })}
+                    />
                 </div>
             </div>
-            <div className="card-preview">
-                <Preview
-                    context={Join.NAMESPACE}
-                    onToggle={(audio, video) => this.setState({ previewAudio: audio, previewVideo: video })}
-                />
-            </div>
-        </div>;
+        );
+    };
 
     Field = ({ name, children }) => {
         return (
@@ -272,6 +277,7 @@ export default class Join extends MegaRenderMixin {
                     className="titleTop required megaInputs"
                     placeholder={children}
                     value={this.state[name] || ''}
+                    maxLength={40}
                     onChange={ev => this.setState({ [name]: ev.target.value })}
                 />
             </div>
@@ -303,6 +309,9 @@ export default class Join extends MegaRenderMixin {
                     if (firstName && lastName && firstName.length > 0 && lastName.length > 0) {
                         this.setState({'joining': true});
 
+                        if (this.props.chatRoom.scheduledMeeting) {
+                            delay('chat-event-sm-guest-join', () => eventlog(99929));
+                        }
                         this.props.onJoinGuestClick(
                             firstName,
                             lastName,
@@ -331,7 +340,7 @@ export default class Join extends MegaRenderMixin {
         </this.Card>;
 
     Unsupported = () =>
-        <div className="unsupported-container">
+        <div className="meetings-unsupported-container">
             <i className="sprite-fm-uni icon-error" />
             <div className="unsupported-info">
                 <h3>{l.heading_unsupported_browser}</h3>
@@ -341,7 +350,7 @@ export default class Join extends MegaRenderMixin {
                     <li>
                         <ParsedHTML>
                             {l.join_via_mobile
-                                .replace('[A]', '<a href="/mobile" class="clickurl">')
+                                .replace('[A]', '<a href="https://mega.io/mobile" target="_blank" class="clickurl">')
                                 .replace('[/A]', '</a>')}
                         </ParsedHTML>
                     </li>
@@ -368,9 +377,6 @@ export default class Join extends MegaRenderMixin {
         this.hidePanels();
         megaChat._joinDialogIsShown = true;
         alarm.hideAllWarningPopups();
-        if ($.dialog === MeetingsCallEndedDialog.dialogName) {
-            closeDialog();
-        }
         sessionStorage.removeItem('guestForced');
         if (!megaChat.hasSupportForCalls) {
             this.setState({ view: Join.VIEW.UNSUPPORTED });

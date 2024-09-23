@@ -631,6 +631,7 @@ AccountRecoveryControl.prototype.startRecovery = function _startRecovery(email, 
                         );
                     }
                     else {
+                        closeDialog();
                         msgDialog('info', '', l.check_email_inbox);
                     }
                 }
@@ -748,7 +749,7 @@ AccountRecoveryControl.prototype.showParkWarning = function _showParkWarning(eas
     }
 
     $('.supportbtn', $dialog).rebind('click', function () {
-        window.open("https://mega.nz/contact");
+        window.open("https://mega.io/contact");
     });
 
     M.safeShowDialog('parkwarning', function () {

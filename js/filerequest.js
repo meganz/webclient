@@ -15,21 +15,15 @@ lazy(mega, 'fileRequest', () => {
     };
 
     const openCreateDialogFromSelect = (selectedNodeHandle) => {
-        mega.fileRequest.dialogs.createDialog.init(selectedNodeHandle, {
-            dialog: false
-        });
+        if (selectedNodeHandle) {
+            mega.fileRequest.dialogs.createDialog.init(selectedNodeHandle);
+        }
     };
 
     const openNewDialogHandler = () => {
-        if (M.currentrootid === 'file-requests') {
-            // We clear the selection as its useless on file requests list page
-            // and will default to M.RootID once dialog is opened
-            selectionManager.clear_selection();
-        }
-
-        openNewFileRequestDialog({
-            post: openCreateDialogFromSelect
-        });
+        openNewFileRequestDialog()
+            .then(openCreateDialogFromSelect)
+            .catch(dump);
         return false;
     };
 
@@ -45,10 +39,57 @@ lazy(mega, 'fileRequest', () => {
         }
     }
     class CommonDialog extends BaseDialog {
-        createTitleDescInput(options) {
-            const namespace = options && options.namespace || '';
+        constructor() {
+            super();
+
+            // Fixed properties
+            this.namespace = 'fr';
+
+            // Changeable properties
+            this.dialogClass = null;
+            this.dialogTitle = null;
+            this.dialogCaption = null;
+            this.selectFolder = false;
+            this.closeWarning = false;
+            this.close = null;
+            this.closePositive = false;
+            this.sectionPrimary = false;
+            this.sectionSecondary = false;
+            this.save = null;
+            this.savePositive = false;
+
+            this.previewButtonPrimary = false;
+            this.previewButtonFooter = false;
+
+            this.stop = false;
+            this.puPagePublicHandle = null;
+
+            this.$dialog = $('.file-request', document.body);
+            this.dialogClassBackup = this.$dialog.prop('class');
+
+            this.$sectionDivider = $('.divider', this.$dialog);
+            this.$sectionPrimary = $('.content-block.primary', this.$dialog);
+            this.$sectionSecondary = $('.content-block.secondary', this.$dialog);
+            this.$scrollableContent = $('.content .scrollable', this.$dialog);
+
+            // Header
+            this.$headerTitle = $('header .dialog-title', this.$dialog);
+            this.$headerCaption = $('header .dialog-caption', this.$dialog);
+
+            // Primary
+            this.$selectFolderContainer = $('.form-row.select-folder', this.$sectionPrimary);
+            this.$selectFolder = new mega.fileRequestUI.SelectFolderComponent(this.$dialog);
+
+            this.$previewButtonContainer = $('.footer-container.preview', this.$sectionPrimary);
+            this.$previewButtonFooter = new mega.fileRequestUI.PreviewButtonComponent(
+                $('footer .file-request-preview-button', this.$dialog)
+            );
+            this.$previewButtons = new mega.fileRequestUI.PreviewButtonComponent(
+                $('.file-request-preview-button', this.$dialog)
+            );
+
             this.$inputTitle = new mega.fileRequestUI.ValidatableInputComponent(
-                $('.file-request-title', this.$dialog), {
+                $('.file-request-title', this.$sectionPrimary), {
                     validations: {
                         limit: {
                             max: 80,
@@ -65,47 +106,77 @@ lazy(mega, 'fileRequest', () => {
                             }
                         }
                     },
-                    namespace: namespace
+                    namespace: this.namespace
                 }
             );
 
             this.$inputDescription = new mega.fileRequestUI.ValidatableInputComponent(
-                $('.file-request-description', this.$dialog), {
+                $('.file-request-description', this.$sectionPrimary), {
                     validations: {
                         limit: {
-                            max: 250,
-                            message: l.file_request_dialog_label_desc_invalid
+                            max: 500,
+                            message: l.file_request_dialog_label_desc_invalid,
+                            formatMessage: true
                         },
                     },
-                    namespace: namespace
+                    namespace: this.namespace
                 }
             );
-        }
 
-        initTitleDescInput() {
-            if (!this.$inputTitle || !this.$inputDescription) {
-                return;
-            }
+            // Secondary
+            this.themeButtonSelector = '.embed-button-theme-input';
+            this.$themeButton = new mega.fileRequestUI.RadioComponent(
+                $(this.themeButtonSelector, this.$dialog), { namespace: 'frm' }
+            );
+            this.themeButtonWrapper = '.embed-button-select';
+            this.$themeButtonWrapper = new mega.fileRequestUI.ButtonComponent(
+                $(this.themeButtonWrapper, this.$dialog), { namespace: 'frm' }
+            );
 
-            this.$inputTitle.setValue('');
-            this.$inputTitle.resetErrorMessage();
-            this.$inputTitle
-                .getInput()
-                .closest(megaInputSelector)
-                .removeClass(activeClass);
+            this.$embedCode = new mega.fileRequestUI.EmbedCodeInputComponent(
+                $('.file-request-embed-code', this.$dialog)
+            );
+            this.$shareLink = new mega.fileRequestUI.ShareLinkInputComponent(
+                $('.file-request-share-link', this.$dialog)
+            );
+            this.$copyButton = new mega.fileRequestUI.ClassCopyButtonComponent(this.$dialog, {
+                copy: {
+                    'file-request-embed-code': {
+                        content: () => {
+                            console.log('content this', this);
+                            return this.$embedCode.getContent();
+                        },
+                        toastText: l.file_request_action_copy_code,
+                        className: 'clipboard-embed-code'
+                    },
+                    'file-request-share-link': {
+                        content: () => {
+                            console.log('content this share', this);
+                            return this.$shareLink.getContent();
+                        },
+                        toastText: l.file_request_action_copy_link
+                    },
+                },
+                namespace: this.namespace
+            });
 
-            this.$inputDescription.setValue('');
-            this.$inputDescription.resetErrorMessage();
-            this.$inputDescription
-                .getInput()
-                .closest(megaInputSelector)
-                .removeClass(activeClass);
-        }
+            // Footer
+            this.$removeButton = new mega.fileRequestUI.ButtonComponent($('.file-request-remove-button', this.$dialog));
+            this.$saveButton = new mega.fileRequestUI.ButtonComponent($('.file-request-save-button', this.$dialog));
+            this.$closeButton = new mega.fileRequestUI.CloseButtonComponent(
+                $('button.close, .file-request-close-button', this.$dialog),
+                {
+                    warning: this.closeWarning
+                }
+            );
+            this.$closeButtonFooter = $('.file-request-close-button', this.$dialog);
 
-        addHandlerTitleDescInput() {
-            if (!this.$inputTitle || !this.$inputDescription) {
-                return;
-            }
+            // Handler section
+            // Primary
+            this.$selectFolder.addEventHandlers({
+                namespace: this.namespace,
+                post: openCreateDialogFromSelect
+            });
 
             const titleDescInputPostCallback = function(selfObject, options) {
                 const $formRow = selfObject.getInput().closest('.form-row');
@@ -142,6 +213,178 @@ lazy(mega, 'fileRequest', () => {
             this.$inputDescription.setOptions({
                 post: titleDescInputPostCallback
             });
+
+            // Secondary
+            this.$previewButtons.setOptions({
+                namespace: this.namespace,
+                callback: () => {
+                    const title = this.$inputTitle.getValue();
+                    const description = this.$inputDescription.getValue();
+
+                    return {
+                        name: u_attr.name,
+                        title,
+                        description,
+                        theme: u_attr && u_attr['^!webtheme'] !== undefined ? u_attr['^!webtheme'] : '',
+                        pupHandle: this.puPagePublicHandle || null
+                    };
+                }
+            });
+
+            this.$themeButton.eventOnChange(($input) => {
+                this.setEmbedCode();
+                this.$themeButton.getInput().closest('.embed-block').removeClass(activeClass);
+                $input.closest('.embed-block').addClass(activeClass);
+                return false;
+            });
+
+            this.$themeButtonWrapper.eventOnClick(($input) => {
+                if ($input.is(this.themeButtonSelector)) {
+                    return;
+                }
+
+                let $parentElement = $input;
+                if ($input.not(this.themeButtonWrapper)) {
+                    $parentElement = $input.parent();
+                }
+
+                $(this.themeButtonSelector, $parentElement).trigger('click');
+                return false;
+            });
+
+            this.$copyButton.addEventHandlers();
+        }
+
+        reset() {
+            this.dialogClass = null;
+            this.dialogTitle = null;
+            this.dialogCaption = null;
+            this.selectFolder = false;
+            this.closeWarning = false;
+            this.close = null;
+            this.closePositive = false;
+            this.sectionPrimary = false;
+            this.sectionSecondary = false;
+
+            this.save = null;
+            this.savePositive = false;
+
+            this.preview = false;
+            this.previewButtonPrimary = false;
+            this.previewButtonFooter = false;
+
+            this.stop = false;
+            this.puPagePublicHandle = null;
+
+            // Reset section header
+            this.$dialog.prop('class', this.dialogClassBackup);
+            this.$headerTitle.text('');
+            this.$headerCaption.text('').addClass('hidden');
+
+            // Reset section primary
+            this.$sectionPrimary.addClass('hidden');
+            this.$selectFolderContainer.addClass('hidden');
+            this.$selectFolder.init();
+            this.$inputTitle.reset();
+            this.$inputDescription.reset();
+            this.$previewButtonContainer.addClass('hidden');
+
+            // Reset Divider
+            this.$sectionDivider.addClass('hidden');
+
+            // Reset section
+            this.$sectionSecondary.addClass('hidden');
+
+            // Footer
+            this.$previewButtonFooter.getInput().addClass('hidden');
+            this.$removeButton.getInput().addClass('hidden');
+            this.$closeButtonFooter.addClass('hidden').removeClass('positive');
+            this.$saveButton.getInput().addClass('hidden').removeClass('positive');
+
+            // dialog
+            this.$dialog.off('dialog-closed');
+        }
+
+        initScrollbar(options) {
+            initPerfectScrollbar(this.$scrollableContent, options || {});
+            this.triggerClickOnRail(this.$scrollableContent);
+        }
+
+        init() {
+            this.setDialogHeader();
+
+            if (this.sectionPrimary) {
+                this.setSectionPrimary();
+            }
+
+            if (this.sectionDivider) {
+                this.$sectionDivider.removeClass('hidden');
+            }
+
+            if (this.sectionSecondary) {
+                this.setSectionSecondary();
+            }
+
+            this.setFooter();
+        }
+
+        setFooter() {
+            if (this.previewButtonFooter) {
+                this.$previewButtonFooter.getInput().removeClass('hidden');
+            }
+
+            if (this.close) {
+                this.$closeButtonFooter.removeClass('hidden');
+                if (this.closePositive) {
+                    this.$closeButtonFooter.addClass('positive');
+                }
+                $('span', this.$closeButtonFooter).text(this.close);
+
+                this.$closeButton.setOptions({
+                    warning: this.closeWarning
+                });
+            }
+
+            if (this.save) {
+                const $saveButton = this.$saveButton.getInput();
+                $saveButton.removeClass('hidden');
+                if (this.savePositive) {
+                    $saveButton.addClass('positive');
+                }
+                $('span', $saveButton).text(this.save);
+            }
+
+            if (this.stop) {
+                this.$removeButton.getInput().removeClass('hidden');
+            }
+        }
+
+        setSectionPrimary() {
+            this.$sectionPrimary.removeClass('hidden');
+
+            if (this.selectFolder) {
+                this.$selectFolderContainer.removeClass('hidden');
+            }
+
+            if (this.previewButtonPrimary) {
+                this.$previewButtonContainer.removeClass('hidden');
+            }
+        }
+
+        setSectionSecondary() {
+            this.$sectionSecondary.removeClass('hidden');
+        }
+
+        setDialogHeader() {
+            if (this.dialogClass) {
+                this.$dialog.addClass(this.dialogClass);
+            }
+            if (this.dialogTitle) {
+                this.$headerTitle.text(this.dialogTitle);
+            }
+            if (this.dialogCaption) {
+                this.$headerCaption.text(this.dialogCaption).removeClass('hidden');
+            }
         }
 
         isLightTheme() {
@@ -169,145 +412,37 @@ lazy(mega, 'fileRequest', () => {
             });
         }
 
-        setThemeChangeEventHandler() {
-            if (!this.$themeButton) {
-                return;
-            }
-
-            this.$themeButton.eventOnChange(($input) => {
-                this.setEmbedCode();
-                this.$themeButton.getInput().closest('.embed-block').removeClass(activeClass);
-                $input.closest('.embed-block').addClass(activeClass);
-                return false;
-            });
-
-            this.$themeButtonWrapper.eventOnClick(($input) => {
-                if ($input.is(this.themeButtonSelector)) {
-                    return;
-                }
-
-                let $parentElement = $input;
-                if ($input.not(this.themeButtonWrapper)) {
-                    $parentElement = $input.parent();
-                }
-
-                $(this.themeButtonSelector, $parentElement).trigger('click');
-                return false;
-            });
-        }
-
-        setPreviewClickEventHandler() {
-            if (!this.$previewButton) {
-                return;
-            }
-
-            this.$previewButton.setOptions({
-                namespace: 'frm',
-                callback: () => {
-                    const title = this.$inputTitle.getValue();
-                    const description = this.$inputDescription.getValue();
-
-                    return {
-                        name: u_attr.name,
-                        title,
-                        description,
-                        theme: u_attr && u_attr['^!webtheme'] !== undefined ? u_attr['^!webtheme'] : ''
-                    };
-                }
-            });
-        }
-
         triggerClickOnRail($scrollableContent) {
             onIdle(() => {
                 if (!$scrollableContent) {
                     return;
                 }
 
-                const $scrollableYRail = $('.ps__scrollbar-y-rail', $scrollableContent);
+                const $scrollableYRail = $('.ps__rail-y', $scrollableContent);
                 if ($scrollableYRail.length) {
-                    $('.ps__scrollbar-y-rail', $scrollableContent).trigger('click');
+                    $('.ps__rail-y', $scrollableContent).trigger('click');
                     $scrollableContent.scrollTop(0);
                 }
             });
         }
     }
 
-    class CommonMobileDialog extends BaseDialog {
-        createTitleDescInput(options) {
-            const namespace = options && options.namespace || '';
-            this.$inputTitle = new mega.fileRequestUI.ValidatableMobileComponent(
-                $('.file-request-title', this.$dialog), {
-                    validations: {
-                        limit: {
-                            max: 80,
-                            message: l.file_request_dialog_label_title_invalid
-                        }
-                    },
-                    namespace: namespace,
-                    selector: '.input'
-                }
-            );
-
-            this.$inputDescription = new mega.fileRequestUI.ValidatableMobileComponent(
-                $('.file-request-description', this.$dialog), {
-                    validations: {
-                        limit: {
-                            max: 250,
-                            message: l.file_request_dialog_label_desc_invalid
-                        },
-                    },
-                    namespace: namespace,
-                    selector: '.input'
-                }
-            );
-        }
-
-        initTitleDescInput() {
-            if (!this.$inputTitle || !this.$inputDescription) {
-                return;
-            }
-
-            this.$inputTitle.setValue('');
-            this.$inputTitle.resetErrorMessage();
-
-            this.$inputDescription.setValue('');
-            this.$inputDescription.resetErrorMessage();
-        }
-    }
-
     // Dialogs start
-    class CreateDialog extends CommonDialog {
+    class CreateDialog {
         constructor() {
-            super();
-
-            this.$dialog = $('.file-request-create-dialog', document.body);
-            this.$createButton = $('.file-request-create-button', this.$dialog);
-            this.$closeButton = new mega.fileRequestUI.CloseButtonComponent(
-                $('button.close, .file-request-close-button',this.$dialog),
-                {
-                    warning: true
-                }
-            );
-            this.$selectFolder = new mega.fileRequestUI.SelectFolderComponent(this.$dialog);
-            this.$previewButton = new mega.fileRequestUI.PreviewButtonComponent(
-                $('.file-request-preview-button', this.$dialog)
-            );
-
-            this.createTitleDescInput({
-                namespace: 'frm'
-            });
-
+            this.commonDialog = mega.fileRequest.commonDialog;
             this.context = null;
             this.fileObject = null;
             this.fileHandle = null;
             this.folderName = null;
-            this.addEventHandlers();
         }
 
-        init(selectedHandle, settings) {
+        init(selectedHandle) {
             // Reset fields
-            this.initTitleDescInput();
-            this.$selectFolder.init(settings);
+            this.commonDialog.reset();
+            this.setDialog();
+            this.commonDialog.init();
+            this.addEventHandlers();
 
             // Reset error messages
             this.setContext({
@@ -318,95 +453,62 @@ lazy(mega, 'fileRequest', () => {
             this.fileHandle = selectedHandle;
             this.folderName = this.fileObject && this.fileObject.name || null;
             if (this.folderName) {
-                this.$selectFolder.setFolder(this.folderName);
+                this.commonDialog.$selectFolder.setFolder(this.folderName);
+                this.commonDialog.$selectFolder.setNodeHandle(selectedHandle);
             }
 
-            M.safeShowDialog('file-request-create-dialog', this.$dialog);
-
-            const $scrollableContent = $('.content .scrollable', this.$dialog);
-            initPerfectScrollbar($scrollableContent);
-            this.triggerClickOnRail($scrollableContent);
+            M.safeShowDialog('file-request-create-dialog', this.commonDialog.$dialog);
+            this.commonDialog.initScrollbar();
         }
 
         setContext(context) {
             this.context = context;
         }
 
+        setDialog() {
+            this.commonDialog.dialogClass = 'file-request-create-dialog';
+            this.commonDialog.dialogTitle = l.file_request_dialog_create_title;
+            this.commonDialog.dialogCaption = l.file_request_dialog_create_desc;
+            this.commonDialog.closeWarning = true;
+            this.commonDialog.selectFolder = true;
+            this.commonDialog.sectionPrimary = true;
+            this.commonDialog.close = l[82];
+            this.commonDialog.save = l[158];
+            this.commonDialog.savePositive = true;
+            this.commonDialog.preview = true;
+            this.commonDialog.previewButtonFooter = true;
+        }
+
         addEventHandlers() {
-            this.$createButton.rebind('click.frc', () => {
-                if (!this.$inputTitle.validate()) {
+            this.commonDialog.$saveButton.eventOnClick(() => {
+                if (!this.commonDialog.$inputTitle.validate()) {
                     return;
                 }
 
-                if (!this.$inputDescription.validate()) {
+                if (!this.commonDialog.$inputDescription.validate()) {
                     return;
                 }
 
                 closeDialog();
 
-                mega.fileRequest.create(
-                    this.context.nodeHandle,
-                    this.$inputTitle.getValue(),
-                    this.$inputDescription.getValue()
-                );
-            });
+                const title = this.commonDialog.$inputTitle.getValue();
+                const description = this.commonDialog.$inputDescription.getValue();
 
-            this.addHandlerTitleDescInput();
-            this.setPreviewClickEventHandler();
-
-            this.$selectFolder.addEventHandlers({
-                namespace: 'frc',
-                post: openCreateDialogFromSelect
+                mega.fileRequest.create(this.context.nodeHandle, title, description).catch(dump);
             });
         }
 
         checkLoseChangesWarning() {
-            if (this.$inputTitle.getValue().length || this.$inputDescription.getValue().length) {
+            if (this.commonDialog.$inputTitle.getValue().length ||
+                this.commonDialog.$inputDescription.getValue().length) {
                 return true;
             }
         }
     }
 
-    class CreateSuccessDialog extends CommonDialog {
+    class CreateSuccessDialog {
         constructor() {
-            super();
-
-            this.$dialog = $('.file-request-create-success-dialog', document.body);
-            this.$closeButton = new mega.fileRequestUI.CloseButtonComponent(
-                $('.file-request-close-button, button.close', this.$dialog)
-            );
-
-            this.themeButtonSelector = '.embed-button-theme-input';
-            this.$themeButton = new mega.fileRequestUI.RadioComponent(
-                $(this.themeButtonSelector, this.$dialog), { namespace: 'frcs' }
-            );
-            this.themeButtonWrapper = '.embed-button-select';
-            this.$themeButtonWrapper = new mega.fileRequestUI.ButtonComponent(
-                $(this.themeButtonWrapper, this.$dialog), { namespace: 'frcs' }
-            );
-
-            this.$embedCode = new mega.fileRequestUI.EmbedCodeInputComponent(
-                $('.file-request-embed-code', this.$dialog)
-            );
-            this.$shareLink = new mega.fileRequestUI.ShareLinkInputComponent(
-                $('.file-request-share-link', this.$dialog)
-            );
-            this.$copyButton = new mega.fileRequestUI.ClassCopyButtonComponent(this.$dialog, {
-                copy: {
-                    'file-request-embed-code': {
-                        content: () => this.$embedCode.getContent(),
-                        toastText: l.file_request_action_copy_code,
-                        className: 'clipboard-embed-code'
-                    },
-                    'file-request-share-link': {
-                        content: () => this.$shareLink.getContent(),
-                        toastText: l.file_request_action_copy_link
-                    },
-                },
-                namespace: 'frcs'
-            });
-
-            this.addEventHandlers();
+            this.commonDialog = mega.fileRequest.commonDialog;
             this.context = null;
             this.puHandleObject = null;
             this.puPagePublicHandle = null;
@@ -416,13 +518,13 @@ lazy(mega, 'fileRequest', () => {
             if (context) {
                 this.setContext(context);
             }
+            loadingDialog.hide();
 
             this.puHandleObject = mega.fileRequest.storage.getPuHandleByPublicHandle(context.ph);
             if (!this.puHandleObject) {
                 if (d) {
                     logger.info('CreateSuccessDialog.init - No puHandleObject found', context);
                 }
-                loadingDialog.hide();
                 return;
             }
 
@@ -432,21 +534,24 @@ lazy(mega, 'fileRequest', () => {
 
             this.puPagePublicHandle = this.puHandleObject.p;
 
+            // Reset fields
+            this.commonDialog.reset();
+            this.setDialog();
+            this.commonDialog.init();
+
             M.safeShowDialog('file-request-create-success-dialog', () => {
-                const $scrollableContent = $('.content .scrollable', this.$dialog);
+                this.commonDialog.setShareLink();
+                this.commonDialog.setEmbedCode();
+                this.commonDialog.initScrollbar({
+                    scrollYMarginOffset: 20
+                });
 
-                this.setShareLink();
-                this.setEmbedCode();
-
-                this.triggerClickOnRail($scrollableContent);
-                initPerfectScrollbar($scrollableContent, {scrollYMarginOffset: 20});
-
-                this.$dialog.rebind('dialog-closed', () => {
-                    this.$dialog.off('dialog-closed');
+                this.commonDialog.$dialog.rebind('dialog-closed', () => {
+                    this.commonDialog.$dialog.off('dialog-closed');
                     mega.fileRequest.storage.removePuMessage(context.ph);
                 });
 
-                return this.$dialog;
+                return this.commonDialog.$dialog;
             });
         }
 
@@ -454,81 +559,36 @@ lazy(mega, 'fileRequest', () => {
             this.context = context;
         }
 
-        addEventHandlers() {
-            this.$copyButton.addEventHandlers();
-            this.setThemeChangeEventHandler();
+        setDialog() {
+            this.commonDialog.dialogClass = 'file-request-create-success-dialog';
+            this.commonDialog.dialogTitle = l.file_request_dialog_create_success_title;
+            this.commonDialog.dialogCaption = l.file_request_dialog_create_success_desc;
+            this.commonDialog.sectionSecondary = true;
+            this.commonDialog.close = l[81];
+            this.commonDialog.closePositive = true;
+            this.commonDialog.puPagePublicHandle = this.puPagePublicHandle;
         }
     }
 
-    class ManageDialog extends CommonDialog {
+    class ManageDialog {
         constructor() {
-            super();
-
-            this.$dialog = $('.file-request-manage-dialog', document.body);
-
-            this.$updateButton = new mega.fileRequestUI.ButtonComponent($('.file-request-update-button', this.$dialog));
-            this.$removeButton = new mega.fileRequestUI.ButtonComponent($('.file-request-remove-button', this.$dialog));
-
-            this.createTitleDescInput({
-                namespace: 'frm'
-            });
-
-            this.$previewButton = new mega.fileRequestUI.PreviewButtonComponent(
-                $('.file-request-preview-button', this.$dialog)
-            );
-            this.$closeButton = new mega.fileRequestUI.CloseButtonComponent(
-                $('.file-request-close-button, button.close', this.$dialog), {
-                    warning: true
-                }
-            );
-
-            this.themeButtonSelector = '.embed-button-theme-input';
-            this.$themeButton = new mega.fileRequestUI.RadioComponent(
-                $(this.themeButtonSelector, this.$dialog), { namespace: 'frm' }
-            );
-            this.themeButtonWrapper = '.embed-button-select';
-            this.$themeButtonWrapper = new mega.fileRequestUI.ButtonComponent(
-                $(this.themeButtonWrapper, this.$dialog), { namespace: 'frm' }
-            );
-
-            this.$embedCode = new mega.fileRequestUI.EmbedCodeInputComponent(
-                $('.file-request-embed-code', this.$dialog)
-            );
-            this.$shareLink = new mega.fileRequestUI.ShareLinkInputComponent(
-                $('.file-request-share-link', this.$dialog)
-            );
-            this.$copyButton = new mega.fileRequestUI.ClassCopyButtonComponent(this.$dialog, {
-                copy: {
-                    'file-request-embed-code': {
-                        content: () => this.$embedCode.getContent(),
-                        toastText: l.file_request_action_copy_code,
-                        className: 'clipboard-embed-code'
-                    },
-                    'file-request-share-link': {
-                        content: () => this.$shareLink.getContent(),
-                        toastText: l.file_request_action_copy_link
-                    },
-                },
-                namespace: 'frm'
-            });
-
-            this.addEventHandlers();
             this.context = null;
             this.puHandleObject = null;
             this.puPagePublicHandle = null;
+            this.commonDialog = mega.fileRequest.commonDialog;
         }
 
         init(context) {
             if (context) {
                 this.setContext(context);
             }
+            loadingDialog.hide();
 
             this.puHandleObject = mega.fileRequest.storage.getPuHandleByNodeHandle(context.h);
             if (!this.puHandleObject) {
                 if (d) {
                     logger.info('ManageDialog.init - No puHandleObject found', context);
                 }
-                loadingDialog.hide();
                 return;
             }
 
@@ -537,30 +597,52 @@ lazy(mega, 'fileRequest', () => {
             }
             this.puPagePublicHandle = this.puHandleObject.p;
 
-            this.initTitleDescInput();
-            this.setShareLink();
-            this.setEmbedCode();
+            M.safeShowDialog('file-request-manage-dialog', () => {
+                eventlog(99774);
 
-            // Reset fields
-            const puHandleObjectData = this.puHandleObject.d;
-            if (puHandleObjectData) {
-                this.$inputTitle.setValue(puHandleObjectData.t);
-                this.$inputDescription.setValue(puHandleObjectData.d);
-            }
-            else {
-                const message = this.puHandleObject.fn || '';
-                this.$inputTitle.setValue(message);
-                this.$inputDescription.setValue('');
-            }
+                // Reset fields
+                this.commonDialog.reset();
+                this.setDialog();
+                this.commonDialog.init();
+                this.addEventHandlers();
 
-            delay('filerequest.log', eventlog.bind(null, 99774)); // manage event
-            M.safeShowDialog('file-request-manage-dialog', this.$dialog);
-            const $scrollableContent = $('.content .scrollable', this.$dialog);
+                this.commonDialog.setShareLink();
+                this.commonDialog.setEmbedCode();
 
-            initPerfectScrollbar($scrollableContent);
-            this.triggerClickOnRail($scrollableContent);
+                // Reset fields
+                const puHandleObjectData = this.puHandleObject.d;
+                if (puHandleObjectData) {
+                    this.commonDialog.$inputTitle.setValue(puHandleObjectData.t);
+                    this.commonDialog.$inputDescription.setValue(puHandleObjectData.d);
+                }
+                else {
+                    const message = this.puHandleObject.fn || '';
+                    this.commonDialog.$inputTitle.setValue(message);
+                    this.commonDialog.$inputDescription.setValue('');
+                }
 
-            loadingDialog.hide();
+                this.commonDialog.initScrollbar();
+                return this.commonDialog.$dialog;
+            });
+        }
+
+        setDialog() {
+            this.commonDialog.dialogClass = 'file-request-manage-dialog';
+            this.commonDialog.dialogTitle = l.file_request_dialog_manage_title;
+
+            this.commonDialog.closeWarning = true;
+            this.commonDialog.sectionPrimary = true;
+            this.commonDialog.close = l[82];
+            this.commonDialog.save = l.msg_dlg_save;
+            this.commonDialog.savePositive = true;
+            this.commonDialog.preview = true;
+            this.commonDialog.previewButtonPrimary = true;
+            this.commonDialog.stop = true;
+
+            this.commonDialog.sectionDivider = true;
+
+            this.commonDialog.sectionSecondary = true;
+            this.commonDialog.puPagePublicHandle = this.puPagePublicHandle;
         }
 
         setContext(context) {
@@ -568,34 +650,27 @@ lazy(mega, 'fileRequest', () => {
         }
 
         addEventHandlers() {
-            this.addHandlerTitleDescInput();
-
-            this.$copyButton.addEventHandlers();
-
-            this.setPreviewClickEventHandler();
-            this.setThemeChangeEventHandler();
-
-            this.$updateButton.eventOnClick(async() => {
-                if (!this.$inputTitle.validate()) {
+            this.commonDialog.$saveButton.eventOnClick(async() => {
+                if (!this.commonDialog.$inputTitle.validate()) {
                     return;
                 }
 
-                if (!this.$inputDescription.validate()) {
+                if (!this.commonDialog.$inputDescription.validate()) {
                     return;
                 }
 
-                this.$updateButton.disable();
+                this.commonDialog.$saveButton.disable();
                 await mega.fileRequest.update(
                     this.puHandleObject.h,
-                    this.$inputTitle.getValue(),
-                    this.$inputDescription.getValue()
+                    this.commonDialog.$inputTitle.getValue(),
+                    this.commonDialog.$inputDescription.getValue()
                 );
-                this.$updateButton.enable();
+                this.commonDialog.$saveButton.enable();
 
                 closeDialog();
             });
 
-            this.$removeButton.eventOnClick(() => {
+            this.commonDialog.$removeButton.eventOnClick(() => {
                 const title = l.file_request_dropdown_remove;
                 const message = l.file_request_action_remove_prompt_title;
                 const description = l.file_request_action_remove_prompt_desc;
@@ -604,13 +679,13 @@ lazy(mega, 'fileRequest', () => {
                     if (!res) {
                         return;
                     }
-                    this.$removeButton.disable();
+                    this.commonDialog.$removeButton.disable();
 
                     mega.fileRequest.remove(this.puHandleObject.h)
                         .catch(dump)
                         .finally(() => {
                             closeDialog();
-                            this.$removeButton.enable();
+                            this.commonDialog.$removeButton.enable();
                             showToast('warning2', l.file_request_action_remove);
                             selectionManager.clear_selection();
                         });
@@ -642,7 +717,8 @@ lazy(mega, 'fileRequest', () => {
                 description = '';
             }
 
-            if (this.$inputTitle.getValue() !== title || this.$inputDescription.getValue() !== description) {
+            if (this.commonDialog.$inputTitle.getValue() !== title ||
+                this.commonDialog.$inputDescription.getValue() !== description) {
                 return true;
             }
         }
@@ -685,7 +761,7 @@ lazy(mega, 'fileRequest', () => {
         }
 
         addEventHandlers() {
-            if (d) {
+            if (d > 1) {
                 logger.info(
                     '#file-request #context-menu - Add Folder context menu event handlers',
                     this.$createButton.length
@@ -730,34 +806,30 @@ lazy(mega, 'fileRequest', () => {
             });
 
             const showRemoveDialog = (selectedNodeHandle, title, message, description) => {
-                msgDialog(
-                    `confirmation:!^${l.file_request_action_remove_prompt_button}!${l[82]}`,
-                    title,
-                    message,
-                    description,
-                    (res) => {
-                        if (!res) {
-                            return;
-                        }
+                const type = `confirmation:!^${l.file_request_action_remove_prompt_button}!${l[82]}`;
 
-                        loadingDialog.show();
-                        mega.fileRequest.remove(selectedNodeHandle)
-                            .catch((ex) => {
-                                if (typeof ex !== 'number' || ex && ex !== ENOENT) {
-                                    return;
-                                }
+                const _remove = () => {
+                    mLoadingSpinner.show('puf-remove');
 
-                                mega.fileRequest.storage.removePuPageByNodeHandle(selectedNodeHandle);
+                    mega.fileRequest.remove(selectedNodeHandle, true)
+                        .catch((ex) => {
+                            if (ex !== ENOENT) {
+                                logger.error(ex);
+                                return;
+                            }
 
-                                refreshFileRequestPageList();
-                            })
-                            .finally(() => {
-                                showToast('warning2', l.file_request_action_remove);
-                                selectionManager.clear_selection();
-                            });
-                    },
-                    1
-                );
+                            onIdle(refreshFileRequestPageList);
+                            return mega.fileRequest.storage.removePuPageByNodeHandle(selectedNodeHandle);
+                        })
+                        .finally(() => {
+                            mLoadingSpinner.hide('puf-remove');
+                        });
+
+                    selectionManager.clear_selection();
+                    showToast('warning2', l.file_request_action_remove);
+                };
+
+                msgDialog(type, title, message, description, (res) => res && _remove(), 1);
             };
 
             this.$removeButton.eventOnClick(() => {
@@ -779,613 +851,51 @@ lazy(mega, 'fileRequest', () => {
         }
     }
 
-    class MobileContextMenu {
-        constructor() {
-            this.$contextMenu = null;
-            this.$createButton = null;
-            this.$manageButton = null;
-            this.$copyLinkButton = null;
-            this.$removeButton = null;
-            this.nodeHandle = null;
-        }
-
-        init($contextMenu, nodeHandle) {
-            this.nodeHandle = nodeHandle;
-            this.$contextMenu = $contextMenu;
-
-            this.reset();
-
-            this.$createButton = new mega.fileRequestUI.ButtonComponent(
-                $('.create-file-request', this.$contextMenu), {
-                    namespace: 'frcmm',
-                    propagate: false,
-                    onOff: true
-                }
-            );
-
-            this.$manageButton = new mega.fileRequestUI.ButtonComponent(
-                $('.manage-file-request', this.$contextMenu), {
-                    namespace: 'frcmm',
-                    propagate: false,
-                    onOff: true
-                }
-            );
-
-            this.$copyLinkButton = new mega.fileRequestUI.CopyButtonComponent(
-                $('.copy-file-request', this.$contextMenu), {
-                    namespace: 'frcm',
-                    toastText: l.file_request_action_copy_link,
-                    propagate: false,
-                    onOff: true
-                }
-            );
-
-            this.$removeButton = new mega.fileRequestUI.ButtonComponent(
-                $('.cancel-file-request', this.$contextMenu), {
-                    namespace: 'frcmm',
-                    propagate: false,
-                    onOff: true
-                }
-            );
-
-            this.addEventHandlers();
-        }
-
-        reset() {
-            if (this.$createButton) {
-                this.$createButton.off();
-                delete this.$createButton;
-            }
-            if (this.$manageButton) {
-                this.$manageButton.off();
-                delete this.$manageButton;
-            }
-            if (this.$copyLinkButton) {
-                this.$copyLinkButton.off();
-                delete this.$copyLinkButton;
-            }
-            if (this.$removeButton) {
-                this.$removeButton.off();
-                delete this.$removeButton;
-            }
-        }
-
-        isInvalidUserStatus() {
-            if (is_mobile) {
-                return !validateUserAction();
-            }
-
-            if (u_attr && u_attr.b && u_attr.b.s === -1) {
-                if (u_attr.b.m) {
-                    msgDialog('warningb', '', l[20401], l[20402]);
-                }
-                else {
-                    msgDialog('warningb', '', l[20462], l[20463]);
-                }
-                return true;
-            }
-
-            return false;
-        }
-
-        addEventHandlers() {
-            this.$createButton.eventOnClick(() => {
-                if (this.isInvalidUserStatus()) {
-                    return false;
-                }
-
-                mobile.cloud.contextMenu.hide();
-                mega.fileRequest.showCreateMobileDialog(this.nodeHandle);
-
-                return false;
-            });
-
-            this.$manageButton.eventOnClick(() => {
-                if (this.isInvalidUserStatus()) {
-                    return false;
-                }
-
-                mobile.cloud.contextMenu.hide();
-                mega.fileRequest.showManageMobileDialog(this.nodeHandle);
-
-                return false;
-            });
-
-            this.$copyLinkButton.setOptions({
-                callback: () => {
-                    const selectedNodeHandle = this.nodeHandle;
-                    const puPagePublicHandle = mega.fileRequest.storage
-                        .getPuHandleByNodeHandle(selectedNodeHandle);
-
-                    mobile.cloud.contextMenu.hide();
-
-                    if (puPagePublicHandle) {
-                        return mega.fileRequest.generator
-                            .generateUrl(puPagePublicHandle.p);
-                    }
-
-                    return null;
-                }
-            });
-
-            this.$removeButton.eventOnClick(() => {
-                if (this.isInvalidUserStatus()) {
-                    return false;
-                }
-
-                const selectedNodeHandle = this.nodeHandle;
-                if (!selectedNodeHandle) {
-                    return false;
-                }
-
-                mobile.cloud.contextMenu.hide();
-                mega.fileRequest.dialogs.removeWarningMobileDialog.init({
-                    h: selectedNodeHandle
-                });
-
-                return false;
-            });
-        }
-    }
-
-    class CreateMobileDialog extends CommonMobileDialog {
-        constructor() {
-            super();
-
-            this.$dialog = $('#mobile-ui-file-request-create', document.body);
-            this.$createButton = $('.file-request-create-button', this.$dialog);
-            this.$closeButton = new mega.fileRequestUI.CloseMobileComponent(
-                $('.cancel.text-button, .fm-dialog-close',this.$dialog),
-                {
-                    $dialog: this.$dialog,
-                    propagate: false
-                }
-            );
-
-            this.createTitleDescInput({
-                namespace: 'frcm'
-            });
-
-            this.context = null;
-            this.fileObject = null;
-            this.fileHandle = null;
-            this.folderName = null;
-            this.addEventHandlers();
-        }
-
-        setContext(context) {
-            this.context = context;
-        }
-
-        addEventHandlers() {
-            this.$createButton.rebind('click.frcm, tap.frcm', (evt) => {
-                evt.stopPropagation();
-
-                if (!this.$inputTitle.validate()) {
-                    return;
-                }
-
-                if (!this.$inputDescription.validate()) {
-                    return;
-                }
-
-                this.$closeButton.closeDialog();
-
-                mega.fileRequest.create(
-                    this.context.nodeHandle,
-                    this.$inputTitle.getValue(),
-                    this.$inputDescription.getValue()
-                );
-
-                return false;
-            });
-        }
-
-        init(selectedHandle) {
-            // Reset fields
-            this.initTitleDescInput();
-
-            // Reset error messages
-            this.setContext({
-                nodeHandle: selectedHandle
-            });
-
-            this.fileObject = M.d[selectedHandle];
-            this.fileHandle = selectedHandle;
-
-            this.$dialog.removeClass('hidden').addClass('overlay');
-
-            mobile.initOverlayPopstateHandler(this.$dialog);
-        }
-    }
-
-    class ManageMobileDialog extends CommonMobileDialog {
-        constructor() {
-            super();
-
-            this.$dialog = $('#mobile-ui-file-request-manage', document.body);
-            this.$updateButton = new mega.fileRequestUI.ButtonComponent(
-                $('.file-request-update-button', this.$dialog),
-                {
-                    namespace: 'frmm',
-                    propagate: false
-                }
-            );
-            this.$removeButton = new mega.fileRequestUI.ButtonComponent(
-                $('.file-request-remove-button', this.$dialog),
-                {
-                    namespace: 'frmm',
-                    propagate: false
-                }
-            );
-            this.$closeButton = new mega.fileRequestUI.CloseMobileComponent(
-                $('.cancel.text-button, .fm-dialog-close',this.$dialog),
-                {
-                    $dialog: this.$dialog,
-                    propagate: false
-                }
-            );
-
-            this.createTitleDescInput({
-                namespace: 'frcm'
-            });
-
-            this.addEventHandlers();
-            this.context = null;
-            this.puHandleObject = null;
-            this.puPagePublicHandle = null;
-        }
-
-        setContext(context) {
-            this.context = context;
-        }
-
-        addEventHandlers() {
-            this.$updateButton.eventOnClick(async() => {
-                if (!this.$inputTitle.validate()) {
-                    return;
-                }
-
-                if (!this.$inputDescription.validate()) {
-                    return;
-                }
-
-                this.$closeButton.closeDialog();
-                if (!this.hasChanges()) {
-                    mega.fileRequest.dialogs.successMobileDialog.init({
-                        ph: this.puHandleObject.ph,
-                        p: this.puHandleObject.p,
-                        h: this.puHandleObject.h
-                    }, true);
-
-                    return false;
-                }
-
-                this.$updateButton.disable();
-                await mega.fileRequest.update(
-                    this.puHandleObject.h,
-                    this.$inputTitle.getValue(),
-                    this.$inputDescription.getValue()
-                );
-                this.$updateButton.enable();
-
-                return false;
-            });
-
-            this.$removeButton.eventOnClick(() => {
-                this.$closeButton.closeDialog();
-
-                mega.fileRequest.dialogs.removeWarningMobileDialog.init({
-                    h: this.puHandleObject.h,
-                    title: this.$inputTitle.getValue(),
-                    description: this.$inputDescription.getValue(),
-                    fromManage: true
-                });
-            });
-        }
-
-        init(context) {
-            if (context) {
-                this.setContext(context);
-            }
-
-            this.puHandleObject = mega.fileRequest.storage.getPuHandleByNodeHandle(context.h);
-            if (!this.puHandleObject) {
-                if (d) {
-                    logger.info('ManageMobileDialog.init - No puHandleObject found', context);
-                }
-                loadingDialog.hide();
-                return;
-            }
-
-            if (d) {
-                logger.info('ManageMobileDialog.init - puHandleObject found', this.puHandleObject);
-            }
-            this.puPagePublicHandle = this.puHandleObject.p;
-
-            this.initTitleDescInput();
-            this.setShareLink();
-
-            // Reset fields
-            const puHandleObjectData = this.puHandleObject.d;
-            if (puHandleObjectData) {
-                this.$inputTitle.setValue(puHandleObjectData.t);
-                this.$inputDescription.setValue(puHandleObjectData.d);
-            }
-            else {
-                const message = this.puHandleObject.fn || '';
-                this.$inputTitle.setValue(message);
-                this.$inputDescription.setValue('');
-            }
-
-            if (this.context.title) {
-                this.$inputTitle.setValue(this.context.title);
-            }
-
-            if (this.context.description) {
-                this.$inputDescription.setValue(this.context.description);
-            }
-
-            this.$dialog.removeClass('hidden').addClass('overlay');
-            mobile.initOverlayPopstateHandler(this.$dialog);
-
-            loadingDialog.hide();
-        }
-
-        hasChanges() {
-            let title = '';
-            let description = '';
-
-            const puHandleObjectData = this.puHandleObject.d;
-            if (puHandleObjectData) {
-                title = puHandleObjectData.t;
-                description = puHandleObjectData.d;
-            }
-            else {
-                const message = this.puHandleObject.fn || '';
-                title = message;
-                description = '';
-            }
-
-            return this.$inputTitle.getValue() !== title || this.$inputDescription.getValue() !== description;
-        }
-    }
-
-    class SuccessMobileDialog extends CommonMobileDialog {
-        constructor() {
-            super();
-
-            this.$dialog = $('#mobile-ui-file-request-create-success', document.body);
-            this.$closeButton = new mega.fileRequestUI.CloseMobileComponent(
-                $('.close.text-button, .fm-dialog-close',this.$dialog),
-                {
-                    $dialog: this.$dialog,
-                    post: () => {
-                        mega.fileRequest.storage.removePuMessage(this.context.ph);
-                        $('.mobile.file-manager-block').removeClass('disable-scroll');
-                    },
-                    propagate: false
-                }
-            );
-            this.$shareLink = new mega.fileRequestUI.ShareLinkInputComponent(
-                $('.file-request-share-link', this.$dialog),
-                {
-                    propagate: false
-                }
-            );
-            this.$copyButton = new mega.fileRequestUI.CopyButtonComponent($('.file-request-copy-link', this.$dialog), {
-                callback: () => {
-                    return {
-                        content: () => this.$shareLink.getContent(),
-                        toastText: l.file_request_action_copy_link
-                    };
-                },
-                namespace: 'frcsm',
-                propagate: false
-            });
-
-            this.$dialogTitle = $('.dialog-heading-text', this.$dialog);
-
-            this.addEventHandlers();
-            this.context = null;
-            this.puHandleObject = null;
-            this.puPagePublicHandle = null;
-        }
-
-        init(context, update) {
-            if (context) {
-                this.setContext(context);
-            }
-
-            let dialogTitle = l.file_request_dialog_create_success_title;
-            if (update) {
-                dialogTitle = l.file_request_dialog_update_success_title;
-            }
-
-            this.$dialogTitle.text(dialogTitle);
-
-            this.puHandleObject = mega.fileRequest.storage.getPuHandleByPublicHandle(context.ph);
-            if (!this.puHandleObject) {
-                if (d) {
-                    logger.info('SuccessMobileDialog.init - No puHandleObject found', context);
-                }
-                loadingDialog.hide();
-                return;
-            }
-
-            if (d) {
-                logger.info('SuccessMobileDialog.init - puHandleObject found', this.puHandleObject);
-            }
-
-            this.puPagePublicHandle = this.puHandleObject.p;
-
-            this.setShareLink();
-
-            $('.mobile.file-manager-block').addClass('disable-scroll');
-
-            // Show the overlay
-            this.$dialog.removeClass('hidden').addClass('overlay');
-            loadingDialog.hide();
-        }
-
-        setContext(context) {
-            this.context = context;
-        }
-
-        addEventHandlers() {
-            this.$copyButton.addEventHandlers();
-            this.$closeButton.eventOnClick(async() => {
-                this.$closeButton.closeDialog();
-            });
-        }
-    }
-
-    class RemoveWarningMobileDialog extends CommonMobileDialog {
-        constructor() {
-            super();
-
-            this.$dialog = $('#mobile-ui-file-request-remove-warning', document.body);
-            this.$closeButton = new mega.fileRequestUI.CloseMobileComponent(
-                $('.close.text-button, .fm-dialog-close',this.$dialog),
-                {
-                    $dialog: this.$dialog,
-                    post: () => {
-                        if (this.context.fromManage) {
-                            mega.fileRequest.dialogs.manageMobileDialog.init({
-                                h: this.context.h,
-                                title: this.context.title || null,
-                                description: this.context.description || null,
-                            });
-                        }
-                    },
-                    propagate: false
-                }
-            );
-            this.$removeButton = new mega.fileRequestUI.ButtonComponent($('.file-request-remove', this.$dialog));
-
-            this.addEventHandlers();
-            this.context = null;
-        }
-
-        init(context) {
-            if (context) {
-                this.setContext(context);
-            }
-
-            $('.mobile.file-manager-block').addClass('disable-scroll');
-
-            // Show the overlay
-            this.$dialog.removeClass('hidden').addClass('overlay');
-        }
-
-        setContext(context) {
-            this.context = context;
-        }
-
-        addEventHandlers() {
-            this.$removeButton.eventOnClick(() => {
-                this.$removeButton.disable();
-
-                mega.fileRequest.remove(this.context.h)
-                    .catch(dump)
-                    .finally(() => {
-                        this.$removeButton.enable();
-                        showToast('warning2', l.file_request_action_remove);
-                        this.$closeButton.closeDialog();
-                    });
-            });
-        }
-    }
-
+    /** @class mega.fileRequest */
     return new class FileRequest {
         constructor() {
             this.contextMenu = new FileRequestContextMenu();
 
-            lazy(this, 'mobileContextMenu', () => new MobileContextMenu());
             lazy(this, 'actionHandler', () => mega.fileRequestCommon.actionHandler);
             lazy(this, 'storage', () => mega.fileRequestCommon.storage);
-            lazy(this, 'api', () =>  mega.fileRequestCommon.api);
-            lazy(this, 'generator', () =>  mega.fileRequestCommon.generator);
+            lazy(this, 'fileRequestApi', () => mega.fileRequestCommon.fileRequestApi);
+            lazy(this, 'generator', () => mega.fileRequestCommon.generator);
 
             this.dialogs = {};
 
+            lazy(this, 'commonDialog', () => new CommonDialog);
             lazy(this.dialogs, 'createDialog', () => new CreateDialog);
             lazy(this.dialogs, 'createSuccessDialog', () => new CreateSuccessDialog);
             lazy(this.dialogs, 'manageDialog', () => new ManageDialog);
-            lazy(this.dialogs, 'createMobileDialog', () => new CreateMobileDialog);
-            lazy(this.dialogs, 'manageMobileDialog', () => new ManageMobileDialog);
-            lazy(this.dialogs, 'successMobileDialog', () => new SuccessMobileDialog);
-            lazy(this.dialogs, 'removeWarningMobileDialog', () => new RemoveWarningMobileDialog);
-
-            // To be removed on mobile FileRequest revamp
-            this.skipDialog = mega.config.get('sdss');
         }
 
         async create(handle, title, description) {
-            const puHandleObject = this.storage.getPuHandleByNodeHandle(handle);
+            let puHandleObject = this.storage.getPuHandleByNodeHandle(handle);
 
-            if (puHandleObject) {
-                if (is_mobile) {
-                    mega.fileRequest.dialogs.SuccessMobileDialog.init({
-                        ph: puHandleObject.ph,
-                        p: puHandleObject.p,
-                        h: puHandleObject.h
+            if (!puHandleObject) {
+
+                puHandleObject = await this.fileRequestApi.create(handle, title, description)
+                    .then((res) => {
+                        const {pkt: {pup: {p}}, result: [ph, puf]} = res;
+                        const c = this.storage.getPuHandleByNodeHandle(handle);
+
+                        assert(c && c.p === p && c.ph === ph && c.p === puf, 'Invalid API response.', res, [c]);
+
+                        onIdle(refreshFileRequestPageList);
+                        this.storage.updatePuPage(c.p, title, description);
+                        this.storage.updatePuHandle(c.h, title, description);
+
+                        return c;
                     });
-                    return;
-                }
-
-                mega.fileRequest.dialogs.createSuccessDialog.init({
-                    ph: puHandleObject.ph,
-                    p: puHandleObject.p,
-                    h: puHandleObject.h
-                });
-                return;
             }
 
-            loadingDialog.show();
-
-            delay('filerequest.log', eventlog.bind(null, 99773)); // create event
-            const response = await this
-                .api
-                .create(handle, title, description)
-                .catch((ex) => {
-                    dump(ex);
-                    loadingDialog.hide();
-                    msgDialog('warninga', l[135], l[47], api_strerror(ex));
-                });
-
-            if (!Array.isArray(response)) {
-                // Page is already existing but the local data was not updated
-                // or maybe encountered an error
-                const publicHandle = response;
-                await this.api
-                    .remove(handle)
-                    .catch(dump);
-
-                await this.storage.addPuHandle(
-                    handle,
-                    publicHandle, {
-                        msg: title,
-                        description: description
-                    },
-                    null,
-                    requesti
-                ).catch(dump);
-                return;
+            if (is_mobile) {
+                eventlog(99834);
+                mobile.fileRequestManagement.showFRUpdatedSheet(false);
             }
-
-            const publicHandle = response[0];
-            const pagePublicHandle = response[1];
-
-            await this.storage.addPuHandle(
-                handle,
-                publicHandle, {
-                    msg: title,
-                    description: description
-                },
-                pagePublicHandle,
-                requesti
-            ).catch(dump);
+            else {
+                mega.fileRequest.dialogs.createSuccessDialog.init({...puHandleObject});
+            }
         }
 
         async update(handle, title, description) {
@@ -1396,30 +906,15 @@ lazy(mega, 'fileRequest', () => {
             }
 
             loadingDialog.show(); // Show dialog
-            await this.api
+            await this.fileRequestApi
                 .update(puHandleObject.p, title, description)
                 .catch(dump);
 
-            this.storage
-                .updatePuHandle(
-                    handle,
-                    title,
-                    description
-                );
-
-            this.storage
-                .updatePuPage(
-                    puHandleObject.p,
-                    title,
-                    description
-                );
+            this.storage.updatePuHandle(handle, title, description);
+            this.storage.updatePuPage(puHandleObject.p, title, description);
 
             if (is_mobile) {
-                this.dialogs.successMobileDialog.init({
-                    ph: puHandleObject.ph,
-                    p: puHandleObject.p,
-                    h: puHandleObject.h
-                }, true);
+                mobile.fileRequestManagement.showFRUpdatedSheet(true);
             }
 
             loadingDialog.hide();
@@ -1431,7 +926,7 @@ lazy(mega, 'fileRequest', () => {
             return e && e.s !== 1 && (!p || e.p);
         }
 
-        removeList(handles, quiet) {
+        async removeList(handles, quiet) {
             if (typeof handles === 'string') {
                 handles = [handles];
             }
@@ -1440,58 +935,22 @@ lazy(mega, 'fileRequest', () => {
                 handles = [];
             }
 
-            const promises = [];
-            const responses = {
-                error: 0,
-                success: 0,
-                items: Object.create(null)
-            };
-
             if (handles.length && !quiet) {
-                loadingDialog.show();
+                loadingDialog.pshow();
             }
 
+            const promises = [];
             for (let index = handles.length; index--;) {
                 const puHandleNodeHandle = handles[index];
-
                 const puHandleObject = this.storage.getPuHandleByNodeHandle(puHandleNodeHandle);
 
-                const promise = puHandleObject ?
-                    new Promise((resolve, reject) => {
-                        this.api
-                            .remove(puHandleNodeHandle)
-                            .then((res) => {
-                                responses.success++;
-                                responses.items[puHandleNodeHandle] = {
-                                    response: res
-                                };
-                                resolve(res);
-                            })
-                            .catch((ex) => {
-                                responses.error++;
-                                responses[puHandleNodeHandle] = {
-                                    error: ex
-                                };
-                                reject(ex);
-                            });
-                    }) :
-                    Promise.reject(new MEGAException(`Public Handle Object not found Node: ${puHandleNodeHandle}`));
-
-                promises.push(promise);
+                if (!puHandleObject) {
+                    logger.warn(`Public Handle Object not found for Node: ${puHandleNodeHandle}`);
+                }
+                promises.push(this.fileRequestApi.remove(puHandleNodeHandle));
             }
 
-            if (promises.length) {
-                return Promise.allSettled(promises)
-                    .finally(() => {
-                        if (!quiet && responses.error) {
-                            if (d) {
-                                logger.error('PUF Remove List Error', responses);
-                            }
-                            loadingDialog.hide();
-                        }
-                        return responses.items;
-                    });
-            }
+            return Promise.allSettled(promises).finally(() => !quiet && loadingDialog.phide());
         }
 
         async remove(handle, quiet) {
@@ -1505,26 +964,17 @@ lazy(mega, 'fileRequest', () => {
                 loadingDialog.show(); // Show dialog
             }
 
-            return this.api
-                .remove(handle)
-                .catch((ex) => {
+            return this.fileRequestApi.remove(handle)
+                .finally(() => {
                     if (!quiet) {
-                        loadingDialog.hide(); // Hide dialog
+                        loadingDialog.hide();
                     }
-                    dump(ex);
-                    throw ex;
                 });
         }
 
         removePuPage(publicUploadPage) {
-            const nodeHandle = this
-                .storage
-                .removePuPage(publicUploadPage.p, publicUploadPage.ph);
 
-            if (nodeHandle) {
-                mBroadcaster
-                    .sendMessage(`FileRequest:pufRemoved_${nodeHandle}`);
-            }
+            return this.storage.removePuPage(publicUploadPage.p, publicUploadPage.ph);
         }
 
         processPuPageFromDB(dbData) {
@@ -1535,12 +985,36 @@ lazy(mega, 'fileRequest', () => {
             return this.storage.processPuHandleFromDB(dbData);
         }
 
-        async refreshPuPageList() {
-            const puPageList = await this.api.getPuPageList().catch(dump);
+        async getPuPage(puPageId, puHandleId) {
 
-            const errorNonExistent = ENOENT;
-            const isDebug = d;
-            const fileRequestCommonObject = mega.fileRequestCommon;
+            return this.fileRequestApi.getPuPage(puPageId)
+                .then(({result: puPage}) => {
+                    this.storage.addPuPage(puPage);
+
+                    const currentPuPage = this.storage.getPuPageByPageId(puPage.p);
+                    if (currentPuPage && puPage.d) {
+                        this.storage.updatePuHandle(currentPuPage.h, puPage.d.msg, puPage.d.description);
+                    }
+
+                    return puPage;
+                })
+                .catch((ex) => {
+                    if (ex === ENOENT) {
+                        this.storage.removePuPage(puPageId, puHandleId);
+
+                        if (d) {
+                            logger.warn('getPuPage(%s) Not found.', puPageId, puHandleId, ex);
+                        }
+                        return;
+                    }
+
+                    throw ex;
+                });
+        }
+
+        async refreshPuPageList() {
+            const promises = [];
+            const {result: puPageList} = await this.fileRequestApi.getPuPageList();
 
             for (let index = puPageList.length; index--;) {
                 const puPageId = puPageList[index].p;
@@ -1548,74 +1022,41 @@ lazy(mega, 'fileRequest', () => {
                 const puHandleState = puPageList[index].s;
 
                 if (!puPageId) {
-                    if (isDebug) {
+                    if (d) {
                         logger.error(
                             'FileRequest.refreshPuPageList - Abnormal state - no puPageId',
                             puPageList[index]
                         );
                     }
 
-                    return;
+                    continue;
                 }
 
-                this.storage.saveOrUpdatePuHandle(
-                    {
-                        state: puHandleState,
-                        publicHandle: puHandleId,
-                        pagePublicHandle: puPageId
-                    }
-                );
-
-                this.api.getPuPage(puPageId)
-                    .then((puPage) => {
-                        this.storage.addPuPage(puPage);
-
-                        const currentPuPage = this.storage.getPuPageByPageId(puPage.p);
-                        if (currentPuPage && puPage.d) {
-                            this.storage
-                                .updatePuHandle(
-                                    currentPuPage.h,
-                                    puPage.d.msg,
-                                    puPage.d.description
-                                );
-                        }
-
-                        fileRequestCommonObject.addFileRequestIcon(puHandleId);
-                    })
-                    .catch(
-                        (ex) => {
-                            if (ex === errorNonExistent) {
-                                this.storage.removePuPage(puPageId, puHandleId);
-
-                                if (isDebug) {
-                                    logger.warn(
-                                        'FileRequest.refreshPuPageList - Api.getPuPage - Page does not exist',
-                                        puHandleId,
-                                        puPageId,
-                                        ex
-                                    );
-                                }
-                                return;
-                            }
-
-                            if (isDebug) {
-                                logger.warn(
-                                    'FileRequest.refreshPuPageList - Api.getPuPage - Something went wrong',
-                                    puHandleId,
-                                    puPageId,
-                                    ex
-                                );
-                            }
+                // Lets check puHandle
+                const nodeHandle = this.storage.getNodeHandleByPuHandle(puHandleId);
+                if (nodeHandle) {
+                    this.storage.saveOrUpdatePuHandle(
+                        {
+                            nodeHandle,
+                            state: puHandleState,
+                            publicHandle: puHandleId,
+                            pagePublicHandle: puPageId
                         }
                     );
+
+                    promises.push(this.getPuPage(puPageId, puHandleId));
+                }
+                else {
+                    this.storage.removePuHandle(null, puHandleId);
+                }
             }
+
+            return Promise.all(promises);
         }
 
-        async processUploadedPuHandles(actionPacket) {
-            await this.actionHandler
-                .processUploadedPuHandles(actionPacket);
-
-            this.refreshPuPageList();
+        async processUploadedPuHandles(fetchNodesResponse) {
+            this.actionHandler.processUploadedPuHandles(fetchNodesResponse);
+            return this.refreshPuPageList();
         }
 
         getPuHandleList() {
@@ -1665,29 +1106,12 @@ lazy(mega, 'fileRequest', () => {
                     mega.fileRequest.removeList(list).always(dump).finally(resolve);
                 };
 
-                if (is_mobile) {
-                    mobile.messageOverlay.show(fldName, l[18229], false, ['No', 'Yes']).then(ack).catch(reject);
-                }
-                else {
-                    msgDialog('confirmation', l[1003], fldName, l[18229], (result) => {
-                        if (result) {
-                            return ack();
-                        }
-                        reject();
-                    });
-                }
-
-
-            });
-        }
-
-        showCreateMobileDialog(nodeHandle) {
-            mega.fileRequest.dialogs.createMobileDialog.init(nodeHandle);
-        }
-
-        showManageMobileDialog(nodeHandle) {
-            mega.fileRequest.dialogs.manageMobileDialog.init({
-                h: nodeHandle
+                msgDialog('confirmation', l[1003], fldName, l[18229], (result) => {
+                    if (result) {
+                        return ack();
+                    }
+                    reject(EBLOCKED);
+                });
             });
         }
 
@@ -1695,34 +1119,29 @@ lazy(mega, 'fileRequest', () => {
          * Make sure that user knows that FileRequest wiil be cancelled if any
          * full shares or public links are available for target
          * @param {Array} handles Array of nodes id which will be moved
-         * @param {Boolean} target Target node
+         * @param {String} target Target node
          *
          * @returns {Promise} returns premove check promise
          */
         async preMoveCheck(handles, target) {
+            const list = [];
             const selected = Array.isArray(handles) ? handles : [handles];
-            let list = [];
 
             // Is there any FileRequest active for given handles?
             // Count for precise dlg message, will loop to the
             // end in case there is not FileRequest or if only 1 found
             for (let i = selected.length; i--;) {
-                list = list.concat(mega.fileRequestCommon.storage.isDropExist(selected[i]));
+                list.push(...mega.fileRequestCommon.storage.isDropExist(selected[i]));
             }
 
-            if (!list.length) {
-                return [selected, target];
-            }
+            if (list.length) {
+                const isShared = await shared(target) || new mega.Share({}).isShareExist([target], false, true);
 
-            const isShared = await shared(target);
-            if (!isShared) {
-                const share = new mega.Share({});
-                if (!share.isShareExist([target], false, true)) { // Search pending shares .ps
-                    return [selected, target];
+                if (isShared) {
+                    await this.showRemoveWarning(list);
                 }
             }
 
-            await this.showRemoveWarning(list);
             return [selected, target];
         }
 
@@ -1764,7 +1183,7 @@ lazy(mega, 'fileRequest', () => {
                     break;
             }
 
-            await this.api
+            await this.fileRequestApi
                 .update(
                     puHandleObject.p,
                     msg,

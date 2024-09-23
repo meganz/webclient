@@ -9,15 +9,10 @@
     cursor: default;
     flex-shrink: 0;
     border-left: 2px solid var(--stroke-main);
+    transition: 200ms linear;
 }
 .rtl .selection-status-bar {
     display: rtl;
-}
-.search .selection-status-bar {
-    display: none;
-}
-.search-multi .selection-status-bar {
-    display: block;
 }
 .fm-right-files-block.item-selected .selection-status-bar {
     margin-bottom: 0;
@@ -40,6 +35,7 @@
     padding: 0 14px;
 }
 
+.mega-lite-mode .selection-status-bar .selection-bar-col .sel-notif-size-total,
 .selection-status-bar .selection-bar-col .sel-notif-size-total:empty {
     display: none;
 }
@@ -113,9 +109,17 @@
     float: left;
     --mask-color: var(--stroke-main-inverted);
 }
-.btn-myfiles.active i:not(.icon-arrow-down),
-.btn-galleries.active i:not(.icon-arrow-down) {
+.btn-myfiles.active,
+.btn-galleries.active {
+    opacity: 1;
+}
+.btn-myfiles.active i:not(.icon-dropdown),
+.btn-galleries.active i:not(.icon-dropdown):not(.icon-link-small) {
     --mask-color: var(--secondary-blue);
+}
+.btn-myfiles.active i.icon-dropdown,
+.btn-galleries.active i.icon-dropdown {
+    --mask-color: var(--icon-active);
 }
 .rtl .btn-myfiles i,
 .rtl .btn-galleries i {
@@ -129,16 +133,46 @@
     cursor: pointer;
     color: var(--stroke-main-inverted);
     background-color: var(--stroke-grey-1);
-    box-shadow: 0 1px 4px 0 rgba(0,0,0,0.1);
-}
-.btn-myfiles.active,
-.btn-galleries.active {
-    opacity: 1;
+    box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.1);
 }
 .btn-myfiles span,
 .btn-galleries span {
     -webkit-margin-end: 8px;
     margin-inline-end: 8px;
+}
+.lp-gallery .btn-galleries span {
+    width: calc(100% - 40px);
+}
+
+.btn-galleries.subalbum-btn::after {
+    content: "";
+    vertical-align: middle;
+    position: sticky;
+    display: inline-block;
+    right: -1px;
+    background: var(--surface-tree-iconwrap);
+    padding: 16px 16px 16px 4px;
+}
+
+.fm-other-tree-panel .btn-galleries.subalbum-btn::after {
+    right: -7px;
+}
+
+.rtl .btn-galleries.subalbum-btn::after {
+    left: -1px;
+    background: var(--surface-tree-iconwrap-rtl);
+}
+
+.btn-galleries.subalbum-btn.active::after,
+.btn-galleries.subalbum-btn:hover::after,
+.btn-galleries.subalbum-btn.selected::after {
+    background: var(--surface-tree-iconwrap-active);
+}
+
+.rtl .btn-galleries.subalbum-btn.active::after,
+.rtl .btn-galleries.subalbum-btn:hover::after,
+.rtl .btn-galleries.subalbum-btn.selected::after {
+    background: var(--surface-tree-iconwrap-active-rtl);
 }
 
 .btn-icon {

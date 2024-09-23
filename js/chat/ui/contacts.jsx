@@ -1,26 +1,16 @@
 import React from 'react';
-import {ContactAwareComponent} from '../mixins';
+import { compose, ContactAwareComponent } from '../mixins';
 import {MegaRenderMixin} from '../mixins';
-import { Emoji, ParsedHTML, OFlowEmoji } from '../../ui/utils.jsx';
+import { Emoji, ParsedHTML, OFlowEmoji, reactStringWrap } from '../../ui/utils.jsx';
 import { PerfectScrollbar } from '../../ui/perfectScrollbar.jsx';
 import { Button } from '../../ui/buttons.jsx';
 import { Dropdown, DropdownItem } from '../../ui/dropdowns.jsx';
 import ContactsPanel from './contactsPanel/contactsPanel.jsx';
 import ModalDialogs from "../../ui/modalDialogs";
+import Link from "./link.jsx";
+import { withUpdateObserver } from './updateObserver.jsx';
 
 export const MAX_FREQUENTS = 3;
-const EMPTY_ARR = [];
-
-let _attchRerenderCbContacts = function(others) {
-    this.addDataStructListenerForProperties(this.props.contact, [
-        'name',
-        'firstName',
-        'lastName',
-        'nickname',
-        'm',
-        'avatar'
-    ].concat(others ? others : EMPTY_ARR));
-};
 
 const closeDropdowns = () => {
     document.dispatchEvent(new Event('closeDropdowns'));
@@ -31,8 +21,6 @@ export class ContactButton extends ContactAwareComponent {
         'manualDataChangeTracking': true,
         'skipQueuedUpdatesOnResize': true
     };
-
-    attachRerenderCallbacks = _attchRerenderCbContacts;
 
     constructor(props) {
         super(props);
@@ -50,7 +38,6 @@ export class ContactButton extends ContactAwareComponent {
         let { contact, dropdowns, chatRoom, dropdownRemoveButton } = this.props;
         dropdowns = dropdowns ? dropdowns : [];
         const moreDropdowns = [];
-        const username = <OFlowEmoji>{M.getNameByHandle(contact.u)}</OFlowEmoji>;
 
         const onContactClicked = () => {
             if (contact.c === 2) {
@@ -74,7 +61,7 @@ export class ContactButton extends ContactAwareComponent {
                 />
                 <div className="dropdown-user-name" >
                     <div className="name">
-                        {username}
+                        <ContactAwareName overflow={true} contact={contact} />
                         <ContactPresence className="small" contact={contact} />
                     </div>
                     {contact && (
@@ -218,8 +205,8 @@ export class ContactButton extends ContactAwareComponent {
                         }
                         else {
                             loadingDialog.show();
-                            M.syncContactEmail(contact.u, new MegaPromise(), true)
-                                .done(email => {
+                            M.syncContactEmail(contact.u, true)
+                                .then(email => {
                                     if (Object.values(M.opc || {}).some(cr => cr.m === email)) {
                                         closeDialog();
                                         msgDialog(
@@ -237,12 +224,11 @@ export class ContactButton extends ContactAwareComponent {
                                         msgDialog('info', title, msg.replace('[X]', email));
                                     }
                                 })
-                                .always(() => loadingDialog.hide())
                                 .catch(() => {
                                     const { chatRoom } = this.props;
                                     const { u: userHandle } = contact;
 
-                                    if (chatRoom.sfuApp) {
+                                    if (chatRoom.call) {
                                         return mBroadcaster.sendMessage('meetings:ephemeralAdd', userHandle);
                                     }
 
@@ -257,7 +243,8 @@ export class ContactButton extends ContactAwareComponent {
                                         /* `Please add them to your contact list once they register their account.` */
                                         l.ephemeral_info
                                     );
-                                });
+                                })
+                                .finally(() => loadingDialog.hide());
                         }
                     }}
                 />
@@ -383,7 +370,6 @@ export class ContactVerified extends MegaRenderMixin {
                             user-card-verified
                             ${this.props.className || ''}
                         `}>
-                        <i className="sprite-fm-mono icon-check" />
                     </div>
                 );
             }
@@ -399,68 +385,96 @@ export class ContactVerified extends MegaRenderMixin {
 
         return null;
     }
-};
+}
 
 export class ContactPresence extends MegaRenderMixin {
     static defaultProps = {
-        'manualDataChangeTracking': true,
-        'skipQueuedUpdatesOnResize': true
+        manualDataChangeTracking: true,
+        skipQueuedUpdatesOnResize: true
+    };
+
+    attachRerenderCallbacks() {
+        this.addDataStructListenerForProperties(this.props.contact, ['presence']);
     }
+
     render() {
-        var contact = this.props.contact;
-        var className = this.props.className || '';
+        const { contact, className } = this.props;
 
         if (!contact || !contact.c) {
             return null;
         }
 
-        const pres = megaChat.userPresenceToCssClass(contact.presence);
-
         return (
-            <div className={`user-card-presence ${pres} ${className}`}>
-            </div>
-        );
-    }
-};
-
-export class LastActivity extends ContactAwareComponent {
-
-    render() {
-        const { contact, showLastGreen } = this.props;
-
-        if (!contact) {
-            return null;
-        }
-
-        const lastActivity = !contact.ats || contact.lastGreen > contact.ats ? contact.lastGreen : contact.ats;
-        const SECONDS = new Date().getTime() / 1000 - lastActivity;
-        const FORTY_FIVE_DAYS = 3888000; // seconds
-        const timeToLast = SECONDS > FORTY_FIVE_DAYS ? l[20673] : time2last(lastActivity, true);
-        const hasActivityStatus = showLastGreen && contact.presence <= 2 && lastActivity;
-
-        return (
-            <span>
-                {hasActivityStatus ?
-                    (l[19994] || "Last seen %s").replace("%s", timeToLast) :
-                    M.onlineStatusClass(contact.presence)[0]}
-            </span>
+            <div
+                className={`
+                    user-card-presence
+                    ${megaChat.userPresenceToCssClass(contact.presence)}
+                    ${className || ''}
+                `}
+            />
         );
     }
 }
 
+export const LastActivity = compose(withUpdateObserver)(
+    (() =>
+        class LastActivity extends ContactAwareComponent {
+            attachRerenderCallbacks() {
+                this._attachRerenderCbContacts([
+                    'ats',
+                    'lastGreen',
+                    'presence',
+                ]);
+            }
+
+            shouldComponentUpdate() {
+                return true;
+            }
+
+            render() {
+                const { contact, showLastGreen } = this.props;
+
+                if (!contact) {
+                    return null;
+                }
+
+                const lastActivity = !contact.ats || contact.lastGreen > contact.ats ? contact.lastGreen : contact.ats;
+                const SECONDS = Date.now() / 1000 - lastActivity;
+                const FORTY_FIVE_DAYS = 3888000; // seconds
+                const timeToLast = SECONDS > FORTY_FIVE_DAYS ? l[20673] : time2last(lastActivity, true);
+                const hasActivityStatus = showLastGreen && contact.presence <= 2 && lastActivity;
+
+                return (
+                    <span>
+                        {hasActivityStatus ?
+                            (l[19994] || 'Last seen %s').replace('%s', timeToLast) :
+                            M.onlineStatusClass(contact.presence)[0]
+                        }
+                    </span>
+                );
+            }
+        })()
+);
+
 export class ContactAwareName extends ContactAwareComponent {
     render() {
-        return this.props.contact ? <span>{this.props.children}</span> : null;
+        const { contact, emoji, overflow } = this.props;
+        if (!contact || !M.u[contact.u || contact.h]) {
+            return null;
+        }
+        const name = M.getNameByHandle(contact.u || contact.h);
+        if (emoji || overflow) {
+            const EmojiComponent = overflow ? OFlowEmoji : Emoji;
+            return <EmojiComponent {...this.props}>{name}</EmojiComponent>;
+        }
+        return <span>{name}</span>;
     }
 }
 
 export class MembersAmount extends ContactAwareComponent {
     render() {
-        const { room } = this.props;
-        const memberKeys = Object.keys(room.members);
-        return room && memberKeys.length ?
-            <span>{mega.icu.format(l[20233], memberKeys.length)}</span> :
-            null;
+        const { chatRoom } = this.props;
+        return <span>{mega.icu.format(l[20233], Object.keys(chatRoom.members).length)}</span>;
     }
 }
 
@@ -502,7 +516,7 @@ export class ContactFingerprint extends MegaRenderMixin {
             ) {
                 verifyButton = <Button
                     className="dropdown-verify active"
-                    label={l[7692]}
+                    label={l.verify_credentials}
                     icon="sprite-fm-mono icon-key"
                     onClick={() => {
                         closeDropdowns();
@@ -534,7 +548,7 @@ export class Avatar extends ContactAwareComponent {
         'manualDataChangeTracking': true,
         'skipQueuedUpdatesOnResize': true
     }
-    attachRerenderCallbacks = _attchRerenderCbContacts;
+
     render() {
         var self = this;
         var contact = this.props.contact;
@@ -569,7 +583,13 @@ export class Avatar extends ContactAwareComponent {
         var extraProps = {};
         if (this.props.simpletip) {
             classes += " simpletip";
-            extraProps['data-simpletip'] = this.props.simpletip;
+            if (this.props.simpletip === true) {
+                extraProps['data-simpletip'] = M.getNameByHandle(contact.h || contact.u) ||
+                    megaChat.plugins.userHelper.SIMPLETIP_USER_LOADER;
+            }
+            else {
+                extraProps['data-simpletip'] = this.props.simpletip;
+            }
             if (this.props.simpletipWrapper) {
                 extraProps['data-simpletipwrapper'] = this.props.simpletipWrapper;
             }
@@ -629,7 +649,7 @@ export class ContactCard extends ContactAwareComponent {
         'skipQueuedUpdatesOnResize': true
     }
     attachRerenderCallbacks() {
-        _attchRerenderCbContacts.call(this, ['presence']);
+        this._attachRerenderCbContacts(['presence']);
     }
     specShouldComponentUpdate(nextProps, nextState) {
         var self = this;
@@ -734,7 +754,6 @@ export class ContactCard extends ContactAwareComponent {
             userCard = <div className="user-card-data">
                 {usernameBlock}
                 <div className="user-card-status">
-                    <ContactPresence contact={contact} className={this.props.presenceClassName}/>
                     {this.props.isInCall ?
                         <div className="audio-call">
                             <i className="sprite-fm-mono icon-phone" />
@@ -812,7 +831,7 @@ export class ContactItem extends ContactAwareComponent {
         'manualDataChangeTracking': true,
         'skipQueuedUpdatesOnResize': true
     }
-    attachRerenderCallbacks = _attchRerenderCbContacts;
+
     render() {
         var self = this;
         var contact = this.props.contact;
@@ -836,7 +855,7 @@ export class ContactItem extends ContactAwareComponent {
                 chatRoom={this.props.chatRoom} />
             <div
                 className="user-card-data simpletip"
-                data-simpletip={username}
+                data-simpletip={username || megaChat.plugins.userHelper.SIMPLETIP_USER_LOADER}
                 data-simpletipposition="top">
                 <ContactButton
                     noContextMenu={this.props.noContextMenu}
@@ -852,6 +871,7 @@ export class ContactItem extends ContactAwareComponent {
 export class ContactPickerWidget extends MegaRenderMixin {
     contactLinkListener = null;
     containerRef = React.createRef();
+
     static defaultProps = {
         multipleSelectedButtonLabel: false,
         singleSelectedButtonLabel: false,
@@ -865,18 +885,91 @@ export class ContactPickerWidget extends MegaRenderMixin {
         newEmptySearchResult: false,
         newNoContact: false,
         emailTooltips: false
-    }
-    constructor(props) {
-        super(props);
-        this.state = {
-            searchValue: '',
-            selected: this.props.selected || false,
-            publicLink: M.account && M.account.contactLink || undefined
-        };
-    }
+    };
+
+    state = {
+        searchValue: '',
+        selected: this.props.selected || [],
+        publicLink: M.account && M.account.contactLink || undefined
+    };
+
     onSearchChange = ev => {
         this.setState({ searchValue: ev.target.value });
     };
+
+    renderParticipantsList = () => {
+        const { contacts, emailTooltips, onSelected } = this.props;
+        const { selected } = this.state;
+        const $$list =
+            contacts.map(handle => {
+                const added = selected.includes(handle);
+                return (
+                    <ContactCard
+                        key={handle}
+                        className={`
+                            contacts-search short
+                            ${added ? 'selected' : ''}
+                        `}
+                        contact={M.u[handle]}
+                        selectable={true}
+                        emailTooltips={emailTooltips}
+                        noContextButton={true}
+                        noContextMenu={true}
+                        onClick={() => {
+                            this.setState(
+                                { selected: added ? selected.filter(h => h !== handle) : [...selected, handle] },
+                                () => onSelected(this.state.selected)
+                            );
+                        }}
+                    />
+                );
+            });
+
+        return (
+            <PerfectScrollbar
+                className="contacts-search-scroll"
+                selected={selected}
+                contacts={contacts}>
+                <div className="contacts-search-subsection">
+                    <div className="contacts-list-header">
+                        {megaChat.activeCall ?
+                            l.call_participants /* `Participants in the call` */ :
+                            l[16217] /* `Participants` */}
+                    </div>
+                    <div className="contacts-search-list">{$$list}</div>
+                </div>
+            </PerfectScrollbar>
+        );
+    };
+
+    renderInviteWarning() {
+        const { chatRoom } = this.props;
+        const { activeCall } = megaChat;
+        // Check if the active call is in the current chat and if it exceeds the free plan limitation.
+        if (
+            !activeCall
+            || activeCall.chatRoom.chatId !== chatRoom.chatId
+            || !activeCall.sfuClient.callLimits
+            || !activeCall.sfuClient.callLimits.usr
+            || chatRoom.getCallParticipants().length < activeCall.sfuClient.callLimits.usr
+        ) {
+            return null;
+        }
+
+        return <div className="picker-user-limit-banner">
+            {
+                activeCall.organiser === u_handle ?
+                    reactStringWrap(l.invite_limit_banner_organiser, '[A]', Link, {
+                        onClick() {
+                            window.open(`${getBaseUrl()}/pro`, '_blank', 'noopener,noreferrer');
+                            eventlog(500263);
+                        }
+                    }) :
+                    l.invite_limit_banner_host
+            }
+        </div>;
+    }
+
     componentDidMount() {
         super.componentDidMount();
         setContactLink(this.containerRef && this.containerRef.current);
@@ -884,6 +977,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
             this.state.publicLink ? null : this.setState({ publicLink })
         );
     }
+
     componentDidUpdate() {
 
         var self = this;
@@ -896,6 +990,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
             self.searchContactsScroll.reinitialise();
         }
     }
+
     componentWillMount() {
         if (super.componentWillMount) {
             super.componentWillMount();
@@ -922,24 +1017,13 @@ export class ContactPickerWidget extends MegaRenderMixin {
                 }
             });
         }
-
-        self._frequents = megaChat.getFrequentContacts();
-        self._frequents.always(function(r) {
-            if (self.props.disableFrequents) {
-                self._foundFrequents = [];
-            }
-            else {
-                self._foundFrequents = r.slice(Math.max(r.length - 30, 0), r.length).reverse();
-            }
-            self.safeForceUpdate();
-        });
     }
+
     componentWillUnmount() {
         super.componentWillUnmount();
         var self = this;
 
         delete self._foundFrequents;
-        delete self._frequents;
 
         if (self.props.multiple) {
             $(document.body).off('keypress.contactPicker' + self.getUniqueId());
@@ -949,6 +1033,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
             mBroadcaster.removeListener(this.contactLinkListener);
         }
     }
+
     _eventuallyAddContact(v, contacts, selectableContacts, forced) {
         var self = this;
         if (!forced && (v.c !== 1 || v.u === u_handle)) {
@@ -981,19 +1066,19 @@ export class ContactPickerWidget extends MegaRenderMixin {
             return false;
         }
 
-        var avatarMeta = generateAvatarMeta(v.u);
-
         if (self.state.searchValue && self.state.searchValue.length > 0) {
-            var userName = ChatSearch._normalize_str(avatarMeta.fullName.toLowerCase());
-            var userRealName = ChatSearch._normalize_str(v.name.toLowerCase());
-            var userEmail = ChatSearch._normalize_str(v.m.toLowerCase());
+            const norm = (s) => ChatSearch._normalize_str(String(s || '').toLowerCase());
+            const sv = norm(this.state.searchValue);
+
+            const skip =
+                !norm(v.name).includes(sv) &&
+                !norm(v.nickname).includes(sv) &&
+                !norm(v.fullname).includes(sv) &&
+                !norm(M.getNameByHandle(v.u)).includes(sv) &&
+                (this.props.notSearchInEmails || !norm(v.m).includes(sv));
 
             // DON'T add to the contacts list if the contact's name or email does not match the search value
-            if (
-                userName.indexOf(self.state.searchValue.toLowerCase()) === -1 &&
-                userRealName.indexOf(self.state.searchValue.toLowerCase()) === -1 &&
-                (userEmail.indexOf(self.state.searchValue.toLowerCase()) === -1 || self.props.notSearchInEmails)
-            ) {
+            if (skip) {
                 return false;
             }
         }
@@ -1058,7 +1143,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                             self.setState({'searchValue': ''});
                         }
                         if (self.props.autoFocusSearchField) {
-                            self.contactSearchField.focus();
+                            self.contactSearchField?.focus();
                         }
                     }
                     self.clickTime = new Date();
@@ -1076,6 +1161,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
         }
         return true;
     }
+
     render() {
         var self = this;
 
@@ -1164,7 +1250,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                         self.setState({'searchValue': ''});
                     }
                     if (self.props.autoFocusSearchField) {
-                        self.contactSearchField.focus();
+                        self.contactSearchField?.focus();
                     }
                 }
                 self.clickTime = new Date();
@@ -1244,22 +1330,34 @@ export class ContactPickerWidget extends MegaRenderMixin {
         var alreadyAdded = {};
         var hideFrequents = !self.props.readOnly && !self.state.searchValue && frequentContacts.length > 0;
         var frequentsLoading = false;
-        if (self._frequents && !self._foundFrequents) {
-            if (self._frequents.state() === 'pending') {
-                hideFrequents = false;
-                frequentsLoading = true;
+
+        if (this.props.readOnly || this.props.disableFrequents) {
+            hideFrequents = true;
+            this._foundFrequents = [];
+        }
+        else if (!self._foundFrequents) {
+            frequentsLoading = true;
+            this._foundFrequents = [];
+
+            megaChat.getFrequentContacts()
+                .then((res) => {
+                    this._foundFrequents = res.slice(Math.max(res.length - 30, 0), res.length).reverse();
+                })
+                .catch(dump)
+                .finally(() => {
+                    if (this.isMounted()) {
+                        this.safeForceUpdate();
+                    }
+                });
+        }
+
+        for (let i = this._foundFrequents.length, total = 0; total < MAX_FREQUENTS && i--;) {
+            const v = this._foundFrequents[i];
+
+            if (v.userId in M.u && this._eventuallyAddContact(M.u[v.userId], frequentContacts, selectableContacts)) {
+                alreadyAdded[v.userId] = 1;
+                total++;
             }
-        } else if (!self.props.readOnly && self._foundFrequents) {
-            var totalFound = 0;
-            self._foundFrequents.forEach(function(v) {
-                if (
-                    totalFound < MAX_FREQUENTS && v.userId in M.u &&
-                    self._eventuallyAddContact(M.u[v.userId], frequentContacts, selectableContacts)
-                ) {
-                    alreadyAdded[v.userId] = 1;
-                    totalFound++;
-                }
-            });
         }
 
         self.props.contacts.forEach(function(v, k) {
@@ -1274,11 +1372,6 @@ export class ContactPickerWidget extends MegaRenderMixin {
             hideFrequents = true;
         }
         var innerDivStyles = {};
-
-        // if (contacts.length < 6) {
-            // innerDivStyles['height'] = Math.max(48, contacts.length * 48);
-            // innerDivStyles['overflow'] = "visible";
-        // }
 
         if (this.props.showMeAsSelected) {
             self._eventuallyAddContact(M.u[u_handle], contacts, selectableContacts, true);
@@ -1325,44 +1418,50 @@ export class ContactPickerWidget extends MegaRenderMixin {
                 }
             }
             else {
-                contactsList = <PerfectScrollbar className="contacts-search-scroll"
-                    selected={this.state.selected}
-                    changedHashProp={this.props.changedHashProp}
-                    contacts={contacts}
-                    frequentContacts={frequentContacts}
-                    ref={(ref) => {
-                        self.searchContactsScroll = ref;
-                    }}
-                    searchValue={this.state.searchValue}>
-                    <div>
-                        <div className="contacts-search-subsection"
-                             style={{'display': (!hideFrequents ? "" : "none")}}>
-                            <div className="contacts-list-header">
-                                {l[20141]}
+                contactsList =
+                    <PerfectScrollbar
+                        ref={ref => {
+                            self.searchContactsScroll = ref;
+                        }}
+                        className="contacts-search-scroll"
+                        selected={this.state.selected}
+                        changedHashProp={this.props.changedHashProp}
+                        contacts={contacts}
+                        frequentContacts={frequentContacts}
+                        searchValue={this.state.searchValue}>
+                        <>
+                            <div
+                                className="contacts-search-subsection"
+                                style={{ display: hideFrequents ? 'none' : '' }}>
+                                <div className="contacts-list-header">{l[20141] /* `Recents` */}</div>
+                                {frequentsLoading ?
+                                    <div className="loading-spinner">...</div> :
+                                    <div
+                                        className="contacts-search-list"
+                                        style={innerDivStyles}>
+                                        {frequentContacts}
+                                    </div>
+                                }
                             </div>
-
-                            {frequentsLoading ?
-                                <div className="loading-spinner">...</div> :
-                                <div className="contacts-search-list" style={innerDivStyles}>
-                                    {frequentContacts}
-                                </div>
+                            {contacts.length > 0 ?
+                                <div className="contacts-search-subsection">
+                                    <div className="contacts-list-header">
+                                        {frequentContacts && frequentContacts.length === 0 ?
+                                            /* `Participants` || `Contacts` */
+                                            this.props.readOnly ? l[16217] : l[165] :
+                                            l[165] /* `Contacts` */
+                                        }
+                                    </div>
+                                    <div
+                                        className="contacts-search-list"
+                                        style={innerDivStyles}>
+                                        {contacts}
+                                    </div>
+                                </div> :
+                                undefined
                             }
-                        </div>
-
-                        {contacts.length > 0 ?
-                            <div className="contacts-search-subsection">
-                                <div className="contacts-list-header">
-                                    {frequentContacts && frequentContacts.length === 0 ? (
-                                        self.props.readOnly ? l[16217] : l[165]
-                                    ) : l[165]}
-                                </div>
-
-                                <div className="contacts-search-list" style={innerDivStyles}>
-                                    {contacts}
-                                </div>
-                            </div> : undefined}
-                    </div>
-                </PerfectScrollbar>;
+                        </>
+                    </PerfectScrollbar>;
             }
         }
         else if (self.props.newNoContact) {
@@ -1439,7 +1538,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                     </div>
                 )}
                 {multipleContacts}
-                {!this.props.readOnly && haveContacts && (
+                {!this.props.readOnly && haveContacts && !this.props.hideSearch && (
                     <>
                         <div
                             className={`
@@ -1464,16 +1563,19 @@ export class ContactPickerWidget extends MegaRenderMixin {
                                 `}
                                 onClick={() => {
                                     this.setState({ searchValue: '' }, () =>
-                                        this.contactSearchField.focus()
+                                        this.contactSearchField?.focus()
                                     );
                                 }}>
                                 <i className="sprite-fm-mono icon-close-component"/>
                             </div>
                         </div>
-                        <div className="contacts-search-header-separator" />
                     </>
                 )}
-                {contactsList}
+                {this.props.inviteWarningLabel && this.props.chatRoom && this.renderInviteWarning()}
+                {!this.props.readOnly && haveContacts && !this.props.hideSearch &&
+                    <div className="contacts-search-header-separator"/>
+                }
+                {this.props.participantsList ? this.renderParticipantsList() : contactsList}
                 {selectFooter}
                 {ContactsPanel.hasContacts() && this.props.showAddContact && (
                     <div className="contacts-search-bottom">
@@ -1484,6 +1586,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
                             onClick={() => {
                                 contactAddDialog();
                                 closeDropdowns();
+                                this.props.onAddContact?.();
                             }}
                         />
                     </div>
@@ -1506,6 +1609,8 @@ export class ContactPickerDialog extends MegaRenderMixin {
             nothingSelectedButtonLabel,
             selectFooter,
             singleSelectedButtonLabel,
+            inviteWarningLabel,
+            chatRoom,
             onClose,
             onSelectDone,
         } = this.props;
@@ -1526,6 +1631,8 @@ export class ContactPickerDialog extends MegaRenderMixin {
                 nothingSelectedButtonLabel={nothingSelectedButtonLabel}
                 selectFooter={selectFooter}
                 singleSelectedButtonLabel={singleSelectedButtonLabel}
+                inviteWarningLabel={inviteWarningLabel}
+                chatRoom={chatRoom}
                 onClose={onClose}
                 onSelectDone={onSelectDone}
             />

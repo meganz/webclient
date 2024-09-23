@@ -75,6 +75,9 @@ MegaData.prototype.renderMain = function(aUpdate) {
  */
 MegaData.prototype.rmSetupUI = function(u, refresh) {
     'use strict';
+    if (this.gallery) {
+        return;
+    }
 
     if (this.viewmode === 1) {
         M.addIconUI(u, refresh);
@@ -85,7 +88,7 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
     if (!u) {
         fm_thumbnails();
     }
-    Soon(fmtopUI);
+    onIdle(fmtopUI);
 
     if (this.onRenderFinished) {
         onIdle(this.onRenderFinished);
@@ -131,13 +134,34 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
         return false;
     };
 
+    const cvHandler = (ev, element) => {
+        if (!element.hasClass('ui-selected')) {
+            element.parent().find(true).removeClass('ui-selected');
+            selectionManager.clear_selection();
+        }
+        element.addClass('ui-selected');
+        ev.preventDefault();
+        ev.stopPropagation(); // do not treat it as a regular click on the file
+        ev.currentTarget = element;
+
+        selectionManager.add_to_selection(element.attr('id'));
+        return fingerprintDialog(M.d[$.selected[0]].su);
+    };
+
     $('.grid-scrolling-table .grid-url-arrow').rebind('click', function(ev) {
         return cmIconHandler.call(this, true, 'tr', ev);
     });
     $('.data-block-view .file-settings-icon').rebind('click', function(ev) {
         return cmIconHandler.call(this, false, 'a', ev);
     });
-
+    $('.grid-scrolling-table .fm-user-verification span').rebind('click.sharesui', function(ev) {
+        var target = $(this).closest('tr');
+        return cvHandler(ev, target);
+    });
+    $('.shared-blocks-view .fm-user-verification span').rebind('click.sharesui', function(ev) {
+        var target = $(this).closest('a');
+        return cvHandler(ev, target);
+    });
     if (M.currentrootid === 'file-requests') {
         mega.fileRequest.rebindListManageIcon({
             iconHandler: cmIconHandler
@@ -145,6 +169,9 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
     }
 
     if (!u) {
+
+        // Re-add the searchbar dropdown event listeners
+        mega.ui.searchbar.addDropdownEventListeners();
 
         if (this.currentrootid === 'shares') {
             let savedUserSelection = null;
@@ -160,31 +187,22 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
             };
 
             $('.shared-details-info-block .grid-url-arrow').rebind('click.sharesui', function(e) {
+
                 const $this = $(this);
                 prepareShareMenuHandler(e);
+
                 if ($this.hasClass('active')) {
                     $this.removeClass('active');
                     $.hideContextMenu();
-
-                    $.selected = savedUserSelection || [];
-                    savedUserSelection = false;
-
-                    if (window.selectionManager) {
-                        return selectionManager.reinitialize();
-                    }
                 }
                 else {
+                    // Close Info panel as no longer applicable (they clicked on the parent folder context menu)
+                    mega.ui.mInfoPanel.closeIfOpen();
                     $.hideContextMenu();
 
-                    // Replace the selection to the parent node
-                    if (window.selectionManager) {
-                        savedUserSelection = selectionManager.get_selected();
-                        selectionManager.resetTo(M.currentdirid);
-                    }
-                    else {
-                        savedUserSelection = $.selected;
-                        $.selected = [M.currentdirid];
-                    }
+                    // Set selection to the parent share dir so the context menu can Download/Copy/Info on the parent
+                    selectionManager.resetTo(M.currentdirid);
+
                     M.contextMenuUI(e, 1);
                     $this.addClass('active');
                 }
@@ -256,11 +274,20 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
 
             // From inside a shared directory e.g. #fm/INlx1Kba and the user clicks the 'Leave share' button
             $('.shared-details-info-block .fm-leave-share').rebind('click', function(e) {
+                if (M.isInvalidUserStatus()) {
+                    return;
+                }
+
                 // Get the share ID from the hash in the URL
                 var shareId = getSitePath().replace('/fm/', '');
 
                 // Remove user from the share
-                M.leaveShare(shareId);
+                M.leaveShare(shareId).catch(ex => {
+                    if (ex === EMASTERONLY) {
+                        msgDialog('warningb', '',
+                                  l.err_bus_sub_leave_share_dlg_title, l.err_bus_sub_leave_share_dlg_text);
+                    }
+                });
             });
         }
     }
@@ -272,25 +299,26 @@ MegaData.prototype.renderTree = function() {
         M.buildtree({h: h}, M.buildtree.FORCE_REBUILD);
     });
 
+    if (s4.ui) {
+        build('s4');
+    }
     build('shares');
+
     // We are no longer build this tree, however, just leave this for potential later usage.
     // build('out-shares');
     // build('public-links');
     // build(M.InboxID);
+
     build(M.RootID);
     build(M.RubbishID);
 
     M.addTreeUIDelayed();
-
-    // TODO: refactor this back to no-promises
-    return MegaPromise.resolve();
 };
 
 MegaData.prototype.hideEmptyGrids = function hideEmptyGrids() {
-
     'use strict';
-
-    $('.fm-empty-section:not(.transfer-panel-empty-txt):not(.fm-recents)').addClass('hidden');
+    const excluded = ['.transfer-panel-empty-txt', '.fm-recents', '.fm-empty-contacts'];
+    $(`.fm-empty-section:not(${excluded.join(',')})`).addClass('hidden');
     $('.fm-empty-section.fm-empty-sharef').remove();
 };
 
@@ -350,24 +378,26 @@ MegaData.prototype.megaListRenderNode = function(aHandle) {
         return false;
     }
 
-    if (!node.__hasMCV) {
-        node.__hasMCV = true;
-        megaRender.setDOMColumnsWidth(node);
-    }
-
-    var selList = selectionManager && selectionManager.selected_list ? selectionManager.selected_list : $.selected;
-
-    if (selList && selList.length) {
-        if (selList.indexOf(aHandle) > -1) {
-            node.classList.add('ui-selected');
+    if (!is_mobile) {
+        if (!node.__hasMCV) {
+            node.__hasMCV = true;
+            megaRender.setDOMColumnsWidth(node);
         }
-        else {
+
+        var selList = selectionManager && selectionManager.selected_list ? selectionManager.selected_list : $.selected;
+
+        if (selList && selList.length) {
+            if (selList.includes(aHandle)) {
+                node.classList.add('ui-selected');
+            }
+            else {
+                node.classList.remove('ui-selected');
+            }
+            node.classList.remove('ui-selectee');
+        }
+        else if (selList && selList.length === 0) {
             node.classList.remove('ui-selected');
         }
-        node.classList.remove('ui-selectee');
-    }
-    else if (selList && selList.length === 0) {
-        node.classList.remove('ui-selected');
     }
 
     if (M.d[aHandle]) {

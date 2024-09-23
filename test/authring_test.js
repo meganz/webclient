@@ -37,7 +37,7 @@ describe("authring unit test", function() {
                                   + 'KqWMI8OX3eXT45+IyWCTTA5yeip/GThvkS8O2HBF'
                                   + 'aNLvSAFq5/5lQG');
 
-    var SERIALISED_RING_ED25519 = atob('you456789xwh/jHfoVSiYWJr+FQEb9InG3vtSwI=');
+    var SERIALISED_RING_ED25519 = atob('me3456789xwh/jHfoVSiYWJr+FQEb9InG3vtSwDKi7jnrvz3HCH+Md+hVKJhYmv4VARv0icbe+1LAg==');
     var RING_ED25519 = {'me3456789xw': {fingerprint: ED25519_STRING_FINGERPRINT,
                                         method: ns.AUTHENTICATION_METHOD.SEEN,
                                         confidence: ns.KEY_CONFIDENCE.UNSURE},
@@ -106,13 +106,14 @@ describe("authring unit test", function() {
 
         it('_splitSingleTAuthRecord()', function() {
             var result = ns._deserialiseRecord(SERIALISED_RING_ED25519);
-            assert.strictEqual(result.userhandle, 'you456789xw');
-            assert.deepEqual(result.value, RING_ED25519['you456789xw']);
-            assert.strictEqual(result.rest, '');
+            assert.strictEqual(result.userhandle, 'me3456789xw');
+            assert.deepEqual(result.value, RING_ED25519['me3456789xw']);
+            assert.strictEqual(result.rest,
+                base64urldecode('you456789xw') + ED25519_STRING_FINGERPRINT + String.fromCharCode(0x02));
         });
 
         it('deserialise()', function() {
-            assert.deepEqual(ns.deserialise(SERIALISED_RING_ED25519), {you456789xw: RING_ED25519.you456789xw});
+            assert.deepEqual(ns.deserialise(SERIALISED_RING_ED25519), RING_ED25519);
         });
     });
 
@@ -123,8 +124,7 @@ describe("authring unit test", function() {
                 mStub(u_authring, 'Ed25519', undefined);
                 var masterPromise = { reject: sinon.stub() };
                 mStub(window, 'MegaPromise').returns(masterPromise);
-                var attributePromise = { done: sinon.stub(),
-                                         fail:  sinon.stub()};
+                var attributePromise = {always: sinon.stub()};
                 mStub(mega.attr, 'get').returns(attributePromise);
 
                 var aPromise = ns.getContacts('Ed25519');
@@ -132,10 +132,9 @@ describe("authring unit test", function() {
                 assert.strictEqual(mega.attr.get.callCount, 1);
                 assert.lengthOf(mega.attr.get.args[0], 4);
                 assert.strictEqual(mega.attr.get.args[0][1], 'authring');
-                assert.strictEqual(attributePromise.done.callCount, 1);
-                assert.strictEqual(attributePromise.fail.callCount, 1);
+                assert.strictEqual(attributePromise.always.callCount, 1);
 
-                var callback = attributePromise.done.args[0][0];
+                var callback = attributePromise.always.args[0][0];
                 callback(EFAILED);
                 assert.strictEqual(masterPromise.reject.callCount, 1);
                 assert.strictEqual(u_authring.Ed25519, undefined);
@@ -148,8 +147,7 @@ describe("authring unit test", function() {
                 mStub(u_authring, 'Ed25519', undefined);
                 var masterPromise = { resolve: sinon.stub() };
                 mStub(window, 'MegaPromise').returns(masterPromise);
-                var attributePromise = { done: sinon.stub(),
-                                         fail:  sinon.stub()};
+                var attributePromise = {always: sinon.stub()};
                 mStub(mega.attr, 'get').returns(attributePromise);
                 mStub(ns, 'setContacts');
 
@@ -158,10 +156,9 @@ describe("authring unit test", function() {
                 assert.strictEqual(mega.attr.get.callCount, 1);
                 assert.lengthOf(mega.attr.get.args[0], 4);
                 assert.strictEqual(mega.attr.get.args[0][1], 'authring');
-                assert.strictEqual(attributePromise.done.callCount, 1);
-                assert.strictEqual(attributePromise.fail.callCount, 1);
+                assert.strictEqual(attributePromise.always.callCount, 1);
 
-                var callback = attributePromise.done.args[0][0];
+                var callback = attributePromise.always.args[0][0];
                 callback(ENOENT);
                 assert.strictEqual(masterPromise.resolve.callCount, 1);
                 assert.deepEqual(u_authring.Ed25519, {});
@@ -176,8 +173,7 @@ describe("authring unit test", function() {
                 mStub(u_authring, 'Ed25519', undefined);
                 var masterPromise = { resolve: sinon.stub() };
                 mStub(window, 'MegaPromise').returns(masterPromise);
-                var attributePromise = { done: sinon.stub(),
-                                         fail:  sinon.stub()};
+                var attributePromise = {always: sinon.stub()};
                 mStub(mega.attr, 'get').returns(attributePromise);
                 mStub(ns, 'deserialise').returns('the authring');
 
@@ -186,10 +182,9 @@ describe("authring unit test", function() {
                 assert.strictEqual(mega.attr.get.callCount, 1);
                 assert.lengthOf(mega.attr.get.args[0], 4);
                 assert.strictEqual(mega.attr.get.args[0][1], 'authring');
-                assert.strictEqual(attributePromise.done.callCount, 1);
-                assert.strictEqual(attributePromise.fail.callCount, 1);
+                assert.strictEqual(attributePromise.always.callCount, 1);
 
-                var callback = attributePromise.done.args[0][0];
+                var callback = attributePromise.always.args[0][0];
                 callback({ '': 'some content' });
                 assert.strictEqual(ns.deserialise.callCount, 1);
                 assert.strictEqual(ns.deserialise.args[0][0], 'some content');
@@ -204,8 +199,7 @@ describe("authring unit test", function() {
                 mStub(u_authring, 'Ed25519', undefined);
                 var masterPromise = { reject: sinon.stub() };
                 mStub(window, 'MegaPromise').returns(masterPromise);
-                var attributePromise = { done: sinon.stub(),
-                                         fail:  sinon.stub()};
+                var attributePromise = {always: sinon.stub()};
                 mStub(mega.attr, 'get').returns(attributePromise);
 
                 var aPromise = ns.getContacts('Ed25519');
@@ -213,10 +207,9 @@ describe("authring unit test", function() {
                 assert.strictEqual(mega.attr.get.callCount, 1);
                 assert.lengthOf(mega.attr.get.args[0], 4);
                 assert.strictEqual(mega.attr.get.args[0][1], 'authring');
-                assert.strictEqual(attributePromise.done.callCount, 1);
-                assert.strictEqual(attributePromise.fail.callCount, 1);
+                assert.strictEqual(attributePromise.always.callCount, 1);
 
-                var callback = attributePromise.fail.args[0][0];
+                var callback = attributePromise.always.args[0][0];
                 callback(EFAILED);
                 assert.strictEqual(masterPromise.reject.callCount, 1);
                 assert.strictEqual(u_authring.Ed25519, undefined);
@@ -229,8 +222,7 @@ describe("authring unit test", function() {
                 mStub(u_authring, 'Ed25519', undefined);
                 var masterPromise = { resolve: sinon.stub() };
                 mStub(window, 'MegaPromise').returns(masterPromise);
-                var attributePromise = { done: sinon.stub(),
-                                         fail:  sinon.stub()};
+                var attributePromise = {always: sinon.stub()};
                 mStub(mega.attr, 'get').returns(attributePromise);
                 mStub(ns, 'setContacts');
 
@@ -239,10 +231,9 @@ describe("authring unit test", function() {
                 assert.strictEqual(mega.attr.get.callCount, 1);
                 assert.lengthOf(mega.attr.get.args[0], 4);
                 assert.strictEqual(mega.attr.get.args[0][1], 'authring');
-                assert.strictEqual(attributePromise.done.callCount, 1);
-                assert.strictEqual(attributePromise.fail.callCount, 1);
+                assert.strictEqual(attributePromise.always.callCount, 1);
 
-                var callback = attributePromise.fail.args[0][0];
+                var callback = attributePromise.always.args[0][0];
                 callback(ENOENT);
                 assert.strictEqual(masterPromise.resolve.callCount, 1);
                 assert.deepEqual(u_authring.Ed25519, {});
@@ -265,8 +256,7 @@ describe("authring unit test", function() {
                 mStub(u_authring, 'RSA', undefined);
                 var masterPromise = { resolve: sinon.stub() };
                 mStub(window, 'MegaPromise').returns(masterPromise);
-                var attributePromise = { done: sinon.stub(),
-                                         fail:  sinon.stub()};
+                var attributePromise = {always: sinon.stub()};
                 mStub(mega.attr, 'get').returns(attributePromise);
                 mStub(ns, 'deserialise').returns('the authring');
 
@@ -275,10 +265,9 @@ describe("authring unit test", function() {
                 assert.strictEqual(mega.attr.get.callCount, 1);
                 assert.lengthOf(mega.attr.get.args[0], 4);
                 assert.strictEqual(mega.attr.get.args[0][1], 'authRSA');
-                assert.strictEqual(attributePromise.done.callCount, 1);
-                assert.strictEqual(attributePromise.fail.callCount, 1);
+                assert.strictEqual(attributePromise.always.callCount, 1);
 
-                var callback = attributePromise.done.args[0][0];
+                var callback = attributePromise.always.args[0][0];
                 callback({ '': 'some content' });
                 assert.strictEqual(ns.deserialise.callCount, 1);
                 assert.strictEqual(ns.deserialise.args[0][0], 'some content');

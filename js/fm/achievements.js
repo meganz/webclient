@@ -34,11 +34,13 @@ Object.defineProperty(mega, 'achievem', {
                                     open('https://mega.nz/MEGAsyncSetup.dmg');
                                     break;
                                 }
-
-                                action = 'sync';
-                                /** Fallthrough */
-
+                                mega.redirect('mega.io', 'desktop', false, false, false);
+                                break;
                             case '/':
+                                if (action === '/mobile') {
+                                    mega.redirect('mega.io', 'mobile', false, false, false);
+                                    break;
+                                }
                                 loadSubPage(action);
                                 break;
 
@@ -238,7 +240,7 @@ mega.achievem.enabled = function achievementsEnabled() {
     }
     else {
         this.achStatus[status] = promise;
-        M.req('ach').always(notify);
+        api.req({a: 'ach'}).then(({result}) => result).always(notify).catch(dump);
     }
 
     return promise;
@@ -404,12 +406,7 @@ mega.achievem.bindStorageDataToView = function bindStorageDataToView($viewContex
 
                 calculateAndBindRewardData(data, idx);
 
-                if (is_mobile) {
-                    mobile.achieve.bindEvents.call($('.mega-button.positive', $cell), selector);
-                }
-                else {
-                    ach.bind.call($('.mega-button.positive', $cell), ach.mapToAction[idx]);
-                }
+                ach.bind.call($('.mega-button.positive', $cell), ach.mapToAction[idx]);
                 $cell.removeClass('hidden');
 
                 // If this is the SMS achievement, and SMS achievements are not enabled yet, hide the container
@@ -691,13 +688,10 @@ mega.achievem.initInviteDialogMultiInputPlugin = function initInviteDialogMultiI
 
                 // Extract email addresses one by one
                 var email = $(value).text().replace(',', '');
+                const myEmail = Object(M.u[u_handle]).m || Object(window.u_attr).email;
 
-                if (M.u[u_handle]) {
-                    M.inviteContact(M.u[u_handle].m, email, emailText);
-                }
-                else if (u_type && typeof u_attr === 'object') {
-                    M.req({'a': 'upc', 'e': u_attr.email, 'u': email, 'msg': emailText, 'aa': 'a', i: requesti})
-                        .dump();
+                if (myEmail) {
+                    M.inviteContact(myEmail, email, emailText);
                 }
                 else {
                     error = true;
@@ -961,7 +955,7 @@ mega.achievem.invitationStatusDialog = function invitationStatusDialog(close) {
         var opc = M.findOutgoingPendingContactIdByEmail(email);
 
         if (opc) {
-            M.reinvitePendingContactRequest(email);
+            M.reinvitePendingContactRequest(email).catch(tell);
         }
         else {
             console.warn('No outgoing pending contact request for %s', email);
@@ -1039,12 +1033,12 @@ mega.achievem.parseAccountAchievements = function parseAccountAchievements() {
     storageCurrentValue += storageBaseQuota;
     transferCurrentValue += transferBaseQuota;
 
-    $('.plan-info > span', $bandwidthContent).text(bytesToSize(transferCurrentValue, 0));
+    $('.plan-info > span', $bandwidthContent).text(bytesToSize(transferCurrentValue, 3, 4));
     $('.settings-sub-bar', $bandwidthContent).css('width', transferProportion + '%');
     $('.base-quota-note span', $bandwidthContent).text(l[19992]
-        .replace('%1', bytesToSize(transferBaseQuota, 0)));
+        .replace('%1', bytesToSize(transferBaseQuota, 3, 4)));
     $('.achieve-quota-note span', $bandwidthContent).text(l[19993]
-        .replace('%1', bytesToSize(transferAchieveValue, 0)));
+        .replace('%1', bytesToSize(transferAchieveValue, 3, 4)));
 
     $('.plan-info > span', $storageContent).text(bytesToSize(storageCurrentValue, 0));
     $('.settings-sub-bar', $storageContent).css('width', storageProportion + '%');

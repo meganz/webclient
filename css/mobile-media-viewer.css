@@ -1,141 +1,170 @@
-.mobile .media-viewer header,
-.mobile .media-viewer footer {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 2;
+/* Media viewer - Common styles */
+
+.mobile .media-viewer .content {
+    min-height: 200px;
 }
-.mobile .media-viewer footer {
-    top: auto;
-    bottom: 0;
+
+.mobile .media-viewer button {
+    --mask-color: none;
 }
-.mobile .download-page .media-viewer .img-wrap {
-    background: #fff;
+
+.mobile .media-viewer .bar > li > button {
+    margin: 0;
+    padding: 18px;
 }
-.mobile .download-page .media-viewer header,
-.mobile .download-page .media-viewer footer {
-    display: none;
+
+.media-viewer button.v-btn {
+    border-radius: var(--mobile-border-radius-medium);
+    margin: 0;
+    padding: 0;
 }
-.mobile .download-page .fullscreen .media-viewer header,
-.mobile .download-page .fullscreen .media-viewer footer {
-    display: flex;
+
+.mobile .media-viewer .viewer-bars:not(.video-controls):not(.slideshow-controls) {
+    position: static;
+    background: var(--mobile-page-background);
 }
-.mobile .download-page.image .fullscreen .viewer-bars {
-    opacity: 1;
-    visibility: visible;
-    background: #fff;
-}
+
 .mobile .media-viewer .viewer-bars:not(.video-controls) .bar {
-	flex: 1 1 0;
-	padding: 0;
+    flex: 1 1 0;
+    padding: 0;
 }
-.mobile .slideshow-image-previewer .media-viewer header .viewer-bars .bar {
-    flex: 0 0 0;
-}
+
 .mobile .media-viewer .bar.menu {
     justify-content: flex-end;
 }
-.mobile .media-viewer .zoom-slider-wrap {
-    flex: 3 1 0;
+
+/* End of Media viewer - Common styles */
+
+/* Media viewer - Header, Footer and Content */
+
+.media-viewer header .viewer-bars {
+    display: flex;
+    flex-direction: column;
+    padding: 16px 24px;
+    background: var(--mobile-page-background);
+    border: none;
+    align-items: start;
 }
-.mobile .download-page .media-viewer .zoom-slider-wrap {
-    padding: 12px 0;
+
+.media-viewer header .viewer-bars > *:not(:last-child) {
+    margin-bottom: 16px;
 }
-.mobile .media-viewer .zoom-slider-wrap button {
-    margin: 6px;
-}
-.mobile .media-viewer .ui-slider.ui-widget-content {
-    max-width: 160px;
+
+.media-viewer .media-viewer-menu {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    align-items: flex-start;
     width: 100%;
-    min-width: 48px;
+    height: auto;
+    box-sizing: border-box;
 }
+
+.media-viewer .file-info {
+    text-align: start;
+}
+
+.media-viewer .file-name {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-heading-h1);
+    margin: 0;
+    padding: 0;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+
+@supports (display: -webkit-box) {
+    .media-viewer .file-name {
+        display: -webkit-box;
+        white-space: normal;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+        word-break: break-all;
+    }
+}
+
+.mobile .media-viewer-container.video footer .slideshow-button,
+.mobile .media-viewer-container.pdf footer .slideshow-button,
+.mobile .media-viewer-container.docx footer .slideshow-button {
+    display: none;
+}
+
 .mobile .media-viewer button.gallery-btn {
-	background-color: rgba(0, 0, 0, 0.6);
-	height: 37px;
-	left: 0;
-	position: absolute;
-	top: 50%;
-	width: 36px;
-	margin: -18px 0 0;
-	background-image: url("../images/mobile/mobile-sprite.png");
-	background-position: -148px -1897px;
-	background-repeat: no-repeat;
-	z-index: 10;
-	border-radius: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    height: 37px;
+    left: 0;
+    position: absolute;
+    top: 50%;
+    width: 36px;
+    margin: -18px 0 0;
+    background-image: url("../images/mobile/mobile-sprite.png");
+    background-position: -148px -1897px;
+    background-repeat: no-repeat;
+    z-index: 10;
+    border-radius: 0;
 }
+
 .mobile .media-viewer button.gallery-btn.next {
     left: auto;
     right: 0;
     background-position: -205px -1897px;
 }
-.mobile .media-viewer .file-info {
-	text-align: start;
-	display: inline-block;
-	vertical-align: middle;
-}
-.mobile .media-viewer .file-name {
-    color: #222;
-    display: block;
-    font-size: 20px;
-    line-height: 25px;
-    margin: 0;
-    max-width: 233px;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    vertical-align: middle;
-    white-space: nowrap;
+
+.mobile .media-viewer .image-controls {
     padding: 0;
+    border: 0;
 }
-.mobile .media-viewer .counter {
-    line-height: 25px;
-    color: #a7a7a7;
-    font-size: 14px;
-    background: none;
-    padding: 0;
-}
-.mobile .media-viewer .bar > li > button {
-    margin: 0;
-    padding: 18px;
-}
-.mobile .download-page .media-viewer .bar > li > button.download {
+
+.mobile .media-viewer .image-controls .menu {
     display: none;
 }
-.mobile .media-viewer .bar > li > button.delete-button {
-    background-position: -194px -1817px;
-    width: 60px;
-    height: 60px;
+
+.media-viewer button.v-btn.slideshow i {
+    --icon-size: 16px;
+    transition: none;
 }
-.mobile .media-viewer .viewer-bars:not(.video-controls):not(.slideshow-controls) {
-    padding: 0;
-    position: static;
-    background: #fff;
+
+.media-viewer-container.fullimage header,
+.media-viewer-container.fullimage footer {
+    display: none;
 }
-.mobile .media-viewer .video-controls {
-    padding: 6px 8px;
-    position: static;
+
+.media-viewer-container.fullimage .gallery-btn {
+    opacity: 0;
+    visibility: hidden;
 }
-.mobile .media-viewer .video-controls .video-progress-block {
-    padding: 11px;
+
+/* End of Media viewer - Header, Footer and Content */
+
+/* Media viewer - Images viewer */
+
+#fmholder #pdfpreviewdiv1,
+#fmholder #docxpreviewdiv1 {
+    margin: 0;
 }
-.mobile .media-viewer .video-controls .bar > li {
-    width: auto;
-    height: auto;
+
+.mobile .media-viewer .ui-slider.ui-widget-content {
+    max-width: 160px;
+    width: 100%;
+    min-width: 48px;
 }
-.mobile .media-viewer .video-controls button.v-btn {
-    --mask-color: #fff;
-    margin: 6px;
-    padding: 0;
-}
-.mobile .media-viewer .image-controls {
-    background: #fff;
-}
+
 .mobile .media-viewer .slideshow-controls button i {
     --mask-color: #fff;
 }
-.mobile .video-theatre-mode .media-viewer header .viewer-bars {
-    background: var(--surface-grey-2);
+
+/* End of Media viewer - Images viewer */
+
+/* Media viewer - Video viewer */
+
+.mobile .media-viewer .video-block,
+.mobile.video .media-viewer .loader-grad-overlay {
+    z-index: 9;
 }
+
 .mobile .media-viewer .video-block video {
     width: 100%;
     height: 100%;
@@ -145,3 +174,205 @@
     border-radius: 3px;
     max-height: 100vh;
 }
+
+.mobile .media-viewer .video-controls {
+    bottom: 0;
+    flex-direction: row;
+    left: 0;
+    padding: 6px 8px;
+    position: absolute;
+}
+
+.mobile .media-viewer .video-controls .video-progress-block {
+    padding: 11px;
+}
+
+.mobile .media-viewer .video-controls .bar {
+    width: auto;
+}
+
+.mobile .media-viewer .video-controls .bar > li {
+    width: auto;
+    height: auto;
+    margin: 0;
+}
+
+.mobile .media-viewer .video-controls button.v-btn {
+    --mask-color: #fff;
+    margin: 6px;
+    padding: 0;
+}
+
+.mobile .media-viewer .video-vol-range {
+    display: none;
+}
+
+.mobile .media-viewer .play-video-button {
+    position: absolute;
+    width: 36px;
+    height: 36px;
+    border-radius: 100%;
+    z-index: 10;
+    cursor: pointer;
+    background-color: #F52929;
+    left: calc(50% - 18px);
+    top: calc(50% - 18px);
+    padding: 0;
+    border: none;
+}
+
+.mobile .media-viewer .play-pause-video-button, 
+.mobile .media-viewer .loader-grad {
+    height: 36px;
+    left: calc(50% - 18px);
+    padding: 0;
+    position: absolute;
+    top: calc(50% - 18px);
+    width: 36px;
+}
+
+.mobile .media-viewer .play-video-button i,
+.mobile .media-viewer .play-pause-video-button i,
+.mobile .media-viewer .loader-grad i {
+    --icon-size: 24px;
+    --mask-color: var(--secondary-white);
+    margin: 6px;
+}
+
+/* End of Media viewer - Video viewer */
+
+/* Media viewer - Content info */
+
+.mobile .media-viewer .content-info {
+    display: flex;
+    overflow: auto;
+    padding: 0 24px 24px;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    box-sizing: border-box;
+    background: var(--mobile-page-background);
+    text-align: start;
+    flex: 1 1 auto;
+}
+
+.mobile .media-viewer .content-info .properties-content {
+    width: 100%;
+}
+
+.mobile .media-viewer .content-info .properties-items > * {
+    display: flex;
+    flex-direction: column;
+}
+
+.mobile .media-viewer .content-info .properties-small-gray {
+    font: var(--mobile-font-caption-large-bold);
+    color: var(--mobile-text-primary);
+    padding-top: 12px;
+}
+
+.mobile .media-viewer .content-info .properties-small-gray:empty {
+    padding: 0;
+}
+
+.mobile .media-viewer .content-info .propreties-dark-txt,
+.mobile .media-viewer .content-info .fm-breadcrumbs-wrapper.info span {
+    font: var(--mobile-font-caption-large-regular);
+    color: var(--mobile-text-secondary);
+}
+
+.mobile .media-viewer .content-info .fm-breadcrumbs {
+    align-items: center;
+    display: inline-flex;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mobile .media-viewer .content-info .fm-breadcrumbs .loading,
+.mobile .media-viewer .content-info .contact-list-icon {
+    display: none;
+}
+
+.mobile .media-viewer .content-info .filetype-img {
+    margin-top: 16px;
+}
+
+.mobile .media-viewer .content-info .mega-component.banner.warning {
+    margin: 32px auto 12px;
+    max-width: var(--mobile-elem-max-width);
+    width: 100%;
+}
+
+.mobile .media-viewer .content-info .filetype-img i {
+    --icon-size: 94px;
+}
+
+/* End of Media viewer - Content info */
+
+/* Media viewer - Text editor */
+
+.mobile .media-viewer .text-editor-container {
+    position: relative;
+    overflow: hidden;
+    padding: 0;
+    text-align: start;
+}
+
+.mobile .media-viewer .text-editor-container .textviewer-block {
+    height: 100%;
+    width: 100%;
+    display: block;
+}
+
+.mobile .media-viewer .text-editor-container .textviewer-block .text-editor {
+    min-width: 0;
+    width: 100%;
+}
+
+.mobile .media-viewer .text-editor-container .textviewer-block .text-editor .content {
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* End of Media viewer - Text editor */
+
+/* Media viewer - Download page */
+
+.mobile .download-page .media-viewer .img-wrap {
+    background: #fff;
+}
+
+.mobile .download-page .media-viewer header,
+.mobile .download-page .media-viewer footer {
+    display: none;
+}
+
+.mobile .download-page .fullscreen .media-viewer header,
+.mobile .download-page .fullscreen .media-viewer footer {
+    display: flex;
+}
+
+.mobile .download-page.image .fullscreen .viewer-bars {
+    opacity: 1;
+    visibility: visible;
+    background: #fff;
+}
+
+.mobile .download-page .media-viewer .bar > li > button.download {
+    display: none;
+}
+
+/* End of Media viewer - Download page */
+
+/* Media viewer - Tablet >= 769px */
+
+@media only screen and (min-width: 769px) {
+    @supports (display: -webkit-box) {
+        .media-viewer .file-name {
+            -webkit-line-clamp: 1;
+        }
+    }
+}
+
+/* End of Media viewer - Tablet >= 769px */

@@ -5,7 +5,53 @@
             {
                 "appID": "T9RH74Y7L9.mega.ios",
                 "paths": [
-                    "NOT /emailverify/*", "NOT /#emailverify/*","NOT /dont-deploy/*", "*"
+                    "/fm/ipc/*",
+                    "/fm/chat/*",
+                    "NOT /fm/*",
+                    "NOT /emailverify/*",
+                    "NOT /#emailverify/*",
+                    "NOT /dont-deploy/*",
+                    "NOT /propay_*",
+                    "NOT /linux/*",
+                    "NOT /MEGAsync*",
+                    "NOT /MEGAvpn*",
+                    "*"
+                ]
+            },
+            {
+                "appID": "T9RH74Y7L9.mega.ios.dev",
+                "paths": [
+                    "/fm/ipc/*",
+                    "/fm/chat/*",
+                    "NOT /fm/*",
+                    "NOT /emailverify*",
+                    "NOT /#emailverify*",
+                    "NOT /#pwrevert*",
+                    "NOT /pwrevert*",
+                    "NOT /dont-deploy/*",
+                    "NOT /propay_*",
+                    "NOT /linux/*",
+                    "NOT /MEGAsync*",
+                    "NOT /MEGAvpn*",
+                    "*"
+                ]
+            },
+            {
+                "appID": "T9RH74Y7L9.mega.ios.qa",
+                "paths": [
+                    "/fm/ipc/*",
+                    "/fm/chat/*",
+                    "NOT /fm/*",
+                    "NOT /emailverify*",
+                    "NOT /#emailverify*",
+                    "NOT /#pwrevert*",
+                    "NOT /pwrevert*",
+                    "NOT /dont-deploy/*",
+                    "NOT /propay_*",
+                    "NOT /linux/*",
+                    "NOT /MEGAsync*",
+                    "NOT /MEGAvpn*",
+                    "*"
                 ]
             }
         ]

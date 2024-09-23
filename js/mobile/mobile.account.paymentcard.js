@@ -2,7 +2,7 @@
  * Functionality for the mobile payment card section
  */
 
-mobile.account.paymentCard = new function() {
+mobile.settings.account.paymentCard = new function() {
     'use strict';
     let $page;
 
@@ -39,38 +39,31 @@ mobile.account.paymentCard = new function() {
             $('.payment-card-bottom a.payment-card-edit', $page).rebind('tap', () => {
 
                 loadingDialog.show();
+                api.send('gw19_ccc')
+                    .then((res) => {
+                        assert(typeof res === 'string');
+                        addressDialog.processUtcResult({EUR: res, edit: true}, true);
+                        const $paymentOverlayHeader = $('.payment-stripe-dialog h1.heading');
 
-                api_req({ a: 'gw19_ccc' }, {
-                    callback: (res) => {
-                        loadingDialog.hide();
+                        $('.payment-stripe-dialog .mega-header').removeClass('hidden');
+                        $paymentOverlayHeader.text(l.update_payment_card).removeClass('hidden');
 
-                        if ($.isNumeric(res)) {
-                            msgDialog(
-                                'warninga',
-                                '',
-                                l.edit_card_error.replace('%1', res),
-                                l.edit_card_error_des,
-                                loadSubPage.bind(null, 'fm/account')
-                            );
-                        }
-                        else if (typeof res === 'string') {
-                            addressDialog.processUtcResult(
-                                {
-                                    EUR: res,
-                                    edit: true
-                                },
-                                true
-                            );
-                        }
-                    }
-                });
+                        $('.payment-stripe-dialog .nav-navigation a').rebind('tap.back', () => {
+                            closeDialog();
+                            $paymentOverlayHeader.text('').addClass('hidden');
+                        });
+                    })
+                    .catch((ex) => {
+                        msgDialog(
+                            'warninga',
+                            '',
+                            l.edit_card_error.replace('%1', ex),
+                            l.edit_card_error_des,
+                            loadSubPage.bind(null, 'fm/account')
+                        );
+                    })
+                    .finally(() => loadingDialog.hide());
             });
-
-            // Initialise back button to go back to My Account page
-            mobile.initBackButton($page, 'fm/account/');
-
-            // Initialise the top menu
-            topmenuUI();
 
             // Show the account page content
             $page.removeClass('hidden');
@@ -78,6 +71,12 @@ mobile.account.paymentCard = new function() {
         else {
             loadSubPage('fm/account');
         }
+    };
+
+    this.validateUser = (account) => {
+        return (u_attr.p || u_attr.b) && account && account.stype === 'S' && ((Array.isArray(account.sgw)
+            && account.sgw.includes('Stripe')) || (Array.isArray(account.sgwids)
+            && account.sgwids.includes((addressDialog || {}).gatewayId_stripe || 19)));
     };
 
     this.init = function() {
@@ -99,7 +98,7 @@ mobile.account.paymentCard = new function() {
 
                 $page.addClass('hidden');
 
-                msgDialog('warninga', '', l.card_info_error, l.card_info_error_desc, () => {
+                msgDialog('warninga', l.card_info_error, l.card_info_error_desc, '', () => {
                     return loadSubPage('fm/account');
                 });
 

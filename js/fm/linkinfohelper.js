@@ -18,17 +18,33 @@ var LinkInfoHelper = function(node_handle, node_key, is_dir, is_chatlink, is_con
     this.is_chatlink = is_chatlink;
     this.is_contactlink = is_contactlink;
     this._url = url;
-    this.info = {};
+    this.info = Object.create(null);
 };
 
-LinkInfoHelper.MEGA_LINKS_REGEXP = [
-    "(http(s?):\\/\\/)?mega.(co\\.nz|nz)\\/#(!|F!)([a-zA-Z\!0-9\-_]+)",
-    "(http(s?):\\/\\/)?mega.(co\\.nz|nz)\\/(chat\\/)([a-zA-Z\#0-9\-_]+)",
-    "(http(s?):\\/\\/)?mega.(co\\.nz|nz)\\/(C!)([a-zA-Z\#0-9\-_]+)",
-    "(http(s?):\\/\\/)?([a-zA-Z0-9\-.]*)?mega.(co\\.nz|nz)\\/(file|folder)/([a-zA-Z\#0-9\-_]+)",
-];
-LinkInfoHelper.MEGA_LINKS_REGEXP_COMPILED = false;
 LinkInfoHelper._CACHE = {};
+
+/** @property LinkInfoHelper.MEGA_LINKS_REGEXP_COMPILED */
+lazy(LinkInfoHelper, 'MEGA_LINKS_REGEXP_COMPILED', () => {
+    'use strict';
+    const res = [];
+    const MEGA_LINKS_REGEXP = [
+        "\\b(?:mega\\.co\\.nz|mega\\.nz)/(C!)([\\w#-]+)",
+        "\\b(?:mega\\.co\\.nz|mega\\.nz)/#(!|F!)([\\w!-]+)",
+        "\\b(?:mega\\.co\\.nz|mega\\.nz)/(chat)/([\\w#-]+)",
+        "\\b(?:mega\\.co\\.nz|mega\\.nz)/(file|folder)/([\\w#-]+)",
+    ];
+
+    for (let i = 0; i < MEGA_LINKS_REGEXP.length; ++i) {
+        let rex = MEGA_LINKS_REGEXP[i];
+
+        if (d && !is_livesite) {
+            rex = rex.replace('|mega\\.nz', `|mega\\.nz|${location.host.replace(/(\W)/g, '\\$1')}`);
+        }
+
+        res.push(new RegExp(rex, "gmi"));
+    }
+    return res;
+});
 
 /**
  * Returns true/false if the passed URL is a valid mega link
@@ -38,24 +54,14 @@ LinkInfoHelper._CACHE = {};
  */
 LinkInfoHelper.isMegaLink = function(url) {
     "use strict";
-    if (!LinkInfoHelper.MEGA_LINKS_REGEXP_COMPILED) {
-        LinkInfoHelper.MEGA_LINKS_REGEXP_COMPILED = [];
-        LinkInfoHelper.MEGA_LINKS_REGEXP.forEach(function(v) {
-            LinkInfoHelper.MEGA_LINKS_REGEXP_COMPILED.push(
-                new RegExp(v, "gmi")
-            );
-        });
-    }
     if (!url || !url.match) {
         return false;
     }
-    else {
-        for (var i = 0; i < LinkInfoHelper.MEGA_LINKS_REGEXP_COMPILED.length; i++) {
-            if (url.match(LinkInfoHelper.MEGA_LINKS_REGEXP_COMPILED[i])) {
-                return true;
-            }
-        }
 
+    for (let i = LinkInfoHelper.MEGA_LINKS_REGEXP_COMPILED.length; i--;) {
+        if (url.match(LinkInfoHelper.MEGA_LINKS_REGEXP_COMPILED[i])) {
+            return true;
+        }
     }
 };
 
@@ -67,50 +73,24 @@ LinkInfoHelper.isMegaLink = function(url) {
  */
 LinkInfoHelper.extractMegaLinksFromString = function(s) {
     "use strict";
-
-    if (!LinkInfoHelper.MEGA_LINKS_REGEXP_COMPILED) {
-        LinkInfoHelper.MEGA_LINKS_REGEXP_COMPILED = [];
-        LinkInfoHelper.MEGA_LINKS_REGEXP.forEach(function(v) {
-            LinkInfoHelper.MEGA_LINKS_REGEXP_COMPILED.push(
-                new RegExp(v, "gmi")
-            );
-        });
-    }
-
     var found = [];
 
     if (s.substr) {
-        var m;
-        for (var i = 0; i < LinkInfoHelper.MEGA_LINKS_REGEXP_COMPILED.length; i++) {
-            var regExp = LinkInfoHelper.MEGA_LINKS_REGEXP_COMPILED[i];
+        let m;
+        for (let i = LinkInfoHelper.MEGA_LINKS_REGEXP_COMPILED.length; i--;) {
+            const regExp = LinkInfoHelper.MEGA_LINKS_REGEXP_COMPILED[i];
 
             while ((m = regExp.exec(s)) !== null) {
                 // This is necessary to avoid infinite loops with zero-width matches
                 if (m.index === regExp.lastIndex) {
                     regExp.lastIndex++;
                 }
+                const [, type, data] = m;
 
-                if (m[4] === "F!" || m[4] === "!") {
-                    var handleAndKey = m[5].split("!");
-                    var handle = handleAndKey[0];
-                    var key = handleAndKey[1];
-                    var is_dir = m[4] === "F!";
-                    var cacheKey = handle + ":" + key;
-
-                    if (!LinkInfoHelper._CACHE[cacheKey]) {
-                        LinkInfoHelper._CACHE[cacheKey] = new LinkInfoHelper(handle, key, is_dir, false, false, m[0]);
-                    }
-
-                    found.push(
-                        LinkInfoHelper._CACHE[cacheKey]
-                    );
-                }
-                else if (m[5] === "file" || m[5] === "folder") {
-                    var handleAndKey = m[6].split("#");
-                    var handle = handleAndKey[0];
-                    var key = handleAndKey[1] && handleAndKey[1].split("/")[0] || "";
-                    var is_dir = m[5] === "folder";
-                    var cacheKey = (m[3] || "") + "_" + handle + ":" + key;
+                if (type === "F!" || type === "!" || type === "file" || type === "folder") {
+                    const is_dir = type === "F!" || type === 'folder';
+                    const [handle, key] = data.split(/[^\w-]/);
+                    const cacheKey = `${handle}:${key}`;
 
                     if (!LinkInfoHelper._CACHE[cacheKey]) {
                         LinkInfoHelper._CACHE[cacheKey] = new LinkInfoHelper(handle, key, is_dir, false, false, m[0]);
@@ -120,12 +100,10 @@ LinkInfoHelper.extractMegaLinksFromString = function(s) {
                         LinkInfoHelper._CACHE[cacheKey]
                     );
                 }
-                else if (m[4] === "chat/") {
+                else if (type === "chat") {
                     // is chat
-                    var chatHandleAndKey = m[5].split("#");
-                    var chatHandle = chatHandleAndKey[0];
-                    var chatKey = chatHandleAndKey[1];
-                    var chatCacheKey = chatHandle + ":" + chatKey;
+                    const [chatHandle, chatKey] = data.split(/[^\w-]/);
+                    const chatCacheKey = `${chatHandle}:${chatKey}`;
 
                     if (!LinkInfoHelper._CACHE[chatCacheKey]) {
                         LinkInfoHelper._CACHE[chatCacheKey] = new LinkInfoHelper(chatHandle, chatKey, false, true);
@@ -135,10 +113,10 @@ LinkInfoHelper.extractMegaLinksFromString = function(s) {
                         LinkInfoHelper._CACHE[chatCacheKey]
                     );
                 }
-                else if (m[4] === "C!") {
+                else if (type === "C!") {
                     // is chat
-                    var contactHash = m[5];
-                    var contactHashKey = "C!" + contactHash;
+                    const contactHash = data;
+                    const contactHashKey = `C!${contactHash}`;
 
                     if (!LinkInfoHelper._CACHE[contactHashKey]) {
                         LinkInfoHelper._CACHE[contactHashKey] = new LinkInfoHelper(
@@ -154,6 +132,9 @@ LinkInfoHelper.extractMegaLinksFromString = function(s) {
                         LinkInfoHelper._CACHE[contactHashKey]
                     );
                 }
+                else if (d) {
+                    console.warn('Unhandled link...', m);
+                }
             }
         }
     }
@@ -161,123 +142,127 @@ LinkInfoHelper.extractMegaLinksFromString = function(s) {
 };
 
 /**
+ * Tells whether the data for this link has been retrieved.
+ */
+LinkInfoHelper.prototype.isDataAvailable = function() {
+    'use strict';
+
+    if (this.failed) {
+        return -1;
+    }
+
+    if (this.is_contactlink) {
+        return !!this.info.e;
+    }
+
+    if (this.is_chatlink) {
+        return !!this.info.ct;
+    }
+
+    // public file/folder-link
+    return !!this.info.at;
+};
+
+/**
  * Retrieve info for the current link
  *
  * @returns {MegaPromise}
  */
-LinkInfoHelper.prototype.retrieve = function() {
+LinkInfoHelper.prototype.retrieve = async function() {
     "use strict";
 
-    if (this._promise) {
+    if (this._promise || this.failed || this.info.at || this.info.ct) {
         return this._promise;
     }
+    const key = base64_to_a32(String(this.node_key).trim()).slice(0, 8);
 
-    var self = this;
+    const fail = (ex) => {
+        this.failed = ex || true;
+    };
+    const ready = () => {
+        this._loaded = true;
+    };
 
-    var key = this.node_key;
-    var base64key = String(key).trim();
-    key = base64_to_a32(base64key).slice(0, 8);
-
-    if (self.info['at'] || self.info['ct']) {
-        return MegaPromise.resolve();
-    }
-    else if (self.is_chatlink) {
-        if (window.is_chatlink && is_chatlink.pnh === self.node_handle) {
-            self.info.ncm = is_chatlink.ncm;
-            self.info.ct = is_chatlink.ct;
-            return MegaPromise.resolve();
+    if (this.is_chatlink) {
+        if (window.is_chatlink && is_chatlink.pnh === this.node_handle) {
+            this.info.ncm = is_chatlink.ncm;
+            this.info.ct = is_chatlink.ct;
+            this.info.mr = is_chatlink.mr;
+            this._promise = Promise.resolve();
+            return ready();
         }
 
-        self._promise = asyncApiReq({
-            'a': 'mcphurl',
-            'v': Chatd.VERSION,
-            'ph': self.node_handle
-        })
-            .done(function (r) {
-                self.info['ncm'] = r.ncm;
-                self.info['ct'] = r.ct;
-                self.info.mr = r.mr;
+        this._promise = api.send({a: 'mcphurl', v: Chatd.VERSION, ph: this.node_handle})
+            .then((res) => {
+                this.info.ncm = res.ncm;
+                this.info.ct = res.ct;
+                this.info.mr = res.mr;
             })
-            .fail(function (e) {
-                self.failed = true;
-                if (d) {
-                    console.error("Failed to retrieve link info: ", e);
-                }
-            });
+            .catch(fail)
+            .finally(ready);
     }
-    else if (self.is_contactlink) {
-        self._promise = asyncApiReq({a: 'clg', 'cl': self.node_handle})
-            .done(function (r) {
-                self.info['e'] = r.e;
-                self.info['fn'] = r.fn;
-                self.info['ln'] = r.ln;
-                self.info['h'] = r.h;
+    else if (this.is_contactlink) {
+        this._promise = api.send({a: 'clg', 'cl': this.node_handle})
+            .then((res) => {
+                this.info.e = res.e;
+                this.info.fn = res.fn;
+                this.info.ln = res.ln;
+                this.info.h = res.h;
             })
-            .fail(function (e) {
-                self.failed = true;
-                if (d) {
-                    console.error("Failed to retrieve link info: ", e);
-                }
-            });
+            .catch(fail)
+            .finally(ready);
     }
-    else if (!self.is_dir) {
-        self._promise = asyncApiReq({a: 'g', p: self.node_handle})
-            .done(function (r) {
-                self.info['size'] = r.s;
-                self.info['at'] = r.at;
-                self.info['fa'] = r.fa;
+    else if (this.is_dir) {
+        // dir handling
+        this._promise = api.send({a: 'pli', ph: this.node_handle})
+            .then((res) => {
+                this.info.s = res.s;
+                this.info.user = res.u;
+                this.info.at = res.attrs;
+                this.info.size = res.s[0];
+                this.info.name = 'unknown';
+                this.info.dirs_count = res.s[2];
+                this.info.files_count = res.s[1];
 
-            })
-            .fail(function (e) {
-                self.failed = true;
-                if (d) {
-                    console.error("Failed to retrieve link info: ", e);
+                if (res.k && res.k.split) {
+                    this.info.rid = res.k.split(":")[0];
+                    this.info.k = base64_to_a32(String(res.k.split(":")[1]).trim()).slice(0, 8);
                 }
-            });
+                if (this.info.k) {
+                    const decr_meta = tryCatch(() => {
+                        const actual_key = decrypt_key(new sjcl.cipher.aes(key), this.info.k);
+                        return dec_attr(base64_to_ab(this.info.at), actual_key);
+                    }, false)();
+
+                    if (decr_meta) {
+                        this.info.name = decr_meta.n && M.getSafeName(decr_meta.n) || this.info.name;
+                    }
+                }
+            })
+            .catch(fail)
+            .finally(ready);
     }
     else {
-        // dir handling
-        self._promise = asyncApiReq({a: 'pli', ph: self.node_handle})
-            .done(function (r) {
-                if (typeof r === 'number' || r === EFAILED) {
-                    self.failed = true;
-                    return;
-                }
-                self.info['at'] = r['attrs'];
-                self.info['s'] = r['s'];
-                self.info['size'] = r['s'][0];
-                self.info['files_count'] = r['s'][1];
-                self.info['dirs_count'] = r['s'][2];
-                self.info['user'] = r['u'];
-                if (r['k'] && r['k'].split) {
-                    self.info['rid'] = r['k'].split(":")[0];
-                    self.info['k'] = r['k'].split(":")[1];
-                    self.info['k'] = String(self.info['k']).trim();
-                    self.info['k'] = base64_to_a32(self.info['k']).slice(0, 8);
-                }
+        this._promise = api.send({a: 'g', p: this.node_handle})
+            .then((res) => {
+                this.info.k = key;
+                this.info.at = res.at;
+                this.info.fa = res.fa;
+                this.info.size = res.s;
+                this.info.name = 'unknown';
 
-                var dl_a = base64_to_ab(self.info['at']);
-                try {
-                    var actual_key = decrypt_key(new sjcl.cipher.aes(key), self.info['k']);
-                    var decr_meta = dec_attr(dl_a, actual_key);
-                    if (!decr_meta.n) {
-                        self.failed = true;
-                    }
-                    self.info['name'] = M.getSafeName(decr_meta.n || 'unknownName') || 'unknownName';
-                }
-                catch (e) {
-                    self.failed = true;
+                const meta = dec_attr(base64_to_ab(this.info.at), key);
+                if (meta.n) {
+                    const name = meta.n && M.getSafeName(meta.n) || this.info.name;
+                    this.info.name = name;
+                    this.info.icon = fileIcon({name});
                 }
             })
-            .fail(function (e) {
-                self.failed = true;
-                if (d) {
-                    console.error("Failed to retrieve link info (dir): ", e);
-                }
-            });
+            .catch(fail)
+            .finally(ready);
     }
 
-    return self._promise;
+    return this._promise;
 };
 
 /**
@@ -286,126 +271,65 @@ LinkInfoHelper.prototype.retrieve = function() {
  *
  * @returns {MegaPromise}
  */
-LinkInfoHelper.prototype.getInfo = function() {
+LinkInfoHelper.prototype.getInfo = async function() {
     "use strict";
 
-    var self = this;
-
-    var promise = new MegaPromise();
-
-    // TODO: refactor this to use some ENUM-like type var
-    if (
-        (!self.is_contactlink && !self.is_chatlink && !self.is_dir && !self.info['size'] && !self.info['at'] &&
-            !self.info['fa']) ||
-        (!self.is_contactlink && !self.is_chatlink && self.is_dir && !self.info['at']) ||
-        (!self.is_contactlink && self.is_chatlink && !self.info['ct']) ||
-        (self.is_contactlink && !self.info['e'])
-    ) {
-        promise.linkFailTo(
-            self.retrieve().done(function() {
-                promise.linkDoneTo(self.getInfo());
-            })
-                .fail(function(r) {
-                    promise.reject(r);
-                })
-
-        );
-        return promise;
+    if (!this.isDataAvailable()) {
+        await this.retrieve()
+            .catch((ex) => {
+                this.failed = ex || this.failed || true;
+            });
     }
 
-    if (self.is_chatlink) {
-        if (self.info['topic']) {
-            promise.resolve(this.info);
+    if (this.failed) {
+        if (d) {
+            console.warn('LinkInfoHelper data retrieval failed.', this.failed, [this]);
         }
-        else {
-            var fakeRoom = {
-                'chatId': 'fakeChat#' + self.node_handle,
-                'ct': self.info['ct'],
-                'publicChatHandle': self.node_handle
+    }
+    else if (this.is_chatlink) {
+        if (this.info.topic === undefined && this.node_key) {
+            const fakeRoom = {
+                'ct': this.info.ct,
+                'publicChatHandle': this.node_handle,
+                'chatId': `fakeChat#${this.node_handle}`
             };
 
-            var ph = new strongvelope.ProtocolHandler(
-                null,
-                null,
-                null,
-                null,
-                strongvelope.CHAT_MODE.PUBLIC
-            );
+            const ph = new strongvelope.ProtocolHandler(null, null, null, null, strongvelope.CHAT_MODE.PUBLIC);
             ph.chatRoom = fakeRoom;
-            ph.unifiedKey = base64urldecode(self.node_key);
+            ph.unifiedKey = base64urldecode(this.node_key);
 
             fakeRoom.protocolHandler = ph;
-
-            megaChat.plugins.chatdIntegration.decryptTopic(fakeRoom)
-                .done(function(r) {
-                    self.info['topic'] = fakeRoom.topic;
-                    promise.resolve(self.info);
-                })
-                .fail(function(e) {
-                    promise.reject(e);
-                });
+            await megaChat.plugins.chatdIntegration.decryptTopic(fakeRoom).catch(dump);
+            this.info.topic = fakeRoom.topic || '';
+        }
+        else if (!this.info.topic) {
+            this.info.topic = '';
         }
     }
-    else if (!self.is_dir && !self.info['name']) {
-        var key = this.node_key;
-        var base64key = String(key).trim();
-        key = base64_to_a32(base64key).slice(0, 8);
-        if (key.length === 8) {
-            this.info['node_key_ab'] = key;
-            var dl_a = base64_to_ab(self.info['at']);
-            var decr_meta = dec_attr(dl_a, key);
-            if (!decr_meta.n) {
-                self.failed = true;
-                return MegaPromise.reject();
+    else if (!this.is_dir && this.info.at) {
+        this.info.h = this.node_handle;
+        const n = new MegaNode(this.info);
+        const v = is_video(n);
+
+        if (v || is_image(n)) {
+            this.info.preview_text = l[16274];
+
+            if (fileext(n.name) === 'pdf') {
+                this.info.preview_text = l[17489];
             }
-            var filename = M.getSafeName(decr_meta.n) || 'unknownName';
-            this.info['name'] = filename;
-            this.info['icon'] = fileIcon({ name: filename });
-
-            if (is_image(filename) || is_video(filename)) {
-                this.info['preview_text'] = l[16274];
-
-                if (fileext(filename) === 'pdf') {
-                    this.info['preview_text'] = l[17489];
-                }
-                else if (is_video(filename)) {
-                    // TODO: no translations?
-                    this.info['preview_text'] = l[17732];
-                }
-            }
-
-            if (self.info['fa']) {
-                // load thumbnail
-                api_getfileattr(
-                    {[self.info.fa]: {fa: self.info.fa, k: key}},
-                    0,
-                    function(a, b, data) {
-                        if (data !== 0xDEAD) {
-                            data = mObjectURL([data.buffer || data], 'image/jpeg');
-
-                            self.info['preview_url'] = data;
-                        }
-                        promise.resolve(self.info);
-                    },
-                    function() {
-                        promise.resolve(self.info);
-                    }
-                );
-            }
-            else {
-                promise.resolve(this.info);
+            else if (v) {
+                this.info.preview_text = l[17732];
             }
         }
-        else {
-            promise.resolve(this.info);
+
+        if (this.info.fa) {
+            // load thumbnail
+            this.info.preview_url = await getImage(n).catch(nop);
         }
-    }
-    else {
-        promise.resolve(this.info);
+        this.info.n = n;
     }
 
-
-    return promise;
+    return this.info;
 };
 
 
@@ -414,34 +338,20 @@ LinkInfoHelper.prototype.getInfo = function() {
  *
  * @returns {MegaPromise}
  */
-LinkInfoHelper.prototype.openPreview = function() {
+LinkInfoHelper.prototype.openPreview = async function() {
     "use strict";
 
-    var promise = new MegaPromise();
-
-    var self = this;
-
-    if (!self.info['size'] && !self.info['at'] && !self.info['fa']) {
-        promise.linkFailTo(
-            self.getInfo().done(function() {
-                promise.linkDoneAndFailTo(self.openPreview());
-            })
-        );
-        return promise;
+    if (!this.info.at) {
+        await this.getInfo();
     }
 
-
     slideshow({
-        k: this.info['node_key_ab'],
-        fa: this.info['fa'],
+        k: this.info.k,
+        fa: this.info.fa,
         h: this.node_handle,
-        name: this.info['name'],
-        link: this.node_handle + '!' + this.node_key
+        name: this.info.name,
+        link: `${this.node_handle}!${this.node_key}`
     });
-
-    promise.resolve(this.info);
-
-    return promise;
 };
 
 
@@ -452,7 +362,7 @@ LinkInfoHelper.prototype.openPreview = function() {
  */
 LinkInfoHelper.prototype.hadLoaded = function() {
     "use strict";
-    return !(!this._promise || this._promise.state() === 'pending');
+    return !!this._promise && this._loaded > 0;
 };
 
 /**
@@ -472,7 +382,7 @@ LinkInfoHelper.prototype.startedLoading = function() {
  */
 LinkInfoHelper.prototype.havePreview = function() {
     "use strict";
-    return !!this.info['preview_url'];
+    return !!this.info.preview_url;
 };
 
 
@@ -483,15 +393,16 @@ LinkInfoHelper.prototype.havePreview = function() {
  */
 LinkInfoHelper.prototype.getLink = function() {
     "use strict";
-    if (!this._url) {
+    if (!this._url || !String(this._url).includes('://')) {
+
         if (this.is_contactlink) {
-            this._url = "https://mega.nz/C!" + this.node_handle;
+            this._url = `${getBaseUrl()}/C!${this.node_handle}`;
         }
         else if (this.is_chatlink) {
-            this._url = "https://mega.nz/chat/" + this.node_handle + "#" + this.node_key;
+            this._url = `${getBaseUrl()}/chat/${this.node_handle}#${this.node_key}`;
         }
         else {
-            this._url = "https://mega.nz/#" + (this.is_dir ? "F" : "") + "!" + this.node_handle + "!" + this.node_key;
+            this._url = `${getBaseUrl()}/#${this.is_dir ? "F" : ""}!${this.node_handle}!${this.node_key}`;
         }
     }
     return this._url;

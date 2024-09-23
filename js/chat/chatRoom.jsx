@@ -1,3 +1,5 @@
+import {prepareExportIo, prepareExportStreams} from "./utils.jsx";
+
 export const RETENTION_FORMAT = { HOURS: 'hour', DAYS: 'day', WEEKS: 'week', MONTHS: 'month', DISABLED: 'none' };
 export const MCO_FLAGS = { OPEN_INVITE: 'oi', SPEAK_REQUEST: 'sr', WAITING_ROOM: 'w' };
 window.RETENTION_FORMAT = RETENTION_FORMAT;
@@ -22,13 +24,14 @@ window.MCO_FLAGS = MCO_FLAGS;
  * @param {Boolean} isMeeting Is the chat a meeting
  * @param {Number} retentionTime Message retention length (0 = forever)
  * @param {Object} mcoFlags Flags related to calls/chat room (Open invite, speak request, waiting room)
+ * @param {String} organiser The user handle of the user who created the chat
  * @returns {ChatRoom}
  * @constructor
  *
  * @property {MessagesBuff} messagesBuff
  */
 var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, chatId, chatShard, chatdUrl, noUI,
-                         publicChatHandle, publicChatKey, ck, isMeeting, retentionTime, mcoFlags
+                         publicChatHandle, publicChatKey, ck, isMeeting, retentionTime, mcoFlags, organiser
 ) {
     var self = this;
 
@@ -56,19 +59,17 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             members: {},
             membersSet: false,
             membersLoaded: false,
-            topic: "",
+            topic: '',
             flags: 0x00,
             publicLink: null,
-            archivedSelected: false,
-            showArchived: false,
             observers: 0,
             dnd: null,
             alwaysNotify: null,
             retentionTime: 0,
-            sfuApp: null,
             activeCallIds: null,
             meetingsLoading: null,
             options: {},
+            scheduledMeeting: undefined
         }
     );
 
@@ -84,6 +85,7 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
     this.chatShard = chatShard;
     this.chatdUrl = chatdUrl;
+    this.publicLink = null;
     this.publicChatHandle = publicChatHandle;
     this.publicChatKey = publicChatKey;
     this.ck = ck;
@@ -95,7 +97,6 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     this.retentionTime = retentionTime;
 
     this.activeSearches = 0;
-    self.members = {};
     this.activeCallIds = new MegaDataMap(this);
     this.ringingCalls = new MegaDataMap(this);
     this.ringingCalls.addChangeListener(() => {
@@ -104,6 +105,17 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     });
 
     this.isMeeting = isMeeting;
+    // Only applies when the user joins a call and the SFU kicks them out due to the user limitation for free plans.
+    this.callUserLimited = false;
+
+    this.members = Object.create(null);
+
+    // @todo was lazy to replace all hasOwn()s...
+    Object.defineProperty(this.members, 'hasOwnProperty', {
+        value(p) {
+            return p in this;
+        }
+    });
 
     if (type === "private") {
         users.forEach(function(userHandle) {
@@ -123,6 +135,8 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     for (const flag of Object.values(MCO_FLAGS)) {
         this.options[flag] = mcoFlags[flag] || 0;
     }
+
+    this.organiser = organiser;
 
     this.setState(ChatRoom.STATE.INITIALIZED);
 
@@ -173,8 +187,12 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
                 contactForMessage.ats = ts;
             }
         }
-
         if (self.lastActivity && self.lastActivity >= ts) {
+            if (msg.deleted) {
+                const { delay, ts } = self.messagesBuff.getLastMessageFromServer();
+                self.lastActivity = delay || ts;
+            }
+
             // this is an old message, DON'T update the lastActivity.
             return;
         }
@@ -255,6 +273,9 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
                     self.trigger('onMembersUpdatedUI', eventData);
                 };
 
+                if (is_chatlink) {
+                    megaChat.initContacts([eventData.userId]);
+                }
                 ChatdIntegration._waitForProtocolHandler(self, addParticipant);
                 queuedMembersUpdatedEvent = true;
             }
@@ -266,8 +287,10 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
                     Object.keys(self.members).forEach(function(userId) {
                         // remove group participant in strongvelope
                         self.protocolHandler.removeParticipant(userId);
-                        // also remove from our list
-                        delete self.members[userId];
+                        // Mark all users as read-only and self as left. Same as loading state when left
+                        self.members[userId] = userId === u_handle ?
+                            ChatRoom.MembersSet.PRIVILEGE_STATE.LEFT :
+                            ChatRoom.MembersSet.PRIVILEGE_STATE.READONLY;
                     });
                 }
                 else {
@@ -295,12 +318,11 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
 
 
     // Handle chatd telling the client that the user is already in the room when visiting a chat link
-    if (is_chatlink && !is_chatlink.callId) {
+    if (is_chatlink && !is_chatlink.callId && !this.options.w) {
         const unbind = () => {
             self.unbind('onMessagesHistoryDone.chatlinkAlreadyIn');
             self.unbind('onMembersUpdated.chatlinkAlreadyIn');
         };
-
 
         self.rebind('onMembersUpdated.chatlinkAlreadyIn', (e, eventData) => {
             if (eventData.userId === u_handle && eventData.priv >= 0) {
@@ -320,8 +342,6 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
      * Manually proxy contact related data change events, for more optimal UI rerendering.
      */
     self.rebind('onMembersUpdatedUI.chatRoomMembersSync', function(e, eventData) {
-        var roomRequiresUpdate = false;
-
         if (eventData.userId === u_handle) {
             self.messagesBuff.joined = true;
             if (eventData.priv === 255 || eventData.priv === -1) {
@@ -334,30 +354,8 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
                     self.setState(ChatRoom.STATE.READY);
                 }
             }
-            roomRequiresUpdate = true;
         }
-        else {
-            var contact = M.u[eventData.userId];
-            if (contact instanceof MegaDataMap) {
-                if (eventData.priv === 255 || eventData.priv === -1) {
-                    if (contact._onMembUpdUIListener) {
-                        contact.removeChangeListener(contact._onMembUpdUIListener);
-                        roomRequiresUpdate = true;
-                    }
-                }
-                else if (!contact._onMembUpdUIListener) {
-                    contact._onMembUpdUIListener = contact.addChangeListener(function() {
-                        self.trackDataChange.apply(self, arguments);
-                    });
-                    roomRequiresUpdate = true;
-                }
-            }
-        }
-
-        if (roomRequiresUpdate) {
-            self.trackDataChange();
-        }
-
+        self.trackDataChange();
     });
 
     self.getParticipantsExceptMe().forEach(function(userHandle) {
@@ -399,7 +397,10 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     var _historyIsAvailable = (ev) => {
         self.initialMessageHistLoaded = ev ? true : -1;
 
-        clearTimeout(timer);
+        if (timer) {
+            timer.abort();
+            timer = null;
+        }
         self.unbind('onMarkAsJoinRequested.initHist');
         self.unbind('onHistoryDecrypted.initHist');
         self.unbind('onMessagesHistoryDone.initHist');
@@ -410,20 +411,32 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     self.rebind('onMessagesHistoryDone.initHist', _historyIsAvailable);
 
     self.rebind('onMarkAsJoinRequested.initHist', () => {
-        timer = setTimeout(function() {
+        (timer = tSleep(300)).then(() => {
             if (d) {
                 self.logger.warn("Timed out waiting to load hist for:", self.chatId || self.roomId);
             }
+            timer = null;
             _historyIsAvailable(false);
-        }, 3e5);
+        });
     });
 
     self.rebind('onRoomDisconnected', () => {
-        if (!self.activeCall) {
+        if (!self.call) {
             for (const activeCallId of self.activeCallIds.keys()) {
                 self.activeCallIds.remove(activeCallId);
             }
+            megaChat.updateSectionUnreadCount();
         }
+    });
+
+    this.rebind(`onCallUserLimitExceeded.${chatId}`, () => {
+        if (this.callUserLimited) {
+            return;
+        }
+        (this.callUserLimited = tSleep(60)).always(() => {
+            this.callUserLimited = false;
+            this.trackDataChange();
+        });
     });
 
     this.membersSetFromApi = new ChatRoom.MembersSet(this);
@@ -466,6 +479,21 @@ ChatRoom.INSTANCE_INDEX = 0;
 ChatRoom.ANONYMOUS_PARTICIPANT = mega.BID;
 ChatRoom.ARCHIVED = 0x01;
 ChatRoom.TOPIC_MAX_LENGTH = 30;
+ChatRoom.SCHEDULED_MEETINGS_INTERVAL = 1.8e6; /* 30 minutes */
+
+ChatRoom._fnRequireParticipantKeys = function(fn, scope) {
+    return function(...args) {
+        const participants = this.protocolHandler.getTrackedParticipants();
+
+        return ChatdIntegration._ensureKeysAreLoaded(undefined, participants)
+            .then(() => {
+                return fn.apply(scope || this, args);
+            })
+            .catch((ex) => {
+                this.logger.error("Failed to retrieve keys..", ex);
+            });
+    };
+};
 
 ChatRoom.MembersSet = function(chatRoom) {
     this.chatRoom = chatRoom;
@@ -473,11 +501,11 @@ ChatRoom.MembersSet = function(chatRoom) {
 };
 
 ChatRoom.MembersSet.PRIVILEGE_STATE = {
-    'NOT_AVAILABLE': -5,
-    'FULL': 3,
-    'OPERATOR': 2,
-    'READONLY': 0,
-    'LEFT': -1
+    NOT_AVAILABLE: -5,
+    OPERATOR: 3,
+    FULL: 2,
+    READONLY: 0,
+    LEFT: -1
 };
 
 ChatRoom.encryptTopic = function(protocolHandler, newTopic, participants, isPublic = false) {
@@ -670,7 +698,7 @@ ChatRoom.prototype.getRetentionLabel = function(retentionTime) {
     switch (this.getRetentionFormat(retentionTime)) {
         case RETENTION_FORMAT.DISABLED:
             // `Disabled`
-            return l[7070];
+            return l.disabled_chat_history_cleaning_status;
         case RETENTION_FORMAT.MONTHS:
             // `month` || `months`
             return mega.icu.format(l.months_chat_history_plural, months);
@@ -824,13 +852,17 @@ ChatRoom.prototype.isAnonymous = function() {
 };
 
 /**
- * Check whether a chat is displayable.
- *
- * @returns {Boolean}
+ * isDisplayable
+ * @description Check whether a chat is displayable
+ * @returns {boolean}
  */
+
 ChatRoom.prototype.isDisplayable = function() {
-    var self = this;
-    return self.showArchived === true || !self.isArchived() || self.activeCall;
+    return !this.isArchived() || this.call;
+};
+
+ChatRoom.prototype.isMuted = function() {
+    return pushNotificationSettings.getDnd(this.chatId) || pushNotificationSettings.getDnd(this.chatId) === 0;
 };
 
 /**
@@ -876,10 +908,8 @@ ChatRoom.prototype.updateFlags = function(f, updateUI) {
     var self = this;
     var flagChange = (self.flags !== f);
     self.flags = f;
-    self.archivedSelected = false;
     if (self.isArchived()) {
         megaChat.archivedChatsCount++;
-        self.showArchived = false;
     }
     else {
         megaChat.archivedChatsCount--;
@@ -1032,29 +1062,37 @@ ChatRoom.prototype.getParticipantsTruncated = function(maxMembers = 5, maxLength
 };
 
 /**
- * Get room title
+ * getRoomTitle
+ * @description Returns the room's topic in i) formatted form if available; alternatively, falls back to
+ * ii) list of participants or iii) room's creation date.
  *
- * @param {Boolean} [ignoreTopic] ignore the topic and just return member names
- * @param {Boolean} [encapsTopicInQuotes] add quotes for the returned topic
- * @returns {string}
+ * ex.:
+ * i)  `MEGA meeting`
+ * ii) `Chat created on DD/MM/YYYY, HH:MM:SS`
+ * iii) `Participant A, Participant B, Participant c, ...`
+ *
+ * @return {string} Formatted room title
  */
-ChatRoom.prototype.getRoomTitle = function(ignoreTopic, encapsTopicInQuotes) {
-    var self = this;
-    var participants;
-    if (self.type === "private") {
-        participants = self.getParticipantsExceptMe();
-        return M.getNameByHandle(participants[0]) || "";
-    }
-    else {
-        if (!ignoreTopic && self.topic && self.topic.substr) {
-            return (encapsTopicInQuotes ? '"' : "") + self.getTruncatedRoomTopic() + (encapsTopicInQuotes ? '"' : "");
-        }
 
-        var names = self.getParticipantsTruncated();
-        var def = l[19077].replace('%s1', new Date(self.ctime * 1000).toLocaleString());
+ChatRoom.prototype.getRoomTitle = function() {
+    const formattedDate =
+        l[19077 /* `Chat created on %s1` */].replace('%s1', new Date(this.ctime * 1000).toLocaleString());
 
-        return names.length > 0 ? names : def;
+    // 1-on-1 chat -> use other participant's name as a topic
+    if (this.type === 'private') {
+        const participants = this.getParticipantsExceptMe();
+        return participants && Array.isArray(participants) ? M.getNameByHandle(participants[0]) : formattedDate;
     }
+
+    // No topic set -> list the participant names or if there aren't any fallback to the room creation date
+    if (this.topic === '' || !this.topic) {
+        return this.getParticipantsTruncated() || formattedDate;
+    }
+
+    // Public chat -> formatted room topic, incl. appended `(canceled)` label for canceled scheduled meetings
+    const formattedTopic = this.getTruncatedRoomTopic();
+    const isCanceled = this.scheduledMeeting && this.scheduledMeeting.isCanceled;
+    return isCanceled ? `${formattedTopic} ${l.canceled_meeting}` : formattedTopic;
 };
 
 /**
@@ -1076,21 +1114,14 @@ ChatRoom.prototype.getTruncatedRoomTopic = function(maxLength = ChatRoom.TOPIC_M
 ChatRoom.prototype.setRoomTitle = function(newTopic, allowEmpty) {
     var self = this;
     newTopic = allowEmpty ? newTopic : String(newTopic);
-    var masterPromise = new MegaPromise();
 
     if (
         (allowEmpty || newTopic.trim().length > 0) &&
         newTopic !== self.getRoomTitle()
     ) {
         self.scrolledToBottom = true;
-
-
         var participants = self.protocolHandler.getTrackedParticipants();
-        var promises = [];
-        promises.push(
-            ChatdIntegration._ensureKeysAreLoaded(undefined, participants)
-        );
-        var _runUpdateTopic = function() {
+        return ChatdIntegration._ensureKeysAreLoaded(undefined, participants).then(() => {
             // self.state.value
             var topic = self.protocolHandler.embeddedEncryptTo(
                 newTopic,
@@ -1101,25 +1132,9 @@ ChatRoom.prototype.setRoomTitle = function(newTopic, allowEmpty) {
             );
 
             if (topic) {
-                masterPromise.linkDoneAndFailTo(
-                    asyncApiReq({
-                        "a":"mcst",
-                        "id":self.chatId,
-                        "ct":base64urlencode(topic),
-                        "v": Chatd.VERSION
-                    })
-                );
+                return asyncApiReq({a: "mcst", id: self.chatId, ct: base64urlencode(topic), v: Chatd.VERSION});
             }
-            else {
-                masterPromise.reject();
-            }
-        };
-        MegaPromise.allDone(promises).done(
-            function () {
-                _runUpdateTopic();
-            }
-        );
-        return masterPromise;
+        }).catch(dump);
     }
     else {
         return false;
@@ -1128,37 +1143,33 @@ ChatRoom.prototype.setRoomTitle = function(newTopic, allowEmpty) {
 
 /**
  * Leave this chat room
- *
- * @param [triggerLeaveRequest] {boolean|undefined} true if you want to notify other devices, falsy value if you don't want action to be sent
- * @returns {undefined|Deferred}
+ * @param {boolean} [notify] Boolean flag indicating whether to notify other clients. `mcr` action is **not** invoked
+ * given a falsy value is passed.
+ * @returns {undefined}
  */
-ChatRoom.prototype.leave = function(triggerLeaveRequest) {
-    var self = this;
 
-    self._leaving = true;
-    self._closing = triggerLeaveRequest;
-    self.topic = null;
+ChatRoom.prototype.leave = function(notify) {
+    const valid = this.type === 'group' || this.type === 'public';
+    console.assert(valid, `Can't leave room "${this.roomId}" of type "${this.type}"`);
+    if (!valid) {
+        return;
+    }
+    this._leaving = true;
+    this.topic = '';
 
-
-    if (triggerLeaveRequest) {
-        if (self.type === "group" || self.type === "public") {
-            self.trigger('onLeaveChatRequested');
-        }
-        else {
-            self.logger.error("Can't leave room of type: " + self.type);
-            return;
-        }
+    if (notify) {
+        this.trigger('onLeaveChatRequested');
     }
 
-
-    if (self.roomId.indexOf("@") != -1) {
-        if (self.state !== ChatRoom.STATE.LEFT) {
-            self.setState(ChatRoom.STATE.LEAVING);
-            self.setState(ChatRoom.STATE.LEFT);
-        }
+    if (this.state !== ChatRoom.STATE.LEFT) {
+        this.setState(ChatRoom.STATE.LEAVING);
+        this.setState(ChatRoom.STATE.LEFT);
     }
-    else {
-        self.setState(ChatRoom.STATE.LEFT);
+    if (this.activeCallIds.length) {
+        for (const activeCallId of this.activeCallIds.keys()) {
+            this.activeCallIds.remove(activeCallId);
+        }
+        megaChat.updateSectionUnreadCount();
     }
 };
 
@@ -1178,7 +1189,7 @@ ChatRoom.prototype.archive = function() {
         'f' : flags,
         'v' : Chatd.VERSION}
         )
-        .done(function(r) {
+        .then((r) => {
             if (r === 0) {
                 self.updateFlags(flags, true);
             }
@@ -1200,8 +1211,8 @@ ChatRoom.prototype.unarchive = function() {
         'm':mask, 'f':flags,
         'v': Chatd.VERSION}
         )
-        .done(function(r) {
-            if (r === 0) {
+        .then((res) => {
+            if (res === 0) {
                 self.updateFlags(flags, true);
             }
         });
@@ -1242,15 +1253,29 @@ ChatRoom.prototype.destroy = function(notifyOtherDevices, noRedirect) {
 
 /**
  * Create a public handle of a chat
- * @param [d] {boolean|undefined} if d is specified, then it will delete the public chat link.
- * @param [callback] {function} call back function.
+ * @param {Boolean} [remove] if specified, then it will delete the public chat link.
+ * @param {Boolean} [cim] create chat link if missing
+ * @param {Boolean} [force] Clear any stored public link to ensure the API request is fired.
+ * @returns {Promise<*>}
  */
-ChatRoom.prototype.updatePublicHandle = function(d, callback) {
-    var self = this;
+ChatRoom.prototype.updatePublicHandle = async function(remove, cim, force) {
+    if (force) {
+        this.publicLink = null;
+    }
+    if (!remove && this.publicLink) {
+        return this.publicLink;
+    }
 
-    return megaChat.plugins.chatdIntegration.updateChatPublicHandle(self.chatId, d, callback);
+    return asyncApiReq({a: 'mcph', id: this.chatId, v: Chatd.VERSION, cim: cim ? 1 : 0, d: remove ? 1 : undefined})
+        .then((res) => {
+            assert(remove && res === 0 || Array.isArray(res) && res[1].length === 8);
+            this.publicLink = remove ? null : `chat/${res[1]}#${this.protocolHandler.getUnifiedKey()}`;
+        })
+        .catch((ex) => {
+            this.logger.warn('updatePublicHandle', ex);
+            this.publicLink = null;
+        });
 };
-
 
 /**
  * Returns true if the current user is in the members list
@@ -1293,54 +1318,25 @@ ChatRoom.prototype.joinViaPublicHandle = function() {
 /**
  * Switch off the public mode of an open chat.
  */
-ChatRoom.prototype.switchOffPublicMode = function() {
-    var self = this;
-    var participants = self.protocolHandler.getTrackedParticipants();
-    var promises = [];
-    promises.push(
-        ChatdIntegration._ensureKeysAreLoaded(undefined, participants)
-    );
-    var onSwitchDone = function() {
-        self.protocolHandler.switchOffOpenMode();
-    };
+ChatRoom.prototype.switchOffPublicMode = ChatRoom._fnRequireParticipantKeys(function() {
+    let {topic, protocolHandler, chatId} = this;
 
-    var _runSwitchOffPublicMode = function() {
-        // self.state.value
-        var topic = null;
-        if (self.topic) {
-            topic = self.protocolHandler.embeddedEncryptTo(
-                self.topic,
-                strongvelope.MESSAGE_TYPES.TOPIC_CHANGE,
-                participants,
-                true,
-                false /* hardcoded to false, to ensure the encryption DOES includes keys in the new topic */
-            );
-            topic = base64urlencode(topic);
+    if (topic) {
+        topic = protocolHandler.embeddedEncryptTo(
+            topic,
+            strongvelope.MESSAGE_TYPES.TOPIC_CHANGE,
+            protocolHandler.getTrackedParticipants(),
+            true,
+            false /* hardcoded to false, to ensure the encryption DOES include keys in the new topic */
+        );
+        topic = base64urlencode(topic);
+    }
 
-            asyncApiReq({
-                a: 'mcscm',
-                id: self.chatId,
-                ct: topic,
-                v: Chatd.VERSION
-            })
-                .done(onSwitchDone);
-        }
-        else {
-            asyncApiReq({
-                a: 'mcscm',
-                id: self.chatId,
-                v: Chatd.VERSION
-            })
-                .done(onSwitchDone);
-        }
-    };
-    MegaPromise.allDone(promises).done(
-        function () {
-            _runSwitchOffPublicMode();
-        }
-    );
-
-};
+    return asyncApiReq({a: 'mcscm', id: chatId, ct: topic || undefined, v: Chatd.VERSION})
+        .then(() => {
+            protocolHandler.switchOffOpenMode();
+        });
+});
 
 /**
  * Show UI elements of this room
@@ -1364,7 +1360,6 @@ ChatRoom.prototype.show = function() {
     });
     self.isCurrentlyActive = true;
     self.lastShownInUI = Date.now();
-    self.showArchived = self.isArchived();
     self.megaChat.setAttachments(self.roomId);
     self.megaChat.lastOpenedChat = self.roomId;
     self.megaChat.currentlyOpenedChat = self.roomId;
@@ -1397,21 +1392,19 @@ ChatRoom.prototype.show = function() {
 
 ChatRoom.prototype.scrollToChat = function() {
     this._scrollToOnUpdate = true;
-
-    if (megaChat.$chatTreePanePs) {
-        var li = document.querySelector('ul.conversations-pane li#conversation_' + this.roomId);
-        if (li) {
-            var pos = li.offsetTop;
-            if (!verge.inViewport(li, -72 /* 2 x 36 px height buttons */)) {
-                var treePane = document.querySelector('.conversationsApp .fm-tree-panel');
-                var wrapOuterHeight = $(treePane).outerHeight();
-                var itemOuterHeight = $('li:first', treePane).outerHeight();
-                megaChat.$chatTreePanePs.doProgramaticScroll(
-                    Math.max(0, pos - wrapOuterHeight / 2 + itemOuterHeight),
-                    true
-                );
-                this._scrollToOnUpdate = false;
-            }
+    const { $chatTreePanePs } = megaChat;
+    if ($chatTreePanePs && $chatTreePanePs.length) {
+        const li = document.querySelector(`ul.conversations-pane li#conversation_${this.roomId}`);
+        if (li && !verge.inViewport(li, -72 /* 2 x 36 px height buttons */)) {
+            Object.values($chatTreePanePs).forEach(({ ref }) => {
+                const wrapOuterHeight = $(ref.domNode).outerHeight();
+                const itemOuterHeight = $('li:first', ref.domNode).outerHeight();
+                const pos = li.offsetTop;
+                if (ref.domNode.contains(li)) {
+                    ref.doProgramaticScroll?.(Math.max(0, pos - wrapOuterHeight / 2 + itemOuterHeight), true);
+                }
+            });
+            this._scrollToOnUpdate = false;
         }
     }
 };
@@ -1641,76 +1634,107 @@ ChatRoom.prototype._sendMessageToTransport = function(messageObject) {
  * @param users {Array}
  * @private
  */
-ChatRoom.prototype._sendNodes = function(nodeids, users) {
-    var promises = [];
-    var self = this;
-
-    if (self.type === "public") {
-        nodeids.forEach(function (nodeId) {
-            promises.push(
-                asyncApiReq({'a': 'mcga', 'n': nodeId, 'u': strongvelope.COMMANDER, 'id': self.chatId, 'v': Chatd.VERSION})
-            );
-        });
+ChatRoom.prototype._sendNodes = async function(nodeids, users) {
+    const u = this.type === 'public' ? [strongvelope.COMMANDER] : users;
+    const promises = nodeids.map(nodeId => asyncApiReq({a: 'mcga', n: [nodeId], u, id: this.chatId, v: Chatd.VERSION}));
+    const res = await Promise.allSettled(promises);
+    const sent = [];
+    for (let i = res.length; i--;) {
+        if (res[i].status === 'fulfilled') {
+            sent.push(nodeids[i]);
+        }
     }
-    else {
-        users.forEach(function (uh) {
-            nodeids.forEach(function (nodeId) {
-                promises.push(
-                    asyncApiReq({'a': 'mcga', 'n': nodeId, 'u': uh, 'id': self.chatId, 'v': Chatd.VERSION})
-                );
-            });
-        });
+    if (!sent.length) {
+        throw ENOENT;
     }
 
-    return MegaPromise.allDone(promises);
+    return sent;
 };
 
 
 /**
  * Attach/share (send as message) file/folder nodes to the chat
  * @param {Array|String} nodes ufs-node handle, or an array of them.
+ * @param {Object} [names] in place node rename
  * @returns {Promise}
  */
-ChatRoom.prototype.attachNodes = mutex('chatroom-attach-nodes', function _(resolve, reject, nodes) {
+ChatRoom.prototype.attachNodes = async function(nodes, names) {
+
+    if (!Array.isArray(nodes)) {
+        nodes = [nodes];
+    }
+    const handles = new Set();
+
+    for (let i = nodes.length; i--;) {
+        const n = nodes[i];
+        const h = String(crypto_keyok(n) && n.h || n);
+
+        if (!M.getNodeByHandle(h)) {
+            handles.add(h);
+        }
+    }
+
+    if (handles.size) {
+        await dbfetch.acquire([...handles]);
+    }
+
+    return this._attachNodes(nodes, names);
+};
+
+// @private -- see {@link ChatRoom.attachNodes}
+ChatRoom.prototype._attachNodes = mutex('chatroom-attach-nodes', function _(resolve, reject, nodes, names) {
     var i;
     var step = 0;
     var users = [];
     var self = this;
+    let result = null;
     var copy = Object.create(null);
     var send = Object.create(null);
+    let link = Object.create(null);
+    let nmap = Object.create(null);
     var members = self.getParticipantsExceptMe();
-    var attach = promisify(function(resolve, reject, nodes) {
+    var attach = (nodes) => {
         console.assert(self.type === 'public' || users.length, 'No users to send to?!');
 
-        self._sendNodes(nodes, users).then(function() {
-            for (var i = nodes.length; i--;) {
-                var n = M.getNodeByHandle(nodes[i]);
-                console.assert(n.h, 'wtf..');
+        return this._sendNodes(nodes, users).then((res) => {
+            for (let i = res.length; i--;) {
+                const n = nmap[res[i]] || M.getNodeByHandle(res[i]);
+                console.assert(n.h, `Node not found... ${res[i]}`);
 
                 if (n.h) {
+                    const name = names && (names[n.hash] || names[n.h]) || n.name;
+
                     // 1b, 1b, JSON
                     self.sendMessage(
                         Message.MANAGEMENT_MESSAGE_TYPES.MANAGEMENT +
                         Message.MANAGEMENT_MESSAGE_TYPES.ATTACHMENT +
                         JSON.stringify([
                             {
-                                h: n.h, k: n.k, t: n.t, s: n.s, fa: n.fa, ts: n.ts, hash: n.hash, name: n.name
+                                h: n.h, k: n.k, t: n.t, s: n.s, fa: n.fa, ts: n.ts, hash: n.hash, name, des: n.des
                             }
                         ])
                     );
                 }
             }
-            resolve();
-        }).catch(reject);
-    });
+        });
+    };
 
     var done = function() {
         if (--step < 1) {
-            resolve();
+            nmap = null;
+            resolve(result);
         }
     };
     var fail = function(ex) {
-        if (d) {
+        if (ex === EBLOCKED) {
+            // User didn't want to revoke FR.
+            result = ex;
+        }
+        else if (ex === ENOENT) {
+            // Nothing to attach
+            result = result || ex;
+        }
+        else if (d) {
             _.logger.error(ex);
         }
         done();
@@ -1727,19 +1751,54 @@ ChatRoom.prototype.attachNodes = mutex('chatroom-attach-nodes', function _(resol
         }
     }
 
-    if (!Array.isArray(nodes)) {
-        nodes = [nodes];
-    }
-
     for (i = nodes.length; i--;) {
-        var n = M.getNodeByHandle(nodes[i]);
-        (n && (n.u !== u_handle || M.getNodeRoot(n.h) === "shares") ? copy : send)[n.h] = 1;
+        const h = nodes[i];
+        const n = crypto_keyok(h) ? h : M.getNodeByHandle(h);
+
+        if (n.t) {
+            link[n.h] = 1;
+            continue;
+        }
+
+        if (n.hash) {
+            nmap[n.hash] = n;
+
+            if (names && names[n.h]) {
+                names[n.hash] = names[n.h];
+            }
+        }
+
+        let op = send;
+        if (n.u !== u_handle || M.getNodeRoot(n.h) === 'shares') {
+            op = copy;
+        }
+
+        op[n.h] = 1;
+        nmap[n.h] = n;
     }
     copy = Object.keys(copy);
     send = Object.keys(send);
+    link = Object.keys(link);
 
     if (d) {
-        _.logger.debug('copy:%d, send:%d', copy.length, send.length, copy, send);
+        _.logger.debug('copy:%d, send:%d, link:%d', copy.length, send.length, link.length, copy, send, link);
+    }
+
+    if (link.length) {
+        ++step;
+        Promise.resolve(mega.fileRequestCommon.storage.isDropExist(link))
+            .then((res) => {
+                if (res.length) {
+                    return mega.fileRequest.showRemoveWarning(res);
+                }
+            })
+            .then(() => {
+                const createLink = (h) => M.createPublicLink(h).then(({link}) => this.sendMessage(link));
+
+                return Promise.all(link.map(createLink));
+            })
+            .then(done)
+            .catch(fail);
     }
 
     if (send.length) {
@@ -1749,83 +1808,83 @@ ChatRoom.prototype.attachNodes = mutex('chatroom-attach-nodes', function _(resol
 
     if (copy.length) {
         step++;
-        M.myChatFilesFolder.get(true)
-            .then(function(target) {
-                var rem = [];
-                var c = Object.keys(M.c[target.h] || {});
-
-                for (var i = copy.length; i--;) {
-                    var n = M.getNodeByHandle(copy[i]);
-                    console.assert(n.h, 'wtf..');
-
-                    for (var y = c.length; y--;) {
-                        var b = M.getNodeByHandle(c[y]);
-
-                        if (n.h === b.h || b.hash === n.hash) {
-                            if (d) {
-                                _.logger.info('deduplication %s:%s', n.h, b.h, [n], [b]);
-                            }
-                            rem.push(n.h);
-                            copy.splice(i, 1);
-                            break;
-                        }
-                    }
-                }
-
-                var next = function(res) {
-                    if (!Array.isArray(res)) {
-                        return fail(res);
-                    }
-                    const [h] = res;
-                    res = [...rem, ...res];
-
-                    if (!res.length) {
-                        // Something went wrong with copyNodes()?..
-                        return fail('Nothing to attach...?!');
-                    }
-
-                    for (let i = res.length; i--;) {
-                        const n = M.getNodeByHandle(res[i]);
-
-                        if (n.fv) {
-
-                            if (d) {
-                                _.logger.info('Skipping file-version %s', n.h, n);
-                            }
-                            res.splice(i, 1);
-                        }
-                    }
-
-                    if (h && !res.length) {
-                        if (d) {
-                            _.logger.info('Adding nothing but a file-version?..', h);
-                        }
-                        res = [h];
-                    }
-
-                    attach(res).then(done).catch(fail);
-                };
-
-                if (copy.length) {
-                    M.copyNodes(copy, target.h, false, next).dump('attach-nodes');
-                }
-                else {
-                    if (d) {
-                        _.logger.info('No new nodes to copy.', [rem]);
-                    }
-                    next([]);
-                }
-            })
-            .catch(fail);
+        this._copyNodesToAttach(copy, nmap).then((res) => attach(res)).then(done).catch(fail);
     }
 
     if (!step) {
         if (d) {
             _.logger.warn('Nothing to do here...');
         }
-        onIdle(done);
+        queueMicrotask(done);
     }
 });
+
+// @private -- see {@link ChatRoom.attachNodes}
+ChatRoom.prototype._copyNodesToAttach = async function(copy, nmap) {
+    const {h: target} = await M.myChatFilesFolder.get(true);
+
+    if (!M.c[target]) {
+        await dbfetch.get(target);
+    }
+    const dir = Object.keys(M.c[target] || {});
+    const rem = [];
+
+    for (let i = copy.length; i--;) {
+        const n = nmap[copy[i]] || M.getNodeByHandle(copy[i]);
+        console.assert(n.h, `Node not found.. ${copy[i]}`);
+
+        for (let y = dir.length; y--;) {
+            const b = M.getNodeByHandle(dir[y]);
+
+            if (n.h === b.h || b.hash === n.hash) {
+                if (d) {
+                    this.logger.info('deduplication %s:%s', n.h, b.h, [n], [b]);
+                }
+                rem.push(n.h);
+                copy.splice(i, 1);
+                break;
+            }
+        }
+    }
+
+    let res = [];
+    if (copy.length) {
+
+        res = await M.copyNodes(copy, target);
+    }
+    else if (d) {
+
+        this.logger.info('No new nodes to copy.', rem);
+    }
+    assert(Array.isArray(res), `Unexpected response, ${res && res.message || res}`, res);
+
+    const [h] = res;
+    res = [...rem, ...res];
+
+    // Something went wrong with copyNodes()?..
+    assert(res.length, 'Unexpected condition... nothing to attach ?!');
+
+    for (let i = res.length; i--;) {
+        const n = nmap[res[i]] || M.getNodeByHandle(res[i]);
+
+        if (n.fv) {
+
+            if (d) {
+                this.logger.info('Skipping file-version %s', n.h, n);
+            }
+            res.splice(i, 1);
+        }
+    }
+
+    if (h && !res.length) {
+        if (d) {
+            this.logger.info('Adding nothing but a file-version?..', h);
+        }
+        res = [h];
+    }
+
+    return res;
+};
 
 ChatRoom.prototype.onUploadStart = function(data) {
     var self = this;
@@ -1885,6 +1944,17 @@ ChatRoom.prototype.getMessageById = function(messageId) {
 };
 
 /**
+ * hasUserMessages
+ * @description Check if the current room has any chat history, excl. management messages
+ * @returns boolean
+ */
+
+ChatRoom.prototype.hasUserMessages = function() {
+    const { messages } = this.messagesBuff;
+    return !!messages.length && messages.some(m => m.messageHtml);
+};
+
+/**
  * Used to update the DOM element containing data about this room.
  * E.g. unread count
  */
@@ -1941,20 +2011,6 @@ ChatRoom.prototype.recover = function() {
     }
 };
 
-ChatRoom._fnRequireParticipantKeys = function(fn, scope) {
-    return function(...args) {
-        const participants = this.protocolHandler.getTrackedParticipants();
-
-        return ChatdIntegration._ensureKeysAreLoaded(undefined, participants)
-            .then(() => {
-                return fn.apply(scope || this, args);
-            })
-            .catch((ex) => {
-                this.logger.error("Failed to retrieve keys..", ex);
-            });
-    };
-};
-
 ChatRoom.prototype.showMissingUnifiedKeyDialog = function() {
     return (
         msgDialog(
@@ -1976,12 +2032,12 @@ ChatRoom.prototype.hasInvalidKeys = function() {
             !this.ck || (this.ck && this.ck.length !== 32)
         ) {
             console.error('Error instantiating room/call -- missing `unifiedKey`/malformed `ck` for public chat.');
-            const { master, slaves } = mBroadcaster.crossTab;
+            const {owner, actors} = mBroadcaster.crossTab;
             eventlog(
                 99751,
                 JSON.stringify([
                     1,
-                    buildVersion.version || 'dev',
+                    buildVersion.website || 'dev',
                     String(this.chatId).length | 0,
                     this.type | 0,
                     this.isMeeting | 0,
@@ -1989,8 +2045,9 @@ ChatRoom.prototype.hasInvalidKeys = function() {
                     String(unifiedKey || '').length | 0,
                     typeof this.ck,
                     String(this.ck).length | 0,
-                    (!!master) | 0,
-                    Object(slaves).length | 0])
+                    (!!owner) | 0,
+                    Object(actors).length | 0
+                ])
             );
             return true;
         }
@@ -1999,58 +2056,43 @@ ChatRoom.prototype.hasInvalidKeys = function() {
 };
 
 ChatRoom.prototype.joinCall = ChatRoom._fnRequireParticipantKeys(function(audio, video, callId) {
-    if (this.activeCallIds.length === 0) {
-        return;
-    }
-    if (!megaChat.hasSupportForCalls) {
-        return;
-    }
-    if (this.meetingsLoading) {
+    if (!megaChat.hasSupportForCalls || this.activeCallIds.length === 0 || this.meetingsLoading) {
         return;
     }
     if (this.hasInvalidKeys()) {
         return this.showMissingUnifiedKeyDialog();
     }
 
-    this.meetingsLoading = l.joining /* `Joining` */;
-
-    this.rebind("onCallLeft.start", (e, data) => {
-        if (data.callId === callId) {
-            // ensure that the Loading/Joining/Starting overlay is removed if the call ended
-            // (or had failed to start)
-            this.meetingsLoading = false;
-        }
-    });
+    this.meetingsLoading = {
+        title: l.joining /* `Joining` */,
+        audio,
+        video
+    };
 
     callId = callId || this.activeCallIds.keys()[0];
     return asyncApiReq({'a': 'mcmj', 'cid': this.chatId, "mid": callId})
         .then((r) => {
-            var app = new SfuApp(this, callId);
-            window.sfuClient = app.sfuClient = new SfuClient(
-                u_handle,
-                app,
-                (
-                    this.protocolHandler.chatMode === strongvelope.CHAT_MODE.PUBLIC &&
-                    str_to_ab(this.protocolHandler.unifiedKey)
-                ),
-                {
-                    'speak': true,
-                    'moderator': true
-                },
-                r.url.replace("https://", "wss://")
-            );
-            app.sfuClient.muteAudio(!audio);
-            app.sfuClient.muteCamera(!video);
-            return app.sfuClient.connect(r.url, callId, {isGroup: this.type !== "private"});
-        }, ex => {
-            console.error('Failed to join call:', ex);
-            this.meetingsLoading = false;
-            this.unbind("onCallLeft.start");
+            this.startOrJoinCall(callId, r.url, audio, video, r.organiser);
         });
-
 });
-
-
+ChatRoom.prototype.startOrJoinCall = function(callId, url, audio, video, organiser) {
+    tryCatch(() => {
+        const call = this.call = megaChat.activeCall =
+            megaChat.plugins.callManager2.createCall(
+                this,
+                callId,
+                this.protocolHandler.chatMode === strongvelope.CHAT_MODE.PUBLIC &&
+                str_to_ab(this.protocolHandler.unifiedKey)
+            );
+        call.setOrganiser(organiser);
+        return call.connect(url, audio, video);
+    }, ex => {
+        this.call?.destroy();
+        this.call = megaChat.activeCall = null;
+        this.meetingsLoading = false;
+        console.error('Failed to start/join call:', ex);
+    })();
+};
 ChatRoom.prototype.rejectCall = function(callId) {
     if (this.activeCallIds.length === 0) {
         return;
@@ -2072,6 +2114,18 @@ ChatRoom.prototype.rejectCall = function(callId) {
     return Promise.resolve();
 };
 
+ChatRoom.prototype.ringUser = function(userId, callId, callstate) {
+    assert(userId, 'Missing user handle.');
+    assert(callId, 'Missing chat handle.');
+    assert(this.type !== 'private', 'Unexpected chat type.');
+    const shard = this.chatd.shards[this.chatShard];
+    if (shard) {
+        api.req({ a: 'mcru', u: userId, cid: this.chatId })
+            .then(() => shard.ringUser(this.chatIdBin, base64urldecode(userId), base64urldecode(callId), callstate))
+            .catch(dump);
+    }
+};
+
 ChatRoom.prototype.endCallForAll = function(callId) {
     if (this.activeCallIds.length && this.type !== 'private') {
         callId = callId || this.activeCallIds.keys()[0];
@@ -2084,13 +2138,13 @@ ChatRoom.prototype.endCallForAll = function(callId) {
     }
 };
 
-ChatRoom.prototype.startAudioCall = function() {
-    return this.startCall(true, false);
+ChatRoom.prototype.startAudioCall = function(scheduled) {
+    return this.startCall(true, false, scheduled);
 };
-ChatRoom.prototype.startVideoCall = function() {
-    return this.startCall(true, true);
+ChatRoom.prototype.startVideoCall = function(scheduled) {
+    return this.startCall(true, true, scheduled);
 };
-ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function(audio, video) {
+ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function(audio, video, scheduled) {
     if (!megaChat.hasSupportForCalls || this.meetingsLoading) {
         return;
     }
@@ -2104,47 +2158,179 @@ ChatRoom.prototype.startCall = ChatRoom._fnRequireParticipantKeys(function(audio
         return this.showMissingUnifiedKeyDialog();
     }
 
-    this.meetingsLoading = l.starting /* `Starting` */;
+    this.meetingsLoading = {
+        title: l.starting /* `Starting` */,
+        audio,
+        video
+    };
 
-    const opts = {'a': 'mcms', 'cid': this.chatId};
+    const opts = { a: 'mcms', cid: this.chatId, sm: scheduled && this.scheduledMeeting && this.scheduledMeeting.id };
     if (localStorage.sfuId) {
         opts.sfu = parseInt(localStorage.sfuId, 10);
     }
 
     return asyncApiReq(opts)
-        .then((r) => {
-            var app = new SfuApp(this, r.callId);
-            window.sfuClient = app.sfuClient = new SfuClient(
-                u_handle,
-                app,
-                (
-                    this.protocolHandler.chatMode === strongvelope.CHAT_MODE.PUBLIC &&
-                    str_to_ab(this.protocolHandler.unifiedKey)
-                ),
-                {
-                    'speak': true,
-                    'moderator': true
-                },
-                r.sfu.replace("https://", "wss://")
-            );
-            app.sfuClient.muteAudio(!audio);
-            app.sfuClient.muteCamera(!video);
-
-            this.rebind("onCallLeft.start", (e, data) => {
-                if (data.callId === r.callId) {
-                    this.meetingsLoading = false;
-                }
-            });
-            // r.callId
-            sfuClient.connect(r.sfu.replace("https://", "wss://"), r.callId, {isGroup: this.type !== "private"});
-        }, ex => {
-            console.error('Failed to start call:', ex);
+        .then(r => {
+            this.startOrJoinCall(r.callId, r.sfu, audio, video, r.organiser);
+        })
+        .catch(ex => {
             this.meetingsLoading = false;
-            this.unbind("onCallLeft.start");
+            this.logger.error(`Failed to start call: ${ex}`);
         });
 });
 
+ChatRoom.prototype.subscribeForCallEvents = function() {
+    const callMgr = megaChat.plugins.callManager2;
+    this.rebind("onChatdPeerJoinedCall.callManager", (e, data) => {
+        if (!this.activeCallIds.exists(data.callId)) {
+            this.activeCallIds.set(data.callId, []);
+        }
+        this.activeCallIds.set(data.callId, [...this.activeCallIds[data.callId], ...data.participants]);
 
+        const parts = data.participants;
+        for (var i = 0; i < parts.length; i++) {
+            // halt call if anyone joins a 1on1 room or if I'd joined (e.g. I'd an incoming ringing first)
+            if (
+                this.type === "private" ||
+                (
+                    parts[i] === u_handle &&
+                    this.ringingCalls.exists(data.callId)
+                )
+            ) {
+                this.ringingCalls.remove(data.callId);
+
+                callMgr.trigger("onRingingStopped", {
+                    callId: data.callId,
+                    chatRoom: this
+                });
+            }
+        }
+
+        megaChat.updateSectionUnreadCount();
+        this.callParticipantsUpdated();
+    });
+    this.rebind("onChatdPeerLeftCall.callManager", (e, data) => {
+        if (!this.activeCallIds[data.callId]) {
+            return;
+        }
+        const parts = data.participants;
+        for (var i = 0; i < parts.length; i++) {
+            array.remove(this.activeCallIds[data.callId], parts[i], true);
+
+            if (parts[i] === u_handle && this.ringingCalls.exists(data.callId)) {
+                this.ringingCalls.remove(data.callId);
+
+                callMgr.trigger("onRingingStopped", {
+                    callId: data.callId,
+                    chatRoom: this
+                });
+            }
+        }
+
+        this.callParticipantsUpdated();
+    });
+    this.rebind("onCallLeft.callManager", (e, data) => {
+        console.warn("onCallLeft:", JSON.stringify(data));
+        const {call} = this;
+        if (!call || call.callId !== data.callId) {
+            if (d) {
+                console.warn("... no active call or event not for it");
+            }
+            return;
+        }
+        this.meetingsLoading = false;
+        call.hangUp(data.reason);
+        megaChat.activeCall = this.call = null;
+    });
+    this.rebind("onChatdCallEnd.callManager", (e, data) => {
+        if (d) {
+            console.warn("onChatdCallEnd:", JSON.stringify(data));
+        }
+        this.meetingsLoading = false;
+        this.activeCallIds.remove(data.callId);
+        if (this.callUserLimited) {
+            this.callUserLimited.abort();
+        }
+        this.callUserLimited = false;
+        this.stopRinging(data.callId);
+        this.callParticipantsUpdated();
+        megaChat.updateSectionUnreadCount();
+    });
+    this.rebind('onCallState.callManager', function(e, data) {
+        const ac = this.activeCallIds[data.callId];
+        console.assert(ac, `unknown call: ${data.callId}`);
+        if (ac) {
+            callMgr.onCallState(data, this);
+            this.callParticipantsUpdated();
+        }
+    });
+    this.rebind('onRoomDisconnected.callManager', function() {
+        this.activeCallIds.clear(); // av: Added this to complement the explicit handling of chatd call events
+        // Keep the current call active when online, but chatd got disconnected
+        megaChat.updateSectionUnreadCount();
+        if (navigator.onLine) {
+            return;
+        }
+
+        if (this.call) {
+            this.trigger('ChatDisconnected', this);
+        }
+        this.callParticipantsUpdated();
+    });
+    this.rebind('onStateChange.callManager', function(e, oldState, newState) {
+        if (newState === ChatRoom.STATE.LEFT && this.call) {
+            this.call.hangUp(SfuClient.TermCode.kLeavingRoom);
+        }
+    });
+    this.rebind('onCallPeerLeft.callManager', (e, data) => {
+        const {call} = this;
+        if (!call ||
+            call.isDestroyed ||
+            call.hasOtherParticipant() ||
+            SfuClient.isTermCodeRetriable(data.reason)
+        ) {
+            return;
+        }
+        if (this.type === 'private') {
+            return this.trigger('onCallLeft', { callId: call.callId });
+        }
+        // Wait for the peer left notifications to process before triggering.
+        setTimeout(() => {
+            // make sure we still have that call as active
+            if (this.call === call) {
+                this.call.initCallTimeout();
+            }
+        }, 3000);
+    });
+
+    this.rebind('onMeAdded', (e, addedBy) => {
+        if (this.activeCallIds.length > 0) {
+            const callId = this.activeCallIds.keys()[0];
+            if (this.ringingCalls.exists(callId)) {
+                return;
+            }
+            this.ringingCalls.set(callId, addedBy);
+            this.megaChat.trigger('onIncomingCall', [
+                this,
+                callId,
+                addedBy,
+                callMgr
+            ]);
+            this.fakedLocalRing = true;
+
+            // clear if not canceled/rejected already
+            setTimeout(() => {
+                delete this.fakedLocalRing;
+                if (this.ringingCalls.exists(callId)) {
+                    callMgr.trigger("onRingingStopped", {
+                        callId: callId,
+                        chatRoom: this
+                    });
+                }
+            }, 30e3);
+        }
+    });
+};
 ChatRoom.prototype.stateIsLeftOrLeaving = function() {
     return (
         this.state == ChatRoom.STATE.LEFT || this.state == ChatRoom.STATE.LEAVING ||
@@ -2186,16 +2372,15 @@ ChatRoom.prototype.isReadOnly = function() {
     );
 };
 ChatRoom.prototype.iAmOperator = function() {
-    return this.type === "private"
-        || this.members && this.members[u_handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.FULL;
-};
-ChatRoom.prototype.iAmStandard = function() {
-    return this.type !== 'private'
-        && this.members && this.members[u_handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR;
+    return this.type === 'private'
+        || this.members && this.members[u_handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR;
 };
 ChatRoom.prototype.iAmReadOnly = function() {
     return this.type !== 'private'
         && this.members && this.members[u_handle] === ChatRoom.MembersSet.PRIVILEGE_STATE.READONLY;
+};
+ChatRoom.prototype.iAmWaitingRoomPeer = function() {
+    return this.options.w && !this.iAmOperator();
 };
 
 /**
@@ -2305,8 +2490,8 @@ ChatRoom.prototype.truncate = function() {
                 m: lastChatMessageId,
                 v: Chatd.VERSION
             })
-                .fail(function(r) {
-                    if (r === -2) {
+                .catch((ex) => {
+                    if (ex === -2) {
                         msgDialog(
                             'warninga',
                             l[135],
@@ -2405,6 +2590,11 @@ ChatRoom.prototype.callParticipantsUpdated = function(
         self.uniqueCallParts[callParts[i]] = true;
     }
 
+    if (this.callUserLimited && this.canJoinLimitedCall()) {
+        this.callUserLimited.abort();
+        this.callUserLimited = false;
+    }
+
     var msg = self.messagesBuff.getMessageById(msgId);
     msg && msg.wrappedChatDialogMessage && msg.wrappedChatDialogMessage.trackDataChange();
 
@@ -2460,9 +2650,9 @@ ChatRoom.prototype.scrollToMessageId = function(msgId, index, retryActive) {
     var self = this;
     if (!self.isCurrentlyActive && !retryActive) {
         // room not shown yet, retry only once again after 1.5s
-        setTimeout(function() {
+        tSleep(1.5).then(() => {
             self.scrollToMessageId(msgId, index, true);
-        }, 1500);
+        });
         return;
     }
 
@@ -2532,19 +2722,199 @@ ChatRoom.prototype.toggleOpenInvite = function() {
 };
 
 ChatRoom.prototype.toggleWaitingRoom = function() {
-    // Not implemented yet.
-    // if (this.type === 'private' || !this.iAmOperator()) {
-    //     return;
-    // }
-    // this.setMcoFlags({ [MCO_FLAGS.WAITING_ROOM]: Math.abs(this.options[MCO_FLAGS.WAITING_ROOM] - 1) });
+    if (this.type === 'private' || !this.iAmOperator()) {
+        return;
+    }
+    this.setMcoFlags({ [MCO_FLAGS.WAITING_ROOM]: Math.abs(this.options[MCO_FLAGS.WAITING_ROOM] - 1) });
 };
 
-ChatRoom.prototype.toggleSpeakRequest = function() {
-    // Not implemented yet.
-    // if (this.type === 'private' || !this.iAmOperator()) {
-    //     return;
-    // }
-    // this.setMcoFlags({ [MCO_FLAGS.SPEAK_REQUEST]: Math.abs(this.options[MCO_FLAGS.SPEAK_REQUEST] - 1) });
+ChatRoom.prototype.exportToFile = function() {
+    if (this.messagesBuff.messages.length === 0 || this.exportIo) {
+        return;
+    }
+
+    loadingDialog.show('chat_export');
+    eventlog(99874);
+    this._exportChat()
+        .then(() => {
+            eventlog(99875, JSON.stringify([1]));
+        })
+        .catch(ex => {
+            if (d) {
+                console.warn('Chat export: ', ex);
+            }
+            const report = [
+                String(ex && ex.message || ex).replace(/\s+/g, '').substring(0, 64),
+            ];
+            report.unshift(report[0] === 'Aborted' ? 1 : 0);
+            if (!report[0]) {
+                msgDialog('error', '', l.export_chat_failed, '', undefined, 1);
+            }
+            eventlog(99875, JSON.stringify(report));
+        })
+        .finally(() => {
+            loadingDialog.hide('chat_export');
+            this.isScrollingToMessageId = false;
+            onIdle(() => this.messagesBuff.detachMessages());
+        });
+};
+
+ChatRoom.prototype._exportChat = async function() {
+    // Fetch messages into memory
+    this.isScrollingToMessageId = true; // Stop detach from running while this is processing.
+    while (this.messagesBuff.haveMoreHistory()) {
+        await this.messagesBuff.retrieveChatHistory(100);
+    }
+    // Wait for potentially in progress fetch/decrypt operations.
+    await Promise.allSettled([
+        this.messagesBuff.isDecrypting || Promise.resolve(),
+        this.messagesBuff.$sharedFilesLoading || Promise.resolve(),
+        this.messagesBuff.$isDecryptingSharedFiles || Promise.resolve(),
+    ]);
+
+    do {
+        await this.messagesBuff.retrieveSharedFilesHistory(100);
+    } while (this.messagesBuff.haveMoreSharedFiles);
+
+    // Check if the user wants the shared nodes if applicable
+    let withMedia = !!M.v.length;
+    if (withMedia) {
+        withMedia = await asyncMsgDialog(
+            `*confirmation:!^${l.export_chat_media_dlg_conf}!${l.export_chat_media_dlg_rej}`,
+            '',
+            l.export_chat_media_dlg_title,
+            l.export_chat_media_dlg_text
+        );
+        if (withMedia === null) {
+            throw new Error('Aborted');
+        }
+    }
+    let { attachNodes, stringNodes } = this.messagesBuff.getExportContent(withMedia);
+    stringNodes = stringNodes.join('\n');
+    const basename = M.getSafeName(this.getRoomTitle());
+    const zname = l.export_chat_zip_file.replace('%s', basename);
+    const bufferName = l.export_chat_text_file.replace('%s', basename);
+
+    if (attachNodes.length) {
+        const p = [];
+        const n = [];
+        let s = 0;
+        for (const node of attachNodes) {
+            s += node.s;
+            if (node.ph) {
+                p.push(node.ph);
+            }
+            else {
+                n.push(node.h);
+            }
+        }
+        const res = await asyncApiReq({ a: 'qbq', s, n, p });
+        if (res === 1 || res === 2) {
+            // Overquota. Offer to just save the chat history
+            const fallback = await asyncMsgDialog(
+                'confirmation',
+                '',
+                l.export_chat_media_obq_title,
+                l.export_chat_media_obq_text
+            );
+            if (fallback) {
+                return M.saveAs(stringNodes, bufferName);
+            }
+        }
+        else if (res === 0) {
+            await M.require('clientzip_js');
+            // Prepare the chat history to be added to the zip file from memory
+            const data = new TextEncoder().encode(stringNodes);
+            const dl = {
+                size: data.byteLength + s,
+                n: bufferName,
+                t: unixtime(),
+                id: this.chatId,
+                p: '',
+                io: Object.create(null),
+                writer: Object.create(null),
+                offset: 0,
+                zname,
+            };
+
+            const io = await prepareExportIo(dl);
+            const t = new Date((this.lastActivity || this.ctime) * 1000);
+            let failedCount = 0;
+
+            const src = prepareExportStreams(attachNodes, (size) => {
+                failedCount++;
+                // Fake progress for empty file.
+                dl.done += size;
+            });
+            src.unshift({
+                name: bufferName,
+                lastModified: t,
+                input: data.buffer,
+            });
+
+            // Rudimentary progress tracking since we are skipping the normal transfer flow.
+            dl.done = 0;
+            const reader = clientZip.downloadZip(src).body.getReader();
+            dl.nextChunk = async() => {
+                const read = await reader.read().catch(dump);
+                if (!read) {
+                    reader.cancel().catch(ex => {
+                        if (ex !== EOVERQUOTA) {
+
+                            msgDialog('error', '', l.export_chat_failed, ex < 0 ? api_strerror(ex) : ex, undefined, 1);
+                        }
+                    });
+                    io.abort();
+                    delete this.exportIo;
+                    loadingDialog.hideProgress();
+                    return;
+                }
+                if (read.done) {
+                    loadingDialog.hideProgress();
+                    io.download(zname);
+                    delete this.exportIo;
+                    if (failedCount) {
+                        msgDialog(
+                            'error',
+                            '',
+                            l.export_chat_failed,
+                            l.export_chat_partial_fail,
+                            undefined,
+                            1
+                        );
+                    }
+                }
+                else {
+                    dl.done += read.value.byteLength;
+                    loadingDialog.showProgress((dl.done / dl.size) * 100);
+                    io.write(read.value, dl.offset, dl.nextChunk);
+                    dl.offset += read.value.length;
+                }
+            };
+            io.begin = dl.nextChunk;
+            io.setCredentials(false, dl.size, zname);
+            this.exportIo = io;
+        }
+        else {
+            throw new Error(`Unexpected qbq response ${res}`);
+        }
+    }
+    else {
+        // Download the chat history.
+        return M.saveAs(stringNodes, bufferName);
+    }
+};
+
+/**
+ * Returns if the current user is able to join the current call (assuming free plan limitation is applied)
+ * Hosts can join as longs as there is any room, non-hosts will leave room for a host to join.
+ *
+ * @returns {*|boolean} If the user could join the current call.
+ */
+ChatRoom.prototype.canJoinLimitedCall = function() {
+    const callParts = this.getCallParticipants();
+    return this.iAmOperator() && callParts.length < CallManager2.CALL_USER_LIMIT
+        || callParts.length < CallManager2.CALL_USER_LIMIT - 1;
 };
 
 window.ChatRoom = ChatRoom;

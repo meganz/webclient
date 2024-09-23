@@ -35,20 +35,8 @@ function removeUInode(h, parent) {
         }
     }
 
-    if (M.currentCustomView.type === 'albums') {
-        mega.gallery.albums.onCDNodeRemove(n);
-    }
-    else {
-        mega.gallery.albumsRendered = false;
-    }
-
-    if (M.currentCustomView.type === 'gallery') {
-        mega.gallery.checkEveryGalleryDelete(h);
-        mega.gallery.albums.onCDNodeRemove(n);
-    }
-    else {
-        mega.gallery.nodeUpdated = true;
-        mega.gallery.albumsRendered = false;
+    if (mega.gallery.handleNodeRemoval) {
+        tryCatch(mega.gallery.handleNodeRemoval)(n);
     }
 
     if (M.isDynPage(M.currentdirid) > 1) {
@@ -92,9 +80,18 @@ function removeUInode(h, parent) {
             // Remove folder and subfolders
             $('#treeli_' + h).remove();
             if (!hasItems) {
-
                 __markEmptied();
-                $('.fm-empty-trashbin').removeClass('hidden');
+
+                // If they have permanently removed all files from the search results screen, show empty search
+                if (M.search) {
+                    $('.fm-search-count').text(mega.icu.format(l.search_results_count, 0));
+                    $('.fm-empty-search').removeClass('hidden');
+                    $('.fm-right-files-block:not(.in-chat) .search-bottom-wrapper').addClass('hidden');
+                }
+                else {
+                    $('.fm-empty-trashbin').removeClass('hidden');
+                }
+
                 $('.fm-clearbin-button').addClass('hidden');
             }
             break;
@@ -114,7 +111,12 @@ function removeUInode(h, parent) {
                 $('.files-grid-view').addClass('hidden');
                 $('.grid-table.fm tbody tr').remove();
 
-                if (folderlink) {
+                if (M.gallery) {
+                    const lastToRemove = M.c[M.currentdirid] &&
+                        Object.values(M.c[M.currentdirid]).length === 1 && h in M.c[M.currentdirid];
+                    mega.gallery.showEmpty(M.currentdirid, lastToRemove);
+                }
+                else if (folderlink) {
                     $('.fm-empty-folder').removeClass('hidden');
                 }
                 else {
@@ -134,8 +136,7 @@ function removeUInode(h, parent) {
             }
             break;
         default:
-            if (M.chat || M.currentdirid.indexOf('user-management') >= 0
-                || M.currentCustomView.type === 'albums') {
+            if (M.chat || String(M.currentdirid).includes('user-management') || M.isAlbumsPage()) {
                 break;
             }
             if (!hasSubFolders) {
@@ -146,7 +147,17 @@ function removeUInode(h, parent) {
             if (!hasItems) {
 
                 __markEmptied();
-                if (sharedFolderUI()) {
+                if (M.gallery) {
+                    $('.files-grid-view').addClass('hidden');
+
+                    const lastToRemove = M.c[M.currentdirid] &&
+                        Object.values(M.c[M.currentdirid]).length === 1 && h in M.c[M.currentdirid];
+                    mega.gallery.showEmpty(M.currentdirid, lastToRemove);
+                }
+                else if (M.dyh) {
+                    M.dyh('empty-ui');
+                }
+                else if (sharedFolderUI()) {
                     M.emptySharefolderUI();
                 }
                 else {
@@ -154,13 +165,30 @@ function removeUInode(h, parent) {
                     if (M.isDynPage(M.currentdirid)) {
                         $(`.fm-empty-${M.currentdirid}`, '.fm-right-files-block').removeClass('hidden');
                     }
+                    else if (M.currentdirid === 'out-shares') {
+                        $('.fm-empty-outgoing').removeClass('hidden');
+                    }
                     else if (M.currentdirid !== 'public-links' && M.currentdirid !== 'file-requests') {
-                        $('.fm-empty-folder').removeClass('hidden');
+
+                        // If they have removed all files from the search results screen, show empty search
+                        if (M.search) {
+                            $('.fm-search-count').text(mega.icu.format(l.search_results_count, 0));
+                            $('.fm-empty-search').removeClass('hidden');
+                            $('.fm-right-files-block:not(.in-chat) .search-bottom-wrapper').addClass('hidden');
+                        }
+                        else {
+                            $('.fm-empty-folder').removeClass('hidden');
+                        }
                     }
                 }
                 $('.grid-table.fm tbody tr').remove();
             }
             break;
+    }
+
+    // Remove item in subtitles dialog
+    if ($.subtitlesMegaRender && $.subtitlesMegaRender.nodeMap) {
+        $.subtitlesMegaRender.revokeDOMNode(h, true);
     }
 
     if (M.megaRender && M.megaRender.megaList) {
@@ -185,50 +213,28 @@ function removeUInode(h, parent) {
  * @param {Boolean} [skipDelWarning] skip..del..warning..
  * @returns {MegaPromise}
  */
-function fmremove(selectedNodes, skipDelWarning) {
-    'use strict';
-
-    var promise = new MegaPromise();
-    var handles;
-
-    if (selectedNodes) {
-        if (!Array.isArray(selectedNodes)) {
-            selectedNodes = [selectedNodes];
-        }
-    }
-    else {
-        selectedNodes = $.selected || [];
-    }
-    handles = selectedNodes.concat();
-
-    dbfetch.coll(handles)
-        .always(function() {
-            var doRemoveShare = handles.some(function(h) {
-                return M.d[h] && M.d[h].su;
-            });
-
-            if (doRemoveShare) {
-                var promises = [];
-
-                for (var i = handles.length; i--;) {
-                    promises.push(M.leaveShare(handles[i]));
-                }
-
-                promise.linkDoneAndFailTo(MegaPromise.allDone(promises));
-            }
-            else {
-                fmremove.sync(selectedNodes, skipDelWarning);
-                promise.resolve();
-            }
-        });
-
-    return promise;
-}
-
 // @todo make eslint happy..
 // eslint-disable-next-line complexity,sonarjs/cognitive-complexity
-fmremove.sync = function(selectedNodes, skipDelWarning) {
+async function fmremove(selectedNodes, skipDelWarning) {
     'use strict';
+
+    selectedNodes = selectedNodes || $.selected;
+    if (!Array.isArray(selectedNodes)) {
+        selectedNodes = selectedNodes ? [selectedNodes] : [];
+    }
+
+    const handles = [...selectedNodes];
+    await dbfetch.coll(handles).catch(nop);
+
+    if (handles.some((h) => M.d[h] && M.d[h].su)) {
+        const promises = [];
+
+        for (let i = handles.length; i--;) {
+            promises.push(M.leaveShare(handles[i]));
+        }
+
+        return Promise.all(promises);
+    }
 
     var i = 0;
     var filecnt = 0;
@@ -237,6 +243,7 @@ fmremove.sync = function(selectedNodes, skipDelWarning) {
     var removesharecnt = 0;
     var title = '';
     var message = '';
+    let s4Bucketcnt = 0;
 
     // If on mobile we will bypass the warning dialog prompts
     skipDelWarning = skipDelWarning || is_mobile ? 1 : mega.config.get('skipDelWarning');
@@ -255,6 +262,10 @@ fmremove.sync = function(selectedNodes, skipDelWarning) {
         }
         else {
             filecnt++;
+        }
+
+        if (M.getS4NodeType(n) === 'bucket') {
+            s4Bucketcnt++;
         }
     }
 
@@ -282,23 +293,25 @@ fmremove.sync = function(selectedNodes, skipDelWarning) {
             sharedFoldersAlertMessage = sharedFoldersAlertMessage.replace('[X]', contactName);
         }
 
-        msgDialog('delete-contact', l[1001], l[1002].replace('[X]', replaceString), sharedFoldersAlertMessage,
-            function(e) {
-                if (e) {
-                    for (i = 0; i < selectedNodes.length; i++) {
-                        var selected = selectedNodes[i];
+        const ack = async(yes) => {
+            const promises = [];
+            const leave = (h) => M.leaveShare(h);
 
-                        if (M.c[selected]) {
-                            Object.keys(M.c[selected])
-                                .forEach(function(sharenode) {
-                                    M.leaveShare(sharenode);
-                                });
-                        }
+            for (let i = yes && selectedNodes.length; i--;) {
+                const h = selectedNodes[i];
 
-                        api_req({a: 'ur2', u: selected, l: '0', i: requesti});
-                    }
+                if (M.c[h]) {
+                    promises.push(...Object.keys(M.c[h]).map(leave));
                 }
-            });
+
+                promises.push(api.screq({a: 'ur2', u: h, l: '0'}));
+            }
+
+            return Promise.allSettled(promises).dump('delete-contact');
+        };
+
+        msgDialog('delete-contact', l[1001], l[1002].replace('[X]', replaceString), sharedFoldersAlertMessage, ack);
+
         if (c > 1) {
             $('#msgDialog').addClass('multiple');
             $('#msgDialog .fm-del-contact-avatar')
@@ -344,15 +357,18 @@ fmremove.sync = function(selectedNodes, skipDelWarning) {
                     tmp = M.currentdirid;
                     M.currentdirid = M.getNodeByHandle(selectedNodes[0]).p || M.RubbishID;
                 }
+
                 M.clearRubbish(false)
-                    .always(function() {
+                    .finally(() => {
                         if (tmp) {
                             M.currentdirid = tmp;
                         }
                     })
-                    .done(function() {
+                    .then((res) => {
+                        console.debug('clear-bin', res);
                         showToast('settings', toastMessage);
-                    });
+                    })
+                    .catch(dump);
             }
         });
     }
@@ -360,7 +376,7 @@ fmremove.sync = function(selectedNodes, skipDelWarning) {
     // Remove contacts
     else if (M.getNodeRoot(selectedNodes[0]) === 'contacts') {
         if (skipDelWarning) {
-            M.copyNodes(selectedNodes, M.RubbishID, true);
+            M.copyNodes(selectedNodes, M.RubbishID, true).catch(tell);
         }
         else {
             title = l[1003];
@@ -376,42 +392,66 @@ fmremove.sync = function(selectedNodes, skipDelWarning) {
 
             msgDialog('confirmation', title, message, false, function(e) {
                     if (e) {
-                        M.copyNodes(selectedNodes, M.RubbishID, 1);
+                    M.copyNodes(selectedNodes, M.RubbishID, true).catch(tell);
                     }
             }, 'skipDelWarning');
         }
     }
     else {
         var moveToRubbish = function() {
-            loadingDialog.pshow();
-            M.moveToRubbish(selectedNodes).always(loadingDialog.phide.bind(loadingDialog)).done(function () {
-                // Re-render the search result / faves page after files being removed
-                if (M.currentdirid.split("/")[0] === "search" || M.currentdirid === 'faves') {
-                    M.openFolder(M.currentdirid, true);
-                }
-            });
+            mLoadingSpinner.show('move-to-rubbish');
+            mBroadcaster.sendMessage('trk:event', 'move-to-rubbish', 'remove', selectedNodes);
+
+            return M.moveToRubbish(selectedNodes)
+                .catch(tell)
+                .finally(() => {
+                    mLoadingSpinner.hide('move-to-rubbish');
+
+                    // Re-render the search result page after files being removed
+                    if (String(M.currentdirid).startsWith("search") || M.isDynPage(M.currentdirid)) {
+                        M.openFolder(M.currentdirid, true);
+                    }
+                });
         };
 
         if (skipDelWarning) {
-            moveToRubbish();
+            return moveToRubbish();
         }
         else {
+            let note = l[7410];
             title = l[1003];
             if (filecnt > 0 && foldercnt === 0) {
-                message = mega.icu.format(l.move_rubbish_files, filecnt);
+                message = mega.icu.format(l.move_files_to_bin, filecnt);
             }
-            else if (filecnt === 0 && foldercnt > 0) {
-                message = mega.icu.format(l.move_rubbish_folders, foldercnt);
+            else if (!filecnt && s4Bucketcnt && foldercnt - s4Bucketcnt === 0) {
+                message = mega.icu.format(l.s4_move_bucket_to_bin, s4Bucketcnt);
+                note = selectedNodes.length === 1 ?
+                    `${l.s4_remove_bucket_note} <p>${l.s4_remove_bucket_tip}</p>` :
+                    `${l.s4_remove_items_note} <p>${l.s4_remove_items_tip}</p>`;
+            }
+            else if (filecnt === 0 && !s4Bucketcnt && foldercnt > 0) {
+                message = mega.icu.format(l.move_folders_to_bin, foldercnt);
             }
             else {
-                message = mega.icu.format(l.move_rubbish_items, filecnt + foldercnt);
+                message = mega.icu.format(l.move_files_to_bin, filecnt + foldercnt);
+
+                if (s4Bucketcnt) {
+                    note = `${l.s4_remove_items_note} <p>${l.s4_remove_items_tip}</p>`;
+                }
             }
 
-            msgDialog('remove', title, message, l[1952] + ' ' + l[7410], function(yes) {
-                if (yes) {
-                    moveToRubbish();
-                }
-            }, 'skipDelWarning');
+            if (filecnt + foldercnt === 1) {
+                message = message.replace('%1', escapeHTML(M.d[selectedNodes[0]].name));
+            }
+
+            msgDialog(
+                `remove:!^${l[62]}!${l[16499]}`,  title, message, note,
+                (yes) => {
+                    if (yes) {
+                        moveToRubbish();
+                    }
+                }, 'skipDelWarning'
+            );
         }
     }
 };

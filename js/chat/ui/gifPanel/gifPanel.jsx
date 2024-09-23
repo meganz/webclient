@@ -25,12 +25,20 @@ export const API = {
     OFFSET: 50
 };
 
-export const LABELS = {
-    SEARCH: l[24025],
-    END_OF_RESULTS: l[24156],
-    NO_RESULTS: l[24050],
-    NOT_AVAILABLE: l[24512]
-};
+export const LABELS = freeze({
+    get SEARCH() {
+        return l[24025];
+    },
+    get NO_RESULTS() {
+        return l[24050];
+    },
+    get NOT_AVAILABLE() {
+        return l[24512];
+    },
+    get END_OF_RESULTS() {
+        return l[24156];
+    }
+});
 
 export default class GifPanel extends MegaRenderMixin {
     pathRef = '';
@@ -110,7 +118,7 @@ export default class GifPanel extends MegaRenderMixin {
                                 }));
                             }
                             return this.setState({ bottom: true, loading: false }, () =>
-                                this.resultContainerRef.reinitialise()
+                                this.resultContainerRef && this.resultContainerRef.reinitialise()
                             );
                         }
                     })

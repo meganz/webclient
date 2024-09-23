@@ -616,7 +616,14 @@ var voucherDialog = {
         var newTransfer = pro.propay.selectedProPackage[3] * Math.pow(1024, 3);
 
         // Update template
-        this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4').addClass('pro' + proNum);
+        const $planIcon = this.$dialog.find('.plan-icon');
+        $planIcon.removeClass('pro1 pro2 pro3 pro4 feature').addClass('pro' + proNum);
+
+        if (proNum === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
+            $planIcon.addClass('feature');
+            $('i.feature', $planIcon).attr('class', 'feature sprite-fm-uni icon-crest-vpn');
+        }
+
         this.$dialog.find('.voucher-plan-title').text(proPlan);
         this.$dialog.find('.voucher-plan-txt .duration').text(monthsWording);
         this.$dialog.find('.voucher-plan-price .price').text(formatCurrency(proPrice));
@@ -644,7 +651,7 @@ var voucherDialog = {
 
             $storageAmount.text(bytesToSize(M.account.space, 0));
             $newStorageAmount.text(bytesToSize(newStorage, 0));
-            if (M.maf.storage.current) {
+            if (M.maf.storage && M.maf.storage.current) {
                 $currentAchievementsAmount.text(`+ ${bytesToSize(M.maf.storage.current, 0)}`);
                 $currentAchievementsAmount.removeClass('hidden');
             }
@@ -793,7 +800,7 @@ var voucherDialog = {
             .then(function() {
                 return redeem.redeemVoucher(voucherCode);
             })
-            .then(function(data, res) {
+            .then(({data, res}) => {
                 loadingDialog.hide();
 
                 if (d) {
@@ -828,6 +835,8 @@ var voucherDialog = {
                     voucherDialog.$dialog.find('.voucher-buy-now').removeClass('hidden');
                     // Hide voucher input
                     $('.voucher-input-container', voucherDialog.$dialog).addClass('hidden');
+
+                    voucherDialog.showVoucherDialog();
                 });
             })
             .catch(function(ex) {
@@ -931,6 +940,9 @@ var voucherDialog = {
         voucherDialog.$successOverlay.find('.payment-result-txt .plan-name').text(proPlanName);
 
         insertEmailToPayResult(voucherDialog.$successOverlay);
+
+        // Send some data to mega.io that we updated the Pro plan
+        initMegaIoIframe(true, proNum);
 
         // Add click handlers for 'Go to my account' and Close buttons
         voucherDialog.$successOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
@@ -1287,14 +1299,16 @@ var addressDialog = {
         loadingDialog.show();
 
         this.fetchBillingInfo().always(function (billingInfo) {
-            billingInfo = billingInfo || {};
-            var selectedState = ((billingInfo.country === 'US' || billingInfo.country === 'CA')
-                && billingInfo.hasOwnProperty('state')) ? billingInfo.state : false;
+            billingInfo = billingInfo || Object.create(null);
+
+            const selectedState =
+                (billingInfo.country === 'US' || billingInfo.country === 'CA') && billingInfo.state || false;
 
             self.showDialog();
             self.prefillInfo(billingInfo);
             self.initStateDropDown(selectedState, billingInfo.country);
             self.initCountryDropDown(billingInfo.country);
+
             loadingDialog.hide();
             self.initCountryDropdownChangeHandler();
             self.initBuyNowButton();
@@ -1309,7 +1323,9 @@ var addressDialog = {
     showDialog: function() {
 
         // Cache DOM reference for lookup in other functions
-        this.$dialog = $('.payment-address-dialog');
+        const dialogParent = is_mobile ? '#startholder' : 'section.mega-dialog-container';
+        this.$dialog = $('.payment-address-dialog', dialogParent);
+
         this.$backgroundOverlay = $('.fm-dialog-overlay');
         this.$propayPage = $('.payment-section', '.fmholder');
 
@@ -1320,6 +1336,7 @@ var addressDialog = {
         var proPrice;
         var numOfMonths;
         var monthsWording;
+        let hasIcon = true;
 
         if (!is_mobile) {
             // Hide the warning message when the registerb dialog gets open each time.
@@ -1358,6 +1375,9 @@ var addressDialog = {
 
             // Get the selected Pro plan details
             proNum = selectedPackage[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
+            if (!pro.filter.simple.hasIcon.has(proNum)) {
+                hasIcon = false;
+            }
             proPlan = pro.getProPlanName(proNum);
             proPrice = selectedPackage[pro.UTQA_RES_INDEX_PRICE];
             numOfMonths = selectedPackage[pro.UTQA_RES_INDEX_MONTHS];
@@ -1396,8 +1416,6 @@ var addressDialog = {
             numOfMonths = this.businessPlan.m;
             this.numOfMonths = numOfMonths;
 
-            // auto renew is mandatory in business
-            this.$dialog.find('.payment-buy-now span').text(l[6172]);
             // recurring is mandatory in business
             this.$dialog.find('.payment-plan-txt .recurring').text(`(${l[6965]})`);
         }
@@ -1428,7 +1446,6 @@ var addressDialog = {
 
             // Set the date to current date e.g. 3 May 2022 (will be converted to local language wording/format)
             const date = new Date();
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
             date.setMonth(date.getMonth() + numOfMonths);
 
             // Get the selected Pro plan name
@@ -1441,7 +1458,7 @@ var addressDialog = {
             // Update text for "When the #-month/year promotion ends on 26 April, 2024 you will start a
             // recurring monthly/yearly subscription for Pro I of EUR9.99 and your card will be billed monthly/yearly."
             discountRecurringText = mega.icu.format(discountRecurringText, monthsOrYears);
-            discountRecurringText = discountRecurringText.replace('%1', date.toLocaleDateString(undefined, options));
+            discountRecurringText = discountRecurringText.replace('%1', time2date(date.getTime() / 1000, 2));
             discountRecurringText = discountRecurringText.replace('%2', proPlanName);
             discountRecurringText = discountRecurringText.replace('%3', formatCurrency(regularMonthlyPrice));
 
@@ -1452,8 +1469,20 @@ var addressDialog = {
 
 
         // Update template
-        this.$dialog.find('.plan-icon').removeClass('pro1 pro2 pro3 pro4 pro101 business')
-            .addClass(proNum);
+        const $planIcon = this.$dialog.find('.plan-icon');
+        $planIcon.removeClass('pro1 pro2 pro3 pro4 pro101 business feature');
+
+        if (this.proNum === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
+            $planIcon.addClass('feature');
+            $('i.feature', $planIcon).attr('class', 'feature sprite-fm-uni icon-crest-vpn');
+        }
+        else if (hasIcon) {
+            $planIcon.addClass(proNum);
+        }
+        else {
+            $planIcon.addClass('no-icon');
+        }
+
         this.$dialog.find('.payment-plan-title').text(proPlan);
         this.$dialog.find('.payment-plan-txt .duration').text(monthsWording);
         this.proPrice = formatCurrency(proPrice);
@@ -1470,6 +1499,14 @@ var addressDialog = {
         this.cityMegaInput = new mega.ui.MegaInputs($('.city', this.$dialog));
         this.postCodeMegaInput = new mega.ui.MegaInputs($('.postcode', this.$dialog));
         this.taxCodeMegaInput = new mega.ui.MegaInputs($('.taxcode', this.$dialog));
+
+        this.firstNameMegaInput.$input.rebind('focus.logFnEvent', () => eventlog(500450));
+        this.lastNameMegaInput.$input.rebind('focus.logLnEvent', () => eventlog(500451));
+        this.addressMegaInput.$input.rebind('focus.logAddEvent', () => eventlog(500452));
+        this.address2MegaInput.$input.rebind('focus.logAdd2Event', () => eventlog(500453));
+        this.cityMegaInput.$input.rebind('focus.logCityEvent', () => eventlog(500454));
+        this.postCodeMegaInput.$input.rebind('focus.logPcEvent', () => eventlog(500455));
+        this.taxCodeMegaInput.$input.rebind('focus.logTaxEvent', () => eventlog(500456));
 
         if (!is_mobile) {
             // Keep the ps scrollbar block code after remove the hidden class from the dialog
@@ -1589,7 +1626,9 @@ var addressDialog = {
         // Initialise the selectmenu
         this.bindPaymentSelectEvents($countriesSelect);
 
-        $countriesSelect.removeClass('disabled').removeAttr('disabled');
+        $countriesSelect
+            .rebind('click.logEvent', () => eventlog(500449))
+            .removeClass('disabled').removeAttr('disabled');
     },
 
     /**
@@ -1610,21 +1649,22 @@ var addressDialog = {
         const $titleElemTaxCode = $('.mega-input-title', $taxcodeMegaInput.$input.parent());
         const $titleElemPostCode = $('.mega-input-title', $postcodeInput.$input.parent());
 
+        const countryCode = $('.option[data-state="active"]', $countriesSelect).attr('data-value');
+        const fullTaxName = `${getTaxName(countryCode)} ${l[7347]}`;
         if ($titleElemTaxCode.length) {
-            $taxcodeMegaInput.updateTitle('VAT ' + l[7347]);
+            $taxcodeMegaInput.updateTitle(fullTaxName);
         }
         else {
-            $taxcodeMegaInput.$input.attr('placeholder','VAT ' + l[7347]);
+            $taxcodeMegaInput.$input.attr('placeholder', fullTaxName);
         }
 
         // Change the States depending on the selected country
         var changeStates = function(selectedCountryCode) {
 
             // If postcode translations not set, then decalre them.
-            if (addressDialog.localePostalCodeName === undefined
-                || addressDialog.localePostalCodeName === null) {
+            if (!addressDialog.localePostalCodeName) {
 
-                addressDialog.localePostalCodeName = {
+                addressDialog.localePostalCodeName = freeze({
                     "US": "ZIP Code",
                     "CA": "Postal Code",
                     "PH": "ZIP Code",
@@ -1634,17 +1674,17 @@ var addressDialog = {
                     "IE": "Eircode",
                     "BR": "CEP",
                     "IT": "CAP"
-                };
+                });
             }
 
             // If selecting a country whereby the postcode is named differently, update the placeholder value.
-            if (addressDialog.localePostalCodeName.hasOwnProperty(selectedCountryCode)) {
+            if (addressDialog.localePostalCodeName[selectedCountryCode]) {
                 if ($titleElemPostCode.length) {
                     $postcodeInput
                         .updateTitle(addressDialog.localePostalCodeName[selectedCountryCode]);
                 }
                 else {
-                    $postcodeInput.$input.attr('placeholder',addressDialog.localePostalCodeName[selectedCountryCode]);
+                    $postcodeInput.$input.attr('placeholder', addressDialog.localePostalCodeName[selectedCountryCode]);
                 }
             }
             else if ($titleElemPostCode.length) {
@@ -1730,8 +1770,8 @@ var addressDialog = {
 
         // Add the click handler to redirect off site
         this.$dialog.find('.payment-buy-now').rebind('click', function() {
-
             addressDialog.validateAndPay();
+            eventlog(500458);
         });
     },
 
@@ -1739,6 +1779,7 @@ var addressDialog = {
      * Attempt to prefill the info based on the user_attr information.
      */
     prefillInfo: function(billingInfo) {
+        'use strict';
 
         const prefillMultipleInputs = (inputs, value) => {
             if (Array.isArray(inputs)) {
@@ -1751,7 +1792,6 @@ var addressDialog = {
             }
         };
 
-        'use strict';
 
         const getBillingProp = (propName, encoded) => {
             if (!billingInfo[propName] || !encoded) {
@@ -1767,7 +1807,7 @@ var addressDialog = {
             if (this.businessPlan && this.userInfo && this.userInfo.hasOwnProperty(businessAttrName)) {
                 prefillMultipleInputs($input, this.userInfo[businessAttrName]);
             }
-            else if (u_attr && u_attr.hasOwnProperty(Atrrname)) {
+            else if (window.u_attr && u_attr[Atrrname]) {
                 prefillMultipleInputs($input, u_attr[Atrrname]);
             }
             else {
@@ -1779,35 +1819,35 @@ var addressDialog = {
         let noLname = true;
 
         if (billingInfo) {
-            const encodedVer = billingInfo.hasOwnProperty('version');
+            const encodedVer = !!billingInfo.version;
 
-            if (billingInfo.hasOwnProperty('firstname')) {
+            if (billingInfo.firstname) {
                 prefillMultipleInputs(this.firstNameMegaInput, getBillingProp('firstname', encodedVer));
                 noFname = false;
             }
 
-            if (billingInfo.hasOwnProperty('lastname')) {
+            if (billingInfo.lastname) {
                 prefillMultipleInputs(this.lastNameMegaInput, getBillingProp('lastname', encodedVer));
                 noLname = false;
             }
 
-            if (billingInfo.hasOwnProperty('address1')) {
+            if (billingInfo.address1) {
                 prefillMultipleInputs(this.addressMegaInput, getBillingProp('address1', encodedVer));
             }
 
-            if (billingInfo.hasOwnProperty('address2')) {
+            if (billingInfo.address2) {
                 prefillMultipleInputs(this.address2MegaInput, getBillingProp('address2', encodedVer));
             }
 
-            if (billingInfo.hasOwnProperty('city')) {
+            if (billingInfo.city) {
                 prefillMultipleInputs(this.cityMegaInput, getBillingProp('city', encodedVer));
             }
 
-            if (billingInfo.hasOwnProperty('postcode')) {
+            if (billingInfo.postcode) {
                 prefillMultipleInputs(this.postCodeMegaInput, getBillingProp('postcode', encodedVer));
             }
 
-            if (billingInfo.hasOwnProperty('taxCode')) {
+            if (billingInfo.taxCode) {
                 prefillMultipleInputs(this.taxCodeMegaInput, getBillingProp('taxCode', encodedVer));
             }
         }
@@ -1833,7 +1873,7 @@ var addressDialog = {
             }
 
             var finished = function() {
-                if (!billingInfo.hasOwnProperty('country') || !billingInfo.country) {
+                if (!billingInfo.country) {
                     billingInfo.country = u_attr.country ? u_attr.country : u_attr.ipcc;
                 }
                 promise.resolve(billingInfo);
@@ -1841,15 +1881,15 @@ var addressDialog = {
 
             if (self.businessPlan && u_attr.b) {
                 self.fetchBusinessInfo().always(function(businessInfo) {
-                    businessInfo = businessInfo || {};
-                    var attributes = ["address1","address2","city","state","country","postcode"];
+                    const attributes = ["address1", "address2", "city", "state", "country", "postcode"];
+
+                    businessInfo = businessInfo || Object.create(null);
                     for (var i = 0; i < attributes.length; i++) {
                         var attr = attributes[i];
                         var battr = attr === "postcode" ? '%zip' : '%' + attr;
-                        if (!billingInfo.hasOwnProperty(attr) || !billingInfo[attr]) {
-                            if (businessInfo.hasOwnProperty(battr) && businessInfo[battr]) {
-                                billingInfo[attr] = businessInfo[battr];
-                            }
+
+                        if (!billingInfo[attr] && businessInfo[battr]) {
+                            billingInfo[attr] = businessInfo[battr];
                         }
                     }
                     finished();
@@ -1874,8 +1914,8 @@ var addressDialog = {
             '%name', '%address1', '%address2', '%city', '%state', '%country', '%zip'
         ];
         var done = 0;
-        var businessInfo = {};
         var timeout = null;
+        const businessInfo = Object.create(null);
 
         var loaded = function(res, ctx) {
             if (typeof res !== 'number') {
@@ -1915,6 +1955,9 @@ var addressDialog = {
             else {
                 self.$rememberDetailsCheckbox.addClass('checkboxOn').removeClass('checkboxOff');
             }
+
+            eventlog(500457);
+
             return false;
         });
     },
@@ -1946,6 +1989,8 @@ var addressDialog = {
                     loadSubPage('repay');
                 }
             }
+
+            eventlog(500459);
         });
     },
 
@@ -1954,8 +1999,10 @@ var addressDialog = {
      */
     closeDialog: function() {
 
-        this.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
-        this.$dialog.removeClass('active').addClass('hidden');
+        if (this.$backgroundOverlay) {
+            this.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
+            this.$dialog.removeClass('active').addClass('hidden');
+        }
     },
 
     /**
@@ -1998,6 +2045,8 @@ var addressDialog = {
         $errorMessage.addClass(is_mobile ? 'v-hidden' : 'hidden');
         $errorMessageContainers.addClass('hidden');
         $allInputs.removeClass('error');
+        $stateSelect.removeClass('error');
+        $countrySelect.removeClass('error');
 
         // Add red border around the missing fields
         $.each(fieldValues, function(fieldName, value) {
@@ -2094,27 +2143,12 @@ var addressDialog = {
         this.extraDetails.city = fieldValues['city'];
         this.extraDetails.zip_code = fieldValues['postcode'];
         this.extraDetails.country = country;
-        this.extraDetails.recurring = false;
+        this.extraDetails.recurring = true;
         this.extraDetails.taxCode = taxCode;
 
         // If the country is US or Canada, add the state by stripping the country code off e.g. to get QC from CA-QC
         if ((country === 'US') || (country === 'CA')) {
             this.extraDetails.state = state.substr(3);
-        }
-
-        // check if we are coming from business account register
-        if (!this.businessPlan || !this.userInfo) {
-            // Get the value for whether the user wants the plan to renew automatically
-            var autoRenewCheckedValue = $('.renewal-options-list input:checked', '.payment-section').val();
-
-            // If the provider supports recurring payments and the user wants the plan to renew automatically
-            if (autoRenewCheckedValue === 'yes') {
-                this.extraDetails.recurring = true;
-            }
-        }
-        else {
-            // in business accounts recurring is mandatory
-            this.extraDetails.recurring = true;
         }
 
         // Hide the dialog so the loading one will show, then proceed to pay
@@ -2138,6 +2172,44 @@ var addressDialog = {
         window.location = url + '?lang=' + lang;
     },
 
+    /**
+     * Showing the infinite cloak after the payment has been made
+     * @param {String} titleTxt Success title
+     * @param {String} msgTxt Success text
+     * @param {String} btnTxt Success button text
+     * @param {Function} callback Success callback
+     * @returns {void}
+     */
+    showSuccessCloak(titleTxt, msgTxt, btnTxt, callback) {
+        'use strict';
+
+        const div = document.createElement('div');
+        const icon = document.createElement('i');
+        const title = document.createElement('p');
+        const text = document.createElement('p');
+
+        title.className = 'font-h3-bold my-4';
+        text.className = 'mb-10 mt-0';
+        div.className = 'payment-success-cloak flex flex-column justify-center items-center';
+        icon.className = 'sprite-fm-mono icon-check-circle-thin-outline';
+        title.textContent = titleTxt;
+        text.textContent = msgTxt;
+
+        div.appendChild(icon);
+        div.appendChild(title);
+        div.appendChild(text);
+
+        const button = new MButton(
+            btnTxt,
+            null,
+            callback,
+            'mega-button large positive'
+        );
+
+        div.appendChild(button.el);
+        document.body.appendChild(div);
+    },
+
     stripePaymentChecker: function(saleId) {
         'use strict';
         addressDialog.stripeCheckerCounter++;
@@ -2152,38 +2224,60 @@ var addressDialog = {
         // If saleId is already an array of sale IDs use that, otherwise add to an array
         const saleIdArray = Array.isArray(saleId) ? saleId : [saleId];
 
-        api_req({ a: 'utd', s: saleIdArray }, {
-            callback: (res) => {
+        api.screq({a: 'utd', s: saleIdArray})
+            .then(({result}) => {
+                assert(typeof result === 'string');
 
-                if (typeof res === 'string') {
+                if (typeof result === 'string') {
                     // success
                     const $stripeDialog = $('.payment-stripe-dialog');
-                    const $stripeSuccessDialog = $('.payment-stripe-success-dialog');
                     const $stripeIframe = $('iframe#stripe-widget', $stripeDialog);
 
-                    // If this is newly created business account, it then requires verification
-                    if (addressDialog.userInfo && !addressDialog.userInfo.isUpgrade) {
-                        $('.success-desc', $stripeSuccessDialog).safeHTML(l[25081]);
-                        $('button.js-close, .btn-close-dialog', $stripeSuccessDialog).addClass('hidden');
+                    if (parseInt(pro.propay.planNum) === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
+                        this.showSuccessCloak(
+                            l[6961],
+                            l.vpn_purchase_success_txt.replace('%1', u_attr.email || ''),
+                            l.vpn_goto,
+                            () => {
+                                mega.redirect('mega.io', 'vpn#downloadapps', false, false);
+                            }
+                        );
+
+                        pro.propay.hideLoadingOverlay();
                     }
                     else {
-                        $('button.js-close, .btn-close-dialog', $stripeSuccessDialog)
-                            .removeClass('hidden')
-                            .rebind('click.stripeDlg', closeDialog);
+                        const $stripeSuccessDialog = $('.payment-stripe-success-dialog');
 
-                        delay('reload:stripe', pro.redirectToSite, 4000);
+                        // If this is newly created business account, it then requires verification
+                        if (addressDialog.userInfo && !addressDialog.userInfo.isUpgrade) {
+                            $('.success-desc', $stripeSuccessDialog).safeHTML(l[25081]);
+                            $('button.js-close, .btn-close-dialog', $stripeSuccessDialog).addClass('hidden');
+                        }
+                        else {
+                            $('button.js-close, .btn-close-dialog', $stripeSuccessDialog)
+                                .removeClass('hidden')
+                                .rebind('click.stripeDlg', closeDialog);
+
+                            delay('reload:stripe', pro.redirectToSite, 4000);
+                        }
+
+                        M.safeShowDialog('stripe-pay-success', $stripeSuccessDialog);
                     }
 
                     $stripeIframe.remove();
                     $stripeDialog.addClass('hidden');
-                    M.safeShowDialog('stripe-pay-success', $stripeSuccessDialog);
                 }
-                else {
+
+            })
+            .catch((ex) => {
+                if (ex === ENOENT) {
                     pro.propay.paymentStatusChecker =
                         setTimeout(addressDialog.stripePaymentChecker.bind(addressDialog, saleId), nextTick);
                 }
-            }
-        });
+                else {
+                    tell(ex);
+                }
+            });
     },
 
     stripeFrameHandler: function(event) {
@@ -2200,21 +2294,57 @@ var addressDialog = {
             const $stripeFailureDialog = $('.payment-stripe-failure-dialog');
             const $stripeIframe = $('iframe#stripe-widget', $stripeDialog);
 
-            $('button.js-close, .btn-close-dialog', $stripeFailureDialog).rebind('click.stripeDlg', closeDialog);
+            $('button.js-close, .btn-close-dialog', $stripeFailureDialog).rebind('click.stripeDlg', () => {
 
-            $('.stripe-error', $stripeFailureDialog).text(error || '');
+                closeDialog();
+                // if we are coming from business plan, we need to reset registration
+                if (addressDialog.businessPlan && addressDialog.userInfo) {
+                    if (page === 'registerb') {
+                        page = '';
+                        loadSubPage('registerb');
+                    }
+                    else if (page === 'repay') {
+                        page = '';
+                        loadSubPage('repay');
+                    }
+                }
+            });
+
+            $('.stripe-error', $stripeFailureDialog).safeHTML(error || '');
 
             if (addressDialog.stripeSaleId === 'EDIT') {
                 $((is_mobile ? '.fail-head' : '.payment-stripe-failure-dialog-title'), $stripeFailureDialog)
                     .text(l.payment_gw_update_fail);
-                $('.err-txt', $stripeFailureDialog).safeHTML(l.payment_gw_update_fail_desc
-                    .replace('[A]', '<a href="mailto:support@mega.nz">')
-                    .replace('[/A]', '</a>'));
             }
 
             $stripeIframe.remove();
-            $stripeDialog.addClass('hidden');
+            closeStripeDialog();
             M.safeShowDialog('stripe-pay-failure', $stripeFailureDialog);
+        };
+
+        const getErrorText = (failData) => {
+            // failData[2] = error code from megapay
+            // failData[3] = decline code (if it exists) from megapay
+            if (typeof failData === 'object') {
+                if (failData[3] === 'insufficient_funds') { // Insufficient funds
+                    return l.stripe_insufficient_funds_error;
+                }
+                if (failData[3] === 'generic_decline') { // Generic error
+                    return l.stripe_generic_decline_error;
+                }
+                if (failData[2] === 'incorrect_cvc') { // Incorrect security code
+                    return l.stripe_incorrect_cvc_error;
+                }
+                if (failData[2] === 'card_declined') { // Declined
+                    return l.stripe_card_declined_error;
+                }
+
+                // Return result.error.message from megapay if the above checks fail
+                return failData[1];
+            }
+
+            // Return the card declined error if failData isn't an object or is empty
+            return l.stripe_card_declined_error;
         };
 
         if (event && event.origin === addressDialog.gatewayOrigin && event.data) {
@@ -2240,21 +2370,26 @@ var addressDialog = {
                 return;
             }
             if (event.data.startsWith('payfail^')) {
-                failHandle(event.data.split('^')[1]);
+                failHandle(getErrorText(event.data.split('^')));
             }
             else if (event.data === 'paysuccess') {
 
                 if (addressDialog.stripeSaleId === 'EDIT') {
-                    closeDialog();
+                    closeStripeDialog();
 
-                    msgDialog('info', '', l.payment_card_update, l.payment_card_update_desc, () => {
-                        if (!is_mobile && page.includes('fm/account/plan')) {
-                            accountUI.plan.init(M.account);
+                    if (is_mobile) {
+                        if (page === 'fm/account/paymentcard') {
+                            mega.ui.toast.show(l.payment_card_update_desc, 6);
+                            loadSubPage('fm/account');
                         }
-                        else if (is_mobile && page === 'fm/account/paymentcard') {
-                            mobile.account.paymentCard.init();
-                        }
-                    });
+                    }
+                    else {
+                        msgDialog('info', '', l.payment_card_update, l.payment_card_update_desc, () => {
+                            if (page.startsWith('fm/account/plan')) {
+                                accountUI.plan.init(M.account);
+                            }
+                        });
+                    }
                 }
                 else {
                     addressDialog.stripeCheckerCounter = 0;
@@ -2267,7 +2402,7 @@ var addressDialog = {
             else if (event.data.startsWith('action^')) {
                 const destURL = event.data.split('^')[1] || '';
                 if (!destURL) {
-                    failHandle();
+                    failHandle(getErrorText());
                 }
                 else {
                     window.location = destURL;
@@ -2309,12 +2444,18 @@ var addressDialog = {
         'use strict';
         this.gatewayOrigin = null;
 
+        if (!utcResult.EUR) {
+            console.error('unexpected result...', utcResult);
+            utcResult.EUR = false;
+        }
+
         if (isStripe) {
             this.stripeSaleId = null;
             if (utcResult.EUR) {
                 const $stripeDialog = $('.payment-stripe-dialog');
                 const $iframeContainer =
-                    $('.fm-dialog.mobile.payment-stripe-dialog, .mega-dialog.payment-stripe-dialog .iframe-container');
+                    $('.mobile.payment-stripe-dialog .iframe-container,' +
+                          ' .mega-dialog.payment-stripe-dialog .iframe-container');
                 let $stripeIframe = $('iframe#stripe-widget', $stripeDialog);
                 $stripeIframe.remove();
                 const sandBoxCSP = 'allow-scripts allow-same-origin allow-forms'
@@ -2914,6 +3055,8 @@ var cardDialog = {
 
         insertEmailToPayResult(cardDialog.$successOverlay);
 
+        // Send some data to mega.io that we updated the Pro plan
+        initMegaIoIframe(true, proNum);
 
         // Add click handlers for 'Go to my account' and Close buttons
         cardDialog.$successOverlay.find('.payment-result-button, .payment-close').rebind('click', function() {
@@ -3066,8 +3209,7 @@ var bitcoinDialog = {
 
         // Set details
         var bitcoinAddress = apiResponse.address;
-        var bitcoinUrl = 'bitcoin:' + apiResponse.address + '?amount=' + apiResponse.amount;
-        var invoiceDateTime = time2date(apiResponse.created, 5);
+        var invoiceDateTime = time2date(apiResponse.created, 7);
         invoiceDateTime = invoiceDateTime[0].toUpperCase() + invoiceDateTime.substring(1);
         var proPlanNum = pro.propay.selectedProPackage[1];
         var planName = pro.getProPlanName(proPlanNum);
@@ -3102,7 +3244,6 @@ var bitcoinDialog = {
         bitcoinDialog.generateBitcoinQrCode($bitcoinDialog, bitcoinAddress, priceBitcoins);
 
         // Update details inside dialog
-        $bitcoinDialog.find('.btn-open-wallet').attr('href', bitcoinUrl);
         $bitcoinDialog.find('.bitcoin-address').text(bitcoinAddress);
         $bitcoinDialog.find('.invoice-date-time').text(invoiceDateTime);
         $bitcoinDialog.find('.plan-icon').addClass('pro' + proPlanNum);
@@ -3189,7 +3330,6 @@ var bitcoinDialog = {
             else {
                 // Grey out and hide details as the price has expired
                 dialog.find('.scan-code-instruction').css('opacity', '0.25');
-                dialog.find('.btn-open-wallet').css('visibility', 'hidden');
                 dialog.find('.bitcoin-address').css('visibility', 'hidden');
                 dialog.find('.bitcoin-qr-code').css('opacity', '0.15');
                 dialog.find('.qr-code-mega-icon').hide();
@@ -3249,22 +3389,6 @@ var bitcoinDialog = {
         });
     }
 };
-
-if (is_chrome_firefox) {
-    mBroadcaster.once('startMega', function() {
-        "use strict";
-
-        unionPay.redirectToSite =
-        sabadell.redirectToSite =
-            tryCatch(function(res) {
-                mozSendPOSTRequest(res.EUR.url, res.EUR.postdata);
-            }, function(error) {
-                msgDialog('warninga', l[135], l[47], error, function() {
-                    pro.propay.hideLoadingOverlay();
-                });
-            });
-    });
-}
 
 var insertEmailToPayResult = function($overlay) {
     "use strict";

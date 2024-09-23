@@ -6,22 +6,26 @@ import { API } from '../../gifPanel/gifPanel.jsx';
 
 export default class Giphy extends AbstractGenericMessage {
     gifRef = React.createRef();
+    viewStateListener = `viewstateChange.giphy--${this.getUniqueId()}`;
 
     state = { src: undefined };
 
     componentDidMount() {
         super.componentDidMount();
-        megaChat.rebind(`viewstateChange.gif${this.getUniqueId()}`, e => {
-            const { state } = e.data;
-            if (state === 'active' && this.gifRef.current.paused || state !== 'active' && !this.gifRef.current.paused) {
-                this.toggle();
+        megaChat.rebind(this.viewStateListener, ({ data }) => {
+            const gifRef = this.gifRef && this.gifRef.current;
+            if (gifRef) {
+                const { state } = data;
+                if (state === 'active' && gifRef.paused || state !== 'active' && !gifRef.paused) {
+                    this.toggle();
+                }
             }
         });
     }
 
     componentWillUnmount() {
         super.componentWillUnmount();
-        megaChat.off(`viewstateChange.gif${this.getUniqueId()}`);
+        megaChat.off(this.viewStateListener);
     }
 
     onVisibilityChange(isIntersecting) {
@@ -79,7 +83,7 @@ export default class Giphy extends AbstractGenericMessage {
                 controls={false}
                 width={w}
                 height={h}
-                style={{ cursor: autoPlay ? 'default' : 'pointer' }}
+                style={{ cursor: autoPlay ? 'default' : 'pointer', height: `${h}px` }}
                 onClick={() => !autoPlay && this.toggle()}
                 src={
                     /* hideActionButtons -> message preview rendered within the delete confirmation dialog */

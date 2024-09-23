@@ -99,15 +99,18 @@ lazy(mega, 'fileRequestUpload', () => {
     // Quota related
     ERROR_TASK_MESSAGES[EOVERQUOTA] = {
         taskType: ERROR_TASK_TYPE_GENERAL,
-        type: ERROR_TYPE_QUOTA
+        type: ERROR_TYPE_QUOTA,
+        message: l[1010]
     };
     ERROR_TASK_MESSAGES[EGOINGOVERQUOTA] = {
         taskType: ERROR_TASK_TYPE_GENERAL,
-        type: ERROR_TYPE_QUOTA
+        type: ERROR_TYPE_QUOTA,
+        message: l[1010]
     };
     ERROR_TASK_MESSAGES[ESHAREROVERQUOTA] = {
         taskType: ERROR_TASK_TYPE_GENERAL,
-        type: ERROR_TYPE_QUOTA
+        type: ERROR_TYPE_QUOTA,
+        message: l[8435]
     };
     ERROR_TASK_MESSAGES[EPAYWALL] = {
         taskType: ERROR_TASK_TYPE_GENERAL,
@@ -151,8 +154,6 @@ lazy(mega, 'fileRequestUpload', () => {
             this.checkEvent(event);
             optionReference.touchedElement = 0;
 
-            let file;
-            let filesize = 0;
             const targetId = mega.fileRequestUpload
                 .getUploadPagePuHandle();
 
@@ -162,10 +163,7 @@ lazy(mega, 'fileRequestUpload', () => {
             const dataTransfer = Object(event.dataTransfer);
             const files = event.target.files || dataTransfer.files;
 
-            const isGecko = dataTransfer && ("mozItemCount" in dataTransfer
-                || browserdetails(ua).browser === 'Firefox');
-
-            if ((!files || files.length === 0) && (!is_chrome_firefox || !dataTransfer.mozItemCount)) {
+            if (!files || !files.length) {
                 return false;
             }
 
@@ -177,9 +175,8 @@ lazy(mega, 'fileRequestUpload', () => {
             }
 
             for (let i = 0; files[i]; i++) {
-                file = files[i];
+                const file = files[i];
                 let path = null;
-                let gecko = null;
 
                 if (file.webkitRelativePath) {
                     path = String(file.webkitRelativePath)
@@ -189,34 +186,29 @@ lazy(mega, 'fileRequestUpload', () => {
                         );
                 }
 
-                if (isGecko) {
-                    gecko = true;
-                }
-
                 if (file.name !== '.') {
                     // FIXME: Improve
                     // eslint-disable-next-line local-rules/hints
                     try {
-                        // this could throw NS_ERROR_FILE_NOT_FOUND
-                        filesize = file.size;
                         const newName = mega.fileRequestUpload.uploadPage.getName(file.name);
-                        const newFile = new File([file], newName, { type: file.type });
-                        newFile.target = targetId;
-                        newFile.flashid = false;
-                        newFile.id = this.uploadId++;
-                        newFile.ownerId = ownerHandle;
-                        newFile.path = path;
-                        newFile.gecko = gecko;
+                        if (newName !== file.name) {
+                            Object.defineProperty(file, 'name', {
+                                value: newName,
+                                writable: true,
+                                configurable: true
+                            });
+                        }
+                        file.target = targetId;
+                        file.id = this.uploadId++;
+                        file.ownerId = ownerHandle;
+                        file.path = path;
 
-                        ul_queue.push(newFile);
+                        ul_queue.push(file);
 
-                        const status = l[7227];
-                        mega.fileRequestUpload
-                            .uploadPage
-                            .addItem(newFile.id, newFile.name, status, filesize);
+                        mega.fileRequestUpload.uploadPage.addItem(file.id, file.name, l[7227], file.size);
 
                         if (is_mobile) {
-                            M.addToTransferTable('ul_' + file.id, file);
+                            M.addToTransferTable(`ul_${file.id}`, file);
                         }
                     }
                     catch (ex) {
@@ -287,7 +279,12 @@ lazy(mega, 'fileRequestUpload', () => {
             this.initialized = false;
             this.error = false;
             this.errorHandlerInitialized = false;
-            this.id = null;
+            this.itemCompleted = Object.create(null);
+            this.stopped = false;
+
+            lazy(this, 'id', () => {
+                return getCleanSitePath().includes('!uid=0') ? '' : makeid(6);
+            });
         }
 
         init() {
@@ -319,6 +316,7 @@ lazy(mega, 'fileRequestUpload', () => {
             this.$labelTitle = $('.detail-title', this.$wrapper);
             this.$labelDescription = $('.detail-description', this.$wrapper);
             this.$labelUploadId = $('.detail-upload-id .upload-id', this.$wrapper);
+            this.$labelUploadIdWrapper = $('.detail-upload-id', this.$wrapper);
 
             this.$selectFileButton = $('#fileselect5', document.body);
             this.$uploadItems = $('.block-uploading-scroll', this.$wrapper);
@@ -447,7 +445,7 @@ lazy(mega, 'fileRequestUpload', () => {
                     .text(formattedName);
             }
 
-            this.$wrapperDetail.removeClass('content-error');
+            this.$wrapperDetail.removeClass('hidden content-error');
             this.$labelTitle
                 .addClass('hidden')
                 .text('');
@@ -459,9 +457,6 @@ lazy(mega, 'fileRequestUpload', () => {
                 this.$wrapperDetail.addClass('content-error');
             }
 
-            this.initId();
-            this.$labelUploadId.text(this.id);
-
             if (title) {
                 this.$labelTitle.removeClass('hidden');
                 this.$labelTitle.text(title);
@@ -469,6 +464,13 @@ lazy(mega, 'fileRequestUpload', () => {
             if (description) {
                 this.$labelDescription.removeClass('hidden');
                 this.$labelDescription.text(description);
+            }
+
+            if (this.id) {
+                this.$labelUploadId.text(this.id);
+            }
+            else if (!(error || title || description)) {
+                this.$wrapperDetail.addClass('hidden');
             }
         }
 
@@ -488,16 +490,21 @@ lazy(mega, 'fileRequestUpload', () => {
 
         onItemUploadCompletion(id) { // Complete Item
             const gid = `ul_${id}`;
-            const $item = this.queue.items[`#${gid}`].$;
-            $item.status.text(l.file_request_upload_status_uploaded);
-            $item.progress.css('width', `100%`);
+            const item = this.queue.items[`#${gid}`];
+            const $itemElement = item.$;
+
+            $itemElement.status.text(l.file_request_upload_status_uploaded);
+            $itemElement.progress.css('width', `100%`);
+            item.completed = true;
 
             delay('filerequest.log', eventlog.bind(null, 99776)); // upload count
+
+            this.addItemCompleted(id);
         }
 
         onUploadCompletion() { // Overall completion
             this.stats.currentSize = this.stats.totalSize;
-            this.stats.current = this.stats.total;
+            this.stats.current = this.getCompletedItems();
 
             this.updateUploadInfo();
         }
@@ -518,18 +525,19 @@ lazy(mega, 'fileRequestUpload', () => {
             // Update specific upload item
             if (perc >= 100) {
                 $item.$.status.text(l.file_request_upload_status_uploaded);
-                this.stats.current += 1;
-                this.updateUploadInfo();
             }
             else {
                 $item.$.status.text(formatPercentage(perc / 100));
             }
 
             $item.$.progress.css('width', `${perc}%`);
-            $item.currentSize = bl;
             $item.percent = perc;
 
-            if (!$item.$.element) {
+            if (bl) {
+                $item.currentSize = bl;
+            }
+
+            if ($item.$.element) {
                 $item.$.element.removeClass('transfer-initiliazing transfer-queued');
                 $item.$.element.addClass('transfer-started');
             }
@@ -543,7 +551,14 @@ lazy(mega, 'fileRequestUpload', () => {
             }
         }
 
-        onItemUploadError(abort, uid, error) { // Item Upload
+        onItemUploadError(abort, uid, error, ignoreGeneral) { // Item Upload
+            this.removeItemCompleted(uid);
+
+            // Upload has been stopped after a showstopper.
+            if (this.stopped) {
+                return;
+            }
+
             const prefix = 'ul_';
             const cacheId = `#${prefix}${uid}`;
             const $item = this.cacheUploadItem(cacheId);
@@ -551,63 +566,72 @@ lazy(mega, 'fileRequestUpload', () => {
             const $errorMessage = $('.error-message', $item.$.error);
             const $errorReupload = $('.error-reupload', $item.$.error);
 
+            $item.completed = false;
             $item.$.error.removeClass('hidden');
 
             // Hide status when there is an upload error
             $item.$.status.addClass('hidden');
+            $errorReupload.addClass('hidden');
 
             let errorType = null;
 
             let message = api_strerror(error);
-
             let errorTaskObject = ERROR_TASK_MESSAGES[error];
             if (!errorTaskObject) {
                 errorTaskObject = {
                     taskType: ERROR_TASK_TYPE
                 };
-                message = l[1578];
+                message =  l[1578];
             }
 
-            const { taskType } = errorTaskObject;
+            const { taskType, message: taskMessage } = errorTaskObject;
             if (errorTaskObject.type) {
                 errorType = errorTaskObject.type;
             }
 
-            if (errorType && taskType === ERROR_TASK_TYPE_GENERAL) { // Show stoppers
-                switch (errorType) {
-                    case ERROR_TYPE_ACCOUNT:
-                        mBroadcaster.sendMessage('FileRequest:disabled');
-                        break;
-                    case ERROR_TYPE_INVALID:
-                        mBroadcaster.sendMessage('FileRequest:invalid');
-                        break;
-                    case ERROR_TYPE_QUOTA:
-                        mBroadcaster.sendMessage('FileRequest:overquota');
-                        break;
-                }
-
-                // Abort all upload - show stopper
-                if (!abort) {
-                    ulmanager.abort(null);
-                }
-                return;
+            if (taskMessage) {
+                message = taskMessage;
             }
 
-            if (taskType === ERROR_TASK_TYPE) {
-                $errorReupload.removeClass('hidden');
-                const gid = `ul_${uid}`;
-
-                if (!abort) {
-                    ulmanager.abort(gid);
+            let gid = null;
+            if (errorType && taskType === ERROR_TASK_TYPE_GENERAL && !ignoreGeneral) { // Show stoppers
+                switch (errorType) {
+                    case ERROR_TYPE_ACCOUNT:
+                        mBroadcaster.sendMessage('FileRequest:disabled', error);
+                        break;
+                    case ERROR_TYPE_INVALID:
+                        mBroadcaster.sendMessage('FileRequest:invalid', error);
+                        break;
+                    case ERROR_TYPE_QUOTA:
+                        mBroadcaster.sendMessage('FileRequest:overquota', error);
+                        break;
                 }
-                $errorMessage.text(message);
-                return;
+
+                this.stopped = true;
+            }
+            else if (taskType === ERROR_TASK_TYPE) {
+                $errorReupload.removeClass('hidden');
+                gid = `ul_${uid}`;
+            }
+
+            if (ignoreGeneral) {
+                $errorReupload.addClass('hidden');
             }
 
             if (d) {
-                logger.info('Upload - Page.onItemUploadError - Default', uid, error);
+                logger.info('Upload - Page.onItemUploadError', uid, error);
             }
+
+            if (!abort) {
+                ulmanager.abort(gid);
+            }
+
             $errorMessage.text(message);
+            this.onItemUploadProgress({
+                id: uid
+            }, 0, 0, 100, 0);
+
+            $item.$.element.addClass('transfer-error');
         }
 
         createItem(id, name, size, status) {
@@ -676,12 +700,13 @@ lazy(mega, 'fileRequestUpload', () => {
                 item.currentSize = 0;
                 item.totalSize = 0;
                 item.percent = 0;
+                item.completed = false;
             }
 
             return item;
         }
 
-        handleError(type) {
+        handleError(type, error) {
             if (type === undefined) {
                 type = ERROR_TYPE_INVALID;
             }
@@ -707,12 +732,33 @@ lazy(mega, 'fileRequestUpload', () => {
                 true
             );
 
-            this.$wrapperEmptyBlock
-                .addClass('block-empty-error')
-                .removeClass('hidden');
+            if (this.hasItemCompleted()) {
+                this.setErrorOnIncompleteItems(error);
+                return;
+            }
+
+            this.showEmptyBlockError();
 
             this.$wrapperItems.addClass('hidden');
             this.$wrapperStatus.addClass('hidden');
+
+            this.$labelUploadIdWrapper.addClass('hidden');
+        }
+
+        setErrorOnIncompleteItems(error) {
+            const keys = Object.keys(this.queue.items);
+            if (keys) {
+                keys.forEach((value) => {
+                    const item = this.queue.items[value];
+
+                    if (!item || item.completed) {
+                        return;
+                    }
+
+                    const fileId = value.replace('#ul_', '');
+                    mBroadcaster.sendMessage('upload:abort', fileId, error, true);
+                });
+            }
         }
 
         hasError() {
@@ -721,6 +767,32 @@ lazy(mega, 'fileRequestUpload', () => {
 
         setError(error) {
             this.error = error;
+        }
+
+        addItemCompleted(uid) {
+            this.itemCompleted[uid] = true;
+            this.updateItemCompletedInfo();
+        }
+
+        removeItemCompleted(uid) {
+            if (this.itemCompleted[uid]) {
+                delete this.itemCompleted[uid];
+            }
+
+            this.updateItemCompletedInfo();
+        }
+
+        updateItemCompletedInfo() {
+            this.stats.current = this.getCompletedItems();
+            this.updateUploadInfo();
+        }
+
+        hasItemCompleted() {
+            return this.getCompletedItems() > 0;
+        }
+
+        getCompletedItems() {
+            return Object.keys(this.itemCompleted).length;
         }
 
         initUploadErrorEventHandler() {
@@ -736,14 +808,6 @@ lazy(mega, 'fileRequestUpload', () => {
             this.errorHandlerInitialized = true;
         }
 
-        initId() {
-            if (this.id !== null) {
-                return;
-            }
-
-            this.id = makeid(6);
-        }
-
         getName(name) {
             if (!this.duplicates[name]) {
                 this.duplicates[name] = 0;
@@ -753,12 +817,19 @@ lazy(mega, 'fileRequestUpload', () => {
             const nameArray = name.split('.');
             const ext = nameArray.pop();
             const newName = nameArray.join('.');
+            const id = this.id ? `_${this.id}` : '';
 
             if (index === 1) {
-                return  `${newName}_${this.id}.${ext}`;
+                return `${newName}${id}.${ext}`;
             }
 
-            return `${newName} (${index - 1})_${this.id}.${ext}`;
+            return `${newName} (${index - 1})${id}.${ext}`;
+        }
+
+        showEmptyBlockError() {
+            this.$wrapperEmptyBlock
+                .addClass('block-empty-error')
+                .removeClass('hidden');
         }
     }
 
@@ -771,41 +842,43 @@ lazy(mega, 'fileRequestUpload', () => {
             this.parameters = null;
             this.ownerPublicKey = null;
 
-            lazy(this, 'api', () => mega.fileRequestCommon.api);
-            lazy(this, 'uploadPage', () =>  new FileRequestUploadPage());
+            lazy(this, 'fileRequestApi', () => mega.fileRequestCommon.fileRequestApi);
+            lazy(this, 'uploadPage', () => new FileRequestUploadPage());
 
             this.addEventHandlers();
         }
 
         async handlePublicUploadPage(uploadPagePath) {
             const parameters = this.parseParameters(uploadPagePath);
-            if (parameters.isPreview) {
+            if (parameters.isPreview && !parameters.isUpdate) {
                 this.handlePreview(parameters);
                 return;
             }
+            const {puPageId} = parameters;
 
-            if (!parameters.puPageId) {
-                mBroadcaster
-                    .sendMessage('FileRequest:invalid');
+            if (!puPageId) {
+                mBroadcaster.sendMessage('FileRequest:invalid', 0);
                 return;
             }
+            eventlog(99775);
 
-            delay('filerequest.log', eventlog.bind(null, 99775)); // open upload page - general
-            loadingDialog.show(); // Show the loading
+            let data = is_megadrop.p === puPageId && is_megadrop;
+            if (!data) {
+                loadingDialog.show();
 
-            // Get page
-            this.api
-                .getPuPage(parameters.puPageId)
-                .then((puPage) => {
-                    this.handle(puPage);
-                })
-                .catch((ex) => {
-                    this.handleException(ex, parameters.puPageId);
-                    dump(ex);
-                })
-                .finally(() => {
-                    loadingDialog.hide();
-                });
+                data = await this.fileRequestApi.getPuPage(puPageId)
+                    .catch((ex) => {
+                        logger.error(ex);
+                        this.handleException(ex, puPageId);
+                    })
+                    .finally(() => {
+                        loadingDialog.hide();
+                    });
+            }
+
+            if (data) {
+                this.handle(data);
+            }
         }
 
         initDragAndDrop() {
@@ -849,60 +922,53 @@ lazy(mega, 'fileRequestUpload', () => {
         }
 
         addEventHandlers() {
-            mBroadcaster
-                .addListener(`FileRequest:disabled`, () => {
-                    this.handleDisabled();
-                });
+            mBroadcaster.addListener(`FileRequest:disabled`, (error) => {
+                this.handleDisabled(error);
+            });
 
-            mBroadcaster
-                .addListener(`FileRequest:invalid`, () => {
-                    this.handleInvalid();
-                });
+            mBroadcaster.addListener(`FileRequest:invalid`, (error) => {
+                this.handleInvalid(error);
+            });
 
-            mBroadcaster
-                .addListener(`FileRequest:overquota`, () => {
-                    this.handleOverQuota();
-                });
-
-            mBroadcaster
-                .addListener(`FileRequest:initialized`, () => {
-                    this.handleInitialized();
-                });
-
-            mBroadcaster
-                .addListener(`FileRequest:checked`, () => {
-                    this.handleChecked();
-                });
+            mBroadcaster.addListener(`FileRequest:overquota`, (error) => {
+                this.handleOverQuota(error);
+            });
         }
 
-        handleDisabled() {
-            this.handlePageError(ERROR_TYPE_ACCOUNT);
+        handleDisabled(error) {
+            this.handlePageError(ERROR_TYPE_ACCOUNT, error);
         }
 
-        handleOverQuota() {
-            this.handlePageError(ERROR_TYPE_QUOTA);
+        handleOverQuota(error) {
+            if (error === 0) {
+                error = EOVERQUOTA;
+            }
+
+            this.handlePageError(ERROR_TYPE_QUOTA, error);
         }
 
-        handleInvalid() {
-            this.handlePageError(ERROR_TYPE_INVALID);
+        handleInvalid(error) {
+            this.handlePageError(ERROR_TYPE_INVALID, error);
         }
 
-        handlePageError(type) {
+        handlePageError(type, error) {
             if (!this.uploadPage || !this.uploadPage.isInitialized()) {
                 this.parsePage();
 
-                mega.ui.theme.set(0);
+                mega.ui.setTheme(0);
             }
 
             this.uploadPage.setError(true);
             this.uploadPage.init();
-            this.uploadPage.handleError(type);
+            this.uploadPage.handleError(type, error);
             this.uploadPage.initLanguage();
         }
 
         handleInitialized() {
-            api_create_u_k();// Creates global var u_k
-            u_k_aes = new sjcl.cipher.aes(u_k); // Create key for encrption
+            if (!window.u_k_aes) {
+                api_create_u_k();
+                u_k_aes = new sjcl.cipher.aes(u_k);
+            }
             u_pubkeys[this.ownerHandle] = this.ownerPublicKey; // Store public key for owner
 
             this.uploadPage.initUploadEventHandler();
@@ -911,50 +977,30 @@ lazy(mega, 'fileRequestUpload', () => {
             this.uploadPage.initUploadErrorEventHandler();
         }
 
-        handleChecked() {
+        async handleChecked() {
             this.parsePage();
 
-            mega.ui.theme.set(0);
-
-            const {name, description, msg: title} = this.puHandleObjectData;
+            let {name, description, msg: title} = this.puHandleObjectData;
+            let theme = 0;
 
             this.uploadPage.init();
+            if (this.parameters && this.parameters.isUpdate) {
+                name = this.parameters.name || name;
+                title = this.parameters.title || title;
+                description = this.parameters.description || description;
+                theme = this.parameters.theme;
+            }
+
+            mega.ui.setTheme(theme);
             this.uploadPage.setLabel(name, title, description);
 
-            this.api
+            return this.fileRequestApi
                 .getOwnerPublicKey(this.ownerHandle)
-                .then((res) => {
-                    if (res < 0) {// Get owner privk failed
-                        msgDialog('warninga', l[135], l[47], api_strerror(res));
-                        if (d) {
-                            logger.info(
-                                'Api.getOwnerPublicKey - Failed',
-                                this.ownerHandle,
-                                api_strerror(res)
-                            );
-                        }
-                    }
-                    else {
-                        this.ownerPublicKey = crypto_decodepubkey(base64urldecode(res.pubk));
-                        if (d) {
-                            logger.info(
-                                'Api.getOwnerPublicKey - PUBK',
-                                res
-                            );
-                        }
+                .then((pubk) => {
 
-                        mBroadcaster
-                            .sendMessage('FileRequest:initialized');
-                    }
-                })
-                .catch((ex) => {
-                    dump(ex);
-                    if (d) {
-                        logger.info(
-                            'Api.getOwnerPublicKey - Failed',
-                            ex
-                        );
-                    }
+                    this.ownerPublicKey = crypto_decodepubkey(base64urldecode(pubk));
+
+                    return this.handleInitialized();
                 });
         }
 
@@ -966,13 +1012,14 @@ lazy(mega, 'fileRequestUpload', () => {
             const description = parameters.description || '';
             const theme = parameters.theme !== '' && parseInt(parameters.theme) || 0;
 
-            mega.ui.theme.set(theme);
+            mega.ui.setTheme(theme);
+            this.uploadPage.setError(true);
 
             this.uploadPage.init();
-            this.uploadPage.initUploadEventHandler();
-            InitFileDrag();
             this.uploadPage.setLabel(name, title, description);
             this.uploadPage.initLanguage();
+
+            this.uploadPage.showEmptyBlockError();
         }
 
         handle(puPageObject, puPagePublicHandle) {
@@ -981,8 +1028,7 @@ lazy(mega, 'fileRequestUpload', () => {
                     logger.info('Upload - Api.getPuPage - Disabled', puPageObject);
                 }
 
-                mBroadcaster
-                    .sendMessage('FileRequest:disabled');
+                mBroadcaster.sendMessage('FileRequest:disabled', 0);
                 return;
             }
 
@@ -992,8 +1038,7 @@ lazy(mega, 'fileRequestUpload', () => {
                         logger.info('Upload - Api.getPuPage - Over Quota', api_strerror(puPage));
                     }
 
-                    mBroadcaster
-                        .sendMessage('FileRequest:overquota');
+                    mBroadcaster.sendMessage('FileRequest:overquota', puPageObject);
                     return;
                 }
 
@@ -1001,8 +1046,7 @@ lazy(mega, 'fileRequestUpload', () => {
                     logger.info('Upload - Api.getPuPage - Other', api_strerror(puPage));
                 }
 
-                mBroadcaster
-                    .sendMessage('FileRequest:disabled');
+                mBroadcaster.sendMessage('FileRequest:disabled', puPageObject);
                 return;
             }
 
@@ -1011,8 +1055,7 @@ lazy(mega, 'fileRequestUpload', () => {
                     logger.info('Upload - Api.getPuPage - Empty', puPage);
                 }
 
-                mBroadcaster
-                    .sendMessage('FileRequest:disabled');
+                mBroadcaster.sendMessage('FileRequest:disabled', 0);
                 return;
             }
 
@@ -1025,8 +1068,7 @@ lazy(mega, 'fileRequestUpload', () => {
             this.puHandleObjectData = puPageObject.d;
             this.puPagePublicHandle = puPagePublicHandle;
 
-            mBroadcaster
-                .sendMessage('FileRequest:checked');
+            this.handleChecked().catch(tell);
 
             if (d) {
                 logger.info('Upload - Api.getPuPage - Handle', puPageObject);
@@ -1036,10 +1078,10 @@ lazy(mega, 'fileRequestUpload', () => {
         handleException(exception, puPagePublicHandle) {
             const errorTaskObject = ERROR_TASK_MESSAGES[exception];
             if (errorTaskObject && errorTaskObject.type === ERROR_TYPE_QUOTA) {
-                mBroadcaster.sendMessage(`FileRequest:overquota`);
+                mBroadcaster.sendMessage(`FileRequest:overquota`, exception);
             }
             else {
-                mBroadcaster.sendMessage(`FileRequest:invalid`);
+                mBroadcaster.sendMessage(`FileRequest:invalid`, exception);
             }
 
             if (d) {
@@ -1056,7 +1098,9 @@ lazy(mega, 'fileRequestUpload', () => {
         }
 
         parseParameters(pagePath) {
-            const isPreview = pagePath.substr(0, 1) === '!';
+            const previewIndex = pagePath.indexOf('!');
+            const isPreview = previewIndex > -1;
+            let isUpdate = false;
 
             if (isPreview) {
                 const parsedPath = String(pagePath).split('!');
@@ -1092,17 +1136,42 @@ lazy(mega, 'fileRequestUpload', () => {
                     description,
                     theme
                 };
-
-                return this.parameters;
             }
 
-            const pupHandle = pagePath.substr(0, 14);
+            let pupHandle = null;
+            if (pagePath.substr(0, 1) !== '!') {
+                const endIndex = isPreview ? previewIndex : 14;
+                pupHandle = pagePath.substr(0, endIndex);
+
+                if (isPreview) { // It has a pup handle and has preview parameters
+                    isUpdate = true;
+                }
+            }
+
             this.parameters = {
-                isPreview,
-                puPageId: pupHandle
+                isUpdate,
+                puPageId: pupHandle,
+                ...this.parameters
             };
 
             return this.parameters;
         }
     };
 });
+
+function init_page() {
+    "use strict";
+
+    if (!is_megadrop) {
+        console.error('Invalid FR Navigation...');
+        return location.replace(getBaseUrl());
+    }
+    const page = getCleanSitePath();
+
+    mega.fileRequestUpload.handlePublicUploadPage(page.split('/')[1]).catch(tell);
+}
+
+function topmenuUI() {
+    'use strict';
+    /* nop */
+}

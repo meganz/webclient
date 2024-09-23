@@ -1,0 +1,21 @@
+.mega-component.date-picker,
+.mega-component.date-picker input[type="date"] {
+    width: 100%;
+    height: 48px;
+}
+
+.mega-component.date-picker input[type="date"] {
+    position: absolute;
+    left: 0;
+    opacity: 0;
+}
+.mega-component.date-picker.ios input[type="date"] {
+    z-index: 12;
+    width: calc(100vw - 48px);
+}
+
+@media only screen and (min-width: 769px) {
+    .mega-component.date-picker.ios input[type="date"] {
+        width: var(--mobile-tablet-elem-width);
+    }
+}

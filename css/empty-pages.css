@@ -9,6 +9,7 @@
     text-align: center;
     flex-grow: 1;
     background: var(--surface-grey-1);
+    transition: 200ms linear;
 }
 .fm-empty-pad {
     margin: auto;
@@ -19,7 +20,7 @@
 .fm-empty-section i.section-icon,
 .fm-empty-pad i.section-icon,
 .fm-empty-sharef i.section-icon {
-    --icon-size: 192px;
+    --icon-size: 256px;
     --mask-color: var(--secondary-grey);
     display: inline-block;
 }
@@ -41,6 +42,12 @@
     color: var(--text-color-high);
     font: var(--text-h0);
     margin-top: 8px;
+}
+.add-to-album-dialog .fm-empty-cloud-txt {
+    color: var(--text-color-medium);
+}
+.fm-empty-cloud-txt.empty-md-title {
+    font-weight: bold;
 }
 .fm-empty-description {
     color: var(--text-color-medium);
@@ -69,6 +76,9 @@
     padding: 1px 20px 29px;
     font: var(--text-body1);
     color: var(--text-color-medium);
+}
+.fm-empty-description.empty-md-description {
+    max-width: 480px;
 }
 .fm-empty-options {
     display: flex;

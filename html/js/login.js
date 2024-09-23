@@ -9,7 +9,7 @@ var signin = {
     old: {
 
         /**
-         * Starts the login proceedure
+         * Starts the login proceedure for v1 accounts
          * @param {String} email The user's email address
          * @param {String} password The user's password
          * @param {String|null} pinCode The two-factor authentication PIN code (6 digit number), or null if N/A
@@ -19,12 +19,13 @@ var signin = {
 
             'use strict';
 
+            postLogin(email, password, pinCode, rememberMe)
+                .then((result) => {
 
-            postLogin(email, password, pinCode, rememberMe, (result) => {
-
-                // Otherwise proceed with regular login
-                signin.proceedWithLogin(result);
-            });
+                    signin.proceedWithLogin(result);
+                })
+                .catch(tell)
+                .finally(() => loadingDialog.hide());
         }
     },
 
@@ -92,7 +93,6 @@ var signin = {
             else {
                 // Otherwise proceed with regular login
                 u_type = result;
-                passwordManager('#login_form');
 
                 if (login_next) {
                     loadSubPage(login_next);
@@ -110,9 +110,12 @@ var signin = {
             // Show a failed login
             $('#login-name2').megaInputsShowError().blur();
             $('#login-password2').megaInputsShowError(l[7431]).val('').blur();
+            if (document.activeElement) {
+                document.activeElement.blur();
+            }
 
-            msgDialog('warninga', l[135], l[7431] + '.', false, function() {
-                $('#login-name2').select();
+            msgDialog('warninga', l[135], l[7431], false, () => {
+                $('#login-password2').select();
             });
         }
     }
@@ -122,23 +125,24 @@ var login_txt = false;
 var login_email = false;
 
 
-function postLogin(email, password, pinCode, remember, loginCompletionCallback) {
+function postLogin(email, password, pinCode, remember) {
     'use strict';
+    return new Promise((resolve) => {
+        var ctx = {
+            checkloginresult(ctx, result) {
+                const {u_k} = window;
 
-    // A little helper to pass only the final result of the User Get (ug) API request
-    // i.e. the (user type or error code) back to the loginCompletionCallback function
-    var ctx = {
-        callback2: loginCompletionCallback,
-        checkloginresult: function(ctx, result) {
-            if (ctx.callback2) {
-                ctx.callback2(result);
+                // Check if we can upgrade the account to v2
+                security.login.checkToUpgradeAccountVersion(result, u_k, password)
+                    .catch(dump)
+                    .finally(() => resolve(result));
             }
-        }
-    };
-    var passwordaes = new sjcl.cipher.aes(prepare_key_pw(password));
-    var uh = stringhash(email.toLowerCase(), passwordaes);
+        };
+        var passwordaes = new sjcl.cipher.aes(prepare_key_pw(password));
+        var uh = stringhash(email.toLowerCase(), passwordaes);
 
-    u_login(ctx, email, password, uh, pinCode, remember);
+        u_login(ctx, email, password, uh, pinCode, remember);
+    });
 }
 
 function pagelogin() {
@@ -251,12 +255,13 @@ function init_login() {
 
     $button.rebind('click.initlogin', function() {
         pagelogin();
+        eventlog(99796);
     });
+
+    if (self.InitFileDrag) {
+        onIdle(InitFileDrag);
+    }
 
     // Init inputs events
     accountinputs.init($formWrapper);
-
-    if (is_chrome_firefox) {
-        Soon(mozLoginManager.fillForm.bind(mozLoginManager, 'login_form'));
-    }
 }

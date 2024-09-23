@@ -84,9 +84,9 @@ function mouseMoveEntropy(e) {
         }
     }
 
-    if (!mouseApiRetryT || mouseApiRetryT < lastactive) {
-        mouseApiRetryT = lastactive + 2000;
-        api_retry();
+    if (mouseApiRetryT < lastactive) {
+        mouseApiRetryT = lastactive + 4e3;
+        api.retry();
     }
 
     if (typeof onactivity === 'function') {

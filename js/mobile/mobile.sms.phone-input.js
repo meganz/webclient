@@ -73,6 +73,9 @@ mobile.sms.phoneInput = {
 
         'use strict';
 
+        if (u_type !== 3) {
+            return loadSubPage('login');
+        }
         // Cache the page
         this.$page = $('.js-phone-input-page');
 

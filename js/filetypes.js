@@ -11,7 +11,7 @@ var extensions = {
     'font': [['fnt', 'otf', 'ttf', 'fon'], 'Font'],
     'generic': [['*'], 'File'],
     'illustrator': [['ai', 'ait'], 'Adobe Illustrator'],
-    'image': [['gif', 'tiff', 'tif', 'bmp', 'png', 'tga', 'jpg', 'jpeg', 'heic', 'webp', 'avif'], 'Image'],
+    'image': [['gif', 'tiff', 'tif', 'bmp', 'png', 'tga', 'jpg', 'jpeg', 'jxl', 'heic', 'webp', 'avif'], 'Image'],
     'indesign': [['indd'], 'Adobe InDesign'],
     'keynote': [['key'], 'Apple Keynote'],
     'mega': [['megaignore'], 'Mega Ignore'],
@@ -22,6 +22,7 @@ var extensions = {
     'photoshop': [['abr', 'psb', 'psd'], 'Adobe Photoshop'],
     'powerpoint': [['pps', 'ppt', 'pptx'], 'Powerpoint'],
     'premiere': [['prproj', 'ppj'], 'Adobe Premiere'],
+    'experiencedesign': [['xd'], 'Adobe XD'],
     'raw': [
         Object.keys(is_image.raw)
             .map(function(e) {
@@ -33,7 +34,7 @@ var extensions = {
     'sketch': [['sketch'], 'Sketch'],
     'spreadsheet': [['ods', 'ots', 'gsheet', 'nb', 'xlr'], 'Spreadsheet'],
     'torrent': [['torrent'], 'Torrent'],
-    'text': [['txt', 'ans', 'ascii', 'log', 'wpd', 'json', 'md'], 'Text', 'pages'],
+    'text': [['txt', 'ans', 'ascii', 'log', 'wpd', 'json', 'md', 'org'], 'Text', 'pages'],
     'vector': [['svgz', 'svg', 'cdr', 'eps'], 'Vector'],
     'video': [['mkv', 'webm', 'avi', 'mp4', 'm4v', 'mpg', 'mpeg', 'mov', '3g2', '3gp', 'asf', 'wmv', 'vob'], 'Video'],
     'web-data': [['html', 'xml', 'shtml', 'dhtml', 'js', 'css', 'jar', 'java', 'class'], 'Web Client Code'],
@@ -41,192 +42,6 @@ var extensions = {
         'php', 'php3', 'php4', 'php5', 'phtml', 'inc', 'asp', 'pl', 'cgi', 'py', 'sql', 'accdb', 'db', 'dbf', 'mdb',
         'pdb', 'c', 'cpp', 'h', 'cs', 'sh', 'vb', 'swift'], 'Web Server Code'],
     'word': [['doc', 'docx', 'dotx', 'wps', 'odt', 'rtf'], 'MS Word']
-};
-
-var extdesc = {
-    '3ds': l[20238],
-    '3dm': l[20239],
-    '3fr': l[20240],
-    '3g2': l[20241],
-    '3gp': l[20375],
-    '7z': l[20242],
-    'accdb': l[20243],
-    'aep': l[20244],
-    'aet': l[20378],
-    'ai': l[20245],
-    'aif': l[20246],
-    'aiff': l[20246],
-    'ait': l[20379],
-    'ans': l[20247],
-    'apk': l[1890],
-    'app': l[20248],
-    'arw': l[20240],
-    'as': l[20249],
-    'asc': l[20250],
-    'ascii': l[20251],
-    'asf': l[20252],
-    'asp': l[20253],
-    'aspx': l[20380],
-    'asx': l[20254],
-    'avi': l[20255],
-    'avif': l[23431],
-    'bat': l[20256],
-    'bay': l[20257],
-    'bmp': l[20258],
-    'bz2': l[20259],
-    'c': l[20260],
-    'cc': l[20261],
-    'cdr': l[20262],
-    'cgi': l[20263],
-    'class': l[20264],
-    'com': l[20265],
-    'cpp': l[20261],
-    'cr2': l[20266],
-    'css': l[20267],
-    'cxx': l[20261],
-    'dcr': l[20240],
-    'db': l[20376],
-    'dbf': l[20376],
-    'dhtml': l[20268],
-    'dll': l[20269],
-    'dng': l[20270],
-    'dmg': l[20271],
-    'doc': l[20272],
-    'docx': l[20381],
-    'dotx': l[20273],
-    'dwg': l[20274],
-    'dwt': l[20275],
-    'dxf': l[20276],
-    'eps': l[20277],
-    'exe': l[20278],
-    'fff': l[20240],
-    'fla': l[20279],
-    'flac': l[20280],
-    'flv': l[20281],
-    'fnt': l[20282],
-    'fon': l[20283],
-    'gadget': l[20284],
-    'gif': l[20285],
-    'gpx': l[20286],
-    'gsheet': l[20287],
-    'gz': l[20288],
-    'h': l[20289],
-    'heic': l[20290],
-    'hpp': l[20289],
-    'htm': l[20291],
-    'html': l[20291],
-    'iff': l[20292],
-    'inc': l[20293],
-    'indd': l[20294],
-    'iso': l[20295],
-    'jar': l[20296],
-    'java': l[20297],
-    'jpeg': l[20298],
-    'jpg': l[20298],
-    'js': l[20299],
-    'key': l[20300],
-    'kml': l[20301],
-    'log': l[20302],
-    'm3u': l[20303],
-    'm4a': l[20304],
-    'max': l[20305],
-    'mdb': l[20306],
-    'mef': l[20240],
-    'mid': l[20307],
-    'midi': l[20307],
-    'mkv': l[20308],
-    'mov': l[20309],
-    'mp3': l[20310],
-    'mpeg': l[20311],
-    'mpg': l[20311],
-    'mrw': l[20266],
-    'msi': l[20312],
-    'nb': l[20313],
-    'numbers': l[20314],
-    'nef': l[20240],
-    'obj': l[20315],
-    'ods': l[20370],
-    'odt': l[20316],
-    'otf': l[20317],
-    'ots': l[20382],
-    'orf': l[20240],
-    'pages': l[20318],
-    'pcast': l[20319],
-    'pdb': l[20377],
-    'pdf': l[20320],
-    'pef': l[20240],
-    'php': l[20321],
-    'php3': l[20321],
-    'php4': l[20321],
-    'php5': l[20321],
-    'phtml': l[20322],
-    'pl': l[20323],
-    'pls': l[20324],
-    'png': l[20325],
-    'ppj': l[20326],
-    'pps': l[20327],
-    'ppt': l[20327],
-    'pptx': l[20327],
-    'prproj': l[20326],
-    'ps': l[20328],
-    'psb': l[20329],
-    'psd': l[20383],
-    'py': l[20330],
-    'ra': l[20331],
-    'ram': l[20384],
-    'rar': l[20332],
-    'rm': l[20333],
-    'rtf': l[20334],
-    'rw2': l[20335],
-    'rwl': l[20240],
-    'sh': l[20336],
-    'shtml': l[20337],
-    'sitx': l[20338],
-    'sql': l[20339],
-    'sketch': l[20340],
-    'srf': l[20341],
-    'srt': l[20342],
-    'stc': l[20343],
-    'std': l[20367],
-    'sti': l[20368],
-    'stw': l[20369],
-    'svg': l[20344],
-    'svgz': l[20385],
-    'swf': l[20345],
-    'sxc': l[20370],
-    'sxd': l[20371],
-    'sxi': l[20372],
-    'sxm': l[20373],
-    'sxw': l[20374],
-    'tar': l[16689],
-    'tbz': l[20346],
-    'tga': l[20347],
-    'tgz': l[20386],
-    'tif': l[20348],
-    'tiff': l[20349],
-    'torrent': l[20350],
-    'ttf': l[20351],
-    'txt': l[20387],
-    'vcf': l[20352],
-    'vob': l[20353],
-    'wav': l[20354],
-    'webm': l[20355],
-    'webp': l[20356],
-    'wma': l[20357],
-    'wmv': l[20358],
-    'wpd': l[20359],
-    'wps': l[20360],
-    'xhtml': l[20361],
-    'xlr': l[20388],
-    'xls': l[20362],
-    'xlsx': l[20389],
-    'xlt': l[20390],
-    'xltm': l[20391],
-    'xml': l[20363],
-    'zip': l[20364],
-    'mp4': l[20365],
-    'vb': l[22676],
-    'swift': l[22677]
 };
 
 var extmime = {
@@ -320,6 +135,7 @@ var extmime = {
     "jpgv": "video/jpeg",
     "jpm": "video/jpm",
     "json": "application/json",
+    "jxl": "image/jxl",
     "jsonml": "application/jsonml+json",
     "kar": "audio/midi",
     "ktx": "image/ktx",
@@ -579,17 +395,209 @@ var extmime = {
     "t38": "image/t38"
 };
 
-for (var i in extensions) {
-    for (var a in extensions[i][0]) {
-        var desc = extensions[i][1];
-        if (extdesc[extensions[i][0][a]]) {
-            desc = extdesc[extensions[i][0][a]];
+mBroadcaster.once('boot_done', () => {
+    'use strict';
+    const extdesc = {
+        '3ds': l[20238],
+        '3dm': l[20239],
+        '3fr': l[20240],
+        '3g2': l[20241],
+        '3gp': l[20375],
+        '7z': l[20242],
+        'accdb': l[20243],
+        'aep': l[20244],
+        'aet': l[20378],
+        'ai': l[20245],
+        'aif': l[20246],
+        'aiff': l[20246],
+        'ait': l[20379],
+        'ans': l[20247],
+        'apk': l[1890],
+        'app': l[20248],
+        'arw': l[20240],
+        'as': l[20249],
+        'asc': l[20250],
+        'ascii': l[20251],
+        'asf': l[20252],
+        'asp': l[20253],
+        'aspx': l[20380],
+        'asx': l[20254],
+        'avi': l[20255],
+        'avif': l[23431],
+        'bat': l[20256],
+        'bay': l[20257],
+        'bmp': l[20258],
+        'bz2': l[20259],
+        'c': l[20260],
+        'cc': l[20261],
+        'cdr': l[20262],
+        'cgi': l[20263],
+        'class': l[20264],
+        'com': l[20265],
+        'cpp': l[20261],
+        'cr2': l[20266],
+        'css': l[20267],
+        'cxx': l[20261],
+        'dcr': l[20240],
+        'db': l[20376],
+        'dbf': l[20376],
+        'dhtml': l[20268],
+        'dll': l[20269],
+        'dng': l[20270],
+        'dmg': l[20271],
+        'doc': l[20272],
+        'docx': l[20381],
+        'dotx': l[20273],
+        'dwg': l[20274],
+        'dwt': l[20275],
+        'dxf': l[20276],
+        'eps': l[20277],
+        'exe': l[20278],
+        'fff': l[20240],
+        'fla': l[20279],
+        'flac': l[20280],
+        'flv': l[20281],
+        'fnt': l[20282],
+        'fon': l[20283],
+        'gadget': l[20284],
+        'gif': l[20285],
+        'gpx': l[20286],
+        'gsheet': l[20287],
+        'gz': l[20288],
+        'h': l[20289],
+        'heic': l[20290],
+        'hpp': l[20289],
+        'htm': l[20291],
+        'html': l[20291],
+        'iff': l[20292],
+        'inc': l[20293],
+        'indd': l[20294],
+        'iso': l[20295],
+        'jar': l[20296],
+        'java': l[20297],
+        'jpeg': l[20298],
+        'jpg': l[20298],
+        'js': l[20299],
+        'key': l[20300],
+        'kml': l[20301],
+        'log': l[20302],
+        'm3u': l[20303],
+        'm4a': l[20304],
+        'max': l[20305],
+        'mdb': l[20306],
+        'mef': l[20240],
+        'mid': l[20307],
+        'midi': l[20307],
+        'mkv': l[20308],
+        'mov': l[20309],
+        'mp3': l[20310],
+        'mpeg': l[20311],
+        'mpg': l[20311],
+        'mrw': l[20266],
+        'msi': l[20312],
+        'nb': l[20313],
+        'numbers': l[20314],
+        'nef': l[20240],
+        'obj': l[20315],
+        'ods': l[20370],
+        'odt': l[20316],
+        'otf': l[20317],
+        'ots': l[20382],
+        'orf': l[20240],
+        'pages': l[20318],
+        'pcast': l[20319],
+        'pdb': l[20377],
+        'pdf': l[20320],
+        'pef': l[20240],
+        'php': l[20321],
+        'php3': l[20321],
+        'php4': l[20321],
+        'php5': l[20321],
+        'phtml': l[20322],
+        'pl': l[20323],
+        'pls': l[20324],
+        'png': l[20325],
+        'ppj': l[20326],
+        'pps': l[20327],
+        'ppt': l[20327],
+        'pptx': l[20327],
+        'prproj': l[20326],
+        'ps': l[20328],
+        'psb': l[20329],
+        'psd': l[20383],
+        'py': l[20330],
+        'ra': l[20331],
+        'ram': l[20384],
+        'rar': l[20332],
+        'rm': l[20333],
+        'rtf': l[20334],
+        'rw2': l[20335],
+        'rwl': l[20240],
+        'sh': l[20336],
+        'shtml': l[20337],
+        'sitx': l[20338],
+        'sql': l[20339],
+        'sketch': l[20340],
+        'srf': l[20341],
+        'srt': l[20342],
+        'stc': l[20343],
+        'std': l[20367],
+        'sti': l[20368],
+        'stw': l[20369],
+        'svg': l[20344],
+        'svgz': l[20385],
+        'swf': l[20345],
+        'sxc': l[20370],
+        'sxd': l[20371],
+        'sxi': l[20372],
+        'sxm': l[20373],
+        'sxw': l[20374],
+        'tar': l[16689],
+        'tbz': l[20346],
+        'tga': l[20347],
+        'tgz': l[20386],
+        'tif': l[20348],
+        'tiff': l[20349],
+        'torrent': l[20350],
+        'ttf': l[20351],
+        'txt': l[20387],
+        'vcf': l[20352],
+        'vob': l[20353],
+        'wav': l[20354],
+        'webm': l[20355],
+        'webp': l[20356],
+        'wma': l[20357],
+        'wmv': l[20358],
+        'wpd': l[20359],
+        'wps': l[20360],
+        'xhtml': l[20361],
+        'xlr': l[20388],
+        'xls': l[20362],
+        'xlsx': l[20389],
+        'xlt': l[20390],
+        'xltm': l[20391],
+        'xml': l[20363],
+        'zip': l[20364],
+        'mp4': l[20365],
+        'vb': l[22676],
+        'swift': l[22677]
+    };
+
+    for (const idx in freeze(extensions)) {
+        const type = extensions[idx][0];
+        const desc = extensions[idx][1];
+
+        for (let i = type.length; i--;) {
+            const m = type[i];
+            ext[m] = [idx, extdesc[m] || desc];
         }
-        ext[extensions[i][0][a]] = [i, desc];
     }
-}
+    freeze(ext);
+    freeze(extmime);
+});
 
 function filemime(n, def) {
+    'use strict';
     if (typeof n === 'object') {
         n = n.name;
     }
@@ -629,84 +637,80 @@ function filetype(n, getFullType, ik) {
 
 /**
  * Get backed up device Icon
- * @param {String} name Device name
+ * @param {String} name Device User Agent or Device name
  * @param {Number} type Device type number, 3 and 4 are mobile
  * @returns {String} Device Icon name
  */
 function deviceIcon(name, type) {
-
     "use strict";
 
-    // Mobile icon
-    // TODO: Change conditions to smth more clever
-    if (type === 3 || type === 4) {
+    const classMap = freeze({
+        'Android': 'mobile-android',
+        'iPhone': 'mobile-ios',
+        'Apple': 'pc-mac',
+        'Windows': 'pc-win',
+        'Linux': 'pc-linux'
+    });
 
+    const os = browserdetails(name).os;
+
+    if (classMap[os]) {
+        return classMap[os];
+    }
+    // Fallback to generic
+    if (type === 3 || type === 4) {
         return 'mobile';
     }
-    if (name.includes('MacBook')) {
-
-        return 'pc-mac';
-    }
-    else if (name.includes('Windows')) {
-
-        return 'pc-win';
-    }
-    else if (name.includes('Linux')) {
-
-        return 'pc-linux';
-    }
-
     return 'pc';
 }
 
 /**
  * Get folder type Icon
  * @param {Object} node A MEGA folder node
+ * @param {String} [root] A MEGA node handle of the root folder
  * @returns {String} Folder Icon name
  */
-function folderIcon(node) {
-
+function folderIcon(node, root) {
     'use strict';
 
     let folderIcon = '';
+    root = root || M.getNodeRoot(node.h);
 
-    if (M.getNodeRoot(node.h) === M.RubbishID) {
-
+    if (root === M.RubbishID) {
         folderIcon = 'rubbish-';
     }
 
-    // Outgoing share
     if (node.t & M.IS_SHARED || M.ps[node.h] || M.getNodeShareUsers(node, 'EXP').length) {
 
-        // folderIcon += 'folder-outgoing'; for vector icon
-        return `${folderIcon}folder-shared`;
-    }
-    // File request folder
-    else if (
-        mega.fileRequestCommon.storage.cache.puHandle[node.h]
-        && mega.fileRequestCommon.storage.cache.puHandle[node.h].s !== 1
-        && mega.fileRequestCommon.storage.cache.puHandle[node.h].p
-    ) {
-        return `${folderIcon}file-request-folder`;
+        if (M.getS4NodeType(node) === 'bucket') {
+            return `${folderIcon}bucket-share`;
+        }
+
+        return `${folderIcon}folder-outgoing`;
     }
     // Incoming share
     else if (node.su) {
-
-        // `${folderIcon}folder-incoming`; for vector icon
-        return `${folderIcon}inbound-share`;
+        return `${folderIcon}folder-incoming`;
     }
     // My chat files
     else if (node.h === M.cf.h) {
-
         return `${folderIcon}folder-chat`;
     }
     // Camera uploads
     else if (node.h === M.CameraId) {
-
-        return `${folderIcon}folder-camera`;
+        return `${folderIcon}folder-camera-uploads`;
     }
+    // S4 Object storage
+    else if (M.getS4NodeType(node) === 'bucket') {
+        return `${folderIcon}bucket`;
+    }
+    // File request folder
+    else if (mega.fileRequest.publicFolderExists(node.h)) {
+        return `${folderIcon}folder-public`;
+    }
+
     // Backups
-    if (M.getNodeRoot(node.h) === M.InboxID) {
+    if (root === M.InboxID) {
 
         // Backed up device icon
         if (node.devid) {
@@ -731,25 +735,31 @@ function folderIcon(node) {
  * @returns {String} Folder Icon name
  */
 function fileIcon(node) {
-
     'use strict';
 
+    if (!node) {
+        return 'generic';
+    }
+
     let icon = '';
+    let rubPrefix = '';
+    const root = M.getNodeRoot(node.h);
+
+    if (node.t === 1 && root === M.RubbishID) {
+        rubPrefix = 'rubbish-';
+    }
 
     if (node.t) {
-
-        return folderIcon(node);
+        return folderIcon(node, root);
     }
-    else if (ext[fileext(node.name)]) {
-
-        return ext[fileext(node.name)][0];
+    else if ((icon = ext[fileext(node.name, 0, 1)]) && icon[0] !== 'mega') {
+        return rubPrefix + icon[0];
     }
     else if ((icon = is_video(node)) > 0) {
-
-        return icon > 1 ? 'audio' : 'video';
+        return rubPrefix + (icon > 1 ? 'audio' : 'video');
     }
 
-    return 'generic';
+    return `${rubPrefix}generic`;
 }
 
 function fileext(name, upper, iknowwhatimdoing) {

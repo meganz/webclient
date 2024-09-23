@@ -38,12 +38,7 @@ var ConnectionRetryManager = function(opts, parentLogger) {
         self._connectionState = ConnectionRetryManager.CONNECTION_STATE.DISCONNECTED;
     }
 
-    var loggerName = "connectionRetryManager";
-    if (parentLogger) {
-        loggerName = (parentLogger.name ? parentLogger.name : parentLogger) + ":" + loggerName;
-    }
-
-    self.logger = new MegaLogger(loggerName, {});
+    self.logger = new MegaLogger("connectionRetryManager", {}, parentLogger);
 
     self.options = $.extend({}, ConnectionRetryManager.DEFAULT_OPTS, opts);
 
@@ -78,7 +73,7 @@ ConnectionRetryManager.DEFAULT_OPTS = {
      * Connection retry delay in ms (reconnection will be triggered with a timeout calculated as:
      * self._connectionRetries * this value)
      */
-    reconnectDelay: 2000,
+    reconnectDelay: 2e3 + 3e3 * Math.random(),
 
     /**
      * Multipliers used in a rand(retryFuzzinesFactors[0], retryFuzzinesFactors[1])
@@ -105,7 +100,7 @@ ConnectionRetryManager.DEFAULT_OPTS = {
     /**
      * The minimum conncetion retry timeout, even if immediate = true
      */
-    minConnectionRetryTimeout: 1000,
+    minConnectionRetryTimeout: 1e3 + 2e3 * Math.random(),
 
     functions: {
         /**
@@ -200,9 +195,7 @@ ConnectionRetryManager.prototype.gotDisconnected = function(){
                 !self.options.functions.isConnected()
             ) {
                 // delay the retry a bit, so that the OS can properly reconnect (e.g. on wifi networks)
-                setTimeout(function() {
-                    self.doConnectionRetry(true);
-                }, 3000);
+                self.doConnectionRetryDelayed(3);
             }
 
             $(window).off("online.megaChatRetry" + self._instanceIdx);
@@ -236,7 +229,7 @@ ConnectionRetryManager.prototype.gotConnected = function(){
     // stop any timer which is running to try to reconnect (which should not happen, but since Karere is async...
     // race condition may trigger a .reconnect() by a timer)
     if (self._connectionRetryInProgress) {
-        clearTimeout(self._connectionRetryInProgress);
+        this._connectionRetryInProgress.abort();
         self._connectionRetryInProgress = null;
     }
     //console.error(self._instanceIdx, "unbind mouse move");
@@ -274,14 +267,14 @@ ConnectionRetryManager.prototype.gotConnected = function(){
  *
  * @param waitForPromise
  * @param [delayed] {Number}
- * @param [name] {String} optional name for the debugging output of createTimeoutPromise
- * @returns {MegaPromise|*}
  */
-ConnectionRetryManager.prototype.startedConnecting = function(waitForPromise, delayed, name) {
+ConnectionRetryManager.prototype.startedConnecting = function(waitForPromise, delayed) {
+    'use strict';
     var self = this;
+    const name = d && `${this.logger.getLoggerPath()}#${this._connectionRetries}`;
 
     if (self._is_paused) {
-        return MegaPromise.reject();
+        return EBLOCKED;
     }
 
     if (self._$connectingPromise) {
@@ -296,7 +289,7 @@ ConnectionRetryManager.prototype.startedConnecting = function(waitForPromise, de
             return self.options.functions.isConnected();
         },
         1500,
-        self.options.connectTimeout + (delayed ? delayed : 0),
+        Math.min(6e5 - 1, Math.max(1e4, self.options.connectTimeout + (delayed | 0) | 0)),
         waitForPromise,
         name
     );
@@ -306,6 +299,7 @@ ConnectionRetryManager.prototype.startedConnecting = function(waitForPromise, de
             if (self._debug) {
                 self.logger.warn("startedConnecting succeeded.", self.logger.name + "#" + self._connectionRetries);
             }
+            this._$connectingPromise = null;
         })
         .catch((ex) => {
             if (ex === EAGAIN) {
@@ -318,12 +312,10 @@ ConnectionRetryManager.prototype.startedConnecting = function(waitForPromise, de
                     ex
                 );
             }
-            self.doConnectionRetry();
-        })
-        .finally(() => {
-            self._$connectingPromise = null;
+            this._$connectingPromise = null;
+            this.doConnectionRetryDelayed();
         });
-    return self._$connectingPromise;
+    return true;
 };
 
 ConnectionRetryManager.prototype.pause = function() {
@@ -338,16 +330,21 @@ ConnectionRetryManager.prototype.unpause = function() {
     // @todo resume timers?
 };
 
+ConnectionRetryManager.prototype.doConnectionRetryDelayed = function(base) {
+    'use strict';
+    tSleep((base | 1) + 3 * Math.random()).then(() => this.requiresConnection()).catch(dump);
+};
+
 /**
  * Force a connection retry
  */
 ConnectionRetryManager.prototype.doConnectionRetry = function(immediately) {
     var self = this;
 
-    if (self._isOffline) {
+    if (self._isOffline || window.isLoggingOut) {
         // in case the OS/browser had reported that we are online, it does not make sense to proceed trying to
         // reconnect.
-        return MegaPromise.reject();
+        return ERATELIMIT;
     }
     if (self._$connectingPromise) {
         if (self._connectionRetries >= self.options.maxConnectionRetries) {
@@ -358,27 +355,29 @@ ConnectionRetryManager.prototype.doConnectionRetry = function(immediately) {
             if (self._debug) {
                 self.logger.warn("recycling previous ._$connectingPromise.");
             }
-            return self._$connectingPromise;
+            return 0;
         }
     }
 
-
     if (self.options.functions.isUserForcedDisconnect()) {
-        return MegaPromise.reject();
+        return EROLLEDBACK;
     }
     self._connectionRetries++;
 
 
     if (self.logger && !immediately) {
-        self.logger.error(
-            "request error, passed arguments: ", arguments, ", number of errors: ", self._connectionRetries
-        );
+        this.logger.error(`Request error, number of errors: ${self._connectionRetries}`);
+    }
+
+    if (this._connectionRetryInProgress) {
+        this._connectionRetryInProgress.abort();
+        this._connectionRetryInProgress = null;
     }
 
     if (immediately !== true && self._connectionRetries > self.options.maxConnectionRetries) {
         self._connectionRetries = 0;
 
-        self._connectionRetryInProgress = setTimeout(function() {
+        (this._connectionRetryInProgress = tSleep(self.options.restartConnectionRetryTimeout / 1e3)).then(() => {
             if (
                 !self.options.functions.isConnectedOrConnecting()
             ) {
@@ -386,7 +385,7 @@ ConnectionRetryManager.prototype.doConnectionRetry = function(immediately) {
                 self._connectionState = ConnectionRetryManager.CONNECTION_STATE.CONNECTING;
             }
             self._connectionRetryInProgress = null;
-        }, self.options.restartConnectionRetryTimeout);
+        });
 
         self.logger.error(
             "Reached max connection retries. Resetting counters and doing a bigger delay: ",
@@ -394,11 +393,7 @@ ConnectionRetryManager.prototype.doConnectionRetry = function(immediately) {
         );
 
         self._lastConnectionRetryTime = unixtime();
-        return self.startedConnecting(
-            undefined,
-            self.options.restartConnectionRetryTimeout,
-            self.logger.name + "#" + self._connectionRetries
-        );
+        return this.startedConnecting(null, self.options.restartConnectionRetryTimeout);
     }
     else {
         if (immediately === true) {
@@ -417,22 +412,14 @@ ConnectionRetryManager.prototype.doConnectionRetry = function(immediately) {
                 self.options.retryFuzzinesFactors[0], self.options.retryFuzzinesFactors[1]
             )
         );
-
-        if (self._connectionRetryInProgress) {
-            clearTimeout(
-                self._connectionRetryInProgress
-            );
-            self._connectionRetryInProgress = null;
-        }
-
         connectionRetryTimeout = Math.max(self.options.minConnectionRetryTimeout, connectionRetryTimeout);
 
-        self._connectionRetryInProgress = setTimeout(function() {
+        (this._connectionRetryInProgress = tSleep(connectionRetryTimeout / 1e3)).then(() => {
             if (!self.options.functions.isConnected()) {
                 self.options.functions.reconnect(self);
                 self._connectionState = ConnectionRetryManager.CONNECTION_STATE.CONNECTING;
             }
-        }, connectionRetryTimeout);
+        });
 
         self._lastConnectionRetryTime = unixtime();
 
@@ -442,13 +429,10 @@ ConnectionRetryManager.prototype.doConnectionRetry = function(immediately) {
                 connectionRetryTimeout, self.logger.name + "#" + self._connectionRetries
             );
         }
-        return self.startedConnecting(
-            undefined,
-            connectionRetryTimeout,
-            self.logger.name + "#" + self._connectionRetries
-        );
+        return this.startedConnecting(null, connectionRetryTimeout);
     }
 };
+
 /**
  * Internal, used to be called by the onmousemove code to force a connection retry
  * @returns {boolean}
@@ -476,7 +460,10 @@ ConnectionRetryManager.prototype.resetConnectionRetries = function() {
     var self = this;
 
     self._connectionRetries = 0;
-    clearTimeout(self._connectionRetryInProgress);
+    if (this._connectionRetryInProgress) {
+        this._connectionRetryInProgress.abort();
+        this._connectionRetryInProgress = null;
+    }
     if (self._$connectingPromise) {
         self._$connectingPromise.reject();
         self._$connectingPromise = null;

@@ -3,7 +3,19 @@ lazy(mega, 'fileRequestCommon', () => {
     'use strict';
 
     const logger = new MegaLogger('common', null, MegaLogger.getLogger('FileRequest'));
-    const folderClass = 'file-request-folder';
+    const treeClass = 'file-request-folder';
+
+    const ongoingRemoval = new Set();
+    const dspOngoingRemoval = () => {
+        const nodes = [...ongoingRemoval].map(h => Object.keys(M.c[h] || {})).flat().map(h => M.d[h]).filter(Boolean);
+
+        ongoingRemoval.clear();
+        mBroadcaster.sendMessage('mediainfo:collect', true, nodes);
+    };
+    const addOngoingRemoval = (h) => {
+        ongoingRemoval.add(h);
+        delay('file-request:ongoing-removal', dspOngoingRemoval, 2e3);
+    };
 
     const refreshFileRequestPageList = () => {
         if (fminitialized && M.currentdirid === 'file-requests') {
@@ -13,17 +25,17 @@ lazy(mega, 'fileRequestCommon', () => {
     };
 
     const updateMobileNodeIcon = (nodeHandle) => {
-        const $node = $(`#${nodeHandle}`, '.mobile.file-manager-block');
-        const iconName = fileIcon(M.d[nodeHandle]);
+        const component = MegaMobileNode.getNodeComponentByHandle(nodeHandle);
 
-        $('.regular-folder', $node).attr('src',`${mobile.imagePath + iconName}.png`);
+        if (component) {
+            component.update('icon');
+        }
     };
 
     const addFileRequestIcon = (puHandlePublicHandle) => {
         if (fminitialized && puHandlePublicHandle) {
-            const puHandleObject = mega.fileRequestCommon
-                .storage
-                .getPuHandleByPublicHandle(puHandlePublicHandle);
+            const puHandleObject = M.d[puHandlePublicHandle]
+                || mega.fileRequestCommon.storage.getPuHandleByPublicHandle(puHandlePublicHandle);
 
             if (!puHandleObject) {
                 if (d) {
@@ -53,12 +65,13 @@ lazy(mega, 'fileRequestCommon', () => {
                 return false;
             }
 
-            const viewModeClass = M.viewmode ? 'span.block-view-file-type' : 'span.transfer-filetype-icon';
-            $(viewModeClass, $nodeId)
-                .addClass(folderClass);
+            const viewModeClass = M.viewmode ? 'span.item-type-icon-90' : 'span.item-type-icon';
+            const folderClass = M.viewmode ? 'icon-folder-public-90' : 'icon-folder-public-24';
+
+            $(viewModeClass, $nodeId).addClass(folderClass);
 
             if ($tree.length) {
-                $tree.addClass(folderClass);
+                $tree.addClass(treeClass);
             }
 
             if (d) {
@@ -85,13 +98,13 @@ lazy(mega, 'fileRequestCommon', () => {
             if (node && M.megaRender && M.megaRender.hasDOMNode(nodeId)) {
                 node = M.megaRender.getDOMNode(nodeId);
 
-                const viewModeClass = M.viewmode ? 'span.block-view-file-type' : 'span.transfer-filetype-icon';
-                $(viewModeClass, node)
-                    .removeClass(folderClass);
+                const viewModeClass = M.viewmode ? 'span.item-type-icon-90' : 'span.item-type-icon';
+                $(viewModeClass, node).removeClass('icon-folder-public-24 icon-folder-public-90')
+                    .addClass(M.viewmode ? 'icon-folder-90' : 'icon-folder-24');
             }
 
             $(`#treea_${nodeId} span.nw-fm-tree-folder`)
-                .removeClass(folderClass);
+                .removeClass(treeClass);
         }
     };
 
@@ -108,74 +121,56 @@ lazy(mega, 'fileRequestCommon', () => {
                 description: description || ''
             };
 
-            const payload = {
-                n: handle, // File handle
-                a: 'ul', // Action
-                d: 0,    // Create public upload folder
-                i: requesti, // ID Tag
-                s: 2, // State?
-                data: data
-            };
+            mLoadingSpinner.show('puf-create');
 
-            return M.req(payload);
+            eventlog(99773);
+            return api.screq({n: handle, a: 'ul', d: 0, s: 2, data})
+                .finally(() => {
+                    mLoadingSpinner.hide('puf-create');
+                });
+        }
+
+        // Remove public upload folder
+        remove(handle) {
+
+            addOngoingRemoval(handle);
+            mLoadingSpinner.show('puf-remove');
+
+            return api.screq({a: 'ul', d: 1, n: handle})
+                .finally(() => {
+                    mLoadingSpinner.hide('puf-remove');
+                });
         }
 
         update(puPagePublicHandle, title, description, name, email) {
-            // TODO: Separate later
-            const data = {
+            const d = {
                 name: name || u_attr.name,
                 email: email || u_attr.email,
                 msg: title,
                 description: description
             };
 
-            const payload = {
-                a: 'ps',
-                p: puPagePublicHandle,// PUP id
-                d: data,// data
-                i: requesti
-            };
+            mLoadingSpinner.show('puf-update');
 
-            return M.req(payload);
+            return api.screq({a: 'ps', p: puPagePublicHandle, d})
+                .finally(() => {
+                    mLoadingSpinner.hide('puf-update');
+                });
         }
 
         getPuPageList() {
-            const payload = {
-                a: 'pl',
-                i: requesti
-            };
 
-            return M.req(payload);
+            return api.req({a: 'pl'});
         }
 
         getPuPage(pageId) {
-            const payload = {
-                a: 'pg',
-                p: pageId
-            };
 
-            return M.req(payload);
-        }
-
-        remove(handle) {
-            const payload = {       // Remove PUF
-                a: 'ul',
-                n: handle,      // Folder handle (node)
-                d: 1,       // Delete public upload folder
-                i: requesti
-            };
-
-            return M.req(payload);
+            return api.req({a: 'pg', p: pageId});
         }
 
         getOwnerPublicKey(ownerHandle) {
-            const payload = {
-                a: 'uk',
-                u: ownerHandle,
-                i: requesti
-            };
 
-            return M.req(payload);
+            return api.req({a: 'uk', u: ownerHandle}).then(({result: {pubk}}) => pubk);
         }
     }
 
@@ -222,49 +217,29 @@ lazy(mega, 'fileRequestCommon', () => {
             if (nodeHandle && this.cache.puHandle[nodeHandle]) {
                 delete this.cache.puHandle[nodeHandle];
             }
+
+            if (fminitialized && nodeHandle) {
+                removeFileRequestIcon(nodeHandle);
+            }
         }
 
-        async addPuHandle(
-            puHandleNodeHandle,
-            puHandlePublicHandle,
-            data,
-            pagePublicHandle,
-            requestId
-        ) {
+        addPuHandle(puHandleNodeHandle, puHandlePublicHandle, data, pagePublicHandle) {
             if (d) {
                 logger.info('Storage.addPuHandle', {
                     puHandleNodeHandle,
                     puHandlePublicHandle
                 });
             }
-
-            await dbfetch.get(puHandleNodeHandle).catch(dump); // Load the file
-
-            if (!M.d[puHandleNodeHandle] || !M.d[puHandleNodeHandle].name) {
+            let n = M.getNodeByHandle(puHandleNodeHandle);
+            // Since the name is getting retrieved asynchronously, we can update it later
+            if (!n.name) {
                 if (d) {
-                    logger.info(
-                        'Storage.addPuHandle - No folder exists',
-                        puHandleNodeHandle,
-                        puHandlePublicHandle,
-                        data
-                    );
+                    logger.warn('Storage.addPuHandle - no name was found', n, puHandleNodeHandle, puHandlePublicHandle);
                 }
-                return false;
             }
 
-            if (!puHandlePublicHandle || !fmdb) {
-                if (d) {
-                    logger.info('Storage.addPuHandle - No handle/fmdb', puHandleNodeHandle);
-                }
-                return false;
-            }
-
-            if (pfkey) {
-                return false;
-            }
-
-            const folderName = M.d[puHandleNodeHandle].name;
             const puHandleState = 2;
+            const {name = ''} = n;
             let title = '';
             let description = '';
 
@@ -285,33 +260,18 @@ lazy(mega, 'fileRequestCommon', () => {
                 );
             }
 
+            // This just make sure we have the entry saved on cache locally
             this.saveOrUpdatePuHandle(
                 {
                     nodeHandle: puHandleNodeHandle,
                     title,
                     description,
-                    folderName,
+                    name,
                     state: puHandleState,
                     publicHandle: puHandlePublicHandle,
                     pagePublicHandle
                 }
             );
-
-            const eventMessage = `FileRequest:puhProcessed_${puHandlePublicHandle}`;
-            if (mBroadcaster.hasListener(eventMessage)) {
-                mBroadcaster
-                    .sendMessage(eventMessage);
-            }
-            else if (requestId === requesti) {
-                this.addPuMessage(puHandlePublicHandle);
-            }
-
-            if (d) {
-                logger.info(
-                    `Storage.addPuHandle - Dispatch ${eventMessage}`,
-                    puHandlePublicHandle
-                );
-            }
         }
 
         saveOrUpdatePuHandle(options, update) {
@@ -323,7 +283,7 @@ lazy(mega, 'fileRequestCommon', () => {
                 );
             }
 
-            const {
+            let {
                 nodeHandle,
                 title,
                 description,
@@ -333,12 +293,21 @@ lazy(mega, 'fileRequestCommon', () => {
                 pagePublicHandle
             } = this.setPuHandleValues(options, update);
 
+            // This is to look for
+            if (!nodeHandle && publicHandle) {
+                nodeHandle = this.getNodeHandleByPuHandle(publicHandle);
+            }
+
+            // Node handle should exist
+            assert(typeof nodeHandle === 'string', 'saveOrUpdatePuHandle: No Handle - Check this',
+                   publicHandle, [options, nodeHandle]);
+
             const puHandleCacheData = {
                 p: pagePublicHandle || '', // Page public handle
-                h:  nodeHandle, // Node Handle
+                h: nodeHandle, // Node Handle
                 ph: publicHandle, // Handle public handle
                 fn: folderName, // Folder Name
-                s:  state, // state
+                s: state, // state
                 d: {
                     t: title || '', // Title
                     d: description || '' // Description
@@ -347,23 +316,14 @@ lazy(mega, 'fileRequestCommon', () => {
 
             this.cache.puHandle[nodeHandle] = puHandleCacheData;
 
-            const puHandleDBData = {
-                p : pagePublicHandle || '', // Page public handle
-                h: nodeHandle, // Node Handle
-                fn: folderName, // Folder Name
-                ph: publicHandle, // Handle public handle
-                s: state, // state
-                d: {
-                    t: title || '', // Title
-                    d: description || '' // Description
-                }
-            };
-
             if (fmdb && !pfkey) {
-                fmdb.add('puf', {
-                    ph: publicHandle,
-                    d: puHandleDBData
-                });
+                const d = {...puHandleCacheData};
+
+                fmdb.add('puf', {ph: publicHandle, d});
+            }
+
+            if (fminitialized) {
+                mega.fileRequestCommon.addFileRequestIcon(nodeHandle);
             }
 
             return puHandleCacheData;
@@ -446,11 +406,8 @@ lazy(mega, 'fileRequestCommon', () => {
         }
 
         getPuHandleList() {
-            if (!this.cache.puHandle) {
-                return null;
-            }
 
-            return this.cache.puHandle;
+            return this.cache.puHandle || false;
         }
 
         updatePuHandlePageId(
@@ -509,9 +466,7 @@ lazy(mega, 'fileRequestCommon', () => {
             const puHandleObject = this.updatePuHandlePageId(puHandlePublicHandle, puPagePublicHandle, puHandleState);
             if (!puHandleObject) {
                 if (d) {
-                    logger.info('Storage.addPuPage - no PUP object', {
-                        puPageObject
-                    });
+                    logger.error('Storage.addPuPage - no PUP object', {puPageObject});
                 }
                 return;
             }
@@ -601,26 +556,10 @@ lazy(mega, 'fileRequestCommon', () => {
 
             this.cache.puPage[pagePublicHandle] = puHandleCacheData;
 
-            const puHandleDBData = {
-                p : pagePublicHandle || '', // Page public handle
-                h: nodeHandle, // Node Handle
-                fn: folderName, // Folder Name
-                ph: publicHandle, // Handle public handle
-                msg: message, // Default message/title
-                s: state, // state
-                name: name || u_attr.name,
-                email: u_attr.email,
-                d: {
-                    t: title || '', // Title
-                    d: description || '' // Description
-                }
-            };
-
             if (fmdb && !pfkey) {
-                fmdb.add('pup', {
-                    p: pagePublicHandle,
-                    d: puHandleDBData
-                });
+                const d = {...puHandleCacheData};
+
+                fmdb.add('pup', {p: pagePublicHandle, d});
             }
 
             return puHandleCacheData;
@@ -678,9 +617,7 @@ lazy(mega, 'fileRequestCommon', () => {
             const puPageObject = this.getPuPageByPageId(puPagePublicHandle);
             if (!puPageObject) {
                 if (d) {
-                    logger.info('Storage.updatePuPage - no PUP object', {
-                        puPageObject
-                    });
+                    logger.error('Storage.updatePuPage - no PUP object', {puPagePublicHandle});
                 }
                 return;
             }
@@ -754,11 +691,10 @@ lazy(mega, 'fileRequestCommon', () => {
             }
 
             const puHandleObject = this.getPuHandleByPublicHandle(puHandlePublicHandle);
-            if (!puHandleObject) {
-                return nodeHandle;
+            if (puHandleObject) {
+                this.removePuHandle(puHandleObject.h, puHandleObject.ph);
             }
 
-            this.removePuHandle(puHandleObject.h, puHandleObject.ph);
             return nodeHandle;
         }
 
@@ -821,17 +757,8 @@ lazy(mega, 'fileRequestCommon', () => {
             );
         }
 
-        isPresent(selectedNodeHandle) {
-            if (!this.cache.puHandle) {
-                return false;
-            }
-
-            const puHandleObject = this.cache.puHandle[selectedNodeHandle];
-            return puHandleObject && puHandleObject.s !== 1 && puHandleObject.p !== null;
-        }
-
         isDropExist(selected) {
-            let sel = Array.isArray(selected) ? selected.slice(0) : [selected];
+            let sel = Array.isArray(selected) ? [...selected] : [selected];
             const result = [];
 
             while (sel.length) {
@@ -848,34 +775,51 @@ lazy(mega, 'fileRequestCommon', () => {
             return result;
         }
 
-        processPuHandleFromDB(dbData) {
-            for (const key in dbData) {
-                if (dbData.hasOwnProperty(key)) {
-                    const puHandleObject = dbData[key];
-                    const nodeHandle = puHandleObject.h;
+        async processPuHandleFromDB(entries) {
 
-                    if (!this.cache.puHandle[nodeHandle]) {
-                        this.cache.puHandle[nodeHandle] = Object.create(null);
-                    }
+            for (let i = entries.length; i--;) {
+                const puHandleObject = entries[i];
+                const nodeHandle = puHandleObject.h;
 
-                    this.cache.puHandle[nodeHandle] = puHandleObject;
-                }
+                this.cache.puHandle[nodeHandle] = puHandleObject;
+
+                entries[i] = nodeHandle;
+            }
+
+            if ((entries = entries.filter(Boolean)).length) {
+
+                return dbfetch.acquire(entries);
             }
         }
 
-        processPuPageFromDB(dbData) {
-            for (const key in dbData) {
-                if (dbData.hasOwnProperty(key)) {
-                    const puPageObject = dbData[key];
-                    const puPageHandle = puPageObject.p;
+        processPuPageFromDB(entries) {
 
-                    if (!this.cache.puPage[puPageHandle]) {
-                        this.cache.puPage[puPageHandle] = Object.create(null);
+            for (let i = entries.length; i--;) {
+                const puPageObject = entries[i];
+                const puPageHandle = puPageObject.p;
+
+                this.cache.puPage[puPageHandle] = puPageObject;
+            }
+        }
+
+        getNodeHandleByPuHandle(puHandlePublicHandle) {
+            if (!this.cache.puHandle) {
+                return null;
+            }
+
+            const puHandleObjects = this.cache.puHandle;
+
+            for (const key in puHandleObjects) {
+                if (puHandleObjects[key]) {
+                    const puHandleObject = puHandleObjects[key];
+
+                    if (puHandleObject.ph === puHandlePublicHandle) {
+                        return key;
                     }
-
-                    this.cache.puPage[puPageHandle] = puPageObject;
                 }
             }
+
+            return null;
         }
     }
 
@@ -902,7 +846,7 @@ lazy(mega, 'fileRequestCommon', () => {
             return `${getBaseUrl()}/filerequest/${puPagePublicHandle}`;
         }
 
-        generateUrlPreview(name, title, description, theme) {
+        generateUrlPreview(name, title, description, theme, pupHandle) {
             const extensionSymbol = is_extension ? '#' : '/';
             const encodedName = name ? `!n-${base64urlencode(to8(name))}` : '';
             const encodedTitle = title ? `!t-${base64urlencode(to8(title))}` : '';
@@ -910,7 +854,7 @@ lazy(mega, 'fileRequestCommon', () => {
             const encodedTheme = theme ? `!m-${base64urlencode(to8(theme))}` : '';
 
             return `${getAppBaseUrl()}${extensionSymbol}` +
-                `filerequest/${encodedName}${encodedTitle}${encodedDescription}${encodedTheme}`;
+                `filerequest/${pupHandle || ''}${encodedName}${encodedTitle}${encodedDescription}${encodedTheme}`;
         }
 
         windowOpen(url) {
@@ -926,187 +870,75 @@ lazy(mega, 'fileRequestCommon', () => {
     }
 
     class FileRequestActionHandler {
-        async processPublicUploadHandle(actionPacket) {
-            if (d) {
+        processPublicUploadHandle(actionPacket) {
+            if (window.d) {
                 logger.info('Handler.processPublicUploadHandle - Handle puh', actionPacket);
             }
 
-            for (let i = actionPacket.length; i--;) {
-                const publicUploadHandle = Object.assign({}, actionPacket[i]);
-                if (publicUploadHandle.d) { // if PUH is deleted
-                    mega.fileRequest.storage.removePuHandle(
-                        publicUploadHandle.h,
-                        publicUploadHandle.ph
-                    );
+            const {h, ph, d} = actionPacket;
 
-                    refreshFileRequestPageList();
-                    removeFileRequestIcon(publicUploadHandle.h);
+            if (d) {
+                mega.fileRequest.storage.removePuHandle(h, ph);
+
+                if (fminitialized) {
+                    // @todo ideally we should not openFolder(true)
+                    delay('fr:processPublicUploadHandle', refreshFileRequestPageList);
                 }
-                else {
-                    await mega.fileRequestCommon.storage.addPuHandle(
-                        publicUploadHandle.h,
-                        publicUploadHandle.ph,
-                        null,
-                        null,
-                        publicUploadHandle.i
-                    ).catch(dump);
-                }
+            }
+            else {
+                mega.fileRequestCommon.storage.addPuHandle(h, ph);
             }
         }
 
-        async processUploadedPuHandles(actionPacket) {
+        processUploadedPuHandles(fetchNodesResponse) {
             if (d) {
-                logger.info('Handler.processUploadedPuHandles - Handle uph');
+                logger.debug('[uph] processUploadedPuHandles', fetchNodesResponse);
             }
 
-            for (let i = actionPacket.length; i--;) {
-                const publicUploadHandle = Object.assign({}, actionPacket[i]);
-
-                await mega.fileRequestCommon.storage.addPuHandle(
-                    publicUploadHandle.h,
-                    publicUploadHandle.ph
-                ).catch(dump);
+            for (let i = 0; i < fetchNodesResponse.length; ++i) {
+                const {h, ph} = fetchNodesResponse[i];
+                mega.fileRequestCommon.storage.addPuHandle(h, ph);
             }
         }
 
         processPublicUploadPage(actionPacket) {
+            const state = actionPacket.s | 0;
+            const doAdd = state === 2;
+
             if (d) {
-                logger.info('Handler.processPublicUploadPage - Handle pup', actionPacket);
+                logger.info('Handler.processPublicUploadPage - %s pup', doAdd ? 'Add' : 'Remove', actionPacket);
             }
 
-            const fileRequestObject = mega.fileRequest;
-            const isDebug = d;
-            const errorNonExistent = ENOENT;
+            assert(actionPacket && typeof actionPacket.p === 'string',
+                   'processPublicUploadPage: No PUP Handle - Check this', actionPacket.ph, [actionPacket]);
 
-            const processDifferentRequest = (publicUploadPage, puHandlePublicHandle) => {
-                const puPageId = publicUploadPage.p;
-                const puHandleId = puHandlePublicHandle;
+            if (doAdd) {
 
-                fileRequestObject.api.getPuPage(puPageId)
-                    .then((puPage) => {
-                        fileRequestObject.storage.addPuPage(puPage);
-
-                        const currentPuPage = fileRequestObject.storage.getPuPageByPageId(puPage.p);
-                        if (currentPuPage && puPage.d) {
-                            fileRequestObject.storage
-                                .updatePuHandle(
-                                    currentPuPage.h,
-                                    puPage.d.msg,
-                                    puPage.d.description
-                                );
-                        }
-                    })
-                    .catch(
-                        (ex) => {
-                            if (ex === errorNonExistent) {
-                                fileRequestObject.storage.removePuPage(puPageId, puHandleId);
-
-                                if (isDebug) {
-                                    logger.warn(
-                                        'processPublicUploadPage - Api.getPuPage - Page does not exist',
-                                        puHandleId,
-                                        puPageId,
-                                        ex
-                                    );
-                                }
-                                return;
-                            }
-
-                            if (isDebug) {
-                                logger.warn(
-                                    'processPublicUploadPage - Api.getPuPage - Something went wrong',
-                                    puHandleId,
-                                    puPageId,
-                                    ex
-                                );
-                            }
-                        }
-                    );
-            };
-
-            for (let i = actionPacket.length; i--;) {
-                const publicUploadPage = Object.assign({}, actionPacket[i]);
-                const puHandlePublicHandle = publicUploadPage.ph;
-                const puHandleState = publicUploadPage.s || 0;
-                const requestId = publicUploadPage.i;
-                const currentRequestId = requesti;
-                const isMobile = is_mobile;
-
-                if (puHandleState !== 2) { // Inactive PUP
-                    if (d) {
-                        logger.info('Handler.processPublicUploadPage - Inactive PUP', publicUploadPage);
-                    }
-                    fileRequestObject.removePuPage(publicUploadPage);
-                    continue;
-                }
-
-                if (!publicUploadPage.u) { // If not update operation
-                    const eventMessage = `FileRequest:puhProcessed_${puHandlePublicHandle}`;
-                    if (d) {
-                        logger.info(
-                            `#file-handler - Handler.processPublicUploadPage - Subscribe ${eventMessage}`,
-                            publicUploadPage
-                        );
-                    }
-
-                    const processedEventCallback = () => {
-                        fileRequestObject.storage.addPuPage(publicUploadPage);
-
-                        if (currentRequestId === requestId) {
-                            if (isMobile) {
-                                fileRequestObject.dialogs.successMobileDialog.init(publicUploadPage);
-                            }
-                            else {
-                                fileRequestObject.dialogs.createSuccessDialog.init(publicUploadPage);
-                            }
-                        }
-                        else {
-                            processDifferentRequest(publicUploadPage, puHandlePublicHandle);
-                        }
-
-                        if (!isMobile) {
-                            refreshFileRequestPageList();
-                        }
-
-                        addFileRequestIcon(puHandlePublicHandle);
-                        fileRequestObject.storage.removePuMessage(puHandlePublicHandle);
-                    };
-
-                    if (fileRequestObject.storage.hasPuMessage(puHandlePublicHandle)) {
-                        processedEventCallback();
-                        if (d) {
-                            logger.info('Handler.processPublicUploadPage - Process Success Dialog', publicUploadPage);
-                        }
-                    }
-                    else {
-                        // We are the first one to subscribe
-                        mBroadcaster.once(eventMessage, processedEventCallback);
-                    }
-
-                    continue;
-                }
-
-                if (d) {
-                    logger.info('Handler.processPublicUploadPage - Update PUP', publicUploadPage);
-                }
-
-                fileRequestObject.storage.addPuPage(publicUploadPage);
-                processDifferentRequest(publicUploadPage, puHandlePublicHandle);
+                mega.fileRequest.storage.addPuPage(actionPacket);
             }
+            else {
 
-            loadingDialog.hide();
+                mega.fileRequest.removePuPage(actionPacket);
+            }
         }
     }
+
+    /** @class mega.fileRequestCommon */
     return new class {
         constructor() {
             this.init();
         }
 
         init() {
+            /** @class mega.fileRequestCommon.storage */
             lazy(this, 'storage', () => new FileRequestStorage);
-            lazy(this, 'api', () => new FileRequestApi);
+            /** @class mega.fileRequestCommon.fileRequestApi */
+            lazy(this, 'fileRequestApi', () => new FileRequestApi());
+            /** @class mega.fileRequestCommon.generator */
             lazy(this, 'generator', () => new FileRequestGenerator);
+            /** @class mega.fileRequestCommon.actionHandler */
             lazy(this, 'actionHandler', () => new FileRequestActionHandler());
+            /** @function mega.fileRequestCommon.addFileRequestIcon */
             lazy(this, 'addFileRequestIcon', () => addFileRequestIcon);
         }
     };

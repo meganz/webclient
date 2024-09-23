@@ -8,6 +8,7 @@ var dlkey = false;
 var cn_url = false;
 var init_l = true;
 var pfkey = false;
+var pfcol = false;
 var pfid = false;
 var pfhandle = false;
 var n_h = false;
@@ -33,8 +34,7 @@ var register_txt = false;
 var login_next = false;
 var loggedout = false;
 var flhashchange = false;
-var is_chatlink = false;
-var avatars = {};
+var avatars = Object.create(null);
 var mega_title = 'MEGA';
 
 var pro_json = '[[["N02zLAiWqRU",1,500,1024,1,"9.99","EUR"],["zqdkqTtOtGc",1,500,1024,12,"99.99","EUR"],["j-r9sea9qW4",2,2048,4096,1,"19.99","EUR"],["990PKO93JQU",2,2048,4096,12,"199.99","EUR"],["bG-i_SoVUd0",3,4096,8182,1,"29.99","EUR"],["e4dkakbTRWQ",3,4096,8182,12,"299.99","EUR"]]]';
@@ -47,10 +47,6 @@ pages.placeholder = '<div class="bottom-page scroll-block placeholder selectable
 
 mBroadcaster.once('startMega', function() {
     'use strict';
-
-    if (is_mobile) {
-        pages.placeholder = pages.mobile || '';
-    }
 
     if (pages['dialogs-common']) {
         $('body').safeAppend(translate(pages['dialogs-common'].replace(/{staticpath}/g, staticpath)));
@@ -71,6 +67,30 @@ mBroadcaster.once('startMega', function() {
     if (({'fa': 1,'ar': 1,'he': 1})[lang]) {
         document.body.classList.add('rtl');
     }
+
+    if (is_mobile) {
+
+        const usingMobPages = ['placeholder', 'register', 'key', 'support', 'keybackup',
+                               'disputenotice', 'download', 'reset', 'propay', 'login'];
+
+        for (let i = usingMobPages.length; i--;) {
+
+            delete pages[usingMobPages[i]];
+            jsl_loaded[usingMobPages[i]] = 1;
+        }
+
+        pages = new Proxy(pages, {
+            get(target, prop) {
+                if (target[prop] === undefined) {
+                    if (d) {
+                        console.info(`[proxy] providing 'mobile' page for '${prop}'`);
+                    }
+                    return target.mobile || '';
+                }
+                return target[prop] || '';
+            }
+        });
+    }
 });
 
 mBroadcaster.once('startMega:desktop', function() {
@@ -85,10 +105,8 @@ mBroadcaster.once('startMega:desktop', function() {
             delete pages[p[i]];
         }
     }
-
-    if ((p = document.querySelector('.media-viewer .content'))) {
-        mCreateElement('iframe', {type: 'content', 'class': 'hidden', src: 'about:blank', id: 'pdfpreviewdiv1'}, p);
-    }
+    $('#avatar-svg').safeAppend(pages.contact_avatar);
+    delete pages.contact_avatar;
 });
 
 function startMega() {
@@ -107,6 +125,7 @@ function startMega() {
     }
 
     if (silent_loading) {
+        loadingDialog.hide('jsl-loader');
         onIdle(silent_loading);
         silent_loading = false;
     }
@@ -146,11 +165,18 @@ function topMenu(close) {
             $mobileOverlay.addClass('hidden').removeClass('active').unbind('tap.topmenu');
         }
         $(window).off('resize.topmenu');
+        if (M.chat && megaChatIsReady) {
+            megaChat.plugins.chatOnboarding.checkAndShowStep();
+        }
     }
     else {
         $.topMenu = 'topmenu';
         $topMenuBtn.addClass('menu-open');
         $topMenu.removeClass('o-hidden');
+
+        if (M.chat && $.dialog === 'onboardingDialog') {
+            closeDialog();
+        }
 
         if (u_type) {
             const $menuAvatar = $('.avatar-block', $topMenu);
@@ -161,31 +187,23 @@ function topMenu(close) {
 
             $('.top-menu-logged .loader', $topMenu).addClass('loading');
 
-            // M.storageQuotaCache is exist, fm is inited but not folder link,
-            // pulled storage data already and the data is not updated.
-            if (M.storageQuotaCache && !folderlink) {
-                topMenuDataUpdate(M.storageQuotaCache);
-            }
-            // M.storageQuotaCache is not exist, it is either not on fm or data was revoked by action packet.
-            else {
-                M.getStorageQuota().then(data => {
+            Promise.resolve(M.storageQuotaCache || M.getStorageQuota())
+                .then((data) => {
 
                     topMenuDataUpdate(data);
 
                     if (fminitialized && !folderlink && M.currentTreeType === 'cloud-drive') {
-                        M.checkLeftStorageBlock(data);
+
+                        return M.checkLeftStorageBlock(data);
                     }
-                }).catch(dump);
-            }
+                })
+                .catch(dump);
         }
 
         if (!is_mobile) {
             topMenuScroll($scrollBlock);
         }
         else {
-            // Mobile
-            // Close the title menu
-            mobile.titleMenu.close();
 
             // Show the dark backround overlay behind the menu and if it's clicked, close the menu
             $('html').addClass('overlayed');
@@ -225,7 +243,15 @@ function topMenuDataUpdate(data) {
 
     $('.loader', $storageBlock).removeClass('loading');
     $('.storage-txt', $storageBlock).safeHTML(storageHtml);
-    $('.storage span', $storageBlock).outerWidth(perc + '%');
+    const $storageBar = $('.storage', $storageBlock);
+
+    if (u_attr && !u_attr.pf) {
+        $('span', $storageBar).outerWidth(perc + '%');
+        $storageBar.removeClass('hidden');
+    }
+    else {
+        $storageBar.addClass('hidden');
+    }
 }
 
 function topMenuScroll($scrollBlock) {
@@ -266,7 +292,9 @@ function scrollMenu() {
 }
 
 function topPopupAlign(button, popup, topPos) {
-    $.popupAlign = function () {
+    'use strict';
+
+    const popupAlign = () => {
         var $button = $(button),
             $popup = $(popup),
             $popupArrow = $popup.children('.dropdown-white-arrow'),
@@ -319,20 +347,27 @@ function topPopupAlign(button, popup, topPos) {
 
     // If top menu is opened - set timeout to count correct positions
     if (!$('.top-menu-popup').hasClass('o-hidden') || $('body').hasClass('hidden')) {
-        setTimeout(function () {
-            $.popupAlign();
-        }, 250);
+
+        tSleep(0.2).then(() => requestAnimationFrame(popupAlign));
     }
     else {
-        $.popupAlign();
+        requestAnimationFrame(popupAlign);
     }
 }
 
 function init_page() {
-    page = page || (u_type ? 'fm' : 'start');
+    page = String(page || (u_type ? 'fm' : 'start'));
 
-    if (!window.M) {
+    if (!window.M || is_megadrop) {
         return console.warn('Something went wrong, the initialization did not completed...');
+    }
+
+    if (mega.ensureAccessibility) {
+        if (mega.ensureAccessibility() !== 'accessible') {
+            console.error('Unable to ensure accessibility...');
+            return false;
+        }
+        delete mega.ensureAccessibility;
     }
 
     // If they are transferring from mega.co.nz
@@ -382,11 +417,16 @@ function init_page() {
     // Rmove business class to affect the top header
     // Remove bottom-page class and old class
     // Remove pro class when user come back from pro page
-    document.body.classList.remove('business', 'bottom-pages', 'old', 'pro');
+    document.body.classList.remove('business', 'bottom-pages', 'old', 'pro', 'mega-lite-mode');
+
+    // Add mega-lite-mode class to hide/show various elements in MEGA Lite mode
+    if (mega.lite.inLiteMode) {
+        document.body.classList.add('mega-lite-mode');
+    }
 
     // Redirect url to extensions when it tries to go plugin or chrome or firefox
     if (page === 'plugin') {
-        loadSubPage('extensions');
+        mega.redirect('mega.io', 'extensions', false, false);
         return false;
     }
 
@@ -408,7 +448,7 @@ function init_page() {
 
     $('#loading').hide();
     if (window.loadingDialog) {
-        loadingDialog.hide();
+        loadingDialog.hide('force');
     }
 
     if (is_chatlink || page.substr(0, 5) === 'chat/') {
@@ -423,13 +463,21 @@ function init_page() {
             return false;
         }
 
+        page = page.slice(0, 36);
+        const [publicChatHandle, publicChatKey] = page.replace('chat/', '').split('#');
+        if (!publicChatHandle || publicChatHandle.length !== 8 || !publicChatKey || publicChatKey.length !== 22) {
+            return u_type
+                ? loadSubPage('fm/chat')
+                : mega.redirect('mega.io', 'chatandmeetings', false, false);
+        }
+
         if (typeof is_chatlink !== 'object') {
             is_chatlink = Object.create(null);
         }
 
         Object.defineProperties(is_chatlink, {
-            ph: {value: page.substr(5, 8)},
-            key: {value: page.substr(14).split("?")[0]},
+            ph: { value: publicChatHandle },
+            key: { value: publicChatKey },
             pnh: {
                 get: function() {
                     return this.url && this.ph;
@@ -490,7 +538,7 @@ function init_page() {
             init();
         }
 
-        mega.ui.theme.setWithUA();
+        mega.ui.setTheme();
 
         return;
     }
@@ -503,7 +551,9 @@ function init_page() {
         var ctLink = page.substring(2, page.length);
         if (!is_mobile) {
             if (!u_type) {
+                parsepage(pages.placeholder);
                 openContactInfoLink(ctLink);
+                return;
             }
             else {
                 page = 'fm/chat/contacts';
@@ -524,7 +574,9 @@ function init_page() {
                 contactInfoCard.showContactLinkInfo();
             };
             if (!u_type) {
-                mBroadcaster.once('HomeStartPageRendered:mobile', processContactLink);
+                parsepage(pages.placeholder);
+                processContactLink();
+                return;
             }
             else {
                 loadSubPage('fm');
@@ -535,34 +587,34 @@ function init_page() {
     }
 
     var newLinkSelector = '';
-    if (page.substr(0, 7) === 'folder/') {
-        var phLen = page.indexOf('#');
-        var possibleS = -1;
+    if (page.startsWith('folder/') || page.startsWith('collection/')) {
+        const pos = page.indexOf('/') + 1;
+        let phLen = page.indexOf('#');
+        let possibleS = -1;
 
         if (phLen < 0) {
             phLen = page.length;
-            possibleS = page.indexOf('/f', 7);
+
+            possibleS = page.indexOf('/f', pos);
             if (possibleS > -1) {
                 phLen = possibleS;
             }
         }
 
-        pfid = page.substr(7, phLen - 7).replace(/[^\w-]+/g, "");
+        pfid = page.substr(pos, phLen - pos).replace(/[^\w-]+/g, "");
 
         // check if we have key
         pfkey = false;
         pfhandle = false;
+        pfcol = page.startsWith('collection/');
+
         if (page.length - phLen > 2) {
             if (possibleS === -1) {
                 phLen++;
             }
-
-            var linkRemaining = page.substr(phLen, page.length - phLen);
-
+            const [linkRemaining] = page.substr(phLen, page.length - phLen).split('?');
             var fileSelectorPlace = linkRemaining.indexOf('/file/');
-
             var folderSelectorPlace = linkRemaining.indexOf('/folder/');
-
             var selectorIsValid = false;
 
             if (fileSelectorPlace > -1 || folderSelectorPlace > -1) {
@@ -600,14 +652,19 @@ function init_page() {
                     keyCutPlace = linkRemaining.length;
                 }
             }
-            pfkey = linkRemaining.substring(0, keyCutPlace).replace(/[^\w-]+/g, "") || false;
-
+            pfkey = linkRemaining.substring(0, keyCutPlace).replace(/[^\w-]+/g, "").slice(0, 22) || false;
         }
 
         n_h = pfid;
         if (!flhashchange || pfkey !== oldPFKey || pfkey.length !== 22 || pfid.length !== 8) {
             closeDialog();
-            eventlog(is_mobile ? 99631 : 99632, true);
+
+            const data = JSON.stringify([
+                1,
+                !oldPFKey | 0, !!flhashchange | 0, (pfkey !== oldPFKey) | 0,
+                pfkey.length | 0, pfid.length | 0, window[`preflight-folder-link-error:${pfid}`] | 0
+            ]);
+            eventlog(pfcol ? is_mobile ? 99911 : 99910 : is_mobile ? 99631 : 99632, data, true);
 
             if (pfid.length !== 8 || window['preflight-folder-link-error:' + pfid]) {
                 folderreqerr(false, window['preflight-folder-link-error:' + pfid] || EARGS);
@@ -616,40 +673,33 @@ function init_page() {
 
             if (pfkey.length === 22) {
                 api_setfolder(n_h);
-                if (waitxhr) {
-                    waitsc();
-                }
+                waitsc.poke();
                 u_n = pfid;
             }
             else {
-                // If mobile, show the decryption key overlay
-                if (is_mobile) {
-                    mobile.initDOM();
-                    mobile.decryptionKeyOverlay.show(pfid, true, pfkey);
-                    fm_hideoverlay();
-                }
-                else {
-                    // Insert placeholder background page while waiting for user input
-                    parsepage(pages.placeholder);
+                // Insert placeholder background page while waiting for user input
+                parsepage(pages.placeholder);
 
-                    // Lets apply theme for this dialog
-                    mega.ui.theme.setWithUA();
+                // Let's apply theme for this dialog
+                mega.ui.setTheme();
+                onIdle(topmenuUI);
 
-                    // Show the decryption key dialog on top
-                    mKeyDialog(pfid, true, pfkey, newLinkSelector)
-                        .fail(function() {
-                            loadSubPage('start');
-                        });
-                    pfkey = false;
-                }
+                // Show the decryption key dialog on top
+                mKeyDialog(pfid, true, pfkey, newLinkSelector)
+                    .catch(() => {
+                        loadSubPage('start');
+                    });
+
+                pfkey = false;
                 return false;
             }
 
             if (fminitialized && (!folderlink || pfkey !== oldPFKey)) {
                 // Clean up internal state in case we're navigating back to a folderlink
-                M.currentdirid = M.RootID = undefined;
+                M.currentdirid = M.RootID = M.currentCustomView = undefined;
                 delete $.onImportCopyNodes;
                 delete $.mcImport;
+                delete $.albumImport;
             }
         }
 
@@ -661,6 +711,12 @@ function init_page() {
         }
     }
     else if (!flhashchange || page !== 'fm/transfers') {
+        if (pfcol) {
+            pfcol = false;
+            mega.gallery.albums.disposeAll();
+            mega.gallery.removeDbActionCache();
+            mega.gallery.albumsRendered = false;
+        }
         n_h = false;
         u_n = false;
         pfkey = false;
@@ -734,6 +790,7 @@ function init_page() {
         && (page !== 'cookie')
         && (page.indexOf('file/') === -1)
         && (page.indexOf('folder/') === -1)
+        && !page.startsWith('collection/')
         && localStorage.awaitingConfirmationAccount) {
 
         var acc = JSON.parse(localStorage.awaitingConfirmationAccount);
@@ -743,16 +800,15 @@ function init_page() {
             delete localStorage.awaitingConfirmationAccount;
         }
         else {
+            parsepage(pages.placeholder);
+
             // Show signup link dialog for mobile
             if (is_mobile) {
-                mobile.initDOM();
                 mobile.register.showConfirmEmailScreen(acc);
                 return false;
             }
             else {
                 // Insert placeholder page while waiting for user input
-                parsepage(pages['placeholder']);
-
                 return mega.ui.sendSignupLinkDialog(acc, function () {
                     // The user clicked 'close', abort and start over...
                     delete localStorage.awaitingConfirmationAccount;
@@ -779,31 +835,32 @@ function init_page() {
         parsepage(pages.placeholder);
 
         if (is_mobile) {
-            mobile.decryptionPasswordOverlay.show(page);
+            mobile.passwordDecryption.show(page);
         }
         else {
             exportPassword.decrypt.init(page);
-
-            // lets set them for the dialog.
-            mega.ui.theme.setWithUA();
         }
+
+        // lets set them for the dialog.
+        mega.ui.setTheme();
     }
     else if (page.substr(0, 4) === 'blog') {
-        location.replace('https://blog.mega.io');
+        window.location.replace('https://blog.mega.io');
     }
     else if (page.substr(0, 6) == 'verify') {
         if (is_mobile) {
-            mobile.initDOM();
-            mobile.verify.init();
+            mobile.settings.account.verifyEmail.init();
         }
         else {
             parsepage(pages.change_email);
             emailchange.main();
         }
     }
+    else if (page === 'corporate/reviews') {
+        window.location.replace('/login');  // Page removed
+    }
     else if (page.substr(0, 9) === 'corporate') {
-        parsepage(pages.corporate);
-        corporate.init();
+        mega.redirect('mega.io', 'media', false, false);
     }
     // If user has been invited to join MEGA and they are not already registered
     else if (page.substr(0, 9) == 'newsignup') {
@@ -848,8 +905,9 @@ function init_page() {
     }
     else if (page.length > 14 && page.substr(0, 14) === 'businesssignup') {
         if (is_mobile) {
-            parsepage(pages['mobile']);
-            mobile.decryptionPasswordOverlay.show(page, true);
+            parsepage(pages.mobile);
+            mega.ui.setTheme();
+            mobile.passwordDecryption.show();
         }
         else {
             var signupCodeEncrypted = page.substring(14, page.length);
@@ -862,7 +920,7 @@ function init_page() {
     }
     else if (page.length > 14 && page.substr(0, 14) === 'businessinvite') {
         if (is_mobile) {
-            mobile.initDOM();
+            parsepage(pages.mobile);
         }
         var signupCode = page.substring(14, page.length);
         M.require('businessAcc_js', 'businessAccUI_js').done(function () {
@@ -873,124 +931,57 @@ function init_page() {
     else if (page === 'confirm') {
 
         loadingDialog.show();
+        security.register.verifyEmailConfirmCode(confirmcode)
+            .then(({email}) => {
 
-        // A callback for when the email confirm code was valid
-        var signUpSucceededCallback = function(email) {
+                page = 'login';
+                confirmok = true;
+                parsepage(pages.login);
+                onIdle(topmenuUI);
 
-            loadingDialog.hide();
-            confirmok = true;
-            page = 'login';
-
-            if (is_mobile) {
-                mobile.initDOM();
-                mobile.register.showConfirmAccountScreen(email);
-            }
-            else {
-                parsepage(pages['login']);
-                login_txt = l[378];
-
-                init_login();
-                if (email) {
-                    $('#login-name2').val(email).blur();
-                    $('.register-st2-button').addClass('active');
-                    $('#login-name2').prop('readonly', true);
-                }
-                topmenuUI();
-            }
-        };
-
-        // A callback for when the email confirm code was invalid
-        var signUpFailedCallback = function(result) {
-
-            loadingDialog.hide();
-            page = 'login';
-
-            if (is_mobile) {
-                parsepage(pages['mobile']);
-                mobile.register.showConfirmAccountFailure(result);
-            }
-            else {
-                if (result === EINCOMPLETE) {
-                    alert(l[703]);
-                }
-                else if (result === ENOENT) {
-                    login_txt = l[19788];
-                }
-                else {
-                    alert(l[705] + result);
-                }
-
-                parsepage(pages['login']);
-                init_login();
-                topmenuUI();
-            }
-        };
-
-        // Decode the email confirm code
-        var decodedConfirmCode = base64urldecode(confirmcode);
-
-        // Check if they registered using the new registration process (version 2)
-        if (decodedConfirmCode.substr(0, 13) === 'ConfirmCodeV2') {
-
-            // If already logged into an account
-            if (u_type === 3) {
-
-                // Ask them to log out and click on the confirmation link again
                 if (is_mobile) {
-                    parsepage(pages['mobile']);
-                    mobile.messageOverlay.show(l[2480], l[12440], function() {
-                        loadSubPage('fm');
-                    });
+                    mobile.register.showConfirmAccountScreen(email);
                 }
                 else {
-                    msgDialog('warningb', l[2480], l[12440], false, function() {
-                        loadSubPage('fm');
-                    });
-                }
-                return false;
-            }
+                    login_txt = l[378];
+                    init_login();
 
-            // Verify the confirm code using the new process
-            security.register.verifyEmailConfirmCode(confirmcode, function(result, email) {
-
-                // If successful
-                if (typeof email === 'string') {
-
-                    if (u_handle && u_handle === result[2]) {
-                        // same account still in active session, let's end.
-                        if ('csp' in window) {
-                            const storage = localStorage;
-                            const value = storage[`csp.${u_handle}`];
-
-                            if (value) {
-                                storage.csp = value;
-                            }
-                        }
-                        u_logout(1);
+                    if (email) {
+                        $('#login-name2').val(email).blur();
+                        $('.register-st2-button').addClass('active');
+                        $('#login-name2').prop('readonly', true);
                     }
+                }
+            })
+            .catch((ex) => {
+                if (ex === EROLLEDBACK) {
+                    return;
+                }
 
-                    signUpSucceededCallback(email);
+                page = 'login';
+                parsepage(pages.login);
+
+                if (is_mobile) {
+                    mobile.register.showConfirmAccountFailure(ex);
                 }
                 else {
-                    signUpFailedCallback(result);
+                    login_txt = ex === ENOENT ? l[19788] : String(ex).includes(l[703]) && l[703] || `${l[705]} ${ex}`;
+
+                    init_login();
+                    topmenuUI();
                 }
+            })
+            .finally(() => {
+                loadingDialog.hide();
             });
-        }
-        else {
-            console.error("Unsupported verification code.");
-            signUpFailedCallback(EINCOMPLETE);
-        }
     }
     else if (page.startsWith('emailverify')) {
         return security.showVerifyEmailDialog('login-to-account');
     }
     else if (u_type == 2) {
+        parsepage(pages.key);
         if (is_mobile) {
-            parsepage(pages['mobile']);
             mobile.register.showGeneratingKeysScreen();
-        }
-        else {
-            parsepage(pages['key']);
         }
         init_key();
     }
@@ -1004,12 +995,12 @@ function init_page() {
             login_txt =  login_next === 'support' ? l.support_redirect_login : l[24766];
             delete window.nextPage;
         }
+        parsepage(pages.login);
         if (is_mobile) {
-            mobile.initDOM();
+            MegaMobileHeader.init(true);
             mobile.signin.show();
         }
         else {
-            parsepage(pages['login']);
             init_login();
         }
     }
@@ -1024,66 +1015,10 @@ function init_page() {
         loadSubPage('fm');
         return false;
     }
-    else if (is_mobile && u_type && page === 'fm/account/invites/how-it-works') {
-        parsepage(pages['mobile']);
-        mobile.achieve.howItWorks.init();
-        return false;
-    }
-    else if (is_mobile && u_type && (page === 'fm/account/plan' || page === 'fm/account/security')) {
-        return loadSubPage('fm/account');
-    }
-    else if (is_mobile && u_type && page === 'fm/account/invites') {
-        parsepage(pages['mobile']);
-        mobile.achieve.invites.init();
-        return false;
-    }
-    else if (is_mobile && u_type && page === 'fm/account/referrals') {
-        parsepage(pages['mobile']);
-        mobile.achieve.referrals.init();
-        return false;
-    }
-    else if (is_mobile && u_type && page === 'fm/account/achievements') {
-        parsepage(pages['mobile']);
-        mobile.achieve.init();
-        return false;
-    }
-    else if (is_mobile && u_type && page === 'fm/account/history') {
-        parsepage(pages['mobile']);
-        mobile.account.history.init();
-        return false;
-    }
-    else if (is_mobile && u_type && page === 'fm/account/paymentcard') {
-        parsepage(pages.mobile);
-        mobile.account.paymentCard.init();
-        return false;
-    }
-    else if (is_mobile && u_type
-        && (page === 'fm/account/security/change-password' || page === 'fm/account/email-and-pass')) {
-        parsepage(pages['mobile']);
-        mobile.account.changePassword.init();
-        return false;
-    }
-    else if (is_mobile && u_type && page === 'fm/account/security/change-email') {
-        mobile.initDOM();
-        mobile.account.changeEmail.init();
-        return false;
-    }
-    else if (is_mobile && fminitialized && u_type && page === 'fm/account/notifications') {
-        mobile.initDOM();
-        mobile.account.notifications.init();
-        return false;
-    }
-    else if (is_mobile && fminitialized && u_type && page === 'fm/account/file-management') {
-        mobile.initDOM();
-        mobile.account.filemanagement.init();
-        return false;
-    }
     else if (page === 'achievements') {
-        parsepage(pages.achievements);
-        achievementPage();
-        return false;
+        mega.redirect('mega.io', 'achievements', false, false);
     }
-    else if (page === 'fm/account/achievements') {
+    else if (!is_mobile && page === 'fm/account/achievements') {
         $.openAchievemetsDialog = true;
         loadSubPage('fm/account/plan');
         return false;
@@ -1092,79 +1027,8 @@ function init_page() {
         loadSubPage('fm');
         return false;
     }
-    else if (is_mobile && u_type && page === 'fm/refer') {
-        parsepage(pages.mobile);
-        mobile.affiliate.initMainPage();
-        return false;
-    }
-    else if (is_mobile && u_type && page === 'fm/refer/redeem') {
-        parsepage(pages.mobile);
-        mobile.affiliate.initRedeemPage();
-        return false;
-    }
-    else if (is_mobile && u_type && page === 'fm/refer/guide') {
-        parsepage(pages.mobile);
-        mobile.affiliate.initGuidePage();
-        return false;
-    }
-    else if (is_mobile && u_type && page === 'fm/refer/history') {
-        parsepage(pages.mobile);
-        mobile.affiliate.initHistoryPage();
-        return false;
-    }
-    else if (is_mobile && u_type && page === 'fm/refer/distribution') {
-        parsepage(pages.mobile);
-        mobile.affiliate.initDistributionPage();
-        return false;
-    }
-    else if (is_mobile && page.substr(0, 9) === 'twofactor') {
-
-        parsepage(pages['mobile']);
-
-        if (page.indexOf('intro') > -1) {
-            mobile.twofactor.intro.init();
-        }
-        else if (page.indexOf('verify-setup') > -1) {
-            mobile.twofactor.verifySetup.init();
-        }
-        else if (page.indexOf('setup') > -1) {
-            mobile.twofactor.setup.init();
-        }
-        else if (page.indexOf('enabled') > -1) {
-            mobile.twofactor.enabled.init();
-        }
-        else if (page.indexOf('verify-disable') > -1) {
-            mobile.twofactor.verifyDisable.init();
-        }
-        else if (page.indexOf('disabled') > -1) {
-            mobile.twofactor.disabled.init();
-        }
-        else if (page.indexOf('verify-login') > -1) {
-            mobile.twofactor.verifyLogin.init();
-        }
-
-        return false;
-    }
-    else if (is_mobile && !isEphemeral() && page.substr(0, 3) === 'sms') {
-
-        parsepage(pages['mobile']);
-
-        if (page.indexOf('add-phone-suspended') > -1) {
-            mobile.sms.phoneInput.init();
-        }
-        else if (page.indexOf('verify-code') > -1) {
-            mobile.sms.verifyCode.init();
-        }
-        else if (page.indexOf('verify-success') > -1) {
-            mobile.sms.verifySuccess.init();
-        }
-        else if (page.indexOf('phone-achievement-intro') > -1) {
-            mobile.sms.achievement.init();
-        }
-        else if (page.indexOf('add-phone-achievement') > -1) {
-            mobile.sms.phoneInput.init();
-        }
-
+    else if (is_mobile && (page.startsWith('twofactor') || page.startsWith('sms'))) {
+        loadSubPage(`fm/account/${page}`);
         return false;
     }
     else if (page === 'fm/account/profile') {
@@ -1173,22 +1037,8 @@ function init_page() {
         loadSubPage('fm/account');
         return false;
     }
-    else if (is_mobile && page === 'fm/account') {
-
-
-        parsepage(pages['mobile']);
-        mobile.account.init();
-        return false;
-    }
     else if (page == 'account') {
         loadSubPage('fm/account');
-        return false;
-    }
-    else if (page.substr(0, 11) === 'filerequest') {
-        mega.fileRequestUpload.handlePublicUploadPage(page.substr(12));
-    }
-    else if (page.substr(0, 8) === 'megadrop') {
-        loadSubPage(`filerequest/${page.substr(9)}`);
         return false;
     }
     else if (page == 'dashboard') {
@@ -1201,28 +1051,31 @@ function init_page() {
             return false;
         }
 
+        parsepage(pages.register);
+
         if (is_mobile) {
             if (window.pickedPlan) {
                 sessionStorage.proPageContinuePlanNum = window.pickedPlan;
                 delete window.pickedPlan;
             }
-            mobile.initDOM();
             mobile.register.show();
         }
         else {
-            parsepage(pages['register']);
             init_register();
         }
+        eventlog(500272);
     }
     else if ((page.substr(0, 9) === 'registerb')) { // business register
         getUAOParameter(page, 'registerb');
 
-        parsepage(pages['registerb']);
+        parsepage(pages.registerb);
         document.body.classList.add('business');
         var regBusiness = new BusinessRegister();
         regBusiness.initPage();
+
+        eventlog(500444);
     }
-    else if (page === 'fm/account/history') {
+    else if (!is_mobile && page === 'fm/account/history') {
         $.scrollIntoSection = '.session-history';
         loadSubPage('fm/account/security');
         return false;
@@ -1232,18 +1085,15 @@ function init_page() {
         return false;
     }
     else if (page == 'key') {
+        parsepage(pages.key);
         if (is_mobile) {
-            mobile.initDOM();
             mobile.register.showGeneratingKeysScreen();
-        }
-        else {
-            parsepage(pages['key']);
         }
         init_key();
     }
     else if (page === 'support') {
         if (is_mobile) {
-            mobile.initDOM();
+            parsepage(pages.support);
             mobile.support.init();
         }
         else if (u_type === 0) {
@@ -1251,70 +1101,27 @@ function init_page() {
             return false;
         }
         else {
-            parsepage(pages['support']);
+            parsepage(pages.support);
             support.initUI();
         }
     }
     else if (page == 'contact') {
-        parsepage(pages['contact']);
-        if (lang == 'ru') {
-            $('.account-mid-block').addClass('high');
-        }
-
-        // if this is a business user
-        var $supportLink = $('#contact-email-support-btn');
-        if (u_attr && u_attr.b) {
-            $supportLink.text('business@mega.nz');
-            $supportLink.prop('href', 'mailto:business@mega.nz');
-        }
-        else {
-            $supportLink.text('support@mega.nz');
-            $supportLink.prop('href', 'mailto:support@mega.nz');
-        }
-
-        // On clicking the directory buttons
-        $('.directory-buttons li').rebind('click', function() {
-
-            // Get the class to the directory title element to scroll to
-            var link = $(this).attr('data-link');
-
-            // Scroll to the element's parent (not the element itself because it's hidden by the header)
-            $('.contact-new-title.' + link).parent().get(0).scrollIntoView({behavior: "smooth"});
-        });
+        mega.redirect('mega.io', 'contact', false, false);
     }
     else if (page.substr(0, 4) === 'help') {
         return location.replace(l.mega_help_host + location.hash);
     }
-    else if (page === 'privacy') {
-        parsepage(pages['privacy']);
-        if (is_mobile) {
-            mobile.privacy.show();
-        }
-    }
-    else if (page === 'gdpr') {
-        if (is_extension) {
-            return loadSubPage('privacy');
-        }
-        location.replace('/privacy');
+    else if (page === 'privacy' || page === 'gdpr') {
+        mega.redirect('mega.io', 'privacy', false, false);
     }
     else if (page === 'privacycompany') {
-        // Redirect to the security page
-        loadSubPage('security');
-        return false;
+        mega.redirect('mega.io', 'security', false, false);
     }
-    else if (page === 'dev') {
-        if (is_extension) {
-            return loadSubPage('developers');
-        }
-        location.replace('/developers');
+    else if (page === 'dev' || page === 'developers' || page === 'doc' || page === 'sdk' || page === 'sourcecode') {
+        mega.redirect('mega.io', 'developers', false, false);
     }
-    else if (page === 'developers') {
-        parsepage(pages['dev']);
-        dev_init('dev');
-    }
-    else if (page == 'doc') {
-        parsepage(pages['dev']);
-        dev_init('doc');
+    else if (page === 'sdkterms') {
+        mega.redirect('mega.io', 'sdkterms', false, false);
     }
     else if (page === 'backup') {
         // Redirect to the new url when access the old /backup path.
@@ -1322,21 +1129,14 @@ function init_page() {
         return false;
     }
     else if (page === 'keybackup' && !u_type) {
-        if (is_mobile) {
-            login_next = page;
-            loadSubPage('login');
-            return false;
-        }
-        else {
-            login_txt = l[1298];
-            parsepage(pages['login']);
-            init_login();
-        }
+        login_next = page;
+        login_txt = l[1298];
+        return loadSubPage('login');
     }
     else if (page === 'keybackup') {
         if (is_mobile) {
-            mobile.initDOM();
-            mobile.backup.init();
+            loadSubPage('fm/account/security/backup-key', 'override');
+            return false;
         }
         else {
             parsepage(pages.keybackup);
@@ -1352,21 +1152,19 @@ function init_page() {
             // Validate code with current logged in session
             ac.validateCodeWithSession().done(function() {
                 if (is_mobile) {
-                    mobile.initDOM();
-                    mobile.account.cancel.init();
+                    parsepage(pages.mobile);
+                    mobile.settings.account.verifyDelete.init();
                 }
                 else {
                     ac.handleFeedback();
                 }
-            })
-            .fail(function(res) {
-
+            }).fail((res) => {
                 // If this is not errored from server but failed verification
                 if (typeof res !== 'number') {
                     if (is_mobile) {
-                        mobile.initDOM();
+                        parsepage(pages.mobile);
                     }
-                    msgDialog('warninga', l[135], l[22001], false, function () {
+                    msgDialog('warninga', l[135], l[22001], false, () => {
                         loadSubPage('fm');
                     });
                 }
@@ -1375,9 +1173,9 @@ function init_page() {
         else {
             // Unable to cancel, not logged in
             if (is_mobile) {
-                mobile.initDOM();
+                parsepage(pages.mobile);
                 login_next = page;
-                msgDialog('warninga', l[6186], l[5841], false, function () {
+                msgDialog('warninga', l[5841], l.account_login_to_continue, false, () => {
                     loadSubPage('login');
                 });
             }
@@ -1397,32 +1195,44 @@ function init_page() {
         }
     }
     else if (page === 'wiretransfer') {
-        parsepage(pages['placeholder']);
 
-        if (u_type === 3) {
-            wireTransferDialog
-                .init(function onClose() {
-                    loadSubPage('fm');
-                });
-        }
-        else if (is_mobile) {
-            login_next = 'wiretransfer';
-            loadSubPage('login');
+        api_req({ a: 'ufpqfull', t: 0, d: 0 }, {
 
-        }
-        else {
-            mega.ui.showLoginRequiredDialog({
-                minUserType: 3,
-                skipInitialDialog: 1
-            })
-                .done(init_page)
-                .fail(function (aError) {
-                    if (aError) {
-                        alert(aError);
-                    }
-                    loadSubPage('start');
-                });
-        }
+            callback: function(gatewayOptions) {
+
+                // if wiretransfer method is disabled by api, redirect to fm.
+                if (!gatewayOptions.some(gateway => gateway.gatewayId === 999)) {
+                    return loadSubPage('fm');
+                }
+
+                parsepage(pages.placeholder);
+
+                if (u_type === 3) {
+                    wireTransferDialog
+                        .init(function onClose() {
+                            loadSubPage('fm');
+                        });
+                }
+                else if (is_mobile) {
+                    login_next = 'wiretransfer';
+                    loadSubPage('login');
+
+                }
+                else {
+                    mega.ui.showLoginRequiredDialog({
+                        minUserType: 3,
+                        skipInitialDialog: 1
+                    })
+                        .done(init_page)
+                        .fail(aError => {
+                            if (aError) {
+                                alert(aError);
+                            }
+                            loadSubPage('start');
+                        });
+                }
+            }
+        });
     }
 
     // Initial recovery process page to choose whether to recover with Master/Recovery Key or park the account
@@ -1433,7 +1243,7 @@ function init_page() {
                 return false;
             }
             else {
-                parsepage(pages['recovery']);
+                parsepage(pages.recovery);
                 //mobile.recovery.init();
                 var recov = new AccountRecoveryControl();
                 mega.accountController = recov;
@@ -1446,7 +1256,7 @@ function init_page() {
                 return false;
             }
             else {
-                parsepage(pages['recovery']);
+                parsepage(pages.recovery);
                 //var accountRecovery = new mega.AccountRecovery();
                 //accountRecovery.initRecovery();
                 var recov = new AccountRecoveryControl();
@@ -1458,125 +1268,86 @@ function init_page() {
 
     // Page for mobile to let them recover by Master/Recovery Key
     else if (is_mobile && page === 'recoverybykey') {
-        mobile.initDOM();
+        parsepage(pages.mobile);
         mobile.recovery.sendEmail.init(mobile.recovery.sendEmail.RECOVERY_TYPE_KEY);
     }
 
     // Page for mobile to let them park their account (start a new account with the same email)
     else if (is_mobile && page === 'recoverybypark') {
-        mobile.initDOM();
+        parsepage(pages.mobile);
         mobile.recovery.sendEmail.init(mobile.recovery.sendEmail.RECOVERY_TYPE_PARK);
     }
 
     // Code for handling the return from a #recover email link
     else if (page.substr(0, 7) === 'recover' && page.length > 25) {
+        parsepage(pages.reset);
         if (is_mobile) {
-            mobile.initDOM();
             mobile.recovery.fromEmailLink.init();
         }
         else {
-            parsepage(pages['reset']);
             init_reset();
         }
     }
 
     // Page for mobile to enter (or upload) their Master/Recovery Key
     else if (is_mobile && page === 'recoveryenterkey') {
-        mobile.initDOM();
+        parsepage(pages.mobile);
         mobile.recovery.enterKey.init();
     }
 
     // Page for mobile to let them change their password after they have entered their Master/Recovery key
     else if (is_mobile && page === 'recoverykeychangepass') {
-        mobile.initDOM();
+        parsepage(pages.mobile);
         mobile.recovery.changePassword.init('key');
     }
 
     // Page for mobile to let the user change their password and finish parking their account
     else if (is_mobile && page === 'recoveryparkchangepass') {
-        mobile.initDOM();
+        parsepage(pages.mobile);
         mobile.recovery.changePassword.init('park');
     }
-    else if (page == 'sdkterms') {
-        parsepage(pages['sdkterms']);
+    else if (page === 'about/reliability') {
+        mega.redirect('mega.io', 'reliability', false, false);
     }
-    else if (page.substr(0, 3) == 'sdk') {
-        parsepage(pages['dev']);
-        if (page.length > 3) {
-            dev_init('sdk', page.replace('sdk_', ''));
-        }
-        else {
-            dev_init('sdk');
-        }
+    else if (page === 'about/privacy') {
+        mega.redirect('mega.io', 'security', false, false);
     }
-    else if (page === 'about/main') {
-        if (is_extension) {
-            return loadSubPage('about');
-        }
-        location.replace('/about');
+    else if (page === 'about/jobs') {
+        window.location.replace('https://careers.mega.nz');
     }
-    else if (page.substr(0, 5) === 'about') {
-        parsepage(pages.about);
-        aboutus.init();
-    }
-    else if (page === 'sourcecode') {
-        parsepage(pages['sourcecode']);
+    else if (page === 'about/main' || page.substr(0, 5) === 'about') {
+        mega.redirect('mega.io', 'about', false, false);
     }
     else if (page.substr(0, 5) === 'terms') {
-        if (is_mobile) {
-            mobile.initDOM();
-            mobile.terms.show();
-        }
-        else {
-            parsepage(pages['terms']);
-        }
-
-        if (page.substr(5, 1) === '/') {
-            delay('waitTermLoad', function() {
-                var anchor = page.split('/')[1];
-                page = 'terms';
-                $('a[data-scrollto="#' + anchor + '"]').click();
-            });
-        }
+        mega.redirect('mega.io', 'terms', false, false);
     }
     else if (page === 'security') {
-        parsepage(pages['securitypractice']);
-        securityPractice.init();
+        mega.redirect('mega.io', 'security', false, false);
     }
     else if (page === 'security/bug-bounty') {
-        parsepage(pages.securitypractice);
-        securityPractice.initBounty();
+        mega.redirect('mega.io', 'bug-bounty', false, false);
     }
-    else if (page == 'takedown') {
-        parsepage(pages['takedown']);
-        if (is_mobile) {
-            mobile.takedown.show();
-        }
+    else if (page === 'takedown') {
+        mega.redirect('mega.io', 'takedown', false, false);
     }
     else if (page === 'copyrightnotice') {
-        parsepage(is_mobile ? pages.mobile : pages.copyrightnotice);
-        copyright.init_cn();
+        mega.redirect('mega.io', 'copyrightnotice', false, false);
     }
     else if (page === 'copyright') {
-        parsepage(pages['copyright']);
-        $('.reg-st5-complete-button').rebind('click', function () {
-            loadSubPage('copyrightnotice');
-        });
+        mega.redirect('mega.io', 'copyright', false, false);
     }
     else if (page === 'disputenotice') {
-        parsepage(is_mobile ? pages.mobile : pages.disputenotice);
+        parsepage(pages.disputenotice);
         copyright.init_cndispute();
     }
     else if (page === 'dispute') {
-        parsepage(pages['dispute']);
-        $('.reg-st5-complete-button').rebind('click', function (e) {
-            loadSubPage('disputenotice');
-        });
+        mega.redirect('mega.io', 'dispute', false, false);
     }
     else if (page.substr(0, 3) === 'pro') {
+
         /* jshint -W018 */
         if (page.substr(0, 6) === 'propay') {
-            parsepage(pages[is_mobile ? 'mobile' : 'propay']);
+            parsepage(pages.propay);
             pro.propay.init();
         }
         else {
@@ -1588,14 +1359,13 @@ function init_page() {
 
         if (!isBussiness || is_mobile) {
             // Load the Pro page in the background
-            parsepage(pages['proplan']);
+            parsepage(pages.proplan);
             if (!isBussiness) {
                 pro.proplan.init();
             }
         }
         else {
-            parsepage(pages['business']);
-            document.body.classList.add('business');
+            mega.redirect('mega.io', 'business', false, false);
         }
 
         // Process the return URL from the payment provider and show a success/failure dialog if applicable
@@ -1623,7 +1393,7 @@ function init_page() {
             (typeof u_attr !== 'undefined' && u_attr.pf && pro.isExpiredOrInGracePeriod(u_attr.pf.s))) {
 
             getUAOParameter(page, 'repay');
-            parsepage(pages['repay']);
+            parsepage(pages.repay);
             var repayPage = new RepayPage();
             repayPage.initPage();
         }
@@ -1632,129 +1402,102 @@ function init_page() {
             return;
         }
     }
-    else if (page == 'credits') {
-        parsepage(pages['credits']);
-        var html = '';
-        $('.credits-main-pad a').sort(function () {
-            return (Math.round(Math.random()) - 0.5);
-        }).each(function (i, e) {
-            html += e.outerHTML;
-        });
-        $('.credits-main-pad').html(html + '<div class="clear"></div>');
-    }
-    else if (page === 'android' || page === 'ios' || page === 'uwp' || page === 'wp' || page === 'mobileapp') {
-        if (is_extension) {
-            return loadSubPage('mobile');
+    else if (page === 'credits') {
+        if (u_type) {
+            loadSubPage('fm');
         }
-        location.replace('/mobile');
+        else {
+            mega.redirect('mega.io', '', false, false);
+        }
     }
-    else if (page === 'mobile') {
-        parsepage(pages['mobileapp']);
+    else if (page === 'mobile' || page === 'android' || page === 'ios' || page === 'uwp' || page === 'wp' ||
+             page === 'mobileapp') {
 
-        // On clicking the 'Learn more' button
-        $('.bottom-page.big-link', '.top-bl').rebind('click.scrollToContent', function() {
-
-            // Scroll to the Windows Phone section
-            $('.full-block', '.scroll-block').get(0).scrollIntoView({behavior: "smooth"});
-        });
+        mega.redirect('mega.io', 'mobile', false, false);
     }
     else if (page === 'nas') {
-        parsepage(pages.nas);
-
-        // Qnap and Synology image/link locale update
-        const langMap = {
-            de: 'de-de', fr: 'fr-fr', nl: 'nl-nl', th: 'th-th', it: 'it-it',
-            pl: 'pl-pl', 'zh-Hans': 'zh-hk', 'zh-Hant': 'zh-tw', pt: 'pt-pt',
-            es: 'es-es', ja: 'ja-jp', ko: 'ko-kr', ru: 'ru-ru'
-        };
-        const langUse = langMap[window.locale];
-        if (langUse) {
-            const qnapLinks = document.querySelectorAll('a.link-qnap');
-            for (let i = qnapLinks.length; i--;) {
-                qnapLinks[i].href = qnapLinks[i].href.replace('/en/', `/${langUse}/`);
-            }
-            const synologyLinks = document.querySelectorAll('a.link-synology');
-            for (let j = synologyLinks.length; j--;) {
-                synologyLinks[j].href = synologyLinks[j].href.replace('/en-nz/', `/${langUse}/`);
-            }
-        }
-    }
-    else if (page === 'nzippmember' || page === 'nziphotographer') {
-        parsepage(pages.nzipp);
-        nzippCampaign.init();
+        mega.redirect('mega.io', 'nas', false, false);
     }
     else if (page === 'refer') {
-        parsepage(pages.affiliate);
-        affiliateprogram.init();
+        mega.redirect('mega.io', 'refer', false, false);
     }
     else if (page.substring(0, 7) === 'special') {
         parsepage(pages.special);
         troyhuntCampaign.init();
     }
-    else if (page === 'extensions' || page === 'chrome' || page === 'firefox' || page === 'edge') {
-        parsepage(pages['browsers']);
-        browserspage.init();
+    else if (page === 'extensions' || page === 'chrome' || page === 'firefox' || page === 'edge' || page === 'plugin') {
+        mega.redirect('mega.io', 'extensions', false, false);
     }
     else if (page === 'business') {
-        parsepage(pages['business']);
-        document.body.classList.add('business');
-        businessProductPage.init();
+        mega.redirect('mega.io', 'business', false, false);
     }
-    else if (page.substr(0, 7) === 'desktop') {
-        parsepage(pages.desktop);
-        M.require('sync_js').then(function() {
-            onIdle(topmenuUI);
-            initMegasync();
-        });
+    else if (page.substr(0, 7) === 'desktop' || page === 'sync') {
+        mega.redirect('mega.io', 'desktop', false, false);
     }
-    else if (page.substr(0, 4) === 'sync') {
-        if (is_extension) {
-            return loadSubPage('desktop');
-        }
-        location.replace('/desktop');
+    else if (page === 'syncing') {
+        mega.redirect('mega.io', 'syncing', false, false);
     }
     else if (page == 'cmd') {
-        parsepage(pages['cmd']);
-        initMegacmd();
+        mega.redirect('mega.io', 'cmd', false, false);
     }
     else if (page == 'resellers') {
-        parsepage(pages['resellers']);
+        mega.redirect('mega.io', 'resellers', false, false);
     }
     else if (page === 'storage') {
-        parsepage(pages.feature_storage);
-        featurePages('storage');
+        mega.redirect('mega.io', 'storage', false, false);
     }
     else if (page === 'securechat') {
-        parsepage(pages.feature_chat);
-        featurePages('securechat');
-        featurePages.fixMobileChatLinks();
+        mega.redirect('mega.io', 'chatandmeetings', false, false);
     }
     else if (page === 'collaboration') {
-        parsepage(pages.feature_collaboration);
-        featurePages('collaboration');
+        mega.redirect('mega.io', 'share', false, false);
     }
     else if (page === 'objectstorage') {
-        parsepage(pages.object_storage);
-        featurePages('objectstorage');
+        mega.redirect('mega.io', 'objectstorage', false, false);
     }
     else if (page === 'megabackup') {
-        parsepage(pages.feature_backup);
-        featurePages('megabackup');
+        mega.redirect('mega.io', 'megabackup', false, false);
     }
     else if (page == 'done') {
-        parsepage(pages['done']);
+        parsepage(pages.done);
         init_done();
     }
     else if (page === 'cookie') {
-        parsepage(pages.cookie);
-        if (is_mobile) {
-            mobile.cookie.show();
+        if (mega.flags.ab_adse) {
+            parsepage(pages.cookiepolicy);
+            $cookiePolicyPage = $('body #mainlayout #startholder .bottom-page.cookie-policy');
+            $('.cookie-policy .cookiesdialog', $cookiePolicyPage).rebind('click', () => {
+                csp.trigger().dump('csp.trigger');
+            });
+        }
+        else {
+            mega.redirect('mega.io', 'cookie', false, false);
+        }
+    }
+    else if (page === 'cookiedialog') {
+
+        // This is a page to directly show the cookie settings dialog, usually users are redirected here from mega.io
+        parsepage(pages.placeholder);
+        csp.trigger().dump('csp.trigger');
+    }
+    else if (page === 'smsdialog') {
+
+        parsepage(pages.placeholder);
+
+        // Only allow if fully registered and logged in
+        if (u_type) {
+            sms.phoneInput.init();
+        }
+        else {
+            login_next = page;
+            login_txt = l[1298];
+            loadSubPage('login', 'override');
         }
     }
     else if (page.substr(0, 5) === 'unsub') {
         // Non-registered user unsubsribe from emails.
         if (is_mobile) {
-            mobile.initDOM();
+            parsepage(pages.mobile);
         }
         M.require('unsub_js').done(function() {
             EmailUnsubscribe.unsubscribe();
@@ -1776,12 +1519,8 @@ function init_page() {
             }
         }
 
-        if (is_mobile) {
-            parsepage(pages.mobile);
-        }
-        else {
-            parsepage(pages.download);
-        }
+        parsepage(pages.download);
+
         dlinfo(dlid, dlkey, false);
         topmenuUI();
     }
@@ -1801,10 +1540,20 @@ function init_page() {
         test(page.substr(4));
     }
 
+    // An URL to let users force load MEGA Lite mode (e.g. for users with large accounts and difficulty getting in,
+    // but are below the threshold that would normally prompt them to try MEGA Lite i.e. > 1.5 million nodes).
+    else if (page.substr(0, 12) === 'loadmegalite') {
+
+        localStorage.megaLiteMode = '1';
+
+        loadSubPage('login');
+
+        return location.reload();
+    }
+
     // New multi-discount handling with discount promotion page e.g.
     // /discountpromoJ2iPNEWqiTM-yhsuGkOToh or short sale URLs e.g. /s/blackfriday
     else if (page.substr(0, 13) === 'discountpromo' || page.substr(0, 2) === 's/') {
-        parsepage(pages.discountpromo);
         return new DiscountPromo();
     }
 
@@ -1913,17 +1662,18 @@ function init_page() {
         };
 
         if ((unixtime() - TWO_HOURS_IN_SECONDS) < contactRequestTime) {
-            M.syncContactEmail(contactHandle, new MegaPromise(), true)
+            M.syncContactEmail(contactHandle, true)
                 .then(function(email) {
                     addContact(u_attr.email, email);
                 })
                 .catch(function(ex) {
-                    console.error(ex);
+                    console.error(contactHandle, ex);
                     localStorage.removeItem('addContact');
                 });
         }
-    } else if (is_fm()) {
-        var id = false;
+    }
+    else if (is_fm()) {
+        let id = false;
         if (page.substr(0, 2) === 'fm') {
             id = page.replace('fm/', '');
             if (id.length < 5 && id !== 'chat') {
@@ -1935,15 +1685,6 @@ function init_page() {
             console.log('Setting up fm...', id, pfid, fminitialized, M.currentdirid);
         }
 
-        // Set System default theme or any previously selected
-        if (!is_mobile) {
-            mega.ui.theme.setWithUA();
-        }
-
-        if (!id && fminitialized) {
-            id = M.RootID;
-        }
-
         // FIXME
         // all global state must be encapsulated in a single object -
         // we can then comfortably switch between states by changing the
@@ -1952,15 +1693,8 @@ function init_page() {
         // switch between FM & folderlinks (completely reinitialize)
         if ((!pfid && folderlink) || (pfid && folderlink === 0) || pfkey !== oldPFKey) {
 
-            M.reset();
+            u_reset();
             folderlink = 0;
-            fminitialized = false;
-            loadfm.loaded = false;
-            loadfm.loading = false;
-
-            stopapi();
-            api_reset();
-            initworkerpool();
 
             if (u_sid) {
                 api_setsid(u_sid);
@@ -1968,21 +1702,17 @@ function init_page() {
             if (pfid) {
                 api_setfolder(n_h);
             }
-
-            // re-initialize waitd connection when switching.
-            if (waitxhr) {
-                waitsc();
-            }
-
-            if (typeof mDBcls === 'function') {
-                mDBcls(); // close fmdb
-            }
         }
 
+        // Set System default theme or any previously selected
+        mega.ui.setTheme();
+
+        if (!id && fminitialized) {
+            id = M.RootID;
+        }
+        delete localStorage.keycomplete;
+
         if (!fminitialized) {
-            if (id) {
-                M.currentdirid = id;
-            }
             if (is_mobile) {
                 $('#fmholder').safeHTML(translate(pages['mobile'].replace(/{staticpath}/g, staticpath)));
             }
@@ -1993,6 +1723,10 @@ function init_page() {
             assert(!is_chatlink);
             mega.initLoadReport();
             loadfm();
+
+            if (id) {
+                M.currentdirid = id;
+            }
         }
         else if ((!pfid || flhashchange) && (id && id !== M.currentdirid || page === 'start')) {
             M.openFolder(id, true);
@@ -2022,8 +1756,7 @@ function init_page() {
                     loadingDialog.show();
                     ulmanager.abort(null);
                     Soon(function() {
-                        u_logout();
-                        location.reload();
+                        u_logout().then(() => location.reload());
                     });
                 };
 
@@ -2032,7 +1765,25 @@ function init_page() {
                 uldl_hold = true;
 
                 if (!is_mobile) {
-                    bottomPageDialog(false, 'terms'); // show terms dialog
+                    M.safeShowDialog('terms', () => {
+                        msgDialog(
+                            `confirmation:!^${l[1037]}!${l[82]}`,
+                            '',
+                            l.terms_dialog_title,
+                            l.terms_dialog_text,
+                            e => {
+                                if (e) {
+                                    $.termsAgree();
+                                }
+                                else {
+                                    $.termsDeny();
+                                }
+                                onIdle(() => closeDialog());
+                            }
+                        );
+                        return $('#msgDialog');
+                    });
+
                 }
             }
         }
@@ -2067,9 +1818,8 @@ function init_page() {
             if (!$('.transfer-table tr#dl_' + Object(fdl_queue_var).ph).length) {
                 var fdl = dlmanager.getDownloadByHandle(Object(fdl_queue_var).ph);
                 if (fdl && fdl_queue_var.dlkey === dlpage_key) {
-                    $.tapioca = Array.isArray(fdl.url);
 
-                    Soon(function () {
+                    onIdle(() => {
                         M.putToTransferTable(fdl);
                         M.onDownloadAdded(1, dlQueue.isPaused(dlmanager.getGID(fdl)));
 
@@ -2093,27 +1843,28 @@ function init_page() {
         login_txt = l[1298];
         loadSubPage('login', 'override');
     }
-    else if (typeof init_start === 'function') {
-        page = 'start';
+    else if (page === 'hashtransfer') {
 
-        // Show the start/homepage
-        parsepage(pages['start'], 'start');
-        init_start();
+        // The site transfer defaults to here and we are waiting for that to finish before redirecting elsewhere
+        parsepage(pages.placeholder);
+        return false;
     }
     else {
-        location.assign('/');
+        // Due to the new mega.io site there is no more /start page (and no more ephemeral accounts)
+        if (is_extension) {
+            loadSubPage('login');
+        }
+        else {
+            // For regular webclient we replace the whole URL
+            // and preserve search parameters as the replace will reload memory.
+            window.location.replace((u_type === false ? '/login' : '/fm') + locationSearchParams);
+        }
     }
 
     // Initialise the update check system
     if (typeof alarm !== 'undefined') {
         alarm.siteUpdate.init();
     }
-
-    // Hide click-tooltip
-    if (mega.cttHintTimer) {
-        M.hideClickHint();
-    }
-
     topmenuUI();
 
     if (!window.is_karma && mega.metatags) {
@@ -2158,6 +1909,7 @@ function topbarUI(holderId) {
     if (!topbar) {
         return;
     }
+    onIdle(() => mega.ui.searchbar.refresh());
 
     topbarUITogglePresence(topbar);
 
@@ -2199,15 +1951,15 @@ function topbarUI(holderId) {
         $(element).text(u_attr.email).attr('data-simpletip', u_attr.email);
     }
 
-    if (holderId === 'fmholder') {
-        window.mega.ui.searchbar.refresh();
-    }
-    else {
-        window.mega.ui.searchbar.init();
+    // Initialise the Back to MEGA button (only shown if in MEGA Lite mode)
+    if (mega.lite.inLiteMode) {
+        mega.lite.initBackToMegaButton();
     }
 
     $('.js-topbaravatar, .js-activity-status', topbar).rebind('click', function() {
-        const $wrap = $(this).closest('.js-dropdown-account');
+        const $clickedItem = $(this);
+
+        const $wrap = $clickedItem.closest('.js-dropdown-account');
         const $btn = $('.downloadmega', $wrap).parent();
         if (!$btn.hasClass('sync-checked')) {
             megasync.isInstalled((err, is) => {
@@ -2223,6 +1975,10 @@ function topbarUI(holderId) {
             container.classList.remove("show");
         }
         else {
+            if (fmconfig.rvonbrddl === 1) {
+                $('.js-accountbtn.feedback', topbar).removeClass('highlight');
+            }
+
             const $accountAvatar = $('.js-account-avatar', topbar);
             if (!$accountAvatar.hasClass('rendered')) {
                 $accountAvatar.addClass('rendered').safeHTML(useravatar.contact(u_handle));
@@ -2245,6 +2001,11 @@ function topbarUI(holderId) {
             else {
                 accountEmail.classList.remove('simpletip');
             }
+
+            // Only send event on avatar click
+            if ($clickedItem.hasClass('js-topbaravatar')) {
+                eventlog(500323);
+            }
         }
     });
 
@@ -2252,14 +2013,25 @@ function topbarUI(holderId) {
 
         if (this.classList.contains('settings')) {
             loadSubPage('fm/account');
+            eventlog(500325);
         }
         else if (this.classList.contains('achievements')) {
             mega.achievem.achievementsListDialog();
+            eventlog(500326);
         }
         else if (this.classList.contains('logout')) {
             mLogout();
+            eventlog(500329);
         }
-
+        else if (this.classList.contains('feedback')) {
+            mega.config.set('rvonbrddl', 1);
+            window.open(
+                'https://survey.mega.co.nz/index.php?r=survey/index&sid=692176&lang=en',
+                '_blank',
+                'noopener,noreferrer'
+            );
+            eventlog(500328);
+        }
         var dropdown = document.getElementsByClassName('js-dropdown-account');
 
         for (i = dropdown.length; i--;) {
@@ -2315,7 +2087,7 @@ function topmenuUI() {
     var $menuPricingItem = $('.top-menu-item.pro', $topMenu);
     const $menuAchievementsItem = $('.top-menu-item.achievements', $topMenu);
     var $menuBackupItem = $('.top-menu-item.backup', $topMenu);
-    var $menuAffiliateItem = $('.top-menu-item.affiliate', $topMenu);
+    var $menuReferItem = $('.top-menu-item.refer', $topMenu);
     var $menuFeedbackItem = $('.top-menu-item.feedback', $topMenu);
     var $menuUserinfo = $('.top-menu-account-info', $menuLoggedBlock);
     var $menuUsername = $('.name', $menuUserinfo);
@@ -2347,7 +2119,7 @@ function topmenuUI() {
     $menuLogoutButton.addClass('hidden');
     $menuAuthButtons.addClass('hidden');
     $menuRefreshItem.addClass('hidden');
-    $menuAffiliateItem.addClass('hidden');
+    $menuReferItem.addClass('hidden');
     $menuUsername.addClass('hidden');
     $menuUpgradeAccount.removeClass('hidden');
     $menuAvatar.removeClass('presence');
@@ -2374,7 +2146,7 @@ function topmenuUI() {
     if (page === 'download') {
         $menuRefreshItem.removeClass('hidden');
     }
-    if (page === 'business' || page ==='registerb') {
+    if (page === 'registerb') {
         $headerIndividualSpan.text(l[19529]); // try Mega MEGA Indivisual
     }
 
@@ -2411,18 +2183,22 @@ function topmenuUI() {
     }
     else if (section) {
         // just in case, a payment provider appended any ?returnurl vars
-        section = section.split("?")[0];
-        section = section.replace(/[^a-zA-Z\-\_]/g, "");
+        const selector = section.split('?')[0].replace(/[^A-Z_a-z-]/g, "");
 
-        var $menuItem = $topMenuItems.filter('.' + section);
-        $menuItem.addClass('active');
+        if (selector.length) {
+            const $menuItem = $topMenuItems.filter(`.${selector}`);
+            const $parent = $menuItem.parent('.top-submenu');
 
-        if ($menuItem.parent('.top-submenu').length) {
-            $menuItem.parent('.top-submenu').prev().addClass('expanded');
+            $menuItem.addClass('active');
+
+            if ($parent.length) {
+                $parent.prev().addClass('expanded');
+            }
         }
-        $menuItem = undefined;
+        else if (d) {
+            console.error('Invalid section...', section);
+        }
     }
-
 
     if (u_type === 3 && u_attr.fullname) {
         $('.user-name', $topHeader).text(u_attr.fullname).removeClass('hidden');
@@ -2430,7 +2206,7 @@ function topmenuUI() {
     }
 
     if (mega.flags.refpr) {
-        $menuAffiliateItem.removeClass('hidden');
+        $menuReferItem.removeClass('hidden');
     }
 
     // Show language in top menu
@@ -2439,15 +2215,14 @@ function topmenuUI() {
     // Show version in top menu
     var $versionButton = $('.top-mega-version', $topMenu).text('v. ' + M.getSiteVersion());
 
-    if (!is_litesite) {
-        var versionClickCounter = 0;
-        var versionClickTimeout = null;
-        $versionButton.rebind('click.versionupdate', function() {
-            clearTimeout(versionClickTimeout);
+    if ($versionButton.length) {
+        let versionClickCounter = 0;
+
+        $versionButton.rebind('click.versionupdate', () => {
             if (++versionClickCounter >= 3) {
                 mega.developerSettings.show();
             }
-            versionClickTimeout = setTimeout(function() {
+            delay('top-version-click', () => {
                 versionClickCounter = 0;
             }, 1000);
         });
@@ -2464,10 +2239,12 @@ function topmenuUI() {
 
         // for top menu, load avatar and show for logged in user
         if (!$topBarAvatar.hasClass('rendered')) {
-            useravatar.loadAvatar(u_handle).always(function(){
+
+            delay('load-own-avatar', async() => {
                 $topBarAvatar.addClass('rendered');
-                $('.avatar',$topBarAvatar).safeHTML(useravatar.contact(u_handle));
-            });
+                await Promise.resolve(useravatar.loadAvatar(u_handle)).catch(nop);
+                $('.avatar', $topBarAvatar).safeHTML(useravatar.contact(u_handle));
+            }, 888);
         }
 
         $headerButtons.addClass('hidden');
@@ -2493,12 +2270,32 @@ function topmenuUI() {
 
         // If Pro Flexi, hide the Upgrade button and Pricing link
         if (u_attr.pf) {
-            $menuUpgradeAccount.addClass('hidden');
             $menuPricingItem.addClass('hidden');
+
+            if (u_attr.pf.s === pro.ACCOUNT_STATUS_ENABLED) {
+                $menuUpgradeAccount.addClass('hidden');
+            }
+            // If Pro Flexi Expired or in Grace Period, show the Reactive button and Pricing link
+            else if (is_mobile) {
+                $('.upgrade-your-account', $topMenu).text(l.reactivate_account_short);
+            }
+            else {
+                $('.upgrade-your-account span', $topMenu).text(l.reactivate_account_short);
+            }
+        }
+
+        document.body.classList.remove('free', 'lite', 'pro-user');
+
+        // If Business or Pro Flexi always show the name (even if expired, which is when u_attr.p is undefined)
+        if (u_attr.b || u_attr.pf) {
+            $('.plan', $menuLoggedBlock).text(
+                pro.getProPlanName(u_attr.b ? pro.ACCOUNT_LEVEL_BUSINESS : pro.ACCOUNT_LEVEL_PRO_FLEXI)
+            );
+            document.body.classList.add('pro-user');
         }
 
         // If a Lite/Pro plan has been purchased
-        if (u_attr.p) {
+        else if (u_attr.p) {
 
             // Set the plan text
             var proNum = u_attr.p;
@@ -2507,15 +2304,12 @@ function topmenuUI() {
             // Set colour of plan and body class
             var cssClass;
 
-            document.body.classList.remove('free');
-
             if (proNum === pro.ACCOUNT_LEVEL_PRO_LITE) {
                 cssClass = 'lite';
                 document.body.classList.add('lite');
             }
             else {
                 cssClass = 'pro' + proNum;
-                document.body.classList.remove('lite');
             }
 
             // Show the Pro badge
@@ -2526,12 +2320,23 @@ function topmenuUI() {
             // Show the free badge
             $('.plan', $menuLoggedBlock).text(l[1150]);
             $('.membership-status', $topHeader).attr('class', 'tiny-icon membership-status free');
-            document.body.classList.remove('lite', 'pro-user');
             document.body.classList.add('free');
         }
 
         if (is_fm()) {
             $menuRefreshItem.removeClass('hidden');
+
+            if (self.d && !self.is_extension && !String(location.host).includes('mega.')) {
+                $('.top-menu-item.infinity-item span', $topMenu)
+                    .text(`${mega.infinity ? l.leave : l[5906]} Infinity \u{1F343}`)
+                    .parent()
+                    .rebind('click', () => M.reload(-0x7e080f))
+                    .removeClass('hidden');
+            }
+        }
+
+        if (pfcol) {
+            $('.fm-import-to-cloudrive span', '.folder-link-btns-container').text(l.context_menu_import);
         }
 
         // If the chat is disabled, or the presence lib isn't loading,
@@ -2544,19 +2349,32 @@ function topmenuUI() {
             megaChat._renderMyStatus();
         }
 
-        // if this is a business account sub-user
+        // if this is a business account
         if (u_attr && u_attr.b) {
             $menuLoggedBlock.addClass('business-acc');
+            $menuUpgradeAccount.addClass('hidden');
 
             if (u_attr.b.s !== -1) {
-
                 $headerAchievements.addClass('hidden');
-                $menuUpgradeAccount.addClass('hidden');
-
-                // Hide Pricing menu item for Business sub accounts and admin expired
-                $menuPricingItem.addClass('hidden');
             }
+
+            // Hide Pricing menu item for any Business account
+            // (admin / sub user; active / deactivated / grace period)
+            $menuPricingItem.addClass('hidden');
+
             document.body.classList.add('business-user');
+
+            // If Business Expired or in Grace Period, and this is the business master account,
+            // show the Reactivate button
+            if (u_attr.b.m && u_attr.b.s !== pro.ACCOUNT_STATUS_ENABLED) {
+                if (is_mobile) {
+                    $('.upgrade-your-account', $topMenu).text(l.reactivate_account_short);
+                }
+                else {
+                    $('.upgrade-your-account span', $topMenu).text(l.reactivate_account_short);
+                }
+                $menuUpgradeAccount.removeClass('hidden');
+            }
         }
         else {
             document.body.classList.remove('business-user');
@@ -2599,6 +2417,9 @@ function topmenuUI() {
                 loadSubPage('registerb');
             }
             else {
+                if (page === 'login') {
+                    delay('loginregisterevlog', () => eventlog(99798));
+                }
                 loadSubPage('register');
             }
         });
@@ -2610,6 +2431,9 @@ function topmenuUI() {
             else {
                 var c = $('.dropdown.top-login-popup', $topHeader).attr('class');
                 if (c && c.indexOf('hidden') > -1) {
+                    if (page === 'register') {
+                        delay('registerloginevlog', () => eventlog(99818));
+                    }
                     tooltiplogin.init();
                 }
                 else {
@@ -2636,7 +2460,7 @@ function topmenuUI() {
             //var languageName = ln[lang];
 
             // Init the top header change language button
-            $topChangeLangName.text(lang);
+            $topChangeLangName.text(getRemappedLangCode(lang));
             $topChangeLang.removeClass('hidden');
             $topChangeLang.rebind('click.changelang', function() {
 
@@ -2727,6 +2551,16 @@ function topmenuUI() {
             }
         }
 
+        if (!e || !c || c && c.includes('fmdb-loader')) {
+            elements = document.getElementsByClassName('js-dropdown-rewind-progress');
+
+            for (i = elements.length; i--;) {
+                if (!elements[i].classList.contains('active') || e && e.target.closest('.topbar-links')) {
+                    elements[i].classList.remove('show');
+                }
+            }
+        }
+
         if (!e || (!e.target.closest('.js-dropdown-notification') &&
             ((c && c.indexOf('js-topbarnotification') === -1) || !c))) {
             notify.closePopup();
@@ -2772,7 +2606,8 @@ function topmenuUI() {
     });
 
     $headerDownloadMega.rebind('click.downloadmega', function() {
-        loadSubPage('desktop');
+        mega.redirect('mega.io', 'desktop', false, false, false);
+        eventlog(500327);
     });
 
     // try individual button in business mode
@@ -2785,21 +2620,29 @@ function topmenuUI() {
             loadSubPage('register');
         }
         else if (page === 'register') {
+            delay('registermovebusevlog', () => eventlog(99794));
             loadSubPage('registerb');
         }
         else {
             if (folderlink) {
                 eventlog(99750);
             }
-            loadSubPage('business');
+            if (page === 'login') {
+                delay('loginmovebusevlog', () => eventlog(99795));
+            }
+            mega.redirect('mega.io', 'business', false, false, false);
         }
     });
 
-    $('.js-more-menu, .top-icon.menu', '.fmholder').rebind('click.openmenu', function() {
+    $('.js-more-menu, .top-icon.menu', '.fmholder').rebind('click.openmenu', () => {
         if ($.liTooltipTimer) {
             clearTimeout($.liTooltipTimer);
         }
         topMenu();
+
+        if (!is_mobile) {
+            eventlog(500324);
+        }
     });
 
     $('.close', $topMenu).rebind('click.closemenu', function() {
@@ -2860,21 +2703,38 @@ function topmenuUI() {
 
                 topMenu(1);
 
+                // Close node Info panel as not applicable after switching pages
+                if (mega.ui.mInfoPanel) {
+                    mega.ui.mInfoPanel.closeIfOpen();
+                }
+
                 var subpage;
                 /*  TODO: Add bird when its done */
                 var subPages = [
-                    'about', 'account', 'keybackup', 'cmd', 'contact',
-                    'copyright', 'corporate', 'credits', 'desktop', 'doc', 'extensions',
-                    'login', 'mega', 'nzippmember', 'nziphotographer', 'privacy', 'mobileapp',
-                    'mobile', 'register', 'resellers', 'sdk', 'sitemap', 'sourcecode',
-                    'support', 'takedown', 'terms', 'start', 'security', 'affiliate',
-                    'nas', 'pro', 'cookie', 'securechat', 'collaboration', 'storage', 'special',
-                    'achievements', 'objectstorage', 'megabackup',
+                    'about', 'account', 'achievements', 'affiliate', 'bug-bounty', 'business',
+                    'chatandmeetings', 'cmd', 'collaboration', 'contact', 'cookie', 'copyright',
+                    'corporate', 'credits', 'desktop', 'developers', 'dispute', 'doc',
+                    'extensions', 'keybackup', 'login', 'media', 'mega', 'megabackup', 'mobile',
+                    'mobileapp', 'nas', 'objectstorage',
+                    'privacy', 'pro', 'register', 'reliability', 'resellers', 'sdk',
+                    'securechat', 'security', 'share', 'sitemap', 'sourcecode', 'special',
+                    'start', 'storage', 'support', 'syncing', 'takedown', 'terms', 'transparency',
+                    'refer', 'individuals', 'freelancers', 'small-business', 'vpn', 'media-files', 'vpn-terms'
+                ];
+                const ioPages = [
+                    'about', 'achievements', 'affiliate', 'bug-bounty', 'business',
+                    'chatandmeetings', 'cmd', 'collaboration', 'contact', 'cookie', 'copyright',
+                    'corporate', 'desktop', 'developers', 'dispute', 'doc', 'extensions', 'media',
+                    'megabackup', 'mobile', 'mobileapp', 'nas', 'objectstorage', 'privacy',
+                    'refer', 'reliability', 'resellers', 'sdk', 'securechat', 'security', 'share',
+                    'sourcecode', 'storage', 'syncing', 'takedown', 'terms', 'transparency', 'individuals',
+                    'freelancers', 'small-business', 'vpn', 'media-files' , 'vpn-terms'
                 ];
                 var moveTo = {
-                    'account': 'fm/account',
-                    'affiliate': 'refer',
-                    'corporate': 'corporate/media'
+                    account: 'fm/account',
+                    corporate: 'media',
+                    collaboration: 'share',
+                    securechat: 'chatandmeetings',
                 };
 
                 for (var i = subPages.length; i--;) {
@@ -2889,10 +2749,26 @@ function topmenuUI() {
                 }
                 else if (!is_mobile && subpage === 'keybackup') {
                     M.showRecoveryKeyDialog(2);
+                    eventlog(500312);
+                }
+                else if (subpage === 'cookie' && mega.flags.ab_adse) {
+                    window.open(`${getBaseUrl()}/cookie`, '_blank', 'noopener,noreferrer');
                 }
                 else if (subpage) {
+                    if (ioPages.includes(subpage)) {
+                        mega.redirect('mega.io', moveTo[subpage] || subpage, false, false, false);
+                        return false;
+                    }
                     // Clear login_next variable before load subpages each time
                     login_next = false;
+
+                    if (is_mobile && subpage === 'keybackup') {
+                        eventlog(99853);
+                    }
+                    if (subpage === 'pro') {
+                        eventlog(500479);
+                    }
+
                     loadSubPage(moveTo[subpage] || subpage);
                 }
                 else if (className.indexOf('feedback') > -1) {
@@ -2901,6 +2777,9 @@ function topmenuUI() {
                     feedbackDialog._type = 'top-button';
                 }
                 else if (className.indexOf('refresh') > -1) {
+                    if (is_mobile) {
+                        eventlog(99852);
+                    }
                     M.reload(ev.ctrlKey || ev.metaKey);
                 }
                 else if (!is_mobile && className.indexOf('languages') > -1) {
@@ -2909,14 +2788,14 @@ function topmenuUI() {
                 else if (className.indexOf('logout') > -1) {
                     mLogout();
                 }
-                else if (className.indexOf('transparency') > -1) {
-                    window.open('https://transparency.mega.io', '_blank', 'noopener,noreferrer');
-                }
                 else if (className.includes('help')) {
-                    window.open(l.mega_help_host, '_blank', 'noopener,noreferrer');
+                    window.open(l.mega_help_host, '_blank', 'noopener');
                 }
                 else if (className.includes('blog')) {
-                    window.open('https://blog.mega.io');
+                    window.open('https://blog.mega.io', '_blank', 'noopener');
+                }
+                else if (className.includes('jobs') || className.includes('careers')) {
+                    window.open('https://careers.mega.nz', '_blank', 'noopener');
                 }
             }
             return false;
@@ -2928,13 +2807,20 @@ function topmenuUI() {
     });
 
     $menuUpgradeAccount.rebind('click.openpricing', function() {
+        if (is_mobile) {
+            eventlog(99851);
+        }
+        else {
+            eventlog(500478);
+        }
+
         topMenu(1);
         loadSubPage('pro');
     });
 
-    // Initialise the language sub menu for mobile
+    // Old version lang menu, need to deprecate it once new menu fully applied on logged out pages
     if (is_mobile) {
-        mobile.languageMenu.init();
+        mobile.languageMenu.oldMenu();
     }
 
     // Hover tooltip for top-menu elements and sidebar icons
@@ -2971,7 +2857,7 @@ function topmenuUI() {
                     }
                 }
                 $tooltip.addClass('hovered');
-            }, 1000);
+            }, 100);
     })
         .rebind('mouseout.nw-fm-left-icon', function () {
             $(this).find('.dark-tooltip').removeClass('hovered');
@@ -2987,6 +2873,7 @@ function topmenuUI() {
     $('.logo, .logo-full', '.top-head, .fm-main, .bar-table').rebind('click', () => {
         if (typeof loadingInitDialog === 'undefined' || !loadingInitDialog.active) {
             loadSubPage(u_type ? 'fm' : 'start');
+            eventlog(500353);
         }
     });
 
@@ -3086,6 +2973,7 @@ function pagemetadata() {
     if (window.is_karma) {
         return;
     }
+    const page = String(window.page || '');
     var metas = mega.metatags.getPageMetaTags(page);
     var mega_desc = metas.mega_desc || mega.whoami;
     mega_title = metas.mega_title || 'MEGA';
@@ -3112,9 +3000,6 @@ function parsepage(pagehtml) {
 
     pagehtml = translate('' + pagehtml).replace(/{staticpath}/g, staticpath);
 
-    if (pagehtml.indexOf('((MEGAINFO))') > -1) {
-        pagehtml = pagehtml.replace(/\(\(MEGAINFO\)\)/g, translate(pages.megainfo));
-    }
     if (pagehtml.indexOf('((TOP))') > -1) {
         pagehtml = pagehtml.replace(/\(\(TOP\)\)/g, parsetopmenu());
     }
@@ -3135,10 +3020,14 @@ function parsepage(pagehtml) {
 
     $('#startholder').safeHTML(pagehtml).removeClass('hidden');
 
+    // With new mobile page render, startholder page should not have M.currentdirid kept to avoid bug
+    if (is_mobile) {
+        delete M.currentdirid;
+    }
+
     // if this is bottom page & not Download Page we have to enforce light mode for now.
-    if (page === 'download' && !is_mobile) {
-        const theme = u_attr && u_attr['^!webtheme'] !== undefined ? u_attr['^!webtheme'] : 0;
-        mega.ui.theme.set(theme);
+    if (page === 'download') {
+        mega.ui.setTheme();
     }
     else {
         document.body.classList.remove('theme-dark');
@@ -3187,11 +3076,9 @@ function loadSubPage(tpage, event) {
         dlPageCleanup();
     }
 
-    if (silent_loading) {
-        return false;
-    }
-
     if (window.slideshowid) {
+        mBroadcaster.sendMessage('trk:event', 'preview', 'close-nav', tpage, slideshowid);
+
         slideshow(0, 1);
     }
 
@@ -3234,7 +3121,7 @@ function loadSubPage(tpage, event) {
         // clear the flag if navigating to an static page..
         M.chat = tpage.substr(0, 2) === 'fm';
         if (!M.chat) {
-            megaChat.cleanup();
+            megaChat.cleanup(true);
         }
     }
 
@@ -3248,9 +3135,12 @@ function loadSubPage(tpage, event) {
     mBroadcaster.sendMessage('beforepagechange', tpage);
     if (window.is_chatlink) {
         window.is_chatlink = false;
-        delete megaChat.initialPubChatHandle;
         delete M.currentdirid;
-        megaChat.destroy();
+
+        if (megaChatIsReady) {
+            delete megaChat.initialPubChatHandle;
+            megaChat.destroy();
+        }
     }
     dlid = false;
 
@@ -3261,8 +3151,9 @@ function loadSubPage(tpage, event) {
         page = '';
     }
 
+    let hold;
     if (page) {
-        var tmp = [];
+        const tmp = [];
 
         for (var p in subpages) {
             if (page.substr(0, p.length) === p) {
@@ -3297,6 +3188,7 @@ function loadSubPage(tpage, event) {
             }
 
             jsl = tmp;
+            hold = true;
         }
     }
 
@@ -3317,8 +3209,8 @@ function loadSubPage(tpage, event) {
         return false;
     }
 
-    if (jsl.length > 0) {
-        loadingDialog.show();
+    if (hold) {
+        loadingDialog.show('jsl-loader');
         jsl_start();
     }
     else {
@@ -3346,7 +3238,7 @@ window.addEventListener('beforeunload', () => {
     }
 
     if (megaChatIsReady && megaChat.activeCall) {
-        ion.sound.play('alert_info_message');
+        megaChat.playSound(megaChat.SOUNDS.ALERT);
         return false;
     }
 
@@ -3439,13 +3331,39 @@ mBroadcaster.once('boot_done', () => {
                 writable: false
             });
         })();
+
+        Object.defineProperty(mega, 'ensureAccessibility', {
+            configurable: true,
+            value: tryCatch(() => {
+
+                if (!window.mainlayout) {
+                    delete window.mainlayout;
+                    Object.defineProperty(window, 'mainlayout', {
+                        value: document.getElementById('mainlayout')
+                    });
+                }
+                assert(window.mainlayout && mainlayout.nodeType > 0, l[8642]);
+                return 'accessible';
+            }, (ex) => {
+                window.onerror = null;
+                onIdle(() => siteLoadError(ex, 'mainlayout'));
+
+                const data = tryCatch(() =>
+                    [...document.body.children]
+                        .map(n => n.tagName + (n.id ? `#${n.id}` : `.${n.classList[0] || ''}`))
+                )();
+                eventlog(99930, String(data || 'N/A').slice(0, 380), true);
+            })
+        });
     }
 
-    onIdle(() => {
+    onIdle(function _() {
         // Initialise the Public Service Announcement system if loaded
         if (typeof psa !== 'undefined') {
+            psa.fetchedPsa = false;
             psa.init().catch(dump.bind(null, 'psa'));
         }
+        return u_sid || mBroadcaster.once('login', _);
     });
 
     onIdle(async() => {
@@ -3454,6 +3372,26 @@ mBroadcaster.once('boot_done', () => {
             M.setPersistentData('reportedMetamask', true).catch(dump);
         }
     });
+
+    // Currently only used in chat so don't bother trying to register for mobile browsers.
+    if (window.isSecureContext && !is_mobile && !is_karma && !is_iframed) {
+        onIdle(tryCatch(() => {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register(`${is_extension ? '' : '/'}sw.js?v=1`).catch(dump);
+            }
+        }));
+    }
+
+    if (!u_sid) {
+        mBroadcaster.sendMessage(mega.flags ? 'global-mega-flags' : 'update-api-search-params');
+    }
+    else if (self.loginresponse === EBLOCKED) {
+        window.startMega = window.eventlog = dump;
+        api.setSID(u_sid);
+        return api.send('ug');
+    }
+
+    // ---------------------------------------------------------------------
 
     if (d) {
         if (!window.crossOriginIsolated) {
@@ -3483,19 +3421,78 @@ mBroadcaster.once('boot_done', () => {
     }
 });
 
-// After open folder call, check if we should restore any previously opened preview node.
-mBroadcaster.once('mega:openfolder', function() {
+mBroadcaster.addListener('fm:initialized', () => {
     'use strict';
 
-    // No need to re-initiate preview when on Album page
-    if (M.currentCustomView.type === 'albums') {
-        sessionStorage.removeItem('previewNode');
+    if (folderlink) {
         return;
     }
+
+    onIdle(() => {
+        // Add the dynamic notifications
+        if (typeof notify.addDynamicNotifications !== 'undefined') {
+            notify.addDynamicNotifications().catch(dump);
+        }
+    });
+
+    return 0xDEAD;
+});
+
+// After open folder call, check if we should restore any previously opened preview node.
+mBroadcaster.once('mega:openfolder', () => {
+    'use strict';
 
     const {previewNode} = sessionStorage;
     if (previewNode) {
         sessionStorage.removeItem('previewNode');
-        slideshow(previewNode);
+
+        // No need to re-initiate preview when on Album page
+        if (!M.isAlbumsPage()) {
+            slideshow(previewNode);
+        }
     }
+
+    // Send some data to mega.io that we logged in
+    if (u_type > 2) {
+        initMegaIoIframe(true);
+    }
+
+    return 0xDEAD;
+});
+
+mBroadcaster.addListener('global-mega-flags', () => {
+    'use strict';
+
+    mBroadcaster.sendMessage('update-api-search-params');
+});
+
+mBroadcaster.addListener('update-api-search-params', async() => {
+    'use strict';
+    if (!self.M) {
+        return;
+    }
+
+    let qs = null;
+    const {apiut: ut, jid, afo} = localStorage;
+
+    if (mega.flags.jid && !localStorage.njt) {
+        let j = jid || await M.getPersistentData('jid').catch(nop);
+        if (!j) {
+            localStorage.jid = j = mega.flags.jid;
+            M.setPersistentData('jid', j).catch(dump);
+        }
+        qs = {...qs, j};
+    }
+
+    if (ut) {
+
+        qs = {...qs, ut};
+    }
+
+    if (afo) {
+
+        qs = {...qs, ...JSON.parse(afo)};
+    }
+
+    api.recycleURLSearchParams('ut,j', qs);
 });

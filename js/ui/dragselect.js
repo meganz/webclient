@@ -10,8 +10,8 @@
          * @param {Function} [data.onDragStart] Method to call when the mousedown is triggered
          * @param {Function} [data.onDragMove] Method to call when the select area is about to re-render
          * @param {Function} [data.onDragEnd] Method to call when the mouse button is released
+         * @param {Function} [data.getScrollTop] Method to retrieve scroll position
          * @param {Function} [data.onScrollUp] Method to call when scroll up is needed
-         * @param {Function} [data.getOffsetTop] Method to call when scroll up is needed
          * @param {Function} [data.onScrollDown] Method to call when scroll down is needed
          */
         constructor(
@@ -24,7 +24,7 @@
                 scrollMargin,
                 onScrollUp,
                 onScrollDown,
-                getOffsetTop
+                getScrollTop
             }) {
             if (el) {
                 this.el = el;
@@ -39,8 +39,13 @@
                 this.onDragMove = onDragMove || nop;
                 this.onDragEnd = onDragEnd || nop;
 
-                this.getOffsetTop = typeof getOffsetTop === 'function' ? getOffsetTop : () => el.offsetTop;
+                this.getScrollTop = typeof getScrollTop === 'function' ? getScrollTop : () => el.scrollTop;
+                this._disabled = false;
             }
+        }
+
+        get disabled() {
+            return this._disabled;
         }
 
         /**
@@ -101,7 +106,7 @@
                     clearTimeout(scrollTimeout);
                 }
 
-                const initOffsetTop = this.getOffsetTop();
+                const initScrollTop = this.getScrollTop();
                 let yCorrection = 0;
                 let mouseX = left;
                 let mouseY = top;
@@ -200,7 +205,7 @@
                         return;
                     }
 
-                    const newCorrection = this.getOffsetTop() - initOffsetTop;
+                    const newCorrection = this.getScrollTop() - initScrollTop;
                     const diff = newCorrection - yCorrection;
                     yCorrection = newCorrection;
 

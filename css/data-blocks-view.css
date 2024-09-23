@@ -1,10 +1,3 @@
-.search .file-block-scrolling,
-.select .file-block-scrolling,
-.select .shared-blocks-scrolling,
-.select .out-shared-blocks-scrolling {
-    height: 100%;
-}
-
 .fm-blocks-view,
 .fm-blocks-view.shared-view,
 .shared-details-block,
@@ -12,7 +5,9 @@
 .out-shared-blocks-view,
 .fm-blocks-view.out-shares-view,
 .fm-blocks-view.public-links-view,
-.files-grid-view {
+.files-grid-view,
+.s4-bucket-block,
+.s4-container-block {
     box-sizing: border-box;
     height: 100%;
     position: relative;
@@ -21,6 +16,7 @@
     overflow: hidden;
     border-top: 1px solid var(--surface-grey-2);
     flex-grow: 1;
+    transition: 200ms linear;
 }
 
 .fm-right-files-block.emptied .fm-blocks-view:not(.shared-folder-content),
@@ -67,6 +63,7 @@
 .data-block-view.medium {
     width: 128px;
 }
+
 .fm-blocks-view .data-block-view,
 .shared-blocks-view .data-block-view,
 .out-shared-blocks-view .data-block-view {
@@ -76,10 +73,32 @@
 .data-block-view:hover {
     box-shadow: 0 0 0 4px var(--stroke-grey-2);
 }
+
+.data-block-view.highlight1 {
+    box-shadow: 0 0 0 5px #f00;
+}
+
+.data-block-view.highlight2 {
+    box-shadow: 0 0 0 5px #f90;
+}
+
 .data-block-view.ui-selected,
 .data-block-view.ui-selecting,
 .data-block-view.dragover {
     box-shadow: 0 0 0 4px var(--secondary-blue);
+}
+
+/* File/folder type icon */
+.data-block-view .item-type-icon-90 {
+    --icon-size: 96px;
+    margin: 28px auto;
+    position: static;
+}
+.data-block-view .thumb .item-type-icon-90 {
+    background: none;
+    height: inherit;
+    margin: 0;
+    width: inherit;
 }
 .data-block-bg {
     height: 192px;
@@ -150,7 +169,8 @@
 .data-block-view .file-status-icon.icon-info,
 .data-block-view.linked .icon-link {
     --icon-size: 16px;
-    margin-right: 4px;
+    margin-inline-end: 4px;
+    -webkit-margin-end: 4px;
     margin-top: 4px;
     margin-bottom: 4px;
     background-image: none;
@@ -161,8 +181,10 @@
 .data-block-view .file-status-icon.icon-versions-previous {
     --mask-color: var(--icon-rest);
 }
+
+.undecryptable-zk .file-status-icon.icon-info,
 .data-block-view .file-status-icon.icon-takedown {
-    --mask-color: var(--secondary-red);
+    --mask-color: var(--secondary-red) !important;
 }
 .data-block-view .file-status-icon.icon-info {
     --mask-color: var(--secondary-orange);
@@ -218,6 +240,15 @@
     text-overflow: ellipsis;
     overflow: hidden;
     color: var(--text-color-medium);
+}
+.data-block-view .fm-user-verification {
+    display: block;
+    text-decoration: underline;
+    cursor: pointer;
+    color: var(--label-blue);
+}
+.data-block-view.cv-on .fm-user-verification {
+    height: 20px;
 }
 .data-block-view:hover .file-settings-icon,
 .data-block-view.ui-selected .file-settings-icon,
@@ -276,12 +307,15 @@
     color: var(--stroke-main-inverted);
     top: 4px;
     position: absolute;
-    text-align: left;
+    text-align: start;
     display: none;
     left: 4px;
     z-index: 2;
 }
-
+.rtl .video-thumb-details {
+    left: auto;
+    right: 4px;
+}
 .data-block-bg.video .video-thumb-details {
     display: block;
 }
@@ -291,226 +325,24 @@
     margin-top: 1px;
     --mask-color: var(--icon-rest);
 }
+.data-block-view .contact-chat-buttons {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 11px 0 0 2px;
+    opacity: 0;
+    z-index: 10;
+}
+.shared-blocks-view .data-block-view .item-type-icon-90,
+.out-shared-blocks-view .data-block-view .item-type-icon-90 {
+    margin: 48px auto;
+}
+.shared-blocks-view .data-block-view .thumb .item-type-icon-90,
+.out-shared-blocks-view .data-block-view .thumb .item-type-icon-90 {
+    margin: 0;
+}
 .shared-blocks-view .data-block-view .data-block-bg,
 .out-shared-blocks-view .data-block-view .data-block-bg {
     border-radius: 10px 10px 0 0;
-}
-.shared-blocks-view .data-block-view .file-settings-icon,
-.out-shared-blocks-view .data-block-view .file-settings-icon {
-    right: 8px;
-    bottom: 64px;
-}
-
-.block-view-file-type {
-    width: 82px;
-    height: 84px;
-    display: block;
-    background-position: 0 -3234px;
-    background-image: url("../images/mega/files-icons.png");
-    background-repeat: no-repeat;
-    position: absolute;
-    left: 50%;
-    top: 45%;
-    transform: translate(-50%, -50%);
-}
-.fm-recents .data-block-bg:not(.thumb) .block-view-file-type {
-    top: 50%;
-}
-.block-view-file-type.thumb {
-    width: 156px;
-    height: 156px;
-    margin: -78px 0 0 -78px;
-    background: none;
-}
-.block-view-file-type.word {
-    background-position: 0 6px;
-}
-.block-view-file-type.web-lang {
-    background-position: 0 -114px;
-}
-.block-view-file-type.web-data {
-    background-position: 0 -234px;
-}
-.block-view-file-type.video {
-    background-position: 0 -354px;
-}
-.block-view-file-type.openoffice {
-    background-position: 0 -474px;
-}
-.block-view-file-type.keynote {
-    background-position: 0 -594px;
-}
-.block-view-file-type.numbers {
-    background-position: 0 -714px;
-}
-.block-view-file-type.vcard {
-    background-position: 0 -834px;
-}
-.block-view-file-type.torrent {
-    background-position: 0 -954px;
-}
-.block-view-file-type.text {
-    background-position: 0 -1074px;
-}
-.block-view-file-type.pages {
-    background-position: 0 -1194px;
-}
-.block-view-file-type.spreadsheet {
-    background-position: 0 -1314px;
-}
-.block-view-file-type.recovery {
-    background-position: 0 -1434px;
-}
-.block-view-file-type.dmg {
-    background-position: 0 -1554px;
-}
-.block-view-file-type.raw {
-    background-position: 0 -1674px;
-}
-.block-view-file-type.premiere {
-    background-position: 0 -1794px;
-}
-.block-view-file-type.powerpoint {
-    background-position: 0 -1914px;
-}
-.block-view-file-type.megasync {
-    background-position: 0 -2034px;
-}
-.block-view-file-type.megasync-mac {
-    background-position: 0 -2154px;
-}
-.block-view-file-type.photoshop {
-    background-position: 0 -2274px;
-}
-.block-view-file-type.pdf {
-    background-position: 0 -2394px;
-}
-.block-view-file-type.experience {
-    background-position: 0 -2514px;
-}
-.block-view-file-type.indesign {
-    background-position: 0 -2634px;
-}
-.block-view-file-type.image {
-    background-position: 0 -2754px;
-}
-.block-view-file-type.illustrator {
-    background-position: 0 -2874px;
-}
-.block-view-file-type.sketch-alt {
-    background-position: 0 -2994px;
-}
-.block-view-file-type.sketch {
-    background-position: 0 -3114px;
-}
-.block-view-file-type.generic {
-    background-position: 0 -3234px;
-}
-.block-view-file-type.font {
-    background-position: 0 -3354px;
-}
-.block-view-file-type.executable {
-    background-position: 0 -3474px;
-}
-.block-view-file-type.excel {
-    background-position: 0 -3594px;
-}
-.block-view-file-type.compressed {
-    background-position: 0 -3714px;
-}
-.block-view-file-type.cad {
-    background-position: 0 -3834px;
-}
-.block-view-file-type.audio {
-    background-position: 0 -3954px;
-}
-.block-view-file-type.aftereffects {
-    background-position: 0 -4074px;
-}
-.block-view-file-type.threed {
-    background-position: 0 -4194px;
-}
-.block-view-file-type.folder {
-    background-position: 0 -4314px;
-}
-.block-view-file-type.rubbish-folder {
-    background-position: 0 -4434px;
-}
-
-.fm-blocks-view.shared-view .block-view-file-type.folder,
-.shared-blocks-view .block-view-file-type.folder,
-.block-view-file-type.folder.inbound-share {
-    background-position: 0 -4794px;
-}
-.block-view-file-type.folder-sync {
-    background-position: 0 -5874px;
-}
-.block-view-file-type.rubbish-folder-sync {
-    background-position: 0 -5994px;
-}
-.block-view-file-type.folder-backup {
-    background-position: 0 -6114px;
-}
-.block-view-file-type.rubbish-folder-backup {
-    background-position: 0 -6234px;
-}
-.block-view-file-type.folder-chat {
-    background-position: 0 -5634px;
-}
-.block-view-file-type.rubbish-folder-chat {
-    background-position: 0 -5754px;
-}
-.block-view-file-type.folder-camera {
-    background-position: 0 -4554px;
-}
-.block-view-file-type.rubbish-folder-camera {
-    background-position: 0 -4674px;
-}
-
-.block-view-file-type.backup {
-    background-position: -5px -6354px;
-}
-.block-view-file-type.pc {
-    background-position: -5px -6474px;
-}
-.block-view-file-type.pc-mac {
-    background-position: -5px -6714px;
-}
-.block-view-file-type.pc-win {
-    background-position: -5px -6594px;
-}
-.block-view-file-type.pc-linux {
-    background-position: -5px -6834px;
-}
-.block-view-file-type.mobile {
-    background-position: -5px -6954px;
-}
-.block-view-file-type.mobile-ios {
-    background-position: -5px -7074px;
-}
-.block-view-file-type.mobile-android {
-    background-position: -5px -7194px;
-}
-.block-view-file-type.ex-device {
-    background-position: -5px -7314px;
-}
-
-.block-view-file-type.folder-shared,
-.out-shared-blocks-view .block-view-file-type.folder {
-    background-position: 0 -5034px;
-}
-.block-view-file-type.rubbish-folder-shared {
-    background-position: 0 -5154px;
-}
-.block-view-file-type.puf-folder {
-    background-position: 0 -5274px;
-}
-.block-view-file-type.rubbish-puf-folder {
-    background-position: 0 -5394px;
-}
- .block-view-file-type.inbound-share {
-    background-position: 0 -4794px;
-}
-.block-view-file-type.file-request-folder {
-    background-position: -7px -7544px;
+    position: relative;
 }

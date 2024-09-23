@@ -52,7 +52,7 @@ export default class GenericGrid extends GenericNodePropsComponent {
                     </span>
                     <i className="sprite-fm-mono icon-link"></i>
                 </span>
-                <span className={"block-view-file-type " + this.nodeProps.icon}>{image}</span>
+                <span className={"item-type-icon-90 icon-" + this.nodeProps.icon + "-90"}>{image}</span>
                 <div className="video-thumb-details">
                     <i className="small-icon small-play-icon"></i>
                     <span>00:00</span>

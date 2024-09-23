@@ -4,7 +4,7 @@
       "@babel/preset-env",
       {
         "targets": {
-          "ie": "11"
+          "safari": "14"
         }
       }
     ],
@@ -21,7 +21,7 @@
             "legacy": true
           }
         ],
-        ["@babel/plugin-proposal-class-properties", { "loose" : true }]
+        ["@babel/plugin-transform-class-properties", { "loose" : true }]
       ]
     },
     "production": {
@@ -33,7 +33,7 @@
             "legacy": true
           }
         ],
-        ["@babel/plugin-proposal-class-properties", { "loose" : true }]
+        ["@babel/plugin-transform-class-properties", { "loose" : true }]
       ]
     }
   }

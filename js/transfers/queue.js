@@ -38,12 +38,14 @@
  * ***************** END MEGA LIMITED CODE REVIEW LICENCE ***************** */
 
 function MegaQueue(worker, limit, name) {
+    'use strict';
     var parentLogger;
     this._limit = limit || 5;
     this._queue = [];
     this._running = 0;
     this._worker = worker;
     this._noTaskCount = 0;
+    this._expanded = 0;
     this._qpaused = {};
     this._pending = [];
 
@@ -54,6 +56,10 @@ function MegaQueue(worker, limit, name) {
     Object.defineProperty(this, '__identity', {
         value: `mQueue[${this.qname}.${makeUUID().substr(-12)}]`
     });
+    Object.defineProperty(this, 'tryProcess', {
+        value: tryCatch(() => this.process(), () => this._process())
+    });
+
     switch (name) {
         case 'downloader':
         case 'zip-writer':
@@ -119,8 +125,9 @@ MegaQueue.prototype.resume = function() {
     this.trigger('resume');
 };
 
-MegaQueue.prototype.canExpand = function() {
-    return !is_mobile && this._limit <= this._running && this._limit * 1.5 >= this._running;
+// eslint-disable-next-line strict
+MegaQueue.prototype.canExpand = is_mobile ? () => false : function() {
+    return this._limit <= this._running && Math.max(0, this._limit - this._expanded) << 3 >= this._running;
 };
 
 /**
@@ -132,7 +139,8 @@ MegaQueue.prototype.canExpand = function() {
  */
 MegaQueue.prototype.expand = function() {
     if (this.canExpand()) {
-        this._expanded = true;
+        this._limit++;
+        this._expanded++;
         this._process();
         if (d) {
             this.logger.info("expand queue " + this._running);
@@ -197,11 +205,8 @@ MegaQueue.prototype.slurp = function(gid) {
 };
 
 MegaQueue.prototype.pause = function() {
-    if (d) {
+    if (d > 1) {
         this.logger.info("pausing queue");
-        if (d > 1 && console.trace) {
-            console.trace();
-        }
     }
     this._paused = true;
     this.trigger('pause');
@@ -235,38 +240,43 @@ MegaQueue.prototype.pushAll = function(tasks, next, error) {
 };
 
 MegaQueue.prototype.run_in_context = function(task) {
+    'use strict';
+
     this._running++;
     this._pending.push(task[0]);
-    this._worker(task[0], function MQRicStub() {
-        console.assert(task[0], 'This should not be reached twice.');
-        if (!task[0]) {
-            return;
-        } /* already called */
-        if (!oIsFrozen(this)) {
-            if (!this._pending || this._pending.indexOf(task[0]) === -1) {
-                this.logger.warn('Task is no longer pending.', task[0], this._pending);
+
+    this._worker(task[0], (...args) => {
+        const [data, ack, scope] = task;
+        task[0] = task[1] = task[2] = null;
+
+        // this.logger.warn(`dsp task ${this._running}...`, this._pending.length, this._limit, [data]);
+
+        if (data && this._queue) {
+
+            if (!this._pending || !this._pending.includes(data)) {
+
+                this.logger.warn('The Task is no longer pending...', data, this._pending);
             }
             else {
                 this._running--;
-                array.remove(this._pending, task[0]);
-                console.assert(this._running > -1, 'Queue inconsistency (RIC)');
+                array.remove(this._pending, data);
 
-                var done = task[1] || task[0].onQueueDone;
-                if (done) {
-                    var len = arguments.length;
-                    var args = Array(len);
-                    while (len--) {
-                        args[len] = arguments[len];
-                    }
-                    done.apply(task[2] || this, [task[0], args]);
+                if (d) {
+                    console.assert(this._running > -1, 'Queue inconsistency (RIC)');
                 }
-                if (!this.isEmpty() || $.len(this._qpaused)) {
-                    this._process();
+                const done = ack || data.onQueueDone;
+
+                if (done) {
+                    done.apply(scope || this, [data, args]);
+                }
+
+                if (this._queue && (!this.isEmpty() || Object.keys(this._qpaused).length)) {
+
+                    this.tryProcess();
                 }
             }
         }
-        task[0] = task[1] = task[2] = undefined;
-    }.bind(this));
+    });
 };
 
 MegaQueue.prototype.validateTask = function() {
@@ -303,6 +313,7 @@ MegaQueue.prototype.process = function(sp) {
     }
     while (this._running < this._limit && this._queue.length > 0) {
         args = this.getNextTask(sp);
+
         if (!args) {
             if (++this._noTaskCount === 666) {
                 /**
@@ -323,21 +334,23 @@ MegaQueue.prototype.process = function(sp) {
             }
             return false;
         }
+
         this._noTaskCount = 0;
         this.run_in_context(args);
-        this.trigger('working', args);
-    }
 
-    if (this._expanded) {
-        args = this.getNextTask();
-        if (args) {
-            this.run_in_context(args);
+        if (this._queue) {
             this.trigger('working', args);
         }
-        delete this._expanded;
     }
-    if (!args && this.mull) {
-        this.mull();
+
+    if (!args) {
+        if (this._expanded) {
+            this._limit -= this._expanded;
+            this._expanded = 0;
+        }
+        if (this.mull) {
+            this.mull();
+        }
     }
 
     return true;
@@ -563,9 +576,21 @@ TransferQueue.prototype.push = function(cl) {
         var dispatcher = function() {
             closeDialog();
             self.resume();
-            qbqq.forEach(function(args) {
+
+            for (let i = 0; i < qbqq.length; i++) {
+                const args = qbqq[i];
+
+                if (i < 32) {
+                    const {dl} = args[0];
+
+                    if (dl && dl.byteOffset !== dl.size) {
+
+                        megaUtilsGFSFetch.getTicketData(dl).catch(dump);
+                    }
+                }
                 MegaQueue.prototype.push.apply(self, args);
-            });
+            }
+
             loadingDialog.hide();
             showToast();
         };

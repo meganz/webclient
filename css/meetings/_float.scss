@@ -1,0 +1,430 @@
+.float-video {
+    position: fixed;
+    bottom: 100px;
+    right: 24px;
+    width: 245px;
+    height: 143px;
+    border-radius: 24px;
+    background: var(--surface-black);
+    cursor: pointer;
+    box-shadow: 0 20px 70px rgba(0, 0, 0, 0.55);
+
+    z-index: 13;
+
+    &.ratio-4-3 { width: 190px; }
+    &.ratio-16-9 { width: 254px; }
+    &.ratio-9-16 { width: 80px; }
+    &.ratio-8-5 { width: 240px; height: 150px; }
+
+    &.mini {
+        width: 320px;
+        height: 240px;
+
+        &.ratio-16-9 { width: 334px; height: 188px; }
+    }
+
+    &.with-sidebar {
+        right: 360px;
+    }
+
+    &.collapsed {
+        width: 160px;
+        height: 24px;
+        text-align: center;
+        background: var(--surface-black);
+        z-index: 1000;
+
+        .icon-collapse {
+            --icon-size: 24px;
+            --mask-color: var(--secondary-white);
+        }
+
+        .collapsed-audio-indicator {
+            position: absolute;
+            top: 4px;
+            left: 8px;
+
+            i {
+                --icon-size: 16px;
+                --mask-color: var(--secondary-green);
+
+                &.inactive { --mask-color: var(--icon-rest); }
+            }
+
+            .mic-fill {
+                bottom: 9px;
+                max-height: 10px;
+                border-radius: 3px;
+            }
+        }
+    }
+
+    &:hover {
+        /* [...] */
+
+        .float-video-self-overlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 24px;
+        }
+    }
+
+    .float-video-options-control {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        margin: 0;
+        padding: 0;
+        background: transparent;
+        z-index: 1;
+
+        &.active {
+            /* [...] */
+
+            i { --mask-color: var(--secondary-blue); }
+        }
+
+        i {
+            --icon-size: 24px;
+            --mask-color: var(--secondary-white);
+        }
+    }
+
+    .float-video-options {
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translate(-95%, -50%);
+        padding: 9px 0 2px 0;
+        border-radius: 12px;
+        border: var(--context-menu-border);
+        background: var(--surface-main);
+        box-shadow: var(--dropdown-shadow);
+        z-index: 1;
+
+        &.options-top {
+            top: -50%;
+            transform: none;
+        }
+
+        &.options-bottom {
+            top: 30%;
+            left: 10px;
+            transform: none;
+        }
+
+        ul {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+
+            &.has-separator {
+                border-top: 1px solid var(--stroke-grey-2);
+                padding: 5px 0 0 0;
+            }
+
+            li {
+                padding: 0 0 3px 0;
+
+                button {
+                    width: auto;
+                    height: auto;
+                    border: 0 none;
+                    text-indent: initial;
+                    font: var(--text-body1);
+                    color: var(--text-color-medium);
+                    background: transparent;
+                    cursor: pointer;
+
+                    &:hover {
+                        color: var(--text-color-high);
+                        i { --mask-color: var(--icon-active); }
+                    }
+
+                    &.end-screen-share {
+                        color: var(--text-color-error);
+
+                        i { --mask-color: var(--secondary-red); }
+                    }
+
+                    i {
+                        float: left;
+                        margin: 4px 0 0 0;
+                        --icon-size: 18px;
+                        --mask-color: var(--icon-rest);
+                    }
+
+                    div {
+                        float: left;
+                        padding: 2px 0 0 7px;
+                    }
+                }
+            }
+        }
+
+        hr {
+
+        }
+    }
+
+    //
+    // Minimized mode
+    // --------------------------------------------------------------------
+
+    &.minimized {
+        z-index: 1109;
+        width: 320px;
+        height: 240px;
+        bottom: 80px;
+        border: 1px solid rgba(33, 33, 33, 1);
+
+        &.ratio-16-9 { width: 334px; height: 188px; }
+
+        &:hover .float-video-overlay,
+        &.active .float-video-overlay {
+            display: block;
+        }
+
+        &:hover .float-video-notifications {
+            display: none;
+        }
+
+        &:hover button.chat-control {
+            display: none;
+        }
+
+        &:hover .video-node-status {
+            bottom: 64px;
+        }
+
+        .float-video-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 24px;
+
+            .float-video-controls {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                position: absolute;
+                left: 50%;
+                bottom: 8px;
+                transform: translate(-50%);
+                width: 100%;
+                text-align: center;
+                box-sizing: border-box;
+                padding: 0 10px 0 24px;
+                z-index: 1;
+
+                button {
+                    background: transparent;
+                    box-shadow: none;
+
+                    &:hover {
+                        background: #333;
+                    }
+
+                    &:last-child {
+                        margin-right: 0
+                    }
+
+                    &.with-fill {
+                        background: var(--secondary-white);
+
+                        i { --mask-color: var(--icon-active); }
+                    }
+
+                    i {
+                        margin: 0 auto;
+                        --icon-size: 24px;
+                        --mask-color: var(--secondary-white);
+
+                        &.icon-options {
+                            transform: rotate(90deg);
+                        }
+                    }
+
+                    &.end-call {
+                        background: #FF333A;
+                        color: var(--text-color-high);
+                        box-shadow: none;
+                        --height: 32px;
+
+                        &:hover { background: #FF6560; }
+                    }
+                    &:has(> div) {
+                        --height: 28px;
+                    }
+                }
+
+                .button-group {
+                    /* [...] */
+
+                    .active-indicator {
+                        top: -1px;
+                        right: 2px;
+                    }
+                }
+            }
+
+            .float-video-fade {
+                position: absolute;
+                left: 0;
+                bottom: 0;
+                width: 100%;
+                height: 56px;
+                border-radius: 0 0 24px 24px;
+                background: rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        .float-video-notifications {
+            position: absolute;
+            left: 8px;
+            bottom: 8px;
+
+            .chat-control {
+                background: rgb(155,229,247);
+                background: linear-gradient(90deg, rgba(155,229,247,1) 0%, rgba(79,192,238,1) 100%);
+
+                i {
+                    --icon-size: 32px;
+                }
+            }
+
+            span {
+                position: absolute;
+                top: -1px;
+                right: 0;
+                width: 17px;
+                height: 17px;
+                text-align: center;
+                border-radius: 200px;
+                font: var(--text-body2);
+                background: var(--surface-error);
+                color: var(--secondary-white);
+            }
+        }
+
+        .float-video-alert {
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 56px;
+            left: 0;
+            right: 0;
+            margin: auto;
+            padding: 12px 16px;
+            width: calc(100% - 60px);
+            font: var(--text-body2);
+            color: var(--text-color-high);
+            border-radius: 24px;
+            background: var(--surface-main);
+
+            div.alert-label {
+                flex: 0 1 36px;
+                max-height: 36px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                width: calc(100% - 24px);
+                &.label-only {
+                    flex-basis: 20px;
+                }
+
+                img.emoji {
+                    margin: 0px;
+                    height: 16px;
+                    width: 16px;
+                }
+            }
+
+            i.icon-raise-hand {
+                display: inline-block;
+                margin-right: 8px;
+                vertical-align: middle;
+            }
+
+            button {
+                background: transparent;
+                border: none;
+                cursor: pointer;
+
+                &.close {
+                    align-items: center;
+                    display: flex;
+                    height: 24px;
+                    justify-content: center;
+                    padding: 0;
+                    position: absolute;
+                    right: 12px;
+                    top: 8px;
+                    width: 24px;
+                    --icon-size: 24px;
+                }
+                &.show-people {
+                    background: var(--surface-grey-2);
+                    border-radius: 4px;
+                    color: var(--text-color-high);
+                    font: var(--text-body1);
+                    height: 28px;
+                    padding: 4px;
+                    text-align: center;
+                    width: 100%;
+                }
+            }
+        }
+
+        button {
+            /* [...] */
+            height: 40px;
+            width: 40px;
+
+            &.inactive i {
+                /* [...] */
+            }
+
+            &.expand {
+                position: absolute;
+                top: 16px;
+                right: 16px;
+                width: 24px;
+                height: 24px;
+                margin: 0;
+                padding: 0;
+                background: transparent;
+                z-index: 21;
+
+                i {
+                    --icon-size: 24px;
+                }
+            }
+
+            i {
+                --mask-color: var(--secondary-white);
+            }
+
+            span {
+                position: fixed;
+                bottom: -9999px;
+                visibility: hidden;
+            }
+        }
+    }
+
+    .video-node {
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        border: 0 none;
+        border-radius: 24px;
+        background: transparent;
+    }
+}

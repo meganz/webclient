@@ -92,9 +92,6 @@
     display: block;
     background-color: rgba(0,0,0,0.1);
 }
-.mega-dialog.arrange-to-back, div.overlay.arrange-to-back {
-    z-index: 900;
-}
 .arrange-to-front, .dropdown.context.arrange-to-front {
     z-index: 1300;
 }
@@ -149,28 +146,31 @@
 }
 
 /* Send Contact Dialog */
-.mega-dialog.new-group-chat .content-block {
+.mega-dialog.contact-picker-widget .content-block {
     padding: 0;
 }
-.mega-dialog.new-group-chat .group-chat-dialog.content {
+.mega-dialog.contact-picker-widget .group-chat-dialog.content {
     padding: 0 48px;
 }
-.mega-dialog.send-contact, .mega-dialog.new-group-chat {
+.mega-dialog.send-contact,
+.mega-dialog.contact-picker-widget {
     width: 420px;
 }
-.fr.fontsize2 .mega-dialog.new-group-chat {
+.fr.fontsize2 .mega-dialog.contact-picker-widget {
     width: 382px;
 }
-body.de .mega-dialog.new-group-chat {
+body.de .mega-dialog.contact-picker-widget {
     width: 440px;
 }
 .mega-dialog .contacts-search-scroll {
     height: 336px !important;
 }
-.mega-dialog.send-contact .fm-dialog-content, .mega-dialog.new-group-chat .fm-dialog-content {
+.mega-dialog.send-contact .fm-dialog-content,
+.mega-dialog.contact-picker-widget .fm-dialog-content {
     padding: 0 0 0 12px;
 }
-.mega-dialog.send-contact .contacts-search-scroll, .mega-dialog.new-group-chat .contacts-search-scroll {
+.mega-dialog.send-contact .contacts-search-scroll,
+.mega-dialog.contact-picker-widget .contacts-search-scroll {
     margin: 8px auto 0;
     height: 320px !important;
 }
@@ -217,7 +217,8 @@ body.de .mega-dialog.new-group-chat {
 .mega-dialog .group-chat-dialog .radio-txt {
     padding-top: 12px;
 }
-.mega-dialog.new-group-chat .contacts-search-scroll.short, .mega-dialog.new-group-chat .group-chat-dialog.checkbox + .contacts-search-scroll {
+.mega-dialog.contact-picker-widget .contacts-search-scroll.short,
+.mega-dialog.contact-picker-widget .group-chat-dialog.checkbox + .contacts-search-scroll {
     height: 226px !important;
 }
 .toggle-checkbox {
@@ -283,8 +284,9 @@ body.de .mega-dialog.new-group-chat {
 .mega-dialog.add-from-cloud .content {
     border-bottom: 1px solid var(--stroke-grey-2);
     overflow: hidden;
+    flex: 1 1;
 }
-.mega-dialog.add-from-cloud .fm-dialog-tabs:after {
+.mega-dialog .fm-dialog-tabs::after {
     display: block;
     content: '';
     position: absolute;
@@ -294,14 +296,13 @@ body.de .mega-dialog.new-group-chat {
 }
 .mega-dialog.add-from-cloud .content-block {
     position: relative;
-    min-height: 500px;
+    max-height: 566px;
+    height: 100%;
 }
 .mega-dialog.add-from-cloud .content-block .content-container {
+    height: calc(100% - 106px);
     position: relative;
     z-index: 1;
-}
-.mega-dialog.add-from-cloud .megaList2.megaListContainer {
-    height: 434px !important;
 }
 .mega-dialog.add-from-cloud .megaListContainer .data-block-bg {
     width: 192px;
@@ -446,7 +447,7 @@ body.de .mega-dialog.new-group-chat {
     margin: 0 auto;
 }
 .fm-dialog-table.grid-table {
-    width: calc(100% - 32px);
+    width: calc(100% - 34px);
     margin: 0 24px 0 8px;
 }
 .fm-dialog-table.grid-table td.extras-column {
@@ -601,7 +602,7 @@ body.de .mega-dialog.new-group-chat {
     border-bottom: 1px solid var(--stroke-grey-2);
     padding: 26px 0 0 0;
 }
-.add-from-cloud .fm-dialog-tab {
+.fm-dialog-tab {
     position: relative;
     cursor: pointer;
     font: var(--text-h3);
@@ -614,13 +615,13 @@ body.de .mega-dialog.new-group-chat {
     margin-bottom: -1px;
     z-index: 1;
 }
-.rtl .add-from-cloud .fm-dialog-tab {
+.rtl .fm-dialog-tab {
    float: right;
 }
 .add-from-cloud.no-incoming .fm-dialog-tab.incoming {
     display: none;
 }
-.add-from-cloud .fm-dialog-tab.active {
+.fm-dialog-tab.active {
     border-color: var(--stroke-info);
     color: var(--text-color-high);
     cursor: default;
@@ -728,7 +729,8 @@ body.de .mega-dialog.new-group-chat {
 .create-folder-input-bl,
 .create-album-input-bl,
 .fm-account-input,
-.rename-input-bl {
+.rename-input-bl,
+.device-rename-input-bl {
     width: 100%;
     border: 1px solid var(--stroke-grey-2);
     box-sizing: border-box;
@@ -740,7 +742,8 @@ body.de .mega-dialog.new-group-chat {
 .create-folder-input-bl input,
 .create-album-input-bl input,
 .fm-account-input input,
-.rename-input-bl input {
+.rename-input-bl input,
+.device-rename-input-bl input {
     width: 100%;
     height: 36px;
     box-sizing: border-box;
@@ -1140,7 +1143,6 @@ body.de .mega-dialog.new-group-chat {
     text-align: start;
 }
 .megasync-slide-info .small-header {
-    text-transform: uppercase;
     font-size: 14px;
     line-height: 17px;
     color: #3C434D;
@@ -1247,9 +1249,10 @@ body.de .mega-dialog.new-group-chat {
     -webkit-margin-start: 8px;
     margin-inline-start: 8px;
 }
-.fm-versioning .medium-file-icon {
+.fm-versioning .item-type-icon-90 {
+    --icon-size: 48px;
     display: inline-block;
-    margin: 0;
+    margin: -5px;
     flex-shrink: 0;
     vertical-align: middle;
 }
@@ -1993,6 +1996,34 @@ body.de .mega-dialog.new-group-chat {
 
 /* end rename-dialog*/
 
+/* device-rename-dialog */
+
+    .mega-dialog.device-rename-dialog {
+        width: 360px;
+    }
+    .mega-dialog.device-rename-dialog .content-block {
+        padding: 8px 20px;
+    }
+
+    .mega-dialog.device-rename-dialog > header {
+        padding: 16px;
+    }
+
+    .mega-dialog.device-rename-dialog > header h2 {
+        text-align: center;
+    }
+
+    .mega-dialog button.close {
+        top: 20px;
+    }
+
+    .mega-dialog.device-rename-dialog > footer .footer-container {
+        padding: 16px 24px 20px;
+    }
+
+
+/* end device-rename-dialog */
+
 /* export-links-dialog */
 
     .mega-dialog.export-links-dialog {
@@ -2000,6 +2031,28 @@ body.de .mega-dialog.new-group-chat {
     }
     .de .mega-dialog.export-links-dialog {
         width: 760px;
+    }
+    .mega-dialog.export-links-dialog .alt-background {
+        background: var(--surface-main);
+    }
+    .theme-dark .mega-dialog.export-links-dialog .alt-background {
+        background: inherit;
+    }
+    .mega-dialog.export-links-dialog .content-block {
+        padding: 0;
+    }
+    .mega-dialog.export-links-dialog .export-keys-separately-block {
+        padding: 0 48px;
+    }
+    .mega-dialog.export-links-dialog .learn-more-text {
+        color: #2ba6de;
+        cursor: pointer;
+        display: inline-block;
+        text-decoration: underline;
+        vertical-align: middle;
+    }
+    .theme-dark .mega-dialog.export-links-dialog .learn-more-text {
+        color: #6fd7ff;
     }
     .mega-dialog.export-links-dialog .settings-row .info-icon {
         vertical-align: middle;
@@ -2017,6 +2070,9 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.export-links-dialog .half-sized-block,
     .mega-dialog.export-links-dialog .half-sized-block:first-child {
         padding: 0;
+    }
+    .mega-dialog.export-links-dialog.embed .embed-content {
+        padding: 0 48px;
     }
     .mega-dialog.export-links-dialog.embed header {
         display: block;
@@ -2040,17 +2096,17 @@ body.de .mega-dialog.new-group-chat {
         opacity: 1;
     }
     .mega-dialog.export-links-dialog.embed .options {
-        padding-top: 10px;
+        padding-top: 16px;
     }
     .mega-dialog.export-links-dialog .links-content .options {
         margin-bottom: 24px;
     }
-    .mega-dialog.export-links-dialog .checkdiv.disabled,
-    .export-links-dialog .checkdiv.disabled + label {
+    .mega-dialog.export-links-dialog .export-keys-switch.disabled,
+    .mega-dialog.export-links-dialog .export-keys-switch.disabled + label {
         opacity: 0.6;
         cursor: default;
     }
-    .mega-dialog.export-links-dialog .checkdiv.disabled input {
+    .mega-dialog.export-links-dialog .export-keys-switch.disabled {
         cursor: default;
     }
     .mega-dialog.export-links-dialog .rounded-tip-button {
@@ -2080,35 +2136,98 @@ body.de .mega-dialog.new-group-chat {
         left: auto;
         right: 34px;
     }
-    .mega-dialog.export-links-dialog .keys-tip.left-arrow i {
+    .mega-dialog.export-links-dialog .keys-tip.left-arrow i,
+    .m-context-menu.keys-tip.left-arrow > i {
         top: 64px;
     }
-    .mega-dialog.export-links-dialog .illustration {
+    .mega-dialog.export-links-dialog .illustration,
+    .m-context-menu.keys-tip .illustration {
         width: 128px;
         --width: 128px;
         height: 92px;
         margin: 16px auto;
     }
-    .mega-dialog.export-links-dialog .keys-tip .tip-header {
+    .mega-dialog.export-links-dialog .keys-tip .tip-header,
+    .m-context-menu.keys-tip .tip-header {
         font: var(--text-h3);
         color: var(--text-color-high);
         margin-bottom: 8px;
     }
-    .mega-dialog.export-links-dialog .keys-tip .tip-text {
+    .mega-dialog.export-links-dialog .keys-tip .tip-text,
+    .m-context-menu.keys-tip .tip-text {
         padding: 0 0 8px;
     }
     .mega-dialog.export-links-dialog .keys-tip .tip-link,
-    .mega-dialog.export-links-dialog .keys-tip .tip-link:visited {
+    .mega-dialog.export-links-dialog .keys-tip .tip-link:visited,
+    .m-context-menu.keys-tip .tip-link,
+    .m-context-menu.keys-tip .tip-link:visited {
         font: var(--text-body2);
+        color: var(--text-color-info);
         cursor: pointer;
         position: relative;
     }
+    .mega-dialog.export-links-dialog .update-success-banner {
+        background: rgba(43, 166, 222, 0.1);
+        border: 1px solid rgba(43, 166, 222, 0.5);
+        border-radius: 4px;
+        color: #299cd1;
+        margin: 0 48px 28px;
+        padding: 2px 16px;
+        text-align: center;
+    }
     .mega-dialog.export-links-dialog .pro {
-        padding: 38px 0 0;
+        background: #fff;
+        border: 2px solid #eee;
+        border-radius: 12px;
+        margin: 20px 48px 0;
         position: relative;
     }
+    .mega-dialog.export-links-dialog .pro.disabled {
+        opacity: 1;
+    }
+    .theme-dark .mega-dialog.export-links-dialog .pro {
+        background: #333;
+        border-color: #444;
+    }
+    .mega-dialog.export-links-dialog .pro-section-header {
+        background: #fafafa;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+        padding: 16px;
+    }
+    .theme-dark .mega-dialog.export-links-dialog .pro-section-header {
+        background: #444;
+    }
+    .mega-dialog.export-links-dialog .pro-header-text {
+        display: inline-block;
+        color: var(--text-color-higher);
+        font: var(--text-body1-bold);
+        font-size: 14px;
+        line-height: 20px;
+        width: 35%;
+    }
+    .theme-dark .mega-dialog.export-links-dialog .pro-header-text {
+        color: #fff;
+    }
+    .mega-dialog.export-links-dialog .link-access-text {
+        color: #2ba6de;
+        display: inline-block;
+        font: var(--text-body1-bold);
+        font-size: 14px;
+        line-height: 20px;
+        text-align: right;
+        width: 64%;
+    }
+    .theme-dark .mega-dialog.export-links-dialog .link-access-text {
+        color: #6fd7ff;
+    }
+    .mega-dialog.export-links-dialog .pro-feature-block {
+        padding: 0 16px 16px;
+    }
+    .mega-dialog.export-links-dialog .pro-feature-block.first-feature-block {
+        padding-top: 16px;
+    }
     .mega-dialog.export-links-dialog .pro.disabled::before {
-        content: '';
         display: block;
         left: 0;
         top: 0;
@@ -2116,45 +2235,239 @@ body.de .mega-dialog.new-group-chat {
         width: 100%;
         height: 100%;
         z-index: 10;
-        cursor: pointer;
     }
     .rtl .mega-dialog.export-links-dialog .pro.disabled::before {
         left: auto;
         right: 0;
     }
+    .mega-dialog.export-links-dialog .pro.disabled .pro-only-feature {
+        cursor: pointer;
+    }
     .mega-dialog.export-links-dialog .pro-only-feature {
         color: var(--text-color-error);
+        font-size: 14px;
+        line-height: 20px;
+        border: 1px solid var(--text-color-error);
         display: none;
+        padding: 3px 6px;
+        margin-left: 5px;
     }
     .mega-dialog.export-links-dialog .disabled .pro-only-feature {
         display: inline;
     }
-    .mega-dialog.export-links-dialog .pro .expiry-container {
+    .mega-dialog.export-links-dialog .pro .password-container {
+        float: right;
+    }
+    .mega-dialog.export-links-dialog .pro-feature-block .mega-input {
+        width: 284px;
+    }
+    .theme-dark .mega-dialog.export-links-dialog .pro-feature-block .mega-input {
+        background: #000;
+    }
+    .mega-dialog.export-links-dialog .expiry-container input,
+    .mega-dialog.export-links-dialog .password-container input {
+        width: 284px;
+    }
+    .mega-dialog.export-links-dialog .password-container .mega-input {
         position: relative;
-        display: inline-block;
-        margin-top: 15px;
+    }
+    .mega-dialog.export-links-dialog .expiry-container .datepicker-input,
+    .mega-dialog.export-links-dialog .password-container .mega-input {
+        border: 1px solid var(--light-mode-surfaces-grey-2, #eee);
+        border-radius: 4px;
+    }
+    .mega-dialog.export-links-dialog .expiry-container .datepicker-input:focus-within,
+    .mega-dialog.export-links-dialog .password-container .mega-input:focus-within {
+        border: 1px solid #2ba6de;
+    }
+    .theme-dark .mega-dialog.export-links-dialog .expiry-container .datepicker-input,
+    .theme-dark .mega-dialog.export-links-dialog .password-container .mega-input {
+        border: none;
+    }
+    .theme-dark .mega-dialog.export-links-dialog .expiry-container .datepicker-input:focus-within,
+    .theme-dark .mega-dialog.export-links-dialog .password-container .mega-input:focus-within {
+        border: 1px solid #2ba6de;
+    }
+    .mega-dialog.export-links-dialog .toggle-password-visible {
+        opacity: 0.7;
+        margin-right: 1px;
+    }
+    .theme-dark .mega-dialog.export-links-dialog .toggle-password-visible {
+        opacity: 1;
+    }
+    .mega-dialog.export-links-dialog .strength-indicator {
+        background-color: green;
+        border-radius: 12px;
+        color: white;
+        font-size: 14px;
+        height: 24px;
+        line-height: 24px;
+        padding: 0 10px;
+        position: absolute;
+        right: 30px;
+        top: 5px;
+        z-index: 12;
+    }
+    .rtl .mega-dialog.export-links-dialog .strength-indicator {
+        left: 30px;
+        right: initial;
+    }
+    .mega-dialog.export-links-dialog .strength-indicator:empty {
+        display: none;
+    }
+    .mega-dialog.export-links-dialog .good1 .strength-indicator {
+        background-color: var(--password-status-veryweak);
+    }
+    .mega-dialog.export-links-dialog .good2 .strength-indicator {
+        background-color: var(--password-status-weak);
+    }
+    .mega-dialog.export-links-dialog .good3 .strength-indicator {
+        background-color: var(--password-status-medium);
+    }
+    .mega-dialog.export-links-dialog .good4 .strength-indicator {
+        background-color: var(--password-status-good);
+    }
+    .mega-dialog.export-links-dialog .good5 .strength-indicator {
+        background-color: var(--password-status-strong);
+    }
+    .mega-dialog.export-links-dialog .password-container .mega-input::before {
+        border: none;
+    }
+    .mega-dialog.export-links-dialog .mega-button.confirm-password {
+        font-size: 14px;
+        float: right;
+        line-height: 20px;
+        margin-top: 16px;
+        min-height: initial;
+        padding: 0;
+    }
+    .mega-dialog.export-links-dialog .mega-button.confirm-password span {
+        line-height: 20px;
+        padding: 2px;
+    }
+    .mega-dialog.export-links-dialog .reset-password {
+        color: #333;
+        font-size: 12px;
+        float: right;
+        line-height: 18px;
+        margin-top: 8px;
+        min-height: initial;
+        padding: 0;
+        text-decoration: underline;
+    }
+    .theme-dark .mega-dialog.export-links-dialog .reset-password {
+        color: #fff;
+    }
+    .mega-dialog.export-links-dialog .pro .expiry-container {
+        float: right;
+    }
+    .mega-dialog.export-links-dialog .pro .expiry-container .mega-input::before {
+        border: none;
+    }
+    .mega-dialog.export-links-dialog .mega-input.datepicker-input i {
+        --mask-color: var(--icon-rest);
+        cursor: pointer;
+    }
+    .theme-dark .mega-dialog.export-links-dialog .mega-input.datepicker-input i {
+        --mask-color: #ccc;
     }
     .mega-dialog.export-links-dialog .pro input.set-date {
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        position: absolute;
-        z-index: 9;
-        opacity: 0;
         cursor: pointer;
+    }
+    .share-link-expiry-calendar {
+        position: absolute;
+        padding: 8px 0;
+        min-width: 300px;
+        border: var(--context-menu-border);
+        border-radius: 20px;
+        box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.3);
+        background: var(--surface-main);
+        transition: var(--transition-opacity);
+        z-index: 150;
+    }
+    .share-link-expiry-calendar .datepicker--pointer {
+        display: none;
+    }
+    .share-link-expiry-calendar .datepicker--content {
+        padding: 7px 7px 7px 10px;
+    }
+    .share-link-expiry-calendar .datepicker--days-names .datepicker--day-name {
+        margin: 2px;
+        width: 36px;
+        color: var(--text-color-low);
+    }
+    .share-link-expiry-calendar .datepicker--cell {
+        width: 36px;
+        height: 36px;
+        margin: 2px;
+        font-size: 12px;
+        line-height: 36px;
+    }
+    .share-link-expiry-calendar .datepicker--cell.-selected- {
+        color: var(--secondary-white);
+    }
+    .share-link-expiry-calendar .datepicker--cell.-disabled- {
+        color: var(--text-color-low);
+    }
+    .share-link-expiry-calendar .datepicker--cell.-disabled-.-selected- {
+        color: var(--secondary-white);
+    }
+    .share-link-expiry-calendar .datepicker--cell.-current- {
+        border: 1px solid #333;
+        background: linear-gradient(180deg, #F2F2F2 0%, #EDEDED 100%);
+        color: var(--text-color-high);
+    }
+    body.theme-dark .share-link-expiry-calendar .datepicker--cell.-current- {
+        border: 1px solid #FFF;
+        background: transparent;
+    }
+    .share-link-expiry-calendar .datepicker--cell.-other-month- {
+        color: var(--text-color-low);
+    }
+    .mega-dialog.export-links-dialog .content-block .sub-header {
+        display: inline-block;
+        min-width: 23%;
+        line-height: 36px;
+        vertical-align: middle;
     }
     .mega-dialog.export-links-dialog .sub-header ~ button {
         margin: 0 0 0;
     }
     .mega-dialog.export-links-dialog .sub-header + button,
     .mega-dialog.export-links-dialog .sub-header ~ button.remove {
-        margin-top: 15px;
+        margin-top: 0;
+    }
+    .mega-dialog.export-links-dialog .sub-header .info {
+        color: #333;
+        display: inline-block;
+        font: var(--text-body1);
+        font-size: 14px;
+        line-height: 20px;
+        width: 82px;
+    }
+    .theme-dark .mega-dialog.export-links-dialog .sub-header .info {
+        color: #fff;
+    }
+    .rtl .mega-dialog.export-links-dialog .sub-header .info {
+        margin-right: 5px;
+        width: 120px;
+    }
+    .mega-dialog.export-links-dialog .mega-switch.expiry-switch,
+    .mega-dialog.export-links-dialog .mega-switch.password-switch {
+        float: initial;
+        vertical-align: middle;
+    }
+    .mega-dialog.export-links-dialog .pro.disabled .expiry-switch,
+    .mega-dialog.export-links-dialog .pro.disabled .password-switch {
+        display: none;
     }
     .mega-dialog.export-links-dialog button.expiry {
         -webkit-margin-end: 4px;
         margin-inline-end: 4px;
         z-index: 1;
+    }
+    .mega-dialog.export-links-dialog .pro.disabled button {
+        visibility: hidden;
     }
     .mega-dialog.export-links-dialog button.expiry .label {
         z-index: 1;
@@ -2186,21 +2499,58 @@ body.de .mega-dialog.new-group-chat {
         left: -4px;
         z-index: 1200;
     }
+    .mega-dialog.export-links-dialog > footer .footer-container {
+        display: flex;
+        position: relative;
+    }
+    .mega-dialog.export-links-dialog .footer-container .left-block {
+        width: 50%;
+    }
+    .mega-dialog.export-links-dialog .footer-container .right-block {
+        width: 50%;
+        text-align: right;
+    }
+    .mega-dialog.export-links-dialog .remove-link-button-container {
+        cursor: pointer;
+        display: inline-block;
+        line-height: 36px;
+        padding-right: 10px;
+        position: relative;
+    }
+    .mega-dialog.export-links-dialog .remove-link-button-container .icon-link-remove {
+        position: absolute;
+        left: 0;
+        top: 5px;
+        --icon-size: 24px;
+        --mask-color: var(--text-color-medium);
+    }
+    .mega-dialog.export-links-dialog .remove-link-button-container .remove-link-text {
+        color: #333;
+        font: var(--text-body1-bold);
+        font-size: 14px;
+        line-height: 20px;
+        margin-left: 30px;
+    }
+    .theme-dark .mega-dialog.export-links-dialog .remove-link-button-container .remove-link-text {
+        color: #fff;
+    }
     .mega-dialog.export-links-dialog .links {
         position: relative;
         padding: 0;
     }
     .mega-dialog.export-links-dialog .links-scroll {
-        max-height: 398px;
-        padding: 24px 48px 0;
-        position: relative;
+        background: var(--surface-main);
         box-sizing: border-box;
+        margin: 24px 0 0;
+        max-height: 215px;  /* Restricted to keep the dialog height short and keep the datepicker fully visible */
+        padding: 0 48px;
+        position: relative;
     }
     .mega-dialog.export-links-dialog .item {
         background: var(--surface-main);
         border-radius: 4px;
         position: relative;
-        padding: 12px;
+        padding: 12px 0;
         white-space: nowrap;
         margin-top: 8px;
     }
@@ -2213,19 +2563,21 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.export-links-dialog .item:last-child {
         margin-bottom: 12px;
     }
-    .mega-dialog.export-links-dialog .item .transfer-filetype-icon {
-        left: 20px;
+    .mega-dialog.export-links-dialog .item .item-type-icon {
+        --icon-size: 24px;
+        position: absolute;
         top: 12px;
+        left: 0;
     }
-    .rtl .mega-dialog.export-links-dialog .item .transfer-filetype-icon {
+    .rtl .mega-dialog.export-links-dialog .item .item-type-icon {
         left: auto;
-        right: 20px;
+        right: 0;
     }
     .mega-dialog.export-links-dialog .item-title {
         display: inline-block;
         max-width: calc(100% - 230px);
-        -webkit-margin-start: 36px;
-        margin-inline-start: 36px;
+        -webkit-margin-start: 30px;
+        margin-inline-start: 30px;
         -webkit-margin-end: 3px;
         margin-inline-end: 3px;
         vertical-align: top;
@@ -2234,14 +2586,29 @@ body.de .mega-dialog.new-group-chat {
         position: relative;
         height: 29px;
         color: var(--text-color-high);
-        padding-top: 3px;
+        padding-top: 2px;
+    }
+    .rtl .mega-dialog.export-links-dialog .item-title {
+        -webkit-margin-start: 0;
+        margin-inline-start: 0;
     }
     .mega-dialog.export-links-dialog .item-size {
         display: inline-block;
+        font-size: 12px;
         -webkit-margin-start: 8px;
         margin-inline-start: 8px;
         vertical-align: top;
         padding-top: 3px;
+    }
+    .mega-dialog.export-links-dialog .item-size.hide-separator::before {
+        display: none;
+    }
+    .mega-dialog.export-links-dialog .item-size::before {
+        border-left: 1px solid #eee;
+        content: "";
+        display: inline-block;
+        height: 12px;
+        width: 8px;
     }
     .mega-dialog.export-links-dialog .item-link {
         display: flex;
@@ -2268,6 +2635,7 @@ body.de .mega-dialog.new-group-chat {
         right: 6px;
     }
     .mega-dialog.export-links-dialog .item-link input {
+        font-size: 12px;
         height: 38px;
         box-sizing: border-box;
         width: 100%;
@@ -2291,25 +2659,23 @@ body.de .mega-dialog.new-group-chat {
         display: none;
     }
     .mega-dialog.export-links-dialog .separately .item:not(.password-protect-link) .item-link {
-        width: calc(50% - 10px);
-        float: left;
-    }
-    .rtl .mega-dialog.export-links-dialog .separately .item:not(.password-protect-link) .item-link {
-        float: right;
+        margin-bottom: 8px;
     }
     .mega-dialog.export-links-dialog .separately .item:not(.password-protect-link) .item-link.key {
         display: flex;
-        -webkit-margin-start: 20px;
-        margin-inline-start: 20px;
+    }
+    .mega-dialog.export-links-dialog .multiple-links .item-link .mega-button.positive {
+        background: none;
+        border-left: 1px solid var(--stroke-grey-2);
+        box-shadow: none;
+        color: #2ba6de;
+        font-size: 14px;
     }
     .mega-dialog.export-links-dialog .icons {
         float: right;
         position: relative;
         -webkit-padding-end: 2px;
         padding-inline-end: 2px;
-    }
-    .rtl .mega-dialog.export-links-dialog .icons {
-        float: left;
     }
     .mega-dialog.export-links-dialog .icons i {
         float: right;
@@ -2333,7 +2699,7 @@ body.de .mega-dialog.new-group-chat {
         opacity: 0;
     }
     .mega-dialog.export-links-dialog .icons i.cog {
-        opacity: 0.7;
+        display: none;
     }
     .mega-dialog.export-links-dialog .dropdown.export {
         min-width: 190px;
@@ -2564,11 +2930,11 @@ body.de .mega-dialog.new-group-chat {
         padding-inline-end: 4px;
         color: var(--text-color-high);
     }
-    .mega-dialog.export-links-dialog .key .checkdiv {
+    .mega-dialog.export-links-dialog .key .export-keys-switch {
         -webkit-margin-end: 4px;
         margin-inline-end: 4px;
     }
-    .mega-dialog.export-links-dialog .key .checkdiv::after {
+    .mega-dialog.export-links-dialog .key .export-keys-switch::after {
         pointer-events: none;
     }
     .mega-dialog.export-links-dialog footer {
@@ -2585,6 +2951,17 @@ body.de .mega-dialog.new-group-chat {
     }
 
 /* end create-file-dialog and create-folder-dialog */
+
+/* add-to-album-dialog */
+
+    .mega-dialog.add-to-album-dialog {
+        width: 420px;
+    }
+    .add-to-album-dialog .icon-album {
+        --mask-color: var(--surface-mid-grey);
+    }
+
+/* end add-to-album-dialog */
 
 /* fm-picker-dialog */
 
@@ -2685,8 +3062,8 @@ body.de .mega-dialog.new-group-chat {
         transition: 0.1s;
         box-sizing: border-box;
         left: 0;
-        height: 32px;
-        line-height: 31px;
+        height: 30px;
+        line-height: 30px;
         white-space: nowrap;
         vertical-align: middle;
         overflow: hidden;
@@ -2702,9 +3079,9 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.fm-picker-dialog .summary-input .summary-ff-name,
     .mega-dialog.fm-picker-dialog .summary-input .summary-ff-name-ellipsis {
-        height: 32px;
+        height: 30px;
         max-width: 280px;
-        line-height: 32px;
+        line-height: 30px;
         -webkit-margin-start: 36px;
         margin-inline-start: 36px;
         position: relative;
@@ -2714,44 +3091,33 @@ body.de .mega-dialog.new-group-chat {
         overflow: hidden;
         text-overflow: ellipsis;
     }
-    .mega-dialog.fm-picker-dialog .summary-container .transfer-filetype-icon.chat {
-        background-image: url(../images/mega/fm-main-sprite.png);
-        background-repeat: no-repeat;
-        background-size: 48px auto;
-        background-position: -12px -4517px;
-        width: 24px;
-        height: 24px;
-        opacity: 0.4;
-    }
-    .mega-dialog.fm-picker-dialog .summary-container .transfer-filetype-icon.folder {
-        background-position: -337px -717px;
-    }
     .mega-dialog.fm-picker-dialog .folder-container {
         width: 100%;
         height: 280px;
         position: relative;
     }
     .mega-dialog.fm-picker-dialog .user-card-email.small.note {
+        background: var(--surface-grey-1);
+        border-radius: 0 0 12px 12px;
         color: var(--text-color-high);
         font: var(--text-body2);
         padding: 8px 16px;
+        position: relative;
         text-align: center;
-        border-radius: 4px;
-        background: var(--surface-grey-1);
-        margin: 12px 0 0;
-        -webkit-margin-end: -8px;
-        margin-inline-end: -8px;
-        -webkit-margin-start: -58px;
-        margin-inline-start: -58px;
+        z-index: 123;
     }
-    .mega-dialog.fm-picker-dialog .dropdown.contact-preview {
-        padding: 12px 20px;
-    }
+    .mega-dialog.fm-picker-dialog .dropdown.contact-preview,
+    .mega-dialog.fm-picker-dialog .dropdown.contact-preview .contacts-info.body,
     .mega-dialog.fm-picker-dialog .dropdown.contact-preview .user-card-data {
-        padding-right: 0;
+        padding: 0;
     }
-    .mega-dialog.fm-picker-dialog .dropdown.contact-preview .contacts-info.body {
-        padding: 0 8px;
+    .mega-dialog.fm-picker-dialog .dropdown.contact-preview .user-card-wrap {
+        padding: 12px;
+    }
+    .mega-dialog.fm-picker-dialog .dropdown.contact-preview .avatar-wrapper {
+        margin: 1px 0;
+        -webkit-margin-end: 8px;
+        margin-inline-end: 8px;
     }
     .mega-dialog.fm-picker-dialog .summary-items.multi {
         cursor: pointer;
@@ -2997,6 +3363,7 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.fm-picker-dialog .right-pane .dialog-tree-panel-scroll span {
         font: var(--text-body2);
         color: var(--text-color-high);
+        line-height: 24px;
         overflow: hidden;
         text-overflow: ellipsis;
     }
@@ -3020,17 +3387,13 @@ body.de .mega-dialog.new-group-chat {
         transform: rotate(90deg);
         background-image: none;
     }
-    .mega-dialog.fm-picker-dialog .nw-fm-tree-folder {
+    .mega-dialog.fm-picker-dialog .nw-fm-tree-folder,
+    .mega-dialog.fm-picker-dialog .nw-fm-tree-icon-wrap {
         -webkit-padding-start: 30px;
         padding-inline-start: 30px;
         max-width: calc(100% - 40px);
         -webkit-margin-start: 24px;
         margin-inline-start: 24px;
-        height: 18px;
-        line-height: 18px;
-    }
-    .mega-dialog.fm-picker-dialog .nw-fm-tree-folder::before {
-        top: -3px;
     }
     .mega-dialog.fm-picker-dialog .nw-fm-tree-item .nw-fm-tree-arrow {
         -webkit-margin-start: 6px;
@@ -3148,11 +3511,11 @@ body.de .mega-dialog.new-group-chat {
         left: auto;
         right: 50%;
     }
-    .mega-dialog.fm-picker-dialog .summary-container .transfer-filetype-icon,
+    .mega-dialog.fm-picker-dialog .summary-container .item-type-icon,
     .mega-dialog.fm-picker-dialog .summary-container .target-icon {
-        margin: 4px 0 0 0;
-        -webkit-margin-start: 8px;
-        margin-inline-start: 8px;
+        margin: 3px 0;
+        -webkit-margin-start: 7px;
+        margin-inline-start: 7px;
         --icon-size: 24px;
         position: absolute;
         --mask-color: var(--icon-rest);
@@ -3752,7 +4115,6 @@ body.de .mega-dialog.new-group-chat {
         padding: 0 5px 17px 5px;
         height: auto;
     }
-
     .mega-dialog.fingerprint-dialog .fingerprint-contact-info {
         margin: 0 16px;
         padding: 21px 0 0 0;
@@ -3767,8 +4129,71 @@ body.de .mega-dialog.new-group-chat {
         float: none;
         padding-right: 0;
     }
+    .mega-dialog.fingerprint-dialog .business-subuser-confirm {
+        display: none;
+    }
+    .mega-dialog.fingerprint-dialog.admin-verify .business-subuser-confirm {
+        background-image: url(../images/mega/fingerprint-icon.svg);
+        background-repeat: no-repeat;
+        background-position: center;
+        width: 140px;
+        height: 102px;
+        display: block;
+    }
+    .mega-dialog.fingerprint-dialog.admin-verify header {
+        align-content: center;
+        justify-content: center;
+        align-items: center;
+        gap: 16px;
+    }
+    .mega-dialog.fingerprint-dialog.admin-verify header h2 {
+        text-align: center;
+    }
+    .mega-dialog.fingerprint-dialog.admin-verify .content-block > p {
+        text-align: center;
+    }
+    .mega-dialog.fingerprint-dialog.admin-verify footer button.dialog-skip-button {
+        display: none;
+    }
+    .mega-dialog.fingerprint-dialog.admin-verify footer .footer-container {
+        justify-content: center;
+        align-items: center;
+    }
+    .mega-dialog.fingerprint-dialog.e-modal button.js-close,
+    .mega-dialog.fingerprint-dialog.e-modal button.dialog-skip-button,
+    .mega-dialog.fingerprint-dialog.admin-verify button.js-close,
+    .mega-dialog.fingerprint-dialog.admin-verify button.dialog-skip-button {
+        display: none;
+    }
 
 /* end fingerprint-dialog */
+
+/* contact verification dialog */
+
+.mega-dialog.mega-dialog.contact-verification-dialog .contact-verification-img {
+    background: url('../images/mega/contact-verification.png') no-repeat;
+    background-size: contain;
+    height: 120px;
+    width: 120px;
+}
+
+.mega-dialog.contact-verification-dialog:not(.dialog-template-message) > header .graphic {
+    margin: unset;
+}
+
+.mega-dialog.contact-verification-dialog > header h2 {
+    text-align: start;
+}
+
+.mega-dialog.contact-verification-dialog p {
+    text-align: start;
+}
+
+.mega-dialog.dialog-template-graphic.contact-verification-dialog > footer .footer-container {
+    justify-content: flex-end;
+}
+
+/* end of contact verification dialog */
 
 /* loginrequired-dialog */
 
@@ -3804,7 +4229,6 @@ body.de .mega-dialog.new-group-chat {
         min-height: 280px;
     }
     .mega-dialog.properties-dialog .properties-file-icon {
-        padding: 8px;
         height: 256px;
         width: 256px;
         position: absolute;
@@ -3834,15 +4258,10 @@ body.de .mega-dialog.new-group-chat {
         right: 0;
     }
     .mega-dialog.properties-dialog .properties-file-icon i {
-        width: 242px;
-        height: 240px;
+        --icon-size: 210px;
         position: absolute;
         left: 0;
-        top: 0;
-        background-image: url(../images/mega/properties-sprite.png);
-        background-position: 29px 40px;
-        background-repeat: no-repeat;
-        margin: 8px;
+        margin: 23px;
         z-index: 3;
     }
     .rtl .mega-dialog.properties-dialog .properties-file-icon i {
@@ -3899,7 +4318,10 @@ body.de .mega-dialog.new-group-chat {
         left: 16px;
         top: 16px;
         --mask-color: var(--icon-rest);
-        --icon-size: 16px;
+        --icon-size: 20px;
+    }
+    .mega-dialog.properties-dialog .file-status-icon.icon-info{
+        --mask-color: var(--secondary-orange);
     }
     .rtl .mega-dialog.properties-dialog .file-status-icon {
         left: auto;
@@ -4040,6 +4462,11 @@ body.de .mega-dialog.new-group-chat {
         display: flex;
         flex-wrap: wrap;
     }
+    /* Temporarily hide the Total Size and Contains in the info/properties dialog */
+    .mega-lite-mode .mega-dialog.properties-dialog.hide-size-and-contains .properties-total-size,
+    .mega-lite-mode .mega-dialog.properties-dialog.hide-size-and-contains .properties-contains {
+        display: none;
+    }
     .mega-dialog.properties-dialog .properties-link-block {
         height: 70px;
         border-top: 2px solid #eeeeee;
@@ -4086,195 +4513,6 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.properties-dialog.show-key .properties-file-key {
         display: inline;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.word {
-        background-position: 29px 40px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.web-lang {
-        background-position: 29px -240px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.web-data {
-        background-position: 29px -520px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.video {
-        background-position: 29px -800px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.openoffice {
-        background-position: 29px -1080px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.keynote {
-        background-position: 29px -1360px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.vector {
-        background-position: 29px -1640px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.numbers {
-        background-position: 29px -1920px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.torrent {
-        background-position: 29px -2200px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.text {
-        background-position: 29px -2480px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.pages {
-        background-position: 29px -2760px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.spreadsheet {
-        background-position: 29px -3040px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.recovery {
-        background-position: 29px -3320px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.dmg {
-        background-position: 29px -3600px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.raw {
-        background-position: 29px -3880px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.premiere {
-        background-position: 29px -4160px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.powerpoint {
-        background-position: 29px -4440px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.megasync {
-        background-position: 29px -7420px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.megasync-mac {
-        background-position: 29px -5000px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.photoshop {
-        background-position: 29px -5280px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.pdf {
-        background-position: 29px -5560px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.experience {
-        background-position: 29px -5840px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.indesign {
-        background-position: 29px -6120px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.image {
-        background-position: -391px 40px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.illustrator {
-        background-position: -391px -240px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.sketch {
-        background-position: -391px -520px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.generic {
-        background-position: -391px -800px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.font {
-        background-position: -391px -1080px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.executable {
-        background-position: -391px -1360px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.excel {
-        background-position: -391px -1640px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.compressed {
-        background-position: -391px -1920px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.cad {
-        background-position: -391px -2200px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.audio {
-        background-position: -391px -2480px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.aftereffects {
-        background-position: -391px -2760px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.threed {
-        background-position: -391px -3040px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.folder {
-        background-position: -391px -3320px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.rubbish-folder {
-        background-position: -391px -3600px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.folder-camera {
-        background-position: -391px -3880px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.rubbish-folder-camera {
-        background-position: -391px -4160px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.folder-chat {
-        background-position: -391px -7260px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.rubbish-folder-chat {
-        background-position: -391px -7540px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.folder-sync {
-        background-position: -391px -6700px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.rubbish-folder-sync {
-        background-position: -391px -6980px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.folder-backup {
-        background-position: -391px -6140px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.rubbish-folder-backup {
-        background-position: -391px -6420px;
-    }
-
-
-    .mega-dialog.properties-dialog .properties-file-icon i.backup {
-        background-position: 13px -6423px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.pc {
-        background-position: 13px -6683px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.pc-linux {
-        background-position: 13px -7464px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.pc-mac {
-        background-position: 13px -6943px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.pc-win {
-        background-position: 13px -7203px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.mobile {
-        background-position: 13px -7723px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.mobile-ios {
-        background-position: 13px -7983px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.mobile-android {
-        background-position: -391px -7982px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.ex-device {
-        background-position: 9px -8242px;
-    }
-
-    .mega-dialog.properties-dialog .properties-file-icon i.folder-shared {
-        background-position: -391px -5020px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.rubbish-folder-shared {
-        background-position: -391px -5300px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.inbound-share {
-        background-position: -391px -4460px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.rubbish-inbound-share {
-        background-position: -391px -4460px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.puf-folder {
-        background-position: -391px -5580px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.rubbish-puf-folder {
-        background-position: -391px -5860px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.file-request-folder {
-        background-position: 9px -8520px;
-    }
-    .mega-dialog.properties-dialog .properties-file-icon i.rubbish-file-request-folder {
-        background-position: -391px -8520px;
     }
 
 /* end properties-dialog */
@@ -4401,6 +4639,10 @@ body.de .mega-dialog.new-group-chat {
         display: inline-block;
         vertical-align: middle;
     }
+    .mega-dialog.payment-address-dialog .plan-icon.no-icon + .payment-plan-info {
+        --webkit-padding-start: 0;
+        padding-inline-start: 0;
+    }
     .mega-dialog.payment-address-dialog .plan-icon i {
         display: none;
         --icon-size: 60px;
@@ -4410,7 +4652,8 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.payment-address-dialog .plan-icon.pro3 i.pro3,
     .mega-dialog.payment-address-dialog .plan-icon.pro4 i.pro4,
     .mega-dialog.payment-address-dialog .plan-icon.pro101 i.pro101,
-    .mega-dialog.payment-address-dialog .plan-icon.business i.business {
+    .mega-dialog.payment-address-dialog .plan-icon.business i.business,
+    .mega-dialog.payment-address-dialog .plan-icon.feature i.feature {
         display: block;
     }
     .mega-dialog.payment-address-dialog .payment-plan-info {
@@ -4567,7 +4810,7 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.payment-address-dialog .footer-container {
         flex-direction: column;
-        align-items: center;
+        align-items: flex-end;
     }
     .mega-dialog.payment-address-dialog .footer-container .button {
         display: flex;
@@ -5064,21 +5307,173 @@ body.de .mega-dialog.new-group-chat {
 
 /* end credentials-warning-dialog */
 
+/* cancel-subscription-benefits */
+
+    .mega-dialog.cancel-subscription-benefits header {
+        padding: 24px 24px 12px;
+    }
+    .mega-dialog.cancel-subscription-benefits header h3 {
+        font: var(--text-h3);
+        text-align: left;
+    }
+    .mega-dialog.cancel-subscription-benefits .cancel-subscription-info {
+        margin-bottom: 20px;
+    }
+    .mega-dialog.cancel-subscription-benefits .cancel-subscription-benefits-content {
+        margin: 0 24px;
+    }
+    .mega-dialog.cancel-subscription-benefits .features-table {
+        border: 2px solid var(--surface-grey-2);
+        border-radius: 12px;
+        overflow: hidden;
+        color: var(--text-color-high);
+    }
+    .mega-dialog.cancel-subscription-benefits .features-table .features-table-header {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        background-color: var(--surface-grey-2);
+        padding: 0 24px;
+        height: 38px;
+        align-items: center;
+    }
+    .mega-dialog.cancel-subscription-benefits .features-table .features-table-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        padding: 0 24px;
+    }
+    .mega-dialog.cancel-subscription-benefits .features-table .features-table-header-content {
+        width: 100%;
+        display: flex;
+        font: var(--text-body1)
+    }
+    .mega-dialog.cancel-subscription-benefits .features-table .features-table-seperator {
+        border-top: 2px solid var(--surface-grey-2);
+        grid-column: 1 / 4;
+    }
+    .mega-dialog.cancel-subscription-benefits .features-table .features-table-header-content.center {
+        justify-content: center;
+    }
+    .mega-dialog.cancel-subscription-benefits .features-table .features-table-item {
+        display: flex;
+        align-items: center;
+        height: 32px;
+        font: var(--text-body2);
+        justify-content: center;
+    }
+    .mega-dialog.cancel-subscription-benefits .features-table .features-table-item.title {
+        justify-content: flex-start;
+        font: var(--text-body2-bold)
+    }
+
+    .mega-dialog.cancel-subscription-benefits .features-table .center {
+        justify-self: center;
+    }
+    .mega-dialog.cancel-subscription-benefits footer {
+        padding: 43px 24px 24px;
+        display: flex;
+        align-items: flex-end;
+    }
+
+/* cancel-subscription-benefits end */
+
 /* cancel-subscription-st1 */
 
     .mega-dialog.cancel-subscription-st1 {
-        width: 444px;
+        width: 704px;
+        max-height: calc(100% - 40px);
+    }
+    .mega-dialog.cancel-subscription-st1 button.close {
+        position: initial;
     }
     .mega-dialog.cancel-subscription-st1 header {
-        margin-bottom: 10px;
+        margin-bottom: 24px;
+        padding: 24px 48px;
+        border-bottom: var(--dropdown-border);
     }
-    .mega-dialog.cancel-subscription-st1 .reset-small-txt {
-        padding: 25px 0 15px 0;
-        font-size: 13px;
+    .mega-dialog.cancel-subscription-st1 section {
+        position: relative;
+        flex-shrink: unset;
     }
-    .mega-dialog.cancel-subscription-st1 form {
+    .mega-dialog.cancel-subscription-st1 section .content-block {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+    .mega-dialog.cancel-subscription-st1 section .cancellation-contact {
+        margin-top: 20px;
+    }
+    .mega-dialog.cancel-subscription-st1 section .content-block > * {
+        font-size: 14px;
+        line-height: 20px;
+    }
+    .mega-dialog.cancel-subscription-st1 .cancel-option-prompt {
         padding: 0;
-        display: block;
+        font-family: var(--text-font-family-bold);
+    }
+    .mega-dialog.cancel-subscription-st1 form,
+    .mega-dialog.cancel-subscription-st1 .allow-contact-options {
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+    }
+    .mega-dialog.cancel-subscription-st1 form .label-wrap {
+        display: flex;
+        flex-direction: row;
+        gap: 8px;
+        align-items: center;
+    }
+    .mega-dialog.cancel-subscription-st1 form .label-wrap.built-option {
+        margin-bottom: 12px;
+    }
+    .mega-dialog.cancel-subscription-st1 form .textarea-and-banner {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding-top: 12px;
+    }
+    .mega-dialog.cancel-subscription-st1 form .label-wrap > *,
+    .mega-dialog.cancel-subscription-st1 .allow-contact-options > * {
+        cursor: pointer;
+    }
+    .mega-dialog.cancel-subscription-st1 form .label-wrap div.cancel-option {
+        margin: 3px;
+    }
+    .mega-dialog.cancel-subscription-st1 form .label-wrap .radio-txt {
+        padding: 2px 0;
+    }
+    .mega-dialog.cancel-subscription-st1 .error-banner {
+        padding: 2px 16px;
+        text-align: center;
+        background-color: var(--banner-background-error);
+        border: 1px solid var(--banner-border-error);
+        border-radius: 4px;
+        color: var(--banner-text-error);
+    }
+    .mega-dialog.cancel-subscription-st1.error-select-reason footer,
+    .mega-dialog.cancel-subscription-st1.error-select-contact footer {
+        margin-top: 16px;
+    }
+    .mega-dialog.cancel-subscription-st1.error-select-reason.error-select-contact footer {
+        margin-top: 32px;
+    }
+    .mega-dialog.cancel-subscription-st1.textbox-open footer {
+        margin-top: 26px;
+    }
+    .mega-dialog.cancel-subscription-st1 footer {
+        margin-top: 20px;
+        padding: 24px 48px;
+        border-top: var(--dropdown-border);
+    }
+    .mega-dialog.cancel-subscription-st1 footer .footer-container {
+        padding: 0;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    .mega-dialog.cancel-subscription-st1 .cancel-subscription-header {
+        display: flex;
+        justify-content: space-between;
+        flex-direction: row;
     }
 
 /* end cancel-subscription-st1 */
@@ -5149,6 +5544,20 @@ body.de .mega-dialog.new-group-chat {
         top: 5px;
         width: 24px;
     }
+    .mega-dialog.dlkey-dialog .dlkey-err {
+        min-height: 24px;
+        position: relative;
+        background-color: var(--banner-background-error);
+        border: 1px solid var(--banner-border-error);
+        padding: 2px 12px;
+        width: 100%;
+        color: var(--banner-text-error);
+        font: var(--text-body1);
+        margin-top: 6px;
+        border-radius: 4px;
+        box-sizing: border-box;
+        z-index: 100;
+    }
 
 /* end dlkey-dialog */
 
@@ -5185,25 +5594,6 @@ body.de .mega-dialog.new-group-chat {
         position: absolute;
         top: 183px;
         width: 40.5px;
-    }
-    .mega-dialog.bitcoin-invoice-dialog a.btn-open-wallet {
-        border: 2px solid #47abdc;
-        border-radius: 5px;
-        color: #47abdc;
-        font-size: 14px;
-        line-height: 27px;
-        margin: 0 36px;
-        display: block;
-        text-align: center;
-        box-sizing: border-box;
-        height: 32px;
-        transition: all 200ms ease-in-out;
-        overflow: hidden;
-        padding: 0 10px;
-    }
-    .mega-dialog.bitcoin-invoice-dialog a.btn-open-wallet:hover {
-        background-color: #47abdc;
-        color: #fff;
     }
     .mega-dialog.bitcoin-invoice-dialog .bitcoin-address {
         color: var(--text-color-medium);
@@ -5244,7 +5634,8 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.bitcoin-invoice-dialog .plan-icon.pro2 i.pro2,
     .mega-dialog.bitcoin-invoice-dialog .plan-icon.pro3 i.pro3,
     .mega-dialog.bitcoin-invoice-dialog .plan-icon.pro4 i.pro4,
-    .mega-dialog.bitcoin-invoice-dialog .plan-icon.business i.business {
+    .mega-dialog.bitcoin-invoice-dialog .plan-icon.business i.business,
+    .mega-dialog.bitcoin-invoice-dialog .plan-icon.feature i.feature {
         display: block;
     }
     .mega-dialog.bitcoin-invoice-dialog .invoice-date-time {
@@ -5713,7 +6104,8 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.voucher-dialog .plan-icon.pro2 i.pro2,
     .mega-dialog.voucher-dialog .plan-icon.pro3 i.pro3,
     .mega-dialog.voucher-dialog .plan-icon.pro4 i.pro4,
-    .mega-dialog.voucher-dialog .plan-icon.business i.business {
+    .mega-dialog.voucher-dialog .plan-icon.business i.business,
+    .mega-dialog.voucher-dialog .plan-icon.feature i.feature {
         display: block;
     }
     .mega-dialog.voucher-dialog .voucher-plan-info {
@@ -5985,22 +6377,28 @@ body.de .mega-dialog.new-group-chat {
 
 /* limited-bandwidth-dialog */
 
-    .mega-dialog.limited-bandwidth-dialog:not(.pro) {
-        width: 1200px;
+    .mega-dialog.limited-bandwidth-dialog {
+        width: 975px;
         max-width: calc(100% - 40px);
         max-height: calc(100% - 40px);
-        min-width: 700px;
         overflow: hidden;
     }
-    .mega-dialog.limited-bandwidth-dialog .radio-txt {
-        -webkit-padding-end: 0;
-        padding-inline-end: 0;
+    .mega-dialog.limited-bandwidth-dialog:not(.uploads).pro3,
+    .mega-dialog.limited-bandwidth-dialog:not(.uploads).pro-mini.no-cards {
+        width: 640px;
+    }
+    .mega-dialog.limited-bandwidth-dialog .dialog.header-before-icon {
+        font-family: var(--text-font-family-bold);
+        font-size: 20px;
+        line-height: 30px;
+        padding: 0 0 32px;
     }
     .mega-dialog.limited-bandwidth-dialog .pricing-page.radio-buttons {
-        margin: 0 12px 14px 0;
+        margin: 20px 0 16px;
         display: flex;
-        height: 28px;
+        height: 24px;
         float: right;
+        align-items: center;
     }
     .mega-dialog.limited-bandwidth-dialog .pricing-page.radio-buttons .radioOn,
     .mega-dialog.limited-bandwidth-dialog .pricing-page.radio-buttons .radioOff {
@@ -6009,413 +6407,275 @@ body.de .mega-dialog.new-group-chat {
     .rtl .mega-dialog.limited-bandwidth-dialog .pricing-page.radio-buttons {
         float: left;
     }
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.radio-buttons .save-yearly,
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-saving {
+        background-color: var(--label-red);
+        color: var(--text-color-white-high);
+        border-radius: 9px;
+        font-size: 12px;
+        line-height: 14px;
+        margin-inline-start: 8px;
+        -webkit-margin-start: 8px;
+        padding: 2px 8px 2px 9px;
+    }
     .mega-dialog.limited-bandwidth-dialog .pricing-page.local-currency-tip {
-        padding: 0;
-    }
-    .mega-dialog.limited-bandwidth-dialog .pricing-page.local-currency-tip:not(.hidden) {
         display: block;
+        padding-top: 20px;
     }
-    .mega-dialog.limited-bandwidth-dialog.pro .pricing-page.local-currency-tip {
-        display: none;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog-scroll-overlay {
-        border: 0;
-        position: absolute;
-        left: 0;
-        width: 100%;
-        margin: -12px 0 0 0;
-        height: 12px;
-        /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
-        background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);
-    }
-    .mega-dialog.limited-bandwidth-dialog.exceeded:not(.local-currency) .dialog-scroll-overlay {
-        display: none;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog-cards {
-        margin: 0;
-        -webkit-margin-end: -12px;
-        margin-inline-end: -12px;
-        overflow: auto;
-        min-height: 664px;
-    }
-    .mega-dialog.limited-bandwidth-dialog .scrollable {
+    .mega-dialog.limited-bandwidth-dialog .scrollable.ps {
         overflow: scroll;
         -webkit-overflow-scrolling: touch;
         position: relative;
         box-sizing: border-box;
         height: 100%;
-        border-top: 1px solid var(--stroke-grey-2);
-        border-bottom: 1px solid var(--stroke-grey-2);
     }
     .mega-dialog.limited-bandwidth-dialog .pricing-page.plans-block {
         border-top: 0;
         max-width: none;
     }
-    .mega-dialog.limited-bandwidth-dialog .registered,
-    .mega-dialog.limited-bandwidth-dialog.registered .not-registered,
-    .mega-dialog.limited-bandwidth-dialog .get-more-bonuses {
-        display: none;
-    }
-    .mega-dialog.limited-bandwidth-dialog.registered .registered {
-        display: block;
-    }
-    .mega-dialog.limited-bandwidth-dialog.registered button .registered {
+    .mega-dialog.limited-bandwidth-dialog:not(.uploads) .dialog.bottom-button {
         display: flex;
+        justify-content: center;
+        padding-top: 20px;
     }
-    .mega-dialog.limited-bandwidth-dialog.achievements .get-more-bonuses {
-        display: inline-flex;
+    .mega-dialog.limited-bandwidth-dialog.pro3 .dialog.bottom-button,
+    .mega-dialog.limited-bandwidth-dialog.pro-mini.no-cards .dialog.bottom-button {
+        padding-top: 24px;
     }
-    .mega-dialog.limited-bandwidth-dialog:not(.exceeded) .bottom-tips span {
-        display: inline-block;
+    .mega-dialog.limited-bandwidth-dialog.pro3 .dialog.bottom-button > *:not(:last-child),
+    .mega-dialog.limited-bandwidth-dialog.pro-mini.no-cards .dialog.bottom-button > *:not(:last-child) {
+        margin-inline-end: 8px;
+        -webkit-margin-end: 8px;
     }
-    .mega-dialog.limited-bandwidth-dialog .limited-bottom {
-        display: none;
+    .mega-dialog.limited-bandwidth-dialog:not(.uploads) .dialog.bottom-button button.dialog-action {
+        padding: 8px 12px;
     }
-    .mega-dialog.limited-bandwidth-dialog footer .footer-container.limited-bottom {
-        padding-bottom: 16px;
+    .mega-dialog.limited-bandwidth-dialog.pro3 .dialog.bottom-button button.dialog-action,
+    .mega-dialog.limited-bandwidth-dialog.pro3 .dialog.bottom-button button.upgrade,
+    .mega-dialog.limited-bandwidth-dialog.pro-mini.no-cards .dialog.bottom-button button.dialog-action,
+    .mega-dialog.limited-bandwidth-dialog.pro-mini.no-cards .dialog.bottom-button button.upgrade {
+        font-size: 16px;
+        line-height: 24px;
+        padding: 12px 24px;
     }
-    .local-currency .mega-dialog.limited-bandwidth-dialog .limited-bottom button.download {
-        margin-top: 20px;
-    }
-    .mega-dialog.limited-bandwidth-dialog:not(.exceeded) .dialog.limited-bottom {
-        display: flex;
-    }
-    .mega-dialog.limited-bandwidth-dialog aside {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 32px;
-    }
-    .mega-dialog.limited-bandwidth-dialog aside > div {
-        flex-basis: 20%;
-    }
-    .mega-dialog.limited-bandwidth-dialog aside > div:first-of-type {
-        text-align: start;
-    }
-    .mega-dialog.limited-bandwidth-dialog .bottom-tips {
-        flex-basis: auto;
-        margin: auto;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog.bottom-tips span {
-        display: inline-block;
-    }
-    .mega-dialog.limited-bandwidth-dialog.exceeded:not(.pro) .dialog.bottom-tips span {
-        display: inline-block;
-    }
-    .mega-dialog.limited-bandwidth-dialog.exceeded.pro .dialog.bottom-tips a {
-        margin-bottom: 8px;
+    .mega-dialog.limited-bandwidth-dialog .step1-block .radio-txt,
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-price,
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-feature,
+    .mega-dialog.limited-bandwidth-dialog section .content-block {
+        padding: 0;
     }
     .mega-dialog.limited-bandwidth-dialog .step1-block .radio-txt:first-of-type {
-        -webkit-margin-end: 24px;
-        margin-inline-end: 24px;
+        margin-inline-end: 32px;
+        -webkit-margin-end: 32px;
     }
-    .mega-dialog.limited-bandwidth-dialog .step1-block,
-    .mega-dialog.limited-bandwidth-dialog.exceeded:not(.pro) .limited-bl,
-    .mega-dialog.limited-bandwidth-dialog .big-104px-icon.full,
-    .mega-dialog.limited-bandwidth-dialog.exceeded .semi-huge-icon.almost-full,
     .mega-dialog.limited-bandwidth-dialog .dialog.header-before-icon.exceeded,
     .mega-dialog.limited-bandwidth-dialog.exceeded .dialog.header-before-icon.limited,
+    .mega-dialog.limited-bandwidth-dialog .limited-bottom,
     .mega-dialog.limited-bandwidth-dialog button.close,
-    .mega-dialog.limited-bandwidth-dialog button.upgrade.pro,
-    .mega-dialog.limited-bandwidth-dialog.exceeded.pro button.upgrade,
-    .mega-dialog.limited-bandwidth-dialog.exceeded.pro button.continue,
-    .mega-dialog.limited-bandwidth-dialog.exceeded.pro .dialog.p-after-icon,
-    .mega-dialog.limited-bandwidth-dialog .dialog.pro-exceeded-bl,
-    .mega-dialog.limited-bandwidth-dialog .dialog.transfer-slider,
-    .mega-dialog.limited-bandwidth-dialog .dialog.pro-exceeded-slider,
-    .mega-dialog.limited-bandwidth-dialog .semi-huge-icon.speedometer.full {
+    .mega-dialog.limited-bandwidth-dialog:not(.uploads) .transfer-overquota-txt,
+    .mega-dialog.limited-bandwidth-dialog.pro.exceeded:not(.no-cards) .dialog.bottom-button,
+    .mega-dialog.limited-bandwidth-dialog.uploads .messages p,
+    .mega-dialog.limited-bandwidth-dialog.uploads .bottom-button,
+    .mega-dialog.limited-bandwidth-dialog.exceeded .msg-prewarning,
+    .mega-dialog.limited-bandwidth-dialog.uploads .msg-prewarning,
+    .mega-dialog.limited-bandwidth-dialog:not(.pro3):not(.no-cards) section i.img-dialog-overquota-storage,
+    .mega-dialog.limited-bandwidth-dialog:not(.pro3):not(.no-cards) .dialog.bottom-button button.upgrade,
+    .mega-dialog.limited-bandwidth-dialog.pro3 .step1-block,
+    .mega-dialog.limited-bandwidth-dialog.pro3 .local-currency-tip,
+    .mega-dialog.limited-bandwidth-dialog:not(.local-currency) .local-currency-tip,
+    .mega-dialog.limited-bandwidth-dialog:not(.local-currency) .ast,
+    .mega-dialog.limited-bandwidth-dialog:not(.pro-mini) .pricing-page.period-subtitle,
+    .mega-dialog.limited-bandwidth-dialog.pro-mini.no-cards .step1-block,
+    .mega-dialog.limited-bandwidth-dialog.pro-mini.no-cards .local-currency-tip {
         display: none;
     }
-    .mega-dialog.limited-bandwidth-dialog:not(.exceeded) .step1-block,
-    .mega-dialog.limited-bandwidth-dialog.exceeded:not(.pro) .step1-block,
+    .mega-dialog.limited-bandwidth-dialog .step1-block,
     .mega-dialog.limited-bandwidth-dialog.exceeded .dialog.header-before-icon.exceeded,
-    .mega-dialog.limited-bandwidth-dialog.exceeded button.close,
-    .mega-dialog.limited-bandwidth-dialog.pro.exceeded .dialog.pro-exceeded-bl,
-    .mega-dialog.limited-bandwidth-dialog.slider .dialog.pro-exceeded-slider {
+    .mega-dialog.limited-bandwidth-dialog.exceeded button.close {
         display: block;
     }
-    .mega-dialog.limited-bandwidth-dialog.exceeded:not(.pro) .semi-huge-iconspeedometer,
-    .mega-dialog.limited-bandwidth-dialog.exceeded.pro button.upgrade.pro,
-    .logged .mega-dialog.limited-bandwidth-dialog.exceeded:not(.pro):not(.achievements) .big-104px-icon.full,
-    .logged .mega-dialog.limited-bandwidth-dialog.exceeded.achievements:not(.pro) .semi-huge-icon.speedometer.full,
-    .not-logged .mega-dialog.limited-bandwidth-dialog.exceeded:not(.pro) .semi-huge-icon.speedometer.full {
+    .mega-dialog.limited-bandwidth-dialog.pro3 section i.img-dialog-overquota-storage,
+    .mega-dialog.limited-bandwidth-dialog.pro-mini.no-cards section i.img-dialog-overquota-storage,
+    .mega-dialog.limited-bandwidth-dialog.exceeded .msg-overquota span,
+    .mega-dialog.limited-bandwidth-dialog:not(.exceeded) .msg-prewarning > span {
         display: inline-block;
+    }
+    .mega-dialog.limited-bandwidth-dialog.exceeded .msg-overquota > span,
+    .mega-dialog.limited-bandwidth-dialog:not(.exceeded) .msg-prewarning > span:first-child {
+        width: 100%;
+    }
+    .mega-dialog.limited-bandwidth-dialog:not(.exceeded) .msg-prewarning > span:not(:first-child) {
+        width: unset;
+    }
+    .mega-dialog.limited-bandwidth-dialog span.learn-more a {
+        text-decoration: underline;
+    }
+    .mega-dialog.limited-bandwidth-dialog:not(.pro3) .msg-prewarning span.learn-more {
+        margin-inline-start: 4px;
+        -webkit-margin-start: 4px;
+    }
+    .mega-dialog.limited-bandwidth-dialog.pro3 span.learn-more,
+    .mega-dialog.limited-bandwidth-dialog.pro-mini.no-cards span.learn-more,
+    .mega-dialog.limited-bandwidth-dialog.pro-mini.no-cards span.upgrade-option {
+        margin-top: 24px;
     }
     .mega-dialog.limited-bandwidth-dialog .dialog.transfer-overquota-txt {
         font: var(--text-body1);
         color: var(--text-color-high);
-        margin: 0 0 16px;
-        box-sizing: border-box;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog.transfer-overquota-txt span {
-        font: var(--text-h3);
-        color: var(--text-color-high);
-        border-bottom: 2px solid #FF333A;
-        padding: 0 2px;
-    }
-    .mega-dialog.limited-bandwidth-dialog:not(.exceeded) .dialog.transfer-overquota-txt {
-        display: none;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog.overquota-bottom-bl {
-        display: none;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog.overquota-bott-bl {
-        display: none;
-    }
-    .not-logged .mega-dialog.limited-bandwidth-dialog.exceeded:not(.pro) .dialog.overquota-bott-bl,
-    .logged .mega-dialog.limited-bandwidth-dialog.exceeded.achievements:not(.pro) .dialog.overquota-bott-bl,
-    .not-logged .mega-dialog.limited-bandwidth-dialog:not(.exceeded) .dialog.overquota-bott-bl,
-    .logged .mega-dialog.limited-bandwidth-dialog:not(.exceeded).achievements .dialog.overquota-bott-bl {
-        display: table;
-        width: 100%;
-        box-shadow: 0 -1px 0 0 rgba(0,0,0,0.1);
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog.overquota-bott-txt,
-    .mega-dialog.limited-bandwidth-dialog .dialog.overquota-bott-buttons {
-        display: table-cell;
-        position: relative;
-        vertical-align: middle;
-        height: 104px;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog.overquota-bott-buttons {
-        width: 100px;
-        white-space: nowrap;
-        text-align: end;
-        -webkit-padding-end: 20px;
-        padding-inline-end: 20px;
-        -webkit-box-sizing: border-box;
-        -moz-box-sizing: border-box;
-        box-sizing: border-box;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog.overquota-bott-txt i {
-        position: absolute;
-        left: 18px;
-        top: 50%;
-        margin: -34px 0 0 0;
-    }
-    .rtl .mega-dialog.limited-bandwidth-dialog .dialog.overquota-bott-txt i {
-        left: auto;
-        right: 18px;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog.overquota-bott-txt span {
-        display: none;
-        padding: 28px 0 28px 0;
-        -webkit-padding-end: 17px;
-        padding-inline-end: 17px;
-        -webkit-padding-start: 108px;
-        padding-inline-start: 108px;
-    }
-    .not-logged .mega-dialog.limited-bandwidth-dialog:not(.achievements) span.not-logged.no-achievements {
-        display: block;
-    }
-    .not-logged .mega-dialog.limited-bandwidth-dialog.achievements span.not-logged.achievements {
-        display: block;
-    }
-    .logged .mega-dialog.limited-bandwidth-dialog.achievements span.logged.achievements {
-        display: block;
-    }
-    .mega-dialog.limited-bandwidth-dialog .overquota-bott-buttons button {
-        display: none;
-        -webkit-margin-start: 9px;
-        margin-inline-start: 9px;
-    }
-    .not-logged .mega-dialog.limited-bandwidth-dialog:not(.achievements) .overquota-bott-buttons button.create-account,
-    .not-logged .mega-dialog.limited-bandwidth-dialog.exceeded .overquota-bott-buttons button.login,
-    .mega-dialog.limited-bandwidth-dialog.achievements .overquota-bott-buttons button.get-more-bonuses {
-        display: inline-block;
-    }
-    .logged .mega-dialog.limited-bandwidth-dialog.achievements .overquota-bott-buttons button .not-registered {
-        display: none;
-    }
-    .logged .mega-dialog.limited-bandwidth-dialog.achievements .overquota-bott-buttons button .registered {
-        display: block;
-    }
-    .mega-dialog.limited-bandwidth-dialog.hidden-bottom .dialog.overquota-bott-bl {
-        display: none !important;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog.transfer-overquota-txt span.countdown {
-        margin: 0 5px;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog.transfer-overquota-txt span span {
-        color: var(--text-color-medium);
-        border: 0;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog.transfer-plans {
-        padding: 8px 0 0 0;
-        white-space: nowrap;
-        margin: 0 -10px;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog.pro-exceeded-txt {
-        font: var(--text-body1);
-        color: var(--text-color-medium);
-        padding: 0 0 6px 0;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog.pro-exceeded-txt {
-        display: inline-block;
-    }
-    .mega-dialog.limited-bandwidth-dialog .account.chart-block {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 16px 0 24px;
-        text-align: start;
-        font: var(--text-h3);
-    }
-    .mega-dialog.limited-bandwidth-dialog .account.chart.body {
-        transform: none;
-    }
-    .mega-dialog.limited-bandwidth-dialog .account.chart.data {
         margin: 0;
-        -webkit-margin-start: 24px;
-        margin-inline-start: 24px;
-        left: 0;
+        box-sizing: border-box;
     }
-    .mega-dialog.limited-bandwidth-dialog:not(.exceeded) .dialog.big-buttons-block {
-        display: none;
+    .mega-dialog.limited-bandwidth-dialog.pro-mini .pricing-page.plans-row {
+        margin-top: 32px;
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: center;
     }
-    .mega-dialog.limited-bandwidth-dialog.exceeded.pro .dialog.big-buttons-block {
-        display: inline-block;
-        margin: 2px 0 10px 0;
-        padding: 16px 0 0 0;
-        text-align: start;
+    .mega-dialog.limited-bandwidth-dialog.pro-mini .pricing-page.plans-row > * {
+        border: 1px solid var(--surface-mid-grey);
     }
-    .mega-dialog.limited-bandwidth-dialog.exceeded.pro.slider .dialog.big-buttons-block {
-        margin: 2px 0 1px 0;
+    body:not(.rtl) .mega-dialog.limited-bandwidth-dialog:not(.pro-mini) .pricing-page.plans-row {
+        border-top: 1px solid var(--surface-mid-grey);
+        border-left: 1px solid var(--surface-mid-grey);
     }
-    .mega-dialog.limited-bandwidth-dialog.exceeded.pro .bandwidth .chart.data .perc-txt::before {
-        display: none;
+    body:not(.rtl) .mega-dialog.limited-bandwidth-dialog:not(.pro-mini) .pricing-page.plans-row > * {
+        border-bottom: 1px solid var(--surface-mid-grey);
+        border-right: 1px solid var(--surface-mid-grey);
     }
-    .mega-dialog.limited-bandwidth-dialog .bandwidth .perc-txt {
-        font: var(--text-body1);
+    .rtl .mega-dialog.limited-bandwidth-dialog:not(.pro-mini) .pricing-page.plans-row {
+        border-top: 1px solid var(--surface-mid-grey);
+        border-right: 1px solid var(--surface-mid-grey);
+    }
+    .rtl .mega-dialog.limited-bandwidth-dialog:not(.pro-mini) .pricing-page.plans-row > * {
+        border-bottom: 1px solid var(--surface-mid-grey);
+        border-left: 1px solid var(--surface-mid-grey);
+    }
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plans-row > * {
+        display: flex;
+        flex-direction: column;
+        text-align: unset;
+        padding: 24px;
+        height: 396px;
+    }
+    .mega-dialog.limited-bandwidth-dialog.pro-mini .pricing-page.plans-row > *:not(.starter) {
+        padding: 12px 16px 12px 24px;
+    }
+    .mega-dialog.limited-bandwidth-dialog.pro-mini .pricing-page.plans-row > * {
+        max-width: 275px;
+        flex-basis: 100%;
+    }
+    .mega-dialog.limited-bandwidth-dialog .plans-row .pricing-page.plan > *,
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-feature.strong *,
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-price > *,
+    .mega-dialog.limited-bandwidth-dialog section .content-block .messages > * {
         color: var(--text-color-high);
-        display: block;
-        height: auto;
-        position: absolute;
-        z-index: 11;
-        top: 50%;
-        left: 50%;
-        transform: translateX(-50%) translateY(-50%);
-    }
-    .mega-dialog.limited-bandwidth-dialog.exceeded.pro .chart.progressbars span::before {
-        background: var(--surface-error);
-    }
-    .mega-dialog.limited-bandwidth-dialog.pro.exceeded {
-        width: 724px;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog-slider-txt {
-        text-align: center;
-        font-size: 20px;
-        line-height: 25px;
-        margin: 22px auto 0 auto;
-        max-width: 504px;
-        position: relative;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog-slider-txt::before {
-        content: '';
-        display: block;
-        position: absolute;
-        width: 100%;
-        height: 1px;
-        background-color: rgba(0,0,0,0.1);
-        top: 13px;
-        left: 0;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog.pro-slider-description {
-        padding: 13px 0 0 0;
-        display: inline-block;
-    }
-    .mega-dialog.limited-bandwidth-dialog .bandwith-settings .slider.numbers.val2 {
-        -webkit-margin-start: 501px;
-        margin-inline-start: 501px;
-    }
-    .mega-dialog.limited-bandwidth-dialog .bandwith-settings {
-        direction: ltr;
-        margin: 48px auto 24px auto;
-    }
-    .mega-dialog.limited-bandwidth-dialog .ui-slider.ui-widget-content {
-        width: 100%;
-        margin: 15px auto 0 auto;
-    }
-    .mega-dialog.limited-bandwidth-dialog .dialog-slider-txt span {
-        padding: 0 15px;
-        position: relative;
-        font: var(--text-h3);
-    }
-    .mega-dialog.limited-bandwidth-dialog.exceeded.pro.slider .radio-txt {
-        padding-top: 8px;
-    }
-    .mega-dialog.limited-bandwidth-dialog.exceeded.pro.slider .checkboxOff,
-    .mega-dialog.exceeded.pro.slider .checkboxOn {
-        margin-top: 10px;
-    }
-    .mega-dialog.limited-bandwidth-dialog.exceeded.uploads .transfer-overquota-txt,
-    .mega-dialog.limited-bandwidth-dialog.exceeded.uploads .msg-prewarning,
-    .mega-dialog.limited-bandwidth-dialog.exceeded.uploads .bottom-tips {
-        display: none;
-    }
-    .mega-dialog.limited-bandwidth-dialog.exceeded.uploads footer aside {
-        padding: 0;
-    }
-    .mega-dialog.limited-bandwidth-dialog .plans-row .pricing-page.plan {
-        border-color: var(--stroke-grey-2);
-    }
-    .mega-dialog.limited-bandwidth-dialog .plans-row .pricing-page.plan:not(.details) {
-        border-top: none;
-    }
-    body:not(.rtl) .mega-dialog.limited-bandwidth-dialog .plans-row .pricing-page.plan:first-child {
-        border-left: none;
-    }
-    .rtl .mega-dialog.limited-bandwidth-dialog .plans-row .pricing-page.plan:last-child {
-        border-left: none;
     }
     .mega-dialog.limited-bandwidth-dialog .pricing-page.plans-block {
         border-bottom: none;
     }
-    .mega-dialog.limited-bandwidth-dialog .pricing-page i {
-        position: absolute;
-        right: 10px;
-        top: 10px;
-        --icon-size: 16px;
-        transition: background-color 200ms ease-in-out;
-        --mask-color: var(--text-color-medium);
+    .mega-dialog.limited-bandwidth-dialog .plan-content {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        margin-top: unset;
     }
-    .mega-dialog.limited-bandwidth-dialog .pricing-page i:hover {
-        --mask-color: var(--text-color-high);
+    .mega-dialog.limited-bandwidth-dialog .plan-header-container,
+    .mega-dialog.limited-bandwidth-dialog .plan-content {
+        display: flex;
+        flex-direction: column;
     }
-    .rtl .mega-dialog.limited-bandwidth-dialog .pricing-page i {
-        right: auto;
-        left: 13px;
+    .mega-dialog.limited-bandwidth-dialog .plan-content {
+        flex: 1;
     }
-    .mega-dialog.limited-bandwidth-dialog .ui-slider .ui-slider-range {
-        background: var(--surface-error);
+    .mega-dialog.limited-bandwidth-dialog .title-and-saving {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: flex-start;
     }
-
+    .mega-dialog.limited-bandwidth-dialog .plan-header-container .pricing-page.plan-title,
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-price {
+        font-size: 24px;
+        line-height: 36px;
+    }
+    .mega-dialog.limited-bandwidth-dialog.pro-mini .plan:not(.starter) .pricing-page.plan-title,
+    .mega-dialog.limited-bandwidth-dialog.exceeded .msg-overquota span.countdown,
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-price > * {
+        font-family: var(--text-font-family-bold);
+    }
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-feature.storage {
+        padding: 32px 0 8px;
+    }
+    .mega-dialog.limited-bandwidth-dialog .plan-header-container,
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-feature.transfer {
+        padding-bottom: 40px;
+    }
+    .mega-dialog.limited-bandwidth-dialog.pro-mini .plan.starter .pricing-page.plan-feature.transfer {
+        padding-bottom: 64px;
+    }
+    .mega-dialog.limited-bandwidth-dialog.pro-mini .pricing-page.storage-and-transfer {
+        flex: 1;
+    }
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan .mega-button {
+        padding: 8px 12px;
+        min-width: unset;
+        display: flex;
+        margin: 0;
+        height: 0;
+        width: fit-content;
+        border: none;
+    }
+    .mega-dialog.limited-bandwidth-dialog .plan .mega-button.positive {
+        color: var(--text-green);
+        border: 1px solid #00BFA5;
+    }
     .mega-dialog.limited-bandwidth-dialog section {
-        flex-shrink: unset;
-        min-height: inherit;
+        padding: 40px 76.5px 30px;
     }
-
-    .mega-dialog.limited-bandwidth-dialog {
-        min-height: 300px;
+    .mega-dialog.limited-bandwidth-dialog.pro.exceeded section {
+        padding-bottom: 24px;
     }
-
-    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-info {
-        height: 130px;
+    .mega-dialog.limited-bandwidth-dialog.pro3 section {
+        padding: 40px 31.5px 80px;
     }
-
-    @media only screen and (max-height: 768px) {
-        .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-button {
-            margin: 12px 0 20px 0;
-        }
-        .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-info {
-            font-size: 14px;
-            line-height: 21px;
-        }
-        .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-label {
-            margin-bottom: 10px;
-        }
-        .mega-dialog.limited-bandwidth-dialog .dialog.transfer-overquota-txt {
-            padding-bottom: 8px;
-        }
+    .mega-dialog.limited-bandwidth-dialog.pro-mini.no-cards section {
+        padding: 40px 31.5px;
+    }
+    .mega-dialog.limited-bandwidth-dialog section .centered-content > :not(i):not(.step1-block),
+    .mega-dialog.limited-bandwidth-dialog section .plan-header-container .pricing-page.plan-title,
+    .mega-dialog.limited-bandwidth-dialog section .pricing-page.plan-content > :not(button),
+    .mega-dialog.limited-bandwidth-dialog.pro-mini section .pricing-page.period-subtitle,
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.local-currency-tip {
+        opacity: 0.7;
+    }
+    .mega-dialog.limited-bandwidth-dialog section * {
+        font-family: var(--text-font-family);
+    }
+    .mega-dialog.limited-bandwidth-dialog:not(.pro3):not(.no-cards) section .content-block .messages > *,
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-only,
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.currency-and-period,
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.monthly-price,
+    .mega-dialog.limited-bandwidth-dialog.pro-mini .pricing-page.period-subtitle,
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-feature {
+        font-size: 16px;
+        line-height: 24px;
+    }
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan .mega-button,
+    .mega-dialog.limited-bandwidth-dialog section .content-block .messages > * {
+        font-size: 14px;
+        line-height: 20px;
+    }
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-only,
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.currency-and-period > * {
+        color: var(--text-color-medium);
+    }
+    .mega-dialog.limited-bandwidth-dialog .pricing-page.plan-only.strikethrough {
+        text-decoration: line-through;
+    }
+    .mega-dialog.limited-bandwidth-dialog section i.img-dialog-overquota-storage {
+        width: 128px;
+        height: 90px;
+        margin-bottom: 32px;
     }
 
 /* end limited-bandwidth-dialog */
@@ -6427,9 +6687,10 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.storage-dialog header .graphic {
         height: 90px;
+        margin: 32px auto;
     }
     .mega-dialog.storage-dialog .fm-dialog-body {
-        padding: 0 48px 19px 48px;
+        padding: 0 48px 30px;
         text-align: center;
     }
     .mega-dialog.storage-dialog .body-p {
@@ -6487,63 +6748,26 @@ body.de .mega-dialog.new-group-chat {
         font: var(--text-body1);
         padding: 2px 0 0 0;
     }
-    .mega-dialog.storage-dialog .body-p.small {
-        font: var(--text-body2);
-        color: var(--text-color-medium);
-        padding: 12px 0 15px 0;
-    }
-    .mega-dialog.storage-dialog .body-p.small.top-pad {
-        padding: 24px 0 0 0;
-    }
-    .mega-dialog.storage-dialog .divider-txt {
-        padding: 16px 0 13px 0;
-        position: relative;
-        font: var(--text-body1);
-        color: var(--text-color-low);
-        margin-top: 12px;
-    }
-    .mega-dialog.storage-dialog .divider-txt::before {
-        content: '';
-        position: absolute;
-        height: 1px;
-        background: var(--surface-grey-2);
-        left: 0;
-        top: 28px;
-        width: 100%;
-    }
-    .rtl .mega-dialog.storage-dialog .divider-txt::before {
-        left: auto;
-        right: 0;
-    }
-    .mega-dialog.storage-dialog .divider-txt span {
-        background: var(--surface-main);
-        padding: 0 16px;
-        display: inline-block;
-        position: relative;
-    }
-    .mega-dialog.storage-dialog .achievements-bl,
-    .mega-dialog.storage-dialog.achievements .no-achievements-bl {
-        display: none;
-    }
-    .mega-dialog.storage-dialog.achievements .achievements-bl {
-        display: block;
-    }
     .mega-dialog.storage-dialog .body-p i.rocket {
         cursor: pointer;
     }
-    .mega-dialog.storage-dialog .body-p.small a {
+    .mega-dialog.storage-dialog .body-p.rubbish-text a {
         color: var(--text-color-medium);
         cursor: pointer;
         text-decoration: underline;
     }
-    .mega-dialog.storage-dialog .body-p.small i {
-        vertical-align: top;
-        display: inline-block;
-        margin: -2px 0 0 0;
+    .mega-dialog.storage-dialog.full header {
+        padding-bottom: 32px;
+    }
+    .mega-dialog.storage-dialog.full .body-p.long {
+        padding: 0 45px 12px;
     }
     .mega-dialog.storage-dialog.almost-full .full,
     .mega-dialog.storage-dialog.full .almost-full {
         display: none;
+    }
+    .mega-dialog.storage-dialog.full {
+        display: block;
     }
     .mega-dialog.storage-dialog .buttons-block {
         display: flex;
@@ -6554,11 +6778,22 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.storage-dialog .buttons-block button {
         margin: 0 6px;
     }
+    .mega-dialog.storage-dialog .estimated-price-text {
+        margin-top: 20px;
+        font: var(--text-body2);
+        margin-bottom: -10px;
+    }
     .mega-dialog.storage-dialog.almost-full .chart.progressbars span::before {
         background: var(--stroke-warning);
     }
     .mega-dialog.storage-dialog.almost-full .chart.progressbars span::after {
         background: var(--stroke-warning);
+    }
+    .mega-dialog.storage-dialog.almost-full .chart.progressbars .left-chart span::after {
+        left: calc(49% - 1px);
+    }
+    .mega-dialog.storage-dialog.almost-full .chart.progressbars .right-chart span::after {
+        left: calc(48% - 3px);
     }
     .mega-dialog.storage-dialog.almost-full .size-txt {
         color: var(--text-color-warning) !important;
@@ -6965,11 +7200,16 @@ body.de .mega-dialog.new-group-chat {
         -o-text-overflow: ellipsis;
         text-overflow: ellipsis;
     }
-    .mega-dialog.duplicate-conflict .export-icon {
-        margin: 0;
-        -webkit-margin-start: -4px;
-        margin-inline-start: -4px;
+    .mega-dialog.duplicate-conflict .item-type-icon-90 {
+        --icon-size: 78px;
+        margin: -9px -11px;
         position: absolute;
+    }
+    .mega-dialog.duplicate-conflict .multiple-files .item-type-icon-90:nth-child(1) {
+        margin: -13px -3px;
+    }
+    .mega-dialog.duplicate-conflict .multiple-files .item-type-icon-90:nth-child(2) {
+        margin: -5px -11px;
     }
     .mega-dialog.duplicate-conflict .file-date span,
     .mega-dialog.duplicate-conflict .file-date i {
@@ -7001,16 +7241,6 @@ body.de .mega-dialog.new-group-chat {
     .rtl .mega-dialog.duplicate-conflict .file-date .time::before {
         left: auto;
         right: 10px;
-    }
-    .mega-dialog.duplicate-conflict .multiple-files .export-icon:nth-child(2) {
-        margin: 4px 0 0 0;
-        -webkit-margin-start: -4px;
-        margin-inline-start: -4px;
-    }
-    .mega-dialog.duplicate-conflict .multiple-files .export-icon:nth-child(1) {
-        margin: -4px 0 0 0;
-        -webkit-margin-start: 4px;
-        margin-inline-start: 4px;
     }
 
 /* end duplicate-conflict dialog */
@@ -7335,7 +7565,8 @@ body.de .mega-dialog.new-group-chat {
         .es .mega-dialog.setup-two-factor-verify .pin-input {
             font: var(--text-h3);
         }
-        .mega-dialog.verify-two-factor-login .warning-text-field {
+        .mega-dialog.verify-two-factor-login .warning-text-field,
+        .mega-dialog.two-factor-verify-action .warning-text-field {
             background: var(--banner-background-error);
             border: 1px solid var(--banner-border-error);
             border-radius: 2px;
@@ -7641,27 +7872,35 @@ body.de .mega-dialog.new-group-chat {
         flex-direction: initial;
     }
     .mega-dialog.group-chat-link header i {
-        margin: 0 8px 0 0;
+        margin-inline-end: 8px;
+        -webkit-margin-end: 8px;
         border-radius: 2px;
         --icon-size: 32px;
     }
     .mega-dialog.group-chat-link header h2,
     .mega-dialog.group-chat-link .content-block {
-        text-align: left;
+        text-align: start;
     }
     .mega-dialog.group-chat-link.in-call-info header h2,
     .mega-dialog.group-chat-link.in-call-info .content-block {
-        text-align: left;
+        text-align: start;
     }
     .fr .mega-dialog.group-chat-link {
         width: 440px;
+    }
+    .mega-dialog.group-chat-link .meeting-icon {
+        margin-inline-end: 8px;
+    }
+    .mega-dialog.group-chat-link .meeting-icon i {
+        --icon-size: 24px;
+        margin-inline: auto;
     }
     .mega-dialog.group-chat-link .link-input-container,
     .mega-dialog.invite .link-input-container {
         position: relative;
     }
     .mega-dialog.group-chat-link .link-input-container input {
-        padding-right: 75px;
+        padding-inline-end: 75px;
     }
     .mega-dialog.group-chat-link .link-input-container button {
         position: absolute;
@@ -7670,6 +7909,10 @@ body.de .mega-dialog.new-group-chat {
         transform: translateY(-50%);
         border-radius: 0 4px 4px 0;
         z-index: 11;
+    }
+    .rtl .mega-dialog.group-chat-link .link-input-container button {
+        left: 0;
+        right: unset;
     }
     .mega-dialog.group-chat-link .info {
         color: var(--text-color-medium);
@@ -7685,7 +7928,8 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.invite-meeting .chat-link-input {
         position: relative;
         box-sizing: border-box;
-        padding: 0 10px 0 0;
+        padding-inline-end: 10px;
+        -webkit-padding-end: 10px;
     }
     .mega-dialog.group-chat-link .chat-link-input i,
     .mega-dialog.invite-meeting .chat-link-input i {
@@ -7696,11 +7940,21 @@ body.de .mega-dialog.new-group-chat {
         --icon-size: 28px;
         --mask-color: var(--icon-rest);
     }
+    .rtl .mega-dialog.group-chat-link .chat-link-input i,
+    .rtl .mega-dialog.invite-meeting .chat-link-input i {
+        left: unset;
+        right: 5px;
+    }
     .mega-dialog.group-chat-link .chat-link-input input,
     .mega-dialog.invite-meeting .chat-link-input input {
         width: 100%;
         height: 40px;
-        padding: 10px 10px 10px 35px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        padding-inline-start: 35px;
+        -webkit-padding-start: 35px;
+        padding-inline-end: 10px;
+        -webkit-padding-end: 10px;
         margin: 0;
         border: 2px solid var(--stroke-grey-2);
         border-radius: 12px;
@@ -7756,8 +8010,44 @@ body.de .mega-dialog.new-group-chat {
         text-align: center;
         width: 770px;
     }
+    .mega-dialog.affiliate-redeem > section.content {
+        flex-shrink: initial;
+    }
+    .mega-dialog.affiliate-redeem:has(.step1.bitcoin:not(.hidden)) {
+        text-align: center;
+        width: 736px;
+    }
+    .mega-dialog.affiliate-redeem footer .footer-container {
+        padding-top: 21px;
+    }
+    .mega-dialog.affiliate-redeem.dialog-small {
+        width: 583px;
+        height: 364px;
+    }
+    .mega-dialog.affiliate-redeem .dialog-commisison-title {
+        font: var(--text-h3);
+        margin-top: 4px;
+    }
+    .mega-dialog.affiliate-redeem .content-block:has(.step0:not(.hidden)) {
+        padding: 0 38px;
+    }
+    .mega-dialog.affiliate-redeem .cells.left.megaquota {
+        margin-left: -9px;
+    }
     .mega-dialog.affiliate-redeem .next-btn {
         margin-inline-start: auto;
+    }
+    .mega-dialog.affiliate-redeem .next-btn.small {
+        min-width: 54px;
+        height: 36px;
+    }
+    .mega-dialog.affiliate-redeem .next-btn.wide {
+        width: 150px;
+        height: 36px;
+        padding: 0;
+    }
+    .mega-dialog.affiliate-redeem .prev-btn {
+        padding-left: 2px;
     }
     .mega-dialog.affiliate-redeem .prev-btn i {
         --icon-size: 16px;
@@ -7792,20 +8082,53 @@ body.de .mega-dialog.new-group-chat {
         border-radius: 4px;
         text-align: start;
         box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
     .rtl .mega-dialog.affiliate-redeem .cells {
         float: right;
     }
     .mega-dialog.affiliate-redeem .cells.left {
+        margin: 22px 0 0;
+        -webkit-margin-start: -12px;
+        margin-inline-start: -12px;
+    }
+    .mega-dialog.affiliate-redeem .bitcoin.cells.left.step2 {
         margin: 24px 0 0 0;
         -webkit-margin-start: -12px;
         margin-inline-start: -12px;
+    }
+    .mega-dialog.affiliate-redeem .megaquota.cells.left.step1 {
+        -webkit-margin-start: -20px;
+        margin-inline-start: -20px;
+    }
+    .mega-dialog.affiliate-redeem .megaquota.cells.left {
+        margin: 20px 0 -9px;
+        -webkit-margin-start: -12px;
+        margin-inline-start: -12px;
+    }
+    .mega-dialog.affiliate-redeem .cells.left.step0 {
+        margin-top: 10px;
     }
     .mega-dialog.affiliate-redeem .cells.scrollable {
         position: relative;
     }
     .mega-dialog.affiliate-redeem .cells .cell-content {
+        padding: 6px 20px;
+        max-height: 400px;
+        position: relative;
+    }
+    .mega-dialog.affiliate-redeem .cells.step0 .cell-content {
+        padding: 6px 22px;
+    }
+    .mega-dialog.affiliate-redeem .cells.bitcoin .cell-content {
         padding: 4px 20px;
+        max-height: 400px;
+        position: relative;
+    }
+    .mega-dialog.affiliate-redeem .cells.bitcoin.step1 .cell-content {
+        padding: 6px 38px 6px 12px;
         max-height: 400px;
         position: relative;
     }
@@ -7814,17 +8137,36 @@ body.de .mega-dialog.new-group-chat {
         border-radius: 12px;
     }
     .mega-dialog.affiliate-redeem .cells:not(.step2) .ps .header {
-        padding: 20px 0 24px;
+        padding-bottom: 12px;
     }
     .mega-dialog.affiliate-redeem .cells.step3 {
         min-height: 290px;
     }
-    .mega-dialog.affiliate-redeem .cells.step4 .cell-content {
-        padding: 0 18px;
+    .mega-dialog.affiliate-redeem .cells.step4 .cell-content.megaquota {
+        padding: 0 11px;
     }
-    .mega-dialog.affiliate-redeem .cells.right {
+    .mega-dialog.affiliate-redeem .cells.step4.megaquota .cell-content {
+        padding: 0 18px 0 13px;
+    }
+    .mega-dialog.affiliate-redeem .cells.left.step4.megaquota .cell-content {
+        margin-left: -18px;
+    }
+    .mega-dialog.affiliate-redeem .cells.right.bitcoin {
         float: right;
         margin-top: 24px;
+    }
+    .mega-dialog.affiliate-redeem .cells.right.megaquota {
+        width: 312px;
+        float: right;
+        margin-top: 19px;
+    }
+    .mega-dialog.affiliate-redeem .cells.right.megaquota .plan-info-header .plan-name {
+        font: var(--text-body2-bold);
+    }
+    .mega-dialog.affiliate-redeem .cells .cell-content-quota {
+        padding: 0 20px;
+        max-height: 400px;
+        position: relative;
     }
     .rtl .mega-dialog.affiliate-redeem .cells.right {
         float: left;
@@ -7840,11 +8182,14 @@ body.de .mega-dialog.new-group-chat {
         color: var(--text-color-high);
         background: var(--surface-main);
     }
+    .mega-dialog.affiliate-redeem .step2 .header.details {
+        margin-top: 8px;
+    }
     .mega-dialog.affiliate-redeem .summary {
         background: var(--surface-main);
     }
     .mega-dialog.affiliate-redeem .header + .mega-input {
-        margin: 8px  0;
+        margin: 8px 0 5px;
     }
     .mega-dialog.affiliate-redeem .template {
         display: none;
@@ -7853,9 +8198,18 @@ body.de .mega-dialog.new-group-chat {
         align-items: baseline;
         padding: 12px 24px;
         display: flex;
+        gap: 10px;
+    }
+    .mega-dialog.affiliate-redeem .cells.right.bitcoin.step1 {
+        float: right;
+        margin-top: 18px;
+        width: 312px;
     }
     .mega-dialog.affiliate-redeem .summary-wrap .header {
         padding: 24px 24px 12px;
+    }
+    .mega-dialog.affiliate-redeem .right.step1.bitcoin .summary-wrap .header {
+        padding: 20px 24px 12px;
     }
     .mega-dialog.affiliate-redeem .summary-wrap .info {
         color: var(--text-color-low);
@@ -7890,6 +8244,7 @@ body.de .mega-dialog.new-group-chat {
         display: flex;
         align-items: baseline;
         font: var(--text-body2);
+        gap: 10px;
     }
     .mega-dialog.affiliate-redeem .amount .info {
         color: var(--text-color-high);
@@ -7900,13 +8255,13 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.affiliate-redeem .local-info {
         font: var(--text-body2);
-        color: var(--text-color-medium);
-        padding: 10px 0 0 0;
+        color: var(--text-color-low);
+        padding: 6px 0 0;
     }
     .mega-dialog.affiliate-redeem .commission-wrap {
         display: flex;
         width: 100%;
-        margin-bottom: 40px;
+        margin-bottom: 17px;
         white-space: nowrap;
         flex-wrap: wrap;
         justify-content: space-between;
@@ -7921,8 +8276,30 @@ body.de .mega-dialog.new-group-chat {
         -webkit-margin-end: 8px;
         margin-inline-end: 8px;
     }
+    .mega-dialog.affiliate-redeem .available-comission span span {
+        font: var(--text-body2);
+    }
+    .mega-dialog.affiliate-redeem .available-comission .available-commission-local {
+        font: var(--text-body2-bold);
+    }
+    .mega-dialog.affiliate-redeem .available-comission .available-commission-euro {
+        font: var(--text-body2);
+        color: var(--text-color-low);
+    }
+    .mega-dialog.affiliate-redeem .available-comission.pro-choice-commission {
+        margin-top: 9px;
+        font: var(--text-body1-bold);
+        margin-bottom: 3px;
+    }
+    .mega-dialog.affiliate-redeem .available-comission.bitcoin .available-commission-euro {
+        font: var(--text-body2);
+        color: var(--text-color-success);
+    }
+    .mega-dialog.affiliate-redeem .available-comission.pro-choice-commission .available-commission-local {
+        font: var(--text-body1-bold);
+    }
     .mega-dialog.affiliate-redeem .amount-message-container {
-        margin: -32px 0 32px;
+        margin: 0;
         color: var(--banner-text-error);
         border: 1px solid var(--banner-border-error);
         background: var(--banner-background-error);
@@ -7932,25 +8309,149 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.affiliate-redeem .available-comission span {
         white-space: nowrap;
         color: var(--text-color-success);
+        font: var(--text-body1-bold);
     }
     .mega-dialog.affiliate-redeem .affiliate-redeem .payment-type-wrapper {
         float: left;
+        display: flex;
+        flex-direction: column;
+        margin-top: 12px;
+        margin-bottom: 12px;
+        margin-left: 2px;
+        gap: 18px;
+    }
+    .mega-dialog.affiliate-redeem .cell-content.megaquota {
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+    }
+    .mega-dialog.affiliate-redeem .redemption-methods-wrapper {
+        padding: 0;
+    }
+    .mega-dialog.affiliate-redeem .payment-type-header {
+        color: var(--text-color-high);
+        font: var(--text-h3-bold);
     }
     .mega-dialog.affiliate-redeem .payment-type {
         margin-top: 16px;
+        display: flex;
+        flex-direction: column;
     }
     .mega-dialog.affiliate-redeem .payment-type .radio-txt {
         color: var(--text-color-high);
         vertical-align: baseline;
+        font: var(--text-body1-bold);
+    }
+    .mega-dialog.affiliate-redeem .bitcoin-redemption-amount-wrapper {
+        display: flex;
+        flex-direction: column;
+    }
+    .mega-dialog.affiliate-redeem .megaquota .redeem-data-quota {
+        display: flex;
+        flex-direction: column;
+
+    }
+    .mega-dialo.affiliate-redeem .megaquota.cells .cell-content {
+        padding: 0 20px;
+    }
+    .mega-dialog.affiliate-redeem .megaquota .duration-dropdown {
+        margin-top: 18px;
+    }
+    .mega-dialog.affiliate-redeem .quota-summary .quota-summary.sub-item {
+        padding: 6px 24px;
+        gap: 10px;
+    }
+    .mega-dialog.affiliate-redeem .quota-summary .quota-summary.sub-item.storage {
+        margin-top: 6px;
+    }
+    .mega-dialog.affiliate-redeem .quota-summary {
+        padding-bottom: 6px;
+    }
+    .mega-dialog.affiliate-redeem .quota-summary .plan-info-title {
+        color: var(--text-color-medium);
+    }
+    .mega-dialog.affiliate-redeem .quota-summary .plan-info-title.plan-info-name {
+        font: var(--text-body2-bold);
+    }
+    .mega-dialog.affiliate-redeem .quota-summary .info.plan-info {
+        font: var(--text-body2-bold);
+    }
+    .mega-dialog.affiliate-redeem .duration-dropdown .option {
+        display: flex;
+        justify-content: space-between;
+    }
+    .mega-dialog.affiliate-redeem .duration-dropdown .redemption-duration-base {
+        color: var(--text-color-high);
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .mega-dialog.affiliate-redeem .duration-dropdown .redemption-duration-default {
+        color: var(--text-color-medium);
+    }
+    .mega-dialog.affiliate-redeem .duration-dropdown .dropdown-item-save {
+        display: flex;
+        align-items: flex-start;
+        padding: 0.5px 8px 0 9px;
+        height: 18px;
+        border-radius: 9px;
+        background-color: #FF625C;
+        font: var(--text-body2);
+        color: var(--text-color-white-high);
+        flex: none;
+    }
+    .mega-dialog.affiliate-redeem .megaquota .megaquota-options-wrapper {
+        margin-top: 22px;
+        margin-left: 3px;
+        gap: 16px;
+        display: flex;
+        flex-direction: column;
+    }
+    .mega-dialog.affiliate-redeem .fm-affiliate .redeem-data-quota {
+        border-top: none;
+    }
+    .mega-dialog.affiliate-redeem .megaquota .plan-select-message {
+        border-radius: 4px;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        width: 312px;
+        flex: none;
+        flex-grow: 0;
+        padding: 2px 16px;
+        gap: 10px;
+        margin-top: 6px;
+    }
+    .mega-dialog.affiliate-redeem .megaquota .insufficient-quota-warning {
+        background: var(--banner-background-error);
+        border: 1px solid var(--banner-border-error);
+        color: var(--banner-text-error);
+    }
+    .mega-dialog.affiliate-redeem .megaquota .under-price-warning {
+        background: var(--banner-background-warning);
+        border: 1px solid var(--banner-border-warning);
+        color: var(--banner-text-warning);
+    }
+    .mega-dialog.affiliate-redeem .megaquota .meqaquota-option-name {
+        color: var(--text-color-high);
+        font: var(--text-body1-bold);
+    }
+    .mega-dialog.affiliate-redeem .megaquota .meqaquota-option-information {
+        color: var(--text-color-medium);
+        font: var(--text-caption);
     }
     .mega-dialog.affiliate-redeem .withdraw-txt {
         font: var(--text-body1);
         color: var(--text-color-medium);
+    }
+    .mega-dialog.affiliate-redeem .bitcoin.step2 .withdraw-txt {
         padding: 16px 0 40px 0;
     }
     .mega-dialog.affiliate-redeem .withdraw-txt a,
     .mega-dialog.affiliate-redeem .withdraw-txt a:visited {
-        font: var(--text-body1);
+        font: var(--text-body2);
         float: right;
         color: var(--text-color-success);
         cursor: pointer;
@@ -7972,6 +8473,7 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.affiliate-redeem .withdraw-details {
         padding: 16px 0 0 0;
+
     }
     .mega-dialog.affiliate-redeem .withdraw-details label {
         color: var(--text-color-low);
@@ -8010,7 +8512,8 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.affiliate-redeem .bitcoin-org {
         padding: 0;
-        margin-top: 16px;
+        margin-top: 11px;
+        margin-bottom: 40px;
     }
     .mega-dialog.affiliate-redeem .bitcoin-org a {
         color: var(--text-color-low);
@@ -8030,6 +8533,9 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.affiliate-redeem label.radio-txt {
         color: var(--text-color-low);
+    }
+    .mega-dialog.affiliate-redeem .green-active {
+        margin-right: 9px;
     }
     .mega-dialog.affiliate-redeem .save-data-checkbox,
     .mega-dialog.affiliate-redeem .auto-fill-checkbox {
@@ -8268,7 +8774,8 @@ body.de .mega-dialog.new-group-chat {
         .mega-dialog.voucher-info-redeem .plan-icon.pro3 i.pro3,
         .mega-dialog.voucher-info-redeem .plan-icon.pro4 i.pro4,
         .mega-dialog.voucher-info-redeem .plan-icon.pro101 i.pro101,
-        .mega-dialog.voucher-info-redeem .plan-icon.business i.business {
+        .mega-dialog.voucher-info-redeem .plan-icon.business i.business,
+        .mega-dialog.voucher-info-redeem .plan-icon.feature i.feature {
             display: block;
         }
         .mega-dialog.voucher-info-redeem .voucher-logo .v-separator {
@@ -8293,11 +8800,18 @@ body.de .mega-dialog.new-group-chat {
 
     /* end do not apply theme colours */
 
+.mega-dialog.voucher-info-redeem .s4-voucher-terms-label {
+    color: var(--text-color-high);
+}
 /* end voucher-info-redeem dialog */
 
 /* affiliate-request dialog */
     .mega-dialog.affiliate-request {
         width: 630px;
+    }
+    .mega-dialog.affiliate-request-quota {
+        width: 594px;
+        height: 342px;
     }
     .mega-dialog.affiliate-request .status-cells {
         display: flex;
@@ -8329,6 +8843,19 @@ body.de .mega-dialog.new-group-chat {
         background: linear-gradient(to bottom, #eeeeee 0%, #d8d8d8 100%);
         border-radius: 100%;
         overflow: hidden;
+    }
+    .mega-dialog.affiliate-request-quota .info {
+        width: 21px;
+        height: 21px;
+        position: relative;
+        background: #3ED8B2;
+        /* stylelint-disable-next-line plugin/no-unsupported-browser-features */
+        background: linear-gradient(180deg, #3ED8B2 0.2%, #1DB07B 100%);
+        border-radius: 100%;
+        overflow: hidden;
+    }
+    .mega-dialog.affiliate-request-quota .info-cells .info-txt {
+        font: var(--text-body2);
     }
     .mega-dialog.affiliate-request .status-txt {
         font: var(--text-h3);
@@ -8367,6 +8894,72 @@ body.de .mega-dialog.new-group-chat {
         height: 4px;
         background-position: 0 -6708px;
         background-repeat: repeat-x;
+    }
+    .mega-dialog.affiliate-redeem .mega-button.next-btn,
+    .mega-dialog.affiliate-request .mega-button.next-btn {
+        background: linear-gradient(180deg, #3ED8B2 0%, #1DB07B 100%);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+        box-shadow: none;
+        justify-content: center;
+        align-items: center;
+    }
+    .mega-dialog.affiliate-request-quota .affiliate-request-title {
+        font: var(--text-h3);
+    }
+    .mega-dialog.affiliate-request-quota .complete .progress span {
+        background-position: 4px -4832px;
+        background-size: 115px auto;
+    }
+    .mega-dialog.affiliate-request-quota .complete .progress {
+        background: linear-gradient(180deg, #3ED8B2 0.2%, #1DB07B 100%);
+    }
+    .mega-dialog.affiliate-request-quota .content .content-block {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .mega-dialog.affiliate-request-quota .content .info-cells {
+        display: flex;
+        gap: 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-right: 21px;
+    }
+    .mega-dialog.affiliate-request-quota .content .info-support {
+        margin-top: 21px;
+        margin-bottom: 16px;
+        font: var(--text-body2);
+    }
+    .mega-dialog.affiliate-request-quota .content .info-support span {
+        color: var(--text-color-high);
+    }
+    .mega-dialog.affiliate-request-quota .content .info-cell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .mega-dialog.affiliate-request-quota .content .plan-name {
+        margin-bottom: 18px;
+        color: var(--text-color-high);
+    }
+    .mega-dialog.affiliate-request-quota footer .mega-button {
+        min-height: 36px;
+        min-width: 45px;
+        justify-content: center;
+        align-items: center;
+    }
+    .mega-dialog.affiliate-request-quota footer .mega-button span {
+        margin: 0 var(--horizontal-padding);
+    }
+    .mega-dialog.affiliate-request-quota .footer-container-quota {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px 48px 24px;
+    }
+    .mega-dialog.affiliate-request-quota header {
+        padding-bottom: 40px;
     }
 
 /* end affiliate-request dialog */
@@ -8422,7 +9015,23 @@ body.de .mega-dialog.new-group-chat {
 /* affiliate-guide dialog */
 
     .mega-dialog.affiliate-guide {
-        width: 750px;
+        width: 708px;
+    }
+    .mega-dialog.affiliate-guide:has(.step1.active) {
+        width: 708px;
+        height: 532px;
+    }
+    .mega-dialog.affiliate-guide > section.content {
+        flex-shrink: initial;
+        display: flex;
+        flex-direction: column;
+    }
+    .mega-dialog.affiliate-guide header {
+        padding-top: 16px;
+        padding-bottom: 14px;
+    }
+    .mega-dialog.affiliate-guide .affiliate-guide-title {
+        font: var(--text-h3)
     }
     .mega-dialog.affiliate-guide .step {
         display: none;
@@ -8430,13 +9039,28 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.affiliate-guide .step.active {
         display: block;
     }
+    .mega-dialog.affiliate-guide .referral-guide-title {
+        font: var(--text-h3);
+    }
+    .mega-dialog.affiliate-guide footer .how-it-works {
+        justify-content: center;
+    }
     .mega-dialog.affiliate-guide footer button.next i,
     .mega-dialog.affiliate-guide footer button.back i {
         --icon-size: 16px;
     }
     .mega-dialog.affiliate-guide footer .step.active {
         display: flex;
-        padding-top: 24px;
+        padding-top: 12px;
+        padding-bottom: 0;
+    }
+    .mega-dialog.affiliate-guide footer .step2.active {
+        padding: 12px 44px 16px;
+    }
+    .mega-dialog.affiliate-guide footer .step.active.step1 {
+        padding-top: 42px;
+        padding-bottom: 24px;
+        align-items: flex-end;
     }
     .mega-dialog.affiliate-guide footer {
         border-top: 1px solid transparent;
@@ -8449,15 +9073,15 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.affiliate-guide .illustration {
         height: 148px;
-        margin: 20px auto 8px;
-        width: 434px;
+        margin: 22px auto 8px;
+        width: 450px;
         --width: 434px;
     }
     .mega-dialog.affiliate-guide .big-header {
         font: var(--text-h1);
         text-align: center;
         color: var(--text-color-high);
-        padding: 18px 0 6px 0;
+        padding: 18px 8px;
     }
     .mega-dialog.affiliate-guide .affiliate-guide-content {
         display: table;
@@ -8479,8 +9103,17 @@ body.de .mega-dialog.new-group-chat {
         display: table-cell;
         vertical-align: middle;
     }
+    .mega-dialog.affiliate-guide .content .step2:not(.slides) {
+        padding: 0 18px;
+    }
     .mega-dialog.affiliate-guide .step2 .cell {
         padding: 0 32px;
+    }
+    .mega-dialog.affiliate-guide .step2 .slide3 .rules {
+        padding: 89px 0;
+    }
+    .mega-dialog.affiliate-guide .step2 .slide1:not(.nav-button) {
+        padding: 0 26px;
     }
     .mega-dialog.affiliate-guide .slide1 .cell {
         padding: 0;
@@ -8493,26 +9126,51 @@ body.de .mega-dialog.new-group-chat {
         --mask-color: var(--secondary-green);
         float: left;
         --icon-size: 24px;
-        margin: 7px 0 0 0;
+        margin: 4px 0 0;
+    }
+    .mega-dialog.affiliate-guide .slide3 .cell i {
+        margin: 4px 0 0;
     }
     .rtl .mega-dialog.affiliate-guide .cell i {
         float: right;
     }
     .mega-dialog.affiliate-guide .cell .feature-block i {
-        --icon-size: 64px;
+        --icon-size: 70px;
         margin-bottom: 12px;
+    }
+    .mega-dialog.affiliate-guide .cell .feature-block .icon-add-users {
+        --icon-size: 70px;
+        margin-bottom: 6px;
+        margin-top: 6px;
+    }
+    .mega-dialog.affiliate-guide .cell .feature-block .icon-web-link {
+        --icon-size: 79px;
+        margin-bottom: 4px;
     }
     .mega-dialog.affiliate-guide .header {
         font: var(--text-body1);
-        color: var(--text-color-medium);
+        color: var(--text-color-high);
         padding: 10px 0;
+    }
+    .mega-dialog.affiliate-guide .step1 .cell {
+        display: flex;
+        flex-direction: row;
+        padding-left: 32px;
+        padding-top: 3px;
+        gap: 34px;
+    }
+    .mega-dialog.affiliate-guide .step1 .cell .header {
+        padding: 5px 0 15px;
+        width: 200px;
+    }
+    .mega-dialog.affiliate-guide .step1 .cell .affiliate-guide-check-item {
+        display: flex;
     }
     .mega-dialog.affiliate-guide .info {
         box-sizing: border-box;
-        color: var(--text-color-medium);
         padding-bottom: 10px;
-        -webkit-padding-start: 28px;
-        padding-inline-start: 28px;
+        -webkit-padding-start: 34px;
+        padding-inline-start: 34px;
     }
     .mega-dialog.affiliate-guide .info strong,
     .mega-dialog.affiliate-guide .info a {
@@ -8531,8 +9189,9 @@ body.de .mega-dialog.new-group-chat {
         padding-inline-end: 28px;
     }
     .mega-dialog.affiliate-guide .cell i + .header {
-        -webkit-padding-start: 28px;
-        padding-inline-start: 28px;
+        -webkit-padding-start: 34px;
+        padding-inline-start: 34px;
+        color: var(--text-color-high);
     }
     .mega-dialog.affiliate-guide .slides {
         position: relative;
@@ -8544,6 +9203,7 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.affiliate-guide .step1 .half-sized {
         padding: 0;
+        width: auto;
         -webkit-padding-start: 12px;
         padding-inline-start: 12px;
     }
@@ -8586,7 +9246,6 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.affiliate-guide .nav-button.active {
         border-color: var(--secondary-blue);
         color: var(--text-color-high);
-        font: var(--text-body1-bold);
     }
 
     /* Slide 1 */
@@ -8594,7 +9253,7 @@ body.de .mega-dialog.new-group-chat {
         box-sizing: border-box;
         color: var(--text-color-medium);
         float: left;
-        padding: 10px 20px;
+        padding: 11px 20px 18px;
         text-align: center;
         width: 50%;
     }
@@ -8617,16 +9276,15 @@ body.de .mega-dialog.new-group-chat {
 
     /* Slide 2 */
     .mega-dialog.affiliate-guide .slide2 i {
-        margin: 10px 0 0 0;
+        margin: 12px 0 0;
     }
     .mega-dialog.affiliate-guide .slide2 .header {
         color: var(--text-color-high);
         font: var(--text-h3);
-        padding: 10px 0;
+        padding: 12px 0 7px;
     }
     .mega-dialog.affiliate-guide .slide2 .info {
-        min-height: 96px;
-        padding-bottom: 16px;
+        padding-bottom: 29px;
     }
     .mega-dialog.affiliate-guide .slide2 .info:last-child {
         min-height: auto;
@@ -8636,22 +9294,20 @@ body.de .mega-dialog.new-group-chat {
     /* Slide 3 */
     .mega-dialog.affiliate-guide .affiliate-guide-content.slide3 {
         display: block;
-        width: calc(100% + 48px);
-        max-width: calc(100% + 48px);
-        padding-right: 48px;
+        width: calc(100% + 15px);
+        max-width: calc(100% + 15px);
+        padding-right: 15px;
     }
     .mega-dialog.affiliate-guide .slide3 .cell.info {
         color: var(--text-color-higher);
         font: var(--text-body1);
-        padding-bottom: 0;
-        padding-top: 28px;
+        padding: 24px 17px 24px 30px;
     }
     .mega-dialog.affiliate-guide .slide3 .info .note {
         font: var(--text-body2);
     }
-    .mega-dialog.affiliate-guide .affiliate-guide.info {
-        color: var(--text-color-medium);
-        padding: 10px 0 4px 31px;
+    .mega-dialog.affiliate-guide .slide3 .affiliate-guide.info {
+        padding: 6px 0 4px 31px;
     }
 
 /* end affiliate-guide dialog */
@@ -8714,7 +9370,7 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.user-management-add-user-dialog .verification-container {
         position: relative;
         height: auto;
-        background: var(--surface-grey-1);
+        background: var(--surface-grey-2);
         box-sizing: border-box;
         border-radius: 4px;
         width: 100%;
@@ -8782,6 +9438,25 @@ body.de .mega-dialog.new-group-chat {
     }
     .mega-dialog.user-management-add-user-dialog .border {
         margin-bottom: 24px;
+    }
+    .mega-dialog.user-management-add-user-dialog .fingerprint-container {
+        background-color: var(--surface-grey-1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        align-content: center;
+        justify-content: center;
+        margin: 24px 0;
+    }
+    .mega-dialog.user-management-add-user-dialog .fingerprint-container .fingerprint-title {
+        padding-top: 10px;
+        color: var(--text-color-high);
+    }
+    .mega-dialog.user-management-add-user-dialog .fingerprint-container .fingerprint-content-container {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+        padding: 8px 0;
     }
 
 /* end user-management-add-user-dialog */
@@ -9226,9 +9901,6 @@ body.de .mega-dialog.new-group-chat {
 
 /* msgDialog (aka dialog-template-message) */
 
-    .mega-dialog.dialog-template-message {
-        z-index: 1201;
-    }
     .mega-dialog.dialog-template-message button.close {
         display: none;
     }
@@ -9741,7 +10413,8 @@ body.de .mega-dialog.new-group-chat {
     .mega-dialog.payment-dialog .plan-icon.pro2 i.pro2,
     .mega-dialog.payment-dialog .plan-icon.pro3 i.pro3,
     .mega-dialog.payment-dialog .plan-icon.pro4 i.pro4,
-    .mega-dialog.payment-dialog .plan-icon.business i.business {
+    .mega-dialog.payment-dialog .plan-icon.business i.business,
+    .mega-dialog.payment-dialog .plan-icon.feature i.feature {
         display: block;
     }
     .mega-dialog.payment-dialog .payment-plan-info {
@@ -9925,7 +10598,8 @@ body.de .mega-dialog.new-group-chat {
     .voucher-redeem-dialog .plan-icon.pro2 i.pro2,
     .voucher-redeem-dialog .plan-icon.pro3 i.pro3,
     .voucher-redeem-dialog .plan-icon.pro4 i.pro4,
-    .voucher-redeem-dialog .plan-icon.business i.business {
+    .voucher-redeem-dialog .plan-icon.business i.business,
+    .voucher-redeem-dialog .plan-icon.feature i.feature {
         display: block;
     }
 
@@ -10031,9 +10705,21 @@ body.de .mega-dialog.new-group-chat {
 
 /* payment-stripe-success/failure-dialog */
 
-    .mega-dialog.payment-stripe-success-dialog,
-    .mega-dialog.payment-stripe-failure-dialog {
+    .mega-dialog.payment-stripe-success-dialog {
         width: 400px;
+    }
+
+    .mega-dialog.payment-stripe-failure-dialog {
+        width: 538px;
+    }
+    .mega-dialog.payment-stripe-failure-dialog > header {
+        padding-bottom: 24px;
+    }
+    .mega-dialog.payment-stripe-failure-dialog > header .graphic {
+        margin-bottom: 34px;
+    }
+    .mega-dialog.payment-stripe-failure-dialog h2 {
+        font: var(--text-h2-bold);
     }
 
     .mega-dialog.payment-stripe-success-dialog .content-block,
@@ -10226,6 +10912,515 @@ body.de .mega-dialog.new-group-chat {
 
 /* Report Abuse dialog End */
 
+/* S4 Dialogs Begin */
+
+.mega-dialog.s4 {
+    width: 592px;
+}
+.mega-dialog.s4 button.close {
+    --mask-color: var(--icon-active);
+}
+.mega-dialog.s4 button.regress {
+    margin-inline-end: auto;
+    -webkit-margin-end: auto;
+}
+.mega-dialog.s4 .spaced-margin {
+    margin: 8px 0 24px;
+}
+.mega-dialog.s4 .input-container {
+    background: var(--surface-main);
+    border: 1px solid var(--stroke-grey-2);
+    border-radius: 3px;
+    display: flex;
+    height: 38px;
+    margin-top: 4px;
+    position: relative;
+    width: 100%;
+}
+.mega-dialog.s4 .input-container .user-input-wrap {
+    flex: 1;
+    vertical-align: top;
+    width: 100%;
+}
+.mega-dialog.s4 .input-container i {
+    --icon-size: 24px;
+    left: 6px;
+    --mask-color: var(--icon-inactive);
+    position: absolute;
+    top: 6px;
+}
+.rtl .mega-dialog.s4 .input-container i {
+    left: auto;
+    right: 6px;
+}
+.mega-dialog.s4 .input-container input {
+    background: transparent;
+    border: 0;
+    box-sizing: border-box;
+    color: var(--text-color-medium);
+    font: var(--text-body1);
+    height: 36px;
+    margin: 0;
+    padding: 0 10px;
+    padding-inline-start: 36px;
+    -webkit-padding-start: 36px;
+    width: 100%;
+}
+.mega-dialog.s4 .input-container input:focus,
+.mega-dialog.s4 .input-container input:hover {
+    color: var(--text-color-high);
+}
+.mega-dialog.s4 .input-container input:focus + i,
+.mega-dialog.s4 .input-container input:hover + i,
+.mega-dialog.s4 .input-container i:hover {
+    --mask-color: var(--icon-active);
+}
+.mega-dialog.s4 .mega-input .message-container {
+    padding: 2px 16px;
+    text-align: start;
+}
+.mega-dialog.s4 div.offset-text {
+    color: var(--text-color-high);
+    font: var(--text-body2);
+    padding: 0 0 3px;
+    padding-inline-start: 40px;
+    -webkit-padding-start: 40px;
+}
+.mega-dialog.s4 .step-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 12px;
+}
+.mega-dialog.s4 .step-head .head-title {
+    color: var(--text-color-high);
+    font: var(--text-h3-bold);
+}
+.mega-dialog.s4 .search-bar {
+    align-items: center;
+    background: var(--surface-grey-6);
+    border-radius: 50px;
+    display: flex;
+    justify-content: space-between;
+    min-height: 32px;
+    position: relative;
+    width: 240px;
+}
+.mega-dialog.s4 .search-bar i {
+    margin-inline-start: 8px;
+    -webkit-margin-start: 8px;
+}
+.mega-dialog.s4 .search-bar input {
+    background-color: transparent;
+    border: 0;
+    box-sizing: border-box;
+    color: var(--stroke-main-inverted);
+    font: var(--text-body1);
+    padding: 6px 0;
+    padding-inline-start: 12px;
+    -webkit-padding-start: 12px;
+    width: 100%;
+}
+.mega-dialog.s4 .sticky-header-table-container {
+    border: solid 1px var(--stroke-grey-2);
+    border-radius: 12px;
+}
+.mega-dialog.s4 .s4-table-scroll {
+    height: 184px;
+}
+.mega-dialog.s4 .sticky-header-table-container th {
+    color: var(--text-color-medium);
+    font: var(--text-body2);
+    padding-top: 12px;
+    text-align: start;
+}
+.mega-dialog.s4 .sticky-header-table-container .no-pad-start {
+    padding-inline-start: 0;
+    -webkit-padding-start: 0;
+}
+.mega-dialog.s4 .dialog-table th:first-child,
+.mega-dialog.s4 .dialog-table td:first-child {
+    line-height: 0;
+    width: 28px;
+}
+.mega-dialog.s4 .dialog-table tr {
+    height: 32px;
+    width: 100%;
+}
+.mega-dialog.s4 .dialog-table td {
+    align-items: center;
+    padding-inline-start: 12px;
+    -webkit-padding-start: 12px;
+}
+.mega-dialog.s4 .dialog-table tr:hover td:first-child::before {
+    left: 4px;
+}
+.mega-dialog.s4 .dialog-table tr:hover td:last-child::before {
+    right: 4px;
+}
+.mega-dialog.s4 .dialog-table td:first-child::after {
+    width: calc(100% - 8px);
+}
+.mega-dialog.s4 .dialog-table td:nth-child(2) span {
+    color: var(--text-color-high);
+}
+.mega-dialog.s4 td span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.mega-dialog.s4 td span:first-child {
+    margin-right: 8px;
+}
+.mega-dialog.s4 .create-item-info {
+    margin-bottom: 24px;
+    max-width: 100%;
+}
+.mega-dialog.s4 .create-item-info td {
+    padding-bottom: 12px;
+}
+.mega-dialog.s4 .create-item-info td:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: wrap;
+    width: 115px;
+    max-width: 115px;
+}
+.mega-dialog.s4 .section-label {
+    color: var(--text-color-high);
+    font: var(--text-h3);
+}
+.mega-dialog.s4 .info-container-wrap {
+    margin-bottom: 16px;
+}
+.mega-dialog.s4 .badge-container {
+    margin-top: 8px;
+    max-width: 100%;
+}
+.mega-dialog.s4 .badge {
+    background: var(--badge-fill);
+    border: solid 2px var(--switch-handle-border);
+    border-radius: 12px;
+    color: var(--text-color-high);
+    display: inline-block;
+    font: var(--text-body1);
+    margin-bottom: 8px;
+    margin-inline-end: 8px;
+    padding-inline-end: 8px;
+    padding-inline-start: 10px;
+    -webkit-margin-end: 8px;
+    -webkit-padding-end: 8px;
+    -webkit-padding-start: 10px;
+}
+.mega-dialog.s4 .badge .badge-name {
+    display: inline-block;
+}
+.mega-dialog.s4 .badge button {
+    --height: 16px;
+    margin: 0 0 1px;
+    --mask-color: var(--icon-rest);
+    padding: 0;
+}
+.mega-dialog.s4 .badge button:hover,
+.mega-dialog.s4 .badge i:hover {
+    --mask-color: var(--icon-active);
+}
+.rtl .mega-dialog.s4 .badge i {
+    left: auto;
+    right: 4px;
+}
+.mega-dialog.s4 .create-success-text {
+    font: var(--text-body1);
+    color: var(--text-color-high);
+    margin-bottom: 24px;
+}
+.mega-dialog.s4 .keys-table {
+    background: var(--surface-grey-1);
+    border: solid 2px var(--stroke-grey-2);
+    border-radius: 12px;
+    margin-bottom: 24px;
+    padding: 12px 16px 2px;
+    width: 100%;
+}
+.mega-dialog.s4 .keys-table td {
+    padding-bottom: 12px;
+}
+.mega-dialog.s4 .keys-table td:first-child {
+    color: var(--text-color-high);
+    width: 90px;
+}
+.mega-dialog.s4 .keys-table td:nth-child(2) {
+    position: relative;
+    top: 2px;
+}
+.mega-dialog.s4 .keys-table .secret-key-value {
+    background: transparent;
+    border: 0;
+    color: var(--text-color-medium);
+    cursor: auto;
+    font: var(--text-body1);
+    padding: 0;
+}
+.mega-dialog.s4 .keys-table .secret-key-value[type="text"] {
+    text-overflow: ellipsis;
+}
+.mega-dialog.s4 .keys-table .mega-button.small {
+    --icon-size: 24px;
+    margin: 0;
+    --mask-color: var(--icon-rest);
+}
+.mega-dialog.s4 .mega-button.small:hover i {
+    --mask-color: var(--icon-active);
+}
+
+
+.mega-dialog.s4 .s4-table-scroll .ps__rail-y {
+    margin: 36px 0 4px;
+}
+.mega-dialog.s4 .radio-wrap {
+    display: flex;
+    white-space: nowrap;
+}
+
+.mega-dialog.s4-create-user-dialog .step-1,
+.mega-dialog.s4-create-group-dialog .step-1 {
+    margin: 16px 0 24px;
+}
+.mega-dialog.s4-create-user-dialog .step-4,
+.mega-dialog.s4-create-group-dialog .step-4 {
+    margin-top: 8px;
+}
+.mega-dialog.s4-create-user-dialog .step-2 .s4-table-scroll .col-2 {
+    width: 170px;
+}
+.mega-dialog.s4-create-user-dialog .step-2 .s4-table-scroll .col-3 {
+    width: 272px;
+}
+.mega-dialog.s4-create-user-dialog .step-2 .group-table .group-policies {
+    font: var(--text-body2);
+}
+.mega-dialog.s4-create-user-dialog .step-2 .group-table .group-name {
+    display: block;
+    max-width: 200px;
+}
+.mega-dialog.s4-create-user-dialog .step-2 .create-group-button {
+    height: 36px;
+    margin-top: 4px;
+}
+.mega-dialog.s4-create-user-dialog .step-2 button.create-group {
+    float: right;
+    margin: 0;
+}
+.mega-dialog.s4-create-user-dialog .step-2 button.save-group {
+    float: right;
+    margin: 10px 0 33px;
+}
+.rtl .mega-dialog.s4-create-user-dialog .step-2 button.create-group,
+.rtl .mega-dialog.s4-create-user-dialog .step-2 button.save-group {
+    float: left;
+}
+.mega-dialog.s4-create-user-dialog .step-3 .sticky-header-table-container th:nth-child(2) {
+    width: calc(100% - 50px);
+}
+.mega-dialog.s4-create-user-dialog .step-3 .policy-table td:nth-child(2) {
+    width: calc(100% - 44px);
+}
+.mega-dialog.s4-create-user-dialog .step-5 .created-title {
+    color: var(--text-color-high);
+    display: inline-block;
+    font: var(--text-h3-bold);
+    padding: 3px 6px;
+}
+.mega-dialog.s4-create-user-dialog .step-4 .container-user-name,
+.mega-dialog.s4-create-user-dialog .step-4 .container-user-arn,
+.mega-dialog.s4-create-group-dialog .step-4 .container-group-name,
+.mega-dialog.s4-create-group-dialog .step-4 .container-group-arn {
+    display: block;
+    max-width: 380px;
+}
+.mega-dialog.s4-create-group-dialog .s4-table-scroll td.col-2 {
+    width: calc(100% - 44px);
+}
+.mega-dialog.s4 .s4-table-scroll .data-table tr td:last-child::after {
+    width: calc(100% - 10px);
+}
+.mega-dialog.s4-create-access-key-dialog .step-1 .radio-buttons {
+    display: flex;
+    padding: 18px 0 0 3px;
+}
+.mega-dialog.s4-create-access-key-dialog .step-1 .radio-wrap {
+    cursor: pointer;
+}
+.mega-dialog.s4-create-access-key-dialog .step-1 .radio-txt {
+    color: var(--text-color-high);
+}
+.mega-dialog.s4-create-access-key-dialog .step-1 .user-select-wrap {
+    margin-top: 32px;
+}
+.mega-dialog.s4-create-access-key-dialog .step-1 .container-user-wrap {
+    border: solid 1px var(--stroke-grey-2);
+    border-radius: 12px;
+}
+.mega-dialog.s4-create-access-key-dialog .step-1 .list-header {
+    height: 36px;
+    padding-top: 12px;
+    position: relative;
+}
+.mega-dialog.s4-create-access-key-dialog .step-1 .list-header span {
+    color: var(--text-color-medium);
+    font: var(--text-body2);
+    padding-inline-start: 16px;
+    -webkit-padding-start: 16px;
+}
+
+.mega-dialog.s4-create-access-key-dialog .step-1 .key-users-table.dialog-table td span {
+    padding-inline-start: 10px;
+    -webkit-padding-start: 10px;
+}
+.mega-dialog.s4-bucket-settings-dialog {
+    width: 704px;
+}
+.mega-dialog.s4-bucket-settings-dialog .fm-dialog-tabs {
+    margin-bottom: 24px;
+    padding-top: 8px;
+}
+.mega-dialog.s4-bucket-settings-dialog .fm-dialog-tab.active {
+    font-weight: bold;
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-info {
+    margin-bottom: 154px;
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-info .label {
+    color: var(--text-color-high);
+    font-weight: bold;
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-info .value {
+    margin-inline-start: 12px;
+    -webkit-margin-start: 12px;
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-info-field {
+    height: 24px;
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-info-field:not(:first-child) {
+    margin-top: 12px;
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-policies .policies-header-wrapper {
+    display: flex;
+    justify-content: space-between;
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-policies .policies-header {
+    color: var(--text-color-high);
+    font: var(--text-body1-bold);
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-policies a.examples {
+    text-decoration: none;
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-policies .policies-editor {
+    height: 226px;
+    margin: 8px 0 -4px;
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-policies .policies-editor * {
+    font: var(--text-code1);
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-access {
+    margin-bottom: 25px;
+    min-height: 225px;
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-access .access-options {
+    margin-bottom: 24px;
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-access .radio-txt {
+    color: var(--text-color-high);
+    font: var(--text-body1-bold);
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-access .offset-subtext {
+    color: var(--text-color-low);
+    font: var(--text-body2);
+    margin: 4px 30px;
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-access .offset-subtext a {
+    text-decoration: none;
+}
+.mega-dialog.s4-bucket-settings-dialog .policies-editor .CodeMirror {
+    border: 2px solid var(--surface-grey-2);
+    border-radius: 12px;
+}
+.mega-dialog.s4-bucket-settings-dialog .policies-editor .CodeMirror-scroll {
+    padding: 14px 0;
+}
+.mega-dialog.s4-bucket-settings-dialog .policies-editor .CodeMirror-linenumbers {
+    background-color: var(--surface-grey-2);
+    width: 48px;
+}
+.mega-dialog.s4-bucket-settings-dialog .bucket-policy-warning {
+    color: var(--banner-text-error);
+    background-color: var(--banner-background-error);
+    border: 1px solid var(--banner-border-error);
+    border-radius: 4px;
+    margin: 8px 0 0;
+    padding: 1px 8px;
+}
+.mega-dialog.s4-object-access-dialog {
+    width: 622px;
+}
+.mega-dialog.s4-object-access-dialog .object-access-entry {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 24px 0 0;
+}
+.mega-dialog.s4-object-access-dialog .content-txt {
+    display: block;
+    padding-inline-end: 72px;
+    -webkit-padding-end: 72px;
+}
+.mega-dialog.s4-object-access-dialog .subtitle-txt {
+    display: block;
+    font: var(--text-h3-bold);
+    margin-bottom: 4px;
+}
+.mega-dialog.s4-object-access-dialog .bucket-access-warning.fm-notification-block {
+    margin: 8px 0 0;
+}
+.mega-dialog.s4-object-access-dialog .file-info .subtitle-txt {
+    font: var(--text-body1);
+    line-height: 24px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.mega-dialog.s4-object-access-dialog .file-info .item-type-icon {
+    --icon-size: 24px;
+    margin: 1px 4px;
+    position: absolute;
+}
+.mega-dialog.s4-object-access-dialog .file-info .file-name {
+    margin-left: 32px;
+}
+.mega-dialog.s4-object-access-dialog .file-info .file-size {
+    font: var(--text-body2);
+    color: var(--text-color-medium);
+    margin-left: 16px;
+}
+.mega-dialog.s4-object-access-dialog .input-container {
+    border-radius: 12px;
+}
+.mega-dialog.s4-object-access-dialog .input-container i {
+    --mask-color: var(--icon-active);
+}
+.mega-dialog.s4-object-access-dialog .input-container input {
+    background-color: transparent;
+    color: var(--text-color-high);
+    font: var(--text-body2);
+}
+.mega-dialog.s4-object-access-dialog footer .footer-container {
+    padding: 16px 48px 32px;
+}
+.mega-dialog.s4 .inactive .user-input-wrap {
+    opacity: 0.6;
+}
+
+/* S4 Dialogs End */
+
 /* Stop backup dialog Begin */
 
 .mega-dialog.stop-backup .select-action-wrap {
@@ -10288,19 +11483,15 @@ body.de .mega-dialog.new-group-chat {
 }
 
 .mega-dialog.file-request header {
-    padding-bottom: 24px;
+    padding-bottom: 2px;
 }
 
 .mega-dialog.file-request header .dialog-title {
     margin-top: 38px;
-    margin-bottom: 12px;
 }
 
-.mega-dialog.file-request.file-request-manage-dialog header {
-    padding-bottom: 2px;
-}
-.mega-dialog.file-request.file-request-manage-dialog header .dialog-title {
-    margin-bottom: 0;
+.mega-dialog.file-request header .dialog-caption {
+    margin-top: 12px;
 }
 
 .mega-dialog.file-request .content {
@@ -10317,7 +11508,7 @@ body.de .mega-dialog.new-group-chat {
     overflow-y: auto;
 }
 
-.mega-dialog.file-request .content .scrollable .ps__scrollbar-y-rail {
+.mega-dialog.file-request .content .scrollable .ps__rail-y {
     margin-inline-end: 8px;
     -webkit-margin-end: 8px;
     opacity: 0.6;
@@ -10332,11 +11523,11 @@ body.de .mega-dialog.new-group-chat {
     padding-bottom: 20px;
 }
 
-.mega-dialog.file-request.file-request-manage-dialog .content-block .form-row.create-success {
+.mega-dialog.file-request.file-request-manage-dialog .content-block.secondary .form-row {
     margin-bottom: 22px;
 }
 
-.mega-dialog.file-request .content-block.primary {
+.mega-dialog.file-request.file-request-manage-dialog .content-block.primary {
     padding-bottom: 36px;
 }
 
@@ -10412,25 +11603,29 @@ body.de .mega-dialog.new-group-chat {
     margin-bottom: 26px;
 }
 
+.mega-dialog.file-request .content-block .form-row.select-folder {
+    padding-top: 22px;
+}
+
 .mega-dialog.file-request .content-block .form-row.create {
     margin-bottom: 24px;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success {
+.mega-dialog.file-request .content-block.secondary .form-row {
     margin-bottom: 18px;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success label {
+.mega-dialog.file-request .content-block.secondary .form-row label {
     font-family: var(--text-font-family-bold);
     margin-bottom: 10px;
     display: block;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success.manage {
+.mega-dialog.file-request .content-block.secondary .form-row.manage {
     margin-bottom: 0;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .file-request-input {
+.mega-dialog.file-request .content-block.secondary .form-row .file-request-input {
     display: flex;
     width: 100%;
     position: relative;
@@ -10438,7 +11633,7 @@ body.de .mega-dialog.new-group-chat {
     border-radius: 4px;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .file-request-input .input-wrapper {
+.mega-dialog.file-request .content-block.secondary .form-row .file-request-input .input-wrapper {
     flex: 1;
     vertical-align: top;
     width: 100%;
@@ -10446,7 +11641,7 @@ body.de .mega-dialog.new-group-chat {
     padding: 8px;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .file-request-input .input-wrapper i {
+.mega-dialog.file-request .content-block.secondary .form-row .file-request-input .input-wrapper i {
     position: absolute;
     left: 10px;
     top: 8px;
@@ -10459,7 +11654,7 @@ body.de .mega-dialog.new-group-chat {
     left: initial;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .file-request-input .input-wrapper input {
+.mega-dialog.file-request .content-block.secondary .form-row .file-request-input .input-wrapper input {
     height: 24px;
     border: 0;
     -webkit-padding-start: 34px;
@@ -10473,7 +11668,7 @@ body.de .mega-dialog.new-group-chat {
     color: var(--text-color-medium);
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .file-request-input .button-wrapper button {
+.mega-dialog.file-request .content-block.secondary .form-row .file-request-input .button-wrapper button {
     --height: 100%;
     font: var(--text-body1);
     padding: 2px 12px;
@@ -10482,33 +11677,33 @@ body.de .mega-dialog.new-group-chat {
     margin: 0;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .file-request-input.input-code {
+.mega-dialog.file-request .content-block.secondary .form-row .file-request-input.input-code {
     border-radius: 4px;
+    margin-top: 12px;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .file-request-embed-button-container {
+.mega-dialog.file-request .content-block.secondary .form-row .file-request-embed-button-container {
     padding: 20px;
     background-color: var(--surface-grey-1);
     text-align: center;
     border-radius: 8px;
-    margin-top: 12px;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .embed-button-header {
+.mega-dialog.file-request .content-block.secondary .form-row .embed-button-header {
     font-family: var(--text-font-family-bold);
     margin-bottom: 20px;
     color: var(--text-color-high);
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .embed-button-selection {
+.mega-dialog.file-request .content-block.secondary .form-row .embed-button-selection {
     display: flex;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .embed-button-selection .embed-block {
+.mega-dialog.file-request .content-block.secondary .form-row .embed-button-selection .embed-block {
     width: 50%;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .embed-button-centre .embed-content-wrapper {
+.mega-dialog.file-request .content-block.secondary .form-row .embed-button-centre .embed-content-wrapper {
     width: 156px;
     border-radius: 5px;
     background-color: var(--surface-grey-2);
@@ -10517,7 +11712,7 @@ body.de .mega-dialog.new-group-chat {
     margin: 0 auto 12px;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .embed-button-centre .embed-mega-icon {
+.mega-dialog.file-request .content-block.secondary .form-row .embed-button-centre .embed-mega-icon {
     border-radius: 50%;
     background-color: var(--file-request-red);
     height: 24px;
@@ -10525,7 +11720,7 @@ body.de .mega-dialog.new-group-chat {
     display: inline-block;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .embed-button-centre .embed-action-text {
+.mega-dialog.file-request .content-block.secondary .form-row .embed-button-centre .embed-action-text {
     margin: 6px 0;
     -webkit-padding-start: 6px;
     padding-inline-start: 6px;
@@ -10535,19 +11730,19 @@ body.de .mega-dialog.new-group-chat {
     display: inline-block;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .embed-block.dark-theme .embed-content-wrapper {
+.mega-dialog.file-request .content-block.secondary .form-row .embed-block.dark-theme .embed-content-wrapper {
     background-color: var(--file-request-red);
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .embed-block.dark-theme .embed-mega-icon {
+.mega-dialog.file-request .content-block.secondary .form-row .embed-block.dark-theme .embed-mega-icon {
     background-color: var(--surface-main);
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .embed-block.dark-theme .embed-action-text {
+.mega-dialog.file-request .content-block.secondary .form-row .embed-block.dark-theme .embed-action-text {
     background-color: var(--surface-main);
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .embed-button-centre .embed-button-select {
+.mega-dialog.file-request .content-block.secondary .form-row .embed-button-centre .embed-button-select {
     display: inline-flex;
     margin-bottom: 4px;
     color: var(--text-color-medium);
@@ -10555,7 +11750,7 @@ body.de .mega-dialog.new-group-chat {
     cursor: pointer;
 }
 
-.mega-dialog.file-request .content-block .form-row.create-success .embed-block.active .embed-button-select {
+.mega-dialog.file-request .content-block.secondary .form-row .embed-block.active .embed-button-select {
     color: var(--text-color-high);
 }
 
@@ -10578,10 +11773,13 @@ body.de .mega-dialog.new-group-chat {
 .mega-dialog.file-request .footer-container .button-container {
     display: inline-flex;
     gap: 8px;
+    margin-inline-start: auto;
+    -webkit-margin-start: auto;
 }
 
 .mega-dialog.file-request .footer-container .button-container button {
     margin-inline-start: 0;
+    -webkit-margin-start: 0;
 }
 
 .mega-dialog.fm-picker-dialog.fm-picker-file-request header {
@@ -10593,4 +11791,201 @@ body.de .mega-dialog.new-group-chat {
     margin: 16px auto;
 }
 
+.duration-discount-dropdown {
+    width: 97px;
+    height: 18px;
+    background-color: #FF625C;
+    border-radius: 9px;
+}
+
 /* File Request Dialog End */
+
+/* Public set decryption key dialog */
+.mega-dialog.pset-decr-dialog {
+    width: 480px;
+}
+.pset-decr-dialog h3 {
+    color: var(--text-color-high);
+    font: var(--text-h2);
+}
+/* Public set decryption key dialog end */
+
+/* Welcome dialog start */
+
+.mega-dialog.upgrade-welcome-dialog {
+    display: flex;
+    flex-direction: row;
+    color: var(--text-color-high);
+}
+.mega-dialog.upgrade-welcome-dialog header {
+    font: var(--text-h1-bold);
+    margin-bottom: 8px;
+}
+.mega-dialog.upgrade-welcome-dialog .thanks-text {
+    font : var(--text-body1);
+    color: var(--text-color-medium);
+}
+.mega-dialog.upgrade-welcome-dialog .upgrade-welcome-content-left {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin: 32px 9px 75px 32px;
+    max-width: 600px;
+}
+.mega-dialog.upgrade-welcome-dialog .upgrade-welcome-content-left .welcome-dialog.content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+.mega-dialog.upgrade-welcome-dialog .upgrade-welcome-content-left .welcome-dialog.content .plan-info-header {
+    font: var(--text-h2-bold);
+}
+.mega-dialog.upgrade-welcome-dialog .upgrade-welcome-content-left .welcome-dialog.content-block {
+    display: flex;
+    flex-direction: row;
+    padding: 0;
+    align-items: center;
+    gap: 16px;
+}
+.mega-dialog.upgrade-welcome-dialog .upgrade-welcome-content-left .content-block i {
+    --icon-size: 24px;
+}
+.mega-dialog.upgrade-welcome-dialog .upgrade-welcome-content-left .content-block .content-info {
+    display: flex;
+    flex-direction: column;
+}
+.mega-dialog.upgrade-welcome-dialog .upgrade-welcome-content-left .content-block .content-info .info-header {
+    font: var(--text-h3-bold);
+    color: var(--text-color-high);
+}
+.mega-dialog.upgrade-welcome-dialog .upgrade-welcome-content-left .content-block .content-info .info-text {
+    font: var(--text-body1);
+    color: var(--text-color-medium);
+}
+.mega-dialog.upgrade-welcome-dialog footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 24px;
+}
+.mega-dialog.upgrade-welcome-dialog footer button {
+    width: max-content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: flex-end;
+}
+.mega-dialog.upgrade-welcome-dialog .image-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.mega-dialog.upgrade-welcome-dialog .image {
+    background-image: url("../images/mega/dialog-welcome-image.png");
+    width: 221px;
+    height: 221px;
+    background-size: 221px;
+}
+
+/* Welcome dialog end */
+
+/* Upgrade to pro dialog start */
+.mega-dialog.upgrade-to-pro-dialog {
+    width: 600px;
+}
+.mega-dialog.upgrade-to-pro-dialog .content {
+    width: 495px;
+    margin: 0 auto;
+}
+.mega-dialog.upgrade-to-pro-dialog .content .dialog-title-and-description {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 16px;
+}
+.mega-dialog.upgrade-to-pro-dialog .content .image-container i.image {
+    width: 168px;
+    height: 168px;
+    background-size: 168px;
+}
+.mega-dialog.upgrade-to-pro-dialog .content .dialog-title-and-description > *:not(:last-child) {
+    margin-bottom: 8px;
+}
+.mega-dialog.upgrade-to-pro-dialog .content .dialog-title-and-description .upgrade-to-pro-dialog-title {
+    font: var(--text-h2-bold);
+    color: var(--text-color-high);
+    line-height: 24px;
+    padding-top: 40px;
+}
+.mega-dialog.upgrade-to-pro-dialog .content .dialog-title-and-description .upgrade-to-pro-dialog-description {
+    font: var(--text-h3);
+    padding: 0 16px;
+    text-align: center;
+}
+.mega-dialog.upgrade-to-pro-dialog .content .tabs {
+    display: flex;
+    flex-direction: row;
+    align-self: center;
+    padding: 48px 0 24px;
+    font: var(--text-body2);
+}
+.mega-dialog.upgrade-to-pro-dialog .content .tabs > *:not(:last-child) {
+    margin-inline-end: 16px;
+    -webkit-margin-end: 16px;
+}
+.mega-dialog.upgrade-to-pro-dialog .content .tabs .tab {
+    cursor: pointer;
+}
+.mega-dialog.upgrade-to-pro-dialog .content .tabs .tab.active {
+    color: var(--text-color-high);
+    border-bottom: 2px solid var(--secondary-red);
+    font: var(--text-body2-bold);
+}
+.mega-dialog.upgrade-to-pro-dialog .content .info-container {
+    display: flex;
+    flex-direction: row;
+    padding-bottom: 10px;
+}
+.mega-dialog.upgrade-to-pro-dialog .content .info-container > *:not(:last-child) {
+    margin-inline-end: 32px;
+    -webkit-margin-end: 32px;
+}
+.mega-dialog.upgrade-to-pro-dialog .content .info-container .title-and-blurb {
+    display: flex;
+    flex-direction: column;
+    font: var(--text-h3);
+}
+.mega-dialog.upgrade-to-pro-dialog .content .info-container .title-and-blurb > *:not(:last-child) {
+    margin-bottom: 8px;
+}
+.mega-dialog.upgrade-to-pro-dialog .content .info-container .title-and-blurb .title {
+    font: var(--text-h3-bold);
+    color: var(--text-color-high);
+}
+.mega-dialog.upgrade-to-pro-dialog .content .price-disclaimer {
+    padding: 2px 0 24px;
+    font: var(--text-body2-bold);
+    opacity: 0.7;
+    text-align: center;
+}
+.mega-dialog.upgrade-to-pro-dialog footer {
+    background-color: var(--surface-grey-1);
+    display: flex;
+    flex-direction: row;
+    padding: 13px 26px;
+}
+.mega-dialog.upgrade-to-pro-dialog footer > *:not(:last-child) {
+    margin-inline-end: 12px;
+    -webkit-margin-end: 12px;
+}
+.mega-dialog.upgrade-to-pro-dialog footer .mega-button {
+    padding: 6px 12px;
+}
+.mega-dialog.upgrade-to-pro-dialog footer button.upgrade {
+    margin: 0;
+}
+.mega-dialog.upgrade-to-pro-dialog .content .image-container i.image.animation,
+.mega-dialog.upgrade-to-pro-dialog .content .info-container .title-and-blurb > *.animation {
+    animation: top-fade-in 0.5s;
+}
+/* Upgrade to pro dialog end */

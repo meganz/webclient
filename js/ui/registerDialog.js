@@ -37,6 +37,7 @@
             $dialog.removeClass('arrange-to-back');
         };
 
+        const $button = $('button:not(.js-close)', $dialog).addClass('disabled');
         if (options.onCreatingAccount) {
             options.onCreatingAccount($dialog);
         }
@@ -46,6 +47,7 @@
         if (u_type > 0) {
             hideOverlay();
             msgDialog('warninga', l[135], l[5843]);
+            $button.removeClass('disabled');
             return false;
         }
 
@@ -86,6 +88,7 @@
          * @param {Boolean} oldMethod Using old registration method.
          */
         const continueProRegistration = (result, oldMethod) => {
+            $button.removeClass('disabled');
             if (result === 0) {
                 if (oldMethod) {
                     var ops = {
@@ -257,6 +260,7 @@
         }
         if (err) {
             hideOverlay();
+            $button.removeClass('disabled');
         }
     }
 
@@ -391,17 +395,6 @@
                 return false;
             }
         });
-
-        $('.checkbox-block.register .terms-check a', $dialog).rebind('click', function(e) {
-
-            e.preventDefault();
-            $.termsAgree = function() {
-                $('.register-check', $dialog).removeClass('checkboxOff')
-                    .addClass('checkboxOn');
-            };
-            bottomPageDialog(false, 'terms', false, true); // show terms dialog
-            return false;
-        });
     }
 
     /**
@@ -452,6 +445,12 @@
                         alert(l[7717]);
                         return;
                     }
+                    if (res === EEXIST) {
+                        $('.reg-resend-email-meg', $dialog).text(l[19562]);
+                        $('input', $dialog).parent().addClass('error');
+                        $('input', $dialog).focus();
+                        return false;
+                    }
                     if (res !== 0) {
                         console.error('sendsignuplink failed', res);
 
@@ -490,6 +489,7 @@
                 // Hide the loading spinner
                 loadingDialog.hide();
 
+                $('.reg-resend-email-meg', $dialog).text(l[1100]);
                 $('input', $dialog).parent().addClass('error');
                 $('input', $dialog).focus();
                 return false;

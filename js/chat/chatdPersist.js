@@ -48,7 +48,7 @@
      * @returns {Boolean}
      */
     ChatdPersist.isMasterTab = function() {
-        return !!mBroadcaster.crossTab.master;
+        return !!mBroadcaster.crossTab.owner;
     };
 
     /**
@@ -1457,18 +1457,11 @@
      * @returns {MegaPromise}
      */
     ChatdPersist.prototype.clear = function() {
-        var self = this;
-        var promises = [];
-        promises.push(MegaPromise.asMegaPromiseProxy(self.db.msgs.clear()));
-        promises.push(MegaPromise.asMegaPromiseProxy(self.db.keys.clear()));
-        promises.push(MegaPromise.asMegaPromiseProxy(self.db.ptrs.clear()));
-
-        return MegaPromise.allDone(promises)
-            .then(function() {
-                if (localStorage.chatdPersistDebug) {
-                    console.warn('ChatdPersist.clear finished.');
-                }
-            });
+        return Promise.allSettled([
+            this.db.msgs.clear(),
+            this.db.keys.clear(),
+            this.db.ptrs.clear()
+        ]);
     };
 
     /**

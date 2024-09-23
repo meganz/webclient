@@ -232,13 +232,22 @@
 
 /* Settings. Content. Subsections */
 .account.data-block {
-    border-bottom: 1px solid  var(--stroke-grey-2);
     display: flex;
     flex-wrap: wrap;
     position: relative;
 }
-.account.data-block:last-child {
-    border: 0;
+.account.data-block + .data-block:not(.hidden) {
+    border-top: 1px solid  var(--stroke-grey-2);
+}
+.account.data-block.account-type .settings-right-block {
+    padding: 0;
+}
+.account.data-block.account-type .settings-right-block > div {
+    background: var(--surface-grey-3);
+    border: 2px solid var(--stroke-grey-2);
+    border-radius: 12px;
+    padding: 0 24px;
+    margin: 35px 0;
 }
 .settings-sub-section {
     align-items: center;
@@ -249,13 +258,27 @@
     padding: 24px 0;
     position: relative;
 }
-.settings-sub-section:not(.hidden) ~ .settings-sub-section {
-    border-top: 1px solid var(--stroke-grey-2);
+.settings-sub-section.full-width {
+    width: 100%;
 }
+.settings-sub-section:not(.hidden) ~ .settings-sub-section {
+    border-top: 1px solid;
+}
+.theme-light .settings-sub-section:not(.hidden) {
+    border-color: var(--stroke-grey-2);
+}
+.theme-dark .settings-sub-section:not(.hidden) {
+    border-color: var(--stroke-mid-grey);
+}
+
 .settings-sub-section.sub-container:not(.hidden) {
     border: 0;
     padding-top: 0;
     max-height: 100px;
+}
+.settings-sub-section .subtitle-txt,
+.settings-sub-section .switch-label {
+    max-width: calc(100% - 48px);
 }
 .settings-sub-section.closed {
     padding: 0;
@@ -263,6 +286,15 @@
 .settings-sub-section button + button {
     -webkit-margin-start: 8px;
     margin-inline-start: 8px;
+}
+.settings-sub-section .new-tag {
+    margin-left: 8px;
+    background: var(--surface-dark-grey);
+    border-radius: 12px;
+    color: var(--stroke-main);
+    display: inline-flex;
+    font: var(--text-body1);
+    padding: 1px 8px;
 }
 
 
@@ -296,10 +328,15 @@
 .content-panel .settings-button .head-title:hover,
 .content-panel .settings-button .sub-title:hover,
 .content-panel .settings-button.active .head-title {
+    --mask-color: var(--icon-rest);
     cursor: pointer;
-    color: var(--stroke-main-inverted);
+    color: var(--text-color-high);
     background-color: var(--stroke-grey-1);
     box-shadow: 0 1px 4px 0 rgb(0 0 0 / 0.1);
+}
+/* Temporarily hide settings sub title in left panel until fixed in MEGA Lite mode */
+.mega-lite-mode .content-panel .settings-button .sub-title[data-scrollto="file-version"] {
+    display: none;
 }
 .content-panel .settings-button .head-title i {
     --icon-size: 24px;
@@ -323,7 +360,6 @@
     padding-inline-start: 50px;
 }
 .content-panel .settings-button .head-title:hover {
-    --mask-color: var(--icon-active);
     color: var(--text-color-high);
 }
 .content-panel .settings-button.active .head-title {
@@ -503,6 +539,38 @@
     color: var(--text-color-high);
 }
 
+
+/* Settings content. Notifications section. */
+.account.account-notification .chat-permissions-banner {
+    margin: 0 0 20px;
+}
+.account.account-notification .chat-permissions-banner.permission--default i {
+    display: none;
+}
+.account.account-notification .chat-permissions-banner.permission--default a,
+.account.account-notification .chat-permissions-banner.permission--default a:visited {
+    color: var(--secondary-blue);
+    text-decoration: underline;
+}
+.account.account-notification .chat-permissions-banner.permission--granted {
+    padding: 0;
+    background: transparent;
+    box-shadow: none;
+}
+.account.account-notification .chat-permissions-banner.permission--granted .cell {
+    color: var(--text-color-medium);
+    border: 0 none;
+}
+.account.account-notification .chat-permissions-banner.permission--granted i {
+    display: none;
+}
+.account.account-notification .chat-permissions-banner.permission--granted a,
+.account.account-notification .chat-permissions-banner.permission--granted a:visited {
+    color: var(--secondary-blue);
+}
+.account.account-notification .chat-permissions-banner.permission--granted .versioning-body-text {
+    padding-inline-start: 0;
+}
 
 /* Settings content. Security section */
 
@@ -723,6 +791,113 @@
 }
 
 
+/* Settings content. Object storage */
+
+/* Settings content. Object storage. S4 specs banner */
+
+.settings-banner.s4-specs-banner {
+    width: 100%;
+}
+
+.settings-banner.s4-specs-banner .settings-banner-cell {
+    padding: 16px;
+}
+
+.settings-banner.s4-specs-banner .settings-banner-cell:nth-child(2) {
+    padding: 16px 0;
+}
+
+.settings-banner.s4-specs-banner i.light-icon {
+    background-image: url("../images/mega/icons-3d/icon-lightbulb-3d.png");
+    background-size: 100%;
+    display: block;
+    height: 40px;
+    margin: 0 auto;
+    width: 40px;
+}
+
+.settings-banner.s4-specs-banner .title-txt {
+    font: var(--text-h3-bold);
+    padding: 0;
+}
+
+/* Settings content. Object storage. Common styling */
+
+.fm-right-account-block .settings-body-txt {
+    color: var(--text-color-high);
+    font: var(--text-body1);
+}
+
+.fm-right-account-block .settings-body-txt.bold {
+    font: var(--text-body1-bold);
+}
+
+.fm-right-account-block a.settings-lnk {
+    color: var(--stroke-info);
+    text-decoration: underline;
+}
+
+.fm-right-account-block .secondary-table {
+    border: 1px solid var(--surface-mid-grey);
+    width: 100%;
+}
+
+.fm-right-account-block .secondary-table th,
+.fm-right-account-block .secondary-table td {
+    color: var(--text-color-high);
+    font: var(--text-body1-bold);
+    padding: 12px 16px;
+    text-align: start;
+}
+
+.fm-right-account-block .secondary-table td {
+    color: var(--text-color-high);
+    border-top: 1px solid var(--stroke-mid-grey);
+    font: var(--text-body1);
+}
+
+/* Settings content. Object storage. Custom styling */
+
+.fm-account-sections.fm-account-s4 .secondary-table {
+    margin: 16px 0 24px;
+}
+
+.fm-account-sections.fm-account-s4 .secondary-table td:last-child {
+    text-align: end;
+}
+
+.fm-account-sections.fm-account-s4 .secondary-table .mega-button {
+    --icon-size: 24px;
+     --mask-color: var(--icon-rest);
+    padding: 0;
+    margin: 0;
+}
+
+.fm-account-sections.fm-account-s4 ul {
+    color: var(--text-color-high);
+    font: var(--text-body1);
+    padding: 16px 0;
+    margin: 0;
+}
+
+.fm-account-sections.fm-account-s4 li {
+    padding: 0 0 8px;
+    -webkit-margin-start: 21px;
+    margin-inline-start: 21px;
+}
+
+.fm-account-sections.fm-account-s4 li span {
+    background-color: var(--stroke-grey-3);
+    border: 1px solid var(--stroke-grey-2);
+    border-radius: 4px;
+    display: inline-block;
+    padding: 0 4px;
+}
+
+.fm-account-sections.fm-account-s4 a.settings-lnk {
+    cursor: default;
+}
+
 /* Settings top banners */
 
 /* Add phone Settings page banner */
@@ -747,6 +922,7 @@
 }
 
 /* Settings/dashboard page quota banner */
+
 .quota-banner {
     justify-content: space-between;
     max-width: 940px;

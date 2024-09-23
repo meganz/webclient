@@ -12,6 +12,15 @@
         root.MegaLogger = factory();
     }
 }(this, /** @lends MegaLogger */ function () {
+    'use strict';
+
+    /**
+     * Static, global log registry
+     *
+     * @private
+     * @static
+     */
+    const _logRegistry = new Map();
 
     /**
      * Internal/private dict to store the session/localStorage values, so that we can improve the performance of
@@ -20,7 +29,7 @@
      * @private
      * @type {{}}
      */
-    var storageCache = {};
+    const storageCache = Object.create(null);
 
     /**
      * Lazy loader of local/sessionStorage values that will be cached in memory so that no more local/sessionStorage
@@ -30,7 +39,7 @@
      * @returns {*}
      */
     var getStorageCacheValue = function(k) {
-        if (!storageCache.hasOwnProperty(k)) {
+        if (!(k in storageCache)) {
             var value;
 
             if (typeof(sessionStorage) !== 'undefined' && k in sessionStorage) {
@@ -44,7 +53,8 @@
                 try {
                     value = JSON.parse(value);
                 }
-                catch (ex) {}
+                catch (ex) {
+                }
             }
 
             storageCache[k] = value;
@@ -52,41 +62,62 @@
         return storageCache[k];
     };
 
+    const getYIQThreshold = function(bg) {
+        bg = parseInt(bg.slice(1), 16);
+        const R = bg >> 16;
+        const G = bg >> 8 & 0xff;
+        const B = bg & 0xff;
+        return R * 0.299 + G * 0.587 + B * 0.114;
+    };
+
     /**
      * Mega Logger
      *
-     * @param name {string}
+     * @param name {string|function}
      *     Name of the database (a-zA-Z0-9_-).
-     * @param options {Object}
+     * @param [options] {Object}
      *     See {MegaLogger.DEFAULT_OPTIONS}.
-     * @param parentLogger {string|object}
+     * @param [parentLogger] {string|object}
      *     Name of or reference to a parent logger.
      * @returns {MegaLogger}
      * @constructor
      */
     function MegaLogger(name, options, parentLogger) {
-        this.name = name;
-        if (typeof(parentLogger) === 'object') {
-            parentLogger = parentLogger.name;
-        }
-
-        if (typeof(MegaLogger.rootLogger) === "undefined" && parentLogger !== false) {
-            MegaLogger.rootLogger = new MegaLogger("", {
-                isEnabled: getStorageCacheValue('d') == 1
-            }, false);
-        }
-        this.options = options || {};
-        this.parentLogger = parentLogger || "";
-
-        for (var key in MegaLogger.DEFAULT_OPTIONS) {
-            if (MegaLogger.DEFAULT_OPTIONS.hasOwnProperty(key)
-                && !this.options.hasOwnProperty(key)) {
-                this.options[key] = MegaLogger.DEFAULT_OPTIONS[key];
-            }
-        }
-
-        return this;
+        Object.defineProperty(this, 'options', {
+            value: Object.assign(Object.create(null), MegaLogger.DEFAULT_OPTIONS, Object(parentLogger).options, options)
+        });
+        Object.defineProperty(this, 'parent', {value: parentLogger && new WeakRef(parentLogger)});
+        Object.defineProperty(this, 'name', typeof name === 'function' ? {get: name} : {value: name});
     }
+
+    if (typeof lazy === 'undefined') {
+        self.lazy = (t, p, s) => Object.defineProperty(t, p, {value: s.call(t)});
+        self.MEGAException = DOMException;
+        self.srvlog = console.error;
+    }
+
+    /** @property MegaLogger.rootLogger */
+    lazy(MegaLogger, 'rootLogger', () => {
+        return new MegaLogger("", {
+            throwOnAssertFail: true,
+            onCritical: function(msg, pkg) {
+                msg = String(msg).split(':').pop().split(/[^\w\s]/)[0].trim().substr(0, 96);
+
+                if (typeof pkg === 'string') {
+                    pkg = pkg.split('[').shift();
+
+                    if (pkg) {
+                        msg = '[' + pkg + '] ' + msg;
+                    }
+                }
+
+                if (msg.length > 7) {
+
+                    srvlog(msg, 0, 1);
+                }
+            }
+        });
+    });
 
     /**
      * Static, log levels
@@ -95,14 +126,14 @@
      * @enum {number}
      * @static
      */
-    MegaLogger.LEVELS = {
+    MegaLogger.LEVELS = freeze({
         'CRITICAL': 50,
         'ERROR': 40,
         'WARN': 30,
         'INFO': 20,
         'LOG': 10,
         'DEBUG': 0
-    };
+    });
 
     /**
      * Static, converts enum to text/label
@@ -110,22 +141,28 @@
      * @private
      * @static
      */
-    var _intToLevel = {
+    const _intToLevel = freeze({
         '50': 'CRITICAL',
         '40': 'ERROR',
         '30': 'WARN',
         '20': 'INFO',
         '10': 'LOG',
         '0': 'DEBUG'
-    };
+    });
 
     /**
-     * Static, global log registry
+     * Static level to Console API function name.
      *
      * @private
-     * @static
      */
-    var _logRegistry = {};
+    const _intLevelToCall = freeze({
+        '50': 'error',
+        '40': 'error',
+        '30': 'warn',
+        '20': 'info',
+        '10': 'log',
+        '0': 'debug'
+    });
 
     /**
      * Returns true IF the currently detected environment (browser/phantomjs/nodejs) supports console formatting or
@@ -168,38 +205,10 @@
             return d.toISOString();
         },
         'transport': function(level, args) {
-            var fn = "log";
-
-            if (level === MegaLogger.LEVELS.DEBUG) {
-                fn = "debug";
-            }
-            else if (level === MegaLogger.LEVELS.LOG) {
-                fn = "log";
-            }
-            else if (level === MegaLogger.LEVELS.INFO) {
-                fn = "info";
-            }
-            else if (level === MegaLogger.LEVELS.WARN) {
-                fn = "warn";
-            }
-            else if (level === MegaLogger.LEVELS.ERROR) {
-                fn = "error";
-            }
-            else if (level === MegaLogger.LEVELS.CRITICAL) {
-                fn = "error";
-            }
-
-            console[fn].apply(console, args);
+            console[_intLevelToCall[level] || 'log'](...args);
         },
         'isEnabled': function() {
-            return MegaLogger.rootLogger.isEnabled(); // alias
-        },
-        'muteList': function() {
-            var cached = getStorageCacheValue("muteList");
-            if (cached !== undefined) {
-                return cached;
-            }
-            return [];
+            return (self.d || getStorageCacheValue('d')) > 0;
         },
         'minLogLevel': function() {
             var cached = getStorageCacheValue("minLogLevel");
@@ -208,6 +217,11 @@
             }
             return MegaLogger.LEVELS.INFO;
         },
+        'showLogLevelTag': true,
+        'adaptiveTextColor': false,
+        'throwOnAssertFail': false,
+        'captureLastLogLine': false,
+        'supColorStyle': 'padding-left:2px;padding-right:3px;border-radius:5px',
         /**
          * Warning: This will use tons of CPU because of the trick of
          * JSON.serialize/.stringify we are using for dereferencing
@@ -231,33 +245,46 @@
      * @static
      */
     MegaLogger.getLogger = function(name, options, parentLogger) {
-        if (typeof(parentLogger) === 'object') {
-            parentLogger = parentLogger.name;
+        let logger = _logRegistry.has(name) && _logRegistry.get(name).deref();
+        if (!logger || parentLogger && !logger.parent) {
+            const _ref = typeof parentLogger === 'string' && ((name) => ({
+                get name() {
+                    return MegaLogger.getLogger(name, null, false).name;
+                }
+            }))(parentLogger);
+
+            logger = new MegaLogger(name, options, _ref || parentLogger);
+            if (_ref) {
+                Object.defineProperty(logger, '$_weakRef_', {value: _ref});
+            }
+            _logRegistry.set(name, new WeakRef(logger));
         }
 
-        if (typeof(_logRegistry[name]) === "undefined") {
-            _logRegistry[name] = new MegaLogger(name, options, parentLogger);
-        }
-        return _logRegistry[name];
+        return logger;
     };
 
 
     /**
      * Formats a breadcrumb/path for a logger (e.g. pkg:subpkg:subsubpkg)
      * @returns {string}
-     * @private
      */
-    MegaLogger.prototype._getLoggerPath = function() {
-        var path = this.name;
+    MegaLogger.prototype.getLoggerPath = function() {
+        let path = this.name, parent = this.parent;
 
-        var parent = _logRegistry[this.parentLogger];
         while (parent) {
-            if (parent.name && parent.name.length > 0) {
-                path = parent.name + ":" + path;
+            const ref = parent.deref();
+            if (!ref) {
+                path = `\u2620\u276F${path}`;
+                break;
             }
-            parent = _logRegistry[parent.parentLogger];
+            const name = ref.name || '';
+
+            if (name.length > 0) {
+                path = `${name}\u276F${path}`;
+            }
+            parent = parent.parent;
         }
-        return path;
+        return path === this.name ? path : `\u2e28${path}\u2e29`;
     };
 
     /**
@@ -267,7 +294,7 @@
      * @param args {*}
      * @private
      */
-    MegaLogger.prototype._log = function() {
+    MegaLogger.prototype._log = function(...args) {
         var options = this.options;
         var level = this._level;
 
@@ -277,82 +304,61 @@
         }
 
         if (this.isEnabled()) {
-            var logDate;
-            var logLine;
-            var logStyle = "";
-            var logSeparator = ' - ';
-            var logPath = this._getLoggerPath();
-            var levelName = _intToLevel[level] || "unknown";
-
-            var len = arguments.length;
-            var args = Array(len);
-            while (len--) {
-                args[len] = arguments[len];
-            }
+            let logStyle = "";
+            const logLine = [];
+            const logSeparator = '\u00B7';
+            const logPath = this.getLoggerPath();
+            const levelName = _intToLevel[level] || "unknown";
 
             if (options.printDate !== false) {
-                logDate = options.dateFormatter(new Date());
+                const logDate = options.dateFormatter(new Date());
                 if (logDate) {
-                    logDate += logSeparator;
+                    logLine.push(logDate, logSeparator);
                 }
             }
+            logLine.push(logPath, logSeparator);
 
-            logLine = (logDate || '') + logPath + logSeparator + levelName;
+            if (options.showLogLevelTag) {
+                logLine.push(levelName);
+            }
 
             // Append the first argument as long it's a string to support substitutions
             if (typeof args[0] === 'string') {
-                logLine += ' ' + args.shift();
-            }
-
-            // nodejs 0.12.7 doesn't support string substitutions
-            if (typeof window === 'undefined' && typeof process !== 'undefined') {
-                logLine = logLine.replace(/%[sfdi]/g, function(m) {
-                    if (m === '%s') {
-                        return String(args.shift());
-                    }
-                    else if (m === '%f') {
-                        return parseFloat(args.shift()).toFixed(6);
-                    }
-                    else {
-                        return parseInt(args.shift());
-                    }
-                });
+                logLine.push(args.shift());
             }
 
             if (options.colorsEnabled) {
-                var clr = options.levelColors[levelName];
-                logStyle = "color: white; background-color: " +  clr + "; padding-left: 1px; padding-right: 1px;";
-                logLine = "%c" + logLine;
+                const bg = options.levelColors[levelName];
+                const tc = options.adaptiveTextColor && getYIQThreshold(bg) > 127 ? '000' : 'fff';
+                logStyle = `color:#${tc}; background-color: ${bg};${options.supColorStyle || ''}`;
+                logLine[0] = `%c${logLine[0]}`;
             }
 
-            args = [logLine, logStyle].concat(args);
+            args = [logLine.join(' '), logStyle, ...args];
             if (options.dereferenceObjects) {
                 args = JSON.parse(JSON.stringify(args));
             }
-
-            var muteList = options.muteList();
-            if (muteList.length) {
-                var txtMsg = args.join(" ");
-                if (muteList.some(function(v) { return RegExp(v).test(txtMsg); })) {
-                    return;
-                }
+            if (options.captureLastLogLine) {
+                this.lastLogLine = [args[0], logStyle];
             }
 
-            options.transport.call(this, level, args);
+            options.transport(level, args);
 
             if (level === MegaLogger.LEVELS.CRITICAL && typeof(mocha) === "undefined") {
-                var text;
+                let text;
                 // convert back to plain text before sending to the server
                 if (options.colorsEnabled) {
                     args[0] = args[0].substr(2);
                     args.splice(1, 1);
                 }
-                // remove date
-                if (logDate) {
-                    args[0] = args[0].substr(args[0].indexOf(logSeparator) + logSeparator.length);
+
+                // remove everything up to the level (inc. and trailing space)
+                if (options.showLogLevelTag) {
+                    args[0] = args[0].slice(args[0].indexOf(levelName) + levelName.length + 1);
                 }
-                // remove level (and trailing space)
-                args[0] = args[0].substr(args[0].indexOf(levelName) + levelName.length + 1);
+                else {
+                    args[0] = args[0].slice(args[0].lastIndexOf(logSeparator) + logSeparator.length + 1);
+                }
 
                 // if a single item, send it as-is
                 if (args.length === 1) {
@@ -367,16 +373,15 @@
                     }
                 }
 
-                var callbackName = "on" +
-                                    levelName.substr(0, 1) +
-                                    levelName.substr(1).toLowerCase();
+                const {rootLogger} = MegaLogger;
+                const callbackName = `on${levelName[0]}${levelName.substr(1).toLowerCase()}`;
 
                 if (this.options[callbackName]) {
                     this.options[callbackName].call(this, text, logPath);
                 }
 
-                if (MegaLogger.rootLogger.options[callbackName]) {
-                    MegaLogger.rootLogger.options[callbackName].call(this, text, logPath);
+                if (this !== rootLogger && rootLogger.options[callbackName]) {
+                    rootLogger.options[callbackName].call(this, text, logPath);
                 }
             }
         }
@@ -417,6 +422,35 @@
     MegaLogger.prototype.critical = function() {
         this._level = MegaLogger.LEVELS.CRITICAL;
         this._log.apply(this, arguments);
+    };
+
+    /**
+     * Assert a condition with a log level CRITICAL
+     *
+     * @param {...*}
+     * @public
+     */
+    MegaLogger.prototype.assert = function(expr, ...args) {
+        if (!expr) {
+            this._level = MegaLogger.LEVELS.CRITICAL;
+            if (!args.length) {
+                args = ['Failed Assertion.'];
+            }
+            this._log.apply(this, args);
+
+            if (this.options.throwOnAssertFail) {
+                let ctx;
+                const message = args.map((value) => {
+                    if (typeof value !== 'string') {
+                        ctx = ctx || value;
+                        value = String(tryCatch(String, false)(value) || '');
+                    }
+                    return value[0] === '[' ? '' : value;
+                });
+
+                throw new MEGAException(message.join(' '), ctx || this, 'ValidationError');
+            }
+        }
     };
 
     /**

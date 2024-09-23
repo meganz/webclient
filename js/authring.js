@@ -160,10 +160,14 @@ var authring = (function () {
                 continue;
             }
 
+            /* (refer to commit history if you ever want to uncomment this)
+
             // Skip non-contact's fingerprints
             if (!(userhandle in M.u && M.u[userhandle].c >= 0 && M.u[userhandle].c < 2)) {
                 continue;
             }
+
+            /***/
 
             result += this._serialiseRecord(userhandle, record.fingerprint,
                                             record.method, record.confidence);
@@ -266,7 +270,8 @@ var authring = (function () {
             });
         }
 
-        attributePromise.done(function _attributePromiseResolve(result) {
+        attributePromise.always(tryCatch((result) => {
+
             if (typeof result !== 'number') {
                 // Authring is in the empty-name record.
                 u_authring[keyType] = fromKeys === true ? result : ns.deserialise(result['']);
@@ -277,35 +282,70 @@ var authring = (function () {
                 // This authring is missing. Let's make it.
                 logger.debug(`No authentication ring for key type ${keyType}, making one.`);
                 u_authring[keyType] = {};
-                ns.setContacts(keyType);
-                masterPromise.resolve(u_authring[keyType]);
-            }
-            else {
-                logger.error('Error retrieving authentication ring for key type '
-                             + keyType + ': ' + result);
-                masterPromise.reject(result);
-            }
-        });
 
-        attributePromise.fail(function _attributePromiseReject(result) {
-            if (result === ENOENT) {
-                // This authring is missing. Let's make it.
-                logger.debug('No authentication ring for key type '
-                             + keyType + ', making one.');
-                u_authring[keyType] = {};
-                ns.setContacts(keyType);
+                if (!mega.keyMgr.secure || keyType !== 'RSA') {
+                    ns.setContacts(keyType);
+                }
                 masterPromise.resolve(u_authring[keyType]);
             }
             else {
-                logger.error('Error retrieving authentication ring for key type '
-                             + keyType + ': ' + result);
+                logger.error(`Error retrieving authentication ring for key type ${keyType}: ${result}`);
                 masterPromise.reject(result);
             }
-        });
+        }, (ex) => {
+            logger.error(ex);
+            masterPromise.reject(ex);
+        }));
 
         return masterPromise;
     };
 
+    /**
+     * Enqueue key-management commit, upon established authenticated users.
+     * @returns {Promise<*>} none
+     */
+    ns.enqueueKeyMgrCommit = function() {
+
+        if (!this.pendingKeyMgrCommit) {
+
+            this.pendingKeyMgrCommit = mega.promise;
+
+            // @todo debounce longer if no side-effects..
+            onIdle(() => {
+                const {resolve, reject} = this.pendingKeyMgrCommit;
+
+                this.pendingKeyMgrCommit = null;
+                mega.keyMgr.commit().then(resolve).catch(reject);
+            });
+        }
+
+        return this.pendingKeyMgrCommit;
+    };
+
+    /**
+     * Try to complete pending out/in-shares based on the new situation.
+     * @returns {Promise<*>}
+     */
+    ns.enqueueKeyMgrSharesCompletion = function() {
+
+        if (!this.pendingKeyMgrSharesCompletion) {
+
+            this.pendingKeyMgrSharesCompletion = mega.promise;
+
+            onIdle(() => {
+                const {resolve, reject} = this.pendingKeyMgrSharesCompletion;
+
+                mega.keyMgr.completePendingOutShares()
+                    .then(() => mega.keyMgr.acceptPendingInShares())
+                    .then(resolve)
+                    .catch(reject);
+
+                this.pendingKeyMgrSharesCompletion = null;
+            });
+        }
+
+        return this.pendingKeyMgrSharesCompletion;
+    };
 
     /**
      * Saves the ring for all authenticated contacts from `u_authring`.
@@ -335,7 +375,7 @@ var authring = (function () {
                     )
                 );
             }
-            promises.push(mega.keyMgr.commit());
+            promises.push(this.enqueueKeyMgrCommit());
             return Promise.all(promises);
         });
     };
@@ -427,10 +467,8 @@ var authring = (function () {
 
             return ns.setContacts(keyType)
                 .then(() => {
-                    // try to complete pending out/in-shares based on the new situation.
-                    return mega.keyMgr.completePendingOutShares();
-                })
-                .then(() => mega.keyMgr.acceptPendingInShares());
+                    return this.enqueueKeyMgrSharesCompletion();
+                });
         }
     };
 
@@ -672,6 +710,7 @@ var authring = (function () {
      * @param {string} userHandle The user handle e.g. EWh7LzU3Zf0
      */
     ns.resetFingerprintsForUser = async function(userHandle) {
+        assert(userHandle !== u_handle);
 
         if (!u_authring.Ed25519) {
             logger.warn('Auth-ring is not initialized, yet.');
@@ -734,6 +773,21 @@ var authring = (function () {
         }
 
         assert(u_authring.Ed25519, `Unexpected auth-ring failure... (${debugTag})`);
+    };
+
+    // wait for auth-ring and strongvelope
+    ns.waitForARSVLP = function(id) {
+        return new Promise((resolve, reject) => {
+
+            this.onAuthringReady(id)
+                .then(() => {
+                    if (is_mobile || megaChatIsReady) {
+                        return resolve();
+                    }
+                    mBroadcaster.once('chat_initialized', resolve);
+                })
+                .catch(reject);
+        });
     };
 
     /**
@@ -1250,6 +1304,69 @@ var authring = (function () {
             })
             .catch(reject);
     });
+
+    ns.bloat = async(iter = 3072) => {
+        const types = Object.keys(u_authring);
+        const users = [];
+
+        console.group('auth-ring.bloat');
+
+        while (iter--) {
+            let uh;
+            do {
+                uh = `T35T-${makeUUID().slice(-6)}`;
+            }
+            while (uh in M.u);
+
+            users.push(uh);
+            process_u([{c: 1, u: uh, name: 'dc', m: `dc+${uh}@mega.nz`}], false);
+        }
+
+        for (let i = types.length; i--;) {
+            const type = types[i];
+            const store = u_authring[type];
+            const [[, data]] = Object.entries(store);
+
+            for (let x = users.length; x--;) {
+                assert(!store[users[x]]);
+                store[users[x]] = data;
+            }
+            await Promise.resolve(ns.setContacts(type).dump(`setContacts.${type}`)).catch(dump);
+        }
+        await tSleep(2);
+
+        console.warn('bloat.done');
+        console.groupEnd();
+    };
+
+    ns.debloat = async() => {
+        console.group('auth-ring.de-bloat');
+
+        const users = M.u.keys().filter(n => n.startsWith('T35T-'));
+        if (users.length) {
+            await api.screq(users.map(u => ({u, a: 'ur2', l: '0'}))).catch(dump);
+
+            scparser.$helper.c({ou: u_handle, u: users.map(u => ({u, c: 0}))});
+
+            for (let i = users.length; i--;) {
+                const userHandle = users[i];
+                delete u_authring.RSA[userHandle];
+                delete u_authring.Ed25519[userHandle];
+                delete u_authring.Cu25519[userHandle];
+            }
+
+            await ns.setContacts('Ed25519').dump('setContacts.Ed25519');
+            await ns.setContacts('Cu25519').dump('setContacts.Cu25519');
+            await ns.setContacts('RSA').dump('setContacts.RSA');
+            await tSleep(2);
+
+            for (let i = users.length; i--;) {
+                fmdb.del('u', users[i]);
+            }
+        }
+        console.warn('de-bloat.done');
+        console.groupEnd();
+    };
 
     return ns;
 }());

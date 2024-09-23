@@ -99,7 +99,7 @@ mobile.signin = {
         var $signInButton = this.$screen.find('.signin-button');
 
         // Add keyup event to the email and password fields
-        $bothFields.rebind('keyup', function(event) {
+        $bothFields.rebind('keyup change', (event) => {
 
             // Change the button to red to enable it if they have entered something in the two fields
             if ($emailField.val().length > 0 && $passwordField.val().length > 0) {
@@ -114,6 +114,10 @@ mobile.signin = {
                 // Grey it out if they have not completed one of the fields
                 $signInButton.removeClass('active');
             }
+        });
+
+        $bothFields.rebind('paste', function() {
+            onIdle(() => $(this).trigger('change'));
         });
     },
 
@@ -218,7 +222,9 @@ mobile.signin.old = {
 
         'use strict';
 
-            postLogin(email, password, pinCode, rememberMe, mobile.signin.old.completeLogin);
+        postLogin(email, password, pinCode, rememberMe)
+            .then((res) => mobile.signin.old.completeLogin(res))
+            .catch(tell);
     },
 
     /**
@@ -232,32 +238,31 @@ mobile.signin.old = {
         // Hide the loading spinner
         mobile.signin.$screen.find('.signin-button').removeClass('loading');
 
+        // @todo: Unify 2FA calls for desktop and mobile
+        // If there was a 2FA error, show a message that the PIN code was incorrect
+        if (result === EFAILED) {
+            mobile.settings.account.twofactorVerifyAction.init(false, result);
+            return false;
+        }
+
+        // Hide overlays
+        mega.ui.overlay.hide();
+
         // If the Two-Factor PIN is required
         if (result === EMFAREQUIRED) {
 
             // Load the Two-Factor PIN entry page
-            loadSubPage('twofactor/verify-login');
+            mobile.settings.account.twofactorVerifyAction.init();
             return false;
         }
 
-        // If there was a 2FA error, show a message that the PIN code was incorrect and clear the text field
-        else if (result === EFAILED) {
-            mobile.twofactor.verifyLogin.showVerificationError();
+        // Check and handle the common login errors
+        if (security.login.checkForCommonErrors(result)) {
             return false;
-        }
-
-        // Cleanup temporary login variables
-        security.login.email = null;
-        security.login.password = null;
-        security.login.rememberMe = false;
-
-        // Check they are not locked out
-        if (result === EBLOCKED) {
-            mobile.messageOverlay.show(l[730]);
         }
 
         // Otherwise if successful
-        else if (result !== false && result >= 0) {
+        if (result !== false && result >= 0) {
 
             // Set the u_type e.g. 3 is fully registered user
             u_type = result;
@@ -298,7 +303,7 @@ mobile.signin.old = {
         }
         else {
             // Otherwise they used an incorrect email or password so show an error
-            mobile.messageOverlay.show(l[16349], l[16350]);
+            msgDialog('warninga', l[16349], l[16350]);
         }
     }
 };
@@ -337,8 +342,16 @@ mobile.signin.new = {
 
         // If email confirm code is ok
         if (confirmok) {
+            // Hide 2FA overlay
+            mega.ui.overlay.hide();
+
+            // Cleanup temporary login variables
+            security.login.email = null;
+            security.login.password = null;
+            security.login.rememberMe = false;
+
             if (result === EBLOCKED) {
-                mobile.messageOverlay.show(l[730]);
+                msgDialog('warninga', l[6789], api_strerror(result));
             }
             else if (result !== false && result >= 0) {
                 u_type = result;
@@ -346,36 +359,36 @@ mobile.signin.new = {
             }
             else {
                 // Otherwise they used an incorrect email or password so show an error
-                mobile.messageOverlay.show(l[16349], l[16350]);
+                msgDialog('warninga', l[16349], l[16350]);
             }
         }
         else {
+
+            // @todo: Unify 2FA calls for desktop and mobile
+            // If there was a 2FA error, show a message that the PIN code was incorrect
+            if (result === EFAILED) {
+                mobile.settings.account.twofactorVerifyAction.init(false, result);
+                return false;
+            }
+
+            // Hide 2FA overlay
+            mega.ui.overlay.hide();
+
             // If the Two-Factor PIN is required
             if (result === EMFAREQUIRED) {
 
                 // Load the Two-Factor PIN entry page
-                loadSubPage('twofactor/verify-login');
+                mobile.settings.account.twofactorVerifyAction.init();
                 return false;
             }
 
-            // If there was a 2FA error, show a message that the PIN code was incorrect and clear the text field
-            else if (result === EFAILED) {
-                mobile.twofactor.verifyLogin.showVerificationError();
+            // Check and handle the common login errors
+            if (security.login.checkForCommonErrors(result)) {
                 return false;
-            }
-
-            // Cleanup temporary login variables
-            security.login.email = null;
-            security.login.password = null;
-            security.login.rememberMe = false;
-
-            // Check they are not locked out
-            if (result === EBLOCKED) {
-                mobile.messageOverlay.show(l[730]);
             }
 
             // Otherwise if successful
-            else if (result !== false && result >= 0) {
+            if (result !== false && result >= 0) {
 
                 // Set the u_type e.g. 3 is fully registered user
                 u_type = result;
@@ -416,7 +429,7 @@ mobile.signin.new = {
             }
             else {
                 // Otherwise they used an incorrect email or password so show an error
-                mobile.messageOverlay.show(l[16349], l[16350]);
+                msgDialog('warninga', l[16349], l[16350]);
             }
         }
     }

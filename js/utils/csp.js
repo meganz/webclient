@@ -8,14 +8,15 @@ lazy(self, 'csp', () => {
     const pid = Math.random().toString(28).slice(-6);
 
     // Cookie settings.
-    const CS_ESSENT = 1 << 0;
-    const CS_PREFER = 1 << 1;
-    const CS_ANALYT = 1 << 2;
-    const CS_ADVERT = 1 << 3;
-    const CS_THIRDP = 1 << 4;
+    const CS_ESSENT = 1 << 0;   // 1    Essential cookies
+    const CS_PREFER = 1 << 1;   // 2    Preference cookies
+    const CS_ANALYT = 1 << 2;   // 4    Analytics cookies
+    const CS_ADVERT = 1 << 3;   // 8    Advertisement cookies
+    const CS_THIRDP = 1 << 4;   // 16   Thirdparty cookies
+    const CS_SETADS = 1 << 5;   // 32   Check if ads cookies are correctly set.
 
     const bitdef = {
-        cs: {s: CS_ESSENT, r: CS_PREFER, n: CS_ANALYT, d: CS_ADVERT, h: CS_THIRDP}
+        cs: {s: CS_ESSENT, r: CS_PREFER, n: CS_ANALYT, d: CS_ADVERT, h: CS_THIRDP, e: CS_SETADS},
     };
 
     const sgValue = async(newValue, byUser) => {
@@ -45,6 +46,7 @@ lazy(self, 'csp', () => {
                     return;
                 }
 
+                u_attr['^!csp'] = String(newValue);
                 storage['csp.' + u_handle] = newValue;
                 const res = srv === newValue ? -srv : mega.attr.set('csp', newValue, -2, 1);
 
@@ -73,7 +75,7 @@ lazy(self, 'csp', () => {
         };
 
         (function check(page) {
-            if (pfid || exclude[String(page).split('/')[0]]) {
+            if (!mega.flags.ab_adse && (pfid || exclude[String(page).split('/')[0]])) {
                 return mBroadcaster.once('pagechange', check);
             }
             if ($.msgDialog) {
@@ -99,6 +101,11 @@ lazy(self, 'csp', () => {
             const chg = value && mega.user && value !== val ? value : false;
 
             value = val;
+            if (mega.flags.ab_adse && !csp.has('setad')) {
+                // reset and ask to re-configure per new requirements.
+                value = 0;
+            }
+
             if (chg || !csp.has('essential')) {
                 await canShowDialog();
                 await csp.showCookiesDialog(chg);
@@ -141,8 +148,8 @@ lazy(self, 'csp', () => {
         },
 
         showCookiesDialog: promisify((resolve, reject, step, chg) => {
-            const banner = document.querySelector('.cookie-banner');
-            const dialog = document.querySelector('.cookie-dialog');
+            let banner = document.querySelector('.cookie-banner');
+            let dialog = document.querySelector('.cookie-dialog');
 
             if (!banner || !dialog) {
                 return reject(tag);
@@ -153,8 +160,13 @@ lazy(self, 'csp', () => {
                 step = null;
             }
 
-            const $banner = $(banner);
-            const $dialog = $(dialog);
+            // Show advertisement cookies option if commercials are enabled.
+            if (mega.flags.ab_adse) {
+                dialog.querySelector('.settings-row.advertisement').classList.remove('hidden');
+            }
+
+            let $banner = $(banner);
+            let $dialog = $(dialog);
             const first = !csp.has('essential');
             const qsa = (sel, cb) => dialog.querySelectorAll(sel).forEach(cb);
 
@@ -169,18 +181,27 @@ lazy(self, 'csp', () => {
                 }
             });
 
+            const updateMegaSwitch = (toggleSwitch, isOn) => {
+                const iconNode = toggleSwitch.querySelector('.mega-feature-switch');
+
+                toggleSwitch.classList[isOn ? 'add' : 'remove']('toggle-on');
+                toggleSwitch.setAttribute('aria-checked', isOn ? 'true' : 'false');
+
+                iconNode.classList.add('sprite-fm-mono-after');
+                iconNode.classList.remove('icon-check-after', 'icon-minimise-after');
+                iconNode.classList.add(`icon-${isOn ? 'check' : 'minimise'}-after`);
+            };
+
             const showBlock = (step) => {
                 const qsa = (sel, cb) => dialog.querySelectorAll(sel).forEach(cb);
                 const all = (sel = '.current') => {
                     sel += ' .mega-switch:not(.all)';
-                    const total = dialog.querySelectorAll(sel).length;
+                    const total = dialog.querySelectorAll(`.settings-row:not(.hidden) ${sel}`).length;
 
                     if (total) {
-                        const active = dialog.querySelectorAll(`${sel}.toggle-on`).length;
+                        const active = dialog.querySelectorAll(`.settings-row:not(.hidden) ${sel}.toggle-on`).length;
 
-                        const toggleSwitch = dialog.querySelector(`${sel.split(':')[0]}.all`);
-                        toggleSwitch.classList[total === active ? 'add' : 'remove']('toggle-on');
-                        toggleSwitch.setAttribute('aria-checked', total === active ? 'true' : 'false');
+                        updateMegaSwitch(dialog.querySelector(`${sel.split(':')[0]}.all`), total === active);
                     }
                 };
 
@@ -191,15 +212,70 @@ lazy(self, 'csp', () => {
                         closeDialog();
                     }
 
+                    // Show banner in mobile sheet component
+                    if (is_mobile) {
+                        mega.ui.overlay.hide();
+                        $banner = $banner.clone(true);
+                        banner = $banner[0];
+
+                        mega.ui.sheet.show({
+                            name: 'cookie-banner',
+                            type: 'modalLeft',
+                            showClose: false,
+                            preventBgClosing: true,
+                            contents: [banner]
+                        });
+                    }
+
                     banner.classList.remove('hidden');
+
                     all('.saved');
                     all('.current');
+
+                    if (mega.flags.ab_adse) {
+                        banner.querySelector('.info .experiment').classList.remove('hidden');
+                    }
+                    else {
+                        banner.querySelector('.info .current').classList.remove('hidden');
+                    }
 
                     return false;
                 }
 
                 banner.classList.add('hidden');
-                M.safeShowDialog(tag, $dialog);
+
+                if (is_mobile) {
+                    mega.ui.sheet.hide();
+                    $dialog = $dialog.clone(true).removeClass('hidden');
+                    dialog = $dialog[0];
+                }
+
+                M.safeShowDialog(tag, () => {
+
+                    // Show dialog in mobile overlay component
+                    if (is_mobile) {
+                        mega.ui.overlay.show({
+                            name: 'cookie-settings-overlay',
+                            showClose: false,
+                            contents: [dialog],
+                        });
+                        return;
+                    }
+
+                    return $dialog;
+                });
+
+                // Add settings policy link to the last dialog option, if it does not already have them.
+                const $settingsLinks = $('.settings-links.hidden', $dialog).clone().removeClass('hidden');
+                const $lastSetting =
+                    $('.settings-row:not(.hidden) .settings-cell:not(.current):not(.saved)', $dialog).last();
+
+                if (!$('.settings-links', $lastSetting).length){
+
+                    // It's possible that it was previously added to another option, remove it from all options first.
+                    $('.settings-row .settings-links', $dialog).remove();
+                    $lastSetting.safeAppend($settingsLinks.prop('outerHTML'));
+                }
 
                 if (chg) {
                     dialog.classList.add('active-saved-cookies');
@@ -209,7 +285,7 @@ lazy(self, 'csp', () => {
                     dialog.querySelector('.use-current-settings').classList.remove('hidden');
 
                     forEachCell((type, toggle) => {
-                        toggle.classList[chg & bitdef.cs[type[1]] ? 'add' : 'remove']('toggle-on');
+                        updateMegaSwitch(toggle, chg & bitdef.cs[type[1]]);
                     }, '.saved');
 
                     if (is_mobile) {
@@ -258,21 +334,20 @@ lazy(self, 'csp', () => {
 
                 $('.mega-switch', dialog).rebind('mousedown.toggle', function() {
                     if (!this.classList.contains('disabled')) {
+                        const setOn = !this.classList.contains('toggle-on');
 
                         if (this.classList.contains('all')) {
-                            const setOn = !this.classList.contains('toggle-on');
 
                             qsa('.settings-cell.current', cell => {
                                 const toggle = cell.querySelector('.mega-switch');
 
                                 if (!toggle.classList.contains('disabled')) {
-                                    toggle.classList[setOn ? 'add' : 'remove']('toggle-on');
-                                    toggle.setAttribute('aria-checked', setOn ? 'true' : 'false');
+                                    updateMegaSwitch(toggle, setOn);
                                 }
                             });
                         }
                         else {
-                            this.classList.toggle('toggle-on');
+                            updateMegaSwitch(this, setOn);
                             all();
                         }
                     }
@@ -305,6 +380,11 @@ lazy(self, 'csp', () => {
                         closeDialog();
                     }
                     banner.classList.add('hidden');
+
+                    if (is_mobile) {
+                        mega.ui.overlay.hide();
+                        mega.ui.sheet.hide();
+                    }
                 });
                 $('.fm-dialog-overlay').off('click.csp');
                 $('*', $dialog.off()).off();
@@ -312,13 +392,18 @@ lazy(self, 'csp', () => {
 
                 value = CS_ESSENT;
                 forEachCell((type, toggle) => {
-                    if (toggle.classList.contains('toggle-on')) {
+                    if (toggle.classList.contains('toggle-on')
+                    && !toggle.closest('.settings-row').classList.contains('hidden')) {
                         value |= bitdef.cs[type[1]];
                     }
                     else {
                         value &= ~bitdef.cs[type[1]];
                     }
                 }, ev === true ? '.saved' : '.current');
+
+                if (mega.flags.ab_adse) {
+                    value |= CS_SETADS;
+                }
 
                 await sgValue(value, true).catch(dump);
                 resolve(value);
@@ -334,6 +419,13 @@ lazy(self, 'csp', () => {
 
                     eventlog(99743, JSON.stringify([1, type, value | 0, chg | 0, pid, ctx]));
                 }
+
+                // If they came from mega.io to directly edit their cookie settings, go back
+                // there after saving so they don't remain on the placeholder background page
+                if (page === 'cookiedialog') {
+                    window.location.replace('https://mega.io/cookie');
+                }
+                mBroadcaster.sendMessage('csp:settingsSaved');
             };
 
             value |= CS_ESSENT;
@@ -343,11 +435,11 @@ lazy(self, 'csp', () => {
                 step = 'step2';
             }
 
-            forEachCell((type, toggle) => toggle.classList[csp.has(type) ? 'add' : 'remove']('toggle-on'), '.current');
+            forEachCell((type, toggle) => updateMegaSwitch(toggle, csp.has(type)), '.current');
             showBlock(step || 'step1');
 
             $('.accept-cookies', $banner).rebind('click.ac', (ev) => {
-                forEachCell((type, toggle) => toggle.classList.add('toggle-on'));
+                forEachCell((type, toggle) => updateMegaSwitch(toggle, true));
                 return save(ev);
             });
             $('.cookie-settings', $banner).rebind('click.ac', () => showBlock('step2'));
@@ -365,7 +457,36 @@ lazy(self, 'csp', () => {
                     save(-0xBADF);
                 }
             }, 7654);
-        })
+        }),
+
+        showCurrentCookies: async function() {
+
+            if (!d) {
+                return;
+            }
+
+            await csp.init();
+
+            const text = {
+                1: 'essential cookies',
+                2: 'preferences cookies',
+                4: 'analytics/performance cookies',
+                8: 'advertisement cookies',
+                16: 'thirdparty cookies',
+                32: 'set advertisement cookies',
+            };
+
+            console.group('Current Cookies: ' + localStorage[`csp.${u_handle}`]);
+            for (let i = 1; i <= 32; i *= 2) {
+                if (csp.has(text[i])) {
+                    console.info(`${i} SET: ${text[i]}`);
+                }
+                else {
+                    console.info(`${i} NOT SET: ${text[i]}`);
+                }
+            }
+            console.groupEnd();
+        }
     });
 });
 

@@ -4,6 +4,8 @@ import ModalDialogsUI from '../../../ui/modalDialogs.jsx';
 import Button from './button.jsx';
 import ModeSwitch from './modeSwitch.jsx';
 import { Emoji } from '../../../ui/utils.jsx';
+import { filterAndSplitSources, PAGINATION } from './stream.jsx';
+import { MODE } from './call.jsx';
 
 export default class StreamHead extends MegaRenderMixin {
     delayProcID = null;
@@ -24,7 +26,8 @@ export default class StreamHead extends MegaRenderMixin {
     state = {
         dialog: false,
         duration: undefined,
-        banner: false
+        banner: false,
+        modeSwitch: false,
     };
 
     get fullscreen() {
@@ -49,7 +52,7 @@ export default class StreamHead extends MegaRenderMixin {
         if (this.durationRef) {
             this.durationRef.current.innerText = this.durationString;
         }
-    }
+    };
 
     /**
      * closeTooltips
@@ -117,7 +120,7 @@ export default class StreamHead extends MegaRenderMixin {
         if (members) {
             const moderators = [];
             for (const [handle, role] of Object.entries(members)) {
-                if (role === ChatRoom.MembersSet.PRIVILEGE_STATE.FULL) {
+                if (role === ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR) {
                     moderators.push(M.getNameByHandle(handle));
                 }
             }
@@ -134,23 +137,30 @@ export default class StreamHead extends MegaRenderMixin {
      */
 
     Dialog = () => {
-        const { link } = this.props;
+        const link = `${getBaseUrl()}/${this.props.chatRoom.publicLink}`;
+        const mods = this.getModerators();
         return (
             <ModalDialogsUI.ModalDialog
                 ref={this.dialogRef}
                 {...this.state}
+                mods={mods}
                 name="meeting-info-dialog"
                 title={l[18132] /* `Information` */}
                 className="group-chat-link dialog-template-main theme-dark-forced in-call-info"
                 hideOverlay={true}>
                 <section className="content">
                     <div className="content-block">
-                        <Emoji className="info">{this.getModerators()}</Emoji>
+                        <Emoji className="info">{mods}</Emoji>
                         <div className="info">{l.copy_and_share /* `Copy this link to send your invite` */}</div>
                         <div className="link-input-container">
                             <div className="mega-input with-icon box-style">
                                 <i className="sprite-fm-mono icon-link" />
-                                <input type="text" className="megaInputs" readOnly={true} value={link} />
+                                <input
+                                    type="text"
+                                    className="megaInputs"
+                                    readOnly={true}
+                                    value={link}
+                                />
                             </div>
                             <Button
                                 className="mega-button positive copy-to-clipboard"
@@ -179,6 +189,42 @@ export default class StreamHead extends MegaRenderMixin {
         );
     };
 
+    Pagination = () => {
+        const { mode, peers, page, streamsPerPage, floatDetached, chunksLength, call, onMovePage } = this.props;
+        if (mode !== MODE.THUMBNAIL || !peers) {
+            return null;
+        }
+        const { screen, video, rest } = filterAndSplitSources(peers, call);
+
+        if (screen.length + video.length + rest.length > (floatDetached ? streamsPerPage + 1 : streamsPerPage)) {
+            return (
+                <div className={`${StreamHead.NAMESPACE}-pagination`}>
+                    <Button
+                        className={`
+                            carousel-button-prev
+                            theme-dark-forced
+                            ${page !== 0 ? '' : 'disabled'}
+                        `}
+                        icon="sprite-fm-mono icon-arrow-left"
+                        onClick={() => page !== 0 && onMovePage(PAGINATION.PREV)}
+                    />
+                    <div>{page + 1}/{chunksLength}</div>
+                    <Button
+                        className={`
+                            carousel-button-next
+                            theme-dark-forced
+                            ${page < chunksLength - 1 ? '' : 'disabled'}
+                        `}
+                        icon="sprite-fm-mono icon-arrow-right"
+                        onClick={() => page < chunksLength - 1 && onMovePage(PAGINATION.NEXT)}
+                    />
+                </div>
+            );
+        }
+
+        return null;
+    };
+
     componentWillUnmount() {
         super.componentWillUnmount();
         clearInterval(this.durationInterval);
@@ -195,8 +241,16 @@ export default class StreamHead extends MegaRenderMixin {
 
     render() {
         const { NAMESPACE } = StreamHead;
+        const {
+            mode,
+            streamsPerPage,
+            chatRoom,
+            onStreamsPerPageChange,
+            onCallMinimize,
+            onModeChange,
+            setActiveElement
+        } = this.props;
         const { dialog } = this.state;
-        const { mode, chatRoom, onCallMinimize, onModeChange } = this.props;
         const SIMPLETIP = { position: 'bottom', offset: 5, className: 'theme-dark-forced' };
 
         //
@@ -206,10 +260,7 @@ export default class StreamHead extends MegaRenderMixin {
         return (
             <div
                 ref={this.headRef}
-                className={`
-                    ${NAMESPACE}
-                    ${dialog ? 'active' : ''}
-                `}>
+                className={`${NAMESPACE}`}>
                 {dialog && <this.Dialog />}
                 <div className={`${NAMESPACE}-content theme-dark-forced`}>
                     <div className={`${NAMESPACE}-info`}>
@@ -222,11 +273,17 @@ export default class StreamHead extends MegaRenderMixin {
                             ref={this.topicRef}
                             className={`
                                 stream-topic
-                                ${chatRoom.isMeeting ? 'has-meeting-link' : ''}
+                                ${chatRoom.isMeeting && chatRoom.publicLink ? 'has-meeting-link' : ''}
                             `}
-                            onClick={() => chatRoom.isMeeting && this.setState({ dialog: !dialog, banner: false })}>
+                            onClick={() =>
+                                chatRoom.isMeeting &&
+                                chatRoom.publicLink &&
+                                this.setState({ dialog: !dialog, banner: false }, () =>
+                                    setActiveElement(this.state.dialog)
+                                )
+                            }>
                             <Emoji>{chatRoom.getRoomTitle()}</Emoji>
-                            {chatRoom.isMeeting && (
+                            {chatRoom.isMeeting && chatRoom.publicLink && (
                                 <i
                                     className={`
                                         sprite-fm-mono
@@ -236,23 +293,36 @@ export default class StreamHead extends MegaRenderMixin {
                             )}
                         </div>
                     </div>
+                    <this.Pagination />
                     <div className={`${NAMESPACE}-controls`}>
-                        <ModeSwitch mode={mode} onModeChange={onModeChange} />
+                        <ModeSwitch
+                            mode={mode}
+                            streamsPerPage={streamsPerPage}
+                            onStreamsPerPageChange={onStreamsPerPageChange}
+                            onModeChange={onModeChange}
+                            setActiveElement={setActiveElement}
+                        />
                         <Button
                             className="head-control"
-                            simpletip={{ ...SIMPLETIP, label: l.minimize /* `Minimize` */}}
-                            icon="icon-min-mode"
-                            onClick={onCallMinimize}>
-                            <span>{l.minimize /* `Minimize` */}</span>
+                            simpletip={{ ...SIMPLETIP, label: this.fullscreen ? l.exit_fullscreen : l[17803] }}
+                            icon={this.fullscreen ? 'icon-fullscreen-leave' : 'icon-fullscreen-enter'}
+                            onClick={this.toggleFullscreen}>
+                            <span>
+                                {this.fullscreen ?
+                                    l.exit_fullscreen /* `Exit full screen` */ :
+                                    l[17803] /* `Full screen` */
+                                }
+                            </span>
                         </Button>
                         <Button
                             className="head-control"
-                            simpletip={{ ...SIMPLETIP, label: this.fullscreen ? l[22895] : l[17803] }}
-                            icon={`${this.fullscreen ? 'icon-fullscreen-leave' : 'icon-fullscreen-enter'}`}
-                            onClick={this.toggleFullscreen}>
-                            <span>
-                                {this.fullscreen ? l[22895] /* `Exit fullscreen` */ : l[17803] /* `Fullscreen` */}
-                            </span>
+                            simpletip={{ ...SIMPLETIP, label: l.minimize /* `Minimize` */}}
+                            icon="icon-call-min-mode"
+                            onClick={() => {
+                                onCallMinimize();
+                                eventlog(500305);
+                            }}>
+                            <div>{l.minimize /* `Minimize` */}</div>
                         </Button>
                     </div>
                 </div>

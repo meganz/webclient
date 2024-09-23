@@ -9,6 +9,11 @@ RepayPage.prototype.initPage = function() {
 
     // if mobile we view the related header for top-mobile.html and hide navigation div of desktop
     if (is_mobile) {
+
+        if (mega.ui && mega.ui.header) {
+            mega.ui.header.update();
+        }
+
         $('.mobile.bus-repay').removeClass('hidden');
         $('.mobile.fm-header').addClass('hidden');
         $('.mobile.fm-header.fm-hr').removeClass('hidden');
@@ -38,17 +43,20 @@ RepayPage.prototype.initPage = function() {
     if (!u_attr.pf && (!u_attr['%name'] || !u_attr['%email'])) {
 
         Promise.allSettled([
-            u_attr['%name'] ? Promise.resolve({ v: u_attr['%name'] }) : mega.attr.get(u_attr.b.bu, '%name', -1),
-            u_attr['%email'] ? Promise.resolve({ v: u_attr['%email'] }) : mega.attr.get(u_attr.b.bu, '%email', -1)
-        ]).then((result) => {
-            // To reduce complexity of encapsulating all of below code inside the "then" handler.
-            if (result[0].status === 'fulfilled') {
-                u_attr['%name'] = result[0].value.v || from8(base64urldecode(result[0].value));
-            }
-            if (result[1].status === 'fulfilled') {
-                u_attr['%email'] = result[1].value.v || from8(base64urldecode(result[1].value));
-            }
+            u_attr['%name'] || mega.attr.get(u_attr.b.bu, '%name', -1),
+            u_attr['%email'] || mega.attr.get(u_attr.b.bu, '%email', -1)
+        ]).then(([{value: name}, {value: email}]) => {
+
+            name = u_attr['%name'] = name && from8(base64urldecode(name) || name) || '';
+            email = u_attr['%email'] = email && from8(base64urldecode(email) || email) || u_attr.email;
+
+            assert(name && email, `Invalid account state (${name}:${email})`);
+
             mySelf.initPage();
+
+        }).catch((ex) => {
+            loadingDialog.hide();
+            msgDialog('warninga', l[135], l[47], ex);
         });
         return false;
     }
@@ -88,7 +96,7 @@ RepayPage.prototype.initPage = function() {
                     loadingDialog.show();
 
                     // Downgrade the user to Free
-                    M.req({ a: 'urpf', r: 1 })
+                    api.req({a: 'urpf', r: 1})
                         .catch(dump)
                         .finally(() => {
 
@@ -138,28 +146,6 @@ RepayPage.prototype.initPage = function() {
             }
             $('.bus-reg-radio', $paymentBlock).removeClass('radioOn').addClass('radioOff');
             $me.removeClass('radioOff').addClass('radioOn');
-        });
-
-
-    // event handler for clicking on terms anchor
-    $('.bus-reg-agreement.mega-terms .radio-txt a', $leftSection)
-        .rebind('click', function termsClickHandler() {
-            if (!is_mobile) {
-                bottomPageDialog(false, 'terms', false, true);
-            }
-            else {
-                var wentOut = false;
-                if (window.open) {
-                    var cutPlace = location.href.indexOf('/registerb');
-                    var myHost = location.href.substr(0, cutPlace);
-                    myHost += '/terms';
-                    wentOut = window.open(myHost, 'MEGA LIMITED TERMS OF SERVICE');
-                }
-                if (!wentOut) {
-                    loadSubPage('terms');
-                }
-            }
-            return false;
         });
 
     $('.bus-reg-agreement.mega-terms .checkdiv', $leftSection)
@@ -219,7 +205,10 @@ RepayPage.prototype.initPage = function() {
                         </div></div>`;
 
         if (!list.length) {
-            return failureExit(l[20431]);
+            if (u_attr.b) {
+                return failureExit(l[20431]);
+            }
+            return failureExit(l.no_payment_providers);
         }
 
         let paymentGatewayToAdd = '';
@@ -435,7 +424,8 @@ RepayPage.prototype.initPage = function() {
                 }
             }
 
-            if (res.nb && futureAmount) {
+            // Show the previous & current invoice rows for Pro Flexi as well
+            if ((res.nb || u_attr.pf) && futureAmount) {
                 const $futurePaymentRow = rowTemplate.clone();
                 nbOfUsers = res.nb;
 
@@ -486,31 +476,18 @@ RepayPage.prototype.initPage = function() {
 
             business.getListOfPaymentGateways(false).always(fillPaymentGateways);
 
-            // Change to the getProFlexiPlanInfo function if we are Pro Flexi
-            if (u_attr && u_attr.pf) {
-                business.getProFlexiPlanInfo().then(function planInfoReceived(st, info) {
-                    mySelf.planInfo = info;
+            business.getBusinessPlanInfo(false, u_attr.pf)
+                .then((plan) => {
+                    mySelf.planInfo = plan;
                     mySelf.planInfo.pastInvoice = res.inv[0];
-                    mySelf.planInfo.currInvoice = { et: res.et || 0, t: res.t };
+                    mySelf.planInfo.currInvoice = {et: res.et || 0, t: res.t};
                     mySelf.userInfo = {
                         fname: '',
                         lname: '',
                         nbOfUsers: res.nb || 0
                     };
-                });
-            }
-            else {
-                business.getBusinessPlanInfo(false).done(function planInfoReceived(st, info) {
-                    mySelf.planInfo = info;
-                    mySelf.planInfo.pastInvoice = res.inv[0];
-                    mySelf.planInfo.currInvoice = { et: res.et || 0, t: res.t };
-                    mySelf.userInfo = {
-                        fname: '',
-                        lname: '',
-                        nbOfUsers: res.nb || 0
-                    };
-                });
-            }
+                })
+                .catch(tell);
         });
     });
 };

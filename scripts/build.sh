@@ -39,15 +39,29 @@ fi
 cat $build_file \
     | $SED_BINARY -E 's!_babel_runtime_helpers_(\w+)__WEBPACK_IMPORTED_MODULE_!_\1!g' \
     | $SED_BINARY 's!__WEBPACK_IMPORTED_MODULE_!!g' \
-    | $SED_BINARY 's!___default\b!!g' \
+    | $SED_BINARY 's!__unused_webpack_module!_!g' \
+    | $SED_BINARY 's!__unused_webpack_!!g' \
+    | $SED_BINARY 's!__webpack_exports__!EXP_!g' \
+    | $SED_BINARY 's!__webpack_require__!REQ_!g' \
+    | $SED_BINARY 's!external_React_default!REaCt!g' \
+    | $SED_BINARY -E 's!\bexternal_+|_+default\b!!g' \
     | $SED_BINARY -E 's!.*webpackMissingModule.*!!g' \
     | $SED_BINARY -E 's!_?inheritsLoose(_default|[0-9]+)\(\)!inherits!g' \
     | $SED_BINARY -E 's!_?assertThisInitialized(_default|[0-9]+)\(\)!!g' \
+    | $SED_BINARY -E 's!(cache__\s*=|exports\s*:)\s*\{\}!\1Object.create(null)!g' \
+    | $SED_BINARY -E 's!/\*+\*/\s?!!g' \
     | $SED_BINARY -E 's!/\*[^*]+\*/\s*!!g' > $temp_file1
 [[ $? -ne 0 ]] && exit 15
 
 mv $temp_file1 $build_file
 [[ $? -ne 0 ]] && exit 23
+
+echo -n "Applying ESLint fixes, please be patient..."
+time ./node_modules/.bin/eslint --no-eslintrc --quiet --fix --no-ignore --env es2018 \
+    --rule "object-shorthand:2,dot-notation:2,no-var:2,no-extra-parens:2" \
+    --rule "prefer-const:2,prefer-arrow-callback:2,prefer-destructuring:2" \
+    --rule "prefer-spread:2,prefer-template:2,no-unneeded-ternary:2" \
+    ./$build_file >/dev/null
 
 if [[ "$1" == "--fix" ]]; then
     git commit -a -m "chat/bundle.js update"

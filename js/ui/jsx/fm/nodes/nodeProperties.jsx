@@ -30,11 +30,12 @@ export class NodeProperties {
         assert(node.h, 'missing handle for node');
 
         if (NodeProperties._globalCleanupTimer) {
-            clearTimeout(NodeProperties._globalCleanupTimer);
+            NodeProperties._globalCleanupTimer.abort();
         }
-        NodeProperties._globalCleanupTimer = setTimeout(() => {
-            NodeProperties.cleanup(0);
-        }, 120e3);
+        (NodeProperties._globalCleanupTimer = tSleep(120))
+            .then(() => {
+                NodeProperties.cleanup(0);
+            });
 
         let nodeProps;
         if (!NodeProperties._cache.has(node.h)) {
@@ -179,6 +180,10 @@ export class NodeProperties {
         let node = this.node;
 
         lazy(this, 'title', () => {
+            if (missingkeys[node.h]) {
+                /* `undecryptable file/folder` */
+                return node.t ? l[8686] : l[8687];
+            }
             return M.getNameByHandle(node.h);
         });
         lazy(this, 'classNames', () => {

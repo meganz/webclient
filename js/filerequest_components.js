@@ -150,6 +150,7 @@ lazy(mega, 'fileRequestUI', () => {
                 namespace: ''
             };
 
+            this.action = is_mobile ? 'tap' : 'click';
             this.setOptions(options);
             this.addEventHandlers();
         }
@@ -160,12 +161,11 @@ lazy(mega, 'fileRequestUI', () => {
                 namespace = `.${namespace}`;
             }
 
-            let action = 'click';
-            if (is_mobile) {
-                action = 'tap';
-            }
-
             const clickHandler = (evt) => {
+                if (is_mobile && !this.options.doNotValidate && !validateUserAction()) {
+                    return false;
+                }
+
                 const stopPropagation = typeof this.options.propagate !== 'undefined' && !this.options.propagate;
                 const inputElement = evt.target;
                 const $input = $(inputElement);
@@ -179,10 +179,10 @@ lazy(mega, 'fileRequestUI', () => {
             };
 
             if (this.options.onOff) {
-                this.$input.off(`${action}`).on(`${action}`, clickHandler);
+                this.$input.off(`${this.action}`).on(`${this.action}`, clickHandler);
             }
             else {
-                this.$input.rebind(`${action}${namespace}`, clickHandler);
+                this.$input.rebind(`${this.action}${namespace}`, clickHandler);
             }
 
             return namespace;
@@ -209,13 +209,7 @@ lazy(mega, 'fileRequestUI', () => {
         }
 
         off() {
-            const namespace = this.options.namespace || '';
-            if (namespace.length) {
-                this.$input.off(`${namespace}`);
-                return;
-            }
-
-            this.$input.off();
+            this.$input.off(`.${this.options.namespace}` || null);
         }
     }
 
@@ -237,6 +231,10 @@ lazy(mega, 'fileRequestUI', () => {
 
         setOnClick() {
             this.eventOnClick(($input) => {
+                if (M.isInvalidUserStatus()) {
+                    return;
+                }
+
                 const optionCallback = this.options.callback;
                 if (!optionCallback) {
                     return;
@@ -293,16 +291,16 @@ lazy(mega, 'fileRequestUI', () => {
                 }
 
                 const {
-                    name, title, description, theme
+                    name, title, description, theme, pupHandle
                 } = optionCallback($input);
 
-                const url = generator
-                    .generateUrlPreview(
-                        name,
-                        title,
-                        description,
-                        theme
-                    );
+                const url = generator.generateUrlPreview(
+                    name,
+                    title,
+                    description,
+                    theme,
+                    pupHandle
+                );
 
                 if (url) {
                     generator
@@ -332,6 +330,9 @@ lazy(mega, 'fileRequestUI', () => {
 
     class CloseMobileComponent extends ButtonComponent {
         constructor($selector, options) {
+
+            options.doNotValidate = true;
+
             super($selector, options);
             this.setOnClick();
         }
@@ -435,8 +436,13 @@ lazy(mega, 'fileRequestUI', () => {
 
             if (validationRules.limit) {
                 const limitOption = validationRules.limit;
-                const validationMessage = limitOption.message;
+                let validationMessage = limitOption.message;
                 const maxLength = limitOption.max;
+                const { formatMessage } = limitOption;
+
+                if (formatMessage) {
+                    validationMessage = mega.icu.format(validationMessage, maxLength);
+                }
 
                 if (this.getValue() && this.getValue().length > maxLength) {
                     if (validationMessage) {
@@ -488,6 +494,14 @@ lazy(mega, 'fileRequestUI', () => {
                 .val(newValue)
                 .trigger(`input${namespace}`);
         }
+
+        reset() {
+            this.setValue('');
+            this.resetErrorMessage();
+            this.getInput()
+                .closest(megaInputSelector)
+                .removeClass(activeClass);
+        }
     }
 
     class ValidatableMobileComponent extends ValidatableInputComponent {
@@ -519,33 +533,30 @@ lazy(mega, 'fileRequestUI', () => {
             );
 
             this.$selectFolderButton =  new ButtonComponent($('.file-request-select-folder', this.$dialog));
+            this.nodeHandle = null;
         }
 
-        init(options) {
+        init() {
             this.$inputFolder.disable();
-            this.$selectFolderButton.disable();
-            this.$inputFolder.setValue('');
+            this.$selectFolderButton.enable();
             this.$inputFolder
                 .getInput()
+                .removeClass('disabled')
                 .closest(megaInputSelector)
-                .removeClass(activeClass);
+                .addClass(activeClass);
 
-            const fromCreate = options && options.dialog === false;
-            if (fromCreate) {
-                this.$selectFolderButton.enable();
-                this.$inputFolder
-                    .getInput()
-                    .removeClass('disabled')
-                    .closest(megaInputSelector)
-                    .addClass(activeClass);
-            }
+            this.nodeHandle = null;
         }
 
         setFolder(folderName) {
             this.$inputFolder.setValue(folderName);
         }
 
-        addEventHandlers(options) {
+        setNodeHandle(nodeHandle) {
+            this.nodeHandle = nodeHandle;
+        }
+
+        addEventHandlers(options = false) {
             const namespace = options && options.namespace || '';
             this.$selectFolderButton.setOptions({
                 namespace: namespace,
@@ -554,19 +565,20 @@ lazy(mega, 'fileRequestUI', () => {
                         if ($input.is(':disabled')) {
                             return false;
                         }
-
                         closeDialog();
-                        openNewFileRequestDialog({
-                            post: (selectedNodeHandle) => {
-                                if (options && typeof options.post === 'function') {
-                                    options.post(selectedNodeHandle);
-                                }
-                            }
-                        });
+
+                        const {post} = options;
+                        if (typeof post === 'function') {
+                            openNewFileRequestDialog(this.nodeHandle).then(post).catch(dump);
+                        }
                         return false;
                     }
                 },
             });
+        }
+
+        off() {
+            this.$selectFolderButton.off();
         }
     }
 

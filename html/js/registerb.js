@@ -388,27 +388,6 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
         updateBreakdown(users, quota, userFare, extraFares.storageFare);
     };
 
-    // event handler for clicking on terms anchor
-    $('.bus-reg-agreement.mega-terms .radio-txt a', $pageContainer)
-        .rebind('click', function termsClickHandler() {
-            if (!is_mobile) {
-                bottomPageDialog(false, 'terms', false, true);
-            }
-            else {
-                var wentOut = false;
-                if (window.open) {
-                    var cutPlace = location.href.indexOf('/registerb');
-                    var myHost = location.href.substr(0, cutPlace);
-                    myHost += '/terms';
-                    wentOut = window.open(myHost, 'MEGA LIMITED TERMS OF SERVICE');
-                }
-                if (!wentOut) {
-                    loadSubPage('terms');
-                }
-            }
-            return false;
-        });
-
     // event handler for check box
     $('.bus-reg-agreement', $pageContainer).rebind(
         'click.suba',
@@ -610,7 +589,7 @@ BusinessRegister.prototype.initPage = function(preSetNb, preSetName, preSetTel, 
         var business = new BusinessAccount();
 
         business.getListOfPaymentGateways(false).always(fillPaymentGateways);
-        business.getBusinessPlanInfo(false).done(function planInfoReceived(st, info) {
+        business.getBusinessPlanInfo(false).then((info) => {
             mySelf.planPrice = Number.parseFloat(info.p);
             mySelf.planInfo = info;
             mySelf.minUsers = info.minu || 3;
@@ -650,7 +629,7 @@ BusinessRegister.prototype.doRegister = function(nbusers, cname, fname, lname, t
             email, pass, isUpgrade);
         settingPromise.always(function settingAttrHandler(st, res) {
             if (st === 0) {
-                if (res[1] && res[1] === EEXIST) {
+                if (res === EEXIST) {
                     msgDialog(
                         'warninga',
                         l[1578],
@@ -670,7 +649,7 @@ BusinessRegister.prototype.doRegister = function(nbusers, cname, fname, lname, t
                     );
                 }
                 else {
-                    msgDialog('warninga', l[1578], l[19508], '', function() {
+                    msgDialog('warninga', l[1578], l[19508], res < 0 ? api_strerror(res) : res, () => {
                         loadingDialog.hide();
                         mySelf.initPage(nbusers, cname, tel, fname, lname, email);
                     });
@@ -734,28 +713,19 @@ BusinessRegister.prototype.processPayment = function(payDetails, businessPlan) {
     "use strict";
     loadingDialog.show();
 
-    var mySelf = this;
-
-    const finalizePayment = (st, res, saleIds) => {
-        if (st === 0) {
-            msgDialog('warninga', '', l[19511], '', () => {
-                loadingDialog.hide();
-                addressDialog.closeDialog();
-            });
-            return;
-        }
+    new BusinessAccount().doPaymentWithAPI(payDetails, businessPlan).then(({result, saleId}) => {
 
         const redirectToPaymentGateway = () => {
             const isStrip = businessPlan.usedGatewayId ?
                 (businessPlan.usedGatewayId | 0) === addressDialog.gatewayId_stripe : false;
 
-            addressDialog.processUtcResult(res, isStrip, saleIds);
+            addressDialog.processUtcResult(result, isStrip, saleId);
         };
 
         let showWarnDialog = false;
         let payMethod = '';
 
-        if (mySelf.hasAppleOrGooglePay) {
+        if (this.hasAppleOrGooglePay) {
 
             const purchases = M.account.purchases;
             for (let p in purchases) {
@@ -783,11 +753,9 @@ BusinessRegister.prototype.processPayment = function(payDetails, businessPlan) {
         else {
             redirectToPaymentGateway();
         }
-    };
+    }).catch((ex) => {
 
-    // at this point i know BusinessAccount class is required before
-    var business = new BusinessAccount();
-    var payingPromise = business.doPaymentWithAPI(payDetails, businessPlan);
+        msgDialog('warninga', '', l[19511], ex < 0 ? api_strerror(ex) : ex, () => addressDialog.closeDialog());
 
-    payingPromise.always(finalizePayment);
+    }).finally(() => loadingDialog.hide());
 };

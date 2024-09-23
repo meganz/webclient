@@ -60,6 +60,7 @@
     .password-status-icon,
     .login-forgot-password,
     .checkboxOn::after,
+    .checkboxOn::before,
     .checkboxOff::after,
     .contains-value .top-clear-button,
     .account-history-drop-items.active,
@@ -88,18 +89,6 @@
     .reg-st5-info-icon {
         background-image: url(../images/mega/register-big-sprite@2x.png);
         background-size: 200px auto;
-    }
-    .terms-agent-info {
-        background-image: url(../images/mega/terms-icons@2x.png);
-        background-size: 14px auto;
-    }
-    .team-social-icon {
-        background-image: url(../images/mega/about-sprite@2x.png);
-        background-size: 72px auto;
-    }
-    .privacy-company-icon, .privacy-company-bott .st-quote-left, .privacy-company-bott .st-quote-right {
-        background-image: url(../images/mega/privacy-sprite@2x.png);
-        background-size: 130px auto;
     }
     .widget-circle, .widget-arrows, .widget-icon, .widget-arrow {
         background-image: url(../images/mega/widget-progress@2x.png);
@@ -241,28 +230,9 @@
         background-image: url(../images/mega/top-sprite@2x.png);
         background-size: 38px auto;
     }
-    .block-view-file-type,
-    .dragger-icon,
-    .export-icon,
-    .new-download-file-icon,
-    .share-folder-icon div,
-    .transfer-filetype-icon,
-    .medium-file-icon,
-    .shared-folder-icon,
-    table.shared-with-me .shared-folder-icon,
-    .shared-details-icon,
-    .contact-share-notification::before {
-        background-image: url(../images/mega/files-icons@2x.png);
-        background-size: 399px 7652px;
-    }
     .download.big-icon, .fm-dialog-close.big, .megasync-img::before, button.megasync-slider::after {
         background-image: url(../images/mega/download-dialog@2x.png);
         background-size: 853px auto;
-    }
-    .properties-file-icon i,
-    .mega-dialog.properties-dialog .properties-file-icon i {
-        background-image: url(../images/mega/properties-sprite@2x.png);
-        background-size: 589px 8800px;
     }
     .drag-n-drop.header, .drag-n-drop hr, .drag-n-drop.info-block i {
         background-image: url(../images/mega/overlay-sprite@2x.png);
@@ -402,9 +372,6 @@
     .arrow.desc.grid-header-star,
     .arrow.asc.grid-header-star,
     .grid-status-icon.star,
-    .file-status-icon.star,
-    .taken-down .file-status-icon,
-    .undecryptable .file-status-icon,
     .clear-transfer-icon::after,
     .fm-breadcrumbs.has-next-button,
     .create-folder-size-icon,
@@ -521,10 +488,5 @@
     .context-sprite, i.context-sprite {
         background-image: url(../images/mega/context-sprite@2x.png);
         background-size: 217px auto;
-    }
-
-    .bottom-page.about-sprite, i.bottom-page.about-sprite {
-        background-image: url(../images/mega/about-sprite@2x.png) !important;
-        background-size: 525px auto;
     }
 }

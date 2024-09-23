@@ -1,0 +1,303 @@
+/* S4 list pages */
+
+/* S4 list common styles */
+.s4-grid-view {
+    height: 100%;
+    min-height: 280px;
+    overflow: hidden;
+    z-index: 200;
+    border-top: 1px solid var(--surface-grey-2);
+    background: no-repeat center 33px linear-gradient(90deg, var(--stroke-grey-2), var(--stroke-grey-2));
+    background-size: 100% 1px;
+}
+
+.s4-grid-view .sticky-header-table-container {
+    height: 100%;
+    box-sizing: border-box;
+    min-height: 100%;
+    min-width: 100%;
+    padding: 0 26px;
+    position: relative;
+    display: inline-block;
+    vertical-align: top;
+}
+
+.s4-info-section .sticky-header-table-container {
+    padding: 0 24px;
+}
+
+.s4-grid-view .s4-grid-table.medium-list {
+    border-collapse: separate;
+    margin: 0 auto;
+    width: 100%;
+    table-layout: fixed;
+}
+
+.s4-grid-view .s4-grid-table th {
+    padding-top: 9px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.s4-grid-view .s4-grid-table td {
+    padding-top: 0;
+}
+
+.s4-grid-view .s4-grid-table th,
+.s4-grid-view .s4-grid-table td {
+    color: var(--text-color-medium);
+    font: var(--text-body2);
+    white-space: nowrap;
+    padding-bottom: 0;
+}
+
+.s4-grid-view .s4-grid-table tr td:first-child::before {
+    left: -10px;
+}
+.s4-grid-view .s4-grid-table tr td:last-child::before {
+    right: -10px;
+}
+
+.s4-grid-view .s4-grid-table tr th:first-child {
+    width: 0;
+    padding: 0;
+}
+
+.s4-grid-view .s4-grid-table tr th:first-child,
+.s4-grid-view .s4-grid-table tr th:last-child
+.s4-grid-view .s4-grid-table tr td:first-child,
+.s4-grid-view .s4-grid-table tr td:last-child {
+    overflow: visible;
+}
+
+.s4-grid-view .s4-grid-table tr:hover td:first-child::before,
+.s4-grid-view .s4-grid-table tr.ui-selected td:first-child::before {
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+}
+
+.s4-grid-view .s4-grid-table.data-table tr:not(.ui-selected):hover td::before {
+    border-color: var(--surface-grey-3);
+}
+
+.s4-users-management-scroll.sticky-header-table-container.ps .ps__rail-y,
+.s4-groups-management-scroll.sticky-header-table-container.ps .ps__rail-y,
+.s4-keys-management-scroll.sticky-header-table-container.ps .ps__rail-y,
+.s4-policies-management-scroll.sticky-header-table-container.ps .ps__rail-y {
+    margin-top: 34px;
+}
+
+.s4-grid-table thead th:not(:last-child):hover::before {
+    content: '';
+    position: absolute;
+    right: 7px;
+    height: 20px;
+    width: 1px;
+    background-color: var(--stroke-mid-grey);
+    cursor: col-resize;
+    bottom: 0;
+}
+
+.s4-grid-view .s4-grid-table thead .grid-view-resize {
+    cursor: col-resize;
+    width: 16px;
+    position: absolute;
+    right: 0;
+}
+.rtl .s4-grid-view .s4-grid-table thead .grid-view-resize {
+    right: auto;
+    left: 0;
+}
+
+.s4-grid-view .s4-grid-table th.no-sortable .arrow {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: auto;
+    height: 24px;
+}
+
+.s4-grid-table tr td:nth-child(2) span {
+    display: block;
+}
+
+.s4-grid-table tr span {
+    vertical-align: middle;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    max-width: 100%;
+}
+
+.s4-grid-table tr span.simpletip {
+    width: 100%;
+}
+
+.s4-grid-table tr span.simpletip span {
+    vertical-align: bottom;
+}
+
+.s4-grid-table tr span.space-for-icon-right {
+    max-width: calc(100% - 24px);
+}
+
+.s4-grid-table tr:nth-child(1) td,
+.s4-grid-table tr:nth-child(2) td,
+.s4-grid-table tr td,
+.s4-grid-table tr th,
+.s4-grid-table tr th:first-child {
+    border-top: 0;
+    border-bottom: 1px solid var(--stroke-grey-2);
+}
+
+.s4-grid-table tr + tr td::after,
+.s4-grid-table tr th::after {
+    position: unset;
+}
+
+.s4-grid-view tr td:nth-child(2) {
+    color: var(--text-color-high);
+    font: var(--text-body1);
+}
+
+.s4-grid-view td.with-icons span {
+    display: inline-block;
+    -webkit-margin-end: 8px;
+    margin-inline-end: 8px;
+    max-width: calc(100% - 40px);
+    overflow: hidden;
+    vertical-align: middle;
+    text-overflow: ellipsis;
+}
+
+.s4-grid-view td.with-icons button.mega-button {
+    --mask-color: var(--icon-rest);
+    margin: 0;
+}
+
+.s4-grid-view td.with-icons button i {
+    opacity: 0;
+}
+
+.s4-grid-view tr:hover td.with-icons button i,
+.s4-grid-view tr.active td.with-icons button i {
+    opacity: 1;
+}
+
+.s4-grid-view td.with-icons button.action:hover {
+    background: none;
+}
+
+
+/* End: S4 list common styles */
+
+/* S4 bucket container - list */
+.files-grid-view.fm.s4-bucket-content .column-settings,
+.files-grid-view.fm.s4-container-content .column-settings {
+    top: 8px;
+}
+.files-grid-view.s4-container-content .filetype-bucket-icon {
+    position: absolute;
+    top: 4px;
+}
+
+/* End: S4 bucket container - list */
+
+/* S4 keys page - list */
+.s4-keys-management-scroll .s4-grid-table td.secret-key input {
+    width: calc(100% - 72px);
+}
+
+.s4-keys-management-scroll .s4-grid-table td.secret-key input[type="text"] {
+    text-overflow: ellipsis;
+}
+
+.s4-keys-management-scroll .s4-grid-table .secret-key-value {
+    background: transparent;
+    vertical-align: middle;
+    border: 0;
+    color: var(--text-color-medium);
+    cursor: auto;
+    font: var(--text-body1);
+    padding: 0;
+}
+
+.s4-keys-management-scroll .s4-grid-table .toggle-vis {
+     -webkit-margin-end: 0;
+    margin-inline-end: 0;
+}
+
+.s4-keys-management-scroll .s4-grid-table td.status i {
+    display: inline-block;
+    -webkit-margin-end: 4px;
+    margin-inline-end: 4px;
+    vertical-align: middle;
+}
+.s4-keys-management-scroll .s4-grid-table td.status i.icon-active {
+    --mask-color: var(--secondary-green);
+}
+.s4-keys-management-scroll .s4-grid-table td.status i.icon-disabled-filled {
+    --mask-color: var(--secondary-red);
+    opacity: 1;
+}
+
+/* End: S4 keys page - list */
+
+/* S4 users page - list */
+.s4-users-management-scroll .s4-grid-table .s4-user-name .avatar-wrapper {
+    border-radius: 2px;
+    height: 24px;
+    width: 24px;
+    font: var(--text-body2);
+    line-height: 27px;
+    flex: none;
+}
+.s4-users-management-scroll .s4-grid-table td.s4-user-name span {
+    line-height: 24px;
+    -webkit-padding-start: 8px;
+    padding-inline-start: 8px;
+}
+
+/* End: S4 users page - list */
+
+/* S4 groups page - list */
+.s4-groups-management-scroll .s4-grid-table .s4-group-arn span {
+    height: 24px;
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 24px;
+}
+
+/* End: S4 groups page - list */
+
+
+/* End: S4 policies page - list */
+
+/* S4 keys page - list */
+.s4-keys-management-scroll .s4-grid-table .secret-key-value,
+.s4-user-keys-management-scroll .s4-grid-table .secret-key-value {
+    background: transparent;
+    border: 0;
+    color: var(--text-color-medium);
+    cursor: auto;
+    font: var(--text-body1);
+    padding: 0;
+    vertical-align: middle;
+    width: calc(100% - 68px);
+}
+
+.s4-grid-table td.secret-key input[type="text"] {
+    vertical-align: middle;
+    text-overflow: ellipsis;
+}
+
+
+/* End: S4 keys page - list */
+
+/* S4 tabs */
+.s4-grid-view .s4-tabs-bl {
+    padding-top: 15px;
+}
+
+/* End: S4 tabs */
+
+/* End: S4 list pages */

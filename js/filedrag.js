@@ -37,7 +37,7 @@
     function addUpload(files, emptyFolders) {
         var straight = $.doStraightUpload || Object(window.fmconfig).ulddd || M.currentrootid === M.RubbishID;
 
-        console.assert(page === 'start' || window.fminitialized, 'check this...');
+        console.assert(M.isFileDragPage(page) || window.fminitialized, 'check this...');
 
         if (M.InboxID && M.currentrootid && (M.currentrootid === M.InboxID
             || M.getNodeRoot(M.currentdirid.split('/').pop()) === M.InboxID)) {
@@ -46,7 +46,7 @@
             return false;
         }
 
-        if (page === 'start' || straight) {
+        if (M.isFileDragPage(page) || straight) {
             M.addUpload(files, false, emptyFolders);
         }
         else {
@@ -65,7 +65,7 @@
             filedrag_u = [];
             filedrag_paths = Object.create(null);
 
-            if (page === 'start') {
+            if (M.isFileDragPage(page)) {
                 start_upload();
             }
         }
@@ -326,6 +326,13 @@
 
         useMegaSync = -1;
 
+        const elem = e.target;
+        const isFolderUpload = elem.hasAttribute('webkitdirectory') || elem.hasAttribute('mozdirectory')
+            || elem.hasAttribute('msdirectory') || elem.hasAttribute('odirectory') || elem.hasAttribute('directory');
+
+        // Log that User selected a folder (or file) for upload from the file explorer
+        eventlog(isFolderUpload ? 500010 : 500012);
+
         var currentDir = M.currentCustomView ? M.currentCustomView.nodeID : M.currentdirid;
 
         if ($.awaitingLoginToUpload) {
@@ -354,7 +361,7 @@
             return false;
         }
 
-        if (page === 'start' && !is_mobile) {
+        if (M.isFileDragPage(page) && !is_mobile) {
             console.assert(typeof fm_addhtml === 'function');
             if (typeof fm_addhtml === 'function') {
                 fm_addhtml();
@@ -363,10 +370,8 @@
 
         var dataTransfer = Object(e.dataTransfer);
         var files = e.target.files || dataTransfer.files;
-        if (!files || files.length == 0) {
-            if (!is_chrome_firefox || !dataTransfer.mozItemCount) {
-                return false;
-            }
+        if (!files || !files.length) {
+            return false;
         }
 
         if (localStorage.testWebGL) {
@@ -421,7 +426,7 @@
             return MegaDexie.import(files[0]).dump();
         }
 
-        if (window.d && (e.ctrlKey || e.metaKey) && MediaInfoLib.isFileSupported(files[0])) {
+        if ((e.ctrlKey || e.metaKey) && MediaInfoLib.isFileSupported(files[0])) {
             window.d = 2;
             document.body.textContent = 'Local videostream.js Test...';
             const video = mCreateElement('video', {width: 1280, height: 720, controls: true}, 'body');
@@ -443,30 +448,6 @@
                         traverseFileTree(item, '', item.isFile && items[i].getAsFile());
                     }
                 }
-            }
-        }
-        else if (is_chrome_firefox && e.dataTransfer) {
-            try {
-                for (var i = 0, m = e.dataTransfer.mozItemCount; i < m; ++i) {
-                    var file = e.dataTransfer.mozGetDataAt("application/x-moz-file", i);
-                    if (file instanceof Ci.nsIFile) {
-                        filedrag_u = [];
-                        if (i == m - 1) {
-                            $.dostart = true;
-                        }
-                        traverseFileTree(new mozDirtyGetAsEntry(file /*,e.dataTransfer*/ ));
-                    }
-                    else {
-                        if (d) {
-                            console.log('FileSelectHandler: Not a nsIFile', file);
-                        }
-                    }
-                    // e.dataTransfer.mozClearDataAt("application/x-moz-file", i);
-                }
-            }
-            catch (e) {
-                alert(e);
-                Cu.reportError(e);
             }
         }
         else {
@@ -492,7 +473,7 @@
                 }
             }
             M.addUpload(u);
-            if (page == 'start') {
+            if (M.isFileDragPage(page)) {
                 start_upload();
             }
             if (!window.InitFileDrag) {
@@ -532,7 +513,7 @@
      * @return {Boolean} Is allowed or not
      */
     function isFileDragAllowed() {
-        if (page === 'start') {
+        if (M.isFileDragPage(page)) {
             return true;
         }
         return !(is_fm() && // if page is fm,
@@ -590,42 +571,13 @@
         document.getElementsByTagName("body")[0].addEventListener("drop", fnHandler, false);
         document.getElementsByTagName("body")[0].addEventListener("dragstart", onDragStartHandler, false);
 
-        if (is_mobile && (ua.details.engine === 'Gecko' || is_ios && is_ios < 13)) {
+        if (is_mobile &&
+            (ua.details.engine === 'Gecko' && parseInt(ua.details.version) < 83
+            || is_ios && is_ios < 13)) {
             // https://bugzilla.mozilla.org/show_bug.cgi?id=1456557
             $('input[multiple]').removeAttr('multiple');
         }
-
-
-        if (is_chrome_firefox) {
-            $('input[webkitdirectory], .fm-folder-upload input').click(function(e) {
-                var file = mozFilePicker(0, 2, { /*gfp:1,*/
-                    title: l[98]
-                });
-
-                if (file) {
-                    e.target = {
-                        files: [-1]
-                    };
-                    e.dataTransfer = {
-                        mozItemCount: 1,
-                        mozGetDataAt: function() {
-                            return file;
-                        }
-                    };
-                    FileSelectHandler(e);
-                    file = undefined;
-                }
-                else {
-                    if (e.stopPropagation) {
-                        e.stopPropagation();
-                    }
-                    if (e.preventDefault) {
-                        e.preventDefault();
-                    }
-                }
-            });
-        }
-    }
+    };
 
 })(this);
 
@@ -666,4 +618,30 @@ function ulDummyFiles(count, len) {
     }
 
     M.addUpload(ul, true);
+}
+
+async function ulDummyImages(count, type) {
+    'use strict';
+
+    const ul = [];
+    const ext = (type = type || 'image/jpeg').split('/').pop();
+
+    eventlog = dump;
+    for (let i = count || 210; i--;) {
+        const rnd = Math.random();
+        const wdh = 320 + rnd * 2345 | 0;
+        const buf = await webgl.createImage(i % 2 ? rnd * Date.now() : null, wdh, wdh / 1.777 | 0, type)
+            .catch((ex) => {
+                console.error(i, wdh, ex.message || ex, ex.data, [ex]);
+            });
+
+        if (buf) {
+            ul.push(new File([buf], `${makeUUID().slice(-17)}.${ext}`, {type, lastModified: 9e11}));
+        }
+
+        if (!(i % 48)) {
+            M.addUpload([...ul], true);
+            ul.length = 0;
+        }
+    }
 }

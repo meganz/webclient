@@ -4,47 +4,77 @@
 mobile.languageMenu = {
 
     /**
-     * Initialise the options
+     * Initialise the options and display them
+     * Cache for future init calls
      */
     init: function() {
 
         'use strict';
 
-        // Main tier 1 languages that we support (based on usage analysis)
-        var tierOneLangCodes = [
-            'es', 'en', 'br', 'ct', 'fr', 'de', 'ru', 'it', 'ar',
-            'nl', 'cn', 'jp', 'kr', 'ro', 'id', 'th', 'vi', 'pl'
-        ];
+        if (this.dropdown) {
+            this.dropdown.trigger('dropdown');
+            return;
+        }
 
-        // Remove all the tier 1 languages and we have only the tier 2 languages remaining
-        var allLangCodes = Object.keys(languages);
-        var tierTwoLangCodes = allLangCodes.filter(function(langCode) {
-            return tierOneLangCodes.indexOf(langCode) < 0;
+        const dropdownItems = {};
+        const langKeys = Object.keys(languages);
+
+        // Create a list of dropdown entries
+        for (let i = 0; i < langKeys.length; i++) {
+            const key = langKeys[i];
+            dropdownItems[key] = {text: languages[key][2], subtext: languages[key][1]};
+        }
+
+        this.dropdown = new MegaMobileDropdown({
+            invisible: true,
+            listContainerClass: 'language-selector',
+            parentNode: document.getElementById('fmholder'),
+            dropdownItems: dropdownItems,
+            sheetHeight: 'full',
+            dropdownOptions: {
+                titleText: l.lang_select_title,
+                search: true,
+                placeholderText: l.lang_select_placeholder
+            },
+            classNames: 'language-input',
+            elemName: 'settings-dropdown-country',
+            resultText: {title: l.lang_select_no_result_title, caption: l.lang_select_no_result_caption},
+            selected: lang,
+            onSelected: (event) => {
+
+                // Get the selected lang code
+                const selectedLangCode = event.currentTarget.optionNode.value;
+
+                // If not the currently selected language, change to the selected language
+                if (selectedLangCode !== lang) {
+
+                    M.uiSaveLang(selectedLangCode)
+                        .then(() => location.reload())
+                        .catch(dump);
+                }
+            }
         });
 
-        // Remove old menu items in case this was re-rendered
-        $('.top-submenu.language-items .top-menu-item').not('.language-template').remove();
-
-        // Generate the HTML for tier one and tier two languages (second param set to true shows beta icon)
-        this.renderLanguages(tierOneLangCodes, false);
-        this.renderLanguages(tierTwoLangCodes, true);
-
-        // Initialise the handler for
-        this.initLanguageSelectionHandler();
+        this.dropdown.trigger('dropdown');
     },
 
-    /**
-     * Create the language HTML from a list of language codes
-     * @param {Array} langCodes Array of language codes e.g. ['en', 'es', ...]
-     * @param {Boolean} tierTwo If this is a tier two / beta language
+    /*
+     * Old code block start - old code for login page
+     * need to deprecate once we applies new top menu to login page
      */
-    renderLanguages: function(langCodes, tierTwo) {
-
+    oldMenu: function() {
         'use strict';
+
+        const langCodes = Object.keys(languages);
 
         // Cache selectors
         var $template = $('.top-menu-item.language-template').clone();
-        var $languageItemsContainer = $('.top-submenu.language-items');
+        var $languageItemsContainer = $('#startholder .top-submenu.language-items');
+
+        // If there are already language items in the container, do nothing
+        if ($languageItemsContainer.children().length > 1) {
+            return;
+        }
 
         // Remove the template class
         $template.removeClass('language-template');
@@ -56,10 +86,8 @@ mobile.languageMenu = {
 
         var html = '';
 
-        // Make single array with code, native lang name, and english lang name
-        for (var i = 0, length = langCodes.length; i < length; i++) {
-
-            // FIXME: why we do have all this code duplicated? :(
+        // Create a list of dropdown entries
+        for (let i = 0; i < langCodes.length; i++) {
 
             var langCode = langCodes[i];                 // Two letter language code e.g. de
             var langItem = Object(languages[langCode]);  // map to languages object
@@ -84,23 +112,19 @@ mobile.languageMenu = {
                 $langHtml.addClass('current');
             }
 
-            // If the beta language, show the beta icon
-            if (tierTwo) {
-                $langHtml.addClass('beta');
-            }
-
             // Build up the HTML to be rendered
             html += $langHtml.prop('outerHTML');
         }
 
         // Render the HTML
         $languageItemsContainer.append(html);
+        this.initOLangSelectionHandler();
     },
 
     /**
-     * Initialise the Save button to set the language and reload the page
+     * Initialise the Save button to set the language and reload the page - DEPRECATED
      */
-    initLanguageSelectionHandler: function() {
+    initOLangSelectionHandler: function() {
 
         'use strict';
 
@@ -123,4 +147,8 @@ mobile.languageMenu = {
             return false;
         });
     }
+
+    /*
+     * Old code block end
+     */
 };

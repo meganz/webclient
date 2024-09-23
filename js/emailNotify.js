@@ -73,7 +73,7 @@
                 attribute.handleAttributeUpdate().then(function() {
                     if (fminitialized && page === 'fm/account/notifications') {
                         if (is_mobile) {
-                            mobile.account.notifications.init();
+                            mobile.settings.notifications.init();
                         } else {
                             accountUI.notifications.render();
                         }

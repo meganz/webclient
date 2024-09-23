@@ -772,6 +772,10 @@ body:not(.rtl) .plans-row .pricing-page.plan.hidden + .plan {
     height: 60px;
     width: 60px;
 }
+.payment-section .pricing-page.plan-icon.no-icon {
+    height: 0;
+    width: 0;
+}
 /* Green button for Create new account*/
 .pricing-page.plan .mega-button {
     margin: 12px 18px 36px;
@@ -905,7 +909,7 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
     font-size: 14px;
     line-height: 20px;
     color: var(--text-color-medium);
-    padding: 20px 0 0;
+    padding: 20px 0 16px;
     text-align: center;
     display: none;
     box-sizing: border-box;
@@ -1723,9 +1727,6 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
     position: relative;
     font-family: 'LatoWebBold', Arial;
 }
-.payment-page.header.choose-renewal {
-    padding-bottom: 5px;
-}
 .payment-page.header .number {
     background-color: rgb(255, 51, 51);
     color: #FFF;
@@ -1758,8 +1759,11 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
     margin: 0 320px 0 50px;
     position: relative;
 }
-.third-section .payment-page.info-block {
-    float: left;
+.payment-section .mega-button.purchase {
+    margin: 32px 0 0;
+}
+.payment-section:not(.mobile) .mega-button.purchase {
+    margin-left: -50px;
 }
 .payment-page.info-block .provider-details {
     color: var(--text-color-high);
@@ -1871,6 +1875,9 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
     display: block;
     font-size: 9px;
 }
+.payment-section:not(.local-currency) .bottom-page.grey-block {
+    padding-bottom: 64px;
+}
 .payment-section .bottom-page.horizontal-centered-bl.mid-wide {
     max-width: 1300px;
 }
@@ -1940,12 +1947,9 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
     font-size: 14px;
     line-height: 26px;
 }
-.payment-instructions {
-    color: #555;
-    font-size: 14px;
-    line-height: 28px;
-    max-width: 470px;
-    float: left;
+.payment-period .loading-placeholder-text {
+    display: inline-block;
+    margin-top: 25px;
 }
 .reg-st5-info-icon {
     width: 32px;
@@ -1963,7 +1967,6 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
     font-size: 13px;
     text-align: center;
     line-height: 1.5;
-    cursor: pointer;
     border-width: 1px;
     border-style: solid;
     border-color: rgb(238, 238, 238);
@@ -1972,6 +1975,16 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
     margin: 12px 0 0 0;
     padding: 8px;
     transition: all 200ms ease-in-out 0s;
+}
+.payment-section .subscription-instructions a {
+    color: var(--text-color-info);
+}
+.payment-period .charge-information {
+    font-size: 14px;
+    margin: 8px 0 10px;
+}
+.payment-period .choose-duration {
+    padding: 0;
 }
 
 /* Promotion Voucher code, I will remove once I have more time */
@@ -2039,6 +2052,19 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
 }
 .dialog-input-title-ontop:not(.birth).active input::placeholder{
    opacity: 0;
+}
+.payment-success-cloak {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: white;
+    z-index: 201;
+}
+.payment-success-cloak i {
+    --icon-size: 86px;
+    color: var(--secondary-green);
 }
 
 /* Retina images */
@@ -2426,9 +2452,6 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
         float: none;
         display: inline-block;
         margin: 40px 0 20px 0;
-    }
-    .payment-instructions {
-        max-width: none;
     }
     .payment-page.info-block .payment-method {
         width: 50%;

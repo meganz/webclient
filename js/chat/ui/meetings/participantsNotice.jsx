@@ -1,16 +1,16 @@
 import React from 'react';
 import { MegaRenderMixin } from '../../mixins';
-import Button from './button';
-import Call from './call';
-import StreamNode from './streamNode';
-import {ParsedHTML} from "../../../ui/utils";
+import Button from './button.jsx';
+import {LocalVideoHiRes} from './videoNode.jsx';
+import { Emoji, ParsedHTML } from '../../../ui/utils.jsx';
+import { InviteParticipantsPanel } from "../inviteParticipantsPanel.jsx";
 
 export default class ParticipantsNotice extends MegaRenderMixin {
     static NAMESPACE = 'participants-notice';
 
     constructor(props) {
         super(props);
-        this.av = this.props.sfuApp.sfuClient.availAv;
+        this.av = this.props.call.sfuClient.availAv;
     }
 
     /**
@@ -21,9 +21,9 @@ export default class ParticipantsNotice extends MegaRenderMixin {
      * @returns {boolean} If the component should updated
      */
     specShouldComponentUpdate(newProps) {
-        const { stayOnEnd, hasLeft, isOnHold, sfuApp } = this.props;
+        const { stayOnEnd, hasLeft, isOnHold, call } = this.props;
         const currAv = this.av;
-        this.av = sfuApp.sfuClient.availAv;
+        this.av = call.sfuClient.availAv;
         return newProps.stayOnEnd !== stayOnEnd
             || newProps.hasLeft !== hasLeft
             || newProps.isOnHold !== isOnHold
@@ -84,6 +84,7 @@ export default class ParticipantsNotice extends MegaRenderMixin {
 
     renderUserWaiting = () => {
         const { chatRoom, onInviteToggle } = this.props;
+
         return (
             <div
                 className={`
@@ -92,51 +93,43 @@ export default class ParticipantsNotice extends MegaRenderMixin {
                     theme-dark-forced
                 `}>
                 <div className={`${ParticipantsNotice.NAMESPACE}-heading`}>
-                    <h1>{l.waiting_for_others /* `Waiting for others to join...` */}</h1>
+                    {chatRoom.type === 'private' ?
+                        <h1>
+                            <Emoji>{l.waiting_for_peer.replace('%NAME', chatRoom.getRoomTitle())}</Emoji>
+                        </h1> :
+                        <h1>{l.waiting_for_others /* `Waiting for others to join...` */}</h1>
+                    }
                 </div>
-                {chatRoom.isMeeting && (
-                    <div className={`${ParticipantsNotice.NAMESPACE}-content`}>
-                        <h3>{l.copy_and_share /* `Copy this link to send your invite` */}</h3>
-                        <div className="mega-input with-icon box-style">
-                            <i className="sprite-fm-mono icon-link" />
-                            <input type="text" className="megaInputs" readOnly={true} defaultValue={this.props.link} />
-                        </div>
-                        <Button
-                            className="mega-button positive large copy-to-clipboard"
-                            onClick={() => copyToClipboard(this.props.link, l[7654])}>
-                            <span>{l[17835] /* `Copy Link` */}</span>
-                        </Button>
-                        {Call.isModerator(chatRoom, u_handle) && (
-                            <div className="peers-invite">
-                                <hr/>
-                                <Button
-                                    className="mega-button action"
-                                    onClick={onInviteToggle}>
-                                    {l.invite_from_contact_list /* `Or invite people form your contact list` */}
-                                </Button>
-                            </div>
-                        )}
+                {chatRoom.isMeeting && chatRoom.publicLink &&
+                    <div className={`${ParticipantsNotice.NAMESPACE}-content-invite`}>
+                        <InviteParticipantsPanel
+                            chatRoom={chatRoom}
+                            disableLinkToggle={true}
+                            onAddParticipants={() => {
+                                this.setState({ inviteDialog: false }, () => onInviteToggle());
+                            }}
+                        />
                     </div>
-                )}
+                }
             </div>
         );
     };
 
 
     render() {
-        const { sfuApp, call, hasLeft, streamContainer, isOnHold } = this.props;
+        const { call, hasLeft, streamContainer, chatRoom } = this.props;
 
-        if (sfuApp.isDestroyed) {
+        if (call.isDestroyed) {
             return null;
         }
 
         return (
             <>
                 {call.isSharingScreen() ? null : (
-                    <StreamNode
+                    <LocalVideoHiRes
                         className="local-stream-mirrored"
-                        isCallOnHold={isOnHold}
-                        stream={call.getLocalStream()}
+                        chatRoom={chatRoom}
+                        source={call.getLocalStream()}
                     />
                 )}
                 {streamContainer(hasLeft ? this.renderUserAlone() : this.renderUserWaiting())}

@@ -1,5 +1,5 @@
 function MegaUtils() {
-    this.logger = new MegaLogger('MegaUtils');
+    'use strict';
     this.fscache = Object.create(null);
 
     if (typeof Intl !== 'undefined' && Intl.Collator) {
@@ -7,241 +7,8 @@ function MegaUtils() {
     }
 }
 
-function MegaApi() {
-    this.logger = new MegaLogger('MegaApi');
-}
-
-MegaApi.prototype = new FileManager();
-MegaApi.prototype.constructor = MegaApi;
-
-MegaUtils.prototype = new MegaApi();
+MegaUtils.prototype = new FileManager();
 MegaUtils.prototype.constructor = MegaUtils;
-
-// TODO: refactor api_req-related functions here.
-MegaApi.prototype.setAPIPath = function(aDomain, aSave) {
-    'use strict';
-
-    if (aDomain === 'debug') {
-        aDomain = location.host + ':444';
-    }
-    apipath = 'https://' + aDomain + '/';
-
-    if (aSave) {
-        localStorage.apipath = apipath;
-    }
-
-    return apipath;
-};
-
-MegaApi.prototype.staging = function(aSave) {
-    this.setAPIPath('staging.api.mega.co.nz', aSave);
-};
-
-MegaApi.prototype.prod = function(aSave) {
-    this.setAPIPath('g.api.mega.co.nz', aSave);
-};
-
-MegaApi.prototype._apiReqInflight = Object.create(null);
-MegaApi.prototype._apiReqPollCache = Object.create(null);
-
-MegaApi.prototype._apiReqReplyCache = Object.create(null);
-MegaApi.prototype._apiReqCacheIndex = {
-    g: function(req) {
-        'use strict';
-
-        if (req.g) {
-            // cache for four seconds.
-            return -4;
-        }
-
-        // cache for the session lifetime
-        return true;
-    }
-};
-
-/**
- * Perform an API request, with capability of de-duplicating pending requests.
- * @param {Object|String} params The request parameters as an object.
- *                               If an string is provided, assumes a plain request with no additional parameters.
- * @param {Number} [ch] The channel to fire the request on.
- * @returns {MegaPromise} The promise is rejected if API gives a negative number.
- */
-MegaApi.prototype.req = function(params, ch) {
-    'use strict';
-
-    if (typeof params === 'string') {
-        params = {a: params};
-    }
-
-    var key = JSON.stringify(params);
-
-    if (this._apiReqInflight[key]) {
-        if (d) {
-            console.info('Reusing pending api request...', params);
-        }
-        return this._apiReqInflight[key];
-    }
-
-    var self = this;
-    var promise = new MegaPromise();
-
-    if (this._apiReqReplyCache[key]) {
-        var entry = this._apiReqReplyCache[key];
-
-        if (Date.now() > entry[1]) {
-            delete this._apiReqReplyCache[key];
-        }
-        else {
-            onIdle(function() {
-                if (d) {
-                    console.info('Returning cached api request...', params, entry);
-                }
-                promise.resolve(entry[0]);
-            });
-            return promise;
-        }
-    }
-    this._apiReqInflight[key] = promise;
-
-    promise.always(function() {
-        delete M._apiReqInflight[key];
-    });
-
-    api_req(params, {
-        callback: tryCatch(function(res) {
-            delete this.callback;
-
-            if (typeof res === 'number' && res < 0) {
-                promise.reject.apply(promise, arguments);
-            }
-            else {
-                var cIdx = self._apiReqCacheIndex[params.a];
-
-                if (cIdx) {
-                    if (typeof cIdx === 'function') {
-                        cIdx = cIdx(params);
-                    }
-
-                    self._apiReqReplyCache[key] = [clone(res), cIdx < 0 ? Date.now() + -cIdx * 1e3 : Infinity];
-                }
-                promise.resolve.apply(promise, arguments);
-            }
-        }, promise.reject.bind(promise, EFAILED))
-    }, ch | 0);
-
-    return promise;
-};
-
-/**
- * Wrapper around MegaApi.req with polling capabilities.
- * @param {Number} seconds The number of seconds to wait between requests, returning a cached result until exhausted.
- * @param {Object|String} params see MegaApi.req
- * @returns {MegaPromise}
- * @see MegaApi.req
- */
-MegaApi.prototype.req.poll = function(seconds, params) {
-    'use strict';
-
-    var cache = M._apiReqPollCache;
-    var key = JSON.stringify(params);
-    var logger = d && MegaLogger.getLogger('req:poll');
-
-    return new Promise(function _reqPollPromise(resolve, reject) {
-        var feedback = function(entry) {
-            if (entry.e) {
-                reject(entry.r);
-            }
-            else {
-                resolve(entry.r);
-            }
-
-            cache = params = resolve = reject = undefined;
-        };
-
-        var fill = function(error, res) {
-            var entry = cache[key];
-            if (!entry) {
-                if (d) {
-                    logger.debug('Storing cache entry...', key);
-                }
-                entry = cache[key] = Object.create(null);
-            }
-
-            entry.r = res;
-            entry.e = error;
-
-            if (entry.t) {
-                clearTimeout(entry.t);
-            }
-            entry.t = setTimeout(function() {
-                if (d) {
-                    logger.debug('Expiring cache entry...', key);
-                }
-                var c = M._apiReqPollCache[key];
-                delete M._apiReqPollCache[key];
-
-                if (c && c.f) {
-                    for (var i = c.f.length; i--;) {
-                        if (d) {
-                            logger.debug('Dispatching awaiting function call...', key, c);
-                        }
-                        c.f[i]();
-                    }
-                }
-            }, Math.abs(seconds) * 1e3);
-
-            feedback(entry);
-        };
-
-        if (cache[key]) {
-            if (d) {
-                logger.warn('Preventing API request from being re-fired.', params, cache[key]);
-            }
-
-            if (seconds < 0) {
-                if (d) {
-                    logger.debug('Awaiting to re-fire request...', params);
-                }
-
-                var c = cache[key];
-                var f = _reqPollPromise.bind(this, resolve, reject);
-
-                if (c.f) {
-                    c.f.push(f);
-                }
-                else {
-                    c.f = [f];
-                }
-            }
-            else {
-                feedback(cache[key]);
-            }
-        }
-        else {
-            M.req(params).tryCatch(fill.bind(null, false), fill.bind(null, true));
-        }
-    });
-};
-
-/**
- * A wrapper around MegaApi.req
- * @param {Array} params An array of parameters to pass through MegaApi.req
- * @returns {MegaPromise} The promise is *always* resolved with an Array of results for each API request.
- * @see MegaApi.req
- */
-MegaApi.prototype.reqA = function(params) {
-    'use strict';
-
-    var self = this;
-    var promise = new MegaPromise();
-    var mapfn = function(v) {
-        return self.req(v);
-    };
-
-    MegaPromise.allDone(params.map(mapfn)).unpack(promise.resolve.bind(promise));
-
-    return promise;
-};
 
 /**
  * execCommandUsable
@@ -354,12 +121,14 @@ MegaUtils.prototype.sortObjFn = function(key, order, alternativeFn) {
  * @returns {Number}
  */
 MegaUtils.prototype.compareStrings = function megaUtilsCompareStrings(stringA, stringB, direction) {
+    'use strict';
 
+    let res;
     if (this.collator) {
-        return this.collator.compare(stringA || '', stringB || '') * direction;
+        res = this.collator.compare(stringA || '', stringB || '') * direction;
     }
 
-    return (stringA || '').localeCompare(stringB || '') * direction;
+    return res || String(stringA || '').localeCompare(stringB || '') * direction;
 };
 
 /**
@@ -375,52 +144,8 @@ MegaUtils.prototype.xhr = megaUtilsXHR;
  *  @return {String}
  */
 MegaUtils.prototype.getStack = function megaUtilsGetStack() {
-    var stack;
-
-    if (is_chrome_firefox) {
-        stack = Components.stack.formattedStack;
-    }
-
-    if (!stack) {
-        stack = (new Error()).stack;
-
-        if (!stack) {
-            try {
-                throw new Error();
-            }
-            catch (e) {
-                stack = e.stack;
-            }
-        }
-    }
-
-    return stack;
-};
-
-/**
- * Get function caller.
- * @returns {String} caller
- */
-MegaUtils.prototype.getCaller = function megaUtilsGetCaller() {
     'use strict';
-    var stackIdx = 2;
-    var stack = M.getStack().split('\n');
-
-    for (var i = stack.length; i--;) {
-        if (stack[i].indexOf('getCaller') > 0) {
-            stackIdx = i;
-            break;
-        }
-    }
-
-    stack = String(stack.splice(++stackIdx + (stack[0] === 'Error')));
-
-    var m = stack.match(/at\s(\S+)/);
-    if (m) {
-        return String(m[1]).split(/[\s:]/)[0];
-    }
-
-    return '<unknown>';
+    return String(new Error('trace').stack);
 };
 
 /**
@@ -448,10 +173,8 @@ MegaUtils.prototype.resetUploadDownload = function megaUtilsResetUploadDownload(
         ulQueue._pending = [];
         ulQueue.setSize((fmconfig.ul_maxSlots | 0) || 4);
 
-        if (page !== 'download') {
-            if (mega.fileRequestUpload && mega.fileRequestUpload.isUploadPageInitialized()) {
-                mega.fileRequestUpload.onUploadCompletion();
-            }
+        if (is_megadrop) {
+            mega.fileRequestUpload.onUploadCompletion();
         }
     }
 
@@ -637,7 +360,12 @@ MegaUtils.prototype.reload = function megaUtilsReload(force) {
         var apipath = debug && localStorage.apipath;
         var cdlogger = debug && localStorage.chatdLogger;
         const rad = sessionStorage.rad;
-        const allowNullKeys = localStorage.allownullkeys;
+        const {
+            mInfinity,
+            megaLiteMode,
+            allownullkeys,
+            testLargeNodes
+        } = localStorage;
 
         force = force || sessionStorage.fmAetherReload;
 
@@ -683,8 +411,17 @@ MegaUtils.prototype.reload = function megaUtilsReload(force) {
         if (hashLogic) {
             localStorage.hashLogic = 1;
         }
-        if (allowNullKeys) {
+        if (allownullkeys) {
             localStorage.allownullkeys = 1;
+        }
+        if (mInfinity) {
+            localStorage.mInfinity = 1;
+        }
+        if (megaLiteMode) {
+            localStorage.megaLiteMode = 1;
+        }
+        if (testLargeNodes) {
+            localStorage.testLargeNodes = 1;
         }
 
         if (force) {
@@ -698,8 +435,8 @@ MegaUtils.prototype.reload = function megaUtilsReload(force) {
     };
 
     if (u_type !== 3 && page !== 'download') {
-        stopsc();
-        stopapi();
+        api.stop();
+        waitsc.stop();
         loadfm(true);
         return;
     }
@@ -728,11 +465,21 @@ MegaUtils.prototype.reload = function megaUtilsReload(force) {
             const waitingPromises = [];
 
             loadingDialog.show();
-            stopsc();
-            stopapi();
+            waitsc.stop();
+            api.stop();
 
             if (window.delay) {
                 delay.abort();
+            }
+
+            if (force === -0x7e080f) {
+                if (mega.infinity) {
+                    delete localStorage.mInfinity;
+                }
+                else {
+                    localStorage.mInfinity = 1;
+                }
+                delete localStorage.megaLiteMode;
             }
 
             if (window.fmdb) {
@@ -783,10 +530,6 @@ MegaUtils.prototype.clearFileSystemStorage = function megaUtilsClearFileSystemSt
             promise = undefined;
         }
     };
-
-    if (is_chrome_firefox || !window.requestFileSystem) {
-        return MegaPromise.resolve();
-    }
 
     if (d) {
         console.time('fscleaning');
@@ -1051,7 +794,7 @@ MegaUtils.prototype.logoutAbortTransfers = function megaUtilsLogoutAbortTransfer
 
             msgDialog('confirmation', l[967], hasTransferMsg + ' ' + l[507] + '?', false, function(doIt) {
                 if (doIt) {
-                    watchdog.notify("abort_trans");
+                    watchdog.notify("abort-transfers");
                     var targetPromise = M.abortTransfers(true);
                     promise.linkDoneAndFailTo(targetPromise);
                 }
@@ -1064,11 +807,11 @@ MegaUtils.prototype.logoutAbortTransfers = function megaUtilsLogoutAbortTransfer
 
     if (u_type === 0) {
         // if it's in ephemeral session
-        watchdog.notify("abort_trans");
+        watchdog.notify("abort-transfers");
         var targetPromise = M.abortTransfers(true);
         promise.linkDoneAndFailTo(targetPromise);
     } else {
-        watchdog.query("transing").always(function (res) {
+        watchdog.query("transfers").always((res) => {
             if (!res.length) {
                 // if it's in normal session with a single tab
                 logoutAbort();
@@ -1118,19 +861,16 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
     M.logoutAbortTransfers().then(function() {
         var step = 2;
         var finishLogout = function() {
-            if (--step === 0) {
-                u_logout(true);
+            const afterLogout = () => {
                 if (is_extension) {
                     location.reload();
                 }
-                else if (is_mobile) {
-                    // Always go back to the Login page on logout on mobile
-                    loadSubPage('login');
-                    return location.reload();
-                }
 
                 var sitePath = getSitePath();
-                if (sitePath.indexOf('fm/search/') > -1 || sitePath.indexOf('/chat') > -1) {
+                if (sitePath.includes('fm/search/')
+                    || sitePath.includes('/chat')
+                    || sitePath.includes('keybackup')) {
+
                     location.replace(getBaseUrl());
                 }
                 else if (location.href.indexOf('fm/user-management/invdet') > -1) {
@@ -1140,16 +880,21 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
                 else {
                     location.reload();
                 }
+            };
+
+            if (--step === 0) {
+                u_logout(true).then(() => afterLogout());
             }
         };
 
         loadingDialog.show();
-        mega.config.flush().always(finishLogout);
-        var promises = [];
+        window.onerror = null;
+        window.isLoggingOut = true;
+        const promises = [mega.config.flush()];
 
         if ('rad' in mega) {
             mega.rad.log('\ud83d\udd1a', 'Logging out...');
-            promises.push(new Promise((resolve) => setTimeout(() => mega.rad.flush().finally(resolve), 280)));
+            promises.push(tSleep(4 / 10).then(() => mega.rad.flush()));
         }
 
         if (fmdb && fmconfig.dbDropOnLogout) {
@@ -1157,6 +902,8 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
         }
 
         if (window.megaChatIsReady) {
+            megaChat.isLoggingOut = true;
+
             if (megaChat.userPresence) {
                 megaChat.userPresence.disconnect();
             }
@@ -1164,24 +911,29 @@ MegaUtils.prototype.logout = function megaUtilsLogout() {
             if (fmconfig.dbDropOnLogout) {
                 promises.push(megaChat.dropAllDatabases());
             }
+
+            megaChat.destroy(true);
         }
 
         if (window.is_eplusplus) {
             promises.push(M.delPersistentData('e++ck'));
         }
 
-        if (promises.length) {
-            ++step;
-            Promise.allSettled(promises).always(finishLogout);
-        }
-
-        if (u_privk && !loadfm.loading) {
-            // Use the 'Session Management Logout' API call to kill the current session
-            api_req({'a': 'sml'}, {callback: finishLogout});
-        }
-        else {
-            finishLogout();
-        }
+        Promise.allSettled(promises)
+            .then((res) => {
+                if (self.d) {
+                    console.debug('logging out...', tryCatch(() => JSON.stringify(res), false)() || res);
+                }
+                waitsc.stop();
+                // XXX: using a batched-command for sml to forcefully flush any pending
+                //      API request, otherwise they could fail with a -15 (ESID) error.
+                return u_type !== false && api.req([{a: 'sml'}]);
+            })
+            .catch(dump)
+            .finally(() => {
+                step = 1;
+                finishLogout();
+            });
     });
 };
 
@@ -1266,6 +1018,13 @@ MegaUtils.prototype.findDupes = function() {
  */
 MegaUtils.prototype.fmSearchNodes = function(searchTerm) {
     'use strict';
+
+    if (String(searchTerm).startsWith('--')) {
+        if (pfid) {
+            onIdle(() => M.filterBySearch(searchTerm));
+        }
+        return Promise.resolve();
+    }
 
     // Add log to see how often they use the search
     eventlog(99603, JSON.stringify([1, pfid ? 1 : 0, Object(M.d[M.RootID]).tf, searchTerm.length]), pfid);
@@ -1423,7 +1182,7 @@ MegaUtils.prototype.checkForDuplication = function(id) {
     for (let i = M.v.length; i--;) {
         const n = M.v[i] || false;
 
-        if (!n.name || missingkeys[n.h]) {
+        if (!n.name || missingkeys[n.h] || n.p !== id) {
             if (d) {
                 console.debug('name-less node', missingkeys[n.h], [n]);
             }
@@ -1496,9 +1255,11 @@ MegaUtils.prototype.checkForDuplication = function(id) {
 mBroadcaster.addListener('mega:openfolder', SoonFc(300, function(id) {
     'use strict';
 
-    var dups = M.checkForDuplication(id);
-    if (dups && (dups.files || dups.folders)) {
-        var $bar = $('.fm-notification-block.duplicated-items-found').addClass('visible');
+    let dups = false;
+
+    // Show desktop notification
+    if (!is_mobile && (dups = M.checkForDuplication(id)) && (dups.files || dups.folders)) {
+        const $bar = $('.fm-notification-block.duplicated-items-found').addClass('visible');
 
         $('.fix-me-btn', $bar).rebind('click.df', function() {
             fileconflict.resolveExistedDuplication(dups, id);
@@ -1541,6 +1302,18 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
             api_req({a: 'log', e: 99804, m: 'User tries to transfer a session from mega.co.nz.'});
 
             var toPage = String(urlParts[2] || 'fm').replace('#', '');
+
+            if (toPage.includes('?')) {
+                const pageParts = toPage.split('?');
+                toPage = pageParts[0];
+                for (let i = 1; i < pageParts.length; i++) {
+                    const queryParts = pageParts[i].split('=');
+                    if (queryParts[0] === 'tab') {
+                        window.mProTab = queryParts[1].split('/')[0];
+                    }
+                }
+            }
+
             // If the user is already logged in here with the same account
             // we can avoid a lot and just take them to the correct page
             if (JSON.stringify(u_k) === JSON.stringify(urlParts[0])) {
@@ -1609,7 +1382,8 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
 
                 var ctx = {
                     checkloginresult: function(ctx, result) {
-                        u_type = result === ESID ? false : result;
+                        u_type = typeof result !== 'number' || result < 0 ? false : result;
+
                         if (toPage.substr(0, 1) === '!' && toPage.length > 7) {
                             _rawXHR(apipath + 'cs?id=0&domain=meganz',
                                 {'a': 'g', 'p': toPage.substr(1, 8)},
@@ -1697,69 +1471,66 @@ MegaUtils.prototype.getSafePath = function(path, file) {
 };
 
 /**
+ * Retrieve transfer quota details, i.e. by firing an uq request.
+ */
+MegaUtils.prototype.getTransferQuota = async function() {
+    'use strict';
+    const {result} = await api.req({a: 'uq', xfer: 1, qc: 1});
+
+    return freeze({
+        ...result,
+        max: result.mxfer,
+        base: result.pxfer
+    });
+};
+
+
+/**
  * Get the state of the storage
  * @param {Number|Boolean} [force] Do not use the cached u_attr value
  * @return {MegaPromise} 0: Green, 1: Orange (almost full), 2: Red (full)
  */
-MegaUtils.prototype.getStorageState = function(force) {
+MegaUtils.prototype.getStorageState = async function(force) {
     'use strict';
-    var promise = new MegaPromise();
 
     if (!force && Object(u_attr).hasOwnProperty('^!usl')) {
-        return promise.resolve(u_attr['^!usl'] | 0);
+        return u_attr['^!usl'] | 0;
     }
 
     // XXX: Not using mega.attr.get since we don't want the result indexedDB-cached.
-    M.req({'a': 'uga', 'u': u_handle, 'ua': '^!usl', 'v': 1}).then(function(res) {
-        if (d) {
-            console.debug('getStorageState', res);
-            console.assert(res.av, 'Unexpected response...');
-        }
-        var value = base64urldecode(res.av || '');
+    const result = await api.send({'a': 'uga', 'u': u_handle, 'ua': '^!usl', 'v': 1});
+    if (d) {
+        console.debug('getStorageState', result);
+        console.assert(result === ENOENT || result.av, `getStorageState: Unexpected response... ${result}`);
+    }
+    const value = base64urldecode(result.av || '');
 
-        if (typeof u_attr === 'object') {
-            u_attr['^!usl'] = value;
-        }
-        promise.resolve(value | 0);
-    }).catch(function(ex) {
-        if (d && ex !== ENOENT) {
-            console.warn(ex);
-        }
-        promise.reject(ex);
-    });
+    if (typeof u_attr === 'object') {
+        u_attr['^!usl'] = value;
+    }
 
-    return promise;
+    return value | 0;
 };
 
 /**
  * Retrieve storage quota details, i.e. by firing an uq request.
  */
-MegaUtils.prototype.getStorageQuota = function() {
+MegaUtils.prototype.getStorageQuota = async function() {
     'use strict';
-    var promise = new MegaPromise();
+    const {result} = await api.req({a: 'uq', strg: 1, qc: 1}, {cache: -4});
 
-    M.req({a: 'uq', strg: 1, qc: 1})
-        .then(function(res) {
-            if (res.uslw === undefined) {
-                res.uslw = 9000;
-            }
-            var data = Object.assign(Object.create(null), res, {
-                max: res.mstrg,
-                used: res.cstrg,
-                isFull: res.cstrg / res.mstrg >= 1,
-                percent: Math.floor(res.cstrg / res.mstrg * 100),
-                isAlmostFull: res.cstrg / res.mstrg >= res.uslw / 10000
-            });
-            promise.resolve(data);
-        })
-        .catch(function(ex) {
-            if (d) {
-                console.warn(ex);
-            }
-            promise.reject(ex);
-        });
+    if (result.uslw === undefined) {
+        result.uslw = 9000;
+    }
 
-    return promise;
+    return freeze({
+        ...result,
+        max: result.mstrg,
+        used: result.cstrg,
+        isFull: result.cstrg / result.mstrg >= 1,
+        percent: Math.floor(result.cstrg / result.mstrg * 100),
+        isAlmostFull: result.cstrg / result.mstrg >= result.uslw / 10000
+    });
 };
 
 /**
@@ -1767,43 +1538,37 @@ MegaUtils.prototype.getStorageQuota = function() {
  * @param {Number} timeout in milliseconds, defaults to 30 seconds
  */
 MegaUtils.prototype.checkStorageQuota = function checkStorageQuota(timeout) {
+    'use strict';
     delay('checkStorageQuota', function _csq() {
-        M.getStorageQuota().done(function(data) {
+        M.getStorageQuota().then((data) => {
             if (data.percent < 100) {
                 if (ulmanager.ulOverStorageQuota) {
                     onIdle(function() {
                         ulmanager.ulResumeOverStorageQuotaState();
                     });
                 }
-                if (is_mobile) {
-                    mobile.overStorageQuotaOverlay.close();
+                if (is_mobile && mega.ui.sheet.name === 'over-storage') {
+                    mega.ui.sheet.hide();
                 }
                 if (u_attr) {
                     delete u_attr.uspw;
                 }
             }
-            M.showOverStorageQuota(data);
-        });
+            return M.showOverStorageQuota(data);
+        }).catch(dump);
     }, timeout || 30000);
 };
 
 /**
  * Check whether an operation could take the user over their storage quota
  * @param {Number} opSize The size needed by the operation
- * @returns {MegaPromise}
+ * @returns {Promise}
  */
 MegaUtils.prototype.checkGoingOverStorageQuota = function(opSize) {
     'use strict';
 
-    var promise = new MegaPromise();
-    loadingDialog.pshow();
-
-    M.getStorageQuota()
-        .always(function() {
-            loadingDialog.phide();
-        })
-        .fail(promise.reject.bind(promise))
-        .done(function(data) {
+    return M.getStorageQuota()
+        .then((data) => {
 
             if (opSize === -1) {
                 opSize = data.mstrg;
@@ -1812,17 +1577,83 @@ MegaUtils.prototype.checkGoingOverStorageQuota = function(opSize) {
             if (opSize > data.mstrg - data.cstrg) {
                 var options = {custom: 1, title: l[882], body: l[16927]};
 
-                M.showOverStorageQuota(data, options)
-                    .always(function() {
-                        promise.reject();
+                return M.showOverStorageQuota(data, options)
+                    .always(() => {
+                        throw EGOINGOVERQUOTA;
                     });
             }
-            else {
-                promise.resolve();
-            }
         });
+};
 
-    return promise;
+/**
+ * Fill LHP storage block caption.
+ * @param {HTMLElement} container storage block element
+ * @param {Number|String} storageQuota available storage quota
+ * @returns {Promise} fulfilled on completion.
+ */
+MegaUtils.prototype.createLeftStorageBlockCaption = async function(container, storageQuota) {
+    'use strict';
+
+    let checked = false;
+    const $storageBlock = $(container);
+    const $popup = $('.js-lp-storage-information-popup', $storageBlock.parent()).removeClass('hidden');
+    const $storageLimitIcon = $('.storage-limit-icon', $storageBlock);
+    const $storageLimitPopup = $('.lp-storage-limit-popup', $storageBlock);
+
+    $storageBlock.rebind('mouseenter.storage-usage', () => {
+        if (!checked) {
+            checked = true;
+
+            Promise.resolve(!u_attr.p || u_attr.tq || this.getTransferQuota())
+                .then((res) => {
+                    if (typeof res === 'object') {
+                        // base transfer quota from getTransferQuota()
+                        res = res.base;
+                    }
+                    if (typeof res === 'number') {
+                        res = bytesToSize(res, 3, 4);
+                    }
+
+                    if (u_attr.p) {
+                        u_attr.tq = res;
+                        $popup.text(l.storage_usage_caption_pro.replace('%1', storageQuota).replace('%2', u_attr.tq));
+                    }
+                    else {
+                        $popup.text(l.storage_usage_caption_free.replace('%1', storageQuota));
+                    }
+                });
+        }
+
+        delay('storage-information-popup-mouseenter', () => {
+            if (!$storageLimitIcon.is(':hover')) {
+                $popup.addClass('hovered');
+            }
+        }, 1e3);
+    });
+
+    $storageBlock.rebind('mouseleave.storage-usage', () => {
+        delay.cancel('storage-information-popup-mouseenter');
+        delay.cancel('storage-information-popup-mouseleave');
+        $popup.removeClass('hovered');
+        $storageLimitPopup.removeClass('hovered');
+    });
+
+    $storageLimitIcon.rebind('mouseenter.storage-limit', () => {
+        delay('storage-limit-popup-mouseenter', () => {
+            $storageLimitPopup.addClass('hovered');
+            $popup.removeClass('hovered');
+        }, 1e3);
+    });
+
+    $storageLimitIcon.rebind('mouseleave.storage-limit', () => {
+        delay.cancel('storage-limit-popup-mouseenter');
+        $storageLimitPopup.removeClass('hovered');
+        delay('storage-information-popup-mouseleave', () => {
+            if ($storageBlock.is(':hover')) {
+                $popup.addClass('hovered');
+            }
+        }, 1e3);
+    });
 };
 
 /**
@@ -1832,7 +1663,6 @@ MegaUtils.prototype.checkGoingOverStorageQuota = function(opSize) {
  */
 MegaUtils.prototype.checkLeftStorageBlock = async function(data) {
     'use strict';
-
     const storageBlock = document.querySelector('.js-lp-storage-usage-block');
 
     if (!u_type || !fminitialized || this.storageQuotaCache) {
@@ -1870,29 +1700,82 @@ MegaUtils.prototype.checkLeftStorageBlock = async function(data) {
         storageBlock.classList.add('warning');
     }
 
-    if (u_attr.p) {
+    // If Business or Pro Flexi always show the plan name (even if expired, which is when u_attr.p is undefined)
+    if (u_attr.b || u_attr.pf) {
+        storageBlock.querySelector('.plan').textContent = pro.getProPlanName(
+            u_attr.b ? pro.ACCOUNT_LEVEL_BUSINESS : pro.ACCOUNT_LEVEL_PRO_FLEXI
+        );
+    }
+    else if (u_attr.p) {
         storageBlock.querySelector('.plan').textContent = pro.getProPlanName(u_attr.p);
     }
     else {
-        storageBlock.querySelector('.plan').textContent = l[1150];
+        storageBlock.querySelector('.plan').textContent = l[1150]; // Free
     }
 
     // Show only space_used for Business and Pro Flexi accounts
     if (u_attr && (u_attr.b || u_attr.pf)) {
         storageHtml = `<span class="lp-sq-used">${space_used}</span>`;
-        storageBlock.querySelector('.js-storagegraph').classList.add('hidden');
         storageBlock.querySelector('.js-lpbtn[data-link="upgrade"]').classList.add('hidden');
     }
     else {
         storageHtml = l[1607].replace('%1', `<span class="lp-sq-used">${space_used}</span>`)
             .replace('%2', `<span class="lp-sq-max">${space}</span>`);
+        storageBlock.querySelector('.js-storagegraph').classList.remove('hidden');
+        $('.js-storagegraph span', storageBlock).outerWidth(`${percent}%`);
+    }
+
+    const storageIsAlmostFullOrFull = isAlmostFull || isFull;
+
+    // Check if user (not a Business or Pro Flexi one) is in the fmpup (FM / Photos upgrade point)
+    // variant group and change the upgrade point UI if so
+    if (!u_attr.b && !u_attr.pf && this.isInExperiment('fmpup')) {
+        const $upgradeBtn = $('.info button.secondary', storageBlock);
+        const $storageLimitIcon = $('.storage-limit-icon', storageBlock);
+
+        const _sendEvent = (eventId) => {
+            // Send eventlog and a message with the tab the user was on
+            // (Drive / Photos) when they clicked the buttons
+            const isDriveTabSelected = M.currentTreeType === 'cloud-drive';
+            const eventMessage = `${isDriveTabSelected ? 'Drive' : 'Photos'} tab selected`;
+
+            eventlog(eventId, eventMessage);
+        };
+
+        $upgradeBtn.removeClass('hidden').rebind('click.sendEvent', () => {
+            _sendEvent(500282);
+            loadSubPage('pro');
+        });
+
+        storageBlock.querySelector('.text-and-tooltip').classList.remove('hidden');
+
+        if (storageIsAlmostFullOrFull) {
+            $storageLimitIcon.removeClass('hidden').rebind('click.sendEvent', () => {
+                _sendEvent(500283);
+
+                const hcArticleURL = 'https://help.mega.io/plans-storage/space-storage/storage-exceeded';
+                window.open(hcArticleURL, '_blank', 'noopener noreferrer');
+            });
+        }
+        storageBlock.querySelector('.info .storage-txt').classList.add('hidden');
+    }
+    else {
+        if (!u_attr.b && !u_attr.pf) {
+            storageBlock.querySelector('.title-block .js-lpbtn[data-link="upgrade"]')
+                .classList.remove('hidden');
+        }
+        storageBlock.querySelector('.title-block .storage-txt').classList.add('hidden');
     }
 
     $('.storage-txt', storageBlock).safeHTML(storageHtml);
-    $('.js-storagegraph span', storageBlock).outerWidth(`${percent}%`);
 
     if (loaderSpinner) {
         loaderSpinner.remove();
+    }
+
+    if (!u_attr.pf && !u_attr.b && (!u_attr.tq || !storageBlock.classList.contains('caption-running'))) {
+        storageBlock.classList.add('caption-running');
+        return this.createLeftStorageBlockCaption(storageBlock, space);
     }
 };
 
@@ -1927,7 +1810,7 @@ MegaUtils.prototype.toArrayBuffer = promisify(function(resolve, reject, data) {
     }
 
     if (data instanceof Blob) {
-        this.readBlob(data).then(resolve).catch(reject);
+        ('arrayBuffer' in data ? data.arrayBuffer() : this.readBlob(data)).then(resolve).catch(reject);
     }
     else if (typeof data === 'string' && data.substr(0, 5) === 'blob:') {
         M.xhr({url: data, type: 'arraybuffer'})
@@ -1948,6 +1831,9 @@ MegaUtils.prototype.toArrayBuffer = promisify(function(resolve, reject, data) {
     }
     else if (data instanceof ArrayBuffer) {
         resolve(data);
+    }
+    else if (data instanceof ReadableStream) {
+        data.arrayBuffer().then(resolve).catch(reject);
     }
     else {
         if (typeof data !== 'string') {
@@ -2005,6 +1891,17 @@ MegaUtils.prototype.decompress = async function(data, format) {
     const ds = new DecompressionStream(format || 'gzip');
     const stream = (await this.getReadableStream(data)).pipeThrough(ds);
     return new Response(stream).arrayBuffer();
+};
+
+/**
+ * Save to disk the current's account tree (fetch-nodes response)
+ * @param {Number} [ca] set to 1 to not clear the tree-cache
+ * @returns {Promise<*>}
+ */
+MegaUtils.prototype.saveFTree = async function(ca) {
+    'use strict';
+    const ts = new Date().toISOString().replace(/\W/g, '');
+    return M.saveAs(await api.send({a: 'f', c: 1, r: 1, ca}), `tree-${ts}.json`);
 };
 
 /**
@@ -2212,15 +2109,11 @@ MegaUtils.prototype.onPersistentDB.fallback = async function(action, key, value)
 
 // Get FileSystem storage ignoring polyfills.
 lazy(MegaUtils.prototype, 'requestFileSystem', function() {
-        'use strict';
-
-        if (!is_chrome_firefox) {
-            var requestFileSystem = window.webkitRequestFileSystem || window.requestFileSystem;
-
-            if (typeof requestFileSystem === 'function') {
-                return requestFileSystem.bind(window);
-            }
-        }
+    'use strict';
+    const requestFileSystem = window.webkitRequestFileSystem || window.requestFileSystem;
+    if (typeof requestFileSystem === 'function') {
+        return requestFileSystem.bind(window);
+    }
 });
 
 /**
@@ -2642,46 +2535,11 @@ MegaUtils.prototype.checkFolderDrop = function(event) {
         }
     };
 
-    var checkMozItems = function _checkMozItems() {
-        try {
-            var m = event.dataTransfer.mozItemCount;
-            for (var j = 0; j < m; ++j) {
-                file = event.dataTransfer.mozGetDataAt("application/x-moz-file", j);
-                if (file instanceof Ci.nsIFile) {
-                    filedrag_u = [];
-                    if (j === m - 1) {
-                        $.dostart = true;
-                    }
-                    var mozitem = new mozDirtyGetAsEntry(file); /*,e.dataTransfer*/
-                    if (mozitem.isDirectory) {
-                        return true;
-                    }
-                }
-                else {
-                    if (d) {
-                        console.log('FileSelectHandler: Not a nsIFile', file);
-                    }
-                }
-            }
-        }
-        catch (e) {
-            alert(e);
-            Cu.reportError(e);
-        }
-    };
-
     if (event.dataTransfer
         && event.dataTransfer.items
         && event.dataTransfer.items.length > 0 && event.dataTransfer.items[0].webkitGetAsEntry) {
         return checkWebkitItems();
     }
-    else if (is_chrome_firefox && event.dataTransfer) {
-        return checkMozItems();
-    }
-    // else {
-    // ie does not support DataTransfer.items property.
-    // Therefore cannot recognise what user upload is folder or not.
-    // }
 
     return false;
 };
@@ -2752,6 +2610,58 @@ MegaUtils.prototype.validatePhoneNumber = function(phoneNumber, countryCode) {
     }
 
     return phoneNumber;
+};
+
+/**
+ * Tells whether the used does have to agree to the copyright warning before proceeding.
+ * @returns {Boolean} value.
+ */
+MegaUtils.prototype.agreedToCopyrightWarning = function() {
+    'use strict';
+
+    if (pfid) {
+        // No need under folder-links, copyright agents are retrieving links there
+        return true;
+    }
+
+    if (mega.config.get('cws') | 0) {
+        // They did.
+        return true;
+    }
+
+    if (Object.keys((this.su || !1).EXP || {}).length > 0) {
+        // rely on the presence of public-links.
+        mega.config.set('cws', 1);
+        return true;
+    }
+
+    return false;
+};
+
+/**
+ * Check if the user is part of / eligible for a particular experiment.
+ *
+ * @param {String} flag The experiment flag to check against (e.g. fupd).
+ * @returns {Boolean} value.
+ */
+MegaUtils.prototype.isInExperiment = function(flag) {
+    'use strict';
+
+    // Check against the feature flag first
+    if (typeof mega.flags[`ff_${flag}`] !== 'undefined') {
+        return mega.flags[`ff_${flag}`];
+    }
+
+    // Then, check the AB flag is set and if it is, commit the user to their experiment group
+    if (mega.flags[`ab_${flag}`] > 0) {
+        api.req({'a': 'abta', c: `ab_${flag}`}).catch(dump);
+
+        // User is in a variant group if flag value is greater than 0
+        return true;
+    }
+
+    // If neither flag is set
+    return false;
 };
 
 MegaUtils.prototype.noSleep = async function(stop, title) {
@@ -2840,3 +2750,36 @@ MegaUtils.prototype.noSleep = async function(stop, title) {
         return vNode.play();
     }
 };
+
+MegaUtils.prototype.updatePaymentCardState = () => {
+    'use strict';
+    return api.req({a: 'cci'}).then((res) => {
+        const date = new Date();
+        const cardM = res.result.exp_month;
+        const cardY = res.result.exp_year;
+        const currentM = date.getMonth() + 1;
+        const currentY = date.getFullYear();
+        const currentD = date.getDate();
+        const isCurrentYear = currentY === cardY;
+        let state;
+        // Expired
+        if (currentY > cardY || ((currentM > cardM) && isCurrentYear)) {
+            state = 'exp';
+        }
+        // Expires this month
+        else if ((currentM === cardM) && isCurrentYear) {
+            state = 'expThisM';
+        }
+        // Expires next month (only show on/after the 15th of the current month)
+        else if ((((currentM + 1) === cardM) && (currentD >= 15)) && isCurrentYear) {
+            state = 'expNextM';
+        }
+        M.showPaymentCardBanner(state);
+        if (M.account && state) {
+            M.account.cce = state;
+        }
+    });
+};
+
+
+Object.freeze(MegaUtils.prototype);

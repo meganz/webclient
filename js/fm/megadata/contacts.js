@@ -148,207 +148,162 @@ MegaData.prototype.getActiveContacts = function() {
     return res;
 };
 
-MegaData.prototype.getContacts = function(n) {
-    var folders = [];
-    for (var i in this.c[n.h])
-        if (this.d[i].t == 1 && this.d[i].name) {
-            folders.push(this.d[i]);
-        }
-
-    return folders;
-};
-
-MegaData.prototype.syncUsersFullname = function(userId, chatHandle, promise) {
+// eslint-disable-next-line complexity
+MegaData.prototype.syncUsersFullname = async function(userId, chatHandle) {
     "use strict";
-    var self = this;
-    var user = userId in this.u && this.u[userId] || false;
+    const user = userId in this.u && this.u[userId] || false;
+    const {name} = user;
 
-    if (!user || user.firstName || user.lastName) {
+    if (user.firstName || user.lastName) {
         // already loaded.
-        return promise ? promise.resolve(user && user.name) : false;
+        return name;
     }
 
-    Promise.allSettled([
+    const attrs = await Promise.allSettled([
         mega.attr.get(userId, 'lastname', -1, false, undefined, undefined, chatHandle),
         mega.attr.get(userId, 'firstname', -1, false, undefined, undefined, chatHandle)
-        // @todo ..
-        // eslint-disable-next-line complexity
-    ]).then(function(r) {
-        var user = self.u[userId];
+    ]);
 
-        if (!user) {
-            if (promise) {
-                promise.reject();
+    for (let i = attrs.length; i--;) {
+        const obj = attrs[i];
+
+        // -1, -9, -2, etc...
+        if (typeof obj.value === 'string') {
+            // eslint-disable-next-line local-rules/hints
+            try {
+                obj.value = from8(base64urldecode(obj.value));
             }
-            return;
-        }
-        var lastName = {name: 'lastname', value: r[0].value};
-        var firstName = {name: 'firstname', value: r[1].value};
-
-        [firstName, lastName].forEach(function(obj) {
-
-            // -1, -9, -2, etc...
-            if (typeof obj.value === 'string') {
-                try {
-                    obj.value = from8(base64urldecode(obj.value));
-                }
-                catch (ex) {
-                    obj.value = ex;
-                }
-            }
-
-            if (typeof obj.value !== 'string' || !obj.value) {
-                obj.value = '';
-            }
-        });
-
-        lastName = lastName.value;
-        firstName = firstName.value;
-
-        const oldNameHash = user.name + user.firstName + user.lastName;
-
-        user.name = "";
-        user.lastName = lastName;
-        user.firstName = firstName;
-
-        if (firstName && $.trim(firstName).length > 0 || lastName && $.trim(lastName).length > 0) {
-
-            if (firstName && $.trim(firstName).length > 0) {
-                user.name = firstName;
-            }
-            if (lastName && $.trim(lastName).length > 0) {
-                user.name += (user.name.length > 0 ? " " : "") + lastName;
-            }
-
-            // Get the nickname if available otherwise get the user name
-            var userName = nicknames.getNickname(userId);
-
-            if (M.currentdirid === 'shares') {// Update right panel list and block view
-                $('.shared-grid-view .' + userId + ' .fm-chat-user').text(userName);
-                $('.inbound-share .' + userId).next().find('.shared-folder-info')
-                    .text(l[17590].replace('%1', userName));
-            }
-            else if (M.currentrootid === 'shares') {
-                $('.shared-details-info-block .' + userId).next()
-                    .find('.fm-chat-user').text(userName + ' <' + user.m + '>');
+            catch (ex) {
+                obj.value = null;
             }
         }
 
-        if (nicknames.cache[userId]) {
-            user.nickname = nicknames.cache[userId];
+        if (typeof obj.value !== 'string' || !obj.value) {
+            obj.value = '';
         }
+    }
 
-        // only clear old avatar if the old one was a text one and was different then the new names
-        if (user.avatar && user.avatar.type !== "image" && oldNameHash !== user.name + user.firstName + user.lastName) {
-            user.avatar = false;
-            useravatar.loaded(userId);
+    user.name = "";
+    user.lastName = attrs[0].value.trim();
+    user.firstName = attrs[1].value.trim();
+
+    if (user.firstName || user.lastName) {
+        user.name = `${user.firstName}${user.firstName.length ? " " : ""}${user.lastName}`;
+
+        // Get the nickname if available otherwise get the user name
+        const userName = nicknames.getNickname(userId);
+
+        if (M.currentdirid === 'shares') {// Update right panel list and block view
+            $(`.shared-grid-view .${userId} .fm-chat-user`).text(userName);
+            $(`.inbound-share .${userId} ~> .shared-folder-info`).text(l[17590].replace('%1', userName));
         }
-
-        if (userId === u_handle) {
-            u_attr.firstname = firstName;
-            u_attr.lastname = lastName;
-            u_attr.name = user.name;
-
-            $('.user-name').text(u_attr.fullname);
-            $('.top-menu-logged .name', '.top-menu-popup').text(u_attr.fullname);
-            $('.membership-big-txt.name').text(u_attr.fullname);
-            if (M.currentdirid === 'account') {
-                accountUI.account.profiles.renderFirstName();
-                accountUI.account.profiles.renderLastName();
-            }
+        else if (M.currentrootid === 'shares') {
+            $(`.shared-details-info-block .${userId} ~> .fm-chat-user`).text(`${userName} <${user.m}>`);
         }
+    }
 
-        // check if this first name + last belongs to business sub-user
-        // we added here to avoid re-calling get attribute + minimize the need of code refactoring
-        if (u_attr && u_attr.b && u_attr.b.m && M.suba && M.suba[userId]) {
-            M.require('businessAcc_js', 'businessAccUI_js').done(
-                function() {
-                    var business = new BusinessAccount();
-                    var subUser = M.suba[userId];
-                    subUser.lastname = r[0].value;
-                    subUser.firstname = r[1].value;
+    if (nicknames.cache[userId]) {
+        user.nickname = nicknames.cache[userId];
+    }
 
-                    business.parseSUBA(subUser, false, true);
-                }
-            );
+    // only clear old avatar if the old one was a text one and was different then the new names
+    if (user.avatar && user.avatar.type !== "image" && name !== user.name) {
+        user.avatar = false;
+        useravatar.loaded(userId);
+    }
+
+    if (userId === u_handle) {
+        u_attr.firstname = user.firstName;
+        u_attr.lastname = user.lastName;
+        u_attr.name = user.name;
+
+        $('.user-name, .top-menu-logged .name, .membership-big-txt.name').text(u_attr.fullname);
+        if (!is_mobile && M.currentdirid === 'account') {
+            accountUI.account.profiles.renderFirstName();
+            accountUI.account.profiles.renderLastName();
         }
+    }
 
-        if ($.dialog === 'share') {
-            // Re-render the content of access list in share dialog to update contacts' latest names
-            renderShareDialogAccessList();
-        }
+    // check if this first name + last belongs to business sub-user
+    // we added here to avoid re-calling get attribute + minimize the need of code refactoring
+    if (u_attr && u_attr.b && u_attr.b.m && M.suba && M.suba[userId]) {
+        M.require('businessAcc_js', 'businessAccUI_js')
+            .then(() => {
+                var business = new BusinessAccount();
+                var subUser = M.suba[userId];
+                subUser.lastname = base64urlencode(to8(user.lastName));
+                subUser.firstname = base64urlencode(to8(user.firstName));
 
-        if (promise) {
-            promise.resolve(user.name);
-        }
-    });
+                business.parseSUBA(subUser, false, true);
+            });
+    }
 
-    return promise || true;
+    if ($.dialog === 'share') {
+        // Re-render the content of access list in share dialog to update contacts' latest names
+        renderShareDialogAccessList();
+    }
+
+    return user.name;
 };
 
-MegaData.prototype.syncContactEmail = function(userHash, promise, forced) {
+// eslint-disable-next-line complexity
+MegaData.prototype.syncContactEmail = async function(userHash, forced) {
     'use strict';
-    var user = userHash in this.u && this.u[userHash] || false;
+    const user = userHash in this.u && this.u[userHash] || false;
+    if (user.m) {
+        return user.m;
+    }
 
     if (megaChatIsReady && megaChat.FORCE_EMAIL_LOADING) {
         forced = true;
     }
 
     if (!forced && (is_chatlink || !user || user.c !== 1 && user.c !== 2)) {
-        return promise ? promise.reject() : false;
+        return Promise.reject(EINCOMPLETE);
     }
 
-    if (user.m) {
-        return promise ? promise.resolve(user.m) : user.m;
+    let cache = false;
+    let data = await Promise.resolve(attribCache.getItem(`${userHash}_uge+`)).catch(nop);
+
+    if (!data) {
+        cache = true;
+        data = await api.send({a: 'uge', u: userHash}).catch(echo);
     }
 
-    var cache = false;
-    var resolve = promise ? function(email) {
-        promise[email ? 'resolve' : 'reject'](email);
-    } : nop;
-    var validate = function(data) {
-        if (typeof data === 'string' && data[0] === '[') {
-            data = JSON.parse(data);
-        }
-        if (!Array.isArray(data)) {
-            data = [data, Infinity];
-        }
-        var email = data[0];
-        var expiry = data[1];
+    if (typeof data === 'string' && data[0] === '[') {
+        data = JSON.parse(data);
+    }
 
-        console.assert(typeof email !== 'string' || email.indexOf('@') > 0);
-        if (typeof email !== 'string' || email.indexOf('@') < 0) {
-            console.assert(email === ENOENT);
-            email = ENOENT;
-        }
+    if (!Array.isArray(data)) {
+        data = [data, Infinity];
+    }
 
-        if (cache === true) {
-            attribCache.setItem(userHash + "_uge+", JSON.stringify([email, Date.now() + 7e6]));
-        }
+    let email = data[0];
+    const expiry = data[1];
 
-        if (email === ENOENT) {
-            if (Date.now() > expiry) {
-                console.assert(!cache);
-                throw EEXPIRED;
-            }
+    console.assert(typeof email !== 'string' || email.includes('@'));
+    if (typeof email !== 'string' || !email.includes('@')) {
+        console.assert(email === ENOENT, `email is ${email}`);
+        email = ENOENT;
+    }
 
-            email = undefined;
-        }
-        else if (M.u[userHash].m !== email) {
-            M.u[userHash].m = email;
+    if (cache === true) {
+        attribCache.setItem(`${userHash}_uge+`, JSON.stringify([email, Date.now() + 7e6]));
+    }
+
+    if (email === ENOENT) {
+        if (Date.now() > expiry) {
+            console.assert(!cache);
+            throw EEXPIRED;
         }
 
-        resolve(email);
-    };
+        email = undefined;
+    }
+    else if (user && user.m !== email) {
+        user.m = email;
+    }
 
-    attribCache.getItem(userHash + "_uge+")
-        .then(validate)
-        .catch(function() {
-            cache = true;
-            asyncApiReq({a: 'uge', u: userHash}).always(validate);
-        });
-
-    return promise || true;
+    return email || Promise.reject(ENOENT);
 };
 
 (function() {
@@ -363,10 +318,8 @@ MegaData.prototype.syncContactEmail = function(userHash, promise, forced) {
     MegaData.prototype.setUser = function(u_h, obj) {
         if (!(u_h in this.u)) {
             if (!(obj instanceof MegaDataObject)) {
-                if (!obj) {
-                    obj = {h: u_h, u: u_h, m: '', c: undefined};
-                }
-                obj = new MegaDataObject(MEGA_USER_STRUCT, obj);
+
+                obj = new MegaDataObject(MEGA_USER_STRUCT, Object.assign({h: u_h, u: u_h, m: '', c: undefined}, obj));
             }
             this.u.set(u_h, obj);
         }
@@ -387,7 +340,11 @@ MegaData.prototype.syncContactEmail = function(userHash, promise, forced) {
             if (user) {
                 for (var key in u) {
                     if (key !== 'name' && key in MEGA_USER_STRUCT) {
-                        user[key] = u[key];
+
+                        if (u[key] !== user[key]) {
+
+                            user[key] = u[key];
+                        }
                     }
                     else if (d) {
                         console.warn('addUser: property "%s" not updated.', key, u[key]);
@@ -398,18 +355,28 @@ MegaData.prototype.syncContactEmail = function(userHash, promise, forced) {
                 user = this.setUser(u.u, u);
             }
 
-            if (fmdb && !ignoreDB && !pfkey) {
-                // convert MegaDataObjects -> JS
-                fmdb.add('u', {u: u.u, d: clone(u instanceof MegaDataMap ? u.toJS() : u)});
-                user.firstName = '';
-                user.lastName = '';
-                attribCache.removeItem(user.u + "_firstname");
-                attribCache.removeItem(user.u + "_lastname");
+            if (fmdb && !ignoreDB) {
+                fmdb.add('u', {u: u.u, d: {...user.toJS()}});
             }
 
-            this.syncUsersFullname(user.u);
-            if (megaChatIsReady && megaChat.plugins.presencedIntegration) {
-                megaChat.plugins.presencedIntegration.eventuallyAddPeer(user.u);
+            if (user.c === 1 || user.u === window.u_handle) {
+
+                if (!ignoreDB) {
+                    user.lastName = '';
+                    user.firstName = '';
+                    attribCache.removeItem(`${user.u}_lastname`);
+                    attribCache.removeItem(`${user.u}_firstname`);
+                }
+
+                if (!user.m) {
+                    // If the email isn't already present, try to fetch it.
+                    this.syncContactEmail(user.u, true).catch(nop);
+                }
+                this.syncUsersFullname(user.u, is_chatlink.ph).catch(dump);
+
+                if (megaChatIsReady && megaChat.plugins.presencedIntegration) {
+                    megaChat.plugins.presencedIntegration.eventuallyAddPeer(user.u);
+                }
             }
         }
     };
@@ -417,10 +384,24 @@ MegaData.prototype.syncContactEmail = function(userHash, promise, forced) {
 
 // Update M.opc and related localStorage
 MegaData.prototype.addOPC = function(u, ignoreDB) {
-    this.opc[u.p] = u;
+    'use strict';
+
     if (fmdb && !ignoreDB && !pfkey) {
-        fmdb.add('opc', {p: u.p, d: u});
+        const d = {...u};
+
+        // Filter out values we don't need to persist.
+        delete d.a;
+        delete d.i;
+        delete d.st;
+        delete d.usn;
+        if (!d.msg || d.msg === l[17738]) {
+            // default invite message.
+            delete d.msg;
+        }
+
+        fmdb.add('opc', {p: d.p, d});
     }
+    this.opc[u.p] = u;
 };
 
 /**
@@ -430,17 +411,34 @@ MegaData.prototype.addOPC = function(u, ignoreDB) {
  *
  */
 MegaData.prototype.delOPC = function(id) {
+    'use strict';
+
     if (fmdb && !pfkey) {
         fmdb.del('opc', id);
     }
+    delete this.opc[id];
 };
 
 // Update M.ipc and related localStorage
 MegaData.prototype.addIPC = function(u, ignoreDB) {
-    this.ipc[u.p] = u;
+    'use strict';
+
     if (fmdb && !ignoreDB && !pfkey) {
-        fmdb.add('ipc', {p: u.p, d: u});
+        const d = {...u};
+
+        // Filter out values we don't need to persist.
+        delete d.a;
+        delete d.i;
+        delete d.st;
+        delete d.usn;
+        if (!d.msg || d.msg === l[17738]) {
+            // default invite message.
+            delete d.msg;
+        }
+
+        fmdb.add('ipc', {p: d.p, d});
     }
+    this.ipc[u.p] = u;
 };
 
 /**
@@ -450,9 +448,12 @@ MegaData.prototype.addIPC = function(u, ignoreDB) {
  *
  */
 MegaData.prototype.delIPC = function(id) {
+    'use strict';
+
     if (fmdb && !pfkey) {
         fmdb.del('ipc', id);
     }
+    delete this.ipc[id];
 };
 
 /**
@@ -520,19 +521,17 @@ MegaData.prototype.delPS = function(pcrId, nodeId) {
 
 /**
  * Invite contacts using email address, also known as ongoing pending contacts.
- * This uses API 2.0
+ * This uses API 3.0
  *
  * @param {String} owner, account owner email address.
  * @param {String} target, target email address.
  * @param {String} msg, optional custom text message.
  * @param {String} contactLink, optional contact link.
- * @returns {Integer} proceed, API response code, if negative something is wrong
+ * @returns {Promise<Number|String>} proceed, API response code, if negative something is wrong
  * look at API response code table.
  */
-MegaData.prototype.inviteContact = function (owner, target, msg, contactLink) {
+MegaData.prototype.inviteContact = async function(owner, target, msg, contactLink) {
     "use strict";
-
-    var invitePromise = new MegaPromise();
 
     // since we have the possibility of having cached attributes of the user we are inviting
     // we will remove the cached attrs to allow API request.
@@ -562,32 +561,29 @@ MegaData.prototype.inviteContact = function (owner, target, msg, contactLink) {
     }
 
     if (d) {
-        console.debug('inviteContact');
+        console.group('inviteContact', target);
     }
-    var request = { 'a': 'upc', 'u': target, 'e': owner, 'aa': 'a', i: requesti };
+
+    const request = {'a': 'upc', 'u': target, 'e': owner, 'aa': 'a'};
     if (contactLink && contactLink.length) {
         request.cl = contactLink;
     }
     if (msg && msg.length) {
         request.msg = msg;
     }
-    api_req(request, {
-        callback: function(resp) {
-            if (typeof resp === 'object' && resp.p) {
 
-                // In case of invite-dialog we will use notifications
-                if ($.dialog !== 'invite-friend') {
-                    M.inviteContactMessageHandler(resp.p);
-                    invitePromise.resolve(resp.m);
-                }
+    return api.screq(request)
+        .then(({result}) => {
+
+            // In case of invite-dialog we will use notifications
+            if ($.dialog !== 'invite-friend') {
+                this.inviteContactMessageHandler(result.p);
             }
-            if ((typeof resp !== 'object' && contactLink) || (typeof resp === 'number')) {
-                M.inviteContactMessageHandler(resp);
-            }
-            invitePromise.reject(false);
-        }
-    });
-    return invitePromise;
+
+            return result.m;
+        })
+        .catch((ex) => this.inviteContactMessageHandler(ex))
+        .finally(() => d && console.groupEnd());
 };
 
 /**
@@ -620,108 +616,80 @@ MegaData.prototype.inviteContactMessageHandler = function(errorCode) {
     }
 };
 
-MegaData.prototype.cancelPendingContactRequest = function(target) {
-    if (d) console.debug('cancelPendingContactRequest');
-    var proceed = this.checkCancelContactPrerequisites(target);
+MegaData.prototype.cancelPendingContactRequest = async function(target) {
+    'use strict';
 
-    if (proceed === 0) {
-        api_req({'a': 'upc', 'u': target, 'aa': 'd', i: requesti}, {
-            callback: function(resp) {
-                proceed = resp;
-            }
-        });
+    if (d) {
+        console.debug('cancelPendingContactRequest', target);
     }
 
-    this.cancelContactMessageHandler(proceed);
+    const {opc} = M;
+    let foundEmail = false;
 
-    return proceed;
-};
-
-MegaData.prototype.cancelContactMessageHandler = function(errorCode) {
-    if (errorCode === -2) {
-        msgDialog('info', '', 'This pending contact is already deleted.');
-    }
-};
-
-MegaData.prototype.checkCancelContactPrerequisites = function(email) {
-
-    // Check pending invitations
-    var opc = M.opc;
-    var foundEmail = false;
-    for (var i in opc) {
-        if (M.opc[i].m === email) {
-            foundEmail = true;
-            if (M.opc[i].dts) {
-                return -2;// opc is already deleted
+    for (const i in opc) {
+        if (opc[i].m === target) {
+            // opc is already deleted
+            if (!opc[i].dts) {
+                foundEmail = true;
             }
+            break;
         }
     }
+
     if (!foundEmail) {
-        return -2;// opc doesn't exist for given email
+        // opc doesn't exist for given email
+        return Promise.reject(EARGS);
     }
 
-    return 0;
+    return api.screq({'a': 'upc', 'u': target, 'aa': 'd'});
 };
 
 MegaData.prototype.reinvitePendingContactRequest = function(target) {
+    'use strict';
 
-    if (d) console.debug('reinvitePendingContactRequest');
-    api_req({'a': 'upc', 'u': target, 'aa': 'r', i: requesti});
+    if (d) {
+        console.debug('reinvitePendingContactRequest');
+    }
+    return api.screq({'a': 'upc', 'u': target, 'aa': 'r'});
 };
 
 // Answer on 'aa':'a', {"a":"upc","p":"0uUure4TCJw","s":2,"uts":1416434431,"ou":"fRSlXWOeSfo","i":"UAouV6Kori"}
 // Answer on 'aa':'i', "{"a":"upc","p":"t17TPe65rMM","s":1,"uts":1416438884,"ou":"nKv9P8pn64U","i":"qHzMjvvqTY"}"
-// ToDo, update M.ipc so we can have info about ipc status for view received requests
-MegaData.prototype.ipcRequestHandler = function(id, action) {
-    if (d) console.debug('ipcRequestHandler');
-    return new MegaPromise((resolve, reject) => {
-        var proceed = this.checkIpcRequestPrerequisites(id);
-
-        if (proceed === 0) {
-            api_req({'a': 'upca', 'p': id, 'aa': action, i: requesti}, {
-                callback: function(res) {
-                    if (res === 0) {
-                        resolve(res);
-                    }
-                    else {
-                        M.ipcRequestMessageHandler(res);
-                        reject(res);
-                    }
-                }
-            });
-        }
-        else {
-            this.ipcRequestMessageHandler(proceed);
-            reject(proceed);
-        }
-    });
-};
-
-MegaData.prototype.ipcRequestMessageHandler = function(errorCode) {
-    if (errorCode === -2) {
-        msgDialog('info', 'Already processed', 'Already handled request, something went wrong.');
+MegaData.prototype.ipcRequestHandler = async function(id, action) {
+    'use strict';
+    if (d) {
+        console.group('ipcRequestHandler', id, action);
     }
 
-    // Server busy, ask them to retry the request
-    else if (errorCode === -3 || errorCode === -4) {
-        msgDialog('warninga', 'Server busy', 'The server was busy, please try again later.');
-    }
-
-    // Repeated request
-    else if (errorCode === -12) {
-        msgDialog('info', 'Repeated request', 'The contact has already been accepted.');
-    }
-};
-
-MegaData.prototype.checkIpcRequestPrerequisites = function(id) {
-    var ipc = this.ipc;
-    for (var i in ipc) {
-        if (this.ipc[i].p === id) {
-            return -0;
+    let found = false;
+    const {ipc} = this;
+    for (const i in ipc) {
+        if (ipc[i].p === id) {
+            found = true;
+            break;
         }
     }
 
-    return 0;
+    if (!found) {
+        return Promise.reject(EARGS);
+    }
+
+    return api.screq({'a': 'upca', 'p': id, 'aa': action})
+        .catch((ex) => {
+            if (ex === -2) {
+                msgDialog('info', 'Already processed', 'Already handled request, something went wrong.');
+            }
+            else if (ex === -3 || ex === -4) {
+                // Server busy, ask them to retry the request
+                msgDialog('warninga', 'Server busy', 'The server was busy, please try again later.');
+            }
+            else if (ex === -12) {
+                // Repeated request
+                msgDialog('info', 'Repeated request', 'The contact has already been accepted.');
+            }
+            throw ex;
+        })
+        .finally(() => d && console.groupEnd());
 };
 
 MegaData.prototype.acceptPendingContactRequest = function(id) {

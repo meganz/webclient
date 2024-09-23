@@ -2,13 +2,6 @@
  * This file contains utility that helps on testing functionality that uses the mBroadcaster and watchdog.
  */
 
-
-
-// copy the mBroadcaster once, so that we can reuse it later for crafting multiple, separated
-// broadcasters for unit tests
-var MASTER_BROADCASTER = clone(mBroadcaster);
-MASTER_BROADCASTER._topics = {};
-
 /**
  * Fake watchdog
  *
@@ -18,7 +11,7 @@ MASTER_BROADCASTER._topics = {};
 var FakeBroadcasterWatchdog = function(broadcaster) {
     this.broadcaster = broadcaster;
 
-    this.id = this.wdID = broadcaster.id;
+    this.id = this.origin = broadcaster.id;
 
     this.eTag = '$WDE$!_';
 
@@ -30,41 +23,6 @@ var FakeBroadcasterWatchdog = function(broadcaster) {
     this.waitingQueries = {};
 
     var loggerOpts = {};
-    if (localStorage.fakeBroadcasterWatchdogDebug) {
-        loggerOpts['isEnabled'] = true;
-        loggerOpts['minLogLevel'] = function () {
-            return MegaLogger.LEVELS.DEBUG;
-        };
-        loggerOpts['transport'] = function (level, args) {
-            var fn = "log";
-            if (level === MegaLogger.LEVELS.DEBUG) {
-                fn = "debug";
-            }
-            else if (level === MegaLogger.LEVELS.LOG) {
-                fn = "log";
-            }
-            else if (level === MegaLogger.LEVELS.INFO) {
-                fn = "info";
-            }
-            else if (level === MegaLogger.LEVELS.WARN) {
-                fn = "warn";
-            }
-            else if (level === MegaLogger.LEVELS.ERROR) {
-                fn = "error";
-            }
-            else if (level === MegaLogger.LEVELS.CRITICAL) {
-                fn = "error";
-            }
-            args.push("[" + fn + "]");
-            console.error.apply(console, args);
-        };
-    }
-    else {
-        loggerOpts['isEnabled'] = true;
-        loggerOpts['minLogLevel'] = function () {
-            return MegaLogger.LEVELS.ERROR;
-        };
-    }
 
     this.logger = new MegaLogger("FakeBroadcasterWatchdog[" + this.id + "]", loggerOpts);
 
@@ -129,7 +87,7 @@ FakeBroadcasterWatchdog.prototype.notify = function(msg, data) {
  */
 FakeBroadcasterWatchdog.prototype.query = function(what, timeout, cache, data, expectsSingleAnswer) {
     var self = this;
-    var token = mRandomToken();
+    var token = Math.random().toString(36);
     var promise = new MegaPromise();
 
     self.logger.debug("SEND query: ", what, data, token, timeout, cache);
@@ -142,8 +100,8 @@ FakeBroadcasterWatchdog.prototype.query = function(what, timeout, cache, data, e
         return MegaPromise.resolve(cache);
     }
 
-    // if not master
-    if (!this.broadcaster.crossTab.master || Object(this.broadcaster.crossTab.slaves).length) {
+    // if not owner
+    if (!this.broadcaster.crossTab.owner || Object(this.broadcaster.crossTab.actors).length) {
 
         if (cache) {
             this.replyCache[what] = [];
@@ -189,9 +147,9 @@ FakeBroadcasterWatchdog.prototype.query = function(what, timeout, cache, data, e
         }
     }
     else {
-        // reject if master
+        // reject if owner
         self.logger.debug(
-            "REJECT SEND query, I'm flagged as master: ",
+            "REJECT SEND query, I'm flagged as owner: ",
             what,
             self.queryQueue[token],
             timeout,
@@ -234,25 +192,25 @@ FakeBroadcasterWatchdog.prototype.handleEvent = function(k, v) {
  */
 var FakeBroadcastersConnector = function() {
     this.tabs = {};
-    this.master = false;
+    this.owner = false;
 };
 
 /**
- * Changes the current master
+ * Changes the current owner
  *
- * @param newMasterId {String} the new master ID
+ * @param newOwnerId {String} the new owner ID
  */
-FakeBroadcastersConnector.prototype.setMaster = function(newMasterId) {
-    if (typeof newMasterId.crossTab !== 'undefined') {
+FakeBroadcastersConnector.prototype.takeOwnership = function(newOwnerId) {
+    if (typeof newOwnerId.crossTab !== 'undefined') {
         // found a mBroadcaster as first argument, convert to string ID
-        newMasterId = newMasterId.id;
+        newOwnerId = newOwnerId.id;
     }
 
-    assert(this.tabs[newMasterId], 'masterId passed to .setMaster is invalid (no such tab found)');
+    assert(this.tabs[newOwnerId], 'ownerId passed to .takeOwnership is invalid (no such tab found)');
 
-    this.master = newMasterId;
+    this.owner = newOwnerId;
 
-    this._updateMasterReferences();
+    this._updateOwnerReferences();
 };
 
 /**
@@ -266,38 +224,38 @@ FakeBroadcastersConnector.prototype.getTabs = function () {
 
 
 /**
- * Update and maintain .crossTab.master and .crossTab.slaves[] on all managed tabs/broadcasters
+ * Update and maintain .crossTab.owner and .crossTab.actors[] on all managed tabs/broadcasters
  *
  * @private
  */
-FakeBroadcastersConnector.prototype._updateMasterReferences = function() {
+FakeBroadcastersConnector.prototype._updateOwnerReferences = function() {
     var self = this;
 
-    var slaves = [];
+    var actors = [];
     Object.keys(self.tabs).forEach(function(id) {
-        if (id !== self.master) {
-            slaves.push(id);
+        if (id !== self.owner) {
+            actors.push(id);
         }
     });
 
-    var masterBroadcaster = null;
+    var ownerBroadcaster = null;
     Object.keys(self.tabs).forEach(function(id) {
         var broadcaster = self.tabs[id];
-        if (id === self.master) {
-            broadcaster.crossTab.slaves = slaves;
-            broadcaster.crossTab.master = id;
-            masterBroadcaster = broadcaster;
+        if (id === self.owner) {
+            broadcaster.crossTab.actors = actors;
+            broadcaster.crossTab.owner = id;
+            ownerBroadcaster = broadcaster;
         }
         else {
-            broadcaster.crossTab.slaves = [];
-            broadcaster.crossTab.master = undefined;
+            broadcaster.crossTab.actors = [];
+            broadcaster.crossTab.owner = undefined;
         }
     });
 
 
-    if (self.master) {
-        assert(masterBroadcaster, 'did not found any broadcaster to set as master, expected:' + self.master);
-        masterBroadcaster.sendMessage('crossTab:master', self.master);
+    if (self.owner) {
+        assert(ownerBroadcaster, 'did not found any broadcaster to set as owner, expected:' + self.owner);
+        ownerBroadcaster.sendMessage('crossTab:owner', self.owner);
     }
 };
 
@@ -315,7 +273,7 @@ FakeBroadcastersConnector.prototype.addTab = function (fakeBroadcasterInstance) 
     fakeBroadcasterInstance.connector = self;
 
 
-    self._updateMasterReferences();
+    self._updateOwnerReferences();
 
     return self.tabs[fakeBroadcasterInstance.id];
 };
@@ -331,29 +289,29 @@ FakeBroadcastersConnector.prototype.removeTab = function (idx) {
     }
 
     if (this.hasTab(idx)) {
-        var wasMaster = false;
-        var newMaster;
+        var owner = false;
+        var election;
 
         var tmp = this.tabs[idx];
         delete this.tabs[idx];
-        if (this.master === idx) {
-            wasMaster = true;
-            // that tab was a master change the master now!
+        if (this.owner === idx) {
+            owner = idx;
+            // that tab was a owner change the owner now!
             var tabIds = Object.keys(this.tabs);
             if (tabIds.length > 0) {
-                this.setMaster(tabIds[0]);
-                newMaster = tabIds[0];
+                this.takeOwnership(tabIds[0]);
+                election = tabIds[0];
             }
         }
 
         this.notify(tmp.crossTab.eTag + 'leaving', JSON.stringify({
             data: {
-                wasMaster: wasMaster || -1,
-                newMaster: newMaster
+                owner,
+                election
             }
         }));
 
-        tmp.sendMessage('crossTab:leave', wasMaster);
+        tmp.sendMessage('crossTab:leave', owner);
     }
 };
 
@@ -387,11 +345,11 @@ FakeBroadcastersConnector.prototype.hasTab = function (idx) {
  * @constructor
  */
 var CreateNewFakeBroadcaster = function(id) {
-    var broadcaster = clone(MASTER_BROADCASTER);
+    var broadcaster = mBroadcaster.create(id);
     broadcaster.id = id;
     broadcaster.watchdog = new FakeBroadcasterWatchdog(broadcaster);
-    broadcaster.crossTab.master = null;
-    broadcaster.crossTab.slaves = [];
+    broadcaster.crossTab.owner = null;
+    broadcaster.crossTab.actors = [];
     broadcaster.destroy = function() {
         this._topics = [];
         this.watchdog.destroy();

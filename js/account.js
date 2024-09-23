@@ -36,48 +36,53 @@ function u_login2(ctx, ks) {
 
 // if no valid session present, return ENOENT if force == false, otherwise create anonymous account and return 0 if
 // successful or ENOENT if error; if valid session present, return user type
-function u_checklogin(ctx, force, passwordkey, invitecode, invitename, uh) {
+function u_checklogin(ctx, force, passwordkey, invitecode, invitename) {
+    'use strict';
+
     if ((u_sid = u_storage.sid)) {
         api_setsid(u_sid);
         u_checklogin3(ctx);
     }
-    else {
-        if (!force) {
-            ctx.checkloginresult(ctx, false);
-        }
-        else {
-            u_logout();
+    else if (force) {
+        u_logout();
+        api_create_u_k();
 
-            api_create_u_k();
+        // Forget whether the user was logged-in creating an ephemeral account.
+        delete localStorage.wasloggedin;
 
-            ctx.createanonuserresult = u_checklogin2;
+        ctx.passwordkey = passwordkey;
+        api_createuser(ctx, invitecode, invitename)
+            .then(({result}) => {
+                assert(
+                    typeof result === 'string'
+                    && (localStorage.p = ctx.passwordkey)
+                    && (localStorage.handle = result),
+                    `Unexpected response (${result}), or state (${!!ctx.passwordkey})`
+                );
 
-            createanonuser(ctx, passwordkey, invitecode, invitename, uh);
-        }
+                $.createanonuser = result;
+                ctx.result = u_checklogin2;
+                api_getsid(ctx, result, ctx.passwordkey, ctx.uh); // if ctx.uh is defined --> we need it for "us"
+
+            })
+            .catch((ex) => {
+                console.error(ex);
+                ctx.checkloginresult(ctx, false);
+            });
     }
-}
-
-function u_checklogin2(ctx, u) {
-    if (u === false) {
+    else {
         ctx.checkloginresult(ctx, false);
     }
-    else {
-        ctx.result = u_checklogin2a;
-        api_getsid(ctx, u, ctx.passwordkey, ctx.uh); // if ctx.uh is defined --> we need it fo "us"
-    }
 }
 
-function u_checklogin2a(ctx, ks) {
+function u_checklogin2(ctx, ks) {
+    'use strict';
 
     if (ks === false) {
         ctx.checkloginresult(ctx, false);
     }
     else {
-        u_k = ks[0];
-        u_sid = ks[1];
-        api_setsid(u_sid);
-        u_storage.k = JSON.stringify(u_k);
-        u_storage.sid = u_sid;
+        security.persistAccountSession(...ks);
         u_checklogin3(ctx);
     }
 }
@@ -88,6 +93,7 @@ function u_checklogin3(ctx) {
 }
 
 function u_checklogin3a(res, ctx) {
+    'use strict';
     var r = false;
 
     if (typeof res !== 'object') {
@@ -98,25 +104,32 @@ function u_checklogin3a(res, ctx) {
     else {
         u_attr = res;
 
-        var exclude = [
+        // u_attr = new Proxy(res, {
+        //     defineProperty(target, prop, descriptor) {
+        //         console.warn('def', prop);
+        //         return Reflect.defineProperty(target, prop, descriptor);
+        //     },
+        //     deleteProperty(target, prop) {
+        //         console.warn('del', prop);
+        //         return Reflect.deleteProperty(target, prop);
+        //     },
+        // });
+
+        const exclude = new Set([
             'aav', 'aas', 'b', 'c', 'currk', 'email', 'flags', 'ipcc', 'k', 'lup', 'mkt',
             'name', 'p', 'pf', 'privk', 'pubk', 's', 'since', 'smsv', 'ts', 'u', 'ut', 'uspw'
-        ];
-        const binary = new Set([
-            '^!keys',
-            '^!bak'
         ]);
 
         for (var n in u_attr) {
-            if (binary.has(n)) {
+            if (n[0] === '^') {
                 u_attr[n] = base64urldecode(u_attr[n]);
-                continue;
             }
-            if (exclude.indexOf(n) === -1 && n[0] !== '*') {
-                try {
-                    u_attr[n] = from8(base64urldecode(u_attr[n]));
-                } catch (e) {
-                    u_attr[n] = base64urldecode(u_attr[n]);
+            else if (n[0] !== '*' && n[0] !== '+' && !exclude.has(n)) {
+                let value = u_attr[n];
+
+                if (typeof value === 'string') {
+                    value = base64urldecode(value);
+                    u_attr[n] = tryCatch(() => window.from8(value), false)() || value;
                 }
             }
         }
@@ -135,34 +148,43 @@ function u_checklogin3a(res, ctx) {
             configurable: false
         });
 
+        const {s4} = u_attr;
+        delete u_attr.s4;
+        Object.defineProperty(u_attr, 's4', {
+            value: !!s4,
+            writable: false,
+            configurable: false
+        });
+
         init_storage(u_storage);
 
         if (u_storage.k) {
-            try {
-                u_k = JSON.parse(u_storage.k);
-            }
-            catch(e) {
-                console.error('Error parsing key', e);
-            }
+            const {k} = u_storage;
+            u_k = tryCatch(() => JSON.parse(k), dump.bind(null, `Error parsing key(${k}):`))();
         }
 
         if (u_k) {
             u_k_aes = new sjcl.cipher.aes(u_k);
         }
 
-        try {
-            if (u_attr.privk) {
-                u_privk = crypto_decodeprivkey(a32_to_str(decrypt_key(u_k_aes, base64_to_a32(u_attr.privk))));
-            }
-        }
-        catch (e) {
-            console.error('Error decoding private RSA key', e);
+        if (u_attr.privk) {
+            u_privk = tryCatch(() => {
+                return crypto_decodeprivkey(a32_to_str(decrypt_key(u_k_aes, base64_to_a32(u_attr.privk))));
+            }, (ex) => {
+                console.error('Error decoding private RSA key', ex);
+            })();
         }
 
         if (typeof u_attr.ut !== 'undefined') {
             localStorage.apiut = u_attr.ut;
         }
-        u_attr.flags = Object(u_attr.flags);
+        const {flags} = u_attr;
+
+        delete u_attr.flags;
+        Object.defineProperty(u_attr, 'flags', {
+            configurable: true,
+            value: freeze(flags || {})
+        });
 
         Object.defineProperty(u_attr, 'fullname', {
             get: function() {
@@ -204,8 +226,6 @@ function u_checklogin3a(res, ctx) {
         if (typeof psa !== 'undefined') {
             psa.updateApiWithLastPsaSeen(u_attr['^!lastPsa']);
         }
-
-        setCookie('logged', '1');
 
         if (r === 3) {
             document.body.classList.add('logged');
@@ -274,14 +294,8 @@ function u_checklogin3a(res, ctx) {
                 }
             })
             .then(() => {
-                if (!r || is_iframed || pfid) {
+                if (!r || is_iframed || pfid || isPublicLink()) {
                     // Nothing to do here.
-                    return;
-                }
-                const page = getCleanSitePath();
-                const pubLink = isPublicLink(page) || isPublickLinkV2(page);
-                if (pubLink) {
-                    // Nor here.
                     return;
                 }
 
@@ -330,21 +344,27 @@ function u_checklogin3a(res, ctx) {
                 // in normal users there's no problem, however in business the user will be disabled
                 // till they pay. therefore, if the importing didnt finish before 'upb' then the importing
                 // will fail.
-                if (r > 2 && !is_embed) {
+                if (r > 2 && !is_iframed) {
                     const {handle} = mBroadcaster.crossTab;
 
                     console.assert(!handle, 'FIXME: cross-tab already initialized.', handle, u_handle);
                     console.assert(!handle || handle === u_handle, 'Unmatched cross-tab handle', handle, u_handle);
 
-                    mBroadcaster.crossTab.initialize(() => ctx.checkloginresult(ctx, r));
+                    return mBroadcaster.crossTab.initialize();
                 }
                 else if ($.createanonuser === u_attr.u) {
-                    M.importWelcomePDF().always(() => ctx.checkloginresult(ctx, r));
                     delete $.createanonuser;
+
+                    if (pfid) {
+                        M.importWelcomePDF().catch(dump);
+                    }
+                    else {
+                        return M.importWelcomePDF().catch(dump);
+                    }
                 }
-                else {
-                    ctx.checkloginresult(ctx, r);
-                }
+            })
+            .then(() => {
+                ctx.checkloginresult(ctx, r);
             })
             .catch((ex) => {
                 // This catch handler is meant to be reached on critical
@@ -360,15 +380,15 @@ function u_checklogin3a(res, ctx) {
 async function u_checklogin4(sid) {
     'use strict';
 
-    console.assert(!u_sid || u_type, `Unexpected state (${u_type}) <> ${!!u_sid}:${!!sid}:${sid === u_sid}`);
     console.assert(u_storage === localStorage || u_storage === sessionStorage);
+    console.assert(!u_sid || u_type || sid === u_sid, `hiccup (${u_type}) <> ${!!u_sid}:${!!sid}:${sid === u_sid}`);
 
     u_storage.sid = u_sid = sid;
     api_setsid(u_sid || false);
     delay.cancel('overquota:retry');
 
     // let's use M.req()'s deduplication capability in case of concurrent callers..
-    const ug = await Promise.resolve(M.req('ug')).catch(echo);
+    const {result: ug} = await api.req({a: 'ug'}).catch(echo);
 
     const res = await promisify(resolve => {
         u_checklogin3a(ug, {
@@ -377,23 +397,29 @@ async function u_checklogin4(sid) {
     })();
 
     if (res >= 0) {
+        let held;
+
         if (window.n_h) {
             // set new sid under folder-links
             api_setfolder(n_h);
+            held = mega.config.sync().catch(dump).then(() => getsc(true).catch(dump));
 
             // hide ephemeral account warning
             if (typeof alarm !== 'undefined') {
                 alarm.hideAllWarningPopups();
             }
         }
+
         u_type = res;
         u_checked = true;
         onIdle(topmenuUI);
+
         if (typeof dlmanager === 'object') {
             dlmanager.setUserFlags();
             delay('overquota:retry', () => dlmanager._onOverQuotaAttemptRetry(sid));
         }
-        return res;
+
+        return held ? held.then(() => res) : res;
     }
 
     u_storage.sid = u_sid = undefined;
@@ -402,9 +428,13 @@ async function u_checklogin4(sid) {
 
 // erase all local user/session information
 function u_logout(logout) {
+    // Send some data to mega.io that we logged out
+    const promise = initMegaIoIframe(false);
+
     var a = [localStorage, sessionStorage];
     for (var i = 2; i--;) {
         a[i].removeItem('sid');
+        a[i].removeItem('jid');
         a[i].removeItem('k');
         a[i].removeItem('p');
         a[i].removeItem('handle');
@@ -434,17 +464,16 @@ function u_logout(logout) {
         delete sessionStorage.signinorup;
         localStorage.removeItem('signupcode');
         localStorage.removeItem('registeremail');
+        localStorage.removeItem('mInfinity');
+        localStorage.removeItem('megaLiteMode');
 
         fminitialized = false;
-        if (typeof mDBcls === 'function') {
-            mDBcls(); // close fmdb
+        if ($.leftPaneResizable) {
+            tryCatch(() => $.leftPaneResizable.destroy())();
         }
 
         if (logout !== -0xDEADF) {
             watchdog.notify('logout');
-        }
-        else {
-            watchdog.clear();
         }
 
         if (typeof slideshow === 'function') {
@@ -457,28 +486,58 @@ function u_logout(logout) {
 
         mBroadcaster.crossTab.leave();
         u_sid = u_handle = u_k = u_attr = u_privk = u_k_aes = undefined;
-        api_setsid(false);
         u_sharekeys = {};
         u_type = false;
         loggedout = true;
-        // setCookie('logged');
+
         $('#fmholder').text('').attr('class', 'fmholder');
         if (window.MegaData) {
+            if (window.M instanceof MegaData) {
+                tryCatch(() => oDestroy(M.reset()), false)();
+            }
             M = new MegaData();
         }
-        $.hideContextMenu = function () {};
-        api_reset();
-        if (waitxhr) {
-            waitxhr.abort();
-            waitxhr = undefined;
-        }
 
-        if (window.loadfm) {
-            loadfm.loaded = false;
-        }
-
+        u_reset();
+        $.hideContextMenu = nop;
         mBroadcaster.sendMessage('logout');
     }
+
+    // Delete closed mobile app banner flag on log in
+    delete localStorage.closedMobileAppBanner;
+
+    return promise;
+}
+
+// cleanup internal state.
+function u_reset() {
+    'use strict';
+
+    api.reset();
+
+    if (window.waitsc) {
+        waitsc.stop();
+    }
+    if (window.initworkerpool) {
+        initworkerpool();
+    }
+
+    // clear the n-auth in ch:4
+    api.setSID(window.u_sid);
+
+    // close fmdb
+    if (typeof mDBcls === 'function') {
+        mDBcls();
+    }
+
+    if (window.M && M.reset) {
+        M.reset();
+    }
+    if (window.loadfm) {
+        loadfm.loaded = false;
+        loadfm.loading = false;
+    }
+    window.fminitialized = false;
 }
 
 // true if user was ever logged in with a non-anonymous account
@@ -493,8 +552,6 @@ function u_setrsa(rsakey) {
     // performance optimization. encode keys once
     var privateKeyEncoded = crypto_encodeprivkey(rsakey);
     var publicKeyEncodedB64 = base64urlencode(crypto_encodepubkey(rsakey));
-    var buinessMaster;
-    var buinsesPubKey;
 
     var request = {
         a: 'up',
@@ -509,28 +566,8 @@ function u_setrsa(rsakey) {
 
     // checking if we are creating keys for a business sub-user
     // (deprecated)
-    if (!mega.keyMgr.secure && window.businessSubAc) {
-        // we get current user's master user + its public key (master user pubkey)
-        buinessMaster = window.businessSubAc.bu;
-        buinsesPubKey = window.businessSubAc.bpubk;
-
-
-        // now we will encrypt the current user master-key using master-user public key. and include it in 'up' request
-        // because master-user must be aware of evey sub-user's master-key.
-        var subUserMasterKey = a32_to_str(u_k);
-
-        var masterAccountRSA_keyPub;
-        if (typeof buinsesPubKey === 'string') {
-            masterAccountRSA_keyPub = crypto_decodepubkey(base64urldecode(buinsesPubKey));
-        }
-        else {
-            masterAccountRSA_keyPub = buinsesPubKey;
-        }
-        var subUserMasterKeyEncRSA = crypto_rsaencrypt(subUserMasterKey, masterAccountRSA_keyPub);
-        var subUserMasterKeyEncRSA_B64 = base64urlencode(subUserMasterKeyEncRSA);
-
-        request.mk = subUserMasterKeyEncRSA_B64;
-
+    if (window.businessSubAc) {
+        request['^gmk'] = 'MQ';
     }
 
     var ctx = {
@@ -550,13 +587,12 @@ function u_setrsa(rsakey) {
 
                 // Check whether this is a business sub-user attempting to confirm the account.
                 if (res === EARGS && !window.businessSubAc) {
-                    M.req('ug').then(function(u_attr) {
-
+                    api.req({a: 'ug'}).then(({result: u_attr}) => {
                         if (u_attr.b && u_attr.b.m === 0 && u_attr.b.bu) {
                             crypt.getPubKeyAttribute(u_attr.b.bu, 'RSA')
                                 .then(function(res) {
                                     window.businessSubAc = {bu: u_attr.b.bu, bpubk: res};
-                                    mBroadcaster.once('fm:initialized', M.importWelcomePDF);
+                                    mBroadcaster.once('fm:initialized', () => M.importWelcomePDF().catch(dump));
                                     $promise.linkDoneAndFailTo(u_setrsa(rsakey));
                                 })
                                 .catch(onError.bind(null, l[22897]));
@@ -643,8 +679,21 @@ function u_setrsa(rsakey) {
                     }
                     mBroadcaster.sendMessage('trk:event', 'account', 'regist', u_attr.b ? 'bus' : 'norm', u_type);
 
-                    $promise.resolve(rsakey);
-                    ui_keycomplete();
+                    if (d) {
+                        console.warn('Initializing auth-ring and keys subsystem...');
+                    }
+
+                    Promise.resolve(authring.initAuthenticationSystem())
+                        .then(() => {
+                            return mega.keyMgr.initKeyManagement();
+                        })
+                        .then(() => {
+                            $promise.resolve(rsakey);
+                        })
+                        .catch((ex) => {
+                            msgDialog('warninga', l[135], l[47], ex < 0 ? api_strerror(ex) : ex);
+                        })
+                        .finally(ui_keycomplete);
                 }
             });
         }
@@ -740,27 +789,6 @@ function u_exportkey(action) {
     }
 }
 
-// ensures that a user identity exists, also sets sid
-function createanonuser(ctx, passwordkey, invitecode, invitename, uh) {
-    ctx.callback = createanonuser2;
-
-    ctx.passwordkey = passwordkey;
-
-    api_createuser(ctx, invitecode, invitename, uh);
-
-    // Forget whether the user was logged-in creating an ephemeral account.
-    delete localStorage.wasloggedin;
-}
-
-function createanonuser2(u, ctx) {
-    if (u === false || !(localStorage.p = ctx.passwordkey) || !(localStorage.handle = u)) {
-        u = false;
-    }
-
-    $.createanonuser = u;
-    ctx.createanonuserresult(ctx, u);
-}
-
 /**
  * Check if the password is the user's password without doing any API call. It tries to decrypt the user's key.
  *
@@ -786,72 +814,6 @@ function checkMyPassword(derivedEncryptionKeyArray32) {
     return decryptedMasterKeyString === masterKeyStringToCompare;
 }
 
-
-function checkquota(ctx) {
-    var req = {
-        a: 'uq',
-        xfer: 1
-    };
-
-    api_req(req, ctx);
-}
-
-function processquota1(res, ctx) {
-    if (typeof res === 'object') {
-        if (res.tah) {
-            var i;
-            var tt = 0;
-            var tft = 0;
-            var tfh = -1;
-
-            for (i = 0; i < res.tah.length; i++) {
-                tt += res.tah[i];
-
-                if (tfh < 0) {
-                    tft += res.tah[i];
-
-                    if (tft > 1048576) {
-                        tfh = i;
-                    }
-                }
-            }
-
-            ctx.processquotaresult(ctx, [tt, tft, (6 - tfh) * 3600 - res.bt, res.tar, res.tal]);
-        }
-        else {
-            ctx.processquotaresult(ctx, false);
-        }
-    }
-}
-
-/**
- * Helper method that will generate a 1 or 2 letter short contact name
- *
- * @param s
- * @param shortFormat
- * @returns {string}
- * @private
- */
-function _generateReadableContactNameFromStr(s, shortFormat) {
-    if (!s) {
-        return "NA";
-    }
-
-    if (shortFormat) {
-        var ss = s.split("@")[0];
-        if (ss.length == 2) {
-            return ss.toUpperCase();
-        }
-        else {
-            return s.substr(0, 1).toUpperCase();
-        }
-    }
-    else {
-        s = s.split(/[^a-z]/ig);
-        s = s[0].substr(0, 1) + (s.length > 1 ? "" + s[1].substr(0, 1) : "");
-        return s.toUpperCase();
-    }
-}
 
 /**
  * Generates meta data required for rendering avatars
@@ -996,6 +958,115 @@ function setLandingPage(page) {
     mega.config.set('uhp', index < 0 ? 0 : index);
 }
 
+/**
+ * Inform the mega.io static server of first name, avatar, login status in/out
+ * @param {Boolean} loginStatus This is true if they just logged in, false if they logged out
+ * @param {Number|undefined} planNum Optional Pro plan number if recently purchased (otherwise u_attr.p is used)
+ * @returns {undefined}
+ */
+function initMegaIoIframe(loginStatus, planNum) {
+
+    'use strict';
+
+    // Set constants for URLs (easier to change for local testing)
+    const megapagesUrl = 'https://mega.io';
+    const parentUrl = 'https://mega.nz';
+
+    const megapagesPromise = mega.promise;
+
+    tryCatch(() => {
+        const megaIoIframe = document.getElementById('i-ping');
+
+        // Check iframe is available
+        if (!megaIoIframe) {
+            console.error('[webclient->megapages] The iframe is not available. Cannot send user details.');
+            megapagesPromise.resolve();
+            return;
+        }
+
+        // We only want to inform the mega.io site if on live domain
+        if (is_iframed || is_extension || location.origin !== parentUrl) {
+            console.warn(`[webclient->megapages] The iframe was not initialised.
+                Is iframed: ${is_iframed}. Is extension: ${is_extension}.
+                Origin unexpected: ${location.origin !== parentUrl} (was ${location.origin}, expecting ${parentUrl}).`);
+            megapagesPromise.resolve();
+            return;
+        }
+
+        // Give mega.io five seconds to provide receipt before allowing other processes to continue
+        const timeout = setTimeout(() => {
+            megapagesPromise.resolve();
+        }, 5000);
+
+        const sendMessage = (messageData) => {
+            // Send the data
+            megaIoIframe.contentWindow.postMessage(messageData, megapagesUrl);
+
+            // Wait for receipt
+            window.addEventListener('message', (e) => {
+                if (e.source === megaIoIframe.contentWindow && e.origin === megapagesUrl) {
+                    console.info('[megapages] megapages hook receipt received. Success:', e.data);
+                    megapagesPromise.resolve();
+                    clearTimeout(timeout);
+                }
+            });
+        };
+
+        // Once the mega.io iframe has loaded
+        megaIoIframe.onload = () => {
+            console.info('[webclient->megapages] iframe loaded. Preparing message...');
+
+            let postMessageData = { };
+
+            // If logging in, assign the first name and set the plan num if available (NB: Free is undefined)
+            if (loginStatus) {
+                postMessageData = {
+                    firstName: u_attr.firstname,
+                    planNum: planNum || u_attr.p || undefined
+                };
+
+                const avatarMeta = generateAvatarMeta(u_handle);
+                if (avatarMeta && avatarMeta.color) {
+                    postMessageData.avatarColourKey = avatarMeta.color;
+                }
+
+                // Get the custom avatar
+                mega.attr.get(u_handle, 'a', true, false)
+                    .done((res) => {
+
+                        // If the avatar (in Base64) exists, add to the data
+                        if (typeof res !== 'number' && res.length > 5) {
+                            postMessageData.avatar = res;
+                        }
+                    })
+                    .always(() => {
+                        console.info('[webclient->megapages] Sending loggedin message to iframe.', postMessageData);
+                        sendMessage(postMessageData);
+                    });
+            }
+            else {
+                console.info('[webclient->megapages] Sending loggedout message to iframe.', postMessageData);
+                sendMessage(postMessageData);
+            }
+        };
+
+        // If they logged out, inform the logged out mega.io URL
+        if (!loginStatus) {
+            console.info('[webclient->megapages] Setting iframe source to loggedout endpoint.');
+
+            megaIoIframe.src = `${megapagesUrl}/webclient/loggedout.html`;
+        }
+        else {
+            console.info('[webclient->megapages] Setting iframe source to loggedin endpoint');
+
+            // Set the source to the logged in mega.io URL
+            megaIoIframe.src = `${megapagesUrl}/webclient/loggedin.html`;
+        }
+    })();
+
+    return megapagesPromise;
+}
+
 (function(exportScope) {
     "use strict";
     var _lastUserInteractionCache = {};
@@ -1010,16 +1081,15 @@ function setLandingPage(page) {
      * @param b
      * @private
      */
-    var _compareLastInteractionStamp = function (a, b) {
+    var _compareLastInteractionStamp = function(a, b) {
         var timestampA = parseInt(a.split(":")[1], 10);
         var timestampB = parseInt(b.split(":")[1], 10);
 
         return timestampA > timestampB;
     };
 
-    var throttledSetLastInteractionOps = [];
-    var timerSetLastInteraction = null;
-    var SET_LAST_INTERACTION_TIMER = 1 * 60 * 1000;
+    const setLastInteractionQueue = [];
+    const SET_LAST_INTERACTION_TIMER = 60; // seconds
 
     /**
      * Returns a promise which will be resolved with a string, formatted like this "$typeOfInteraction:$timestamp"
@@ -1081,14 +1151,8 @@ function setLandingPage(page) {
             else {
                 $elem.addClass('never');
             }
-            if (time2last(ts)) {
-                $elem.text(
-                    time2last(ts)
-                );
-            }
-            else {
-                $elem.text(l[1051]);
-            }
+
+            $elem.text(time2last(ts) || l[1051]);
         };
 
         var _renderLastInteractionFail = noRender ? nop : function (r) {
@@ -1270,14 +1334,14 @@ function setLandingPage(page) {
      * @private
      */
     var _flushSetLastInteractionWith = function() {
-        timerSetLastInteraction = null;
 
-        for (var i = throttledSetLastInteractionOps.length - 1; i >= 0; i--) {
-            var op = throttledSetLastInteractionOps[i];
-            throttledSetLastInteractionOps.splice(i, 1);
-            _lastUserInteractionCacheInFlight[op[0]] = -1;
-            op[2].linkDoneAndFailTo(_realSetLastInteractionWith(op[0], op[1]));
+        for (let i = setLastInteractionQueue.length; i--;) {
+            const [user, value, promise] = setLastInteractionQueue[i];
+
+            _lastUserInteractionCacheInFlight[user] = -1;
+            promise.linkDoneAndFailTo(_realSetLastInteractionWith(user, value));
         }
+        setLastInteractionQueue.length = 0;
     };
 
 
@@ -1288,24 +1352,31 @@ function setLandingPage(page) {
      * @param v {String} "$typeOfInteraction:$unixTimestamp" (see getLastInteractionWith for the types of int...)
      * @returns {Deferred|MegaPromise}
      */
-    var setLastInteractionWith = function(u_h, v) {
+    exportScope.setLastInteractionWith = function(u_h, v) {
         var promise = new MegaPromise();
 
+        if (d && u_h === 'test-me') {
+            const user = M.u[M.u.keys()[0]] || !1;
+
+            onIdle(_flushSetLastInteractionWith);
+            console.debug(`Triggering last-interaction (upv->ua combo) for "${user.name}" (${user.u}, ${user.m})`);
+
+            u_h = user.u;
+            v = `0:${unixtime()}`;
+        }
+
         // set on client side, to simulate a real commit
-        var ts = Object(M.u[u_h]).ts;
-        var newTs = parseInt(v.split(":")[1], 10);
-        if (ts < newTs) {
-            Object(M.u[u_h]).ts = newTs;
+        const user = u_h in M.u && M.u[u_h] || false;
+        const newTs = parseInt(String(v).split(":")[1], 10);
+
+        if (user && user.ts < newTs) {
+            user.ts = newTs;
             _lastUserInteractionCacheInFlight[u_h] = v;
         }
+        tSleep.schedule(SET_LAST_INTERACTION_TIMER, _flushSetLastInteractionWith);
 
-        if (timerSetLastInteraction) {
-            clearTimeout(timerSetLastInteraction);
-        }
-        timerSetLastInteraction = setTimeout(_flushSetLastInteractionWith, SET_LAST_INTERACTION_TIMER);
-
-        for (var i = 0; i < throttledSetLastInteractionOps.length; i++) {
-            var entry = throttledSetLastInteractionOps[i];
+        for (var i = 0; i < setLastInteractionQueue.length; i++) {
+            var entry = setLastInteractionQueue[i];
             var u_h2 = entry[0];
             var ts2 = parseInt(entry[1].split(":")[1], 10);
 
@@ -1320,11 +1391,9 @@ function setLandingPage(page) {
 
             }
         }
-        throttledSetLastInteractionOps.push([u_h, v, promise]);
+        setLastInteractionQueue.push([u_h, v, promise]);
 
         return promise;
     };
-
-    exportScope.setLastInteractionWith = setLastInteractionWith;
     exportScope.getLastInteractionWith = getLastInteractionWith;
 })(window);

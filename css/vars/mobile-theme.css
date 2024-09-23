@@ -1,0 +1,156 @@
+/**
+  * Please read wiki article 'CSS Variables and Themes' before editing this file.
+  *
+  * All variable names are based on the design system and serve the purpose of bridging between the design and
+  * development teams. Other variables should be put elsewhere.
+  *
+  * Variable format: --type-purpose-color-importance-state, e.g. --text-body1-black-high-hover. Not all parts need
+  * to be added for all variables, and some parts may have multiple words (e.g. `line-height`).
+  *
+  * When styling, always use the most specific variable, e.g. if you are styling an element which should have
+  * body (1) text, use `--text-color-high` rather than `--text-color-white-high` so that it changes with
+  * the theme.
+  *
+  * The variables at the bottom will update their value when switching theme, and the attributes can be assigned
+  * to the body, or any element within it to give that element and its children a different theme, e.g. to demo
+  * themes, or for sections which are inverted compared to the rest of the theme (accents, etc.).
+  *
+  * Themes can be forced so that they are always on using the `-forced` suffix, for example the nav bar is always
+  * dark mode.
+  *
+  * Color must be in RGBA format. e.g. rgba(0, 0, 0, 1)
+  *
+  * Custom Alpha Level can be added to override the alpha level when required.
+  * Custom alpha var name must be starts with color var {type}. e.g. --label-black: rgba(0, 0, 0, var(--label-alpha, 1))
+  */
+
+
+/*** Section 1: constants that will not vary by theme, but may only be used by one theme at the moment ***/
+
+body,
+.custom-alpha {
+
+    /* texts */
+
+        /* font family */
+
+            --mobile-font-family-main: "Inter", sans-serif;
+            --mobile-font-family-heading: "Poppins", sans-serif;
+
+
+        /* font weight */
+
+            --mobile-font-weight-bold: 700;
+            --mobile-font-weight-semibold: 600;
+            --mobile-font-weight-regular: 400;
+
+
+        /* line height */
+
+            --mobile-font-line-height-heading: 1.2;
+            --mobile-font-line-height-text: 1.5;
+
+
+        /* letter-spacing */
+
+            --mobile-font-letter-spacing-body: 0%;
+            --mobile-font-letter-spacing-caption: 2%;
+
+
+        /* font size */
+
+            --mobile-font-size-1: 10px;
+            --mobile-font-size-2: 12px;
+            --mobile-font-size-3: 14px;
+            --mobile-font-size-4: 16px;
+            --mobile-font-size-5: 18px;
+            --mobile-font-size-6: 20px;
+            --mobile-font-size-7: 24px;
+            --mobile-font-size-8: 32px;
+            --mobile-font-size-9: 40px;
+            --mobile-font-size-10: 48px;
+            --mobile-font-size-11: 60px;
+
+        /* font */
+
+            --mobile-font-heading-h1: var(--mobile-font-weight-bold) var(--mobile-font-size-6)/var(--mobile-font-line-height-heading) var(--mobile-font-family-heading);
+            --mobile-font-heading-h2: var(--mobile-font-weight-bold) var(--mobile-font-size-5)/var(--mobile-font-line-height-heading) var(--mobile-font-family-main);
+            --mobile-font-heading-h3: var(--mobile-font-weight-semibold) var(--mobile-font-size-5)/var(--mobile-font-line-height-heading) var(--mobile-font-family-main);
+
+            --mobile-font-copy-regular: var(--mobile-font-weight-regular) var(--mobile-font-size-4)/var(--mobile-font-line-height-text) var(--mobile-font-family-main);
+            --mobile-font-copy-semibold: var(--mobile-font-weight-semibold) var(--mobile-font-size-4)/var(--mobile-font-line-height-text) var(--mobile-font-family-main);
+            --mobile-font-copy-bold: var(--mobile-font-weight-bold) var(--mobile-font-size-4)/var(--mobile-font-line-height-text) var(--mobile-font-family-main);
+
+            --mobile-font-caption-large-regular: var(--mobile-font-weight-regular) var(--mobile-font-size-3)/var(--mobile-font-line-height-text) var(--mobile-font-family-main);
+            --mobile-font-caption-large-semibold: var(--mobile-font-weight-semibold) var(--mobile-font-size-3)/var(--mobile-font-line-height-text) var(--mobile-font-family-main);
+            --mobile-font-caption-large-bold: var(--mobile-font-weight-bold) var(--mobile-font-size-3)/var(--mobile-font-line-height-text) var(--mobile-font-family-main);
+
+            --mobile-font-caption-small-regular: var(--mobile-font-weight-regular) var(--mobile-font-size-2)/var(--mobile-font-line-height-heading) var(--mobile-font-family-main);
+            --mobile-font-caption-small-semibold: var(--mobile-font-weight-semibold) var(--mobile-font-size-2)/var(--mobile-font-line-height-heading) var(--mobile-font-family-main);
+            --mobile-font-caption-small-bold: var(--mobile-font-weight-bold) var(--mobile-font-size-2)/var(--mobile-font-line-height-heading) var(--mobile-font-family-main);
+
+            --mobile-font-link-large-regular: var(--mobile-font-weight-regular) var(--mobile-font-size-4)/var(--mobile-font-line-height-text) var(--mobile-font-family-main);
+            --mobile-font-link-large-semibold: var(--mobile-font-weight-semibold) var(--mobile-font-size-4)/var(--mobile-font-line-height-text) var(--mobile-font-family-main);
+            --mobile-font-link-large-bold: var(--mobile-font-weight-bold) var(--mobile-font-size-4)/var(--mobile-font-line-height-text) var(--mobile-font-family-main);
+
+            --mobile-font-link-small-regular: var(--mobile-font-weight-regular) var(--mobile-font-size-3)/var(--mobile-font-line-height-text) var(--mobile-font-family-main);
+            --mobile-font-link-small-semibold: var(--mobile-font-weight-semibold) var(--mobile-font-size-3)/var(--mobile-font-line-height-text) var(--mobile-font-family-main);
+            --mobile-font-link-small-bold: var(--mobile-font-weight-bold) var(--mobile-font-size-3)/var(--mobile-font-line-height-text) var(--mobile-font-family-main);
+
+            --mobile-font-label-bold: var(--mobile-font-weight-semibold) var(--mobile-font-size-4)/var(--mobile-font-line-height-heading) var(--mobile-font-family-main);
+            --mobile-font-label-underline: var(--mobile-font-weight-semibold) var(--mobile-font-size-4)/var(--mobile-font-line-height-heading) var(--mobile-font-family-main);
+
+            --mobile-font-input-regular: var(--mobile-font-weight-regular) var(--mobile-font-size-4)/var(--mobile-font-line-height-heading) var(--mobile-font-family-main);
+
+
+    /* blur backgrounds */
+
+
+        /* effects */
+
+            --mobile-background-blur-subtle: blur(2px);
+            --mobile-background-blur-medium: blur(4px);
+            --mobile-background-blur-strong: blur(8px);
+
+
+    /* default maximum element width: inputs, buttons, etc */
+
+        --mobile-elem-max-width: 382px;
+        --mobile-page-max-width: 697px;
+        --mobile-tablet-elem-width: 327px;
+}
+
+
+/*** Section 2: shorthand variables that will automatically update on changing theme ***/
+
+/* light theme */
+.theme-light,
+.theme-light .custom-alpha,
+html .theme-light-forced {
+
+    /* shadows */
+
+        --mobile-shadow-subtle: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        --mobile-shadow-medium: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        --mobile-shadow-strong: 0px 8px 16px rgba(0, 0, 0, 0.15);
+
+
+    /* node icons */
+    --mobile-surface-node-icon-background: rgba(250, 250, 250, var(--mobile-surface-alpha, 0.7));
+}
+
+/* dark theme */
+.theme-dark,
+.theme-dark .custom-alpha,
+html .theme-dark-forced {
+
+    /* shadows */
+
+        --mobile-shadow-subtle: 0px 2px 4px rgba(0, 0, 0, 0.7);
+        --mobile-shadow-medium: 0px 4px 8px rgba(0, 0, 0, 0.7);
+        --mobile-shadow-strong: 0px 8px 16px rgba(0, 0, 0, 0.7);
+
+
+    /* node icons */
+    --mobile-surface-node-icon-background: rgba(48, 50, 51, var(--mobile-surface-alpha, 0.7));
+}

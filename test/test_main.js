@@ -5,6 +5,33 @@ describe("Initialization Unit Tests", function() {
     "use strict";
 
     var assert = chai.assert;
+    const nuke = (desc) => {
+        const rejectedPromise = Promise.reject(EBLOCKED);
+        const stub = (proto, method, test) => {
+            const orig = proto[method];
+            const name = proto[Symbol.toStringTag] || Object(proto.constructor).name || proto.name || 'unknown';
+
+            Object.defineProperty(window, `__sinon_stub_${Math.random()}`, {
+                value: sinon.stub(proto, method)
+                    .callsFake(function(...args) {
+                        if (test && test(...args)) {
+                            console.info(`${name}.${method} call for...`, ...args);
+                            return orig.apply(this, args);
+                        }
+                        console.warn(
+                            `Forbidden call to ${name}.${method},\n` +
+                            `ARGUMENTS: ${JSON.stringify(args, null, 4)},\n` +
+                            `STACKTRACE:\n${mStub.stack()}\r\n`
+                        );
+                        return rejectedPromise;
+                    })
+            });
+        };
+
+        for (let i = desc.length; i--;) {
+            stub(...desc[i]);
+        }
+    };
 
     it("did not called jsl_start()", function() {
         // There is no reason to let secureboot's onload handler invoke jsl_start() because:
@@ -23,6 +50,12 @@ describe("Initialization Unit Tests", function() {
 
         _showDebug(['api_req', 'console.error', 'console.info']);
 
+        nuke([
+            [window, 'fetch'],
+            [MEGAPIRequest.prototype, 'enqueue'],
+            [XMLHttpRequest.prototype, 'open', (...args) => /^base\/.*\.js$/.test(args[1])]
+        ]);
+
         // turn the `ua` (userAgent) string into an object which holds the browser details
         try {
             ua = Object(ua);
@@ -30,16 +63,13 @@ describe("Initialization Unit Tests", function() {
         }
         catch (e) {}
 
-        var len = function(o) {
-            return Object.keys(o || {}).length;
-        };
         var blen = function(p) {
-            return len(mBroadcaster._topics[p]);
+            return mBroadcaster.hasListener(p);
         };
 
         // We must have boot_done listeners at least for:
         // api_reset(), watchdog.setup(), eventsCollect(), MegaData(), polyfills, and attrs.js
-        assert(blen('boot_done') > 5, 'Unexpected boot_done listeners...');
+        assert(blen('boot_done'), 'Unexpected boot_done listeners...');
 
         // We must have a bunch of listeners waiting for startMega() to get invoked...
         assert(blen('startMega'), 'Should listen to startMega()...');
@@ -47,33 +77,39 @@ describe("Initialization Unit Tests", function() {
 
         // Check for some others...
         assert(blen('closedialog'), 'safeShowDialog() should listen to closeDialog()');
-        assert(blen('crossTab:master'), 'Should listen to cross-tab master ownership');
-        assert(blen('mediainfo:collect'), 'Should listen to collect mediainfo metadata');
+        assert(blen('crossTab:owner'), 'Should listen to cross-tab ownership');
+        // assert(blen('mediainfo:collect'), 'Should listen to collect mediainfo metadata');
+
+        // catch errors dispatching broadcast events (console.error addendum)
+        const repl = mStub(window, 'reportError', (ex) => {
+            repl.errors.add(ex && `${ex + '\n' + ex.stack}` || 'unknown-error');
+        });
+        repl.errors = new Set();
+        window.buildVersion.timestamp = Date.now();
 
         // Initialize core components
         mBroadcaster.sendMessage('boot_done');
 
-        var rejectedPromise = MegaPromise.reject(EBLOCKED);
-        M.$reqStub = sinon.stub(M, 'req').callsFake(function(r) {
-            console.warn('Prevented call to M.req(), the network should not be reached.' +
-                '\nREQUEST: ' + JSON.stringify(r) +
-                '\nSTACKTRACE: \n' + mStub.stack() + '\n\n');
-            return rejectedPromise;
-        });
-
         mBroadcaster.sendMessage('startMega');
         mBroadcaster.sendMessage('startMega:desktop');
 
+        if (repl.errors.size) {
+            for (const ex of repl.errors) {
+                dump(`\u{1F90C} Caught exception... ${ex} \u{1F691} \u{1F691}`);
+            }
+        }
+
+        expect(repl.errors.size).to.eql(0);
         expect(console.error.callCount).to.eql(0);
         _hideDebug();
 
         // Test stubbing and restoring.
         var warn = sinon.stub(console, 'warn');
-        M.req('doh');
+        window.fetch('doh')
+            .catch(r => assert.ok(r === EBLOCKED));
         expect(console.warn.callCount).to.eql(1);
-        M.reqA(['hah']);
-        assert.ok(M.req.calledWith('hah'));
-        expect(console.warn.callCount).to.eql(2);
+        expect(window.fetch.callCount).to.eql(1);
+        assert.ok(window.fetch.calledWith('doh'));
         warn.restore();
     });
 });

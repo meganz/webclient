@@ -72,27 +72,31 @@ export default class GenericConversationMessage extends ConversationMessageMixin
             'click.dropdownShortcut',
             CLICKABLE_ATTACHMENT_CLASSES,
             function(e){
-                if (e.target.classList.contains('button')) {
+                const $target = $(e.target);
+                if ($target.hasClass('button')) {
                     // prevent recursion
                     return;
                 }
-                if (e.target.classList.contains('no-thumb-prev')) {
-                    // do now show the dropdown clicking a previeable item without thumbnail
+                if (
+                    $target.hasClass('no-thumb-prev')
+                    || $target.parents('.no-thumb-prev').length
+                ) {
+                    // don't show the dropdown clicking an item without thumbnail but do when clicking the meta info
                     return;
                 }
 
-                var $block;
-                if ($(e.target).is('.shared-data')) {
-                    $block = $(e.target);
+                let $block;
+                if ($target.is('.shared-data')) {
+                    $block = $target;
                 }
                 else if (
-                    $(e.target).is(SHARED_INFO_CLS) || $(e.target).parents(SHARED_INFO_CLS).length > 0
+                    $target.is(SHARED_INFO_CLS) || $target.parents(SHARED_INFO_CLS).length > 0
                 ) {
-                    $block = $(e.target).is(SHARED_INFO_CLS) ?
-                        $(e.target).next() : $(e.target).parents(SHARED_INFO_CLS).next();
+                    $block = $target.is(SHARED_INFO_CLS) ?
+                        $target.next() : $target.parents(SHARED_INFO_CLS).next();
                 }
                 else {
-                    $block = $(e.target).parents('.message.shared-data');
+                    $block = $target.parents('.message.shared-data');
                 }
 
 
@@ -156,7 +160,7 @@ export default class GenericConversationMessage extends ConversationMessageMixin
 
         this.doCancelRetry(e, msg);
         chatRoom._sendMessageToTransport(msg)
-            .done(internalId => {
+            .then(internalId => {
                 msg.internalId = internalId;
                 this.safeForceUpdate();
             });
@@ -209,7 +213,7 @@ export default class GenericConversationMessage extends ConversationMessageMixin
 
         var haveLink = self._isNodeHavingALink(h) === true;
 
-        var getManageLinkText = haveLink ? l[6909] : l[59];
+        var getManageLinkText = haveLink ? l[6909] : l[5622];
 
         arr.push(
             <DropdownItem
@@ -242,25 +246,13 @@ export default class GenericConversationMessage extends ConversationMessageMixin
     _addToCloudDrive(v, openSendToChat) {
         $.selected = [v.h];
         $.chatAttachmentShare = true;
+        if ($.dialog === 'onboardingDialog') {
+            closeDialog();
+        }
         openSaveToDialog(v, function(node, target) {
             if (Array.isArray(target)) {
-                M.myChatFilesFolder.get(true)
-                    .then(function(myChatFolder) {
-                        M.injectNodes(node, myChatFolder.h, function(res) {
-                            if (Array.isArray(res) && res.length) {
-                                megaChat.openChatAndAttachNodes(target, res).dump();
-                            }
-                            else if (d) {
-                                console.warn('Unable to inject nodes... no longer existing?', res);
-                            }
-                        });
-                    })
-                    .catch(function() {
-                        if (d) {
-                            // eslint-disable-next-line local-rules/hints
-                            console.error("Failed to allocate 'My chat files' folder.", arguments);
-                        }
-                    });
+
+                megaChat.openChatAndAttachNodes(target, node.ch || node.h).catch(tell);
             }
             else {
                 // is a save/copy to

@@ -3,9 +3,6 @@
  */
 mobile.support = {
 
-    /** The minimum acceptable message length to prevent short spam messages going to support */
-    minimumMessageLength: 30,
-
     /**
      * Initialise functionality
      */
@@ -19,9 +16,12 @@ mobile.support = {
         }
 
         var $page = $('.mobile.get-support');
+        this.minimumMessageLength = 30;
 
         // Init functionality
-        mobile.support.initSendMessageButton($page);
+        MegaMobileHeader.init(true);
+        mega.ui.topmenu.toggleActive();
+        this.initSendMessageButton($page);
 
         // Show the page
         $page.removeClass('hidden');
@@ -41,7 +41,7 @@ mobile.support = {
         var $supportEnquiryMessage = $page.find('.support-text-field');
 
         // On clicking/tapping the Send button
-        $sendButton.off('tap').on('tap', function() {
+        $sendButton.rebind('tap', () => {
 
             // Get the message and type
             var enquiryMessage = $supportEnquiryMessage.val();
@@ -50,7 +50,7 @@ mobile.support = {
             var enquiryTypeInt = parseInt(enquiryType);
 
             // If the message length is below the minimum, don't do anything
-            if (enquiryMessageTrimmed.length < mobile.support.minimumMessageLength) {
+            if (enquiryMessageTrimmed.length < this.minimumMessageLength) {
                 msgDialog(
                     'warninga',
                     l[7884], // Message too short
@@ -74,7 +74,7 @@ mobile.support = {
                     if (response === 0) {
 
                         // If they click OK on the confirm dialog, load the cloud drive
-                        mobile.messageOverlay.show(l[7882], l[7881], function() {
+                        mobile.messageOverlay.show(l[7882], l[7881]).then(() => {
                             loadSubPage('fm');
                         });
                     }

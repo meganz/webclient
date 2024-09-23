@@ -25,6 +25,8 @@ lazy(self, 'tlvstore', () => {
     const ns = {
         _logger: MegaLogger.getLogger('tlvstore')
     };
+    const hasOwn = {}.hasOwnProperty;
+    const SYMBOL = Symbol('~~TLV~~');
 
     const getKey = (key) => {
         if (Array.isArray(key)) {
@@ -113,7 +115,7 @@ lazy(self, 'tlvstore', () => {
         var result = '';
         let safe = true;
         for (var key in container) {
-            if (container.hasOwnProperty(key)) {
+            if (hasOwn.call(container, key)) {
                 const type = typeof container[key];
 
                 if (type !== 'string') {
@@ -224,8 +226,8 @@ lazy(self, 'tlvstore', () => {
      *     failing TLV decoding.
      */
     ns.tlvRecordsToContainer = function(tlvContainer, utf8LegacySafe) {
-        var rest = tlvContainer;
-        var container = {};
+        let rest = tlvContainer;
+        let container = Object.create(null);
 
         if (!rest.charCodeAt(0) && rest.length > 65538) {
             this._logger.warn('tlv-record overflow fix-up.', [rest]);
@@ -356,24 +358,27 @@ lazy(self, 'tlvstore', () => {
      *
      * @param {String|Object} payload plain string or key/value pairs to encrypt
      * @param {Boolean} [utf8] Whether to take UTF-8 into account (default: true)
-     * @param {Array|String|Uint8Array} [key] Encryption key.
+     * @param {Array|String|Uint8Array|*} [key] Encryption key.
      * @param {Number} [mode] Encryption scheme, AES GCM 12/16 by default.
      * @returns {String} encrypted payload.
      * @memberOf tlvstore
      */
     ns.encrypt = function(payload, utf8, key, mode) {
         utf8 = utf8 !== false;
-        key = getKey(key || self.u_k);
-
-        if (mode === undefined) {
-            mode = this.BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16;
-        }
 
         if (typeof payload !== 'object') {
             payload = {'': String(payload)};
         }
+        payload = this.containerToTlvRecords(payload, utf8);
 
-        return base64urlencode(this.blockEncrypt(this.containerToTlvRecords(payload, utf8), key, mode));
+        if (key !== SYMBOL) {
+            if (mode === undefined) {
+                mode = this.BLOCK_ENCRYPTION_SCHEME.AES_GCM_12_16;
+            }
+            payload = this.blockEncrypt(payload, getKey(key || self.u_k), mode);
+        }
+
+        return base64urlencode(payload);
     };
 
     /**
@@ -386,14 +391,17 @@ lazy(self, 'tlvstore', () => {
      * @memberOf tlvstore
      */
     ns.decrypt = function(payload, utf8, key) {
+        const obj = Object.create(null);
+
         utf8 = utf8 !== false;
-        key = getKey(key || self.u_k);
+        payload = base64urldecode(payload);
 
-        const obj = {};
-        let rest = tlvstore.blockDecrypt(base64urldecode(payload), key);
+        if (key !== SYMBOL) {
+            payload = this.blockDecrypt(payload, getKey(key || self.u_k));
+        }
 
-        while (rest.length > 0) {
-            const res = ns.splitSingleTlvRecord(rest);
+        while (payload.length > 0) {
+            const res = ns.splitSingleTlvRecord(payload);
             if (!res) {
                 return false;
             }
@@ -404,11 +412,34 @@ lazy(self, 'tlvstore', () => {
             }
             obj[key] = value;
 
-            rest = res.rest;
+            payload = res.rest;
         }
 
         return obj[''] || obj;
     };
+
+    /**
+     * Generates an encoded TLV record container from an object containing key-value pairs.
+     * @param {String|Object} payload plain string or key/value pairs to encode.
+     * @param {Boolean} [utf8] Whether to take UTF-8 into account (default: true)
+     * @returns {String} Single binary encoded container of TLV records.
+     * @memberOf tlvstore
+     */
+    ns.encode = function(payload, utf8) {
+        return this.encrypt(payload, utf8, SYMBOL);
+    };
+
+    /**
+     * Decodes a binary encoded container of TLV records into an object representation.
+     * @param {String} payload Single binary encoded container of TLV records.
+     * @param {Boolean} [utf8] Whether to take UTF-8 into account (default: true)
+     * @return {Object|String} original plain string or key/value pairs encoded.
+     * @memberOf tlvstore
+     */
+    ns.decode = function(payload, utf8) {
+        return this.decrypt(payload, utf8, SYMBOL);
+    };
+
 
     if (!window.is_karma) {
         Object.setPrototypeOf(ns, null);

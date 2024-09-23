@@ -334,29 +334,7 @@
     </div>
 </div>
 
-<div class="hidden" id="avatar-svg">
-    <svg xmlns="http://www.w3.org/2000/svg" pointer-events="none" width="120" height="120"
-        style="border-radius: 100%;
-            margin-left: -2px;
-            margin-top: -2px;
-            border: 2px solid white;
-            box-sizing: border-box;
-            background-color: red;
-            width: 120px;
-            height: 120px;">
-        <text text-anchor="middle"
-            y="50%" x="50%"
-            dy="0.35em"
-            pointer-events="auto"
-            fill="#ffffff"
-            style="
-                font-family: 'Open Sans', Arial, Helvetica, sans-serif;
-                font-weight: 400;
-                font-size: 60px;">
-            C
-        </text>
-    </svg>
-</div>
+<div class="hidden" id="avatar-svg"></div>
 
 <!-- Overlay -->
 <div class="voucher-redeem-dialog theme-dark-forced hidden">
@@ -373,6 +351,7 @@
                     <i class="pro3 sprite-fm-uni icon-crests-pro-3-details"></i>
                     <i class="pro4 sprite-fm-uni icon-crests-lite-details"></i>
                     <i class="business sprite-fm-uni icon-crests-business-details"></i>
+                    <i class="feature"></i>
                 </div>
                 <div class="pricing-page plan-title"></div>
                 <div class="pricing-page plan-content">
@@ -402,23 +381,6 @@
                 <div class="choose-plan-button">[$7711]</div>
             </div>
         </div>
-    </div>
-</div>
-
-<!-- Public Service Announcement -->
-<div class="bottom-info body public-service-anouncement">
-    <div class="bottom-info content">
-        <div class="bottom-info column">
-            <img class="bottom-info display-icon" />
-        </div>
-        <div class="bottom-info column">
-            <h4 class="bottom-info title"></h4>
-            <div class="bottom-info messageA"></div>
-            <button class="mega-button bottom-info view-more-info" data-continue-link="">
-                <span class="bottom-info text"></span>
-            </button>
-        </div>
-        <div class="bottom-info fm-dialog-close"></div>
     </div>
 </div>
 
@@ -468,7 +430,7 @@
                             </li>
                             <li>
                                 <button class="get-link-f">
-                                    <span>[$22662]</span>
+                                    <span>[$5622]</span>
                                 </button>
                             </li>
                             <li>
@@ -524,7 +486,7 @@
 
                 <div class="text-editor-file-name">
                     <!-- TODO: replace by svg icon !-->
-                    <i class="transfer-filetype-icon text file"></i>
+                    <i class="item-type-icon icon-text-24"></i>
                     <span></span>
                 </div>
             </header>
@@ -564,7 +526,7 @@
                         </button>
                     </li>
                     <li>
-                        <button class="v-btn simpletip getlink" aria-label="[$59]" data-simpletip="[$59]" data-simpletipoffset="2" data-simpletip-class="theme-dark-forced">
+                        <button class="v-btn simpletip getlink" aria-label="[$5622]" data-simpletip="[$5622]" data-simpletipoffset="2" data-simpletip-class="theme-dark-forced">
                             <i class="sprite-fm-mono icon-link"></i>
                         </button>
                     </li>
@@ -611,6 +573,15 @@
                                 <!-- Active state: .icon-favourite-removed !-->
                                 <i class="sprite-fm-mono icon-favourite"></i>
                                 <span>[$5871]</span>
+                            </button>
+                        </li>
+                        <li class="divider">
+                            <hr/>
+                        </li>
+                        <li>
+                            <button class="send-to-chat">
+                                <i class="sprite-fm-mono icon-message-arrow-up-small-regular-outline"></i>
+                                <span>[$17764]</span>
                             </button>
                         </li>
                         <li class="divider">
@@ -712,19 +683,36 @@
             <video id="video" data-autoplayvideo="false" data-playvideoonclick="false"></video>
 
             <button class="gallery-btn previous" aria-label="[[previous]]">
-                <i class="sprite-fm-mono icon-arrow-left-thin"></i>
+                <i class="sprite-fm-mono icon-arrow-left-regular-outline"></i>
             </button>
             <button class="gallery-btn next" aria-label="[[next]]">
-                <i class="sprite-fm-mono icon-arrow-right-thin"></i>
+                <i class="sprite-fm-mono icon-arrow-right-regular-outline"></i>
             </button>
 
             <div class="play-video-button hidden">
-                <i class="sprite-fm-mono icon-play"></i>
+                <i class="sprite-fm-mono icon-play-regular-solid"></i>
             </div>
+
+            <div class="play-pause-video-button hidden">
+                <i class="sprite-fm-mono icon-play-regular-solid"></i>
+            </div>
+
+            <div class="watch-again-button hidden">
+                <i class="sprite-fm-mono icon-rotate-ccw-small-regular-outline"></i>
+                <span>[$video_player_watch_again]</span>
+            </div>
+
+            <div class="watch-again-button-overlay"></div>
 
             <div class="bouncing-loader viewer-pending hidden">
                 <span></span><span></span><span></span>
             </div>
+
+            <div class="loader-grad hidden">
+                <i class="sprite-fm-mono icon-loader-grad-small-regular-outline"></i>
+            </div>
+
+            <div class="loader-grad-overlay"></div>
 
             <div class="viewer-error hidden">
                 <div class="viewer-error-header">
@@ -806,44 +794,93 @@
             </nav>
 
             <nav class="viewer-bars video-controls hidden" data-state="hidden">
-                <ul class="bar">
-                     <li>
-                        <button class="v-btn playpause" aria-label="[[play pause]]" data-state="play">
-                            <!-- Active state: .icon-pause !-->
-                            <i class="sprite-fm-mono icon-play"></i>
-                        </button>
-                    </li>
-                    <li class="vol-wrapper">
-                        <button class="v-btn mute" data-state="mute" aria-label="[[volume]]">
-                            <!-- Active state: .icon-volume-muted !-->
-                            <i class="sprite-fm-mono icon-volume"></i>
-                        </button>
-                        <div class="video-vol-range">
-                            <div class="volume-bar"><span></span></div>
-                        </div>
-                    </li>
-                    <li>
-                        <div class="video-timing current">
-                            00:00
-                        </div>
-                    </li>
-                </ul>
                 <div class="video-progress-block">
                     <div class="video-progress-bar">
                         <div class="video-time-bar"></div>
+                        <div class="video-expected-time-bar">
+                            <div class="video-progress-time">
+                                00:00
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <ul class="bar">
                     <li>
+                        <div class="playpause-wrapper">
+                            <button class="v-btn playpause" aria-label="[[play pause]]" data-state="play">
+                                <!-- Active state: .icon-pause !-->
+                                <i class="sprite-fm-mono icon-play-small-regular-outline"></i>
+                            </button>
+                            <div class="tooltip">
+                                [$video_player_play]
+                            </div>
+                        </div>
+                        <div class="vol-wrapper">
+                            <button class="v-btn mute" data-state="mute" aria-label="[[volume]]">
+                                <!-- Active state: .icon-volume-muted !-->
+                                <i class="sprite-fm-mono icon-volume-max-small-regular-outline"></i>
+                            </button>
+                            <div class="video-vol-range">
+                                <div class="volume-bar"><span></span></div>
+                            </div>
+                            <div class="tooltip">
+                                [$video_player_mute]
+                            </div>
+                        </div>
+                    </li>
+                    <li class="timing">
+                        <div class="video-timing current">
+                            00:00
+                        </div>
+                        <div>
+                            /
+                        </div>
                         <div class="video-timing duration">
                             00:00
                         </div>
                     </li>
                     <li>
-                        <button class="v-btn fs" aria-label="[[fullscreen]]" data-state="go-fullscreen">
-                            <!-- Active state: .icon-fullscreen-leave !-->
-                            <i class="sprite-fm-mono icon-fullscreen-enter"></i>
-                        </button>
+                        <div class="speed-wrapper">
+                            <button class="v-btn speed" aria-label="[[speed]]" data-state="speed">
+                                <i class="sprite-fm-mono icon-playback-1x-small-regular-outline"></i>
+                            </button>
+                            <div class="tooltip">
+                                [$video_player_playback_speed]
+                            </div>
+                        </div>
+                        <div class="repeat-wrapper">
+                            <button class="v-btn repeat" aria-label="[[repeat]]" data-state="repeat">
+                                <i class="sprite-fm-mono icon-repeat-one-small-regular-solid"></i>
+                            </button>
+                            <div class="tooltip">
+                                [$video_player_repeat]
+                            </div>
+                        </div>
+                        <div class="subtitles-wrapper">
+                            <button class="v-btn subtitles" aria-label="[[subtitles]]" data-state="subtitles">
+                                <i class="sprite-fm-mono icon-subtitles-02-small-regular-outline"></i>
+                            </button>
+                            <div class="tooltip">
+                                [$video_player_subtitles]
+                            </div>
+                        </div>
+                        <div class="settings-wrapper">
+                            <button class="v-btn settings" aria-label="[[settings]]" data-state="settings">
+                                <i class="sprite-fm-mono icon-settings-02-small-regular-outline"></i>
+                            </button>
+                            <div class="tooltip">
+                                [$823]
+                            </div>
+                        </div>
+                        <div class="fs-wrapper">
+                            <button class="v-btn fs" aria-label="[[fullscreen]]" data-state="go-fullscreen">
+                                <!-- Active state: .icon-fullscreen-leave !-->
+                                <i class="sprite-fm-mono icon-maximize-02-small-regular-outline"></i>
+                            </button>
+                            <div class="tooltip">
+                                [$video_player_fullscreen]
+                            </div>
+                        </div>
                     </li>
                 </ul>
             </nav>
@@ -882,6 +919,141 @@
             <div class="video-progress-bar vad" title="">
                 <div class="video-time-bar"></div>
             </div>
+
+            <template id="media-viewer-speed-menu">
+                <nav class="context-menu playback-speed options-menu avoid-bottom" aria-expanded="false">
+                    <ul>
+                        <li>
+                            <div class="title">[$video_player_playback_speed]</div>
+                        </li>
+                        <li>
+                            <button class="05x">
+                                <span>[$video_player_speed_0.5x]</span>
+                                <i class="sprite-fm-mono icon-active icon-check-small-regular-outline hidden"></i>
+                            </button>
+                        </li>
+                        <li>
+                            <button class="1x">
+                                <span>[$video_player_speed_1x]</span>
+                                <i class="sprite-fm-mono icon-active icon-check-small-regular-outline"></i>
+                            </button>
+                        </li>
+                        <li>
+                            <button class="15x">
+                                <span>[$video_player_speed_1.5x]</span>
+                                <i class="sprite-fm-mono icon-active icon-check-small-regular-outline hidden"></i>
+                            </button>
+                        </li>
+                        <li>
+                            <button class="2x">
+                                <span>[$video_player_speed_2x]</span>
+                                <i class="sprite-fm-mono icon-active icon-check-small-regular-outline hidden"></i>
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </template>
+            <template id="media-viewer-subtitles-menu">
+                <nav class="context-menu subtitles options-menu avoid-bottom" aria-expanded="false">
+                    <ul>
+                        <li>
+                            <div class="title">[$video_player_subtitles]</div>
+                        </li>
+                        <li class="options">
+                            <div class="options-wrapper">
+                                <button class="off">
+                                    <span>[$video_player_off]</span>
+                                    <i class="sprite-fm-mono icon-active icon-check-small-regular-outline"></i>
+                                </button>
+                            </div>
+                        </li>
+                        <li class="divider">
+                            <hr/>
+                        </li>
+                        <li>
+                            <button class="add">
+                                <span>[$video_player_add_subtitles]</span>
+                            </button>
+                        </li>
+                    </ul>
+                </nav>
+            </template>
+            <template id="subtitles-dialog-subtitles-grid-table">
+                <div class="subtitles-grid-table grid-scrolling-table">
+                    <div class="grid-wrapper">
+                        <table class="grid-table table-hover">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th megatype="fname">
+                                        <div class="name">[$86]</div>
+                                    </th>
+                                    <th megatype="size">
+                                        <div class="size">[$87]</div>
+                                    </th>
+                                    <th megatype="timeAd">
+                                        <div class="date">[$17445]</div>
+                                    </th>
+                                    <th megatype="location">
+                                        <div class="location">[$17818]</div>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </template>
+            <template id="subtitles-dialog-empty-subtitles">
+                <div class="empty-subtitles">
+                    <div class="empty-subtitles-wrapper">
+                        <i class="empty-subtitles-icon sprite-fm-mono icon-subtitles-02-small-regular-solid"></i>
+                        <div class="empty-subtitles-txt">[$video_player_no_subtitle_files]</div>
+                    </div>
+                </div>
+            </template>
+            <template id="media-viewer-video-settings-menu">
+                <nav class="context-menu settings options-menu avoid-bottom" aria-expanded="false">
+                    <ul>
+                        <li>
+                            <div class="settings-wrapper">
+                                <span>[$video_player_brightness]</span>
+                                <div class="settings-range">
+                                    <span>0</span>
+                                    <div class="settings-bar brightness-bar"><span></span></div>
+                                    <div class="value">50</div>
+                                    <span>100</span>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="settings-wrapper">
+                                <span>[$video_player_contrast]</span>
+                                <div class="settings-range">
+                                    <span>0</span>
+                                    <div class="settings-bar contrast-bar"><span></span></div>
+                                    <div class="value">50</div>
+                                    <span>100</span>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="settings-wrapper">
+                                <span>[$video_player_saturation]</span>
+                                <div class="settings-range">
+                                    <span>0</span>
+                                    <div class="settings-bar saturate-bar"><span></span></div>
+                                    <div class="value">50</div>
+                                    <span>100</span>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <button class="reset-all invisible">[$video_player_reset_all]</button>
+                        </li>
+                    </ul>
+                </nav>
+            </template>
         </footer>
     </div>
 </section>
@@ -896,7 +1068,7 @@
         </div>
         <div class="fm-versioning pad">
             <div class="fm-versioning top-column">
-                <div class="medium-file-icon"></div>
+                <div class="item-type-icon-90"></div>
                 <div class="fm-versioning file-data">
                     <div class="fm-versioning file-name"></div>
                     <div class="fm-versioning file-path"></div>
@@ -981,12 +1153,12 @@
         <a data-by="name" class="dropdown-item asc active">
             <i class="sprite-fm-mono icon-name"></i>
             <span>[$86]</span>
-            <i class="sprite-fm-mono sort-arrow"></i>
+            <i id="name-sort-arrow" class="sprite-fm-mono sort-arrow icon-up"></i>
         </a>
         <a data-by="label" class="dropdown-item dropdown-item-label disabled static">
             <i class="sprite-fm-mono icon-label"></i>
             <span>[$17398]</span>
-            <i class="sprite-fm-mono sort-arrow"></i>
+            <i id="label-sort-arrow" class="sprite-fm-mono sort-arrow icon-up"></i>
         </a>
         <hr>
     </div>
@@ -1279,7 +1451,7 @@
         <section class="content">
             <div class="content-block">
                 <div class="create-folder-input-bl create-folder-wrapper">
-                    <i class="sprite-fm-uni icon-folder-24"></i>
+                    <i class="item-type-icon icon-folder-24"></i>
                     <input name="dialog-new-folder" type="text" value="" placeholder="[$157]" autofocus />
                 </div>
                 <div class="whitespaces-input-warning">
@@ -1322,7 +1494,7 @@
         <section class="content">
             <div class="content-block">
                 <div class="create-folder-input-bl create-file-wrapper">
-                    <i class="sprite-fm-uni icon-text-24"></i>
+                    <i class="item-type-icon icon-text-24"></i>
                     <input name="dialog-new-file" type="text" value="" placeholder="[$17506]" autofocus />
                 </div>
                 <div class="whitespaces-input-warning">
@@ -1373,6 +1545,7 @@
                         <input name="dialog-new-folder" type="text" placeholder="[$7971]" value="" autocomplete="disabled" />
                     </div>
                 </div>
+                <div class="dlkey-err hidden">[$enter_valid_dlkey]</div>
             </div>
         </section>
 
@@ -1572,7 +1745,7 @@
         <section class="content">
             <div class="content-block">
                 <div class="rename-input-bl">
-                    <i class="transfer-filetype-icon"></i>
+                    <i class="input-icon"></i>
                     <input name="dialog-rename" type="text" value="[$157]" />
                 </div>
                 <div class="whitespaces-input-warning">
@@ -1621,7 +1794,7 @@
             <div class="content-block">
                 <!-- Templates -->
                 <div class="fm-picker-dialog-panel-header">
-                    <span>[$5916]</span>
+                    <span class="item-names">[$5916]</span>
                     <div class="fm-picker-dialog-panel-arrows">
                         <i class="sprite-fm-mono icon-queue-down"></i>
                     </div>
@@ -1640,7 +1813,7 @@
                     <div class="summary-input summary-items correct-input scroll-auto unfold">
                         <div class="item-row-group">
                             <div class="item-row">
-                                <div class="transfer-filetype-icon generic file"></div>
+                                <div class="item-type-icon icon-generic-24"></div>
                                 <div class="summary-ff-name">[$5533]</div>
                                 <div class="delete-img icon"></div>
                                 <input class="summary-ff-name hidden" type="text" value="" placeholder="[$17506]" />
@@ -1687,6 +1860,11 @@
                         <div class="tooltip">[$1687]</div>
                         <i class="sprite-fm-mono icon-cloud-drive"></i>
                     </div>
+                    <div class="fm-picker-dialog-button s4" data-section="s4">
+                        <div class="left-border"></div>
+                        <div class="tooltip">[$obj_storage]</div>
+                        <i class="sprite-fm-mono icon-object-storage"></i>
+                    </div>
                     <div class="fm-picker-dialog-button shared-with-me" data-section="shared-with-me">
                         <div class="left-border"></div>
                         <div class="tooltip">[$5589]</div>
@@ -1706,6 +1884,12 @@
 
                 <!-- Tab Sections -->
                 <div class="right-pane fm-picker-dialog-tree-panel cloud-drive">
+                    <!--div class="fm-picker-dialog-panel-header"></div-->
+                    <div class="dialog-tree-panel-scroll">
+                        <div class="dialog-content-block"></div>
+                    </div>
+                </div>
+                <div class="right-pane fm-picker-dialog-tree-panel s4">
                     <!--div class="fm-picker-dialog-panel-header"></div-->
                     <div class="dialog-tree-panel-scroll">
                         <div class="dialog-content-block"></div>
@@ -1736,6 +1920,14 @@
                         <i class="sprite-fm-mono icon-cloud-drive"></i>
                         <div class="dialog-empty-header">
                             [$20461]
+                        </div>
+                    </div>
+                </div>
+                <div class="dialog-empty-block s4">
+                    <div class="dialog-empty-pad">
+                        <i class="sprite-fm-mono icon-object-storage"></i>
+                        <div class="dialog-empty-header">
+                            [$obj_storage]
                         </div>
                     </div>
                 </div>
@@ -1881,9 +2073,8 @@
         </button>
 
         <header>
-            <!-- Or [$8734] for multiple links !-->
             <h2 class="get-link" id="export-links-title">
-                [$59]
+                [$share_link]
             </h2>
 
             <h2 class="embed-header">
@@ -1894,61 +2085,80 @@
         <section class="content">
             <div class="content-block links-content">
                 <div class="options">
-                    <div class="key">
-                        <div class="checkdiv checkboxOff">
-                            <input type="checkbox" name="export-keys-opt" id="export-keys-opt">
-                        </div>
+                    <div class="key export-keys-separately-block">
                         <label for="export-keys-opt" class="radio-txt">
-                            [$23620]
+                            [$send_decryption_key_separately]
                         </label>
-
-                        <div class="rounded-tip-button">
-                            <i class="sprite-fm-theme icon-question-grey"></i>
-                            <div class="dropdown body dropdown-arrow down-arrow keys-tip">
-                                <i class="dropdown-white-arrow"></i>
-                                <div class="illustration sprite-fm-illustration img-dialog-decryption-key"></div>
-                                <div class="tip-header">
-                                    [$1028]
-                                </div>
-                                <div class="tip-text">
-                                    [$23621]
-                                </div>
-                                <a href="[$mega_help_host]/files-folders/sharing/encrypted-links" target="_blank" rel="noopener noreferrer" class="tip-link">[$8742]</a>
-                            </div>
+                        <a href="[$mega_help_host]/files-folders/sharing/encrypted-links" target="_blank" rel="noopener noreferrer" class="learn-more-text">[$8742]</a>
+                        <div class="mega-switch toggle-off export-keys-switch js-export-keys-switch" id="export-keys-opt">
+                            <div class="mega-feature-switch no-trans-init"></div>
                         </div>
                         <div class="clear"></div>
                     </div>
 
-                    <div class="pro">
-                        <div class="half-sized-block">
-                            <div class="sub-header expiry">
-                                <span class="info">[$23622]</span> <span class="pro-only-feature">[$8695]</span>
-                            </div>
-                            <div class="expiry-container">
-                                <button class="mega-button expiry">
-                                    <span class="label">[$8953]</span>
+                    <div class="content-block links-content links alt-background">
+                        <!-- Please use "separately" classname if its available to copy keys separately !-->
+                        <div class="links-scroll"></div>
+                        <div class="links-scroll-overlays"></div>
+                        <div class="update-success-banner js-update-success-banner hidden">[$links_updated_copy_again]</div>
+                    </div>
 
-                                </button>
-                                <input type="text" class="set-date common" value="" />
+                    <div class="pro">
+                        <div class="pro-section-header">
+                            <div class="pro-header-text">[$link_access]</div>
+                            <div class="link-access-text js-link-access-text">[$link_access_explainer]</div>
+                        </div>
+                        <div class="pro-feature-block first-feature-block">
+                            <div class="sub-header">
+                                <span class="info">[$expiry_date]</span> <span class="pro-only-feature">[$8695]</span>
                             </div>
-                            <button class="mega-button square remove-date hidden">
-                                <div>
-                                    <i class="sprite-fm-mono icon-close-component"></i>
+                            <div class="mega-switch toggle-off expiry-switch js-expiry-switch" role="switch" aria-checked="false" tabindex="0">
+                                <div class="mega-feature-switch no-trans-init sprite-fm-mono-after icon-minimise-after"></div>
+                            </div>
+                            <div class="expiry-container hidden">
+                                <div class="mega-input datepicker-input">
+                                    <input type="text" name="share-link-expiry-datepicker" class="dialog-input set-date" autocomplete="off" placeholder="[$8953]" value="">
+                                    <i class="sprite-fm-mono icon-calendar2 js-datepicker-calendar-icon"></i>
                                 </div>
-                            </button>
+                            </div>
                             <div class="clear"></div>
                         </div>
-                        <div class="half-sized-block">
+                        <div class="pro-feature-block">
                             <div class="sub-header">
-                                <span class="info">[$23623]</span> <span class="pro-only-feature">[$8695]</span>
+                                <span class="info">[$17454]</span> <span class="pro-only-feature">[$8695]</span>
                             </div>
-                            <button class="mega-button password">
-                                <span>[$17454]</span>
-                            </button>
-                            <button class="mega-button remove hidden">
-                                <span>[$83]</span>
-                            </button>
+                            <div class="mega-switch toggle-off password-switch js-password-switch" role="switch" aria-checked="false" tabindex="1">
+                                <div class="mega-feature-switch no-trans-init sprite-fm-mono-after icon-minimise-after"></div>
+                            </div>
+                            <div class="password-container hidden">
+                                <div class="mega-input with-icon good1 valued">
+                                    <input class="underlinedText with-icon enter-pass megaInputs js-password-input" type="password" placeholder="[$9074]" data-icon="sprite-fm-mono icon-lock">
+                                    <div class="message-container mega-banner"></div>
+                                    <i class="sprite-fm-mono icon-eye-reveal toggle-password-visible js-toggle-password-visible"></i>
+                                    <div class="strength-indicator js-strength-indicator"></div>
+                                    <div class="error-text-block hidden"></div>
+                                </div>
+                                <div class="clear"></div>
+                                <button class="mega-button positive confirm-password js-confirm-password">
+                                    <span>[$870]</span>
+                                </button>
+                                <a href="#" class="reset-password js-reset-password hidden">[$737]</a>
+                            </div>
                             <div class="clear"></div>
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+                    <div class="hidden" id="link-hidden-repair-proc"
+                         style="margin:8px 48px;border:1px solid;padding:16px;box-shadow:0 0 32px inset;border-radius:5px;text-align: justify">
+                        <div>
+                            <button class="mega-button"><span>Repair</span></button>
+                            <span>
+                                This feature should only be used to aid with repairing a damaged link or share,
+                                our friendly support staff may have guided you to use this feature if you had contacted
+                                us about a broken link due to missing share keys.
+                                Before proceeding, please be sure that the link you are operating on is in fact
+                                damaged, and you wish to have it repaired.
+                            </span>
                         </div>
                         <div class="clear"></div>
                     </div>
@@ -1974,12 +2184,6 @@
                         <span>[$6821]</span>
                     </div>
                 </div>
-            </div>
-
-            <div class="content-block links-content links alt-background">
-                <!-- Please use "separately" classname if its availbable to copy keys separately !-->
-                <div class="links-scroll"></div>
-                <div class="links-scroll-overlays"></div>
             </div>
 
             <!-- Embed code block - Hidden unless it is selected from the context menu via Embed video or when the tab is selected !-->
@@ -2072,19 +2276,34 @@
 
         <footer class="alt-background">
             <div class="footer-container links-footer">
-                <button class="mega-button positive copy links">
-                    <span>[$20840]</span>
-                </button>
-                <button class="mega-button positive copy keys hidden">
-                    <span>[$23624]</span>
-                </button>
-
+                <div class="left-block">
+                    <div class="remove-link-button-container js-remove-link-button">
+                        <i class="sprite-fm-mono icon-link-remove"></i>
+                        <a href="#" class="remove-link-text"></a>
+                    </div>
+                </div>
+                <div class="right-block">
+                    <button class="mega-button positive copy links">
+                        <span>[$23625]</span>
+                    </button>
+                    <button class="mega-button positive copy keys">
+                        <span>[$23624]</span>
+                    </button>
+                </div>
             </div>
 
             <div class="footer-container embed-footer hidden">
-                <button class="mega-button positive copy links">
-                    <span>[$17408]</span>
-                </button>
+                <div class="left-block">
+                    <div class="remove-link-button-container js-remove-link-button">
+                        <i class="sprite-fm-mono icon-link-remove"></i>
+                        <a href="#" class="remove-link-text"></a>
+                    </div>
+                </div>
+                <div class="right-block">
+                    <button class="mega-button positive copy links">
+                        <span>[$17408]</span>
+                    </button>
+                </div>
             </div>
         </footer>
     </div>
@@ -2119,7 +2338,7 @@
                     <input class="underlinedText with-icon enter-pass" type="password" placeholder="[$9074]" data-icon="sprite-fm-mono icon-lock" />
                     <div class="set-password-dialog strength"></div>
                     <div class="retype">
-                        <input class="underlinedText with-icon confirm-pass" type="password" placeholder="[$1114]" data-icon="sprite-fm-mono icon-lock-2" />
+                        <input class="underlinedText with-icon confirm-pass" type="password" placeholder="[$870]" data-icon="sprite-fm-mono icon-lock-2" />
                     </div>
                 </div>
             </div>
@@ -2497,7 +2716,7 @@
         <footer>
             <div class="footer-container">
                 <button class="mega-button positive large add-user-popup-button">
-                    <span>[$19112]</span>
+                    <span></span>
                 </button>
 
                 <div class="hidden-achievement-info">
@@ -2572,7 +2791,7 @@
             <div class="content-block share-dialog-top">
                 <div class="share-dialog-top-body">
                     <div class="share-dialog-shared-item">
-                        <i class="item-type-icon sprite-fm-uni"></i>
+                        <i class="item-type-icon-90"></i>
                         <div class="share-dialog-folder-info-block">
                             <div class="share-dialog-folder-name"></div>
                             <div class="share-dialog-folder-info"></div>
@@ -2610,6 +2829,8 @@
                         </div>
                     </div>
                     <div class="share-dialog-access-title">[$23706]</div>
+                    <div class="mega-banner body warning-template contact-verify-notification"><span></span></div>
+                    <div class="mega-banner body warning-template contact-verify-warning">[$undec_outshare_warning_banner]</div>
                     <div class="share-dialog-access-list"></div>
                     <button class="mega-button action share-dialog-access-add">
                         <div>
@@ -2674,13 +2895,14 @@
         </button>
 
         <header>
-            <h2 id="fingerprint-dialog-title">[$6783]</h2>
+            <div class="business-subuser-confirm"></div>
+            <h2 id="fingerprint-dialog-title">[$verify_credentials]</h2>
         </header>
 
         <section>
             <div class="content-block">
-                <p>
-                    [$6779]
+                <p class="sub-title-txt">
+                    [$contact_ver_dialog_content]
                 </p>
 
                 <div class="fingerprint-mid-info">
@@ -2699,7 +2921,7 @@
                     </div>
                 </div>
                 <div class="fingerprint-mid-txt">
-                    [$6781]
+                    [$contact_ver_dialog_banner]
                 </div>
                 <div class="fingerprint-bott-txt">
                     <div class="fingerprint-bott-header">
@@ -2718,7 +2940,7 @@
                     <span>[$1379]</span>
                 </button>
                 <button class="mega-button positive dialog-approve-button">
-                    <span>[$6777]</span>
+                    <span>[$mark_as_verified]</span>
                 </button>
             </div>
         </footer>
@@ -3012,7 +3234,7 @@
                     <div class="fingerprint selectable-txt"></div>
                 </div>
                 <div class="verifyCredentials hidden">
-                    <div class="title">[$7692]:</div>
+                    <div class="title">[$verify_credentials]:</div>
                     <div class="description">
                         [$7693]
                     </div>
@@ -3070,6 +3292,7 @@
                     <i class="pro3 sprite-fm-uni icon-crests-pro-3-details"></i>
                     <i class="pro4 sprite-fm-uni icon-crests-lite-details"></i>
                     <i class="business sprite-fm-uni icon-crests-business-details"></i>
+                    <i class="feature"></i>
                 </div>
                 <div class="payment-plan-info">
                     <div class="payment-plan-title">PRO I</div>wwewrwerwer
@@ -3206,7 +3429,6 @@
         <section class="content">
             <div class="content-block dialog-bottom">
                 <p class="stripe-error"></p>
-                <p class="err-txt">[$25050]</p>
             </div>
         </section>
     </div>
@@ -3230,6 +3452,7 @@
                     <i class="pro4 sprite-fm-uni icon-crests-lite-details"></i>
                     <i class="pro101 sprite-fm-uni icon-crests-pro-flexi-details"></i>
                     <i class="business sprite-fm-uni icon-crests-business-details"></i>
+                    <i class="feature"></i>
                 </div>
                 <div class="payment-plan-info">
                     <div id="payment-address-dialog-title" class="payment-plan-title">PRO I</div>
@@ -3308,7 +3531,7 @@
         <footer>
             <div class="footer-container">
                 <button class="mega-button positive large payment-buy-now">
-                    <span>[$6190]</span>
+                    <span>[$enter_card_details]</span>
                 </button>
             </div>
 
@@ -3445,47 +3668,186 @@
         </section>
     </div>
 
+
+    <!-- Dialog: Pro plan benefits: Pre-cancellation -->
+    <div class="mega-dialog dialog-template-main cancel-subscription-benefits hidden"
+         role="dialog"
+         aria-labelledby="cancel-benefits-title"
+         aria-modal="true">
+
+        <header class="cancel-subscription-benefits-header">
+            <h3>[$cancel_pro_header]</h3>
+            <button class="close js-close" aria-label="[$148]">
+                <i class="sprite-fm-mono icon-dialog-close"></i>
+            </button>
+        </header>
+        <div class="cancel-subscription-benefits-content">
+
+            <div class="cancel-subscription-info">[$cancel_pro_info]</div>
+            <div class="features-table">
+                <div class="features-table-header">
+                    <div class="features-table-header-content">[$23377]</div>
+                    <div class="features-table-header-content center">[$1150]</div>
+                    <div class="features-table-header-content center plan-name"></div>
+                </div>
+
+                <div class="features-table-content">
+                    <div class="features-table-item title">[$495]</div>
+                    <div class="features-table-item center free-storage"></div>
+                    <div class="features-table-item center pro-storage"></div>
+
+                    <div class="features-table-seperator"></div>
+
+                    <div class="features-table-item title">[$18057]</div>
+                    <div class="features-table-item center free-transfer"></div>
+                    <div class="features-table-item center pro-transfer"></div>
+
+                    <div class="features-table-seperator"></div>
+
+                    <div class="features-table-item title">[$cancel_pro_password_links]</div>
+                    <div class="features-table-item center">
+                        <i class="tiny-icon red-cross"></i>
+                    </div>
+                    <div class="features-table-item center">
+                        <i class="small-icon icons-sprite bold-green-tick"></i>
+                    </div>
+
+                    <div class="features-table-seperator"></div>
+
+                    <div class="features-table-item title">[$pr_link_expire]</div>
+                    <div class="features-table-item center">
+                        <i class="tiny-icon red-cross"></i>
+                    </div>
+                    <div class="features-table-item center">
+                        <i class="small-icon icons-sprite bold-green-tick"></i>
+                    </div>
+
+                    <div class="features-table-seperator"></div>
+
+                    <div class="features-table-item title">[$pr_trns_share]</div>
+                    <div class="features-table-item center">
+                        <i class="tiny-icon red-cross"></i>
+                    </div>
+                    <div class="features-table-item center">
+                        <i class="small-icon icons-sprite bold-green-tick"></i>
+                    </div>
+
+                    <div class="features-table-seperator"></div>
+
+                    <div class="features-table-item title">[$rewind]</div>
+                    <div class="features-table-item center rewind-free">[$rewind_free_feature]</div>
+                    <div class="features-table-item center rewind-pro">[$pr_365_days]</div>
+
+                    <div class="features-table-seperator"></div>
+
+                    <div class="features-table-item title">[$mega_vpn]</div>
+                    <div class="features-table-item center">
+                        <i class="tiny-icon red-cross"></i>
+                    </div>
+                    <div class="features-table-item center">
+                        <i class="small-icon icons-sprite bold-green-tick"></i>
+                    </div>
+
+                    <div class="features-table-seperator"></div>
+
+                    <div class="features-table-item title">[$pr_call_meet_duration]</div>
+                    <div class="features-table-item center meet-duration"></div>
+                    <div class="features-table-item center">[$7094]</div>
+
+                    <div class="features-table-seperator"></div>
+
+                    <div class="features-table-item title">[$pr_call_meet_participants]</div>
+                    <div class="features-table-item center meet-participants"></div>
+                    <div class="features-table-item center">[$7094]</div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <div class="cancel-buttons">
+                <button class="mega-button js-continue">
+                    <span>[$cancel_pro_continue]</span>
+                </button>
+                <button class="mega-button positive js-keep-plan">
+                    <span></span>
+                </button>
+            </div>
+        </footer>
+    </div>
+
     <!-- Dialog: cancel-subscription-st1 -->
     <div class="mega-dialog dialog-template-main cancel-subscription-st1 hidden"
          role="dialog"
          aria-labelledby="cancel-subscription-st1-title"
          aria-modal="true">
 
-        <button class="close js-close" aria-label="[$148]">
-            <i class="sprite-fm-mono icon-dialog-close"></i>
-        </button>
+        <div class="label-wrap built-option cancel-subscription-radio-template hidden">
+            <div class="cancel-option radioOff" id="subcancel_div">
+                <input type="radio" id="subcancel" class="cancel-option radioOff" value="">
+            </div>
+            <div class="radio-txt"></div>
+        </div>
 
-        <header>
+        <header class="cancel-subscription-header">
             <h2 id="cancel-subscription-st1-title">[$6822]</h2>
+            <button class="close js-close" aria-label="[$148]">
+                <i class="sprite-fm-mono icon-dialog-close"></i>
+            </button>
         </header>
 
         <section class="content">
-            <div class="content-block">
+            <div class="content-block cancellation-reason">
                 <div class="fm-dialog-top-text">
                     [$6996]
                 </div>
-                <div class="reset-small-txt">[$7005]:</div>
-                <form>
-                    <div class="cancel-textarea-bl mega-textarea">
-                        <div class="cancel-textarea textarea-scroll">
-                            <textarea></textarea>
+                <div class="cancel-option-prompt">[$7005]</div>
+                <div class="error-banner select-reason hidden">[$cancel_sub_no_opt_picked_mob]</div>
+                <form class="cancel-options">
+                    <div class="label-wrap">
+                        <div class="cancel-option radioOff" id="subcancel8_div">
+                            <input type="radio" id="subcancel8" class="cancel-option radioOff" value="8">
                         </div>
+                        <div class="radio-txt">[$cancel_sub_other_reason]</div>
+                    </div>
+                    <div class="textarea-and-banner hidden">
+                        <div class="cancel-textarea-bl mega-textarea">
+                            <div class="cancel-textarea textarea-scroll">
+                                <textarea></textarea>
+                            </div>
+                        </div>
+                        <div class="error-banner invalid-details hidden"></div>
                     </div>
                 </form>
-                <div class="cancel-subscription-txt">
-                    [$6998]
-                </div>
+            </div>
+            <div class="content-block cancellation-contact">
+                <div class="cancel-option-prompt">[$cancel_sub_can_contact]</div>
+                <div class="error-banner select-can-contact hidden">[$cancel_sub_err_make_selection]</div>
+                <form class="allow-contact-options mega-gap-12">
+                    <div class="allow-contact-wrapper">
+                        <div class="contact-option radioOff" id="cancel_sub_contact_yes">
+                            <input type="radio" class="contact-option radioOff" value="1">
+                        </div>
+                        <div class="radio-txt">[$78]</div>
+                    </div>
+                    <div class="allow-contact-wrapper">
+                        <div class="contact-option radioOff" id="cancel_sub_contact_no">
+                            <input type="radio" class="contact-option radioOff" value="0">
+                        </div>
+                        <div class="radio-txt">[$79]</div>
+                    </div>
+                </form>
             </div>
         </section>
-
         <footer>
             <div class="footer-container">
-                <button class="mega-button cancel">
-                    <span>[$822]</span>
+                <button class="mega-button dont-cancel">
+                    <span>[$dont_cancel_sub_btn_label]</span>
                 </button>
-                <button class="mega-button positive continue-cancel-subscription disabled">
-                    <span>[$507]</span>
-                </button>
+                <div class="cancel-buttons">
+                    <button class="mega-button positive cancel-subscription">
+                        <span>[$cancel_sub_btn_label]</span>
+                    </button>
+                </div>
             </div>
         </footer>
     </div>
@@ -3539,6 +3901,7 @@
                     <i class="pro3 sprite-fm-uni icon-crests-pro-3-details"></i>
                     <i class="pro4 sprite-fm-uni icon-crests-lite-details"></i>
                     <i class="business sprite-fm-uni icon-crests-business-details"></i>
+                    <i class="feature"></i>
                 </div>
                 <div class="voucher-plan-info">
                     <div id="voucher-dialog-title" class="voucher-plan-title">PRO I</div>
@@ -3688,7 +4051,6 @@
                 <div class="price-expired-instruction">
                     [$12482]
                 </div>
-                <a class="btn-open-wallet" href="">[$6811]</a>
                 <div class="bitcoin-address selectable-txt"></div>
             </div>
             <div class="right-side">
@@ -3699,6 +4061,7 @@
                     <i class="pro3 sprite-fm-uni icon-crests-pro-3-details"></i>
                     <i class="pro4 sprite-fm-uni icon-crests-lite-details"></i>
                     <i class="business sprite-fm-uni icon-crests-business-details"></i>
+                    <i class="feature"></i>
                 </div>
                 <div class="plan-name"></div>
                 <div class="plan-duration"></div>
@@ -3742,7 +4105,7 @@
         </footer>
     </div>
 
-    <!-- Dialog: limited-bandwidth-dialog-->
+    <!-- Dialog: limited-bandwidth-dialog -->
     <div class="mega-dialog dialog-template-action limited-bandwidth-dialog hidden"
          role="dialog"
          aria-label="Limited bandwidth dialog"
@@ -3752,94 +4115,31 @@
             <i class="sprite-fm-mono icon-dialog-close"></i>
         </button>
 
-        <header>
-        </header>
-
         <section class="content">
             <div class="content-block centered-content">
+                <i class="graphic full sprite-fm-illustration img-dialog-overquota-storage"></i>
+
                 <div class="dialog header-before-icon limited">[$16164]</div>
                 <div class="dialog header-before-icon exceeded">[$17]</div>
 
-                <p class="dialog p-after-icon msg-overquota">[$120]</p>
-                <p class="dialog p-after-icon msg-prewarning">
-                    [$17090]
-                </p>
-                <div class="dialog transfer-overquota-txt">[$7100]</div>
-                <div class="dialog pro-exceeded-bl">
-                    <div class="fm-account-blocks bandwidth">
-                        <div class="account chart-block">
-                            <div class="account chart body">
-                                <div class="account chart progressbars">
-                                    <div class="chart0 main-chart right-chart"><span></span></div>
-                                    <div class="chart0 main-chart left-chart"><span></span></div>
-                                </div>
-                                <span class="perc-txt"></span>
-                            </div>
-                            <div class="account chart data">
-                                <div class="fm-account-header"><span>[$16120]</span></div>
-                                <span class="size-txt">2.93 GB</span>
-                                <span class="of-txt">/</span>
-                                <span class="pecents-txt">15</span>
-                                <span class="gb-txt">GB</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="dialog pro-exceeded-txt">
-                        <span class="msg-overquota">[$17084]</span>
-                        <span class="msg-prewarning">[$16356]</span>
-                    </div>
+                <div class="messages">
+                    <p class="msg-overquota"></p>
+                    <p class="msg-prewarning"></p>
+                    <div class="dialog transfer-overquota-txt"></div>
                 </div>
 
-                <div class="dialog limited-bl">
-                    <div class="dialog big-buttons-block">
-                        <button class="mega-button large continue">
-                            <!-- [$6826] - Continue !-->
-                            <!-- [$8945] - Continue without account !-->
-                            <span class="registered">[$6826]</span>
-                            <span class="not-registered">[$8945]</span>
-                        </button>
-                        <button class="mega-button large upgrade">
-                            <!-- [$16353] - See our plans !-->
-                            <!-- [$8696] - Upgrade to PRO !-->
-                            <span>[$8696]</span>
-                        </button>
-                        <button class="mega-button positive large upgrade pro">
-                            <!-- [$16386] - Upgrade your PRO account !-->
-                            <span>[$16386]</span>
-                        </button>
-                    </div>
-
-                    <div class="dialog pro-exceeded-slider">
-                        <div class="dialog transfer-slider">
-                            <div class="dialog-slider-txt">
-                                <span>[$174]</span>
-                            </div>
-                        </div>
-                        <div class="dialog pro-slider-description">
-                            [$16388]
-                        </div>
-                        <div class="bandwith-settings">
-                            <div class="bandwidth-slider"></div>
-                            <div class="slider numbers val1">0 <span>%</span></div>
-                            <div class="slider numbers val2 last">100 <span>%</span></div>
-                            <div class="clear"></div>
-                        </div>
-                    </div>
-
-                    <div class="centered-checkbox dialog-bottom"></div>
-                </div>
                 <div class="step1-block">
-                    <div class="pricing-page radio-buttons individual-el right">
-                        <div class="radioOn">
-                            <input id="d-pro-monthly-payment" name="d-pro-payment-period" type="radio" class="radioOn megaInputs" value="1" checked>
+                    <div class="pricing-page radio-buttons individual-el right hidden">
+                        <div class="radioOff">
+                            <input id="d-pro-monthly-payment" name="d-pro-payment-period" type="radio" class="megaInputs radioOff" value="1">
                         </div>
                         <label class="radio-txt" for="d-pro-monthly-payment">[$23779]</label>
                         <div class="radioOff">
                             <input id="d-pro-yearly-payment" name="d-pro-payment-period" type="radio" class="megaInputs radioOff" value="12">
                         </div>
                         <label class="radio-txt" for="d-pro-yearly-payment">[$23780]</label>
+                        <div class="save-yearly">[$redemption_save_16_percent]</div>
                     </div>
-                    <div class="clear"></div>
                 </div>
             </div>
 
@@ -3847,276 +4147,46 @@
                 <div class="step1-block dialog-cards">
                     <div class="pricing-page plans-block">
                         <div class="pricing-page plans-row">
-                            <div class="pricing-page plan pro4 hidden" data-payment="4">
-                                <div class="pricing-page plan-label"></div>
-                                <div class="pricing-page plan-title"></div>
-                                <div class="pricing-page plan-info">
-                                    [$23950]
+                            <div class="pricing-page plan template hidden" data-payment="">
+                                <div class="pricing-page plan-header-container">
+                                    <div class="pricing-page title-and-saving">
+                                        <div class="pricing-page plan-title"></div>
+                                        <div class="pricing-page plan-saving hidden"></div>
+                                    </div>
+                                    <div class="pricing-page period-subtitle"></div>
                                 </div>
                                 <div class="pricing-page plan-content">
-                                    <div class="pricing-page plan-price">
-                                        <span class="price"></span><span class="asterisk">*</span>
+                                    <div class="pricing-page cost">
+                                        <div class="pricing-page plan-only"></div>
+                                        <div class="pricing-page plan-price">
+                                            <span class="price"></span><span class="ast">*</span>
+                                        </div>
+                                        <div class="pricing-page currency-and-period"></div>
+                                        <div class="pricing-page monthly-price hidden">([$bsn_page_plan_price])</div>
                                     </div>
-                                    <div class="pricing-page plan-currency"></div>
-                                    <div class="pricing-page plan-period">
-                                        /[$931]
-                                    </div>
-                                    <div class="pricing-page euro-price"></div>
-                                    <div class="clear"></div>
-                                    <div class="pricing-page plan-button">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="pricing-page plan pro1 hidden" data-payment="1">
-                                <div class="pricing-page plan-label">[$23948]</div>
-                                <div class="pricing-page plan-title">
-                                </div>
-                                <div class="pricing-page plan-info">
-                                    [$23949]
-                                </div>
-                                <div class="pricing-page plan-content">
-                                    <div class="pricing-page plan-price">
-                                        <span class="price"></span><span class="asterisk">*</span>
-                                    </div>
-                                    <div class="pricing-page plan-currency"></div>
-                                    <div class="pricing-page plan-period">
-                                        /[$931]
-                                    </div>
-                                    <div class="pricing-page euro-price"></div>
-                                    <div class="clear"></div>
-                                    <div class="pricing-page plan-button">
+                                    <div class="pricing-page storage-and-transfer">
+                                        <div class="pricing-page plan-feature storage strong">
+                                            <span>[$23789.s]</span>
+                                        </div>
+                                        <div class="pricing-page plan-feature transfer strong">
+                                            <span>[$23790.s]</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="pricing-page plan pro2 hidden" data-payment="2">
-                                <div class="pricing-page plan-label"></div>
-                                <div class="pricing-page plan-title">
-                                </div>
-                                <div class="pricing-page plan-info">
-                                    [$23952]
-                                </div>
-                                <div class="pricing-page plan-content">
-                                    <div class="pricing-page plan-price">
-                                        <span class="price"></span><span class="asterisk">*</span>
-                                    </div>
-                                    <div class="pricing-page plan-currency"></div>
-                                    <div class="pricing-page plan-period">
-                                        /[$931]
-                                    </div>
-                                    <div class="pricing-page euro-price"></div>
-                                    <div class="clear"></div>
-                                    <div class="pricing-page plan-button">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="pricing-page plan pro3 hidden" data-payment="3">
-                                <div class="pricing-page plan-label">[$506]</div>
-                                <div class="pricing-page plan-title">
-                                </div>
-                                <div class="pricing-page plan-info">
-                                    [$24066]
-                                </div>
-                                <div class="pricing-page plan-content">
-                                    <div class="pricing-page plan-price">
-                                        <span class="price"></span><span class="asterisk">*</span>
-                                    </div>
-                                    <div class="pricing-page plan-currency"></div>
-                                    <div class="pricing-page plan-period">
-                                        /[$931]
-                                    </div>
-                                    <div class="pricing-page euro-price"></div>
-                                    <div class="clear"></div>
-                                    <div class="pricing-page plan-button">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="pricing-page plans-row">
-                            <div class="pricing-page plan pro4 details hidden" data-payment="4">
-                                <div class="pricing-page plan-feature storage strong">
-                                    <span>[$23789.s]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23807]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature strong transfer">
-                                    <span>[$23790.s]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23808]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23791]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23792]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23793]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23799]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23958]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23801]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$24550]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$24032]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23803]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23804]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23959]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23806]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23956]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$24051]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                            </div>
-                            <div class="pricing-page plan pro1 details hidden" data-payment="1">
-                                <div class="pricing-page plan-feature storage strong">
-                                    <span>[$23789.s]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23807]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature strong transfer">
-                                    <span>[$23790.s]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23808]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23791]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23792]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23793]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23799]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23958]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23801]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$24550]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$24032]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23803]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23804]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23959]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23806]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23956]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$24051]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                            </div>
-                            <div class="pricing-page plan pro2 details hidden" data-payment="2">
-                                <div class="pricing-page plan-feature storage strong">
-                                    <span>[$23789.s]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23807]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature strong transfer">
-                                    <span>[$23790.s]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23808]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23791]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23792]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23793]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23799]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23958]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23801]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$24550]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$24032]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23803]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23804]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23959]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23806]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23956]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$24051]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                            </div>
-                            <div class="pricing-page plan pro3 details hidden" data-payment="3">
-                                <div class="pricing-page plan-feature storage strong">
-                                    <span>[$23789.s]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23807]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature strong transfer">
-                                    <span>[$23790.s]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23808]" data-simpletipposition="top"  data-simpletipoffset="3" data-simpletip-class="pricing-tip transformed" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23791]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23792]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23793]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23799]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23958]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23801]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$24550]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$24032]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23803]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23804]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23959]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$23806]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
-                                <div class="pricing-page plan-feature">
-                                    <span>[$23956]</span>
-                                    <i class="sprite-fm-mono icon-info-filled simpletip" data-simpletip="[$24051]" data-simpletipposition="top" data-simpletipoffset="3" data-simpletip-class="pricing-tip" data-simpletipwrapper=".content"></i>
-                                </div>
+                                <button class="mega-button positive pricing-page plan-button"></button>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <div class="condition pricing-page local-currency-tip">* [$18770]</div>
+
+            <div class="dialog bottom-button">
+                <button class="mega-button dialog-action"></button>
+                <button class="mega-button positive upgrade"></button>
             </div>
         </section>
-
-        <footer>
-            <div class="footer-container dialog limited-bottom">
-                <button class="mega-button large positive download continue-download">
-                    <div>
-                        <i class="sprite-fm-mono icon-download"></i>
-                    </div>
-                    <span>[$17091]</span>
-                </button>
-            </div>
-
-            <aside class="with-condition">
-                <div class="dialog limited-bottom">
-                    <div class="checkdiv checkboxOff">
-                        <input type="checkbox" name="limit-warning-checkbox" id="limit-warning-checkbox" class="checkboxOff">
-                    </div>
-                    <label for="limit-warning-checkbox" class="radio-txt">[$229]</label>
-                </div>
-                <div class="dialog bottom-tips">
-                    <span>[$16355]</span>
-                    <a>[$16354]</a>
-                </div>
-                <div class="dialog limited-bottom"></div>
-                <div class="condition pricing-page local-currency-tip">
-                    * [$18770]
-                </div>
-            </aside>
-        </footer>
     </div>
 
     <!-- Dialog: achievements-list-dialog -->
@@ -4347,7 +4417,7 @@
                                 [$16322]
                             </div>
                             <div class="achievement-dialog input-field">
-                                <input type="text" class="achievement-dialog input" value="https://mega.nz/desktop" readonly>
+                                <input type="text" class="achievement-dialog input" value="https://mega.io/desktop" readonly>
                             </div>
                         </div>
                         <div class="achievement-dialog links-block second">
@@ -4355,7 +4425,7 @@
                                 [$16323]
                             </div>
                             <div class="achievement-dialog input-field">
-                                <input type="text" class="achievement-dialog input" value="https://mega.nz/mobile" readonly>
+                                <input type="text" class="achievement-dialog input" value="https://mega.io/mobile" readonly>
                             </div>
                         </div>
                         <div class="clear"></div>
@@ -4441,7 +4511,6 @@
                     </div>
                 </div>
                 <div class="table-info hint">
-                    <!-- do NOT translate this, it's on the JS side -->
                     [$achievm_invitefrddesc]
                 </div>
             </div>
@@ -4450,10 +4519,10 @@
         <footer>
             <div class="footer-container">
                 <button class="mega-button reinvite-all">
-                    <!--Reinvite all pending--><span>[$16103]</span>
+                    <span>[$16103]</span>
                 </button>
                 <button class="mega-button positive invite-more">
-                    <!--Invite more friends--><span>[$16102]</span>
+                    <span>[$16102]</span>
                 </button>
             </div>
         </footer>
@@ -4472,15 +4541,13 @@
 
         <header>
             <i class="graphic full sprite-fm-illustration img-dialog-overquota-storage"></i>
-            <h2 class="full">[$16360]</h2>
+            <h2 class="full"></h2>
             <h2 class="almost-full">[$16312]</h2>
         </header>
 
         <section class="content">
             <div class="content-block fm-dialog-body storage-dialog full dialog-bottom">
-                <div class="storage-dialog body-p long">
-                    [$16304]
-                </div>
+                <div class="storage-dialog body-p long main-text"></div>
                 <div class="odq-warning hidden">
                     <div class="odq-divider"></div>
                     <div class="odq-body">
@@ -4489,36 +4556,16 @@
                     </div>
                     <div class="odq-divider"></div>
                 </div>
+                <div class="storage-dialog body-p rubbish-text top-pad">
+                    [$16306]
+                </div>
                 <div class="storage-dialog buttons-block">
                     <button class="mega-button positive large choose-plan">
                         <span>[$8696]</span>
                     </button>
                 </div>
-                <div class="full-extras">
-                    <div class="storage-dialog divider-txt">
-                        <span> [$174] </span>
-                    </div>
-                    <div class="storage-dialog no-achievements-bl">
-                        <!--div class="storage-dialog body-p medium">
-                            [$16306]
-                        </div-->
-                        <div class="storage-dialog body-p small">
-                            [$16306]
-                        </div>
-                    </div>
-                    <div class="storage-dialog achievements-bl">
-                        <div class="storage-dialog body-p">
-                            [$16308]
-                        </div>
-                        <div class="storage-dialog buttons-block">
-                            <button class="mega-button large get-bonuses">
-                                <span>[$16309]</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="storage-dialog body-p small top-pad">
-                        [$16310]
-                    </div>
+                <div class="estimated-price-text hidden">
+                    * [$18770]
                 </div>
             </div>
 
@@ -4542,35 +4589,24 @@
                         </div>
                     </div>
                 </div>
-                <div class="storage-dialog no-achievements-bl">
-                    <div class="storage-dialog body-p">
+                <div class="storage-dialog">
+                    <div class="storage-dialog body-p main-text">
                         [$16313]
                     </div>
-                    <div class="storage-dialog buttons-block">
-                        <button class="mega-button positive large choose-plan">
-                            <span>[$8696]</span>
-                        </button>
-                        <button class="mega-button large skip">
-                            <span>[$1379]</span>
-                        </button>
-                    </div>
-                </div>
-                <div class="storage-dialog achievements-bl">
-                    <div class="storage-dialog body-p">
-                        [$16313]
-                        [$16314]
+                    <div class="storage-dialog body-p rubbish-text top-pad">
+                        [$16306]
                     </div>
                     <div class="storage-dialog buttons-block">
-                        <button class="mega-button large get-bonuses">
-                            <span>[$16309]</span>
+                        <button class="mega-button large skip hidden">
+                            <span>[$ok_button]</span>
                         </button>
                         <button class="mega-button positive large choose-plan">
                             <span>[$8696]</span>
                         </button>
                     </div>
-                </div>
-                <div class="storage-dialog body-p small top-pad">
-                    [$16306]
+                    <div class="estimated-price-text hidden">
+                        * [$18770]
+                    </div>
                 </div>
             </div>
         </section>
@@ -4593,7 +4629,6 @@
         <section class="content">
             <div class="content-block">
                 <div class="duplicate-conflict info-txt info-txt-fn">
-                    <!-- Replace %1 by <strong>filename.ext</strong> !-->
                     [$16486]
                 </div>
                 <div class="duplicate-conflict info-txt light-grey">
@@ -4618,7 +4653,7 @@
                         !-->
                     </div>
                     <div class="duplicate-conflict info-block">
-                        <div class="export-icon image"></div>
+                        <div class="item-type-icon-90 icon-image-90"></div>
                         <div class="duplicate-conflict file-info">
                             <div class="duplicate-conflict info-txt file-name">
                                 examplefilename.png
@@ -4648,7 +4683,7 @@
                         [$16491]
                     </div>
                     <div class="duplicate-conflict info-block">
-                        <div class="export-icon image"></div>
+                        <div class="item-type-icon-90 icon-image-90"></div>
                         <div class="duplicate-conflict file-info">
                             <div class="duplicate-conflict info-txt file-name">
                                 examplefilename.png
@@ -4678,8 +4713,8 @@
                         -->
                     </div>
                     <div class="duplicate-conflict info-block multiple-files">
-                        <div class="export-icon image"></div>
-                        <div class="export-icon image"></div>
+                        <div class="item-type-icon-90 icon-image-90"></div>
+                        <div class="item-type-icon-90 icon-image-90"></div>
                         <div class="duplicate-conflict file-info">
                             <div class="duplicate-conflict info-txt file-name">
                                 examplefilename.png
@@ -4996,7 +5031,8 @@
                 <div class="fm-account-input">
                     <input class="pin-input" type="text" value="" placeholder="[$19193]" maxlength="6">
                 </div>
-                <div class="warning-text-field v-hidden">[$19192]</div>
+                <div class="warning-text-field failed v-hidden">[$19192]</div>
+                <div class="warning-text-field empty hidden">[$19191]</div>
             </div>
         </section>
 
@@ -5078,8 +5114,11 @@
                 <div class="fm-account-input">
                     <input class="pin-input" type="text" value="" placeholder="[$19193]" maxlength="6">
                 </div>
-                <div class="information-highlight warning hidden">
+                <div class="information-highlight warning failed hidden">
                     <span>[$19197]</span>
+                </div>
+                <div class="information-highlight warning empty hidden">
+                    <span>[$19191]</span>
                 </div>
                 <div class="information-highlight success hidden">
                     <span>[$19198]</span>
@@ -5117,7 +5156,7 @@
         <section class="content">
             <div class="content-block dialog-bottom">
                 <div class="recovery-key-container">
-                    <i class="recovery-key-icon sprite-fm-uni icon-text-24"></i>
+                    <i class="recovery-key-icon sprite-fm-mime icon-text-24"></i>
                     <div class="recovery-key-info-block">
                         [$backup_setup_2fa_recovery_key]
                     </div>
@@ -5156,6 +5195,7 @@
                 <div class="fm-account-input">
                     <input class="pin-input" type="text" value="" placeholder="[$19193]" maxlength="6">
                 </div>
+                <div class="information-highlight warning hidden">[$19191]</div>
             </div>
         </section>
 
@@ -5310,7 +5350,7 @@
                 <h3 class="step-main-question pre-register">[$19852]</h3>
                 <p class="first-paragraph pre-register">[$19853]</p>
                 <p class="second-paragraph pre-register">[$19854]</p>
-                <p class="second-paragraph post-register">[$20189]<br /><a href="https://mega.nz/security" class="info" target="_blank" rel="noopener noreferrer">[$8742]</a>.</p>
+                <p class="second-paragraph post-register">[$20189]<br /><a href="https://help.mega.io/accounts/password-management/recovery-key" class="info" target="_blank" rel="noopener noreferrer">[$8742]</a>.</p>
                 <div class="recover-paste-block">
                     <div class="left-section">
                         <h3 class="backup-key-header">[$8963]</h3>
@@ -5336,6 +5376,39 @@
                 <p class="reset-account">[$19840]</p>
                 <p class="skip-button">[$20190]</p>
             </aside>
+        </footer>
+    </div>
+
+    <!-- Dialog: contact-verification-dialog -->
+    <div class="mega-dialog dialog-template-graphic contact-verification-dialog hidden"
+         role="dialog"
+         aria-labelledby="cv-title"
+         aria-modal="true">
+
+        <button class="close js-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+
+        <header>
+            <div class="graphic contact-verification-img"></div>
+            <h2 id="cv-title">[$contact_verification_dialog_title]</h2>
+        </header>
+
+        <section class="content">
+            <div class="content-block">
+                <p class="first-paragraph">[$contact_verification_dialog_content_1]</p>
+                &nbsp;
+                &nbsp;
+                <p class="second-paragraph">[$contact_verification_dialog_content_2]</p>
+            </div>
+        </section>
+
+        <footer>
+            <div class="footer-container">
+                <button class="mega-button positive dialog-approve-button">
+                    <span>[$contact_verification_dialog_button]</span>
+                </button>
+            </div>
         </footer>
     </div>
 
@@ -5453,6 +5526,14 @@
                         <span>[$19601]</span>
                     </button>
                 </div><!-- END folder container -->
+                <div class="fingerprint-container hidden">
+                    <div class="fingerprint-title">Your business admin credentials</div>
+                    <div class="fingerprint-content-container">
+                        <div>15AE9</div><div>15AE9</div><div>15AE9</div><div>15AE9</div><div>15AE9</div>
+                        <div>15AE9</div><div>15AE9</div><div>15AE9</div><div>15AE9</div><div>15AE9</div>
+                    </div>
+
+                </div>
             </div>
         </section>
 
@@ -5895,6 +5976,7 @@
                         <i class="pro4 sprite-fm-uni icon-crests-lite-details"></i>
                         <i class="pro101 sprite-fm-uni icon-crests-pro-flexi-details"></i>
                         <i class="business sprite-fm-uni icon-crests-business-details"></i>
+                        <i class="feature"></i>
                     </div>
                     <div class="v-separator"></div>
                     <span class="plan-info v-storage"></span>
@@ -5904,6 +5986,10 @@
             </div>
             <div class="content-block">
                 <h3 class="v-description">[$22120]</h3>
+            </div>
+            <div class="content-block">
+                <div class="hidden s4-voucher-terms-check checkboxOff"></div>
+                <label class="hidden radio-txt s4-voucher-terms-label">[$s4_voucher_terms]</label>
             </div>
         </section>
 
@@ -5931,11 +6017,11 @@
         </button>
 
         <header class="step step1 active">
-            <h2 id="affiliate-guide-title">[$22682]</h2>
+            <h2 id="affiliate-guide-title" class="affiliate-guide-title">[$referral_prog_title]</h2>
         </header>
 
         <header class="step step2 alt-background">
-            <h2>[$22718]</h2>
+            <h2 class="referral-guide-title">[$22718]</h2>
         </header>
 
         <section class="content">
@@ -5947,22 +6033,30 @@
                 <div class="affiliate-guide-content active">
                     <div class="cell">
                         <div class="half-sized">
-                            <i class="sprite-fm-mono icon-check"></i>
-                            <div class="header">[$22713]</div>
-                            <i class="sprite-fm-mono icon-check"></i>
-                            <div class="header">[$22714]</div>
+                            <div class="affiliate-guide-check-item">
+                                <i class="sprite-fm-mono icon-check"></i>
+                                <div class="header">[$22713]</div>
+                            </div>
+                            <div class="affiliate-guide-check-item">
+                                <i class="sprite-fm-mono icon-check"></i>
+                                <div class="header">[$22714]</div>
+                            </div>
                         </div>
                         <div class="half-sized">
-                            <i class="sprite-fm-mono icon-check"></i>
-                            <div class="header">[$22715]</div>
-                            <i class="sprite-fm-mono icon-check"></i>
-                            <div class="header">[$22716]</div>
+                            <div class="affiliate-guide-check-item">
+                                <i class="sprite-fm-mono icon-check"></i>
+                                <div class="header">[$22715]</div>
+                            </div>
+                            <div class="affiliate-guide-check-item">
+                                <i class="sprite-fm-mono icon-check"></i>
+                                <div class="header">[$22716]</div>
+                            </div>
                         </div>
                         <div class="clear"></div>
                     </div>
                 </div>
             </div>
-            <div class="content-block step step2 alt-background">
+            <div class="content-block step step2 slides alt-background">
                 <div class="top-block">
                     <div class="nav-button slide1 active" data-slide="1">
                         <span class="num">1.</span>
@@ -5987,14 +6081,6 @@
                                 [$22771][$22723]
                             </div>
                             <div class="feature-block">
-                                <i class="sprite-fm-uni icon-share-file"></i>
-                                [$22772][$22724]
-                            </div>
-                            <div class="feature-block">
-                                <i class="sprite-fm-uni icon-chat-link"></i>
-                                [$22725]
-                            </div>
-                            <div class="feature-block">
                                 <i class="sprite-fm-uni icon-add-users"></i>
                                 [$22726]
                             </div>
@@ -6013,7 +6099,7 @@
                     </div>
                     <div class="affiliate-guide-content slide3">
                         <div class="cell info rules">
-                            [$23181.d]
+                            [$referral_program_rules.d]
                         </div>
                     </div>
                 </div>
@@ -6022,7 +6108,7 @@
 
         <footer>
             <div class="footer-container step step1 active space-between">
-                <a href="/refer" class="clickurl bottom-link" target="_blank">[$22717]</a>
+                <a href="https://mega.io/refer" class="clickurl bottom-link" target="_blank">[$22717]</a>
                 <button class="mega-button positive how-it-works">
                     <span>[$1070]</span>
                 </button>
@@ -6033,7 +6119,7 @@
                         <div>
                             <i class="sprite-fm-mono icon-arrow-left"></i>
                         </div>
-                        <span>[$18068]</span>
+                        <span>[$822]</span>
                     </button>
                 </div>
                 <div>
@@ -6085,17 +6171,16 @@
                     <span data-page="start" class="active">[$ref_link_start_page]</span>
                     <span data-page="business">[$19530]</span>
                     <span data-page="mobile">[$955]</span>
-                    <span data-page="sync">[$956]</span>
-                    <span data-page="security">[$7337]</span>
-                    <span data-page="privacycompany">[$16113]</span>
-                    <span data-page="pro">[$16111]</span>
+                    <span data-page="desktop">[$956]</span>
+                    <span data-page="security">[$footer_item_security_privacy]</span>
+                    <span data-page="pricing">[$1361]</span>
                     <span data-page="help">[$384]</span>
-                    <span data-page="about">[$16112]</span>
-                    <span data-page="storage">[$24401]</span>
-                    <span data-page="collaboration">[$24367]</span>
-                    <span data-page="securechat">[$24432]</span>
-                    <span data-page="extensions">[$16541]</span>
-                    <span data-page="refer">[$22745]</span>
+                    <span data-page="about">[$396]</span>
+                    <span data-page="storage">[$footer_item_cloud_storage]</span>
+                    <span data-page="share">[$footer_item_share]</span>
+                    <span data-page="chatandmeetings">[$footer_item_chat_meetings]</span>
+                    <span data-page="extensions">[$16603]</span>
+                    <span data-page="refer">[$22682]</span>
                     <span data-page="more">[$22746]</span>
                 </div>
                 <div class="generate-url custom-block hidden">
@@ -6152,17 +6237,31 @@
 
     <!-- Dialog: affiliate-redeem -->
     <!-- Affiliate program redemption dialog !-->
-    <div class="mega-dialog dialog-template-tool affiliate-redeem contrast hidden"
+    <div class="mega-dialog dialog-template-tool affiliate-redeem contrast dialog-small hidden"
          role="dialog"
          aria-labelledby="affiliate-redeem-title"
          aria-modal="true">
+
+         <div class="templates hidden">
+            <span class="available-comission-template hidden">
+                <span class="available-commission-local hidden"></span>
+                <span class="available-commission-euro hidden"></span>
+            </span>
+            <div class="dropdown-templates hidden">
+                <div class="select-item-template option" data-state="" data-type="">
+                    <span class="dropdown-item-text"></span>
+                    <div class="dropdown-item-save hidden"></div>
+                </div>
+
+            </div>
+         </div>
 
         <button class="close js-close" aria-label="[$148]">
             <i class="sprite-fm-mono icon-dialog-close"></i>
         </button>
 
         <header>
-            <h2 id="affiliate-redeem-title">[$23295]</h2>
+            <h2 id="affiliate-redeem-title" class="dialog-commisison-title">[$23295]</h2>
         </header>
 
         <section class="content">
@@ -6175,48 +6274,72 @@
                 <!-- Steps !-->
                 <!-- Add class "scrollable" to any cell if we want to init scrolling !-->
 
-                <!-- Step1 block. Payment !-->
-                <div class="affiliate-redeem cells left step1">
+                <!-- Step0 block. Select MEGAquota redemption or Bitcoin redemption -->
+                <div class="affiliate-redeem cells left step0 ">
                     <div class="affiliate-redeem cell-content">
-                        <div class="affiliate-redeem header">
-                            [$23297]
-                        </div>
-                        <input class="currencyField redeem-amount" type="number" name="affiliate-redemption-amount" id="affiliate-redemption-amount" step="any" data-prefix="&euro;">
-                        <div class="affiliate-redeem commission-wrap">
-                            <div class="affiliate-redeem available-comission">
-                                [$23299]
-                            </div>
-                            <button class="mega-button small positive redeem-all-btn">
-                                <span>[$23298]</span>
-                            </button>
-                        </div>
-                        <div class="amount-message-container hidden"></div>
-                        <div class="affiliate-redeem header">
-                            [$23300]
-                        </div>
                         <div class="affiliate-redeem payment-type">
-                            <div class="affiliate-redeem payment-type-wrapper hidden">
-                                <div class="radioOn green-active">
-                                    <input type="radio" id="affiliate-payment-type2" name="affiliate-payment-type" class="radioOn" value="2">
-                                </div>
-                                <label for="affiliate-payment-type2" class="radio-txt">[$6802]</label>
+                            <div class="affiliate-redeem payment-type-header">
+                                [$redemption_method_options]
                             </div>
-                            <div class="affiliate-redeem payment-type-wrapper hidden">
+                            <div class="affiliate-payment-template hidden">
                                 <div class="radioOff green-active">
-                                    <input type="radio" id="affiliate-payment-type1" name="affiliate-payment-type" class="radioOff" value="1">
+                                    <input type="radio" id="affiliate-payment-template-id" name="affiliate-payment-type" class="radioOn" value="1">
                                 </div>
-                                <label for="affiliate-payment-type1" class="radio-txt">[$23301]</label>
+                                <label for="affiliate-payment-template-id" class="radio-txt"></label>
+                            </div>
+
+                            <!-- This wrapper is filled by affiliate.js with the redemption options in the above template -->
+                            <div class="affiliate-redeem payment-type-wrapper"></div>
+
+                            <div class="affiliate-redeem commission-wrap">
+                                <div class="affiliate-redeem available-comission available-comission-quota">
+                                    [$23299]
+                                </div>
+                            </div>
+                            <div class="affiliate-redeem local-info">[$estimated_price_text_min_50]</div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step1 block. Bitcoin enter amount-->
+                <div class="affiliate-redeem cells left step1 bitcoin">
+                    <div class="affiliate-redeem cell-content">
+                        <div class="affiliate-redeem redemption-methods-wrapper">
+                            <div class="affiliate-redeem header">
+                                [$23302]
+                            </div>
+                            <div class="affiliate-redeem withdraw-txt">
+                                <div class="method-chosen"></div>
+                                <a href="">[$1776]</a>
                             </div>
                             <div class="clear"></div>
                             <div class="affiliate-redeem bitcoin-org">
                                 <a href="https://bitcoin.org/" target="_blank" rel="noopener noreferrer">[$23536]</a>
                             </div>
                         </div>
+
+                        <div class="affiliate-redeem bitcoin-redemption-amount-wrapper">
+                            <div class="affiliate-redeem header">
+                                [$23297]
+                            </div>
+                            <input class="currencyField redeem-amount" type="number" name="affiliate-redemption-amount" id="affiliate-redemption-amount" step="any" data-prefix="&euro;">
+                            <div class="affiliate-redeem commission-wrap">
+                                <div class="affiliate-redeem available-comission-bitcoin available-comission">
+                                    [$23299]
+                                    <!-- -avail-commis2 -->
+                                </div>
+                                <button class="mega-button small positive redeem-all-btn">
+                                    <span>[$23298]</span>
+                                </button>
+                            </div>
+                            <div class="amount-message-container hidden"></div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Step2. Withdraw details !-->
-                <div class="affiliate-redeem cells left step2 scrollable hidden">
+                <div class="affiliate-redeem cells left step2 scrollable bitcoin hidden">
                     <div class="affiliate-redeem cell-content">
                         <div class="affiliate-redeem header">
                             [$23302]
@@ -6226,7 +6349,7 @@
                             <a href="">[$1776]</a>
                             <div class="clear"></div>
                         </div>
-                        <div class="affiliate-redeem header">
+                        <div class="affiliate-redeem header details">
                             [$23303]
                         </div>
                         <form autocomplete="disabled" class="withdraw-details">
@@ -6250,8 +6373,8 @@
                             </div>
 
                             <!-- Bitcoin address input and tip !-->
-                            <div class="affiliate-redeem bitcoin-data hidden">
-                                <div class="affiliate-redeem bitcoin-fill-checkbox hidden">
+                            <div class="affiliate-redeem bitcoin-data">
+                                <div class="affiliate-redeem bitcoin-fill-checkbox">
                                     <div class="checkdiv checkboxOn">
                                         <input type="checkbox" id="affi-bitcoin-fill" />
                                     </div>
@@ -6259,14 +6382,14 @@
                                     <div class="clear"></div>
                                 </div>
                                 <input type="text" class="underlinedText" value="" title="[$23361]" name="affi-bitcoin-address" id="affi-bitcoin-address" />
-                                <div class="affiliate-redeem save-bitcoin-checkbox hidden">
+                                <div class="affiliate-redeem save-bitcoin-checkbox">
                                     <div class="checkdiv checkboxOn">
                                         <input type="checkbox" id="affi-save-bitcoin" />
                                     </div>
                                     <label for="affi-save-bitcoin" class="radio-txt"> [$referral_bitcoin_save] </label>
                                     <div class="clear"></div>
                                 </div>
-                                <div class="affiliate-redeem save-data-tip hidden">
+                                <div class="affiliate-redeem save-data-tip">
                                     <div>[$referral_bitcoin_update]</div>
                                     <div class="right accept">[$78]</div>
                                     <div class="right cancel">[$79]</div>
@@ -6285,57 +6408,17 @@
                 <div class="affiliate-redeem cells left step3 scrollable hidden">
                     <div class="affiliate-redeem cell-content">
                         <div class="affiliate-redeem header">
-                            [$427]
+                            [$23302]
                         </div>
-                        <form class="account-details">
-
-                            <!-- Auto fill checkbox. Please add/remove "hidden" class !-->
-                            <div class="affiliate-redeem auto-fill-checkbox hidden">
-                                <div class="checkdiv checkboxOn">
-                                    <input type="checkbox" id="affi-auto-fill" />
-                                </div>
-                                <label for="affi-auto-fill" class="radio-txt"> [$23305] </label>
-                                <div class="clear"></div>
-                            </div>
-
-                            <input type="text" class="affi-dynamic-acc-input underlinedText template" value="" title="" name="" id="" />
-
-                            <div class="mega-input dropdown-input title-ontop affi-dynamic-acc-select template">
-                                <div class="mega-input-title"></div>
-                                <span></span>
-                                <i class="sprite-fm-mono icon-dropdown"></i>
-                                <div class="mega-input-dropdown hidden"><div class="dropdown-scroll"></div></div>
-                            </div>
-
-                            <div class="affi-dynamic-acc-name">
-                                <input type="text" class="underlinedText" value="" title="[$23362]" name="affi-account-name" id="affi-account-name" />
-                            </div>
-                            <div class="affi-dynamic-acc-type"></div>
-                            <div class="affi-dynamic-acc-info"></div>
-
-                            <!-- Save information checkbox. Please add/remove "hidden" class !-->
-                            <div class="affiliate-redeem save-data-checkbox">
-                                <div class="checkdiv checkboxOff">
-                                    <input type="checkbox" id="affi-save-info" />
-                                </div>
-                                <label for="affi-save-info" class="radio-txt"> [$23306] </label>
-                                <div class="clear"></div>
-                            </div>
-
-                            <!-- Save information green tip. Please add/remove "hidden" class !-->
-                            <div class="affiliate-redeem save-data-tip hidden">
-                                <div>[$23307]</div>
-                                <div class="right accept">[$78]</div>
-                                <div class="right cancel">[$79]</div>
-                                <div class="clear"></div>
-                            </div>
-                        </form>
+                        <div class="affiliate-redeem header">
+                            [$23303]
+                        </div>
                     </div>
                 </div>
 
                 <!-- Step4. Transfer info !-->
                 <div class="affiliate-redeem cells left step4 scrollable hidden">
-                    <div class="affiliate-redeem cell-content">
+                    <div class="affiliate-redeem cell-content bitcoin hidden">
                         <div class="fm-affiliate redeem-data">
                             <span class="strong">[$23308]</span>
                             <span class="method"></span>
@@ -6351,9 +6434,143 @@
                             <span class="strong full-size">[$23310]</span>
                         </div>
                     </div>
+                    <div class="affiliate-redeem cell-content megaquota hidden">
+                        <div class="fm-affiliate redeem-data redeem-data-quota redemption-method-wrapper">
+                            <span class="strong redemption-method redeem-method-quota">[$23302]</span>
+                            <div class="change-method megaquota">
+                                <span class="method"></span>
+                                <div class="affiliate-redeem withdraw-txt">
+                                    <div class="method-chosen"></div>
+                                    <a href="">[$1776]</a>
+                                    <div class="clear"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="fm-affiliate redeem-data redeem-data-quota">
+                            <span class="strong full-size">[$23303]</span>
+                            <span class="selected-plan-account full-size">[$redemption_account_plan_for]</span>
+                            <span class="email full-size"></span>
+
+                        </div>
+                        <div class="fm-affiliate selected-plan-warning selected-plan-warning1 hidden">
+                            [$redemption_info_higher_plan]
+                        </div>
+                        <div class="fm-affiliate selected-plan-warning selected-plan-warning2 hidden">
+                            [$redemption_info_lower_plan]
+                        </div>
+                        <div class="fm-affiliate selected-plan-warning selected-plan-warning3 hidden">
+                            [$redemption_info_same_plan]
+                        </div>
+                    </div>
                 </div>
 
-                <div class="affiliate-redeem cells right">
+                <!-- MEGAquota redemption step 1: choose plan and duration -->
+                <div class="affiliate-redeem cells left step1 megaquota scrollable hidden">
+                    <div class="affiliate-redeem cell-content-quota">
+                    <!-- <div class="affiliate-redeem cell-content"> -->
+                        <div class="affiliate-redeem plan-selection-wrapper">
+                            <div class="affiliate-redeem header">
+                                [$redemption_plan_selection_title]
+                            </div>
+
+                            <!-- Select which mega plan you would like to redeem for -->
+                            <div>
+                                <div class="megaquota-option-template hidden">
+                                    <div class="radioOff green-active megaquota-option-radio">
+                                        <input type="radio" name="plan-redeem-type-lite" class="" value="lite" />
+                                    </div>
+                                    <label for="plan-redeem-type" class="megaquota-option-label radio-txt">
+                                        <div class="meqaquota-option-name">Pro Lite template</div>
+                                        <div class="meqaquota-option-information">2400 GB Storage template / 1TB Transfer template</div>
+                                    </label>
+                                </div>
+                                <div class="megaquota-options-wrapper">
+
+                                </div>
+                                <!-- Duration Dropdown -->
+                                <div class="affiliate-redeem duration-dropdown">
+                                    <div class="templates hidden">
+                                        <div class="save-percent-template">
+                                            <span class="dropdown-item-save">[$redemption_save_16_percent]</span>
+                                        </div>
+                                    </div>
+                                    <div class="mega-input title-ontop dropdown-input redemption-plan-duration" id="affi-redemption-plans">
+                                        <div class="mega-input-title">[$duration]</div>
+                                        <span class="redemption-duration-base redemption-duration-default">
+                                            <span class="dropdown-text"></span>
+                                            <span class="dropdown-item-save hidden">[$redemption_save_16_percent]</span>
+                                        </span>
+                                        <i class="sprite-fm-mono icon-dropdown"></i>
+                                        <div class="mega-input-dropdown hidden"><div class="dropdown-scroll"></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Steps 2 and 3 are skipped as they are irrelevant to the MEGAquota pro plan redemption -->
+
+
+                <!-- Summary page for if the user is redeeming a pro plan -->
+                <div class="affiliate-redeem cells right megaquota">
+                    <div class="affiliate-redeem summary-wrap">
+                        <div class="affiliate-redeem header">
+                            [$23311]
+                        </div>
+                        <div class="affiliate-redeem summary quota-summary">
+                            <div class="plan-info-header">
+                                <div class="info plan-info-title plan-info-name">
+                                    [$redemption_summary_name]
+                                </div>
+                                <div class="info price pro-plan">
+                                    <span class="plan-info plan-name">Pro Lite Example</span>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="quota-summary sub-item storage">
+                                <div class="info plan-info-title">
+                                    [$redemption_summary_storage]
+                                </div>
+                                <div class="info price pro-storage">
+                                    <span class="plan-info"></span>
+                                </div>
+                            </div>
+                            <div class="quota-summary sub-item">
+                                <div class="info plan-info-title">
+                                    [$redemption_summary_quota]
+                                </div>
+                                <div class="info price pro-quota">
+                                    <span class="plan-info"></span>
+                                </div>
+                            </div>
+                            <div class="quota-summary sub-item">
+                                <div class="info plan-info-title">
+                                    [$redemption_summary_duration]
+                                </div>
+                                <div class="info price pro-duration">
+                                    <span class="plan-info"></span><span class="euro hidden">------</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="affiliate-redeem amount">
+                            <div class="info">
+                                [$redemption_summary_cost]
+                            </div>
+                            <div class="info price pro-price">
+                                <span class="plan-info">-</span><span class="euro hidden">------</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="affiliate-redeem-quota plan-select-message hidden">
+                    </div>
+                    <div class="affiliate-redeem available-comission available-comission-quota pro-choice-commission">
+                        [$23299]
+                    </div>
+                    <div class="affiliate-redeem local-info">[$estimated_price_text_min_50]</div>
+                </div>
+
+                <div class="affiliate-redeem cells right bitcoin">
                     <div class="affiliate-redeem summary-wrap">
                         <div class="affiliate-redeem header">
                             [$23311]
@@ -6386,16 +6603,14 @@
                             </div>
                         </div>
                     </div>
-                    <div class="affiliate-redeem local-info hidden">
-                        [$23315]
-                    </div>
+                    <div class="affiliate-redeem local-info ">[$estimated_price_text_min_50]</div>
                 </div>
             </div>
         </section>
 
         <footer>
             <div class="footer-container space-between">
-                <button class="mega-button prev-btn action hidden">
+                <button class="mega-button prev-btn action ">
                     <div>
                         <i class="sprite-fm-mono icon-arrow-left"></i>
                     </div>
@@ -6410,7 +6625,7 @@
 
     <!-- Dialog: affiliate-request -->
     <!-- Affiliate program redemption request dialog !-->
-    <div class="mega-dialog dialog-template-action affiliate-request hidden"
+    <div class="mega-dialog dialog-template-action affiliate-request bitcoin hidden"
          role="dialog"
          aria-labelledby="affiliate-request-title"
          aria-modal="true">
@@ -6470,6 +6685,59 @@
             </div>
         </footer>
     </div>
+
+    <!-- Affiliate program redemption request dialog for Pro Plan Redemption!-->
+    <div class="mega-dialog dialog-template-action affiliate-request-quota affiliate-request hidden"
+         role="dialog"
+         aria-labelledby="affiliate-request-quota-title"
+         aria-modal="true">
+
+        <button class="close js-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+
+        <header>
+            <h2 class="affiliate-request-title" id="affiliate-request-quota-title">[$redemption_confirmation_header]</h2>
+        </header>
+
+        <section class="content">
+            <div class="content-block">
+                <div class="plan-name"></div>
+                <div class="info-cells">
+                    <div class="affiliate-request info-cell complete">
+                        <div class="affiliate-request info">
+                            <div class="affiliate-request progress"><span class="dialog-sprite"></span></div>
+                        </div>
+                        <div class="affiliate-request info-txt plan-storage"></div>
+                    </div>
+                    <div class="affiliate-request info-cell complete">
+                        <div class="affiliate-request info">
+                            <div class="affiliate-request progress"><span class="dialog-sprite"></span></div>
+                        </div>
+                        <div class="affiliate-request info-txt plan-quota"></div>
+                    </div>
+                    <div class="affiliate-request info-cell complete">
+                        <div class="affiliate-request info">
+                            <div class="affiliate-request progress"><span class="dialog-sprite"></span></div>
+                        </div>
+                        <div class="affiliate-request info-txt plan-duration"></div>
+                    </div>
+                </div>
+                <div class="affiliate-request info-support">
+                    [$redemption_support_email]
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <div class="footer-container-quota">
+                <button class="mega-button positive">
+                    <span>[$81]</span>
+                </button>
+            </div>
+        </footer>
+    </div>
+
 
     <div class="mega-dialog dialog-template-action pro-discount hidden"
          role="dialog"
@@ -6609,7 +6877,7 @@
             </div>
             <aside>
                 <div>
-                    <a class="clickurl" href="/desktop">[$desktopapp_dialog_other_os]</a>
+                    <a class="clickurl" href="https://mega.io/desktop" target="_blank">[$desktopapp_dialog_other_os]</a>
                 </div>
             </aside>
         </footer>
@@ -7196,7 +7464,6 @@
                 </div>
             </div>
         </section>
-
         <footer>
             <div class="footer-container">
                  <button class="mega-button js-close">
@@ -7208,11 +7475,11 @@
             </div>
         </footer>
     </div>
-    <!-- Dialog: file-request-create-dialog -->
-    <!-- Create File Request folder -->
-    <div class="mega-dialog dialog-template-tool file-request file-request-create-dialog hidden"
+
+    <!-- Dialog: file-request Dialog -->
+    <div class="mega-dialog dialog-template-tool file-request hidden"
          role="dialog"
-         aria-labelledby="file-request-create-dialog-title"
+         aria-labelledby="file-request-dialog-title"
          aria-modal="true">
 
         <button class="close js-close" aria-label="[$148]">
@@ -7220,183 +7487,26 @@
         </button>
 
         <header>
-            <h2 id="file-request-create-dialog-title" class="dialog-title">[$file_request_dialog_create_title]</h2>
-            <p>[$file_request_dialog_create_desc]</p>
-        </header>
-
-        <section class="content">
-            <div class="content-block scrollable">
-                <div class="form-row create">
-                    <label for="file-request-folder">[$1049]</label>
-                    <div class="input-container">
-                        <div class="mega-input box-style mega-input-icon">
-                            <i class="sprite-fm-mono icon-folder-filled"></i>
-                            <input class="file-request-folder" type="text" placeholder="Folder name">
-                        </div>
-                        <button class="mega-button file-request-select-folder disabled">
-                            <span>[$file_request_dialog_button_select_folder]</span>
-                        </button>
-                    </div>
-                </div>
-                <div class="form-row create">
-                    <label for="file-request-title">[$file_request_dialog_label_title]</label>
-                    <span class="char-count"></span>
-                    <div class="mega-input-wrapper">
-                        <div class="mega-input box-style">
-                            <input class="file-request-title" type="text" placeholder="[$file_request_dialog_placeholder_title]">
-                        </div>
-                        <div class="message-container"></div>
-                    </div>
-                </div>
-                <div class="form-row last">
-                    <label for="file-request-description">[$16462]</label>
-                    <span class="char-count"></span>
-                    <div class="mega-input-wrapper">
-                        <div class="mega-input box-style">
-                            <input class="file-request-description" type="text" placeholder="[$file_request_dialog_placeholder_desc]">
-                        </div>
-                        <div class="message-container"></div>
-                    </div>
-                    <p class="caption">[$file_request_dialog_caption_desc]</p>
-                </div>
-            </div>
-        </section>
-
-        <footer class="alt-background">
-            <div class="footer-container manage alt-background space-between">
-                <button class="mega-button file-request-preview-button">
-                    <span>[$file_request_dialog_button_preview]</span>
-                </button>
-                <div class="button-container">
-                    <button class="mega-button file-request-close-button">
-                        <span>[$82]</span>
-                    </button>
-                    <button class="mega-button file-request-create-button positive">
-                        <span>[$158]</span>
-                    </button>
-                </div>
-            </div>
-        </footer>
-    </div>
- 
-    <!-- Create File Request Success folder -->
-    <div class="mega-dialog dialog-template-tool file-request file-request-create-success-dialog hidden"
-         role="dialog"
-         aria-labelledby="file-request-create-success-dialog-title"
-         aria-modal="true">
-
-        <button class="close js-close" aria-label="[$148]">
-            <i class="sprite-fm-mono icon-dialog-close"></i>
-        </button>
-
-        <header>
-            <h2 id="file-request-create-success-dialog-title" class="dialog-title">[$file_request_dialog_create_success_title]</h2>
-            <p>[$file_request_dialog_create_success_desc]</p>
-        </header>
-
-        <section class="content">
-            <div class="content-block scrollable">
-                <div class="form-row create-success">
-                    <label for="file-request-share-link">[$file_request_dialog_label_url]</label>
-                    <div class="file-request-input input-share">
-                        <div class="input-wrapper">
-                            <i class="sprite-fm-mono icon-link chain"></i>
-                            <input class="file-request-share-link" type="text" readonly="readonly">
-                        </div>
-                        <div class="button-wrapper">
-                            <button class="mega-button positive copy">[$1394]</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-row create-success">
-                    <label for="file-request-embed-code">[$file_request_dialog_label_embed]</label>
-                    <div class="file-request-input input-code">
-                        <div class="input-wrapper">
-                            <i class="tab-icon url sprite-fm-mono icon-embed-code"></i>
-                            <input type="text" class="file-request-embed-code" value="" readonly="readonly">
-                        </div>
-                        <div class="button-wrapper">
-                            <button class="mega-button positive copy">[$17408]</button>
-                        </div>
-                    </div>
-                    <div class="file-request-embed-button-container">
-                        <div class="embed-button-header">
-                            [$file_request_dialog_theme_desc]
-                        </div>
-                        <div class="embed-button-selection light-theme">
-                            <div class="embed-block active">
-                                <div class="embed-button-centre">
-                                    <div class="embed-button centre-button theme-light-forced">
-                                        <div class="embed-content-wrapper">
-                                            <div class="embed-mega-icon">
-                                            </div>
-                                            <div class="embed-action-text">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="embed-button-select">
-                                        <div class="embed-button-theme radioOn">
-                                            <input type="radio" class="embed-button-theme-input radioOn" value="0">
-                                        </div>
-                                        <div class="embed-button-subheading">
-                                            [$18217]
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="embed-block dark-theme">
-                                <div class="embed-button-centre">
-                                    <div class="embed-button centre-button theme-light-forced">
-                                        <div class="embed-content-wrapper">
-                                            <div class="embed-mega-icon">
-                                            </div>
-                                            <div class="embed-action-text">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="embed-button-select">
-                                        <div class="embed-button-theme radioOff">
-                                            <input type="radio" class="embed-button-theme-input radioOff" value="1">
-                                        </div>
-                                        <div class="embed-button-subheading">
-                                            [$18216]
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <footer class="alt-background">
-            <div class="footer-container manage">
-                <button class="mega-button positive file-request-close-button">
-                    <span>[$81]</span>
-                </button>
-            </div>
-        </footer>
-    </div>
-
-    <!-- Manage File Request folder -->
-    <div class="mega-dialog dialog-template-tool file-request file-request-manage-dialog hidden"
-         role="dialog"
-         aria-labelledby="file-request-manage-dialog-title"
-         aria-modal="true">
-
-        <button class="close js-close" aria-label="[$148]">
-            <i class="sprite-fm-mono icon-dialog-close"></i>
-        </button>
-
-        <header>
-            <h2 id="file-request-manage-dialog-title" class="dialog-title">[$file_request_dialog_manage_title]</h2>
+            <h2 id="file-request-dialog-title" class="dialog-title"></h2>
+            <p class="dialog-caption"></p>
         </header>
 
         <section class="content">
             <div class="scrollable">
-                <div class="content-block primary">
-                    <div class="form-row create">
+                <div class="content-block primary hidden">
+                    <div class="form-row select-folder">
+                        <label for="file-request-folder">[$1049]</label>
+                        <div class="input-container">
+                            <div class="mega-input box-style mega-input-icon">
+                                <i class="sprite-fm-mono icon-folder-filled"></i>
+                                <input class="file-request-folder" type="text" placeholder="Folder name">
+                            </div>
+                            <button class="mega-button file-request-select-folder disabled">
+                                <span>[$file_request_dialog_button_select_folder]</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-row">
                         <label for="file-request-title">[$file_request_dialog_label_title]</label>
                         <span class="char-count"></span>
                         <div class="mega-input-wrapper">
@@ -7417,15 +7527,15 @@
                         </div>
                         <p class="caption">[$file_request_dialog_caption_desc]</p>
                     </div>
-                    <div class="footer-container space-between">
+                    <div class="footer-container space-between preview">
                         <button class="mega-button file-request-preview-button">
                             <span>[$file_request_dialog_button_preview]</span>
                         </button>
                     </div>
                 </div>
                 <hr class="divider"/>
-                <div class="content-block secondary">
-                    <div class="form-row create-success">
+                <div class="content-block secondary hidden">
+                    <div class="form-row">
                         <label for="file-request-share-link">[$file_request_dialog_label_url]</label>
                         <div class="file-request-input input-share">
                             <div class="input-wrapper">
@@ -7437,17 +7547,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-row create-success">
+                    <div class="form-row">
                         <label for="file-request-embed-code">[$file_request_dialog_label_embed]</label>
-                        <div class="file-request-input input-code">
-                            <div class="input-wrapper">
-                                <i class="tab-icon url sprite-fm-mono icon-embed-code"></i>
-                                <input class="file-request-embed-code" type="text" value="" readonly="readonly">
-                            </div>
-                            <div class="button-wrapper">
-                                <button class="mega-button positive copy">[$17408]</button>
-                            </div>
-                        </div>
                         <div class="file-request-embed-button-container">
                             <div class="embed-button-header">
                                 [$file_request_dialog_theme_desc]
@@ -7495,6 +7596,15 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="file-request-input input-code">
+                            <div class="input-wrapper">
+                                <i class="tab-icon url sprite-fm-mono icon-embed-code"></i>
+                                <input class="file-request-embed-code" type="text" value="" readonly="readonly">
+                            </div>
+                            <div class="button-wrapper">
+                                <button class="mega-button positive copy">[$17408]</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -7504,15 +7614,788 @@
                 <button class="mega-button file-request-remove-button">
                     <span>[$file_request_dialog_button_remove]</span>
                 </button>
+                <button class="mega-button file-request-preview-button">
+                    <span>[$file_request_dialog_button_preview]</span>
+                </button>
                 <div class="button-container">
                     <button class="mega-button file-request-close-button">
                         <span>[$82]</span>
                     </button>
-                    <button class="mega-button file-request-update-button positive">
+                    <button class="mega-button file-request-save-button positive">
                         <span>[$msg_dlg_save]</span>
                     </button>
                 </div>
             </div>
         </footer>
+    </div>
+
+    <!--  S4 related dialogs  -->
+    <!-- Dialog: S4-create-bucket-dialog -->
+    <div class="mega-dialog dialog-template-main s4 s4-create-bucket-dialog hidden"
+         role="dialog"
+         aria-labelledby="s4-create-bucket-title"
+         aria-modal="true">
+        <button class="close js-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+        <header>
+            <h2 class="s4-create-bucket-title">[$s4_create_bkt]</h2>
+        </header>
+        <section class="content">
+            <div class="content-block spaced-margin">
+                <div class="offset-text">[$s4_enter_bkt_name]</div>
+                <div class="mega-input with-icon box-style">
+                    <i class="sprite-fm-mono icon-bucket-filled"></i>
+                    <input class="megaInputs underlinedText" name="bucket-name" type="text" placeholder="[$s4_bkt_name_txt]" autofocus />
+                    <div class="message-container mega-banner"></div>
+                </div>
+            </div>
+        </section>
+        <footer>
+            <div class="footer-container">
+                <button class="mega-button cancel">
+                    <span>[$82]</span>
+                </button>
+                <button class="mega-button positive progress disabled">
+                    <span>[$158]</span>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Dialog: S4-create-user-dialog -->
+    <div class="mega-dialog dialog-template-main s4 s4-create-user-dialog hidden"
+         role="dialog"
+         aria-labelledby="s4-create-user-title"
+         aria-modal="true">
+        <button class="close js-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+        <header>
+            <h2 id="s4-create-user-title">[$s4_user_create]</h2>
+        </header>
+        <section class="content">
+            <div class="content-block">
+                <div class="step-1 hidden">
+                    <div class="offset-text">[$s4_user_name_enter]</div>
+                    <div class="mega-input with-icon box-style">
+                        <i class="sprite-fm-mono icon-user-filled"></i>
+                        <input class="megaInputs underlinedText" name="user-name-input" type="text" placeholder="[$s4_user_name]" autocomplete="disabled"/>
+                        <div class="message-container mega-banner"></div>
+                    </div>
+                </div>
+                <div class="step-2 spaced-margin hidden">
+                    <div class="step-head">
+                        <div class="head-title">[$s4_user_add_to_group]</div>
+                        <div class="search-bar">
+                            <i class="sprite-fm-mono icon-preview-reveal"></i>
+                            <input class="group-search" placeholder="[$s4_group_search]">
+                        </div>
+                    </div>
+                    <div class="sticky-header-table-container">
+                        <div class="s4-table-scroll ps-container ps-theme-default">
+                            <table class="group-table data-table table-hover dialog-table">
+                                <thead>
+                                    <tr>
+                                        <th class="col-1"></th>
+                                        <th class="col-2 no-pad-start">[$s4_group_name]</th>
+                                        <th class="col-3 no-pad-start">[$s4_assigned_policies]</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="group-row group-template hidden">
+                                        <td class="col-1">
+                                            <div class="group-check checkboxOff checkbox">
+                                                <input class="checkboxOff" type="checkbox" name="groupA">
+                                            </div>
+                                        </td>
+                                        <td class="col-2 no-pad-start">
+                                            <span class="group-name">Proxy devs</span>
+                                        </td>
+                                        <td class="col-3 no-pad-start">
+                                            <span class="group-policies">Policies</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="create-group-button">
+                        <button class="mega-button action create-group" title="Create new group">
+                            <div>
+                                <i class="sprite-fm-mono icon-add-circle icon-green"></i>
+                            </div>
+                            <span>[$s4_group_new]</span>
+                        </button>
+                    </div>
+                    <div class="create-group-container hidden">
+                        <div class="offset-text">[$18509]</div>
+                        <div class="mega-input with-icon box-style">
+                            <i class="sprite-fm-mono icon-contacts"></i>
+                            <input class="group-name megaInputs underlinedText" type="text" name="group-name-input" placeholder="[$s4_group_name]" autocomplete="disabled"/>
+                            <div class="message-container mega-banner"></div>
+                        </div>
+                        <button class="mega-button positive save-group disabled">
+                            <span>[$158]</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="step-3 spaced-margin hidden">
+                    <div class="step-head">
+                        <div class="head-title">[$s4_user_attach_policy]</div>
+                        <div class="search-bar">
+                            <i class="sprite-fm-mono icon-preview-reveal"></i>
+                            <input class="policies-search" placeholder="[$s4_policy_search]">
+                        </div>
+                    </div>
+                    <div class="sticky-header-table-container">
+                        <div class="s4-table-scroll ps-container ps-theme-default">
+                            <table class="policy-table data-table table-hover dialog-table">
+                                <thead>
+                                    <tr>
+                                        <th></th>
+                                        <th class="no-pad-start">[$s4_policy_name]</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="policy-row policy-template hidden">
+                                        <td>
+                                            <div class="policy-check checkboxOff checkbox">
+                                                <input class="checkboxOff" type="checkbox" name="policyA">
+                                            </div>
+                                        </td>
+                                        <td class="no-pad-start">
+                                            <span class="policy-name">Policy name</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="step-4 hidden">
+                    <table class="create-item-info">
+                        <tr class="create-user-name">
+                            <td>
+                                <div class="section-label">[$s4_user_name_label]</div>
+                            </td>
+                            <td>
+                                <span class="container-user-name"></span>
+                            </td>
+                        </tr>
+                        <tr class="create-user-arn">
+                            <td>
+                                <div class="section-label">[$s4_user_arn_label]</div>
+                            </td>
+                            <td>
+                                <span class="container-user-arn"></span>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="badge-template badge hidden">
+                        <div class="badge-name"></div>
+                        <button class="mega-button small action remove">
+                            <i class="sprite-fm-mono icon-dialog-close"></i>
+                        </button>
+                    </div>
+                    <div class="info-container-wrap group-info">
+                        <div class="section-label">[$s4_groups_label]</div>
+                        <div class="badge-container"></div>
+                    </div>
+                    <div class="info-container-wrap policy-info">
+                        <div class="section-label">[$s4_policies_label]</div>
+                        <div class="badge-container"></div>
+                    </div>
+                </div>
+                <div class="step-5 hidden">
+                    <div class="create-success-text user-success-text"></div>
+                    <table class="keys-table">
+                        <tr>
+                            <td>
+                                <span>[$s4_key_access_colon]</span>
+                            </td>
+                            <td>
+                                <span class="access-key-value"></span>
+                                <button class="mega-button small action copy" data-key="ak">
+                                    <i class="sprite-fm-mono icon-copy"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span>[$s4_key_secret_colon]</span>
+                            </td>
+                            <td>
+                                <input class="secret-key-value" type="password" readonly>
+                                <button class="mega-button small action toggle-vis">
+                                    <i class="sprite-fm-mono icon-eye-reveal toggle-vis"></i>
+                                </button>
+                                <button class="mega-button small action copy" data-key="sk">
+                                    <i class="sprite-fm-mono icon-copy" ></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </section>
+        <footer>
+            <div class="footer-container">
+                <button class="mega-button action regress hidden">
+                    <i class="sprite-fm-mono icon-arrow-left"></i>
+                    <div>[$822]</div>
+                </button>
+                <button class="mega-button cancel">
+                    <span>[$82]</span>
+                </button>
+                <button class="mega-button positive progress disabled">
+                    <span>[$158]</span>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Dialog: S4-create-group-dialog -->
+    <div class="mega-dialog dialog-template-main s4 s4-create-group-dialog hidden"
+         role="dialog"
+         aria-labelledby="s4-create-group-dialog-title"
+         aria-modal="true">
+        <button class="close js-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+        <header>
+            <h2 id="s4-create-group-dialog-title">[$s4_group_create]</h2>
+        </header>
+        <section class="content">
+            <div class="content-block">
+                <div class="step-1 spaced-margin hidden">
+                    <div class="offset-text">[$18509]</div>
+                    <div class="mega-input with-icon box-style">
+                        <i class="sprite-fm-mono icon-contacts"></i>
+                        <input class="megaInputs underlinedText" name="group-name-input" type="text" placeholder="[$s4_group_name]" autocomplete="disabled"/>
+                        <div class="message-container mega-banner"></div>
+                    </div>
+                </div>
+                <div class="step-2 spaced-margin hidden">
+                    <div class="step-head">
+                        <div class="head-title">[$s4_group_attach_policy]</div>
+                        <div class="search-bar">
+                            <i class="sprite-fm-mono icon-preview-reveal"></i>
+                            <input class="policies-search" placeholder="[$s4_policy_search]">
+                        </div>
+                    </div>
+                    <div class="sticky-header-table-container">
+                        <div class="s4-table-scroll ps-container ps-theme-default">
+                            <table class="policy-table data-table table-hover dialog-table">
+                                <thead>
+                                    <tr>
+                                        <th class="col-1"></th>
+                                        <th class="col-2 no-pad-start">[$s4_policy_name]</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="policy-row policy-template hidden">
+                                        <td class="col-1">
+                                            <div class="policy-check checkboxOff checkbox">
+                                                <input class="checkboxOff" type="checkbox" name="policyA">
+                                            </div>
+                                        </td>
+                                        <td class="col-2 no-pad-start">
+                                            <span class="policy-name">Policy name</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="step-3 spaced-margin hidden">
+                    <div class="step-head">
+                        <div class="head-title">[$s4_group_select_users]</div>
+                        <div class="search-bar">
+                            <i class="sprite-fm-mono icon-preview-reveal"></i>
+                            <input class="users-search" placeholder="[$s4_user_search]">
+                        </div>
+                    </div>
+                    <div class="sticky-header-table-container">
+                        <div class="s4-table-scroll ps-container ps-theme-default">
+                            <table class="group-users-table data-table table-hover dialog-table">
+                                <thead>
+                                    <tr>
+                                        <th class="col-1"></th>
+                                        <th class="col-2 no-pad-start">[$s4_user_name]</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="group-user-row group-user-template hidden">
+                                        <td class="col-1">
+                                            <div class="group-user-check checkboxOff checkbox">
+                                                <input class="checkboxOff" type="checkbox" name="userA">
+                                            </div>
+                                        </td>
+                                        <td class="col-2 no-pad-start">
+                                            <span class="group-user-name">ABC DEF</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="step-4 hidden">
+                    <table class="create-item-info">
+                        <tr class="create-group-name">
+                            <td>
+                                <div class="section-label">[$s4_group_name_label]</div>
+                            </td>
+                            <td>
+                                <span class="container-group-name"></span>
+                            </td>
+                        </tr>
+                        <tr class="create-group-arn">
+                            <td>
+                                <div class="section-label">[$s4_group_arn_label]</div>
+                            </td>
+                            <td>
+                                <span class="container-group-arn"></span>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="badge-template badge hidden">
+                        <div class="badge-name"></div>
+                        <button class="mega-button small action remove">
+                            <i class="sprite-fm-mono icon-dialog-close"></i>
+                        </button>
+                    </div>
+                    <div class="info-container-wrap user-info">
+                        <div class="section-label">[$s4_users_label]</div>
+                        <div class="badge-container"></div>
+                    </div>
+                    <div class="info-container-wrap policy-info">
+                        <div class="section-label">[$s4_policies_label]</div>
+                        <div class="badge-container"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <footer>
+            <div class="footer-container">
+                <button class="mega-button action regress hidden">
+                    <i class="sprite-fm-mono icon-arrow-left"></i>
+                    <div>[$822]</div>
+                </button>
+                <button class="mega-button cancel">
+                    <span>[$82]</span>
+                </button>
+                <button class="mega-button positive progress disabled">
+                    <span>[$158]</span>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Dialog: S4-create-access-key-dialog -->
+    <div class="mega-dialog dialog-template-main s4 s4-create-access-key-dialog hidden"
+         role="dialog"
+         aria-labelledby="s4-create-access-key-title"
+         aria-modal="true">
+        <button class="close js-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+        <header>
+            <h2 id="s4-create-access-key-title">[$s4_key_create]</h2>
+        </header>
+        <section class="content">
+            <div class="content-block">
+                <div class="step-1 spaced-margin hidden">
+                    <div class="offset-text">[$s4_key_name_enter]</div>
+                    <div class="mega-input with-icon box-style">
+                        <i class="sprite-fm-mono icon-key"></i>
+                        <input class="megaInputs underlinedText" name="key-name-input" type="text" placeholder="[$s4_key_name]" autocomplete="disabled"/>
+                        <div class="message-container mega-banner"></div>
+                    </div>
+                    <div class="radio-buttons">
+                        <div class="radio-wrap">
+                            <div class="user-radio radioOn">
+                                <input type="radio" name="user" value="rootuser" checked>
+                            </div>
+                            <div class="radio-txt">[$s4_user_root]</div>
+                        </div>
+                        <div class="radio-wrap">
+                            <div class="user-radio radioOff">
+                                <input type="radio" name="user" value="subuser">
+                            </div>
+                            <div class="radio-txt">[$s4_user_sub]</div>
+                        </div>
+                    </div>
+                    <div class="user-select-wrap hidden">
+                        <div class="step-head">
+                            <div class="head-title">[$s4_user_assign_title]</div>
+                            <div class="search-bar">
+                                <i class="sprite-fm-mono icon-preview-reveal"></i>
+                                <input class="container-user-search" placeholder="[$s4_user_search]">
+                            </div>
+                        </div>
+                        <div class="sticky-header-table-container">
+                            <div class="s4-table-scroll ps-container ps-theme-default">
+                                <table class="key-users-table data-table">
+                                    <thead>
+                                        <tr>
+                                            <th class="col-1">[$s4_user_name]</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="key-user-row key-user-template hidden">
+                                            <td class="col-1">
+                                                <span class="key-user-name">user name</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="step-2 hidden">
+                    <div class="create-success-text key-success-text"></div>
+                    <table class="keys-table">
+                        <tr>
+                            <td>
+                                <span>[$s4_key_access_colon]</span>
+                            </td>
+                            <td>
+                                <span class="access-key-value"></span>
+                                <button class="mega-button small action copy" data-key="ak">
+                                    <i class="sprite-fm-mono icon-copy"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span>[$s4_key_secret_colon]</span>
+                            </td>
+                            <td>
+                                <input class="secret-key-value" type="password" readonly>
+                                <button class="mega-button small action toggle-vis">
+                                    <i class="sprite-fm-mono icon-eye-reveal"></i>
+                                </button>
+                                <button class="mega-button small action copy" data-key="sk">
+                                    <i class="sprite-fm-mono icon-copy"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </section>
+        <footer>
+            <div class="footer-container">
+                <button class="mega-button cancel">
+                    <span>[$82]</span>
+                </button>
+                <button class="mega-button positive progress disabled">
+                    <span>[$158]</span>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Dialog: S4-bucket-settings-dialog -->
+    <div class="mega-dialog dialog-template-main s4 s4-bucket-settings-dialog hidden"
+         role="dialog"
+         aria-labelledby="s4-bucket-settings-title"
+         aria-modal="true">
+        <button class="close js-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+        <header>
+            <h2 id="s4-bucket-settings-title">[$s4_bkt_settings]</h2>
+        </header>
+        <section class="content">
+            <div class="content-block">
+                <div class="fm-dialog-tabs">
+                    <div class="fm-dialog-tab info active" data-target="bucket-info">[$892]</div>
+                    <div class="fm-dialog-tab policies" data-target="bucket-policies">[$s4_policy_label]</div>
+                    <div class="fm-dialog-tab access" data-target="bucket-access">[$s4_url_access_label]</div>
+                    <div class="clear"></div>
+                </div>
+                <div class="content-container bucket-info">
+                    <div class="bucket-info-field name">
+                        <span class="label">[$1764]</span>
+                        <span class="value"></span>
+                    </div>
+                    <div class="bucket-info-field total-size">
+                        <span class="label">[$22130]</span>
+                        <span class="value"></span>
+                    </div>
+                    <div class="bucket-info-field contains">
+                        <span class="label">[$22147]</span>
+                        <span class="value"></span>
+                    </div>
+                    <div class="bucket-info-field date-added">
+                        <span class="label">[$22143]</span>
+                        <span class="value"></span>
+                    </div>
+                </div>
+                <div class="content-container bucket-policies hidden">
+                    <div class="policies-header-wrapper">
+                        <span class="policies-header">[$s4_policy_label]</span>
+                        <a class="examples clickurl hidden" target="_blank" href="https://help.mega.io">[$s4_policy_examples]</a>
+                    </div>
+                    <div class="policies-editor">
+                        <textarea class="txtar"></textarea>
+                    </div>
+                    <div class="fm-notification-block bucket-policy-warning">[$s4_invalid_policy]</div>
+                </div>
+                <div class="content-container bucket-access hidden">
+                    <div class="access-options">
+                        <div class="radio-wrap">
+                            <div class="access-radio radioOn">
+                                <input type="radio" name="bucket-access" value="0">
+                            </div>
+                            <div class="radio-txt">[$s4_url_obj_level_txt]</div>
+                        </div>
+                        <div class="offset-subtext">[$s4_url_obj_level_subtxt]</div>
+                    </div>
+                    <div class="access-options">
+                        <div class="radio-wrap">
+                            <div class="access-radio radioOff">
+                                <input type="radio" name="bucket-access" value="1">
+                            </div>
+                            <div class="radio-txt">[$s4_url_grant_txt]</div>
+                        </div>
+                        <div class="offset-subtext">[$s4_url_grant_subtxt]</div>
+                    </div>
+                    <div class="access-options">
+                        <div class="radio-wrap">
+                            <div class="access-radio radioOff">
+                                <input type="radio" name="bucket-access" value="2">
+                            </div>
+                            <div class="radio-txt">[$s4_url_deny_txt]</div>
+                        </div>
+                        <div class="offset-subtext">[$s4_url_deny_subtxt]</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <footer>
+            <div class="footer-container">
+                <button class="mega-button cancel">
+                    <span>[$82]</span>
+                </button>
+                <button class="mega-button positive progress">
+                    <span>[$707]</span>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Dialog: S4-object-access-dialog -->
+    <div class="mega-dialog dialog-template-main s4 s4-object-access-dialog hidden"
+         role="dialog"
+         aria-labelledby="s4-object-access-title"
+         aria-modal="true">
+        <button class="close js-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+        <header>
+            <h2 id="s4-object-access-title">[$s4_access_dig_header]</h2>
+        </header>
+        <section class="content">
+            <div class="content-block">
+                <div class="object-access-entry">
+                    <div>
+                        <div class="subtitle-txt">
+                            [$s4_public_url]
+                        </div>
+                        <div class="content-txt">
+                            [$s4_access_enable_msg]
+                        </div>
+                    </div>
+                    <div class="mega-switch pub-access-toggle toggle-off" role="switch" aria-checked="false" tabindex="0">
+                        <div class="mega-feature-switch"></div>
+                    </div>
+                </div>
+                <div class="fm-notification-block bucket-access-warning"></div>
+            </div>
+            <div class="content-block">
+                <div class="object-access-entry file-info inactive">
+                    <div class="subtitle-txt">
+                        <span class="item-type-icon audio file"><img alt=""/></span>
+                        <span class="file-name">Object 2</span>
+                        <span class="file-size">20 MB</span>
+                    </div>
+                    <div class="input-container">
+                        <div class="user-input-wrap">
+                            <i class="sprite-fm-mono icon-link chain"></i>
+                            <input type="text" readonly="" value="">
+                        </div>
+                        <button class="mega-button positive copy">
+                            <span>[$63]</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <footer class="">
+            <div class="footer-container"></div>
+        </footer>
+    </div>
+    <!-- Dialog: Welcome for new subscriberes / newly upgraded subscribers -->
+    <div class="mega-dialog dialog-template-tool upgrade-welcome-dialog hidden"
+        role="dialog"
+        aria-labelledby=""
+        aria-modal="true">
+        <button class="close js-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+        <section class="upgrade-welcome-content-left">
+            <section>
+                <header></header>
+                <div class="thanks-text">[$welcome_dialog_dl_mobile]</div>
+            </section>
+            <section class="welcome-dialog content">
+                <div class="welcome-dialog plan-info-header">[$welcome_dialog_info_title]</div>
+                <div class="welcome-dialog content-block">
+                    <i class="sprite-fm-mono icon-cloud"></i>
+                    <div class="content-info more-quota">
+                        <div class="welcome-dialog info-header">[$welcome_dialog_more_quota]</div>
+                        <div class="welcome-dialog info-text"></div>
+                    </div>
+                </div>
+                <div class="welcome-dialog content-block">
+                    <i class="sprite-fm-mono icon-share-outgoing-external"></i>
+                    <div class="content-info transfer-sharing">
+                        <div class="welcome-dialog info-header">[$pr_trns_share]</div>
+                        <div class="welcome-dialog info-text">[$welcome_dialog_share_transfer]</div>
+                    </div>
+                </div>
+                <div class="welcome-dialog content-block">
+                    <i class="sprite-fm-mono icon-lock"></i>
+                    <div class="content-info additional-security">
+                        <div class="welcome-dialog info-header">[$welcome_dialog_addit_security]</div>
+                        <div class="welcome-dialog info-text">[$welcome_dialog_secure_links]</div>
+                    </div>
+                </div>
+                <div class="welcome-dialog content-block">
+                    <i class="sprite-fm-mono grid-separate"></i>
+                    <div class="content-info additional-security">
+                        <div class="welcome-dialog info-header">[$welc_dlg_unrestricted_calls]</div>
+                        <div class="welcome-dialog info-text">[$welc_dlg_host_calls]</div>
+                    </div>
+                </div>
+                <div class="welcome-dialog content-block">
+                    <i class="sprite-fm-mono icon-shield-thin-outline"></i>
+                    <div class="content-info additional-security">
+                        <div class="welcome-dialog info-header">[$mega_vpn]</div>
+                        <div class="welcome-dialog info-text">[$welc_dlg_stay_private]</div>
+                    </div>
+                </div>
+            </section>
+        </section>
+        <footer>
+            <button class="mega-button positive">[$81]</button>
+        </footer>
+    </div>
+    <!-- Dialog: rewind-download-upgrade -->
+    <div class="mega-dialog dialog-template-graphic rewind-download-upgrade hidden"
+       role="dialog"
+       aria-labelledby="rewind-upgrade-title"
+       aria-modal="true">
+
+       <button class="close js-close" aria-label="[$148]">
+           <i class="sprite-fm-mono icon-dialog-close"></i>
+       </button>
+
+       <header>
+           <div class="graphic sprite-fm-illustration img-rewind-download-upgrade"></div>
+           <h2 class="rewind-upgrade-title">[$rewind_upgrade_dialog_title]</h2>
+       </header>
+
+       <section class="content">
+           <div class="content-block">
+               <p>[$rewind_upgrade_dialog_desc]</p>
+           </div>
+       </section>
+
+       <footer>
+           <aside>
+               <button class="mega-button positive btn-download-upgrade"><span>[$433]</span></button>
+           </aside>
+       </footer>
+   </div>
+
+    <!-- Dialog: upgrade-to-pro-dialog -->
+    <!-- Experimental upgrade to pro dialog for targeted free users only !-->
+    <div class="mega-dialog dialog-template-message upgrade-to-pro-dialog hidden"
+         role="dialog"
+         aria-labelledby="upgrade-to-pro-dialog-title"
+         aria-modal="true">
+
+        <section class="content">
+            <div class="dialog-title-and-description">
+                <div class="upgrade-to-pro-dialog-title">[$view_upgrade_pro_dialog_title]</div>
+                <div class="upgrade-to-pro-dialog-description"></div>
+            </div>
+            <div class="tabs">
+                <div class="tab template" data-tab-num="" data-evt=""></div>
+            </div>
+            <div class="info-container">
+                <div class="image-container">
+                    <i class="image"></i>
+                </div>
+                <div class="title-and-blurb">
+                    <div class="title"></div>
+                    <div class="blurb"></div>
+                </div>
+            </div>
+            <div class="price-disclaimer hidden">* [$18770]</div>
+        </section>
+
+        <footer>
+            <button class="mega-button close-dialog">[$maybe_later_btn]</button>
+            <button class="mega-button positive upgrade">[$8696]</button>
+        </footer>
+    </div>
+</section>
+
+<section class="mega-dialog-container">
+    <!-- Dialog: device-rename-dialog -->
+    <div class="mega-dialog dialog-template-main device-rename-dialog hidden"
+    role="dialog"
+    aria-labelledby="device-rename-dialog-title"
+    aria-modal="true">
+
+    <button class="close js-close" aria-label="[$148]">
+    <i class="sprite-fm-mono icon-dialog-close"></i>
+    </button>
+
+    <header>
+    <h2 id="device-rename-dialog-title">[$device_rename_dialog_header]</h2>
+    </header>
+
+    <section class="content">
+    <div class="content-block">
+        <div class="device-rename-input-bl">
+            <i class="item-type-icon-90"></i>
+            <input name="dialog-device-rename" type="text" value="[$157]" />
+        </div>
+        <div class="duplicated-input-warning">
+            <div class="arrow"></div>
+            <span>[$17578]</span>
+        </div>
+    </div>
+    </section>
+
+    <footer>
+    <div class="footer-container">
+        <button class="mega-button device-rename-dialog-button cancel">
+            <span>[$82]</span>
+        </button>
+        <button class="mega-button positive device-rename-dialog-button rename">
+            <span>[$61]</span>
+        </button>
+    </div>
+    </footer>
     </div>
 </section>

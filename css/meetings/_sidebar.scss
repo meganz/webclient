@@ -1,119 +1,105 @@
-.sidebar {
-    position: relative;
-    float: left;
-    width: 300px;
+.sidebar-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 16px 0 0;
     height: 100%;
-    box-sizing: border-box;
-    background: var(--surface-main);
-    z-index: 12;
 
-    @import '_collapse.scss';
-    @import '_participants.scss';
-    @import '_guest.scss';
-    @import '_historyPanel.scss';
+    .sidebar {
+        position: relative;
+        float: left;
+        width: 345px;
+        height: calc(100% - 160px);
+        margin: -22px 0 0 0;
+        border-radius: 12px;
+        box-sizing: border-box;
+        background: var(--surface-main);
+        z-index: 12;
 
-    //
-    // Sidebar streams / Speaker mode
-    // --------------------------------------------------------------------
+        @import '_collapse.scss';
+        @import '_participants.scss';
+        @import '_guest.scss';
+        @import '_historyPanel.scss';
 
-    &-streams-container {
-        height: calc(100% - 70px);
-
-        &.guest {
-            height: calc(100% - 365px);
+        .rtl & {
+            direction: rtl;
         }
-    }
 
-    &-streams {
-        overflow: hidden;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        grid-gap: 8px;
-        padding: 8px 16px;
-
-        .stream-node {
-            overflow: hidden;
-            border: 0 none;
-            border-radius: 8px;
-            background: #222;
-            width: 100%;
-            height: 100%;
+        ul {
+            list-style: none;
             margin: 0;
+            padding: 0;
+
+            li {
+                padding: 8px 0;
+            }
+        }
+
+        //
+        // Sidebar streams / Speaker mode
+        // --------------------------------------------------------------------
+
+        &-streams-container {
+            height: calc(100% - 70px);
+
+            &.guest {
+                height: calc(100% - 365px);
+            }
+        }
+
+        //
+        // Sidebar head
+        // --------------------------------------------------------------------
+
+        &-head {
+            width: 100%;
+            padding: 12px 12px 8px;
             box-sizing: border-box;
+            border-radius: 12px 12px 0 0;
+            background: var(--surface-main);
+            z-index: 2;
 
-            &.active {
-                border: 2px solid #6FD7FF;
-
-                .stream-node-content {
-                    overflow: hidden;
-                    border: 2px solid #222;
-                    border-radius: 8px;
-                }
+            h2 {
+                margin-top: 0;
+                margin-bottom: 0;
+                margin-inline-start: 5px;
+                -webkit-margin-start: 5px;
+                color: var(--text-color-high);
             }
 
-            &-status {
-                bottom: 5px;
-                left: 5px;
+            button {
+                margin: 0 5px 0 0;
+
+                &.add {
+                    position: absolute;
+                    top: 15px;
+                    right: 20px;
+
+                    i { --mask-color: var(--secondary-white) }
+
+                    body.rtl & {
+                        left: 20px;
+                        right: unset;
+                    }
+                }
+
+                i {
+                    margin: 0 auto;
+                    --icon-size: 24px;
+                    --mask-color: var(--icon-rest);
+                }
 
                 span {
-                    width: 24px;
-                    height: 24px;
-                    margin: 0 2px 0 0;
-
-                    i { --icon-size: 16px; }
+                    position: fixed;
+                    bottom: -9999px;
+                    visibility: hidden;
                 }
             }
-
-            .call-role-icon {
-                padding: 5px;
-                --icon-size: 18px;
-                --mask-color: var(--secondary-white);
-            }
-
-            .loading-icon {
-                width: 64px;
-                height: 64px;
-                margin-left: -32px;
-                margin-top: -32px;
-                filter: invert(0);
-            }
         }
     }
+}
 
-    //
-    // Sidebar head
-    // --------------------------------------------------------------------
-
-    &-head {
-        padding: 16px;
-
-        h2 {
-            margin: 0 0 0 5px;
-            color: var(--text-color-high);
-        }
-
-        button {
-            margin: 0 5px 0 0;
-
-            &.add {
-                position: absolute;
-                top: 15px;
-                right: 20px;
-
-                i { --mask-color: var(--secondary-white) }
-            }
-
-            i {
-                margin: 0 auto;
-                --icon-size: 24px;
-                --mask-color: var(--icon-rest);
-            }
-
-            span {
-                position: fixed;
-                bottom: -9999px;
-                visibility: hidden;
-            }
-        }
-    }
+&.with-timeout-banner .sidebar-wrapper .sidebar {
+    height: calc(100% - 200px);
+    margin-top: 16px;
 }

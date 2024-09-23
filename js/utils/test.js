@@ -31,7 +31,10 @@
             u_type = 3;
             u_attr = Object(window.u_attr);
             u_handle = u_handle || "AAAAAAAAAAA";
-            u_attr.flags = Object(u_attr.flags);
+            Object.defineProperty(u_attr, 'flags', {
+                configurable: true,
+                value: {...u_attr.flags}
+            });
             u_attr.flags.ach = flags & 4;
         }
 
@@ -72,6 +75,11 @@
             else {
                 delete dlmanager.efq;
             }
+
+            if (data.streaming) {
+                dlmanager.isStreaming = true;
+            }
+
             dlmanager.showOverQuotaDialog(null, flags);
         }
     };
@@ -176,9 +184,20 @@
         for (var i = 1; i < data.length; i += 2) {
             data[data[i] = String(data[i]).replace(/\W/g, '')] = mURIDecode(data[i + 1]);
         }
+        ['closeDialog', 'eventlog']
+            .forEach((meth) => {
+                window[meth] = (...args) => console.warn(meth, args);
+            });
         window.addEventListener('click', function(ev) {
+            const msg = "Nothing on this page is clickable, it's meant to test/verify visual changes.";
+
             ev.preventDefault();
             ev.stopPropagation();
+
+            if (typeof window.showToast === 'function') {
+                showToast('warning', msg);
+            }
+            console.warn(msg);
         }, true);
 
         var name = data[1];

@@ -9,6 +9,7 @@
             top: 0;
             width: 100%;
             z-index: 1000;
+            transition: 200ms linear;
         }
         .media-viewer {
             background: var(--surface-black);
@@ -25,18 +26,6 @@
             flex-direction: column;
             position: relative;
         }
-        .media-viewer .viewer-bars {
-            align-items: center;
-            background: var(--surface-grey-2);
-            border: 2px solid var(--stroke-black);
-            border-width: 0 0 2px;
-            box-sizing: border-box;
-            display: flex;
-            font-size: 0;
-            line-height: 0;
-            padding: 6px 8px;
-            transition: var(--transition-all);
-        }
         .media-viewer .viewer-rounded {
             position: absolute;
             top: 24px;
@@ -49,52 +38,6 @@
         }
         .media-viewer .viewer-bars.image-controls {
             bottom: 0;
-        }
-        .media-viewer .bar {
-            display: flex;
-            flex: 0 0 200px;
-            justify-content: flex-start;
-            list-style: none;
-            margin: 0;
-            padding: 8px 0;
-        }
-        .media-viewer .bar:last-child,
-        .media-viewer .bar.control {
-             justify-content: flex-end;
-        }
-        .media-viewer .bar > li {
-            align-items: center;
-            display: inline-flex;
-            position: relative;
-        }
-        .media-viewer button {
-            --mask-color: var(--icon-rest);
-            -webkit-appearance: none;
-            appearance: none;
-            background: transparent;
-            border: 0;
-            cursor: pointer;
-            outline: none;
-        }
-        .media-viewer button:hover,
-        .media-viewer button.active {
-            --mask-color: var(--icon-active);
-        }
-        .media-viewer button.v-btn {
-            border-radius: 100%;
-            margin: 6px 12px;
-            padding: 0;
-        }
-        .media-viewer button.v-btn.active {
-            background: var(--surface-grey-1);
-        }
-        .media-viewer button.v-btn i {
-            --icon-size: 24px;
-            transition: var(--transition-bg-color);
-            display: block;
-        }
-        .media-viewer button.v-btn.browserscreen {
-            display: none;
         }
 
     /* Header */
@@ -134,15 +77,23 @@
         .media-viewer button.gallery-btn {
             border-radius: 4px;
             left: 0;
-            margin: -29px 20px 0 20px;
+            margin: -30px 24px 0;
             padding: 5px 0;
-            position: absolute;
+            position: fixed;
             top: 50%;
             transition: var(--transition-all);
             z-index: 10;
         }
         .media-viewer button.gallery-btn:hover {
             --mask-color: var(--icon-rest);
+        }
+        .media-viewer button.gallery-btn:has(.icon-arrow-right-regular-outline),
+        .media-viewer button.gallery-btn:has(.icon-arrow-left-regular-outline) {
+            border-radius: 100%;
+            padding: 4px;
+            --mask-color: var(--icon-rest);
+            background: var(--surface-grey-6);
+            top: calc(50% + 12px);
         }
         .media-viewer button.gallery-btn.next {
             left: auto;
@@ -151,6 +102,10 @@
         .media-viewer button.gallery-btn i {
             --icon-size: 48px;
             transition: var(--transition-bg-color);
+        }
+        .media-viewer button.gallery-btn i.icon-arrow-right-regular-outline,
+        .media-viewer button.gallery-btn i.icon-arrow-left-regular-outline {
+            --icon-size: 24px;
         }
 
     /* Images viewer */
@@ -193,13 +148,21 @@
                 width: 100%;
             }
 
+            #fmholder #pdfpreviewdiv1 {
+                margin: 62px 0 60px;
+            }
+
+            #fmholder #docxpreviewdiv1 {
+                margin-top: 62px;
+            }
+
         /* Images viewer controls */
 
             .media-viewer .image-controls {
                 border-width: 2px 0 0;
             }
             .media-viewer .image-controls .bar {
-                padding: 0;
+                padding: 3px 0;
             }
             .media-viewer .zoom-slider-wrap {
                 align-items: center;
@@ -392,258 +355,6 @@
                 height: 30px;
                 overflow: hidden;
             }
-
-    /* Video viewer */
-
-        /* Video content */
-
-            .video .media-viewer video {
-                background: var(--surface-black);
-                max-height: 100%;
-                max-width: 100%;
-                min-height: 70%;
-                background-size: contain;
-                background-repeat: no-repeat;
-                background-position: center;
-            }
-            .video-theatre-mode .media-viewer video {
-                height: 100%;
-                width: 100%;
-            }
-            .media-viewer .play-video-button {
-                --mask-color: var(--text-color-high);
-                background: var(--progress-bar-fill1);
-                border-radius: 100%;
-                cursor: pointer;
-                left: calc(50% - 18px);
-                position: absolute;
-                top: calc(50% - 18px);
-                z-index: 10;
-            }
-            .media-viewer .play-video-button i {
-                --icon-size: 48px;
-                margin: 12px;
-                display: block;
-            }
-        /* Video controls */
-
-            .fullscreen .media-viewer .viewer-bars,
-            .video-theatre-mode .media-viewer .viewer-bars,
-            .media-viewer .video-controls {
-                background: var(--surface-black-bar);
-                border: 0;
-                position: absolute;
-                width: 100%;
-                z-index: 10;
-            }
-            .media-viewer .video-controls {
-                bottom: 0;
-                direction: ltr; /* Do not change video controls for rtl */
-            }
-            .media-viewer .video-controls .bar {
-                flex: 0 0 auto;
-            }
-            .media-viewer .video-progress-block {
-                flex: 1 1 auto;
-            }
-            .media-viewer .video-progress-bar {
-                background: var(--progress-bar-background);
-                border-radius: 2px;
-                cursor: pointer;
-                height: 2px;
-                margin: 2px 0;
-                position: relative;
-                text-align: left;
-                transition: var(--transition-all);
-            }
-            .video-progress-block:hover .video-progress-bar {
-                border-radius: 3px;
-                height: 6px;
-                margin: 0;
-            }
-            .media-viewer .video-time-bar,
-            .media-viewer .video-buffer-bar {
-                background: var(--progress-bar-fill2);
-                border-radius: inherit;
-                height: 100%;
-                left: 0;
-                position: absolute;
-                top: 0;
-                width: 0;
-            }
-            .media-viewer .video-buffer-bar {
-                background: var(--progress-bar-background);
-            }
-            .media-viewer .video-time-bar::before {
-                background: var(--text-color-high);
-                border-radius: 100%;
-                bottom: 0;
-                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-                content: '';
-                height: 12px;
-                margin: auto;
-                position: absolute;
-                right: -6px;
-                top: 0;
-                width: 12px;
-            }
-            .media-viewer .video-timing {
-                color: var(--text-color-high);
-                font: var(--text-body2);
-                margin: 0 24px 0 36px;
-            }
-            .media-viewer .video-timing.duration {
-                margin: 0 36px 0 24px;
-            }
-            .media-viewer .video-controls progress::-moz-progress-bar {
-                background: var(--progress-bar-fill2);
-            }
-            .media-viewer .video-controls progress::-webkit-progress-value {
-                background: var(--progress-bar-fill2);
-            }
-            .media-viewer .video-vol-range {
-                background: var(--progress-bar-background);
-                border-radius: 10px;
-                bottom: 100%;
-                height: 0;
-                left: 14px;
-                opacity: 0;
-                overflow: hidden;
-                position: absolute;
-                transition: var(--transition-all);
-                visibility: hidden;
-                width: 20px;
-            }
-            .media-viewer .vol-wrapper.audio:hover .video-vol-range {
-                height: 80px;
-                opacity: 1;
-                visibility: visible;
-            }
-            .media-viewer .volume-bar {
-                background: var(--surface-black-bar);
-                border-radius: 2px;
-                cursor: pointer;
-                height: 64px;
-                margin: 8px;
-                position: relative;
-                width: 4px;
-            }
-            .media-viewer .volume-bar span {
-                background: var(--progress-bar-fill2);
-                border-radius: inherit;
-                bottom: 0;
-                height: 100%;
-                left: 0;
-                position: absolute;
-                width: 100%;
-            }
-            .media-viewer .volume-bar span::before {
-                background: var(--text-color-high);
-                border-radius: 100%;
-                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-                content: '';
-                height: 8px;
-                left: -2px;
-                position: absolute;
-                top: -4px;
-                width: 8px;
-            }
-
-    /* Video advertisement */
-
-        .viewer-vad-control {
-            background: var(--surface-black-bar);
-            border-radius: 4px;
-            bottom: 66px;
-            box-shadow: 0 0 0 2px var(--text-color-medium);
-            color: var(--text-color-medium);
-            cursor: default;
-            height: 48px;
-            margin: 0 0 16px 0;
-            min-width: 120px;
-            position: absolute;
-            right: 12px;
-            text-align: center;
-            transition: var(--transition-all);
-            z-index: 10;
-            white-space: nowrap;
-        }
-        .viewer-vad-control.skip {
-            cursor: pointer;
-        }
-        .viewer-vad-control.skip:hover {
-            color: var(--text-color-high);
-        }
-        .viewer-vad-control .thumb {
-            display: none;
-            float: right;
-            height: 48px;
-            line-height: 0;
-            overflow: hidden;
-            width: 76px;
-        }
-        .viewer-vad-control .thumb.active {
-            display: block;
-        }
-        .viewer-vad-control .thumb img,
-        .video .download.video-block .viewer-vad-control .thumb img {
-            display: block;
-            height: auto;
-            left: 50%;
-            max-width: 86px;
-            min-height: 100%;
-            min-width: 100%;
-            position: relative;
-            top: 50%;
-            -webkit-transform: translate(-50%, -50%);
-            transform: translate(-50%, -50%);
-        }
-        .viewer-vad-control .counter {
-            display: inline-block;
-            padding: 0 10px;
-        }
-        .viewer-vad-control .label,
-        .viewer-vad-control.skip .thumb.active,
-        .viewer-vad-control.skip .counter {
-            display: none;
-        }
-        .viewer-vad-control.skip .label {
-            display: block;
-            padding: 0 14px;
-        }
-        .viewer-vad-control .label i {
-            margin: 14px -3px 0 11px;
-            opacity: 0.8;
-            transition: var(--transition-all);
-        }
-        .viewer-vad-control.skip:hover .label i {
-             opacity: 1;
-        }
-        .video-progress-bar.vad {
-            background: var(--surface-black-bar);
-            border-radius: 0;
-            bottom: 0;
-            height: 4px;
-            opacity: 0;
-            position: absolute;
-            left: 0;
-            transition: var(--transition-all);
-            visibility: hidden;
-            width: 100%;
-            z-index: 10;
-        }
-        .vad .video-time-bar,
-        .vad .video-buffer-bar {
-            background: var(--progress-bar-fill3);
-        }
-        .vad .video-progress-block:hover .video-progress-bar {
-            cursor: default;
-            height: 2px;
-            margin-top: 2px;
-        }
-        .vad .video-time-bar::before {
-            display: none;
-        }
 
 
     /* On mouse idle */

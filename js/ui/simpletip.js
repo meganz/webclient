@@ -74,6 +74,19 @@
         '</div>'
     );
 
+    const $breadcrumbs = $(
+        '<div class="fm-breadcrumbs-wrapper info">' +
+            '<div class="crumb-overflow-link dropdown">' +
+                '<a class="breadcrumb-dropdown-link info-dlg">' +
+                    '<i class="menu-icon sprite-fm-mono icon-options icon24"></i>' +
+                '</a>' +
+                '<i class="sprite-fm-mono icon-arrow-right icon16"></i>' +
+            '</div>' +
+            '<div class="fm-breadcrumbs-block"></div>' +
+            '<div class="breadcrumb-dropdown"></div>' +
+        '</div>'
+    );
+
     var $currentNode;
     var $currentTriggerer;
     var SIMPLETIP_UPDATED_EVENT = 'simpletipUpdated.internal';
@@ -162,7 +175,8 @@
         }
 
         var contents = $this.hasClass('simpletip-tc') ? $this.text() : $this.attr('data-simpletip');
-        if (contents) {
+        const isBreadcrumb = $this.hasClass('simpletip-breadcrumb');
+        if (contents || isBreadcrumb) {
             const $node = $template.clone();
             const $textContainer = $('span', $node);
             $textContainer.safeHTML(sanitize(contents));
@@ -177,6 +191,12 @@
                 unmount();
             });
             $('body').append($node);
+
+            if (isBreadcrumb) {
+                $node.addClass('breadcrumb-tip theme-dark-forced');
+                $textContainer.replaceWith($breadcrumbs);
+                M.renderPathBreadcrumbs($this.parent().parent().get(0).id, false, true);
+            }
 
             $currentNode = $node;
             $currentTriggerer = $this;
@@ -235,7 +255,8 @@
                 my: my,
                 at: at,
                 collision: 'flipfit',
-                within: $this.parents(wrapper ? `${wrapper} body` : '.ps, body').first(),
+                within: $this.hasClass('simpletip-breadcrumb') ? $this.parents('body').first()
+                    : $this.parents(wrapper ? `${wrapper} body` : '.ps, body').first(),
                 using: function(obj, info) {
 
                     /*

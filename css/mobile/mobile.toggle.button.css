@@ -1,0 +1,85 @@
+.mega-toggle-button {
+    display: flex;
+    flex-direction: row;
+    padding: 12px 0;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+}
+
+.mega-toggle-button .pro-label {
+    color: var(--mobile-button-brand);
+    border: 1px solid var(--mobile-button-brand);
+    border-radius: 2px;
+    padding: 4px;
+    font-size: var(--mobile-font-size-2);
+    line-height: 14px;
+}
+
+.mega-toggle-button .toggle-labels {
+    -webkit-padding-end: 16px;
+    padding-inline-end: 16px;
+    display: flex;
+    flex-direction: column;
+}
+
+.mega-toggle-button .toggle-sublabel {
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-caption-large-regular);
+}
+
+.mega-toggle-button .toggle-wrapper {
+    position: relative;
+    width: 48px;
+    height: 24px;
+    background: var(--mobile-page-background);
+    border: 1px solid var(--mobile-selection-control);
+    border-radius: 12px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    flex: none;
+    transition: .1s ease-in-out;
+}
+.mega-toggle-button .toggle-wrapper.disabled {
+    border: 1px solid var(--mobile-border-disabled);
+    opacity: 1;
+}
+.mega-toggle-button.on .toggle-wrapper {
+    background: var(--mobile-selection-control);
+}
+.mega-toggle-button.on .toggle-wrapper.disabled {
+    background: var(--mobile-border-disabled);
+}
+
+.mega-toggle-button .toggle-wrapper input {
+    display: none;
+}
+
+.mega-toggle-button .toggle-wrapper::after {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    left: 4px;
+    right: unset;
+    width: 16px;
+    height: 16px;
+    border-radius: 16px;
+    background: var(--mobile-selection-control);
+    color: var(--mobile-page-background);
+}
+.mega-toggle-button.on .toggle-wrapper::after {
+    left: unset;
+    right: 4px;
+    background: var(--mobile-page-background);
+    color: var(--mobile-selection-control);
+}
+
+.mega-toggle-button .toggle-wrapper.disabled::after {
+    background: var(--mobile-border-disabled);
+}
+.mega-toggle-button.on .toggle-wrapper.disabled::after {
+    background: var(--mobile-page-background);
+    color: var(--mobile-border-disabled);
+}

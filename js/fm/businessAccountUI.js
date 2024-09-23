@@ -50,7 +50,17 @@ function BusinessAccountUI() {
     this.initUItoRender = function () {
 
         // dealing with non-confirmed accounts, non Pro Flexi accounts and not paid business ones
-        if (!u_attr || !u_privk || (!u_attr.pf && (!u_attr.b || u_attr.b.s === pro.ACCOUNT_STATUS_EXPIRED))) {
+        if (
+            !u_attr
+            || !u_privk
+            || (
+                !u_attr.pf
+                && (
+                    !u_attr.b
+                    || u_attr.b.s === pro.ACCOUNT_STATUS_EXPIRED && M.currentdirid !== 'user-management/account'
+                )
+            )
+        ) {
             loadSubPage('start');
             return false;
         }
@@ -120,6 +130,9 @@ function BusinessAccountUI() {
 
             // Don't show some buttons in the top right panel
             $('.fm-right-header-user-management .user-management-main-page-buttons').addClass('hidden');
+        }
+        if (u_attr && u_attr.b && u_attr.b.s === pro.ACCOUNT_STATUS_EXPIRED) {
+            $('.user-management-main-page-buttons', '.fm-right-header-user-management').addClass('hidden');
         }
 
         return true;
@@ -242,12 +255,12 @@ function getReportDates(leadingDate) {
     "use strict";
 
     const today = leadingDate || new Date();
-    const todayMonth = today.getUTCMonth() + 1;
+    const todayMonth = today.getMonth() + 1;
     let currMonth = String(todayMonth);
     if (currMonth.length < 2) {
         currMonth = `0${currMonth}`;
     }
-    const currYear = String(today.getUTCFullYear());
+    const currYear = String(today.getFullYear());
 
     const startDate = `${currYear}${currMonth}01`;
 
@@ -255,10 +268,30 @@ function getReportDates(leadingDate) {
     if (!endDate) {
         return;
     }
-    const endDateStr = String(endDate.getUTCFullYear()) + currMonth + String(endDate.getDate());
+    const endDateStr = String(endDate.getFullYear()) + currMonth + String(endDate.getDate());
 
     return { fromDate: startDate, toDate: endDateStr };
 }
+
+BusinessAccountUI.prototype.checkCu25519 = function(userHandle, callback) {
+    if (!pubCu25519[userHandle]) {
+        if (!authring.getContactAuthenticated(userHandle, 'Cu25519')) {
+            const ret = fingerprintDialog(userHandle, null, callback);
+            if (ret === -5) {
+                // not confimed account
+                return true;
+            }
+        }
+        else {
+            crypt.getPubCu25519(userHandle).always(() => {
+                callback(userHandle);
+            });
+        }
+        return false;
+    }
+    return true;
+};
+
 
 /**
  * Decodes fields in a user object into the correct values.
@@ -270,22 +303,12 @@ function getReportDates(leadingDate) {
 BusinessAccountUI.prototype.decodeFields = function(encodedUser, fields) {
     'use strict';
     const decodedUser = {};
+    const decode = tryCatch((encodedField) => from8(base64urldecode(encodedField)), false);
 
-    const decode = encodedField => {
-        return from8(base64urldecode(encodedField));
-    };
-
-    tryCatch(() => {
-        for (let field of fields) {
-            decodedUser[field] = 'Error';
-            if (typeof encodedUser[field] !== 'undefined' && encodedUser[field] !== null) {
-                decodedUser[field] = decode(encodedUser[field]);
-            }
-            else {
-                decodedUser[field] = null;
-            }
-        }
-    })();
+    for (let i = fields.length; i--;) {
+        const field = fields[i];
+        decodedUser[field] = String(encodedUser[field] && decode(encodedUser[field]) || encodedUser[field] || '');
+    }
 
     return decodedUser;
 };
@@ -299,6 +322,11 @@ BusinessAccountUI.prototype.decodeFields = function(encodedUser, fields) {
  */
 BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBlockView, quickWay) {
     "use strict";
+
+    if (!quickWay) {
+        this.URLchanger('');
+    }
+
     if (!this.business.isBusinessMasterAcc()) {
         return false;
     }
@@ -332,10 +360,6 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     $contentBlock.removeClass('hidden');
     $subAccountsView.removeClass('hidden').addClass('main-page');
     $emptyBlock.addClass('hidden');
-
-    if (!quickWay) {
-        this.URLchanger('');
-    }
 
     if (!Object.keys(currSubAccounts).length) { // no subs
         return this.viewLandingPage();
@@ -451,7 +475,8 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
             }
             else {
                 $currUser.find('.fm-user-management-user .admin-icon').removeClass('hidden');
-                $currUser.find('.edit-icon, .disabled-icon').addClass('disabled');
+                $('.edit-icon', $currUser).removeClass('disabled');
+                $('.disabled-icon', $currUser).addClass('disabled');
             }
 
             $currUserLeftPane.removeClass('selected');
@@ -489,6 +514,9 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 
             $detailListTable.append($currUser);
 
+            if (u_attr.b.s === pro.ACCOUNT_STATUS_EXPIRED) {
+                $currUserLeftPane.addClass('disabled');
+            }
             // left pane part
             $usersLeftPanel.append($currUserLeftPane);
         }
@@ -505,6 +533,10 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         $('.grid-table-user-management .view-icon, .content-panel.user-management .nw-user-management-item,' +
             '.grid-table-user-management tbody tr')
             .rebind('click.subuser', function subUserViewInfoClickHandler() {
+
+                if ($(this).hasClass('disabled')) {
+                    return;
+                }
 
                 $('.content-panel.user-management .nw-user-management-item').removeClass('selected');
 
@@ -548,13 +580,22 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
         $('.grid-table-user-management .dis-en-icon').rebind(
             'click.subuser',
             function disableEnableSubUserClickHandler() {
-                if ($(this).hasClass('disabled')) {
+                const $this = $(this);
+
+                if ($this.hasClass('disabled')) {
                     return false;
                 }
-                var userHandle = $(this).closest('tr').attr('id');
+                const userHandle = $this.closest('tr').attr('id');
                 if (!M.suba[userHandle]) {
                     return;
                 }
+
+                if (!mySelf.checkCu25519(userHandle, mySelf.viewSubAccountInfoUI.bind(mySelf))) {
+                    return false;
+                }
+
+                $this.addClass('disabled');
+
                 var isDisable = false;
                 if (M.suba[userHandle].s === 10 || M.suba[userHandle].s === 0) {
                     isDisable = true;
@@ -579,6 +620,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                                 }
                             );
                         }
+                        $this.removeClass('disabled');
                     };
 
                     mySelf.showDisableAccountConfirmDialog(confirmationDlgResultHandler, uName);
@@ -604,6 +646,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                                 }
                             );
                         }
+                        $this.removeClass('disabled');
                     };
 
                     mySelf.showDisableAccountConfirmDialog(confirmationDlgResultHandler2, uName, true);
@@ -652,7 +695,6 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                 var activeDate = '--------';
                 if (dd) {
                     activeDate = new Date(dd.substr(0, 4), dd.substr(4, 2) - 1, dd.substr(6, 2));
-                    // activeDate = activeDate.toLocaleDateString();
                     activeDate = time2date(activeDate.getTime() / 1000, 1);
                 }
                 $('.business-sub-last-active span', $subTr).text(activeDate);
@@ -693,6 +735,12 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
     else {
         loadingDialog.phide();
     }
+
+    // In MEGA Lite, on login and visiting the User Management page, the cloud drive is still showing, so hide it.
+    // NB: Not using the hidden class, because something else is continually re-rendering and removing it.
+    if (mega.lite.inLiteMode) {
+        $('.files-grid-view.fm').addClass('mega-lite-hidden');
+    }
 };
 
 /**
@@ -709,7 +757,7 @@ BusinessAccountUI.prototype.subUserStatus = function (statusCode) {
         return l[7379]; // pending
     }
     else if (statusCode === 11) {
-        return l[7070]; // disabled
+        return l.sub_user_disabled; // disabled
     }
     else if (statusCode === 12) {
         return l[7376]; // deleted
@@ -957,7 +1005,12 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
     if (!this.initUItoRender()) {
         return;
     }
-    var mySelf = this;
+
+    const mySelf = this;
+
+    if (!mySelf.checkCu25519(subUserHandle, mySelf.viewSubAccountInfoUI.bind(mySelf))) {
+        return false;
+    }
 
     var $businessAccountContainer = $('.files-grid-view.user-management-view');
     var $subAccountContainer = $('.user-management-subaccount-view-container', $businessAccountContainer);
@@ -1112,7 +1165,31 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
             if ($(this).hasClass('disabled')) {
                 return;
             }
-            mySelf.migrateSubUserData(subUserHandle);
+            var $migrateDialog = $('.user-management-migrate-process-dialog.user-management-dialog');
+
+            mySelf.migrateSubUserData(subUserHandle)
+                .then((n) => {
+                    M.safeShowDialog('migration-success-dlg', () => {
+                        const $dialog = $('.user-management-able-user-dialog.mig-success.user-management-dialog');
+
+                        $('.yes-answer', $dialog).rebind('click.suba', closeDialog);
+                        $('.dialog-text-one', $dialog)
+                            .safeHTML(l[19149].replace('{0}', `<b>${M.suba[subUserHandle].e}</b>`)
+                                .replace('{1}', `<b>${escapeHTML(n.name)}</b>`));
+
+                        return $dialog;
+                    });
+                })
+                .catch((ex) => {
+                    if (ex && ex.name === 'AbortError') {
+                        return msgDialog('warningb', '', `${ex.message}`);
+                    }
+                    console.error(ex);
+                    msgDialog('warningb', l[135], l[19146], api.strerror(ex));
+                })
+                .finally(() => {
+                    $migrateDialog.addClass('hidden');
+                });
         });
 
     // event handler for edit sub-user button
@@ -1192,6 +1269,8 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         var outshareInfo = subUserStats["ose"] || emptyArray;
         var outshareInternalInfo = subUserStats["osi"] || emptyArray;
         const backupsInfo = subUserStats["3"] || emptyArray;
+        const publicFolderInfo = subUserStats.ps || emptyArray;
+        const publicFileInfo = subUserStats.pf || emptyArray;
 
         totalStorage = subUserStats["ts"] || 0;
         totalBandwidth = subUserStats["dl"] || 0;
@@ -1211,6 +1290,7 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         var outshareTotalFormatted = numOfBytes(outshareInfo[0] - (outshareInfo[3] || 0), 2);
         var outshareTotalInternalFormatted = numOfBytes(outshareInternalInfo[0], 2);
         const backupsTotalFormatted = numOfBytes(backupsInfo[0], 2);
+        const linksTotalFormatted = numOfBytes(publicFolderInfo[0] + publicFileInfo[0], 2);
 
         var versionsTotalFormatted = numOfBytes(rootInfo[3] + rubbishInfo[3]
             + inshareInternalInfo[3] + inshareExternalInfo[3] + backupsInfo[3], 2);
@@ -1235,6 +1315,10 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
             ' .used-storage-info.ba-backups', $subAccountContainer);
         var $rubbishSection = $('.user-management-view-data .subaccount-view-used-data' +
             ' .used-storage-info.ba-rubbish', $subAccountContainer);
+        const $linksSection = $(
+            '.user-management-view-data .subaccount-view-used-data .used-storage-info.ba-pub-links',
+            $subAccountContainer
+        );
         var $versionsSection = $('.user-management-view-data .subaccount-view-used-data' +
             ' .used-storage-info.ba-version', $subAccountContainer);
 
@@ -1290,6 +1374,12 @@ BusinessAccountUI.prototype.viewSubAccountInfoUI = function (subUserHandle) {
         $('.ff-occupy', $rubbishSection).text(rubbishTotalFormatted.size + ' ' + rubbishTotalFormatted.unit);
         $('.folder-number', $rubbishSection).text(rubbishFolderNumText);
         $('.file-number', $rubbishSection).text(rubbishFileNumText);
+
+        const linksFolderNumText = ffNumText(publicFolderInfo[2], 'folder');
+        const linksFileNumText = ffNumText(publicFileInfo[1], 'file');
+        $('.ff-occupy', $linksSection).text(`${linksTotalFormatted.size} ${linksTotalFormatted.unit}`);
+        $('.folder-number', $linksSection).text(linksFolderNumText);
+        $('.file-number', $linksSection).text(linksFileNumText);
 
         var versionsFileNumText = ffNumText(rootInfo[4] + rubbishInfo[4]
             + inshareInternalInfo[4] + inshareExternalInfo[4], 'file');
@@ -1360,8 +1450,13 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
 
         totalStorage = rootTotal + rubbishTotal + outshareTotal + inshareTotal + backupsTotal;
 
+        // Get Object storgae size and reduce cloud drive size if needed
+        const { ts: s4Total = 0 } = 'utils' in s4 && s4.utils.getStorageData() || {};
+        rootTotal -= s4Total;
+
         const totalStorageFormatted = numOfBytes(totalStorage, 2);
         const rootTotalFormatted = numOfBytes(rootTotal, 2);
+        const s4TotalFormatted = numOfBytes(s4Total, 2);
         const rubbishTotalFormatted = numOfBytes(rubbishTotal, 2);
         const inshareTotalFormatted = numOfBytes(inshareTotal, 2);
         const outshareTotalFormatted = numOfBytes(outshareTotal, 2);
@@ -1371,6 +1466,9 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
         let rootPercentage = rootTotal / totalStorage;
         rootPercentage = Number.isNaN(rootPercentage) ? 0 : rootPercentage;
         rootPercentage = Math.round(Number.parseFloat(rootPercentage * 100).toFixed(2));
+
+        let s4Percentage = s4Total / totalStorage || 0;
+        s4Percentage = Math.round(Number.parseFloat(s4Percentage * 100).toFixed(2));
 
         let insharePercentage = inshareTotal / totalStorage;
         insharePercentage = Number.isNaN(insharePercentage) ? 0 : insharePercentage;
@@ -1390,6 +1488,7 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
 
         const digitClassMap = ["one-digit", "two-digits", "three-digits"];
         const cloudNodeDigitClass = digitClassMap[String(rootPercentage).length - 1];
+        const s4NodeDigitClass = digitClassMap[String(s4Percentage).length - 1];
         const inshareNodeDigitClass = digitClassMap[String(insharePercentage).length - 1];
         const rubbishNodeDigitClass = digitClassMap[String(rubbishPercentage).length - 1];
         const outshareNodeDigitClass = digitClassMap[String(outsharePercentage).length - 1];
@@ -1424,6 +1523,18 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
             $('.storage-division-container.inshare-node', $storageAnalysisPie).addClass('hidden');
         }
 
+        // Show Object storage is available
+        if (u_attr.s4) {
+            $('.storage-division-container.s4-node', $storageAnalysisPie).removeClass('hidden');
+            $('.storage-division-container.s4-node .storage-division-num', $storageAnalysisPie)
+                .text(s4TotalFormatted.size + ' ' + s4TotalFormatted.unit);
+            $('.storage-division-container.s4-node .storage-division-per', $storageAnalysisPie)
+                .text(`${s4Percentage}%`).addClass(s4NodeDigitClass);
+        }
+        else {
+            $('.storage-division-container.s4-node', $storageAnalysisPie).addClass('hidden');
+        }
+
         // Show the storage pie chart and data analysis panel
         $storageAnalysisPie.removeClass('hidden');
 
@@ -1449,6 +1560,7 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
             const style = getComputedStyle(document.body);
             const colors = [
                 style.getPropertyValue('--label-red').trim(),
+                style.getPropertyValue('--label-blue').trim(),
                 style.getPropertyValue('--label-orange').trim(),
                 style.getPropertyValue('--label-purple').trim(),
                 style.getPropertyValue('--label-green').trim(),
@@ -1456,6 +1568,7 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
             ];
             const hoverColors = [
                 style.getPropertyValue('--label-red-hover').trim(),
+                style.getPropertyValue('--label-blue-hover').trim(),
                 style.getPropertyValue('--label-orange-hover').trim(),
                 style.getPropertyValue('--label-purple-hover').trim(),
                 style.getPropertyValue('--label-green-hover').trim(),
@@ -1465,7 +1578,7 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
                 type: 'doughnut',
                 data: {
                     datasets: [{
-                        data: [rootTotal, outshareTotal, inshareTotal, backupsTotal, rubbishTotal],
+                        data: [rootTotal, s4Total, outshareTotal, inshareTotal, backupsTotal, rubbishTotal],
                         backgroundColor: colors,
                         hoverBackgroundColor: hoverColors,
                         hoverBorderColor: 'rgb(0, 0, 0, 0.2)',
@@ -1474,6 +1587,7 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
                     // These labels appear in the legend and in the tooltips when hovering different arcs
                     labels: [
                         l[164],
+                        l.obj_storage,
                         l[19187],
                         l[16770],
                         l.restricted_folder_button,
@@ -1503,17 +1617,20 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
                 .rebind('click.subuser', function chartLegendClickHandler(e) {
                     const $me = $(this);
                     let ix = 0;
-                    if ($me.hasClass('inbox-node')) {
+                    if ($me.hasClass('s4-node')) {
                         ix = 1;
                     }
-                    else if ($me.hasClass('inshare-node')) {
+                    if ($me.hasClass('inbox-node')) {
                         ix = 2;
                     }
-                    else if ($me.hasClass('backups-node')) {
+                    else if ($me.hasClass('inshare-node')) {
                         ix = 3;
                     }
-                    else if ($me.hasClass('rubbish-node')) {
+                    else if ($me.hasClass('backups-node')) {
                         ix = 4;
+                    }
+                    else if ($me.hasClass('rubbish-node')) {
+                        ix = 5;
                     }
 
                     if ($me.hasClass('disabled')) {
@@ -1528,6 +1645,12 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
                 });
             $customChartLegend.removeClass('disabled');
         });
+
+        // If Pro Flexi expired we want to hide the Storage Usage Breakdown and storage/transfer pie charts
+        if (u_attr.pf && u_attr.pf.s === pro.ACCOUNT_STATUS_EXPIRED) {
+            $storageAnalysisPie.addClass('hidden');
+            $stgeTrfAnalysisContainer.addClass('hidden');
+        }
     };
 
     // Private function to determine the scale unit of the bar chart
@@ -1794,6 +1917,12 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
         // If Pro Flexi
         if (u_attr.pf) {
 
+            // If they are expired, hide the next bill container (similar to Business)
+            if (u_attr.pf.s === pro.ACCOUNT_STATUS_EXPIRED) {
+                $nbPriceContainer.addClass('hidden');
+                return;
+            }
+
             // Add special class for Pro Flexi specific changes to the UI in this section
             $nbPriceContainer.addClass('pro-iv');
 
@@ -1813,6 +1942,10 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
                         usersM.viewBusinessInvoicesPage();
 
                         $('.fm-right-files-block', '.fmholder').removeClass('hidden emptied');
+
+                        if (mega.ui.mNodeFilter) {
+                            mega.ui.mNodeFilter.resetFilterSelections();
+                        }
                     });
                 });
             });
@@ -1873,6 +2006,7 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
     const populateMonthDropDownList = function($targetContainer) {
         const adminCreationDate = new Date(u_attr.since * 1000);
         const nowDate = new Date();
+        nowDate.setDate(1);
         const monthLimit = 12; // 1 year back max
         const $monthDropdown = $('.chart-month-selector', $targetContainer);
         const $dropdownScroll = $('.dropdown-scroll', $monthDropdown);
@@ -1970,6 +2104,12 @@ BusinessAccountUI.prototype.initBusinessAccountHeader = function ($accountContai
         $('.settings-menu-bar .settings-menu-item.suba-setting-profile', $accountContainer).addClass('hidden');
     }
 
+    // NB: u_attr.b (for Business) is not available in Pro Flexi, so always check for that
+    // before checking sub properties like u_attr.b.s otherwise an exception gets thrown
+    if (u_attr.b && u_attr.b.s === pro.ACCOUNT_STATUS_EXPIRED) {
+        $('.settings-menu-bar .settings-menu-item.suba-setting-inv', $accountContainer).addClass('hidden');
+    }
+
     // event handler for header clicking
     $('.settings-menu-bar .settings-menu-item', $accountContainer).off('click.suba').on('click.suba',
         function settingHeaderClickHandler() {
@@ -2063,11 +2203,16 @@ BusinessAccountUI.prototype.showExp_GraceUIElements = function() {
  */
 BusinessAccountUI.prototype.showExpiredDialog = function(isMaster) {
     "use strict";
-    var $dialog;
+
+    const $dialog = isMaster ?
+        $('.payment-reminder.user-management-dialog') :
+        $('.user-management-able-user-dialog.warning.user-management-dialog');
+
+    if (!$dialog.length) {
+        return;
+    }
 
     if (isMaster) {
-        $dialog = $('.payment-reminder.user-management-dialog');
-
         $('button.js-close', $dialog)
             .rebind('click.subuser', function closeExpiredAccountDialog() {
                 closeDialog();
@@ -2098,8 +2243,6 @@ BusinessAccountUI.prototype.showExpiredDialog = function(isMaster) {
         });
     }
     else {
-        $dialog = $('.user-management-able-user-dialog.warning.user-management-dialog');
-
         $('.dialog-text-one', $dialog).safeHTML(l[20462]);
         $('.text-two-text', $dialog).text(l[20463]);
         $('.bold-warning', $dialog).text(l[20464] + ':');
@@ -2119,7 +2262,7 @@ BusinessAccountUI.prototype.showExpiredDialog = function(isMaster) {
 
 
 /** view business account page */
-BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
+BusinessAccountUI.prototype.viewBusinessAccountPage = SoonFc(60, function() {
     "use strict";
     if (!this.initUItoRender()) {
         return;
@@ -2492,13 +2635,15 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     );
 
     // event handler for clicking on header
-    $('.acc-home', $pageHeader).rebind('click.suba',
-        function invoiceListHeaderClick() {
-            var $me = $(this);
-            if ($me.hasClass('acc-home')) {
-                return mySelf.viewSubAccountListUI();
-            }
-        });
+    $('.acc-home', $pageHeader).rebind('click.suba', function invoiceListHeaderClick() {
+        if (u_attr.b.s === pro.ACCOUNT_STATUS_EXPIRED) {
+            return;
+        }
+        const $me = $(this);
+        if ($me.hasClass('acc-home')) {
+            return mySelf.viewSubAccountListUI();
+        }
+    });
 
     // event handler for country select changing
     $('.cnt-ddl .option', $profileContainer).rebind('click.suba',
@@ -2516,8 +2661,7 @@ BusinessAccountUI.prototype.viewBusinessAccountPage = function () {
     });
 
     unhideSection();
-
-};
+});
 
 
 /** show business account page (Settings and invoices)
@@ -2609,7 +2753,6 @@ BusinessAccountUI.prototype.viewBusinessInvoicesPage = function () {
             var invId = invoicesList[k].n;
 
             $newInvoiceRow.attr('id', invId);
-            // $newInvoiceRow.find('.inv-date').text(invoiceDate.toLocaleDateString());
             $newInvoiceRow.find('.inv-date').text(time2date(invoicesList[k].ts, 1));
             $newInvoiceRow.find('.inv-desc').text(invoicesList[k].d);
             $('.inv-total', $newInvoiceRow).text(formatCurrency(invoicesList[k].tot));
@@ -2933,32 +3076,37 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                         var myPage = pages['business_invoice'];
                         myPage = translate(myPage);
 
+                        const { mega, ts, n, u, items, tot } = invoiceDetail;
+                        const { e, phaddr, poaddr, taxnum, cname } = mega;
                         // now prepare the invoice.
-                        myPage = myPage.replace('{0Date}', escapeHTML(time2date(invoiceDetail.ts, 1)));
+                        myPage = myPage.replace('{1cname}', escapeHTML(cname));
+                        myPage = myPage.replace('{1megae}', escapeHTML(e));
+                        myPage = myPage.replace('{1phaddr}', escapeHTML(phaddr.join(', ')));
+                        myPage = myPage.replace('{1poaddr}', escapeHTML(poaddr.join(', ')));
+                        myPage = myPage.replace('{0Date}', escapeHTML(time2date(ts, 1)));
                         myPage = myPage.replace('{1InvoiceTitle}', escapeHTML($invoiceTopTitle.find('.inv-title.invv').text()));
-                        myPage = myPage.replace('{1InvoiceNB}', escapeHTML(invoiceDetail.n));
-                        myPage = myPage.replace('{2VATNB}', escapeHTML(invoiceDetail.mega.taxnum[1]));
+                        myPage = myPage.replace('{1InvoiceNB}', escapeHTML(n));
+                        myPage = myPage.replace('{2VATNB}', escapeHTML(taxnum[1]));
                         myPage = myPage.replace('{2VATTXT}', escapeHTML(
-                            l.taxname_label.replace('%TAXNAME', invoiceDetail.mega.taxnum[0])));
-                        myPage = myPage.replace('{3CompanyName}', escapeHTML(invoiceDetail.u.cname));
-                        myPage = myPage.replace('{4CompanyEmail}', escapeHTML(invoiceDetail.u.e));
+                            l.taxname_label.replace('%TAXNAME', taxnum[0])));
+                        myPage = myPage.replace('{3CompanyName}', escapeHTML(u.cname));
+                        myPage = myPage.replace('{4CompanyEmail}', escapeHTML(u.e));
                         myPage = myPage.replace('{5CompanyAddress}', escapeHTML(validAddressSentFromApi.join(', ')));
-                        myPage = myPage.replace('{6CompanyCountry}',
-                            escapeHTML(invoiceDetail.u.addr[invoiceDetail.u.addr.length - 1]));
+                        myPage = myPage.replace('{6CompanyCountry}', escapeHTML(u.addr[u.addr.length - 1]));
                         var cVat = '---';
-                        if (invoiceDetail.u.taxnum && invoiceDetail.u.taxnum[1]) {
-                            cVat = l.taxname_label.replace('%TAXNAME', invoiceDetail.u.taxnum[0])
-                                + ' ' + invoiceDetail.u.taxnum[1];
+                        if (u.taxnum && u.taxnum[1]) {
+                            cVat = l.taxname_label.replace('%TAXNAME', u.taxnum[0])
+                                + ' ' + u.taxnum[1];
                         }
                         myPage = myPage.replace('{7CompanyVat}', escapeHTML(cVat));
                         var itemDate = '---';
                         var itemDec = '---';
                         var itemAmount = '---';
-                        if (invoiceDetail.items && invoiceDetail.items.length) {
-                            itemDate = time2date(invoiceDetail.items[0].ts, 1);
-                            itemDec = invoiceDetail.items[0].d;
-                            itemAmount = invoiceDetail.items[0].net;
-                            if (invoiceDetail.items[0].v && invoiceDetail.items[0].list) {
+                        if (items && items.length) {
+                            itemDate = time2date(items[0].ts, 1);
+                            itemDec = items[0].d;
+                            itemAmount = items[0].net;
+                            if (items[0].v && items[0].list) {
                                 const rowStart = myPage.indexOf('<li class="inv-li-content"');
                                 if (rowStart) {
                                     const rowEnd = myPage.indexOf('</li>', rowStart);
@@ -2988,7 +3136,7 @@ BusinessAccountUI.prototype.viewInvoiceDetail = function (invoiceID) {
                             escapeHTML($invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-perc')[0].textContent));
                         myPage = myPage.replace('{11itemVat}',
                             escapeHTML($invoiceItemsContainer.find('.inv-payment-price.inv-li-gst .inv-gst-val')[0].textContent));
-                        myPage = myPage.replace('{12totalCost}', '\u20ac' + Number(invoiceDetail.tot).toFixed(2));
+                        myPage = myPage.replace('{12totalCost}', '\u20ac' + Number(tot).toFixed(2));
 
                         var pdfPrintIframe = document.getElementById('invoicePdfPrinter');
                         var newPdfPrintIframe = document.createElement('iframe');
@@ -3071,6 +3219,29 @@ BusinessAccountUI.prototype.showDisableAccountConfirmDialog = function (actionFu
     });
 };
 
+/**
+ * This is a function to show the fingerprint dialog.
+ * It can be called whenever needed
+ */
+BusinessAccountUI.prototype.showVerifyDialog = function() {
+    "use strict";
+
+    if (!u_attr || !u_attr.b || u_attr.b.m || u_attr.b.s === -1) {
+        return;
+    }
+
+    const showVerifyDlg = (sendCredentials) => {
+
+        if (!sendCredentials || sendCredentials === -9) {
+            return;
+        }
+
+        fingerprintDialog(u_attr.b.mu[0], true);
+
+    };
+
+    mega.attr.get(u_handle, 'gmk', -2, 0).always(showVerifyDlg);
+};
 
 /** show Welcome to business account dialog */
 BusinessAccountUI.prototype.showWelcomeDialog = function () {
@@ -3127,6 +3298,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
         $adduserContianer.removeClass('hidden');
         $('.verification-container', $dialog).addClass('hidden');
         $('.dialog-subtitle', $dialog).addClass('hidden');
+        $('.fingerprint-container', $dialog).addClass('hidden');
         $('header h2', $dialog).text(l[19084]).removeClass('hidden');
         $('footer .add-more', $dialog).addClass('hidden');
         $('footer .add-sub-user', $dialog).removeClass('a-ok-btn');
@@ -3154,10 +3326,11 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
 
     // checking if we are passing a valid result object
     if (result && result.u && result.m) {
-        var $addContianer = $('.dialog-input-container', $dialog);
-        var $resultContianer = $('.verification-container', $dialog);
+        const $addContianer = $('.dialog-input-container', $dialog);
+        const $resultContianer = $('.verification-container', $dialog);
+        const $fpContainer = $('.fingerprint-container', $dialog).addClass('hidden');
 
-        var subUserDefaultAvatar = useravatar.contact(result.u);
+        const subUserDefaultAvatar = useravatar.contact(result.u);
         $('.new-sub-user', $resultContianer).safeHTML(subUserDefaultAvatar);
         $('.sub-e', $resultContianer).text(result.m);
         if (result.lp) {
@@ -3186,6 +3359,18 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
         }
 
         $addContianer.addClass('hidden');
+
+        userFingerprint(u_handle, (fprint) => {
+            if (!fprint || !fprint.length) {
+                return;
+            }
+            const $divs = $('.fingerprint-content-container div', $fpContainer);
+            for (let v = 0; v < fprint.length && v < 10; v++) {
+                $divs[v].textContent = fprint[v];
+            }
+            $fpContainer.removeClass('hidden');
+        });
+
         $resultContianer.removeClass('hidden');
         $('footer .add-sub-user', $dialog).addClass('a-ok-btn'); // OK
         $('footer .add-sub-user span', $dialog).text(l[81]); // OK
@@ -3323,6 +3508,7 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
                 var $addContianer = $('.dialog-input-container', $dialog);
                 var $resultContianer = $('.verification-container', $dialog);
                 const $subUserEmail = $('.sub-e', $resultContianer);
+                const $fpContainer = $('.fingerprint-container', $dialog).addClass('hidden');
 
                 if (st === 1) {
                     var subUserDefaultAvatar = useravatar.contact(res.u);
@@ -3358,6 +3544,18 @@ BusinessAccountUI.prototype.showAddSubUserDialog = function (result, callback) {
                     }
 
                     $addContianer.addClass('hidden');
+
+                    userFingerprint(u_handle, (fprint) => {
+                        if (!fprint || !fprint.length) {
+                            return;
+                        }
+                        const $divs = $('.fingerprint-content-container div', $fpContainer);
+                        for (let v = 0; v < fprint.length && v < 10; v++) {
+                            $divs[v].textContent = fprint[v];
+                        }
+                        $fpContainer.removeClass('hidden');
+                    });
+
                     $resultContianer.removeClass('hidden');
                     $('footer .add-more', $dialog).removeClass('hidden');
                     $('footer .add-sub-user', $dialog).addClass('a-ok-btn'); // OK
@@ -3479,41 +3677,30 @@ BusinessAccountUI.prototype.showResetPasswordSubUserDialog = function(subUserHan
     $copyPassBtn.off('click.subuser').on('click.subuser', copyGeneratedPass);
     $tempPass.off('copy.subuser').on('copy.subuser', copyGeneratedPass);
 
-    var resetPasswordResultHandler = function(c, res, txt) {
-        if (c) {
+    $confirmBtn.rebind('click.subuser', function confirmResetPassBtn() {
+        if ($(this).hasClass('disabled')) {
+            return;
+        }
+        closeDialog();
 
-            M.safeShowDialog('pass-reset-success-subuser-dlg', function() {
-                var $resetDialog =
-                    $('.user-management-able-user-dialog.mig-success.user-management-dialog');
-                $('.yes-answer', $resetDialog).off('click.suba').on('click.suba', closeDialog);
-                $resetDialog.find('.dialog-text-one')
-                    .safeHTML(l[22081].replace('{0}', '<b>' + subUser.e + '</b>'));
+        mySelf.business.resetSubUserPassword(subUserHandle, mySelf.lastGeneratedPass)
+            .then(() => {
 
-                return $resetDialog;
+                M.safeShowDialog('pass-reset-success-subuser-dlg', () => {
+                    const $resetDialog = $('.user-management-able-user-dialog.mig-success.user-management-dialog');
+
+                    $('.yes-answer', $resetDialog).rebind('click.suba', closeDialog);
+                    $('.dialog-text-one', $resetDialog)
+                        .safeHTML(l[22081].replace('{0}', `<b>${subUser.e}</b>`));
+
+                    return $resetDialog;
+                });
+
+            })
+            .catch((ex) => {
+                msgDialog('info', '', l[22082], api.strerror(ex));
             });
-        }
-        else {
-            if (d) {
-                console.error(txt + ' ' + res);
-            }
-            msgDialog('info', '', l[22082]);
-        }
-
-    };
-
-    $confirmBtn.off('click.subuser').on('click.subuser',
-        function confirmResetPassBtn() {
-            if ($(this).hasClass('disabled')) {
-                return;
-            }
-
-            closeDialog();
-
-            var resetPassOperation = mySelf.business.resetSubUserPassword(subUserHandle, mySelf.lastGeneratedPass);
-
-            resetPassOperation.always(resetPasswordResultHandler);
-
-        });
+    });
 
     M.safeShowDialog('sub-user-resetPass-dlg', function() {
         return $dialog;
@@ -3533,8 +3720,14 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
     if (!M.suba[subUserHandle]) {
         return;
     }
+
+    const mySelf = this;
+
+    if (!mySelf.checkCu25519(subUserHandle, mySelf.showEditSubUserDialog.bind(mySelf))) {
+        return false;
+    }
+
     var subUser = M.suba[subUserHandle];
-    var mySelf = this;
 
     var $dialog = $('.user-management-edit-profile-dialog.user-management-dialog');
     var $usersContainer = $('.content-block', $dialog);
@@ -3671,7 +3864,7 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
     var handleEditResult = function (st, res, req) {
         closeDialog();
         if (st === 0) {
-            msgDialog('warningb', '', l[19524]);
+            msgDialog('warningb', '', res === EACCESS ?  l[19562] : l[19524]);
             if (d) {
                 console.error(res);
             }
@@ -3733,9 +3926,21 @@ BusinessAccountUI.prototype.showEditSubUserDialog = function (subUserHandle) {
                     $lnameInput.megaInputsShowError();
                     return;
                 }
-                if ('email' in changedVals && !isValidEmail(changedVals.email)) {
-                    $emailInput.megaInputsShowError(l[5705]);
-                    return;
+                if ('email' in changedVals) {
+                    if (!isValidEmail(changedVals.email)) {
+                        $emailInput.megaInputsShowError(l[5705]);
+                        return;
+                    }
+                    for (const u of Object.values(M.suba)) {
+                        if (u.e === changedVals.email) {
+                            $emailInput.megaInputsShowError(
+                                u.s !== 0 && u.s !== 10
+                                    ? l.err_bus_sub_exists_deactive
+                                    : l[19562]
+                            );
+                            return;
+                        }
+                    }
                 }
                 var editPromise = mySelf.business.editSubAccount(subUserHandle, changedVals.email,
                     changedVals.fname, changedVals.lname,
@@ -3827,21 +4032,17 @@ BusinessAccountUI.prototype.showAddSubUserResultDialog = function (results) {
  * Start data migration of a sub-user
  * @param {String} subUserHandle            sub-user's handle
  */
-BusinessAccountUI.prototype.migrateSubUserData = function (subUserHandle) {
+BusinessAccountUI.prototype.migrateSubUserData = async function(subUserHandle) {
     "use strict";
-    if (!subUserHandle || subUserHandle.length !== 11) {
-        return;
+    if (!subUserHandle || subUserHandle.length !== 11 || !M.suba[subUserHandle]) {
+        throw new MEGAException(`Invalid data-migration sub-user handle, ${subUserHandle}`);
     }
-    if (!M.suba[subUserHandle]) {
-        return;
-    }
-    var mySelf = this;
+    const subUser = M.suba[subUserHandle];
+    const $migrateDialog = $('.user-management-migrate-process-dialog.user-management-dialog');
 
-    var subUser = M.suba[subUserHandle];
-    var $migrateDialog = $('.user-management-migrate-process-dialog.user-management-dialog');
-
-    const decodedUser = mySelf.decodeFields(subUser, ['firstname', 'lastname']);
+    const decodedUser = this.decodeFields(subUser, ['firstname', 'lastname']);
     const subName = `${decodedUser.firstname} ${decodedUser.lastname}`.trim();
+
     $migrateDialog.find('.sub-user-name-from').text(subName);
     $migrateDialog.find('.process-percentage').text('0%');
     $migrateDialog.find('.data-migrate.progress-bar').attr('style', 'width:0');
@@ -3862,117 +4063,40 @@ BusinessAccountUI.prototype.migrateSubUserData = function (subUserHandle) {
      * 3- decrypting
      * 4- copying to master account
      */
-    // failed
-    var failing = function (msg) {
-        $migrateDialog.addClass('hidden');
-        msgDialog('warningb', '', msg);
-        return;
-    };
+    changePercentage(10);
 
     // getting sub-user tree.
-    var gettingSubTreePromise = this.business.getSubUserTree(subUserHandle);
+    const [f, {k, k2}] = await Promise.all([
+        this.business.getSubUserTree(subUserHandle),
+        this.business.getSubAccountMKey(subUserHandle)
+    ]);
+    changePercentage(20);
 
-    gettingSubTreePromise.fail(
-        function getTreefailed(st, res, m) {
-            if (d) {
-                console.error("getting sub-user tree has failed! " + res + " --" + m);
-            }
-            return failing(l[19146]);
-        }
-    );
+    // sub-user tree decrypting
+    const {tree, errors, warns} = this.business.decrypteSubUserTree(f, k || k2, k ? 0 : subUserHandle);
 
-    gettingSubTreePromise.done(
-        function getTreeOk(st, treeResult) {
-            changePercentage(10);
-            // getting sub-user master-key
-            var gettingSubMasterKey = mySelf.business.getSubAccountMKey(subUserHandle);
-            changePercentage(15);
-            gettingSubMasterKey.fail(
-                function getMKeyfailed(mkSt, mkRes, mkM) {
-                    if (d) {
-                        console.error("getting sub-user Master key has failed! " + mkRes + " --" + mkM);
-                    }
-                    var failMsg = l[22083].replace('{0}', '<b>' + subUser.e + '</b></br></br>');
-                    return failing(failMsg);
+    if (errors.length || warns.length) {
+        // operation contains errors and/or warning
+        const msg = l[19147].replace(/\[Br]/g, '<br/>')
+            .replace('{0}', M.suba[subUserHandle].e)
+            .replace('{1}', errors.length)
+            .replace('{2}', warns.length);
+
+        await new Promise((resolve, reject) => {
+            msgDialog('confirmation', '', msg, l[18229], (yes) => {
+                if (!yes) {
+                    return reject(new MEGAException(l[19148].replace('{0}', subUser.e), subUser, 'AbortError'));
                 }
-            );
+                resolve();
+            });
+        });
+    }
+    changePercentage(30);
 
-            gettingSubMasterKey.done(
-                function getMKeyOK(st2, MKeyResult) {
-                    changePercentage(20);
-                    // sub-user tree decrypting
-                    var treeObj = mySelf.business.decrypteSubUserTree(treeResult, MKeyResult.k);
-                    changePercentage(30);
-                    if (!treeObj) {
-                        if (d) {
-                            console.error("decrypting sub-user tree with the Master key has failed! "
-                                + "although the key and tree fetching succeeded");
-                        }
-                        return failing(l[19146]);
-                    }
-                    else {
+    // name the folder as the sub-user email + timestamp.
+    const folderName = `${subUser.e}_${Date.now()}`;
 
-                        var doMigrateSubUserDate = function (isOK) {
-                            if (!isOK) {
-                                return failing(l[19148].replace('{0}', M.suba[subUserHandle].e));
-                            }
-
-                            // name the folder as the sub-user email + timestamp.
-                            var folderName = M.suba[subUserHandle].e;
-                            folderName += '_' + Date.now();
-
-                            var cpyPromise = mySelf.business.copySubUserTreeToMasterRoot(treeObj.tree,
-                                folderName, changePercentage);
-
-                            cpyPromise.fail(
-                                function copySubUserFailHandler(stF, errF, desF) {
-                                    if (d) {
-                                        console.error("copying sub-user data key has failed! " + errF + " --" + desF);
-                                    }
-                                    return failing(l[19146]);
-                                }
-                            );
-
-                            cpyPromise.done(
-                                function copySubUserSuccHandler() {
-                                    changePercentage(100);
-                                    $migrateDialog.addClass('hidden');
-
-                                    M.safeShowDialog('migration-success-dlg', function () {
-                                        var $dialog =
-                                            $('.user-management-able-user-dialog.mig-success.user-management-dialog');
-                                        $('.yes-answer', $dialog).off('click.suba').on('click.suba', closeDialog);
-                                        $dialog.find('.dialog-text-one')
-                                            .safeHTML(l[19149].replace('{0}', '<b>' + M.suba[subUserHandle].e + '</b>')
-                                                .replace('{1}', '<b>' + escapeHTML(folderName) + '</b>'));
-                                        return $dialog;
-                                    });
-                                    return;
-                                }
-                            );
-
-                        };
-
-                        if (treeObj.errors.length || treeObj.warns.length) {
-                            // operation contains errors and/or warning
-                            var msgMsg = l[19147].replace(/\[Br\]/g, '<br/>');
-                            var msgQuestion = l[18229]; // Do you want to proceed?
-                            msgMsg = msgMsg.replace('{0}', M.suba[subUserHandle].e)
-                                .replace('{1}', treeObj.errors.length).replace('{2}', treeObj.warns.length);
-
-                            msgDialog('confirmation', '', msgMsg, msgQuestion, doMigrateSubUserDate);
-                        }
-                        else {
-                            doMigrateSubUserDate(true);
-                        }
-
-
-                    }
-                }
-            );
-
-        }
-    );
+    return this.business.copySubUserTreeToMasterRoot(tree, folderName, changePercentage);
 };
 
 /**
@@ -4090,6 +4214,9 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
             // $userRow.addClass('hidden');
             leftPanelClass = 'disabled-accounts';
         }
+        if (u_attr.b.s === pro.ACCOUNT_STATUS_EXPIRED) {
+            $userRow.addClass('disabled');
+        }
         self.updateSubUserLeftPanel($('.user-management-tree-panel-header.' + leftPanelClass)[0]);
     };
 
@@ -4097,7 +4224,7 @@ BusinessAccountUI.prototype.UIEventsHandler = function (subuser) {
         updateLeftSubUserPanel(subuser);
     }
 
-    if (M.currentdirid && M.currentdirid.indexOf('user-management') === -1) {
+    if (!String(M.currentdirid).includes('user-management')) {
         return;
     }
 

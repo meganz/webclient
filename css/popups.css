@@ -1,18 +1,25 @@
 /* Search contacts popup */
+.mega-dialog.popup.contacts-search,
 .dropdown.body.popup.contacts-search {
     width: 420px;
     padding: 0;
     border-radius: 24px;
 }
+.mega-dialog.popup.contacts-search.main-start-chat-dropdown,
 .dropdown.body.popup.contacts-search.main-start-chat-dropdown {
     height: 602px;
 }
+body.it .mega-dialog.popup.contacts-search,
+body.br .mega-dialog.popup.contacts-search,
+body.fr .mega-dialog.popup.contacts-search,
+body.id .mega-dialog.popup.contacts-search,
 body.it .dropdown.body.popup.contacts-search,
 body.br .dropdown.body.popup.contacts-search,
 body.fr .dropdown.body.popup.contacts-search,
 body.id .dropdown.body.popup.contacts-search {
     width: 456px;
 }
+body.tl .mega-dialog.popup.contacts-search,
 body.tl .dropdown.body.popup.contacts-search {
     width: 480px;
 }
@@ -22,7 +29,7 @@ body.tl .dropdown.body.popup.contacts-search {
 }
 .popup.contact-picker-dialog {
     right: auto;
-    width: 420px;
+    width: 500px;
 }
 .popup.add-participant-selector .dropdown-white-arrow {
     top: -55px;
@@ -159,6 +166,10 @@ body.tl .dropdown.body.popup.contacts-search {
     max-width: 80%;
     padding-inline-start: 10px;
 }
+.rtl .invite-meeting-contacts .contacts-search-list .contacts-info .user-card-data,
+.rtl .add-participant-selector .contacts-search-list .contacts-info .user-card-data {
+    padding-inline-start: 15px;
+}
 .contacts-search-list .user-card-data .user-card-name {
     margin: 0 5px 0 0;
 }
@@ -196,7 +207,8 @@ body.tl .dropdown.body.popup.contacts-search {
     height: 24px;
     font: var(--text-body1);
 }
-.rtl .contacts-search-list .contacts-info.body.contacts-search .avatar-wrapper {
+.rtl .add-participant-selector .contacts-search-list .contacts-info.body.contacts-search .avatar-wrapper,
+.rtl .invite-meeting-contacts .contacts-search-list .contacts-info.body.contacts-search .avatar-wrapper {
     right: 12px;
 }
 .contacts-search-list .contacts-info.body.contacts-search img {
@@ -233,7 +245,7 @@ body.tl .dropdown.body.popup.contacts-search {
     position: relative;
     padding: 0 48px;
 }
-.horizontal-contacts-list div.ps > .ps__scrollbar-x-rail > .ps__scrollbar-x {
+.horizontal-contacts-list div.ps > .ps__rail-x > .ps__thumb-x {
     height: 6px;
     bottom: 1px;
 }
@@ -424,6 +436,20 @@ body.tl .dropdown.body.popup.contacts-search {
 .contact-picker-dialog.add-participant-selector .horizontal-contacts-list {
     box-sizing: unset;
 }
+.contact-picker-dialog.add-participant-selector .picker-user-limit-banner {
+    background: var(--banner-background-warning);
+    border: 1px solid var(--banner-border-warning);
+    border-radius: 4px;
+    box-sizing: border-box;
+    color: var(--banner-text-warning);
+    padding: 2px 16px;
+    text-align: center;
+    margin: 16px 48px;
+}
+.contact-picker-dialog.add-participant-selector .picker-user-limit-banner a {
+    color: var(--banner-text-warning);
+    text-decoration: underline;
+}
 .add-participant-selector footer {
     padding: 24px;
 }
@@ -491,6 +517,10 @@ body.tl .dropdown.body.popup.contacts-search {
     padding: 12px;
     min-height: 312px;
 }
+.rtl .popup-scroll-content.emoji .emoji-category-container {
+    left: 12px;
+    width: calc(100% - 24px);
+}
 /* End of Emoji one popup */
 
 /* GIF panel */
@@ -553,4 +583,10 @@ body.tl .dropdown.body.popup.contacts-search {
 }
 .dark-direct-tooltip.simpletip-tooltip.no-max-width {
     max-width: none;
+}
+.dark-direct-tooltip.simpletip-tooltip i.small-blue-spinner {
+    height: 16px;
+    position: relative;
+    top: 2px;
+    width: 16px;
 }

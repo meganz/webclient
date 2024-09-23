@@ -56,6 +56,12 @@ function dashboardUI(updProcess) {
         if (u_attr.pf) {
             $('.overall-usage-container', $bsnDashboard).addClass('admin');
         }
+
+        // If Pro Flexi expired/grace period
+        if (u_attr.pf && (u_attr.pf.s !== pro.ACCOUNT_STATUS_ENABLED)) {
+            $('.left-pane.small-txt.plan-date-info', '.dashboard').addClass('hidden');
+            $('.left-pane.big-txt.plan-date-val', '.dashboard').addClass('hidden');
+        }
     }
     else {
         // Show regular dashboard
@@ -153,6 +159,7 @@ function dashboardUI(updProcess) {
 
             $('.more-bonuses', $achWidget).rebind('click', function() {
                 mega.achievem.achievementsListDialog();
+                eventlog(500475);
             });
         }
         else {
@@ -165,7 +172,8 @@ function dashboardUI(updProcess) {
         }
 
         // Elements for free/pro accounts. Expires date / Registration date
-        if (u_attr.p || (u_attr.b && u_attr.b.s === -1)) {
+        if (u_attr.p || (u_attr.b && u_attr.b.s === pro.ACCOUNT_STATUS_EXPIRED) ||
+            (u_attr.pf && u_attr.pf.s === pro.ACCOUNT_STATUS_EXPIRED)) {
 
             var timestamp;
             // Subscription
@@ -185,12 +193,15 @@ function dashboardUI(updProcess) {
                 }
             }
             else if (account.stype == 'O') {
+                const planExpiryString = pro.filter.simple.miniPlans.has(u_attr.p)
+                    ? l.plan_expires_on
+                    : l[20153];
                 // one-time or cancelled subscription
                 $('.account.left-pane.plan-date-val').text(time2date(account.expiry, 2));
 
                 // If user has nextplan, show infomative tooltip
                 if (account.nextplan) {
-                    $('.account.left-pane.plan-date-info').safeHTML(escapeHTML(l[20153]) +
+                    $('.account.left-pane.plan-date-info').safeHTML(escapeHTML(planExpiryString) +
                         '<div class="sprite-fm-mono icon-info-filled simpletip" ' +
                         'data-simpletip-class="center-align medium-width" data-simpletip="' +
                         escapeHTML(l[20965]) + '"></div>');
@@ -199,19 +210,22 @@ function dashboardUI(updProcess) {
                     $('.account.left-pane.plan-date-info').text(l[987]);
                 }
                 else {
-                    $('.account.left-pane.plan-date-info').text(l[20153]);
+                    $('.account.left-pane.plan-date-info').text(planExpiryString);
                 }
             }
 
-            if (u_attr.b && (u_attr.p === 100 || u_attr.b.s === -1)) {
+            // If active/grace/expired Business or Pro Flexi expired status
+            if ((u_attr.b) || (u_attr.pf && u_attr.pf.s === pro.ACCOUNT_STATUS_EXPIRED)) {
+
                 // someone modified the CSS to overwirte the hidden class !!, therefore .hide() will be used
                 $('.account.left-pane.reg-date-info, .account.left-pane.reg-date-val').addClass('hidden').hide();
                 var $businessLeft = $('.account.left-pane.info-block.business-users').removeClass('hidden');
-                if (u_attr.b.s === 1) {
+
+                if (u_attr.b && u_attr.b.s === pro.ACCOUNT_STATUS_ENABLED) {
                     $businessLeft.find('.suba-status').addClass('active').removeClass('disabled pending')
                         .text(l[7666]);
                 }
-                else if (u_attr.b.s === 2 && u_attr.b.m) {
+                else if (u_attr.b && u_attr.b.s === pro.ACCOUNT_STATUS_GRACE_PERIOD && u_attr.b.m) {
                     $('.suba-status', $businessLeft).addClass('pending').removeClass('disabled active')
                         .text(l[19609]);
                     if (u_attr.b.sts && u_attr.b.sts[0] && u_attr.b.sts[0].s === -1) {
@@ -228,18 +242,25 @@ function dashboardUI(updProcess) {
                     $('.suba-status', $businessLeft).addClass('disabled').removeClass('pending active')
                         .text(l[19608]);
 
-                    if (u_attr.b.m) {
+                    if (u_attr.b && u_attr.b.m) {
                         $('.suba-pay-bill', $businessLeft).removeClass('hidden');
                     }
                 }
 
-                if (u_attr.b.m) { // master
-                    $businessLeft.find('.suba-role').text(l[19610]);
+                // For Pro Flexi, hide the Role block
+                if (u_attr.pf) {
+                    $('.suba-role', $businessLeft).parent().addClass('hidden');
+                }
+
+                // Otherwise for Business Master and User show the Role block
+                if (u_attr.b && u_attr.b.m) {
+                    $('.suba-role', $businessLeft).text(l[19610]); // Administrator
                 }
                 else {
-                    $businessLeft.find('.suba-role').text(l[5568]);
+                    $('.suba-role', $businessLeft).text(l[5568]); // User
                 }
-                if (u_attr.b.s !== 1 || !u_attr.b.m) {
+
+                if (u_attr.b && (u_attr.b.s !== pro.ACCOUNT_STATUS_ENABLED || !u_attr.b.m)) {
                     $('.left-pane.small-txt.plan-date-info', '.dashboard').addClass('hidden');
                     $('.left-pane.big-txt.plan-date-val', '.dashboard').addClass('hidden');
                 }
@@ -263,21 +284,12 @@ function dashboardUI(updProcess) {
             }
             else {
                 loadSubPage('pro');
+                eventlog(500474);
             }
         });
 
         $('.account.left-pane.reg-date-info').text(l[16128]);
         $('.account.left-pane.reg-date-val').text(time2date(u_attr.since, 2));
-
-        // left-panel responsive contents
-        var maxwidth = 0;
-        for (var i = 0; i < $('.account.left-pane.small-txt:visible').length; i++) {
-            var rowwidth = $('.account.left-pane.small-txt:visible').get(i).offsetWidth
-                + $('.account.left-pane.big-txt:visible').get(i).offsetWidth;
-            maxwidth = Math.max(maxwidth, rowwidth);
-        }
-        $.leftPaneResizable.options.updateWidth = maxwidth;
-        $($.leftPaneResizable).trigger('resize');
 
         const mBackupsNode = M.getNodeByHandle(M.BackupsId);
 
@@ -456,9 +468,16 @@ function dashboardUI(updProcess) {
 
             const rubbishSize = account.stats[M.RubbishID].bytes;
 
-            var folderNumText = ffNumText(account.stats[M.RootID].folders, 'folder');
-            var fileNumText = ffNumText(account.stats[M.RootID].files, 'file');
-            $('.ba-root .ff-occupy', $dataStats).text(bytesToSize(account.stats[M.RootID].bytes, 2));
+            // Get Object storage size and reduce cloud drive data if needed
+            const {
+                ts: s4Total = 0,
+                tf: s4FileCnt = 0,
+                td: s4FolderCnt = 0
+            } = 'utils' in s4 && s4.utils.getStorageData() || {};
+
+            var folderNumText = ffNumText(account.stats[M.RootID].folders - s4FolderCnt, 'folder');
+            var fileNumText = ffNumText(account.stats[M.RootID].files - s4FileCnt, 'file');
+            $('.ba-root .ff-occupy', $dataStats).text(bytesToSize(account.stats[M.RootID].bytes - s4Total, 2));
             $('.ba-root .folder-number', $dataStats).text(folderNumText);
             $('.ba-root .file-number', $dataStats).text(fileNumText);
 
@@ -485,6 +504,15 @@ function dashboardUI(updProcess) {
             $('.ba-pub-links .ff-occupy', $dataStats).text(bytesToSize(account.stats.links.bytes, 2));
             $('.ba-pub-links .folder-number', $dataStats).text(folderNumText);
             $('.ba-pub-links .file-number', $dataStats).text(fileNumText);
+
+            // Show Object storage and fill in the size
+            if (u_attr.s4) {
+                $('.ba-s4', $dataStats).removeClass('hidden');
+                $('.ba-s4 .ff-occupy', $dataStats).text(bytesToSize(s4Total, 2));
+            }
+            else {
+                $('.ba-s4', $dataStats).addClass('hidden');
+            }
 
             if (mBackupsNode) {
                 $('.js-backups-el', '.business-dashboard').removeClass('hidden');
@@ -523,8 +551,13 @@ function dashboardUI(updProcess) {
                 loadSubPage('fm/account/file-management');
             });
 
-            $('.business-dashboard .used-storage-info.ba-pub-links').rebind('click.suba', function() {
+            $('.used-storage-info.ba-pub-links .links-s', '.business-dashboard').rebind('click.suba', () => {
                 loadSubPage('fm/links');
+            });
+
+            $('.used-storage-info.ba-s4 .object-storage', '.business-dashboard').rebind('click.openS4', () => {
+                const cn = 'utils' in s4 && s4.utils.getContainersList();
+                loadSubPage(cn.length ? `fm/${cn[0].h}` : 'fm');
             });
 
             fileNumText = ffNumText(verFiles, 'file');
@@ -538,8 +571,13 @@ function dashboardUI(updProcess) {
         //    $('.account.widget.body.achievements').addClass('hidden');
         // }
 
-        onIdle(fm_resize_handler);
+        $.tresizer();
         initTreeScroll();
+
+        // Init the dashboard content scroll, after we've fetched account data (in MEGA Lite this takes longer)
+        if (mega.lite.inLiteMode) {
+            initDashboardScroll();
+        }
 
         // Button on dashboard to backup their master key
         $('.dashboard .backup-master-key').rebind('click', function() {
@@ -596,6 +634,7 @@ dashboardUI.renderReferralWidget = function() {
                 // Referral widget button
                 $('button.referral-program', $referralWidget).rebind('click.refer', () => {
                     loadSubPage('/fm/refer');
+                    eventlog(500476);
                 });
             }
         }).catch(ex => {

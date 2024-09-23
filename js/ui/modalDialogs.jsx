@@ -217,7 +217,9 @@ class ModalDialog extends MegaRenderMixin {
 
         return (
             <utils.RenderTo element={document.body} className="fm-modal-dialog" popupDidMount={this.onPopupDidMount}>
-                <div className={classes}
+                <div
+                    id={self.props.id}
+                    className={classes}
                     aria-labelledby={self.props.dialogName ? self.props.dialogName + "-title" : null}
                     role="dialog"
                     aria-modal="true"
@@ -353,16 +355,9 @@ class SelectContactDialog extends MegaRenderMixin {
             </ModalDialog>
         );
     }
-};
+}
 
 class ConfirmDialog extends MegaRenderMixin {
-    static defaultProps = {
-        'confirmLabel': l[6826],
-        'cancelLabel': l[82],
-        'dontShowAgainCheckbox': true,
-        'hideable': true,
-        'dialogType': 'message'
-    };
 
     static saveState(o) {
         let state = mega.config.get('xcod') >>> 0;
@@ -521,7 +516,17 @@ class ConfirmDialog extends MegaRenderMixin {
             </ModalDialog>
         );
     }
-};
+}
+
+lazy(ConfirmDialog, 'defaultProps', () => {
+    return freeze({
+        'confirmLabel': l[6826],
+        'cancelLabel': l[82],
+        'dontShowAgainCheckbox': true,
+        'hideable': true,
+        'dialogType': 'message'
+    });
+});
 
 export default {
     ModalDialog,

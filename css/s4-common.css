@@ -1,0 +1,167 @@
+/* S4 common styles */
+.rtl .s4-container-block,
+.rtl .s4-bucket-block,
+.rtl .s4-details-section,
+.rtl .s4-info-section .info-section-header,
+.rtl .s4-tabs-bl {
+    direction: rtl;
+}
+.s4-info-header-blocks *.js-selectable-text,
+.s4-details-section *.js-selectable-text {
+    cursor: text;
+    -webkit-user-select: text;
+}
+.s4-info-header-blocks {
+    transition: 200ms linear;
+}
+.container-details-info,
+.bucket-details-info {
+    background: var(--surface-grey-1);
+    border-top: 1px solid var(--surface-grey-2);
+    box-sizing: border-box;
+    height: 129px;
+    position: relative;
+}
+.files-grid-view.active-header,
+.fm-blocks-view.active-header {
+    border-color: transparent;
+}
+.files-grid-view.active-header {
+    height: calc(100% - 7px);
+    margin-top: 7px;
+}
+.container-details-info {
+    height: 156px;
+}
+.container-details-info .content {
+    padding: 24px 48px;
+    position: relative;
+}
+.container-details-info .bkt-container-name {
+    font: var(--text-h2-bold);
+    color: var(--text-color-high);
+}
+.container-details-info .bkt-container-domain {
+    display: flex;
+    margin-top: 24px;
+    position: relative;
+}
+.container-details-info .domain-title {
+    font: var(--text-body1-bold);
+    color: var(--text-color-high);
+}
+.container-details-info .domain-value {
+    font: var(--text-body1);
+    color: var(--text-color-low);
+    -webkit-margin-start: 24px;
+    margin-inline-start: 24px;
+}
+.container-details-info .domain-value .info {
+    margin-top: 8px;
+}
+.container-details-info .domain-value .learn-more {
+    color: var(--secondary-blue);
+    cursor: pointer;
+    -webkit-margin-start: 8px;
+    margin-inline-start: 8px;
+}
+.bucket-details-info .content {
+    padding: 16px 24px;
+    position: relative;
+    box-sizing: border-box;
+}
+.bucket-details-info .bucket-details-icon {
+    --icon-size: 96px;
+    display: inline-block;
+    vertical-align: middle;
+    flex-shrink: 0;
+}
+.bucket-details-info .bucket-details-info-block {
+    vertical-align: middle;
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    width: 100%;
+}
+.bucket-details-info .bucket-details-pad {
+    position: relative;
+    overflow: hidden;
+    -webkit-margin-start: 8px;
+    margin-inline-start: 8px;
+}
+.bucket-details-pad div .avatar-wrapper {
+    margin: 0;
+    vertical-align: middle;
+    float: none;
+    display: inline-block;
+}
+.bucket-details-pad .bucket-details-user-info {
+    display: inline-block;
+    vertical-align: middle;
+    -webkit-margin-start: 4px;
+    margin-inline-start: 4px;
+}
+.bucket-details-pad .bucket-details-name {
+    color: var(--text-color-high);
+    font: var(--text-h2);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    -webkit-padding-end: 16px;
+    padding-inline-end: 16px;
+    display: inline-block;
+    vertical-align: middle;
+}
+.bucket-details-pad .bucket-domain {
+    font: var(--text-body1);
+    color: var(--text-color-low);
+    margin-top: 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.bucket-details-buttons .bkt-settings-btn {
+    margin-right: 4px;
+}
+.bucket-details-buttons {
+    margin-inline-start: auto;
+    -webkit-margin-start: auto;
+    display: flex;
+    flex-wrap: nowrap;
+    margin-top: 24px;
+}
+.bucket-access-warning.fm-notification-block {
+    color: var(--banner-text-warning);
+    background-color: var(--banner-background-warning);
+    border: 1px solid var(--banner-border-warning);
+    border-radius: 4px;
+    display: block;
+    margin: 8px 24px;
+    padding: 1px 8px;
+}
+.bucket-access-warning.fm-notification-block a,
+.bucket-access-warning.fm-notification-block a:link,
+.bucket-access-warning.fm-notification-block a:visited {
+    color: var(--banner-text-warning);
+}
+.dark-direct-tooltip.simpletip-tooltip.bucket-settings {
+    max-width: 240px;
+}
+.dark-direct-tooltip.simpletip-tooltip.bucket-settings.managed {
+    max-width: 370px;
+}
+.dark-direct-tooltip.bucket-settings a,
+.dark-direct-tooltip.bucket-settings a:link,
+.dark-direct-tooltip.bucket-settings:visited {
+    text-decoration: underline;
+}
+.dark-direct-tooltip.bucket-settings::before {
+    content: '';
+    height: 20px;
+    left: 0;
+    position: absolute;
+    top: 100%;
+    width: 100%;
+}
+
+/* End: S4 common styles */

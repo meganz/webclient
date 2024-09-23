@@ -4,16 +4,179 @@
     left: 0;
     width: 100%;
     height: 100%;
+    background: #222;
     z-index: 120;
 
     &.minimized {
         display: none;
     }
 
+    &.with-active-element {
+        /* [...] */
+
+        .stream-controls,
+        .sidebar-controls,
+        .recording-control { bottom: 0; }
+        .stream-head { top: 0; }
+    }
+
+    &-onboarding {
+        /* [...] */
+
+        .mega-onboarding-dialog {
+            z-index: 11;
+
+            &.onboarding-UI {
+                top: 74px;
+                right: 84px;
+            }
+
+            &.onboarding-recording {
+                bottom: 100px;
+                left: 12px;
+
+                #ob-dialog-arrow { left: 32px; }
+
+                .link-button {
+                    text-decoration: underline;
+                    &:hover { text-decoration: none; }
+                }
+            }
+
+            &.onboarding-raise {
+                left: 50%;
+                bottom: calc(100% + 24px);
+                transform: translateX(-50%);
+                width: 448px;
+                text-align: left;
+
+                span {
+                    margin: 0 var(--horizontal-padding);
+                    font: var(--text-font-family);
+                    color: inherit;
+                }
+            }
+
+            h2 {
+                font: var(--text-h2-bold);
+            }
+        }
+    }
+
     @import '_stream.scss';
+    @import '_recordingControl.scss';
+    @import '_streamControls.scss';
+    @import '_sidebarControls.scss';
     @import '_sidebar.scss';
+
+    button.call-action {
+        background: transparent;
+        box-shadow: none;
+
+        &:hover {
+            background: #333;
+        }
+
+        i {
+            display: block;
+            margin: 0 auto;
+            --icon-size: 24px;
+            --mask-color: var(--secondary-white);
+        }
+    }
+
+    .call-time-limit-banner {
+        background: var(--banner-background-warning);
+        border: 1px solid var(--banner-border-warning);
+        border-radius: 4px;
+        box-sizing: border-box;
+        color: var(--banner-text-warning);
+        margin: 72px 16px 0;
+        padding: 4px 16px;
+        position: absolute;
+        text-align: center;
+        width: calc(100% - 32px);
+        z-index: 10;
+
+        .rtl & {
+            direction: rtl;
+        }
+
+        .call-limit-banner-action {
+            color: var(--banner-text-warning);
+            cursor: pointer;
+            float: right;
+            margin-inline-start: 24px;
+            -webkit-margin-start: 24px;
+
+            .rtl & {
+                float: left;
+            }
+        }
+    }
 }
 
 .local-stream-mirrored video {
     transform: scaleX(-1);
+}
+
+.mega-dialog.meetings-permissions-dialog {
+    /* [...] */
+
+    .info-container {
+        /* [...] */
+    }
+
+    header {
+        padding-inline-end: 24px;
+    }
+
+    .permissions-warning-cover {
+        padding: 18px 0;
+        width: 100%;
+        height: 280px;
+
+        span {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center center;
+
+            &.permissions-mic {
+                background-image: url(../images/mega/permissions/mic-mac-light.svg);
+
+                body.theme-dark & {
+                    background-image: url(../images/mega/permissions/mic-mac-dark.svg);
+                }
+            }
+
+            &.permissions-camera {
+                background-image: url(../images/mega/permissions/camera-mac-light.svg);
+
+                body.theme-dark & {
+                    background-image: url(../images/mega/permissions/camera-mac-dark.svg);
+                }
+            }
+        }
+    }
+
+    .permissions-warning-info {
+        /* [...] */
+
+        i {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            background-size: 16px 16px;
+        }
+    }
+}
+
+.call-toast {
+    position: absolute;
+    left: 50%;
+    bottom: 94px;
+    transform: translateX(-50%);
 }

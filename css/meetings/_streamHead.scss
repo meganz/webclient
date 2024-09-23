@@ -5,16 +5,17 @@
 */
 
 .stream-head {
-    position: absolute;
-    top: -250px;
+    position: fixed;
+    top: -300px;
     left: 0;
     width: 100%;
     height: 64px;
-    background: var(--surface-black-bar);
     transition: opacity 500ms ease-in-out, top 500ms ease-in-out;
-    z-index: 11;
+    z-index: 13;
 
     &-content {
+        display: flex;
+        justify-content: space-between;
         position: absolute;
         top: 50%;
         width: 100%;
@@ -23,7 +24,6 @@
         box-sizing: border-box;
 
         .stream-head-info {
-            float: left;
             font: var(--text-h3);
             color: var(--secondary-white);
 
@@ -52,8 +52,38 @@
             }
         }
 
+        .stream-head-pagination {
+            display: flex;
+            font: var(--text-h3);
+            color: var(--text-color-medium);
+
+            button {
+                border: 0 none;
+                cursor: pointer;
+                z-index: 1;
+                opacity: 0.6;
+                background: transparent;
+                transition: opacity 500ms ease-in-out;
+
+                &:hover {
+                    opacity: 1;
+                }
+
+                &.disabled {
+                    opacity: 0.2;
+                }
+
+                i {
+                    display: block;
+                    margin: 0 auto;
+                    --icon-size: 24px;
+                    --mask-color: var(--icon-rest);
+                }
+            }
+        }
+
         .stream-head-controls {
-            float: right;
+            /* [...] */
 
             button.head-control {
                 display: block;
@@ -63,17 +93,18 @@
                 background: transparent;
                 cursor: pointer;
                 border: 0 none;
+                font: var(--text-h3);
+                color: var(--text-color-medium);
 
-                i {
-                    margin: 0 auto;
-                    --icon-size: 24px;
-                    --mask-color: var(--icon-rest);
+                div {
+                    float: left;
                 }
 
-                span {
-                    position: fixed;
-                    bottom: -9999px;
-                    visibility: hidden;
+                i {
+                    float: left;
+                    margin: 0 8px 0 0;
+                    --icon-size: 24px;
+                    --mask-color: var(--icon-rest);
                 }
             }
         }

@@ -44,9 +44,6 @@ window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileS
 if (localStorage.dlMethod) {
     dlMethod = window[localStorage.dlMethod];
 }
-else if (is_chrome_firefox & 4) {
-    dlMethod = FirefoxIO;
-}
 else if (window.requestFileSystem) {
     dlMethod = FileSystemAPI;
 }
@@ -54,7 +51,8 @@ else if (MemoryIO.usable()) {
     dlMethod = MemoryIO;
 }
 else {
-    dlMethod = FlashIO;
+    dlMethod = false;
+    console.error(`No download method available! ${ua}`);
 }
 
 if (typeof dlMethod.init === 'function') {
@@ -105,17 +103,14 @@ mBroadcaster.once('startMega', function() {
                                     dlmanager.logger.info('Resuming transfers...', entries);
                                 }
 
-                                if (is_mobile) {
-                                    // We only resume a single download on mobile.
-                                    mobile.downloadOverlay.resumeDownload(entries[0]);
-                                } else {
-                                    M.addDownload(entries);
-                                }
+                                M.addDownload(entries);
                             };
 
                             if (is_mobile) {
-                                mobile.resumeTransfersOverlay.show(continueTransfers, cancelTransfers);
-                            } else {
+                                // We only resume a single download on mobile.
+                                mobile.downloadOverlay.resumeDownload(entries[0]);
+                            }
+                            else {
                                 var $dialog = $('.mega-dialog.resume-transfer');
 
                                 $('button.js-close, .cancel', $dialog).rebind('click', function() {

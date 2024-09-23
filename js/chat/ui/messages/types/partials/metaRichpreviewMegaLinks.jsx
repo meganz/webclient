@@ -6,8 +6,6 @@ import {ContactVerified, ContactPresence, Avatar} from "../../../contacts.jsx";
 
 class MetaRichpreviewMegaLinks extends ConversationMessageMixin {
     render() {
-        var self = this;
-
         var message = this.props.message;
         var chatRoom = this.props.message.chatRoom;
         var previewContainer;
@@ -24,10 +22,21 @@ class MetaRichpreviewMegaLinks extends ConversationMessageMixin {
             if (megaLinkInfo.hadLoaded() === false) {
                 if (megaLinkInfo.startedLoading() === false) {
                     megaLinkInfo.getInfo()
-                        .always(function() {
-                            Soon(function() {
-                                message.trackDataChange();
-                                self.safeForceUpdate();
+                        .then(() => {
+                            const { megaLinks } = this.props.message;
+                            const contactLinkHandles = megaLinks
+                                .filter(link => link.is_contactlink)
+                                .map(link => link.info.h);
+                            if (contactLinkHandles.length) {
+                                this.addContactListenerIfMissing(contactLinkHandles);
+                            }
+                        })
+                        .catch(reportError)
+                        .finally(() => {
+                            message.trackDataChange();
+
+                            onIdle(() => {
+                                this.safeForceUpdate();
                             });
                         });
                 }
@@ -78,7 +87,7 @@ class MetaRichpreviewMegaLinks extends ConversationMessageMixin {
                     true : !(megaLinkInfo.havePreview() && megaLinkInfo.info.preview_url);
 
                 if (megaLinkInfo.is_chatlink) {
-                    desc = l[8876] + ": " + megaLinkInfo.info.ncm;
+                    desc = l[8876].replace('%1', megaLinkInfo.info.ncm) /* `Chat participants: %1` */;
                 }
                 else if (!megaLinkInfo.is_dir) {
                     desc = bytesToSize(megaLinkInfo.info.size);
@@ -108,11 +117,11 @@ class MetaRichpreviewMegaLinks extends ConversationMessageMixin {
                             {megaLinkInfo.is_chatlink ?
                                 <i className="huge-icon conversations"></i>
                                 :
-                                <div className={"message richpreview icon block-view-file-type " + (
+                                <div className={"message richpreview icon item-type-icon-90 icon-" + (
                                     megaLinkInfo.is_dir ?
                                         "folder" :
                                         fileIcon(megaLinkInfo.info)
-                                )}></div>
+                                ) + "-90"}></div>
                             }
                         </div>
                     }

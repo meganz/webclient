@@ -1,0 +1,190 @@
+.overlay-wrap {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    z-index: 101;
+    visibility: hidden;
+    transition: visibility 0.2s ease-out;
+}
+
+.overlay-wrap.active {
+    background: var(--mobile-background-blur);
+    transition: background 0.2s ease-out, visibility 0.2s ease-out;
+    visibility: visible;
+}
+
+.mega-overlay.active .overlay {
+    transform: translateY(0%);
+}
+
+.mega-overlay .overlay {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 24px;
+    background: var(--mobile-page-background);
+    transform: translateY(100%);
+    transition: transform 0.2s ease-out;
+    height: 100%;
+}
+
+.mega-overlay.mega-overlay-view {
+    position: absolute;
+    height: fill-available;
+    height: -webkit-fill-available;
+}
+
+.mega-overlay.mega-overlay-view .overlay {
+    padding: 0;
+}
+
+.mega-overlay.mega-overlay-view .mega-bottom-bar {
+    position: relative;
+}
+
+.overlay-wrap .nav-elem.close {
+    padding: 0;
+    margin-left: auto;
+}
+
+.overlay-wrap .main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+    width: 100%;
+    overflow: hidden;
+    height: 100%;
+}
+
+.mega-overlay.overlay-wrap .title,
+.mega-overlay.overlay-wrap .image {
+    align-self: flex-start;
+}
+.overlay-wrap .title h1 {
+    font: var(--mobile-font-heading-h1);
+}
+.overlay-wrap .title h2 {
+    font: var(--mobile-font-heading-h2);
+}
+.overlay-wrap .title h1,
+.overlay-wrap .title h2 {
+    color: var(--mobile-text-primary);
+    margin: 0;
+}
+.mega-overlay.overlay-wrap .title.centered,
+.mega-overlay.overlay-wrap .image.centered {
+    align-self: center;
+}
+.overlay-wrap .subtitle {
+    margin-top: -8px;
+}
+
+.overlay-wrap .subtitle span {
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-copy-regular);
+}
+
+.overlay-wrap .content {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-copy-regular);
+    width: 100%;
+}
+
+.overlay-wrap .actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+    width: 100%;
+}
+.overlay-wrap .main > *:not(:last-child),
+.mega-overlay .overlay > .close {
+    margin-bottom: 16px;
+}
+.overlay-wrap .actions > *:not(:first-child),
+.mega-overlay:not(.action-button-bottom) .overlay > .actions {
+    margin-top: 16px;
+}
+.overlay-wrap .actions .button {
+    max-width: var(--mobile-elem-max-width);
+    width: 100%;
+    height: 48px;
+}
+
+.overlay-wrap .image {
+    --icon-size: 80px;
+    color: var(--mobile-icon-primary);
+}
+.overlay-wrap .actions .button span {
+    font-weight: var(--mobile-font-weight-semibold);
+}
+
+.overlay-wrap .image:empty,
+.overlay-wrap .title:empty,
+.overlay-wrap .subtitle:empty,
+.overlay-wrap .content:empty,
+.overlay-wrap .actions:empty {
+    display: none;
+}
+
+/* Action on bottom style */
+.overlay-wrap.action-button-bottom .content {
+    padding-bottom: 16px;
+}
+.overlay-wrap.action-button-bottom .overlay {
+    padding-bottom: 81px;
+}
+.overlay-wrap.action-button-bottom .actions {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    box-sizing: border-box;
+}
+.overlay-wrap.action-button-bottom .actions > button {
+    margin: 0 24px 24px;
+    width: calc(100% - 48px);
+}
+
+/* Icon images styles */
+.overlay-wrap .image i.key {
+    background-image: url("../../images/mobile/key.png");
+}
+.overlay-wrap .image i.reload {
+    background-image: url("../../images/mobile/reload.png");
+}
+
+.overlay-wrap .image i.bell {
+    background-image: url("../../images/mobile/bell.png");
+}
+.overlay-wrap .image i.password {
+    background-image: url("../../images/mobile/password.png");
+}
+
+.overlay-wrap .image i.key,
+.overlay-wrap .image i.reload {
+    background-size: contain;
+    width: 96px;
+    height: 96px;
+}
+
+.overlay-wrap .image i.bell,
+.overlay-wrap .image i.password {
+    background-size: contain;
+    width: 64px;
+    height: 64px;
+}
+
+@media only screen and (orientation: landscape) and (max-height: 359px) {
+    .overlay-wrap i.icon {
+       display: none;
+    }
+}

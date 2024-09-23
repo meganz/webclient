@@ -4,32 +4,12 @@ var ConversationMessageMixin = require('./mixin.jsx').ConversationMessageMixin;
 import { Emoji, ParsedHTML } from '../../../ui/utils.jsx';
 
 class AltPartsConvMessage extends ConversationMessageMixin {
-    _ensureNameIsLoaded(h) {
-        var self = this;
-        var contact = M.u[h] ? M.u[h] : {
-            'u': h,
-            'h': h,
-            'c': 0,
-        };
-        var displayName = generateAvatarMeta(contact.u).fullName;
-
-
-        if (!displayName) {
-            M.u.addChangeListener(function () {
-                displayName = generateAvatarMeta(contact.u).fullName;
-                if (displayName) {
-                    self.safeForceUpdate();
-
-                    return 0xDEAD;
-                }
-            });
-        }
-    }
     haveMoreContactListeners() {
         if (!this.props.message || !this.props.message.meta) {
             return false;
         }
-        return this.props.message.meta.included || this.props.message.meta.excluded;
+        const { included, excluded } = this.props.message.meta;
+        return array.unique([...included || [], ...excluded || []]);
     }
     render() {
         var self = this;
@@ -46,7 +26,7 @@ class AltPartsConvMessage extends ConversationMessageMixin {
 
         var displayName;
         if (contact) {
-            displayName = generateAvatarMeta(contact.u).fullName;
+            displayName = M.getNameByHandle(contact.u);
         }
         else {
             displayName = contact;
@@ -64,16 +44,22 @@ class AltPartsConvMessage extends ConversationMessageMixin {
             var avatar = <ContactsUI.Avatar contact={otherContact}
                 chatRoom={self.props.chatRoom}
                 className="message avatar-wrapper small-rounded-avatar"/>;
-            var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
+            var otherDisplayName = M.getNameByHandle(otherContact.u);
 
-            var text = (h === contact.u) ?
-                l[23756] :
-                l[8907].replace(
-                    "%s",
-                    `<strong>${megaChat.html(displayName)}</strong>`
-                );
+            const isSelfJoin = h === contact.u;
+            let text = isSelfJoin
+                ? l[23756] /* `%1 joined the group chat.` */
+                : l[8907]; /* `%1 joined the group chat by invitation from %2.` */
+            if (self.props.chatRoom.isMeeting) {
+                text = isSelfJoin
+                    ? l.meeting_mgmt_user_joined /* `%1 joined the meeting.` */
+                    : l.meeting_mgmt_user_added; /* `%1 joined the meeting by invitation from %2.` */
+            }
+            text = text.replace('%1', megaChat.html(otherDisplayName));
+            if (!isSelfJoin) {
+                text = text.replace('%2', `<strong>${megaChat.html(displayName)}</strong>`);
+            }
 
-            self._ensureNameIsLoaded(otherContact.u);
             messages.push(
                 <div className="message body" data-id={"id" + message.messageId} key={message.messageId + "_" + h}>
                     {avatar}
@@ -104,16 +90,20 @@ class AltPartsConvMessage extends ConversationMessageMixin {
             var avatar = <ContactsUI.Avatar contact={otherContact}
                 chatRoom={self.props.chatRoom}
                 className="message avatar-wrapper small-rounded-avatar"/>;
-            var otherDisplayName = generateAvatarMeta(otherContact.u).fullName;
-
-            self._ensureNameIsLoaded(otherContact.u);
+            var otherDisplayName = M.getNameByHandle(otherContact.u);
 
             var text;
             if (otherContact.u === contact.u) {
-                text = l[8908];
+                text = self.props.chatRoom.isMeeting
+                    ? l.meeting_mgmt_left /* `Left the meeting` */
+                    : l[8908]; /* `Left the group chat` */
             }
             else {
-                text = l[8906].replace(
+                text = (
+                    self.props.chatRoom.isMeeting
+                        ? l.meeting_mgmt_kicked /* `Was removed from the meeting by %s.` */
+                        : l[8906] /* `Was removed from the group chat by %s.` */
+                ).replace(
                     "%s",
                     `<strong>${megaChat.html(displayName)}</strong>`
                 );

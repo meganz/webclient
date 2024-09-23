@@ -35,7 +35,9 @@ describe("MegaNotifications Unit Test", function() {
             sinon.spy(this, 'close');
             return this;
         };
-        _notification.requestPermission = sinon.stub();
+        _notification.requestPermission = sinon.stub().callsFake(() => {
+            return Promise.resolve('granted');
+        });
         _notification.permission = 'granted';
         mStub(window, 'Notification', _notification);
         mStub(window, 'Favico', function() {
@@ -47,6 +49,18 @@ describe("MegaNotifications Unit Test", function() {
 
             return this;
         });
+        mStub(window, 'megaChat', {
+            playSound: (sound, options, stop) => {
+                if (options === true) {
+                    stop = true;
+                    options = undefined;
+                }
+                if (stop) {
+                    ion.sound.stop(sound);
+                }
+                return ion.sound.play(sound, options);
+            }
+        })
 
         megaNotifications = new MegaNotifications({
             anfFlag: 'chat_enabled',
@@ -131,7 +145,7 @@ describe("MegaNotifications Unit Test", function() {
 
         expect(megaNotifications.favico instanceof Favico).to.eql(true);
 
-        delay(function() {
+        delay('tick', function() {
             expect(megaNotifications.favico.badge.callCount).to.eql(1);
             expect(megaNotifications.favico.badge.calledWith(1)).to.eql(true);
 
@@ -147,7 +161,7 @@ describe("MegaNotifications Unit Test", function() {
             expect(ion.sound.play.calledWith("type1-sound")).to.eql(true);
 
             n.setUnread(false);
-            delay(function() {
+            delay('tick', function() {
 
                 expect(ion.sound.stop.callCount).to.eql(3);
                 expect(ion.sound.stop.calledWith("type1-sound")).to.eql(true);

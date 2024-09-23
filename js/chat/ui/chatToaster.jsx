@@ -276,21 +276,21 @@ export default class ChatToaster extends MegaRenderMixin {
             && !fmToastId
             && <div className={`chat-toast-bar ${isRootToaster ? 'toaster-root' : ''}`}>
                 {
-                    toast
-                    && <ChatToastMsg
-                        toast={toast}
-                        isRootToaster={isRootToaster}
-                        onClose={p => this.onClose(p)}
-                    />
-                }
-                {
                     showDualNotifications
                     && persistentToast
                     && <ChatToastMsg
                         toast={persistentToast}
                         isRootToaster={isRootToaster}
-                        isDualToast={!!toast}
                         usePersistentStyle={true}
+                        onClose={p => this.onClose(p)}
+                    />
+                }
+                {
+                    toast
+                    && <ChatToastMsg
+                        toast={toast}
+                        isRootToaster={isRootToaster}
+                        isDualToast={!!persistentToast}
                         onClose={p => this.onClose(p)}
                     />
                 }
@@ -341,7 +341,7 @@ class ChatToastMsg extends MegaRenderMixin {
         const { toast, isRootToaster, isDualToast, usePersistentStyle, onClose } = this.props;
         const { value } = this.state;
         if (usePersistentStyle && toast.options.persistent) {
-            return <div className={`${NAMESPACE} chat-persistent-toast ${isDualToast ? 'dual-toast' : ''}`}>
+            return <div className={`${NAMESPACE} chat-persistent-toast`}>
                 {value || toast.render()}
             </div>;
         }
@@ -363,7 +363,7 @@ class ChatToastMsg extends MegaRenderMixin {
             );
         }
         return (
-            <div className={`${NAMESPACE} chat-toast-wrapper theme-light-forced`}>
+            <div className={`${NAMESPACE} chat-toast-wrapper theme-light-forced ${isDualToast ? 'dual-toast' : ''}`}>
                 <div className="toast-value">{value || toast.render()}</div>
             </div>
         );

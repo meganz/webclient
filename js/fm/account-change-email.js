@@ -77,7 +77,7 @@ var accountChangeEmail = {
 
         // On Change Email button click
         $changeEmailButton.rebind('click', function() {
-            
+
             if ($(this).hasClass('disabled')) {
                 return false;
             }
@@ -94,25 +94,19 @@ var accountChangeEmail = {
             // If there is text in the email field and it doesn't match the existing one
             if (newEmail !== '' && u_attr.email.toLowerCase() !== newEmail) {
 
-                loadingDialog.show();
-
                 // Check if 2FA is enabled on their account
-                twofactor.isEnabledForAccount(function(result) {
+                twofactor.isEnabledForAccount()
+                    .then((result) => {
 
-                    loadingDialog.hide();
+                        // If 2FA is enabled
+                        if (result) {
 
-                    // If 2FA is enabled
-                    if (result) {
-
-                        // Show the verify 2FA dialog to collect the user's PIN
-                        twofactor.verifyActionDialog.init(function(twoFactorPin) {
-                            accountChangeEmail.continueChangeEmail(newEmail, twoFactorPin);
-                        });
-                    }
-                    else {
-                        accountChangeEmail.continueChangeEmail(newEmail, null);
-                    }
-                });
+                            // Show the verify 2FA dialog to collect the user's PIN
+                            return twofactor.verifyActionDialog.init();
+                        }
+                    })
+                    .then((twoFactorPin) => accountChangeEmail.continueChangeEmail(newEmail, twoFactorPin || null))
+                    .catch((ex) => ex !== EBLOCKED && tell(ex));
             }
         });
     },
@@ -149,12 +143,20 @@ var accountChangeEmail = {
 
                 // If something went wrong with the 2FA PIN
                 if (result === EFAILED || result === EEXPIRED) {
-                    msgDialog('warninga', l[135], l[19216]);
+                    msgDialog('warninga', l[135], l[19192]);
                 }
 
                 // If they have already requested a confirmation link for that email address, show an error
                 else if (result === -12) {
-                    return msgDialog('warninga', l[135], l[7717]);
+                    msgDialog('warninga', l[135], l.resend_email_error,  mega.icu.format(l.resend_email_error_info, 2));
+                }
+
+                // If they have already requested the confirmation links twice in one hour, show an error
+                else if (result === -6) {
+                    msgDialog(
+                        'warninga', l[135], l.change_email_error,
+                        mega.icu.format(l.change_email_error_info, u_attr.b ? 10 : 2)
+                    );
                 }
 
                 // EACCESS, the email address is already in use or current user is invalid. (less likely).

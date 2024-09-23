@@ -10,6 +10,9 @@
     box-sizing: border-box;
     box-shadow: var(--dropdown-shadow);
 }
+.dropdown.body.m-context-menu {
+    z-index: 1150;
+}
 .rtl .dropdown.body {
     direction: rtl;
 }
@@ -129,6 +132,20 @@
     position: relative;
     width: auto;
     z-index: 10;
+}
+.mega-lite-mode .dropdown.body .dropdown-item[megatype="size"] {
+    display: none;
+}
+/* Temporarily hide Versioning and Favourite options until we have a fix for MEGA Lite mode */
+.mega-lite-mode .dropdown.body .dropdown-item[megatype="versions"],
+.mega-lite-mode .dropdown.body .dropdown-item.properties-versions,
+.mega-lite-mode .dropdown.body .dropdown-item.clearprevious-versions,
+.mega-lite-mode .dropdown.body .dropdown-item.add-star-item {
+    display: none;
+}
+/* Temporarily hide Move item in context menu for files & folders which is nor working in MEGA Lite mode */
+.mega-lite-mode .dropdown.body .dropdown-item.move-item {
+    display: none;
 }
 .dropdown.body span.loading {
     line-height: 32px;
@@ -295,6 +312,9 @@
 .dropdown-item.contains-submenu.icon-arrow-right-after.opened::after {
    --mask-color: var(--icon-active);
 }
+.rtl .dropdown-item.contains-submenu.icon-arrow-right-before i.icon-arrow-right {
+    transform: rotateY(180deg);
+}
 /*  Item with tick */
 .dropdown-item.tick-item.active .status-text {
     -webkit-margin-end: 8px;
@@ -354,6 +374,15 @@
 .context .dropdown.submenu {
     border-radius: 12px;
     box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Dropdown beta tag */
+.dropdown-item .beta {
+    border: 1px solid var(--progress-bar-fill3);
+    border-radius: 3px;
+    padding: 2px 8px;
+    font: var(--text-body2);
+    color: var(--progress-bar-fill3);
 }
 
 /* Dropdown warning notification */
@@ -558,7 +587,6 @@
     color: var(--text-color-medium);
     display: block;
     margin: 8px;
-    text-transform: uppercase;
 }
 .dark .dropdown-color-txt {
     color: #FFFFFF;
@@ -1216,6 +1244,10 @@
     .gif-panel .gif-panel-results {
         column-count: 18;
     }
+}
+
+body.in-call .gif-panel .gif-panel-results {
+    column-count: 4;
 }
 
 .gif-panel .gif-panel-results .node-container {

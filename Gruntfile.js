@@ -199,8 +199,7 @@ var Secureboot = function() {
                 var currentSection =
                     content[i].indexOf('if (is_drop') > 0 ? 'drop' :
                         content[i].indexOf('if (is_embed') > 0 ? 'embed' :
-                            content[i].indexOf('if (is_litesite') > 0 ? 'lite' :
-                                section;
+                            section;
 
                 if (currentSection !== section) {
                     // console.log('Section move, %s->%s', section, currentSection);
@@ -863,6 +862,14 @@ module.exports = function(grunt) {
                     require('htmlnano')({
                         removeEmptyAttributes: false,
                         sortAttributesWithLists: false,
+                        removeComments(comments) {
+                            const clean = comments.replace(/<!--[\S\s]*?-->/, '').trim();
+                            if (clean) {
+                                process.stderr.write(`WARNING: text-node surrounding comment: ${comments}\n`);
+                                return false;
+                            }
+                            return true;
+                        },
                         collapseWhitespace: process.env.DEBUG ? false : 'conservative'
                     })
                 ])

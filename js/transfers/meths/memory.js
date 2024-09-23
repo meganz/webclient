@@ -38,7 +38,6 @@
  * ***************** END MEGA LIMITED CODE REVIEW LICENCE ***************** */
 
 (function(scope) {
-    var msie = typeof MSBlobBuilder === 'function';
     var hasDownloadAttr = "download" in document.createElementNS("http://www.w3.org/1999/xhtml", "a");
 
     function MemoryIO(dl_id, dl) {
@@ -51,46 +50,27 @@
         }
 
         this.write = function(buffer, position, done) {
+            if (!dblob) {
+                return done();
+            }
             try {
-                if (msie) {
-                    dblob.append(have_ab ? buffer : buffer.buffer);
-                }
-                else {
-                    dblob.push(new Blob([buffer]));
-                }
+                dblob.push(new Blob([buffer]));
             }
             catch (e) {
                 dlFatalError(dl, e);
             }
-            offset += (have_ab ? buffer : buffer.buffer).length;
+            offset += buffer.length;
             buffer = null;
-            onIdle(done);
+            queueMicrotask(done);
         };
 
         this.download = function(name, path) {
-            var blob = this.getBlob(name);
+            var blob = dblob && this.getBlob(name);
 
-            if (this.completed) {
+            if (!blob || this.completed) {
                 if (d) {
                     console.log('Transfer already completed...', dl);
                 }
-            }
-            else if (is_chrome_firefox) {
-                requestFileSystem(0, blob.size, function(fs) {
-                    var opt = {
-                        create: !0,
-                        fxo: dl
-                    };
-                    fs.root.getFile(dl_id, opt, function(fe) {
-                        fe.createWriter(function(fw) {
-                            fw.onwriteend = fe.toURL.bind(fe);
-                            fw.write(blob);
-                        });
-                    });
-                });
-            }
-            else if (msie) {
-                navigator.msSaveOrOpenBlob(blob, name);
             }
             else if (hasDownloadAttr) {
                 var blob_url = myURL.createObjectURL(blob);
@@ -128,29 +108,13 @@
         this.openInBrowser = function(name) {
             var blob = this.getBlob(name || dl.n);
 
-            if (/CriOS/i.test(navigator.userAgent)) {
-                var reader = new FileReader();
-                reader.onload = function() {
-                    window.open(reader.result, '_blank');
-                };
-                reader.onerror = function(ex) {
-                    alert(ex.message || ex);
-                };
-                reader.readAsDataURL(blob);
-            }
-            else {
-                // XXX: As of Chrome 69+ the object/blob uri may gets automatically revoked
-                //      when leaving the site, causing a later Download invocation to fail.
-                var blobURI = myURL.createObjectURL(blob);
+            // XXX: As of Chrome 69+ the object/blob uri may gets automatically revoked
+            //      when leaving the site, causing a later Download invocation to fail.
+            var blobURI = myURL.createObjectURL(blob);
 
-                mBroadcaster.once('visibilitychange:false', function() {
-                    later(function() {
-                        myURL.revokeObjectURL(blobURI);
-                    });
-                });
-
-                window.open(blobURI);
-            }
+            mBroadcaster.once('visibilitychange:false', () => later(() => myURL.revokeObjectURL(blobURI)));
+            // eslint-disable-next-line local-rules/open
+            window.open(blobURI);
         };
 
         this.setCredentials = function(url, size, filename, chunks, sizes) {
@@ -161,38 +125,20 @@
             if (size > MemoryIO.fileSizeLimit) {
                 dlFatalError(dl, Error(l[16872]));
                 if (!this.is_zip) {
-                    ASSERT(!this.begin, "This should have been destroyed 'while initializing'");
+                    ASSERT(!this.begin || dl.awaitingPromise, "This should have been destroyed 'while initializing'");
                 }
             }
             else {
-                dblob = msie ? new MSBlobBuilder() : [];
+                dblob = [];
                 this.begin();
             }
         };
 
         this.abort = function() {
-            if (dblob) {
-                if (!this.completed) {
-                    try {
-                        if (msie) {
-                            dblob.getBlob().msClose();
-                        }
-                        else {
-                            for (var i = dblob.length; i--;) {
-                                dblob[i].close();
-                            }
-                        }
-                    }
-                    catch (e) {}
-                }
-                dblob = undefined;
-            }
+            dblob = undefined;
         };
 
         this.getBlob = function(name) {
-            if (msie) {
-                return dblob.getBlob();
-            }
             try {
                 return new File(dblob, name, {type: filemime(name)});
             }
@@ -212,7 +158,7 @@
 
     Object.defineProperty(MemoryIO, 'canSaveToDisk', {
         get: function() {
-            return is_chrome_firefox || navigator.msSaveOrOpenBlob || hasDownloadAttr;
+            return !!hasDownloadAttr;
         }
     });
 

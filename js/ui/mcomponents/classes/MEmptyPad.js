@@ -1,12 +1,12 @@
 class MEmptyPad extends MComponent {
     buildElement() {
         this.el = document.createElement('div');
-        this.el.setAttribute('class', 'fm-empty-pad text-center');
+        this.el.className = 'fm-empty-pad text-center';
     }
 
     static createTxt(text, className) {
         const el = document.createElement('div');
-        el.setAttribute('class', className);
+        el.className = className;
         el.textContent = text;
 
         return el;
@@ -14,16 +14,15 @@ class MEmptyPad extends MComponent {
 
     static createIcon(className) {
         const icon = document.createElement('i');
-        icon.setAttribute('class', className);
-
+        icon.className = className;
         return icon;
     }
 
     static createOptionItem(text, iconClasses) {
         const el = document.createElement('div');
-        el.setAttribute('class', 'fm-empty-options-item');
+        el.className = 'fm-empty-options-item';
 
-        el.append(MEmptyPad.createIcon(iconClasses));
+        el.appendChild(MEmptyPad.createIcon(iconClasses));
         el.append(text);
 
         return el;
@@ -38,10 +37,10 @@ class MEmptyPad extends MComponent {
 
         for (let i = 0; i < array.length; i++) {
             const [text, icon] = array[i];
-            options.append(MEmptyPad.createOptionItem(text, icon));
+            options.appendChild(MEmptyPad.createOptionItem(text, icon));
         }
 
-        this.el.append(options);
+        this.el.appendChild(options);
     }
 
     remove() {

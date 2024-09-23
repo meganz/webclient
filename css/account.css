@@ -605,12 +605,30 @@ button.loading .loader {
     width: 456px;
     overflow: hidden;
     position: relative;
-    margin: 48px 0 0;
+    margin-top: 60px;
 }
 .login-slide-block {
-    margin-top: 0;
+    margin-top: 48px;
+}
+.trusted-users-section {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    color: var(--text-color-black-higher);
+    font-family: var(--text-font-family-second-regular);
+    font-size: 30px;
+    line-height: 36px;
+    margin: 120px auto 0;
+}
+.trusted-users-section .users-value {
+    color: rgba(255, 51, 58, 1);
+    font-family: var(--text-font-family-second-bold);
+    font-size: 54px;
+    line-height: 65px;
 }
 .register-slide-block h2, .login-slide-block h2 {
+    display: flex;
+    flex-direction: column;
     font-weight: 300;
     font-family: 'LatoWebLight','source_sans_proregular', Arial;
     margin: 32px 0 20px 0;
@@ -624,6 +642,7 @@ button.loading .loader {
     font-size: 14px;
     line-height: 20px;
     text-decoration: underline;
+    white-space: normal;
 }
 .register-slide-wrapper {
     white-space: nowrap;
@@ -640,6 +659,9 @@ button.loading .loader {
 }
 .register-slide-wrapper[data-slide="3"] {
     left: -913px;
+}
+.register-slide-wrapper[data-slide="4"] {
+    left: -1370px;
 }
 .register-slide .slider-ctrl-button {
     position: absolute;
@@ -676,4 +698,5 @@ button.loading .loader {
     display: inline-block;
     width: 100%;
     vertical-align: top;
+    white-space: normal;
 }

@@ -4,8 +4,11 @@ import {GenericNodePropsComponent} from "../genericNodePropsComponent";
 export class ColumnTimeAdded extends GenericNodePropsComponent {
     static sortable = true;
     static id = "ts";
-    static label = l[16169];
     static megatype = "timeAd";
+
+    static get label() {
+        return l[16169];
+    }
 
     render() {
         let {nodeAdapter} = this.props;

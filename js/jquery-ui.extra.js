@@ -1,6 +1,6 @@
 $.widget.extend($.ui.selectable.prototype, {
 
-    _create: function() {
+    _create: tryCatch(function() {
 
         'use strict';
 
@@ -76,11 +76,11 @@ $.widget.extend($.ui.selectable.prototype, {
 
         this._mouseInit();
 
-        this.helper = $('<div>');
-        this._addClass(this.helper, 'ui-selectable-helper');
-    },
+        this.helper = $(mCreateElement('div', {"class": "ui-selectable-helper"}));
+    }),
 
-    _mouseStart: function(event) {
+    // eslint-disable-next-line complexity -- @todo revamp
+    _mouseStart: tryCatch(function(event) {
 
         'use strict';
 
@@ -95,7 +95,7 @@ $.widget.extend($.ui.selectable.prototype, {
 
         this.opos = [event.pageX, event.pageY];
 
-        if (this.options.disabled) {
+        if (this.options.disabled || !this.helper) {
             return;
         }
 
@@ -162,11 +162,11 @@ $.widget.extend($.ui.selectable.prototype, {
         for (let i = $target.length; i--;) {
             var doSelect;
             const selectee = $.data($target[i], 'selectable-item');
-            if (selectee) {
+            if (selectee && selectee.element) {
                 doSelect = !event.metaKey && !event.ctrlKey ||
                     !selectee.$element.hasClass('ui-selected');
-                this._removeClass(selectee.$element, doSelect ? 'ui-unselecting' : 'ui-selected')
-                    ._addClass(selectee.$element, doSelect ? 'ui-selecting' : 'ui-unselecting');
+                selectee.element.classList.remove(doSelect ? 'ui-unselecting' : 'ui-selected');
+                selectee.element.classList.add(doSelect ? 'ui-selecting' : 'ui-unselecting');
                 selectee.unselecting = !doSelect;
                 selectee.selecting = doSelect;
                 selectee.selected = doSelect;
@@ -185,7 +185,7 @@ $.widget.extend($.ui.selectable.prototype, {
                 break;
             }
         }
-    },
+    }),
 
     _mouseDrag: function(event) {
 
@@ -193,7 +193,7 @@ $.widget.extend($.ui.selectable.prototype, {
 
         this.dragged = true;
 
-        if (this.options.disabled) {
+        if (this.options.disabled || !this.opos || !this.helper) {
             return;
         }
 
@@ -205,7 +205,7 @@ $.widget.extend($.ui.selectable.prototype, {
             pageY += this.element.scrollTop() - this.elementPos.top;
         }
 
-        var tmp;
+        let tmp, maxX, maxY;
         var options = this.options;
         var x1 = this.opos[0];
         var y1 = this.opos[1];
@@ -225,8 +225,8 @@ $.widget.extend($.ui.selectable.prototype, {
         // Lets limit drag within container only
         if (this.options.appendTo) {
 
-            var maxX = this.element[0].scrollWidth - 2;
-            var maxY = this.element[0].scrollHeight - 2;
+            maxX = this.element[0].scrollWidth - 2;
+            maxY = this.element[0].scrollHeight - 2;
 
             x1 = Math.max(0, x1);
             x2 = Math.min(maxX, x2);
@@ -375,7 +375,7 @@ $.widget.extend($.ui.selectable.prototype, {
                     this._mouseDrag(event);
                     this.refresh();
                 }
-            }, 20);
+            }, 50);
 
             if (M.megaRender && M.megaRender.megaList) {
                 M.megaRender.megaList.throttledOnScroll({target: this.element[0]});
@@ -385,7 +385,7 @@ $.widget.extend($.ui.selectable.prototype, {
         return false;
     },
 
-    _mouseStop: function(event) {
+    _mouseStop: tryCatch(function(event) {
 
         'use strict';
 
@@ -402,6 +402,10 @@ $.widget.extend($.ui.selectable.prototype, {
                 if (M.megaRender.megaList) {
                     delete this.mlistMap;
                 }
+            }
+
+            if (!(selectee && selectee.element)) {
+                continue;
             }
 
             if (elm.classList.contains('ui-unselecting')) {
@@ -432,7 +436,7 @@ $.widget.extend($.ui.selectable.prototype, {
         this.helper.remove();
 
         return false;
-    },
+    }),
 
     // MegaRender and MegaList related custom functions. Only works when there is MegaRender and List
     _getJQSelecteesFromMegaList: function() {

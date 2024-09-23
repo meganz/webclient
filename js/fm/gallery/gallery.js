@@ -7,12 +7,12 @@ class GalleryNodeBlock {
 
         this.spanEl = document.createElement('span');
         this.spanEl.className = 'data-block-bg content-visibility-auto';
-        this.el.append(this.spanEl);
+        this.el.appendChild(this.spanEl);
 
         this.el.nodeBlock = this;
         this.isRendered = false;
 
-        this.isVideo = mega.gallery.isGalleryVideo(this.node);
+        this.isVideo = mega.gallery.isVideo(this.node);
     }
 
     setThumb(dataUrl) {
@@ -22,36 +22,42 @@ class GalleryNodeBlock {
         if (this.el.nextSibling && this.el.nextSibling.classList.contains('gallery-block-bg-wrap')) {
             this.el.nextSibling.querySelector('img').src = dataUrl;
         }
+
+        mega.gallery.unsetShimmering(this.el);
+
+        if (this.thumb) {
+            this.thumb.classList.remove('w-full');
+        }
     }
 
     fill(mode) {
         this.el.setAttribute('title', this.node.name);
 
         const spanMedia = document.createElement('span');
-        this.spanEl.append(spanMedia);
-        spanMedia.className = 'block-view-file-type file sprite-fm-mono';
+        this.spanEl.appendChild(spanMedia);
+        spanMedia.className = 'item-type-icon-90';
         this.thumb = document.createElement('img');
-        spanMedia.append(this.thumb);
+        spanMedia.appendChild(this.thumb);
 
         if (this.isVideo) {
-            spanMedia.classList.add('icon-videos', 'video');
+            spanMedia.classList.add('icon-video-90');
             this.spanEl.classList.add('video');
 
             const div = document.createElement('div');
             div.className = 'video-thumb-details';
-            this.spanEl.append(div);
+            this.spanEl.appendChild(div);
 
             const spanTime = document.createElement('span');
             spanTime.textContent = secondsToTimeShort(MediaAttribute(this.node).data.playtime);
-            div.append(spanTime);
+            div.appendChild(spanTime);
         }
         else {
-            spanMedia.classList.add('icon-images', 'image');
+            spanMedia.classList.add('icon-image-90');
         }
 
         const spanFav = document.createElement('span');
         spanFav.className = 'data-block-fav-icon sprite-fm-mono icon-favourite-filled';
-        this.spanEl.append(spanFav);
+        this.spanEl.appendChild(spanFav);
 
         if (mode === 'm' || mode === 'y') {
             this.el.dataset.ts = this.node.mtime || this.node.ts;
@@ -110,7 +116,7 @@ class MegaGallery {
         this.lastAddedKeys = {};
         this.galleryBlock = document.getElementById('gallery-view');
         this.contentRowTemplateNode = document.getElementById('gallery-cr-template');
-        this.updNode = {};
+        this.updNode = Object.create(null);
         this.type = mega.gallery.sections[id] ? 'basic' : 'discovery';
         this.shouldProcessScroll = true;
         this.inPreview = false;
@@ -120,7 +126,14 @@ class MegaGallery {
     }
 
     get onpage() {
-        return this.id === M.currentCustomView.nodeID;
+        return this.id === M.currentCustomView.nodeID || (M.gallery && M.currentrootid === M.RootID);
+    }
+
+    mainViewNodeMapper(h) {
+        const n = M.d[h] || this.updNode[h] || false;
+
+        console.assert(!!n, `Node ${h} not found...`);
+        return n;
     }
 
     setObserver() {
@@ -134,6 +147,10 @@ class MegaGallery {
                     threshold: 0.1
                 }
             );
+
+        this.blockSizeObserver = typeof ResizeObserver === 'undefined'
+            ? null
+            : new ResizeObserver((entries) => MegaGallery.handleResize(entries));
     }
 
     dropDynamicList() {
@@ -210,7 +227,10 @@ class MegaGallery {
 
         this.dropDynamicList();
 
-        if (pushHistory === 2) {
+        if (pfid) {
+            pushHistoryState(true, Object.assign({}, history.state, {galleryMode: this.mode}));
+        }
+        else if (pushHistory === 2) {
             pushHistoryState(true, {subpage: page, galleryMode: this.mode});
         }
         else if (pushHistory === 1) {
@@ -616,7 +636,6 @@ class MegaGallery {
     }
 
     updateMonthMaxAndOrder() {
-
         const monthKeys = Object.keys(this.groups.m).sort((a, b) => b - a);
         let triEvenCount = 0;
 
@@ -691,6 +710,7 @@ class MegaGallery {
             }
 
             this.clearRenderCache(`m${ts}`);
+            this.updateMonthMaxAndOrder();
 
             if (this.dynamicList && this.mode === 'm' && (group.extn !== compareGroup.extn ||
                 !group.n.every(h => compareGroup.n.includes(h)))) {
@@ -792,19 +812,13 @@ class MegaGallery {
         this.groups.d[key].c++;
 
         if (this.groups.d[key].c <= 5) {
-
-            if (this.groups.d[key].n.length === 4) {
-
-                const itemsToMove = this.groups.d[key].n.splice(2, 2);
-
-                this.groups.d[key - 0.5] = {l: '', c: 0, mc: 0,  n: [...itemsToMove]};
-                this.groups.d[key - 0.5].n.push(h);
-            }
-            else {
-                this.groups.d[key].n.push(h);
-            }
-
+            this.groups.d[key].n.push(h);
             this.groups.d[key].n.sort(this.sortByMtime.bind(this));
+
+            if (this.groups.d[key].n.length === 5) {
+                const itemsToMove = this.groups.d[key].n.splice(2, 3);
+                this.groups.d[key - 0.5] = {l: '', c: 0, mc: 0,  n: [...itemsToMove]};
+            }
         }
         else {
             this.groups.d[key - 0.5].mc++;
@@ -1069,7 +1083,10 @@ class MegaGallery {
     }
 
     async addNodeToGroups(n) {
-        if (n.fv) {
+        if (
+            n.fv // Improper file version
+            || this.updNode[n.h] // The node is being added from another place
+        ) {
             return;
         }
 
@@ -1096,7 +1113,7 @@ class MegaGallery {
         this.addToYearGroup(n, updatedGroup[1]);
 
         if (this.dynamicList && this.onpage) {
-            M.v = Object.keys(this.nodes).map(h => M.d[h] || this.updNode[h]);
+            mega.gallery.fillMainView(this);
         }
 
         MegaGallery.sortViewNodes();
@@ -1123,7 +1140,7 @@ class MegaGallery {
         this.removeFromYearGroup(n.h, updatedGroup[1]);
 
         if (this.dynamicList && M.currentCustomView.original === this.id) {
-            M.v = Object.keys(this.nodes).map(h => M.d[h] || this.updNode[h]);
+            mega.gallery.fillMainView(this);
         }
 
         MegaGallery.sortViewNodes();
@@ -1146,7 +1163,7 @@ class MegaGallery {
             this.removeNodeFromGroups(M.d[h]);
         }
         else {
-            this.removeNodeFromGroups({h: h, mtime: this.nodes[h]});
+            this.removeNodeFromGroups({ h, mtime: this.nodes[h] });
         }
     }
 
@@ -1171,6 +1188,10 @@ class MegaGallery {
     }
 
     initDynamicList() {
+        const container = document.querySelector('.gallery-view-scrolling');
+        while (container.firstChild) {
+            container.removeChild(container.firstChild);
+        }
 
         this.slideShowCloseLister = mBroadcaster.addListener('slideshow:close', () => {
             delay('galleryCloseSlideShow', () => {
@@ -1186,17 +1207,19 @@ class MegaGallery {
             this.galleryBlock.classList.add(`zoom-${this.zoom}`);
         }
 
-        this.dynamicList = new MegaDynamicList(document.querySelector('.gallery-view-scrolling'), {
+        this.dynamicList = new MegaDynamicList(container, {
             'contentContainerClasses': 'content',
             'itemRenderFunction': this.renderGroup.bind(this),
             'itemHeightCallback': this.getGroupHeight.bind(this),
             'onResize': this.throttledResize.bind(this),
             'onScroll': this.throttledOnScroll.bind(this),
             'perfectScrollOptions': {
-                'handlers': ['click-rail', 'drag-scrollbar', 'wheel', 'touch'],
+                'handlers': ['click-rail', 'drag-thumb', 'wheel', 'touch'],
                 'minScrollbarLength': 20
             }
         });
+
+        M.initShortcutsAndSelection(container);
     }
 
     render(rewriteModeByRoot, reset) {
@@ -1220,6 +1243,30 @@ class MegaGallery {
             }
         }
 
+        const rfBlock = $('.fm-right-files-block', '.fmholder');
+        const galleryHeader = $('.gallery-tabs-bl', rfBlock);
+
+        galleryHeader.removeClass('hidden');
+        $('.gallery-section-tabs', galleryHeader).toggleClass('hidden', M.currentdirid === 'favourites');
+        rfBlock.removeClass('hidden');
+        $('.files-grid-view.fm, .fm-blocks-view.fm, .fm-right-header, .fm-empty-section', rfBlock).addClass('hidden');
+        $('.fm-files-view-icon').removeClass('active').filter('.media-view').addClass('active');
+
+        if (pfid && !M.v) {
+            $('.fm-empty-section', rfBlock).removeClass('hidden');
+        }
+
+        if (window.selectionManager) {
+            window.selectionManager.hideSelectionBar();
+        }
+
+        if (!mega.gallery.viewBtns) {
+            const viewBtns = $('.fm-header-buttons .view-links', rfBlock);
+            mega.gallery.viewBtns = viewBtns.clone(true);
+            galleryHeader.append(mega.gallery.viewBtns);
+            $('.view-links', galleryHeader).toggleClass('hidden', M.isGalleryPage());
+        }
+
         if (M.v.length > 0) {
             if (mega.gallery.emptyBlock) {
                 mega.gallery.emptyBlock.hide();
@@ -1237,11 +1284,15 @@ class MegaGallery {
             mega.gallery.showEmpty(M.currentdirid);
             this.galleryBlock.classList.add('hidden');
         }
+        tryCatch(() => {
+            galleryHeader.toggleClass('invisible', !M.v.length &&
+                (this.id === 'photos' || this.id === 'images' || this.id === 'videos'));
+        })();
     }
 
     resetAndRender() {
         if (this.dynamicList && M.currentCustomView.original === this.id) {
-            M.v = Object.keys(this.nodes).map(h => M.d[h] || this.updNode[h]);
+            mega.gallery.fillMainView(this);
         }
 
         MegaGallery.sortViewNodes();
@@ -1265,6 +1316,9 @@ class MegaGallery {
             selectionManager.add_to_selection(h);
 
             $.hideContextMenu(e);
+
+            // If the side Info panel is visible, update the information in it
+            mega.ui.mInfoPanel.reRenderIfVisible($.selected);
 
             return false;
         });
@@ -1308,16 +1362,19 @@ class MegaGallery {
 
             if (this.mode === 'a') {
                 const h = $eTarget.attr('id');
-                const n = M.d[h] || {};
+                const isVideo = e.currentTarget.nodeBlock.isVideo;
 
-                if (e.currentTarget.nodeBlock.isVideo) {
-                    if (!e.currentTarget.nodeBlock.isVideo.isPreviewable || !MediaAttribute.getMediaType(n)) {
+                if (isVideo) {
+                    if (!isVideo.isVideo) {
                         M.addDownload([h]);
                         return;
                     }
 
                     $.autoplay = h;
                 }
+
+                // Close node Info panel as it's not applicable when opening Preview
+                mega.ui.mInfoPanel.closeIfOpen();
 
                 this.inPreview = true;
                 slideshow(h, false);
@@ -1382,12 +1439,14 @@ class MegaGallery {
 
         $('.gallery-view-zoom-control > button', this.galleryBlock).rebind('click.galleryZoom', e => {
             e.stopPropagation();
-
             $.hideContextMenu(e);
 
-            if (!this.$middleBlock) {
-                this.$middleBlock = this.findMiddleImage();
+            if (!this.dynamicList) {
+                // @todo dropDynamicList() shall $.off()..?
+                return false;
             }
+
+            this.$middleBlock = this.findMiddleImage();
 
             if (e.currentTarget.classList.contains('disabled')) {
                 return false;
@@ -1414,24 +1473,43 @@ class MegaGallery {
 
         if (!this.beforePageChangeListener) {
             this.beforePageChangeListener = mBroadcaster.addListener('beforepagechange', tpage => {
+                const pageId = String(self.page).replace('fm/', '');
+                if (this.inPreview && (pageId.length < 5 ? M.RootID === M.currentdirid : pageId === M.currentdirid)) {
+                    return;
+                }
 
                 this.dropDynamicList();
 
-                // Clear render cache for free memory
+                // Clear render cache to free memory
                 this.clearRenderCache();
 
+                if (pfid && !tpage.startsWith('folder/')) {
+                    $('.fm-files-view-icon.media-view').addClass('hidden');
+                }
+
+                const id = tpage.replace(/^fm\//, '');
+
+                if (!mega.gallery.sections[id] && !id.startsWith('discovery/')) {
+                    $('.gallery-tabs-bl', '.fm-right-files-block').addClass('hidden');
+                }
+
                 // Clear thumbnails to free memory if target page is not gallery anymore
-                if (M.isCustomView(tpage).type !== 'gallery') {
-                    mBroadcaster.removeListener(this.beforePageChangeListener);
-                    delete this.beforePageChangeListener;
+                mBroadcaster.removeListener(this.beforePageChangeListener);
+                delete this.beforePageChangeListener;
 
-                    // Clear discovery
-                    if (this.isDiscovery) {
-                        delete mega.gallery.discovery;
+                // Clear discovery when it's not applicable anymore
+                if (
+                    this.isDiscovery
+                    && (
+                        !M.gallery
+                        || pfid
+                        || M.currentdirid !== tpage
+                    )
+                ) {
+                    delete mega.gallery.discovery;
 
-                        if (mega.gallery.mdReporter.runId) {
-                            mega.gallery.mdReporter.stop();
-                        }
+                    if (mega.gallery.reporter.runId) {
+                        mega.gallery.reporter.stop();
                     }
                 }
 
@@ -1447,21 +1525,31 @@ class MegaGallery {
             });
         }
 
-        $(window).rebind('popstate.galleryview', e => {
+        $(window).rebind('popstate.galleryview', (ev) => {
             if (mega.gallery.titleControl) {
                 mega.gallery.titleControl.hide();
             }
 
-            if (e.originalEvent.state.galleryMode && this.id === M.currentdirid) {
-                this.setMode(e.originalEvent.state.galleryMode, undefined, true);
-                this.render(false);
+            if (!this.inPreview) {
+                const { state = false } = ev.originalEvent || !1;
+
+                if (state && state.galleryMode && this.onpage) {
+                    this.setMode(state.galleryMode, undefined, true);
+                    this.render(false);
+
+                    this.inPreview = !!state.view;
+                }
             }
         });
 
-        if (this.isDiscovery) {
-            $('.gallery-close-discovery').rebind('click.exitDiscovery', () => {
-                M.openFolder(this.id);
-            });
+        if (!pfid && M.currentdirid.substr(0, 9) === 'discovery') {
+            $('.gallery-close-discovery', '.gallery-tabs-bl')
+                .removeClass('hidden')
+                .rebind('click.exitDiscovery', () => {
+
+                    M.openFolder(this.id).catch(dump);
+                    return false;
+                });
 
             $(window).rebind('keyup.exitDiscovery', e => {
                 if (e.keyCode === 27 && !this.inPreview) { // ESC key pressed
@@ -1561,7 +1649,7 @@ class MegaGallery {
         const iconBlock = document.createElement('i');
 
         iconBlock.classList.add('sprite-fm-mono', 'icon-arrow-right');
-        dateblock.append(iconBlock);
+        dateblock.appendChild(iconBlock);
         groupWrap.prepend(dateblock);
 
         if (group.r) {
@@ -1596,8 +1684,8 @@ class MegaGallery {
             bgimg.classList.add('gallery-block-bg');
             wrap.classList.add('gallery-block-bg-wrap');
 
-            wrap.append(bgimg);
-            contentBlock.append(wrap);
+            wrap.appendChild(bgimg);
+            contentBlock.appendChild(wrap);
         }
     }
 
@@ -1625,6 +1713,8 @@ class MegaGallery {
         }
 
         const elm = new GalleryNodeBlock(node);
+
+        mega.gallery.setShimmering(elm.el);
 
         if (this.nodeBlockObserver) {
             this.nodeBlockObserver.observe(elm.el, this);
@@ -1737,10 +1827,12 @@ class MegaGallery {
     }
 
     setView() {
+        const tempSubfolderMd = this.subfolderMd;
+        this.subfolderMd = !mega.config.get('noSubfolderMd');
 
-        if (this.nodes) {
+        if (this.nodes && this.subfolderMd === tempSubfolderMd) {
 
-            M.v = Object.keys(this.nodes).map(h => M.d[h] || this.updNode[h]);
+            mega.gallery.fillMainView(this);
             MegaGallery.sortViewNodes();
 
             return false;
@@ -1775,19 +1867,23 @@ class MegaGallery {
 class MegaTargetGallery extends MegaGallery {
 
     async setView() {
-
         if (super.setView() === false) {
             return false;
         }
 
-        const handles = this.id === 'photos' ? MegaGallery.getCameraHandles() : M.getTreeHandles(this.id);
+        const handles = this.id === 'photos' ? MegaGallery.getCameraHandles()
+            : this.subfolderMd ? M.getTreeHandles(this.id) : [this.id];
         let subs = [];
 
-        await dbfetch.geta(handles).catch(nop);
+        if (self.fmdb) {
+            await dbfetch.geta(handles).catch(nop);
+        }
 
         for (let i = handles.length; i--;) {
             if (!M.c[handles[i]]) {
-                console.error(`Gallery cannot find handle ${handles[i]}`);
+                if (self.d && !M.d[handles[i]]) {
+                    console.error(`Gallery cannot find handle ${handles[i]}`);
+                }
                 continue;
             }
 
@@ -1809,7 +1905,7 @@ class MegaTargetGallery extends MegaGallery {
         for (const h of subs) {
             const n = M.d[h];
             this.nodes[n.h] = this.setGroup(n)[0];
-            M.v.push(M.d[n.h]);
+            M.v.push(n);
         }
 
         this.mergeYearGroup();
@@ -1819,7 +1915,34 @@ class MegaTargetGallery extends MegaGallery {
     }
 
     checkGalleryUpdate(n) {
-        if (!n.t && mega.gallery.isGalleryNode(n)) {
+        if (!mega.gallery.isGalleryNode(n)) {
+            return;
+        }
+
+        if (M.currentdirid === n.p && !M.v.length) {
+            $(`.fm-empty-folder, .fm-empty-folder-link, .fm-empty-${M.currentdirid}`, '.fm-right-files-block')
+                .addClass('hidden');
+        }
+
+        if (pfid) {
+            delay(`pfid_discovery:node_update${n.h}`, () => {
+                if (M.currentdirid === n.p) {
+                    if (this.nodes[n.h]) {
+                        this.updateNodeName(n);
+                    }
+                    else {
+                        this.addNodeToGroups(n);
+                    }
+                }
+                else if (this.nodes[n.h]) {
+                    this.removeNodeFromGroups(n);
+                }
+            });
+
+            return;
+        }
+
+        if (!n.t) {
             const cameraTree = M.getTreeHandles(this.isDiscovery ? this.id : M.CameraId);
             const rubTree = M.getTreeHandles(M.RubbishID);
 
@@ -1904,18 +2027,16 @@ class MegaMediaTypeGallery extends MegaGallery {
                 }
             }
 
-            dbfetch.geta(handles)
-                .then(() => {
-                    MegaGallery.dbActionPassed = true;
+            await dbfetch.geta(handles).catch(nop);
 
-                    this.updNode = {};
+            MegaGallery.dbActionPassed = true;
 
-                    // Initializing albums here for the performace's sake
-                    if (mega.gallery.albums.awaitingDbAction) {
-                        mega.gallery.albums.init();
-                    }
-                })
-                .catch(nop);
+            this.updNode = Object.create(null);
+
+            // Initializing albums here for the performace's sake
+            if (mega.gallery.albums.awaitingDbAction) {
+                mega.gallery.albums.init();
+            }
         }
 
         // This sort is needed for building groups, do not remove
@@ -1944,7 +2065,7 @@ class MegaMediaTypeGallery extends MegaGallery {
             }
         }
 
-        M.v = Object.keys(this.nodes).map(h => M.d[h] || this.updNode[h]);
+        mega.gallery.fillMainView(this);
 
         this.mergeYearGroup();
         this.filterMonthGroup();
@@ -2001,11 +2122,39 @@ class MegaMediaTypeGallery extends MegaGallery {
 mega.gallery = Object.create(null);
 mega.gallery.nodeUpdated = false;
 mega.gallery.albumsRendered = false;
+mega.gallery.publicSet = Object.create(null);
 mega.gallery.titleControl = null;
 mega.gallery.emptyBlock = null;
 mega.gallery.rootMode = {photos: 'a', images: 'a', videos: 'a'};
 mega.gallery.pendingFaBlocks = {};
 mega.gallery.pendingThumbBlocks = {};
+mega.gallery.disallowedExtensions = { 'PSD': true, 'SVG': true };
+
+/**
+ * @TODO: Remove this check once we bump all browsers up to support this feature
+ */
+mega.gallery.hasWebAnimationsApi = typeof document.body.getAnimations === 'function';
+
+Object.defineProperty(mega.gallery, 'albumsRendered', {
+    get() {
+        'use strict';
+        return this._albumsRendered;
+    },
+    set(value) {
+        'use strict';
+        if (this._albumsRendered && value === false) {
+            for (const id in this.albums.store) {
+                const album = this.albums.store[id];
+
+                if (album.cellEl) {
+                    album.cellEl.dropBackground();
+                }
+            }
+        }
+
+        this._albumsRendered = value;
+    }
+});
 
 mega.gallery.secKeys = {
     cuphotos: 'camera-uploads-photos',
@@ -2016,8 +2165,42 @@ mega.gallery.secKeys = {
     cdvideos: 'cloud-drive-videos'
 };
 
+mega.gallery.fillMainView = (list, mapper) => {
+    'use strict';
+
+    if (list instanceof MegaGallery) {
+        mapper = list.mainViewNodeMapper.bind(list);
+        list = Object.keys(list.nodes);
+    }
+    const {length} = list;
+
+    if (mapper) {
+        list = list.map(mapper);
+    }
+    M.v = list.filter(Boolean);
+
+    console.assert(M.v.length === length, 'check this... filtered invalid entries.');
+};
+
+mega.gallery.handleNodeRemoval = (n) => {
+    'use strict';
+
+    if (M.isAlbumsPage()) {
+        mega.gallery.albums.onCDNodeRemove(n);
+        mega.gallery.nodeUpdated = true;
+    }
+    else if (M.gallery) {
+        mega.gallery.checkEveryGalleryDelete(n.h);
+        mega.gallery.albums.onCDNodeRemove(n);
+    }
+    else {
+        mega.gallery.nodeUpdated = true;
+        mega.gallery.albumsRendered = false;
+    }
+};
+
 /**
- * Same as is_image3(), additionally checking whether the node meet requirements for photo/media gallery.
+ * Checking if the file is even available for the gallery
  * @param {String|MegaNode|Object} n An ufs-node, or filename
  * @param {String} [ext] Optional filename extension
  * @returns {Number|String|Function|Boolean}
@@ -2026,8 +2209,68 @@ mega.gallery.isGalleryNode = (n, ext) => {
     'use strict';
 
     ext = ext || fileext(n && n.name || n, true, true);
+    return n.fa && (mega.gallery.isImage(n, ext) || mega.gallery.isVideo(n));
+};
 
-    return ext !== 'PSD' && is_image3(n, ext) || mega.gallery.isGalleryVideo(n);
+/**
+     * Adding a loading icon to the cell
+     * @param {HTMLElement} el DOM Element to add the loading icon to
+     * @param {Boolean} isVideo Whether to attach loading icon as for a video or an image
+     * @returns {void}
+     */
+mega.gallery.setShimmering = (el) => {
+    'use strict';
+
+    // Image is already loaded
+    if (el.style.backgroundImage) {
+        return;
+    }
+
+    el.classList.add('shimmer');
+
+    if (mega.gallery.hasWebAnimationsApi) {
+        requestAnimationFrame(() => {
+            const anims = el.getAnimations();
+
+            for (let i = 0; i < anims.length; i++) {
+                anims[i].startTime = 0;
+            }
+        });
+    }
+};
+
+/**
+ * Removing the loading icon from the cell
+ * @param {HTMLElement} el DOM Element to remove the loading icon from
+ * @returns {void}
+ */
+mega.gallery.unsetShimmering = (el) => {
+    'use strict';
+    el.classList.remove('shimmer');
+};
+
+/**
+ * Checking if the file is qualified to have a preview
+ * @param {String|MegaNode|Object} n An ufs-node, or filename
+ * @param {String} [ext] Optional filename extension
+ * @returns {Number|String|Function|Boolean}
+ */
+mega.gallery.isPreviewable = (n, ext) => {
+    'use strict';
+    return is_image3(n, ext) || is_video(n);
+};
+
+/**
+ * Same as is_image3(), additionally checking whether the node meet requirements for photo/media gallery.
+ * @param {String|MegaNode|Object} n An ufs-node, or filename
+ * @param {String} [ext] Optional filename extension
+ * @returns {Boolean}
+ */
+mega.gallery.isImage = (n, ext) => {
+    'use strict';
+
+    ext = ext || fileext(n && n.name || n, true, true);
+    return !mega.gallery.disallowedExtensions[ext] && is_image3(n, ext);
 };
 
 /**
@@ -2035,7 +2278,7 @@ mega.gallery.isGalleryNode = (n, ext) => {
  * @param {Object} n ufs node
  * @returns {Object.<String, Number>|Boolean}
  */
-mega.gallery.isGalleryVideo = (n) => {
+mega.gallery.isVideo = (n) => {
     'use strict';
 
     if (!n || !n.fa || !n.fa.includes(':8*')) {
@@ -2111,6 +2354,20 @@ mega.gallery.checkEveryGalleryDelete = h => {
     }
 };
 
+mega.gallery.clearMdView = () => {
+    'use strict';
+    const $mediaIcon = $('.fm-files-view-icon.media-view').addClass('hidden');
+
+    if (M.gallery) {
+        $mediaIcon.removeClass('active');
+        $('.gallery-tabs-bl').addClass('hidden');
+        $(`.fm-files-view-icon.${M.viewmode ? 'block-view' : 'listing-view'}`).addClass('active');
+
+        assert(pfid);
+        M.gallery = false;
+    }
+};
+
 mega.gallery.resetAll = () => {
     'use strict';
 
@@ -2133,8 +2390,15 @@ mega.gallery.resetAll = () => {
     mega.gallery.nodeUpdated = false;
 };
 
-mega.gallery.showEmpty = (type) => {
+mega.gallery.showEmpty = (type, noMoreFiles) => {
     'use strict';
+
+    if (noMoreFiles || M.currentrootid === M.RootID &&
+        (!M.c[M.currentdirid] || !Object.values(M.c[M.currentdirid]).length)) {
+        $('.fm-empty-folder', '.fm-right-files-block').removeClass('hidden');
+        $(`.fm-empty-${M.currentdirid}`, '.fm-right-files-block').addClass('hidden');
+        return;
+    }
 
     if (!mega.gallery.emptyBlock) {
         mega.gallery.emptyBlock = new GalleryEmptyBlock('.fm-main.default > .fm-right-files-block');
@@ -2142,14 +2406,6 @@ mega.gallery.showEmpty = (type) => {
 
     mega.gallery.emptyBlock.type = type;
     mega.gallery.emptyBlock.show();
-};
-
-mega.gallery.hideEmpty = () => {
-    'use strict';
-
-    if (mega.gallery.emptyBlock) {
-        mega.gallery.emptyBlock.hide();
-    }
 };
 
 /**
@@ -2181,7 +2437,7 @@ mega.gallery.arrayBufferContainsAlpha = (ab) => {
 /**
  * A method to make/load the thumbnails of specific size based on the list of handles provided
  * @param {Array} keys Handle+size key to fetch from local database or to generate.
- * Key example: `1P9hFJwb|w233` - handle is 1P9hFJwb, width 233px
+ * Key example: `1P9hFJwb|w320` - handle is 1P9hFJwb, width 320px
  * @param {Function} [onLoad] Single image successful load callback
  * @param {Function} [onErr] Callback when a single image is failed to load
  * @returns {void}
@@ -2189,7 +2445,7 @@ mega.gallery.arrayBufferContainsAlpha = (ab) => {
 mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
     'use strict';
 
-    const {dbLoading} = mega.gallery;
+    const { dbLoading } = mega.gallery;
 
     if (!MegaGallery.workerBranch) {
         MegaGallery.workerBranch = await webgl.worker.attach();
@@ -2198,16 +2454,34 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
     if (dbLoading) {
         await dbLoading;
     }
-    const {workerBranch} = MegaGallery;
+
+    const { workerBranch } = MegaGallery;
+
+    const isLocationCorrect = () => {
+        if (pfid || M.isGalleryPage() || M.isAlbumsPage() || M.gallery) {
+            return true;
+        }
+
+        console.log(`Cancelling the thumbnail request...`);
+        return false;
+    };
 
     const processBlob = (key, blob) => {
-
         webgl.readAsArrayBuffer(blob)
             .then((ab) => {
+                if (!isLocationCorrect()) {
+                    return;
+                }
+
                 ab.type = blob.type;
 
-                onLoad(key, ab);
-                return mega.gallery.lru.set(key, ab);
+                mega.gallery.lru.set(key, ab).then(() => {
+                    if (!isLocationCorrect()) {
+                        return;
+                    }
+
+                    onLoad(key, ab);
+                });
             })
             .catch(dump);
     };
@@ -2217,6 +2491,10 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
     const faData = {};
 
     for (let i = 0; i < keys.length; i++) {
+        if (!isLocationCorrect()) {
+            return;
+        }
+
         const key = keys[i];
 
         // Fetching already stored thumbnail
@@ -2244,7 +2522,7 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
         const ext = fileext(node.name || node, true, true);
         const type = inThumbSize || GalleryNodeBlock.allowsTransparent[ext] || ext === 'SVG' ? 0 : 1;
 
-        faData[fa] = {
+        faData[key] = {
             key,
             handle: node.h,
             byteSize: node.s,
@@ -2253,8 +2531,113 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
             ext
         };
 
-        fetchTypes[type][node.fa] = node;
+        fetchTypes[type][key] = node;
     }
+
+    const isAbAvailable = ab => ab !== 0xDEAD && ab.byteLength > 0;
+
+    const adjustBlobToConditions = async(key, thumbAB, type, size) => {
+        let blob;
+
+        const {
+            handle,
+            byteSize,
+            inThumbSize,
+            ext
+        } = faData[key];
+
+        // Checking if we can use the already received thumbAB, or we need to load the original
+        if (
+            byteSize < 8e6 // 8MB. The file size allows it to be fetched
+            && (
+                (!isAbAvailable(thumbAB) && type === 0) // Thumbnail is not available
+                || (
+                    !inThumbSize // Need bigger than the thumbnail
+                    && mega.gallery.arrayBufferContainsAlpha(thumbAB) // AB contains transparent pixels
+                    && GalleryNodeBlock.allowsTransparent[ext] // The image is designed to allow transparency
+                )
+            )
+        ) {
+            // The thumbnail and preview did not qualify for conditions, so original image must be fetched
+            const original = await M.gfsfetch(handle, 0, -1).catch(dump);
+
+            if (!isLocationCorrect()) {
+                return;
+            }
+
+            if (original) {
+                blob = await webgl.getDynamicThumbnail(original, size, workerBranch).catch(dump);
+            }
+        }
+
+        return blob;
+    };
+
+    const processUint8 = async(ctx, key, thumbAB, type) => {
+        if (!isLocationCorrect()) {
+            return;
+        }
+
+        const abIsEmpty = !isAbAvailable(thumbAB);
+        const {
+            handle,
+            pxSize
+        } = faData[key];
+
+        if (abIsEmpty && type === 1) { // Preview fetch is not successful
+            api_getfileattr(
+                { [key]: M.d[faData[key].handle] },
+                0,
+                (ctx1, key1, thumbAB1) => {
+                    processUint8(ctx1, key1, thumbAB1, 0);
+                }
+            );
+
+            onErr('The basic thumbnail image seems to be tainted...');
+            return;
+        }
+
+        const size = parseInt(pxSize) | 0;
+
+        let blob = await adjustBlobToConditions(key, thumbAB, type, size);
+
+        if (!isLocationCorrect()) {
+            return;
+        }
+
+        if (!blob && abIsEmpty) {
+            console.warn('Could not fetch neither of the available image options...');
+            return;
+        }
+
+        if (!blob) {
+            const bak = new ArrayBuffer(thumbAB.byteLength);
+            new Uint8Array(bak).set(new Uint8Array(thumbAB));
+
+            if (bak.byteLength) {
+                blob = await webgl.getDynamicThumbnail(bak, size, workerBranch).catch(dump);
+            }
+
+            if (!blob) {
+                blob = new Blob([thumbAB], { type: 'image/webp' });
+
+                if (!blob.size) {
+                    blob = null;
+                }
+            }
+        }
+
+        if (!isLocationCorrect()) {
+            return;
+        }
+
+        if (blob) {
+            processBlob(key, blob);
+        }
+        else {
+            onErr(`Could not generate dynamic thumbnail of ${size}px for ${handle}`);
+        }
+    };
 
     fetchTypes.forEach((nodes, type) => {
         if (!Object.keys(nodes).length) {
@@ -2264,60 +2647,84 @@ mega.gallery.generateSizedThumbnails = async(keys, onLoad, onErr) => {
         api_getfileattr(
             nodes,
             type,
-            async(thumbCtx, thumbFa, thumbAB) => {
-                let blob;
+            (ctx, key, thumbAB) => {
+                processUint8(ctx, key, thumbAB, type);
+            },
+            (key) => {
+                if (faData[key] && type) {
+                    console.warn(`Could not receive preview image for ${key}, reverting back to thumbnail...`);
 
-                if (thumbAB === 0xDEAD || thumbAB.length === 0) {
-                    if (d) {
-                        console.log(`Cannot make thumbnail for ${thumbFa}`);
-                    }
-
-                    onErr('The basic thumbnail image seems to be tainted...');
-                    return;
-                }
-
-                const {
-                    key,
-                    handle,
-                    pxSize,
-                    byteSize,
-                    inThumbSize,
-                    ext
-                } = faData[thumbFa];
-
-                const size = parseInt(pxSize) | 0;
-
-                // Checking when we can use the already receieved thumbAB (either `:0*` or `:1*`)
-                if (
-                    !inThumbSize // The image px size is bigger than the one we already have
-                    && byteSize < 8e6 // 8MB. The image size allows the network fetch
-                    && GalleryNodeBlock.allowsTransparent[ext] // The image is designed to be transparent
-                    && mega.gallery.arrayBufferContainsAlpha(thumbAB)  // The image contains alpha channel
-                ) {
-                    // The thumbnail did not qualify for `:0*` or `:1*`, so original image must be fetched
-                    const original = await M.gfsfetch(handle, 0, -1).catch(dump);
-
-                    if (original) {
-                        blob = await webgl.getDynamicThumbnail(original, size, workerBranch).catch(dump);
-                    }
-                }
-
-                blob = blob || await webgl.getDynamicThumbnail(thumbAB, size, workerBranch).catch(dump);
-
-                if (blob) {
-                    processBlob(key, blob);
-                }
-                else {
-                    onErr(`Could not generate dynamic thumbnail of ${size}px for ${handle}`);
+                    api_getfileattr(
+                        { [key]: M.d[faData[key].handle] },
+                        0,
+                        (ctx1, key1, thumbAB1) => {
+                            processUint8(ctx1, key1, thumbAB1, 0);
+                        }
+                    );
                 }
             }
         );
     });
 };
 
-async function galleryUI(id) {
-
+/**
+ * Clearing the check, so the next time the DB will be re-requested
+ */
+mega.gallery.removeDbActionCache = () => {
     'use strict';
+    MegaGallery.dbActionPassed = false;
+    mega.gallery.resetAll();
+};
+
+/**
+ * @param {HTMLCollection} elements The collection of the sidebar buttons
+ * @param {HTMLElement} galleryBtn The gallery button
+ * @returns {Promise<void>}
+ */
+mega.gallery.updateButtonsStates = async(elements, galleryBtn) => {
+    'use strict';
+
+    const galleryRoots = {
+        photos: true,
+        images: true,
+        videos: true
+    };
+    const { getItem } = await mega.gallery.prefs.init();
+
+    const res = getItem('web.locationPref');
+
+    if (!res || typeof res !== 'object' || !elements[0].querySelector) {
+        return;
+    }
+
+    const keys = Object.keys(res);
+
+    for (let i = 0; i < keys.length; i++) {
+        const pathKey = keys[i];
+
+        if (!galleryRoots[pathKey]) {
+            continue;
+        }
+
+        const btn = elements[0].querySelector(`.btn-galleries[data-link=${pathKey}]`);
+
+        if (btn) {
+            btn.dataset.locationPref = res[pathKey];
+        }
+
+        if (pathKey === 'photos') {
+            galleryBtn.dataset.locationPref = res[pathKey];
+        }
+    }
+};
+
+async function galleryUI(id) {
+    'use strict';
+
+    if (self.d) {
+        console.group(`Setting up gallery-view...`, M.currentdirid, id);
+        console.time('gallery-ui');
+    }
 
     loadingDialog.show('MegaGallery');
 
@@ -2327,15 +2734,40 @@ async function galleryUI(id) {
 
     let gallery = mega.gallery[M.currentdirid];
 
-    const $closeDiscovery = $('.gallery-close-discovery').addClass('hidden');
+    $('.gallery-close-discovery', '.gallery-tabs-bl').addClass('hidden');
 
     if (!mega.gallery.titleControl) {
         mega.gallery.titleControl = new GalleryTitleControl('.gallery-tabs-bl .gallery-section-title');
     }
 
+    // cleanup existing (FM-side) MegaRender and such.
+    M.v = [];
+    $.selected = [];
+    M.gallery |= 1;
+    M.renderMain();
+    delay.cancel('rmSetupUI');
+
+    M.onTreeUIOpen(M.currentdirid);
+
+    if (pfid || M.gallery && !M.isGalleryPage() && !M.isAlbumsPage()) {
+        if (window.pfcol) {
+            return mega.gallery.albums.initPublicAlbum();
+        }
+        id = !id || typeof id !== 'string' ? M.currentdirid : id;
+        $('.view-links', '.gallery-tabs-bl').removeClass('hidden');
+    }
+    else {
+        $('.view-links', '.gallery-tabs-bl').addClass('hidden');
+    }
+
+    // This keeps the banner persistent when navigating from Recents to Gallery
+    $('.fm-right-files-block').addClass('visible-notification');
+
     // This is media discovery
     if (id) {
-        mega.gallery.mdReporter.report();
+        if (!pfid) {
+            mega.gallery.reporter.report(false, 'MD');
+        }
 
         if (!M.getNodeByHandle(id) || M.getNodeRoot(id) === M.RubbishID) {
 
@@ -2350,10 +2782,8 @@ async function galleryUI(id) {
         mega.gallery.titleControl.addTooltipToTitle();
 
         gallery = mega.gallery.discovery;
-
-        $closeDiscovery.removeClass('hidden');
     }
-    else {
+    else if (mega.gallery.sections[M.currentdirid]) {
         mega.gallery.titleControl.filterSection = M.currentdirid;
         mega.gallery.titleControl.title = mega.gallery.sections[M.currentdirid].title;
         mega.gallery.titleControl.icon = mega.gallery.sections[M.currentdirid].icon;
@@ -2361,9 +2791,11 @@ async function galleryUI(id) {
     }
 
     if (!gallery) {
-        await M.getCameraUploads().catch(nop);
+        if (!pfid) {
+            await M.getCameraUploads().catch(nop);
+        }
 
-        if (id !== undefined) {
+        if (id) {
             gallery = mega.gallery.discovery = new MegaTargetGallery(id);
         }
         else if (mega.gallery.sections[M.currentdirid]) {
@@ -2378,11 +2810,7 @@ async function galleryUI(id) {
         gallery.galleryBlock.classList.remove('gallery-type-fav');
     }
 
-    onIdle(async() => {
-
-        await gallery.setView().catch((ex) => {
-            console.error(ex);
-        });
+    gallery.setView().catch(dump).finally(() => {
 
         if (mega.gallery.modeBeforeReset && mega.gallery.modeBeforeReset[M.currentdirid]) {
 
@@ -2394,12 +2822,12 @@ async function galleryUI(id) {
         gallery.render(true, true);
         gallery.bindEvents();
 
-        M.viewmode = 1;
-
-        $.selectddUIgrid = '.gallery-view';
-        $.selectddUIitem = 'a';
-
         loadingDialog.hide('MegaGallery');
+
+        if (self.d) {
+            console.timeEnd('gallery-ui');
+            console.groupEnd();
+        }
     });
 }
 
@@ -2414,7 +2842,9 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
         GalleryNodeBlock.thumbCache = Object.create(null);
     }
 
+    const thumbSize = 240;
     const keys = [];
+    const thumbBlocks = {};
 
     for (let i = 0; i < nodeBlocks.length; i++) {
         if (!nodeBlocks[i].node) { // No node is associated with the block
@@ -2426,12 +2856,25 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
         /**
          * The element width to fetch with relation to dpx
          */
-        const width = parseInt(nodeBlocks[i].el.clientWidth * (window.devicePixelRatio || 1));
+        const width = parseInt(nodeBlocks[i].el.clientWidth) | 0;
         const key = MegaGallery.getCacheKey(fa, width);
 
         // In case fa is not arrived yet, placing the node to the buffer
         if (!fa) {
+            if (!mega.gallery.pendingFaBlocks[h]) {
+                mega.gallery.pendingFaBlocks[h] = Object.create(null);
+            }
+
             mega.gallery.pendingFaBlocks[h][width] = nodeBlocks[i];
+            continue;
+        }
+        else if (width <= thumbSize) {
+            if (thumbBlocks[nodeBlocks[i].node.h]) {
+                thumbBlocks[nodeBlocks[i].node.h].push(nodeBlocks[i]);
+            }
+            else {
+                thumbBlocks[nodeBlocks[i].node.h] = [nodeBlocks[i]];
+            }
             continue;
         }
 
@@ -2450,6 +2893,26 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
         else {
             mega.gallery.pendingThumbBlocks[key] = [nodeBlocks[i]];
         }
+
+        // Stretch the image when loading
+        if (nodeBlocks[i].thumb) {
+            nodeBlocks[i].thumb.classList.add('w-full');
+        }
+    }
+
+    // Checking if there are any re-usable thumbnails available
+    const thumbHandles = Object.keys(thumbBlocks);
+
+    if (thumbHandles.length) {
+        fm_thumbnails(
+            'standalone',
+            thumbHandles.map(h => M.d[h]),
+            ({ h, fa }) => {
+                for (let i = 0; i < thumbBlocks[h].length; i++) {
+                    thumbBlocks[h][i].setThumb(thumbnails.get(fa), fa);
+                }
+            }
+        );
     }
 
     // All nodes are in pending state, no need to proceed
@@ -2466,7 +2929,7 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
             if (!blocks[key]) {
                 return;
             }
-            const weAreOnGallery = M.currentCustomView.type === 'gallery' || M.currentCustomView.type === 'albums';
+            const weAreOnGallery = pfid || M.isGalleryPage() || M.isAlbumsPage() || M.gallery;
 
             if (d) {
                 console.assert(weAreOnGallery, `This should not be running!`);
@@ -2533,13 +2996,18 @@ MegaGallery.getCacheKey = (prefix, width) => {
     return width ? `${prefix}|w${parseInt(width)}` : prefix;
 };
 
-MegaGallery.handleIntersect = (entries, gallery) => {
+MegaGallery.handleIntersect = tryCatch((entries, gallery) => {
     'use strict';
 
     const toFetchAttributes = [];
 
     for (let i = 0; i < entries.length; i++) {
         const { isIntersecting, target: { nodeBlock } } = entries[i];
+
+        if (!nodeBlock) {
+            console.assert(false, 'MegaGallery.handleIntersect: nodeBlock not available.');
+            continue;
+        }
 
         if (isIntersecting) {
             if (!nodeBlock.isRendered) {
@@ -2550,13 +3018,42 @@ MegaGallery.handleIntersect = (entries, gallery) => {
             if (Array.isArray($.selected) && $.selected.includes(nodeBlock.node.h)) {
                 nodeBlock.el.classList.add('ui-selected');
             }
+
+            if (gallery.blockSizeObserver) {
+                gallery.blockSizeObserver.observe(nodeBlock.el);
+            }
+        }
+        else if (gallery.blockSizeObserver) {
+            gallery.blockSizeObserver.unobserve(nodeBlock.el);
         }
     }
 
     if (toFetchAttributes.length) {
         MegaGallery.addThumbnails(toFetchAttributes);
     }
-};
+});
+
+MegaGallery.handleResize = SoonFc(200, (entries) => {
+    'use strict';
+
+    const toFetchAttributes = [];
+    const fill = tryCatch((entry) => {
+        const {contentRect, target: {nodeBlock}, target: {nodeBlock: {thumb}}} = entry;
+
+        if (contentRect.width > thumb.naturalWidth) {
+            toFetchAttributes.push(nodeBlock);
+        }
+    });
+
+    for (let i = 0; i < entries.length; i++) {
+
+        fill(entries[i]);
+    }
+
+    if (toFetchAttributes.length) {
+        MegaGallery.addThumbnails(toFetchAttributes);
+    }
+});
 
 MegaGallery.dbAction = () => {
     'use strict';
@@ -2620,7 +3117,7 @@ lazy(mega.gallery, 'sections', () => {
             icon: 'photos',
             root: 'photos',
             filterFn: (n, cameraTree) => cameraTree && cameraTree.includes(n.p)
-                && (is_image3(n) || mega.gallery.isGalleryVideo(n)),
+                && (mega.gallery.isImage(n) || mega.gallery.isVideo(n)),
             title: l.gallery_camera_uploads
         },
         [mega.gallery.secKeys.cdphotos]: {
@@ -2628,75 +3125,84 @@ lazy(mega.gallery, 'sections', () => {
             icon: 'photos',
             root: 'photos',
             filterFn: (n, cameraTree) => (!cameraTree || !cameraTree.includes(n.p))
-                && (is_image3(n) || mega.gallery.isGalleryVideo(n)),
+                && (mega.gallery.isImage(n) || mega.gallery.isVideo(n)),
             title: l.gallery_from_cloud_drive
         },
         images: {
             path: 'images',
             icon: 'images',
             root: 'images',
-            filterFn: n => is_image3(n),
+            filterFn: n => mega.gallery.isImage(n),
             title: l.gallery_all_locations
         },
         [mega.gallery.secKeys.cuimages]: {
             path: mega.gallery.secKeys.cuimages,
             icon: 'images',
             root: 'images',
-            filterFn: (n, cameraTree) => cameraTree && cameraTree.includes(n.p) && is_image3(n),
+            filterFn: (n, cameraTree) => cameraTree && cameraTree.includes(n.p) && mega.gallery.isImage(n),
             title: l.gallery_camera_uploads
         },
         [mega.gallery.secKeys.cdimages]: {
             path: mega.gallery.secKeys.cdimages,
             icon: 'images',
             root: 'images',
-            filterFn: (n, cameraTree) => (!cameraTree || !cameraTree.includes(n.p)) && is_image3(n),
+            filterFn: (n, cameraTree) => (!cameraTree || !cameraTree.includes(n.p)) && mega.gallery.isImage(n),
             title: l.gallery_from_cloud_drive
         },
         videos: {
             path: 'videos',
             icon: 'videos',
             root: 'videos',
-            filterFn: n => mega.gallery.isGalleryVideo(n),
+            filterFn: n => mega.gallery.isVideo(n),
             title: l.gallery_all_locations
         },
         [mega.gallery.secKeys.cuvideos]: {
             path: mega.gallery.secKeys.cuvideos,
             icon: 'videos',
             root: 'videos',
-            filterFn: (n, cameraTree) => cameraTree && cameraTree.includes(n.p) && mega.gallery.isGalleryVideo(n),
+            filterFn: (n, cameraTree) => cameraTree && cameraTree.includes(n.p) && mega.gallery.isVideo(n),
             title: l.gallery_camera_uploads
         },
         [mega.gallery.secKeys.cdvideos]: {
             path: mega.gallery.secKeys.cdvideos,
             icon: 'videos',
             root: 'videos',
-            filterFn: (n, cameraTree) => (!cameraTree || !cameraTree.includes(n.p)) && mega.gallery.isGalleryVideo(n),
+            filterFn: (n, cameraTree) => (!cameraTree || !cameraTree.includes(n.p)) && mega.gallery.isVideo(n),
             title: l.gallery_from_cloud_drive
         },
         favourites: {
             path: 'favourites',
             icon: 'favourite-filled',
             root: 'favourites',
-            filterFn: n => is_image3(n) || mega.gallery.isGalleryVideo(n),
+            filterFn: n => mega.gallery.isImage(n) || mega.gallery.isVideo(n),
             title: l.gallery_favourites
         }
     };
 });
 
-lazy(mega.gallery, 'mdReporter', () => {
+lazy(mega.gallery, 'reporter', () => {
     'use strict';
 
-    /**
-     * @type {Array}
-     * @property {Number} 0 Timeout
-     * @property {Number} 1 EventId
-     */
-    const marks = [
-        [10, 99753],
-        [30, 99754],
-        [60, 99755],
-        [180, 99756]
-    ];
+    const intervals = {
+        MD: {
+            initEvt: 99900,
+            favEvt: 99757,
+            marks: [
+                [10, 99753], // This timeout value is also being used for Fav reporter
+                [30, 99754],
+                [60, 99755],
+                [180, 99756]
+            ]
+        },
+        Album: {
+            marks: [
+                [10, 99931],
+                [30, 99932],
+                [60, 99933],
+                [180, 99934]
+            ]
+        }
+    };
 
     /**
      * The number to qualify as a favourite
@@ -2705,7 +3211,6 @@ lazy(mega.gallery, 'mdReporter', () => {
     const timesOver = 3;
 
     const statsStorageKey = 'regularPageStats';
-    const mdPageKey = 'MD';
 
     /**
      * This one prevents events from sending same requests multiple times when leaving and coming back to the tab
@@ -2713,6 +3218,8 @@ lazy(mega.gallery, 'mdReporter', () => {
      * @type {Number[]}
      */
     let passedSessionMarks = [];
+    let sessionTimer = null;
+    let favTimer = null;
 
     let fmStats = null;
     let disposeVisibilityChange = null;
@@ -2736,72 +3243,101 @@ lazy(mega.gallery, 'mdReporter', () => {
 
     return {
         runId: 0,
-        notApplicable(currentPage, runId) {
-            return this.runId !== runId
-                || document.visibilityState === 'hidden'
-                || window.M.currentdirid !== currentPage;
+        sameRun(runId) {
+            return runId === this.runId && document.visibilityState !== 'hidden';
         },
-        report(skipReset) {
-            if (!skipReset && this.runId) {
-                this.stop(); // Stopping the previously initialised reporter's run
+        /**
+         * @param {Boolean} isCarryOn Whether to carry on the paused session or not (e.g. when visibility changes)
+         * @param {String} pageKey The page key to use for the reporting
+         * @returns {void}
+         */
+        report(isCarryOn, pageKey) {
+            const { initEvt, marks, favEvt } = intervals[pageKey];
+
+            if (!isCarryOn && initEvt) {
+                eventlog(initEvt);
+
+                // We need to stop the previously initialised reporter's run if any
+                if (this.runId) {
+                    this.stop();
+                }
             }
 
             this.runId = Date.now();
-            const {runId} = this;
+            const { runId } = this;
 
             disposeVisibilityChange = MComponent.listen(
                 document,
                 'visibilitychange',
                 () => {
                     if (document.visibilityState === 'visible' && this.runId === runId) {
-                        this.report(true);
+                        this.report(true, pageKey);
                     }
                 }
             );
 
-            this.reportSessionMarks(marks[0][0], M.currentdirid, 0, runId);
-            this.processSectionFavourite(M.currentdirid, runId);
+            sessionTimer = this.reportSessionMarks(marks[0][0], 0, runId, pageKey);
+
+            if (favEvt) {
+                favTimer = this.processSectionFavourite(runId, pageKey);
+            }
+
+            mBroadcaster.once('pagechange', () => {
+                this.stop();
+            });
         },
         /**
          * Sending time marks if the session time is surpassing a specific value
          * @param {Number} timeout
-         * @param {String} currentPage
          * @param {Number} diff Timeout to the next mark
          * @param {Number} runId Current report run id to check
+         * @param {String} pageKey The page key to use for the reporting
          */
-        reportSessionMarks(timeout, currentPage, diff, runId) {
+        reportSessionMarks(timeout, diff, runId, pageKey) {
+            const { marks } = intervals[pageKey];
             const eventIndex = marks.findIndex(([to]) => to === timeout);
+            const timer = tSleep(timeout - diff);
 
-            tSleep(timeout - diff).then(
+            timer.then(
                 () => {
-                    if (this.notApplicable(currentPage, runId)) {
+                    if (!this.sameRun(runId)) {
+                        sessionTimer = null;
                         return;
                     }
 
                     if (!passedSessionMarks.includes(timeout)) {
                         passedSessionMarks.push(timeout);
 
-                        window.eventlog(
-                            marks[eventIndex][1],
-                            `Session mark: ${mdPageKey} | ${timeout}s`
+                        delay(
+                            `gallery_stat_${marks[eventIndex][1]}`,
+                            eventlog.bind(null, marks[eventIndex][1], `Session mark: ${pageKey} | ${timeout}s`)
                         );
                     }
 
                     const nextIndex = eventIndex + 1;
                     if (marks[nextIndex]) {
-                        this.reportSessionMarks(marks[nextIndex][0], currentPage, timeout, runId);
+                        sessionTimer = this.reportSessionMarks(marks[nextIndex][0], timeout, runId, pageKey);
+                    }
+                    else {
+                        sessionTimer = null;
                     }
                 }
             );
+
+            return timer;
         },
         /**
          * Report if user visited a specific section/page more than timesOver times
-         * @param {String} currentPage
          * @param {Number} runId Current report run id to check
+         * @param {String} pageKey The page key to use for the reporting
          */
-        processSectionFavourite(currentPage, runId) {
-            tSleep(marks[0][0]).then(() => {
-                if (this.notApplicable(currentPage, runId)) {
+        processSectionFavourite(runId, pageKey) {
+            const { marks, favEvt } = intervals[pageKey];
+            const timer = tSleep(marks[0][0]);
+
+            timer.then(() => {
+                if (!this.sameRun(runId)) {
+                    favTimer = null;
                     return;
                 }
 
@@ -2810,20 +3346,23 @@ lazy(mega.gallery, 'mdReporter', () => {
                         fmStats = [];
                     }
 
-                    let section = fmStats.find(({ name }) => name === mdPageKey);
+                    let section = fmStats.find(({ name }) => name === pageKey);
 
                     if (section) {
                         section.count++;
                     }
                     else {
-                        section = {name: mdPageKey, count: 1, reported: false};
+                        section = { name: pageKey, count: 1, reported: false };
                         fmStats.push(section);
                     }
 
                     if (!section.reported) {
                         if (section.count >= timesOver) {
                             section.reported = true;
-                            eventlog(99757, `${mdPageKey} has been visited ${section.count} times`);
+                            delay(
+                                `gallery_stat_${favEvt}`,
+                                eventlog.bind(null, favEvt, `${pageKey} has been visited ${section.count} times`)
+                            );
                         }
 
                         M.setPersistentData(statsStorageKey, fmStats).catch(() => {
@@ -2832,6 +3371,8 @@ lazy(mega.gallery, 'mdReporter', () => {
                     }
                 });
             });
+
+            return timer;
         },
         stop() {
             if (typeof disposeVisibilityChange === 'function') {
@@ -2840,6 +3381,169 @@ lazy(mega.gallery, 'mdReporter', () => {
 
             this.runId = 0;
             passedSessionMarks = [];
+
+            if (sessionTimer) {
+                sessionTimer.abort();
+            }
+
+            if (favTimer) {
+                favTimer.abort();
+            }
         }
     };
+});
+
+lazy(mega.gallery, 'prefs', () => {
+    'use strict';
+
+    const prefKey = 'ccPref';
+    let data = {};
+
+    const saveUserAttribute = async() => {
+        const res = await Promise.resolve(mega.attr.get(u_attr.u, prefKey, false, true)).catch(dump);
+
+        if (res && res.cc && typeof res.cc === 'string') {
+            tryCatch(() => {
+                const tmp = JSON.parse(res.cc);
+                const tmpKeys = Object.keys(tmp);
+
+                for (let i = 0; i < tmpKeys.length; i++) {
+                    const key = tmpKeys[i];
+
+                    if (key === 'web') {
+                        continue;
+                    }
+
+                    data[key] = tmp[key];
+                }
+            })();
+        }
+
+        mega.attr.set(prefKey, { cc: JSON.stringify(data) }, false, true).catch(dump);
+    };
+
+    const p = {
+        init: async() => {
+            if (!u_attr) {
+                dump('Gallery preferences are disabled for guests...');
+                return;
+            }
+
+            if (p.getItem) {
+                return p;
+            }
+
+            if (!p.isInitializing) {
+                p.isInitializing = Promise.resolve(mega.attr.get(u_attr.u, prefKey, false, true)).catch(dump);
+
+                p.isInitializing
+                    .then((res) => {
+                        if (res && res.cc && typeof res.cc === 'string') {
+                            tryCatch(() => {
+                                data = JSON.parse(res.cc);
+                            })();
+                        }
+                    })
+                    .finally(() => {
+                        if (p.isInitializing) {
+                            delete p.isInitializing;
+                        }
+                    });
+            }
+
+            await p.isInitializing;
+
+            if (!p.getItem) {
+                /**
+                 * Getting the value by traversing through the dotted key
+                 * @param {String|String[]} keys Key(s) to use. Format is 'root.childKey1.childKey2...'
+                 * @param {Object.<String, any>} d Data to traverse through recursively
+                 * @returns {any}
+                 */
+                p.getItem = (keys, d) => {
+                    if (typeof keys === 'string') {
+                        keys = keys.split('.');
+                    }
+
+                    if (!d) {
+                        d = data;
+                    }
+
+                    const key = keys.shift();
+
+                    return (keys.length && d[key]) ? p.getItem(keys, d[key]) : d[key];
+                };
+
+                /**
+                 * Removing the value by traversing through the dotted key
+                 * @param {String|String[]} keys Key(s) to use. Format is 'root.childKey1.childKey2...'
+                 * @param {Object.<String, any>} d Data to traverse through recursively
+                 * @returns {void}
+                 */
+                p.removeItem = (keys, d) => {
+                    if (typeof keys === 'string') {
+                        keys = keys.split('.');
+                    }
+
+                    if (!d) {
+                        d = data;
+                    }
+
+                    const key = keys.shift();
+
+                    if (!d[key]) {
+                        saveUserAttribute();
+                        return;
+                    }
+
+                    if (keys.length) {
+                        p.removeItem(keys, d[key]);
+                    }
+                    else {
+                        delete d[key];
+                        saveUserAttribute();
+                    }
+                };
+
+                /**
+                 * Updating the value by traversing through the dotted key
+                 * @param {String|String[]} keys Key(s) to use. Format is 'root.childKey1.childKey2...'
+                 * @param {any} value Value to set
+                 * @param {Object.<String, any>} d Data to traverse through recursively
+                 * @returns {void}
+                 */
+                p.setItem = (keys, value, d) => {
+                    if (typeof keys === 'string') {
+                        keys = keys.split('.');
+                    }
+
+                    if (!d) {
+                        d = data;
+                    }
+
+                    const key = keys.shift();
+
+                    if (!d[key]) {
+                        d[key] = {};
+                    }
+
+                    if (!keys.length) {
+                        d[key] = value;
+                        saveUserAttribute();
+                        return;
+                    }
+
+                    if (typeof d[key] !== 'object') {
+                        d[key] = {};
+                    }
+
+                    p.setItem(keys, value, d[key]);
+                };
+            }
+
+            return p;
+        }
+    };
+
+    return p;
 });

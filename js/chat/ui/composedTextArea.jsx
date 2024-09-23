@@ -88,7 +88,8 @@ export default class ComposedTextArea extends MegaRenderMixin {
                             noArrow="true"
                             positionMy="left top"
                             positionAt="left bottom"
-                            vertOffset={4}>
+                            vertOffset={4}
+                            wrapper="#fmholder">
                             <div className="dropdown info-txt">{l[23753] ? l[23753] : "Send..."}</div>
                             <DropdownItem
                                 className="link-button"

@@ -11,6 +11,10 @@ class GalleryTitleControl extends MComponent {
         return this._filterSection || '';
     }
 
+    get locationPrefKey() {
+        return `web.locationPref.${this.filterSection}`;
+    }
+
     /**
      * Set the filter section
      * @param {String} section Gallery section to filter
@@ -106,6 +110,58 @@ class GalleryTitleControl extends MComponent {
         return 'cloud-drive-' + this._filterSection;
     }
 
+    /**
+     * @param {String} location Location preference to push to API
+     * @returns {void}
+     */
+    pushNewLocationPreference(location) {
+        if (this.rootBtn) {
+            this.rootBtn.dataset.locationPref = location;
+        }
+
+        if (this.filterSection === 'photos') {
+            const galleryBtn = document.querySelector('.nw-fm-left-icon.gallery');
+
+            if (galleryBtn) {
+                galleryBtn.dataset.locationPref = location;
+            }
+        }
+
+        mega.gallery.prefs.init().then(({ setItem }) => {
+            setItem(this.locationPrefKey, location);
+        });
+    }
+
+    clearLocationPreference() {
+        if (this.rootBtn && this.rootBtn.dataset.locationPref) {
+            delete this.rootBtn.dataset.locationPref;
+        }
+
+        mega.gallery.prefs.init().then(({ removeItem }) => {
+            removeItem(this.locationPrefKey);
+        });
+    }
+
+    /**
+     * @param {String} location Location to open
+     * @returns {void}
+     */
+    openLocationFolder(location) {
+        if (this.rootBtn && this.rootBtn.dataset.locationPref) {
+            tryCatch(
+                () => {
+                    this.pushNewLocationPreference(location);
+                },
+                () => {
+                    console.warn('Cannot set the preference for the location');
+                }
+            )();
+        }
+
+        this._menu.ignorePageNavigationOnce = true;
+        M.openFolder(location, true);
+    }
+
     attachTitle() {
         this.titleEl = document.createElement('span');
         this.el.append(this.titleEl);
@@ -146,35 +202,98 @@ class GalleryTitleControl extends MComponent {
     }
 
     resetItemOptions() {
+        this.rootBtn = document.querySelector(`.js-lp-gallery .btn-galleries[data-link=${this.filterSection}]`);
+
         this._menu.options = [
+            {
+                label: l.show_items_from
+            },
             {
                 label: this.allItemsTitle,
                 click: () => {
-                    M.openFolder(this._filterSection, true);
+                    this.openLocationFolder(this._filterSection);
                 },
+                selectable: true,
                 selected: M.currentdirid === this._filterSection
             },
-            { label: l.gallery_show_only },
             {
                 label: l.gallery_from_cloud_drive,
                 click: () => {
-                    M.openFolder(this.cdFolder, true);
+                    this.openLocationFolder(this.cdFolder);
                 },
+                selectable: true,
                 selected: M.currentdirid === this.cdFolder
             },
             {
                 label: l.gallery_camera_uploads,
                 click: () => {
-                    M.openFolder(this.cuFolder, true);
+                    this.openLocationFolder(this.cuFolder);
                 },
+                selectable: true,
                 selected: M.currentdirid === this.cuFolder
+            },
+            {
+                label: () => {
+                    const label = document.createElement('div');
+                    label.className = 'flex-1 flex flex-row items-center remember-location-pref';
+
+                    const span = document.createElement('span');
+                    span.className = 'flex-1';
+                    span.textContent = l.gallery_remember_location_pref;
+
+                    const checkbox = new MCheckbox({
+                        name: 'remember_location_pref',
+                        id: 'remember-location-pref',
+                        checked: false,
+                        passive: true
+                    });
+
+                    mega.gallery.prefs.init().then(({ getItem }) => {
+                        const location = getItem(this.locationPrefKey);
+                        checkbox.checked = typeof(location || null) === 'string';
+                    });
+
+                    const onChange = (status) => {
+                        checkbox.disabled = true;
+
+                        tryCatch(
+                            () => {
+                                if (status) {
+                                    this.pushNewLocationPreference(M.currentdirid);
+                                }
+                                else {
+                                    this.clearLocationPreference();
+                                }
+
+                                checkbox.disabled = false;
+                                checkbox.checked = status;
+                            },
+                            () => {
+                                console.warn('Could not update location preference...');
+                            }
+                        )();
+                    };
+
+                    span.onclick = () => {
+                        onChange(!checkbox.checked);
+                    };
+
+                    checkbox.onChange = (status) => {
+                        onChange(status);
+                    };
+
+                    label.appendChild(span);
+                    label.appendChild(checkbox.el);
+                    return label;
+                },
+                additionalClasses: 'px-6'
             }
         ];
     }
 
     initMenu() {
         if (!this._menu) {
-            this._menu = new MMenuSelect(this.el, ['item-bold']);
+            this._menu = new MMenuSelect(this.el, ['item-bold'], false);
             this._menu.width = 200;
         }
     }

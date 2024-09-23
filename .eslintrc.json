@@ -1,13 +1,12 @@
 {
     "env": {
         "browser": true,
-        "es6": true,
+        "es2020": true,
         "jquery": true,
         "mocha": true,
         "worker": true
     },
     "parserOptions": {
-        "ecmaVersion": 2018,
         "ecmaFeatures": {
             "jsx": true
         }
@@ -32,14 +31,21 @@
     "settings": {
         "polyfills": [
             // List of polyfills in place for eslint-plugin-compact to not complain about them
-            "Set",
-            "Number", // <- E.g. Number.isNaN, Number.parseFloat, etc are polyfilled on es6-shim.js
-            "Promise",
-            "TextEncoder",
-            "TextDecoder",
-            "Object.assign",
-            "Object.values"
+            "Array.findLast",
+            "Array.flat",
+            "Array.flatMap",
+            "document.exitFullscreen",
+            "navigator.locks",
+            "Object.fromEntries",
+            "Promise.allSettled",
+            "Promise.withResolvers",
+            "queueMicrotask",
+            "reportError",
+            "requestIdleCallback",
+            "structuredClone",
+            "WeakRef"
         ],
+        "lintAllEsApis": true,
         "react": {
             "version": "16.8.6"
         }
@@ -49,7 +55,7 @@
         "block-scoped-var": 2,
         "brace-style": [2, "stroustrup"],
         "comma-style": [2, "last"],
-        "complexity": [2, 15],
+        "complexity": [2, 18],
         "consistent-this": [2, "self"],
         "consistent-return": 0,
         "curly": [2, "all"],
@@ -123,6 +129,7 @@
         "no-void": 2,
         "no-with": 2,
         "no-whitespace-before-property": 2,
+        "object-shorthand": [2],
         "one-var": [2, {"initialized": "never"}],
         "operator-assignment": 2,
         "prefer-arrow-callback": [2, { "allowNamedFunctions": true }],
@@ -158,17 +165,31 @@
             "ignoredNodes": ["JSXElement"]
         }],
 
+        "no-restricted-syntax": [
+            "error",
+            {
+                "selector": "CallExpression[callee.name='gSetTimeout']",
+                "message": "Forbidden function call."
+            },
+            {
+                "selector": "CallExpression[callee.name='api_req']",
+                "message": "This function is deprecated, use api.req(), api.screq() or api.send() depending your use-case."
+            }
+        ],
+
         // ESLint plugins configuration follows
 
-        "compat/compat": 1,
+        "compat/compat": 2,
 
         "es/no-atomics": 2,
+        "es/no-bigint": "off",
         "es/no-exponential-operators": 2,
+        "es/no-object-fromentries": "off",
         "es/no-promise-all-settled": "off",
         "es/no-regexp-lookbehind-assertions": 2,
         "es/no-regexp-named-capture-groups": 2,
         "es/no-regexp-s-flag": 2,
-        "es/no-regexp-unicode-property-escapes": 2,
+        "es/no-regexp-unicode-property-escapes": "off",
         "es/no-trailing-function-commas": 2,
 
         "jquery/no-ajax": 2,
@@ -187,6 +208,7 @@
         "jquery/no-ready": 2,
 
         "local-rules/classes": 2,
+        "local-rules/good-boy": 2,
         "local-rules/hints": 2,
         "local-rules/jquery-replacements": 2,
         "local-rules/jquery-scopes": 1,
@@ -195,7 +217,7 @@
 
         "optimize-regex/optimize-regex": 2,
         "sonarjs/cognitive-complexity": [1, 48],
-        "sonarjs/no-duplicate-string": [1, 5],
+        "sonarjs/no-duplicate-string": [1, { "threshold": 6 }],
 
         "unicorn/catch-error-name": [2, {"name": "ex"}],
         "unicorn/consistent-destructuring": 1,
@@ -239,6 +261,7 @@
             ],
             "rules": {
                 "unicorn/no-array-push-push": 0,
+                "object-shorthand": 0,
                 "prefer-arrow-callback": 0,
                 "prefer-const": 0,
                 "prefer-destructuring": 0,

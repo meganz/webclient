@@ -19,11 +19,18 @@ mobile.proSignupPrompt = {
         // Cache the selector
         this.$dialog = $('.mobile.loginrequired-dialog');
         this.scrollPos = $('html').scrollTop();
+        this.onLowTierProPg = page === 'pro' && window.mProTab;
 
         // Initialise the buttons
         this.initCloseButton();
         this.initRegisterButton();
         this.initLoginButton();
+
+        // Update the title text if on low tier page
+        if (this.onLowTierProPg) {
+            $('.dialog-heading-text', this.$dialog).text(l[1768]);
+            $('.dialog-body-text', this.$dialog).text(l.log_in_to_continue);
+        }
 
         // Show the dialog
         this.$dialog.removeClass('hidden').addClass('overlay');
@@ -55,8 +62,17 @@ mobile.proSignupPrompt = {
         var $dialog = self.$dialog;
         var $closeButton = $dialog.find('.fm-dialog-close');
 
+        // Force the user to login if they want to view the low tier tab of the pro page
+        if (self.onLowTierProPg) {
+            $closeButton.addClass('hidden');
+            return;
+        }
+
         // Add click/tap handler
         $closeButton.off('tap').on('tap', function() {
+
+            // Trigger close event
+            delay('logindlg.close', eventlog.bind(null, 99861));
 
             // They don't want to continue with the Registration/Login so remove the flag
             sessionStorage.removeItem('proPageContinuePlanNum');
@@ -82,8 +98,16 @@ mobile.proSignupPrompt = {
         var self = this;
         var $registerButton = self.$dialog.find('.register');
 
+        if (self.onLowTierProPg) {
+            $registerButton.addClass('hidden');
+            return;
+        }
+
         // Add click/tap handler
         $registerButton.off('tap').on('tap', function() {
+
+            // Trigger register event
+            delay('logindlg.register', eventlog.bind(null, 99860));
 
             // Set the plan number they selected into sessionStorage for use after Registration/Login
             self.setSelectedPlanNum();
@@ -114,6 +138,9 @@ mobile.proSignupPrompt = {
 
         // Add click/tap handler
         $loginButton.off('tap').on('tap', function() {
+
+            // Trigger register event
+            delay('logindlg.login', eventlog.bind(null, 99859));
 
             // Set the plan number they selected into sessionStorage for use after Registration/Login
             self.setSelectedPlanNum();
@@ -149,6 +176,8 @@ mobile.proSignupPrompt = {
         var selectedPlanNum = pro.proplan2.selectedPlan || $('.pricing-page.plan.selected').data('payment');
 
         // Set the selected plan number so when they've completed Login and Registration they can proceed to pay
-        sessionStorage.setItem('proPageContinuePlanNum', selectedPlanNum);
+        if (typeof selectedPlanNum !== 'undefined') {
+            sessionStorage.setItem('proPageContinuePlanNum', selectedPlanNum);
+        }
     }
 };

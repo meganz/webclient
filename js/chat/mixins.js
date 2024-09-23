@@ -391,11 +391,13 @@ export class MegaRenderMixin extends React.Component {
             if (node) {
                 this.__intersectionVisibility = false;
 
-                setTimeout(() => {
+                onIdle(() => {
                     // bug in IntersectionObserver, that caused the intersection observer to not fire the initial
                     // visibility call once its initialized
                     this.__intersectionObserverInstance = new IntersectionObserver(
-                        ([entry]) => {
+                        (entries) => {
+                            // IntersectionObserver may queue events. Check the latest.
+                            const entry = entries.pop();
                             if (entry.intersectionRatio < 0.2 && !entry.isIntersecting) {
                                 this.__intersectionVisibility = false;
                             }
@@ -415,7 +417,7 @@ export class MegaRenderMixin extends React.Component {
                         }
                     );
                     this.__intersectionObserverInstance.observe(node);
-                }, 150);
+                });
             }
         }
         if (this.onResizeObserved) {
@@ -557,7 +559,10 @@ export class MegaRenderMixin extends React.Component {
     _recurseAddListenersIfNeeded(idx, map, depth) {
         depth |= 0;
 
-        if (map instanceof MegaDataMap) {
+        // Add a listener if there isn't one already.
+        if (map instanceof MegaDataMap
+            && !(this._contactChangeListeners && this._contactChangeListeners.includes(map))) {
+
             var cacheKey = this._getUniqueIDForMap(map, idx);
             var instanceId = this.getUniqueId();
 
@@ -565,6 +570,7 @@ export class MegaRenderMixin extends React.Component {
                 _propertyTrackChangesVars._listenersMap[instanceId] = Object.create(null);
             }
             if (!_propertyTrackChangesVars._listenersMap[instanceId][cacheKey]) {
+
                 _propertyTrackChangesVars._listenersMap[instanceId][cacheKey]
                     = [map, map.addChangeListener(() => this.onPropOrStateUpdated())];
             }
@@ -928,13 +934,39 @@ export class ContactAwareComponent extends MegaRenderMixin {
         this.loadContactInfo();
     }
 
-    loadContactInfo() {
-        const contact = this.props.contact;
-        const contactHandle = contact && (contact.h || contact.u);
+    _validContact() {
+        const { contact } = this.props;
+        if (!contact) {
+            return false;
+        }
+        return (contact.h || contact.u) in M.u;
+    }
 
-        if (!(contactHandle in M.u)) {
+    _attachRerenderCbContacts(others) {
+        if (!this._validContact()) {
             return;
         }
+        this.addDataStructListenerForProperties(this.props.contact, [
+            'name',
+            'firstName',
+            'lastName',
+            'nickname',
+            'm',
+            'avatar'
+        ].concat(Array.isArray(others) ? others : []));
+    }
+
+    attachRerenderCallbacks() {
+        this._attachRerenderCbContacts();
+    }
+
+    loadContactInfo() {
+        if (!this._validContact()) {
+            return;
+        }
+
+        const { contact, chatRoom } = this.props;
+        const contactHandle = contact.h || contact.u;
 
         const syncName = !ContactAwareComponent.unavailableNames[contactHandle] && !contact.firstName &&
             !contact.lastName;
@@ -957,14 +989,14 @@ export class ContactAwareComponent extends MegaRenderMixin {
             }
 
             const promises = [];
-            const chatHandle = is_chatlink.ph || (this.props.chatRoom && this.props.chatRoom.publicChatHandle);
+            const chatHandle = is_chatlink.ph || (chatRoom && chatRoom.publicChatHandle);
 
             if (syncName) {
-                promises.push(M.syncUsersFullname(contactHandle, chatHandle, new MegaPromise()));
+                promises.push(megaChat.plugins.userHelper.getUserName(contactHandle, chatHandle));
             }
 
             if (syncMail) {
-                promises.push(M.syncContactEmail(contactHandle, new MegaPromise()));
+                promises.push(M.syncContactEmail(contactHandle));
             }
 
             if (syncAvtr) {
@@ -979,7 +1011,7 @@ export class ContactAwareComponent extends MegaRenderMixin {
             // force stuck in "Loading" state
             // promises.push([function() { return new MegaPromise(); }]);
 
-            MegaPromise.allDone(promises)
+            return Promise.allSettled(promises)
                 .always(() => {
                     this.eventuallyUpdate();
                     this.__isLoadingContactInfo = false;
@@ -990,7 +1022,7 @@ export class ContactAwareComponent extends MegaRenderMixin {
         };
 
         if (syncName || syncMail || syncAvtr) {
-            this.__isLoadingContactInfo = setTimeout(loader, 300);
+            (this.__isLoadingContactInfo = tSleep(0.3)).then(loader).catch(dump);
         }
     }
 
@@ -1007,7 +1039,8 @@ export class ContactAwareComponent extends MegaRenderMixin {
         super.componentWillUnmount();
 
         if (this.__isLoadingContactInfo) {
-            clearTimeout(this.__isLoadingContactInfo);
+            this.__isLoadingContactInfo.abort();
+            this.__isLoadingContactInfo = false;
         }
     }
 

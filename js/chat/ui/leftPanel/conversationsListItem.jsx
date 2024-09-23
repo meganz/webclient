@@ -1,9 +1,14 @@
 import React from 'react';
 import { MegaRenderMixin, timing } from '../../mixins';
 import utils, { OFlowParsedHTML, ParsedHTML } from '../../../ui/utils.jsx';
-import { Avatar, ContactAwareName } from '../contacts.jsx';
+import { Avatar, ContactPresence } from '../contacts.jsx';
 
 export default class ConversationsListItem extends MegaRenderMixin {
+
+    state = {
+        isLoading: true,
+    };
+
     isLoading() {
         const mb = this.props.chatRoom.messagesBuff;
 
@@ -15,32 +20,31 @@ export default class ConversationsListItem extends MegaRenderMixin {
     }
 
     specShouldComponentUpdate() {
-        return !this.loadingShown;
-    }
-
-    componentWillMount() {
-        this.chatRoomChangeListener = SoonFc(200 + Math.random() * 400 | 0, () => {
-            if (d > 2) {
-                console.debug('%s: loading:%s', this.getReactId(), this.loadingShown, this.isLoading(), [this]);
-            }
-            this.safeForceUpdate();
-        });
-        this.props.chatRoom.rebind('onUnreadCountUpdate.conversationsListItem', () => {
-            delete this.lastMessageId;
-            this.safeForceUpdate();
-        });
-        this.props.chatRoom.addChangeListener(this.chatRoomChangeListener);
+        return !this.state.isLoading;
     }
 
     componentWillUnmount() {
         super.componentWillUnmount();
-        this.props.chatRoom.removeChangeListener(this.chatRoomChangeListener);
         this.props.chatRoom.unbind('onUnreadCountUpdate.conversationsListItem');
     }
 
     componentDidMount() {
         super.componentDidMount();
         this.eventuallyScrollTo();
+        const promise = this.isLoading();
+        if (promise && promise.always) {
+            promise.always(() => {
+                if (this.isMounted()) {
+                    this.setState({ isLoading: false });
+                }
+            });
+        }
+        else if (promise === false) {
+            this.setState({ isLoading: false });
+        }
+        this.props.chatRoom.rebind('onUnreadCountUpdate.conversationsListItem', () => {
+            this.safeForceUpdate();
+        });
     }
 
     componentDidUpdate() {
@@ -72,6 +76,20 @@ export default class ConversationsListItem extends MegaRenderMixin {
             return todayOrYesterday(timestamp * 1000) ? getTimeMarker(timestamp) : time2date(timestamp, 17);
         }
         return null;
+    }
+
+    getScheduledDateTime() {
+        const { scheduledMeeting } = this.props.chatRoom;
+
+        if (scheduledMeeting) {
+            const { nextOccurrenceStart, nextOccurrenceEnd } = scheduledMeeting;
+
+            return {
+                date: time2date(nextOccurrenceStart / 1000, 19),
+                startTime: toLocaleTime(nextOccurrenceStart),
+                endTime: toLocaleTime(nextOccurrenceEnd)
+            };
+        }
     }
 
     @timing(0.7, 8)
@@ -123,16 +141,18 @@ export default class ConversationsListItem extends MegaRenderMixin {
         else {
             return "unknown room type: " + chatRoom.roomId;
         }
-        this.loadingShown = this.isLoading();
 
         var unreadCount = chatRoom.messagesBuff.getUnreadCount();
         var isUnread = false;
 
         var notificationItems = [];
         if (chatRoom.havePendingCall() && chatRoom.state !== ChatRoom.STATE.LEFT) {
-            notificationItems.push(<i
-                className={"tiny-icon " + (chatRoom.isCurrentlyActive ? "blue" : "white") + "-handset"}
-                key="callIcon"/>);
+            notificationItems.push(
+                <i
+                    className="tiny-icon white-handset"
+                    key="callIcon"
+                />
+            );
         }
         if (unreadCount > 0) {
             notificationItems.push(
@@ -150,22 +170,9 @@ export default class ConversationsListItem extends MegaRenderMixin {
         var lastMessage = showHideMsg ? '' : chatRoom.messagesBuff.getLatestTextMessage();
         var lastMsgDivClasses;
 
-        if (lastMessage && lastMessage.renderableSummary && this.lastMessageId === lastMessage.messageId) {
-            lastMsgDivClasses = this._lastMsgDivClassesCache;
-            lastMessageDiv = this._lastMessageDivCache;
-            lastMsgDivClasses += (isUnread ? " unread" : "");
-            if (chatRoom.havePendingCall() || chatRoom.haveActiveCall()) {
-                lastMsgDivClasses += " call";
-                classString += " call-exists";
-            }
-        }
-        else if (lastMessage) {
+        if (lastMessage) {
             lastMsgDivClasses = "conversation-message" + (isUnread ? " unread" : "");
-            // safe some CPU cycles...
-            var renderableSummary = lastMessage.renderableSummary || chatRoom.messagesBuff.getRenderableSummary(
-                lastMessage
-            );
-            lastMessage.renderableSummary = renderableSummary;
+            const renderableSummary = chatRoom.messagesBuff.getRenderableSummary(lastMessage);
 
             if (chatRoom.havePendingCall() || chatRoom.haveActiveCall()) {
                 lastMsgDivClasses += " call";
@@ -177,11 +184,10 @@ export default class ConversationsListItem extends MegaRenderMixin {
                         {renderableSummary}
                     </ParsedHTML>
                 </div>;
-            const voiceClipType = Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP;
 
             if (
                 lastMessage.textContents &&
-                lastMessage.textContents[1] === voiceClipType &&
+                lastMessage.textContents[1] === Message.MANAGEMENT_MESSAGE_TYPES.VOICE_CLIP &&
                 lastMessage.getAttachmentMeta()[0]
             ) {
                 const playTime = secondsToTimeShort(lastMessage.getAttachmentMeta()[0].playtime);
@@ -213,16 +219,9 @@ export default class ConversationsListItem extends MegaRenderMixin {
             lastMessageDiv = showHideMsg
                 ? '' :
                 <div className={lastMsgDivClasses}>
-                    {this.loadingShown ? l[7006] : l[8000]}
+                    {this.state.isLoading ? l[7006] : l[8000]}
                 </div>;
         }
-
-        this.lastMessageId = lastMessage && lastMessage.messageId;
-        this._lastMsgDivClassesCache = lastMsgDivClasses
-            .replace(" call-exists", "")
-            .replace(" unread", "");
-        this._lastMessageDivCache = lastMessageDiv;
-
 
         if (chatRoom.type !== "public") {
             nameClassString += " privateChat";
@@ -230,31 +229,38 @@ export default class ConversationsListItem extends MegaRenderMixin {
         let roomTitle = <OFlowParsedHTML>{megaChat.html(chatRoom.getRoomTitle())}</OFlowParsedHTML>;
         if (chatRoom.type === "private") {
             roomTitle =
-                <ContactAwareName contact={this.props.contact}>
+                <span>
                     <div className="user-card-wrapper">
                         <OFlowParsedHTML>{megaChat.html(chatRoom.getRoomTitle())}</OFlowParsedHTML>
                     </div>
-                </ContactAwareName>;
+                </span>;
         }
         nameClassString += chatRoom.type === "private" || chatRoom.type === "group" ? ' badge-pad' : '';
+
+        const { scheduledMeeting, isMeeting } = chatRoom;
+        const isUpcoming = scheduledMeeting && scheduledMeeting.isUpcoming;
+        const { startTime, endTime } = this.getScheduledDateTime() || {};
 
         return (
             <li
                 id={id}
-                className={classString}
+                className={`
+                    ${classString}
+                    ${isUpcoming ? 'upcoming-conversation' : ''}
+                `}
                 data-room-id={roomId}
                 data-jid={contactId}
-                onClick={ev => this.props.onConversationClick(ev)}>
+                onClick={ev => this.props.onConversationClick?.(ev) || loadSubPage(chatRoom.getRoomUrl(false))}>
                 <div className="conversation-avatar">
                     {(chatRoom.type === 'group' || chatRoom.type === 'public') &&
                         <div
                             className={`
                                 chat-topic-icon
-                                ${chatRoom.isMeeting ? 'meeting-icon' : ''}
+                                ${isMeeting ? 'meeting-icon' : ''}
                             `}>
                             <i
                                 className={
-                                    chatRoom.isMeeting ?
+                                    isMeeting ?
                                         'sprite-fm-mono icon-video-call-filled' :
                                         'sprite-fm-uni icon-chat-group'
                                 }
@@ -267,27 +273,63 @@ export default class ConversationsListItem extends MegaRenderMixin {
                     <div className="conversation-data-top">
                         <div className={`conversation-data-name ${nameClassString}`}>
                             {roomTitle}
+                            {chatRoom.isMuted() ?
+                                <i className="sprite-fm-mono icon-notification-off-filled muted-conversation-icon" /> :
+                                null
+                            }
                         </div>
                         <div className="conversation-data-badges">
-                            {chatRoom.type === "private" && <span className={`user-card-presence ${presenceClass}`} />}
-                            {(chatRoom.type === "group" || chatRoom.type === "private") &&
-                                <i className="sprite-fm-uni icon-ekr-key simpletip" data-simpletip={l[20935]} />}
+                            {chatRoom.type === 'private' ? <ContactPresence contact={contact} /> : null}
+                            {chatRoom.type === 'group' || chatRoom.type === 'private' ?
+                                <i className="sprite-fm-uni icon-ekr-key simpletip" data-simpletip={l[20935]} /> :
+                                null
+                            }
+                            {scheduledMeeting && scheduledMeeting.isUpcoming && scheduledMeeting.isRecurring &&
+                                <i className="sprite-fm-mono icon-repeat-thin-solid" />
+                            }
                         </div>
                     </div>
                     <div className="clear" />
-                    <div className="conversation-message-info">
-                        {lastMessageDiv}
-                    </div>
+                    {isUpcoming ?
+                        <div className="conversation-message-info">
+                            <div className="conversation-scheduled-data">
+                                <span>{startTime}</span>
+                                <span>&nbsp; - &nbsp;</span>
+                                <span>{endTime}</span>
+                            </div>
+                            <div className="conversation-scheduled-data">
+                                {notificationItems.length > 0 ?
+                                    <div
+                                        className={`
+                                            unread-messages
+                                            items-${notificationItems.length}
+                                            unread-upcoming
+                                        `}>
+                                        {notificationItems}
+                                    </div> :
+                                    null
+                                }
+                            </div>
+                        </div> :
+                        <div className="conversation-message-info">
+                            {lastMessageDiv}
+                        </div>
+                    }
                 </div>
-                <div className='date-time-wrapper'>
-                    <div className="date-time">{this.getConversationTimestamp()}</div>
-                    {notificationItems.length > 0 ?
+                {isUpcoming ?
+                    null :
+                    <div className="date-time-wrapper">
+                        <div className="date-time">{this.getConversationTimestamp()}</div>
+                        {notificationItems.length > 0 ?
                             <div className="unread-messages-container">
                                 <div className={`unread-messages items-${notificationItems.length}`}>
                                     {notificationItems}
                                 </div>
-                            </div> : null}
-                </div>
+                            </div> :
+                            null
+                        }
+                    </div>
+                }
             </li>
         );
     }

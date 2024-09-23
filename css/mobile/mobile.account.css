@@ -1,0 +1,226 @@
+.mega-mobile-settings.account .account-information {
+    padding: 16px 24px;
+    display: flex;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.mega-mobile-settings.account .account-information > *:not(:last-child) {
+    margin-inline-end: 16px;
+    -webkit-margin-end: 16px;
+}
+
+.mega-mobile-settings.account .avatar-container {
+    padding: 0;
+    height: 40px;
+    width: 40px;
+    border-radius: 100%;
+}
+
+.mega-mobile-settings.account .avatar-container img {
+    max-height: 100%;
+    width: auto;
+    border-radius: 100%;
+}
+
+.mega-mobile-settings.account .avatar-container div {
+    width: 40px;
+    text-align: center;
+    border-radius: 100%;
+}
+
+.mega-mobile-settings.account .avatar-container div span {
+    border-radius: 100%;
+    font-family: var(--text-font-family);
+    color: white;
+    font-size: 24px;
+    height: 40px;
+    line-height: 40px;
+    margin: 0 auto;
+    padding: 0;
+    width: 40px;
+}
+
+.mega-mobile-settings.account .account-information div:nth-of-type(2) {
+    display: flex;
+    flex-direction: column;
+}
+
+.mega-mobile-settings.account .account-information h2 {
+    font: var(--mobile-font-heading-h2);
+    margin: 0;
+    line-break: anywhere;
+}
+
+.mega-mobile-settings.account .account-information span {
+    font: var(--mobile-font-copy-regular);
+    color: var(--mobile-text-primary);
+    line-break: anywhere;
+}
+
+.mega-mobile-settings.account .upgrade {
+    margin-top: 8px;
+}
+
+.mega-mobile-settings.account .storage-info {
+    display: flex;
+    flex-direction: column;
+    color: var(--mobile-text-primary);
+}
+
+.mega-mobile-settings.account .plan-information.nav-elem {
+    pointer-events: none;
+}
+
+.mega-mobile-settings.account .storage-info .storage.green {
+    color: var(--mobile-text-success);
+}
+.mega-mobile-settings.account .storage-info .storage.warning {
+    color: var(--mobile-text-warning);
+}
+.mega-mobile-settings.account .storage-info .storage.error {
+    color: var(--mobile-text-error);
+}
+
+.mega-mobile-settings.account .odq-alert {
+    padding: 24px;
+}
+
+.mega-mobile-settings.account .dynamic-information {
+    width: 100%;
+}
+
+.mega-mobile-settings .button.mobile-log-out {
+    margin: 24px;
+    width: calc(100% - 2 * 24px);
+    height: 47px;
+}
+
+.mega-mobile-settings .button.mobile-log-out span {
+    font: var(--mobile-font-link-large-semibold);
+}
+
+.mega-mobile-settings div.mobile-mega-version.no-deco {
+    margin: 0 auto;
+    color: var(--mobile-text-secondary);
+}
+
+.my-account-change-email-page.overlay-confirm {
+    position: absolute;
+    top: 0;
+    left: 0;
+    justify-content: center;
+    z-index: 1100;
+}
+
+/** Developer Settings Page **/
+.bottom-page.developer-settings > *:not(.main-pad-block),
+.bottom-page.developer-settings > .mobile.fm-header {
+    display: none;
+}
+.bottom-page.developer-settings > .main-pad-block > .bottom-page {
+    padding: 0;
+}
+.bottom-page.developer-settings .developer-settings-table {
+    margin: auto;
+    text-align: left;
+    color: var(--mobile-text-primary);
+}
+.bottom-page.developer-settings .developer-settings-container {
+    margin-bottom: 100px;
+    text-align: center;
+    padding: 0 5%;
+}
+.bottom-page.developer-settings h3 {
+    text-align: center;
+}
+.bottom-page.developer-settings .apply {
+    color: white;
+    background-color: #F0373A;
+    margin: 10px auto;
+    max-width: 300px;
+    width: 50%;
+}
+.bottom-page.developer-settings .developer-setting {
+    width: 100%;
+}
+.bottom-page.developer-settings .api-setting-item {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    position: relative;
+    padding: 18px 0;
+}
+.bottom-page.developer-settings .api-setting-item > *:not(:last-child){
+    margin-bottom: 5px;
+}
+.bottom-page.developer-settings .api-setting-item:not(.user-attr-settings)::after {
+    content: "";
+    position: absolute;
+    left: 10%;
+    right: 0;
+    bottom: 0;
+    height: 1;
+    width: 80%;
+    border-bottom: 1px solid #ccc;
+}
+.bottom-page.developer-settings .misc .api-setting-item:last-child {
+    border-bottom: none;
+}
+.bottom-page.developer-settings .misc .large-input {
+    min-width: 50%;
+}
+.bottom-page.developer-settings .button-container {
+    align-items: center;
+    justify-content: center;
+    display: flex;
+}
+.bottom-page.developer-settings .info {
+    font: var(--text-body2);
+}
+.bottom-page.developer-settings .api-setting-item button.mega-button {
+    width: max-content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.bottom-page.developer-settings .error {
+    outline: 2px solid red;
+    border-radius: 4px;
+}
+.bottom-page.developer-settings .error::before {
+    position: absolute;
+    content: "Please enter name and value";
+    top: 0;
+    left: 3px;
+    font: var(--text-body2);
+    color: var(--text-color-error);
+}
+.bottom-page.developer-settings .set-used-transfer.error::before {
+    content: "Please enter desired quota";
+}
+
+/** End Developer Settings Page **/
+
+/* Overlay version style */
+.mega-overlay .mega-mobile-settings.account .account-information,
+.mega-overlay .mega-mobile-settings.account .plan-information.nav-elem,
+.mega-overlay .mega-mobile-settings.account > a,
+.mega-overlay .mega-mobile-settings.account > button {
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.mega-overlay .mega-mobile-settings .button.mobile-log-out {
+    width: 100%;
+}
+
+@media only screen and (min-width: 769px) {
+
+    .mega-mobile-settings .button.mobile-log-out,
+    .mega-overlay .mega-mobile-settings .button.mobile-log-out {
+        width: var(--mobile-tablet-elem-width);
+    }
+}

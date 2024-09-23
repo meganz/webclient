@@ -82,14 +82,13 @@ var security = {
      * These values are needed for when registering, changing the user's password, recovering with Master Key and
      * for parking the user's account.
      * @param {String} password The password from the user
-     * @param {String} masterKeyArray32 The user's Master Key
-     * @param {Function} completeCallback The function to be run after the keys are created which will pass the
+     * @param {Array} masterKeyArray32 The unencrypted Master Key
+     * @returns {Promise<Object>} will pass
      *                                    the clientRandomValueBytes, encryptedMasterKeyArray32,
      *                                    hashedAuthenticationKeyBytes
      *                                    and derivedAuthenticationKeyBytes as the parameters
      */
-    deriveKeysFromPassword: function(password, masterKeyArray32, completeCallback) {
-
+    deriveKeysFromPassword: async function(password, masterKeyArray32) {
         'use strict';
 
         // Create the 128 bit (16 byte) Client Random Value and Salt
@@ -106,27 +105,30 @@ var security = {
         var derivedKeyLength = security.derivedKeyLengthInBits;
 
         // Run the PPF
-        security.deriveKey(saltBytes, passwordBytes, iterations, derivedKeyLength, function(derivedKeyBytes) {
+        const derivedKeyBytes = await security.deriveKey(saltBytes, passwordBytes, iterations, derivedKeyLength);
 
-            // Get the first 16 bytes as the Encryption Key and the next 16 bytes as the Authentication Key
-            var derivedEncryptionKeyBytes = derivedKeyBytes.subarray(0, 16);
-            var derivedAuthenticationKeyBytes = derivedKeyBytes.subarray(16, 32);
+        // Get the first 16 bytes as the Encryption Key and the next 16 bytes as the Authentication Key
+        const derivedEncryptionKeyBytes = derivedKeyBytes.subarray(0, 16);
+        const derivedAuthenticationKeyBytes = derivedKeyBytes.subarray(16, 32);
 
-            // Get a hash of the Authentication Key which the API will use for authentication at login time
-            var hashedAuthenticationKeyBytes = asmCrypto.SHA256.bytes(derivedAuthenticationKeyBytes);
+        // Get a hash of the Authentication Key which the API will use for authentication at login time
+        let hashedAuthenticationKeyBytes = asmCrypto.SHA256.bytes(derivedAuthenticationKeyBytes);
 
-            // Keep only the first 128 bits (16 bytes) of the Hashed Authentication Key
-            hashedAuthenticationKeyBytes = hashedAuthenticationKeyBytes.subarray(0, 16);
+        // Keep only the first 128 bits (16 bytes) of the Hashed Authentication Key
+        hashedAuthenticationKeyBytes = hashedAuthenticationKeyBytes.subarray(0, 16);
 
-            // Convert the Derived Encryption Key to a big endian array of 32 bytes, then encrypt the Master Key
-            var derivedEncryptionKeyArray32 = base64_to_a32(ab_to_base64(derivedEncryptionKeyBytes));
-            var cipherObject = new sjcl.cipher.aes(derivedEncryptionKeyArray32);
-            var encryptedMasterKeyArray32 = encrypt_key(cipherObject, masterKeyArray32);
+        // Convert the Derived Encryption Key to a big endian array of 32 bytes, then encrypt the Master Key
+        const derivedEncryptionKeyArray32 = base64_to_a32(ab_to_base64(derivedEncryptionKeyBytes));
+        const cipherObject = new sjcl.cipher.aes(derivedEncryptionKeyArray32);
+        const encryptedMasterKeyArray32 = encrypt_key(cipherObject, masterKeyArray32);
 
-            // Pass the Client Random Value, Encrypted Master Key and Hashed Authentication Key to the calling function
-            completeCallback(clientRandomValueBytes, encryptedMasterKeyArray32, hashedAuthenticationKeyBytes,
-                derivedAuthenticationKeyBytes);
-        });
+        // Pass the Client Random Value, Encrypted Master Key and Hashed Authentication Key to the calling function
+        return {
+            clientRandomValueBytes,
+            encryptedMasterKeyArray32,
+            hashedAuthenticationKeyBytes,
+            derivedAuthenticationKeyBytes
+        };
     },
 
     /**
@@ -163,89 +165,34 @@ var security = {
         return saltBytes;
     },
 
-    /*
-     * Checks if Two-Factor Authentication is enabled for the user's account
-     * @param {String} email The user's email address
-     * @param {Function} completeCallback The function to run if successful
-     */
-    checkIfTwoFactorAuthEnabled: function(email, completeCallback) {
-
-        'use strict';
-
-        // Make Multi-Factor Auth Get request
-        api_req({ a: 'mfag', e: email }, {
-            callback: function(result) {
-
-                // If enabled, send back true
-                if (result === 1) {
-                    completeCallback(true);
-                }
-                else {
-                    completeCallback(false);
-                }
-            }
-        });
-    },
-
     /**
      * Fetch the user's salt from the API
      * @param {String} email The user's email address
-     * @param {Function} completeCallback The function to run if successful
      */
-    fetchAccountVersionAndSalt: function(email, completeCallback) {
-
+    fetchAccountVersionAndSalt: async function(email) {
         'use strict';
+        const {result: {s, v}} = await api.req({a: 'us0', user: email});
 
-        // Send the email to the API
-        api_req({ a: 'us0', user: email }, {
-            callback: function(result) {
-
-                // If successful
-                if (typeof result === 'object') {
-
-                    // Get the version and salt (there is no salt for old version 1 accounts)
-                    var version = result.v;
-                    var salt = (version >= 2) ? result.s : null;
-
-                    // Run the callback
-                    completeCallback(version, salt);
-                }
-                else {
-                    // Show an error dialog
-                    if (is_mobile) {
-                        mobile.messageOverlay.show(l[47], l[200]);
-                    }
-                    else {
-                        // Desktop error dialog
-                        msgDialog('warningb', l[47], l[200]);
-                    }
-
-                    console.error('Error fetching user salt!', result);
-                }
-            }
-        });
+        return {version: v, salt: v > 1 ? s : null};
     },
 
     /**
      * A wrapper function used for deriving a key from a password
      * @param {Uint8Array} saltBytes The salt as a byte array
-     * @param {String} passwordBytes The password as a byte array
+     * @param {Uint8Array} passwordBytes The password as a byte array
      * @param {Number} iterations The cost factor / number of iterations of the PPF to perform
      * @param {Number} derivedKeyLength The length of the derived key to create
-     * @param {Function} callback A function to call when the operation is complete
      */
-    deriveKey: function(saltBytes, passwordBytes, iterations, derivedKeyLength, callback) {
-
+    deriveKey: async function(saltBytes, passwordBytes, iterations, derivedKeyLength) {
         'use strict';
 
         // If Web Crypto method supported, use that as it's nearly as fast as native
         if (window.crypto && window.crypto.subtle && !is_microsoft) {
-            security.deriveKeyWithWebCrypto(saltBytes, passwordBytes, iterations, derivedKeyLength, callback);
+            return security.deriveKeyWithWebCrypto(saltBytes, passwordBytes, iterations, derivedKeyLength);
         }
-        else {
-            // Otherwise use asmCrypto which is the next fastest
-            security.deriveKeyWithAsmCrypto(saltBytes, passwordBytes, iterations, derivedKeyLength, callback);
-        }
+
+        // Otherwise, use asmCrypto which is the next fastest
+        return security.deriveKeyWithAsmCrypto(saltBytes, passwordBytes, iterations, derivedKeyLength);
     },
 
     /**
@@ -254,37 +201,31 @@ var security = {
      * @param {Uint8Array} passwordBytes The password as a byte array
      * @param {Number} iterations The cost factor / number of iterations of the PPF to perform
      * @param {Number} derivedKeyLength The length of the derived key to create
-     * @param {Function} callback A function to call when the operation is complete
      */
-    deriveKeyWithWebCrypto: function(saltBytes, passwordBytes, iterations, derivedKeyLength, callback) {
-
+    deriveKeyWithWebCrypto: async function(saltBytes, passwordBytes, iterations, derivedKeyLength) {
         'use strict';
 
         // Import the password as the key
-        crypto.subtle.importKey(
-            'raw', passwordBytes, 'PBKDF2', false, ['deriveBits']
-        )
-        .then(function(key) {
+        return crypto.subtle.importKey('raw', passwordBytes, 'PBKDF2', false, ['deriveBits'])
+            .then((key) => {
 
-            // Required PBKDF2 parameters
-            var params = {
-                name: 'PBKDF2',
-                hash: 'SHA-512',
-                salt: saltBytes,
-                iterations: iterations
-            };
+                // Required PBKDF2 parameters
+                var params = {
+                    name: 'PBKDF2',
+                    hash: 'SHA-512',
+                    salt: saltBytes,
+                    iterations: iterations
+                };
 
-            // Derive bits using the algorithm
-            return crypto.subtle.deriveBits(params, key, derivedKeyLength);
-        })
-        .then(function(derivedKeyArrayBuffer) {
+                // Derive bits using the algorithm
+                return crypto.subtle.deriveBits(params, key, derivedKeyLength);
+            })
+            .then((derivedKeyArrayBuffer) => {
 
-            // Convert to a byte array
-            var derivedKeyBytes = new Uint8Array(derivedKeyArrayBuffer);
-
-            // Pass the derived key to the callback
-            callback(derivedKeyBytes);
-        });
+                // Convert to a byte array
+                // Pass the derived key to the callback
+                return new Uint8Array(derivedKeyArrayBuffer);
+            });
     },
 
     /**
@@ -293,18 +234,15 @@ var security = {
      * @param {Uint8Array} passwordBytes The password as a byte array
      * @param {Number} iterations The cost factor / number of iterations of the PPF to perform
      * @param {Number} derivedKeyLength The length of the derived key to create
-     * @param {Function} callback A function to call when the operation is complete
      */
-    deriveKeyWithAsmCrypto: function(saltBytes, passwordBytes, iterations, derivedKeyLength, callback) {
-
+    deriveKeyWithAsmCrypto: async function(saltBytes, passwordBytes, iterations, derivedKeyLength) {
         'use strict';
 
         // Convert the desired derived key length to bytes and derive the key
         var keyLengthBytes = derivedKeyLength / 8;
-        var derivedKeyBytes = asmCrypto.PBKDF2_HMAC_SHA512.bytes(passwordBytes, saltBytes, iterations, keyLengthBytes);
 
         // Pass the derived key to the callback
-        callback(derivedKeyBytes);
+        return asmCrypto.PBKDF2_HMAC_SHA512.bytes(passwordBytes, saltBytes, iterations, keyLengthBytes);
     },
 
     /**
@@ -314,12 +252,12 @@ var security = {
      * @param {String} [saltBase64] Account Authentication Salt, if applicable
      * @returns {Promise} derivedEncryptionKeyArray32
      */
-    getDerivedEncryptionKey: promisify(function(resolve, reject, password, saltBase64) {
+    getDerivedEncryptionKey: async function(password, saltBase64) {
         'use strict';
 
         saltBase64 = saltBase64 === undefined ? u_attr && u_attr.aas || '' : saltBase64;
         if (!saltBase64) {
-            return resolve(prepare_key_pw(password));
+            return prepare_key_pw(password);
         }
 
         // Convert the salt and password to byte arrays
@@ -332,18 +270,15 @@ var security = {
         var derivedKeyLength = security.derivedKeyLengthInBits;
 
         // Run the PPF
-        security.deriveKey(saltBytes, passwordBytes, iterations, derivedKeyLength, function(derivedKeyBytes) {
+        const derivedKeyBytes = await security.deriveKey(saltBytes, passwordBytes, iterations, derivedKeyLength);
 
-            // Get the first 16 bytes as the Encryption Key
-            var derivedEncryptionKeyBytes = derivedKeyBytes.subarray(0, 16);
+        // Get the first 16 bytes as the Encryption Key
+        const derivedEncryptionKeyBytes = derivedKeyBytes.subarray(0, 16);
 
-            // Convert the Derived Encryption Key to a big endian array of 32 bit values for decrypting the Master Key
-            var derivedEncryptionKeyArray32 = base64_to_a32(ab_to_base64(derivedEncryptionKeyBytes));
-
-            // Pass only the Derived Encryption Key back to the callback
-            resolve(derivedEncryptionKeyArray32);
-        });
-    }),
+        // Convert the Derived Encryption Key to a big endian array of 32 bit values for decrypting the Master Key
+        // Pass only the Derived Encryption Key back to the callback
+        return base64_to_a32(ab_to_base64(derivedEncryptionKeyBytes));
+    },
 
     /**
      * Complete the Park Account process
@@ -357,7 +292,7 @@ var security = {
         'use strict';
 
         // Fetch the user's account version
-        security.fetchAccountVersionAndSalt(recoveryEmail, function(version) {
+        security.fetchAccountVersionAndSalt(recoveryEmail).then(({version}) => {
 
             // If using the new registration method (v2)
             if (version === 2) {
@@ -366,8 +301,8 @@ var security = {
                 api_create_u_k();
 
                 // Derive keys from the new password
-                security.deriveKeysFromPassword(newPassword, u_k,
-                    function(clientRandomValueBytes, encryptedMasterKeyArray32, hashedAuthenticationKeyBytes) {
+                security.deriveKeysFromPassword(newPassword, u_k)
+                    .then(({clientRandomValueBytes, encryptedMasterKeyArray32, hashedAuthenticationKeyBytes}) => {
 
                         // Convert Master Key, Hashed Authentication Key and Client Random Value to Base64
                         var encryptedMasterKeyBase64 = a32_to_base64(encryptedMasterKeyArray32);
@@ -413,96 +348,133 @@ var security = {
      * to change their password which will then call this function again with all the parameters.
      *
      * @param {String} recoveryCode The recovery code from the email
-     * @param {String} masterKeyArray32 The Master/Recovery Key entered by the user
+     * @param {Array} masterKeyArray32 The Master/Recovery Key entered by the user
      * @param {String} recoveryEmail The email address that is being recovered
-     * @param {String|null} newPassword The new password for the account (optional)
-     * @param {Function} completeCallback The function to run when the callback completes
+     * @param {String} [newPassword] The new password for the account (optional)
      */
-    resetKey: function(recoveryCode, masterKeyArray32, recoveryEmail, newPassword, completeCallback) {
-
+    async resetKey(recoveryCode, masterKeyArray32, recoveryEmail, newPassword) {
         'use strict';
-
-        // Fetch the user's account version
-        security.fetchAccountVersionAndSalt(recoveryEmail, function(version) {
-
-            // If using the new registration method (v2)
-            if (version === 2) {
-
-                // Check the recovery code
-                api_req({
-                    a: 'erx',
-                    r: 'gk',
-                    c: recoveryCode
-                },
-                {
-                    callback: function(result) {
-
-                        // If the private RSA key was returned
-                        if (typeof result === 'string') {
-
-                            // If the decryption of the RSA private key failed, pass error back to callback
-                            if (!verifyPrivateRsaKeyDecryption(result, masterKeyArray32)) {
-                                completeCallback(EKEY);
-                            }
-
-                            // Complete the reset of the user's password using the Master Key provided
-                            else if (newPassword) {
-                                security.completeResetKey(newPassword, recoveryCode, masterKeyArray32,
-                                                          completeCallback);
-                            }
-                            else {
-                                completeCallback(0);
-                            }
-                        }
-                        else {
-                            completeCallback(result);
-                        }
-                    }
-                });
-            }
-            else {
-                // Otherwise use the old reset password by recovery key method
-                api_resetkeykey(
-                    { result: completeCallback }, recoveryCode, masterKeyArray32, recoveryEmail, newPassword
-                );
-            }
+        const messages = freeze({
+            [EKEY]: l[1978],
+            [ENOENT]: l[1967],
+            [EBLOCKED]: l[1980],
+            [EEXPIRED]: l[1967],
         });
+
+        loadingDialog.show();
+
+        // Complete the reset of the user's password using the Master Key provided
+        return this.performKeyReset(recoveryCode, masterKeyArray32, recoveryEmail, newPassword)
+            .then((res) => {
+                assert(res === 0);
+                return res;
+            })
+            .catch((ex) => {
+                console.warn(ex);
+                if (String(ex).includes('invalid aes key size')) {
+                    ex = EKEY;
+                }
+                const msg = String(messages[ex] || (ex < 0 ? api_strerror(ex) : ex));
+
+                if (newPassword && msg.includes(l[1978])) {
+                    $('.recover-block.error').removeClass('hidden');
+                }
+
+                throw msg;
+            })
+            .finally(() => {
+                loadingDialog.hide();
+            });
     },
 
     /**
      * Complete the reset of the user's password using the Master Key provided by the user
-     * @param {String} newPassword The new password for the account
      * @param {String} recoveryCode The recovery code from the email
-     * @param {String} masterKeyArray32 The Master/Recovery Key entered by the user
-     * @param {Function} completeCallback The function to run when the callback completes
+     * @param {Array} masterKeyArray32 The Master/Recovery Key entered by the user
+     * @param {String} recoveryEmail The email address that is being recovered
+     * @param {String} [newPassword] The new password for the account (optional)
      */
-    completeResetKey: function(newPassword, recoveryCode, masterKeyArray32, completeCallback) {
-
+    async performKeyReset(recoveryCode, masterKeyArray32, recoveryEmail, newPassword) {
         'use strict';
 
-        // Derive keys from the new password
-        security.deriveKeysFromPassword(newPassword, masterKeyArray32,
-            function(clientRandomValueBytes, encryptedMasterKeyArray32, hashedAuthenticationKeyBytes) {
+        // Fetch the user's account version
+        const [result, {version}] = await Promise.all([
+            api.send({a: 'erx', r: 'gk', c: recoveryCode}),
+            security.fetchAccountVersionAndSalt(recoveryEmail)
+        ]);
+
+        // If the private RSA key was returned
+        assert(typeof result === 'string' && version > 0);
+
+        // Decrypt the private RSA key.
+        const privateRsaKeyArray32 = base64_to_a32(result);
+        const cipher = new sjcl.cipher.aes(masterKeyArray32);
+
+        let privateRsaKeyStr = a32_to_str(decrypt_key(cipher, privateRsaKeyArray32));
+        let i = 0;
+
+        // Verify the integrity of the decrypted private key
+        while (i++ < 4) {
+            const l = (privateRsaKeyStr.charCodeAt(0) * 256 + privateRsaKeyStr.charCodeAt(1) + 7 >> 3) + 2;
+
+            if (privateRsaKeyStr.substr(0, l).length < 2) {
+                break;
+            }
+            privateRsaKeyStr = privateRsaKeyStr.substr(l);
+        }
+
+        // If invalid, EKEY error.
+        assert(i === 5 && privateRsaKeyStr.length < 16, l[1978]);
+
+        if (newPassword) {
+            const payload = {a: 'erx', r: 'sk', c: recoveryCode};
+
+            if (version > 1) {
+                // Derive keys from the new password
+                const {
+                    clientRandomValueBytes,
+                    encryptedMasterKeyArray32,
+                    hashedAuthenticationKeyBytes
+                } = await security.deriveKeysFromPassword(newPassword, masterKeyArray32);
 
                 // Convert Master Key, Hashed Authentication Key and Client Random Value to Base64
-                var encryptedMasterKeyBase64 = a32_to_base64(encryptedMasterKeyArray32);
-                var hashedAuthenticationKeyBase64 = ab_to_base64(hashedAuthenticationKeyBytes);
-                var clientRandomValueBase64 = ab_to_base64(clientRandomValueBytes);
+                const clientRandomValueBase64 = ab_to_base64(clientRandomValueBytes);
+                const encryptedMasterKeyBase64 = a32_to_base64(encryptedMasterKeyArray32);
+                const hashedAuthenticationKeyBase64 = ab_to_base64(hashedAuthenticationKeyBytes);
 
-                // Run API request to park the account and start a new one under the same email
-                api_req({
-                    a: 'erx',
-                    r: 'sk',
-                    c: recoveryCode,
-                    x: encryptedMasterKeyBase64,
-                    y: {
-                        crv: clientRandomValueBase64,
-                        hak: hashedAuthenticationKeyBase64
-                    }
-                },
-                { callback: completeCallback });
+                payload.x = encryptedMasterKeyBase64;
+                payload.y = {
+                    crv: clientRandomValueBase64,
+                    hak: hashedAuthenticationKeyBase64
+                };
             }
-        );
+            else {
+                const aes = new sjcl.cipher.aes(prepare_key_pw(newPassword));
+
+                payload.y = stringhash(recoveryEmail.toLowerCase(), aes);
+                payload.x = a32_to_base64(encrypt_key(aes, masterKeyArray32));
+            }
+
+            // Run API request to park the account and start a new one under the same email
+            return api.send(payload);
+        }
+
+        return 0;
+    },
+
+    /**
+     * Verify if a given password is the user's password.
+     * e.g., If everything is correct, we attempt to verify the email.
+     * @param {String} pwd user-entered password
+     * @returns {Promise<Boolean>}
+     */
+    async verifyUserPassword(pwd) {
+        'use strict';
+        const {u = false} = await M.getAccountDetails();
+
+        assert(u.length === 11 && window.u_attr && u_attr.u === u, l[19]);
+
+        return security.getDerivedEncryptionKey(pwd);
     },
 
     /**
@@ -569,17 +541,19 @@ var security = {
         var xhr = function(key, uh) {
             req.y = uh;
             req.x = a32_to_base64(key);
-            M.req(req).then(resolve).catch(reject);
+            api.req(req).then(resolve).catch(reject);
         };
 
         // If using the new registration method (v2)
         if (u_attr.aav > 1) {
             req.r = 'v2';
 
-            security.deriveKeysFromPassword(pwd, u_k, tryCatch(function(crv, key, uh) {
-                req.z = ab_to_base64(crv);
-                xhr(key, ab_to_base64(uh));
-            }, reject));
+            security.deriveKeysFromPassword(pwd, u_k)
+                .then(({clientRandomValueBytes, encryptedMasterKeyArray32, hashedAuthenticationKeyBytes}) => {
+                    req.z = ab_to_base64(clientRandomValueBytes);
+                    xhr(encryptedMasterKeyArray32, ab_to_base64(hashedAuthenticationKeyBytes));
+                })
+                .catch(reject);
         }
         else {
             var aes = new sjcl.cipher.aes(prepare_key_pw(pwd));
@@ -615,11 +589,13 @@ var security = {
             }
             var showLoading = function() {
                 loadingDialog.show();
-                $dialog.addClass('arrange-to-back');
+                $('.mega-dialog-container.common-container').addClass('arrange-to-back');
             };
             var hideLoading = function() {
                 loadingDialog.hide();
-                $dialog.removeClass('arrange-to-back');
+                if (!$.msgDialog) {
+                    $('.mega-dialog-container.common-container').removeClass('arrange-to-back');
+                }
             };
             var reset = function(step) {
                 hideLoading();
@@ -632,28 +608,26 @@ var security = {
                     security.showVerifyEmailDialog(step && step.to);
                 }
             };
+
+            hideLoading();
             $('.mega-dialog:visible').addClass('hidden');
 
             if (aStep === 'login-to-account') {
                 var code = String(page).substr(11);
 
-                onIdle(showLoading);
+                showLoading();
                 console.assert(String(page).startsWith('emailverify'));
 
-                M.req({a: 'erv', v: 2, c: code})
-                    .always(function(res) {
-                        loadingDialog.hide();
+                api.req({a: 'erv', v: 2, c: code})
+                    .then(({result: res}) => {
+                        hideLoading();
                         console.debug('erv', [res]);
 
-                        if (res === EEXPIRED || res === ENOENT) {
-                            return msgDialog('warninga', l[135], res === EEXPIRED ? l[7719] : l[22128], false, reset);
-                        }
                         if (!Array.isArray(res) || !res[6]) {
                             return msgDialog('warninga', l[135], l[47], res < 0 ? api_strerror(res) : l[253], reset);
                         }
 
                         u_logout(true);
-                        $dialog.removeClass('arrange-to-back');
 
                         u_handle = res[4];
                         u_attr = {u: u_handle, email: res[1], privk: res[6].privk, evc: code, evk: res[6].k};
@@ -676,6 +650,10 @@ var security = {
                             var $input = $('.pass', $dialog);
                             var pwd = $input.val();
 
+                            if (!window.u_attr || !u_attr.evk) {
+                                return tell(ESID);
+                            }
+
                             showLoading();
                             security.verifyPassword(pwd, u_attr.evk, u_attr.privk)
                                 .then(function(res) {
@@ -691,7 +669,14 @@ var security = {
 
                             return false;
                         });
-                    });
+                    })
+                    .catch((ex) => {
+                        if (ex === EEXPIRED || ex === ENOENT) {
+                            return msgDialog('warninga', l[135], ex === EEXPIRED ? l[7719] : l[22128], false, reset);
+                        }
+                        tell(ex);
+                    })
+                    .finally(() => loadingDialog.hide());
             }
             else if (aStep === 'set-new-pass') {
                 console.assert(u_attr && u_attr.evc, 'Invalid procedure...');
@@ -749,18 +734,15 @@ var security = {
             }
             else {
                 $('.send-email', $dialog).rebind('click.ve', function() {
-                    $(this).unbind('click.ve').addClass('disabled');
-                    M.req('era').always(function(res) {
-                        $('aside.status', $dialog).addClass('hidden');
-
-                        if (res === 0) {
-                            $('aside.status', $dialog).removeClass('hidden');
-                        }
-                        else if (res === ETEMPUNAVAIL) {
-                            msgDialog('warninga', l[135], l[23628], l[23629], loadSubPage.bind(null, 'contact'));
+                    api.req({a: 'era'}).then(({result}) => {
+                        assert(result === 0);
+                        showToast('info', l[16827]);
+                    }).catch((ex) => {
+                        if (ex === ETEMPUNAVAIL) {
+                            msgDialog('warningb', l[135], l.resend_email_error, l.resend_email_ten_min_error_info);
                         }
                         else {
-                            msgDialog('warninga', l[135], l[47], api_strerror(res), loadSubPage.bind(null, 'contact'));
+                            msgDialog('warningb', l[135], l[47], api_strerror(ex));
                         }
                     });
                     return false;
@@ -785,6 +767,48 @@ var security = {
             mega.ui.MegaInputs($inputs);
             return $dialog;
         });
+    },
+
+    /**
+     * Persist account session data into WebStorage.
+     * @param {Array} masterKeyArray32 The unencrypted Master Key
+     * @param {String} decryptedSessionIdBase64 The decrypted Session ID as a Base64 string
+     * @param {Array} [decodedPrivateRsaKey] The decoded RSA Private Key as an array of parts
+     * @returns {undefined}
+     */
+    persistAccountSession(masterKeyArray32, decryptedSessionIdBase64, decodedPrivateRsaKey) {
+        'use strict';
+        const temp = security.login.rememberMe === false && !localStorage.sid;
+        assert(Array.isArray(masterKeyArray32) && masterKeyArray32.length === 4);
+
+        // tell whether this computer was ever logged
+        localStorage.wasloggedin = true;
+
+        // Before key is stored on storage and can be accessible by the other tabs, notify it.
+        watchdog.notify('beforelogin');
+
+        // Use localStorage if the user checked the Remember Me checkbox, otherwise use temporary sessionStorage
+        u_storage = init_storage(temp ? sessionStorage : localStorage);
+
+        // Set global values which are used everywhere
+        u_k = masterKeyArray32;
+        u_sid = decryptedSessionIdBase64;
+        u_k_aes = new sjcl.cipher.aes(masterKeyArray32);
+
+        // Store the Master Key and Session ID
+        u_storage.k = JSON.stringify(masterKeyArray32);
+        u_storage.sid = decryptedSessionIdBase64;
+
+        // Store the RSA private key
+        if (decodedPrivateRsaKey) {
+            u_storage.privk = base64urlencode(crypto_encodeprivkey(decodedPrivateRsaKey));
+        }
+
+        // Notify other tabs
+        watchdog.notify('login', [temp && masterKeyArray32, decryptedSessionIdBase64, temp && u_storage.privk]);
+
+        // Set the Session ID for future API requests
+        api.setSID(u_sid);
     }
 };
 
@@ -822,11 +846,11 @@ security.register = {
         security.register.createEphemeralAccount(function() {
 
             // Derive the Client Random Value, Encrypted Master Key and Hashed Authentication Key
-            security.deriveKeysFromPassword(password, u_k,
-                function(clientRandomValueBytes, encryptedMasterKeyArray32, hashedAuthenticationKeyBytes) {
+            security.deriveKeysFromPassword(password, u_k)
+                .then(({clientRandomValueBytes, encryptedMasterKeyArray32, hashedAuthenticationKeyBytes}) => {
 
                     // Encode parameters to Base64 before sending to the API
-                    var sendEmailRequestParams = {
+                    const req = {
                         a: 'uc2',
                         n: base64urlencode(to8(firstName + ' ' + lastName)),         // Name (used just for the email)
                         m: base64urlencode(email),                                   // Email
@@ -838,14 +862,12 @@ security.register = {
 
                     // If this was a registration from the Pro page
                     if (fromProPage === true) {
-                        sendEmailRequestParams.p = 1;
+                        req.p = 1;
                     }
 
                     // Send signup link email
-                    security.register.sendSignupLink(sendEmailRequestParams, firstName, lastName, email,
-                                                     completeCallback);
-                }
-            );
+                    security.register.sendSignupLink(req, firstName, lastName, email, completeCallback);
+                });
         });
     },
 
@@ -870,14 +892,21 @@ security.register = {
 
             // Create anonymous ephemeral account
             u_checklogin({
-                checkloginresult: function(context, userType) {
+                checkloginresult: tryCatch((context, userType) => {
+                    const {u_k_aes} = window;
 
                     // Set the user type
                     u_type = userType;
 
+                    // Ensure all went ok..
+                    assert(u_type !== false && u_k_aes, `Invalid state (${u_type}:${!!u_k_aes})`);
+
                     // Continue registering the account
                     callbackFunction();
-                }
+                }, (ex) => {
+                    window.onerror = null;
+                    msgDialog('warninga', l[135], `${l[47]} ${l.edit_card_error_des}`, String(ex));
+                })
             }, true);
         }
 
@@ -918,6 +947,7 @@ security.register = {
                 if (result === 0) {
                     security.register.sendAdditionalInformation(firstName, lastName);
                 }
+                security.register.sendEmailRequestParams = false;
 
                 // Run the callback requested by the calling function to show a check email dialog or show error
                 completeCallback(result, firstName, lastName, email);
@@ -976,9 +1006,6 @@ security.register = {
                 if (is_mobile && result === 0) {
                     mobile.messageOverlay.show(l[16351]);    // The email was sent successfully.
                 }
-                else if (is_mobile && result < 0) {
-                    mobile.messageOverlay.show(l[47]);    // Oops, something went wrong. Sorry about that!
-                }
 
                 // Run the callback requested by the calling function to show a check email dialog or whatever
                 completeCallback(result, firstName, lastName, newEmail);
@@ -1015,31 +1042,47 @@ security.register = {
     /**
      * Verifies the email confirmation code after registering
      * @param {String} confirmCode The confirm code from the registration email
-     * @param {Function} completeCallback The function to run when the email confirm code has been sent to the API
+     * @return {Promise<void>} {email, result}
      */
-    verifyEmailConfirmCode: function(confirmCode, completeCallback) {
-
+    async verifyEmailConfirmCode(confirmCode) {
         'use strict';
 
+        const cc = String(typeof confirmCode === 'string' && base64urldecode(confirmCode));
+
+        // Check if they registered using the new registration process (version 2)
+        assert(cc.startsWith('ConfirmCodeV2'), l[703]);
+
+        // Ask them to log out and click on the confirmation link again
+        if (u_type === 3) {
+
+            msgDialog('warningb', l[2480], l[12440], false, () => loadSubPage('fm'));
+            throw EROLLEDBACK;
+        }
+
         // Send the confirmation code back to the API
-        api_req({ a: 'ud2', c: confirmCode }, {
-            callback: function(result) {
+        return api.req({a: 'ud2', c: confirmCode})
+            .then(({result}) => {
+                const [email, name, uh] = result[1];
 
-                // If successful
-                if (typeof result === 'object') {
+                if (window.u_handle && u_handle === uh) {
+                    // same account still in active session, let's end.
+                    if ('csp' in window) {
+                        const storage = localStorage;
+                        const value = storage[`csp.${u_handle}`];
 
-                    // Decode the result (array index 0 = email, 1 = name, 2 = Base64 encoded user handle)
-                    var email = base64urldecode(result[0]);
-
-                    // Pass the email back
-                    completeCallback(result, email);
+                        if (value) {
+                            storage.csp = value;
+                        }
+                    }
+                    u_logout(1);
                 }
-                else {
-                    // Pass the error code back
-                    completeCallback(result);
-                }
-            }
-        });
+
+                return {
+                    name: base64urldecode(name),
+                    email: base64urldecode(email),
+                    result
+                };
+            });
     }
 };
 
@@ -1088,7 +1131,7 @@ security.login = {
         security.login.rememberMe = rememberMe;
 
         // Fetch the user's salt from the API
-        security.fetchAccountVersionAndSalt(email, function(version, salt) {
+        security.fetchAccountVersionAndSalt(email).then(({version, salt}) => {
 
             // If using the new method pass through the salt as well
             if (version === 2) {
@@ -1099,7 +1142,7 @@ security.login = {
             else if (version === 1) {
                 oldStartCallback(email, password, pinCode, rememberMe);
             }
-        });
+        }).catch(tell);
     },
 
     /**
@@ -1128,7 +1171,7 @@ security.login = {
         security.login.loginCompleteCallback = loginCompleteCallback;
 
         // Run the PPF
-        security.deriveKey(saltBytes, passwordBytes, iterations, derivedKeyLength, function(derivedKeyBytes) {
+        security.deriveKey(saltBytes, passwordBytes, iterations, derivedKeyLength).then((derivedKeyBytes) => {
 
             // Get the first 16 bytes as the Encryption Key and the next 16 bytes as the Authentication Key
             var derivedEncryptionKeyBytes = derivedKeyBytes.subarray(0, 16);
@@ -1208,24 +1251,13 @@ security.login = {
 
     /**
      * Sets some session variables and skips to the RSA Key Generation page and process
-     * @param {Array} masterKeyArray32 The raw unencrypted Master Key
+     * @param {Array} masterKeyArray32 The unencrypted Master Key
      * @param {String} temporarySessionIdBase64 The temporary session ID send from the API
      */
     skipToGenerateRsaKeys: function(masterKeyArray32, temporarySessionIdBase64) {
-
         'use strict';
 
-        // Set global values which are used everywhere
-        u_k = masterKeyArray32;
-        u_sid = temporarySessionIdBase64;
-        u_k_aes = new sjcl.cipher.aes(masterKeyArray32);
-
-        // Set the Session ID for future API requests
-        api_setsid(temporarySessionIdBase64);
-
-        // Set to localStorage as well
-        u_storage.k = JSON.stringify(masterKeyArray32);
-        u_storage.sid = temporarySessionIdBase64;
+        security.persistAccountSession(masterKeyArray32, temporarySessionIdBase64);
 
         // Redirect to key generation page
         loadSubPage('key');
@@ -1233,7 +1265,7 @@ security.login = {
 
     /**
      * Decrypts the RSA private key and the RSA encrypted session ID
-     * @param {Array} masterKeyArray32 The raw unencrypted Master Key
+     * @param {Array} masterKeyArray32 The unencrypted Master Key
      * @param {String} encryptedSessionIdBase64 The encrypted session ID as a Base64 string
      * @param {String} encryptedPrivateRsaKeyBase64 The private RSA key as a Base64 string
      * @param {String} userHandle The encrypted user handle from the 'us' response
@@ -1329,7 +1361,7 @@ security.login = {
      * Set the session variables and complete the login
      * @param {Array} keyAndSessionData A basic array consisting of:
      *     [
-     *        {Array} The raw unencrypted Master Key,
+     *        {Array} The unencrypted Master Key,
      *        {String} The decrypted Session ID as a Base64 string,
      *        {Array} The decoded RSA Private Key as an array of parts
      *     ]
@@ -1343,31 +1375,11 @@ security.login = {
             return false;
         }
 
-        // Set variables
-        var masterKeyArray32 = keyAndSessionData[0];
-        var decryptedSessionIdBase64 = keyAndSessionData[1];
-        var decodedPrivateRsaKey = keyAndSessionData[2];
-
-        // Set flag
-        localStorage.wasloggedin = true;
-
         // Remove all previous login data
         u_logout();
 
-        // Use localStorage if the user checked the Remember Me checkbox, otherwise use temporary sessionStorage
-        u_storage = init_storage(security.login.rememberMe ? localStorage : sessionStorage);
-
-        // Store the Master Key and Session ID
-        u_storage.k = JSON.stringify(masterKeyArray32);
-        u_storage.sid = decryptedSessionIdBase64;
-
-        // Notify other tabs of login
-        watchdog.notify('login', [!security.login.rememberMe && masterKeyArray32, decryptedSessionIdBase64]);
-
-        // Store the RSA private key
-        if (decodedPrivateRsaKey) {
-            u_storage.privk = base64urlencode(crypto_encodeprivkey(decodedPrivateRsaKey));
-        }
+        // Set variables
+        security.persistAccountSession(...keyAndSessionData);
 
         // Cleanup temporary login variables
         security.login.email = null;
@@ -1403,9 +1415,6 @@ security.login = {
 
         loadingDialog.hide();
 
-        // Reset the 2FA dialog back to default UI
-        twofactor.loginDialog.resetState();
-
         // If the Two-Factor Auth PIN is required
         if (result === EMFAREQUIRED) {
 
@@ -1430,7 +1439,7 @@ security.login = {
 
         // Check for suspended account
         if (result === EBLOCKED) {
-            msgDialog('warninga', l[6789], l[730]);
+            msgDialog('warninga', l[6789], api_strerror(result));
             return true;
         }
 
@@ -1443,18 +1452,84 @@ security.login = {
 
         // Check for incomplete registration
         else if (result === EINCOMPLETE) {
-            if (is_mobile) {
-                mobile.messageOverlay.show(l[882], l[9082]);
-            }
-            else {
-                msgDialog('warningb', l[882], l[9082]); // This account has not completed the registration
-            }
+            msgDialog('warningb', l[882], l[9082]); // This account has not completed the registration
 
             return true;
         }
 
         // Not applicable to this function
         return false;
+    },
+
+    /**
+     * Silently upgrades a user's account from version 1 to the improved version 2 format (which has a per user salt)
+     * and using the user's existing password. This is a general security improvement to upgrade all legacy users to
+     * the latest account format when they log in.
+     * @param {Number} loginResult The result from the v1 postLogin function which returns from u_checklogin3a
+     * @param {Array} masterKey The unencrypted Master Key as an array of Int32 values
+     * @param {String} password The current password from the user entered at login
+     * @returns {Promise<*>} avu result
+     */
+    async checkToUpgradeAccountVersion(loginResult, masterKey, password) {
+        'use strict';
+
+        // Double check that: 1) not currently in registration signup, 2) account version is v1 and 3) login succeeded
+        if (!confirmok && typeof u_attr === 'object' && u_attr.aav === 1 && loginResult !== false && loginResult >= 0) {
+
+            // Show a console message in case it will take a while
+            if (d) {
+                console.info('Attempting to perform account version upgrade to v2...');
+            }
+
+            // Create the Client Random Value, re-encrypt the Master Key and create the Hashed Authentication Key
+            const {
+                clientRandomValueBytes,
+                encryptedMasterKeyArray32,
+                hashedAuthenticationKeyBytes
+            } = await security.deriveKeysFromPassword(password, masterKey);
+
+            // Convert to Base64
+            const encryptedMasterKeyBase64 = a32_to_base64(encryptedMasterKeyArray32);
+            const hashedAuthenticationKeyBase64 = ab_to_base64(hashedAuthenticationKeyBytes);
+            const clientRandomValueBase64 = ab_to_base64(clientRandomValueBytes);
+            const saltBase64 = ab_to_base64(security.createSalt(clientRandomValueBytes));
+
+            // Prepare the Account Version Upgrade (avu) request
+            const requestParams = {
+                a: 'avu',
+                emk: encryptedMasterKeyBase64,
+                hak: hashedAuthenticationKeyBase64,
+                crv: clientRandomValueBase64
+            };
+
+            // Send API request to change password
+            const {result} = await api.req(requestParams).catch(dump);
+
+            // If successful
+            if (result === 0) {
+
+                // Update global user attributes (key, salt and version) because the
+                // 'ug' request is not re-done, nor are action packets sent for this
+                u_attr.k = encryptedMasterKeyBase64;
+                u_attr.aas = saltBase64;
+                u_attr.aav = 2;
+
+                // Log to console
+                if (d) {
+                    console.info('Account version upgrade to v2 successful.');
+                }
+
+                // Log to Stats (to know how many are successfully upgraded)
+                eventlog(99770, true);
+            }
+            else {
+                // Log failures as well (to alert us of bugs)
+                eventlog(99771, true);
+            }
+
+            // If not successful, it will attempt again on next login, continue to update UI
+            return result;
+        }
     }
 };
 
@@ -1468,16 +1543,16 @@ security.changePassword = {
      * Change the user's password using the old method
      * @param {String} newPassword The new password
      * @param {String|null} twoFactorPin The 2FA PIN code or null if not applicable
-     * @param {Function} completeCallback The function to run when complete (to update the UI)
      */
-    oldMethod: function(newPassword, twoFactorPin, completeCallback) {
+    async oldMethod(newPassword, twoFactorPin) {
 
         'use strict';
 
         // Otherwise change the password using the old method
-        var pw_aes = new sjcl.cipher.aes(prepare_key_pw(newPassword));
-        var encryptedMasterKeyBase64 = a32_to_base64(encrypt_key(pw_aes, u_k));
-        var userHash = stringhash(u_attr.email.toLowerCase(), pw_aes);
+        const newPasswordTrimmed = $.trim(newPassword);
+        const pw_aes = new sjcl.cipher.aes(prepare_key_pw(newPasswordTrimmed));
+        const encryptedMasterKeyBase64 = a32_to_base64(encrypt_key(pw_aes, u_k));
+        const userHash = stringhash(u_attr.email.toLowerCase(), pw_aes);
 
         // Prepare the request
         var requestParams = {
@@ -1492,33 +1567,30 @@ security.changePassword = {
         }
 
         // Make API request to change the password
-        api_req(requestParams, {
-            callback: function(result) {
+        return api.screq(requestParams)
+            .then(({result}) => {
 
                 // If successful, update user attribute key property with the Encrypted Master Key
                 if (result) {
                     u_attr.k = encryptedMasterKeyBase64;
                 }
 
-                // Update UI
-                completeCallback(result);
-            }
-        });
+                return result;
+            });
     },
 
     /**
      * Change the user's password using the new method
      * @param {String} newPassword The new password
      * @param {String|null} twoFactorPin The 2FA PIN code or null if not applicable
-     * @param {Function} completeCallback The function to run when complete (to update the UI)
      */
-    newMethod: function(newPassword, twoFactorPin, completeCallback) {
+    async newMethod(newPassword, twoFactorPin) {
 
         'use strict';
 
         // Create the Client Random Value, Encrypted Master Key and Hashed Authentication Key
-        security.deriveKeysFromPassword(newPassword, u_k,
-            function(clientRandomValueBytes, encryptedMasterKeyArray32, hashedAuthenticationKeyBytes) {
+        return security.deriveKeysFromPassword(newPassword, u_k)
+            .then(({clientRandomValueBytes, encryptedMasterKeyArray32, hashedAuthenticationKeyBytes}) => {
 
                 // Convert to Base64
                 var encryptedMasterKeyBase64 = a32_to_base64(encryptedMasterKeyArray32);
@@ -1540,65 +1612,69 @@ security.changePassword = {
                 }
 
                 // Send API request to change password
-                api_req(requestParams, {
-                    callback: function(result) {
+                return api.screq(requestParams).then(({result}) => {
 
-                        // If successful, update global user attributes key and salt as the 'ug' request is not re-done
-                        if (result) {
-                            u_attr.k = encryptedMasterKeyBase64;
-                            u_attr.aas = saltBase64;
-                        }
-
-                        // Update UI
-                        completeCallback(result);
+                    // If successful, update global user attributes key and salt as the 'ug' request is not re-done
+                    if (result) {
+                        u_attr.k = encryptedMasterKeyBase64;
+                        u_attr.aas = saltBase64;
                     }
+
+                    // Update UI
+                    return result;
                 });
-            }
-        );
+            });
     },
 
-    isPasswordTheSame: function(newPassword, method) {
+    /**
+     * Checks for the user's current Account Authentication Version (e.g. v1 or v2)
+     * @returns {Promise<Number>} Account version.
+     */
+    async checkAccountVersion() {
+        'use strict';
+
+        // If the Account Authentication Version is already v2 we don't need to check the version again via the API
+        if (u_attr && u_attr.aav === 2) {
+            return u_attr.aav;
+        }
+
+        // If we are currently a v1 account, we must check here for the current account version (in case it changed
+        // recently in another app/browser) because we don't want the other app/browser to have logged in and
+        // updated to v2 and then the current account which is still logged in here as v1 to overwrite that with
+        // the old format data when they change password. If that happened the user would not be able to log into
+        // their account anymore.
+        return (await M.getAccountDetails()).aav;
+    },
+
+    async isPasswordTheSame(newPassword, method) {
         "use strict";
-        var operation = new MegaPromise();
+        let encryptedMasterKeyBase64;
+        assert(window.u_attr && u_attr.k && window.u_k, l[23324]);
+
         // registration v2
         if (method === 2) {
-            if (!u_attr || typeof u_attr.aas === "undefined" || typeof u_attr.k === "undefined"
-                || !u_k) {
-                return operation.reject(0);
-            }
+            assert(typeof u_attr.aas !== "undefined", l[23324]);
 
-            var saltBytes = base64_to_ab(u_attr.aas);
-            var passwordBytes = security.stringToByteArray($.trim(newPassword));
+            const saltBytes = base64_to_ab(u_attr.aas);
+            const passwordBytes = security.stringToByteArray($.trim(newPassword));
 
-            security.deriveKey(saltBytes, passwordBytes, security.numOfIterations,
-                security.derivedKeyLengthInBits, function(derivedKeyBytes) {
+            const {numOfIterations: iter, derivedKeyLengthInBits: len} = security;
+            const derivedKeyBytes = await security.deriveKey(saltBytes, passwordBytes, iter, len);
 
-                    // callback could be Promise based or not
-                    var derivedEncryptionKeyBytes = derivedKeyBytes.subarray(0, 16);
-                    var derivedEncryptionKeyArray32 = base64_to_a32(ab_to_base64(derivedEncryptionKeyBytes));
-                    var cipherObject = new sjcl.cipher.aes(derivedEncryptionKeyArray32);
-                    var encryptedMasterKeyArray32 = encrypt_key(cipherObject, u_k);
-                    var encryptedMasterKeyBase64 = a32_to_base64(encryptedMasterKeyArray32);
+            const derivedEncryptionKeyBytes = derivedKeyBytes.subarray(0, 16);
+            const derivedEncryptionKeyArray32 = base64_to_a32(ab_to_base64(derivedEncryptionKeyBytes));
+            const cipherObject = new sjcl.cipher.aes(derivedEncryptionKeyArray32);
+            const encryptedMasterKeyArray32 = encrypt_key(cipherObject, u_k);
 
-                    if (u_attr.k === encryptedMasterKeyBase64) {
-                        return operation.reject(1);
-                    }
-                    else {
-                        return operation.resolve();
-                    }
-                });
-            return operation;
+            encryptedMasterKeyBase64 = a32_to_base64(encryptedMasterKeyArray32);
         }
         else {
-            var pw_aes = new sjcl.cipher.aes(prepare_key_pw(newPassword));
-            var encryptedMasterKeyBase64 = a32_to_base64(encrypt_key(pw_aes, u_k));
+            // registration v1
+            const pw_aes = new sjcl.cipher.aes(prepare_key_pw(newPassword));
 
-            if (u_attr.k === encryptedMasterKeyBase64) {
-                return operation.reject(1);
-            }
-            else {
-                return operation.resolve();
-            }
+            encryptedMasterKeyBase64 = a32_to_base64(encrypt_key(pw_aes, u_k));
         }
+
+        return u_attr.k === encryptedMasterKeyBase64;
     }
 };

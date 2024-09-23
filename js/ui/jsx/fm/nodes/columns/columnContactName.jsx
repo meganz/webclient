@@ -6,8 +6,11 @@ import { GenericNodePropsComponent } from "../genericNodePropsComponent";
 export class ColumnContactName extends GenericNodePropsComponent {
     static sortable = true;
     static id = "name";
-    static label = l[86];
     static megatype = "name";
+
+    static get label() {
+        return l[86];
+    }
 
     Mail = withOverflowObserver(() =>
         <span className="contact-item-email">{this.props.nodeAdapter.props.node.m}</span>

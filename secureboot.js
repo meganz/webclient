@@ -1,9 +1,7 @@
 // Release version information is replaced by the build scripts
 var buildVersion = { website: '', chrome: '', firefox: '', commit: '', timestamp: '', dateTime: '' };
 
-var m, tmp;
 var browserUpdate = 0;
-var apipath;
 var pageLoadTime;
 var silent_loading = false;
 var cookiesDisabled = false;
@@ -11,20 +9,21 @@ var storageQuotaError = false;
 var lastactive = new Date().getTime();
 var seqno = Math.ceil(Math.random()*1000000000);
 var staticpath = null;
-var cmsStaticPath = null;
 var defaultStaticPath = 'https://eu.static.mega.co.nz/4/';
-var defaultCMSStaticPath = 'https://eu.static.mega.co.nz/cms/';
 var ua = window.navigator.userAgent.toLowerCase();
 var uv = window.navigator.appVersion.toLowerCase();
 var storage_version = '1'; // clear localStorage when version doesn't match
 var contenterror = 0;
 var nocontentcheck = false;
 var l, d = false;
+var loginresponse, voucher, dl_res, gmf_res;
+var tmp, page, apipath, hashLogic, u_storage, u_sid;
 
 // Cache location.search parameters early as the URL may get rewritten later
 var locationSearchParams = location.search;
 
 var is_electron = false;
+var is_eplusplus = false;
 if (typeof process !== 'undefined') {
     var mll = process.moduleLoadList || [];
 
@@ -63,47 +62,13 @@ if (is_android && !is_huawei) {
         'jef-nx9', 'jny-lx2', 'lio-an00m', 'lio-l29', 'lio-n29', 'med-lx9', 'noh-an00', 'noh-lg', 'noh-nx9',
         'nop-an00', 'oce-an10', 'oce-an50', 'tas-l29', 'tet-an00'
     ];
-    for (m = tmp.length; m--;) {
+    for (var m = tmp.length; m--;) {
         if (ua.indexOf(tmp[m]) > 0) {
             is_huawei = tmp[m];
             break;
         }
     }
 }
-
-// @todo get rid of 'm' around the codebase!
-m = !!is_mobile;
-
-tmp = getCleanSitePath();
-var is_selenium = !ua.indexOf('mozilla/5.0 (selenium; ');
-var is_embed = String(location.pathname).substr(0, 6) === '/embed' || tmp.substr(0, 2) === 'E!';
-var is_drop = location.pathname === '/filerequest' || location.pathname === '/drop' || tmp.substr(0, 2) === 'D!';
-var is_iframed = is_embed || is_drop;
-var is_karma = !is_iframed && /^localhost:987[6-9]/.test(window.top.location.host);
-
-var is_chrome_firefox = document.location.protocol === 'chrome:' &&       // Only true for Palemoon/Legacy FF extension
-    document.location.host === 'mega' || document.location.protocol === 'mega:';
-var location_sub = document.location.href.substr(0, 16);
-var is_chrome_web_ext = location_sub === 'chrome-extension' || location_sub === 'ms-browser-exten';
-var is_firefox_web_ext = location_sub === 'moz-extension://';
-var is_extension = is_chrome_firefox || is_electron || is_chrome_web_ext || is_firefox_web_ext;
-var is_microsoft = /msie|edge|trident/i.test(ua);
-var is_bot = !is_extension && /bot|crawl/i.test(ua);
-var is_webcache = location.host === 'webcache.googleusercontent.com';
-var is_livesite = location.host === 'mega.nz' || location.host === 'mega.io'
-    || location.host === 'smoketest.mega.nz' || is_extension;
-var is_litesite = !is_embed && location.host === 'mega.io';
-var is_eplusplus = false;
-var is_filerequest_page = String(location.pathname).substr(0, 13) === '/filerequest/' ||
-    String(location.pathname).substr(0, 10) === '/megadrop/';
-
-
-self.fetchStreamSupport = (
-    window.fetch && !window.MSBlobBuilder
-    && typeof ReadableStream === 'function'
-    && typeof AbortController === 'function'
-    && typeof Object(AbortController.prototype).abort === 'function'
-);
 
 var staticServerLoading = {
     loadFailuresOriginal: 0,        // Count of failures on the original static server (from any thread)
@@ -121,6 +86,163 @@ var load_error_types = {
     /** A file loading issue, network issue or the static server is down */
     file_load_error: 2
 };
+
+Object.defineProperties(self, {
+    'freeze': {
+        value: function freeze(obj) {
+            Object.setPrototypeOf(obj, null);
+            return Object.freeze(obj);
+        }
+    },
+
+    'gClearTimeout': {
+        value: self.clearTimeout
+    },
+
+    'gSetTimeout': {
+        value: self.setTimeout
+    },
+
+    'lazy': {
+        value: function lazy(target, property, stub) {
+            return Object.defineProperty(target, property, {
+                get: function() {
+                    Object.defineProperty(this, property, {
+                        value: stub.call(this),
+                        enumerable: property[0] !== '_'
+                    });
+                    return this[property];
+                },
+                configurable: true
+            });
+        }
+    },
+
+    'megaChatIsDisabled': ((function() {
+        var status = tryCatch(function() {
+            return localStorage.testChatDisabled;
+        }, false)();
+        return {
+            set: function(val) {
+                status = val;
+                if (status) {
+                    $(document.body).addClass("megaChatDisabled");
+                }
+                else {
+                    $(document.body).removeClass("megaChatDisabled");
+                }
+            },
+            get: function() {
+                return status || window.mega.flags.mcs === 0;
+            }
+        };
+    })()),
+
+    'megaChatIsReady': {
+        get: function() {
+            return !self.megaChatIsDisabled && typeof megaChat !== 'undefined' && megaChat.is_initialized;
+        }
+    }
+});
+
+/**
+ * Check whether the provided `page` points to a public link
+ * @param {String} [page] optional page to check.
+ * @returns {String|Array|Boolean} page for v1, [public-handle, key] for v2+, or false
+ */
+function isPublicLink(page) {
+    'use strict';
+    var ptr = (page = getCleanSitePath(page)).split(/[^\w-]/).filter(String);
+
+    if (page[0] === '!') {
+
+        ptr.unshift('file');
+    }
+    else if (isPublicLink.upd[ptr[0]]) {
+
+        ptr[0] = isPublicLink.upd[ptr[0]];
+    }
+    else if (isPublicLink.v1[page.slice(0, 2)]) {
+
+        return page;
+    }
+
+    if (ptr.length > 1 && page.length > isPublicLink.v2[ptr[0]]) {
+
+        return Object.defineProperties(ptr.slice(1), {
+            dl: {
+                value: ptr[0] === 'file' || ptr[0] === 'embed'
+            },
+            pf: {
+                value: ptr[0] === 'folder' || ptr[0] === 'collection'
+            },
+            link: {
+                value: ptr[0] + '/' + ptr[1] + '#' + ptr[2] + (ptr.length > 3 ? '/' + ptr.slice(3).join('/') : '')
+            }
+        });
+    }
+
+    return false;
+}
+
+Object.defineProperties(isPublicLink, {
+    v1: {
+        value: {'F!': 1, 'P!': 1, 'E!': 1, 'D!': 1}
+    },
+    v2: {
+        value: {file: 6, folder: 8, embed: 7, chat: 6, collection: 12}
+    },
+    upd: {
+        value: {F: 'folder', E: 'embed', D: 'filerequest'}
+    }
+});
+
+try {
+// auto-shield
+    freeze(freeze);
+    freeze(lazy);
+
+    freeze(isPublicLink.v1);
+    freeze(isPublicLink.v2);
+    freeze(isPublicLink.upd);
+    freeze(isPublicLink);
+
+    delete String.prototype.big;
+    delete String.prototype.sup;
+    delete String.prototype.sub;
+    delete String.prototype.bold;
+    delete String.prototype.link;
+    delete String.prototype.blink;
+    delete String.prototype.small;
+    delete String.prototype.fixed;
+    delete String.prototype.anchor;
+    delete String.prototype.strike;
+    delete String.prototype.italics;
+    delete String.prototype.fontsize;
+    delete String.prototype.fontcolor;
+}
+catch (ex) {
+    console.warn('unsecure browser environment...', ex);
+}
+
+tmp = document.location.href.substr(0, 16);
+var is_chrome_web_ext = tmp === 'chrome-extension' || tmp === 'ms-browser-exten';
+var is_firefox_web_ext = tmp === 'moz-extension://';
+var is_extension = hashLogic = is_electron || is_chrome_web_ext || is_firefox_web_ext;
+
+tmp = getCleanSitePath();
+var is_embed = tmp.substr(0, 6) === 'embed/' || tmp.substr(0, 2) === 'E!';
+var is_drop = tmp.substr(0, 12) === 'filerequest#' || tmp.substr(0, 4) === 'drop' || tmp.substr(0, 2) === 'D!';
+var is_megadrop = (tmp.substr(0, 9) === 'megadrop/' || tmp.substr(0, 12) === 'filerequest/') && tmp.split('/')[1];
+var is_chatlink = tmp.substr(0, 5) === 'chat/' && tmp.replace(/[#?].*$/, '').split('/')[1];
+var is_iframed = is_embed || is_drop || is_megadrop;
+var is_karma = !is_iframed && /^localhost:987[6-9]/.test(window.top.location.host);
+
+var is_microsoft = /msie|edge|trident/i.test(ua);
+var is_bot = !is_extension && /bot|crawl/i.test(ua);
+var is_webcache = location.host === 'webcache.googleusercontent.com';
+var is_livesite = location.host === 'mega.nz' || location.host === 'mega.io'
+    || location.host === 'smoketest.mega.nz' || is_extension;
 
 function getMobileStoreLink() {
     'use strict';
@@ -144,12 +266,7 @@ function goToMobileApp(aBaseLink) {
     }, false)();
 
     if (is_ios || testbed === 'ios') {
-        tryCatch(function() {
-            sessionStorage.setItem('__mobile_app_tap', 1);
-        }, false)();
-
-        var link = 'https://' + location.host + '/' + aBaseLink;
-        openExternalLink('mega://' + aBaseLink, link + '?mobileapptap');
+        openExternalLink('mega://' + aBaseLink);
     }
     else if (is_windowsphone || testbed === 'winphone') {
         top.location = 'mega://' + aBaseLink;
@@ -169,72 +286,39 @@ function goToMobileApp(aBaseLink) {
     return false;
 }
 
-function openExternalLink(aExternalLink, aFallbackLink, aTimeout) {
+function openExternalLink(aExternalLink) {
     'use strict';
-    var vis = 0;
-    var dsp = function() {
-        // failed to go to the external link if visibility hasn't changed
-        if (vis !== 1) {
-            if (aFallbackLink) {
-                if (top.location.href === aFallbackLink) {
-                    vis = 3;
-                }
-                top.location = aFallbackLink;
-            }
-            // we came back from the external link if visibility changed twice.
-            if (vis > 1) {
-                location.reload();
-            }
-        }
+
+    // Clear page events
+    var clearEvents = function() {
+        document.removeEventListener('visibilitychange', clearEvents);
+        clearTimeout(window.appLnkInt);
+        window.appLnkInt = undefined;
+        return 0xDEAD;
     };
-    if (aFallbackLink === 'self') {
-        aFallbackLink = 'https://' + location.host + '/#' + getCleanSitePath().replace('?mobileapptap', '');
-    }
-    setTimeout(dsp, parseInt(aTimeout) || 3e3);
-    document.addEventListener('visibilitychange', function() {
-        if (++vis > 1) {
-            dsp();
-        }
-    });
+    mBroadcaster.addListener('beforepagechange', clearEvents);
+
+    // Clear events when changing the tab visibility
+    clearEvents();
+    document.addEventListener('visibilitychange', clearEvents);
+
+    // Open App link
     tryCatch(function() {
         top.location = aExternalLink;
-    }, dsp)();
-}
-
-function setCookie(key, val) {
-    'use strict';
-    if (!is_iframed && !is_extension && is_livesite && key) {
-        tryCatch(function() {
-            document.cookie = key + '=' + (val || '') + '; expires=' +
-                (val ? 'Fri, 31 Dec 9999 23:59:59 GMT' : 'Thu, 01 Jan 1970 00:00:00 GMT')
-                + '; path=/';
-            // now we need to inform the server [of mega.io]
-            if (location.host === 'mega.nz') {
-                var iping = document.getElementById('i-ping');
-                if (iping) {
-                    iping.src = 'https://mega.io/' + (val ? 'loggedin' : 'loggedout');
-                }
-            }
-        })();
-    }
-}
-
-function getCookie() {
-    'use strict';
-    var cookies = '';
-    tryCatch(function() {
-        cookies = document.cookie;
     })();
-    return cookies;
+
+    // Try to open Store link If application link is not opened
+    window.appLnkInt = setTimeout(function() {
+
+        if (!document.hidden) {
+            top.location = getMobileStoreLink();
+        }
+        clearEvents();
+    }, 3e3);
 }
 
 function getSitePath() {
     'use strict';
-    var hash = location.hash.replace('#', '');
-
-    if (hashLogic || isPublicLink(hash)) {
-        return '/' + hash;
-    }
 
     if (is_webcache) {
         var m = String(location.href).match(/mega\.nz\/([\w-]+)/);
@@ -243,11 +327,7 @@ function getSitePath() {
         }
     }
 
-    if (isPublickLinkV2(document.location.pathname)) {
-        return document.location.pathname + document.location.hash;
-    }
-
-    return hash && location.pathname.substr(0, 6) === '/chat/' ? location.pathname + '#' + hash : location.pathname;
+    return self.hashLogic ? '/' + location.hash.replace('#', '') : location.pathname + location.hash;
 }
 
 // remove dangling characters from the pathname/hash
@@ -302,29 +382,48 @@ function getCleanSitePath(path) {
             target.uaoref = path.uao;
         }
         if (path.aff) {
-            if (!path.aff_time) {
-                sessionStorage.affid = path.aff;
-                sessionStorage.affts = Date.now();
-                sessionStorage.afftype = 1;
-            }
-            else if (!(sessionStorage.affts > (path.aff_time *= 1000))) {
-                sessionStorage.affid = path.aff;
-                sessionStorage.affts = path.aff_time;
+            tryCatch(function() {
+                if (!path.aff_time) {
+                    sessionStorage.affid = path.aff;
+                    sessionStorage.affts = Date.now();
+                    sessionStorage.afftype = 1;
+                }
+                else if (!(sessionStorage.affts > (path.aff_time *= 1000))) {
+                    sessionStorage.affid = path.aff;
+                    sessionStorage.affts = path.aff_time;
 
-                // Future proof, currently only public link affiliate data is coming from other agent.
-                // Later, url from other agents will contains type for it to support other type.
-                sessionStorage.afftype = path.aff_type || 2;
+                    // Future proof, currently only public link affiliate data is coming from other agent.
+                    // Later, url from other agents will contains type for it to support other type.
+                    sessionStorage.afftype = path.aff_type || 2;
+                }
+            }, false)();
+        }
+
+        tryCatch(function() {
+            if (path.csp) {
+                localStorage.csp = path.csp >>> 0 & 0xff;
             }
-        }
-        if (path.csp) {
-            localStorage.csp = path.csp >>> 0 & 0xff;
-        }
-        if (path.sra) {
-            localStorage.utm = b64decode(path.sra);
-        }
+            if (path.sra) {
+                localStorage.utm = b64decode(path.sra);
+            }
+            if (path.lang && path.lang.length < 6) {
+                localStorage.lang = path.lang;
+            }
+            if (path.cjevent) {
+                sessionStorage.cjevent = path.cjevent;
+            }
+            if (path[0] === 'pro' && path.tab) {
+                window.mProTab = path.tab;
+            }
+        }, false)();
+
         if (path.mt) {
             window.uTagMT = path.mt;
         }
+        if (path.mct) {
+            window.uTagMCT = path.mct;
+        }
+
         if (path.next) {
             window.nextPage = b64decode(path.next);
             if (path.plan) {
@@ -334,29 +433,9 @@ function getCleanSitePath(path) {
                 window.helpOrigin = b64decode(path.articleUrl);
             }
         }
-        if (path.lang && path.lang.length < 6) {
-            localStorage.lang = path.lang;
-        }
     }
 
     return path[0];
-}
-
-// Check whether the provided `page` points to a public link
-function isPublicLink(page) {
-    'use strict';
-    page = getCleanSitePath(page);
-
-    var types = {'F!': 1, 'P!': 1, 'E!': 1, 'D!': 1};
-    return (page[0] === '!' || types[page.substr(0, 2)]) ? page : false;
-}
-
-function isPublickLinkV2(page) {
-    'use strict';
-    page = getCleanSitePath(page);
-
-    var types = {'file': 6, 'folder': 8, 'embed': 7};
-    return page.length > types[page.split('/')[0]];
 }
 
 // Safer wrapper around decodeURIComponent
@@ -397,14 +476,14 @@ function geoStaticPath(cms) {
             // Set which countries will use which static server
             var northAmericaStaticCountries = 'AG AI AR BB BL BO BR BS BZ CA CL CO CO CR CU DO EC FK GD GF GL GT GY HN HT IS JM KN LC MX NI PA PE PR PY SR SR TT US UY VC VE VE VG VI';
             var newZealandStaticCountries = 'AU FJ NC NZ';
-            var singaporeStaticCountries = 'BD BN BT HK ID IN JP KR LK MM MY NP PH SG TH VN';
+            var japanStaticCountries = 'JP TW PH HK MO KR SG KP BN BT MM MY TH VN';
 
             // Match on cookie e.g. "geoip=SG" returns array ['geoip=SG', 'SG']
             var cookieMatch = String(document.cookie).match(/geoip\s*\=\s*([A-Z]{2})/);
 
             // Check the country code to return a closer static server
-            if (cookieMatch && cookieMatch[1] && singaporeStaticCountries.indexOf(cookieMatch[1]) > -1) {
-                return 'https://sg.static.mega.co.nz/' + finalPath;
+            if (cookieMatch && cookieMatch[1] && japanStaticCountries.indexOf(cookieMatch[1]) > -1) {
+                return 'https://jp.static.mega.co.nz/' + finalPath;
             }
             else if (cookieMatch && cookieMatch[1] && northAmericaStaticCountries.indexOf(cookieMatch[1]) > -1) {
                 return 'https://na.static.mega.co.nz/' + finalPath;
@@ -416,60 +495,23 @@ function geoStaticPath(cms) {
     }
     catch (ex) {}
 
-    return cms ? defaultCMSStaticPath : defaultStaticPath;
-}
-
-if (is_chrome_firefox) {
-    var Cu = Components.utils;
-    var Cc = Components.classes;
-    var Ci = Components.interfaces;
-
-    Cu['import']("resource://gre/modules/XPCOMUtils.jsm");
-    Cu['import']("resource://gre/modules/Services.jsm");
-
-    ['userAgent', 'appName', 'appVersion', 'platform', 'oscpu']
-        .forEach(function(k) {
-            var pref = 'general.' + k.toLowerCase() + '.override';
-
-            if (Services.prefs.prefHasUserValue(pref)
-                    && Services.prefs.getPrefType(pref) === 32) {
-
-                try {
-                    var value = Services.prefs.getCharPref(pref);
-                    Services.prefs.clearUserPref(pref);
-
-                    Object.defineProperty(navigator, k, {
-                        enumerable: true,
-                        value: Cc["@mozilla.org/network/protocol;1?name=http"]
-                                    .getService(Ci.nsIHttpProtocolHandler)[k]
-                    });
-                    Services.prefs.setCharPref(pref, value);
-                }
-                catch (e) {}
-            }
-        });
-
-    ua = navigator.userAgent.toLowerCase();
+    return defaultStaticPath;
 }
 
 var myURL = window.URL;
 
 // Check whether we should redirect the user to the browser update.html page (triggered for Edge 18 and worse browsers)
-browserUpdate = browserUpdate || !myURL || typeof DataView === 'undefined' || window.MSBlobBuilder
-    || typeof history !== 'object' || typeof history.replaceState !== 'function'
-    || window.chrome && !document.exitPointerLock
-;
+browserUpdate = browserUpdate ||
+    (is_embed
+            ? (typeof ReadableStream === 'undefined' || typeof IntersectionObserver === 'undefined')
+            : typeof BigInt === 'undefined'
+    );
+// ReadableStream: C43 E14 F65 O30 S10.1
+// IntersectionObserver: C51 E15 F55 O38 S12.1
 
 if (!String.prototype.trim) {
     String.prototype.trim = function() {
         return this.replace(/^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g, '');
-    };
-}
-if (!String.prototype.localeCompare) {
-    String.prototype.localeCompare = function(to) {
-        var s1 = this.toLowerCase();
-        var s2 = String(to).toLowerCase();
-        return s1 > s2 ? 1 : (s1 < s2 ? -1 : 0);
     };
 }
 if (!String.trim) {
@@ -477,88 +519,9 @@ if (!String.trim) {
         return String(s).trim();
     };
 }
-if (!Date.now) {
-    Date.now = function now() {
-        return new Date().getTime();
-    };
-}
-
-try {
-    // Browser compatibility
-    // Fx 4.0   Chrome 5   MSIE 9   Opera 11.60   Safari 5.1
-    Object.defineProperty(this, 'megaChatIsDisabled', (function() {
-        var status;
-        return {
-            set: function(val) {
-                status = val;
-                if (status) {
-                    $(document.body).addClass("megaChatDisabled");
-                }
-                else {
-                    $(document.body).removeClass("megaChatDisabled");
-                }
-            },
-            get: function() {
-                return status || localStorage.testChatDisabled || window.mega.flags.mcs === 0;
-            }
-        };
-    })());
-
-    // Check whether Mega Chat is enabled *and* initialized
-    Object.defineProperty(this, 'megaChatIsReady', {
-        get: function() {
-            return !megaChatIsDisabled
-                && typeof megaChat !== 'undefined'
-                && megaChat.is_initialized;
-        }
-    });
-}
-catch (ex) {
-    console.error(ex);
-    window.megaChatIsReady = false;
-    window.megaChatIsDisabled = false;
-    browserUpdate = true;
-}
 
 if (!browserUpdate) try
 {
-    if (is_chrome_firefox)
-    {
-        XPCOMUtils.defineLazyModuleGetter(this, "NetUtil", "resource://gre/modules/NetUtil.jsm");
-
-        (function(global) {
-            global.loadSubScript = function(file,scope) {
-                var loader = Services.scriptloader;
-
-                if (global.d && loader.loadSubScriptWithOptions) {
-                    loader.loadSubScriptWithOptions(file, {
-                        charset: "UTF-8",
-                        ignoreCache: true,
-                        target: scope || global
-                    });
-                } else {
-                    loader.loadSubScript(file, scope || global);
-                }
-            };
-        })(this);
-
-        try {
-            var mozBrowserID =
-            [   Services.appinfo.name,
-                Services.appinfo.platformVersion,
-                Services.appinfo.platformBuildID,
-                Services.appinfo.OS,
-                Services.appinfo.XPCOMABI].join(" ");
-        } catch(e) {
-            var mozBrowserID = ua;
-        }
-
-        loadSubScript('chrome://mega/content/strg.js');
-
-        if (!(localStorage instanceof Ci.nsIDOMStorage)) {
-            throw new Error('Invalid DOM Storage instance.');
-        }
-    }
     try {
         if (typeof localStorage === 'undefined' || localStorage === null) {
             throw new Error('SecurityError: DOM Exception 18');
@@ -629,21 +592,6 @@ if (!browserUpdate) try
         }, 4000);
     }
 
-    if (is_mobile && String(location.href).indexOf("mobileapptap") > 0) {
-        tmp = true;
-        tryCatch(function() {
-            'use strict';
-            tmp = sessionStorage.getItem('__mobile_app_tap');
-            sessionStorage.removeItem('__mobile_app_tap');
-        })();
-        tryCatch(function() {
-            'use strict';
-            if (tmp) {
-                openExternalLink(getMobileStoreLink(), 'self');
-            }
-        })();
-    }
-
     if (!is_livesite && !is_karma && !is_webcache) {
         d = d > 0 ? d : !localStorage.nfd;
         jj = d > 0 && !sessionStorage.dbgContentCheck;
@@ -663,11 +611,9 @@ if (!browserUpdate) try
 
     if (location.host === 'smoketest.mega.nz') {
         staticpath = 'https://smoketest.static.mega.nz/4/';
-        cmsStaticPath = 'https://smoketest.static.mega.nz/cms/';
         defaultStaticPath = staticpath;
         d = 1;
         sessionStorage.rad = 1;
-        is_litesite = !!localStorage.testIO;
     }
 
     if (d > 0) {
@@ -680,17 +626,15 @@ if (!browserUpdate) try
     }
 
     staticpath = localStorage.staticpath || staticpath || geoStaticPath(false);
-    cmsStaticPath = localStorage.cms || cmsStaticPath || geoStaticPath(true);
-
     apipath = localStorage.apipath || 'https://g.api.mega.co.nz/';
 
     // If dark mode flag is enabled, change styling
     if (localStorage.getItem('darkMode') === '1') {
-        document.getElementsByTagName('html')[0].classList.add('dark-mode');
+        document.documentElement.classList.add('dark-mode');
     }
 }
 catch(e) {
-    if (!m || !cookiesDisabled) {
+    if (!is_mobile || !cookiesDisabled) {
         var extraInfo = '';
         if (storageQuotaError) {
             extraInfo = "\n\nTip: We've detected this issue is likely caused by " +
@@ -715,7 +659,6 @@ catch(e) {
     }
 }
 
-is_litesite = is_litesite || !is_livesite && localStorage.testIO;
 if (location.host === 'mega.io') {
     tmp = document.head.querySelector('meta[property="og:url"]');
     if (tmp) {
@@ -752,14 +695,14 @@ var mega = {
     whoami: 'We make secure cloud storage simple. Create an account and get up to 50 GB ' +
             'free on MEGA\'s end-to-end encrypted cloud collaboration platform today!',
 
-    maxWorkers: Math.min(navigator.hardwareConcurrency || 4, 6),
+    maxWorkers: Math.min(navigator.hardwareConcurrency || 4, 16),
 
     /** An object with flags detailing which features are enabled on the API
      *  XXX: This is now meant to be a legacy private property, use `mega.flags` instead.
      */
     apiMiscFlags: null,
 
-    /** Get browser brancd internal ID */
+    /** Get browser brand internal ID */
     getBrowserBrandID: function() {
         if (Object(window.chrome).torch) {
             return 1;
@@ -812,15 +755,19 @@ var mega = {
                 // Do not tell API to rebuild the treecache if we were loading from indexedDB
                 if (r.mode === 1 && !sessionStorage.lightTreeReload) {
                     sessionStorage.lightTreeReload = true;
-                    fm_forcerefresh(true);
+                    fm_fullreload(true);
                 }
                 else {
-                    api_req({a: 'log', e: 99679}); // sc processing took too long
+                    onIdle(function() {
+                        eventlog(99679, true); // sc processing took too long
+                    });
 
+                    $.closeMsgDialog = 1;
                     msgDialog('warninga:!^' + l[17704] + '!' + l[17705], l[882], l[17706], 0, function(yes) {
                         if (yes) {
-                            fm_forcerefresh();
+                            fm_fullreload();
                         }
+                        $.closeMsgDialog = 0;
                     });
 
                     r.scSent = now;
@@ -834,11 +781,21 @@ var mega = {
         this.state |= window.MEGAFLAG_LOADINGCLOUD;
     },
 
-    redirect: function(to, page, kv, urlQs) {
+    redirect: function(to, page, kv, urlQs, st) {
         'use strict';
         var storage = localStorage;
+        var toMegaIo = to === 'mega.io';
+        var getCount = 0;
+        st = typeof st === 'undefined' || st;
 
         to = (String(to).indexOf('//') < 0 ? 'https://' : '') + to;
+
+        var uLang = sessionStorage.lang || storage.lang;
+        if (uLang) {
+            // Map webclient language codes to those that are supported on mega.io
+            to += '/' + mega.getMegaIoMappedLang(uLang);
+        }
+
         if (page) {
             to += '/' + page;
         }
@@ -846,20 +803,25 @@ var mega = {
         var affid = sessionStorage.affid || storage.affid;
         var affts = sessionStorage.affts || storage.affts;
         if (affid && affts && !(Date.now() - affts > 864e5)) {
-            to += '/aff=' + affid;
+            to += '?aff=' + affid;
+            getCount++;
         }
 
-        var uLang = sessionStorage.lang || storage.lang;
-        if (uLang) {
-            to += '/lang=' + uLang;
+        var _getSeperator = function() {
+            if (toMegaIo) {
+                return getCount++ ? '&' : '?';
+            }
+            else {
+                return '/';
+            }
         }
 
-        if (storage.csp) {
-            to += '/csp=' + storage.csp;
+        if (!toMegaIo && storage.csp) {
+            to += _getSeperator() + 'csp=' + storage.csp;
         }
 
-        if (storage.utm) {
-            to += '/sra=' + b64encode(storage.utm);
+        if (!toMegaIo && storage.utm) {
+            to += _getSeperator() + 'sra=' + b64encode(storage.utm);
         }
 
         if (Array.isArray(kv)) {
@@ -872,38 +834,53 @@ var mega = {
                 }
             }
         }
-
-        window.onload = window.onerror = null;
-        location.replace(to + (urlQs || ''));
+        if (st) {
+            window.onload = window.onerror = null;
+            return location.replace(to + (urlQs || ''));
+        }
+        window.open(to + (urlQs || ''), '_blank', toMegaIo ? 'noopener' : 'noopener,noreferrer');
     },
 
-    /** Parameters to append to API requests */
-    urlParams: function() {
-        if (!this._urlParams) {
-            var params = '&domain=meganz'; // domain origin
-            if (location.host === 'mega.io') {
-                params = '&domain=megaio';
-            }
+    /**
+     * Map webclient language codes to those that are supported on mega.io
+     * @param {String} userLang The current webclient user language code e.g. EN, NL etc
+     * @returns {String} Returns the mapped language for mega.io (could be empty string for English or not supported)
+     */
+    getMegaIoMappedLang: function(userLang) {
+        'use strict';
 
-            // If using an extension, the version is passed through to the API for the helpdesk tool
-            if (is_extension) {
-                params += '&ext=' + (is_chrome_web_ext ? buildVersion.chrome : buildVersion.firefox);
-            }
+        // Webclient (mega.nz) to mega.io mappings
+        var mappings = {
+            'en': '',
+            'ar': 'ar',
+            'br': 'pt-br',
+            'cn': 'zh-hans',
+            'ct': 'zh-hant',
+            'de': 'de',
+            'es': 'es',
+            'fr': 'fr',
+            'he': '',   // Hebrew not supported
+            'hu': '',   // Hungarian not supported
+            'id': 'id',
+            'it': 'it',
+            'jp': 'ja',
+            'ka': '',   // Georgian not supported
+            'kr': 'ko',
+            'nl': 'nl',
+            'pl': 'pl',
+            'pt': 'pt',
+            'ro': 'ro',
+            'ru': 'ru',
+            'th': 'th',
+            'tl': '',   // Filipino not supported
+            'tr': '',   // Turkish not supported
+            'uk': '',   // Ukrainian not supported
+            'vi': 'vi'
+        };
 
-            // Append browser brand for easier troubleshoting
-            var brand = this.getBrowserBrandID();
-            if (brand) {
-                params += '&bb=' + parseInt(brand);
-            }
+        var mappedLang = mappings[userLang];
 
-            var apiut = localStorage.apiut ? '&ut=' + localStorage.apiut : "";
-            params += apiut;
-
-            params += '&v=2&lang=' + window.lang;
-            this._urlParams = params;
-        }
-
-        return this._urlParams;
+        return typeof mappedLang === 'undefined' ? '' : mappedLang;
     }
 };
 
@@ -946,7 +923,8 @@ Object.defineProperty(mega, 'BID', {
 Object.defineProperty(mega, 'paywall', {
     get: function() {
         'use strict';
-        return typeof u_attr === 'object' && (u_attr.uspw || u_attr.b && u_attr.b.s === -1) || false;
+        return typeof u_attr === 'object' &&
+            (u_attr.uspw || u_attr.b && u_attr.b.s === -1 || u_attr.pf && u_attr.pf.s === -1) || false;
     }
 });
 
@@ -959,6 +937,23 @@ Object.defineProperty(mega, 'active', {
             return Date.now() - lastactive < THRESHOLD;
         };
     })()
+});
+
+/** @property mega.infinity */
+lazy(mega, 'infinity', function() {
+    return mega.flags.inf > 0 || !!localStorage.mInfinity || !!localStorage.megaLiteMode;
+});
+
+/** @property mega.rewindEnabled */
+lazy(mega, 'rewindEnabled', function() {
+    'use strict';
+    return (mega.flags.rw || localStorage.rewindEnable) && !is_mobile;
+});
+
+/** @property mega.viewID */
+lazy(mega, 'viewID', function() {
+    'use strict';
+    return (Date.now() / 1e3 >>> 0).toString(16).slice(-8) + makeUUID().slice(-8);
 });
 
 (function(chrome) {
@@ -1001,16 +996,23 @@ if (window.crypto && typeof crypto.getRandomValues === 'function') {
             return rand.call(crypto, seed);
         };
         mega.getRandomValues.strong = true;
+
+        if (window.isSecureContext && typeof crypto.randomUUID === 'function') {
+            Object.defineProperty(window, 'makeUUID', {
+                value: function() {
+                    return crypto.randomUUID();
+                }
+            });
+        }
     })(crypto, crypto.getRandomValues);
+}
+
+if (!window.AudioContext && window.webkitAudioContext) {
+    window.AudioContext = window.webkitAudioContext;
 }
 
 // nb: can overflow..
 Object.defineProperty(window, 'mIncID', {value: 0, writable: true});
-
-var hashLogic = false;
-if (localStorage.hashLogic) hashLogic=true;
-if (localStorage.testMobileSite) is_mobile = m = true;
-if (typeof history == 'undefined') hashLogic=true;
 
 var bootstaticpath = staticpath;
 var urlrootfile = '';
@@ -1023,12 +1025,21 @@ else if (is_karma) {
     nocontentcheck = true;
     bootstaticpath = 'base/';
 }
+// Disable hash checking if requested for development
+/*
+else if (localStorage.disablecontentcheck) {
+    nocontentcheck = true;
+}
+//*/
+
+is_mobile = is_mobile || localStorage.testMobileSite;
+hashLogic = hashLogic || localStorage.hashLogic || typeof history == 'undefined';
 
 tmp = getCleanSitePath(location.hash || undefined);
 if (tmp.substr(0, 12) === 'sitetransfer') {
     try {
         sessionStorage.sitet = tmp;
-        location.hash = 'home';
+        location.hash = 'hashtransfer';
     }
     catch (ex) {
         console.warn(ex);
@@ -1037,6 +1048,19 @@ if (tmp.substr(0, 12) === 'sitetransfer') {
 }
 else if (tmp.substr(0, 4) === 'test') {
     hashLogic = true;
+    tmp = -0x8feed;
+}
+
+Object.defineProperty(self, 'mShowAds', {
+    value: (is_livesite || localStorage.gads) && !is_extension && !(localStorage.sid || sessionStorage.sid)
+});
+
+// eslint-disable-next-line es/no-object-fromentries
+if (Object.fromEntries && !self.mShowAds) {
+    if (is_karma || tmp === -0x8feed) {
+        Object.freeze = echo;
+    }
+    Object.freeze(Object);
 }
 
 if (!browserUpdate && is_extension)
@@ -1044,35 +1068,7 @@ if (!browserUpdate && is_extension)
     hashLogic = true;
     nocontentcheck=true;
 
-    if (is_chrome_firefox)
-    {
-        bootstaticpath = 'chrome://mega/content/';
-        urlrootfile = 'secure.html';
-        if (d > 1) {
-            staticpath = bootstaticpath;
-        }
-        else {
-            staticpath = defaultStaticPath;
-        }
-        try {
-            loadSubScript(bootstaticpath + 'fileapi.js');
-        } catch(e) {
-            browserUpdate = 1;
-            Cu.reportError(e);
-            alert('Unable to initialize core functionality:\n\n' + e + '\n\n' + mozBrowserID);
-        }
-        if (location.protocol === 'mega:') {
-            try {
-                var url = mObjectURL([""]);
-                myURL.revokeObjectURL(url);
-            }
-            catch (e) {
-                console.error('mObjectURL failed, is this TOR?', e);
-                document.location = bootstaticpath + urlrootfile + location.hash;
-            }
-        }
-    }
-    else if (is_electron) {
+    if (is_electron) {
         urlrootfile = 'index.html';
         bootstaticpath = location.href.replace(urlrootfile, '');
     }
@@ -1096,7 +1092,8 @@ if (!browserUpdate && is_extension)
             tmp = typeof chrome.runtime.getManifest === 'function' && chrome.runtime.getManifest() || false;
 
             if (tmp.version === '109101.103.97') {
-                urlrootfile = 'webclient/index.html';
+                d = d > 0 ? d : 1;
+                urlrootfile = 'webclient/secure.html';
 
                 if (typeof chrome.runtime.getPackageDirectoryEntry === 'function') {
                     chrome.runtime.getPackageDirectoryEntry(function(root) {
@@ -1113,7 +1110,8 @@ if (!browserUpdate && is_extension)
             }
         }
 
-        bootstaticpath = chrome.extension.getURL(urlrootfile.split('/')[0] + '/');
+        Object.defineProperty(self, 'jj', {value: -1});
+        bootstaticpath = chrome.runtime.getURL(urlrootfile.split('/')[0] + '/');
     }
 
     if (localStorage.useBootStaticPath) {
@@ -1128,18 +1126,17 @@ if (!browserUpdate && is_extension)
     });
 }
 
-var page;
-window.redirect = ['about', 'achievements', 'android', 'bird', 'business', 'chrome', 'cmd',
-                   'contact', 'collaboration', 'copyright', 'corporate', 'credits', 'desktop', 'dev',
+window.redirect = ['about', 'achievements', 'android', 'bird', 'business', 'chrome', 'cmd', 'collaboration',
+                   'contact', 'cookie', 'copyright', 'corporate', 'credits', 'desktop', 'dev',
                    'developers', 'dispute', 'doc', 'edge', 'extensions', 'firefox', 'gdpr', 'help', 'ios',
                    'megabackup', 'mobile', 'nas', 'objectstorage',
-                   'plugin', 'privacy', 'resellers', 'sdkterms', 'securechat',
+                   'plugin', 'privacy', 'refer', 'resellers', 'sdk', 'securechat',
                    'security', 'sourcecode', 'start', 'storage', 'sync', 'takedown', 'terms', 'uwp', 'wp'];
 var isStaticPage = function(page) {
     'use strict';
     if (page) {
         var excludedPages = {copyrightnotice: 1, disputenotice: 1, businesssignup: 1, businessinvite: 1};
-        if (excludedPages[page] || page.indexOf('businesssignup') > -1 || page.indexOf('businessinvite') > -1) {
+        if (excludedPages[page] || page.indexOf('businesssignup') > -1 || page.indexOf('businessinvite') > -1 || page.indexOf('about/jobs') > -1) {
             return false;
         }
         for (var k = redirect.length; k--;) {
@@ -1158,30 +1155,12 @@ if (hashLogic) {
     // legacy support:
     page = getCleanSitePath(document.location.hash);
 }
-else if ((tmp = getSitePath()).substr(0, 6) === '/chat/') {
-    page = tmp.substr(1);
-    history.replaceState({subpage: page}, "", '/' + page);
-}
-else if ((page = isPublicLink(document.location.hash))) {
+else if ((page = isPublicLink())) {
     // folder or file link: always keep the hash URL to ensure that keys remain client side
     // history.replaceState so that back button works in new URL paradigm
-    if (is_litesite) {
-        page = '';
-        history.replaceState({ subpage: page }, "", page);
-    }
-    else {
-        history.replaceState({ subpage: page }, "", '#' + page);
-    }
-
-}
-else if (isPublickLinkV2(document.location.pathname)) {
-    page = getCleanSitePath();
-    history.replaceState({ subpage: page }, "", '/' + page);
-
-    if (is_embed) {
-        page = page.split(/[#/]/);
-        page = '!' + page[1] + '!' + page[2];
-    }
+    dl_res = !!page.dl;
+    page = page.link || page;
+    pushHistoryState(true, page);
 }
 else {
     if (document.location.hash.length > 0) {
@@ -1194,19 +1173,6 @@ else {
     }
 
     page = getCleanSitePath(page);
-    if (is_litesite) {
-        var loggedCookie = getCookie().indexOf('logged=1') > -1;
-        var comingFromNZ = locationSearchParams.indexOf('nz=1') > -1;
-        if ((!isStaticPage(page) && page !== 'pro' && page !== 'sdk' && page !== 'refer') ||
-            (loggedCookie && !comingFromNZ)) {
-
-            mega.redirect('mega.nz', page);
-        }
-        else if (loggedCookie && comingFromNZ) {
-            // oh, a race probably,
-            setCookie('logged');
-        }
-    }
 
 	// put try block around it to allow the page to be rendered in Google cache
 	try
@@ -1334,6 +1300,7 @@ function mCreateElement(aNode, aAttrs, aChildNodes, aTarget, aData) {
         }
 
         if (aNode.nodeName === 'SCRIPT') {
+            console.assert(self.is_extension === false, 'We cannot use blob-URIs under the browser extension.');
             aNode.src = aData;
         }
         else {
@@ -1344,467 +1311,23 @@ function mCreateElement(aNode, aAttrs, aChildNodes, aTarget, aData) {
     return aNode;
 }
 
-function mObjectURL(data, type)
-{
-    var blob;
-    try {
-        blob = new Blob( data, { type: type });
-    } catch(e) {
-        if (d) console.error(e);
-        if (!window.BlobBuilder) {
-            window.BlobBuilder = window.WebKitBlobBuilder || window.MozBlobBuilder || window.MSBlobBuilder;
-        }
-        if (window.BlobBuilder) {
-            var bb = new BlobBuilder();
-            bb.append(data.join("\n"));
-            blob = bb.getBlob(type);
-        }
-    }
-    return blob && URL.createObjectURL(blob);
+function mObjectURL(data, type) {
+    'use strict';
+    return URL.createObjectURL(new Blob(data, {type: type}));
 }
 
 /**
  * Events broadcaster
  * @name mBroadcaster
- * @global
+ * @private
  */
-(function(s, o) {
-    'use strict';
-    Object.defineProperty(s, 'mBroadcaster', {
-        value: o,
-        writable: false
-    });
-})(self, {
-    // @private
-    _topics: Object.create(null),
-
-    /**
-     * Add broadcast event listener.
-     * @param {String} topic A string representing the event type to listen for.
-     * @param {Object|Function} options Event options or function to invoke.
-     * @returns {String} The ID identifying the event
-     * @memberOf mBroadcaster
-     */
-    addListener: function mBroadcaster_addListener(topic, options) {
-        'use strict';
-
-        if (typeof options === 'function') {
-            options = {
-                callback : options
-            };
-        }
-        if (options.hasOwnProperty('handleEvent')) {
-            options = {
-                scope: options,
-                callback: options.handleEvent
-            };
-        }
-        if (typeof options.callback !== 'function') {
-            return false;
-        }
-
-        if (!this._topics[topic]) {
-            this._topics[topic] = Object.create(null);
-        }
-
-        var id = makeUUID();
-        this._topics[topic][id] = options;
-
-        //if (d) console.log('Adding broadcast listener', topic, id, options);
-
-        return id;
-    },
-
-    /**
-     * Check whether someone is listening for an event
-     * @param {String} topic A string representing the event type we may be listening for.
-     * @returns {Boolean}
-     */
-    hasListener: function mBroadcaster_hasListener(topic) {
-        'use strict';
-        return Boolean(this._topics[topic]);
-    },
-
-    /**
-     * Remove all broadcast events for an specific topic.
-     * @param {String} topic The string representing the event type we were listening for.
-     * @returns {Boolean} Whether the event was found.
-     * @memberOf mBroadcaster
-     */
-    removeListeners: function mBroadcaster_removeListeners(topic) {
-        'use strict';
-
-        if (this._topics[topic]) {
-            delete this._topics[topic];
-            return true;
-        }
-        return false;
-    },
-
-    /**
-     * Remove an specific event based on the ID given by addListener()
-     * @param {String} token The ID identifying the event.
-     * @param {EventListener} [listener] Optional DOM event listener.
-     * @returns {Boolean} Whether the event was found.
-     * @memberOf mBroadcaster
-     */
-    removeListener: function mBroadcaster_removeListenr(token, listener) {
-        'use strict';
-
-        // if (d) console.log('Removing broadcast listener', token);
-
-        if (listener) {
-            // Remove an EventListener interface.
-            var found;
-            for (var id in this._topics[token]) {
-                if (this._topics[token].hasOwnProperty(id)
-                    && this._topics[token][id].scope === listener) {
-
-                    found = id;
-                    break;
-                }
-            }
-
-            token = found;
-        }
-
-        for (var topic in this._topics) {
-            if (this._topics[topic][token]) {
-                delete this._topics[topic][token];
-                if (!Object.keys(this._topics[topic]).length) {
-                    delete this._topics[topic];
-                }
-                return true;
-            }
-        }
-        return false;
-    },
-
-    /**
-     * Send a broadcast event
-     * @param {String} topic A string representing the event type to notify.
-     * @returns {Boolean} Whether anyone were listening.
-     * @memberOf mBroadcaster
-     */
-    sendMessage: function mBroadcaster_sendMessage(topic) {
-        'use strict';
-
-        if (this._topics[topic]) {
-            var idr  = [];
-            var args = toArray.apply(null, arguments);
-            args.shift();
-
-            if (!args.length) {
-                args = [{type: topic}];
-            }
-
-            // if (d) console.log('Broadcasting ' + topic, args);
-
-            for (var id in this._topics[topic]) {
-                var ev = this._topics[topic][id], rc;
-                try {
-                    rc = ev.callback.apply(ev.scope, args);
-                } catch (ex) {
-                    if (d) console.error(ex);
-
-                    onIdle(function() {
-                        throw ex;
-                    });
-                }
-                if (ev.once || rc === 0xDEAD)
-                    idr.push(id);
-            }
-            if (idr.length) {
-                for (var i = idr.length; i--;) {
-                    this.removeListener(idr[i]);
-                }
-            }
-
-            return true;
-        }
-
-        return false;
-    },
-
-    /**
-     * Wrapper around addListener() that will listen for the event just once.
-     * @param {String} topic A string representing the event type to listen for.
-     * @param {Function} callback The function to invoke
-     * @memberOf mBroadcaster
-     */
-    once: function mBroadcaster_once(topic, callback) {
-        'use strict';
-
-        this.addListener(topic, {
-            once : true,
-            callback : callback
-        });
-    },
-
-    /**
-     * Send message when there is listener for it, if there is not listener for it,
-     * wait for listener to be initialize and send message at that point.
-     * Reason for this function is make sure callback is executed,
-     * even there is race condition between sender and listener.
-     * This function should be paired with 'onceAfterReady'.
-     * @param {String} topic A string representing the event type to listen for.
-     * @param {Interger} [timeout] Time for waiting listener to be init in ms, if it passed destroy awaiting.
-     * @memberOf mBroadcaster
-     */
-    sendMessageAfterReady: function mBroadcaster_sendMessageAfterReady(topic, timeout) {
-        'use strict';
-
-        if (this.hasListener(topic)) {
-            this.sendMessage(topic);
-        }
-        else {
-            this.once(topic + '_awaiting_listener', this.sendMessage.bind(this, topic));
-            if (timeout) {
-                setTimeout(function() {
-                    if (this.hasListener(topic + '_awaiting_listener')) {
-                        this.removeListener(topic + '_awaiting_listener');
-                    }
-                }, timeout);
-            }
-        }
-    },
-
-    /**
-     * Add once listener and if there is sendMessage waiting for listner to be init,
-     * made it init and trigger message to be sent so it can execute callback
-     * Reason for this function is make sure callback is executed,
-     * even there is race condition between sender and listener.
-     * This function should be paired with 'sendMessageAfterReady'.
-     * @param {String} topic A string representing the event type to listen for.
-     * @param {Function} callback The function to invoke
-     * @memberOf mBroadcaster
-     */
-    onceAfterReady: function mBroadcaster_onceAfterReady(topic, callback) {
-        'use strict';
-
-        this.once(topic, callback);
-
-        if (this.hasListener(topic + '_awaiting_listener')) {
-            this.sendMessage(topic + '_awaiting_listener');
-        }
-    },
-
-    crossTab: {
-        eTag: '$CTE$!_',
-
-        initialize: function crossTab_init(cb) {
-            var setup = function(ev) {
-                var msg = String(ev && ev.key).substr(this.eTag.length);
-                if (d) console.log('crossTab setup-event', msg, ev);
-                if (cb && (!ev || msg === 'pong')) {
-                    this.unlisten(setup);
-                    if (msg !== 'pong') {
-                        this.setMaster();
-                    } else {
-                        this.notify('ack-pong');
-                        delete localStorage[ev.key];
-                    }
-                    this.listen();
-                    if (d) {
-                        console.log('CROSSTAB COMMUNICATION INITIALIZED AS '
-                            + (this.master ? 'MASTER':'SLAVE'));
-
-                        console.log(String(ua));
-                        console.log(buildVersion);
-                        console.log(browserdetails(ua).prod + u_handle);
-                    }
-                    mBroadcaster.sendMessage('crossTab:setup', this.master);
-                    cb(this.master);
-                    cb = null;
-                }
-            }.bind(this);
-
-            if (this.handle) {
-                this.eTag = this.eTag.split(this.handle).shift();
-            }
-            this.slaves = [];
-            this.handle = u_handle;
-            this.eTag += u_handle + '!';
-
-            this.ctID = ~~(Math.random() * Date.now());
-            this.listen(setup);
-            this.notify('ping');
-
-            // if multiple tabs are reloaded/opened at the same time
-            // they would both see .ctInstances as === 0, so we need to increase this
-            // as earlier as possible, e.g. now.
-            localStorage.ctInstances = (parseInt(localStorage.ctInstances) || 0) + 1;
-
-            setTimeout(setup, parseInt(localStorage.ctInstances) === 1 ? 0 : 2100 + Math.floor(Math.random() * 900));
-        },
-
-        listen: function crossTab_listen(aListener) {
-            if (window.addEventListener) {
-                window.addEventListener('storage', aListener || this, false);
-            }
-            else if (window.attachEvent) {
-                if (!aListener) {
-                    aListener = this.__msie_listener = this.handleEvent.bind(this);
-                }
-                window.attachEvent('onstorage', aListener);
-            }
-        },
-
-        unlisten: function crossTab_unlisten(aListener) {
-            if (window.addEventListener) {
-                window.removeEventListener('storage', aListener || this, false);
-            }
-            else if (window.attachEvent) {
-                if (!aListener) {
-                    aListener = this.__msie_listener;
-                    delete this.__msie_listener;
-                }
-                window.detachEvent('onstorage', aListener);
-            }
-        },
-
-        leave: function crossTab_leave() {
-            if (this.ctID) {
-                var wasMaster = this.master;
-                if (wasMaster) {
-                    var current = parseInt(localStorage.ctInstances);
-                    if (current > 1) {
-                        // only decrease ctInstnaces if its > 1, so that we would never
-                        // get into a case when ctInstances is < 0
-                        localStorage.ctInstances--;
-                    }
-                    else {
-                        localStorage.ctInstances = 0;
-                    }
-                    localStorage['mCrossTabRef_' + u_handle] = this.master;
-                    delete this.master;
-                } else if (d) {
-                    console.log('crossTab leaving');
-                }
-
-                this.unlisten();
-                this.notify('leaving', {
-                    wasMaster: wasMaster || -1,
-                    newMaster: this.slaves[0]
-                });
-
-                mBroadcaster.sendMessage('crossTab:leave', wasMaster);
-                this.ctID = 0;
-            }
-        },
-
-        drain: function() {
-            'use strict';
-            if (typeof delay === 'function') {
-                var tag = this.eTag;
-                delay('crosstab:drain', function() {
-                    var entries = Object.keys(localStorage)
-                        .filter(function(k) {
-                            return k.startsWith(tag);
-                        });
-                    console.debug('Removing crossTab entries...', entries);
-
-                    for (var i = entries.length; i--;) {
-                        delete localStorage[entries[i]];
-                    }
-                }, 8e3);
-            }
-        },
-
-        notify: tryCatch(function crossTab_notify(msg, data) {
-            'use strict';
-            this.drain();
-            data = { origin: this.ctID, data: data, sid: ++mIncID };
-            localStorage.setItem(this.eTag + msg, JSON.stringify(data));
-            if (d) console.log('crossTab Notifying', this.eTag + msg, localStorage[this.eTag + msg]);
-        }),
-
-        setMaster: function crossTab_setMaster() {
-            this.master = (Math.random() * Date.now()).toString(36);
-
-            localStorage.ctInstances = (this.slaves.length + 1);
-            mBroadcaster.sendMessage('crossTab:master', this.master);
-            this.notify('pong');
-
-            // (function liveLoop(tag) {
-            // if (tag === mBroadcaster.crossTab.master) {
-            // localStorage['mCrossTabRef_' + u_handle] = Date.now();
-            // setTimeout(liveLoop, 6e3, tag);
-            // }
-            // })(this.master);
-        },
-
-        clear: function crossTab_clear() {
-            Object.keys(localStorage).forEach(function(key) {
-                if (key.substr(0,this.eTag.length) === this.eTag) {
-                    if (d) console.log('crossTab Removing ' + key);
-                    delete localStorage[key];
-                }
-            }.bind(this));
-        },
-
-        handleEvent: function crossTab_handleEvent(ev) {
-            if (d > 1) console.log('crossTab ' + ev.type + '-event', ev.key, ev.newValue, ev);
-
-            if (String(ev.key).indexOf(this.eTag) !== 0) {
-                return;
-            }
-            var msg = ev.key.substr(this.eTag.length),
-                strg = JSON.parse(ev.newValue ||'""');
-
-            if (!strg || strg.origin === this.ctID) {
-                if (d) console.log('Ignoring crossTab event', msg, strg);
-                return;
-            }
-
-            switch (msg) {
-                case 'ack-pong':
-                    if (!this.master || this.slaves.indexOf(strg.origin) >= 0) {
-                        break;
-                    }
-                    /* fallthrough */
-                case 'ping':
-                    this.slaves.push(strg.origin);
-                    if (this.master) {
-                        localStorage.ctInstances = (this.slaves.length + 1);
-                    }
-
-                    mBroadcaster.sendMessage('crossTab:slave', strg.origin);
-                    this.notify('pong');
-                    break;
-                case 'leaving':
-                    var idx = this.slaves.indexOf(strg.origin);
-                    if (idx !== -1) {
-                        this.slaves.splice(idx, 1);
-                        if (this.master) {
-                            localStorage.ctInstances = (this.slaves.length + 1);
-                        }
-                    }
-
-                    if (localStorage['mCrossTabRef_' + u_handle] === strg.data.wasMaster) {
-                        if (strg.data.newMaster === this.ctID) {
-                            if (d) {
-                                console.log('Taking crossTab-master ownership');
-                            }
-                            delete localStorage['mCrossTabRef_' + u_handle];
-                            this.setMaster();
-                        }
-                    }
-                default:
-                    mBroadcaster.sendMessage('crossTab:' + msg, strg);
-
-                    break;
-            }
-
-            delete localStorage[ev.key];
-        }
-    }
-});
-
-if (!is_karma) {
-    Object.freeze(mBroadcaster);
-}
-
+tmp = [];
+self.mBroadcaster = {
+    mbl: tmp,
+    once: Array.prototype.push.bind(tmp, true),
+    addListener: Array.prototype.push.bind(tmp, false)
+};
+tmp = 0;
 
 var sh = [];
 
@@ -1895,17 +1418,6 @@ function init_storage ( storage ) {
     return storage;
 }
 
-if (typeof XDomainRequest !== 'undefined' && typeof ArrayBuffer === 'undefined') {
-    window.getxhr = function _getxhr() {
-        return new XDomainRequest();
-    };
-}
-else {
-    window.getxhr = function _getxhr() {
-        return new XMLHttpRequest();
-    };
-}
-
 /**
  * Logs errors when loading/verifying files. This will log once for a file load error on the regular static server
  * (after x retries of any file), log once for any error on the default static server (after x retries per file) and
@@ -1971,12 +1483,12 @@ function logStaticServerFailure(errorType, filename, staticPathToLog) {
 
     // Send log. NB: Not using staticpath global here, in case it changed in the main thread
     // and due to the onIdle timeout below it hasn't actually sent the log yet
-    onIdle(function() {
-        var xhr = getxhr();
-        xhr.open('POST', apipath + 'cs?id=0' + mega.urlParams(), true);
+    setTimeout(function() {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', apipath + 'cs?id=0', true);
         xhr.send(
             JSON.stringify(
-                [{ a: 'log', e: 99723, m: JSON.stringify([1, errorType, filename, staticPathToLog]) }]
+                [{a: 'log', e: 99723, m: JSON.stringify([1, errorType, filename, staticPathToLog])}]
             )
         );
     });
@@ -1989,10 +1501,12 @@ function logStaticServerFailure(errorType, filename, staticPathToLog) {
  * @param {String} filename The file that failed to load
  */
 function siteLoadError(error, filename) {
-
     'use strict';
 
-    logStaticServerFailure(error, filename, staticpath);
+    if (filename !== 'mainlayout') {
+
+        logStaticServerFailure(error, filename, staticpath);
+    }
 
     var message = ['MEGA failed to load because '];
     if (location.host !== 'mega.nz') {
@@ -2028,7 +1542,7 @@ function siteLoadError(error, filename) {
     console.error(message);
     contenterror = 1;
 
-    if (window.sleTick) {
+    if (window.sleTick || window.top !== window) {
         return;
     }
 
@@ -2048,60 +1562,32 @@ function siteLoadError(error, filename) {
     }, 2e3);
 }
 
-// Add manifest.json so this can be used on latest browsers.
-var tag=document.createElement('link');
-tag.rel = "manifest";
-tag.href = "/manifest.json";
-document.getElementsByTagName('head')[0].appendChild(tag);
+if (is_mobile) {
+    mCreateElement('meta', {
+        sizes: "72x72",
+        name: "apple-touch-icon-precomposed",
+        href: staticpath + "images/favicons/apple-touch-icon-72x72.png"
+    }, 'head');
+    mCreateElement('meta', {
+        sizes: "144x114",
+        name: "apple-touch-icon-precomposed",
+        href: staticpath + "images/favicons/apple-touch-icon-144x114.png"
+    }, 'head');
+    mCreateElement('meta', {
+        sizes: "144x144",
+        name: "apple-touch-icon-precomposed",
+        href: staticpath + "images/favicons/apple-touch-icon-144x144.png"
+    }, 'head');
 
-if (m || (typeof localStorage !== 'undefined' && localStorage.mobile))
-{
-    var tag=document.createElement('meta');
-    tag.name = "viewport";
-    tag.content = "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0";
-    document.getElementsByTagName('head')[0].appendChild(tag);
-    var tag=document.createElement('meta');
-    tag.name = "apple-mobile-web-app-capable";
-    tag.content = "yes";
-    document.getElementsByTagName('head')[0].appendChild(tag);
-    var tag=document.createElement('meta');
-    tag.name = "apple-mobile-web-app-status-bar-style";
-    tag.content = "black";
-    document.getElementsByTagName('head')[0].appendChild(tag);
-    var tag=document.createElement('link');
-    tag.rel = "apple-touch-icon-precomposed";
-    tag.sizes = "144x144";
-    tag.href = staticpath + "images/favicons/apple-touch-icon-144x144.png";
-    document.getElementsByTagName('head')[0].appendChild(tag);
-    var tag=document.createElement('link');
-    tag.rel = "apple-touch-icon-precomposed";
-    tag.sizes = "114x114";
-    tag.href = staticpath + "images/favicons/apple-touch-icon-114x114.png";
-    document.getElementsByTagName('head')[0].appendChild(tag);
-    var tag=document.createElement('link');
-    tag.rel = "apple-touch-icon-precomposed";
-    tag.sizes = "72x72";
-    tag.href = staticpath + "images/favicons/apple-touch-icon-72x72.png";
-    document.getElementsByTagName('head')[0].appendChild(tag);
-    var tag=document.createElement('link');
-    tag.rel = "apple-touch-icon-precomposed";
-    tag.href = staticpath + "images/favicons/apple-touch-icon-57x57.png";
-    document.getElementsByTagName('head')[0].appendChild(tag);
-    var tag=document.createElement('link');
-    tag.rel = "shortcut icon";
-    tag.type = "image/vnd.microsoft.icon";
-    tag.href = "https://mega.nz/favicon.ico";
-    document.getElementsByTagName('head')[0].appendChild(tag);
-    m=true;
+    mCreateElement('meta', {name: "apple-mobile-web-app-capable", content: "yes"}, 'head');
+    mCreateElement('meta', {name: "apple-mobile-web-app-status-bar-style", content: "black"}, 'head');
+}
+
+if (is_livesite && !is_extension) {
+    mCreateElement('link', {rel: "manifest", href: "/manifest.json"}, 'head');
 }
 
 if (is_ios) {
-    tmp = document.querySelector('meta[name="apple-itunes-app"]');
-    if (tmp) {
-        tmp.setAttribute('content',
-            'app-id=706857885, app-argument=mega://#' + page);
-    }
-
     // http://whatsmyuseragent.com/Devices/iPhone-User-Agent-Strings
     // http://www.enterpriseios.com/wiki/Complete_List_of_iOS_User_Agent_Strings
     tmp = ua.match(/(?:iphone|cpu) os (\d+)[\._](\d+)/);
@@ -2119,7 +1605,7 @@ if (is_ios) {
     }
     tmp = undefined;
 
-    if (m) {
+    if (is_mobile) {
         // Prevent Safari's copy&paste bug..
         window.onhashchange = function() {
             location.reload();
@@ -2127,8 +1613,18 @@ if (is_ios) {
     }
 }
 
+// Viewport meta.
+// Disable user-scalable to avoid auto-zoom on iOS and firefox browsers (?)
+// These browsers already support zoom
+mCreateElement('meta', {
+    name: 'viewport',
+    content: 'width=device-width, initial-scale=1, maximum-scale=1, ' +
+        (!is_mobile || is_ios || ua.indexOf('firefox') > 0 ? 'user-scalable=0, ' : '') +
+        'interactive-widget=resizes-content'
+}, 'head');
+
 // Determine whether to show the legacy mobile page for these links so that they redirect back to the app
-var showLegacyMobilePage = m && (
+tmp = is_mobile && (
     page.substr(0, 9) === 'newsignup'
     || page.substr(0, 7) === 'account'
     || is_old_windows_phone && page.substr(0, 7) === 'confirm'
@@ -2139,7 +1635,7 @@ var showLegacyMobilePage = m && (
  * app if any cancel, verify, fm/ipc, newsignup, recover or account links are clicked in the app
  * because the new mobile site is not designed for those yet.
  */
-if (showLegacyMobilePage) {
+if (tmp) {
 
     var app;
     var android;
@@ -2275,12 +1771,10 @@ else if (!browserUpdate) {
             function mTrim(s)
             {
                 return String(s)
-                    .replace(/resource:.+->\s/,'')
+                    .replace('-extension://', '~')
                     .replace(/blob:[^:\s]+/, '..')
                     .replace(/([^'])\w+:\/\/[^\s:]+/, '$1..')
                     .replace(/\.\.:\/\/[^:\s]+/, '..')
-                    .replace('chrome://mega/content','..')
-                    .replace(/file:.+extensions/,'..fx')
                     .replace(/(?: line \d+ > eval)+/g,' >.eval')
                     .trim();
             }
@@ -2291,11 +1785,7 @@ else if (!browserUpdate) {
                 return;
             }
 
-            var expectedSourceOrigin = url || ln > 10;
-            if (url === '@srvlog') {
-                url = '';
-            }
-
+            var expectedSourceOrigin = url || ln > 999;
             var dump = {
                 l: ln,
                 f: mTrim(url),
@@ -2310,7 +1800,7 @@ else if (!browserUpdate) {
                         return "'" + (a.origin !== 'null' && a.origin
                             || (a.protocol + '//' + a.hostname)) + "...'";
                     })
-                    .replace(/(Cannot read property )('[\w-]{8}')/, "$1'<h>?'")
+                    .replace(/(Cannot read propert[\w\s]+)\(?([\w\s]*'[\w-]{8}')/, "$1'<h>?'")
                     .replace(/(Access to '\.\.).*(' from script denied)/, '$1$2')
                     .replace(/gfs\w+\.userstorage/, 'gfs...userstorage')
                     .replace(/^Uncaught\W*(?:exception\W*)?/i, ''),
@@ -2336,11 +1826,24 @@ else if (!browserUpdate) {
             dump.m = (
                 is_mobile ? '[mobile] ' :
                     is_embed ? '[embed] ' :
+                        window.pfid ? '[FL] ' :
+                            mega.infinity ? '[INF] ' :
                         is_drop ? '[drop] ' : ''
             ) + dump.m.replace(/\s+/g, ' ');
 
-            if (is_litesite) {
-                dump.m = '[lite]' + (dump.m[0] === '[' ? '' : ' ') + dump.m;
+            var injectedScript =
+                /userscript|user\.js|EvalError/.test(dump.m + url + (errobj && errobj.stack))
+                || dump.m.indexOf('Permission denied to access property') !== -1
+                || dump.m.indexOf('Cannot redefine property') !== -1
+                || dump.m.indexOf("evaluating 'ze(e,t)'") !== -1
+                || dump.m.indexOf("evaluating 'r(a,c)'") !== -1
+                || dump.m.indexOf("evaluating 'a.L") !== -1
+                || dump.m.indexOf('Error: hookFull') !== -1;
+
+            if (injectedScript) {
+                window.onerror = null;
+                window.log99723 = true;
+                expectedSourceOrigin = false;
             }
 
             if (expectedSourceOrigin && !window.u_checked) {
@@ -2351,15 +1854,18 @@ else if (!browserUpdate) {
                 return siteLoadError(dump.m, url + '^~' + ln);
             }
 
-            if (/userscript|user\.js|EvalError/.test(dump.m + url + (errobj && errobj.stack))
-                || dump.m.indexOf('Permission denied to access property') !== -1
-                || dump.m.indexOf('Cannot redefine property') !== -1
-                || dump.m.indexOf("evaluating 'r(a,c)'") !== -1
-                || dump.m.indexOf('Error: hookFull') !== -1) {
-
+            if (injectedScript) {
                 // Some third party extension is injecting bogus script(s)...
                 console.warn('Your account is only as secure as your computer...');
                 console.warn('Check your installed extensions for the one injecting bogus scripts on this page...');
+                console.error(dump.m, dump, errobj);
+                return false;
+            }
+
+            if (/NS_ERR|out[\s_]+of[\s_]+mem|dead\s+object|allocation\s+failed/i.test(dump.m)
+                && (!window.ua || !ua.details || !ua.details.blink)) {
+
+                window.onerror = null;
                 console.error(dump.m, dump, errobj);
                 return false;
             }
@@ -2370,8 +1876,8 @@ else if (!browserUpdate) {
 
                 if (!/SyntaxError|Script\serror/.test(dump.m)) {
                     onIdle(function() {
-                        var xhr = getxhr();
-                        xhr.open('POST', apipath + 'cs?id=0' + mega.urlParams(), true);
+                        var xhr = new XMLHttpRequest();
+                        xhr.open('POST', apipath + 'cs?id=0', true);
                         xhr.send(
                             JSON.stringify(
                                 [{a: 'log', e: 99806, m: JSON.stringify([1, dump.m, url + ':' + ln])}]
@@ -2385,7 +1891,7 @@ else if (!browserUpdate) {
             var version = buildVersion.website;
 
             if (is_extension) {
-                if (is_chrome_firefox || is_firefox_web_ext) {
+                if (is_firefox_web_ext) {
                     version = buildVersion.firefox;
                 }
                 else if (mega.chrome) {
@@ -2395,7 +1901,6 @@ else if (!browserUpdate) {
 
             if (errobj)
             {
-                if (errobj.udata) dump.d = errobj.udata;
                 if (errobj.stack)
                 {
                     var maxStackLines = 15;
@@ -2448,7 +1953,7 @@ else if (!browserUpdate) {
             }
             if (cn) dump.c = cn;
 
-            if (/Access to (?:the script at )?'.*(?:' from script|is) denied/.test(dump.m)) {
+            if (/Access to (?:the script at )?'.*(?:' from script|'?is) denied|origin 'null'/.test(dump.m)) {
                 console.error(dump.m, dump);
                 return false;
             }
@@ -2523,10 +2028,6 @@ else if (!browserUpdate) {
                 report.ud = uds;
                 report.cc = cc;
 
-                if (is_chrome_firefox)
-                {
-                    report.mo = mozBrowserID + '::' + is_chrome_firefox + '::' + mozMEGAExtensionVersion;
-                }
                 report = JSON.stringify(r? report:{});
 
                 for (var i = __cdumps.length; i--;)
@@ -2561,6 +2062,15 @@ else if (!browserUpdate) {
 
         // Get the preferred language in their browser
         var userLangs, userLang, ourLangs, k, v, j, i, u;
+
+        // Check if a language override exists on the URL where applicable.
+        if (is_drop) {
+            tmp = page.split('!').pop();
+
+            if (languages[tmp]) {
+                return tmp;
+            }
+        }
 
         // Otherwise get the user's preferred language in their browser settings
         userLangs = navigator.languages || navigator.language || navigator.userLanguage;
@@ -2645,6 +2155,20 @@ else if (!browserUpdate) {
         return enLang;
     };
 
+    tryCatch(function() {
+        if (!is_mobile && !is_iframed && 'serviceWorker' in navigator) {
+            // The service worker isn't listened to until much later so just queue any messages for now.
+            var handler = function(ev) {
+                mega.pendingServiceWorkerMsgs.push({data: ev.data});
+            };
+            navigator.serviceWorker.addEventListener('message', handler);
+
+            mega.pendingServiceWorkerMsgs = [];
+            mega.pendingServiceWorkerHandler = handler;
+        }
+    })();
+
+
     var lang = sessionStorage.lang || localStorage.lang;
     var jsl = [];
 
@@ -2672,8 +2196,11 @@ else if (!browserUpdate) {
     jsl.push({f:'js/vendor/megaLogger.js', n: 'megaLogger_js', j:1});
     jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
     jsl.push({f:'js/jquery-ui.extra.js', n: 'jquery_ui_extra_js', j:1});
+    jsl.push({f:'js/vendor/twemoji.noutf.js', n: 'twemoji_js', j:1});
 
+    jsl.push({f:'js/utils/broadcast.js', n: 'js_utils_broadcast_js', j: 1});
     jsl.push({f:'js/utils/polyfills.js', n: 'js_utils_polyfills_js', j: 1});
+    jsl.push({f:'js/utils/api.js', n: 'js_utils_api_js', j: 1});
     jsl.push({f:'js/utils/browser.js', n: 'js_utils_browser_js', j: 1});
     jsl.push({f:'js/utils/clipboard.js', n: 'js_utils_clipboard_js', j: 1});
     jsl.push({f:'js/utils/conv.js', n: 'js_utils_conv_js', j: 1});
@@ -2685,7 +2212,9 @@ else if (!browserUpdate) {
     jsl.push({f:'js/utils/icu.js', n: 'js_utils_icu_js', j: 1});
     jsl.push({f:'js/keymgr.js', n: 'keymgr_js', j:1});
     jsl.push({f:'js/utils/locale.js', n: 'js_utils_locale_js', j: 1});
+    jsl.push({f:'js/utils/md5.js', n: 'js_utils_md5_js', j: 1});
     jsl.push({f:'js/utils/media.js', n: 'js_utils_pictools_js', j: 1});
+    jsl.push({f:'js/utils/megalite.js', n: 'js_utils_megalite_js', j: 1});
     jsl.push({f:'js/utils/network.js', n: 'js_utils_network_js', j: 1});
     jsl.push({f:'js/utils/splitter.js', n: 'js_utils_splitter_js', j: 1});
     jsl.push({f:'js/utils/test.js', n: 'js_utils_test_js', j: 1});
@@ -2694,6 +2223,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/utils/workers.js', n: 'js_utils_workers_js', j: 1});
     jsl.push({f:'js/utils/trans.js', n: 'js_utils_trans_js', j: 1});
     jsl.push({f:'js/utils/webgl.js', n: 'webgl_js', j:1});
+    jsl.push({f:'js/utils/subtitles.js', n: 'subtitles_js', j:1});
 
     // Sets and elements
     jsl.push({f:'js/utils/sets.js', n: 'fm_sets_js', j:1});
@@ -2706,6 +2236,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/security.js', n: 'security_js', j: 1, w: 5});
     jsl.push({f:'js/two-factor-auth.js', n: 'two_factor_auth_js', j: 1, w: 5});
     jsl.push({f:'js/attr.js', n: 'mega_attr_js', j:1});
+    jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j: 1});
     jsl.push({f:'js/mega.js', n: 'mega_js', j:1,w:7});
     jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
     jsl.push({f:'js/reqstatclient.js', n: 'reqstatclient_js', j:1,w:5});
@@ -2717,8 +2248,6 @@ else if (!browserUpdate) {
     jsl.push({f:'js/sharedlocalkvstorage.js', n: 'sharedlocalkvstorage_js', j: 1, w: 5});
 
     jsl.push({f:'js/tlvstore.js', n: 'tlvstore_js', j:1});
-    jsl.push({f:'js/vendor/jsbn.js', n: 'jsbn_js', j:1, w:2});
-    jsl.push({f:'js/vendor/jsbn2.js', n: 'jsbn2_js', j:1, w:2});
     jsl.push({f:'js/vendor/nacl-fast.js', n: 'nacl_js', j:1,w:7});
 
     jsl.push({f:'js/authring.js', n: 'authring_js', j:1});
@@ -2726,11 +2255,9 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/export.js', n: 'export_js', j:1,w:1});
     jsl.push({f:'html/js/key.js', n: 'key_js', j:1});
 
-
     jsl.push({f:'js/ui/simpletip.js', n: 'simpletip_js', j:1,w:1});
     jsl.push({f:'js/useravatar.js', n: 'contact_avatar_js', j:1,w:3});
     jsl.push({f:'css/avatars.css', n: 'avatars_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
 
     // Common desktop and mobile, bottom pages
     jsl.push({f:'css/fonts.css', n: 'fonts_css', j:2,w:5,c:1,d:1,cache:1});
@@ -2744,16 +2271,10 @@ else if (!browserUpdate) {
     jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/business-register.css', n: 'business-register_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/psa.css', n: 'psa_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
-    jsl.push({f:'css/about.css', n: 'about_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/features.css', n: 'features_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/achievements.css', n: 'achievements_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'css/corporate.css', n: 'corporate_css', j:2,w:5,c:1,d:1,cache:1});
-    jsl.push({f:'html/start.html', n: 'start', j:0});
-    jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
     jsl.push({f:'html/js/bottompage.js', n: 'bottompage_js', j:1});
     jsl.push({f:'html/pagesmenu.html', n: 'pagesmenu', j:0});
     jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
-    jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
     jsl.push({f:'js/filedrag.js', n: 'filedrag_js', j:1});
     jsl.push({f:'js/thumbnail.js', n: 'thumbnail_js', j:1});
     jsl.push({f:'js/vendor/exif.js', n: 'exif_js', j:1, w:3});
@@ -2764,6 +2285,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/publicServiceAnnouncement.js', n: 'psa_js', j:1,w:1});
     jsl.push({f:'js/ui/megaInputs.js', n: 'megainputs_js', j:1,w:1});
     jsl.push({f:'js/ui/megaInputs-underlinedText.js', n: 'megainputs_underlinedtext_js', j:1,w:1});
+    jsl.push({f:'js/ui/megaInputs-textArea.js', n: 'megainputs_textarea_js', j:1,w:1});
     jsl.push({f:'js/ui/megaInputs-currencyField.js', n: 'megainputs_currencyfield_js', j:1, w:1});
     jsl.push({f:'html/registerb.html', n: 'registerb',j:0});
     jsl.push({f:'html/developersettings.html', n: 'developersettings', j:0});
@@ -2776,22 +2298,17 @@ else if (!browserUpdate) {
     jsl.push({f:'css/dialogs/cookie-dialog.css', n: 'cookie-dialog_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'js/metatags.js', n: 'metatags_js', j:1 });
     jsl.push({f:'js/vendor/verge.js', n: 'verge', j:1, w:5});
+    jsl.push({f:'js/vendor/perfect-scrollbar.js', n: 'ps_js', j:1,w:1});
+    jsl.push({f:'js/ui/languageDialog.js', n: 'languageDialog_js', j:1,w:7});
     jsl.push({f:'css/jquery-ui.extra.css', n: 'jquery_ui_extra_css', j:2,w:5,c:1,d:1,cache:1});
+    // jsl.push({f:'js/ui/commercials.js', n: 'commercials', j:1,w:1});
+    jsl.push({f:'html/cookiepolicy.html', n: 'cookiepolicy', j:0});
+    jsl.push({f:'css/cookiepolicy.css', n: 'cookiepolicy_css', j:2,w:5,c:1,d:1,cache:1});
 
     if (!is_mobile) {
-        jsl.push({f:'js/ui/nicknames.js', n: 'nicknames_js', j:1});
         jsl.push({f:'js/jquery.tokeninput.js', n: 'jquerytokeninput_js', j:1});
         jsl.push({f:'js/jquery.checkboxes.js', n: 'checkboxes_js', j:1});
-
-        // This is not used anymore, unless we process and store credit card details for renewals again
-        // jsl.push({f:'js/paycrypt.js', n: 'paycrypt_js', j:1 });
-
-        // Desktop notifications
-        jsl.push({f:'js/vendor/notification.js', n: 'notification_js', j:1,w:7});
-
-        // Other
         jsl.push({f:'js/vendor/moment.js', n: 'moment_js', j:1,w:1});
-        jsl.push({f:'js/vendor/perfect-scrollbar.js', n: 'ps_js', j:1,w:1});
 
         // UI Elements
         jsl.push({f:'js/ui/megaRender.js', n: 'megarender_js', j:1,w:1});
@@ -2801,7 +2318,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/ui/registerDialog.js', n: 'registerdialog_js', j:1,w:1});
         jsl.push({f:'js/ui/keySignatureWarningDialog.js', n: 'mega_js', j:1,w:7});
         jsl.push({f:'js/ui/feedbackDialog.js', n: 'feedbackdialogui_js', j:1,w:1});
-        jsl.push({f:'js/ui/languageDialog.js', n: 'mega_js', j:1,w:7});
+        jsl.push({f:'js/ui/forcedUpgradeProDialog.js', n: 'forcedupgradeprodialog_js', j:1,w:1});
         jsl.push({f:'js/ui/alarm.js', n: 'alarm_js', j:1,w:1});
         jsl.push({f:'js/ui/toast.js', n: 'toast_js', j:1,w:1});
         jsl.push({f:'js/ui/top-tooltip-login.js', n: 'top-tooltip-login', j:1});
@@ -2810,11 +2327,6 @@ else if (!browserUpdate) {
         // Bottom pages for desktop
         jsl.push({f:'css/bottom-pages-animations.css', n: 'bottom-pages-animations_css', j:2,w:5,c:1,d:1,cache:1});
     } // !is_mobile
-
-    if (is_chrome_firefox && parseInt(Services.appinfo.version) > 27) {
-        is_chrome_firefox |= 4;
-        jsl.push({f:'js/transfers/meths/firefox-extension.js', n: 'dl_firefox', j: 1, w: 3});
-    }
 
     // TextEditor
     jsl.push({f:'js/fm/fileTextEditor.js', n: 'filetexteditor_js', j:1});
@@ -2827,7 +2339,6 @@ else if (!browserUpdate) {
     jsl.push({f:'js/transfers/queue.js', n: 'queue', j:1,w:4});
     jsl.push({f:'js/transfers/utils.js', n: 'tutils', j:1,w:4});
     jsl.push({f:'js/transfers/meths/cache.js', n: 'dl_cache', j:1,w:3});
-    jsl.push({f:'js/transfers/meths/flash.js', n: 'dl_flash', j:1,w:3});
     jsl.push({f:'js/transfers/meths/memory.js', n: 'dl_memory', j:1,w:3});
     jsl.push({f:'js/transfers/meths/filesystem.js', n: 'dl_chrome', j:1,w:3});
     // jsl.push({f:'js/transfers/meths/mediasource.js', n: 'dl_mediasource', j:1,w:3});
@@ -2839,13 +2350,13 @@ else if (!browserUpdate) {
     jsl.push({f:'js/transfers/reader.js', n: 'upload_reader_js', j: 1, w: 2});
     jsl.push({f:'js/transfers/zip64.js', n: 'zip_js', j: 1});
     jsl.push({f:'js/transfers/cloudraid.js', n: 'cloudraid_js', j: 1});
-    jsl.push({f:'js/vendor/int64.js', n: 'int64_js', j:1});
 
     // Everything else...
     jsl.push({f:'index.js', n: 'index', j:1,w:4});
 
     jsl.push({f:'html/transferwidget.html', n: 'transferwidget', j:0});
     jsl.push({f:'js/filetypes.js', n: 'filetypes_js', j:1});
+    jsl.push({f:'js/fm/properties.js', n: 'fm_properties_js', j:1});
     jsl.push({f:'js/fm/removenode.js', n: 'fm_removenode_js', j: 1});
     jsl.push({f:'js/fm/ufssizecache.js', n: 'ufssizecache_js', j:1});
 
@@ -2859,6 +2370,9 @@ else if (!browserUpdate) {
     jsl.push({f:'html/js/propay.js', n: 'propay_js', j:1});
     jsl.push({f:'html/js/propay-dialogs.js', n: 'propay_js', j:1});
     jsl.push({f:'js/states-countries.js', n: 'states_countries_js', j:1});
+
+    // Plan pages for features
+    jsl.push({f:'html/js/planpricing/vpn-pricing.js', n: 'vpn_pricing_js', j:1});
 
     jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
     jsl.push({f:'js/fm/achievements.js', n: 'achievements_js', j:1, w:5});
@@ -2883,6 +2397,8 @@ else if (!browserUpdate) {
     jsl.push({f:'js/filerequest_common.js', n: 'filerequest_common_js', j:1});
     jsl.push({f:'js/filerequest_components.js', n: 'filerequest_components_js', j:1});
     jsl.push({f:'js/filerequest.js', n: 'filerequest_js', j:1});
+    jsl.push({f:'js/ui/sprites.js', n: 'sprites_js', j: 1, w: 1});
+    jsl.push({f:'js/ui/theme.js', n: 'theme_js', j: 1, w: 1});
 
     // Variables which can be used across all stylesheets
     jsl.push({f:'css/vars/theme.css', n: 'vars_theme_css', j:2, w:30, c:1, d:1, cache:1});
@@ -2890,6 +2406,8 @@ else if (!browserUpdate) {
 
     // Sprites
     jsl.push({f:'css/sprites/fm-uni@uni.css', n: 'fm_uni_css', j:2, w:30, c:1, d:1, cache:1});
+    jsl.push({f:'css/sprites/fm-mime@uni.css', n: 'fm_mime_css', j:2, w:30, c:1, d:1, cache:1});
+    jsl.push({f:'css/sprites/fm-mime-90@uni.css', n: 'fm_mime_90_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/sprites/fm-mono@mono.css', n: 'fm_mono_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/sprites/fm-theme@dark.css', n: 'fm_dark_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/sprites/fm-theme@light.css', n: 'fm_light_css', j:2, w:30, c:1, d:1, cache:1});
@@ -2906,20 +2424,30 @@ else if (!browserUpdate) {
     jsl.push({f:'css/checkboxes.css', n: 'checkboxes_css', j:2,w:5,c:1,d:1,cache:1});
 
     jsl.push({f:'css/media-viewer.css', n: 'media_viewer_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/video-player.css', n: 'video_player_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/animations.css', n: 'animations_css', j:2, w:30, c:1, d:1, cache:1});
+    jsl.push({f:'css/ui/mcomponents.css', n: 'm_components_css', j:2,w:5,c:1,d:1,cache:1});
+
+    // Megalist
+    jsl.push({f:'js/vendor/megalist.js', n: 'megalist_js', j:1, w:5});
+
+    // Search
+    jsl.push({f:'js/ui/searchbar.js', n: 'searchbar_js', j:1});
 
     if (!is_mobile) {
-        jsl.push({f:'js/ui/theme.js', n: 'theme_js', j: 1, w: 1});
 
         jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/components.css', n: 'components_css', j:2, w:30, c:1, d:1, cache:1});
 
         // MComponents
-        jsl.push({f:'css/ui/mcomponents.css', n: 'm_components_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'js/ui/mcomponents/classes/MComponent.js', n: 'm_component_js', j:1});
         jsl.push({f:'js/ui/mcomponents/classes/MButton.js', n: 'm_button_js', j:1});
+        jsl.push({f:'js/ui/mcomponents/classes/MCheckbox.js', n: 'm_checkbox_js', j:1});
         jsl.push({f:'js/ui/mcomponents/classes/MContextMenu.js', n: 'm_context_menu_js', j:1});
         jsl.push({f:'js/ui/mcomponents/classes/MDialog.js', n: 'm_dialog_js', j:1});
         jsl.push({f:'js/ui/mcomponents/classes/MEmptyPad.js', n: 'm_empty_pad_js', j:1});
+        jsl.push({f:'js/ui/mcomponents/classes/MHint.js', n: 'm_hint_js', j:1});
         jsl.push({f:'js/ui/mcomponents/classes/MMenuSelect.js', n: 'm_menu_select_js', j:1});
         jsl.push({f:'js/ui/mcomponents/classes/MMenuSelectItem.js', n: 'm_menu_select_item_js', j:1});
         jsl.push({f:'js/ui/mcomponents/classes/MSidebarButton.js', n: 'm_sidebar_button_js', j:1});
@@ -2928,11 +2456,12 @@ else if (!browserUpdate) {
 
         jsl.push({f:'html/top.html', n: 'top', j:0});
         jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/fm-header.css', n: 'fm_header_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/fm-breadcrumb.css', n: 'fm_breadcrumb_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/fm-lists.css', n: 'fm_lists_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/grid-table.css', n: 'grid_table_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/tabs.css', n: 'tabs_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/empty-pages.css', n: 'empty_page_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'js/vendor/megalist.js', n: 'megalist_js', j:1, w:5});
         jsl.push({f:'js/vendor/megaDynamicList.js', n: 'mega_dynamic_list_js', j:1, w:5});
         jsl.push({f:'js/fm/quickfinder.js', n: 'fm_quickfinder_js', j:1, w:1});
         jsl.push({f:'js/fm/selectionManager2.js', n: 'fm_selectionmanager2_js', j:1, w:1});
@@ -2941,19 +2470,23 @@ else if (!browserUpdate) {
         jsl.push({f:'js/fm/dashboard.js', n: 'fmdashboard_js', j:1, w:5});
         jsl.push({f:'js/fm/recents.js', n: 'fmrecents_js', j:1, w:5});
         jsl.push({f:'js/time_checker.js', n: 'time_checker_js', j:1});
+        jsl.push({f:'js/ui/contextMenu.js', n: 'context_menu_js', j: 1});
+        jsl.push({f:'js/ui/dragselect.js', n: 'dargselect_js', j:1});
+        jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
+        jsl.push({f:'js/ui/sms.js', n: 'sms_js', j: 1, w: 1});
         jsl.push({f:'js/fm/account.js', n: 'fm_account_js', j:1});
+        jsl.push({f:'js/fm/account-plan.js', n: 'fm_account_plan_js', j:1});
         jsl.push({f:'js/fm/account-change-password.js', n: 'fm_account_change_password_js', j:1});
         jsl.push({f:'js/fm/account-change-email.js', n: 'fm_account_change_email_js', j:1});
         jsl.push({f:'js/fm/dialogs.js', n: 'fm_dialogs_js', j:1});
-        jsl.push({f:'js/fm/properties.js', n: 'fm_properties_js', j:1});
         jsl.push({f:'js/ui/dropdowns.js', n: 'dropdowns_js', j:1});
+        jsl.push({f:'css/node-filter.css', n: 'nodefilter_css', j:2});
+        jsl.push({f:'js/ui/node-filter.js', n: 'nodefilter_js', j:1});
+        jsl.push({f:'js/ui/info-panel.js', n: 'infopanel_js', j:1});
         jsl.push({f:'js/notify.js', n: 'notify_js', j:1});
         jsl.push({f:'js/vendor/avatar.js', n: 'avatar_js', j:1, w:3});
         jsl.push({f:'js/fm/affiliate.js', n: 'fm_affiliate_js', j: 1});
-        jsl.push({f:'js/ui/contextMenu.js', n: 'context_menu_js', j: 1});
-        jsl.push({f:'js/ui/searchbar.js', n: 'searchbar_js', j:1});
-
-        jsl.push({f:'js/ui/dragselect.js', n: 'dargselect_js', j:1});
+        jsl.push({f:'js/fm/vpn.js', n: 'fmvpn_js', j: 1});
 
         // Gallery helpers
         jsl.push({f:'js/fm/gallery/helpers/GalleryTitleControl.js', n: 'fm_gallery_title_control_js', j:1});
@@ -2967,11 +2500,9 @@ else if (!browserUpdate) {
         jsl.push({f:'css/gallery.css', n: 'gallery_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'js/fm/gallery/gallery.js', n: 'fm_gallery_js', j:1});
 
-        // Albums
         jsl.push({f:'js/fm/albums/Albums.js', n: 'fm_albums_js', j:1});
+        jsl.push({f:'js/fm/albums/AlbumTimeline.js', n: 'fm_albums_timeline_js', j:1});
 
-        jsl.push({f:'js/ui/onboarding.js', n: 'onboarding_js', j:1,w:1});
-        jsl.push({f:'js/ui/sms.js', n: 'sms_js', j: 1, w: 1});
         jsl.push({f:'html/onboarding.html', n: 'onboarding', j:0,w:2});
         jsl.push({f:'css/onboarding.css', n: 'onboarding_css', j:2,w:5,c:1,d:1,cache:1});
 
@@ -2986,25 +2517,24 @@ else if (!browserUpdate) {
         jsl.push({f:'css/labels-and-filters.css', n: 'labels-and-filters_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/share-dialog.css', n: 'share_dialog_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/filerequest.css', n: 'filerequest_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/data-blocks-view.css', n: 'data_blocks_view_css', j:2,w:5,c:1,d:1,cache:1});
 
-        jsl.push({f:'css/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/recovery.css', n: 'recovery_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/settings.css', n: 'settings_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/media-print.css', n: 'media_print_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/animations.css', n: 'animations_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/affiliate-program.css', n: 'affiliate_program_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/backup-center.css', n: 'backup_center_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/context-menu.css', n: 'context_menu_css', j:2, w:5, c:1, d:1, cache:1});
         jsl.push({f:'css/tables.css', n: 'tables_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/recents.css', n: 'recents_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/vpn.css', n: 'vpn_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/transfer-widget.css', n: 'transfer_widget_css', j:2, w:30, c:1, d:1, cache:1});
 
         // CSS Revamp changes
         jsl.push({f:'css/components/fm-left-pane.css', n: 'components_fm_left_pane_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/components/info-panel.css', n: 'components_info_panel_css', j:2, w:30, c:1, d:1, cache:1});
 
         // `Meetings` UI styles
         jsl.push({f:'css/chat-bundle.css', n: 'meetings_css', j:2, w:30, c:1, d:1, cache:1});
@@ -3014,7 +2544,13 @@ else if (!browserUpdate) {
         jsl.push({f:'html/fm.html', n: 'fm', j:0, w:3});
         jsl.push({f:'html/top-login.html', n: 'top-login', j:0});
         jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
+        jsl.push({f:'images/mega/contact-avatar.svg', n: 'contact_avatar', j:0});
+        jsl.push({f:'html/rewind.html', n: 'rewind_html', j:0});
         jsl.push({f:'css/topbar.css', n: 'topbar_css', j:2,w:5,c:1,d:1,cache:1});
+
+        // Notification banner
+        jsl.push({f:'css/notification-banner.css', n: 'notification-banner_css', j: 2, w: 5});
+        jsl.push({f:'js/ui/notificationBanner.js', n: 'notificationBanner_js', j:1,w:1});
     } // !is_mobile
 
     // do not change the order...
@@ -3022,7 +2558,6 @@ else if (!browserUpdate) {
     jsl.push({f:'js/fm/utils.js', n: 'fm_utils_js', j: 1});
     jsl.push({f:'js/fm/megadata.js', n: 'fm_megadata_js', j: 1});
     jsl.push({f:'js/fm/megadata/account.js', n: 'fm_megadata_account_js', j: 1});
-    jsl.push({f:'js/fm/megadata/avatars.js', n: 'fm_megadata_avatars_js', j: 1});
     jsl.push({f:'js/fm/megadata/contacts.js', n: 'fm_megadata_contacts_js', j: 1});
     jsl.push({f:'js/fm/megadata/filters.js', n: 'fm_megadata_filters_js', j: 1});
     jsl.push({f:'js/fm/megadata/menus.js', n: 'fm_megadata_menus_js', j: 1});
@@ -3030,15 +2565,17 @@ else if (!browserUpdate) {
     jsl.push({f:'js/fm/megadata/openfolder.js', n: 'fm_megadata_openfolder_js', j: 1});
     jsl.push({f:'js/fm/megadata/render.js', n: 'fm_megadata_render_js', j: 1});
     jsl.push({f:'js/fm/megadata/render-breadcrumbs.js', n: 'fm_megadata_render_breadcrumbs_js', j: 1});
-    jsl.push({f:'js/fm/megadata/reset.js', n: 'fm_megadata_reset_js', j: 1});
     jsl.push({f:'js/fm/megadata/shares.js', n: 'fm_megadata_shares_js', j: 1});
     jsl.push({f:'js/fm/megadata/sort.js', n: 'fm_megadata_sort_js', j: 1});
     jsl.push({f:'js/fm/megadata/transfers.js', n: 'fm_megadata_transfers_js', j: 1});
     jsl.push({f:'js/fm/megadata/tree.js', n: 'fm_megadata_tree_js', j: 1});
+    jsl.push({f:'js/fm/megadata/reset.js', n: 'fm_megadata_reset_js', j: 1});
     jsl.push({f:'html/js/megasync.js', n: 'megasync_js', j: 1});
     jsl.push({f:'js/fm/linkinfohelper.js', n: 'fm_linkinfohelper_js', j: 1});
     jsl.push({f:'js/fm/affiliatedata.js', n: 'fm_affiliatedata_js', j: 1});
+    jsl.push({f:'js/eaffiliate.js', n: 'eaffiliate_js', j: 1});
     jsl.push({f:'js/fm/affiliateRedemption.js', n: 'fm_affiliateredemption_js', j: 1});
+    jsl.push({f:'js/ui/megaGesture.js', n: 'mega_gesture_js', j: 1, w:1});
 
     if (localStorage.makeCache) {
         jsl.push({f:'makecache.js', n: 'makecache', j:1});
@@ -3056,46 +2593,82 @@ else if (!browserUpdate) {
 
     // Load files common to all mobile pages
     if (is_mobile) {
+
+        // Variables which can be used across all mobile stylesheets
+        jsl.push({f:'css/vars/mobile-theme.css', n: 'vars_mobile_theme_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/vars/mobile-theme-auto.css', n: 'vars_mobile_theme_auto_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/mobile/mobile.dropdown.css', n: 'mobile_dropdown_css', j: 2, w: 1});
+        jsl.push({f:'css/mobile/mobile.overlay.css', n: 'mobile_overlay_css', j:2, w:1});
+        jsl.push({f:'css/mobile/mobile.sheet.css', n: 'mobile_sheet_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/mobile/mobile.context.menu.css', n: 'mobile_context_menu_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/mobile/mobile.checkbox.css', n: 'mobile_checkbox_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.radio.button.css', n: 'mobile_radio_button_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.toggle.button.css', n: 'mobile_toggle_button_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.footer.css', n: 'mobile_footer_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.header.css', n: 'mobile_header_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.top.menu.css', n: 'mobile_top_menu_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.msgdialog.css', n: 'mobile_msgdialog_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.rack.css', n: 'mobile_rack_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.toast.css', n: 'mobile_toast_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.rubbish-bin.css', n: 'mobile_rubbish_bin_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.banner.css', n: 'mobile_banner_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.node-selector.css', n: 'mobile_node_selector_css', j:2, w:5, c:1, d:1, cache:1});
+        jsl.push({f:'css/mobile/mobile.empty.state.css', n: 'mobile_empty_state_css', j:2, w:1});
+        jsl.push({f:'css/mobile/mobile.transfer.block.css', n: 'mobile_transfer_block_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.bottom.bar.css', n: 'mobile_bottom_bar_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.account.css', n: 'mobile_account_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.download.css', n: 'mobile_download_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.promo.banner.css', n: 'mobile_promo_banner_css', j:2,w:5,c:1,d:1,cache:1});
+
+        // Sprites
+        jsl.push({f:'css/sprites/mobile-fm-uni@uni.css', n: 'mobile_fm_uni_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/sprites/mobile-fm-mono@mono.css', n: 'mobile_fm_mono_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/sprites/mobile-fm-theme@dark.css', n: 'mobile_fm_dark_css', j:2, w:30, c:1, d:1, cache:1});
+        jsl.push({f:'css/sprites/mobile-fm-theme@light.css', n: 'mobile_fm_light_css', j:2, w:30, c:1, d:1, cache:1});
+
         jsl.push({f:'html/top-mobile.html', n: 'top-mobile', j:0});
         jsl.push({f:'html/mobile-add-contact-card.html', n: 'mobile-add-contact-card', j:0});
         jsl.push({f:'css/mobile.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
-        jsl.push({f:'css/mobile-help.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+        jsl.push({f:'css/mobile/mobile.tappable.css', n: 'mobile_tappable_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+        jsl.push({f:'css/mobile/mobile.settings.css', n: 'mobile_settings_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+        jsl.push({f:'css/mobile/mobile.settings.history.css', n: 'mobile_settings_history_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+        jsl.push({f:'css/mobile/mobile.link-management.css', n: 'mobile_link_management_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+        jsl.push({f:'css/mobile/mobile.referral.css', n: 'mobile_referral_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+        jsl.push({f:'css/mobile-help.css', n: 'mobile_help_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile-top-menu.css', n: 'mobile_top_menu_css',  j: 2, w: 30, c: 1, d: 1, m: 1});
-        jsl.push({f:'css/mobile-toast.css', n: 'mobile_toast_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/mobile-media-viewer.css', n: 'mobile_media_viewer_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/mobile/mobile.node.css', n: 'mobile_node_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+        jsl.push({f:'css/mobile/mobile.sharednode.css', n: 'mobile_sharednode_css', j: 2, w: 1});
+        jsl.push({f:'css/mobile/mobile.tab.css', n: 'mobile_tab_css', j: 2, w: 1});
+        jsl.push({f:'css/mobile/mobile.public.link.css', n: 'mobile_public_linkcss', j: 2, w: 1});
+        jsl.push({f:'css/mobile/mobile.datepicker.css', n: 'mobile_datepicker_css', j: 2, w: 1});
+        jsl.push({f:'css/mobile/mobile.account.cancel-subscription.css', n: 'mobile_account_cancel_sub_css', j: 2, w: 1});
+        jsl.push({f:'css/mobile/mobile.backup.recovery.css', n: 'mobile_backup_recovery_css', j: 2, w: 1});
+        jsl.push({f:'css/mobile/mobile.achieve.css', n: 'mobile_achieve_css', j: 2, w: 1});
+        jsl.push({f:'css/mobile/mobile.achieve.invites.css', n: 'mobile_achieve_invites_css', j: 2, w: 1});
+        jsl.push({f:'css/mobile/mobile.achievements-block.css', n: 'mobile_achievements_block_css', j: 2, w: 1});
+        jsl.push({f:'css/mobile/mobile.achieve.invite-bonuses.css', n: 'mobile_achieve_inv_bonuses_css', j: 2, w: 1});
+        jsl.push({f:'css/mobile/mobile.file-request-management.css', n: 'mobile_fr_mgmt_css', j: 2, w: 1});
+        jsl.push({f:'css/mobile/mobile.conflict-resolution.css', n: 'mobile_conflict_resolution_css', j: 2, w: 1});
+        jsl.push({f:'css/mobile/mobile.recovery.logout.css', n: 'mobile_recovery_logout_css', j: 2, w: 1});
+
         jsl.push({f:'html/mobile.html', n: 'mobile', j: 0, w: 1});
         jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
         jsl.push({f:'js/mobile/mobile.js', n: 'mobile_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.account.js', n: 'mobile_account_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.account.cancel.js', n: 'mobile_account_cancel_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.account.history.js', n: 'mobile_account_history_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.account.paymentcard.js', n: 'mobile_payment_card_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.account.change-password.js', n: 'mobile_account_change_pass_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.account.change-email.js', n: 'mobile_account_change_email_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.account.notifications.js', n: 'mobile_account_notifications_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.account.file-management.js', n: 'mobile_account_file_management_js', j:1, w: 1});
-        jsl.push({f:'js/mobile/mobile.achieve.js', n: 'mobile_achieve_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.achieve.how-it-works.js', n: 'mobile_achieve_how_it_works_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.achieve.invites.js', n: 'mobile_achieve_invites_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.achieve.referrals.js', n: 'mobile_achieve_referrals_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.megaRender.js', n: 'mobile_mega_render_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.affiliate.js', n: 'mobile_affiliate_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.backup.js', n: 'mobile_backup_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.cookie.js', n: 'mobile_cookie_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.cloud.js', n: 'mobile_cloud_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.cloud.action-bar.js', n: 'mobile_cloud_action_bar_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.cloud.context-menu.js', n: 'mobile_cloud_context_menu_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.cloud.sort.js', n: 'mobile_cloud_context_sort_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.create-folder-overlay.js', n: 'mobile_create_folder_overlay_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.decryption-key-overlay.js', n: 'mobile_mobile_dec_key_overlay_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.decryption-password-overlay.js', n: 'mobile_dec_pass_overlay_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.delete-overlay.js', n: 'mobile_delete_overlay_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.download-overlay.js', n: 'mobile_download_overlay_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.node-name-control.js', n: 'mobile_node_name_control_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.key.decryption.js', n: 'mobile_mobile_dec_key_overlay_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.password.decryption.js', n: 'mobile_dec_pass_overlay_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.download.overlay.js', n: 'mobile_download_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.chatlink.js', n: 'mobile_chatlink_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.language-menu.js', n: 'mobile_language_menu_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.link-overlay.js', n: 'mobile_link_overlay_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.link-management.js', n: 'mobile_link_management_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.file-request-management.js', n: 'mobile_file_request_management_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.message-overlay.js', n: 'mobile_message_overlay_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.not-found-overlay.js', n: 'mobile_not_found_overlay_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.privacy.js', n: 'mobile_privacy_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.not-found.js', n: 'mobile_not_found_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.pro-signup-prompt.js', n: 'mobile_pro_signup_prompt_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.propay.js', n: 'mobile_propay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.recovery.js', n: 'mobile_rec_js', j: 1, w: 1});
@@ -3104,44 +2677,87 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.recovery.enter-key.js', n: 'mobile_rec_enter_key_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.recovery.change-password.js', n: 'mobile_rec_change_password_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.register.js', n: 'mobile_register_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.rename-overlay.js', n: 'mobile_rename_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.signin.js', n: 'mobile_signin_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.support.js', n: 'mobile_support_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.takedown.js', n: 'mobile_takedown_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.terms.js', n: 'mobile_terms_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.upload-overlay.js', n: 'mobile_upload_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.contact-link.js', n: 'mobile_contactlink_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.twofactor.js', n: 'mobile_twofactor_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.twofactor.intro.js', n: 'mobile_twofactor_info_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.twofactor.setup.js', n: 'mobile_twofactor_setup_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.twofactor.verify-setup.js', n: 'mobile_twofactor_verify_setup_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.twofactor.enabled.js', n: 'mobile_twofactor_enabled_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.twofactor.verify-disable.js', n: 'mobile_twofactor_verify_disable_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.twofactor.disabled.js', n: 'mobile_twofactor_disabled_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.twofactor.verify-login.js', n: 'mobile_twofactor_verify_login_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.twofactor.verify-action.js', n: 'mobile_twofactor_verify_action_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.sms.phone-input.js', n: 'mobile_sms_phone_input_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.sms.verify-code.js', n: 'mobile_sms_verify_code_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.sms.verify-success.js', n: 'mobile_sms_verify_success_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.sms.achievement.js', n: 'mobile_sms_achievement', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.titlemenu.js', n: 'mobile_titlemenu_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.rubbish-bin-empty-overlay.js', n: 'mobile_rubbish_bin_empty_overlay_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.rubbishbin.js', n: 'mobile_rubbishbin_js', j: 1, w: 1});
-        jsl.push({f:'js/mobile/mobile.alertbanner.js', n: 'mobile_alert_banner', j: 1 });
-        jsl.push({f:'js/mobile/mobile.conflict-resolution-overlay.js', n: 'mobile_conflict_resolution_overlay_js', j: 1 });
-        jsl.push({f:'js/mobile/mobile.over-storage-quota-overlay.js', n: 'mobile_over_storage_quota_overlay_js', j: 1 });
-        jsl.push({f:'js/mobile/mobile.resume-transfers-overlay.js', n: 'mobile_resume_transfers_overlay_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.conflict-resolution.js', n: 'mobile_conflict_resolution_js', j: 1 });
+        jsl.push({f:'js/mobile/mobile.recovery-logout.js', n: 'mobile_recovery_logout_js', j: 1 });
+        jsl.push({f:'js/mobile/mobile.over-bandwidth-quota.js', n: 'mobile_over_bandwidth_quota_js', j: 1 });
+        jsl.push({f:'js/mobile/mobile.over-storage-quota.js', n: 'mobile_over_storage_quota_js', j: 1 });
         jsl.push({f:'html/mvoucherinfo.html', n: 'mvoucherinfo', j: 0, w: 1});
-        jsl.push({f:'js/mobile/mobile.verify.js', n: 'mobile_verify_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.component.js', n: 'mobile_component_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.group.js', n: 'mobile_group_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.dropdown.js', n: 'mobile_component_dropdown_js', j:1, w:1});
+        jsl.push({f:'js/mobile/mobile.dropdown-items.js', n: 'mobile_dropdownitem_js', j:1, w:1});
+        jsl.push({f:'js/mobile/mobile.context.menu.js', n: 'mobile_context_menu_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.tappable.js', n: 'mobile_tappable_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.info-menu-item.js', n: 'mobile_info_menu_item_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.link.js', n: 'mobile_link_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.button.js', n: 'mobile_button_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.checkbox.js', n: 'mobile_checkbox_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.node.js', n: 'mobile_node_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.sharednode.js', n: 'mobile_sharednode_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.radio.button.js', n: 'mobile_radio_button_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.radio.group.js', n: 'mobile_radio_group_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.toggle.button.js', n: 'mobile_radio_button_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.footer.js', n: 'mobile_footer_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.header.js', n: 'mobile_header_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.top.menu.js', n: 'mobile_top_menu_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/appearance.js', n: 'mobile_settings_appearance_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/settingsHelper.js', n: 'mobile_settings_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/settings.js', n: 'mobile_settings_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/account.js', n: 'mobile_my_account_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.account.paymentcard.js', n: 'mobile_payment_card_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.account.cancel-subscription.js', n: 'mobile_account_cancel_sub_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.achieve.js', n: 'mobile_achieve_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.achievements-block.js', n: 'mobile_achievements_block_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.achieve.invites.js', n: 'mobile_achieve_invites_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.achieve.referrals.js', n: 'mobile_achieve_referrals_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.achieve.invite-bonuses.js', n: 'mobile_achieve_inv_bonuses_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/settings/support.js', n: 'mobile_settings_support_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/about.js', n: 'mobile_settings_about_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/changePassword.js', n: 'mobile_change_password_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/changeEmail.js', n: 'mobile_change_email_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/lostAuthDevice.js', n: 'mobile_lost_auth_device_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/verifyEmail.js', n: 'mobile_verfiy_email_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/twofactorVerifyAction.js', n: 'mobile_verfiy_action_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/deleteAccount.js', n: 'mobile_delete_accountl_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/verifyDelete.js', n: 'mobile_verify_delete_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/privacyAndSecurity.js', n: 'mobile_privacy_security_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/history.js', n: 'mobile_session_history_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/backupRecovery.js', n: 'mobile_backup_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/settings/fileManagement.js', n: 'mobile_file_management_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/settings/notifications.js', n: 'mobile_account_notifications_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/settings/referral.js', n: 'mobile_referral_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/settings/referralDistribution.js', n: 'mobile_referral_distribution_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/settings/termsPolicies.js', n: 'mobile_terms_policies_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/settings/twofactorSettings.js', n: 'mobile_twofactor_settings_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.msgdialog.js', n: 'mobile_msgdialog_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.rack.slot.js', n: 'mobile_rack_slot_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.rack.js', n: 'mobile_rack_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.toast.js', n: 'mobile_toast_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.banner.js', n: 'mobile_banner_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.datepicker.js', n: 'mobile_datepicker_js', j: 1, w: 1});
+        jsl.push({f:'js/mobile/mobile.tab.js', n: 'mobile_tab_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.overlay.js', n: 'mobile_overlay_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.sheet.js', n: 'mobile_sheet_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.node-selector.js', n: 'mobile_node_selector_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.empty.state.js', n: 'mobile_empty_state_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.transfer.block.js', n: 'mobile_transfer_block_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.bottom.bar.js', n: 'mobile_bottom_bar_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.view.overlay.js', n: 'mobile_view_overlay_js', j: 1, w:1});
+        jsl.push({f:'js/mobile/mobile.appbanner.js', n: 'mobile_app_banner_js', j: 1, w: 1});
+        jsl.push({f:'js/chat/strongvelope.js', n: 'strongvelope_js', j: 1, w: 3});
+        jsl.push({f:'js/mobile/mobile.promo.banner.js', n: 'mobile_promo_banner_js', j: 1, w:1});
 
-        if (is_filerequest_page) {
-            jsl.push({f:'js/vendor/perfect-scrollbar.js', n: 'ps_js', j:1,w:1});
-            jsl.push({f:'css/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
-            jsl.push({f:'js/ui/theme.js', n: 'theme_js', j: 1, w: 1});
-            jsl.push({f:'js/ui/languageDialog.js', n: 'languagedialog_js', j:1});
-            jsl.push({f:'css/filerequest.css', n: 'filerequest_css', j:2,w:5,c:1,d:1,cache:1});
-            jsl.push({f:'css/filerequest-mobile.css', n: 'filerequest_mobile_css', j:2,w:5,c:1,d:1,cache:1});
-        }
+        jsl.push({f:'js/ui/mcomponents/classes/MDialogMobile.js', n: 'mobile_m_dialog_mobile_js', j:1});
     }
 
     jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
@@ -3149,6 +2765,19 @@ else if (!browserUpdate) {
     jsl.push({f:'css/megainput.css', n: 'megainput_css', j:2, w:5, c:1, d:1, cache: 1});
     jsl.push({f:'css/vars/text-input.css', n: 'vars_text_input_css', j:2, w:30, c:1, d:1, cache:1});
     jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
+
+    if (is_megadrop) {
+        // @todo FIXME: we *should* load required resources only!
+
+        jsl.push({f:'js/filerequest_upload.js', n: 'filerequest_upload_js', j:1 });
+
+        jsl.push({f:'html/filerequest.html', n: 'filerequest', j:0 });
+        jsl.push({f:'css/filerequest.css', n: 'filerequest_css', j:2,w:5});
+
+        if (is_mobile) {
+            jsl.push({f:'css/filerequest-mobile.css', n: 'filerequest_mobile_css', j:2, w:5});
+        }
+    }
 
     // We need to keep a consistent order in loaded resources, so that if users
     // send us logs we won't get different line numbers on stack-traces from
@@ -3160,12 +2789,16 @@ else if (!browserUpdate) {
         jsl.push({f:'sjcl.js', n: 'sjcl_js', j: 1});
         jsl.push({f:'nodedec.js', n: 'nodedec_js', j: 1});
         jsl.push({f:'js/vendor/jquery.js', n: 'jquery', j: 1, w: 10});
+        jsl.push({f:'js/jquery.protect.js', n: 'jqueryprotect_js', j:1});
         jsl.push({f:'js/vendor/jquery.fullscreen.js', n: 'jquery_fullscreen', j:1, w:10});
+        jsl.push({f:'js/vendor/jquery.mousewheel.js', n: 'jquerymouse_js', j: 1});
         jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j: 1});
         jsl.push({f:'html/js/embedplayer.js', n: 'embedplayer_js', j: 1, w: 4});
         jsl.push({f:'js/transfers/cloudraid.js', n: 'cloudraid_js', j: 1});
 
+        jsl.push({f:'js/utils/broadcast.js', n: 'js_utils_broadcast_js', j: 1});
         jsl.push({f:'js/utils/polyfills.js', n: 'js_utils_polyfills_js', j: 1});
+        jsl.push({f:'js/utils/api.js', n: 'js_utils_api_js', j: 1});
         jsl.push({f:'js/utils/browser.js', n: 'js_utils_browser_js', j: 1});
         jsl.push({f:'js/utils/clipboard.js', n: 'js_utils_clipboard_js', j: 1});
         jsl.push({f:'js/utils/conv.js', n: 'js_utils_conv_js', j: 1});
@@ -3180,6 +2813,7 @@ else if (!browserUpdate) {
 
         jsl.push({f:'js/crypto.js', n: 'crypto_js', j: 1, w: 5});
         jsl.push({f:'js/account.js', n: 'user_js', j: 1});
+        jsl.push({f:'js/ui/contextMenu.js', n: 'context_menu_js', j: 1});
 
         jsl.push({f:'js/transfers/queue.js', n: 'queue', j: 1, w: 4});
         jsl.push({f:'js/transfers/decrypter.js', n: 'dl_downloader', j: 1, w: 3});
@@ -3187,127 +2821,8 @@ else if (!browserUpdate) {
 
         jsl.push({f:'html/embedplayer.html', n: 'index', j: 0});
         jsl.push({f:'css/embedplayer.css', n: 'embedplayer_css', j: 2, w: 5});
-    }
-
-    if (is_litesite) {
-        jsl = [{f: langFilepath, n: 'lang', j: 3}];
-        jsl.push({f:'js/vendor/jquery.js', n: 'jquery', j:1, w:10});
-        jsl.push({f:'js/jquery.protect.js', n: 'jqueryprotect_js', j: 1});
-        jsl.push({f:'js/vendor/jquery-ui.js', n: 'jqueryui_js', j:1, w:10});
-        jsl.push({f:'js/vendor/jquery-ui-touch.js', n: 'jqueryui_touch_js', j:1, w:10});
-        jsl.push({f:'js/vendor/jquery.mousewheel.js', n: 'jquerymouse_js', j:1});
-        jsl.push({f:'js/scrolling.utils.js', n: 'scrolling_utils_js', j: 1});
-        jsl.push({f:'js/jquery.misc.js', n: 'jquerymisc_js', j:1});
-        jsl.push({f:'js/utils/polyfills.js', n: 'js_utils_polyfills_js', j: 1});
-        jsl.push({f:'js/utils/browser.js', n: 'js_utils_browser_js', j: 1});
-        jsl.push({f:'js/utils/locale.js', n: 'js_utils_locale_js', j: 1});
-        jsl.push({f:'js/utils/dom.js', n: 'js_utils_dom_js', j: 1});
-        jsl.push({f:'js/utils/network.js', n: 'js_utils_network_js', j: 1});
-        jsl.push({f:'js/utils/timers.js', n: 'js_utils_timers_js', j: 1});
-        jsl.push({f:'js/megaPromise.js', n: 'megapromise_js', j:1,w:5});
-        jsl.push({f:'index.js', n: 'index', j:1,w:4});
-        jsl.push({f:'js/staticPages.js', n: 'staticPages_js', j:1});
-        jsl.push({f:'js/metatags.js', n: 'metatags_js', j:1 });
-        jsl.push({f:'html/js/start.js', n: 'start_js', j:1});
-        jsl.push({f:'html/js/bottompage.js', n: 'bottompage_js', j:1});
-        jsl.push({f:'css/bottom-pages.css', n: 'bottom-pages_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/startpage.css', n: 'startpage_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'html/start.html', n: 'start', j:0});
-        jsl.push({f:'css/bottom-menu.css', n: 'bottom-menu_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'html/bottom2.html', n: 'bottom2',j:0});
-        jsl.push({f:'html/megainfo.html', n: 'megainfo', j:0});
-        jsl.push({f:'html/pagesmenu.html', n: 'pagesmenu', j:0});
-        jsl.push({f:'css/fonts.css', n: 'fonts_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'html/js/megasync.js', n: 'megasync_js', j: 1});
-        jsl.push({f:'css/business.css', n: 'business_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'js/cms.js', n: 'cms_js', j:1});
-        jsl.push({f:'html/proplan.html', n: 'proplan', j:0});
-        jsl.push({f:'html/planpricing.html', n: 'planpricing', j:0});
-        jsl.push({f:'html/propay.html', n: 'propay', j:0});
-        jsl.push({f:'html/js/pro.js', n: 'pro_js', j:1});
-        jsl.push({f:'html/js/proplan.js', n: 'proplan_js', j:1});
-        jsl.push({f:'html/js/planpricing.js', n: 'planpricing_js', j:1});
-        jsl.push({f:'html/js/propay.js', n: 'propay_js', j:1});
-        jsl.push({f:'html/js/propay-dialogs.js', n: 'propay_js', j:1});
-        jsl.push({f:'js/ui/dropdowns.js', n: 'dropdowns_js', j:1});
-        jsl.push({f:'css/animations.css', n: 'animations_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/pro.css', n: 'pro_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/planpricing.css', n: 'planpricing_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/about.css', n: 'about_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/media-viewer.css', n: 'media_viewer_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/corporate.css', n: 'corporate_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'html/staticdialog.html', n: 'staticdialog', j:0});
-        jsl.push({f:'js/ui/languageDialog.js', n: 'languagedialog_js', j:1});
-        jsl.push({f:'css/dialogs-common.css', n: 'dialogs-common_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'js/utils/clipboard.js', n: 'js_utils_clipboard_js', j: 1});
-        jsl.push({f:'js/ui/simpletip.js', n: 'simpletip_js', j:1,w:1});
-        jsl.push({f:'css/features.css', n: 'features_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/psa.css', n: 'psa_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
-        jsl.push({f:'css/general.css', n: 'general_css', j:2, w:5, c:1, d:1, cache: 1});
-        jsl.push({f:'css/vars/theme.css', n: 'vars_theme_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/grid-table.css', n: 'grid_table_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'js/states-countries.js', n: 'states_countries_js', j:1});
-        jsl.push({f:'css/checkboxes.css', n: 'checkboxes_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'js/utils/icu.js', n: 'js_utils_icu_js', j: 1});
-
-        // Sprites
-        jsl.push({f:'css/sprites/fm-uni@uni.css', n: 'fm_uni_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/sprites/fm-mono@mono.css', n: 'fm_mono_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/sprites/fm-theme@light.css', n: 'fm_light_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/sprites/fm-illustrations.css', n: 'fm_illustration_css', j:2, w:30, c:1, d:1, cache:1});
-
-        // Dialog templates
-        jsl.push({f:'css/mega-dialog.css', n: 'mega_dialog_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/vars/dialog.css', n: 'vars_dialog_css', j:2, w:30, c:1, d:1, cache:1});
-
-        // Inputs
-        jsl.push({f:'css/megainput.css', n: 'megainput_css', j:2, w:5, c:1, d:1, cache: 1});
-        jsl.push({f:'css/vars/button.css', n: 'vars_button_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/radios.css', n: 'radios_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/mega-button.css', n: 'mega_button_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/switches.css', n: 'switches_css', j:2,w:5,c:1,d:1,cache:1});
-
-        jsl.push({f:'html/dialogs-common.html', n: 'dialogs-common', j:0,w:2});
-        jsl.push({f:'css/dialogs/cookie-dialog.css', n: 'cookie-dialog_css', j:2,w:5,c:1,d:1,cache:1});
-
-        if (lang === 'ar' || lang === 'fa') {
-            jsl.push({f:'css/lang_ar.css', n: 'lang_arabic_css', j: 2, w: 30, c: 1, d: 1, m: 1 });
-        }
-        if (lang === 'th') {
-            jsl.push({f:'css/lang_th.css', n: 'lang_thai_css', j: 2, w: 30, c: 1, d: 1, m: 1 });
-        }
-        if (is_mobile) {
-            jsl.push({f:'html/top-mobile.html', n: 'top-mobile', j:0});
-            jsl.push({f:'css/mobile.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
-            jsl.push({f:'css/mobile-help.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
-            jsl.push({f:'css/mobile-top-menu.css', n: 'mobile_top_menu_css',  j: 2, w: 30, c: 1, d: 1, m: 1});
-            jsl.push({f:'html/mobile.html', n: 'mobile', j: 0, w: 1});
-            jsl.push({f:'js/vendor/jquery.mobile.js', n: 'jquery_mobile_js', j: 1, w: 5});
-            jsl.push({f:'js/mobile/mobile.js', n: 'mobile_js', j: 1, w: 1});
-            jsl.push({f:'js/mobile/mobile.language-menu.js', n: 'mobile_language_menu_js', j: 1, w: 1});
-            jsl.push({f:'js/mobile/mobile.titlemenu.js', n: 'mobile_titlemenu_js', j: 1, w: 1});
-            jsl.push({f:'js/mobile/mobile.message-overlay.js', n: 'mobile_message_overlay_js', j: 1, w: 1});
-            jsl.push({f:'js/mobile/mobile.terms.js', n: 'mobile_terms_js', j: 1, w: 1});
-            jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
-            jsl.push({f:'js/mobile/mobile.privacy.js', n: 'mobile_privacy_js', j: 1, w: 1});
-        }
-        else {
-            jsl.push({f:'js/vendor/perfect-scrollbar.js', n: 'ps_js', j:1,w:1});
-            jsl.push({f:'css/perfect-scrollbar.css', n: 'vendor_ps_css', j:2,w:5,c:1,d:1,cache:1});
-            jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
-            jsl.push({f:'css/dialogs.css', n: 'dialogs_css', j:2,w:5,c:1,d:1,cache:1});
-            jsl.push({f:'html/top.html', n: 'top', j:0});
-            jsl.push({f:'css/top-menu.css', n: 'top_menu_css', j:2, w:30, c:1, d:1, cache:1});
-            jsl.push({f:'css/buttons.css', n: 'buttons_css', j:2,w:5,c:1,d:1,cache:1});
-            jsl.push({f:'css/dropdowns.css', n: 'dropdowns_css', j:2,w:5,c:1,d:1,cache:1});
-            jsl.push({f:'css/popups.css', n: 'popups_css', j:2,w:5,c:1,d:1,cache:1});
-            jsl.push({f:'css/retina-images.css', n: 'retina_images_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
-            jsl.push({f:'css/topbar.css', n: 'topbar_css', j:2,w:5,c:1,d:1,cache:1});
-            jsl.push({f:'css/icons.css', n: 'icons_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
-        }
-
-        // end of staticPages
+        jsl.push({f:'css/video-player.css', n: 'video_player_css', j: 2});
+        jsl.push({f:'css/sprites/embed-mono@mono.css', n: 'embed_mono_css', j:2});
     }
 
     if (is_drop) {
@@ -3319,15 +2834,13 @@ else if (!browserUpdate) {
     else {
         jsl.push({f:'js/vendor/asmcrypto.js', n: 'asmcrypto_js', j: 1, w: 5});
 
-        if (typeof Number.isNaN !== 'function' || typeof Set === 'undefined' || !Object.assign) {
-            jsl.push({f:'js/vendor/es6-shim.js', n: 'es6shim_js', j: 1});
+        if (typeof ReadableStreamDefaultController === 'undefined'
+            || !Object.hasOwnProperty.call(ReadableStreamDefaultController.prototype || {}, 'enqueue')) {
+
+            jsl.push({f:'js/vendor/web-streams-polyfill.js', n: 'web_streams_polyfill_js', j: 1});
         }
     }
 
-    // If the TextEncoder is not supported natively (IE, Edge) then load the polyfill
-    if (typeof TextEncoder !== 'function') {
-        jsl.push({f:'js/vendor/encoding.js', n: 'encoding_js', j:1});
-    }
     if (page.substr(0, 5) === 'chat/') {
         jsl.push({f:'html/chatlink.html', n: 'chatlink', j: 0});
     }
@@ -3335,26 +2848,14 @@ else if (!browserUpdate) {
     var jsl2 =
     {
         'dcrawjs': {f:'js/vendor/dcraw.js', n: 'dcraw_js', j: 1},
-        'about': {f:'html/about.html', n: 'about', j:0},
-        'about_js': {f:'html/js/about.js', n: 'about_js', j:1},
-        'corporate': {f:'html/corporate.html', n: 'corporate', j:0},
-        'corporate_js': {f:'html/js/corporate.js', n: 'corporate_js', j:1},
         'datepicker_js': {f:'js/vendor/datepicker.js', n: 'datepicker_js', j:1},
         'sourcecode': {f:'html/sourcecode.html', n: 'sourcecode', j:0},
-        'affiliate': {f:'html/affiliate.html', n: 'affiliate', j:0},
-        'affiliate_js': {f:'html/js/affiliate.js', n: 'affiliate_js', j:1},
         'register': {f:'html/register.html', n: 'register', j:0},
         'register_js': {f:'html/js/register.js', n: 'register_js', j:1},
-        'resellers': {f:'html/resellers.html', n: 'resellers', j:0},
         'download': {f:'html/download.html', n: 'download', j:0},
         'download_js': {f:'html/js/download.js', n: 'download_js', j:1},
-        'dispute': {f:'html/dispute.html', n: 'dispute', j:0},
         'disputenotice': {f:'html/disputenotice.html', n: 'disputenotice', j:0},
-        'copyright': {f:'html/copyright.html', n: 'copyright', j:0},
-        'copyrightnotice': {f:'html/copyrightnotice.html', n: 'copyrightnotice', j:0},
         'copyright_js': {f:'html/js/copyright.js', n: 'copyright_js', j:1},
-        'privacy': {f:'html/privacy.html', n: 'privacy', j:0},
-        'terms': {f:'html/terms.html', n: 'terms', j:0},
         'keybackup': {f:'html/backup.html', n: 'keybackup', j:0},
         'keybackup_js': {f:'html/js/backup.js', n: 'keybackup_js', j:1},
         'cancel': {f:'html/cancel.html', n: 'cancel', j:0},
@@ -3363,25 +2864,11 @@ else if (!browserUpdate) {
         'reset_js': {f:'html/js/reset.js', n: 'reset_js', j:1},
         'change_email_js': {f:'html/js/emailchange.js', n: 'change_email_js', j:1},
         'change_email': {f:'html/emailchange.html', n: 'change_email', j:0},
-        'filesaver': {f:'js/vendor/filesaver.js', n: 'filesaver', j:1},
         'recovery': {f:'html/recovery.html', n: 'recovery', j:0},
         'recovery_js': {f:'html/js/recovery.js', n: 'recovery_js', j:1},
-        'credits': {f:'html/credits.html', n: 'credits', j:0},
-        'creditscss': {f:'css/credits.css', n: 'creditscss', j:2},
-        'takedown': {f:'html/takedown.html', n: 'takedown', j:0},
-        'dev': {f:'html/dev.html', n: 'dev', j:0},
-        'dev_js': {f:'html/js/dev.js', n: 'dev_js', j:1},
         'sdkterms': {f:'html/sdkterms.html', n: 'sdkterms', j:0},
-        'desktop': {f:'html/desktop.html', n: 'desktop', j:0},
-        'sync_js': {f:'html/js/sync.js', n: 'sync_js', j:1},
-        'cmd': {f:'html/megacmd.html', n: 'cmd', j:0},
-        'mobileapp': {f:'html/mobileapp.html', n: 'mobileapp', j:0},
-        'megacmd_js': {f:'html/js/megacmd.js', n: 'megacmd_js', j:1},
-        'nas': {f:'html/nas.html', n: 'nas', j:0},
-        'cms_snapshot_js': {f:'js/cmsSnapshot.js', n: 'cms_snapshot_js', j:1},
         'support_js': {f:'html/js/support.js', n: 'support_js', j:1},
         'support': {f:'html/support.html', n: 'support', j:0},
-        'contact': {f:'html/contact.html', n: 'contact', j:0},
         'pdfjs': {f:'js/vendor/pdf.js', n: 'pdfjs', j:1},
         'tiffjs': {f:'js/vendor/tiff.js', n: 'tiffjs', j:1},
         'webpjs': {f:'js/vendor/webp.js', n: 'webpjs', j:1},
@@ -3389,18 +2876,10 @@ else if (!browserUpdate) {
         'mediainfo': {f:'js/vendor/mediainfo.js', n: 'mediainfo', j:1},
         'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1},
         'redeem': {f:'html/redeem.html', n: 'redeem', j:0},
-        'discountpromo': {f:'html/discountpromo.html', n: 'discountpromo', j:0},
         'discountpromo_js': {f:'html/js/discountpromo.js', n: 'discountpromo_js', j:1},
-        'discountpromo_css': {f:'css/discountpromo.css', n:'discountpromo_css', j:2},
         'unsub': {f:'html/unsub.html', n: 'unsub', j:0},
         'unsub_js': {f:'html/js/unsub.js', n: 'unsub_js', j:1},
         'redeem_js': {f:'html/js/redeem.js', n: 'redeem_js', j:1},
-        'browsers': {f:'html/browsers.html', n: 'browsers', j:0},
-        'browsers_js': {f:'html/js/browsers.js', n: 'browsers_js', j:1},
-        'nzipp': {f:'html/nzipp.html', n: 'nzipp', j:0},
-        'nzipp_js': {f:'html/js/nzipp.js', n: 'nzipp_js', j:1},
-        'nzipp_css': {f:'css/nzipp.css', n: 'nzipp_css', j:2},
-        'megabird': {f:'html/megabird.html', n: 'megabird', j:0},
         'pdfjs2': {f:'js/vendor/pdf.js', n: 'pdfjs2', j:4 },
         'pdfviewer': {f:'html/pdf.viewer.html', n: 'pdfviewer', j:0 },
         'pdfviewercss': {f:'css/pdf.viewer.css', n: 'pdfviewercss', j:4 },
@@ -3408,33 +2887,24 @@ else if (!browserUpdate) {
         'filerequest': {f:'html/filerequest.html', n: 'filerequest', j:0 },
         'businessAcc_js': {f:'js/fm/megadata/businessaccount.js', n: 'businessAcc_js', j:1 },
         'businessAccUI_js': {f:'js/fm/businessAccountUI.js', n: 'businessAccUI_js', j:1 },
-        'business': {f:'html/business.html', n: 'business',j:0},
-        'businessjs': {f:'html/js/business.js', n: 'business_pp_js', j:1},
         'charts_js': {f:'js/vendor/Chart.js', n: 'charts_js', j:1},
         'charthelper_js': {f:'js/ui/chart.helper.js', n: 'charthelper_js', j:1},
         'business_invoice': {f:'html/invoicePDF.html', n: 'business_invoice', j:0},
-        'securitypractice': {f:'html/security-practice.html', n: 'securitypractice', j:0},
-        'securitypractice_js': {f:'html/js/security-practice.js', n: 'securitypractice_js', j:1},
         'codemirror_js': {f:'js/vendor/codemirror.js', n: 'codemirror_js', j:1},
         'codemirrorscroll_js': {f:'js/vendor/simplescrollbars.js', n: 'codemirrorscroll_js', j:1},
-        'features_js': {f:'html/js/features.js', n: 'features_js', j:1},
-        'feature_storage': {f:'html/features-storage.html', n: 'feature_storage', j:0},
-        'feature_backup': {f:'html/features-backup.html', n: 'feature_backup', j:0},
-        'feature_chat': {f:'html/features-chat.html', n: 'feature_chat', j:0},
-        'feature_collaboration': {f:'html/features-collaboration.html', n: 'feature_collaboration', j:0},
-        'cookie': {f:'html/cookie.html', n: 'cookie', j:0},
-        'achievements': {f:'html/achievements.html', n: 'achievements', j:0},
-        'achievementsPage_js': {f:'html/js/achievements.js', n: 'achievementsPage_js', j:1},
-        'achievements_css':{f:'css/achievements.css', n: 'achievements_css', j: 2, w: 5, c: 1, d: 1, cache: 1 },
         'special': {f:'html/troy-hunt.html', n:'special', j:0},
         'special_js': {f:'html/js/troy-hunt.js', n:'special_js', j:1},
         'special_css': {f:'css/troy-hunt.css', n:'special_css', j:2},
         'reportabuse_js': {f:'js/ui/reportAbuse.js', n:'reportabuse_js', j:1},
-        'object_storage': {f:'html/objectstorage.html', n: 'object_storage', j:0},
         'folderlink_css':{f:'css/folder-link.css', n: 'folderlink_css', j: 2, w: 5, c: 1, d: 1, cache: 1},
         'time_checker_js': {f:'js/time_checker.js', n:'time_checker_js', j:1},
         'filerequest_js': {f:'js/filerequest.js', n: 'filerequest_js', j:1 },
-        'filerequest_upload_js': {f:'js/filerequest_upload.js', n: 'filerequest_upload_js', j:1 }
+        'filerequest_upload_js': {f:'js/filerequest_upload.js', n: 'filerequest_upload_js', j:1 },
+        'docxpreview_js': {f:'js/vendor/docx-preview.js', n: 'docxpreview_js', j:4},
+        'docxviewer_js': {f:'js/ui/docx.viewer.js', n: 'docxviewer_js', j:4},
+        'docxviewer': {f:'html/docx.viewer.html', n: 'docxviewer', j:0},
+        'docxviewercss': {f:'css/docx.viewer.css', n: 'docxviewercss', j:4},
+        'clientzip_js': {f:'js/vendor/client-zip.js', n: 'clientzip_js', j:1},
     };
 
     /* eslint-disable max-len */
@@ -3444,6 +2914,32 @@ else if (!browserUpdate) {
             'webgl:exif_js': {f:'js/vendor/exif.js', n: 'webgl:exif_js', j:5},
             'webgl:dcraw_js': {f:'js/vendor/dcraw.js', n: 'webgl:dcraw_js', j:5},
             'webgl:smartcrop_js': {f:'js/vendor/smartcrop.js', n: 'webgl:smartcrop_js', j:5}
+        },
+        's4': {
+            's4:s4_common_css': {f:'css/s4-common.css', n: 's4_common_css', j:2,w:5},
+            's4:s4_list_css': {f:'css/s4-list.css', n: 's4_list_css', j:2,w:5},
+            's4:s4_info_css': {f:'css/s4-info.css', n: 's4_info_css', j:2,w:5},
+            's4:s4_empty_css': {f:'css/s4-empty.css', n: 's4_empty_css', j:2,w:5},
+
+            's4:fm_s4_ui_js': {f:'js/fm/s4/ui.js', n: 'fm_s4_ui_js', j:1},
+            's4:fm_s4_utils_js': {f:'js/fm/s4/utils.js', n: 'fm_s4_utils_js', j:1},
+            's4:fm_s4_objects_js': {f:'js/fm/s4/objects.js', n: 'fm_s4_objects_js', j:1},
+            's4:fm_s4_buckets_js': {f:'js/fm/s4/buckets.js', n: 'fm_s4_buckets_js', j:1},
+            's4:fm_s4_keys_js': {f:'js/fm/s4/keys.js', n: 'fm_s4_keys_js', j:1},
+            's4:fm_s4_groups_js': {f:'js/fm/s4/groups.js', n: 'fm_s4_groups_js', j:1},
+            's4:fm_s4_group_properties_js': {f:'js/fm/s4/properties-group.js', n: 'fm_s4_group_properties_js', j:1},
+            's4:fm_s4_users_js': {f:'js/fm/s4/users.js', n: 'fm_s4_users_js', j:1},
+            's4:fm_s4_user_properties_js': {f:'js/fm/s4/properties-user.js', n: 'fm_s4_user_properties_js', j:1},
+            's4:fm_s4_policies_js': {f:'js/fm/s4/policies.js', n: 'fm_s4_policies_js', j:1},
+            's4:fm_s4_policy_properties_js': {f:'js/fm/s4/properties-policy.js', n: 'fm_s4_policy_properties_js', j:1},
+            's4:kernel': {f:'js/utils/s4.js', n: 'js_utils_s4_js', j: 1}
+        },
+        'rewind': {
+            'rewind_css': {f:'css/rewind.css', n: 'rewind_css', j:2, w:5},
+            'rewind_js': {f:'js/rewind/index.js', n: 'rewind_js', j: 1, w: 1},
+            'rewind_ui_js': {f:'js/rewind/ui.js', n: 'rewind_ui_js', j: 1, w: 1},
+            'rewind_utils_js': {f:'js/rewind/utils.js', n: 'rewind_utils_js', j: 1, w: 1},
+            'rewind_storage_js': {f:'js/rewind/storage.js', n: 'rewind_storage_js', j: 1, w: 1}
         },
         'chat': {
             /* chat related css */
@@ -3464,19 +2960,17 @@ else if (!browserUpdate) {
             'reactdom_js': {f:'js/vendor/react-dom.js', n: 'reactdom_js', j:1},
             'keepalive_js': {f:'js/keepAlive.js', n: 'keepalive_js', j:1},
             'meganotifications_js': {f:'js/megaNotifications.js', n: 'meganotifications_js', j:1},
-            'twemoji_js': {f:'js/vendor/twemoji.noutf.js', n: 'twemoji_js', j:1},
             'ionsound_js': {f:'js/vendor/ion.sound.js', n: 'ionsound_js', j:1},
             'favico_js': {f:'js/vendor/favico.js', n: 'favico_js', j:1},
             'autolinker_js': {f:'js/vendor/autolinker.js', n: 'autolinker_js', j:1},
             'strongvelope_js': {f:'js/chat/strongvelope.js', n: 'strongvelope_js', j:1},
-            'adapter_js': {f:'js/vendor/chat/adapter.js', n: 'adapter_js', j:1},
             'chatdpersist_js': {f:'js/chat/chatdPersist.js', n: 'chatdpersist_js', j:1},
             'chatd_js': {f:'js/chat/chatd.js', n: 'chatd_js', j:1},
             'sfuClient_js': {f:'js/chat/sfuClient.js', n: 'sfuClient_js', j:1},
-            'sfuAppImpl_js': {f:'js/chat/sfuAppImpl.js', n: 'sfuAppImpl_js', j:1},
             'emojiUtils_js': {f:'js/utils/emoji.js', n: 'emojiUtils_js', j:1},
             'chatdInt_js': {f:'js/chat/plugins/chatdIntegration.js', n: 'chatdInt_js', j:1},
             'callManager2_js': {f:'js/chat/plugins/callManager2.js', n: 'callManager2_js', j:1},
+            'sfuAppImpl_js': {f:'js/chat/sfuAppImpl.js', n: 'sfuAppImpl_js', j:1},
             'geoLocationLinks_js': {f:'js/chat/plugins/geoLocationLinks.js', n: 'geoLocationLinks_js', j:1},
             'cti_js': {f:'js/chat/plugins/chatToastIntegration.js', n: 'cti_js', j:1},
             'urlFilter_js': {f:'js/chat/plugins/urlFilter.js', n: 'urlFilter_js', j:1},
@@ -3494,6 +2988,7 @@ else if (!browserUpdate) {
             'chat_reactions_js': {f:'js/chat/reactions.js', n: 'chat_reactions_js', j:1},
             'chat_messages_Js': {f:'js/chat/messages.js', n: 'chat_messages_Js', j:1},
             'presence2_js': {f:'js/chat/presence2.js', n: 'presence2_js', j:1},
+            'chatuserhelp_js': {f:'js/chat/plugins/chatUserHelper.js', n: 'chatuserhelp_js', j:1},
             // leave the bundle at the end.
             'chat_react_minified_js': {f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1}
         }
@@ -3501,12 +2996,7 @@ else if (!browserUpdate) {
 
     var subpages =
     {
-        'about': ['about', 'about_js'],
-        'corporate': ['corporate', 'corporate_js'],
-        'sourcecode': ['sourcecode'],
-        'terms': ['terms'],
-        'credits': ['credits', 'creditscss'],
-        'keybackup': ['keybackup', 'keybackup_js', 'filesaver'],
+        'keybackup': ['keybackup', 'keybackup_js'],
         'recovery': ['recovery', 'recovery_js'],
         'reset': ['reset', 'reset_js'],
         'verify': ['change_email', 'change_email_js'],
@@ -3514,56 +3004,21 @@ else if (!browserUpdate) {
         'register': ['register', 'register_js', 'zxcvbn_js'],
         'newsignup': ['register', 'register_js', 'zxcvbn_js'],
         'emailverify': ['zxcvbn_js'],
-        'resellers': ['resellers'],
         '!': ['download', 'download_js'],
         'file': ['download', 'download_js'],
         'F!': ['folderlink_css'],
         'folder': ['folderlink_css'],
-        'discountpromo': ['discountpromo', 'discountpromo_js', 'discountpromo_css'],
-        's': ['discountpromo', 'discountpromo_js', 'discountpromo_css'], // Short URL for 'sale' e.g. /sale/blackfriday
-        'dispute': ['dispute'],
+        'collection': ['folderlink_css'],
+        'discountpromo': ['discountpromo_js'],
+        's': ['discountpromo_js'], // Short URL for 'sale' e.g. /s/blackfriday
         'disputenotice': ['disputenotice', 'copyright_js'],
-        'copyright': ['copyright'],
-        'copyrightnotice': ['copyrightnotice', 'copyright_js'],
-        'privacy': ['privacy'],
-        'takedown': ['takedown'],
-        'desktop': ['desktop', 'sync_js'],
-        'cmd': ['cmd', 'megacmd_js'],
-        'mobile': ['mobileapp'],
-        'nas': ['nas'],
-        'ios': ['mobileapp'],
-        'refer': ['affiliate', 'affiliate_js'],
-        'android': ['mobileapp'],
         'support': ['support_js', 'support'],
-        'contact': ['contact'],
-        'dev': ['dev','dev_js','sdkterms'],
-        'sdk': ['dev','dev_js','sdkterms'],
-        'doc': ['dev','dev_js','sdkterms'],
         'recover': ['reset', 'reset_js'],
         'redeem': ['redeem', 'redeem_js'],
-        'plugin': ['browsers', 'browsers_js'],
-        'extensions': ['browsers', 'browsers_js'],
-        'chrome': ['browsers', 'browsers_js'],
-        'firefox': ['browsers', 'browsers_js'],
-        'edge': ['browsers', 'browsers_js'],
-        'bird': ['megabird'],
-        'wp': ['mobileapp'],
-        'uwp': ['mobileapp'],
         'unsub': ['unsub', 'unsub_js'],
-        'security': ['securitypractice', 'securitypractice_js', 'filesaver'],
         'developersettings': ['developersettings', 'developersettings_js'],
         'filerequest': ['filerequest', 'filerequest_upload_js'],
-        'storage': ['feature_storage', 'features_js'],
-        'megabackup': ['feature_backup', 'features_js'],
-        'securechat': ['feature_chat', 'features_js'],
-        'collaboration': ['feature_collaboration', 'features_js'],
-        'achievements': ['achievements', 'achievementsPage_js', 'achievements_css'],
-        'nzippmember': ['nzipp', 'nzipp_js', 'nzipp_css'],
-        'nziphotographer': ['nzipp', 'nzipp_js', 'nzipp_css'],
-        'business': ['business', 'businessjs'],
-        'cookie': ['cookie'],
-        'special': ['special', 'special_js', 'special_css'],
-        'objectstorage': ['object_storage', 'features_js']
+        'special': ['special', 'special_js', 'special_css']
     };
 
     if (is_mobile) {
@@ -3710,7 +3165,7 @@ else if (!browserUpdate) {
             if (jsl[i] && !jsl[i].text) {
                 jsl_total += jsl[i].w || 1;
 
-                if (jj) {
+                if (jj && (jj > 0 || jsl[i].j !== 2)) {
 
                     if (jsl[i].j === 1) {
                         jj_done = false;
@@ -3725,7 +3180,7 @@ else if (!browserUpdate) {
                     }
                 }
 
-                if (!jj || !jsl[i].j || jsl[i].j > 2) {
+                if (!jj || !jsl[i].j || jsl[i].j > 1 + (jj > 0)) {
                     jsl_done = false;
                 }
             }
@@ -3841,7 +3296,7 @@ else if (!browserUpdate) {
 
     function xhr_load(url,jsi,xhri)
     {
-        xhr_stack[xhri] = getxhr();
+        xhr_stack[xhri] = new XMLHttpRequest();
         xhr_stack[xhri].onload = function()
         {
             try {
@@ -3916,7 +3371,7 @@ else if (!browserUpdate) {
                 xhr_stack[xhri].timeout = xhr_timeout;
             }
 
-            if (is_chrome_firefox || is_firefox_web_ext) {
+            if (is_firefox_web_ext) {
                 xhr_stack[xhri].overrideMimeType('text/plain');
             }
             xhr_stack[xhri].send(null);
@@ -3946,10 +3401,14 @@ else if (!browserUpdate) {
             })();
         });
 
+        if (is_extension) {
+            return jsl_start();
+        }
+
         scriptTest(
             'es6s =' +
-            ' ({...{a:23}}).a === 23' + // C60 E79 F55 O47 S11
-            ' && Promise.prototype.finally' + // C63 E18 F58 O50 S11
+            (is_embed || ' BigInt(Math.pow(2, 48)) << 16n === 18446744073709551616n') + // C67 E79 F68 O54 S14
+            ' && "\u044b \u0432".match(/\\p{L}+/gu)[1] === "\u0432"' + // C64 E79 F78 O51 S11
             ' && (Array.prototype.values === Array.prototype[Symbol.iterator])' + // C66 E12 F60 O53 S9
             ' && (function *(a=1,){yield a})(2).next().value === 2', // C58 E14 F52 O45 S10
             function(error) {
@@ -4014,8 +3473,8 @@ else if (!browserUpdate) {
         var j2re1 = /(?:\.\.\/)+/g;
         var j2re2 = /\/en\//g;
         var j2tr2 = '/' + lang + '/';
-        var j4re = /url\(["']?images\/([^"')]+)["']?\)/g;
-        var j4tr = "url('" + staticpath + "images/pdfV/$1')";
+        var j4re = /url\(["'./]*(images\/[^"')]+)["']?\)/g;
+        var j4tr = "url('" + staticpath + "$1')";
 
         if (lang === 'en') {
             j2tr2 = 0;
@@ -4028,7 +3487,7 @@ else if (!browserUpdate) {
             {
                 jsar.push(jsl[i].text + '\n\n');
             }
-            else if ((jsl[i].j == 2) && (!jj))
+            else if (jsl[i].j === 2 && (!jj || jj < 0))
             {
                 if (tmp !== -23 && (tmp = document.getElementById('bootbottom'))) {
                     tmp.style.display = 'none';
@@ -4063,6 +3522,9 @@ else if (!browserUpdate) {
                         blobLink = mObjectURL([jsl[i].text.replace(j4re, j4tr)], 'text/css');
                     }
                     else {
+                        if (self.is_extension) {
+                            console.error("This won't work...", jsl[i].n);
+                        }
                         blobLink = mObjectURL([jsl[i].text], 'text/javascript');
                     }
                     window[jsl[i].n] = blobLink;
@@ -4093,33 +3555,30 @@ else if (!browserUpdate) {
 
             jsl[i].text = ' ';
         }
-        if (window.URL)
-        {
-            if (localStorage.makeCache && !cssCache) cssCache=cssar;
-            if (cssar.length)
-            {
-                mCreateElement('link', {type: 'text/css', rel: 'stylesheet'}, 'head', cssar);
+
+        if (cssar.length) {
+            mCreateElement('link', {type: 'text/css', rel: 'stylesheet'}, 'head', cssar);
+        }
+
+        if (jj) {
+            jsl_done = true;
+            boot_done();
+        }
+        else {
+            if (localStorage.makeCache && !cssCache) {
+                cssCache = cssar;
             }
             if (!jsl_done || jsar.length) {
                 jsar.push('jsl_done=true; boot_done();');
-            } else {
+            }
+            else {
                 boot_done();
             }
             if (jsar.length) {
-                if (is_chrome_firefox) {
-                    console.error('jsar must be empty here...');
-                }
-                else {
-                    addScript(jsar);
-                }
+                addScript(jsar);
             }
-            jsar=undefined;
-            cssar=undefined;
-        }
-        else
-        {
-            jsl_done=true;
-            boot_done();
+            jsar = undefined;
+            cssar = undefined;
         }
     }
 
@@ -4130,9 +3589,6 @@ else if (!browserUpdate) {
     // The loading-sprite images are embedded inside the extensions
     if (is_chrome_web_ext || is_firefox_web_ext) {
         istaticpath = '../images/mega/';
-    }
-    else if (is_chrome_firefox) {
-        istaticpath = 'chrome://mega/content/images/mega/';
     }
 
     mCreateElement('style', {type: 'text/css'}, 'body').textContent = '.div, span, input {outline: none;}.hidden {display: none;}.clear {clear: both;margin: 0px;padding: 0px;display: block;}.loading-main-block {width: 100%;height: 100%;position: fixed;z-index: 10000;font-family:Arial, Helvetica, sans-serif;}.main-blur-block,.bottom-page.scroll-block{display:none}.loading-mid-white-block {height: 100%;width:100%;}.loading-cloud {width: 222px;position: fixed;height: 158px;background-image: url(' + istaticpath + 'loading-sprite_v4.png);background-repeat: no-repeat;background-position: 0 0;left:50%;top:50%;margin:-79px 0 0 -111px;}.loading-m-block{width:60px;height:60px;position:absolute; left:81px;top:65px;background-color:white;background-image: url(' + istaticpath + 'loading-sprite_v4.png);background-repeat: no-repeat;background-position: -81px -65px;border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;z-index:10;}.loading-percentage { width: 80px;height: 80px; background-color: #e1e1e1;position: absolute;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;overflow: hidden;background-image: url(' + istaticpath + 'loading-sprite_v4.png);background-repeat: no-repeat;background-position: -70px -185px;left:71px;top:55px;}.loading-percentage ul {list-style-type: none;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;overflow: hidden;}.loading-percentage li {position: absolute;top: 0px;}.loading-percentage p, .loading-percentage li, .loading-percentage ul{width: 80px;height: 80px;padding: 0;margin: 0;}.loading-percentage span {display: block;width: 40px;height: 80px;}.loading-percentage ul :nth-child(odd) {clip: rect(0px, 80px, 80px, 40px);}.loading-percentage ul :nth-child(even) {clip: rect(0px, 40px, 80px, 0px);}.loading-percentage .right-c span {-moz-border-radius-topleft: 40px;-moz-border-radius-bottomleft: 40px;-webkit-border-top-left-radius: 40px;-webkit-border-bottom-left-radius: 40px;border-top-left-radius: 40px;border-bottom-left-radius: 40px;background-color:#dc0000;}.loading-percentage .left-c span {margin-left: 40px;-moz-border-radius-topright: 40px;-moz-border-radius-bottomright: 40px;-webkit-border-top-right-radius: 40px;-webkit-border-bottom-right-radius: 40px;border-top-right-radius: 40px;border-bottom-right-radius: 40px;background-color:#dc0000;}.loading-main-bottom {max-width: 940px;width: 100%;position: absolute;bottom: 20px;left: 50%;margin: 0 0 0 -470px;text-align: center;}.loading-bottom-button {height: 29px;width: 29px;float: left;background-image: url(' + istaticpath + 'loading-sprite_v4.png);background-repeat: no-repeat;cursor: pointer;}.st-social-block-load {position: fixed;bottom: 20px;left: 0;width: 100%;height: 43px;text-align: center;}.st-bottom-button {height: 24px;width: 24px;margin: 0 8px;display: inline-block;background-image: url(' + istaticpath + 'loading-sprite_v4.png);background-repeat: no-repeat;background-position:11px -405px;cursor: pointer;-moz-border-radius: 100%;-webkit-border-radius: 100%;border-radius: 100%;-webkit-transition: all 200ms ease-in-out;-moz-transition: background-color 200ms ease-in-out;-o-transition: background-color 200ms ease-in-out;-ms-transition: background-color 200ms ease-in-out;transition: background-color 200ms ease-in-out;background-color:#999999;}.st-bottom-button.st-google-button {background-position: 11px -405px;}.st-bottom-button.st-google-button {background-position: -69px -405px;}.st-bottom-button.st-twitter-button{background-position: -29px -405px;}.st-bottom-button:hover {background-color:#334f8d;}.st-bottom-button.st-twitter-button:hover {background-color:#1a96f0;}.st-bottom-button.st-google-button:hover {background-color:#d0402a;}@media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {.maintance-block, .loading-percentage, .loading-m-block, .loading-cloud, .loading-bottom-button,.st-bottom-button, .st-bottom-scroll-button {background-image: url(' + istaticpath + 'loading-sprite_v4@2x.png);    background-size: 222px auto;}}';
@@ -4162,6 +3618,7 @@ else if (!browserUpdate) {
 
             document.body.textContent = '';
             document.body.style.background = is_drop ? '#fff' : '#000';
+            document.body.className = is_drop ? 'theme-light' : 'theme-dark-forced';
             jsl_progress = function() {};
         }
         catch (ex) {
@@ -4174,14 +3631,13 @@ else if (!browserUpdate) {
         }
     }
 
-    var u_storage, loginresponse, u_sid, dl_res, voucher, gmf_res;
     u_storage = init_storage(localStorage.sid ? localStorage : sessionStorage);
 
     (function _crossTabSession(u_storage) {
         'use strict';
 
         var xhr = function(params, data, callback) {
-            var xhr = getxhr();
+            var xhr = new XMLHttpRequest();
             xhr.onloadend = function() {
                 var response = false;
 
@@ -4203,7 +3659,7 @@ else if (!browserUpdate) {
                 }
             };
 
-            xhr.open("POST", apipath + 'cs?id=0' + mega.urlParams() + (params || ''), true);
+            xhr.open("POST", apipath + 'cs?id=0' + (params || ''), true);
             xhr.send(JSON.stringify([].concat(data)));
         };
 
@@ -4214,28 +3670,9 @@ else if (!browserUpdate) {
                 if (Array.isArray(result) && typeof result[0] === 'object') {
                     // Cache flags object
                     mega.apiMiscFlags = result[0];
-                    mBroadcaster.sendMessage('global-mega-flags');
                 }
-                else {
-                    if (d) {
-                        console.error('API request error, no flags given...');
-                    }
-
-                    mBroadcaster.once('startMega', function() {
-                        setTimeout(function() {
-                            if (typeof M.req === 'function') {
-                                M.req('gmf').always(function(result) {
-                                    if (typeof result === 'object') {
-                                        mega.apiMiscFlags = result;
-                                        mBroadcaster.sendMessage('global-mega-flags');
-                                    }
-                                    else if (d) {
-                                        console.error('Giving up retrieving API flags...');
-                                    }
-                                });
-                            }
-                        }, 700);
-                    });
+                else if (d) {
+                    console.error('API request error, no flags given...', result);
                 }
                 gmf_res = false;
             });
@@ -4271,12 +3708,29 @@ else if (!browserUpdate) {
             if (dl_res) {
                 var g = {
                     a: 'g',
-                    p: page.substr(0, 5) === 'file/' ? page.substr(5, 8) : page.split('!')[1]
+                    ad: 1,
+                    p: page.split(/[!#/]/)[1]
                 };
 
-                xhr(u_sid ? '&sid=' + u_sid : false, g, function(response) {
+                xhr(u_sid ? '&v=2&sid=' + u_sid : '&v=2', g, function(response) {
                     dl_res = Array.isArray(response) && response[0];
                 });
+            }
+
+            if (is_chatlink) {
+                xhr(u_sid ? '&sid=' + u_sid : false, {a: "mcphurl", v: 1, ph: is_chatlink}, function(response) {
+                    is_chatlink = Array.isArray(response) && response[0] || -1;
+                });
+
+                is_chatlink = true;
+            }
+
+            if (is_megadrop) {
+                xhr(u_sid ? '&sid=' + u_sid : false, {a: "pg", p: is_megadrop.substr(0, 11)}, function(response) {
+                    is_megadrop = Array.isArray(response) && response[0] || -1;
+                });
+
+                is_megadrop = true;
             }
 
             if (voucher) {
@@ -4284,7 +3738,7 @@ else if (!browserUpdate) {
                 var request = [
                     {a: 'uavq', f: 1, v: code},
                     {a: 'uq', pro: 1, gc: 1},
-                    {a: 'utqa', nf: 2, p: 1}
+                    {a: 'utqa', nf: 2, p: 1, r: 1}
                 ];
 
                 xhr(u_sid ? ('&sid=' + u_sid) : false, request, function(res) {
@@ -4313,13 +3767,10 @@ else if (!browserUpdate) {
             return;
         }
 
-        if (location.host === 'mega.nz' && !u_storage.sid
-            && !is_iframed && isStaticPage(page) && !location.hash && !u_storage.wasloggedin
-            && getCookie().indexOf('logged=1') === -1) {
-            // there isn't a stored session ID (regardless of its validity), we move.
-            // since without a session-id it's not possible to access any internal page.
-            tmp = (locationSearchParams ? locationSearchParams + '&' : '?') + 'nz=1';
-            return mega.redirect('mega.io', page, false, tmp);
+        // Redirect static pages to mega.io if there isn't a stored session ID (regardless of its validity),
+        // since without a session-id it's not possible to access any internal page.
+        if (location.host === 'mega.nz' && !u_storage.sid && !is_iframed && isStaticPage(page) && !location.hash) {
+            return mega.redirect('mega.io', page, false, locationSearchParams);
         }
 
         if (page[0] === 'F' && page[1] === '!' || page.substr(0, 7) === 'folder/') {
@@ -4343,16 +3794,15 @@ else if (!browserUpdate) {
 
         loginresponse = true;
         voucher = localStorage.voucher !== undefined || page.substr(0, 7) === 'voucher';
-        dl_res = page[0] === '!' || page[0] === 'E' && page[1] === '!' || page.substr(0, 5) === 'file/';
 
-        if (localStorage === u_storage) {
+        if (localStorage === u_storage || is_iframed) {
             ack();
         }
         else {
             var setLSItem = tryCatch(function(k, v) {
                 localStorage.setItem(k, JSON.stringify(v));
             });
-            var onStorageEvent = function(ev) {
+            window.addEventListener('storage', function(ev) {
                 if (ev.key === 'sb!sid') {
                     var value = JSON.parse(ev.newValue || '""');
 
@@ -4366,7 +3816,7 @@ else if (!browserUpdate) {
                             data.sid = sessionStorage.sid;
                         }
 
-                        onIdle(function() {
+                        setTimeout(function() {
                             setLSItem('sb!sid', data);
                         });
                     }
@@ -4384,15 +3834,7 @@ else if (!browserUpdate) {
 
                     delete localStorage[ev.key];
                 }
-            };
-
-            if (window.addEventListener) {
-                window.addEventListener('storage', onStorageEvent, false);
-            }
-            else if (window.attachEvent) {
-                window.attachEvent('onstorage', onStorageEvent);
-            }
-            onStorageEvent = undefined;
+            });
 
             if (u_storage.sid) {
                 ack();
@@ -4429,8 +3871,14 @@ else if (!browserUpdate) {
 
         if (d) console.log('boot_done', loginresponse === true, dl_res === true, !jsl_done, !jj_done);
 
-        // eslint-disable-next-line max-len
-        if (loginresponse === true || dl_res === true || gmf_res === true || voucher === true || !jsl_done || !jj_done) {
+        if (!jsl_done
+            || !jj_done
+            || dl_res === true
+            || gmf_res === true
+            || voucher === true
+            || is_chatlink === true
+            || is_megadrop === true
+            || loginresponse === true) {
             return;
         }
 
@@ -4443,7 +3891,7 @@ else if (!browserUpdate) {
 
         // announce the loading finish of relevant resources in jsl
         for (var i = 0; i < jsl.length; i++) {
-            if (!jj || !jsl[i].j || jsl[i].j > 2) {
+            if (!jj || !jsl[i].j || jsl[i].j > 1 + (jj > 0)) {
                 jsl_loaded[jsl[i].n] = 1;
             }
         }
@@ -4471,7 +3919,6 @@ else if (!browserUpdate) {
     }
 }
 
-/* jshint -W098 */
 /**
  * History API's pushState helper that takes into account whether we're running through an extension or public-link
  * @param {Object|String} page The page to change to, or an history's state object
@@ -4503,7 +3950,7 @@ function pushHistoryState(page, state) {
             console.warn('duplicate push state attempt.');
         }
 
-        history[method](state, '', (hashLogic || isPublicLink(page) ? '#' : '/') + page);
+        history[method](state, '', (self.hashLogic || page[1] === '!' ? '#' : '/') + page);
     }
     catch (ex) {
         console.warn(ex);
@@ -4517,6 +3964,7 @@ function pushHistoryState(page, state) {
  * owning function, to mitigate it use this function as follow: toArray.apply(null, arguments)
  *
  * @returns {Array}
+ * @deprecated
  */
 function toArray() {
     var len = arguments.length;
@@ -4539,7 +3987,7 @@ function tryCatch(fn, onerror)
             }
 
             if (typeof onerror === 'function') {
-                onIdle(onerror.bind(null, e));
+                setTimeout(onerror.bind(null, e));
             }
         }
     };
@@ -4559,25 +4007,9 @@ function wchecksum(data, seed) {
     return seed >>> 0;
 }
 
-var onIdle = function(handler) {
-        var startTime = Date.now();
-
-        return setTimeout(function() {
-            handler({
-                didTimeout: false,
-                timeRemaining: function() {
-                    return Math.max(0, 50.0 - (Date.now() - startTime));
-                }
-            });
-        }, 1);
-    };
-
-if (window.requestIdleCallback) {
-    onIdle = function onIdle(callback) {
-        'use strict';
-
-        return window.requestIdleCallback(callback, {timeout: 20});
-    };
+function onIdle(callback) {
+    'use strict';
+    return window.requestIdleCallback(callback, {timeout: 51});
 }
 
 function makeUUID(a) {
@@ -4617,21 +4049,6 @@ function inherits(target, source) {
     if (source) {
         Object.setPrototypeOf(target, source);
     }
-}
-
-// eslint-disable-next-line strict
-function lazy(target, property, stub) {
-    Object.defineProperty(target, property, {
-        get: function() {
-            Object.defineProperty(this, property, {
-                value: stub.call(this),
-                enumerable: property[0] !== '_'
-            });
-            return this[property];
-        },
-        configurable: true
-    });
-    return target;
 }
 
 function b64encode(str) {
@@ -4678,6 +4095,33 @@ function echo(a) {
     return a;
 }
 
+// Promise.catch helper
+function tell(ex) {
+    'use strict';
+    if (d) {
+        console.error(ex);
+    }
+    msgDialog('warninga', l[135], l[47], ex < 0 ? api_strerror(ex) : ex);
+}
+
+tryCatch(function(x) {
+    'use strict';
+    var ael = x.addEventListener;
+    var psy = tryCatch(function(f) {
+        return String(f).indexOf('Synchronizetion') > 0;
+    });
+    x.addEventListener = function(t, f) {
+        if (t === 'contextmenu' && psy(f)) {
+            window.onerror = null;
+            return;
+        }
+        return ael.apply(x, arguments);
+    };
+    mBroadcaster.once('startMega', tryCatch(function() {
+        x.addEventListener = ael;
+    }));
+})(window);
+
 var dump = nop;
 mBroadcaster.once('startMega', function() {
     'use strict';
@@ -4695,8 +4139,15 @@ mBroadcaster.once('startMega', function() {
         var mt = window.uTagMT;
         delete window.uTagMT;
 
-        setTimeout(function() {
-            M.req({a: 'mrt', t: mt}).dump('uTagMT');
+        onIdle(function() {
+            api.req({a: 'mrt', t: mt}).dump('uTagMT');
+        });
+    }
+
+    if (window.uTagMCT) {
+        onIdle(function() {
+            eventlog(99988, window.uTagMCT);
+            delete window.uTagMCT;
         });
     }
 
@@ -4710,3 +4161,5 @@ mBroadcaster.once('startMega', function() {
 
     Object.defineProperty(window, 'dump', {value: console.warn.bind(console, '[dump]')});
 });
+
+Object.defineProperty(self, 's4', {value: Object.create(null)});

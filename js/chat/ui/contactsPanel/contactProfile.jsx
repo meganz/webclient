@@ -63,7 +63,7 @@ export default class ContactProfile extends MegaRenderMixin {
     }
 
     onAttachClicked = () => {
-        const { selected } = this.state.selected;
+        const { selected } = this.state;
         if (selected[0]) {
             this.onExpand(selected[0]);
         }
@@ -107,7 +107,7 @@ export default class ContactProfile extends MegaRenderMixin {
                             ${IS_VERIFIED ? '' : 'positive'}
                         `}
                         onClick={() => ContactsPanel[IS_VERIFIED ? 'resetCredentials' : 'verifyCredentials'](contact)}>
-                        {IS_VERIFIED ? l[742] : l[7692]}
+                        {IS_VERIFIED ? l[742] : l.verify_credentials}
                     </button>
                 </div>
             );
@@ -192,38 +192,13 @@ export default class ContactProfile extends MegaRenderMixin {
                                     />
                                     <Button
                                         className="mega-button round simpletip"
-                                        icon="sprite-fm-mono icon-share-filled"
-                                        attrs={{ 'data-simpletip': l[5631] /* `Share folder` */ }}
+                                        icon="sprite-fm-mono icon-send-files"
+                                        attrs={{ 'data-simpletip': l[6834] /* `Send files` */ }}
                                         onClick={() => {
                                             if (M.isInvalidUserStatus()) {
                                                 return;
                                             }
-                                            openCopyShareDialog(handle);
-                                        }}
-                                    />
-                                    <Button
-                                        className="mega-button round simpletip"
-                                        icon="sprite-fm-mono icon-video-call-filled"
-                                        disabled={!navigator.onLine || !megaChat.hasSupportForCalls}
-                                        attrs={{
-                                            'data-simpletipposition': 'top',
-                                            'data-simpletip': !megaChat.hasSupportForCalls ?
-                                                l.unsupported_browser_video : l[5897]
-                                            /* `Your browser doesn't support video calls. Please try a different one!`
-                                            : `Start Video Call` */ }}
-                                        onClick={() => {
-                                            if (M.isInvalidUserStatus()) {
-                                                return;
-                                            }
-                                            return inProgressAlert()
-                                                .then(() =>
-                                                    megaChat.createAndShowPrivateRoom(handle)
-                                                        .then(room => {
-                                                            room.setActive();
-                                                            room.startVideoCall();
-                                                        })
-                                                )
-                                                .catch(() => d && console.warn('Already in a call.'));
+                                            megaChat.openChatAndSendFilesDialog(handle);
                                         }}
                                     />
                                     <Button

@@ -1,60 +1,5 @@
-MegaData.prototype.makeDir = function(n) {
-    if (is_chrome_firefox & 4) {
-        return;
-    }
-
-    var dirs = [];
-
-    function getfolders(d, o) {
-        var c = 0;
-        for (var e in M.d) {
-            if (M.d[e].t == 1 && M.d[e].p == d) {
-                var p = o || [];
-                if (!o) {
-                    p.push(M.getSafeName(M.d[d].name));
-                }
-                p.push(M.getSafeName(M.d[e].name));
-                if (!getfolders(M.d[e].h, p)) {
-                    dirs.push(p);
-                }
-                ++c;
-            }
-        }
-        return c;
-    }
-
-    getfolders(n);
-
-    if (d) {
-        console.log('makedir', dirs);
-    }
-
-    if (is_chrome_firefox) {
-        var root = mozGetDownloadsFolder();
-        if (root) {
-            dirs.filter(String).forEach(function(p) {
-                try {
-                    p = mozFile(root, 0, p);
-                    if (!p.exists()) {
-                        p.create(Ci.nsIFile.DIRECTORY_TYPE, parseInt("0755", 8));
-                    }
-                }
-                catch (e) {
-                    Cu.reportError(e);
-                    console.log('makedir', e.message);
-                }
-            });
-        }
-    }
-    else {
-        // FIXME: add support once available
-    }
-};
 
 MegaData.prototype.getDownloadFolderNodes = function(n, md, nodes, paths) {
-    if (md) {
-        this.makeDir(n);
-    }
 
     var subids = this.getNodesSync(n, false, false, true);
 
@@ -108,18 +53,6 @@ MegaData.prototype.putToTransferTable = function(node, ttl) {
     else if (node.failed || node.dl_failed) {
         isFailed = true;
     }
-    var flashhtml = '';
-    if (dlMethod === FlashIO) {
-        flashhtml = '<object width="1" height="1" id="dlswf_'
-            + htmlentities(handle)
-            + '" type="application/x-shockwave-flash">'
-            + '<param name=FlashVars value="buttonclick=1" />'
-            + '<param name="movie" value="' + location.origin + '/downloader.swf"/>'
-            + '<param value="always" name="allowscriptaccess"/>'
-            + '<param name="wmode" value="transparent"/>'
-            + '<param value="all" name="allowNetworking">'
-            + '</object>';
-    }
 
     var dowloadedSize = node.loaded || 0;
     var rightRotate = '';
@@ -141,8 +74,8 @@ MegaData.prototype.putToTransferTable = function(node, ttl) {
         + '<td><div class="transfer-type download sprite-fm-mono-after icon-down-after">'
         + '<ul><li class="right-c"><p ' + rightRotate + '>'
         + '<span></span></p></li><li class="left-c"><p ' + leftRotate + '><span></span></p></li></ul>'
-        + '</div>' + flashhtml + '</td>'
-        + '<td><span class="transfer-filetype-icon ' + fileIcon(node) + '"></span>'
+        + '</div></td>'
+        + '<td><span class="item-type-icon icon-' + fileIcon(node) + '-24"></span>'
         + '<span class="tranfer-filetype-txt">' + htmlentities(node.name) + '</span></td>'
         + '<td>' + filetype(node) + '</td>'
         + '<td class="transfer-size">' + bytesToSize(node.s) + '</td>'
@@ -194,6 +127,11 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
             });
     };
 
+    // @TODO: Remove this bypass once the new download method public albums is implemented
+    if (pfcol) {
+        return webdl();
+    }
+
     if (!folderlink && (z || preview || !fmconfig.dlThroughMEGAsync)) {
         return webdl();
     }
@@ -232,8 +170,10 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
                                 p: node.p,
                                 n: base64urlencode(to8(M.getSafeName(node.name))),
                                 s: node.s,
+                                c: node.hash,
                                 ts: node.mtime || node.ts,
-                                k: a32_to_base64(node.k)
+                                k: a32_to_base64(node.k),
+                                rewind: node.rewind
                             });
                         }
                         else {
@@ -241,7 +181,10 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
                                 t: node.t,
                                 h: node.h,
                                 p: node.p,
-                                n: base64urlencode(to8(M.getSafeName(node.name)))
+                                n: base64urlencode(to8(M.getSafeName(node.name))),
+                                ts: node.mtime || node.ts,
+                                k: a32_to_base64(node.k),
+                                rewind: node.rewind
                             });
                         }
                     }
@@ -262,7 +205,8 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
                         }
                         else { // it's object
                             addNodeToArray(files, nodes[k]);
-                            if (nodes[k].t) {
+                            if (nodes[k].t && !nodes[k].rewind) {
+                                // If its a rewind download, we need not add the children recursively here
                                 recursivelyLoadNodes(arr, Object.keys(M.c[nodes[k].h]));
                             }
                         }
@@ -282,6 +226,10 @@ MegaData.prototype.addDownloadSync = function(n, z, preview) {
             if (!files.length) {
                 console.error('No files');
                 return webdl();
+            }
+
+            if (files[0].rewind) {
+                cmd.a = 'gd';
             }
 
             cmd.f = files;
@@ -309,7 +257,7 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
     var entries = [];
     let quiet = false;
 
-    if (!is_extension && !preview && !z && (dlMethod === MemoryIO || dlMethod === FlashIO)) {
+    if (!is_extension && !preview && !z && dlMethod === MemoryIO) {
         var nf = [], cbs = [];
         for (var i in n) {
             if (this.d[n[i]] && this.d[n[i]].t) {
@@ -421,8 +369,9 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
             $tr.remove();
         }
         var entry = {
+            ...n,
             size: n.s,
-            nauth: n_h,
+            nauth: n.nauth || n_h,
             id: n.h,
             key: n.k,
             n: n.name,
@@ -430,13 +379,19 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
             zipid: z,
             zipname: zipname,
             preview: preview,
-            p: path,
+            p: n.path || path,
+            ph: undefined,
             onDownloadProgress: this.dlprogress.bind(this),
             onDownloadComplete: this.dlcomplete.bind(this),
             onBeforeDownloadComplete: this.dlbeforecomplete.bind(this),
             onDownloadError: this.dlerror.bind(this),
             onDownloadStart: this.dlstart.bind(this)
         };
+
+        if (n.rewind) {
+            entry.customRequest = 'gd';
+        }
+
         entries.push({node: n, entry: entry});
     }
 
@@ -510,18 +465,13 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
         tempEntry = null;
     }
 
-    var flashhtml = '';
-    if (dlMethod === FlashIO) {
-        flashhtml = '<object width="1" height="1" id="dlswf_zip_' + htmlentities(z) + '" type="application/x-shockwave-flash"><param name=FlashVars value="buttonclick=1" /><param name="movie" value="' + document.location.origin + '/downloader.swf"/><param value="always" name="allowscriptaccess"><param name="wmode" value="transparent"><param value="all" name="allowNetworking"></object>';
-    }
-
     if (z && zipsize) {
         this.addToTransferTable('zip_' + z, ttl,
             '<tr id="zip_' + z + '" class="transfer-queued transfer-download ' + p + '">'
             + '<td><div class="transfer-type download sprite-fm-mono-after icon-down-after">'
             + '<ul><li class="right-c"><p><span></span></p></li><li class="left-c"><p><span></span></p></li></ul>'
-            + '</div>' + flashhtml + '</td>'
-            + '<td><span class="transfer-filetype-icon ' + fileIcon({name: 'archive.zip'}) + '"></span>'
+            + '</div></td>'
+            + '<td><span class="item-type-icon icon-' + fileIcon({name: 'archive.zip'}) + '-24"></span>'
             + '<span class="tranfer-filetype-txt">' + htmlentities(zipname) + '</span></td>'
             + '<td>' + filetype({name: 'archive.zip'}) + '</td>'
             + '<td class="transfer-size">' + bytesToSize(zipsize) + '</td>'
@@ -545,7 +495,6 @@ MegaData.prototype.addWebDownload = function(n, z, preview, zipname) {
 
     if (!preview) {
         this.onDownloadAdded(entries.length, uldl_hold, z, zipsize);
-        setupTransferAnalysis();
     }
 
     delete $.dlhash;
@@ -720,21 +669,10 @@ MegaData.prototype.dlcomplete = function(dl) {
 
     var $tr = $('.transfer-table #' + id);
     $tr.removeClass('transfer-started').addClass('transfer-completed');
-    $('.link-transfer-status', $tr).addClass('hidden');
     $tr.find('.left-c p, .right-c p').css('transform', 'rotate(180deg)');
     $tr.find('.transfer-status').text(l[1418]);
     $tr.find('.eta, .speed').text('').removeClass('unknown');
     $tr.find('.downloaded-size').html($tr.find('.transfer-size').text());
-
-    if ($('#dlswf_' + id.replace('dl_', '')).length > 0) {
-        var flashid = id.replace('dl_', '');
-        $('#dlswf_' + flashid).width(170);
-        $('#dlswf_' + flashid).height(22);
-        $('#' + id + ' .transfer-type')
-            .removeClass('download')
-            .addClass('safari-downloaded')
-            .text('Save File');
-    }
 
     if ($.transferprogress && $.transferprogress[id]) {
         if (!$.transferprogress['dlc']) {
@@ -846,9 +784,23 @@ MegaData.prototype.dlerror = function(dl, error) {
 
                 if (error === EOVERQUOTA) {
                     $tr.find('.transfer-status').addClass('overquota');
+
+                    if (page === 'fm/dashboard') {
+                        delay('obq-update.dashboard', () => dashboardUI());
+                    }
                 }
             }
-            setTransferStatus(dl, errorstr);
+
+            switch (error) {
+                case EACCESS:
+                case ETOOMANY:
+                case EBLOCKED:
+                    dlFatalError(dl, errorstr);
+                    delete dlmanager.onDownloadFatalError;
+                    break;
+                default:
+                    setTransferStatus(dl, errorstr);
+            }
         }
     }
 };
@@ -920,7 +872,8 @@ MegaData.prototype.getTransferTableLengths = function() {
 };
 
 MegaData.prototype.getTransferElements = function() {
-    var obj = {};
+    'use strict';
+    const obj = Object.create(null);
     obj.domTransfersBlock = document.querySelector('.fm-transfers-block');
     if (!obj.domTransfersBlock) {
         return false;
@@ -938,9 +891,11 @@ MegaData.prototype.getTransferElements = function() {
     obj.domDownloadChart = obj.domDownloadBlock.querySelector('.progress-chart');
     obj.domUploadChart = obj.domUploadBlock.querySelector('.progress-chart');
 
-    this.getTransferElements = function() {
-        return obj;
-    };
+    Object.defineProperty(this, 'getTransferElements', {
+        value() {
+            return obj;
+        }
+    });
 
     return obj;
 };
@@ -1077,7 +1032,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
                 hideMEGAsyncDialog();
 
                 if (!syncData) {
-                    loadSubPage('desktop');
+                    mega.redirect('mega.io', 'desktop', false, false, false);
                 }
                 // if the user is running MEGAsync 3.0+
                 else if (!syncData.verNotMeet) {
@@ -1099,6 +1054,14 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
                 }
             });
 
+            if (syncData && syncData.u !== u_handle) {
+                $('.megasync-title span', '.megasync-upload-overlay').text(l.msync_upload_wrong_user_title);
+                $('.megasync-info', '.megasync-upload-overlay').safeHTML(l.megasync_upload_wrong_user);
+            }
+            else {
+                $('.megasync-title span', '.megasync-upload-overlay').text(l[19639]);
+                $('.megasync-info', '.megasync-upload-overlay').safeHTML(l[12488]);
+            }
             delay(tag, () => {
                 if (!elementIsVisible(document.querySelector('.megasync-upload-overlay'))) {
                     onclick();
@@ -1107,7 +1070,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
         };
         dlmanager.isMEGAsyncRunning('3.0', 1)
             .done(function(ms, syncData) {
-                showMEGAsyncDialog(l[8912], syncData);
+                showMEGAsyncDialog(u_handle === syncData.u ? l[8912] : l.megasync_check_logins, syncData);
             })
             .fail(function() {
                 showMEGAsyncDialog(l.desktopapp_dialog_btn);
@@ -1119,7 +1082,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
     var ul_id;
     var pause = '';
     var pauseTxt = '';
-    var ephemeral = page === 'start';
+    var ephemeral = M.isFileDragPage(page);
     var ttl = this.getTransferTableLengths();
 
     target = target || this.currentdirid;
@@ -1149,9 +1112,6 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
             var filesize = f.size;
 
             ul_id = ++__ul_id;
-            if (!f.flashid) {
-                f.flashid = false;
-            }
             f.target = f.target || target;
             f.id = ul_id;
 
@@ -1162,7 +1122,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
                 + '<ul><li class="right-c"><p><span></span></p></li>'
                 + '<li class="left-c"><p><span></span></p></li></ul>'
                 + '</div></td>'
-                + '<td><span class="transfer-filetype-icon ' + fileIcon({ name: f.name }) + '"></span>'
+                + '<td><span class="item-type-icon icon-' + fileIcon({ name: f.name }) + '-24"></span>'
                 + '<span class="tranfer-filetype-txt">' + htmlentities(f.name) + '</span></td>'
                 + '<td>' + filetype(f.name) + '</td>'
                 + '<td class="transfer-size">' + bytesToSize(filesize) + '</td>'
@@ -1227,7 +1187,6 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
             delay('fm_tfsupdate', fm_tfsupdate); // this will call $.transferHeader()
         }
 
-        setupTransferAnalysis();
         if ((ulmanager.isUploading = Boolean(ul_queue.length))) {
             $('.transfer-pause-icon').removeClass('disabled');
             $('.transfer-clear-completed').removeClass('disabled');
@@ -1302,7 +1261,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
     }
 
     var uuid = makeUUID();
-    var makeDirPromise = new MegaPromise();
+    var makeDirPromise = mega.promise;
 
     if (d) {
         ulmanager.logger.info('[%s] Pre-upload preparation...', uuid, u.length, [u]);
@@ -1333,7 +1292,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
 
         for (var i = folders.length; i--;) {
             var name = folders[i];
-            var found = fileconflict.getNodeByName(target, name);
+            const found = fileconflict.getFolderByName(target, name);
 
             if (found) {
                 conflicts.push([{t: 1, name: name}, found]);
@@ -1357,7 +1316,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
                             if (d) {
                                 console.timeEnd('makeDirProc-' + uuid);
                             }
-                            return makeDirPromise.reject(EACCESS);
+                            return makeDirPromise.reject(EBLOCKED);
                         }
 
                         if (action === fileconflict.DONTCOPY) {
@@ -1416,7 +1375,7 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
         });
     });
 
-    makeDirPromise.done(function() {
+    makeDirPromise.then(() => {
         var targets = Object.create(null);
 
         for (var i = u.length; i--;) {
@@ -1428,11 +1387,14 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
             else if (paths[file.path]) {
                 file.target = paths[file.path];
             }
+            else if (!file.target) {
+                file.target = target;
+            }
 
             targets[file.target] = 1;
         }
 
-        dbfetch.geta(Object.keys(targets)).always(function(r) {
+        return dbfetch.geta(Object.keys(targets)).then((r) => {
             // loadingDialog.hide();
 
             if (!M.c[target] && String(target).length !== 11 && !toChat) {
@@ -1445,9 +1407,9 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
             var to = toChat ? u[0].target : target;
             var op = fileversioning.dvState ? 'replace' : 'upload';
 
-            fileconflict.check(u, to, op, toChat ? fileconflict.KEEPBOTH : 0).done(startUpload);
+            return fileconflict.check(u, to, op, toChat ? fileconflict.KEEPBOTH : 0);
         });
-    }).always(function() {
+    }).then(startUpload).catch((ex) => ex !== EBLOCKED && tell(ex)).finally(() => {
         if (d) {
             console.timeEnd('makeDirPromise-' + uuid);
         }
@@ -1465,7 +1427,7 @@ MegaData.prototype.addNewFile = function(fileName, dest) {
     // eslint-disable-next-line local-rules/hints
     var addFilePromise = new MegaPromise();
     dest = dest || M.currentdirid || M.RootID;
-    dest = dest.replace('public-links/', '').replace('out-shares/', '').replace('file-requests/', '');
+    dest = dest.split('/').pop();
 
     if ([8, 11].indexOf(String(dest).length) === -1) {
         return addFilePromise.reject(EACCESS);
@@ -1601,8 +1563,8 @@ MegaData.prototype.ulerror = function(ul, error) {
 
     if (error === EOVERQUOTA) {
         ulQueue.pause();
-        if (mega.fileRequestUpload && !mega.fileRequestUpload.isUploadPageInitialized()) {
-            M.showOverStorageQuota(-1);
+        if (!is_megadrop) {
+            M.showOverStorageQuota(-1).catch(nop);
         }
     }
     else if (error === EGOINGOVERQUOTA) {
@@ -1646,8 +1608,8 @@ MegaData.prototype.ulerror = function(ul, error) {
             $('.transfer-status', $rows).text(l[1010]);
 
             // Inform user that upload File request is not available anymore
-            if (page.substr(0, 11) === 'filerequest') {
-                mBroadcaster.sendMessage('FileRequest:overquota');
+            if (is_megadrop) {
+                mBroadcaster.sendMessage('FileRequest:overquota', error);
             }
         }
         else {
@@ -1685,7 +1647,6 @@ MegaData.prototype.ulcomplete = function(ul, h, faid) {
     }
 
     mBroadcaster.sendMessage('upload:completion', ul.id, h || -0xBADF, faid, ul.chatid);
-    mBroadcaster.sendMessage('trk:event', 'upload', 'completed');
 
     if (ul.skipfile) {
         showToast('megasync', l[372] + ' "' + ul.name + '" (' + l[1668] + ')');
@@ -1726,8 +1687,12 @@ MegaData.prototype.ulfinalize = function(ul, status, h) {
     }
 
     // If File request windows exists and upload
-    if (id && mega.fileRequestUpload && mega.fileRequestUpload.isUploadPageInitialized()) {
+    if (id && is_megadrop) {
         mega.fileRequestUpload.onItemUploadCompletion(id);
+    }
+    else if (h) {
+        // @todo better error handling..
+        M.confirmNodesAtLocation(h).catch(tell);
     }
 
     delay('tfscomplete', function() {
@@ -1774,155 +1739,6 @@ MegaData.prototype.openTransfersPanel = function openTransfersPanel() {
     if ($('table.transfer-table tr').length > 1) {
         $('.transfer-clear-all-icon').removeClass('hidden');
     }
-
-    if (!$.mSortableT) {
-        $.mSortableT = $('.transfer-table tbody');
-        $.mSortableT.sortable({
-            delay: 200,
-            revert: 100,
-            start: function() {
-                $('body').addClass('dndc-sort');
-            },
-            helper: function(ev, tr) {
-                if (!tr.hasClass('ui-selected')) {
-                    tr.addClass('ui-selected');
-                }
-                this.order = fm_tfsorderupd();
-                var $selected = tr.parent().children('.ui-selected').clone();
-                tr.data('multidrag', $selected).siblings('.ui-selected').hide();
-                var $helper = $('<tr/>');
-                return $helper.append($selected);
-            },
-            stop: function(ev, ui) {
-                var cancel = false;
-                $('body').removeClass('dndc-sort');
-
-                var $selected = ui.item.data('multidrag');
-                ui.item.after($selected).remove();
-                $('.transfer-table tr.ui-selected:not(:visible)').remove();
-                $.transferHeader(); // rebind cloned trs
-
-                // var $tr = $(ui.item[0]);
-                // var id = String($tr.attr('id'));
-                // var $next = $tr.next();
-
-                /*if ($selected.hasClass('started')) {
-                    cancel = true;
-                }
-                else {
-                    var $prev = $tr.prev();
-                    var pid = $prev.attr('id');
-                    var nid = $next.attr('id');
-
-                    cancel = ((id[0] === 'u' && nid && nid[0] !== 'u')
-                            || (id[0] !== 'u' && pid && pid[0] === 'u'));
-                }*/
-                if (cancel) {
-                    $.mSortableT.sortable('cancel');
-                }
-                else {
-                    var order = fm_tfsorderupd();
-
-                    if (JSON.stringify(order) !== JSON.stringify(this.order)) {
-                        var mDL = {
-                            pos: 0,
-                            etmp: [],
-                            oQueue: [],
-                            pQueue: {},
-                            mQueue: dlQueue,
-                            m_queue: dl_queue,
-                            prop: 'dl'
-                        };
-                        var mUL = {
-                            pos: 0,
-                            etmp: [],
-                            oQueue: [],
-                            pQueue: {},
-                            mQueue: ulQueue,
-                            m_queue: ul_queue,
-                            prop: 'ul'
-                        };
-                        var id;
-                        var dst;
-                        var i = 0;
-                        var len = Object.keys(order).length / 2;
-
-                        [dl_queue, ul_queue].forEach(function(queue) {
-                            var t_queue = queue.filter(isQueueActive);
-                            if (t_queue.length !== queue.length) {
-                                var m = t_queue.length;
-                                var i = 0;
-                                while (i < m) {
-                                    (queue[i] = t_queue[i]).pos = i;
-                                    ++i;
-                                }
-                                queue.length = i;
-                                while (queue[i]) {
-                                    delete queue[i++];
-                                }
-                            }
-                        });
-
-                        while (len > i) {
-                            id = M.t[i++];
-
-                            dst = id[0] === 'u' ? mUL : mDL;
-                            var mQ = dst.mQueue.slurp(id);
-                            // for (var x in mQ) {
-                            // if (mQ.hasOwnProperty(x)) {
-                            // var entry = mQ[x][0][dst.prop];
-                            // if (dst.etmp.indexOf(entry) === -1) {
-                            // (dst.m_queue[dst.pos] = entry).pos = dst.pos;
-                            // dst.etmp.push(entry);
-                            // dst.pos++;
-                            // }
-                            // }
-                            // }
-                            dst.oQueue = dst.oQueue.concat(mQ);
-
-                            if (dst.mQueue._qpaused.hasOwnProperty(id)) {
-                                dst.pQueue[id] = dst.mQueue._qpaused[id];
-                            }
-                        }
-
-                        dlQueue._queue = mDL.oQueue;
-                        ulQueue._queue = mUL.oQueue;
-                        dlQueue._qpaused = mDL.pQueue;
-                        ulQueue._qpaused = mUL.pQueue;
-
-                        // Check for transfers moved before any started one
-                        var $prev = $('.transfer-table tr.transfer-started')
-                            .first()
-                            .prevAll()
-                            .not('.transfer-paused');
-                        // XXX: we rely on the speed field being non-numeric
-                        if ($prev.length && !$prev.find('.speed').text().replace(/\D/g, '')) {
-                            var ids = $('.transfer-table tr:not(.transfer-paused)').attrs('id');
-                            ids.forEach(fm_tfspause);
-                            if (dlQueue._queue.length || ulQueue._queue.length) {
-                                dlmanager.logger.error('The move operation should have cleared the queues.');
-                            }
-                            ids.forEach(fm_tfsresume);
-                            i = 0;
-                            mDL.pQueue = {};
-                            mUL.pQueue = {};
-                            while (len > i) {
-                                id = M.t[i++];
-                                dst = id[0] === 'u' ? mUL : mDL;
-                                if (dst.mQueue._qpaused.hasOwnProperty(id)) {
-                                    dst.pQueue[id] = dst.mQueue._qpaused[id];
-                                }
-                            }
-                            dlQueue._qpaused = mDL.pQueue;
-                            ulQueue._qpaused = mUL.pQueue;
-                        }
-                    }
-                }
-
-                $('.transfer-table tr.ui-selected').removeClass('ui-selected');
-            }
-        });
-    }
 };
 
 MegaData.prototype.showTransferToast = function showTransferToast(t_type, t_length, isPaused) {
@@ -1941,25 +1757,13 @@ MegaData.prototype.showTransferToast = function showTransferToast(t_type, t_leng
         // Upload message
         if (t_type === 'u') {
             // Plural message
-            if (t_length > 1) {
-                text.textContent = l[12480].replace('%1', t_length);
-            }
-            // Singular message
-            else {
-                text.textContent = l[7223];
-            }
+            text.textContent = mega.icu.format(l.transfer_toast_added_ul, t_length);
         }
         // Download message
         else {
             icons = ['download'];
             // Plural message
-            if (t_length > 1) {
-                text.textContent = l[12481].replace('%1', t_length);
-            }
-            // Singular message
-            else {
-                text.textContent = l[7222];
-            }
+            text.textContent = mega.icu.format(l.transfer_toast_added_dl, t_length);
         }
 
         // Add (paused) to the message
@@ -1970,7 +1774,7 @@ MegaData.prototype.showTransferToast = function showTransferToast(t_type, t_leng
         }
 
         // Only display the "Show me" button in the toast if the user is logged in
-        if (u_type) {
+        if (self.fminitialized && u_type) {
             buttons.push({
                 text: l[7224],
                 onClick: () => {
@@ -1980,7 +1784,7 @@ MegaData.prototype.showTransferToast = function showTransferToast(t_type, t_leng
                     if (el) {
                         el.classList.add('hidden');
                     }
-                    document.querySelector('.nw-fm-left-icon.transfers').click();
+                    $('.nw-fm-left-icon.transfers').trigger('click');
                 }
             });
         }
@@ -1994,6 +1798,13 @@ MegaData.prototype.showTransferToast = function showTransferToast(t_type, t_leng
     }
 };
 
+// @see filedrag.js
+MegaData.prototype.isFileDragPage = function(page) {
+    'use strict';
+
+    return page === 'start' || page === 'login' || page === 'register';
+};
+
 // report a transient upload error
 function onUploadError(ul, errorstr, reason, xhr, isOverQuota) {
     'use strict';
@@ -2004,6 +1815,11 @@ function onUploadError(ul, errorstr, reason, xhr, isOverQuota) {
 
     if (d) {
         ulmanager.logger.error('onUploadError', ul.id, ul.name, errorstr, reason, hostname(ul.posturl));
+    }
+
+    if (is_mobile) {
+        mobile.uploadOverlay.error(ul, errorstr);
+        return;
     }
 
     tfsheadupdate(isOverQuota ? {o: `ul_${ul.id}`} : {e: `ul_${ul.id}`});
@@ -2028,27 +1844,6 @@ function resetOverQuotaTransfers(ids) {
 
     tfsheadupdate({t: ids});
     mega && mega.tpw && mega.tpw.resetErrorsAndQuotasUI(mega.tpw.DOWNLOAD);
-}
-
-function fm_tfsorderupd() {
-    'use strict';
-
-    M.t = {};
-    $('.transfer-table tr[id]:visible').each(function(pos, node) {
-        var t = String(node.id).split('_').shift();
-        if (['ul', 'dl', 'zip', 'LOCKed'].indexOf(t) === -1) {
-            dlmanager.logger.error('fm_tfsorderupd', 'Unexpected node id: ' + node.id);
-        }
-
-        // if (t !== 'LOCKed') {
-        M.t[pos] = node.id;
-        M.t[node.id] = pos;
-        // }
-    });
-    if (d) {
-        dlmanager.logger.info('M.t', M.t);
-    }
-    return M.t;
 }
 
 function fm_tfspause(gid, overquota) {
@@ -2178,132 +1973,6 @@ function fm_tfsresume(gid) {
         return true;
     }
     return false;
-}
-
-function fm_tfsmove(gid, dir) { // -1:up, 1:down
-    'use strict';
-    /* jshint -W074 */
-    var tfs = $('#' + gid);
-    var to;
-    var act;
-    var p1;
-    var p2;
-    var i;
-    var x;
-    var mng;
-    gid = String(gid);
-    mng = gid[0] === 'u' ? ulmanager : dlmanager;
-    if (tfs.length !== 1) {
-        mng.logger.warn('Invalid transfer node', gid, tfs);
-        return;
-    }
-
-    if (!GlobalProgress[gid] || GlobalProgress[gid].working.length) {
-        mng.logger.warn('Invalid transfer state', gid);
-        return;
-    }
-
-    if (dir !== -1) {
-        to = tfs.next();
-        act = 'after';
-    }
-    else {
-        to = tfs.prev();
-        act = 'before';
-    }
-
-    var id = to && to.attr('id') || 'x';
-
-    if (!GlobalProgress[id] || GlobalProgress[id].working.length) {
-        if (id !== 'x') {
-            mng.logger.warn('Invalid [to] transfer state', gid, id, to);
-        }
-        return;
-    }
-
-    if (id[0] === gid[0] || "zdz".indexOf(id[0] + gid[0]) !== -1) {
-        to[act](tfs);
-    }
-    else {
-        if (d) {
-            dlmanager.logger.error('Unable to move ' + gid);
-        }
-        return;
-    }
-
-    fm_tfsorderupd();
-
-    var m_prop;
-    var m_queue;
-    var mQueue = [];
-    if (gid[0] === 'z' || id[0] === 'z') {
-        var p = 0;
-        var trick = Object.keys(M.t).map(Number).filter(function(n) {
-            return !isNaN(n) && M.t[n][0] !== 'u';
-        });
-        for (i in trick) {
-            if (trick.hasOwnProperty(i)) {
-                ASSERT(i === trick[i] && M.t[i], 'Oops..');
-                var mQ = dlQueue.slurp(M.t[i]);
-                for (x in mQ) {
-                    if (mQ.hasOwnProperty(x)) {
-                        (dl_queue[p] = mQ[x][0].dl).pos = p;
-                        ++p;
-                    }
-                }
-                mQueue = mQueue.concat(mQ);
-            }
-        }
-        // we should probably fix our Array inheritance
-        for (var j = p, len = dl_queue.length; j < len; ++j) {
-            delete dl_queue[j];
-        }
-        dl_queue.length = p;
-        dlQueue._queue = mQueue;
-        return;
-    }
-
-    if (gid[0] === 'u') {
-        m_prop = 'ul';
-        mQueue = ulQueue._queue;
-        m_queue = ul_queue;
-    }
-    else {
-        m_prop = 'dl';
-        mQueue = dlQueue._queue;
-        m_queue = dl_queue;
-    }
-    var t_queue = m_queue.filter(isQueueActive);
-    if (t_queue.length !== m_queue.length) {
-        var m = t_queue.length;
-        i = 0;
-        while (i < m) {
-            (m_queue[i] = t_queue[i]).pos = i;
-            ++i;
-        }
-        m_queue.length = i;
-        while (m_queue[i]) {
-            delete m_queue[i++];
-        }
-    }
-    for (i in mQueue) {
-        if (mQueue[i][0][gid]) {
-            var tmp = mQueue[i];
-            var m_q = tmp[0][m_prop];
-            p1 = Number(i) + dir;
-            p2 = m_q.pos;
-            tmp[0][m_prop].pos = mQueue[p1][0][m_prop].pos;
-            mQueue[p1][0][m_prop].pos = p2;
-            mQueue[i] = mQueue[p1];
-            mQueue[p1] = tmp;
-            p1 = m_queue.indexOf(m_q);
-            tmp = m_queue[p1];
-            m_queue[p1] = m_queue[p1 + dir];
-            m_queue[p1 + dir] = tmp;
-            ASSERT(m_queue[p1].pos === mQueue[i][0][m_prop].pos, 'Huh, move sync error..');
-            break;
-        }
-    }
 }
 
 function fm_tfsupdate() {
@@ -2566,7 +2235,8 @@ function tfsheadcalc(update) {
             delete tfsheadupdate.stats[type][update.c];
             break;
         }
-        default: {
+        default:
+            if (tfsheadupdate.stats[type]) {
             const id = update[key];
             if (
                 typeof tfsheadupdate.stats[type][id] !== "undefined"

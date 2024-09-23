@@ -31,6 +31,11 @@ mobile.propay = {
 
         // Show the page for mobile
         $stepTwo.removeClass('hidden');
+
+        if (mobile.settingsHelper.currentPage) {
+            mobile.settingsHelper.currentPage.hide();
+            mobile.settingsHelper.currentPage = $stepTwo;
+        }
     },
 
     /**

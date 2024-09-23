@@ -101,13 +101,16 @@ export default class FMView extends MegaRenderMixin {
         // onAttachClicked={this.onAttachClicked}
         selectedList = [...selectedList];
         let highlighted = selectedList;
-        if (this.props.folderSelectNotAllowed) {
+        // If folderSelectNotAllowed and folderSelectable select a single folder
+        // Browser entries should handle only allowing a single folder selection in this case.
+        if (this.props.folderSelectNotAllowed && !this.props.folderSelectable) {
             selectedList = selectedList.filter((nodeId) => this.dataSource[nodeId].t !== 1);
         }
 
         this.setState({'selected': selectedList, 'highlighted': highlighted});
         this.props.onSelected(selectedList);
         this.props.onHighlighted(highlighted);
+        $.selected = highlighted;
     }
     getEntries(newState) {
         var self = this;
@@ -168,6 +171,9 @@ export default class FMView extends MegaRenderMixin {
         }
         else if (sortBy[0] === "interaction") {
             sortFunc = M.getSortByInteractionFn();
+        }
+        else if (sortBy[0] === "verification") {
+            sortFunc = M.getSortByVerificationFn();
         }
         else if (sortBy[0] === "email") {
             sortFunc = M.getSortByEmail();

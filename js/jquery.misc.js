@@ -216,11 +216,7 @@ $.fn.noTransition = function(action) {
 
     var $this = $(this);
     $this.addClass('no-trans');
-    $.when(action.call(this)).done(function() {
-        setTimeout(function() {
-            $this.removeClass('no-trans');
-        }, 0);
-    });
+    requestAnimationFrame(() => Promise.resolve(action.call(this)).then(() => $this.removeClass('no-trans')));
 };
 
 // JQuery Show/Hide alternative version to avoid hidden class importancy side effect

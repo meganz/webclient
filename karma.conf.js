@@ -21,40 +21,30 @@ module.exports = function(config) {
         // == Basics ==
         'js/vendor/jquery.js',
         'js/vendor/jquery-ui.js',
-        'js/vendor/jquery.mousewheel.js',
-        'js/vendor/jquery.fullscreen.js',
-        'js/vendor/jquery.qrcode.js',
-        'js/jquery.tokeninput.js',
         'js/jquery.misc.js',
-        'js/jquery.checkboxes.js',
 
         // == Libraries ==
         'js/vendor/asmcrypto.js',
-        'js/vendor/jsbn.js',
-        'js/vendor/jsbn2.js',
         'js/vendor/nacl-fast.js',
-        // For notifications.
-        'js/vendor/notification.js',
         'js/vendor/moment.js',
-
-        // Other.
         'js/vendor/autolinker.js',
-        'js/vendor/qrcode.js',
-        'js/vendor/megaLogger.js',
 
         // == Test helpers and test configuration ==
         'test/lang_dummy.js',
         'test/config.js',
 
         // Shim for ES6 features some browsers may not have (PhantomJS, MSIE).
-        'js/vendor/es6-shim.js',
+        'js/vendor/web-streams-polyfill.js',
         'js/vendor/dexie.js',
 
         // == Our code ==
         'secureboot.js',
         'index.js',
         'nodedec.js',
+        'js/vendor/megaLogger.js',
+        'js/utils/broadcast.js',
         'js/utils/polyfills.js',
+        'js/utils/api.js',
         'js/utils/browser.js',
         'js/utils/debug.js',
         'js/utils/conv.js',
@@ -81,7 +71,6 @@ module.exports = function(config) {
         'js/fm/utils.js',
         'js/fm/megadata.js',
         'js/fm/megadata/account.js',
-        'js/fm/megadata/avatars.js',
         'js/fm/megadata/contacts.js',
         'js/fm/megadata/filters.js',
         'js/fm/megadata/menus.js',
@@ -123,9 +112,7 @@ module.exports = function(config) {
         'js/notify.js',
         'js/megaNotifications.js',
         'js/vendor/avatar.js',
-        'js/vendor/int64.js',
         'js/keymgr.js',
-        'js/cms.js',
         'js/keepAlive.js',
         'js/metatags.js',
         'js/utils/trans.js',
@@ -253,16 +240,16 @@ module.exports = function(config) {
     // - Opera (has to be installed with `npm install karma-opera-launcher`)
     // - Safari (only Mac; has to be installed with `npm install karma-safari-launcher`)
     browsers: [
-        'Firefox',
-        'FirefoxHeadless',
-        'Firefox_Extension',
-        'Firefox_NoCookies',
-        'Firefox_Incognito',
-        'Chrome',
+        // 'Firefox',
+        // 'FirefoxHeadless',
+        // 'Firefox_Extension',
+        // 'Firefox_NoCookies',
+        // 'Firefox_Incognito',
+        // 'Chrome',
         'ChromeHeadless',
-        'Chrome_Incognito',
-        'Chrome_Unlimited',
-        'Chrome_NoCookies'
+        // 'Chrome_Incognito',
+        // 'Chrome_Unlimited',
+        // 'Chrome_NoCookies'
     ],
 
     customLaunchers: {

@@ -1,0 +1,276 @@
+@import 'videoNodeMenu.scss';
+
+/*
+* Stream node
+*/
+
+.video-node {
+    position: relative;
+    float: left;
+    width: calc(100% - 4px);
+    height: calc(100% - 4px);
+    min-height: 100%;
+    margin: 6px;
+    border-radius: 12px;
+    box-sizing: border-box;
+    background: #333;
+
+    &:after {
+        content: '';
+        display: block;
+        padding-top: calc(9/16 * 100%);
+    }
+
+    &:hover .node-menu { display: block; }
+
+    &.full { width: 100%; }
+    &.half { width: 50%; }
+    &.third { width: 33%; }
+    &.quarter { width: 25%; }
+
+    &.clickable { cursor: pointer; }
+
+    &.active,
+    &.active-speaker {
+        border: 2px solid #81CFB3;
+
+        video {
+            border-radius: 10px;
+        }
+    }
+
+    .loading-icon {
+        filter: invert(1);
+        --icon-size: 64px;
+    }
+
+    &-content {
+        overflow: hidden;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        border-radius: 4px;
+
+        .loading-icon {
+            width: 128px;
+            height: 128px;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            margin-left: -64px;
+            margin-top: -64px;
+            opacity: 0.2;
+            filter: invert(1);
+            -webkit-animation: rotate 1s infinite linear;
+            animation: rotate 1s infinite linear;
+        }
+
+        .video-rtc-stats {
+            position: absolute;
+            color: #0f0;
+            padding-left: 4px;
+            padding-right: 4px;
+            padding-top: 0;
+            text-shadow: 0 0 4px black;
+            z-index: 1;
+            pointer-events: none;
+            font-size: 6pt;
+        }
+
+        .video-rtc-stats-ralign {
+            width: 80%;
+            right: 0;
+        }
+
+        video,
+        .video-node-holder {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+
+        .presenter-video-holder {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 15%;
+            height: 15%;
+            background-color: black;
+            border-top-left-radius: 6px;
+        }
+
+        .presenter-video-holder video {
+            border-radius: inherit;
+        }
+
+        video {
+            object-position: center;
+            object-fit: contain;
+
+            .video-crop & {
+                object-fit: cover;
+            }
+        }
+
+        .video-node-loading::before {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            content: "o o o o";
+            color: white;
+            font-size: 1em;
+            z-index: 0;
+        }
+
+        .avatar-wrapper {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+
+            span {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            img {
+                width: 100%;
+                height: 100%;
+            }
+
+            .user-card-verified {
+                display: none;
+            }
+        }
+
+        .stream-signifiers {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            display: flex;
+
+            .float-video & {
+                left: auto;
+                right: 8px;
+            }
+
+            span {
+                display: flex;
+                justify-content: center;
+                width: 32px;
+                height: 32px;
+                align-items: center;
+                border-radius: 200px;
+                background: rgba(17, 17, 17, 0.8);
+            }
+
+            .stream-signifier-icon {
+                --icon-size: 24px;
+                --mask-color: var(--secondary-white);
+            }
+        }
+    }
+
+    &-status {
+        position: absolute;
+        bottom: 8px;
+        left: 8px;
+        max-width: calc(100% - 28px);
+        color: var(--secondary-white);
+        font-size: 9px;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 8px;
+        display: flex;
+        height: 24px;
+        padding: 0 6px;
+
+        .float-video & {
+            bottom: 16px;
+            left: 16px;
+            max-width: calc(100% - 44px);
+        }
+
+        span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            float: left;
+            width: 24px;
+            height: 24px;
+            margin: 0 5px 0 0;
+
+            &:last-child {
+                margin-right: 0;
+            }
+
+            i {
+                overflow: hidden;
+                position: relative;
+                --mask-color: var(--secondary-green);
+                --icon-size: 12px;
+
+                &.icon-mic-off-thin-outline,
+                &.icon-call-offline {
+                    --mask-color: var(--secondary-rest);
+                }
+            }
+
+            span {
+                position: fixed;
+                bottom: -9999px;
+                visibility: hidden;
+            }
+        }
+
+        .video-status-name {
+            margin: 2px 5px 0 0;
+            max-width: 100%;
+            overflow: hidden;
+
+            span {
+                display: block;
+                font: var(--text-body1);
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                text-wrap: nowrap;
+                width: fit-content;
+            }
+            img.emoji {
+                height: 16px;
+                margin: 0;
+                width: 16px;
+            }
+        }
+    }
+}
+
+.stream .video-node-content .avatar-wrapper {
+    width: 96px;
+    height: 96px;
+    font: var(--text-h1);
+}
+
+.float-video .video-node-content .avatar-wrapper {
+    width: 48px;
+    height: 48px;
+}
+
+.mic-fill {
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    margin: 0 0 0 -1.5px;
+    width: 3px;
+    max-height: 7px;
+    border-radius: 0 0 3px 3px;
+    background: var(--secondary-green);
+    transition: height 100ms ease-out;
+}

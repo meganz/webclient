@@ -1,9 +1,9 @@
 import React from 'react';
 import { compose, MegaRenderMixin } from '../../../mixins.js';
 import { Avatar } from '../../contacts.jsx';
-import Call from '../call.jsx';
+import { isGuest } from '../call.jsx';
 import Button from '../button.jsx';
-import { withPermissionsObserver } from '../permissionsObserver';
+import { withPermissionsObserver } from '../permissionsObserver.jsx';
 
 class Preview extends MegaRenderMixin {
     static NAMESPACE = 'preview-meeting';
@@ -15,12 +15,22 @@ class Preview extends MegaRenderMixin {
 
     videoRef = React.createRef();
     stream = null;
-    avatarMeta = null;
 
     state = {
         audio: false,
-        video: false
+        video: false,
+        avatarMeta: undefined
     };
+
+    constructor(props) {
+        super(props);
+        this.state.audio = this.props.audio || this.state.audio;
+        if (this.props.video) {
+            this.state.video = this.props.video;
+            this.startStream(Preview.STREAMS.VIDEO);
+            this.props.onToggle(this.state.audio, this.state.video);
+        }
+    }
 
     getTrackType = type => !type ? 'getTracks' : type === Preview.STREAMS.AUDIO ? 'getAudioTracks' : 'getVideoTracks';
 
@@ -43,12 +53,16 @@ class Preview extends MegaRenderMixin {
             .catch(ex => {
                 // Unable to start audio/video -> trigger media error, w/o enabling the control
                 const stream = type === Preview.STREAMS.AUDIO ? 'audio' : 'video';
-                this.setState(state => ({ [stream]: !state[stream] }), () => {
-                    megaChat.trigger('onLocalMediaError', {
-                        [type === Preview.STREAMS.AUDIO ? 'mic' : 'camera']: `${ex.name}: ${ex.message}`
-                    });
-                    console.error(`${ex.name}: ${ex.message}`);
-                });
+                return (
+                    this.isMounted &&
+                    this.setState(state => ({ [stream]: !state[stream] }), () => {
+                        megaChat.trigger('onLocalMediaError', {
+                            [type === Preview.STREAMS.AUDIO ? 'mic' : 'camera']: `${ex.name}: ${ex.message}`
+                        });
+                        console.error(`${ex.name}: ${ex.message}`);
+                    })
+                );
+
             });
     };
 
@@ -70,10 +84,11 @@ class Preview extends MegaRenderMixin {
             }
             return this.state[stream] ? this.startStream(type) : this.stopStream(type);
         });
+        this.props.resetError?.(type === Preview.STREAMS.AUDIO ? Av.Audio : Av.Camera);
     };
 
     renderAvatar = () => {
-        if (Call.isGuest()) {
+        if (isGuest()) {
             return (
                 <div className="avatar-guest">
                     <i className="sprite-fm-uni icon-owner" />
@@ -82,7 +97,7 @@ class Preview extends MegaRenderMixin {
         }
 
         if (is_chatlink) {
-            const { avatarUrl, color, shortName } = this.avatarMeta || {};
+            const { avatarUrl, color, shortName } = this.state.avatarMeta || {};
             return (
                 <div
                     className={`
@@ -105,16 +120,17 @@ class Preview extends MegaRenderMixin {
 
     componentDidMount() {
         super.componentDidMount();
+
         if (this.props.onToggle) {
             this.props.onToggle(this.state.audio, this.state.video);
         }
-        this.toggleStream(Preview.STREAMS.AUDIO);
-        this.avatarMeta = is_chatlink ? generateAvatarMeta(u_handle) : null;
+
+        this.setState({ avatarMeta: is_chatlink ? generateAvatarMeta(u_handle) : undefined });
     }
 
     render() {
         const { NAMESPACE } = Preview;
-        const { hasToRenderPermissionsWarning, renderPermissionsWarning, resetError } = this.props;
+        const { hasToRenderPermissionsWarning, renderPermissionsWarning } = this.props;
         const { audio, video } = this.state;
         const SIMPLETIP_PROPS = { label: undefined, position: 'top', className: 'theme-dark-forced' };
 
@@ -138,17 +154,16 @@ class Preview extends MegaRenderMixin {
                             className={`
                                 mega-button
                                 round
-                                large
                                 theme-light-forced
-                                ${audio ? '' : 'inactive'}
+                                ${NAMESPACE}-control
+                                ${audio ? '' : 'with-fill'}
                             `}
-                            icon={audio ? 'icon-audio-filled' : 'icon-audio-off'}
+                            icon={audio ? 'icon-mic-thin-outline' : 'icon-mic-off-thin-outline'}
                             onClick={() => {
-                                resetError(Av.Audio);
                                 this.toggleStream(Preview.STREAMS.AUDIO);
                             }}>
-                            <span>{audio ? l[16214] /* `Mute` */ : l[16708] /* `Unmute` */}</span>
                         </Button>
+                        <span>{l.mic_button /* `Mic` */}</span>
                         {hasToRenderPermissionsWarning(Av.Audio) ? renderPermissionsWarning(Av.Audio) : null}
                     </div>
                     <div className="preview-control-wrapper">
@@ -160,14 +175,14 @@ class Preview extends MegaRenderMixin {
                             className={`
                                 mega-button
                                 round
-                                large
                                 theme-light-forced
-                                ${video ? '' : 'inactive'}
+                                ${NAMESPACE}-control
+                                ${video ? '' : 'with-fill'}
                             `}
-                            icon={video ? 'icon-video-call-filled' : 'icon-video-off'}
+                            icon={video ? 'icon-video-thin-outline' : 'icon-video-off-thin-outline'}
                             onClick={() => this.toggleStream(Preview.STREAMS.VIDEO)}>
-                            <span>{video ? l[22894] /* `Disable video` */ : l[22893] /* `Enable video` */}</span>
                         </Button>
+                        <span>{l.camera_button /* `Camera` */}</span>
                         {hasToRenderPermissionsWarning(Av.Camera) ? renderPermissionsWarning(Av.Camera) : null}
                     </div>
                 </div>

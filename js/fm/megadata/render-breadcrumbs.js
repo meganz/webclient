@@ -28,7 +28,9 @@
 
         removeSimpleTip($('.fm-breadcrumbs', $block));
         showHideBreadcrumbDropdown(extraItems, scope, dropdown);
-        applyBreadcrumbEventHandlers(scope, dropdown, clickAction);
+        if (!scope.parentNode.classList.contains('simpletip-tooltip')) {
+            applyBreadcrumbEventHandlers(scope, dropdown, clickAction);
+        }
     };
 
     /**
@@ -37,16 +39,26 @@
      * @param {string} fileHandle - the id of the selected file or folder
      * @return {undefined}
      */
-    MegaData.prototype.renderPathBreadcrumbs = function(fileHandle, isInfoBlock = false) {
+    MegaData.prototype.renderPathBreadcrumbs = function(fileHandle, isInfoBlock = false, isSimpletip = false) {
         let scope;
 
         if (isInfoBlock) {
             scope = document.querySelector('.properties-breadcrumb .fm-breadcrumbs-wrapper');
         }
+        else if (isSimpletip) {
+            scope = document.querySelector('.simpletip-tooltip .fm-breadcrumbs-wrapper');
+        }
         else {
             scope = document.querySelector('.fm-right-files-block .fm-right-header .fm-breadcrumbs-wrapper');
         }
+
+        if (!scope) {
+            console.assert(false, 'invalid scope');
+            return;
+        }
+
         let items = this.getPath(fileHandle || this.currentdirid);
+        const hasRewind = scope.classList.contains('rewind');
 
         const dictionary = handle => {
             let name = '';
@@ -145,6 +157,15 @@
                         name = localeName;
                     }
                 }
+                else if (M.dyh) {
+                    const {type, localeName} = M.dyh('breadcrumb-properties', handle);
+                    if (type) {
+                        typeClass = type;
+                    }
+                    if (localeName) {
+                        name = localeName;
+                    }
+                }
             }
 
             return {
@@ -155,11 +176,15 @@
         };
 
         this.renderBreadcrumbs(items, scope, dictionary, id => {
+            if (hasRewind) {
+                return;
+            }
+
             breadcrumbClickHandler.call(this, id);
         });
 
         // if on info dialog we do not want to open the file versioning dialog
-        if (!is_mobile && fileHandle && !isInfoBlock) {
+        if (!is_mobile && fileHandle && !isInfoBlock && !isSimpletip) {
             fileversioning.fileVersioningDialog(fileHandle);
         }
     };
@@ -171,81 +196,87 @@
      * @return {undefined}
      */
     MegaData.prototype.renderSearchBreadcrumbs = function() {
-        const block = document.querySelector('.fm-main .fm-right-files-block:not(.in-chat)');
+        const scope = document.querySelector('.fm-right-files-block .search-bottom-wrapper');
+
+        if (!scope) {
+            return;
+        }
 
         if (this.currentdirid && this.currentdirid.substr(0, 7) === 'search/') {
-            if (block) {
-                block.classList.remove('search-multi');
-            }
-            if (selectionManager && selectionManager.selected_list.length > 0) {
-                block.classList.add('search');
 
-                const scope = block.querySelector('.search-bottom-wrapper');
-                scope.classList.remove('hidden');
-                const items = this.getPath(selectionManager.selected_list[0]);
+            const showBreadcrumbs = () => {
+                // Show Breadcrumbs bar instead of Selection bar only when 1 item is selected
+                if (self.selectionManager && selectionManager.selected_list.length === 1) {
 
-                const dictionary = handle => {
-                    let id = '';
-                    let typeClass = '';
-                    let name = '';
+                    const items = this.getPath(selectionManager.selected_list[0]);
+                    const dictionary = handle => {
+                        let id = '';
+                        let typeClass = '';
+                        let name = '';
 
-                    if (handle.length === 11 && this.u[handle]) {
-                        id = handle;
-                        typeClass = 'contacts-item';
-                        name = this.u[handle].m;
-                    }
-                    else if (handle === this.RootID && !folderlink) {
-                        id = this.RootID;
-                        typeClass = 'cloud-drive';
-                        name = l[164];
-                    }
-                    else if (handle === this.RubbishID) {
-                        id = this.RubbishID;
-                        typeClass = 'recycle-item';
-                        name = l[168];
-                    }
-                    else if (this.BackupsId && handle === this.BackupsId) {
-                        id = this.BackupsId;
-                        typeClass = 'backups';
-                        name = l.restricted_folder_button;
-                    }
-                    else {
-                        const n = this.d[handle];
-                        if (n) {
-                            id = n.h;
-                            typeClass = '';
-                            if (n.name) {
-                                name = n.name;
-                            }
-                            if (n.t) {
-                                typeClass = 'folder';
+                        if (handle.length === 11 && this.u[handle]) {
+                            id = handle;
+                            typeClass = 'contacts-item';
+                            name = this.u[handle].m;
+                        }
+                        else if (handle === this.RootID && !folderlink) {
+                            id = this.RootID;
+                            typeClass = 'cloud-drive';
+                            name = l[164];
+                        }
+                        else if (handle === this.RubbishID) {
+                            id = this.RubbishID;
+                            typeClass = 'recycle-item';
+                            name = l[168];
+                        }
+                        else if (this.BackupsId && handle === this.BackupsId) {
+                            id = this.BackupsId;
+                            typeClass = 'backups';
+                            name = l.restricted_folder_button;
+                        }
+                        else {
+                            const n = this.d[handle];
+                            if (n) {
+                                id = n.h;
+                                name = n.name || '';
+                                typeClass = n.t && 'folder' || '';
+
+                                if (n.s4 && n.p === this.RootID) {
+                                    name = l.obj_storage;
+                                    typeClass = 's4-object-storage';
+                                }
+                                else if (this.d[n.p] && this.d[n.p].s4 && this.d[n.p].p === this.RootID) {
+                                    typeClass = 's4-buckets';
+                                }
                             }
                         }
-                    }
 
-                    return {
-                        id,
-                        typeClass,
-                        name
+                        return {
+                            id,
+                            typeClass,
+                            name
+                        };
                     };
-                };
 
-                if (selectionManager.selected_list.length === 1) {
+                    scope.classList.remove('hidden');
+                    selectionManager.hideSelectionBar();
+                    selectionManager.scrollToElementProxyMethod(selectionManager.last_selected);
+
                     this.renderBreadcrumbs(items, scope, dictionary, id => {
                         breadcrumbClickHandler.call(this, id);
                     });
                 }
                 else {
                     scope.classList.add('hidden');
-                    block.classList.add('search-multi');
                 }
+            };
 
-                return;
-            }
+            // Toggle search bar and selection bar with delay
+            // Delay to allow the user to double click on item without it's position change
+            delay('renderSearchBreadcrumbs', showBreadcrumbs, 180);
         }
-
-        if (block) {
-            block.classList.remove('search');
+        else {
+            scope.classList.add('hidden');
         }
     };
 
@@ -262,7 +293,22 @@
 
             let icon = '';
 
-            if (item.type === 'cloud-drive') {
+            if (item.type === 's4-object-storage') {
+                icon = 'icon-object-storage';
+            }
+            else if (item.type === 's4-buckets') {
+                icon = 'icon-bucket-filled';
+            }
+            else if (item.type === 's4-policies') {
+                icon = 'icon-policy-filled';
+            }
+            else if (item.type === 's4-users') {
+                icon = 'icon-user-filled';
+            }
+            else if (item.type === 's4-groups') {
+                icon = 'icon-contacts';
+            }
+            else if (item.type === 'cloud-drive') {
                 icon = 'icon-cloud';
             }
             else if (item.type === 'backups') {
@@ -357,13 +403,26 @@
         const maxPathLength = getMaxPathLength(14, container);
         let extraItems = [];
         let isInfoBlock = false;
+        let isSimpletip = false;
         let lastPos = 0;
 
-        if (container.classList.contains('info')) {
+        if (container.parentNode.parentNode.classList.contains('simpletip-tooltip')) {
+            isSimpletip = true;
+        }
+        else if (container.classList.contains('location')) {
+            items.shift(); // Show location of item without item itself
+        }
+        else if (container.classList.contains('info')) {
             isInfoBlock = true;
         }
 
+        const isDyhRoot = M.dyh ? M.dyh('is-breadcrumb-root', items) : false;
+
         for (let i = 0; i < items.length; i++) {
+
+            if (isSimpletip && i === lastPos) {
+                continue;
+            }
 
             let {name, typeClass, id} = dictionary(items[i]);
 
@@ -371,13 +430,14 @@
             // Don't include the contact name (can be removed later if you want it back)
             if (name !== '') {
 
-                const isLastItem = i === lastPos;
+                const isLastItem = isSimpletip ? i === lastPos + 1 : i === lastPos;
                 const isRoot = i === items.length - 1;
+                const icon = `${mega.ui.sprites.mono} icon-arrow-right`;
                 let item;
                 // if we won't have space, add it to the dropdown, but always render the current folder,
                 // and root if there are no extraItems
                 // for info block we show max 2 items in the in-view breadcrumb
-                if (!isLastItem &&
+                if (!isDyhRoot && !isLastItem && !isSimpletip &&
                     (currentPathLength > maxPathLength && !isInfoBlock) || (isInfoBlock && i > 1)) {
                     extraItems.push({
                         name,
@@ -390,7 +450,8 @@
                     name = escapeHTML(name);
                     item = escapeHTML(items[i]);
                     html =
-                        `<a class="fm-breadcrumbs ${escapeHTML(typeClass)} ${isRoot ? 'root' : ''} ui-droppable"
+                        `<a class="fm-breadcrumbs ${escapeHTML(typeClass)} ${
+                            isRoot || isDyhRoot ? 'root' : ''} ui-droppable"
                             data-id="${item}" id="pathbc-${item}">
                             <span
                                 class="right-arrow-bg simpletip simpletip-tc">
@@ -399,7 +460,7 @@
                                     </span>
                                     <i class="loading sprite-fm-theme icon-loading-spinner"></i>` : name}
                             </span>
-                            ${isLastItem ? '' : '<i class="next-arrow sprite-fm-mono icon-arrow-right icon16"></i>'}
+                            ${isLastItem ? '' : `<i class="next-arrow ${icon} icon16"></i>`}
                         </a>` + html;
 
                     // add on some space for the arrow
@@ -422,7 +483,8 @@
         let $currentBreadcrumb;
         for (let i = 0; i < $breadCrumbs.length; i++) {
             $currentBreadcrumb = $($breadCrumbs[i]);
-            if ($('span', $currentBreadcrumb).get(0).offsetWidth >= $('span', $currentBreadcrumb).get(0).scrollWidth) {
+            if ($('span', $currentBreadcrumb).get(0).offsetWidth >= $('span', $currentBreadcrumb).get(0).scrollWidth
+                || $currentBreadcrumb.parents('.simpletip-tooltip').length > 0) {
                 $('.right-arrow-bg', $currentBreadcrumb).removeClass('simpletip');
             }
         }
@@ -458,9 +520,10 @@
             'public-links',
             'file-requests'
         ];
+        mBroadcaster.sendMessage('trk:event', 'breadcrumb', 'click', id);
 
         // super special case (contact)
-        if (id in M.u) {
+        if (M.u.hasOwnProperty(id)) {
             loadSubPage("chat/contacts/" + id);
         }
         else if (n) {
@@ -490,6 +553,9 @@
         }
         else if (specialCases.includes(id)) {
             this.openFolder(id);
+        }
+        else if (M.dyh) {
+            M.dyh('breadcrumb-click', id);
         }
     }
 })();

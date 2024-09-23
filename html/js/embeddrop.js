@@ -5,9 +5,9 @@ function startMega() {
     mBroadcaster.sendMessage("startMega");
     if (!startMega.eventlog) {
         startMega.eventlog = 1;
-        var xhr = getxhr();
+        var xhr = new XMLHttpRequest();
         xhr.onloadend = console.debug.bind(console);
-        xhr.open("POST", apipath + 'cs?id=0' + mega.urlParams(), true);
+        xhr.open("POST", `${apipath}cs?id=0`, true);
         xhr.send(JSON.stringify([{a: 'log', e: 99690}]));
     }
     init_page();
@@ -54,6 +54,7 @@ function init_page() {
                 true
             );
         });
+        document.body.style.removeProperty('background');
     }
     else {
         console.info(404, tmp);

@@ -1,41 +1,9 @@
 // Note: Referral Program is called as affiliate program at begining, so all systemic names are under word affiliate
 // i.e. affiliate === referral
 
+// Old page. Awaiting revamp
+
 mobile.affiliate = {
-
-    /**
-     * Initialise Main page
-     */
-    initMainPage: function() {
-
-        'use strict';
-
-        // If not logged in, return to the login page
-        if (typeof u_attr === 'undefined') {
-            loadSubPage('login');
-            return false;
-        }
-
-        // Cache selectors
-        var $page = $('.mobile.affiliate-page');
-
-        // Initialise the top menu
-        topmenuUI();
-
-        // Init the titleMenu for this page.
-        mobile.titleMenu.init();
-
-        // Show the account page content
-        $page.removeClass('hidden');
-
-        loadingDialog.show('affiliateRefresh');
-
-        this.getMobileAffiliateData(function() {
-            mobile.affiliate.setCommissionIndexes($page);
-            mobile.affiliate.setTotalRedeemInfo($page);
-            mobile.affiliate.initMainPageButtons($page);
-        });
-    },
 
     getMobileAffiliateData: function(callback) {
 
@@ -55,143 +23,6 @@ mobile.affiliate = {
                 loadingDialog.hide('affiliateRefresh');
             });
         });
-    },
-
-    /**
-     * Main page. Init buttons.
-     */
-    initMainPageButtons: function($page) {
-
-        'use strict';
-
-        var $buttons = $('.mobile.button-block.clickable', $page);
-        var $redeemButton = $('.fm-green-button.redeem', $page);
-
-        /* Subsections buttons */
-        $buttons.rebind('tap', function() {
-            var $this = $(this);
-
-            if ($this.data('link')) {
-                loadSubPage('fm/refer/' + $this.data('link'));
-                return false;
-            }
-        });
-
-        // Redeem requires at least one payment history and available balance more than 50 euro
-        if (M.affiliate.redeemable && M.affiliate.balance.available >= 50 && M.affiliate.utpCount) {
-            $redeemButton.removeClass('disabled');
-        }
-        else {
-            $redeemButton.addClass('disabled');
-        }
-
-        /* Redeem button event */
-        $redeemButton.rebind('tap.redeemButton', function() {
-            var $this = $(this);
-
-            if (!$this.is('.disabled')) {
-                loadSubPage('/fm/refer/redeem/');
-            }
-
-            // Prevent double taps
-            return false;
-        });
-    },
-
-    /**
-     * Main page. Set commision indexes.
-     */
-    setCommissionIndexes: function($page) {
-
-        'use strict';
-
-        var $commissionBlocks = $('.affiliate-comission', $page);
-        var balance = M.affiliate.balance;
-        var currencyHtml = ' <span class="local-currency-code">' + balance.localCurrency + '</span>';
-        var localTotal;
-        var localPending;
-        var localAvailable;
-
-        if (balance.localCurrency === 'EUR') {
-
-            $('.euro', $commissionBlocks).addClass('hidden');
-
-            localTotal = formatCurrency(balance.localTotal);
-            localPending = formatCurrency(balance.localPending);
-            localAvailable = formatCurrency(balance.localAvailable);
-        }
-        else {
-            localTotal = formatCurrency(balance.localTotal, balance.localCurrency, 'number');
-            localPending = formatCurrency(balance.localPending, balance.localCurrency, 'number');
-            localAvailable = formatCurrency(balance.localAvailable, balance.localCurrency, 'number');
-
-            currencyHtml = ' <span class="currency">' + balance.localCurrency + '</span>';
-
-            $('.total.euro', $commissionBlocks)
-                .text(formatCurrency(balance.pending + balance.available));
-            $('.pending.euro', $commissionBlocks).text(formatCurrency(balance.pending));
-            $('.available.euro', $commissionBlocks).text(formatCurrency(balance.available));
-        }
-
-        $('.total.local', $commissionBlocks).safeHTML(localTotal + currencyHtml);
-        $('.pending.local', $commissionBlocks).safeHTML(localPending + currencyHtml);
-        $('.available.local', $commissionBlocks).safeHTML(localAvailable + currencyHtml);
-
-        $('.commission-info', $commissionBlocks).rebind('tap', function() {
-
-            var $overlay = $('.mobile.commission-overlay');
-
-            if (balance.localCurrency === 'EUR') {
-                $('.non-euro-only', $overlay).addClass('hidden');
-            }
-
-            if (u_attr.b) {
-                $('.no-buisness', $overlay).addClass('hidden');
-            }
-
-            $overlay.removeClass('hidden');
-            $page.addClass('hidden');
-
-            $('.fm-dialog-close', $overlay).rebind('tap', function() {
-                $overlay.addClass('hidden');
-                $page.removeClass('hidden');
-            });
-        });
-    },
-
-    /**
-     * Main page. Set total registrations and purchases.
-     */
-    setTotalRedeemInfo: function($page) {
-
-        'use strict';
-
-        // TODO: Set registrations and purchases
-        var $registrations = $('.mobile.affiliate-registration', $page);
-        var $purchases = $('.mobile.affiliate-purchases', $page);
-        var thisMonth = calculateCalendar('m');
-        var thisMonthRegCount = 0;
-        var thisMonthPurCount = 0;
-        var creditList = M.affiliate.creditList.active.concat(M.affiliate.creditList.pending);
-
-        M.affiliate.signupList.forEach(function(item) {
-            if (thisMonth.start <= item.ts && item.ts <= thisMonth.end) {
-                thisMonthRegCount++;
-            }
-        });
-
-        creditList.forEach(function(item) {
-            if (thisMonth.start <= item.gts && item.gts <= thisMonth.end) {
-                thisMonthPurCount++;
-            }
-        });
-
-        $('.mobile.affiliate-compare', $page).safeHTML(l[22700]);
-        $('.affiliate-number', $registrations).text(M.affiliate.signupList.length);
-        $('.affiliate-compare span', $registrations).text('+' + thisMonthRegCount);
-
-        $('.affiliate-number', $purchases).text(creditList.length);
-        $('.affiliate-compare span', $purchases).text('+' + thisMonthPurCount);
     },
 
     /**
@@ -258,7 +89,7 @@ mobile.affiliate = {
 
         'use strict';
 
-        var $dialog = $('#startholder .mobile.generate-url.overlay');
+        var $dialog = $('#fmholder .mobile.generate-url.overlay');
         var $urlBar = $('.mobile.generate-url.url-block', $dialog);
         var $doneButton = $('.mobile.generate-url.button.done');
         var $page = $('.mobile.affiliate-guide-page');
@@ -303,9 +134,13 @@ mobile.affiliate = {
             if (page === 'start') {
                 page = '';
             }
-
             M.affiliate.getURL(page).then(function(url) {
-                $('.url', $urlBar).safeHTML(url.replace(page, '<span>' + page + '</span>'));
+                if (page === 'help') {
+                    $('.url', $urlBar).safeHTML(url);
+                }
+                else {
+                    $('.url', $urlBar).safeHTML(url.replace(page, `<span>${page}</span>`));
+                }
             });
         });
 
@@ -391,15 +226,24 @@ mobile.affiliate = {
 
             $('.affiliate-empty-data', $page).addClass('hidden');
 
-            var methodIconClass = ['', 'red-bank', 'bitcoin'];
+            var methodIconClass = ['pro-plan', 'red-bank', 'bitcoin'];
             var $template =  $('.mobile.affiliate-redemption-item.template', $page);
             var html = '';
 
             for (var i = 0; i < this.historyList.length; i++) {
 
                 var item = this.historyList[i];
+                let proSuccessful;
+                if (item.gw === 0) {
+                    if (item.hasOwnProperty('state')) {
+                        proSuccessful = item.state === 4;
+                    }
+                    else {
+                        proSuccessful = item.s === 4;
+                    }
+                }
                 var $item = $template.clone().removeClass('template');
-                var status = affiliateRedemption.getRedemptionStatus(item.s);
+                var status = affiliateRedemption.getRedemptionStatus(item.s, proSuccessful);
                 var la = parseFloat(item.la);
 
                 $('.method-icon', $item).addClass(methodIconClass[item.gw]);
@@ -412,7 +256,7 @@ mobile.affiliate = {
                 }
 
                 $('.date', $item).text(time2date(item.ts, 1));
-                $('.status', $item).addClass(status.c).text(status.s);
+                $('.status', $item).removeClass('red').addClass(status.c).text(status.s);
 
                 html += $item.prop('outerHTML');
             }
@@ -424,8 +268,12 @@ mobile.affiliate = {
             $list.rebind('tap.toRedemptionDetail', function() {
 
                 var i = $list.index(this);
+                const rid = self.historyList[i].rid;
+                const state = self.historyList[i].hasOwnProperty('state')
+                    ? self.historyList[i].state
+                    : self.historyList[i].s;
 
-                M.affiliate.getRedemptionDetail(self.historyList[i].rid).then(function(res) {
+                M.affiliate.getRedemptionDetail(rid, state).then((res) => {
 
                     $page.addClass('hidden');
 
@@ -460,7 +308,7 @@ mobile.affiliate = {
         $overlay.removeClass('hidden');
 
         // Show Context menu
-        $contextMenu.removeClass('o-hidden');
+        $contextMenu.removeClass(['o-hidden', 'hidden']);
     },
 
     /**
@@ -550,7 +398,11 @@ mobile.affiliate = {
         // Show the guide page content
         $detailsPage.removeClass('hidden');
 
-        affiliateRedemption.fillBasicHistoryInfo($detailsPage, data);
+        const state = data.hasOwnProperty('state')
+            ? data.state
+            : data.s;
+
+        affiliateRedemption.fillBasicHistoryInfo($detailsPage, data, state);
         affiliateRedemption.redemptionAccountDetails($detailsPage, data.gw, data);
 
         // Init Go back to History page
@@ -582,7 +434,11 @@ mobile.affiliate = {
 
         var self = this;
 
-        Promise.all([M.affiliate.getRedemptionMethods(), M.affiliate.getBalance()]).then(function() {
+        Promise.all([
+            this.getMobileAffiliateData(),
+            M.affiliate.getRedemptionMethods(),
+            M.affiliate.getBalance()
+        ]).then(() => {
 
             // Cache selector
             self.$page = $('.fmholder:not(.hidden) .mobile.affiliate-redeem-page');
@@ -615,22 +471,24 @@ mobile.affiliate = {
 
                     const isConfirmed = $(this).data('confirmUpdate');
 
+                    if (currentStep === 2) {
+                        $('#affiliate-redemption-amount', self.$page).trigger('blur');
+                    }
+
                     if (currentStep === 4 && !$('.auto-fill-checkbox', this.$page).hasClass('hidden') &&
                         isConfirmed && affiliateRedemption.validateDynamicAccInputs()) {
 
                         mobile.messageOverlay.show(
                             l[23374],
                             l[23307],
-                            function() {
-
-                                affiliateRedemption.updateAccInfo();
-
-                                $('.redeem-button[data-step="4"]', self.$page).data('confirmUpdate', false);
-                            },
                             false,
-                            false,
-                            [l[79], l[78]]
-                        );
+                            [l[78], l[79]]
+                        ).then(() => {
+
+                            affiliateRedemption.updateAccInfo();
+
+                            $('.redeem-button[data-step="4"]', self.$page).data('confirmUpdate', false);
+                        }).catch(dump);
                     }
 
                     affiliateRedemption.processSteps().then(async res => {
@@ -647,18 +505,16 @@ mobile.affiliate = {
                                 mobile.messageOverlay.show(
                                     l[23374],
                                     l.referral_bitcoin_update,
-                                    () => {
-
-                                        affiliateRedemption.updateAccInfo();
-
-                                        $('.redeem-button[data-step="3"]', self.$page).data('confirmUpdate', false);
-
-                                        resolve();
-                                    },
-                                    resolve,
                                     false,
-                                    [l[79], l[78]]
-                                );
+                                    [l[78], l[79]]
+                                ).then(() => {
+
+                                    affiliateRedemption.updateAccInfo();
+
+                                    $('.redeem-button[data-step="3"]', self.$page).data('confirmUpdate', false);
+
+                                    resolve();
+                                }).catch(resolve);
                             });
                         }
 
@@ -670,12 +526,11 @@ mobile.affiliate = {
                                     l[24964],
                                     l[24965],
                                     false,
-                                    () => {
-                                        self.closeRedeemPage();
-                                        return false;
-                                    },
-                                    false,
-                                    [l[79], l[78]]);
+                                    [l[78], l[79]]
+                                ).catch(() => {
+                                    self.closeRedeemPage();
+                                    return false;
+                                });
                             }
 
                             currentStep++;
@@ -817,6 +672,38 @@ mobile.affiliate = {
                     .parents('.payment-type-wrapper').removeClass('hidden');
             }
         }
+
+        const balance = M.affiliate.balance;
+
+        const euro = formatCurrency(balance.available);
+
+        const $availableComissionTemplates = $('.templates .available-comission-template', self.$step1);
+        const $euroTemplate = $('.available-commission-euro', $availableComissionTemplates)
+            .clone()
+            .removeClass('hidden');
+        const $localTemplate = $('.available-commission-local', $availableComissionTemplates)
+            .clone()
+            .removeClass('hidden');
+        const $availableComissionArea = $('.available-comission-quota span', self.$step1).empty();
+        const $availableBitcoinArea = $('.available-comission-bitcoin span', self.$step1).empty();
+
+        $euroTemplate.text(euro);
+
+        if (balance.localCurrency && balance.localCurrency !== 'EUR') {
+            const local = balance.localCurrency + ' ' +
+                formatCurrency(balance.localAvailable, balance.localCurrency, 'narrowSymbol') + '* ';
+            $localTemplate.text(local);
+            $availableComissionArea
+                .safeAppend($localTemplate.prop('outerHTML'))
+                .safeAppend($euroTemplate.prop('outerHTML'));
+        }
+        else {
+            $localTemplate.text(euro + '*');
+            $availableComissionArea.safeAppend($localTemplate.prop('outerHTML'));
+            $('.redemption-choice-info .estimated-price-min-50 span', self.$step1).addClass('hidden');
+        }
+
+        $availableBitcoinArea.safeAppend($localTemplate.text(euro).prop('outerHTML'));
     },
 
     redeemStep2: function(comeback) {
@@ -881,8 +768,9 @@ mobile.affiliate = {
         var $currencySelect = $('#affi-currency', $step3);
         var rdmReq = affiliateRedemption.requests;
         var selectedGWData = M.affiliate.redeemGateways[rdmReq.first.m];
-        var seletedGWDefaultData = selectedGWData.data.d;
-        var activeCountry = seletedGWDefaultData[0];
+        const seletedGWDefaultData = selectedGWData.data.d || [];
+        const activeCountry = affiliateRedemption.requests.first.cc || seletedGWDefaultData[0] ||
+            selectedGWData.data.cc[0];
 
         // Country Select
         var contentHtml = '';
@@ -898,7 +786,9 @@ mobile.affiliate = {
         }
 
         // IOS hack to display long options
-        contentHtml += '<optgroup label=""></optgroup>';
+        if (is_ios) {
+            contentHtml += '<optgroup label=""></optgroup>';
+        }
 
         $countrySelect.safeHTML(contentHtml);
 
@@ -906,7 +796,8 @@ mobile.affiliate = {
             $(this).prev().text(M.getCountryName(this.value));
         });
 
-        var activeCurrency = seletedGWDefaultData[1];
+        const activeCurrency = affiliateRedemption.requests.first.c || seletedGWDefaultData[1] ||
+            selectedGWData.data.$[0];
 
         // Country Select
         contentHtml = '';
@@ -1405,112 +1296,5 @@ mobile.affiliate = {
         });
 
         return $select;
-    },
-
-    /**
-     * Initialise affiliate Distribution page
-     */
-    initDistributionPage: function() {
-
-        'use strict';
-
-        // If not logged in, return to the login page
-        if (typeof u_attr === 'undefined') {
-            loadSubPage('login');
-            return false;
-        }
-
-        // Cache selector
-        var $page = $('.mobile.affiliate-distrib-page');
-
-        // Show the giude page content
-        $page.removeClass('hidden');
-
-        loadingDialog.show('affiliateRefresh');
-
-        this.getMobileAffiliateData(function() {
-            mobile.initBackButton($page, 'fm/refer/');
-            mobile.affiliate.initDistributionButtons();
-            mobile.affiliate.drawTable($page);
-        });
-    },
-
-    /**
-     * Guide page. Init buttons
-     */
-    initDistributionButtons: function($page) {
-
-        'use strict';
-
-        var $tabs = $('.tab-button', $page);
-
-        $tabs.rebind('tap', function() {
-            var $this = $(this);
-
-            if (!$this.hasClass('active') && $this.data('table')) {
-                $tabs.removeClass('active');
-                $this.addClass('active');
-                $('.content', $page).addClass('hidden');
-                $('.content.' + $this.data('table'), $page).removeClass('hidden');
-            }
-        });
-    },
-
-    /**
-     * Let's draw table with give data
-     * @returns {Void} void function
-     */
-    drawTable: function($page) {
-
-        'use strict';
-
-        var template =
-            '<div class="mobile fm-affiliate list-item">' +
-                '<div class="img-wrap"><img src="$countryImg" alt=""></div>' +
-                '$countryName <span class="num">$count</span>' +
-            '</div>';
-
-        var signupGeo = {};
-        var creditGeo = {};
-
-        M.affiliate.signupList.forEach(function(item) {
-            signupGeo[item.cc] = ++signupGeo[item.cc] || 1;
-        });
-
-        var creditList = M.affiliate.creditList.active.concat(M.affiliate.creditList.pending);
-
-        creditList.forEach(function(item) {
-            creditGeo[item.cc] = ++creditGeo[item.cc] || 1;
-        });
-
-        var _sortFunc = function(a, b) {
-            return signupGeo[b] - signupGeo[a];
-        };
-        var orderedSignupGeoKeys = Object.keys(signupGeo).sort(_sortFunc);
-        var orderedCreditGeoKeys = Object.keys(creditGeo).sort(_sortFunc);
-
-        var html = '';
-        var countList = signupGeo;
-
-        var _htmlFunc = function(item) {
-            var country = countrydetails(item);
-            html += template.replace('$countryImg', staticpath + 'images/flags/' + country.icon)
-                .replace('$countryName', country.name || 'Unknown').replace('$count', countList[item]);
-        };
-
-        orderedSignupGeoKeys.forEach(_htmlFunc);
-
-        if (html) {
-            $('.geo-dist-reg .list', $page).safeHTML(html);
-        }
-
-        html = '';
-        countList = creditGeo;
-
-        orderedCreditGeoKeys.forEach(_htmlFunc);
-
-        if (html) {
-            $('.geo-dist-pur .list', $page).safeHTML(html);
-        }
     }
 };

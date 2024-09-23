@@ -199,11 +199,6 @@ var alarm = {
             var $button = $('.js-dropdown-accountlink', handlerElem);
             var $dialog = $('.top-warning-popup.non-activated-account', handlerElem);
 
-            // If they just purchased it, log specific event
-            if (recentPurchase) {
-                megaAnalytics.log('pro', 'showNonActivatedAccountDialog');
-            }
-
             // If the user has previously seen an ephemeral dialog and they closed it,
             // then they purchased a plan then this forces the dialog to popup. This means
             // this dialog always shows so it is an incentive to confirm their email.
@@ -546,8 +541,8 @@ var alarm = {
                 this.updateUrl = defaultStaticPath + 'current_ver_test.txt';
             }
 
-            // Only run the update check if using legacy Firefox ext, or on mega.nz, or the testSiteUpdate flag is set
-            if (is_chrome_firefox || window.location.hostname === 'mega.nz' ||
+            // Only run the update on mega.nz, or the testSiteUpdate flag is set
+            if (window.location.hostname === 'mega.nz' ||
                     localStorage.getItem('testSiteUpdate')) {
 
                 // Clear old timer
@@ -625,12 +620,6 @@ var alarm = {
                 $dialog.find('.release-version').text(serverBuildVersion.website);
                 $dialog.find('.release-date-time').text(time2date(serverBuildVersion.timestamp));
 
-                // Change the text for the Legacy Extension
-                if (is_chrome_firefox) {
-                    $dialog.find('.description').addClass('hidden');
-                    $dialog.find('.description-legacy-extension').removeClass('hidden');
-                }
-
                 // Cache server update details so the popup can be immediately re-rendered if they switch page
                 this.cachedServerBuildVersion = serverBuildVersion;
 
@@ -685,18 +674,8 @@ var alarm = {
 
                 // Check for pending transfers and if there are, prompt user to see if they want to continue
                 M.abortTransfers().then(function() {
-
-                    // Add a log
-                    api_req({ a: 'log', e: 99612, m: 'User chose to update from site update dialog' });
-
-                    // If Firefox Legacy extension go the URL
-                    if (is_chrome_firefox) {
-                        window.location = 'https://mega.nz/meganz-legacy.xpi';
-                    }
-                    else {
-                        // If on the mega.nz site, hard refresh the page
-                        document.location.reload(true);
-                    }
+                    loadingDialog.show();
+                    Promise.resolve(eventlog(99612)).finally(() => location.reload(true));
                 });
             });
         }

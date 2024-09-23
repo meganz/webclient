@@ -1,0 +1,149 @@
+/* Banner rack */
+.mobile-rack.banner-rack {
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+    flex-flow: column-reverse nowrap;
+    grid-row: 2/ 3;
+}
+
+/* Banner inner content */
+.mega-component.banner {
+    border: 0;
+    display: flex;
+    flex-flow: row nowrap;
+    align-content: center;
+    align-items: flex-start;
+    justify-content: space-between;
+    box-sizing: border-box;
+    padding: 24px;
+    position: static;
+    top: 0;
+    overflow: hidden;
+    transition: top 1s ease-in;
+    font: var(--mobile-font-caption-regular);
+    width: 100%;
+    color: var(--mobile-text-primary);
+}
+
+/* Banner overarching types */
+.mega-component.banner,
+.mega-component.banner.alert {
+    border-radius: 0;
+}
+.mega-component.banner.inline {
+    border-radius: var(--mobile-border-radius-medium);
+    overflow: initial;
+}
+
+.mega-component.banner .content-box {
+    align-items: flex-start;
+    display: flex;
+    flex-flow: column nowrap;
+    flex: 1 1 auto;
+    order: 5;
+    padding: 0 8px;
+}
+
+.mega-component.advertisement .content-box,
+.mega-component.anouncement .content-box {
+    padding: 0 16px;
+}
+
+.mega-component.banner .end-box {
+    display: flex;
+    flex-flow: column nowrap;
+    align-content: center;
+    align-items: flex-end;
+    justify-content: center;
+    order: 10;
+}
+
+/* Gap for all content child elems */
+
+.mega-component.banner .content-box > * {
+    margin-top: 8px;
+}
+
+.mega-component.banner .content-box > *:empty,
+.mega-component.banner .content-box > *:first-child {
+    margin-top: 0;
+}
+
+/* Custom button styles */
+.mega-component.banner .button.icon-only {
+    -webkit-margin-start: auto;
+    margin-inline-start: auto;
+    padding: 0;
+    justify-self: flex-end;
+    align-self: flex-start;
+    order: 1;
+}
+.mega-component.banner .button.action-link .primary-text,
+.mega-component.banner .message-text .clickurl {
+    font: var(--mobile-font-copy-semibold);
+    text-decoration: underline;
+    color: var(--mobile-link-primary);
+}
+
+/* Component attribute styles */
+.mega-component.banner .title-text {    
+    font: var(--mobile-font-heading-h3);
+    color: var(--mobile-text-primary);
+}
+.mega-component.banner .message-text {
+    font: var(--mobile-font-copy-regular);
+    color: var(--mobile-text-primary);
+}
+.mega-component.banner .banner.left-icon.icon-size-24 {
+    --icon-size: 24px;
+}
+.mega-component.banner .banner.left-icon.icon-size-48 {
+    --icon-size: 48px;
+}
+.mega-component.banner .banner.left-icon {
+    --icon-size: 24px;
+    color: var(--icon-color);
+    order: 1;
+}
+.mega-component.banner .banner.right-icon {
+    --icon-size: 96px;
+    grid-area: right-icon;
+    justify-self: flex-end;
+    align-self: center;
+    order: 10;
+}
+.mega-component.banner img {
+    height: 48px;
+    width: 48px;
+}
+
+/* Banner right icons */
+.mega-component.banner .banner.right-icon.chat {
+    content: url("../../images/mobile/chat.png");
+    width: 60px;
+}
+
+/* Component styles, default info */
+.mega-component.banner,
+.mega-component.banner.info {
+    background: var(--mobile-notification-info);
+    --icon-color: var(--mobile-support-info);
+}
+.mega-component.banner.success {
+    background: var(--mobile-notification-success);
+    --icon-color: var(--mobile-support-success);
+}
+.mega-component.banner.warning {
+    background: var(--mobile-notification-warning);
+    --icon-color: var(--mobile-support-warning);
+}
+.mega-component.banner.error {
+    background: var(--mobile-notification-error);
+    --icon-color: var(--mobile-support-error);
+}
+.mega-component.banner.advertisement,
+.mega-component.banner.anouncement {
+    background: var(--mobile-surface-2);
+    --icon-color: var(--mobile-support-info);
+}

@@ -1,0 +1,33 @@
+.bottom-page .cookie-policy {
+    padding: 50px 20%;
+    max-width: 880px;
+    margin: auto;
+}
+.bottom-page .cookie-policy h1 {
+    text-align: center;
+    font: var(--text-h2-pricing);
+    color: var(--color-heading);
+}
+.bottom-page .cookie-policy h2 {
+    font: var(--text-h6-pricing);
+    color: var(--color-heading);
+    padding-top: 20px;
+}
+.bottom-page .cookie-policy p,
+.bottom-page .cookie-policy li {
+
+    font: var(--text-copy-medium-pricing);
+    color: var(--color-primary);
+}
+.bottom-page .cookie-policy a,
+.bottom-page .cookie-policy .cookiesdialog {
+    color: var(--color-secondary-cobalt-600);
+    text-decoration: underline;
+    cursor: pointer;
+}
+.mobile .bottom-page ul {
+    padding-left: 18px;
+}
+.mobile .bottom-page li {
+    list-style-type: disc;
+}

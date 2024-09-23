@@ -1,149 +1,281 @@
 /**
  * Shows a custom message e.g. error or success message in a popup overlay
  */
-mobile.messageOverlay = {
+mobile.messageOverlay = (() => {
+    'use strict';
+
+    let targetSheet;
+
+    /* Button variables */
+    let buttonTemplate;
+    let confirmButton;
+    let buttons = [];
 
     /**
-     * Shows the error overlay
-     * @param {String} message The main message to be displayed
-     * @param {String} [subMessage] An optional second message to be displayed after the first
-     * @param {Function} [onSuccess] An optional success callback to be run after they confirm OK
-     * @param {Function} [onFailure] An optional failure callback to be run after they click Close
-     * @param {String} [icon] An optional class name to show an icon, empty-icon classes can be found in mobile.css
-     * @param {String} [buttons] An optional second button in place of text-link close
+     * Handle messageOverlay close event and clean up after ourselves.
+     *
+     * @param {Object} callbacks Argument object of callbacks.
+     * @param {Bool|*} callbackArg The argument(s) provided to the onInteraction callback.
+     * @param {MegaMobileButton} [actionButton] The button the handler is applied too.
+     * @param {number} [index] The index of the button provided to the callback.
+     *
+     * @returns {Function}
      */
-    show: function(message, subMessage, onSuccess, onFailure, icon, buttons, checkbox) {
-        'use strict';
-
-        // Cache selectors
-        var $overlay = $('#mobile-ui-error');
-        var $firstMessage = $overlay.find('.first-message');
-        var $optionalSecondMessage = $overlay.find('.optional-second-message');
-        var $iconElement = $('.mobile.empty-icon', $overlay).attr('class', 'mobile empty-icon hidden');
-        var $buttons = $('.buttons', $overlay).removeClass('inline-buttons');
-        var $checkbox = $('.checkbox-block', $overlay).addClass('hidden');
-        var $fileManagerHolder = $('.mobile .fmholder');
-        var promise = new MegaPromise();
-        var reject = function() {
-            // Hide overlay with download button options
-            $overlay.addClass('hidden');
-            $fileManagerHolder.removeClass('no-scroll');
-
-            // Run the callback
-            if (typeof onFailure === 'function') {
-                onFailure();
+    const closeHandler = (callbacks, callbackArg, actionButton, index) => {
+        return function() {
+            /* Cleanup */
+            if (actionButton) {
+                actionButton.off('tap');
+                targetSheet.hide();
             }
+            targetSheet.off('close.mobileSheet');
+            targetSheet.clear();
 
-            onIdle(function() {
-                promise.reject();
-            });
-            return false;
+            if (callbacks) {
+                if (callbacks.onInteraction && typeof callbacks.onInteraction === 'function') {
+                    callbacks.onInteraction(callbackArg || false, index);
+                }
+
+                if (callbackArg && callbacks.onSuccess && typeof callbacks.onSuccess === 'function') {
+                    callbacks.onSuccess(index);
+                }
+
+                if (!callbackArg && callbacks.onFailure && typeof callbacks.onFailure === 'function') {
+                    callbacks.onFailure(index);
+                }
+            }
         };
+    };
 
-        $('input').blur();
-
-        if (typeof onSuccess === 'string') {
-            icon = onSuccess;
-            onSuccess = null;
-        }
-        if (!buttons && typeof onFailure !== 'function') {
-            buttons = onFailure;
-            onFailure = null;
-        }
-
-        // Clear old messages
-        $firstMessage.empty();
-        $optionalSecondMessage.empty();
-        $('.third span', $overlay).text(l[148]);
-
-        // If the close button is needed, unhide the button
-        var $closeButton = $overlay.find('.fm-dialog-close, .text-button.cancel');
-        if (typeof onFailure === 'function') {
-            $closeButton.removeClass('hidden');
-        }
-
-        // Add tap handler
-        $closeButton.rebind('tap', reject);
-
-        // Set the first message
-        $firstMessage.safeHTML(message);
-
-        // If there is a second message, set that
-        if (typeof subMessage === 'string' && subMessage.length) {
-            $optionalSecondMessage.safeHTML(subMessage);
-        }
-
-        // set image icon, if any
-        if (icon) {
-            $iconElement.removeClass('hidden').addClass(icon);
-        }
-
-        // set additional button, if any
-        if (buttons) {
-            var okButton = l[1596];
-            var cancelButton = buttons;
-            if (Array.isArray(buttons)) {
-                okButton = buttons[1];
-                cancelButton = buttons[0];
-            }
-            $('.text-button.cancel', $overlay).addClass('hidden');
-
-            $buttons.addClass('inline-buttons')
-                .find('.first').removeClass('red-button').addClass('green-button').text(okButton).end()
-                .find('.second').removeClass('hidden').rebind('tap', reject).find('span').text(cancelButton);
-        }
-        else {
-            $buttons.removeClass('inline-buttons')
-                .find('.first').addClass('red-button').removeClass('green-button').text(l[1596]).end()
-                .find('.second').addClass('hidden');
-        }
-
-        if (checkbox && typeof checkbox === 'function') {
-            $checkbox.removeClass('hidden').rebind('click.msgcheck', () => {
-                const $o = $('.checkbox-block .checkdiv, .checkbox-block input', $overlay);
-                if ($o.eq(0).hasClass('checkboxOff')) {
-                    $o.removeClass('checkboxOff').addClass('checkboxOn');
-                    checkbox(true);
-                }
-                else {
-                    $o.removeClass('checkboxOn').addClass('checkboxOff');
-                    checkbox(false);
-                }
-                return false;
+    /**
+     * Renders the checkbox from the callback.
+     *
+     * @param {Function} checkboxCallback The callback on checkbox state change.
+     *
+     * @returns {undefined}
+     */
+    function renderCheckbox(checkboxCallback) {
+        if (checkboxCallback && typeof checkboxCallback === 'function') {
+            const checkboxNode = new MegaMobileCheckbox({
+                parentNode: targetSheet.actionsNode,
+                componentClassname: 'mega-checkbox',
+                checkboxName: 'show-again',
+                checkboxAlign: 'left',
+                labelTitle: l[229], // Do not show again
+                checked: false
+            });
+            checkboxNode.on('tap', () => {
+                // We haven't hit the rising or falling edge yet, so it's actually
+                // the inverse of the current state.
+                // Looks like tap is called before click...
+                checkboxCallback(!checkboxNode.checked);
             });
         }
-
-        // Show the error overlay and prevent scrolling behind
-        $overlay.removeClass('hidden');
-        $fileManagerHolder.addClass('no-scroll');
-
-        mobile.initOverlayPopstateHandler($overlay);
-
-        // Initialise the OK/close button
-        $('.confirm-ok-button', $overlay).rebind('tap.ok', function() {
-
-            // Hide the error overlay
-            $overlay.addClass('hidden');
-            $fileManagerHolder.removeClass('no-scroll');
-
-            // Remove the loading spinner if on the Login page and came back from an error
-            if (page === 'login') {
-                $('.mobile.signin-button').removeClass('loading');
-            }
-
-            // Run the success callback if requested
-            if (typeof onSuccess === 'function') {
-                onSuccess();
-            }
-
-            onIdle(function() {
-                promise.resolve();
-            });
-
-            // Prevent clicking behind
-            return false;
-        });
-
-        return promise;
     }
-};
+
+    function generateAdditionalButtons(buttonsArg) {
+        if (buttonsArg) {
+            if (Array.isArray(buttonsArg)) {
+                let button;
+                for (let i = 0; i < buttonsArg.length; i++) {
+                    button = buttonsArg[i];
+                    if (i === 0) {
+                        button = typeof button === 'string' ? {
+                            ...buttonTemplate,
+                            text: button,
+                        } : button;
+                        confirmButton = button;
+                    }
+                    else {
+                        button = typeof button === 'string' ? {
+                            ...buttonTemplate,
+                            text: button,
+                            componentClassname: 'secondary',
+                        } : button;
+                        buttons.push(button);
+                    }
+                }
+            }
+            else {
+                buttons.push(typeof buttonsArg === 'string' ? {
+                    ...buttonTemplate,
+                    text: buttonsArg,
+                } : buttonsArg);
+            }
+        }
+    }
+
+    /**
+     * Render the provided icon sheetClass vs DomNode class.
+     *
+     * @param {String} icon Icon classes for warning messages
+     *
+     * @returns {undefined}
+     */
+    function renderIcon(icon) {
+        if (icon) {
+            targetSheet.addImage(icon);
+        }
+    }
+
+    /**
+     * Render the buttons in the confirmButton and buttons variables if
+     * they are avaliable.
+     *
+     * @param {Object} callbacks Argument object of callbacks.
+     *
+     * @returns {undefined}
+     */
+    function renderButtons(callbacks) {
+        let subNode;
+        if (confirmButton) {
+            subNode = new MegaMobileButton(confirmButton);
+            subNode.on('tap', closeHandler(callbacks, true, subNode));
+        }
+
+        if (buttons) {
+            for (let i = 0; i < buttons.length; i++) {
+                subNode = new MegaMobileButton(buttons[i]);
+                subNode.on('tap', closeHandler(callbacks, false, subNode, i));
+            }
+        }
+    }
+
+
+    return {
+        /**
+         * Full featured messageOverlay display function, of which other functions (msgDialog,
+         * messageOverlay.show) take a feature subset.
+         *
+         * @param {String} [title] The overlay title.
+         * @param {String} [message] The primary message in the overlay.
+         * @param {String} [subMessage] The sub message in the overlay.
+         * @param {Object} [callbacks] Object containing callbacks for the overlay.
+         * @param {Function} [callbacks.onSuccess] Called on success (user pressing primary button).
+         * @param {Function} [callbacks.onFailure] Called on failure (user pressing cancel button or sheet close).
+         * @param {Function} [callbacks.onInteraction] Called on any interaction with callback({Bool} interactionType).
+         * @param {Function} [callbacks.checkbox] Shows the "Do not show again" checkbox and callback with state.
+         * @param {Object} [options] Object containing additional options for the overlay.
+         * @param {String|Object} [options.icon] Sheet icon class to display. May be string or sheet icon class.
+         * @param {String|List} [options.buttons] Additional buttons to display. If string, button is added
+         * as secondary "Failure/cancel" button. If array, i=0 is confirm, i>0 is cancel and index is passed.
+         * @param {Boolean} [safeShow] Whether to use M.safeShowDialog or not, mainly for msgDialogs which in
+         * desktop web are shown without this mechanism.
+         * @param {Boolean} [closeButton] Show close button or not. also use for background tap close.
+         *
+         * @returns {undefined}
+         */
+        render: function(title, message, subMessage, callbacks, options, safeShow, closeButton) {
+            let dialogName;
+            if (title) {
+                dialogName = title.toLowerCase().replace(/\s+/g, '');
+            }
+            else {
+                dialogName = Math.random();
+            }
+
+            const _sheet = () => {
+                targetSheet = mega.ui.sheet;
+
+                targetSheet.clear();
+                targetSheet.type = 'modal';
+                targetSheet.showClose = closeButton || false;
+                targetSheet.preventBgClosing = typeof closeButton === 'boolean' ? !closeButton : true;
+
+                buttonTemplate = {
+                    parentNode: targetSheet.actionsNode,
+                    type: 'normal',
+                    componentClassname: 'block',
+                };
+                confirmButton = {
+                    ...buttonTemplate,
+                    text: l.ok_button, // OK, got it!
+                };
+                buttons = [];
+
+                // Pre-revamp dialog ignores the title, so most of the
+                // current calls treat the first msg as the title
+                if (title) {
+                    targetSheet.addTitle(title);
+                }
+
+                let subNode;
+
+                if (message) {
+                    subNode = document.createElement('div');
+                    subNode.classList.add('primary-message');
+                    subNode.append(parseHTML(message));
+                    targetSheet.addContent(subNode);
+                }
+
+                if (subMessage) {
+                    subNode = document.createElement('div');
+                    subNode.classList.add('sub-message');
+                    subNode.append(parseHTML(subMessage.message || subMessage));
+                    targetSheet.addContent(subNode);
+                }
+
+                if (callbacks) {
+                    renderCheckbox(callbacks.checkbox);
+                }
+
+                if (options) {
+                    renderIcon(options.icon);
+                    generateAdditionalButtons(options.buttons);
+                }
+
+                // Bind to the sheet actions
+                targetSheet.on('close.mobileSheet', closeHandler(callbacks, false));
+
+                renderButtons(callbacks);
+            };
+
+            if (safeShow) {
+                M.safeShowDialog(`mobile-messageOverlay-${dialogName}`, () => {
+                    _sheet();
+                    targetSheet.show();
+                });
+            }
+            else {
+                _sheet();
+                targetSheet.show();
+            }
+        },
+
+        /**
+         * Shows the error overlay
+         *
+         * @param {String} message The main message to be displayed
+         * @param {String} [subMessage] An optional second message to be displayed after the first
+         * @param {String} [icon] An optional class name to show an icon, empty-icon classes can be found in mobile.css
+         * @param {String} [buttons] An optional second button in place of text-link close
+         * @param {Function} [checkboxCallback] An optional function callback for a "Do not show again" checkbox
+         * @param {Boolean} [closeButton] Show close button or not. also use for background tap close.
+         * Note: for case that using .catch() on show, you have to set closeButton as true, in order to make it works
+         *       on the other hand if you have closeButton true or have 2 buttons which one of them cause fail,
+         *       you have to set catch to prevent exception.
+         *
+         *
+         * @returns {Promise}
+         */
+        show: function(message, subMessage, icon, buttons, checkboxCallback, closeButton) {
+
+            return new Promise((resolve, reject) => this.render(
+                '',
+                message,
+                subMessage,
+                {
+                    onSuccess: resolve,
+                    onFailure: reject,
+                    checkbox: checkboxCallback,
+                },
+                {
+                    icon: icon,
+                    buttons: buttons,
+                },
+                true,
+                closeButton
+            ));
+        }
+    };
+})();

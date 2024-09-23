@@ -121,7 +121,6 @@ export class Start extends MegaRenderMixin {
                 name={NAMESPACE}
                 className={NAMESPACE}
                 stopKeyPropagation={editing}
-                noCloseOnClickOutside={true}
                 onClose={() => this.props.onClose()}>
                 <div className={`${NAMESPACE}-preview`}>
                     <Preview
@@ -153,10 +152,15 @@ export class Start extends MegaRenderMixin {
                     </div>
                     <Button
                         className="mega-button positive large start-meeting-button"
-                        onClick={this.startMeeting}>
+                        onClick={() => {
+                            this.startMeeting();
+                            eventlog(500235);
+                        }}>
                         <span>{l[7315] /* `Start` */}</span>
                     </Button>
-                    <Link to="/securechat">{l.how_meetings_work /* `Learn more about MEGA Meetings` */}</Link>
+                    <Link to="https://mega.io/chatandmeetings" target="_blank">
+                        {l.how_meetings_work /* `Learn more about MEGA Meetings` */}
+                    </Link>
                 </div>
             </ModalDialogsUI.ModalDialog>
         );

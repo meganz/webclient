@@ -1,0 +1,61 @@
+.mega-empty-states.overlay-wrap {
+    display: block;
+    overflow-y: scroll;
+    visibility: visible;
+    position: relative;
+    transition: none;
+    background: none;
+    text-align: center;
+}
+
+.mega-empty-states .empty-states {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    padding: 0 24px 96px;
+    align-items: center;
+}
+
+.overlay-wrap .empty-states .main {
+    overflow-y: scroll;
+    max-width: var(--mobile-page-max-width);
+}
+
+.empty-states .button.nav-elem {
+    background-color: var(--mobile-button-secondary);
+    color: var(--mobile-text-primary);
+}
+
+.mega-empty-states .image .icon {
+    height: 96px;
+    width: 96px;
+    background-size: contain;
+}
+
+.mega-empty-states .image .icon.cloud-drive {
+    background-image: url("../../images/mobile/cloud-drive.png");
+}
+
+.mega-empty-states .image .icon.folder {
+    background-image: url("../../images/mobile/folder.png");
+}
+
+.mega-empty-states .image .icon.details {
+    background-image: url("../../images/mobile/details.png");
+}
+
+.mega-empty-states .image .icon.incoming-shares {
+    background-image: url("../../images/mobile/incoming-shares.png");
+}
+
+.mega-empty-states .image .icon.outgoing-shares {
+    background-image: url("../../images/mobile/outgoing-shares.png");
+}
+
+.mega-empty-states .image .icon.shared-links {
+    background-image: url("../../images/mobile/links.png");
+}
+
+.mega-empty-states .image .icon.rubbish-bin {
+    background-image: url("../../images/mobile/rubbish-bin.png");
+}

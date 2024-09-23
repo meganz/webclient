@@ -12,16 +12,17 @@ var slideshowid;
     var slideshowpause;
     var origImgHeight;
     var slideshowTimer;
-    var mouseIdleTimer;
     var fullScreenManager;
     var _hideCounter = false;
     var switchedSides = false;
     var fitToWindow = Object.create(null);
     var _pdfSeen = false;
+    var _docxSeen = false;
     var optionsMenu;
     var settingsMenu;
     var preselection;
     const broadcasts = [];
+    const MOUSE_IDLE_TID = 'auto-hide-previewer-controls';
 
     const onConfigChange = (name) => {
         if (name === 'speed') {
@@ -60,9 +61,12 @@ var slideshowid;
         const $overlay = $('.media-viewer-container');
         const $controls = $('.gallery-btn', $overlay);
         const $counter = $('header .counter', $overlay);
-        const $slideshowButton = $('footer .v-btn.slideshow', $overlay);
+        const $startButton = $('.v-btn.slideshow', $overlay);
         const forward = [];
         const backward = [];
+
+        let slideShowItemCount = window.dl_node ? 2 : 0;
+        const slideShowModeFilter = !slideShowItemCount && mega.slideshow.utils.filterNodes(undefined, true);
 
         let current;
         let pos = [];
@@ -76,9 +80,6 @@ var slideshowid;
             index = (i) => preselection[i].h;
             filter = () => true;
         }
-        else if (is_mobile) {
-            filter = (n) => (n.fa || !M.getNodeShare(n).down) && (is_video(n) || is_image3(n));
-        }
 
         const list = preselection || M.v;
         for (let i = 0, m = list.length; i < m; ++i) {
@@ -89,6 +90,11 @@ var slideshowid;
                     current = i;
                 }
                 pos.push(i);
+
+                if (slideShowItemCount < 2 && slideShowModeFilter(list[i])) {
+
+                    ++slideShowItemCount;
+                }
             }
         }
 
@@ -113,21 +119,19 @@ var slideshowid;
                     backward.push(index(pos[n - 1]));
             }
 
-            if (!is_video(list[current])) {
-                $slideshowButton.removeClass('hidden');
-            }
             $counter.removeClass('hidden');
             $controls.removeClass('hidden');
 
+            $startButton.toggleClass('hidden', slideShowItemCount < 2);
             $counter.text(String(l.preview_counter || '').replace('%1', pos = n + 1).replace('%2', len));
         }
         else {
             $counter.addClass('hidden');
             $controls.addClass('hidden');
-            $slideshowButton.addClass('hidden');
+            $startButton.addClass('hidden');
         }
 
-        if (_hideCounter) {
+        if (_hideCounter || is_video(M.v[current])) {
             $counter.addClass('hidden');
         }
 
@@ -181,6 +185,14 @@ var slideshowid;
 
             mBroadcaster.sendMessage(`slideshow:${dir}`, steps);
             slideshow(newShownHandle);
+
+            if (is_mobile) {
+                mobile.appBanner.updateBanner(newShownHandle);
+            }
+            else {
+                // Rerender info panel when moving to next/previous at slide show.
+                mega.ui.mInfoPanel.reRenderIfVisible([newShownHandle]);
+            }
         }
 
         slideshow_timereset();
@@ -252,10 +264,14 @@ var slideshowid;
         var $favButton = $('.context-menu .favourite', $overlay);
         var root = M.getNodeRoot(n && n.h || false);
 
-        if (!n || !n.p || root === M.InboxID || root === 'shares' && M.getNodeRights(n.p) < 2 ||
-            folderlink || root === M.RubbishID ||
-            (M.getNodeByHandle(n.h) && !M.getNodeByHandle(n.h).u && M.getNodeRights(n.p) < 2)) {
-
+        if (!n
+            || !n.p
+            || root === M.InboxID
+            || root === 'shares'
+            || folderlink
+            || root === M.RubbishID
+            || (M.getNodeByHandle(n.h) && !M.getNodeByHandle(n.h).u && M.getNodeRights(n.p) < 2)
+        ) {
             $favButton.addClass('hidden');
         }
         else {
@@ -269,22 +285,35 @@ var slideshowid;
 
                 if (newFavState) {
                     $('span', $button).text(l[5872]);
-                    $('i', $button).removeClass('icon-favourite').addClass('icon-favourite-removed');
+                    if (is_video(n)) {
+                        $('i', $button).removeClass('icon-favourite')
+                            .addClass('icon-heart-broken-small-regular-outline');
+                    }
+                    else {
+                        $('i', $button).removeClass('icon-favourite').addClass('icon-favourite-removed');
+                    }
                 }
                 else {
                     $('span', $button).text(l[5871]);
-                    $('i', $button).removeClass('icon-favourite-removed').addClass('icon-favourite');
+                    if (is_video(n)) {
+                        $('i', $button).removeClass('icon-heart-broken-small-regular-outline')
+                            .addClass('icon-favourite');
+                    }
+                    else {
+                        $('i', $button).removeClass('icon-favourite-removed').addClass('icon-favourite');
+                    }
                 }
             });
 
             // Change favourite icon
             if (M.isFavourite(n.h)) {
+                const icon = is_video(n) ? 'icon-heart-broken-small-regular-outline' : 'icon-favourite-removed';
                 $('span', $favButton).text(l[5872]);
-                $('i', $favButton).removeClass('icon-favourite').addClass('icon-favourite-removed');
+                $('i', $favButton).removeClass().addClass(`sprite-fm-mono ${icon}`);
             }
             else {
                 $('span', $favButton).text(l[5871]);
-                $('i', $favButton).removeClass('icon-favourite-removed').addClass('icon-favourite');
+                $('i', $favButton).removeClass().addClass('sprite-fm-mono icon-favourite');
             }
         }
     }
@@ -302,7 +331,12 @@ var slideshowid;
         }
         else {
             $infoButton.addClass('hidden');
-            $optionButton.removeClass('hidden');
+
+            // Keep the Info panel option hidden on public links (but usable in regular Cloud Drive etc)
+            const currentSitePath = getSitePath();
+            if (!isPublicLink(currentSitePath)) {
+                $optionButton.removeClass('hidden');
+            }
         }
 
     }
@@ -313,6 +347,7 @@ var slideshowid;
         const $removeButtonV = $('.v-btn.remove', $overlay);
         var $divider = $removeButton.closest('li').prev('.divider');
         var root = M.getNodeRoot(n && n.h || false);
+        const $sendToChatButton = $('.context-menu .send-to-chat', $overlay);
 
         if (!n || !n.p || root === M.InboxID || (root === 'shares' && M.getNodeRights(n.p) < 2) || folderlink ||
             (M.getNodeByHandle(n.h) && !M.getNodeByHandle(n.h).u && M.getNodeRights(n.p) < 2) || M.chat) {
@@ -324,16 +359,16 @@ var slideshowid;
         else if (is_mobile) {
 
             $removeButtonV.rebind('click.mediaviewer', () => {
+            // TODO: work on this in view files ticket
+            //     // Show the folder/file delete overlay
+            //     mobile.deleteOverlay.show(n.h, () => {
 
-                // Show the folder/file delete overlay
-                mobile.deleteOverlay.show(n.h, () => {
+                //     // After successful delete, hide the preview slideshow
+                //     history.back();
+                // });
 
-                    // After successful delete, hide the preview slideshow
-                    history.back();
-                });
-
-                // Prevent double tap
-                return false;
+            //     // Prevent double tap
+            //     return false;
             });
         }
         else {
@@ -367,7 +402,24 @@ var slideshowid;
             $removeButtonV.rebind('click.mediaviewer', removeFunc);
         }
 
-
+        if (is_video(n)) {
+            $removeButton.addClass('mask-color-error');
+            $('span', $removeButton).addClass('color-error');
+            if (fminitialized && !folderlink && u_type === 3 && M.currentrootid !== M.RubbishID) {
+                $sendToChatButton.removeClass('hidden');
+                $sendToChatButton.closest('li').prev('.divider').removeClass('hidden');
+            }
+            else {
+                $sendToChatButton.addClass('hidden');
+                $sendToChatButton.closest('li').prev('.divider').addClass('hidden');
+            }
+        }
+        else {
+            $removeButton.removeClass('mask-color-error');
+            $('span', $removeButton).removeClass('color-error');
+            $sendToChatButton.addClass('hidden');
+            $sendToChatButton.closest('li').prev('.divider').addClass('hidden');
+        }
     }
 
     function slideshow_node(id, $overlay) {
@@ -386,18 +438,32 @@ var slideshowid;
             var root = M.getNodeRoot(n && n.h || false);
             var $getLinkBtn = $('.v-btn.getlink', $overlay);
 
-            if (!n || !n.p || root === 'shares' || root === M.RubbishID ||
-                (!folderlink && M.getNodeByHandle(n.h) && !M.getNodeByHandle(n.h).u &&
-                 M.getNodeRights(n.p) < 2)) {
-
+            if (!n
+                || !n.p
+                || root === 'shares'
+                || root === M.RubbishID
+                || (pfcol)
+                || (
+                    !folderlink
+                    && M.getNodeByHandle(n.h)
+                    && !M.getNodeByHandle(n.h).u
+                    && M.getNodeRights(n.p) < 2
+                )
+            ) {
                 $getLinkBtn.addClass('hidden');
             }
             else {
 
                 $getLinkBtn.removeClass('hidden');
                 $getLinkBtn.rebind('click.mediaviewer', function() {
+                    if ($getLinkBtn.hasClass('disabled')) {
+                        return;
+                    }
+                    $getLinkBtn.addClass('disabled');
+                    tSleep(3).then(() => $getLinkBtn.removeClass('disabled'));
+
                     if (is_mobile) {
-                        mobile.linkOverlay.show(n.h);
+                        mobile.linkManagement.showOverlay(n.h);
                     }
                     else {
                         $(document).fullScreen(false);
@@ -445,6 +511,12 @@ var slideshowid;
     }
 
     function slideshow_zoomSlider(value = 100) {
+
+        if (is_mobile) {
+            mega.ui.viewerOverlay.zoom = value;
+            return;
+        }
+
         const container = document.querySelector('.media-viewer-container');
         const wrapper = container && container.querySelector('.zoom-slider-wrap');
         const $elm = $('.zoom-slider', wrapper);
@@ -487,7 +559,7 @@ var slideshowid;
                 );
             }
         });
-    }
+    };
 
     // Inits Image viewer bottom control bar
     function slideshow_imgControls(slideshow_stop, close) {
@@ -559,7 +631,13 @@ var slideshowid;
             zoom_mode = false;
 
             if (is_mobile) {
+                eventlog(99835);
                 M.noSleep().catch(dump);
+                if (is_ios) {
+                    // Due to the handling of the onload event with the previous image in iOS,
+                    // force the call to img position
+                    slideshow_imgPosition();
+                }
             }
 
             // hack to start the slideshow in full screen mode
@@ -617,12 +695,16 @@ var slideshowid;
             else {
                 $zoomOutButton.trigger('click.mediaviewer');
             }
-            return false;
         });
 
         // Bind Slideshow Close button
         $('.sl-btn.close', is_mobile ? $slideshowControls : $slideshowControlsUpper).rebind('click.mediaviewer', () => {
             slideshowplay_close();
+            if (is_mobile && is_ios) {
+                // Due to the handling of the onload event with the previous image in iOS,
+                // force the call to img position
+                slideshow_imgPosition();
+            }
             return false;
         });
     }
@@ -639,29 +721,32 @@ var slideshowid;
         var lastPos = {x: null, y: null};
 
         if (close) {
-            $imgWrap.off('mousedown.pickpan');
-            $imgWrap.off('mouseup.pickpan mouseout.pickpan');
-            $imgWrap.off('mousemove.pickpan');
+            $imgWrap.off('mousedown.pickpan touchstart.pickpan');
+            $imgWrap.off('mouseup.pickpan mouseout.pickpan touchend.pickpan');
+            $imgWrap.off('mousemove.pickpan touchmove.pickpan');
             return false;
         }
 
         // Get cursor last position before dragging
-        $imgWrap.rebind('mousedown.pickpan', function(event) {
-            dragStart = 1;
+        $imgWrap.rebind('mousedown.pickpan touchstart.pickpan', function(event) {
+            dragStart = (!event.touches || event.touches.length === 1) | 0; // double finger should not treated as drag
             lastPos = {x: event.pageX, y: event.pageY};
             $(this).addClass('picked');
         });
 
         // Stop dragging
-        $imgWrap.rebind('mouseup.pickpan mouseout.pickpan', function() {
+        $imgWrap.rebind('mouseup.pickpan mouseout.pickpan touchend.pickpan', function() {
             dragStart = 0;
             $(this).removeClass('picked');
         });
 
         // Drag image if it doesn't fit into the container
-        $imgWrap.rebind('mousemove.pickpan', function(event) {
+        $imgWrap.rebind('mousemove.pickpan touchmove.pickpan', event => {
             if (dragStart) {
-                var currentPos = {x: event.pageX, y: event.pageY};
+
+                const {pageX, pageY} = event.type === 'touchmove' ? event.touches[0] : event;
+
+                var currentPos = {x: pageX, y: pageY};
                 var changeX = currentPos.x - lastPos.x;
                 var changeY = currentPos.y - lastPos.y;
 
@@ -721,14 +806,13 @@ var slideshowid;
         else if (!zoomout) {
             zoomStep = (newPerc * 1.2).toFixed(2);
             newPerc = zoomStep <= 1000 ? zoomStep : 1000;
-            console.log(newPerc);
         }
 
         newPerc /= devicePixelRatio * 100;
         newImgWidth = origImgWidth * newPerc;
 
         $img.css({
-            'width': switchedSides ? newImgHeight : newImgWidth
+            'width': newImgWidth
         });
 
         zoom_mode = true;
@@ -816,6 +900,138 @@ var slideshowid;
         slideshow_zoomSlider(imgWidth / origImgWidth * 100 * devicePixelRatio);
     }
 
+    // Mobile finger gesture
+    function slideshow_gesture(h, elm, type) {
+
+        // TODO: change to `!is_touchable` to support desktop touch device
+        if (!is_mobile || !is_touchable || !mega.ui.viewerOverlay) {
+            return;
+        }
+
+        const name = type ? 'iframeGesture' : 'gesture';
+
+        // Lets reset
+        if (mega.ui.viewerOverlay[name]) {
+
+            mega.ui.viewerOverlay[name].destroy();
+            delete mega.ui.viewerOverlay[name];
+        }
+
+        // no node passed means it is closing
+        if (!elm) {
+
+            delete mega.ui.viewerOverlay.zoom;
+
+            return;
+        }
+
+        let containerSelector;
+
+        if (type) {
+
+            containerSelector = type === 'PDF' ? '#viewerContainer' : 'body';
+            elm = elm.contentDocument;
+        }
+        else {
+            containerSelector = is_video(M.getNodeByHandle(h)) ? '.video-block' : '.img-wrap';
+            elm = elm.querySelector('.content');
+        }
+
+        console.assert(elm, 'Invalid element to initialise slideshow gesture');
+
+        const options = {
+            domNode: elm,
+            onTouchStart: function() {
+
+                const container = this.domNode.querySelector(containerSelector);
+                const style = {
+                    top: container.scrollTop,
+                    left: container.scrollLeft,
+                    width: container.offsetWidth,
+                    height: container.offsetHeight
+                };
+
+                if (containerSelector === '.img-wrap') {
+
+                    const img = container.querySelector('img.active');
+                    const compstyle = img && getComputedStyle(img);
+
+                    if (compstyle && compstyle.position === 'absolute') {
+
+                        style.top = Math.abs(parseInt(compstyle.top));
+                        style.left = Math.abs(parseInt(compstyle.left));
+                        style.width = parseInt(compstyle.width);
+                        style.height = parseInt(compstyle.height);
+                    }
+                }
+
+                this.onEdge = {
+                    top: style.top === 0,
+                    right: (style.left + container.offsetWidth) / style.width > 0.999,
+                    bottom: (style.top + container.offsetHeight) / style.height > 0.999,
+                    left: style.left === 0
+                };
+            },
+            onDragging: function(ev) {
+                // Stop tap to be triggered
+                ev.stopPropagation();
+                return;
+            }
+        };
+
+        if (name === 'iframeGesture') {
+            options.iframeDoc = elm;
+        }
+
+        options.onSwipeRight = options.onSwipeLeft = options.onSwipeDown = options.onSwipeUp = ev => {
+            ev.preventDefault();
+        };
+
+        if (page !== 'download') {
+
+            options.onSwipeRight = function() {
+
+                if (this.onEdge.left) {
+                    slideshow_prev();
+                }
+            };
+
+            options.onSwipeLeft = function() {
+
+                if (this.onEdge.right) {
+                    slideshow_next();
+                }
+            };
+        }
+
+        if (!type) {
+
+            options.onPinchZoom = function(ev, mag) {
+
+                mega.ui.viewerOverlay.zoom *= mag;
+                slideshow_zoom($(elm), 0, mega.ui.viewerOverlay.zoom);
+            };
+        }
+        else if (type === 'DOCX') {
+            options.onPinchZoom = function(ev, mag) {
+
+                const dElm = this.domNode.documentElement;
+                const curr = parseFloat(dElm.style.transform.replace(/[^\d.]/g, '')) || 1;
+
+                if (!this.initZoom) {
+                    this.initZoom = curr;
+                }
+
+                const newVal = Math.max(curr * mag, this.initZoom);
+
+                dElm.style.transform = `scale(${newVal.toFixed(6)})`;
+                dElm.classList.add('scaled');
+            };
+        }
+
+        mega.ui.viewerOverlay[name] = new MegaGesture(options);
+    }
+
     function sendToChatHandler() {
         $(document).fullScreen(false);
         const $wrapper = $('.media-viewer-container', 'body');
@@ -825,13 +1041,15 @@ var slideshowid;
         }
         $.noOpenChatFromPreview = true;
         openCopyDialog('conversations');
+
+        mBroadcaster.sendMessage('trk:event', 'preview', 'send-chat');
     }
 
     // Viewer Init
     // eslint-disable-next-line complexity
     function slideshow(id, close, hideCounter, filteredNodeArr) {
         if (!close && M.isInvalidUserStatus()) {
-            return;
+            return false;
         }
 
         var $overlay = $('.media-viewer-container', 'body');
@@ -848,6 +1066,8 @@ var slideshowid;
         var $prevNextButtons = $('.gallery-btn', $content);
         var $document = $(document);
         const $sendToChat = $('.v-btn.send-to-chat', $overlay);
+        const $playPauseButton = $('.play-pause-video-button', $content);
+        const $watchAgainButton = $('.watch-again-button', $content);
 
         if (d) {
             console.log('slideshow', id, close, slideshowid);
@@ -863,9 +1083,12 @@ var slideshowid;
             _hideCounter = false;
             slideshow_play(false, true);
             preselection = undefined;
-            $overlay.removeClass('video video-theatre-mode mouse-idle slideshow fullscreen')
+            $overlay.removeClass('video video-theatre-mode mouse-idle slideshow fullscreen fullimage')
                 .addClass('hidden');
             $playVideoButton.addClass('hidden');
+            $watchAgainButton.addClass('hidden');
+            $playPauseButton.addClass('hidden');
+            $('i', $playPauseButton).removeClass().addClass('sprite-fm-mono icon-play-regular-solid');
             $videoControls.addClass('hidden');
             $zoomSlider.attr('data-perc', 100);
             $(window).off('resize.imgResize');
@@ -873,6 +1096,19 @@ var slideshowid;
             $imgWrap.attr('data-count', '');
             $('img', $imgWrap).attr('src', '').removeAttr('style').removeClass('active');
             $('.v-btn.active', $controls).removeClass('active');
+            $('.speed i', $videoControls).removeClass()
+                .addClass('sprite-fm-mono icon-playback-1x-small-regular-outline');
+            $('.speed', $videoControls).removeClass('margin-2');
+            $('.context-menu.playback-speed button i', $videoControls).addClass('hidden');
+            $('.context-menu.playback-speed button.1x i', $videoControls).removeClass('hidden');
+            $('div.video-subtitles', $content).remove();
+            $('.context-menu.subtitles button i', $videoControls).addClass('hidden');
+            $('.context-menu.subtitles button.off i', $videoControls).removeClass('hidden');
+            $('.subtitles-wrapper', $videoControls).removeClass('hidden');
+            $('button.subtitles', $videoControls).removeClass('mask-color-brand');
+            $('.settings', $videoControls).removeClass('mask-color-brand');
+            $('.settings i', $videoControls).removeClass('icon-settings-02-small-regular-solid')
+                .addClass('icon-settings-02-small-regular-outline');
             if (optionsMenu) {
                 contextMenu.close(optionsMenu);
             }
@@ -901,6 +1137,9 @@ var slideshowid;
 
             if (is_mobile) {
                 M.noSleep(true).catch(dump);
+                if (mega.ui.viewerOverlay) {
+                    mega.ui.viewerOverlay.hide();
+                }
             }
 
             if (_pdfSeen) {
@@ -912,6 +1151,15 @@ var slideshowid;
                     document.getElementById('pdfpreviewdiv1').contentDocument.body.dispatchEvent(ev);
                 })();
             }
+            if (_docxSeen) {
+                _docxSeen = false;
+                tryCatch(() => {
+                    const ev = new Event('docxviewercleanup');
+                    document.getElementById('docxpreviewdiv1').contentDocument.dispatchEvent(ev);
+                })();
+            }
+
+            slideshow_gesture();
 
             return false;
         }
@@ -926,6 +1174,10 @@ var slideshowid;
             // then pushing fake states of history/hash
             if (page !== 'download' && (!history.state || history.state.view !== id)) {
                 pushHistoryState();
+
+                if (n.p && !folderlink && M.getNodeRoot(n.p) !== M.RubbishID) {
+                    onIdle(() => mega.ui.searchbar.recentlyOpened.addFile(id, false));
+                }
             }
             _hideCounter = !d && hideCounter;
         }
@@ -948,23 +1200,17 @@ var slideshowid;
         zoom_mode = false;
         switchedSides = false;
         $('header .file-name', $overlay).text(n.name);
-        $('.viewer-error, #pdfpreviewdiv1', $overlay).addClass('hidden');
+        $('.viewer-error, #pdfpreviewdiv1, #docxpreviewdiv1', $overlay).addClass('hidden');
         $('.viewer-progress', $overlay).addClass('vo-hidden');
 
-        if (is_mobile) {
-            $('.v-btn.slideshow', $imageControls).addClass('hidden');
-            if (is_video(n)) {
-                $('.zoom-slider-wrap', $imageControls).addClass('hidden');
-            }
-            else {
-                $('.zoom-slider-wrap', $imageControls).removeClass('hidden');
-            }
-        }
-        else {
+        if (!is_mobile) {
             $imageControls.addClass('hidden');
         }
         $prevNextButtons.addClass('hidden');
         $playVideoButton.addClass('hidden');
+        $watchAgainButton.addClass('hidden');
+        $playPauseButton.addClass('hidden');
+        $('i', $playPauseButton).removeClass().addClass('sprite-fm-mono icon-play-regular-solid');
         $('.viewer-progress p, .video-time-bar', $content).removeAttr('style');
 
         if (!slideshowplay) {
@@ -977,6 +1223,19 @@ var slideshowid;
         $('.video-time-bar', $videoControls).removeAttr('style');
         $('.video-progress-bar', $videoControls).removeAttr('title');
         $('.video-timing', $videoControls).text('');
+        $('.speed i', $videoControls).removeClass()
+            .addClass('sprite-fm-mono icon-playback-1x-small-regular-outline');
+        $('.speed', $videoControls).removeClass('margin-2');
+        $('.context-menu.playback-speed button i', $videoControls).addClass('hidden');
+        $('.context-menu.playback-speed button.1x i', $videoControls).removeClass('hidden');
+        $('div.video-subtitles', $content).remove();
+        $('.context-menu.subtitles button i', $videoControls).addClass('hidden');
+        $('.context-menu.subtitles button.off i', $videoControls).removeClass('hidden');
+        $('.subtitles-wrapper', $videoControls).removeClass('hidden');
+        $('button.subtitles', $videoControls).removeClass('mask-color-brand');
+        $('.settings', $videoControls).removeClass('mask-color-brand');
+        $('.settings i', $videoControls).removeClass('icon-settings-02-small-regular-solid')
+            .addClass('icon-settings-02-small-regular-outline');
 
         // Init full screen icon and related data attributes
         if ($document.fullScreen()) {
@@ -986,7 +1245,9 @@ var slideshowid;
 
             $content.attr('data-fullscreen', 'true');
             $('.v-btn.fs', $videoControls).addClass('cancel-fullscreen').removeClass('go-fullscreen');
-            $('.v-btn.fs i', $videoControls).addClass('icon-fullscreen-leave').removeClass('icon-fullscreen-enter');
+            $('.v-btn.fs i', $videoControls).removeClass()
+                .addClass('sprite-fm-mono icon-minimize-02-small-regular-outline');
+            $('.fs-wrapper .tooltip', $videoControls).text(l.video_player_exit_fullscreen);
         }
         else {
             $('.v-btn.fullscreen i', $imageControls)
@@ -995,7 +1256,9 @@ var slideshowid;
 
             $content.attr('data-fullscreen', 'false');
             $('.v-btn.fs', $videoControls).removeClass('cancel-fullscreen').addClass('go-fullscreen');
-            $('.v-btn.fs i', $videoControls).removeClass('icon-fullscreen-leave').addClass('icon-fullscreen-enter');
+            $('.v-btn.fs i', $videoControls).removeClass()
+                .addClass('sprite-fm-mono icon-maximize-02-small-regular-outline');
+            $('.fs-wrapper .tooltip', $videoControls).text(l.video_player_fullscreen);
         }
 
         // Turn off pick and pan mode
@@ -1013,27 +1276,36 @@ var slideshowid;
 
         // Bind static events is viewer is not in slideshow mode to avoid unnecessary rebinds
         if (!slideshowplay) {
-            $overlay.removeClass('fullscreen browserscreen mouse-idle slideshow video pdf');
+            $overlay.removeClass('fullscreen browserscreen mouse-idle slideshow video pdf docx');
 
             // Bind keydown events
             $document.rebind('keydown.slideshow', function(e) {
                 const isDownloadPage = page === 'download';
 
                 if (e.keyCode === 37 && slideshowid && !e.altKey && !e.ctrlKey && !isDownloadPage) {
+                    mBroadcaster.sendMessage('trk:event', 'preview', 'arrow-key', this, self.slideshowid);
                     slideshow_prev();
                 }
                 else if (e.keyCode === 39 && slideshowid && !isDownloadPage) {
+                    mBroadcaster.sendMessage('trk:event', 'preview', 'arrow-key', this, self.slideshowid);
                     slideshow_next();
                 }
                 else if (e.keyCode === 46 && fullScreenManager) {
                     fullScreenManager.exitFullscreen();
                 }
                 else if (e.keyCode === 27 && slideshowid && !$document.fullScreen()) {
+                    mBroadcaster.sendMessage('trk:event', 'preview', 'close-btn', this, self.slideshowid);
+
                     if ($.dialog) {
                         closeDialog($.dialog);
                     }
                     else if ($.msgDialog) {
                         closeMsg();
+
+                        if ($.warningCallback) {
+                            $.warningCallback(false);
+                            $.warningCallback = null;
+                        }
                     }
                     else if (slideshowplay) {
                         slideshow_imgControls(1);
@@ -1048,7 +1320,8 @@ var slideshowid;
                         return false;
                     }
                 }
-                else if ((e.keyCode === 8 || e.key === 'Backspace') && !isDownloadPage && !$.copyDialog) {
+                else if ((e.keyCode === 8 || e.key === 'Backspace') && !isDownloadPage && !$.copyDialog
+                        && !$.dialog && !$.msgDialog && !mega.ui.mInfoPanel.isOpen()) {
                     history.back();
                     return false;
                 }
@@ -1056,6 +1329,8 @@ var slideshowid;
 
             // Close icon
             $('.v-btn.close, .viewer-error-close', $overlay).rebind('click.media-viewer', function() {
+                mBroadcaster.sendMessage('trk:event', 'preview', 'close-btn', this, self.slideshowid);
+
                 if (page === 'download') {
                     if ($(document).fullScreen()) {
                         fullScreenManager.exitFullscreen();
@@ -1069,25 +1344,26 @@ var slideshowid;
                     return false;
                 }
                 history.back();
+                mega.ui.mInfoPanel.closeIfOpen();
                 return false;
             });
+
+            // Keep the Info panel option hidden on public links (but usable in regular Cloud Drive etc)
+            const currentSitePath = getSitePath();
+            if (isPublicLink(currentSitePath)) {
+                $('.v-btn.options', $overlay).addClass('hidden');
+            }
 
             // Properties icon
             $('.context-menu .info, .v-btn.info', $overlay).rebind('click.media-viewer', () => {
                 $document.fullScreen(false);
-                propertiesDialog();
+                // Use original ID to render info from chats
+                $.selected = [id];
+                mega.ui.mInfoPanel.initInfoPanel();
                 return false;
             });
 
             if (is_mobile) {
-
-                const isDownload = page === 'download';
-
-                if (isDownload) {
-
-                    $controls.addClass('hidden');
-                    $controls = $controls.not('button');
-                }
 
                 $('.img-wrap', $overlay).rebind('tap.media-viewer', () => {
 
@@ -1095,20 +1371,32 @@ var slideshowid;
                         return;
                     }
 
-                    if (isDownload && !$overlay.hasClass('fullscreen')) {
-                        $overlay.addClass('fullscreen');
-                        $controls.addClass('hidden');
-                        slideshow_imgPosition($overlay);
-                    }
+                    $overlay.toggleClass('fullimage');
 
-                    if ($controls.hasClass('hidden')) {
-                        $controls.removeClass('hidden');
-                    }
-                    else {
-                        $controls.addClass('hidden');
+                    slideshow_imgPosition($overlay);
+
+                    if (mega.flags.ab_ads) {
+                        mega.commercials.updateOverlays();
                     }
 
                     return false;
+                });
+
+                $('.go-fullscreen', $overlay).rebind('click.media-viewer', () => {
+                    if (ua.details.os === "iPad") {
+                        // iPad does not allow fullscreen mode for now
+                        // therefore, we do not modify the header and imageControls
+                        // since otherwise, we will not be able to revoke this action.
+                        return;
+                    }
+                    if ($document.fullScreen()) {
+                        $('header', $overlay).removeClass('hidden');
+                        $imageControls.removeClass('hidden');
+                    }
+                    else {
+                        $('header', $overlay).addClass('hidden');
+                        $imageControls.addClass('hidden');
+                    }
                 });
             }
             else {
@@ -1160,8 +1448,11 @@ var slideshowid;
                     return false;
                 });
 
-                if (fminitialized && !folderlink && u_type === 3 && M.currentrootid !== M.RubbishID) {
+                if (fminitialized && !folderlink && u_type === 3 && M.currentrootid !== M.RubbishID && !is_video(n)) {
                     $sendToChat.removeClass('hidden');
+                }
+                else if (is_video(n)) {
+                    $sendToChat.addClass('hidden');
                 }
 
                 $sendToChat.rebind('click.media-viewer', () => {
@@ -1172,6 +1463,10 @@ var slideshowid;
                         showToast('send-chat', l[17794]);
                         mBroadcaster.once('chat_initialized', () => sendToChatHandler());
                     }
+                });
+
+                $('.context-menu .send-to-chat', $overlay).rebind('click.media-viewer', () => {
+                    $sendToChat.trigger('click.media-viewer');
                 });
 
                 // Close context menu
@@ -1220,15 +1515,15 @@ var slideshowid;
             }
 
             if (steps.backward.length) {
-                $prevNextButtons.filter('.previous').removeClass('hidden');
+                $prevNextButtons.filter('.previous').removeClass('hidden opacity-50').removeAttr('disabled');
             }
             if (steps.forward.length) {
-                $prevNextButtons.filter('.next').removeClass('hidden');
+                $prevNextButtons.filter('.next').removeClass('hidden opacity-50').removeAttr('disabled');
             }
 
             $prevNextButtons.rebind('click.mediaviewer', function() {
 
-                if (!this.classList.contains('hidden')) {
+                if (!this.classList.contains('hidden') && M.v.length > 1) {
                     const steps = slideshowsteps();
 
                     if (this.classList.contains('previous')) {
@@ -1249,7 +1544,7 @@ var slideshowid;
 
             const idleAction = is_mobile ? 'touchstart' : 'mousemove';
 
-            clearTimeout(mouseIdleTimer);
+            delay.cancel(MOUSE_IDLE_TID);
             $document.off(`${idleAction}.idle`);
             $controls.off('mousemove.idle');
 
@@ -1259,18 +1554,15 @@ var slideshowid;
 
                 // Autohide controls
                 (function _() {
-                    clearTimeout(mouseIdleTimer);
                     $overlay.removeClass('mouse-idle');
-                    mouseIdleTimer = setTimeout(function() {
-                        $overlay.addClass('mouse-idle');
-                    }, 2000);
+                    delay(MOUSE_IDLE_TID, () => $overlay.addClass('mouse-idle'), 2e3);
                     $document.rebind(`${idleAction}.idle`, _);
                 })();
 
                 if (!is_mobile) {
                     $controls.rebind('mousemove.idle', () => {
                         onIdle(() => {
-                            clearTimeout(mouseIdleTimer);
+                            delay.cancel(MOUSE_IDLE_TID);
                         });
                     });
                 }
@@ -1289,7 +1581,7 @@ var slideshowid;
 
         $dlBut.rebind('click.media-viewer', function _dlButClick() {
 
-            if (this.classList.contains('disabled')) {
+            if (this.classList && this.classList.contains('disabled')) {
                 return false;
             }
 
@@ -1297,12 +1589,12 @@ var slideshowid;
 
             if (p && p.full && Object(p.buffer).byteLength) {
                 M.saveAs(p.buffer, n.name)
-                    .fail(function(ex) {
+                    .catch((ex) => {
                         if (d) {
                             console.debug(ex);
                         }
                         p.full = p.buffer = false;
-                        _dlButClick();
+                        _dlButClick.call(this);
                     });
                 return false;
             }
@@ -1318,6 +1610,10 @@ var slideshowid;
                     M.openTransfersPanel();
                     return;
                 }
+            }
+
+            if (pfcol) {
+                tryCatch(() => eventlog(mega.gallery.isVideo(n) ? 99972 : 99973))();
             }
 
             // TODO: adapt the above code to work on the downloads page if we need to download the original
@@ -1360,7 +1656,12 @@ var slideshowid;
         }
         else {
             $('img', $imgWrap).attr('src', '');
-            $pendingBlock.removeClass('hidden');
+            if (is_video(n)) {
+                $('.loader-grad', $content).removeClass('hidden');
+            }
+            else {
+                $pendingBlock.removeClass('hidden');
+            }
 
             if (!preqs[n.h]) {
                 fetchsrc(n);
@@ -1369,30 +1670,8 @@ var slideshowid;
 
         $overlay.removeClass('hidden');
 
-        if (is_mobile) {
-            const isVideo = is_video(n);
-            const listener = mBroadcaster.addListener('orientationchange', (mode) => {
-
-                requestAnimationFrame(() => {
-
-                    if (slideshowplay) {
-                        // If the image slideshow is in progress, disable the orientation change function
-                        return false;
-                    }
-
-                    if (isVideo) {
-
-                        if (mode === 'landscape') {
-
-                            $controls.addClass('hidden');
-                        }
-                        else {
-                            $controls.removeClass('hidden');
-                        }
-                    }
-                });
-            });
-            broadcasts.push(listener);
+        if (mega.ui.viewerOverlay) {
+            mega.ui.viewerOverlay.show(id);
         }
     }
 
@@ -1481,15 +1760,19 @@ var slideshowid;
             console.debug('slideshow.fetchsrc', id, n, n.h);
         }
 
-        if (fileext(n.name) === 'pdf') {
+        if (['pdf', 'docx'].includes(fileext(n.name))) {
             if (!preqs[n.h]) {
                 preqs[n.h] = 1;
 
+                const ext = fileext(n.name);
                 M.gfsfetch(n.link || n.h, 0, -1).then((data) => {
-                    preview({type: 'application/pdf'}, n.h, data.buffer);
+                    const type = ext === 'pdf' ? 'application/pdf' : extmime.docx;
+
+                    preview({ type }, n.h, data.buffer);
+
                 }).catch((ex) => {
                     if (d) {
-                        console.warn('Failed to retrieve PDF, failing back to broken eye image...', ex);
+                        console.warn(`Failed to retrieve ${ext}, failing back to broken eye image...`, ex);
                     }
 
                     previewimg(n.h, null);
@@ -1539,7 +1822,7 @@ var slideshowid;
         }
 
         preqs[n.h] = 1;
-        var maxSize = ua.details.engine === 'Trident' ? 12 : 50;
+        const maxSize = parseInt(localStorage.maxPrvOrigSize) || 50;
         var loadOriginal = n.s < maxSize * 1048576 && is_image(n) === 1;
         var loadPreview = !loadOriginal || !slideshowplay && n.s > 1048576;
         var onPreviewError = loadOriginal ? previewimg.bind(window, n.h, null) : eot;
@@ -1633,7 +1916,8 @@ var slideshowid;
         }
         var n = slideshow_node(id, $overlay);
         var $content = $('.content', $overlay);
-        const $pendingBlock = $('.viewer-pending', $content);
+        const autoPlay = $.autoplay === id;
+        const $pendingBlock = $('.loader-grad', $content);
         var $video = $('video', $content);
         var $playVideoButton = $('.play-video-button', $content);
         let bgsize = 'auto';
@@ -1688,6 +1972,7 @@ var slideshowid;
 
             initVideoStream(n, $overlay, destroy).done(streamer => {
                 preqs[n.h] = streamer;
+                preqs[n.h].options.uclk = !autoPlay;
 
                 preqs[n.h].ev1 = mBroadcaster.addListener('slideshow:next', destroy);
                 preqs[n.h].ev2 = mBroadcaster.addListener('slideshow:prev', destroy);
@@ -1732,6 +2017,7 @@ var slideshowid;
         $pendingBlock.addClass('hidden');
         $('.img-wrap', $content).addClass('hidden');
         $content.removeClass('hidden');
+        $('.viewer-pending', $content).addClass('hidden');
 
         if (n.name) {
             var c = MediaAttribute.getCodecStrings(n);
@@ -1765,7 +2051,7 @@ var slideshowid;
 
         previews[id].poster = previews[id].poster || '';
 
-        if ($.autoplay === id || page === 'download') {
+        if ($.autoplay === id) {
             queueMicrotask(() => {
                 $playVideoButton.trigger('click');
             });
@@ -1774,7 +2060,7 @@ var slideshowid;
     }
 
     function isThumbnailMissing(n) {
-        return !M.chat && (!n.fa || n.fa.indexOf(':0*') < 0);
+        return !M.chat && (!n.fa || !n.fa.includes(':0*')) && M.shouldCreateThumbnail(n.p);
     }
 
     function createNodeThumbnail(n, ab) {
@@ -1794,6 +2080,42 @@ var slideshowid;
         }
     }
 
+    const require = async(html, js, ...other) => {
+        const files = [html, ...other];
+
+        if (!self.is_extension) {
+            files.push(...js);
+        }
+        await M.require(...files);
+
+        const map = require.map[html];
+        html = translate(pages[html]);
+
+        for (let [k, v] of map) {
+            v = self.is_extension && js.includes(v) ? bootstaticpath + jsl2[v].f : window[v];
+
+            assert(!!v, `${l[16]}, ${k}`);
+
+            html = html.replace(k, v);
+        }
+
+        return html;
+    };
+    lazy(require, 'map', () => {
+        return freeze({
+            pdfviewer: new Map([
+                ['viewer.js', 'pdfviewerjs'],
+                ['viewer.css', 'pdfviewercss'],
+                ['../build/pdf.js', 'pdfjs2']
+            ]),
+            docxviewer: new Map([
+                ['docx.js', 'docxviewer_js'],
+                ['viewer.css', 'docxviewercss'],
+                ['docx-preview.js', 'docxpreview_js']
+            ])
+        });
+    });
+
     // a method to fetch scripts and files needed to run pdfviewer
     // and then excute them on iframe element [#pdfpreviewdiv1]
     function prepareAndViewPdfViewer(data) {
@@ -1805,6 +2127,7 @@ var slideshowid;
             ev.initEvent("pdfjs-openfile.meganz", true);
             ev.data = data.buffer || data.src;
             elm.contentDocument.body.dispatchEvent(ev);
+            slideshow_gesture(data.h, elm, 'PDF');
             return true;
         });
 
@@ -1815,18 +2138,27 @@ var slideshowid;
             }
         }
 
-        M.require('pdfjs2', 'pdfviewer', 'pdfviewercss', 'pdfviewerjs').then(() => {
-            var myPage = pages['pdfviewer'];
-            myPage = myPage.replace('viewer.css', window.pdfviewercss);
-            myPage = myPage.replace('../build/pdf.js', window.pdfjs2);
-            myPage = myPage.replace('viewer.js', window.pdfviewerjs);
-            // remove then re-add iframe to avoid History changes [push]
-            var pdfIframe = document.getElementById('pdfpreviewdiv1');
-            var newPdfIframe = document.createElement('iframe');
-            newPdfIframe.id = 'pdfpreviewdiv1';
+        require('pdfviewer', ['pdfjs2', 'pdfviewerjs'], 'pdfviewercss').then((myPage) => {
+            const id = 'pdfpreviewdiv1';
+            const pdfIframe = document.getElementById(id);
+            const newPdfIframe = document.createElement('iframe');
+            newPdfIframe.id = id;
             newPdfIframe.src = 'about:blank';
-            var pdfIframeParent = pdfIframe.parentNode;
-            pdfIframeParent.replaceChild(newPdfIframe, pdfIframe);
+
+            if (pdfIframe) {
+
+                // replace existing iframe to avoid History changes [push]
+                pdfIframe.parentNode.replaceChild(newPdfIframe, pdfIframe);
+            }
+            else {
+                // making pdf iframe for initial start
+                const p = document.querySelector('.pdf .media-viewer .content');
+
+                if (p) {
+                    p.appendChild(newPdfIframe);
+                }
+            }
+
             var doc = newPdfIframe.contentWindow.document;
             doc.open();
             doc.write(myPage);
@@ -1836,7 +2168,69 @@ var slideshowid;
             });
             doc.close();
             _pdfSeen = true;
+        }).catch(tell);
+    }
+
+    function prepareAndViewDocxViewer(data) {
+        const signal = tryCatch(() => {
+            const elem = document.getElementById('docxpreviewdiv1');
+            elem.classList.remove('hidden');
+            const ev = new Event('docxviewerload');
+            ev.data = {
+                blob: data.blob
+            };
+            elem.contentDocument.dispatchEvent(ev);
+            slideshow_gesture(data.h, elem, 'DOCX');
         });
+
+        if (_docxSeen) {
+            signal();
+            return;
+        }
+
+        require('docxviewer', ['docxpreview_js', 'docxviewer_js'], 'docxviewercss').then((myPage) => {
+            const id = 'docxpreviewdiv1';
+            const iframe = document.getElementById(id);
+            const newIframe = document.createElement('iframe');
+            newIframe.id = id;
+            newIframe.src = 'about:blank';
+
+            if (iframe) {
+
+                // replace existing iframe to avoid History changes [push]
+                iframe.parentNode.replaceChild(newIframe, iframe);
+            }
+            else {
+                // making docx iframe for initial start
+                const p = document.querySelector('.docx .media-viewer .content');
+
+                if (p) {
+                    p.appendChild(newIframe);
+                }
+            }
+
+            const doc = newIframe.contentWindow.document;
+            // eslint-disable-next-line local-rules/open
+            doc.open();
+            doc.write(myPage);
+            doc.addEventListener('docxviewerready', function ready() {
+                doc.removeEventListener('docxviewerready', ready);
+                queueMicrotask(signal);
+            });
+            doc.addEventListener('docxviewererror', (ev) => {
+                const { data } = ev;
+                let errBody = '';
+                if (data.error === -1) {
+                    errBody = l.preview_failed_support;
+                }
+                else if (data.error === -2) {
+                    errBody = l.preview_failed_temp;
+                }
+                msgDialog('error', '', l.preview_failed_title, errBody);
+            });
+            doc.close();
+            _docxSeen = true;
+        }).catch(tell);
     }
 
     function previewsrc(id) {
@@ -1860,14 +2254,16 @@ var slideshowid;
         $('embed', $content).addClass('hidden');
         $('video', $content).addClass('hidden');
         $imgWrap.removeClass('hidden');
-        $('#pdfpreviewdiv1', $content).addClass('hidden');
+        $('#pdfpreviewdiv1, #docxpreviewdiv1', $content).addClass('hidden');
         $bottomBar.removeClass('hidden');
 
         if (previews[id].type === 'application/pdf') {
             $overlay.addClass('pdf');
             $pendingBlock.addClass('hidden');
             $progressBlock.addClass('vo-hidden');
-            $bottomBar.addClass('hidden');
+            if (!is_mobile) {
+                $bottomBar.addClass('hidden');
+            }
             $imgWrap.addClass('hidden');
             // preview pdfs using pdfjs for all browsers #8036
             // to fix pdf compatibility - Bug #7796
@@ -1875,8 +2271,28 @@ var slideshowid;
             api_req({a: 'log', e: 99660, m: 'Previewed PDF Document.'});
             return;
         }
+        if (previews[id].type === extmime.docx) {
+            $overlay.addClass('docx');
+            $pendingBlock.addClass('hidden');
+            $progressBlock.addClass('vo-hidden');
+            if (!is_mobile) {
+                $bottomBar.addClass('hidden');
+            }
+            $imgWrap.addClass('hidden');
+            prepareAndViewDocxViewer(previews[id]);
+            eventlog(99819);
+            return;
+        }
 
-        if (/^(?:audio|video)\//i.test(previews[id].type)) {
+        tryCatch(() => slideshow_gesture(previews[id].h, $overlay[0]), self.reportError)();
+
+        const isVideoStream = /^(?:audio|video)\//i.test(previews[id].type);
+
+        if (pfcol) {
+            eventlog(isVideoStream ? 99970 : 99971);
+        }
+
+        if (isVideoStream) {
             return slideshow_videostream(id, $overlay);
         }
 
@@ -1995,7 +2411,6 @@ var slideshowid;
                     slideshow_imgPosition($overlay);
                     $img.removeClass('vo-hidden');
                 });
-                // slideshow_zoomSlider($img.width() / origImgWidth * 100 * devicePixelRatio);
             }
 
             // Apply exit orientation
@@ -2078,7 +2493,7 @@ var slideshowid;
         }
 
         // Ensure we are not eating too much memory...
-        delay('slideshow:freemem', slideshow_freemem, 6e3);
+        tSleep.schedule(7, slideshow_freemem);
     }
 
     function slideshow_freemem() {

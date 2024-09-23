@@ -8,8 +8,21 @@
     width: var(--icon-size, 16px);
     height: var(--icon-size, 16px);
 }
-.sprite-mobile-fm-uni.mega-logo-full, .sprite-mobile-fm-uni-before.mega-logo-full-before::before, .sprite-mobile-fm-uni-after.mega-logo-full-after::after {
-   background-image: url("../../images/sprites/mobile-fm-uni@uni.svg#mega-logo-full");
+
+.sprite-mobile-fm-uni.icon-authy, .sprite-mobile-fm-uni-before.icon-authy-before::before, .sprite-mobile-fm-uni-after.icon-authy-after::after {
+   background-image: url("../../images/sprites/mobile-fm-uni@uni.svg#icon-authy");
+}
+.sprite-mobile-fm-uni.icon-duo-auth, .sprite-mobile-fm-uni-before.icon-duo-auth-before::before, .sprite-mobile-fm-uni-after.icon-duo-auth-after::after {
+   background-image: url("../../images/sprites/mobile-fm-uni@uni.svg#icon-duo-auth");
+}
+.sprite-mobile-fm-uni.icon-google-auth, .sprite-mobile-fm-uni-before.icon-google-auth-before::before, .sprite-mobile-fm-uni-after.icon-google-auth-after::after {
+   background-image: url("../../images/sprites/mobile-fm-uni@uni.svg#icon-google-auth");
+}
+.sprite-mobile-fm-uni.icon-mega-logo-rounded-square, .sprite-mobile-fm-uni-before.icon-mega-logo-rounded-square-before::before, .sprite-mobile-fm-uni-after.icon-mega-logo-rounded-square-after::after {
+   background-image: url("../../images/sprites/mobile-fm-uni@uni.svg#icon-mega-logo-rounded-square");
+}
+.sprite-mobile-fm-uni.icon-microsoft-auth, .sprite-mobile-fm-uni-before.icon-microsoft-auth-before::before, .sprite-mobile-fm-uni-after.icon-microsoft-auth-after::after {
+   background-image: url("../../images/sprites/mobile-fm-uni@uni.svg#icon-microsoft-auth");
 }
 .sprite-mobile-fm-uni.mime-3d-outline, .sprite-mobile-fm-uni-before.mime-3d-outline-before::before, .sprite-mobile-fm-uni-after.mime-3d-outline-after::after {
    background-image: url("../../images/sprites/mobile-fm-uni@uni.svg#mime-3d-outline");

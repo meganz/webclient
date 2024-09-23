@@ -6,12 +6,17 @@
     backdrop-filter: blur(10px);
 
     &.user-alone {
-        margin-top: -140px;
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        margin: -10px 0 0 0;
+
         .notice-footer {
             display: flex;
             justify-content: flex-end;
             margin-top: 24px;
             width: 100%;
+
             button {
                 margin-inline-start: 10px;
                 -webkit-margin-start: 10px;
@@ -25,10 +30,12 @@
         text-align: center;
         background: var(--surface-highlight-1);
 
-        h1, h3 {
+        h1,
+        h3 {
             margin: 0;
             color: var(--secondary-white);
         }
+
         &.user-alone {
             box-sizing: border-box;
             margin: 0 auto;
@@ -59,22 +66,34 @@
                 border-top: 1px solid #444;
             }
         }
+
         &.user-alone {
             margin-top: 32px;
             padding: 24px;
             width: 478px;
+
             h3 {
                 margin: 0 0 12px;
             }
+
             p {
                 color: var(--text-color-medium);
                 text-align: start;
             }
-            div.stay-dlg-subtext {
+
+            .stay-dlg-subtext {
                 color: var(--text-color-low);
                 font: var(--text-body2);
                 margin-top: 12px;
             }
         }
+    }
+    &-content-invite {
+        width: 460px;
+        padding: 12px;
+        margin: 12px auto 0;
+        box-sizing: border-box;
+        border-radius: 34px;
+        background: var(--surface-highlight-1);
     }
 }

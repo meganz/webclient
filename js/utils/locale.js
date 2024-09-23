@@ -120,6 +120,31 @@ function localeImages(scope) {
 
 /**
  * Set Date time object for time2date
+ *
+ * Examples by format value (NZ locale all made on Monday, 3 October 2022):
+ * 1:       3/10/2022
+ * 2:       3 October 2022
+ * 3:       October 2022
+ * 4:       Monday, 3 October 2022
+ * 5:       Monday, 3 October 2022 at 10:30:00 NZDT
+ * 6:       Oct 2022
+ * 7:       Monday, 3 October 2022 at 10:30 NZDT
+ * 8:       3 October 2022
+ * 9:       3 October 2022
+ * 10:      Mon
+ * 11:      Monday
+ * 12:      Oct
+ * 13:      October
+ * 14:      2022
+ * 15:      3 Oct
+ * 16:      3
+ * 17:      3/10/22
+ * 18:      3 Oct 2022
+ * 19:      Mon, 3 Oct
+ * 20:      Mon, 3 Oct 2022
+ * 21:      13:30
+ * 22:      1:30 pm
+ *
  * @param {String} locales Locale string
  * @param {Number} format format number for the case.
  */
@@ -136,7 +161,7 @@ function setDateTimeFormat(locales, format) {
         options.day = format === 3 || format === 6 ? undefined : 'numeric';
         options.weekday = format === 4 || format === 5 ? 'long' : undefined;
 
-        if (format === 0 || format === 5) {
+        if (format === 0 || format === 5 || format === 7) {
             options.minute = 'numeric';
             options.hour = 'numeric';
             if (format === 5) {
@@ -147,6 +172,10 @@ function setDateTimeFormat(locales, format) {
 
         if (format === 6) {
             options.month = 'short';
+        }
+        if (format === 7) {
+            options.weekday = 'long';
+            options.timeZoneName = 'short';
         }
     }
     // Set non full date format
@@ -180,11 +209,27 @@ function setDateTimeFormat(locales, format) {
                 options.day = 'numeric';
                 break;
             case 18:
+                options.day = 'numeric';
+                options.month = 'short';
+                options.year = 'numeric';
+                break;
+            case 19:
+                options.weekday = 'short';
+                options.day = 'numeric';
+                options.month = 'long';
+                break;
+            case 20:
+                options.weekday = 'short';
+                options.day = 'numeric';
+                options.month = 'long';
+                options.year = 'numeric';
+                break;
+            case 21:
                 options.hourCycle = 'h23';
                 options.hour = 'numeric';
                 options.minute = 'numeric';
                 break;
-            case 19:
+            case 22:
                 options.hourCycle = undefined;
                 options.hour = 'numeric';
                 options.minute = 'numeric';
@@ -199,8 +244,8 @@ function setDateTimeFormat(locales, format) {
 
         // If locale is Arabic and country is non-Arabic country, not set, or not logged in
         if (locale === 'ar' && (!u_attr || !u_attr.country || arabics.indexOf(u_attr.country) < 0)) {
-            // To avoid Chrome bug, set Egypt as default country.
-            $.dateTimeFormat[locales + '-' + format] = new Intl.DateTimeFormat('ar-EG', options);
+            // To avoid Firefox bug, set Egypt as default country.
+            $.dateTimeFormat[locales + '-' + format] = new Intl.DateTimeFormat('ar-AE', options);
         }
     }
     catch (e) {
@@ -236,7 +281,7 @@ function setDateTimeFormat(locales, format) {
  *       13: January (Only month long version)
  *       14: 2021 (Only year)
  *       15: dd mm (Date format with short month and without time and year)
- *       16: yyyy (Only year)
+ *       16: dd (Only day)
  */
 function time2date(unixTime, format) {
     'use strict';
@@ -295,9 +340,9 @@ function setAccDateTimeFormat(locales) {
 
         // If locale is Arabic and country is non-Arabic country or non set,
         if (locale === 'ar' && (!u_attr || !u_attr.country || arabics.indexOf(u_attr.country) < 0)) {
-            // To avoid Chrome bug, set Egypt as default country.
-            $.acc_dateTimeFormat[locales] = new Intl.DateTimeFormat('ar-EG', options);
-            $.acc_dateTimeFormat[locales + '-noY'] = new Intl.DateTimeFormat('ar-EG', nYOptions);
+            // To avoid Firefox bug, set Egypt as default country.
+            $.acc_dateTimeFormat[locales] = new Intl.DateTimeFormat('ar-AE', options);
+            $.acc_dateTimeFormat[locales + '-noY'] = new Intl.DateTimeFormat('ar-AE', nYOptions);
         }
     }
     catch (e) {
@@ -377,6 +422,33 @@ function time2last(timestamp, skipSeconds) {
         return mega.icu.format(l.hour_last_count, Math.ceil(sec / 3600));
     }
     return mega.icu.format(l.day_last_count, Math.ceil(sec / 86400));
+}
+
+/**
+ * Function to create long date format for current locales.
+ * @param {Number} expiry The UNIX timestamp in seconds that the offer expires OR seconds until offer expires.
+ * @param {Boolean} remainingGiven Optional, are the remaining seconds given, otherwise is a UNIX timestamp.
+ * @returns {String} result Formatted date.
+ */
+function time2offerExpire(expiry, remainingGiven) {
+    'use strict';
+    const remainingSecs = remainingGiven ? expiry : expiry - Date.now() / 1000;
+    // Expired
+    if (remainingSecs <= 0) {
+        return l.notif_offer_expired;
+    }
+    else if (remainingSecs < 60) {
+        return mega.icu.format(l.notif_offer_exp_second, Math.floor(remainingSecs));
+    }
+    else if (remainingSecs < 3600) {
+        const mins = Math.floor(remainingSecs / 60);
+        const secs = Math.floor(remainingSecs % 60);
+        return l.notif_offer_exp_minute_second.replace('%1', mins).replace('%2', secs);
+    }
+    else if (remainingSecs < 86400) {
+        return mega.icu.format(l.notif_offer_exp_hour, Math.floor(remainingSecs / 3600));
+    }
+    return mega.icu.format(l.notif_offer_exp_day, Math.floor(remainingSecs / 86400));
 }
 
 /*
@@ -472,7 +544,7 @@ function getDateStructure() {
         var options_m = {month: 'numeric'}; // Format only Month
         var options_d = {day: 'numeric'}; // Format only Year
 
-        locales = !u_attr || !u_attr.country || arabics.indexOf(u_attr.country) < 0 ? 'ar-EG' : locales;
+        locales = !u_attr || !u_attr.country || arabics.indexOf(u_attr.country) < 0 ? 'ar-AE' : locales;
 
         try {
             if (typeof Intl !== 'undefined') {
@@ -724,7 +796,8 @@ function daysSince1Jan2000() {
  *                  'code' - use the ISO currency code such as "NZD",
  *                  'name' - use a localized currency name such as "dollar"
  *                  'number' - just number with correct decimal
- * @param {Boolean} noDecimals If the number should be displayed without decimals
+ * @param {*} noDecimals True if no decimals wanted, otherwise it is the maximum number of decimals wanted
+ * @param {Number} maxDecimalPlaces Set the maximum decimal places that will be printed
  * @returns {String} formated currency value
  */
 function formatCurrency(value, currency, display, noDecimals) {
@@ -748,20 +821,13 @@ function formatCurrency(value, currency, display, noDecimals) {
         narrowSymbol = currency !== 'EUR'; // Euro cannot have country
     }
 
-    const cnl = getCountryAndLocales();
-    let locales = cnl.locales;
-
-    // If locale is Arabic and country is non-Arabic country or non set,
-    if (locale === 'ar' && arabics.indexOf(cnl.country) < 0) {
-        // To avoid Chrome bug, set Egypt as default country.
-        locales = 'ar-EG';
-    }
+    const {country, locales} = getCountryAndLocales();
 
     var options = {'style': 'currency', 'currency': currency, currencyDisplay: display};
 
     if (noDecimals) {
-        options.maximumFractionDigits = 0;
         options.minimumFractionDigits = 0;
+        options.maximumFractionDigits = noDecimals === true ? 0 : noDecimals;
     }
 
     var result = value.toLocaleString(locales, options);
@@ -772,6 +838,10 @@ function formatCurrency(value, currency, display, noDecimals) {
         // Romanian with Euro Symbol currency display is currently buggy on all browsers, so doing this to polyfill it
         if (locales.startsWith('ro')) {
             result = value.toLocaleString('fr', options);
+        }
+        else if (locales.startsWith('ar') && !arabics.includes(country)) {
+            // To avoid Firefox bug, set UAE as default country.
+            result = value.toLocaleString('ar-AE', options);
         }
         else {
             result = value.toLocaleString(locale, options);
@@ -836,7 +906,7 @@ function getCountryAndLocales() {
         locales = locale + '-' + country;
     }
     // Otherwise, try grab country data from browser's navigator.languages
-    else if (navigator.languages) {
+    else if (Array.isArray(navigator.languages)) {
 
         locales = navigator.languages.filter(l => l !== locale && l.startsWith(locale))[0];
 
@@ -851,6 +921,12 @@ function getCountryAndLocales() {
     }
 
     locales = mega.intl.test(locales) || mega.intl.test(locale) || 'ISO';
+
+    // If locale is Arabic and country is non-Arabic country or non set,
+    if (locale === 'ar' && !arabics.includes(country)) {
+        // To avoid Firefox bug, set UAE as default country.
+        locales = 'ar-AE';
+    }
 
     return $.cnl = {country: country, locales: locales};
 }
@@ -928,17 +1004,18 @@ function getTimeMarker(unixtime, verbose) {
 /**
  * Returns formatted time string for the given timestamp. The format used is based on the user's locale and selected
  * settings, e.g. ISO formatting. Use `HH h MM` format for French locales.
- * @param {Number} unixtime
+ * @param {Number} unixtime UNIX timestamp, either in milliseconds or seconds.
  * @returns {String}
  */
 
 function toLocaleTime(unixtime) {
     'use strict';
+    unixtime = Math.abs(Date.now() - unixtime) < Math.abs(Date.now() - unixtime * 1000) ? unixtime / 1000 : unixtime;
     const { locales, country } = getCountryAndLocales();
     if (fmconfig.uidateformat || country === 'ISO') {
-        return time2date(unixtime, 18);
+        return time2date(unixtime, 21);
     }
-    return locales.startsWith('fr') ? time2date(unixtime, 19).replace(':', ' h ') : time2date(unixtime, 19);
+    return locales.startsWith('fr') ? time2date(unixtime, 22).replace(':', ' h ') : time2date(unixtime, 22);
 }
 
 //----------------------------------------------------------------------------
@@ -946,7 +1023,6 @@ function toLocaleTime(unixtime) {
 // eslint-disable-next-line complexity
 mBroadcaster.once('boot_done', function populate_l() {
     'use strict';
-    var i;
 
     if (d) {
         const loaded = l;
@@ -973,20 +1049,17 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[8762] = escapeHTML(l[8762]).replace("[S]", "<span class='red'>").replace("[/S]", "</span>");
     l[208] = escapeHTML(l[208]).replace('[/A]', '</a>');
     l['208a'] = l[208].replace('[A]', '<a href="/terms" class="red clickurl" tabindex="-1">');
-    l['208.a2'] = l[208].replace('[A]', '<a href="/terms" tabindex="-1">');
-    l['208s'] = l[208].replace('[A]', '<a class="red txt-bold" href="#">');
-    l['208.g'] = l[208].replace('[A]', '<a class="green">');
-    l['208.g2'] = l[208].replace('[A]', '<a href="/terms" class="green clickurl" target="_blank">');
-    l[208] = l[208].replace('[A]', '<a href="/terms" class="clickurl" tabindex="-1">');
-    l[517] = escapeHTML(l[517]).replace(
-        '[A]',
-        '<a href="' + l.mega_help_host + '" class="help-center-link clickurl" target="_blank">'
-    ).replace('[/A]', '</a>');
-    l[1094] = escapeHTML(l[1094]).replace('[A]', '<a href="/extensions" class="clickurl">').replace('[/A]', '</a>');
+    l['208.a2'] = l[208].replace('[A]', '<a href="https://mega.io/terms" tabindex="-1" target="_blank">');
+    l['208s'] = l[208].replace('[A]', '<a href="https://mega.io/terms" class="red txt-bold" target="_blank">');
+    l['208.g'] = l[208].replace('[A]', '<a href="https://mega.io/terms" class="green" target="_blank">');
+    l[208] = l[208].replace('[A]', '<a href="https://mega.io/terms" class="clickurl" tabindex="-1" target="_blank">');
+    l[1094] = escapeHTML(l[1094])
+        .replace('[A]', '<a href="https://mega.io/extensions" target="_blank" class="clickurl">')
+        .replace('[/A]', '</a>');
     l[1095] = escapeHTML(l[1095]).replace('[A]', '<span class="red">').replace('[/A]', '</span>');
-    l[731] = escapeHTML(l[731]).replace('[A]', '<a href="/terms" class="clickurl">').replace('[/A]', '</a>');
-    l[1274] = escapeHTML(l[1274]).replace('[A]', '<a href="/takedown" class="clickurl">').replace('[/A]', '</a>');
-    l[1275] = escapeHTML(l[1275]).replace('[A]', '<a href="/copyright" class="clickurl">').replace('[/A]', '</a>');
+    l[731] = escapeHTML(l[731])
+        .replace('[A]', '<a href="https://mega.io/terms" target="_blank" class="clickurl">')
+        .replace('[/A]', '</a>');
     l[1942] = escapeHTML(l[1942]).replace('[A]', '<a href="/keybackup" class="clickurl">').replace('[/A]', '</a>');
     l[1943] = escapeHTML(l[1943]).replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
     l[1982] = escapeHTML(l[1982]).replace('[A]', '<span class="red">').replace('[/A]', '</span>');
@@ -997,9 +1070,13 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A2]', '<a href="mailto:support@mega.nz">')
         .replace('[/A2]', '</a>');
     l[6976] = escapeHTML(l[6976]).replace('%1', '<span class="plan-name"></span>');
-    l[7156] = escapeHTML(l[7156]).replace('[A]', '<a href="/mobile" class="clickurl">').replace('[/A]', '</a>');
-    l[7202] = escapeHTML(l[7202]).replace('[A]', '<a href="/resellers" class="voucher-reseller-link clickurl">')
-                     .replace('[/A]', '</a>');
+    l[7156] = escapeHTML(l[7156])
+        .replace('[A]', '<a href="https://mega.io/mobile" target="_blank" class="clickurl">')
+        .replace('[/A]', '</a>');
+    l[7202] = escapeHTML(l[7202]).replace(
+        '[A]',
+        '<a href="https://mega.io/resellers" target="_blank" rel="noopener noreferrer" class="voucher-reseller-link">'
+    ).replace('[/A]', '</a>');
     l[7709] = escapeHTML(l[7709]).replace('[S]', '<span class="complete-text">').replace('[/S]', '</span>');
     l[7945] = escapeHTML(l[7945]).replace('[B]', '<b>').replace('[/B]', '</b>');
     l[7991] = escapeHTML(l[7991])
@@ -1008,15 +1085,6 @@ mBroadcaster.once('boot_done', function populate_l() {
 
     l[8436] = escapeHTML(l[8436])
         .replace('[/A]', '</a>').replace('[A]', '<a class="red" href="mailto:support@mega.nz">');
-    l[8440] = escapeHTML(l[8440]).replace('[A]', '<a href="https://github.com/meganz/">').replace('[/A]', '</a>')
-        .replace('[A2]', '<a href="/contact" class="clickurl">').replace('[/A2]', '</a>');
-    l[8441] = escapeHTML(l[8441]).replace('[A]', '<a href="mailto:bugs@mega.nz">').replace('[/A]', '</a>')
-        .replace('[A2]', `<a href="https://blog.mega.io/vulnerability-rewards-the-first-week"  target="_blank">`)
-        .replace('[/A2]', '</a>');
-    l[19310] = escapeHTML(l[19310])
-        .replace('[A]', `<a href="https://blog.mega.io/the-mega-vulnerability-reward-program" target="_blank">`)
-        .replace('[/A]', '</a>');
-
 
     l[8644] = escapeHTML(l[8644]).replace('[S]', '<span class="green">').replace('[/S]', '</span>');
     l[8651] = escapeHTML(l[8651]).replace('%1', '<span class="header-pro-plan"></span>');
@@ -1031,37 +1099,42 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[8855] = escapeHTML(l[8855]).replace('[BR]', '<br>');
     l[8912] = escapeHTML(l[8912]).replace('[B]', '<span>').replace('[/B]', '</span>');
     l[8846] = escapeHTML(l[8846]).replace('[S]', '').replace('[/S]', '');
-    l[8847] = escapeHTML(l[8847]).replace('[S]', '').replace('[/S]', '');
-    l[8950] = escapeHTML(l[8950]).replace('[S]', '<span>').replace('[/S]', '</span>');
-    l[8951] = escapeHTML(l[8951]).replace('[S]', '<span>').replace('[/S]', '</span>');
-    l[8952] = escapeHTML(l[8952]).replace('[S]', '<span>').replace('[/S]', '</span>');
 
-    l[10631] = escapeHTML(l[10631]).replace('[A]',
-        '<a href="https://mega.nz/terms/refunds" target="_blank" rel="noopener noreferrer">').replace('[/A]', '</a>');
-    l[10630] = escapeHTML(l[10630]).replace('[A]',
-        '<a href="https://mega.nz/terms/refunds" target="_blank" rel="noopener noreferrer">').replace('[/A]', '</a>');
+    l[10631] = escapeHTML(l[10631])
+        .replace('[A]', '<a href="https://mega.io/terms/#Refunds" target="_blank" rel="noopener noreferrer">')
+        .replace('[/A]', '</a>');
+
+    const propayLinksAttr = 'target="_blank" class="clickurl" rel="noopener noreferrer"';
+    const recurringPaymentsLink = 'https://mega.io/terms#RecurringPaidSubscriptions';
+    const cancelSubLink = 'https://help.mega.io/plans-storage/payments-billing/cancel-subscription';
+    l[10630] = escapeHTML(l[10630])
+        .replace('[A1]',
+                 `<a ${propayLinksAttr} href="${recurringPaymentsLink}" data-eventid="500371">`)
+        .replace('[A2]',
+                 `<a ${propayLinksAttr} href="https://mega.io/terms#Refunds" data-eventid="500372">`)
+        .replace('[A3]',
+                 `<a ${propayLinksAttr} href="${cancelSubLink}" data-eventid="500373">`)
+        .replace(/\[\/A\d]/g, '</a>');
+
     l[10634] = escapeHTML(l[10634])
-        .replace('[A]', '<a href="https://mega.nz/support" target="_blank" rel="noopener noreferrer">')
+        .replace('[A]', `<a href="https://mega.nz/support" ${propayLinksAttr} data-eventid="500460">`)
         .replace('[/A]', '</a>');
 
     l[10635] = escapeHTML(l[10635]).replace('[B]', '<b>').replace('[/B]', '</b>');
 
     l[12482] = escapeHTML(l[12482]).replace('[B]', '<b>').replace('[/B]', '</b>');
     l[12483] = escapeHTML(l[12483]).replace('[BR]', '<br>');
-    l[12487] = escapeHTML(l[12487]).replace('[A1]', '<a href="" class="red windows">').replace('[/A1]', '</a>')
-        .replace('[A2]', '<a href="" class="red linux">').replace('[/A2]', '</a>');
     l[12488] = escapeHTML(l[12488]).replace('[A]', '<a>').replace('[/A]', '</a>').replace('[BR]', '<br>');
+    l.megasync_upload_wrong_user = escapeHTML(l.megasync_upload_wrong_user).replace(/\[BR]/g, '<br>');
     l[16116] = escapeHTML(l[16116]).replace('[S]', '<span class="red">').replace('[/S]', '</span>');
 
     l.bus_acc_delete_msg = escapeHTML(l.bus_acc_delete_msg)
         .replace('[S]', '<span class="red">').replace('[/S]', '</span>');
 
-    l[16167] = escapeHTML(l[16167]).replace('[A]', '<a href="/mobile" class="clickurl">').replace('[/A]', '</a>');
+    l[16167] = escapeHTML(l[16167])
+        .replace('[A]', '<a href="https://mega.io/mobile" target="_blank" class="clickurl">')
+        .replace('[/A]', '</a>');
     l[16301] = escapeHTML(l[16301]).replace('[S]', '<span class="quota-info-pr-txt-used">').replace('[/S]', '</span>');
-    l[16306] = escapeHTML(l[16306])
-        .replace('[A]', '<a href="/fm/rubbish" class="clickurl gotorub">').replace('[/A]', '</a>');
-    l[16310] = escapeHTML(l[16310])
-        .replace('[A]', '<a href="/fm/dashboard" class="clickurl dashboard-link">').replace('[/A]', '</a>');
     l[16317] = escapeHTML(l[16317]).replace('[S]', '<strong>').replace('[/S]', '</strong>');
     l[16494] = escapeHTML(l[16494]).replace('[S]2[/S]', '%1');
     l[25048] = escapeHTML(l[25048])
@@ -1072,6 +1145,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>');
 
     l[16649] = escapeHTML(l[16649]).replace('%1', '<span class="amount">10.00</span>');
+    l.save_percent = escapeHTML(l.save_percent).replace('%1', '<span class="amount">10%</span>');
     l[16501] = escapeHTML(l[16501]).replace('[A1]', '<a class="red" href="mailto:support@mega.nz">')
         .replace('[/A1]', '</a>')
         .replace(
@@ -1092,28 +1166,29 @@ mBroadcaster.once('boot_done', function populate_l() {
             + '">'
         )
         .replace('[/A3]', '</a>');
-    l[16614] = escapeHTML(l[16614])
-        .replace('[A]', '<a class="red" href="https://thunderbird.net/" target="_blank" rel="noopener noreferrer">')
+    l[16865] = escapeHTML(l[16865])
+        .replace('[A]', '<a href="https://mega.io/desktop" target="_blank" class="clickurl">')
         .replace('[/A]', '</a>');
-    l[16865] = escapeHTML(l[16865]).replace('[A]', '<a href="/desktop" class="clickurl">').replace('[/A]', '</a>');
-    l[16866] = escapeHTML(l[16866]).replace('[A]', '<a href="/desktop" class="clickurl">').replace('[/A]', '</a>');
-    l[16870] = escapeHTML(l[16870]).replace('[A]', '<a href="/desktop" class="clickurl">').replace('[/A]', '</a>');
-    l[16883] = escapeHTML(l[16883]).replace('[A]', '<a href="/desktop" class="clickurl">').replace('[/A]', '</a>');
+    l[16866] = escapeHTML(l[16866])
+        .replace('[A]', '<a href="https://mega.io/desktop" target="_blank" class="clickurl">')
+        .replace('[/A]', '</a>');
+    l[16870] = escapeHTML(l[16870])
+        .replace('[A]', '<a href="https://mega.io/desktop" target="_blank" class="clickurl">')
+        .replace('[/A]', '</a>');
+    l[16883] = escapeHTML(l[16883])
+        .replace('[A]', '<a href="https://mega.io/desktop" target="_blank" class="clickurl">')
+        .replace('[/A]', '</a>');
     l[17793] = escapeHTML(l[17793])
-        .replace('[A1]', '<a href="/desktop" class="clickurl">').replace('[/A1]', '</a>')
-        .replace('[A2]', '<a href="/extensions" class="clickurl">').replace('[/A2]', '</a>')
+        .replace('[A1]', '<a href="https://mega.io/desktop" target="_blank" class="clickurl">')
+        .replace('[/A1]', '</a>')
+        .replace('[A2]', '<a href="https://mega.io/extensions" target="_blank" class="clickurl">')
+        .replace('[/A2]', '</a>')
         .replace('[A3]', '<a class="freeupdiskspace">').replace('[/A3]', '</a>');
-
-    l[17083] = escapeHTML(l[17083])
-        .replace('[A]', '<a href="https://www.microsoft.com/store/apps/9nbs1gzzk3zg" target="_blank">')
-        .replace('[/A]', '</a>');
 
     var linktohelp = l.mega_help_host + '/files-folders/restore-delete/file-version-history';
     l[17097] =  escapeHTML(l[17097])
                 .replace('[A]', '<a id="versionhelp" href="' + linktohelp + '" target="_blank" class="red">')
                 .replace('[/A]', '</a>');
-    l[17690] = escapeHTML(l[17690]).replace('[A]', '<a href="https://mega.nz/recovery" target="_blank" class="red">')
-                       .replace('[/A]', '</a>');
     l[17701] = escapeHTML(l[17701]).replace('[B]', '<b>').replace('[/B]', '</b>');
     l[17742] = escapeHTML(l[17742]).replace('[S]', '<strong>').replace('[/S]', '</strong>');
     l[17805] = escapeHTML(l[17805]).replace('[A]', '<a class="mobile red-email" href="mailto:support@mega.nz">')
@@ -1126,9 +1201,6 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace(/\[\/B\]/g, '</strong>');
 
     l[18638] = escapeHTML(l[18638]).replace(/\[+[1-9B]+]/g, '<b>').replace(/\[\/+[1-9B]+]/g, '</b>');
-    l[18787] = escapeHTML(l[18787])
-        .replace('[A]', '<a href="https://github.com/meganz/MEGAcmd" rel="noreferrer" target="_blank">')
-        .replace('[/A]', '</a>');
     l[19111] = escapeHTML(l[19111])
         .replace('[A]', `<a class="public-contact-link simpletip" data-simpletip="${l[18739]}">`)
         .replace('[/A]', '</a>');
@@ -1142,14 +1214,6 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[19514] = escapeHTML(l[19514]).replace('[A]', '<a href="mailto:support@mega.nz">').replace('[/A]', '</a>')
         .replace('%1', 2)
         .replace('%2', '<span class="user-email"></span>').replace('[B]', '<b>').replace('[/B]', '</b>');
-    l[19661] = escapeHTML(l[19661]).replace(
-        '[A]',
-        '<a href="'
-        + l.mega_help_host
-        + '/installs-apps/desktop-syncing" class="clickurl" rel="noreferrer" target="_blank">'
-    ).replace('[/A]', '</a>');
-    l[19685] = escapeHTML(l[19685]).replace('[S]', '<span class="bold">').replace('[/S]', '</span>');
-    l[19691] = escapeHTML(l[19691]).replace('[S]', '<span class="bold">').replace('[/S]', '</span>');
     l[19834] = escapeHTML(l[19834]).replace('[A]', '<a class="red" href="mailto:support@mega.nz">')
         .replace('[/A]', '</a>');
     l[19835] = escapeHTML(l[19835]).replace('[A]', '<a class="red" href="mailto:support@mega.nz">')
@@ -1162,9 +1226,6 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[19849] = escapeHTML(l[19849]).replace('[A]', '<a class="red clickurl" href="/recovery">').replace('[/A]', '</a>');
     l[19851] = escapeHTML(l[19851]).replace('[B]', '<strong class="warning-text">').replace('[/B]', '</strong>');
     l[19857] = escapeHTML(l[19857]).replace('[BR]', '<br>');
-    l[20015] = escapeHTML(l[20015])
-        .replace('[A]', '<a target="_blank" class="red" rel="noopener noreferrer" href="https://mega.nz/keybackup">')
-        .replace('[/A]', '</a>');
     l[20189] = escapeHTML(l[20189]).replace('[B]', '<b>').replace('[/B]', '</b>');
     l[20192] = escapeHTML(l[20192]).replace('[B]', '<b>').replace('[/B]', '</b>');
     l[20193] = escapeHTML(l[20193]).replace('[B]', '<b>').replace('[/B]', '</b>');
@@ -1177,18 +1238,13 @@ mBroadcaster.once('boot_done', function populate_l() {
 
     // Mobile only
     if (is_mobile) {
-        l[20197] = escapeHTML(l[20197]).replace('[S1]', '<span class="used">').replace('[/S1]', '</span>\n')
-            .replace('[S2]', '')
-            .replace('[/S2]', '\n').replace('[S3]', '<span class="total">').replace('[/S3]', '</span>\n')
-            .replace('$1', '0').replace('$2', '0') + '<br>';
+        l[16306] = escapeHTML(l[16306]).replace('[A]', '<span class="gotorub">').replace('[/A]', '</span>');
         l[20220] = escapeHTML(l[20220]).replace('%1', '<span class="mobile user-number js-user-phone-number"></span>');
     }
     else {
         // Desktop only
-        l[20197] = escapeHTML(l[20197]).replace('[S1]', '<span class="size-txt">').replace('[/S1]', '</span>')
-            .replace('[S2]', '<span class="of-txt">').replace('[/S2]', '</span>\n')
-            .replace('[S3]', '<span class="pecents-txt">').replace('[/S3]', '</span>\n<span class="gb-txt">GB</span>')
-            .replace('$1', '0 MB').replace('$2', '0');
+        l[16306] = escapeHTML(l[16306])
+            .replace('[A]', '<a href="/fm/rubbish" class="clickurl gotorub">').replace('[/A]', '</a>');
     }
 
     l[20223] = escapeHTML(l[20223]).replace('%1', '24');  // 24 hours
@@ -1197,17 +1253,11 @@ mBroadcaster.once('boot_done', function populate_l() {
     if (lang === 'es') {
         l[20217] = escapeHTML(l[20217]).replace(' a:', '&nbsp;a:');
     }
-    l[20552] = escapeHTML(l[20552]).replace('[Br]', '<br>');
-    l[20553] = escapeHTML(l[20553]).replace('[S]', '<strong>').replace('[/S]', '</strong>');
-    l[20588] = escapeHTML(l[20588]).replace('[A]', '<a class="clickurl" href="/security">')
-        .replace('[/A]', '</a>');
-    l[20592] = escapeHTML(l[20592]).replace('[A1]', '').replace('[/A1]', '')
-        .replace('[A2]', '<a target="_blank" rel="noopener noreferrer" href="https://mega.nz/SecurityWhitepaper.pdf">')
-        .replace('[/A2]', '</a>');
-    l[20609] = escapeHTML(l[20609]).replace('[A]', '<a class="clickurl" href="/desktop">').replace('[/A]', '</a>');
     l[20650] = escapeHTML(l[20650]).replace(/\[S]/g, '<span>').replace(/\[\/S]/g, '</span>')
         .replace('[A]', '<a href="/repay" class="clickurl">').replace('[/A]', '</a>');
-    l['20635.a'] = escapeHTML(l[20635]).replace('[A]', '<a class="clickurl" href="/register">').replace('[/A]', '</a>');
+    l['20635.a'] = escapeHTML(l[20635])
+        .replace('[A]', '<a class="clickurl" href="/register" data-eventid="99797">')
+        .replace('[/A]', '</a>');
     l[20635] = escapeHTML(l[20635]).replace('[A]', '<a>').replace('[/A]', '</a>');
     l[20713] = escapeHTML(l[20713]).replace('[B]%1[/B]', '<b>%1</b>');
     l[20714] = escapeHTML(l[20714])
@@ -1216,104 +1266,109 @@ mBroadcaster.once('boot_done', function populate_l() {
     l[20756] = escapeHTML(l[20756]).replace('[S]', '<span>').replace('[/S]', '</span>');
     l[20757] = escapeHTML(l[20757]).replace('[S]', '<span>').replace('[/S]', '</span>');
     l[20759] = escapeHTML(l[20759]).replace('[B]%1[/B]', '<b>%1</b>');
-    l[20846] = escapeHTML(l[20846])
-        .replace('[A]', '<a href="https://mega.nz/linux/repo/" target="_blank" class="download-all-link">')
-        .replace('[/A]', '</a>');
     l[20923] = escapeHTML(l[20923]).replace('[S]', '<span>').replace('[/S]', '</span>');
-    l[20924] = escapeHTML(l[20924]);
-    l[20932] = escapeHTML(l[20932]).replace('[R/]', '<sup>&reg;</sup>');
-    l[20959] = escapeHTML(l[20959]).replace('[A]', '<a class="red" href="https://mega.nz/SecurityWhitepaper.pdf" '
-        + 'target="_blank" rel="noopener noreferrer">')
+    l['20975.b'] = escapeHTML(l[20975])
+        .replace('[B]', '<b class="txt-dark">').replace('[/B]', '</b>')
+        .replace('[A]', '<a href="https://mega.io/security" class="clickurl green" target="_blank">')
         .replace('[/A]', '</a>');
-    l['20975.b'] = escapeHTML(l[20975]).replace('[B]', '<b class="txt-dark">').replace('[/B]', '</b>')
-        .replace('[A]', '<a href="/security" class="clickurl green" target="_blank">').replace('[/A]', '</a>');
     l[20975] = escapeHTML(l[20975]).replace('[B]', '<b class="txt-dark">').replace('[/B]', '</b>')
-        .replace('[A]', '<a href="/security" class="clickurl red txt-bold" target="_blank">').replace('[/A]', '</a>');
+        .replace('[A]', '<a href="https://mega.io/security" class="clickurl red txt-bold" target="_blank">')
+        .replace('[/A]', '</a>');
     l[23748] = escapeHTML(l[23748]).replace('[B]', '<b class="txt-dark">').replace('[/B]', '</b>')
-        .replace('[A]', '<a href="/security" class="clickurl red txt-bold" target="_blank">').replace('[/A]', '</a>');
+        .replace('[A]', '<a href="https://mega.io/security" class="clickurl red txt-bold" target="_blank">')
+        .replace('[/A]', '</a>');
     l[22074] = escapeHTML(l[22074]).replace('[S]', '<span class="purchase">').replace('[/S]', '</span>');
     l[22077] = escapeHTML(l[22077]).replace('[S]', '<span class="green strong">').replace('[S]', '</span>');
-    l[22247] = escapeHTML(l[22247]).replace(/\[S]/g, '<strong>').replace(/\[\/S]/g, '</strong>');
+    l[22248] = escapeHTML(l[22248]).replace(/\[S]/g, '<strong>').replace(/\[\/S]/g, '</strong>');
+    l[22667] = escapeHTML(l[22667])
+        .replace(/\[S]/g, '<span>').replace(/\[\/S]/g, '</span>')
+        .replace('[A]', '<a class="clickurl" href="/pro" data-eventid="500491">')
+        .replace('[/A]', '</a>');
+    l[22668] = escapeHTML(l[22668])
+        .replace(/\[S]/g, '<span>').replace(/\[\/S]/g, '</span>')
+        .replace('[A]', '<a class="clickurl" href="/pro" data-eventid="500490">')
+        .replace('[/A]', '</a>');
     l[22685] = escapeHTML(l[22685]).replace('[B]', '<strong>').replace('[/B]', '</strong>');
-    l[22687] = escapeHTML(l[22687]).replace('[B]', '<strong>').replace('[/B]', '</strong>');
-    l[22688] = escapeHTML(l[22688]).replace('[B]', '<strong>').replace('[/B]', '</strong>');
     l[22689] = escapeHTML(l[22689]).replace('[B]', '<strong>').replace('[/B]', '</strong>');
-    l[22696] = escapeHTML(l[22696]).replace('[A]', '<a class="clickurl" href="/pro">').replace('[/A]', '</a>')
+    l[22696] = escapeHTML(l[22696])
+        .replace('[A]', '<a class="clickurl" href="/pro" data-eventid="500481">').replace('[/A]', '</a>')
         .replace('[S]', '<span class="no-buisness">').replace('[/S]', '</span>');
     l[22700] = escapeHTML(l[22700]).replace('[S]', '<i class="sprite-fm-mono icon-up"></i><span>')
         .replace('[/S]', '</span>').replace('%1', '');
     l[22723] = escapeHTML(l[22723]).replace('[B]', '<strong>').replace('[/B]', '</strong>');
-    l['22725.m'] = escapeHTML(l[22725]).replace('[B]', '<strong>').replace('[/B]', '*</strong>');
-    l[22725] = escapeHTML(l[22725]).replace('[B]', '<strong>').replace('[/B]', '</strong>');
     l['22726.m'] = escapeHTML(l[22726]).replace('[B]', '<strong>').replace('[/B]', '*</strong>');
     l[22726] = escapeHTML(l[22726]).replace('[B]', '<strong>').replace('[/B]', '</strong>');
-    l[22764] = escapeHTML(l[22764]).replace('[S]', '<span class="calc-price-week">').replace('[/S]', '</span>')
-        .replace('%1', '');
-    l['22771.a'] = escapeHTML(l[22771]).replace('[B]', '').replace('[/B]', '');
     l[22771] = escapeHTML(l[22771]).replace('[B]', '<strong>').replace('[/B]', '</strong>');
-    l['22772.a'] = escapeHTML(l[22772]).replace('[B]', '').replace('[/B]', '');
-    l[22772] = escapeHTML(l[22772]).replace('[B]', '<strong>').replace('[/B]', '</strong>');
-    l[22773] = escapeHTML(l[22773]).replace('[B]', '').replace('[/B]', '');
-    l[22786] = escapeHTML(l[22786]).replace('[A]', '<a href="/pro" class="clickurl">').replace('[/A]', '</a>');
-    l[22791] = escapeHTML(l[22791]).replace('[A]', '<a class="to-aff-dash">').replace('[/A]', '</a>');
-    l[22793] = escapeHTML(l[22793]).replace('[A1]', '<a class="clickurl" href="/business">').replace('[/A1]', '</a>')
-        .replace('[A2]', '<a class="clickurl" href="/pro">').replace('[/A2]', '</a>');
-    l[22795] = escapeHTML(l[22795]).replace('[A]', '<a class="to-aff-dash">').replace('[/A]', '</a>')
-        .replace(/\[BR]/g, '<br/>');
-    l[22796] = escapeHTML(l[22796]).replace('[A]', '<a href="/contact" class="clickurl" target="_blank">')
-        .replace('[/A]', '</a>');
-    l[22882] = escapeHTML(l[22882]).replace('[A]', '<a class="clickurl" href="/pro">').replace('[/A]', '</a>')
-        .replace('[S]', '<span class="no-buisness">').replace('[/S]', '</span>')
-        .replace('[B]', '<b>').replace('[/B]', '</b>');
-    l[22898] = escapeHTML(l[22898]).replace('[A]', '<a class="clickurl" href="/mobile">').replace('[/A]', '</a>')
+    l[22898] = escapeHTML(l[22898]).replace('[A]', '<a class="clickurl" href="https://mega.io/mobile" target="_blank">')
+        .replace('[/A]', '</a>')
         .replace('[BR]', '<br>');
     l[22900] = escapeHTML(l[22900]).replace('[A]', '<a class="reg-success-change-email-btn">').replace('[/A]', '</a>');
     l['23062.k'] = escapeHTML(l[23062]).replace('[%s]', l[7049]);
-    l[23067] = escapeHTML(l[23067]).replace('[S]', '<span class="num">').replace('[/S]', '</span>')
-        .replace('%1', '<span></span>');
-    l[23068] = escapeHTML(l[23068]).replace('[S]', '<span class="num">').replace('[/S]', '</span>')
-        .replace('%1', '<span></span>');
-    l[23069] = escapeHTML(l[23069]).replace('[S]', '<span class="num">').replace('[/S]', '</span>')
-        .replace('%1', '<span></span>');
-    l.about_countries_info_text = escapeHTML(l.about_countries_info_text)
-        .replace('[S]', '<span class="num">').replace('[/S]', '</span>')
-        .replace('%1', '<span></span>');
-    l[23120] = escapeHTML(l[23120].replace(/&quot;|"/g, '%1')).replace(/%1/g, '"');
-    l[23126] = escapeHTML(l[23126].replace(/&quot;|"/g, '%1')).replace(/\[BR]/g, '<br/>').replace(/%1/g, '"');
-    l[23181] = escapeHTML(l[23181].replace(/&quot;|"/g, '%1')).replace(/%1/g, '"')
-        .replace('[A]', '<a class="clickurl" href="/terms" target="_blank">')
-        .replace('[/A]', '</a>');
-    l['23181.d'] = l[23181]
+    let referral_program_rules = '';
+    const breaks = '[BR][BR]';
+    const referralProgramStrings = [
+        l.referral_program_rules_p0,
+        '[BR]',
+        l.referral_program_rules_l0,
+        l.referral_program_rules_l1,
+        l.referral_program_rules_l2,
+        '[BR]',
+        l.referral_program_rules_p1,
+        breaks,
+        l.referral_program_rules_p2,
+        breaks,
+        l.referral_program_rules_p3,
+        breaks,
+        l.referral_program_rules_p4,
+        breaks,
+        l.referral_program_rules_p5,
+        breaks,
+        l.referral_program_rules_p6,
+        breaks,
+        l.referral_program_rules_p7,
+        breaks,
+        l.referral_program_rules_p8,
+        breaks,
+        l.referral_program_rules_p9,
+        breaks,
+        l.referral_program_rules_p10,
+        breaks,
+        l.referral_program_rules_p11,
+        breaks,
+        l.referral_program_rules_p12,
+        breaks,
+        l.referral_program_rules_p13,
+        breaks,
+        l.referral_program_rules_p14,
+        breaks,
+        l.referral_program_rules_p15,
+        breaks,
+        l.referral_program_rules_p16,
+        breaks,
+        l.referral_program_rules_p17
+    ];
+    for (let i = 0; i < referralProgramStrings.length; i++){
+        referral_program_rules += referralProgramStrings[i];
+    }
+    l['referral_program_rules.d'] = escapeHTML(referral_program_rules)
         .replace(/\[P]/g, '').replace(/\[\/P]/g, '')
         .replace(/\[L]/g, '<i class="sprite-fm-mono icon-check"></i><div class="affiliate-guide info">')
         .replace(/\[\/L]/g, '</div>')
-        .replace(/\[BLOCK]/g, '').replace(/\[\/BLOCK]/g, '').replace(/\[BR]/g, '<br>');
-    l['23181.m'] = l[23181]
+        .replace(/\[BR]/g, '<br>')
+        .replace(/\[A]/g, '<a class="clickurl" href="https://mega.io/terms" target="_blank">')
+        .replace(/\[\/A]/g, '</a>');
+    l['referral_program_rules.m'] = escapeHTML(referral_program_rules)
         .replace(/\[P]/g, '<div class="mobile button-block no-bg"><div class="mobile label-info no-icon">')
         .replace(/\[\/P]/g, '</div></div>')
         .replace(/\[L]/g, '<div class="mobile button-block no-bg"><div class="mobile fm-icon green-tick">' +
             '</div><div class="mobile label-info">').replace(/\[\/L]/g, '</div></div>')
-        .replace(/\[BLOCK]/g, '').replace(/\[\/BLOCK]/g, '').replace(/\[BR]/g, '');
-    l[23181] = l[23181]
-        .replace(/\[P]/g, '').replace(/\[\/P]/g, '')
-        .replace(/\[L]/g, '<div class="bottom-page list-item">' +
-            '<i class="bottom-page icon x12 new-pages-sprite tick"></i>').replace(/\[\/L]/g, '</div>')
-        .replace(/\[BR]/g, '<br>')
-        .replace(/\[BLOCK]/g, '<div class="inline-block col-2 affiliate-list"><div class="bottom-page fadein list">')
-        .replace(/\[\/BLOCK]/g, '</div></div>');
+        .replace(/\[BR]/g, '')
+        .replace(/\[A]/g, '<a class="clickurl" href="https://mega.io/terms" target="_blank">')
+        .replace(/\[\/A]/g, '</a>');
     l[23214] = escapeHTML(l[23214]).replace('[A]', '<a class="fm-affiliate guide-dialog to-rules">')
         .replace('[/A]', '</a>');
-    l[23243] = escapeHTML(l[23243]).replace('[A]', '<a href="/terms" class="clickurl">').replace('[/A]', '</a>');
-    l[23263] = escapeHTML(l[23263]).replace('[A]', '<a>').replace('[/A]', '</a>');
-    l[23332] = escapeHTML(l[23332]).replace('[A1]', '<a href="/cmd" target="_blank" class="clickurl">')
-        .replace('[/A1]', '</a>')
-        .replace('[A2]', '<a class="link-qnap" href="https://www.qnap.com/en/app_center/' +
-            '?qts=4.3&kw=megacmd&type_choose=&cat_choose=" target="_blank" rel="noopener noreferrer">')
-        .replace('[/A2]', '</a>')
-        .replace('[A3]', '<a class="link-synology" href="https://www.synology.com/en-nz/dsm/packages/MEGAcmd' +
-            '" target="_blank" rel="noopener noreferrer">')
-        .replace('[/A3]', '</a>');
-    l[23354] = escapeHTML(l[23354]).replace('[A]', '<a href="/pro" class="clickurl">')
+    l[23243] = escapeHTML(l[23243])
+        .replace('[A]', '<a href="https://mega.io/terms" class="clickurl" target="_blank">')
         .replace('[/A]', '</a>');
     l[23370] = escapeHTML(l[23370]).replace('[A]', '<a class="mailto" href="mailto:support@mega.nz">')
         .replace('[/A]', '</a>');
@@ -1323,35 +1378,15 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A]', '</a>');
     l[23373] = escapeHTML(l[23373]).replace('[A]', '<a class="mailto" href="mailto:support@mega.nz">')
         .replace('[/A]', '</a>');
-    l[23376] = escapeHTML(l[23376]).replace('[A]', '<a href="/security" class="clickurl" target="_blank">')
-        .replace('[/A]', '</a>');
-    l[24074] = escapeHTML(l[24074]).replace('[A]', '<a>').replace('[/A]', '</a>');
-    l[24141] = escapeHTML(l[24141])
-        .replace(
-            '[A]',
-            `<a class="red" href="https://blog.mega.io/mega-adds-two-factor-authentication" target="_blank">`)
-        .replace('[/A]', '</a>');
     l[24431] = escapeHTML(l[24431]).replace('[A]', '<a href="/repay" class="clickurl">').replace('[/A]', '</a>')
         .replace('[S]', '<span>').replace('[/S]', '</span>');
-    l[24440] = escapeHTML(l[24440]).replace('[B]', '<strong>').replace('[/B]', '</strong>');
-    l[24408] = escapeHTML(l[24408]).replace('[A]', '<a href="/fm" class="clickurl">').replace('[/A]', '</a>');
-    l[24409] = escapeHTML(l[24409]).replace('[A]', '<a href="/register" class="clickurl">').replace('[/A]', '</a>');
-    l[24547] = escapeHTML(l[24547]).replace('[A1]', '<a target="_blank" href="/sourcecode" class="clickurl">')
-        .replace('[/A1]', '</a>')
-        .replace('[A2]', '<a target="_blank" href="/security" class="clickurl">')
-        .replace('[/A2]', '</a>')
-        .replace(/\[S]/g, '<span>').replace(/\[\/S]/g, '</span>')
-        .replace(/\[BR]/g, '<br/>');
     l[24708] = escapeHTML(l[24708]).replace('%s', '" * / : < > ? \\ |');
     l[24852] = escapeHTML(l[24852])
         .replace('[A]', '<a target="_blank" class="green-link" href="https://blog.mega.io">')
         .replace('[/A]', '</a>');
     l.achievem_dialogfootertext = escapeHTML(l.achievem_dialogfootertext)
-        .replace('[A]', '<a href="/pro" class="clickurl">')
+        .replace('[A]', '<a href="/pro" class="clickurl" data-eventid="500480">')
         .replace('[/A]', '</a>');
-    l.achievem_pagedesc = escapeHTML(l.achievem_pagedesc)
-        .replace('[S]', '<span>')
-        .replace('[/S]', '</span>');
     l.achievem_storagetitle = escapeHTML(l.achievem_storagetitle)
         .replace('[S]', '<span>')
         .replace('[/S]', '</span>');
@@ -1367,33 +1402,6 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[S]', '<span>')
         .replace('[/S]', '</span>')
         .replace('%1', '');
-    l.bsn_plan_users = escapeHTML(l.bsn_plan_users).replace('%1', '<span></span>');
-    l.bsn_plan_storage = escapeHTML(l.bsn_plan_storage).replace('%1', '<span></span>');
-    l.bsn_plan_transfer = escapeHTML(l.bsn_plan_transfer).replace('%1', '<span></span>');
-    l.bsn_plan_more_users = escapeHTML(l.bsn_plan_more_users)
-        .replace('[B]', '<strong>')
-        .replace('[/B]', '</strong>')
-        .replace('%1', '');
-    l.bsn_plan_more_storage = escapeHTML(l.bsn_plan_more_storage)
-        .replace('[B]', '<strong>')
-        .replace('[/B]', '</strong>')
-        .replace('%1', '');
-    l.bsn_plan_more_transfer = escapeHTML(l.bsn_plan_more_transfer)
-        .replace('[B]', '<strong>')
-        .replace('[/B]', '</strong>')
-        .replace('%1', '');
-    l.bsn_versioning_info = escapeHTML(l.bsn_versioning_info)
-        .replace('[S]', '<span>')
-        .replace('[/S]', '</span>')
-        .replace('[BR]', '<br>');
-    l.bsn_backup_info = escapeHTML(l.bsn_backup_info)
-        .replace('[S]', '<span>')
-        .replace('[/S]', '</span>')
-        .replace('[BR]', '<br>');
-    l.bsn_meetings_info = escapeHTML(l.bsn_meetings_info)
-        .replace('[S]', '<span>')
-        .replace('[/S]', '</span>')
-        .replace('[BR]', '<br>');
     l.onboard_v4_control_finished = escapeHTML(l.onboard_v4_control_finished)
         .replace('[S]', '<span>').replace('[/S]', '</span>')
         .replace(
@@ -1429,77 +1437,23 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.redeem_etoomany = escapeHTML(l.redeem_etoomany)
         .replace('[A]', `<a class="clickurl" href="/support">`)
         .replace('[/A]', '</a>');
-    l.extensions_top_btn_info = escapeHTML(l.extensions_top_btn_info).replace(/\[R\/]/g, '<sup>&reg;</sup>');
-    l.extensions_avbl_desktop = escapeHTML(l.extensions_avbl_desktop).replace('[A1]', '<a href="" class="red a1"></a>');
-    l.extensions_avbl_mobile = escapeHTML(l.extensions_avbl_mobile).replace(/\[S]/g, '<strong>')
-        .replace(/\[\/S]/g, '</strong>');
-    l.copy_to_my_backups = escapeHTML(l.copy_to_my_backups)
-        .replace('[A]', '<a>').replace('[/A]', '</a>');
     l.backup_read_only_wrng = escapeHTML(l.backup_read_only_wrng)
         .replace('[S]', '<span>')
         .replace('[/S]', '</span>');
     l.cookie_banner_txt = escapeHTML(l.cookie_banner_txt)
         .replace('[A]', '<a href="/cookie" class="clickurl" target="_blank">')
         .replace('[/A]', '</a>');
-    l.payment_card_almost_exp = escapeHTML(l.payment_card_almost_exp)
-        .replace('[A]', '<a>').replace('[/A]', '</a>');
-    l.payment_card_exp = escapeHTML(l.payment_card_exp)
-        .replace('[A]', '<a>').replace('[/A]', '</a>');
+    l.cookie_banner_txt_upd_cookies = escapeHTML(l.cookie_banner_txt_upd_cookies)
+        .replace('[A]', '<a href="/cookie" class="clickurl" target="_blank">')
+        .replace('[/A]', '</a>');
     l.backup_pcs_info = escapeHTML(l.backup_pcs_info)
         .replace('[A]', '<a>').replace('[/A]', '</a>');
     l.backup_mobiles_info = escapeHTML(l.backup_mobiles_info)
         .replace('[A]', '<a>').replace('[/A]', '</a>');
 
-    l.ri_s4_header = escapeHTML(l.ri_s4_header)
-        .replace('[A1]', '<h1>')
-        .replace('[/A1]', '</h1>')
-        .replace('[A2]', '<h2>')
-        .replace('[/A2]', '</h2>');
-    l.ri_s4_subheader = escapeHTML(l.ri_s4_subheader)
-        .replace('%1', '&#8364 1,000')
-        .replace('[B]', '<strong>')
-        .replace('[/B]', '</strong>');
-    l.ri_s4_card1_desc = escapeHTML(l.ri_s4_card1_desc)
-        .replace('[B]', '<strong>')
-        .replace('[/B]', '</strong>');
-    l.ri_s4_card3_desc = escapeHTML(l.ri_s4_card3_desc)
-        .replace('[B]', '<strong>')
-        .replace('[/B]', '</strong>');
-    l.ri_s4_card4_desc = escapeHTML(l.ri_s4_card4_desc)
-        .replace('%1', '&#8364 2.99')
-        .replace('[B]', '<strong>')
-        .replace('[/B]', '</strong>');
-    l.ri_s4_card5_desc = escapeHTML(l.ri_s4_card5_desc)
-        .replace('[B]', '<strong>')
-        .replace('[/B]', '</strong>');
-    l.ri_s4_betat_header = escapeHTML(l.ri_s4_betat_header)
-        .replace('%1', '&#8364 1,000');
-    l.ri_s4_regf_q6_ans1 = escapeHTML(l.ri_s4_regf_q6_ans1)
-        .replace('[B]', '<strong>')
-        .replace('[/B]', '</strong>');
-    l.ri_s4_regf_q6_ans2 = escapeHTML(l.ri_s4_regf_q6_ans2)
-        .replace('[B]', '<strong>')
-        .replace('[/B]', '</strong>');
-    l.ri_s4_regf_success = escapeHTML(l.ri_s4_regf_success)
-        .replace('[BR]', '<br>');
-    l.about_vision_desc = escapeHTML(l.about_vision_desc)
-        .replace(/\[S]/g, '<span>')
-        .replace(/\[\/S]/g, '</span>');
-    l.about_vision_title = escapeHTML(l.about_vision_title)
-        .replace(/\[S]/g, '<span>')
-        .replace(/\[\/S]/g, '</span>');
-    l.about_contributors = escapeHTML(l.about_contributors)
-        .replace(/\[S]/g, '<span>')
-        .replace(/\[\/S]/g, '</span>');
-    // cant reduce size
-    l.jobs_opportunity_invert_card_desc = escapeHTML(l.jobs_opportunity_invert_card_desc)
-        .replace(/\[BR]/g, '<br>');
-    l.jobs_grow_invert_card_desc = escapeHTML(l.jobs_grow_invert_card_desc)
-        .replace('[BR]', '<br>');
-    l.about_job_expressions_txt = escapeHTML(l.about_job_expressions_txt)
-        .replace('[BR]', '<br>');
     ['empty_call_dlg_text', 'empty_call_dlg_text_min', 'empty_call_dlg_text_sec'].forEach(s => {
-        l[s] = escapeHTML(l[s])
+        // Prevent double escaping
+        l[s] = escapeHTML(`${l[s]}`.replace(/&gt;/g, '>'))
             .replace(/\[S1]/g, '<span class="stay-dlg-counter">')
             .replace(/\[\/S1]/g, '</span>')
             .replace(/\[S2]/g, '<div class="stay-dlg-subtext">')
@@ -1523,6 +1477,60 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.contact_support_email = escapeHTML(l.contact_support_email)
         .replace('[A]', '<a class="mailto" href="mailto:support@mega.nz">')
         .replace('[/A]', '</a>');
+    l.s4_url_obj_level_subtxt = escapeHTML(l.s4_url_obj_level_subtxt)
+        .replace(
+            '[A]',
+            `<a class="clickurl" target="_blank" href="${l.mega_help_host}`
+            + `/megas4/s4-buckets/change-bucket-object-url-access">`
+        ).replace('[/A]', '</a>');
+    l.s4_url_grant_subtxt = escapeHTML(l.s4_url_grant_subtxt)
+        .replace(
+            '[A]',
+            `<a class="clickurl" target="_blank" href="${l.mega_help_host}`
+            + `/megas4/s4-buckets/change-bucket-object-url-access">`
+        ).replace('[/A]', '</a>');
+    l.s4_url_deny_subtxt = escapeHTML(l.s4_url_deny_subtxt)
+        .replace(
+            '[A]',
+            `<a class="clickurl" target="_blank" href="${l.mega_help_host}`
+            + `/megas4/s4-buckets/change-bucket-object-url-access">`
+        ).replace('[/A]', '</a>');
+    l.s4_invalid_bucket_name = escapeHTML(l.s4_invalid_bucket_name)
+        .replace(
+            '[A]',
+            `<a class="clickurl" target="_blank" href="${l.mega_help_host}`
+            + `/megas4/s4-buckets/bucket-naming-conventions">`
+        ).replace('[/A]', '</a>');
+    l.s4_bkt_access_granted_tip = escapeHTML(l.s4_bkt_access_granted_tip)
+        .replace(
+            '[A]',
+            `<a class="clickurl" target="_blank" href="${l.mega_help_host}`
+            + `/megas4/s4-buckets/change-bucket-object-url-access">`
+        ).replace('[/A]', '</a>');
+    l.s4_bkt_access_denied_tip = escapeHTML(l.s4_bkt_access_denied_tip)
+        .replace(
+            '[A]',
+            `<a class="clickurl" target="_blank" href="${l.mega_help_host}`
+            + `/megas4/s4-buckets/change-bucket-object-url-access">`
+        ).replace('[/A]', '</a>');
+    l.s4_bkt_access_origin_tip = escapeHTML(l.s4_bkt_access_origin_tip)
+        .replace(
+            '[A]',
+            `<a class="clickurl" target="_blank" href="${l.mega_help_host}`
+            + `/megas4/s4-buckets/change-bucket-object-url-access">`
+        ).replace('[/A]', '</a>');
+    l.s4_obj_access_granted_tip = escapeHTML(l.s4_obj_access_granted_tip)
+        .replace(
+            '[A]',
+            `<a class="clickurl" target="_blank" href="${l.mega_help_host}`
+            + `/megas4/s4-buckets/change-bucket-object-url-access">`
+        ).replace('[/A]', '</a>');
+    l.s4_obj_access_denied_tip = escapeHTML(l.s4_obj_access_denied_tip)
+        .replace(
+            '[A]',
+            `<a class="clickurl" target="_blank" href="${l.mega_help_host}`
+            + `/megas4/s4-buckets/change-bucket-object-url-access">`
+        ).replace('[/A]', '</a>');
     l.pro_flexi_expired_banner = escapeHTML(l.pro_flexi_expired_banner)
         .replace('[A]', '<a href="/repay" class="clickurl">').replace('[/A]', '</a>')
         .replace('[S]', '<span>').replace('[/S]', '</span>');
@@ -1532,33 +1540,335 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.transfer_quota_pct = escapeHTML(l.transfer_quota_pct).replace('[S]', '<span>').replace('[/S]', '</span>');
     l.pr_I_III_365_days = escapeHTML(l.pr_I_III_365_days).replace("[S]", "<span>").replace("[/S]", "</span>");
     l.pr_lite_90_days = escapeHTML(l.pr_lite_90_days).replace("[S]", "<span>").replace("[/S]", "</span>");
+    l.pr_save_tip = escapeHTML(l.pr_save_tip).replace('[S]', '<span>').replace('[/S]', '</span>');
     l.emoji_suggestion_instruction = escapeHTML(l.emoji_suggestion_instruction)
         .replace(/\[S]/g, '<strong>')
         .replace(/\[\/S]/g, '</strong>')
         .replace('[i1]', '<i class="small-icon tab-icon"></i>')
         .replace('[i2]', '<i class="small-icon enter-icon left-pad"></i>');
 
-    l.file_request_upload_empty = l.file_request_upload_empty
+    l.file_request_upload_empty = escapeHTML(l.file_request_upload_empty)
         .replace('[A]', '<a class="upload-btn block-empty-upload-link" href="#">')
         .replace('[/A]', '</a>');
-    l.file_request_upload_caption_2 = l.file_request_upload_caption_2
-        .replace('[A]', '<a target="_blank" href="https://help.mega.io/files-folders/sharing/file-request">')
+    l.file_request_upload_caption_2 = escapeHTML(l.file_request_upload_caption_2)
+        .replace('[A]', '<a target="_blank" href="https://help.mega.io/files-folders/sharing/upload-file-request">')
+        .replace('[/A]', '</a>');
+    l.redemption_support_email = escapeHTML(l.redemption_support_email)
+        .replace('[S]', '<span>').replace('[/S]', '</span>');
+    l.estimated_price_text_min_50 = escapeHTML(l.estimated_price_text_min_50)
+        .replace('[S]', '<span>').replace('[/S]', '</span>');
+
+    // TODO: Combine all of these limited dl strings to be done at once in a new array?
+    l.dl_limited_tq_mini = escapeHTML(l.dl_limited_tq_mini)
+        .replace('[A]',
+                 `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
+        .replace('[/A]', '</a>')
+        .replace('[S1]', '<span>')
+        .replace('[S2]', '<span class="get-more-quota">')
+        .replace('[S3]', '<span class="learn-more">')
+        .replace(/\[\/S\d]/g, '</span>');
+    l.dl_limited_tq_free = escapeHTML(l.dl_limited_tq_free)
+        .replace('[A]',
+                 `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
+        .replace('[/A]', '</a>')
+        .replace('[S1]', '<span>')
+        .replace('[S2]', '<span class="get-more-quota">')
+        .replace('[S3]', '<span class="learn-more">')
+        .replace(/\[\/S\d]/g, '</span>');
+
+    l.dl_tq_exceeded_mini = escapeHTML(l.dl_tq_exceeded_mini)
+        .replace('[A]',
+                 `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
+        .replace('[/A]', '</a>')
+        .replace('[S1]', '<span>')
+        .replace('[S2]', '<span class="get-more-quota">')
+        .replace('[S3]', '<span class="upgrade-option">')
+        .replace('[S4]', '<span class="bullet-separator">')
+        .replace('[S5]', '<span class="wait-option">')
+        .replace('[S6]', '<span class="countdown hidden">')
+        .replace('[S7]', '<span class="learn-more">')
+        .replace(/\[\/S\d]/g, '</span>');
+    l.dl_tq_exceeded_free = escapeHTML(l.dl_tq_exceeded_free)
+        .replace('[A]',
+                 `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
+        .replace('[/A]', '</a>')
+        .replace('[S1]', '<span>')
+        .replace('[S2]', '<span class="get-more-quota">')
+        .replace('[S3]', '<span class="upgrade-option">')
+        .replace('[S4]', '<span class="bullet-separator">')
+        .replace('[S5]', '<span class="wait-option">')
+        .replace('[S6]', '<span class="countdown hidden">')
+        .replace('[S7]', '<span class="learn-more">')
+        .replace(/\[\/S\d]/g, '</span>');
+    l.dl_tq_exceeded_pro = escapeHTML(l.dl_tq_exceeded_pro)
+        .replace('[A]',
+                 `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
+        .replace('[/A]', '</a>')
+        .replace('[S1]', '<span>')
+        .replace('[S2]', '<span>')
+        .replace('[S3]', '<span class="learn-more">')
+        .replace(/\[\/S\d]/g, '</span>');
+    l.dl_tq_exceeded_pro3 = escapeHTML(l.dl_tq_exceeded_pro3)
+        .replace('[A]',
+                 `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
+        .replace('[/A]', '</a>')
+        .replace('[S1]', '<span>')
+        .replace('[S2]', '<span>')
+        .replace('[S3]', '<span class="learn-more">')
+        .replace(/\[\/S\d]/g, '</span>');
+
+    l.stream_media_tq_exceeded_mini = escapeHTML(l.stream_media_tq_exceeded_mini)
+        .replace('[A]',
+                 `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
+        .replace('[/A]', '</a>')
+        .replace('[S1]', '<span>')
+        .replace('[S2]', '<span class="get-more-quota">')
+        .replace('[S3]', '<span class="upgrade-option">')
+        .replace('[S4]', '<span class="bullet-separator">')
+        .replace('[S5]', '<span>')
+        .replace('[S6]', '<span class="countdown hidden">')
+        .replace('[S7]', '<span class="learn-more">')
+        .replace(/\[\/S\d]/g, '</span>');
+    l.stream_media_tq_exceeded_free = escapeHTML(l.stream_media_tq_exceeded_free)
+        .replace('[A]',
+                 `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
+        .replace('[/A]', '</a>')
+        .replace('[S1]', '<span>')
+        .replace('[S2]', '<span class="get-more-quota">')
+        .replace('[S3]', '<span class="upgrade-option">')
+        .replace('[S4]', '<span class="bullet-separator">')
+        .replace('[S5]', '<span>')
+        .replace('[S6]', '<span class="countdown hidden">')
+        .replace('[S7]', '<span class="learn-more">')
+        .replace(/\[\/S\d]/g, '</span>');
+    l.stream_media_tq_exceeded_pro = escapeHTML(l.stream_media_tq_exceeded_pro)
+        .replace('[A]',
+                 `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
+        .replace('[/A]', '</a>')
+        .replace('[S1]', '<span>')
+        .replace('[S2]', '<span class="get-more-quota">')
+        .replace('[S3]', '<span class="learn-more">')
+        .replace(/\[\/S\d]/g, '</span>');
+    l.stream_media_tq_exceeded_pro3 = escapeHTML(l.stream_media_tq_exceeded_pro3)
+        .replace('[A]',
+                 `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
+        .replace('[/A]', '</a>')
+        .replace('[S1]', '<span>')
+        .replace('[S2]', '<span class="get-more-quota">')
+        .replace('[S3]', '<span class="learn-more">')
+        .replace(/\[\/S\d]/g, '</span>');
+
+    l.streaming_tq_exc_mini_desktop = escapeHTML(l.streaming_tq_exc_mini_desktop)
+        .replace('[A]',
+                 `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
+        .replace('[/A]', '</a>')
+        .replace('[S1]', '<span>')
+        .replace('[S2]', '<span class="upgrade-option">')
+        .replace('[S3]', '<span>')
+        .replace('[S4]', '<span class="countdown hidden">')
+        .replace('[S5]', '<span class="learn-more">')
+        .replace(/\[\/S\d]/g, '</span>');
+    l.streaming_tq_exc_free_desktop = escapeHTML(l.streaming_tq_exc_free_desktop)
+        .replace('[A]',
+                 `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
+        .replace('[/A]', '</a>')
+        .replace('[S1]', '<span>')
+        .replace('[S2]', '<span class="upgrade-to-pro">')
+        .replace('[S3]', '<span>')
+        .replace('[S4]', '<span class="countdown hidden">')
+        .replace('[S5]', '<span class="learn-more">')
+        .replace(/\[\/S\d]/g, '</span>');
+
+    l.dl_tq_exc_mini_desktop = escapeHTML(l.dl_tq_exc_mini_desktop)
+        .replace('[A]',
+                 `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
+        .replace('[/A]', '</a>')
+        .replace('[S1]', '<span>')
+        .replace('[S2]', '<span class="upgrade-option">')
+        .replace('[S3]', '<span>')
+        .replace('[S4]', '<span class="countdown hidden">')
+        .replace('[S5]', '<span class="learn-more">')
+        .replace(/\[\/S\d]/g, '</span>');
+    l.dl_tq_exc_free_desktop = escapeHTML(l.dl_tq_exc_free_desktop)
+        .replace('[A]',
+                 `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
+        .replace('[/A]', '</a>')
+        .replace('[S1]', '<span>')
+        .replace('[S2]', '<span>')
+        .replace('[S3]', '<span>')
+        .replace('[S4]', '<span class="countdown hidden">')
+        .replace('[S5]', '<span class="learn-more">')
+        .replace(/\[\/S\d]/g, '</span>');
+    l.dl_tq_exceeded_more_mini = escapeHTML(l.dl_tq_exceeded_more_mini)
+        .replace('[A]',
+                 `<a target="_blank" href="https://help.mega.io/plans-storage/space-storage/transfer-quota">`)
+        .replace('[/A]', '</a>')
+        .replace('[S1]', '<span>')
+        .replace('[S2]', '<span>')
+        .replace('[S3]', '<span>')
+        .replace(/\[\/S\d]/g, '</span>');
+
+    l.manage_link_export_link_text = escapeHTML(l.manage_link_export_link_text)
+        .replace('[A]', '<a target="_blank" href="https://help.mega.io/files-folders/sharing/encrypted-links">')
+        .replace('[/A]', '</a>');
+    l.terms_dialog_text = escapeHTML(l.terms_dialog_text)
+        .replace('[A]', '<a href="https://mega.io/terms" target="_blank" rel="noopener noreferrer">')
+        .replace('[/A]', '</a>');
+    l.browser_memory_full = escapeHTML(l.browser_memory_full)
+        .replace('[A]', '<a class="anchor-link" href="mailto:support@mega.nz">')
         .replace('[/A]', '</a>');
 
+    const megaLiteHelpCenterLink = 'https://help.mega.io/files-folders/view-move/mega-lite';
+    l.in_mega_lite_mode_banner = escapeHTML(l.in_mega_lite_mode_banner)
+        .replace('[A]', `<a class="clickurl" href="${megaLiteHelpCenterLink}" target="_blank">`)
+        .replace('[/A]', '</a>');
+
+    l.blocked_rsn_terminated = escapeHTML(l.blocked_rsn_terminated)
+        .replace('[A]', '<a href="https://mega.io/terms" target="_blank" rel="noopener noreferrer">')
+        .replace('[/A]', '</a>')
+        .replace('[BR]', '<br><br>');
+    l.blocked_rsn_copyright = escapeHTML(l.blocked_rsn_copyright).replace('[BR]', '<br><br>');
+
+    const faqLink = 'https://help.mega.io/plans-storage/space-storage/transfer-quota';
+    const faqLinkAttr = 'target="_blank" class="clickurl" rel="noopener noreferrer"';
+    l.pricing_page_faq_answer_1 = escapeHTML(l.pricing_page_faq_answer_1)
+        .replace('[A]', `<a ${faqLinkAttr} href="${faqLink}" data-eventid="500346">`)
+        .replace('[/A]', '</a>');
+    l.pricing_page_faq_answer_3 = escapeHTML(l.pricing_page_faq_answer_3)
+        .replace('[A]', `<a ${faqLinkAttr} href="${faqLink}" data-eventid="500349">`)
+        .replace('[/A]', '</a>');
+
+    const welcDialogURL = '/fm/account/plan/purchase-history';
+    l.welcome_dialog_active_check = escapeHTML(l.welcome_dialog_active_check)
+        .replace('[A]', `<a class="clickurl" href="${welcDialogURL}" target="_self" rel="noopener noreferrer">`)
+        .replace('[/A]', '</a>');
+    const recoveryKeyLink = 'https://help.mega.io/accounts/password-management/recovery-key';
+    l.password_changed_more_info = escapeHTML(l.password_changed_more_info)
+        .replace('[A]', `<a class="anchor-link" href="${recoveryKeyLink}" target="_blank" rel="noopener noreferrer">`)
+        .replace('[/A]', '</a>');
+    l.s4_voucher_terms = escapeHTML(l.s4_voucher_terms)
+        .replace('[A]', '<a class="clickurl" href="https://mega.io/s4-terms" target="_blank">')
+        .replace('[/A]', '</a>');
+
+    const rewindHelpLink = 'https://help.mega.io/files-folders/rewind/how-do-i-use-rewind';
+    const rewindLinkAttr = 'target="_blank" class="clickurl" rel="noopener noreferrer"';
+    l.rewind_upg_content_free = escapeHTML(l.rewind_upg_content_free)
+        .replace('[A]', `<a ${rewindLinkAttr} href="${rewindHelpLink}">`)
+        .replace('[/A]', '</a>')
+        .replace('[BR]', '<br />');
+    l.rewind_upg_content_pro_lite = escapeHTML(l.rewind_upg_content_pro_lite)
+        .replace('[A]', `<a ${rewindLinkAttr} href="${rewindHelpLink}">`)
+        .replace('[/A]', '</a>')
+        .replace('[BR]', '<br />');
+    l.rewind_upg_content_pro_flexi = escapeHTML(l.rewind_upg_content_pro_flexi)
+        .replace('[A]', `<a ${rewindLinkAttr} href="${rewindHelpLink}">`)
+        .replace('[/A]', '</a>')
+        .replace('[BR]', '<br />');
+
+    l.two_fa_download_app = escapeHTML(l.two_fa_download_app)
+        .replace('[A]', '<a href="">')
+        .replace('[/A]', '</a>');
+
+    l.recovery_key_blurb = escapeHTML(l.recovery_key_blurb)
+        .replace('[A]', `<a href="${recoveryKeyLink}" target="_blank">`)
+        .replace('[/A]', '</a>')
+        .replace('[S1]', '<span>')
+        .replace('[S2]', '<span class="hc-article-link">')
+        .replace(/\[\/S\d]/g, '</span>');
+
+    l.want_more_storage_prompt = escapeHTML(l.want_more_storage_prompt)
+        .replace('[A]', '<a class="clickurl" href="/pro" target="_blank">')
+        .replace('[/A]', '</a>');
+    l.how_it_works_blurb = escapeHTML(l.how_it_works_blurb)
+        .replace('[UL]', '<ul>').replace('[/UL]', '</ul>')
+        .replace(/\[LI]/g, '<li class="">').replace(/\[\/LI]/g, '</li>');
+
+    l.account_reset_email_info = escapeHTML(l.account_reset_email_info)
+        .replace('[A]', '<a href="mailto:support@mega.nz" class="primary-link">').replace('[/A]', '</a>');
+    l.account_reset_details = escapeHTML(l.account_reset_details).replace('[B]', '<b>').replace('[/B]', '</b>');
+
+    l.file_request_overlay_blurb = escapeHTML(l.file_request_overlay_blurb)
+        .replace(/\[S\d]/g, '<span>')
+        .replace(/\[\/S\d]/g, '</span>');
+
+    l.logout_recovery_key = escapeHTML(l.logout_recovery_key)
+        .replace('[A]', `<a href="${recoveryKeyLink}" target="_blank">`)
+        .replace('[/A]', '</a>');
+
+    l.invite_subject_text = escapeHTML(encodeURIComponent(l.invite_subject_text));
+    l.available_commission_tip = escapeHTML(l.available_commission_tip)
+        .replace('[A]', '<a class="clickurl" href="/pro">').replace('[/A]', '</a>');
+
+    l.etd_link_removed_body = escapeHTML(l.etd_link_removed_body)
+        .replace('[A1]', `<a href="https://mega.io/terms" target="_blank">`)
+        .replace('[/A1]', '</a>')
+        .replace('[A2]', `<a href="https://mega.io/takedown" target="_blank">`)
+        .replace('[/A2]', '</a>')
+        .replace('[P]', '<h3 class="sub-header">')
+        .replace('[/P]', '</h3>');
+
+    l.s4_s3_prefix_example = escapeHTML(l.s4_s3_prefix_example)
+        .replace(/\[S]/g, '<span>')
+        .replace(/\[\/S]/g, '</span>');
+
+    l.s4_iam_prefix_example = escapeHTML(l.s4_iam_prefix_example)
+        .replace(/\[S]/g, '<span>')
+        .replace(/\[\/S]/g, '</span>');
+
+    l.content_removed = escapeHTML(l.content_removed)
+        .replace('[A]', '<a class="clickurl" href="https://mega.io/takedown" target="_blank">')
+        .replace('[/A]', '</a>');
+
+    l.pr_save_up_to = escapeHTML(l.pr_save_up_to).replace('[S]', '').replace('[/S]', '');
+
+    l.view_upgrade_pro_dialog_desc = escapeHTML(l.view_upgrade_pro_dialog_desc)
+        .replace('[S1]', '<span class="monthly-price">')
+        .replace('[S2]', '<span class="asterisk hidden">')
+        .replace(/\[\/S\d]/g, '</span>');
+
+    l.trusted_users_worldwide = escapeHTML(l.trusted_users_worldwide)
+        .replace('[S1]', '<span class="trusted-by">')
+        .replace('[S2]', '<span class="users-value">')
+        .replace('[S3]', '<span class="users-worldwide">')
+        .replace(/\[\/S\d]/g, '</span>');
+
+    l.rewind_select_date_pro = escapeHTML(l.rewind_select_date_pro)
+        .replace('[BR]', '<br />')
+        .replace('[A]', `<a ${rewindLinkAttr} href="${rewindHelpLink}">`)
+        .replace('[/A]', '</a>');
+
+    l.rewind_upgrade_info_text = escapeHTML(l.rewind_upgrade_info_text)
+        .replace('[A1]', '<a class="rewind-sidebar-upgrade-action clickurl" data-eventid="500002" href="/pro">')
+        .replace('[/A1]', '</a>')
+        .replace('[A2]', `<a ${rewindLinkAttr} href="${rewindHelpLink}">`)
+        .replace('[/A2]', '</a>');
+
+    l.stripe_card_declined_error = escapeHTML(l.stripe_card_declined_error)
+        .replace('[A]', '<a href="https://help.mega.io/plans-storage/payments-billing/why-is-my-card-being-declined">')
+        .replace('[/A]', '</a>');
+
+    l.stripe_generic_decline_error = escapeHTML(l.stripe_generic_decline_error)
+        .replace('[A]', '<a href="mailto:support@mega.nz">')
+        .replace('[/A]', '</a>');
 
     const common = [
-        15536, 16107, 16119, 16120, 16136, 16304, 16313, 16316, 16358, 16360, 16361, 16394, 18228, 18268, 18282,
+        15536, 16119, 16120, 16313, 16316, 16360, 18228, 18268, 18282,
         18284, 18285, 18286, 18287, 18289, 18290, 18291, 18294, 18295, 18296, 18297, 18298, 18302, 18303, 18304,
         18305, 18314, 18315, 18316, 18419, 19807, 19808, 19810, 19811, 19812, 19813, 19814, 19854, 19821, 20402,
-        20462, 20969, 20970, 20971, 20973, 22667, 22668, 22674, 22669, 22671, 22672, 22784, 22789, 22881, 22883,
-        23351, 23524, 23534, 23296, 23299, 23304, 23819, 24077, 24097, 24099, 24139, 24540, 24542, 24543, 24544,
+        20462, 20969, 20970, 20971, 20973,
+        23524, 23534, 23296, 23299, 23304, 23819, 24077, 24099,
         24680, 24849, 24850,
 
         // Non numeric ids
         'bsn_calc_min_users',
-        'pro_flexi_account_suspended_description'
+        'pro_flexi_account_suspended_description',
+        'cannot_leave_share_content',
+        'available_commission_tip',
+        'pending_commission_tip',
+        'commission_amount_tip',
+        'go_to_pro'
     ];
-    for (i = common.length; i--;) {
+    for (let i = common.length; i--;) {
         var num = common[i];
 
         l[num] = escapeHTML(l[num])
@@ -1635,14 +1945,11 @@ lazy(mega, 'intl', function _() {
     /** @property mega.intl.locale */
     lazy(ns, 'locale', function() {
         const locale = window.locale || window.lang;
-        let navLocales;
-
-        if (navigator.languages) {
-            navLocales = navigator.languages.filter(l => l !== locale && l.startsWith(locale))[0];
-        }
+        const navLocales = Array.isArray(navigator.languages)
+            && navigator.languages.filter(l => l !== locale && l.startsWith(locale))[0];
 
         // @todo Polyfill Intl.Locale() and return an instance of it instead?
-        return this.test(navLocales) || this.test(locale) || 'en';
+        return navLocales && this.test(navLocales) || this.test(locale) || 'en';
     });
 
     /** @function mega.intl.get */
@@ -1691,4 +1998,26 @@ function getTransifexLangCode() {
         case 'kr': return 'ko';
         default: return lang;
     }
+}
+
+/**
+ * Apply any remapping of internal language codes to what should be shown in the UI
+ *
+ * @param {string} [langCode] The two character language code used internally by webclient
+ * @returns {string} The two character language code that should be displayed to the user
+ */
+function getRemappedLangCode(langCode) {
+    'use strict';
+
+    langCode = langCode || lang;
+    const remaps = {
+        br: 'pt',
+        cn: 'sc',
+        ct: 'tc',
+    };
+
+    if (remaps[langCode]) {
+        return remaps[langCode];
+    }
+    return langCode;
 }

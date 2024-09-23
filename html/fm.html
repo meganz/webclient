@@ -45,8 +45,16 @@
             <i class="sprite-fm-mono icon-add"></i>
             <span>[$17398]</span>
         </a>
+        <a class="dropdown-item visible-col-select" megatype="accessCtrl">
+            <i class="sprite-fm-mono icon-add"></i>
+            <span>[$s4_public_url]</span>
+        </a>
     </div>
     <div class="dropdown-section">
+        <a class="dropdown-item vhl-item">
+            <i class="sprite-fm-mono icon-warning-triangle"></i>
+            <span>Toggle</span>
+        </a>
         <a class="dropdown-item play-item">
             <i class="sprite-fm-mono icon-video-call-filled"></i>
             <span>[$16275]</span>
@@ -54,6 +62,10 @@
         <a class="dropdown-item preview-item">
             <i class="sprite-fm-mono icon-preview-reveal"></i>
             <span>[$1899]</span>
+        </a>
+        <a class="dropdown-item play-slideshow">
+            <i class="sprite-fm-mono icon-play-square"></i>
+            <span>[$album_play_slideshow]</span>
         </a>
         <a class="dropdown-item new-backup">
             <i class="sprite-fm-mono icon-add-circle"></i>
@@ -63,9 +75,13 @@
             <i class="sprite-fm-mono icon-folder-open"></i>
             <span>[$865]</span>
         </a>
+        <a class="dropdown-item settings-item">
+            <i class="sprite-fm-mono icon-settings-outline"></i>
+            <span>[$823]</span>
+        </a>
        <a class="dropdown-item view-in-bc-item">
             <i class="sprite-fm-mono icon-search-cloud"></i>
-            <span>[$view_in_bc]</span>
+            <span>[$view_in_dc]</span>
         </a>
         <a class="dropdown-item download-item contains-submenu sprite-fm-mono-after icon-arrow-right-after">
             <i class="sprite-fm-mono icon-download-small"></i>
@@ -83,6 +99,10 @@
                 </span>
             </span>
         </span>
+        <a class="dropdown-item verify-credential">
+            <i class="sprite-fm-mono icon-key"></i>
+            <span>[$verify_credentials]</span>
+        </a>
         <a class="dropdown-item open-gallery">
             <i class="sprite-fm-mono icon-photo-discovery"></i>
             <span>[$gallery_media_discovery]</span>
@@ -91,12 +111,20 @@
             <i class="sprite-fm-mono icon-search-cloud"></i>
             <span>[$23704]</span>
         </a>
+        <a class="dropdown-item open-s4-item">
+            <i class="sprite-fm-mono icon-search-cloud"></i>
+            <span>[$open_s4_item]</span>
+        </a>
+        <a class="dropdown-item open-in-location">
+            <i class="sprite-fm-mono icon-search-cloud"></i>
+            <span>[$folder_link_show_in_location]</span>
+        </a>
         <a class="dropdown-item file-request-create">
             <i class="sprite-fm-mono icon-folder-mega-drop"></i>
             <span>[$file_request_dropdown_create]</span>
         </a>
         <a class="dropdown-item file-request-copy-link">
-            <i class="sprite-fm-mono icon-copy-2"></i>
+            <i class="sprite-fm-mono icon-square-copy"></i>
             <span>[$file_request_dropdown_copy]</span>
         </a>
         <a class="dropdown-item file-request-manage">
@@ -111,7 +139,7 @@
     </div>
     <div class="dropdown-section">
         <a class="dropdown-item file-request-copy-link file-request-page">
-            <i class="sprite-fm-mono icon-copy-2"></i>
+            <i class="sprite-fm-mono icon-square-copy"></i>
             <span>[$file_request_dropdown_copy]</span>
         </a>
         <a class="dropdown-item file-request-manage file-request-page">
@@ -138,7 +166,7 @@
         </a>
         <a class="dropdown-item getlink-item">
             <i class="sprite-fm-mono icon-link"></i>
-            <span>[$59]</span>
+            <span>[$5622]</span>
         </a>
         <a class="dropdown-item embedcode-item">
             <i class="sprite-fm-mono icon-embed-code"></i>
@@ -147,6 +175,10 @@
         <a class="dropdown-item removelink-item">
             <i class="sprite-fm-mono icon-link-remove"></i>
             <span>[$6821]</span>
+        </a>
+        <a class="dropdown-item managepuburl-item">
+            <i class="sprite-fm-mono icon-languages"></i>
+            <span>[$s4_access_dig_header]</span>
         </a>
         <a class="dropdown-item sh4r1ng-item">
             <i class="sprite-fm-mono icon-folder-outgoing-share"></i>
@@ -196,7 +228,7 @@
             </div>
             <div class="dropdown-verify">
                 <i class="sprite-fm-mono icon-key"></i>
-                <span>[$7692]</span>
+                <span>[$verify_credentials]</span>
             </div>
         </div>
     </div>
@@ -243,6 +275,10 @@
             <i class="sprite-fm-mono icon-info"></i>
             <span>[$6859]</span>
         </a>
+        <a class="dropdown-item device-rename-item">
+            <i class="sprite-fm-mono icon-rename"></i>
+            <span>[$61]</span>
+        </a>
         <a class="dropdown-item properties-versions">
             <i class="sprite-fm-mono icon-versions-previous"></i>
             <span>[$16474]</span>
@@ -279,6 +315,13 @@
         <hr />
     </div>
     <div class="dropdown-section">
+        <a class="dropdown-item add-to-album">
+            <i class="sprite-fm-mono rectangle-stack-plus-small-regular-outline"></i>
+            <span>[$add_to_album]</span>
+        </a>
+        <hr />
+    </div>
+    <div class="dropdown-section">
         <a class="dropdown-item rename-item">
             <i class="sprite-fm-mono icon-rename"></i>
             <span>[$61]</span>
@@ -300,12 +343,21 @@
             <i class="sprite-fm-mono icon-versions-previous"></i>
             <span>[$5726]</span>
         </a>
+        <a class="dropdown-item rewind-item">
+            <i class="sprite-fm-mono icon-rewind"></i>
+            <span>[$rewind_action_label]</span>
+            <b class="beta">[$rewind_beta_tag]</b>
+        </a>
         <hr />
     </div>
     <div class="dropdown-section">
         <a class="dropdown-item newfolder-item">
             <i class="sprite-fm-mono icon-folder-new"></i>
             <span>[$68]</span>
+        </a>
+        <a class="dropdown-item new-bucket-item">
+            <i class="sprite-fm-mono icon-bucket-filled"></i>
+            <span>[$s4_create_bkt]</span>
         </a>
         <hr />
     </div>
@@ -386,6 +438,7 @@
             <span>[$98]</span>
         </a>
         <input type="file" id="fileselect4" name="fileselect4" webkitdirectory multiple class="hidden" />
+        <hr />
     </div>
     <div class="dropdown-section">
         <a class="dropdown-item set-nickname">
@@ -394,6 +447,75 @@
         </a>
         <hr />
     </div>
+    <div class="dropdown-section">
+        <a class="dropdown-item cd-send-to-contact-item">
+            <i class="sprite-fm-mono icon-send-to-chat"></i>
+            <span>[$17764]</span>
+        </a>
+        <a class="dropdown-item cd-getlink-item">
+            <i class="sprite-fm-mono icon-link"></i>
+            <span>[$5622]</span>
+        </a>
+        <a class="dropdown-item cd-removelink-item">
+            <i class="sprite-fm-mono icon-link-remove"></i>
+            <span>[$6821]</span>
+        </a>
+        <a class="dropdown-item cd-sh4r1ng-item">
+            <i class="sprite-fm-mono icon-folder-outgoing-share"></i>
+            <span>[$5631]</span> <!--Share folder-->
+        </a>
+        <a class="dropdown-item cd-removeshare-item">
+            <i class="sprite-fm-mono icon-folder-remove-share"></i>
+            <span>[$remove_share]</span>
+        </a>
+        <a class="dropdown-item cd-shared-folder-item">
+            <i class="sprite-fm-mono icon-share"></i>
+            <span>[$6775]</span>
+        </a>
+        <hr />
+    </div>
+    <div class="dropdown-section">
+        <a class="dropdown-item s4-key-enable">
+            <i class="sprite-fm-mono icon-enable-small"></i>
+            <span>[$s4_key_enable]</span>
+        </a>
+        <a class="dropdown-item s4-key-disable">
+            <i class="sprite-fm-mono icon-disable-small"></i>
+            <span>[$s4_key_disable]</span>
+        </a>
+        <hr />
+    </div>
+
+    <div class="dropdown-section">
+        <a class="dropdown-item s4-key-download">
+            <i class="sprite-fm-mono icon-download-small"></i>
+            <span>[$58]</span>
+        </a>
+        <a class="dropdown-item s4-key-copy-config">
+            <i class="sprite-fm-mono icon-copy"></i>
+            <span>[$63]</span>
+        </a>
+        <a class="dropdown-item s4-key-rename">
+            <i class="sprite-fm-mono icon-rename"></i>
+            <span>[$61]</span>
+        </a>
+        <hr />
+    </div>
+
+    <div class="dropdown-section">
+        <a class="dropdown-item s4-policy-copy-arn">
+            <i class="sprite-fm-mono icon-copy"></i>
+            <span>[$s4_copy_arn]</span>
+        </a>
+    </div>
+
+    <div class="dropdown-section">
+        <a class="dropdown-item s4-key-delete">
+            <i class="sprite-fm-mono icon-bin"></i>
+            <span>[$1730]</span>
+        </a>
+    </div>
+
     <div class="dropdown-section">
         <a class="dropdown-item remove-contact red">
             <i class="sprite-fm-mono icon-disabled-filled"></i>
@@ -462,29 +584,81 @@
             <span>[$103]</span>
         </a>
     </div>
+    <div class="dropdown-section">
+        <a class="dropdown-item open-item-rewind">
+            <i class="sprite-fm-mono icon-folder-open"></i>
+            <span>[$865]</span>
+        </a>
+        <hr />
+    </div>
+    <div class="dropdown-section">
+        <a class="dropdown-item s4-copy-arn">
+            <i class="sprite-fm-mono icon-copy"></i>
+            <span>[$s4_copy_arn]</span>
+        </a>
+        <a class="dropdown-item s4-user-rename">
+            <i class="sprite-fm-mono icon-rename"></i>
+            <span>[$61]</span>
+        </a>
+        <hr />
+    </div>
+    <div class="dropdown-section">
+        <a class="dropdown-item properties-item-rewind">
+            <i class="sprite-fm-mono icon-info"></i>
+            <span>[$6859]</span>
+        </a>
+    </div>
+    <div class="dropdown-section">
+        <a class="dropdown-item s4-user-delete">
+            <i class="sprite-fm-mono icon-bin"></i>
+            <span>[$1730]</span>
+        </a>
+    </div>
+    <div class="dropdown-section">
+        <a class="dropdown-item s4-group-copy-arn">
+            <i class="sprite-fm-mono icon-copy"></i>
+            <span>[$s4_copy_arn]</span>
+        </a>
+        <a class="dropdown-item s4-group-rename">
+            <i class="sprite-fm-mono icon-rename"></i>
+            <span>[$61]</span>
+        </a>
+        <hr />
+    </div>
+    <div class="dropdown-section">
+        <a class="dropdown-item s4-group-delete">
+            <i class="sprite-fm-mono icon-bin"></i>
+            <span>[$1730]</span>
+        </a>
+    </div>
 </div>
 
 <div class="main-blur-block">
     <!-- Please add "fm-notification" class and "full"/"almost-full" class !-->
     <div class="fm-main default">
+        <div id="commercial-close-button" class="commercial-close-button hidden">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </div>
         <nav class="nw-fm-left-icons-panel" data-theme="dark">
             <a class="logo hidden">
                 <i class="sprite-fm-uni icon-home"></i>
             </a>
             <div class="nw-fm-left-icon dashboard sprite-fm-uni-before icon-home-before js-fm-tab" aria-role="button" name="dashboard">
-                <div class="nw-fm-left-border"></div>
                 <div class="dark-tooltip">[$16668]</div>
             </div>
             <div class="nw-fm-left-icon cloud-drive sprite-fm-uni-before icon-files-before js-fm-tab" aria-role="button" name="cloud-drive">
-                <div class="nw-fm-left-border"></div>
-                <div class="dark-tooltip">[$24681]</div>
+                <div class="dark-tooltip">[$drive]</div>
+                <div class="nav-icon-label-container">
+                    <div class="nav-icon-label">[$drive]</div>
+                </div>
             </div>
             <div class="nw-fm-left-icon gallery sprite-fm-uni-before icon-gallery-before js-fm-tab" aria-role="button" name="gallery">
-                <div class="nw-fm-left-border"></div>
                 <div class="dark-tooltip">[$gallery_photos]</div>
+                <div class="nav-icon-label-container">
+                    <div class="nav-icon-label">[$gallery_photos]</div>
+                </div>
             </div>
             <div class="nw-fm-left-icon conversations sprite-fm-uni-before icon-chat-before js-fm-tab" aria-role="button" name="conversations">
-                <div class="nw-fm-left-border"></div>
                 <div class="new-messages-indicator hidden">
                     <span class="chat-pending-call hidden"><i class="tiny-icon white-handset"></i></span>
                     <span class="chat-unread-count hidden"></span>
@@ -496,21 +670,27 @@
                     <span>[$onboard_megachat_new_user_text]</span>
                     <i class="sprite-fm-mono icon-tooltip-arrow tooltip-arrow"></i>
                 </div>
-                <div class="dark-tooltip">[$5902]</div>
+                <div class="dark-tooltip">[$7997]</div>
+                <div class="nav-icon-label-container">
+                    <div class="nav-icon-label">[$7997]</div>
+                </div>
                 <div class="beta-text"></div>
             </div>
             <div class="nw-fm-left-icon backup-center sprite-fm-uni-before icon-backup-before js-fm-tab" aria-role="button" name="backup-center">
-                <div class="nw-fm-left-border"></div>
-                <div class="dark-tooltip">[$backup_centre]</div>
+                <div class="dark-tooltip">[$devices]</div>
+                <div class="nav-icon-label-container">
+                    <div class="nav-icon-label">[$devices]</div>
+                </div>
             </div>
             <div class="nw-fm-left-icon user-management sprite-fm-uni-before icon-business-before hidden js-fm-tab" aria-role="button" name="user-management">
-                <div class="nw-fm-left-border"></div>
-                <div class="dark-tooltip">[$18677]</div>
+                <div class="dark-tooltip">[$bsn_compare_users]</div>
+                <div class="nav-icon-label-container">
+                    <div class="nav-icon-label">[$bsn_compare_users]</div>
+                </div>
                 <div class="beta-text"></div>
             </div>
             <div class="bottom-icons theme-dark-forced">
                 <div class="nw-fm-left-icon transfers js-fm-tab" aria-role="button" name="transfers">
-                    <div class="nw-fm-left-border file-transfer-icon"></div>
                     <div class="dark-tooltip">[$104]</div>
                     <div class="nw-fm-percentage download">
                         <ul>
@@ -542,52 +722,6 @@
                         </ul>
                         <div class="transfer-bar-overlay">
                             <i class="sprite-fm-mono icon-transfer-filled icon24"></i>
-                        </div>
-                    </div>
-                    <div class="dropdown body popup dropdown-arrow transfer-widget left-arrow hidden">
-                        <i class="dropdown-white-arrow"></i>
-                        <div class="fm-dialog-close small"></div>
-
-                        <div class="transfer-widget body">
-                            <div class="transfer-widget transfer-block download hidden">
-                                <i class="small-icon green-arrow"></i>
-                                <span class="transfer-filetype-icon audio file"></span>
-                                <span class="tranfer-filetype-txt"></span>
-                                <!--file.name-->
-                                <div class="transfer-widget progress">
-                                    <span></span>
-                                </div>
-                                <div class="transfer-widget info-block left">
-                                    <span class="current dark"></span>
-                                    <span class="of">[$5528]</span>
-                                    <span class="number dark"></span>
-                                </div>
-                                <div class="transfer-widget info-block right">
-                                    <span class="speed dark"></span>
-                                    <span class="speed-txt"></span>
-                                </div>
-                                <div class="clear"></div>
-                            </div>
-
-                            <div class="transfer-widget transfer-block upload hidden">
-                                <i class="small-icon blue-arrow left"></i>
-                                <span class="transfer-filetype-icon audio file"></span>
-                                <span class="tranfer-filetype-txt"></span>
-                                <!--file.name-->
-                                <div class="transfer-widget progress">
-                                    <span></span>
-                                </div>
-                                <div class="transfer-widget info-block left">
-                                    <span class="current dark"></span>
-                                    <span class="of">[$5528]</span>
-                                    <span class="number dark"></span>
-                                </div>
-                                <div class="transfer-widget info-block right">
-                                    <span class="speed dark"></span>
-                                    <span class="speed-txt"></span>
-                                </div>
-                                <div class="clear"></div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -645,14 +779,14 @@
             </div>
 
             <!-- My Files Section Begin -->
-            <section class="js-lp-myfiles lp-myfiles" >
+            <section class="js-lp-myfiles lp-myfiles">
                 <div class="lp-header">
-                    <span>[$24681]</span>
+                    <span class="drive-text">[$drive]</span>
+                    <span class="mega-lite-text">[$mega_lite]</span>
                 </div>
                 <div class="content-area js-myfiles-panel">
 
                     <div class="lp-content-wrap cloud-drive-panel">
-                        <span class="section-title">[$24682]</span>
 
                         <div class="fm-tree-panel js-myfile-tree-panel">
                             <button class="btn-myfiles js-lpbtn js-clouddrive-btn cloud-drive collapse" data-link="clouddrive">
@@ -665,6 +799,19 @@
                                 <div class="tree"></div>
                             </div>
                         </div>
+
+                        <div class="fm-tree-panel js-s4-tree-panel hidden">
+                            <button class="btn-myfiles js-lpbtn js-s4-btn s4 collapse" data-link="s4">
+                                <i class="sprite-fm-mono icon-dropdown js-cloudtree-expander hidden"></i>
+                                <i class="sprite-fm-mono icon-object-storage"></i>
+                                [$obj_storage]
+                            </button>
+
+                            <div class="content-panel s4 collapse">
+                                <div class="tree"></div>
+                            </div>
+                        </div>
+
                         <button class="btn-myfiles js-lpbtn recents js-fm-tab" data-link="recents">
                             <i class="sprite-fm-mono icon-recents-filled"></i>[$20141]
                         </button>
@@ -700,48 +847,64 @@
             <!-- My Files Section End -->
 
             <!-- Gallery Section Begin -->
-            <section class="js-lp-gallery lp-gallery" >
-                <div class="lp-header">
-                    <span>[$gallery_photos]</span>
-                </div>
+            <section class="js-lp-gallery lp-gallery">
                 <div class="content-area js-gallery-panel">
-                    <div class="lp-content-wrap library-panel">
-                        <span class="section-title">[$gallery_subtitle]</span>
-                        <button class="btn-galleries js-lpbtn photos js-fm-tab" data-link="photos">
-                            <i class="sprite-fm-mono icon-photos"></i>[$gallery_all_media]
-                        </button>
-                        <button class="btn-galleries js-lpbtn images js-fm-tab" data-link="images">
-                            <i class="sprite-fm-mono icon-images"></i>[$gallery_images]
-                        </button>
-                        <button class="btn-galleries js-lpbtn videos js-fm-tab" data-link="videos">
-                            <i class="sprite-fm-mono icon-videos"></i>[$gallery_videos]
-                        </button>
-                        <button class="btn-galleries js-lpbtn favourites js-fm-tab" data-link="favourites">
-                            <i class="sprite-fm-mono icon-favourite-filled"></i>[$gallery_favourites]
-                        </button>
+                    <div class="lp-header">
+                        <span>[$gallery_photos]</span>
+                    </div>
+                    <div class="lp-content-wrap-wrap">
+                        <div class="lp-content-wrap library-panel">
+                            <span class="section-title">[$gallery_subtitle]</span>
+                            <button class="btn-galleries js-lpbtn photos js-fm-tab" data-link="photos">
+                                <i class="sprite-fm-mono icon-photos"></i>[$gallery_all_media]
+                            </button>
+                            <button class="btn-galleries js-lpbtn images js-fm-tab" data-link="images">
+                                <i class="sprite-fm-mono icon-images"></i>[$gallery_images]
+                            </button>
+                            <button class="btn-galleries js-lpbtn videos js-fm-tab" data-link="videos">
+                                <i class="sprite-fm-mono icon-videos"></i>[$gallery_videos]
+                            </button>
+                            <button class="btn-galleries js-lpbtn favourites js-fm-tab" data-link="favourites">
+                                <i class="sprite-fm-mono icon-favourite-filled"></i>[$gallery_favourites]
+                            </button>
+                        </div>
                     </div>
                 </div>
             </section>
             <!-- Gallery Section End -->
+
+            <div>
+                <div class="commercial-wrapper hidden" id="commercial-wrapper-webcdsl"></div>
+                <div class="commercial-wrapper hidden" id="commercial-wrapper-webphsl"></div>
+            </div>
 
             <section class="js-lp-storage-usage lp-storage-usage">
                 <div class="storage-usage-panel js-lp-storage-usage-block">
                     <div class="title-block">
                         <div class="plan"></div>
 
-                        <button class="btn-link js-lpbtn" data-link="upgrade">
+                        <button class="btn-link js-lpbtn hidden" data-link="upgrade">
                             [$24686]
                         </button>
+                        <div class="text-and-tooltip hidden">
+                            <div class="storage-txt"></div>
+                            <i class="icon sprite-fm-mono icon-info storage-limit-icon hidden"></i>
+                            <div class="lp-storage-limit-popup">[$storage_limit_tooltip]</div>
+                        </div>
                     </div>
 
-                    <div class="storage-graph js-storagegraph">
+                    <div class="storage-graph js-storagegraph hidden">
                         <span></span>
                     </div>
                     <div class="info">
                         <div class="loader menus-sprite loading"></div>
-                        <div class="storage-txt" ></div>
+                        <div class="storage-txt"></div>
+                        <button class="mega-button secondary js-lpbtn hidden">
+                            [$24686]
+                        </button>
                     </div>
                 </div>
+                <div class="js-lp-storage-information-popup lp-storage-information-popup hidden"></div>
             </section>
 
             <!-- My User Management Section Begin -->
@@ -795,7 +958,7 @@
                 <!-- Backup centre left pane -->
                 <div class="content-panel backup-center">
                     <div class="lp-header">
-                        <span>[$backup_centre]</span>
+                        <span>[$device_centre]</span>
                     </div>
                     <div class="lp-content-wrap">
                         <button class="btn-myfiles devices js-fm-tab js-lpbtn" data-link="devices">
@@ -837,6 +1000,7 @@
                             <i class="pro4 sprite-fm-uni icon-crests-lite-details"></i><!-- Acct Level 4 (PRO Lite) -->
                             <i class="pro101 sprite-fm-uni icon-crests-pro-flexi-details"></i><!-- Act lvl 101 (Pro Flexi) -->
                             <i class="business sprite-fm-uni icon-crests-business-details"></i>
+                            <i class="feature"></i>
                         </div>
                         <div class="account membership-plan"></div>
                     </div>
@@ -949,7 +1113,6 @@
                                 <div class="sub-title" data-scrollto="rubbish-cleaning">[$20229]</div>
                                 <div class="sub-title" data-scrollto="user-interface">[$16158]</div>
                                 <div class="sub-title" data-scrollto="dialog-options">[$20169]</div>
-                                <div class="sub-title" data-scrollto="link-options">[$setting_section_plink]</div>
                             </div>
                         </div>
                         <div class="settings-button slide-in-out ts-500 closed transfers">
@@ -974,6 +1137,7 @@
                                 <div class="sub-title" data-scrollto="chat-settings">[$chat_settings]</div>
                                 <div class="sub-title" data-scrollto="rich-url-preview">[$18696]</div>
                                 <div class="sub-title" data-scrollto="push-notification-settings">[$22121]</div>
+                                <div class="sub-title" data-scrollto="contact-verification-settings">[$contact_verification_title]</div>
                             </div>
                         </div>
                         <div class="settings-button slide-in-out ts-500 closed reseller hidden">
@@ -1000,8 +1164,38 @@
                                 <div class="sub-title" data-scrollto="sound-notifications">[$sound_notifications]</div>
                             </div>
                         </div>
+                        <div class="settings-button slide-in-out ts-500 vpn closed">
+                            <div class="head-title">
+                                <i class="sprite-fm-mono icon-arrow-right expand"></i>
+                                <i class="sprite-fm-mono icon-globe"></i>
+                                <span>[$vpn_settings_main_title]</span>
+                            </div>
+                            <div class="sub-menu slide-item">
+                                <div class="sub-title" data-scrollto="manage-credentials">[$vpn_settings_manage_title]</div>
+                            </div>
+                        </div>
+                        <div class="settings-button slide-in-out ts-500 closed s4 hidden">
+                            <div class="head-title">
+                                <i class="sprite-fm-mono icon-arrow-right expand"></i>
+                                <i class="sprite-fm-mono icon-object-storage"></i>
+                                <span>[$obj_storage]</span>
+                            </div>
+                            <div class="sub-menu slide-item">
+                                <div class="sub-title" data-scrollto="endpoints">[$s4_endpoints_header]</div>
+                            </div>
+                            <div class="sub-menu slide-item">
+                                <div class="sub-title" data-scrollto="access-keys">[$s4_access_keys]</div>
+                            </div>
+                            <div class="sub-menu slide-item hidden">
+                                <div class="sub-title" data-scrollto="thumb-preview">[$s4_thumb_preview]</div>
+                            </div>
+                            <div class="sub-menu slide-item hidden">
+                                <div class="sub-title" data-scrollto="out-opts">[$s4_out_opts]</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                <div class="commercial-wrapper hidden" id="commercial-wrapper-webdashsl"></div>
             </section>
         </div>
 
@@ -1014,6 +1208,27 @@
         </div>
 
         <div id="topmenu"></div>
+
+        <div class="notification-banner hidden">
+            <div class="banner-contents">
+                <img class="display-icon hidden">
+                <div class="info-and-buttons">
+                    <div class="info">
+                        <div class="title"></div>
+                        <div class="message"></div>
+                    </div>
+                    <div class="buttons">
+                        <div class="cta-buttons">
+                            <button class="mega-button positive cta-primary hidden" data-continue-link=""></button>
+                            <button class="mega-button cta-secondary hidden" data-continue-link=""></button>
+                        </div>
+                        <button class="close js-close mega-button action icon" aria-label="[$148]">
+                            <i class="sprite-fm-mono icon-dialog-close icon24"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="section conversations hidden">
             <div class="fm-chat-is-loading hidden">
@@ -1028,36 +1243,6 @@
         </div>
 
         <div class="fm-right-files-block">
-            <div class="fm-notification-block full">
-                <i class="notification-block-icon sprite-fm-mono icon-offline"></i>
-                <span>[$22667]</span>
-            </div>
-            <div class="fm-notification-block expired-business">
-
-            </div>
-            <div class="fm-notification-block almost-full">
-                <i class="notification-block-icon sprite-fm-mono icon-offline"></i>
-                <span>[$16316]</span>
-                <i class="fm-notification-close sprite-fm-mono icon-close-component"></i>
-            </div>
-            <div class="fm-notification-block grace-business">
-                <span>[$16316]</span>
-            </div>
-            <div class="fm-notification-block business-next-tier"></div>
-            <div class="fm-notification-block duplicated-items-found">
-                <span>[$22101]</span>
-                <a class="fix-me-btn">[$22102]</a>
-                <div class="fm-notification-close fix-me-close sprite-fm-mono icon-close-component"></div>
-            </div>
-            <div class="fm-notification-block payment-card-status payment-card-expired">
-                <div>[$payment_card_exp]</div>
-                <i class="fm-notification-close sprite-fm-mono icon-close-component close-banner"></i>
-            </div>
-            <div class="fm-notification-block payment-card-status payment-card-almost-expired">
-                <div>[$payment_card_almost_exp]</div>
-                <i class="fm-notification-close sprite-fm-mono icon-close-component close-banner"></i>
-            </div>
-
             <div class="onboarding-control-panel hidden">
                 <div class="onboarding-control-panel-content">
                     <button class="close js-close mega-button action icon" aria-label="[$148]">
@@ -1112,14 +1297,32 @@
 
             <div class="fm-right-header fm hidden">
 
+                <div class="fm-breadcrumbs-wrapper">
+                    <div class="crumb-overflow-link dropdown">
+                        <a class="breadcrumb-dropdown-link">
+                            <i class="menu-icon sprite-fm-mono icon-options icon24"></i>
+                        </a>
+                        <i class="sprite-fm-mono icon-arrow-right icon16"></i>
+                    </div>
+                    <div class="fm-breadcrumbs-block"></div>
+                    <div class="breadcrumb-dropdown"></div>
+                </div>
+
+                <div class="fm-search-count hidden"></div>
+
                 <div class="fm-header-buttons">
 
-                    <a class="fm-files-view-icon block-view" title="[$5552]">
-                        <i class="sprite-fm-mono icon-view-grid"></i>
-                    </a>
-                    <a class="fm-files-view-icon listing-view active" title="[$5553]">
-                        <i class="sprite-fm-mono icon-view-medium-list"></i>
-                    </a>
+                    <div class="view-links flex flex-row gap-3 items-center pl-4">
+                        <a class="fm-files-view-icon media-view hidden" title="[$md_view]">
+                            <i class="sprite-fm-mono icon-images"></i>
+                        </a>
+                        <a class="fm-files-view-icon listing-view active" title="[$5553]">
+                            <i class="sprite-fm-mono icon-view-medium-list"></i>
+                        </a>
+                        <a class="fm-files-view-icon block-view" title="[$5552]">
+                            <i class="sprite-fm-mono icon-view-grid"></i>
+                        </a>
+                    </div>
 
                     <div class="button link-button dropdown fm-uploads">
                         <i class="sprite-fm-mono icon-upload icon-blue"></i>
@@ -1144,6 +1347,13 @@
                             <i class="sprite-fm-mono icon-add-circle icon-green"></i>
                         </div>
                         <span>[$68]</span>
+                    </button>
+
+                    <button class="mega-button no-hover action fm-share-folder" title="[$5631]">
+                        <div>
+                            <i class="sprite-fm-mono icon-folder-outgoing-share icon-yellow"></i>
+                        </div>
+                        <span>[$5631]</span>
                     </button>
 
                     <button class="mega-button no-hover action fm-add-user hidden">
@@ -1207,6 +1417,41 @@
                         </div>
                         <span>[$file_request_action_create]</span>
                     </button>
+
+                    <button class="mega-button no-hover action fm-s4-settings js-s4-settings hidden" title="[$823]">
+                        <div>
+                            <i class="sprite-fm-mono icon-settings-outline icon-blue"></i>
+                        </div>
+                        <span>[$823]</span>
+                    </button>
+
+                    <button class="mega-button no-hover action fm-s4-new-bucket js-s4-new-bucket hidden" title="[$s4_create_bkt]">
+                        <div>
+                            <i class="sprite-fm-mono icon-add-circle icon-green"></i>
+                        </div>
+                        <span>[$s4_create_bkt]</span>
+                    </button>
+
+                    <button class="mega-button no-hover action fm-s4-new-key hidden" title="[$s4_key_create]">
+                        <div>
+                            <i class="sprite-fm-mono icon-add-circle icon-green"></i>
+                        </div>
+                        <span>[$s4_key_create]</span>
+                    </button>
+
+                    <button class="mega-button no-hover action fm-s4-new-user hidden" title="Create new user">
+                        <div>
+                            <i class="sprite-fm-mono icon-add-circle icon-green"></i>
+                        </div>
+                        <span>[$s4_user_create_button]</span>
+                    </button>
+
+                    <button class="mega-button no-hover action fm-s4-new-group hidden" title="Create new group">
+                        <div>
+                            <i class="sprite-fm-mono icon-add-circle icon-green"></i>
+                        </div>
+                        <span>[$s4_group_create_button]</span>
+                    </button>
                 </div>
 
                 <div class="filter-block fm body hidden">
@@ -1253,26 +1498,45 @@
                         <i class="sprite-fm-mono icon-close-component small-cross"></i>
                     </div>
                 </div>
-
-                <div class="fm-breadcrumbs-wrapper">
-                    <div class="crumb-overflow-link dropdown">
-                        <a class="breadcrumb-dropdown-link">
-                            <i class="menu-icon sprite-fm-mono icon-options icon24"></i>
-                        </a>
-                        <i class="sprite-fm-mono icon-arrow-right icon16"></i>
-                    </div>
-                    <div class="fm-breadcrumbs-block"></div>
-                    <div class="breadcrumb-dropdown"></div>
-                </div>
-
-                <div class="fm-bottom-right-buttons hidden">
-                    <div class="folder-link-btns-container">
-                        <button class="mega-button fm-import-to-cloudrive"><span>[$folder_link_import_all]</span></button>
-                        <button class="mega-button positive fm-download-as-zip"><span>[$folder_link_download_all]</span></button>
-                    </div>
-                </div>
             </div>
 
+            <div class="fm-notification-block mega-lite-mode-warning">
+                <i class="notification-block-icon sprite-fm-mono icon-lock"></i>
+                <span>[$in_mega_lite_mode_banner]</span>
+            </div>
+            <div class="fm-notification-block unverified-share">
+                <i class="notification-block-icon sprite-fm-mono icon-info"></i>
+                <span></span>
+            </div>
+            <div class="fm-notification-block full">
+                <i class="notification-block-icon sprite-fm-mono icon-offline"></i>
+                <span>[$22667]</span>
+            </div>
+            <div class="fm-notification-block expired-business">
+
+            </div>
+            <div class="fm-notification-block almost-full">
+                <i class="notification-block-icon sprite-fm-mono icon-offline"></i>
+                <span>[$16316]</span>
+                <i class="fm-notification-close sprite-fm-mono icon-close-component"></i>
+            </div>
+            <div class="fm-notification-block grace-business">
+                <span>[$16316]</span>
+            </div>
+            <div class="fm-notification-block business-next-tier"></div>
+            <div class="fm-notification-block duplicated-items-found">
+                <span>[$22101]</span>
+                <a class="fix-me-btn">[$22102]</a>
+                <div class="fm-notification-close fix-me-close sprite-fm-mono icon-close-component"></div>
+            </div>
+            <div class="fm-notification-block payment-card-status">
+                <i class="notification-block-icon sprite-fm-mono icon-alert-circle-thin-outline"></i>
+                <span class="payment-banner-content-wrapper">
+                    <span class="banner-title"></span>
+                    <span class="banner-txt"></span>
+                    <a>[$update_card]</a>
+                </span>
+            </div>
             <!-- Users Management Header -->
             <div class="fm-right-header-user-management hidden">
                 <div class="sub-loader js-ba-loader"></div>
@@ -1340,16 +1604,74 @@
 
             <!-- End Users Management Header -->
 
+            <div class="s4-info-header-blocks hidden">
+                <div class="s4-info-header-bucket">
+                    <div class="bucket-details-info">
+                        <div class="content">
+                            <div class="bucket-details-info-block">
+                                <i class="bucket-details-icon item-type-icon-90 icon-bucket-90"></i>
+                                <div class="bucket-details-pad">
+                                    <div class="bucket-details-pad-bucket">
+                                        <div class="bucket-details-name"></div>
+                                    </div>
+                                    <div class="bucket-domain js-selectable-text"></div>
+                                </div>
+                                <div class="bucket-details-buttons">
+                                    <button class="mega-button bkt-settings-btn"><span>[$s4_bkt_settings]</span></button>
+                                </div>
+                                <div class="clear"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="fm-notification-block bucket-access-warning"></div>
+            </div>
+
+            <div class="fm-filter-chips-wrapper hidden">
+                <i class="sprite-fm-mono icon-check selected-mark selected-mark-template hidden"></i>
+                <div class="fm-filter-chips">
+                    <div class="fm-filter-chip-button fm-filter-chip-location hidden">
+                        <div class="fm-filter-chip-button-text">
+                            [$17818]
+                        </div>
+                        <span class="nw-fm-tree-arrow rot-90"></span>
+                    </div>
+
+                    <div class="fm-filter-chip-button fm-filter-chip-type">
+                        <div class="fm-filter-chip-button-text">
+                            [$filter_chip_type]
+                        </div>
+                        <span class="nw-fm-tree-arrow rot-90"></span>
+                    </div>
+                    <div class="fm-filter-chip-button fm-filter-chip-mtime">
+                        <div class="fm-filter-chip-button-text">
+                            [$filter_chip_mdate]
+                        </div>
+                        <span class="nw-fm-tree-arrow rot-90"></span>
+                    </div>
+                    <div class="fm-filter-chip-button fm-filter-chip-dateadded">
+                        <div class="fm-filter-chip-button-text">
+                            [$17445]
+                        </div>
+                        <span class="nw-fm-tree-arrow rot-90"></span>
+                    </div>
+                    <div class="fm-filter-reset hidden">
+                        [$filter_chip_reset]
+                    </div>
+                </div>
+            </div>
+
             <div class="fm-empty-section fm-empty-faves hidden">
                 <div class="fm-empty-pad">
                     <i class="section-icon sprite-fm-theme icon-empty-state-favourite"></i>
                     <div class="fm-empty-cloud-txt">[$gallery_favourites_empty]</div>
                 </div>
             </div>
+
             <div class="fm-empty-section fm-empty-cloud hidden">
                 <div class="fm-empty-pad">
                     <i class="section-icon sprite-fm-mono icon-cloud-drive"></i>
-                    <div class="fm-empty-cloud-txt">[$1343]</div>
+                    <div class="fm-empty-cloud-txt">[$cloud_drive_empty_title]</div>
                     <div class="fm-not-logged-text">
                         <div class="fm-not-logged-description">
                             [$8762]
@@ -1384,7 +1706,7 @@
             <div class="fm-empty-section fm-empty-search hidden">
                 <div class="fm-empty-pad">
                     <i class="section-icon sprite-fm-mono icon-preview-reveal"></i>
-                    <div class="fm-empty-cloud-txt">[$978]</div>
+                    <div class="fm-empty-cloud-txt">[$8674]</div>
                 </div>
                 <div class="empty-search-bottom-menu">
                     <div class="empty-search-bg"></div>
@@ -1456,6 +1778,75 @@
                 </div>
             </div>
 
+            <div class="fm-empty-section s4 fm-empty-s4-container hidden">
+                <div class="fm-empty-pad">
+                    <div class="empty-message">[$welcome_mega_s4]</div>
+                    <div class="create-new-bkt-block">
+                        <div class="create-new-bkt-wrapper">
+                            <i class="sprite-fm-theme icon-bucket"></i>
+                            <div class="new-bkt-message">
+                                <div class="new-bkt-title">[$s4_create_bkt]</div>
+                                <div class="new-bkt-txt">[$s4_purp_msg]</div>
+                            </div>
+                            <button class="mega-button round large new-bkt-btn js-s4-new-bucket"><i class="sprite-fm-mono icon-arrow-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fm-empty-section s4 fm-empty-s4-bucket hidden">
+                <div class="fm-empty-pad">
+                    <i class="section-icon sprite-fm-theme icon-empty-state-bucket-upload"></i>
+                    <div class="fm-empty-cloud-txt">[$s4_bucket_empty_title]</div>
+                    <div class="fm-empty-description">[$s4_bucket_empty_msg]</div>
+                </div>
+            </div>
+
+            <div class="fm-empty-section s4 fm-empty-s4-keys hidden">
+                <div class="fm-empty-pad">
+                    <i class="section-icon sprite-fm-theme icon-empty-state-keys"></i>
+                    <div class="fm-empty-s4-keys-txt">
+                        <div class="fm-empty-s4-keys-title">[$s4_key_create]</div>
+                        <div class="fm-empty-s4-keys-message">[$s4_key_create_explain]</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fm-empty-section s4 fm-empty-s4-policies hidden">
+                <div class="fm-empty-pad">
+                    <i class="section-icon sprite-fm-theme icon-empty-state-policy"></i>
+                    <div class="fm-empty-s4-policies-txt">
+                        <div class="fm-empty-s4-policies-title">[$s4_no_policies]</div>
+                        <div class="fm-empty-s4-policies-message">[$s4_no_policies_info]</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fm-empty-section s4 fm-empty-s4-users hidden">
+                <div class="fm-empty-pad">
+                    <i class="section-icon sprite-fm-theme icon-empty-state-users"></i>
+                    <div class="fm-empty-s4-users-txt">
+                        <div class="fm-empty-s4-users-title">[$s4_user_create_empty]</div>
+                        <div class="fm-empty-s4-users-message">[$s4_user_empty_msg]</div>
+                    </div>
+                </div>
+            </div>
+            <div class="fm-empty-section s4 fm-empty-s4-groups hidden">
+                <div class="fm-empty-pad">
+                    <i class="section-icon sprite-fm-theme icon-empty-state-groups"></i>
+                    <div class="fm-empty-s4-groups-txt">
+                        <div class="fm-empty-s4-groups-title">[$s4_group_create_empty]</div>
+                        <div class="fm-empty-s4-groups-message">[$s4_group_empty_msg]</div>
+                    </div>
+                </div>
+            </div>
+            <div class="fm-rewind-progress-section hidden">
+                <div class="content">
+                    <div class="image"></div>
+                    <div class="title"></div>
+                    <div class="message"></div>
+                </div>
+            </div>
             <div class="files-grid-view fm hidden">
                 <div class="column-settings overlap">
                     <i class="sprite-fm-theme icon-settings"></i>
@@ -1485,6 +1876,10 @@
                                         <div class="arrow type sprite-fm-mono icon-dropdown">[$93]</div>
                                         <div class="grid-view-resize">&nbsp;</div>
                                     </th>
+                                    <th megatype="accessCtrl">
+                                        <div class="arrow accessCtrl sprite-fm-mono icon-dropdown">[$s4_public_url]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
                                     <th megatype="timeAd">
                                         <div class="arrow date sprite-fm-mono icon-dropdown">[$17445]</div>
                                         <div class="grid-view-resize">&nbsp;</div>
@@ -1499,6 +1894,10 @@
                                     </th>
                                     <th megatype="playtime">
                                         <div class="arrow playtime sprite-fm-mono icon-dropdown">[$duration]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th megatype="fileLoc">
+                                        <div class="arrow fileLoc sprite-fm-mono icon-dropdown">[$file_location_label]</div>
                                         <div class="grid-view-resize">&nbsp;</div>
                                     </th>
                                     <!--<th megatype="extras">
@@ -1864,6 +2263,18 @@
                                     </div>
                                     <div class="ff-occupy"></div>
                                 </div>
+                                <div class="used-storage-info ba-pub-links">
+                                    <div class="used-storage-icon-cell">
+                                        <i class="sprite-fm-mono icon-link"></i>
+                                    </div>
+                                    <div class="ff-name">[$16516]</div>
+                                    <div class="ff-number">
+                                        <div class="folder-number"></div>
+                                        <div>, </div>
+                                        <div class="file-number"> </div>
+                                    </div>
+                                    <div class="ff-occupy"></div>
+                                </div>
                                 <div class="used-storage-info ba-version">
                                     <div class="used-storage-icon-cell">
                                         <i class="sprite-fm-mono icon-versions-previous"></i>
@@ -2127,9 +2538,7 @@
                         <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table shared-with-me table-hover">
                             <thead>
                                 <tr>
-                                    <th width="45">
-                                        <span class="grid-header-star fav"><i class="sprite-fm-mono icon-favourite-filled"></i></span>
-                                    </th>
+                                    <th></th>
                                     <th class="full-width-col" data-minwidth="250">
                                         <div class="arrow name label desc sprite-fm-mono icon-dropdown">[$86]</div>
                                         <div class="grid-view-resize">&nbsp;</div>
@@ -2221,12 +2630,443 @@
                 </div>
                 <!-- END Templates for Gallery list -->
             </div>
+			<div id="albums-view" class="flex-column hidden"></div>
 
-            <div id="albums-view" class="flex-column hidden"></div>
+            <div class="s4-grid-view hidden">
+                <div class="s4-keys-management-scroll sticky-header-table-container hidden">
+                    <table class="s4-grid-table table-hover data-table medium-list">
+                        <thead>
+                            <tr>
+                                <th s4sort="n" class="key-name">
+                                    <div class="arrow sprite-fm-mono icon-dropdown">[$86]</div>
+                                    <div class="grid-view-resize">&nbsp;</div>
+                                </th>
+                                <th s4sort="ak" class="access-key">
+                                    <div class="arrow sprite-fm-mono icon-dropdown">[$s4_key_access_title]</div>
+                                    <div class="grid-view-resize">&nbsp;</div>
+                                </th>
+                                <th class="secret-key no-sortable">
+                                    <div class="arrow sprite-fm-mono">[$s4_key_secret_title]</div>
+                                    <div class="grid-view-resize">&nbsp;</div>
+                                </th>
+                                <th s4sort="en" class="status">
+                                    <div class="arrow sprite-fm-mono icon-dropdown">[$89]</div>
+                                    <div class="grid-view-resize">&nbsp;</div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="s4-policies-management-scroll sticky-header-table-container hidden">
+                    <table class="s4-grid-table table-hover data-table medium-list">
+                        <thead>
+                            <tr>
+                                <th s4sort="policyName" class="policy-name">
+                                    <div class="arrow sprite-fm-mono icon-dropdown">[$86]</div>
+                                    <div class="grid-view-resize">&nbsp;</div>
+                                 </th>
+                                <th s4sort="attachmentCount" class="policy-attach">
+                                    <div class="arrow sprite-fm-mono icon-dropdown">[$s4_policy_arn_assigned_num]</div>
+                                    <div class="grid-view-resize">&nbsp;</div>
+                                </th>
+                                <th s4sort="arn" class="policy-arn">
+                                    <div class="arrow sprite-fm-mono icon-dropdown">[$s4_policy_arn]</div>
+                                    <div class="grid-view-resize">&nbsp;</div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="s4-users-management-scroll sticky-header-table-container hidden">
+                    <table class="s4-grid-table table-hover data-table medium-list">
+                        <thead>
+                            <tr>
+                                <th s4sort="name" class="s4-user-name">
+                                    <div class="arrow sprite-fm-mono icon-dropdown">[$86]</div>
+                                    <div class="grid-view-resize">&nbsp;</div>
+                                </th>
+                                <th class="s4-groups no-sortable">
+                                    <div class="arrow sprite-fm-mono icon-dropdown">[$s4_groups]</div>
+                                    <div class="grid-view-resize">&nbsp;</div>
+                                </th>
+                                <th class="s4-user-arn no-sortable">
+                                    <div class="arrow sprite-fm-mono icon-dropdown">[$s4_policy_arn]</div>
+                                    <div class="grid-view-resize">&nbsp;</div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="s4-groups-management-scroll sticky-header-table-container hidden">
+                    <table class="s4-grid-table table-hover data-table medium-list">
+                        <thead>
+                            <tr>
+                                <th s4sort="name" class="s4-group-name">
+                                    <div class="arrow sprite-fm-mono icon-dropdown">[$86]</div>
+                                    <div class="grid-view-resize">&nbsp;</div>
+                                </th>
+                                <th class="s4-user-amount no-sortable">
+                                    <div class="arrow sprite-fm-mono icon-dropdown">[$19087]</div>
+                                    <div class="grid-view-resize">&nbsp;</div>
+                                </th>
+                                <th class="s4-att-policies no-sortable">
+                                    <div class="arrow sprite-fm-mono icon-dropdown">[$s4_assigned_policies]</div>
+                                    <div class="grid-view-resize">&nbsp;</div>
+                                </th>
+                                <th class="s4-group-arn no-sortable">
+                                    <div class="arrow sprite-fm-mono icon-dropdown">[$s4_policy_arn]</div>
+                                    <div class="grid-view-resize">&nbsp;</div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="s4-policies-info-content-block hidden">
+                    <div class="s4-details-section basic-info">
+                        <div class="basic-info-header">[$s4_policy_properties]</div>
+                        <div class="basic-info-body">
+                            <div class="labels-col">
+                                <div class="row">[$s4_policy_name_label]</div>
+                                <div class="row">[$s4_policy_arn_label]</div>
+                                <div class="row">[$s4_policy_assigned_label]</div>
+                            </div>
+                            <div class="values-col">
+                                <div class="row js-policies-name-value"></div>
+                                <div class="row js-policies-arn-value">
+                                    <span class="js-selectable-text"></span>
+                                    <i class="sprite-fm-mono icon-copy icon24"></i>
+                                </div>
+                                <div class="row js-policies-att-num-value"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="s4-tabs-bl">
+                        <button class="s4-tab-lnk s4-policy-pdoc active" data-table="policy-pdoc-info">[$s4_policy_doc_label]</button>
+                        <button class="s4-tab-lnk s4-policy-groups" data-table="policy-groups-info">[$s4_groups]</button>
+                        <button class="s4-tab-lnk s4-policy-users" data-table="policy-users-info">[$s4_users]</button>
+                    </div>
+                    <div class="s4-info-section policy-pdoc-info">
+                        <div class="info-section-header">
+                            <span class="header-txt">[$s4_policy_doc_label]</span>
+                        </div>
+                        <div class="s4-policy-pdoc-management-scroll policy-doc-container">
+                            <textarea class="policy-doc" readonly></textarea>
+                            <div class="policy-doc-footer">
+                                <div class="foot-left-gutter"></div>
+                                <div class="foot-button">
+                                    <button class="btn-icon copy-policy-doc"><i class="sprite-fm-mono icon-copy icon24"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="s4-info-section policy-groups-info hidden">
+                        <div class="info-section-header">
+                            <span class="header-txt">[$s4_groups]</span>
+                            <div class="header-btn">
+                                <button class="mega-button no-hover action add-s4-new-groups">
+                                    <i class="sprite-fm-mono icon-accounts icon24"></i>
+                                    <span>[$s4_add_groups]</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="s4-policy-groups-management-scroll sticky-header-table-container">
+                            <table class="s4-grid-table data-table medium-list">
+                                <thead>
+                                    <tr>
+                                        <th s4sort="name" class="s4-group-name">
+                                            <div class="arrow sprite-fm-mono icon-dropdown">[$86]</div>
+                                            <div class="grid-view-resize">&nbsp;</div>
+                                        </th>
+                                        <th class="actions-btn no-sortable">
+                                            <div class="grid-view-resize">&nbsp;</div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="s4-info-section policy-users-info hidden">
+                        <div class="info-section-header">
+                            <span class="header-txt">[$s4_users]</span>
+                            <div class="header-btn">
+                                <button class="mega-button no-hover action add-s4-new-users">
+                                    <i class="sprite-fm-mono icon-contact icon24"></i>
+                                    <span>[$s4_add_users]</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="s4-policy-users-management-scroll sticky-header-table-container">
+                            <table class="s4-grid-table data-table medium-list">
+                                <thead>
+                                    <tr>
+                                        <th s4sort="name" class="s4-user-name">
+                                            <div class="arrow sprite-fm-mono icon-dropdown">[$86]</div>
+                                            <div class="grid-view-resize">&nbsp;</div>
+                                        </th>
+                                        <th class="actions-btn no-sortable">
+                                            <div class="grid-view-resize">&nbsp;</div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="s4-users-info-content-block hidden">
+                    <div class="s4-details-section basic-info">
+                        <div class="basic-info-header">[$s4_user_properties]</div>
+                        <div class="basic-info-body">
+                            <div class="labels-col">
+                                <div class="row">[$s4_user_name_label]</div>
+                                <div class="row">[$s4_user_arn_label]</div>
+                            </div>
+                            <div class="values-col">
+                                <div class="row js-user-name-value"></div>
+                                <div class="row js-user-arn-value">
+                                    <span class="js-selectable-text"></span>
+                                    <i class="sprite-fm-mono icon-copy icon24"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="s4-tabs-bl">
+                        <button class="s4-tab-lnk s4-user-keys active" data-table="user-keys-info">[$s4_keys]</button>
+                        <button class="s4-tab-lnk s4-user-groups" data-table="user-groups-info">[$s4_groups]</button>
+                        <button class="s4-tab-lnk s4-user-policies" data-table="user-policies-info">[$s4_policies]</button>
+                        <div class="clear"></div>
+                    </div>
+                    <div class="s4-info-section user-keys-info">
+                        <div class="info-section-header">
+                            <span class="header-txt">[$s4_keys]</span>
+                            <div class="header-btn">
+                                <button class="mega-button no-hover action add-s4-new-keys">
+                                    <i class="sprite-fm-mono icon-add-circle icon-green icon24"></i>
+                                    <span>[$s4_key_create]</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="s4-user-keys-management-scroll sticky-header-table-container">
+                            <table class="s4-grid-table table-hover data-table medium-list">
+                                <thead>
+                                    <tr>
+                                        <th s4sort="n" class="key-name">
+                                            <div class="arrow sprite-fm-mono icon-dropdown">[$86]</div>
+                                            <div class="grid-view-resize">&nbsp;</div>
+                                        </th>
+                                        <th s4sort="ak" class="access-key">
+                                            <div class="arrow sprite-fm-mono icon-dropdown">[$s4_key_access_title]</div>
+                                            <div class="grid-view-resize">&nbsp;</div>
+                                        </th>
+                                        <th class="secret-key no-sortable">
+                                            <div class="arrow sprite-fm-mono">[$s4_key_secret_title]</div>
+                                            <div class="grid-view-resize">&nbsp;</div>
+                                        </th>
+                                        <th s4sort="en" class="status">
+                                            <div class="arrow sprite-fm-mono icon-dropdown">[$89]</div>
+                                            <div class="grid-view-resize">&nbsp;</div>
+                                        </th>
+                                        <th class="actions-btn no-sortable">
+                                            <div class="grid-view-resize">&nbsp;</div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="s4-info-section user-groups-info hidden">
+                        <div class="info-section-header">
+                            <span class="header-txt">[$s4_groups]</span>
+                            <div class="header-btn">
+                                <button class="mega-button no-hover action add-s4-new-groups">
+                                    <i class="sprite-fm-mono icon-accounts icon24"></i>
+                                    <span>[$s4_user_add_to_group]</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="s4-user-groups-management-scroll sticky-header-table-container">
+                            <table class="s4-grid-table table-hover data-table medium-list">
+                                <thead>
+                                    <tr>
+                                        <th s4sort="n" class="group-name">
+                                            <div class="arrow sprite-fm-mono icon-dropdown">[$86]</div>
+                                            <div class="grid-view-resize">&nbsp;</div>
+                                        </th>
+                                        <th class="att-policies no-sortable">[$s4_assigned_policies]</th>
+                                        <th class="actions-btn no-sortable">
+                                            <div class="grid-view-resize">&nbsp;</div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="s4-info-section user-policies-info hidden">
+                        <div class="info-section-header">
+                            <span class="header-txt">[$s4_policies]</span>
+                            <div class="header-btn">
+                                <button class="mega-button no-hover action add-policies">
+                                    <i class="sprite-fm-mono icon-policy icon24"></i>
+                                    <span>[$s4_add_policies]</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="s4-user-policies-management-scroll sticky-header-table-container">
+                            <table class="s4-grid-table table-hover data-table medium-list">
+                                <thead>
+                                    <tr>
+                                        <th s4sort="name" class="policy-name">
+                                            <div class="arrow sprite-fm-mono icon-dropdown">[$86]</div>
+                                            <div class="grid-view-resize">&nbsp;</div>
+                                        </th>
+                                        <th class="actions-btn no-sortable">
+                                            <div class="grid-view-resize">&nbsp;</div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="s4-groups-info-content-block hidden">
+                    <div class="s4-details-section basic-info">
+                        <div class="basic-info-header">[$s4_group_properties]</div>
+                        <div class="basic-info-body">
+                            <div class="labels-col">
+                                <div class="row">[$s4_group_name_label]</div>
+                                <div class="row">[$s4_group_arn_label]</div>
+                            </div>
+                            <div class="values-col">
+                                <div class="row js-group-name-value"></div>
+                                <div class="row js-group-arn-value">
+                                    <span class="js-selectable-text"></span>
+                                    <i class="sprite-fm-mono icon-copy icon24"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="s4-tabs-bl">
+                        <button class="s4-tab-lnk s4-group-users active" data-table="group-users-info">[$s4_users]</button>
+                        <button class="s4-tab-lnk s4-group-policies" data-table="group-policies-info">[$s4_policies]</button>
+                    </div>
+                    <div class="s4-info-section group-users-info">
+                        <div class="info-section-header">
+                            <span class="header-txt">[$s4_users]</span>
+                            <div class="header-btn">
+                                <button class="mega-button no-hover action add-s4-new-users">
+                                    <i class="sprite-fm-mono icon-contact icon24"></i>
+                                    <span>[$s4_add_users]</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="s4-group-users-management-scroll sticky-header-table-container">
+                            <table class="s4-grid-table table-hover data-table medium-list">
+                                <thead>
+                                    <tr>
+                                        <th s4sort="name" class="s4-user-name">
+                                            <div class="arrow sprite-fm-mono icon-dropdown">[$86]</div>
+                                            <div class="grid-view-resize">&nbsp;</div>
+                                        </th>
+                                        <th class="actions-btn no-sortable">
+                                            <div class="grid-view-resize">&nbsp;</div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="s4-info-section group-policies-info hidden">
+                        <div class="info-section-header">
+                            <span class="header-txt">[$s4_policies]</span>
+                            <div class="header-btn">
+                                <button class="mega-button no-hover action add-policies">
+                                    <i class="sprite-fm-mono icon-policy icon24"></i>
+                                    <span>[$s4_add_policies]</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="s4-group-policies-management-scroll sticky-header-table-container">
+                            <table class="s4-grid-table table-hover data-table medium-list">
+                                <thead>
+                                    <tr>
+                                        <th s4sort="name" class="policy-name">
+                                            <div class="arrow sprite-fm-mono icon-dropdown">[$86]</div>
+                                            <div class="grid-view-resize">&nbsp;</div>
+                                        </th>
+                                        <th class="actions-btn no-sortable">
+                                            <div class="grid-view-resize">&nbsp;</div>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <div class="selection-status-bar hidden">
                 <span class="selection-bar-col"></span>
                 <div class="selection-links-wrapper">
+                    <button class="mega-button simpletip small action js-statusbarbtn s4-key-enable" data-simpletipoffset="2" data-simpletip="[$s4_key_enable]" data-simpletipposition="top">
+                        <div><i class="sprite-fm-mono icon-enable-small"></i></div>
+                    </button>
+                    <button class="mega-button simpletip small action js-statusbarbtn s4-key-disable" data-simpletipoffset="2" data-simpletip="[$s4_key_disable]" data-simpletipposition="top">
+                        <div><i class="sprite-fm-mono icon-disable-small"></i></div>
+                    </button>
+                    <button class="mega-button simpletip small action js-statusbarbtn s4-key-download" data-simpletipoffset="2" data-simpletip="[$58]" data-simpletipposition="top">
+                        <div><i class="sprite-fm-mono icon-download-small"></i></div>
+                    </button>
+                    <button class="mega-button simpletip small action js-statusbarbtn s4-key-copy-config" data-simpletipoffset="2" data-simpletip="[$63]" data-simpletipposition="top">
+                        <div><i class="sprite-fm-mono icon-copy"></i></div>
+                    </button>
+                    <button class="mega-button simpletip small action js-statusbarbtn s4-policy-copy-arn" data-simpletipoffset="2" data-simpletip="[$63]" data-simpletipposition="top">
+                        <div><i class="sprite-fm-mono icon-copy"></i></div>
+                    </button>
+                    <button class="mega-button simpletip small action js-statusbarbtn s4-key-rename" data-simpletipoffset="2" data-simpletip="[$61]" data-simpletipposition="top">
+                        <div><i class="sprite-fm-mono icon-rename"></i></div>
+                    </button>
+                    <button class="mega-button simpletip small action js-statusbarbtn s4-key-delete" data-simpletipoffset="2" data-simpletip="[$1730]" data-simpletipposition="top">
+                        <div><i class="sprite-fm-mono icon-bin"></i></div>
+                    </button>
+                    <button class="mega-button simpletip small action js-statusbarbtn s4-user-copy-arn" data-simpletipoffset="2" data-simpletip="[$s4_copy_arn]" data-simpletipposition="top">
+                        <div><i class="sprite-fm-mono icon-copy"></i></div>
+                    </button>
+                    <button class="mega-button simpletip small action js-statusbarbtn s4-user-rename" data-simpletipoffset="2" data-simpletip="[$61]" data-simpletipposition="top">
+                        <div><i class="sprite-fm-mono icon-rename"></i></div>
+                    </button>
+                    <button class="mega-button simpletip small action js-statusbarbtn s4-user-delete" data-simpletipoffset="2" data-simpletip="[$1730]" data-simpletipposition="top">
+                        <div><i class="sprite-fm-mono icon-bin"></i></div>
+                    </button>
+                    <button class="mega-button simpletip small action js-statusbarbtn s4-group-copy-arn" data-simpletipoffset="2" data-simpletip="[$s4_copy_arn]" data-simpletipposition="top">
+                        <div><i class="sprite-fm-mono icon-copy"></i></div>
+                    </button>
+                    <button class="mega-button simpletip small action js-statusbarbtn s4-group-rename" data-simpletipoffset="2" data-simpletip="[$61]" data-simpletipposition="top">
+                        <div><i class="sprite-fm-mono icon-rename"></i></div>
+                    </button>
+                    <button class="mega-button simpletip small action js-statusbarbtn s4-group-delete" data-simpletipoffset="2" data-simpletip="[$1730]" data-simpletipposition="top">
+                        <div><i class="sprite-fm-mono icon-bin"></i></div>
+                    </button>
                     <button class="mega-button simpletip small action js-statusbarbtn preview" data-simpletipoffset="2" data-simpletip="[$1899]" data-simpletipposition="top">
                         <div><i class="sprite-fm-mono icon-preview-reveal"></i></div>
                     </button>
@@ -2239,21 +3079,21 @@
                     <button class="mega-button simpletip small action js-statusbarbtn sendto" data-simpletipoffset="2" data-simpletip="[$17764]" data-simpletipposition="top">
                         <div><i class="sprite-fm-mono icon-send-to-chat"></i></div>
                     </button>
-                    <button class="mega-button simpletip small action js-statusbarbtn link" data-simpletipoffset="2" data-simpletip="[$59]" data-simpletipposition="top">
+                    <button class="mega-button simpletip small action js-statusbarbtn link" data-simpletipoffset="2" data-simpletip="[$share_link]" data-simpletipposition="top">
                         <div><i class="sprite-fm-mono icon-link"></i></div>
                     </button>
                     <button class="mega-button simpletip small action js-statusbarbtn delete" data-simpletipoffset="2" data-simpletip="[$83]" data-simpletipposition="top">
                         <div><i class="sprite-fm-mono icon-bin"></i></div>
                     </button>
                     <button class="mega-button simpletip small action js-statusbarbtn delete-from-album" data-simpletipoffset="2" data-simpletip="[$album_item_remove_label]" data-simpletipposition="top">
-                        <div><i class="sprite-fm-mono icon-disabled-filled"></i></div>
+                        <div><i class="sprite-fm-mono icon-bin"></i></div>
                     </button>
                     <button class="mega-button simpletip small action js-statusbarbtn options" data-simpletipoffset="2" data-simpletip="[$tooltip_more]" data-simpletipposition="top">
                         <div><i class="sprite-fm-mono icon-options"></i></div>
                     </button>
                 </div>
             </div>
-            <div class="search-bottom-wrapper">
+            <div class="search-bottom-wrapper hidden">
                 <div class="crumb-overflow-link dropdown">
                     <a class="breadcrumb-dropdown-link">
                         <i class="menu-icon sprite-fm-mono icon-options icon24"></i>
@@ -2263,7 +3103,9 @@
                 <div class="fm-breadcrumbs-block"></div>
                 <div class="breadcrumb-dropdown"></div>
             </div>
+            <div class="commercial-wrapper hidden" id="commercial-wrapper-weblinkb"></div>
         </div>
+
 
         <div class="fm-transfers-block">
             <div class="fm-transfers-header">
@@ -2687,68 +3529,76 @@
                             <div class="title-txt">[$17022]</div>
                         </div>
                         <div class="settings-right-block accounttype">
-                            <div class="settings-sub-section">
-                                <div class="subtitle-txt">[$16166]</div>
-                                <div class="account plan-info accounttype">
-                                    <span></span>
+                            <div class="plan-details">
+                                <div class="settings-sub-section">
+                                    <div class="subtitle-txt">[$16166]</div>
+                                    <div class="account plan-info accounttype">
+                                        <span></span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="settings-sub-section acc-storage-space">
-                                <div class="subtitle-txt">[$798]</div>
-                                <div class="account plan-info storage">
-                                    <span></span>
+                                <div class="settings-sub-section pro-extras hidden">
+                                    <div class="subtitle-txt">[$extras_plan_title]</div>
+                                    <div class="account plan-info">
+                                        <span>[$pro_extras_vpn]</span>
+                                    </div>
                                 </div>
-                                <div class="bars-container storage">
-                                    <div class="bars-content">
-                                        <div class="settings-bar">
-                                            <div class="settings-sub-bar"></div>
-                                        </div>
-                                        <div class="quota-note base-quota-note">
-                                            <i></i><span></span>
-                                        </div>
-                                        <div class="quota-note achieve-quota-note">
-                                             <i></i><span></span>
+                                <div class="settings-sub-section acc-storage-space">
+                                    <div class="subtitle-txt">[$798]</div>
+                                    <div class="account plan-info storage">
+                                        <span></span>
+                                    </div>
+                                    <div class="bars-container storage">
+                                        <div class="bars-content">
+                                            <div class="settings-bar">
+                                                <div class="settings-sub-bar"></div>
+                                            </div>
+                                            <div class="quota-note base-quota-note">
+                                                <i></i><span></span>
+                                            </div>
+                                            <div class="quota-note achieve-quota-note">
+                                                <i></i><span></span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="settings-sub-section acc-bandwidth-vol hidden">
-                                <div class="subtitle-txt short-title">[$16122]</div>
-                                <div class="account plan-info bandwidth">
-                                    <span></span>
-                                </div>
-                                <div class="bars-container bandwidth">
-                                    <div class="bars-content">
-                                        <div class="settings-bar">
-                                            <div class="settings-sub-bar"></div>
-                                        </div>
-                                        <div class="quota-note base-quota-note">
-                                             <i></i><span></span>
-                                        </div>
-                                        <div class="quota-note achieve-quota-note">
-                                             <i></i><span></span>
+                                <div class="settings-sub-section acc-bandwidth-vol hidden">
+                                    <div class="subtitle-txt short-title">[$16122]</div>
+                                    <div class="account plan-info bandwidth">
+                                        <span></span>
+                                    </div>
+                                    <div class="bars-container bandwidth">
+                                        <div class="bars-content">
+                                            <div class="settings-bar">
+                                                <div class="settings-sub-bar"></div>
+                                            </div>
+                                            <div class="quota-note base-quota-note">
+                                                <i></i><span></span>
+                                            </div>
+                                            <div class="quota-note achieve-quota-note">
+                                                <i></i><span></span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="settings-sub-section acc-renew-date-info ">
-                                <div class="subtitle-txt expiry-txt">[$7354]</div>
-                                <div class="account plan-info expiry">
-                                    <span class="red">September 1st 2013</span>
+                                <div class="settings-sub-section acc-renew-date-info ">
+                                    <div class="subtitle-txt expiry-txt">[$7354]</div>
+                                    <div class="account plan-info expiry">
+                                        <span class="red">September 1st 2013</span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="settings-sub-section sub-container subscription justify-end  border hidden">
-                                <button class="mega-button btn-cancel-sub">
-                                    <span>[$6822]</span>
-                                </button>
-                            </div>
-                            <div class="settings-sub-section justify-end">
-                                <button class="mega-button right btn-achievements">
-                                    <span>[$16117]</span>
-                                </button>
-                                <button class="mega-button positive upgrade-to-pro">
-                                    <span>[$5549]</span>
-                                </button>
+                                <div class="settings-sub-section sub-container subscription justify-end  border hidden">
+                                    <button class="mega-button btn-cancel-sub">
+                                        <span>[$sub_cancellation_btn_label]</span>
+                                    </button>
+                                </div>
+                                <div class="settings-sub-section justify-end">
+                                    <button class="mega-button right btn-achievements">
+                                        <span>[$16117]</span>
+                                    </button>
+                                    <button class="mega-button positive upgrade-to-pro plan-details-upgrade">
+                                        <span>[$5549]</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2872,9 +3722,17 @@
                                         <div class="mega-feature-switch no-trans-init"></div>
                                     </div>
                                 </div>
+                                <div class="settings-sub-section">
+                                    <div for="file-request" class="switch-label">
+                                    [$settings_cloud_file_request]
+                                    </div>
+                                    <div class="mega-switch toggle-on" id="file-request" name="upload">
+                                        <div class="mega-feature-switch no-trans-init"></div>
+                                    </div>
+                                </div>
                             </div>
                             <div class="switch-container chat">
-                                <div class="subtitle-txt">[$7997]</div>
+                                <div class="subtitle-txt">[$chat_and_meetings_settings]</div>
                                 <div class="settings-sub-section">
                                     <div class="switch-label">
                                         [$16144]
@@ -2883,14 +3741,14 @@
                                         <div class="mega-feature-switch no-trans-init"></div>
                                     </div>
                                 </div>
-                                <!-- <div class="settings-sub-section">
-                                    <div class="switch-label">
-                                    Video call notifications
+                                <div class="mega-banner body with-btn chat-permissions-banner">
+                                    <div class="mega-banner">
+                                        <i class="sprite-fm-mono icon-info-filled"></i>
                                     </div>
-                                    <div class="mega-switch toggle-on" id=" ">
-                                        <div class="mega-feature-switch no-trans-init"></div>
+                                    <div class="mega-banner cell text-cell">
+                                        <div class="versioning-body-text"></div>
                                     </div>
-                                </div> -->
+                                </div>
                             </div>
                             <div class="switch-container contacts">
                                 <div class="subtitle-txt">[$165]</div>
@@ -3157,7 +4015,7 @@
                     </div>
                 </div>
                 <div class="fm-account-file-management fm-account-sections">
-                    <div class="account data-block file-version">
+                    <div class="account data-block file-version js-file-version-settings">
                         <div class="settings-left-block">
                             <div class="title-txt">[$19475]</div>
                         </div>
@@ -3230,7 +4088,7 @@
                                         <div class="versioning-body-text">[$18678]</div>
                                     </div>
                                     <div class="mega-banner cell">
-                                        <button class="mega-button positive upgrade-to-pro">
+                                        <button class="mega-button positive upgrade-to-pro rubbish-upgrade">
                                             <span>[$129]</span>
                                         </button>
                                     </div>
@@ -3280,6 +4138,16 @@
                                 </div>
                             </div>
                             <div class="settings-sub-section">
+                                <div class="subtitle-txt">
+                                    <span>[$subfolder_media_discovery]</span>
+                                    <span class="new-tag">[$24648]</span>
+                                </div>
+                                <div class="mega-switch toggle-on" id="subfolder-media-discovery">
+                                    <div class="mega-feature-switch no-trans-init"></div>
+                                </div>
+                                <div class="content-txt">[$subfolder_media_discovery_desc]</div>
+                            </div>
+                            <div class="settings-sub-section">
                                 <div class="subtitle-txt">[$hide_recent_activity]</div>
                                 <div class="mega-switch toggle-on" id="hide-recents">
                                     <div class="mega-feature-switch no-trans-init"></div>
@@ -3290,25 +4158,67 @@
                     </div>
                     <div class="account data-block dialog-options">
                         <div class="settings-left-block">
-                            <div class="title-txt">[$20169]</div>
+                            <div class="title-txt">[$show_again_dialog_header]</div>
+                            <div class="content-txt">[$show_again_dialog_desc]</div>
                         </div>
                         <div class="settings-right-block">
                             <div class="settings-sub-section">
-                                <div class="subtitle-txt">[$19596]</div>
+                                <div class="subtitle-txt">[$drag_drop_show_again]</div>
                                 <div class="mega-switch toggle-on" id="ulddd">
                                     <div class="mega-feature-switch no-trans-init"></div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="account data-block link-options">
-                        <div class="settings-left-block">
-                            <div class="title-txt">[$setting_section_plink]</div>
-                        </div>
-                        <div class="settings-right-block">
                             <div class="settings-sub-section">
-                                <div class="subtitle-txt">[$setting_plink_warn]</div>
-                                <div class="mega-switch" id="nowarnpl">
+                                <div class="subtitle-txt">[$move_to_rub_show_again]</div>
+                                <div class="mega-switch toggle-on" id="skipDelWarning">
+                                    <div class="mega-feature-switch no-trans-init"></div>
+                                </div>
+                            </div>
+                            <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$pass_confirm_show_again]</div>
+                                <div class="mega-switch toggle-on" id="prd">
+                                    <div class="mega-feature-switch no-trans-init"></div>
+                                </div>
+                            </div>
+                            <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$delete_chat_msg_show_again]</div>
+                                <div class="mega-switch toggle-on chat-dialog" id="xcod-1">
+                                    <div class="mega-feature-switch no-trans-init"></div>
+                                </div>
+                            </div>
+                            <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$paste_img_chat_show_again]</div>
+                                <div class="mega-switch toggle-on chat-dialog" id="xcod-2">
+                                    <div class="mega-feature-switch no-trans-init"></div>
+                                </div>
+                            </div>
+                            <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$archive_chat_show_again]</div>
+                                <div class="mega-switch toggle-on chat-dialog" id="xcod-4">
+                                    <div class="mega-feature-switch no-trans-init"></div>
+                                </div>
+                            </div>
+                            <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$unarchive_chat_show_again]</div>
+                                <div class="mega-switch toggle-on chat-dialog" id="xcod-5">
+                                    <div class="mega-feature-switch no-trans-init"></div>
+                                </div>
+                            </div>
+                            <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$plan_expiry_show_again]</div>
+                                <div class="mega-switch toggle-on" id="hideProExpired">
+                                    <div class="mega-feature-switch no-trans-init"></div>
+                                </div>
+                            </div>
+                            <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$remove_link_show_again]</div>
+                                <div class="mega-switch toggle-on" id="nowarnpl">
+                                    <div class="mega-feature-switch no-trans-init"></div>
+                                </div>
+                            </div>
+                            <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$rewind_confirm_account_setting_label]</div>
+                                <div class="mega-switch toggle-on" id="rwReinstate">
                                     <div class="mega-feature-switch no-trans-init"></div>
                                 </div>
                             </div>
@@ -3351,7 +4261,7 @@
                                         </div>
                                     </div>
                                     <div class="mega-banner cell">
-                                        <button class="mega-button positive upgrade-to-pro">
+                                        <button class="mega-button positive upgrade-to-pro bandwidth-upgrade">
                                             <span>[$129]</span>
                                         </button>
                                     </div>
@@ -3582,6 +4492,23 @@
                             </div>
                         </div>
                     </div>
+                    <div class="account data-block contact-verification-settings">
+                        <!-- new feature -->
+                        <div class="settings-left-block">
+                            <div class="title-txt">[$contact_verification_title]</div>
+                        </div>
+                        <div class="settings-right-block">
+                            <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$contact_verification_sub_title]</div>
+                                <div class="mega-switch" id="contact-verification-toggle">
+                                    <div class="mega-feature-switch no-trans-init"></div>
+                                </div>
+                                <div class="content-txt">
+                                    [$contact_verification_content]
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="fm-account-reseller fm-account-sections hidden">
                     <div class="account data-block create-voucher">
@@ -3652,6 +4579,7 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Hear a sound when someone joins or leaves a call. -->
                     <div class="account data-block sound-notifications">
                         <div class="settings-left-block">
                             <div class="title-txt">[$sound_notifications]</div>
@@ -3666,8 +4594,164 @@
                         </div>
                     </div>
                 </div>
+                <div class="fm-account-vpn fm-account-sections">
+                    <div class="account data-block manage-credentials">
+                        <div class="settings-left-block">
+                            <div class="title-txt">[$vpn_page_welcome_section_title]</div>
+                            <div class="step-desc free-info">
+                                <div class="step-desc">[$vpn_page_welcome_only_pro]</div>
+                                <a href="/pro" class="mega-button positive clickurl upgrade-to-pro">[$vpn_page_welcome_upgrade_to_pro]</a>
+                            </div>
+                            <div class="step-desc pro-info hidden">[$vpn_page_welcome_free_for_pro]</div>
+                            <div class="step-device more-info">
+                                <a href="https://mega.io/vpn" target="_blank" rel="noopener noreferrer" class="vpn-link clickurl more-info">[$more_settings_more_info_title]</a>
+                            </div>
+                            <p class="step-device contact-support"><i class="sprite-fm-mono icon-email-filled icon24"></i>[$vpn_page_welcome_contact]</p>
+                            <a href="mailto:support@mega.nz" target="_blank" rel="noopener" class="mega-button vpn-link email-support">support@mega.co.nz</a>
+                        </div>
+                        <div class="settings-right-block">
+                            <h3 class="setup-step-heading">[$vpn_page_setup_heading]</h3>
+                            <div class="step-device">[$vpn_page_desktop_heading]</div>
+                            <div class="desktop-download-links">
+                                <a href="https://mega.nz/MEGAvpnSetup64.exe" target="_blank" rel="noopener noreferrer" class="mega-button vpn-link clickurl js-vpn-client-desktop windows">[$vpn_page_install_windows_desktop]</a>
+                                <a href="https://apps.apple.com/app/mega-vpn-privacy-online/id6456784858" target="_blank" rel="noopener noreferrer" class="mega-button vpn-link clickurl js-vpn-client-desktop macos">[$vpn_page_install_macos_desktop]</a>
+                            </div>
+                            <div class="step-device">[$vpn_page_mobile_heading]</div>
+                            <div class="step-desc">[$vpn_page_install_mobile_client_desc]</div>
+                            <div class="download-qrs">
+                                <div class="download-qr android">
+                                    <div class="qr-img"></div>
+                                    <span class="qr-desc"><i class="sprite-fm-mono icon-android icon24"></i>[$android]</span>
+                                </div>
+                                <div class="download-qr ios">
+                                    <div class="qr-img"></div>
+                                    <span class="qr-desc"><i class="sprite-fm-mono icon-ios icon24"></i>[$ios]</span>
+                                </div>
+                            </div>
+                            <div class="step-device credentials-heading">[$vpn_page_step2_credentials_heading]</div>
+                            <div class="tnc-agree-checkbox">
+                                <div class="tnc-check checkboxOff"></div>
+                                <label class="radio-txt">[$vpn_page_step2_tnc_checkbox_label]</label>
+                                <div class="clear"></div>
+                            </div>
+                            <div class="step2-actions">
+                                <i class="sprite-fm-mono icon-globe-01 location-icon"></i>
+                                <div class="mega-input title-ontop dropdown-input acc-setting-country-sec location-dropdown" id="vpn-country">
+                                    <span>Choose location</span>
+                                    <i class="sprite-fm-mono icon-dropdown"></i>
+                                    <div class="mega-input-dropdown hidden">
+                                        <div class="dropdown-scroll"></div>
+                                    </div>
+                                </div>
+                                <button class="mega-button js-create-cred">[$vpn_page_generate_cred_btn]</button>
+                            </div>
+                            <div class="step2-out hidden">
+                                <div class="cred-slots">
+                                    <div class="creds-container"></div>
+                                    <template id="cred-slot-tpl">
+                                        <div class="cred-slot">
+                                            <h3 class="label">[$vpn_page_slot_available]</h3>
+                                            <i class="control sprite-fm-mono icon-bin js-remove"></i>
+                                        </div>
+                                    </template>
+                                </div>
+                                <div class="post-create-section hidden">
+                                    <div class="config-qr">
+                                        <div class="qr-img"></div>
+                                    </div>
+                                    <div class="config-actions">
+                                        <a href="" class="mega-button positive vpn-link js-download-config">[$vpn_page_step2_desktop_btn]</a>
+<!--                                        <button class="view-ini-config">View</button>-->
+                                    </div>
+                                    <div class="config-output hidden">
+                                        <pre class="config-text"></pre>
+                                        <button class="copy js-copy" aria-label="[$vpn_created_dialog_step2_copy_config]">
+                                            <i class="sprite-fm-mono icon-copy-2"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                 <!-- S4 object storage settings. -->
+                <div class="fm-account-s4 fm-account-sections hidden">
+                    <div class="account settings-banner s4-specs-banner">
+                        <div class="settings-banner-cell first-block">
+                            <i class="light-icon"></i>
+                        </div>
+                        <div class="settings-banner-cell second-block">
+                           <div class="title-txt">[$s4_specs_banner]</div>
+                        </div>
+                        <div class="settings-banner-cell last-block">
+                            <button class="mega-button show-s4-specs">
+                                <span>[$8742]</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="account data-block endpoints">
+                        <div class="settings-left-block">
+                            <div class="title-txt">[$s4_endpoints_header]</div>
+                        </div>
+                        <div class="settings-right-block">
+                            <div class="settings-sub-section">
+                                <div class="full-sized">
+                                    <div class="settings-body-txt">[$s4_available_endpoints]</div>
+                                    <table class="secondary-table"></table>
+                                    <div class="settings-body-txt bold">[$s4_endpoints_prefix_info]</div>
+                                    <ul></ul>
+                                    <div class="settings-body-txt">[$s4_endpoints_info]</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="account data-block access-keys">
+                        <div class="settings-left-block">
+                            <div class="title-txt">[$s4_access_keys]</div>
+                        </div>
+                        <div class="settings-right-block">
+                            <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$s4_manage_access_keys]</div>
+                                <button class="mega-button manage-s4-keys">
+                                    <span>[$s4_manage_keys]</span>
+                                </button>
+                                <div class="content-txt">[$s4_key_create_explain] </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="account data-block thumb-preview hidden">
+                        <div class="settings-left-block">
+                            <div class="title-txt">[$s4_thumb_preview]</div>
+                        </div>
+                        <div class="settings-right-block">
+                            <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$s4_enable_thumb_preview]</div>
+                                <div class="mega-switch s4-thumb-switch">
+                                    <div class="mega-feature-switch no-trans-init"></div>
+                                </div>
+                                <div class="content-txt">
+                                    [$s4_thumb_preview_info]
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="account data-block out-opts hidden">
+                        <div class="settings-left-block">
+                            <div class="title-txt">[$s4_obj_storage_opt_out]</div>
+                        </div>
+                        <div class="settings-right-block">
+                            <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$s4_disable_obj_storage]</div>
+                                <button class="mega-button negative disable-obj-storage">
+                                    <span>[$s4_disable_obj_storage_btn]</span>
+                                </button>
+                                <div class="content-txt">[$s4_opt_out_info]</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <!-- Hear a sound when someone joins or leaves a call. -->
         </section>
 
         <!-- Backup center - Backups section !-->
@@ -3702,27 +4786,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Download mobile app banner !-->
-                <div class="apps-banner hidden">
-                    <i class="banner-icon sprite-fm-illustration img-dialog-backup-phone"></i>
-                    <div class="info">
-                        <div class="header">[$backup_banner_info]</div>
-                        <div class="apps">
-                            <a href="/mobile" class="ios clickurl">
-                                <i class="sprite-fm-mono icon-ios"></i>
-                                <span>[$ios]</span>
-                            </a>
-                            <a href="/mobile" class="android clickurl">
-                                <i class="sprite-fm-mono icon-android"></i>
-                                <span>[$android]</span>
-                            </a>
-                        </div>
-                    </div>
-                    <button class="close-btn" aria-label="[[close banner]]">
-                        <i class="sprite-fm-mono icon-close-component"></i>
-                    </button>
                 </div>
             </div>
 
@@ -3929,6 +4992,11 @@
                                         <div class="storage-division-name">[$164]</div>
                                         <div class="storage-division-num"> </div>
                                     </div>
+                                    <div class="storage-division-container s4-node hidden">
+                                        <div class="storage-division-per s4-color"> </div>
+                                        <div class="storage-division-name">[$s4_object_storage]</div>
+                                        <div class="storage-division-num"> </div>
+                                    </div>
                                     <div class="storage-division-container inbox-node">
                                         <div class="storage-division-per inbox-color"> </div>
                                         <div class="storage-division-name">[$19187]</div>
@@ -3974,6 +5042,17 @@
                                         </td>
                                         <td>
                                             <div class="folder-number"> </div>,
+                                            <div class="file-number"> </div>
+                                        </td>
+                                        <td class="ff-occupy"> </td>
+                                    </tr>
+                                    <tr class="account data-item used-storage-info ba-s4 hidden">
+                                        <td>
+                                            <i class="sprite-fm-mono icon-bucket"></i>
+                                            <span class="object-storage pointer-c">[$s4_object_storage]</span>
+                                        </td>
+                                        <td>
+                                            <div class="folder-number"> </div>
                                             <div class="file-number"> </div>
                                         </td>
                                         <td class="ff-occupy"> </td>
@@ -4047,7 +5126,7 @@
                                     <tr class="account data-item used-storage-info ba-pub-links">
                                         <td>
                                             <i class="sprite-fm-mono icon-link"></i>
-                                            <span>[$16516]</span>
+                                            <span class="links-s pointer-c">[$16516]</span>
                                         </td>
                                         <td>
                                             <div class="folder-number"> </div>,
@@ -4074,7 +5153,7 @@
                             <div class="account widget content">
                                 <div class="account widget title">
                                     <i class="sprite-fm-uni icon-referral"></i>
-                                    <span>[$referral_prog_title]</span>
+                                    <span>[$22682]</span>
                                 </div>
                                 <div class="account widget text">
                                     [$22712]
@@ -4175,7 +5254,7 @@
                                     </div>
                                 </div>
 
-                                <div class="account item-wrapper js-backups-el">
+                                <div class="account item-wrapper account-item-wrapper-backups js-backups-el">
                                     <div class="account pr-item backups">
                                         <div class="account progress-perc pr2"></div>
                                         <div class="account progress-size small backups">
@@ -4188,7 +5267,7 @@
                                     </div>
                                 </div>
 
-                                <div class="account item-wrapper">
+                                <div class="account item-wrapper account-item-wrapper-versions">
                                     <div class="account pr-item versions">
                                         <div class="account progress-perc pr3"></div>
                                         <div class="account progress-size small versions">
@@ -4377,7 +5456,7 @@
                                         0 MB
                                     </td>
                                 </tr>
-                                <tr class="account data-item js-backups-el">
+                                <tr class="account data-item account-data-item-backups js-backups-el">
                                     <td class="account">
                                         <i class="sprite-fm-mono icon-database"></i>
                                         <span class="backups pointer-c">[$restricted_folder_button]</span>
@@ -4401,7 +5480,7 @@
                                         -
                                     </td>
                                 </tr>
-                                <tr class="account data-item">
+                                <tr class="account data-item account-data-item-versions">
                                     <td class="account">
                                         <i class="sprite-fm-mono icon-versions-previous"></i>
                                         <span>[$16474]</span>
@@ -4447,7 +5526,7 @@
                     <i class="sprite-fm-mono icon-arrow-right"></i>
                 </div>
                 <div class="content">
-                    <div class="medium-file-icon"></div>
+                    <div class="item-type-icon-90"></div>
                     <div class="fm-recents file-info">
                         <div class="fm-recents file-name"></div>
                         <div class="fm-recents breadcrumbs"></div>
@@ -4464,8 +5543,8 @@
                     <i class="sprite-fm-mono icon-arrow-right"></i>
                 </div>
                 <div class="content">
-                    <div class="medium-file-icon image double">
-                        <div class="medium-file-icon image"></div>
+                    <div class="item-type-icon-90 double">
+                        <div class="item-type-icon-90"></div>
                     </div>
                     <div class="fm-recents file-info">
                         <div class="fm-recents file-name"></div>
@@ -4488,7 +5567,7 @@
                                             </span>
                                             <i class="sprite-fm-mono icon-link"></i>
                                         </span>
-                                        <span class="block-view-file-type image file"><img/></span>
+                                        <span class="item-type-icon-90"><img/></span>
                                         <span class="file-settings-icon active">
                                             <i class="sprite-fm-mono icon-options"></i>
                                         </span>
@@ -4512,6 +5591,127 @@
             </div>
             <!-- END Templates for recents list -->
         </section>
+
+        <!-- New position of Info Panel so Recents area works too -->
+        <div class="folder-file-info-panel">
+            <button class="close js-close" aria-label="Close" tabindex="-1">
+                <i class="sprite-fm-mono icon-dialog-close"></i>
+            </button>
+            <div class="inner-container info-panel-scroll-block">
+                <div class="header-title">[$6859]</div>
+                <div class="info-data node-description-section top hidden">
+                    <div class="description">[$info_panel_description]</div>
+                    <div class="node-description mega-textarea">
+                        <div class="node-description-textarea textarea-scroll">
+                            <textarea placeholder="[$info_panel_description_add]" maxlength="300"></textarea>
+                            <div class="textarea-clone"></div>
+                        </div>
+                    </div>
+                    <div class="status">
+                        <div class="descPermission hidden"><span></span></div>
+                        <div class="descCounter hidden"><span>0</span>/300</div>
+                    </div>
+                </div>
+                <div class="icon-frame">
+                    <span class="block-view-file-type item-type-icon-90"><img/></span>
+                </div>
+                <div class="info-data name-section">
+                    <div class="description">[$info_panel_name]</div>
+                    <span class="sprite-fm-mono icon-takedown"></span>
+                    <div class="value name-value"></div>
+                    <div class="takedown-warning">[$item_subject_to_takedown]</div>
+                </div>
+                <div class="info-data type-section">
+                    <div class="description">[$93]</div>
+                    <div class="value type-value"></div>
+                </div>
+                <div class="info-data path-section">
+                    <div class="description">[$info_panel_path]</div>
+                    <div class="value path-value"></div>
+                </div>
+                <div class="info-data permissions-section">
+                    <i class="permissions-icon sprite-fm-mono icon-star hidden"></i>
+                    <i class="permissions-icon sprite-fm-mono icon-permissions-write hidden"></i>
+                    <i class="permissions-icon sprite-fm-mono icon-read-only hidden"></i>
+                    <div class="value permissions-value"></div>
+                </div>
+                <div class="info-data owner-section">
+                    <div class="description">[$5905]</div>
+                    <div class="value owner-value"></div>
+                </div>
+                <div class="info-data version-section">
+                    <div class="description">[$info_panel_versions]</div>
+                    <div class="value version-value"></div>
+                </div>
+                <div class="info-data current-version-section">
+                    <div class="description">[$info_panel_current_version]</div>
+                    <div class="value current-version-value"></div>
+                </div>
+                <div class="info-data prev-version-section">
+                    <div class="description">[$info_panel_previous_version]</div>
+                    <div class="value prev-version-value"></div>
+                </div>
+                <div class="info-data">
+                    <div class="description">[$info_panel_total_size]</div>
+                    <div class="value size-value"></div>
+                </div>
+                <div class="info-data contains-section">
+                    <div class="description">[$info_panel_contains]</div>
+                    <div class="value contains-value"></div>
+                </div>
+                <div class="info-data last-modified-section">
+                    <div class="description">[$info_panel_last_modified]</div>
+                    <div class="value last-modified-value"></div>
+                </div>
+                <div class="info-data date-added-section">
+                    <div class="description">[$info_panel_date_added]</div>
+                    <div class="value date-added-value"></div>
+                </div>
+                <div class="info-data node-description-section bottom hidden">
+                    <div class="description">[$info_panel_description]</div>
+                    <div class="node-description mega-textarea">
+                        <div class="node-description-textarea textarea-scroll">
+                            <textarea placeholder="[$info_panel_description_add]" maxlength="300"></textarea>
+                            <div class="textarea-clone"></div>
+                        </div>
+                    </div>
+                    <div class="status">
+                        <div class="desc-permission hidden"><span></span></div>
+                        <div class="desc-counter hidden"><span>0</span>/300</div>
+                    </div>
+                </div>
+                <div class="info-data node-tags-section hidden">
+                    <div class="description">[$info_panel_tags]<span class="pro-only-feature">[$8695]</span></div>
+                    <div class="node-tags-dropdown">
+                        <div class="dropdown-body top hidden"></div>
+                        <div class="mega-input box-style">
+                            <input type="text" name="tag-input" autocomplete="off" placeholder="[$info_panel_tags_placeholder]" class="node-tags-input megaInputs"/>
+                            <button class="js-btnClearTags hidden" type="button"><i class="sprite-fm-mono icon-dialog-close"></i></button>
+                            <div class="message-container mega-banner"></div>
+                        </div>
+                        <div class="dropdown-body bottom hidden">
+                        </div>
+                        <div class="suggestions suggestions-template hidden"></div>
+                        <div class="dropdown-item-tips dropdown-content-template-tips hidden">
+                            <div class="node-tags-tips">
+                                [$info_panel_tags_help]
+                            </div>
+                        </div>
+                        <div class="dropdown-item dropdown-content-template hidden">
+                            <div class="node-tags-add"></div>
+                        </div>
+                    </div>
+                    <div class="node-tags-chips">
+                        <div class="node-tag-chip-template hidden">
+                            <span></span> 
+                            <button class="js-btnDeleteTag" type="button"><i class="sprite-fm-mono icon-dialog-close"></i></button>
+                        </div>
+                    </div>
+                    <div class="empty-tags hidden">[$info_panel_tags_empty]</div>
+                </div>
+                <div class="pads"></div>
+            </div>
+        </div>
 
         <!-- Affiliate block. Init scrolling here !-->
         <div class="fm-affiliate body selectable-txt">
@@ -4555,20 +5755,6 @@
                                 </div>
                                 <a>[$22686]</a>
                             </div>
-                            <div class="refer-block" data-reftype="link">
-                                <i class="sprite-fm-uni icon-share-file"></i>
-                                <div class="info">
-                                    [$22687]
-                                </div>
-                                <a>[$22691]</a>
-                            </div>
-                            <div class="refer-block" data-reftype="chatlink">
-                                <i class="sprite-fm-uni icon-chat-link"></i>
-                                <div class="info">
-                                    [$22688]
-                                </div>
-                                <a>[$20575]</a>
-                            </div>
                         </div>
                     </div>
 
@@ -4578,7 +5764,7 @@
                             <span>[$22690]</span>
                             <button class="mega-button positive redeem disabled">
                                 <span>
-                                    [$458]
+                                    [$redeem_commissions_label]
                                 </span>
                             </button>
                         </div>
@@ -4791,8 +5977,13 @@
                                         <span class="name">[$22707]</span>
                                         <span class="num">0</span>
                                     </div>
-                                    <div class="fm-affiliate list-item business">
+                                    <div class="fm-affiliate list-item pro101">
                                         <span class="label blue"></span>
+                                        <span class="name">[$pro_flexi_purchases]</span>
+                                        <span class="num">0</span>
+                                    </div>
+                                    <div class="fm-affiliate list-item business">
+                                        <span class="label green"></span>
                                         <span class="name">[$22708]</span>
                                         <span class="num">0</span>
                                     </div>

@@ -1,18 +1,40 @@
 .meetings-signal-issue {
     position: absolute;
-    right: 1px;
-    bottom: -4px;
+    top: 0;
+    width: 48px;
+    height: 48px;
     border-radius: 200px;
     cursor: pointer;
 
+    &.with-small-area {
+        width: 10px;
+        height: 10px;
+        right: 10px;
+    }
+
     .button-group-item & {
-        bottom: 3px;
-        right: -6px;
+        z-index: 1;
+
+        i {
+            /* [...] */
+        }
     }
 
     i {
+        position: absolute;
+        top: -4px;
+        right: -18px;
         --icon-size: 24px;
         --mask-color: var(--secondary-orange);
+
+        .in-call &,
+        .float-video-overlay & { right: -2px; }
+    }
+
+    .dropdown.button-group-menu & {
+        top: 34px;
+        width: 34px;
+        z-index: 11;
     }
 }
 

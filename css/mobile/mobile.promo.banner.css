@@ -1,0 +1,76 @@
+.mobile .mega-promo-banner {
+    background: var(--mobile-page-background);
+    z-index: 101;
+}
+
+.mobile .mega-promo-banner .promo-banner {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.mobile .mega-promo-banner .main {
+    padding: 20px 24px 24px;
+    box-sizing: border-box;
+    height: auto;
+    overflow-y: auto;
+}
+
+.mobile .mega-promo-banner.overlay-wrap .content {
+    max-width: var(--mobile-elem-max-width);
+}
+
+.mobile .mega-promo-banner .icon-mega-logo-rounded-square {
+    --icon-size: 64px;
+}
+
+.mobile .mega-promo-banner .image {
+    margin-bottom: 24px;
+}
+
+.mobile .mega-promo-banner .title {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.mobile .mega-promo-banner .advantage-container {
+    --icon-size: 32px;
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    column-gap: 16px;
+    margin-bottom: 24px;
+    align-items: center;
+}
+
+.mobile .mega-promo-banner .advantage-container:last-of-type {
+    margin-bottom: 0;
+}
+
+.mobile .mega-promo-banner .advantage-container i {
+    grid-column: 1/1;
+    grid-row: span 2;
+}
+
+.mobile .mega-promo-banner .advantage-container h4 {
+    grid-column: 2/2;
+    grid-row: 1/1;
+    font: var(--mobile-font-copy-bold);
+    margin: 0;
+    color: var(--mobile-text-primary);
+}
+
+.mobile .mega-promo-banner .advantage-container p {
+    grid-column: 2/2;
+    grid-row: 2/2;
+    font: var(--mobile-font-copy-regular);
+    margin: 0;
+    color: var(--mobile-text-secondary);
+}
+
+.mobile .mega-promo-banner .actions {
+    border-top: 1px solid var(--mobile-border-strong);
+    padding: 16px 24px;
+    box-sizing: border-box;
+}

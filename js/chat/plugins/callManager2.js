@@ -17,43 +17,51 @@
         HD_PENDING: 4
     };
     const DOWNGRADING_QUALITY_INTRVL = 2000;
+    const NO_SIMUL_SCRSHARE_AND_CAMERA = false;
 
  /**                        ==== Overview of peer & local video rendering ====
- * The app creates a StreamNode React component for each video it wants to display - for peers, local camera,
- * thumbnail and large viewports. The StreamNode is passed a "stream" object (implementing an imaginary
- * StreamSource interface), which is responsible for providing the video. For peers, this is the Peer object.
- * For local video, this is a LocalPeerStream object. A single StreamSource can have multiple StreamNode-s
- * attached to it. StreamNode-s are regarded as "consumers" by the StreamSource. A StreamSource keeps track of all
- * its consumers and the video resolution they need. It requests from the SFU a resolution that satisfies
- * the requirement of all consumers, i.e. is higher or equal to the resolution each of them demands.
- * The most important parts of the interface between the StreamNode and the StreamSource are:
- * - StreamSource.source property, which is a video element managed by the StreamSource. This is the actual video
- *   source. The lifetime of this object is independent of the lifetime of the GUI/consumers, and is external to React.
- * - StreamNode.requestedQuality property - informs the StreamSource object what resolution the StreamNode consumer
+ * The app creates a VideoNode-derived React component for each video it wants to display - for peers (PeerVideoThumb
+ * or PeerVideoHiRes), local camera (LocalVideoThumb and LocalVideoHiRes). Video components are passed a "source"
+ * object (implementing an imaginary StreamSource interface), which is responsible for providing the video stream.
+ * For peers, this is the Peer object. For local video, this is a LocalPeerStream object. A single StreamSource can
+ * have multiple VideoNode-s attached to it.
+ * Most of the VideoNode components implement the "dynamic video" mechanism, in which the GUI displays an externally
+ * provided video player, which may be changed externally at any time. The purpose if this is to have the player exist
+ * and load the video stream before it is rendered in the GUI, allowing for smooth switching between video sources, i.e.
+ * when changing the selected peer in MainView mode.
+ * Such video components are derived from the DynVideo react class. These components are registered with the
+ * StreamSource as "consumers". A StreamSource keeps track of all its consumers and the video resolution they need.
+ * It requests from the SFU a resolution that satisfies the requirement of all consumers, i.e. is higher or equal
+ * to the resolution each of them demands. The most important parts of the interface between the VideoNode and the
+ * StreamSource are:
+ * - StreamSource.player is the video element managed by the StreamSource. This is the actual video source.
+ *   The lifetime of this object is independent of the lifetime of the GUI/consumers, and is external to React.
+ * - VideoNode.requestedQuality - informs the StreamSource object what resolution the VideoNode consumer
  *   requires
- * - StreamSource.updateVideoQuality() - calculates the quality needed to satisfy all consumers and requests it
- *   from the SFU. When a StreamNode changes its demanded video quality, it updates its .requestedQuality property
- *   and calls StreamSource.updateVideoQuality()
- * - StreamNode.updateVideoElem() - updates the DOM of the StreamNode to display the video of the current
- *   StreamSource.source. This is called both internally by the StreamNode, and externally by Stream, when
- *   StreamSource.source changes asynchronously
+ * - StreamSource.dynUpdateVideoQuality() - calculates the quality needed to satisfy all consumers and requests it
+ *   from the SFU. When a DynVideo component wants to changes its demanded video quality, it updates its
+ *  .requestedQuality property and calls StreamSource.dynUpdateVideoQuality()
+ * - DynVideo.dynUpdateVideoElem() - updates the DOM of the DynVideo to display the current StreamSource.player video.
+ *   This is called both internally by the DynVideo, and externally by StreamSource, when StreamSource.player changes
+ *   asynchronously
  *
  * Direct and cloned video display
- * Ideally, all consumers of a StreamSource would simply display the StreamSource.source video. However,
- * a DOM element can't be mounted more than once in the DOM, so each StreamNode consumer must display a different
- * <video> player. For efficiency, one of them is the "original" external StreamSource.source <video> element,
- * and the others are "clones", managed by React and having their .srcObject equal assigned to that of
- * the original .source element. Hence, the StreamNode renders the video in one of two modes - "external" or "cloned".
- * The mode flag is passed upon construction, via the .externalVideo React property.
+ * Ideally, all consumers of a StreamSource would simply display the StreamSource.player video. However,
+ * a DOM element can't be mounted more than once in the DOM, so each VideoNode consumer must display a different
+ * <video> player. So one of them displays the "original" external StreamSource.player <video> element,
+ * and the others are "clones", managed by React and having their .srcObject assigned to that of the original .player
+ * element. Hence, the DynVideo renders the video in one of two modes - "external" or "cloned". The Hi-Res versions of
+ * the video components display the external player, so that they can start rendering the video immediately. Thumbnail
+ * videos use cloned players.
  *
  * Smooth video switching
  * When switching a StreamSource between thumbnail and hi-res track, it takes a bit of time for the newly requested
  * track to start playing. If the track is directly fed into the visible <video> player, this will cause a short
  * blackout before the new resolution video starts. To avoid this, two indenepdent <video> players are used while
- * switching, and StreamSource.source points to the one currently displayed. The current track and video player
+ * switching, and StreamSource.player points to the one currently displayed. The current track and video player
  * are kept running and displayed while the newly requested track is being buffered. When the player of the new
  * track fires the "onplay" event, the "old" player is swapped with the "new" one instantly, by changing the
- * Stream.source property and calling updateVideoElem() on all consumers. The old track can then be stopped
+ * .player property and calling dynUpdateVideoElem() on all consumers. The old track can then be stopped
  * and the old player destroyed.
  *
  * Gradual resolution downgrade
@@ -68,27 +76,27 @@
             super({
                 'clientId': null,
                 'userHandle': null,
-                'audioMuted': null,
-                'videoMuted': null,
-                'haveScreenshare': null,
-                'isOnHold': null,
                 'isVisible': null,
                 'isActive': null,
-                'lastSpeaktime': null,
-                'hasSlowNetwork': null,
+                'lastSpeaktime': null
             });
             this.call = call;
             this.userHandle = userHandle;
             this.clientId = clientId;
-            this.sfuPeer = call.sfuApp.sfuClient.peers.get(clientId);
+            this.sfuPeer = call.sfuClient.peers.get(clientId);
             this.isActive = false;
             this.consumers = new Set();
+            this.vuLevelConsumers = new Set();
             this.currentQuality = VIDEO_QUALITY.NO_VIDEO;
             this.resState = RES_STATE.NO_VIDEO;
-            this.source = null;
+            this.player = null;
             this.onHdReleaseTimer = this._onHdReleaseTimer.bind(this);
             this.onAvChange(av);
             call.peers.push(this);
+            this.onAudioLevel = this.onAudioLevel.bind(this);
+            if (this.sfuPeer) { // we may be a test fake peer with invalid clientId, in which case sfuPeer is undefined
+                this.sfuPeer.requestAudioLevel(this.onAudioLevel);
+            }
         }
         destroy() {
             this.hdReleaseTimerStop();
@@ -98,19 +106,20 @@
         get name() {
             return M.getNameByHandle(this.userHandle);
         }
-        setResState(newState, video) {
-            const oldSource = this.source;
+        get hasScreen() {
+            return !!(this.av & Av.Screen);
+        }
+        setResState(newState) {
             this.resState = newState;
-            if (video) {
-                this.source = video;
-            }
-            else {
-                this.source = (newState === RES_STATE.HD || newState === RES_STATE.THUMB_PENDING)
-                    ? (this.sfuPeer.hiResPlayer && this.sfuPeer.hiResPlayer.gui.video)
-                    : (this.sfuPeer.vThumbPlayer && this.sfuPeer.vThumbPlayer.gui.video);
-            }
-            // console.warn(`setResState[${this.clientId}]: ->`, newState, this.source);
-            if (this.source !== oldSource) {
+            const thumbVideo = this.vThumbPlayer && this.vThumbPlayer.gui.video;
+            const hdVideo = this.hiResPlayer && this.hiResPlayer.gui.video;
+            const player = (newState === RES_STATE.HD || newState === RES_STATE.THUMB_PENDING)
+                ? hdVideo || thumbVideo
+                : thumbVideo || hdVideo;
+            // console.warn(`setResState[${this.clientId}]: ->`, newState, this.player);
+            const changed = this.player !== player;
+            this.player = player;
+            if (changed) {
                 this.updateConsumerVideos();
             }
         }
@@ -119,27 +128,71 @@
             // console.warn(`isStreaming[${this.clientId}]:`, !(av & Av.onHold) && (av & Av.Video));
             return !(av & Av.onHold) && (av & Av.Video);
         }
-        onAvChange(av) {
-            this.audioMuted = !(av & SfuClient.Av.Audio);
-            this.videoMuted = !(av & SfuClient.Av.Camera);
-            this.haveScreenshare = !!(av & SfuClient.Av.Screen);
-            this.isOnHold = !!(av & SfuClient.Av.onHold);
-        }
-        registerConsumer(consumerGui) {
-            this.consumers.add(consumerGui);
-            if (this.source && !consumerGui.clonedVideo) {
-                Promise.resolve(this.source.play()).catch(nop);
+        onAvChange(av, oldAv) {
+            const Av = SfuClient.Av;
+            this.isOnHold = !!(av & Av.onHold);
+            if (this.onHold) {
+                this.audioMuted = this.videoMuted = true;
+                this.isScreen = this.hasScreenAndCam = false;
+                delete this.hdLowQualityStart;
+            }
+            else {
+                this.audioMuted = !(av & Av.Audio);
+                this.videoMuted = !(av & Av.Camera);
+                this.hasScreenAndCam = !!((av & Av.ScreenHiRes) && (av & Av.CameraLowRes));
+                this.isScreen = !!(av & Av.ScreenHiRes);
+                const scrChange = !!((av ^ oldAv) & Av.ScreenHiRes);
+                if (scrChange) {
+                    this.hdLowQualityStart = this.isScreen;
+                }
+            }
+            if ((av ^ this.av) & Av.Recording) {
+                this.isRecording = !!(av & Av.Recording);
+                this.call.recorder = this.userHandle;
+                megaChat.plugins.userHelper.fetchAllNames([this.userHandle], this.call.chatRoom)
+                    .catch(dump)
+                    .finally(() => {
+                        this.call.chatRoom.trigger(
+                            this.isRecording ? 'onRecordingStarted' : 'onRecordingStopped',
+                            this
+                        );
+                    });
+            }
+            this.av = av;
+            for (const cons of this.consumers) {
+                cons.onAvChange();
             }
         }
-        deregisterConsumer(consumerGui) {
-            this.consumers.delete(consumerGui);
-            if (!this.isDestroyed) {
-                this.updateVideoQuality();
+        registerConsumer(cons) {
+            this.consumers.add(cons);
+            if (cons.isDirect && this.player) {
+                Promise.resolve(this.player.play()).catch(nop);
+            }
+        }
+        deregisterConsumer(cons) {
+            this.consumers.delete(cons);
+            if (cons.requestedQ !== undefined && !this.isDestroyed) {
+                this.dynUpdateVideoQuality();
+            }
+        }
+        registerVuLevelConsumer(cons) {
+            this.vuLevelConsumers.add(cons);
+        }
+        unregisterVuLevelConsumer(cons) {
+            this.vuLevelConsumers.delete(cons);
+        }
+        onAudioLevel(level) {
+            if (level === this.lastVuLevel) {
+                return;
+            }
+            this.lastVuLevel = level;
+            for (const cons of this.vuLevelConsumers) {
+                cons.updateAudioLevel(level);
             }
         }
         hdReleaseTimerStop() {
             if (this.hdReleaseTimer) {
-                clearTimeout(this.hdReleaseTimer);
+                clearInterval(this.hdReleaseTimer);
                 delete this.hdReleaseTimer;
                 delete this.targetQuality;
             }
@@ -166,24 +219,32 @@
             this.doGetVideoWithQuality(newQ);
         }
         noVideoSlotsForSmoothSwitch() {
-            return this.call.numVideoTracksUsed < SfuClient.numInputVideoTracks - 1;
+            const sfuClient = this.call.sfuClient;
+            return sfuClient.numRxHiRes + sfuClient.numRxVthumb >= sfuClient.numInputVideoTracks - 1;
         }
         /** Get a video stream that satisfies the quality minimum for all consumers
          * @returns {boolean} - true if video source changed synchronously, which can happen only if video was disabled,
          * or if there was no free slot for parallel request to change hi-res<->vthumb quality
          */
-        updateVideoQuality() {
+        dynUpdateVideoQuality() {
             // if no free tracks, change the quality "in-place", rather than using a second track for smooth switching
             // leave 2 tracks for race conditions, etc
             this._consumersUpdated = false;
             var maxQ = 0;
             for (const { requestedQ } of this.consumers) {
+                if (requestedQ === undefined) {
+                    continue; // not a dynamic video consumer
+                }
                 if (requestedQ > maxQ) {
                     maxQ = requestedQ;
                     if (requestedQ === VIDEO_QUALITY.HIGH) {
                         break;
                     }
                 }
+            }
+            if (this.hdLowQualityStart & maxQ > 2) {
+                maxQ = 2;
+             // console.warn("Limiting quality to 2 for low HD start");
             }
             if (maxQ === this.currentQuality) {
                 this.hdReleaseTimerStop();
@@ -198,8 +259,10 @@
                     this.hdReleaseTimerStop();
                     this.doGetVideoWithQuality(maxQ);
                 }
-                // start gradual lowering of stream quality
-                this.hdReleaseTimerRestart(maxQ);
+                else {
+                    // start gradual lowering of stream quality
+                    this.hdReleaseTimerRestart(maxQ);
+                }
             }
             return this._consumersUpdated; // return false for all cases except the ones that immediately change quality
         }
@@ -211,92 +274,134 @@
                 return;
             }
             this.currentQuality = newQuality;
-
             if (newQuality > VIDEO_QUALITY.THUMB) {
                 this.requestHdStream(4 - newQuality); // convert quality to resolution divider
             }
             else if (newQuality === VIDEO_QUALITY.THUMB) {
-                this.requestThumbStream();
+                if (this.hasScreenAndCam) {
+                    this.requestHdStream(2);
+                }
+                else {
+                    this.requestThumbStream();
+                }
             }
             else if (newQuality === VIDEO_QUALITY.NO_VIDEO) {
                 this.setResState(RES_STATE.NO_VIDEO);
-                const { sfuPeer } = this;
-                if (sfuPeer.hiResPlayer) {
-                    sfuPeer.hiResPlayer.destroy();
-                }
-                if (sfuPeer.vThumbPlayer) {
-                    sfuPeer.vThumbPlayer.destroy();
-                }
+                this.delHiResPlayer();
+                this.delVthumbPlayer();
             }
         }
         updateConsumerVideos() {
             for (const cons of this.consumers) {
-                cons.updateVideoElem();
+                if (cons.dynUpdateVideoElem) {
+                    cons.dynUpdateVideoElem();
+                }
             }
             this._consumersUpdated = true;
         }
+        delHiResPlayer() {
+            if (this.hiResPlayer) {
+                this.hiResPlayer.destroy();
+            }
+        }
+        delVthumbPlayer() {
+            if (this.vThumbPlayer) {
+                this.vThumbPlayer.destroy();
+            }
+        }
         requestHdStream(resDivider) {
             const peer = this.sfuPeer;
-            if (this.noVideoSlotsForSmoothSwitch() && peer.vThumbPlayer) {
-                peer.vThumbPlayer.destroy();
+            if (peer.isLeavingCall) {
+                console.error("SoftAssert: requestHdStream on a deleted peer");
+                return;
             }
-            const hdPlayer = peer.hiResPlayer;
-            if (hdPlayer) {
-                this.setResState(RES_STATE.HD);
-                if (resDivider !== hdPlayer.resDivider) {
-                    peer.setHiResDivider(resDivider);
+            if (this.hiResPlayer) {
+                assert(this.resState !== RES_STATE.THUMB);
+                if (!this.hdLowQualityStart) {
+                    this.hiResPlayer.setHiResDivider(resDivider);
+                }
+                if (this.resState === RES_STATE.THUMB_PENDING) { // cancel vthumb request, revert to hi-res
+                    this.delVthumbPlayer();
+                    this.setResState(RES_STATE.HD);
                 }
                 return;
             }
             // request hi-res stream
-            this.setResState(RES_STATE.HD_PENDING);
-            const gui = peer.requestHiResVideo(resDivider);
-            if (!gui) {
-                console.error("SoftAssert: requestHiResVideo on a deleted peer");
-                return;
+            if (this.noVideoSlotsForSmoothSwitch()) { // FIXME: disable this if .presenterVideo ?
+                console.warn("requestHdStream: No free video slots, freeing vthumb one if used");
+                this.delVthumbPlayer();
             }
-            gui.onPlay = () => {
+            if (this.hdLowQualityStart) {
+                resDivider = 2;
+             // console.warn("requestHdStream: Limiting HD quality to 2 for low HD start");
+            }
+            this.hiResPlayer = peer.getHiResVideo(resDivider, (sfuPlayer) => {
+                return new PlayerCtx(this.call, sfuPlayer);
+            });
+            this.setResState(RES_STATE.HD_PENDING);
+            this.hiResPlayer.gui.video.onplaying = () => {
                 if (this.resState !== RES_STATE.HD_PENDING) {
                     return false;
                 }
-                if (peer.vThumbPlayer) {
-                    peer.vThumbPlayer.destroy();
-                }
+                this.delVthumbPlayer();
                 this.setResState(RES_STATE.HD);
+                if (this.hdLowQualityStart) {
+                    delete this.hdLowQualityStart;
+                 // console.warn("hdPlayer screenshare started in low hd quality, ramping up quality");
+                    this.dynUpdateVideoQuality();
+                }
                 return true;
             };
         }
         requestThumbStream() {
             const peer = this.sfuPeer;
-            if (peer.vThumbPlayer) {
-                this.setResState(RES_STATE.THUMB);
-                if (peer.hiResPlayer) {
-                    peer.hiResPlayer.destroy();
+            if (peer.isLeavingCall) {
+                console.error("softAssert: requestThumbStream on a deleted peer");
+                return;
+            }
+            if (this.vThumbPlayer) {
+                assert(this.resState !== RES_STATE.HD);
+                if (this.resState === RES_STATE.HD_PENDING) {
+                    this.delHiResPlayer();
+                    this.setResState(RES_STATE.THUMB);
                 }
                 return;
             }
-            if (this.noVideoSlotsForSmoothSwitch() && peer.hiResPlayer) {
-                peer.hiResPlayer.destroy();
+            if (this.noVideoSlotsForSmoothSwitch()) {
+                console.warn("requestThumbStream: No free video slot, freeing hires one if used");
+                this.delHiResPlayer();
             }
+            this.vThumbPlayer = peer.getThumbVideo((player) => {
+                return new PlayerCtx(this.call, player);
+            });
             this.setResState(RES_STATE.THUMB_PENDING);
-            const gui = peer.requestThumbnailVideo();
-            if (!gui) {
-                console.error("SoftAssert: requestThumbnailVideo on a deleted peer");
-                return;
-            }
-            gui.onPlay = () => {
+            this.vThumbPlayer.gui.video.onplaying = () => {
                 if (this.resState !== RES_STATE.THUMB_PENDING) {
-                    if (this.resState === RES_STATE.HD && peer.vThumbPlayer) {
+                    if (this.resState === RES_STATE.HD) {
                         // vthumb request was aborted meanwhile, hd re-used. Delete the vthumb stream
-                        peer.vThumbPlayer.destroy();
+                        this.delVthumbPlayer();
                     }
                     return;
                 }
-                if (peer.hiResPlayer) {
-                    peer.hiResPlayer.destroy();
-                }
+                this.delHiResPlayer();
                 this.setResState(RES_STATE.THUMB);
             };
+        }
+        onPlayerDestroy(player) {
+            if (player === this.hiResPlayer) {
+                delete this.hiResPlayer;
+            }
+            else if (player === this.vThumbPlayer) {
+                delete this.vThumbPlayer;
+            }
+            else {
+                return;
+            }
+            // clean up cached quality, if there are no players
+            if (!this.hiResPlayer && !this.vThumbPlayer) {
+                this.currentQuality = VIDEO_QUALITY.NO_VIDEO;
+                // console.warn("No video from peer, setting quality to NO_VIDEO");
+            }
         }
     }
 
@@ -304,6 +409,25 @@
         constructor(call) {
             super("clientId", undefined, call.chatRoom);
             this.call = call;
+        }
+        find(cb) {
+            for (const key of this.keys()) {
+                const peer = this[key];
+                if (cb(peer)) {
+                    return peer;
+                }
+            }
+            return undefined;
+        }
+        findLast(cb) {
+            const keys = this.keys();
+            for (let i = keys.length - 1; i >= 0; i--) {
+                const peer = this[keys[i]];
+                if (cb(peer)) {
+                    return peer;
+                }
+            }
+            return undefined;
         }
         addFakeDupStream() {
             var ids = this.keys();
@@ -339,102 +463,90 @@
     }
 
     const CALL_VIEW_MODES = {
-        'GRID': 1,
-        'SPEAKER': 2,
+        'THUMBNAIL': 1,
+        'MAIN': 2,
         'MINI': 3
     };
 
     class Call extends MegaDataObject {
-        constructor(sfuApp, chatRoom, callId) {
+        constructor(chatRoom, callId, callKey) {
             super({
                 'chatRoom': null,
                 'callId': null,
                 'av': null,
                 'localVideoStream': null,
                 'viewMode': null,
-                'activeStream': null,
-                'forcedActiveStream': null,
+                'speakerCid': null, // can be 0 - means us, and null - means nobody is the active speaker
+                'pinnedCid': null, // can be 0 - means pinned local video, and null - means nothing pinned
+                'presenterStreams': new Set(),
                 'activeVideoStreamsCnt': 0,
                 'ts': Date.now(),
                 'left': false
             });
-            this.sfuApp = sfuApp;
             this.chatRoom = chatRoom;
             this.callId = callId;
             this.peers = new Peers(this);
-            this.numVideoTracksUsed = 0;
-            // eslint-disable-next-line no-use-before-define
-            this.localPeerStream = new LocalPeerStream(this);
-            this.viewMode = CALL_VIEW_MODES.GRID;
-            chatRoom.activeCall = this;
-            megaChat.activeCall = this;
+            this.viewMode = CALL_VIEW_MODES.THUMBNAIL;
+            this.stayOnEnd = !!mega.config.get('callemptytout');
+
+            chatRoom.meetingsLoading = l.joining;
+            SfuClient.speakDetectorUseSetTimeout = true;
+            this.sfuClient = window.sfuClient = new SfuClient(u_handle, this, callKey, { numVideoSlots: 60 });
+            this.localPeerStream = new LocalPeerStream(this); // needs this.sfuClient
             // Peer is alone in a group call after 1 min -> mute mic
-            delay('call:init', this.muteIfAlone.bind(this), 6e4);
+            tSleep(60).then(() => this.muteIfAlone()).catch(dump);
         }
-        get isPublic() {
-            const type = this.chatRoom && this.chatRoom.type;
-            return type === 'group' || type === 'public';
+        connect(url, audio, video) {
+            const {sfuClient} = this;
+            sfuClient.muteAudio(!audio);
+            sfuClient.muteCamera(!video);
+            sfuClient.enableSpeakerDetector(true);
+            return sfuClient.connect(url, this.callId, {isGroup: this.chatRoom.type !== "private"});
         }
-        setViewMode(newMode) {
-            this.viewMode = newMode;
-            let activePeer;
-            if (this.forcedActiveStream && (activePeer = this.peers[this.forcedActiveStream])) {
-                activePeer.isActive = false;
-            }
-
-            if (newMode === CALL_VIEW_MODES.GRID) {
-                this.forcedActiveStream = null;
-            }
-
-            if (newMode === CALL_VIEW_MODES.SPEAKER || newMode === CALL_VIEW_MODES.MINI) {
-                this.sfuApp.sfuClient.enableSpeakerDetector(true);
-            }
-            else {
-                this.sfuApp.sfuClient.enableSpeakerDetector(false);
-                this.activeStream = null;
+        setOrganiser(userHandle) {
+            this.organiser = userHandle;
+        }
+// SfuClient.IClientEventListener interface
+        onServerError(errCode) {
+            console.error('onServerError:', errCode);
+            if (errCode === SfuClient.TermCode.kErrProtocolVersion) {
+                return megaChat.showUpgradeDialog();
             }
         }
-        setForcedActiveStream(clientId) {
-            if (this.forcedActiveStream === clientId) {
-                this.forcedActiveStream = null;
+        onJoined() {
+            for (const peer of this.sfuClient.peers.values()) {
+                this.onPeerJoined(peer, true);
             }
-            else {
-                this.forcedActiveStream = clientId;
+            this.chatRoom.trigger('onCallIJoined');
+            this.chatRoom.meetingsLoading = false;
+            this.chatRoom.unbind("onCallLeft.start");
+            this.chatRoom.megaChat.trigger('sfuConnOpen');
+        }
+        onPeerJoined(sfuPeer, isInitial) {
+            const appPeer = new Peer(this, sfuPeer.userId, sfuPeer.cid, sfuPeer.av);
+            if (appPeer.hasScreen) {
+                this.presenterStreams.add(sfuPeer.cid);
+                this.handlePeerScreenChange(sfuPeer.cid);
             }
-        }
-        setActiveStream(clientId) {
-            this.activeStream = clientId;
-        }
-        getActiveStream() {
-            const activeStream = this.forcedActiveStream || this.activeStream;
-            if (activeStream) {
-                return this.peers[activeStream];
-            }
-            return this.peers.getItem(0);
-        }
-        getLocalStream() {
-            return this.localPeerStream;
-        }
-        onPeerJoined(peer, isInitial) {
-            new Peer(this, peer.userId, peer.cid, peer.av);
             if (!isInitial) {
-                this.chatRoom.trigger('onCallPeerJoined', peer.userId);
+                this.chatRoom.trigger('onCallPeerJoined', sfuPeer.userId);
             }
-
-            // Force high res for now:
-            // thumb is already loaded, only uncomment if we want HD by default?
-            // this.sfuApp.sfuClient.peers.get(peer.cid).requestThumbnailVideo();
-            if (peer.userId !== u_handle) {
+            if (sfuPeer.userId !== u_handle) {
                 this.callTimeoutDone();
+            }
+            if (this.stayOnEnd !== !!mega.config.get('callemptytout')) {
+                this.stayOnEnd = !!mega.config.get('callemptytout');
             }
         }
         onPeerLeft(peer, reason) {
-            if (this.activeStream && this.activeStream === peer.cid) {
-                this.activeStream = null;
+            if (this.speakerCid === peer.cid) {
+                this.speakerCid = null;
             }
-            if (this.forcedActiveStream === peer.cid) {
-                this.forcedActiveStream = null;
+            if (this.pinnedCid === peer.cid) {
+                this.pinnedCid = null;
             }
+            this.presenterStreams.delete(peer.cid);
+            this.handlePeerScreenChange(peer.cid);
 
             this.peers[peer.cid].destroy();
             this.chatRoom.trigger('onCallPeerLeft', { userHandle: peer.userId, reason });
@@ -447,12 +559,82 @@
                 });
             }
             // Peer is left alone in a group call -> mute mic
-            if (peer.client.isLeavingCall()) {
+            if (peer.client.isLeavingCall) {
                 this.muteIfAlone();
             }
+            this.recordActiveStream();
         }
-        onJoined() {
-            this.chatRoom.trigger('onCallIJoined');
+        onActiveSpeakerChange(newSpeakerCid/* , prevSpeakerCid */) {
+            this.speakerCid = newSpeakerCid;
+            this.recordActiveStream();
+        }
+        recordActiveStream() {
+            if (!this.sfuClient.isRecording) {
+                return;
+            }
+            const { peers, pinnedCid, localPeerStream, sfuClient } = this;
+            let src, tag;
+            if (localPeerStream && localPeerStream.isScreen) {
+                src = localPeerStream;
+                tag = "local screen";
+            }
+            // pinnedCid === 0 means the user pinned their local video
+            else if ((src = (pinnedCid === 0) ? localPeerStream : peers[pinnedCid])) {
+                tag = "pinned";
+            }
+            else if ((src = peers.findLast(p => p.isScreen))) {
+                tag = "peer screen";
+            }
+            else if ((src = this.getActiveSpeaker()) && (src.av & Av.HiResVideo)) {
+                tag = "active speaker";
+            }
+            else if ((src = peers.find(p => p.av & Av.HiResVideo))) {
+                tag = "fallback: first peer with video";
+            }
+            else if (localPeerStream && (localPeerStream.av & Av.Video)) {
+                src = localPeerStream;
+                tag = "fallback: local video";
+            }
+            else {
+                src = null;
+                tag = "fallback: no video";
+            }
+            const srcCid = src ? src.clientId : null;
+            if (srcCid !== sfuClient.recordedVideoCid) {
+                console.warn(`Recording: switching to video of cid ${srcCid} (${tag})`);
+                sfuClient.recordingSetVideoSource(srcCid);
+            }
+        }
+        onPeerAvChange(peer, av, oldAv) {
+            const callManagerPeer = this.peers[peer.cid];
+            assert(callManagerPeer);
+            const oldScreen = callManagerPeer.hasScreen;
+            const oldScreenAndCam = callManagerPeer.hasScreenAndCam;
+            const newScreen = !!(av & Av.Screen);
+            const newScreenAndCam = !!(av & Av.Screen) && !!(av & Av.Camera);
+            const prevSize = this.presenterStreams.size;
+            if (newScreen) {
+                if (!oldScreen) {
+                    this.presenterStreams.add(peer.cid);
+                }
+            }
+            else if (oldScreen) {
+                this.presenterStreams.delete(peer.cid);
+            }
+            if (prevSize !== this.presenterStreams.size) {
+                this.handlePeerScreenChange(peer.cid);
+            }
+            // Trigger update on the state of the Call object after modifying presenterStreams. This will possibly
+            // switch the call view between thumbnail and main view mode
+            if (newScreen !== oldScreen || oldScreenAndCam !== newScreenAndCam) {
+                this.trackDataChange();
+             // console.warn("screen/cam: track data change");
+            }
+            callManagerPeer.onAvChange(av, oldAv);
+            if ((av ^ oldAv) & Av.Video) {
+                this.recordActiveStream();
+            }
+            this.chatRoom.trigger('onPeerAvChange', peer);
         }
         onNoMicInput() {
             this.chatRoom.trigger('onNoMicInput');
@@ -460,28 +642,184 @@
         onMicSignalDetected(signal) {
             this.chatRoom.trigger('onMicSignalDetected', signal);
         }
+        onConnStats(stats) {
+            if (this.av & Av.Audio) {
+                this.localPeerStream.onAudioLevel(this.sfuClient.micAudioLevel);
+            }
+        }
         onBadNetwork(e) {
             this.chatRoom.trigger('onBadNetwork', e);
         }
-        onTrackAllocated(playerData) {
-            this.numVideoTracksUsed++;
-        }
-        onTrackReleased(playerData) {
-            this.numVideoTracksUsed--;
-            // console.log("onTrackRelease:", this.numVideoTracksUsed);
-            const peer = playerData.appPeer.sfuPeer;
-            // clean up cached quality, if there are no players
-            if ((peer.hiResPlayer && peer.hiResPlayer.slot) || (peer.vThumbPlayer && peer.vThumbPlayer.slot)) {
-                return;
+        onDisconnect(termCode, willReconnect) {
+            if (willReconnect) {
+                this.chatRoom.megaChat.trigger('sfuConnClose');
             }
-            appPeer.currentQuality = VIDEO_QUALITY.NO_VIDEO;
-            // console.warn("No video from peer, setting quality to NO_VIDEO");
-        }
-        onLocalMediaChange(diffFlag) {
-            if (diffFlag & SfuClient.Av.Video) {
-                this.localPeerStream.onStreamChange();
+            else if (!this.isDisconnecting) {
+                this.handleDisconnect(termCode);
             }
-            this.av = this.sfuApp.sfuClient.availAv;
+        }
+        onLocalMediaQueryError(type, err) {
+            megaChat.trigger('onLocalMediaQueryError', { type, err });
+        }
+        wrOnJoinAllowed() {
+            this.chatRoom.trigger('wrOnJoinAllowed', this.callId);
+            this.chatRoom.call.sfuClient.joinCall();
+        }
+        wrOnJoinNotAllowed() {
+            this.chatRoom.trigger('wrOnJoinNotAllowed', this.callId);
+        }
+        wrOnUsersEntered(users) {
+            megaChat.plugins.userHelper.fetchAllNames(Object.keys(users), this.chatRoom).catch(dump).finally(() => {
+                this.chatRoom.trigger('wrOnUsersEntered', users);
+            });
+        }
+        wrOnUserLeft(user) {
+            this.chatRoom.trigger('wrOnUserLeft', user);
+        }
+        wrOnUsersAllow(users) {
+            this.chatRoom.trigger('wrOnUsersAllow', [users]);
+        }
+        wrOnUserDump(users) {
+            megaChat.plugins.userHelper.fetchAllNames(Object.keys(users), this.chatRoom).catch(dump).finally(() => {
+                this.chatRoom.trigger('wrOnUserDump', users);
+            });
+        }
+        onModeratorAdd(user) {
+            this.chatRoom.trigger('onModeratorAdd', user);
+        }
+        onMutedBy(cid) {
+            this.chatRoom.trigger('onMutedBy', { cid });
+        }
+        onRaisedHandAdd(userHandle) {
+            this.chatRoom.trigger('onRaisedHandAdd', { userHandle });
+        }
+        onRaisedHandDel(userHandle) {
+            this.chatRoom.trigger('onRaisedHandDel', { userHandle });
+        }
+// == end SfuClientIClientEventListener interface
+        handleDisconnect(termCode) {
+            console.assert(termCode !== undefined, "handleDisconnect: termCode is undefined");
+            this.isDisconnecting = true;
+            this.chatRoom.trigger('onCallLeft', {
+                callId: this.callId,
+                chatId: this.chatRoom.chatId,
+                showCallFeedback: true,
+                termCode
+            });
+
+            if (termCode === SfuClient.TermCode.kCallParticipantLimit) {
+                msgDialog('warningb', '', l[20200]);
+            }
+            if (termCode === SfuClient.TermCode.kCallUserLimit) {
+                if (!is_eplusplus && !megaChat.initialChatId) {
+                    msgDialog(
+                        'error',
+                        '',
+                        /* `Cannot join` */
+                        l.join_call_user_limit_title,
+                        /* `Only 100 participants can join the call. Any additional participants will...` */
+                        l.invite_limit_banner_host,
+                        undefined,
+                        1
+                    );
+                }
+                this.chatRoom.trigger('onCallUserLimitExceeded');
+            }
+            if (termCode === SfuClient.TermCode.kCallDurLimit && this.organiser === u_handle) {
+                tSleep(1).then(() => megaChat.trigger('onCallTimeLimitExceeded'));
+            }
+
+            if (termCode === SfuClient.TermCode.kNoMediaPath) {
+                msgDialog(
+                    'warningb',
+                    null,
+                    l[19966], /* `Call failed` */
+                    l.call_failed_firewall
+                        .replace(
+                            '[A]',
+                            `<a
+                                href="${l.mega_help_host}/chats-meetings/chats/firewall-blocking-call"
+                                target="_blank"
+                                class="clickurl">`
+                        )
+                        .replace('[/A]', '</a>'),
+                    undefined,
+                    0
+                );
+            }
+
+            if (termCode === SfuClient.TermCode.kCallEndedByModerator) {
+                megaChat.playSound(megaChat.SOUNDS.CALL_END);
+            }
+        }
+        get isPublic() {
+            const type = this.chatRoom && this.chatRoom.type;
+            return type === 'group' || type === 'public';
+        }
+        setViewMode(newMode) {
+            this.viewMode = newMode;
+            let activePeer;
+            if (this.pinnedCid && (activePeer = this.peers[this.pinnedCid])) {
+                activePeer.isActive = false;
+            }
+
+            if (newMode === CALL_VIEW_MODES.THUMBNAIL) {
+                this.pinnedCid = null;
+            }
+
+            if (newMode === CALL_VIEW_MODES.MINI) {
+                this.speakerCid = null;
+            }
+        }
+        setPinnedCid(clientId, toggle) {
+            if (this.pinnedCid === clientId) {
+                if (!toggle) {
+                    return;
+                }
+                this.pinnedCid = null;
+            }
+            else {
+                this.pinnedCid = clientId;
+            }
+            this.chatRoom.trigger('onSpeakerChange', clientId);
+            this.recordActiveStream();
+        }
+        getActiveStream() {
+            if (Number.isFinite(this.pinnedCid)) {
+                return this.pinnedCid === 0 ? this.localPeerStream : this.peers[this.pinnedCid];
+            }
+            else if (this.speakerCid) {
+                return this.peers[this.speakerCid];
+            }
+            else {
+                return this.peers.find((peer) => peer.av & Av.HiResVideo) || this.peers.getItem(0);
+            }
+        }
+        getLocalStream() {
+            return this.localPeerStream;
+        }
+        getActiveSpeaker() {
+            if (this.speakerCid === null) {
+                return undefined;
+            }
+            return (this.speakerCid === 0) ? this.localPeerStream : this.peers[this.speakerCid];
+        }
+        onLocalMediaChange(diffAv) {
+            this.av = this.sfuClient.availAv;
+            if (diffAv & Av.Screen) {
+                const prevSize = this.presenterStreams.size;
+                if (this.av & Av.Screen) {
+                    this.presenterStreams.add(u_handle);
+                }
+                else {
+                    this.presenterStreams.delete(u_handle);
+                }
+                if (prevSize !== this.presenterStreams.size) {
+                    this.handlePeerScreenChange(u_handle);
+                }
+                this.trackDataChange();
+            }
+            this.localPeerStream.onAvChange(diffAv);
         }
         onLocalMediaError(errObj) {
             megaChat.trigger('onLocalMediaError', errObj);
@@ -489,50 +827,107 @@
         onAudioSendDenied(msg) {
             this.chatRoom.trigger('onAudioSendDenied');
         }
+        onMicDisconnected() {
+            delay('call-mic-disconnect', () => {
+                const track = this.sfuClient.localAudioTrack();
+                if (!track) {
+                    return;
+                }
+                window.toaster.main.show({
+                    /* `Microphone switched to '%s'` */
+                    content: l.mic_switch_toast.replace('%s', track.label),
+                    icons: ['sprite-fm-mono icon-info'],
+                    classes: ['mic-change']
+                });
+            });
+        }
+        onCallAboutToEnd(endIn) {
+            // The call will time out after endIn seconds. Save the time.
+            this.callEndTime = Date.now() + endIn * 1000;
+            this.chatRoom.trigger('onCallEndTimeUpdated', this.callEndTime);
+        }
+        onCallLimitsUpdated() {
+            const { callLimits } = this.sfuClient;
+            if (this.callEndTime && (!callLimits || !callLimits.ldur)) {
+                this.callEndTime = 0;
+                this.chatRoom.trigger('onCallEndTimeUpdated', this.callEndTime);
+            }
+            this.trackDataChange();
+        }
+        onLocalSpeechDetected() {
+            this.chatRoom.trigger('onLocalSpeechDetected');
+            eventlog(500508);
+        }
         toggleAudio() {
-            this.sfuApp.sfuClient.muteAudio(!this.sfuApp.sfuClient.localAudioMuted());
+            this.sfuClient.muteAudio(!this.sfuClient.localAudioMuted());
             // when we are not a speaker, local audio track is never obtained, so the event is never fired
             this.onLocalMediaChange(SfuClient.Av.Audio);
         }
         toggleVideo() {
-            if (this.isSharingScreen()) {
-                this.sfuApp.sfuClient.enableScreenshare(false);
+            if (this.isSharingScreen() && NO_SIMUL_SCRSHARE_AND_CAMERA) {
+                this.sfuClient.enableScreenshare(false);
             }
-            this.sfuApp.sfuClient.muteCamera(!!(this.av & SfuClient.Av.Camera));
+            this.sfuClient.muteCamera(!!(this.av & SfuClient.Av.Camera));
         }
         toggleScreenSharing() {
-            if (this.av & SfuClient.Av.Camera) {
-                this.sfuApp.sfuClient.muteCamera(true);
+            if ((this.av & SfuClient.Av.Camera) && NO_SIMUL_SCRSHARE_AND_CAMERA) {
+                this.sfuClient.muteCamera(true);
             }
-            this.sfuApp.sfuClient.enableScreenshare(!this.sfuApp.sfuClient.isSharingScreen());
+            if (!this.isSharingScreen() && this.presenterStreams.size) {
+                // The set tracks the order but needs to convert to an array to grab the latest presenter.
+                const latestPeer = this.peers[[...this.presenterStreams].pop()];
+                if (latestPeer) {
+                    return msgDialog(
+                        `confirmation:!^${l.takeover_presenter_scr_btn}!${l[82]}`,
+                        '',
+                        l.takeover_presenter_scr_title,
+                        l.takeover_presenter_text.replace('%s', escapeHTML(M.getNameByHandle(latestPeer.userHandle))),
+                        e => e && this.sfuClient.enableScreenshare(true),
+                        1
+                    );
+                }
+            }
+            this.sfuClient.enableScreenshare(!this.sfuClient.isSharingScreen());
         }
         isSharingScreen() {
-            return this.sfuApp.sfuClient.isSharingScreen();
+            return this.sfuClient.isSharingScreen();
         }
         toggleHold() {
             if (this.av & SfuClient.Av.onHold) {
-                this.sfuApp.sfuClient.releaseHold();
+                this.sfuClient.releaseHold();
             }
             else {
-                this.sfuApp.sfuClient.putOnHold();
+                this.sfuClient.putOnHold();
             }
         }
         hangUp(reason) {
-            this.sfuApp.destroy(reason);
+            this.destroy(reason);
+        }
+        destroy(reason) {
             if (this.isDestroyed) {
                 return;
             }
             this.isDestroyed = true;
+            if (reason === undefined) {
+                reason = SfuClient.TermCode.kUserHangup;
+            }
+            if (!this.isDisconnecting && !this.sfuClient.disconnect(reason)) {
+                this.handleDisconnect(reason);
+            }
+            delete window.sfuClient;
             this.localPeerStream.destroy();
             if (this.peers.size() !== 0) {
                 console.error("hangUp: Soft assert: peers.size is not zero, but", this.peers.size());
             }
             this.callTimeoutDone(true);
             this.chatRoom.callParticipantsUpdated(); // av: I have added it just in case, but do we need this?
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            }
         }
         muteIfAlone() {
             if (!this.isDestroyed && this.peers.length === 0 && this.isPublic && !!(this.av & SfuClient.Av.Audio)) {
-                return this.sfuApp.sfuClient.muteAudio(true);
+                return this.sfuClient.muteAudio(true);
             }
             return false;
         }
@@ -545,7 +940,7 @@
                 delete this.callToutInt;
                 delete this.callToutEnd;
             }
-            if ($('.stay-dlg-subtext').is(':visible')) {
+            if ($('.mega-dialog .stay-dlg-subtext').is(':visible')) {
                 closeDialog();
             }
             if (this.callToutId) {
@@ -586,7 +981,11 @@
                 ChatToast.flush(); // We don't want this toast to be held up by any other toasts so clear them out.
                 this.callToutId
                     .setOnShown(function() {
+                        // `this` is the toast object not the call.
                         this.callToutEnd = unixtime() + 120;
+                        if (megaChat.activeCall) {
+                            megaChat.activeCall.showTimeoutDialog();
+                        }
                     })
                     .setUpdater(function() {
                         let timeRemain = (this.callToutEnd || unixtime() + 120) - unixtime();
@@ -616,6 +1015,34 @@
                     .dispatch();
             }
         }
+        showTimeoutDialog() {
+            if (document.body.classList.contains('in-call')) {
+                return;
+            }
+            msgDialog(
+                `warninga:!^${l.empty_call_dlg_end}!${l.empty_call_stay_button}`,
+                'stay-on-call',
+                l.empty_call_dlg_title,
+                mega.icu.format(l.empty_call_dlg_text_min, 2).replace('%s', '02:00'),
+                res => {
+                    if (res === null) {
+                        return;
+                    }
+                    if (res) {
+                        this.handleStayConfirm();
+                        return;
+                    }
+                    eventlog(99760, JSON.stringify([this.callId, 0]));
+                    this.hangUp();
+                },
+                1
+            );
+        }
+        handleStayConfirm() {
+            eventlog(99760, JSON.stringify([this.callId, 1]));
+            this.stayOnEnd = true;
+            this.initCallTimeout(true);
+        }
         hasOtherParticipant() {
             const {peers} = this;
             for (let i = 0; i < peers.length; i++) {
@@ -625,54 +1052,136 @@
             }
             return false;
         }
+        handlePeerScreenChange(clientId) {
+            if (this.presenterStreams.has(clientId)) {
+                this.setPinnedCid(clientId === u_handle ? 0 : clientId);
+            }
+            else if (this.presenterStreams.size) {
+                // Only set if we are already forcing a presenter stream and there is another.
+                if (this.pinnedCid) {
+                    const nextPresenter = [...this.presenterStreams].pop();
+                    this.setPinnedCid(nextPresenter === u_handle ? 0 : nextPresenter);
+                }
+            }
+            else {
+                this.setPinnedCid(null);
+            }
+        }
     }
+    class PlayerCtx { // implements IVideoPlayerGui
+        constructor(call, player) {
+            this.call = call;
+            this.player = player;
+            this.appPeer = this.call.peers[player.peer.cid];
+            assert(this.appPeer);
+            this.video = CallManager2.createVideoElement();
+        }
+        attachToTrack(track) { // we wait for player to sync and start, so nothing to do here
+         // this.video.onpause = tryCatch(() => { console.warn("source video: onPause"); });
+            SfuClient.playerPlay(this.video, track);
+            this.appPeer.updateConsumerVideos();
+        }
+
+        detachFromTrack() {
+            delete this.video.onpause;
+            SfuClient.playerStop(this.video);
+        }
+        onPlayerDestroy() {
+            this.appPeer.onPlayerDestroy(this.player);
+        }
+    }
+    Call.PlayerCtx = PlayerCtx;
+
     class LocalPeerStream {
         constructor(call) {
             this.isLocal = true;
-            this.hasSlowNetwork = null;
-            this.source = null; // local video player
-            // call.sfuApp.sfuClient is not available at this time
+            this.player = null; // local video player
             this.call = call;
-            this.sfuApp = call.sfuApp;
             this.userHandle = u_handle;
+            this.clientId = 0; // for pinnedCid
             this.consumers = new Set();
+            this.vuLevelConsumers = new Set();
+            this.sfuClient = call.sfuClient;
         }
-        onStreamChange() {
-            const vtrack = this.sfuApp.sfuClient.mainSentVtrack();
-            if (vtrack) {
-                if (!this.source) {
-                    this.source = document.createElement("video");
+        onAvChange(avDiff) {
+            this.av = this.sfuClient.availAv;
+            if (avDiff & SfuClient.Av.Video) {
+                // we are managing the hi-res local player, which displays screen video if available
+                let vtrack = this.sfuClient.localScreenTrack();
+                 if (vtrack) {
+                    this.isScreen = true;
                 }
-                SfuClient.playerPlay(this.source, vtrack);
+                else {
+                    vtrack = this.sfuClient.localCameraTrack();
+                    this.isScreen = false;
+                }
+                if (vtrack) {
+                    if (!this.player) {
+                        this.player = CallManager2.createVideoElement();
+                    }
+                    SfuClient.playerPlay(this.player, vtrack, true);
+                }
+                else {
+                    if (this.player) {
+                        SfuClient.playerStop(this.player);
+                    }
+                    this.player = null;
+                }
+                this.call.recordActiveStream();
             }
-            else {
-                if (this.source) {
-                    SfuClient.playerStop(this.source);
-                }
-                this.source = null;
+            for (const cons of this.consumers) {
+                cons.onAvChange();
             }
         }
         get audioMuted() {
-            return this.sfuApp.sfuClient.localAudioMuted();
+            return this.sfuClient.localAudioMuted();
+        }
+        get videoMuted() {
+            return (this.sfuClient.availAv & Av.Video) === 0;
+        }
+        get hasScreen() {
+            return !!(this.av & Av.Screen);
+        }
+        get hasScreenAndCam() {
+            const { av } = this;
+            return !!((av & Av.ScreenHiRes) && (av & Av.CameraLowRes));
         }
         registerConsumer(consumer) {
             this.consumers.add(consumer);
             // player may have stopped when the last non-clone consumer was unmounted from the DOM
-            if (this.source && !consumer.clonedVideo) { // && this.source.paused - just in case, don't check if paused
-                Promise.resolve(this.source.play()).catch(nop);
+            if (consumer.isDirect && this.player) { // && this.player.paused - just in case, don't check if paused
+                Promise.resolve(this.player.play()).catch(nop);
             }
         }
         deregisterConsumer(consumer) {
             this.consumers.delete(consumer);
         }
-        isStreaming() {
-            return this.sfuApp.sfuClient.availAv & Av.Video;
+        registerVuLevelConsumer(cons) {
+            this.vuLevelConsumers.add(cons);
         }
-        updateVideoQuality() {
-            return false; // returing false will cause the caller StreamNode to update itself
+        unregisterVuLevelConsumer(cons) {
+            this.vuLevelConsumers.delete(cons);
+        }
+        onAudioLevel(level) {
+            if (level === this.lastAudioLevel) {
+                return;
+            }
+            this.lastAudioLevel = level;
+            for (const cons of this.vuLevelConsumers) {
+                cons.updateAudioLevel(level);
+            }
+        }
+        isStreaming() {
+            return this.sfuClient.availAv & Av.Video;
+        }
+        get isOnHold() {
+            return this.sfuClient.isOnHold();
+        }
+        dynUpdateVideoQuality() {
+            return false; // returing false will cause the caller VideoNode to update itself
         }
         destroy() {
-            this.isDestroyed = true; // let StreamNode know we are destroyed
+            this.isDestroyed = true; // let VideoNode know we are destroyed
         }
     }
     /**
@@ -683,167 +1192,19 @@
      * @constructor
      */
     var CallManager2 = function(megaChat) {
-        var self = this;
-
-        self.logger = MegaLogger.getLogger("callManager", {}, megaChat.logger);
-
-        self.megaChat = megaChat;
-
-
+        this.logger = MegaLogger.getLogger("callManager", {}, megaChat.logger);
+        this.megaChat = megaChat;
         megaChat.rebind("onRoomDestroy.callManager", function(e, chatRoom) {
             assert(chatRoom.type, 'missing room type');
         });
 
         megaChat.rebind("onRoomInitialized.chatStore", function(e, chatRoom) {
             assert(chatRoom.type, 'missing room type');
-
-
-            chatRoom.rebind("onChatdPeerJoinedCall.callManager", (e, data) => {
-                if (!chatRoom.activeCallIds.exists(data.callId)) {
-                    chatRoom.activeCallIds.set(data.callId, []);
-                }
-                chatRoom.activeCallIds.set(data.callId, chatRoom.activeCallIds[data.callId].concat(data.participants));
-
-                const parts = data.participants;
-                for (var i = 0; i < parts.length; i++) {
-                    // halt call if anyone joins a 1on1 room or if I'd joined (e.g. I'd an incoming ringing first)
-                    if (
-                        chatRoom.type === "private" ||
-                        (
-                            parts[i] === u_handle &&
-                            chatRoom.ringingCalls.exists(data.callId)
-                        )
-                    ) {
-                        chatRoom.ringingCalls.remove(data.callId);
-
-                        self.trigger("onRingingStopped", {
-                            callId: data.callId,
-                            chatRoom: chatRoom
-                        });
-                    }
-                }
-
-                chatRoom.callParticipantsUpdated();
-            });
-            chatRoom.rebind("onChatdPeerLeftCall.callManager", (e, data) => {
-                if (!chatRoom.activeCallIds[data.callId]) {
-                    return;
-                }
-                let parts = data.participants;
-                for (var i = 0; i < parts.length; i++) {
-                    array.remove(chatRoom.activeCallIds[data.callId], parts[i], true);
-
-                    if (parts[i] === u_handle && chatRoom.ringingCalls.exists(data.callId)) {
-                        chatRoom.ringingCalls.remove(data.callId);
-
-                        self.trigger("onRingingStopped", {
-                            callId: data.callId,
-                            chatRoom: chatRoom
-                        });
-                    }
-                }
-
-                chatRoom.callParticipantsUpdated();
-            });
-            chatRoom.rebind("onCallLeft.callManager", (e, data) => {
-                console.warn("onCallLeft:", JSON.stringify(data));
-                const activeCall = chatRoom.activeCall;
-                if (!activeCall || activeCall.callId !== data.callId) {
-                    if (d) {
-                        console.warn("... no active call or event not for it");
-                    }
-                    return;
-                }
-                activeCall.hangUp(data.reason);
-                megaChat.activeCall = chatRoom.activeCall = null;
-            });
-            chatRoom.rebind("onChatdCallEnd.callManager", (e, data) => {
-                if (d) {
-                    console.warn("onChatdCallEnd:", JSON.stringify(data));
-                }
-                chatRoom.activeCallIds.remove(data.callId);
-                chatRoom.stopRinging(data.callId);
-                chatRoom.callParticipantsUpdated();
-            });
-            chatRoom.rebind('onCallState.callManager', function(e, data) {
-                assert(chatRoom.activeCallIds[data.callId], 'unknown call:' + data.callId);
-                self.onCallState(data, chatRoom);
-                chatRoom.callParticipantsUpdated();
-            });
-            chatRoom.rebind('onRoomDisconnected.callManager', function() {
-                this.activeCallIds.clear(); // av: Added this to complement the explicit handling of chatd call events
-                // Keep the current call active when online, but chatd got disconnected
-                if (navigator.onLine) {
-                    return;
-                }
-
-                if (this.activeCall) {
-                    chatRoom.trigger('ChatDisconnected', chatRoom);
-                }
-
-                chatRoom.callParticipantsUpdated();
-            });
-            chatRoom.rebind('onStateChange.callManager', function(e, oldState, newState) {
-                if (newState === ChatRoom.STATE.LEFT && chatRoom.activeCall) {
-                    chatRoom.activeCall.hangUp(SfuClient.TermCode.kLeavingRoom);
-                }
-            });
-            chatRoom.rebind('onCallPeerLeft.callManager', (e, data) => {
-                const activeCall = chatRoom.activeCall;
-                if (
-                    activeCall.sfuApp.isDestroyed ||
-                    activeCall.hasOtherParticipant() ||
-                    SfuClient.isTermCodeRetriable(data.reason)
-                ) {
-                    return;
-                }
-                if (chatRoom.type === 'private') {
-                    return chatRoom.trigger('onCallLeft', { callId: activeCall.callId });
-                }
-                // Wait for the peer left notifications to process before triggering.
-                setTimeout(() => {
-                    // make sure we still have that call as active
-                    if (chatRoom.activeCall === activeCall) {
-                        chatRoom.activeCall.initCallTimeout();
-                    }
-                }, 3000);
-            });
-
-            chatRoom.rebind('onMeAdded', (e, addedBy) => {
-                if (chatRoom.activeCallIds.length > 0) {
-                    const cm = megaChat.plugins.callManager2;
-
-                    const callId = chatRoom.activeCallIds.keys()[0];
-                    if (chatRoom.ringingCalls.exists(callId)) {
-                        return;
-                    }
-                    chatRoom.ringingCalls.set(callId, addedBy);
-                    chatRoom.megaChat.trigger('onIncomingCall', [
-                        chatRoom,
-                        callId,
-                        addedBy,
-                        cm
-                    ]);
-                    chatRoom.fakedLocalRing = true;
-
-                    // clear if not canceled/rejected already
-                    setTimeout(() => {
-                        delete chatRoom.fakedLocalRing;
-                        if (chatRoom.ringingCalls.exists(callId)) {
-                            cm.trigger("onRingingStopped", {
-                                callId: callId,
-                                chatRoom: chatRoom
-                            });
-                        }
-                    }, 30e3);
-                }
-            });
+            chatRoom.subscribeForCallEvents();
         });
-
         this.calls = {};
-        return self;
+        return this;
     };
-
     inherits(CallManager2, MegaDataEmitter);
 
     /**
@@ -955,7 +1316,7 @@
         var contact = Message.getContactForMessage(message);
         var contactName = "";
         if (contact) {
-            contactName = htmlentities(M.getNameByHandle(contact.u));
+            contactName = M.getNameByHandle(contact.u);
         }
 
         if (!participants && message.meta && message.meta.participants && message.meta.participants.length > 0) {
@@ -989,7 +1350,6 @@
                     otherContactsName.push(message.chatRoom.topic);
                 }
             }
-            otherContactsName = otherContactsName.map(name => megaChat.html(name));
         }
 
         if (message.chatRoom.type === "private") {
@@ -1174,9 +1534,8 @@
         return result;
     };
 
-    CallManager2.prototype.registerCall = function(sfuApp, chatRoom, callId) {
-        this.calls[`${chatRoom.chatId}_${callId}`] = new Call(sfuApp, chatRoom, callId);
-        return this.calls[`${chatRoom.chatId}_${callId}`];
+    CallManager2.prototype.createCall = function(chatRoom, callId, callKey) {
+        return (this.calls[`${chatRoom.chatId}_${callId}`] = new Call(chatRoom, callId, callKey));
     };
 
     CallManager2.prototype.onCallState = function(eventData, chatRoom) {
@@ -1230,12 +1589,23 @@
 
         chatRoom.callParticipantsUpdated();
     };
-
+    CallManager2.createVideoElement = function() {
+        const video = document.createElement("video");
+        video.oncontextmenu = () => false;
+        return video;
+    };
+    CallManager2.prototype.destroy = function() {
+        for (const call of Object.values(this.calls)) {
+            call.destroy();
+        }
+    };
     CallManager2.Peers = Peers;
     CallManager2.Peer = Peer;
     CallManager2.Call = Call;
     CallManager2.VIDEO_QUALITY = VIDEO_QUALITY;
     CallManager2.FORCE_LOWQ = !!localStorage.forceLowQuality;
+    // Note this should not be used in cases where there is an active call. Use sfuClient.callLimits.usr instead.
+    CallManager2.CALL_USER_LIMIT = 100;
     scope.CallManager2 = CallManager2;
 
 })(window);

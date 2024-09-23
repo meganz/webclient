@@ -215,9 +215,10 @@ class ChatToastIntegration {
 
     constructor(megaChat) {
         const { chatd } = megaChat.plugins.chatdIntegration;
+        const { SOUNDS } = megaChat;
         if (chatd) {
             chatd.rebind('onOpen.cTI', () => {
-                if (!megaChat.allChatsHadInitialLoadedHistory()) {
+                if (!megaChat.allChatsHadInitialLoadedHistory() || !mega.active) {
                     return;
                 }
                 delay(
@@ -228,6 +229,9 @@ class ChatToastIntegration {
                 );
             });
             chatd.rebind('onClose.cTI', () => {
+                if (!mega.active) {
+                    return;
+                }
                 delay(
                     'chatdClose.cTI',
                     /* `Chat is now offline` */
@@ -241,82 +245,83 @@ class ChatToastIntegration {
                 let playingSound = false;
                 megaRoom
                     .rebind('onCallPeerJoined.cTI', (e, userHandle) => {
-                        const name = nicknames.getNickname(userHandle);
-                        this.batchNotifications(
-                            'onCallPeerJoined',
-                            this.getTrimmedName(name),
-                            {
-                                close: true,
-                                cb: () => {
-                                    if (!playingSound && !mega.config.get('callinout')) {
-                                        ion.sound.stop('user_join_call');
-                                        ion.sound.play('user_join_call');
-                                    }
-                                },
-                                joiner: (arr) => {
-                                    if (arr.length === 1) {
-                                        /* `%s joined the call` */
-                                        return l[24152].replace('%s', arr[0]);
-                                    }
-                                    else if (arr.length === 2) {
-                                        /* `%s1 and %s2 joined the call` */
-                                        return l[24153].replace('%s1', arr[0]).replace('%s2', arr[1]);
-                                    }
-                                    return mega.icu.format(
-                                        /* `%s and # other(s) joined the call` */
-                                        l.chat_call_joined_multi,
-                                        arr.length - 1
-                                    ).replace('%s', arr[0]);
-                                }
-                            }
-                        );
-                    })
-                    .rebind('onCallPeerLeft.cTI', (e, { userHandle }) => {
-                        if (navigator.onLine) {
-                            if (window.sfuClient && window.sfuClient.isLeavingCall()) {
-                                // Don't show leaving toasts if we are leaving.
-                                return;
-                            }
-                            const name = nicknames.getNickname(userHandle);
-                            if (megaRoom.type === 'private') {
-                                // 1-1 call will show disconnect instead of showing peer left message.
-                                return;
-                            }
+                        megaChat.plugins.userHelper.getUserNickname(userHandle).catch(dump).always(name => {
                             this.batchNotifications(
-                                'onCallPeerLeft',
-                                this.getTrimmedName(name),
+                                'onCallPeerJoined',
+                                this.getTrimmedName(name || ''),
                                 {
                                     close: true,
                                     cb: () => {
-                                        if (!mega.config.get('callinout')) {
-                                            playingSound = true;
-                                            ion.sound.stop('user_join_call');
-                                            ion.sound.stop('user_left_call');
-                                            ion.sound.play('user_left_call');
+                                        if (!playingSound && !mega.config.get('callinout')) {
+                                            megaChat.playSound(SOUNDS.CALL_JOIN, true);
                                         }
-
-                                        onIdle(() => {
-                                            playingSound = false;
-                                        });
                                     },
                                     joiner: (arr) => {
                                         if (arr.length === 1) {
-                                            /* `%s left the call` */
-                                            return l[24154].replace('%s', arr[0]);
+                                            /* `%s joined the call` */
+                                            return l[24152].replace('%s', arr[0]);
                                         }
                                         else if (arr.length === 2) {
-                                            /* `%s1 and %s2 left the call` */
-                                            return l[24155].replace('%s1', arr[0]).replace('%s2', arr[1]);
+                                            /* `%s1 and %s2 joined the call` */
+                                            return l[24153].replace('%s1', arr[0]).replace('%s2', arr[1]);
                                         }
                                         return mega.icu.format(
-                                            /* `%s and # other(s) left the call` */
-                                            l.chat_call_left_multi,
+                                            /* `%s and # other(s) joined the call` */
+                                            l.chat_call_joined_multi,
                                             arr.length - 1
                                         ).replace('%s', arr[0]);
                                     }
                                 }
                             );
+                        });
+                    })
+                    .rebind('onCallPeerLeft.cTI', (e, { userHandle }) => {
+                        if (
+                            !navigator.onLine ||
+                            !window.sfuClient ||
+                            window.sfuClient.isLeavingCall ||
+                            megaRoom.type === 'private'
+                        ) {
+                            // Don't show leaving toasts if we are leaving, offline, or in a 1-1 room.
+                            return;
                         }
+                        megaChat.plugins.userHelper.getUserNickname(userHandle, megaRoom).catch(dump).always(name => {
+                            if (navigator.onLine) {
+                                this.batchNotifications(
+                                    'onCallPeerLeft',
+                                    this.getTrimmedName(name || ''),
+                                    {
+                                        close: true,
+                                        cb: () => {
+                                            if (!mega.config.get('callinout')) {
+                                                playingSound = true;
+                                                ion.sound.stop(SOUNDS.CALL_JOIN);
+                                                megaChat.playSound(SOUNDS.CALL_LEFT, true);
+                                            }
+
+                                            onIdle(() => {
+                                                playingSound = false;
+                                            });
+                                        },
+                                        joiner: (arr) => {
+                                            if (arr.length === 1) {
+                                                /* `%s left the call` */
+                                                return l[24154].replace('%s', arr[0]);
+                                            }
+                                            else if (arr.length === 2) {
+                                                /* `%s1 and %s2 left the call` */
+                                                return l[24155].replace('%s1', arr[0]).replace('%s2', arr[1]);
+                                            }
+                                            return mega.icu.format(
+                                                /* `%s and # other(s) left the call` */
+                                                l.chat_call_left_multi,
+                                                arr.length - 1
+                                            ).replace('%s', arr[0]);
+                                        }
+                                    }
+                                );
+                            }
+                        });
                     })
                     .rebind('onCallIJoined.cTI', () => {
                         const initialPriv = megaRoom.members[u_handle];
@@ -324,8 +329,8 @@ class ChatToastIntegration {
                             const { userId, priv } = data;
                             if (
                                 userId === u_handle &&
-                                priv === ChatRoom.MembersSet.PRIVILEGE_STATE.FULL &&
-                                initialPriv !== ChatRoom.MembersSet.PRIVILEGE_STATE.FULL
+                                priv === ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR &&
+                                initialPriv !== ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR
                             ) {
                                 ChatToast.quick(
                                     l.chosen_moderator /* `You were chosen to be the moderator of this call` */,
@@ -335,19 +340,20 @@ class ChatToastIntegration {
                         });
                     })
                     .rebind('onCallPrivilegeChange', (e, userHandle, privilege) => {
-                        const name = nicknames.getNickname(userHandle);
-                        const role = privilege === ChatRoom.MembersSet.PRIVILEGE_STATE.FULL
-                            ? l.chat_user_role_change_op
-                            : l.chat_user_role_change_std;
+                        megaChat.plugins.userHelper.getUserNickname(userHandle, megaRoom).catch(dump).always(name => {
+                            const role = privilege === ChatRoom.MembersSet.PRIVILEGE_STATE.OPERATOR
+                                ? l.chat_user_role_change_op
+                                : l.chat_user_role_change_std;
 
-                        ChatToast.quick(
-                            /* %NAME was changed to %ROLE */
-                            role.replace('%NAME', this.getTrimmedName(name)),
-                            'sprite-fm-mono icon-chat-filled'
-                        );
+                            ChatToast.quick(
+                                /* %NAME was changed to %ROLE */
+                                role.replace('%NAME', this.getTrimmedName(name || '')),
+                                'sprite-fm-mono icon-chat-filled'
+                            );
+                        });
                     })
                     .rebind('onNoMicInput.cTI', () => {
-                        if (megaRoom.activeCall) {
+                        if (megaRoom.call) {
                             ChatToast.quick(
                                 l.chat_mic_off_toast /* Your mic is not working */,
                                 'sprite-fm-mono icon-audio-off'
@@ -372,7 +378,7 @@ class ChatToastIntegration {
                                         }
                                     },
                                     updater: function() {
-                                        if (!megaRoom.activeCall) {
+                                        if (!megaRoom.call) {
                                             this.content = '';
                                         }
                                     }

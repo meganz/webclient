@@ -1,28 +1,39 @@
 // Note: Referral Program is called as affiliate program at begining, so all systemic names are under word affiliate
 // i.e. affiliate === referral
 
+// Can't set chosenPlan to min plan, as pro.minPlan hasn't been created yet.
 var affiliateRedemption = {
-    currentStep: 1,
+    currentStep: 0,
     requests: {
         first: {},
         second: {}
     },
     req1res: {},
-    dynamicInputs: {}
+    dynamicInputs: {},
+    plan : {
+        chosenPlan: undefined,
+        planName: '',
+        planStorage: -1,
+        planQuota: -1,
+        planDuration: undefined,
+        planPriceRedeem: -1,
+        planCostMonthly: -1,
+        planCostYearly: -1,
+    },
 };
 
 affiliateRedemption.getMethodString = function(type) {
 
     'use strict';
 
-    return ({1: l[23301], 2: l[6802]})[type];
+    return ({0: l.redemption_method_pro_plan, 1: l[23301], 2: l[6802]})[type];
 };
 
 affiliateRedemption.reset = function() {
 
     'use strict';
 
-    this.currentStep = 1;
+    this.currentStep = 0;
     this.requests = {
         first: {},
         second: {}
@@ -45,9 +56,15 @@ affiliateRedemption.close = function(force) {
     }
 };
 
-affiliateRedemption.getRedemptionStatus = function(code) {
+affiliateRedemption.getRedemptionStatus = function(code, proSuccessful) {
 
     'use strict';
+
+    if (proSuccessful !== undefined) {
+        return proSuccessful
+            ? {c: '', s: l[25002], class: 'complete', m: l[23373]}
+            : {c: 'red', s: l[22819], class: 'failed', m: l[23369]};
+    }
 
     switch (code) {
         case 1:
@@ -59,6 +76,8 @@ affiliateRedemption.getRedemptionStatus = function(code) {
         case 5:
         case 6:
             return {c: 'red', s: l[22819], class: 'failed', m: l[23369]};
+        default:
+            return {c: 'red', s: l[22819], class: 'failed', m: ''};
     }
 };
 
@@ -71,6 +90,7 @@ affiliateRedemption.processSteps = function() {
 
     if (is_mobile) {
         steps = [
+            [],
             ['__processBlock1'],
             ['__processBlock2'],
             ['__processBlock3'],
@@ -82,7 +102,8 @@ affiliateRedemption.processSteps = function() {
     }
     else {
         steps = [
-            ['__processBlock1', '__processBlock2'],
+            ['__processBlock1'],
+            this.requests.first.m === 0 ? ['__processBlock2', '__processBlock3'] : ['__processBlock2'],
             ['__processBlock3'],
             this.requests.first.m === 2 ? [] : [ '__processBlock4'], // If this is Bitcoin skip Block 4
             ['__processBlock5']
@@ -90,8 +111,7 @@ affiliateRedemption.processSteps = function() {
 
         this.$rdmUI = affiliateUI.redemptionDialog.$dialog;
     }
-
-    return Promise.all(steps[this.currentStep - 1].map(function(func) {
+    return Promise.all(steps[this.currentStep].map((func) => {
         return self[func]();
     })).catch(function(ex) {
 
@@ -165,7 +185,13 @@ affiliateRedemption.__processBlock1 = function() {
 
     'use strict';
 
-    this.requests.first.m = $('.payment-type .radioOn input', this.$step).val() | 0;
+    // Update chosenPlan default to the min available pro plan, as it has now been created
+    const minPlanNum = pro.filter.affMin[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
+    affiliateRedemption.plan.chosenPlan = affiliateRedemption.plan.chosenPlan || minPlanNum;
+
+    this.requests.first.m = $('.payment-type .radioOn input', this.$dialog).val() | 0;
+    const $nextBtn = $('.next-btn', this.$dialog);
+    $nextBtn.addClass('disabled');
 };
 
 affiliateRedemption.__processBlock2 = function() {
@@ -174,22 +200,39 @@ affiliateRedemption.__processBlock2 = function() {
 
     var method = this.requests.first.m;
     var activeMethodMin = M.affiliate.redeemGateways[method].min || 50;
-    const megaInput = $('#affiliate-redemption-amount', this.$step).data('MegaInputs');
-    const value = megaInput ? megaInput.getValue() : 0;
+    let value;
+    let megaInput;
+    let errored;
 
+    if (affiliateRedemption.requests.first.m === 0) {
+        value = this.plan.planPriceRedeem;
+    }
+    else if (affiliateRedemption.requests.first.m === 2){
+        megaInput = $('#affiliate-redemption-amount', this.$dialog).data('MegaInputs');
+        value = megaInput ? megaInput.getValue() : 0;
+    }
     if (!value){
 
         msgDialog('warninga', '', l[23318]);
-        return Promise.reject();
+        errored = true;
     }
     else if (value < activeMethodMin){
 
         msgDialog('warninga', '', l[23319].replace('%1', formatCurrency(activeMethodMin)));
-        return Promise.reject();
+        errored = true;
     }
     else if (value > M.affiliate.balance.available) {
 
         msgDialog('warninga', '', l[23320]);
+        errored = true;
+    }
+
+    if (errored) {
+
+        if (megaInput) {
+            megaInput.$input.trigger('blur');
+        }
+
         return Promise.reject();
     }
 
@@ -237,6 +280,8 @@ affiliateRedemption.__processBlock3 = function() {
                 msgDialog('warninga', '', l[23322]);
             }
 
+            $('#affi-bitcoin-address', this.$step).trigger('blur');
+
             this.$rdmUI.removeClass('arrange-to-back');
 
             return Promise.reject();
@@ -250,6 +295,10 @@ affiliateRedemption.__processBlock3 = function() {
         this.requests.first.cc = $('#affi-country', this.$step).val();
         this.requests.first.c = $('#affi-currency', this.$step).val();
     }
+    else if (this.requests.first.m === 0){
+        this.requests.first.cc = u_attr.country || "GB";
+        this.requests.first.c = M.affiliate.balance.localCurrency;
+    }
     else {
         this.requests.first.cc = $('#affi-country .option.active', this.$step).data('type');
         this.requests.first.c = $('#affi-currency .option.active', this.$step).data('type');
@@ -261,7 +310,8 @@ affiliateRedemption.__processBlock3 = function() {
 
     return Promise.all([
         M.affiliate.redeemStep1(),
-        this.requests.first.m === 2 ? false : M.affiliate.getRedeemAccountInfo()
+        this.requests.first.m % 2 === 0 ? false : M.affiliate.getRedeemAccountInfo()
+
     ]).then(function(res) {
 
         self.req1res = res;
@@ -543,28 +593,36 @@ affiliateRedemption.stopTimer = function(hide) {
     delete this.timerInterval;
 };
 
-affiliateRedemption.fillBasicHistoryInfo = function($wrapper, item) {
+affiliateRedemption.fillBasicHistoryInfo = function($wrapper, item, status) {
 
     'use strict';
 
-    var itemStatus = this.getRedemptionStatus(item.s);
+    const proSuccessful = item.gw === 0
+        ? status === 4
+        : undefined;
+
+    var itemStatus = this.getRedemptionStatus(item.s, proSuccessful);
 
     var la = parseFloat(item.la);
     var lf = parseFloat(item.lf);
     var a = parseFloat(item.a);
     var f = parseFloat(item.f);
+    let receivedAmount = a - f;
+    if (proSuccessful === false || item.s === 5 || item.s === 6) {
+        receivedAmount = 0;
+    }
 
     $('.receipt', $wrapper).text(item.ridd);
     $('.date', $wrapper).text(time2date(item.ts, 1));
     $('.method', $wrapper).text(this.getMethodString(item.gw));
-    $('.status', $wrapper).addClass(itemStatus.c).text(itemStatus.s);
+    $('.status', $wrapper).removeClass('red').addClass(itemStatus.c).text(itemStatus.s);
     $('.country', $wrapper).text(M.getCountryName(item.cc));
     $('.currency', $wrapper).text(item.c);
 
     if (item.c === 'EUR') {
         $('.request-amount', $wrapper).text(formatCurrency(a));
         $('.fee-charged', $wrapper).text(formatCurrency(f));
-        $('.recived-amount', $wrapper).text(formatCurrency(a - f));
+        $('.recived-amount', $wrapper).text(formatCurrency(receivedAmount));
     }
     else if (item.c === 'XBT') {
         $('.request-amount', $wrapper).safeHTML('<span class="euro">' + formatCurrency(a) + '</span>' +
@@ -579,8 +637,8 @@ affiliateRedemption.fillBasicHistoryInfo = function($wrapper, item) {
             '</span><span class="local">' + formatCurrency(la, item.c, 'code') + '</span>');
         $('.fee-charged', $wrapper).safeHTML('<span class="euro">' + formatCurrency(f) +
             '</span><span class="local">' + formatCurrency(lf, item.c, 'code') + '</span>');
-        $('.recived-amount', $wrapper).safeHTML('<span class="euro">' + formatCurrency(a - f) +
-            '</span><span class="local">' + formatCurrency(la - lf, item.c, 'code') + '</span>');
+        $('.recived-amount', $wrapper).safeHTML('<span class="euro">' + formatCurrency(receivedAmount) +
+            '</span><span class="local">' + formatCurrency(receivedAmount, item.c, 'code') + '</span>');
     }
 
     $('.status-message', $wrapper).safeHTML(item.gw === 2 && itemStatus.bm || itemStatus.m);
@@ -610,7 +668,7 @@ affiliateRedemption.redemptionAccountDetails = function($wrapper, method, data) 
         html += itemTemplate.replace('%1', l[23361]).replace('%2', extra.an)
             .replace('%3', 'bitcoin-address');
     }
-    else {
+    else if (method === 1) {
 
         itemTemplate = itemTemplate.replace('%3', '');
 
@@ -623,6 +681,9 @@ affiliateRedemption.redemptionAccountDetails = function($wrapper, method, data) 
             html += itemTemplate.replace('%1', '@@').replace('%2', '@@');
             safeArgs.push(details[i].lk, (details[i].lv || details[i].v));
         }
+    }
+    else if (method === 0) {
+        html += itemTemplate.replace('%1', l[23362]).replace('%2', u_attr.email);
     }
 
     safeArgs.unshift(html);

@@ -49,7 +49,7 @@ var psa = {
         psa.lastSeenPsaId = parseInt(seen[1].value || seen[0].value) | 0;
 
         // Make Get PSA (gpsa) API request
-        const result = await Promise.resolve(M.req({a: 'gpsa', n: psa.lastSeenPsaId})).catch(echo);
+        const {result} = await api.req({a: 'gpsa', n: psa.lastSeenPsaId});
 
         // If there is an announcement to be shown
         if (typeof result === 'object' && 'id' in result) {
@@ -59,9 +59,6 @@ var psa = {
 
             // Show the announcement
             psa.configureAndShowAnnouncement();
-        }
-        else if (parseInt(result) !== ENOENT) {
-            throw new Error(`Unexpected GPSA result, ${result}`);
         }
     },
 
@@ -74,11 +71,9 @@ var psa = {
 
         // Only show the announcement if they have not seen the current announcement.
         // The localStorage.alwaysShowPsa is a test variable to force show the PSA
-        if ((psa.lastSeenPsaId < psa.currentPsa.id) || (localStorage.alwaysShowPsa === '1')) {
+        if ((psa.lastSeenPsaId < psa.currentPsa.id || localStorage.alwaysShowPsa === '1')
+            && psa.prefillAnnouncementDetails()) {
 
-            psa.prefillAnnouncementDetails();
-            psa.addCloseButtonHandler();
-            psa.addMoreInfoButtonHandler();
             psa.showAnnouncement();
         }
         else {
@@ -90,6 +85,7 @@ var psa = {
 
     /**
      * Update the details of the announcement depending on the current one
+     * @returns {boolean} whether announcement integrity is ok or not
      */
     prefillAnnouncementDetails: function() {
 
@@ -103,21 +99,61 @@ var psa = {
         var title = from8(base64urldecode(psa.currentPsa.t));
         var description = from8(base64urldecode(psa.currentPsa.d));
         var buttonLabel = from8(base64urldecode(psa.currentPsa.b));
+        var wrapperNode = document.getElementById('mainlayout');
+        var innerNode;
 
-        // Populate the details
-        var $psa = $('.public-service-anouncement');
-        $psa.find('.title').text(title);
-        $psa.find('.messageA').text(description);
-        if (psa.currentPsa.l) {
-            $('.view-more-info', $psa).attr('data-continue-link', psa.currentPsa.l);
+        if (!title || !description || !buttonLabel || !wrapperNode) {
+            return false;
         }
-        $psa.find('.view-more-info .text').text(buttonLabel);
-        $psa.find('.display-icon').attr('src', imagePath).on('error', function() {
 
+        // PSA container
+        innerNode = document.querySelector('.psa-holder') || mCreateElement('div', {
+            'class': `psa-holder${is_mobile ? '' : ' theme-light-forced'}`// Light theme until design is ready
+        }, wrapperNode);
+
+        // Create PSA banner
+        innerNode.textContent = '';
+        wrapperNode = mCreateElement('div', {
+            'class': 'mega-component banner anouncement hidden'
+        }, innerNode);
+
+        // Create PSA icon
+        innerNode = mCreateElement('img', {'src': imagePath}, wrapperNode);
+        innerNode.onerror = function() {
+            var url =  `${psa.currentPsa.dsp + psa.currentPsa.img + retina}.png`;
+
+            if (this.getAttribute('src') === url) {
+                return this.removeAttribute('src');
+            }
             // If the icon doesn't exist for new PSAs which is likely while in local development, use the one
             // on the default static path as they are added directly to the static servers now for each new PSA
-            $(this).attr('src', psa.currentPsa.dsp + psa.currentPsa.img + retina + '.png');
-        });
+            this.src = url;
+        };
+
+        // Create PSA details
+        innerNode = mCreateElement('div', {'class': 'content-box'}, wrapperNode);
+        mCreateElement('span', {'class': 'banner title-text'}, innerNode).textContent = title;
+        mCreateElement('span', {'class': 'banner message-text'}, innerNode).textContent = description;
+
+        // Create PSA details button
+        if (psa.currentPsa.l) {
+            innerNode = mCreateElement('button', {
+                'class': `${is_mobile ? 'action-link nav-elem normal button' : 'mega-button'} js-more-info`,
+                'data-continue-link': psa.currentPsa.l
+            }, innerNode);
+            mCreateElement('span', {'class': 'text'}, innerNode).textContent = buttonLabel;
+        }
+
+        // Create PSA close button
+        innerNode = mCreateElement('div', {'class': 'banner end-box'}, wrapperNode);
+        innerNode = mCreateElement('button', {
+            'class': 'mega-component nav-elem mega-button action icon js-close'
+        }, innerNode);
+        mCreateElement('i', {
+            'class': `sprite-${is_mobile ? 'mobile-' : ''}fm-mono icon-dialog-close`
+        }, innerNode);
+
+        return true;
     },
 
     /**
@@ -128,8 +164,7 @@ var psa = {
         'use strict';
 
         // Use delegated event in case the HTML elements are not loaded yet
-        $('body').off('click', '.public-service-anouncement .fm-dialog-close');
-        $('body').on('click', '.public-service-anouncement .fm-dialog-close', function() {
+        $('body').rebind('click.closePsa', '.psa-holder .js-close', () => {
 
             // Hide the banner and store that they have seen this PSA
             psa.hideAnnouncement();
@@ -145,10 +180,10 @@ var psa = {
         'use strict';
 
         // Use delegated event in case the HTML elements are not loaded yet
-        $('body').rebind('click', '.public-service-anouncement button.view-more-info', function() {
+        $('body').rebind('click.showPsaInfo', '.psa-holder .js-more-info', (e) => {
 
             // Get the page link for this announcement
-            var pageLink = $(this).attr('data-continue-link');
+            var pageLink = e.currentTarget.dataset.continueLink;
 
             // Hide the banner and save the PSA as seen
             psa.hideAnnouncement();
@@ -170,11 +205,22 @@ var psa = {
 
         'use strict';
 
-        // Show the PSA
-        $('body').addClass('notification');
+        var bannerNode = document.querySelector('.psa-holder .banner');
 
-        // Move the file manager up
-        psa.resizeFileManagerHeight();
+        if (!bannerNode) {
+            return false;
+        }
+
+        // Show the announcement
+        document.body.classList.add('psa-notification');
+        bannerNode.classList.remove('hidden');
+
+        // Bind Learn more and Close button evts
+        psa.addCloseButtonHandler();
+        psa.addMoreInfoButtonHandler();
+
+        // Currently being shown
+        psa.visible = true;
 
         // Add a handler to fix the layout if the window is resized
         $(window).rebind('resize.bottomNotification', function() {
@@ -182,8 +228,8 @@ var psa = {
             psa.repositionAccountLoadingBar();
         });
 
-        // Currently being shown
-        psa.visible = true;
+        // Trigger resize so that full content in the file manager is updated
+        $(window).trigger('resize');
     },
 
     /**
@@ -193,29 +239,28 @@ var psa = {
 
         'use strict';
 
+        var bannerNode;
+
         // If already hidden, don't do anything (specially a window.trigger('resize')).
-        if (!this.visible) {
+        if (!this.visible || !(bannerNode = document.querySelector('.psa-holder .banner'))) {
             return false;
         }
 
-        // Move the progress bar back to the 0 position
-        $('.loader-progressbar').css('bottom', 0);
-
         // Hide the announcement
-        $('body').removeClass('notification');
+        document.body.classList.remove('psa-notification');
+        bannerNode.classList.add('hidden');
 
-        // Reset file manager height
-        $('.fmholder').css('height', '');
-        $(window).off('resize.bottomNotification');
-
-        // Trigger resize so that full content in the file manager is visible after closing
-        $(window).trigger('resize');
+        // Set to no longer visible
+        psa.visible = false;
 
         // Save last seen announcement number for page changes
         psa.lastSeenPsaId = psa.currentPsa.id;
 
-        // Set to no longer visible
-        psa.visible = false;
+        // Trigger resize so that full content in the file manager is visible after closing
+        $(window).trigger('resize');
+
+        // Remove even listeners
+        $(window).unbind('resize.bottomNotification');
     },
 
     /**
@@ -259,22 +304,31 @@ var psa = {
     },
 
     /**
-     * Resize the fmholder and startholder container heights
+     * Resize the fmholder and startholder container heights, align loader bar
      * because they depend on the bottom notification height
      */
     resizeFileManagerHeight: function() {
 
         'use strict';
 
+        if (is_mobile) {
+            return false;
+        }
+
+        var bannerNode = document.querySelector('.psa-holder .banner');
+
         // If the PSA announcement is currently shown
-        if (!is_mobile && $('body').hasClass('notification')) {
+        // @todo: Set display flex to ''.main-layout' and remove custom styling
+        if (bannerNode && psa.visible) {
+            var holderHeight = document.body.offsetHeight -
+                bannerNode.offsetHeight || 0;
 
-            var notificationSize = $('.bottom-info.body').outerHeight();
-            var bodyHeight = $('body').outerHeight();
-
-            if (notificationSize > 120) {
-                $('.fmholder').height(bodyHeight - notificationSize);
-            }
+            document.getElementById('fmholder').style.height = `${holderHeight}px`;
+            document.getElementById('startholder').style.height = `${holderHeight}px`;
+        }
+        else {
+            document.getElementById('fmholder').style.removeProperty('height');
+            document.getElementById('startholder').style.removeProperty('height');
         }
     },
 
@@ -285,16 +339,20 @@ var psa = {
 
         'use strict';
 
-        // If the PSA is visible
-        if (psa.visible) {
+        if (is_mobile) {
+            return false;
+        }
 
+        var bannerNode = document.querySelector('.psa-holder .banner');
+
+        // If the PSA is visible
+        if (bannerNode && psa.visible) {
             // Move the progress bar up above the PSA otherwise it's not visible
-            var psaHeight = $('.public-service-anouncement').outerHeight();
-            $('.loader-progressbar').css('bottom', psaHeight);
+            document.querySelector('.loader-progressbar').style.bottom = `${bannerNode.offsetHeight}px`;
         }
         else {
             // Reset to the bottom
-            $('.loader-progressbar').css('bottom', 0);
+            document.querySelector('.loader-progressbar').style.removeProperty('bottom');
         }
     }
 };

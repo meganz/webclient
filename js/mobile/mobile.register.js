@@ -248,7 +248,7 @@ mobile.register = {
                                 mobile.signin.new.startLogin);
 
                             // I need this event handler to be triggered only once after successful sub-user login
-                            mBroadcaster.once('fm:initialized', M.importWelcomePDF);
+                            mBroadcaster.once('fm:initialized', () => M.importWelcomePDF().catch(dump));
                             delete localStorage.businessSubAc;
                         }
                     },
@@ -390,7 +390,8 @@ mobile.register = {
     initCancelRegistrationButton: function($button) {
         'use strict';
         $button.off('tap').on('tap', function() {
-            mobile.messageOverlay.show(l[5710], false, mobile.register.abort, false, false, [l[79], l[78]]);
+            mobile.messageOverlay.show(l[5710], false, false, [l[78], l[79]])
+                .then((a0) => mobile.register.abort(a0)).catch(dump);
         });
     },
 
@@ -548,6 +549,16 @@ mobile.register.new = {
                 // Continue to the Pro payment page
                 loadSubPage('propay_' + planNum);
             }
+            // If they were on a page and asked to login or register before accessing, return to that page
+            else if (login_next) {
+                if (typeof login_next === 'function') {
+                    return login_next();
+                }
+
+                const nextPageAfterLogin = login_next;
+                login_next = false;
+                loadSubPage(nextPageAfterLogin);
+            }
             else {
                 // Otherwise show the signup email confirmation screen
                 mobile.register.showConfirmEmailScreen(registrationVars);
@@ -555,14 +566,16 @@ mobile.register.new = {
         }
 
         // Show an error if the email is already in use
-        else if (result === EACCESS || result === EEXIST) {
-            loginFromEphemeral.init();
-            /*mobile.messageOverlay.show(l[9000], '', function() {
+        else if (result === EEXIST) {
+            mobile.messageOverlay.show(l[7869], '').then(() => {
                 if (isEphemeral()) {
                     // Prevent the ephemeral session in mobile web if the email has been registered
                     u_logout(true);
                 }
-            });  */  // Error. This email address is already in use.
+            });    // Error. This email address is already in use.
+        }
+        else if (result === EACCESS) {
+            loginFromEphemeral.init();
         }
         else {
             // Show an error

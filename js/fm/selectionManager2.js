@@ -68,10 +68,15 @@ class SelectionManager2Base {
      * Clears the whole selection
      */
     clear_selection() {
+        const res = this.selected_list;
+
         this.selected_list = [];
         this.clear_last_selected();
+
         this.eventHandlers.onSelectedUpdated(this.selected_list);
         delete this.shiftFirst;
+
+        return res;
     }
 
     /**
@@ -138,6 +143,10 @@ class SelectionManager2Base {
         if (scrollTo) {
             this.scrollToElementProxyMethod(nodeId);
         }
+
+        // If info panel is open change its attributes by current selected node
+        mega.ui.mInfoPanel.reRenderIfVisible($.selected);
+
         return nodeId;
     }
 
@@ -283,6 +292,9 @@ class SelectionManager2Base {
                             this.shiftFirst = current;
                         }
                     }
+
+                    // Rerender if info panel is visible when selecting node via shorcut
+                    mega.ui.mInfoPanel.reRenderIfVisible($.selected);
                 }
             }
         }
@@ -409,7 +421,14 @@ class SelectionManager2Base {
 
         // Very first node start shift + select
         if (!this.shiftFirst) {
-            this.shiftFirst = $.selected[0];
+            if ($.selected && $.selected[0]) {
+                this.shiftFirst = $.selected[0];
+            }
+            else {
+                // always select very first node of shift if $.selected is empty, following Windows explorer behaviour
+                this.shiftFirst = currentViewIds[0];
+                current_idx = 0;
+            }
         }
 
         if (current_idx !== -1 && last_idx !== -1) {
@@ -575,6 +594,11 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 if (unselectedId) {
                     // dont use 'this/self' but the current/global selectionManager
                     this.remove_from_selection(unselectedId , false);
+
+                    // Close node Info panel as nothing selected
+                    if (this.selected_list.length === 0) {
+                        mega.ui.mInfoPanel.closeIfOpen();
+                    }
                 }
             });
 
@@ -590,16 +614,28 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
                 if ($target.is(`${$.selectddUIgrid}:not(.hidden)`) &&
                     e.button === 0 && !e.shiftKey && !e.metaKey && !e.ctrlKey &&
-                    !e.target.classList.contains('ps__scrollbar-x-rail') &&
-                    !e.target.classList.contains('ps__scrollbar-y-rail')) {
+                    !e.target.classList.contains('ps__rail-x') &&
+                    !e.target.classList.contains('ps__rail-y')) {
+
+                    // Close node Info panel as nothing selected
+                    mega.ui.mInfoPanel.closeIfOpen();
+
                     this.clear_selection();
                 }
             });
         }
     }
 
-    scrollToElementProxyMethod(nodeHandle) {
+    updateScrollBar() {
+        if (M.megaRender && M.megaRender.megaList) {
+            M.megaRender.megaList.resized();
+        }
+        else {
+            initPerfectScrollbar($(this._get_selectable_container()).closest('.ps'));
+        }
+    }
 
+    scrollToElementProxyMethod(nodeHandle) {
         if (M.megaRender && M.megaRender.megaList) {
             M.megaRender.megaList.scrollToItem(nodeHandle);
         }
@@ -651,7 +687,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
     }
 
     clear_selection() {
-        super.clear_selection();
+        const res = super.clear_selection();
 
         let $selectable = this._get_selectable_container();
         $('.ui-selected', $selectable).removeClass(this.CLS_UI_SELECTED);
@@ -662,6 +698,8 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 this.hideSelectionBar();
             }
         });
+
+        return res;
     }
     set_currently_selected(nodeId, scrollTo) {
         super.set_currently_selected(nodeId, scrollTo);
@@ -697,6 +735,9 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 if ((n = M.d[n])) {
                     selectionSize += n.t ? n.tb : n.s;
                 }
+                else if (M.dyh) {
+                    selectionSize = 0;
+                }
                 if (e) {
                     e.classList.add(this.CLS_UI_SELECTED);
                 }
@@ -708,7 +749,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             else {
                 this.selectionNotification(selectionSize, false, false);
             }
-        }, 20);
+        }, 180);
 
         return res;
     }
@@ -741,7 +782,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
             if (this.selected_list.length !== 0 && this.removing_list.length > 1) {
 
-                const cb = (pv, c) => pv + (M.d[c].tb === undefined ? M.d[c].s : M.d[c].tb);
+                const cb = (pv, c) => pv + (M.d[c] ? M.d[c].tb === undefined ? M.d[c].s : M.d[c].tb : 0);
                 const removingSize = this.removing_list.reduce(cb, 0);
                 nid = this.selected_totalSize - removingSize;
             }
@@ -756,6 +797,8 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
         var container = this._get_selectable_container().get(0);
         var nodeList = container && container.querySelectorAll('.megaListItem') || false;
+        const currentNode = M.d[this.currentdirid]
+            || M.currentrootid === 's4' && M.d[this.currentdirid.split('/').pop()];
 
         if (nodeList.length) {
             for (var i = nodeList.length; i--;) {
@@ -767,10 +810,11 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             // Not under a MegaList-powered view
             this.add_to_selection(this.selected_list.pop(), false, true);
         }
-
-        if (M.d[this.currentdirid]) {
-            this.selectionNotification(M.d[this.currentdirid].tb);
+        if (currentNode) {
+            this.selectionNotification(currentNode.tb);
         }
+
+        mega.ui.mInfoPanel.reRenderIfVisible($.selected);
     }
 
     /**
@@ -780,16 +824,17 @@ class SelectionManager2_DOM extends SelectionManager2Base {
      * @returns {Boolean}
      */
     selectionNotification(nodeId, isAddToSelection, scrollTo = true) {
-        if (M.chat || M.currentCustomView.type === 'gallery' || typeof nodeId !== 'number' && !M.d[nodeId]) {
+        if (M.chat || M.isGalleryPage() || typeof nodeId !== 'number' && !M.d[nodeId]) {
             return false;
         }
+        let itemsNum = this.selected_list.filter(h => h !== this.currentdirid).length;
 
-        if (this.selected_list.length === 0) {
+        if (itemsNum === 0) {
             this.hideSelectionBar();
         }
         else {
             var totalNodes = this.items.length;
-            var itemsNum = this.selected_list.length;
+
             var itemsTotalSize = "";
             var notificationText = "";
 
@@ -811,23 +856,20 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
             const totalHtml = `<span class="sel-notif-size-total">${itemsTotalSize}</span>`;
 
-            if (totalNodes === 1) { // Only one item exists
-                notificationText = l[24679].replace('%1', itemsNum).replace('%2', totalHtml);
-            }
-            else { // Multiple items here
-                itemsNum = mega.icu.format(l.selected_count, itemsNum);
+            if (totalNodes) {
+                if (totalNodes === 1) { // Only one item exists
+                    notificationText = l[24679].replace('%1', itemsNum).replace('%2', totalHtml);
+                }
+                else { // Multiple items here
+                    itemsNum = mega.icu.format(l.selected_count, itemsNum);
 
-                notificationText = mega.icu.format(l[24672], totalNodes)
-                    .replace('%1', `<span class="sel-notif-count-total">${itemsNum}</span>`).replace('%2', totalHtml);
+                    notificationText = mega.icu.format(l[24672], totalNodes)
+                        .replace('%1', `<span class="sel-notif-count-total">${itemsNum}</span>`)
+                        .replace('%2', totalHtml);
+                }
             }
+
             this.showSelectionBar(notificationText, itemsNum, itemsTotalSize, totalNodes);
-
-            if (M.megaRender && M.megaRender.megaList) {
-                M.megaRender.megaList.resized();
-            }
-            else {
-                initPerfectScrollbar($(this._get_selectable_container()).closest('.ps'));
-            }
 
             if (scrollTo) {
                 this.scrollToElementProxyMethod(this.last_selected);
@@ -845,45 +887,30 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         let scrollBarYClass = '';
         const $selCountElm = $('.sel-notif-count-total', $selectionBar);
 
-        // if count is existing, lets using existing dom node not create new one.
-        if ($selCountElm.length && totalNodes === $selectionBar.data('total-node')) {
-            $selCountElm.text(itemSelected);
-            $('.sel-notif-size-total', $selectionBar).text(itemsTotalSize);
+        if (notificationText) {
+            // if count is existing, lets using existing dom node not create new one.
+            if ($selCountElm.length && totalNodes === $selectionBar.data('total-node')) {
+                $selCountElm.text(itemSelected);
+                $('.sel-notif-size-total', $selectionBar).text(itemsTotalSize);
+            }
+            else {
+                $('.selection-bar-col', $selectionBar).safeHTML(notificationText);
+                $selectionBar.data('total-node', totalNodes);
+            }
         }
         else {
-            $('.selection-bar-col', $selectionBar).safeHTML(notificationText);
-            $selectionBar.data('total-node', totalNodes);
+            $('.selection-bar-col', $selectionBar).empty();
         }
 
         this.vSelectionBar = $('b', $selectionBar).get(0);
 
-        if (this.currentdirid === "out-shares") {
-            scrollBarYClass = M.viewmode ? '.out-shared-blocks-scrolling.ps--active-y' :
-                '.out-shared-grid-view .grid-scrolling-table.ps--active-y';
-        }
-        else if (this.currentdirid === "shares") {
-            scrollBarYClass = M.viewmode ? '.shared-blocks-scrolling.ps--active-y' :
-                '.shared-grid-view .grid-scrolling-table.ps--active-y';
-        }
-        else {
-            scrollBarYClass = (M.viewmode === 1) ?
-                '.file-block-scrolling.ps--active-y' : '.grid-scrolling-table.ps--active-y';
-        }
-
-        if (this.currentdirid.substr(0, 7) !== 'search/' || this.selected_list.length > 0) {
-            if (folderlink) {
-                $('.fm-bottom-right-buttons', fmholder).addClass('hidden');
-            }
-
+        if (
+            (!M.gallery || M.isAlbumsPage())
+            && (this.currentdirid.substr(0, 7) !== 'search/' || this.selected_list.length > 1)
+        ) {
             $selectionBar.removeClass('hidden');
-        }
-
-        const scrollBarY = document.querySelector(scrollBarYClass);
-        if (scrollBarY && (scrollBarY.scrollHeight - scrollBarY.scrollTop - scrollBarY.clientHeight) < 37) {
-            requestAnimationFrame(() => {
-                scrollBarY.scrollTop = scrollBarY.scrollHeight;
-                initPerfectScrollbar();
-            });
+            this.updateScrollBar();
+            this.scrollToElementProxyMethod(this.last_selected);
         }
 
         this.showRequiredLinks();
@@ -894,28 +921,16 @@ class SelectionManager2_DOM extends SelectionManager2Base {
      */
     hideSelectionBar() {
 
-        let selectionBar = document.getElementsByClassName('selection-status-bar').item(0);
+        const selectionBar = document.querySelector('.selection-status-bar');
 
         if (selectionBar) {
             selectionBar.classList.add('hidden');
         }
-        const block = document.querySelector('.search-multi');
-        if (block) {
-            block.classList.remove('search-multi');
-        }
+
         this.selected_totalSize = 0;
         this.vSelectionBar = null;
 
-        if (M.megaRender && M.megaRender.megaList) {
-            M.megaRender.megaList.resized();
-        }
-        else {
-            initPerfectScrollbar($(this._get_selectable_container()).closest('.ps'));
-        }
-
-        if (this.currentdirid.substr(0, 7) !== 'search/' && folderlink) {
-            $('.fm-bottom-right-buttons', fmholder).removeClass('hidden');
-        }
+        this.updateScrollBar();
     }
 
     /**
@@ -932,10 +947,10 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             return false;
         }
 
-        const isAlbums = M.currentCustomView.type === 'albums';
+        const isAlbums = M.isAlbumsPage(2);
 
         const allButtons = selectionLinkWrapper.querySelectorAll(
-            isAlbums ? '.js-statusbarbtn' : '.js-statusbarbtn:not(.options)'
+            mega.gallery.albums.isPublic ? '.js-statusbarbtn:not(.options)' : '.js-statusbarbtn'
         );
 
         for (let i = allButtons.length; i--;) {
@@ -958,27 +973,30 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             }
         };
 
-        if (isAlbums) {
-            if (
-                mega.gallery.albums.grid
-                && mega.gallery.albums.grid.timeline
-                && Object.keys(mega.gallery.albums.grid.timeline.selections).length === 1
-            ) {
-                __showBtn('preview');
+        const isMegaList = M.dyh ? M.dyh('is-mega-list') : true;
+
+        if (isAlbums && mega.gallery.albums.grid && mega.gallery.albums.grid.timeline) {
+            if (mega.gallery.albums.isPublic) {
+                const selections = Object.keys(mega.gallery.albums.grid.timeline.selections);
+
+                if (selections.length === 1 && mega.gallery.isPreviewable(M.d[selections[0]])) {
+                    __showBtn('preview');
+                }
             }
 
             __showBtn('download');
-            // __showBtn('sendto');
-            // __showBtn('link');
 
-            const albumId = M.currentdirid.replace('albums/', '');
+            if (!mega.gallery.albums.isPublic) {
+                const albumId = M.currentdirid.replace('albums/', '');
 
-            if (mega.gallery.albums.store[albumId] && !mega.gallery.albums.store[albumId].filterFn) {
-                __showBtn('delete-from-album');
+                if (mega.gallery.albums.store[albumId] && !mega.gallery.albums.store[albumId].filterFn) {
+                    __showBtn('delete-from-album');
+                }
             }
         }
-        else {
-            const isSearch = page.startsWith('fm/search');
+        else if (isMegaList) {
+            __showBtn('options');
+            const isSearch = String(self.page).startsWith('fm/search');
             const selNode = M.getNodeByHandle($.selected[0]);
             const sourceRoot = M.getSelectedSourceRoot(isSearch);
             const shareButton = selectionLinkWrapper.querySelector(`.js-statusbarbtn.share`);
@@ -992,13 +1010,15 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 spanTotal.classList.remove('hidden');
             }
 
-            // Set default "Share folder" string
-            shareButton.dataset.simpletip = l[5631];
+            // Set default "Share folder" / "Share bucket" string
+            shareButton.dataset.simpletip = sourceRoot === 's4'
+                && M.getS4NodeType(selNode) === 'bucket' && l.s4_share_bucket || l[5631];
 
             const { dataset } = selectionLinkWrapper.querySelector('.selection-links-wrapper .delete');
             dataset.simpletip = M.getSelectedRemoveLabel($.selected);
 
-            if ((sourceRoot === M.RootID || M.isDynPage(sourceRoot)) && !folderlink) {
+            if ((sourceRoot === M.RootID || sourceRoot === 's4'
+                 || M.isDynPage(sourceRoot)) && !folderlink) {
 
                 const cl = new mega.Share.ExportLink();
 
@@ -1028,7 +1048,9 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 __showBtn('sendto');
             }
 
-            if (M.getNodeRoot(M.currentdirid) !== M.RubbishID) {
+            // Temporarily hide download button for now in MEGA Lite mode (still accessible via zip in context menu)
+            if (M.getNodeRoot(M.currentdirid) !== M.RubbishID &&
+                (!mega.lite.inLiteMode || !mega.lite.containsFolderInSelection($.selected))) {
                 __showBtn('download');
             }
 
@@ -1056,6 +1078,30 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 __hideButton('share');
                 __hideButton('sendto');
             }
+
+            // If in MEGA Lite mode, temporarily hide any download buttons in the Shared area
+            if (mega.lite.inLiteMode && M.currentrootid === 'shares') {
+                __hideButton('download');
+            }
+
+            // If in MEGA Lite mode, temporarily hide the Bove to Rubbish Bin button in the outgoing shares area
+            if (mega.lite.inLiteMode && M.currentrootid === 'out-shares') {
+                __hideButton('delete');
+            }
+        }
+        else {
+            M.dyh('required-links')
+                .then((links) => {
+                    if (links) {
+                        const { show, hide } = links;
+                        for (const h of hide) {
+                            __hideButton(h);
+                        }
+                        for (const s of show) {
+                            __showBtn(s);
+                        }
+                    }
+                });
         }
 
         M.initStatusBarLinks();

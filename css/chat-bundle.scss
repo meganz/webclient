@@ -1,13 +1,16 @@
-// The main `Meetings` in-call container
-@import 'meetings/_call.scss';
-
 // Global components, i.e. may be rendered in the in-call container OR the body
 @import 'meetings/_streamHead.scss';
-@import 'meetings/_streamNode.scss';
-@import 'meetings/_local.scss';
-@import 'meetings/_streamExtendedControls.scss';
+@import 'meetings/_videoNode.scss';
+@import 'meetings/_float.scss';
+@import 'meetings/_floatExtendedControls.scss';
 @import 'meetings/_micObserver.scss';
-@import 'meetings/chatToaster.scss';
+@import 'meetings/_chatToaster.scss';
+@import 'meetings/_leftPanel.scss';
+@import 'meetings/_inviteParticipantsPanel.scss';
+@import 'meetings/_chatOverlay.scss';
+
+// The main `Meetings` in-call container
+@import 'meetings/_call.scss';
 
 // Workflow components
 @import 'meetings/workflow/_start.scss';
@@ -16,4 +19,10 @@
 @import 'meetings/workflow/_incoming.scss';
 @import 'meetings/workflow/_invite.scss';
 @import 'meetings/workflow/_loading.scss';
+@import 'meetings/waitingRoom/_waitingRoom.scss';
 @import 'meetings/workflow/_alert.scss';
+@import 'meetings/schedule/_schedule.scss';
+@import 'meetings/schedule/_datepicker.scss';
+@import 'meetings/schedule/_recurring.scss';
+@import 'meetings/workflow/_unsupported.scss';
+@import 'meetings/workflow/_freeCallEnded.scss';

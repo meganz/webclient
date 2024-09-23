@@ -15,20 +15,10 @@ MegaData.prototype.sharesUI = function() {
 /**
  * Open the share dialog
  */
-MegaData.prototype.openSharingDialog = function() {
+MegaData.prototype.openSharingDialog = function(target) {
     'use strict';
 
-    if (!Array.isArray($.selected)) {
-        return;
-    }
-
-    const targetHandle = $.selected[0];
-
-    if (!targetHandle // Nothing is selected
-        || !M.d[targetHandle] // Node does not exist anymore
-        || M.d[targetHandle].t === 0 // Node is not a folder
-        || M.isInvalidUserStatus() // User does not have permissions
-    ) {
+    if (M.isInvalidUserStatus()) {
         return;
     }
     if (u_type === 0) {
@@ -54,10 +44,26 @@ MegaData.prototype.openSharingDialog = function() {
     });
 
     var showShareDlg = function() {
-        // Checking if the selection is still the same after dialog rendering
-        if (!Array.isArray($.selected) || $.selected[0] !== targetHandle) {
-            return;
-        }
+        const scl = mBroadcaster.addListener('statechange', () => {
+
+            if ($.dialog === 'fingerprint-dialog') {
+                closeDialog();
+            }
+
+            if ($.dialog === 'share-add') {
+                $('.cancel-add-share').trigger('click');
+            }
+
+            console.assert($.dialog === 'share');
+            closeDialog();
+        });
+
+        $dialog.rebind('dialog-closed.share', () => {
+            $dialog.off('dialog-closed.share');
+
+            mBroadcaster.removeListener(scl);
+            mega.keyMgr.removeShareSnapshot(target);
+        });
 
         $.hideContextMenu();
 
@@ -68,7 +74,7 @@ MegaData.prototype.openSharingDialog = function() {
 
         // @todo refactor!
         // eslint-disable-next-line no-use-before-define
-        fillShareDlg(targetHandle).catch(dump);
+        fillShareDlg(target).catch(dump);
 
         // Show the share dialog
         return $dialog.removeClass('hidden');
@@ -78,14 +84,13 @@ MegaData.prototype.openSharingDialog = function() {
         if (!M.d[h]) {
             await dbfetch.get(h);
         }
-        const {shares, name, td, tf} = M.getNodeByHandle(h);
+        const node = M.getNodeByHandle(h);
+        const {shares, name, td, tf} = node;
         assert(name);
 
         var shareKeys = Object.keys(shares || {});
 
-        // Temporary condition till all MIME icons are vector
-        // $('.item-type-icon', $dialog).attr('class', `item-type-icon sprite-fm-uni icon-${folderIcon}-90`);
-        $('.item-type-icon', $dialog).attr('class', `item-type-icon medium-file-icon ${fileIcon(M.d[h])}`);
+        $('.item-type-icon-90', $dialog).attr('class', `item-type-icon-90 icon-${folderIcon(node)}-90`);
 
         // This is shared folder, not just folder link
         if (shares && !(shares.EXP && shareKeys.length === 1) || M.ps[h]) {
@@ -118,24 +123,15 @@ MegaData.prototype.openSharingDialog = function() {
         return $dialog;
     };
 
-    const fire = () => {
-        mega.keyMgr.setShareSnapshot(targetHandle)
-            .then(() => M.safeShowDialog('share', showShareDlg))
-            .catch(dump);
-    };
-
-    const mdList = mega.fileRequestCommon.storage.isDropExist($.selected);
-    if (mdList.length) {
-        mega.fileRequest.showRemoveWarning(mdList).then(fire).catch((ex) => {
-            if (ex) {
-                dump(ex);
-                showToast('warning2', l[253]);
+    Promise.resolve(mega.fileRequestCommon.storage.isDropExist(target))
+        .then((res) => {
+            if (res.length) {
+                return mega.fileRequest.showRemoveWarning(res);
             }
-        });
-    }
-    else {
-        fire();
-    }
+        })
+        .then(() => mega.keyMgr.setShareSnapshot(target))
+        .then(() => M.safeShowDialog('share', showShareDlg))
+        .catch(dump);
 };
 
 /**
@@ -177,7 +173,7 @@ MegaData.prototype.initShareAddDialog = function(alreadyAddedContacts, $extraCon
 
     // Detect the new added contact whether in the remove list or not
     var notRmContacts = function(handle) {
-        if (handle !== undefined && $.removedContactsFromShare[handle]) {
+        if ($.removedContactsFromShare && $.removedContactsFromShare[handle]) {
             delete $.removedContactsFromShare[handle];
             return false;
         }
@@ -354,4 +350,23 @@ MegaData.prototype.initAddByEmailComponent = function(alreadyAddedContacts) {
     $('.share-message textarea', $shareAddDialog).rebind('blur', function() {
         $('.share-message', $shareAddDialog).removeClass('focused');
     });
+};
+
+/**
+ * Return tooltip label for undecripted node depending on node type and shared or owned
+ * @param {Object} node The current node.
+ */
+MegaData.prototype.getUndecryptedLabel = function(node) {
+    'use strict';
+
+    if (self.nullkeys && self.nullkeys[node.h]) {
+        return l.allownullkeys_tooltip;
+    }
+
+    const isShared = M.getNodeRoot(node.p) !== M.RootID;
+
+    if (node.t) {
+        return isShared ? l[8595] : l.undecryptable_folder_tooltip;
+    }
+    return isShared ? l[8602] : l.undecryptable_file_tooltip;
 };

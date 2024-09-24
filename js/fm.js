@@ -675,7 +675,10 @@ function fmtopUI() {
             $rewindNotification.addClass('hidden');
         }
         else {
+            delay('rubbish-bin:rewind-prom', () => eventlog(500530, true), 4e3);
+
             $('.fm-notification-close', $rewindNotification).rebind('click', () => {
+                eventlog(500529);
                 mega.config.set('dsmRubRwd', 1);
                 $rewindNotification.addClass('hidden');
             });

@@ -199,6 +199,41 @@ lazy(mega, 'rewind', () => {
             mBroadcaster.addListener('mega:openfolder', () => openSidebarListener());
         }
 
+        showRewindPromoDialog() {
+            const $dialog = $('.rw-promo-dialog', '.mega-dialog-container');
+            const $actionButton = $('.btn-rw-promo-action', $dialog);
+            const isPro = this.getAccountType() !== ACCOUNT_TYPE_FREE;
+
+            if (isPro) {
+                $('.rw-promo-dialog-info-link', $dialog).addClass('hidden');
+                $('span', $actionButton).text(l[8742]);
+                $actionButton.rebind('click.rewind', () => {
+                    eventlog(500533);
+                    window.open(
+                        `${l.mega_help_host}/files-folders/rewind/how-do-i-use-rewind`,
+                        '_blank',
+                        'noopener,noreferrer'
+                    );
+                });
+            }
+            else {
+                $('.rw-promo-dialog-info-link', $dialog).removeClass('hidden');
+                $('span', $actionButton).text(l.upgrade_for_rewind);
+                $actionButton.rebind('click.rewind', () => {
+                    eventlog(500534);
+                    loadSubPage('pro');
+                });
+            }
+
+            M.safeShowDialog('rw-promo-dialog', () => $dialog);
+
+            $('.js-close', $dialog).rebind('click.rewind', () => {
+                $actionButton.off('click.rewind');
+                closeDialog();
+                return false;
+            });
+        }
+
         async removeNodeListener() {
             mBroadcaster.removeListener(`nodeUpdated:${this.selectedHandle}`);
         }
@@ -281,6 +316,7 @@ lazy(mega, 'rewind', () => {
         }
 
         isAccountProType() {
+            this.accountType = this.accountType || this.getAccountType();
             return this.accountType !== ACCOUNT_TYPE_PRO_LITE && this.accountType !== ACCOUNT_TYPE_FREE;
         }
 

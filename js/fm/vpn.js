@@ -112,6 +112,7 @@ class VpnPage {
         this.tncCheck = this.tncCheckbox.querySelector('.tnc-check');
         this.createCredBtn = this.page.querySelector('.js-create-cred');
         this.postCreateSection = this.page.querySelector('.post-create-section');
+        this.emailSupport = this.page.querySelector('.email-support');
         this.downloadConfigBtn = this.postCreateSection.querySelector('.js-download-config');
         this.configQr = this.postCreateSection.querySelector('.config-qr .qr-img');
         this.configDiv = this.postCreateSection.querySelector('.config-output');
@@ -136,21 +137,49 @@ class VpnPage {
                     + 'target="_blank" rel="noopener" class="clickurl">')
                 .replaceAll('[/A]', '</a>'));
 
+        const planName = pro.getProPlanName(u_attr.p);
+
+        const mailtoBody = `${l.support_email_prefill_write_feedback}
+
+
+
+                            ${l.support_email_prefill_user_app_info}
+                            ${l.support_email_prefill_user_app_name} ${l.pr_vpn}
+
+                            ${l.support_email_prefill_user_information}
+                            ${l[670]}: ${lang}
+                            ${l.support_email_prefill_user_timezone} ${mega.ipcc}
+                            ${l.support_email_prefill_user_account} ${u_attr.email} (${planName})`;
+
+        this.emailSupport.href = `${this.emailSupport.href}&body=${encodeURIComponent(mailtoBody)}`;
+
         this._onCheckboxClicked = this._onCheckboxClicked.bind(this);
         this.createCred = this.createCred.bind(this);
         this.removeCred = this.removeCred.bind(this);
         this._onCredCreated = this._onCredCreated.bind(this);
         this._onCredDeactivated = this._onCredDeactivated.bind(this);
 
+        if (this.isTncChecked) {
+            this.tncCheck.classList.add('hidden', 'checkboxOn');
+            this.tncCheckbox.classList.add('hidden');
+        }
+
         this.tncCheckbox.addEventListener('click', this._onCheckboxClicked);
+
         this.createCredBtn.addEventListener('click', () => {
-            if (!this.isTncChecked) {
+            if (!(this.isTncChecked || this.tncCheck.classList.contains('checkboxOn'))) {
                 msgDialog('info', '', l.vpn_page_tnc_msg_title, l.vpn_page_tnc_msg_desc);
                 return;
             }
 
+            if (!this.isTncChecked){
+                mega.attr.set('vpnTnc', 1, -2, true);
+                this.tncCheck.classList.add('hidden', 'checkboxOn');
+                this.tncCheckbox.classList.add('hidden');
+            }
             this.createCred();
         });
+
 
         // this.postCreateSection.querySelector('.view-ini-config').addEventListener('click', () => {
         //     this.configDiv.classList.remove('hidden');
@@ -179,7 +208,9 @@ class VpnPage {
             this.downloadConfigBtn.download = `vpn-${this.downloadConfigBtn.dataset.credNum}-${randomStr}.conf`;
         });
 
-        if (u_attr.p && u_attr.p > 0 || d && apipath === 'https://staging.api.mega.co.nz/') {
+        if (u_attr.p && u_attr.p > 0
+            || pro.proplan2.getUserFeature('vpn')
+            || d && apipath === 'https://staging.api.mega.co.nz/'){
             this.page.querySelector('.settings-left-block .free-info').classList.add('hidden');
             this.page.querySelector('.settings-left-block .pro-info').classList.remove('hidden');
             this.page.querySelector('.step2-out').classList.remove('hidden');
@@ -207,8 +238,10 @@ class VpnPage {
 
     async _initLocationDropdown() {
         const knownNames = {
-            'CA-EAST':  l.vpn_location_ca_east,
+            'CA-EAST': l.vpn_location_ca_east,
             'CA-WEST': l.vpn_location_ca_west,
+            'US-EAST': l.vpn_location_us_east,
+            'US-WEST': l.vpn_location_us_west
         };
 
         const options = { };
@@ -240,10 +273,16 @@ class VpnPage {
         }
 
         this.$locationDropdown = $('.location-dropdown', this.page);
+
+        const sortedOptions = Object.fromEntries(Object.entries(options)
+            .sort((code, location) => code[1].localeCompare(location[1])));
+
+        const selectedLocation = sortedOptions[Object.keys(sortedOptions)[0]];
+
         createDropdown(this.$locationDropdown, {
-            placeholder: options[0],
-            items: options,
-            selected: locations[0],
+            placeholder: selectedLocation,
+            items: sortedOptions,
+            selected: selectedLocation,
         });
         bindDropdownEvents(this.$locationDropdown);
 
@@ -253,7 +292,7 @@ class VpnPage {
     }
 
     get isTncChecked() {
-        return this.tncCheck.classList.contains('checkboxOn');
+        return  u_attr['^!vpnTnc'];
     }
 
     async show() {
@@ -298,7 +337,7 @@ class VpnPage {
     }
 
     async createCred() {
-        if (!this.isTncChecked) {
+        if (!(this.isTncChecked || this.tncCheck.classList.contains('checkboxOn'))) {
             return;
         }
 
@@ -330,14 +369,23 @@ class VpnPage {
         if (!cred) {
             return; // TODO
         }
-
+        this._onCredCreated();
         this.showStep2(cred);
     }
 
     async removeCred(credNum) {
         loadingDialog.show('vpn-deactivate');
+
+        msgDialog(
+            `warningb:!^${l.vpn_page_delete_credential_confirm}!${l.vpn_page_delete_credential_dialog_cancel}`,
+            '', '', l.vpn_page_delete_credential, async(e) => {
+                if (!e) {
         await VpnCredsManager.deactivateCredential(credNum);
+                }
         loadingDialog.hide('vpn-deactivate');
+                this._onCredDeactivated(credNum);
+            }
+        );
     }
 
     showStep2(cred) {
@@ -365,7 +413,6 @@ class VpnPage {
 
     reset() {
         this.postCreateSection.classList.add('hidden');
-
         this.recentSlot = undefined;
         $('.cred-slot.recent', this.credsContainer).removeClass('recent');
         $(this.configQr).empty();
@@ -390,7 +437,9 @@ class VpnPage {
         credElement.dataset.num = credNum;
         credElement.querySelector('.label').textContent = l.vpn_page_manage_cred_title.replace('%s', credNum);
         const removeBtn = credElement.querySelector('.js-remove');
-        removeBtn.addEventListener('click', () => this.removeCred(credNum));
+        removeBtn.addEventListener('click', () => {
+            this.removeCred(credNum);
+        });
 
         this.credsContainer.appendChild(credElement);
     }

@@ -2653,11 +2653,12 @@ MegaUtils.prototype.isInExperiment = function(flag) {
     }
 
     // Then, check the AB flag is set and if it is, commit the user to their experiment group
-    if (mega.flags[`ab_${flag}`] > 0) {
+    // (control - 0, variant - 1/2/3 etc)
+    if (typeof mega.flags[`ab_${flag}`] !== 'undefined') {
         api.req({'a': 'abta', c: `ab_${flag}`}).catch(dump);
 
         // User is in a variant group if flag value is greater than 0
-        return true;
+        return mega.flags[`ab_${flag}`] > 0;
     }
 
     // If neither flag is set

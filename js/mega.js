@@ -84,6 +84,18 @@ lazy(self, 'mLoadingSpinner', () => {
     const callers = new Map();
     const domNode = document.querySelector('.fmdb-loader');
 
+    const hideToast = (id) => {
+        if (id) {
+            return self.toaster && Promise.resolve(id).then(toaster.main.hide).catch(dump);
+        }
+
+        for (const [, v] of callers) {
+            if (v.toast) {
+                hideToast(v.toast);
+            }
+        }
+    };
+
     return freeze({
         show(id = 'main', title = 'Background activity') {
             if (!callers.size) {
@@ -92,19 +104,33 @@ lazy(self, 'mLoadingSpinner', () => {
                 }
                 document.documentElement.classList.add('fmdb-working');
             }
+
             const store = callers.get(id) || {title, count: 0};
             const res = ++store.count;
 
+            // Show a special toast message with loading spinner
+            if (title && !store.toast && self.toaster && String(id).includes('loading-toast')) {
+                store.toast = toaster.main.show({
+                    timeout: 0,
+                    content: title,
+                    classes: ['loading-toast'],
+                    icons: ['sprite-fm-theme icon-loading-spinner rotating-animation']
+                });
+            }
             callers.set(id, store);
             return res;
         },
 
         hide(id = 'main', force = false) {
             let res = 0;
-            const store = !force && callers.get(id);
+            const store = callers.get(id);
 
-            if (!store || store.count < 2) {
+            if (force || !store || store.count < 2) {
                 callers.delete(id);
+
+                if (store && store.toast) {
+                    hideToast(store.toast);
+                }
             }
             else {
                 res = --store.count;
@@ -126,6 +152,7 @@ lazy(self, 'mLoadingSpinner', () => {
         },
 
         clear() {
+            hideToast();
             callers.clear();
             return this.hide();
         }

@@ -69,7 +69,7 @@ window.toastRack = (() => {
      * @returns {{toastSlot: object, toast: object}} the toast and its slot within the rack
      */
     function createToastSlot(rack, {
-        timeout,
+        timeout = 3000,
         icons,
         buttons,
         hasClose = true,
@@ -102,7 +102,6 @@ window.toastRack = (() => {
         }
 
         // set hide after timeout
-        timeout = timeout || 3000;
         if (timeout > 0) {
             toastSlot.expiry = Date.now() + timeout;
 
@@ -1133,12 +1132,17 @@ window.showToast = function(
     });
 };
 
-// Create all the toasters
+/**
+ * Create all the toasters
+ * @name toaster
+ * @global
+ */
 lazy(window, 'toaster', () => {
     'use strict';
 
     const toaster = {};
 
+    /** @property toaster.main */
     lazy(toaster, 'main', () => {
         const mainToaster = document.createElement('section');
         mainToaster.className = 'global-toast-container';
@@ -1146,6 +1150,7 @@ lazy(window, 'toaster', () => {
         return window.toastRack(mainToaster, 'global-toast-container', 'top');
     });
 
+    /** @property toaster.alerts */
     lazy(toaster, 'alerts', () => window.toastRack(
         document.querySelector('.alert-toast-container'),
         'alert-toast-container',

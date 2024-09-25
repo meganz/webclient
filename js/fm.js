@@ -1710,7 +1710,7 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
                 </button>`,
                 l[20754],
                 l[171],
-                l[170]);
+                l[209]);
 
         // Register a new account to complete the import
         $('#msgDialog .mega-button.confirm').rebind('click', function() {

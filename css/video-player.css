@@ -766,3 +766,13 @@
     .height-84 {
         height: 84px;
     }
+
+@media (max-width: 420px) {
+    .media-viewer .bar:last-child, .media-viewer .bar.control {
+        transform: scale(0.8);
+    }
+
+    .media-viewer .bar {
+        padding: revert;
+    }
+}

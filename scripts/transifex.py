@@ -590,7 +590,6 @@ def lock_resource(branch_resource_name, keys, branch, update_time = 0, char_limi
         lockedTags = ["do_not_translate"]
         if branch:
             lockedTags.append('feature-in-feature')
-            lockedTags.append('locked')
         for language in languages:
             lockedTags.append("locked_" + language["attributes"]["code"])
         while url != 0:

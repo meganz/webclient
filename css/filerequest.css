@@ -44,6 +44,10 @@
     background-color: var(--color-surface-2);
 }
 
+.rtl .file-request-upload-page {
+    direction: rtl;
+}
+
 .theme-dark .file-request-upload-page {
     --color-surface-1: rgba(48, 50, 51, 1);
     --color-surface-2: rgba(73, 74, 77, 1);
@@ -228,19 +232,23 @@ body.file-request-drag .file-request-upload-page .page-main .page-content .block
     display: flex;
     border-style: solid;
     flex-direction: column;
-    padding-right: 2px;
+    padding-inline-end: 2px;
+    -webkit-padding-end: 2px;
 }
 
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-scroll {
     height: 314px;
     overflow-y: scroll;
-    padding-left: 11px;
-    padding-right: 9px;
+    -webkit-padding-start: 11px;
+    padding-inline-start: 11px;
+    -webkit-padding-end: 9px;
+    padding-inline-end: 9px;
     box-sizing: border-box;
 }
 
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-scroll.ps.ps--active-y {
-    padding-right: 15px;
+    -webkit-padding-end: 15px;
+    padding-inline-end: 15px;
 }
 
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-scroll .ps__rail-y {
@@ -277,14 +285,17 @@ body.file-request-drag .file-request-upload-page .page-main .page-content .block
 
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-details .item-size {
     width: 70px;
-    margin-left: 16px;
-    margin-right: 16px;
+    margin-inline-start: 16px;
+    -webkit-margin-start: 16px;
+    margin-inline-end: 16px;
+    -webkit-margin-end: 16px;
     color: var(--color-text-secondary);
     flex: 0 0 70px;
 }
 
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-details .item-status {
-    margin-left: auto;
+    margin-inline-start: auto;
+    -webkit-margin-start: auto;
     color: var(--color-text-secondary);
     text-align: right;
 
@@ -296,6 +307,10 @@ body.file-request-drag .file-request-upload-page .page-main .page-content .block
 
     width: 75px;
     flex: 0 0 75px;
+}
+
+.rtl .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-details .item-status {
+    text-align: left;
 }
 
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-error {
@@ -310,14 +325,16 @@ body.file-request-drag .file-request-upload-page .page-main .page-content .block
 }
 
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-error .error-message {
-    margin-left: 8px;
+    margin-inline-start: 8px;
+    -webkit-margin-start: 8px;
 }
 
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-error .error-reupload {
     text-decoration: underline;
     color: var(--color-link-primary);
     font: var(--text-link-small);
-    margin-left: 3px;
+    margin-inline-start: 3px;
+    -webkit-margin-start: 3px;
 }
 
 .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-error .error-icon i {
@@ -477,6 +494,10 @@ body.file-request-drag .file-request-upload-page .page-main .page-content .block
         text-align: left;
     }
 
+    .rtl .file-request-upload-page .page-main .page-content .content-details.content-error {
+        text-align: right;
+    }
+
     .file-request-upload-page .page-main .page-content .content-details.content-error .error-icon {
         display: inline;
         color: var(--color-support-error);
@@ -484,7 +505,8 @@ body.file-request-drag .file-request-upload-page .page-main .page-content .block
     }
 
     .file-request-upload-page .page-main .page-content .content-details.content-error .detail-wrapper {
-        margin-left: 8px;
+        margin-inline-start: 8px;
+        -webkit-margin-start: 8px;
         row-gap: unset;
     }
 
@@ -514,7 +536,8 @@ body.file-request-drag .file-request-upload-page .page-main .page-content .block
     }
 
     .file-request-upload-page .page-main .page-content .block-uploading .block-uploading-item .item-error .error-message {
-        margin-left: 0;
+        margin-inline-start: 0;
+        -webkit-margin-start: 0;
     }
 
     .file-request-upload-page .page-main .page-content .block-empty {

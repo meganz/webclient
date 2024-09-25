@@ -2405,7 +2405,9 @@ function logExportEvt(type, target) {
             const toastText = mega.icu.format(l.toast_link_created_and_copied, $items.length);
 
             // Copy to clipboard
-            copyToClipboard(data, toastText, null, 2000);
+            tSleep(4 / 10).then(() => {
+                copyToClipboard(data, toastText, null, 2000);
+            });
         }
     };
 
@@ -3002,7 +3004,11 @@ function logExportEvt(type, target) {
                 'nodesToProcess': nodesToProcess
             });
 
-            exportLink.getExportLink();
+            mLoadingSpinner.show('get-link-loading-toast', l.generating_links);
+
+            exportLink.getExportLink().finally(() => {
+                mLoadingSpinner.hide('get-link-loading-toast');
+            });
         });
 
         // If they've already agreed to the copyright warning (cws = copyright warning shown)

@@ -2484,7 +2484,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
      * @private
      */
     mega.initMobileVideoControlsToggle = function($wrapper) {
-        var $video = $('.video-block', $wrapper);
+        const $video = $('.video-block, .embedplayer .video-wrapper', $wrapper);
         var $videoControl = $('.video-controls', $wrapper);
         var $adControl = $('.viewer-vad-control', $wrapper);
         var videoElement = $('video', $video).get(0);

@@ -260,8 +260,13 @@
     color: var(--label-blue);
     cursor: pointer;
 }
+
 .fm-right-account-block .fm-account-vpn .post-create-section .view-ini-config:hover {
     color: var(--label-blue-hover);
+}
+
+.fm-right-account-block .fm-account-vpn .post-create-section .config-output .copy {
+    color: var(--text-color-medium)
 }
 
 /* endregion */

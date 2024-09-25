@@ -234,6 +234,16 @@ FileManager.prototype.initFileManager = async function() {
                     if (d) {
                         console.info('REWIND Initialized.', [mega.rewind]);
                     }
+
+                    const m = new Date().getMonth();
+                    if (m > 7) {
+                        const sm = mega.config.get('rwdPromoDiag');
+                        if (sm === undefined && m > 10 || m < 11 && sm !== m) {
+                            mega.config.set('rwdPromoDiag', m);
+                            eventlog(500532);
+                            mega.rewind.showRewindPromoDialog();
+                        }
+                    }
                 })
                 .catch((ex) => {
                     reportError(ex);

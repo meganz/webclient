@@ -669,6 +669,21 @@ function fmtopUI() {
         if (M.v.length) {
             $('.fm-clearbin-button').removeClass('hidden');
         }
+
+        const $rewindNotification = $('.fm-notification-block.new-feature-rewind-notification');
+        if (mega.config.get('dsmRubRwd')) {
+            $rewindNotification.addClass('hidden');
+        }
+        else {
+            delay('rubbish-bin:rewind-prom', () => eventlog(500530, true), 4e3);
+
+            $('.fm-notification-close', $rewindNotification).rebind('click', () => {
+                eventlog(500529);
+                mega.config.set('dsmRubRwd', 1);
+                $rewindNotification.addClass('hidden');
+            });
+        }
+
         $('.fm-right-files-block').addClass('rubbish-bin visible-notification');
     }
     else {
@@ -874,7 +889,12 @@ function doClearbin(all) {
     msgDialog('clear-bin', l[14], l[15], l[1007], function(e) {
 
         if (e) {
-            M.clearRubbish(all).catch(dump);
+            M.clearRubbish(all).catch(dump).finally(() => {
+                if (mega.rewind) {
+                    eventlog(500531);
+                    mega.rewind.showRewindPromoDialog();
+                }
+            });
         }
     });
 }

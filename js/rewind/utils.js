@@ -5,6 +5,7 @@ lazy(mega, 'rewindUtils', () => {
     const logger = new MegaLogger('utils', null, MegaLogger.getLogger('rewind'));
     let treeChannel = -1;
     let packetChannel = -1;
+    let reinstateChannel = -1;
     let rewindWorker = null;
 
     class RewindMEGAWorker extends MEGAWorker {
@@ -435,11 +436,20 @@ lazy(mega, 'rewindUtils', () => {
 
         init() {
             this.toBeRestored = [];
+            this.seen = new Set();
             this.restored = Object.create(null);
             this.freshNodes = Object.create(null);
             this.selectedNodes = [];
             this.inProgress = false;
             this.stats = Object.create(null);
+            this.apiInit = false;
+        }
+
+        initChannel() {
+            if (!this.apiInit) {
+                reinstateChannel = api.addChannel(-1, 'cs');
+                this.apiInit = true;
+            }
         }
 
         /**
@@ -513,7 +523,8 @@ lazy(mega, 'rewindUtils', () => {
 
             const statProp = req.n[0].t ? 'dirs' : 'files';
 
-            return api.screq(req).then(res => {
+            this.initChannel();
+            return api.screq(req, reinstateChannel).then(res => {
                 this.restored[handle] = res.handle;
                 this.stats[statProp] = (this.stats[statProp] || 0) + 1;
                 return res.handle;
@@ -534,6 +545,7 @@ lazy(mega, 'rewindUtils', () => {
             // Running rewind on a folder means that the folder always exists
             if (handle === mega.rewind.selectedHandle) {
                 this.restored[handle] = handle;
+                this.seen.add(handle);
                 return;
             }
 
@@ -548,6 +560,7 @@ lazy(mega, 'rewindUtils', () => {
             // Populate M.d with the node so we can check its existence
             if (!M.d[handle]) {
                 await dbfetch.acquire(handle);
+                this.seen.add(parentHandle);
             }
 
             // Check if the parent exists, if it does, add it to the restored map
@@ -556,6 +569,7 @@ lazy(mega, 'rewindUtils', () => {
                 && M.d[parentHandle].p === mega.rewind.persist.nodeDictionary[parentHandle].p) {
 
                 this.restored[parentHandle] = parentHandle;
+                this.seen.add(parentHandle);
 
                 // Restore the folder name
                 const previousName = mega.rewind.persist.nodeDictionary[parentHandle].name;
@@ -574,11 +588,13 @@ lazy(mega, 'rewindUtils', () => {
             else {
                 this.freshNodes[parentHandle] = 1;
                 await this.addParentsToRestoreList(parentHandle);
+                this.seen.add(parentHandle);
             }
 
             // Add current node
             if (!this.toBeRestored.includes(handle)) {
                 this.toBeRestored.unshift(handle);
+                this.seen.add(handle);
             }
 
             // Mark current node as fresh if parent is fresh
@@ -596,6 +612,8 @@ lazy(mega, 'rewindUtils', () => {
 
             const children = mega.rewind.persist.nodeChildrenDictionary[handle];
 
+            this.seen.add(handle);
+
             if (!children) {
                 return;
             }
@@ -603,6 +621,8 @@ lazy(mega, 'rewindUtils', () => {
             for (const [h, type] of Object.entries(children)) {
                 // Add the handle to the list for restoring
                 if (!this.toBeRestored.includes(h)) {
+
+                    this.seen.add(h);
                     this.toBeRestored.push(h);
                 }
 
@@ -653,11 +673,6 @@ lazy(mega, 'rewindUtils', () => {
 
             loadingDialog.show();
 
-            this.toBeRestored = typeof handles === 'string' ? [handles] : handles;
-            this.restored = Object.create(null);
-
-            loadingDialog.hide();
-
             // If any subtree is collapsed, we add the hidden nodes to be restored as well
             const partials = Object.values(mega.rewind.persist.selectedNodesPartial).flatMap(o => Object.keys(o));
 
@@ -668,11 +683,19 @@ lazy(mega, 'rewindUtils', () => {
             // We sort the handles by depth, needed for partial selections
             this._sortHandlesByDepth(handles, mega.rewind.persist.nodeDictionary, mega.rewind.persist.selectedHandle);
 
+            this.toBeRestored = typeof handles === 'string' ? [handles] : handles;
+            this.restored = Object.create(null);
+
+            loadingDialog.hide();
+
             // Do a traversal along the parents for each node and restore if parent is missing
             let idx = 0;
             while (idx < this.toBeRestored.length) {
                 const currentHandle = this.toBeRestored[idx];
-                await this.addParentsToRestoreList(currentHandle);
+                if (!this.seen.has(currentHandle)) {
+                    await this.addParentsToRestoreList(currentHandle);
+                }
+
                 // `1` refers to a fully selected node, add its children in case its subtree is collapsed
                 // If the node is not in `selectedNodes`, we added this to the restore list
                 if (mega.rewind.persist.nodeDictionary[currentHandle].t
@@ -708,6 +731,9 @@ lazy(mega, 'rewindUtils', () => {
                                             this.stats.versioned | 0]);
             // Cleanup
             this.toBeRestored = [];
+            this.seen.clear();
+            api.removeChannel(reinstateChannel);
+            this.apiInit = false;
             this.restored = Object.create(null);
             this.freshNodes = Object.create(null);
             this.stats = Object.create(null);

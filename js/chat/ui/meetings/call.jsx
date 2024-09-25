@@ -574,26 +574,28 @@ export default class Call extends MegaRenderMixin {
                         }],
                         classes: ['theme-dark-forced', 'call-toast'],
                         icons: ['sprite-fm-uni icon-raise-hand'],
-                        timeout: 10e3,
-                        content: raisedHandPeers.length > 2 ?
-                            // `N` people raised their hand || You and `N` people raised their hand
-                            (
-                                raisedHandPeers.includes(u_handle) ?
-                                    mega.icu.format(l.raise_self_peers_raised, raisedHandPeers.length - 1) :
-                                    mega.icu.format(l.raise_peers_raised, raisedHandPeers.length)
-                            ) :
-                            // `${NAME} raised their hand` || `${NAME} and 1 other raised their hand` ||
-                            // `You and 1 other raised their hand`
-                            (
-                                raisedHandPeers.length === 1 ?
-                                    l.raise_peer_raised :
-                                    mega.icu.format(
-                                        raisedHandPeers.includes(u_handle) ?
-                                            l.raise_self_peers_raised : l.raise_two_raised,
-                                        raisedHandPeers.length - 1
-                                    )
-                            )
-                                .replace('%s', M.getNameByHandle(raisedHandPeers[0]))
+                        timeout: 10e3 /* 10 seconds */,
+                        content: (() => {
+                            const peerName = M.getNameByHandle(raisedHandPeers[0]);
+                            const peersCount = raisedHandPeers.length;
+                            const withCurrentPeer = raisedHandPeers.includes(u_handle);
+                            const CONTENT = {
+                                1: () =>
+                                    // `${NAME} raised their hand`
+                                    l.raise_peer_raised.replace('%s', peerName),
+                                2: () => {
+                                    // `You and 1 other raised their hand` || `${NAME} and 1 other raised their hand`
+                                    const message = withCurrentPeer ? l.raise_self_peers_raised : l.raise_two_raised;
+                                    return mega.icu.format(message, peersCount - 1).replace('%s', peerName);
+                                },
+                                rest: () => {
+                                    // `You and N people raised their hand` || `N people raised their hand`
+                                    const message = withCurrentPeer ? l.raise_self_peers_raised : l.raise_peers_raised;
+                                    return mega.icu.format(message, withCurrentPeer ? peersCount - 1 : peersCount);
+                                }
+                            };
+                            return (CONTENT[peersCount] || CONTENT.rest)();
+                        })()
                     });
                 }
                 // [...] TODO: abstract into HOC, consumed in `participants.jsx`,`float.jsx`, `videoNode.jsx`
@@ -1140,9 +1142,7 @@ export default class Call extends MegaRenderMixin {
         chatRoom.megaChat.off(`onPeerAvChange.${NAMESPACE}`);
 
         mBroadcaster.removeListener(this.ephemeralAddListener);
-        if (this.pageChangeListener) {
-            mBroadcaster.removeListener(this.pageChangeListener);
-        }
+        mBroadcaster.removeListener(this.pageChangeListener);
 
         clearTimeout(this.callStartTimeout);
         delay.cancel('callOffline');
@@ -1155,6 +1155,7 @@ export default class Call extends MegaRenderMixin {
             clearInterval(this.timeoutBannerInterval);
         }
 
+        window.toaster.main.hideAll();
         this.unbindCallEvents();
         willUnmount?.(minimized);
     }

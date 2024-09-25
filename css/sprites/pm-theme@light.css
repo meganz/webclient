@@ -13,4 +13,12 @@
 .theme-light-forced .sprite-pm-theme.icon-loader-throbber-light-outline, .theme-light-forced .sprite-pm-theme-before.icon-loader-throbber-light-outline-before::before, .theme-light-forced .sprite-pm-theme-after.icon-loader-throbber-light-outline-after::after {
    background-image: url("chrome-extension://__MSG_@@extension_id__/images/sprites/pm-theme@light.svg#icon-loader-throbber-light-outline");
 }
+.theme-light .sprite-pm-theme.icon-pwm-extension, .theme-light .sprite-pm-theme-before.icon-pwm-extension-before::before, .theme-light .sprite-pm-theme-after.icon-pwm-extension-after::after,
+.theme-light-forced .sprite-pm-theme.icon-pwm-extension, .theme-light-forced .sprite-pm-theme-before.icon-pwm-extension-before::before, .theme-light-forced .sprite-pm-theme-after.icon-pwm-extension-after::after {
+   background-image: url("chrome-extension://__MSG_@@extension_id__/images/sprites/pm-theme@light.svg#icon-pwm-extension");
+}
+.theme-light .sprite-pm-theme.icon-pwm-extension-disabled, .theme-light .sprite-pm-theme-before.icon-pwm-extension-disabled-before::before, .theme-light .sprite-pm-theme-after.icon-pwm-extension-disabled-after::after,
+.theme-light-forced .sprite-pm-theme.icon-pwm-extension-disabled, .theme-light-forced .sprite-pm-theme-before.icon-pwm-extension-disabled-before::before, .theme-light-forced .sprite-pm-theme-after.icon-pwm-extension-disabled-after::after {
+   background-image: url("chrome-extension://__MSG_@@extension_id__/images/sprites/pm-theme@light.svg#icon-pwm-extension-disabled");
+}
 

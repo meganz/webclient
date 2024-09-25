@@ -16,6 +16,12 @@
 }
 /* End of slide In / Out animation */
 
+/* Rotation animations */
+.rotating-animation {
+    animation: rotate 0.8s infinite linear;
+}
+/* End of Rotation animations */
+
 .no-trans, .no-trans::before, .no-trans::after, .no-trans-init, .no-trans-init::before, .no-trans-init::after {
     -webkit-transition: none!important;
     -moz-transition: none!important;

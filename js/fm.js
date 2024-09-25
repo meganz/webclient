@@ -889,7 +889,12 @@ function doClearbin(all) {
     msgDialog('clear-bin', l[14], l[15], l[1007], function(e) {
 
         if (e) {
-            M.clearRubbish(all).catch(dump);
+            M.clearRubbish(all).catch(dump).finally(() => {
+                if (mega.rewind) {
+                    eventlog(500531);
+                    mega.rewind.showRewindPromoDialog();
+                }
+            });
         }
     });
 }

@@ -764,6 +764,60 @@ body.theme-dark .rewind-datepicker-calendar .datepicker--cell.-current- {
     flex-shrink: 0;
 }
 
+.mega-dialog.rw-promo-dialog {
+    width: 543px;
+}
+
+.mega-dialog.rw-promo-dialog .img-rw-promo-dialog {
+    background-image: url("../images/mega/rewind/rewind-promo-dialog.png");
+    background-size: 327px 224px;
+    background-repeat: no-repeat;
+    background-position: 50% bottom;
+    background-color: var(--surface-grey-2);
+    height: 248px !important;
+    width: 543px !important;
+    margin-bottom: 8px !important;
+    padding-top: 24px;
+}
+
+.theme-dark .mega-dialog.rw-promo-dialog .img-rw-promo-dialog {
+    background-color: var(--surface-grey-1);
+}
+
+.mega-dialog.rw-promo-dialog.dialog-template-graphic > header {
+    padding: 0 0 4px;
+    overflow: hidden;
+}
+
+.mega-dialog.rw-promo-dialog.dialog-template-graphic > header h2 {
+    font: var(--text-h2-bold);
+}
+
+.mega-dialog.rw-promo-dialog.dialog-template-graphic > header .graphic {
+    margin: 0 auto 24px;
+}
+
+.mega-dialog.rw-promo-dialog > section {
+    margin-bottom: 8px;
+}
+
+.mega-dialog.rw-promo-dialog > section a {
+    text-decoration: underline;
+}
+
+.mega-dialog.rw-promo-dialog > footer aside {
+    padding: 8px 0 24px;
+    background: unset;
+}
+
+.mega-dialog.rw-promo-dialog > footer > aside > button {
+    padding: 8px 12px;
+}
+
+.mega-dialog.rw-promo-dialog > footer aside button span {
+    font: var(--text-body1);
+}
+
 .fm-rewind-progress-section {
     position: absolute;
     top: 48px;

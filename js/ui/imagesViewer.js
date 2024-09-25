@@ -1655,12 +1655,15 @@ var slideshowid;
             fetchnext();
         }
         else {
-            $('img', $imgWrap).attr('src', '');
-            if (is_video(n)) {
-                $('.loader-grad', $content).removeClass('hidden');
-            }
-            else {
-                $pendingBlock.removeClass('hidden');
+            if (!slideshowplay) {
+                $('img', $imgWrap).attr('src', '');
+
+                if (is_video(n)) {
+                    $('.loader-grad', $content).removeClass('hidden');
+                }
+                else {
+                    $pendingBlock.removeClass('hidden');
+                }
             }
 
             if (!preqs[n.h]) {
@@ -2419,6 +2422,10 @@ var slideshowid;
             $pendingBlock.addClass('hidden');
             $progressBlock.addClass('vo-hidden');
         };
+
+        if (slideshowplay) {
+            slideshow_aborttimer();
+        }
 
         img.src = src;
     }

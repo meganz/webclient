@@ -1713,6 +1713,9 @@ class SfuClient {
             } while (0);
             return;
         }
+        if (isNaN(this.termCode)) {
+            this.termCode = TermCode.kSigDisconn;
+        }
         do {
             if (window.d) {
                 console.warn(client_kLogTag, "Signaling connection closed");

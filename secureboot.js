@@ -891,6 +891,13 @@ Object.defineProperty(mega, 'flags', {
     }
 });
 
+Object.defineProperty(mega, 'bstrg', {
+    get: function() {
+        'use strict';
+        return this.flags.bstrg || 21474836480;
+    }
+});
+
 Object.defineProperty(mega, 'user', {
     get: function() {
         'use strict';
@@ -3658,6 +3665,11 @@ else if (!browserUpdate) {
                     boot_done();
                 }
             };
+
+            params = tryCatch(function(p) {
+                tmp = u_storage.afo;
+                return tmp ? p + '&' + new URLSearchParams(JSON.parse(tmp)) : p;
+            })(params || '');
 
             xhr.open("POST", apipath + 'cs?id=0' + (params || ''), true);
             xhr.send(JSON.stringify([].concat(data)));

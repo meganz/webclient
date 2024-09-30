@@ -365,7 +365,8 @@
             $('header p', $dialog).safeHTML(options.body);
         }
         else {
-            $('header p', $dialog).safeHTML(l[20757]);
+            $('header p', $dialog)
+                .safeHTML(`${l.free_storage_info__register.replace('%s', bytesToSize(mega.bstrg, 0))}`);
 
             // Hide the "Create an account and get x GB of free storage on MEGA"
             // text if coming from the discount promotion page

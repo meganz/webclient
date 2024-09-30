@@ -496,7 +496,7 @@ pro.proplan = {
 
         compareDetails = [
             [
-                ['', bytesToSize(20 * gb), '', l[16362]],
+                ['', bytesToSize(mega.bstrg), '', l[16362]],
                 ['', bytesToSize(2 * gb), '' , l[24075]],
                 ['', bytesToSize(15 * gb), '', l[24076]]
             ],

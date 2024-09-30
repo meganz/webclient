@@ -742,7 +742,7 @@ accountUI.plan = {
                         && (plan[pro.UTQA_RES_INDEX_MONTHS] === duration));
 
                     this.proPlanName = pro.getProPlanName(subscription);
-                    const freeStorage = bytesToSize(20 * 1024 * 1024 * 1024, 0);
+                    const freeStorage = bytesToSize(mega.bstrg, 0);
                     const proStorage = bytesToSize(plan[pro.UTQA_RES_INDEX_STORAGE] * 1073741824, 0);
                     const freeTransfer = l['1149'];
                     const proTransfer = bytesToSize(plan[pro.UTQA_RES_INDEX_TRANSFER] * 1073741824, 0);

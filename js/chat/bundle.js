@@ -377,7 +377,7 @@ class ScheduledMeeting {
     this.occurrences = new MegaDataMap();
     this.nextOccurrenceStart = this.start;
     this.nextOccurrenceEnd = this.end;
-    this.isPast = (this.isRecurring ? this.recurring.end : this.end) < Date.now();
+    this.isCompleted = false;
     this.ownerHandle = meetingInfo.u;
     this.chatRoom = meetingInfo.chatRoom;
     this.chatRoom.scheduledMeeting = this.isRoot ? this : this.parent;
@@ -391,8 +391,11 @@ class ScheduledMeeting {
   get isCanceled() {
     return !!this.canceled;
   }
+  get isPast() {
+    return (this.isRecurring ? this.recurring.end : this.end) < Date.now();
+  }
   get isUpcoming() {
-    return !this.isCanceled && !this.isPast && this.chatRoom.members[u_handle] >= 0;
+    return !(this.isCanceled || this.isPast || this.isCompleted);
   }
   get isRecurring() {
     return !!this.recurring;
@@ -410,12 +413,9 @@ class ScheduledMeeting {
     return this.isRoot ? null : this.megaChat.plugins.meetingsManager.getMeetingById(this.parentId);
   }
   setNextOccurrence() {
-    if (!this.didFetchOccurrences) {
-      return;
-    }
     const upcomingOccurrences = Object.values(this.occurrences).filter(o => o.isUpcoming);
     if (!upcomingOccurrences || !upcomingOccurrences.length) {
-      this.isPast = this.isRecurring || this.end < Date.now();
+      this.isCompleted = this.isRecurring;
       return;
     }
     const sortedOccurrences = upcomingOccurrences.sort((a, b) => a.start - b.start);
@@ -449,7 +449,6 @@ class ScheduledMeeting {
       delete req.cid;
     }
     const occurrences = await asyncApiReq(req);
-    this.didFetchOccurrences = true;
     if (Array.isArray(occurrences)) {
       if (!options) {
         this.occurrences.clear();
@@ -15017,7 +15016,7 @@ class ConversationPanels extends mixins.w9 {
       const {
         scheduledMeeting
       } = chatRoom;
-      if (scheduledMeeting && scheduledMeeting.isUpcoming && scheduledMeeting.isRecurring) {
+      if (scheduledMeeting && !scheduledMeeting.isPast && scheduledMeeting.isRecurring) {
         scheduledMeeting.getOccurrences().catch(nop);
       }
     });
@@ -19249,7 +19248,7 @@ class Meetings extends mixins.w9 {
     })) : null;
     this.Upcoming = () => {
       const upcomingMeetings = Object.values(this.props.conversations || {}).filter(c => {
-        return c.isDisplayable() && c.isMeeting && c.scheduledMeeting && c.scheduledMeeting.isUpcoming && !c.havePendingCall();
+        return c.isDisplayable() && c.isMeeting && c.scheduledMeeting && c.scheduledMeeting.isUpcoming && c.iAmInRoom() && !c.havePendingCall();
       }).sort((a, b) => a.scheduledMeeting.nextOccurrenceStart - b.scheduledMeeting.nextOccurrenceStart || a.ctime - b.ctime);
       const nextOccurrences = upcomingMeetings.reduce((nextOccurrences, chatRoom) => {
         const {
@@ -19301,7 +19300,14 @@ class Meetings extends mixins.w9 {
     };
     this.Past = () => {
       const conversations = Object.values(this.props.conversations || {});
-      const pastMeetings = conversations.filter(c => c.isMeeting && c.isDisplayable() && (!c.scheduledMeeting || c.scheduledMeeting.isCanceled || c.scheduledMeeting.isPast) && !c.havePendingCall()).sort(M.sortObjFn(c => c.lastActivity || c.ctime, -1));
+      const pastMeetings = conversations.filter(c => {
+        const {
+          isCanceled,
+          isPast,
+          isCompleted
+        } = c.scheduledMeeting || {};
+        return c.isMeeting && c.isDisplayable() && (!c.scheduledMeeting || isCanceled || isPast || isCompleted) && !c.havePendingCall();
+      }).sort(M.sortObjFn(c => c.lastActivity || c.ctime, -1));
       const archivedMeetings = conversations.filter(c => c.isMeeting && c.isArchived()).sort(M.sortObjFn(c => c.lastActivity || c.ctime, -1));
       return REaCt().createElement(this.Holder, {
         categoryName: "past"
@@ -33181,7 +33187,7 @@ const withUpdateObserver = Component => class extends _mixins_js1__.w9 {
   render() {
     return react0().createElement(Component, (0,_extends2__.A)({
       ref: this.instanceRef
-    }, this.props));
+    }, this.state, this.props));
   }
 };
 

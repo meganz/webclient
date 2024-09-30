@@ -2985,7 +2985,7 @@ export class ConversationPanels extends MegaRenderMixin {
 
         megaChat.chats.forEach(chatRoom => {
             const { scheduledMeeting } = chatRoom;
-            if (scheduledMeeting && scheduledMeeting.isUpcoming && scheduledMeeting.isRecurring) {
+            if (scheduledMeeting && !scheduledMeeting.isPast && scheduledMeeting.isRecurring) {
                 scheduledMeeting.getOccurrences().catch(nop);
             }
         });

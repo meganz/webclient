@@ -35,7 +35,7 @@ var sms = {
     },
 
     /**
-     * Update the language advertisement string 'Get 20 GB storage and 40 GB transfer quota for free when you...' with
+     * Update the language advertisement string 'Get N GB storage and N GB transfer quota for free when you...' with
      * the details from the API. If a non-achievement account, a different text will be rendered.
      * @param {Object} $textField The text field to be updated
      */
@@ -65,7 +65,7 @@ var sms = {
                 var storageQuotaFormatted = bytesToSize(storage, 0, 3);
                 var transferQuotaFormatted = bytesToSize(transfer, 0, 3);
 
-                // Update string to 'Get 20 GB storage and 40 GB transfer quota for free when you add your phone...'
+                // Update string to 'Get N GB storage and 40 GB transfer quota for free when you add your phone...'
                 langString = l[20210].replace('%1', storageQuotaFormatted).replace('%2', transferQuotaFormatted);
             }
 

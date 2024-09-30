@@ -121,6 +121,9 @@ function removeUInode(h, parent) {
                 }
                 else {
                     $('.fm-empty-cloud').removeClass('hidden');
+                    if (u_type !== 3) {
+                        $('.fm-not-logged-description').safeHTML(l[8762].replace('%s', bytesToSize(mega.bstrg, 0)));
+                    }
                 }
             }
             break;

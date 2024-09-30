@@ -3,7 +3,18 @@ import { MegaRenderMixin } from '../../mixins';
 import Button from './button.jsx';
 
 export default class Guest extends MegaRenderMixin {
+    state = {
+        copy: ''
+    };
+
+    componentDidMount() {
+        super.componentDidMount();
+        this.setState({ copy: `${l.free_storage_info__call.replace('%s', bytesToSize(mega.bstrg, 0))}` });
+    }
+
     render() {
+        const { copy } = this.state;
+
         return (
             <div className="guest-register">
                 <div className="guest-register-content">
@@ -14,8 +25,8 @@ export default class Guest extends MegaRenderMixin {
                         <span>{l[148] /* `Close` */}</span>
                     </Button>
                     <div>
-                        <i className="sprite-fm-illustration-wide registration" />
-                        {l.meetings_signup}
+                        <i className="sprite-fm-illustration-wide registration"/>
+                        <span>{copy}</span>
                     </div>
                     <Button
                         className="mega-button positive register-button"

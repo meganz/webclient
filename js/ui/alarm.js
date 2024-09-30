@@ -146,6 +146,7 @@ var alarm = {
             const handlerElem = alarm.handler();
             var $button = $('.js-dropdown-ephemeral', handlerElem);
             var $dialog = $('.top-warning-popup.ephemeral-session', handlerElem);
+            $('.description', $dialog).safeHTML(l[8644].replace('%s', bytesToSize(mega.bstrg, 0)));
 
             // Add button click handler
             this.initRegisterButton($button, $dialog);

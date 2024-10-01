@@ -1713,6 +1713,7 @@ accountUI.account = {
                 function(val) {
                     mega.attr.set('webtheme', val, -2, 1);
                     mega.ui.setTheme(val);
+                    showToast('settings', l[16168]);
                 }
             );
 

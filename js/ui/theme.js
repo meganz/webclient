@@ -81,7 +81,7 @@
 
 
     /**
-     * Sets the current theme, by value.
+     * Sets the current theme, by value
      * Does not store the change to localStorage, purely presentational.
      *
      * @param {*} [value] the value of the theme to set [0/"0":  follow system, 1/"1": light, 2/"2": dark]
@@ -105,6 +105,22 @@
 
             if (value < 3 && window.u_attr) {
                 u_attr['^!webtheme'] = String(value);
+            }
+
+            // Update UI when change with a value and in current page
+            if (fminitialized) {
+                // For mobile
+                if (is_mobile && $.dialog === 'mobile-settings-appearance') {
+                    mobile.appearance.themeGroup.children[value].checked = true;
+                }
+                else if (page === 'fm/account' && !is_mobile) {
+                    // Update theme radio button based in current value
+                    accountUI.inputs.radio.set(
+                        '.uiTheme',
+                        accountUI.$contentBlock,
+                        value | 0
+                    );
+                }
             }
         }
 

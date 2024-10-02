@@ -529,6 +529,9 @@
                 else if (this.logger) {
                     this.logger.info('Empty folder not handled...', M.currentdirid, M.currentrootid);
                 }
+                if (u_type !== 3) {
+                    $('.fm-not-logged-description').safeHTML(l[8762].replace('%s', bytesToSize(mega.bstrg, 0)));
+                }
             }
 
             if (this.logger) {

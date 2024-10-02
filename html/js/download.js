@@ -870,11 +870,11 @@ function start_import() {
     var dialogHeader = l[20751];
     var dialogTxt = l[20752];
     var dialogType = 'import_login_or_register';
-    var buttonEventRegister = function() {
+    var buttonEventRegister = () => {
         mega.ui.showRegisterDialog({
-            body: l[20756],
+            body: `${l.free_storage_info__create.replace('%s', bytesToSize(mega.bstrg, 0))}`,
             showLogin: true,
-            onAccountCreated: function(gotLoggedIn, accountData) {
+            onAccountCreated(gotLoggedIn, accountData) {
                 if (gotLoggedIn) {
                     console.assert(u_type, 'Invalid procedure...');
                     return start_import();

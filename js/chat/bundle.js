@@ -16084,62 +16084,36 @@ class Recurring extends mixins.w9 {
     this.WEEK_DAYS = {
       MONDAY: {
         value: 1,
-        label: l.schedule_day_control_mon,
-        name: l.schedule_occur_mon
+        label: l.schedule_day_control_mon
       },
       TUESDAY: {
         value: 2,
-        label: l.schedule_day_control_tue,
-        name: l.schedule_occur_tue
+        label: l.schedule_day_control_tue
       },
       WEDNESDAY: {
         value: 3,
-        label: l.schedule_day_control_wed,
-        name: l.schedule_occur_wed
+        label: l.schedule_day_control_wed
       },
       THURSDAY: {
         value: 4,
-        label: l.schedule_day_control_thu,
-        name: l.schedule_occur_thu
+        label: l.schedule_day_control_thu
       },
       FRIDAY: {
         value: 5,
-        label: l.schedule_day_control_fri,
-        name: l.schedule_occur_fri
+        label: l.schedule_day_control_fri
       },
       SATURDAY: {
         value: 6,
-        label: l.schedule_day_control_sat,
-        name: l.schedule_occur_sat
+        label: l.schedule_day_control_sat
       },
       SUNDAY: {
         value: 7,
-        label: l.schedule_day_control_sun,
-        name: l.schedule_occur_sun
+        label: l.schedule_day_control_sun
       }
     };
-    this.OFFSETS = {
-      FIRST: {
-        value: 1,
-        label: l.recurring_frequency_offset_first
-      },
-      SECOND: {
-        value: 2,
-        label: l.recurring_frequency_offset_second
-      },
-      THIRD: {
-        value: 3,
-        label: l.recurring_frequency_offset_third
-      },
-      FOURTH: {
-        value: 4,
-        label: l.recurring_frequency_offset_fourth
-      },
-      FIFTH: {
-        value: 5,
-        label: l.recurring_frequency_offset_fifth
-      }
-    };
+    this.OFFSETS = [[l.recur_freq_offset_first_mon || '[A]first[/A][B]Monday[/B]', l.recur_freq_offset_first_tue || '[A]first[/A][B]Tuesday[/B]', l.recur_freq_offset_first_wed || '[A]first[/A][B]Wednesday[/B]', l.recur_freq_offset_first_thu || '[A]first[/A][B]Thursday[/B]', l.recur_freq_offset_first_fri || '[A]first[/A][B]Friday[/B]', l.recur_freq_offset_first_sat || '[A]first[/A][B]Saturday[/B]', l.recur_freq_offset_first_sun || '[A]first[/A][B]Sunday[/B]'], [l.recur_freq_offset_second_mon || '[A]second[/A][B]Monday[/B]', l.recur_freq_offset_second_tue || '[A]second[/A][B]Tuesday[/B]', l.recur_freq_offset_second_wed || '[A]second[/A][B]Wednesday[/B]', l.recur_freq_offset_second_thu || '[A]second[/A][B]Thursday[/B]', l.recur_freq_offset_second_fri || '[A]second[/A][B]Friday[/B]', l.recur_freq_offset_second_sat || '[A]second[/A][B]Saturday[/B]', l.recur_freq_offset_second_sun || '[A]second[/A][B]Sunday[/B]'], [l.recur_freq_offset_third_mon || '[A]third[/A][B]Monday[/B]', l.recur_freq_offset_third_tue || '[A]third[/A][B]Tuesday[/B]', l.recur_freq_offset_third_wed || '[A]third[/A][B]Wednesday[/B]', l.recur_freq_offset_third_thu || '[A]third[/A][B]Thursday[/B]', l.recur_freq_offset_third_fri || '[A]third[/A][B]Friday[/B]', l.recur_freq_offset_third_sat || '[A]third[/A][B]Saturday[/B]', l.recur_freq_offset_third_sun || '[A]third[/A][B]Sunday[/B]'], [l.recur_freq_offset_fourth_mon || '[A]fourth[/A][B]Monday[/B]', l.recur_freq_offset_fourth_tue || '[A]fourth[/A][B]Tuesday[/B]', l.recur_freq_offset_fourth_wed || '[A]fourth[/A][B]Wednesday[/B]', l.recur_freq_offset_fourth_thu || '[A]fourth[/A][B]Thursday[/B]', l.recur_freq_offset_fourth_fri || '[A]fourth[/A][B]Friday[/B]', l.recur_freq_offset_fourth_sat || '[A]fourth[/A][B]Saturday[/B]', l.recur_freq_offset_fourth_sun || '[A]fourth[/A][B]Sunday[/B]'], [l.recur_freq_offset_fifth_mon || '[A]fifth[/A][B]Monday[/B]', l.recur_freq_offset_fifth_tue || '[A]fifth[/A][B]Tuesday[/B]', l.recur_freq_offset_fifth_wed || '[A]fifth[/A][B]Wednesday[/B]', l.recur_freq_offset_fifth_thu || '[A]fifth[/A][B]Thursday[/B]', l.recur_freq_offset_fifth_fri || '[A]fifth[/A][B]Friday[/B]', l.recur_freq_offset_fifth_sat || '[A]fifth[/A][B]Saturday[/B]', l.recur_freq_offset_fifth_sun || '[A]fifth[/A][B]Sunday[/B]']];
+    this.OFFSET_POS_REGEX = /\[A]([^[]+)\[\/A]/;
+    this.OFFSET_DAY_REGEX = /\[B]([^[]+)\[\/B]/;
     this.MONTH_RULES = {
       DAY: 'day',
       OFFSET: 'offset'
@@ -16157,8 +16131,8 @@ class Recurring extends mixins.w9 {
       monthRule: this.MONTH_RULES.DAY,
       monthDays: [this.initialMonthDay],
       offset: {
-        value: this.OFFSETS.FIRST.value,
-        weekDay: this.WEEK_DAYS.MONDAY.value
+        value: 1,
+        weekDay: 1
       },
       monthDaysWarning: this.initialMonthDay > 28
     };
@@ -16167,6 +16141,56 @@ class Recurring extends mixins.w9 {
       frequency,
       ...state
     });
+    this.MonthDaySelect = ({
+      offset
+    }) => {
+      const dayIdx = (offset && offset.weekDay || 1) - 1;
+      const posIdx = (offset && offset.value || 1) - 1;
+      const dayValues = this.OFFSETS[posIdx].map((part, idx) => ({
+        value: idx + 1,
+        label: this.OFFSET_DAY_REGEX.exec(part)[1]
+      }));
+      const posValues = [];
+      for (let i = 0; i < this.OFFSETS.length; i++) {
+        posValues.push({
+          value: i + 1,
+          label: this.OFFSET_POS_REGEX.exec(this.OFFSETS[i][dayIdx])[1]
+        });
+      }
+      const posFirst = this.OFFSETS[posIdx][dayIdx].indexOf('[A]') < this.OFFSETS[posIdx][dayIdx].indexOf('[B]');
+      const pos = REaCt().createElement(Select, {
+        name: "recurring-offset-value",
+        className: "inline",
+        icon: true,
+        value: posValues[posIdx].label,
+        options: posValues,
+        onSelect: option => {
+          this.setState(state => ({
+            monthRule: this.MONTH_RULES.OFFSET,
+            offset: {
+              value: option.value,
+              weekDay: state.offset.weekDay || this.WEEK_DAYS.MONDAY.value
+            }
+          }));
+        }
+      });
+      return REaCt().createElement(REaCt().Fragment, null, posFirst && pos, REaCt().createElement(Select, {
+        name: "recurring-offset-day",
+        className: "inline",
+        icon: true,
+        value: dayValues[dayIdx].label,
+        options: dayValues,
+        onSelect: option => {
+          this.setState(state => ({
+            monthRule: this.MONTH_RULES.OFFSET,
+            offset: {
+              value: state.offset.value || 1,
+              weekDay: option.value
+            }
+          }));
+        }
+      }), !posFirst && pos);
+    };
     this.IntervalSelect = () => {
       const {
         interval,
@@ -16514,42 +16538,8 @@ class Recurring extends mixins.w9 {
                                     `
     })), REaCt().createElement("div", {
       className: "radio-txt"
-    }, REaCt().createElement(Select, {
-      name: "recurring-offset-value",
-      className: "inline",
-      icon: true,
-      value: offset && offset.value && Object.values(this.OFFSETS).find(o => o.value === offset.value).label || this.OFFSETS.FIRST.label,
-      options: Object.values(this.OFFSETS),
-      onSelect: option => {
-        this.setState(state => ({
-          monthRule: this.MONTH_RULES.OFFSET,
-          offset: {
-            value: option.value,
-            weekDay: state.offset.weekDay || this.WEEK_DAYS.MONDAY.value
-          }
-        }));
-      }
-    }), REaCt().createElement(Select, {
-      name: "recurring-offset-day",
-      className: "inline",
-      icon: true,
-      value: offset && offset.weekDay && Object.values(this.WEEK_DAYS).find(o => o.value === offset.weekDay).name || this.WEEK_DAYS.MONDAY.name,
-      options: Object.values(this.WEEK_DAYS).map(({
-        value,
-        name
-      }) => ({
-        value,
-        label: name
-      })),
-      onSelect: option => {
-        this.setState(state => ({
-          monthRule: this.MONTH_RULES.OFFSET,
-          offset: {
-            value: state.offset.value || this.OFFSETS.FIRST.value,
-            weekDay: option.value
-          }
-        }));
-      }
+    }, REaCt().createElement(this.MonthDaySelect, {
+      offset
     }))))), this.renderEndControls());
   }
   renderNavigation(view) {
@@ -22537,7 +22527,22 @@ class Participants extends mixins.w9 {
 
 
 class Guest extends mixins.w9 {
+  constructor(...args) {
+    super(...args);
+    this.state = {
+      copy: ''
+    };
+  }
+  componentDidMount() {
+    super.componentDidMount();
+    this.setState({
+      copy: `${l.free_storage_info__call.replace('%s', bytesToSize(mega.bstrg, 0))}`
+    });
+  }
   render() {
+    const {
+      copy
+    } = this.state;
     return REaCt().createElement("div", {
       className: "guest-register"
     }, REaCt().createElement("div", {
@@ -22548,7 +22553,7 @@ class Guest extends mixins.w9 {
       onClick: this.props.onGuestClose
     }, REaCt().createElement("span", null, l[148])), REaCt().createElement("div", null, REaCt().createElement("i", {
       className: "sprite-fm-illustration-wide registration"
-    }), l.meetings_signup), REaCt().createElement(meetings_button.A, {
+    }), REaCt().createElement("span", null, copy)), REaCt().createElement(meetings_button.A, {
       className: "mega-button positive register-button",
       onClick: () => loadSubPage('register')
     }, l[968])));

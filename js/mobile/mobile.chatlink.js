@@ -49,12 +49,16 @@ mobile.chatlink = {
             .always(() => {
                 this.linkInfo.getInfo()
                     .then((res) => {
-                        if (res.mr) {
-                            $('p', $overlay).text(`${l.mobile_meeting_link_tip} ${l.free_plan_bonus_info}`);
-                        }
+                        $('p', $overlay)
+                            .text(
+                                `${res.mr ? l.mobile_meeting_link_tip : l.mobile_chat_link_tip} ` +
+                                `${l.free_plan_bonus_info}`
+                            );
+
                         if (res.topic) {
                             $('h2.topic', $overlay).safeHTML(megaChat.html(res.topic) || '');
                         }
+
                         if (res.ncm) {
                             $('.members', $overlay).text(mega.icu.format(l[20233], res.ncm));
                         }

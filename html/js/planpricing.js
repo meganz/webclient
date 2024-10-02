@@ -497,8 +497,8 @@ lazy(pro, 'proplan2', () => {
             return false;
         });
 
-        // set 20GB text for the storage value in the comparison table.
-        $('#table-strg-v', $tableContainer).text(bytesToSize(20 * 1073741824, 0));
+        // set N GB text for the storage value in the comparison table.
+        $('#table-strg-v', $tableContainer).text(bytesToSize(mega.bstrg, 0));
 
         // Set 100 for the maximum number of participants in a free tier meeting.
         $('#meet-up-to-participants', $tableContainer).text(l.pr_meet_up_to_participants.replace('%1', 100));
@@ -1242,6 +1242,7 @@ lazy(pro, 'proplan2', () => {
         localPriceInfo = localPriceInfo || 'EUR';
         $('.pricing-get-free-banner-price-val', $freeBanner)
             .text(formatCurrency(0, localPriceInfo, 'narrowSymbol', true));
+        $('.pricing-get-free-storage-txt', $freeBanner).text(l.pr_free_strg.replace('%s', bytesToSize(mega.bstrg, 0)));
 
         $('.pricing-get-free-ads', $freeBanner).toggleClass('hidden', !(mega.flags.ab_ads));
 

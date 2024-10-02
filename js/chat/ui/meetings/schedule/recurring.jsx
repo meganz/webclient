@@ -26,22 +26,66 @@ export default class Recurring extends MegaRenderMixin {
     };
 
     WEEK_DAYS = {
-        MONDAY: { value: 1, label: l.schedule_day_control_mon, name: l.schedule_occur_mon },
-        TUESDAY: { value: 2, label: l.schedule_day_control_tue, name: l.schedule_occur_tue },
-        WEDNESDAY: { value: 3, label: l.schedule_day_control_wed, name: l.schedule_occur_wed },
-        THURSDAY: { value: 4, label: l.schedule_day_control_thu, name: l.schedule_occur_thu },
-        FRIDAY: { value: 5, label: l.schedule_day_control_fri, name: l.schedule_occur_fri },
-        SATURDAY: { value: 6, label: l.schedule_day_control_sat, name: l.schedule_occur_sat },
-        SUNDAY: { value: 7, label: l.schedule_day_control_sun, name: l.schedule_occur_sun }
+        MONDAY: { value: 1, label: l.schedule_day_control_mon },
+        TUESDAY: { value: 2, label: l.schedule_day_control_tue },
+        WEDNESDAY: { value: 3, label: l.schedule_day_control_wed },
+        THURSDAY: { value: 4, label: l.schedule_day_control_thu },
+        FRIDAY: { value: 5, label: l.schedule_day_control_fri },
+        SATURDAY: { value: 6, label: l.schedule_day_control_sat },
+        SUNDAY: { value: 7, label: l.schedule_day_control_sun }
     };
 
-    OFFSETS = {
-        FIRST: { value: 1, label: l.recurring_frequency_offset_first },
-        SECOND: { value: 2, label: l.recurring_frequency_offset_second },
-        THIRD: { value: 3, label: l.recurring_frequency_offset_third },
-        FOURTH: { value: 4, label: l.recurring_frequency_offset_fourth },
-        FIFTH: { value: 5, label: l.recurring_frequency_offset_fifth }
-    };
+    OFFSETS = [
+        [
+            l.recur_freq_offset_first_mon || '[A]first[/A][B]Monday[/B]',
+            l.recur_freq_offset_first_tue || '[A]first[/A][B]Tuesday[/B]',
+            l.recur_freq_offset_first_wed || '[A]first[/A][B]Wednesday[/B]',
+            l.recur_freq_offset_first_thu || '[A]first[/A][B]Thursday[/B]',
+            l.recur_freq_offset_first_fri || '[A]first[/A][B]Friday[/B]',
+            l.recur_freq_offset_first_sat || '[A]first[/A][B]Saturday[/B]',
+            l.recur_freq_offset_first_sun || '[A]first[/A][B]Sunday[/B]',
+        ],
+        [
+            l.recur_freq_offset_second_mon || '[A]second[/A][B]Monday[/B]',
+            l.recur_freq_offset_second_tue || '[A]second[/A][B]Tuesday[/B]',
+            l.recur_freq_offset_second_wed || '[A]second[/A][B]Wednesday[/B]',
+            l.recur_freq_offset_second_thu || '[A]second[/A][B]Thursday[/B]',
+            l.recur_freq_offset_second_fri || '[A]second[/A][B]Friday[/B]',
+            l.recur_freq_offset_second_sat || '[A]second[/A][B]Saturday[/B]',
+            l.recur_freq_offset_second_sun || '[A]second[/A][B]Sunday[/B]',
+        ],
+        [
+            l.recur_freq_offset_third_mon || '[A]third[/A][B]Monday[/B]',
+            l.recur_freq_offset_third_tue || '[A]third[/A][B]Tuesday[/B]',
+            l.recur_freq_offset_third_wed || '[A]third[/A][B]Wednesday[/B]',
+            l.recur_freq_offset_third_thu || '[A]third[/A][B]Thursday[/B]',
+            l.recur_freq_offset_third_fri || '[A]third[/A][B]Friday[/B]',
+            l.recur_freq_offset_third_sat || '[A]third[/A][B]Saturday[/B]',
+            l.recur_freq_offset_third_sun || '[A]third[/A][B]Sunday[/B]',
+        ],
+        [
+            l.recur_freq_offset_fourth_mon || '[A]fourth[/A][B]Monday[/B]',
+            l.recur_freq_offset_fourth_tue || '[A]fourth[/A][B]Tuesday[/B]',
+            l.recur_freq_offset_fourth_wed || '[A]fourth[/A][B]Wednesday[/B]',
+            l.recur_freq_offset_fourth_thu || '[A]fourth[/A][B]Thursday[/B]',
+            l.recur_freq_offset_fourth_fri || '[A]fourth[/A][B]Friday[/B]',
+            l.recur_freq_offset_fourth_sat || '[A]fourth[/A][B]Saturday[/B]',
+            l.recur_freq_offset_fourth_sun || '[A]fourth[/A][B]Sunday[/B]',
+        ],
+        [
+            l.recur_freq_offset_fifth_mon || '[A]fifth[/A][B]Monday[/B]',
+            l.recur_freq_offset_fifth_tue || '[A]fifth[/A][B]Tuesday[/B]',
+            l.recur_freq_offset_fifth_wed || '[A]fifth[/A][B]Wednesday[/B]',
+            l.recur_freq_offset_fifth_thu || '[A]fifth[/A][B]Thursday[/B]',
+            l.recur_freq_offset_fifth_fri || '[A]fifth[/A][B]Friday[/B]',
+            l.recur_freq_offset_fifth_sat || '[A]fifth[/A][B]Saturday[/B]',
+            l.recur_freq_offset_fifth_sun || '[A]fifth[/A][B]Sunday[/B]',
+        ],
+    ];
+
+    // Used to parse string parts from above offset strings e.g; [A]first[/A][B]Monday[/B]
+    OFFSET_POS_REGEX = /\[A]([^[]+)\[\/A]/;
+    OFFSET_DAY_REGEX = /\[B]([^[]+)\[\/B]/;
 
     MONTH_RULES = {
         DAY: 'day',
@@ -62,8 +106,9 @@ export default class Recurring extends MegaRenderMixin {
         monthRule: this.MONTH_RULES.DAY,
         monthDays: [this.initialMonthDay],
         offset: {
-            value: this.OFFSETS.FIRST.value,
-            weekDay: this.WEEK_DAYS.MONDAY.value
+            // First Monday as default for offset
+            value: 1,
+            weekDay: 1
         },
         monthDaysWarning: this.initialMonthDay > 28
     };
@@ -173,6 +218,66 @@ export default class Recurring extends MegaRenderMixin {
             </div>
         );
     }
+
+    MonthDaySelect = ({ offset }) => {
+        const dayIdx = (offset && offset.weekDay || 1) - 1;
+        const posIdx = (offset && offset.value || 1) - 1;
+        // Options must match the selected value of the other select.
+        // Day values are extracted from the [B] portion of the string
+        const dayValues = this.OFFSETS[posIdx].map((part, idx) => ({
+            value: idx + 1,
+            label: this.OFFSET_DAY_REGEX.exec(part)[1]
+        }));
+        const posValues = [];
+        // Pos values are extracted from the [A] portion of the string
+        for (let i = 0; i < this.OFFSETS.length; i++) {
+            posValues.push({
+                value: i + 1,
+                label: this.OFFSET_POS_REGEX.exec(this.OFFSETS[i][dayIdx])[1]
+            });
+        }
+
+        // Handle possibly different positions of the strings from translations.
+        const posFirst = this.OFFSETS[posIdx][dayIdx].indexOf('[A]') < this.OFFSETS[posIdx][dayIdx].indexOf('[B]');
+        const pos = (
+            <Select
+                name="recurring-offset-value"
+                className="inline"
+                icon={true}
+                value={posValues[posIdx].label}
+                options={posValues}
+                onSelect={option => {
+                    this.setState(state => ({
+                        monthRule: this.MONTH_RULES.OFFSET,
+                        offset: {
+                            value: option.value,
+                            weekDay: state.offset.weekDay || this.WEEK_DAYS.MONDAY.value
+                        }
+                    }));
+                }}
+            />
+        );
+        return <>
+            {posFirst && pos}
+            <Select
+                name="recurring-offset-day"
+                className="inline"
+                icon={true}
+                value={dayValues[dayIdx].label}
+                options={dayValues}
+                onSelect={option => {
+                    this.setState(state => ({
+                        monthRule: this.MONTH_RULES.OFFSET,
+                        offset: {
+                            value: state.offset.value || 1,
+                            weekDay: option.value
+                        }
+                    }));
+                }}
+            />
+            {!posFirst && pos}
+        </>;
+    };
 
     IntervalSelect = () => {
         const { interval, view } = this.state;
@@ -398,47 +503,8 @@ export default class Recurring extends MegaRenderMixin {
                                 />
                             </div>
                             <div className="radio-txt">
-                                <Select
-                                    name="recurring-offset-value"
-                                    className="inline"
-                                    icon={true}
-                                    value={
-                                        offset && offset.value &&
-                                        Object.values(this.OFFSETS).find(o => o.value === offset.value).label ||
-                                        this.OFFSETS.FIRST.label
-                                    }
-                                    options={Object.values(this.OFFSETS)}
-                                    onSelect={option => {
-                                        this.setState(state => ({
-                                            monthRule: this.MONTH_RULES.OFFSET,
-                                            offset: {
-                                                value: option.value,
-                                                weekDay: state.offset.weekDay || this.WEEK_DAYS.MONDAY.value
-                                            }
-                                        }));
-                                    }}
-                                />
-                                <Select
-                                    name="recurring-offset-day"
-                                    className="inline"
-                                    icon={true}
-                                    value={
-                                        offset && offset.weekDay &&
-                                        Object.values(this.WEEK_DAYS).find(o => o.value === offset.weekDay).name ||
-                                        this.WEEK_DAYS.MONDAY.name
-                                    }
-                                    options={
-                                        Object.values(this.WEEK_DAYS).map(({ value, name }) => ({ value, label: name }))
-                                    }
-                                    onSelect={option => {
-                                        this.setState(state => ({
-                                            monthRule: this.MONTH_RULES.OFFSET,
-                                            offset: {
-                                                value: state.offset.value || this.OFFSETS.FIRST.value,
-                                                weekDay: option.value
-                                            }
-                                        }));
-                                    }}
+                                <this.MonthDaySelect
+                                    offset={offset}
                                 />
                             </div>
                         </div>

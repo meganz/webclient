@@ -770,7 +770,7 @@ body.theme-dark .rewind-datepicker-calendar .datepicker--cell.-current- {
 
 .mega-dialog.rw-promo-dialog .img-rw-promo-dialog {
     background-image: url("../images/mega/rewind/rewind-promo-dialog.png");
-    background-size: 327px 224px;
+    background-size: 327px 201px;
     background-repeat: no-repeat;
     background-position: 50% bottom;
     background-color: var(--surface-grey-2);

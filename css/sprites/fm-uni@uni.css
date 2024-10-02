@@ -252,6 +252,9 @@
 .sprite-fm-uni.icon-plan-expiry, .sprite-fm-uni-before.icon-plan-expiry-before::before, .sprite-fm-uni-after.icon-plan-expiry-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-plan-expiry");
 }
+.sprite-fm-uni.icon-pwm, .sprite-fm-uni-before.icon-pwm-before::before, .sprite-fm-uni-after.icon-pwm-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-pwm");
+}
 .sprite-fm-uni.icon-question, .sprite-fm-uni-before.icon-question-before::before, .sprite-fm-uni-after.icon-question-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-question");
 }

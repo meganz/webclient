@@ -3433,6 +3433,13 @@ mBroadcaster.addListener('fm:initialized', () => {
         if (typeof notify.addDynamicNotifications !== 'undefined') {
             notify.addDynamicNotifications().catch(dump);
         }
+
+        if (u_attr['^!welpdf'] === '0') {
+            Promise.all([
+                M.importWelcomePDF(),
+                mega.attr.set2(null, 'welpdf', '1', -2, true)
+            ]).dump('welpdf');
+        }
     });
 
     return 0xDEAD;

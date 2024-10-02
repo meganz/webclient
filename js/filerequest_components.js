@@ -397,9 +397,9 @@ lazy(mega, 'fileRequestUI', () => {
 
             this.setOptions(options);
             this.eventOnInput(() => {
-                this.validate();
+                const result = this.validate();
                 if (this.options.post && typeof this.options.post == 'function') {
-                    this.options.post(this, this.options);
+                    this.options.post(this, this.options, result);
                 }
             });
         }

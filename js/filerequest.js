@@ -95,6 +95,9 @@ lazy(mega, 'fileRequest', () => {
                             max: 80,
                             message: l.file_request_dialog_label_title_invalid
                         },
+                        required: {
+                            message: l.file_request_dialog_label_title_required
+                        },
                         postValidation: ($input, result) => {
                             const $formRow = $input.closest('.form-row');
                             if ($formRow.length) {
@@ -178,13 +181,23 @@ lazy(mega, 'fileRequest', () => {
                 post: openCreateDialogFromSelect
             });
 
-            const titleDescInputPostCallback = function(selfObject, options) {
+            const titleDescInputPostCallback = (selfObject, options, result) => {
                 const $formRow = selfObject.getInput().closest('.form-row');
                 const $charCount = $('.char-count', $formRow);
                 const limit = options &&
                     options.validations &&
                     options.validations.limit ||
                     0;
+
+                if (this.$saveButton) {
+                    this.$saveButton.disable();
+                    if (
+                        result &&
+                        (selfObject === this.$inputTitle ? this.$inputDescription : this.$inputTitle).validate()
+                    ) {
+                        this.$saveButton.enable();
+                    }
+                }
 
                 if (selfObject.getValue()) {
                     if ($charCount.length && limit && limit.max) {

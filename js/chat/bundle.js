@@ -27461,16 +27461,20 @@ Ay: () => __WEBPACK_DEFAULT_EXPORT__,
 _F: () => renderEndConfirm,
 sX: () => renderLeaveConfirm
 });
+const _extends5__ = REQ_(168);
 const react0__ = REQ_(594);
 const react0 = REQ_.n(react0__);
 const _mixins1__ = REQ_(137);
 const _button_jsx3__ = REQ_(959);
 const _stream_jsx4__ = REQ_(415);
-const _micObserver_jsx7__ = REQ_(772);
-const _permissionsObserver_jsx8__ = REQ_(542);
-const _call_jsx5__ = REQ_(3);
+const _micObserver_jsx9__ = REQ_(772);
+const _permissionsObserver_jsx10__ = REQ_(542);
+const _call_jsx6__ = REQ_(3);
 const _hostsObserver_jsx2__ = REQ_(972);
-const _ui_dropdowns_jsx6__ = REQ_(911);
+const _ui_dropdowns_jsx8__ = REQ_(911);
+const _ui_utils_jsx7__ = REQ_(314);
+
+
 
 
 
@@ -27538,26 +27542,21 @@ class StreamControls extends _mixins1__.w9 {
     this.handleMousedown = ({
       target
     }) => {
-      if (!this.isMounted()) {
-        return;
+      if (this.isMounted()) {
+        const {
+          audioSelectDropdown,
+          videoSelectDropdown,
+          endCallOptions
+        } = this.state;
+        return (audioSelectDropdown || videoSelectDropdown || endCallOptions) && ['audio-sources', 'video-sources', 'meetings-end-options'].some(selector => {
+          let _document$querySelect;
+          return (_document$querySelect = document.querySelector(`.${selector}`)) == null ? void 0 : _document$querySelect.contains(target);
+        }) ? 0x4B1D : this.setState({
+          audioSelectDropdown: false,
+          videoSelectDropdown: false,
+          endCallOptions: false
+        }, this.setActiveElement);
       }
-      const state = {};
-      const {
-        audioSelectDropdown,
-        videoSelectDropdown
-      } = this.state;
-      const $target = $(target);
-      const isOpenerParent = (audioSelectDropdown || videoSelectDropdown) && $target.parents('.input-source-opener').length;
-      if (audioSelectDropdown && $target.parents('.audio-sources').length === 0 && !isOpenerParent) {
-        state.audioSelectDropdown = false;
-      }
-      if (videoSelectDropdown && $target.parents('.video-sources').length === 0 && !isOpenerParent) {
-        state.videoSelectDropdown = false;
-      }
-      if (!(this.endContainerRef && this.endContainerRef.current && this.endContainerRef.current.contains(target))) {
-        state.endCallOptions = false;
-      }
-      this.setState(state, this.setActiveElement);
     };
     this.renderDebug = () => {
       return react0().createElement("div", {
@@ -27587,6 +27586,7 @@ class StreamControls extends _mixins1__.w9 {
       }, react0().createElement("span", null, l[83])), react0().createElement("span", null, this.props.peers.length + 1));
     };
     this.renderEndCallOptions = () => {
+      let _this$endContainerRef;
       const {
         chatRoom,
         recorder,
@@ -27600,14 +27600,23 @@ class StreamControls extends _mixins1__.w9 {
       const doEnd = () => this.setState({
         endCallPending: true
       }, () => chatRoom.endCallForAll());
-      return react0().createElement("div", {
+      const endContainerRef = (_this$endContainerRef = this.endContainerRef) == null ? void 0 : _this$endContainerRef.current;
+      return react0().createElement("div", (0,_extends5__.A)({}, endCallOptions && {
+        style: (({
+          left,
+          top
+        }) => ({
+          left,
+          top
+        }))(endContainerRef.getBoundingClientRect())
+      }, {
         className: `
-                    end-options
+                    meetings-end-options
                     theme-dark-forced
                     ${endCallOptions ? '' : 'hidden'}
                 `
-      }, react0().createElement("div", {
-        className: "end-options-content"
+      }), react0().createElement("div", {
+        className: "meetings-end-options-content"
       }, react0().createElement(this.LeaveButton, {
         chatRoom,
         recorder,
@@ -27640,7 +27649,7 @@ class StreamControls extends _mixins1__.w9 {
         ref: this.endContainerRef,
         className: "end-call-container",
         onClick: () => {
-          if (chatRoom.type !== 'private' && peers.length && _call_jsx5__.Ay.isModerator(chatRoom, u_handle)) {
+          if (chatRoom.type !== 'private' && peers.length && _call_jsx6__.Ay.isModerator(chatRoom, u_handle)) {
             return this.setState(state => ({
               endCallOptions: !state.endCallOptions
             }), () => {
@@ -27655,7 +27664,9 @@ class StreamControls extends _mixins1__.w9 {
           }
           return onCallEnd();
         }
-      }, this.renderEndCallOptions(), react0().createElement(_button_jsx3__.A, {
+      }, react0().createElement(_ui_utils_jsx7__.Ay.RenderTo, {
+        element: document.body
+      }, this.renderEndCallOptions()), react0().createElement(_button_jsx3__.A, {
         simpletip: {
           ...this.SIMPLETIP,
           label: l[5884]
@@ -27838,7 +27849,7 @@ class StreamControls extends _mixins1__.w9 {
       selectedOut = 'default';
     }
     const mics = Object.entries(audioIn).map(([id, name]) => {
-      return react0().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
+      return react0().createElement(_ui_dropdowns_jsx8__.DropdownItem, {
         key: id,
         onClick: () => {
           call.sfuClient.setMicDevice(id === 'default' ? null : id);
@@ -27853,7 +27864,7 @@ class StreamControls extends _mixins1__.w9 {
       })));
     });
     const speakers = Object.entries(audioOut).map(([id, name]) => {
-      return react0().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
+      return react0().createElement(_ui_dropdowns_jsx8__.DropdownItem, {
         key: id,
         onClick: () => {
           Promise.resolve(call.sfuClient.setAudioOutDevice(id === 'default' ? null : id)).catch(dump);
@@ -27867,7 +27878,7 @@ class StreamControls extends _mixins1__.w9 {
         className: "sprite-fm-mono icon-check-small-regular-outline"
       })));
     });
-    return react0().createElement(_ui_dropdowns_jsx6__.Dropdown, {
+    return react0().createElement(_ui_dropdowns_jsx8__.Dropdown, {
       className: "input-sources audio-sources theme-dark-forced",
       active: true,
       noArrow: true,
@@ -27880,13 +27891,13 @@ class StreamControls extends _mixins1__.w9 {
       }, this.setActiveElement)
     }, react0().createElement("div", {
       className: "source-label"
-    }, l.microphone), mics.length ? mics : react0().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
+    }, l.microphone), mics.length ? mics : react0().createElement(_ui_dropdowns_jsx8__.DropdownItem, {
       label: l.no_mics
     }), react0().createElement("hr", null), react0().createElement("div", {
       className: "source-label"
-    }, l.speaker), speakers.length ? speakers : react0().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
+    }, l.speaker), speakers.length ? speakers : react0().createElement(_ui_dropdowns_jsx8__.DropdownItem, {
       label: l.no_speakers
-    }), react0().createElement("hr", null), react0().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
+    }), react0().createElement("hr", null), react0().createElement(_ui_dropdowns_jsx8__.DropdownItem, {
       icon: "sprite-fm-mono icon-volume-max-small-regular-outline",
       label: l.test_speaker,
       disabled: speakers.length === 0,
@@ -27921,7 +27932,7 @@ class StreamControls extends _mixins1__.w9 {
       selectedCam = 'default';
     }
     const cameras = Object.entries(videoIn).map(([id, name]) => {
-      return react0().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
+      return react0().createElement(_ui_dropdowns_jsx8__.DropdownItem, {
         key: id,
         onClick: () => {
           call.sfuClient.setCameraDevice(id === 'default' ? null : id);
@@ -27935,7 +27946,7 @@ class StreamControls extends _mixins1__.w9 {
         className: "sprite-fm-mono icon-check-small-regular-outline"
       })));
     });
-    return react0().createElement(_ui_dropdowns_jsx6__.Dropdown, {
+    return react0().createElement(_ui_dropdowns_jsx8__.Dropdown, {
       className: "input-sources video-sources theme-dark-forced",
       active: true,
       noArrow: true,
@@ -27948,7 +27959,7 @@ class StreamControls extends _mixins1__.w9 {
       }, this.setActiveElement)
     }, react0().createElement("div", {
       className: "source-label"
-    }, l.camera_button), cameras.length ? cameras : react0().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
+    }, l.camera_button), cameras.length ? cameras : react0().createElement(_ui_dropdowns_jsx8__.DropdownItem, {
       label: l.no_cameras
     }));
   }
@@ -28076,7 +28087,9 @@ class StreamControls extends _mixins1__.w9 {
     }), react0().createElement("span", null, l.mic_button), signal ? null : renderSignalWarning(), hasToRenderPermissionsWarning(Av.Audio) ? renderPermissionsWarning(Av.Audio) : null, this.renderSourceOpener({
       type: 'audioSelectDropdown',
       eventId: chatRoom.isMeeting ? 500299 : 500300
-    })), audioSelectDropdown && this.renderSoundDropdown(), react0().createElement("li", {
+    })), audioSelectDropdown && react0().createElement("div", {
+      ref: this.audioDropdownRef
+    }, this.renderSoundDropdown()), react0().createElement("li", {
       className: `
                                 ${isOnHold ? 'disabled' : ''}
                                 with-input-selector
@@ -28101,7 +28114,9 @@ class StreamControls extends _mixins1__.w9 {
     }), react0().createElement("span", null, l.camera_button), hasToRenderPermissionsWarning(Av.Camera) ? renderPermissionsWarning(Av.Camera) : null, this.renderSourceOpener({
       type: 'videoSelectDropdown',
       eventId: chatRoom.isMeeting ? 500301 : 500302
-    })), videoSelectDropdown && this.renderVideoDropdown(), react0().createElement("li", {
+    })), videoSelectDropdown && react0().createElement("div", {
+      ref: this.videoDropdownRef
+    }, this.renderVideoDropdown()), react0().createElement("li", {
       className: isOnHold ? 'disabled' : '',
       onClick: () => {
         if (isOnHold) {
@@ -28140,7 +28155,7 @@ class StreamControls extends _mixins1__.w9 {
   }
 }
 StreamControls.NAMESPACE = 'stream-controls';
-const __WEBPACK_DEFAULT_EXPORT__ = (0,_mixins1__.Zz)(_micObserver_jsx7__.Q, _permissionsObserver_jsx8__.$)(StreamControls);
+const __WEBPACK_DEFAULT_EXPORT__ = (0,_mixins1__.Zz)(_micObserver_jsx9__.Q, _permissionsObserver_jsx10__.$)(StreamControls);
 
 },
 

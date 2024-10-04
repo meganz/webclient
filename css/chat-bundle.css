@@ -2270,35 +2270,6 @@ body.rtl .meetings-call .stream .stream-participants-block .participants-contain
 .meetings-call .stream-controls .stream-debug button span {
   text-indent: -9999px;
 }
-.meetings-call .stream-controls .end-options {
-  position: absolute;
-  left: 50%;
-  transform: translate(-50%, -100%);
-}
-.meetings-call .stream-controls .end-options-content {
-  padding: 24px;
-  min-width: 205px;
-  min-height: 130px;
-  margin: 0 0 13px 0;
-  box-sizing: border-box;
-  border-radius: 24px;
-  background: var(--surface-main);
-}
-.meetings-call .stream-controls .end-options-content button {
-  display: block;
-  margin: 0 auto 8px;
-  min-width: 150px;
-}
-.meetings-call .stream-controls .end-options-content button:last-child {
-  margin-bottom: 0;
-}
-.meetings-call .stream-controls .end-options-content button span {
-  position: relative;
-  bottom: auto;
-  margin: 0;
-  font: var(--text-body1);
-  visibility: visible;
-}
 .meetings-call .stream-controls .mic-muted-tip {
   background: var(--surface-grey-1);
   border-radius: 6px;
@@ -3085,6 +3056,36 @@ body.theme-dark .mega-dialog.meetings-permissions-dialog .permissions-warning-co
   left: 50%;
   bottom: 94px;
   transform: translateX(-50%);
+}
+
+.meetings-end-options {
+  position: absolute;
+  margin: -144px 0 0 -84px;
+  z-index: 2100;
+}
+.meetings-end-options-content {
+  padding: 24px;
+  min-width: 205px;
+  min-height: 130px;
+  margin: 0 0 13px 0;
+  box-sizing: border-box;
+  border-radius: 24px;
+  background: var(--surface-main);
+}
+.meetings-end-options-content button {
+  display: block;
+  margin: 0 auto 8px;
+  min-width: 150px;
+}
+.meetings-end-options-content button:last-child {
+  margin-bottom: 0;
+}
+.meetings-end-options-content button span {
+  position: relative;
+  bottom: auto;
+  margin: 0;
+  font: var(--text-body1);
+  visibility: visible;
 }
 
 .start-meeting {

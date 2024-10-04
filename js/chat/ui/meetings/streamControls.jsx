@@ -6,7 +6,8 @@ import { withMicObserver } from './micObserver.jsx';
 import { withPermissionsObserver } from './permissionsObserver.jsx';
 import Call from './call.jsx';
 import { withHostsObserver } from './hostsObserver.jsx';
-import { Dropdown, DropdownItem } from "../../../ui/dropdowns.jsx";
+import { Dropdown, DropdownItem } from '../../../ui/dropdowns.jsx';
+import utils from '../../../ui/utils.jsx';
 
 export const renderLeaveConfirm = (onConfirm, onRecordingToggle) =>
     msgDialog(
@@ -45,6 +46,7 @@ class StreamControls extends MegaRenderMixin {
 
     endContainerRef = React.createRef();
     endButtonRef = React.createRef();
+
     SIMPLETIP = { position: 'top', offset: 8, className: 'theme-dark-forced' };
 
     state = {
@@ -98,24 +100,19 @@ class StreamControls extends MegaRenderMixin {
         );
 
     handleMousedown = ({ target }) => {
-        if (!this.isMounted()) {
-            return;
+        if (this.isMounted()) {
+            const { audioSelectDropdown, videoSelectDropdown, endCallOptions } = this.state;
+            return (
+                (audioSelectDropdown || videoSelectDropdown || endCallOptions) &&
+                ['audio-sources', 'video-sources', 'meetings-end-options']
+                    .some(selector => document.querySelector(`.${selector}`)?.contains(target)) ?
+                    0x4B1D :
+                    this.setState(
+                        { audioSelectDropdown: false, videoSelectDropdown: false, endCallOptions: false },
+                        this.setActiveElement
+                    )
+            );
         }
-        const state = {};
-        const { audioSelectDropdown, videoSelectDropdown } = this.state;
-        const $target = $(target);
-        const isOpenerParent = (audioSelectDropdown || videoSelectDropdown) &&
-            $target.parents('.input-source-opener').length;
-        if (audioSelectDropdown && $target.parents('.audio-sources').length === 0 && !isOpenerParent) {
-            state.audioSelectDropdown = false;
-        }
-        if (videoSelectDropdown && $target.parents('.video-sources').length === 0 && !isOpenerParent) {
-            state.videoSelectDropdown = false;
-        }
-        if (!(this.endContainerRef && this.endContainerRef.current && this.endContainerRef.current.contains(target))) {
-            state.endCallOptions = false;
-        }
-        this.setState(state, this.setActiveElement);
     };
 
     renderDebug = () => {
@@ -151,15 +148,19 @@ class StreamControls extends MegaRenderMixin {
         const { chatRoom, recorder, onRecordingToggle, onCallEnd } = this.props;
         const { endCallOptions, endCallPending } = this.state;
         const doEnd = () => this.setState({ endCallPending: true }, () => chatRoom.endCallForAll());
+        const endContainerRef = this.endContainerRef?.current;
 
         return (
             <div
+                {...(endCallOptions && {
+                    style: (({ left, top }) => ({ left, top }))(endContainerRef.getBoundingClientRect())
+                })}
                 className={`
-                    end-options
+                    meetings-end-options
                     theme-dark-forced
                     ${endCallOptions ? '' : 'hidden'}
                 `}>
-                <div className="end-options-content">
+                <div className="meetings-end-options-content">
                     <this.LeaveButton
                         chatRoom={chatRoom}
                         recorder={recorder}
@@ -216,7 +217,7 @@ class StreamControls extends MegaRenderMixin {
 
                     return onCallEnd();
                 }}>
-                {this.renderEndCallOptions()}
+                <utils.RenderTo element={document.body}>{this.renderEndCallOptions()}</utils.RenderTo>
                 <Button
                     simpletip={{ ...this.SIMPLETIP, label: l[5884] /* `End call` */ }}
                     className="mega-button theme-dark-forced round negative end-call call-action"
@@ -647,7 +648,11 @@ class StreamControls extends MegaRenderMixin {
                                 eventId: chatRoom.isMeeting ? 500299 : 500300
                             })}
                         </li>
-                        {audioSelectDropdown && this.renderSoundDropdown()}
+                        {audioSelectDropdown &&
+                            <div ref={this.audioDropdownRef}>
+                                {this.renderSoundDropdown()}
+                            </div>
+                        }
                         <li
                             className={`
                                 ${isOnHold ? 'disabled' : ''}
@@ -678,7 +683,11 @@ class StreamControls extends MegaRenderMixin {
                                 eventId: chatRoom.isMeeting ? 500301 : 500302
                             })}
                         </li>
-                        {videoSelectDropdown && this.renderVideoDropdown()}
+                        {videoSelectDropdown &&
+                            <div ref={this.videoDropdownRef}>
+                                {this.renderVideoDropdown()}
+                            </div>
+                        }
                         <li
                             className={isOnHold ? 'disabled' : ''}
                             onClick={() => {

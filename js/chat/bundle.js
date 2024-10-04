@@ -17,7 +17,7 @@ const ReactDOM_ = REQ_(206);
 const ReactDOM = REQ_.n(ReactDOM_);
 // EXTERNAL MODULE: ./js/chat/ui/conversations.jsx + 20 modules
 const conversations = REQ_(823);
-;// CONCATENATED MODULE: ./js/chat/chatRouting.jsx
+;// ./js/chat/chatRouting.jsx
 let _ChatRouting;
 class ChatRouting {
   constructor(megaChatInstance) {
@@ -275,7 +275,7 @@ ChatRouting.gPageHandlers = {
 const scheduleMetaChange = REQ_(757);
 // EXTERNAL MODULE: ./js/chat/chatRoom.jsx + 1 modules
 const chat_chatRoom = REQ_(553);
-;// CONCATENATED MODULE: ./js/chat/meetingsManager.jsx
+;// ./js/chat/meetingsManager.jsx
 
 
 class Occurrence {
@@ -1201,7 +1201,7 @@ window.MeetingsManager = MeetingsManager;
 const applyDecoratedDescriptor = REQ_(793);
 // EXTERNAL MODULE: ./js/chat/mixins.js
 const mixins = REQ_(137);
-;// CONCATENATED MODULE: ./js/chat/chatOnboarding.jsx
+;// ./js/chat/chatOnboarding.jsx
 
 let _dec, _class;
 
@@ -1517,7 +1517,7 @@ const ChatOnboarding = (_dec = (0,mixins.hG)(1000), _class = class ChatOnboardin
 
 // EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 11 modules
 const call = REQ_(3);
-;// CONCATENATED MODULE: ./js/chat/chat.jsx
+;// ./js/chat/chat.jsx
 
 
 
@@ -3666,7 +3666,7 @@ REQ_.d(EXP_, {
   "default": () => chatRoom
 });
 
-;// CONCATENATED MODULE: ./js/chat/utils.jsx
+;// ./js/chat/utils.jsx
 async function prepareExportIo(dl) {
   const {
     zname,
@@ -3729,7 +3729,7 @@ function prepareExportStreams(attachNodes, onEmpty) {
     };
   });
 }
-;// CONCATENATED MODULE: ./js/chat/chatRoom.jsx
+;// ./js/chat/chatRoom.jsx
 
 const RETENTION_FORMAT = {
   HOURS: 'hour',
@@ -6912,7 +6912,7 @@ const React_ = REQ_(594);
 const REaCt = REQ_.n(React_);
 // EXTERNAL MODULE: ./js/chat/mixins.js
 const mixins = REQ_(137);
-;// CONCATENATED MODULE: ./js/chat/ui/whosTyping.jsx
+;// ./js/chat/ui/whosTyping.jsx
 const React = REQ_(594);
 
 class WhosTyping extends mixins.w9 {
@@ -7029,7 +7029,7 @@ const typingArea = REQ_(795);
 const buttons = REQ_(994);
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
 const dropdowns = REQ_(911);
-;// CONCATENATED MODULE: ./js/chat/ui/composedTextArea.jsx
+;// ./js/chat/ui/composedTextArea.jsx
 
 
 
@@ -8550,7 +8550,7 @@ const REaCt = REQ_.n(React_);
 const mixins = REQ_(137);
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
 const buttons = REQ_(994);
-;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/navigation.jsx
+;// ./js/chat/ui/contactsPanel/navigation.jsx
 
 
 
@@ -8599,7 +8599,7 @@ class Navigation extends mixins.w9 {
 }
 // EXTERNAL MODULE: ./js/ui/utils.jsx
 const utils = REQ_(314);
-;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/nil.jsx
+;// ./js/chat/ui/contactsPanel/nil.jsx
 
 
 
@@ -8639,7 +8639,7 @@ const fmView = REQ_(701);
 const contacts = REQ_(251);
 // EXTERNAL MODULE: ./js/ui/jsx/fm/nodes/genericNodePropsComponent.jsx + 1 modules
 const genericNodePropsComponent = REQ_(984);
-;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactName.jsx
+;// ./js/ui/jsx/fm/nodes/columns/columnContactName.jsx
 
 
 
@@ -8676,7 +8676,7 @@ class ColumnContactName extends genericNodePropsComponent.B {
 ColumnContactName.sortable = true;
 ColumnContactName.id = "name";
 ColumnContactName.megatype = "name";
-;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactStatus.jsx
+;// ./js/ui/jsx/fm/nodes/columns/columnContactStatus.jsx
 
 
 class ColumnContactStatus extends genericNodePropsComponent.B {
@@ -8703,7 +8703,7 @@ class ColumnContactStatus extends genericNodePropsComponent.B {
 ColumnContactStatus.sortable = true;
 ColumnContactStatus.id = "status";
 ColumnContactStatus.megatype = "status";
-;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactLastInteraction.jsx
+;// ./js/ui/jsx/fm/nodes/columns/columnContactLastInteraction.jsx
 
 
 class ColumnContactLastInteraction extends genericNodePropsComponent.B {
@@ -8761,7 +8761,7 @@ class ColumnContactLastInteraction extends genericNodePropsComponent.B {
 ColumnContactLastInteraction.sortable = true;
 ColumnContactLastInteraction.id = "interaction";
 ColumnContactLastInteraction.megatype = "interaction";
-;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactVerifiedStatus.jsx
+;// ./js/ui/jsx/fm/nodes/columns/columnContactVerifiedStatus.jsx
 
 
 
@@ -8814,7 +8814,7 @@ ColumnContactVerifiedStatus.verifiedLabel = REaCt().createElement("div", {
 const dropdowns = REQ_(911);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 11 modules
 const call = REQ_(3);
-;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/contextMenu.jsx
+;// ./js/chat/ui/contactsPanel/contextMenu.jsx
 
 
 
@@ -8957,7 +8957,7 @@ class ContextMenu extends mixins.w9 {
     }));
   }
 }
-;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactButtons.jsx
+;// ./js/ui/jsx/fm/nodes/columns/columnContactButtons.jsx
 
 
 
@@ -9035,7 +9035,7 @@ ColumnContactButtons.label = "";
 ColumnContactButtons.megatype = "grid-url-header-nw";
 // EXTERNAL MODULE: ./js/chat/ui/updateObserver.jsx
 const updateObserver = REQ_(501);
-;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/contactList.jsx
+;// ./js/chat/ui/contactsPanel/contactList.jsx
 
 
 
@@ -9193,7 +9193,7 @@ class ContactList extends mixins.w9 {
 ContactList.updateListener = 'getLastInteractions';
 ContactList.updateInterval = 6e4;
 const contactList = (0,mixins.Zz)(updateObserver.Y)(ContactList);
-;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactRequestsEmail.jsx
+;// ./js/ui/jsx/fm/nodes/columns/columnContactRequestsEmail.jsx
 
 
 
@@ -9223,7 +9223,7 @@ class ColumnContactRequestsEmail extends mixins.w9 {
 ColumnContactRequestsEmail.sortable = true;
 ColumnContactRequestsEmail.id = "email";
 ColumnContactRequestsEmail.megatype = "email";
-;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactRequestsTs.jsx
+;// ./js/ui/jsx/fm/nodes/columns/columnContactRequestsTs.jsx
 
 
 class ColumnContactRequestsTs extends mixins.w9 {
@@ -9255,7 +9255,7 @@ class ColumnContactRequestsTs extends mixins.w9 {
 ColumnContactRequestsTs.sortable = true;
 ColumnContactRequestsTs.id = "ts";
 ColumnContactRequestsTs.megatype = "ts";
-;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactRequestsRcvdBtns.jsx
+;// ./js/ui/jsx/fm/nodes/columns/columnContactRequestsRcvdBtns.jsx
 
 
 
@@ -9294,7 +9294,7 @@ ColumnContactRequestsRcvdBtns.sortable = true;
 ColumnContactRequestsRcvdBtns.id = "grid-url-header-nw";
 ColumnContactRequestsRcvdBtns.label = "";
 ColumnContactRequestsRcvdBtns.megatype = "grid-url-header-nw contact-controls-container";
-;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/receivedRequests.jsx
+;// ./js/chat/ui/contactsPanel/receivedRequests.jsx
 
 
 
@@ -9366,7 +9366,7 @@ class ReceivedRequests extends mixins.w9 {
     }, this.drawReceivedRequests());
   }
 }
-;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactRequestsSentBtns.jsx
+;// ./js/ui/jsx/fm/nodes/columns/columnContactRequestsSentBtns.jsx
 
 
 
@@ -9407,7 +9407,7 @@ ColumnContactRequestsSentBtns.sortable = true;
 ColumnContactRequestsSentBtns.id = "grid-url-header-nw";
 ColumnContactRequestsSentBtns.label = "";
 ColumnContactRequestsSentBtns.megatype = "grid-url-header-nw contact-controls-container";
-;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnContactRequestsRts.jsx
+;// ./js/ui/jsx/fm/nodes/columns/columnContactRequestsRts.jsx
 
 
 class ColumnContactRequestsRts extends ColumnContactRequestsTs {
@@ -9418,7 +9418,7 @@ class ColumnContactRequestsRts extends ColumnContactRequestsTs {
 ColumnContactRequestsRts.sortable = true;
 ColumnContactRequestsRts.id = "rts";
 ColumnContactRequestsRts.megatype = "rts";
-;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/sentRequests.jsx
+;// ./js/chat/ui/contactsPanel/sentRequests.jsx
 
 
 
@@ -9497,7 +9497,7 @@ class SentRequests extends mixins.w9 {
 }
 // EXTERNAL MODULE: ./js/ui/jsx/fm/nodes/columns/columnFavIcon.jsx
 const columnFavIcon = REQ_(161);
-;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnSharedFolderName.jsx
+;// ./js/ui/jsx/fm/nodes/columns/columnSharedFolderName.jsx
 
 
 class ColumnSharedFolderName extends genericNodePropsComponent.B {
@@ -9528,7 +9528,7 @@ class ColumnSharedFolderName extends genericNodePropsComponent.B {
 ColumnSharedFolderName.sortable = true;
 ColumnSharedFolderName.id = "name";
 ColumnSharedFolderName.megatype = "name";
-;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnSharedFolderAccess.jsx
+;// ./js/ui/jsx/fm/nodes/columns/columnSharedFolderAccess.jsx
 
 
 class ColumnSharedFolderAccess extends genericNodePropsComponent.B {
@@ -9555,7 +9555,7 @@ class ColumnSharedFolderAccess extends genericNodePropsComponent.B {
 ColumnSharedFolderAccess.sortable = true;
 ColumnSharedFolderAccess.id = 'access';
 ColumnSharedFolderAccess.megatype = 'access';
-;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnSharedFolderButtons.jsx
+;// ./js/ui/jsx/fm/nodes/columns/columnSharedFolderButtons.jsx
 
 
 
@@ -9603,7 +9603,7 @@ ColumnSharedFolderButtons.label = "";
 ColumnSharedFolderButtons.megatype = "grid-url-header-nw";
 // EXTERNAL MODULE: ./js/chat/ui/link.jsx
 const ui_link = REQ_(280);
-;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/contactProfile.jsx
+;// ./js/chat/ui/contactsPanel/contactProfile.jsx
 
 
 
@@ -9808,7 +9808,7 @@ class ContactProfile extends mixins.w9 {
     return null;
   }
 }
-;// CONCATENATED MODULE: ./js/chat/ui/contactsPanel/contactsPanel.jsx
+;// ./js/chat/ui/contactsPanel/contactsPanel.jsx
 
 
 
@@ -10014,7 +10014,7 @@ const mixins = REQ_(137);
 const buttons = REQ_(994);
 // EXTERNAL MODULE: ./js/ui/modalDialogs.jsx + 1 modules
 const modalDialogs = REQ_(318);
-;// CONCATENATED MODULE: ./js/ui/jsx/fm/viewModeSelector.jsx
+;// ./js/ui/jsx/fm/viewModeSelector.jsx
 
 
 class ViewModeSelector extends mixins.w9 {
@@ -10045,7 +10045,7 @@ ViewModeSelector.VIEW_MODE = {
   "GRID": 1,
   "LIST": undefined
 };
-;// CONCATENATED MODULE: ./js/ui/jsx/fm/breadcrumbs.jsx
+;// ./js/ui/jsx/fm/breadcrumbs.jsx
 
 
 class Breadcrumbs extends mixins.w9 {
@@ -10231,7 +10231,7 @@ class Breadcrumbs extends mixins.w9 {
 }
 // EXTERNAL MODULE: ./js/ui/jsx/fm/fmView.jsx + 10 modules
 const fmView = REQ_(701);
-;// CONCATENATED MODULE: ./js/ui/cloudBrowserModalDialog.jsx
+;// ./js/ui/cloudBrowserModalDialog.jsx
 
 
 
@@ -10640,7 +10640,7 @@ const cloudBrowserModalDialog = {
 };
 // EXTERNAL MODULE: ./js/chat/chatRoom.jsx + 1 modules
 const chat_chatRoom = REQ_(553);
-;// CONCATENATED MODULE: ./js/ui/historyRetentionDialog.jsx
+;// ./js/ui/historyRetentionDialog.jsx
 
 
 
@@ -10866,7 +10866,7 @@ const dropdowns = REQ_(911);
 const ui_contacts = REQ_(251);
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
 const perfectScrollbar = REQ_(486);
-;// CONCATENATED MODULE: ./js/ui/accordion.jsx
+;// ./js/ui/accordion.jsx
 const React = REQ_(594);
 
 class AccordionPanel extends mixins.w9 {
@@ -10933,7 +10933,7 @@ class Accordion extends mixins.w9 {
   }
 }
 
-;// CONCATENATED MODULE: ./js/chat/ui/participantsList.jsx
+;// ./js/chat/ui/participantsList.jsx
 
 
 const DropdownsUI = REQ_(911);
@@ -11194,7 +11194,7 @@ ParticipantsListInner.defaultProps = {
 
 // EXTERNAL MODULE: ./js/chat/ui/messages/generic.jsx + 14 modules
 const generic = REQ_(890);
-;// CONCATENATED MODULE: ./js/chat/ui/sharedFilesAccordionPanel.jsx
+;// ./js/chat/ui/sharedFilesAccordionPanel.jsx
 
 let _dec, _class;
 const sharedFilesAccordionPanel_React = REQ_(594);
@@ -11410,7 +11410,7 @@ const SharedFilesAccordionPanel = (_dec = utils.Ay.SoonFcWrap(350), _class = cla
   }
 }, (0,applyDecoratedDescriptor.A)(_class.prototype, "eventuallyRenderThumbnails", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "eventuallyRenderThumbnails"), _class.prototype), _class);
 
-;// CONCATENATED MODULE: ./js/chat/ui/incomingSharesAccordionPanel.jsx
+;// ./js/chat/ui/incomingSharesAccordionPanel.jsx
 const incomingSharesAccordionPanel_React = REQ_(594);
 
 class SharedFolderItem extends mixins.w9 {
@@ -11536,7 +11536,7 @@ class IncSharesAccordionPanel extends mixins.w9 {
   }
 }
 
-;// CONCATENATED MODULE: ./js/chat/ui/chatlinkDialog.jsx
+;// ./js/chat/ui/chatlinkDialog.jsx
 
 
 
@@ -11729,7 +11729,7 @@ ChatlinkDialog.defaultProps = {
   disableCheckingVisibility: true
 };
 ChatlinkDialog.NAMESPACE = 'chat-link-dialog';
-;// CONCATENATED MODULE: ./js/chat/ui/pushSettingsDialog.jsx
+;// ./js/chat/ui/pushSettingsDialog.jsx
 
 let _PushSettingsDialog;
 
@@ -11800,7 +11800,7 @@ const call = REQ_(3);
 const historyPanel = REQ_(814);
 // EXTERNAL MODULE: ./js/chat/ui/composedTextArea.jsx + 1 modules
 const composedTextArea = REQ_(77);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/loading.jsx
+;// ./js/chat/ui/meetings/workflow/loading.jsx
 
 
 class Loading extends mixins.w9 {
@@ -11907,7 +11907,7 @@ const meetings_button = REQ_(959);
 const preview = REQ_(485);
 // EXTERNAL MODULE: ./js/chat/ui/link.jsx
 const ui_link = REQ_(280);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/join.jsx
+;// ./js/chat/ui/meetings/workflow/join.jsx
 
 
 
@@ -12235,7 +12235,7 @@ Join.VIEW = {
   ACCOUNT: 2,
   UNSUPPORTED: 4
 };
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/alert.jsx
+;// ./js/chat/ui/meetings/workflow/alert.jsx
 
 
 const NAMESPACE = 'meetings-alert';
@@ -12301,7 +12301,7 @@ Alert.TYPE = {
 const helpers = REQ_(110);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/hostsObserver.jsx
 const hostsObserver = REQ_(972);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/waitingRoom/waitingRoom.jsx
+;// ./js/chat/ui/meetings/waitingRoom/waitingRoom.jsx
 
 
 
@@ -12681,7 +12681,7 @@ class WaitingRoom extends mixins.w9 {
 const streamControls = REQ_(489);
 // EXTERNAL MODULE: ./js/chat/ui/inviteParticipantsPanel.jsx
 const inviteParticipantsPanel = REQ_(815);
-;// CONCATENATED MODULE: ./js/chat/ui/chatOverlay.jsx
+;// ./js/chat/ui/chatOverlay.jsx
 
 
 
@@ -12734,7 +12734,7 @@ class ChatOverlay extends mixins.w9 {
   }
 }
 
-;// CONCATENATED MODULE: ./js/chat/ui/conversationpanel.jsx
+;// ./js/chat/ui/conversationpanel.jsx
 
 
 let conversationpanel_dec, _dec2, conversationpanel_class;
@@ -15241,7 +15241,7 @@ const preview = REQ_(485);
 const ui_link = REQ_(280);
 // EXTERNAL MODULE: ./js/ui/utils.jsx
 const utils = REQ_(314);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/start.jsx
+;// ./js/chat/ui/meetings/workflow/start.jsx
 
 let _Start;
 
@@ -15408,7 +15408,7 @@ Start.STREAMS = {
 const perfectScrollbar = REQ_(486);
 // EXTERNAL MODULE: ./js/chat/ui/contacts.jsx
 const ui_contacts = REQ_(251);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/invite.jsx
+;// ./js/chat/ui/meetings/schedule/invite.jsx
 
 
 
@@ -15645,7 +15645,7 @@ class Invite extends mixins.w9 {
 Invite.NAMESPACE = 'meetings-invite';
 // EXTERNAL MODULE: ./js/chat/ui/meetings/schedule/helpers.jsx
 const helpers = REQ_(110);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/datepicker.jsx
+;// ./js/chat/ui/meetings/schedule/datepicker.jsx
 
 
 class Datepicker extends mixins.w9 {
@@ -15766,7 +15766,7 @@ class Datepicker extends mixins.w9 {
   }
 }
 Datepicker.NAMESPACE = 'meetings-datepicker';
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/select.jsx
+;// ./js/chat/ui/meetings/schedule/select.jsx
 
 
 
@@ -15955,7 +15955,7 @@ class Select extends mixins.w9 {
   }
 }
 Select.NAMESPACE = 'meetings-select';
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/datetime.jsx
+;// ./js/chat/ui/meetings/schedule/datetime.jsx
 
 
 
@@ -16054,7 +16054,7 @@ class DateTime extends mixins.w9 {
     }));
   }
 }
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/recurring.jsx
+;// ./js/chat/ui/meetings/schedule/recurring.jsx
 
 
 
@@ -16865,7 +16865,7 @@ class Edit extends mixins.w9 {
 }
 // EXTERNAL MODULE: ./js/chat/chatRoom.jsx + 1 modules
 const chat_chatRoom = REQ_(553);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/schedule/schedule.jsx
+;// ./js/chat/ui/meetings/schedule/schedule.jsx
 
 let _Schedule;
 
@@ -17638,7 +17638,7 @@ const UpgradeNotice = ({
 };
 // EXTERNAL MODULE: ./js/ui/miniui.jsx
 const miniui = REQ_(818);
-;// CONCATENATED MODULE: ./js/chat/ui/startGroupChatWizard.jsx
+;// ./js/chat/ui/startGroupChatWizard.jsx
 const React = REQ_(594);
 
 
@@ -17974,7 +17974,7 @@ const startGroupChatWizard = {
 const call = REQ_(3);
 // EXTERNAL MODULE: ./js/chat/ui/chatToaster.jsx
 const chatToaster = REQ_(424);
-;// CONCATENATED MODULE: ./js/chat/ui/searchPanel/resultTable.jsx
+;// ./js/chat/ui/searchPanel/resultTable.jsx
 
 
 class ResultTable extends mixins.w9 {
@@ -17990,7 +17990,7 @@ class ResultTable extends mixins.w9 {
     }, heading) : null, children);
   }
 }
-;// CONCATENATED MODULE: ./js/chat/ui/searchPanel/resultRow.jsx
+;// ./js/chat/ui/searchPanel/resultRow.jsx
 
 
 
@@ -18235,7 +18235,7 @@ class ResultRow extends mixins.w9 {
     });
   }
 }
-;// CONCATENATED MODULE: ./js/chat/ui/searchPanel/resultContainer.jsx
+;// ./js/chat/ui/searchPanel/resultContainer.jsx
 
 
 
@@ -18335,7 +18335,7 @@ class ResultContainer extends mixins.w9 {
     return this.renderResults(results, status, isFirstQuery, onSearchMessages);
   }
 }
-;// CONCATENATED MODULE: ./js/chat/ui/searchPanel/searchField.jsx
+;// ./js/chat/ui/searchPanel/searchField.jsx
 let _SearchField;
 
 
@@ -18450,7 +18450,7 @@ SearchField.select = () => {
 SearchField.focus = () => _SearchField.inputRef && _SearchField.inputRef.current && _SearchField.inputRef.current.focus();
 SearchField.hasValue = () => _SearchField.inputRef && _SearchField.inputRef.current && !!_SearchField.inputRef.current.value.length;
 SearchField.isVisible = () => _SearchField.inputRef && _SearchField.inputRef.current && elementIsVisible(_SearchField.inputRef.current);
-;// CONCATENATED MODULE: ./js/chat/ui/searchPanel/searchPanel.jsx
+;// ./js/chat/ui/searchPanel/searchPanel.jsx
 
 
 
@@ -18635,7 +18635,7 @@ class SearchPanel extends mixins.w9 {
 }
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
 const buttons = REQ_(994);
-;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/navigation.jsx
+;// ./js/chat/ui/leftPanel/navigation.jsx
 
 
 
@@ -18703,7 +18703,7 @@ const Navigation = ({
 })), REaCt().createElement("span", null, l[165])));
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
 const dropdowns = REQ_(911);
-;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/actions.jsx
+;// ./js/chat/ui/leftPanel/actions.jsx
 
 
 
@@ -18802,7 +18802,7 @@ class Actions extends mixins.w9 {
 }
 // EXTERNAL MODULE: ./node_modules/@babel/runtime/helpers/esm/applyDecoratedDescriptor.js
 const applyDecoratedDescriptor = REQ_(793);
-;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/conversationsListItem.jsx
+;// ./js/chat/ui/leftPanel/conversationsListItem.jsx
 
 let _dec, _dec2, _class;
 
@@ -19062,7 +19062,7 @@ const ConversationsListItem = (_dec = utils.Ay.SoonFcWrap(40, true), _dec2 = (0,
   }
 }, (0,applyDecoratedDescriptor.A)(_class.prototype, "eventuallyScrollTo", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "eventuallyScrollTo"), _class.prototype), (0,applyDecoratedDescriptor.A)(_class.prototype, "render", [_dec2], Object.getOwnPropertyDescriptor(_class.prototype, "render"), _class.prototype), _class);
 
-;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/conversationsList.jsx
+;// ./js/chat/ui/leftPanel/conversationsList.jsx
 
 
 
@@ -19376,7 +19376,7 @@ class Meetings extends mixins.w9 {
 }
 // EXTERNAL MODULE: ./js/chat/ui/updateObserver.jsx
 const updateObserver = REQ_(501);
-;// CONCATENATED MODULE: ./js/chat/ui/leftPanel/leftPanel.jsx
+;// ./js/chat/ui/leftPanel/leftPanel.jsx
 
 
 
@@ -19540,7 +19540,7 @@ class LeftPanel extends mixins.w9 {
   }
 }
 const leftPanel = (0,mixins.Zz)(updateObserver.Y)(LeftPanel);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/freeCallEnded.jsx
+;// ./js/chat/ui/meetings/workflow/freeCallEnded.jsx
 
 
 
@@ -19594,7 +19594,7 @@ class FreeCallEnded extends mixins.w9 {
     }, REaCt().createElement("span", null, l.upgrade_now)))));
   }
 }
-;// CONCATENATED MODULE: ./js/chat/ui/contactSelectorDialog.jsx
+;// ./js/chat/ui/contactSelectorDialog.jsx
 
 
 
@@ -19677,7 +19677,7 @@ class ContactSelectorDialog extends mixins.w9 {
 ContactSelectorDialog.defaultProps = {
   requiresUpdateOnResize: true
 };
-;// CONCATENATED MODULE: ./js/chat/ui/conversations.jsx
+;// ./js/chat/ui/conversations.jsx
 
 
 
@@ -20057,7 +20057,7 @@ const REaCt = REQ_.n(React_);
 const mixins = REQ_(137);
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
 const perfectScrollbar = REQ_(486);
-;// CONCATENATED MODULE: ./js/chat/ui/gifPanel/searchField.jsx
+;// ./js/chat/ui/gifPanel/searchField.jsx
 let _SearchField;
 
 
@@ -20102,7 +20102,7 @@ _SearchField = SearchField;
 SearchField.inputRef = REaCt().createRef();
 SearchField.focus = () => _SearchField.inputRef && _SearchField.inputRef.current && _SearchField.inputRef.current.focus();
 SearchField.hasValue = () => _SearchField.inputRef && _SearchField.inputRef.current && !!_SearchField.inputRef.current.value.length;
-;// CONCATENATED MODULE: ./js/chat/ui/gifPanel/result.jsx
+;// ./js/chat/ui/gifPanel/result.jsx
 
 
 
@@ -20146,7 +20146,7 @@ class Result extends mixins.w9 {
     }, REaCt().createElement("span", null, title)));
   }
 }
-;// CONCATENATED MODULE: ./js/chat/ui/gifPanel/resultContainer.jsx
+;// ./js/chat/ui/gifPanel/resultContainer.jsx
 
 
 
@@ -20271,7 +20271,7 @@ class ResultContainer extends mixins.w9 {
     return null;
   }
 }
-;// CONCATENATED MODULE: ./js/chat/ui/gifPanel/gifPanel.jsx
+;// ./js/chat/ui/gifPanel/gifPanel.jsx
 
 
 
@@ -20532,7 +20532,7 @@ const REaCt = REQ_.n(React_);
 const mixins = REQ_(137);
 // EXTERNAL MODULE: ./js/ui/utils.jsx
 const utils = REQ_(314);
-;// CONCATENATED MODULE: ./js/chat/ui/messages/alterParticipants.jsx
+;// ./js/chat/ui/messages/alterParticipants.jsx
 const React = REQ_(594);
 const ContactsUI = REQ_(251);
 const ConversationMessageMixin = REQ_(446).M;
@@ -20638,7 +20638,7 @@ class AltPartsConvMessage extends ConversationMessageMixin {
   }
 }
 
-;// CONCATENATED MODULE: ./js/chat/ui/messages/truncated.jsx
+;// ./js/chat/ui/messages/truncated.jsx
 const truncated_React = REQ_(594);
 const truncated_ContactsUI = REQ_(251);
 const truncated_ConversationMessageMixin = REQ_(446).M;
@@ -20693,7 +20693,7 @@ class TruncatedMessage extends truncated_ConversationMessageMixin {
   }
 }
 
-;// CONCATENATED MODULE: ./js/chat/ui/messages/privilegeChange.jsx
+;// ./js/chat/ui/messages/privilegeChange.jsx
 const privilegeChange_React = REQ_(594);
 const privilegeChange_ContactsUI = REQ_(251);
 const privilegeChange_ConversationMessageMixin = REQ_(446).M;
@@ -20765,7 +20765,7 @@ class PrivilegeChange extends privilegeChange_ConversationMessageMixin {
   }
 }
 
-;// CONCATENATED MODULE: ./js/chat/ui/messages/topicChange.jsx
+;// ./js/chat/ui/messages/topicChange.jsx
 const topicChange_React = REQ_(594);
 const topicChange_ContactsUI = REQ_(251);
 const topicChange_ConversationMessageMixin = REQ_(446).M;
@@ -20818,7 +20818,7 @@ class TopicChange extends topicChange_ConversationMessageMixin {
   }
 }
 
-;// CONCATENATED MODULE: ./js/chat/ui/messages/closeOpenMode.jsx
+;// ./js/chat/ui/messages/closeOpenMode.jsx
 const closeOpenMode_React = REQ_(594);
 const closeOpenMode_ContactsUI = REQ_(251);
 const closeOpenMode_ConversationMessageMixin = REQ_(446).M;
@@ -20869,7 +20869,7 @@ class CloseOpenModeMessage extends closeOpenMode_ConversationMessageMixin {
   }
 }
 
-;// CONCATENATED MODULE: ./js/chat/ui/messages/chatHandle.jsx
+;// ./js/chat/ui/messages/chatHandle.jsx
 const chatHandle_React = REQ_(594);
 const chatHandle_ContactsUI = REQ_(251);
 const chatHandle_ConversationMessageMixin = REQ_(446).M;
@@ -20928,7 +20928,7 @@ const perfectScrollbar = REQ_(486);
 const mixin = REQ_(446);
 // EXTERNAL MODULE: ./js/chat/ui/contacts.jsx
 const contacts = REQ_(251);
-;// CONCATENATED MODULE: ./js/chat/ui/messages/retentionChange.jsx
+;// ./js/chat/ui/messages/retentionChange.jsx
 
 
 
@@ -20964,7 +20964,7 @@ class RetentionChange extends mixin.M {
 const call = REQ_(3);
 // EXTERNAL MODULE: ./js/chat/ui/messages/scheduleMetaChange.jsx
 const scheduleMetaChange = REQ_(757);
-;// CONCATENATED MODULE: ./js/chat/ui/historyPanel.jsx
+;// ./js/chat/ui/historyPanel.jsx
 
 let _dec, _class;
 
@@ -22083,7 +22083,7 @@ const historyPanel = REQ_(814);
 const ui_contacts = REQ_(251);
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
 const perfectScrollbar = REQ_(486);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/collapse.jsx
+;// ./js/chat/ui/meetings/collapse.jsx
 
 
 class Collapse extends mixins.w9 {
@@ -22129,7 +22129,7 @@ const contactsPanel = REQ_(173);
 const videoNodeMenu = REQ_(539);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/videoNode.jsx
 const videoNode = REQ_(414);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/participants.jsx
+;// ./js/chat/ui/meetings/participants.jsx
 
 
 
@@ -22522,7 +22522,7 @@ class Participants extends mixins.w9 {
     }), this.renderParticipantsList())) : this.renderParticipantsList());
   }
 }
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/guest.jsx
+;// ./js/chat/ui/meetings/guest.jsx
 
 
 
@@ -22559,7 +22559,7 @@ class Guest extends mixins.w9 {
     }, l[968])));
   }
 }
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/sidebar.jsx
+;// ./js/chat/ui/meetings/sidebar.jsx
 
 
 
@@ -22671,7 +22671,7 @@ class Sidebar extends mixins.w9 {
 }
 // EXTERNAL MODULE: ./js/ui/modalDialogs.jsx + 1 modules
 const modalDialogs = REQ_(318);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/invite/search.jsx
+;// ./js/chat/ui/meetings/workflow/invite/search.jsx
 let _Search;
 
 
@@ -22702,7 +22702,7 @@ Search.inputRef = REaCt().createRef();
 Search.focus = () => {
   return _Search.inputRef && _Search.inputRef.current && _Search.inputRef.current.focus();
 };
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/invite/footer.jsx
+;// ./js/chat/ui/meetings/workflow/invite/footer.jsx
 
 
 
@@ -22728,7 +22728,7 @@ class Footer extends mixins.w9 {
     }, l.add)));
   }
 }
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/invite/nil.jsx
+;// ./js/chat/ui/meetings/workflow/invite/nil.jsx
 
 
 
@@ -22743,7 +22743,7 @@ class Nil extends mixins.w9 {
 }
 // EXTERNAL MODULE: ./js/chat/ui/link.jsx
 const ui_link = REQ_(280);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/invite/invite.jsx
+;// ./js/chat/ui/meetings/workflow/invite/invite.jsx
 
 
 
@@ -23020,7 +23020,7 @@ class Invite extends mixins.w9 {
   }
 }
 Invite.NAMESPACE = 'invite-meeting';
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/workflow/ephemeral.jsx
+;// ./js/chat/ui/meetings/workflow/ephemeral.jsx
 
 
 
@@ -23055,7 +23055,7 @@ class Ephemeral extends mixins.w9 {
   }
 }
 Ephemeral.NAMESPACE = 'ephemeral-dialog';
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/offline.jsx
+;// ./js/chat/ui/meetings/offline.jsx
 
 
 
@@ -23090,7 +23090,7 @@ Offline.NAMESPACE = 'reconnect-dialog';
 const conversationpanel = REQ_(438);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/streamControls.jsx
 const streamControls = REQ_(489);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/sidebarControls.jsx
+;// ./js/chat/ui/meetings/sidebarControls.jsx
 
 
 
@@ -23168,7 +23168,7 @@ class SidebarControls extends mixins.w9 {
 }
 // EXTERNAL MODULE: ./js/chat/ui/inviteParticipantsPanel.jsx
 const inviteParticipantsPanel = REQ_(815);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/call.jsx
+;// ./js/chat/ui/meetings/call.jsx
 
 
 
@@ -24968,7 +24968,7 @@ const meetings_button = REQ_(959);
 const dropdowns = REQ_(911);
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
 const buttons = REQ_(994);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/floatExtendedControls.jsx
+;// ./js/chat/ui/meetings/floatExtendedControls.jsx
 
 
 
@@ -25057,7 +25057,7 @@ const permissionsObserver = REQ_(542);
 const hostsObserver = REQ_(972);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/streamControls.jsx
 const streamControls = REQ_(489);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/float.jsx
+;// ./js/chat/ui/meetings/float.jsx
 
 
 
@@ -25706,7 +25706,7 @@ Minimized.UNREAD_EVENT = 'onUnreadCountUpdate.localStreamNotifications';
 const __Minimized = (0,mixins.Zz)(micObserver.Q, permissionsObserver.$)(Minimized);
 // EXTERNAL MODULE: ./js/chat/ui/inviteParticipantsPanel.jsx
 const inviteParticipantsPanel = REQ_(815);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/participantsNotice.jsx
+;// ./js/chat/ui/meetings/participantsNotice.jsx
 
 
 
@@ -25795,7 +25795,7 @@ class ParticipantsNotice extends mixins.w9 {
 ParticipantsNotice.NAMESPACE = 'participants-notice';
 // EXTERNAL MODULE: ./js/chat/ui/chatToaster.jsx
 const chatToaster = REQ_(424);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/participantsBlock.jsx
+;// ./js/chat/ui/meetings/participantsBlock.jsx
 
 
 
@@ -26066,7 +26066,7 @@ class ParticipantsBlock extends mixins.w9 {
 const videoNodeMenu = REQ_(539);
 // EXTERNAL MODULE: ./js/ui/modalDialogs.jsx + 1 modules
 const modalDialogs = REQ_(318);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/modeSwitch.jsx
+;// ./js/chat/ui/meetings/modeSwitch.jsx
 
 
 
@@ -26260,7 +26260,7 @@ class ModeSwitch extends mixins.w9 {
 }
 ModeSwitch.NAMESPACE = 'modeSwitch';
 ModeSwitch.BASE_CLASS = 'mode';
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/streamHead.jsx
+;// ./js/chat/ui/meetings/streamHead.jsx
 
 
 
@@ -26528,7 +26528,7 @@ const contacts = REQ_(251);
 const perfectScrollbar = REQ_(486);
 // EXTERNAL MODULE: ./js/chat/ui/link.jsx
 const ui_link = REQ_(280);
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/waitingRoom/admit.jsx
+;// ./js/chat/ui/meetings/waitingRoom/admit.jsx
 
 
 
@@ -26703,7 +26703,7 @@ class Admit extends mixins.w9 {
     return null;
   }
 }
-;// CONCATENATED MODULE: ./js/chat/ui/meetings/stream.jsx
+;// ./js/chat/ui/meetings/stream.jsx
 
 
 
@@ -27461,16 +27461,20 @@ Ay: () => __WEBPACK_DEFAULT_EXPORT__,
 _F: () => renderEndConfirm,
 sX: () => renderLeaveConfirm
 });
+const _extends5__ = REQ_(168);
 const react0__ = REQ_(594);
 const react0 = REQ_.n(react0__);
 const _mixins1__ = REQ_(137);
 const _button_jsx3__ = REQ_(959);
 const _stream_jsx4__ = REQ_(415);
-const _micObserver_jsx7__ = REQ_(772);
-const _permissionsObserver_jsx8__ = REQ_(542);
-const _call_jsx5__ = REQ_(3);
+const _micObserver_jsx9__ = REQ_(772);
+const _permissionsObserver_jsx10__ = REQ_(542);
+const _call_jsx6__ = REQ_(3);
 const _hostsObserver_jsx2__ = REQ_(972);
-const _ui_dropdowns_jsx6__ = REQ_(911);
+const _ui_dropdowns_jsx8__ = REQ_(911);
+const _ui_utils_jsx7__ = REQ_(314);
+
+
 
 
 
@@ -27538,26 +27542,21 @@ class StreamControls extends _mixins1__.w9 {
     this.handleMousedown = ({
       target
     }) => {
-      if (!this.isMounted()) {
-        return;
+      if (this.isMounted()) {
+        const {
+          audioSelectDropdown,
+          videoSelectDropdown,
+          endCallOptions
+        } = this.state;
+        return (audioSelectDropdown || videoSelectDropdown || endCallOptions) && ['audio-sources', 'video-sources', 'meetings-end-options'].some(selector => {
+          let _document$querySelect;
+          return (_document$querySelect = document.querySelector(`.${selector}`)) == null ? void 0 : _document$querySelect.contains(target);
+        }) ? 0x4B1D : this.setState({
+          audioSelectDropdown: false,
+          videoSelectDropdown: false,
+          endCallOptions: false
+        }, this.setActiveElement);
       }
-      const state = {};
-      const {
-        audioSelectDropdown,
-        videoSelectDropdown
-      } = this.state;
-      const $target = $(target);
-      const isOpenerParent = (audioSelectDropdown || videoSelectDropdown) && $target.parents('.input-source-opener').length;
-      if (audioSelectDropdown && $target.parents('.audio-sources').length === 0 && !isOpenerParent) {
-        state.audioSelectDropdown = false;
-      }
-      if (videoSelectDropdown && $target.parents('.video-sources').length === 0 && !isOpenerParent) {
-        state.videoSelectDropdown = false;
-      }
-      if (!(this.endContainerRef && this.endContainerRef.current && this.endContainerRef.current.contains(target))) {
-        state.endCallOptions = false;
-      }
-      this.setState(state, this.setActiveElement);
     };
     this.renderDebug = () => {
       return react0().createElement("div", {
@@ -27587,6 +27586,7 @@ class StreamControls extends _mixins1__.w9 {
       }, react0().createElement("span", null, l[83])), react0().createElement("span", null, this.props.peers.length + 1));
     };
     this.renderEndCallOptions = () => {
+      let _this$endContainerRef;
       const {
         chatRoom,
         recorder,
@@ -27600,14 +27600,23 @@ class StreamControls extends _mixins1__.w9 {
       const doEnd = () => this.setState({
         endCallPending: true
       }, () => chatRoom.endCallForAll());
-      return react0().createElement("div", {
+      const endContainerRef = (_this$endContainerRef = this.endContainerRef) == null ? void 0 : _this$endContainerRef.current;
+      return react0().createElement("div", (0,_extends5__.A)({}, endCallOptions && {
+        style: (({
+          left,
+          top
+        }) => ({
+          left,
+          top
+        }))(endContainerRef.getBoundingClientRect())
+      }, {
         className: `
-                    end-options
+                    meetings-end-options
                     theme-dark-forced
                     ${endCallOptions ? '' : 'hidden'}
                 `
-      }, react0().createElement("div", {
-        className: "end-options-content"
+      }), react0().createElement("div", {
+        className: "meetings-end-options-content"
       }, react0().createElement(this.LeaveButton, {
         chatRoom,
         recorder,
@@ -27640,7 +27649,7 @@ class StreamControls extends _mixins1__.w9 {
         ref: this.endContainerRef,
         className: "end-call-container",
         onClick: () => {
-          if (chatRoom.type !== 'private' && peers.length && _call_jsx5__.Ay.isModerator(chatRoom, u_handle)) {
+          if (chatRoom.type !== 'private' && peers.length && _call_jsx6__.Ay.isModerator(chatRoom, u_handle)) {
             return this.setState(state => ({
               endCallOptions: !state.endCallOptions
             }), () => {
@@ -27655,7 +27664,9 @@ class StreamControls extends _mixins1__.w9 {
           }
           return onCallEnd();
         }
-      }, this.renderEndCallOptions(), react0().createElement(_button_jsx3__.A, {
+      }, react0().createElement(_ui_utils_jsx7__.Ay.RenderTo, {
+        element: document.body
+      }, this.renderEndCallOptions()), react0().createElement(_button_jsx3__.A, {
         simpletip: {
           ...this.SIMPLETIP,
           label: l[5884]
@@ -27838,7 +27849,7 @@ class StreamControls extends _mixins1__.w9 {
       selectedOut = 'default';
     }
     const mics = Object.entries(audioIn).map(([id, name]) => {
-      return react0().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
+      return react0().createElement(_ui_dropdowns_jsx8__.DropdownItem, {
         key: id,
         onClick: () => {
           call.sfuClient.setMicDevice(id === 'default' ? null : id);
@@ -27853,7 +27864,7 @@ class StreamControls extends _mixins1__.w9 {
       })));
     });
     const speakers = Object.entries(audioOut).map(([id, name]) => {
-      return react0().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
+      return react0().createElement(_ui_dropdowns_jsx8__.DropdownItem, {
         key: id,
         onClick: () => {
           Promise.resolve(call.sfuClient.setAudioOutDevice(id === 'default' ? null : id)).catch(dump);
@@ -27867,7 +27878,7 @@ class StreamControls extends _mixins1__.w9 {
         className: "sprite-fm-mono icon-check-small-regular-outline"
       })));
     });
-    return react0().createElement(_ui_dropdowns_jsx6__.Dropdown, {
+    return react0().createElement(_ui_dropdowns_jsx8__.Dropdown, {
       className: "input-sources audio-sources theme-dark-forced",
       active: true,
       noArrow: true,
@@ -27880,13 +27891,13 @@ class StreamControls extends _mixins1__.w9 {
       }, this.setActiveElement)
     }, react0().createElement("div", {
       className: "source-label"
-    }, l.microphone), mics.length ? mics : react0().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
+    }, l.microphone), mics.length ? mics : react0().createElement(_ui_dropdowns_jsx8__.DropdownItem, {
       label: l.no_mics
     }), react0().createElement("hr", null), react0().createElement("div", {
       className: "source-label"
-    }, l.speaker), speakers.length ? speakers : react0().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
+    }, l.speaker), speakers.length ? speakers : react0().createElement(_ui_dropdowns_jsx8__.DropdownItem, {
       label: l.no_speakers
-    }), react0().createElement("hr", null), react0().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
+    }), react0().createElement("hr", null), react0().createElement(_ui_dropdowns_jsx8__.DropdownItem, {
       icon: "sprite-fm-mono icon-volume-max-small-regular-outline",
       label: l.test_speaker,
       disabled: speakers.length === 0,
@@ -27921,7 +27932,7 @@ class StreamControls extends _mixins1__.w9 {
       selectedCam = 'default';
     }
     const cameras = Object.entries(videoIn).map(([id, name]) => {
-      return react0().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
+      return react0().createElement(_ui_dropdowns_jsx8__.DropdownItem, {
         key: id,
         onClick: () => {
           call.sfuClient.setCameraDevice(id === 'default' ? null : id);
@@ -27935,7 +27946,7 @@ class StreamControls extends _mixins1__.w9 {
         className: "sprite-fm-mono icon-check-small-regular-outline"
       })));
     });
-    return react0().createElement(_ui_dropdowns_jsx6__.Dropdown, {
+    return react0().createElement(_ui_dropdowns_jsx8__.Dropdown, {
       className: "input-sources video-sources theme-dark-forced",
       active: true,
       noArrow: true,
@@ -27948,7 +27959,7 @@ class StreamControls extends _mixins1__.w9 {
       }, this.setActiveElement)
     }, react0().createElement("div", {
       className: "source-label"
-    }, l.camera_button), cameras.length ? cameras : react0().createElement(_ui_dropdowns_jsx6__.DropdownItem, {
+    }, l.camera_button), cameras.length ? cameras : react0().createElement(_ui_dropdowns_jsx8__.DropdownItem, {
       label: l.no_cameras
     }));
   }
@@ -28076,7 +28087,9 @@ class StreamControls extends _mixins1__.w9 {
     }), react0().createElement("span", null, l.mic_button), signal ? null : renderSignalWarning(), hasToRenderPermissionsWarning(Av.Audio) ? renderPermissionsWarning(Av.Audio) : null, this.renderSourceOpener({
       type: 'audioSelectDropdown',
       eventId: chatRoom.isMeeting ? 500299 : 500300
-    })), audioSelectDropdown && this.renderSoundDropdown(), react0().createElement("li", {
+    })), audioSelectDropdown && react0().createElement("div", {
+      ref: this.audioDropdownRef
+    }, this.renderSoundDropdown()), react0().createElement("li", {
       className: `
                                 ${isOnHold ? 'disabled' : ''}
                                 with-input-selector
@@ -28101,7 +28114,9 @@ class StreamControls extends _mixins1__.w9 {
     }), react0().createElement("span", null, l.camera_button), hasToRenderPermissionsWarning(Av.Camera) ? renderPermissionsWarning(Av.Camera) : null, this.renderSourceOpener({
       type: 'videoSelectDropdown',
       eventId: chatRoom.isMeeting ? 500301 : 500302
-    })), videoSelectDropdown && this.renderVideoDropdown(), react0().createElement("li", {
+    })), videoSelectDropdown && react0().createElement("div", {
+      ref: this.videoDropdownRef
+    }, this.renderVideoDropdown()), react0().createElement("li", {
       className: isOnHold ? 'disabled' : '',
       onClick: () => {
         if (isOnHold) {
@@ -28140,7 +28155,7 @@ class StreamControls extends _mixins1__.w9 {
   }
 }
 StreamControls.NAMESPACE = 'stream-controls';
-const __WEBPACK_DEFAULT_EXPORT__ = (0,_mixins1__.Zz)(_micObserver_jsx7__.Q, _permissionsObserver_jsx8__.$)(StreamControls);
+const __WEBPACK_DEFAULT_EXPORT__ = (0,_mixins1__.Zz)(_micObserver_jsx9__.Q, _permissionsObserver_jsx10__.$)(StreamControls);
 
 },
 
@@ -29292,7 +29307,7 @@ const mixin = REQ_(446);
 const ui_contacts = REQ_(251);
 // EXTERNAL MODULE: ./js/ui/utils.jsx
 const utils = REQ_(314);
-;// CONCATENATED MODULE: ./js/chat/ui/messages/abstractGenericMessage.jsx
+;// ./js/chat/ui/messages/abstractGenericMessage.jsx
 
 
 
@@ -29361,7 +29376,7 @@ class AbstractGenericMessage extends mixin.M {
     }, this.getTimestampAsString()), !hideActionButtons && this.getMessageActionButtons && this.renderMessageActionButtons(this.getMessageActionButtons()), this.getContents && this.getContents(), hideActionButtons ? null : this.getEmojisImages()));
   }
 }
-;// CONCATENATED MODULE: ./js/chat/ui/messages/utils.jsx
+;// ./js/chat/ui/messages/utils.jsx
 let getMessageString;
 (function () {
   let MESSAGE_STRINGS;
@@ -29438,7 +29453,7 @@ mega.ui = mega.ui || {};
 mega.ui.chat = mega.ui.chat || {};
 mega.ui.chat.getMessageString = getMessageString;
 
-;// CONCATENATED MODULE: ./js/chat/ui/messages/types/local.jsx
+;// ./js/chat/ui/messages/types/local.jsx
 
 
 
@@ -29679,7 +29694,7 @@ class Local extends AbstractGenericMessage {
 const dropdowns = REQ_(911);
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
 const buttons = REQ_(994);
-;// CONCATENATED MODULE: ./js/chat/ui/messages/types/contact.jsx
+;// ./js/chat/ui/messages/types/contact.jsx
 
 
 
@@ -29845,7 +29860,7 @@ class Contact extends AbstractGenericMessage {
     }, contacts);
   }
 }
-;// CONCATENATED MODULE: ./js/chat/ui/messages/types/attachment.jsx
+;// ./js/chat/ui/messages/types/attachment.jsx
 
 
 
@@ -30107,7 +30122,7 @@ class Attachment extends AbstractGenericMessage {
 }
 // EXTERNAL MODULE: ./js/chat/mixins.js
 const mixins = REQ_(137);
-;// CONCATENATED MODULE: ./js/chat/ui/messages/types/partials/audioPlayer.jsx
+;// ./js/chat/ui/messages/types/partials/audioPlayer.jsx
 
 
 class AudioPlayer extends mixins.w9 {
@@ -30277,7 +30292,7 @@ class AudioPlayer extends mixins.w9 {
     }));
   }
 }
-;// CONCATENATED MODULE: ./js/chat/ui/messages/types/partials/audioContainer.jsx
+;// ./js/chat/ui/messages/types/partials/audioContainer.jsx
 
 
 
@@ -30350,7 +30365,7 @@ AudioContainer.defaultProps = {
   h: null,
   mime: null
 };
-;// CONCATENATED MODULE: ./js/chat/ui/messages/types/voiceClip.jsx
+;// ./js/chat/ui/messages/types/voiceClip.jsx
 
 
 
@@ -30407,7 +30422,7 @@ class VoiceClip extends AbstractGenericMessage {
     return REaCt().createElement(REaCt().Fragment, null, this.props.message.getState() === Message.STATE.NOT_SENT ? null : this._getActionButtons(), this._getAudioContainer());
   }
 }
-;// CONCATENATED MODULE: ./js/chat/ui/messages/types/partials/metaRichpreview.jsx
+;// ./js/chat/ui/messages/types/partials/metaRichpreview.jsx
 const React = REQ_(594);
 const ConversationMessageMixin = REQ_(446).M;
 const MetaRichPreviewLoading = REQ_(707).a;
@@ -30500,7 +30515,7 @@ class MetaRichpreview extends ConversationMessageMixin {
   }
 }
 
-;// CONCATENATED MODULE: ./js/chat/ui/messages/types/partials/metaRichpreviewConfirmation.jsx
+;// ./js/chat/ui/messages/types/partials/metaRichpreviewConfirmation.jsx
 const metaRichpreviewConfirmation_React = REQ_(594);
 const metaRichpreviewConfirmation_ConversationMessageMixin = REQ_(446).M;
 class MetaRichprevConfirmation extends metaRichpreviewConfirmation_ConversationMessageMixin {
@@ -30577,7 +30592,7 @@ class MetaRichprevConfirmation extends metaRichpreviewConfirmation_ConversationM
   }
 }
 
-;// CONCATENATED MODULE: ./js/chat/ui/messages/types/partials/geoLocation.jsx
+;// ./js/chat/ui/messages/types/partials/geoLocation.jsx
 
 function GeoLocation(props) {
   const {
@@ -30626,7 +30641,7 @@ function GeoLocation(props) {
 const geoLocation = GeoLocation;
 // EXTERNAL MODULE: ./js/chat/ui/messages/types/partials/metaRichPreviewLoading.jsx
 const metaRichPreviewLoading = REQ_(707);
-;// CONCATENATED MODULE: ./js/chat/ui/messages/types/partials/metaRichpreviewMegaLinks.jsx
+;// ./js/chat/ui/messages/types/partials/metaRichpreviewMegaLinks.jsx
 
 
 
@@ -30794,7 +30809,7 @@ class MetaRichpreviewMegaLinks extends mixin.M {
 const typingArea = REQ_(795);
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
 const perfectScrollbar = REQ_(486);
-;// CONCATENATED MODULE: ./js/chat/ui/messages/types/text.jsx
+;// ./js/chat/ui/messages/types/text.jsx
 
 
 
@@ -31064,7 +31079,7 @@ class Text extends AbstractGenericMessage {
 }
 // EXTERNAL MODULE: ./js/chat/ui/gifPanel/gifPanel.jsx + 3 modules
 const gifPanel = REQ_(691);
-;// CONCATENATED MODULE: ./js/chat/ui/messages/types/giphy.jsx
+;// ./js/chat/ui/messages/types/giphy.jsx
 
 
 
@@ -31165,7 +31180,7 @@ class Giphy extends AbstractGenericMessage {
     });
   }
 }
-;// CONCATENATED MODULE: ./js/chat/ui/messages/generic.jsx
+;// ./js/chat/ui/messages/generic.jsx
 
 
 
@@ -32249,7 +32264,7 @@ const mixins = REQ_(137);
 const emojiDropdown = REQ_(844);
 // EXTERNAL MODULE: ./js/ui/buttons.jsx
 const ui_buttons = REQ_(994);
-;// CONCATENATED MODULE: ./js/chat/ui/emojiAutocomplete.jsx
+;// ./js/chat/ui/emojiAutocomplete.jsx
 
 const React = REQ_(594);
 
@@ -32468,7 +32483,7 @@ EmojiAutocomplete.defaultProps = {
 const gifPanel = REQ_(691);
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
 const perfectScrollbar = REQ_(486);
-;// CONCATENATED MODULE: ./js/chat/ui/typingArea.jsx
+;// ./js/chat/ui/typingArea.jsx
 
 let _dec, _class;
 
@@ -34228,7 +34243,7 @@ const esm_extends = REQ_(168);
 const applyDecoratedDescriptor = REQ_(793);
 // EXTERNAL MODULE: ./js/ui/perfectScrollbar.jsx
 const perfectScrollbar = REQ_(486);
-;// CONCATENATED MODULE: ./js/ui/jsx/megaList/megaList2.jsx
+;// ./js/ui/jsx/megaList/megaList2.jsx
 
 
 let _dec, _class;
@@ -34570,7 +34585,7 @@ const MegaList2 = (_dec = (0,mixins.hG)(30, true), _class = class MegaList2 exte
 }, (0,applyDecoratedDescriptor.A)(_class.prototype, "onPsUserScroll", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "onPsUserScroll"), _class.prototype), _class);
 // EXTERNAL MODULE: ./js/ui/jsx/fm/nodes/genericNodePropsComponent.jsx + 1 modules
 const genericNodePropsComponent = REQ_(984);
-;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/genericGrid.jsx
+;// ./js/ui/jsx/fm/nodes/genericGrid.jsx
 
 
 class GenericGrid extends genericNodePropsComponent.B {
@@ -34642,7 +34657,7 @@ class GenericGrid extends genericNodePropsComponent.B {
     }, this.nodeProps.title));
   }
 }
-;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/genericTable.jsx
+;// ./js/ui/jsx/fm/nodes/genericTable.jsx
 
 
 
@@ -34743,7 +34758,7 @@ class GenericTable extends genericNodePropsComponent.B {
     }, columns);
   }
 }
-;// CONCATENATED MODULE: ./js/ui/jsx/megaList/adapters.jsx
+;// ./js/ui/jsx/megaList/adapters.jsx
 
 
 class GenericListAdapter extends mixins.w9 {
@@ -34814,7 +34829,7 @@ Table.itemsPerRow = 1;
 Table.containerClassName = "grid-scrolling-table megaListContainer";
 // EXTERNAL MODULE: ./js/ui/jsx/fm/nodes/columns/columnFavIcon.jsx
 const columnFavIcon = REQ_(161);
-;// CONCATENATED MODULE: ./js/ui/tooltips.jsx
+;// ./js/ui/tooltips.jsx
 const React = REQ_(594);
 
 class Handler extends mixins.w9 {
@@ -34970,7 +34985,7 @@ const tooltips = {
   Handler,
   Contents
 };
-;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnNodeName.jsx
+;// ./js/ui/jsx/fm/nodes/columns/columnNodeName.jsx
 
 
 
@@ -35034,7 +35049,7 @@ class ColumnNodeName extends genericNodePropsComponent.B {
 ColumnNodeName.sortable = true;
 ColumnNodeName.id = 'name';
 ColumnNodeName.megatype = 'fname';
-;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnSize.jsx
+;// ./js/ui/jsx/fm/nodes/columns/columnSize.jsx
 
 
 class ColumnSize extends genericNodePropsComponent.B {
@@ -35054,7 +35069,7 @@ class ColumnSize extends genericNodePropsComponent.B {
 ColumnSize.sortable = true;
 ColumnSize.id = "size";
 ColumnSize.megatype = "size";
-;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnTimeAdded.jsx
+;// ./js/ui/jsx/fm/nodes/columns/columnTimeAdded.jsx
 
 
 class ColumnTimeAdded extends genericNodePropsComponent.B {
@@ -35074,7 +35089,7 @@ class ColumnTimeAdded extends genericNodePropsComponent.B {
 ColumnTimeAdded.sortable = true;
 ColumnTimeAdded.id = "ts";
 ColumnTimeAdded.megatype = "timeAd";
-;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/columns/columnExtras.jsx
+;// ./js/ui/jsx/fm/nodes/columns/columnExtras.jsx
 
 
 class ColumnExtras extends genericNodePropsComponent.B {
@@ -35096,7 +35111,7 @@ ColumnExtras.id = "extras";
 ColumnExtras.label = "";
 ColumnExtras.megatype = "extras";
 ColumnExtras.headerClassName = "grid-url-header";
-;// CONCATENATED MODULE: ./js/ui/jsx/fm/browserEntries.jsx
+;// ./js/ui/jsx/fm/browserEntries.jsx
 
 
 
@@ -35522,7 +35537,7 @@ BrowserEntries.defaultProps = {
   'hideable': true,
   'requiresUpdateOnResize': true
 };
-;// CONCATENATED MODULE: ./js/ui/jsx/fm/fmView.jsx
+;// ./js/ui/jsx/fm/fmView.jsx
 
 
 
@@ -35928,7 +35943,7 @@ REQ_.d(EXP_, {
 
 // EXTERNAL MODULE: ./js/chat/mixins.js
 const mixins = REQ_(137);
-;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/nodeProperties.jsx
+;// ./js/ui/jsx/fm/nodes/nodeProperties.jsx
 class NodeProperties {
   static get(node, changeListener) {
     assert(node.h, 'missing handle for node');
@@ -36105,7 +36120,7 @@ NodeProperties.MAX_CACHE_SIZE = 100;
 if (d) {
   window.NodeProperties = NodeProperties;
 }
-;// CONCATENATED MODULE: ./js/ui/jsx/fm/nodes/genericNodePropsComponent.jsx
+;// ./js/ui/jsx/fm/nodes/genericNodePropsComponent.jsx
 
 
 class GenericNodePropsComponent extends mixins.w9 {
@@ -36208,7 +36223,7 @@ REQ_.d(EXP_, {
 const utils = REQ_(314);
 // EXTERNAL MODULE: ./js/chat/mixins.js
 const mixins = REQ_(137);
-;// CONCATENATED MODULE: ./js/ui/forms.jsx
+;// ./js/ui/forms.jsx
 const React = REQ_(594);
 
 class Checkbox extends mixins.w9 {
@@ -36258,7 +36273,7 @@ class Checkbox extends mixins.w9 {
 const ui_forms = {
   Checkbox
 };
-;// CONCATENATED MODULE: ./js/ui/modalDialogs.jsx
+;// ./js/ui/modalDialogs.jsx
 const modalDialogs_React = REQ_(594);
 
 

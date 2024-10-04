@@ -3026,8 +3026,9 @@ export class ConversationPanels extends MegaRenderMixin {
 
         return (
             <div className="conversation-panels">
-                {routingSection === 'contacts' || notificationsPermissions === 'granted' ?
+                {routingSection === 'contacts' ?
                     null :
+                    window.Notification && notificationsPermissions !== 'granted' &&
                     <>
                         {notificationsPermissions === 'default' && this.renderNotificationsPending()}
                         {notificationsPermissions === 'denied' && this.renderNotificationsBlocked()}

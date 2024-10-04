@@ -453,22 +453,21 @@ var ChatNotifications = function(megaChat, options) {
     };
 
     if (!is_chatlink && mega.pendingServiceWorkerHandler) {
-
         // Process the pending messages when chat has finished loading.
         megaChat.rebind('onInit.swPending', SoonFc(500, () => {
             megaChat.off('onInit.swPending');
-
             const msg = mega.pendingServiceWorkerMsgs;
+            if (msg) {
+                for (let i = 0; i < msg.length; i++) {
+                    const data = msg[i];
+                    serviceWorkerHandler({ data });
+                }
+                navigator.serviceWorker.addEventListener('message', serviceWorkerHandler);
+                navigator.serviceWorker.removeEventListener('message', mega.pendingServiceWorkerHandler);
 
-            for (let i = 0; i < msg.length; i++) {
-                const data = msg[i];
-                serviceWorkerHandler({data});
+                delete mega.pendingServiceWorkerMsgs;
+                delete mega.pendingServiceWorkerHandler;
             }
-            navigator.serviceWorker.addEventListener('message', serviceWorkerHandler);
-            navigator.serviceWorker.removeEventListener('message', mega.pendingServiceWorkerHandler);
-
-            delete mega.pendingServiceWorkerMsgs;
-            delete mega.pendingServiceWorkerHandler;
         }));
     }
 };

@@ -26,6 +26,7 @@ export const ConversationsList = ({ conversations, className, children }) =>
                 <ConversationsListItem
                     key={chatRoom.roomId}
                     chatRoom={chatRoom}
+                    {...(chatRoom.type === 'private' && { contact: M.u[chatRoom.getParticipantsExceptMe()[0]] })}
                 />
             )}
         </ul>

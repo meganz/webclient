@@ -19092,10 +19092,12 @@ const ConversationsList = ({
                 conversations-pane
                 ${className || ''}
             `
-}, children || conversations.map(chatRoom => chatRoom.roomId && REaCt().createElement(ConversationsListItem, {
+}, children || conversations.map(chatRoom => chatRoom.roomId && REaCt().createElement(ConversationsListItem, (0,esm_extends.A)({
   key: chatRoom.roomId,
   chatRoom
-}))));
+}, chatRoom.type === 'private' && {
+  contact: M.u[chatRoom.getParticipantsExceptMe()[0]]
+})))));
 const Chats = ({
   conversations,
   onArchivedClicked,

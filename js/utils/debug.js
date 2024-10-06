@@ -344,7 +344,7 @@ mBroadcaster.once('boot_done', function radSetup() {
     localStorage.d = d |= 1;
     localStorage.minLogLevel |= 0;
 
-    if (Date.now() < 173e10) {
+    if (Date.now() < 174e10) {
         localStorage.chatdLogger = 1;
     }
     else if (d) {

@@ -77,11 +77,15 @@ mobile.proSignupPrompt = {
             // They don't want to continue with the Registration/Login so remove the flag
             sessionStorage.removeItem('proPageContinuePlanNum');
 
-            // Hide the dialog
-            $dialog.addClass('hidden').removeClass('overlay');
-
-            // Enabled scroll again and scroll to previous position
-            self.restoreScrollPosition();
+            if (String(page).startsWith('propay')) {
+                // Load the pro page if on propay page
+                loadSubPage('pro');
+            }
+            else {
+                // Otherwise hide the dialog and scroll to previous position
+                self.$dialog.addClass('hidden').removeClass('overlay');
+                self.restoreScrollPosition();
+            }
 
             // Prevent any additional clicks
             return false;

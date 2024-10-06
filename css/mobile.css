@@ -4294,7 +4294,7 @@ div.checkboxOn {
 
 .mobile.loginrequired-dialog {
     position: fixed;
-    z-index: 100;
+    z-index: 101;
     background-color: rgba(250, 250, 250, 0.95);
     left: 0;
     top: 0;

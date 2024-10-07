@@ -104,7 +104,10 @@ class ScheduledMeeting {
         this.occurrences = new MegaDataMap();
         this.nextOccurrenceStart = this.start;
         this.nextOccurrenceEnd = this.end;
-        this.isPast = (this.isRecurring ? this.recurring.end : this.end) < Date.now();
+        // Recurring meeting with all of its occurrences in the past and end date that is still in the future.
+        // See `setNextOccurrence`.
+        this.isCompleted = false;
+
         this.ownerHandle = meetingInfo.u;
         this.chatRoom = meetingInfo.chatRoom;
         this.chatRoom.scheduledMeeting = this.isRoot ? this : this.parent;
@@ -122,8 +125,12 @@ class ScheduledMeeting {
         return !!this.canceled;
     }
 
+    get isPast() {
+        return (this.isRecurring ? this.recurring.end : this.end) < Date.now();
+    }
+
     get isUpcoming() {
-        return !this.isCanceled && !this.isPast && this.chatRoom.members[u_handle] >= 0;
+        return !(this.isCanceled || this.isPast || this.isCompleted);
     }
 
     get isRecurring() {
@@ -146,15 +153,12 @@ class ScheduledMeeting {
     }
 
     setNextOccurrence() {
-        if (!this.didFetchOccurrences) {
-            return;
-        }
         const upcomingOccurrences = Object.values(this.occurrences).filter(o => o.isUpcoming);
 
         if (!upcomingOccurrences || !upcomingOccurrences.length) {
             // We consider the recurring meeting as a past meeting once its last occurrence had passed, i.e.
             // irrespective of the meeting's recurrence end date.
-            this.isPast = this.isRecurring || this.end < Date.now();
+            this.isCompleted = this.isRecurring;
             return;
         }
 
@@ -180,7 +184,6 @@ class ScheduledMeeting {
         }
 
         const occurrences = await asyncApiReq(req);
-        this.didFetchOccurrences = true;
         if (Array.isArray(occurrences)) {
             if (!options) {
                 this.occurrences.clear();

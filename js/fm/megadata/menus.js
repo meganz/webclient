@@ -233,8 +233,9 @@ MegaData.prototype.menuItems = async function menuItems(isTree) {
             }
 
             // This is just to make sure the source root is on the cloud drive
-            if (mega.rewind && sourceRoot === M.RootID && !!mega.rewind.contextMenu) {
+            if (mega.rewind && sourceRoot === M.RootID) {
                 items['.rewind-item'] = 1;
+                mega.rewind.bindContextMenu();
             }
         }
         else {
@@ -788,9 +789,9 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
                         $(menuCMI).filter('.folderupload-item').removeClass('hidden');
                     }
 
-                    if (nodeRoot !== 's4' && mega.rewind && !!mega.rewind.contextMenu
-                        && mega.rewind.permittedRoots[M.currentrootid]) {
+                    if (nodeRoot !== 's4' && mega.rewind && mega.rewind.permittedRoots[M.currentrootid]) {
                         $(menuCMI).filter('.rewind-item').removeClass('hidden');
+                        mega.rewind.bindContextMenu();
                     }
                     // Flag added for share folder while on it at context menu
                     if (mega.flags.ab_ctxmenu_shares) {
@@ -1033,8 +1034,9 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
             else {
                 flt += ',.findupes-item';
 
-                if (mega.rewind && !!mega.rewind.contextMenu) {
+                if (mega.rewind) {
                     flt += ',.rewind-item';
+                    mega.rewind.bindContextMenu();
                 }
             }
             if (M.v.length && folderlink) {

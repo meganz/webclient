@@ -1001,7 +1001,7 @@ FileManager.prototype.initFileManagerUI = function() {
         }
         var $target = $(e.target);
         var exclude = '.upgradelink, .campaign-logo, .resellerbuy, .linkified, '
-            + 'a.red, a.mailto, a.top-social-button, .notif-help, .vpn-link';
+            + 'a.red, a.mailto, a.top-social-button, .notif-help, .vpn-link, a.extlink';
 
         if ($target.attr('type') !== 'file'
             && !$target.is(exclude)

@@ -2196,7 +2196,7 @@ var notify = {
     checkForNotifUpdates() {
         'use strict';
 
-        if (!notificationBanner.bannerInited) {
+        if (!u_attr.notifs || !notificationBanner.bannerInited) {
             return;
         }
 

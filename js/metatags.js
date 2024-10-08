@@ -13,7 +13,7 @@ mega.metatags = new function() {
             'discount', 'download', 'emailverify', 'key', 'filerequest', 'payment', 'recover',
             'recoverybykey', 'recoverybypark', 'recoveryenterkey',
             'recoverykeychangepass', 'recoveryparkchangepass',
-            'redeem', 'repay', 'reset', 'sms', 'special', 'start', 'test', 'thanks', 'twofactor',
+            'redeem', 'repay', 'reset', 'sms', 'start', 'test', 'thanks', 'twofactor',
             'unsub', 'verify', 'voucher', 'wiretransfer'
         ];
 
@@ -332,19 +332,6 @@ mega.metatags = new function() {
             mTags.en_desc = 'Get support';
             mTags.mega_title = l.support_meta_tag || mTags.en_title;
             mTags.mega_desc = l[516] || mTags.en_desc;
-        }
-        else if (page.startsWith('special')) {
-            mTags.mega_title = 'Special - MEGA';
-            mTags.mega_desc = 'MEGA\'s Special Page';
-
-            if (page.endsWith('/pro')) {
-                mTags.mega_title = 'Special - PRO - MEGA';
-            }
-            else if (page.endsWith('/business')) {
-                mTags.mega_title = 'Special - Business - MEGA';
-            }
-
-            stopBots(metaRobots);
         }
         else if (page && (mTags.excluded = isPageExcluded(page))) {
             mTags.mega_title = page.charAt(0).toUpperCase() + page.slice(1) + ' - MEGA';

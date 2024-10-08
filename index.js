@@ -1422,8 +1422,7 @@ function init_page() {
         mega.redirect('mega.io', 'refer', false, false);
     }
     else if (page.substring(0, 7) === 'special') {
-        parsepage(pages.special);
-        troyhuntCampaign.init();
+        mega.redirect('mega.io', 'pricing', false, false);
     }
     else if (page === 'extensions' || page === 'chrome' || page === 'firefox' || page === 'edge' || page === 'plugin') {
         mega.redirect('mega.io', 'extensions', false, false);

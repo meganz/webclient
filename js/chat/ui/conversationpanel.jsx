@@ -2985,7 +2985,7 @@ export class ConversationPanels extends MegaRenderMixin {
 
         megaChat.chats.forEach(chatRoom => {
             const { scheduledMeeting } = chatRoom;
-            if (scheduledMeeting && scheduledMeeting.isUpcoming && scheduledMeeting.isRecurring) {
+            if (scheduledMeeting && !scheduledMeeting.isPast && scheduledMeeting.isRecurring) {
                 scheduledMeeting.getOccurrences().catch(nop);
             }
         });
@@ -3026,8 +3026,9 @@ export class ConversationPanels extends MegaRenderMixin {
 
         return (
             <div className="conversation-panels">
-                {routingSection === 'contacts' || notificationsPermissions === 'granted' ?
+                {routingSection === 'contacts' ?
                     null :
+                    window.Notification && notificationsPermissions !== 'granted' &&
                     <>
                         {notificationsPermissions === 'default' && this.renderNotificationsPending()}
                         {notificationsPermissions === 'denied' && this.renderNotificationsBlocked()}

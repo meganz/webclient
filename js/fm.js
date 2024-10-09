@@ -627,6 +627,29 @@ function fmtopUI() {
         }
     }
 
+    /**
+     * Initialise the Rewind header button functionality in case of Rewindable folders
+     * Retries management in case mega.rewind not yet loaded
+     * @param {Number} cur - current attempt number
+     * @param {Number} max - max number of attempts before giving up
+     */
+    const initRewindHeaderButton = (cur = 0, max = 3) => {
+        if (mega.rewind) {
+            if (M.getSelectedSourceRoot() === M.RootID && M.currentrootid === M.RootID) {
+                mega.rewind.bindHeaderButton();
+            }
+            else {
+                mega.rewind.unbindHeaderButton();
+            }
+        }
+        else if (cur < max) {
+            // this is needed on first webclient load of rewindable empty folders
+            delay('fm-header:rewind-btn', () => initRewindHeaderButton(cur + 1, max), 1e3);
+        }
+    };
+
+    initRewindHeaderButton();
+
     $('.shares-tab-lnk.active', $sharesTabBlock).removeClass('active');
     $('.gallery-tab-lnk.active', $galleryTabBlock).removeClass('active');
 
@@ -682,6 +705,8 @@ function fmtopUI() {
                 mega.config.set('dsmRubRwd', 1);
                 $rewindNotification.addClass('hidden');
             });
+
+            $('.learn-more a', $rewindNotification).rebind('click.rnb-lm', () => eventlog(500528));
         }
 
         $('.fm-right-files-block').addClass('rubbish-bin visible-notification');

@@ -592,9 +592,7 @@ var slideshowid;
             $(window).off('blur.slideshowLoseFocus');
             slideshowsteps(); // update x of y counter
 
-            if (is_mobile) {
-                M.noSleep(true).catch(dump);
-            }
+            M.noSleep(true).catch(dump);
 
             return false;
         }
@@ -630,9 +628,10 @@ var slideshowid;
             $prevNextButtons.addClass('hidden');
             zoom_mode = false;
 
+            M.noSleep().catch(dump);
+
             if (is_mobile) {
                 eventlog(99835);
-                M.noSleep().catch(dump);
                 if (is_ios) {
                     // Due to the handling of the onload event with the previous image in iOS,
                     // force the call to img position
@@ -1134,9 +1133,9 @@ var slideshowid;
             mBroadcaster.sendMessage('slideshow:close');
             slideshow_freemem();
             $(window).off('blur.slideshowLoseFocus');
+            M.noSleep(true).catch(dump);
 
             if (is_mobile) {
-                M.noSleep(true).catch(dump);
                 if (mega.ui.viewerOverlay) {
                     mega.ui.viewerOverlay.hide();
                 }

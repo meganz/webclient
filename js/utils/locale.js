@@ -1751,7 +1751,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A]', '</a>');
 
     const rewindHelpLink = 'https://help.mega.io/files-folders/rewind/how-do-i-use-rewind';
-    const rewindLinkAttr = 'target="_blank" class="clickurl" rel="noopener noreferrer"';
+    const rewindLinkAttr = 'target="_blank" class="extlink" rel="noopener noreferrer"';
     l.rewind_upg_content_free = escapeHTML(l.rewind_upg_content_free)
         .replace('[A]', `<a ${rewindLinkAttr} href="${rewindHelpLink}">`)
         .replace('[/A]', '</a>')
@@ -1765,7 +1765,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A]', '</a>')
         .replace('[BR]', '<br />');
     l.new_feature_rewind_learn_more = escapeHTML(l.new_feature_rewind_learn_more)
-        .replace('[A]', `<a ${rewindLinkAttr} href="${rewindHelpLink}" data-eventid="500528">`)
+        .replace('[A]', `<a ${rewindLinkAttr} href="${rewindHelpLink}">`)
         .replace('[/A]', '</a>');
 
     l.two_fa_download_app = escapeHTML(l.two_fa_download_app)

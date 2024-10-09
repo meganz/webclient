@@ -26,6 +26,7 @@ export const ConversationsList = ({ conversations, className, children }) =>
                 <ConversationsListItem
                     key={chatRoom.roomId}
                     chatRoom={chatRoom}
+                    {...(chatRoom.type === 'private' && { contact: M.u[chatRoom.getParticipantsExceptMe()[0]] })}
                 />
             )}
         </ul>
@@ -230,6 +231,7 @@ export class Meetings extends MegaRenderMixin {
                     c.isMeeting &&
                     c.scheduledMeeting &&
                     c.scheduledMeeting.isUpcoming &&
+                    c.iAmInRoom() &&
                     !c.havePendingCall()
                 );
             })
@@ -308,12 +310,15 @@ export class Meetings extends MegaRenderMixin {
     Past = () => {
         const conversations = Object.values(this.props.conversations || {});
         const pastMeetings = conversations
-            .filter(c =>
-                c.isMeeting &&
-                c.isDisplayable() &&
-                (!c.scheduledMeeting || c.scheduledMeeting.isCanceled || c.scheduledMeeting.isPast) &&
-                !c.havePendingCall()
-            )
+            .filter(c => {
+                const { isCanceled, isPast, isCompleted } = c.scheduledMeeting || {};
+                return (
+                    c.isMeeting &&
+                    c.isDisplayable() &&
+                    (!c.scheduledMeeting || isCanceled || isPast || isCompleted) &&
+                    !c.havePendingCall()
+                );
+            })
             .sort(M.sortObjFn(c => c.lastActivity || c.ctime, -1));
         const archivedMeetings = conversations
             .filter(c => c.isMeeting && c.isArchived())

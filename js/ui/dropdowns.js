@@ -1,11 +1,12 @@
 /**
  * bindDropdownEvents Bind custom select event
  *
- * @param {Selector} $select  Class .dropdown elements selector
- * @param {String}   saveOption Addition option for account page only. Allows to show "Show changes" notification
- * @param {String}   classname/id of  content block for dropdown aligment
+ * @param {jQuery} $select  Class .dropdown elements selector
+ * @param {String}   [saveOption] Addition option for account page only. Allows to show "Show changes" notification
+ * @param {String}   [contentBlock] id of  content block for dropdown aligment
+ * @param {Object} [psOptions] options for the perfect scrollbar.
  */
-function bindDropdownEvents($select, saveOption, contentBlock) {
+function bindDropdownEvents($select, saveOption, contentBlock, psOptions) {
     'use strict';
 
     var $dropdownItem = $('.option', $select);
@@ -32,6 +33,7 @@ function bindDropdownEvents($select, saveOption, contentBlock) {
             $dropdown.addClass('hidden').removeAttr('style');
             $contentBlock.unbind('mousedown.closeInputDropdown');
             $hiddenInput.trigger('blur');
+            $this.closest('.ps').off('scroll.dropdownpos');
         };
 
         if ($this.hasClass('disabled')) {
@@ -56,18 +58,30 @@ function bindDropdownEvents($select, saveOption, contentBlock) {
             $('.option.active', $this).removeClass('active');
             $activeDropdownItem.addClass('active');
             $dropdown.removeClass('hidden');
+            const $parentPs = $this.closest('.ps');
 
             // For case select is located under overflow none element, to avoid it is hidden under overflow
-            if ($this.closest('.ps').length) {
+            if ($parentPs.length) {
 
                 $dropdown.css('min-width', $this.width() + 18);
-
-                $dropdown.position({
-                    of: $this,
-                    my: 'left-9 top-7',
-                    at: 'left top',
-                    collision: 'flipfit'
-                });
+                const position = () => {
+                    $dropdown.position({
+                        of: $this,
+                        my: 'left-9 top-7',
+                        at: 'left top',
+                        collision: 'flipfit'
+                    });
+                };
+                position();
+                $parentPs.rebind('scroll.dropdownpos', () => requestAnimationFrame(() => {
+                    const { top, bottom } = $select[0].getBoundingClientRect();
+                    if (top >= 0 && bottom <= $parentPs[0].clientHeight) {
+                        position();
+                    }
+                    else {
+                        closeDropdown();
+                    }
+                }));
             }
 
             $hiddenInput.trigger('focus');
@@ -117,7 +131,7 @@ function bindDropdownEvents($select, saveOption, contentBlock) {
                     Ps.destroy($scrollBlock[0]);
                 }
 
-                Ps.initialize($scrollBlock[0]);
+                Ps.initialize($scrollBlock[0], psOptions);
 
                 if ($activeDropdownItem.length) {
                     $scrollBlock.scrollTop($activeDropdownItem.position().top);

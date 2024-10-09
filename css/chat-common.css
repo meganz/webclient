@@ -1392,6 +1392,7 @@ button.fm-empty-button {
     background: var(--surface-main);
     box-shadow: var(--dropdown-shadow);
     width: 320px;
+    z-index: 2100;
 }
 .dropdown.input-sources div {
     width: 100%;

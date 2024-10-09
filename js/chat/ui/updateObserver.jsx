@@ -37,6 +37,12 @@ export const withUpdateObserver = Component =>
         }
 
         render() {
-            return <Component ref={this.instanceRef} {...this.props} />;
+            return (
+                <Component
+                    ref={this.instanceRef}
+                    {...this.state}
+                    {...this.props}
+                />
+            );
         }
     };

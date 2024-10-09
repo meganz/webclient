@@ -2899,9 +2899,6 @@ else if (!browserUpdate) {
         'business_invoice': {f:'html/invoicePDF.html', n: 'business_invoice', j:0},
         'codemirror_js': {f:'js/vendor/codemirror.js', n: 'codemirror_js', j:1},
         'codemirrorscroll_js': {f:'js/vendor/simplescrollbars.js', n: 'codemirrorscroll_js', j:1},
-        'special': {f:'html/troy-hunt.html', n:'special', j:0},
-        'special_js': {f:'html/js/troy-hunt.js', n:'special_js', j:1},
-        'special_css': {f:'css/troy-hunt.css', n:'special_css', j:2},
         'reportabuse_js': {f:'js/ui/reportAbuse.js', n:'reportabuse_js', j:1},
         'folderlink_css':{f:'css/folder-link.css', n: 'folderlink_css', j: 2, w: 5, c: 1, d: 1, cache: 1},
         'time_checker_js': {f:'js/time_checker.js', n:'time_checker_js', j:1},
@@ -3025,7 +3022,6 @@ else if (!browserUpdate) {
         'unsub': ['unsub', 'unsub_js'],
         'developersettings': ['developersettings', 'developersettings_js'],
         'filerequest': ['filerequest', 'filerequest_upload_js'],
-        'special': ['special', 'special_js', 'special_css']
     };
 
     if (is_mobile) {

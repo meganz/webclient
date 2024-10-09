@@ -48,94 +48,8 @@ lazy(mega, 'rewind', () => {
     const TRIGGER_FOLDER_CONTEXT_MENU = 2;
     const TRIGGER_SIDEBAR_CONTEXT_MENU = 3;
 
-    class FileRequestContextMenu {
-        constructor() {
-            this.$contextMenu = $('.dropdown.body.context', document.body);
-            this.$rewindButton = $('.dropdown-item.rewind-item', this.$contextMenu);
-            const clickEventNamespace = 'click.rewind';
-
-            this.$rewindButton.off(clickEventNamespace).on(clickEventNamespace, () => {
-
-                if (M.isInvalidUserStatus()) {
-                    eventlog(500469);
-                    return;
-                }
-
-                if (mega.rewindUtils.reinstate.inProgress) {
-                    eventlog(500469);
-                    M.openFolder(mega.rewind.selectedHandle, true);
-                    return;
-                }
-
-                let selectedHandle = $.selected.length && $.selected[0] || M.currentdirid;
-
-                if (mega.rewind.permittedRoots[M.currentrootid]
-                    && M.currentCustomView && M.currentCustomView.nodeID) {
-                    selectedHandle = M.currentCustomView.nodeID;
-                }
-
-                const nodeRoot = M.getNodeRoot(selectedHandle);
-                let redirect = false;
-                let redirectFolderHandle = selectedHandle;
-
-                // If not on cloud drive
-                if (nodeRoot === M.RootID) {
-
-                    if (M.currentrootid !== nodeRoot) {
-                        redirect = true;
-                        redirectFolderHandle = selectedHandle;
-                    }
-                    // We know the currentdirid is not same as the slected one
-                    else if (selectedHandle !== M.currentdirid) {
-                        const nodeParent = M.getNodeParent(selectedHandle);
-                        if (mega.rewindUi.sidebar.active) {
-                            if (nodeParent && nodeParent !== M.currentdirid) {
-                                redirect = true;
-                            }
-                        }
-                        else {
-                            redirect = true;
-                        }
-                    }
-                    // If we are in gallery mode on same folder
-                    else if (M.gallery) {
-                        redirect = true;
-                        M.gallery = false;
-                        // return to list view
-                        if (fmconfig.uiviewmode | 0) {
-                            mega.config.set('viewmode', 0);
-                        }
-                        else {
-                            fmviewmode(M.currentdirid, 0);
-                        }
-                    }
-                }
-
-                if (redirect) {
-                    mega.rewind.folderRedirect = selectedHandle;
-                    eventlog(500469);
-                    M.openFolder(redirectFolderHandle, true);
-                    return;
-                }
-
-                eventlog(500469);
-                mega.rewind.openSidebar(null, selectedHandle)
-                    .then(() => {
-                        const eventData = mega.rewind.getOpenSidebarEventData(selectedHandle);
-                        if (eventData) {
-                            eventlog(500001, eventData);
-                        }
-                    })
-                    .catch(tell);
-            });
-        }
-    }
-
     return new class Rewind {
         constructor() {
-            /** @property mega.rewind.contextMenu */
-            lazy(this, 'contextMenu', () => new FileRequestContextMenu);
-
             this.ACCOUNT_TYPE_FREE = ACCOUNT_TYPE_FREE;
             this.ACCOUNT_TYPE_PRO_LITE = ACCOUNT_TYPE_PRO_LITE;
             this.ACCOUNT_TYPE_PRO = ACCOUNT_TYPE_PRO;
@@ -1913,6 +1827,105 @@ lazy(mega, 'rewind', () => {
                     node.tvb -= tvb;
                 }
             }
+        }
+
+        bindContextMenu() {
+            $('.dropdown-item.rewind-item', '.dropdown.body.context')
+                .rebind('click.rewind.contextMenu', () => this._startOnEvent(500469, true));
+        }
+
+        bindHeaderButton() {
+            $('.action.fm-rewind', '.fm-header-buttons')
+                .removeClass('hidden')
+                .rebind('click.rewind.header', () => this._startOnEvent(500527));
+        }
+
+        unbindHeaderButton() {
+            $('.action.fm-rewind', '.fm-header-buttons')
+                .addClass('hidden')
+                .unbind('click.rewind.header');
+        }
+
+        /**
+         * Handles start of rewind UI (sidebar) after an event is triggered
+         * @param {Number} eventId - Event ID
+         * @param {Boolean} isInitialNodeAllowed - Whether rewind can be initiated on a inital node
+         *                                         In case "false" current folder will be used as default node
+         * @returns {void}
+         */
+        _startOnEvent(eventId, isInitialNodeAllowed) {
+            if (eventId) {
+                eventlog(eventId);
+            }
+
+            if (M.isInvalidUserStatus()) {
+                return;
+            }
+
+            if (mega.rewindUtils.reinstate.inProgress) {
+                M.openFolder(mega.rewind.selectedHandle, true);
+                return;
+            }
+
+            let selectedHandle = $.selected.length && $.selected[0] || M.currentdirid;
+
+            if (mega.rewind.permittedRoots[M.currentrootid]
+                && M.currentCustomView && M.currentCustomView.nodeID) {
+                selectedHandle = M.currentCustomView.nodeID;
+            }
+
+            const node = M.getNodeByHandle(selectedHandle);
+
+            // If no initial node allowed OR the selected node is not a folder, force current folder to be selected
+            if (!isInitialNodeAllowed || !node.t) {
+                selectedHandle = M.currentdirid;
+            }
+
+            if (this._isRedirect(selectedHandle)) {
+                mega.rewind.folderRedirect = selectedHandle;
+                M.openFolder(selectedHandle, true);
+                return;
+            }
+
+            mega.rewind.openSidebar(null, selectedHandle)
+                .then(() => {
+                    const eventData = mega.rewind.getOpenSidebarEventData(selectedHandle);
+                    if (eventData) {
+                        eventlog(500001, eventData);
+                    }
+                })
+                .catch(tell);
+        }
+
+        /**
+         * Returns true whether redirect must be done
+         * @param {String} selectedHandle - current selected handle
+         * @returns {Boolean}
+         */
+        _isRedirect(selectedHandle) {
+            const nodeRoot = M.getNodeRoot(selectedHandle);
+            if (nodeRoot === M.RootID) {
+                if (nodeRoot !== M.currentrootid) {
+                    return true;
+                }
+
+                if (selectedHandle !== M.currentdirid) {
+                    const nodeParent = M.getNodeParent(selectedHandle);
+                    return mega.rewindUi.sidebar.active ? M.currentdirid !== nodeParent : true;
+                }
+
+                if (M.gallery) {
+                    M.gallery = false;
+                    if (fmconfig.uiviewmode | 0) {
+                        mega.config.set('viewmode', 0);
+                    }
+                    else {
+                        fmviewmode(M.currentdirid, 0);
+                    }
+                    return true;
+                }
+            }
+            return false;
         }
     };
 });

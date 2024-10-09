@@ -68,6 +68,13 @@
     align-items: center;
     transition: 200ms linear;
 }
+.fm-header-buttons .link-button.dropdown {
+    border-radius: 4px;
+}
+
+.fm-header-buttons .link-button.dropdown:hover:not(.disabled) {
+    background: var(--button-hover);
+}
 .fm-breadcrumbs-block {
     height: 36px;
     overflow: hidden;

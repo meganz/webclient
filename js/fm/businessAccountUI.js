@@ -2049,7 +2049,7 @@ BusinessAccountUI.prototype.viewAdminDashboardAnalysisUI = function() {
                 populateBarChart(st, res, $activeMonthDropdown.hasClass('transfer'), selectedDate);
             });
         });
-        bindDropdownEvents($monthDropdown);
+        bindDropdownEvents($monthDropdown, undefined, undefined, { wheelPropagation: false });
     };
 
     const quotasPromise = this.business.getQuotaUsage();

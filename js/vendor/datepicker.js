@@ -339,20 +339,17 @@
                 case 'days':
                     this.date = new Date(d.year, d.month + 1, 1);
                     if (o.onChangeMonth) o.onChangeMonth(this.parsedDate.month, this.parsedDate.year);
-                    this.update();
-                    this._triggerOnChange();
+                    this.reflow();
                     break;
                 case 'months':
                     this.date = new Date(d.year + 1, d.month, 1);
                     if (o.onChangeYear) o.onChangeYear(this.parsedDate.year);
-                    this.update();
-                    this._triggerOnChange();
+                    this.reflow();
                     break;
                 case 'years':
                     this.date = new Date(d.year + 10, 0, 1);
                     if (o.onChangeDecade) o.onChangeDecade(this.curDecade);
-                    this.update();
-                    this._triggerOnChange();
+                    this.reflow();
                     break;
             }
         },
@@ -364,20 +361,17 @@
                 case 'days':
                     this.date = new Date(d.year, d.month - 1, 1);
                     if (o.onChangeMonth) o.onChangeMonth(this.parsedDate.month, this.parsedDate.year);
-                    this.update();
-                    this._triggerOnChange();
+                    this.reflow();
                     break;
                 case 'months':
                     this.date = new Date(d.year - 1, d.month, 1);
                     if (o.onChangeYear) o.onChangeYear(this.parsedDate.year);
-                    this.update();
-                    this._triggerOnChange();
+                    this.reflow();
                     break;
                 case 'years':
                     this.date = new Date(d.year - 10, 0, 1);
                     if (o.onChangeDecade) o.onChangeDecade(this.curDecade);
-                    this.update();
-                    this._triggerOnChange();
+                    this.reflow();
                     break;
             }
         },
@@ -653,16 +647,7 @@
             if (!this.opts.onlyTimepicker) this.nav._render();
             this.views[this.currentView]._render();
 
-            if (this.elIsInput && !this.opts.inline) {
-                this._setPositionClasses(this.opts.position);
-                if (this.visible) {
-                    this.setPosition(this.opts.position)
-                }
-            }
-
-            if (this.opts.classes) {
-                this.$datepicker.addClass(this.opts.classes)
-            }
+            this.reflow();
 
             if (this.opts.onlyTimepicker) {
                 this.$datepicker.addClass('-only-timepicker-');
@@ -682,6 +667,19 @@
             this._setInputValue();
 
             return this;
+        },
+
+        reflow: function() {
+            if (this.elIsInput && !this.opts.inline) {
+                this._setPositionClasses(this.opts.position);
+                if (this.visible) {
+                    this.setPosition(this.opts.position)
+                }
+            }
+
+            if (this.opts.classes) {
+                this.$datepicker.addClass(this.opts.classes)
+            }
         },
 
         _syncWithMinMaxDates: function () {
@@ -1255,8 +1253,7 @@
 
         _onHotKey: function (e, hotKey) {
             this._handleHotKey(hotKey);
-            this.update();
-            this._triggerOnChange();
+            this.reflow();
         },
 
         _onMouseEnterCell: function (e) {
@@ -1400,8 +1397,7 @@
                     this.opts.onChangeView(val)
                 }
                 if (this.elIsInput && this.visible) {
-                    this.update();
-                    this._triggerOnChange();
+                    this.reflow();
                 }
             }
 

@@ -1374,6 +1374,12 @@ lazy(mega, 'rewind', () => {
                         break;
                 }
 
+                if (String(M.currentdirid).substr(0, 7) === 'search/'
+                    || mega.ui.mNodeFilter.selectedFilters
+                    && M.currentrootid !== 'shares') {
+                    emptyFolderName = '.fm-empty-search';
+                }
+
                 return document.querySelector(`${emptyFolderName}`);
             }
 

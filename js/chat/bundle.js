@@ -460,6 +460,7 @@ class ScheduledMeeting {
         });
         this.occurrences.set(occurrence.uid, occurrence);
       }
+      this.isCompleted = false;
       this.setNextOccurrence();
       this.megaChat.trigger(meetingsManager.EVENTS.OCCURRENCES_UPDATE, this);
     }
@@ -12878,9 +12879,10 @@ class EndCallButton extends mixins.w9 {
         });
       }
       return this.renderButton({
-        label: peers ? l[5883] : l[5884],
-        onClick: () => call.hangUp()
-      });
+          label: peers ? l[5883] : l[5884],
+          onClick: () => call.hangUp()
+        })
+      ;
     }
     if (chatRoom.havePendingGroupCall()) {
       return this.IS_MODERATOR ? this.renderButton({
@@ -29637,7 +29639,8 @@ class Local extends AbstractGenericMessage {
     }, REaCt().createElement("i", {
       className: `sprite-fm-mono ${message.cssClass}`
     }));
-    return message.showInitiatorAvatar ? grouped ? null : $$AVATAR : $$ICON;
+    return message.showInitiatorAvatar ? grouped ? null : $$AVATAR : $$ICON
+    ;
   }
   getMessageTimestamp() {
     let _this$props$message;
@@ -29737,7 +29740,8 @@ class Contact extends AbstractGenericMessage {
     if ((_this$props$chatRoom = this.props.chatRoom) != null && _this$props$chatRoom.isAnonymous()) {
       return this._doAddContact(contactEmail).then(addedEmail => this.DIALOG.ADDED(addedEmail)).catch(this.DIALOG.DUPLICATE);
     }
-    return Object.values(M.opc).some(opc => opc.m === contactEmail) ? this.DIALOG.DUPLICATE() : this._doAddContact(contactEmail).then(addedEmail => this.DIALOG.ADDED(addedEmail));
+    return Object.values(M.opc).some(opc => opc.m === contactEmail) ? this.DIALOG.DUPLICATE() : this._doAddContact(contactEmail).then(addedEmail => this.DIALOG.ADDED(addedEmail))
+    ;
   }
   _getContactAvatar(contact, className) {
     return REaCt().createElement(ui_contacts.Avatar, {

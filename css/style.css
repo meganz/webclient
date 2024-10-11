@@ -2317,7 +2317,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     position: relative;
     width: 256px;
     z-index: 20;
-    max-width: calc(100% - 600px);
+    max-width: calc(100% - 720px);
     padding-right: 10px;
 }
 .rtl .fm-left-panel {

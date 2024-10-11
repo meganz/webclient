@@ -2718,7 +2718,7 @@ function topmenuUI() {
                     'privacy', 'pro', 'register', 'reliability', 'resellers', 'sdk',
                     'securechat', 'security', 'share', 'sitemap', 'sourcecode', 'special',
                     'start', 'storage', 'support', 'syncing', 'takedown', 'terms', 'transparency',
-                    'refer', 'individuals', 'freelancers', 'small-business', 'vpn', 'media-files', 'vpn-terms'
+                    'refer', 'individuals', 'freelancers', 'small-business', 'vpn', 'media-files',
                 ];
                 const ioPages = [
                     'about', 'achievements', 'affiliate', 'bug-bounty', 'business',
@@ -2727,7 +2727,7 @@ function topmenuUI() {
                     'megabackup', 'mobile', 'mobileapp', 'nas', 'objectstorage', 'privacy',
                     'refer', 'reliability', 'resellers', 'sdk', 'securechat', 'security', 'share',
                     'sourcecode', 'storage', 'syncing', 'takedown', 'terms', 'transparency', 'individuals',
-                    'freelancers', 'small-business', 'vpn', 'media-files' , 'vpn-terms'
+                    'freelancers', 'small-business', 'vpn', 'media-files',
                 ];
                 var moveTo = {
                     account: 'fm/account',

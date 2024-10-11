@@ -108,8 +108,6 @@ class VpnPage {
         this.page = document.querySelector('.fm-right-account-block .fm-account-vpn');
         this.credsContainer = this.page.querySelector('.creds-container');
         this.credTpl = this.page.querySelector('template#cred-slot-tpl');
-        this.tncCheckbox = this.page.querySelector('.tnc-agree-checkbox');
-        this.tncCheck = this.tncCheckbox.querySelector('.tnc-check');
         this.createCredBtn = this.page.querySelector('.js-create-cred');
         this.postCreateSection = this.page.querySelector('.post-create-section');
         this.emailSupport = this.page.querySelector('.email-support');
@@ -121,21 +119,6 @@ class VpnPage {
         this.knownSlotCount = 5;
 
         this._initLocationDropdown();
-
-        $('.disclaimer1', this.page).safeHTML(
-            escapeHTML(l.vpn_page_welcome_disclaimer1)
-                .replace('[A1]', '<a href="https://mega.io/terms" '
-                    + 'target="_blank" rel="noopener" class="clickurl vpn-link">')
-                .replace('[A2]', '<a href="https://mega.io/vpn-terms" '
-                    + 'target="_blank" rel="noopener" class="clickurl vpn-link">')
-                .replace('[/A1]', '</a>')
-                .replace('[/A2]', '</a>'));
-
-        $('.tnc-agree-checkbox .radio-txt', this.page).safeHTML(
-            escapeHTML(l.vpn_page_step2_tnc_checkbox_label)
-                .replaceAll('[A]', '<a href="https://mega.io/vpn-terms" '
-                    + 'target="_blank" rel="noopener" class="clickurl">')
-                .replaceAll('[/A]', '</a>'));
 
         const planName = pro.getProPlanName(u_attr.p);
 
@@ -153,33 +136,12 @@ class VpnPage {
 
         this.emailSupport.href = `${this.emailSupport.href}&body=${encodeURIComponent(mailtoBody)}`;
 
-        this._onCheckboxClicked = this._onCheckboxClicked.bind(this);
         this.createCred = this.createCred.bind(this);
         this.removeCred = this.removeCred.bind(this);
         this._onCredCreated = this._onCredCreated.bind(this);
         this._onCredDeactivated = this._onCredDeactivated.bind(this);
 
-        if (this.isTncChecked) {
-            this.tncCheck.classList.add('hidden', 'checkboxOn');
-            this.tncCheckbox.classList.add('hidden');
-        }
-
-        this.tncCheckbox.addEventListener('click', this._onCheckboxClicked);
-
-        this.createCredBtn.addEventListener('click', () => {
-            if (!(this.isTncChecked || this.tncCheck.classList.contains('checkboxOn'))) {
-                msgDialog('info', '', l.vpn_page_tnc_msg_title, l.vpn_page_tnc_msg_desc);
-                return;
-            }
-
-            if (!this.isTncChecked){
-                mega.attr.set('vpnTnc', 1, -2, true);
-                this.tncCheck.classList.add('hidden', 'checkboxOn');
-                this.tncCheckbox.classList.add('hidden');
-            }
-            this.createCred();
-        });
-
+        this.createCredBtn.addEventListener('click', this.createCred);
 
         // this.postCreateSection.querySelector('.view-ini-config').addEventListener('click', () => {
         //     this.configDiv.classList.remove('hidden');
@@ -291,10 +253,6 @@ class VpnPage {
         });
     }
 
-    get isTncChecked() {
-        return  u_attr['^!vpnTnc'];
-    }
-
     async show() {
         this.reset();
 
@@ -337,10 +295,6 @@ class VpnPage {
     }
 
     async createCred() {
-        if (!(this.isTncChecked || this.tncCheck.classList.contains('checkboxOn'))) {
-            return;
-        }
-
         this.reset();
 
         loadingDialog.show('vpn-create');
@@ -456,11 +410,6 @@ class VpnPage {
                 credElement.querySelector('.label').textContent = l.vpn_page_slot_available;
             }
         }
-    }
-
-    _onCheckboxClicked() {
-        this.tncCheck.classList.toggle('checkboxOn');
-        this.tncCheck.classList.toggle('checkboxOff');
     }
 
     _onCredCreated() {

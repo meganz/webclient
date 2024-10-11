@@ -280,10 +280,10 @@ MegaData.prototype.menuItems = async function menuItems(isTree) {
 
         if (M.getNodeRights(selNode.h) > 1) {
             items['.rename-item'] = 1;
-            items['.colour-label-items'] = 1;
 
             if (!isInShare) {
                 items['.add-star-item'] = 1;
+                items['.colour-label-items'] = 1;
 
                 if (M.isFavourite(selNode.h)) {
 

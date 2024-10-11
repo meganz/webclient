@@ -41,11 +41,11 @@
   "readmeFilename": "README.md",
   "sideEffects": false,
   "dependencies": {
-    "@babel/core": "7.25.7",
+    "@babel/core": "7.25.8",
     "@babel/plugin-proposal-decorators": "7.25.7",
     "@babel/plugin-transform-class-properties": "7.25.7",
     "@babel/plugin-transform-runtime": "7.25.7",
-    "@babel/preset-env": "7.25.7",
+    "@babel/preset-env": "7.25.8",
     "@babel/preset-react": "7.25.7",
     "@babel/runtime": "7.25.7",
     "@lodder/grunt-postcss": "3.1.1",
@@ -66,7 +66,7 @@
     "webpack-cli": "5.1.4"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "7.25.7",
+    "@babel/eslint-parser": "7.25.8",
     "chai": "4.3.10",
     "eslint": "8.57.1",
     "eslint-plugin-compat": "6.0.1",
@@ -91,10 +91,10 @@
     "karma-sinon": "1.0.5",
     "mocha": "10.7.3",
     "react-hot-loader": "4.13.1",
-    "sass": "1.79.4",
+    "sass": "1.79.5",
     "sass-loader": "16.0.2",
     "sinon": "15.0.3",
-    "stylelint": "16.9.0",
+    "stylelint": "16.10.0",
     "stylelint-config-standard": "36.0.1",
     "stylelint-no-unsupported-browser-features": "8.0.1",
     "webpack-dev-server": "5.1.0"

@@ -16,6 +16,10 @@
                                 <section class="content" data-fullscreen="false">
                                     <video id="video" data-autoplayvideo="false" data-playvideoonclick="false"></video>
 
+                                    <div class="loader-grad hidden">
+                                        <i class="sprite-fm-mono icon-loader-grad-small-regular-outline"></i>
+                                    </div>
+
                                     <div class="download play-video-button">
                                         <i class="sprite-fm-mono icon-play-regular-solid"></i>
                                     </div>
@@ -35,10 +39,6 @@
                                         <span></span><span></span><span></span>
                                     </div>
 
-                                    <div class="loader-grad hidden">
-                                        <i class="sprite-fm-mono icon-loader-grad-small-regular-outline"></i>
-                                    </div>
-
                                     <div class="loader-grad-overlay"></div>
                                 </section>
 
@@ -56,7 +56,7 @@
                                         </div>
                                         <ul class="bar">
                                             <li>
-                                                <div class="playpause-wrapper">
+                                                <div class="playpause-wrapper wrapper">
                                                     <button class="v-btn playpause" aria-label="[[play pause]]" data-state="play">
                                                         <!-- Active state: .icon-pause !-->
                                                         <i class="sprite-fm-mono icon-play-small-regular-outline"></i>
@@ -65,7 +65,7 @@
                                                         [$video_player_play]
                                                     </div>
                                                 </div>
-                                                <div class="vol-wrapper">
+                                                <div class="vol-wrapper wrapper">
                                                     <button class="v-btn mute" data-state="mute" aria-label="[[volume]]">
                                                         <!-- Active state: .icon-volume-muted !-->
                                                         <i class="sprite-fm-mono icon-volume-max-small-regular-outline"></i>
@@ -90,7 +90,7 @@
                                                 </div>
                                             </li>
                                             <li>
-                                                <div class="speed-wrapper">
+                                                <div class="speed-wrapper wrapper">
                                                     <button class="v-btn speed" aria-label="[[speed]]" data-state="speed">
                                                         <i class="sprite-fm-mono icon-playback-1x-small-regular-outline"></i>
                                                     </button>
@@ -98,7 +98,7 @@
                                                         [$video_player_playback_speed]
                                                     </div>
                                                 </div>
-                                                <div class="repeat-wrapper">
+                                                <div class="repeat-wrapper wrapper">
                                                     <button class="v-btn repeat" aria-label="[[repeat]]" data-state="repeat">
                                                         <i class="sprite-fm-mono icon-repeat-one-small-regular-solid"></i>
                                                     </button>
@@ -106,7 +106,7 @@
                                                         [$video_player_repeat]
                                                     </div>
                                                 </div>
-                                                <div class="subtitles-wrapper">
+                                                <div class="subtitles-wrapper wrapper">
                                                     <button class="v-btn subtitles" aria-label="[[subtitles]]" data-state="subtitles">
                                                         <i class="sprite-fm-mono icon-subtitles-02-small-regular-outline"></i>
                                                     </button>
@@ -114,7 +114,7 @@
                                                         [$video_player_subtitles]
                                                     </div>
                                                 </div>
-                                                <div class="settings-wrapper">
+                                                <div class="settings-wrapper wrapper">
                                                     <button class="v-btn settings" aria-label="[[settings]]" data-state="settings">
                                                         <i class="sprite-fm-mono icon-settings-02-small-regular-outline"></i>
                                                     </button>
@@ -122,7 +122,7 @@
                                                         [$823]
                                                     </div>
                                                 </div>
-                                                <div class="fs-wrapper">
+                                                <div class="fs-wrapper wrapper">
                                                     <button class="v-btn fs" aria-label="[[fullscreen]]" data-state="go-fullscreen">
                                                         <!-- Active state: .icon-fullscreen-leave !-->
                                                         <i class="sprite-fm-mono icon-maximize-02-small-regular-outline"></i>

@@ -1105,9 +1105,8 @@ var slideshowid;
             $('.context-menu.subtitles button.off i', $videoControls).removeClass('hidden');
             $('.subtitles-wrapper', $videoControls).removeClass('hidden');
             $('button.subtitles', $videoControls).removeClass('mask-color-brand');
-            $('.settings', $videoControls).removeClass('mask-color-brand');
-            $('.settings i', $videoControls).removeClass('icon-settings-02-small-regular-solid')
-                .addClass('icon-settings-02-small-regular-outline');
+            $('button.subtitles i', $videoControls).removeClass('icon-subtitles-02-small-regular-solid')
+                .addClass('icon-subtitles-02-small-regular-outline');
             if (optionsMenu) {
                 contextMenu.close(optionsMenu);
             }
@@ -1232,9 +1231,8 @@ var slideshowid;
         $('.context-menu.subtitles button.off i', $videoControls).removeClass('hidden');
         $('.subtitles-wrapper', $videoControls).removeClass('hidden');
         $('button.subtitles', $videoControls).removeClass('mask-color-brand');
-        $('.settings', $videoControls).removeClass('mask-color-brand');
-        $('.settings i', $videoControls).removeClass('icon-settings-02-small-regular-solid')
-            .addClass('icon-settings-02-small-regular-outline');
+        $('button.subtitles i', $videoControls).removeClass('icon-subtitles-02-small-regular-solid')
+            .addClass('icon-subtitles-02-small-regular-outline');
 
         // Init full screen icon and related data attributes
         if ($document.fullScreen()) {

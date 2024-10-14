@@ -122,7 +122,12 @@ function init_embed(ph, key, g) {
                 copyToClipboard(content, 1);
             });
 
-            $('.tab-content', $block).rebind('click', function() {
+            $('.share-link .tab-content', $block).rebind('click', () => {
+                selectText('share-link-field');
+                return false;
+            });
+
+            $('.embed-code .tab-content', $block).rebind('click', () => {
                 selectText('embed-code-field');
                 return false;
             });

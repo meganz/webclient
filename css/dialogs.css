@@ -2766,9 +2766,9 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.export-links-dialog .video-thumbnail * {
         height: 72px;
         width: 128px;
-        background-color: #222;
         position: relative;
         display: inline-block;
+        object-fit: contain;
     }
     .mega-dialog.export-links-dialog .video-thumbnail div {
         width: 100%;
@@ -2875,6 +2875,7 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.export-links-dialog .embed-content .video-resolution input,
     .mega-dialog .embed-content .start-at-time input {
         width: auto;
+        min-width: 50px;
         max-width: 80px;
         outline: none;
         font: var(--text-body1);

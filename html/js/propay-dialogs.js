@@ -2616,7 +2616,7 @@ var addressDialog = {
             utcResult.EUR = false;
         }
 
-        if (isStripe) {
+        if (isStripe && !((typeof utcResult.EUR === 'object') && utcResult.EUR.error)) {
             this.stripeSaleId = null;
             if (utcResult.EUR) {
                 const $stripeDialog = $('.payment-stripe-dialog').toggleClass('edit', !!utcResult.edit);
@@ -2788,6 +2788,8 @@ var addressDialog = {
      */
     showError: function(utcResult) {
 
+        let callbackFn;
+
         // Generic error: Oops, something went wrong. Please try again later.
         var message = l[200] + ' ' + l[253];
 
@@ -2804,12 +2806,11 @@ var addressDialog = {
         // You have too many incomplete payments in the last 12 hours...
         else if (utcResult.EUR.error === ETEMPUNAVAIL) {
             message = l[7982];
+            callbackFn = addressDialog.closeDialog.bind(addressDialog);
         }
 
         // Show error dialog
-        msgDialog('warninga', l[7235], message, '', function() {
-            addressDialog.showDialog();
-        });
+        msgDialog('warninga', l[7235], message, '', callbackFn || addressDialog.showDialog.bind(addressDialog));
     },
 
     /**

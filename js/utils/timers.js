@@ -545,6 +545,7 @@ tryCatch(() => {
 
 mBroadcaster.once('boot_done', tryCatch(() => {
     'use strict';
+    let lax = 0;
     let pid = Math.random() * Date.now() >>> 9;
 
     const running = Object.create(null);
@@ -553,6 +554,7 @@ mBroadcaster.once('boot_done', tryCatch(() => {
 
     const IDLE_TIMEOUT = freeze({timeout: 100});
     const IDLE_PIPELINE = {ts: 0, pid: 0, tasks: []};
+    const IDLE_THRESHOLD = IDLE_TIMEOUT.timeout << 4;
 
     const idleCallbackTaskSorter = (a, b) => b.ms - a.ms || b.pri - a.pri;
 
@@ -598,10 +600,19 @@ mBroadcaster.once('boot_done', tryCatch(() => {
         }
 
         if (self.d > 2) {
-            const rem = res.didTimeout ? -1 : res.timeRemaining();
+            const rem = res instanceof IdleDeadline && (res.didTimeout ? -1 : res.timeRemaining());
 
             // Print out a warning if there are less than 5ms left until the next re-paint.
             logger[rem < 0 ? 'debug' : rem < 5 ? 'warn' : 'info'](`${tasks.length} ICTask(s) handled...`, elapsed, rem);
+        }
+
+        if (elapsed > IDLE_THRESHOLD && !(lax++ % 10)) {
+            logger.warn('Caught unreliable requestIdleCallback()...', lax);
+
+            if (self.buildOlderThan10Days === false) {
+
+                eventlog(99641, true);
+            }
         }
 
         IDLE_PIPELINE.pid = null;
@@ -613,7 +624,7 @@ mBroadcaster.once('boot_done', tryCatch(() => {
 
         if (!IDLE_PIPELINE.pid) {
             IDLE_PIPELINE.ts = performance.now();
-            IDLE_PIPELINE.pid = requestIdleCallback(idleCallbackHandler, IDLE_TIMEOUT);
+            IDLE_PIPELINE.pid = (lax ? requestAnimationFrame : requestIdleCallback)(idleCallbackHandler, IDLE_TIMEOUT);
         }
     };
 

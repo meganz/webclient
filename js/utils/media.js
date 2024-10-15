@@ -1177,7 +1177,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     $watchAgainButton.addClass('hidden');
                     $playPauseButton.removeClass('hidden');
                     videoElement.style.filter = videoElement.style.filter.replace('blur(6px)', '');
-                    $('i', $playPauseButton).removeClass('icon-play-regular-solid')
+                    $('i', $playPauseButton).removeClass('icon-play-small-regular-solid')
                         .addClass('icon-pause-small-regular-solid');
                     tSleep(2.5).then(() => $playPauseButton.addClass('hidden'));
 
@@ -1194,7 +1194,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     videoElement.style.filter = videoElement.style.filter.replace('blur(6px)', '');
                     if ($('i', $playPauseButton).hasClass('icon-pause-small-regular-solid')) {
                         $playPauseButton.removeClass('hidden');
-                        $('i', $playPauseButton).addClass('icon-play-regular-solid')
+                        $('i', $playPauseButton).addClass('icon-play-small-regular-solid')
                             .removeClass('icon-pause-small-regular-solid');
                         tSleep(2.5).then(() => $playPauseButton.addClass('hidden'));
                     }

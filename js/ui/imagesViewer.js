@@ -1087,7 +1087,7 @@ var slideshowid;
             $playVideoButton.addClass('hidden');
             $watchAgainButton.addClass('hidden');
             $playPauseButton.addClass('hidden');
-            $('i', $playPauseButton).removeClass().addClass('sprite-fm-mono icon-play-regular-solid');
+            $('i', $playPauseButton).removeClass().addClass('sprite-fm-mono icon-play-small-regular-solid');
             $videoControls.addClass('hidden');
             $zoomSlider.attr('data-perc', 100);
             $(window).off('resize.imgResize');
@@ -1208,7 +1208,7 @@ var slideshowid;
         $playVideoButton.addClass('hidden');
         $watchAgainButton.addClass('hidden');
         $playPauseButton.addClass('hidden');
-        $('i', $playPauseButton).removeClass().addClass('sprite-fm-mono icon-play-regular-solid');
+        $('i', $playPauseButton).removeClass().addClass('sprite-fm-mono icon-play-small-regular-solid');
         $('.viewer-progress p, .video-time-bar', $content).removeAttr('style');
 
         if (!slideshowplay) {

@@ -1235,6 +1235,7 @@ function asyncApiReq(payload, options) {
         case 'mcr':
         case 'mcph':
         case 'mcsmfo':
+        case 'mcms':
             cache = null;
             break;
     }

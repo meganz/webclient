@@ -244,6 +244,9 @@
          */
         this._currentlyRendered = {};
 
+        /** See {@link MegaList.throttledOnScroll} */
+        this._throttledStage = 0;
+
 
         /**
          * Init the render adapter
@@ -307,15 +310,22 @@
     };
 
     MegaList.prototype.throttledOnScroll = function(e) {
-        var self = this;
-        delay('megalist:scroll:' + this.listId, function() {
-            if (self._isUserScroll === true && self.listContainer === e.target) {
-                if (self.options.enableUserScrollEvent) {
-                    self.trigger('onUserScroll', e);
+        // dump(`throttledOnScroll(${this._throttledStage})`);
+
+        if (this._isUserScroll === true && !this._throttledStage++) {
+
+            requestAnimationFrame(() => {
+                if (this._isUserScroll === true && this.listContainer === e.target) {
+                    if (this.options.enableUserScrollEvent) {
+                        this.trigger('onUserScroll', e);
+                    }
+                    this._onScroll(e);
                 }
-                self._onScroll(e);
-            }
-        }, 30);
+
+                this._throttledStage = -1;
+                // dump('throttledOnScroll()---END');
+            });
+        }
     };
 
     /**
@@ -1540,7 +1550,7 @@
                     this.spaceMaintainerCount++;
                 }
             }
-        }        
+        }
 
         _rendered() {
 

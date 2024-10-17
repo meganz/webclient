@@ -60,7 +60,11 @@ var pro = {
     BYTES_PER_TB: 1024 * 1024 * 1024 * 1024,
 
     // Plans that have a single duration. {key: planAccountLevel, value: durationAvailable}
-    singleDurationPlans: Object.create(null),
+    singleDurationPlans: null,
+
+    bfStandalone: null,
+
+    blockPlans: null,
 
     /**
      * Determines if a Business or Pro Flexi account is expired or in grace period
@@ -71,6 +75,41 @@ var pro = {
         'use strict';
 
         return [this.ACCOUNT_STATUS_EXPIRED, this.ACCOUNT_STATUS_GRACE_PERIOD].includes(accountStatus);
+    },
+
+    applyDevSettings() {
+
+        'use strict';
+
+        // Avoid checking localStorage repeatedly if dev options are not enabled
+        const allowLocal = localStorage.blockLocal !== '1';
+        const blockFreeTrial = localStorage.blockFreeTrial
+            && new Set(localStorage.blockFreeTrial.split(',').map(n => +n));
+
+        pro.membershipPlans = pro.membershipPlans.map((plan) => {
+            if (!allowLocal) {
+                plan[pro.UTQA_RES_INDEX_LOCALPRICE] = null;
+                plan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY] = null;
+                plan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCYSAVE] = null;
+            }
+
+            if (pro.blockPlans && pro.blockPlans.has(plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL])) {
+                return null;
+            }
+
+            if (blockFreeTrial && blockFreeTrial.has(plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL])) {
+                plan[pro.UTQA_RES_INDEX_EXTRAS].trial = false;
+            }
+
+            return plan;
+
+        }).filter(p => p);
+    },
+
+    resetCaching() {
+        'use strict';
+        pro.singleDurationPlans = Object.create(null);
+        pro.planSearch.reset();
     },
 
     /**
@@ -106,6 +145,8 @@ var pro = {
             api.req(payload)
                 .then(({result: results}) => {
 
+                    pro.resetCaching();
+
                     // The rest of the webclient expects this data in an array format
                     // [api_id, account_level, storage, transfer, months, price, currency, monthlybaseprice]
                     var plans = [];
@@ -114,18 +155,13 @@ var pro = {
                     var lmbps = {};
                     const durationsChecked = new Set();
 
-                    const allowLocal = localStorage.blockLocal !== '1';
-                    const blockedPlans = localStorage.blockPlans && localStorage.blockPlans.split(',');
+                    pro.blockPlans = d && localStorage.blockPlans && new Set(localStorage.blockPlans.split(','));
 
                     const conversionRate = results[0].l.lc === "EUR" ? 1 : results[0].l.exch;
 
                     for (var i = 1; i < results.length; i++) {
 
                         let discount = 0;
-
-                        if (blockedPlans && blockedPlans.includes(String(results[i].al))) {
-                            continue;
-                        }
 
                         if (results[i].m === 1) {
                             lmbps[results[i].mbp] = results[i].lp;
@@ -135,6 +171,8 @@ var pro = {
                         }
 
                         results[i].f = results[i].f || false;
+                        results[i].trial = results[i].trial || false;
+
                         if (results[i].al === pro.ACCOUNT_LEVEL_FEATURE) {
                             if (!results[i].f) {
                                 console.error('Feature level plan without features given from API', results[i]);
@@ -153,6 +191,13 @@ var pro = {
                             pro.singleDurationPlans[planLevel] = planDuration;
                             durationsChecked.add(planLevel);
                         }
+
+                        const trialStrings = this.featureInfo[results[i].al + '-trial'];
+                        const featureStrings = this.featureInfo[results[i].al];
+
+                        results[i].featureStrings = featureStrings || false;
+                        results[i].trialStrings = trialStrings || false;
+
 
                         // If this is Pro Flexi, the data is structured similarly to business, so set that manually
                         if (results[i].al === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
@@ -175,6 +220,9 @@ var pro = {
                                 results[i].bd.trns.lp / 100,    // extra transfer local rate
                                 {                       // Extra information about the plan from API, such as features
                                     f: results[i].f,    // Features object, or false if none
+                                    trial: results[i].trial,
+                                    trialStrings: results[i].trialStrings,
+                                    featureStrings: results[i].featureStrings,
                                 },
                             ]);
                         }
@@ -189,9 +237,9 @@ var pro = {
                                 results[i].p / 100,     // price
                                 results[0].l.c,         // currency
                                 results[i].mbp / 100,   // monthly base price
-                                (allowLocal && results[i].lp / 100),    // local price
-                                (allowLocal && results[0].l.lc),        // local price currency
-                                (allowLocal && discount / 100),         // local price save
+                                results[i].lp / 100,    // local price
+                                results[0].l.lc,        // local price currency
+                                discount / 100,         // local price save
                                 results[i].it,          // item (will be 0 for user)
                                 undefined,              // Slot used by flexi only
                                 undefined,              // Slot used by flexi only
@@ -199,22 +247,31 @@ var pro = {
                                 undefined,              // Slot used by flexi only
                                 {                       // Extra information about the plan from API, such as features
                                     f: results[i].f,    // Features object, or false if none
+                                    trial: results[i].trial,
+                                    trialStrings: results[i].trialStrings,
+                                    featureStrings: results[i].featureStrings,
                                 },
                             ]);
                         }
-                        pro.planObjects.createPlanObject(plans[plans.length - 1]);
-                        if (results[i].m === 1 && results[i].it !== 1) {
-                            if (!maxPlan || maxPlan[2] < results[i]['s']) {
-                                maxPlan = plans[plans.length - 1];
-                            }
-                            if (!minPlan || minPlan[2] > results[i]['s']) {
-                                minPlan = plans[plans.length - 1];
+                        if (!pro.blockPlans || !pro.blockPlans.has(results[i].al)) {
+                            pro.planObjects.createPlanObject(plans[plans.length - 1]);
+                            pro.planSearch.addPlanToSearch(plans[plans.length - 1]);
+                            if (results[i].m === 1 && results[i].it !== 1) {
+                                if (!maxPlan || maxPlan[2] < results[i].s) {
+                                    maxPlan = plans[plans.length - 1];
+                                }
+                                if (!minPlan || minPlan[2] > results[i].s) {
+                                    minPlan = plans[plans.length - 1];
+                                }
                             }
                         }
                     }
 
                     // Store globally
                     pro.membershipPlans = plans;
+                    if (d && localStorage.useDevOptions) {
+                        pro.applyDevSettings();
+                    }
                     pro.lastLoginStatus = u_type;
                     pro.maxPlan = maxPlan;
                     pro.minPlan = minPlan;
@@ -351,25 +408,27 @@ var pro = {
 
         switch (planNum) {
             case 1:
-                return l[5819];                 // Pro I
+                return l[5819];                                 // Pro I
             case 2:
-                return l[6125];                 // Pro II
+                return l[6125];                                 // Pro II
             case 3:
-                return l[6126];                 // Pro III
+                return l[6126];                                 // Pro III
             case 4:
-                return l[8413];                 // Pro Lite
+                return l[8413];                                 // Pro Lite
             case 11:
-                return l.plan_name_starter;     // Starter
+                return l.plan_name_starter;                     // Starter
             case 12:
-                return l.plan_name_basic;       // Basic
+                return l.plan_name_basic;                       // Basic
             case 13:
-                return l.plan_name_essential;   // Essential
+                return l.plan_name_essential;                   // Essential
             case 100:
-                return l[19530];                // Business
+                return l[19530];                                // Business
             case 101:
                 return l.pro_flexi_name;        // Pro Flexi
             case pro.ACCOUNT_LEVEL_FEATURE_VPN: // 100000
                 return l.mega_vpn;              // VPN
+            case pro.ACCOUNT_LEVEL_FEATURE_PWM: // 100001
+                return l.mega_pwm;              // Password Manager
             default:
                 return l[1150];                 // Free
         }
@@ -627,6 +686,8 @@ var pro = {
                     _correlatedPlan: null,       // Stores the correlated plan, in case given by another plan
                     _maxCorrPriceEur: null,
                     planArray: plan,
+                    features: plan[pro.UTQA_RES_INDEX_EXTRAS].f,
+                    trial: plan[pro.UTQA_RES_INDEX_EXTRAS].trial,
                 };
 
                 lazy(thisPlan, 'id', () => plan[pro.UTQA_RES_INDEX_ID]);
@@ -714,6 +775,22 @@ var pro = {
                         return pro.filter.simple[filter].has(thisPlan.level) ? thisPlan.level : 0;
                     }
                     return pro.filter.simple[filter].has(thisPlan.level);
+                };
+
+                /**
+                 * Returns the price of the plan formatted as a string
+                 * @param {string} display - The display type of the price
+                 * @param {Boolean} returnEuro - If the price should be returned in Euro
+                 * @param {boolean} noDecimals - If the price should be returned without decimals
+                 * @returns {string} - The formatted price
+                 */
+                thisPlan.getFormattedPrice = (display, returnEuro, noDecimals) => {
+                    return formatCurrency(
+                        returnEuro ? thisPlan.priceEuro : thisPlan.price,
+                        returnEuro ? thisPlan.currencyEuro : thisPlan.currency,
+                        display,
+                        noDecimals
+                    );
                 };
 
                 return thisPlan;
@@ -849,17 +926,22 @@ var pro = {
      */
     getPlanObj(plan, months) {
         'use strict';
+        if (!pro.membershipPlans.length) {
+            console.assert(!d, 'getPlanObj called before membershipPlans were loaded.');
+            return;
+        }
         const {planTypes} = pro.planObjects;
         months = (months |= 0) || 1;
         let key;
         let type;
         if (typeof plan === 'number' || typeof plan === 'string') {
+            plan |= 0;
             type = plan + '_' + months;
             if (planTypes[type]) {
                 return planTypes[type];
             }
             plan = pro.membershipPlans.find((searchPlan) => {
-                return ((searchPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === +plan)
+                return ((searchPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] === plan)
                     && (searchPlan[pro.UTQA_RES_INDEX_MONTHS] === months));
             });
         }
@@ -918,6 +1000,9 @@ var pro = {
      */
     getStandaloneBits(features) {
         'use strict';
+        if (features === false) {
+            return 0;
+        }
         if (!features || typeof features !== 'object') {
             console.assert(!d, `Invalid features object given to getStandaloneBits: ${features}`);
             return 0;
@@ -926,6 +1011,43 @@ var pro = {
         return featureNames.reduce((featureBits, feature) => {
             return featureBits | pro.bfStandalone[feature.toUpperCase()];
         }, 0);
+    },
+
+    /**
+     *
+     * @param {string} type - The name of the plan set to retrive
+     * @param {?number} duration - The duration of the plan set to retrieve
+     * @returns {Array} - The array of plans in the set
+     */
+    plansInSet(type, duration) {
+        'use strict';
+        const durationString = duration ? (duration === 1 ? 'M' : 'Y') : '';
+        return pro.filter.plans[type + durationString];
+    },
+
+    planSearch: {
+        searchedPlans: Object.create(null),
+        addPlanToSearch(plan) {
+            'use strict';
+            const planLevel = plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
+            const planDuration = plan[pro.UTQA_RES_INDEX_MONTHS];
+            const planKey = planLevel + (planDuration ? '_' + planDuration : '');
+            if (!pro.planSearch.searchedPlans[planLevel]) {
+                pro.planSearch.searchedPlans[planLevel] = plan;
+            }
+            pro.planSearch.searchedPlans[planKey] = plan;
+        },
+        reset() {
+            'use strict';
+            pro.planSearch.searchedPlans = Object.create(null);
+        }
+    },
+    getPlan(planLevel, months) {
+        'use strict';
+        planLevel |= 0;
+        const searchKey = planLevel + (months ? '_' + months : '');
+
+        return pro.planSearch.searchedPlans[searchKey] || false;
     },
 };
 
@@ -1044,6 +1166,14 @@ lazy(pro, 'filter', () => {
             vpnTab: new Set([
                 pro.ACCOUNT_LEVEL_FEATURE_VPN,
             ]),
+
+            // generalStringPlans: 11, 12, 13, 4, 1, 2, 3 - plans that use the general strings for plan information
+            generalStringPlans:
+                new Set([
+                    pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL, pro.ACCOUNT_LEVEL_STARTER,
+                    pro.ACCOUNT_LEVEL_PRO_LITE, pro.ACCOUNT_LEVEL_PRO_I, pro.ACCOUNT_LEVEL_PRO_II,
+                    pro.ACCOUNT_LEVEL_PRO_III, pro.ACCOUNT_LEVEL_PRO_FLEXI
+                ]),
         },
 
         // Sets of plans to invert (all plans minus specified plans), will then
@@ -1072,6 +1202,18 @@ lazy(pro, 'filter', () => {
                 new Set([
                     pro.ACCOUNT_LEVEL_STARTER, pro.ACCOUNT_LEVEL_BASIC, pro.ACCOUNT_LEVEL_ESSENTIAL,
                     pro.ACCOUNT_LEVEL_PRO_FLEXI
+                ]),
+
+            // Plans that do not need to be checked for their storage quota for access to propay page
+            checkStorage:
+                new Set([
+                    pro.ACCOUNT_LEVEL_FEATURE_VPN, pro.ACCOUNT_LEVEL_PRO_FLEXI,
+                ]),
+
+            // Plans that do not see the cancel subscription survey
+            canSeeCancelSubsSurvey:
+                new Set([
+                    pro.ACCOUNT_LEVEL_BUSINESS
                 ]),
         },
 
@@ -1131,6 +1273,60 @@ lazy(pro, 'filter', () => {
     }
 
     return Object.setPrototypeOf(pf, null);
+});
+
+lazy(pro, 'featureInfo', () => {
+
+    'use strict';
+
+    const general = [
+        {
+            text: l.mega_vpn
+        },
+        {
+            text: l.pr_no_meet_time_limits
+        },
+        {
+            text: l.pr_unlimited_participants
+        }
+    ];
+
+    const strings = {
+        '100000-trial': [
+            {
+                icon: 'sprite-fm-mono icon-lock',
+                text: l.unlock_secure_browsing
+            },
+            {
+                icon: 'sprite-fm-mono icon-notification',
+                text: l.email_before_trial_end
+            },
+            {
+                icon: 'sprite-fm-mono icon-star',
+                text: l.sub_start_d_can_cancel,
+                getText(planInfo) {
+                    return this.text.replace('%1', time2date((Date.now() / 1000) + planInfo.days * 24 * 60 * 60, 2));
+                }
+            },
+        ],
+        '100000': [
+            {
+                text: l.privacy_on_the_go
+            },
+            {
+                text: l.lightning_fast_speeds
+            },
+            {
+                text: l.servers_around_globe
+            },
+        ],
+    };
+
+    for (const plan of pro.filter.simple.generalStringPlans) {
+        strings[plan] = general;
+    }
+
+    return strings;
 });
 
 /** @property pro.bfStandalone */

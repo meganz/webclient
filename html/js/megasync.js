@@ -458,8 +458,12 @@ var megasync = (function() {
                     }
 
                     showToast('megasync-transfer upload', toastTxt, l[865], l[823],
-                        ns.transferManager,
-                        function () { loadSubPage('fm/account/transfers'); }); // Upload added toMEGAsync
+                              ns.transferManager,
+                              () => {
+                                  loadSubPage('fm/account/transfers');  // Upload added toMEGAsync
+                              },
+                              6000
+                    );
                 }
                 else if (response.s == 0) { // selection not done yet
                     setTimeout(_uploadTick, 2000);

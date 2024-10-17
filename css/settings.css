@@ -240,6 +240,8 @@
     border-top: 1px solid  var(--stroke-grey-2);
 }
 .account.data-block.account-type .settings-right-block {
+    display: flex;
+    flex-direction: column;
     padding: 0;
 }
 .account.data-block.account-type .settings-right-block > div {
@@ -248,6 +250,15 @@
     border-radius: 12px;
     padding: 0 24px;
     margin: 35px 0;
+}
+.account.data-block.account-type .settings-right-block .vpn-details {
+    order: -1;
+}
+.account.data-block.account-type .settings-right-block .extra-sub.paid {
+    order: -2;
+}
+.account.data-block.account-type .settings-right-block .plan-details.paid {
+    order: -3;
 }
 .settings-sub-section {
     align-items: center;
@@ -453,23 +464,19 @@
 
 
 /* Settings content. Plan section */
-
-/* Settings content. Plan section. Plan name colors */
 .account.plan-info {
     color: var(--text-color-high);
     font: var(--text-body1);
 }
-.account.plan-info.accounttype {
+
+/* Settings content. Free trial */
+.account.plan-info .free-trial {
     color: var(--text-color-error);
-}
-.free .account.plan-info.accounttype {
-    color: var(--text-color-success);
-}
-.lite .account.plan-info.accounttype {
-    color: var(--secondary-orange);
-}
-.business.account.plan-info.accounttype {
-    color: var(--secondary-green);
+    border: 1px solid var(--secondary-red);
+    border-radius: 3px;
+    padding: 2px 8px;
+    margin-inline-start: 12px;
+    -webkit-margin-start: 12px;
 }
 
 /* Settings content. Plan section. Achievement Storage/Badwidth bars */

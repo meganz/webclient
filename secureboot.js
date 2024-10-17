@@ -2230,7 +2230,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/utils/workers.js', n: 'js_utils_workers_js', j: 1});
     jsl.push({f:'js/utils/trans.js', n: 'js_utils_trans_js', j: 1});
     jsl.push({f:'js/utils/webgl.js', n: 'webgl_js', j:1});
-    jsl.push({f:'js/utils/subtitles.js', n: 'subtitles_js', j:1});
+    jsl.push({f:'js/utils/subtitles.js', n: 'subtitles_js', j: 1});
 
     // Sets and elements
     jsl.push({f:'js/utils/sets.js', n: 'fm_sets_js', j:1});
@@ -2441,6 +2441,11 @@ else if (!browserUpdate) {
 
     // Search
     jsl.push({f:'js/ui/searchbar.js', n: 'searchbar_js', j:1});
+
+    // General templates
+    jsl.push({f:'html/extra-templates.html', n: 'extra_templates_html', j: 0});
+    jsl.push({f:'js/ui/extra-templates.js', n: 'extra_templates_js', j: 1});
+    jsl.push({f:'js/ui/elementSwitcher.js', n: 'elementSwitcher_js', j: 1});
 
     if (!is_mobile) {
 

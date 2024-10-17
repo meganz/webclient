@@ -1,59 +1,127 @@
-.cancel-subscription-survey {
+.cancel-subscription-page {
     padding: 0 24px;
     max-width: var(--mobile-page-max-width);
 }
 
-.cancel-subscription-survey > * {
+.cancel-subscription-page > * {
     font: var(--mobile-font-copy-regular);
 }
 
-.cancel-subscription-survey .cancel-sub-result {
+.cancel-subscription-page .cancel-sub-warnings {
+    display: flex;
+    flex-direction: column;
+}
+
+.cancel-subscription-page .cancel-sub-warnings > *,
+.cancel-subscription-page .buttons-container > *:not(:last-child) {
+    margin-bottom: 16px;
+}
+
+.cancel-subscription-page .features-table {
+    border: 2px solid var(--surface-grey-2);
+    border-radius: 12px;
+    overflow: hidden;
+    color: var(--text-color-high);
+}
+
+.cancel-subscription-page .features-table .ft-header {
+    background-color: var(--surface-grey-2);
+    min-height: 38px;
+    align-items: center;
+}
+
+.cancel-subscription-page .features-table .ft-header,
+.cancel-subscription-page .features-table .ft-rows {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    padding: 0 24px;
+}
+
+.cancel-subscription-page .features-table .ft-header > *:not(:first-child),
+.cancel-subscription-page .features-table .ft-rows .row-item.center {
+    justify-self: center;
+}
+
+.cancel-subscription-page .features-table .ft-rows .row-item {
+    display: flex;
+    align-items: center;
+    min-height: 32px;
+    font: var(--mobile-font-caption-large-regular);
+}
+
+.cancel-subscription-page .features-table .ft-rows .row-item.feature {
+    justify-content: flex-start;
+}
+
+.cancel-subscription-page .features-table .ft-rows .row-item.plan i.icon-check-thin-solid {
+    font-weight: var(--mobile-font-weight-semibold);
+    color: var(--secondary-green);
+}
+
+.cancel-subscription-page .features-table .ft-rows .ft-row-separator {
+    border-top: 2px solid var(--surface-grey-2);
+    grid-column: 1 / 4;
+}
+
+.cancel-subscription-page .cancel-sub-result {
     color: var(--mobile-text-secondary);
 }
 
-.cancel-subscription-survey .cancel-sub-prompt,
-.cancel-subscription-survey .email-consent-prompt {
+.cancel-subscription-page .email-consent-prompt {
     margin: 16px 0;
+}
+
+.cancel-subscription-page .cancel-sub-prompt,
+.cancel-subscription-page .email-consent-prompt,
+.cancel-subscription-page .select-subscription {
     font: var(--mobile-font-heading-h3);
     color: var(--mobile-text-primary);
 }
+.cancel-subscription-page .cancel-sub-prompt.top {
+    order: -1;
+}
 
-.cancel-subscription-survey .mega-component.banner {
+.cancel-subscription-page .select-subscription {
+    margin-bottom: 12px;
+}
+
+.cancel-subscription-page .mega-component.banner {
     max-width: var(--mobile-elem-max-width);
 }
 
-.cancel-subscription-survey .cancel-sub-buttons {
+.cancel-subscription-page .buttons-container {
     padding: 24px 0;
     width: 100%;
     display: flex;
     flex-direction: column;
 }
-.cancel-subscription-survey .cancel-sub-buttons > * {
+.cancel-subscription-page .buttons-container > * {
     height: 48px;
-}
-.cancel-subscription-survey .cancel-sub-buttons > *:not(:last-child) {
-    margin-bottom: 16px;
+    max-width: var(--mobile-elem-max-width);
 }
 
-.cancel-subscription-survey .mega-radio-button .radio-wrapper {
+.cancel-subscription-page .buttons-container button.nav-elem span {
+    font-weight: var(--mobile-font-weight-semibold);
+}
+
+.cancel-subscription-page .mega-radio-button:not(.disabled) .radio-wrapper {
     background: none;
-    border: 2px solid var(--mobile-selection-control);
 }
 
-.cancel-subscription-survey .mega-radio-button .radio-action {
+.cancel-subscription-page .mega-radio-button .radio-action {
     flex: 1;
 }
 
-.cancel-subscription-survey .mobile.mega-input.box-style {
+.cancel-subscription-page .mobile.mega-input.box-style {
     margin-bottom: 22px;
 }
 
-.cancel-subscription-survey .mobile.mega-input .message-container {
+.cancel-subscription-page .mobile.mega-input .message-container {
     top: 148px;
 }
 
 @media only screen and (min-width: 769px) {
-    .cancel-subscription-survey .mobile.mega-input.box-style {
+    .cancel-subscription-page .mobile.mega-input.box-style {
         margin-top: 16px;
     }
 }

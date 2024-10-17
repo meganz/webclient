@@ -1682,12 +1682,8 @@ function completeProLogin(result) {
 async function checkPlanStorage(currentStored, planNum) {
     'use strict';
 
-    if (
-        // If the user is purchasing a Pro Flexi account, they will be able to get extra storage
-        planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI
-        // If the user is purchasing a VPN plan, they do not need to check storage quota
-        || planNum === pro.ACCOUNT_LEVEL_FEATURE_VPN
-    ) {
+    // User is purchasing Flexi or a feature, neither of which have storage quota limits (features have no storage)
+    if (!pro.planInFilter(planNum, 'checkStorage')) {
         return true;
     }
 

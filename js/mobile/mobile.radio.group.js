@@ -14,7 +14,10 @@ class MegaMobileRadioGroup extends MegaMobileComponentGroup {
                 radioAlign: options.align,
                 radioValue: radio.value,
                 labelTitle: radio.label,
+                subLabelTitle: radio.subLabel,
                 checked: radio.checked,
+                disabled: radio.disabled,
+                disabledReason: radio.disabledReason,
                 group: this
             });
 
@@ -28,7 +31,7 @@ class MegaMobileRadioGroup extends MegaMobileComponentGroup {
 
             radioButton.on('tap.radioChanged', function(...args) {
 
-                if (this.group.value === this.value) {
+                if (this.group.value === this.value || this.disabled) {
                     return;
                 }
 

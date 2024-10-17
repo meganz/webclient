@@ -1043,6 +1043,23 @@ mBroadcaster.once('boot_done', function populate_l() {
         l[0] = 'MEGA';
     }
 
+    // MEGA io links
+    const mega_io_links = {
+        'terms#recPaiSub': "https://mega.io/terms#RecurringPaidSubscriptions",
+        'terms#ref': "https://mega.io/terms#Refunds",
+        'p-s/p-b/c-s': "https://help.mega.io/plans-storage/payments-billing/cancel-subscription",
+        'terms': "https://mega.io/terms",
+        'vpn': "https://mega.io/vpn",
+        'vpn#dow': "https://mega.io/vpn#downloadapps",
+        'pricing': "https://mega.io/pricing",
+    };
+
+    const mega_io_hyperlinks = Object.create(null);
+
+    for (const key in mega_io_links) {
+        mega_io_hyperlinks[key] = `<a href="${mega_io_links[key]}" target="_blank" rel="noopener noreferrer">`;
+    }
+
     // MEGA static hosts
     l.mega_help_host = 'https://help.mega.io';
 
@@ -1069,7 +1086,6 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A1]', '</a>')
         .replace('[A2]', '<a href="mailto:support@mega.nz">')
         .replace('[/A2]', '</a>');
-    l[6976] = escapeHTML(l[6976]).replace('%1', '<span class="plan-name"></span>');
     l[7156] = escapeHTML(l[7156])
         .replace('[A]', '<a href="https://mega.io/mobile" target="_blank" class="clickurl">')
         .replace('[/A]', '</a>');
@@ -1845,6 +1861,27 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A1]', '</a>')
         .replace('[A2]', `<a ${rewindLinkAttr} href="${rewindHelpLink}">`)
         .replace('[/A2]', '</a>');
+    l.agree_vpn_tos = escapeHTML(l.agree_vpn_tos)
+        .replace('[A]', '<a class="clickurl" href="https://mega.io/vpn-terms" target="_blank">')
+        .replace('[/A]', '</a>');
+    l.then_price_m_after_n_days = escapeHTML(l.then_price_m_after_n_days)
+        .replace(/\[S]/g, '<span class="asterisk">')
+        .replace(/\[\/S]/g, '</span>');
+    l.after_trial_card_charged_m = escapeHTML(l.after_trial_card_charged_m);
+    l.trial_details_visit_tos = escapeHTML(l.trial_details_visit_tos)
+        .replace('[A1]', mega_io_hyperlinks['terms#recPaiSub'])
+        .replace('[A2]', mega_io_hyperlinks['terms#ref'])
+        .replace('[A3]', mega_io_hyperlinks['p-s/p-b/c-s'])
+        .replace('[A4]', mega_io_hyperlinks.terms)
+        .replace(/\[\/A\d*]/g, '</a>');
+    l.vpn_is_attached_text = escapeHTML(l.vpn_is_attached_text)
+        .replace('[A1]', mega_io_hyperlinks['vpn#dow'])
+        .replace('[A2]', mega_io_hyperlinks.pricing)
+        .replace(/\[\/A[12]]/g, '</a>');
+    l.vpn_added_text = escapeHTML(l.vpn_added_text)
+        .replace('[A1]', mega_io_hyperlinks['vpn#dow'])
+        .replace('[A2]', '<a href="/fm/account/plan" target="_blank" rel="noopener noreferrer">')
+        .replace(/\[\/A[12]]/g, '</a>');
 
     l.stripe_card_declined_error = escapeHTML(l.stripe_card_declined_error)
         .replace('[A]', '<a href="https://help.mega.io/plans-storage/payments-billing/why-is-my-card-being-declined">')
@@ -1854,11 +1891,15 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a href="mailto:support@mega.nz">')
         .replace('[/A]', '</a>');
 
+    l.vpn_to_disable_text = escapeHTML(l.vpn_to_disable_text)
+        .replace('[A]', `<a href="${cancelSubLink}" target="_blank">`)
+        .replace('[/A]', '</a>');
+
     const common = [
         15536, 16119, 16120, 16313, 16316, 16360, 18228, 18268, 18282,
         18284, 18285, 18286, 18287, 18289, 18290, 18291, 18294, 18295, 18296, 18297, 18298, 18302, 18303, 18304,
         18305, 18314, 18315, 18316, 18419, 19807, 19808, 19810, 19811, 19812, 19813, 19814, 19854, 19821, 20402,
-        20462, 20969, 20970, 20971, 20973,
+        20462, 20969, 20970, 20971, 20973, 10637,
         23524, 23534, 23296, 23299, 23304, 23819, 24077, 24099,
         24680, 24849, 24850,
 
@@ -1869,7 +1910,8 @@ mBroadcaster.once('boot_done', function populate_l() {
         'available_commission_tip',
         'pending_commission_tip',
         'commission_amount_tip',
-        'go_to_pro'
+        'go_to_pro',
+        'after_days_card_charged_m',
     ];
     for (let i = common.length; i--;) {
         var num = common[i];

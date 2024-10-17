@@ -10,6 +10,9 @@ pro.propay = {
     /** The selected Pro plan name e.g. Pro I - III & Pro Lite */
     planName: null,
 
+    /** The selected Pro plan features, if any */
+    planFeatures: 0,
+
     /** All payment gateways loaded from the API */
     allGateways: [],
 
@@ -34,6 +37,19 @@ pro.propay = {
     /** Selector for the Pro Pay page (step 2 of the process) */
     $page: null,
 
+    $pricingBox: null,
+    $planName: null,
+    $priceNum: null,
+    $pricePeriod: null,
+    $storageAmount: null,
+    $storageTip: null,
+    $bandwidthAmount: null,
+    $bandwidthTip: null,
+    $euroPrice: null,
+    $currncyAbbrev: null,
+    $todayText: null,
+    $selectedPlanTitle: null,
+
     paymentStatusChecker: null,
 
     /** The user's subscription payment gateway id */
@@ -41,6 +57,50 @@ pro.propay = {
 
     /** @var Dialog Log in / register dialog displayed when not signed in */
     accountRequiredDialog: null,
+
+    /** A plan object of the same level as the users chosen plan */
+    planObjOfChosenLevel: null,
+
+    selectedPlan: null,
+
+    freeTrialCardController: null,
+
+    purchaseButton: null,
+
+    initialPaymentOptionIsStripe: false,
+
+    stripeSupported: false,     // Does the user have a stripe payment gateway available?
+
+    trial: null,
+
+    currentPlanData: null,
+
+    gatewaysByName: Object.create(null),
+
+    /**
+     * @returns {Object} Purchasable feature plans. Each feature plan should include
+     * an array of features to show on the features table when the user goes
+     * to cancel their subscription
+     */
+    purchasableFeaturePlans() {
+        'use strict';
+        return {
+            'vpn': {
+                'cancelSubFeatures': [
+                    l.vpn_cancel_subfeature1,
+                    l.vpn_cancel_subfeature2,
+                    l.vpn_cancel_subfeature3,
+                    l.vpn_cancel_subfeature4,
+                ]
+            }
+        };
+    },
+
+    shouldShowTrial() {
+        'use strict';
+        return (!pro.propay.freeTrialCardController || (pro.propay.freeTrialCardController.getVal() !== 'error'))
+            && pro.propay.trial;
+    },
 
     /**
      * Initialises the page and functionality
@@ -77,8 +137,11 @@ pro.propay = {
         // Cache current Pro Payment page selector
         this.$page = $('.payment-section', '#startholder');
 
-        const $selectedPlanTitle = $('.top-header.plan-title', this.$page);
-        const $purchaseButton = $('button.purchase', this.$page);
+        pro.propay.purchaseButton = {
+            $button: $('button.purchase', this.$page),
+            canProceedTOS: false,
+            canProceedLoaded: false,
+        };
 
         // Preload loading/transferring/processing animation
         pro.propay.preloadAnimation();
@@ -98,13 +161,14 @@ pro.propay = {
             return;
         }
 
-        // Update header text with plan
-        if (pro.propay.planNum === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
-            $selectedPlanTitle.text(pro.propay.planName);
+        if (pro.propay.freeTrialCardController) {
+            pro.propay.freeTrialCardController = pro.propay.freeTrialCardController.remove();
         }
-        else {
-            $('.plan-name', $selectedPlanTitle).text(pro.propay.planName);
+        if (pro.propay.thirdSectionController) {
+            pro.propay.thirdSectionController = pro.propay.thirdSectionController.remove();
         }
+
+        pro.propay.currentPlanData = null;
 
         let discountInfo = pro.propay.getDiscount();
         if (discountInfo && discountInfo.used) {
@@ -129,6 +193,7 @@ pro.propay = {
 
         // Show loading spinner because some stuff may not be rendered properly yet
         loadingDialog.show('propayReady');
+        pro.propay.loading = true;
 
         // Initialise some extra stuff just for mobile
         if (is_mobile) {
@@ -157,7 +222,7 @@ pro.propay = {
             M.getStorageQuota().then((storage) => {
                 checkPlanStorage(storage.used, pro.propay.planNum).then((res) => {
                     if (res) {
-                        $purchaseButton.removeClass('disabled');
+                        pro.propay.purchaseButton.canProceedLoaded = true;
                         resolve();
                     }
                     else {
@@ -170,13 +235,41 @@ pro.propay = {
         });
 
         // Initialise the main purchase button
-        $purchaseButton.rebind('click.purchase', () => {
+        pro.propay.purchaseButton.$button.rebind('click.purchase', () => {
+            const canProceedLoaded = pro.propay.purchaseButton.canProceedLoaded;
+            const canProceedTOS = !pro.propay.trial || (pro.propay.trial && pro.propay.purchaseButton.canProceedTOS);
+            if (!canProceedLoaded || !canProceedTOS) {
+                return false;
+            }
             if (is_mobile) {
                 pro.propay.userSubsGatewayId =
                     M.account.sgwids && M.account.sgwids.length > 0 ? M.account.sgwids[0] : null;
             }
             pro.propay.startPurchaseProcess();
             return false;
+        });
+
+        // Include the hyperlink specifically, so that we can detect if it was clicked and block it
+        $('.agree-to-vpn-tos-wrapper > *, .agree-to-vpn-tos-wrapper a', pro.propay.$page).rebind('click', function() {
+            const $this = $(this);
+
+            // Prevent the click event if the user clicked on a link
+            if ($this.is('a')) {
+                return false;
+            }
+
+            const $checkbox = $('.checkbox', $this.parent());
+            if ($checkbox.hasClass('checkboxOff')) {
+                $checkbox.removeClass('checkboxOff').addClass('checkboxOn');
+                pro.propay.purchaseButton.canProceedTOS = true;
+            }
+            else {
+                $checkbox.removeClass('checkboxOn').addClass('checkboxOff');
+                pro.propay.purchaseButton.canProceedTOS = false;
+            }
+            pro.propay.updatePurchaseButton();
+
+            delay('vpn-cb.log', eventlog.bind(null, 500515));
         });
 
         clickURLs();
@@ -190,25 +283,26 @@ pro.propay = {
                 // Load payment providers and do the rest of the rendering if the selected plan
                 // has enough storage. Otherwuse do not proceed with rendering the page.
                 proceed.then(async () => {
+                    let vpnBlockerTitle = false;
                     let vpnBlockerText = false;
+                    let canContinue = false;
 
                     /** @todo this should be an actual 'plan has-feature' check */
                     const isVpnPlan = pro.propay.planNum === pro.ACCOUNT_LEVEL_FEATURE_VPN;
                     const hasVpnAlready = pro.proplan2.getUserFeature('vpn');
+
+                    pro.propay.trial = pro.getPlan(pro.propay.planNum)[pro.UTQA_RES_INDEX_EXTRAS].trial;
 
                     // VPN related warnings
                     if (isVpnPlan || hasVpnAlready) {
                         const isProUser = u_attr && u_attr.p && !u_attr.b;
 
                         if (isProUser && isVpnPlan) {
-                            vpnBlockerText = escapeHTML(l.vpn_is_attached_text)
-                                .replace('[A1]', '<a href="https://mega.io/vpn">')
-                                .replace('[A2]', '<a href="https://mega.io/pricing">')
-                                .replace(/\[\/A[12]]/g, '</a>');
+                            vpnBlockerText = l.vpn_is_attached_text;
                         }
                         else if (!isProUser && hasVpnAlready) {
+
                             if (pro.filter.simple.validPurchases.has(pro.propay.planNum)) {
-                                loadingDialog.hide('propayReady');
                                 const status = await pro.propay.vpnFeatureConfirmation();
 
                                 if (status === 2) { // The user refused to proceed
@@ -219,46 +313,57 @@ pro.propay = {
                                 loadingDialog.show('propayReady');
                             }
                             else if (isVpnPlan) {
-                                vpnBlockerText = escapeHTML(l.vpn_added_text)
-                                    .replace('[A1]', '<a href="https://mega.io/vpn">')
-                                    .replace('[A2]', '<a href="https://mega.nz/fm/account/plan">')
-                                    .replace(/\[\/A[12]]/g, '</a>');
+                                const {currentSub, currentPlan} = await pro.propay.checkCurrentFeatureStatus(
+                                    pro.ACCOUNT_LEVEL_FEATURE_VPN);
+
+                                if ((currentSub && !currentSub.is_trial) || (currentPlan && !currentPlan.is_trial)) {
+                                    vpnBlockerText = l.vpn_added_text;
+                                }
                             }
                         }
 
                         if (vpnBlockerText) {
-                            const dialog = new MDialog({
-                                ok: {
-                                    label: l[81]
-                                },
-                                onclose: () => {
-                                    loadSubPage('pro');
-                                },
-                                titleClasses: 'pt-4',
-                                setContent() {
-                                    this.title = l.vpn_added_title;
+                            const status = await pro.propay.showFeatureWarning(
+                                l.vpn_added_title, vpnBlockerText);
 
-                                    if (is_mobile) {
-                                        this.slot = parseHTML(vpnBlockerText);
-                                    }
-                                    else {
-                                        const slot = document.createElement('p');
-                                        slot.className = 'px-12 information';
-                                        $(slot).safeHTML(vpnBlockerText);
-                                        this.slot = slot;
-                                    }
-                                }
-                            });
+                            if (status === 2 || !canContinue) {
+                                loadSubPage('pro');
+                                return;
+                            }
+                            else if ((status === 1) && pro.propay.loading) {
+                                loadingDialog.show('propayReady');
+                            }
+                        }
 
-                            loadingDialog.hide('propayReady');
-                            dialog.show();
+                        if (isVpnPlan && !pro.propay.trial) {
 
-                            return;
+                            vpnBlockerTitle = l.free_trial_unavailable;
+                            vpnBlockerText = l.subs_to_make_online_life_x;
+                            canContinue = true;
+
+                            const status = await pro.propay.showFeatureWarning(
+                                vpnBlockerTitle, vpnBlockerText, l[82], l.subscribe_btn);
+
+                            if (status === 2 || !canContinue) {
+                                loadSubPage('pro');
+                                return;
+                            }
+                            else if ((status === 1) && pro.propay.loading) {
+                                loadingDialog.show('propayReady');
+                            }
                         }
                     }
 
+
+                    const planTitleClass = pro.propay.trial ? '.free-trial' : '.paid-only';
+                    pro.propay.$selectedPlanTitle = $(`.top-header.plan-title${planTitleClass}`, pro.propay.$page);
+
                     await pro.propay.loadPaymentGatewayOptions();
+
+                    pro.propay.updatePurchaseButton();
+                    pro.propay.updateMainPageDisplay();
                     loadingDialog.hide('propayReady');
+                    pro.propay.loading = false;
 
                     const propayPageVisitEventId = pro.propay.getPropayPageEventId(pro.propay.planNum);
                     eventlog(propayPageVisitEventId);
@@ -269,6 +374,103 @@ pro.propay = {
         });
     },
 
+    showFeatureWarning(title, text, cancelTxt, proceedText) {
+        'use strict';
+
+
+        return new Promise((resolve) => {
+
+            let cancel;
+            if (cancelTxt) {
+                cancel = {
+                    label: cancelTxt,
+                };
+            }
+
+            const dialog = new MDialog({
+                cancel,
+                ok: {
+                    label: proceedText || l[81],
+                    callback: () => {
+                        resolve(1);
+                    }
+                },
+                onclose: () => {
+                    resolve(2);
+                },
+                titleClasses: 'pt-4',
+                setContent() {
+                    this.title = title;
+
+                    if (is_mobile) {
+                        const mobileTextWrapper = document.createElement('div');
+                        mobileTextWrapper.append(parseHTML(text));
+                        this.slot = mobileTextWrapper;
+                    }
+                    else {
+                        const slot = document.createElement('p');
+                        slot.className = 'px-12 information';
+                        $(slot).safeHTML(text);
+                        this.slot = slot;
+                    }
+                }
+            });
+
+            loadingDialog.hide('propayReady');
+            dialog.show();
+        });
+    },
+
+    updatePurchaseButton() {
+        'use strict';
+        // Check membership plans loaded, and TOS agreed to if needed
+        const canProceedLoaded = pro.propay.purchaseButton.canProceedLoaded;
+        const isVPN = pro.propay.planNum === pro.ACCOUNT_LEVEL_FEATURE_VPN;
+        const canProceedTOS = !isVPN || (isVPN && pro.propay.purchaseButton.canProceedTOS);
+        pro.propay.purchaseButton.$button.toggleClass('disabled', !canProceedLoaded || !canProceedTOS);
+    },
+
+    async checkCurrentFeatureStatus(planLevel) {
+        'use strict';
+
+        if (!pro.propay.currentPlanData) {
+            pro.propay.currentPlanData = await M.getUserPlanInfo().then(({subs, plans}) => {
+
+                let currentSub = false;
+                let currentSubMobile = false;
+                let currentPlan = false;
+
+                for (let i = 0; i < subs.length; i++) {
+                    const sub = subs[i];
+                    if ((sub.al + pro.getStandaloneBits(sub.features)) === planLevel) {
+                        const gateway = sub.gwid;
+                        if (!currentSubMobile && (gateway === 2 || gateway === 3)) {
+                            currentSubMobile = sub;
+                        }
+                        else {
+                            currentSub = sub;
+                            break;
+                        }
+                    }
+                }
+
+                if (!currentSub) {
+                    currentPlan = plans.find((plan) => {
+                        return (plan.al + pro.getStandaloneBits(plan.features)) === planLevel;
+                    });
+                }
+
+                return {
+                    currentSub,
+                    currentSubMobile,
+                    currentPlan,
+                };
+            });
+        }
+
+        return pro.propay.currentPlanData;
+    },
+
     /**
      * @returns {Promise<0|1|2>} // Returns 0 if the feature is not enabled, 1 if OK clicked and 2 if Cancel clicked
      */
@@ -276,49 +478,70 @@ pro.propay = {
         'use strict';
 
         return new Promise((resolve) => {
-            if (pro.proplan2.getUserFeature('vpn')) {
-                const dialog = new MDialog({
-                    ok: {
-                        label: l[507],
-                        callback: () => {
-                            resolve(1);
-                            return true;
-                        }
-                    },
-                    onclose: () => {
-                        resolve(2);
-                    },
-                    cancel: {
-                        label: l[82],
-                        callback: () => {
-                            resolve(2);
-                        }
-                    },
-                    titleClasses: 'pt-4',
-                    setContent() {
-                        this.title = l.vpn_added_title;
-                        const helpUrl = 'https://help.mega.io/plans-storage/payments-billing/cancel-subscription';
-                        const text = escapeHTML(l.vpn_to_disable_text)
-                            .replace('[A]', `<a href="${helpUrl}" target="_blank">`)
-                            .replace('[/A]', '</a>');
 
-                        if (is_mobile) {
-                            this.slot = parseHTML(text);
-                        }
-                        else {
-                            const slot = document.createElement('p');
-                            slot.className = 'px-12';
-                            $(slot).safeHTML(text);
-                            this.slot = slot;
-                        }
-                    }
-                });
-
-                dialog.show();
-            }
-            else {
+            if (!pro.proplan2.getUserFeature('vpn')) {
                 resolve(0);
+                return;
             }
+            pro.propay.checkCurrentFeatureStatus(pro.ACCOUNT_LEVEL_FEATURE_VPN)
+                .then(({currentSub, currentSubMobile, currentPlan}) => {
+
+                    let shouldShowWarning = false;
+
+                    if (currentSub.is_trial) {
+                        shouldShowWarning = !!currentSubMobile;
+                    }
+                    else if (currentSub) {
+                        shouldShowWarning = true;
+                    }
+                    else if (currentPlan) {
+                        shouldShowWarning = !currentPlan.is_trial;
+                    }
+
+                    if (!shouldShowWarning) {
+                        resolve(0);
+                        return;
+                    }
+
+                    const dialog = new MDialog({
+                        ok: {
+                            label: l[507],
+                            callback: () => {
+                                resolve(1);
+                                return true;
+                            }
+                        },
+                        onclose: () => {
+                            resolve(2);
+                        },
+                        cancel: {
+                            label: l[82],
+                            callback: () => {
+                                resolve(2);
+                            }
+                        },
+                        titleClasses: 'pt-4',
+                        setContent() {
+                            this.title = l.vpn_added_title;
+                            const text = l.vpn_to_disable_text;
+
+                            if (is_mobile) {
+                                const mobileTextWrapper = document.createElement('div');
+                                mobileTextWrapper.append(parseHTML(text));
+                                this.slot = mobileTextWrapper;
+                            }
+                            else {
+                                const slot = document.createElement('p');
+                                slot.className = 'px-12';
+                                $(slot).safeHTML(text);
+                                this.slot = slot;
+                            }
+                        }
+                    });
+
+                    loadingDialog.hide('propayReady');
+                    dialog.show();
+                }).catch(() => resolve(0));
         });
     },
 
@@ -335,7 +558,12 @@ pro.propay = {
             return false;
         }
 
-        const proNumInt = parseInt(pageParts[1]);
+        const planNumsByName = {
+            'vpn': pro.ACCOUNT_LEVEL_FEATURE_VPN,
+            'pwm': pro.ACCOUNT_LEVEL_FEATURE_PWM,
+        };
+
+        const proNumInt = planNumsByName[pageParts[1]] || parseInt(pageParts[1]);
 
         // If the Pro Flexi enabled (pf) flag is not on and they're trying to access the page, don't allow
         if (mega.flags && mega.flags.pf !== 1 && proNumInt === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
@@ -445,6 +673,8 @@ pro.propay = {
             return false;
         }
 
+        pro.propay.planObjOfChosenLevel = pro.getPlanObj(pro.propay.planNum);
+
         const checkGateway = (gate) => {
             // If plan is flexi and the gateway doesn't support business(and flexi)
             if (pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
@@ -471,7 +701,18 @@ pro.propay = {
             return gate;
         };
 
-        var tempGatewayOptions = gatewayOptions.filter(checkGateway);
+        const addGatewayToObject = (gate) => {
+            pro.propay.gatewaysByName[gate.gatewayName] = gate;
+        };
+
+        pro.propay.stripeSupported = false;
+
+        var tempGatewayOptions = gatewayOptions.filter((gate) => {
+            addGatewayToObject(gate);
+            const validGate = checkGateway(gate);
+            pro.propay.stripeSupported = pro.propay.stripeSupported || (validGate && validGate.supportsTrial);
+            return validGate;
+        });
 
         // if this user has a discount, clear gateways that are not supported.
         const discountInfo = pro.propay.getDiscount();
@@ -566,6 +807,8 @@ pro.propay = {
 
         // Clear the radio options, in case they revisted the page
         $('.payment-duration', $durationList).not('.template').remove();
+
+        const planIsSingleDuration = pro.planInFilter(pro.propay.planNum, 'singleDurationPlans');
 
         // Loop through the available plan durations for the current membership plan
         for (var i = 0, length = pro.membershipPlans.length; i < length; i++) {
@@ -728,6 +971,9 @@ pro.propay = {
         $('input', $selectedOption).prop('checked', true);
         $('.membership-radio', $selectedOption).addClass('checked');
         $('.membership-radio-label', $selectedOption).addClass('checked');
+
+        $(`${is_mobile ? '.pro-payment-block' : '.payment-page.plan-info'} > .payment-period`, this.$page)
+            .toggleClass('hidden', planIsSingleDuration);
     },
 
     /**
@@ -833,9 +1079,56 @@ pro.propay = {
             // Update the main price and wording for one-time or recurring
             pro.propay.updateMainPrice(planIndex);
             pro.propay.updateTextDependingOnRecurring();
+
+            pro.propay.currentPlanArr = pro.membershipPlans[planIndex];
         });
     },
 
+    updateFeaturePlanDetails() {
+        'use strict';
+        let storageTxt = '';
+        let bandwidthTxt = '';
+
+        if (pro.propay.planNum === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
+            storageTxt = l.pr_vpn_text1;
+            bandwidthTxt = l.pr_vpn_text2;
+        }
+
+        pro.propay.$storageAmount.text(storageTxt);
+        pro.propay.$bandwidthAmount.text(bandwidthTxt);
+
+        if (pro.propay.shouldShowTrial()) {
+            pro.propay.updateTrialPlanCard(pro.propay.selectedPlan);
+            return false;
+        }
+        return true;
+    },
+
+    updateFreeTrialPlanDetails() {
+        'use strict';
+
+        const freeTrialStrings = {
+            '100000': [l.privacy_on_the_go, l.lightning_fast_speeds, l.servers_around_globe],   // VPN
+        };
+
+        const features = freeTrialStrings[pro.propay.planNum];
+
+        if (!features) {
+            console.assert(!d, 'Unknown free trial plan:', pro.propay.planNum);
+            return false;
+        }
+
+        // Remove all direct children except the template
+        const $target = pro.propay.$freeTrialTemplate.parent();
+        $('> *:not(.template)', $target).remove();
+
+        for (const f of features) {
+            const $feature = pro.propay.$freeTrialTemplate.clone().removeClass('hidden template').text(f);
+            $target.safeAppend($feature.prop('outerHTML'));
+        }
+    },
+
+    // TODO: Make updateMainPrice(...) not run twice every load
     /**
      * Updates the main price
      * @param {Number} planIndex    The array index of the plan in pro.membershipPlans
@@ -866,25 +1159,101 @@ pro.propay = {
         const bandwidthValue = bytesToSize(currentPlan[pro.UTQA_RES_INDEX_TRANSFER] * pro.BYTES_PER_GB, 3, 4);
 
         // Set selectors
-        const $pricingBox = $('.pricing-page.plan', this.$page);
-        const $planName = $('.plan-title', $pricingBox);
-        const $priceNum = $('.plan-price .price', $pricingBox);
-        const $pricePeriod = $('.plan-period', $pricingBox);
-        const $storageAmount = $('.plan-feature.storage', $pricingBox);
-        const $storageTip = $('i', $storageAmount);
-        const $bandwidthAmount = $('.plan-feature.transfer', $pricingBox);
-        const $bandwidthTip = $('i', $bandwidthAmount);
-        const $euroPrice = $('.euro-price', $pricingBox);
-        const $currncyAbbrev = $('.plan-currency', $pricingBox);
+        pro.propay.$pricingBox = $('.pricing-page.plan', this.$page);
+        pro.propay.$planName = $('.plan-title', pro.propay.$pricingBox);
+        pro.propay.$priceNum = $('.plan-price .price', pro.propay.$pricingBox);
+        pro.propay.$pricePeriod = $('.plan-period', pro.propay.$pricingBox);
+        pro.propay.$storageAmount = $('.plan-feature.storage', pro.propay.$pricingBox);
+        pro.propay.$storageTip = $('i', pro.propay.$storageAmount);
+        pro.propay.$bandwidthAmount = $('.plan-feature.transfer', pro.propay.$pricingBox);
+        pro.propay.$bandwidthTip = $('i', pro.propay.$bandwidthAmount);
+        pro.propay.$euroPrice = $('.euro-price', pro.propay.$pricingBox);
+        pro.propay.$currncyAbbrev = $('.plan-currency', pro.propay.$pricingBox);
+        pro.propay.$pricePeriodFree = $('.free-trial-period', pro.propay.$pricingBox);
+        pro.propay.$freeTrialTemplate = $('.template.free-trial.plan-feature', pro.propay.$pricingBox);
+
+        const {
+            $pricingBox, $planName, $priceNum, $pricePeriod, $storageAmount, $storageTip, $bandwidthAmount,
+            $bandwidthTip, $euroPrice, $currncyAbbrev
+        } = pro.propay;
 
         var localPrice;
+
+        const initElementSwitcher = () => {
+            if (pro.propay.freeTrialCardController) {
+                return;
+            }
+
+            let trial;
+            const $error = $('.error-box-not-stripe', pro.propay.$page);
+
+            let $mobileTrial;
+
+            if (is_mobile) {
+                $mobileTrial = mobile.propay.createMobilePaymentCard(
+                    $('.payment-options .mobile.pro-plan-card-container', this.$page),
+                    'pr-payment-card-mob',
+                    currentPlan);
+            }
+
+            if (!pro.propay.trial) {
+                return;
+            }
+
+            if (is_mobile) {
+                trial = {
+                    $element: $mobileTrial,
+                    initialised: true,
+                };
+            }
+            else {
+                const options = {
+                    id: 'propay-free-trial-card',
+                    days: pro.propay.trial.days,
+                };
+
+                const price = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE] || currentPlan[pro.UTQA_RES_INDEX_PRICE];
+                const currency = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY] || 'EUR';
+
+                trial = {
+                    $element: pro.propay.createFreeTrialCard(
+                        formatCurrency(price, currency, 'narrowSymbol'),
+                        currency,
+                        options
+                    ),
+                    $target: $('.payment-page.info-block.plan-info .free-trial-card-container', pro.propay.$page)
+                        .removeClass('hidden'),
+                };
+            }
+
+            pro.propay.freeTrialCardController = mega.elementSwitcher({
+                trial,
+                'error': {
+                    $element: $error,
+                    initialised: true,
+                },
+                onElementChange: () => {
+                    pro.propay.updateMainPageDisplay();
+                    if (is_mobile) {
+                        mobile.propay.updateMobilePaymentCard(currentPlan, !pro.propay.shouldShowTrial());
+                    }
+                },
+
+            }, pro.propay.initialPaymentOptionIsStripe ? 'trial' : 'error', 'free-trial-payment-switcher');
+        };
+
+        if (pro.propay.trial || is_mobile) {
+            initElementSwitcher();
+        }
 
         if (currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE]) {
             this.$page.addClass('local-currency');
             $currncyAbbrev.text(localCurrency);
             $euroPrice.text(euroPrice);
             localPrice = formatCurrency(currentPlan[pro.UTQA_RES_INDEX_LOCALPRICE], localCurrency, 'narrowSymbol');
-            $('.local-currency-tip', this.$page).removeClass('hidden');
+            if (!is_mobile) {
+                $('.local-currency-tip', this.$page).removeClass('hidden');
+            }
         }
         else {
             this.$page.removeClass('local-currency');
@@ -893,9 +1262,20 @@ pro.propay = {
 
         // If mobile, name at the top
         if (is_mobile) {
-            const $mobilePlanName = $('.payment-options .plan-name', this.$page);
+            let planNameText;
+            const $proCardContainer = $('.mobile.pro-card-container', this.$page);
+            const $mobilePlanName = $('.plan-name', $proCardContainer);
 
-            $mobilePlanName.text(pro.propay.planName);
+            if (pro.propay.shouldShowTrial()) {
+                planNameText = mega.icu
+                    .format(l.try_plan_free_for_days, currentPlan[pro.UTQA_RES_INDEX_EXTRAS].trial.days)
+                    .replace('%1', pro.propay.planName);
+            }
+            else {
+                planNameText = pro.propay.planName;
+            }
+
+            $mobilePlanName.text(planNameText);
         }
 
         // Update the style of the dialog to be Pro I-III or Lite, also change the plan name
@@ -905,49 +1285,60 @@ pro.propay = {
 
         // Default to svg sprite icon format icon-crests-pro-x-details
         let iconClass = 'no-icon';
+        let updatePrice = true;
 
-        if (pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_LITE) {
-            iconClass = 'sprite-fm-uni icon-crests-lite-details';
-        }
-        else if (pro.propay.planNum === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
-            iconClass = 'sprite-fm-uni icon-crest-vpn';
+        if (pro.planInFilter(pro.propay.planNum, 'validFeatures')) {
+            pro.propay.planObj = pro.getPlanObj(currentPlan);
+            updatePrice = pro.propay.updateFeaturePlanDetails();
+            if (pro.propay.shouldShowTrial()) {
+                pro.propay.updateFreeTrialPlanDetails();
+            }
+
+            if (pro.propay.planNum === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
+                iconClass = 'sprite-fm-uni icon-crest-vpn';
+            }
 
             $storageAmount.text(l.pr_vpn_text1);
             $bandwidthAmount.text(l.vpn_choose_title3);
         }
-        else if (pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
-            iconClass = 'sprite-fm-uni icon-crests-pro-flexi-details';
-        }
-        else if (pro.filter.simple.hasIcon.has(pro.propay.planNum)) {
-            iconClass = `sprite-fm-uni icon-crests-pro-${pro.propay.planNum}-details`;
-        }
+        if (updatePrice) {
+            if (pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_LITE) {
+                iconClass = 'sprite-fm-uni icon-crests-lite-details';
+            }
+            else if (pro.filter.simple.hasIcon.has(pro.propay.planNum)) {
+                iconClass = `sprite-fm-uni icon-crests-pro-${pro.propay.planNum}-details`;
+            }
+            else if (pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
+                iconClass = 'sprite-fm-uni icon-crests-pro-flexi-details';
+            }
 
-        // Add svg icon class (for desktop and mobile)
-        $('.plan-icon', this.$page).addClass(iconClass);
+            // Add svg icon class (for desktop and mobile)
+            $('.plan-icon', this.$page).addClass(iconClass);
 
-        // Update the price of the plan and the /month or /year next to the price box
-        // work for local currency if present
-        if (localPrice) {
-            $priceNum.text(localPrice);
-        }
-        else {
-            $priceNum.text(euroPrice);
-        }
-        $pricePeriod.text('/' + monthOrYearWording);
+            // Update the price of the plan and the /month or /year next to the price box
+            // work for local currency if present
+            if (localPrice) {
+                $priceNum.text(localPrice);
+            }
+            else {
+                $priceNum.text(euroPrice);
+            }
+            $pricePeriod.text('/' + monthOrYearWording);
 
-        // Update storage
-        if ($storageTip && $storageTip.attr('data-simpletip')) {
-            $('span span', $storageAmount).text(storageValue);
-            $storageTip.attr('data-simpletip', l[23807].replace('%1', '[U]' + storageValue + '[/U]'));
-        }
+            // Update storage
+            if ($storageTip && $storageTip.attr('data-simpletip')) {
+                $('span span', $storageAmount).text(storageValue);
+                $storageTip.attr('data-simpletip', l[23807].replace('%1', '[U]' + storageValue + '[/U]'));
+            }
 
-        // Update bandwidth
-        if ($bandwidthTip && $bandwidthTip.data('simpletip')) {
-            $('span span', $bandwidthAmount).text(bandwidthValue);
-            $bandwidthTip.attr('data-simpletip', bandwidthText.replace('%1', '[U]' + bandwidthValue + '[/U]'));
-        }
+            // Update bandwidth
+            if ($bandwidthTip && $bandwidthTip.data('simpletip')) {
+                $('span span', $bandwidthAmount).text(bandwidthValue);
+                $bandwidthTip.attr('data-simpletip', bandwidthText.replace('%1', '[U]' + bandwidthValue + '[/U]'));
+            }
 
-        discountInfo = discountInfo || pro.propay.getDiscount();
+            discountInfo = discountInfo || pro.propay.getDiscount();
+        }
 
         // Handle new multi-use discounts
         if (discountInfo && discountInfo.md && discountInfo.pd && discountInfo.al === pro.propay.planNum) {
@@ -1023,6 +1414,65 @@ pro.propay = {
         }
     },
 
+    initThirdSectionSwitcher() {
+        'use strict';
+
+        const elements = {
+            'regular': {
+                $element: $('.third-section.paid-only, .bottom-page .pro-plan', pro.propay.$page),
+                initialised: true,
+            },
+            'vpn': {
+                $element: $('.third-section.vpn-only', pro.propay.$page),
+                initialised: true,
+            },
+        };
+        pro.propay.thirdSectionController = mega.elementSwitcher(
+            elements,
+            pro.propay.planNum === pro.ACCOUNT_LEVEL_FEATURE_VPN ? 'vpn' : 'regular',
+            'payment-sect-three',
+            true);
+    },
+
+    updateMainPageDisplay() {
+        'use strict';
+
+        const isTrial = !!pro.propay.shouldShowTrial();
+        const isVPN = pro.propay.planNum === pro.ACCOUNT_LEVEL_FEATURE_VPN;
+
+        const $page = pro.propay.$page.toggleClass('free-trial', isTrial);
+
+        // Show the free trial elements, and hide the paid only elements
+        $('.free-trial:not(.template, .mobile.pro-card-container)', $page).toggleClass('hidden', !isTrial);
+        $('.paid-only', $page).toggleClass('hidden', isTrial);
+
+        // Show the VPN specific elements
+        if (!pro.propay.thirdSectionController) {
+            pro.propay.initThirdSectionSwitcher();
+        }
+        $('.vpn-only', $page).toggleClass('hidden', !isVPN);
+        pro.propay.thirdSectionController
+            .showElement(pro.propay.planNum === pro.ACCOUNT_LEVEL_FEATURE_VPN ? 'vpn' : 'regular');
+
+        const isFeaturePlan = pro.filter.simple.validFeatures.has(pro.propay.planNum);
+
+        // Update header text with plan
+        if (isTrial) {
+            pro.propay.$selectedPlanTitle.text(mega.icu.format(l.try_plan_free_for_days, pro.propay.trial.days)
+                .replace('%1', pro.propay.planName));
+        }
+        else if (isFeaturePlan) {
+            pro.propay.$selectedPlanTitle.text(pro.propay.planName);
+        }
+        else {
+            pro.propay.$selectedPlanTitle.text(l[6976].replace('%1', pro.propay.planName));
+        }
+
+        if (is_mobile) {
+            $('.mobile.pro-card-container', pro.propay.$page).toggleClass('free-trial', isTrial);
+        }
+    },
+
     /**
      * Updates the text on the page depending on the payment option they've selected and
      * the duration/period so it is accurate for a recurring subscription or one off payment.
@@ -1041,9 +1491,7 @@ pro.propay = {
         // Update whether this selected option is recurring or one-time
         const $selectDurationOption = $('.duration-options-list .membership-radio.checked', this.$page);
         const selectedGatewayName = $('.payment-options-list input:checked', this.$page).val();
-        const selectedProvider = pro.propay.allGateways.filter(val => {
-            return (val.gatewayName === selectedGatewayName);
-        })[0] || false;
+        const selectedProvider = pro.propay.gatewaysByName[selectedGatewayName] || false;
 
         // Set text to subscribe or purchase
         var planIndex = $selectDurationOption.parent().attr('data-plan-index');
@@ -1193,7 +1641,7 @@ pro.propay = {
             // Show the discount recurring/non-recurring text block below the Pro plan name
             $planTextRecurringDiscount.removeClass('hidden').text(recurringOrNonRecurring);
         }
-        else {
+        else if (!pro.propay.shouldShowTrial()) {
             // If recurring subscription is chosen, show only the standard recurring text in the dialog
             if (recurringEnabled) {
                 $noteStandardRecurring.removeClass('hidden');
@@ -1209,9 +1657,20 @@ pro.propay = {
             $('.recurring', $planTextStandard).text(recurringOrNonRecurring);
         }
 
-        // If recurring, always show recurring info box above the Pro pay page Purchase button and init click handler
-        if (recurringEnabled) {
-            $subscriptionInstructions.removeClass('hidden');
+
+        // If plan is monthly only trial, and recurring:
+        if (pro.propay.trial
+            && !pro.getPlan(pro.propay.planNum, 12)
+            && (numOfMonths === 1)
+            && recurringEnabled
+            && pro.propay.shouldShowTrial()) {
+
+            $subscriptionInstructions.removeClass('hidden')
+                .safeHTML(mega.icu.format(l.after_days_card_charged_m, pro.propay.trial.days) + ' ' + l['10630']);
+        }
+        // Elif recurring, always show recurring info box above the Pro pay page Purchase button and init click handler
+        else if (recurringEnabled && !is_mobile) {
+            $subscriptionInstructions.removeClass('hidden').safeHTML(l['10637'] + ' ' + l['10630']);
         }
         else {
             // Otherwise hide it
@@ -1290,9 +1749,9 @@ pro.propay = {
         // Get their plan price from the currently selected duration radio button
         var selectedPlanIndex = $('.duration-options-list .membership-radio.checked', 'body')
             .parent().attr('data-plan-index');
-        var selectedPlan = pro.membershipPlans[selectedPlanIndex];
-        var selectedPlanNum = selectedPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
-        var selectedPlanPrice = selectedPlan[pro.UTQA_RES_INDEX_PRICE];
+        pro.propay.selectedPlan = pro.membershipPlans[selectedPlanIndex];
+        var selectedPlanNum = pro.propay.selectedPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
+        var selectedPlanPrice = pro.propay.selectedPlan[pro.UTQA_RES_INDEX_PRICE];
 
         // Convert to float for numeric comparisons
         var planPriceFloat = parseFloat(selectedPlanPrice);
@@ -1333,7 +1792,7 @@ pro.propay = {
             }
 
             // Add hidden class if this payment method is not supported for this plan
-            if ((gatewayOpt.supportsExpensivePlans === 0) && pro.filter.simple.supportsExpensive.has(selectedPlan)) {
+            if ((gatewayOpt.supportsExpensivePlans === 0) && pro.filter.simple.supportsExpensive.has(selectedPlanNum)) {
                 $gateway.addClass('hidden');
                 $gateway.attr('title', l[7162]);
             }
@@ -1413,6 +1872,13 @@ pro.propay = {
             $('.membership-radio', $this).addClass('checked');
             $('.provider-details', $this).addClass('checked');
 
+            if (pro.propay.trial && pro.propay.freeTrialCardController) {
+                const selectedProvider = pro.propay.gatewaysByName[$input.val()];
+                pro.propay.freeTrialCardController.showElement(selectedProvider.supportsTrial
+                    ? 'trial'
+                    : 'error');
+            }
+
             pro.propay.updateTextDependingOnRecurring();
             pro.propay.updateDurationOptionsOnProviderChange();
         });
@@ -1467,6 +1933,9 @@ pro.propay = {
             // Otherwise select the first available payment option
             pro.propay.preselectPaymentOption();
         }
+
+        const preSelectedProvider = $('.payment-options-list .membership-radio.checked input', '.fmholder').val();
+        pro.propay.initialPaymentOptionIsStripe = pro.propay.gatewaysByName[preSelectedProvider].supportsTrial;
     },
 
     /**
@@ -1483,10 +1952,32 @@ pro.propay = {
             '.fmholder:not(.hidden)'
         );
 
+        let $option = null;
+
+        if (pro.propay.trial) {
+            let stripePaymentFound = false;
+            let counter = 0;
+            const numberOfOptions = $payOptions.length;
+
+            while (!stripePaymentFound && (counter++ < numberOfOptions)) {
+                const $payOption = $payOptions.eq(counter - 1);
+                const gatewayName = $('input', $payOption).val();
+                const gateway = pro.propay.gatewaysByName[gatewayName];
+
+                stripePaymentFound = !!gateway.supportsTrial;
+                if (stripePaymentFound) {
+                    $option = $payOption;
+                }
+            }
+        }
+
         // If they have a Pro balance, select the first option, otherwise select
         // the next payment option (usually API will have it ordered to be Visa)
-        var $option = (parseFloat(pro.propay.proBalance) > 0) ? $payOptions.first()
-            : $payOptions.length > 1 ? $payOptions.eq(1) : $payOptions.eq(0);
+        if (!$option) {
+            $option = parseFloat(pro.propay.proBalance) > 0
+                ? $payOptions.first()
+                : $payOptions.length > 1 ? $payOptions.eq(1) : $payOptions.eq(0);
+        }
 
         // Check the radio button option
         $('input', $option).prop('checked', true);
@@ -1588,6 +2079,58 @@ pro.propay = {
                 $(window).trigger('resize');
             });
         }
+    },
+
+    createFreeTrialCard(formattedPrice, curr, information) {
+        'use strict';
+        information = information || Object.create(null);
+        if (!formattedPrice || !curr) {
+            return false;
+        }
+
+        // Just in case this is accidentally called multiple times for the same element, or to update an element
+        if (information.id) {
+            $('#' + information.id).remove();
+        }
+
+        information.days = information.days || 7;
+        information.id = information.id || makeid(10);
+        information.startDate = information.startDate
+            || time2date((Date.now() / 1000) + information.days * 24 * 60 * 60, 2);
+
+        const $template = mega.templates.getTemplate('free-trial-card-temp')
+            .addClass(information.type + information.classList);
+
+        const priceText = mega.icu.format(l.days_free_then_price_m, information.days)
+            .replace('%1', formattedPrice + (curr === 'EUR' ? '' : '*'))
+            .replace('%2', curr);
+
+        const startDateText = l.sub_start_d_can_cancel.replace('%1', information.startDate);
+
+        const fiveDays = mega.icu.format(l.on_day_n, 5);
+        const sevenDays = mega.icu.format(l.on_day_n, 7);
+
+        $('.price', $template).text(priceText);
+        $('.start-date', $template).text(startDateText);
+        $('.day-7', $template).text(sevenDays);
+        $('.day-5', $template).text(fiveDays);
+
+        return $template;
+    },
+
+    updateTrialPlanCard(plan) {
+        'use strict';
+        const price = plan[pro.UTQA_RES_INDEX_LOCALPRICE] || plan[pro.UTQA_RES_INDEX_PRICE];
+        const currency = plan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY] || 'EUR';
+        const formattedPrice = formatCurrency(price, currency, 'narrowSymbol');
+        pro.propay.$planName.text(l.free_trial_caps);
+        pro.propay.$priceNum.text(formatCurrency(0, currency, 'narrowSymbol'));
+        pro.propay.$pricePeriodFree.safeHTML(
+            mega.icu.format(l.then_price_m_after_n_days, pro.propay.trial.days)
+                .replace('%1', formattedPrice)
+                .replace('%2', currency)
+        );
+        $('.asterisk', pro.propay.$pricePeriodFree).toggleClass('hidden', currency === 'EUR');
     },
 
     /**
@@ -1842,6 +2385,37 @@ pro.propay = {
 
                 tell(errorMessage);
             });
+    },
+
+    redeemFreeTrial() {
+
+        'use strict';
+
+        pro.propay.showLoadingOverlay();
+
+        if (!(pro.propay.proPaymentMethod.toLowerCase().indexOf('stripe') === 0)) {
+            console.error('redeemFreeTrial: Invalid payment method:', pro.propay.proPaymentMethod);
+            return;
+        }
+
+        pro.lastPaymentProviderId = addressDialog.gatewayId_stripe;
+
+        const rftRequest = {
+            a: 'rft',
+            it: pro.propay.selectedProPackage[pro.UTQA_RES_INDEX_ITEMNUM],
+            id: pro.propay.selectedProPackage[pro.UTQA_RES_INDEX_ID],
+            gw: addressDialog.gatewayId_stripe,
+            extra: addressDialog.extraDetails,
+        };
+
+        return api.screq(rftRequest).then(({result}) => {
+            pro.propay.trial.trialId = result.id;
+            addressDialog.processUtcResult({'EUR': result.url}, true, result.id);
+        }).catch((ex) => {
+            reportError(ex);
+            pro.propay.hideLoadingOverlay();
+            tell(ex < 0 ? api_strerror(ex) : ex);
+        });
     },
 
     /**
@@ -2133,10 +2707,17 @@ pro.propay = {
                 loginProceed = true;
                 pro.propay.accountRequiredDialog.hide();
                 showLoginDialog();
+
+                onIdle(() => eventlog(500512));
+
                 return false;
             });
 
             $('header p', $dialog).text(l[5842]);
+
+            $('button.close.js-close', $dialog).rebind('click.closeDialog', () => {
+                delay('login-dlg-x.log', eventlog.bind(null, 500514));
+            });
 
             $('.pro-register', $dialog).rebind('click.loginrequired', () => {
                 loginProceed = true;
@@ -2155,6 +2736,9 @@ pro.propay = {
                 else {
                     showRegisterDialog();
                 }
+
+                delay('create-acc-btn.log', eventlog.bind(null, 500513));
+
                 return false;
             });
 
@@ -2166,6 +2750,8 @@ pro.propay = {
         });
 
         pro.propay.accountRequiredDialog.show();
+
+        onIdle(() => eventlog(500511));
     },
 };
 mBroadcaster.once('login2', () => {

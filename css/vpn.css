@@ -59,10 +59,6 @@
 .fm-right-account-block .fm-account-vpn .mobile-config-heading {
     margin-top: 16px;
 }
-.fm-right-account-block .fm-account-vpn .tnc-agree-checkbox {
-    display: flex;
-    margin-bottom: 12px;
-}
 
 .fm-right-account-block .fm-account-vpn .config-qr {
     width: fit-content;

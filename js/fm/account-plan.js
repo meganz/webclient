@@ -157,14 +157,30 @@ accountUI.plan = {
         renderAccountDetails($planContent, account) {
             'use strict';
 
-            if (u_attr.p) { // Pro/Lite/Business account
-                var planNum = u_attr.p;
+            const $planDetails = $('.accounttype .plan-details', $planContent);
+
+            // Find the first Pro/Business plan the user purchased
+            const activeSubscription = account.subs.find(({ al, next }) =>
+                next >= unixtime() && al !== pro.ACCOUNT_LEVEL_FEATURE
+            );
+            const activePlan = !activeSubscription && account.plans.find(({ al, expires }) =>
+                expires >= unixtime() && al !== pro.ACCOUNT_LEVEL_FEATURE
+            );
+            const mainPlanDetails = activeSubscription || activePlan;
+
+            if (mainPlanDetails) { // Pro/Lite/Business account
+                var planNum = mainPlanDetails.al;
                 var planText = pro.getProPlanName(planNum);
 
-                // if this is p=100 business
-                if (planNum === pro.ACCOUNT_LEVEL_BUSINESS) {
+                // Add paid class for plan card priority (Non-feature plan > Feature plan > Free)
+                $planDetails.addClass('paid').attr('subid', mainPlanDetails.id);
+
+                // if this is p=100 business or p=101 flexi
+                if (planNum === pro.ACCOUNT_LEVEL_BUSINESS || planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
                     $('.account.plan-info.accounttype', $planContent).addClass('business');
-                    $('.fm-account-plan .acc-renew-date-info', $planContent).removeClass('border');
+                    if (planNum === pro.ACCOUNT_LEVEL_BUSINESS) {
+                        $('.fm-account-plan .acc-renew-date-info', $planContent).removeClass('border');
+                    }
                 }
                 else {
                     $('.account.plan-info.accounttype', $planContent).removeClass('business');
@@ -176,22 +192,17 @@ accountUI.plan = {
                 $('.account .plan-icon', $planContent).addClass(`pro${planNum}`);
 
                 // Subscription
-                if (account.stype === 'S') {
-                    const activeSubscription = Array.isArray(account.plans)
-                        && account.plans[0].subid
-                        && Array.isArray(account.subs)
-                        && account.subs.find(({ id }) => id === account.plans[0].subid)
-                        || null;
-
-                    this.renderSubscription(activeSubscription, $planContent);
+                if (mainPlanDetails.next) {
+                    this.renderSubscription(mainPlanDetails, $planContent);
                 }
-                else if (account.stype === 'O') {
+                // One-off or cancelled
+                else if (mainPlanDetails.expires) {
+                    const expiryTimestamp = M.account.expiry || mainPlanDetails.expires;
 
-                    var expiryTimestamp = account.nextplan ? account.nextplan.t : account.expiry;
-
-                    // one-time or cancelled subscription
                     $('.subtitle-txt.expiry-txt', $planContent).text(l[987]);
-                    $('.account.plan-info.expiry span', $planContent).text(time2date(expiryTimestamp, 2));
+                    $('.account.plan-info.expiry span', $planContent)
+                        .addClass('red')
+                        .text(time2date(expiryTimestamp, 2));
                     $('.sub-container.subscription:not(.feature)', $planContent).addClass('hidden');
                 }
 
@@ -200,9 +211,10 @@ accountUI.plan = {
                 $('.account.plan-info.bandwidth', $planContent).parent().removeClass('hidden');
             }
             else { // Free account
+                $planDetails.removeClass('paid').attr('subid', '');
                 $('.account.plan-info.accounttype span', $planContent).text(l[1150]);
                 $('.account .plan-icon', $planContent).addClass('free');
-                $('.account.plan-info.expiry', $planContent).text(l[436]);
+                $('.account.plan-info.expiry', $planContent).removeClass('red').text(l[436]);
                 $('.sub-container.subscription:not(.feature)', $planContent).addClass('hidden');
                 if (account.mxfer) {
                     $('.account.plan-info.bandwidth', $planContent).parent().removeClass('hidden');
@@ -211,23 +223,14 @@ accountUI.plan = {
                     $('.account.plan-info.bandwidth', $planContent).parent().addClass('hidden');
                 }
             }
-
-            // If Business or Pro Flexi, override to show the name (even if expired i.e. when u_attr.p is undefined)
-            if (u_attr.b || u_attr.pf) {
-                $('.account.plan-info.accounttype', $planContent).addClass('business');
-                $('.account.plan-info.accounttype span', $planContent).text(
-                    pro.getProPlanName(u_attr.b ? pro.ACCOUNT_LEVEL_BUSINESS : pro.ACCOUNT_LEVEL_PRO_FLEXI)
-                );
-            }
         },
 
         /**
-         * @param {Array<String|Number>} vpnPlan The plan details
          * @param {jQuery} $planContent The jQuery element to render the block into
          * @param {Object} account Account data to work with
          * @returns {void}
          */
-        renderVpnPlanBlock(vpnPlan, $planContent, account) {
+        renderVpnPlanBlock($planContent, account) {
             'use strict';
 
             const activeSubscription = account.subs
@@ -236,8 +239,15 @@ accountUI.plan = {
                         && features.vpn
                         && Object.keys(features).length === 1
                 );
+            const expiredPlan = !activeSubscription && account.plans
+                && account.plans.find(
+                    ({ al, features }) => al === pro.ACCOUNT_LEVEL_FEATURE
+                        && features.vpn
+                        && Object.keys(features).length === 1
+                );
 
-            if (!activeSubscription && u_attr && u_attr.p) {
+            // Do not render if we cannot find a VPN subscription (active or cancelled)
+            if (!activeSubscription && !expiredPlan) {
                 return;
             }
 
@@ -251,30 +261,25 @@ accountUI.plan = {
             vpnBlock = document.createElement('div');
             vpnBlock.className = 'vpn-details';
 
+            const isTrial = activeSubscription ? activeSubscription.is_trial : expiredPlan.is_trial;
+            const planCardDate = activeSubscription ? activeSubscription.next : expiredPlan.expires;
+
             const sections = [
                 {
                     label: l[16166],
-                    value: l.pr_vpn_title
+                    value: l.pr_vpn_title,
+                    isTrial
+                },
+                {
+                    label: activeSubscription ? isTrial ? l.sub_begins : l[6971] : l[987],
+                    value: time2date(planCardDate, 2),
+                    expires: !!expiredPlan
                 }
             ];
 
-            if (activeSubscription) {
-                sections.push({
-                    label: l[6971],
-                    value: time2date(activeSubscription.next, 2)
-                });
-            }
-            else {
-                sections.push({
-                    label: l[987],
-                    value: time2date(vpnPlan[0], 2),
-                    expires: true
-                });
-            }
-
             for (let i = 0; i < sections.length; i++) {
-                const { label, value, expires } = sections[i];
-                const section = this.renderSubSection(label, value, expires);
+                const { label, value, expires, isTrial } = sections[i];
+                const section = this.renderSubSection(label, value, expires, null, isTrial);
                 vpnBlock.appendChild(section);
             }
 
@@ -302,8 +307,6 @@ accountUI.plan = {
                                 delay('megaVpnCancel', () => {
                                     const { cancelSubscriptionDialog } = accountUI.plan.accountType;
                                     cancelSubscriptionDialog.init(activeSubscription, section);
-                                    cancelSubscriptionDialog.$dialog.removeClass('hidden');
-                                    cancelSubscriptionDialog.$benefitsCancelDialog.addClass('hidden');
                                 });
                             }
                         },
@@ -313,7 +316,7 @@ accountUI.plan = {
 
                             const info = document.createElement('div');
                             info.className = 'cancel-subscription-info';
-                            info.textContent = l.vpn_cancel_confirm_txt1;
+                            info.textContent = isTrial ? l.vpn_trial_cancel_confirm : l.vpn_cancel_confirm_txt1;
 
                             const table = document.createElement('div');
                             const header = document.createElement('div');
@@ -377,12 +380,12 @@ accountUI.plan = {
                             }
 
                             this.slot = div;
-                            this.title = l.vpn_cancel_confirm_title1;
+                            this.title = isTrial ? l.cancel_trial_header : l.vpn_cancel_confirm_title1;
                         }
                     });
 
                     dialog.show();
-                });
+                }, isTrial);
 
                 vpnBlock.appendChild(section);
             }
@@ -409,14 +412,11 @@ accountUI.plan = {
             $('.pro-extras')
                 .toggleClass('hidden', !allowedPlans.has(u_attr.p));
 
-            const vpnPlan = pro.proplan2.getUserFeature('vpn');
-
-            if (vpnPlan) {
-                this.renderVpnPlanBlock(vpnPlan, $planContent, account);
-            }
+            // Try to render VPN plan block
+            this.renderVpnPlanBlock($planContent, account);
         },
 
-        renderSubSection(label, value, expires, extraClasses) {
+        renderSubSection(label, value, expires, extraClasses, isTrial) {
             'use strict';
 
             const section = document.createElement('div');
@@ -435,21 +435,30 @@ accountUI.plan = {
             const valueSpan = document.createElement('span');
             valueSpan.className = (expires) ? 'red' : '';
             valueSpan.textContent = value;
-
             valueEl.appendChild(valueSpan);
+
+            if (isTrial) {
+                const freeTrialSpan = document.createElement('span');
+                freeTrialSpan.className = 'free-trial';
+                freeTrialSpan.textContent = l.free_trial_caps;
+                valueEl.appendChild(freeTrialSpan);
+            }
+
             section.appendChild(labelEl);
             section.appendChild(valueEl);
             return section;
         },
 
-        renderSubBtnSection(callback) {
+        renderSubBtnSection(callback, isTrial) {
             'use strict';
 
             const section = document.createElement('div');
             section.className = 'settings-sub-section sub-container feature'
                 + ' subscription justify-end border btn-cancel-sub';
 
-            const cancelBtn = new MButton(l[7165], null, callback, 'mega-button');
+            const btnString = isTrial ? l.cancel_trial_btn : l[7165];
+
+            const cancelBtn = new MButton(btnString, null, callback, 'mega-button');
             section.appendChild(cancelBtn.el);
 
             return section;
@@ -460,19 +469,24 @@ accountUI.plan = {
 
             const $rightBlock = $('.settings-right-block', $planContent);
 
-            if ($('.extra-sub', $rightBlock).length) {
-                return; // Rendered already
-            }
+            const mainSubId = $('.plan-details', $rightBlock).attr('subid') || null;
+            const extraSubs = account.subs.filter(({ al, id, next }) =>
+                al !== pro.ACCOUNT_LEVEL_FEATURE &&
+                mainSubId !== id &&
+                next >= unixtime()
+            );
 
-            const activeSubId = account.plans && account.plans[0].subid || null;
-            const extraSubs = account.subs
-                .filter(({ al, id }) => al !== pro.ACCOUNT_LEVEL_FEATURE && (activeSubId !== id));
+            // Remove any already rendered plan cards
+            $('.extra-sub', $rightBlock).remove();
 
             for (let i = 0; i < extraSubs.length; i++) {
                 const { id, al, next, gwid } = extraSubs[i];
                 const subBlock = document.createElement('div');
                 subBlock.id = `extra-sub-${id}`;
                 subBlock.className = 'extra-sub';
+
+                // Add paid class for plan card priority (Non-feature plan > Feature plan > Free)
+                subBlock.classList.add('paid');
 
                 const sections = [
                     { label: l[16166], value: pro.getProPlanName(al) },
@@ -492,7 +506,7 @@ accountUI.plan = {
                     }
 
                     accountUI.plan.accountType.cancelSubscriptionDialog.init(extraSubs[i], subBlock);
-                });
+                }, false);
                 subBlock.appendChild(btnSection);
 
                 $rightBlock[0].appendChild(subBlock);
@@ -520,12 +534,12 @@ accountUI.plan = {
 
                 // Change placeholder 'Expires on' to 'Renews'
                 $('.subtitle-txt.expiry-txt', $planContent).text(l[6971]);
-                $('.account.plan-info.expiry', $planContent).text(paymentType);
+                $('.account.plan-info.expiry span', $planContent).text(paymentType);
             }
             else {
                 // Otherwise show nothing
                 $('.account.plan-info.expiry', $planContent).text('');
-                $('.subtitle-txt.expiry-txt', $planContent).text('');
+                $('.subtitle-txt.expiry-txt span', $planContent).text('');
             }
 
             var $subscriptionBlock = $('.sub-container.subscription:not(.feature)', $planContent);
@@ -619,6 +633,10 @@ accountUI.plan = {
                 this.$expiryTextBlock = $(expContainer.querySelector('.acc-renew-date-info .subtitle-txt'));
                 this.$expiryDateBlock = $(expContainer.querySelector('.acc-renew-date-info .plan-info'));
 
+                const accountLevel = subscription && subscription.al || M.account.slevel;
+
+                this.canAnswerSurvey = pro.filter.simple.canSeeCancelSubsSurvey.has(accountLevel);
+
                 const options = {
                     temp_plan: 1,
                     too_expensive: 2,
@@ -654,12 +672,18 @@ accountUI.plan = {
                 this.$allowContactOptions = $('.allow-contact-wrapper', this.$dialog);
 
                 // Show benefits dialog before cancellation dialog if user does not have Pro Flex or Business
-                if (pro.filter.simple.canSeeCancelBenefits.has(subscription && subscription.al || M.account.slevel)) {
+                if (pro.filter.simple.canSeeCancelBenefits.has(accountLevel)) {
                     this.displayBenefits();
                 }
-                else {
+                // Otherwise, show the cancel subscription survey if the plan being cancelled has one
+                else if (this.canAnswerSurvey) {
                     this.$dialog.removeClass('hidden');
                     this.initUpdateDialogScrolling(this.$formContent);
+                }
+                // Otherwise just cancel the plan directly
+                else {
+                    this.sendSubCancelRequestToApi(subscription && subscription.id || null);
+                    return;
                 }
                 this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
 
@@ -890,6 +914,7 @@ accountUI.plan = {
             initCloseButtonSuccessDialog() {
                 'use strict';
 
+                $('p', this.$dialogSuccess).toggleClass('hidden', !this.canAnswerSurvey);
                 this.$dialogSuccess.find('button.js-close').rebind('click', () => {
                     this.$dialogSuccess.addClass('hidden');
                     this.$backgroundOverlay.addClass('hidden').removeClass('payment-dialog-overlay');
@@ -953,42 +978,46 @@ accountUI.plan = {
                 'use strict';
 
                 let reason;
+                let canContactUser;
 
-                const $optionSelected = $('.cancel-option.radioOn', this.$options);
-                const isReasonSelected = $optionSelected.length;
+                // Check the user has answered all the survey questions
+                if (this.canAnswerSurvey) {
+                    const $optionSelected = $('.cancel-option.radioOn', this.$options);
+                    const isReasonSelected = $optionSelected.length;
 
-                const $selectedContactOption = $('.contact-option.radioOn', this.$allowContactOptions);
-                const isContactOptionSelected = $selectedContactOption.length;
+                    const $selectedContactOption = $('.contact-option.radioOn', this.$allowContactOptions);
+                    const isContactOptionSelected = $selectedContactOption.length;
 
-                if (!isReasonSelected || !isContactOptionSelected) {
-                    if (!isReasonSelected) {
-                        this.$selectReasonDialog.removeClass('hidden');
-                        this.$dialog.addClass('error-select-reason');
-                    }
-                    if (!isContactOptionSelected) {
-                        this.$selectCanContactError.removeClass('hidden');
-                        this.$dialog.addClass('error-select-contact');
-                    }
-                    return;
-                }
-
-                const value = $('input', $optionSelected).val();
-                const radioText = $('.radio-txt', $optionSelected.parent()).text().trim();
-                const canContactUser = $('input', $selectedContactOption).val() | 0;
-
-                // The cancellation reason (r) sent to the API is the radio button text, or
-                // when the chosen option is "Other (please provide details)" it is
-                // what the user enters in the text field
-                if (value === "8") {
-                    reason = this.$textarea.val().trim();
-
-                    if (!reason.length || reason.length > 1000) {
-                        this.showTextareaError(!reason.length);
+                    if (!isReasonSelected || !isContactOptionSelected) {
+                        if (!isReasonSelected) {
+                            this.$selectReasonDialog.removeClass('hidden');
+                            this.$dialog.addClass('error-select-reason');
+                        }
+                        if (!isContactOptionSelected) {
+                            this.$selectCanContactError.removeClass('hidden');
+                            this.$dialog.addClass('error-select-contact');
+                        }
                         return;
                     }
-                }
-                else {
-                    reason = `${value} - ${radioText}`;
+
+                    const value = $('input', $optionSelected).val();
+                    const radioText = $('.radio-txt', $optionSelected.parent()).text().trim();
+                    canContactUser = $('input', $selectedContactOption).val() | 0;
+
+                    // The cancellation reason (r) sent to the API is the radio button text, or
+                    // when the chosen option is "Other (please provide details)" it is
+                    // what the user enters in the text field
+                    if (value === "8") {
+                        reason = this.$textarea.val().trim();
+
+                        if (!reason.length || reason.length > 1000) {
+                            this.showTextareaError(!reason.length);
+                            return;
+                        }
+                    }
+                    else {
+                        reason = `${value} - ${radioText}`;
+                    }
                 }
 
                 // Hide the dialog and show loading spinner
@@ -997,9 +1026,15 @@ accountUI.plan = {
                 loadingDialog.show();
 
                 // Setup standard request to 'cccs' = Credit Card Cancel Subscriptions
-                const ccReq = { a: 'cccs', r: reason, cc: canContactUser };
+                const ccReq = { a: 'cccs' };
                 const requests = [ccReq];
 
+                if (reason) {
+                    ccReq.r = reason;
+                }
+                if (typeof canContactUser !== 'undefined') {
+                    ccReq.cc = canContactUser;
+                }
                 if (subscriptionId) {
                     ccReq.sub = subscriptionId;
                 }
@@ -1011,17 +1046,10 @@ accountUI.plan = {
 
                 // Cancel the subscription/s
                 api.req(requests).then(() => {
-                    // Giving a chance to reveive an account update response from the API
+                    // Giving a chance to receive an account update response from the API
                     delay('accountUI.cancelSubscriptionDialog', () => {
-                        const sub = M.account.subs.find(({ id }) => id === subscriptionId);
-
-                        // Hide loading dialog and cancel subscription button on
-                        // account page, set expiry date
+                        // Hide loading dialog
                         loadingDialog.hide();
-                        this.$accountPageCancelButton.addClass('hidden');
-                        this.$expiryTextBlock.text(l[987]);
-                        this.$expiryDateBlock
-                            .safeHTML('<span class="red">@@</span>', time2date(sub && sub.next || account.expiry, 2));
 
                         // Show success dialog
                         this.$dialogSuccess.removeClass('hidden');

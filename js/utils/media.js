@@ -885,17 +885,21 @@ FullScreenManager.prototype.enterFullscreen = function() {
         }, 3000);
     };
 
-    const _createSubtitlesManager = tryCatch((node, $wrapper, $video, $videoControls) => {
+    const _createSubtitlesManager = tryCatch((node, $wrapper, $video, $videoControls, $playpause) => {
         let continuePlay, $subtitles;
         const video = $video.get(0);
         const $button = $('button.subtitles', $videoControls);
         const manager = mega.utils.subtitles.init();
-        const menu = contextMenu.create({
-            animationDuration: 150,
-            boundingElement: $wrapper[0],
-            sibling: $('.subtitles-wrapper .tooltip', $wrapper)[0],
-            template: $('#media-viewer-subtitles-menu', $wrapper)[0]
-        });
+        // Subtitles context menu
+        let menu = $('.context-menu.subtitles', $wrapper).get(0);
+        if (!menu) {
+            menu = contextMenu.create({
+                template: $('#media-viewer-subtitles-menu', $wrapper)[0],
+                sibling: $('.subtitles-wrapper .tooltip', $wrapper)[0],
+                animationDuration: 150,
+                boundingElement: $wrapper[0]
+            });
+        }
         const destroy = tryCatch(() => {
             if ($subtitles) {
                 $subtitles.off();
@@ -904,6 +908,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 contextMenu.close(menu);
             }
             $button.off().parent().addClass('hidden');
+            manager.destroySubtitlesMenu();
         });
         onIdle(() => manager.configure(node).catch(destroy));
 
@@ -922,7 +927,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     video.pause();
                     $wrapper.rebind('mouseup.close-subtitles-context-menu', () => {
                         if (video.paused) {
-                            video.pause();
+                            $playpause.trigger('click');
                         }
                         $wrapper.off('mouseup.close-subtitles-context-menu');
                     });
@@ -964,11 +969,15 @@ FullScreenManager.prototype.enterFullscreen = function() {
                         });
                         manager.displaySubtitles(video.streamer, $subtitles);
                         $button.addClass('mask-color-brand');
+                        $('i', $button).removeClass('icon-subtitles-02-small-regular-outline')
+                            .addClass('icon-subtitles-02-small-regular-solid');
                         mBroadcaster.sendMessage('trk:event', 'media-journey', 'subtitles', 'select');
                     }
                     else {
-                        mBroadcaster.sendMessage('trk:event', 'media-journey', 'subtitles', 'off');
                         $button.removeClass('mask-color-brand');
+                        $('i', $button).addClass('icon-subtitles-02-small-regular-outline')
+                            .removeClass('icon-subtitles-02-small-regular-solid');
+                        mBroadcaster.sendMessage('trk:event', 'media-journey', 'subtitles', 'off');
                     }
                     $('.context-menu.subtitles button i', $wrapper).addClass('hidden');
                     $(`.context-menu.subtitles button.${name} i`, $wrapper).removeClass('hidden');
@@ -1023,6 +1032,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
         const SPRITE = is_embed ? 'sprite-embed-mono' : 'sprite-fm-mono';
         const $playPauseButton = $('.play-pause-video-button', $wrapper);
         const $watchAgainButton = $('.watch-again-button', $wrapper);
+        let subtitlesManager, speedMenu, settingsMenu;
 
         const props = Object.defineProperties(Object.create(null), {
             duration: {
@@ -1031,7 +1041,6 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 }
             }
         });
-        let subtitlesManager, speedMenu, settingsMenu;
 
         /* Drag status */
         let timeDrag = false;
@@ -1177,7 +1186,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     $watchAgainButton.addClass('hidden');
                     $playPauseButton.removeClass('hidden');
                     videoElement.style.filter = videoElement.style.filter.replace('blur(6px)', '');
-                    $('i', $playPauseButton).removeClass('icon-play-regular-solid')
+                    $('i', $playPauseButton).removeClass('icon-play-small-regular-solid')
                         .addClass('icon-pause-small-regular-solid');
                     tSleep(2.5).then(() => $playPauseButton.addClass('hidden'));
 
@@ -1194,7 +1203,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     videoElement.style.filter = videoElement.style.filter.replace('blur(6px)', '');
                     if ($('i', $playPauseButton).hasClass('icon-pause-small-regular-solid')) {
                         $playPauseButton.removeClass('hidden');
-                        $('i', $playPauseButton).addClass('icon-play-regular-solid')
+                        $('i', $playPauseButton).addClass('icon-play-small-regular-solid')
                             .removeClass('icon-pause-small-regular-solid');
                         tSleep(2.5).then(() => $playPauseButton.addClass('hidden'));
                     }
@@ -1327,6 +1336,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
         };
 
         // Playback Speed context menu
+        speedMenu = $('.context-menu.playback-speed', $wrapper).get(0);
         if (!speedMenu) {
             speedMenu = contextMenu.create({
                 template: $('#media-viewer-speed-menu', $wrapper)[0],
@@ -1337,6 +1347,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
         }
 
         // Settings context menu
+        settingsMenu = $('.context-menu.settings', $wrapper).get(0);
         if (!settingsMenu) {
             settingsMenu = contextMenu.create({
                 template: $('#media-viewer-video-settings-menu', $wrapper)[0],
@@ -1353,7 +1364,6 @@ FullScreenManager.prototype.enterFullscreen = function() {
         $volumeBar.find('style').removeAttr('style');
 
         if ($('.loader-grad', $wrapper).hasClass('hidden')) {
-
             $playVideoButton.removeClass('hidden');
         }
 
@@ -1372,9 +1382,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         // Subtitles manager
         if (self.fminitialized && !self.pfcol && !is_audio(node) && !is_mobile) {
-
-            subtitlesManager = _createSubtitlesManager(node, $wrapper, $video, $videoControls);
+            subtitlesManager = _createSubtitlesManager(node, $wrapper, $video, $videoControls, $playpause);
         }
+
         if (!subtitlesManager) {
             if (page === 'download' || self.pfcol) {
                 $('button.subtitles', $videoControls).attr('disabled', 'disabled').addClass('mask-color-grey-out');
@@ -1765,15 +1775,11 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 return false;
             }
             if ($this.hasClass('active')) {
-                $settings.removeClass('active deactivated mask-color-brand');
-                $('i', $settings).removeClass('icon-settings-02-small-regular-solid')
-                    .addClass('icon-settings-02-small-regular-outline');
+                $this.removeClass('active deactivated');
                 contextMenu.close(settingsMenu);
             }
             else {
-                $settings.addClass('active deactivated mask-color-brand').trigger('simpletipClose');
-                $('i', $settings).addClass('icon-settings-02-small-regular-solid')
-                    .removeClass('icon-settings-02-small-regular-outline');
+                $this.addClass('active deactivated').trigger('simpletipClose');
                 // xxx: no, this is not a window.open() call..
                 // eslint-disable-next-line local-rules/open
                 contextMenu.open(settingsMenu);
@@ -2029,6 +2035,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 else if (opt.autoplay) {
                     options.autoplay = true;
                     this.parent.play();
+                    $('.video-wrapper .play-video-button:not(.hidden)').click();
                 }
                 else {
                     this.start = this.parent.play.bind(this.parent);

@@ -2316,10 +2316,20 @@ function topmenuUI() {
             document.body.classList.add('pro-user');
         }
         else {
-            // Show the free badge
-            $('.plan', $menuLoggedBlock).text(l[1150]);
-            $('.membership-status', $topHeader).attr('class', 'tiny-icon membership-status free');
-            document.body.classList.add('free');
+            // Check if a standalone plan has been purchased
+            M.getUserPlanInfo((res) => {
+                const firstFeaturePurchased = M.getFirstFeaturePurchased(res);
+                let planText = l[1150];
+                if (firstFeaturePurchased) {
+                    planText = firstFeaturePurchased.planName;
+                }
+                else {
+                    $('.membership-status', $topHeader).attr('class', 'tiny-icon membership-status free');
+                    document.body.classList.add('free');
+                }
+
+                $('.plan', $menuLoggedBlock).text(planText);
+            });
         }
 
         if (is_fm()) {
@@ -2718,7 +2728,7 @@ function topmenuUI() {
                     'privacy', 'pro', 'register', 'reliability', 'resellers', 'sdk',
                     'securechat', 'security', 'share', 'sitemap', 'sourcecode', 'special',
                     'start', 'storage', 'support', 'syncing', 'takedown', 'terms', 'transparency',
-                    'refer', 'individuals', 'freelancers', 'small-business', 'vpn', 'media-files', 'vpn-terms'
+                    'refer', 'individuals', 'freelancers', 'small-business', 'vpn', 'media-files',
                 ];
                 const ioPages = [
                     'about', 'achievements', 'affiliate', 'bug-bounty', 'business',
@@ -2727,7 +2737,7 @@ function topmenuUI() {
                     'megabackup', 'mobile', 'mobileapp', 'nas', 'objectstorage', 'privacy',
                     'refer', 'reliability', 'resellers', 'sdk', 'securechat', 'security', 'share',
                     'sourcecode', 'storage', 'syncing', 'takedown', 'terms', 'transparency', 'individuals',
-                    'freelancers', 'small-business', 'vpn', 'media-files' , 'vpn-terms'
+                    'freelancers', 'small-business', 'vpn', 'media-files',
                 ];
                 var moveTo = {
                     account: 'fm/account',

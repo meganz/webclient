@@ -300,6 +300,12 @@
         padding-left: 0;
     }
 
+    .mega-button.red-positive {
+        background: var(--banner-background-error);
+        box-shadow: none;
+        color: var(--color-primary-red-500)
+    }
+
     /* branded colours */
 
         .mega-button.branded-red {
@@ -340,6 +346,9 @@
 
     .mega-button.action:hover:not(.disabled) {
         background: var(--action-hover);
+    }
+    .mega-button.red-positive:hover:not(.disabled) {
+        background: var(--banner-border-error);
     }
 
     .mega-button.no-hover:hover {

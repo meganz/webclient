@@ -1576,6 +1576,15 @@ scparser.$bulkAdd(['psts', 'psts_v2'], function(a) {
     this.sqac(a);
 });
 
+// Free trial redeemed
+scparser.$add('ftr', function(a) {
+    'use strict';
+
+    // Update the UI to show the plan purchased
+    this.sqac(a);
+    topmenuUI();
+});
+
 // Storage quota allowance changed.
 scparser.$add('sqac', (a) => {
     'use strict';

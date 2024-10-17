@@ -12173,6 +12173,15 @@ a.pr-faded-link {
     text-decoration: underline;
     color: var(--color-copy-secondary);
 }
+.mega-error-box {
+    color: var(--text-color-error);
+    font: var(--text-body1);
+    padding: 2px 16px;
+    border-radius: 4px;
+    background: var(--banner-background-error);
+    border: 1px solid var(--banner-border-error);
+    text-align: center;
+}
 
 /* End utility classes */
 

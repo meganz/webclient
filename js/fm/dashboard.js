@@ -270,6 +270,37 @@ function dashboardUI(updProcess) {
             }
         }
         else {
+            const purchasableFeaturePlans = Object.keys(pro.propay.purchasableFeaturePlans());
+
+            // Get active or expired feature plan subscription if it exists
+            const activeSubscription = account.subs
+                && account.subs.find(
+                    ({ al, features }) => al === pro.ACCOUNT_LEVEL_FEATURE
+                    && Object.keys(features).some(item => purchasableFeaturePlans.includes(item))
+                );
+            const cancelledPlan = !activeSubscription && account.plans
+                && account.plans.find(
+                    ({ al, features }) => al === pro.ACCOUNT_LEVEL_FEATURE
+                    && Object.keys(features).some(item => purchasableFeaturePlans.includes(item))
+                );
+
+            // Elements for accounts who have purchased a standalone plan
+            const featurePlan = activeSubscription || cancelledPlan;
+            if (featurePlan) {
+                const feature = Object.keys(featurePlan.features)[0];
+
+                // Feature plan date strings:
+                // l.vpn_renews_on
+                // l.vpn_expires_on
+                const infoTxt = activeSubscription ?
+                    activeSubscription.is_trial ? l.sub_begins : l[`${feature}_renews_on`] :
+                    l[`${feature}_expires_on`];
+                const dateTxt = activeSubscription ? activeSubscription.next : cancelledPlan.expires;
+
+                $('.account.left-pane.plan-date-info').text(infoTxt);
+                $('.account.left-pane.plan-date-val').text(time2date(dateTxt, 2));
+            }
+
             // resetting things might be changed in business account
             $('.fm-right-block.dashboard .business-dashboard').addClass('hidden');
             $('.account.left-pane.info-block.business-users').addClass('hidden');

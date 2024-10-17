@@ -290,6 +290,14 @@
     background-size: unset;
 }
 
+/* Page Types */
+.bottom-page.payment-section:not(.free-trial) .pricing-page.free-trial {
+    display: none;
+}
+.bottom-page.payment-section.free-trial .bottom-page .pricing-page.paid-only {
+    display: none;
+}
+
 /* Pricing icons */
 .pricing-sprite,
 i.pricing-sprite,
@@ -464,6 +472,51 @@ i.pricing-sprite,
     color: #F1373B;
 }
 
+/* Free Trial Card */
+.payment-page .free-trial-container {
+    height: calc(100% - 24px);
+    display: flex;
+    background: var(--surface-main);
+    max-width: 444px;
+    margin: 24px 0 46px
+}
+.payment-page .free-trial-card {
+    padding: 24px;
+    font: var(--text-body1)
+}
+.payment-page .free-trial-card .title {
+    color :var(--text-color-high);
+    font: var(--text-h2-bold);
+    margin-bottom: 22px;
+}
+.payment-page .free-trial-card .secondary-title {
+    color: var(--text-color-high);
+    font: var(--text-body1-bold);
+}
+.payment-page .free-trial-card .icons {
+    width: 40px;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 0 12.5%;
+}
+.payment-page .free-trial-card .icons i {
+    --icon-size: 24px;
+    color: rgb(255, 51, 51)
+}
+.payment-page .free-trial-card .icons .line {
+    height: 25%;
+    width: 0;
+    border: 1px solid var(--surface-grey-2);
+    border-radius: 2px;
+    margin: 4px 0 8px;
+}
+.payment-page .free-trial-card .steps .info-block {
+    min-height: 72px;
+}
+.payment-page .free-trial-card button.start {
+    padding: 12px 24px;
+    width: max-content;
+}
 /* Plans */
 .bottom-page.plans-bottom-pad.mid-wide {
     padding-bottom: 130px;
@@ -655,15 +708,29 @@ i.pricing-sprite,
     display: none;
     margin-top: -5px;
 }
+.pricing-page.plan-price .today {
+    display: none;
+    font: var(--text-body1-bold)
+}
 .local-currency .pricing-page.plan-price .asterisk {
+    display: inline-block;
+}
+.free-trial .pricing-page.plan-price .today {
     display: inline-block;
 }
 .pricing-page.plan-currency,
 .pricing-page.plan-period,
-.pricing-page.plan-data {
+.pricing-page.plan-data,
+.pricing-page.plan-price .today {
     color: var(--text-color-high);
     font: var(--text-h3);
     font-family: var(--text-font-family);
+}
+.pricing-page.free-trial-period {
+    font: var(--text-body1);
+    color: var(--text-color-medium);
+    font-family: var(--text-font-family);
+    padding: 0 60px;
 }
 .pricing-page.plan-data {
     font-size: 15px;
@@ -1688,6 +1755,9 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
     box-sizing: border-box;
     max-width: calc(100% - 2px);
 }
+.free-trial .orange-notification.body:not(.mobile){
+    margin: -25px 0 20px
+}
 .orange-notification.cell {
     display: table-cell;
     vertical-align: middle;
@@ -1712,8 +1782,10 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
 .payment-page.plan-wrap {
     float: right;
     width: 300px;
+    margin-bottom: 70px;
 }
-.payment-section.local-currency .pricing-page.plan.main {
+.payment-section.local-currency .pricing-page.plan.main,
+.payment-section:not(.local-currency) .pricing-page.plan.main .free-trial-period {
     padding-bottom: 28px;
 }
 .payment-section .button.purchase {
@@ -1740,6 +1812,21 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
     height: 30px;
     border-radius: 100%;
 }
+.payment-section .pricing-page.plan .plan-title {
+    margin-top: 40px;
+}
+.free-trial.payment-section .payment-page.header .number {
+    display: none;
+}
+.free-trial.payment-section .pricing-page.plan .plan-icon {
+    height: auto;
+}
+.free-trial.payment-section .pricing-page.plan .plan-title {
+    color: rgb(255, 51, 51);
+}
+.free-trial.payment-section .payment-period {
+    display: none;
+}
 .payment-method.template {
     display: none;
 }
@@ -1761,9 +1848,32 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
 }
 .payment-section .mega-button.purchase {
     margin: 32px 0 0;
-}
-.payment-section:not(.mobile) .mega-button.purchase {
     margin-left: -50px;
+}
+.payment-section.mobile .mega-button.purchase,
+.payment-section.free-trial .mega-button.purchase {
+    margin-left: 0;
+}
+.payment-section .third-section.vpn-only .mega-button.purchase {
+    margin-left: 0;
+}
+.payment-section.mobile .mega-button.purchase {
+    max-width: 368px;
+    width: 100%;
+}
+.bottom-page.pricing-page.third-section.vpn-only > .continue-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 90px;
+}
+.bottom-page.pricing-page.third-section.vpn-only > .continue-section > *:not(.local-currency-tip) {
+    align-self: flex-start;
+}
+.bottom-page.pricing-page.third-section.vpn-only .agree-to-vpn-tos-wrapper {
+    display: flex;
+    margin-bottom: 22px;
+    width: 100%;
 }
 .payment-page.info-block .provider-details {
     color: var(--text-color-high);
@@ -2057,14 +2167,38 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
+    width: calc(100vw - 34px);
     height: 100vh;
+    max-height: 100%;
+    overflow-y: auto;
     background: white;
     z-index: 201;
+    padding: 0 17px;
+    text-align: center;
 }
 .payment-success-cloak i {
     --icon-size: 86px;
     color: var(--secondary-green);
+}
+.payment-success-cloak button {
+    padding: 4px 20px;
+}
+.payment-success-cloak.mobile .text-wrapper{
+    font-family: Inter, serif;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    text-align: center;
+    margin-bottom: 40px;
+}
+.payment-success-cloak.mobile .title,
+.payment-success-cloak .trial .title {
+    font-family: Poppins, serif;
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 24px;
+    text-align: center;
+    color: var(--text-color-high);
 }
 
 /* Retina images */
@@ -2465,6 +2599,12 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
         max-width: 300px;
         margin: 0 auto 60px auto;
     }
+    .payment-page .free-trial-card-container {
+        padding-right: 50px;
+    }
+    .payment-page .free-trial-container {
+        margin: 24px auto 46px;
+    }
     .payment-page.info-block {
         margin: 0 0 0 50px;
     }
@@ -2656,6 +2796,9 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
     }
 
     /* Payment page */
+    .payment-page .free-trial-card-container {
+        padding-right: 0;
+    }
     .payment-page.info-block .payment-method,
     .payment-page.info-block .payment-duration {
         width: 100%;

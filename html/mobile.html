@@ -1489,12 +1489,17 @@
                 <div class="mobile payment-options-container">
                     <div class="mobile payment-options">
                         <div class="mobile pro-card-container">
-                            <i class="mobile plan-icon"></i><!-- Add icon-crests-pro-3-details etc -->
                             <span class="mobile right-banner-block">
                                 <div class="mobile small-text">[$22150]</div>
                                 <div class="mobile plan-name"></div>
                             </span>
                             <div class="mobile small-text show-plans js-back-to-plans">[$1776]</div>
+                        </div>
+
+                        <div class="mobile pro-plan-card-container"></div>
+
+                        <div class="subscription-instructions hidden free-trial">
+                            [$10637] [$10630]
                         </div>
 
                         <div class="pro-payment-block">
@@ -1544,13 +1549,13 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="orange-notification body with-btn argentina-only hidden">
-                                    <div class="orange-notification">
-                                        <i class="icons-sprite fvnotice"></i>
-                                    </div>
-                                    <div class="orange-notification cell text-cell">
-                                        <div class="versioning-body-text">[$23132]</div>
-                                    </div>
+                            </div>
+                            <div class="mobile orange-notification body with-btn argentina-only hidden">
+                                <div class="orange-notification">
+                                    <i class="icons-sprite fvnotice"></i>
+                                </div>
+                                <div class="orange-notification cell text-cell">
+                                    <div class="versioning-body-text">[$23132]</div>
                                 </div>
                             </div>
 
@@ -1580,17 +1585,35 @@
                                 </div>
                             </div>
                             <span class="loading-placeholder-text">[$5533]</span>
-                            <div class="charge-information-container">
+                            <div class="charge-information-container paid-only">
                                 <div class="charge-information"></div>
                             </div>
                         </div>
 
+                        <div class="mega-error-box error-box-not-stripe hidden">
+                            [$err_prov_doesnt_supp_trial]
+                        </div>
+
+                        <div class="agree-to-vpn-tos-wrapper vpn-only hidden">
+                            <div class="checkbox square checkboxOff">
+                                <input id="vpn-terms-of-service" class="checkboxOff agree-to-vpn-tos" type="checkbox">
+                            </div>
+                            <label for="agree-to-vpn-tos-wrapper" class="radio-txt">[$agree_vpn_tos]</label>
+                        </div>
+
                         <div class="main-mid-pad third-section">
                             <button class="mega-button positive large purchase">
-                                <span>[$continue_to_payment]</span>
+                                <span class="paid-only">[$continue_to_payment]</span>
+                                <span class="free-trial hidden">[$507]</span>
                             </button>
                             <div class="clear"></div>
                         </div>
+                    </div>
+                    <div class="pricing-page local-currency-tip paid-only">
+                        *[$18770]
+                    </div>
+                    <div class="pricing-page local-currency-tip free-trial">
+                        *[$est_price_acc_billed_euro]
                     </div>
                     <div class="mobile external-payment-options">[$7156]</div>
                 </div>
@@ -1678,16 +1701,7 @@
 <!-- Credit card payment address dialog for ECP/Stripe -->
 <div class="mobile fm-block main-block full-page-scrollable payment-address-dialog hidden">
     <div class="mobile header-scroll-suggester"></div>
-    <div class="pro-plan-details">
-        <div class="mobile plan-icon pro1">
-            <i class="pro1 sprite-fm-uni icon-crests-pro-1-details"></i>
-            <i class="pro2 sprite-fm-uni icon-crests-pro-2-details"></i>
-            <i class="pro3 sprite-fm-uni icon-crests-pro-3-details"></i>
-            <i class="pro4 sprite-fm-uni icon-crests-lite-details"></i>
-            <i class="pro101 sprite-fm-uni icon-crests-pro-flexi-details"></i>
-            <i class="business sprite-fm-uni icon-crests-business-details"></i>
-            <i class="feature"></i>
-        </div>
+    <div class="pro-plan-details paid-only">
         <div class="payment-plan-info">
             <div class="payment-plan-title"></div>
             <div class="payment-plan-txt js-plan-txt-normal hidden">
@@ -1699,14 +1713,21 @@
             <span class="price"></span>
         </div>
     </div>
-    <div class="mobile separator-line"></div>
+    <div class="free-trial pro-plan-details hidden">
+        <div class="trial-title"></div>
+        <div class="free-trial-text-icon">[$free_trial_caps]</div>
+    </div>
+
+    <div class="mobile separator-line paid-only"></div>
     <div class="mobile fm-row">
         <div class="mobile fm-content">
             <div class="mobile fm-scrolling">
                 <div class="mobile content-row first">
                     <div class="mobile content-cell">
                         <div class="payment-address-dialog-body">
-                            <div class="main-title">[$6963]</div>
+                            <div class="main-title paid-only">[$6963]</div>
+                            <div class="free-trial-info free-trial main-title hidden"></div>
+                            <div class="payment-note-first free-trial monthly hidden">[$trial_details_visit_tos]</div>
                             <div class="payment-note-first js-multi-discount-recurring hidden">
                                 <span class="js-discount-text"></span> [$10630]
                             </div>

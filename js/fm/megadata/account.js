@@ -526,6 +526,19 @@ MegaData.prototype.getAccountDetails = function() {
         });
 };
 
+MegaData.prototype.getUserPlanInfo = async function(callback) {
+    'use strict';
+
+    if (M.account && M.account.features && M.account.plans && M.account.subs) {
+        return callback ? callback(M.account) : M.account;
+    }
+
+    const uqres = await api.send({a: 'uq', pro: 1, v: 2});
+
+
+    return callback ? callback(uqres) : uqres;
+};
+
 /**
  * Show the Master/Recovery Key dialog
  * @param {Number} [version] Dialog version, 1: post-register, otherwise default one.

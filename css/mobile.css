@@ -3125,12 +3125,23 @@ div.checkboxOn {
 .payment-address-dialog .main-title {
     margin:0 0 32px 0;
 }
-.mobile.membership-step2 .external-payment-options {
+.payment-address-dialog .main-title.free-trial {
+    margin-top: -10px;
+    margin-bottom: 8px;
+    font-family: LatoWebBold, serif;
+    font-size: 16px;
+    line-height: 24px;
+}
+.mobile.membership-step2 .external-payment-options,
+.mobile.membership-step2 .local-currency-tip {
     color: #667;
     font-size: 14px;
     line-height: 22px;
     margin-top: 48px;
     text-align: center;
+}
+.mobile.membership-step2 .local-currency-tip {
+    margin-top: 0;
 }
 .mobile.membership-step2 .external-payment-options a {
     color: #F0373B;
@@ -3171,13 +3182,6 @@ div.checkboxOn {
     position: relative;
 }
 
-.mobile.payment-options .plan-icon {
-    display: inline-block;
-    height: 32px;
-    margin: 20px 12px 0 0;
-    vertical-align: top;
-    width: 32px;
-}
 .mobile.payment-options .plan-name {
     color: #676D75;
     font-family: 'LatoWebBold', 'source_sans_proregular', sans-serif;
@@ -3192,6 +3196,87 @@ div.checkboxOn {
     opacity: 0.4;
     font-size: 14px;
 }
+.mobile.payment-options-container #pr-payment-card-mob {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--text-color-low);
+    margin-top: 22px;
+    width: 100%;
+    max-width: 768px;
+}
+.mobile.payment-options-container #pr-payment-card-mob .discount-title {
+    display: flex;
+    height: 50px;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+    line-height: 36px;
+    background: var(--discount-main);
+    color: var(--text-color-white-high);
+}
+.mobile.payment-options-container #pr-payment-card-mob .card-head {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 1px solid var(--text-color-low);
+    align-items: center;
+    padding: 40px 80px;
+    text-align: center;
+    font-family: LatoWebLight, sans-serif;
+
+}
+.mobile.payment-options-container #pr-payment-card-mob .card-head .title {
+    font-weight: 300;
+    font-size: 32px;
+    line-height: 36px;
+}
+.mobile.payment-options-container #pr-payment-card-mob .card-head .free-trial-title {
+    color: rgba(253, 62, 56, 1);
+}
+.mobile.payment-options-container #pr-payment-card-mob .card-head .price-row {
+    display: flex;
+    font-family: LatoWeb, sans-serif;
+    font-size: 38px;
+    line-height: 36px;
+    font-weight: 400;
+    margin: 32px 0 16px;
+}
+
+.mobile.payment-options-container #pr-payment-card-mob.discount .card-head .discount-price-row {
+    text-decoration: line-through;
+    margin-top: 12px;
+    margin-bottom: -20px;
+    font-size: 24px;
+    font-weight: 400;
+    line-height: 36px;
+}
+.mobile.payment-options-container #pr-payment-card-mob.discount .card-head .price-row .price,
+.mobile.payment-options-container #pr-payment-card-mob.discount .card-head .price-row .asterisk {
+    color: var(--discount-main);
+}
+.mobile.payment-options-container #pr-payment-card-mob .card-head .price-row .payment-cycle {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 24px;
+    align-self: flex-end;
+    white-space: pre;
+}
+.mobile.payment-options-container #pr-payment-card-mob .card-head .extra-info {
+    font: var(--text-body1)
+}
+.mobile.payment-options-container #pr-payment-card-mob .card-body {
+    font: var(--text-body1);
+    display: flex;
+    flex-direction: column;
+    padding: 19px 16px;
+}
+.mobile.payment-options-container #pr-payment-card-mob .card-body .feature {
+    display: flex;
+    align-items: flex-start;
+}
+.mobile.payment-options-container #pr-payment-card-mob .card-body .feature i {
+    --icon-size: 24px;
+    color: rgba(253, 62, 56, 1);
+}
 .payment-address-dialog .main-title {
     font-size: 17px;
 }
@@ -3201,6 +3286,10 @@ div.checkboxOn {
     font-family: "LatoWebBold", serif;
     margin: 20px 0 0 0;
     text-align: center;
+}
+.mobile.membership-step2 .subscription-instructions {
+    border-color: rgba(204, 204, 204, 1);
+    color: var(--text-color-high);
 }
 .mobile.membership-step2 .membership-st2-head {
     margin: 30px 0 20px 0;
@@ -3232,6 +3321,16 @@ div.checkboxOn {
 }
 .pro-payment-block .radio-wrap {
     position: relative;
+}
+.mobile .agree-to-vpn-tos-wrapper {
+    margin: 25px auto 0;
+    max-width: 368px;
+}
+.mobile .agree-to-vpn-tos-wrapper label {
+    font: var(--text-body1)
+}
+.mobile .agree-to-vpn-tos-wrapper a {
+    text-decoration: underline;
 }
 
 .mobile.membership-step2 .membership-radio {
@@ -3800,6 +3899,11 @@ div.checkboxOn {
     font-size: 14px;
     line-height: 22px;
     white-space: normal;
+}
+.payment-address-dialog .payment-note-first.free-trial {
+    line-height: 20px;
+    color: var(--text-color-medium);
+    margin-bottom: -18px;
 }
 .wire-transfer-dialog .wiretransfer-note-first {
     color: #676D75;
@@ -7570,6 +7674,13 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     position: relative;
     margin: 22px 15px;
 }
+.mobile.payment-address-dialog .pro-plan-details.free-trial {
+    margin-bottom: 0;
+}
+.mobile.payment-address-dialog .pro-plan-details.free-trial .trial-title {
+    font-size: 20px;
+    margin-bottom: 4px;
+}
 .mobile.voucher-dialog .plan-icon {
     float: left;
     margin: 6px 0 0 5px;
@@ -7596,9 +7707,11 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
 
 .mobile.voucher-dialog .voucher-plan-info,
 .mobile.payment-address-dialog .payment-plan-info {
-    margin-left: 56px;
     margin-right: 42px;
     z-index: 1;
+}
+.mobile.voucher-dialog .voucher-plan-info {
+    margin-left: 56px;
 }
 .mobile.voucher-dialog .voucher-plan-title,
 .mobile.payment-address-dialog .payment-plan-title {
@@ -8079,9 +8192,21 @@ body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mob
     overflow: hidden;
     transition: all 500ms ease-in-out;
 }
+.mobile.payment-options .pro-card-container.free-trial {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.mobile.payment-options .pro-card-container.free-trial .mobile.small-text {
+    display: none;
+}
 .mobile.pro-card-container.banner {
     height: 180px;
     transition: all 500ms ease-in-out;
+}
+.mobile.pro-plan-card-container {
+    display: flex;
+    justify-content: center;
 }
 .mobile.payment-options .mobile.small-text.show-plans {
     display: inline-block;
@@ -11599,6 +11724,29 @@ body.rtl .overlay-wrap {
     grid-row: -1/-2;
     overflow-y: scroll;
     position: static;
+}
+
+/* General css items */
+.free-trial-text-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2px 8px;
+    color: rgba(253, 62, 56, 1);
+    border: 1px solid rgba(253, 62, 56, 1);
+    border-radius: 3px;
+    font-size: 12px;
+    line-height: normal;
+    width: max-content;
+}
+.mega-error-box {
+    color: var(--text-color-error);
+    font: var(--text-body1);
+    padding: 2px 16px;
+    border-radius: 4px;
+    background: var(--banner-background-error);
+    border: 1px solid var(--banner-border-error);
+    text-align: center;
 }
 
 /* Mobile Web Revamp responsive styles */

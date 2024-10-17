@@ -42,6 +42,7 @@ lazy(pro.proplan2, 'vpn', () => {
                     ? plan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY]
                     : plan[pro.UTQA_RES_INDEX_CURRENCY]
             ) || '';
+            // const planExtras = plan[pro.UTQA_RES_INDEX_EXTRAS] || false;
             const priceValue = formatCurrency(
                 (hasLocal ? plan[pro.UTQA_RES_INDEX_LOCALPRICE] : plan[pro.UTQA_RES_INDEX_PRICE]) || 'err',
                 priceCurrency,
@@ -86,7 +87,14 @@ lazy(pro.proplan2, 'vpn', () => {
             }
 
             const btnContainer = createEl(['pricing-plan-btn-container']);
-            const btn = createEl(['pricing-plan-btn'], l.pr_buy_vpn, 'button');
+            // TODO: Make this dynamic based on if the plan has a trial or not
+            const btn = createEl(
+                ['pricing-plan-btn'],
+                // planExtras.trial
+                //     ? mega.icu.format(l.try_free_for_days, planExtras.trial.days)
+                //     : l.pr_buy_vpn,      // uncomment this
+                mega.icu.format(l.try_free_for_days, 7),        // remove this
+                'button');
             const moreContainer = createEl(['relative']);
             const more = createEl(['vpn-read-more', 'absolute', '-top-8'], l.vpn_more, 'a');
             more.href = 'https://mega.io/vpn';
@@ -109,7 +117,8 @@ lazy(pro.proplan2, 'vpn', () => {
 
             if (hasLocal) {
                 $vpnContainer.safeAppend(
-                    $(createEl(['pricing-flexi-block-card-note', 'text-center'], `*${l[18770]}`)).prop('outerHTML')
+                    $(createEl(['pricing-flexi-block-card-note', 'text-center'], `*${l.est_price_acc_billed_euro}`))
+                        .prop('outerHTML')
                 );
             }
 

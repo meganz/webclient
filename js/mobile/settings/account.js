@@ -60,13 +60,13 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
         }
     },
 
-    getProPlanDetails: {
-        value: function() {
+    getPlanDetails: {
+        value() {
             'use strict';
 
             let proNum = u_attr.p;
 
-            // If Business or Pro Flexi we override the u_attr.p because it's undefined when these plans are expired.
+            // If Business or Pro Flexi we override the proNum because it's undefined when these plans are expired.
             // We don't want to show as Free because they are still on that account and they must pay to reactivate.
             if (u_attr.b) {
                 proNum = pro.ACCOUNT_LEVEL_BUSINESS;
@@ -75,8 +75,45 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
                 proNum = pro.ACCOUNT_LEVEL_PRO_FLEXI;
             }
 
+            // If proNum is still undefined then check if the user has purchased a feature plan
+            if (!proNum) {
+                const purchasableFeaturePlans = Object.keys(pro.propay.purchasableFeaturePlans());
+                const firstPurchasedPlan = M.account.plans && M.account.plans.find(
+                    ({ al, features }) => al === pro.ACCOUNT_LEVEL_FEATURE
+                        && Object.keys(features).some(item => purchasableFeaturePlans.includes(item))
+                );
+
+                if (firstPurchasedPlan && firstPurchasedPlan.features) {
+                    const upperCaseFeature = Object.keys(firstPurchasedPlan.features)[0].toUpperCase();
+                    proNum = pro[`ACCOUNT_LEVEL_FEATURE_${upperCaseFeature}`];
+                }
+            }
+
             return pro.getProPlanName(proNum);
         },
+    },
+
+    /**
+     * Check if the user has any active subscriptions, and load the cancel subscriptions page if so
+     */
+    checkForActiveSubs: {
+        async value() {
+            'use strict';
+
+            // Show a loading dialog while the data is fetched from the API
+            loadingDialog.show();
+
+            // Check if there are any active subscriptions
+            // ccqns = Credit Card Query Number of Subscriptions
+            const {result: numOfSubscriptions} = await api.req({a: 'ccqns'}).catch(dump);
+
+            if (numOfSubscriptions > 0) {
+                loadSubPage('fm/account/cancel');
+            }
+
+            // Hide the loading dialog after request completes
+            loadingDialog.hide();
+        }
     },
 
     /**
@@ -144,7 +181,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
 
             /* Plan info */
 
-            const planName = this.getProPlanDetails();
+            const planName = this.getPlanDetails();
             const storageInfo = this.getStorageUsage(data);
 
             const iconClass = 'sprite-mobile-fm-mono icon-shield-thin-outline left-icon icon-size-24';
@@ -276,31 +313,31 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
                     icon: 'sprite-mobile-fm-mono icon-slash-circle-thin-outline',
                     componentClassname: 'hidden cancel-subscription',
                     defaultRightIcon: true,
-                    binding: async() => {
-                        const gatewayId = M.account.sgwids.length > 0 ? M.account.sgwids[0] : null; // Gateway ID
-
-                        // If Apple or Google subscription (see pro.getPaymentGatewayName function for codes)
-                        if (gatewayId === 2 || gatewayId === 3) {
-
-                            // Show popup
-                            msgDialog('info', l[7165], l[16501]);
-                        }
-                        else if (gatewayId === 16 || gatewayId === 17 || gatewayId === 19) {
-
-                            // Show a loading dialog while the data is fetched from the API
-                            loadingDialog.show();
-
-                            // Check if there are any active subscriptions
-                            // ccqns = Credit Card Query Number of Subscriptions
-
-                            const {result: numOfSubscriptions} = await api.req({a: 'ccqns'}).catch(dump);
-
-                            if (numOfSubscriptions > 0) {
-                                loadSubPage('fm/account/cancel');
+                    binding: () => {
+                        const _gatewayCheck = async(gatewayIds) => {
+                            // If Apple or Google subscription show popup dialog
+                            if (gatewayIds.length === 1 && (gatewayIds.includes(2) || gatewayIds.includes(3))) {
+                                msgDialog('info', l[7165], l[16501]);
                             }
+                            // Otherwise check for active subscriptions
+                            else {
+                                await this.checkForActiveSubs();
+                            }
+                        };
 
-                            // Hide the loading dialog after request completes
-                            loadingDialog.hide();
+                        const { sgwids, features, subs } = M.account;
+                        let gatewayIds = sgwids; // Gateway ID's
+
+                        if (gatewayIds && gatewayIds.length > 0) {
+                            _gatewayCheck(gatewayIds);
+                        }
+                        else if (features && features.length > 0) {
+                            // M.account.sgwids is not set for feature plans so
+                            // get the gateway IDs from their subscriptions
+                            gatewayIds = subs
+                                .filter(({ al }) => al === pro.ACCOUNT_LEVEL_FEATURE)
+                                .map(({ gwid }) => gwid);
+                            _gatewayCheck(gatewayIds);
                         }
                     }
                 }
@@ -393,7 +430,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
     },
 
     updateCallback: {
-        value: function() {
+        value() {
             'use strict';
 
             const dynamicInfoContainer = this.domNode.querySelector('.dynamic-information');
@@ -437,14 +474,8 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
                     payCardBtn.show();
                 }
 
-                // Display the date their subscription will renew if known
-                if (cancelSubsBtn && !u_attr.b && M.account.stype === 'S') {
-                    const renewTimestamp = M.account.srenew.length > 0 ? M.account.srenew[0] : 0; // Timestamp
-
-                    if (renewTimestamp > 0) {
-                        cancelSubsBtn.subtext = l.renews_on_cancel_btn.replace('%1', time2date(renewTimestamp, 1));
-                    }
-
+                // Check for any subscriptions
+                if (cancelSubsBtn && !u_attr.b && M.account.subs.length) {
                     cancelSubsBtn.show();
                 }
 

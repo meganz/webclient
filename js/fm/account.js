@@ -517,24 +517,35 @@ accountUI.general = {
 
         // Default is Free (proNum undefined)
         let proNum = u_attr.p;
-        let planClass = 'free';
+        let planClass = '';
         let planText = l[1150];
 
         // If Business or Pro Flexi, always show the icon & name (even if expired, which is when u_attr.p is undefined)
-        if (u_attr.b || u_attr.pf) {
-            proNum = u_attr.b ? pro.ACCOUNT_LEVEL_BUSINESS : pro.ACCOUNT_LEVEL_PRO_FLEXI;
+        if (u_attr.b || u_attr.pf || proNum) {
+            if (u_attr.b || u_attr.pf) {
+                proNum = u_attr.b ? pro.ACCOUNT_LEVEL_BUSINESS : pro.ACCOUNT_LEVEL_PRO_FLEXI;
+            }
             planClass = 'pro' + proNum;
             planText = pro.getProPlanName(proNum);
+
+            $('.account .plan-icon', $dashboardPane).addClass(planClass);
+            $('.account.membership-plan', $dashboardPane).text(planText);
         }
 
-        // Otherwise if it's an active Pro account
-        else if (proNum) {
-            planClass = 'pro' + proNum;
-            planText = pro.getProPlanName(proNum);
+        // Otherwise the user may have purchased a standalone plan (VPN the only one for now)
+        else {
+            M.getUserPlanInfo((res) => {
+                const firstFeaturePurchased = M.getFirstFeaturePurchased(res);
+                if (firstFeaturePurchased) {
+                    planText = firstFeaturePurchased.planName;
+                }
+                else {
+                    planClass = 'free';
+                }
+                $('.account .plan-icon', $dashboardPane).addClass(planClass);
+                $('.account.membership-plan', $dashboardPane).text(planText);
+            });
         }
-
-        $('.account .plan-icon', $dashboardPane).addClass(planClass);
-        $('.account.membership-plan', $dashboardPane).text(planText);
 
         // update avatar
         $('.fm-account-avatar', $fmContent).safeHTML(useravatar.contact(u_handle, '', 'div', false));

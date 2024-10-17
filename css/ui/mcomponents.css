@@ -63,6 +63,9 @@
 .mr-4 {
     margin-right: 1rem;
 }
+.mt-0 {
+    margin-top: 0;
+}
 .mt-1 {
     margin-top: 0.25rem;
 }
@@ -72,8 +75,14 @@
 .mt-16 {
     margin-top: 4rem;
 }
+.mb-0 {
+    margin-bottom: 0;
+}
 .mb-2 {
     margin-bottom: 0.5rem;
+}
+.mb-8 {
+    margin-bottom: 2rem;
 }
 .mx-1 {
     margin-left: 0.25rem;
@@ -271,9 +280,6 @@ body.rtl .m-dropdown-item i.ml-3 {
 .content-visibility-auto {
     content-visibility: auto;
 }
-.gap-4 {
-    gap: 1rem;
-}
 .block {
     display: block;
 }
@@ -453,8 +459,14 @@ i.green-check-circle {
 .opacity-50 {
     opacity: 0.5;
 }
+.gap-2 {
+    gap: 0.5rem;
+}
 .gap-3 {
     gap: 0.75rem;
+}
+.gap-4 {
+    gap: 1rem;
 }
 .pointer-events-none {
     pointer-events: none;

@@ -5,8 +5,8 @@ lazy(mega, 'templates', () => {
     let $templates = null;
 
     const init = () => {
-        pages.extra_templates_html = translate(pages.extra_templates_html).replace(/{staticpath}/g, staticpath);
-        return $(parseHTML(pages.extra_templates_html));
+        pages.exttemplates = translate(pages.exttemplates).replace(/{staticpath}/g, staticpath);
+        return $(parseHTML(pages.exttemplates));
     };
 
     /**

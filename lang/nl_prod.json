@@ -3469,6 +3469,8 @@
     "err_schedule_title_long": "Voer tot 30\u00a0tekens in",
     "err_session_closed": "Synchronisatie of back-up is gestopt omdat u bent uitgelogd of de sessie hebt gesloten. Om opnieuw in te schakelen, gaat u naar Instellingen in de desktop-applicatie, selecteert u het tabblad Synchroniseren of Back-up en vinkt u de relevante map aan.",
     "err_share_wo_access": "Map kan niet worden gesynchroniseerd omdat het een gedeelde map is zonder volledige toegang.",
+    "err_sub_user_key_miss": "Verifieer de referenties van de beheerder",
+    "err_sub_user_key_miss_txt": "U heeft de referenties van uw bedrijfsbeheerder nog niet geverifieerd. U moet een desktopbrowser gebruiken om hun referenties te verifi\u00ebren voordat u verder kunt gaan.",
     "err_sync_above_path": "Map kan niet gesynchroniseert worden omdat het al binnen een gesynchroniseerde map is.",
     "err_sync_below_path": "Map kan niet worden gesynchroniseerd omdat deze al gesynchroniseerde mappen bevat.",
     "err_t_unable_to_proceed": "Kan niet doorgaan",

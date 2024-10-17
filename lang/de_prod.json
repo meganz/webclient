@@ -3469,6 +3469,8 @@
     "err_schedule_title_long": "Maximal 30 Zeichen eingeben",
     "err_session_closed": "Die Synchronisierung oder Sicherung wurde gestoppt, da Sie sich abgemeldet oder die Sitzung geschlossen haben. Zur erneuten Aktivierung \u00f6ffnen Sie die Einstellungen der Desktop-App, w\u00e4hlen Sie den Reiter Synchronisierung oder Backup aus und aktivieren Sie den entsprechenden Ordner.",
     "err_share_wo_access": "Der Ordner kann nicht synchronisiert werden, da es sich um einen freigegebenen Ordner handelt, auf den Sie keinen Vollzugriff haben.",
+    "err_sub_user_key_miss": "Verify administrator credentials",
+    "err_sub_user_key_miss_txt": "You have not yet verified your business administrator\u2019s credentials. You need to use a desktop browser to verify their credentials before you can proceed.",
     "err_sync_above_path": "Der Ordner kann nicht synchronisiert werden, da er sich bereits innerhalb eines synchronisierten Ordners befindet.",
     "err_sync_below_path": "Der Ordner kann nicht synchronisiert werden, da er bereits synchronisierte Ordner enth\u00e4lt.",
     "err_t_unable_to_proceed": "Fortfahren nicht m\u00f6glich",

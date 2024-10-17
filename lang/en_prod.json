@@ -3469,6 +3469,8 @@
     "err_schedule_title_long": "Enter up to 30\u00a0characters",
     "err_session_closed": "Sync or backup has been stopped as you\u2019ve logged out or closed the session. To re-enable, go to Settings in the desktop app, select the Sync or Backup tab, and check the relevant folder.",
     "err_share_wo_access": "Folder can\u2019t be synced as it\u2019s a shared folder without full access.",
+    "err_sub_user_key_miss": "Verify administrator credentials",
+    "err_sub_user_key_miss_txt": "You have not yet verified your business administrator\u2019s credentials. You need to use a desktop browser to verify their credentials before you can proceed.",
     "err_sync_above_path": "Folder can\u2019t be synced as it\u2019s already inside a synced folder.",
     "err_sync_below_path": "Folder can\u2019t be synced as it already contains synced folders.",
     "err_t_unable_to_proceed": "Unable to proceed",

@@ -3469,6 +3469,8 @@
     "err_schedule_title_long": "Introducir hasta 30\u00a0caracteres",
     "err_session_closed": "La sincronizaci\u00f3n o el backup se han detenido porque te has desconectado o has cerrado la sesi\u00f3n. Para reactivarlos, ve a Ajustes en la aplicaci\u00f3n de escritorio, selecciona la pesta\u00f1a Sincronizar o Backup y marca la carpeta correspondiente.",
     "err_share_wo_access": "La carpeta no se puede sincronizar porque es una carpeta compartida sin acceso completo.",
+    "err_sub_user_key_miss": "Verificar las credenciales del administrador",
+    "err_sub_user_key_miss_txt": "A\u00fan no has verificado las credenciales del administrador de la cuenta Business. Antes de continuar, necesitar\u00e1s usar un navegador de escritorio para verificar sus credenciales.",
     "err_sync_above_path": "La carpeta no se puede sincronizar porque ya est\u00e1 dentro de una carpeta sincronizada.",
     "err_sync_below_path": "La carpeta no se puede sincronizar porque ya contiene carpetas sincronizadas.",
     "err_t_unable_to_proceed": "No se puede continuar",

@@ -3469,6 +3469,8 @@
     "err_schedule_title_long": "Wprowad\u017a do 30 znak\u00f3w",
     "err_session_closed": "Synchronizacja lub tworzenie kopii zapasowych zosta\u0142o zatrzymane, poniewa\u017c u\u017cytkownik wylogowa\u0142 si\u0119 lub zamkn\u0105\u0142 sesj\u0119. Aby ponownie w\u0142\u0105czy\u0107, przejd\u017a do Ustawie\u0144 w aplikacji desktopowej, wybierz kart\u0119 Synchronizacja lub kopia zapasowa i sprawd\u017a odpowiedni folder.",
     "err_share_wo_access": "Katalog nie mo\u017ce by\u0107 zsynchronizowany, poniewa\u017c jest to katalog wsp\u00f3\u0142dzielony bez pe\u0142nego dost\u0119pu.",
+    "err_sub_user_key_miss": "Verify administrator credentials",
+    "err_sub_user_key_miss_txt": "You have not yet verified your business administrator\u2019s credentials. You need to use a desktop browser to verify their credentials before you can proceed.",
     "err_sync_above_path": "Katalog nie mo\u017ce by\u0107 zsynchronizowany, poniewa\u017c znajduje si\u0119 ju\u017c w zsynchronizowanym katalogu.",
     "err_sync_below_path": "Katalog nie mo\u017ce by\u0107 zsynchronizowany, poniewa\u017c zawiera ju\u017c zsynchronizowane katalogi.",
     "err_t_unable_to_proceed": "Nie mo\u017cna kontynuowa\u0107",

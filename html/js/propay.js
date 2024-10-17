@@ -139,7 +139,6 @@ pro.propay = {
 
         pro.propay.purchaseButton = {
             $button: $('button.purchase', this.$page),
-            canProceedTOS: false,
             canProceedLoaded: false,
         };
 
@@ -237,8 +236,7 @@ pro.propay = {
         // Initialise the main purchase button
         pro.propay.purchaseButton.$button.rebind('click.purchase', () => {
             const canProceedLoaded = pro.propay.purchaseButton.canProceedLoaded;
-            const canProceedTOS = !pro.propay.trial || (pro.propay.trial && pro.propay.purchaseButton.canProceedTOS);
-            if (!canProceedLoaded || !canProceedTOS) {
+            if (!canProceedLoaded) {
                 return false;
             }
             if (is_mobile) {
@@ -247,29 +245,6 @@ pro.propay = {
             }
             pro.propay.startPurchaseProcess();
             return false;
-        });
-
-        // Include the hyperlink specifically, so that we can detect if it was clicked and block it
-        $('.agree-to-vpn-tos-wrapper > *, .agree-to-vpn-tos-wrapper a', pro.propay.$page).rebind('click', function() {
-            const $this = $(this);
-
-            // Prevent the click event if the user clicked on a link
-            if ($this.is('a')) {
-                return false;
-            }
-
-            const $checkbox = $('.checkbox', $this.parent());
-            if ($checkbox.hasClass('checkboxOff')) {
-                $checkbox.removeClass('checkboxOff').addClass('checkboxOn');
-                pro.propay.purchaseButton.canProceedTOS = true;
-            }
-            else {
-                $checkbox.removeClass('checkboxOn').addClass('checkboxOff');
-                pro.propay.purchaseButton.canProceedTOS = false;
-            }
-            pro.propay.updatePurchaseButton();
-
-            delay('vpn-cb.log', eventlog.bind(null, 500515));
         });
 
         clickURLs();
@@ -423,11 +398,8 @@ pro.propay = {
 
     updatePurchaseButton() {
         'use strict';
-        // Check membership plans loaded, and TOS agreed to if needed
-        const canProceedLoaded = pro.propay.purchaseButton.canProceedLoaded;
-        const isVPN = pro.propay.planNum === pro.ACCOUNT_LEVEL_FEATURE_VPN;
-        const canProceedTOS = !isVPN || (isVPN && pro.propay.purchaseButton.canProceedTOS);
-        pro.propay.purchaseButton.$button.toggleClass('disabled', !canProceedLoaded || !canProceedTOS);
+        // Check membership plans loaded
+        pro.propay.purchaseButton.$button.toggleClass('disabled', !pro.propay.purchaseButton.canProceedLoaded);
     },
 
     async checkCurrentFeatureStatus(planLevel) {

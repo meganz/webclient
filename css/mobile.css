@@ -3322,16 +3322,6 @@ div.checkboxOn {
 .pro-payment-block .radio-wrap {
     position: relative;
 }
-.mobile .agree-to-vpn-tos-wrapper {
-    margin: 25px auto 0;
-    max-width: 368px;
-}
-.mobile .agree-to-vpn-tos-wrapper label {
-    font: var(--text-body1)
-}
-.mobile .agree-to-vpn-tos-wrapper a {
-    text-decoration: underline;
-}
 
 .mobile.membership-step2 .membership-radio {
     position: absolute;

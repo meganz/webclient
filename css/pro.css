@@ -1870,11 +1870,6 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
 .bottom-page.pricing-page.third-section.vpn-only > .continue-section > *:not(.local-currency-tip) {
     align-self: flex-start;
 }
-.bottom-page.pricing-page.third-section.vpn-only .agree-to-vpn-tos-wrapper {
-    display: flex;
-    margin-bottom: 22px;
-    width: 100%;
-}
 .payment-page.info-block .provider-details {
     color: var(--text-color-high);
     display: inline-block;

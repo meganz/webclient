@@ -2443,8 +2443,8 @@ else if (!browserUpdate) {
     jsl.push({f:'js/ui/searchbar.js', n: 'searchbar_js', j:1});
 
     // General templates
-    jsl.push({f:'html/extra-templates.html', n: 'exttemplates', j: 0});
-    jsl.push({f:'js/ui/extra-templates.js', n: 'exttemplates_js', j: 1});
+    jsl.push({f:'html/exttemplates.html', n: 'exttemplates', j: 0});
+    jsl.push({f:'js/ui/exttemplates.js', n: 'exttemplates_js', j: 1});
     jsl.push({f:'js/ui/elementSwitcher.js', n: 'elementSwitcher_js', j: 1});
 
     if (!is_mobile) {

@@ -1314,6 +1314,8 @@ var addressDialog = {
             self.initBuyNowButton();
             self.initCloseButton();
             self.initRememberDetailsCheckbox();
+
+            onIdle(() => eventlog(500516));
         });
     },
 
@@ -1329,6 +1331,9 @@ var addressDialog = {
         this.$backgroundOverlay = $('.fm-dialog-overlay');
         this.$propayPage = $('.payment-section', '.fmholder');
 
+        const $proPlanDetails = $('.pro-plan-details.paid-only', this.$dialog);
+        const $trialDetails = $('.pro-plan-details.free-trial', this.$dialog);
+
         var selectedPlanIndex;
         var selectedPackage;
         var proNum;
@@ -1336,7 +1341,7 @@ var addressDialog = {
         var proPrice;
         var numOfMonths;
         var monthsWording;
-        let hasIcon = true;
+        let trial;
 
         if (!is_mobile) {
             // Hide the warning message when the registerb dialog gets open each time.
@@ -1375,15 +1380,29 @@ var addressDialog = {
 
             // Get the selected Pro plan details
             proNum = selectedPackage[pro.UTQA_RES_INDEX_ACCOUNTLEVEL];
-            if (!pro.filter.simple.hasIcon.has(proNum)) {
-                hasIcon = false;
-            }
             proPlan = pro.getProPlanName(proNum);
             proPrice = selectedPackage[pro.UTQA_RES_INDEX_PRICE];
             numOfMonths = selectedPackage[pro.UTQA_RES_INDEX_MONTHS];
             this.proNum = proNum;
             this.numOfMonths = numOfMonths;
             proNum = 'pro' + proNum;
+
+            trial = (!pro.propay.freeTrialCardController || (pro.propay.freeTrialCardController.getVal() !== 'error'))
+                ? selectedPackage[pro.UTQA_RES_INDEX_EXTRAS].trial
+                : false;
+
+            const $freeTrial = $('.free-trial', this.$dialog).toggleClass('hidden', !trial);
+            $('.main-title.paid-only', this.$dialog).toggleClass('hidden', !!trial);
+            $('.payment-plan-price', this.$dialog).toggleClass('hidden', !!trial);
+
+            if (trial) {
+                const trailText = l.after_trial_card_charged_m
+                    .replace('%1', trial.days)
+                    .replace('%2', formatCurrency(selectedPackage[pro.UTQA_RES_INDEX_PRICE]));
+
+                $freeTrial.filter('.free-trial-info').text(trailText);
+            }
+
 
             if (discountInfo &&
                 ((numOfMonths === 1 && discountInfo.emp) || (numOfMonths === 12 && discountInfo.eyp))) {
@@ -1467,26 +1486,28 @@ var addressDialog = {
             $promotionTextSelector.text(discountRecurringText);
         }
 
+        $('.mobile.separator-line.paid-only', this.$dialog).toggleClass('hidden', trial);
 
-        // Update template
-        const $planIcon = this.$dialog.find('.plan-icon');
-        $planIcon.removeClass('pro1 pro2 pro3 pro4 pro101 business feature');
+        if (trial) {
+            if (is_mobile) {
+                $proPlanDetails.addClass('hidden');
+                $trialDetails.removeClass('hidden');
+                $('.trial-title', $trialDetails).text(proPlan);
+            }
+            else {
+                $('.payment-plan-title', this.$dialog).text(proPlan);
+            }
 
-        if (this.proNum === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
-            $planIcon.addClass('feature');
-            $('i.feature', $planIcon).attr('class', 'feature sprite-fm-uni icon-crest-vpn');
-        }
-        else if (hasIcon) {
-            $planIcon.addClass(proNum);
         }
         else {
-            $planIcon.addClass('no-icon');
-        }
+            $proPlanDetails.removeClass('hidden');
+            $trialDetails.addClass('hidden');
 
-        this.$dialog.find('.payment-plan-title').text(proPlan);
-        this.$dialog.find('.payment-plan-txt .duration').text(monthsWording);
-        this.proPrice = formatCurrency(proPrice);
-        this.$dialog.find('.payment-plan-price .price').text(this.proPrice);
+            this.$dialog.find('.payment-plan-title').text(proPlan);
+            this.$dialog.find('.payment-plan-txt .duration').text(monthsWording);
+            this.proPrice = formatCurrency(proPrice);
+            this.$dialog.find('.payment-plan-price .price').text(this.proPrice);
+        }
 
         // Show the black background overlay and the dialog
         this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');
@@ -2083,6 +2104,9 @@ var addressDialog = {
                     $contentSection.scrollTop(scrollBottom);
                 }
             }
+
+            onIdle(() => eventlog(500517));
+
             return false;
         }
 
@@ -2155,7 +2179,12 @@ var addressDialog = {
         this.$dialog.addClass('hidden');
 
         if (!this.businessPlan || !this.userInfo || !this.businessRegPage) {
-            pro.propay.sendPurchaseToApi();
+            if (pro.propay.trial && pro.propay.shouldShowTrial()) {
+                pro.propay.redeemFreeTrial();
+            }
+            else {
+                pro.propay.sendPurchaseToApi();
+            }
         }
         else {
             this.businessRegPage.processPayment(this.extraDetails, this.businessPlan);
@@ -2178,35 +2207,68 @@ var addressDialog = {
      * @param {String} msgTxt Success text
      * @param {String} btnTxt Success button text
      * @param {Function} callback Success callback
+     * @param {Boolean | string} isEur If the success message should show localCurrency, or the currency
      * @returns {void}
      */
-    showSuccessCloak(titleTxt, msgTxt, btnTxt, callback) {
+    showSuccessCloak(titleTxt, msgTxt, btnTxt, callback, showDisclaimer) {
         'use strict';
+
+        if (!Array.isArray(msgTxt)) {
+            msgTxt = [msgTxt];
+        }
+        if (typeof showDisclaimer === 'string') {
+            showDisclaimer = showDisclaimer !== 'EUR';
+        }
+
+        const lastLineClassName = 'mb-10 mt-0';
+        const msgLen = msgTxt.length;
+
+        const textItems = msgTxt.reduce((wrapper, msg, i) => {
+            const text = document.createElement(is_mobile
+                ? 'span'
+                : 'p');
+            const isLast = i === (msgLen - 1);
+            text.className = isLast ? lastLineClassName : 'mb-0 mt-0';
+            text.textContent = msg + (isLast ? '' : ' ');
+            wrapper.appendChild(text);
+            return wrapper;
+        }, document.createElement('div'));
+
+        textItems.className = 'text-wrapper';
 
         const div = document.createElement('div');
         const icon = document.createElement('i');
         const title = document.createElement('p');
-        const text = document.createElement('p');
 
-        title.className = 'font-h3-bold my-4';
-        text.className = 'mb-10 mt-0';
-        div.className = 'payment-success-cloak flex flex-column justify-center items-center';
+        const spacerDiv = document.createElement('div');
+        const estimatedPriceDiv = document.createElement('div');
+        const mainContentDiv = document.createElement('div');
+
+        title.className = 'font-h3-bold my-4 title';
+        div.className = 'payment-success-cloak flex flex-column justify-between items-center'
+            + (is_mobile ? ' mobile' : '');
+        mainContentDiv.className = 'payment-success-content-wrapper flex flex-column justify-center items-center'
+            + (pro.propay.trial ? ' trial' : '');
         icon.className = 'sprite-fm-mono icon-check-circle-thin-outline';
+        estimatedPriceDiv.className = 'font-h3-bold mb-8';
+
+        estimatedPriceDiv.textContent = showDisclaimer ? `*${l.est_price_acc_billed_euro}` : '';
         title.textContent = titleTxt;
-        text.textContent = msgTxt;
 
-        div.appendChild(icon);
-        div.appendChild(title);
-        div.appendChild(text);
+        mainContentDiv.appendChild(icon);
+        mainContentDiv.appendChild(title);
 
-        const button = new MButton(
-            btnTxt,
-            null,
-            callback,
-            'mega-button large positive'
-        );
+        mainContentDiv.appendChild(textItems);
 
-        div.appendChild(button.el);
+        const button = document.createElement('button');
+        button.textContent = btnTxt;
+        button.className = 'mega-button large positive';
+        button.addEventListener('click', callback);
+
+        mainContentDiv.appendChild(button);
+        div.appendChild(spacerDiv);
+        div.appendChild(mainContentDiv);
+        div.appendChild(estimatedPriceDiv);
         document.body.appendChild(div);
     },
 
@@ -2220,6 +2282,62 @@ var addressDialog = {
         const shift = 500;
         const base = 3000; // 3sec
         const nextTick = addressDialog.stripeCheckerCounter * shift + base;
+
+        if (pro.propay.trial) {
+            api.screq({a: 'cft', id: saleId}).then(({result}) => {
+
+                if (+result === 1) {
+                    pro.propay.paymentStatusChecker =
+                        setTimeout(addressDialog.stripePaymentChecker.bind(addressDialog, saleId), nextTick);
+                    return;
+                }
+
+                if (+result === 0) {
+                    const $stripeDialog = $('.payment-stripe-dialog');
+                    const $stripeIframe = $('iframe#stripe-widget', $stripeDialog);
+
+                    // Assume all trials are monthly plans at the moment
+                    const plan = pro.getPlan(pro.propay.planNum, 1);
+                    const planPrice = plan[pro.UTQA_RES_INDEX_LOCALPRICE] || plan[pro.UTQA_RES_INDEX_PRICE];
+                    const planCurrency = plan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY] || 'EUR';
+
+                    const startDateTxt = l.m_sub_will_start
+                        .replace('%1', formatCurrency(planPrice, planCurrency, 'narrowSymbol')
+                            + (planCurrency === 'EUR' ? '' : '*'))
+                        .replace('%2', time2date((Date.now() / 1000) + pro.propay.trial.days * 86400, 2));
+
+                    if (parseInt(pro.propay.planNum) === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
+                        onIdle(() => eventlog(500525));
+
+                        this.showSuccessCloak(
+                            l.trial_started,
+                            [startDateTxt, l.cancel_to_avoid_charge],
+                            l.goto_mega_vpn,
+                            () => {
+                                onIdle(() => eventlog(500526));
+                                mega.redirect('mega.io', 'vpn#downloadapps', false, false);
+                            },
+                            planCurrency
+                        );
+
+                        pro.propay.hideLoadingOverlay();
+                    }
+
+                    $stripeIframe.remove();
+                    $stripeDialog.addClass('hidden');
+                }
+
+            }).catch((ex) => {
+                if (ex === EEXIST) {
+                    msgDialog('warninga', l[135], l.vpn_free_trial_used_h, l.vpn_free_trial_used_b);
+                    onIdle(() => eventlog(500522));
+                }
+                else {
+                    tell(ex);
+                }
+            });
+            return;
+        }
 
         // If saleId is already an array of sale IDs use that, otherwise add to an array
         const saleIdArray = Array.isArray(saleId) ? saleId : [saleId];
@@ -2237,7 +2355,7 @@ var addressDialog = {
                         this.showSuccessCloak(
                             l[6961],
                             l.vpn_purchase_success_txt.replace('%1', u_attr.email || ''),
-                            l.vpn_goto,
+                            l.goto_mega_vpn,
                             () => {
                                 mega.redirect('mega.io', 'vpn#downloadapps', false, false);
                             }
@@ -2355,8 +2473,15 @@ var addressDialog = {
                 failHandle(l[1679]);
                 return;
             }
+            if (event.data.startsWith('eventlog^')) {
+                // Log events that come from the stripe iframe dialog
+                onIdle(() => eventlog(event.data.split('^')[1]));
+                return;
+            }
             if (event.data === 'closeme') {
                 closeStripeDialog();
+
+                onIdle(() => eventlog(500519));
 
                 // Load the proper page UI after close the stripe payment dialog
                 if (page === 'registerb') {
@@ -2452,14 +2577,13 @@ var addressDialog = {
         if (isStripe) {
             this.stripeSaleId = null;
             if (utcResult.EUR) {
-                const $stripeDialog = $('.payment-stripe-dialog');
+                const $stripeDialog = $('.payment-stripe-dialog').toggleClass('edit', !!utcResult.edit);
                 const $iframeContainer =
                     $('.mobile.payment-stripe-dialog .iframe-container,' +
                           ' .mega-dialog.payment-stripe-dialog .iframe-container');
                 let $stripeIframe = $('iframe#stripe-widget', $stripeDialog);
                 $stripeIframe.remove();
-                const sandBoxCSP = 'allow-scripts allow-same-origin allow-forms'
-                    + (utcResult.edit ? ' allow-popups' : '');
+                const sandBoxCSP = 'allow-scripts allow-same-origin allow-forms allow-popups';
 
                 $stripeIframe = mCreateElement(
                     'iframe',
@@ -2476,6 +2600,7 @@ var addressDialog = {
                 const payInfo = tryCatch(() => {
                     return new URL(utcResult.EUR);
                 })();
+
                 this.gatewayOrigin = payInfo.origin;
 
                 // if a testing gateway is set.
@@ -2543,6 +2668,13 @@ var addressDialog = {
                     iframeSrc += '&mobile=1';
                 }
 
+                if (pro.propay.selectedProPackage &&
+                    pro.propay.selectedProPackage[pro.UTQA_RES_INDEX_EXTRAS].trial) {
+                    iframeSrc += `&trial=${pro.propay.selectedProPackage[pro.UTQA_RES_INDEX_EXTRAS].trial.days}`;
+                    iframeSrc += `&tprice=${pro.propay.selectedProPackage[pro.UTQA_RES_INDEX_PRICE]}`;
+                    iframeSrc += `&locales=${getCountryAndLocales().locales}`;
+                }
+
                 $stripeIframe.src = iframeSrc;
                 $stripeIframe.id = 'stripe-widget';
 
@@ -2550,6 +2682,8 @@ var addressDialog = {
                 loadingDialog.hide();
 
                 M.safeShowDialog('stripe-pay', $stripeDialog);
+
+                onIdle(() => eventlog(500518));
 
                 window.addEventListener('message', addressDialog.stripeFrameHandler, { once: true });
                 pro.propay.listenRemover = setTimeout(() => {

@@ -4660,9 +4660,15 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.payment-address-dialog .payment-plan-info {
         display: inline-block;
         vertical-align: middle;
-        -webkit-padding-start: 15px;
-        padding-inline-start: 15px;
         max-width: 485px;
+    }
+    .mega-dialog.payment-address-dialog .free-trial-subtitle {
+        display: flex;
+        width: max-content;
+        border-radius: 3px;
+        padding: 2px 8px;
+        color: rgba(253, 62, 56, 1);
+        outline: 1px solid;
     }
     .mega-dialog.payment-address-dialog .payment-form-header {
         margin-top: 20px;
@@ -4716,6 +4722,10 @@ body.de .mega-dialog.contact-picker-widget {
         -webkit-touch-callout: text;
         -webkit-user-select: text;
         user-select: text;
+    }
+    .mega-dialog.payment-address-dialog .free-trial-info {
+        font: var(--text-h3-bold);
+        color: var(--text-color-medium);
     }
     .mega-dialog.payment-address-dialog .payment-form-title {
         color: var(--text-color-high);
@@ -10693,8 +10703,12 @@ body.de .mega-dialog.contact-picker-widget {
         border-radius: 24px;
         background: none;
         display: block;
-        height: 585px;
+        min-height: 615px;
+        max-height: 640px;
         width: 640px;
+    }
+    .mega-dialog.payment-stripe-dialog.edit iframe {
+        min-height: 510px;
     }
 
     .mega-dialog.payment-stripe-dialog .content-block {

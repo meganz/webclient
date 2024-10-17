@@ -1711,7 +1711,15 @@ MegaUtils.prototype.checkLeftStorageBlock = async function(data) {
         storageBlock.querySelector('.plan').textContent = pro.getProPlanName(u_attr.p);
     }
     else {
-        storageBlock.querySelector('.plan').textContent = l[1150]; // Free
+        M.getUserPlanInfo((res) => {
+            const firstFeaturePurchased = M.getFirstFeaturePurchased(res);
+            if (firstFeaturePurchased) {
+                storageBlock.querySelector('.plan').textContent = firstFeaturePurchased.planName;
+            }
+            else {
+                storageBlock.querySelector('.plan').textContent = l[1150]; // Free
+            }
+        });
     }
 
     // Show only space_used for Business and Pro Flexi accounts
@@ -2664,6 +2672,35 @@ MegaUtils.prototype.isInExperiment = function(flag) {
 
     // If neither flag is set
     return false;
+};
+
+/**
+ * Get the first feature plan the user purchased
+ *
+ * @param {Object} result M.accountData result
+ * @returns {Object} M.firstFeaturePurchased (object will be empty if the user hasn't purchased one)
+ */
+MegaUtils.prototype.getFirstFeaturePurchased = function(result) {
+    'use strict';
+
+    if (result.features.length === 0) {
+        return null;
+    }
+
+    const purchasableFeaturePlans = Object.keys(pro.propay.purchasableFeaturePlans());
+    const firstFeaturePurchased = result.plans && result.plans.find(
+        ({ al, features }) => al === pro.ACCOUNT_LEVEL_FEATURE
+            && Object.keys(features).some(item => purchasableFeaturePlans.includes(item))
+    );
+
+    if (!firstFeaturePurchased) {
+        return null;
+    }
+
+    const upperCaseFeature = Object.keys(firstFeaturePurchased.features)[0].toUpperCase();
+    firstFeaturePurchased.planName = pro.getProPlanName(pro[`ACCOUNT_LEVEL_FEATURE_${upperCaseFeature}`]);
+
+    return firstFeaturePurchased;
 };
 
 MegaUtils.prototype.noSleep = async function(stop, title) {

@@ -364,6 +364,10 @@ html .theme-light-forced {
         --stroke-grey-1-inverted: rgba(34, 34, 34, var(--stroke-alpha, 1));
         --stroke-link-inverted: rgba(103, 103, 103, var(--stroke-alpha, 1));
 
+    /* Discounts */
+        --discount-main: rgba(48, 194, 101, 1);
+
+
     /* TODO: remove this once the library is updated */
         --surface-overlay-background: rgba(204, 204, 204, var(--surface-alpha, 0.9));
         --surface-main-inverted: rgba(51, 51, 51, var(--surface-alpha, 1));

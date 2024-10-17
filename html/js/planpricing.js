@@ -1048,6 +1048,7 @@ lazy(pro, 'proplan2', () => {
         if (ProFlexiFound[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY] && ProFlexiFound[pro.UTQA_RES_INDEX_LOCALPRICE]) {
             flexiPrice = ProFlexiFound[pro.UTQA_RES_INDEX_LOCALPRICE];
             flexiCurrency = ProFlexiFound[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
+            hasLocalPrices = true;
         }
         else {
             flexiPrice = ProFlexiFound[pro.UTQA_RES_INDEX_PRICE];
@@ -1063,9 +1064,8 @@ lazy(pro, 'proplan2', () => {
             .text(l.bsn_base_stg_trs.replace('%1', baseStorage));
 
         // if we have local price info for extra storage
-        if (ProFlexiFound[13]) {
+        if (ProFlexiFound[13] && hasLocalPrices) {
             extraPrice = formatCurrency(ProFlexiFound[13], flexiCurrency, 'narrowSymbol');
-            hasLocalPrices = true;
         }
         else {
             extraPrice = formatCurrency(ProFlexiFound[12]);
@@ -1154,6 +1154,9 @@ lazy(pro, 'proplan2', () => {
 
             if (planNum === pro.ACCOUNT_LEVEL_FEATURE_VPN && currentPlan[pro.UTQA_RES_INDEX_MONTHS] === 1) {
                 VpnPlanFound = currentPlan;
+                if (!localPriceInfo) {
+                    localPriceInfo = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
+                }
                 continue;
             }
 
@@ -1745,7 +1748,7 @@ lazy(pro, 'proplan2', () => {
                 return loadSubpage('register');
             }
 
-            loadingDialog.show();
+            loadingDialog.show('pricingReady');
 
             await fetchPlansData();
             await fetchBusinessPlanInfo();
@@ -1799,7 +1802,7 @@ lazy(pro, 'proplan2', () => {
             initFeatureTable();
             initScrollObserver();
 
-            loadingDialog.hide();
+            loadingDialog.hide('pricingReady');
 
             if (sessionStorage.mScrollTo === 'flexi' && ProFlexiFound) {
                 $proflexiBlock[0].scrollIntoView({behavior: 'smooth'});

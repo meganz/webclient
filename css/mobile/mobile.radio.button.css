@@ -1,13 +1,26 @@
 .mega-radio-button {
     display: flex;
-    flex-direction: row;
-    align-items: center;
+    flex-direction: column;
     padding: 12px 0;
     width: 100%;
     box-sizing: border-box;
 }
 
-.mega-radio-button.align-right {
+.mega-radio-button .button-and-labels {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.mega-radio-button.disabled {
+    color: var(--mobile-text-disabled);
+    opacity: 1;
+}
+.mega-radio-button.disabled > *:not(.disabled-reason) {
+    opacity: 0.5;
+}
+
+.mega-radio-button.align-right .button-and-labels {
     flex-direction: row-reverse;
 }
 
@@ -16,6 +29,21 @@
     -webkit-margin-start: auto;
     margin-inline-end: 0;
     -webkit-margin-end: 0;
+}
+
+.mega-radio-button .label-and-sublabel {
+    display: flex;
+    flex-direction: column;
+}
+
+.mega-radio-button .radio-sublabel,
+.mega-radio-button .disabled-reason {
+    font: var(--mobile-font-caption-large-regular);
+    color: var(--mobile-text-secondary);
+}
+
+.mega-radio-button .disabled-reason {
+    margin: 8px 0 0 37px;
 }
 
 .mega-radio-button .radio-wrapper {
@@ -30,6 +58,9 @@
     position: relative;
     margin-inline-end: 16px;
     -webkit-margin-end: 16px;
+}
+.mega-radio-button.disabled .radio-wrapper {
+    border: 1px solid var(--mobile-border-disabled);
 }
 
 .mega-radio-button.on .radio-wrapper::after {
@@ -54,7 +85,6 @@
     color: var(--mobile-text-primary);
     height: auto;
     flex: none;
-    order: 1;
 }
 
 .mega-radio-button .radio-action[for^="labels-"]::before {

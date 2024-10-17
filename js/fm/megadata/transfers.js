@@ -1570,6 +1570,9 @@ MegaData.prototype.ulerror = function(ul, error) {
     else if (error === EGOINGOVERQUOTA) {
         M.checkGoingOverStorageQuota(-1);
     }
+    else if (error === ESUBUSERKEYMISSING) {
+        ulmanager.ulShowBusAdminVerifyDialog(ul);
+    }
     else {
         overquota = false;
     }

@@ -3469,6 +3469,8 @@
     "err_schedule_title_long": "Masukan hingga 30\u00a0karakter",
     "err_session_closed": "Sinkronisasi atau pencadangan telah dihentikan saat anda keluar atau menutup sesi. Untuk mengaktifkan kembali, buka Pengaturan di aplikasi desktop, pilih tab Sinkronisasi atau Pencadangan, dan periksa folder yang relevan.",
     "err_share_wo_access": "Folder tidak dapat disinkronkan karena merupakan folder bersama tanpa akses penuh.",
+    "err_sub_user_key_miss": "Verifikasi kredensi administrator",
+    "err_sub_user_key_miss_txt": "Anda belum memverifikasi kredensi administrator bisnis anda. Anda perlu menggunakan browser desktop untuk memverifikasi kredensialnya sebelum anda dapat melanjutkan.",
     "err_sync_above_path": "Folder tidak dapat disinkronkan karena sudah berada di dalam folder yang disinkronkan.",
     "err_sync_below_path": "Folder tidak dapat disinkronkan karena sudah berisi folder yang disinkronkan.",
     "err_t_unable_to_proceed": "Tidak dapat melanjutkan",

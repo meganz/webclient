@@ -3469,6 +3469,8 @@
     "err_schedule_title_long": "Introduce\u021bi p\u00e2n\u0103 la 30 de caractere",
     "err_session_closed": "Sincronizarea sau backupul au fost oprite pe m\u0103sur\u0103 ce v-a\u021bi deconectat sau a\u021bi \u00eenchis sesiunea. Pentru a reactiva, accesa\u021bi Set\u0103ri \u00een aplica\u021bia desktop, selecta\u021bi fila Sincronizeaz\u0103 sau Backup \u0219i verifica\u021bi folderul relevant.",
     "err_share_wo_access": "Folderul nu poate fi sincronizat, deoarece este un folder partajat f\u0103r\u0103 acces complet.",
+    "err_sub_user_key_miss": "Verify administrator credentials",
+    "err_sub_user_key_miss_txt": "You have not yet verified your business administrator\u2019s credentials. You need to use a desktop browser to verify their credentials before you can proceed.",
     "err_sync_above_path": "Folderul nu poate fi sincronizat, deoarece se afl\u0103 deja \u00eentr-un folder sincronizat.",
     "err_sync_below_path": "Folderul nu poate fi sincronizat deoarece con\u021bine deja foldere sincronizate.",
     "err_t_unable_to_proceed": "Imposibil de a continua",

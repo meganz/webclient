@@ -3469,6 +3469,8 @@
     "err_schedule_title_long": "Inserisci fino a 30\u00a0caratteri",
     "err_session_closed": "La sincronizzazione o il backup ha ricevuto un'interruzione perch\u00e9 hai effettuato il logout o hai chiuso la sessione. Per riattivarla, vai nelle Impostazioni nell'app per desktop, seleziona la sezione Sincronizzazioni o Backup, e controlla la cartella.",
     "err_share_wo_access": "La cartella non pu\u00f2 essere sincronizzata perch\u00e9 \u00e8 una cartella condivisa senza pieno accesso.",
+    "err_sub_user_key_miss": "Verify administrator credentials",
+    "err_sub_user_key_miss_txt": "You have not yet verified your business administrator\u2019s credentials. You need to use a desktop browser to verify their credentials before you can proceed.",
     "err_sync_above_path": "La cartella non pu\u00f2 essere sincronizzata in quanto \u00e8 gi\u00e0 dentro una cartella sincronizzata.",
     "err_sync_below_path": "La cartella non pu\u00f2 essere sincronizzata perch\u00e9 gi\u00e0 contiene cartelle sincronizzate.",
     "err_t_unable_to_proceed": "Impossibile procedere",

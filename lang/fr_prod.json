@@ -3469,6 +3469,8 @@
     "err_schedule_title_long": "Saisir jusqu\u2019\u00e0 30\u00a0caract\u00e8res",
     "err_session_closed": "La synchronisation ou la sauvegarde a cess\u00e9 \u00e0 la suite d\u2019une d\u00e9connexion ou d\u2019une fermeture de session. Pour la r\u00e9activer, allez dans les Param\u00e8tres de l\u2019appli pour ordinateur, s\u00e9lectionnez l\u2019onglet Synchronisations ou Sauvegardes et cochez le dossier concern\u00e9.",
     "err_share_wo_access": "Impossible de synchroniser le dossier, car c\u2019est un dossier partag\u00e9 sans acc\u00e8s total.",
+    "err_sub_user_key_miss": "Verify administrator credentials",
+    "err_sub_user_key_miss_txt": "You have not yet verified your business administrator\u2019s credentials. You need to use a desktop browser to verify their credentials before you can proceed.",
     "err_sync_above_path": "Le dossier ne peut pas \u00eatre synchronis\u00e9, car il fait d\u00e9j\u00e0 partie d\u2019un dossier synchronis\u00e9.",
     "err_sync_below_path": "Le dossier ne peut pas \u00eatre synchronis\u00e9, car il comprend d\u00e9j\u00e0 des dossiers synchronis\u00e9s.",
     "err_t_unable_to_proceed": "Impossible de poursuivre",

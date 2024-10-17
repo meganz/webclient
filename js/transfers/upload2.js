@@ -143,6 +143,22 @@ var ulmanager = {
         });
     },
 
+    ulShowBusAdminVerifyDialog(upload) {
+        'use strict';
+        if (is_mobile) {
+            onIdle(() => msgDialog('error', '', api_strerror(ESUBUSERKEYMISSING), l.err_sub_user_key_miss_txt));
+        }
+        else {
+            M.require('businessAcc_js', 'businessAccUI_js').done(() => {
+                const businessUI = new BusinessAccountUI();
+                businessUI.showVerifyDialog();
+            });
+        }
+        if (upload) {
+            onUploadError(upload, api_strerror(ESUBUSERKEYMISSING));
+        }
+    },
+
     ulResumeOverStorageQuotaState: function() {
         'use strict';
 
@@ -767,6 +783,11 @@ var ulmanager = {
                 return false;
             }
 
+            if (res === ESUBUSERKEYMISSING) {
+                M.ulerror(ul_queue[ctx.reqindex], res);
+                return false;
+            }
+
             // Reset in case of a retry
             delete ul_queue[ctx.reqindex].posturl;
 
@@ -971,7 +992,10 @@ var ulmanager = {
         api.screq(req)
             .catch(echo)
             .then((res) => {
-                ulmanager.ulCompletePending2(res, ctx);
+                ulmanager.ulCompletePending2(
+                    typeof res === 'number' && res < 0 ? { result: res, payload: req } : res,
+                    ctx
+                );
             })
             .catch(reportError);
     },

@@ -94,6 +94,7 @@ var EMFAREQUIRED = -26;     // Multi-Factor Authentication Required
 var EMASTERONLY = -27;      // Access denied for sub-users (only for business accounts)
 var EBUSINESSPASTDUE = -28; // Business account expired
 var EPAYWALL = -29;     // ODQ paywall state
+var ESUBUSERKEYMISSING = -30;
 
 // custom errors
 var ETOOERR = -400;
@@ -2970,7 +2971,8 @@ lazy(api_strerror, 'map', () => {
         [EBUSINESSPASTDUE]: 'Business account expired.',
         [EPAYWALL]: 'Over Disk Quota Paywall.',
         [ETOOERR]: 'Too many concurrent errors.',
-        [ESHAREROVERQUOTA]: l[19597] || 'Share owner is over storage quota.'
+        [ESHAREROVERQUOTA]: l[19597] || 'Share owner is over storage quota.',
+        [ESUBUSERKEYMISSING]: l.err_sub_user_key_miss || 'Verify administrator credentials',
     });
 });
 

@@ -1624,6 +1624,9 @@ accountUI.account = {
                     parseInt(res),
                     function(val) {
                         mega.attr.set('clv', val, -2, 0);
+                        if (typeof u_attr === 'object') {
+                            u_attr['^clv'] = val;
+                        }
                     });
             });
         },

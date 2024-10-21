@@ -775,6 +775,11 @@ MegaData.prototype.copyNodes = async function(cn, t, del, tree) {
         await api_cachepubkeys([t]);
     }
 
+    // Display confirmation dialog when copying to/from object storage
+    if ('utils' in s4 && await s4.utils.confirmAction(cn, t).catch(dump) === false) {
+        return;
+    }
+
     if (!tree) {
         if (this.isFileNode(cn)) {
             tree = [cn];
@@ -1086,6 +1091,11 @@ MegaData.prototype.moveNodes = async function(n, t, folderConflictResolution) {
     }
     if (promises.length) {
         await Promise.all(promises).catch(dump);
+    }
+
+    // Display confirmation dialog when moving to/from object storage
+    if ('utils' in s4 && await s4.utils.confirmAction(n, t, true).catch(dump) === false) {
+        return;
     }
 
     const cleanEmptyMergedFolders = () => {
@@ -4717,9 +4727,8 @@ MegaData.prototype.preparePublicSetImport = function(pfid, data) {
 MegaData.prototype.shouldCreateThumbnail = function(target) {
     'use strict';
 
-    // @todo: Fix after the proxy server changes are released.
-    if (self.omitthumb !== false) {
-        return !self.omitthumb;
+    if (self.omitthumb) {
+        return false;
     }
 
     target = target || this.currentCustomView.nodeID || this.currentdirid || this.lastSeenCloudFolder;

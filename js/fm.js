@@ -1695,6 +1695,9 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
                 checkboxSetting === 'cslrem'
                 || checkboxSetting === 'nowarnpl'
                 || checkboxSetting === 'skipDelWarning'
+                || checkboxSetting === 'skipcdtos4'
+                || checkboxSetting === 'skips4tocd'
+                || checkboxSetting === 'skips4tos4'
                 || checkboxSetting === 'rwReinstate', checkboxSetting);
 
             $('#msgDialog .checkbox-block .checkdiv,' +

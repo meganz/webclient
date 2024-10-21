@@ -492,7 +492,7 @@ FileManager.prototype.initFileManagerUI = function() {
                     const cn = s4.utils.getContainersList();
 
                     // Drag and drop folder to the only container or skip
-                    if (cn.length === 1 && M.isFolder(ids)) {
+                    if (cn.length === 1) {
                         t = cn[0].h;
                     }
                     else {

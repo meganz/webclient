@@ -468,3 +468,77 @@ function eventlog(id, msg, once) {
 }
 
 eventlog.sent = Object.create(null);
+
+
+/**
+ * Network connectivity watcher.
+ * @description The idea is that classes/functions making use of the Fetch API will
+ * register themselves on this interface whenever attempting to stablish a connection.
+ * Whenever the catch handler is invoked, they shall register the exception thrown.
+ * @name enotconn
+ * @global
+ */
+lazy(self, 'enotconn', () => {
+    'use strict';
+    let down;
+    const wm = new IWeakMap();
+    const logger = MegaLogger.getLogger('enotconn');
+    const dsp = () => {
+        let fail = 0;
+        const {size} = wm;
+        for (const [, t] of wm) {
+            if (t !== 'online') {
+                ++fail;
+            }
+        }
+
+        if (fail > 0) {
+            if (self.d) {
+                logger.warn('%d of %d connections are failing', fail, size);
+            }
+            if (size === fail) {
+                down = 1;
+                mBroadcaster.sendMessage('ENOTCONN', navigator.onLine ? 'maybe-offline' : 'offline');
+            }
+        }
+        else if (size > 0) {
+            mBroadcaster.sendMessage('ENOTCONN', down ? 'online' : 'keep-alive');
+            down = 0;
+        }
+        else {
+            if (self.d) {
+                logger.warn('Ran empty, nothing to watch for.');
+            }
+            mBroadcaster.sendMessage('ENOTCONN', 'dead-end');
+        }
+    };
+
+    ((ec) => {
+        window.addEventListener('online', ec);
+        window.addEventListener('offline', ec);
+    })((ev) => {
+        for (const [cl] of wm) {
+            enotconn.register(cl, ev.type);
+
+            if (typeof cl.handleEvent === 'function') {
+                cl.handleEvent(ev);
+            }
+        }
+    });
+
+    return freeze({
+        unregister(cl) {
+            if (self.d) {
+                logger.log('unregister', cl);
+            }
+            wm.delete(cl);
+        },
+        register(cl, val = 'online') {
+            if (self.d > 1) {
+                logger.log('register', cl, val);
+            }
+            wm.set(cl, `${val}`);
+            delay(`enotconn<dsp>`, dsp, 2e3);
+        }
+    });
+});

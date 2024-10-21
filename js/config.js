@@ -855,6 +855,20 @@
         });
     };
 
+    if (self.d > 0) {
+        ns.test = async() => {
+            const config = await mega.attr.get(u_handle, 'fmconfig', false, true);
+
+            config.foo = String(Math.random() * Number.MAX_SAFE_INTEGER);
+            const p1 = mega.attr.set2(null, 'fmconfig', config, false, true);
+
+            config.foo = String(Math.random() * Number.MAX_SAFE_INTEGER);
+            const p2 = mega.attr.set2(null, 'fmconfig', config, false, true);
+
+            return Promise.all([p1, p2]);
+        };
+    }
+
     mBroadcaster.once('startMega', () => {
         const cfg = tryCatch(() => {
             const value = sessionStorage.fmconfig || localStorage.fmconfig;

@@ -97,8 +97,40 @@ lazy(s4, 'utils', () => {
          * @memberOf s4
          */
         getContainersList() {
-            return M.tree.s4 && Object.keys(M.tree.s4).map(h => M.d[h]).filter(n => n && n.s4
-                && n.p === M.RootID && s4.kernel.getS4NodeType(n) === 'container') || [];
+            const res = [];
+            for (const h in M.tree.s4) {
+                const n = M.getNodeByHandle(h);
+
+                if (n.s4 && s4.kernel.getS4NodeType(n) === 'container') {
+                    res.push(n);
+                }
+            }
+            return res;
+        },
+
+        /**
+         * Getting bucket node for S4 item
+         * @param {Object|String} n S4 node of handle
+         * @param {String} type S4 node type
+         * @returns {Object} bucket node
+         * @memberOf s4
+         */
+        getBucketNode(n, type) {
+            if (typeof n === 'string') {
+                n = M.getNodeByHandle(n);
+            }
+
+            type = type || s4.kernel.getS4NodeType(n);
+
+            if (type === 'bucket') {
+                return n;
+            }
+
+            if (type === 'bucket-child' || type === 'object') {
+                return s4.kernel.getS4BucketForObject(n);
+            }
+
+            return false;
         },
 
         /**
@@ -152,11 +184,10 @@ lazy(s4, 'utils', () => {
         validateS4Url(urlPath) {
             const allowedPages = new Set(['keys', 'policies', 'users', 'groups']);
             const path = M.getPath(urlPath).reverse();
+            const bucket = this.getBucketNode(path[1]);
 
-            if (path[0] !== 's4' || s4.kernel.getS4NodeType(path[1]) !== 'container') {
-                const {p} = s4.kernel.getS4BucketForObject(path[1]);
-
-                return p ? `${p}/${path[1]}` : false;
+            if (path[0] !== 's4' || bucket) {
+                return bucket.p ? `${bucket.p}/${path[1]}` : false;
             }
 
             if (path.length > 2 && !(allowedPages.has(path[2]) || M.d[path[2]])) {

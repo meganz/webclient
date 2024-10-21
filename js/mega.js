@@ -1065,7 +1065,6 @@ scparser.$add('t', function(a, scnodes) {
     let i;
     const ufsc = new UFSSizeCache();
     let rootNode = scnodes.length && scnodes[0] || false;
-    let share = M.d[rootNode.h];
 
     // is this tree a new inshare with root scinshare.h? set share-relevant
     // attributes in its root node.
@@ -1077,10 +1076,7 @@ scparser.$add('t', function(a, scnodes) {
                 scnodes[i].sk = scinshare.sk;
                 rootNode = scnodes[i];
 
-                // XXX: With Infinity, we may did retrieve the node API-side prior to parsing "t" ...
-                share = M.d[rootNode.h];
-
-                if (share) {
+                if (M.d[rootNode.h]) {
                     // save r/su/sk, we'll break next...
                     M.addNode(rootNode);
                 }
@@ -1092,7 +1088,7 @@ scparser.$add('t', function(a, scnodes) {
         }
         scinshare.h = false;
     }
-    if (share) {
+    if (M.d[rootNode.h]) {
         // skip repetitive notification of (share) nodes
         if (d) {
             console.debug('skipping repetitive notification of (share) nodes');
@@ -2256,13 +2252,13 @@ function emplacenode(node, noc) {
         }
     }
     else if (node.t > 1 && node.t < 5) {
+        if (!M.c[node.h]) {
+            M.c[node.h] = Object.create(null);
+        }
         M[['RootID', 'InboxID', 'RubbishID'][node.t - 2]] = node.h;
     }
     else {
-        if (d) {
-            console.error("Received parent-less node of type " + node.t + ": " + node.h);
-        }
-
+        console.error(`Received parent-less node of type ${node.t}: ${node.h}`);
         srvlog2('parent-less', node.t, node.h);
     }
 
@@ -2397,24 +2393,18 @@ function worker_procmsg(ev) {
                     M.c.shares[ev.data.h].sk = a32_to_base64(u_sharekeys[ev.data.h][0]);
                 }
             }
-
-            if (ufsc.cache && ev.data.p) {
-                ufsc.feednode(ev.data);
-            }
-
             const ok = fmdb && !fmdb.crashed;
             const emplace = mega.nobp || !ok || fminitialized || fmdb && fmdb.memoize || M.isInRoot(ev.data, true);
 
-            if (ok) {
-                fmdb.add('f', {
-                    h : ev.data.h,
-                    p : ev.data.p,
-                    s : ev.data.s >= 0 ? ev.data.s : -ev.data.t,
-                    t : ev.data.t ? 1262304e3 - ev.data.ts : ev.data.ts,
-                    c : ev.data.hash || '',
-                    fa: ev.data.fa || '',
-                    d : ev.data
-                });
+            // If `ufsc.cache` is not set, `ufsc.save()` was already called,
+            // only in such a case we need to explicitly add new nodes to DB.
+            // Under Infinity, this will ensure (M)tree[] nodes do consistently
+            // remain in memory, which is a strong requirement for S4 (lhp)...
+            if (ufsc.cache) {
+                ufsc.feednode(ev.data);
+            }
+            else {
+                ufsc.addToDB(ev.data);
             }
 
             if (emplace) {

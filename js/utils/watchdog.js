@@ -25,6 +25,20 @@ lazy(self, 'watchdog', () => {
 
             if (queryQueue[token]) {
                 queryQueue[token].push(value);
+
+                const {tax} = queryQueue[token];
+                if (tax) {
+                    if (self.d) {
+                        const m = '[%s] %s reply from %d/%d tabs';
+                        channel.logger.info(m, token.slice(-12), query, tax.ping + 1, tax.tabs, [value]);
+                    }
+                    if (++tax.ping >= tax.tabs) {
+                        onIdle(() => {
+                            tax.resolve(queryQueue[token]);
+                            delete queryQueue[token];
+                        });
+                    }
+                }
             }
 
             if (replyCache[query]) {
@@ -127,6 +141,28 @@ lazy(self, 'watchdog', () => {
         },
     });
 
+    // watchdog.query() response handlers.
+    const mWatchDogQueryDux = freeze({
+        'dlsize'() {
+            return dlmanager.getCurrentDownloadsSize();
+        },
+        'dling'() {
+            return dlmanager.getCurrentDownloads();
+        },
+        'qbqdata'() {
+            return dlmanager.getQBQData();
+        },
+        'transfers'() {
+            return M.hasPendingTransfers();
+        },
+        'rad-flush'() {
+            return 'rad' in mega && mega.rad.flush().always(nop);
+        },
+        'ST(catchup)'(data) {
+            return fminitialized && !isPublicLink() && api.catchup(data.st, true);
+        }
+    });
+
     // ------------------------------------------------------------------------------------------
 
     return freeze({
@@ -188,7 +224,7 @@ lazy(self, 'watchdog', () => {
                     delete replyCache[what];
                     return resolve(cache);
                 }
-                const tabs = mBroadcaster.crossTab.peers;
+                const tabs = mBroadcaster.crossTab.peers | 0;
                 if (!tabs) {
                     // Nothing to do here.
                     return reject(EEXIST);
@@ -205,6 +241,15 @@ lazy(self, 'watchdog', () => {
                 queueMicrotask(() => {
                     this.notify(`Q!${what}`, tmpData);
                 });
+
+                if (timeout === 'await') {
+                    // no-timeout special handling
+                    if (self.d) {
+                        channel.logger.warn('[%s] Waiting "%s" reply from %d tabs', token.slice(-12), what, tabs);
+                    }
+                    Object.defineProperty(queryQueue[token], 'tax', {value: {resolve, tabs, ping: 0}});
+                    return;
+                }
                 timeout = parseInt(timeout || 384) / 1e3;
 
                 if (expectsSingleAnswer) {
@@ -299,33 +344,11 @@ lazy(self, 'watchdog', () => {
                 tryCatch(mWatchDogHandlers[message])(payload, origin);
             }
             else if (!mBroadcaster.sendMessage(`watchdog:${message}`, data) && message.startsWith('Q!')) {
-                let value = false;
                 const query = message.slice(2);
-
-                switch (query) {
-                    case 'dlsize':
-                        value = dlmanager.getCurrentDownloadsSize();
-                        break;
-
-                    case 'dling':
-                        value = dlmanager.getCurrentDownloads();
-                        break;
-
-                    case 'qbqdata':
-                        value = dlmanager.getQBQData();
-                        break;
-
-                    case 'transfers':
-                        value = M.hasPendingTransfers();
-                        break;
-
-                    case 'rad-flush':
-                        value = 'rad' in mega && mega.rad.flush().always(nop);
-                        break;
-                }
+                const value = mWatchDogQueryDux[query] && mWatchDogQueryDux[query](payload, data);
 
                 Promise.resolve(value)
-                    .then((value) => {
+                    .then((value = false) => {
                         this.notify('Q!Rep!y', {query, value, token: payload.reply});
                     })
                     .catch(dump);

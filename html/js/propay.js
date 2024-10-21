@@ -805,6 +805,11 @@ pro.propay = {
         // }
         let {result: gatewayOptions} = await api.req({ a: 'ufpqfull', t: 0, d: enableAllPaymentGateways });
 
+        // The propage has been abandoned, no need to proceed
+        if (typeof page !== 'string' || !page.startsWith('propay')) {
+            return false;
+        }
+
         const $placeholderText = $('.loading-placeholder-text', pro.propay.$page);
         const $pricingBox = $('.pricing-page.plan', pro.propay.$page);
 

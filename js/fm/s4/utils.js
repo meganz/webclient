@@ -134,6 +134,197 @@ lazy(s4, 'utils', () => {
         },
 
         /**
+         * Getting confirmation when copying/moving from/to s4
+         * @param {Array} handles Array of node handles
+         * @param {String} t Target folder node handle
+         * @param {Boolean} toMove True for moving/false for copying
+         * @returns {Promise<boolean>} boolean
+         * @memberOf s4
+         */
+        async confirmAction(handles, t, toMove) {
+            const tNode = M.getNodeByHandle(t);
+
+            if (!tNode || tNode.h === M.RubbishID) {
+                return true;
+            }
+
+            const tType = s4.kernel.getS4NodeType(tNode);
+            const tBucket = tType && this.getBucketNode(tNode, tType).h;
+            const { n, s4Nodes, type, bucket, filecnt } = this.getS4Data(handles);
+
+            // Confirm any actions for non-s4 items
+            if (!n.length || !type && !tType) {
+                return true;
+            }
+
+            // Confirm any action inside one bucket
+            if (tType && bucket && bucket === tBucket) {
+                return true;
+            }
+
+            // Deny copying/moving files to container
+            if (tType === 'container' && filecnt) {
+                msgDialog('warningb', '', l.s4_title_move_file_to_container);
+                return false;
+            }
+
+            // Get confirmation message data
+            const { title, message, cfgName } = this.getConfirmationMessage({
+                action: toMove ? 'move' : 'copy', n, s4Nodes, type, tNode, tType
+            });
+
+            // Show confiormation dialog
+            if (title && message && !mega.config.get(cfgName)) {
+                return asyncMsgDialog(
+                    `confirmation:!^${toMove ? l[62] : l[63]}!${l[82]}`,
+                    null,
+                    title,
+                    message,
+                    null,
+                    cfgName
+                );
+            }
+
+            // Confirm action other actions
+            return true;
+        },
+
+        /**
+         * Getting nodes, S4 type,S4 nodes, bucket handle, file count
+         * @param {Array|String} handles Array of node handles
+         * @returns {Object} Nodes, s4 nodes, s4 type, bucket handle, filecnt
+         * @memberOf s4
+         */
+        getS4Data(handles = []) {
+            const n = [];
+            const s4Nodes = [];
+            let bucket = false;
+            let filecnt = 0;
+            let type = false;
+
+            if (typeof handles === 'string') {
+                handles = [handles];
+            }
+
+            for (let i = handles.length; i--;) {
+                const node = M.getNodeByHandle(handles[i]);
+                let bh = false;
+                let t = false;
+
+                if (!node) {
+                    continue;
+                }
+
+                if (node.t === 0) {
+                    filecnt++;
+                }
+                n.push(node);
+
+                if (!(t = s4.kernel.getS4NodeType(node))) {
+                    continue;
+                }
+
+                s4Nodes.push(node);
+                type = type && type !== t ? 'items' : t;
+
+                if ((bh = this.getBucketNode(node, t).h)) {
+                    bucket = bucket && bucket !== bh ? 'multiple' : bh;
+                }
+            }
+
+            return { n, s4Nodes, type, bucket, filecnt };
+        },
+
+        /**
+         * Getting message for confirmation dialog when copying/moving from/to s4
+         * @param {Object} data Nodes, S4 nodes, types, action name
+         * @returns {Object} title, message, cfgName
+         * @memberOf s4
+         */
+        getConfirmationMessage(data = {}) {
+            const { action, n, type, s4Nodes, tNode, tType } = data;
+
+            let helpUrl = `${l.mega_help_host}/megas4/s4-buckets/move-bucket`;
+            let title = '';
+            let message = '';
+            let cfgName = '';
+            let suffix = '';
+
+            // Get number of S4 nodes only
+            if (s4Nodes.length > 1) {
+                suffix =  '_plural';
+            }
+
+            // Files and folders to a container
+            if (tType === 'container') {
+                cfgName = type ? 'skips4tos4' : 'skipcdtos4';
+                suffix = n.length > 1 ? '_plural' : ''; // Get number of all nodes
+                helpUrl = 'https://mega.io/privacy';
+
+                // Folders to a container
+                title = l[`s4_title_${ action }_folder_to_container${ suffix }`];
+                message = l[`s4_warn_copy_move_folder_to_container${ suffix }`];
+            }
+            // To S4 bucket or bucket-child
+            else if (tType) {
+                cfgName = 'skips4tos4';
+
+                // Buckets to another bucket
+                if (type === 'bucket') {
+                    title = l[`s4_title_${ action }_bucket_to_bucket${ suffix }`];
+                    message = l[`s4_warn_copy_move_bucket_to_bucket${ suffix }`];
+                }
+                // Objects to another bucket
+                else if (type === 'object') {
+                    title = l[`s4_title_${ action }_object_to_bucket${ suffix }`];
+                    message = l[`s4_warn_${ action }_object_to_bucket${ suffix }`];
+                }
+                // Multiple items to another bucket
+                else if (type) {
+                    title = l[`s4_title_${ action }_s4_items_to_bucket${ suffix }`];
+                    message = l[`s4_warn_${ action }_s4_items_to_bucket${ suffix }`];
+                }
+                // Files/folders from Cloud drive to a bucket
+                else {
+                    cfgName = 'skipcdtos4';
+                    suffix = n.length > 1 ? '_plural' : ''; // Get number of all nodes
+                    helpUrl = 'https://mega.io/privacy';
+
+                    title = l[`s4_title_${ action }_items_to_bucket`];
+                    message = l[`s4_warn_${ action }_items_to_bucket${ suffix }`];
+                }
+            }
+            // From Object storage to Cloud drive
+            else {
+                cfgName = 'skips4tocd';
+
+                // Buckets to Cloud drive
+                if (type === 'bucket') {
+                    title = l[`s4_title_${ action }_bucket_to_cd${ suffix }`];
+                    message = l[`s4_warn_copy_move_bucket_to_cd${ suffix }`];
+                }
+                // Objects or sub-folders to Cloud drive
+                else if (type === 'object' || type === 'bucket-child' && s4Nodes.length === 1) {
+                    title = l[`s4_title_${ action }_object_to_cd${ suffix }`];
+                    message = l.s4_warn_copy_move_items_to_cd;
+                }
+                // Multiple items to Cloud drive
+                else if (type) {
+                    title = l[`s4_title_${ action }_items_to_cd${ suffix }`];
+                    message = l.s4_warn_copy_move_items_to_cd;
+                }
+            }
+
+            title = title.replace('%1', n[0].name).replace('%2', tNode.name);
+            message = escapeHTML(message)
+                .replace('[A]', `<a class="clickurl" target="_blank" href="${ helpUrl }">`)
+                .replace('[/A]', '</a>')
+                .replace('%1', n[0].name).replace('%2', tNode.name);
+
+            return { title, message, cfgName };
+        },
+
+        /**
          * Getting containers size and objects/folders number
          * @returns {Object} object
          * @memberOf s4

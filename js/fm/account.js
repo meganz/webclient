@@ -3940,6 +3940,22 @@ accountUI.s4 = {
                 mega.config.setn('s4thumbs', val ? 1 : undefined);
             }
         );
+
+        const $toggles = $('.fm-account-s4 .s4-warn-dialogs .mega-switch', this.$container);
+
+        // Enable copy/move warning dialog switchers
+        for (let i = $toggles.length; i--;) {
+            const cfgName = $toggles[i].getAttribute('name');
+
+            accountUI.inputs.switch.init(
+                `[name="${cfgName}"]`,
+                this.$container,
+                !mega.config.get(cfgName),
+                (val) => {
+                    mega.config.setn(cfgName, val ? undefined : 1);
+                }
+            );
+        }
     }
 };
 

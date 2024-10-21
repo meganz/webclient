@@ -147,6 +147,7 @@
     }
 
     .mega-dialog a,
+    .mega-dialog a:link,
     .mega-dialog a:visited,
     .mega-dialog a:active {
         color: var(--text-color-info);
@@ -474,6 +475,7 @@
 
             .mega-dialog.dialog-template-message > header p {
                 margin-top: 12px;
+                word-break: break-word;
             }
 
             .mega-dialog.dialog-template-message > header h3.sub-header {

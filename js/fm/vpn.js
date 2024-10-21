@@ -203,7 +203,8 @@ class VpnPage {
             'CA-EAST': l.vpn_location_ca_east,
             'CA-WEST': l.vpn_location_ca_west,
             'US-EAST': l.vpn_location_us_east,
-            'US-WEST': l.vpn_location_us_west
+            'US-WEST': l.vpn_location_us_west,
+            'GB-LONDON': l.vpn_location_gb_london,
         };
 
         const options = { };
@@ -239,12 +240,10 @@ class VpnPage {
         const sortedOptions = Object.fromEntries(Object.entries(options)
             .sort((code, location) => code[1].localeCompare(location[1])));
 
-        const selectedLocation = sortedOptions[Object.keys(sortedOptions)[0]];
-
         createDropdown(this.$locationDropdown, {
-            placeholder: selectedLocation,
+            placeholder: options[0],
             items: sortedOptions,
-            selected: selectedLocation,
+            selected: locations[0],
         });
         bindDropdownEvents(this.$locationDropdown);
 

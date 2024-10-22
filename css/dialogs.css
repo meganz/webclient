@@ -11149,34 +11149,45 @@ body.de .mega-dialog.contact-picker-widget {
     color: var(--text-color-high);
     margin-bottom: 24px;
 }
-.mega-dialog.s4 .keys-table {
+.mega-dialog.s4 .info-box {
+    color: var(--text-color-high);
     background: var(--surface-grey-1);
     border: solid 2px var(--stroke-grey-2);
     border-radius: 12px;
     margin-bottom: 24px;
-    padding: 12px 16px 2px;
+    padding: 16px;
+}
+.mega-dialog.s4 .keys-table .row + .row {
+    border-top: 1px solid var(--stroke-grey-2);
+    padding-top: 12px;
+    margin-top: 12px;
+}
+.mega-dialog.s4 .keys-table .cell {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
     width: 100%;
 }
-.mega-dialog.s4 .keys-table td {
-    padding-bottom: 12px;
+.mega-dialog.s4 .keys-table .name {
+    font: var(--text-body1-bold);
+    padding-bottom: 8px;
 }
-.mega-dialog.s4 .keys-table td:first-child {
-    color: var(--text-color-high);
-    width: 90px;
+.mega-dialog.s4 .keys-table .val {
+    overflow: hidden;
+    flex: 1;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
-.mega-dialog.s4 .keys-table td:nth-child(2) {
-    position: relative;
-    top: 2px;
-}
-.mega-dialog.s4 .keys-table .secret-key-value {
+.mega-dialog.s4 .keys-table input {
     background: transparent;
     border: 0;
-    color: var(--text-color-medium);
+    color: var(--text-color-high);
     cursor: auto;
     font: var(--text-body1);
     padding: 0;
+    width: 100%;
 }
-.mega-dialog.s4 .keys-table .secret-key-value[type="text"] {
+.mega-dialog.s4 .keys-table input[type="text"] {
     text-overflow: ellipsis;
 }
 .mega-dialog.s4 .keys-table .mega-button.small {
@@ -11433,6 +11444,304 @@ body.de .mega-dialog.contact-picker-widget {
 .mega-dialog.s4 .inactive .user-input-wrap {
     opacity: 0.6;
 }
+
+/* S4 Dialogs. Setup/Onboarding dialog */
+
+.mega-dialog.s4-setup-dialog {
+    overflow: hidden;
+    min-height: 600px;
+    width: 800px;
+}
+
+/* Side pane */
+
+.mega-dialog.s4-setup-dialog .side-pane {
+    background: var(--surface-grey-1);
+    box-sizing: border-box;
+    flex: 0 0 auto;
+    padding: 48px 36px;
+    width: 264px;
+}
+
+.mega-dialog.s4-setup-dialog .side-pane img,
+.mega-dialog.s4-setup-dialog .side-pane.intro .nav {
+    display: none;
+}
+
+.mega-dialog.s4-setup-dialog .side-pane.intro img {
+    display: block;
+    height: 225px;
+    margin: auto;
+}
+
+.mega-dialog.s4-setup-dialog .side-pane.intro {
+    background: none;
+    margin: 48px 0;
+    padding: 0;
+    border-right: 1px solid var(--surface-grey-2);
+}
+
+.rtl .mega-dialog.s4-setup-dialog .side-pane.intro {
+    border: 0;
+    border-left: 1px solid var(--surface-grey-2);
+}
+
+.mega-dialog.s4-setup-dialog .nav .nav-step {
+    align-items: center;
+    display: flex;
+    font: var(--text-body2-bold);
+    opacity: 0.1;
+    padding: 4px;
+}
+
+.mega-dialog.s4-setup-dialog .nav .number {
+    align-items: center;
+    border-radius: 100%;
+    border: 2px solid var(--text-color-higher);
+    color: var(--text-color-high);
+    display: flex;
+    justify-content: center;
+    height: 22px;
+    margin: 1px;
+    width: 22px;
+}
+
+.mega-dialog.s4-setup-dialog .nav .name {
+    color: var(--text-color-high);
+    -webkit-margin-start: 8px;
+    margin-inline-start: 8px;
+}
+
+.mega-dialog.s4-setup-dialog .nav i {
+    --icon-size: 14px;
+    --mask-color: var(--surface-grey-1);
+    display: none;
+}
+
+.mega-dialog.s4-setup-dialog .nav .active .number,
+.mega-dialog.s4-setup-dialog .nav .complete .number {
+    background-color: var(--text-color-higher);
+    border-color: transparent;
+    color: var(--text-color-high-inverted);
+}
+
+.mega-dialog.s4-setup-dialog .nav .complete .number {
+    background-color: var(--secondary-green);
+}
+
+.mega-dialog.s4-setup-dialog .nav .complete,
+.mega-dialog.s4-setup-dialog .nav .complete + .separator,
+.mega-dialog.s4-setup-dialog .nav .active {
+    opacity: 1;
+}
+
+.mega-dialog.s4-setup-dialog .nav .complete i {
+    display: block;
+}
+
+.mega-dialog.s4-setup-dialog .nav .complete span {
+    display: none;
+}
+
+.mega-dialog.s4-setup-dialog .nav .separator {
+    background-color: var(--text-color-higher);
+    border-radius: 1px;
+    height: 28px;
+    margin: 0 15px;
+    opacity: 0.1;
+    width: 2px;
+}
+
+/* Content pane */
+
+.mega-dialog.s4-setup-dialog .content-pane {
+    color: var(--text-color-high);
+    flex: 1 1 auto;
+    font: var(--text-body1);
+    overflow: hidden;
+}
+
+.mega-dialog.s4-setup-dialog header {
+    padding-bottom: 0;
+}
+
+.mega-dialog.s4-setup-dialog p {
+    padding-top: 20px;
+}
+
+.mega-dialog.s4-setup-dialog p.higher {
+    color: var(--text-color-higher);
+}
+
+.mega-dialog.s4-setup-dialog *.secondary {
+    font: var(--text-body2);
+}
+
+.mega-dialog.s4-setup-dialog ul {
+    margin: 12px 0 0;
+    padding: 0;
+}
+
+.mega-dialog.s4-setup-dialog li {
+    color: var(--text-color-high);
+    padding: 8px 3px;
+    -webkit-margin-start: 28px;
+    margin-inline-start: 28px;
+}
+
+.mega-dialog.s4-setup-dialog li span {
+    color: var(--text-color-medium);
+}
+
+.mega-dialog.s4-setup-dialog ul.secondary {
+    margin: 5px 0;
+}
+
+.mega-dialog.s4-setup-dialog ul.secondary li {
+    color: var(--text-color-high);
+    padding: 3px 0;
+    -webkit-margin-start: 18px;
+    margin-inline-start: 18px;
+}
+
+.mega-dialog.s4-setup-dialog li span.code {
+    background: var(--surface-grey-1);
+    border: 1px solid var(--stroke-grey-2);
+    border-radius: 4px;
+    color: var(--text-color-high);
+    display: inline-block;
+    padding: 0 4px;
+}
+
+.mega-dialog.s4-setup-dialog li b {
+    color: var(--text-color-higher);
+    font: var(--text-body1-bold);
+}
+
+.mega-dialog.s4-setup-dialog .steps {
+    flex: 1 1 auto;
+}
+
+/* Step 2 */
+
+.mega-dialog.s4-setup-dialog .secondary-table {
+    background: var(--surface-grey-1);
+    border: 1px solid var(--stroke-grey-2);
+    margin-top: 16px;
+    width: 100%;
+}
+
+.mega-dialog.s4-setup-dialog .secondary-table i {
+    --icon-size: 20px;
+    --mask-color: var(--icon-rest);
+}
+
+.mega-dialog.s4-setup-dialog .secondary-table a,
+.mega-dialog.s4-setup-dialog .secondary-table a:link,
+.mega-dialog.s4-setup-dialog .secondary-table a:visited {
+    cursor: default;
+    text-decoration: none;
+}
+
+.mega-dialog.s4-setup-dialog .secondary-table button {
+    margin: 0;
+    padding: 0;
+}
+
+.mega-dialog.s4-setup-dialog .secondary-table th,
+.mega-dialog.s4-setup-dialog .secondary-table td {
+    color: var(--text-color-medium);
+    font: var(--text-body2);
+    padding: 12px 16px;
+    text-align: start;
+}
+
+.mega-dialog.s4-setup-dialog .secondary-table td {
+    border-top: 1px solid var(--stroke-grey-2);
+    color: var(--text-color-high);
+}
+
+.mega-dialog.s4-setup-dialog .secondary-table td:last-child {
+    text-align: end;
+}
+
+/* Step 3 */
+
+.mega-dialog.s4-setup-dialog .step-icon {
+    display: block;
+    height: 64px;
+    margin: 20px 0 12px;
+}
+
+/* Step 4 */
+
+.mega-dialog.s4-setup-dialog .keys-table {
+    margin: 20px 0;
+}
+
+.mega-dialog.s4-setup-dialog .secondary-btns {
+    display: flex;
+    justify-content: end;
+}
+
+/* Step 6 */
+
+.mega-dialog.s4-setup-dialog h3 {
+    margin: 20px 0;
+}
+
+.mega-dialog.s4-setup-dialog .help-wrapper {
+    display: flex;
+    justify-content: space-between;
+}
+
+.mega-dialog.s4-setup-dialog .help-wrapper .info-box {
+    align-items: start;
+    display: flex;
+    flex: 0 0 calc(50% - 4px);
+    flex-direction: column;
+}
+
+.mega-dialog.s4-setup-dialog .help-wrapper h3 {
+    margin: 8px 0;
+}
+
+.mega-dialog.s4-setup-dialog .help-wrapper p {
+    color: var(--text-color-medium);
+    padding: 0 0 16px;
+}
+
+.mega-dialog.s4-setup-dialog a.read-more,
+.mega-dialog.s4-setup-dialog a.read-more:link,
+.mega-dialog.s4-setup-dialog a.read-more:visited {
+    align-items: center;
+    --icon-size: 20px;
+    --mask-color: var(--icon-active);
+    color: var(--text-color-high);
+    display: inline-flex;
+    font: var(--text-body1-bold);
+    margin: auto 0 0;
+    padding: 10px 0;
+    text-decoration: none;
+}
+
+.mega-dialog.s4-setup-dialog a.read-more span {
+    display: block;
+    -webkit-margin-end: 8px;
+    margin-inline-end: 8px;
+    text-decoration: underline;
+}
+
+.mega-dialog.s4-setup-dialog a.read-more:hover span {
+    text-decoration: none;
+}
+
+.mega-dialog.s4-setup-dialog .help-icon {
+    display: block;
+    height: 32px;
+}
+
+/* S4 Dialogs. End of Onboarding dialog */
 
 /* S4 Dialogs End */
 

@@ -216,6 +216,12 @@ FileManager.prototype.initFileManager = async function() {
                         this.buildtree({h: 's4'});
                         $('.js-s4-tree-panel').removeClass('hidden');
                     })
+                    .then(() => {
+                        if (!mega.config.get('s4onboarded')) {
+                            mega.config.set('s4onboarded', 1);
+                            return s4.ui.showDialog(s4.containers.dialogs.setup);
+                        }
+                    })
                     .catch((ex) => {
                         reportError(ex);
                         if (hold) {

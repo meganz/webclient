@@ -109,7 +109,7 @@
     };
 
     shrink.bitdef = freeze({
-        s4a: ['s4thumbs', 'skipcdtos4', 'skips4tocd', 'skips4tos4'],
+        s4a: ['s4thumbs', 'skipcdtos4', 'skips4tocd', 'skips4tos4', 's4onboarded'],
         v04: ['rvonbrddl', 'rvonbrdfd', 'rvonbrdas'],
         xb1: [
             // do NOT change the order, add new entries at the tail UP TO 31, and 8 per row.

@@ -1827,12 +1827,32 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/P]', '</h3>');
 
     l.s4_s3_prefix_example = escapeHTML(l.s4_s3_prefix_example)
-        .replace(/\[S]/g, '<span>')
+        .replace(/\[S]/g, '<span class="code">')
         .replace(/\[\/S]/g, '</span>');
 
     l.s4_iam_prefix_example = escapeHTML(l.s4_iam_prefix_example)
-        .replace(/\[S]/g, '<span>')
+        .replace(/\[S]/g, '<span class="code">')
         .replace(/\[\/S]/g, '</span>');
+
+    l.s4_tip_setup_using_s3 = escapeHTML(l.s4_tip_setup_using_s3)
+        .replace(
+            '[A1]',
+            '<a href="https://github.com/meganz/s4-specs?tab=readme-ov-file#12-endpoints" ' +
+            'class="clickurl" target="_blank">'
+        )
+        .replace('[/A1]', '</a>')
+        .replace(
+            '[A2]',
+            '<a href="https://github.com/meganz/s4-specs?tab=readme-ov-file#2-s3-api" ' +
+            'class="clickurl" target="_blank">'
+        )
+        .replace('[/A2]', '</a>');
+
+    l.s4_tip_encryption_info = escapeHTML(l.s4_tip_encryption_info)
+        .replace('[A]', '<a href="https://mega.io/privacy" class="clickurl" target="_blank">')
+        .replace('[/A]', '</a>')
+        .replace('[B]', '<b>')
+        .replace('[/B]', '</b>');
 
     l.content_removed = escapeHTML(l.content_removed)
         .replace('[A]', '<a class="clickurl" href="https://mega.io/takedown" target="_blank">')

@@ -7812,33 +7812,31 @@
                 </div>
                 <div class="step-5 hidden">
                     <div class="create-success-text user-success-text"></div>
-                    <table class="keys-table">
-                        <tr>
-                            <td>
-                                <span>[$s4_key_access_colon]</span>
-                            </td>
-                            <td>
-                                <span class="access-key-value"></span>
+                    <div class="info-box keys-table">
+                        <div class="row">
+                            <div class="name">[$s4_key_access_colon]</div>
+                            <div class="cell">
+                                <div class="val access-key-value">123123</div>
                                 <button class="mega-button small action copy" data-key="ak">
                                     <i class="sprite-fm-mono icon-copy"></i>
                                 </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <span>[$s4_key_secret_colon]</span>
-                            </td>
-                            <td>
-                                <input class="secret-key-value" type="password" readonly>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="name">[$s4_key_secret_colon]</div>
+                            <div class="cell">
+                                <div class="val">
+                                    <input class="secret-key-value" type="password" readonly />
+                                </div>
                                 <button class="mega-button small action toggle-vis">
-                                    <i class="sprite-fm-mono icon-eye-reveal toggle-vis"></i>
+                                    <i class="sprite-fm-mono icon-eye-reveal"></i>
                                 </button>
                                 <button class="mega-button small action copy" data-key="sk">
-                                    <i class="sprite-fm-mono icon-copy" ></i>
+                                    <i class="sprite-fm-mono icon-copy"></i>
                                 </button>
-                            </td>
-                        </tr>
-                    </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -8061,33 +8059,31 @@
                 </div>
                 <div class="step-2 hidden">
                     <div class="create-success-text key-success-text"></div>
-                    <table class="keys-table">
-                        <tr>
-                            <td>
-                                <span>[$s4_key_access_colon]</span>
-                            </td>
-                            <td>
-                                <span class="access-key-value"></span>
+                    <div class="info-box keys-table">
+                        <div class="row">
+                            <div class="name">[$s4_key_access_colon]</div>
+                            <div class="cell">
+                                <div class="val access-key-value">123123</div>
                                 <button class="mega-button small action copy" data-key="ak">
                                     <i class="sprite-fm-mono icon-copy"></i>
                                 </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <span>[$s4_key_secret_colon]</span>
-                            </td>
-                            <td>
-                                <input class="secret-key-value" type="password" readonly>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="name">[$s4_key_secret_colon]</div>
+                            <div class="cell">
+                                <div class="val">
+                                    <input class="secret-key-value" type="password" readonly />
+                                </div>
                                 <button class="mega-button small action toggle-vis">
                                     <i class="sprite-fm-mono icon-eye-reveal"></i>
                                 </button>
                                 <button class="mega-button small action copy" data-key="sk">
                                     <i class="sprite-fm-mono icon-copy"></i>
                                 </button>
-                            </td>
-                        </tr>
-                    </table>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -8244,6 +8240,215 @@
             <div class="footer-container"></div>
         </footer>
     </div>
+
+    <!-- Dialog: s4-setup-dialog -->
+    <div class="mega-dialog dialog-template-panes s4 s4-setup-dialog hidden"
+         role="dialog"
+         aria-labelledby="s4-setup-title"
+         aria-modal="true">
+        <button class="close js-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+        <section class="side-pane">
+            <img alt="" src="{staticpath}images/mega/icons-3d/illustration-s4-3d.png" />
+            <div class="nav">
+                <div class="nav-step nav-step-2">
+                    <div class="number">
+                        <span>1</span>
+                        <i class="sprite-fm-mono icon-check-small-regular-outline"></i>
+                    </div>
+                    <div class="name">
+                        [$s4_setup_endpoints]
+                    </div>
+                </div>
+                <div class="separator"></div>
+                <div class="nav-step nav-step-3 nav-step-4">
+                    <div class="number">
+                        <span>2</span>
+                        <i class="sprite-fm-mono icon-check-small-regular-outline"></i>
+                    </div>
+                    <div class="name">
+                        [$s4_create_root_key]
+                    </div>
+                </div>
+                <div class="separator"></div>
+                <div class="nav-step nav-step-5 nav-step-6">
+                    <div class="number">
+                        <span>3</span>
+                        <i class="sprite-fm-mono icon-check-small-regular-outline"></i>
+                    </div>
+                    <div class="name">
+                        [$s4_create_bkt]
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content-pane">
+            <div class="steps step-1 hidden">
+                <header>
+                    <h2 class="s4-setup-title">[$s4_get_started]</h2>
+                </header>
+                <section class="content">
+                    <div class="content-block">
+                        <p>[$s4_get_started_info]</p>
+                        <p class="higher">[$s4_skip_setup_header]</p>
+                        <ul>
+                            <li><span>[$s4_tip_setup_using_s3]</span></li>
+                            <li><span>[$s4_tip_create_key]</span></li>
+                            <li><span>[$s4_tip_encryption_info]</span></li>
+                            <li><span>[$s4_tip_amazon_support]</span></li>
+                            <li><span>[$s4_tip_check_email]</span></li>
+                        </ul>
+                    </div>
+                </section>
+            </div>
+
+            <div class="steps step-2 hidden">
+                <header>
+                    <h2 class="s4-setup-title">[$s4_copy_endpoints]</h2>
+                </header>
+                <section class="content">
+                    <div class="content-block">
+                        <p class="higher">[$s4_available_endpoints]</p>
+                        <table class="secondary-table js-endpoints-table"></table>
+                        <p class="secondary">[$s4_endpoints_prefix_info]</p>
+                        <ul class="secondary js-endpoints-desc"></ul>
+                        <a href="https://github.com/meganz/s4-specs?tab=readme-ov-file#12-endpoints" class="clickurl secondary" target="_blank">[$s4_endpoints_more_info]</a>
+                    </div>
+                </section>
+            </div>
+
+            <div class="steps step-3 hidden">
+                <header>
+                    <h2 class="s4-setup-title">[$s4_create_root_access_key]</h2>
+                </header>
+                <section class="content">
+                    <div class="content-block">
+                        <p>[$s4_access_keys_info] </p>
+                        <img alt="" class="step-icon" src="{staticpath}images/mega/icons-3d/icon-key-3d.png" />
+                        <div class="offset-text">[$s4_key_name_enter]</div>
+                        <div class="mega-input with-icon box-style">
+                            <i class="sprite-fm-mono icon-key"></i>
+                            <input class="megaInputs underlinedText" name="key-name-input" type="text" placeholder="[$s4_key_name]" autocomplete="disabled"/>
+                            <div class="message-container mega-banner"></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="steps step-4 hidden">
+                <header>
+                    <h2 class="s4-setup-title">[$s4_key_created_success]</h2>
+                </header>
+                <section class="content">
+                    <div class="content-block">
+                        <p>[$s4_manage_keys_info]</p>
+                        <div class="info-box keys-table">
+                            <div class="row">
+                                <div class="name">[$s4_key_access_colon]</div>
+                                <div class="cell">
+                                    <div class="val access-key-value"></div>
+                                    <button class="mega-button small action copy" data-key="ak">
+                                        <i class="sprite-fm-mono icon-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="name">[$s4_key_secret_colon]</div>
+                                <div class="cell">
+                                    <div class="val">
+                                        <input class="secret-key-value" type="password" readonly />
+                                    </div>
+                                    <button class="mega-button small action toggle-vis">
+                                        <i class="sprite-fm-mono icon-eye-reveal"></i>
+                                    </button>
+                                    <button class="mega-button small action copy" data-key="sk">
+                                        <i class="sprite-fm-mono icon-copy"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="secondary-btns">
+                            <button class="mega-button download-key">
+                                <span>[$s4_download_key_btn]</span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="steps step-5 hidden">
+                <header>
+                    <h2 class="s4-setup-title">[$s4_create_first_bucket]</h2>
+                </header>
+                <section class="content">
+                    <div class="content-block">
+                        <p>[$s4_managing_buckets_info]</p>
+                        <a href="https://help.mega.io/megas4/s4-buckets" class="clickurl" target="_blank">[$s4_buckets_more_info]</a>
+                        <img alt="" class="step-icon" src="{staticpath}images/mega/icons-3d/icon-bucket-3d.png" />
+                        <div class="offset-text">[$s4_enter_bkt_name]</div>
+                        <div class="mega-input with-icon box-style">
+                            <i class="sprite-fm-mono icon-bucket-filled"></i>
+                            <input class="megaInputs underlinedText" name="bucket-name" type="text" placeholder="[$s4_bkt_name_txt]" autofocus="">
+                            <div class="message-container mega-banner"></div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="steps step-6 hidden">
+                <header>
+                    <h2 class="s4-setup-title">[$s4_setup_complete]</h2>
+                </header>
+                <section class="content">
+                    <div class="content-block">
+                        <p>[$s4_setup_complete_info]</p>
+                        <h3>[$s4_more_actions_info]</h3>
+                        <div class="help-wrapper">
+                            <div class="info-box">
+                                <img alt="" class="help-icon" src="{staticpath}images/mega/icons-3d/icon-lightbulb-3d.png" />
+                                <h3>[$384]</h3>
+                                <p class="secondary">[$s4_troubleshooting]</p>
+                                <a href="https://help.mega.io/megas4" class="clickurl read-more" target="_blank">
+                                    <span>[$8742]</span>
+                                    <i class="sprite-fm-mono icon-arrow-right-regular-outline"></i>
+                                </a>
+                            </div>
+                            <div class="info-box">
+                                <img alt="" class="help-icon" src="{staticpath}images/mega/icons-3d/icon-list-3d.png" />
+                                <h3>[$github_name]</h3>
+                                <p class="secondary">[$s4_docs_info]</p>
+                                <a href="https://github.com/meganz/s4-specs" class="clickurl read-more" target="_blank">
+                                    <span>[$read_guide_btn]</span>
+                                    <i class="sprite-fm-mono icon-arrow-right-regular-outline"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <footer>
+                <div class="footer-container align-end">
+                    <button class="mega-button manage-bucket-settings hidden">
+                        <span>[$s4_manage_bucket_settings_btn]</span>
+                    </button>
+                    <button class="mega-button skip-step hidden">
+                        <span>[$1379]</span>
+                    </button>
+                    <button class="mega-button skip-setup">
+                        <span>[$s4_skip_setup_btn]</span>
+                    </button>
+                    <button class="mega-button positive setup progress">
+                        <span>[$s4_setu_s4_btn]</span>
+                    </button>
+                </div>
+            </footer>
+        </section>
+    </div>
+    <!-- End of S4 Dialog: s4-setup-dialog -->
+
     <!-- Dialog: Welcome for new subscriberes / newly upgraded subscribers -->
     <div class="mega-dialog dialog-template-tool upgrade-welcome-dialog hidden"
         role="dialog"

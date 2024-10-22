@@ -2932,6 +2932,7 @@ else if (!browserUpdate) {
 
             's4:fm_s4_ui_js': {f:'js/fm/s4/ui.js', n: 'fm_s4_ui_js', j:1},
             's4:fm_s4_utils_js': {f:'js/fm/s4/utils.js', n: 'fm_s4_utils_js', j:1},
+            's4:fm_s4_containers_js': {f:'js/fm/s4/containers.js', n: 'fm_s4_containers_js', j:1},
             's4:fm_s4_objects_js': {f:'js/fm/s4/objects.js', n: 'fm_s4_objects_js', j:1},
             's4:fm_s4_buckets_js': {f:'js/fm/s4/buckets.js', n: 'fm_s4_buckets_js', j:1},
             's4:fm_s4_keys_js': {f:'js/fm/s4/keys.js', n: 'fm_s4_keys_js', j:1},

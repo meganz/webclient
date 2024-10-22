@@ -1508,6 +1508,9 @@ var addressDialog = {
             this.proPrice = formatCurrency(proPrice);
             this.$dialog.find('.payment-plan-price .price').text(this.proPrice);
         }
+        if (this.businessPlan) {
+            $('.duration', $('.payment-note-first.recurring', this.$dialog).removeClass('hidden')).text(l[10628]);
+        }
 
         // Show the black background overlay and the dialog
         this.$backgroundOverlay.removeClass('hidden').addClass('payment-dialog-overlay');

@@ -536,4 +536,42 @@
                 margin-top: -24px;
             }
 
+        /* panes */
+
+            .mega-dialog.dialog-template-panes {
+                flex-direction: row;
+            }
+
+            .mega-dialog.dialog-template-panes header {
+                padding: 48px 48px 16px;
+            }
+
+            .mega-dialog.dialog-template-panes header h2,
+            .mega-dialog.dialog-template-panes header h3 {
+                font-weight: 400;
+                margin: 0;
+                overflow: hidden;
+                padding: 0;
+                text-overflow: ellipsis;
+                width: 100%;
+            }
+
+            .mega-dialog.dialog-template-panes .content-block {
+                padding: 0 48px;
+            }
+
+            .mega-dialog.dialog-template-panes footer .footer-container {
+                padding: 16px 48px 48px;
+            }
+
+            .mega-dialog.dialog-template-panes footer .footer-container.align-end {
+                display: flex;
+                justify-content: flex-end;
+            }
+
+            .mega-dialog.dialog-template-panes footer button ~ button {
+                -webkit-margin-start: 8px;
+                margin-inline-start: 8px;
+            }
+
         /* some complex dialogs are untemplated so have no dialog-* class */

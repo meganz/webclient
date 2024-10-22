@@ -7,15 +7,15 @@
 .fm-empty-s4-container .empty-message {
     font: var(--text-h1);
     color: var(--text-color-high);
+    margin: 0 24px;
     text-align: center;
 }
 .fm-empty-s4-container .create-new-bkt-block {
     border: 2px solid var(--table-border);
     border-radius: 12px;
-    margin-top: 24px;
-    margin-bottom: 60px;
-    height: 116px;
-    width: 648px;
+    margin: 24px;
+    min-height: 116px;
+    max-width: 648px;
 }
 .fm-empty-s4-container .create-new-bkt-wrapper {
     display: flex;

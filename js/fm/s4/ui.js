@@ -1039,7 +1039,7 @@ lazy(s4, 'ui', () => {
         show() {
             super.show();
 
-            $('header h2', this.$dialogContainer).text(this.text.header);
+            $('> header h2', this.$dialogContainer).text(this.text.header);
             if (!this.isCustomFlow) {
                 this.steps(1);
             }

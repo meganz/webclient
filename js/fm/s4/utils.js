@@ -455,6 +455,84 @@ lazy(s4, 'utils', () => {
             }
         },
 
+        renderEndpointsData($wrapper) {
+
+            const parentNode = $wrapper && $wrapper.length && $wrapper[0];
+
+            if (!parentNode) {
+                return false;
+            }
+
+            // Static endpoints data for now
+            const endpoints = [
+                [
+                    'eu-central-1.s4.mega.io',
+                    l.location_amsterdam
+                ],
+                [
+                    'eu-central-2.s4.mega.io',
+                    l.location_bettembourg
+                ],
+                [
+                    'ca-central-1.s4.mega.io',
+                    l.location_montreal
+                ],
+                [
+                    'ca-west-1.s4.mega.io',
+                    l.location_vancouver
+                ]
+            ];
+
+            const tableNode = parentNode.querySelector('.js-endpoints-table');
+            const tipsNode = parentNode.querySelector('.js-endpoints-desc');
+            let rowNode = null;
+
+            if (!tableNode || !tipsNode) {
+                return false;
+            }
+
+            tableNode.textContent = '';
+            tipsNode.textContent = '';
+
+            // Create table header
+            rowNode = mCreateElement('tr', undefined, tableNode);
+            mCreateElement('th', undefined, rowNode).textContent = l.s4_endpoint_header;
+            mCreateElement('th', undefined, rowNode).textContent = l[17818];
+            mCreateElement('th', undefined, rowNode);
+
+            // Create enpoint rows
+            for (const item of endpoints) {
+                let subNode = null;
+
+                // Create table header
+                rowNode = mCreateElement('tr', undefined, tableNode);
+                subNode = mCreateElement('td', undefined, rowNode);
+                mCreateElement('a', { class: 'settings-lnk' }, subNode).textContent = item[0];
+                mCreateElement('td', undefined, rowNode).textContent = item[1];
+                subNode = mCreateElement('td', undefined, rowNode);
+
+                // Create copy to clipboard button
+                subNode = mCreateElement('button', {
+                    'class': 'mega-button small action copy',
+                    'data-url': item[0]
+                }, subNode);
+                mCreateElement('i', { class: 'sprite-fm-mono icon-copy' }, subNode);
+            }
+
+            // Fill URL exapmles in the tips
+            mCreateElement('li', undefined, tipsNode).append(parseHTML(
+                l.s4_s3_prefix_example.replace('%1', `s3.${endpoints[0][0]}`)
+            ));
+            mCreateElement('li', undefined, tipsNode).append(parseHTML(
+                l.s4_iam_prefix_example.replace('%1', `iam.${endpoints[0][0]}`)
+            ));
+
+            // Copy to clipboard buttons
+            $('.mega-button.copy', parentNode).rebind('click.copyUrl', (e) => {
+                copyToClipboard(e.currentTarget.dataset.url, l.s4_endpoint_copied, 'hidden');
+            });
+        },
+
         /**
          * Set node multiple text in order to avoid long items name using all the container space
          * The purpose is to have following representations in the UI

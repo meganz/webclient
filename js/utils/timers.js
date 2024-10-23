@@ -606,10 +606,10 @@ mBroadcaster.once('boot_done', tryCatch(() => {
             logger[rem < 0 ? 'debug' : rem < 5 ? 'warn' : 'info'](`${tasks.length} ICTask(s) handled...`, elapsed, rem);
         }
 
-        if (elapsed > IDLE_THRESHOLD && !(lax++ % 10)) {
-            logger.warn('Caught unreliable requestIdleCallback()...', lax);
+        if (elapsed > IDLE_THRESHOLD) {
+            logger.warn('Caught unreliable requestIdleCallback()...', lax, elapsed);
 
-            if (self.buildOlderThan10Days === false) {
+            if (!document.hidden && ++lax < 2 && self.buildOlderThan10Days === false) {
 
                 eventlog(99641, true);
             }
@@ -623,8 +623,13 @@ mBroadcaster.once('boot_done', tryCatch(() => {
         IDLE_PIPELINE.tasks.push(task);
 
         if (!IDLE_PIPELINE.pid) {
+            if (lax > 1 && !document.hidden) {
+                IDLE_PIPELINE.pid = requestAnimationFrame(idleCallbackHandler);
+            }
+            else {
+                IDLE_PIPELINE.pid = requestIdleCallback(idleCallbackHandler, IDLE_TIMEOUT);
+            }
             IDLE_PIPELINE.ts = performance.now();
-            IDLE_PIPELINE.pid = (lax ? requestAnimationFrame : requestIdleCallback)(idleCallbackHandler, IDLE_TIMEOUT);
         }
     };
 

@@ -3998,9 +3998,6 @@ const ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, c
       $(window).off(`focus.${  self.roomId}`);
     }
   });
-  self.rebind('onClientLeftCall.chatRoom', () => self.callParticipantsUpdated());
-  self.rebind('onClientJoinedCall.chatRoom', () => self.callParticipantsUpdated());
-  self.rebind('onCallParticipantsUpdated.chatRoom', () => self.callParticipantsUpdated());
   self.initialMessageHistLoaded = false;
   let timer = null;
   const _historyIsAvailable = ev => {
@@ -6220,7 +6217,7 @@ const MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 =
   _recursiveSearchForDataChanges(idx, map, referenceMap, depth) {
     const self = this;
     depth = depth || 0;
-    if (!this.isMounted() || this._pendingForceUpdate === true || this._updatesDisabled === true) {
+    if (!this.isMounted() || this._updatesDisabled === true) {
       return;
     }
     if (!this._wasRendered) {
@@ -6263,7 +6260,7 @@ const MegaRenderMixin = (_dec = logcall(), _dec2 = SoonFcWrap(50, true), _dec3 =
     if (megaChat && megaChat.isLoggingOut) {
       return false;
     }
-    if (!this.isMounted() || this._pendingForceUpdate === true || this._updatesDisabled === true) {
+    if (!this.isMounted() || this._updatesDisabled === true) {
       if (window.RENDER_DEBUG) {
         console.error("shouldUpdate? No.", "F1", this.getElementName(), this.props, nextProps, this.state, nextState);
       }
@@ -12895,8 +12892,9 @@ class EndCallButton extends mixins.w9 {
   }
 }
 class StartMeetingNotification extends mixins.w9 {
-  customIsEventuallyVisible() {
-    return this.props.chatRoom.isCurrentlyActive;
+  constructor(...args) {
+    super(...args);
+    this.customIsEventuallyVisible = () => true;
   }
   render() {
     const {
@@ -12926,8 +12924,9 @@ class StartMeetingNotification extends mixins.w9 {
   }
 }
 class JoinCallNotification extends mixins.w9 {
-  customIsEventuallyVisible() {
-    return this.props.chatRoom.isCurrentlyActive;
+  constructor(...args) {
+    super(...args);
+    this.customIsEventuallyVisible = () => true;
   }
   render() {
     const {
@@ -14118,10 +14117,6 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
     if (!room || !room.roomId) {
       return null;
     }
-    if (!room.isCurrentlyActive && !self._wasAppendedEvenOnce) {
-      return null;
-    }
-    self._wasAppendedEvenOnce = true;
     const contacts = room.getParticipantsExceptMe();
     let contactHandle;
     let contact;
@@ -28943,7 +28938,8 @@ class Incoming extends _mixins1__.w9 {
     this.state = {
       video: false,
       unsupported: undefined,
-      hoveredSwitch: true
+      hoveredSwitch: true,
+      hideOverlay: false
     };
     this.renderSwitchControls = () => {
       const className = `mega-button large round switch ${this.state.hoveredSwitch ? 'hovered' : ''}`;
@@ -29012,6 +29008,7 @@ class Incoming extends _mixins1__.w9 {
       }, react0().createElement("span", null, video ? l[22894] : l[22893])));
     };
     this.state.unsupported = !megaChat.hasSupportForCalls;
+    this.state.hideOverlay = document.body.classList.contains('overlayed');
   }
   componentDidMount() {
     super.componentDidMount();

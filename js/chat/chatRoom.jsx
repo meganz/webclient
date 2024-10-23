@@ -387,10 +387,6 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
         }
     });
 
-    self.rebind('onClientLeftCall.chatRoom', () => self.callParticipantsUpdated());
-    self.rebind('onClientJoinedCall.chatRoom', () => self.callParticipantsUpdated());
-    self.rebind('onCallParticipantsUpdated.chatRoom', () => self.callParticipantsUpdated());
-
     self.initialMessageHistLoaded = false;
 
     var timer = null;

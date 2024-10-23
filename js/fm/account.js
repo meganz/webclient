@@ -3848,68 +3848,12 @@ accountUI.s4 = {
             return false;
         }
 
-        this.renderEndpointsData();
-        this.bindEvents();
-    },
-
-    renderEndpointsData() {
-        'use strict';
-
-        // Static endpoints data for now
-        const endpoints = [
-            [
-                'eu-central-1.s4.mega.io',
-                l.location_amsterdam
-            ],
-            [
-                'ca-central-1.s4.mega.io',
-                l.location_montreal
-            ],
-            [
-                'ca-west-1.s4.mega.io',
-                l.location_vancouver
-            ]
-        ];
-
-        const tableNode = this.$container[0].querySelector('.secondary-table');
-        const tipsNode = this.$container[0].querySelector('ul');
-        let rowNode = null;
-
-        tableNode.textContent = '';
-        tipsNode.textContent = '';
-
-        // Create table header
-        rowNode = mCreateElement('tr', undefined, tableNode);
-        mCreateElement('th', undefined, rowNode).textContent = l.s4_endpoint_header;
-        mCreateElement('th', undefined, rowNode).textContent = l[17818];
-        mCreateElement('th', undefined, rowNode);
-
-        // Create enpoint rows
-        for (const item of endpoints) {
-            let subNode = null;
-
-            // Create table header
-            rowNode = mCreateElement('tr', undefined, tableNode);
-            subNode = mCreateElement('td', undefined, rowNode);
-            mCreateElement('a', { class: 'settings-lnk' }, subNode).textContent = item[0];
-            mCreateElement('td', undefined, rowNode).textContent = item[1];
-            subNode = mCreateElement('td', undefined, rowNode);
-
-            // Create copy to clipboard button
-            subNode = mCreateElement('button', {
-                'class': 'mega-button small action copy',
-                'data-url': item[0]
-            }, subNode);
-            mCreateElement('i', { class: 'sprite-fm-mono icon-copy' }, subNode);
+        // Render endpoints list
+        if ('utils' in s4) {
+            s4.utils.renderEndpointsData(this.$container);
         }
 
-        // Fill URL exapmles in the tips
-        mCreateElement('li', undefined, tipsNode).append(parseHTML(
-            l.s4_s3_prefix_example.replace('%1', `s3.${endpoints[0][0]}`)
-        ));
-        mCreateElement('li', undefined, tipsNode).append(parseHTML(
-            l.s4_iam_prefix_example.replace('%1', `iam.${endpoints[0][0]}`)
-        ));
+        this.bindEvents();
     },
 
     bindEvents() {
@@ -3926,11 +3870,6 @@ accountUI.s4 = {
             loadSubPage(cn.length ? `fm/${cn[0].h}/keys` : 'fm');
         });
 
-        // Copy to clipboard buttons in Endpoints section
-        $('.mega-button.copy', this.$container).rebind('click.copyUrl', (e) => {
-            copyToClipboard(e.currentTarget.dataset.url, l.s4_endpoint_copied, 'hidden');
-        });
-
         // Enable thumb previews switcher in thumb previews
         accountUI.inputs.switch.init(
             '.s4-thumb-switch',
@@ -3940,6 +3879,22 @@ accountUI.s4 = {
                 mega.config.setn('s4thumbs', val ? 1 : undefined);
             }
         );
+
+        const $toggles = $('.fm-account-s4 .s4-warn-dialogs .mega-switch', this.$container);
+
+        // Enable copy/move warning dialog switchers
+        for (let i = $toggles.length; i--;) {
+            const cfgName = $toggles[i].getAttribute('name');
+
+            accountUI.inputs.switch.init(
+                `[name="${cfgName}"]`,
+                this.$container,
+                !mega.config.get(cfgName),
+                (val) => {
+                    mega.config.setn(cfgName, val ? undefined : 1);
+                }
+            );
+        }
     }
 };
 

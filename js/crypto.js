@@ -1294,8 +1294,10 @@ async function api_setshare(node, targets, sharenodes) {
             exp = {a: 'l', n: node};
 
             if (req.s[i].w) {
+                exp.t = 1;
                 exp.w = 1;
-                exp.sk = a32_to_base64(u_sharekeys[node][0]);
+                const aes = new sjcl.cipher.aes(base64_to_a32(req.s[i].w));
+                exp.sk = a32_to_base64(encrypt_key(aes, u_sharekeys[node][0]));
                 req.s[i].r = 2;
                 delete req.s[i].w;
             }

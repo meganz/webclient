@@ -372,7 +372,7 @@ lazy(s4, 'ui', () => {
                 await dbfetch.get(n.h);
             }
 
-            if (!(this.bucket = s4.kernel.getS4BucketForObject(n))) {
+            if (!(this.bucket = s4.utils.getBucketNode(n))) {
                 return false;
             }
 
@@ -1039,7 +1039,7 @@ lazy(s4, 'ui', () => {
         show() {
             super.show();
 
-            $('header h2', this.$dialogContainer).text(this.text.header);
+            $('> header h2', this.$dialogContainer).text(this.text.header);
             if (!this.isCustomFlow) {
                 this.steps(1);
             }

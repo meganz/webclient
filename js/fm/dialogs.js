@@ -195,8 +195,15 @@
             }
         }
 
-        // Set Create folder label
+        // Set Create folder btn label for S4 container and Cloud drive
         if (section === 's4' && M.tree.s4 && M.tree.s4[$.mcselected]) {
+
+            // Disable action button when copying/moving files to container
+            if (!M.isFolder($.selected)) {
+                $btn.addClass('disabled');
+            }
+
+            // "Create new bucket"  label
             $('.dialog-newfolder-button span', $dialog).text(l.s4_create_bkt);
         }
         else {

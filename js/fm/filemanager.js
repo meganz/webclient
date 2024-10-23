@@ -155,13 +155,14 @@ FileManager.prototype.initFileManager = async function() {
 
     if (!pfid && !is_mobile && u_type) {
         const s4e = u_attr.s4;
-        const pTag = 's4-setup';
+        const pTag = 's4-object-storage';
 
         if (d) {
             console.assert(!window[pTag], 'S4 Setup already ongoing...');
         }
 
         if (s4e && !window[pTag]) {
+            const {infinity: inf} = mega;
             const hold = !!this.getNodeByHandle(path.slice(0, 8)).s4;
             window[pTag] = Date.now();
 
@@ -174,32 +175,33 @@ FileManager.prototype.initFileManager = async function() {
                             .map((h) => this.d[h]).filter((n) => n && n.s4);
 
                         const res = [cnt, value];
-                        return cnt.length && value ? dbfetch.geta(cnt.map(n => n.h)).then(() => res) : res;
+                        return cnt.length && (inf || value) ? dbfetch.geta(cnt.map(n => n.h)).then(() => res) : res;
                     })
                     .then(([cnt, pending]) => {
                         const promises = [];
 
-                        if (pending) {
-                            if (d) {
-                                pending = new Date(pending).toISOString();
-                                console.warn('Previous S4 Container creation did not complete.', pending);
-                            }
+                        if (self.d && pending) {
+                            pending = new Date(pending).toISOString();
+                            console.warn('Previous S4 Container creation did not complete.', pending);
+                        }
 
-                            while (cnt.length) {
-                                const n = cnt.pop();
-
-                                if (Object.keys(this.c[n.h] || {}).length) {
-                                    cnt.push(n);
-                                    if (d) {
-                                        console.error(`S4 Container ${n.h} is not empty.`, cnt);
-                                    }
+                        if (cnt.length) {
+                            for (let i = cnt.length; i--;) {
+                                const n = cnt[i];
+                                if (s4.kernel.validateS4Container(n) > 0) {
                                     break;
                                 }
+                                if (self.d) {
+                                    console.warn(`Invalid S4 Container ${n.h}`, n);
+                                }
+                                cnt.splice(i, 1);
 
-                                promises.push(
-                                    api.setNodeAttributes(n, {name: `${pTag}.lost&found`})
-                                        .then(() => this.moveToRubbish([n.h]))
-                                );
+                                if (pending) {
+                                    promises.push(
+                                        api.setNodeAttributes(n, {name: `${pTag}.lost&found`})
+                                            .then(() => this.moveToRubbish([n.h]))
+                                    );
+                                }
                             }
                         }
 
@@ -211,8 +213,14 @@ FileManager.prototype.initFileManager = async function() {
                     .then(() => {
                         window[pTag] = null;
                         this.delPersistentData(pTag).dump(pTag);
+                        this.buildtree({h: 's4'});
                         $('.js-s4-tree-panel').removeClass('hidden');
-                        return this.buildtree({h: 's4'}, this.buildtree.FORCE_REBUILD);
+                    })
+                    .then(() => {
+                        if (!mega.config.get('s4onboarded')) {
+                            mega.config.set('s4onboarded', 1);
+                            return s4.ui.showDialog(s4.containers.dialogs.setup);
+                        }
                     })
                     .catch((ex) => {
                         reportError(ex);
@@ -223,7 +231,12 @@ FileManager.prototype.initFileManager = async function() {
 
             if (hold) {
                 // We're (re)loading over a s4-page, hold it up.
-                await s4load;
+                await s4load.catch((ex) => {
+                    if (self.d) {
+                        console.error('Failed to initialize S4 (?!)', [ex]);
+                    }
+                    onIdle(() => this.openFolder('fm'));
+                });
             }
         }
 
@@ -485,7 +498,7 @@ FileManager.prototype.initFileManagerUI = function() {
                     const cn = s4.utils.getContainersList();
 
                     // Drag and drop folder to the only container or skip
-                    if (cn.length === 1 && M.isFolder(ids)) {
+                    if (cn.length === 1) {
                         t = cn[0].h;
                     }
                     else {

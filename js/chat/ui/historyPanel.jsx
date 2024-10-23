@@ -470,13 +470,6 @@ export default class HistoryPanel extends MegaRenderMixin {
             return null;
         }
 
-        // Hm...enable this if needed.
-
-        // // room is not active, don't waste DOM nodes, CPU and Memory (and save some avatar loading calls...)
-        // if (!room.isCurrentlyActive && !self._wasAppendedEvenOnce) {
-        //     return null;
-        // }
-
         var contacts = room.getParticipantsExceptMe();
         var contactHandle;
         var contact;

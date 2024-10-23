@@ -109,11 +109,12 @@
     };
 
     shrink.bitdef = freeze({
+        s4a: ['s4thumbs', 'skipcdtos4', 'skips4tocd', 'skips4tos4', 's4onboarded'],
         v04: ['rvonbrddl', 'rvonbrdfd', 'rvonbrdas'],
         xb1: [
             // do NOT change the order, add new entries at the tail UP TO 31, and 8 per row.
             'cws', 'ctt', 'viewmode', 'dbDropOnLogout', 'dlThroughMEGAsync', 'sdss', 'tpp', 'ulddd',
-            'cbvm', 'mgvm', 'uiviewmode', 'uisorting', 'uidateformat', 'skipsmsbanner', 'skipDelWarning', 's4thumbs',
+            'cbvm', 'mgvm', 'uiviewmode', 'uisorting', 'uidateformat', 'skipsmsbanner', 'skipDelWarning', 'rsv0',
             'nowarnpl', 'zip64n', 'callemptytout', 'callinout', 'showHideChat', 'showRecents', 'nocallsup', 'cslrem',
             'rsv2', 'noSubfolderMd', 'rwReinstate'
         ]
@@ -854,6 +855,20 @@
             }
         });
     };
+
+    if (self.d > 0) {
+        ns.test = async() => {
+            const config = await mega.attr.get(u_handle, 'fmconfig', false, true);
+
+            config.foo = String(Math.random() * Number.MAX_SAFE_INTEGER);
+            const p1 = mega.attr.set2(null, 'fmconfig', config, false, true);
+
+            config.foo = String(Math.random() * Number.MAX_SAFE_INTEGER);
+            const p2 = mega.attr.set2(null, 'fmconfig', config, false, true);
+
+            return Promise.all([p1, p2]);
+        };
+    }
 
     mBroadcaster.once('startMega', () => {
         const cfg = tryCatch(() => {

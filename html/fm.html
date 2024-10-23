@@ -1186,8 +1186,11 @@
                             <div class="sub-menu slide-item">
                                 <div class="sub-title" data-scrollto="access-keys">[$s4_access_keys]</div>
                             </div>
-                            <div class="sub-menu slide-item hidden">
+                            <div class="sub-menu slide-item">
                                 <div class="sub-title" data-scrollto="thumb-preview">[$s4_thumb_preview]</div>
+                            </div>
+                             <div class="sub-menu slide-item">
+                                <div class="sub-title" data-scrollto="s4-warn-dialogs">[$s4_warn_dialogs_header]</div>
                             </div>
                             <div class="sub-menu slide-item hidden">
                                 <div class="sub-title" data-scrollto="out-opts">[$s4_out_opts]</div>
@@ -4707,9 +4710,9 @@
                             <div class="settings-sub-section">
                                 <div class="full-sized">
                                     <div class="settings-body-txt">[$s4_available_endpoints]</div>
-                                    <table class="secondary-table"></table>
+                                    <table class="secondary-table js-endpoints-table"></table>
                                     <div class="settings-body-txt bold">[$s4_endpoints_prefix_info]</div>
-                                    <ul></ul>
+                                    <ul class="js-endpoints-desc"></ul>
                                     <div class="settings-body-txt">[$s4_endpoints_info]</div>
                                 </div>
                             </div>
@@ -4729,7 +4732,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="account data-block thumb-preview hidden">
+                    <div class="account data-block thumb-preview">
                         <div class="settings-left-block">
                             <div class="title-txt">[$s4_thumb_preview]</div>
                         </div>
@@ -4741,6 +4744,32 @@
                                 </div>
                                 <div class="content-txt">
                                     [$s4_thumb_preview_info]
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="account data-block s4-warn-dialogs">
+                        <div class="settings-left-block">
+                            <div class="title-txt">[$s4_warn_dialogs_header]</div>
+                            <div class="content-txt">[$s4_warn_dialogs_info]</div>
+                        </div>
+                        <div class="settings-right-block">
+                            <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$s4_setting_warn_from_cd_to_s4]</div>
+                                <div class="mega-switch" name="skipcdtos4">
+                                    <div class="mega-feature-switch no-trans-init"></div>
+                                </div>
+                            </div>
+                            <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$s4_setting_warn_from_s4_to_cd]</div>
+                                <div class="mega-switch" name="skips4tocd">
+                                    <div class="mega-feature-switch no-trans-init"></div>
+                                </div>
+                            </div>
+                            <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$s4_setting_warn_from_s4_to_s4]</div>
+                                <div class="mega-switch" name="skips4tos4">
+                                    <div class="mega-feature-switch no-trans-init"></div>
                                 </div>
                             </div>
                         </div>

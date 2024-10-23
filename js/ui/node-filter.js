@@ -495,7 +495,7 @@ lazy(mega.ui, 'mNodeFilter', () => {
         },
         match(n) {
 
-            if (n.name && n.p !== 'contacts' && !(n.s4 && n.p === this.RootID)) {
+            if (n.name && n.p !== 'contacts' && !(n.s4 && M.getS4NodeType(n))) {
 
                 for (const name in filters) {
                     const ctx = filters[name];

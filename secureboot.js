@@ -2320,6 +2320,7 @@ else if (!browserUpdate) {
         // UI Elements
         jsl.push({f:'js/ui/megaRender.js', n: 'megarender_js', j:1,w:1});
         jsl.push({f:'js/ui/dialog.js', n: 'dialogui_js', j:1,w:1});
+        jsl.push({f:'js/ui/mcomponents/classes/MComponent.js', n: 'm_component_js', j:1});
         jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'creddialogui_js', j:1,w:1});
         jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'loginrequireddialog_js', j:1,w:1});
         jsl.push({f:'js/ui/registerDialog.js', n: 'registerdialog_js', j:1,w:1});
@@ -2453,7 +2454,6 @@ else if (!browserUpdate) {
         jsl.push({f:'css/components.css', n: 'components_css', j:2, w:30, c:1, d:1, cache:1});
 
         // MComponents
-        jsl.push({f:'js/ui/mcomponents/classes/MComponent.js', n: 'm_component_js', j:1});
         jsl.push({f:'js/ui/mcomponents/classes/MButton.js', n: 'm_button_js', j:1});
         jsl.push({f:'js/ui/mcomponents/classes/MCheckbox.js', n: 'm_checkbox_js', j:1});
         jsl.push({f:'js/ui/mcomponents/classes/MContextMenu.js', n: 'm_context_menu_js', j:1});
@@ -2932,6 +2932,7 @@ else if (!browserUpdate) {
 
             's4:fm_s4_ui_js': {f:'js/fm/s4/ui.js', n: 'fm_s4_ui_js', j:1},
             's4:fm_s4_utils_js': {f:'js/fm/s4/utils.js', n: 'fm_s4_utils_js', j:1},
+            's4:fm_s4_containers_js': {f:'js/fm/s4/containers.js', n: 'fm_s4_containers_js', j:1},
             's4:fm_s4_objects_js': {f:'js/fm/s4/objects.js', n: 'fm_s4_objects_js', j:1},
             's4:fm_s4_buckets_js': {f:'js/fm/s4/buckets.js', n: 'fm_s4_buckets_js', j:1},
             's4:fm_s4_keys_js': {f:'js/fm/s4/keys.js', n: 'fm_s4_keys_js', j:1},

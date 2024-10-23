@@ -279,7 +279,7 @@ MegaData.prototype.getPath = function(id) {
                 break;
             }
 
-            if (this.d[id].s4 && this.d[id].p === this.RootID) {
+            if (this.d[id].s4 && this.getS4NodeType(id) === 'container') {
                 id = 's4';
                 continue;
             }
@@ -775,6 +775,11 @@ MegaData.prototype.copyNodes = async function(cn, t, del, tree) {
         await api_cachepubkeys([t]);
     }
 
+    // Display confirmation dialog when copying to/from object storage
+    if ('utils' in s4 && await s4.utils.confirmAction(cn, t).catch(dump) === false) {
+        return;
+    }
+
     if (!tree) {
         if (this.isFileNode(cn)) {
             tree = [cn];
@@ -1086,6 +1091,11 @@ MegaData.prototype.moveNodes = async function(n, t, folderConflictResolution) {
     }
     if (promises.length) {
         await Promise.all(promises).catch(dump);
+    }
+
+    // Display confirmation dialog when moving to/from object storage
+    if ('utils' in s4 && await s4.utils.confirmAction(n, t, true).catch(dump) === false) {
+        return;
     }
 
     const cleanEmptyMergedFolders = () => {
@@ -3285,12 +3295,26 @@ MegaData.prototype.createFolder = promisify(function(resolve, reject, target, na
             req.cr[1][0] = 'xxxxxxxx';
         }
 
-        api.screq(req).then(({handle}) => resolve(handle))
-            .then(() => {
-                if (M.d[target].s4 && name !== n.name) {
-                    showToast('info', l.s4_bucket_autorename.replace('%1', n.name));
+        api.screq(req)
+            .then(({st, handle}) => {
+                if (d) {
+                    console.debug('Created folder %s/%s...(%s)', target, handle, n.name, st);
                 }
-            }).catch(reject);
+
+                if (M.d[target].s4) {
+                    if (name !== n.name) {
+                        showToast('info', l.s4_bucket_autorename.replace('%1', n.name));
+                    }
+
+                    // wait for other tabs (if any) to catch up with this st
+                    if (typeof st === 'string') {
+                        return api.catchup(st).then(() => resolve(handle));
+                    }
+                }
+
+                resolve(handle);
+            })
+            .catch(reject);
     };
 
     if (M.c[target]) {
@@ -4703,9 +4727,8 @@ MegaData.prototype.preparePublicSetImport = function(pfid, data) {
 MegaData.prototype.shouldCreateThumbnail = function(target) {
     'use strict';
 
-    // @todo: Fix after the proxy server changes are released.
-    if (self.omitthumb !== false) {
-        return !self.omitthumb;
+    if (self.omitthumb) {
+        return false;
     }
 
     target = target || this.currentCustomView.nodeID || this.currentdirid || this.lastSeenCloudFolder;
@@ -4725,13 +4748,18 @@ MegaData.prototype.getS4NodeType = function(n) {
         n = this.getNodeByHandle(n);
     }
 
-    if (crypto_keyok(n)) {
+    if (n && n.s4 && crypto_keyok(n)) {
 
-        if (n.s4 && n.p === this.RootID) {
+        if ('kernel' in s4) {
+            return s4.kernel.getS4NodeType(n);
+        }
+        const isc = (n) => n.s4 && n.p === this.RootID && "li" in n.s4 && n.s4.k && this.getNodeShare(n).w;
+
+        if (isc(n)) {
             return 'container';
         }
 
-        if ((n = M.d[n.p]) && n.s4 && n.p === this.RootID) {
+        if ("pao" in n.s4 && (n = this.d[n.p]) && isc(n)) {
             return 'bucket';
         }
     }

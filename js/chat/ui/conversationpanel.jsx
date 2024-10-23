@@ -182,9 +182,7 @@ class EndCallButton extends MegaRenderMixin {
 }
 
 class StartMeetingNotification extends MegaRenderMixin {
-    customIsEventuallyVisible() {
-        return this.props.chatRoom.isCurrentlyActive;
-    }
+    customIsEventuallyVisible = () => true;
 
     render() {
         const { chatRoom, offset, onWaitingRoomJoin, onStartCall } = this.props;
@@ -211,9 +209,7 @@ class StartMeetingNotification extends MegaRenderMixin {
 }
 
 export class JoinCallNotification extends MegaRenderMixin {
-    customIsEventuallyVisible() {
-        return this.props.chatRoom.isCurrentlyActive;
-    }
+    customIsEventuallyVisible = () => true;
 
     render() {
         const { chatRoom, offset, rhpCollapsed } = this.props;
@@ -1795,11 +1791,6 @@ export class ConversationPanel extends MegaRenderMixin {
         if (!room || !room.roomId) {
             return null;
         }
-        // room is not active, don't waste DOM nodes, CPU and Memory (and save some avatar loading calls...)
-        if (!room.isCurrentlyActive && !self._wasAppendedEvenOnce) {
-            return null;
-        }
-        self._wasAppendedEvenOnce = true;
 
         var contacts = room.getParticipantsExceptMe();
         var contactHandle;

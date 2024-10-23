@@ -2189,6 +2189,12 @@ Chatd.Messages.prototype._setLoginState = function(state) {
         console.error("chat %s: Invalid login state transition from %s to %s",
             base64urlencode(this.chatId), constStateToText(LoginState, oldState), constStateToText(LoginState, state));
     }
+    if (this.shard.loggerIsEnabled) {
+        this.shard.logger.debug(
+            `Login state transition ${base64urlencode(this.chatId)}:`,
+            `${constStateToText(LoginState, oldState)} -> ${constStateToText(LoginState, state)}`
+        );
+    }
     this._loginState = state;
 };
 

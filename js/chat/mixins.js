@@ -544,14 +544,6 @@ export class MegaRenderMixin extends React.Component {
         this.eventuallyUpdate();
     }
 
-    // onHashChangeDoUpdate() {
-    //     if (!this.isMounted() || this._pendingForceUpdate === true) {
-    //         return;
-    //     }
-    //
-    //     this.eventuallyUpdate();
-    // }
-
     _getUniqueIDForMap(map, payload) {
         return map + '.' + payload;
     }
@@ -631,7 +623,7 @@ export class MegaRenderMixin extends React.Component {
         var self = this;
         depth = depth || 0;
 
-        if (!this.isMounted() || this._pendingForceUpdate === true || this._updatesDisabled === true) {
+        if (!this.isMounted() || this._updatesDisabled === true) {
             return;
         }
 
@@ -698,11 +690,7 @@ export class MegaRenderMixin extends React.Component {
             return false;
         }
 
-        if (
-            !this.isMounted() ||
-            this._pendingForceUpdate === true ||
-            this._updatesDisabled === true
-        ) {
+        if (!this.isMounted() || this._updatesDisabled === true) {
             if (window.RENDER_DEBUG) {
                 console.error(
                     "shouldUpdate? No.", "F1", this.getElementName(), this.props, nextProps, this.state, nextState

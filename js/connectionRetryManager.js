@@ -189,6 +189,7 @@ ConnectionRetryManager.prototype.gotDisconnected = function(){
 
         $(window).off("offline.megaChatRetry" + self._instanceIdx);
         $(window).rebind("online.megaChatRetry" + self._instanceIdx, function() {
+            self.logger.info('OS notified we are online.');
             self._isOffline = false;
             if (
                 !self.options.functions.isUserForcedDisconnect() &&
@@ -237,9 +238,7 @@ ConnectionRetryManager.prototype.gotConnected = function(){
 
     $(window).off("online.megaChatRetry" + self._instanceIdx);
     $(window).rebind("offline.megaChatRetry" + self._instanceIdx, function() {
-        if (self._debug) {
-            self.logger.warn("OS notified we are offline.");
-        }
+        self.logger.warn('OS notified we are offline.');
         self._isOffline = true;
         if (!self.options.functions.isUserForcedDisconnect()) {
             if (self._debug) {

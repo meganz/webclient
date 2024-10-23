@@ -5,11 +5,10 @@ mega.tpw = new function TransferProgressWidget() {
     var downloadRowPrefix = 'tpw_dl_';
     var uploadRowPrefix = 'tpw_ul_';
     const textSelector = '.transfer-progress-txt';
-    const tpwRowSelector = '.transfer-task-row';
     const transferPauseAllSelector = '.transfer-pause-icon';
-    var frozenTimeout = 6e4; // 60 sec
-    var completedTimeToStay = 3e5; // 5 min
-    var FailedTimeToStay = 9e5; // 15 min
+    const frozenTimeout = 60; // 60 sec
+    const completedTimeToStay = 300; // 5 min
+    const failedTimeToStay = 900; // 15 min
     var maximumLength = 200; // maximum rows to draw in normal mode
 
     var $widget;
@@ -19,17 +18,11 @@ mega.tpw = new function TransferProgressWidget() {
     var $widgetTabActive;
     var $widgetTabsHeader;
     var $widgetTabCompleted;
-    var $rowsContainer;
     var $bodyContainer;
     var $widgetFooter;
-    var $rowTemplate;
-    var $downloadRowTemplate;
-    var $uploadRowTemplate;
-    var $transferActionTemplate;
     var $overQuotaBanner;
     var $uploadChart;
     var $downloadChart;
-    var rowProgressWidth = 0;
 
     this.INITIALIZING = 0;
     this.DOWNLOADING = 1;
@@ -51,62 +44,23 @@ mega.tpw = new function TransferProgressWidget() {
 
     var monitors = Object.create(null);
 
-    /**
-     * setting the status of the row
-     * @param {Object} row          JQuery object contains the row
-     * @param {Number} status       represents the status id
-     * @param {Object} extraOption
-     */
-    var setStatus = function(row, status, extraOption) {
-        'use strict';
-        if (row && row.length && typeof status !== 'undefined') {
-            var stText = '';
-            switch (status) {
-                case mySelf.DONE:
-                    stText = l[1418];
-                    break;
-                case mySelf.FAILED:
-                    stText = extraOption || l.tfw_generic_fail_msg;
-                    break;
-                case mySelf.FROZEN:
-                    stText = 'Frozen';
-                    break;
-                case mySelf.PAUSED:
-                    stText = l[1651];
-                    break;
-            }
-
-            $('.transfer-task-status', row).text(escapeHTML(stText));
-        }
-        else {
-            return;
-        }
-    };
-
     var initScrolling = function() {
         delay('tpw:initScrolling', () => {
             initPerfectScrollbar($bodyContainer);
         }, 250);
     };
 
-    var removeRow = function($row) {
-
-        if (!$row || !$row.length) {
+    var removeRow = function(transferId) {
+        if (!transferId) {
             return;
         }
 
-        var timer = $row.data('timer');
-        if (timer) {
-            clearTimeout(timer);
+        if (monitors[transferId]) {
+            monitors[transferId].abort();
+            delete monitors[transferId];
         }
 
-        var dId = $row.attr('id');
-        if (monitors[dId]) {
-            clearTimeout(monitors[dId]);
-            delete monitors[dId];
-        }
-
-        $row.remove();
+        mega.tpw.removeDOMRow(transferId);
         delay('tpw:remove', () => {
             initScrolling();
             mega.tpw.updateHeaderAndContent();
@@ -115,38 +69,15 @@ mega.tpw = new function TransferProgressWidget() {
 
     /**
      * Show a tab in Transfer progress widget
-     * @param {Number} section  1 = completed, 0 = on progress
      * @returns {void} void
      */
-    var viewTransferSection = function(section) {
-        var $rows = $(tpwRowSelector, $rowsContainer);
-        if (typeof section === 'undefined') {
-            section = $widgetTabActive.hasClass('inactive') ? 1 : $widgetTabActive.hasClass('active') ? 0 : 1;
-        }
-
-        // for enhanced performance, instead of using ".find" or ".filter" 2 times
-        // I will apply the calls on 1 go O(n).
-
-        for (var r = 0; r < $rows.length; r++) {
-            var $currRow = $($rows[r]);
-            if ($currRow.hasClass('complete')) {
-                if (section) {
-                    $currRow.removeClass('hidden');
-                }
-                else {
-                    $currRow.addClass('hidden');
-                }
-            }
-            else if (section) {
-                $currRow.addClass('hidden');
-            }
-            else {
-                $currRow.removeClass('hidden');
-            }
-        }
-
+    var viewTransferSection = function() {
         if ($widgetTabCompleted.hasClass('active')) {
+            $bodyContainer.addClass('completed').removeClass('active');
             $('.ps__rail-y', $bodyContainer).addClass('y-rail-offset');
+        }
+        else {
+            $bodyContainer.addClass('active').removeClass('completed');
         }
 
         initScrolling();
@@ -217,7 +148,7 @@ mega.tpw = new function TransferProgressWidget() {
                 return false;
             }
             $widgetTabCompleted.toggleClass('active');
-            viewTransferSection($this.hasClass('js-tab-active') ? 0 : 1);
+            viewTransferSection();
             $widgetTabActive.toggleClass('active');
             $widgetFooter.toggleClass('hidden');
 
@@ -306,128 +237,15 @@ mega.tpw = new function TransferProgressWidget() {
         }
 
         $overQuotaBanner.addClass('hidden');
-        $(tpwRowSelector, $widget).removeClass('overquota error');
+        const reset = (id) => {
+            this.updateDOMRow(id, {
+                noError: true,
+            });
+        };
+        this.applyToRows(reset, this.TYPE_OVERQUOTA);
+        this.applyToRows(reset, this.TYPE_ERRORED);
         this.updateHeaderAndContent();
     };
-
-    /**
-     * Hide action buttons if file node is removed
-     * @return {void}
-     */
-    const hideCompleteActions = (e) => {
-        let actionsNode;
-
-        if (!(e.currentTarget.classList.contains('complete')
-            && (actionsNode = e.currentTarget.querySelector('.transfer-complete-actions')))) {
-
-            return;
-        }
-
-        const h = e.currentTarget.getAttribute('nhandle')
-            || e.currentTarget.getAttribute('id').split('_').pop();
-
-        if (h && M.d[h]) {
-            actionsNode.classList.remove('hidden');
-        }
-        else {
-            actionsNode.classList.add('hidden');
-        }
-    };
-
-    var actionsOnRowEventHandler = function() {
-        var $me = $(this);
-        if ($me.hasClass('disabled') || !$me.is(':visible')) {
-            return;
-        }
-
-        var $transferRow = $me.closest(tpwRowSelector);
-        var trId = $transferRow.attr('id');
-        var id = trId.split('_').pop();
-        var node = null;
-
-        if ($me.hasClass('cancel')) {
-            if ($transferRow.hasClass('download')) {
-                if (!$transferRow.attr('zippo')) {
-                    id = 'dl_' + id;
-                }
-                else {
-                    id = 'zip_' + id;
-                }
-                if (GlobalProgress[id]) {
-                    dlmanager.abort(id);
-                }
-            }
-            else {
-                id = 'ul_' + id;
-                if (GlobalProgress[id]) {
-                    ulmanager.abort(id);
-                }
-            }
-            $('.transfer-table tr#' + id).remove();
-            if ($.clearTransferPanel) {
-                $.clearTransferPanel();
-            }
-            if (M.tfsdomqueue[id]) {
-                delete M.tfsdomqueue[id];
-            }
-            tfsheadupdate({c: id});
-
-            $transferRow.fadeOut(400, function() {
-                removeRow($transferRow);
-            });
-        }
-        else if ($me.hasClass('link')) {
-            var nodeHandle = $transferRow.attr('nhandle');
-            node = M.d[nodeHandle || id];
-            if (!node) {
-                return;
-            }
-            $.selected = [nodeHandle || id];
-            $('.dropdown.body.context .dropdown-item.getlink-item').click();
-        }
-        else if ($me.hasClass('cloud-folder')) {
-            var nHandle = $transferRow.attr('nhandle');
-            node = M.d[nHandle || id];
-            if (!node) {
-                return;
-            }
-
-            if (node.p) {
-                $.autoSelectNode = node.h;
-                M.openFolder(node.p).always((res) => {
-                    if (res && res === EEXIST && selectionManager) {
-                        selectionManager.clear_selection();
-                        selectionManager.add_to_selection($.autoSelectNode, true);
-                        delete $.autoSelectNode;
-                    }
-                });
-            }
-        }
-        else if ($me.hasClass('pause') || $me.hasClass('restart')) {
-            if ($transferRow.hasClass('download')) {
-                if ($transferRow.attr('zippo')) {
-                    id = 'zip_' + id;
-                }
-                else {
-                    id = 'dl_' + id;
-                }
-            }
-            else {
-                id = 'ul_' + id;
-            }
-            if ($me.hasClass('pause')) {
-                fm_tfspause(id);
-            }
-            else {
-                $transferRow.removeAttr('prepared');
-                fm_tfsresume(id);
-            }
-
-        }
-
-        return false;
-    };
-
 
     var clearAndReturnWidget = function() {
         var $currWidget = $('.transfer-progress.tpw');
@@ -454,7 +272,6 @@ mega.tpw = new function TransferProgressWidget() {
     /** Initialize the properties and class members */
     var init = function() {
         'use strict';
-        // return;
         if (mega.tpw.initialized) {
             return;
         }
@@ -463,6 +280,7 @@ mega.tpw = new function TransferProgressWidget() {
             return;
         }
 
+        mega.tpw.initDOM();
         $widgetWarnings = $('.banner.transfer', $widget);
         $rowsHeader = $('.transfer-progress-head', $widget);
         $widgetHeadAndBody = $('.transfer-progress-widget', $widget);
@@ -470,25 +288,10 @@ mega.tpw = new function TransferProgressWidget() {
         $widgetTabActive = $('.js-tab-active', $widgetTabsHeader);
         $widgetTabCompleted = $('.js-tab-completed', $widgetTabsHeader);
         $bodyContainer = $('.widget-body-container', $widget);
-        $rowsContainer = $('.transfer-progress-widget-body', $bodyContainer);
         $widgetFooter = $('.transfer-widget-footer', $widget);
         $overQuotaBanner = $('.banner.transfer', $widget);
-        $rowTemplate = $($(tpwRowSelector, $rowsContainer)[0]).clone();
-        $rowTemplate.rebind('mouseover.hideButtons', hideCompleteActions);
-        rowProgressWidth = $($rowsContainer[0]).find('.transfer-progress-bar').width();
-        $downloadRowTemplate = $rowTemplate.clone(true).removeClass('upload').addClass('download icon-down');
-        $uploadRowTemplate = $rowTemplate.clone(true).removeClass('download').addClass('upload icon-up');
         $uploadChart = $('.transfer-progress-type.upload .progress-chart', $widgetHeadAndBody);
         $downloadChart = $('.transfer-progress-type.download .progress-chart', $widgetHeadAndBody);
-
-        $transferActionTemplate = $($('button.btn-icon.transfer-progress-btn', $downloadRowTemplate)[0]).clone()
-            .removeClass('pause cancel link cloud-folder restart');
-        var $transferActionTemplateIcon = $('i.transfer-progress-icon', $transferActionTemplate);
-        $transferActionTemplateIcon.removeClass('pause cancel link cloud-folder restart' +
-            'icon-pause icon-close-component icon-link icon-search-cloud icon-play-small');
-        $transferActionTemplateIcon.bind('click', actionsOnRowEventHandler);
-
-        $rowsContainer.empty();
 
         // events handlers
         initEventsHandlers();
@@ -541,41 +344,6 @@ mega.tpw = new function TransferProgressWidget() {
     });
     mBroadcaster.addListener('fm:initialized', viewPreparation);
 
-
-    /**
-     * update a row when no update has arrived on it for a while
-     * @param {Number} id       row id
-     * @param {Boolean} u       isUpload
-     */
-    var updateToFrozen = function(id, isUpload) {
-        if (!id) {
-            return;
-        }
-        if (Array.isArray(id)) {
-            if (!id.length) {
-                return;
-            }
-            id = id[0];
-        }
-        var $targetedRow = $rowsContainer.find('#' + ((!isUpload) ? downloadRowPrefix : uploadRowPrefix) + id);
-        if (!$targetedRow || !$targetedRow.length) {
-            return;
-        }
-        if (!$targetedRow.hasClass('progress')) {
-            return;
-        }
-        $targetedRow.removeClass('complete error progress paused overquota').addClass('inqueue');
-        setStatus($targetedRow, mySelf.FROZEN);
-    };
-
-    var getDownloadsRows = function() {
-        return $(`[id^='${downloadRowPrefix}']`, $rowsContainer);
-    };
-
-    var getUploadsRows = function() {
-        return $(`[id^='${uploadRowPrefix}']`, $rowsContainer);
-    };
-
     /**
      * Draws the progress circle in the header of the widget reflecting the done elements
      * @param {Object} $headerSection       jQuery object containing the download/upload section in header
@@ -604,14 +372,12 @@ mega.tpw = new function TransferProgressWidget() {
 
 
     var cleanOverLimitRows = function() {
-        var $allRows = $(tpwRowSelector, $rowsContainer);
-        var rowsCount = $allRows.length;
-
-        if (rowsCount <= maximumLength) {
-            return;
-        }
-        else {
+        if (mega.tpw.rowsLength > maximumLength) {
             mega.tpw.clearRows(mega.tpw.DONE);
+            $widgetTabCompleted.removeClass('active');
+            $widgetTabActive.addClass('active');
+            $widgetFooter.removeClass('hidden');
+            $bodyContainer.removeClass('completed').addClass('active');
         }
     };
 
@@ -621,15 +387,11 @@ mega.tpw = new function TransferProgressWidget() {
         if (!$currWidget) {
             return false;
         }
+        // Moving widget from fm -> static pages or vice-versa.
+        if ($currWidget[0].querySelector('.transfer-progress-widget-body').children.length === 0) {
+            $currWidget.replaceWith($widget);
 
-        var $rows = $(tpwRowSelector, $currWidget);
-        if ($rows.length) {
-            if (!$rows.eq(0).attr('id')) {
-                $currWidget.replaceWith($widget);
-
-                initEventsHandlers();
-                $('i.transfer-progress-icon', $widget).rebind('click.tpw', actionsOnRowEventHandler);
-            }
+            initEventsHandlers();
             // init sections
             viewTransferSection();
         }
@@ -638,13 +400,11 @@ mega.tpw = new function TransferProgressWidget() {
 
 
     var postProcessComplete = function() {
-        var $allRows = $(tpwRowSelector, $rowsContainer);
-        var $completedRows = $allRows.filter('.complete');
-        if ($completedRows.length === $allRows.length) {
+        if (mega.tpw.completeRowsLength === mega.tpw.rowsLength) {
             $widgetTabCompleted.addClass('active');
             $widgetTabActive.addClass('inactive');
-            $allRows.removeClass('hidden');
             $widgetFooter.addClass('hidden');
+            $bodyContainer.addClass('completed').removeClass('active');
         }
         initScrolling();
     };
@@ -658,6 +418,23 @@ mega.tpw = new function TransferProgressWidget() {
         initScrolling();
     };
 
+    const validateEntry = function(type, entry) {
+        if (!mega.tpw.domReady || typeof type === 'undefined' || !entry) {
+            return false;
+        }
+        let prefix = uploadRowPrefix;
+        let dId = entry.id;
+
+        if (type === mega.tpw.DOWNLOAD) {
+            prefix = downloadRowPrefix;
+            if (entry.zipid) {
+                dId = entry.zipid;
+            }
+        }
+        const transferId = `${prefix}${dId}`;
+        return mega.tpw.hasDOMRow(transferId) && transferId;
+    };
+
     /**
      * Adding a download/upload entry to transfer progress widget
      * @param {Number} type             Entry type: 1 download, 2 upload
@@ -666,7 +443,7 @@ mega.tpw = new function TransferProgressWidget() {
      */
     this.addDownloadUpload = function(type, entry, specifiedSize) {
         'use strict';
-        if (!$rowsContainer || typeof type === 'undefined' || !entry) {
+        if (!this.domReady || typeof type === 'undefined' || !entry) {
             return;
         }
 
@@ -687,16 +464,13 @@ mega.tpw = new function TransferProgressWidget() {
             reverted = true;
         }
 
-        var addAsHidden = $widgetTabCompleted.hasClass('active');
-
-        if (addAsHidden && $widgetTabActive.hasClass('inactive')) {
+        if ($widgetTabCompleted.hasClass('active') && $widgetTabActive.hasClass('inactive')) {
             $widgetTabActive.removeClass('inactive').addClass('active');
             $widgetTabCompleted.removeClass('active');
             if ($widgetHeadAndBody.hasClass('expand')) {
                 $widgetFooter.removeClass('hidden');
             }
-            $('.transfer-task-row', $rowsContainer).addClass('hidden');
-            addAsHidden = false;
+            $bodyContainer.addClass('active').removeClass('completed');
         }
         for (var r = 0; r < entriesArray.length; r++) {
             var fName;
@@ -719,84 +493,45 @@ mega.tpw = new function TransferProgressWidget() {
                 prefix = uploadRowPrefix;
                 toolTipText = l[1617];
             }
-            const id = prefix + dId;
-            const $targetedRow = $(`#${id}`, $rowsContainer);
-            var $row = null;
+            const transferId = `${prefix}${dId}`;
+            const rowData = {
+                transferId,
+                type,
+                name: fName,
+                zipId: entriesArray[r].zipid,
+            };
 
-            if ($targetedRow.length === 1) {
-                $row = $targetedRow;
-            }
-            else if ($targetedRow.length > 1) {
-                // somehow we found multiple instances
-                $targetedRow.remove();
-            }
-            if (!$row) {
-                $row = (type === this.DOWNLOAD)
-                    ? $downloadRowTemplate.clone(true) : $uploadRowTemplate.clone(true);
-
-                $row.attr('id', id);
-            }
-
-            if (monitors[dId]) {
-                clearTimeout(monitors[dId]);
-            }
-            monitors[dId] = setTimeout(updateToFrozen, frozenTimeout, dId);
-
-            $row.find('.transfer-filetype-txt').text(fName);
-
-            var $enqueueAction = $transferActionTemplate.clone(true).addClass('cancel');
-            $('i.transfer-progress-icon', $enqueueAction).addClass('cancel icon-close-component')
-                .attr('data-simpletip', toolTipText);
-            $row.find('.transfer-task-actions').empty().append($enqueueAction);
-            if ($('.transfer-complete-actions', $row).length) {
-                $('.transfer-complete-actions', $row).remove();
-            }
-            $row.find('.transfer-progress-bar .transfer-progress-bar-pct').css('width', 0);
-
-            $row.removeClass('complete error progress paused overquota').addClass('inqueue');
-            $('.transfer-task-status', $row).text('');
-            $('.item-type-icon', $row)
-                .attr('class', `item-type-icon icon-${fileIcon({name: fName})}-24`);
-
-
-            if (entriesArray[r].zipid) {
-                $row.attr('zippo', 'y');
-            }
-
-            if (addAsHidden) {
-                $row.addClass('hidden');
+            if (monitors[transferId]) {
+                monitors[transferId].restart();
             }
             else {
-                $row.removeClass('hidden');
+                monitors[transferId] = tSleep(frozenTimeout);
+                monitors[transferId].then(() => delete monitors[transferId]).then(() => this.freezeDOMRow(transferId));
             }
 
-            setStatus($row, this.INITIALIZING);
-            if (!reverted) {
-                $tempRows[tempRowPos++] = $row;
+            if (reverted) {
+                $tempRows[tempRowPos--] = rowData;
             }
             else {
-                $tempRows[tempRowPos--] = $row;
+                $tempRows[tempRowPos++] = rowData;
             }
         }
 
         // for a concurrent batch of adding, we will postpone final calculations to the end.
         delay('tpw:addTimer', finalizeUpdates, 1500);
 
-        $rowsContainer.prepend($tempRows);
-        $tempRows = null;
+        for (const row of $tempRows) {
+            this.addDOMRow(row);
+        }
     };
-
 
     this.updateDownloadUpload = function(type, id, perc, bytesLoaded, bytesTotal, kbps, queue_num, startTime) {
         'use strict';
-        if (!$rowsContainer || typeof type === 'undefined' || !id) {
+        if (!this.domReady || typeof type === 'undefined' || !id) {
             return;
         }
 
         var dId = id;
-
-        var pauseText;
-        var cancelText;
 
         var prefix;
         var queue;
@@ -805,8 +540,6 @@ mega.tpw = new function TransferProgressWidget() {
             dId = id = id.split('_').pop();
             prefix = downloadRowPrefix;
             queue = dl_queue;
-            pauseText = l.tfw_transfer_pause;
-            cancelText = l.tfw_transfer_cancel;
 
             if (queue[queue_num].zipid) {
                 dId = queue[queue_num].zipid;
@@ -816,14 +549,11 @@ mega.tpw = new function TransferProgressWidget() {
         else {
             prefix = uploadRowPrefix;
             queue = ul_queue;
-            pauseText = l[16185];
-            cancelText = l[1617];
         }
 
-        var $targetedRow = $rowsContainer.find('#' + prefix + dId);
-
-        if (!$targetedRow || !$targetedRow.length) {
-            var tempObj = {
+        const transferId = `${prefix}${dId}`;
+        if (!this.hasDOMRow(transferId)) {
+            const entry = {
                 n: queue[queue_num].n,
                 name: queue[queue_num].name, // in upload will be null - OK
                 id: id,
@@ -832,115 +562,41 @@ mega.tpw = new function TransferProgressWidget() {
                 size: queue[queue_num].size
             };
 
-            this.addDownloadUpload(type, tempObj);
+            this.addDownloadUpload(type, entry);
             return mySelf.updateDownloadUpload(type, id, perc, bytesLoaded, bytesTotal, kbps, queue_num);
         }
 
-        if (monitors[dId]) {
-            clearTimeout(monitors[dId]);
+        if (monitors[transferId]) {
+            monitors[transferId].restart();
         }
-        monitors[dId] = setTimeout(updateToFrozen, frozenTimeout, dId);
+        else {
+            monitors[transferId] = tSleep(frozenTimeout);
+            monitors[transferId].then(() => delete monitors[transferId]).then(() => this.freezeDOMRow(transferId));
+        }
 
         var timeSpent = (new Date().getTime() - startTime) / 1000;
         var realSpeed = bytesLoaded / timeSpent; // byte per sec
 
         var speed = (kbps) ? Math.min(realSpeed, kbps) : realSpeed;
-
-        $targetedRow.removeClass('complete error inqueue paused overquota').addClass('progress');
-
-        if (!$targetedRow.attr('prepared')) {
-            var $actionsRow = $targetedRow.find('.transfer-task-actions').empty();
-            var $progressAction = $transferActionTemplate.clone(true).addClass('pause');
-            $('i.transfer-progress-icon', $progressAction).addClass('pause icon-pause')
-                .attr('data-simpletip', pauseText);
-            $actionsRow.append($progressAction);
-            $progressAction = $transferActionTemplate.clone(true).addClass('cancel');
-            $('i.transfer-progress-icon', $progressAction).addClass('cancel icon-close-component')
-                .attr('data-simpletip', cancelText);
-            $actionsRow.append($progressAction);
-            $targetedRow.attr('prepared', 'yes');
-        }
-
-        var prog = perc * rowProgressWidth / 100;
-        $targetedRow.find('.transfer-progress-bar-pct').width(prog);
-        $('.transfer-task-status', $targetedRow).text(bytesToSpeed(speed));
-
+        this.updateDOMRow(transferId, {
+            status: 'progress',
+            progress: perc,
+            statusText: bytesToSpeed(speed),
+            running: true,
+        });
         this.updateHeaderAndContent();
     };
 
     this.finishDownloadUpload = function(type, entry, handle) {
         'use strict';
-        if (!$rowsContainer || typeof type === 'undefined' || !entry) {
+        const transferId = validateEntry(type, entry);
+        if (!transferId) {
             return;
         }
 
-        var dId = entry.id;
-        var prefix;
-
-        var unHide = $widgetTabCompleted.hasClass('active');
-
-        if (type === this.DOWNLOAD) {
-            if (entry.zipid) {
-                dId = entry.zipid;
-            }
-            prefix = downloadRowPrefix;
-        }
-        else {
-            prefix = uploadRowPrefix;
-        }
-
-        var $targetedRow = $rowsContainer.find('#' + prefix + dId);
-
-        if (!$targetedRow || !$targetedRow.length) {
-            return;
-        }
-
-        if (monitors[dId]) {
-            clearTimeout(monitors[dId]);
-            delete monitors[dId];
-        }
-
-        $targetedRow.removeClass('progress error inqueue paused overquota').addClass('complete');
-        setStatus($targetedRow, this.DONE);
-
-        if (handle) {
-            $targetedRow.attr('nhandle', handle);
-        }
-
-        var $actionsRow = $targetedRow.find('.transfer-task-actions').empty();
-
-        var $finishedAction = $transferActionTemplate.clone(true).addClass('link');
-        if (!$targetedRow.attr('zippo')) {
-            var $finishedActionsRow = $actionsRow.clone();
-            $targetedRow.find('.transfer-complete-actions').remove();
-            $finishedActionsRow.removeClass('transfer-task-actions').addClass('transfer-complete-actions');
-            const root = M.getNodeRoot(handle || dId);
-            if (root && root !== 'shares') {
-                $('i.transfer-progress-icon', $finishedAction).removeClass('sprite-fm-mono')
-                    .addClass('sprite-fm-mono link icon-link').attr('data-simpletip', l[5622]);
-                $finishedActionsRow.append($finishedAction);
-            }
-            if (type === this.UPLOAD) {
-                $finishedAction = $transferActionTemplate.clone(true).addClass('cloud-folder');
-                $('i.transfer-progress-icon', $finishedAction).addClass('cloud-folder icon-search-cloud')
-                    .attr('data-simpletip', l[20695]);
-            }
-            else {
-                $finishedAction = $();
-            }
-            $finishedActionsRow.append($finishedAction);
-            $finishedActionsRow.insertAfter($('.transfer-filetype-txt', $targetedRow));
-        }
-        $finishedAction = $transferActionTemplate.clone(true).addClass('cancel');
-        $('i.transfer-progress-icon', $finishedAction).addClass('cancel icon-close-component')
-            .attr('data-simpletip', l.tfw_transfer_remove);
-        $actionsRow.append($finishedAction);
-
-        if (unHide) {
-            $targetedRow.removeClass('hidden');
-        }
-        else {
-            $targetedRow.addClass('hidden');
+        if (monitors[transferId]) {
+            monitors[transferId].abort();
+            delete monitors[transferId];
         }
 
         // for a concurrent batch of finishes, we will postpone final calculations to the end.
@@ -949,174 +605,91 @@ mega.tpw = new function TransferProgressWidget() {
             postProcessComplete();
         }, 400);
 
-        var timerHandle = setTimeout(function() {
-            $targetedRow.fadeOut(400, function() {
-                removeRow($targetedRow);
-            });
-
-        }, completedTimeToStay);
-
-        $targetedRow.data('timer', timerHandle);
+        this.eventuallyFadeOutRow(transferId, completedTimeToStay);
+        this.updateDOMRow(transferId, {
+            status: 'complete',
+            statusText: l[1418],
+            complete: M.getNodeRoot(handle || entry.zipid || entry.id) || true, // If there is a root pass it.
+            handle
+        });
     };
-
-
-
 
     this.errorDownloadUpload = function(type, entry, errorStr, isOverQuota) {
         'use strict';
-        if (!$rowsContainer || typeof type === 'undefined' || !entry) {
+        const transferId = validateEntry(type, entry);
+        if (!transferId) {
             return;
         }
-
-        var prefix;
-        var cancelText;
-        var dId = entry.id;
-
-        if (type === this.DOWNLOAD) {
-            prefix = downloadRowPrefix;
-            cancelText = l[1196];
-            if (entry.zipid) {
-                dId = entry.zipid;
-            }
+        if (monitors[transferId]) {
+            monitors[transferId].abort();
+            delete monitors[transferId];
         }
-        else {
-            prefix = uploadRowPrefix;
-            cancelText = l[1617];
-        }
-        var $targetedRow = $rowsContainer.find('#' + prefix + dId);
-
-        if (!$targetedRow || !$targetedRow.length) {
-            return;
-        }
-        if (monitors[dId]) {
-            clearTimeout(monitors[dId]);
-            delete monitors[dId];
-        }
-        $targetedRow.removeClass('complete progress inqueue paused');
-        setStatus($targetedRow, this.FAILED, errorStr);
-
-        var $errorCancelAction = $transferActionTemplate.clone(true).addClass('cancel');
-        $('i.transfer-progress-icon', $errorCancelAction).addClass('cancel icon-close-component')
-            .attr('data-simpletip', cancelText);
-        $targetedRow.find('.transfer-task-actions').empty().append($errorCancelAction);
-
-        $targetedRow.removeAttr('prepared');
+        const update = {
+            status: isOverQuota ? 'overquota' : 'error',
+            statusText: errorStr || l.tfw_generic_fail_msg,
+            running: false,
+        };
 
         if (isOverQuota) {
-            $targetedRow.addClass('overquota');
             viewOverQuotaBanner(type);
+            update.overquota = true;
         }
         else {
-            $targetedRow.addClass('error');
+            update.errored = true;
         }
 
-        var timerH = setTimeout(function() {
-            $targetedRow.fadeOut(400, function() {
-                removeRow($targetedRow);
-            });
-
-        }, FailedTimeToStay);
-
-        $targetedRow.data('timer', timerH);
+        this.updateDOMRow(transferId, update);
+        this.eventuallyFadeOutRow(transferId, failedTimeToStay);
         this.updateHeaderAndContent();
     };
 
-
-
     this.resumeDownloadUpload = function(type, entry) {
         'use strict';
-        if (!$rowsContainer || typeof type === 'undefined' || !entry) {
+        const transferId = validateEntry(type, entry);
+        if (!transferId) {
             return;
         }
-
-        var dId = entry.id;
-        var prefix;
-        var toolTipText;
-
-        if (type === this.DOWNLOAD) {
-            prefix = downloadRowPrefix;
-            toolTipText = l[1196];
-            if (entry.zipid) {
-                dId = entry.zipid;
-            }
+        if (!this.isRowPaused(transferId)) {
+            return;
+        }
+        if (monitors[transferId]) {
+            monitors[transferId].restart();
         }
         else {
-            prefix = uploadRowPrefix;
-            toolTipText = l[1617];
+            monitors[transferId] = tSleep(frozenTimeout);
+            monitors[transferId].then(() => delete monitors[transferId]).then(() => this.freezeDOMRow(transferId));
         }
-        const $targetedRow = $(`#${prefix}${dId}`, $rowsContainer);
 
-        if (!$targetedRow.length) {
-            return;
-        }
-        if (!$targetedRow.hasClass('paused')) {
-            return;
-        }
-        if (monitors[dId]) {
-            clearTimeout(monitors[dId]);
-            delete monitors[dId];
-        }
-        monitors[dId] = setTimeout(updateToFrozen, frozenTimeout, dId);
-
-        var $enqueueAction = $transferActionTemplate.clone(true).addClass('cancel');
-        $('i.transfer-progress-icon', $enqueueAction).addClass('cancel icon-close-component')
-            .attr('data-simpletip', toolTipText);
-        $targetedRow.find('.transfer-task-actions').empty().append($enqueueAction);
-        $targetedRow.removeClass('complete error progress paused overquota').addClass('inqueue');
-        $('.transfer-task-status', $targetedRow).text('');
-        setStatus($targetedRow, this.INITIALIZING);
+        this.updateDOMRow(transferId, {
+            paused: false,
+            status: 'inqueue',
+            statusText: '',
+        });
         // for a concurrent batch of resumes, we will postpone final calculations to the end.
         delay('tpw:resumeTimer', finalizeUpdates, 1500);
     };
 
-
     this.pauseDownloadUpload = function(type, entry) {
         'use strict';
-        if (!$rowsContainer || typeof type === 'undefined' || !entry) {
+        const transferId = validateEntry(type, entry);
+        if (!transferId) {
             return;
         }
 
-        var dId = entry.id;
-        var prefix;
-
-        if (type === this.DOWNLOAD) {
-            prefix = downloadRowPrefix;
-            if (entry.zipid) {
-                dId = entry.zipid;
-            }
-        }
-        else {
-            prefix = uploadRowPrefix;
+        if (monitors[transferId]) {
+            monitors[transferId].abort();
+            delete monitors[transferId];
         }
 
-        const $targetedRow = $(`#${prefix}${dId}`, $rowsContainer);
-
-        if (!$targetedRow.length) {
-            return;
-        }
-        if (monitors[dId]) {
-            clearTimeout(monitors[dId]);
-            delete monitors[dId];
-        }
-
-
-        $targetedRow.removeClass('error complete progress inqueue overquota').addClass('paused');
-        setStatus($targetedRow, this.PAUSED);
-
-        const $actionsRow = $('.transfer-task-actions', $targetedRow).empty();
-        var $pausedAction = $transferActionTemplate.clone(true).addClass('restart');
-        $('i.transfer-progress-icon', $pausedAction).addClass('restart icon-play-small')
-            .attr('data-simpletip', l.tfw_transfer_start);
-        $actionsRow.append($pausedAction);
-        $pausedAction = $transferActionTemplate.clone(true).addClass('cancel');
-        $('i.transfer-progress-icon', $pausedAction).addClass('cancel icon-close-component')
-            .attr('data-simpletip', l.tfw_transfer_cancel);
-        $actionsRow.append($pausedAction);
-        $targetedRow.removeAttr('prepared');
+        this.updateDOMRow(transferId, {
+            paused: true,
+            status: 'paused',
+            statusText: l[1651],
+        });
         delay('tpwpauseallcheck', () => {
             if (
-                $('.paused, .complete, .error, .overquota', $rowsContainer).length
-                === $(tpwRowSelector, $rowsContainer).length
+                this.completeRowsLength + this.pausedRowsLength + this.erroredRowsLength + this.overquotaRowsLength
+                === this.rowsLength
             ) {
                 const $pauseAllBtn = $(transferPauseAllSelector, $widgetFooter);
                 $pauseAllBtn.addClass('active');
@@ -1155,6 +728,12 @@ mega.tpw = new function TransferProgressWidget() {
         }
 
         var dId = rowId;
+        if (dId.startsWith('tpw')) {
+            if (this.hasDOMRow(dId)) {
+                removeRow(dId);
+            }
+            return;
+        }
         if (rowId[0] === 'd') {
             isUpload = false;
             dId = rowId.substr(3);
@@ -1170,13 +749,12 @@ mega.tpw = new function TransferProgressWidget() {
         }
 
         var prefix = (isUpload) ? uploadRowPrefix : downloadRowPrefix;
-        var $targetedRow = $rowsContainer.find('#' + prefix + dId);
-
-        if (!$targetedRow || !$targetedRow.length) {
+        const transferId = `${prefix}${dId}`;
+        if (!this.hasDOMRow(transferId)) {
             return;
         }
 
-        removeRow($targetedRow);
+        removeRow(transferId);
     };
 
 
@@ -1187,7 +765,7 @@ mega.tpw = new function TransferProgressWidget() {
     this.showWidget = function() {
         init();
         initUI();
-        if (!$rowsContainer || !$(tpwRowSelector, $rowsContainer).length) {
+        if (!this.domReady || !this.rowsLength) {
             return;
         }
         if (u_type !== false && M.getTransferElements() && !pfid) {
@@ -1210,19 +788,13 @@ mega.tpw = new function TransferProgressWidget() {
         if (d) {
             console.time('tpw:clearRows');
         }
-        var $tasks;
         if (!type) { // all
-            $tasks = $(tpwRowSelector, $rowsContainer);
+            this.applyToRows(removeRow);
         }
         else if (type === this.DONE) {
-            $tasks = $rowsContainer.find('.transfer-task-row.complete');
+            this.applyToRows(removeRow, this.TYPE_COMPLETE);
         }
 
-        if ($tasks && $tasks.length) {
-            for (var r = 0; r < $tasks.length; r++) {
-                removeRow($($tasks[r]));
-            }
-        }
         if (d) {
             console.timeEnd('tpw:clearRows');
         }
@@ -1267,7 +839,7 @@ mega.tpw = new function TransferProgressWidget() {
 
     this.updateHeaderAndContent = function() {
         const tfStats = this.getHeadStats();
-        if (!tfStats.dl && !tfStats.ul || !$(tpwRowSelector, $rowsContainer).length) {
+        if (!tfStats.dl && !tfStats.ul || !this.rowsLength) {
             this.hideWidget();
             return;
         }
@@ -1332,3 +904,517 @@ mega.tpw = new function TransferProgressWidget() {
         }
     };
 };
+((scope) => {
+    'use strict';
+    let root;
+    const rows = new Map();
+    const toAnimate = new Map();
+    const toEventuallyAnimate = new Map();
+    const animationLength = 400;
+    let animateUntil = false;
+    let animationTick = 0;
+
+    class MTransferRowActionButton extends MComponent {
+        constructor(parent) {
+            super();
+            this.parent = parent;
+            this._state = 'cancel';
+            this.attachEvent('click', () => {
+                const id = this.transferId.split('_').pop();
+                const gid = this.zipId ? `zip_${id}` : `${this.type === scope.DOWNLOAD ? 'dl' : 'ul'}_${id}`;
+                switch (this._state) {
+                    case 'restart': {
+                        fm_tfsresume(gid);
+                        break;
+                    }
+                    case 'pause': {
+                        fm_tfspause(gid);
+                        break;
+                    }
+                    case 'cancel': {
+                        if (this.type === scope.DOWNLOAD) {
+                            if (GlobalProgress[gid]) {
+                                dlmanager.abort(gid);
+                            }
+                        }
+                        else if (GlobalProgress[gid]) {
+                            ulmanager.abort(gid);
+                        }
+                        $(`.transfer-table tr#${gid}`).remove();
+                        if ($.clearTransferPanel) {
+                            $.clearTransferPanel();
+                        }
+                        if (M.tfsdomqueue[gid]) {
+                            delete M.tfsdomqueue[gid];
+                        }
+                        tfsheadupdate({c: gid});
+                        scope.fadeOutRow(this.transferId);
+                        break;
+                    }
+                    case 'link': {
+                        const node = M.d[this.handle || id];
+                        if (node) {
+                            $.selected = [node.h];
+                            M.getLinkAction();
+                        }
+                        break;
+                    }
+                    case 'cloud': {
+                        const node = M.d[this.handle || id];
+                        if (node && node.p) {
+                            $.autoSelectNode = node.h;
+                            M.openFolder(node.p).always((res) => {
+                                if (res && res === EEXIST && selectionManager) {
+                                    selectionManager.clear_selection();
+                                    selectionManager.add_to_selection($.autoSelectNode, true);
+                                    delete $.autoSelectNode;
+                                }
+                            });
+                        }
+                        break;
+                    }
+                }
+                return false;
+            }, undefined, this.icon);
+        }
+
+        buildElement() {
+            this.el = document.createElement('button');
+            this.el.className = 'btn-icon transfer-progress-btn cancel';
+            this.icon = document.createElement('i');
+            this.icon.className = 'transfer-progress-icon sprite-fm-mono simpletip';
+            this.icon.dataset.simpletipoffset = '5';
+            this.icon.dataset.simpletipposition = 'top';
+            this.icon.dataset.simpletipwrapper = '.transfer-progress.tpw';
+            this.el.append(this.icon);
+        }
+
+        get transferId() {
+            return this.parent.transferId;
+        }
+
+        get zipId() {
+            return this.parent.zipId;
+        }
+
+        get type() {
+            return this.parent.type;
+        }
+
+        get handle() {
+            return this.parent._handle;
+        }
+
+        set hidden(hidden) {
+            if (hidden) {
+                this.el.classList.add('hidden');
+                return;
+            }
+            this.el.classList.remove('hidden');
+        }
+
+        reset() {
+            this.el.classList.remove('restart', 'pause', 'cancel', 'link', 'cloud-folder');
+            this.icon.classList.remove(
+                'restart', 'icon-play-small',
+                'pause', 'icon-pause',
+                'cancel', 'icon-close-component',
+                'link', 'icon-link',
+                'cloud-folder', 'icon-search-cloud'
+            );
+        }
+
+        statePlay() {
+            this.reset();
+            this.appendCss('restart');
+            this.icon.classList.add('restart', 'icon-play-small');
+            this.icon.dataset.simpletip = l.tfw_transfer_start;
+            this._state = 'restart';
+        }
+
+        statePause() {
+            this.reset();
+            this.appendCss('pause');
+            this.icon.classList.add('pause', 'icon-pause');
+            this.icon.dataset.simpletip = this.type === scope.UPLOAD ? l[16185] : l.tfw_transfer_pause;
+            this._state = 'pause';
+        }
+
+        stateCancel(string) {
+            this.reset();
+            this.appendCss('cancel');
+            this.icon.classList.add('cancel', 'icon-close-component');
+            this.icon.dataset.simpletip = string || (this.type === scope.UPLOAD ? l[1617] : l[1196]);
+            this._state = 'cancel';
+        }
+
+        stateLink() {
+            this.reset();
+            this.appendCss('link');
+            this.icon.classList.add('link', 'icon-link');
+            this.icon.dataset.simpletip = l[5622];
+            this._state = 'link';
+        }
+
+        stateCloud() {
+            this.reset();
+            this.appendCss('cloud-folder');
+            this.icon.classList.add('cloud-folder', 'icon-search-cloud');
+            this.icon.dataset.simpletip = l[20695];
+            this._state = 'cloud';
+        }
+    }
+
+    class MTransferRow extends MComponent {
+        constructor({ transferId, type, name, zipId }) {
+            super();
+            this.type = type;
+            this.transferId = transferId;
+            this.zipId = zipId;
+            this.el.setAttribute('id', transferId);
+            this.appendCss(type === scope.UPLOAD ? 'upload icon-up' : 'download icon-down');
+            this.progress = 0;
+            this.status = 'inqueue';
+            this.file = name;
+            if (zipId) {
+                this.el.setAttribute('zippo', 'y');
+            }
+            this.actionLeft.stateCancel();
+            this.actionRight.stateCancel();
+            this.actionRight.hidden = true;
+            this._running = false;
+            this._paused = false;
+            this._complete = false;
+            this.errored = false;
+            this.overquota = false;
+        }
+
+        get running() {
+            return this._running;
+        }
+
+        get paused() {
+            return this._paused;
+        }
+
+        get complete() {
+            return this._complete;
+        }
+
+        set progress(percent) {
+            this.progressPercent.setAttribute('style', `width: ${percent}%;`);
+        }
+
+        set status(status) {
+            if (this._complete && status !== 'complete') {
+                return;
+            }
+            this.el.classList.remove('complete', 'error', 'progress', 'paused', 'overquota', 'inqueue');
+            this.el.classList.add(status);
+        }
+
+        set statusText(text) {
+            this.statusEl.textContent = text;
+        }
+
+        set file(file) {
+            this.icon.className = `item-type-icon icon-${fileIcon({ name: file })}-24`;
+            this.fileType.textContent = file;
+        }
+
+        set handle(handle) {
+            this._handle = handle;
+        }
+
+        set opacity(value) {
+            this.el.style.opacity = value;
+        }
+
+        set paused(isPaused) {
+            if (this._complete) {
+                return;
+            }
+            if (isPaused) {
+                this.actionLeft.statePlay();
+                this.actionRight.stateCancel(l.tfw_transfer_cancel);
+                this.actionRight.hidden = false;
+                this._paused = true;
+                this._running = false;
+                return;
+            }
+            this.actionLeft.stateCancel();
+            this.actionRight.hidden = true;
+            this._paused = false;
+        }
+
+        set running(isRunning) {
+            if (this._complete) {
+                return;
+            }
+            if (isRunning) {
+                if (this._running) {
+                    return;
+                }
+                this.actionLeft.statePause();
+                this.actionRight.stateCancel();
+                this.actionRight.hidden = false;
+                this._running = true;
+                return;
+            }
+            this.actionLeft.stateCancel();
+            this.actionRight.hidden = true;
+            this._running = false;
+        }
+
+        set complete(complete) {
+            if (!this.zipId) {
+                if (typeof complete === 'string' && complete !== 'shares') {
+                    this.completeActions.classList.remove('hidden');
+                    this.completeActionBtnLeft.stateLink();
+                    if (this.type === scope.UPLOAD) {
+                        this.completeActionBtnRight.stateCloud();
+                    }
+                    else {
+                        this.completeActionBtnRight.hidden = true;
+                    }
+                }
+                else if (this.type === scope.UPLOAD) {
+                    this.completeActions.classList.remove('hidden');
+                    this.completeActionBtnLeft.stateCloud();
+                    this.completeActionBtnRight.hidden = true;
+                }
+            }
+            this.actionLeft.stateCancel(l.tfw_transfer_remove);
+            this.actionRight.hidden = true;
+            this._complete = true;
+            this._running = false;
+        }
+
+        set noError(noError) {
+            this.el.classList.remove('overquota', 'error');
+            this.overquota = false;
+            this.errored = false;
+        }
+
+        buildElement() {
+            this.el = document.createElement('div');
+            this.el.className = `transfer-task-row sprite-fm-mono progress`;
+            this.icon = document.createElement('i');
+            this.el.appendChild(this.icon);
+            this.fileType = document.createElement('div');
+            this.fileType.className = 'transfer-filetype-txt';
+            this.el.appendChild(this.fileType);
+            this.completeActions = document.createElement('div');
+            this.completeActions.className = 'transfer-complete-actions hidden';
+            this.el.appendChild(this.completeActions);
+            this.completeActionBtnLeft = new MTransferRowActionButton(this);
+            this.completeActions.append(this.completeActionBtnLeft.el);
+            this.completeActionBtnRight = new MTransferRowActionButton(this);
+            this.completeActions.append(this.completeActionBtnRight.el);
+            this.statusEl = document.createElement('div');
+            this.statusEl.className = 'transfer-task-status';
+            this.el.appendChild(this.statusEl);
+            const spinner = document.createElement('i');
+            spinner.className = 'sprite-fm-theme icon-loading-spinner';
+            this.el.appendChild(spinner);
+            this.transferActions = document.createElement('div');
+            this.transferActions.className = 'transfer-task-actions';
+            this.el.appendChild(this.transferActions);
+            this.actionLeft = new MTransferRowActionButton(this);
+            this.transferActions.appendChild(this.actionLeft.el);
+            this.actionRight = new MTransferRowActionButton(this);
+            this.transferActions.appendChild(this.actionRight.el);
+            const progressBar = document.createElement('div');
+            progressBar.className = 'transfer-progress-bar';
+            this.el.appendChild(progressBar);
+            this.progressPercent = document.createElement('div');
+            this.progressPercent.className = 'transfer-progress-bar-pct';
+            progressBar.append(this.progressPercent);
+            this.el.appendChild(document.createElement('hr'));
+        }
+    }
+
+    scope.TYPE_COMPLETE = 'complete';
+    scope.TYPE_RUNNING = 'running';
+    scope.TYPE_PAUSED = 'paused';
+    scope.TYPE_OVERQUOTA = 'overquota';
+    scope.TYPE_ERRORED = 'errored';
+    const types = [
+        scope.TYPE_COMPLETE,
+        scope.TYPE_RUNNING,
+        scope.TYPE_PAUSED,
+        scope.TYPE_OVERQUOTA,
+        scope.TYPE_ERRORED
+    ];
+    scope.addDOMRow = (data) => {
+        if (!scope.domReady || !data.transferId) {
+            return false;
+        }
+        if (rows.has(data.transferId)) {
+            rows.get(data.transferId).detachEl();
+        }
+        const row = new MTransferRow(data);
+        root.prepend(row.el);
+        rows.set(data.transferId, row);
+        return true;
+    };
+    scope.updateDOMRow = (id, update) => {
+        if (!scope.domReady || !rows.has(id)) {
+            return false;
+        }
+        const row = rows.get(id);
+        for (const key in update) {
+            if (update.hasOwnProperty(key)) {
+                row[key] = update[key];
+            }
+        }
+        return true;
+    };
+    scope.freezeDOMRow = (id) => {
+        if (!rows.has(id)) {
+            return false;
+        }
+        const row = rows.get(id);
+        if (!row.running) {
+            return;
+        }
+        row.status = 'inqueue';
+        row.statusText = l.tfw_frozen_status;
+        row.running = false;
+    };
+    scope.removeDOMRow = (id) => {
+        if (!scope.domReady || !rows.has(id)) {
+            return true;
+        }
+        rows.get(id).detachEl();
+        toAnimate.delete(id);
+        const promise = toEventuallyAnimate.get(id);
+        if (promise) {
+            promise.abort();
+            toEventuallyAnimate.delete(id);
+        }
+        return rows.delete(id);
+    };
+    scope.applyToRows = (fn, type) => {
+        const out = [];
+        if (!scope.domReady || type && !types.includes(type)) {
+            return out;
+        }
+        for (const [key, row] of rows) {
+            if (!type || row[type]) {
+                if (typeof fn === 'function') {
+                    fn(key);
+                }
+                out.push(key);
+            }
+        }
+        return out;
+    };
+    scope.hasDOMRow = (id) => rows.has(id);
+    scope.isRowPaused = (id) => rows.has(id) && rows.get(id).paused;
+
+    const animate = () => {
+        if (animateUntil <= Date.now()) {
+            animateUntil = false;
+            animationTick = 0;
+            if (toAnimate.size) {
+                scope.removeRow(toAnimate.keys().toArray());
+            }
+            return;
+        }
+        requestAnimationFrame((last) => {
+            if (!animationTick) {
+                animationTick = last;
+                return animate();
+            }
+            const diff = last - animationTick;
+            const progressPct = diff / animationLength;
+            for (const [id, progress] of toAnimate) {
+                const opacity = 1 - (progress + progressPct);
+                if (opacity <= 0) {
+                    scope.removeRow(id);
+                }
+                else {
+                    toAnimate.set(id, progress + progressPct);
+                    rows.get(id).opacity = opacity;
+                }
+            }
+            animationTick = last;
+            if (toAnimate.size === 0) {
+                animateUntil = false;
+                animationTick = 0;
+                return;
+            }
+            animate();
+        });
+    };
+    scope.fadeOutRow = (id) => {
+        if (!rows.has(id)) {
+            return;
+        }
+        if (toEventuallyAnimate.has(id)) {
+            toEventuallyAnimate.get(id).abort();
+            toEventuallyAnimate.delete(id);
+        }
+        toAnimate.set(id, 0);
+        const wasAnimating = !!animateUntil;
+        animateUntil = Date.now() + animationLength;
+        if (!wasAnimating) {
+            animate();
+        }
+    };
+    scope.eventuallyFadeOutRow = (id, timeout) => {
+        if (toAnimate.has(id)) {
+            return false;
+        }
+        if (toEventuallyAnimate.has(id)) {
+            toEventuallyAnimate.get(id).abort();
+        }
+        const promise = tSleep(timeout);
+        promise.then(() => {
+            toEventuallyAnimate.delete(id);
+            scope.fadeOutRow(id);
+        });
+        toEventuallyAnimate.set(id, promise);
+        return true;
+    };
+    scope.initDOM = () => {
+        if (scope.domReady) {
+            return;
+        }
+        root = document.querySelector('.tpw .widget-body-container .transfer-progress-widget-body');
+    };
+
+    Object.defineProperty(scope, 'rowsLength', {
+        get() {
+            return rows.size;
+        },
+    });
+
+    /**
+     * @property scope.completeRowsLength
+     * @property scope.runningRowsLength
+     * @property scope.pausedRowsLength
+     * @property scope.overquotaRowsLength
+     * @property scope.erroredRowsLength
+     */
+    for (const key of types) {
+        Object.defineProperty(scope, `${key}RowsLength`, {
+            get() {
+                let matched = 0;
+                for (const [, row] of rows) {
+                    if (row[key]) {
+                        matched++;
+                    }
+                }
+                return matched;
+            }
+        });
+    }
+
+    Object.defineProperty(scope, 'domReady', {
+        get() {
+            return !!root;
+        },
+    });
+})(mega.tpw);

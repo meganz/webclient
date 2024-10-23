@@ -3007,7 +3007,10 @@ function logExportEvt(type, target) {
                 'nodesToProcess': nodesToProcess
             });
 
-            mLoadingSpinner.show('get-link-loading-toast', l.generating_links);
+            mLoadingSpinner.show(
+                'get-link-loading-toast',
+                nodesToProcess.length === 1 ? l.generating_link : l.generating_links
+            );
 
             exportLink.getExportLink().finally(() => {
                 mLoadingSpinner.hide('get-link-loading-toast');

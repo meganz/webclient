@@ -12,12 +12,14 @@ export default class Incoming extends MegaRenderMixin {
     state = {
         video: false,
         unsupported: undefined,
-        hoveredSwitch: true
+        hoveredSwitch: true,
+        hideOverlay: false,
     };
 
     constructor(props) {
         super(props);
         this.state.unsupported = !megaChat.hasSupportForCalls;
+        this.state.hideOverlay = document.body.classList.contains('overlayed');
     }
 
     componentDidMount() {

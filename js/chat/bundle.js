@@ -28938,7 +28938,8 @@ class Incoming extends _mixins1__.w9 {
     this.state = {
       video: false,
       unsupported: undefined,
-      hoveredSwitch: true
+      hoveredSwitch: true,
+      hideOverlay: false
     };
     this.renderSwitchControls = () => {
       const className = `mega-button large round switch ${this.state.hoveredSwitch ? 'hovered' : ''}`;
@@ -29007,6 +29008,7 @@ class Incoming extends _mixins1__.w9 {
       }, react0().createElement("span", null, video ? l[22894] : l[22893])));
     };
     this.state.unsupported = !megaChat.hasSupportForCalls;
+    this.state.hideOverlay = document.body.classList.contains('overlayed');
   }
   componentDidMount() {
     super.componentDidMount();

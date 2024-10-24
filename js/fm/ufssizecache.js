@@ -218,7 +218,7 @@ UFSSizeCache.prototype.addToDB = function(n) {
  */
 UFSSizeCache.prototype.addTreeNode = function(n, ignoreDB) {
     'use strict';
-    const p = n.s4 && M.getS4NodeType(n) === 'container' ? 's4' : n.su ? 'shares' : n.p;
+    const p = n.s4 && M.getS4NodeType(n) === 'container' || n.t & M.IS_S4CRT ? 's4' : n.su ? 'shares' : n.p;
 
     if (!M.tree[p]) {
         M.tree[p] = Object.create(null);

@@ -57,6 +57,9 @@ MegaData.prototype.buildSubMenu = function(id) {
 
         folders.sort(M.getSortByNameFn2(1));
         for (var i = 0; i < folders.length; i++) {
+            if (folders[i].t & M.IS_S4CRT) {
+                continue;
+            }
             var fid = escapeHTML(folders[i].h);
 
             cs = '';

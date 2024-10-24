@@ -3100,7 +3100,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
             const r = await fmdb.getbykey('f', 'h', ['s', ['-2', '-3', '-4']]);
 
             emplace(r);
-            if (!r.length || !M.RootID) {
+            if (!r.length || !M.RootID || !M.RubbishID) {
                 if (sessionStorage.dbcrpt) {
                     delete sessionStorage.dbcrpt;
                     throw new Error('indexedDB corruption!');

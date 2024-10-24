@@ -2400,7 +2400,7 @@ function worker_procmsg(ev) {
             // only in such a case we need to explicitly add new nodes to DB.
             // Under Infinity, this will ensure (M)tree[] nodes do consistently
             // remain in memory, which is a strong requirement for S4 (lhp)...
-            if (ufsc.cache) {
+            if (ufsc.cache && ev.data.p) {
                 ufsc.feednode(ev.data);
             }
             else {

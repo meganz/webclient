@@ -1629,6 +1629,8 @@ MegaData.prototype.moveToRubbish = async function(handles) {
     'use strict';
     let tag;
 
+    assert(this.RubbishID && this.RubbishID.length === 8, `Invalid rub=${this.RubbishID}`);
+
     if (!Array.isArray(handles)) {
         handles = [handles];
     }
@@ -4753,7 +4755,18 @@ MegaData.prototype.getS4NodeType = function(n) {
         if ('kernel' in s4) {
             return s4.kernel.getS4NodeType(n);
         }
-        const isc = (n) => n.s4 && n.p === this.RootID && "li" in n.s4 && n.s4.k && this.getNodeShare(n).w;
+        const isc = (n) => {
+            if (n.s4 && n.p === this.RootID && "li" in n.s4) {
+
+                for (const k in n.s4.k) {
+                    if (k.length > 36) {
+                        return !!this.getNodeShare(n).w;
+                    }
+                }
+            }
+
+            return false;
+        };
 
         if (isc(n)) {
             return 'container';

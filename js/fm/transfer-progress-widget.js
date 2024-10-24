@@ -1313,12 +1313,14 @@ mega.tpw = new function TransferProgressWidget() {
     scope.hasDOMRow = (id) => rows.has(id);
     scope.isRowPaused = (id) => rows.has(id) && rows.get(id).paused;
 
-    const animate = () => {
+    const animate = tryCatch(() => {
         if (animateUntil <= Date.now()) {
             animateUntil = false;
             animationTick = 0;
             if (toAnimate.size) {
-                scope.removeRow(toAnimate.keys().toArray());
+                for (const [key] of toAnimate) {
+                    scope.removeRow(key);
+                }
             }
             return;
         }
@@ -1347,7 +1349,7 @@ mega.tpw = new function TransferProgressWidget() {
             }
             animate();
         });
-    };
+    });
     scope.fadeOutRow = (id) => {
         if (!rows.has(id)) {
             return;

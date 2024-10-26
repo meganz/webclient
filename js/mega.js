@@ -2404,10 +2404,12 @@ function worker_procmsg(ev) {
             // only in such a case we need to explicitly add new nodes to DB.
             // Under Infinity, this will ensure (M)tree[] nodes do consistently
             // remain in memory, which is a strong requirement for S4 (lhp)...
-            if (ufsc.cache && ev.data.p) {
+            const feed = ufsc.cache && ev.data.p;
+            if (feed) {
                 ufsc.feednode(ev.data);
             }
-            else {
+
+            if (!feed || !emplace) {
                 ufsc.addToDB(ev.data);
             }
 
@@ -2665,7 +2667,7 @@ async function fetchfm(sn) {
                 }
             }
             loadfm.fromapi = true;
-            return dbfetchfm(result);
+            return loadfm_callback(result);
         });
 }
 
@@ -2741,7 +2743,6 @@ function dbfetchfm(residual) {
 
         if (isFromAPI) {
             window.loadingInitDialog.step3(1, 20);
-            return tSleep(0.3, residual || false).then(loadfm_callback);
         }
 
         return getsc(true);
@@ -3774,23 +3775,27 @@ function loadfm_callback(res) {
         // this is a legacy cached tree without an ok0 element
         process_ok(res.ok);
     }
+    /**
     if (res.u) {
         process_u(res.u);
     }
     if (res.opc) {
         processOPC(res.opc);
     }
+    /**/
     if (res.suba) {
         if (!is_mobile) {
             process_suba(res.suba);
         }
     }
+    /**
     if (res.ipc) {
         processIPC(res.ipc);
     }
     if (res.ps) {
         processPS(res.ps);
     }
+    /**/
     if (res.mcf) {
         // save the response to be processed later once chat files were loaded
         loadfm.chatmcf = res.mcf.c || res.mcf;
@@ -3843,6 +3848,7 @@ function loadfm_callback(res) {
         eventlog(99695);
     }
 
+    /**
     if (res.f) {
         process_f(res.f);
     }
@@ -3883,6 +3889,7 @@ function loadfm_callback(res) {
         crypto_procsr(res.sr);
     }
     setsn(currsn = res.sn);
+    /**/
 
     mega.loadReport.procNodeCount = Object.keys(M.d || {}).length;
     mega.loadReport.procNodes = Date.now() - mega.loadReport.stepTimeStamp;
@@ -3893,12 +3900,57 @@ function loadfm_callback(res) {
     // Time to save the ufs-size-cache, from which M.tree nodes will be created and being
     // those dependent on in-memory-nodes from the initial load to set flags such as SHARED.
     return (async() => ufsc.save())().catch(dump)
-        .finally(() => {
+        .then(() => {
+
+            window.loadingInitDialog.step3(35, 40);
+
+            // since v5.36 we're preventing sending the same nodes twice to FMDB, thus it
+            // requires handling the residual gettree response upon ufsc.save() completes
+
+            if (res.u) {
+                process_u(res.u);
+            }
+            if (res.opc) {
+                processOPC(res.opc);
+            }
+            if (res.ipc) {
+                processIPC(res.ipc);
+            }
+            if (res.ps) {
+                processPS(res.ps);
+            }
+            if (res.f) {
+                process_f(res.f);
+            }
+            if (res.f2) {
+                process_f(res.f2, true);
+            }
+
+            if (res.s) {
+                if (d) {
+                    console.info(`[f.s(${res.s.length})] %s`, res.s.map(n => `${n.h}*${n.u}`).sort());
+                }
+                for (let i = res.s.length; i--;) {
+                    M.nodeShare(res.s[i].h, res.s[i]);
+                }
+            }
+
+            // Handle public/export links. Why here? Make sure that M.d already exists
+            if (res.ph) {
+                processPH(res.ph);
+            }
+
+            // This package is sent on hard refresh if owner have enabled or disabled PUF
+            if (res.uph) {
+                mega.fileRequest.processUploadedPuHandles(res.uph).dump('processUPH');
+            }
+
+            // decrypt hitherto undecrypted nodes
+            crypto_fixmissingkeys(missingkeys);
+
             // commit transaction and set sn
             setsn(res.sn);
             currsn = res.sn;
-
-            window.loadingInitDialog.step3(35, 40);
 
             if (window.pfcol) {
                 return loadfm_done(-0x800e0fff);
@@ -3906,7 +3958,8 @@ function loadfm_callback(res) {
 
             // retrieve the initial batch of action packets, if any,
             // we'll then complete the process using loadfm_done()
-            getsc(true);
+            // (going through dbfetchfm() -> getsc() to do so)
+            return dbfetchfm();
         });
 }
 

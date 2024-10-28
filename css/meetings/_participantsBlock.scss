@@ -1,3 +1,5 @@
+@use '_mixins.scss';
+
 .stream-participants-block {
     float: left;
     display: flex;
@@ -5,7 +7,7 @@
     margin: -10px 0 0 0;
     height: 100%;
 
-    @include small-screen {
+    @include mixins.small-screen {
         position: absolute;
         top: 50%;
         right: 20px;
@@ -17,7 +19,7 @@
         position: relative;
         width: 292px;
 
-        @include small-screen {
+        @include mixins.small-screen {
             width: 212px;
         }
 
@@ -27,7 +29,7 @@
             grid-gap: 8px;
             width: 100%;
 
-            @include small-screen {
+            @include mixins.small-screen {
                 grid-gap: 4px;
             }
 
@@ -94,11 +96,6 @@
                     bottom: 6px;
                     left: 6px;
 
-                    body.rtl & {
-                        left: unset;
-                        right: 5px;
-                    }
-
                     span {
                         margin: 0 2px 0 0;
                     }
@@ -138,7 +135,7 @@
             cursor: pointer;
             z-index: 900;
 
-            @include small-screen {
+            @include mixins.small-screen {
                 position: absolute;
 
                 &.carousel-button-prev { top: -44px; }

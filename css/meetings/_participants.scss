@@ -133,17 +133,9 @@
                 padding-top: 8px;
                 padding-inline-start: 10px;
 
-                body.rtl & {
-                    float: right;
-                }
-
                 span {
                     display: block;
                     float: left;
-
-                    body.rtl & {
-                        float: right;
-                    }
 
                     &:first-child {
                         overflow: hidden;
@@ -182,10 +174,6 @@
                 display: flex;
                 align-items: center;
                 margin: 5px 0 0 auto;
-
-                body.rtl & {
-                    float: left;
-                }
 
                 .recording-status {
                     display: block;
@@ -275,11 +263,6 @@
                     right: 8px;
                     width: max-content;
                     z-index: 11;
-
-                    body.rtl & {
-                        left: 0;
-                        right: unset;
-                    }
 
                     ul {
                         margin: 0;

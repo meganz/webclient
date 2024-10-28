@@ -1,28 +1,30 @@
 // Global components, i.e. may be rendered in the in-call container OR the body
-@import 'meetings/_streamHead.scss';
-@import 'meetings/_videoNode.scss';
-@import 'meetings/_float.scss';
-@import 'meetings/_floatExtendedControls.scss';
-@import 'meetings/_micObserver.scss';
-@import 'meetings/_chatToaster.scss';
-@import 'meetings/_leftPanel.scss';
-@import 'meetings/_inviteParticipantsPanel.scss';
-@import 'meetings/_chatOverlay.scss';
+@use 'meetings/_streamHead.scss';
+@use 'meetings/_videoNode.scss';
+@use 'meetings/_float.scss';
+@use 'meetings/_floatExtendedControls.scss';
+@use 'meetings/_micObserver.scss';
+@use 'meetings/_chatToaster.scss';
+@use 'meetings/_leftPanel.scss';
+@use 'meetings/_inviteParticipantsPanel.scss';
+@use 'meetings/_chatOverlay.scss';
 
 // The main `Meetings` in-call container
-@import 'meetings/_call.scss';
+@use 'meetings/_call.scss';
 
 // Workflow components
-@import 'meetings/workflow/_start.scss';
-@import 'meetings/workflow/_join.scss';
-@import 'meetings/workflow/_preview.scss';
-@import 'meetings/workflow/_incoming.scss';
-@import 'meetings/workflow/_invite.scss';
-@import 'meetings/workflow/_loading.scss';
-@import 'meetings/waitingRoom/_waitingRoom.scss';
-@import 'meetings/workflow/_alert.scss';
-@import 'meetings/schedule/_schedule.scss';
-@import 'meetings/schedule/_datepicker.scss';
-@import 'meetings/schedule/_recurring.scss';
-@import 'meetings/workflow/_unsupported.scss';
-@import 'meetings/workflow/_freeCallEnded.scss';
+@use 'meetings/workflow/_start.scss';
+@use 'meetings/workflow/_join.scss';
+@use 'meetings/workflow/_preview.scss';
+@use 'meetings/workflow/_incoming.scss';
+@use 'meetings/workflow/_invite.scss';
+@use 'meetings/workflow/_loading.scss';
+@use 'meetings/waitingRoom/_waitingRoom.scss';
+@use 'meetings/workflow/_alert.scss';
+@use 'meetings/schedule/_schedule.scss';
+@use 'meetings/schedule/_datepicker.scss';
+@use 'meetings/schedule/_recurring.scss';
+@use 'meetings/workflow/_unsupported.scss';
+@use 'meetings/workflow/_freeCallEnded.scss';
+
+@use 'meetings/_rtl.scss';

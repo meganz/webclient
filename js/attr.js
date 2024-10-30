@@ -1343,6 +1343,11 @@
                 }
             });
         };
+        uaPacketParserHandler.pwmh = userHandle => {
+            mega.attr.get(userHandle, 'pwmh', -1, false, res => {
+                u_attr.pwmh = res;
+            });
+        };
         uaPacketParserHandler['^!prd'] = function() {
             mBroadcaster.sendMessage('attr:passwordReminderDialog');
             // if page is session history and new password action detected. update session table.

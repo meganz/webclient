@@ -28,6 +28,7 @@
 /*** Section 1: constants that will not vary by theme, but may only be used by one theme at the moment ***/
 
 body,
+:host(.mega-shadow-dom),
 .custom-alpha {
 
     /* texts */

@@ -30,7 +30,7 @@ mobile.settings.account.changePassword = Object.create(mobile.settingsHelper, {
                 'type': 'password'
             }, this.domNode);
 
-            new MegaMobileButton({
+            new MegaButton({
                 parentNode: this.domNode,
                 componentClassname: 'form-button block',
                 text: l[706]

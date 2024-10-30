@@ -71,6 +71,7 @@
 }
 
 .mega-sheet .image:empty,
+.mega-sheet .header-title:empty
 .mega-sheet .title:empty,
 .mega-sheet .content:empty,
 .mega-sheet .actions:empty {

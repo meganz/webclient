@@ -3,9 +3,8 @@ class MegaMobileSheet extends MegaMobileOverlay {
     constructor(options) {
         super(options);
 
-        this.rebind('tap.closeSheet', (e) => {
-            if (e.data
-                && e.data.target === this.domNode
+        this.rebind('click.closeSheet', (e) => {
+            if (e.target === this.domNode
                 // do not close sheet when an input element is focussed
                 && !this.domNode.querySelector('.mega-input.active')) {
                 if (this.preventBgClosing) {
@@ -160,12 +159,19 @@ class MegaMobileSheet extends MegaMobileOverlay {
 
     /**
      * Overridden function
-     * @param {String} title
+     * @param {string|HTMLElement} title
+     *
+     * @returns {void}
      */
     addTitle(title) {
         this.clearTitle();
-        const subNode = document.createElement('h2');
-        subNode.textContent = title;
+        let subNode = title;
+
+        if (typeof subNode === 'string') {
+            subNode = document.createElement('h2');
+            subNode.textContent = title;
+        }
+
         this.titleNode.appendChild(subNode);
     }
 }

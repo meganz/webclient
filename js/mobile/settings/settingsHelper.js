@@ -28,7 +28,7 @@ mobile.settingsHelper = {
      * @param {String} [opt.href] Href attribute if binding is not set
      * @param {Function} [opt.binding] Button binding if not a link.
      *
-     * @returns {MegaMobileLink|MegaMobileButton} The generated menu item.
+     * @returns {MegaLink|MegaButton} The generated menu item.
      */
     generateMenuItem: function(targetNode, opt) {
         'use strict';
@@ -58,11 +58,11 @@ mobile.settingsHelper = {
 
         // Infer the tappable type
         if (opt.binding) {
-            item = new MegaMobileButton(props);
+            item = new MegaButton(props);
             item.on('tap', opt.binding);
         }
         else {
-            item = new MegaMobileLink(props);
+            item = new MegaLink(props);
         }
         if (opt.eventLog) {
             item.rebind('tap.eventlog', () => eventlog(opt.eventLog));

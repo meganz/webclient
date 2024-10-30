@@ -1930,6 +1930,32 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', `<a href="${cancelSubLink}" target="_blank">`)
         .replace('[/A]', '</a>');
 
+    l.date_added = escapeHTML(l.date_added).replace('[S]', '<span>').replace('[/S]', '</span>');
+
+    l.error_fetching_items = escapeHTML(l.error_fetching_items)
+        .replace('[A]', '<a href="mailto:support@mega.nz">')
+        .replace('[/A]', '</a>');
+
+    l.contact_support = escapeHTML(l.contact_support)
+        .replace('[A]', '<a href="mailto:support@mega.nz">')
+        .replace('[/A]', '</a>');
+
+    l.item_updated = escapeHTML(l.item_updated)
+        .replace('[S]', '"<span class="long-title-truncate">')
+        .replace('[/S]', '</span>"');
+
+    l.delete_confirmation_title = escapeHTML(l.delete_confirmation_title)
+        .replace('[S]', '<span class="long-title-truncate">"')
+        .replace('[/S]', '</span>"');
+
+    l.item_deleted = escapeHTML(l.item_deleted)
+        .replace('[S]', '"<span class="long-title-truncate">')
+        .replace('[/S]', '</span>"');
+
+    l.request_failed = escapeHTML(l.request_failed)
+        .replace('[A]', '<a href="mailto:support@mega.nz">')
+        .replace('[/A]', '</a>');
+
     const common = [
         15536, 16119, 16120, 16313, 16316, 16360, 18228, 18268, 18282,
         18284, 18285, 18286, 18287, 18289, 18290, 18291, 18294, 18295, 18296, 18297, 18298, 18302, 18303, 18304,

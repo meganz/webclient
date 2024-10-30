@@ -1,4 +1,4 @@
-class MegaMobileNode extends MegaMobileComponent {
+class MegaMobileNode extends MegaComponent {
 
     constructor(options) {
 
@@ -137,7 +137,7 @@ class MegaMobileNode extends MegaMobileComponent {
 
         this.domNode.classList.add('mobile', 'fm-item', ...classNames);
 
-        const btnNode = new MegaMobileButton({
+        const btnNode = new MegaButton({
             type: 'icon',
             parentNode: this.domNode,
             icon: 'sprite-mobile-fm-mono icon-more-horizontal-thin-outline',

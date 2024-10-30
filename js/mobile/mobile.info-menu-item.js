@@ -1,4 +1,4 @@
-class MegaMobileInfoMenuItem extends MegaMobileTappable {
+class MegaMobileInfoMenuItem extends MegaInteractable {
 
     constructor(options) {
 
@@ -37,7 +37,7 @@ class MegaMobileInfoMenuItem extends MegaMobileTappable {
         this.domNode.tipIcon.c = iconClass;
 
         if (this.iconSize) {
-            elm.classList.add(MegaMobileTappable.iconSizesClass[this.iconSize]);
+            elm.classList.add(MegaInteractable.iconSizesClass[this.iconSize]);
         }
     }
 

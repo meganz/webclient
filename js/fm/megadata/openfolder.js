@@ -375,6 +375,10 @@
             // Render S4 section / S4 FM header
             queueMicrotask(() => s4.ui.render());
         }
+        else if (this.currentrootid === 'pwm' && is_mobile) {
+            console.error('invalid code-path...');
+            return this.openFolder('fm').catch(dump);
+        }
 
         const $fmRightFilesBlock = $('.fm-right-files-block');
         const $fmRightHeader = $('.fm-right-header', $fmRightFilesBlock);
@@ -407,6 +411,10 @@
             mega.ui.mNodeFilter.resetFilterSelections(stash);
         }
 
+        if (mega.ui.pm) {
+            mega.ui.pm.closeUI();
+        }
+
         if (id === undefined && folderlink) {
             // Error reading shared folder link! (Eg, server gave a -11 (EACCESS) error)
             // Force cleaning the current cloud contents and showing an empty msg
@@ -419,7 +427,8 @@
             id.substr(0, 7) === 'devices' ||
             id.substr(0, 9) === 'dashboard' ||
             id.substr(0, 15) === 'user-management' ||
-            id.substr(0, 5) === 'refer') {
+            id.substr(0, 5) === 'refer' ||
+            id.startsWith('pwm')) {
 
             this.v = [];
             delay.cancel('rmSetupUI');
@@ -428,11 +437,13 @@
                 // Remove shares-specific UI.
                 sharedFolderUI();
             }
-
             if (this.gallery) {
                 queueMicrotask(() => {
                     galleryUI(this.gallery > 1 && this.currentCustomView.nodeID);
                 });
+            }
+            else if (id && id.startsWith('pwm')) {
+                Promise.resolve(!mega.ui.pm && M.require('pwm')).then(() => mega.ui.pm.initUI()).catch(reportError);
             }
         }
         else {
@@ -838,6 +849,10 @@
 
             id = cv.nodeID;
             fetchDBNodes = ['container', 'bucket'].includes(cv.subType) && id.length === 8;
+        }
+        else if (cv.type === 'pwm') {
+            fetchDBNodes = true;
+            id = mega.pwmh;
         }
         else if (
             id &&

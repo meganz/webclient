@@ -31,7 +31,7 @@ mobile.settings.account.twofactorSettings = Object.create(mobile.settingsHelper,
             this.settingsNode = mCreateElement('div', {'class': 'settings-step'}, this.domNode);
 
             // Enable/disable 2FA button
-            this.toggleButton = new MegaMobileToggleButton({
+            this.toggleButton = new MegaToggleButton({
                 parentNode: this.settingsNode,
                 componentClassname: 'mega-toggle-button',
                 value: 'twoFactorSetup',
@@ -129,7 +129,7 @@ mobile.settings.account.twofactorSettings = Object.create(mobile.settingsHelper,
             this.qrCodeNode = mCreateElement('div', {'class': 'qr-code-img'}, this.scanTabNode);
 
             // Continue setup button to open 2FA verification overlay
-            new MegaMobileButton({
+            new MegaButton({
                 parentNode: this.setupNode,
                 componentClassname: 'form-button block',
                 text: l[6826]
@@ -410,7 +410,7 @@ mobile.settings.account.twofactorSettings = Object.create(mobile.settingsHelper,
                 ]);
 
                 // Add OK action button
-                new MegaMobileButton({
+                new MegaButton({
                     parentNode: mega.ui.sheet.actionsNode,
                     componentClassname: 'block',
                     text: l.ok_button

@@ -1,10 +1,10 @@
-class MegaMobileFooter extends MegaMobileComponent {
+class MegaMobileFooter extends MegaComponent {
 
     constructor(options) {
 
         super(options);
 
-        const plusButton = new MegaMobileButton({
+        const plusButton = new MegaButton({
             parentNode: this.domNode,
             type: 'icon',
             icon: 'sprite-mobile-fm-mono icon-plus-thin-outline',
@@ -151,7 +151,7 @@ class MegaMobileFooter extends MegaMobileComponent {
             mega.ui.sheet.addContent(menuNode);
 
             const buildItem = (item) => {
-                const buttonItem = new MegaMobileButton({
+                const buttonItem = new MegaButton({
                     ...this.menuOpts,
                     ...item,
                     parentNode: menuNode

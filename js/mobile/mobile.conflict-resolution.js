@@ -14,18 +14,18 @@ mobile.conflictResolution = {
             mCreateElement('div', {'class': 'info-txt-fn'}, this.container);
 
             // Action block a1
-            const button1 = new MegaMobileButton({
+            const button1 = new MegaButton({
                 parentNode: this.container,
-                type: 'text',
+                type: 'normal',
                 componentClassname: 'secondary action-block a1',
                 text: 'text',
                 subtext: 'subtext'
             });
 
             // Action block a3
-            const button2 = new MegaMobileButton({
+            const button2 = new MegaButton({
                 parentNode: this.container,
-                type: 'text',
+                type: 'normal',
                 componentClassname: 'secondary action-block a3',
                 text: 'text',
                 subtext: 'subtext'
@@ -34,7 +34,7 @@ mobile.conflictResolution = {
             // Aside for multiple files conflicts
             const aside = mCreateElement('aside', {}, this.container);
             /* eslint-disable no-new */
-            new MegaMobileCheckbox({
+            new MegaCheckbox({
                 parentNode: aside,
                 componentClassname: 'mega-checkbox duplicates-checkbox',
                 checkboxName: 'duplicates-checkbox',
@@ -44,9 +44,9 @@ mobile.conflictResolution = {
             });
 
             // Action block a2
-            new MegaMobileLink({
+            new MegaLink({
                 parentNode: this.container,
-                type: 'text',
+                type: 'normal',
                 componentClassname: 'text-only action-block a2',
                 text: 'test'
             });

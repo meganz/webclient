@@ -1,5 +1,6 @@
 /* general */
 body,
+:host(.mega-shadow-dom),
 .custom-alpha {
     --mobile-border-radius-circle: 50%;
     --mobile-border-radius-extra-large: 24px;
@@ -18,7 +19,7 @@ html .theme-light-forced {
     --mobile-surface-3: rgba(216, 217, 219, var(--mobile-surface-alpha, 1));
     --mobile-surface-2: rgba(243, 244, 244, var(--mobile-surface-alpha, 1));
     --mobile-background-blur: rgba(0, 0, 0, var(--mobile-background-alpha, 0.2));
-    --mobile-surface-accent-inverse: rgba(57, 66, 78, var(--mobile-surface-alpha, 1));
+    --mobile-surface-inverse-accent: rgba(57, 66, 78, var(--mobile-surface-alpha, 1));
     --mobile-button-primary: rgba(4, 16, 30, var(--mobile-button-alpha, 1));
     --mobile-button-primary-pressed: rgba(83, 91, 101, var(--mobile-button-alpha, 1));
     --mobile-button-brand: rgba(221, 20, 5, var(--mobile-button-alpha, 1));
@@ -96,7 +97,7 @@ html .theme-dark-forced {
     --mobile-surface-3: rgba(97, 99, 102, var(--mobile-surface-alpha, 1));
     --mobile-surface-2: rgba(73, 74, 77, var(--mobile-surface-alpha, 1));
     --mobile-background-blur: rgba(0, 0, 0, var(--mobile-background-alpha, 0.502));
-    --mobile-surface-accent-inverse: rgba(189, 192, 196, var(--mobile-surface-alpha, 1));
+    --mobile-surface-inverse-accent: rgba(189, 192, 196, var(--mobile-surface-alpha, 1));
     --mobile-button-primary: rgba(244, 244, 245, var(--mobile-button-alpha, 1));
     --mobile-button-primary-pressed: rgba(189, 192, 196, var(--mobile-button-alpha, 1));
     --mobile-button-brand: rgba(242, 52, 51, var(--mobile-button-alpha, 1));

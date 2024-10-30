@@ -1,0 +1,195 @@
+.overlay-wrap {
+    background: var(--mobile-background-blur);
+    box-sizing: border-box;
+    z-index: 2;
+}
+.overlay-wrap .overlay {
+    box-sizing: border-box;
+}
+.overlay-wrap.active .overlay {
+    transform: translateY(0%);
+}
+.mega-overlay .overlay {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    background: var(--mobile-page-background);
+    transform: translateY(100%);
+    transition: transform 0.2s ease-out;
+    height: 100%;
+}
+.mega-overlay.mega-overlay-view {
+    position: absolute;
+    height: fill-available;
+    height: -webkit-fill-available;
+}
+.mega-overlay.mega-overlay-view .overlay {
+    padding: 0;
+}
+.mega-overlay.mega-overlay-view .mega-bottom-bar {
+    position: relative;
+}
+.overlay-wrap .nav-elem.close {
+    padding: 0;
+    margin-left: auto;
+    height: auto;
+}
+.overlay-wrap .main {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+}
+.mega-overlay.overlay-wrap .title {
+    align-self: flex-start;
+}
+.overlay-wrap .title h1,
+.overlay-wrap .title h2 {
+    color: var(--mobile-text-primary);
+    margin: 0 0 24px;
+}
+.overlay-wrap .subtitle {
+    margin-top: -8px;
+}
+.overlay-wrap .subtitle span {
+    color: var(--mobile-text-secondary);
+    font: var(--mobile-font-copy-regular);
+}
+.overlay-wrap .content {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-copy-regular);
+    width: 100%;
+    height: auto;
+}
+.overlay-wrap .actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: end;
+    padding: 16px 24px;
+}
+.overlay-wrap .actions .button {
+    width: 100%;
+    height: 48px;
+}
+.overlay-wrap .image {
+    --icon-size: 80px;
+    color: var(--mobile-icon-primary);
+}
+.overlay-wrap .actions .button span {
+    font-weight: var(--mobile-font-label-underline);
+}
+.overlay-wrap .image:empty,
+.overlay-wrap .title:empty,
+.overlay-wrap .subtitle:empty,
+.overlay-wrap .content:empty,
+.overlay-wrap .actions:empty,
+.overlay-wrap .nav-title:empty,
+.overlay-wrap .header-title:empty {
+    display: none;
+}
+.mega-overlay .header {
+    padding: 24px;
+    box-sizing: border-box;
+}
+.header-title h2 {
+    font: var(--mobile-font-heading-h2);
+}
+.header-title h3 {
+    font: var(--mobile-font-heading-h3);
+}
+.header-title > * {
+    margin: 0;
+    color: var(--mobile-text-primary);
+}
+.overlay-wrap.warningb {
+    --mobile-elem-max-width: 514px;
+}
+
+/* Overridden component styles for webclient layout */
+.overlay-wrap {
+    transition: none;
+}
+.overlay-wrap.pm-overlay {
+    position: absolute;
+    display: none;
+    top: 0;
+    left: 0;
+    z-index: 220;
+}
+
+.overlay-wrap.active.pm-overlay {
+    display: flex;
+}
+
+.mega-overlay.pm-overlay .overlay {
+    height: initial;
+}
+
+.overlay-wrap.pm-overlay .main {
+    height: initial;
+    overflow: initial;
+}
+.overlay-wrap.pm-overlay .overlay {
+    padding: 0;
+    min-height: 100%;
+}
+.overlay-wrap.pm-overlay .main.centered {
+    max-width: 528px;
+    margin: auto;
+    padding: 0 24px;
+    box-sizing: border-box;
+}
+.overlay-wrap.pm-overlay .title h1,
+.overlay-wrap.pm-overlay .title h2 {
+    margin: 0;
+}
+.overlay-wrap.pm-overlay.ps {
+    min-width: initial;
+}
+.with-top-nav .header {
+    border-bottom: 1px solid var(--mobile-border-strong);
+}
+.overlay-wrap .actions button:last-child:nth-child(even) {
+    margin-top: 0;
+    margin-inline-end: 16px;
+    -webkit-margin-end: 16px;
+}
+.overlay-wrap .title h1,
+.overlay-wrap .title h2 {
+    margin: 0;
+}
+.overlay-wrap .sub-message {
+    color: var(--mobile-text-secondary);
+    font-size: 14px;
+}
+.overlay-wrap .content.ps {
+    padding-inline-end: 12px;
+    -webkit-pading-end: 12px;
+}
+.overlay-wrap .actions {
+    box-sizing: border-box;
+    flex-flow: row-reverse nowrap;
+}
+.overlay-wrap .actions.center {
+    justify-content: center;
+}
+
+.overlay-wrap .actions .button span {
+    font-weight: var(--mobile-font-weight-semibold);
+}
+.overlay-wrap.modal-dialog .main .title {
+    max-width: 100%;
+}
+.overlay-wrap.modal-dialog .main .title h2.text-container {
+    position: relative;
+    display: flex;
+    width: 100%;
+}
+.overlay-wrap .title h2.text-container > * {
+    margin-inline-start: 4px;
+    -webkit-margin-start: 4px;
+}
+.overlay-wrap.modal-dialog .main a {
+    color: var(--mobile-link-primary);
+}

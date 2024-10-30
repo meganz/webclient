@@ -537,7 +537,7 @@ var mobile = {
 
         var $otherPages = $('#fmholder > div:not(.top-menu-popup)');
         var $excludes = $('.mobile.file-manager-block, .mobile.top-menu-popup, .mega-header, .mega-top-menu, '
-            + '.mobile-rack' , '#mainlayout');
+            + '.rack' , '#mainlayout');
 
         // If logged in
         if (typeof u_attr !== 'undefined') {

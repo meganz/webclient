@@ -37,7 +37,7 @@ mobile.settings.account.lostAuthDevice = Object.create(mobile.settingsHelper, {
             }, dataNode);
 
             // Download recovery key button
-            new MegaMobileButton({
+            new MegaButton({
                 parentNode: dataNode,
                 componentClassname: 'form-button block ',
                 text: l.recovery_key_download_button
@@ -47,7 +47,7 @@ mobile.settings.account.lostAuthDevice = Object.create(mobile.settingsHelper, {
             });
 
             // Reset account button
-            new MegaMobileButton({
+            new MegaButton({
                 parentNode: dataNode,
                 componentClassname: 'form-button block secondary',
                 text: l.account_reset_label
@@ -63,7 +63,7 @@ mobile.settings.account.lostAuthDevice = Object.create(mobile.settingsHelper, {
             );
 
             // Resent email button
-            new MegaMobileButton({
+            new MegaButton({
                 parentNode: this.resetNode,
                 componentClassname: 'form-button block ',
                 text: l.resend_email

@@ -110,7 +110,7 @@ class MegaMobileDropdownItemList {
                 componentClassname: 'text-only list-item'
             };
 
-            const tappableListItem = new MegaMobileTappable(dItemContainerOptions);
+            const tappableListItem = new MegaInteractable(dItemContainerOptions);
             const targetNode = tappableListItem.domNode;
 
             targetNode.dataset.value = key;

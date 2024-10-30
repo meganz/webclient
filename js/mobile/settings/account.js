@@ -230,7 +230,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
             let btn;
 
             if (u_attr && !u_attr.pf && !u_attr.b) {
-                btn = new MegaMobileLink({
+                btn = new MegaLink({
                     parentNode: userInfoContainer,
                     href: 'pro',
                     componentClassname: 'upgrade outline',
@@ -242,7 +242,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
             else if (u_attr && (u_attr.b && u_attr.b.m && u_attr.b.s !== pro.ACCOUNT_STATUS_ENABLED
                 || u_attr.pf && u_attr.pf.s !== pro.ACCOUNT_STATUS_ENABLED)) {
 
-                btn = new MegaMobileLink({
+                btn = new MegaLink({
                     parentNode: userInfoContainer,
                     href: 'repay',
                     componentClassname: 'upgrade outline',
@@ -390,7 +390,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
             });
 
             // Log out button, see mobile-settings.css
-            const logout = new MegaMobileButton({
+            const logout = new MegaButton({
                 parentNode: this.domNode,
                 text: l.mobile_settings_log_out_button,
                 componentClassname: "mobile-log-out",
@@ -402,7 +402,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
             });
 
             // Version number
-            const version = new MegaMobileTappable({
+            const version = new MegaInteractable({
                 parentNode: this.domNode,
                 text: `v. ${  M.getSiteVersion()}`,
                 componentClassname: "mobile-mega-version text-only no-deco"

@@ -496,7 +496,7 @@ MegaData.prototype.getAccountDetails = function() {
             const {u_attr} = window;
 
             if (u_attr && typeof result === 'object') {
-                const upd = `b,mkt,p,pf,uspw,notifs`.split(',');
+                const upd = `b,features,mkt,notifs,p,pf,pwmh,uspw`.split(',');
 
                 for (let i = upd.length; i--;) {
                     const k = upd[i];

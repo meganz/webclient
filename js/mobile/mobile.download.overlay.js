@@ -160,7 +160,7 @@ mobile.downloadOverlay = {
         mega.ui.overlay.titleNode.classList.add('centered');
         mega.ui.overlay.imageNode.classList.add('centered');
 
-        const cancelTransfer = new MegaMobileButton({
+        const cancelTransfer = new MegaButton({
             parentNode: mega.ui.overlay.actionsNode,
             type: 'normal',
             componentClassname: 'block secondary',
@@ -446,7 +446,7 @@ mobile.downloadOverlay = {
         if (dl.io instanceof MemoryIO) {
             const openInBrowser = dlmanager.openInBrowser(dl);
 
-            const statusButton = new MegaMobileButton({
+            const statusButton = new MegaButton({
                 parentNode: mega.ui.overlay.actionsNode,
                 type: 'normal',
                 componentClassname: 'block',

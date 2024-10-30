@@ -42,7 +42,7 @@ mobile.settings.backupRecovery = Object.create(mobile.settingsHelper, {
             ], this.domNode);
 
             // Inline copy button
-            const copyButton = new MegaMobileButton({
+            const copyButton = new MegaButton({
                 parentNode: rkinput,
                 type: 'icon',
                 icon: 'sprite-mobile-fm-mono icon-square-copy',
@@ -55,7 +55,7 @@ mobile.settings.backupRecovery = Object.create(mobile.settingsHelper, {
             });
 
             // Download button
-            const dlButton = new MegaMobileButton({
+            const dlButton = new MegaButton({
                 parentNode: recoveryKeyContainer,
                 text: l.recovery_key_download_button,
                 componentClassname: 'primary block dlButton'

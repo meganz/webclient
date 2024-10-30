@@ -258,7 +258,7 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
                 featuresTableContents.append(ftRowCol1, ftRowCol2, ftRowCol3);
 
                 /* eslint-disable no-new */
-                new MegaMobileButton({
+                new MegaButton({
                     parentNode: ftRowCol3,
                     type: 'icon',
                     icon: 'sprite-fm-mono icon-check-small-regular-outline',
@@ -550,7 +550,7 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
             }
 
             /* eslint-disable no-new */
-            new MegaMobileButton({
+            new MegaButton({
                 parentNode: surveyButtons,
                 text: primaryBtnText,
                 componentClassname: 'block primary'
@@ -563,7 +563,7 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
                 }
             });
 
-            this.secondBtn = new MegaMobileButton({
+            this.secondBtn = new MegaButton({
                 parentNode: surveyButtons,
                 text: canContinueCancellation ? l.cancel_pro_continue : l.dont_cancel_sub_btn_label,
                 componentClassname: canContinueCancellation ? 'text-only' : 'block secondary',

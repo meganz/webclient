@@ -1,4 +1,4 @@
-class MegaMobileTopMenu extends MegaMobileComponent {
+class MegaMobileTopMenu extends MegaComponent {
 
     constructor(options) {
         super(options);
@@ -11,7 +11,7 @@ class MegaMobileTopMenu extends MegaMobileComponent {
         subNode.className = 'top-nav';
         this.domNode.appendChild(subNode);
 
-        const megaLink = new MegaMobileLink({
+        const megaLink = new MegaLink({
             parentNode: subNode,
             type: 'icon',
             componentClassname: 'text-icon home',
@@ -31,7 +31,7 @@ class MegaMobileTopMenu extends MegaMobileComponent {
             }
         });
 
-        const closeButton = new MegaMobileButton({
+        const closeButton = new MegaButton({
             parentNode: subNode,
             type: 'icon',
             componentClassname: 'text-icon close',
@@ -72,7 +72,7 @@ class MegaMobileTopMenu extends MegaMobileComponent {
 
         if (u_attr) {
 
-            const accountTabletLink = new MegaMobileLink({
+            const accountTabletLink = new MegaLink({
                 ...menuOpts,
                 text: l[403],
                 href: '/fm/account',
@@ -126,7 +126,7 @@ class MegaMobileTopMenu extends MegaMobileComponent {
                     text: l.mobile_settings_lang_title,
                     subtext: languages[lang][2],
                     icon: 'sprite-mobile-fm-mono icon-globe-01-thin-outline',
-                    binding: mobile.languageMenu.init
+                    binding: is_mobile && mobile.languageMenu.init
                 },
                 {
                     text: l[823],
@@ -156,13 +156,13 @@ class MegaMobileTopMenu extends MegaMobileComponent {
                 {
                     text: l.mobile_settings_appearance_title,
                     icon: 'sprite-mobile-fm-mono icon-palette-thin-outline',
-                    binding: mobile.appearance.init
+                    binding: is_mobile && mobile.appearance.init
                 },
                 {
                     text: l.mobile_settings_lang_title,
                     subtext: languages[lang][2],
                     icon: 'sprite-mobile-fm-mono icon-globe-01-thin-outline',
-                    binding: mobile.languageMenu.init
+                    binding: is_mobile && mobile.languageMenu.init
                 },
                 {
                     text: l.log_in,
@@ -176,7 +176,7 @@ class MegaMobileTopMenu extends MegaMobileComponent {
         for (const item of menuItems) {
             // Infer the tappable type
             if (item.binding) {
-                menuItem = new MegaMobileButton({
+                menuItem = new MegaButton({
                     ...menuOpts,
                     ...item,
                     parentNode: menuNode
@@ -189,7 +189,7 @@ class MegaMobileTopMenu extends MegaMobileComponent {
                 });
             }
             else {
-                menuItem = new MegaMobileLink({
+                menuItem = new MegaLink({
                     ...menuOpts,
                     ...item,
                     parentNode: menuNode
@@ -287,7 +287,7 @@ class MegaMobileTopMenu extends MegaMobileComponent {
     }
 
     static getPageRoot() {
-        const {active: selActive, origin: selOrigin} = mobile.nodeSelector;
+        const {active: selActive, origin: selOrigin} = is_mobile && mobile.nodeSelector || {};
         const page = selActive ? `fm/${selOrigin}` : window.page;
         const root = selActive ? M.getNodeRoot(selOrigin) : M.currentrootid;
 

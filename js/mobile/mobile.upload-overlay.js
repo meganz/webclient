@@ -92,7 +92,7 @@ mobile.uploadOverlay = {
         mega.ui.overlay.titleNode.classList.add('centered');
 
         const closeButton = mega.ui.overlay.domNode.querySelector('.close').component;
-        closeButton.rebind('tap.closeOverlay', () => {
+        closeButton.rebind('click.closeOverlay', () => {
             this.confirmClose();
         });
     },
@@ -194,7 +194,7 @@ mobile.uploadOverlay = {
             mega.ui.overlay.titleNode.classList.add('centered');
 
             mega.ui.overlay.clearActions();
-            const uploadMoreButton = new MegaMobileButton({
+            const uploadMoreButton = new MegaButton({
                 parentNode: mega.ui.overlay.actionsNode,
                 componentClassname: 'secondary',
                 type: 'normal',
@@ -217,7 +217,7 @@ mobile.uploadOverlay = {
                         onClick: onClick
                     } = this.actions[i];
 
-                    const button = new MegaMobileButton({
+                    const button = new MegaButton({
                         parentNode: mega.ui.overlay.actionsNode,
                         type: type || 'normal',
                         componentClassname: className || '',

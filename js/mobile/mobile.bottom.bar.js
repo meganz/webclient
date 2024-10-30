@@ -1,4 +1,4 @@
-class MegaMobileBottomBar extends MegaMobileComponent {
+class MegaMobileBottomBar extends MegaComponent {
 
     constructor(options) {
 
@@ -16,7 +16,7 @@ class MegaMobileBottomBar extends MegaMobileComponent {
 
         const buildAction = (options) => {
 
-            const buttonAction = new MegaMobileButton(options);
+            const buttonAction = new MegaButton(options);
 
             if (typeof options.binding === 'function') {
                 buttonAction.on('tap', options.binding);

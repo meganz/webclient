@@ -1,13 +1,14 @@
-class MegaMobileOverlay extends MegaMobileComponent {
+class MegaMobileOverlay extends MegaComponent {
 
     constructor(options) {
+
         super(options);
 
         if (!this.domNode) {
             return;
         }
 
-        this.domNode.classList.add('custom-alpha', 'overlay-wrap');
+        this.addClass('custom-alpha', 'overlay-wrap');
 
         let targetNode = this.domNode;
         let subNode = document.createElement('div');
@@ -17,13 +18,24 @@ class MegaMobileOverlay extends MegaMobileComponent {
 
         targetNode = overlay;
 
-        this.closeButton = new MegaMobileButton({
+        subNode = document.createElement('div');
+        subNode.className = 'header';
+        targetNode.appendChild(subNode);
+        targetNode = subNode;
+
+        this.headerTitleNode = subNode = document.createElement('div');
+        subNode.className = 'header-title';
+        targetNode.appendChild(subNode);
+
+        this.closeButton = new MegaButton({
             parentNode: targetNode,
             type: 'icon',
             componentClassname: 'text-icon close',
             icon: 'sprite-mobile-fm-mono icon-dialog-close',
             iconSize: 24
         });
+
+        targetNode = overlay;
 
         subNode = document.createElement('div');
         subNode.className = 'main';
@@ -54,7 +66,7 @@ class MegaMobileOverlay extends MegaMobileComponent {
     }
 
     get visible() {
-        return this.domNode.classList.contains('active');
+        return this.hasClass('active');
     }
 
     show(options) {
@@ -81,8 +93,16 @@ class MegaMobileOverlay extends MegaMobileComponent {
 
             this.name = options.name || '';
 
+            if (options.navImage) {
+                this.addNavImage(options.navImage, true);
+            }
+
             if (options.icon) {
                 this.addImage(options.icon);
+            }
+
+            if (options.header) {
+                this.addHeader(options.header, options.headerType);
             }
 
             if (options.title) {
@@ -101,21 +121,23 @@ class MegaMobileOverlay extends MegaMobileComponent {
                         type: type,
                         text: text,
                         className: className,
-                        onClick: onClick
+                        onClick: onClick,
+                        icon
                     } = options.actions[i];
 
-                    const button = new MegaMobileButton({
+                    const button = new MegaButton({
                         parentNode: this.actionsNode,
                         type: type || 'normal',
                         componentClassname: className || '',
-                        text: text
+                        text,
+                        icon
                     });
 
-                    _bindEvent(onClick, button, 'tap.overlayAction');
+                    _bindEvent(onClick, button, 'click.overlayAction');
                 }
             }
 
-            _bindEvent(options.onClose, this, 'close.mobileOverlay');
+            _bindEvent(options.onClose, this, 'close.overlay');
 
             if (options.actionOnBottom) {
                 this.domNode.classList.add('action-button-bottom');
@@ -124,7 +146,7 @@ class MegaMobileOverlay extends MegaMobileComponent {
             _bindEvent(options.onShow);
         }
 
-        this.closeButton.rebind('tap.closeOverlay', async() => {
+        this.closeButton.rebind('click.closeOverlay', async() => {
             // If the overlay requires a confirmation action before closing it,
             // wait for the user's response before trying to close the overlay
             if (options && options.confirmClose) {
@@ -141,7 +163,7 @@ class MegaMobileOverlay extends MegaMobileComponent {
             this.trigger('close');
         });
 
-        this.domNode.classList.add('active');
+        this.addClass('active');
 
         if (mega.flags.ab_ads) {
             mega.commercials.updateOverlays(undefined, true);
@@ -149,7 +171,7 @@ class MegaMobileOverlay extends MegaMobileComponent {
     }
 
     hide() {
-        this.domNode.classList.remove('active');
+        this.removeClass('active');
 
         mainlayout.classList.remove('fm-overlay');
         document.documentElement.classList.remove('overlayed');
@@ -160,6 +182,7 @@ class MegaMobileOverlay extends MegaMobileComponent {
     }
 
     clear() {
+        this.clearHeader();
         this.clearTitle();
         this.clearSubTitle();
         this.clearImage();
@@ -167,7 +190,7 @@ class MegaMobileOverlay extends MegaMobileComponent {
         this.clearActions();
         this.clearUserEvents();
 
-        this.domNode.classList.remove('action-button-bottom');
+        this.removeClass('action-button-bottom');
     }
 
     // Methods for each of its elements
@@ -203,6 +226,17 @@ class MegaMobileOverlay extends MegaMobileComponent {
         this.titleNode.className = 'title';
     }
 
+    addHeader(title, headerType) {
+        this.clearHeader();
+        const subNode = document.createElement(headerType || 'h2');
+        subNode.textContent = title;
+        this.headerTitleNode.appendChild(subNode);
+    }
+
+    clearHeader() {
+        this.headerTitleNode.textContent = '';
+    }
+
     addSubTitle(subtitle) {
         this.clearSubTitle();
         if (subtitle) {
@@ -227,7 +261,16 @@ class MegaMobileOverlay extends MegaMobileComponent {
         this.imageNode.append(elem);
     }
 
+    addNavImage(imageClass, icon = true) {
+        const elem = document.createElement('i');
+        elem.className = icon ? `icon ${imageClass}` : imageClass;
+        this.headerTitleNode.appendChild(elem);
+    }
+
     addContent(content, clear) {
+        if (!content) {
+            return;
+        }
         if (typeof content === 'string') {
             content = document.createTextNode(content);
         }
@@ -256,16 +299,29 @@ class MegaMobileOverlay extends MegaMobileComponent {
         if (clear) {
             this.clearActions();
         }
-        const buttonClassList = ['nav-elem', 'normal', 'button'];
-        for (let i = actions.length; i--;) {
-            const button = actions[i];
-            button.classList.add(...buttonClassList);
-            this.actionsNode.insertBefore(button, this.actionsNode.firstChild);
+
+        const res = [];
+
+        for (let i = 0; i < actions.length; i++) {
+
+            const interactable = actions.href ? MegaLink : MegaButton;
+            const buttonProps = {
+                ...actions[i],
+                parentNode: this.actionsNode,
+                componentClassname: `${actions[i].componentClassname || 'primary'} nav-elem normal button`
+            };
+
+            const btn = new interactable(buttonProps);
+
+            res.push(btn);
         }
+
+        return res;
     }
 
     clearActions() {
         this.actionsNode.textContent = '';
+        this.actionsNode.className = 'actions';
     }
 
     // Other util methods
@@ -277,7 +333,7 @@ class MegaMobileOverlay extends MegaMobileComponent {
     }
 
     clearUserEvents() {
-        this.off('close.mobileOverlay');
+        this.off('close.overlay');
     }
 }
 

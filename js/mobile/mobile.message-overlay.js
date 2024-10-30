@@ -1,7 +1,7 @@
 /**
  * Shows a custom message e.g. error or success message in a popup overlay
  */
-mobile.messageOverlay = (() => {
+var megaMsgDialog = (() => {
     'use strict';
 
     let targetSheet;
@@ -16,7 +16,7 @@ mobile.messageOverlay = (() => {
      *
      * @param {Object} callbacks Argument object of callbacks.
      * @param {Bool|*} callbackArg The argument(s) provided to the onInteraction callback.
-     * @param {MegaMobileButton} [actionButton] The button the handler is applied too.
+     * @param {MegaButton} [actionButton] The button the handler is applied too.
      * @param {number} [index] The index of the button provided to the callback.
      *
      * @returns {Function}
@@ -56,7 +56,7 @@ mobile.messageOverlay = (() => {
      */
     function renderCheckbox(checkboxCallback) {
         if (checkboxCallback && typeof checkboxCallback === 'function') {
-            const checkboxNode = new MegaMobileCheckbox({
+            const checkboxNode = new MegaCheckbox({
                 parentNode: targetSheet.actionsNode,
                 componentClassname: 'mega-checkbox',
                 checkboxName: 'show-again',
@@ -129,15 +129,18 @@ mobile.messageOverlay = (() => {
     function renderButtons(callbacks) {
         let subNode;
         if (confirmButton) {
-            subNode = new MegaMobileButton(confirmButton);
-            subNode.on('tap', closeHandler(callbacks, true, subNode));
+            subNode = new MegaButton(confirmButton);
+            subNode.on('click', closeHandler(callbacks, true, subNode));
         }
 
-        if (buttons) {
+        if (buttons.length) {
             for (let i = 0; i < buttons.length; i++) {
-                subNode = new MegaMobileButton(buttons[i]);
-                subNode.on('tap', closeHandler(callbacks, false, subNode, i));
+                subNode = new MegaButton(buttons[i]);
+                subNode.on('click', closeHandler(callbacks, false, subNode, i));
             }
+        }
+        else {
+            mega.ui.sheet.actionsNode.classList.add('center');
         }
     }
 
@@ -166,13 +169,8 @@ mobile.messageOverlay = (() => {
          * @returns {undefined}
          */
         render: function(title, message, subMessage, callbacks, options, safeShow, closeButton) {
-            let dialogName;
-            if (title) {
-                dialogName = title.toLowerCase().replace(/\s+/g, '');
-            }
-            else {
-                dialogName = Math.random();
-            }
+            const dialogName = title && typeof title === 'string' ?
+                title.toLowerCase().replace(/\s+/g, '') : Math.random();
 
             const _sheet = () => {
                 targetSheet = mega.ui.sheet;
@@ -279,3 +277,7 @@ mobile.messageOverlay = (() => {
         }
     };
 })();
+
+if (is_mobile) {
+    mobile.messageOverlay = megaMsgDialog;
+}

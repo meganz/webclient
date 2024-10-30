@@ -37,6 +37,7 @@ get_core_tokens() {
         BEGIN {
                 print "/* general */"
                 print "body,"
+                print ":host(.mega-shadow-dom),"
                 print ".custom-alpha {"
             }
             {

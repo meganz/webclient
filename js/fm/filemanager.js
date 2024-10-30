@@ -1007,7 +1007,7 @@ FileManager.prototype.initFileManagerUI = function() {
         if ($.hideTopMenu) {
             $.hideTopMenu(e);
         }
-        if (M.chat) {
+        if (M.chat || M.currentdirid === 'pwm') {
             // chat can handle its own links..no need to return false on every "click" and "element" :O
             // halt early, to save some CPU cycles if in chat.
             return;
@@ -1096,7 +1096,8 @@ FileManager.prototype.initFileManagerUI = function() {
             'backups':         {root: 'backups',   prev: null},
             'rubbish-bin':     {root: M.RubbishID, prev: null},
             'backup-center':   {root: 'devices', prev: null},
-            'file-requests':   {root: 'file-requests',    prev: null}
+            'file-requests':   {root: 'file-requests',    prev: null},
+            'pwm':             {root: 'pwm',    prev: null}
         });
 
         this.fmTabPages = deepFreeze(
@@ -1531,6 +1532,9 @@ FileManager.prototype.updFileManagerUI = async function() {
             }
         }
 
+        if (UImain === 'pwm' && mega.ui.pm && mega.pwmh) {
+            tryCatch(() => mega.ui.pm.list.initLayout().catch(reportError))();
+        }
     }
 
     if (u_type === 0) {
@@ -2956,7 +2960,7 @@ FileManager.prototype.initUIKeyEvents = function() {
     "use strict";
 
     $(window).rebind('keydown.uikeyevents', function(e) {
-        if ((M.chat && !$.dialog) || M.isAlbumsPage()) {
+        if ((M.chat && !$.dialog) || M.isAlbumsPage() || M.currentrootid === 'pwm') {
             return true;
         }
 

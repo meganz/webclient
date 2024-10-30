@@ -1,0 +1,96 @@
+.subscription-content-title {
+    font: var(--mobile-font-copy-bold);
+    text-align: start;
+    margin-bottom: 16px;
+}
+.benefits-list {
+    display: flex;
+    text-align: start;
+    padding: 8px 0;
+    color: var(--mobile-text-secondary);
+}
+.benefits-list i {
+    margin-inline-end: 16px;
+    -webkit-margin-end: 16px;
+    --icon-size: 24px;
+    color: var(--mobile-button-brand);
+}
+.mega-sheet.overlay-wrap.free-trial .title h2 {
+    font: var(--mobile-font-heading-h1);
+    margin-bottom: 24px;
+}
+.timeline-container h3 {
+    font: var(--mobile-font-heading-h3);
+    color: var(--mobile-text-primary);
+    margin: 0 0 16px;
+    text-align: start;
+}
+.timeline-item {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    grid-template-rows: repeat(2, auto);
+    gap: 4px 16px;
+    margin-bottom: 8px;
+}
+.timeline-icon {
+    grid-area: 1 / 1 / 2 / 2;
+    --icon-size: 24px;
+    color: var(--mobile-button-brand);
+}
+p.timeline-day {
+    grid-area: 1 / 2 / 2 / 3;
+    text-align: start;
+    font: var(--mobile-font-copy-bold);
+    margin: 0;
+}
+.timeline-bar {
+    grid-area: 2 / 1 / 3 / 2;
+    width: 0;
+    height: 44px;
+    border-right: 2px solid var(--mobile-border-strong);
+    border-radius: var(--mobile-border-radius-circle);
+    place-self: start center;
+}
+.timeline-description {
+    grid-area: 2 / 2 / 3 / 3;
+    text-align: start;
+    margin: 0;
+    color: var(--mobile-text-secondary);
+}
+
+.overlay-wrap.free-trial .main,
+.overlay-wrap.subscription-dialog .main {
+    padding: 40px;
+    box-sizing: border-box;
+}
+
+.overlay-wrap.free-trial .actions .button,
+.overlay-wrap.subscription-dialog .actions .button {
+    width: auto;
+    margin: inherit;
+}
+
+.overlay-wrap.free-trial .actions,
+.overlay-wrap.subscription-dialog .actions {
+    padding: 0 40px 40px;
+    margin-top: 0;
+}
+
+.mega-sheet.free-trial .sheet,
+.mega-sheet.subscription-dialog .sheet {
+    padding: 0;
+    max-width: 600px;
+}
+
+.pwm-image {
+    background: url('../../images/pm/plan-subscription.png') center / cover no-repeat;
+    width: 100%;
+    height: 200px;
+    display: block;
+    border-radius: var(--mobile-border-radius-large)
+                    var(--mobile-border-radius-large) 0 0;
+}
+
+.overlay-wrap.free-trial .header-title {
+    margin-bottom: 0;
+}

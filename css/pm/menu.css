@@ -1,0 +1,18 @@
+.menu-container.overlay-wrap {
+    background-color: var(--mobile-surface-1);
+    height: auto;
+    width: max-content;
+    border-radius: var(--mobile-border-radius-large);
+    align-items: start;
+    position: absolute;
+    overflow-y: auto;
+    transition: none;
+}
+
+/* Overridden component styles for webclient layout */
+
+.menu-container.overlay-wrap {
+    background-color: var(--mobile-page-background);
+    border: 1px solid var(--mobile-border-strong);
+    box-shadow: var(--mobile-shadow-medium);
+}

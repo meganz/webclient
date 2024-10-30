@@ -1,4 +1,4 @@
-class MegaMobileContextMenu extends MegaMobileComponentGroup {
+class MegaMobileContextMenu extends MegaComponentGroup {
 
     constructor() {
 
@@ -39,7 +39,7 @@ class MegaMobileContextMenu extends MegaMobileComponentGroup {
                 rightIconSize: item.subMenu ? '24' : ''
             };
 
-            const tappableListItem = new MegaMobileButton(options);
+            const tappableListItem = new MegaButton(options);
 
             this.addChild(key, tappableListItem);
 

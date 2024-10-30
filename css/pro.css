@@ -1854,20 +1854,20 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
 .payment-section.free-trial .mega-button.purchase {
     margin-left: 0;
 }
-.payment-section .third-section.vpn-only .mega-button.purchase {
+.payment-section .third-section.feature-only .mega-button.purchase {
     margin-left: 0;
 }
 .payment-section.mobile .mega-button.purchase {
     max-width: 368px;
     width: 100%;
 }
-.bottom-page.pricing-page.third-section.vpn-only > .continue-section {
+.bottom-page.pricing-page.third-section.feature-only > .continue-section {
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 0 90px;
 }
-.bottom-page.pricing-page.third-section.vpn-only > .continue-section > *:not(.local-currency-tip) {
+.bottom-page.pricing-page.third-section.feature-only > .continue-section > *:not(.local-currency-tip) {
     align-self: flex-start;
 }
 .payment-page.info-block .provider-details {

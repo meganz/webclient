@@ -268,6 +268,9 @@ var pro = {
                     }
 
                     // Store globally
+                    if (d && localStorage.useDevOptions) {
+                        pro.applyDevSettings();
+                    }
                     pro.membershipPlans = plans;
                     if (d && localStorage.useDevOptions) {
                         pro.applyDevSettings();
@@ -1077,7 +1080,7 @@ lazy(pro, 'filter', () => {
                 ]),
 
             validFeatures: new Set([
-                pro.ACCOUNT_LEVEL_FEATURE_VPN
+                pro.ACCOUNT_LEVEL_FEATURE_VPN, pro.ACCOUNT_LEVEL_FEATURE_PWM,
             ]),
 
             // all: 11, 12, 13, 4, 1, 2, 3, 101, 100 - all currently available plans
@@ -1165,6 +1168,10 @@ lazy(pro, 'filter', () => {
             // Plans that can show on the pricing page that come under the MEGA VPN tab
             vpnTab: new Set([
                 pro.ACCOUNT_LEVEL_FEATURE_VPN,
+            ]),
+            // Plans that can show on the pricing page that come under the MEGA PWM tab
+            pwmTab: new Set([
+                pro.ACCOUNT_LEVEL_FEATURE_PWM,
             ]),
 
             // generalStringPlans: 11, 12, 13, 4, 1, 2, 3 - plans that use the general strings for plan information
@@ -1318,6 +1325,37 @@ lazy(pro, 'featureInfo', () => {
             },
             {
                 text: l.servers_around_globe
+            },
+        ],
+        '100001-trial': [
+            {
+                icon: 'sprite-fm-mono icon-lock',
+                text: l.free_trial_today_desc
+            },
+            {
+                icon: 'sprite-fm-mono icon-notification',
+                text: l.email_before_trial_end
+            },
+            {
+                icon: 'sprite-fm-mono icon-star',
+                text: l.free_trial_end_desc,
+                getText(planInfo) {
+                    return this.text.replace('%1', time2date((Date.now() / 1000) + planInfo.days * 24 * 60 * 60, 2));
+                }
+            },
+        ],
+        '100001': [
+            {
+                icon: 'icon-password-input',
+                text: l.pwm_cancel_subfeature1
+            },
+            {
+                icon: 'icon-file-edit-lined',
+                text: l.pwm_cancel_subfeature2
+            },
+            {
+                icon: 'icon-sync-large',
+                text: l.sync_log_across_devices
             },
         ],
     };

@@ -1777,6 +1777,20 @@ mBroadcaster.addListener('crossTab:owner', function _setup() {
     };
 });
 
+// Update account UI on other tabs when cancelling subscription
+mBroadcaster.addListener('crossTab:cancelSub', () => {
+    'use strict';
+
+    // Fetch new account data
+    if (M.account) {
+        M.account.lastupdate = 0;
+    }
+
+    if (page.indexOf('fm/account') === 0) {
+        accountUI();
+    }
+});
+
 /**
  * Simple alias that will return a random number in the range of: a < b
  *

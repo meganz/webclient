@@ -1,4 +1,4 @@
-lazy(pro.proplan2, 'vpn', () => {
+lazy(pro.proplan2, 'feature', () => {
     'use strict';
 
     /**
@@ -24,17 +24,15 @@ lazy(pro.proplan2, 'vpn', () => {
     return {
         /**
          * @param {Array} plan VPN plan to work with
-         * @param {jQuery} $parentPage Page container
          * @param {Function} callback Callback function to execute on buy btn click
          * @returns {void}
          */
-        renderPricingPage: (plan, $parentPage, callback) => {
-            const $vpnContainer = $('.pricing-pg.pricing-vpn-plan-container', $parentPage);
-            let cardsContainer = $('.pricing-pg.plans-cards-container', $vpnContainer);
+        renderPricingPage: (plan, callback, extras) => {
 
-            if (cardsContainer.length) {
-                return;
-            }
+            const {cardFeatures, $featureContainer, btnText, cardId, moreLinkInfo, clickName, title} = extras;
+            const {moreClass, moreText, moreLink} = moreLinkInfo;
+
+            let cardsContainer;
 
             const hasLocal = !!plan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
             const priceCurrency = (
@@ -49,19 +47,13 @@ lazy(pro.proplan2, 'vpn', () => {
                 'narrowSymbol'
             );
 
-            const cardFeatures = [
-                { i: 'icon-shield-thin-outline', t: l.vpn_choose_title4 },
-                { i: 'icon-zap-thin-outline', t: l.vpn_choose_title3 },
-                { i: 'icon-globe-americas-thin-outline', t: l.vpn_choose_title1 }
-            ];
-
             cardsContainer = createEl(['pricing-pg', 'plans-cards-container']);
             const cardWrapper = createEl(['pricing-plan-card-wrapper']);
 
             const card = createEl(['pricing-plan-card', 'popular']);
-            card.id = `vpn-monthly`;
+            card.id = cardId;
             card.appendChild(createEl(['pricing-plan-recommend'], l.introductory_price));
-            card.appendChild(createEl(['pricing-plan-title'], l.mega_vpn));
+            card.appendChild(createEl(['pricing-plan-title'], title));
             card.appendChild(createEl(['pricing-plan-only'], l.pr_only));
 
             const price = createEl(['pricing-plan-price']);
@@ -79,10 +71,10 @@ lazy(pro.proplan2, 'vpn', () => {
             const features = createEl(['pricing-plan-features']);
 
             for (let k = 0; k < cardFeatures.length; k++) {
-                const { i, t } = cardFeatures[k];
+                const {icon, text} = cardFeatures[k];
                 const row = createEl(['flex', 'flex-row', 'items-center']);
-                row.appendChild(createEl(['sprite-fm-mono', i], null, 'i'));
-                row.appendChild(createEl(['flex-1'], t));
+                row.appendChild(createEl(['sprite-fm-mono', icon], null, 'i'));
+                row.appendChild(createEl(['flex-1'], text));
                 features.appendChild(row);
             }
 
@@ -90,14 +82,11 @@ lazy(pro.proplan2, 'vpn', () => {
             // TODO: Make this dynamic based on if the plan has a trial or not
             const btn = createEl(
                 ['pricing-plan-btn'],
-                // planExtras.trial
-                //     ? mega.icu.format(l.try_free_for_days, planExtras.trial.days)
-                //     : l.pr_buy_vpn,      // uncomment this
-                mega.icu.format(l.try_free_for_days, 7),        // remove this
+                btnText,
                 'button');
             const moreContainer = createEl(['relative']);
-            const more = createEl(['vpn-read-more', 'absolute', '-top-8'], l.vpn_more, 'a');
-            more.href = 'https://mega.io/vpn';
+            const more = createEl([moreClass, 'absolute', '-top-8'], moreText, 'a');
+            more.href = moreLink;
             more.target = '_blank';
 
             moreContainer.appendChild(more);
@@ -110,19 +99,106 @@ lazy(pro.proplan2, 'vpn', () => {
 
             cardsContainer.appendChild(cardWrapper);
 
-            $vpnContainer.safeAppend($(cardsContainer).prop('outerHTML'));
+            $featureContainer.safeAppend($(cardsContainer).prop('outerHTML'));
 
-            $('.pricing-plan-btn', $vpnContainer)
-                .rebind('click.vpnPricing', callback.bind(null, pro.ACCOUNT_LEVEL_FEATURE_VPN));
+            $('.pricing-plan-btn', $featureContainer)
+                .rebind(`click.${clickName}`, callback.bind(null, plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL]));
 
             if (hasLocal) {
-                $vpnContainer.safeAppend(
-                    $(createEl(['pricing-flexi-block-card-note', 'text-center'], `*${l.est_price_acc_billed_euro}`))
+                $featureContainer.safeAppend(
+                    $(createEl(['pricing-flexi-block-card-note', 'text-center'], `*${l[18770]}`))
                         .prop('outerHTML')
                 );
             }
+            return $('.pricing-plan-card-wrapper', $featureContainer);
+        }
+    };
+});
 
-            return $('.pricing-plan-card-wrapper', $vpnContainer);
+lazy(pro.proplan2, 'vpn', () => {
+    'use strict';
+    return {
+        renderPricingPage: (plan, $parentPage, callback) => {
+            const $featureContainer = $('.pricing-pg.pricing-feature-plan-container.vpn', $parentPage);
+            const cardsContainer = $('.pricing-pg.plans-cards-container', $featureContainer);
+
+            if (cardsContainer.length) {
+                return;
+            }
+
+            const cardFeatures = [
+                {icon: 'icon-shield-thin-outline', text: l.vpn_choose_title4},
+                {icon: 'icon-zap-thin-outline', text: l.vpn_choose_title3},
+                {icon: 'icon-globe-americas-thin-outline', text: l.vpn_choose_title1}
+            ];
+            // const btnText = plan[pro.UTQA_RES_INDEX_EXTRAS].trial
+            //     ? mega.icu.format(l.try_free_for_days, plan[pro.UTQA_RES_INDEX_EXTRAS].trial.days)
+            //     : l.pr_buy_vpn;
+            const btnText = mega.icu.format(l.try_free_for_days, 7);
+            const cardId = 'vpn-monthly';
+            const moreClass = 'vpn-read-more';
+            const moreText = l.vpn_more;
+            const moreLink = 'https://mega.io/vpn';
+            const clickName = 'vpnPricing';
+            const title = l.mega_vpn;
+
+            const extras = {
+                $featureContainer,
+                cardFeatures,
+                btnText,
+                cardId,
+                moreLinkInfo: {
+                    moreClass,
+                    moreText,
+                    moreLink
+                },
+                clickName,
+                title,
+            };
+
+            return pro.proplan2.feature.renderPricingPage(plan, callback, extras);
+        }
+    };
+});
+
+lazy(pro.proplan2, 'pwm', () => {
+    'use strict';
+    return {
+        renderPricingPage: (plan, $parentPage, callback) => {
+            const $featureContainer = $('.pricing-pg.pricing-feature-plan-container.pwm', $parentPage);
+            const cardsContainer = $('.pricing-pg.plans-cards-container', $featureContainer);
+
+            if (cardsContainer.length) {
+                return;
+            }
+
+            const cardFeatures = pro.featureInfo[plan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL]];
+            // const btnText = plan[pro.UTQA_RES_INDEX_EXTRAS].trial
+            //     ? mega.icu.format(l.try_free_for_days, plan[pro.UTQA_RES_INDEX_EXTRAS].trial.days)
+            //     : "Buy MEGA\u00a0PWM";
+            const btnText = mega.icu.format(l.try_free_for_days, 14);
+            const cardId = 'pwm-monthly';
+            const moreClass = 'pwm-read-more';
+            const moreText = l.pwm_more;
+            const moreLink = 'https://mega.io/pass';
+            const clickName = 'pwmPricing';
+            const title = l.mega_pwm;
+
+            const extras = {
+                $featureContainer,
+                cardFeatures,
+                btnText,
+                cardId,
+                moreLinkInfo: {
+                    moreClass,
+                    moreText,
+                    moreLink
+                },
+                clickName,
+                title,
+            };
+
+            return pro.proplan2.feature.renderPricingPage(plan, callback, extras);
         }
     };
 });

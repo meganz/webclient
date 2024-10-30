@@ -60,6 +60,7 @@ lazy(pro, 'proplan2', () => {
 
     let ProFlexiFound = false;
     let VpnPlanFound = false;
+    let PwmPlanFound = false;
 
     /**
      * @type {PricingPageInformation}
@@ -132,6 +133,21 @@ lazy(pro, 'proplan2', () => {
             $planCardsContainer: null,
             $planCards: null,
             isAvailable: () => !!VpnPlanFound,
+            updateTabVisibility(hide) {
+                tabsFunctions.updateTabVisibility(this, hide);
+            },
+        },
+        'pwm': {
+            key: 'pwm',
+            tabID: 'pr-pwm-tab',
+            tabControlName: 'tab-ctrl-pwm',
+            requiresUpdate: true,
+            initialized: false,
+            $tab: null,
+            $tabItems: null,
+            $planCardsContainer: null,
+            $planCards: null,
+            isAvailable: () => !!PwmPlanFound,
             updateTabVisibility(hide) {
                 tabsFunctions.updateTabVisibility(this, hide);
             },
@@ -274,13 +290,26 @@ lazy(pro, 'proplan2', () => {
 
     /**
      * Checks whether account has got a feature enabled
-     * @param {String} featureKey The name of the feature to check
-     * @returns {Array<String|Number>|Boolean}
+     * @param {?String} featureKey The name of the feature to check. If not provided, returns all features as a set
+     * @returns {Array<String|Number>|Boolean|Set<String>}
      */
-    const getUserFeature = (featureKey) => !!u_attr
-        && Array.isArray(u_attr.features)
-        && u_attr.features.find(([, f]) => f === featureKey)
-        || false;
+    const getUserFeature = (featureKey) => {
+        if (typeof featureKey === 'number') {
+            featureKey = featureKey === pro.ACCOUNT_LEVEL_FEATURE_VPN && 'vpn'
+                || featureKey === pro.ACCOUNT_LEVEL_FEATURE_PWM && 'pwm';
+        }
+
+        if (featureKey) {
+            return !!u_attr
+                && Array.isArray(u_attr.features)
+                && u_attr.features.find(([, f]) => f === featureKey)
+                || false;
+        }
+        // Return as a set in case there are any duplicates
+        return !!u_attr
+            && Array.isArray(u_attr.features)
+            && new Set(u_attr.features.map(([, f]) => f));
+    };
 
     const moveToBuyStep = (planId) => {
         pro.proplan2.selectedPlan = planId;
@@ -338,10 +367,10 @@ lazy(pro, 'proplan2', () => {
 
             target.classList.add('selected');
 
-            // 0 - Indidivual, 1 - Business, 2 - Exclusive Offers, 3 - VPN
+            // 0 - Indidivual, 1 - Business, 2 - Exclusive Offers, 3 - VPN, 4 - PWM
             let tab = 0;
 
-            $page.removeClass('business individual exc-offer vpn-tab');
+            $page.removeClass('business individual exc-offer vpn-tab pwm-tab');
 
             // Hide the content of just the last shown tab
             if (pageInformation.currentTab) {
@@ -363,6 +392,9 @@ lazy(pro, 'proplan2', () => {
             else if (target.id === tabsInfo.vpn.tabID) {
                 tab = 3; // VPN
             }
+            else if (target.id === tabsInfo.pwm.tabID) {
+                tab = 4; // PWM
+            }
 
             if (tab === 1 && tabAvailable('bsn')) {
                 tabsFunctions.updatePage('bsn');
@@ -378,6 +410,15 @@ lazy(pro, 'proplan2', () => {
                     tabsInfo.vpn.requiresUpdate = true;
                 }
                 tabsFunctions.updatePage('vpn');
+            }
+            else if (tab === 4 && tabAvailable('pwm')) {
+                if (!tabsInfo.pwm.initialized) {
+                    tabsInfo.pwm.$planCards = pro.proplan2.pwm.renderPricingPage(PwmPlanFound, $page, moveToBuyStep);
+                    tabsInfo.pwm.initialized = true;
+                    tabsInfo.pwm.updateTabVisibility();
+                    tabsInfo.pwm.requiresUpdate = true;
+                }
+                tabsFunctions.updatePage('pwm');
             }
             else {
                 console.assert(tab === 0, 'Tab not able to show:', tab);
@@ -1151,12 +1192,15 @@ lazy(pro, 'proplan2', () => {
                 ProFlexiFound = currentPlan;
                 continue;
             }
-
             if (planNum === pro.ACCOUNT_LEVEL_FEATURE_VPN && currentPlan[pro.UTQA_RES_INDEX_MONTHS] === 1) {
                 VpnPlanFound = currentPlan;
                 if (!localPriceInfo) {
                     localPriceInfo = currentPlan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY];
                 }
+                continue;
+            }
+            if (planNum === pro.ACCOUNT_LEVEL_FEATURE_PWM && currentPlan[pro.UTQA_RES_INDEX_MONTHS] === 1) {
+                PwmPlanFound = currentPlan;
                 continue;
             }
 

@@ -2,125 +2,117 @@
 // History Panel
 // --------------------------------------------------------------------
 
-&.chat-opened {
-    /* [...] */
+.sidebar-head {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
 
-    .sidebar-head {
-        position: absolute;
-        top: 0;
-        left: 0;
+.in-call {
+    display: flex;
+    align-items: start;
+    margin-top: 52px;
 
-        body.rtl & {
-            width: calc(100% - 32px);
+    .message.body {
+        padding: 3px 15px 0 10px;
+    }
+
+    .shared-link.thumb {
+        max-width: 100%;
+    }
+
+    .message.richpreview.container {
+        width: 100%;
+
+        .img-wrapper {
+            display: block;
+            margin: 0 auto;
+
+            .preview-confirmation {
+                margin: 0;
+            }
+
+            .preview {
+                margin: 17px 0 9px 0;
+            }
+        }
+
+        .inner-wrapper {
+            display: block;
+            margin: 6px 0 0 0;
+            padding: 0;
+            width: 100%;
+        }
+
+        .buttons-block {
+            float: left;
+            margin: 8px 0 8px 0;
+            padding: 0;
+
+            button {
+                float: left;
+                margin: 8px 8px 0 0;
+            }
         }
     }
 
-    .in-call {
-        display: flex;
-        align-items: start;
-        margin-top: 52px;
+    .reactions-bar {
+        flex-wrap: wrap;
+    }
 
-        .message.body {
-            padding: 3px 15px 0 10px;
-        }
+    .geolocation-container {
+        padding: 0 27px 0 0;
 
-        .shared-link.thumb {
-            max-width: 100%;
-        }
-
-        .message.richpreview.container {
+        .geolocation {
             width: 100%;
+            height: auto;
 
-            .img-wrapper {
-                display: block;
-                margin: 0 auto;
+            &__details {
+                padding: 4px;
 
-                .preview-confirmation {
+                .geolocation__icon {
+                    width: 100%;
                     margin: 0;
                 }
 
-                .preview {
-                    margin: 17px 0 9px 0;
-                }
-            }
+                ul.geolocation__data-list {
+                    display: block;
+                    position: relative;
+                    top: auto;
+                    left: auto;
+                    transform: none;
+                    margin: 5px 0 4px 5px;
+                    padding: 0;
 
-            .inner-wrapper {
-                display: block;
-                margin: 6px 0 0 0;
-                padding: 0;
-                width: 100%;
-            }
-
-            .buttons-block {
-                float: left;
-                margin: 8px 0 8px 0;
-                padding: 0;
-
-                button {
-                    float: left;
-                    margin: 8px 8px 0 0;
-                }
-            }
-        }
-
-        .reactions-bar {
-            flex-wrap: wrap;
-        }
-
-        .geolocation-container {
-            padding: 0 27px 0 0;
-
-            .geolocation {
-                width: 100%;
-                height: auto;
-
-                &__details {
-                    padding: 4px;
-
-                    .geolocation__icon {
-                        width: 100%;
+                    li {
                         margin: 0;
                     }
-
-                    ul.geolocation__data-list {
-                        display: block;
-                        position: relative;
-                        top: auto;
-                        left: auto;
-                        transform: none;
-                        margin: 5px 0 4px 5px;
-                        padding: 0;
-
-                        li {
-                            margin: 0;
-                        }
-                    }
                 }
             }
         }
     }
+}
 
-    .chat-textarea-block {
-        bottom: 10px;
-        min-height: 48px;
+.chat-textarea-block {
+    bottom: 10px;
+    min-height: 48px;
 
-        .gif-panel-wrapper {
-            z-index: 130;
-            position: fixed;
-            left: auto;
-            right: -10px;
-            bottom: 80px;
-            width: 600px;
-        }
-
-        .chat-textarea {
-            margin: 0 8px 0 8px;
-        }
+    .gif-panel-wrapper {
+        z-index: 130;
+        position: fixed;
+        left: auto;
+        right: -10px;
+        bottom: 80px;
+        width: 600px;
     }
 
-    .giphy-block {
-        object-fit: cover;
-        max-width: 100%;
-        height: 100%;
+    .chat-textarea {
+        margin: 0 8px 0 8px;
     }
+}
+
+.giphy-block {
+    object-fit: cover;
+    max-width: 100%;
+    height: 100%;
 }

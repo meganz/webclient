@@ -1,9 +1,12 @@
+@use 'sass:meta';
+
 #schedule-dialog {
     width: 500px;
     height: 745px;
 
     &.fluid {
         height: auto;
+
         &.upgrade {
             min-height: 606px;
 
@@ -197,8 +200,8 @@
         }
     }
 
-    @import '_select.scss';
-    @import '_invite.scss';
+    @include meta.load-css('_select.scss');
+    @include meta.load-css('_invite.scss');
 }
 
 .schedule-dialog-confirmation.mega-dialog {

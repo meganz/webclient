@@ -1,8 +1,5 @@
-@mixin small-screen {
-    @media only screen and (max-height: 760px) {
-        @content;
-    }
-}
+@use 'sass:meta';
+@use '_mixins.scss';
 
 .stream {
     position: relative;
@@ -18,8 +15,8 @@
     &.hovered ~ .recording-control { bottom: 0; }
     &.hovered .stream-head { top: 0; }
 
-    @import '_participantsNotice.scss';
-    @import '_participantsBlock.scss';
+    @include meta.load-css('_participantsNotice.scss');
+    @include meta.load-css('_participantsBlock.scss');
 
     &-wrapper{
         display: grid;
@@ -34,7 +31,7 @@
             float: left;
             width: calc(100% - 310px);
 
-            @include small-screen {
+            @include mixins.small-screen {
                 width: calc(100% - 230px);
             }
         }
@@ -164,7 +161,7 @@
     float: left;
     height: 100%;
 
-    @include small-screen {
+    @include mixins.small-screen {
         float: right;
     }
 
@@ -225,9 +222,4 @@
             justify-content: center;
         }
     }
-}
-
-&.with-timeout-banner .stream-wrapper {
-    height: calc(100% - 200px);
-    padding-top: 102px;
 }

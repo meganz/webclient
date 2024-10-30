@@ -149,7 +149,8 @@ twofactor.loginDialog = {
             const {email, password, rememberMe} = security.login;
 
             // Show loading spinner on the buttons
-            $submitButton.addClass('loading');
+            $submitButton.addClass('loading disabled');
+            $pinCodeInput.addClass('disabled');
 
             // Check if using old/new login method and log them in
             security.login.checkLoginMethod(email, password, pinCode, rememberMe,
@@ -247,10 +248,10 @@ twofactor.loginDialog = {
         var $submitButton = $dialog.find('.submit-button');
 
         // Hide loading spinner, warning text and clear the text input
-        $submitButton.removeClass('loading');
+        $submitButton.removeClass('loading disabled');
         $warningText.addClass('v-hidden');
         $warningText2.addClass('hidden');
-        $pinCodeInput.val('');
+        $pinCodeInput.removeClass('disabled').val('');
     },
 
     /**

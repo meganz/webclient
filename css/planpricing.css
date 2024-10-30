@@ -279,6 +279,9 @@
     margin-right: 10px;
     --icon-size: 24px;
 }
+.pricing-plan-card#pwm-monthly .pricing-plan-features i {
+    font: var(--text-body2);
+}
 .pricing-plan-card .pricing-plan-more {
     margin-top: 8px;
     font: var(--text-copy-secondary-pricing);
@@ -289,7 +292,8 @@
     white-space: initial;
 }
 .pricing-plan-card .pricing-plan-more span,
-.pricing-plan-card .vpn-read-more {
+.pricing-plan-card .vpn-read-more,
+.pricing-plan-card .pwm-read-more {
     color: var(--color-secondary-cobalt-600);
     text-decoration: underline;
     cursor: pointer;
@@ -325,7 +329,7 @@
 }
 .pricing-plan-card.popular .pricing-plan-btn,
 .pricing-flexi-block-card-contianer .pricing-plan-btn,
-.pricing-vpn-plan-container .pricing-plan-btn {
+.pricing-feature-plan-container .pricing-plan-btn {
     background-color: var(--color-primary-red-500);
     color: var(--color-grey-50);
     border: unset;
@@ -333,7 +337,7 @@
 }
 .pricing-plan-card.popular .pricing-plan-btn:hover,
 .pricing-flexi-block-card-contianer .pricing-plan-btn:hover,
-.pricing-vpn-plan-container .pricing-plan-btn:hover {
+.pricing-feature-plan-container .pricing-plan-btn:hover {
     background-color: var(--color-primary-red-600);
 }
 .pricing-pg .exclusive-plans-container .plans-cards-container{
@@ -930,7 +934,7 @@ i.pricing-i-icon {
     margin-bottom: 76px;
     white-space: unset;
 }
-.pricing-pg.pricing-vpn-plan-container .pricing-plan-trasfer {
+.pricing-pg.pricing-feature-plan-container .pricing-plan-trasfer {
     margin-bottom: 92px;
 }
 .pricing-flexi-block-card-contianer .pricing-plan-card .pricing-plan-storage {
@@ -1078,15 +1082,15 @@ i.pricing-i-icon {
     padding-left: var(--left-padding);
     padding-right: var(--right-padding);
 }
-.pricing-pg .pricing-pg.pricing-vpn-plan-container .plans-cards-container {
+.pricing-pg .pricing-pg.pricing-feature-plan-container .plans-cards-container {
     place-items: center;
 }
-.pricing-pg .pricing-pg.pricing-vpn-plan-container .plans-cards-container .pricing-plan-card-wrapper {
+.pricing-pg .pricing-pg.pricing-feature-plan-container .plans-cards-container .pricing-plan-card-wrapper {
     width: 100%;
     max-width: 392px;
     margin-top: 24px;
 }
-.pricing-pg .pricing-pg.pricing-vpn-plan-container .pricing-flexi-block-card-note {
+.pricing-pg .pricing-pg.pricing-feature-plan-container .pricing-flexi-block-card-note {
     padding-top: 1rem;
     font: var(--text-caption-regular-pricing);
     color: var(--color-copy-secondary);

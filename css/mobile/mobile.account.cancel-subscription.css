@@ -40,6 +40,7 @@
 .cancel-subscription-page .features-table .ft-header > *:not(:first-child),
 .cancel-subscription-page .features-table .ft-rows .row-item.center {
     justify-self: center;
+    text-align: center;
 }
 
 .cancel-subscription-page .features-table .ft-rows .row-item {
@@ -53,9 +54,13 @@
     justify-content: flex-start;
 }
 
-.cancel-subscription-page .features-table .ft-rows .row-item.plan i.icon-check-thin-solid {
+.cancel-subscription-page .features-table .ft-rows .row-item.plan i {
     font-weight: var(--mobile-font-weight-semibold);
     color: var(--secondary-green);
+}
+.cancel-subscription-page .features-table .ft-rows .row-item.no-plan i {
+    font-weight: var(--mobile-font-weight-semibold);
+    color: var(--secondary-red);
 }
 
 .cancel-subscription-page .features-table .ft-rows .ft-row-separator {
@@ -78,6 +83,7 @@
     color: var(--mobile-text-primary);
 }
 .cancel-subscription-page .cancel-sub-prompt.top {
+    font: var(--mobile-font-heading-h1);
     order: -1;
 }
 

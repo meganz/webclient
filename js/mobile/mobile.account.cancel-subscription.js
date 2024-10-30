@@ -12,10 +12,18 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
         value() {
             'use strict';
 
-            const tryLoadPage = () => {
+            loadingDialog.pshow();
+
+            M.accountData(() => {
+                loadingDialog.phide();
+
                 this.cancelFeatureSub = '';
+                this.feature = '';
+                this.subIdToCancel = '';
 
                 this.subscriptions = !u_attr.b && M.account.subs;
+
+                this.purchasableFeaturePlans = Object.keys(pro.propay.purchasableFeaturePlans());
 
                 let canInit = this.subscriptions.length >= 1;
 
@@ -27,10 +35,12 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
                     // If it is not, set some flags & variables before initing the page
                     if (canInit) {
                         const subscription = this.subscriptions[0];
+                        const featureKeys = Object.keys(subscription.features);
 
                         this.cancelFeatureSub = subscription.al === pro.ACCOUNT_LEVEL_FEATURE
-                            && subscription.features.vpn
-                            && Object.keys(subscription.features).length === 1;
+                            && featureKeys.some(item => this.purchasableFeaturePlans.includes(item))
+                            && subscription;
+                        this.feature = this.cancelFeatureSub && Object.keys(subscription.features)[0];
 
                         this.subIdToCancel = subscription.id;
                     }
@@ -42,20 +52,7 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
                 else {
                     loadSubPage('fm/account');
                 }
-            };
-
-            if (M.account) {
-                tryLoadPage();
-            }
-            else {
-                loadingDialog.pshow();
-
-                M.accountData(() => {
-                    loadingDialog.phide();
-
-                    tryLoadPage();
-                });
-            }
+            });
         }
     },
 
@@ -113,9 +110,14 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
             const subscriptionRadios = [];
 
             for (const sub of this.subscriptions) {
-                const { al: subLevel, id: subId, is_trial, next, gwid: gatewayId } = sub;
+                const { al: subLevel, id: subId, features, is_trial, next, gwid: gatewayId } = sub;
 
-                let label = subLevel === pro.ACCOUNT_LEVEL_FEATURE ? l.mega_vpn : pro.getProPlanName(subLevel);
+                let proNum = subLevel;
+                if (proNum === pro.ACCOUNT_LEVEL_FEATURE) {
+                    const upperCaseFeature = Object.keys(features)[0].toUpperCase();
+                    proNum = pro[`ACCOUNT_LEVEL_FEATURE_${upperCaseFeature}`];
+                }
+                let label = pro.getProPlanName(proNum);
 
                 const subLabelText = is_trial ? l.sub_begins_btn : l.sub_renews_btn;
                 if (is_trial) {
@@ -131,8 +133,9 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
                     disabled: gatewayId === 2 || gatewayId === 3, // Apple or Google payment
                 };
                 if (radioBtnOptions.disabled) {
-                    // TODO add localised disabled reason
-                    // radioBtnOptions.disabledReason = ;
+                    // String keys: l.cancel_apple_sub, l.cancel_google_sub
+                    const gateway = gatewayId === 2 ? 'apple' : 'google';
+                    radioBtnOptions.disabledReason = l[`cancel_${gateway}_sub`];
                 }
 
                 subscriptionRadios.push(radioBtnOptions);
@@ -149,10 +152,10 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
 
                     this.cancelFeatureSub = this.subscriptions.find(
                         ({ al, features, id }) => al === pro.ACCOUNT_LEVEL_FEATURE
-                            && features.vpn
-                            && Object.keys(features).length === 1
+                            && Object.keys(features).some(item => this.purchasableFeaturePlans.includes(item))
                             && id === this.subIdToCancel
                     );
+                    this.feature = this.cancelFeatureSub && Object.keys(this.cancelFeatureSub.features)[0];
                 }
             });
 
@@ -193,13 +196,19 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
 
     /**
      * Show a features table outlining what the user will miss out on if they cancel their subscription.
-     * Only for VPN plan for now.
+     * Only for standalone feature plans for now.
      *
      * @returns {undefined}
      */
     showFeaturesTable: {
         value() {
             'use strict';
+
+            const features = pro.propay.purchasableFeaturePlans()[this.feature];
+
+            if (!features || !features.cancelSubFeatures) {
+                return;
+            }
 
             const featuresTable = document.createElement('div');
             featuresTable.className = 'features-table';
@@ -212,29 +221,29 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
             ftHeaderCol1.className = 'feature';
             ftHeaderCol1.textContent = l[23377];
 
+            // String keys:
+            // l.no_vpn
+            // l.no_pwm
             const ftHeaderCol2 = document.createElement('div');
             ftHeaderCol2.className = 'no-plan';
-            ftHeaderCol2.textContent = l.no_vpn;
+            ftHeaderCol2.textContent = l[`no_${this.feature}`];
 
+            // String keys:
+            // l.mega_vpn
+            // l.mega_pwm
             const ftHeaderCol3 = document.createElement('div');
             ftHeaderCol3.className = 'plan';
-            ftHeaderCol3.textContent = l.mega_vpn;
+            ftHeaderCol3.textContent = l[`mega_${this.feature}`];
 
             const featuresTableContents = document.createElement('div');
             featuresTableContents.className = 'ft-rows';
             featuresTableContents.textContent = '';
 
-            const features = [
-                l.vpn_cancel_subfeature1,
-                l.vpn_cancel_subfeature2,
-                l.vpn_cancel_subfeature3,
-                l.vpn_cancel_subfeature4
-            ];
-
-            for (const feature of features) {
+            const cancelSubFeatures = features.cancelSubFeatures;
+            for (let i = 0; i < cancelSubFeatures.length; i++) {
                 const ftRowCol1 = document.createElement('div');
                 ftRowCol1.className = 'row-item feature';
-                ftRowCol1.textContent = feature;
+                ftRowCol1.textContent = cancelSubFeatures[i];
 
                 const ftRowCol2 = document.createElement('div');
                 ftRowCol2.className = 'row-item center no-plan';
@@ -252,12 +261,12 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
                 new MegaMobileButton({
                     parentNode: ftRowCol3,
                     type: 'icon',
-                    icon: 'sprite-mobile-fm-mono icon-check-thin-solid',
+                    icon: 'sprite-fm-mono icon-check-small-regular-outline',
                     iconSize: 24,
                     componentClassname: 'text-icon'
                 });
 
-                if (feature !== features[features.length - 1]) {
+                if (i < cancelSubFeatures.length - 1) {
                     const ftRowSeparator = document.createElement('div');
                     ftRowSeparator.className = 'ft-row-separator';
                     featuresTableContents.append(ftRowSeparator);
@@ -288,14 +297,19 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
             const cancelSubPrompt = document.createElement('div');
             cancelSubPrompt.className = 'cancel-sub-prompt';
 
-            const { cancelFeatureSub, cancelPlanSection } = this;
+            const { cancelFeatureSub, cancelPlanSection, feature } = this;
 
             let resultText = l[6996];
             let promptText = l[7005];
 
             if (cancelFeatureSub) {
+                // String keys:
+                // l.vpn_trial_cancel_confirm
+                // l.pwm_trial_cancel_confirm
+                // l.vpn_cancel_confirm_txt1
+                // l.pwm_cancel_confirm_txt1
                 resultText = cancelFeatureSub.is_trial ?
-                    l.vpn_trial_cancel_confirm : l.vpn_cancel_confirm_txt1;
+                    l[`${feature}_trial_cancel_confirm`] : l[`${feature}_cancel_confirm_txt1`];
                 promptText = cancelFeatureSub.is_trial ? l.cancel_trial_header : l.vpn_cancel_confirm_title1;
             }
 
@@ -520,7 +534,7 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
             const surveyButtons = document.createElement('div');
             surveyButtons.className = 'buttons-container';
 
-            const { cancelFeatureSub, subSelectionArea, cancelPlanSection } = this;
+            const { cancelFeatureSub, subSelectionArea, cancelPlanSection, feature } = this;
 
             const canContinueCancellation = isShowingPlanPicker || cancelFeatureSub;
 
@@ -529,7 +543,10 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
                 primaryBtnText = l.dont_cancel_sub_btn_label;
             }
             else {
-                primaryBtnText = cancelFeatureSub ? l.vpn_keep_plan : l.cancel_sub_btn_label;
+                // Label keys:
+                // l.vpn_keep_plan
+                // l.pwm_keep_plan
+                primaryBtnText = cancelFeatureSub ? l[`${feature}_keep_plan`] : l.cancel_sub_btn_label;
             }
 
             /* eslint-disable no-new */
@@ -628,6 +645,9 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
                 M.account.lastupdate = 0;
                 loadSubPage('fm/account');
                 mobile.showToast(l[6999], 4);
+
+                // Notify any other open tabs of the cancelled subscription
+                mBroadcaster.crossTab.notify('cancelSub', 1);
             }).catch(tell);
         }
     }

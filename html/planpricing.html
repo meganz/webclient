@@ -21,6 +21,9 @@
                     <div id ="pr-vpn-tab" class="tabs-module-block">
                         <div class="tabs-block-title">[$mega_vpn]</div>
                     </div>
+                    <div id ="pr-pwm-tab" class="tabs-module-block">
+                        <div class="tabs-block-title">[$mega_pwm]</div>
+                    </div>
                     <div id ="pr-business-tab" class="tabs-module-block" data-should-log="true">
                         <div class="tabs-block-title">[$19530]</div>
                     </div>
@@ -174,7 +177,10 @@
             </div>
 
             <!-- VPN info is being populated dynamically -->
-            <div class="card-container pricing-pg pricing-vpn-plan-container pb-16 hidden tab-ctrl-vpn"></div>
+            <div class="card-container pricing-pg pricing-feature-plan-container vpn pb-16 hidden tab-ctrl-vpn"></div>
+
+            <div class="card-container pricing-pg pricing-feature-plan-container pwm pb-16 hidden tab-ctrl-pwm"></div>
+
 
             <div class="pricing-pg exclusive-plans-container card-container tab-ctrl-exc hidden">
                 <div class="pricing-pg plans-cards-container">
@@ -430,8 +436,7 @@
                         <button class="experiment-button tab-ctrl-exc pro-exc-offer hidden"></button>
                     </div>
                     <div class="pricing-plans-compare-table-item plans-table-header pro-plans x-bold line center">
-                        <span class="tab-ctrl-exc-inv">[$pr_pro_i_to_iii]</span>
-                        <span class="tab-ctrl-exc hidden">[$pr_pro_plans]</span>
+                        [$pr_pro_plans]
                         <button class="experiment-button hidden pro primary">[$pr_table_button_see_pro]</button>
                     </div>
                     <div class="pricing-plans-compare-table-item plans-table-header pro-flexi x-bold line center">
@@ -576,6 +581,16 @@
                     <div class="pricing-plans-compare-table-item pro center rb bg-gr"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro-flexi center bg-gr"><i class="grey-small-check-tick"></i></div>
                     <div class="pricing-plans-compare-table-item pro-business center bg-gr"><i class="minus-icon"></i></div>
+
+                    <!-- PWM sections -->
+                    <div class="pricing-plans-compare-table-item header">[$password_manager]</div>
+
+                    <div class="pricing-plans-compare-table-item bold rb bg-gr">[$mega_pass_access]</div>
+                    <div class="pricing-plans-compare-table-item center rb bg-gr"><i class="minus-icon"></i></div>
+                    <div class="pricing-plans-compare-table-item tab-ctrl-exc center rb bg-gr hidden"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro center rb bg-gr"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-flexi center bg-gr"><i class="grey-small-check-tick"></i></div>
+                    <div class="pricing-plans-compare-table-item pro-business center bg-gr"><i class="grey-small-check-tick"></i></div>
 
 
                     <!-- Admin sections -->

@@ -1277,6 +1277,11 @@ var addressDialog = {
 
     /** Extra details for the API 'utc' call */
     extraDetails: {},
+    /** The success cloak and listener if a cloak has been created */
+    successCloakInfo: {
+        cloak: null,
+        listener: null
+    },
 
     /**
      * Open and setup the dialog
@@ -2216,6 +2221,10 @@ var addressDialog = {
     showSuccessCloak(titleTxt, msgTxt, btnTxt, callback, showDisclaimer) {
         'use strict';
 
+        if (this.successCloakInfo.cloak) {
+            this.successCloakInfo.cloak.remove();
+        }
+
         if (!Array.isArray(msgTxt)) {
             msgTxt = [msgTxt];
         }
@@ -2248,14 +2257,14 @@ var addressDialog = {
         const mainContentDiv = document.createElement('div');
 
         title.className = 'font-h3-bold my-4 title';
-        div.className = 'payment-success-cloak flex flex-column justify-between items-center'
+        div.className = 'payment-success-cloak flex flex-column justify-between items-center gap-4'
             + (is_mobile ? ' mobile' : '');
         mainContentDiv.className = 'payment-success-content-wrapper flex flex-column justify-center items-center'
             + (pro.propay.trial ? ' trial' : '');
         icon.className = 'sprite-fm-mono icon-check-circle-thin-outline';
         estimatedPriceDiv.className = 'font-h3-bold mb-8';
 
-        estimatedPriceDiv.textContent = showDisclaimer ? `*${l.est_price_acc_billed_euro}` : '';
+        estimatedPriceDiv.textContent = showDisclaimer ? `*${l[18770]}` : '';
         title.textContent = titleTxt;
 
         mainContentDiv.appendChild(icon);
@@ -2273,6 +2282,11 @@ var addressDialog = {
         div.appendChild(mainContentDiv);
         div.appendChild(estimatedPriceDiv);
         document.body.appendChild(div);
+
+        this.successCloakInfo.cloak = div;
+        this.successCloakInfo.listener = mBroadcaster.once('beforepagechange', () => {
+            div.remove();
+        });
     },
 
     stripePaymentChecker: function(saleId) {
@@ -2303,13 +2317,14 @@ var addressDialog = {
                     const plan = pro.getPlan(pro.propay.planNum, 1);
                     const planPrice = plan[pro.UTQA_RES_INDEX_LOCALPRICE] || plan[pro.UTQA_RES_INDEX_PRICE];
                     const planCurrency = plan[pro.UTQA_RES_INDEX_LOCALPRICECURRENCY] || 'EUR';
+                    const planNumber = parseInt(pro.propay.planNum);
 
                     const startDateTxt = l.m_sub_will_start
                         .replace('%1', formatCurrency(planPrice, planCurrency, 'narrowSymbol')
                             + (planCurrency === 'EUR' ? '' : '*'))
                         .replace('%2', time2date((Date.now() / 1000) + pro.propay.trial.days * 86400, 2));
 
-                    if (parseInt(pro.propay.planNum) === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
+                    if (planNumber === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
                         onIdle(() => eventlog(500525));
 
                         this.showSuccessCloak(
@@ -2325,14 +2340,37 @@ var addressDialog = {
 
                         pro.propay.hideLoadingOverlay();
                     }
+                    else if (planNumber === pro.ACCOUNT_LEVEL_FEATURE_PWM) {
+                        onIdle(() => eventlog(500563));
+
+                        this.showSuccessCloak(
+                            l.trial_started,
+                            [startDateTxt, l.cancel_to_avoid_charge],
+                            l.goto_mega_pass,
+                            () => {
+                                onIdle(() => eventlog(500564));
+                                mega.redirect('mega.io', 'pass#downloadapps', false, false);
+                            },
+                            planCurrency
+                        );
+
+                        pro.propay.hideLoadingOverlay();
+                    }
 
                     $stripeIframe.remove();
                     $stripeDialog.addClass('hidden');
+
+                    closeStripeDialog();
                 }
 
             }).catch((ex) => {
+                closeStripeDialog();
                 if (ex === EEXIST) {
-                    msgDialog('warninga', l[135], l.vpn_free_trial_used_h, l.vpn_free_trial_used_b);
+                    const planNumber = parseInt(pro.propay.planNum);
+                    const warningTitle = planNumber === pro.ACCOUNT_LEVEL_FEATURE_VPN
+                        ? l.vpn_free_trial_used_h
+                        : l.pwm_free_trial_used_h;
+                    msgDialog('warninga', l[135], warningTitle, l.vpn_free_trial_used_b);
                     onIdle(() => eventlog(500522));
                 }
                 else {
@@ -2361,6 +2399,18 @@ var addressDialog = {
                             l.goto_mega_vpn,
                             () => {
                                 mega.redirect('mega.io', 'vpn#downloadapps', false, false);
+                            }
+                        );
+
+                        pro.propay.hideLoadingOverlay();
+                    }
+                    else if (parseInt(pro.propay.planNum) === pro.ACCOUNT_LEVEL_FEATURE_PWM) {
+                        this.showSuccessCloak(
+                            l[6961],
+                            l.pwm_purchase_success_txt.replace('%1', u_attr.email || ''),
+                            l.goto_mega_pass,
+                            () => {
+                                mega.redirect('mega.io', 'pwm#downloadapps', false, false);
                             }
                         );
 

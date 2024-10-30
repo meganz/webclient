@@ -2316,20 +2316,10 @@ function topmenuUI() {
             document.body.classList.add('pro-user');
         }
         else {
-            // Check if a standalone plan has been purchased
-            M.getUserPlanInfo((res) => {
-                const firstFeaturePurchased = M.getFirstFeaturePurchased(res);
-                let planText = l[1150];
-                if (firstFeaturePurchased) {
-                    planText = firstFeaturePurchased.planName;
-                }
-                else {
-                    $('.membership-status', $topHeader).attr('class', 'tiny-icon membership-status free');
-                    document.body.classList.add('free');
-                }
-
-                $('.plan', $menuLoggedBlock).text(planText);
-            });
+            // Show the free badge
+            $('.plan', $menuLoggedBlock).text(l[1150]);
+            $('.membership-status', $topHeader).attr('class', 'tiny-icon membership-status free');
+            document.body.classList.add('free');
         }
 
         if (is_fm()) {

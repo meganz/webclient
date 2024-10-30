@@ -226,75 +226,67 @@ accountUI.plan = {
         },
 
         /**
+         * Render the feature plan block
+         *
          * @param {jQuery} $planContent The jQuery element to render the block into
-         * @param {Object} account Account data to work with
+         * @param {Object} featurePlan The plan details
          * @returns {void}
+         * @see pro.propay.purchasableFeaturePlans for features which can be rendered here
          */
-        renderVpnPlanBlock($planContent, account) {
+        renderFeaturePlanBlock($planContent, featurePlan) {
             'use strict';
 
-            const activeSubscription = account.subs
-                && account.subs.find(
-                    ({ al, features }) => al === pro.ACCOUNT_LEVEL_FEATURE
-                        && features.vpn
-                        && Object.keys(features).length === 1
-                );
-            const expiredPlan = !activeSubscription && account.plans
-                && account.plans.find(
-                    ({ al, features }) => al === pro.ACCOUNT_LEVEL_FEATURE
-                        && features.vpn
-                        && Object.keys(features).length === 1
-                );
+            const feature = Object.keys(featurePlan.features)[0];
 
-            // Do not render if we cannot find a VPN subscription (active or cancelled)
-            if (!activeSubscription && !expiredPlan) {
+            const $rightBlock = $('.settings-right-block', $planContent);
+            const $featureBlock = $(`.feature-details.${feature}`, $rightBlock);
+
+            // Do not display more than one plan card of the same feature (e.g. free trial
+            // and standalone)
+            if ($featureBlock.length) {
                 return;
             }
 
-            const $rightBlock = $('.settings-right-block', $planContent);
-            let vpnBlock = $rightBlock.children('div.vpn-details')[0];
+            const featureBlock = document.createElement('div');
+            featureBlock.className = `feature-details ${feature}`;
 
-            if (vpnBlock) {
-                $(vpnBlock).remove();
-            }
-
-            vpnBlock = document.createElement('div');
-            vpnBlock.className = 'vpn-details';
-
-            const isTrial = activeSubscription ? activeSubscription.is_trial : expiredPlan.is_trial;
-            const planCardDate = activeSubscription ? activeSubscription.next : expiredPlan.expires;
+            const isTrial = featurePlan.is_trial;
 
             const sections = [
                 {
                     label: l[16166],
-                    value: l.pr_vpn_title,
+                    value: pro.getProPlanName(pro[`ACCOUNT_LEVEL_FEATURE_${feature.toUpperCase()}`]),
                     isTrial
                 },
                 {
-                    label: activeSubscription ? isTrial ? l.sub_begins : l[6971] : l[987],
-                    value: time2date(planCardDate, 2),
-                    expires: !!expiredPlan
+                    label: featurePlan.next ? isTrial ? l.sub_begins : l[6971] : l[987],
+                    value: time2date(featurePlan.next || featurePlan.expires, 2),
+                    expires: featurePlan.expires
                 }
             ];
 
             for (let i = 0; i < sections.length; i++) {
                 const { label, value, expires, isTrial } = sections[i];
                 const section = this.renderSubSection(label, value, expires, null, isTrial);
-                vpnBlock.appendChild(section);
+                featureBlock.appendChild(section);
             }
 
-            if (activeSubscription) {
+            // If the subscription is active
+            if (featurePlan.next) {
                 const section = this.renderSubBtnSection(() => {
-                    if (activeSubscription.gwid === 2 || activeSubscription.gwid === 3) {
+                    if (featurePlan.gwid === 2 || featurePlan.gwid === 3) {
                         msgDialog('warninga', l[7179], l[16501]);
                         return;
                     }
 
                     const dialog = new MDialog({
-                        dialogClasses: 'cancel-subscription-benefits',
+                        dialogClasses: 'cancel-subscription-benefits features',
                         titleClasses: 'pl-4',
                         ok: {
-                            label: l.vpn_keep_plan,
+                            // Label keys:
+                            // l.vpn_keep_plan
+                            // l.pwm_keep_plan
+                            label: l[`${feature}_keep_plan`],
                             callback: nop
                         },
                         cancel: {
@@ -304,9 +296,9 @@ accountUI.plan = {
                                     return;
                                 }
 
-                                delay('megaVpnCancel', () => {
+                                delay('megaFeatureCancel', () => {
                                     const { cancelSubscriptionDialog } = accountUI.plan.accountType;
-                                    cancelSubscriptionDialog.init(activeSubscription, section);
+                                    cancelSubscriptionDialog.init(featurePlan, section);
                                 });
                             }
                         },
@@ -314,69 +306,79 @@ accountUI.plan = {
                             const div = document.createElement('div');
                             div.className = 'cancel-subscription-benefits-content px-6';
 
+                            // String keys:
+                            // l.vpn_trial_cancel_confirm
+                            // l.pwm_trial_cancel_confirm
+                            // l.vpn_cancel_confirm_txt1
+                            // l.pwm_cancel_confirm_txt1
                             const info = document.createElement('div');
                             info.className = 'cancel-subscription-info';
-                            info.textContent = isTrial ? l.vpn_trial_cancel_confirm : l.vpn_cancel_confirm_txt1;
-
-                            const table = document.createElement('div');
-                            const header = document.createElement('div');
-                            const content = document.createElement('div');
-                            table.className = 'features-table';
-                            header.className = 'features-table-header';
-                            content.className = 'features-table-content';
-
-                            const th1 = document.createElement('div');
-                            const th2 = document.createElement('div');
-                            const th3 = document.createElement('div');
-                            th1.className = 'features-table-header-content';
-                            th2.className = 'features-table-header-content center';
-                            th3.className = 'features-table-header-content center plan-name';
-                            th1.textContent = l[23377];
-                            th2.textContent = l.no_vpn;
-                            th3.textContent = l.pr_vpn_title;
-
-                            header.appendChild(th1);
-                            header.appendChild(th2);
-                            header.appendChild(th3);
-                            table.appendChild(header);
-                            table.appendChild(content);
+                            info.textContent = isTrial ?
+                                l[`${feature}_trial_cancel_confirm`] :
+                                l[`${feature}_cancel_confirm_txt1`];
                             div.appendChild(info);
-                            div.appendChild(table);
 
-                            const features = [
-                                l.vpn_cancel_subfeature1,
-                                l.vpn_cancel_subfeature2,
-                                l.vpn_cancel_subfeature3,
-                                l.vpn_cancel_subfeature4
-                            ];
+                            const features = pro.propay.purchasableFeaturePlans()[feature];
 
-                            for (let i = 0; i < features.length; i++) {
-                                if (i) {
-                                    const separator = document.createElement('div');
-                                    separator.className = 'features-table-seperator';
-                                    content.appendChild(separator);
+                            if (features && features.cancelSubFeatures) {
+                                const table = document.createElement('div');
+                                const header = document.createElement('div');
+                                const content = document.createElement('div');
+                                table.className = 'features-table';
+                                header.className = 'features-table-header';
+                                content.className = 'features-table-content';
+
+                                // String keys:
+                                // l.no_vpn
+                                // l.no_pwm
+                                // l.mega_vpn
+                                // l.mega_pwm
+                                const th1 = document.createElement('div');
+                                const th2 = document.createElement('div');
+                                const th3 = document.createElement('div');
+                                th1.className = 'features-table-header-content';
+                                th2.className = 'features-table-header-content center';
+                                th3.className = 'features-table-header-content center plan-name';
+                                th1.textContent = l[23377];
+                                th2.textContent = l[`no_${feature}`];
+                                th3.textContent = l[`mega_${feature}`];
+
+                                header.appendChild(th1);
+                                header.appendChild(th2);
+                                header.appendChild(th3);
+                                table.appendChild(header);
+                                table.appendChild(content);
+                                div.appendChild(table);
+
+                                const cancelSubFeatures = features.cancelSubFeatures;
+                                for (let i = 0; i < cancelSubFeatures.length; i++) {
+                                    const td1 = document.createElement('div');
+                                    const td2 = document.createElement('div');
+                                    const td3 = document.createElement('div');
+                                    td1.className = 'features-table-item title';
+                                    td2.className = 'features-table-item center';
+                                    td3.className = 'features-table-item center';
+
+                                    td1.textContent = cancelSubFeatures[i];
+
+                                    const crossIcon = document.createElement('i');
+                                    const checkIcon = document.createElement('i');
+                                    crossIcon.className = 'tiny-icon red-cross';
+                                    checkIcon.className = 'sprite-fm-mono icon-check-small-regular-outline';
+
+                                    td2.appendChild(crossIcon);
+                                    td3.appendChild(checkIcon);
+
+                                    content.appendChild(td1);
+                                    content.appendChild(td2);
+                                    content.appendChild(td3);
+
+                                    if (i < cancelSubFeatures.length - 1) {
+                                        const separator = document.createElement('div');
+                                        separator.className = 'features-table-seperator';
+                                        content.appendChild(separator);
+                                    }
                                 }
-
-                                const td1 = document.createElement('div');
-                                const td2 = document.createElement('div');
-                                const td3 = document.createElement('div');
-                                td1.className = 'features-table-item title';
-                                td2.className = 'features-table-item center';
-                                td3.className = 'features-table-item center';
-
-                                td1.textContent = features[i];
-
-                                const crossIcon = document.createElement('i');
-                                const checkIcon = document.createElement('i');
-                                crossIcon.className = 'tiny-icon red-cross';
-                                checkIcon.className = 'small-icon icons-sprite bold-green-tick';
-
-                                td2.appendChild(crossIcon);
-                                td3.appendChild(checkIcon);
-
-                                content.appendChild(td1);
-                                content.appendChild(td2);
-                                content.appendChild(td3);
                             }
 
                             this.slot = div;
@@ -387,10 +389,10 @@ accountUI.plan = {
                     dialog.show();
                 }, isTrial);
 
-                vpnBlock.appendChild(section);
+                featureBlock.appendChild(section);
             }
 
-            $rightBlock[0].appendChild(vpnBlock);
+            $rightBlock[0].appendChild(featureBlock);
         },
 
         /**
@@ -412,8 +414,45 @@ accountUI.plan = {
             $('.pro-extras')
                 .toggleClass('hidden', !allowedPlans.has(u_attr.p));
 
-            // Try to render VPN plan block
-            this.renderVpnPlanBlock($planContent, account);
+            // Check if a user has purchased any feature plans.
+            const purchasableFeaturePlans = Object.keys(pro.propay.purchasableFeaturePlans());
+            const featureSubs = account.subs.filter(({ al, next }) =>
+                next >= unixtime() && al === pro.ACCOUNT_LEVEL_FEATURE
+            );
+            const featurePlans = account.plans.filter(({ al, expires }) =>
+                expires >= unixtime() && al === pro.ACCOUNT_LEVEL_FEATURE
+            );
+
+            // Combine the subs and plans arrays
+            const subsAndPlans = featureSubs
+                .concat(featurePlans.filter(plan => !featureSubs.some(sub => sub.id === plan.subid)))
+                .sort((a, b) => {
+                    // Show standalone plan cards first, then free trial ones.
+                    if (!a.is_trial && b.is_trial) {
+                        return -1;
+                    }
+                    if (!b.is_trial && a.is_trial) {
+                        return 1;
+                    }
+
+                    // Show VPN plan cards above PWM ones
+                    if (a.features.vpn && b.features.pwm) {
+                        return -1;
+                    }
+                    if (b.features.vpn && a.features.pwm) {
+                        return 1;
+                    }
+
+                    return 0;
+                });
+
+            // Remove any existing plan cards before rendering the feature plan blocks/cards
+            $('.settings-right-block .feature-details', $planContent).remove();
+            for (const purchase of subsAndPlans) {
+                if (purchasableFeaturePlans.includes(Object.keys(purchase.features)[0])) {
+                    this.renderFeaturePlanBlock($planContent, purchase);
+                }
+            }
         },
 
         renderSubSection(label, value, expires, extraClasses, isTrial) {
@@ -441,7 +480,7 @@ accountUI.plan = {
                 const freeTrialSpan = document.createElement('span');
                 freeTrialSpan.className = 'free-trial';
                 freeTrialSpan.textContent = l.free_trial_caps;
-                valueEl.appendChild(freeTrialSpan);
+                valueSpan.appendChild(freeTrialSpan);
             }
 
             section.appendChild(labelEl);
@@ -1061,6 +1100,9 @@ accountUI.plan = {
                         // and re-render the account page UI
                         M.account.lastupdate = 0;
                         accountUI();
+
+                        // Notify any other open tabs of the cancelled subscription
+                        mBroadcaster.crossTab.notify('cancelSub', 1);
                     }, 1e3);
                 });
             }

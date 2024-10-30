@@ -770,11 +770,11 @@ body.theme-dark .rewind-datepicker-calendar .datepicker--cell.-current- {
 
 .mega-dialog.rw-promo-dialog .img-rw-promo-dialog {
     background-image: url("../images/mega/rewind/rewind-promo-dialog.png");
-    background-size: 327px 201px;
+    background-size: 327px auto;
     background-repeat: no-repeat;
-    background-position: 50% bottom;
+    background-position: 50% 24px;
     background-color: var(--surface-grey-2);
-    height: 248px !important;
+    height: 224px !important;
     width: 543px !important;
     margin-bottom: 8px !important;
     padding-top: 24px;
@@ -816,6 +816,88 @@ body.theme-dark .rewind-datepicker-calendar .datepicker--cell.-current- {
 
 .mega-dialog.rw-promo-dialog > footer aside button span {
     font: var(--text-body1);
+}
+
+.rw-whats-new-mini-promo-container {
+    position: absolute;
+    z-index: 1200;
+    padding-top: 8px;
+}
+
+.rw-whats-new-mini-promo {
+    width: 366px;
+    position: unset;
+    z-index: unset;
+    box-shadow: unset;
+    filter: drop-shadow(0 0 16px rgba(0, 0, 0, .1));
+}
+
+.theme-dark .rw-whats-new-mini-promo {
+    filter: drop-shadow(0 0 16px rgba(0, 0, 0, .7));
+}
+
+.rw-whats-new-mini-promo .rw-mini-promo-tooltip-arrow {
+    position: absolute;
+    rotate: 180deg;
+    top: -15px;
+    left: 288px;
+    --icon-size: 24px;
+    --mask-color: var(--surface-main);
+}
+
+/* .rw-whats-new-mini-promo .rw-mini-promo-tooltip-arrow::before {
+    filter: drop-shadow(0 -4px 16px rgba(0, 0, 0, .7));
+} */
+
+.rw-whats-new-mini-promo .img-rw-whats-new-mini-promo {
+    background-image: url("../images/mega/rewind/rewind-promo-dialog.png");
+    background-size: 281px auto;
+    background-repeat: no-repeat;
+    background-position: 50% 24px;
+    background-color: var(--surface-grey-2);
+    height: 220px !important;
+    width: 334px !important;
+    margin-bottom: 16px !important;
+    border-radius: 16px;
+}
+
+.rw-whats-new-mini-promo.dialog-template-graphic > header {
+    padding: 16px 16px 12px;
+    overflow: hidden;
+}
+
+.rw-whats-new-mini-promo.dialog-template-graphic > header
+.rw-whats-new-mini-promo-highlight {
+    text-align: center;
+    color: var(--secondary-red);
+    font: var(--text-body1-bold);
+    margin-bottom: 12px;
+}
+
+.rw-whats-new-mini-promo > section {
+    margin-bottom: 12px;
+}
+
+.rw-whats-new-mini-promo > section .content-block {
+    padding: 0 16px;
+}
+
+.rw-whats-new-mini-promo > footer aside {
+    background: unset;
+    margin-bottom: 12px;
+}
+
+.rw-whats-new-mini-promo > footer > aside > button span {
+    font: var(--text-body1);
+}
+
+.rw-whats-new-mini-promo > footer > aside > button span:hover {
+    font: var(--text-body1);
+}
+
+
+.no-overlay-vignette {
+    background: unset;
 }
 
 .fm-rewind-progress-section {
@@ -897,4 +979,27 @@ body.theme-dark .rewind-datepicker-calendar .datepicker--cell.-current- {
 .dropdown.rewind-progress .content .text .message {
     color: var(--text-color-medium);
     font: var(--text-body2);
+}
+.fm-header-buttons .mega-button.fm-rewind {
+    overflow: unset;
+}
+.fm-header-buttons .fm-rewind .blinking-highlight-dot,
+.fm-header-buttons .fm-rewind .blinking-highlight-dot::before,
+.fm-header-buttons .fm-rewind .blinking-highlight-dot::after {
+    content: '';
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    right: 3px;
+    top: 3px;
+    background: var(--label-blue);
+    border-radius: 100%;
+}
+.fm-header-buttons .fm-rewind .blinking-highlight-dot::before,
+.fm-header-buttons .fm-rewind .blinking-highlight-dot::after {
+    right: 0;
+    left: 0;
+    top: 0;
+    background: radial-gradient(circle, transparent 40%, var(--label-blue) calc(100% - 2px), var(--label-blue) 100%);
+    animation: 1.5s linear infinite onboarding-hotspot-circle;
 }

@@ -60,6 +60,11 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
         }
     },
 
+    /**
+     * Get the plan details of the user and update the plan name accordingly.
+     *
+     * @returns {String} 'Free' if u_attr.p is undefined, otherwise the plan name (e.g. Pro II)
+     */
     getPlanDetails: {
         value() {
             'use strict';
@@ -73,20 +78,6 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
             }
             else if (u_attr.pf) {
                 proNum = pro.ACCOUNT_LEVEL_PRO_FLEXI;
-            }
-
-            // If proNum is still undefined then check if the user has purchased a feature plan
-            if (!proNum) {
-                const purchasableFeaturePlans = Object.keys(pro.propay.purchasableFeaturePlans());
-                const firstPurchasedPlan = M.account.plans && M.account.plans.find(
-                    ({ al, features }) => al === pro.ACCOUNT_LEVEL_FEATURE
-                        && Object.keys(features).some(item => purchasableFeaturePlans.includes(item))
-                );
-
-                if (firstPurchasedPlan && firstPurchasedPlan.features) {
-                    const upperCaseFeature = Object.keys(firstPurchasedPlan.features)[0].toUpperCase();
-                    proNum = pro[`ACCOUNT_LEVEL_FEATURE_${upperCaseFeature}`];
-                }
             }
 
             return pro.getProPlanName(proNum);
@@ -107,12 +98,17 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
             // ccqns = Credit Card Query Number of Subscriptions
             const {result: numOfSubscriptions} = await api.req({a: 'ccqns'}).catch(dump);
 
-            if (numOfSubscriptions > 0) {
-                loadSubPage('fm/account/cancel');
-            }
-
             // Hide the loading dialog after request completes
             loadingDialog.hide();
+
+            if (numOfSubscriptions > 0) {
+                loadSubPage('fm/account/cancel');
+
+                // Hide the account overlay if coming from a folder or file link
+                if (mega.ui.overlay.visible) {
+                    mega.ui.overlay.hide();
+                }
+            }
         }
     },
 
@@ -234,7 +230,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
             let btn;
 
             if (u_attr && !u_attr.pf && !u_attr.b) {
-                btn = new MegaMobileLink({
+                btn = new MegaLink({
                     parentNode: userInfoContainer,
                     href: 'pro',
                     componentClassname: 'upgrade outline',
@@ -246,7 +242,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
             else if (u_attr && (u_attr.b && u_attr.b.m && u_attr.b.s !== pro.ACCOUNT_STATUS_ENABLED
                 || u_attr.pf && u_attr.pf.s !== pro.ACCOUNT_STATUS_ENABLED)) {
 
-                btn = new MegaMobileLink({
+                btn = new MegaLink({
                     parentNode: userInfoContainer,
                     href: 'repay',
                     componentClassname: 'upgrade outline',
@@ -394,7 +390,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
             });
 
             // Log out button, see mobile-settings.css
-            const logout = new MegaMobileButton({
+            const logout = new MegaButton({
                 parentNode: this.domNode,
                 text: l.mobile_settings_log_out_button,
                 componentClassname: "mobile-log-out",
@@ -406,7 +402,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
             });
 
             // Version number
-            const version = new MegaMobileTappable({
+            const version = new MegaInteractable({
                 parentNode: this.domNode,
                 text: `v. ${  M.getSiteVersion()}`,
                 componentClassname: "mobile-mega-version text-only no-deco"

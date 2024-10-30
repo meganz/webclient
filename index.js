@@ -1675,7 +1675,7 @@ function init_page() {
         let id = false;
         if (page.substr(0, 2) === 'fm') {
             id = page.replace('fm/', '');
-            if (id.length < 5 && id !== 'chat') {
+            if (id.length < 5 && id !== 'chat' && id !== 'pwm') {
                 id = false;
             }
         }
@@ -1809,6 +1809,10 @@ function init_page() {
 
                 if ($.transferHeader) {
                     $.transferHeader();
+                }
+
+                if (mega.ui.header) {
+                    mega.ui.header.show();
                 }
             }
         }
@@ -2316,20 +2320,10 @@ function topmenuUI() {
             document.body.classList.add('pro-user');
         }
         else {
-            // Check if a standalone plan has been purchased
-            M.getUserPlanInfo((res) => {
-                const firstFeaturePurchased = M.getFirstFeaturePurchased(res);
-                let planText = l[1150];
-                if (firstFeaturePurchased) {
-                    planText = firstFeaturePurchased.planName;
-                }
-                else {
-                    $('.membership-status', $topHeader).attr('class', 'tiny-icon membership-status free');
-                    document.body.classList.add('free');
-                }
-
-                $('.plan', $menuLoggedBlock).text(planText);
-            });
+            // Show the free badge
+            $('.plan', $menuLoggedBlock).text(l[1150]);
+            $('.membership-status', $topHeader).attr('class', 'tiny-icon membership-status free');
+            document.body.classList.add('free');
         }
 
         if (is_fm()) {

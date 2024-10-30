@@ -1,4 +1,4 @@
-class MegaMobileRadioGroup extends MegaMobileComponentGroup {
+class MegaMobileRadioGroup extends MegaComponentGroup {
 
     constructor(options) {
 

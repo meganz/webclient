@@ -48,7 +48,7 @@ mobile.keyDecryption = {
 
             this.domNode.append(title, subNode, dKey);
 
-            dButton = new MegaMobileButton({
+            dButton = new MegaButton({
                 type: 'normal',
                 text: l[1027],
                 parentNode: this.domNode,

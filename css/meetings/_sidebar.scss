@@ -1,3 +1,5 @@
+@use 'sass:meta';
+
 .sidebar-wrapper {
     display: flex;
     justify-content: center;
@@ -16,13 +18,14 @@
         background: var(--surface-main);
         z-index: 12;
 
-        @import '_collapse.scss';
-        @import '_participants.scss';
-        @import '_guest.scss';
-        @import '_historyPanel.scss';
+        @include meta.load-css('_collapse.scss');
+        @include meta.load-css('_participants.scss');
+        @include meta.load-css('_guest.scss');
 
-        .rtl & {
-            direction: rtl;
+        &.chat-opened {
+            /* [...] */
+
+            @include meta.load-css('_historyPanel.scss');
         }
 
         ul {
@@ -70,19 +73,6 @@
             button {
                 margin: 0 5px 0 0;
 
-                &.add {
-                    position: absolute;
-                    top: 15px;
-                    right: 20px;
-
-                    i { --mask-color: var(--secondary-white) }
-
-                    body.rtl & {
-                        left: 20px;
-                        right: unset;
-                    }
-                }
-
                 i {
                     margin: 0 auto;
                     --icon-size: 24px;
@@ -97,9 +87,4 @@
             }
         }
     }
-}
-
-&.with-timeout-banner .sidebar-wrapper .sidebar {
-    height: calc(100% - 200px);
-    margin-top: 16px;
 }

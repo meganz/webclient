@@ -1049,9 +1049,10 @@ mBroadcaster.once('boot_done', function populate_l() {
         'terms#ref': "https://mega.io/terms#Refunds",
         'p-s/p-b/c-s': "https://help.mega.io/plans-storage/payments-billing/cancel-subscription",
         'terms': "https://mega.io/terms",
+        'pricing': "https://mega.io/pricing",
         'vpn': "https://mega.io/vpn",
         'vpn#dow': "https://mega.io/vpn#downloadapps",
-        'pricing': "https://mega.io/pricing",
+        'pass#dow': "https://mega.io/pass#downloadapps",
     };
 
     const mega_io_hyperlinks = Object.create(null);
@@ -1898,10 +1899,21 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A1]', mega_io_hyperlinks['vpn#dow'])
         .replace('[A2]', mega_io_hyperlinks.pricing)
         .replace(/\[\/A[12]]/g, '</a>');
+    l.pwm_is_attached_text = escapeHTML(l.pwm_is_attached_text)
+        .replace('[A1]', mega_io_hyperlinks['pass#dow'])
+        .replace('[A2]', mega_io_hyperlinks.pricing)
+        .replace(/\[\/A[12]]/g, '</a>');
     l.vpn_added_text = escapeHTML(l.vpn_added_text)
         .replace('[A1]', mega_io_hyperlinks['vpn#dow'])
         .replace('[A2]', '<a href="/fm/account/plan" target="_blank" rel="noopener noreferrer">')
         .replace(/\[\/A[12]]/g, '</a>');
+    l.pwm_added_text = escapeHTML(l.pwm_added_text)
+        .replace('[A1]', mega_io_hyperlinks['pass#dow'])
+        .replace('[A2]', '<a href="/fm/account/plan" target="_blank" rel="noopener noreferrer">')
+        .replace(/\[\/A[12]]/g, '</a>');
+    l.already_have_two_features_b = escapeHTML(l.already_have_two_features_b)
+        .replace('[A1]', mega_io_hyperlinks['p-s/p-b/c-s'])
+        .replace('[/A1]', '</a>');
 
     l.stripe_card_declined_error = escapeHTML(l.stripe_card_declined_error)
         .replace('[A]', '<a href="https://help.mega.io/plans-storage/payments-billing/why-is-my-card-being-declined">')
@@ -1913,6 +1925,35 @@ mBroadcaster.once('boot_done', function populate_l() {
 
     l.vpn_to_disable_text = escapeHTML(l.vpn_to_disable_text)
         .replace('[A]', `<a href="${cancelSubLink}" target="_blank">`)
+        .replace('[/A]', '</a>');
+    l.pwm_to_disable_text = escapeHTML(l.pwm_to_disable_text)
+        .replace('[A]', `<a href="${cancelSubLink}" target="_blank">`)
+        .replace('[/A]', '</a>');
+
+    l.date_added = escapeHTML(l.date_added).replace('[S]', '<span>').replace('[/S]', '</span>');
+
+    l.error_fetching_items = escapeHTML(l.error_fetching_items)
+        .replace('[A]', '<a href="mailto:support@mega.nz">')
+        .replace('[/A]', '</a>');
+
+    l.contact_support = escapeHTML(l.contact_support)
+        .replace('[A]', '<a href="mailto:support@mega.nz">')
+        .replace('[/A]', '</a>');
+
+    l.item_updated = escapeHTML(l.item_updated)
+        .replace('[S]', '"<span class="long-title-truncate">')
+        .replace('[/S]', '</span>"');
+
+    l.delete_confirmation_title = escapeHTML(l.delete_confirmation_title)
+        .replace('[S]', '<span class="long-title-truncate">"')
+        .replace('[/S]', '</span>"');
+
+    l.item_deleted = escapeHTML(l.item_deleted)
+        .replace('[S]', '"<span class="long-title-truncate">')
+        .replace('[/S]', '</span>"');
+
+    l.request_failed = escapeHTML(l.request_failed)
+        .replace('[A]', '<a href="mailto:support@mega.nz">')
         .replace('[/A]', '</a>');
 
     const common = [

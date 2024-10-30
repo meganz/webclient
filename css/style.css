@@ -2303,10 +2303,14 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .contains-value .top-search-input {
     transition: none;
 }
-.fm-main {
+.fm-main, .pm-main {
     height: 100%;
     overflow: hidden;
     background: var(--surface-main);
+}
+.pm-main {
+    display: flex;
+    flex-direction: column;
 }
 .fm-left-panel {
     background: var(--surface-grey-2);
@@ -2443,6 +2447,12 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
 .nw-fm-left-icon.user-management::before {
     width: 48px;
     height: 48px;
+}
+.nw-fm-left-icon.pwm {
+    height: 94px;
+}
+.nw-fm-left-icon.pwm .nav-icon-label {
+    white-space: normal;
 }
 .transfers .nw-fm-left-border {
     z-index: 100;

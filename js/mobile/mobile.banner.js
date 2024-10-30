@@ -1,9 +1,9 @@
 /**
  * Create a banner object that covers top alerts, inline alerts and inline advertisements
  *
- * @parent MegaMobileComponent
+ * @parent MegaComponent
  * @features type, title, message, left-icon, right-icon/advertisement, action button text
- * @structure Banner component is used by MegaMobileRack for top-alert banners and directly for inline banners.
+ * @structure Banner component is used by MegaRack for top-alert banners and directly for inline banners.
  * @example
  * // MegaMobileBanner({
  *     parentNode: XXX,
@@ -11,7 +11,7 @@
  * })
  *
  */
-class MegaMobileBanner extends MegaMobileComponent {
+class MegaMobileBanner extends MegaComponent {
 
     /**
      * Banner constructor.
@@ -42,7 +42,8 @@ class MegaMobileBanner extends MegaMobileComponent {
         ]);
 
         // CTA button
-        this.actionButton = new MegaMobileButton({
+        const interactableClass = options.actionButtonType === 'link' ? MegaLink : MegaButton;
+        this.actionButton = new interactableClass({
             parentNode: contentBox,
             text: 'b',
             type: 'normal',
@@ -55,7 +56,7 @@ class MegaMobileBanner extends MegaMobileComponent {
 
         const endBox = this.domNode.appendChild(mCreateElement('div', {'class': 'banner end-box'}));
         // Close button
-        this.xButton = new MegaMobileButton({
+        this.xButton = new MegaButton({
             parentNode: endBox,
             type: 'icon',
             icon: 'sprite-mobile-fm-mono icon-dialog-close',
@@ -404,7 +405,7 @@ class MegaMobileBanner extends MegaMobileComponent {
     }
 
     /**
-     * Create MegaMobileRacks at runtime as appropriate to display alerts and ads.
+     * Create MegaRacks at runtime as appropriate to display alerts and ads.
      *
      * @returns {undefined}
      */
@@ -415,7 +416,7 @@ class MegaMobileBanner extends MegaMobileComponent {
         }
 
         // Single alerts instant object
-        mega.ui.alerts = new MegaMobileRack({
+        mega.ui.alerts = new MegaRack({
             parentNode: mainlayout,
             componentClassname: 'banner-rack flow-up top',
             prependRack: true,

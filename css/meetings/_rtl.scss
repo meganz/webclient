@@ -1,0 +1,49 @@
+body.rtl {
+    /* [...] */
+
+    .stream-participants-block {
+        /* [...] */
+
+        .video-node-status {
+            left: unset;
+            right: 5px;
+        }
+    }
+
+    .meetings-call {
+        /* [...] */
+
+        .sidebar-wrapper {
+            /* [...] */
+
+            .sidebar {
+                direction: rtl;
+            }
+
+            .participants {
+                /* [...] */
+
+                ul {
+                    /* [...] */
+
+                    li {
+                        /* [...] */
+
+                        .name span { float: right; }
+                        .status { float: left; }
+
+                        .participants-menu-content {
+                            left: 0;
+                            right: unset;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #schedule-dialog .meetings-select .mega-input .mega-input-dropdown {
+        left: 0;
+        right: auto;
+    }
+}

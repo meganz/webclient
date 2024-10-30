@@ -1,4 +1,4 @@
-class MegaMobileDatePicker extends MegaMobileComponent {
+class MegaMobileDatePicker extends MegaComponent {
 
     /**
      * Date picker constructor.

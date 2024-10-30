@@ -1,0 +1,107 @@
+.pm.mega-input input,
+.pm.mega-input.title-ontop .mega-input-title,
+.pm.mega-input .pass-visible {
+    z-index: auto;
+}
+.pm.mega-input input {
+    outline: none;
+}
+.pm.mega-input.box-style.textarea {
+    padding: 0;
+    border: none;
+    height: 142px;
+}
+.pm.mega-input .text-area-wrapper {
+    display: inline-block;
+    height: 140px;
+    width: 100%;
+    padding: 14px 12px;
+    overflow: hidden;
+    box-sizing: border-box;
+    border-radius: var(--mobile-border-radius-medium);
+    border: 1px solid var(--mobile-border-strong);
+    margin-bottom: 24px;
+}
+.pm textarea.form-element {
+    overflow-y: auto;
+    height: 100%;
+    padding: 12px;
+    border: none;
+    box-sizing: border-box;
+    border-radius: var(--mobile-border-radius-medium);
+}
+.pm.mega-input .mega-input-title .optional {
+    margin-inline-start: 8px;
+    -webkit-margin-start: 8px;
+    font: var(--mobile-font-caption-large-regular);
+    color: var(--mobile-text-primary);
+}
+.pm.mega-input.optional .mega-input-title {
+    display: flex;
+}
+.pm.mega-input input.password,
+.pm.mega-input .password-colorized {
+    font: var(--font-input-password);
+    text-overflow: clip;
+}
+.pm.mega-input .password-colorized {
+    position: absolute;
+    top: auto;
+    left: 11px;
+    background: var(--mobile-page-background);
+    padding: 2px;
+    box-sizing: border-box;
+    width: 351px;
+    overflow: hidden;
+}
+.pm.mega-input.strengthChecker .message-container {
+    top: 51px;
+}
+.pm.mega-input.strengthChecker.title-ontop {
+    margin-bottom: 30px;
+}
+.pm.mega-input .account.password-status {
+    font: var(--mobile-font-caption-large-regular);
+    display: none;
+    align-items: center;
+    position: absolute;
+    top: 41px;
+    left: 0;
+    width: 100%;
+    margin: 10px 0 24px;
+}
+.pm.mega-input .account.password-status.checked {
+    display: flex;
+}
+.pm.mega-input .account.password-status .strength-text {
+    margin-left: 8px;
+}
+.pm.mega-input input[type="number"] {
+    appearance: textfield;
+    text-align: center;
+}
+.pm.mega-input input[type="number"]::-webkit-inner-spin-button,
+.pm.mega-input input[type="number"]::-webkit-outer-spin-button {
+    appearance: none;
+    margin: 0;
+}
+.pm.mega-input.box-style > input ~ i {
+    margin: 0;
+    -webkit-margin-end: 8px;
+    margin-inline-end: 8px;
+}
+.pm.mega-input.success.msg,
+.pm.mega-input.box-style.active.success {
+    border: 1px solid var(--mobile-support-success);
+}
+.pm.mega-input.success .message-container {
+    color: var(--mobile-text-success);
+}
+.pm.mega-input.title-ontop {
+    margin: 24px 0;
+}
+
+/* Overridden component styles for webclient layout */
+.pm.mega-input .mega-banner i {
+    --icon-size: 16px;
+}

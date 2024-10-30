@@ -1,0 +1,132 @@
+.mega-dropdown {
+    display: grid;
+}
+
+.mega-dropdown label {
+    font: var(--mobile-font-caption-large-bold);
+    color: var(--mobile-text-primary);
+}
+
+.nav-elem.full-width.dropdown-button {
+    height: 48px;
+}
+.dropdown-button {
+    border: none;
+    background: var(--mobile-page-background);
+    padding: 0 5px;
+    font: var(--mobile-font-copy-regular);
+    color: var(--mobile-text-placeholder);
+}
+.dropdown-button.selected option {
+    color: var(--mobile-text-primary);
+}
+
+.search-box-wrapper {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    justify-content: space-between;
+}
+
+.list-items {
+    overflow-y: auto;
+}
+
+.nav-elem.list-item {
+    padding: 0;
+}
+
+/* Selection options */
+.nav-elem.full-width.text-only.list-item span {
+    font: var(--mobile-font-copy-regular);
+    color: var(--mobile-text-primary);
+}
+
+.nav-elem.full-width.text-only.list-item:active {
+    text-decoration: none;
+}
+
+/* Selected */
+.sort-password-list .nav-elem.full-width.text-only.list-item span.sub-text {
+    font: var(--mobile-font-caption-large-regular);
+    color: var(--mobile-text-secondary);
+}
+
+.sort-password-list li.list-item {
+    height: 65px;
+}
+
+.no-results {
+    color: var(--mobile-text-primary);
+    font: var(--mobile-font-copy-regular);
+    text-align: center;
+    word-break: break-word;
+}
+
+.no-results h2:empty {
+    margin: 0;
+}
+
+.dropdown-container {
+    background-color: var(--mobile-surface-1);
+    width: auto;
+    height: auto;
+    border-radius: var(--mobile-border-radius-large);
+    display: flex;
+    box-sizing: border-box;
+    align-items: start;
+    position: absolute;
+    overflow-y: auto;
+    visibility: hidden;
+}
+.dropdown-container.active {
+    visibility: visible;
+}
+
+.overlay-wrap .content ul.sort-password-list {
+    width: 260px;
+    padding: 16px;
+    margin: 0;
+}
+
+ul.sort-password-list li i {
+    margin-inline-start: auto;
+    -webkit-margin-start: auto;
+}
+
+.hidden-select {
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    position: absolute;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+.sk-loading.name-sort.dropdown-button {
+    padding-bottom: 0;
+    justify-content: flex-start;
+}
+.sk-loading.name-sort.dropdown-button .icon {
+    display: none;
+}
+
+/* Overridden component styles for webclient layout */
+
+.overlay-wrap .content ul.sort-password-list,
+.nav-elem.full-width.dropdown-button {
+    width: auto;
+}
+
+.sort-password-list .list-item.nav-elem {
+    padding: 16px 8px;
+    height: auto;
+}
+
+.sort-password-list .list-item:hover {
+    background: var(--mobile-surface-1);
+    border-radius: var(--mobile-border-radius-medium);
+}

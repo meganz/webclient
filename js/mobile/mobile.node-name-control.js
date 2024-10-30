@@ -92,7 +92,7 @@ class MobileNodeNameControl {
                 onIdle(() => nameInput.$input.trigger('focus'));
             }
 
-            const button = this.actionButton = new MegaMobileButton({
+            const button = this.actionButton = new MegaButton({
                 parentNode: mega.ui.sheet.actionsNode,
                 type: 'normal',
                 text: typeInfo.button,

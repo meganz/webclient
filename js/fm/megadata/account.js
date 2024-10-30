@@ -262,16 +262,18 @@ MegaData.prototype.accountData = function(cb, blockui, force) {
                     account.subs = Array.isArray(uqres.subs) && uqres.subs || [];
 
                     if (account.plans.length) { // Backward compatibility to uq:v1 based on the first active plan
-                        const { al, expires, features, subid } = account.plans[0]; // Active plan details
+                        // Active plan details (get first plan with plan level matching u_attr.p,
+                        // or use first entry if u_attr.p doesn't exist)
+                        const activePlan = account.plans.find(({ al }) => al === u_attr.p) || account.plans[0];
 
                         // Excluding feature plans
-                        if (al !== pro.ACCOUNT_LEVEL_FEATURE) {
-                            const sub = account.subs.find(({ id }) => id === subid);
+                        if (activePlan && activePlan.al !== pro.ACCOUNT_LEVEL_FEATURE) {
+                            const sub = account.subs.find(({ id }) => id === activePlan.subid);
                             const hasSub = !!sub;
 
-                            account.slevel = al;
-                            account.snext = hasSub && sub.next || expires || 0;
-                            account.sfeature = features;
+                            account.slevel = activePlan.al;
+                            account.snext = hasSub && sub.next || activePlan.expires || 0;
+                            account.sfeature = activePlan.features;
                             account.stype = hasSub && sub.type || 'O';
                             account.scycle = hasSub && sub.cycle || '';
                             account.smixed = 0;
@@ -494,7 +496,7 @@ MegaData.prototype.getAccountDetails = function() {
             const {u_attr} = window;
 
             if (u_attr && typeof result === 'object') {
-                const upd = `b,mkt,p,pf,uspw,notifs`.split(',');
+                const upd = `b,features,mkt,notifs,p,pf,pwmh,uspw`.split(',');
 
                 for (let i = upd.length; i--;) {
                     const k = upd[i];

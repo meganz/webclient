@@ -28,7 +28,7 @@ class MegaMobilePromoBanner extends MegaMobileOverlay {
 
         this.buildAdvantages([advantageOne,advantageTwo,advantageThree]);
 
-        const openInAppBtn = new MegaMobileButton({
+        const openInAppBtn = new MegaButton({
             parentNode: this.actionsNode,
             type: 'normal',
             componentClassname: `primary block`,
@@ -40,7 +40,7 @@ class MegaMobilePromoBanner extends MegaMobileOverlay {
             goToMobileApp(MegaMobileViewOverlay.getAppLink(folderlink || M.RootID));
         });
 
-        const continueBtn = new MegaMobileButton({
+        const continueBtn = new MegaButton({
             parentNode: this.actionsNode,
             type: 'normal',
             componentClassname: `secondary block`,

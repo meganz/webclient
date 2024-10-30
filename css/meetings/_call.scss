@@ -1,3 +1,5 @@
+@use 'sass:meta';
+
 .meetings-call {
     position: fixed;
     top: 0;
@@ -18,6 +20,20 @@
         .sidebar-controls,
         .recording-control { bottom: 0; }
         .stream-head { top: 0; }
+    }
+
+    &.with-timeout-banner {
+        /* [...] */
+
+        .sidebar-wrapper .sidebar {
+            height: calc(100% - 200px);
+            margin-top: 16px;
+        }
+
+        .stream-wrapper {
+            height: calc(100% - 200px);
+            padding-top: 102px;
+        }
     }
 
     &-onboarding {
@@ -63,11 +79,11 @@
         }
     }
 
-    @import '_stream.scss';
-    @import '_recordingControl.scss';
-    @import '_streamControls.scss';
-    @import '_sidebarControls.scss';
-    @import '_sidebar.scss';
+    @include meta.load-css('_stream.scss');
+    @include meta.load-css('_recordingControl.scss');
+    @include meta.load-css('_streamControls.scss');
+    @include meta.load-css('_sidebarControls.scss');
+    @include meta.load-css('_sidebar.scss');
 
     button.call-action {
         background: transparent;

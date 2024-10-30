@@ -24,7 +24,7 @@
     });
  */
 
-class MegaMobileTab extends MegaMobileComponent {
+class MegaMobileTab extends MegaComponent {
 
     constructor(options) {
 
@@ -66,7 +66,7 @@ class MegaMobileTab extends MegaMobileComponent {
             return false;
         }
 
-        let tabComponent = MegaMobileButton;
+        let tabComponent = MegaButton;
 
         const tabOptions = {
             parentNode: this.domNode.querySelector('.tab-container'),
@@ -86,7 +86,7 @@ class MegaMobileTab extends MegaMobileComponent {
                 return false;
             }
 
-            tabComponent = MegaMobileLink;
+            tabComponent = MegaLink;
             tabOptions.href = item.href;
         }
 

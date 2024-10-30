@@ -44,13 +44,13 @@ mobile.settings.account.verifyDelete = Object.create(mobile.settingsHelper, {
                 'class': 'mobile-settings-buttons'
             }, this.domNode);
 
-            this.deleteButton = new MegaMobileButton({
+            this.deleteButton = new MegaButton({
                 parentNode: buttonsDiv,
                 componentClassname: 'mobile-settings-button block',
                 text: l.account_continue_delete
             }).on('tap.deleteAccount', () => this.continue());
 
-            this.noDeleteButton = new MegaMobileButton({
+            this.noDeleteButton = new MegaButton({
                 parentNode: buttonsDiv,
                 componentClassname: 'mobile-settings-button block secondary',
                 text: l.account_no_delete

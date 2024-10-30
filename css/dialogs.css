@@ -5355,7 +5355,7 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.cancel-subscription-benefits .features-table .features-table-header-content {
         width: 100%;
         display: flex;
-        font: var(--text-body1)
+        font: var(--text-body1-bold);
     }
     .mega-dialog.cancel-subscription-benefits .features-table .features-table-seperator {
         border-top: 2px solid var(--surface-grey-2);
@@ -5367,9 +5367,16 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.cancel-subscription-benefits .features-table .features-table-item {
         display: flex;
         align-items: center;
-        height: 32px;
+        min-height: 32px;
         font: var(--text-body2);
         justify-content: center;
+    }
+    .mega-dialog.cancel-subscription-benefits .features-table i.icon-check-small-regular-outline {
+        --icon-size: 24px;
+    }
+    .mega-dialog.cancel-subscription-benefits .features-table i.icon-check-small-regular-outline::before {
+        font-weight: bold;
+        color: var(--secondary-green);
     }
     .mega-dialog.cancel-subscription-benefits .features-table .features-table-item.title {
         justify-content: flex-start;
@@ -5383,6 +5390,9 @@ body.de .mega-dialog.contact-picker-widget {
         padding: 43px 24px 24px;
         display: flex;
         align-items: flex-end;
+    }
+    .mega-dialog.cancel-subscription-benefits.features footer {
+        padding: 8px 24px 0;
     }
 
 /* cancel-subscription-benefits end */

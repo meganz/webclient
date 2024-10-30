@@ -83,7 +83,7 @@ function msgDialog(type, title, msg, subMsg, callback, checkboxCallback) {
         buttonsArray.reverse();
     }
 
-    mobile.messageOverlay.render(
+    megaMsgDialog.render(
         title,
         msg,
         subMsg,

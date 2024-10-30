@@ -251,7 +251,7 @@
     padding: 0 24px;
     margin: 35px 0;
 }
-.account.data-block.account-type .settings-right-block .vpn-details {
+.account.data-block.account-type .settings-right-block .feature-details {
     order: -1;
 }
 .account.data-block.account-type .settings-right-block .extra-sub.paid {
@@ -467,6 +467,12 @@
 .account.plan-info {
     color: var(--text-color-high);
     font: var(--text-body1);
+    display: flex;
+    flex-direction: column;
+}
+
+.settings-sub-section.pro-extras .account.plan-info > *:not(:last-child) {
+    margin-bottom: 8px;
 }
 
 /* Settings content. Free trial */

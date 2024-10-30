@@ -1,0 +1,83 @@
+/* Top navigation styles */
+.top-container .login-header,
+.top-container .logged-header {
+    border-bottom: 1px solid var(--mobile-border-strong);
+    height: 47px;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.top-container.logged-in .login-header,
+.top-container:not(.logged-in) .logged-header {
+    display: none;
+}
+
+.nav-elem.menu-btn {
+    padding: 0 12px;
+}
+.pm.mega-input.search-bar.disabled {
+    background-color: var(--mobile-button-disabled);
+}
+.pm.mega-input.search-bar {
+    width: auto;
+    flex-grow: 1;
+    margin: 0 16px 0 0;
+}
+
+.search-bar .form-element {
+    margin: 0;
+    width: 100%;
+}
+
+.search-bar .left-icon {
+    z-index: 1;
+}
+
+.search-bar.focus .form-element {
+    padding-left: 12px;
+}
+
+.search-bar input:focus::placeholder {
+    color: transparent;
+}
+
+.search-bar.focus.mega-input.with-icon .left-icon,
+.search-bar.valued.mega-input.with-icon .left-icon {
+    color: transparent;
+}
+
+/* Overridden component styles for webclient layout */
+
+.top-container {
+    width: 100%;
+}
+
+.top-container .menu-btn,
+.top-container .avatar {
+    display: none;
+}
+
+.top-container .logged-header {
+    border: none;
+    padding: 24px;
+}
+
+.top-container .search-bar {
+    max-width: 800px;
+    flex: 1;
+}
+
+@media only screen and (max-width: 1319px) {
+    .top-container .add-btn {
+        padding: 12px;
+    }
+    .top-container .add-btn i {
+        margin-inline-end: 0;
+        -webkit-margin-end: 0;
+    }
+    .top-container .add-btn .text-box-wrapper {
+        display: none;
+    }
+}

@@ -1,0 +1,117 @@
+/* Important general classnames */
+
+.pm-main .favicon {
+    width: 24px;
+    height: 24px;
+}
+
+.pm-main .manual-favicon,
+.password-item-form .manual-favicon {
+    color: var(--favicon-text-color);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background-color: var(--mobile-surface-3);
+}
+
+.pm-main .manual-favicon.color0,
+.password-item-form .manual-favicon.color0 {
+    background-color: var(--mobile-indicator-yellow);
+}
+
+.pm-main .manual-favicon.color1,
+.password-item-form .manual-favicon.color1 {
+    background-color: var(--mobile-indicator-blue);
+}
+
+.pm-main .manual-favicon.color2,
+.password-item-form .manual-favicon.color2 {
+    background-color: var(--mobile-indicator-green);
+}
+
+.pm-main .favicon .favicon-brand img,
+.password-item-form .favicon .favicon-brand img {
+    width: 24px;
+    height: 24px;
+}
+
+.pm-main h1 {
+    font: var(--mobile-font-heading-h1);
+}
+
+.pm-main h2 {
+    font: var(--mobile-font-heading-h2);
+}
+
+.pm-main h3 {
+    font: var(--mobile-font-heading-h3);
+}
+
+.pm-main span,
+.pm-main p {
+    font: var(--mobile-font-caption-large-regular);
+}
+
+.pm-main a {
+    font: var(--mobile-font-link-large-regular);
+    color: var(--mobile-link-primary);
+}
+
+.pm-main label {
+    font: var(--font-label-semibold);
+}
+
+.pm-main textarea {
+    resize: none;
+    outline: none;
+}
+
+.pm-main input::placeholder {
+    color: var(--mobile-text-placeholder);
+}
+
+.pm-main fieldset.fieldset {
+    border: none;
+    padding: 0;
+}
+
+
+/* Skeleton loading */
+
+.pm-main .sk-loading {
+    cursor: default !important;
+}
+
+.pm-main .sk-loading .sk-elm * {
+    display: none;
+}
+
+.pm-main .sk-loading i.sk-elm,
+.pm-main .sk-loading .sk-elm > * {
+    position: relative;
+    overflow: hidden;
+    inset: 0;
+    background-image: linear-gradient(90deg, var(--mobile-surface-2) 50px, var(--mobile-surface-1) 150px, var(--mobile-surface-2) 250px);
+    background-size: 1000px 100%;
+    animation: pm-shimmer 2s infinite linear;
+    border-radius: 8px;
+}
+.pm-main .sk-loading .sk-elm::after {
+    border-radius: 8px;
+    display: block;
+    content: "";
+}
+.pm-main .nav-elem.sk-loading .sk-elm::after {
+    height: 0;
+}
+
+@keyframes pm-shimmer {
+    0% {
+        background-position: 0;
+    }
+    100% {
+        background-position: 1000px;
+    }
+}

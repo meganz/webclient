@@ -45,11 +45,6 @@
             left: auto;
             right: 0;
             height: 220px;
-
-            body.rtl & {
-                left: 0;
-                right: auto;
-            }
         }
     }
 }

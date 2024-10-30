@@ -4135,7 +4135,7 @@ function FMResizablePane(element, opts) {
 
     this.setOption = function(key, value) {
         opts[key] = value;
-        this.element.resizable('option', key, value);
+        $element.resizable('option', key, value);
         this.setWidth();
     };
 

@@ -73,7 +73,7 @@ mobile.settings.history = Object.create(mobile.settingsHelper, {
             const actionButtonsContainer = mCreateElement('div', {"class": "action-buttons"}, this.domNode);
 
             // "Close all sessions" button - disable if a user has no active sessions
-            const closePrevSessions = new MegaMobileButton({
+            const closePrevSessions = new MegaButton({
                 parentNode: actionButtonsContainer,
                 text: l.log_out_prev_sessions,
                 componentClassname: "block secondary"
@@ -202,7 +202,7 @@ mobile.settings.history = Object.create(mobile.settingsHelper, {
                 ),
                 active: targetNode => {
 
-                    const closeSessionButton = new MegaMobileButton({
+                    const closeSessionButton = new MegaButton({
                         parentNode: targetNode,
                         componentClassname: `action-link active session-action-button`,
                         text: l.log_out_state,

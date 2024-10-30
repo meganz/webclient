@@ -1,0 +1,102 @@
+.rack.toast {
+    --slot-spacing: 10px;
+    position: fixed;
+    display: inline-flex;
+    padding-bottom: 24px;
+    place-content: center center;
+    align-items: stretch;
+    max-width: 327px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Rack positioning */
+.rack.toast,
+.rack.toast.bottom {
+    flex-flow: column-reverse nowrap;
+    bottom: 0;
+}
+.rack.toast.bottom.above-fab,
+.rack.toast.bottom.above-actions {
+    bottom: 64px;
+}
+.rack.toast.bottom.above-btn {
+    bottom: 48px;
+}
+.rack.toast.top {
+    flex-flow: column nowrap;
+    top: 0;
+}
+
+/* Toast component */
+.toast-notification {
+    display: flex;
+    flex-flow: row nowrap;
+    place-content: center space-between;
+    align-items: center;
+    background-color: var(--mobile-toast-background);
+    color: var(--mobile-text-inverse);
+    font: var(--mobile-font-caption-large-regular);
+    border-radius: var(--mobile-border-radius-medium);
+    box-shadow: var(--mobile-shadow-strong);
+    box-sizing: border-box;
+    padding: 11px 24px;
+    width: 100%;
+}
+
+.toast-notification > button {
+    margin-inline-start: 10px;
+    -webkit-margin-start: 10px;
+}
+
+.toast-notification .message-body {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: flex;
+}
+
+.toast-notification .action-link span {
+    color: #69A3FB;
+    font: var(--mobile-font-label-bold);
+}
+
+/* Style added for toast component */
+.nav-elem.normal.action-link {
+    padding: 0;
+    background: none;
+    height: auto;
+    color: var(--mobile-link-primary);
+    font: var(--mobile-font-label-bold);
+    text-decoration: none;
+}
+
+.nav-elem.action-link.toast {
+    color: var(--mobile-link-inverse);
+}
+.nav-elem.action-link.toast span {
+    font: var(--mobile-font-copy-semibold);
+    white-space: nowrap;
+}
+
+.long-title-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+@media only screen and (min-width: 768px) and (max-width: 1024px) {
+    .rack.toast.bottom.above-btn {
+        bottom: 64px;
+    }
+}
+
+@media only screen and (min-width: 769px) {
+    .rack.toast {
+        max-width: fit-content;
+    }
+
+    .long-title-truncate {
+        max-width: 178px;
+    }
+}

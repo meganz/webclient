@@ -123,7 +123,7 @@ mobile.linkManagement = {
 
         const expiryTimestamp = M.getNodeShare(this.handle).ets;
 
-        const expiryDateToggle = new MegaMobileToggleButton({
+        const expiryDateToggle = new MegaToggleButton({
             parentNode: this.expDateToggleContainer,
             componentClassname: 'mega-toggle-button',
             disabled: false,
@@ -353,7 +353,7 @@ mobile.linkManagement = {
         this.pwdToggleContainer = document.createElement('div');
         this.pwdToggleContainer.className = 'toggle-container password';
 
-        this.passwordToggle = new MegaMobileToggleButton({
+        this.passwordToggle = new MegaToggleButton({
             parentNode: this.pwdToggleContainer,
             componentClassname: 'mega-toggle-button',
             disabled: false,
@@ -429,7 +429,7 @@ mobile.linkManagement = {
         this.decKeyToggleContainer = document.createElement('div');
         this.decKeyToggleContainer.className = 'toggle-container decryption-key';
 
-        this.decryptionKeyToggle = new MegaMobileToggleButton({
+        this.decryptionKeyToggle = new MegaToggleButton({
             parentNode: this.decKeyToggleContainer,
             componentClassname: 'mega-toggle-button',
             disabled: false,

@@ -1,0 +1,78 @@
+/**
+  * Please read wiki article 'CSS Variables and Themes' before editing this file.
+  *
+  * All variable names are based on the design system and serve the purpose of bridging between the design and
+  * development teams. Other variables should be put elsewhere.
+  *
+  * Variable format: --type-purpose-color-importance-state, e.g. --text-body1-black-high-hover. Not all parts need
+  * to be added for all variables, and some parts may have multiple words (e.g. `line-height`).
+  *
+  * When styling, always use the most specific variable, e.g. if you are styling an element which should have
+  * body (1) text, use `--text-color-high` rather than `--text-color-white-high` so that it changes with
+  * the theme.
+  *
+  * The variables at the bottom will update their value when switching theme, and the attributes can be assigned
+  * to the body, or any element within it to give that element and its children a different theme, e.g. to demo
+  * themes, or for sections which are inverted compared to the rest of the theme (accents, etc.).
+  *
+  * Themes can be forced so that they are always on using the `-forced` suffix, for example the nav bar is always
+  * dark mode.
+  *
+  * Color must be in RGBA format. e.g. rgba(0, 0, 0, 1)
+  *
+  * Custom Alpha Level can be added to override the alpha level when required.
+  * Custom alpha var name must be starts with color var {type}. e.g. --label-black: rgba(0, 0, 0, var(--label-alpha, 1))
+  */
+
+
+/*** Section 1: constants that will not vary by theme, but may only be used by one theme at the moment ***/
+
+body,
+.custom-alpha {
+
+    /* texts */
+
+        /* font family */
+
+            --font-family-password: "Work Sans", sans-serif;
+
+        /* font weight */
+
+            --font-weight-medium: 500;
+
+        /* font */
+
+            --font-button-label: var(--mobile-font-weight-semibold) var(--mobile-font-size-4)/var(--mobile-font-line-height-heading) var(--mobile-font-family-main);
+            --font-password-preview: var(--mobile-font-weight-bold) var(--mobile-font-size-6)/var(--mobile-font-line-height-text) var(--font-family-password);
+            --font-input-password: var(--font-weight-medium) var(--mobile-font-size-4)/var(--mobile-font-line-height-text) var(--font-family-password);
+            --font-label-semibold: var(--mobile-font-weight-semibold) var(--mobile-font-size-3)/var(--mobile-font-line-height-heading) var(--mobile-font-family-main);
+
+    /* outline */
+
+        --outline: 4px solid var(--field-outline);
+
+
+    /* favicons(site icons) */
+        --favicon-text-color: rgba(48, 50, 51, 1);
+}
+
+
+/*** Section 2: shorthand variables that will automatically update on changing theme ***/
+
+/* light theme */
+.theme-light,
+.theme-light .custom-alpha,
+html .theme-light-forced {
+
+    /* outline */
+        --field-outline: rgba(189, 217, 255, 1);
+}
+
+/* dark theme */
+.theme-dark,
+.theme-dark .custom-alpha,
+html .theme-dark-forced {
+
+    /* outline */
+        --field-outline: rgb(38, 71, 208);
+}

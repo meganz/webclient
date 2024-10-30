@@ -1,4 +1,4 @@
-class MegaMobileAchievementsBlock extends MegaMobileComponent {
+class MegaMobileAchievementsBlock extends MegaComponent {
 
     /**
      * Constructor for the achievements block

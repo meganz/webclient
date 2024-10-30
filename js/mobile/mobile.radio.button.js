@@ -1,4 +1,4 @@
-class MegaMobileRadioButton extends MegaMobileComponent {
+class MegaMobileRadioButton extends MegaComponent {
 
     constructor(options) {
 

@@ -406,6 +406,9 @@ function crypto_makeattr(n, nn) {
     if (typeof n.des !== 'undefined') {
         ar.des = n.des;
     }
+    if (typeof n.pwm !== 'undefined') {
+        ar.pwm = JSON.stringify(n.pwm).slice(1, -1);
+    }
 
     const buf = str_to_ab(`MEGA${to8(JSON.stringify(ar))}`);
     const key = a32_to_ab([nn.k[0] ^ nn.k[4], nn.k[1] ^ nn.k[5], nn.k[2] ^ nn.k[6], nn.k[3] ^ nn.k[7]]);
@@ -524,6 +527,11 @@ function crypto_procattr(n, key) {
             if (typeof o.des !== 'undefined') {
                 n.des = o.des;
                 delete o.des;
+            }
+
+            if (typeof o.pwm !== 'undefined') {
+                n.pwm = tryCatch(() => JSON.parse(`{${o.pwm}}`))();
+                delete o.pwm;
             }
 
             if (o.l && o.l.length === 8 || o.gp && o.gp.length === 16) {
@@ -1001,7 +1009,7 @@ lazy(self, 'decWorkerPool', function decWorkerPool() {
     /** @class decWorkerPool */
     return new class extends Array {
         get url() {
-            const WORKER_VERSION = 6;
+            const WORKER_VERSION = 7;
             return `${window.is_extension || window.is_karma ? '' : '/'}nodedec.js?v=${WORKER_VERSION}`;
         }
 

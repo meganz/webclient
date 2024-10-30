@@ -1,4 +1,4 @@
-class MegaMobileDropdown extends MegaMobileComponent {
+class MegaMobileDropdown extends MegaComponent {
     constructor(options) {
         super(options);
 

@@ -32,7 +32,7 @@ mobile.settings.account.verifyEmail = Object.create(mobile.settingsHelper, {
                 'data-wrapper-class': 'box-style fixed-width mobile',
             }, this.domNode);
 
-            new MegaMobileButton({
+            new MegaButton({
                 parentNode: this.domNode,
                 componentClassname: 'form-button block',
                 text: l[1960]

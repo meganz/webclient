@@ -54,8 +54,8 @@ mobile.achieve.invites = Object.create(mobile.settingsHelper, {
             this.domNode.append(rewardInfo);
 
             // How it works button
-            const howItWorksBtn = new MegaMobileButton({
-                type: 'text',
+            const howItWorksBtn = new MegaButton({
+                type: 'normal',
                 componentClassname: 'text-icon how-it-works',
                 text: l[1070],
                 parentNode: this.domNode
@@ -107,7 +107,7 @@ mobile.achieve.invites = Object.create(mobile.settingsHelper, {
             });
 
             // Invite button
-            this.inviteButton = new MegaMobileButton({
+            this.inviteButton = new MegaButton({
                 parentNode: formNode,
                 text: l[8726],
                 type: 'normal',

@@ -1,0 +1,26 @@
+.pm-form {
+    display: flex;
+    width: 364px;
+    flex-direction: column;
+    position: relative;
+    margin: auto;
+    text-align: start;
+    box-sizing: border-box;
+}
+
+/* Overridden component styles for webclient layout */
+.pm-form {
+    width: initial;
+    margin-bottom: 24px;
+}
+.form-actions {
+    display: flex;
+    padding: 8px 0;
+}
+.form-actions .button.nav-elem.normal {
+    width: 232px;
+}
+.form-actions .button.nav-elem.normal:first-child {
+    margin-inline-end: 16px;
+    -webkit-margin-end: 16px;
+}

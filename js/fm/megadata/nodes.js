@@ -242,6 +242,7 @@ MegaData.prototype.getPath = function(id) {
             || mega.gallery.sections[id]
             || id === 'file-requests'
             || id === 's4'
+            || id === 'pwm'
         ) {
             result.push(id);
         }
@@ -314,6 +315,10 @@ MegaData.prototype.getPath = function(id) {
             }
             else if (cv.type === 'file-requests' && mega.fileRequest.publicFolderExists(result[i], true)) {
                 result[i + 1] = 'file-requests';
+                break;
+            }
+            else if (cv.type === 'pwm' && cv.nodeID === result[i]) {
+                result[i + 1] = 'pwm';
                 break;
             }
             result.pop();
@@ -455,6 +460,19 @@ MegaData.prototype.isCustomView = function(pathOrID) {
         result.type = result.nodeID = 'file-requests';
         result.prefixTree = 'fr_';
         result.prefixPath = '';
+    }
+    else if (pathOrID === 'pwm' || pathOrID === mega.pwmh) {
+        result.type = 'pwm';
+        result.nodeID = mega.pwmh;
+        result.prefixTree = '';
+        result.prefixPath = '';
+        result.original = 'pwm';
+    }
+    else if (pathOrID.startsWith('pwm/') || node.pwm) {
+        result.type = 'pwm';
+        result.nodeID = pathOrID.replace('pwm/', '');
+        result.prefixTree = '';
+        result.prefixPath = 'pwm/';
     }
 
     // This is not a out-share or a public-link
@@ -1910,6 +1928,13 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
                 mega.gallery.albumsRendered = false;
             }
 
+            // TODO: Improve the list rendering to only update each node if the action packet does not affect
+            // list ordering.
+            // Currently, we lack the detailed feature for this, which will be part of the PWM extension.
+            if (type === 'pwm') {
+                tryCatch(() => mega.ui.pm.list.loadList().catch(reportError))();
+            }
+
             if (this.isDynPage(this.currentdirid) > 1) {
                 this.dynContentLoader[this.currentdirid].sync(n);
             }
@@ -3295,6 +3320,10 @@ MegaData.prototype.createFolder = promisify(function(resolve, reject, target, na
         if (sn.length) {
             req.cr = crypto_makecr([n], sn, false);
             req.cr[1][0] = 'xxxxxxxx';
+        }
+
+        if (M.getNodeRoot(target) === 'pwm') {
+            req.vw = 1;
         }
 
         api.screq(req)

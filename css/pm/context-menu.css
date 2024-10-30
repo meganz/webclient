@@ -1,0 +1,47 @@
+.mega-component.context-menu {
+    opacity: 1;
+    box-shadow: none;
+}
+
+.mega-component.context-menu.menu-container {
+    max-width: 312px;
+}
+.mega-component.context-menu.menu-container.overlay-wrap {
+    background-color: var(--mobile-page-background);
+    border: 1px solid var(--mobile-border-strong)
+}
+.mega-component.context-menu .context-menu-items {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 8px 0;
+}
+
+.mega-component.context-menu .content {
+    max-height: 450px;
+    overflow-y: auto;
+}
+.mega-component.context-menu .context-menu-items .nav-elem {
+    padding: 24px;
+}
+
+.menu-container.context-menu button,
+.menu-container.context-menu .nav-elem.button span.primary-text {
+    font: var(--mobile-font-copy-regular)
+}
+
+/* Overridden component styles for webclient layout */
+
+.mega-component.menu-container.overlay-wrap {
+    width: 280px;
+}
+
+.mega-component.context-menu .context-menu-items {
+    padding: 8px 16px;
+}
+
+.mega-component.context-menu .context-menu-items .nav-elem {
+    padding: 16px 8px;
+}

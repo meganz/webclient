@@ -128,7 +128,7 @@ mobile.fileRequestManagement = {
         this.container.append(frButtonsDiv);
 
         // Buttons (create/update & stop FR)
-        this.createUpdateFRBtn = new MegaMobileButton({
+        this.createUpdateFRBtn = new MegaButton({
             parentNode: frButtonsDiv,
             text: this.puHandleObject ? l[707] : l[158],  // Update / Create
             componentClassname: 'block primary create-update'
@@ -160,7 +160,7 @@ mobile.fileRequestManagement = {
         this.createUpdateFRBtn.disabled = this.puHandleObject;
 
         if (this.puHandleObject) {
-            const stopFR = new MegaMobileButton({
+            const stopFR = new MegaButton({
                 parentNode: frButtonsDiv,
                 text: l.file_request_dialog_button_remove,
                 componentClassname: 'block text-only'

@@ -98,7 +98,7 @@ button.disabled.visible {
     background-color: var(--stroke-main);
 }
 /* buttons for business account */
-button:not(.mega-button) .icon {
+button:not(.mega-button):not(.mega-component) .icon {
     width: 24px;
     height: 24px;
     margin: 3px 8px 4px 0;
@@ -171,7 +171,7 @@ button.disabled.visible {
     background-color: var(--surface-main);
 }
 /* buttons for business account */
-button:not(.mega-button) .icon {
+button:not(.mega-button):not(.mega-component) .icon {
     width: 24px;
     height: 24px;
     margin: 3px 8px 4px 0;

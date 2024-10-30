@@ -128,6 +128,7 @@
 }
 
 .overlay-wrap .image:empty,
+.overlay-wrap .header-title:empty,
 .overlay-wrap .title:empty,
 .overlay-wrap .subtitle:empty,
 .overlay-wrap .content:empty,
@@ -181,6 +182,19 @@
     background-size: contain;
     width: 64px;
     height: 64px;
+}
+
+.overlay-wrap .header {
+    display: flex;
+    align-items: center;
+}
+
+.overlay-wrap .header > * {
+    margin-bottom: 16px;
+}
+
+.overlay-wrap .header-title {
+    width: 100%;
 }
 
 @media only screen and (orientation: landscape) and (max-height: 359px) {

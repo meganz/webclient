@@ -1,0 +1,119 @@
+/*
+CSS and styling for racks.
+
+Racks are constructed in the following way:
+<div rack>
+    <div rack-slot>
+        <!-- Component boundary -->
+        <Component
+    </div>
+    ...n
+</div>
+ */
+
+/*
+Racks.
+ */
+.rack {
+    --slot-spacing: 0;
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    box-sizing: border-box;
+    z-index: 101;
+    pointer-events: none;
+    transition: bottom 0.25s ease-in, top 0.25s ease-in;
+}
+
+/*
+This covers the case of transitions for racks that descend from the top/bottom.
+DEFAULT: bottom
+ */
+.rack,
+.rack.bottom {
+    top: auto;
+    bottom: 0;
+    flex-flow: column-reverse nowrap;
+}
+.rack.top {
+    top: 0;
+    bottom: auto;
+}
+
+/*
+Rack slots.
+ */
+
+/* Flexbox uses margin to position itself. This adjusts the margin & height
+in order to pseudo-animate flexbox controlled elements.
+
+NB: The "slot" animation is there to animate the other flexbox items, not
+the actual notification itself. It is responsible for it's pos: relative
+transition.
+
+Using max-height is a workaround. Ideally we would use height: auto -> 0
+ */
+.rack .rack-slot {
+    transition: max-height 1s linear, opacity 1s ease-in;
+    max-height: 310px;
+    width: 100%;
+    margin: calc(1/2 * var(--slot-spacing)) 0;
+}
+
+/* Flow animation */
+.rack.flow-up .rack-slot.close,
+.rack.flow-down .rack-slot.close {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+}
+
+/* Disappearing animation */
+.rack.disappear .rack-slot {
+    transition: max-height 1s linear, opacity 1s ease-in;
+}
+.rack.disappear .rack-slot.close {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+}
+
+/* Remove the margin once the animation has completed. */
+.rack.disappear .rack-slot.close.non-blocking {
+    margin: 0;
+}
+
+/*
+Slot inners
+*/
+.rack .rack-slot .slot-inner {
+    position: relative;
+    pointer-events: auto;
+    transition: opacity 1s ease-in;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.rack.disappear .rack-slot.close .slot-inner {
+    opacity: 0;
+    top: 0;
+    overflow: hidden;
+}
+
+/* Flow up/down used for alert notifications, not toasts */
+.rack.flow-up .rack-slot .slot-inner,
+.rack.flow-down .rack-slot .slot-inner {
+    overflow: hidden;
+    top: 0;
+    transition: top 4s ease-in;
+}
+.rack.flow-down .rack-slot.close .slot-inner {
+    top: 100vh;
+    overflow: visible;
+}
+.rack.flow-up .rack-slot.close .slot-inner {
+    top: -100vh;
+    overflow: visible;
+}

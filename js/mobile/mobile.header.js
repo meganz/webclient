@@ -1,4 +1,4 @@
-class MegaMobileHeader extends MegaMobileComponent {
+class MegaMobileHeader extends MegaComponent {
 
     constructor(options) {
 
@@ -16,7 +16,7 @@ class MegaMobileHeader extends MegaMobileComponent {
         subNode.className = 'nav-navigation';
         targetNode.appendChild(subNode);
 
-        const megaLink = new MegaMobileLink({
+        const megaLink = new MegaLink({
             parentNode: subNode,
             type: 'icon',
             componentClassname: 'text-icon home',
@@ -36,7 +36,7 @@ class MegaMobileHeader extends MegaMobileComponent {
         targetNode.appendChild(actionsNode);
 
         const _renderLoggedIn = replace => {
-            const avatarButton = new MegaMobileLink({
+            const avatarButton = new MegaLink({
                 parentNode: actionsNode,
                 type: 'normal',
                 componentClassname: 'avatar'
@@ -80,7 +80,7 @@ class MegaMobileHeader extends MegaMobileComponent {
             _renderLoggedIn();
         }
         else {
-            const loginLink = new MegaMobileLink({
+            const loginLink = new MegaLink({
                 parentNode: actionsNode,
                 text: l.log_in,
                 type: "normal",
@@ -98,7 +98,7 @@ class MegaMobileHeader extends MegaMobileComponent {
             });
         }
 
-        const menuButton = new MegaMobileButton({
+        const menuButton = new MegaButton({
             parentNode: actionsNode,
             type: 'icon',
             componentClassname: 'text-icon menu',
@@ -113,7 +113,7 @@ class MegaMobileHeader extends MegaMobileComponent {
         });
 
         // Search bar will come in version 2
-        /* const searchButton = new MegaMobileButton({
+        /* const searchButton = new MegaButton({
             parentNode: actionsNode,
             type: 'icon',
             componentClassname: 'text-icon search',
@@ -146,7 +146,7 @@ class MegaMobileHeader extends MegaMobileComponent {
         subNode.className = 'nav-navigation';
         targetNode.appendChild(subNode);
 
-        const backLink = new MegaMobileLink({
+        const backLink = new MegaLink({
             parentNode: subNode,
             type: 'icon',
             componentClassname: 'text-icon back',
@@ -193,7 +193,7 @@ class MegaMobileHeader extends MegaMobileComponent {
         targetNode.appendChild(subNode);
 
         // Rubbish bin icon is visible only on the Rubbish bin page
-        const binIcon = new MegaMobileButton({
+        const binIcon = new MegaButton({
             parentNode: subNode,
             type: 'icon',
             componentClassname: 'text-icon clear-bin hidden',
@@ -222,7 +222,7 @@ class MegaMobileHeader extends MegaMobileComponent {
             });
         });
 
-        const createFolderButton = new MegaMobileButton({
+        const createFolderButton = new MegaButton({
             parentNode: subNode,
             type: 'icon',
             componentClassname: 'text-icon create-folder',
@@ -248,7 +248,7 @@ class MegaMobileHeader extends MegaMobileComponent {
         targetNode.appendChild(title);
 
         if (!pfcol) {
-            const filterButton = new MegaMobileButton({
+            const filterButton = new MegaButton({
                 parentNode: subNode,
                 type: 'icon',
                 componentClassname: 'text-icon filter',
@@ -259,7 +259,7 @@ class MegaMobileHeader extends MegaMobileComponent {
                 MegaMobileHeader.showFilters.call(this);
             });
 
-            this.closeButton = new MegaMobileButton({
+            this.closeButton = new MegaButton({
                 parentNode: subNode,
                 type: 'icon',
                 componentClassname: 'text-icon close',
@@ -407,7 +407,7 @@ class MegaMobileHeader extends MegaMobileComponent {
         searchWrapper.className = 'search-wrapper';
         parent.appendChild(searchWrapper);
 
-        const closeSearchButton = new MegaMobileButton({
+        const closeSearchButton = new MegaButton({
             parentNode: searchWrapper,
             type: 'icon',
             componentClassname: 'text-icon js-btncloseSearch',
@@ -433,7 +433,7 @@ class MegaMobileHeader extends MegaMobileComponent {
         subNode.className = 'search-input js-filesearcher';
         searchForm.appendChild(subNode);
 
-        const clearSearchButton = new MegaMobileButton({
+        const clearSearchButton = new MegaButton({
             parentNode: searchForm,
             type: 'icon',
             componentClassname: 'text-icon js-btnclearSearch hidden',
@@ -605,7 +605,7 @@ class MegaMobileHeader extends MegaMobileComponent {
 
             const selectedRadio = sortByGroup.children[sortByGroup.value || 'name'];
 
-            orderArrow = new MegaMobileButton({
+            orderArrow = new MegaButton({
                 parentNode: selectedRadio.domNode,
                 type: 'icon',
                 icon: `sprite-mobile-fm-mono icon-arrow-${d < 0 ? 'down' : 'up'}-thin-outline`,
@@ -620,7 +620,7 @@ class MegaMobileHeader extends MegaMobileComponent {
                 this.icon = `sprite-mobile-fm-mono icon-arrow-${this.value < 0 ? 'down' : 'up'}-thin-outline`;
             });
 
-            const applyButton = new MegaMobileButton({
+            const applyButton = new MegaButton({
                 parentNode: mega.ui.sheet.actionsNode,
                 type: 'normal',
                 text: l.filter_apply
@@ -735,7 +735,7 @@ class MegaMobileHeader extends MegaMobileComponent {
             if (pfid) {
                 return;
             }
-            if (mobile.nodeSelector.active) {
+            if (is_mobile && mobile.nodeSelector.active) {
                 return mobile.nodeSelector.type;
             }
             if (M.currentdirid === M.RootID) {
@@ -759,7 +759,7 @@ class MegaMobileHeader extends MegaMobileComponent {
         if (page.startsWith('fm/account/') || page.startsWith('fm/refer') || page === 'support') {
             iType = 3;
         }
-        if (mobile.nodeSelector.active) {
+        if (is_mobile && mobile.nodeSelector.active) {
             iType = 4;
         }
 

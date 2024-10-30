@@ -1,0 +1,83 @@
+.mega-slider {
+    display: flex;
+    padding: 16px 0;
+    align-items: center;
+}
+
+.slider-container {
+    position: relative;
+    width: 100%;
+    -webkit-margin-end: 16px;
+    margin-inline-end: 16px;
+}
+
+.range-input {
+    appearance: none;
+    width: 100%;
+    background: transparent;
+}
+
+.range-input:focus {
+    outline: none;
+}
+
+.range-input::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 4px;
+    cursor: pointer;
+    box-shadow: none;
+    background: var(--mobile-border-strong);
+    border-radius: 5px;
+    background-image: linear-gradient(var(--mobile-button-primary), var(--mobile-button-primary));
+    background-repeat: no-repeat;
+    background-size: var(--val);
+}
+
+/* Note this moz and webkit is duplicated on purpose, as make it both as one make it not working */
+.range-input::-moz-range-track {
+    width: 100%;
+    height: 4px;
+    cursor: pointer;
+    box-shadow: none;
+    background: var(--mobile-border-strong);
+    border-radius: 5px;
+    background-image: linear-gradient(var(--mobile-button-primary), var(--mobile-button-primary));
+    background-repeat: no-repeat;
+    background-size: var(--val);
+}
+
+input.range-input[type='range']::-webkit-slider-thumb {
+    appearance: none;
+    width: 24px;
+    height: 24px;
+    background-color: var(--mobile-button-primary);
+    margin-top: -10px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: none;
+    border: none;
+}
+
+.range-input::-moz-range-thumb {
+    box-shadow: none;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: var(--mobile-button-primary);
+    cursor: pointer;
+}
+
+.mega-slider .pm.mega-input.box-style.number {
+    box-sizing: border-box;
+    height: 48px;
+    min-width: 48px;
+    max-width: 48px;
+    text-align: center;
+    padding: 0;
+}
+
+.mega-slider input[type='range'] {
+    appearance: none;
+    width: 100%;
+    background: transparent;
+}

@@ -946,6 +946,13 @@ Object.defineProperty(mega, 'active', {
     })()
 });
 
+Object.defineProperty(mega, 'pwmh', {
+    get: function() {
+        'use strict';
+        return typeof u_attr === 'object' && u_attr.pwmh || false;
+    }
+});
+
 /** @property mega.infinity */
 lazy(mega, 'infinity', function() {
     return mega.flags.inf > 0 || !!localStorage.mInfinity || !!localStorage.megaLiteMode;
@@ -2320,7 +2327,7 @@ else if (!browserUpdate) {
         // UI Elements
         jsl.push({f:'js/ui/megaRender.js', n: 'megarender_js', j:1,w:1});
         jsl.push({f:'js/ui/dialog.js', n: 'dialogui_js', j:1,w:1});
-        jsl.push({f:'js/ui/mcomponents/classes/MComponent.js', n: 'm_component_js', j:1});
+        jsl.push({f:'js/ui/components/MComponent.js', n: 'm_component_js', j:1});
         jsl.push({f:'js/ui/credentialsWarningDialog.js', n: 'creddialogui_js', j:1,w:1});
         jsl.push({f:'js/ui/loginRequiredDialog.js', n: 'loginrequireddialog_js', j:1,w:1});
         jsl.push({f:'js/ui/registerDialog.js', n: 'registerdialog_js', j:1,w:1});
@@ -2454,17 +2461,17 @@ else if (!browserUpdate) {
         jsl.push({f:'css/components.css', n: 'components_css', j:2, w:30, c:1, d:1, cache:1});
 
         // MComponents
-        jsl.push({f:'js/ui/mcomponents/classes/MButton.js', n: 'm_button_js', j:1});
-        jsl.push({f:'js/ui/mcomponents/classes/MCheckbox.js', n: 'm_checkbox_js', j:1});
-        jsl.push({f:'js/ui/mcomponents/classes/MContextMenu.js', n: 'm_context_menu_js', j:1});
-        jsl.push({f:'js/ui/mcomponents/classes/MDialog.js', n: 'm_dialog_js', j:1});
-        jsl.push({f:'js/ui/mcomponents/classes/MEmptyPad.js', n: 'm_empty_pad_js', j:1});
-        jsl.push({f:'js/ui/mcomponents/classes/MHint.js', n: 'm_hint_js', j:1});
-        jsl.push({f:'js/ui/mcomponents/classes/MMenuSelect.js', n: 'm_menu_select_js', j:1});
-        jsl.push({f:'js/ui/mcomponents/classes/MMenuSelectItem.js', n: 'm_menu_select_item_js', j:1});
-        jsl.push({f:'js/ui/mcomponents/classes/MSidebarButton.js', n: 'm_sidebar_button_js', j:1});
-        jsl.push({f:'js/ui/mcomponents/classes/MTab.js', n: 'm_tab_js', j:1});
-        jsl.push({f:'js/ui/mcomponents/classes/MTabs.js', n: 'm_tabs_js', j:1});
+        jsl.push({f:'js/ui/components/MButton.js', n: 'm_button_js', j:1});
+        jsl.push({f:'js/ui/components/MCheckbox.js', n: 'm_checkbox_js', j:1});
+        jsl.push({f:'js/ui/components/MContextMenu.js', n: 'm_context_menu_js', j:1});
+        jsl.push({f:'js/ui/components/MDialog.js', n: 'm_dialog_js', j:1});
+        jsl.push({f:'js/ui/components/MEmptyPad.js', n: 'm_empty_pad_js', j:1});
+        jsl.push({f:'js/ui/components/MHint.js', n: 'm_hint_js', j:1});
+        jsl.push({f:'js/ui/components/MMenuSelect.js', n: 'm_menu_select_js', j:1});
+        jsl.push({f:'js/ui/components/MMenuSelectItem.js', n: 'm_menu_select_item_js', j:1});
+        jsl.push({f:'js/ui/components/MSidebarButton.js', n: 'm_sidebar_button_js', j:1});
+        jsl.push({f:'js/ui/components/MTab.js', n: 'm_tab_js', j:1});
+        jsl.push({f:'js/ui/components/MTabs.js', n: 'm_tabs_js', j:1});
 
         jsl.push({f:'html/top.html', n: 'top', j:0});
         jsl.push({f:'css/style.css', n: 'style_css', j:2, w:30, c:1, d:1, cache:1});
@@ -2613,15 +2620,15 @@ else if (!browserUpdate) {
         jsl.push({f:'css/mobile/mobile.overlay.css', n: 'mobile_overlay_css', j:2, w:1});
         jsl.push({f:'css/mobile/mobile.sheet.css', n: 'mobile_sheet_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/mobile/mobile.context.menu.css', n: 'mobile_context_menu_css', j:2, w:30, c:1, d:1, cache:1});
-        jsl.push({f:'css/mobile/mobile.checkbox.css', n: 'mobile_checkbox_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/components/checkbox.css', n: 'checkbox_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/mobile/mobile.radio.button.css', n: 'mobile_radio_button_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/mobile/mobile.toggle.button.css', n: 'mobile_toggle_button_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/components/toggle-button.css', n: 'toggle_button_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/mobile/mobile.footer.css', n: 'mobile_footer_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/mobile/mobile.header.css', n: 'mobile_header_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/mobile/mobile.top.menu.css', n: 'mobile_top_menu_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/mobile/mobile.msgdialog.css', n: 'mobile_msgdialog_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/mobile/mobile.rack.css', n: 'mobile_rack_css', j:2,w:5,c:1,d:1,cache:1});
-        jsl.push({f:'css/mobile/mobile.toast.css', n: 'mobile_toast_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/components/rack.css', n: 'rack_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/components/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/mobile/mobile.rubbish-bin.css', n: 'mobile_rubbish_bin_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/mobile/mobile.banner.css', n: 'mobile_banner_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/mobile/mobile.node-selector.css', n: 'mobile_node_selector_css', j:2, w:5, c:1, d:1, cache:1});
@@ -2641,7 +2648,7 @@ else if (!browserUpdate) {
         jsl.push({f:'html/top-mobile.html', n: 'top-mobile', j:0});
         jsl.push({f:'html/mobile-add-contact-card.html', n: 'mobile-add-contact-card', j:0});
         jsl.push({f:'css/mobile.css', n: 'mobile_css', j: 2, w: 30, c: 1, d: 1, m: 1});
-        jsl.push({f:'css/mobile/mobile.tappable.css', n: 'mobile_tappable_css', j: 2, w: 30, c: 1, d: 1, m: 1});
+        jsl.push({f:'css/components/interactable.css', n: 'interactable_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile/mobile.settings.css', n: 'mobile_settings_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile/mobile.settings.history.css', n: 'mobile_settings_history_css', j: 2, w: 30, c: 1, d: 1, m: 1});
         jsl.push({f:'css/mobile/mobile.link-management.css', n: 'mobile_link_management_css', j: 2, w: 30, c: 1, d: 1, m: 1});
@@ -2704,21 +2711,21 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/mobile.over-bandwidth-quota.js', n: 'mobile_over_bandwidth_quota_js', j: 1 });
         jsl.push({f:'js/mobile/mobile.over-storage-quota.js', n: 'mobile_over_storage_quota_js', j: 1 });
         jsl.push({f:'html/mvoucherinfo.html', n: 'mvoucherinfo', j: 0, w: 1});
-        jsl.push({f:'js/mobile/mobile.component.js', n: 'mobile_component_js', j: 1, w:1});
-        jsl.push({f:'js/mobile/mobile.group.js', n: 'mobile_group_js', j: 1, w:1});
+        jsl.push({f:'js/ui/components/component.js', n: 'component_js', j: 1, w:1});
+        jsl.push({f:'js/ui/components/group.js', n: 'group_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.dropdown.js', n: 'mobile_component_dropdown_js', j:1, w:1});
         jsl.push({f:'js/mobile/mobile.dropdown-items.js', n: 'mobile_dropdownitem_js', j:1, w:1});
         jsl.push({f:'js/mobile/mobile.context.menu.js', n: 'mobile_context_menu_js', j: 1, w:1});
-        jsl.push({f:'js/mobile/mobile.tappable.js', n: 'mobile_tappable_js', j: 1, w:1});
+        jsl.push({f:'js/ui/components/interactable.js', n: 'interactable_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.info-menu-item.js', n: 'mobile_info_menu_item_js', j: 1, w:1});
-        jsl.push({f:'js/mobile/mobile.link.js', n: 'mobile_link_js', j: 1, w:1});
-        jsl.push({f:'js/mobile/mobile.button.js', n: 'mobile_button_js', j: 1, w:1});
-        jsl.push({f:'js/mobile/mobile.checkbox.js', n: 'mobile_checkbox_js', j: 1, w:1});
+        jsl.push({f:'js/ui/components/link.js', n: 'link_js', j: 1, w:1});
+        jsl.push({f:'js/ui/components/button.js', n: 'button_js', j: 1, w:1});
+        jsl.push({f:'js/ui/components/checkbox.js', n: 'checkbox_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.node.js', n: 'mobile_node_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.sharednode.js', n: 'mobile_sharednode_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.radio.button.js', n: 'mobile_radio_button_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.radio.group.js', n: 'mobile_radio_group_js', j: 1, w:1});
-        jsl.push({f:'js/mobile/mobile.toggle.button.js', n: 'mobile_radio_button_js', j: 1, w:1});
+        jsl.push({f:'js/ui/components/toggle-button.js', n: 'toggle_button_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.footer.js', n: 'mobile_footer_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.header.js', n: 'mobile_header_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.top.menu.js', n: 'mobile_top_menu_js', j: 1, w:1});
@@ -2752,9 +2759,9 @@ else if (!browserUpdate) {
         jsl.push({f:'js/mobile/settings/termsPolicies.js', n: 'mobile_terms_policies_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/settings/twofactorSettings.js', n: 'mobile_twofactor_settings_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.msgdialog.js', n: 'mobile_msgdialog_js', j: 1, w:1});
-        jsl.push({f:'js/mobile/mobile.rack.slot.js', n: 'mobile_rack_slot_js', j: 1, w:1});
-        jsl.push({f:'js/mobile/mobile.rack.js', n: 'mobile_rack_js', j: 1, w:1});
-        jsl.push({f:'js/mobile/mobile.toast.js', n: 'mobile_toast_js', j: 1, w:1});
+        jsl.push({f:'js/ui/components/rack-slot.js', n: 'rack_slot_js', j: 1, w:1});
+        jsl.push({f:'js/ui/components/rack.js', n: 'rack_js', j: 1, w:1});
+        jsl.push({f:'js/ui/components/toast.js', n: 'toast_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.banner.js', n: 'mobile_banner_js', j: 1, w:1});
         jsl.push({f:'js/mobile/mobile.datepicker.js', n: 'mobile_datepicker_js', j: 1, w: 1});
         jsl.push({f:'js/mobile/mobile.tab.js', n: 'mobile_tab_js', j: 1, w:1});
@@ -2769,7 +2776,7 @@ else if (!browserUpdate) {
         jsl.push({f:'js/chat/strongvelope.js', n: 'strongvelope_js', j: 1, w: 3});
         jsl.push({f:'js/mobile/mobile.promo.banner.js', n: 'mobile_promo_banner_js', j: 1, w:1});
 
-        jsl.push({f:'js/ui/mcomponents/classes/MDialogMobile.js', n: 'mobile_m_dialog_mobile_js', j:1});
+        jsl.push({f:'js/ui/components/MDialogMobile.js', n: 'mobile_m_dialog_mobile_js', j:1});
     }
 
     jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
@@ -3001,6 +3008,87 @@ else if (!browserUpdate) {
             'chatuserhelp_js': {f:'js/chat/plugins/chatUserHelper.js', n: 'chatuserhelp_js', j:1},
             // leave the bundle at the end.
             'chat_react_minified_js': {f:'js/chat/bundle.js', n: 'chat_react_minified_js', j:1}
+        },
+        'pwm': {
+            'pwm:vars_pm_theme_css': {f:'css/vars/pm-theme.css', n: 'vars_pm_theme_css', j:2, w:30, c:1, d:1, cache:1},
+            'pwm:pm_mono_css': {f:'css/sprites/pm-mono@mono.css', n: 'pm_mono_css', j:2, w:30, c:1, d:1, cache:1},
+            'pwm:pm_dark_css': {f:'css/sprites/pm-theme@dark.css', n: 'pm_dark_css', j:2, w:30, c:1, d:1, cache:1},
+            'pwm:pm_light_css': {f:'css/sprites/pm-theme@light.css', n: 'pm_light_css', j:2, w:30, c:1, d:1, cache:1},
+            'pwm:checkbox_css': {f:'css/components/checkbox.css', n: 'checkbox_css', j:2, w:1},
+            'pwm:rack_css': {f:'css/components/rack.css', n: 'rack_css', j:2, w:1},
+            'pwm:toast_css': {f:'css/components/toast.css', n: 'toast_css', j:2, w:1},
+            'pwm:toggle_css': {f:'css/components/toggle-button.css', n: 'toggle_button_css', j:2, w:1},
+            'pwm:interactable_css': {f:'css/components/interactable.css', n: 'interactable_css', j:2, w:1},
+            'pwm:read_only_field_css': {f:'css/components/read-only.css', n: 'read_only_field_css', j:2, w:1},
+            'pwm:vars_mobile_theme_css': {f:'css/vars/mobile-theme.css', n: 'vars_mobile_theme_css', j:2, w:30, c:1, d:1, cache:1},
+            'pwm:vars_mobile_theme_auto_css': {f:'css/vars/mobile-theme-auto.css', n: 'vars_mobile_theme_auto_css', j:2, w:30, c:1, d:1, cache:1},
+            'pwm:mobile_fm_mono_css': {f:'css/sprites/mobile-fm-mono@mono.css', n: 'mobile_fm_mono_css', j:2, w:30, c:1, d:1, cache:1},
+            'pwm:mobile_fm_dark_css': {f:'css/sprites/mobile-fm-theme@dark.css', n: 'mobile_fm_dark_css', j:2, w:30, c:1, d:1, cache:1},
+            'pwm:mobile_fm_light_css': {f:'css/sprites/mobile-fm-theme@light.css', n: 'mobile_fm_light_css', j:2, w:30, c:1, d:1, cache:1},
+            'pwm:mobile_overlay_css': {f:'css/mobile/mobile.overlay.css', n: 'mobile_overlay_css', j:2, w:1},
+            'pwm:mobile_header_css': {f:'css/mobile/mobile.header.css', n: 'mobile_header_css', j:2, w:1},
+            'pwm:mobile_top_menu_css': {f:'css/mobile/mobile.top.menu.css', n: 'mobile_top_menu_css', j:2, w:1},
+            'pwm:header_css': {f:'css/pm/header.css', n: 'header_css', j: 2, w:1},
+            'pwm:top_menu_css': {f:'css/pm/top-menu.css', n: 'top_menu_css', j: 2, w:1},
+            'pwm:mobile_sheet_css': {f:'css/mobile/mobile.sheet.css', n:'mobile_sheet_css', j: 2, w:1},
+            'pwm:form_css': {f:'css/pm/form.css', n: 'pm_form_css', j:2, w:1},
+            'pwm:pm_password_list_page_css': {f:'css/pm/password-list-page.css', n: 'pm_password_list_page_css', j:2, w:1},
+            'pwm:top_nav_css': {f:'css/pm/top-nav.css', n: 'pm_top_nav_css', j:2, w:1},
+            'pwm:clickable_css': {f:'css/pm/clickable.css', n: 'pm_clickable_css', j:2, w:1},
+            'pwm:mega_inputs_css': {f:'css/pm/mega-inputs.css', n: 'pm_mega_inputs_css', j:2, w:1},
+            'pwm:general_css': {f:'css/pm/general.css', n: 'pm_general_css', j:2, w:1},
+            'pwm:layout_css': {f:'css/pm/layout.css', n: 'pm_layout_css', j:2, w:1},
+            'pwm:banner_css': {f:'css/pm/banner.css', n: 'pm_banner_css', j:2, w:1},
+            'pwm:spinners_css': {f:'css/pm/spinners.css', n: 'pm_spinners_css', j:2, w:1},
+            'pwm:dropdown_css': {f:'css/pm/dropdown.css', n: 'pm_dropdown_css', j:2, w:1},
+            'pwm:context_menu_css': {f:'css/pm/context-menu.css', n: 'pm_context_menu_css', j:2, w:1},
+            'pwm:overlay_css': {f:'css/pm/overlay.css', n: 'pm_overlay_css', j:2, w:1},
+            'pwm:slider_css': {f:'css/pm/slider.css', n: 'pm_slider_css', j:2, w:1},
+            'pwm:password_generator_css': {f:'css/pm/password-generator.css', n: 'pm_password_generator_css', j:2, w:1},
+            'pwm:menu_css': {f:'css/pm/menu.css', n: 'pm_menu_css', j:2, w:1},
+            'pwm:password_item_form_css': {f:'css/pm/password-item-form.css', n: 'pm_password_item_form_css', j:2, w:1},
+            'pwm:subscription_dialog_css': {f:'css/pm/subscription-dialog.css', n: 'subscription_dialog_css', j:2, w:1},
+
+            'pwm:component_js': {f:'js/ui/components/component.js', n: 'component_js', j: 1, w:1},
+            'pwm:group_js': {f:'js/ui/components/group.js', n: 'group_js', j: 1, w:1},
+            'pwm:checkbox_js': {f:'js/ui/components/checkbox.js', n: 'checkbox_js', j: 1, w:1},
+            'pwm:rack_slot_js': {f:'js/ui/components/rack-slot.js', n: 'rack_slot_js', j: 1, w:1},
+            'pwm:rack_js': {f:'js/ui/components/rack.js', n: 'rack_js', j: 1, w:1},
+            'pwm:toast_js': {f:'js/ui/components/toast.js', n: 'toast_js', j: 1, w:1},
+            'pwm:toggle_button_js': {f:'js/ui/components/toggle-button.js', n: 'toggle_button_js', j: 1, w:1},
+            'pwm:interactable_js': {f:'js/ui/components/interactable.js', n: 'interactable_js', j: 1, w:1},
+            'pwm:link_js': {f:'js/ui/components/link.js', n: 'link_js', j: 1, w:1},
+            'pwm:button_js': {f:'js/ui/components/button.js', n: 'button_js', j: 1, w:1},
+            'pwm:read_only_field_js': {f:'js/ui/components/read-only-field.js', n: 'read_only_field_js', j: 1, w:1},
+            'pwm:mobile_overlay_js': {f:'js/mobile/mobile.overlay.js', n: 'mobile_overlay_js', j: 1, w:1},
+            'pwm:mobile_sheet_js': {f:'js/mobile/mobile.sheet.js', n:'mobile_sheet_js', j: 1, w:1},
+            'pwm:mobile_message_overlay_js': {f:'js/mobile/mobile.message-overlay.js', n: 'mobile_message_overlay_js', j: 1, w:1},
+            'pwm:mobile_banner_js': {f:'js/mobile/mobile.banner.js', n: 'mobile_banner_js', j: 1, w:1},
+            'pwm:mobile_header_js': {f:'js/mobile/mobile.header.js', n: 'mobile_header_js', j: 1, w:1},
+            'pwm:mobile_top_menu_js': {f:'js/mobile/mobile.top.menu.js', n: 'mobile_top_menu_js', j: 1, w:1},
+            'pwm:pm_js': {f:'js/ui/pwm/pm.js', n: 'pm_js', j: 1, w:1},
+            'pwm:pm_ui_js': {f:'js/ui/pwm/pm-ui.js', n: 'pm_ui_js', j: 1, w:1},
+            'pwm:functions_js': {f:'js/ui/pwm/functions.js', n: 'pm_functions_js', j: 1, w:1},
+            'pwm:header_js': {f:'js/ui/pwm/component/header.js', n: 'header_js', j: 1, w:1},
+            'pwm:top_menu_js': {f:'js/ui/pwm/component/top-menu.js', n: 'top_menu_js', j: 1, w:1},
+            'pwm:top_nav_js': {f:'js/ui/pwm/component/top-nav.js', n: 'top_nav_js', j: 1, w:1},
+            'pwm:banner_js': {f:'js/ui/pwm/component/banner.js', n: 'banner_js', j: 1, w:1},
+            'pwm:view_js': {f:'js/ui/pwm/component/view.js', n: 'view_js', j: 1, w:1},
+            'pwm:form_js': {f:'js/ui/pwm/component/form.js', n: 'form_js', j: 1, w:1},
+            'pwm:password_item_form_js': {f:'js/ui/pwm/component/password-item-form.js', n: 'password_item_form_js', j: 1, w:1},
+            'pwm:password_list_js': {f:'js/ui/pwm/component/password-list.js', n: 'password_list_js', j: 1, w:1},
+            'pwm:password_item_detail_js': {f:'js/ui/pwm/component/password-item-detail.js', n: 'password_item_detail_js', j: 1, w:1},
+            'pwm:dropdown_items_js': {f:'js/ui/pwm/component/dropdown-items.js', n: 'dropdown_items_js', j: 1, w:1},
+            'pwm:dropdown_js': {f:'js/ui/pwm/component/dropdown.js', n: 'dropdown_js', j: 1, w:1},
+            'pwm:overlay_js': {f:'js/ui/pwm/component/overlay.js', n: 'overlay_js', j: 1, w:1},
+            'pwm:menu_js': {f:'js/ui/pwm/component/menu.js', n: 'menu_js', j: 1, w:1},
+            'pwm:context_menu_js': {f:'js/ui/pwm/component/context-menu.js', n: 'context_menu_js', j: 1, w:1},
+            'pwm:range_slider_js': {f:'js/ui/pwm/component/range-slider.js', n: 'range_slider_js', j: 1, w:1},
+            'pwm:password_generator_js': {f:'js/ui/pwm/component/password-generator.js', n: 'password_generator_js', j: 1, w:1},
+            'pwm:megaInputs_pmTextArea_js': {f:'js/ui/pwm/utils/megaInputs-pmTextArea.js', n: 'megaInputs_pmTextArea_js', j: 1, w:1},
+            'pwm:megaInputs_pmText_js': {f:'js/ui/pwm/utils/megaInputs-pmText.js', n: 'megaInputs_pmText_js', j: 1, w:1},
+            'pwm:sort_js': {f:'js/ui/pwm/utils/sort.js', n: 'sort_js', j: 1, w:1},
+            'pwm:deleteItem_js': {f:'js/ui/pwm/deleteItem.js', n: 'deleteItem_js', j: 1, w:1}
         }
     };
 

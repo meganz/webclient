@@ -31,7 +31,7 @@ mobile.settings.account.changeEmail = Object.create(mobile.settingsHelper, {
                 'type': 'text'
             }, this.domNode);
 
-            new MegaMobileButton({
+            new MegaButton({
                 parentNode: this.domNode,
                 componentClassname: 'form-button block',
                 text: l[7743]

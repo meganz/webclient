@@ -1624,6 +1624,10 @@ scparser.$add('sqac', (a) => {
                         if (mega.rewindUi && mega.rewindUi.sidebar.active) {
                             mBroadcaster.sendMessage('rewind:accountUpgraded');
                         }
+
+                        if (mega.pm) {
+                            mega.pm.clearPlan();
+                        }
                     });
                 }
             }

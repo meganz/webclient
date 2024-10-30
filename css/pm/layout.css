@@ -1,0 +1,127 @@
+#fmholder.pmholder {
+    min-width: 769px;
+}
+
+.fm-overlay .pmholder {
+    pointer-events: none;
+}
+
+/* Temporary top menu style to show fm right menu, once bento box is implemented using hidden on fm-main instead */
+/* #fmholder.pmholder .fm-main { */
+#fmholder.pmholder .fm-main > *:not(#topmenu) {
+    display: none;
+}
+
+#fmholder.pmholder .fm-main {
+    height: 0;
+}
+
+#fmholder.pmholder .top-menu-popup button.positive {
+    color: var(--mobile-text-inverse);
+    background: var(--mobile-button-primary);
+    box-shadow: none;
+}
+
+#fmholder.pmholder .top-menu-popup button.branded-red {
+    color: var(--mobile-text-primary);
+    background: var(--mobile-button-secondary);
+    box-shadow: none;
+}
+
+.pm-main {
+    display: grid;
+    grid-template-columns: 287px auto;
+    grid-template-rows: auto auto 1fr;
+    align-content: start;
+    height: 100%;
+    overflow-x: hidden;
+    background-color: var(--mobile-page-background);
+}
+
+.pm-main .banner-rack {
+    grid-row: 1/2;
+    grid-column: 2/3;
+}
+
+.pm-main .mega-top-menu {
+    grid-row: 1/4;
+    grid-column: 1/2;
+}
+
+.pm-main .mega-header {
+    grid-row: 2/3;
+    grid-column: 2/3;
+}
+
+.pm-main .password-list-page {
+    grid-row: 3/4;
+    grid-column: 2/3;
+}
+
+/* PWM Logo */
+.theme-light .pm-main .sprite-fm-illustration-wide.img-mega-logo {
+    background: url('../../images/pm/favicons/pwm_logo_lightmode.svg') no-repeat;
+}
+
+.theme-dark .pm-main .sprite-fm-illustration-wide.img-mega-logo {
+    background: url('../../images/pm/favicons/pwm_logo_darkmode.svg') no-repeat;
+}
+
+/* New features for webclient layout */
+.password-list-page .detail-panel .nav-header {
+    display: none;
+}
+
+.password-list-page .left-pane-drag-handle {
+    right: -5px;
+}
+
+.password-list-page .left-pane-drag-handle::after {
+    display: none;
+}
+
+/* Small and Medium secondary content column */
+@media only screen and (max-width: 1079px) {
+    .password-list-page {
+        grid-auto-columns: 1fr;
+        grid-auto-rows: auto 1fr;
+    }
+
+    .password-list-page .password-list-panel {
+        width: 100% !important;
+        grid-row: 2/3;
+        background: var(--mobile-page-background);
+        z-index: 1;
+    }
+
+    .password-list-page .vertical-divider {
+        display: none;
+    }
+
+    .password-list-page .detail-panel {
+        grid-column: 1;
+        grid-row: 2/3;
+        z-index: 0;
+        background: var(--mobile-page-background);
+    }
+
+    .password-list-page .detail-panel.active {
+        z-index: 2;
+    }
+
+    .password-list-page .detail-panel .nav-header {
+        display: block;
+        padding: 16px 24px 0;
+    }
+
+    .password-list-page .empty-state {
+        grid-row: 3/4;
+    }
+}
+
+/* A 1080px screen has min value equal to max value */
+@media only screen and (max-width: 1080px) {
+    .left-pane-drag-handle {
+        display: none;
+    }
+}

@@ -304,6 +304,7 @@
     src: url("../fonts/Inter-Regular.eot?#iefix") format("embedded-opentype"), url("../fonts/Inter-Regular.woff2") format("woff2"), url("../fonts/Inter-Regular.woff") format("woff"), url("../fonts/Inter-Regular.ttf") format("truetype");
     font-weight: normal;
     font-style: normal;
+    unicode-range: U+0000-26FF, U+27C0-FFFF;
 }
 
 @font-face {
@@ -312,6 +313,7 @@
     src: url("../fonts/Inter-SemiBold.eot?#iefix") format("embedded-opentype"), url("../fonts/Inter-SemiBold.woff2") format("woff2"), url("../fonts/Inter-SemiBold.woff") format("woff"), url("../fonts/Inter-SemiBold.ttf") format("truetype");
     font-weight: 600;
     font-style: normal;
+    unicode-range: U+0000-26FF, U+27C0-FFFF;
 }
 
 @font-face {
@@ -319,5 +321,20 @@
     src: url("../fonts/Inter-Bold.eot");
     src: url("../fonts/Inter-Bold.eot?#iefix") format("embedded-opentype"), url("../fonts/Inter-Bold.woff2") format("woff2"), url("../fonts/Inter-Bold.woff") format("woff"), url("../fonts/Inter-Bold.ttf") format("truetype");
     font-weight: bold;
+    font-style: normal;
+    unicode-range: U+0000-26FF, U+27C0-FFFF;
+}
+
+@font-face {
+    font-family: 'Work Sans';
+    src: url('../fonts/worksans-bold.woff2') format('woff2'), url('../fonts/worksans-bold.woff') format('woff'), url('../fonts/worksans-bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Work Sans';
+    src: url('../fonts/worksans-medium.woff2') format('woff2'), url('../fonts/worksans-medium.woff') format('woff'), url('../fonts/worksans-medium.ttf') format('truetype');
+    font-weight: 500;
     font-style: normal;
 }

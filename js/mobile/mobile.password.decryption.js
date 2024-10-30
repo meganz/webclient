@@ -36,7 +36,7 @@ mobile.passwordDecryption = {
             this.passwordInput = new mega.ui.MegaInputs($(dKeyInput));
             this.passwordInput.$wrapper.addClass('box-style fixed-width mobile');
 
-            const dButton = new MegaMobileButton({
+            const dButton = new MegaButton({
                 type: 'normal',
                 text: l[1027],
                 parentNode: this.pwdDecryption,

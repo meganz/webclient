@@ -117,7 +117,7 @@ function u_checklogin3a(res, ctx) {
 
         const exclude = new Set([
             'aav', 'aas', 'b', 'c', 'currk', 'email', 'flags', 'ipcc', 'k', 'lup', 'mkt',
-            'name', 'p', 'pf', 'privk', 'pubk', 's', 'since', 'smsv', 'ts', 'u', 'ut', 'uspw'
+            'name', 'p', 'pf', 'privk', 'pubk', 'pwmh', 's', 'since', 'smsv', 'ts', 'u', 'ut', 'uspw'
         ]);
 
         for (var n in u_attr) {
@@ -505,6 +505,9 @@ function u_logout(logout) {
 
     // Delete closed mobile app banner flag on log in
     delete localStorage.closedMobileAppBanner;
+
+    // Delete closed PWM extension banner flag on log in
+    delete localStorage.closedPWMExtensionBanner;
 
     return promise;
 }

@@ -56,7 +56,7 @@ mobile.settings.account.referral = Object.create(mobile.settingsHelper, Object.g
         mCreateElement('div', { class: 'euro' }, subNode);
 
         // Redeem button, disabled by default
-        this.redeemBtn = new MegaMobileButton({
+        this.redeemBtn = new MegaButton({
             disabled: true,
             parentNode: node,
             componentClassname: 'form-button block',

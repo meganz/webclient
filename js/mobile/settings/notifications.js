@@ -31,7 +31,7 @@ mobile.settings.notifications = Object.create(mobile.settingsHelper, {
             }, form);
 
             // Build toggle ALL component
-            this.toggleAllComponent = new MegaMobileToggleButton({
+            this.toggleAllComponent = new MegaToggleButton({
                 parentNode: toggleList,
                 componentClassname: 'mega-toggle-button',
                 value: 'all',
@@ -87,7 +87,7 @@ mobile.settings.notifications = Object.create(mobile.settingsHelper, {
             // Build toggle components and store in togglesComponents array by id
             this.togglesComponents = [];
             for (const toggle of toggleArray){
-                const toggleComponent = new MegaMobileToggleButton({
+                const toggleComponent = new MegaToggleButton({
                     parentNode: toggleList,
                     componentClassname: 'mega-toggle-button',
                     ...toggle,

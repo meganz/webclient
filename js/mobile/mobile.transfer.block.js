@@ -1,4 +1,4 @@
-class MegaMobileTransferBlock extends MegaMobileComponent {
+class MegaMobileTransferBlock extends MegaComponent {
 
     constructor(options) {
         super(options);
@@ -41,7 +41,7 @@ class MegaMobileTransferBlock extends MegaMobileComponent {
         targetNode.appendChild(subNode);
         this.status = MegaMobileTransferBlock.stateStrings.QUEUED;
 
-        this.cancelButton = new MegaMobileButton({
+        this.cancelButton = new MegaButton({
             parentNode: targetNode,
             type: 'icon',
             componentClassname: 'text-icon cancel hidden',
@@ -54,7 +54,7 @@ class MegaMobileTransferBlock extends MegaMobileComponent {
             }
         });
 
-        this.resumeButton = new MegaMobileButton({
+        this.resumeButton = new MegaButton({
             parentNode: targetNode,
             type: 'icon',
             componentClassname: 'text-icon resume hidden',
@@ -66,7 +66,7 @@ class MegaMobileTransferBlock extends MegaMobileComponent {
             this.resumeTransfer();
         });
 
-        this.pauseButton = new MegaMobileButton({
+        this.pauseButton = new MegaButton({
             parentNode: targetNode,
             type: 'icon',
             componentClassname: 'text-icon pause',

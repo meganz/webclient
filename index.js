@@ -1675,7 +1675,7 @@ function init_page() {
         let id = false;
         if (page.substr(0, 2) === 'fm') {
             id = page.replace('fm/', '');
-            if (id.length < 5 && id !== 'chat') {
+            if (id.length < 5 && id !== 'chat' && id !== 'pwm') {
                 id = false;
             }
         }
@@ -1809,6 +1809,10 @@ function init_page() {
 
                 if ($.transferHeader) {
                     $.transferHeader();
+                }
+
+                if (mega.ui.header) {
+                    mega.ui.header.show();
                 }
             }
         }

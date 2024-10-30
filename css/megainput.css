@@ -640,57 +640,75 @@
 }
 
 /* Mobile Revamp Version */
-.mobile.mega-input {
+.mobile.mega-input,
+.pm.mega-input {
     padding: 1px;
 }
-.mobile.mega-input::before {
+.mobile.mega-input::before,
+.pm.mega-input::before {
     display: none;
 }
-.mobile.mega-input.box-style {
+.mobile.mega-input.box-style,
+.pm.mega-input.box-style {
     width: 100%;
     border-radius: var(--mobile-border-radius-medium);
     height: 47px;
     border: 1px solid var(--mobile-border-strong);
     background: var(--mobile-page-background);
 }
-.mobile.mega-input.box-style.fixed-width {
+.mobile.mega-input.box-style.fixed-width,
+.pm.mega-input.box-style.fixed-width {
     max-width: var(--mobile-elem-max-width);
 }
-.mobile.mega-input.box-style.active {
+.mobile.mega-input.box-style.active,
+.pm.mega-input.box-style.active {
     border-color: var(--mobile-border-strong-selected);
 }
-.mobile.mega-input.box-style.warning {
+.mobile.mega-input.box-style.warning,
+.pm.mega-input.box-style.warning {
     border-color: var(--mobile-support-warning);
 }
-.mobile.mega-input.box-style.error {
+.mobile.mega-input.box-style.error,
+.pm.mega-input.box-style.error {
     border-color: var(--mobile-support-error);
 }
-.mobile.mega-input.box-style.readonly {
+.mobile.mega-input.box-style.readonly,
+.pm.mega-input.box-style.readonly {
     background: var(--mobile-button-disabled);
     border-color: var(--mobile-border-disabled);
 }
-.mobile.mega-input.box-style.readonly input.megaInputs {
+.mobile.mega-input.box-style.readonly input.megaInputs,
+.pm.mega-input.box-style.readonly input.megaInputs {
     color: var(--mobile-text-disabled);
 }
 .mobile.mega-input.box-style input,
-.mobile.mega-input input::placeholder {
+.mobile.mega-input input::placeholder,
+.pm.mega-input.box-style input,
+.pm.mega-input.box-style textarea,
+.pm.mega-input input::placeholder {
     font: var(--mobile-font-input-regular);
     color: var(--mobile-text-placeholder);
     -webkit-opacity: 1;
 }
 .mobile.mega-input.error .message-container,
-.mobile.mega-input-wrapper.error .message-container {
+.mobile.mega-input-wrapper.error .message-container,
+.pm.mega-input.error .message-container,
+.pm.mega-input-wrapper.error .message-container {
     color: var(--mobile-support-error);
 }
-.mobile.mega-input.msg-left .message-container {
+.mobile.mega-input.msg-left .message-container,
+.pm.mega-input.msg-left .message-container {
     text-align: left;
 }
-.mobile.mega-input.error .message-container i {
+.mobile.mega-input.error .message-container i,
+.pm.mega-input.error .message-container i {
     margin-inline-end: 8px;
     -webkit-margin-end: 8px;
     vertical-align: text-bottom;
 }
-.mobile.mega-input input.megaInputs:not(:placeholder-shown) {
+.mobile.mega-input input.megaInputs:not(:placeholder-shown),
+.pm.mega-input input.megaInputs:not(:placeholder-shown),
+.pm.mega-input textarea.megaInputs:not(:placeholder-shown) {
     color: var(--mobile-text-primary);
 }
 .mobile.mega-input.title-ontop {
@@ -698,16 +716,21 @@
 }
 .mobile.mega-input > i,
 .mobile.mega-input:hover > i,
-.mobile.mega-input.active > i {
+.mobile.mega-input.active > i,
+.pm.mega-input > i,
+.pm.mega-input:hover > i,
+.pm.mega-input.active > i {
     --icon-size: 20px;
     --mask-color: var(--mobile-icon-secondary);
     opacity: 1;
 }
-.mobile.mega-input input {
+.mobile.mega-input input,
+.pm.mega-input input {
     padding: 14px 12px;
     box-sizing: border-box;
 }
-.mobile.mega-input.title-ontop.box-style .mega-input-title {
+.mobile.mega-input.title-ontop.box-style .mega-input-title,
+.pm.mega-input.title-ontop.box-style .mega-input-title {
     font: var(--mobile-font-caption-large-bold);
     padding-inline-start: 0;
     -webkit-padding-start: 0;
@@ -717,30 +740,36 @@
     text-overflow: ellipsis;
     top: -24px;
 }
-.mobile.mega-input .message-container {
+.mobile.mega-input .message-container,
+.pm.mega-input .message-container {
     font: var(--mobile-font-caption-large-regular);
     border: 0;
     background: none;
     text-align: start;
     top: 51px;
 }
-.mobile.mega-input.warning .message-container {
+.mobile.mega-input.warning .message-container,
+.pm.mega-input.warning .message-container {
     color: var(--mobile-text-warning);
     display: flex;
 }
-.mobile.mega-input.error .message-container {
+.mobile.mega-input.error .message-container,
+.pm.mega-input.error .message-container {
     color: var(--mobile-text-error);
     display: flex;
 }
 .mobile.mega-input.error .message-container .alert,
-.mobile.mega-input.msg .message-container i {
+.mobile.mega-input.msg .message-container i,
+.pm.mega-input.error .message-container .alert,
+.pm.mega-input.msg .message-container i {
     display: inline-block;
     vertical-align: top;
     margin-top: 3px;
     -webkit-margin-end: 8px;
     margin-inline-end: 8px;
 }
-.mobile.mega-input .length-check {
+.mobile.mega-input .length-check,
+.pm.mega-input .length-check {
     position: absolute;
     top: 100%;
     right: 0;
@@ -751,7 +780,8 @@
 
 /* Mobile textarea */
 
-.mobile.mega-input.textarea {
+.mobile.mega-input.textarea,
+.pm.mega-input.textarea {
     padding: 14px 12px;
     width: 100%;
     height: 142px;
@@ -759,7 +789,8 @@
     align-items: flex-start;
 }
 
-.mobile.mega-input.textarea textarea {
+.mobile.mega-input.textarea textarea,
+.pm.mega-input.textarea textarea {
     font: var(--mobile-font-copy-regular);
     color: var(--mobile-text-primary);
     overflow: hidden;
@@ -768,25 +799,29 @@
     white-space: pre-wrap;
 }
 
-.mobile.mega-input.textarea textarea::placeholder {
+.mobile.mega-input.textarea textarea::placeholder,
+.pm.mega-input.textarea textarea::placeholder {
     font: var(--mobile-font-copy-regular);
 }
 
-.mobile.mega-input.textarea i {
+.mobile.mega-input.textarea i,
+.pm.mega-input.textarea i {
     margin-inline-end: 0;
     -webkit-margin-end: 0;
 }
 
 /* Textarea with auto height */
 
-.mobile.mega-input.textarea.box-style.auto-height {
+.mobile.mega-input.textarea.box-style.auto-height,
+.pm.mega-input.textarea.box-style.auto-height {
     align-items: center;
     height: auto;
     min-height: 47px;
     padding: 9px 6px;
 }
 
-.mobile.mega-input.textarea.box-style.auto-height textarea {
+.mobile.mega-input.textarea.box-style.auto-height textarea,
+.pm.mega-input.textarea.box-style.auto-height textarea {
     display: block;
     height: 24px;
     overflow: auto;
@@ -794,52 +829,64 @@
     min-height: 24px;
 }
 
-.mobile.mega-input.textarea.box-style.auto-height textarea ~ i {
+.mobile.mega-input.textarea.box-style.auto-height textarea ~ i,
+.pm.mega-input.textarea.box-style.auto-height textarea ~ i {
     margin: 0;
     margin-inline-end: 6px;
     -webkit-margin-end: 6px;
 }
 
-.mobile.mega-input.textarea.box-style.auto-height .message-container {
+.mobile.mega-input.textarea.box-style.auto-height .message-container,
+.pm.mega-input.textarea.box-style.auto-height .message-container {
     top: calc(100% + 6px);
 }
 
 /* End of Mobile textarea */
 
-.mobile.mega-input.strengthChecker.msg:not(.error) {
+.mobile.mega-input.strengthChecker.msg:not(.error),
+.pm.mega-input.strengthChecker.msg:not(.error) {
     border-color: var(--stroke-mid-grey);
 }
 
-.mobile.mega-input.strengthChecker.msg.active:not(.error) {
+.mobile.mega-input.strengthChecker.msg.active:not(.error),
+.pm.mega-input.strengthChecker.msg.active:not(.error) {
     border-color: var(--mobile-border-strong-selected);
 }
 
-.mobile.mega-input.strengthChecker.msg:not(.error) .message-container {
+.mobile.mega-input.strengthChecker.msg:not(.error) .message-container,
+.pm.mega-input.strengthChecker.msg:not(.error) .message-container {
     color: var(--mobile-text-secondary);
     display: flex;
 }
 
-.mobile.mega-input.strengthChecker .account-pass-lines {
+.mobile.mega-input.strengthChecker .account-pass-lines,
+.pm.mega-input.strengthChecker .account-pass-lines {
     position: absolute;
     top: 52px;
     background: none;
     width: 100%;
 }
 
-.mobile.mega-input.strengthChecker .message-container {
+.mobile.mega-input.strengthChecker .message-container,
+.pm.mega-input.strengthChecker .message-container {
     top: 60px;
 }
 
 .mobile.mega-input.strengthChecker:not(.error) .good1.message-container i,
-.mobile.mega-input.strengthChecker:not(.error) .good2.message-container i {
+.mobile.mega-input.strengthChecker:not(.error) .good2.message-container i,
+.pm.mega-input.strengthChecker:not(.error) .good1.message-container i,
+.pm.mega-input.strengthChecker:not(.error) .good2.message-container i {
     color: var(--mobile-support-error);
 }
 
-.mobile.mega-input.strengthChecker:not(.error) .good3.message-container i {
+.mobile.mega-input.strengthChecker:not(.error) .good3.message-container i,
+.pm.mega-input.strengthChecker:not(.error) .good3.message-container i {
     color: var(--mobile-support-warning);
 }
 
 .mobile.mega-input.strengthChecker:not(.error) .good4.message-container i,
-.mobile.mega-input.strengthChecker:not(.error) .good5.message-container i {
+.mobile.mega-input.strengthChecker:not(.error) .good5.message-container i,
+.pm.mega-input.strengthChecker:not(.error) .good4.message-container i,
+.pm.mega-input.strengthChecker:not(.error) .good5.message-container i {
     color: var(--mobile-support-success);
 }

@@ -33,7 +33,7 @@ mobile.recoveryLogout = {
             ], this.container);
 
             // Inline copy button
-            const copyButton = new MegaMobileButton({
+            const copyButton = new MegaButton({
                 parentNode: rkinput,
                 type: 'icon',
                 icon: 'sprite-mobile-fm-mono icon-square-copy',
@@ -47,7 +47,7 @@ mobile.recoveryLogout = {
 
             // Download button
             /* eslint-disable no-new */
-            new MegaMobileButton({
+            new MegaButton({
                 parentNode: recoveryKeyContainer,
                 text: l.logout_recovery_key_download,
                 componentClassname: 'primary block dlButton button-prd-backup'
@@ -81,7 +81,7 @@ mobile.recoveryLogout = {
             ], this.container);
 
             // Confirm button
-            new MegaMobileButton({
+            new MegaButton({
                 parentNode: passReminderContainer,
                 text: l.logout_password_confirm,
                 componentClassname: 'primary block confirmButton button-prd-confirm'
@@ -94,9 +94,9 @@ mobile.recoveryLogout = {
             ], passReminderContainer);
 
             // Skip link
-            const skipLink = new MegaMobileLink({
+            const skipLink = new MegaLink({
                 parentNode: this.container,
-                type: 'text',
+                type: 'normal',
                 componentClassname: 'text-only skip-link',
                 text: l[1379]
             });

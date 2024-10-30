@@ -1097,8 +1097,12 @@ async function api_setattr(n) {
         console.debug('Updating node attributes for "%s"...', n.h);
     }
     const req = {a: 'a', n: n.h, at: ab_to_base64(crypto_makeattr(n))};
-    if (M.getNodeRoot(n.h) === M.InboxID) {
+    const root = M.getNodeRoot(n.h);
+    if (root === M.InboxID) {
         mega.backupCenter.ackVaultWriteAccess(n.h, req);
+    }
+    else if (root === 'pwm') {
+        req.vw = 1;
     }
     return api.screq(req);
 }

@@ -1,4 +1,4 @@
-class MegaMobileViewOverlay extends MegaMobileComponent {
+class MegaMobileViewOverlay extends MegaComponent {
 
     constructor(options) {
         super(options);
@@ -17,7 +17,7 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
         overlay.append(document.getElementById('view-file-template').content.cloneNode(true));
 
         // Build header
-        const backLink = new MegaMobileLink({
+        const backLink = new MegaLink({
             parentNode: overlay.querySelector('.media-viewer-menu'),
             type: 'icon',
             componentClassname: 'text-icon back',
@@ -41,7 +41,7 @@ class MegaMobileViewOverlay extends MegaMobileComponent {
             this.hide();
         });
 
-        const contextMenuButton = new MegaMobileButton({
+        const contextMenuButton = new MegaButton({
             type: 'icon',
             parentNode: overlay.querySelector('.media-viewer-menu'),
             icon: 'sprite-mobile-fm-mono icon-more-horizontal-thin-outline',

@@ -45,14 +45,14 @@ mobile.settings.account.twofactorVerifyAction = Object.create(mobile.settingsHel
                 }
 
                 // Create Verify button
-                new MegaMobileButton({
+                new MegaButton({
                     parentNode: this.domNode,
                     componentClassname: 'block',
                     text: l[1960]
                 }).on('tap.confirmAction', () => this.verifyTwoFA());
 
                 // Create Lost device button
-                this.lostDeviceButton = new MegaMobileButton({
+                this.lostDeviceButton = new MegaButton({
                     parentNode: this.domNode,
                     componentClassname: 'block text-only',
                     text: l[19215]

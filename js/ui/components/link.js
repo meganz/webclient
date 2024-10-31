@@ -54,11 +54,13 @@ MegaLink.bindEvent = function() {
         return;
     }
 
-    this.on('click', async() => {
+    this.on('click', async e => {
         if (this.disabled
             || is_mobile && mega.ui.viewerOverlay.confirmDiscard && !await mega.ui.viewerOverlay.confirmDiscard()) {
             return false;
         }
+
+        e.preventDefault();
 
         if (window.textEditorVisible) {
             mega.textEditorUI.doClose();

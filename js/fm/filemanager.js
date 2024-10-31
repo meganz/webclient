@@ -248,13 +248,23 @@ FileManager.prototype.initFileManager = async function() {
                         console.info('REWIND Initialized.', [mega.rewind]);
                     }
 
+                    // Only show to user account older than 1 month
+                    if (Date.now() - u_attr.since * 1000 < 30 * 24 * 60 * 60 * 1000) {
+                        return;
+                    }
+
                     const m = new Date().getMonth();
                     if (m > 7) {
                         const sm = mega.config.get('rwdPromoDiag');
-                        if (sm === undefined && m > 10 || m < 11 && sm !== m) {
+                        if (typeof sm === 'undefined' && m > 10 || m < 11 && sm !== m) {
                             mega.config.set('rwdPromoDiag', m);
-                            eventlog(500532);
-                            mega.rewind.showRewindPromoDialog();
+                            tSleep(1)
+                                .then(() => mega.config.flush())
+                                .then(() => {
+                                    eventlog(500532);
+                                    return mega.rewind.showRewindPromoDialog();
+                                })
+                                .catch(dump);
                         }
                     }
                 })

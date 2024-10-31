@@ -129,7 +129,7 @@ class MegaMobileDropdownItemList {
             listItems[key] = targetNode;
 
             tappableListItem.on('tap', (e) => {
-                const item = e.target.domNode.dataset.value;
+                const item = e.currentTarget.domNode.dataset.value;
 
                 if (this.selected) {
                     this.selected.classList.remove('focused');

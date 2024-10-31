@@ -26,7 +26,7 @@ mobile.settings.account.referral = Object.create(mobile.settingsHelper, Object.g
         }).on('tap.redeem', (e) => {
 
             // Show tip on tip icon tap only
-            if (e.data.target.classList.contains('tip-icon')) {
+            if (e.target.classList.contains('tip-icon')) {
                 this.showCommisionTip();
             }
         });

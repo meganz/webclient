@@ -134,6 +134,22 @@ lazy(s4, 'utils', () => {
         },
 
         /**
+         * Disabling S4 Object storage and reming container public links
+         * @returns {void} void
+         * @memberOf s4
+         */
+        async optsOut() {
+            const cn = this.getContainersList();
+            const params = [{ a: 's4r' }];
+
+            for (let i = 0; i < cn.length; i++) {
+                params.push({a: 's2', n: cn[i].h, s: [{u: 'EXP', r: ''}], ha: ''});
+            }
+
+            return api.req(params);
+        },
+
+        /**
          * Getting confirmation when copying/moving from/to s4
          * @param {Array} handles Array of node handles
          * @param {String} t Target folder node handle

@@ -1984,6 +1984,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         'commission_amount_tip',
         'go_to_pro',
         'after_days_card_charged_m',
+        's4_disable_feature_info',
     ];
     for (let i = common.length; i--;) {
         var num = common[i];

@@ -100,7 +100,8 @@ class ActivateS4Page {
                 ActivateS4.instance.activateAuthCode(window.s4ac)
                     .then((res) => {
                         if (res === 0) {
-                            window.location = '/';
+                            loadSubPage('fm');
+                            location.reload();
                             return;
                         }
                         return ActivateS4.instance.handleResponse(res);

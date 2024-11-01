@@ -148,7 +148,7 @@ function u_checklogin3a(res, ctx) {
             configurable: false
         });
 
-        const {s4} = u_attr;
+        const s4 = u_attr.s4 | 0;
         delete u_attr.s4;
         Object.defineProperty(u_attr, 's4', {
             value: !!s4,

@@ -141,6 +141,12 @@ pro.propay = {
         // If a current Pro Flexi user (not expired/grace period), don't allow
         // access to this Pro Pay page or they would end up purchasing a new plan
         if (u_attr && u_attr.pf && !pro.isExpiredOrInGracePeriod(u_attr.pf.s)) {
+            // Unless they have entered the S4 Object Storage RYI flow, in which case send them to that landing page.
+            if (window.s4ac) {
+                loadSubPage('activate-s4');
+                return;
+            }
+
             loadSubPage('start');
             return;
         }
@@ -157,6 +163,7 @@ pro.propay = {
         pro.propay.purchaseButton = {
             $button: $('button.purchase', this.$page),
             canProceedLoaded: false,
+            termsAccepted: true // No special terms by default
         };
 
         // Preload loading/transferring/processing animation
@@ -173,6 +180,23 @@ pro.propay = {
 
         // If the plan number is not set in the URL e.g. propay_4, go back to Pro page step 1 so they can choose a plan
         if (!pro.propay.setProPlanFromUrl()) {
+
+            // Redirect to Buy Pro Flexi page or back to mega.io if user comes from link propay?ac=<Auth Code>
+            if (window.s4ac) {
+
+                ActivateS4.instance.verifyAuthCode(window.s4ac)
+                    .then(res => {
+                        if (res === 0) {
+                            loadSubPage(`propay_${pro.ACCOUNT_LEVEL_PRO_FLEXI}`);
+                            return false;
+                        }
+                        return ActivateS4.instance.handleResponse(res);
+                    })
+                    .catch(tell);
+
+                return;
+            }
+
             loadSubPage('pro');
             return;
         }
@@ -252,8 +276,10 @@ pro.propay = {
 
         // Initialise the main purchase button
         pro.propay.purchaseButton.$button.rebind('click.purchase', () => {
-            const canProceedLoaded = pro.propay.purchaseButton.canProceedLoaded;
-            if (!canProceedLoaded) {
+            const canProceed = pro.propay.purchaseButton.canProceedLoaded
+                && pro.propay.purchaseButton.termsAccepted;
+
+            if (!canProceed) {
                 return false;
             }
             if (is_mobile) {
@@ -263,6 +289,18 @@ pro.propay = {
             pro.propay.startPurchaseProcess();
             return false;
         });
+
+        // Init/hide S4 UI
+        if (window.s4ac && pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
+            $('.plan-feature.subtext',  this.$page).text(l.pro_page_flexi_feature_subtext).removeClass('hidden');
+            $('.s4-tos', this.$page).removeClass('hidden');
+
+            pro.propay.initS4TermsCheckbox();
+        }
+        else {
+            $('.plan-feature.subtext',  this.$page).addClass('hidden');
+            $('.s4-tos', this.$page).addClass('hidden');
+        }
 
         clickURLs();
 
@@ -414,6 +452,32 @@ pro.propay = {
         return false;
     },
 
+    /**
+     * Init S4 Tos checkbox and change states when clicked
+     * @param {Boolean} state True setting initial state On
+     * @returns {void} void
+     */
+    initS4TermsCheckbox: (state) => {
+        'use strict';
+
+        const $check = $('.s4-tos .checkbox', this.$page);
+
+        const changeState = (state) => {
+            if (state) {
+                $check.removeClass('checkboxOff').addClass('checkboxOn');
+                pro.propay.purchaseButton.termsAccepted = true;
+            }
+            else {
+                $check.addClass('checkboxOff').removeClass('checkboxOn');
+                pro.propay.purchaseButton.termsAccepted = false;
+            }
+            pro.propay.updatePurchaseButton();
+        };
+
+        $check.rebind('click.changeState', () => changeState($check.hasClass('checkboxOff')));
+        changeState(state);
+    },
+
     showFeatureWarning(title, text, cancelTxt, proceedText) {
         'use strict';
 
@@ -471,7 +535,10 @@ pro.propay = {
     updatePurchaseButton() {
         'use strict';
         // Check membership plans loaded
-        pro.propay.purchaseButton.$button.toggleClass('disabled', !pro.propay.purchaseButton.canProceedLoaded);
+        pro.propay.purchaseButton.$button.toggleClass(
+            'disabled',
+            !(pro.propay.purchaseButton.canProceedLoaded && pro.propay.purchaseButton.termsAccepted)
+        );
     },
 
     async getUserPlanInfo() {
@@ -2438,6 +2505,14 @@ pro.propay = {
             utsRequest.dc = mega.discountInfo.dc;
         }
 
+        // Add S4 parameters
+        const s4Flexi = window.s4ac && pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI;
+
+        if (window.s4ac && pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
+            utsRequest.ac = window.s4ac;
+            utsRequest.s4 = 1;
+        }
+
         const setValues = (extra, saleId) => {
 
             if (pro.propay.proPaymentMethod === 'voucher' || pro.propay.proPaymentMethod === 'pro_prepaid') {
@@ -2536,8 +2611,12 @@ pro.propay = {
                 // Default error is "Something went wrong. Try again later..."
                 let errorMessage;
 
+                // Get S4 error messages
+                if (s4Flexi && (errorMessage = ActivateS4.instance.invalidCodeMsg(ex))) {
+                    delete window.s4ac;
+                }
                 // Handle specific discount errors
-                if (ex === EEXPIRED) {
+                else if (ex === EEXPIRED) {
                     // The discount code has expired.
                     errorMessage = l[24675];
                 }

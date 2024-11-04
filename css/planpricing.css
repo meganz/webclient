@@ -67,21 +67,7 @@
     --text-button-pricing: normal 400 var(--font-copy-medium) var(--font-noto-sb-pricing);
     /* End Fonts */
     /* Colors*/
-    --color-heading: #04101E;
-    --color-bg-surface-1: #F9F9FB;
-    --color-bg-surface-2: #F5F5F6;
-    --color-primary-red-500: #DD1405;
-    --color-primary-red-600: #B72C1C;
-    --color-copy-secondary: #6E6E6E;
-    --color-grey-150: #E2E3E3;
-    --color-secondary-cobalt-900: #00174C;
-    --color-secondary-cobalt-600: #003C9C;
-    --color-grey-50: #F8F8F9;
-    --color-grey-200: #D7D8D9;
-    --color-primary: #333333;
-    --color-bg: #FFFFFF;
     --color-disabled: #D5D5D5;
-    --color-copy-primary: #E5E5E5;
     --selected-tab-border: rgba(221, 20, 5, 1);
     --tabs-bottom-border: rgba(216, 217, 219, 1);
     /* End Colors*/
@@ -189,7 +175,7 @@
 }
 .pricing-pg .pricing-pg.period-note-container .period-note-txt {
     padding: 10px;
-    background: #F5F9FF; /* not named color!*/
+    background: var(--color-secondary-cobalt-50);
     border-radius: 27px;
     margin-top: 8px;
 }
@@ -245,7 +231,7 @@
 .pricing-plan-card .pricing-plan-storage,
 .pricing-plan-card .pricing-plan-trasfer {
     font: var(--text-copy-medium-bold-pricing);
-    color: var(--color-primary);
+    color: var(--color-copy-primary);
     white-space: nowrap;
 }
 .pricing-plan-card .pricing-plan-storage {
@@ -311,7 +297,7 @@
     align-items: center;
     font: var(--text-button-pricing);
     cursor: pointer;
-    background-color: var(--color-bg);
+    background-color: var(--color-bg-page);
 }
 .disabled .pricing-plan-btn-container .pricing-plan-btn {
     opacity: 0.2;
@@ -377,7 +363,7 @@
     align-items: center;
     gap: 8px;
     font: var(--text-copy-large-pricing);
-    color: var(--color-primary);
+    color: var(--color-copy-primary);
     outline: unset;
 }
 .pricing-get-free-banner .pricing-get-free-storage {
@@ -511,7 +497,7 @@ i.dropbox-icon {
 .pricing-why-store-with-us .pricing-why-store-with-us-block-txt {
     margin-top: 12px;
     font: var(--text-copy-medium-pricing);
-    color: var(--color-primary);
+    color: var(--color-copy-primary);
 }
 .pricing-pg .pricing-compare-full-container {
     background-color: var(--color-bg-surface-1);
@@ -548,7 +534,7 @@ i.dropbox-icon {
 .pricing-compare-cards-container .pricing-compare-cards {
     display: flex;
     flex-direction: column;
-    background-color: var(--color-bg);
+    background-color: var(--color-bg-page);
     border: 1px solid var(--color-grey-150);
     box-sizing: border-box;
 }
@@ -596,12 +582,12 @@ i.dropbox-icon {
 .pricing-flexi-block-estimator-total .pricing-flexi-block-estimator-total-nb span.ars {
     font: var(--text-top-reference);
     vertical-align: top;
-    color: var(--color-primary);
+    color: var(--color-copy-primary);
 }
 .pricing-compare-cards .pricing-compare-cards-rate sup {
     font: var(--text-top-reference2);
     vertical-align: top;
-    color: var(--color-primary);
+    color: var(--color-copy-primary);
 }
 .pricing-compare-cards .pricing-compare-cards-period {
     margin-top: 8px;
@@ -789,7 +775,7 @@ i.pricing-i-icon {
 .pricing-get-started .pricing-get-started-txt {
     font: var(--text-h3-pricing);
     margin: var(--right-padding) 24px 0 24px;
-    color: var(--color-bg);
+    color: var(--color-bg-page);
 }
 .pricing-get-started .pricing-get-started-subtxt {
     font: var(--text-copy-medium-pricing);
@@ -829,7 +815,7 @@ i.pricing-i-icon {
 }
 .pricing-plans-compare-table .pricing-plans-compare-table-item {
     font: var(--text-copy-medium-pricing);
-    color: var(--color-primary);
+    color: var(--color-copy-primary);
     padding: 20px 16px;
     grid-column: span 1;
 }
@@ -862,7 +848,7 @@ i.pricing-i-icon {
     border-bottom: 1px solid var(--color-grey-150);
     position: sticky;
     top: 118px;
-    background-color: var(--color-bg);
+    background-color: var(--color-bg-page);
 }
 .mobile .pricing-plans-compare-table .pricing-plans-compare-table-item.line {
     top: 0;
@@ -889,7 +875,7 @@ i.pricing-i-icon {
     display: none;
     justify-content: center;
     align-items: center;
-    background-color: var(--color-bg);
+    background-color: var(--color-bg-page);
     border: 2px solid var(--color-heading);
     border-radius: 8px;
     height: 48px;
@@ -971,7 +957,7 @@ i.pricing-i-icon {
 }
 .pricing-flexi-block-estimator-contianer .pricing-flexi-block-estimator-title {
     font: var(--text-copy-medium-bold-pricing);
-    color: var(--color-primary);
+    color: var(--color-copy-primary);
 }
 .pricing-flexi-block-estimator-contianer .pricing-flexi-block-estimator-slider-contianer {
     margin-top: 24px;
@@ -1024,7 +1010,7 @@ i.pricing-i-icon {
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    background: var(--color-bg);
+    background: var(--color-bg-page);
     cursor: pointer;
     border: 8px solid var(--color-secondary-cobalt-900);
     box-sizing: border-box;
@@ -1036,17 +1022,17 @@ i.pricing-i-icon {
 .pricing-flexi-block-estimator-slider-headers-container .pricing-flexi-block-estimator-slider-input-box {
     border: 1px solid var(--color-grey-200);
     border-radius: 8px;
-    background-color: var(--color-bg);
+    background-color: var(--color-bg-page);
 }
 .pricing-flexi-block-estimator-slider-headers-container input.pricing-flexi-block-estimator-slider-input {
     height: 48px;
     max-width: 100px;
     -webkit-margin-start: 12px;
     margin-inline-start: 12px;
-    background-color: var(--color-bg);
+    background-color: var(--color-bg-page);
     border: none;
     font: var(--text-copy-medium-pricing);
-    color: var(--color-primary);
+    color: var(--color-copy-primary);
 }
 .pricing-flexi-block-estimator-slider-headers-container .pricing-flexi-block-estimator-slider-input-container span {
     font: var(--text-copy-medium-pricing);
@@ -1063,12 +1049,12 @@ i.pricing-i-icon {
 }
 .pricing-flexi-block-estimator-total .pricing-flexi-block-estimator-total-title {
     font: var(--text-copy-medium-bold-pricing);
-    color: var(--color-primary);
+    color: var(--color-copy-primary);
 }
 .pricing-flexi-block-estimator-total .pricing-flexi-block-estimator-total-nb {
     margin-top: 24px;
     font: var(--text-h3-pricing);
-    color: var(--color-primary);
+    color: var(--color-copy-primary);
 }
 .pricing-flexi-block-estimator-total .pricing-flexi-block-estimator-total-unit {
     font: var(--text-caption-regular-pricing);
@@ -1129,7 +1115,7 @@ i.pricing-i-icon {
 .feature-alternating .feature-block .text-pane p,
 .ft-simple-cards .ft-card-txt,
 .feature-glance-body p {
-    color: var(--color-primary);
+    color: var(--color-copy-primary);
     font: var(--text-copy-medium-pricing);
 }
 .feature-alternating .feature-block .img-box img {

@@ -2274,12 +2274,14 @@ else if (!browserUpdate) {
     jsl.push({f:'css/avatars.css', n: 'avatars_css', j:2,w:5,c:1,d:1,cache:1});
 
     // Common desktop and mobile, bottom pages
+    jsl.push({f:'css/mio.css', n: 'mio_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/fonts.css', n: 'fonts_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/bottom-pages.css', n: 'bottom-pages_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/bottom-menu.css', n: 'bottom-menu_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/business.css', n: 'business_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/pro.css', n: 'pro_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/planpricing.css', n: 'planpricing_css', j:2,w:5,c:1,d:1,cache:1});
+    jsl.push({f:'css/activate-s4.css', n: 'activates4_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/startpage.css', n: 'startpage_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/icons.css', n: 'icons_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
     jsl.push({f:'css/spinners.css', n: 'spinners_css', j: 2, w: 5, c: 1, d: 1, cache: 1});
@@ -2388,6 +2390,10 @@ else if (!browserUpdate) {
 
     // Plan pages for features
     jsl.push({f:'html/js/planpricing/vpn-pricing.js', n: 'vpn_pricing_js', j:1});
+
+    // Activate S4 feature
+    jsl.push({f:'html/activate-s4.html', n: 'activates4', j:0});
+    jsl.push({f:'html/js/activate-s4.js', n: 'activates4_js', j:1});
 
     jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});
     jsl.push({f:'js/fm/achievements.js', n: 'achievements_js', j:1, w:5});
@@ -2920,7 +2926,7 @@ else if (!browserUpdate) {
         'docxviewer_js': {f:'js/ui/docx.viewer.js', n: 'docxviewer_js', j:4},
         'docxviewer': {f:'html/docx.viewer.html', n: 'docxviewer', j:0},
         'docxviewercss': {f:'css/docx.viewer.css', n: 'docxviewercss', j:4},
-        'clientzip_js': {f:'js/vendor/client-zip.js', n: 'clientzip_js', j:1},
+        'clientzip_js': {f:'js/vendor/client-zip.js', n: 'clientzip_js', j:1}
     };
 
     /* eslint-disable max-len */
@@ -3115,7 +3121,7 @@ else if (!browserUpdate) {
         'redeem': ['redeem', 'redeem_js'],
         'unsub': ['unsub', 'unsub_js'],
         'developersettings': ['developersettings', 'developersettings_js'],
-        'filerequest': ['filerequest', 'filerequest_upload_js'],
+        'filerequest': ['filerequest', 'filerequest_upload_js']
     };
 
     if (is_mobile) {

@@ -1,92 +1,6 @@
-/* region mega.io spacing */
-
-/* Breakpoints XL and L */
-:root footer.bottom-menu {
-    --spacing-1: 2px;
-    --spacing-2: 4px;
-    --spacing-3: 8px;
-    --spacing-4: 12px;
-    --spacing-5: 16px;
-    --spacing-6: 20px;
-    --spacing-7: 24px;
-    --spacing-8: 32px;
-    --spacing-9: 40px;
-    --spacing-10: 48px;
-    --spacing-11: 64px;
-    --spacing-12: 80px;
-    --spacing-13: 96px;
-    --spacing-14: 120px;
-    --spacing-15: 160px;
-}
-
-
-/* Breakpoints M */
-@media screen and (min-width: 768px) and (max-width: 1080px) {
-    :root footer.bottom-menu {
-        --spacing-1: 2px;
-        --spacing-2: 4px;
-        --spacing-3: 8px;
-        --spacing-4: 12px;
-        --spacing-5: 16px;
-        --spacing-6: 20px;
-        --spacing-7: 24px;
-        --spacing-8: 28px;
-        --spacing-9: 36px;
-        --spacing-10: 44px;
-        --spacing-11: 56px;
-        --spacing-12: 72px;
-        --spacing-13: 80px;
-        --spacing-14: 96px;
-        --spacing-15: 144px;
-    }
-}
-
-/* Breakpoints S and XS */
-@media screen and (max-width: 768px) {
-    :root footer.bottom-menu {
-        --spacing-1: 2px;
-        --spacing-2: 4px;
-        --spacing-3: 8px;
-        --spacing-4: 12px;
-        --spacing-5: 16px;
-        --spacing-6: 20px;
-        --spacing-7: 24px;
-        --spacing-8: 28px;
-        --spacing-9: 32px;
-        --spacing-10: 40px;
-        --spacing-11: 48px;
-        --spacing-12: 64px;
-        --spacing-13: 72px;
-        --spacing-14: 80px;
-        --spacing-15: 120px;
-    }
-}
-
-/* endregion */
-
-/* region adapt vars from mega.io */
-
-:root {
-    --font-family-inter: 'Inter', arial, sans-serif;
-    --font-copy-md-bold: normal bold 16px/24px var(--font-family-inter);
-    --font-copy-sm: normal normal 14px/20px var(--font-family-inter);
-    --font-copy-sm-bold: normal bold 14px/20px var(--font-family-inter);
-    --font-caption-lg: normal normal 14px/20px var(--font-family-inter);
-}
-
-@media screen and (min-width: 0) and (max-width: 1080px) {
-    :root footer.bottom-menu {
-        --default-padding: var(--spacing-7);
-    }
-}
-
-/* endregion */
+/* footer menu */
 
 footer.bottom-menu {
-    --color-copy-primary: var(--text-color-black-high);
-    --color-grey-100: var(--surface-grey-2);
-    --default-padding: var(--spacing-9);
-
     display: grid;
     grid-template-columns: repeat(12, 1fr);
     column-gap: var(--spacing-8);
@@ -122,11 +36,8 @@ footer.bottom-menu .info-group {
 
 footer.bottom-menu .info-group .mlogo {
     display: block;
-    width: 144px;
-    height: 48px;
-    background-image: url('../images/mega/startpage-sprite@2x.png');
-    background-size: 225px auto;
-    background-position: -10px -1149px;
+    --width: 144px;
+    --height: 48px;
 }
 
 footer.bottom-menu .info-group .slogan {

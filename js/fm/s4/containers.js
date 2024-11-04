@@ -60,6 +60,9 @@ lazy(s4, 'containers', () => {
                 return false;
             }
 
+            // Show onborading ID: 0
+            this._evtLog(0);
+
             super.show();
         }
 
@@ -101,6 +104,15 @@ lazy(s4, 'containers', () => {
             // Step 1
             $skipSetupBtn.rebind('click.s4dlg', () => {
                 this.destroy(true);
+
+                // Skip setup ID: 4
+                this._evtLog(4);
+            });
+
+            // Step 2
+            $('a.secondary', $steps[2]).rebind('click.s4dlg', () => {
+                // Learn more about endpoints ID: 3
+                this._evtLog(3);
             });
 
             // Step 3 events
@@ -165,6 +177,11 @@ lazy(s4, 'containers', () => {
             // Skip steps btn
             $skipStepBtn.rebind('click.s4dlg', () => {
                 if (this.skipStep) {
+                    // Skip key creation ID: 5, Skip bucket creation ID: 6
+                    if (this.skipStep === 5 || this.skipStep === 6) {
+                        this._evtLog(this.skipStep);
+                    }
+
                     this.steps(this.skipStep);
                 }
             });
@@ -186,6 +203,9 @@ lazy(s4, 'containers', () => {
             if (finalise) {
                 return Promise.resolve();
             }
+
+            // Start setup ID: 1
+            this._evtLog(1);
 
             s4.utils.renderEndpointsData(this.$steps[this.step]);
             this.$progressLabel.text(l[556]);
@@ -283,6 +303,10 @@ lazy(s4, 'containers', () => {
             this.$skipStepBtn.addClass('hidden');
             this.$progressLabel.text(l[726]);
             this._switchStep();
+        }
+
+        _evtLog(id) {
+            eventlog(500572, JSON.stringify([1, id]));
         }
 
         _switchStep() {

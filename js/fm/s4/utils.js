@@ -529,6 +529,11 @@ lazy(s4, 'utils', () => {
 
             // Copy to clipboard buttons
             $('.mega-button.copy', parentNode).rebind('click.copyUrl', (e) => {
+                if ($.dialog === 's4-managed-setup') {
+                    // Copy endpoints ID: 2
+                    eventlog(500572, JSON.stringify([1, 2]));
+                }
+
                 copyToClipboard(e.currentTarget.dataset.url, l.s4_endpoint_copied, 'hidden');
             });
         },

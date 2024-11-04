@@ -181,11 +181,18 @@ module.exports = {
             return {
                 MemberExpression(node) {
                     if (node.parent.type === 'AssignmentExpression') {
+                        const {object: {name: o}, property: {name: p}} = node;
 
-                        if (node.object.name === "$" && node.property.name === "dialog") {
+                        if (o === "$" && p === "dialog") {
                             context.report(node,
                                 'Overwriting $.dialog is discouraged, handling of' +
                                 ' new dialogs should be achieved through M.safeShowDialog(), see MR!1419');
+                        }
+                        else if ((o === 'location' && p === 'href')
+                            || p === "location" && (o === "window" || o === 'self')) {
+
+                            context.report(node,
+                                'Assigning to (self|window).location.* will not work over our browser extension.');
                         }
                     }
                 },

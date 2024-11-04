@@ -1206,7 +1206,8 @@ body div:has(+ div.dropdown.body.button-group-menu:hover) .float-video .video-no
 }
 .lhp-container .lhp-archived-empty h3 {
   display: block;
-  margin: 8px 0 0 0;
+  margin: 8px 0 0;
+  padding: 0 14px;
 }
 .lhp-container .lhp-nil {
   padding: 4px 6px 0 6px;

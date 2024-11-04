@@ -1285,9 +1285,7 @@ function MessagesBuff(chatRoom, chatdInt) {
                 self.setLastReceived(eventData.messageId);
             }
 
-            if (!self.isRetrievingHistory) {
-                self.trigger('onNewMessageReceived', msgObject);
-            }
+            self.trigger('onNewMessageReceived', msgObject);
 
             if (eventData.pendingid) {
                 chatRoom.trigger('onPendingMessageConfirmed', msgObject);

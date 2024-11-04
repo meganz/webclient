@@ -1642,7 +1642,7 @@ Chat.prototype.renderListing = async function megaChatRenderListing(location, is
                     view = VIEWS.CHATS;
                 }
             }
-            else if (!chats.length) {
+            else if (!chats.length && meetings.length) {
                 rooms = meetings;
                 view = VIEWS.MEETINGS;
             }

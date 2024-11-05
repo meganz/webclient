@@ -303,7 +303,7 @@ html.gbot {
     display: none;
 }
 .bottom-page .top-head.floating {
-    background-color: white;
+    background-color: var(--surface-main);
     height: 60px;
     position: fixed;
     padding-bottom: 14px;

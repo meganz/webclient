@@ -3045,6 +3045,10 @@ function parsepage(pagehtml) {
     if (page === 'download') {
         mega.ui.setTheme();
     }
+    else if (page === 'login' || page.substring(0, 8) === 'register') {
+        mega.ui.setTheme();
+        document.body.classList.add('bottom-pages');
+    }
     else {
         document.body.classList.remove('theme-dark');
         document.body.classList.add('theme-light', 'bottom-pages');

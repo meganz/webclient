@@ -1,5 +1,5 @@
 .sign .main-pad-block {
-    background-color: #FAFAFA;
+    background-color: var(--surface-grey-1);
 }
 .bottom-page.sign .register-st2-txt-block {
     padding-top: 94px;
@@ -14,7 +14,7 @@
     border-radius: 24px;
     padding: 4px 48px 0;
     box-sizing: border-box;
-    background-color: #fff;
+    background-color: var(--surface-main);
     box-shadow: 0 1px 2px 0 rgba(0,0,0,0.1);
     text-align: center;
     overflow: hidden;
@@ -51,8 +51,8 @@
 .account.register-form .dialog-dark-bottom.login,
 .account.login-form .dialog-dark-bottom.register {
     align-items: center;
-    color: var(--text-color-medium-inverted);
-    background: var(--surface-main-inverted);
+    color: var(--text-color-medium);
+    background: var(--surface-grey-2);
     box-sizing: border-box;
     display: flex;
     font: var(--text-body1);
@@ -68,7 +68,7 @@
 .account.register-form .dialog-dark-bottom.login a,
 .account.login-form .dialog-dark-bottom.register a {
     font-size: 15px;
-    color: var(--text-color-high-inverted);
+    color: var(--text-color-medium);
     font-family: var(--text-font-family-semibold);
     margin-left: 4px;
     text-decoration: underline;
@@ -85,7 +85,7 @@
     font-family: var(--text-font-family-second-regular);
     font-size: 28px;
     line-height: 44px;
-    color: #333;
+    color: var(--text-color-high);
     padding: 48px 0 40px 0;
 }
 .mega-dialog header .account.top-header {
@@ -614,7 +614,7 @@ button.loading .loader {
     display: flex;
     flex-direction: column;
     width: fit-content;
-    color: var(--text-color-black-higher);
+    color: var(--text-color-higher);
     font-family: var(--text-font-family-second-regular);
     font-size: 30px;
     line-height: 36px;
@@ -638,7 +638,7 @@ button.loading .loader {
     font-family: 'LatoWebBold','source_sans_proregular', Arial;
 }
 .register-slide-block a, .login-slide-block a {
-    color: #FF333A;
+    color: var(--text-color-error);
     font-size: 14px;
     line-height: 20px;
     text-decoration: underline;

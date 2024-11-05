@@ -65,6 +65,7 @@
 .bus-reg-body .bus-reg-radio-option,
 .bus-repay-block .bus-reg-radio-option {
     align-items: center;
+    color: var(--text-color-medium);
     cursor: pointer;
     display: inline-flex;
     margin-bottom: 8px;
@@ -146,6 +147,9 @@
     background-color: var(--stroke-main);
 }
 
+.theme-dark .bus-reg-plan {
+    background-color: var(--stroke-grey-1);
+}
 .bus-reg-plan .plan-icon {
     margin: 40px auto 0;
 }
@@ -192,6 +196,9 @@
     border-width: 1px;
     border-color: var(--surface-grey-2);
     padding-bottom: 14px;
+}
+.theme-dark .bus-reg-plan .bus-internal-block {
+    background-color: var(--stroke-main);
 }
 .bus-reg-plan .bus-internal-block.business-plan-peruse {
     border-radius: 8px 8px 0 0;
@@ -249,6 +256,9 @@
     border-width: 1px;
     border-color: var(--surface-grey-2);
     border-top-width: 0;
+}
+.theme-dark .bus-reg-plan .business-plan-quota-note {
+    background-color: var(--stroke-main);
 }
 .bus-reg-plan .bus-quota-note-head {
     font: var(--text-h3);
@@ -348,7 +358,7 @@
     font-weight: 300;
     text-align: center;
     margin-bottom: 64px;
-    color: #333;
+    color: var(--text-color-high);
     line-height: 54px;
 }
 
@@ -370,14 +380,14 @@
 .bus-reg-featureTxt {
     width: 80%;
     margin:48px auto 64px auto;
-    color: #666;
+    color: var(--text-color-high);
     font-size: 16px;
     line-height: 28px;
     text-align: center;
 }
 
 .bus-reg-featureTxt a {
-    color: #F0373B;
+    color: var(--text-color-error);
 }
 
 .bus-reg-featureTxt a:hover {

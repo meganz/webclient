@@ -99,6 +99,9 @@
 
         if (value === undefined) {
             value = (window.u_attr && u_attr['^!webtheme'] || fmconfig.webtheme) | 0;
+            if (u_type === false) {
+                value = self.darkloader ? 2 : 1;
+            }
         }
         else {
             value = Math.max(0, value | 0);

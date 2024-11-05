@@ -268,9 +268,6 @@ var pro = {
                     }
 
                     // Store globally
-                    if (d && localStorage.useDevOptions) {
-                        pro.applyDevSettings();
-                    }
                     pro.membershipPlans = plans;
                     if (d && localStorage.useDevOptions) {
                         pro.applyDevSettings();

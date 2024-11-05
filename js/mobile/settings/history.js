@@ -152,8 +152,17 @@ mobile.settings.history = Object.create(mobile.settingsHelper, {
                 country.icon = 'ud.png';
             }
 
+            let browserFullName = browser.nameTrans;
+
             // Show if using an extension e.g. "Firefox on Linux (+Extension)"
-            const browserFullName = browser.nameTrans += browser.isExtension ? ` (+${l[7683]})` : '';
+            if (browser.isExtension) {
+                if (session[2].startsWith('MEGEXTPWM')) {
+                    browserFullName += ' (MEGA Pass Ext)';
+                }
+                else {
+                    browserFullName += ' (+' + l[7683] + ')';
+                }
+            }
 
             const sessionNode = mCreateElement('div', {'class': `mobile session ${sessionStatus}`, 'id': sessionId});
             mCreateElement('div', {'class': 'heading'}, [

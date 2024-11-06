@@ -41,7 +41,7 @@ textarea {
     width: 100%;
 }
 .media-viewer {
-    background-color: #000;
+    background-color: transparent;
     height: 100%;
     width: 100%;
 }
@@ -172,6 +172,10 @@ textarea {
 .media-viewer .v-btn:hover i,
 .close-overlay:hover i {
     opacity: 1;
+}
+
+.media-viewer .v-btn.share.clicked i {
+    --mask-color: var(--label-green);
 }
 .media-viewer .v-btn.share i {
     --icon-size: 24px;
@@ -658,7 +662,7 @@ textarea {
 }
 
 .download.info-txt.big-txt {
-    color: white;
+    color: var(--text-color-high);
     font-size: 14px;
     display: inline-block;
     overflow: hidden;
@@ -1215,35 +1219,163 @@ textarea {
     width: 100%;
 }
 
-/* Theme */
-.theme-dark,
-.theme-dark .custom-alpha,
-html .theme-dark-forced {
-    --icon-rest: rgba(204, 204, 204, var(--icon-alpha, 1));
-    --icon-active: rgba(255, 255, 255, var(--icon-alpha, 1));
-    --secondary-grey: rgba(204, 204, 204, var(--secondary-alpha, 1));
-    --surface-main: rgba(51, 51, 51, var(--surface-alpha, 1));
-    --surface-grey-1: rgba(34, 34, 34, var(--surface-alpha, 1));
-    --surface-grey-2: rgba(68, 68, 68, var(--surface-alpha, 1));
-    --surface-grey-6: var(--surface-black);
-    --surface-black: rgba(0, 0, 0, var(--surface-alpha, 1));
-    --surface-black-bar: rgba(0, 0, 0, var(--surface-alpha, 0.7));
-    --text-color-error: rgba(255, 126, 121, 1);
-    --text-color-white-medium: rgba(255, 255, 255, 0.7);
-    --text-color-white-high: rgba(255, 255, 255, 1);
-    --text-color-white-higher: rgba(255, 255, 255, 1);
-    --text-color-medium: var(--text-color-white-medium);
-    --text-color-high: var(--text-color-white-high);
-    --text-color-higher: var(--text-color-white-higher);
-    --dropdown-arrow-color: rgba(51, 51, 51, 1);
-    --button-hover: rgba(255, 255, 255, 0.1);
-    --progress-bar-fill2: rgba(255, 51, 58, 1);
-    --progress-bar-background: rgba(255, 255, 255, 0.2);
-    --text-font-family: "LatoWeb", sans-serif;
-    --text-body1: 14px/20px var(--text-font-family);
-    --text-body2: 12px/18px var(--text-font-family);
-    --stroke-grey-2: rgba(68, 68, 68, var(--stroke-alpha, 1));
-    --transition-all: all 800ms ease-in-out;
+/* Tooltip */
+.dark-direct-tooltip {
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--text-color-high-inverted);
+    padding: 8px 12px;
+    background: var(--surface-grey-1-inverted);
+    border-radius: 6px;
+}
+.dark-direct-tooltip i.icon-tooltip-arrow {
+    position: absolute;
+    bottom: -6px;
+    left: calc(50% - 12px);
+    width: 24px;
+}
+
+/* Embed audio */
+.audio-wrapper {
+    width: 663px;
+    height: 96px;
+    padding: 22px;
+    border-radius: 16px;
+    display: flex;
+    background: var(--surface-main);
+    box-shadow: 0 1px 4px 0 var(--switch-handle-border);
+    position: relative;
+    left: 2px;
+    top: 2px;
+}
+.audio-thumbnail {
+    margin-right: 24px;
+}
+.audio-thumbnail img {
+    height: 96px;
+    width: 96px;
+    object-fit: contain;
+    border-radius: 8px;
+}
+.audio-container {
+    display: grid;
+    gap: 6px;
+}
+.media-viewer .audio-wrapper .audio-container .viewer-bars {
+    height: 42px;
+    width: 543px;
+    padding: 0;
+    display: flex;
+    border: none;
+    background: var(--surface-main);
+    position: inherit;
+}
+.viewer-bars.top {
+    gap: 4px;
+}
+.audio-container .viewer-bars .viewer-filename {
+    width: 455px;
+    padding: 0;
+    position: relative;
+}
+.audio-container .download.info-txt.big-txt {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 24px;
+}
+.audio-wrapper .logo-container .logo-icon {
+    width: 24px;
+}
+.media-viewer .audio-wrapper .viewer-bars.video-controls {
+    gap: 8px;
+    flex-direction: inherit;
+    position: inherit;
+}
+.mouse-idle .audio-wrapper .video-controls {
+    opacity: 1;
+}
+.media-viewer .audio-wrapper .play-video-button {
+    position: relative;
+    top: auto;
+    left: auto;
+    padding: 9px;
+    border: 1px solid rgba(225, 225, 225, 0.50);
+    margin: 2px;
+}
+.media-viewer .audio-wrapper .play-video-button i {
+    --icon-size: 16px;
+}
+.media-viewer .audio-wrapper button.v-btn {
+    margin: 8px;
+}
+.audio-wrapper .video-timing {
+    color: var(--text-color-high);
+    font: var(--text-body2);
+    margin: 9px 4px;
+}
+.media-viewer .audio-wrapper .video-progress-block {
+    padding: 0;
+    width: auto;
+    flex: none;
+}
+.media-viewer .audio-wrapper .video-progress-bar {
+    width: 393px;
+    height: 6px;
+    margin-top: 0;
+    border-radius: 3px;
+}
+.audio-wrapper .playpause-wrapper.hidden ~ .video-progress-block .video-time-bar::before,
+.audio-wrapper .video-progress-block .video-time-bar[style*='width: 0%']::before {
+    display: none;
+}
+.audio-wrapper .video-time-bar::before {
+    background: var(--progress-bar-fill2);
+    border-radius: 100%;
+    bottom: 0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    content: '';
+    height: 12px;
+    margin: auto;
+    position: absolute;
+    right: -6px;
+    top: 0;
+    width: 12px;
+}
+.audio-wrapper .v-btn.share i {
+    --mask-color: var(--icon-rest);
+}
+.audio-wrapper video {
+    width: 0;
+    height: 0;
+}
+[data-simpletip]:hover {
+    position: relative;
+}
+[data-simpletip]:hover::after {
+    content: attr(data-simpletip);
+    top: calc(100% + 8px);
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--text-color-high-inverted);
+    background: var(--surface-grey-1-inverted);
+    border-radius: 6px;
+    padding: 8px 12px;
+    white-space: nowrap;
+}
+[data-simpletip]:hover::before {
+    content: "";
+    bottom: -10px;
+    border-width: 8px;
+    border-style: solid;
+    border-color: transparent transparent var(--surface-grey-1-inverted) transparent;
+}
+[data-simpletip]:hover::before,
+[data-simpletip]:hover::after {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3000;
+    animation: simpletip-fadein 0.8s forwards;
 }
 
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
@@ -1281,5 +1413,17 @@ html .theme-dark-forced {
     .tab-content {
         max-height: 40px;
         overflow: auto;
+    }
+}
+
+@keyframes simpletip-fadein {
+    0% {
+        opacity: 0;
+    }
+    60% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
     }
 }

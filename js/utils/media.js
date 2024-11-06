@@ -1162,25 +1162,29 @@ FullScreenManager.prototype.enterFullscreen = function() {
             // Play/Pause button
             if (type === 'playpause' && !timeDrag) {
                 const {ended} = streamer || !1;
+                const style = is_embed === 2 ? 'solid' : 'outline';
 
-                if (ended && $watchAgainButton.hasClass('hidden')) {
-
+                if (ended) {
                     if ($repeat.mnh === node.h) {
-
                         $playpause.trigger('click');
                         return;
                     }
 
-                    $('i', $playpause).removeClass('icon-pause-small-regular-outline')
+                    $('i', $playpause).removeClass(`icon-pause-small-regular-${style}`)
                         .addClass('icon-rotate-ccw-small-regular-outline');
                     $('.playpause-wrapper .tooltip', $wrapper).text(l.video_player_watch_again);
                     $watchAgainButton.removeClass('hidden');
                     videoElement.style.filter = `${videoElement.style.filter.replace('none', '')}blur(6px)`;
                     mBroadcaster.sendMessage('trk:event', 'media-journey', 'playback', 'ended');
+
+                    if (is_embed === 2) {
+                        $('.audio-wrapper .playpause-wrapper').addClass('hidden');
+                        $('.audio-wrapper .play-video-button').removeClass('hidden');
+                    }
                 }
                 else if (videoElement.paused) {
-                    $('i', $playpause).removeClass('icon-pause-small-regular-outline')
-                        .addClass('icon-play-small-regular-outline');
+                    $('i', $playpause).removeClass(`icon-pause-small-regular-${style}`)
+                        .addClass(`icon-play-small-regular-${style}`);
                     $('.playpause-wrapper .tooltip', $wrapper).text(l.video_player_play);
                     $pendingBlock.addClass('hidden');
                     $watchAgainButton.addClass('hidden');
@@ -1196,7 +1200,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                     }
                 }
                 else {
-                    $('i', $playpause).removeClass().addClass(`${SPRITE} icon-pause-small-regular-outline`);
+                    $('i', $playpause).removeClass().addClass(`${SPRITE} icon-pause-small-regular-${style}`);
                     $('.playpause-wrapper .tooltip', $wrapper).text(l.video_player_pause);
                     $playVideoButton.addClass('hidden');
                     $watchAgainButton.addClass('hidden');
@@ -1206,6 +1210,11 @@ FullScreenManager.prototype.enterFullscreen = function() {
                         $('i', $playPauseButton).addClass('icon-play-small-regular-solid')
                             .removeClass('icon-pause-small-regular-solid');
                         tSleep(2.5).then(() => $playPauseButton.addClass('hidden'));
+                    }
+
+                    if (is_embed === 2) {
+                        $('.audio-wrapper .playpause-wrapper').removeClass('hidden');
+                        $('.audio-wrapper .play-video-button').addClass('hidden');
                     }
                 }
             }
@@ -1335,26 +1344,28 @@ FullScreenManager.prototype.enterFullscreen = function() {
             streamer.currentTime = Math.min(props.duration, Math.max(0, streamer.currentTime + sec));
         };
 
-        // Playback Speed context menu
-        speedMenu = $('.context-menu.playback-speed', $wrapper).get(0);
-        if (!speedMenu) {
-            speedMenu = contextMenu.create({
-                template: $('#media-viewer-speed-menu', $wrapper)[0],
-                sibling: $('.speed-wrapper .tooltip', $wrapper)[0],
-                animationDuration: 150,
-                boundingElement: $wrapper[0]
-            });
-        }
+        if (is_embed !== 2) {
+            // Playback Speed context menu
+            speedMenu = $('.context-menu.playback-speed', $wrapper).get(0);
+            if (!speedMenu) {
+                speedMenu = contextMenu.create({
+                    template: $('#media-viewer-speed-menu', $wrapper)[0],
+                    sibling: $('.speed-wrapper .tooltip', $wrapper)[0],
+                    animationDuration: 150,
+                    boundingElement: $wrapper[0]
+                });
+            }
 
-        // Settings context menu
-        settingsMenu = $('.context-menu.settings', $wrapper).get(0);
-        if (!settingsMenu) {
-            settingsMenu = contextMenu.create({
-                template: $('#media-viewer-video-settings-menu', $wrapper)[0],
-                sibling: $('.settings-wrapper .tooltip', $wrapper)[0],
-                animationDuration: 150,
-                boundingElement: $wrapper[0]
-            });
+            // Settings context menu
+            settingsMenu = $('.context-menu.settings', $wrapper).get(0);
+            if (!settingsMenu) {
+                settingsMenu = contextMenu.create({
+                    template: $('#media-viewer-video-settings-menu', $wrapper)[0],
+                    sibling: $('.settings-wrapper .tooltip', $wrapper)[0],
+                    animationDuration: 150,
+                    boundingElement: $wrapper[0]
+                });
+            }
         }
 
         // Set Init Values
@@ -1406,6 +1417,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 changeButtonState('playpause');
             }
         });
+
+        // Used for bypassing chromimum no-timeupdate bug
+        let streamCheckId = 0;
 
         $video.rebind('playing', function() {
             if (streamer.currentTime + 0.01) {
@@ -1467,6 +1481,15 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
                 hideControls();
                 $document.rebind('mousemove.idle', hideControls);
+
+                if (is_embed === 2 && mega.chrome) {
+                    clearInterval(streamCheckId);
+
+                    streamCheckId = setInterval(() => {
+                        // Force-trigger event to bypass chromium no-timeupdate bug
+                        $video[0].dispatchEvent(new Event('timeupdate'));
+                    });
+                }
             }
         });
 
@@ -1480,6 +1503,12 @@ FullScreenManager.prototype.enterFullscreen = function() {
             setIdle(false);
             delay.cancel(MOUSE_IDLE_TID);
             $document.off('mousemove.idle');
+
+            if (streamCheckId) {
+                clearInterval(streamCheckId);
+                streamCheckId = 0;
+            }
+
             if (streamer.ended) {
                 delete sessionStorage.previewTime;
                 onIdle(() => progressBarElementStyle.setProperty('width', '100%'));
@@ -1941,6 +1970,13 @@ FullScreenManager.prototype.enterFullscreen = function() {
             };
         }
 
+        if (is_embed === 2) {
+            $document.off('mousemove.idle');
+            $videoControls.off('mousemove.idle');
+            clearTimeout(hideMobileVideoControls);
+            _initHideMobileVideoControls = hideControls = nop;
+        }
+
         $wrapper.rebind('is-over-quota', function() {
             fullScreenManager.exitFullscreen();
             $pendingBlock.addClass('hidden');
@@ -2277,6 +2313,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 }
                 else if (k === 'm') {
                     options.muted = videoElement.muted = v | 0;
+                }
+                else if (k === 'v' || k === 'c') {
+                    console.assert(window.is_embed === 2);
                 }
             });
             $.playbackOptions = null;
@@ -2635,6 +2674,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
                         stream.start();
                     }).fail(console.warn.bind(console));
 
+                    if (is_embed === 2) {
+                        $('.audio-wrapper .playpause-wrapper').removeClass('hidden');
+                    }
                     $wrapper.addClass('video-theatre-mode');
                     $videoControls.removeClass('hidden');
 

@@ -367,6 +367,50 @@
                 </nav>
             </template>
         </div>
+        <div class="audio-wrapper">
+            <div class="audio-thumbnail"><img /></div>
+            <div class="audio-container">
+                <div class="viewer-bars top">
+                    <div class="viewer-filename">
+                        <div class="download file-info">
+                            <div class="download info-txt big-txt filename">
+                                <span class="filename"></span>
+                                <span class="extension"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="v-btn right share simpletip" data-simpletip="[$copy_link]">
+                        <i class="sprite-embed-mono icon-share-network-small-regular-outline"></i>
+                    </div>
+                    <div class="v-btn logo-container right">
+                        <div class="logo-icon"></div>
+                    </div>
+                </div>
+                <video id="audio" data-autoplayvideo="false" data-playvideoonclick="false"></video>
+                <div class="viewer-bars video-controls">
+                    <div class="play-video-button">
+                        <i class="sprite-embed-mono icon-play-small-regular-solid"></i>
+                    </div>
+                    <div class="playpause-wrapper hidden">
+                        <button class="v-btn playpause" aria-label="[[play pause]]" data-state="play">
+                            <!-- Active state: .icon-pause !-->
+                            <i class="sprite-embed-mono icon-play-small-regular-outline"></i>
+                        </button>
+                    </div>
+                    <div class="video-timing current">
+                        00:00
+                    </div>
+                    <div class="video-progress-block">
+                        <div class="video-progress-bar">
+                            <div class="video-time-bar"></div>
+                        </div>
+                    </div>
+                    <div class="video-timing duration">
+                        00:00
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

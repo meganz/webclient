@@ -2847,6 +2847,7 @@ else if (!browserUpdate) {
         jsl.push({f:'html/embedplayer.html', n: 'index', j: 0});
         jsl.push({f:'css/embedplayer.css', n: 'embedplayer_css', j: 2, w: 5});
         jsl.push({f:'css/video-player.css', n: 'video_player_css', j: 2});
+        jsl.push({f:'css/vars/theme.css', n: 'vars_theme_css', j:2, w:30, c:1, d:1, cache:1});
         jsl.push({f:'css/sprites/embed-mono@mono.css', n: 'embed_mono_css', j:2});
     }
 

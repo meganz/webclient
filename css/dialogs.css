@@ -2764,11 +2764,12 @@ body.de .mega-dialog.contact-picker-widget {
         overflow: auto;
     }
     .mega-dialog.export-links-dialog .video-thumbnail * {
-        height: 72px;
-        width: 128px;
+        height: 66px;
+        width: 66px;
         position: relative;
         display: inline-block;
         object-fit: contain;
+        border-radius: 12px;
     }
     .mega-dialog.export-links-dialog .video-thumbnail div {
         width: 100%;
@@ -2790,6 +2791,7 @@ body.de .mega-dialog.contact-picker-widget {
         vertical-align: middle;
         line-height: 0;
         width: 10px;
+        padding: 12px;
     }
     .mega-dialog.export-links-dialog .video-attributes {
         color: var(--text-color-medium);
@@ -2826,7 +2828,7 @@ body.de .mega-dialog.contact-picker-widget {
         display: table;
         width: 100%;
         box-sizing: border-box;
-        margin: 24px 0;
+        margin: 16px 0;
     }
     .mega-dialog.export-links-dialog .embed-content .code-field {
         background: var(--surface-main);

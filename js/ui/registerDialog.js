@@ -325,6 +325,12 @@
             });
         }
 
+        // S4 new ToS And Privacy checkboxes
+        if (options.s4Flag) {
+            $('.terms-check', $dialog).safeHTML(l.accept_tos_and_s4_tos);
+            $('.privacy-checkbox-block').removeClass('hidden');
+        }
+
         // Init inputs events
         accountinputs.init($dialog);
 
@@ -382,12 +388,6 @@
             if (sessionStorage.getItem('discountPromoContinuePlanNum')) {
                 $('header p', $dialog).addClass('hidden');
             }
-        }
-
-        // S4 new ToS And Privacy checkboxes
-        if (options.s4Flag) {
-            $('.terms-check', $dialog).safeHTML(l.accept_tos_and_s4_tos);
-            $('.privacy-checkbox-block').removeClass('hidden');
         }
 
         $inputs.rebind('keydown.proRegister', function(e) {

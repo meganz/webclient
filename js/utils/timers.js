@@ -307,7 +307,7 @@ lazy(self, 'tSleep', function tSleep() {
     /**
      * Helper around Promise.race()
      * @param {Number} timeout in seconds, per {@link tSleep}
-     * @param {Promise[]} args promises to race against.
+     * @param {Promise<[*]>} args promises to race against.
      * @returns {Promise} eventual state of the first promise in the iterable to settle.
      * @memberOf tSleep
      */

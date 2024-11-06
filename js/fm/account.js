@@ -2347,7 +2347,12 @@ accountUI.security = {
 
             // Show if using an extension e.g. "Firefox on Linux (+Extension)"
             if (browser.isExtension) {
-                browserName += ' (+' + l[7683] + ')';
+                if (el[2].startsWith('MEGEXTPWM')) {
+                    browserName += ' (MEGA Pass Ext)';
+                }
+                else {
+                    browserName += ' (+' + l[7683] + ')';
+                }
             }
 
             // If not the current session

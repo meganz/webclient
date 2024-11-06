@@ -3892,6 +3892,27 @@ accountUI.s4 = {
                 }
             );
         }
+
+        // Disable S4 feature
+        $('.disable-obj-storage', this.$container).rebind('click.openKeys', () => {
+            msgDialog(
+                `remove:!^${l.s4_accept_opts_out_btn}!${l[82]}`,
+                l.s4_obj_storage_opt_out,
+                l.s4_disable_feature_header,
+                l.s4_disable_feature_info, (yes) => {
+                    if (yes) {
+                        loadingDialog.show('s4optsout.s4r');
+                        s4.utils.optsOut()
+                            .then(() => {
+                                loadSubPage('fm');
+                                location.reload();
+                            })
+                            .catch(tell)
+                            .finally(() => loadingDialog.hide('s4optsout.s4r'));
+                    }
+                }
+            );
+        });
     }
 };
 

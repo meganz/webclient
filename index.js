@@ -928,6 +928,19 @@ function init_page() {
             business.openInvitationLink(signupCode);
         });
     }
+    /**
+     * If S4 Auth Code from url e.g. #s4acAUTHCODE
+     */
+    else if (page.substr(0, 4) === 's4ac') {
+        window.s4ac = page.substr(4);
+        loadSubPage('propay');
+    }
+    /**
+     * Activate S4 Auth Code for Pro Flexi accounts
+     */
+    else if (page === 'activate-s4') {
+        ActivateS4Page.load();
+    }
     else if (page === 'confirm') {
 
         loadingDialog.show();
@@ -3031,6 +3044,10 @@ function parsepage(pagehtml) {
     // if this is bottom page & not Download Page we have to enforce light mode for now.
     if (page === 'download') {
         mega.ui.setTheme();
+    }
+    else if (page === 'login' || page.substring(0, 8) === 'register') {
+        mega.ui.setTheme();
+        document.body.classList.add('bottom-pages');
     }
     else {
         document.body.classList.remove('theme-dark');

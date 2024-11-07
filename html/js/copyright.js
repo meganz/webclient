@@ -18,10 +18,20 @@ copyright.ourDomains = {'mega.co.nz': 1, 'mega.nz': 1, 'mega.io': 1};
  * Validate that the user has entered a link that is, or can be easily turned into, a valid MEGA link
  * @param {String} url The url to validate as a mega public link
  * @return {Array} The link type at idx 0, handle found as idx 1, and sub-node as idx 2 if any.
+ * If S4, then idx 0 "s4" and idx 1 an object of S4 parts.
  */
 copyright.validateUrl = function(url) {
     'use strict';
     url = tryCatch(() => new URL(mURIDecode(url).trim()), false)();
+    if (!url) {
+        return null;
+    }
+
+    const s4Match = /([\w-]*)\.?(s3\.(\w+)\.s4\.mega\.io)\/(\S+)/i.exec(url.href);
+    if (s4Match) {
+        return ['s4', { bucket: s4Match[1], region: s4Match[3], path: s4Match[4] }];
+    }
+
     const ext = url && String(url.protocol).endsWith('-extension:');
 
     if (!url || !this.ourDomains[url.host] && !ext) {
@@ -225,6 +235,12 @@ copyright.init_cndispute = function() {
 
             if (['collection', 'album'].includes(handles[0])) {
                 requestParameters.collection = 1;
+            }
+
+            if (handles[0] === 's4') {
+                requestParameters.s4 = 1;
+                requestParameters.ph = url;
+                delete requestParameters.ufsh;
             }
 
             api_req(requestParameters, {

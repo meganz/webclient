@@ -407,6 +407,20 @@ function browserdetails(useragent) {
             icon = 'unknown.png';
         }
     }
+    else if (useragent.includes('megapasswordmanager')) {
+        // iOS and Android Mega Pass apps
+        if (os === 'iPhone' || os === 'iPad') {
+            icon = 'apple.png';
+        }
+        else if (os === 'Android') {
+            icon = 'android.png';
+        }
+        else {
+            icon = 'unknown.png';
+        }
+
+        browser = 'MEGA Pass';
+    }
     else if (/^[\sa-z]+\/\d/.test(useragent)) {
         verSep = '^';
         browser = String(origUA).split('/').shift().trim();

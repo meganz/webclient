@@ -1254,7 +1254,7 @@ mega.tpw = new function TransferProgressWidget() {
             rows.get(data.transferId).detachEl();
         }
         const row = new MTransferRow(data);
-        root.prepend(row.el);
+        root.append(row.el);
         rows.set(data.transferId, row);
         return true;
     };

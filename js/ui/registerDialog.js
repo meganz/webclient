@@ -22,6 +22,11 @@
             $('.understand-check', $dialog).removeClass('checkboxOn').addClass('checkboxOff');
             $('.register-check', $dialog).removeClass('checkboxOn').addClass('checkboxOff');
 
+            // Restore changes after S4 feature
+            $('.terms-check', $dialog).safeHTML(l['208.g']);
+            $('.privacy-checkbox-block').addClass('hidden');
+            $('.privacy-check', $dialog).removeClass('checkboxOn').addClass('checkboxOff');
+
             if (isUserTriggered && options.onDialogClosed) {
                 options.onDialogClosed($dialog);
             }
@@ -242,6 +247,10 @@
                 hideOverlay();
                 msgDialog('warninga', l[1117], l[1118]);
             }
+            else if (options.s4Flag && $('.privacy-check', $dialog).hasClass('checkboxOff')) {
+                hideOverlay();
+                msgDialog('warninga', l[1117], l.accept_privacy_policy_warning);
+            }
             else {
                 if (u_type === false) {
                     hideOverlay();
@@ -314,6 +323,12 @@
                 $.registerDialog = 'register';
                 return $dialog;
             });
+        }
+
+        // S4 new ToS And Privacy checkboxes
+        if (options.s4Flag) {
+            $('.terms-check', $dialog).safeHTML(l.accept_tos_and_s4_tos);
+            $('.privacy-checkbox-block').removeClass('hidden');
         }
 
         // Init inputs events

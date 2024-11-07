@@ -95,6 +95,9 @@ var bottompage = {
         var $content = $('.bottom-page.scroll-block', '.fmholder');
         bottompage.$footer = $('.bottom-page footer.bottom-menu', '.fmholder');
 
+        $('.info-group .mlogo', bottompage.$footer)
+            .addClass(mega.ui.isDarkTheme() ? 'mega-logo-dark' : 'img-mega-logo-light');
+
         // Unbind sliders events
         $(window).unbind('resize.sliderResize');
 

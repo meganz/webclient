@@ -1701,8 +1701,23 @@ async function checkPlanStorage(currentStored, planNum) {
 function showRegisterDialog(aPromise) {
     'use strict';
 
+    let body = null;
+    let s4Feature = null;
+    let title = l[5840];
+
+    // Add S4 ToS and update strings if there is Auth Code and dialog is fired on pro flexi page
+    if (window.s4ac && pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
+        body = l.create_pro_flexi_with_s4.replace('%1', bytesToSize(3e+12, 0)); // 3 TB Pro flexi acc
+        s4Feature = true;
+        title = l.create_your_mega_account;
+    }
+
     mega.ui.showRegisterDialog({
-        title: l[5840],
+        title,
+
+        body,
+
+        s4Flag: s4Feature,
 
         onLoginAttemptFailed: function(registerData) {
             msgDialog('warninga:' + l[171], l[1578], l[218], null, function(e) {

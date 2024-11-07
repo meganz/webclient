@@ -941,19 +941,28 @@ body:not(.mobile) .plan.pro3:not(.current) .pricing-page.plan-button:hover {
     color: var(--text-color-medium);
     font-size: 15px;
     line-height: 20px;
-    padding: 7px 38px 7px 16px;
+    padding: 7px 16px;
+    -webkit-padding-start: 38px;
+    padding-inline-start: 38px;
     position: relative;
     max-width: 370px;
     margin: 0 auto;
     white-space: normal;
 }
-.rtl .pricing-page.plan-feature {
-    padding: 7px 16px 7px 38px;
+.pricing-page.plan-feature.subtext {
+    padding: 7px 16px;
+}
+.mobile .pricing-page.plan-feature.subtext {
+    padding: 19px 16px;
+    margin: 0;
+    max-width: none;
 }
 .pricing-page.plan-feature.text-body1 {
     font: var(--text-body1);
     margin: 20px auto;
-    padding: 3px 38px 3px 16px;
+    padding: 3px 38px;
+    -webkit-padding-start: 16px;
+    padding-inline-start: 16px;
 }
 .pricing-page.plan-feature.text-body1 .text-h2 {
     color: var(--text-color-high);
@@ -1843,19 +1852,30 @@ body:not(.mobile) .pricing-page.slider-dot:hover {
 }
 .payment-page.info-block {
     text-align: left;
-    margin: 0 320px 0 50px;
+    margin: 0 320px;
+    margin-inline-start: 0;
+    -webkit-margin-start: 0;
     position: relative;
 }
+.payment-page.info-content {
+    margin-inline-start: 50px;
+    -webkit-margin-end: 50px;
+    position: relative;
+}
+
+/* S4 tos checkbox on propay page */
+.payment-page.info-block .additional-tos {
+    padding: 46px 0 8px;
+}
+.payment-page.info-block .additional-tos a {
+    text-decoration: underline;
+}
+.payment-page.info-block .additional-tos a:hover {
+    text-decoration: none;
+}
+
 .payment-section .mega-button.purchase {
     margin: 32px 0 0;
-    margin-left: -50px;
-}
-.payment-section.mobile .mega-button.purchase,
-.payment-section.free-trial .mega-button.purchase {
-    margin-left: 0;
-}
-.payment-section .third-section.feature-only .mega-button.purchase {
-    margin-left: 0;
 }
 .payment-section.mobile .mega-button.purchase {
     max-width: 368px;
@@ -2244,7 +2264,8 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
         width: 220px;
     }
     .payment-page.info-block {
-        margin: 0 240px 0 50px;
+        margin-inline-end: 240px;
+        -webkit-margin-end: 240px;
     }
 }
 
@@ -2601,7 +2622,8 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
         margin: 24px auto 46px;
     }
     .payment-page.info-block {
-        margin: 0 0 0 50px;
+        margin-inline-end: 0;
+        -webkit-margin-end: 0;
     }
 }
 

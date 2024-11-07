@@ -1,0 +1,357 @@
+/* styling from mega.io */
+
+:root {
+    --font-family-inter: 'Inter', arial, sans-serif;
+    --font-family-poppins: 'Poppins', arial, sans-serif;
+
+    --font-copy-md: normal normal 16px/24px var(--font-family-inter);
+    --font-copy-md-bold: normal bold 16px/24px var(--font-family-inter);
+    --font-copy-sm: normal normal 14px/20px var(--font-family-inter);
+    --font-copy-sm-bold: normal bold 14px/20px var(--font-family-inter);
+    --font-h1: normal bold 60px/72px var(--font-family-poppins);
+    --font-h3: normal 600 40px/48px var(--font-family-poppins);
+    --font-h4: normal 600 32px/40px var(--font-family-poppins);
+    --font-h5: normal 600 24px/28px var(--font-family-poppins);
+    --font-h6: normal bold 20px/24px var(--font-family-inter);
+    --font-caption-lg: normal normal 14px/20px var(--font-family-inter);
+    --font-btn-lg: normal 600 16px/24px var(--font-family-inter);
+    --font-input-lg: normal normal 16px/24px var(--font-family-inter);
+
+    --color-bg-page: #FFFFFF;
+    --color-bg-surface-1: #F9F9FB;
+    --color-bg-surface-2: #F5F5F6;
+    --color-bg-tinted-peach: #F8D0CD;
+    --color-bg-tinted-pink: #FCE8E6;
+    --color-bg-tinted-pale-pink: #FDF3F3;
+
+    --color-heading: #04101E;
+    --color-copy-primary: #333333;
+    --color-copy-secondary: #6E6E6E;
+
+    --color-link-disabled: #D4D4D4;
+
+    --color-grey-50: #F8F8F9;
+    --color-grey-100: #EDEDEE;
+    --color-grey-150: #E2E3E3;
+    --color-grey-200: #D7D8D9;
+    --color-primary-black-600: #515861;
+    --color-primary-black-700: #38404A;
+    --color-primary-black-800: #1F2834;
+    --color-primary-black-900: #04101E;
+    --color-primary-red-500: #DD1405;
+    --color-primary-red-600: #B72C1C;
+    --color-primary-red-700: #A22618;
+    --color-primary-red-800: #8E2114;
+    --color-secondary-cobalt-50: #F5F9FF;
+    --color-secondary-cobalt-600: #003C9C;
+    --color-secondary-cobalt-900: #00174C;
+
+    --color-system-error: #E40046;
+}
+
+/* dark theme */
+.theme-dark {
+    --color-bg-surface-1: #1F242A;
+    --color-bg-surface-2: #23282F;
+    --color-bg-tinted-peach: #3E2527;
+    --color-bg-tinted-pink: #402D30;
+    --color-bg-tinted-pale-pink: #423539;
+
+    --color-heading: #FFFFFF;
+    --color-copy-primary: #E5E5E5;
+    --color-copy-secondary: #999999;
+
+    --color-link-disabled: #686B70;
+
+    --color-grey-50: #1A1F26;
+    --color-grey-100: #30353B;
+    --color-grey-150: #3B4046;
+    --color-grey-200: #464B50;
+    --color-grey-1000: #F8F8F9;
+    --color-primary-black-600: #8F9195;
+    --color-primary-black-700: #9C9FA4;
+    --color-primary-black-800: #B5B7BC;
+    --color-primary-black-900: #EDEDED;
+    --color-primary-red-500: #CE3F2D;
+    --color-primary-red-600: #D35040;
+    --color-primary-red-700: #D76457;
+    --color-primary-red-800: #DC796E;
+    --color-secondary-cobalt-50: #00174C;
+    --color-secondary-cobalt-600: #5784D1;
+    --color-secondary-cobalt-900: #D9E1F5;
+
+    --color-system-error: #F5828B;
+}
+
+/* endregion */
+
+/* Breakpoints XL and L */
+:root {
+    --spacing-1: 2px;
+    --spacing-2: 4px;
+    --spacing-3: 8px;
+    --spacing-4: 12px;
+    --spacing-5: 16px;
+    --spacing-6: 20px;
+    --spacing-7: 24px;
+    --spacing-8: 32px;
+    --spacing-9: 40px;
+    --spacing-10: 48px;
+    --spacing-11: 64px;
+    --spacing-12: 80px;
+    --spacing-13: 96px;
+    --spacing-14: 120px;
+    --spacing-15: 160px;
+
+    --default-padding: var(--spacing-9);
+}
+
+.mio-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    column-gap: var(--spacing-8);
+}
+
+.mio-grid > * {
+    grid-column: 1 / -1; /* default */
+}
+
+/* Breakpoint M */
+@media screen and (min-width: 768px) and (max-width: 1080px) {
+    :root {
+        --spacing-1: 2px;
+        --spacing-2: 4px;
+        --spacing-3: 8px;
+        --spacing-4: 12px;
+        --spacing-5: 16px;
+        --spacing-6: 20px;
+        --spacing-7: 24px;
+        --spacing-8: 28px;
+        --spacing-9: 36px;
+        --spacing-10: 44px;
+        --spacing-11: 56px;
+        --spacing-12: 72px;
+        --spacing-13: 80px;
+        --spacing-14: 96px;
+        --spacing-15: 144px;
+
+        --font-h1: normal bold 48px/56px var(--font-family-poppins);
+        --font-h3: normal 600 32px/40px var(--font-family-poppins);
+        --font-h4: normal 600 24px/28px var(--font-family-poppins);
+        --font-h5: normal 600 20px/24px var(--font-family-poppins);
+        --font-h6: normal bold 18px/24px var(--font-family-inter);
+    }
+}
+
+/* Breakpoints M and S */
+@media screen and (max-width: 1080px) {
+    :root {
+        --default-padding: var(--spacing-7);
+    }
+
+    .mio-grid {
+        column-gap: var(--spacing-7);
+    }
+}
+
+/* Breakpoint S */
+@media screen and (max-width: 768px) {
+    :root {
+        --spacing-1: 2px;
+        --spacing-2: 4px;
+        --spacing-3: 8px;
+        --spacing-4: 12px;
+        --spacing-5: 16px;
+        --spacing-6: 20px;
+        --spacing-7: 24px;
+        --spacing-8: 28px;
+        --spacing-9: 32px;
+        --spacing-10: 40px;
+        --spacing-11: 48px;
+        --spacing-12: 64px;
+        --spacing-13: 72px;
+        --spacing-14: 80px;
+        --spacing-15: 120px;
+
+        --font-h1: normal bold 32px/40px var(--font-family-poppins);
+        --font-h3: normal 600 24px/28px var(--font-family-poppins);
+        --font-h4: normal 600 22px/26px var(--font-family-poppins);
+        --font-h5: normal 600 20px/24px var(--font-family-poppins);
+        --font-h6: normal bold 18px/24px var(--font-family-inter);
+    }
+
+    .mio-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* region Buttons */
+
+.mio-button, .mio-text-button, .mio-icon-button {
+    all: unset;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.mio-button, .mio-text-button {
+    width: fit-content;
+    padding: var(--btn-padding);
+    flex-direction: row;
+    gap: var(--btn-gap);
+    min-height: var(--btn-height);
+    font: var(--btn-font);
+    text-align: center;
+}
+
+.mio-button.lg, .mio-text-button.lg {
+    --btn-height: 48px;
+    --btn-icon-size: 24px;
+    --btn-gap: 12px;
+    --btn-padding: 0 24px;
+    --btn-font: var(--font-btn-lg);
+}
+
+/* Primary */
+.mio-button.primary {
+    color: var(--color-grey-50);
+    background-color: var(--color-primary-red-500);
+}
+.mio-button.primary:hover:not(:disabled),
+.mio-button.primary:focus:not(:disabled) {
+    background-color: var(--color-primary-red-600);
+}
+.mio-button.primary:active:not(:disabled) {
+    background-color: var(--color-primary-red-700);
+}
+.mio-button.primary:disabled {
+    color: var(--color-link-disabled);
+    background-color: var(--color-grey-100);
+}
+
+/* Secondary */
+.mio-button.secondary {
+    color: var(--color-primary-red-500);
+    background-color: var(--color-bg-tinted-pale-pink);
+}
+.mio-button.secondary:hover:not(:disabled),
+.mio-button.secondary:focus:not(:disabled) {
+    background-color: var(--color-bg-tinted-pink);
+}
+.mio-button.secondary:active:not(:disabled) {
+    background-color: var(--color-bg-tinted-peach);
+}
+.mio-button.secondary:disabled {
+    color: var(--color-link-disabled);
+    background-color: var(--color-grey-100);
+}
+
+/* Primary, muted */
+.mio-button.primary-muted {
+    color: var(--color-grey-50);
+    background-color: var(--color-primary-black-900);
+}
+.mio-button.primary-muted:hover:not(:disabled),
+.mio-button.primary-muted:focus:not(:disabled) {
+    background-color: var(--color-primary-black-700);
+}
+.mio-button.primary-muted:active:not(:disabled) {
+    background-color: var(--color-primary-black-600);
+}
+.mio-button.primary-muted:disabled {
+    color: var(--color-link-disabled);
+    background-color: var(--color-grey-100);
+}
+
+/* Outline, muted */
+.mio-button.outline-muted {
+    color: var(--color-primary-black-900);
+
+    /* Temporary disable until exception is added for currentColor */
+    border: 2px solid currentColor; /* stylelint-disable-line value-keyword-case */
+}
+.mio-button.outline-muted:hover:not(:disabled),
+.mio-button.outline-muted:focus:not(:disabled) {
+    color: var(--color-primary-black-900);
+    background-color: var(--color-bg-surface-1);
+}
+.mio-button.outline-muted:active:not(:disabled) {
+    color: var(--color-primary-black-800);
+    background-color: var(--color-bg-surface-2);
+}
+.mio-button.outline-muted:disabled {
+    color: var(--color-link-disabled);
+    background-color: unset;
+}
+
+/* Primary */
+.theme-dark .mio-button.primary {
+    color: var(--color-grey-1000);
+}
+
+/* Secondary */
+.theme-dark .mio-button.secondary {
+    color: var(--color-primary-red-800);
+    background-color: var(--color-bg-tinted-peach);
+}
+.theme-dark .mio-button.secondary:active:not(:disabled) {
+    background-color: var(--color-bg-tinted-pale-pink);
+}
+
+/* Primary, muted */
+.theme-dark .mio-button.primary-muted:hover:not(:disabled),
+.theme-dark .mio-button.primary-muted:focus:not(:disabled) {
+    background-color: var(--color-primary-black-800);
+}
+.theme-dark .mio-button.primary-muted:active:not(:disabled) {
+    background-color: var(--color-primary-black-700);
+}
+
+/* Outline, muted */
+.theme-dark .mio-button.outline-muted:hover:not(:disabled),
+.theme-dark .mio-button.outline-muted:focus:not(:disabled) {
+    border-color: var(--color-primary-black-900);
+}
+.theme-dark .mio-button.outline-muted:active:not(:disabled) {
+    border-color: var(--color-primary-black-800);
+}
+.theme-dark .mio-button.outline-muted:disabled {
+    color: var(--color-link-disabled);
+    background-color: unset;
+    border-color: var(--color-grey-100);
+}
+
+/* endregion */
+
+/* region Textarea Input */
+
+.mio-textarea {
+    height: var(--input-height);
+    padding: var(--input-padding);
+    box-sizing: border-box;
+    background: var(--color-bg-page);
+    border: 1px solid var(--color-grey-200);
+    border-radius: 8px;
+    font: var(--input-font);
+    color: var(--color-copy-primary);
+    resize: none;
+}
+.mio-textarea.lg {
+    --input-height: 96px;
+    --input-padding: 12px;
+    --input-font: var(--font-input-lg);
+}
+
+/* Temporary disable until WM-1886 mio stuff is merged */
+.mio-textarea:focus-visible { /* stylelint-disable-line */
+    border-color: var(--color-primary-black-800);
+    outline: none;
+}
+.mio-textarea.error-highlight {
+    border-color: var(--color-system-error);
+}
+
+/* endregion */

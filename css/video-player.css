@@ -249,8 +249,8 @@
         width: 100%;
     }
     .media-viewer .play-video-button {
-        --mask-color: var(--dropdown-arrow-color);
-        background: var(--text-color-high);
+        --mask-color: var(--text-color-black-high);
+        background: var(--text-color-white-high);
         border-radius: 100%;
         cursor: pointer;
         left: calc(50% - 65px);
@@ -353,6 +353,9 @@
         position: absolute;
         width: 100%;
         z-index: 10;
+    }
+    .media-viewer .viewer-bars.top {
+        z-index: 11;
     }
     .media-viewer .video-controls {
         bottom: 0;

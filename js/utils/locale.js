@@ -1494,6 +1494,17 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.contact_support_email = escapeHTML(l.contact_support_email)
         .replace('[A]', '<a class="mailto" href="mailto:support@mega.nz">')
         .replace('[/A]', '</a>');
+    l.agree_s4_tos = escapeHTML(l.agree_s4_tos)
+        .replace('[A]', '<a class="clickurl green" target="_blank" href="https://mega.io/terms#S4">')
+        .replace('[/A]', '</a>');
+    l.accept_privacy_policy = escapeHTML(l.accept_privacy_policy)
+        .replace('[A]', '<a class="clickurl green" target="_blank" href="https://mega.io/privacy">')
+        .replace('[/A]', '</a>');
+    l.accept_tos_and_s4_tos = escapeHTML(l.accept_tos_and_s4_tos)
+        .replace('[A1]', '<a class="clickurl green" target="_blank" href="https://mega.io/terms">')
+        .replace('[/A1]', '</a>')
+        .replace('[A2]', '<a class="clickurl green" target="_blank" href="https://mega.io/terms#S4">')
+        .replace('[/A2]', '</a>');
     l.s4_url_obj_level_subtxt = escapeHTML(l.s4_url_obj_level_subtxt)
         .replace(
             '[A]',
@@ -1973,6 +1984,7 @@ mBroadcaster.once('boot_done', function populate_l() {
         'commission_amount_tip',
         'go_to_pro',
         'after_days_card_charged_m',
+        's4_disable_feature_info',
     ];
     for (let i = common.length; i--;) {
         var num = common[i];

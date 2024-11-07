@@ -258,7 +258,7 @@ MegaData.prototype.menuItems = async function menuItems(isTree) {
                 if (mediaType) {
                     items['.play-item'] = 1;
 
-                    if (mediaType === 1 && sourceRoot !== M.RubbishID && sourceRoot !== "shares") {
+                    if (sourceRoot !== M.RubbishID && sourceRoot !== "shares") {
                         items['.embedcode-item'] = 1;
                     }
                 }

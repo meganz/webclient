@@ -9,7 +9,7 @@ mega.metatags = new function() {
     var isPageExcluded = function(page) {
         // XXX: add new items sorted alphabetically.
         var excludedPages = [
-            'keybackup', 'businessinvite', 'businesssignup', 'cancel', 'confirm', 'debug',
+            'activate-s4', 'keybackup', 'businessinvite', 'businesssignup', 'cancel', 'confirm', 'debug',
             'discount', 'download', 'emailverify', 'key', 'filerequest', 'payment', 'recover',
             'recoverybykey', 'recoverybypark', 'recoveryenterkey',
             'recoverykeychangepass', 'recoveryparkchangepass',

@@ -1,0 +1,191 @@
+/* Styling for /activate-s4, desktop and mobile */
+
+.main-mid-pad.activates4 {
+    max-width: 1320px;
+    padding: 80px var(--default-padding);
+}
+
+.mobile.activates4 {
+    padding: 0 var(--default-padding);
+}
+
+.activates4 .frame {
+    grid-column: 2 / -2;
+}
+
+.activates4 .heading {
+    margin: 0;
+    font: var(--font-h4);
+    color: var(--color-heading);
+}
+
+.activates4 .blurb {
+    padding-top: var(--spacing-4);
+    font: var(--font-copy-md);
+    color: var(--color-copy-primary);
+}
+
+.activates4 .postcard {
+    margin-top: var(--spacing-11);
+    grid-template-columns: repeat(10, 1fr);
+    border: 1px solid var(--color-grey-150);
+}
+
+.activates4 .postcard > * {
+    grid-column: span 5;
+}
+
+.activates4 .postcard .text-pane {
+    padding: var(--spacing-8) 0 var(--spacing-9);
+    -webkit-padding-start: var(--spacing-3);
+    padding-inline-start: var(--spacing-7);
+}
+
+.activates4 .postcard .heading {
+    font: var(--font-h6);
+    color: var(--color-heading);
+}
+
+.activates4 .postcard .p {
+    font: var(--font-copy-md);
+    color: var(--color-copy-primary);
+}
+
+.activates4 .postcard .features {
+    display: flex;
+    flex-flow: column nowrap;
+}
+
+.activates4 .postcard .features .feature {
+    align-items: center;
+    display: flex;
+    flex-flow: row nowrap;
+    margin-top: var(--spacing-7);
+}
+
+.activates4 .postcard .features .feature i {
+    --icon-size: 24px;
+    --mask-color: var(--color-copy-primary);
+    -webkit-margin-end: var(--spacing-3);
+    margin-inline-end: var(--spacing-3);
+}
+
+.activates4 .postcard button.enable-s4 {
+    margin-top: var(--spacing-9);
+}
+
+.activates4 .postcard img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Temp checkbox styling until component is ready */
+.activates4 .checkbox-wrap {
+    display: flex;
+    margin-top: var(--spacing-9);
+}
+
+.activates4 .checkbox-wrap label {
+    font: var(--font-copy-sm);
+    color: var(--color-copy-secondary);
+}
+
+.activates4 .checkbox-wrap label a,
+.activates4 .checkbox-wrap label a:link,
+.activates4 .checkbox-wrap label a:visited,
+.activates4 .checkbox-wrap label a:hover,
+.activates4 .checkbox-wrap label a:active
+{
+    font: var(--font-copy-sm);
+    color: var(--color-copy-primary);
+    text-decoration: underline;
+}
+
+.activates4 .checkbox-wrap label a:hover {
+    text-decoration: none;
+}
+
+.activates4 .checkbox {
+    border: 1px solid var(--color-heading);
+    border-radius: 3px;
+    box-sizing: border-box;
+    display: flex;
+    flex: 0 0 auto;
+    height: 20px;
+    position: relative;
+    -webkit-margin-end: var(--spacing-3);
+    margin-inline-end: var(--spacing-3);
+    width: 20px;
+}
+.activates4 .checkbox.checked {
+    background-color: var(--color-grey-50);
+    border: 0;
+}
+
+.activates4 .checkbox input {
+    border: 0;
+    cursor: pointer;
+    height: 100%;
+    opacity: 0;
+    padding: 0;
+    position: absolute;
+    margin: 0;
+    width: 100%;
+    z-index: 1;
+}
+
+.activates4 .checkbox i {
+    display: none;
+}
+
+.activates4 .checkbox.checked i {
+    --icon-size: 20px;
+    --mask-color: var(--color-primary-black-800);
+    display: block;
+}
+
+/* Wrong S4 activation link dialog on mobile */
+
+.mobile .mega-dialog.acs4-invalid-ac.fullsize-on-mobile {
+    align-items: center;
+    justify-content: center;
+}
+
+.mobile .mega-dialog.acs4-invalid-ac.fullsize-on-mobile > header {
+    padding: 24px 24px 0;
+    text-align: center;
+}
+
+.mobile .mega-dialog.acs4-invalid-ac.fullsize-on-mobile h3 {
+    text-align: center;
+}
+
+.mobile .additional-tos.s4-tos {
+    align-items: center;
+    display: flex;
+}
+
+/* End of Wrong S4 activation link dialog on mobile */
+
+/* Breakpoints M and S */
+@media screen and (max-width: 1080px) {
+    .activates4 .frame {
+        grid-column: 1 / -1;
+    }
+}
+
+/* Breakpoint S */
+@media screen and (max-width: 768px) {
+    .activates4 .postcard > * {
+        grid-column: 1 / -1;
+    }
+
+    .activates4 .postcard {
+        grid-row-gap: var(--spacing-10);
+    }
+
+    .activates4 .postcard .text-pane {
+        order: 1;
+    }
+}

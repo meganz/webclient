@@ -2214,7 +2214,7 @@
                     <div class="fm-subheading">
                         <span>[$6849]</span>
                     </div>
-                    <div class="settings-container">
+                    <div class="settings-container video">
                         <div class="settings-row">
                             <div class="start-video-at">
                                 <!-- The checkbox and the label should enable/disable the feature. The inputs should only work when the feature is enabled. Otherwise prevent them from interacting with the input -->
@@ -2267,6 +2267,16 @@
                                     <input type="checkbox" id="mute-video" class="checkboxOff" />
                                 </div>
                                 <label for="mute-video" class="radio-txt">[$embed_dlg_mute]</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="settings-container audio">
+                        <div class="settings-row">
+                            <div class="allow-copy-link">
+                                <div class="checkdiv checkboxOff">
+                                    <input type="checkbox" id="allow-copy-link" class="checkboxOff" />
+                                </div>
+                                <label for="allow-copy-link" class="radio-txt">[$allow_copy_link]</label>
                             </div>
                         </div>
                     </div>
@@ -3044,6 +3054,13 @@
                                 <input class="checkboxOff" type="checkbox" checked="">
                             </div>
                             <label class="radio-txt terms-check">[$208.g]</label>
+                            <div class="clear"></div>
+                        </div>
+                        <div class="account checkbox-block register privacy-checkbox-block hidden">
+                            <div class="privacy-check checkboxOff checkbox">
+                                <input class="checkboxOff" type="checkbox" checked="">
+                            </div>
+                            <label class="radio-txt privacy-label">[$accept_privacy_policy]</label>
                             <div class="clear"></div>
                         </div>
                     </div>
@@ -8441,7 +8458,7 @@
                         <span>[$s4_skip_setup_btn]</span>
                     </button>
                     <button class="mega-button positive setup progress">
-                        <span>[$s4_setu_s4_btn]</span>
+                        <span>[$s4_setup_s4_btn]</span>
                     </button>
                 </div>
             </footer>
@@ -8604,6 +8621,7 @@
             <button class="mega-button positive upgrade">[$8696]</button>
         </footer>
     </div>
+
 </section>
 
 <section class="mega-dialog-container">

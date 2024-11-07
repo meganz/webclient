@@ -1868,10 +1868,11 @@ function logExportEvt(type, target) {
         // Embed code handling
         var n = Object($.itemExport).length === 1 && M.d[$.itemExport[0]];
 
-        if ($.itemExportEmbed || is_video(n) === 1 && !folderlink) {
+        if ($.itemExportEmbed || is_video(n) && !folderlink) {
 
             var link;
             var iframe = '<iframe width="%w" height="%h" frameborder="0" src="%s" allowfullscreen %a></iframe>\n';
+            const audio = is_audio(n);
 
             // Add special class to dialog
             $linksDialog.addClass('embed');
@@ -1891,10 +1892,12 @@ function logExportEvt(type, target) {
                 var autoplay = false;
                 var muted = false;
                 var optionAdded = false;
+                let copy = true;
                 var $time = $('.start-video-at .embed-setting', $embedTab);
                 var $vres = $('.change-video-resolution .embed-setting', $embedTab);
                 var $enauto = $('.enable-autoplay .checkdiv', $embedTab);
                 var $muted = $('.mute-video .checkdiv', $embedTab);
+                const $copy = $('.allow-copy-link .checkdiv', $embedTab);
 
                 var getValue = function(s, c) {
 
@@ -1938,11 +1941,20 @@ function logExportEvt(type, target) {
                     optionAdded = true;
                 }
 
+                if (audio) {
+                    width = 711;
+                    height = 144;
+                    optionAdded = true;
+                    if (!$copy.hasClass('checkboxOn')) {
+                        copy = false;
+                    }
+                }
+
                 var code = iframe
                     .replace('%w', width > 0 && height > 0 ? width : 640)
                     .replace('%h', width > 0 && height > 0 ? height : 360)
                     .replace('%s', link + (optionAdded ? '!' : '') + (time > 0 ? time + 's' : '') +
-                        (autoplay ? '1a' : '') + (muted ? '1m' : ''))
+                        (autoplay ? '1a' : '') + (muted ? '1m' : '') + (audio ? '1v' : '') + (copy ? '' : '1c'))
                     .replace('%a', autoplay ? 'allow="autoplay;"' : '');
 
                 $('.code-field .code', $embedTab).text(code);
@@ -1961,6 +1973,10 @@ function logExportEvt(type, target) {
                 }
                 setCode();
             });
+
+            // Reset share options
+            $('.settings-container', $embedTab).addClass('hidden');
+            $('.settings-container', $embedTab).get(audio ? 1 : 0).classList.remove('hidden');
 
             // Reset all numeric inputs under Share Options
             $('.settings-container .embed-setting', $embedTab).addClass('disabled');
@@ -2009,7 +2025,8 @@ function logExportEvt(type, target) {
             $('.start-video-at .embed-setting input', $embedTab).attr('max', playtime || 0);
             $('.start-video-at', $embedTab).toggleClass('opacity-50 pointer-events-none', !playtime);
 
-            var $thumb = $('.video-thumbnail img', $embedTab).attr('src', noThumbURI);
+            const thumbURI = audio ? `${staticpath}/images/mega/audio.png` : noThumbURI;
+            var $thumb = $('.video-thumbnail img', $embedTab).attr('src', thumbURI);
 
             getImage(n, 1).then((uri) => $thumb.attr('src', uri)).catch(dump);
 
@@ -2295,7 +2312,7 @@ function logExportEvt(type, target) {
                 };
 
                 // Show confirmartion dialog if handle is media
-                if (is_video(M.d[handle]) === 1) {
+                if (is_video(M.d[handle])) {
                     msgDialog('confirmation', l[882], l[17824], 0, function(e) {
                         if (e) {
                             removeLink();

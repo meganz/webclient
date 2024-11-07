@@ -17,7 +17,7 @@ var accountinputs = {
 
         var $loginForm = $formWrapper.find('form');
         var $inputs = $('input',  $formWrapper);
-        var $checkbox = $('.account.checkbox-block input, .pw-remind.checkbox-block input', $loginForm);
+        var $checkbox = $('.account.checkbox-block:not(.hidden) input, .pw-remind.checkbox-block input', $loginForm);
         var $button = $('button.mega-button', $formWrapper);
         var $tooltip  = $loginForm.find('.account.input-tooltip');
 

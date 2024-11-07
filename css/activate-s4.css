@@ -72,6 +72,7 @@
 
 .activates4 .postcard button.enable-s4 {
     margin-top: var(--spacing-9);
+    align-items: center;
 }
 
 .activates4 .postcard img {

@@ -2392,7 +2392,7 @@ else if (!browserUpdate) {
     jsl.push({f:'html/js/planpricing/vpn-pricing.js', n: 'vpn_pricing_js', j:1});
 
     // Activate S4 feature
-    jsl.push({f:'html/activate-s4.html', n: 'activates4', j:0});
+    jsl.push({f:'html/activates4.html', n: 'activates4', j:0});
     jsl.push({f:'html/js/activate-s4.js', n: 'activates4_js', j:1});
 
     jsl.push({f:'js/ui/miniui.js', n: 'miniui_js', j:1});

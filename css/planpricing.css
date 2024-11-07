@@ -780,7 +780,7 @@ i.pricing-i-icon {
 .pricing-get-started .pricing-get-started-subtxt {
     font: var(--text-copy-medium-pricing);
     margin: 20px 24px -24px;
-    color: var(--color-copy-primary);
+    color: var(--text-color-white-high);
 }
 .pricing-get-started .pricing-plan-btn-container {
     margin: 56px 24px var(--right-padding) 24px;

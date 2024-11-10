@@ -1783,6 +1783,10 @@ var addressDialog = {
     prefillInfo: function(billingInfo) {
         'use strict';
 
+        if (this.billingInfoFilled) {
+            return;
+        }
+
         const prefillMultipleInputs = (inputs, value) => {
             if (Array.isArray(inputs)) {
                 inputs.forEach(($megaInput) => {
@@ -1859,6 +1863,8 @@ var addressDialog = {
         if (noLname) {
             fillInputFromAttr(this.lastNameMegaInput, 'lname', 'lastname');
         }
+
+        this.billingInfoFilled = true;
     },
 
     /**
@@ -1950,6 +1956,16 @@ var addressDialog = {
         'use strict';
         var self = this;
         this.$rememberDetailsCheckbox = $(".remember-billing-info-wrapper").find(".checkbox");
+
+        // If the user has not checked the remember checkbox, clear the billing info fields
+        // We won't save the billing info, but may appear to the user that we do in this case if we don't clear it
+        if (!this.$rememberDetailsCheckbox.hasClass("checkboxOn")) {
+            const $billingInfoInputs = $('.content-block.address-block .mega-input', this.$dialog);
+            $('.address1, .address2, .city, .state, .postcode, .country, .taxcode', $billingInfoInputs)
+                .val('')
+                .parent().removeClass('valued');
+        }
+
         $(".remember-billing-info, .radio-txt", this.$dialog).rebind('click.commonevent', function() {
             if (self.$rememberDetailsCheckbox.hasClass('checkboxOn')) {
                 self.$rememberDetailsCheckbox.addClass('checkboxOff').removeClass('checkboxOn');

@@ -597,6 +597,13 @@ dashboardUI.renderReferralWidget = function() {
             if (u_attr.b || u_attr.pf) {
                 prefix = '.business-dashboard ';
             }
+            if (!mega.refsunref) {
+                $('.refer-programme-banner', prefix).removeClass('hidden');
+                $('.referrals .account.widget.text', prefix).text(l.referral_close_desc);
+                $('.refer-programme-banner i', prefix).rebind('click.refsun', () => {
+                    $('.refer-programme-banner', prefix).addClass('hidden');
+                });
+            }
 
             const $referralWidget = $(prefix + '.account.widget.referrals');
             const balance = M.affiliate.balance;

@@ -1967,6 +1967,14 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a href="mailto:support@mega.nz">')
         .replace('[/A]', '</a>');
 
+    l.referral_close_full = escapeHTML(l.referral_close_full)
+        .replace('[A]', '<a href="https://mega.io/refer" target="_blank" class="clickurl">')
+        .replace('[/A]', '</a>');
+
+    l.referral_close_text = escapeHTML(l.referral_close_text)
+        .replace('[A]', '<a href="https://mega.io/refer" target="_blank">')
+        .replace('[/A]', '</a>');
+
     const common = [
         15536, 16119, 16120, 16313, 16316, 16360, 18228, 18268, 18282,
         18284, 18285, 18286, 18287, 18289, 18290, 18291, 18294, 18295, 18296, 18297, 18298, 18302, 18303, 18304,

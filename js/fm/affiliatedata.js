@@ -644,6 +644,9 @@
      * @returns {void}
      */
     AffiliateData.prototype.storeAffiliate = function(value, type) {
+        if (!mega.refsunref) {
+            return;
+        }
         sessionStorage.affid = value;
         sessionStorage.affts = Date.now();
         sessionStorage.afftype = type;
@@ -691,7 +694,7 @@
                 }
                 await csp.init();
 
-                if (csp.has('analyze')) {
+                if (mega.refsunref && csp.has('analyze')) {
                     if (sessionStorage.affid) {
                         storage.affid = sessionStorage.affid;
                         storage.affts = sessionStorage.affts;
@@ -705,6 +708,11 @@
                     delete storage.affid;
                     delete storage.affts;
                     delete storage.afftype;
+                    if (!mega.refsunref) {
+                        delete sessionStorage.affid;
+                        delete sessionStorage.affts;
+                        delete sessionStorage.afftype;
+                    }
                 }
             }
 
@@ -725,6 +733,12 @@
     Object.defineProperty(mega, 'affid', {
         get: function() {
             const storage = sessionStorage.affid ? sessionStorage : localStorage;
+            if (!mega.refsunref) {
+                delete storage.affid;
+                delete storage.affts;
+                delete storage.afftype;
+                return false;
+            }
             if (storage.affid) {
                 return { id: storage.affid, t: storage.afftype || 2, ts: Math.floor(storage.affts / 1000) };
             }

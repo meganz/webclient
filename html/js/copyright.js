@@ -27,7 +27,7 @@ copyright.validateUrl = function(url) {
         return null;
     }
 
-    const s4Match = /([\w-]*)\.?(s3\.(\w+)\.s4\.mega\.io)\/(\S+)/i.exec(url.href);
+    const s4Match = /([\w-]*)\.?(s3\.([\w-]+)\.s4\.mega\.io)\/(\S+)/i.exec(url.href);
     if (s4Match) {
         return ['s4', { bucket: s4Match[1], region: s4Match[3], path: s4Match[4] }];
     }

@@ -802,7 +802,7 @@ var mega = {
 
         var affid = sessionStorage.affid || storage.affid;
         var affts = sessionStorage.affts || storage.affts;
-        if (affid && affts && !(Date.now() - affts > 864e5)) {
+        if (mega.refsunref && affid && affts && !(Date.now() - affts > 864e5)) {
             to += '?aff=' + affid;
             getCount++;
         }
@@ -950,6 +950,19 @@ Object.defineProperty(mega, 'pwmh', {
     get: function() {
         'use strict';
         return typeof u_attr === 'object' && u_attr.pwmh || false;
+    }
+});
+
+Object.defineProperty(mega, 'refsunref', {
+    get: function() {
+        'use strict';
+        return (this.flags.ff_refsun | 0) < 1;
+    }
+});
+Object.defineProperty(mega, 'refsuncom', {
+    get: function() {
+        'use strict';
+        return (this.flags.ff_refsun | 0) < 2;
     }
 });
 

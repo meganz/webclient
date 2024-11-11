@@ -594,9 +594,12 @@ class MegaMobileHeader extends MegaComponent {
                 align: 'right',
                 onChange: function() {
                     if (orderArrow) {
-                        this.domNode.appendChild(orderArrow.domNode);
-                        orderArrow.value = 1;
-                        orderArrow.icon = `sprite-mobile-fm-mono icon-arrow-up-thin-outline`;
+                        const labelWrapper = this.domNode.querySelector('.label-wrapper');
+                        if (labelWrapper) {
+                            labelWrapper.appendChild(orderArrow.domNode);
+                            orderArrow.value = 1;
+                            orderArrow.icon = `sprite-mobile-fm-mono icon-arrow-up-thin-outline`;
+                        }
                     }
                 }
             });
@@ -605,8 +608,13 @@ class MegaMobileHeader extends MegaComponent {
 
             const selectedRadio = sortByGroup.children[sortByGroup.value || 'name'];
 
+            let orderArrowParent;
+            if (selectedRadio && selectedRadio.domNode) {
+                orderArrowParent = selectedRadio.domNode.querySelector('.label-wrapper');
+            }
+
             orderArrow = new MegaButton({
-                parentNode: selectedRadio.domNode,
+                parentNode: orderArrowParent,
                 type: 'icon',
                 icon: `sprite-mobile-fm-mono icon-arrow-${d < 0 ? 'down' : 'up'}-thin-outline`,
                 iconSize: 24,

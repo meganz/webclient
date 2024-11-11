@@ -3045,7 +3045,7 @@ function parsepage(pagehtml) {
     if (page === 'download') {
         mega.ui.setTheme();
     }
-    else if (page === 'login' || page.substring(0, 8) === 'register') {
+    else if (page === 'login' || page.substring(0, 8) === 'register' || page === 'recovery') {
         mega.ui.setTheme();
         document.body.classList.add('bottom-pages');
     }

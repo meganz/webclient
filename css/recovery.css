@@ -62,7 +62,7 @@
 .improved-recovery-steps .card-container, .backup-recover.withkey .card-container {
     width: 680px;
     margin: 0 auto 80px;
-    background-color: #fff;
+    background-color: var(--surface-main);
     border-radius: 4px;
     border: 1px solid rgba(0, 40, 100, 0.12);
     height: auto;
@@ -100,7 +100,7 @@
     text-align: left;
     font-family: 'LatoWebBold', 'source_sans_proregular', Arial;
     font-size: 15px;
-    color: #495057;
+    color: var(--text-color-high);
 }
 .improved-recovery-steps .check-sessions-text {
     text-align: center;
@@ -264,7 +264,7 @@
     -moz-background-clip: padding;
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
-    color: #333;
+    color: var(--text-color-high);
     font-weight: 900;
     display: inline-block;
     content: counter(list);
@@ -342,7 +342,7 @@
     margin-top: 24px;
     font-size: 13px;
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
-    color: #495057;
+    color: var(--text-color-medium);
 }
 .improved-recovery-steps .recover-state {
     font-family: 'source_sans_probold', 'LatoWeb', Arial;
@@ -361,7 +361,7 @@
 }
 .improved-recovery-steps .container-information li {
     margin-bottom: 16px;
-    color: #676D75;
+    color: var(--text-color-medium);
 }
 .improved-recovery-steps .container-information li:last-of-type {
     margin-bottom: 0;
@@ -423,6 +423,9 @@
     position: relative;
     opacity: 1;
     line-height: 24px;
+}
+.improved-recovery-steps .nav-header-block i {
+    line-height: 36px;
 }
 .improved-recovery-steps .nav-header-block h2 {
     display: inline-block;
@@ -740,6 +743,12 @@
     display: flex;
     align-items: center;
     position: relative;
+}
+.improved-recovery-steps .app-button-block select {
+    color: var(--text-color-high);
+}
+.improved-recovery-steps .app-button-block option {
+    background: var(--surface-main);
 }
 .improved-recovery-steps .app-button-block i.icon-dropdown {
     pointer-events: none;

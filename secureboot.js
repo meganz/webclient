@@ -2583,7 +2583,7 @@ else if (!browserUpdate) {
         jsl.push({f:'html/top-login.html', n: 'top-login', j:0});
         jsl.push({f:'html/dialogs.html', n: 'dialogs', j:0,w:2});
         jsl.push({f:'images/mega/contact-avatar.svg', n: 'contact_avatar', j:0});
-        jsl.push({f:'html/rewind.html', n: 'rewind_html', j:0});
+        jsl.push({f:'html/rewind.html', n: 'rewind', j:0});
         jsl.push({f:'css/topbar.css', n: 'topbar_css', j:2,w:5,c:1,d:1,cache:1});
 
         // Notification banner
@@ -2797,6 +2797,7 @@ else if (!browserUpdate) {
 
         jsl.push({f:'js/ui/components/MDialogMobile.js', n: 'mobile_m_dialog_mobile_js', j:1});
     }
+    jsl.push({f:'html/chatlink.html', n: 'chatlink', j: 0});
 
     jsl.push({f:'css/toast.css', n: 'toast_css', j:2,w:5,c:1,d:1,cache:1});
     jsl.push({f:'css/general.css', n: 'general_css', j:2, w:5, c:1, d:1, cache: 1});
@@ -2878,10 +2879,6 @@ else if (!browserUpdate) {
 
             jsl.push({f:'js/vendor/web-streams-polyfill.js', n: 'web_streams_polyfill_js', j: 1});
         }
-    }
-
-    if (page.substr(0, 5) === 'chat/') {
-        jsl.push({f:'html/chatlink.html', n: 'chatlink', j: 0});
     }
 
     var jsl2 =

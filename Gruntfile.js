@@ -419,11 +419,10 @@ var Secureboot = function() {
     };
 
     ns.getHTML = function() {
-        return jsl.filter(function(f) {
-            return f.f.match(/html?$/);
-        }).map(function(f) {
-            return usePostHTML ? getBuildFile(f.f) : f.f;
-        });
+        return jsl.filter((f) => /\.html?$/.test(f.f))
+            .map((f) => {
+                return {...f, bf: usePostHTML ? getBuildFile(f.f) : f.f};
+            });
     };
 
     ns.getCSSGroups = function() {
@@ -909,11 +908,15 @@ module.exports = function(grunt) {
         const files = Secureboot.getHTML().sort();
 
         for (let i = files.length; i--;) {
-            const file = files[i];
+            const {bf: file, n} = files[i];
             const name = basename(file).split('.')[0];
 
             if (!exclude[name]) {
-                res[name] = fs.readFileSync(path.join(cwd, file)).toString('utf-8');
+                let k = n || name;
+                if (debug || k !== name) {
+                    console.warn(`%s Using '${n}' for html-template ~/%s`, debug && k !== name ? '[!] >>' : '', file);
+                }
+                res[k] = fs.readFileSync(path.join(cwd, file)).toString('utf-8');
             }
         }
 

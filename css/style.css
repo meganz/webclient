@@ -5055,7 +5055,7 @@ span.orange {
     background-color: #F5F7F9;
 }
 .main-mid-pad.improved-recovery-steps {
-    background-color: var(--surface-grey-1);
+    background-color: var(--stroke-grey-1);
 }
 .main-mid-pad.bus-repay {
     background: var(--surface-grey-1);

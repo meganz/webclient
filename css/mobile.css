@@ -6594,7 +6594,7 @@ textarea.mobile.support-text-field {
     max-width: 640px;
     margin: 80px 12px 12px 12px;
     display: inline-block;
-    background-color: var(--surface-main);
+    background-color: var(--stroke-main);
     border-radius: 4px;
     border: 1px solid rgba(0, 40, 100, 0.12);
     height: auto;

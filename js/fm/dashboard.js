@@ -171,9 +171,10 @@ function dashboardUI(updProcess) {
             dashboardUI.renderReferralWidget();
         }
 
+        const accountStatus = (u_attr.b && u_attr.b.s) || (u_attr.pf && u_attr.pf.s);
+
         // Elements for free/pro accounts. Expires date / Registration date
-        if (u_attr.p || (u_attr.b && u_attr.b.s === pro.ACCOUNT_STATUS_EXPIRED) ||
-            (u_attr.pf && u_attr.pf.s === pro.ACCOUNT_STATUS_EXPIRED)) {
+        if (u_attr.p || [pro.ACCOUNT_STATUS_EXPIRED, pro.ACCOUNT_STATUS_GRACE_PERIOD].includes(accountStatus)) {
 
             var timestamp;
             // Subscription
@@ -214,8 +215,9 @@ function dashboardUI(updProcess) {
                 }
             }
 
-            // If active/grace/expired Business or Pro Flexi expired status
-            if ((u_attr.b) || (u_attr.pf && u_attr.pf.s === pro.ACCOUNT_STATUS_EXPIRED)) {
+            // If active/grace/expired Business or grace/expired Pro Flexi
+            if (u_attr.b ||
+                (u_attr.pf && [pro.ACCOUNT_STATUS_EXPIRED, pro.ACCOUNT_STATUS_GRACE_PERIOD].includes(u_attr.pf.s))) {
 
                 // someone modified the CSS to overwirte the hidden class !!, therefore .hide() will be used
                 $('.account.left-pane.reg-date-info, .account.left-pane.reg-date-val').addClass('hidden').hide();
@@ -225,11 +227,15 @@ function dashboardUI(updProcess) {
                     $businessLeft.find('.suba-status').addClass('active').removeClass('disabled pending')
                         .text(l[7666]);
                 }
-                else if (u_attr.b && u_attr.b.s === pro.ACCOUNT_STATUS_GRACE_PERIOD && u_attr.b.m) {
+                else if ((u_attr.b && u_attr.b.s === pro.ACCOUNT_STATUS_GRACE_PERIOD && u_attr.b.m) ||
+                         (u_attr.pf && u_attr.pf.s === pro.ACCOUNT_STATUS_GRACE_PERIOD)) {
                     $('.suba-status', $businessLeft).addClass('pending').removeClass('disabled active')
                         .text(l[19609]);
-                    if (u_attr.b.sts && u_attr.b.sts[0] && u_attr.b.sts[0].s === -1) {
-                        const expiryDate = new Date(u_attr.b.sts[0].ts * 1000);
+
+                    const statusAndTimestamp = (u_attr.b && u_attr.b.sts) || (u_attr.pf && u_attr.pf.sts);
+
+                    if (statusAndTimestamp && statusAndTimestamp[0] && statusAndTimestamp[0].s === -1) {
+                        const expiryDate = new Date(statusAndTimestamp[0].ts * 1000);
                         const currentTime = new Date();
                         let remainingDays = Math.floor((expiryDate - currentTime) / 864e5);
                         remainingDays = remainingDays < 0 ? 0 : remainingDays;
@@ -242,7 +248,7 @@ function dashboardUI(updProcess) {
                     $('.suba-status', $businessLeft).addClass('disabled').removeClass('pending active')
                         .text(l[19608]);
 
-                    if (u_attr.b && u_attr.b.m) {
+                    if ((u_attr.b && u_attr.b.m) || u_attr.pf) {
                         $('.suba-pay-bill', $businessLeft).removeClass('hidden');
                     }
                 }

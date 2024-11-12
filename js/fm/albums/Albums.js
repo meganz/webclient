@@ -115,6 +115,10 @@ lazy(mega.gallery, 'albums', () => {
      * @returns {void}
      */
     scope.playSlideshow = (albumId, useFullscreen, autoplay) => {
+        if (M.isInvalidUserStatus()) {
+            return;
+        }
+
         const album = scope.albums.store[albumId];
 
         if (album && album.nodes.length > 0) {
@@ -487,6 +491,10 @@ lazy(mega.gallery, 'albums', () => {
                 label: l[5928],
                 icon: 'download-standard',
                 click: () => {
+                    if (M.isInvalidUserStatus()) {
+                        return;
+                    }
+
                     const handles = scope.getAlbumsHandles(albumIds);
 
                     if (handles.length) {
@@ -499,6 +507,10 @@ lazy(mega.gallery, 'albums', () => {
                 label: l[864],
                 icon: 'download-zip',
                 click: () => {
+                    if (M.isInvalidUserStatus()) {
+                        return;
+                    }
+
                     const handles = scope.getAlbumsHandles(albumIds);
 
                     if (handles.length) {
@@ -525,6 +537,10 @@ lazy(mega.gallery, 'albums', () => {
             label: l.download_option,
             icon: 'download-small',
             click: () => {
+                if (M.isInvalidUserStatus()) {
+                    return;
+                }
+
                 const handles = scope.getAlbumsHandles(albumIds);
 
                 if (handles.length) {
@@ -998,6 +1014,10 @@ lazy(mega.gallery, 'albums', () => {
     }
 
     const removeShareWithConfirmation = (albumIds) => {
+        if (M.isInvalidUserStatus()) {
+            return;
+        }
+
         if (mega.config.get('nowarnpl')) {
             scope.albums.removeShare(albumIds);
         }
@@ -2354,6 +2374,10 @@ lazy(mega.gallery, 'albums', () => {
                             label: l[17520],
                             icon: 'link',
                             click: () => {
+                                if (M.isInvalidUserStatus()) {
+                                    return;
+                                }
+
                                 const albumIds = [];
 
                                 for (let i = 0; i < albums.length; i++) {
@@ -2375,6 +2399,10 @@ lazy(mega.gallery, 'albums', () => {
                         label: mega.icu.format(l.album_share_link, albums.length),
                         icon: 'link',
                         click: () => {
+                            if (M.isInvalidUserStatus()) {
+                                return;
+                            }
+
                             scope.albums.addShare(albums.map(({ id }) => id));
                         }
                     });
@@ -2385,6 +2413,10 @@ lazy(mega.gallery, 'albums', () => {
                         label: (sharedCount > 1) ? l[8735] : l[6821],
                         icon: 'link-remove',
                         click: () => {
+                            if (M.isInvalidUserStatus()) {
+                                return;
+                            }
+
                             const albumIds = [];
 
                             for (let i = 0; i < albums.length; i++) {
@@ -2417,6 +2449,10 @@ lazy(mega.gallery, 'albums', () => {
                     {
                         label: l.delete_album,
                         click: () => {
+                            if (M.isInvalidUserStatus()) {
+                                return;
+                            }
+
                             const dialog = new RemoveAlbumDialog(albums.map(({ id }) => id));
                             dialog.show();
                             this.hide();
@@ -2451,6 +2487,10 @@ lazy(mega.gallery, 'albums', () => {
                     label: l.album_play_slideshow,
                     icon: 'play-square',
                     click: () => {
+                        if (M.isInvalidUserStatus()) {
+                            return;
+                        }
+
                         if (scope.albums.grid && scope.albums.grid.timeline) {
                             scope.albums.grid.timeline.clearSiblingSelections();
                         }
@@ -2499,6 +2539,10 @@ lazy(mega.gallery, 'albums', () => {
                                 label: l.add_album_items,
                                 icon: 'add',
                                 click: () => {
+                                    if (M.isInvalidUserStatus()) {
+                                        return;
+                                    }
+
                                     const dialog = new AlbumItemsDialog(albumId);
                                     dialog.show();
                                 }
@@ -2513,6 +2557,10 @@ lazy(mega.gallery, 'albums', () => {
                                 label: l[6909],
                                 icon: 'link',
                                 click: () => {
+                                    if (M.isInvalidUserStatus()) {
+                                        return;
+                                    }
+
                                     // The share has changed already, ignoring
                                     if (!scope.albums.store[albumId].p) {
                                         return;
@@ -2536,6 +2584,10 @@ lazy(mega.gallery, 'albums', () => {
                             label: mega.icu.format(l.album_share_link, 1),
                             icon: 'link',
                             click: () => {
+                                if (M.isInvalidUserStatus()) {
+                                    return;
+                                }
+
                                 // The share has changed already, ignoring
                                 if (scope.albums.store[albumId].p) {
                                     return;
@@ -2555,6 +2607,10 @@ lazy(mega.gallery, 'albums', () => {
                                 label: l.set_album_cover,
                                 icon: 'images',
                                 click: () => {
+                                    if (M.isInvalidUserStatus()) {
+                                        return;
+                                    }
+
                                     const dialog = new AlbumCoverDialog(albumId);
                                     dialog.show();
                                 }
@@ -2566,6 +2622,10 @@ lazy(mega.gallery, 'albums', () => {
                         {
                             label: l.rename_album,
                             click: () => {
+                                if (M.isInvalidUserStatus()) {
+                                    return;
+                                }
+
                                 const dialog = new AlbumNameDialog(albumId);
                                 dialog.show();
                             },
@@ -2575,6 +2635,10 @@ lazy(mega.gallery, 'albums', () => {
                         {
                             label: l.delete_album,
                             click: () => {
+                                if (M.isInvalidUserStatus()) {
+                                    return;
+                                }
+
                                 const dialog = new RemoveAlbumDialog([albumId]);
                                 dialog.show();
                                 this.hide();
@@ -2919,6 +2983,10 @@ lazy(mega.gallery, 'albums', () => {
                             l.add_album_items,
                             'add icon-green',
                             () => {
+                                if (M.isInvalidUserStatus()) {
+                                    return;
+                                }
+
                                 const dialog = new AlbumItemsDialog(albumId);
                                 dialog.show();
                             },
@@ -2929,6 +2997,10 @@ lazy(mega.gallery, 'albums', () => {
                             p ? l[6909] : mega.icu.format(l.album_share_link, 1),
                             'link icon-yellow',
                             () => {
+                                if (M.isInvalidUserStatus()) {
+                                    return;
+                                }
+
                                 const newP = scope.albums.store[albumId].p;
 
                                 // The share has changed already, ignoring
@@ -2966,6 +3038,10 @@ lazy(mega.gallery, 'albums', () => {
                         l.album_download,
                         'download-small icon-blue',
                         (component) => {
+                            if (M.isInvalidUserStatus()) {
+                                return;
+                            }
+
                             if (component) {
                                 const { x, bottom } = component.el.getBoundingClientRect();
                                 const menu = new DownloadContextMenu(albumId);
@@ -3004,6 +3080,10 @@ lazy(mega.gallery, 'albums', () => {
                             l.rename_album,
                             'rename',
                             () => {
+                                if (M.isInvalidUserStatus()) {
+                                    return;
+                                }
+
                                 const dialog = new AlbumNameDialog(albumId);
                                 dialog.show();
                             },
@@ -3013,6 +3093,10 @@ lazy(mega.gallery, 'albums', () => {
                             l.delete_album,
                             'bin',
                             () => {
+                                if (M.isInvalidUserStatus()) {
+                                    return;
+                                }
+
                                 const dialog = new RemoveAlbumDialog([albumId]);
                                 dialog.show();
                             },
@@ -3072,6 +3156,10 @@ lazy(mega.gallery, 'albums', () => {
                 l.new_album,
                 'add icon-green',
                 () => {
+                    if (M.isInvalidUserStatus()) {
+                        return;
+                    }
+
                     const dialog = new AlbumNameDialog();
                     dialog.show();
                 },
@@ -3240,6 +3328,10 @@ lazy(mega.gallery, 'albums', () => {
                     l.album_no_media,
                     l.add_album_items,
                     () => {
+                        if (M.isInvalidUserStatus()) {
+                            return;
+                        }
+
                         const dialog = new AlbumItemsDialog(albumId);
                         dialog.show();
                     }
@@ -3405,6 +3497,10 @@ lazy(mega.gallery, 'albums', () => {
                             l.no_albums,
                             l.create_new_album,
                             () => {
+                                if (M.isInvalidUserStatus()) {
+                                    return;
+                                }
+
                                 const dialog = new AlbumNameDialog();
                                 dialog.show();
                             }
@@ -5091,6 +5187,10 @@ lazy(mega.gallery, 'albums', () => {
         }
 
         requestAlbumElementsRemoval() {
+            if (M.isInvalidUserStatus()) {
+                return;
+            }
+
             if (!this.grid || !this.grid.timeline || !this.grid.timeline.selCount) {
                 return;
             }
@@ -5300,6 +5400,8 @@ lazy(mega.gallery, 'albums', () => {
          * @returns {void}
          */
         removeShare(albumIds) {
+
+
             loadingDialog.show('MegaAlbumsRemoveShare');
 
             const idsToClear = [];
@@ -5326,6 +5428,10 @@ lazy(mega.gallery, 'albums', () => {
         }
 
         addToAlbum(handle, selections) {
+            if (M.isInvalidUserStatus()) {
+                return;
+            }
+
             const dialog = new AddToAlbumDialog(handle, selections);
             dialog.show();
         }

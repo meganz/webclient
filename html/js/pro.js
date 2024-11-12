@@ -142,7 +142,7 @@ var pro = {
                 })
                 .catch(dump);
 
-            api.req(payload)
+            return api.req(payload)
                 .then(({result: results}) => {
 
                     pro.resetCaching();
@@ -279,8 +279,8 @@ var pro = {
                     pro.filter.dynamic.singleDurationPlans = new Set(
                         // Sets are made from numbers, so convert the keys back to numbers
                         Object.keys(pro.singleDurationPlans).map(level => level | 0));
-                })
-                .finally(() => {
+
+                    // Initialize the filtered plans
                     pro.initFilteredPlans();
                     // Run the callback function
                     loadedCallback();

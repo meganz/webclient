@@ -1832,6 +1832,14 @@ var dlmanager = {
         pro.proplan.updateEachPriceBlock("D", $pricingBoxes, $dialog, preSelectedPeriod, planType);
     },
 
+    async getRequiredStorageQuota() {
+        'use strict';
+
+        const res = M.account || M.storageQuotaCache || false;
+
+        return typeof res.mstrg === 'number' ? res : M.getStorageQuota();
+    },
+
     setPlanPrices($dialog, showDialogCb, ignoreStorageReq) {
         'use strict';
 
@@ -1840,61 +1848,63 @@ var dlmanager = {
         // Set scroll to top
         $scrollBlock.scrollTop(0);
 
-        // Load the membership plans
-        pro.loadMembershipPlans(function() {
+        // Load the membership plans, and the required storage quota if needed
+        Promise.all([!ignoreStorageReq && this.getRequiredStorageQuota(), pro.loadMembershipPlans()])
+            .then(([storageObj]) => {
 
-            const slideshowPreview = slideshowid && is_video(M.getNodeByHandle(slideshowid));
-            const isStreaming = !dlmanager.isDownloading && (dlmanager.isStreaming || slideshowPreview);
-            const requiredQuota = ignoreStorageReq ? 0 : (M.account.mstrg || 0);
+                const slideshowPreview = slideshowid && is_video(M.getNodeByHandle(slideshowid));
+                const isStreaming = !dlmanager.isDownloading && (dlmanager.isStreaming || slideshowPreview);
 
-            const lowestRequiredMiniPlan = pro.filter.lowestRequired(requiredQuota, 'miniPlans', ignoreStorageReq);
-            const lowestPlanIsMini = !!lowestRequiredMiniPlan;
+                const requiredQuota = storageObj.mstrg || 0;
 
-            let miniPlanId;
-            if (lowestPlanIsMini) {
-                $dialog.addClass('pro-mini');
+                const lowestRequiredMiniPlan = pro.filter.lowestRequired(requiredQuota, 'miniPlans', ignoreStorageReq);
+                const lowestPlanIsMini = !!lowestRequiredMiniPlan;
 
-                if (isStreaming) {
-                    $dialog.addClass('no-cards');
-                }
-                miniPlanId = lowestPlanIsMini ? lowestRequiredMiniPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] : '';
-            }
+                let miniPlanId;
+                if (lowestPlanIsMini) {
+                    $dialog.addClass('pro-mini');
 
-            // Update the blurb text of the dialog
-            dlmanager.updateOBQDialogBlurb($dialog, miniPlanId, isStreaming);
-
-            // Render the plan details if required
-            if (!$dialog.hasClass('no-cards')) {
-                dlmanager.prepareOBQDialogPlans($dialog, lowestPlanIsMini, miniPlanId);
-            }
-
-            if (dlmanager.isOverQuota) {
-                dlmanager._overquotaInfo();
-            }
-
-            if (!is_mobile) {
-
-                // Check if touch device
-                var is_touch = function() {
-                    return 'ontouchstart' in window || 'onmsgesturechange' in window;
-                };
-
-                // Initialise scrolling
-                if (!is_touch()) {
-                    if ($scrollBlock.is('.ps')) {
-                        Ps.update($scrollBlock[0]);
+                    if (isStreaming) {
+                        $dialog.addClass('no-cards');
                     }
-                    else {
-                        Ps.initialize($scrollBlock[0]);
+                    miniPlanId = lowestPlanIsMini ? lowestRequiredMiniPlan[pro.UTQA_RES_INDEX_ACCOUNTLEVEL] : '';
+                }
+
+                // Update the blurb text of the dialog
+                dlmanager.updateOBQDialogBlurb($dialog, miniPlanId, isStreaming);
+
+                // Render the plan details if required
+                if (!$dialog.hasClass('no-cards')) {
+                    dlmanager.prepareOBQDialogPlans($dialog, lowestPlanIsMini, miniPlanId);
+                }
+
+                if (dlmanager.isOverQuota) {
+                    dlmanager._overquotaInfo();
+                }
+
+                if (!is_mobile) {
+
+                    // Check if touch device
+                    var is_touch = function() {
+                        return 'ontouchstart' in window || 'onmsgesturechange' in window;
+                    };
+
+                    // Initialise scrolling
+                    if (!is_touch()) {
+                        if ($scrollBlock.is('.ps')) {
+                            Ps.update($scrollBlock[0]);
+                        }
+                        else {
+                            Ps.initialize($scrollBlock[0]);
+                        }
                     }
                 }
-            }
 
-            // Run the callback function (to show the dialog) if one exists
-            if (typeof showDialogCb === 'function') {
-                showDialogCb();
-            }
-        });
+                // Run the callback function (to show the dialog) if one exists
+                if (typeof showDialogCb === 'function') {
+                    showDialogCb();
+                }
+            });
     },
 
     showLimitedBandwidthDialog: function(res, callback, flags) {

@@ -14,6 +14,8 @@ export default class Breadcrumbs extends MegaRenderMixin {
     }
     getBreadcrumbNodeText(nodeId, prevNodeId) {
         const backupsId = M.BackupsId || 'backups';
+        const s4Container = M.getNodeByHandle(nodeId).s4
+            && M.getS4NodeType(nodeId) === 'container' && nodeId;
 
         switch (nodeId) {
             case M.RootID:
@@ -25,6 +27,9 @@ export default class Breadcrumbs extends MegaRenderMixin {
             case backupsId:
                 // `Backups`
                 return l.restricted_folder_button;
+            case s4Container:
+                // `S4 Container`
+                return l.obj_storage;
             case 'shares':
                 // `username@mega.co.nz` || `Shared with me`
                 return prevNodeId && M.d[prevNodeId] ? M.d[prevNodeId].m : l[5589];

@@ -138,7 +138,11 @@ export default class FMView extends MegaRenderMixin {
                 });
         }
         else {
-            Object.keys(M.c[self.props.currentlyViewedEntry] || self.props.dataSource || {}).forEach((h) => {
+            Object.keys(
+                M.c[self.props.currentlyViewedEntry]
+                || M.tree[self.props.currentlyViewedEntry]
+                || self.props.dataSource || {}
+            ).forEach((h) => {
                 if (this.dataSource[h]) {
                     if (self.props.customFilterFn) {
                         if (self.props.customFilterFn(this.dataSource[h])) {

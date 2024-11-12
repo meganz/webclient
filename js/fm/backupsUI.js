@@ -539,7 +539,15 @@ lazy(mega, 'backupCenter', () => {
                     })
                     .then((folder) => {
                         target = folder;
-                        $input.val(M.getPath(folder).reverse().map(h => M.getNameByHandle(h)).join('/'));
+                        $input.val(M.getPath(folder).reverse().map(h => {
+                            const n = M.getNodeByHandle(h);
+
+                            // Use translated "Object storage" string for S4 container
+                            if (n.s4 && n.p === M.RootID && M.getS4NodeType(n) === 'container') {
+                                return l.obj_storage;
+                            }
+                            return M.getNameByHandle(h);
+                        }).join('/'));
                     })
                     .catch(tell);
             });

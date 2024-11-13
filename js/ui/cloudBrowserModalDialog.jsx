@@ -22,7 +22,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
             'selected': [],
             'highlighted': [],
             'currentlyViewedEntry': M.RootID,
-            'selectedTab': 'clouddrive',
+            'selectedTab': M.RootID,
             'searchValue': '',
             'searchText': '',
         };
@@ -81,14 +81,20 @@ class CloudBrowserDialog extends MegaRenderMixin {
             'isActiveSearch': false,
             'searchValue': '',
             'searchText': '',
-            'currentlyViewedEntry': this.state.selectedTab === 'shares' ? 'shares' : M.RootID
+            'currentlyViewedEntry': this.state.selectedTab
         });
     }
 
     handleTabChange(selectedTab) {
+        const s4Cn = selectedTab === 's4' && M.tree.s4 && Object.keys(M.tree.s4);
+
+        // Clear selections when switching the tabs
+        this.clearSelectionAndHighlight();
+
         this.setState({
             selectedTab,
-            currentlyViewedEntry: selectedTab === 'shares' ? 'shares' : M.RootID,
+            // Show the contents of S4 container if it is the only one
+            currentlyViewedEntry: s4Cn && s4Cn.length === 1 ? s4Cn[0] : selectedTab,
             searchValue: '',
             searchText: '',
             isLoading: false
@@ -115,7 +121,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
             return;
         }
         if (this.state.currentlyViewedEntry === 'search' && (!searchValue || searchValue.length < MIN_SEARCH_LENGTH)) {
-            newState.currentlyViewedEntry = this.state.selectedTab === 'shares' ? 'shares' : M.RootID;
+            newState.currentlyViewedEntry = this.state.selectedTab;
             newState.searchValue = undefined;
         }
 
@@ -153,6 +159,9 @@ class CloudBrowserDialog extends MegaRenderMixin {
     clearSelectionAndHighlight() {
         this.onSelected([]);
         this.onHighlighted([]);
+        if (selectionManager) {
+            selectionManager.clear_selection();
+        }
     }
     onPopupDidMount(elem) {
         this.domNode = elem;
@@ -161,16 +170,17 @@ class CloudBrowserDialog extends MegaRenderMixin {
         this.props.onAttachClicked();
     }
     onBreadcrumbNodeClick(nodeId) {
-        if (nodeId === 'shares') {
+        if (nodeId === 'shares' || nodeId === 's4') {
             // Switch the active tab to `Incoming Shares`
-            return this.handleTabChange('shares');
+            return this.handleTabChange(nodeId);
         }
 
         // Click to open allowed only on folders as breadcrumb nodes
         if (M.d[nodeId] && M.d[nodeId].t) {
             const nodeRoot = M.getNodeRoot(nodeId);
+
             this.setState({
-                selectedTab: nodeRoot === 'shares' || nodeRoot === "contacts" ? 'shares' : 'clouddrive',
+                selectedTab: nodeRoot === "contacts" ? 'shares' : nodeRoot,
                 currentlyViewedEntry: nodeId,
                 selected: [],
                 searchValue: '',
@@ -196,17 +206,25 @@ class CloudBrowserDialog extends MegaRenderMixin {
 
         let folderIsHighlighted = false;
         let share = false;
+        let isS4Cn = false;
         let isSearch = this.state.currentlyViewedEntry === 'search';
         const entryId = isSearch ? self.state.highlighted[0] : self.state.currentlyViewedEntry;
+
+        // Filter non S4-container items
+        const filterFn = entryId === M.RootID && M.tree.s4 ? n => !M.tree.s4[n.h] : null;
 
         // Flag that the specific node is part of the `Incoming Shares` node chain;
         // The `Attach` button is not available for isIncomingShare nodes.
         let isIncomingShare = M.getNodeRoot(entryId) === "shares";
 
-
         this.state.highlighted.forEach(nodeId => {
             if (M.d[nodeId] && M.d[nodeId].t === 1) {
                 folderIsHighlighted = true;
+
+                // Is S4 Container selected
+                if (M.tree.s4 && M.tree.s4[nodeId]) {
+                    isS4Cn = true;
+                }
             }
             share = M.getNodeShare(nodeId);
         });
@@ -227,7 +245,8 @@ class CloudBrowserDialog extends MegaRenderMixin {
             const highlightedNode = highlighted && highlighted.length && highlighted[0];
             const allowAttachFolders = (
                 this.props.allowAttachFolders &&
-                !isIncomingShare
+                !isIncomingShare &&
+                !isS4Cn
             );
 
             buttons.push(
@@ -308,11 +327,13 @@ class CloudBrowserDialog extends MegaRenderMixin {
                 "label": this.props.selectLabel,
                 "key": "select",
                 "className": "positive " +
-                    (this.state.selected.length === 0 || (share && share.down) ? "disabled" : ""),
+                    (this.state.selected.length === 0 || share && share.down || isS4Cn ? "disabled" : ""),
                 "onClick": e => {
                     if (this.state.selected.length > 0) {
                         this.props.onSelected(
-                            this.state.selected.filter(node => !M.getNodeShare(node).down)
+                            this.state.selected.filter(node => {
+                                return !M.getNodeShare(node).down && !(M.tree.s4 && M.tree.s4[node.h]);
+                            })
                         );
                         this.props.onAttachClicked();
                     }
@@ -360,9 +381,9 @@ class CloudBrowserDialog extends MegaRenderMixin {
                             <div
                                 className={`
                                     fm-dialog-tab cloud
-                                    ${self.state.selectedTab === 'clouddrive' ? 'active' : ''}
+                                    ${self.state.selectedTab === M.RootID ? 'active' : ''}
                                 `}
-                                onClick={() => self.handleTabChange('clouddrive')}>
+                                onClick={() => self.handleTabChange(M.RootID)}>
                                 {l[164] /* `Cloud Drive` */}
                             </div>
                             <div
@@ -372,6 +393,15 @@ class CloudBrowserDialog extends MegaRenderMixin {
                                 `}
                                 onClick={() => self.handleTabChange('shares')}>
                                 {l[5542] /* `Incoming Shares` */}
+                            </div>
+                            <div
+                                className={`
+                                    fm-dialog-tab s4
+                                    ${self.state.selectedTab === 's4' ? 'active' : ''}
+                                    ${u_attr.s4 ? '' : 'hidden'}
+                                `}
+                                onClick={() => self.handleTabChange('s4')}>
+                                {l.obj_storage /* `S4 Object storage` */}
                             </div>
                             <div className="clear"></div>
                         </div>
@@ -416,6 +446,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
                             nodeLoading={this.state.nodeLoading}
                             sortFoldersFirst={true}
                             currentlyViewedEntry={this.state.currentlyViewedEntry}
+                            customFilterFn={filterFn}
                             folderSelectNotAllowed={this.props.folderSelectNotAllowed}
                             folderSelectable={this.props.folderSelectable}
                             onSelected={this.onSelected}

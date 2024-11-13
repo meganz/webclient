@@ -35,6 +35,9 @@ lazy(s4, 'containers', () => {
             }
 
             if (skipWarning || this.step === 6) {
+                // Skip setup btn at the step 1 and Close btn at the last step
+                eventlog(skipWarning ? 500584 : 500583, JSON.stringify([0]));
+
                 super.destroy();
                 this._clear();
                 return;
@@ -47,6 +50,9 @@ lazy(s4, 'containers', () => {
                 l.s4_skip_setup_warn,
                 (yes) => {
                     if (yes) {
+                        // Skip setup button in confirmation dialog when clicking [X] btn
+                        eventlog(500584, JSON.stringify([this.step]));
+
                         super.destroy();
                         this._clear();
                     }
@@ -59,9 +65,6 @@ lazy(s4, 'containers', () => {
             if (!(this.container = s4.utils.getContainersList()[0])) {
                 return false;
             }
-
-            // Show onborading ID: 0
-            this._evtLog(0);
 
             super.show();
         }
@@ -104,15 +107,12 @@ lazy(s4, 'containers', () => {
             // Step 1
             $skipSetupBtn.rebind('click.s4dlg', () => {
                 this.destroy(true);
-
-                // Skip setup ID: 4
-                this._evtLog(4);
             });
 
             // Step 2
             $('a.secondary', $steps[2]).rebind('click.s4dlg', () => {
-                // Learn more about endpoints ID: 3
-                this._evtLog(3);
+                // Learn more about endpoints
+                eventlog(500587);
             });
 
             // Step 3 events
@@ -177,10 +177,8 @@ lazy(s4, 'containers', () => {
             // Skip steps btn
             $skipStepBtn.rebind('click.s4dlg', () => {
                 if (this.skipStep) {
-                    // Skip key creation ID: 5, Skip bucket creation ID: 6
-                    if (this.skipStep === 5 || this.skipStep === 6) {
-                        this._evtLog(this.skipStep);
-                    }
+                    // Skip key creation, Skip bucket creation
+                    eventlog(this.step === 3 ? 500585 : 500586);
 
                     this.steps(this.skipStep);
                 }
@@ -190,6 +188,10 @@ lazy(s4, 'containers', () => {
         step1(finalise) {
             if (finalise) {
                 this.$sidePane.removeClass('intro');
+
+                // Start setup btn
+                eventlog(500572);
+
                 return Promise.resolve();
             }
 
@@ -203,9 +205,6 @@ lazy(s4, 'containers', () => {
             if (finalise) {
                 return Promise.resolve();
             }
-
-            // Start setup ID: 1
-            this._evtLog(1);
 
             s4.utils.renderEndpointsData(this.$steps[this.step]);
             this.$progressLabel.text(l[556]);
@@ -291,6 +290,8 @@ lazy(s4, 'containers', () => {
 
         async step6(finalise) {
             if (finalise) {
+                // Done btn at the last step
+                eventlog(500583, JSON.stringify([1]));
                 return;
             }
 
@@ -303,10 +304,6 @@ lazy(s4, 'containers', () => {
             this.$skipStepBtn.addClass('hidden');
             this.$progressLabel.text(l[726]);
             this._switchStep();
-        }
-
-        _evtLog(id) {
-            eventlog(500572, JSON.stringify([1, id]));
         }
 
         _switchStep() {

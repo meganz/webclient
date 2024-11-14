@@ -976,7 +976,7 @@
             }
 
             if (handles.length) {
-                if (mega.infinity && !$.inSharesRebuild) {
+                if ((mega.infinity || u_attr.s4) && !$.inSharesRebuild) {
                     // @todo validate which nodes are legit to query here
                     loadingDialog.show();
                 }
@@ -987,7 +987,7 @@
                 $.inSharesRebuild = Date.now();
 
                 queueMicrotask(() => {
-                    mega.keyMgr.decryptInShares()
+                    mega.keyMgr.decryptInShares(-0xFEED)
                         .then(() => {
                             return this.showContactVerificationDialog();
                         })

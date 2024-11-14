@@ -143,6 +143,17 @@
 .fm-affiliate .refer-users-block {
     margin: 0 0 36px 0;
 }
+.fm-affiliate .refer-banner {
+    margin: 16px;
+    padding: 4px 100px;
+    font: var(--text-body1);
+    width: 100%;
+    text-align: center;
+}
+.fm-affiliate .refer-banner a {
+    color: var(--banner-text-warning);
+    text-decoration: underline;
+}
 .fm-affiliate .refer-block {
     box-sizing: border-box;
     cursor: pointer;

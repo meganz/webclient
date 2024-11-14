@@ -20,10 +20,6 @@ class MegaMobileRadioButton extends MegaComponent {
         subNode.className = 'radio-wrapper';
         targetNode.appendChild(subNode);
 
-        const labelsNode = document.createElement('div');
-        labelsNode.className = 'label-and-sublabel';
-        targetNode.appendChild(labelsNode);
-
         targetNode = subNode;
         this.input = subNode = document.createElement('input');
         subNode.type = 'radio';
@@ -33,7 +29,17 @@ class MegaMobileRadioButton extends MegaComponent {
         subNode.disabled = options.disabled;
         targetNode.appendChild(subNode);
 
-        targetNode = labelsNode;
+        targetNode = buttonAndLabelsNode;
+        subNode = document.createElement('div');
+        subNode.className = 'label-wrapper';
+        targetNode.appendChild(subNode);
+
+        targetNode = subNode;
+        subNode = document.createElement('div');
+        subNode.className = 'label-and-sublabel';
+        targetNode.appendChild(subNode);
+
+        targetNode = subNode;
         subNode = document.createElement('label');
         subNode.className = 'radio-action';
         subNode.htmlFor = `${options.radioName}-${options.radioValue}`;

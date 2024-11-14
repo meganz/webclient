@@ -14,6 +14,20 @@ mobile.settings.account.referral = Object.create(mobile.settingsHelper, Object.g
 
         this.domNode = this.generatePage('account-referral-program');
 
+        if (!mega.refsunref) {
+            const text = mCreateElement('div', {}, [
+                mCreateElement('span', {}, [parseHTML(l.referral_close_text)])
+            ]);
+            mobile.inline.alert.create({
+                parentNode: this.domNode,
+                componentClassname: 'refer-programme-banner',
+                title: l.referral_close_title,
+                text,
+                icon: 'sprite-mobile-fm-mono icon-info-thin-outline',
+                iconSize: '24',
+            });
+        }
+
         // Comission index info block
         new MegaMobileInfoMenuItem({
             componentClassname: 'no-active',
@@ -83,12 +97,14 @@ mobile.settings.account.referral = Object.create(mobile.settingsHelper, Object.g
             parentNode: this.domNode
         });
 
-        // Program guide link
-        this.generateMenuItem(this.domNode, {
-            text: l[22683],
-            icon: 'sprite-mobile-fm-mono icon-file-text-thin-outline',
-            href: 'fm/refer/guide'
-        });
+        if (mega.refsunref) {
+            // Program guide link
+            this.generateMenuItem(this.domNode, {
+                text: l[22683],
+                icon: 'sprite-mobile-fm-mono icon-file-text-thin-outline',
+                href: 'fm/refer/guide'
+            });
+        }
 
         // Redemption history link
         this.generateMenuItem(this.domNode, {

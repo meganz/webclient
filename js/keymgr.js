@@ -1174,12 +1174,20 @@ lazy(mega, 'keyMgr', () => {
         }
 
         // try decrypting inshares based on the current key situation
-        async decryptInShares() {
+        async decryptInShares(pz) {
+
+            if (pz !== -0xFEED && u_attr.s4) {
+                // Let's make S4 users life easier,
+                // only do this whenever actually entering into the in-shares section,
+                // not on the background right after entering the site.
+                // @todo 'this.gotHereFromAFolderLink' (?)..
+                return EBLOCKED;
+            }
 
             if (!pkPull.dsLock) {
                 pkPull.dsLock = mega.promise;
 
-                let shares = mega.infinity && array.unique((await fmdb.get('s')).map(n => n.t || n.h));
+                let shares = (u_attr.s4 || mega.infinity) && array.unique((await fmdb.get('s')).map(n => n.t || n.h));
 
                 onIdle(() => {
                     const {resolve} = pkPull.dsLock;

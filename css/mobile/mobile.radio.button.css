@@ -31,6 +31,11 @@
     -webkit-margin-end: 0;
 }
 
+.mega-radio-button .label-wrapper {
+    display: flex;
+    flex-direction: row;
+}
+
 .mega-radio-button .label-and-sublabel {
     display: flex;
     flex-direction: column;

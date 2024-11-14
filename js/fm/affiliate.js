@@ -72,8 +72,12 @@ affiliateUI.guideDialog = {
         'use strict';
 
         var self = this;
+        if (!mega.refsunref) {
+            return;
+        }
 
-        $('.guide-dialog', affiliateUI.$body).rebind('click.guide-dialog', function() {
+        $('.refer-rules-note', affiliateUI.$body).removeClass('hidden');
+        $('.guide-dialog', affiliateUI.$body).removeClass('hidden').rebind('click.guide-dialog', function() {
             affiliateUI.guideDialog.show();
 
             if (this.classList.contains('to-rules')) {
@@ -480,7 +484,16 @@ affiliateUI.referUsers = {
 
         'use strict';
 
-        this.bindEvents();
+        if (mega.refsunref) {
+            $('.refer-block', affiliateUI.$body).removeClass('hidden');
+            $('.refer-users', affiliateUI.$body).removeClass('hidden');
+            this.bindEvents();
+        }
+        else {
+            $('.refer-block', affiliateUI.$body).addClass('hidden');
+            $('.refer-users', affiliateUI.$body).addClass('hidden');
+            $('.refer-banner', affiliateUI.$body).removeClass('hidden');
+        }
     },
 
     bindEvents: function() {

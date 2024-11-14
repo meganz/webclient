@@ -3306,22 +3306,13 @@ Object.defineProperty(self, 'dbfetch', (function() {
             let bulk = handles.filter(h => !M.d[h]);
 
             if (bulk.length) {
-                if (fmdb.hasPendingWrites('f')) {
-                    if (d) {
-                        fmdb.logger.warn('Holding data retrieval until there are no pending writes...', bulk);
-                    }
-                    // @todo we have to do something about the dirty-reads procedure becoming a nefarious bottleneck
-                    do {
-
-                        await tSleep(4);
-                    }
-                    while (fmdb.hasPendingWrites('f'));
-                }
+                await this.flushed();
                 emplace(await fmdb.getbykey('f', 'h', ['h', bulk]), true);
             }
 
             bulk = handles.filter(h => M.d[h] && M.d[h].t && !M.c[h]);
             if (bulk.length) {
+                await this.flushed();
                 await this.tree(bulk, 0);
             }
 
@@ -3441,6 +3432,25 @@ Object.defineProperty(self, 'dbfetch', (function() {
 
                 await this.geta(handles);
                 node_inflight.lock = false;
+            }
+        },
+
+        /**
+         * Wait for DB rows to have been flushed to disk.
+         * @param {Number} [int] Iteration interval.
+         * @param {String} [table] DB Table.
+         * @returns {Promise<*>} void
+         */
+        async flushed(int = 3, table = 'f') {
+            if (fmdb.hasPendingWrites(table)) {
+                // @todo we have to do something about the dirty-reads procedure becoming a nefarious bottleneck
+                fmdb.logger.warn('Holding data retrieval until there are no pending writes...');
+
+                do {
+
+                    await tSleep(int);
+                }
+                while (fmdb.hasPendingWrites(table));
             }
         },
 

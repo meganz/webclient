@@ -483,19 +483,23 @@ lazy(s4, 'utils', () => {
             const endpoints = [
                 [
                     'eu-central-1.s4.mega.io',
-                    l.location_amsterdam
+                    l.location_amsterdam,
+                    'Amsterdam'
                 ],
                 [
                     'eu-central-2.s4.mega.io',
-                    l.location_bettembourg
+                    l.location_bettembourg,
+                    'Bettembourg'
                 ],
                 [
                     'ca-central-1.s4.mega.io',
-                    l.location_montreal
+                    l.location_montreal,
+                    'Montreal'
                 ],
                 [
                     'ca-west-1.s4.mega.io',
-                    l.location_vancouver
+                    l.location_vancouver,
+                    'Vancouver'
                 ]
             ];
 
@@ -530,7 +534,8 @@ lazy(s4, 'utils', () => {
                 // Create copy to clipboard button
                 subNode = mCreateElement('button', {
                     'class': 'mega-button small action copy',
-                    'data-url': item[0]
+                    'data-url': item[0],
+                    'data-location': item[2]
                 }, subNode);
                 mCreateElement('i', { class: 'sprite-fm-mono icon-copy' }, subNode);
             }
@@ -546,8 +551,8 @@ lazy(s4, 'utils', () => {
             // Copy to clipboard buttons
             $('.mega-button.copy', parentNode).rebind('click.copyUrl', (e) => {
                 if ($.dialog === 's4-managed-setup') {
-                    // Copy endpoints ID: 2
-                    eventlog(500572, JSON.stringify([1, 2]));
+                    // Copy endpoints btn evt
+                    eventlog(500582, JSON.stringify([e.currentTarget.dataset.location]));
                 }
 
                 copyToClipboard(e.currentTarget.dataset.url, l.s4_endpoint_copied, 'hidden');

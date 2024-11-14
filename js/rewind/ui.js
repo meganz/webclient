@@ -78,7 +78,7 @@ lazy(mega, 'rewindUi', () => {
 
             /** @property RewindSidebar.template */
             lazy(this, 'template', () => {
-                const res = getTemplate(pages.rewind ? 'rewind' : 'rewind_html');
+                const res = getTemplate('rewind');
                 delete pages.rewind;
                 return res;
             });

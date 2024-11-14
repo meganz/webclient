@@ -635,11 +635,72 @@ class MEGAPIRequest {
     }
 
     async fetch(uri, body) {
+        let response;
         const signal = this.getAbortSignal();
-        const response = await fetch(uri, {method: body ? 'POST' : 'GET', body, signal});
+        const options = {method: body ? 'POST' : 'GET', body, signal};
+
+        while (true) {
+            response = await fetch(uri, options);
+            if (response.status !== 402) {
+                break;
+            }
+            let cash = response.headers.get('X-Hashcash');
+            this.logger.assert(cash, `Invalid 402 response, missing header.`);
+
+            cash = cash.split(':');
+            this.logger.assert(cash.length === 4, `Invalid 402 response, unexpected number of elements ${cash}`);
+
+            const x = cash[0] | 0;
+            const y = parseInt(cash[1]);
+            this.logger.assert(x === 1 && y >= 0 && y < 256, `Invalid 402 response, mismatch ${cash}`);
+
+            options.headers = {'X-Hashcash': `1:${cash[3]}:${await this.gencash(cash[3], y)}`};
+        }
 
         this.response = response;
         this.status = response.status;
+    }
+
+    /**
+     * @param {String|Uint8Array} token 48-byte payload
+     * @param {Number} easiness encoded threshold,
+     * (maximum acceptable value in the first 32 bytes of the hash (little endian) - the lower, the harder to solve)
+     * @returns {Promise<String>} suitable base64-encoded four-byte prefix
+     */
+    async gencash(token, easiness) {
+        const buffer = new Uint8Array(4 + 262144 * 48);
+        const threshold = ((easiness & 63) << 1) + 1 << (easiness >> 6) * 7 + 3;
+
+        if (typeof token === 'string') {
+            token = new Uint8Array(base64_to_ab(token));
+        }
+
+        for (let i = 0; i < 262144; i++) {
+            buffer.set(token, 4 + i * 48);
+        }
+
+        let achieved = 0;
+        const round = async() => {
+            while (true) {
+                // increment prefix
+                for (let j = 0; ; j++) {
+                    buffer[j]++;
+                    if (buffer[j]) {
+                        break;
+                    }
+                }
+                const prefix = buffer.slice(0, 4);
+                const view = new DataView(await crypto.subtle.digest("SHA-256", buffer));
+
+                if (achieved || view.getUint32(0) <= threshold) {
+                    achieved = 1;
+                    return ab_to_base64(prefix);
+                }
+            }
+        };
+
+        // in theory, this should scale with the number of CPU cores, but no such luck on Chromium
+        return Promise.race([round(), round()]);
     }
 
     async parser() {

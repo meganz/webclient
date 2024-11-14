@@ -1384,10 +1384,10 @@ FileManager.prototype.updFileManagerUI = async function() {
     var newpath = false;
     var newshare = false;
     var selnode;
-    var buildtree = function(n) {
-        delay('updFileManagerUI:buildtree:' + n.h, function() {
-            M.buildtree(n, M.buildtree.FORCE_REBUILD);
-            M.addTreeUIDelayed();
+    const buildtree = (n) => {
+        delay(`updFileManagerUI:buildtree:${n.h}`, () => {
+            this.buildtree(n, this.buildtree.FORCE_REBUILD);
+            this.addTreeUIDelayed();
         }, 2600);
     };
 
@@ -1437,16 +1437,11 @@ FileManager.prototype.updFileManagerUI = async function() {
     for (var h in treebuild) {
         var tb = this.d[h];
         if (tb) {
+            buildtree(tb);
+
             // If this is out-shares or public-links page, build both cloud-drive tree and it's own
             if (this.currentCustomView) {
-                if (tb.h === M.RubbishID) {
-                    tb = {h: M.RootID};
-                }
-                this.buildtree(tb, this.buildtree.FORCE_REBUILD, 'cloud-drive');
-                this.buildtree({h: this.currentCustomView.type}, this.buildtree.FORCE_REBUILD);
-            }
-            else {
-                buildtree(tb);
+                buildtree({h: this.currentCustomView.type});
             }
             UItree = true;
         }

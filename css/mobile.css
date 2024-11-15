@@ -6138,7 +6138,7 @@ textarea.mobile.support-text-field {
     background-color: var(--stroke-grey-1);
 }
 .mobile .fm-dialog-body.improved-recovery-steps {
-    background-color: var(--mobile-page-background);
+    background-color: var(--stroke-main);
 }
 .mobile .fm-dialog-body.improved-recovery-steps .fm-dialog-title {
     color: var(--text-color-high);
@@ -6925,6 +6925,7 @@ textarea.mobile.support-text-field {
     margin: 0 auto;
     max-height: 95%;
     overflow: scroll;
+    background-color: var(--stroke-main);
 }
 .mobile.fm-dialog.park-account-dialog .improved-recovery-steps {
     padding: 0;

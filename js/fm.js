@@ -2944,7 +2944,7 @@ function closeDialog(ev) {
         $('.mega-dialog.bottom-pages-dialog').addClass('hidden');
     }
     else if ($.dialog === 'createfolder' && ($.copyDialog || $.moveDialog || $.selectFolderDialog || $.saveAsDialog)) {
-        $('.mega-dialog.create-folder-dialog').addClass('hidden');
+        $('.mega-dialog.create-folder-dialog, .mega-dialog.s4-create-bucket-dialog').addClass('hidden');
         $('.mega-dialog.create-folder-dialog .create-folder-size-icon').removeClass('hidden');
     }
     else if (($.dialog === 'slideshow') && $.copyrightsDialog) {

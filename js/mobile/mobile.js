@@ -1076,7 +1076,7 @@ function affiliateUI() {
     else if (page === 'fm/refer/redeem') {
         mobile.affiliate.initRedeemPage();
     }
-    else if (page === 'fm/refer/guide') {
+    else if (mega.refsunref && page === 'fm/refer/guide') {
         mobile.affiliate.initGuidePage();
     }
     else if (page === 'fm/refer/history') {

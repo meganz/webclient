@@ -366,6 +366,10 @@ async function fmremove(selectedNodes, skipDelWarning) {
                         if (tmp) {
                             M.currentdirid = tmp;
                         }
+                        if (mega.rewind && !sessionStorage.rwnPromoDiagSeen) {
+                            sessionStorage.rwnPromoDiagSeen = 1;
+                            mega.rewind.showRewindPromoDialog();
+                        }
                     })
                     .then((res) => {
                         console.debug('clear-bin', res);

@@ -36,6 +36,7 @@
                             mega.ui.pm.comm.deleteItem(mega.ui.pm.list.passwordItem.item.h)
                                 .then(() => {
                                     mega.ui.toast.show(parseHTML(l.item_deleted.replace('%1', title)));
+                                    mega.ui.pm.list.passwordItem.domNode.classList.remove('active');
                                     return mega.ui.pm.list.loadList();
                                 })
                                 .catch((ex) => {

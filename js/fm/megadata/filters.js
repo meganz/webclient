@@ -243,13 +243,15 @@ MegaData.prototype.getFilterBySearchFn = function(searchTerm) {
     if (regex) {
         return function(node) {
             return node.name && regex.test(node.name)
-                && node.p !== 'contacts' && !(node.s4 && node.p === M.RootID);
+                && node.p !== 'contacts'
+                && !(node.s4 && node.p === M.RootID && M.getS4NodeType(node) === 'container');
         };
     }
 
     return function(node) {
         return node.name && node.name.toLowerCase().includes(str)
-            && node.p !== 'contacts' && !(node.s4 && node.p === M.RootID);
+            && node.p !== 'contacts'
+            && !(node.s4 && node.p === M.RootID && M.getS4NodeType(node) === 'container');
     };
 };
 

@@ -10056,6 +10056,7 @@ class Breadcrumbs extends mixins.w9 {
   }
   getBreadcrumbNodeText(nodeId, prevNodeId) {
     const backupsId = M.BackupsId || 'backups';
+    const s4Container = M.getNodeByHandle(nodeId).s4 && M.getS4NodeType(nodeId) === 'container' && nodeId;
     switch (nodeId) {
       case M.RootID:
         return l[164];
@@ -10063,6 +10064,8 @@ class Breadcrumbs extends mixins.w9 {
         return l[167];
       case backupsId:
         return l.restricted_folder_button;
+      case s4Container:
+        return l.obj_storage;
       case 'shares':
         return prevNodeId && M.d[prevNodeId] ? M.d[prevNodeId].m : l[5589];
       default:
@@ -10244,7 +10247,7 @@ class CloudBrowserDialog extends mixins.w9 {
       'selected': [],
       'highlighted': [],
       'currentlyViewedEntry': M.RootID,
-      'selectedTab': 'clouddrive',
+      'selectedTab': M.RootID,
       'searchValue': '',
       'searchText': ''
     };
@@ -10296,13 +10299,15 @@ class CloudBrowserDialog extends mixins.w9 {
       'isActiveSearch': false,
       'searchValue': '',
       'searchText': '',
-      'currentlyViewedEntry': this.state.selectedTab === 'shares' ? 'shares' : M.RootID
+      'currentlyViewedEntry': this.state.selectedTab
     });
   }
   handleTabChange(selectedTab) {
+    const s4Cn = selectedTab === 's4' && M.tree.s4 && Object.keys(M.tree.s4);
+    this.clearSelectionAndHighlight();
     this.setState({
       selectedTab,
-      currentlyViewedEntry: selectedTab === 'shares' ? 'shares' : M.RootID,
+      currentlyViewedEntry: s4Cn && s4Cn.length === 1 ? s4Cn[0] : selectedTab,
       searchValue: '',
       searchText: '',
       isLoading: false
@@ -10327,7 +10332,7 @@ class CloudBrowserDialog extends mixins.w9 {
       return;
     }
     if (this.state.currentlyViewedEntry === 'search' && (!searchValue || searchValue.length < MIN_SEARCH_LENGTH)) {
-      newState.currentlyViewedEntry = this.state.selectedTab === 'shares' ? 'shares' : M.RootID;
+      newState.currentlyViewedEntry = this.state.selectedTab;
       newState.searchValue = undefined;
     }
     this.setState(newState);
@@ -10368,6 +10373,9 @@ class CloudBrowserDialog extends mixins.w9 {
   clearSelectionAndHighlight() {
     this.onSelected([]);
     this.onHighlighted([]);
+    if (selectionManager) {
+      selectionManager.clear_selection();
+    }
   }
   onPopupDidMount(elem) {
     this.domNode = elem;
@@ -10376,13 +10384,13 @@ class CloudBrowserDialog extends mixins.w9 {
     this.props.onAttachClicked();
   }
   onBreadcrumbNodeClick(nodeId) {
-    if (nodeId === 'shares') {
-      return this.handleTabChange('shares');
+    if (nodeId === 'shares' || nodeId === 's4') {
+      return this.handleTabChange(nodeId);
     }
     if (M.d[nodeId] && M.d[nodeId].t) {
       const nodeRoot = M.getNodeRoot(nodeId);
       this.setState({
-        selectedTab: nodeRoot === 'shares' || nodeRoot === "contacts" ? 'shares' : 'clouddrive',
+        selectedTab: nodeRoot === "contacts" ? 'shares' : nodeRoot,
         currentlyViewedEntry: nodeId,
         selected: [],
         searchValue: '',
@@ -10405,12 +10413,17 @@ class CloudBrowserDialog extends mixins.w9 {
     const classes = `add-from-cloud ${self.props.className} dialog-template-tool `;
     let folderIsHighlighted = false;
     let share = false;
+    let isS4Cn = false;
     const isSearch = this.state.currentlyViewedEntry === 'search';
     const entryId = isSearch ? self.state.highlighted[0] : self.state.currentlyViewedEntry;
+    const filterFn = entryId === M.RootID && M.tree.s4 ? n => !M.tree.s4[n.h] : null;
     const isIncomingShare = M.getNodeRoot(entryId) === "shares";
     this.state.highlighted.forEach(nodeId => {
       if (M.d[nodeId] && M.d[nodeId].t === 1) {
         folderIsHighlighted = true;
+        if (M.tree.s4 && M.tree.s4[nodeId]) {
+          isS4Cn = true;
+        }
       }
       share = M.getNodeShare(nodeId);
     });
@@ -10429,7 +10442,7 @@ class CloudBrowserDialog extends mixins.w9 {
       } = this.state;
       const className = `${share && share.down ? 'disabled' : ''}`;
       const highlightedNode = highlighted && highlighted.length && highlighted[0];
-      const allowAttachFolders = this.props.allowAttachFolders && !isIncomingShare;
+      const allowAttachFolders = this.props.allowAttachFolders && !isIncomingShare && !isS4Cn;
       buttons.push({
         "label": this.props.openLabel,
         "key": "select",
@@ -10501,10 +10514,12 @@ class CloudBrowserDialog extends mixins.w9 {
       buttons.push({
         "label": this.props.selectLabel,
         "key": "select",
-        "className": `positive ${  this.state.selected.length === 0 || share && share.down ? "disabled" : ""}`,
+        "className": `positive ${  this.state.selected.length === 0 || share && share.down || isS4Cn ? "disabled" : ""}`,
         "onClick": e => {
           if (this.state.selected.length > 0) {
-            this.props.onSelected(this.state.selected.filter(node => !M.getNodeShare(node).down));
+            this.props.onSelected(this.state.selected.filter(node => {
+              return !M.getNodeShare(node).down && !(M.tree.s4 && M.tree.s4[node.h]);
+            }));
             this.props.onAttachClicked();
           }
           e.preventDefault();
@@ -10540,9 +10555,9 @@ class CloudBrowserDialog extends mixins.w9 {
     }, REaCt().createElement("div", {
       className: `
                                     fm-dialog-tab cloud
-                                    ${self.state.selectedTab === 'clouddrive' ? 'active' : ''}
+                                    ${self.state.selectedTab === M.RootID ? 'active' : ''}
                                 `,
-      onClick: () => self.handleTabChange('clouddrive')
+      onClick: () => self.handleTabChange(M.RootID)
     }, l[164]), REaCt().createElement("div", {
       className: `
                                     fm-dialog-tab incoming
@@ -10550,6 +10565,13 @@ class CloudBrowserDialog extends mixins.w9 {
                                 `,
       onClick: () => self.handleTabChange('shares')
     }, l[5542]), REaCt().createElement("div", {
+      className: `
+                                    fm-dialog-tab s4
+                                    ${self.state.selectedTab === 's4' ? 'active' : ''}
+                                    ${u_attr.s4 ? '' : 'hidden'}
+                                `,
+      onClick: () => self.handleTabChange('s4')
+    }, l.obj_storage), REaCt().createElement("div", {
       className: "clear"
     })), REaCt().createElement("div", {
       className: "fm-picker-header"
@@ -10590,6 +10612,7 @@ class CloudBrowserDialog extends mixins.w9 {
       nodeLoading: this.state.nodeLoading,
       sortFoldersFirst: true,
       currentlyViewedEntry: this.state.currentlyViewedEntry,
+      customFilterFn: filterFn,
       folderSelectNotAllowed: this.props.folderSelectNotAllowed,
       folderSelectable: this.props.folderSelectable,
       onSelected: this.onSelected,
@@ -13934,7 +13957,7 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
       createTimeoutPromise(() => chatRoom.topic && chatRoom.state === ChatRoom.STATE.READY, 350, 15000).always(() => {
         return chatRoom.isCurrentlyActive ? this.setState({
           chatLinkDialog: true
-        }, () => affiliateUI.registeredDialog.show()) : chatRoom.updatePublicHandle(false, true);
+        }, () => mega.refsunref && affiliateUI.registeredDialog.show()) : chatRoom.updatePublicHandle(false, true);
       });
     });
     if (chatRoom.type === 'private') {
@@ -35653,7 +35676,7 @@ class FMView extends mixins.w9 {
         entries.push(n);
       });
     } else {
-      Object.keys(M.c[self.props.currentlyViewedEntry] || self.props.dataSource || {}).forEach(h => {
+      Object.keys(M.c[self.props.currentlyViewedEntry] || M.tree[self.props.currentlyViewedEntry] || self.props.dataSource || {}).forEach(h => {
         if (this.dataSource[h]) {
           if (self.props.customFilterFn) {
             if (self.props.customFilterFn(this.dataSource[h])) {

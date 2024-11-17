@@ -723,8 +723,10 @@ var slideshowid;
             $imgWrap.off('mousedown.pickpan touchstart.pickpan');
             $imgWrap.off('mouseup.pickpan mouseout.pickpan touchend.pickpan');
             $imgWrap.off('mousemove.pickpan touchmove.pickpan');
+            $img.removeAttr('draggable');
             return false;
         }
+        $img.attr('draggable', false);
 
         // Get cursor last position before dragging
         $imgWrap.rebind('mousedown.pickpan touchstart.pickpan', function(event) {

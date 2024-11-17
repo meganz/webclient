@@ -81,7 +81,7 @@ Unless otherwise noted, they were released under a [MIT License].
 ---
 [jquery-ui.js]: jQuery-UI - jQuery User Interface library.
 
-> This is a custom build created from: [https://jqueryui.com/download/#!...](https://jqueryui.com/download/#!version=1.12.1&themeParams=none&components=111101011101111110100010110110001000001000000000)
+> This is a custom build created from: [https://jqueryui.com/download/#!...](https://jqueryui.com/download/#!version=1.14.1&themeParams=none&components=111101011101111110000010110110000000000000000000)
 
 ---
 [jquery-ui-touch.js]: jQuery UI Touch Punch is a small hack that enables the use of touch events on sites using the jQuery UI user interface library.

@@ -288,7 +288,7 @@ lazy(s4, 'kernel', () => {
         return 0;
     };
     const isAtContainer = (n) => validateS4Container(n.p) > 0;
-    const isS4ALessBucket = (n) => !n.s4 && isAtContainer(n);
+    const isS4BucketByLocation = (n) => n && n.p && isAtContainer(n);
 
     const getStandardUniqueName = (name, store, prop = 'n') => {
         store = Object.values(store).map(o => o[prop] && String(o[prop]).toLowerCase()).filter(Boolean);
@@ -327,7 +327,7 @@ lazy(s4, 'kernel', () => {
             n = M.getNodeByHandle(n);
         }
 
-        if (isAtContainer(n)) {
+        if (isS4BucketByLocation(n)) {
 
             if (!haveGoodBucketParent(n)) {
                 logger.warn(`Establishing default s4-attr on bucket ${n.h}`, n);
@@ -342,7 +342,6 @@ lazy(s4, 'kernel', () => {
             return n.s4;
         }
 
-        logger.error(`Provided node (${n.h}) is not a bucket...`);
         return false;
     };
 
@@ -352,14 +351,13 @@ lazy(s4, 'kernel', () => {
             n = M.getNodeByHandle(n);
         }
 
-        do {
+        while (n && (n = M.d[n.p])) {
 
-            if (n.s4 && s4nt.bucket in n.s4 || isS4ALessBucket(n)) {
+            if (getS4BucketAttribute(n)) {
 
                 return n;
             }
         }
-        while ((n = M.d[n.p]));
 
         return false;
     };
@@ -368,13 +366,18 @@ lazy(s4, 'kernel', () => {
         if (typeof n === 'string') {
             n = M.getNodeByHandle(n);
         }
+
         const b = getS4BucketForObject(n);
         if (b) {
-            const {s4} = n;
-            return !s4 || !s4.c || haveGoodBucketParent(b) && isAtContainer(b) && b.p === s4.c;
+            const {s4, h} = n;
+
+            if (!s4 || s4.c !== b.p) {
+                logger.warn(`Establishing container linkage on object ${h}`, n);
+                n.s4 = {...s4, c: b.p};
+            }
         }
 
-        return false;
+        return !!b;
     };
 
     const getS4NodeType = (n) => {
@@ -383,22 +386,24 @@ lazy(s4, 'kernel', () => {
             n = M.getNodeByHandle(n);
         }
 
-        if (n.s4) {
-            for (const k in s4rt) {
-                if (k in n.s4) {
-                    if (s4rt[k] === 'bucket') {
-                        return haveGoodBucketParent(n) && isAtContainer(n) && s4rt[k];
-                    }
-                    return (s4rt[k] !== 'container' || validateS4Container(n) > 0) && s4rt[k];
-                }
-            }
-        }
-        else if (isS4ALessBucket(n)) {
+        if (getS4BucketAttribute(n)) {
             return 'bucket';
         }
 
         if (haveGoodObjectParent(n)) {
             return n.t ? 'bucket-child' : 'object';
+        }
+
+        if (n.s4) {
+            for (const k in s4rt) {
+                if (k in n.s4) {
+                    if (s4rt[k] !== 'container') {
+                        logger.warn(`Unexpected s4-attr on node ${n.h}`, [n]);
+                        return false;
+                    }
+                    return validateS4Container(n) > 0 && s4rt[k];
+                }
+            }
         }
 
         return false;

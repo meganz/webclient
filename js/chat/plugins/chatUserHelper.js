@@ -73,7 +73,9 @@ class ChatUserHelper {
             return this._dedupUserPromises[user];
         }
         const name = M.getNameByHandle(user);
-        if (name) {
+        // If the user seems to only have the email set try fetching again.
+        // Accepting that users with their name explicitly set as their email will be re-fetched.
+        if (name && name !== String(M.u[user].m).trim()) {
             return name;
         }
 

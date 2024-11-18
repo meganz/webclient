@@ -394,7 +394,7 @@ lazy(s4, 'utils', () => {
             const bucket = this.getBucketNode(path[1]);
 
             if (path[0] !== 's4' || bucket) {
-                return bucket.p ? `${bucket.p}/${path[1]}` : false;
+                return bucket.p ? `${bucket.p}/${path[path.length - 1]}` : false;
             }
 
             if (path.length > 2 && !(allowedPages.has(path[2]) || M.d[path[2]])) {

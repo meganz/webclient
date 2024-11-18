@@ -326,7 +326,7 @@ lazy(s4, 'utils', () => {
                 }
                 // Multiple items to Cloud drive
                 else if (type) {
-                    title = l[`s4_title_${ action }_items_to_cd${ suffix }`];
+                    title = l[`s4_title_${ action }_items_to_cd_plural`];
                     message = l.s4_warn_copy_move_items_to_cd;
                 }
             }

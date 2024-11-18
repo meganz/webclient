@@ -412,8 +412,11 @@ function getCleanSitePath(path) {
             if (path.cjevent) {
                 sessionStorage.cjevent = path.cjevent;
             }
-            if (path[0] === 'pro' && path.tab) {
+            if (path.tab && path[0] === 'pro') {
                 window.mProTab = path.tab;
+            }
+            if (path.m && path[0].startsWith('propay_')) {
+                sessionStorage['pro.period'] = path.m;
             }
         }, false)();
 

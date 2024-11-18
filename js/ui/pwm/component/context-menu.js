@@ -128,7 +128,7 @@ class MegaContextMenu extends MegaComponentGroup {
                 icon: 'sprite-pm-mono icon-copy-user-thin-outline',
                 onClick: (nodeHandle) => {
                     const node = M.getNodeByHandle(nodeHandle);
-                    copyPMToClipboard(node.pwm.u, l.username_copied);
+                    mega.ui.pm.utils.copyPMToClipboard(node.pwm.u, l.username_copied);
                     eventlog(500542);
                 }
             },
@@ -137,7 +137,7 @@ class MegaContextMenu extends MegaComponentGroup {
                 icon: 'sprite-pm-mono icon-copy-password-thin-outline',
                 onClick: (nodeHandle) => {
                     const node = M.getNodeByHandle(nodeHandle);
-                    copyPMToClipboard(node.pwm.pwd, l[19602]);
+                    mega.ui.pm.utils.copyPMToClipboard(node.pwm.pwd, l[19602]);
                     eventlog(500541);
                 }
             },

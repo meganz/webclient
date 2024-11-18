@@ -1007,7 +1007,7 @@ FileManager.prototype.initFileManagerUI = function() {
         if ($.hideTopMenu) {
             $.hideTopMenu(e);
         }
-        if (M.chat || M.currentdirid === 'pwm') {
+        if (M.chat || String(M.currentdirid).startsWith('pwm')) {
             // chat can handle its own links..no need to return false on every "click" and "element" :O
             // halt early, to save some CPU cycles if in chat.
             return;

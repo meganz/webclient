@@ -2,6 +2,7 @@
     background-color: var(--mobile-surface-1);
     height: auto;
     width: max-content;
+    border: 1px solid var(--mobile-border-strong);
     border-radius: var(--mobile-border-radius-large);
     align-items: start;
     position: absolute;
@@ -13,6 +14,5 @@
 
 .menu-container.overlay-wrap {
     background-color: var(--mobile-page-background);
-    border: 1px solid var(--mobile-border-strong);
     box-shadow: var(--mobile-shadow-medium);
 }

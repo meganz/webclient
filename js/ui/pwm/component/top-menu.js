@@ -15,15 +15,15 @@ class MegaTopMenu extends MegaMobileTopMenu {
         const menuItems = [
             {
                 text: l.rewind_label_all_default,
-                icon: 'sprite-pm-mono icon-square-regular-solid',
+                icon: 'sprite-pm-mono icon-square-regular-outline',
                 href: '/fm/pwm'
             },
-            /* {
+            {
                 text: l[823],
                 icon: 'sprite-mobile-fm-mono icon-settings-thin-outline',
-                href: '',
-                eventLog: 99903
-            } */
+                href: '/fm/pwm/account',
+                eventLog: 500573
+            }
         ];
 
         let menuItem;

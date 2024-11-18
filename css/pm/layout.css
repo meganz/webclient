@@ -53,7 +53,8 @@
     grid-column: 2/3;
 }
 
-.pm-main .password-list-page {
+.pm-main .password-list-page,
+.pm-main .settings-wrap {
     grid-row: 3/4;
     grid-column: 2/3;
 }

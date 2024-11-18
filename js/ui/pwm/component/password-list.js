@@ -334,7 +334,7 @@ class MegaPasswordList extends MegaView {
             outer.append(span);
 
             item.domNode.prepend(outer);
-            generateFavicon(passwordName, pwmItem.url, outer);
+            mega.ui.pm.utils.generateFavicon(passwordName, pwmItem.url, outer);
 
             item.on('click', ({currentTarget}, noShowDetail) => {
                 const elemId = currentTarget.domNode.id;
@@ -481,7 +481,7 @@ class MegaPasswordList extends MegaView {
             searchResults = this.vaultPasswords.filter(item => {
                 return item.name.toLowerCase().includes(this.searchTerm)
                     || item.pwm.u && item.pwm.u.toLowerCase().includes(this.searchTerm)
-                    || item.pwm.url && fullDomainFromURL(item.pwm.url).includes(this.searchTerm);
+                    || item.pwm.url && mega.ui.pm.utils.fullDomainFromURL(item.pwm.url).includes(this.searchTerm);
             });
             this.searchResultsDiv.classList.remove('hidden');
         }

@@ -586,6 +586,7 @@ export class Schedule extends MegaRenderMixin {
                             chatRoom={this.props.chatRoom}
                             startDateTime={startDateTime}
                             endDateTime={endDateTime}
+                            isLoading={isLoading}
                             onMount={datepicker => {
                                 this.datepickerRefs.recurringEnd = datepicker;
                             }}
@@ -604,6 +605,7 @@ export class Schedule extends MegaRenderMixin {
                         <Column>
                             <Invite
                                 className={isLoading ? 'disabled' : ''}
+                                isLoading={isLoading}
                                 participants={participants}
                                 onSelect={this.handleParticipantSelect}
                             />
@@ -694,6 +696,7 @@ export class Schedule extends MegaRenderMixin {
 
                     <Textarea
                         name="description"
+                        isLoading={isLoading}
                         invalid={descriptionInvalid}
                         placeholder={l.schedule_description_input /* `Add a description` */}
                         value={description}
@@ -819,6 +822,7 @@ const Input = ({ name, placeholder, value, invalid, invalidMessage, autoFocus, i
                         type="text"
                         name={`${Schedule.NAMESPACE}-${name}`}
                         className={isLoading ? 'disabled' : ''}
+                        disabled={isLoading}
                         autoFocus={autoFocus}
                         autoComplete="off"
                         placeholder={placeholder}
@@ -861,10 +865,11 @@ const Checkbox = ({ name, className, checked, label, subLabel, isLoading, onTogg
                     className={`
                         checkdiv
                         ${checked ? 'checkboxOn' : 'checkboxOff'}
+                        ${isLoading ? 'disabled' : ''}
                     `}>
                     <input
                         name={`${Schedule.NAMESPACE}-${name}`}
-                        className={isLoading ? 'disabled' : ''}
+                        disabled={isLoading}
                         type="checkbox"
                         onChange={() => onToggle(name)}
                     />
@@ -874,7 +879,7 @@ const Checkbox = ({ name, className, checked, label, subLabel, isLoading, onTogg
                 <label
                     htmlFor={`${Schedule.NAMESPACE}-${name}`}
                     className={isLoading ? 'disabled' : ''}
-                    onClick={() => onToggle(name)}>
+                    onClick={() => isLoading ? null : onToggle(name)}>
                     {label}
                 </label>
                 {subLabel && <div className="sub-label">{subLabel}</div>}
@@ -889,6 +894,7 @@ const Checkbox = ({ name, className, checked, label, subLabel, isLoading, onTogg
  * @param toggled
  * @param label
  * @param isLoading
+ * @param subLabel
  * @param onToggle
  * @return {React.Element}
  */
@@ -906,7 +912,7 @@ const Switch = ({ name, toggled, label, isLoading, subLabel, onToggle }) => {
                         schedule-label
                         ${isLoading ? 'disabled' : ''}
                     `}
-                    onClick={() => onToggle(name)}>
+                    onClick={() => isLoading ? null : onToggle(name)}>
                     {label}
                 </span>
                 <div
@@ -915,7 +921,7 @@ const Switch = ({ name, toggled, label, isLoading, subLabel, onToggle }) => {
                         ${toggled ? 'toggle-on' : ''}
                         ${isLoading ? 'disabled' : ''}
                     `}
-                    onClick={() => onToggle(name)}>
+                    onClick={() => isLoading ? null : onToggle(name)}>
                     <div
                         className={`
                             mega-feature-switch
@@ -955,6 +961,7 @@ const Textarea = ({ name, placeholder, isLoading, value, invalid, onChange, onFo
                         className={isLoading ? 'disabled' : ''}
                         placeholder={placeholder}
                         value={value}
+                        readOnly={isLoading}
                         onChange={({ target }) => onChange(target.value)}
                         onFocus={onFocus}
                     />
@@ -991,7 +998,7 @@ const Footer = ({ isLoading, isEdit, topic, onSubmit }) => {
                         positive
                         ${isLoading ? 'disabled' : ''}
                     `}
-                    onClick={() => !isLoading && onSubmit()}
+                    onClick={() => isLoading ? null : onSubmit()}
                     topic={topic}>
                     <span>{isEdit ? l.update_meeting_button : l.schedule_meeting_button}</span>
                 </Button>
@@ -1006,6 +1013,7 @@ const Footer = ({ isLoading, isEdit, topic, onSubmit }) => {
  *
  * @returns {React.Element}
  */
+
 export const UpgradeNotice = ({ onUpgradeClicked }) => {
     return !!mega.flags.ff_chmon && (
         <Row className="schedule-upgrade-notice">

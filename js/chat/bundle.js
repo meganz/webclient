@@ -15404,6 +15404,10 @@ class Invite extends mixins.w9 {
   }
   render() {
     const {
+      className,
+      isLoading
+    } = this.props;
+    const {
       value,
       expanded,
       loading,
@@ -15413,13 +15417,15 @@ class Invite extends mixins.w9 {
       ref: this.containerRef,
       className: `
                     ${Invite.NAMESPACE}
-                    ${this.props.className || ''}
+                    ${className || ''}
                 `
     }, REaCt().createElement("div", {
       className: "multiple-input"
     }, REaCt().createElement("ul", {
       className: "token-input-list-mega",
-      onClick: ev => ev.target.classList.contains('token-input-list-mega') && this.setState({
+      onClick: ({
+        target
+      }) => isLoading ? null : target.classList.contains('token-input-list-mega') && this.setState({
         expanded: true
       })
     }, selected.map(handle => {
@@ -15436,7 +15442,7 @@ class Invite extends mixins.w9 {
         overflow: true
       }), REaCt().createElement("i", {
         className: "sprite-fm-mono icon-close-component",
-        onClick: () => this.handleSelect({
+        onClick: () => isLoading ? null : this.handleSelect({
           userHandle: handle
         })
       })));
@@ -15447,6 +15453,7 @@ class Invite extends mixins.w9 {
       type: "text",
       name: "participants",
       className: `${Invite.NAMESPACE}-input`,
+      disabled: isLoading,
       autoComplete: "off",
       placeholder: selected.length ? '' : l.schedule_participant_input,
       value,
@@ -15554,6 +15561,7 @@ class Datepicker extends REaCt().Component {
       name,
       className,
       placeholder,
+      isLoading,
       onFocus,
       onChange,
       onBlur
@@ -15573,6 +15581,7 @@ class Datepicker extends REaCt().Component {
                             ${className || ''}
                         `,
       autoComplete: "off",
+      disabled: isLoading,
       placeholder: placeholder || '',
       value: formattedValue,
       onFocus: ev => onFocus == null ? void 0 : onFocus(ev),
@@ -15580,7 +15589,7 @@ class Datepicker extends REaCt().Component {
       onBlur: ev => onBlur == null ? void 0 : onBlur(ev)
     }), REaCt().createElement("i", {
       className: "sprite-fm-mono icon-calendar1",
-      onClick: () => {
+      onClick: isLoading ? null : () => {
         if (this.datepicker) {
           let _this$inputRef$curren;
           this.datepicker.show();
@@ -15682,6 +15691,7 @@ class Select extends mixins.w9 {
       options,
       value,
       format,
+      isLoading,
       onChange,
       onBlur,
       onSelect
@@ -15698,7 +15708,7 @@ class Select extends mixins.w9 {
                         dropdown-input
                         ${typeable ? 'typeable' : ''}
                     `,
-      onClick: this.handleToggle
+      onClick: isLoading ? null : this.handleToggle
     }, typeable ? null : value && REaCt().createElement("span", null, format ? format(value) : value), REaCt().createElement("input", {
       ref: this.inputRef,
       type: "text",
@@ -15840,6 +15850,7 @@ class DateTime extends REaCt().Component {
     return REaCt().createElement(REaCt().Fragment, null, label && REaCt().createElement("span", null, label), REaCt().createElement(Datepicker, {
       name: `${Datepicker.NAMESPACE}-${name}`,
       className: isLoading ? 'disabled' : '',
+      isLoading,
       startDate,
       altField: `${Select.NAMESPACE}-${altField}`,
       value,
@@ -15862,6 +15873,7 @@ class DateTime extends REaCt().Component {
     }), REaCt().createElement(Select, {
       name: `${Select.NAMESPACE}-${altField}`,
       className: isLoading ? 'disabled' : '',
+      isLoading,
       typeable: true,
       options: filteredTimeIntervals,
       value: (() => typeof value === 'number' ? value : this.state.datepickerRef.currentDate.getTime())(),
@@ -15960,7 +15972,7 @@ class Recurring extends mixins.w9 {
       },
       monthDaysWarning: this.initialMonthDay > 28
     };
-    this.toggleView = (view, frequency, state) => this.setState({
+    this.toggleView = (view, frequency, state) => this.props.isLoading ? null : this.setState({
       view,
       frequency,
       ...state
@@ -15987,6 +15999,7 @@ class Recurring extends mixins.w9 {
         className: "inline",
         icon: true,
         value: posValues[posIdx].label,
+        isLoading: this.props.isLoading,
         options: posValues,
         onSelect: option => {
           this.setState(state => ({
@@ -16003,6 +16016,7 @@ class Recurring extends mixins.w9 {
         className: "inline",
         icon: true,
         value: dayValues[dayIdx].label,
+        isLoading: this.props.isLoading,
         options: dayValues,
         onSelect: option => {
           this.setState(state => ({
@@ -16026,6 +16040,7 @@ class Recurring extends mixins.w9 {
         name: `${Recurring.NAMESPACE}-interval`,
         value: interval > 0 ? interval : 1,
         icon: true,
+        isLoading: this.props.isLoading,
         options: [...Array(view === this.VIEWS.WEEKLY ? 52 : 12).keys()].map(value => {
           value += 1;
           return {
@@ -16153,7 +16168,7 @@ class Recurring extends mixins.w9 {
                                 ${isCurrentlySelected ? 'active' : ''}
                                 ${weekDays.length === 1 && isCurrentlySelected ? 'disabled' : ''}
                             `,
-        onClick: () => {
+        onClick: this.props.isLoading ? null : () => {
           if (view === this.VIEWS.WEEKLY) {
             return handleWeeklySelection(value, isCurrentlySelected);
           }
@@ -16172,6 +16187,10 @@ class Recurring extends mixins.w9 {
     }, (0,utils.lI)(mega.icu.format(view === this.VIEWS.MONTHLY ? l.recur_rate_monthly : l.recur_rate_weekly, interval > 0 ? interval : 1), "[S]", this.IntervalSelect));
   }
   renderEndControls() {
+    const {
+      isLoading,
+      onMount
+    } = this.props;
     const {
       end,
       prevEnd
@@ -16192,6 +16211,7 @@ class Recurring extends mixins.w9 {
     }, REaCt().createElement("input", {
       type: "radio",
       name: `${Recurring.NAMESPACE}-radio-end`,
+      disabled: isLoading,
       className: `
                                     uiTheme
                                     ${end ? 'radioOff' : 'radioOn'}
@@ -16206,12 +16226,10 @@ class Recurring extends mixins.w9 {
       className: "radio-txt"
     }, REaCt().createElement("span", {
       className: "recurring-radio-label",
-      onClick: () => {
-        this.setState(state => ({
-          end: undefined,
-          prevEnd: state.end || state.prevEnd
-        }));
-      }
+      onClick: () => isLoading ? null : this.setState(state => ({
+        end: undefined,
+        prevEnd: state.end || state.prevEnd
+      }))
     }, l.recurring_never))), REaCt().createElement("div", {
       className: "recurring-label-wrap"
     }, REaCt().createElement("div", {
@@ -16222,39 +16240,33 @@ class Recurring extends mixins.w9 {
     }, REaCt().createElement("input", {
       type: "radio",
       name: `${Recurring.NAMESPACE}-radio-end`,
+      disabled: isLoading,
       className: `
                                     uiTheme
                                     ${end ? 'radioOn' : 'radioOff'}
                                 `,
-      onChange: () => {
-        this.setState({
-          end: prevEnd || this.initialEnd
-        });
-      }
+      onChange: () => isLoading ? null : this.setState({
+        end: prevEnd || this.initialEnd
+      })
     })), REaCt().createElement("div", {
       className: "radio-txt"
     }, REaCt().createElement("span", {
       className: "recurring-radio-label",
-      onClick: () => {
-        return end ? null : this.setState({
-          end: prevEnd || this.initialEnd
-        });
-      }
+      onClick: () => isLoading || end ? null : this.setState({
+        end: prevEnd || this.initialEnd
+      })
     }, l.recurring_on), REaCt().createElement(Datepicker, {
       name: `${Recurring.NAMESPACE}-endDateTime`,
       position: "top left",
       startDate: end || this.initialEnd,
       selectedDates: [new Date(end)],
+      isLoading,
       value: end || prevEnd || '',
       placeholder: time2date(end || prevEnd || this.initialEnd / 1000, 18),
-      onMount: this.props.onMount,
-      onSelect: timestamp => {
-        this.setState({
-          end: timestamp
-        }, () => {
-          this.safeForceUpdate();
-        });
-      }
+      onMount,
+      onSelect: timestamp => this.setState({
+        end: timestamp
+      }, () => this.safeForceUpdate())
     })))));
   }
   renderDaily() {
@@ -16269,6 +16281,9 @@ class Recurring extends mixins.w9 {
   }
   renderMonthly() {
     const {
+      isLoading
+    } = this.props;
+    const {
       monthRule,
       monthDays,
       monthDaysWarning,
@@ -16280,7 +16295,7 @@ class Recurring extends mixins.w9 {
       className: "recurring-field-row"
     }, REaCt().createElement("div", {
       className: "recurring-radio-buttons",
-      onClick: ev => {
+      onClick: isLoading ? null : ev => {
         const {
           name,
           value
@@ -16302,6 +16317,7 @@ class Recurring extends mixins.w9 {
       type: "radio",
       name: `${Recurring.NAMESPACE}-radio-monthRule`,
       value: "day",
+      disabled: isLoading,
       className: `
                                         uiTheme
                                         ${monthRule === 'day' ? 'radioOn' : 'radioOff'}
@@ -16310,17 +16326,16 @@ class Recurring extends mixins.w9 {
       className: "radio-txt"
     }, REaCt().createElement("span", {
       className: "recurring-radio-label",
-      onClick: () => {
-        this.setState({
-          monthRule: this.MONTH_RULES.DAY
-        });
-      }
+      onClick: () => isLoading ? null : this.setState({
+        monthRule: this.MONTH_RULES.DAY
+      })
     }, l.recurring_frequency_day), REaCt().createElement("div", {
       className: "mega-input inline recurring-day"
     }, REaCt().createElement(Select, {
       name: `${Recurring.NAMESPACE}-monthDay`,
       icon: true,
       value: monthDays[0],
+      isLoading,
       options: [...Array(31).keys()].map(value => {
         value += 1;
         return {
@@ -16356,6 +16371,7 @@ class Recurring extends mixins.w9 {
       type: "radio",
       name: `${Recurring.NAMESPACE}-radio-monthRule`,
       value: "offset",
+      disabled: isLoading,
       className: `
                                         uiTheme
                                         ${monthRule === this.MONTH_RULES.OFFSET ? 'radioOn' : 'radioOff'}
@@ -16435,7 +16451,10 @@ class Recurring extends mixins.w9 {
       view
     } = this.state;
     return REaCt().createElement(Row, null, REaCt().createElement(Column, null), REaCt().createElement(Column, null, REaCt().createElement("div", {
-      className: NAMESPACE
+      className: `
+                            ${NAMESPACE}
+                            ${this.props.isLoading ? 'disabled' : ''}
+                        `
     }, REaCt().createElement("div", {
       className: `${NAMESPACE}-container`
     }, REaCt().createElement("div", {
@@ -17152,6 +17171,7 @@ class Schedule extends mixins.w9 {
       chatRoom: this.props.chatRoom,
       startDateTime,
       endDateTime,
+      isLoading,
       onMount: datepicker => {
         this.datepickerRefs.recurringEnd = datepicker;
       },
@@ -17164,6 +17184,7 @@ class Schedule extends mixins.w9 {
       className: "sprite-fm-mono icon-contacts"
     })), REaCt().createElement(Column, null, REaCt().createElement(Invite, {
       className: isLoading ? 'disabled' : '',
+      isLoading,
       participants,
       onSelect: this.handleParticipantSelect
     }))), REaCt().createElement(Switch, {
@@ -17217,6 +17238,7 @@ class Schedule extends mixins.w9 {
                                                 class="clickurl">
                                             `).replace('[/A]', '</a>')))) : null, REaCt().createElement(Textarea, {
       name: "description",
+      isLoading,
       invalid: descriptionInvalid,
       placeholder: l.schedule_description_input,
       value: description,
@@ -17324,6 +17346,7 @@ const Input = ({
     type: "text",
     name: `${Schedule.NAMESPACE}-${name}`,
     className: isLoading ? 'disabled' : '',
+    disabled: isLoading,
     autoFocus,
     autoComplete: "off",
     placeholder,
@@ -17354,10 +17377,11 @@ const Checkbox = ({
     className: `
                         checkdiv
                         ${checked ? 'checkboxOn' : 'checkboxOff'}
+                        ${isLoading ? 'disabled' : ''}
                     `
   }, REaCt().createElement("input", {
     name: `${Schedule.NAMESPACE}-${name}`,
-    className: isLoading ? 'disabled' : '',
+    disabled: isLoading,
     type: "checkbox",
     onChange: () => onToggle(name)
   }))), REaCt().createElement(Column, {
@@ -17365,7 +17389,7 @@ const Checkbox = ({
   }, REaCt().createElement("label", {
     htmlFor: `${Schedule.NAMESPACE}-${name}`,
     className: isLoading ? 'disabled' : '',
-    onClick: () => onToggle(name)
+    onClick: () => isLoading ? null : onToggle(name)
   }, label), subLabel && REaCt().createElement("div", {
     className: "sub-label"
   }, subLabel)));
@@ -17388,14 +17412,14 @@ const Switch = ({
                         schedule-label
                         ${isLoading ? 'disabled' : ''}
                     `,
-    onClick: () => onToggle(name)
+    onClick: () => isLoading ? null : onToggle(name)
   }, label), REaCt().createElement("div", {
     className: `
                         mega-switch
                         ${toggled ? 'toggle-on' : ''}
                         ${isLoading ? 'disabled' : ''}
                     `,
-    onClick: () => onToggle(name)
+    onClick: () => isLoading ? null : onToggle(name)
   }, REaCt().createElement("div", {
     className: `
                             mega-feature-switch
@@ -17426,6 +17450,7 @@ const Textarea = ({
     className: isLoading ? 'disabled' : '',
     placeholder,
     value,
+    readOnly: isLoading,
     onChange: ({
       target
     }) => onChange(target.value),
@@ -17450,7 +17475,7 @@ const Footer = ({
                         positive
                         ${isLoading ? 'disabled' : ''}
                     `,
-    onClick: () => !isLoading && onSubmit(),
+    onClick: () => isLoading ? null : onSubmit(),
     topic
   }, REaCt().createElement("span", null, isEdit ? l.update_meeting_button : l.schedule_meeting_button))));
 };

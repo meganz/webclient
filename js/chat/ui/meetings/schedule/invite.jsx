@@ -169,6 +169,7 @@ export default class Invite extends MegaRenderMixin {
     }
 
     render() {
+        const { className, isLoading } = this.props;
         const { value, expanded, loading, selected } = this.state;
 
         return (
@@ -176,13 +177,15 @@ export default class Invite extends MegaRenderMixin {
                 ref={this.containerRef}
                 className={`
                     ${Invite.NAMESPACE}
-                    ${this.props.className || ''}
+                    ${className || ''}
                 `}>
                 <div className="multiple-input">
                     <ul
                         className="token-input-list-mega"
-                        onClick={ev =>
-                            ev.target.classList.contains('token-input-list-mega') && this.setState({ expanded: true })
+                        onClick={({ target }) =>
+                            isLoading ?
+                                null :
+                                target.classList.contains('token-input-list-mega') && this.setState({ expanded: true })
                         }>
                         {selected.map(handle => {
                             return (
@@ -194,7 +197,7 @@ export default class Invite extends MegaRenderMixin {
                                         <ContactAwareName contact={M.u[handle]} overflow={true} />
                                         <i
                                             className="sprite-fm-mono icon-close-component"
-                                            onClick={() => this.handleSelect({ userHandle: handle })}
+                                            onClick={() => isLoading ? null : this.handleSelect({ userHandle: handle })}
                                         />
                                     </div>
                                 </li>
@@ -206,6 +209,7 @@ export default class Invite extends MegaRenderMixin {
                                 type="text"
                                 name="participants"
                                 className={`${Invite.NAMESPACE}-input`}
+                                disabled={isLoading}
                                 autoComplete="off"
                                 placeholder={
                                     selected.length ? '' : l.schedule_participant_input /* `Add participants` */

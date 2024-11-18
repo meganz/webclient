@@ -1781,8 +1781,17 @@ lazy(pro, 'proplan2', () => {
 
         async initPage() {
 
-            // validate the request, checking for business + proFlexi
+            // TODO: Use only one of either window or sessionStorage for accessing a mega.nz/pro tab
+            const canAccessProPage = u_attr
+                || (window.mProTab === 'exc')       // This will force the user to login, and pre-select the tab
+                || (sessionStorage.mScrollTo === 'exc')     // Does the same as above
+                || (localStorage.allowLoggedOutPricingPage);        // May be useful for future testing
 
+            if (!canAccessProPage) {
+                mega.redirect('mega.io', 'pricing', false, false);
+            }
+
+            // validate the request, checking for business + proFlexi
             if (!validatePageRequest()) {
                 return false;
             }

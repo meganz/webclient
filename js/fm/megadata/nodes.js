@@ -251,6 +251,10 @@ MegaData.prototype.getPath = function(id) {
             // Container and Bucket will using existing method as it's node handle exist in M.d.
             return s4.utils.getS4SubPath(cv.original);
         }
+        else if (cv.type === 'pwm' && id === 'account') {
+            // Get PWM subpath only for account subpage
+            return [id, 'pwm'];
+        }
         else if (!id || id.length !== 11) {
             return [];
         }
@@ -473,6 +477,8 @@ MegaData.prototype.isCustomView = function(pathOrID) {
         result.nodeID = pathOrID.replace('pwm/', '');
         result.prefixTree = '';
         result.prefixPath = 'pwm/';
+        result.subType = pathOrID.replace('pwm/', '');
+        result.original = pathOrID;
     }
 
     // This is not a out-share or a public-link

@@ -304,6 +304,9 @@ class MegaMobileTopMenu extends MegaComponent {
         else if (page.startsWith('fm/account')) {
             return '/fm/account';
         }
+        else if (page.endsWith('account')) {
+            return `/${page}`;
+        }
         else if (page === 'fm' || `fm/${root}` === `fm/${M.RootID}`) {
             return '/fm';
         }

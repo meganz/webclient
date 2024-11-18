@@ -199,7 +199,7 @@ mega.ui.MegaInputs.prototype.pmText._withIconOrPrefix = function() {
         const $copyBtn = $('.copy-input-value', $wrapper);
 
         const copyButton = () => {
-            copyPMToClipboard(
+            mega.ui.pm.utils.copyPMToClipboard(
                 $input.val(),
                 this.options.copyToastText ? escapeHTML(this.options.copyToastText) : l.clipboard_copied
             );
@@ -308,7 +308,7 @@ mega.ui.MegaInputs.prototype.pmText._withIconOrPrefix = function() {
             $input.rebind('input.colorizedPassword change.colorizedPassword', () => {
                 const viewPassword = wrapper.querySelector('.password-colorized');
                 viewPassword.textContent = '';
-                viewPassword.appendChild(colorizedPassword($input.val()));
+                viewPassword.appendChild(mega.ui.pm.utils.colorizedPassword($input.val()));
             });
         }
     }
@@ -362,7 +362,7 @@ mega.ui.MegaInputs.prototype.pmText._strengthChecker = function() {
                             'icon-alert-circle-thin-outline',
                             'icon-alert-triangle-thin-outline');
 
-                const strength = classifyPMPassword($input.val());
+                const strength = mega.ui.pm.utils.classifyPMPassword($input.val());
 
                 if (typeof strength === 'object') {
                     $passStatus.addClass(`${strength.className} checked`);

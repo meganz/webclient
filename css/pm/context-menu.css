@@ -6,10 +6,6 @@
 .mega-component.context-menu.menu-container {
     max-width: 312px;
 }
-.mega-component.context-menu.menu-container.overlay-wrap {
-    background-color: var(--mobile-page-background);
-    border: 1px solid var(--mobile-border-strong)
-}
 .mega-component.context-menu .context-menu-items {
     display: flex;
     flex-direction: column;

@@ -15667,8 +15667,7 @@ Invite.NAMESPACE = 'meetings-invite';
 const helpers = REQ_(110);
 ;// ./js/chat/ui/meetings/schedule/datepicker.jsx
 
-
-class Datepicker extends mixins.w9 {
+class Datepicker extends REaCt().Component {
   constructor(props) {
     super(props);
     this.OPTIONS = {
@@ -15721,13 +15720,11 @@ class Datepicker extends mixins.w9 {
     }
   }
   componentWillUnmount() {
-    super.componentWillUnmount();
     if (this.containerRef && this.containerRef.current) {
       $(this.containerRef.current).unbind(`keyup.${Datepicker.NAMESPACE}`);
     }
   }
   componentDidMount() {
-    super.componentDidMount();
     M.require('datepicker_js').done(() => this.initialize());
     if (this.containerRef && this.containerRef.current) {
       $(this.containerRef.current).rebind(`keyup.${Datepicker.NAMESPACE}`, ({
@@ -15980,8 +15977,7 @@ Select.NAMESPACE = 'meetings-select';
 
 
 
-
-class DateTime extends mixins.w9 {
+class DateTime extends REaCt().Component {
   constructor(...args) {
     super(...args);
     this.state = {
@@ -16679,7 +16675,9 @@ class Edit extends mixins.w9 {
               endDateTime: startDateTime + this.interval
             });
           }
-          this.datepickerRefs.startDateTime.selectDate(new Date(endDateTime - this.interval));
+          this.handleTimeSelect({
+            startDateTime: endDateTime - this.interval
+          });
         }
       });
     };
@@ -16978,7 +16976,9 @@ class Schedule extends mixins.w9 {
             endDateTime: startDateTime + this.interval
           });
         }
-        this.datepickerRefs.startDateTime.selectDate(new Date(endDateTime - this.interval));
+        this.handleDateSelect({
+          startDateTime: endDateTime - this.interval
+        });
       }
     };
     this.handleToggle = prop => {

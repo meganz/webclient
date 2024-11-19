@@ -66,6 +66,10 @@ html .theme-light-forced {
 
     /* outline */
         --field-outline: rgba(189, 217, 255, 1);
+
+    /* Settings */
+        --settings-page-background: var(--mobile-surface-2);
+        --settings-list-background: var(--mobile-page-background);
 }
 
 /* dark theme */
@@ -75,4 +79,8 @@ html .theme-dark-forced {
 
     /* outline */
         --field-outline: rgb(38, 71, 208);
+
+    /* Settings */
+        --settings-page-background: var(--mobile-page-background);
+        --settings-list-background: var(--mobile-surface-1);
 }

@@ -28,7 +28,7 @@
             });
 
             copyPasswordIcon.on('click', () => {
-                copyPMToClipboard(this.previewPassword.textContent, l[19602]);
+                mega.ui.pm.utils.copyPMToClipboard(this.previewPassword.textContent, l[19602]);
                 eventlog(500552);
             });
             preview.append(this.previewPassword, copyPassword);
@@ -82,7 +82,7 @@
             const password = this.generatePassword();
             const passwordStrength = zxcvbn(password).score;
 
-            this.previewPassword.append(colorizedPassword(password));
+            this.previewPassword.append(mega.ui.pm.utils.colorizedPassword(password));
 
             const icon = this.strength.querySelector('.strength-icon');
             const text = this.strength.querySelector('.strength-text');

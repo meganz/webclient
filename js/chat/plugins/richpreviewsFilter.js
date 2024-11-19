@@ -542,8 +542,8 @@ RichpreviewsFilter.syncFromAttribute = function() {
         .always(function() {
             const path = String(M.currentdirid);
 
-            if (path.includes("account") && !path.includes('user-management')) {
-                // below if statment is to exlude URLs having user-management (Business)
+            if (path.includes("account") && !path.includes('user-management') && !path.includes('pwm')) {
+                // below if statment is to exlude URLs having user-management (Business) and pwm
                 accountUI();
             }
         });

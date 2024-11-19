@@ -131,6 +131,10 @@ class MegaComponent extends MegaDataEmitter {
         return this.domNode.classList.contains(sel);
     }
 
+    toggleClass(sel) {
+        return this.domNode.classList.toggle(sel);
+    }
+
     get visible() {
         return !this.domNode.classList.contains('hidden');
     }

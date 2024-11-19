@@ -143,6 +143,9 @@
     cursor: pointer;
     z-index: 100;
 }
+.meetings-call .messages.scroll-area .messages-toast.active {
+    bottom: 52px;
+}
 .messages.scroll-area .messages-toast i {
     position: absolute;
     top: 50%;
@@ -926,7 +929,7 @@
     display: flex;
     align-items: center;
     height: 50px;
-    width: 402px;
+    width: 95%;
     border-radius: 8px;
     background-color: var(--stroke-grey-1);
     border: 1px solid var(--stroke-grey-2);
@@ -983,15 +986,16 @@ body.theme-dark .message .audio-player {
 }
 
 .message .audio-player .slider {
+    display: block;
+    width: calc(100% - 120px);
     height: 2px;
-    background-color: #DDD;
-    display: inline-block;
-    width: 284px;
     position: absolute;
     top: 50%;
-    left: 55px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    margin: 0 0 0 -15px;
+    background-color: #DDD;
 }
-
 .message .audio-player .slider__progress {
     background-color: var(--secondary-red);
     height: 2px;
@@ -1292,6 +1296,10 @@ body.theme-dark .message .audio-player {
     position: relative;
 }
 
+.meetings-call .message.schedule-message .schedule-detail-block {
+    display: block;
+}
+
 .message.schedule-message .schedule-detail-block div {
     flex: 1;
 }
@@ -1300,6 +1308,10 @@ body.theme-dark .message .audio-player {
     color: var(--text-color-high);
     font: var(--text-body1-bold);
     max-width: 50%;
+}
+
+.meetings-call .message.schedule-message .schedule-detail-block .schedule-meeting-title {
+    max-width: 100%;
 }
 
 .message.schedule-message .schedule-detail-block .schedule-calendar-icon {
@@ -1313,6 +1325,11 @@ body.theme-dark .message .audio-player {
     margin-inline-end: 24px;
     -webkit-margin-end: 24px;
     text-align: center;
+}
+
+.meetings-call .message.schedule-message .schedule-detail-block .schedule-calendar-icon {
+    float: left;
+    width: 50px;
 }
 
 .message.schedule-message .schedule-calendar-icon .schedule-date {
@@ -1333,6 +1350,10 @@ body.theme-dark .message .audio-player {
     max-width: 45%;
 }
 
+.meetings-call .message.schedule-message .schedule-detail-block .schedule-timing-block {
+    max-width: 100%;
+}
+
 .message.schedule-message .schedule-timing-block s {
     display: block;
 }
@@ -1340,6 +1361,10 @@ body.theme-dark .message .audio-player {
 .message.schedule-message .schedule-detail-block button {
     align-self: flex-end;
     margin: auto 0;
+}
+
+.meetings-call .message.schedule-message .schedule-detail-block button {
+    margin: 12px 0 0;
 }
 
 .message.schedule-message .schedule-description {

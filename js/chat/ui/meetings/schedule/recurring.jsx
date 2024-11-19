@@ -680,7 +680,7 @@ export class Edit extends MegaRenderMixin {
                 if (endDateTime < Date.now()) {
                     return this.setState({ endDateTime: startDateTime + this.interval });
                 }
-                this.datepickerRefs.startDateTime.selectDate(new Date(endDateTime - this.interval));
+                this.handleTimeSelect({ startDateTime: endDateTime - this.interval });
             }
         });
     };

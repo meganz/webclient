@@ -1,7 +1,6 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../mixins.js';
 
-export default class Datepicker extends MegaRenderMixin {
+export default class Datepicker extends React.Component {
     static NAMESPACE = 'meetings-datepicker';
 
     OPTIONS = {
@@ -69,14 +68,12 @@ export default class Datepicker extends MegaRenderMixin {
     }
 
     componentWillUnmount() {
-        super.componentWillUnmount();
         if (this.containerRef && this.containerRef.current) {
             $(this.containerRef.current).unbind(`keyup.${Datepicker.NAMESPACE}`);
         }
     }
 
     componentDidMount() {
-        super.componentDidMount();
         M.require('datepicker_js').done(() => this.initialize());
 
         if (this.containerRef && this.containerRef.current) {

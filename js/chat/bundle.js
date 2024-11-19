@@ -22271,7 +22271,7 @@ class Participant extends mixins.w9 {
       stream: source,
       onSpeakerChange,
       onModeChange
-    })), chatRoom.iAmOperator() && u_handle !== handle && REaCt().createElement("li", null, REaCt().createElement(meetings_button.A, {
+    })), call.isPublic && chatRoom.iAmOperator() && u_handle !== handle && REaCt().createElement("li", null, REaCt().createElement(meetings_button.A, {
       icon: "sprite-fm-mono icon-disabled-filled",
       onClick: () => chatRoom.trigger('onRemoveUserRequest', handle)
     }, REaCt().createElement("span", null, l[8867]))))))));

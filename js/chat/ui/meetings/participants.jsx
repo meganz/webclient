@@ -160,7 +160,7 @@ class Participant extends MegaRenderMixin {
                                         onModeChange={onModeChange}
                                     />
                                 </li>
-                                {chatRoom.iAmOperator() && u_handle !== handle &&
+                                {call.isPublic && chatRoom.iAmOperator() && u_handle !== handle &&
                                     <li>
                                         <Button
                                             icon="sprite-fm-mono icon-disabled-filled"

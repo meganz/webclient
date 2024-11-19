@@ -15280,8 +15280,7 @@ class Start extends mixins.w9 {
       video: false,
       editing: false,
       previousTopic: undefined,
-      topic: undefined,
-      mounted: false
+      topic: undefined
     };
     this.handleChange = ev => this.setState({
       topic: ev.target.value
@@ -15350,9 +15349,10 @@ class Start extends mixins.w9 {
   componentDidMount() {
     super.componentDidMount();
     this.bindEvents();
-    M.safeShowDialog(Start.dialogName, () => this.setState({
-      mounted: true
-    }));
+    if ($.dialog === 'onboardingDialog') {
+      closeDialog();
+    }
+    M.safeShowDialog(Start.dialogName, () => $(`#${Start.NAMESPACE}`));
   }
   componentWillUnmount() {
     super.componentWillUnmount();
@@ -15371,7 +15371,8 @@ class Start extends mixins.w9 {
       topic
     } = this.state;
     return REaCt().createElement(modalDialogs.A.ModalDialog, (0,esm_extends.A)({}, this.state, {
-      name: NAMESPACE,
+      id: NAMESPACE,
+      dialogName: NAMESPACE,
       className: NAMESPACE,
       stopKeyPropagation: editing,
       onClose: () => this.props.onClose()

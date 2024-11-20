@@ -385,9 +385,9 @@ MegaData.prototype.isCustomView = function(pathOrID) {
             result.subType = ['keys', 'policies', 'users', 'groups'].includes(s4path[2]) ? s4path[2] : 'bucket';
         }
         else if (s4path.length === 2 && node.p !== M.RootID) {
-            result.containerID = node.p;
+            result.containerID = s4.utils.getBucketNode(node).p || node.p;
             result.nodeID = s4path[1];
-            result.prefixPath = `${node.p}/`;
+            result.prefixPath = `${result.containerID}/`;
             result.subType = 'bucket';
         }
         else if (s4path.length === 2) {
@@ -4774,7 +4774,7 @@ MegaData.prototype.shouldCreateThumbnail = function(target) {
 };
 
 /**
- * Simplified check whether an object is a S4 container or bucket node
+ * Simplified check whether a node is a S4 container or bucket node
  * @param {MegaNode|Object|String} n The object to check
  * @returns {String} Node type
  */
@@ -4785,7 +4785,7 @@ MegaData.prototype.getS4NodeType = function(n) {
         n = this.getNodeByHandle(n);
     }
 
-    if (n && n.s4 && crypto_keyok(n)) {
+    if (n && crypto_keyok(n)) {
 
         if ('kernel' in s4) {
             return s4.kernel.getS4NodeType(n);
@@ -4807,7 +4807,7 @@ MegaData.prototype.getS4NodeType = function(n) {
             return 'container';
         }
 
-        if ("pao" in n.s4 && (n = this.d[n.p]) && isc(n)) {
+        if ((n = this.d[n.p]) && isc(n)) {
             return 'bucket';
         }
     }

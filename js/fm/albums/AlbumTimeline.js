@@ -105,6 +105,10 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                     label: l.set_as_album_cover,
                     icon: 'images',
                     click: () => {
+                        if (M.isInvalidUserStatus()) {
+                            return;
+                        }
+
                         if (albums.grid.timeline.selCount === 1) {
                             albums.updateAlbumCover(album, Object.keys(albums.grid.timeline.selections)[0]);
                         }
@@ -119,6 +123,10 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                         label: l.album_item_remove_label,
                         icon: 'bin',
                         click: () => {
+                            if (M.isInvalidUserStatus()) {
+                                return;
+                            }
+
                             albums.requestAlbumElementsRemoval();
                         },
                         classes: ['red']
@@ -179,6 +187,10 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                     label: l.album_download,
                     icon: 'download-small',
                     click: () => {
+                        if (M.isInvalidUserStatus()) {
+                            return;
+                        }
+
                         if (!M.isAlbumsPage()) {
                             return;
                         }

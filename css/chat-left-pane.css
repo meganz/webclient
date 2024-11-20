@@ -1758,6 +1758,7 @@ td.verification .contact-item {
     margin: 0 auto;
     padding: 0;
     border: 0;
+    background: transparent;
 }
 
 .conversationsApp .lhp-nav-button i {

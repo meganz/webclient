@@ -22210,8 +22210,14 @@ class Participant extends mixins.w9 {
       onSpeakerChange,
       onModeChange
     } = this.props;
+    const {
+      isOnHold,
+      videoMuted,
+      audioMuted,
+      clientId
+    } = source;
     const hasRelationship = contactsPanel.A.hasRelationship(contact);
-    return REaCt().createElement(REaCt().Fragment, null, this.state.raisedHandPeers.includes(handle) ? REaCt().createElement("div", {
+    return REaCt().createElement(REaCt().Fragment, null, this.state.raisedHandPeers.includes(handle) && !isOnHold ? REaCt().createElement("div", {
       className: "participant-signifier"
     }, REaCt().createElement("i", {
       className: "sprite-fm-uni icon-raise-hand"
@@ -22231,7 +22237,7 @@ class Participant extends mixins.w9 {
     }, REaCt().createElement("span", null)) : null, REaCt().createElement("i", {
       className: `
                             ${this.baseIconClass}
-                            ${source.videoMuted ? 'icon-video-off-thin-outline inactive' : 'icon-video-thin-outline'}
+                            ${videoMuted ? 'icon-video-off-thin-outline inactive' : 'icon-video-thin-outline'}
                         `
     }), REaCt().createElement(videoNode.Gz, {
       source
@@ -22249,10 +22255,10 @@ class Participant extends mixins.w9 {
         onCallMinimize();
         loadSubPage(`fm/chat/contacts/${handle}`);
       }
-    }, REaCt().createElement("span", null, l[6859]))) : null, chatRoom.iAmOperator() && u_handle !== handle && !source.audioMuted && REaCt().createElement("li", null, REaCt().createElement(meetings_button.A, {
+    }, REaCt().createElement("span", null, l[6859]))) : null, chatRoom.iAmOperator() && u_handle !== handle && !audioMuted && REaCt().createElement("li", null, REaCt().createElement(meetings_button.A, {
       icon: "sprite-fm-mono icon-mic-off-thin-outline",
       onClick: () => {
-        call.sfuClient.mutePeer(source.clientId);
+        call.sfuClient.mutePeer(clientId);
         megaChat.plugins.userHelper.getUserNickname(handle).catch(dump).always(name => {
           ChatToast.quick(l.you_muted_peer.replace('%NAME', name || ''));
         });

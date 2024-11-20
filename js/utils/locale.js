@@ -1990,6 +1990,10 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[B]', '<b>')
         .replace('[/B]', '</b>');
 
+    l.import_notes = escapeHTML(l.import_notes)
+        .replace('[A]', `<a href="https://help.mega.io/pass/features/import-passwords" target="_blank">`)
+        .replace('[/A]', '</a>');
+
     l.referral_close_full = escapeHTML(l.referral_close_full)
         .replace('[A]', '<a href="https://mega.io/refer" target="_blank" class="clickurl">')
         .replace('[/A]', '</a>');

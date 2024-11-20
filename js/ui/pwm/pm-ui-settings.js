@@ -46,9 +46,9 @@ mega.ui.pm.settings = {
 
         const settingsContainer = document.querySelector('.settings-container');
 
-        const settingsUI = {};
+        this.settingsUI = {};
 
-        settingsUI.accountList = new MegaPassList({
+        this.settingsUI.accountList = new MegaPassList({
             parentNode: settingsContainer,
             title: l.mega_account_title,
             items: {
@@ -68,7 +68,7 @@ mega.ui.pm.settings = {
             }
         });
 
-        const importBlock = settingsUI.import = new MegaPassList({
+        const importBlock = this.settingsUI.import = new MegaPassList({
             parentNode: settingsContainer,
             title: l.import_title
         });
@@ -86,7 +86,7 @@ mega.ui.pm.settings = {
         titleItemText.appendChild(importTitle);
         const importSubtitle = document.createElement('span');
         importSubtitle.className = 'mega-item-list-subtitle';
-        importSubtitle.textContent = l.import_notes;
+        importSubtitle.append(parseHTML(l.import_notes));
         titleItemText.appendChild(importSubtitle);
         importBlock.listNode.append(importTitleItem);
 
@@ -106,7 +106,7 @@ mega.ui.pm.settings = {
         const buttonLine = document.createElement('div');
         buttonLine.className = 'mega-list-item-second';
         importSelectItem.appendChild(buttonLine);
-        settingsUI.importProviderDropdown = new MegaDropdown({
+        this.settingsUI.importProviderDropdown = new MegaDropdown({
             parentNode: buttonLine,
             dropdownOptions: {},
             text: l.google_password_manager,
@@ -152,7 +152,6 @@ mega.ui.pm.settings = {
             parentNode: importButtonLine,
             text: l.import_passwords_btn,
             disabled: true,
-            loader: true,
             componentClassname: 'import-file',
             onClick: () => {
                 if (this.file && mega.pm.validateUserStatus()) {
@@ -207,7 +206,7 @@ mega.ui.pm.settings = {
             }
         });
 
-        settingsUI.securityList = new MegaPassList({
+        this.settingsUI.securityList = new MegaPassList({
             parentNode: settingsContainer,
             title: l[7337],
             items: {
@@ -215,6 +214,7 @@ mega.ui.pm.settings = {
                     title: l.recovery_key_title,
                     subtitle: parseHTML(l.recovery_key_subtitle),
                     iconButton: {
+                        className: 'text-icon',
                         icon: 'sprite-pm-mono icon-download-thin-outline',
                         text: l.recovery_key_button_label,
                         iconSize: 24,
@@ -235,7 +235,7 @@ mega.ui.pm.settings = {
             }
         });
 
-        settingsUI.contactList = new MegaPassList({
+        this.settingsUI.contactList = new MegaPassList({
             parentNode: settingsContainer,
             title: l.footer_heading_help,
             items: {
@@ -263,6 +263,29 @@ mega.ui.pm.settings = {
                         iconSizeSmall: 16,
                         title: l[399],
                         evId: 500581
+                    }
+                }
+            }
+        });
+
+        this.settingsUI.deleteAll = new MegaPassList({
+            parentNode: settingsContainer,
+            title: l.delete_passwords,
+            items: {
+                'delete-all': {
+                    title: l.delete_all,
+                    subtitle: l.delete_all_msg,
+                    componentClassname: 'wrap',
+                    textInteractable: {
+                        className: 'delete-all destructive',
+                        text: l.delete_all_btn,
+                        loaderColor: 'w',
+                        onClick: ({currentTarget}) => {
+                            if (mega.pm.validateUserStatus()) {
+                                mega.ui.pm.delete.showConfirmAll(currentTarget);
+                                eventlog(500601);
+                            }
+                        }
                     }
                 }
             }

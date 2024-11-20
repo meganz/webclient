@@ -346,12 +346,20 @@ button.nav-elem.no-active:active,
     -webkit-margin-start: -8px;
 }
 
-.nav-elem i.loading {
+.nav-elem.loading.sprite-fm-theme-after::after,
+.nav-elem.loading.sprite-fm-uni-after::after {
     animation-name: rotate;
     animation-duration: 1000ms;
     animation-iteration-count: infinite;
-    animation-timing-function: linear;
+    animation-timing-function: steps(8, end);
     margin: auto; /* Justify in center */
+    display: block;
+    --icon-size: 22px;
+    position: absolute;
+}
+
+.nav-elem.loading .text-box-wrapper.sk-elm {
+    opacity: 0;
 }
 
 .nav-elem .multi-text-box {

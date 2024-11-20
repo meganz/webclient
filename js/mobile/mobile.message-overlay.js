@@ -73,7 +73,7 @@ var megaMsgDialog = (() => {
         }
     }
 
-    function generateAdditionalButtons(buttonsArg) {
+    function generateAdditionalButtons(buttonsArg, confirmButtonClass) {
         if (buttonsArg) {
             if (Array.isArray(buttonsArg)) {
                 let button;
@@ -83,6 +83,7 @@ var megaMsgDialog = (() => {
                         button = typeof button === 'string' ? {
                             ...buttonTemplate,
                             text: button,
+                            componentClassname: confirmButtonClass
                         } : button;
                         confirmButton = button;
                     }
@@ -161,6 +162,7 @@ var megaMsgDialog = (() => {
          * @param {Object} [options] Object containing additional options for the overlay.
          * @param {String|Object} [options.icon] Sheet icon class to display. May be string or sheet icon class.
          * @param {String|List} [options.buttons] Additional buttons to display. If string, button is added
+         * @param {String} [options.confirmButtonClass] An optional CSS class to apply to the confirmation button.
          * as secondary "Failure/cancel" button. If array, i=0 is confirm, i>0 is cancel and index is passed.
          * @param {Boolean} [safeShow] Whether to use M.safeShowDialog or not, mainly for msgDialogs which in
          * desktop web are shown without this mechanism.
@@ -188,6 +190,7 @@ var megaMsgDialog = (() => {
                 confirmButton = {
                     ...buttonTemplate,
                     text: l.ok_button, // OK, got it!
+                    componentClassname: options.confirmButtonClass
                 };
                 buttons = [];
 
@@ -219,7 +222,7 @@ var megaMsgDialog = (() => {
 
                 if (options) {
                     renderIcon(options.icon);
-                    generateAdditionalButtons(options.buttons);
+                    generateAdditionalButtons(options.buttons, options.confirmButtonClass);
                 }
 
                 // Bind to the sheet actions

@@ -3,7 +3,7 @@ class MegaPassListItem extends MegaComponent {
     constructor(options) {
         super(options);
 
-        this.domNode.classList.add('mega-list-item');
+        this.addClass('mega-list-item');
 
         this.rightcontainer = document.createElement('div');
         this.rightcontainer.className = 'mega-list-item-right';
@@ -46,14 +46,16 @@ class MegaPassListItem extends MegaComponent {
         }
 
         if (options.iconButton) {
-
             const interactableClass = options.iconButton.href ? MegaLink : MegaButton;
-
             const fullButton = new interactableClass({
                 parentNode: this.rightcontainer,
-                componentClassname: 'full-button text-icon',
+                componentClassname: `full-button ${options.iconButton.className || ''}`,
                 ...options.iconButton
             });
+
+            if (!options.iconButton.href && !options.iconButton.className) {
+                fullButton.addClass('secondary');
+            }
 
             if (options.iconButton.iconSizeSmall) {
                 options.iconButton.iconSize = options.iconButton.iconSizeSmall;
@@ -76,6 +78,29 @@ class MegaPassListItem extends MegaComponent {
                     eventlog(options.iconButton.evId);
                 });
             }
+        }
+
+        if (options.textInteractable) {
+            const {textInteractable} = options;
+            const interactableClass = textInteractable.href ? MegaLink : MegaButton;
+
+            const fullButton = new interactableClass({
+                parentNode: this.rightcontainer,
+                componentClassname: `full-text-button ${textInteractable.className || ''}`,
+                ...textInteractable
+            });
+
+            if (!textInteractable.href && !textInteractable.className) {
+                fullButton.addClass('secondary');
+            }
+
+            if (textInteractable.evId) {
+                fullButton.on('click', () => {
+                    eventlog(textInteractable.evId);
+                });
+            }
+
+            this.addClass('text-button');
         }
 
         if (options.toggle) {

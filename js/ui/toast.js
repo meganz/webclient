@@ -1070,7 +1070,7 @@ window.toastRack = (() => {
  * @param {Number} [timeout] -  - The approximate time to display the toast for. Will be rounded up to the next 0.5s.
  * @returns {undefined}
  */
-window.showToast = function(
+function showToast(
     type,
     content,
     firstButtonText,
@@ -1104,6 +1104,11 @@ window.showToast = function(
     const span = document.createElement('span');
     span.className = 'message';
     $(span).safeHTML(content);
+
+    if (typeof firstButtonText === 'number') {
+        timeout = firstButtonText;
+        firstButtonText = 0;
+    }
 
     // buttons
     let buttons;

@@ -31,7 +31,7 @@ function init_page() {
         throw new Error('Unexpected access...');
     }
 
-    const [ph, key, opt] = isPublicLink(page);
+    const [ph, key, opt] = isPublicLink(page) || [];
     $.playbackOptions = opt;
 
     var init = function(res) {
@@ -119,7 +119,7 @@ function init_embed(ph, key, g) {
                 if (playing && document.getElementById('timecheckbox').checked) {
                     content = content.replace(/[!/][\w-]{8}[!#][^"]+/, '$&!' + timeoffset + 's');
                 }
-                copyToClipboard(content, 1);
+                copyToClipboard(content, l[16763]);
             });
 
             $('.share-link .tab-content', $block).rebind('click', () => {
@@ -151,15 +151,6 @@ function init_embed(ph, key, g) {
 
             $block.removeClass('hidden');
             $wrapper.addClass('main-blur-block share-option');
-        });
-
-        $('.audio-wrapper .share').rebind('click', function() {
-            copyToClipboard(getBaseUrl() + link, 1);
-            const $this = $(this).addClass('clicked').attr('data-simpletip', l.copied_link);
-            later(() => {
-                $this.removeClass('clicked').attr('data-simpletip', l.copy_link);
-            });
-            return false;
         });
 
         watchdog.registerOverrider('login', function(ev, strg) {
@@ -212,6 +203,14 @@ function init_embed(ph, key, g) {
             }
             if ($.playbackOptions.includes('1c')) {
                 $('.audio-wrapper .share').addClass('invisible');
+            }
+            else {
+                $('.audio-wrapper .share').rebind('click', function() {
+                    copyToClipboard(getBaseUrl() + link, l[16763]);
+                    const $this = $(this).addClass('clicked');
+                    later(() => $this.removeClass('clicked'));
+                    return false;
+                });
             }
             const $thumb = $('.audio-wrapper .audio-thumbnail img')
                 .attr('src', `${staticpath}/images/mega/audio.png`);
@@ -470,14 +469,15 @@ function under(page) {
     return false;
 }
 
-function showToast() {
+function showToast(type, content, timeout) {
     'use strict';
 
-    var $toast = $('.toast-notification');
-    $toast.addClass('visible second');
-    setTimeout(function() {
+    const $toast = $('.toast-notification').addClass('visible second');
+    $('.toast-message', $toast).text(content);
+
+    setTimeout(() => {
         $toast.removeClass('visible second');
-    }, 2000);
+    }, parseInt(timeout) || 2000);
 }
 
 function msgDialog(type, title, msg, submsg, callback, checkbox) {

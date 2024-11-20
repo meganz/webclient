@@ -995,6 +995,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
         return freeze({
             destroy,
+            get isVisible() {
+                return $.dialog === 'subtitles-dialog' || menu.classList.contains('visible');
+            },
             fire(ev) {
                 if (ev.type === 'mouseup') {
                     const $target = $(ev.target);
@@ -1403,14 +1406,21 @@ FullScreenManager.prototype.enterFullscreen = function() {
             else {
                 $('button.subtitles', $videoControls).parent().addClass('hidden');
             }
+            subtitlesManager = false;
         }
+
+        // deal with play() failed because the user didn't interact with the document first.
+        streamer.on('cannot-play', SoonFc((ev, ex) => {
+            if (!playevent && options.autoplay && !$pendingBlock.hasClass('hidden')) {
+                $pendingBlock.addClass('hidden');
+                $playVideoButton.removeClass('hidden');
+            }
+            dump(ex && ex.message);
+        }));
 
         // Add event listeners for video specific events
         $video.rebind('play pause', function() {
-            if (!videoElement.paused &&
-                ($.dialog === 'subtitles-dialog' ||
-                $('.context-menu.subtitles', $wrapper).get(0) &&
-                $('.context-menu.subtitles', $wrapper).get(0).classList.contains('visible'))) {
+            if (!videoElement.paused && subtitlesManager.isVisible) {
                 videoElement.pause();
             }
             else {
@@ -1418,11 +1428,9 @@ FullScreenManager.prototype.enterFullscreen = function() {
             }
         });
 
-        // Used for bypassing chromimum no-timeupdate bug
-        let streamCheckId = 0;
-
         $video.rebind('playing', function() {
             if (streamer.currentTime + 0.01) {
+                changeButtonState('playpause');
                 $pendingBlock.addClass('hidden');
 
                 if (!playevent) {
@@ -1481,15 +1489,6 @@ FullScreenManager.prototype.enterFullscreen = function() {
 
                 hideControls();
                 $document.rebind('mousemove.idle', hideControls);
-
-                if (is_embed === 2 && mega.chrome) {
-                    clearInterval(streamCheckId);
-
-                    streamCheckId = setInterval(() => {
-                        // Force-trigger event to bypass chromium no-timeupdate bug
-                        $video[0].dispatchEvent(new Event('timeupdate'));
-                    });
-                }
             }
         });
 
@@ -1503,11 +1502,6 @@ FullScreenManager.prototype.enterFullscreen = function() {
             setIdle(false);
             delay.cancel(MOUSE_IDLE_TID);
             $document.off('mousemove.idle');
-
-            if (streamCheckId) {
-                clearInterval(streamCheckId);
-                streamCheckId = 0;
-            }
 
             if (streamer.ended) {
                 delete sessionStorage.previewTime;
@@ -1596,7 +1590,6 @@ FullScreenManager.prototype.enterFullscreen = function() {
             const delta = Math.max(-1, Math.min(1, e.deltaY || -e.detail));
 
             setVideoVolume(0.1 * delta);
-            return false;
         });
 
         updateVolumeBar();
@@ -2007,6 +2000,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
             }
             if (subtitlesManager) {
                 subtitlesManager.destroy();
+                subtitlesManager = false;
             }
             if (speedMenu) {
                 contextMenu.close(speedMenu);
@@ -2071,7 +2065,6 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 else if (opt.autoplay) {
                     options.autoplay = true;
                     this.parent.play();
-                    $('.video-wrapper .play-video-button:not(.hidden)').click();
                 }
                 else {
                     this.start = this.parent.play.bind(this.parent);
@@ -2100,10 +2093,13 @@ FullScreenManager.prototype.enterFullscreen = function() {
         };
 
         vAdInstance.start = function() {
+            let rc = 0;
             if (this.stream) {
+                rc = 1;
                 this.stream.play();
             }
             opt.autoplay = true;
+            return rc;
         };
 
         if (options.vad === false || is_audio(node)) {
@@ -2247,12 +2243,15 @@ FullScreenManager.prototype.enterFullscreen = function() {
         };
 
         vStream.start = function() {
+            let rc = 0;
             if (vAdInstance) {
-                vAdInstance.start();
+                rc = vAdInstance.start();
             }
-            else if (vStream) {
+            if (!rc && vStream) {
+                rc = 2;
                 vStream.play();
             }
+            return rc;
         };
 
         vAdInstance.parent = vStream;
@@ -2359,9 +2358,10 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 console.debug(ev.type, ev);
             }
 
-            var $pinner = $('.loader-grad', $wrapper);
-            $pinner.removeClass('hidden');
-            $('span', $pinner).text(navigator.onLine === false ? 'No internet access.' : '');
+            if (navigator.onLine === false) {
+                showToast('warning', l.no_internet, 4e3);
+            }
+            const $pinner = $('.loader-grad', $wrapper).removeClass('hidden');
 
             if (this.isOverQuota) {
                 var self = this;
@@ -2773,8 +2773,11 @@ FullScreenManager.prototype.enterFullscreen = function() {
             return Promise.race([tSleep(timeout), MediaAttribute.getMediaData(file)])
                 .then((res) => {
                     if (res) {
-                        const {duration, width, height} = res;
+                        const {duration, width, height, fps} = res;
 
+                        if (!this.fps && fps > 0) {
+                            Object.defineProperty(this, 'fps', {value: fps});
+                        }
                         if (!this.width && width > 0) {
                             Object.defineProperty(this, 'width', {value: width});
                         }
@@ -4027,14 +4030,100 @@ FullScreenManager.prototype.enterFullscreen = function() {
             elm.currentTime = 0x80000;
             elm.ondurationchange = function() {
                 if (elm.duration !== Infinity) {
-                    const {videoWidth: width, videoHeight: height, duration, src, videoTracks, audioTracks} = elm;
+                    const res = {
+                        width: elm.videoWidth,
+                        height: elm.videoHeight,
+                        duration: elm.duration,
+                        video: elm.videoTracks,
+                        audio: elm.audioTracks
+                    };
 
-                    URL.revokeObjectURL(src);
                     elm.ondurationchange = null;
-                    resolve(freeze({width, height, duration, video: videoTracks, audio: audioTracks}));
+                    tSleep.race(6, MediaAttribute.estimateVideoFrameRate(elm))
+                        .then((data) => {
+                            if (data) {
+                                const p = 'fps,width,height'.split(',');
+                                for (let i = p.length; i--;) {
+                                    const k = p[i];
+                                    if (!res[k] && data[k] !== undefined) {
+                                        res[k] = data[k] | 0;
+                                    }
+                                }
+                            }
+                        })
+                        .catch(dump)
+                        .finally(() => {
+                            resolve(freeze(res));
+                            URL.revokeObjectURL(elm.src);
+                            elm.src = '';
+                        });
                 }
             };
             elm.src = URL.createObjectURL(entry);
+        });
+    };
+
+    /**
+     * Estimate video frame rate.
+     * @param {Blob|HTMLVideoElement} video File entry, blob, or video element
+     * @param {Number} [runTime] number of seconds to run the estimator.
+     * @returns {Promise<{fps, width, height}>} fps, plus width/height
+     */
+    MediaAttribute.estimateVideoFrameRate = function(video, runTime = 4) {
+        return new Promise((resolve) => {
+            let revoke;
+            let time = 0;
+            let ticks = 0;
+            let frames = 0;
+            const data = {fps: 0};
+            const finish = (res) => {
+                if (revoke) {
+                    URL.revokeObjectURL(revoke);
+                    video.src = '';
+                }
+                if (data.fps > 0) {
+                    data.fps = Math.round(1.0 / (data.fps / ticks));
+                    res = data;
+                }
+                resolve(res || false);
+            };
+
+            if (video instanceof Blob) {
+                const elm = document.createElement('video');
+                revoke = elm.src = URL.createObjectURL(video);
+                video = elm;
+            }
+
+            if (typeof video.requestVideoFrameCallback !== 'function' || video.playbackRate !== 1) {
+                return finish();
+            }
+
+            video.requestVideoFrameCallback(function stub(now, {mediaTime, presentedFrames, width, height}) {
+                time = Math.abs(mediaTime - time);
+                frames = Math.abs(presentedFrames - frames);
+
+                const avg = time / frames;
+                if (avg && avg < 1) {
+                    ticks++;
+                    data.fps += avg;
+                }
+
+                if ((time = mediaTime) > runTime) {
+                    data.width = width;
+                    data.height = height;
+                    finish();
+                }
+                else {
+                    frames = presentedFrames;
+                    video.requestVideoFrameCallback(stub);
+                }
+            });
+
+            video.muted = true;
+            video.currentTime = 0;
+            video.addEventListener('error', finish);
+            video.addEventListener('ended', finish);
+            Promise.resolve(video.play()).catch(dump);
         });
     };
 
@@ -4373,7 +4462,7 @@ mBroadcaster.once('startMega', function isAudioContextSupported() {
     'use strict';
 
     if (isMediaSourceSupported()) {
-        onIdle(tryCatch(() => {
+        queueMicrotask(tryCatch(() => {
             if (!localStorage.vsWebM) {
                 if (mega.chrome) {
                     Object.defineProperty(isMediaSourceSupported, 'webm', {value: 2});

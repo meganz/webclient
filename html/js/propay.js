@@ -180,23 +180,6 @@ pro.propay = {
 
         // If the plan number is not set in the URL e.g. propay_4, go back to Pro page step 1 so they can choose a plan
         if (!pro.propay.setProPlanFromUrl()) {
-
-            // Redirect to Buy Pro Flexi page or back to mega.io if user comes from link propay?ac=<Auth Code>
-            if (window.s4ac) {
-
-                ActivateS4.instance.verifyAuthCode(window.s4ac)
-                    .then(res => {
-                        if (res === 0) {
-                            loadSubPage(`propay_${pro.ACCOUNT_LEVEL_PRO_FLEXI}`);
-                            return false;
-                        }
-                        return ActivateS4.instance.handleResponse(res);
-                    })
-                    .catch(tell);
-
-                return;
-            }
-
             loadSubPage('pro');
             return;
         }
@@ -2508,8 +2491,7 @@ pro.propay = {
         // Add S4 parameters
         const s4Flexi = window.s4ac && pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI;
 
-        if (window.s4ac && pro.propay.planNum === pro.ACCOUNT_LEVEL_PRO_FLEXI) {
-            utsRequest.ac = window.s4ac;
+        if (s4Flexi) {
             utsRequest.s4 = 1;
         }
 
@@ -2612,7 +2594,7 @@ pro.propay = {
                 let errorMessage;
 
                 // Get S4 error messages
-                if (s4Flexi && (errorMessage = ActivateS4.instance.invalidCodeMsg(ex))) {
+                if (s4Flexi && (errorMessage = ActivateS4.instance.getErrorMsg(ex))) {
                     delete window.s4ac;
                 }
                 // Handle specific discount errors

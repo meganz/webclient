@@ -36,7 +36,7 @@ lazy(s4, 'containers', () => {
 
             if (skipWarning || this.step === 6) {
                 // Skip setup btn at the step 1 and Close btn at the last step
-                eventlog(skipWarning ? 500584 : 500583, JSON.stringify([0]));
+                eventlog(skipWarning ? 500594 : 500583, JSON.stringify([0]));
 
                 super.destroy();
                 this._clear();
@@ -150,6 +150,9 @@ lazy(s4, 'containers', () => {
             });
 
             $('button.download-key', $steps[4]).rebind('click.s4dlg', () => {
+                // Download key btn
+                eventlog(500596);
+
                 this._download();
             });
 
@@ -164,7 +167,21 @@ lazy(s4, 'containers', () => {
                 this._validateBucket();
             });
 
+            // Step 6
+            $('.info-box.help a', $steps[6]).rebind('click.s4dlg', () => {
+                // Help centre lnk
+                eventlog(500599);
+            });
+
+            $('.info-box.git a', $steps[6]).rebind('click.s4dlg', () => {
+                // Git lnk
+                eventlog(500600);
+            });
+
             $manageBucketBtn.rebind('click.s4dlg', () => {
+                // Managed bucket btn
+                eventlog(500598);
+
                 const n = M.getNodeByHandle(this.bucket);
 
                 if (n) {
@@ -217,6 +234,9 @@ lazy(s4, 'containers', () => {
 
         async step3(finalise) {
             if (finalise) {
+                // Create key btn
+                eventlog(500595);
+
                 const n = this.$keyInput.$input.val().trim();
                 this.stepLocked = true;
 
@@ -262,6 +282,9 @@ lazy(s4, 'containers', () => {
 
         async step5(finalise) {
             if (finalise) {
+                // Create bucket btn
+                eventlog(500597);
+
                 this.stepLocked = true;
                 const n = this.$bucketInput.$input.val().trim();
 

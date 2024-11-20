@@ -545,9 +545,9 @@
             });
 
             $('#duplicates-checkbox', $dialog)
-                .switchClass('checkboxOn', 'checkboxOff')
+                .removeClass('checkboxOn').addClass('checkboxOff')
                 .parent()
-                .switchClass('checkboxOn', 'checkboxOff');
+                .removeClass('checkboxOn').addClass('checkboxOff');
 
             var $aside = $('aside', $dialog).addClass('hidden');
 

@@ -5053,6 +5053,9 @@ span.orange {
     padding: 0 0;
     background-color: #F5F7F9;
 }
+.main-mid-pad.improved-recovery-steps {
+    background-color: var(--stroke-grey-1);
+}
 .main-mid-pad.bus-repay {
     background: var(--surface-grey-1);
 }
@@ -5095,6 +5098,9 @@ h3.main-italic-header {
     padding: 30px 0 25px 0;
     font-weight: normal;
     color: #333333;
+}
+.improved-recovery-steps h3.main-italic-header {
+    color: var(--text-color-high);
 }
 h5.main-italic-header {
     font-size: 17px;
@@ -5198,6 +5204,9 @@ button.loading span i {
     font-size: 14px;
     line-height: 20px;
     color: #666666;
+}
+.improved-recovery-steps .register-st2-txt-block p {
+    color: var(--text-color-medium);
 }
 .register-st2-txt-block p a {
     color: #F0373B;

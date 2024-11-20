@@ -30,9 +30,9 @@
     overflow-y: auto;
 }
 
-/* .mega-top-menu .menu .nav-elem:nth-last-child(1) {
+.mega-top-menu .menu .nav-elem:nth-last-child(1) {
     margin-top: auto;
-} */
+}
 
 .mega-top-menu .menu .nav-elem:nth-last-child(2) {
     margin-top: 0;

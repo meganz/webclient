@@ -42,19 +42,6 @@
 }
 
 /* Button and Link styles */
-.nav-elem,
-.nav-elem button,
-.nav-elem button.mega-pm-button,
-.nav-elem a {
-    display: inline-flex;
-    flex-flow: row nowrap;
-    justify-content: center;
-    align-items: center;
-    padding: 12px 24px;
-    border: none;
-    cursor: pointer;
-}
-
 .nav-elem.text-only.link {
     font: var(--mobile-font-label-underline);
     text-decoration: none;
@@ -62,6 +49,9 @@
 .nav-elem.text-only.link:hover .primary-text,
 .nav-elem.text-only.link:active .primary-text,
 .nav-elem.text-only.link:focus .primary-text {
+    color: var(--mobile-button-primary-pressed);
+}
+.nav-elem.text-only.link:active .primary-text {
     color: var(--mobile-button-primary-pressed);
 }
 .nav-elem.text-only.link:focus {
@@ -128,6 +118,10 @@ button.nav-elem.normal.outline:not(.icon-only):active {
     background: none;
     border: solid 2px var(--mobile-button-primary-pressed);
     color: var(--mobile-button-primary-pressed);
+}
+button.nav-elem.text-icon.outline:not(.icon-only):focus span.primary-text,
+button.nav-elem.text-icon.outline:not(.icon-only):focus .sprite-pm-mono {
+    color: var(--mobile-text-primary);
 }
 button.nav-elem.outline:not(.icon-only):active .primary-text,
 button.nav-elem.normal.outline:active .sprite-pm-mono {
@@ -207,6 +201,9 @@ button.nav-elem {
     background: var(--mobile-button-primary);
     cursor: pointer;
 }
+.nav-elem {
+    cursor: pointer;
+}
 .nav-elem.text-only,
 button.mega-pm-button.nav-elem.text-only,
 button.nav-elem.text-icon,
@@ -215,31 +212,42 @@ button.mega-pm-button.nav-elem.text-icon {
     color: var(--mobile-text-primary);
     text-decoration: none;
 }
-
+.nav-elem.text-only,
+button.nav-elem.text-icon {
+    text-decoration: underline;
+}
+.nav-elem.text-only.no-deco,
+.nav-elem.full-width.text-icon,
+.nav-elem.full-width.text-only {
+    text-decoration: none;
+}
 button.nav-elem.text-icon.normal span.primary-text,
 button.mega-pm-button.nav-elem.text-icon span.primary-text {
     background: none;
     color: var(--mobile-text-primary);
 }
 button.nav-elem.text-icon.normal:not(.icon-only):hover,
+button.nav-elem.text-icon.normal:not(.icon-only):active,
 button.nav-elem.text-icon.normal:not(.icon-only):active .sprite-pm-mono {
     background: none;
     color: var(--mobile-button-primary-pressed);
-    opacity: 1;
-    text-decoration: none;
 }
 button.nav-elem.text-icon.normal:active .sprite-pm-mono,
 button.nav-elem.text-icon.normal:active span.primary-text {
-    color: var(--mobile-button-primary);
-}
-button.nav-elem.text-icon.normal:not(.icon-only):hover span.primary-text,
-button.nav-elem.text-icon.normal:not(.icon-only):hover .sprite-pm-mono {
     color: var(--mobile-button-primary-pressed);
 }
-.nav-elem.text-icon.disabled {
+button.nav-elem.text-icon.normal:not(.icon-only):hover span.primary-text,
+button.nav-elem.text-icon.normal:not(.icon-only):hover .sprite-pm-mono,
+button.nav-elem.text-icon.normal:not(.icon-only):focus span.primary-text,
+button.nav-elem.text-icon.normal:not(.icon-only):focus .sprite-pm-mono {
+    color: var(--mobile-button-primary-pressed);
+}
+.nav-elem.text-icon.disabled,
+.nav-elem.text-icon.disabled:active {
     color: var(--mobile-text-disabled);
 }
-.nav-elem.text-icon.disabled span {
+.nav-elem.text-icon.disabled span,
+.nav-elem.text-icon.disabled:active span {
     border-bottom: 1px solid var(--mobile-text-disabled);
 }
 button.nav-elem.normal:not(.icon-only):hover {
@@ -256,19 +264,30 @@ button.nav-elem.normal.secondary:active {
     background: var(--mobile-button-secondary-pressed);
 }
 button.nav-elem.normal:hover span.primary-text,
-button.nav-elem.normal:hover .sprite-pm-mono {
+button.nav-elem.normal:focus span.primary-text,
+button.nav-elem.normal:hover .sprite-pm-mono,
+button.nav-elem.normal:focus .sprite-pm-mono {
     color: var(--mobile-text-on-color);
 }
 button.nav-elem.normal.secondary:hover span.primary-text,
-button.nav-elem.normal.secondary:focus span.primary-text {
+button.nav-elem.normal.secondary:hover i,
+button.nav-elem.icon-only.secondary:hover i,
+button.nav-elem.normal.secondary:focus span.primary-text,
+button.nav-elem.normal.secondary:focus i,
+button.nav-elem.icon-only.secondary:focus i {
     color: var(--mobile-text-secondary);
 }
-button.nav-elem.normal.secondary:active span.primary-text {
+button.nav-elem.normal.secondary:active span.primary-text,
+button.nav-elem.normal.secondary:active i,
+button.nav-elem.icon-only.secondary:active i {
     color: var(--mobile-text-placeholder);
 }
 button.nav-elem.normal:active span.primary-text,
 button.nav-elem.normal:active .sprite-pm-mono {
     color: var(--mobile-text-inverse-accent);
+}
+button.nav-elem.loading {
+    pointer-events: none;
 }
 button.nav-elem.loading:hover,
 button.nav-elem.loading:focus,
@@ -285,6 +304,9 @@ a.nav-elem.icon-only {
     padding: 12px;
     height: 40px;
 }
+.nav-elem.icon-only {
+    cursor: pointer;
+}
 
 .nav-elem.normal.link {
     padding: 0;
@@ -293,11 +315,13 @@ a.nav-elem.icon-only {
 
 .nav-elem.normal.link span,
 .nav-elem.normal.link i {
-    font: var(--font-label-semibold);
     color: var(--mobile-text-primary);
     text-decoration: underline;
 }
 
+.nav-elem.normal.link span {
+    font: var(--font-button-label);
+}
 .nav-elem.normal.link:hover span,
 .nav-elem.normal.link:active span,
 .nav-elem.normal.link:hover i,
@@ -343,8 +367,20 @@ button.nav-elem.secondary {
     background: var(--mobile-button-secondary);
 }
 button.nav-elem.normal.secondary span.primary-text,
+button.nav-elem.normal.secondary i,
 button.nav-elem.icon-only.secondary i {
     color: var(--mobile-text-primary);
+}
+
+button.nav-elem.normal.disabled,
+button.nav-elem.normal:disabled {
+    background: var(--mobile-button-disabled);
+    pointer-events: none;
+}
+
+button.nav-elem.normal.disabled .primary-text,
+button.nav-elem.normal:disabled .primary-text {
+    color: var(--mobile-text-on-color-disabled);
 }
 
 a.nav-elem.secondary {

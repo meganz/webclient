@@ -16,6 +16,7 @@
     padding: 0 5px;
     font: var(--mobile-font-copy-regular);
     color: var(--mobile-text-placeholder);
+    position: relative;
 }
 .dropdown-button.selected option {
     color: var(--mobile-text-primary);
@@ -112,6 +113,35 @@ ul.sort-password-list li i {
 }
 .sk-loading.name-sort.dropdown-button .icon {
     display: none;
+}
+
+.nav-elem.normal.dropdown-button {
+    padding: 0 12px;
+    border: 1px solid var(--mobile-border-strong);
+    cursor: pointer;
+}
+.dropdown-options-wrap {
+    top: 100%;
+    position: absolute;
+    left: 0;
+    display: none;
+    box-shadow: var(--mobile-shadow-medium);
+}
+.dropdown-options-wrap.top {
+    top: 0;
+    transform: translateY(-100%);
+    right: 0;
+}
+.dropdown-options-wrap.right {
+    left: auto;
+    right: 0;
+}
+.dropdown-button.active .dropdown-options-wrap {
+    display: block;
+    border-radius: var(--mobile-border-radius-large);
+}
+.dropdown-options-wrap .dropdown-menu.overlay-wrap {
+    position: relative;
 }
 
 /* Overridden component styles for webclient layout */

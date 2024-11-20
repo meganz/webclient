@@ -932,8 +932,7 @@ function init_page() {
      * If S4 Auth Code from url e.g. #s4acAUTHCODE
      */
     else if (page.substr(0, 4) === 's4ac') {
-        window.s4ac = page.substr(4);
-        loadSubPage('propay');
+        loadSubPage('fm');
     }
     /**
      * Activate S4 Auth Code for Pro Flexi accounts
@@ -3045,7 +3044,7 @@ function parsepage(pagehtml) {
     if (page === 'download') {
         mega.ui.setTheme();
     }
-    else if (page === 'login' || page.substring(0, 8) === 'register') {
+    else if (page === 'login' || page.substring(0, 8) === 'register' || page === 'recovery') {
         mega.ui.setTheme();
         document.body.classList.add('bottom-pages');
     }

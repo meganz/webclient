@@ -47,6 +47,13 @@ class MegaDropdown extends MegaInteractable {
         this.dropdownItems = options.dropdownItems;
         this.selected = options.selected;
 
+        this.rightIcon = 'icon sprite-pm-mono icon-chevron-down-thin-outline';
+        this.rightIconSize = '20';
+
+        options.optionsWrap = document.createElement('div');
+        options.optionsWrap.classList.add('dropdown-options-wrap');
+        this.domNode.appendChild(options.optionsWrap);
+
         options.dropdown = this;
         this.items = new MegaDropdownItemList(options);
 
@@ -55,7 +62,7 @@ class MegaDropdown extends MegaInteractable {
         }
 
         this.on('click', event => {
-            if (this.domNode.classList.toggle('menu-active')) {
+            if (this.toggleClass('active')) {
                 this.rightIcon = 'icon sprite-pm-mono icon-chevron-up-thin-outline';
                 this.items.rerender({...options, event});
             }
@@ -67,7 +74,7 @@ class MegaDropdown extends MegaInteractable {
 
         this.dropdownMenu.on('close.menu', () => {
             this.rightIcon = 'icon sprite-pm-mono icon-chevron-down-thin-outline';
-            this.domNode.classList.remove('menu-active');
+            this.active = false;
         });
 
         document.body.addEventListener('click', event => {
@@ -79,7 +86,7 @@ class MegaDropdown extends MegaInteractable {
         }, true);
     }
 
-    set selected(val = '') {
+    set selected(val) {
         if (this.dropdownItems[val]) {
             this.optionNode.textContent = this.dropdownItems[val];
             this.optionNode.value = val;

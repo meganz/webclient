@@ -167,7 +167,7 @@ class MegaReadOnlyField extends MegaComponent {
             }
 
             if (this._isPasswordVisible) {
-                const fragment = colorizedPassword(this._originalValue);
+                const fragment = mega.ui.pm.utils.colorizedPassword(this._originalValue);
                 this.valueSpan.appendChild(fragment);
                 this.valueSpan.classList.add('password-colorized');
                 return;
@@ -185,7 +185,7 @@ class MegaReadOnlyField extends MegaComponent {
      * @returns {void}
      */
     passwordStrength() {
-        const strength = classifyPMPassword(this._originalValue);
+        const strength = mega.ui.pm.utils.classifyPMPassword(this._originalValue);
 
         this.strenghtText.textContent = strength.string1;
         this.strengthCheck.className = `strength-checker ${strength.className}`;

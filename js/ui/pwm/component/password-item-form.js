@@ -18,8 +18,8 @@ class PasswordItemForm extends MegaForm {
                                 this.megaTitleInput.$input.megaInputsHideError();
                             }
 
-                            generateFavicon(this.megaTitleInput.$input.val(), this.megaWebsiteInput.$input.val(),
-                                            this.outer);
+                            mega.ui.pm.utils.generateFavicon(this.megaTitleInput.$input.val(),
+                                                             this.megaWebsiteInput.$input.val(), this.outer);
                         }
                     }
                 },
@@ -63,8 +63,8 @@ class PasswordItemForm extends MegaForm {
                         name: 'megaWebsiteInput',
                         event: 'blur',
                         on: () => {
-                            generateFavicon(this.megaTitleInput.$input.val(), this.megaWebsiteInput.$input.val(),
-                                            this.outer);
+                            mega.ui.pm.utils.generateFavicon(this.megaTitleInput.$input.val(),
+                                                             this.megaWebsiteInput.$input.val(), this.outer);
                         }
                     }
                 },
@@ -264,7 +264,7 @@ class PasswordItemForm extends MegaForm {
         // trigger input to remove the strength checker message
         this.megaPwdInput.$input.trigger('input');
 
-        generateFavicon('', '', this.outer);
+        mega.ui.pm.utils.generateFavicon('', '', this.outer);
     }
 
     setValue(pwdItem) {
@@ -297,7 +297,7 @@ class PasswordItemForm extends MegaForm {
             success = false;
         }
 
-        if (url && !isURL(url)) {
+        if (url && !mega.ui.pm.utils.isURL(url)) {
             this.megaWebsiteInput.$input.megaInputsShowError(`${alertIcon} ${l.url_value}`);
             success = false;
         }

@@ -15280,8 +15280,7 @@ class Start extends mixins.w9 {
       video: false,
       editing: false,
       previousTopic: undefined,
-      topic: undefined,
-      mounted: false
+      topic: undefined
     };
     this.handleChange = ev => this.setState({
       topic: ev.target.value
@@ -15350,9 +15349,10 @@ class Start extends mixins.w9 {
   componentDidMount() {
     super.componentDidMount();
     this.bindEvents();
-    M.safeShowDialog(Start.dialogName, () => this.setState({
-      mounted: true
-    }));
+    if ($.dialog === 'onboardingDialog') {
+      closeDialog();
+    }
+    M.safeShowDialog(Start.dialogName, () => $(`#${Start.NAMESPACE}`));
   }
   componentWillUnmount() {
     super.componentWillUnmount();
@@ -15371,7 +15371,8 @@ class Start extends mixins.w9 {
       topic
     } = this.state;
     return REaCt().createElement(modalDialogs.A.ModalDialog, (0,esm_extends.A)({}, this.state, {
-      name: NAMESPACE,
+      id: NAMESPACE,
+      dialogName: NAMESPACE,
       className: NAMESPACE,
       stopKeyPropagation: editing,
       onClose: () => this.props.onClose()
@@ -15666,8 +15667,7 @@ Invite.NAMESPACE = 'meetings-invite';
 const helpers = REQ_(110);
 ;// ./js/chat/ui/meetings/schedule/datepicker.jsx
 
-
-class Datepicker extends mixins.w9 {
+class Datepicker extends REaCt().Component {
   constructor(props) {
     super(props);
     this.OPTIONS = {
@@ -15720,13 +15720,11 @@ class Datepicker extends mixins.w9 {
     }
   }
   componentWillUnmount() {
-    super.componentWillUnmount();
     if (this.containerRef && this.containerRef.current) {
       $(this.containerRef.current).unbind(`keyup.${Datepicker.NAMESPACE}`);
     }
   }
   componentDidMount() {
-    super.componentDidMount();
     M.require('datepicker_js').done(() => this.initialize());
     if (this.containerRef && this.containerRef.current) {
       $(this.containerRef.current).rebind(`keyup.${Datepicker.NAMESPACE}`, ({
@@ -15979,8 +15977,7 @@ Select.NAMESPACE = 'meetings-select';
 
 
 
-
-class DateTime extends mixins.w9 {
+class DateTime extends REaCt().Component {
   constructor(...args) {
     super(...args);
     this.state = {
@@ -16678,7 +16675,9 @@ class Edit extends mixins.w9 {
               endDateTime: startDateTime + this.interval
             });
           }
-          this.datepickerRefs.startDateTime.selectDate(new Date(endDateTime - this.interval));
+          this.handleTimeSelect({
+            startDateTime: endDateTime - this.interval
+          });
         }
       });
     };
@@ -16977,7 +16976,9 @@ class Schedule extends mixins.w9 {
             endDateTime: startDateTime + this.interval
           });
         }
-        this.datepickerRefs.startDateTime.selectDate(new Date(endDateTime - this.interval));
+        this.handleDateSelect({
+          startDateTime: endDateTime - this.interval
+        });
       }
     };
     this.handleToggle = prop => {
@@ -18652,8 +18653,6 @@ class SearchPanel extends mixins.w9 {
     })));
   }
 }
-// EXTERNAL MODULE: ./js/ui/buttons.jsx
-const buttons = REQ_(994);
 ;// ./js/chat/ui/leftPanel/navigation.jsx
 
 
@@ -18681,10 +18680,10 @@ const Navigation = ({
     renderView(CHATS);
     eventlog(500233);
   }
-}, REaCt().createElement(buttons.$, {
+}, REaCt().createElement(meetings_button.A, {
   unreadChats,
   className: `${NAMESPACE}-nav-button`,
-  icon: "sprite-fm-mono icon-chat-filled"
+  icon: "icon-chat-filled"
 }, !!unreadChats && REaCt().createElement("div", {
   className: "notifications-count"
 })), REaCt().createElement("span", null, l.chats)), REaCt().createElement("div", {
@@ -18697,10 +18696,10 @@ const Navigation = ({
     renderView(MEETINGS);
     eventlog(500234);
   }
-}, REaCt().createElement(buttons.$, {
+}, REaCt().createElement(meetings_button.A, {
   unreadMeetings,
   className: `${NAMESPACE}-nav-button`,
-  icon: "sprite-fm-mono icon-video-call-filled"
+  icon: "icon-video-call-filled"
 }, !!unreadMeetings && REaCt().createElement("div", {
   className: "notifications-count"
 })), REaCt().createElement("span", null, l.meetings)), is_eplusplus || is_chatlink ? null : REaCt().createElement("div", {
@@ -18713,13 +18712,15 @@ const Navigation = ({
     loadSubPage('fm/chat/contacts');
     eventlog(500296);
   }
-}, REaCt().createElement(buttons.$, {
+}, REaCt().createElement(meetings_button.A, {
   className: `${NAMESPACE}-nav-button`,
   contactRequests,
-  icon: "sprite-fm-mono icon-contacts"
+  icon: "icon-contacts"
 }, !!contactRequests && REaCt().createElement("div", {
   className: "notifications-count"
 })), REaCt().createElement("span", null, l[165])));
+// EXTERNAL MODULE: ./js/ui/buttons.jsx
+const buttons = REQ_(994);
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
 const dropdowns = REQ_(911);
 ;// ./js/chat/ui/leftPanel/actions.jsx
@@ -22209,8 +22210,14 @@ class Participant extends mixins.w9 {
       onSpeakerChange,
       onModeChange
     } = this.props;
+    const {
+      isOnHold,
+      videoMuted,
+      audioMuted,
+      clientId
+    } = source;
     const hasRelationship = contactsPanel.A.hasRelationship(contact);
-    return REaCt().createElement(REaCt().Fragment, null, this.state.raisedHandPeers.includes(handle) ? REaCt().createElement("div", {
+    return REaCt().createElement(REaCt().Fragment, null, this.state.raisedHandPeers.includes(handle) && !isOnHold ? REaCt().createElement("div", {
       className: "participant-signifier"
     }, REaCt().createElement("i", {
       className: "sprite-fm-uni icon-raise-hand"
@@ -22230,7 +22237,7 @@ class Participant extends mixins.w9 {
     }, REaCt().createElement("span", null)) : null, REaCt().createElement("i", {
       className: `
                             ${this.baseIconClass}
-                            ${source.videoMuted ? 'icon-video-off-thin-outline inactive' : 'icon-video-thin-outline'}
+                            ${videoMuted ? 'icon-video-off-thin-outline inactive' : 'icon-video-thin-outline'}
                         `
     }), REaCt().createElement(videoNode.Gz, {
       source
@@ -22248,10 +22255,10 @@ class Participant extends mixins.w9 {
         onCallMinimize();
         loadSubPage(`fm/chat/contacts/${handle}`);
       }
-    }, REaCt().createElement("span", null, l[6859]))) : null, chatRoom.iAmOperator() && u_handle !== handle && !source.audioMuted && REaCt().createElement("li", null, REaCt().createElement(meetings_button.A, {
+    }, REaCt().createElement("span", null, l[6859]))) : null, chatRoom.iAmOperator() && u_handle !== handle && !audioMuted && REaCt().createElement("li", null, REaCt().createElement(meetings_button.A, {
       icon: "sprite-fm-mono icon-mic-off-thin-outline",
       onClick: () => {
-        call.sfuClient.mutePeer(source.clientId);
+        call.sfuClient.mutePeer(clientId);
         megaChat.plugins.userHelper.getUserNickname(handle).catch(dump).always(name => {
           ChatToast.quick(l.you_muted_peer.replace('%NAME', name || ''));
         });
@@ -22270,7 +22277,7 @@ class Participant extends mixins.w9 {
       stream: source,
       onSpeakerChange,
       onModeChange
-    })), chatRoom.iAmOperator() && u_handle !== handle && REaCt().createElement("li", null, REaCt().createElement(meetings_button.A, {
+    })), call.isPublic && chatRoom.iAmOperator() && u_handle !== handle && REaCt().createElement("li", null, REaCt().createElement(meetings_button.A, {
       icon: "sprite-fm-mono icon-disabled-filled",
       onClick: () => chatRoom.trigger('onRemoveUserRequest', handle)
     }, REaCt().createElement("span", null, l[8867]))))))));

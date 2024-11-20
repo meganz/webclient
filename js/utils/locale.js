@@ -1967,6 +1967,14 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[A]', '<a href="mailto:support@mega.nz">')
         .replace('[/A]', '</a>');
 
+    l.recovery_key_subtitle = escapeHTML(l.recovery_key_subtitle)
+        .replace('[A]', `<a href="${recoveryKeyLink}" target="_blank">`)
+        .replace('[/A]', '</a>');
+
+    l.select_file_notes = escapeHTML(l.select_file_notes)
+        .replace('[B]', '<b>')
+        .replace('[/B]', '</b>');
+
     l.referral_close_full = escapeHTML(l.referral_close_full)
         .replace('[A]', '<a href="https://mega.io/refer" target="_blank" class="clickurl">')
         .replace('[/A]', '</a>');

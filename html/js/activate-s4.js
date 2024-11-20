@@ -15,7 +15,7 @@ class ActivateS4 {
 
         loadingDialog.hide('verifys4.s4v');
 
-        if (this.invalidCodeMsg(result)) {
+        if (this.getErrorMsg(result)) {
             delete window.s4ac;
         }
 
@@ -23,66 +23,54 @@ class ActivateS4 {
     }
 
     async activateAuthCode(authCode) {
+        const req = { a: 's4a' };
+
+        if (authCode) {
+            req.ac = authCode;
+        }
+
         loadingDialog.show('activates4.s4a');
 
-        const result = await api.send({a: 's4a', ac: authCode}).catch(echo);
+        const result = await api.send(req).catch(echo);
 
         loadingDialog.hide('activates4.s4a');
 
-        if (result === 0 || this.invalidCodeMsg(result)) {
+        if (result === 0 || this.getErrorMsg(result)) {
             delete window.s4ac;
         }
 
         return result;
     }
 
-    invalidCodeMsg(res) {
+    getErrorMsg(res) {
+        if (res === ETEMPUNAVAIL) { // plan is temporarily unavailable for purchase
+            return l.s4_unable_to_purchase;
+        }
+        /* Uncomment if we need Auth Code verification */
+        /*
         if (res === EACCESS || res === ENOENT) { // AuthCode is invalid, expired,
             return l.activate_s4_ac_invalid_message;
         }
         if (res === EEXIST) { // AuthCode has already been used.
             return l.activate_s4_ac_expired_message;
         }
+        */
 
         return false;
     }
 
     handleResponse(res) {
-        const msg = this.invalidCodeMsg(res);
-
-        if (msg) {
-            this.showInvalidDialog(l.activate_s4_ac_invalid_title, msg);
-            return false;
-        }
-
-        // "... unknown error... try again later"
         if (res !== 0) {
-            return msgDialog('warningb', l[16], l[7140], null, (yes) => {
-                if (yes) {
-                    loadSubPage('pro');
-                }
-            });
+            return msgDialog(
+                'warningb',
+                l[16],
+                this.getErrorMsg(res) || l[7140],
+                null,
+                () => loadSubPage('pro')
+            );
         }
 
         return res;
-    }
-
-    showInvalidDialog(title, message) {
-        if (!this.dialog) {
-            this.dialog = document.querySelector('.mega-dialog.acs4-invalid-ac');
-            this.dialogTitle = this.dialog.querySelector('.title');
-            this.dialogMessage = this.dialog.querySelector('.message');
-
-            $('button', this.dialog).rebind('click.s4ac', () => {
-                mega.redirect('mega.io', 'objectstorage#register_your_interest', false, false);
-            });
-        }
-
-        M.safeShowDialog('acs4-invalid-ac', () => {
-            this.dialogTitle.textContent = title;
-            this.dialogMessage.textContent = message;
-            return $(this.dialog);
-        });
     }
 }
 
@@ -91,15 +79,18 @@ class ActivateS4Page {
         this.page = document.querySelector('.fmholder .js-activate-s4-page');
         this.activateBtn = this.page.querySelector('button.enable-s4');
         this.checkbox = this.page.querySelector('.checkbox');
-        this.codeVerified = false;
         this.tosAccepted = false;
 
         this.activateBtn.addEventListener('click', () => {
             if (!this.activateBtn.disabled) {
 
-                ActivateS4.instance.activateAuthCode(window.s4ac)
+                // Log S4 feature activation
+                eventlog(500593);
+
+                ActivateS4.instance.activateAuthCode()
                     .then((res) => {
                         if (res === 0) {
+
                             loadSubPage('fm');
                             location.reload();
                             return;
@@ -114,32 +105,23 @@ class ActivateS4Page {
     }
 
     static load() {
-        if (u_attr && u_attr.pf && !pro.isExpiredOrInGracePeriod(u_attr.pf.s) && window.s4ac) {
+        if (u_attr && u_attr.pf && !u_attr.s4 && !pro.isExpiredOrInGracePeriod(u_attr.pf.s)) {
             parsepage(pages.activates4);
             return new ActivateS4Page();
         }
 
         if (u_attr && u_attr.s4) {
-            loadSubPage('pro');
+            loadSubPage('fm');
             return false;
         }
 
-        mega.redirect('mega.io', 'objectstorage#register_your_interest', false, false);
+        window.s4ac = true;
+        loadSubPage(`propay_${pro.ACCOUNT_LEVEL_PRO_FLEXI}`);
     }
 
     init() {
-        this.codeVerified = false;
         this._initCheckbox();
         this._updateButtonState();
-
-        ActivateS4.instance.verifyAuthCode(window.s4ac).then((res) => {
-            if (res === 0) {
-                this.codeVerified = true;
-                this._updateButtonState();
-                return;
-            }
-            return ActivateS4.instance.handleResponse(res);
-        }).catch(tell);
     }
 
     _initCheckbox() {
@@ -156,7 +138,7 @@ class ActivateS4Page {
     }
 
     _updateButtonState() {
-        if (this.tosAccepted && this.codeVerified) {
+        if (this.tosAccepted) {
             this.activateBtn.disabled = false;
             this.activateBtn.classList.remove('disabled');
         }

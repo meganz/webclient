@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '../../../ui/buttons.jsx';
+import Button from '../meetings/button.jsx';
 import { NAMESPACE } from './leftPanel.jsx';
 
 export const Navigation =
@@ -18,7 +18,7 @@ export const Navigation =
                 <Button
                     unreadChats={unreadChats}
                     className={`${NAMESPACE}-nav-button`}
-                    icon="sprite-fm-mono icon-chat-filled">
+                    icon="icon-chat-filled">
                     {!!unreadChats && <div className="notifications-count"/>}
                 </Button>
                 <span>{l.chats /* `Chats` */}</span>
@@ -36,7 +36,7 @@ export const Navigation =
                 <Button
                     unreadMeetings={unreadMeetings}
                     className={`${NAMESPACE}-nav-button`}
-                    icon="sprite-fm-mono icon-video-call-filled">
+                    icon="icon-video-call-filled">
                     {!!unreadMeetings && <div className="notifications-count"/>}
                 </Button>
                 <span>{l.meetings /* `Meetings` */}</span>
@@ -56,7 +56,7 @@ export const Navigation =
                     <Button
                         className={`${NAMESPACE}-nav-button`}
                         contactRequests={contactRequests}
-                        icon="sprite-fm-mono icon-contacts">
+                        icon="icon-contacts">
                         {!!contactRequests && <div className="notifications-count"/>}
                     </Button>
                     <span>{l[165] /* `Contacts` */}</span>

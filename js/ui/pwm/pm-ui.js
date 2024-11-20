@@ -27,10 +27,18 @@ mega.ui.pm = {
             fmholder.classList.add('pmholder');
         }
 
-        this.list.show();
+        if (nodeID === 'account') {
+            this.list.hide();
+            mega.ui.pm.settings.initUI();
+        }
+        else {
+            mega.ui.pm.settings.closeUI();
 
-        if (nodeID){
-            this.comm.saveLastSelected(nodeID);
+            if (nodeID) {
+                this.comm.saveLastSelected(nodeID);
+            }
+
+            this.list.show();
         }
 
         if (pmlayout) {

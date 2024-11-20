@@ -1,0 +1,126 @@
+.mega-list-container h3 {
+    margin-bottom: 16px;
+    line-height: 2;
+}
+.mega-list {
+    border-radius: var(--mobile-border-radius-medium);
+    background: var(--settings-list-background);
+}
+
+.mega-list-item {
+    display: flex;
+    padding: 16px 24px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.mega-list-item.force-wrap {
+    flex-flow: column wrap;
+    align-items: flex-start;
+}
+
+.mega-list-item-text {
+    margin-right: 24px;
+}
+
+.mega-list-item-text span {
+    display: block;
+}
+
+.mega-list-item-text .mega-item-list-title {
+    font: var(--mobile-font-copy-regular);
+    margin-bottom: 4px;
+}
+
+.mega-list-item-text .mega-item-list-title-small {
+    font: var(--mobile-font-caption-large-regular);
+    margin-bottom: 8px;
+}
+
+.mega-list-item-text .mega-item-list-subtitle {
+    font: var(--mobile-font-caption-small-regular);
+    color: var(--mobile-text-secondary);
+}
+
+.mega-list-item-text .mega-item-list-subtitle a {
+    font: var(--mobile-font-caption-small-regular);
+    text-decoration: none;
+}
+
+.mega-list-item-right .full-button {
+    display: none;
+}
+
+.mega-list-item-right.tag {
+    flex: none;
+}
+
+.mega-list-item-right .mega-tag {
+    border: 1px solid var(--mobile-button-brand);
+    padding: 4px;
+    border-radius: var(--border-radius-extra-small);
+    font: var(--font-caption-small-regular);
+    color: var(--mobile-button-brand)
+}
+
+.mega-list-item-second > *:not(:last-child) {
+    margin-inline-end: 16px;
+    -webkit-margin-end: 16px;
+}
+
+.mega-list-item.force-wrap .mega-list-item-second {
+    margin-top: 16px;
+}
+
+.mega-dropdown.clipboard-time {
+    width: 188px;
+    justify-content: space-between;
+}
+
+.mega-dropdown.clipboard-time i {
+    margin-inline-end: 0;
+    -webkit-margin-end: 0;
+}
+
+@media screen and (max-width: 1079px) {
+    .mega-list-item.wrap {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .mega-list-item.wrap .mega-list-item-right {
+        margin-top: 16px;
+    }
+}
+
+@media screen  and (min-width: 1080px) {
+
+    .mega-list-item.icon-button .mega-list-item-text {
+        flex: 0 1 auto;
+    }
+
+    .mega-list-item-right .small-button {
+        display: none;
+    }
+
+    .mega-list-item-right .full-button {
+        display: flex;
+        justify-content: flex-end;
+    }
+}
+
+/* Overridden component styles for webclient layout */
+.mega-list-container h3 {
+    color: var(--mobile-text-primary);
+}
+
+.mega-list-item .nav-elem.normal.link {
+    padding: 12px 24px;
+}
+
+@media screen and (max-width: 1079px) {
+    .mega-list-item-second > *:not(:first-child) {
+        margin-top: 16px;
+    }
+}

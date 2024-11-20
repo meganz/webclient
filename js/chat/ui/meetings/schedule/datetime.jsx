@@ -1,10 +1,9 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../mixins';
 import { stringToDate } from './helpers.jsx';
 import Datepicker from './datepicker.jsx';
 import Select from './select.jsx';
 
-export class DateTime extends MegaRenderMixin {
+export class DateTime extends React.Component {
     state = {
         datepickerRef: undefined,
         manualDateInput: '',

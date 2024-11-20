@@ -4,10 +4,36 @@ class MegaDropdownItemList {
         const keys = Object.keys(options.dropdownItems);
 
         this.dropdownMenu = options.dropdown.dropdownMenu = new MegaMenu({
-            parentNode: mainlayout,
-            componentClassname: 'menu-container',
+            parentNode: options.optionsWrap,
+            componentClassname: 'menu-container dropdown-menu',
             wrapperClassname: 'dropdown'
         });
+
+        this.dropdownMenu.calcPosition = (event) => {
+            if (!this.dropdownMenu.visible) {
+                return;
+            }
+
+            var POPUP_HEIGHT = window.innerHeight;
+            var POPUP_WIDTH = window.innerWidth;
+
+            options.optionsWrap.classList.remove('top', 'right');
+
+            const {bottom, left} = event.currentTarget.domNode.getBoundingClientRect();
+            const menuWidth = parseFloat(this.dropdownMenu.domNode.offsetWidth);
+            const menuHeight = parseFloat(this.dropdownMenu.domNode.offsetHeight);
+
+            // check if top is at the second half of the popup.
+            // if so, show the context menu dialog above the target element
+            if (bottom + menuHeight > POPUP_HEIGHT - mega.ui.pm.POPUP_TOP_MARGIN) {
+                options.optionsWrap.classList.add('top');
+            }
+
+            // show the dialog right side of the target element if position exceeds the max width
+            if (left + mega.ui.pm.POPUP_SIDE_MARGIN + menuWidth > POPUP_WIDTH - mega.ui.pm.POPUP_SIDE_MARGIN) {
+                options.optionsWrap.classList.add('right');
+            }
+        };
 
         this.dropdown = options.dropdown;
 
@@ -152,6 +178,8 @@ class MegaDropdownItemList {
                     this.searchInput.$input.val('');
                     this.searchList(_filterItems);
                 }
+
+                return false;
             });
         }
     }

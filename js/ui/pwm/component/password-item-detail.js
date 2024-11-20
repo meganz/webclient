@@ -37,7 +37,7 @@ class MegaPasswordItemDetail {
         });
 
         contextMenuBtn.on('click', event => {
-            if (contextMenuBtn.domNode.classList.toggle('menu-active')) {
+            if (contextMenuBtn.domNode.classList.toggle('active')) {
                 mega.ui.contextMenu.show({
                     name: 'item-detail-menu',
                     event,
@@ -50,7 +50,7 @@ class MegaPasswordItemDetail {
         });
 
         mega.ui.menu.on('close.menu', () => {
-            contextMenuBtn.domNode.classList.remove('menu-active');
+            contextMenuBtn.domNode.classList.remove('active');
         });
 
         this.domNode.append(subHeader);
@@ -67,14 +67,14 @@ class MegaPasswordItemDetail {
             actions: [{
                 icon: 'sprite-pm-mono icon-copy-user-thin-outline',
                 onClick: (e, field) => {
-                    copyPMToClipboard(field.inputValue, l.username_copied);
+                    mega.ui.pm.utils.copyPMToClipboard(field.inputValue, l.username_copied);
                     eventlog(500546);
                 },
                 hint: l.copy_username
             }],
             label: l.username_label,
             onClick: (e) => {
-                copyPMToClipboard(e.currentTarget.inputValue, l.username_copied);
+                mega.ui.pm.utils.copyPMToClipboard(e.currentTarget.inputValue, l.username_copied);
             }
         });
 
@@ -99,7 +99,7 @@ class MegaPasswordItemDetail {
                 {
                     icon: 'sprite-pm-mono icon-copy-password-thin-outline',
                     onClick: (e, field) => {
-                        copyPMToClipboard(field.inputValue, l[19602]);
+                        mega.ui.pm.utils.copyPMToClipboard(field.inputValue, l[19602]);
                         eventlog(500548);
                     },
                     hint: l[19601]
@@ -108,7 +108,7 @@ class MegaPasswordItemDetail {
             label: l[909],
             isPassword: true,
             onClick: (e) => {
-                copyPMToClipboard(e.currentTarget.inputValue, l[19602]);
+                mega.ui.pm.utils.copyPMToClipboard(e.currentTarget.inputValue, l[19602]);
             }
         });
 
@@ -130,7 +130,7 @@ class MegaPasswordItemDetail {
                 {
                     icon: 'sprite-pm-mono icon-copy-thin-outline',
                     onClick: (e, field) => {
-                        copyPMToClipboard(field.inputValue, l.notes_copied);
+                        mega.ui.pm.utils.copyPMToClipboard(field.inputValue, l.notes_copied);
                         eventlog(500550);
                     },
                     hint: l.copy_notes
@@ -138,7 +138,7 @@ class MegaPasswordItemDetail {
             ],
             label: l.notes_label,
             onClick: (e) => {
-                copyPMToClipboard(e.currentTarget.inputValue, l.notes_copied);
+                mega.ui.pm.utils.copyPMToClipboard(e.currentTarget.inputValue, l.notes_copied);
             }
         });
 
@@ -182,9 +182,9 @@ class MegaPasswordItemDetail {
         const span = document.createElement('span');
         outer.append(span);
 
-        generateFavicon(this.item.name, url, outer);
+        mega.ui.pm.utils.generateFavicon(this.item.name, url, outer);
 
-        // const newFavicon = generateFavicon(name, url);
+        // const newFavicon = mega.ui.pm.utils.generateFavicon(name, url);
         this.nameSubHeader.replaceChild(outer, this.subHeaderIcon);
         this.subHeaderIcon = outer;
 

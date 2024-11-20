@@ -1,0 +1,108 @@
+.settings-wrap {
+    background: var(--settings-page-background);
+    margin: 0;
+    color: var(--mobile-text-primary);
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.settings-container {
+    max-width: 705px;
+    margin: 24px;
+}
+
+.settings-header {
+    background: var(--mobile-page-background);
+    border-bottom: 1px solid var(--mobile-border-strong);
+    height: 72px;
+}
+
+.settings-container .mega-dropdown {
+    display: flex;
+}
+
+.settings-container .menu-container.overlay-wrap {
+    background: var(--mobile-page-background);
+    border: 1px solid var(--mobile-border-strong);
+    box-shadow: var(--mobile-shadow-medium);
+    border-radius: var(--mobile-border-radius-large);
+    width: 280px;
+}
+
+.settings-container .menu-container .list-items {
+    margin: 0;
+    padding: 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.settings-container .menu-container .list-items .list-item.nav-elem.full-width {
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+.settings-container .dropdown {
+    width: 100%;
+}
+
+.settings-container .button.import-file {
+    min-width: 188px;
+}
+
+.settings-container .import-error-message {
+    color: var(--mobile-text-error);
+    display: flex;
+    margin-top: 16px;
+}
+
+.settings-container .import-error-message i {
+    margin-inline-end: 8px;
+    -webkit-margin-end: 8px;
+    margin-top: 4px;
+}
+
+.settings-container .long-notification .toast-notification .message-body {
+    white-space: unset;
+}
+
+.settings-container .import-passwords-label {
+    word-break: break-word;
+}
+
+.settings-container .dropdown-options-wrap {
+    top: calc(100% + 4px);
+}
+
+.settings-container .dropdown-options-wrap.top {
+    top: -4px;
+}
+
+@media screen  and (min-width: 769px) {
+    .settings-container {
+        margin: 24px auto;
+    }
+}
+
+@media screen and (min-width: 1080px) {
+    .settings-container {
+        max-width: 728px;
+    }
+}
+
+/* Overridden component styles for webclient layout */
+.settings-wrap {
+    min-width: auto;
+}
+
+.settings-container {
+    width: 100%;
+    max-width: 428px;
+}
+
+@media screen and (min-width: 1080px) {
+    .settings-container {
+        max-width: 728px;
+    }
+}

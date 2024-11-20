@@ -1736,9 +1736,15 @@ td.verification .contact-item {
     color: var(--text-color-high);
 }
 
+.conversationsApp .lhp-nav-container:hover i {
+    --mask-color: var(--icon-active);
+}
+
 .conversationsApp .lhp-nav-container.active .lhp-nav-button,
-.conversationsApp .lhp-nav-container.active span {
+.conversationsApp .lhp-nav-container.active span,
+.conversationsApp .lhp-nav-container.active i {
     color: var(--secondary-green);
+    --mask-color: var(--secondary-green);
 }
 
 .conversationsApp .lhp-nav-container span {
@@ -1750,10 +1756,15 @@ td.verification .contact-item {
     position: relative;
     width: 24px;
     margin: 0 auto;
+    padding: 0;
+    border: 0;
+    background: transparent;
 }
 
 .conversationsApp .lhp-nav-button i {
     --icon-size: 24px;
+    --mask-color: var(--icon-rest);
+    cursor: pointer;
 }
 
 .conversationsApp .lhp-nav-container .notifications-count {

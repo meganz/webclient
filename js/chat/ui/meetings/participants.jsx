@@ -58,11 +58,12 @@ class Participant extends MegaRenderMixin {
             onSpeakerChange,
             onModeChange
         } = this.props;
+        const { isOnHold, videoMuted, audioMuted, clientId } = source;
         const hasRelationship = ContactsPanel.hasRelationship(contact);
 
         return (
             <>
-                {this.state.raisedHandPeers.includes(handle) ?
+                {this.state.raisedHandPeers.includes(handle) && !isOnHold ?
                     <div className="participant-signifier">
                         <i className="sprite-fm-uni icon-raise-hand" />
                     </div> :
@@ -89,7 +90,7 @@ class Participant extends MegaRenderMixin {
                     <i
                         className={`
                             ${this.baseIconClass}
-                            ${source.videoMuted ? 'icon-video-off-thin-outline inactive' : 'icon-video-thin-outline'}
+                            ${videoMuted ? 'icon-video-off-thin-outline inactive' : 'icon-video-thin-outline'}
                         `}
                     />
                     <AudioLevelIndicator source={source} />
@@ -112,12 +113,12 @@ class Participant extends MegaRenderMixin {
                                     </li> :
                                     null
                                 }
-                                {chatRoom.iAmOperator() && u_handle !== handle && !source.audioMuted &&
+                                {chatRoom.iAmOperator() && u_handle !== handle && !audioMuted &&
                                     <li>
                                         <Button
                                             icon="sprite-fm-mono icon-mic-off-thin-outline"
                                             onClick={() => {
-                                                call.sfuClient.mutePeer(source.clientId);
+                                                call.sfuClient.mutePeer(clientId);
                                                 megaChat.plugins.userHelper.getUserNickname(handle)
                                                     .catch(dump)
                                                     .always(name => {

@@ -18653,8 +18653,6 @@ class SearchPanel extends mixins.w9 {
     })));
   }
 }
-// EXTERNAL MODULE: ./js/ui/buttons.jsx
-const buttons = REQ_(994);
 ;// ./js/chat/ui/leftPanel/navigation.jsx
 
 
@@ -18682,10 +18680,10 @@ const Navigation = ({
     renderView(CHATS);
     eventlog(500233);
   }
-}, REaCt().createElement(buttons.$, {
+}, REaCt().createElement(meetings_button.A, {
   unreadChats,
   className: `${NAMESPACE}-nav-button`,
-  icon: "sprite-fm-mono icon-chat-filled"
+  icon: "icon-chat-filled"
 }, !!unreadChats && REaCt().createElement("div", {
   className: "notifications-count"
 })), REaCt().createElement("span", null, l.chats)), REaCt().createElement("div", {
@@ -18698,10 +18696,10 @@ const Navigation = ({
     renderView(MEETINGS);
     eventlog(500234);
   }
-}, REaCt().createElement(buttons.$, {
+}, REaCt().createElement(meetings_button.A, {
   unreadMeetings,
   className: `${NAMESPACE}-nav-button`,
-  icon: "sprite-fm-mono icon-video-call-filled"
+  icon: "icon-video-call-filled"
 }, !!unreadMeetings && REaCt().createElement("div", {
   className: "notifications-count"
 })), REaCt().createElement("span", null, l.meetings)), is_eplusplus || is_chatlink ? null : REaCt().createElement("div", {
@@ -18714,13 +18712,15 @@ const Navigation = ({
     loadSubPage('fm/chat/contacts');
     eventlog(500296);
   }
-}, REaCt().createElement(buttons.$, {
+}, REaCt().createElement(meetings_button.A, {
   className: `${NAMESPACE}-nav-button`,
   contactRequests,
-  icon: "sprite-fm-mono icon-contacts"
+  icon: "icon-contacts"
 }, !!contactRequests && REaCt().createElement("div", {
   className: "notifications-count"
 })), REaCt().createElement("span", null, l[165])));
+// EXTERNAL MODULE: ./js/ui/buttons.jsx
+const buttons = REQ_(994);
 // EXTERNAL MODULE: ./js/ui/dropdowns.jsx
 const dropdowns = REQ_(911);
 ;// ./js/chat/ui/leftPanel/actions.jsx

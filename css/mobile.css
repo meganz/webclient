@@ -898,14 +898,14 @@ ul, li {
 }
 .mobile.signin-register-block .mobile.fm-block,
 .mobile.bus-pw-confirm-block .mobile.fm-block {
-    background-color: #F8F9FA;
+    background-color: var(--stroke-grey-1);
 }
 .mobile.registration-confirm-email{
-    background-color: #F8F9FA;
+    background-color: var(--stroke-grey-1);
 }
 .mobile.registration-confirm-email .mobile.fm-block {
     padding-bottom: 24px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--stroke-grey-2);
 }
 .mobile.full-page-scrollable {
     overflow: scroll;
@@ -929,6 +929,11 @@ ul, li {
     overflow: hidden;
     background-color: #fff;
 }
+.signin-register-block .mobile.sign-header,
+.registration-confirm-email .mobile.sign-header {
+    border-bottom: 1px solid var(--stroke-main);
+    background-color: var(--stroke-main);
+}
 .mobile.full-page-scrollable.voucher-redeem-dialog .mobile.fm-header, .mobile.full-page-scrollable.voucher-redeem-dialog .mobile.fm-header {
     position: fixed;
     width: 100%;
@@ -942,6 +947,11 @@ ul, li {
 .mobile.fm-header.fm-hr, .mobile.sign-header.fm-hr {
     box-shadow: 0px 2px 18px 0px rgba(0,0,0,0.07);
     z-index: 101;
+}
+.theme-dark .signin-register-block .mobile.sign-header.fm-hr,
+.theme-dark .forgot-password-page .mobile.fm-header,
+.theme-dark .registration-confirm-email .mobile.sign-header.fm-hr {
+    box-shadow: 0 2px 18px 0 rgba(0,0,0,0.6);
 }
 .mobile.fm-header.folder-link {
     height: 126px;
@@ -1535,6 +1545,11 @@ ul, li {
     white-space: nowrap;
     margin: 0 60px 0;
 }
+.mobile.fm-header-txt.sign-in,
+.mobile.fm-header-txt.register,
+.registration-confirm-email .mobile.fm-header-txt {
+    color: var(--text-color-high);
+}
 .mobile.fm-folder-size {
     font-size: 14px;
     line-height: 19px;
@@ -2007,16 +2022,16 @@ ul, li {
     text-align: center;
     font-size: 0;
     line-height: 0;
-    border-bottom: 1px solid #eee;
-    border-top: 1px solid #eee;
-    background-color: #fff;
+    border-bottom: 1px solid var(--stroke-grey-1);
+    border-top: 1px solid var(--stroke-grey-1);
+    background-color: var(--stroke-main);
 }
 .mobile.top-link {
     cursor: pointer;
     width: 100%;
     font-size: 15px;
     letter-spacing: 0.2px;
-    color: #939DA3;
+    color: var(--text-color-medium);
     text-align: center;
     display: inline-block;
     line-height: 54px;
@@ -2047,6 +2062,10 @@ ul, li {
     position: relative;
     margin: 0 16px 4px 16px;
     border-radius: 3px;
+}
+.signin-register-block .mobile.signin-input {
+    background-color: var(--stroke-grey-1);
+    border-color: var(--stroke-grey-2);
 }
 .mobile.default-input {
     padding: 11px 12px 0 12px;
@@ -2144,6 +2163,19 @@ ul, li {
     left: 16px;
     top: 13px;
 }
+.signin-register-block .mobile.signin-input i:first-child {
+    --mask-color: var(--icon-rest);
+    --icon-size: 16px;
+    position: absolute;
+    left: 16px;
+    top: 17px;
+}
+.signin-register-block .mobile.signin-input.incorrect i:first-child {
+    --mask-color: var(--stroke-error);
+}
+.signin-register-block .mobile.signin-input i.pass-visible {
+    --mask-color: var(--icon-active);
+}
 .mobile.country-input span {
     background-position: -93px -2071px;
     width: 24px;
@@ -2198,6 +2230,10 @@ ul, li {
 .mobile.signin-input,
 .mobile.password-input {
     --icon-size: 24px;
+}
+.signin-register-block .mobile.signin-input input {
+    background-color: var(--stroke-grey-1);
+    color: var(--text-color-medium);
 }
 .mobile.signin-input.password input,
 .mobile.signin-input.password-confirm input,
@@ -2332,6 +2368,9 @@ body.de .mobile.verify-number .vn-input-wrapper .verify-number-code input::place
 .mobile.signin-input.incorrect input:-ms-input-placeholder, .mobile.verify-page .vn-input-wrapper .verify-number-code.incorrect input:-ms-input-placeholder, .mobile.phone-number-input.incorrect input:-ms-input-placeholder {
     color: #FF5555;
 }
+.signin-register-block .mobile.signin-input.incorrect {
+    color: var(--text-color-error);
+}
 .two-factor-qr-block .mobile.signin-input.two-factor-seed-input input {
     text-align: center;
     line-height: 38px;
@@ -2379,7 +2418,7 @@ input[type='checkbox'] {
     margin-right: 16px;
     margin-left: 16px;
     margin-bottom: 4px;
-    background-color: #fff;
+    background-color: var(--stroke-main);
 }
 .mobile.remember-me div.checkboxOn, .mobile.remember-me div.checkboxOff {
     margin: 18px 0 0 0;
@@ -2419,8 +2458,11 @@ input[type='checkbox'] {
     z-index: 2;
     position: absolute;
 }
+.signin-register-block .checkboxOn.square,
+.signin-register-block .checkboxOff.square {
+    border: 1px solid var(--stroke-grey-2);
+}
 .mobile.remember-me .text {
-    color: #eb4444;
     cursor: pointer;
     display: block;
     font-family: 'LatoWeb';
@@ -2430,7 +2472,7 @@ input[type='checkbox'] {
     font-stretch: normal;
     line-height: 54px;
     letter-spacing: normal;
-    color: #666;
+    color: var(--text-color-medium);
     float: none;
     padding: 0 0 0px 37px;
 }
@@ -2455,6 +2497,9 @@ input[type='checkbox'] {
     text-align: center;
     width: 100%;
 }
+.mobile.sign-in .forgot-password-button {
+    color: var(--text-color-medium);
+}
 .mobile.verify-login-page .lost-authenticator-button {
     background-color: #fff;
     border-top: 1px solid #eee;
@@ -2463,18 +2508,17 @@ input[type='checkbox'] {
     margin-top: 8px;
 }
 .mobile.confirm-terms {
-    background-color: #fff;
+    background-color: var(--stroke-main);
     overflow: hidden;
     padding-left: 17px;
 }
 .mobile.confirm-terms .checkbox {
     border-radius: 2px;
-    background-color: #ffffff;
+    background-color: var(--stroke-main);
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.15);
-    border: solid 1px #ebebeb;
+    border: solid 1px var(--stroke-grey-1);
 }
 .mobile.confirm-terms .text {
-    color: #eb4444;
     cursor: pointer;
     display: block;
     font-family: 'source_sans_proregular', sans-serif;
@@ -2484,11 +2528,11 @@ input[type='checkbox'] {
     font-stretch: normal;
     line-height: 21px;
     letter-spacing: normal;
-    color: #666;
+    color: var(--text-color-medium);
     padding: 16px 0 16px 36px;
 }
 .mobile.confirm-terms .text a {
-    color: #eb4444;
+    color: var(--text-color-error);
 }
 .mobile.signin-button, .mobile.register-button, .mobile.resend-button, .mobile.create-account-botton {
     background-image: linear-gradient(-180deg, #07BEB1 0%, #00BFA5 100%);
@@ -2573,6 +2617,13 @@ input[type='checkbox'] {
     margin-right: 5px;
     width: 20%;
     width: calc(20% - 5px);
+}
+.theme-dark .register-pass-status-line1,
+.theme-dark .register-pass-status-line2,
+.theme-dark .register-pass-status-line3,
+.theme-dark .register-pass-status-line4,
+.theme-dark .register-pass-status-line5 {
+    background-color: rgba(0, 0, 0, 0.3);
 }
 .good1 .register-pass-status-line1 {
     background-color: var(--mobile-support-error);
@@ -2687,9 +2738,9 @@ div.checkboxOn {
 }
 .mobile.tab-block.sign-in, .mobile.tab-block.register {
     padding-top: 24px;
-    background-color: #fff;
+    background-color: var(--stroke-main);
     padding-bottom: 16px;
-    border-bottom:1px solid #eee;
+    border-bottom:1px solid var(--stroke-grey-2);
 }
 .mobile.registration-confirm-email .email-icon {
     width: 200px;
@@ -2700,7 +2751,7 @@ div.checkboxOn {
     margin: 46px auto 0 auto;
 }
 .mobile.registration-confirm-email .confirm-message {
-    color: #666;
+    color: var(--text-color-high);
     font-size: 15px;
     text-align: center;
     margin-left: 16px;
@@ -2708,12 +2759,12 @@ div.checkboxOn {
     margin-top: 26px;
 }
 .mobile.registration-confirm-email .change-email {
-    background-color: #fafafa;
+    background-color: var(--stroke-grey-1);
     margin-top: 30px;
     padding: 14px 0;
     text-align: center;
     margin: 24px 16px;
-    border: 1px solid #eee;
+    border: 1px solid var(--stroke-grey-2);
 }
 .recover-account-email-block .account.input-wrapper {
     margin: 0 auto;
@@ -2725,9 +2776,9 @@ div.checkboxOn {
     border-color: var(--input-text-underline-hover);
 }
 .mobile.registration-confirm-email .change-email input {
-    background-color: #f8f8f8;
+    background-color: var(--stroke-grey-1);
     border: 0;
-    color: #444;
+    color: var(--text-color-medium);
     display: block;
     font-size: 14px;
     margin: 0;
@@ -2741,7 +2792,7 @@ div.checkboxOn {
     opacity: 0.6;
     font-size: 13px;
     text-align: center;
-    color: #667;
+    color: var(--text-color-medium);
     margin: 16px 10px 20px 10px;
 }
 .mobile.registration-generating-keys .information-message {
@@ -6084,10 +6135,13 @@ textarea.mobile.support-text-field {
 
 /* Recover account styles */
 .mobile .improved-recovery-steps {
-    background-color: #F5F7F9;
+    background-color: var(--stroke-grey-1);
 }
 .mobile .fm-dialog-body.improved-recovery-steps {
-    background-color: #fff;
+    background-color: var(--stroke-main);
+}
+.mobile .fm-dialog-body.improved-recovery-steps .fm-dialog-title {
+    color: var(--text-color-high);
 }
 .mobile .improved-recovery-steps .block-wrapper {
     width: 100%;
@@ -6113,14 +6167,14 @@ textarea.mobile.support-text-field {
     text-align: center;
 }
 .mobile .improved-recovery-steps h3.main-italic-header.main-header {
-    color: #999;
+    color: var(--text-color-high);
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
     font-weight: initial;
 }
 .mobile .improved-recovery-steps p, .mobile .improved-recovery-steps h3.main-italic-header {
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
     font-size: 14px;
-    color: #495057;
+    color: var(--text-color-medium);
     letter-spacing: 0;
     line-height: 22px;
     padding-bottom: 0;
@@ -6161,7 +6215,7 @@ textarea.mobile.support-text-field {
     margin-bottom: 10px;
     display: list-item;
     list-style: disc;
-    color: #676D75;
+    color: var(--text-color-medium);
     font-size: 13px;
 }
 .mobile .improved-recovery-steps .container-information li:last-of-type {
@@ -6184,7 +6238,7 @@ textarea.mobile.support-text-field {
 }
 .mobile .improved-recovery-steps h1, .mobile.fm-dialog.park-account-dialog .fm-dialog-title  {
     font-size: 20px;
-    color: #495057;
+    color: var(--text-color-high);
     line-height: 30px;
     -webkit-margin-before: 0.4em;
     -webkit-margin-after: 20px;
@@ -6229,7 +6283,7 @@ textarea.mobile.support-text-field {
 }
 .mobile .improved-recovery-steps p {
     font-size: 14px;
-    color: #495057;
+    color: var(--text-color-high);
     letter-spacing: 0;
     line-height: 23px;
     padding-bottom: 0;
@@ -6540,7 +6594,7 @@ textarea.mobile.support-text-field {
     max-width: 640px;
     margin: 80px 12px 12px 12px;
     display: inline-block;
-    background-color: #fff;
+    background-color: var(--stroke-main);
     border-radius: 4px;
     border: 1px solid rgba(0, 40, 100, 0.12);
     height: auto;
@@ -6566,7 +6620,7 @@ textarea.mobile.support-text-field {
     -moz-background-clip: padding;
     -webkit-background-clip: padding-box;
     background-clip: padding-box;
-    color: #444;
+    color: var(--text-color-high);
     font-weight: 900;
     display: inline-block;
     content: counter(list);
@@ -6583,12 +6637,12 @@ textarea.mobile.support-text-field {
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
     font-weight: initial;
     font-size: 13px;
-    color: #676D75;
+    color: var(--text-color-medium);
 }
 .mobile .improved-recovery-steps .list-point b {
     font-family: 'LatoWebSemibold', 'source_sans_prosemibold', Arial;
     font-weight: initial;
-    color: #495057;
+    color: var(--text-color-high);
 }
 .mobile .improved-recovery-steps strong {
     font-family: 'LatoWebSemibold', 'source_sans_probold', Arial;
@@ -6611,10 +6665,10 @@ textarea.mobile.support-text-field {
     margin-top: 26px;
 }
 .mobile .improved-recovery-steps .info-container, .mobile .improved-recovery-steps .app-instruction-block{
-    background-color: rgba(250,250,250,0.5);
+    background-color: var(--stroke-grey-1);
     padding: 24px 16px 16px;
     margin: 0 0;
-    border: 1px solid #eee;
+    border: 1px solid var(--stroke-grey-2);
     border-radius: 4px;
 }
 .mobile .improved-recovery-steps .app-instruction-block {
@@ -6624,6 +6678,7 @@ textarea.mobile.support-text-field {
 .mobile .improved-recovery-steps .app-instruction-block select {
     background: transparent;
     border: none;
+    color: var(--text-color-high);
     font-size: 14px;
     height: 44px;
     padding: 5px 5px 5px 12px;
@@ -6633,6 +6688,10 @@ textarea.mobile.support-text-field {
     appearance: none;
     -moz-appearance:none;
     outline: none;
+}
+.mobile .improved-recovery-steps .app-instruction-block select option {
+    background: var(--surface-main);
+    color: var(--text-color-high);
 }
 .mobile .improved-recovery-steps .app-instruction-block .app-button-block {
     margin: 0 auto;
@@ -6683,7 +6742,7 @@ textarea.mobile.support-text-field {
 .mobile .improved-recovery-steps .check-sessions-text {
     font-family: 'LatoWebBold', 'source_sans_proregular', Arial;
     font-size: 14px;
-    color: #495057;
+    color: var(--text-color-medium);
 }
 
 .mobile .improved-recovery-steps .info-container .settings-row input.checkboxOn, .mobile .improved-recovery-steps .info-container .settings-row input.checkboxOff {
@@ -6718,7 +6777,7 @@ textarea.mobile.support-text-field {
 .mobile .improved-recovery-steps .info-container .settings-row label {
     line-height: 1.6;
     padding-top: 13px;
-    color: #333;
+    color: var(--text-color-high);
     font-size: 14px;
     max-width: initial;
     padding-right: 12px;
@@ -6735,10 +6794,10 @@ textarea.mobile.support-text-field {
 }
 .mobile .improved-recovery-steps strong {
     font-family: 'LatoWebSemibold', 'source_sans_probold', Arial;
-    color: #333;
+    color: var(--text-color-high);
 }
 .mobile .improved-recovery-steps  strong.warning-text {
-    color: #eb4444;
+    color: var(--text-color-error);
 }
 .mobile .improved-recovery-steps .instruction-block {
     margin-top: 32px;
@@ -6770,7 +6829,7 @@ textarea.mobile.support-text-field {
     background: rgba(235,68,68,0.03);
     border: 1px solid rgba(235,68,68,0.15);
     border-radius: 2px;
-    color: #eb4444;
+    color: var(--text-color-error);
     padding: 12px;
     margin-bottom: 14px;
 }
@@ -6866,6 +6925,7 @@ textarea.mobile.support-text-field {
     margin: 0 auto;
     max-height: 95%;
     overflow: scroll;
+    background-color: var(--stroke-main);
 }
 .mobile.fm-dialog.park-account-dialog .improved-recovery-steps {
     padding: 0;
@@ -6910,7 +6970,7 @@ textarea.mobile.support-text-field {
 }
 .forgot-password-page .mobile.fm-header-txt {
     font-size: 20px;
-    color: #495057;
+    color: var(--text-color-high);
     padding: 21px 0 0 0;
 }
 .mobile .improved-recovery-steps .nav-back-icon {
@@ -7068,14 +7128,20 @@ textarea.mobile.support-text-field {
     font-size: 14px;
     font-family: 'LatoWeb', 'source_sans_proregular', Arial;
     line-height: 21px;
-    color: #495057;
+    color: var(--text-color-medium);
 }
 .mobile .improved-recovery-steps .check-sessions .checkdiv {
     margin: 12px auto 20px;
     float: initial;
 }
+.mobile .improved-recovery-steps .default-select.recovery-instructions {
+    border: 1px solid var(--stroke-grey-2);
+}
+.mobile.park-account-dialog .fm-dialog-title {
+    color: var(--text-color-high);
+}
 .bottom-page .forgot-password-page .mobile.fm-header {
-    background-color: #fff;
+    background-color: var(--stroke-main);
 }
 body.bottom-pages.mobile .fmholder.no-scroll, .mobile .fm-holder.no-scroll, .mobile .main-block.my-account-page.no-scroll {
     overflow: hidden;

@@ -131,6 +131,62 @@ FileManager.prototype.isInvalidUserStatus = function() {
 };
 
 /**
+ * Initialize MEGA S4 Object Storage.
+ * @type {function(...[*]): Promise<void>}
+ */
+FileManager.prototype.initS4FileManager = mutex('s4-object-storage.lock', function(resolve, reject) {
+    'use strict';
+    const stringify = tryCatch((v) => JSON.stringify(v));
+
+    return Promise.resolve(this.require('s4'))
+        .then(() => {
+            const cnt = Object.keys(this.c[this.RootID] || {})
+                .map((h) => this.d[h]).filter((n) => n && n.s4);
+
+            if (cnt.length) {
+                for (let i = cnt.length; i--;) {
+                    const n = cnt[i];
+                    if (s4.kernel.validateS4Container(n) > 0) {
+                        break;
+                    }
+                    if (self.d) {
+                        console.warn(`a node with s4-attr in root is not a (valid) container... ${n.h}`, stringify(n));
+                    }
+                    cnt.splice(i, 1);
+                }
+            }
+
+            if (!cnt.length) {
+                if (self.d) {
+                    console.group('Begin creation of S4 Container...');
+                }
+                return s4.kernel.container.create(true);
+            }
+        })
+        .then((h) => {
+            this.buildtree({h: 's4'});
+            $('.js-s4-tree-panel').removeClass('hidden');
+
+            if (h) {
+                const st = api.lastst;
+                if (self.d) {
+                    console.info(`S4 Container created with handle '${h}'`, st);
+                    console.groupEnd();
+                }
+                return typeof st === 'string' && api.catchup(st);
+            }
+        })
+        .then(() => {
+            if (!mega.config.get('s4onboarded')) {
+                mega.config.set('s4onboarded', 1);
+                return s4.ui.showDialog(s4.containers.dialogs.setup);
+            }
+        })
+        .then(resolve)
+        .catch(reject);
+});
+
+/**
  * Initialize the rendering of the cloud/file-manager
  * @details Former renderfm()
  * @returns {MegaPromise}
@@ -153,91 +209,17 @@ FileManager.prototype.initFileManager = async function() {
 
     const path = $.autoSelectNode && M.getNodeByHandle($.autoSelectNode).p || M.currentdirid || getLandingPage();
 
-    if (!pfid && !is_mobile && u_type) {
-        const s4e = u_attr.s4;
-        const pTag = 's4-object-storage';
+    if (!pfid && !is_mobile && u_type > 0 && u_attr.s4) {
+        const s4load = this.initS4FileManager();
 
-        if (d) {
-            console.assert(!window[pTag], 'S4 Setup already ongoing...');
-        }
-
-        if (s4e && !window[pTag]) {
-            const {infinity: inf} = mega;
-            const hold = !!this.getNodeByHandle(path.slice(0, 8)).s4;
-            window[pTag] = Date.now();
-
-            const s4load =
-                Promise.allSettled([this.getPersistentData(pTag), this.require('s4')])
-                    .then(([{value}]) => {
-                        this.setPersistentData(pTag, Date.now()).catch(dump);
-
-                        const cnt = Object.keys(this.c[this.RootID] || {})
-                            .map((h) => this.d[h]).filter((n) => n && n.s4);
-
-                        const res = [cnt, value];
-                        return cnt.length && (inf || value) ? dbfetch.geta(cnt.map(n => n.h)).then(() => res) : res;
-                    })
-                    .then(([cnt, pending]) => {
-                        const promises = [];
-
-                        if (self.d && pending) {
-                            pending = new Date(pending).toISOString();
-                            console.warn('Previous S4 Container creation did not complete.', pending);
-                        }
-
-                        if (cnt.length) {
-                            for (let i = cnt.length; i--;) {
-                                const n = cnt[i];
-                                if (s4.kernel.validateS4Container(n) > 0) {
-                                    break;
-                                }
-                                if (self.d) {
-                                    console.warn(`Invalid S4 Container ${n.h}`, n);
-                                }
-                                cnt.splice(i, 1);
-
-                                if (pending) {
-                                    promises.push(
-                                        api.setNodeAttributes(n, {name: `${pTag}.lost&found`})
-                                            .then(() => this.moveToRubbish([n.h]))
-                                    );
-                                }
-                            }
-                        }
-
-                        if (!cnt.length) {
-                            return Promise.allSettled(promises)
-                                .then(() => s4.kernel.container.create(true));
-                        }
-                    })
-                    .then(() => {
-                        window[pTag] = null;
-                        this.delPersistentData(pTag).dump(pTag);
-                        this.buildtree({h: 's4'});
-                        $('.js-s4-tree-panel').removeClass('hidden');
-                    })
-                    .then(() => {
-                        if (!mega.config.get('s4onboarded')) {
-                            mega.config.set('s4onboarded', 1);
-                            return s4.ui.showDialog(s4.containers.dialogs.setup);
-                        }
-                    })
-                    .catch((ex) => {
-                        reportError(ex);
-                        if (hold) {
-                            throw ex;
-                        }
-                    });
-
-            if (hold) {
-                // We're (re)loading over a s4-page, hold it up.
-                await s4load.catch((ex) => {
-                    if (self.d) {
-                        console.error('Failed to initialize S4 (?!)', [ex]);
-                    }
-                    onIdle(() => this.openFolder('fm'));
-                });
-            }
+        if (this.getNodeByHandle(path.slice(0, 8)).s4) {
+            // We're (re)loading over a s4-page, hold it up.
+            await s4load.catch((ex) => {
+                if (self.d) {
+                    console.error('Failed to initialize S4 (?!)', [ex]);
+                }
+                onIdle(() => this.openFolder('fm'));
+            });
         }
 
         if (mega.rewindEnabled) {

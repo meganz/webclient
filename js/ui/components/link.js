@@ -73,6 +73,11 @@ MegaLink.bindEvent = function() {
         }
 
         /* Handle redirection internally */
-        onIdle(() => loadSubPage(this.href));
+        if (this.href.startsWith('/fm/')) {
+            M.openFolder(this.href.slice(4));
+        }
+        else {
+            loadSubPage(this.href);
+        }
     });
 };

@@ -209,17 +209,20 @@ FileManager.prototype.initFileManager = async function() {
 
     const path = $.autoSelectNode && M.getNodeByHandle($.autoSelectNode).p || M.currentdirid || getLandingPage();
 
-    if (!pfid && !is_mobile && u_type > 0 && u_attr.s4) {
-        const s4load = this.initS4FileManager();
+    if (!pfid && !is_mobile && u_type > 0) {
 
-        if (this.getNodeByHandle(path.slice(0, 8)).s4) {
-            // We're (re)loading over a s4-page, hold it up.
-            await s4load.catch((ex) => {
-                if (self.d) {
-                    console.error('Failed to initialize S4 (?!)', [ex]);
-                }
-                onIdle(() => this.openFolder('fm'));
-            });
+        if (u_attr.s4) {
+            const s4load = this.initS4FileManager();
+
+            if (this.getNodeByHandle(path.slice(0, 8)).s4) {
+                // We're (re)loading over a s4-page, hold it up.
+                await s4load.catch((ex) => {
+                    if (self.d) {
+                        console.error('Failed to initialize S4 (?!)', [ex]);
+                    }
+                    onIdle(() => this.openFolder('fm'));
+                });
+            }
         }
 
         if (mega.rewindEnabled) {

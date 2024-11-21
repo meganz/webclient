@@ -58,7 +58,27 @@
 
 /* Cookies banner */
 .mega-banner-template.cookie-banner .content {
-    min-height: 72px;
+    min-height: 92px;
+}
+
+.mega-banner-template.cookie-banner .header-container {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+}
+.mobile .mega-banner-template.cookie-banner .header-container {
+    align-items: center;
+}
+
+
+.mega-banner-template.cookie-banner .reject-all {
+    width: max-content;
+    margin: 12px 0 24px;
+    text-decoration: underline;
+    cursor: pointer;
+}
+.mobile .mega-banner-template.cookie-banner .reject-all {
+    margin: 8px 0 32px;
 }
 
 /* Step 1. Common info */

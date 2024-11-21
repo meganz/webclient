@@ -385,7 +385,8 @@ function api_reqfailed(channel, error) {
                 }
                 else {
                     // Unknown reasonCode
-                    reasonText = l[17740]; // Your account was terminated due to breach of Mega's Terms of Service...
+                    // Your account was terminated due to breach of Mega's Terms of Service...
+                    reasonText = l.blocked_rsn_terminated;
                 }
 
                 // Log the user out for all scenarios except SMS required (500)

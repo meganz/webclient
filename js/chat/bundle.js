@@ -23459,10 +23459,13 @@ class Call extends mixins.w9 {
             recorder: userHandle
           }, () => {
             ChatToast.quick(l.user_recording_toast.replace('%NAME', nicknames.getNickname(this.state.recorder).substr(0, ChatToastIntegration.MAX_NAME_CHARS)));
-          }) : M.safeShowDialog(RecordingConsentDialog.dialogName, () => this.setState({
-            recorder: userHandle,
-            recordingConsentDialog: true
-          }));
+          }) : (() => {
+            closeDialog();
+            M.safeShowDialog(RecordingConsentDialog.dialogName, () => this.setState({
+              recorder: userHandle,
+              recordingConsentDialog: true
+            }));
+          })();
         }
       });
       chatRoom.rebind(`onRecordingStopped.${NAMESPACE}`, (ev, {

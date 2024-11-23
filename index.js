@@ -3393,6 +3393,16 @@ mBroadcaster.once('boot_done', () => {
         }));
     }
 
+    if (self.d > 0 && u_storage.apiHook) {
+        const stub = (cmd) => ({payload: {a}}) => {
+            if (cmd === a) {
+                console.warn(`caught(${a})`);
+                // debugger;
+            }
+        };
+        String(u_storage.apiHook).split(',').forEach((cmd) => api.hook(stub(cmd)));
+    }
+
     if (!u_sid) {
         mBroadcaster.sendMessage(mega.flags ? 'global-mega-flags' : 'update-api-search-params');
     }

@@ -5086,7 +5086,10 @@ FileManager.prototype.initLeftPanel = function() {
             const $eTarget = $(this);
             const $s4ContentPanel = $('.content-panel.s4', '.js-myfiles-panel');
 
-            if (M.dyh && M.dyh('is-section', 'container') || $(e.target).hasClass('js-cloudtree-expander')) {
+            if (M.dyh && M.dyh('is-section', 'container')
+                || $(e.target).hasClass('js-cloudtree-expander')
+                || s4.utils.getContainersList().length > 1) {
+
                 $eTarget.toggleClass('collapse');
                 if ($s4ContentPanel.hasClass('collapse')) {
                     $s4ContentPanel.removeClass('collapse');

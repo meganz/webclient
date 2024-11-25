@@ -252,12 +252,14 @@ async function fmremove(selectedNodes, skipDelWarning) {
     var title = '';
     var message = '';
     let s4Bucketcnt = 0;
+    let s4Containercnt = 0;
 
     // If on mobile we will bypass the warning dialog prompts
     skipDelWarning = skipDelWarning || is_mobile ? 1 : mega.config.get('skipDelWarning');
 
     for (i = 0; i < selectedNodes.length; i++) {
         var n = M.d[selectedNodes[i]];
+        const s4Type = M.getS4NodeType(n);
 
         if (n && n.su) {
             removesharecnt++;
@@ -272,7 +274,10 @@ async function fmremove(selectedNodes, skipDelWarning) {
             filecnt++;
         }
 
-        if (M.getS4NodeType(n) === 'bucket') {
+        if (s4Type === 'container') {
+            s4Containercnt++;
+        }
+        if (s4Type === 'bucket') {
             s4Bucketcnt++;
         }
     }
@@ -436,6 +441,11 @@ async function fmremove(selectedNodes, skipDelWarning) {
                 note = selectedNodes.length === 1 ?
                     `${l.s4_remove_bucket_note} <p>${l.s4_remove_bucket_tip}</p>` :
                     `${l.s4_remove_items_note} <p>${l.s4_remove_items_tip}</p>`;
+            }
+            // Moving S4 containers if they were accidentally created
+            else if (s4Containercnt) {
+                message = mega.icu.format(l.move_files_to_bin, filecnt + foldercnt);
+                note = `${l.s4_remove_items_note} <p>${l.s4_remove_container_tip}</p>`;
             }
             else if (filecnt === 0 && !s4Bucketcnt && foldercnt > 0) {
                 message = mega.icu.format(l.move_folders_to_bin, foldercnt);

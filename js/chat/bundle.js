@@ -15083,7 +15083,7 @@ class ConversationPanels extends mixins.w9 {
     const now = Date.now();
     return REaCt().createElement("div", {
       className: "conversation-panels"
-    }, routingSection === 'contacts' ? null : window.Notification && notificationsPermissions !== 'granted' && REaCt().createElement(REaCt().Fragment, null, notificationsPermissions === 'default' && this.renderNotificationsPending(), notificationsPermissions === 'denied' && this.renderNotificationsBlocked()), routingSection === 'contacts' ? null : supportAlert && !mega.config.get('nocallsup') && !notificationsPermissions && REaCt().createElement(Alert, {
+    }, routingSection === 'contacts' || is_chatlink ? null : window.Notification && notificationsPermissions !== 'granted' && REaCt().createElement(REaCt().Fragment, null, notificationsPermissions === 'default' && this.renderNotificationsPending(), notificationsPermissions === 'denied' && this.renderNotificationsBlocked()), routingSection === 'contacts' ? null : supportAlert && !mega.config.get('nocallsup') && REaCt().createElement(Alert, {
       type: Alert.TYPE.MEDIUM,
       className: `
                                 ${megaChat.chatUIFlags.convPanelCollapse ? 'full-span' : ''}

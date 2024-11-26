@@ -232,25 +232,9 @@ FileManager.prototype.initFileManager = async function() {
                     if (d) {
                         console.info('REWIND Initialized.', [mega.rewind]);
                     }
-
-                    // Only show to user account older than 1 month
-                    if (Date.now() - u_attr.since * 1000 < 30 * 24 * 60 * 60 * 1000) {
-                        return;
-                    }
-
-                    const m = new Date().getMonth();
-                    if (m > 7) {
-                        const sm = mega.config.get('rwdPromoDiag');
-                        if (typeof sm === 'undefined' && m > 10 || m < 11 && sm !== m) {
-                            mega.config.set('rwdPromoDiag', m);
-                            tSleep(1)
-                                .then(() => mega.config.flush())
-                                .then(() => {
-                                    eventlog(500532);
-                                    return mega.rewind.showRewindPromoDialog();
-                                })
-                                .catch(dump);
-                        }
+                    // Remove rewind promo flag as we no longer do initial loading promo
+                    if (fmconfig.rwdPromoDiag) {
+                        mega.config.remove('rwdPromoDiag');
                     }
                 })
                 .catch((ex) => {

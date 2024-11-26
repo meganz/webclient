@@ -58,6 +58,9 @@ mega.ui.pm = {
         if (d) {
             console.info('PWM Initialized.');
         }
+
+        // if user visit pwm page, we treated they are finished promotion and update their flags
+        mega.ui.onboarding.flagStorage.setSync(OBV4_FLAGS.CLOUD_DRIVE_MP_BUBBLE,1);
     },
 
     closeUI() {

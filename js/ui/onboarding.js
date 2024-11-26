@@ -25,6 +25,9 @@ window.OBV4_FLAGS = {
     CHAT_CALL_UI: 'obmcui',
     CHAT_CALL_RECORDING: 'obmcrec',
     CHAT_CALL_RAISE: 'obmcrai',
+    CLOUD_DRIVE_MP: 'obcdmp',
+    CLOUD_DRIVE_MP_TRY: 'obcdmpt',
+    CLOUD_DRIVE_MP_BUBBLE: 'obcdmpb'
     // New onboarding flags to be added at the end of this object. Don't change the order!!!!
 };
 
@@ -46,94 +49,6 @@ mBroadcaster.addListener('fm:initialized', () => {
     const flagMap = attribCache.bitMapsManager.exists('obv4')
         ? attribCache.bitMapsManager.get('obv4')
         : new MegaDataBitMap('obv4', false, Object.values(OBV4_FLAGS));
-
-    flagMap.isReady().then((res) => {
-        if (res) {
-            // ENOENT so migrate any old flags to this attribute
-            for (const flag of Object.values(OBV4_FLAGS)) {
-                let val = typeof fmconfig[flag] === 'undefined' || fmconfig[flag] === 0 ? 0 : 1;
-                if (fmconfig.obrev) {
-                    val ^= 1;
-                }
-                flagMap.setSync(flag, val, true);
-            }
-            flagMap.commit().catch(dump);
-        }
-
-        // If new user then we can ignore the first chat step
-        if (u_attr.since >= 1659398400) {
-            flagMap.setSync(OBV4_FLAGS.CHAT_NAV, 1);
-            flagMap.safeCommit();
-            // Show the new user onboarding dot when chat is ready.
-            const handleFirstChatStep = () => {
-                const $mcNavDot = $('.nw-fm-left-icon.conversations .onboarding-highlight-dot', fmholder);
-                if (!flagMap.getSync(OBV4_FLAGS.CHAT_OPEN) && !M.chat) {
-                    $('.dark-tooltip', $mcNavDot.parent().addClass('w-onboard')).addClass('hidden');
-                    $mcNavDot.removeClass('hidden');
-                }
-
-                mBroadcaster.addListener('pagechange', () => {
-                    if (M.chat) {
-                        flagMap.setSync(OBV4_FLAGS.CHAT_OPEN, 1);
-                        flagMap.safeCommit();
-                        $mcNavDot.addClass('hidden');
-                        $('.dark-tooltip', $mcNavDot.parent().removeClass('w-onboard')).removeClass('hidden');
-
-                        return 0xDEAD;
-                    }
-                });
-            };
-            if (megaChatIsReady) {
-                if (M.chat) {
-                    // Already on chat so just skip
-                    flagMap.setSync(OBV4_FLAGS.CHAT_OPEN, 1);
-                    flagMap.safeCommit();
-                }
-                else {
-                    handleFirstChatStep();
-                }
-            }
-            else {
-                mBroadcaster.once('chat_initialized', () => handleFirstChatStep());
-            }
-        }
-        else {
-            let upgraded = false;
-            if (upgradeFrom !== false && upgradeFrom < 1) {
-                // This is the version where the new chat path was added so convert to it.
-                // Existing users shall only see the scheduled meetings changes
-                flagMap.setSync(OBV4_FLAGS.CHAT_NAV, 1);
-                flagMap.setSync(OBV4_FLAGS.CHAT_CHATS_PANE, 1);
-                flagMap.setSync(OBV4_FLAGS.CHAT_MEETINGS_PANE, 1);
-                flagMap.setSync(OBV4_FLAGS.CHAT_CONTACT_PANE, 1);
-                // Set complete for now future schedule steps will reset it
-                flagMap.setSync(OBV4_FLAGS.CHAT, 0);
-                upgraded = true;
-            }
-
-
-            // Future upgrades may be added here
-
-
-            if (upgraded) {
-                flagMap.safeCommit();
-            }
-        }
-
-        if (u_attr.since <= 1674432000) {
-            flagMap.setSync(OBV4_FLAGS.CHAT_FEEDBACK_NEW, 1);
-            flagMap.safeCommit();
-        }
-
-        if (mega.ui.onboarding) {
-            mBroadcaster.addListener('pagechange', () => {
-                // Hide the control panel while the page change is finishing up.
-                $('.onboarding-control-panel').addClass('hidden');
-                onIdle(mega.ui.onboarding.start.bind(mega.ui.onboarding));
-            });
-            mega.ui.onboarding.start();
-        }
-    }).catch(dump);
 
     // Onboarding Flow map. This need to be set carefully for design flow on each section.
     // Instruction requires to be place on later stage.
@@ -413,6 +328,146 @@ mBroadcaster.addListener('fm:initialized', () => {
         }
     };
 
+    const _obv4Chat = () => {
+        // If new user then we can ignore the first chat step
+        if (u_attr.since >= 1659398400) {
+            flagMap.setSync(OBV4_FLAGS.CHAT_NAV, 1);
+            flagMap.safeCommit();
+            // Show the new user onboarding dot when chat is ready.
+            const handleFirstChatStep = () => {
+                const $mcNavDot = $('.nw-fm-left-icon.conversations .onboarding-highlight-dot', fmholder);
+                if (!flagMap.getSync(OBV4_FLAGS.CHAT_OPEN) && !M.chat) {
+                    $('.dark-tooltip', $mcNavDot.parent().addClass('w-onboard')).addClass('hidden');
+                    $mcNavDot.removeClass('hidden');
+                }
+
+                mBroadcaster.addListener('pagechange', () => {
+                    if (M.chat) {
+                        flagMap.setSync(OBV4_FLAGS.CHAT_OPEN, 1);
+                        flagMap.safeCommit();
+                        $mcNavDot.addClass('hidden');
+                        $('.dark-tooltip', $mcNavDot.parent().removeClass('w-onboard')).removeClass('hidden');
+
+                        return 0xDEAD;
+                    }
+                });
+            };
+            if (megaChatIsReady) {
+                if (M.chat) {
+                    // Already on chat so just skip
+                    flagMap.setSync(OBV4_FLAGS.CHAT_OPEN, 1);
+                    flagMap.safeCommit();
+                }
+                else {
+                    handleFirstChatStep();
+                }
+            }
+            else {
+                mBroadcaster.once('chat_initialized', () => handleFirstChatStep());
+            }
+        }
+        else {
+            let upgraded = false;
+            if (upgradeFrom !== false && upgradeFrom < 1) {
+                // This is the version where the new chat path was added so convert to it.
+                // Existing users shall only see the scheduled meetings changes
+                flagMap.setSync(OBV4_FLAGS.CHAT_NAV, 1);
+                flagMap.setSync(OBV4_FLAGS.CHAT_CHATS_PANE, 1);
+                flagMap.setSync(OBV4_FLAGS.CHAT_MEETINGS_PANE, 1);
+                flagMap.setSync(OBV4_FLAGS.CHAT_CONTACT_PANE, 1);
+                // Set complete for now future schedule steps will reset it
+                flagMap.setSync(OBV4_FLAGS.CHAT, 0);
+                upgraded = true;
+            }
+
+            // Future upgrades may be added here
+            if (upgraded) {
+                flagMap.safeCommit();
+            }
+        }
+
+        if (u_attr.since <= 1674432000) {
+            flagMap.setSync(OBV4_FLAGS.CHAT_FEEDBACK_NEW, 1);
+            flagMap.safeCommit();
+        }
+    };
+
+    const _obv4Pwm = () => {
+
+        if (mega.ui.onboarding) {
+            if (u_attr.since < 1631664000 || flagMap.getSync(OBV4_FLAGS.CLOUD_DRIVE)) {
+                const _obMap = obMap || {};
+                _obMap['cloud-drive'] = {
+                    title: l.mega_pwm,
+                    flag: OBV4_FLAGS.CLOUD_DRIVE_MP,
+                    noCP: true,
+                    steps: [
+                        {
+                            name: l.mega_pwm,
+                            flag: OBV4_FLAGS.CLOUD_DRIVE_MP_TRY,
+                            actions: [
+                                {
+                                    type: 'showExtDialog',
+                                    targetElmClass: '.mega-dialog.pwm-promo-dialog',
+                                    dialogInitFunc: mega.ui.onboarding.extDlg.showPwmPromoDialog,
+                                    markComplete: true,
+                                    postComplete: () => {
+                                        $.MPNotOpened = true;
+                                    },
+                                }
+                            ]
+                        },
+                        {
+                            name: l.mega_pwm,
+                            flag: OBV4_FLAGS.CLOUD_DRIVE_MP_BUBBLE,
+                            get prerequisiteCondition() {
+                                return typeof $.MPNotOpened === 'undefined';
+                            },
+                            actions: [
+                                {
+                                    type: 'showDialog',
+                                    dialogClass: 'mcob pwm',
+                                    dialogTitle: l.pwm_promo_onboarding_title,
+                                    dialogDesc: l.pwm_promo_onboarding_content,
+                                    targetElmClass: '.nw-fm-left-icons-panel .nw-fm-left-icon.pwm',
+                                    targetElmPosition: 'right',
+                                    markComplete: true,
+                                }
+                            ]
+                        }
+                    ]
+                };
+                mega.ui.onboarding.map = _obMap;
+            }
+            mBroadcaster.addListener('pagechange', () => {
+                // Hide the control panel while the page change is finishing up.
+                $('.onboarding-control-panel').addClass('hidden');
+                onIdle(mega.ui.onboarding.start.bind(mega.ui.onboarding));
+            });
+            mega.ui.onboarding.start();
+
+            // Mega Pass onboarding requires kickstarting manually as it does not have control panel
+            if (obMap && obMap['cloud-drive'].flag === OBV4_FLAGS.CLOUD_DRIVE_MP && M.currentrootid === M.RootID) {
+                mega.ui.onboarding.currentSection.startNextOpenSteps();
+            }
+        }
+    };
+
+    flagMap.isReady().then((res) => {
+        if (res) {
+            // ENOENT so migrate any old flags to this attribute
+            for (const flag of Object.values(OBV4_FLAGS)) {
+                let val = typeof fmconfig[flag] === 'undefined' || fmconfig[flag] === 0 ? 0 : 1;
+                if (fmconfig.obrev) {
+                    val ^= 1;
+                }
+                flagMap.setSync(flag, val, true);
+            }
+            flagMap.commit().catch(dump);
+        }
+        _obv4Chat();
+        _obv4Pwm();
+    }).catch(dump);
 
     // If this is an old user don't show them the cloud-drive onboarding v4
     if (!(u_attr.since > 1631664000 || localStorage.obv4test)) {
@@ -546,6 +601,10 @@ mBroadcaster.addListener('fm:initialized', () => {
                         </button>`;
 
                 this.steps[i] = new OnboardV4Step(this, i ,currentSteps[i], this.$obControlPanel);
+            }
+
+            if (this.map.noCP) {
+                this.$obControlPanel.addClass('hidden');
             }
 
             $('.onboarding-control-panel-step', this.$obControlPanel).safeHTML(html);
@@ -1148,6 +1207,44 @@ mBroadcaster.addListener('fm:initialized', () => {
     mega.ui.onboardingFlags = OBV4_FLAGS;
 
     window.OnboardV4Action = OnboardV4Action;
+
+    mega.ui.onboarding.extDlg = {
+        showPwmPromoDialog: () => {
+            "use strict";
+
+            const $dialog = $('.pwm-promo-dialog', '.mega-dialog-container');
+            const $actionButton = $('.btn-pwm-promo-action', $dialog);
+            const $background = $('.fm-dialog-overlay', '.mega-dialog-container');
+            const $clsBtn = $('.js-close', $dialog);
+            const _offEvents = () => {
+                $actionButton.off('click.pwm-promo');
+                $background.off('click.pwm-promo');
+                $clsBtn.off('click.pwm-promo');
+            };
+
+            $actionButton.rebind('click.pwm-promo', () => {
+                eventlog(500569);
+                loadSubPage('fm/pwm');
+                _offEvents();
+            });
+
+            $clsBtn.rebind('click.pwm-promo', () => {
+                sessionStorage.MPNotOpened = true;
+                eventlog(500570);
+                closeDialog();
+                _offEvents();
+                return false;
+            });
+
+            $background.rebind('click.pwm-promo', () => {
+                sessionStorage.MPNotOpened = true;
+                eventlog(500570);
+                _offEvents();
+            });
+
+            M.safeShowDialog('pwm-promo-dialog', $dialog);
+        }
+    }
 
     return 0xDEAD;
 });

@@ -1183,6 +1183,13 @@ mBroadcaster.once('boot_done', function populate_l() {
             + '">'
         )
         .replace('[/A3]', '</a>');
+    l.double_billing_sub_cancel = escapeHTML(l.double_billing_sub_cancel)
+        .replace(
+            '[A]',
+            `<a href="https://help.mega.io/plans-storage/payments-billing/cancel-mobile-subscription"
+                target="_blank" class="clickurl">`
+        )
+        .replace('[/A]', '</a>');
     l[16865] = escapeHTML(l[16865])
         .replace('[A]', '<a href="https://mega.io/desktop" target="_blank" class="clickurl">')
         .replace('[/A]', '</a>');

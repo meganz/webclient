@@ -313,7 +313,7 @@ mobile.settings.account = Object.create(mobile.settingsHelper, {
                         const _gatewayCheck = async(gatewayIds) => {
                             // If Apple or Google subscription show popup dialog
                             if (gatewayIds.length === 1 && (gatewayIds.includes(2) || gatewayIds.includes(3))) {
-                                msgDialog('info', l[7165], l[16501]);
+                                msgDialog('info', l[7165], l.double_billing_sub_cancel);
                             }
                             // Otherwise check for active subscriptions
                             else {

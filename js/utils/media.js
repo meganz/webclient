@@ -2439,7 +2439,7 @@ FullScreenManager.prototype.enterFullscreen = function() {
                 switch (String(hint)) {
                     case api_strerror(EBLOCKED):
                         if (!window.is_iframed) {
-                            emsg = l.not_avbl_tos_msg;
+                            emsg = l[246];
                         }
                     /* fallthrough */
                     case api_strerror(ENOENT):

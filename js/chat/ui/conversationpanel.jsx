@@ -3018,7 +3018,7 @@ export class ConversationPanels extends MegaRenderMixin {
 
         return (
             <div className="conversation-panels">
-                {routingSection === 'contacts' ?
+                {routingSection === 'contacts' || is_chatlink ?
                     null :
                     window.Notification && notificationsPermissions !== 'granted' &&
                     <>
@@ -3029,7 +3029,7 @@ export class ConversationPanels extends MegaRenderMixin {
 
                 {routingSection === 'contacts' ?
                     null :
-                    supportAlert && !mega.config.get('nocallsup') && !notificationsPermissions &&
+                    supportAlert && !mega.config.get('nocallsup') &&
                         <Alert
                             type={Alert.TYPE.MEDIUM}
                             className={`

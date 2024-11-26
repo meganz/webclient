@@ -275,7 +275,7 @@ accountUI.plan = {
             if (featurePlan.next) {
                 const section = this.renderSubBtnSection(() => {
                     if (featurePlan.gwid === 2 || featurePlan.gwid === 3) {
-                        msgDialog('warninga', l[7179], l[16501]);
+                        msgDialog('warninga', l[7179], l.double_billing_sub_cancel);
                         return;
                     }
 
@@ -540,7 +540,7 @@ accountUI.plan = {
 
                 const btnSection = this.renderSubBtnSection(() => {
                     if (gwid === 2 || gwid === 3) {
-                        msgDialog('warninga', l[7179], l[16501]);
+                        msgDialog('warninga', l[7179], l.double_billing_sub_cancel);
                         return;
                     }
 
@@ -595,7 +595,7 @@ accountUI.plan = {
                 // Tell them they need to cancel their plan off-site and don't show the feedback dialog
                 $subscriptionBlock.removeClass('hidden');
                 $cancelSubscriptionButton.rebind('click', () => {
-                    msgDialog('warninga', l[7179], l[16501]);
+                    msgDialog('warninga', l[7179], l.double_billing_sub_cancel);
                 });
             }
 

@@ -1,0 +1,74 @@
+.mega-dialog.pwm-promo-dialog {
+    width: 543px;
+    border-radius: 8px;
+}
+
+.mega-dialog.dialog-template-graphic.pwm-promo-dialog header .graphic.img-pwm-promo-dialog {
+    background-image: url("../../images/pm/pwm-promo-dialog.png");
+    background-size: 412px 228px;
+    background-repeat: no-repeat;
+    background-position: 50% bottom;
+    background-color: var(--surface-grey-2);
+    height: 248px !important;
+    width: 543px !important;
+    margin-bottom: 24px !important;
+    padding-top: 24px;
+}
+
+.theme-dark .mega-dialog.pwm-promo-dialog .img-pwm-promo-dialog {
+    background-color: var(--surface-grey-2);
+}
+
+.mega-dialog.pwm-promo-dialog.dialog-template-graphic > header {
+    padding: 0 0 4px;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.mega-dialog.pwm-promo-dialog.dialog-template-graphic > header h2 {
+    font: var(--text-h2-bold);
+}
+
+.mega-dialog.pwm-promo-dialog.dialog-template-graphic > header .graphic {
+    margin: 0 auto 12px;
+}
+
+.mega-dialog.pwm-promo-dialog > section {
+    margin-bottom: 8px;
+}
+
+.mega-dialog.pwm-promo-dialog > section a {
+    text-decoration: underline;
+}
+
+.mega-dialog.pwm-promo-dialog > section .content-block {
+    padding: 0 24px;
+}
+
+.mega-dialog.pwm-promo-dialog > footer aside {
+    padding: 16px 0 24px;
+    background: unset;
+}
+
+.mega-dialog.pwm-promo-dialog > footer > aside > button {
+    padding: 8px 12px;
+}
+
+.mega-dialog.pwm-promo-dialog > footer aside button span {
+    font: var(--text-body1);
+}
+
+#ob-dialog.pwm footer {
+    display: none;
+}
+
+#ob-dialog.pwm header {
+    padding-bottom: 24px;
+}
+
+@media only screen and (-webkit-min-device-pixel-ratio: 1.5),
+    only screen and (min-resolution: 1.5dppx) {
+    .mega-dialog.dialog-template-graphic.pwm-promo-dialog header .graphic.img-pwm-promo-dialog {
+        background-image: url("../../images/pm/pwm-promo-dialog@2x.png");
+    }
+}

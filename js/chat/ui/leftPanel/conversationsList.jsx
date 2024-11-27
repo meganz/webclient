@@ -183,7 +183,6 @@ export class Meetings extends MegaRenderMixin {
                         mega-button
                         action
                         ${tab === PAST ? 'is-active' : ''}
-                        category-past
                     `}
                     onClick={() => this.setState({ tab: PAST }, () => eventlog(500254))}>
                     <span>
@@ -195,9 +194,7 @@ export class Meetings extends MegaRenderMixin {
         );
     };
 
-    Holder = ({ heading, categoryName, className, children }) =>
-        // The `categoryName` selectors are used as references in the onboarding flow;
-        // see `chatOnboarding.jsx`, `onboarding.js` for further details.
+    Holder = ({ heading, className, children }) =>
         <div
             className={`
                 conversations-holder
@@ -206,7 +203,6 @@ export class Meetings extends MegaRenderMixin {
             <div
                 className={`
                     conversations-category
-                    ${categoryName ? `category-${categoryName}` : ''}
                 `}>
                 {heading && <span>{heading}</span>}
             </div>
@@ -262,7 +258,7 @@ export class Meetings extends MegaRenderMixin {
         const upcomingItem = chatRoom => <ConversationsListItem key={chatRoom.roomId} chatRoom={chatRoom} />;
 
         return (
-            <this.Holder categoryName="upcoming">
+            <this.Holder>
                 {upcomingMeetings && upcomingMeetings.length ?
                     <ConversationsList conversations={upcomingMeetings}>
                         {nextOccurrences.today && nextOccurrences.today.length ?
@@ -325,7 +321,7 @@ export class Meetings extends MegaRenderMixin {
             .sort(M.sortObjFn(c => c.lastActivity || c.ctime, -1));
 
         return (
-            <this.Holder categoryName="past">
+            <this.Holder>
                 <ConversationsList conversations={pastMeetings}>
                     {pastMeetings.length ?
                         pastMeetings.map(chatRoom =>

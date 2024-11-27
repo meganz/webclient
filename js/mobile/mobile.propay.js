@@ -90,7 +90,7 @@ mobile.propay = {
         const isEuro = currency === 'EUR';
 
         let discount = pro.propay.getDiscount();
-        if (discount.m && (discount.m !== planDuration)) {
+        if (discount.m && (discount.m < planDuration)) {
             discount = false;
         }
 
@@ -101,7 +101,10 @@ mobile.propay = {
             discountedPrice = discount[isEuro ? 'edtp' : 'ldtp'];
         }
 
-        const periodText = plan[pro.UTQA_RES_INDEX_MONTHS] === 12 ? l[932] : l[931];
+        let periodText = plan[pro.UTQA_RES_INDEX_MONTHS] === 12 ? l[932] : l[931];
+        if (discount && discount.m && discount.m !== 1 && discount.m !== 12) {
+            periodText = mega.icu.format(l.months_chat_history_plural, discount.m);
+        }
 
         const planExtras = plan[pro.UTQA_RES_INDEX_EXTRAS];
 
@@ -110,7 +113,7 @@ mobile.propay = {
         const planPrice = plan[pro.UTQA_RES_INDEX_LOCALPRICE] || plan[pro.UTQA_RES_INDEX_PRICE];
         const price = discountedPrice || planPrice;
 
-        const transfer = plan[pro.UTQA_RES_INDEX_TRANSFER] * pro.BYTES_PER_GB;
+        let transfer = plan[pro.UTQA_RES_INDEX_TRANSFER] * pro.BYTES_PER_GB;
         const storage = plan[pro.UTQA_RES_INDEX_STORAGE] * pro.BYTES_PER_GB;
 
         const $featureTemplate = mega.templates.getTemplate('pr-pay-card-mob-f-temp');
@@ -145,6 +148,9 @@ mobile.propay = {
 
         const setInformation = () => {
             if (transfer) {
+                if (discount && discount.m !== 1 && discount.m !== 12) {
+                    transfer = (transfer / planDuration) * discount.m;
+                }
                 $transfer.text(l[23790].replace('%1', bytesToSize(transfer, 3, 4))).removeClass('hidden');
             }
             if (storage) {
@@ -169,7 +175,11 @@ mobile.propay = {
             }
 
             if (discount) {
-                $discountItems.filter('.old-price').text(formatCurrency(planPrice, currency, 'narrowSymbol'));
+                $discountItems.filter('.old-price').text(formatCurrency(
+                    discount.ltp || planPrice,
+                    currency,
+                    'narrowSymbol'
+                ));
                 $discountItems.filter('.discount-title').text(l[24670]
                     .replace('$1', formatPercentage(discountPercentage / 100)));
             }

@@ -77,6 +77,7 @@ affiliateUI.guideDialog = {
         }
 
         $('.refer-rules-note', affiliateUI.$body).removeClass('hidden');
+        $('.guide-block', affiliateUI.$body).removeClass('hidden');
         $('.guide-dialog', affiliateUI.$body).removeClass('hidden').rebind('click.guide-dialog', function() {
             affiliateUI.guideDialog.show();
 
@@ -559,6 +560,10 @@ affiliateUI.commissionIndex = {
         'use strict';
 
         this.$block = $('.mega-data-box.commission', affiliateUI.$body);
+        if (!mega.refsuncom) {
+            return;
+        }
+        this.$block.removeClass('hidden');
 
         this.calculateCommission();
         this.bindEvents();

@@ -56,6 +56,11 @@ mega.pm = {
         'use strict';
 
         const {pwmh} = mega;
+
+        if (!pwmh) {
+            return ['name', 1];
+        }
+
         return {sortdata: fmconfig.sortmodes[pwmh] ?
             Object.values(fmconfig.sortmodes[pwmh]) : ['name', 1]};
     },
@@ -64,6 +69,11 @@ mega.pm = {
         'use strict';
 
         const {pwmh} = mega;
+
+        if (!pwmh) {
+            return;
+        }
+
         fmsortmode(pwmh, sortdata[0], sortdata[1]);
     },
 

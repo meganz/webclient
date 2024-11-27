@@ -27,6 +27,14 @@ mega.ui.pm = {
             fmholder.classList.add('pmholder');
         }
 
+        if (pmlayout) {
+            pmlayout.classList.remove('hidden');
+        }
+
+        if (!mega.pm.pwmFeature) {
+            return;
+        }
+
         if (nodeID === 'account') {
             this.list.hide();
             mega.ui.pm.settings.initUI();
@@ -39,10 +47,6 @@ mega.ui.pm = {
             }
 
             this.list.show();
-        }
-
-        if (pmlayout) {
-            pmlayout.classList.remove('hidden');
         }
 
         if (navigator.onLine) {

@@ -334,6 +334,9 @@ export default class HistoryPanel extends MegaRenderMixin {
 
     isLoading() {
         const chatRoom = this.props.chatRoom;
+        if (chatRoom.historyTimedOut) {
+            return false;
+        }
         const mb = chatRoom.messagesBuff;
 
         return this.scrollPullHistoryRetrieval === true
@@ -499,7 +502,12 @@ export default class HistoryPanel extends MegaRenderMixin {
             }
             delete self.loadingShown;
 
-            if (mb.joined === true && !self.scrollPullHistoryRetrieval && mb.haveMoreHistory() === false) {
+            if (
+                room.historyTimedOut ||
+                mb.joined === true &&
+                !self.scrollPullHistoryRetrieval &&
+                mb.haveMoreHistory() === false
+            ) {
                 var headerText = l[8002];
                 headerText =
                     contactName ?

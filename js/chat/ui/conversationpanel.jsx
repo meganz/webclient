@@ -32,6 +32,11 @@ import Link from "./link.jsx";
 const ENABLE_GROUP_CALLING_FLAG = true;
 const MAX_USERS_CHAT_PRIVATE = 100;
 const ALERTS_BASE_OFFSET = 4;
+const DISMISS_TRANSITIONS = {
+    NOT_SHOWN: 0,
+    SHOWN: 1,
+    DISMISSED: 2,
+};
 
 class EndCallButton extends MegaRenderMixin {
     IS_MODERATOR = Call.isModerator(this.props.chatRoom, u_handle);
@@ -1448,6 +1453,7 @@ export class ConversationPanel extends MegaRenderMixin {
         occurrencesLoading: false,
         waitingRoom: false,
         callUserLimit: false,
+        historyTimeOutBanner: DISMISS_TRANSITIONS.NOT_SHOWN,
     };
 
     constructor(props) {
@@ -1640,6 +1646,15 @@ export class ConversationPanel extends MegaRenderMixin {
             }
         });
 
+        chatRoom.rebind(`onHistTimeoutChange.${this.getUniqueId()}`, () => {
+            if (this.state.historyTimeOutBanner === DISMISS_TRANSITIONS.NOT_SHOWN && chatRoom.historyTimedOut) {
+                this.setState({ historyTimeOutBanner: DISMISS_TRANSITIONS.SHOWN });
+            }
+            else if (this.state.historyTimeOutBanner && !chatRoom.historyTimedOut) {
+                this.setState({ historyTimeOutBanner: DISMISS_TRANSITIONS.NOT_SHOWN });
+            }
+        });
+
         // Waiting room link where the current user is already a participant -> join the room automatically and mount
         // the waiting room UI w/o going through the `Ask to join` workflow; hosts are bypassing the waiting room here.
         if (chatRoom.options.w) {
@@ -1724,6 +1739,7 @@ export class ConversationPanel extends MegaRenderMixin {
         this.props.chatRoom.unbind(`wrOnJoinNotAllowed.${this.getUniqueId()}`);
         this.props.chatRoom.unbind(`wrOnJoinAllowed.${this.getUniqueId()}`);
         megaChat.unbind(`onIncomingCall.${this.getUniqueId()}`);
+        this.props.chatRoom.unbind(`onHistTimeoutChange.${this.getUniqueId()}`);
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -2757,6 +2773,25 @@ export class ConversationPanel extends MegaRenderMixin {
                                     </>
                                 }
                                 onClose={() => this.setState({ invalidKeysBanner: false })}
+                            />
+                        )}
+
+                        {this.state.historyTimeOutBanner === DISMISS_TRANSITIONS.SHOWN && (
+                            <Alert
+                                type={Alert.TYPE.ERROR}
+                                className={`
+                                    ${megaChat.chatUIFlags.convPanelCollapse ? 'full-span' : ''}
+                                    ${this.props.offset === ALERTS_BASE_OFFSET ? 'single_alert' : ''}
+                                    history-timeout-banner
+                                `}
+                                offset={this.props.offset === ALERTS_BASE_OFFSET ? 0 : this.props.offset}
+                                content={
+                                    <>
+                                        {l.chat_timeout_banner}
+                                        <a onClick={() => location.reload()}>{l[85]}</a>
+                                    </>
+                                }
+                                onClose={() => this.setState({ historyTimeOutBanner: DISMISS_TRANSITIONS.DISMISSED })}
                             />
                         )}
 

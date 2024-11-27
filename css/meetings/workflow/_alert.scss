@@ -15,6 +15,7 @@
     &-neutral { background: var(--secondary-grey); }
     &-medium { background: var(--secondary-orange); }
     &-high { background: var(--secondary-red); }
+    &-error { background-color: var(--stroke-error); }
 
     .messages-block & {
         top: 12px;
@@ -71,5 +72,18 @@
 
     &.unsupported-call-alert:has(~ .conversation-panel:not(.hidden) .unsupported-call-alert-progress) {
         display: none;
+    }
+
+    &.history-timeout-banner {
+        .meetings-alert-content {
+            border-radius: 8px;
+            padding: 6px 40px 6px 8px;
+            width: 100%;
+        }
+
+        a {
+            float: right;
+            margin-right: 10px;
+        }
     }
 }

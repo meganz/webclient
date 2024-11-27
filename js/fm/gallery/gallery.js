@@ -1243,7 +1243,7 @@ class MegaGallery {
             }
         }
 
-        const rfBlock = $('.fm-right-files-block', '.fmholder');
+        const rfBlock = $('.fm-right-files-block:not(.in-chat)', '.fmholder');
         const galleryHeader = $('.gallery-tabs-bl', rfBlock);
 
         galleryHeader.removeClass('hidden');

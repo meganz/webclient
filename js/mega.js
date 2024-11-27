@@ -2092,7 +2092,7 @@ function fm_updated(n) {
         if (M.megaRender) {
             M.megaRender.revokeDOMNode(n.h, true);
         }
-        delay('ui:fm.updated', () => M.updFileManagerUI().catch(dump), 30);
+        M.updFileManagerUI().catch(dump);
     }
 }
 

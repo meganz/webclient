@@ -368,7 +368,7 @@ MegaData.prototype.menuItems = async function menuItems(isTree) {
     }
     items['.refresh-item'] = 1;
 
-    if (M.gallery) {
+    if (M.gallery && $.selected.length === 1) {
         items['.add-to-album'] = 1;
     }
 
@@ -390,8 +390,9 @@ MegaData.prototype.menuItems = async function menuItems(isTree) {
     }
 
     if (M.isGalleryPage()) {
-
-        items['.open-cloud-item'] = 1;
+        if ($.selected.length === 1 && !M.isMediaDiscoveryPage()) {
+            items['.open-cloud-item'] = 1;
+        }
 
         delete items['.move-item'];
         delete items['.copy-item'];

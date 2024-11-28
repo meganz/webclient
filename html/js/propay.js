@@ -1291,15 +1291,12 @@ pro.propay = {
         let bandwidthTxt = '';
         let extraTxt = '';
 
-        if (pro.propay.planNum === pro.ACCOUNT_LEVEL_FEATURE_PWM) {
+        if ([pro.ACCOUNT_LEVEL_FEATURE_PWM, pro.ACCOUNT_LEVEL_FEATURE_VPN].includes(pro.propay.planNum)) {
+
             const planStrings = pro.propay.selectedPlan[pro.UTQA_RES_INDEX_EXTRAS].featureStrings;
             storageTxt = planStrings[0].text;
             bandwidthTxt = planStrings[1].text;
             extraTxt = planStrings[2].text;
-        }
-        else if (pro.propay.planNum === pro.ACCOUNT_LEVEL_FEATURE_VPN) {
-            storageTxt = l.pr_vpn_text1;
-            bandwidthTxt = l.pr_vpn_text2;
         }
 
         pro.propay.$storageAmount.text(storageTxt);

@@ -1287,6 +1287,7 @@ mega.gallery = {
     showEmpty: nop,
     updateButtonsStates: nop,
     removeDbActionCache: nop,
+    canShowAddToAlbum: nop,
     isGalleryNode: nop,
     emptyBlock: null,
     albumsRendered: false,

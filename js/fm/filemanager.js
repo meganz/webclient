@@ -176,12 +176,6 @@ FileManager.prototype.initS4FileManager = mutex('s4-object-storage.lock', functi
                 return typeof st === 'string' && api.catchup(st);
             }
         })
-        .then(() => {
-            if (!mega.config.get('s4onboarded')) {
-                mega.config.set('s4onboarded', 1);
-                return s4.ui.showDialog(s4.containers.dialogs.setup);
-            }
-        })
         .then(resolve)
         .catch(reject);
 });

@@ -1784,6 +1784,18 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.s4_voucher_terms = escapeHTML(l.s4_voucher_terms)
         .replace('[A]', '<a class="clickurl" href="https://mega.io/s4-terms" target="_blank">')
         .replace('[/A]', '</a>');
+    l.pwm_upsell_desc = escapeHTML(l.pwm_upsell_desc)
+        .replace('[A]', '<a class="clickurl" href="https://mega.io/pass" target="_blank">')
+        .replace('[/A]', '</a>');
+    l.vpn_upsell_desc = escapeHTML(l.vpn_upsell_desc)
+        .replace('[A]', '<a class="clickurl" href="https://mega.io/vpn" target="_blank">')
+        .replace('[/A]', '</a>');
+    l.pro_welcome_dialog_pwm_desc = escapeHTML(l.pro_welcome_dialog_pwm_desc)
+        .replace('[A]', '<a class="clickurl" href="https://mega.io/pass" target="_blank">')
+        .replace('[/A]', '</a>');
+    l.pro_welcome_dialog_vpn_desc = escapeHTML(l.pro_welcome_dialog_vpn_desc)
+        .replace('[A]', '<a class="clickurl" href="https://mega.io/vpn" target="_blank">')
+        .replace('[/A]', '</a>');
 
     const rewindHelpLink = 'https://help.mega.io/files-folders/rewind/how-do-i-use-rewind';
     const rewindLinkAttr = 'target="_blank" class="extlink" rel="noopener noreferrer"';

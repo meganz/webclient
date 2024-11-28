@@ -1602,7 +1602,7 @@ var notify = {
                 const plan = pro.getPlanObj(newPlanLevel, account.purchases[0][6]);
 
                 $('header', $dialog).text(l.welcome_dialog_header.replace('%1', plan.name));
-                $('.more-quota .info-text', $dialog).text(l.welcome_dialog_quota_details
+                $('.thanks-text', $dialog).text(l.pro_welcome_dialog_quota_brief
                     .replace('%1', bytesToSize(plan.storage, 3, 4))
                     .replace('%2', bytesToSize(plan.transfer, 3, 4)));
                 $('button', $dialog).rebind('click', () => {

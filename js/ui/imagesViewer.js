@@ -422,6 +422,24 @@ var slideshowid;
         }
     }
 
+    function slideshow_addToAlbum(n, $overlay) {
+        const $addToAlbumButton = $('.context-menu .add-to-album', $overlay);
+        const $divider = $addToAlbumButton.closest('li').prev('.divider');
+
+        if (M.getNodeRoot(n.h) === M.RootID && mega.gallery.canShowAddToAlbum() && mega.gallery.isGalleryNode(n)) {
+            $addToAlbumButton.removeClass('hidden');
+            $divider.removeClass('hidden');
+
+            $addToAlbumButton.rebind('click.mediaviewer', () => {
+                mega.gallery.albums.addToAlbum([n.h]);
+            });
+        }
+        else {
+            $addToAlbumButton.addClass('hidden');
+            $divider.addClass('hidden');
+        }
+    }
+
     function slideshow_node(id, $overlay) {
         var n = M.getNodeByHandle(id);
 
@@ -1490,6 +1508,9 @@ var slideshowid;
 
             // Remove Icon
             slideshow_remove(n, $overlay);
+
+            // Add to album icon
+            slideshow_addToAlbum(n, $overlay);
 
             if (filteredNodeArr && Array.isArray(filteredNodeArr)) {
                 preselection = filteredNodeArr;

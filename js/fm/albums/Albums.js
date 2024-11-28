@@ -1878,7 +1878,9 @@ lazy(mega.gallery, 'albums', () => {
                                 });
                             }
                             else {
-                                scope.albums.tree.setPendingButton(value);
+                                if (scope.albums.tree) {
+                                    scope.albums.tree.setPendingButton(value);
+                                }
                                 if (scope.albums.grid) {
                                     scope.albums.grid.setPendingCell(value);
                                 }
@@ -2163,7 +2165,7 @@ lazy(mega.gallery, 'albums', () => {
     }
 
     class AddToAlbumDialog extends MDialog {
-        constructor(handle, selections) {
+        constructor(handles, selections) {
             super({
                 ok: {
                     label: l.add_to_album_ok,
@@ -2172,13 +2174,28 @@ lazy(mega.gallery, 'albums', () => {
 
                         for (let i = 0; i < selections.length; i++) {
                             const album = scope.albums.store[selections[i]];
-                            mega.sets.elements.add(handle, album.id, album.k).catch(dump);
+                            const { nodes, id, k, eHandles } = album;
+                            const handlesToAdd = [];
+
+                            for (let j = 0; j < handles.length; j++) {
+                                const h = handles[j];
+
+                                if (!eHandles[h]) {
+                                    handlesToAdd.push({ h, o: (nodes.length + handlesToAdd.length + 1) * 1000 });
+                                }
+                            }
+
+                            mega.sets.elements.bulkAdd(handlesToAdd, id, k).catch(dump);
                         }
 
                         toaster.main.show({
                             icons: ['sprite-fm-mono icon-check-small-regular-outline green-check-circle'],
                             content: selections.length > 1
-                                ? mega.icu.format(l.added_item_to_albums, selections.length)
+                                ? mega.icu.format(l.added_items_to_albums, handles.length)
+                                    .replace('%s', mega.icu.format(l.albums_count, selections.length))
+                                : handles.length > 1
+                                    ? mega.icu.format(l.added_items_to_album, handles.length)
+                                        .replace('%s', scope.albums.store[selections[0]].label)
                                 : l.added_item_to_album.replace('%s', scope.albums.store[selections[0]].label)
                         });
                     }
@@ -2188,7 +2205,7 @@ lazy(mega.gallery, 'albums', () => {
                 contentClasses: 'border-top border-bottom'
             });
 
-            this.handle = handle;
+            this.handles = handles;
             this.selections = selections || Object.create(null);
             this.setContent();
             this._title.classList.add('text-center');
@@ -2226,7 +2243,7 @@ lazy(mega.gallery, 'albums', () => {
                             if (albumId) {
                                 this.selections[albumId] = true;
                             }
-                            scope.albums.addToAlbum(this.handle, this.selections);
+                            scope.albums.addToAlbum(this.handles, this.selections);
                         }
                     );
                     dialog.show();
@@ -4228,7 +4245,9 @@ lazy(mega.gallery, 'albums', () => {
                         if (this.grid) {
                             this.grid.clearPendingCell();
                         }
-                        this.tree.clearPendingButton();
+                        if (this.tree) {
+                            this.tree.clearPendingButton();
+                        }
                         pendingName = '';
                     }
                     else if (album) {
@@ -4445,9 +4464,8 @@ lazy(mega.gallery, 'albums', () => {
                 document.querySelector('.js-lp-gallery.lp-gallery .js-gallery-panel .lp-content-wrap-wrap');
             const isAlbums = M.isAlbumsPage();
             const isGallery = M.isGalleryPage();
-            const isMediaDiscovery = M.isMediaDiscoveryPage();
 
-            if ((!isAlbums && !isGallery && !(isMediaDiscovery && !folderlink)) || !gallerySidebar) {
+            if (!isAlbums && !isGallery || !gallerySidebar) {
                 // It is either not a Gallery page or dom is broken
                 return;
             }
@@ -4767,7 +4785,7 @@ lazy(mega.gallery, 'albums', () => {
         addUserAlbumToTree(albumId, toInsert) {
             const album = this.store[albumId];
 
-            if (!album) {
+            if (!album || !this.tree) {
                 return;
             }
 
@@ -5134,12 +5152,22 @@ lazy(mega.gallery, 'albums', () => {
             }
         }
 
-        static fetchDBDataFromGallery() {
-            const passDbAction = (handles) => {
+        /**
+         * Fetching the data from the local DB for the albums
+         * @param {Boolean} skipInitUi Skipping init the albums UI
+         * @returns {void}
+         */
+        static fetchDBDataFromGallery(skipInitUi = false) {
+            const passDbAction = (handles, skipInitUi) => {
                 MegaGallery.dbActionPassed = true;
 
                 if (scope.albums.awaitingDbAction) {
-                    scope.albums.init(handles);
+                    if (skipInitUi) {
+                        scope.albums.initUserAlbums();
+                    }
+                    else {
+                        scope.albums.init(handles);
+                    }
                 }
             };
 
@@ -5167,12 +5195,12 @@ lazy(mega.gallery, 'albums', () => {
                 }
 
                 if (skipDbFetch) {
-                    passDbAction(handles);
+                    passDbAction(handles, skipInitUi);
                 }
                 else {
                     dbfetch.geta(handles)
                         .then(() => {
-                            passDbAction(handles);
+                            passDbAction(handles, skipInitUi);
                         })
                         .catch(nop);
                 }
@@ -5427,13 +5455,33 @@ lazy(mega.gallery, 'albums', () => {
                 });
         }
 
-        addToAlbum(handle, selections) {
+        addToAlbum(handles, selections) {
             if (M.isInvalidUserStatus()) {
                 return;
             }
 
-            const dialog = new AddToAlbumDialog(handle, selections);
+            const dialog = new AddToAlbumDialog(handles, selections);
             dialog.show();
+        }
+
+        initUserAlbums() {
+            if (!MegaGallery.dbActionPassed) {
+                if (this.awaitingDbAction) {
+                    return; // Some other part has already requested this
+                }
+
+                this.awaitingDbAction = true;
+
+                if (M.isGalleryPage()) {
+                    return; // Handles will be retrieved by Gallery
+                }
+
+                Albums.fetchDBDataFromGallery(true);
+                return; // Fetch will re-trigger Albums.initUserAlbums() the second time after the db data is retrieved
+            }
+
+            mega.gallery.albums.setUserAlbums();
+            mega.gallery.albums.subscribeToSetsChanges();
         }
     }
 

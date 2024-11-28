@@ -12707,10 +12707,9 @@ class EndCallButton extends mixins.w9 {
         });
       }
       return this.renderButton({
-          label: peers ? l[5883] : l[5884],
-          onClick: () => call.hangUp()
-        })
-      ;
+        label: peers ? l[5883] : l[5884],
+        onClick: () => call.hangUp()
+      });
     }
     if (chatRoom.havePendingGroupCall()) {
       return this.IS_MODERATOR ? this.renderButton({
@@ -29470,8 +29469,7 @@ class Local extends AbstractGenericMessage {
     }, REaCt().createElement("i", {
       className: `sprite-fm-mono ${message.cssClass}`
     }));
-    return message.showInitiatorAvatar ? grouped ? null : $$AVATAR : $$ICON
-    ;
+    return message.showInitiatorAvatar ? grouped ? null : $$AVATAR : $$ICON;
   }
   getMessageTimestamp() {
     let _this$props$message;
@@ -29571,8 +29569,7 @@ class Contact extends AbstractGenericMessage {
     if ((_this$props$chatRoom = this.props.chatRoom) != null && _this$props$chatRoom.isAnonymous()) {
       return this._doAddContact(contactEmail).then(addedEmail => this.DIALOG.ADDED(addedEmail)).catch(this.DIALOG.DUPLICATE);
     }
-    return Object.values(M.opc).some(opc => opc.m === contactEmail) ? this.DIALOG.DUPLICATE() : this._doAddContact(contactEmail).then(addedEmail => this.DIALOG.ADDED(addedEmail))
-    ;
+    return Object.values(M.opc).some(opc => opc.m === contactEmail) ? this.DIALOG.DUPLICATE() : this._doAddContact(contactEmail).then(addedEmail => this.DIALOG.ADDED(addedEmail));
   }
   _getContactAvatar(contact, className) {
     return REaCt().createElement(ui_contacts.Avatar, {
@@ -29787,6 +29784,7 @@ class Attachment extends AbstractGenericMessage {
             const firstGroupOfButtons = [];
             let revokeButton = null;
             let downloadButton = null;
+            let addToAlbumButton = null;
             if (message.isEditable && message.isEditable()) {
               revokeButton = REaCt().createElement(dropdowns.DropdownItem, {
                 icon: "sprite-fm-mono icon-dialog-close",
@@ -29838,16 +29836,24 @@ class Attachment extends AbstractGenericMessage {
                   openCopyDialog('conversations');
                 }
               }));
+              if (mega.gallery.isGalleryNode(v)) {
+                addToAlbumButton = REaCt().createElement(dropdowns.DropdownItem, {
+                  icon: "sprite-fm-mono rectangle-stack-plus-small-regular-outline",
+                  label: l.add_to_album,
+                  disabled: mega.paywall,
+                  onClick: () => mega.gallery.albums.addToAlbum([v.h])
+                });
+              }
             }
-            if (!previewButton && firstGroupOfButtons.length === 0 && !downloadButton && linkButtons.length === 0 && !revokeButton) {
+            if (!previewButton && firstGroupOfButtons.length === 0 && !downloadButton && !addToAlbumButton && linkButtons.length === 0 && !revokeButton) {
               return null;
             }
-            if (previewButton && (firstGroupOfButtons.length > 0 || downloadButton || linkButtons.length > 0 || revokeButton)) {
+            if (previewButton && (firstGroupOfButtons.length > 0 || downloadButton || addToAlbumButton || linkButtons.length > 0 || revokeButton)) {
               previewButton = [previewButton, REaCt().createElement("hr", {
                 key: "preview-sep"
               })];
             }
-            return REaCt().createElement("div", null, previewButton, firstGroupOfButtons, firstGroupOfButtons.length > 0 ? REaCt().createElement("hr", null) : "", downloadButton, linkButtons, revokeButton && downloadButton ? REaCt().createElement("hr", null) : "", revokeButton);
+            return REaCt().createElement("div", null, previewButton, firstGroupOfButtons, firstGroupOfButtons.length > 0 ? REaCt().createElement("hr", null) : "", addToAlbumButton, addToAlbumButton ? REaCt().createElement("hr", null) : "", downloadButton, linkButtons, revokeButton && downloadButton ? REaCt().createElement("hr", null) : "", revokeButton);
           }
         }));
       } else {

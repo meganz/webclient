@@ -216,6 +216,9 @@
 .sprite-fm-uni.icon-linkedin, .sprite-fm-uni-before.icon-linkedin-before::before, .sprite-fm-uni-after.icon-linkedin-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-linkedin");
 }
+.sprite-fm-uni.icon-loader-throbber-light-outline, .sprite-fm-uni-before.icon-loader-throbber-light-outline-before::before, .sprite-fm-uni-after.icon-loader-throbber-light-outline-after::after {
+   background-image: url("../../images/sprites/fm-uni@uni.svg#icon-loader-throbber-light-outline");
+}
 .sprite-fm-uni.icon-loading, .sprite-fm-uni-before.icon-loading-before::before, .sprite-fm-uni-after.icon-loading-after::after {
    background-image: url("../../images/sprites/fm-uni@uni.svg#icon-loading");
 }

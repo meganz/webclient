@@ -125,6 +125,10 @@
 .theme-dark-forced .sprite-fm-theme.icon-image-zoom-out, .theme-dark-forced .sprite-fm-theme-before.icon-image-zoom-out-before::before, .theme-dark-forced .sprite-fm-theme-after.icon-image-zoom-out-after::after {
    background-image: url("../../images/sprites/fm-theme@dark.svg#icon-image-zoom-out");
 }
+.theme-dark .sprite-fm-theme.icon-loader-throbber-light-outline, .theme-dark .sprite-fm-theme-before.icon-loader-throbber-light-outline-before::before, .theme-dark .sprite-fm-theme-after.icon-loader-throbber-light-outline-after::after,
+.theme-dark-forced .sprite-fm-theme.icon-loader-throbber-light-outline, .theme-dark-forced .sprite-fm-theme-before.icon-loader-throbber-light-outline-before::before, .theme-dark-forced .sprite-fm-theme-after.icon-loader-throbber-light-outline-after::after {
+   background-image: url("../../images/sprites/fm-theme@dark.svg#icon-loader-throbber-light-outline");
+}
 .theme-dark .sprite-fm-theme.icon-loading-spinner, .theme-dark .sprite-fm-theme-before.icon-loading-spinner-before::before, .theme-dark .sprite-fm-theme-after.icon-loading-spinner-after::after,
 .theme-dark-forced .sprite-fm-theme.icon-loading-spinner, .theme-dark-forced .sprite-fm-theme-before.icon-loading-spinner-before::before, .theme-dark-forced .sprite-fm-theme-after.icon-loading-spinner-after::after {
    background-image: url("../../images/sprites/fm-theme@dark.svg#icon-loading-spinner");

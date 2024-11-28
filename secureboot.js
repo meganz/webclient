@@ -3030,8 +3030,6 @@ else if (!browserUpdate) {
         'pwm': {
             'pwm:vars_pm_theme_css': {f:'css/vars/pm-theme.css', n: 'vars_pm_theme_css', j:2, w:30, c:1, d:1, cache:1},
             'pwm:pm_mono_css': {f:'css/sprites/pm-mono@mono.css', n: 'pm_mono_css', j:2, w:30, c:1, d:1, cache:1},
-            'pwm:pm_dark_css': {f:'css/sprites/pm-theme@dark.css', n: 'pm_dark_css', j:2, w:30, c:1, d:1, cache:1},
-            'pwm:pm_light_css': {f:'css/sprites/pm-theme@light.css', n: 'pm_light_css', j:2, w:30, c:1, d:1, cache:1},
             'pwm:checkbox_css': {f:'css/components/checkbox.css', n: 'checkbox_css', j:2, w:1},
             'pwm:rack_css': {f:'css/components/rack.css', n: 'rack_css', j:2, w:1},
             'pwm:toast_css': {f:'css/components/toast.css', n: 'toast_css', j:2, w:1},

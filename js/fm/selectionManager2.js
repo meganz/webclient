@@ -824,7 +824,12 @@ class SelectionManager2_DOM extends SelectionManager2Base {
      * @returns {Boolean}
      */
     selectionNotification(nodeId, isAddToSelection, scrollTo = true) {
-        if (M.chat || M.isGalleryPage() || typeof nodeId !== 'number' && !M.d[nodeId]) {
+        if (
+            M.chat
+            || (typeof nodeId !== 'number' && !M.d[nodeId])
+            || (M.isGalleryPage() && mega.gallery.photos && mega.gallery.photos.mode !== 'a')
+            || (M.isMediaDiscoveryPage() && mega.gallery.discovery && mega.gallery.discovery.mode !== 'a')
+        ) {
             return false;
         }
         let itemsNum = this.selected_list.filter(h => h !== this.currentdirid).length;
@@ -904,10 +909,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
         this.vSelectionBar = $('b', $selectionBar).get(0);
 
-        if (
-            (!M.gallery || M.isAlbumsPage())
-            && (this.currentdirid.substr(0, 7) !== 'search/' || this.selected_list.length > 1)
-        ) {
+        if (this.currentdirid.substr(0, 7) !== 'search/' || this.selected_list.length > 1) {
             $selectionBar.removeClass('hidden');
             this.updateScrollBar();
             this.scrollToElementProxyMethod(this.last_selected);

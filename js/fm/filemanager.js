@@ -3008,7 +3008,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             !is_transfers_or_accounts &&
             !$.dialog &&
             !slideshowid &&
-            M.viewmode == 1
+            (M.viewmode === 1 || M.gallery)
         ) {
             if (e.keyCode == 37) {
                 // left
@@ -3186,8 +3186,9 @@ FileManager.prototype.initUIKeyEvents = function() {
             is_selection_manager_available &&
             e.keyCode == 65 &&
             e.ctrlKey &&
-            !$.dialog &&
-            !M.isGalleryPage()
+            (!M.isGalleryPage() || !mega.gallery.photos || mega.gallery.photos.mode !== 'a') &&
+            (!M.isMediaDiscoveryPage() || !mega.gallery.discovery || mega.gallery.discovery.mode !== 'a') &&
+            !$.dialog
         ) {
             if (is_transfers_or_accounts) {
                 return;

@@ -172,6 +172,18 @@ lazy(s4, 'ui', () => {
         }
 
         /**
+         * Show Onboarding Setup
+         * @returns {void} void
+         * @memberOf s4.ui
+         */
+        showSetupDialog() {
+            if (!mega.config.get('s4onboarded')) {
+                mega.config.set('s4onboarded', 1);
+                this.showDialog(s4.containers.dialogs.setup);
+            }
+        }
+
+        /**
          * Render Object storage section
          * Show Container content until multiple containers feature is available
          * Create Container if containers list is empty
@@ -434,6 +446,9 @@ lazy(s4, 'ui', () => {
             if (M.dyh !== dyh) {
                 M.dyh = dyh;
             }
+
+            // Show setup dialog if user opens S4 section first time
+            this.showSetupDialog();
 
             if (!this.beforePageChangeListener) {
                 this.beforePageChangeListener = mBroadcaster.addListener('beforepagechange', tpage => {

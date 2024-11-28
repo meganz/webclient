@@ -81,6 +81,7 @@
 
 .settings-container .dropdown-options-wrap.top {
     top: -4px;
+    max-height: 400px;
 }
 
 @media screen  and (min-width: 769px) {

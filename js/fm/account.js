@@ -3904,6 +3904,7 @@ accountUI.s4 = {
                         loadingDialog.show('s4optsout.s4r');
                         s4.utils.optsOut()
                             .then(() => {
+                                mega.config.remove('s4onboarded');
                                 loadSubPage('fm');
                                 location.reload();
                             })

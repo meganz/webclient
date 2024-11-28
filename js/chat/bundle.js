@@ -1209,50 +1209,9 @@ let _dec, _class;
 const ChatOnboarding = (_dec = (0,mixins.hG)(1000), _class = class ChatOnboarding {
   constructor(megaChat) {
     this.finished = false;
-    this.currentChatIsScheduled = false;
     if (u_type === 3 && !is_mobile) {
-      this.scheduledOccurrencesMap = {
-        flag: OBV4_FLAGS.CHAT_SCHEDULE_OCCUR,
-        actions: [{
-          type: 'showDialog',
-          dialogClass: 'mcob',
-          dialogTitle: l.onboard_megachat_dlg7b_title,
-          dialogDesc: l.onboard_megachat_dlg7b_text,
-          targetElmClass: `.conversationsApp .conversation-panel:not(.hidden)
-                                 .chatroom-occurrences-panel .chat-dropdown.header`,
-          targetElmPosition: 'left',
-          ignoreBgClick: true,
-          markComplete: true
-        }]
-      };
-      this.feedbackMap = {
-        flag: OBV4_FLAGS.CHAT_FEEDBACK_NEW,
-        actions: [{
-          type: 'showDialog',
-          dialogClass: 'mcob',
-          dialogTitle: l.onboard_megachat_dlg10_title,
-          dialogDesc: l.onboard_megachat_dlg10_text,
-          targetElmClass: '#fmholder button.js-more-menu.js-top-buttons',
-          targetElmPosition: 'left bottom',
-          targetHotSpot: true,
-          markComplete: true,
-          skipHidden: true,
-          ignoreBgClick: '.conversationsApp',
-          dialogNext: l[726]
-        }]
-      };
       this.state = {
-        [OBV4_FLAGS.CHAT]: -1,
-        [OBV4_FLAGS.CHAT_SCHEDULE_NEW]: -1,
-        [OBV4_FLAGS.CHAT_SCHEDULE_ADDED]: -1,
-        [OBV4_FLAGS.CHAT_SCHEDULE_OCCUR]: -1,
-        [OBV4_FLAGS.CHAT_SCHEDULE_CONF]: -1,
-        [OBV4_FLAGS.CHAT_FEEDBACK_NEW]: -1,
-        [OBV4_FLAGS.CHAT_CONTACT_PANE]: -1
-      };
-      this.actions = {
-        [OBV4_FLAGS.CHAT_SCHEDULE_OCCUR]: null,
-        [OBV4_FLAGS.CHAT_FEEDBACK_NEW]: null
+        [OBV4_FLAGS.CHAT]: -1
       };
       this.megaChat = megaChat;
       this.flagMap = attribCache.bitMapsManager.exists('obv4') ? attribCache.bitMapsManager.get('obv4') : new MegaDataBitMap('obv4', false, Object.values(OBV4_FLAGS));
@@ -1287,108 +1246,8 @@ const ChatOnboarding = (_dec = (0,mixins.hG)(1000), _class = class ChatOnboardin
       if (!room) {
         return;
       }
-      if ($.dialog === 'onboardingDialog' && (this.currentChatIsScheduled && !room.scheduledMeeting || this.occurrenceDialogShown ^ this.willShowOccurrences)) {
-        closeDialog();
-      }
-      this.currentChatIsScheduled = !!room.scheduledMeeting;
       this.checkAndShowStep();
     });
-    this.schedListeners = [`${this.megaChat.plugins.meetingsManager.EVENTS.INITIALIZE}.chatonboard`, `${this.megaChat.plugins.meetingsManager.EVENTS.OCCURRENCES_UPDATE}.chatonboard`];
-    for (const event of this.schedListeners) {
-      this.megaChat.rebind(event, () => this.handleNewScheduledMeeting());
-    }
-  }
-  handleNewScheduledMeeting() {
-    if (this.state[OBV4_FLAGS.CHAT_SCHEDULE_NEW] !== 1) {
-      this.flagMap.set(OBV4_FLAGS.CHAT_SCHEDULE_NEW, 1).always(() => {
-        this.flagMap.safeCommit();
-        if ($.dialog === 'onboardingDialog') {
-          closeDialog();
-        }
-        this.checkAndShowStep();
-      });
-    }
-    for (const event of this.schedListeners) {
-      this.megaChat.off(event);
-    }
-    if (M.chat && megaChatIsReady) {
-      this.checkAndShowStep();
-    }
-    delete this.schedListeners;
-  }
-  showOccurrencesDialog() {
-    if (this.state[OBV4_FLAGS.CHAT_SCHEDULE_CONF] === 1) {
-      this.scheduledOccurrencesMap.actions[0].skipHidden = true;
-      this.scheduledOccurrencesMap.actions[0].dialogNext = l[81];
-      if (this.actions[OBV4_FLAGS.CHAT_SCHEDULE_OCCUR] && typeof this.actions[OBV4_FLAGS.CHAT_SCHEDULE_OCCUR].map.skipHidden === 'undefined') {
-        delete this.actions[OBV4_FLAGS.CHAT_SCHEDULE_OCCUR];
-      }
-    }
-    if (!this.actions[OBV4_FLAGS.CHAT_SCHEDULE_OCCUR]) {
-      const parent = {
-        markDone: () => {
-          this.flagMap.set(OBV4_FLAGS.CHAT_SCHEDULE_OCCUR, 1).always(() => {
-            this.flagMap.safeCommit();
-            this.occurrenceDialogShown = false;
-            this.checkAndShowStep();
-          });
-        },
-        markDeactive: () => {
-          this.occurrenceDialogShown = false;
-        },
-        toNextAction: nop,
-        $obControlPanel: $('.onboarding-control-panel', fmholder),
-        parentSection: {
-          showConfirmDismiss: () => {
-            this.flagMap.setSync(OBV4_FLAGS.CHAT_SCHEDULE_OCCUR, 1);
-            this.flagMap.commit().always(() => {
-              this.flagMap.setSync(OBV4_FLAGS.CHAT, 1);
-              this.flagMap.safeCommit();
-            });
-          },
-          startNextOpenSteps: nop,
-          hotspotNextStep: nop,
-          parent: {}
-        }
-      };
-      this.actions[OBV4_FLAGS.CHAT_SCHEDULE_OCCUR] = new OnboardV4Action(parent, this.scheduledOccurrencesMap.actions[0]);
-    }
-    if ($.dialog === 'onboardingDialog') {
-      closeDialog();
-    }
-    $('.chat-dropdown.header:not(.expanded)', '.chatroom-occurrences-panel').filter(':visible').click();
-    this.actions[OBV4_FLAGS.CHAT_SCHEDULE_OCCUR].execute();
-    this.occurrenceDialogShown = true;
-  }
-  showNewUserFeedbackDialog() {
-    if (!this.actions[OBV4_FLAGS.CHAT_FEEDBACK_NEW]) {
-      const parent = {
-        markDone: () => {
-          this.flagMap.set(OBV4_FLAGS.CHAT_FEEDBACK_NEW, 1).always(() => {
-            this.flagMap.safeCommit();
-            delete mega.ui.onboarding.$hotSpotNode;
-            this.checkAndShowStep();
-          });
-        },
-        markDeactive: () => {
-          delete mega.ui.onboarding.$hotSpotNode;
-        },
-        toNextAction: nop,
-        $obControlPanel: $('.onboarding-control-panel', fmholder),
-        parentSection: {
-          showConfirmDismiss: nop,
-          startNextOpenSteps: nop,
-          hotspotNextStep: nop,
-          parent: {}
-        }
-      };
-      this.actions[OBV4_FLAGS.CHAT_FEEDBACK_NEW] = new OnboardV4Action(parent, this.feedbackMap.actions[0]);
-    }
-    if ($.dialog === 'onboardingDialog') {
-      closeDialog();
-    }
-    this.actions[OBV4_FLAGS.CHAT_FEEDBACK_NEW].execute();
-    mega.ui.onboarding.$hotSpotNode = $(this.feedbackMap.actions[0].targetElmClass);
   }
   checkAndShowStep() {
     this._checkAndShowStep();
@@ -1428,15 +1287,6 @@ const ChatOnboarding = (_dec = (0,mixins.hG)(1000), _class = class ChatOnboardin
     if (!obChat) {
       return;
     }
-    if (this.state[OBV4_FLAGS.CHAT_FEEDBACK_NEW] !== 1 && this.state[OBV4_FLAGS.CHAT_CONTACT_PANE] === 1) {
-      this.showNewUserFeedbackDialog();
-      return;
-    }
-    const room = this.megaChat.getCurrentRoom();
-    if (room && room.scheduledMeeting && room.scheduledMeeting.recurring && this.state[OBV4_FLAGS.CHAT_SCHEDULE_ADDED] === 1 && this.state[OBV4_FLAGS.CHAT_SCHEDULE_OCCUR] !== 1 && !this.megaChat.chatUIFlags.convPanelCollapse) {
-      this.showOccurrencesDialog();
-      return;
-    }
     if (this.state[OBV4_FLAGS.CHAT]) {
       return;
     }
@@ -1449,21 +1299,7 @@ const ChatOnboarding = (_dec = (0,mixins.hG)(1000), _class = class ChatOnboardin
       if (obChat.steps && obChat.steps[nextIdx] && obChat.steps[nextIdx].isComplete) {
         return;
       }
-      if (!megaChat.hasSupportForCalls && obChat.steps[nextIdx].map.flag === OBV4_FLAGS.CHAT_SCHEDULE_START) {
-        this.flagMap.isReady().always(() => {
-          this.flagMap.setSync(OBV4_FLAGS.CHAT_SCHEDULE_START, 1);
-          this.flagMap.safeCommit();
-          this._checkAndShowStep();
-        });
-        return;
-      }
-      if (obChat.steps[nextIdx].map.flag === OBV4_FLAGS.CHAT_SCHEDULE_ADDED && this.hasDisplayableScheduleMeeting && !this.isMeetingsTab) {
-        this.megaChat.trigger(conversations.qY.NAV_RENDER_VIEW, conversations.Vw.MEETINGS);
-      }
-      const res = obChat.startNextOpenSteps(nextIdx);
-      if (obChat.steps[nextIdx].map.flag === OBV4_FLAGS.CHAT_SCHEDULE_CONF && res !== false) {
-        $('.chat-dropdown.header:not(.expanded)', '.chatroom-options-panel').filter(':visible').click();
-      }
+      obChat.startNextOpenSteps(nextIdx);
       this.$obDialog = this.$obDialog || $('#ob-dialog');
     }
   }
@@ -1479,38 +1315,10 @@ const ChatOnboarding = (_dec = (0,mixins.hG)(1000), _class = class ChatOnboardin
       }
     }
   }
-  get hasDisplayableScheduleMeeting() {
-    return !!Object.values(this.megaChat.chats.toJS()).filter(c => c.isDisplayable() && c.isMeeting && c.scheduledMeeting && c.scheduledMeeting.isUpcoming).length;
-  }
-  get isMeetingsTab() {
-    this.$meetingsTab = this.$meetingsTab || $('.lhp-nav .lhp-meetings-tab', '.conversationsApp');
-    return this.$meetingsTab.hasClass('active');
-  }
-  get willShowOccurrences() {
-    if (!this.currentChatIsScheduled) {
-      return false;
-    }
-    if (this.state[OBV4_FLAGS.CHAT_SCHEDULE_OCCUR] === 1) {
-      return false;
-    }
-    if (this.state[OBV4_FLAGS.CHAT_SCHEDULE_ADDED] === 0) {
-      return false;
-    }
-    return !!this.megaChat.getCurrentRoom().scheduledMeeting.recurring;
-  }
-  get canShowScheduledNew() {
-    return this.state[OBV4_FLAGS.CHAT_FEEDBACK_NEW] === 1 && this.state[OBV4_FLAGS.CHAT_CONTACT_PANE] === 1;
-  }
   destroy() {
     if (this.interval) {
       clearInterval(this.interval);
       delete this.interval;
-    }
-    if (this.schedListeners) {
-      for (const event of this.schedListeners) {
-        this.megaChat.off(event);
-      }
-      delete this.schedListeners;
     }
   }
 }, (0,applyDecoratedDescriptor.A)(_class.prototype, "checkAndShowStep", [_dec], Object.getOwnPropertyDescriptor(_class.prototype, "checkAndShowStep"), _class.prototype), _class);
@@ -12899,10 +12707,9 @@ class EndCallButton extends mixins.w9 {
         });
       }
       return this.renderButton({
-          label: peers ? l[5883] : l[5884],
-          onClick: () => call.hangUp()
-        })
-      ;
+        label: peers ? l[5883] : l[5884],
+        onClick: () => call.hangUp()
+      });
     }
     if (chatRoom.havePendingGroupCall()) {
       return this.IS_MODERATOR ? this.renderButton({
@@ -15083,7 +14890,7 @@ class ConversationPanels extends mixins.w9 {
     const now = Date.now();
     return REaCt().createElement("div", {
       className: "conversation-panels"
-    }, routingSection === 'contacts' ? null : window.Notification && notificationsPermissions !== 'granted' && REaCt().createElement(REaCt().Fragment, null, notificationsPermissions === 'default' && this.renderNotificationsPending(), notificationsPermissions === 'denied' && this.renderNotificationsBlocked()), routingSection === 'contacts' ? null : supportAlert && !mega.config.get('nocallsup') && !notificationsPermissions && REaCt().createElement(Alert, {
+    }, routingSection === 'contacts' || is_chatlink ? null : window.Notification && notificationsPermissions !== 'granted' && REaCt().createElement(REaCt().Fragment, null, notificationsPermissions === 'default' && this.renderNotificationsPending(), notificationsPermissions === 'denied' && this.renderNotificationsBlocked()), routingSection === 'contacts' ? null : supportAlert && !mega.config.get('nocallsup') && REaCt().createElement(Alert, {
       type: Alert.TYPE.MEDIUM,
       className: `
                                 ${megaChat.chatUIFlags.convPanelCollapse ? 'full-span' : ''}
@@ -19234,7 +19041,6 @@ class Meetings extends mixins.w9 {
                         mega-button
                         action
                         ${tab === PAST ? 'is-active' : ''}
-                        category-past
                     `,
         onClick: () => this.setState({
           tab: PAST
@@ -19245,7 +19051,6 @@ class Meetings extends mixins.w9 {
     };
     this.Holder = ({
       heading,
-      categoryName,
       className,
       children
     }) => REaCt().createElement("div", {
@@ -19256,7 +19061,6 @@ class Meetings extends mixins.w9 {
     }, REaCt().createElement("div", {
       className: `
                     conversations-category
-                    ${categoryName ? `category-${categoryName}` : ''}
                 `
     }, heading && REaCt().createElement("span", null, heading)), children);
     this.Ongoing = ({
@@ -19296,9 +19100,7 @@ class Meetings extends mixins.w9 {
         key: chatRoom.roomId,
         chatRoom
       });
-      return REaCt().createElement(this.Holder, {
-        categoryName: "upcoming"
-      }, upcomingMeetings && upcomingMeetings.length ? REaCt().createElement(ConversationsList, {
+      return REaCt().createElement(this.Holder, null, upcomingMeetings && upcomingMeetings.length ? REaCt().createElement(ConversationsList, {
         conversations: upcomingMeetings
       }, nextOccurrences.today && nextOccurrences.today.length ? REaCt().createElement("div", {
         className: "conversations-group"
@@ -19330,9 +19132,7 @@ class Meetings extends mixins.w9 {
         return c.isMeeting && c.isDisplayable() && (!c.scheduledMeeting || isCanceled || isPast || isCompleted) && !c.havePendingCall();
       }).sort(M.sortObjFn(c => c.lastActivity || c.ctime, -1));
       const archivedMeetings = conversations.filter(c => c.isMeeting && c.isArchived()).sort(M.sortObjFn(c => c.lastActivity || c.ctime, -1));
-      return REaCt().createElement(this.Holder, {
-        categoryName: "past"
-      }, REaCt().createElement(ConversationsList, {
+      return REaCt().createElement(this.Holder, null, REaCt().createElement(ConversationsList, {
         conversations: pastMeetings
       }, pastMeetings.length ? pastMeetings.map(chatRoom => chatRoom.roomId && REaCt().createElement(ConversationsListItem, {
         key: chatRoom.roomId,
@@ -23459,10 +23259,13 @@ class Call extends mixins.w9 {
             recorder: userHandle
           }, () => {
             ChatToast.quick(l.user_recording_toast.replace('%NAME', nicknames.getNickname(this.state.recorder).substr(0, ChatToastIntegration.MAX_NAME_CHARS)));
-          }) : M.safeShowDialog(RecordingConsentDialog.dialogName, () => this.setState({
-            recorder: userHandle,
-            recordingConsentDialog: true
-          }));
+          }) : (() => {
+            closeDialog();
+            M.safeShowDialog(RecordingConsentDialog.dialogName, () => this.setState({
+              recorder: userHandle,
+              recordingConsentDialog: true
+            }));
+          })();
         }
       });
       chatRoom.rebind(`onRecordingStopped.${NAMESPACE}`, (ev, {
@@ -29666,8 +29469,7 @@ class Local extends AbstractGenericMessage {
     }, REaCt().createElement("i", {
       className: `sprite-fm-mono ${message.cssClass}`
     }));
-    return message.showInitiatorAvatar ? grouped ? null : $$AVATAR : $$ICON
-    ;
+    return message.showInitiatorAvatar ? grouped ? null : $$AVATAR : $$ICON;
   }
   getMessageTimestamp() {
     let _this$props$message;
@@ -29767,8 +29569,7 @@ class Contact extends AbstractGenericMessage {
     if ((_this$props$chatRoom = this.props.chatRoom) != null && _this$props$chatRoom.isAnonymous()) {
       return this._doAddContact(contactEmail).then(addedEmail => this.DIALOG.ADDED(addedEmail)).catch(this.DIALOG.DUPLICATE);
     }
-    return Object.values(M.opc).some(opc => opc.m === contactEmail) ? this.DIALOG.DUPLICATE() : this._doAddContact(contactEmail).then(addedEmail => this.DIALOG.ADDED(addedEmail))
-    ;
+    return Object.values(M.opc).some(opc => opc.m === contactEmail) ? this.DIALOG.DUPLICATE() : this._doAddContact(contactEmail).then(addedEmail => this.DIALOG.ADDED(addedEmail));
   }
   _getContactAvatar(contact, className) {
     return REaCt().createElement(ui_contacts.Avatar, {
@@ -29983,6 +29784,7 @@ class Attachment extends AbstractGenericMessage {
             const firstGroupOfButtons = [];
             let revokeButton = null;
             let downloadButton = null;
+            let addToAlbumButton = null;
             if (message.isEditable && message.isEditable()) {
               revokeButton = REaCt().createElement(dropdowns.DropdownItem, {
                 icon: "sprite-fm-mono icon-dialog-close",
@@ -30034,16 +29836,24 @@ class Attachment extends AbstractGenericMessage {
                   openCopyDialog('conversations');
                 }
               }));
+              if (mega.gallery.isGalleryNode(v)) {
+                addToAlbumButton = REaCt().createElement(dropdowns.DropdownItem, {
+                  icon: "sprite-fm-mono rectangle-stack-plus-small-regular-outline",
+                  label: l.add_to_album,
+                  disabled: mega.paywall,
+                  onClick: () => mega.gallery.albums.addToAlbum([v.h])
+                });
+              }
             }
-            if (!previewButton && firstGroupOfButtons.length === 0 && !downloadButton && linkButtons.length === 0 && !revokeButton) {
+            if (!previewButton && firstGroupOfButtons.length === 0 && !downloadButton && !addToAlbumButton && linkButtons.length === 0 && !revokeButton) {
               return null;
             }
-            if (previewButton && (firstGroupOfButtons.length > 0 || downloadButton || linkButtons.length > 0 || revokeButton)) {
+            if (previewButton && (firstGroupOfButtons.length > 0 || downloadButton || addToAlbumButton || linkButtons.length > 0 || revokeButton)) {
               previewButton = [previewButton, REaCt().createElement("hr", {
                 key: "preview-sep"
               })];
             }
-            return REaCt().createElement("div", null, previewButton, firstGroupOfButtons, firstGroupOfButtons.length > 0 ? REaCt().createElement("hr", null) : "", downloadButton, linkButtons, revokeButton && downloadButton ? REaCt().createElement("hr", null) : "", revokeButton);
+            return REaCt().createElement("div", null, previewButton, firstGroupOfButtons, firstGroupOfButtons.length > 0 ? REaCt().createElement("hr", null) : "", addToAlbumButton, addToAlbumButton ? REaCt().createElement("hr", null) : "", downloadButton, linkButtons, revokeButton && downloadButton ? REaCt().createElement("hr", null) : "", revokeButton);
           }
         }));
       } else {

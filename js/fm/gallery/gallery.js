@@ -1,9 +1,15 @@
 class GalleryNodeBlock {
-    constructor(node) {
+    constructor(node, mode = 'a') {
         this.node = node;
         this.el = document.createElement('a');
         this.el.className = 'data-block-view';
         this.el.id = node.h;
+
+        if (mode === 'a') {
+            const checkmark = document.createElement('i');
+            checkmark.className = 'sprite-fm-mono icon-check';
+            this.el.appendChild(checkmark);
+        }
 
         this.spanEl = document.createElement('span');
         this.spanEl.className = 'data-block-bg content-visibility-auto';
@@ -1243,7 +1249,7 @@ class MegaGallery {
             }
         }
 
-        const rfBlock = $('.fm-right-files-block', '.fmholder');
+        const rfBlock = $('.fm-right-files-block:not(.in-chat)', '.fmholder');
         const galleryHeader = $('.gallery-tabs-bl', rfBlock);
 
         galleryHeader.removeClass('hidden');
@@ -1288,6 +1294,34 @@ class MegaGallery {
             galleryHeader.toggleClass('invisible', !M.v.length &&
                 (this.id === 'photos' || this.id === 'images' || this.id === 'videos'));
         })();
+
+        if (this.mode === 'a') {
+            $.selectddUIgrid = '.gallery-type-a .gallery-view-scrolling';
+            $.selectddUIitem = 'a';
+
+            $($.selectddUIgrid).selectable({
+                filter: $.selectddUIitem,
+                cancel: '.ps__rail-y, .ps__rail-x, a',
+                start: e => {
+                    $.hideContextMenu(e);
+                    $.hideTopMenu();
+                    $.selecting = true;
+                },
+                stop: () => {
+                    $.selecting = false;
+                    mega.ui.mInfoPanel.reRenderIfVisible($.selected);
+                },
+                appendTo: $.selectddUIgrid
+            });
+            $($.selectddUIgrid).trigger('selectablereinitialized');
+        }
+        else {
+            const uiGrid = $('.gallery-view-scrolling');
+
+            if (uiGrid.selectable('instance')) {
+                uiGrid.selectable('destroy');
+            }
+        }
     }
 
     resetAndRender() {
@@ -1312,7 +1346,10 @@ class MegaGallery {
             const $eTarget = $(e.currentTarget);
             const h = $eTarget.attr('id');
 
-            selectionManager.clear_selection();
+            if (this.mode !== 'a') {
+                selectionManager.clear_selection();
+            }
+
             selectionManager.add_to_selection(h);
 
             $.hideContextMenu(e);
@@ -1329,8 +1366,12 @@ class MegaGallery {
                 return false;
             }
 
+            if (e.target && M.d[e.target.id] && !$.selected.includes(e.target.id)) {
+                selectionManager.clear_selection();
+                selectionManager.add_to_selection(e.target.id);
+            }
+
             $.hideContextMenu(e);
-            selectionManager.resetTo(e.currentTarget.id);
             M.contextMenuUI(e, 1);
         });
 
@@ -1352,11 +1393,7 @@ class MegaGallery {
             return false;
         });
 
-        $galleryBlock.rebind('click.galleryViewClear', () => {
-            selectionManager.clear_selection();
-        });
-
-        $galleryBlock.rebind('dblclick.galleryView', '.data-block-view', e => {
+        $galleryBlock.rebind('dblclick.galleryView', 'a.data-block-view', e => {
 
             const $eTarget = $(e.currentTarget);
 
@@ -1712,7 +1749,7 @@ class MegaGallery {
             return;
         }
 
-        const elm = new GalleryNodeBlock(node);
+        const elm = new GalleryNodeBlock(node, this.mode);
 
         mega.gallery.setShimmering(elm.el);
 
@@ -2210,6 +2247,23 @@ mega.gallery.isGalleryNode = (n, ext) => {
 
     ext = ext || fileext(n && n.name || n, true, true);
     return n.fa && (mega.gallery.isImage(n, ext) || mega.gallery.isVideo(n));
+};
+
+/**
+ * Checking if we want to see add to album option in the current viewing page
+ * @returns {Boolean}
+ */
+mega.gallery.canShowAddToAlbum = () => {
+    'use strict';
+
+    const areas = {
+        'shares': true,
+        's4': true,
+        [M.RubbishID]: true,
+        [M.getNodeByHandle(M.BackupsId).p]: true
+    };
+
+    return !areas[M.currentrootid];
 };
 
 /**

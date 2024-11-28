@@ -12165,7 +12165,7 @@ body.de .mega-dialog.contact-picker-widget {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    margin: 32px 9px 75px 32px;
+    margin: 32px 24px 84px 32px;
     max-width: 600px;
 }
 .mega-dialog.upgrade-welcome-dialog .upgrade-welcome-content-left .welcome-dialog.content {
@@ -12216,11 +12216,23 @@ body.de .mega-dialog.contact-picker-widget {
     align-items: center;
     justify-content: center;
 }
+.mega-dialog.upgrade-welcome-dialog .top-image-container {
+    margin-bottom: 8px;
+}
 .mega-dialog.upgrade-welcome-dialog .image {
     background-image: url("../images/mega/dialog-welcome-image.png");
     width: 221px;
     height: 221px;
     background-size: 221px;
+}
+.mega-dialog.upgrade-welcome-dialog .top-image {
+    background-image: url("../images/mega/dialog-welcome-top-image.png");
+    width: 104px;
+    height: 104px;
+    background-size: 104px;
+}
+.mega-dialog.upgrade-welcome-dialog a {
+    text-decoration: none;
 }
 
 /* Welcome dialog end */
@@ -12228,6 +12240,9 @@ body.de .mega-dialog.contact-picker-widget {
 /* Upgrade to pro dialog start */
 .mega-dialog.upgrade-to-pro-dialog {
     width: 600px;
+}
+.mega-dialog.upgrade-to-pro-dialog .blurb a {
+    text-decoration: none;
 }
 .mega-dialog.upgrade-to-pro-dialog .content {
     width: 495px;
@@ -12281,6 +12296,7 @@ body.de .mega-dialog.contact-picker-widget {
     display: flex;
     flex-direction: row;
     padding-bottom: 10px;
+    justify-content: center;
 }
 .mega-dialog.upgrade-to-pro-dialog .content .info-container > *:not(:last-child) {
     margin-inline-end: 32px;
@@ -12290,6 +12306,7 @@ body.de .mega-dialog.contact-picker-widget {
     display: flex;
     flex-direction: column;
     font: var(--text-h3);
+    width: 247px;
 }
 .mega-dialog.upgrade-to-pro-dialog .content .info-container .title-and-blurb > *:not(:last-child) {
     margin-bottom: 8px;

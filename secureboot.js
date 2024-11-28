@@ -2500,6 +2500,7 @@ else if (!browserUpdate) {
         jsl.push({f:'css/grid-table.css', n: 'grid_table_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/tabs.css', n: 'tabs_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'css/empty-pages.css', n: 'empty_page_css', j:2,w:5,c:1,d:1,cache:1});
+        jsl.push({f:'css/pm/onboarding.css', n: 'pm_onboarding_css', j:2,w:5,c:1,d:1,cache:1});
         jsl.push({f:'js/vendor/megaDynamicList.js', n: 'mega_dynamic_list_js', j:1, w:5});
         jsl.push({f:'js/fm/quickfinder.js', n: 'fm_quickfinder_js', j:1, w:1});
         jsl.push({f:'js/fm/selectionManager2.js', n: 'fm_selectionmanager2_js', j:1, w:1});
@@ -3029,8 +3030,6 @@ else if (!browserUpdate) {
         'pwm': {
             'pwm:vars_pm_theme_css': {f:'css/vars/pm-theme.css', n: 'vars_pm_theme_css', j:2, w:30, c:1, d:1, cache:1},
             'pwm:pm_mono_css': {f:'css/sprites/pm-mono@mono.css', n: 'pm_mono_css', j:2, w:30, c:1, d:1, cache:1},
-            'pwm:pm_dark_css': {f:'css/sprites/pm-theme@dark.css', n: 'pm_dark_css', j:2, w:30, c:1, d:1, cache:1},
-            'pwm:pm_light_css': {f:'css/sprites/pm-theme@light.css', n: 'pm_light_css', j:2, w:30, c:1, d:1, cache:1},
             'pwm:checkbox_css': {f:'css/components/checkbox.css', n: 'checkbox_css', j:2, w:1},
             'pwm:rack_css': {f:'css/components/rack.css', n: 'rack_css', j:2, w:1},
             'pwm:toast_css': {f:'css/components/toast.css', n: 'toast_css', j:2, w:1},

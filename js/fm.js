@@ -1093,7 +1093,9 @@ function FMShortcuts() {
             !selectionManager ||
             M.currentrootid === 'chat' || // prevent shortcut for chat
             M.currentrootid === undefined || // prevent shortcut for file transfer, dashboard, settings
-            M.isGalleryPage()
+            M.isAlbumsPage() ||
+            (M.isGalleryPage() && mega.gallery.photos && mega.gallery.photos.mode !== 'a') ||
+            (M.isMediaDiscoveryPage() && mega.gallery.discovery && mega.gallery.discovery.mode !== 'a')
         ) {
             return true;
         }
@@ -1113,7 +1115,7 @@ function FMShortcuts() {
         var charTyped = String.fromCharCode(charCode).toLowerCase();
 
         if (charTyped === "a" && (e.ctrlKey || e.metaKey)) {
-            if (typeof selectionManager != 'undefined' && selectionManager && !M.gallery && !M.isAlbumsPage()) {
+            if (typeof selectionManager != 'undefined' && selectionManager) {
                 selectionManager.select_all();
             }
             return false; // stop prop.
@@ -1121,7 +1123,9 @@ function FMShortcuts() {
         else if (
             (charTyped === "c" || charTyped === "x") &&
             (e.ctrlKey || e.metaKey) &&
-            !isShareRoot
+            !isShareRoot &&
+            !M.gallery &&
+            !M.albums
         ) {
             var items = clone(selectionManager.get_selected());
             if (items.length === 0) {
@@ -1142,7 +1146,9 @@ function FMShortcuts() {
         else if (
             charTyped === "v" &&
             (e.ctrlKey || e.metaKey) &&
-            !isShareRoot
+            !isShareRoot &&
+            !M.gallery &&
+            !M.albums
         ) {
             if (!current_operation || (M.getNodeRights(M.currentdirid || '') | 0) < 1) {
                 return false; // stop prop.
@@ -1163,7 +1169,9 @@ function FMShortcuts() {
         }
         else if (
             charCode === 8 &&
-            !isShareRoot
+            !isShareRoot &&
+            !M.gallery &&
+            !M.albums
         ) {
             if (M.isInvalidUserStatus() || $.msgDialog === 'remove') {
                 return;
@@ -3039,9 +3047,6 @@ function closeDialog(ev) {
                 && mega.ui.onboarding.$hotSpotNode.hasClass('onboarding-hotspot-animation-rect')
             ) {
                 mega.ui.onboarding.$hotSpotNode.removeClass('onboarding-hotspot-animation-rect');
-            }
-            if (M.chat) {
-                megaChat.plugins.chatOnboarding.occurrenceDialogShown = false;
             }
         }
     }

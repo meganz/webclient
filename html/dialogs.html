@@ -588,6 +588,15 @@
                             <hr/>
                         </li>
                         <li>
+                            <button class="add-to-album">
+                                <i class="sprite-fm-mono rectangle-stack-plus-small-regular-outline"></i>
+                                <span>[$add_to_album]</span>
+                            </button>
+                        </li>
+                        <li class="divider">
+                            <hr/>
+                        </li>
+                        <li>
                             <button class="remove">
                                 <i class="sprite-fm-mono icon-bin"></i>
                                 <span>[$move_to_rubbish_bin]</span>
@@ -2151,14 +2160,8 @@
                     <div class="hidden" id="link-hidden-repair-proc"
                          style="margin:8px 48px;border:1px solid;padding:16px;box-shadow:0 0 32px inset;border-radius:5px;text-align: justify">
                         <div>
-                            <button class="mega-button"><span>Repair</span></button>
-                            <span>
-                                This feature should only be used to aid with repairing a damaged link or share,
-                                our friendly support staff may have guided you to use this feature if you had contacted
-                                us about a broken link due to missing share keys.
-                                Before proceeding, please be sure that the link you are operating on is in fact
-                                damaged, and you wish to have it repaired.
-                            </span>
+                            <button class="mega-button"><span>[$repair]</span></button>
+                            <span>[$repair_note]</span>
                         </div>
                         <div class="clear"></div>
                     </div>
@@ -8476,18 +8479,14 @@
         </button>
         <section class="upgrade-welcome-content-left">
             <section>
+                <div class="top-image-container">
+                    <i class="top-image"></i>
+                </div>
                 <header></header>
-                <div class="thanks-text">[$welcome_dialog_dl_mobile]</div>
+                <div class="thanks-text"></div>
             </section>
             <section class="welcome-dialog content">
-                <div class="welcome-dialog plan-info-header">[$welcome_dialog_info_title]</div>
-                <div class="welcome-dialog content-block">
-                    <i class="sprite-fm-mono icon-cloud"></i>
-                    <div class="content-info more-quota">
-                        <div class="welcome-dialog info-header">[$welcome_dialog_more_quota]</div>
-                        <div class="welcome-dialog info-text"></div>
-                    </div>
-                </div>
+                <div class="welcome-dialog plan-info-header">[$you_also_get]</div>
                 <div class="welcome-dialog content-block">
                     <i class="sprite-fm-mono icon-share-outgoing-external"></i>
                     <div class="content-info transfer-sharing">
@@ -8503,17 +8502,24 @@
                     </div>
                 </div>
                 <div class="welcome-dialog content-block">
-                    <i class="sprite-fm-mono grid-separate"></i>
+                    <i class="sprite-fm-mono icon-lock-plain"></i>
                     <div class="content-info additional-security">
-                        <div class="welcome-dialog info-header">[$welc_dlg_unrestricted_calls]</div>
-                        <div class="welcome-dialog info-text">[$welc_dlg_host_calls]</div>
+                        <div class="welcome-dialog info-header">[$mega_pwm]</div>
+                        <div class="welcome-dialog info-text">[$pro_welcome_dialog_pwm_desc]</div>
                     </div>
                 </div>
                 <div class="welcome-dialog content-block">
-                    <i class="sprite-fm-mono icon-shield-thin-outline"></i>
+                    <i class="sprite-fm-mono icon-zap"></i>
                     <div class="content-info additional-security">
                         <div class="welcome-dialog info-header">[$mega_vpn]</div>
-                        <div class="welcome-dialog info-text">[$welc_dlg_stay_private]</div>
+                        <div class="welcome-dialog info-text">[$pro_welcome_dialog_vpn_desc]</div>
+                    </div>
+                </div>
+                <div class="welcome-dialog content-block">
+                    <i class="sprite-fm-mono icon-user-square-thin-outline"></i>
+                    <div class="content-info additional-security">
+                        <div class="welcome-dialog info-header">[$welc_dlg_unrestricted_calls]</div>
+                        <div class="welcome-dialog info-text">[$welc_dlg_host_calls]</div>
                     </div>
                 </div>
             </section>
@@ -8613,7 +8619,7 @@
                     <div class="blurb"></div>
                 </div>
             </div>
-            <div class="price-disclaimer hidden">* [$18770]</div>
+            <div class="price-disclaimer hidden">* [$est_price_acc_billed_euro]</div>
         </section>
 
         <footer>
@@ -8622,6 +8628,41 @@
         </footer>
     </div>
 
+    <!-- Dialog: Password manager promo -->
+    <div class="mega-dialog dialog-template-graphic pwm-promo-dialog hidden"
+         role="dialog"
+         aria-labelledby="pwm-promo-dialog-title"
+         aria-modal="true">
+
+        <button class="close js-close" aria-label="[$148]">
+            <i class="sprite-fm-mono icon-dialog-close"></i>
+        </button>
+
+        <header>
+            <div class="graphic sprite-fm-illustration img-pwm-promo-dialog"></div>
+            <h2 class="pwm-promo-dialog-title">[$pwm_promo_dialog_title]</h2>
+        </header>
+
+        <section class="content">
+            <div class="content-block">
+                <p>
+                    [$pwm_promo_dialog_description]
+                </p>
+            </div>
+        </section>
+
+        <footer>
+            <aside>
+                <button class="mega-button positive btn-pwm-promo-action">
+                    <span>[$onboard_try_scheduled]</span>
+                </button>
+            </aside>
+        </footer>
+    </div>
+
+</section>
+
+<section class="mega-dialog-container">
     <!-- Dialog: device-rename-dialog -->
     <div class="mega-dialog dialog-template-main device-rename-dialog hidden"
         role="dialog"

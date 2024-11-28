@@ -499,10 +499,13 @@ export default class Call extends MegaRenderMixin {
                                 )
                             );
                         }) :
-                        M.safeShowDialog(
-                            RecordingConsentDialog.dialogName,
-                            () => this.setState({ recorder: userHandle, recordingConsentDialog: true })
-                        )
+                        (() => {
+                            closeDialog();
+                            M.safeShowDialog(
+                                RecordingConsentDialog.dialogName,
+                                () => this.setState({ recorder: userHandle, recordingConsentDialog: true })
+                            );
+                        })()
                 );
             }
         });

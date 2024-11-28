@@ -125,6 +125,10 @@
 .theme-light-forced .sprite-fm-theme.icon-image-zoom-out, .theme-light-forced .sprite-fm-theme-before.icon-image-zoom-out-before::before, .theme-light-forced .sprite-fm-theme-after.icon-image-zoom-out-after::after {
    background-image: url("../../images/sprites/fm-theme@light.svg#icon-image-zoom-out");
 }
+.theme-light .sprite-fm-theme.icon-loader-throbber-light-outline, .theme-light .sprite-fm-theme-before.icon-loader-throbber-light-outline-before::before, .theme-light .sprite-fm-theme-after.icon-loader-throbber-light-outline-after::after,
+.theme-light-forced .sprite-fm-theme.icon-loader-throbber-light-outline, .theme-light-forced .sprite-fm-theme-before.icon-loader-throbber-light-outline-before::before, .theme-light-forced .sprite-fm-theme-after.icon-loader-throbber-light-outline-after::after {
+   background-image: url("../../images/sprites/fm-theme@light.svg#icon-loader-throbber-light-outline");
+}
 .theme-light .sprite-fm-theme.icon-loading-spinner, .theme-light .sprite-fm-theme-before.icon-loading-spinner-before::before, .theme-light .sprite-fm-theme-after.icon-loading-spinner-after::after,
 .theme-light-forced .sprite-fm-theme.icon-loading-spinner, .theme-light-forced .sprite-fm-theme-before.icon-loading-spinner-before::before, .theme-light-forced .sprite-fm-theme-after.icon-loading-spinner-after::after {
    background-image: url("../../images/sprites/fm-theme@light.svg#icon-loading-spinner");

@@ -1183,6 +1183,13 @@ mBroadcaster.once('boot_done', function populate_l() {
             + '">'
         )
         .replace('[/A3]', '</a>');
+    l.double_billing_sub_cancel = escapeHTML(l.double_billing_sub_cancel)
+        .replace(
+            '[A]',
+            `<a href="https://help.mega.io/plans-storage/payments-billing/cancel-mobile-subscription"
+                target="_blank" class="clickurl">`
+        )
+        .replace('[/A]', '</a>');
     l[16865] = escapeHTML(l[16865])
         .replace('[A]', '<a href="https://mega.io/desktop" target="_blank" class="clickurl">')
         .replace('[/A]', '</a>');
@@ -1776,6 +1783,18 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace('[/A]', '</a>');
     l.s4_voucher_terms = escapeHTML(l.s4_voucher_terms)
         .replace('[A]', '<a class="clickurl" href="https://mega.io/s4-terms" target="_blank">')
+        .replace('[/A]', '</a>');
+    l.pwm_upsell_desc = escapeHTML(l.pwm_upsell_desc)
+        .replace('[A]', '<a class="clickurl" href="https://mega.io/pass" target="_blank">')
+        .replace('[/A]', '</a>');
+    l.vpn_upsell_desc = escapeHTML(l.vpn_upsell_desc)
+        .replace('[A]', '<a class="clickurl" href="https://mega.io/vpn" target="_blank">')
+        .replace('[/A]', '</a>');
+    l.pro_welcome_dialog_pwm_desc = escapeHTML(l.pro_welcome_dialog_pwm_desc)
+        .replace('[A]', '<a class="clickurl" href="https://mega.io/pass" target="_blank">')
+        .replace('[/A]', '</a>');
+    l.pro_welcome_dialog_vpn_desc = escapeHTML(l.pro_welcome_dialog_vpn_desc)
+        .replace('[A]', '<a class="clickurl" href="https://mega.io/vpn" target="_blank">')
         .replace('[/A]', '</a>');
 
     const rewindHelpLink = 'https://help.mega.io/files-folders/rewind/how-do-i-use-rewind';

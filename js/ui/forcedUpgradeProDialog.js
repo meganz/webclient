@@ -67,7 +67,7 @@ class ForcedUpgradeProDialog {
 
         $('.title-and-blurb *', this.$dialog).addClass('animation');
         this.$title.text(contents.title);
-        this.$blurb.text(contents.blurb);
+        this.$blurb.safeHTML(contents.blurb);
 
         this.$image
             .addClass('animation')
@@ -126,9 +126,16 @@ class ForcedUpgradeProDialog {
             {
                 tabName: l.vpn_title,
                 imgName: 'dialog-vpn',
-                title: l.mega_vpn,
-                blurb: l.vpn_stay_private,
+                title: l.vpn_upsell_headline,
+                blurb: l.vpn_upsell_desc,
                 eventId: 500270
+            },
+            {
+                tabName: l.password_manager,
+                imgName: 'dialog-pwm',
+                title: l.pwm_upsell_headline,
+                blurb: l.pwm_upsell_desc,
+                eventId: 500603
             },
             {
                 tabName: l.meetings,
@@ -154,7 +161,7 @@ class ForcedUpgradeProDialog {
             // Set info container title, blurb and image to contents for first tab
             if (tabCount === 0) {
                 this.$title.text(tabInfo.title);
-                this.$blurb.text(tabInfo.blurb);
+                this.$blurb.safeHTML(tabInfo.blurb);
                 this.$image.css('background-image', `url(${staticpath}images/mega/${tabInfo.imgName}.png)`);
             }
 
@@ -208,7 +215,7 @@ class ForcedUpgradeProDialog {
         // Update dialog blurb text with the price of the lowest available Pro plan
         const dialogBlurbText = l.view_upgrade_pro_dialog_desc
             .replace('%1', formatCurrency(dialogBlurbPrice, dialogBlurbCurrency, 'narrowSymbol'));
-        $('.upgrade-to-pro-dialog-description', this.$dialog).safeAppend(dialogBlurbText);
+        $('.upgrade-to-pro-dialog-description', this.$dialog).safeHTML(dialogBlurbText);
 
         // Show or hide the price disclaimer and asterisk as appropriate
         $('span.asterisk', '.upgrade-to-pro-dialog-description')

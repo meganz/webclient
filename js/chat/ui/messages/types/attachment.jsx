@@ -94,6 +94,7 @@ export default class Attachment extends AbstractGenericMessage {
                             var firstGroupOfButtons = [];
                             var revokeButton = null;
                             var downloadButton = null;
+                            let addToAlbumButton = null;
 
                             if (message.isEditable && message.isEditable()) {
                                 revokeButton = (
@@ -160,12 +161,20 @@ export default class Attachment extends AbstractGenericMessage {
                                     />
                                 );
 
+                                if (mega.gallery.isGalleryNode(v)) {
+                                    addToAlbumButton = <DropdownItem
+                                        icon="sprite-fm-mono rectangle-stack-plus-small-regular-outline"
+                                        label={l.add_to_album /* `Add to album` */}
+                                        disabled={mega.paywall}
+                                        onClick={() => mega.gallery.albums.addToAlbum([v.h])}/>;
+                                }
                             }
 
                             if (
                                 !previewButton &&
                                 firstGroupOfButtons.length === 0 &&
                                 !downloadButton &&
+                                !addToAlbumButton &&
                                 linkButtons.length === 0 &&
                                 !revokeButton
                             ) {
@@ -176,6 +185,7 @@ export default class Attachment extends AbstractGenericMessage {
                                 previewButton && (
                                     firstGroupOfButtons.length > 0 ||
                                     downloadButton ||
+                                    addToAlbumButton ||
                                     linkButtons.length > 0 ||
                                     revokeButton
                                 )
@@ -188,6 +198,8 @@ export default class Attachment extends AbstractGenericMessage {
                                 {previewButton}
                                 {firstGroupOfButtons}
                                 {firstGroupOfButtons && firstGroupOfButtons.length > 0 ? <hr/> : ""}
+                                {addToAlbumButton}
+                                {addToAlbumButton ? <hr/> : ""}
                                 {downloadButton}
                                 {linkButtons}
                                 {revokeButton && downloadButton ? <hr/> : ""}

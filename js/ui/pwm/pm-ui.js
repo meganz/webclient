@@ -27,6 +27,14 @@ mega.ui.pm = {
             fmholder.classList.add('pmholder');
         }
 
+        if (pmlayout) {
+            pmlayout.classList.remove('hidden');
+        }
+
+        if (!mega.pm.pwmFeature) {
+            return;
+        }
+
         if (nodeID === 'account') {
             this.list.hide();
             mega.ui.pm.settings.initUI();
@@ -39,10 +47,6 @@ mega.ui.pm = {
             }
 
             this.list.show();
-        }
-
-        if (pmlayout) {
-            pmlayout.classList.remove('hidden');
         }
 
         if (navigator.onLine) {
@@ -58,6 +62,9 @@ mega.ui.pm = {
         if (d) {
             console.info('PWM Initialized.');
         }
+
+        // if user visit pwm page, we treated they are finished promotion and update their flags
+        mega.ui.onboarding.flagStorage.setSync(OBV4_FLAGS.CLOUD_DRIVE_MP_BUBBLE,1);
     },
 
     closeUI() {

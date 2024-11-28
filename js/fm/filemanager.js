@@ -176,12 +176,6 @@ FileManager.prototype.initS4FileManager = mutex('s4-object-storage.lock', functi
                 return typeof st === 'string' && api.catchup(st);
             }
         })
-        .then(() => {
-            if (!mega.config.get('s4onboarded')) {
-                mega.config.set('s4onboarded', 1);
-                return s4.ui.showDialog(s4.containers.dialogs.setup);
-            }
-        })
         .then(resolve)
         .catch(reject);
 });
@@ -232,25 +226,9 @@ FileManager.prototype.initFileManager = async function() {
                     if (d) {
                         console.info('REWIND Initialized.', [mega.rewind]);
                     }
-
-                    // Only show to user account older than 1 month
-                    if (Date.now() - u_attr.since * 1000 < 30 * 24 * 60 * 60 * 1000) {
-                        return;
-                    }
-
-                    const m = new Date().getMonth();
-                    if (m > 7) {
-                        const sm = mega.config.get('rwdPromoDiag');
-                        if (typeof sm === 'undefined' && m > 10 || m < 11 && sm !== m) {
-                            mega.config.set('rwdPromoDiag', m);
-                            tSleep(1)
-                                .then(() => mega.config.flush())
-                                .then(() => {
-                                    eventlog(500532);
-                                    return mega.rewind.showRewindPromoDialog();
-                                })
-                                .catch(dump);
-                        }
+                    // Remove rewind promo flag as we no longer do initial loading promo
+                    if (fmconfig.rwdPromoDiag) {
+                        mega.config.remove('rwdPromoDiag');
                     }
                 })
                 .catch((ex) => {
@@ -2576,7 +2554,7 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(`${c}.add-to-album`).rebind('click.add-to-album', () => {
-        mega.gallery.albums.addToAlbum($.selected[0]);
+        mega.gallery.albums.addToAlbum($.selected);
     });
 
     $(`${c}.new-bucket-item`)
@@ -3024,7 +3002,7 @@ FileManager.prototype.initUIKeyEvents = function() {
             !is_transfers_or_accounts &&
             !$.dialog &&
             !slideshowid &&
-            M.viewmode == 1
+            (M.viewmode === 1 || M.gallery)
         ) {
             if (e.keyCode == 37) {
                 // left
@@ -3202,8 +3180,9 @@ FileManager.prototype.initUIKeyEvents = function() {
             is_selection_manager_available &&
             e.keyCode == 65 &&
             e.ctrlKey &&
-            !$.dialog &&
-            !M.isGalleryPage()
+            (!M.isGalleryPage() || !mega.gallery.photos || mega.gallery.photos.mode !== 'a') &&
+            (!M.isMediaDiscoveryPage() || !mega.gallery.discovery || mega.gallery.discovery.mode !== 'a') &&
+            !$.dialog
         ) {
             if (is_transfers_or_accounts) {
                 return;
@@ -4505,7 +4484,6 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     var tmpId;
     var $fmholder = $('#fmholder', 'body');
     const isAlbums = M.isAlbumsPage();
-    const isMediaDiscovery = M.isMediaDiscoveryPage();
 
     if (d) {
         console.group('sectionUIOpen', id, folderlink);
@@ -4833,7 +4811,6 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         || isAlbums
         || M.isDynPage(id)
         || mega.gallery.sections[id]
-        || (isMediaDiscovery && !folderlink)
         || id === 'file-requests'
     ) {
         M.initLeftPanel();
@@ -4865,6 +4842,9 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         if (selectionManager) {
             selectionManager.clear_selection();
         }
+    }
+    else if (id === 'conversations') {
+        mega.gallery.albums.initUserAlbums();
     }
 
     // Revamp Implementation End
@@ -4991,7 +4971,6 @@ FileManager.prototype.initLeftPanel = function() {
     const isGallery = M.isGalleryPage();
     const isDiscovery = isGallery && M.currentCustomView.prefixPath === 'discovery/';
     const isAlbums = M.isAlbumsPage();
-    const isMediaDiscovery = M.isMediaDiscoveryPage();
 
     let elements = document.getElementsByClassName('js-lpbtn');
 
@@ -5009,8 +4988,11 @@ FileManager.prototype.initLeftPanel = function() {
         elements[j].classList.remove('hidden');
     }
 
-    if ((isGallery || isAlbums || isMediaDiscovery && !folderlink) && mega.gallery.albums) {
+    if ((isGallery || isAlbums) && mega.gallery.albums) {
         mega.gallery.albums.init();
+    }
+    else if (mega.gallery.canShowAddToAlbum()) {
+        mega.gallery.albums.initUserAlbums();
     }
 
     $('.js-lp-storage-usage').removeClass('hidden');

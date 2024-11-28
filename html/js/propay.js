@@ -1580,6 +1580,21 @@ pro.propay = {
             $('.old-plan-price', $pricingBox).text(formattedNormalTotalPrice).removeClass('hidden');
             $('.cross-line', $pricingBox).removeClass('hidden');
             $('.plan-period', $pricingBox).addClass('hidden');
+            if (discountInfo.m !== 1 && discountInfo.m !== 12) {
+                $pricePeriod.text(`/${mega.icu.format(l.months_chat_history_plural, discountInfo.m)}`);
+                // All bandwidth will be available as the plan starts so update the values
+                const appliedBw = bytesToSize(
+                    (currentPlan[pro.UTQA_RES_INDEX_TRANSFER] / currentPlan[pro.UTQA_RES_INDEX_MONTHS]) *
+                    discountInfo.m * pro.BYTES_PER_GB,
+                    3,
+                    4
+                );
+                $('span span', $bandwidthAmount).text(appliedBw);
+                $bandwidthTip.attr(
+                    'data-simpletip',
+                    mega.icu.format(l.bw_applied_per_months, discountInfo.m).replace('%1', `[U]${appliedBw}[/U]`)
+                );
+            }
             $priceNum.parent('.pricing-page.plan-price').addClass('discounted');
             $priceNum.text(formattedDiscountedTotalPrice);
         }

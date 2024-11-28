@@ -315,16 +315,13 @@
         <hr />
     </div>
     <div class="dropdown-section">
-        <a class="dropdown-item add-to-album">
-            <i class="sprite-fm-mono rectangle-stack-plus-small-regular-outline"></i>
-            <span>[$add_to_album]</span>
-        </a>
-        <hr />
-    </div>
-    <div class="dropdown-section">
         <a class="dropdown-item rename-item">
             <i class="sprite-fm-mono icon-rename"></i>
             <span>[$61]</span>
+        </a>
+        <a class="dropdown-item add-to-album">
+            <i class="sprite-fm-mono rectangle-stack-plus-small-regular-outline"></i>
+            <span>[$add_to_album]</span>
         </a>
         <a class="dropdown-item move-item contains-submenu sprite-fm-mono-after icon-arrow-right-after">
             <i class="sprite-fm-mono icon-move"></i>
@@ -662,13 +659,6 @@
                 <div class="new-messages-indicator hidden">
                     <span class="chat-pending-call hidden"><i class="tiny-icon white-handset"></i></span>
                     <span class="chat-unread-count hidden"></span>
-                </div>
-                <div class="onboarding-highlight-dot hidden"></div>
-                <div class="onboarding-mc-nv">
-                    <img src="{staticpath}images/mega/chat-onboarding-preview.png">
-                    <div>[$onboard_megachat_new_user_title]</div>
-                    <span>[$onboard_megachat_new_user_text]</span>
-                    <i class="sprite-fm-mono icon-tooltip-arrow tooltip-arrow"></i>
                 </div>
                 <div class="dark-tooltip">[$7997]</div>
                 <div class="nav-icon-label-container">
@@ -5857,7 +5847,7 @@
                     </div>
 
                     <!-- Commission index !-->
-                    <div class="mega-data-box commission">
+                    <div class="mega-data-box commission hidden">
                         <div class="mega-data-header">
                             <span>[$22690]</span>
                             <button class="mega-button positive redeem disabled">

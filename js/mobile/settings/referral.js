@@ -28,54 +28,56 @@ mobile.settings.account.referral = Object.create(mobile.settingsHelper, Object.g
             });
         }
 
-        // Comission index info block
-        new MegaMobileInfoMenuItem({
-            componentClassname: 'no-active',
-            type: 'fullwidth',
-            iconSize: 24,
-            tipIcon: 'sprite-mobile-fm-mono icon-info-thin-outline',
-            text: l[22690],
-            icon: 'sprite-mobile-fm-mono icon-dollar-sign-thin',
-            parentNode: this.domNode
-        }).on('tap.redeem', (e) => {
+        if (mega.refsuncom) {
+            // Comission index info block
+            new MegaMobileInfoMenuItem({
+                componentClassname: 'no-active',
+                type: 'fullwidth',
+                iconSize: 24,
+                tipIcon: 'sprite-mobile-fm-mono icon-info-thin-outline',
+                text: l[22690],
+                icon: 'sprite-mobile-fm-mono icon-dollar-sign-thin',
+                parentNode: this.domNode
+            }).on('tap.redeem', (e) => {
 
-            // Show tip on tip icon tap only
-            if (e.target.classList.contains('tip-icon')) {
-                this.showCommisionTip();
-            }
-        });
+                // Show tip on tip icon tap only
+                if (e.target.classList.contains('tip-icon')) {
+                    this.showCommisionTip();
+                }
+            });
 
-        // Comission index wrapper
-        const node = mCreateElement('div', {'class': 'comission-wrapper'}, this.domNode);
-        let subNode = mCreateElement('div', {'class': 'comission-item total'}, node);
+            // Comission index wrapper
+            const node = mCreateElement('div', {'class': 'comission-wrapper'}, this.domNode);
+            let subNode = mCreateElement('div', {'class': 'comission-item total'}, node);
 
-        // Total amount
-        mCreateElement('div', { class: 'name' }, subNode)
-            .textContent = l.total_referral_comission;
-        mCreateElement('div', { class: 'local' }, subNode);
-        mCreateElement('div', { class: 'euro' }, subNode);
+            // Total amount
+            mCreateElement('div', { class: 'name' }, subNode)
+                .textContent = l.total_referral_comission;
+            mCreateElement('div', { class: 'local' }, subNode);
+            mCreateElement('div', { class: 'euro' }, subNode);
 
-        // Pending amount
-        subNode = mCreateElement('div', {'class': 'comission-item pending'}, node);
-        mCreateElement('div', { class: 'name' }, subNode)
-            .textContent = l.pending_referral_comission;
-        mCreateElement('div', { class: 'local' }, subNode);
-        mCreateElement('div', { class: 'euro' }, subNode);
+            // Pending amount
+            subNode = mCreateElement('div', {'class': 'comission-item pending'}, node);
+            mCreateElement('div', { class: 'name' }, subNode)
+                .textContent = l.pending_referral_comission;
+            mCreateElement('div', { class: 'local' }, subNode);
+            mCreateElement('div', { class: 'euro' }, subNode);
 
-        // Available amount
-        subNode = mCreateElement('div', {'class': 'comission-item available'}, node);
-        mCreateElement('div', { class: 'name' }, subNode)
-            .textContent = l.available_referral_comission;
-        mCreateElement('div', { class: 'local' }, subNode);
-        mCreateElement('div', { class: 'euro' }, subNode);
+            // Available amount
+            subNode = mCreateElement('div', {'class': 'comission-item available'}, node);
+            mCreateElement('div', { class: 'name' }, subNode)
+                .textContent = l.available_referral_comission;
+            mCreateElement('div', { class: 'local' }, subNode);
+            mCreateElement('div', { class: 'euro' }, subNode);
 
-        // Redeem button, disabled by default
-        this.redeemBtn = new MegaButton({
-            disabled: true,
-            parentNode: node,
-            componentClassname: 'form-button block',
-            text: l.redeem_commissions_label
-        }).on('tap.redeem', () => loadSubPage('/fm/refer/redeem'));
+            // Redeem button, disabled by default
+            this.redeemBtn = new MegaButton({
+                disabled: true,
+                parentNode: node,
+                componentClassname: 'form-button block',
+                text: l.redeem_commissions_label
+            }).on('tap.redeem', () => loadSubPage('/fm/refer/redeem'));
+        }
 
         // Registrations info block
         this.registrationNode = new MegaMobileInfoMenuItem({
@@ -189,7 +191,7 @@ mobile.settings.account.referral = Object.create(mobile.settingsHelper, Object.g
             localPending = formatCurrency(balance.localPending);
             localAvailable = formatCurrency(balance.localAvailable);
         }
-        else {
+        else if (mega.refsuncom) {
             // Cache the currency value to adapt text in Comission index overlay
             this.currency = balance.localCurrency;
 
@@ -207,10 +209,12 @@ mobile.settings.account.referral = Object.create(mobile.settingsHelper, Object.g
             localAvailable = formatCurrency(balance.localAvailable, this.currency, 'number');
         }
 
-        // Set Comission index base values
-        this.domNode.querySelector('.total .local').textContent = `${localTotal} ${this.currency}`;
-        this.domNode.querySelector('.pending .local').textContent = `${localPending} ${this.currency}`;
-        this.domNode.querySelector('.available .local').textContent = `${localAvailable} ${this.currency}`;
+        if (mega.refsuncom) {
+            // Set Comission index base values
+            this.domNode.querySelector('.total .local').textContent = `${localTotal} ${this.currency}`;
+            this.domNode.querySelector('.pending .local').textContent = `${localPending} ${this.currency}`;
+            this.domNode.querySelector('.available .local').textContent = `${localAvailable} ${this.currency}`;
+        }
 
         // Get registrations for the month
         for (const item of M.affiliate.signupList) {
@@ -234,6 +238,9 @@ mobile.settings.account.referral = Object.create(mobile.settingsHelper, Object.g
         this.purchasesNode.subtext = `(${l.plus_x_this_month.replace('%1', thisMonthPurCount)})`;
         this.purchasesNode.dataValue = creditList.length;
 
+        if (!mega.refsuncom) {
+            return;
+        }
         // Toggle Redeem button disabled state
         // Redeem requires at least one payment history and available balance more than 50 euro
         if (M.affiliate.redeemable && M.affiliate.balance.available >= 50 && M.affiliate.utpCount) {

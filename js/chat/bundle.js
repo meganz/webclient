@@ -28266,10 +28266,13 @@ class VideoNode extends _mixins1__.w9 {
     });
   }
   renderContent() {
-    const {source} = this;
+    const {
+      source,
+      contRef
+    } = this;
     if (this.props.isPresenterNode || source.av & Av.Camera) {
       return react0().createElement("div", {
-        ref: this.contRef,
+        ref: contRef,
         className: "video-node-holder video-node-loading"
       });
     }

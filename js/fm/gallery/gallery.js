@@ -2250,6 +2250,23 @@ mega.gallery.isGalleryNode = (n, ext) => {
 };
 
 /**
+ * Checking if we want to see add to album option in the current viewing page
+ * @returns {Boolean}
+ */
+mega.gallery.canShowAddToAlbum = () => {
+    'use strict';
+
+    const areas = {
+        'shares': true,
+        's4': true,
+        [M.RubbishID]: true,
+        [M.getNodeByHandle(M.BackupsId).p]: true
+    };
+
+    return !areas[M.currentrootid];
+};
+
+/**
      * Adding a loading icon to the cell
      * @param {HTMLElement} el DOM Element to add the loading icon to
      * @param {Boolean} isVideo Whether to attach loading icon as for a video or an image

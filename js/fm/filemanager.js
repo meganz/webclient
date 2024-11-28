@@ -2554,7 +2554,7 @@ FileManager.prototype.initContextUI = function() {
     });
 
     $(`${c}.add-to-album`).rebind('click.add-to-album', () => {
-        mega.gallery.albums.addToAlbum($.selected[0]);
+        mega.gallery.albums.addToAlbum($.selected);
     });
 
     $(`${c}.new-bucket-item`)
@@ -4484,7 +4484,6 @@ FileManager.prototype.onSectionUIOpen = function(id) {
     var tmpId;
     var $fmholder = $('#fmholder', 'body');
     const isAlbums = M.isAlbumsPage();
-    const isMediaDiscovery = M.isMediaDiscoveryPage();
 
     if (d) {
         console.group('sectionUIOpen', id, folderlink);
@@ -4812,7 +4811,6 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         || isAlbums
         || M.isDynPage(id)
         || mega.gallery.sections[id]
-        || (isMediaDiscovery && !folderlink)
         || id === 'file-requests'
     ) {
         M.initLeftPanel();
@@ -4844,6 +4842,9 @@ FileManager.prototype.onSectionUIOpen = function(id) {
         if (selectionManager) {
             selectionManager.clear_selection();
         }
+    }
+    else if (id === 'conversations') {
+        mega.gallery.albums.initUserAlbums();
     }
 
     // Revamp Implementation End
@@ -4970,7 +4971,6 @@ FileManager.prototype.initLeftPanel = function() {
     const isGallery = M.isGalleryPage();
     const isDiscovery = isGallery && M.currentCustomView.prefixPath === 'discovery/';
     const isAlbums = M.isAlbumsPage();
-    const isMediaDiscovery = M.isMediaDiscoveryPage();
 
     let elements = document.getElementsByClassName('js-lpbtn');
 
@@ -4988,8 +4988,11 @@ FileManager.prototype.initLeftPanel = function() {
         elements[j].classList.remove('hidden');
     }
 
-    if ((isGallery || isAlbums || isMediaDiscovery && !folderlink) && mega.gallery.albums) {
+    if ((isGallery || isAlbums) && mega.gallery.albums) {
         mega.gallery.albums.init();
+    }
+    else if (mega.gallery.canShowAddToAlbum()) {
+        mega.gallery.albums.initUserAlbums();
     }
 
     $('.js-lp-storage-usage').removeClass('hidden');

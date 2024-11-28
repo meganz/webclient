@@ -368,7 +368,9 @@ MegaData.prototype.menuItems = async function menuItems(isTree) {
     }
     items['.refresh-item'] = 1;
 
-    if (M.gallery && $.selected.length === 1) {
+    if (M.gallery || mega.gallery.canShowAddToAlbum()
+        && $.selected.every(h => mega.gallery.isGalleryNode(M.getNodeByHandle(h)))
+    ) {
         items['.add-to-album'] = 1;
     }
 

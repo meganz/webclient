@@ -1626,7 +1626,7 @@ scparser.$add('sqac', (a) => {
                         }
 
                         if (mega.pm) {
-                            mega.pm.clearPlan();
+                            mega.pm.hideSubsDialog();
                         }
                     });
                 }

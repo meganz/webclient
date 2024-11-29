@@ -34,6 +34,7 @@ module.exports = function(config) {
         'test/config.js',
 
         // Shim for ES6 features some browsers may not have (PhantomJS, MSIE).
+        'js/vendor/scheduler-polyfill.js',
         'js/vendor/web-streams-polyfill.js',
         'js/vendor/dexie.js',
 

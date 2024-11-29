@@ -142,11 +142,10 @@ export default class Incoming extends MegaRenderMixin {
                                     large
                                     round
                                     negative
-                                    ${unsupported ? 'disabled' : ''}
                                 `}
                                 icon="icon-end-call"
-                                simpletip={unsupported ? null : { position: 'top', label: rejectLabel }}
-                                onClick={unsupported ? null : onReject}>
+                                simpletip={{ position: 'top', label: rejectLabel }}
+                                onClick={onReject}>
                                 <span>{rejectLabel}</span>
                             </Button>
                             {CALL_IN_PROGRESS ? this.renderSwitchControls() : this.renderAnswerControls()}

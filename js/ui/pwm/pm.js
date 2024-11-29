@@ -183,6 +183,13 @@ mega.pm = {
         }
     },
 
+    _updatePwmFeature() {
+
+        'use strict';
+
+        this.pwmFeature = u_attr.features && u_attr.features.find(elem => elem[1] === 'pwm') || false;
+    },
+
     /**
      * Get current plan details or plan eligibility for the user
      *
@@ -192,7 +199,7 @@ mega.pm = {
     async getPlanDetails() {
         'use strict';
 
-        this.pwmFeature = u_attr.features && u_attr.features.find(elem => elem[1] === 'pwm') || false;
+        this._updatePwmFeature();
 
         // check for the active subscription status
         if (this.pwmFeature && this.pwmFeature[0] > Date.now() / 1000) {
@@ -209,13 +216,16 @@ mega.pm = {
         }
     },
 
-    clearPlan() {
+    hideSubsDialog() {
+
         'use strict';
 
-        // check for the latest u_attr features flag value before
-        // closing the free trial or standalone dialogs
-        if (u_attr.features && u_attr.features.some(elem => elem[1] === 'pwm')) {
-            delete this.plan;
+        this._updatePwmFeature();
+
+        // If this has a pwmFeature flag, it means the user purchased a subscription or it already has a subscription,
+        // Lets set plan as true.
+        if (this.pwmFeature) {
+            this.plan = true;
             mega.ui.pm.subscription.hideDialog();
         }
     }

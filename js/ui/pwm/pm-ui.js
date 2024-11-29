@@ -1,15 +1,15 @@
 mega.ui.pm = {
 
-    initUI() {
+    async initUI() {
         'use strict';
 
         if (!mega.pm.casRan) {
             mega.pm.casRan = true;
-            mega.pm.checkActiveSubscription().catch(tell);
+            await mega.pm.checkActiveSubscription().catch(tell);
 
             mBroadcaster.addListener('pagechange', page => {
-                if (page === 'fm/pwm' && !(u_attr.features && u_attr.features.length) && 'plan' in mega.pm) {
-                    if (mega.pm.plan.trial) {
+                if (page === 'fm/pwm' && !mega.pm.pwmFeature) {
+                    if (mega.pm.plan && mega.pm.plan.trial) {
                         this.subscription.freeTrial();
                     }
                     else {
@@ -76,6 +76,10 @@ mega.ui.pm = {
 
         if (fmholder) {
             fmholder.classList.remove('pmholder');
+        }
+
+        if (!mega.pm.pwmFeature) {
+            return;
         }
 
         if (this.list) {

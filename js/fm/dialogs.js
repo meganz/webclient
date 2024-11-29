@@ -199,7 +199,7 @@
         if (section === 's4' && M.tree.s4 && M.tree.s4[$.mcselected]) {
 
             // Disable action button when copying/moving files to container
-            if (!M.isFolder($.selected)) {
+            if ($.selected.length === 0 || !M.isFolder($.selected)) {
                 $btn.addClass('disabled');
             }
 
@@ -1058,8 +1058,7 @@
             $sharedMe.removeClass('hidden');
         }
 
-        if ('kernel' in s4 && M.tree.s4 &&
-            ($.copyDialog || $.moveDialog || $.selectFolderDialog && !$.fileRequestNew)) {
+        if ('kernel' in s4 && ($.copyDialog || $.moveDialog || $.selectFolderDialog && !$.fileRequestNew)) {
             $s4.removeClass('hidden');
         }
         else {

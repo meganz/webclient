@@ -799,11 +799,6 @@ MegaData.prototype.copyNodes = async function(cn, t, del, tree) {
         await api_cachepubkeys([t]);
     }
 
-    // Display confirmation dialog when copying to/from object storage
-    if ('utils' in s4 && await s4.utils.confirmAction(cn, t).catch(dump) === false) {
-        return;
-    }
-
     if (!tree) {
         if (this.isFileNode(cn)) {
             tree = [cn];
@@ -857,6 +852,11 @@ MegaData.prototype.copyNodes = async function(cn, t, del, tree) {
     if (!Object(tree).length) {
         // we may receive an empty array, for example if the user cancelled the fileconflict dialog
 
+        return;
+    }
+
+    // Display confirmation dialog when copying to/from object storage
+    if ('utils' in s4 && await s4.utils.confirmAction(cn, t).catch(dump) === false) {
         return;
     }
 

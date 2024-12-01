@@ -552,16 +552,16 @@ mBroadcaster.once('boot_done', tryCatch(() => {
     const logger = new MegaLogger(`GTR:${pid.toString(16)}`);
     const dump = (ex) => logger.error(ex, reportError(ex));
 
-    const IDLE_TIMEOUT = freeze({timeout: 100});
+    const IDLE_TIMEOUT = freeze({delay: 100});
     const IDLE_PIPELINE = {ts: 0, pid: 0, tasks: []};
-    const IDLE_THRESHOLD = IDLE_TIMEOUT.timeout << 4;
+    const IDLE_THRESHOLD = IDLE_TIMEOUT.delay << 2;
 
     const idleCallbackTaskSorter = (a, b) => b.ms - a.ms || b.pri - a.pri;
 
     const idleCallbackTaskDispatcher = (pid, ms, f, args) => {
 
         if (ms < 30) {
-            if (self.d > 2) {
+            if (self.d > -2) {
                 logger.warn('Expediting ICTask...', ms, pid);
             }
             delete running[pid];
@@ -599,7 +599,7 @@ mBroadcaster.once('boot_done', tryCatch(() => {
             }
         }
 
-        if (self.d > 2) {
+        if (self.d > -2) {
             const rem = res instanceof IdleDeadline && (res.didTimeout ? -1 : res.timeRemaining());
 
             // Print out a warning if there are less than 5ms left until the next re-paint.
@@ -627,7 +627,7 @@ mBroadcaster.once('boot_done', tryCatch(() => {
                 IDLE_PIPELINE.pid = requestAnimationFrame(idleCallbackHandler);
             }
             else {
-                IDLE_PIPELINE.pid = requestIdleCallback(idleCallbackHandler, IDLE_TIMEOUT);
+                IDLE_PIPELINE.pid = scheduler.postTask(idleCallbackHandler, IDLE_TIMEOUT);
             }
             IDLE_PIPELINE.ts = performance.now();
         }
@@ -678,12 +678,12 @@ mBroadcaster.once('boot_done', tryCatch(() => {
         running[pid] = 'starting';
         scheduleIdleCallback({ms, f, args, pid, pri: ++mIncID});
 
-        // logger.warn('setTimeout', pid, ms);
+        logger.warn('setTimeout', pid, ms);
         return pid;
     };
 
     window.clearTimeout = function(pid) {
-        // logger.warn('clearTimeout', pid, running[pid]);
+        logger.warn('clearTimeout', pid, running[pid]);
 
         if (pid) {
             if (typeof pid === 'string') {

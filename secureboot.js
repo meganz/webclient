@@ -2880,6 +2880,11 @@ else if (!browserUpdate) {
 
             jsl.push({f:'js/vendor/web-streams-polyfill.js', n: 'web_streams_polyfill_js', j: 1});
         }
+
+        if (!(typeof Scheduler !== 'undefined' && self.scheduler instanceof Scheduler && self.scheduler.yield)) {
+
+            jsl.push({f:'js/vendor/scheduler-polyfill.js', n: 'scheduler_polyfill_js', j: 1});
+        }
     }
 
     var jsl2 =
@@ -4137,7 +4142,7 @@ function wchecksum(data, seed) {
 
 function onIdle(callback) {
     'use strict';
-    return window.requestIdleCallback(callback, {timeout: 51});
+    self.scheduler.postTask(callback);
 }
 
 function makeUUID(a) {

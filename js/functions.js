@@ -2598,7 +2598,7 @@ function getTaxName(countryCode) {
         case "AU": return "GST";
         case "BO": return "IVA";
         case "BA": return "PDV";
-        case "BR": return "ICMS";
+        case "BR": return "CPF/CNPJ";
         case "CA": return "GST";
         case "CL": return "IVA";
         case "CO": return "IVA";

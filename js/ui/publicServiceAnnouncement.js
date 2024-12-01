@@ -108,7 +108,7 @@ var psa = {
 
         // PSA container
         innerNode = document.querySelector('.psa-holder') || mCreateElement('div', {
-            'class': `psa-holder${is_mobile ? '' : ' theme-light-forced'}`// Light theme until design is ready
+            'class': 'psa-holder'
         }, wrapperNode);
 
         // Create PSA banner

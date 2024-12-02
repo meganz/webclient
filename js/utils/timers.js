@@ -561,7 +561,7 @@ mBroadcaster.once('boot_done', tryCatch(() => {
     const idleCallbackTaskDispatcher = (pid, ms, f, args) => {
 
         if (ms < 30) {
-            if (self.d > -2) {
+            if (self.d > 2) {
                 logger.warn('Expediting ICTask...', ms, pid);
             }
             delete running[pid];
@@ -599,7 +599,7 @@ mBroadcaster.once('boot_done', tryCatch(() => {
             }
         }
 
-        if (self.d > -2) {
+        if (self.d > 2) {
             const rem = res instanceof IdleDeadline && (res.didTimeout ? -1 : res.timeRemaining());
 
             // Print out a warning if there are less than 5ms left until the next re-paint.
@@ -678,12 +678,12 @@ mBroadcaster.once('boot_done', tryCatch(() => {
         running[pid] = 'starting';
         scheduleIdleCallback({ms, f, args, pid, pri: ++mIncID});
 
-        logger.warn('setTimeout', pid, ms);
+        // logger.warn('setTimeout', pid, ms);
         return pid;
     };
 
     window.clearTimeout = function(pid) {
-        logger.warn('clearTimeout', pid, running[pid]);
+        // logger.warn('clearTimeout', pid, running[pid]);
 
         if (pid) {
             if (typeof pid === 'string') {

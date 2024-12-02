@@ -75,7 +75,7 @@ MegaData.prototype.renderMain = function(aUpdate) {
  */
 MegaData.prototype.rmSetupUI = function(u, refresh) {
     'use strict';
-    if (this.gallery) {
+    if (this.gallery || this.albums) {
         return;
     }
 

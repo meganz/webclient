@@ -63,6 +63,7 @@ export class DateTime extends React.Component {
                 <Datepicker
                     name={`${Datepicker.NAMESPACE}-${name}`}
                     className={isLoading ? 'disabled' : ''}
+                    isLoading={isLoading}
                     startDate={startDate}
                     altField={`${Select.NAMESPACE}-${altField}`}
                     value={value}
@@ -81,6 +82,7 @@ export class DateTime extends React.Component {
                 <Select
                     name={`${Select.NAMESPACE}-${altField}`}
                     className={isLoading ? 'disabled' : ''}
+                    isLoading={isLoading}
                     typeable
                     options={filteredTimeIntervals}
                     value={(() => typeof value === 'number' ? value : this.state.datepickerRef.currentDate.getTime())()}

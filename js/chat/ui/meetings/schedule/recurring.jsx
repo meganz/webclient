@@ -159,7 +159,7 @@ export default class Recurring extends MegaRenderMixin {
         }
     }
 
-    toggleView = (view, frequency, state) => this.setState({ view, frequency, ...state });
+    toggleView = (view, frequency, state) => this.props.isLoading ? null : this.setState({ view, frequency, ...state });
 
     renderDayControls() {
         const { weekDays, view } = this.state;
@@ -205,7 +205,7 @@ export default class Recurring extends MegaRenderMixin {
                                 ${isCurrentlySelected ? 'active' : ''}
                                 ${weekDays.length === 1 && isCurrentlySelected ? 'disabled' : ''}
                             `}
-                            onClick={() => {
+                            onClick={this.props.isLoading ? null : () => {
                                 if (view === this.VIEWS.WEEKLY) {
                                     return handleWeeklySelection(value, isCurrentlySelected);
                                 }
@@ -245,6 +245,7 @@ export default class Recurring extends MegaRenderMixin {
                 className="inline"
                 icon={true}
                 value={posValues[posIdx].label}
+                isLoading={this.props.isLoading}
                 options={posValues}
                 onSelect={option => {
                     this.setState(state => ({
@@ -257,44 +258,52 @@ export default class Recurring extends MegaRenderMixin {
                 }}
             />
         );
-        return <>
-            {posFirst && pos}
-            <Select
-                name="recurring-offset-day"
-                className="inline"
-                icon={true}
-                value={dayValues[dayIdx].label}
-                options={dayValues}
-                onSelect={option => {
-                    this.setState(state => ({
-                        monthRule: this.MONTH_RULES.OFFSET,
-                        offset: {
-                            value: state.offset.value || 1,
-                            weekDay: option.value
-                        }
-                    }));
-                }}
-            />
-            {!posFirst && pos}
-        </>;
+
+        return (
+            <>
+                {posFirst && pos}
+                <Select
+                    name="recurring-offset-day"
+                    className="inline"
+                    icon={true}
+                    value={dayValues[dayIdx].label}
+                    isLoading={this.props.isLoading}
+                    options={dayValues}
+                    onSelect={option => {
+                        this.setState(state => ({
+                            monthRule: this.MONTH_RULES.OFFSET,
+                            offset: {
+                                value: state.offset.value || 1,
+                                weekDay: option.value
+                            }
+                        }));
+                    }}
+                />
+                {!posFirst && pos}
+            </>
+        );
     };
 
     IntervalSelect = () => {
         const { interval, view } = this.state;
-        return <div className="mega-input inline recurring-interval">
-            <Select
-                name={`${Recurring.NAMESPACE}-interval`}
-                value={interval > 0 ? interval : 1}
-                icon={true}
-                options={[...Array(view === this.VIEWS.WEEKLY ? 52 : 12).keys()].map(value => {
-                    value += 1;
-                    return { value, label: value };
-                })}
-                onSelect={({ value }) => {
-                    this.setState({ interval: value === 1 ? 0 : value });
-                }}
-            />
-        </div>;
+
+        return (
+            <div className="mega-input inline recurring-interval">
+                <Select
+                    name={`${Recurring.NAMESPACE}-interval`}
+                    value={interval > 0 ? interval : 1}
+                    icon={true}
+                    isLoading={this.props.isLoading}
+                    options={[...Array(view === this.VIEWS.WEEKLY ? 52 : 12).keys()].map(value => {
+                        value += 1;
+                        return { value, label: value };
+                    })}
+                    onSelect={({ value }) => {
+                        this.setState({ interval: value === 1 ? 0 : value });
+                    }}
+                />
+            </div>
+        );
     };
 
     renderIntervalControls() {
@@ -317,6 +326,7 @@ export default class Recurring extends MegaRenderMixin {
     }
 
     renderEndControls() {
+        const { isLoading, onMount } = this.props;
         const { end, prevEnd } = this.state;
 
         return (
@@ -332,6 +342,7 @@ export default class Recurring extends MegaRenderMixin {
                             <input
                                 type="radio"
                                 name={`${Recurring.NAMESPACE}-radio-end`}
+                                disabled={isLoading}
                                 className={`
                                     uiTheme
                                     ${end ? 'radioOff' : 'radioOn'}
@@ -344,9 +355,14 @@ export default class Recurring extends MegaRenderMixin {
                         <div className="radio-txt">
                             <span
                                 className="recurring-radio-label"
-                                onClick={() => {
-                                    this.setState(state => ({ end: undefined, prevEnd: state.end || state.prevEnd }));
-                                }}>
+                                onClick={() =>
+                                    isLoading ?
+                                        null :
+                                        this.setState(state => ({
+                                            end: undefined,
+                                            prevEnd: state.end || state.prevEnd
+                                        }))
+                                }>
                                 {l.recurring_never}
                             </span>
                         </div>
@@ -360,21 +376,20 @@ export default class Recurring extends MegaRenderMixin {
                             <input
                                 type="radio"
                                 name={`${Recurring.NAMESPACE}-radio-end`}
+                                disabled={isLoading}
                                 className={`
                                     uiTheme
                                     ${end ? 'radioOn' : 'radioOff'}
                                 `}
-                                onChange={() => {
-                                    this.setState({ end: prevEnd || this.initialEnd });
-                                }}
+                                onChange={() => isLoading ? null : this.setState({ end: prevEnd || this.initialEnd })}
                             />
                         </div>
                         <div className="radio-txt">
                             <span
                                 className="recurring-radio-label"
-                                onClick={() => {
-                                    return end ? null : this.setState({ end: prevEnd || this.initialEnd });
-                                }}>
+                                onClick={() =>
+                                    isLoading || end ? null : this.setState({ end: prevEnd || this.initialEnd })
+                                }>
                                 {l.recurring_on}
                             </span>
                             <Datepicker
@@ -382,14 +397,11 @@ export default class Recurring extends MegaRenderMixin {
                                 position="top left"
                                 startDate={end || this.initialEnd}
                                 selectedDates={[new Date(end)]}
+                                isLoading={isLoading}
                                 value={end || prevEnd || ''}
                                 placeholder={time2date(end || prevEnd || this.initialEnd / 1000, 18)}
-                                onMount={this.props.onMount}
-                                onSelect={timestamp => {
-                                    this.setState({ end: timestamp }, () => {
-                                        this.safeForceUpdate();
-                                    });
-                                }}
+                                onMount={onMount}
+                                onSelect={timestamp => this.setState({ end: timestamp }, () => this.safeForceUpdate())}
                             />
                         </div>
                     </div>
@@ -418,19 +430,25 @@ export default class Recurring extends MegaRenderMixin {
     }
 
     renderMonthly() {
+        const { isLoading } = this.props;
         const { monthRule, monthDays, monthDaysWarning, offset } = this.state;
+
         return (
             <div className={`${Recurring.NAMESPACE}-monthly`}>
                 {this.renderIntervalControls()}
                 <div className="recurring-field-row">
                     <div
                         className="recurring-radio-buttons"
-                        onClick={ev => {
-                            const { name, value } = ev.target;
-                            if (name === `${Recurring.NAMESPACE}-radio-monthRule`) {
-                                this.setState({ monthRule: value });
-                            }
-                        }}>
+                        onClick={
+                            isLoading ?
+                                null :
+                                ev => {
+                                    const { name, value } = ev.target;
+                                    if (name === `${Recurring.NAMESPACE}-radio-monthRule`) {
+                                        this.setState({ monthRule: value });
+                                    }
+                                }
+                        }>
                         <div className="recurring-label-wrap">
                             <div
                                 className={`
@@ -441,6 +459,7 @@ export default class Recurring extends MegaRenderMixin {
                                     type="radio"
                                     name={`${Recurring.NAMESPACE}-radio-monthRule`}
                                     value="day"
+                                    disabled={isLoading}
                                     className={`
                                         uiTheme
                                         ${monthRule === 'day' ? 'radioOn' : 'radioOff'}
@@ -450,9 +469,9 @@ export default class Recurring extends MegaRenderMixin {
                             <div className="radio-txt">
                                 <span
                                     className="recurring-radio-label"
-                                    onClick={() => {
-                                        this.setState({ monthRule: this.MONTH_RULES.DAY });
-                                    }}>
+                                    onClick={() =>
+                                        isLoading ? null : this.setState({ monthRule: this.MONTH_RULES.DAY })
+                                    }>
                                     {l.recurring_frequency_day}
                                 </span>
                                 <div className="mega-input inline recurring-day">
@@ -460,6 +479,7 @@ export default class Recurring extends MegaRenderMixin {
                                         name={`${Recurring.NAMESPACE}-monthDay`}
                                         icon={true}
                                         value={monthDays[0]}
+                                        isLoading={isLoading}
                                         options={[...Array(31).keys()].map(value => {
                                             value += 1;
                                             return { value, label: value };
@@ -496,6 +516,7 @@ export default class Recurring extends MegaRenderMixin {
                                     type="radio"
                                     name={`${Recurring.NAMESPACE}-radio-monthRule`}
                                     value="offset"
+                                    disabled={isLoading}
                                     className={`
                                         uiTheme
                                         ${monthRule === this.MONTH_RULES.OFFSET ? 'radioOn' : 'radioOff'}
@@ -503,9 +524,7 @@ export default class Recurring extends MegaRenderMixin {
                                 />
                             </div>
                             <div className="radio-txt">
-                                <this.MonthDaySelect
-                                    offset={offset}
-                                />
+                                <this.MonthDaySelect offset={offset} />
                             </div>
                         </div>
                     </div>
@@ -621,7 +640,11 @@ export default class Recurring extends MegaRenderMixin {
             <Row>
                 <Column />
                 <Column>
-                    <div className={NAMESPACE}>
+                    <div
+                        className={`
+                            ${NAMESPACE}
+                            ${this.props.isLoading ? 'disabled' : ''}
+                        `}>
                         <div className={`${NAMESPACE}-container`}>
                             <div className={`${NAMESPACE}-navigation`}>
                                 {this.renderNavigation(view)}

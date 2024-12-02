@@ -1469,8 +1469,8 @@ function showLoginDialog(email, password) {
 
         closeDialog();
 
-        if (page.includes('propay')) {
-            loadSubPage('pro');
+        if (page.startsWith('propay_')) {
+            return loadSubPage('pro');
         }
 
         return false;

@@ -891,7 +891,8 @@
     color: var(--mobile-support-success);
 }
 
-.pm.mega-input input:-webkit-autofill {
+.pm.mega-input input:-webkit-autofill,
+.mobile.mega-input input:-webkit-autofill {
     padding: 2px 8px !important;
     box-shadow: 0 0 0 50px var(--mobile-page-background) inset;
 }

@@ -119,7 +119,13 @@ class MegaToast extends MegaComponent {
      * @returns void
      */
     set actionButtonText(message) {
-        this.actionButton.text = message || "";
+        message = message || '';
+        this.actionButton.text = message;
+        if (!message) {
+            this.actionButton.hide();
+            return;
+        }
+        this.actionButton.show();
     }
 
     /**

@@ -1841,10 +1841,6 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace(/\[S\d]/g, '<span>')
         .replace(/\[\/S\d]/g, '</span>');
 
-    l.logout_recovery_key = escapeHTML(l.logout_recovery_key)
-        .replace('[A]', `<a href="${recoveryKeyLink}" target="_blank">`)
-        .replace('[/A]', '</a>');
-
     l.invite_subject_text = escapeHTML(encodeURIComponent(l.invite_subject_text));
     l.available_commission_tip = escapeHTML(l.available_commission_tip)
         .replace('[A]', '<a class="clickurl" href="/pro">').replace('[/A]', '</a>');

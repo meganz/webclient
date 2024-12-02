@@ -1,4 +1,4 @@
-class MegaMobileOverlay extends MegaComponent {
+class MegaOverlay extends MegaComponent {
 
     constructor(options) {
 
@@ -14,7 +14,7 @@ class MegaMobileOverlay extends MegaComponent {
         let subNode = document.createElement('div');
         subNode.className = `${options.wrapperClassname} custom-alpha`;
         targetNode.appendChild(subNode);
-        const overlay = subNode;
+        const overlay = this.overlayNode = subNode;
 
         targetNode = overlay;
 
@@ -31,7 +31,7 @@ class MegaMobileOverlay extends MegaComponent {
             parentNode: targetNode,
             type: 'icon',
             componentClassname: 'text-icon close',
-            icon: 'sprite-mobile-fm-mono icon-dialog-close',
+            icon: `${mega.ui.sprites.mono} icon-dialog-close`,
             iconSize: 24
         });
 
@@ -56,13 +56,35 @@ class MegaMobileOverlay extends MegaComponent {
         targetNode.appendChild(subNode);
 
         this.contentNode = subNode = document.createElement('div');
-        subNode.className = 'content fm-scrolling scroller-space';
+        subNode.className = 'content fm-scrolling scroller-space content';
         targetNode.appendChild(subNode);
 
         targetNode = overlay;
         this.actionsNode = subNode = document.createElement('div');
         subNode.className = 'actions';
         targetNode.appendChild(subNode);
+
+        targetNode = overlay;
+        this.footerNode = subNode = document.createElement('footer');
+        subNode.className = 'overlay-footer hidden';
+        targetNode.appendChild(subNode);
+
+        if (!is_mobile) {
+            overlay.Ps = new PerfectScrollbar(overlay);
+        }
+    }
+
+    get centered() {
+        return !!this.domNode.querySelector('.main').classList.contains('centered');
+    }
+
+    set centered(val) {
+        val = val || true;
+        const main = this.domNode.querySelector('.main');
+
+        if (val !== this.centered) {
+            main.classList.toggle('centered');
+        }
     }
 
     get visible() {
@@ -73,6 +95,11 @@ class MegaMobileOverlay extends MegaComponent {
         if (options) {
             this.clear();
             this.showClose = options.showClose;
+            this.centered = options.centered;
+
+            if (options.classList) {
+                this.addClass(...options.classList);
+            }
 
             if (!options.name && d) {
                 console.warn('Overlay name is missing. Please set it in the options');
@@ -137,6 +164,10 @@ class MegaMobileOverlay extends MegaComponent {
                 }
             }
 
+            if (options.footer) {
+                this.addFooter(options.footer);
+            }
+
             _bindEvent(options.onClose, this, 'close.overlay');
 
             if (options.actionOnBottom) {
@@ -170,14 +201,18 @@ class MegaMobileOverlay extends MegaComponent {
         }
     }
 
-    hide() {
-        this.removeClass('active');
+    hide(name) {
+        if (this.visible && (!name || name === this.name)) {
+            this.removeClass('active', 'pm-dialog');
 
-        mainlayout.classList.remove('fm-overlay');
-        document.documentElement.classList.remove('overlayed');
+            mainlayout.classList.remove('fm-overlay', 'pm-dialog');
+            document.documentElement.classList.remove('overlayed');
+            this.name = undefined;
+            this.trigger('hide');
 
-        if (mega.flags.ab_ads) {
-            mega.commercials.updateOverlays();
+            if (mega.flags.ab_ads) {
+                mega.commercials.updateOverlays();
+            }
         }
     }
 
@@ -188,6 +223,7 @@ class MegaMobileOverlay extends MegaComponent {
         this.clearImage();
         this.clearContent();
         this.clearActions();
+        this.clearFooter();
         this.clearUserEvents();
 
         this.removeClass('action-button-bottom');
@@ -280,6 +316,10 @@ class MegaMobileOverlay extends MegaComponent {
         }
 
         this.contentNode.appendChild(content);
+
+        if (this.overlayNode.Ps) {
+            this.overlayNode.Ps.update();
+        }
     }
 
     addContents(contents, clear) {
@@ -293,6 +333,9 @@ class MegaMobileOverlay extends MegaComponent {
 
     clearContent() {
         this.contentNode.textContent = '';
+        if (this.overlayNode.Ps) {
+            this.overlayNode.Ps.update();
+        }
     }
 
     addActions(actions, clear) {
@@ -324,6 +367,38 @@ class MegaMobileOverlay extends MegaComponent {
         this.actionsNode.className = 'actions';
     }
 
+    addFooter(options, clear) {
+        if (clear) {
+            this.clearFooter();
+        }
+        if (!['checkbox', 'link'].includes(options.type)) {
+            return;
+        }
+        const { type, classList = [] } = options;
+        if (type === 'checkbox') {
+            this.footerComp = new MegaCheckbox({
+                parentNode: this.footerNode,
+                componentClassname: 'mega-checkbox',
+                ...options,
+            });
+        }
+        else if (type === 'link') {
+            this.footerComp = new MegaLink({
+                parentNode: this.footerNode,
+                ...options,
+            });
+        }
+        this.footerNode.className = ['overlay-footer', ...classList].join(' ');
+        this.addClass('with-footer');
+    }
+
+    clearFooter() {
+        this.footerNode.className = 'overlay-footer hidden';
+        this.footerNode.textContent = '';
+        delete this.footerComp;
+        this.removeClass('with-footer');
+    }
+
     // Other util methods
 
     scrollTo(element) {
@@ -337,7 +412,7 @@ class MegaMobileOverlay extends MegaComponent {
     }
 }
 
-mega.ui.overlay = new MegaMobileOverlay({
+mega.ui.overlay = new MegaOverlay({
     parentNode: document.body,
     componentClassname: 'mega-overlay',
     wrapperClassname: 'overlay'

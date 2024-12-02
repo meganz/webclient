@@ -108,7 +108,7 @@ mobile.settings.account.referralDistribution = Object.create(mobile.settingsHelp
     renderEmptyTab(node, type) {
         'use strict';
 
-        const emptyNode = new MegaMobileOverlay({
+        const emptyNode = new MegaOverlay({
             parentNode: node,
             componentClassname: 'mega-empty-states',
             wrapperClassname: 'empty-states'

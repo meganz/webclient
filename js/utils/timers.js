@@ -153,6 +153,7 @@ lazy(self, 'tSleep', function tSleep() {
     const pending = new Set();
     const symbol = Symbol('^^tSleep::scheduler~~');
 
+    let pid = 0;
     let tid = null;
     let threshold = MAX_THRESHOLD;
 
@@ -180,6 +181,10 @@ lazy(self, 'tSleep', function tSleep() {
         if (pending.size) {
             if (self.d > 2) {
                 console.warn(`tSleep rescheduled for ${threshold | 0}ms`, pending);
+            }
+            if (document.hidden && self.tSleep !== self.sleep) {
+                const xid = ++pid;
+                return sleep(threshold / 1e3).then(() => xid === pid && dequeue());
             }
             tid = gSetTimeout(dequeue, threshold);
         }
@@ -554,7 +559,7 @@ mBroadcaster.once('boot_done', tryCatch(() => {
 
     const IDLE_TIMEOUT = freeze({delay: 100});
     const IDLE_PIPELINE = {ts: 0, pid: 0, tasks: []};
-    const IDLE_THRESHOLD = IDLE_TIMEOUT.delay << 3;
+    const IDLE_THRESHOLD = IDLE_TIMEOUT.delay << 2;
 
     const idleCallbackTaskSorter = (a, b) => b.ms - a.ms || b.pri - a.pri;
 
@@ -623,7 +628,10 @@ mBroadcaster.once('boot_done', tryCatch(() => {
         IDLE_PIPELINE.tasks.push(task);
 
         if (!IDLE_PIPELINE.pid) {
-            if (lax > 1 && !document.hidden) {
+            if (document.hidden) {
+                IDLE_PIPELINE.pid = sleep((IDLE_THRESHOLD - 50) / 1e3).then(idleCallbackHandler);
+            }
+            else if (lax > 1) {
                 IDLE_PIPELINE.pid = requestAnimationFrame(idleCallbackHandler);
             }
             else {

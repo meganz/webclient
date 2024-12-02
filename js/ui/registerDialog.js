@@ -299,6 +299,11 @@
                     aPromise.reject();
                 }
                 closeRegisterDialog($dialog, true);
+
+                if (page.startsWith('propay_')) {
+                    return loadSubPage('pro');
+                }
+
                 return false;
             });
 

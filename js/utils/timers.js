@@ -554,7 +554,7 @@ mBroadcaster.once('boot_done', tryCatch(() => {
 
     const IDLE_TIMEOUT = freeze({delay: 100});
     const IDLE_PIPELINE = {ts: 0, pid: 0, tasks: []};
-    const IDLE_THRESHOLD = IDLE_TIMEOUT.delay << 2;
+    const IDLE_THRESHOLD = IDLE_TIMEOUT.delay << 3;
 
     const idleCallbackTaskSorter = (a, b) => b.ms - a.ms || b.pri - a.pri;
 

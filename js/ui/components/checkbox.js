@@ -31,7 +31,12 @@ class MegaCheckbox extends MegaComponent {
 
         this.checked = options.checked;
 
-        this.on('click.checkbox', () => {
+        this.on('click.checkbox', (ev) => {
+            if (ev.target === this.input) {
+                ev.stopPropagation();
+                this.onToggle();
+                return;
+            }
             this.checked = !this.checked;
             return false;
         });
@@ -68,12 +73,13 @@ class MegaCheckbox extends MegaComponent {
 
     onToggle() {
         const checkboxWrapper = this.domNode.querySelector('.checkbox-wrapper');
-        const checkedClassList = ['sprite-mobile-fm-mono', 'icon-check-thin-outline'];
+        const checkedClassList = [mega.ui.sprites.mono, 'icon-check-thin-outline'];
         if (this.checked) {
             checkboxWrapper.classList.add(...checkedClassList);
         }
         else {
             checkboxWrapper.classList.remove(...checkedClassList);
         }
+        this.trigger('toggle', this.checked);
     }
 }

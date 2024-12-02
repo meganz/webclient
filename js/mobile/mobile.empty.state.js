@@ -1,4 +1,4 @@
-class MegaMobileEmptyState extends MegaMobileOverlay {
+class MegaMobileEmptyState extends MegaOverlay {
     show(container) {
         if (container) {
             container.classList.add('hidden');

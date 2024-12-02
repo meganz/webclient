@@ -1,4 +1,4 @@
-class MegaMobileSheet extends MegaMobileOverlay {
+class MegaSheet extends MegaOverlay {
 
     constructor(options) {
         super(options);
@@ -46,7 +46,7 @@ class MegaMobileSheet extends MegaMobileOverlay {
     }
 
     set type(key) {
-        const sheetType = MegaMobileSheet.typeClass[key];
+        const sheetType = MegaSheet.typeClass[key];
 
         if (!sheetType) {
             console.error('Sheet type is not given');
@@ -65,7 +65,7 @@ class MegaMobileSheet extends MegaMobileOverlay {
     }
 
     set height(key) {
-        const sheetHeight = MegaMobileSheet.heightClass[key];
+        const sheetHeight = MegaSheet.heightClass[key];
 
         if (!sheetHeight) {
             console.error('Sheet height mode is not given');
@@ -176,19 +176,19 @@ class MegaMobileSheet extends MegaMobileOverlay {
     }
 }
 
-MegaMobileSheet.typeClass = {
+MegaSheet.typeClass = {
     normal: 'normal',
     modal: 'modal-dialog',
     modalLeft: 'modal-dialog-left'
 };
 
-MegaMobileSheet.heightClass = {
+MegaSheet.heightClass = {
     full: 'full-height',
     auto: 'dynamic-height'
 };
 
 // Create instance before fm is initialized
-mega.ui.sheet = new MegaMobileSheet({
+mega.ui.sheet = new MegaSheet({
     parentNode: document.body,
     componentClassname: 'mega-sheet',
     wrapperClassname: 'sheet'

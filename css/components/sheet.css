@@ -3,12 +3,23 @@
     flex-direction: column;
     width: 100%;
     box-sizing: border-box;
-    padding: 24px;
+    padding: 24px 0;
     background: var(--mobile-surface-1);
     border-radius: var(--mobile-border-radius-large) var(--mobile-border-radius-large) 0 0;
     transform: translateY(calc(50% + 50vh));
     transition: transform 0.2s ease-out;
     max-height: calc(100% - 16px);
+}
+
+.mega-sheet.with-footer .sheet {
+    padding-bottom: 0;
+}
+
+.mega-sheet .sheet .header,
+.mega-sheet .sheet .main,
+.mega-sheet .sheet .actions {
+    padding: 0 24px;
+    width: calc(100% - 48px);
 }
 
 .mega-sheet .sheet > .close {
@@ -83,9 +94,11 @@
         justify-content: center;
     }
 
-    .mega-sheet .sheet {
+    .mega-sheet .sheet,
+    .mega-sheet .sheet.ps {
         border-radius: var(--mobile-border-radius-large);
         max-width: 562px;
+        min-width: unset;
         max-height: 95%;
         margin: auto;
     }
@@ -93,6 +106,16 @@
     .mega-sheet .actions {
         flex-flow: row wrap;
         justify-content: center;
+    }
+
+    .mega-sheet .overlay-footer {
+        margin-top: 24px;
+        border-radius: 0 0 var(--mobile-border-radius-large) var(--mobile-border-radius-large);
+    }
+
+    .mega-sheet.modal-dialog .actions {
+        padding: 24px 48px;
+        width: 100%;
     }
 }
 

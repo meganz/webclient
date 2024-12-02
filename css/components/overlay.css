@@ -28,11 +28,15 @@
     flex-direction: column;
     width: 100%;
     box-sizing: border-box;
-    padding: 24px;
+    padding: 24px 0;
     background: var(--mobile-page-background);
     transform: translateY(100%);
     transition: transform 0.2s ease-out;
     height: 100%;
+}
+
+.mega-overlay.with-footer .overlay {
+    padding-bottom: 0;
 }
 
 .mega-overlay.mega-overlay-view {
@@ -58,8 +62,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0;
-    width: 100%;
+    padding: 0 24px;
+    width: calc(100% - 48px);
     overflow: hidden;
     height: 100%;
 }
@@ -102,8 +106,8 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0;
-    width: 100%;
+    padding: 0 24px;
+    width: calc(100% - 48px);
 }
 .overlay-wrap .main > *:not(:last-child),
 .mega-overlay .overlay > .close {
@@ -171,14 +175,16 @@
 }
 
 .overlay-wrap .image i.key,
-.overlay-wrap .image i.reload {
+.overlay-wrap .image i.reload,
+.overlay-wrap .image i.bell,
+.overlay-wrap .image i.password {
     background-size: contain;
     width: 96px;
     height: 96px;
 }
 
-.overlay-wrap .image i.bell,
-.overlay-wrap .image i.password {
+body.mobile .overlay-wrap .image i.bell,
+body.mobile .overlay-wrap .image i.password {
     background-size: contain;
     width: 64px;
     height: 64px;
@@ -187,6 +193,8 @@
 .overlay-wrap .header {
     display: flex;
     align-items: center;
+    padding: 0 24px;
+    width: calc(100% - 48px);
 }
 
 .overlay-wrap .header > * {
@@ -197,8 +205,24 @@
     width: 100%;
 }
 
+.overlay-wrap .overlay-footer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 4px 24px 16px;
+    transition: transform 0.2s ease-out;
+    max-height: 48px;
+}
+
 @media only screen and (orientation: landscape) and (max-height: 359px) {
     .overlay-wrap i.icon {
        display: none;
+    }
+}
+
+@media only screen and (min-width: 769px) {
+    .overlay-wrap .overlay-footer {
+        padding-top: 16px;
     }
 }

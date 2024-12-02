@@ -1,4 +1,4 @@
-class MegaMobilePromoBanner extends MegaMobileOverlay {
+class MegaMobilePromoBanner extends MegaOverlay {
 
     constructor(options) {
         options.wrapperClassname = 'promo-banner';

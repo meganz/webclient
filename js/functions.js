@@ -1549,7 +1549,7 @@ function mLogout(aCallback, force) {
                 if (window.waitsc) {
                     waitsc.stop();
                 }
-                return Promise.resolve(mega.ui.passwordReminderDialog.recheckLogoutDialog()).then(() => true);
+                return mega.ui.passwordReminderDialog.recheckLogoutDialog();
             }
             return proceed;
         })

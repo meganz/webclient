@@ -2943,7 +2943,7 @@ function closeDialog(ev) {
         }
     }
 
-    if ($.dialog === 'prd') {
+    if ($.dialog === 'recoverykey-logout-overlay') {
         // PasswordReminderDialog manages its own states, so don't do anything.
         return;
     }

@@ -347,3 +347,14 @@ mega.ui.pm = {
         }
     }
 };
+
+(mega => {
+    "use strict";
+
+    lazy(mega.ui.pm, 'overlay', () => new MegaOverlay({
+        parentNode: document.querySelector('.password-list-page'),
+        componentClassname: 'mega-overlay pm-overlay',
+        wrapperClassname: 'overlay'
+    }));
+
+})(window.mega);

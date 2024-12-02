@@ -16,6 +16,7 @@
     box-sizing: border-box;
     height: auto;
     overflow-y: auto;
+    width: 100%;
 }
 
 .mobile .mega-promo-banner.overlay-wrap .content {
@@ -73,4 +74,5 @@
     border-top: 1px solid var(--mobile-border-strong);
     padding: 16px 24px;
     box-sizing: border-box;
+    width: 100%;
 }

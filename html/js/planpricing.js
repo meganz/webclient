@@ -571,6 +571,13 @@ lazy(pro, 'proplan2', () => {
                     }
                     delay('pricing.plan', eventlog.bind(null, 99779 + planId));
 
+                    if (mega.flags.ff_npabm) {
+                        eventlog(500591, sessionStorage['pro.period']);
+                    }
+                    else {
+                        eventlog(500590, sessionStorage['pro.period']);
+                    }
+
                     moveToBuyStep(planId);
                 }
 
@@ -1182,6 +1189,8 @@ lazy(pro, 'proplan2', () => {
         let periodSwapped = false;
         ProFlexiFound = false;
 
+        let showYearlyPerMonth = mega.flags.ff_npabm && (period === 12);
+
         for (const currentPlan of pro.membershipPlans) {
 
             const months = currentPlan[pro.UTQA_RES_INDEX_MONTHS];
@@ -1212,6 +1221,7 @@ lazy(pro, 'proplan2', () => {
                 period = pro.singleDurationPlans[planNum];
                 periodText = period === 12 ? l[932] : l[931];
                 periodSwapped = true;
+                showYearlyPerMonth = showYearlyPerMonth && (period === 12);
             }
 
             if (months !== period || planNum === pro.ACCOUNT_LEVEL_BUSINESS) {
@@ -1234,10 +1244,20 @@ lazy(pro, 'proplan2', () => {
                 }
             }
 
-            const priceText = formatCurrency(planPrice, priceCurrency, 'narrowSymbol');
+            let billingFrequencyText;
+            let priceText;
+            if (showYearlyPerMonth) {
+                billingFrequencyText = l.curr_per_month_billed_yearly
+                    .replace('%1', priceCurrency);
+                priceText = formatCurrency(planPrice / 12, priceCurrency, 'narrowSymbol');
+            }
+            else {
+                billingFrequencyText = priceCurrency + ' / ' + periodText;
+                priceText = formatCurrency(planPrice, priceCurrency, 'narrowSymbol');
+            }
 
             $('.pricing-plan-price span.vl', $planCard).text(priceText);
-            $('.pricing-plan-price-unit', $planCard).text(priceCurrency + ' / ' +  periodText);
+            $('.pricing-plan-price-unit', $planCard).text(billingFrequencyText);
 
             if (priceText) {
                 $planCard.toggleClass('long-currency1', priceText.length >= 9 && priceText.length <= 12);
@@ -1282,6 +1302,13 @@ lazy(pro, 'proplan2', () => {
                 $('.meeting-limits span', $featuresBox).text(l.pr_no_meet_time_limits);
                 $('.meeting-participants span', $featuresBox).text(l.pr_unlimited_participants);
             }
+        }
+
+        if (showYearlyPerMonth) {
+            eventlog(500588, true);
+        }
+        else if (period === 12) {
+            eventlog(500589, true);
         }
 
         const $freeBanner = $('.pricing-pg.pricing-banner-container', $page);

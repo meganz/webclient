@@ -3698,7 +3698,7 @@ BusinessAccountUI.prototype.showResetPasswordSubUserDialog = function(subUserHan
 
             })
             .catch((ex) => {
-                msgDialog('info', '', l[22082], api.strerror(ex));
+                msgDialog('info', '', l[22082], ex === ENOENT ? l.err_miss_sub_pw_reset : api.strerror(ex));
             });
     });
 

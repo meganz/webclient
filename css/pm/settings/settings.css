@@ -10,7 +10,11 @@
 
 .settings-container {
     max-width: 705px;
-    margin: 24px;
+    margin: 24px 24px 48px;
+}
+
+.settings-container > .mega-list-container {
+    margin-bottom: 32px;
 }
 
 .settings-header {
@@ -81,7 +85,7 @@
 
 @media screen  and (min-width: 769px) {
     .settings-container {
-        margin: 24px auto;
+        margin: 24px auto 48px;
     }
 }
 

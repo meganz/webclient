@@ -34,10 +34,10 @@ mega.pm = {
         }
     },
 
-    deleteItem(handle) {
+    async deleteItem(handles) {
         'use strict';
 
-        return api.screq({a: 'd', n: handle, vw: 1});
+        return Promise.all(handles.map(n => api.screq({a: 'd', n, vw: 1})));
     },
 
     saveLastSelected(handle) {

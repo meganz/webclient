@@ -121,7 +121,7 @@ class MegaForm extends MegaComponent {
     }
 
     addButton(options) {
-        const {text, classname, icon, type, typeAttr, onClick, loader, parentNode} = options;
+        const {text, classname, icon, type, typeAttr, onClick, parentNode} = options;
 
         const actionBtn = new MegaButton({
             parentNode : parentNode || this.domNode,
@@ -130,8 +130,7 @@ class MegaForm extends MegaComponent {
             icon,
             type,
             typeAttr,
-            onClick,
-            loader
+            onClick
         });
 
         this.buttons.push(actionBtn);

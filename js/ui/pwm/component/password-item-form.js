@@ -82,7 +82,6 @@ class PasswordItemForm extends MegaForm {
                     text: l.msg_dlg_save,
                     classname: 'primary submit',
                     typeAttr: 'button',
-                    loader: true,
                     onClick: () => {
                         if (!this.isLoading()) {
                             this.setLoading(true);
@@ -119,14 +118,14 @@ class PasswordItemForm extends MegaForm {
                                 this.createItem()
                                     .catch((ex) => {
                                         this.setLoading(false);
-                                        this.showError(ex);
+                                        tell(ex);
                                     });
                             }
                             else {
                                 this.updateItem()
                                     .catch((ex) => {
                                         this.setLoading(false);
-                                        this.showError(ex);
+                                        tell(ex);
                                     });
                             }
                         }
@@ -313,21 +312,5 @@ class PasswordItemForm extends MegaForm {
         }
 
         return success;
-    }
-
-    showError(result) {
-        // show dialog on api request errors
-        megaMsgDialog.render(
-            l.unsuccessful_action,
-            l.request_failed,
-            `${l.error_code}: ${result}`,
-            '',
-            {
-                icon: 'sprite-pm-mono icon-alert-triangle-thin-outline warning',
-                buttons: [l.ok_button]
-            },
-            false,
-            true
-        );
     }
 }

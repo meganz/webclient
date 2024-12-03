@@ -746,7 +746,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 /**
  * get the status string of a sub-user
  * @param {Number} statusCode       a number represents the status code of a sub-user
- * @returns {String}                the status string (Active, disabled ...etc)
+ * @returns {String}                the status string (Active, deactivated ...etc)
  */
 BusinessAccountUI.prototype.subUserStatus = function (statusCode) {
     "use strict";
@@ -757,7 +757,7 @@ BusinessAccountUI.prototype.subUserStatus = function (statusCode) {
         return l[7379]; // pending
     }
     else if (statusCode === 11) {
-        return l.sub_user_disabled; // disabled
+        return l.sub_user_deactivated; // deactivated
     }
     else if (statusCode === 12) {
         return l[7376]; // deleted

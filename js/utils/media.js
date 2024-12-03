@@ -101,6 +101,7 @@ function is_rawimage(name, ext) {
 is_image.def = {
     'JPG': 1,
     'JPEG': 1,
+    'JFIF': 1,
     'GIF': 1,
     'BMP': 1,
     'PNG': 1

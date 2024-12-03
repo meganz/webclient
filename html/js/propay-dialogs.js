@@ -1689,34 +1689,7 @@ var addressDialog = {
 
         // Change the States depending on the selected country
         var changeStates = function(selectedCountryCode) {
-
-            // If postcode translations not set, then decalre them.
-            if (!addressDialog.localePostalCodeName) {
-
-                addressDialog.localePostalCodeName = freeze({
-                    "US": "ZIP Code",
-                    "CA": "Postal Code",
-                    "PH": "ZIP Code",
-                    "DE": "PLZ",
-                    "AT": "PLZ",
-                    "IN": "Pincode",
-                    "IE": "Eircode",
-                    "BR": "CEP",
-                    "IT": "CAP"
-                });
-            }
-
-            // If selecting a country whereby the postcode is named differently, update the placeholder value.
-            if (addressDialog.localePostalCodeName[selectedCountryCode]) {
-                if ($titleElemPostCode.length) {
-                    $postcodeInput
-                        .updateTitle(addressDialog.localePostalCodeName[selectedCountryCode]);
-                }
-                else {
-                    $postcodeInput.$input.attr('placeholder', addressDialog.localePostalCodeName[selectedCountryCode]);
-                }
-            }
-            else if ($titleElemPostCode.length) {
+            if ($titleElemPostCode.length) {
                 $postcodeInput.updateTitle(l[10659]);
             }
             else {

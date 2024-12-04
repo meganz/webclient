@@ -503,11 +503,11 @@ var myURL = window.URL;
 // Check whether we should redirect the user to the browser update.html page (triggered for Edge 18 and worse browsers)
 browserUpdate = browserUpdate ||
     (is_embed
-            ? (typeof ReadableStream === 'undefined' || typeof IntersectionObserver === 'undefined')
+        ? typeof ReadableStream === 'undefined' || typeof AbortController === 'undefined'
             : typeof BigInt === 'undefined'
     );
 // ReadableStream: C43 E14 F65 O30 S10.1
-// IntersectionObserver: C51 E15 F55 O38 S12.1
+// AbortController: C66 E16 F57 O53 S12.1
 
 if (!String.prototype.trim) {
     String.prototype.trim = function() {

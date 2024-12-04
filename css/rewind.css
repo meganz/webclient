@@ -1003,3 +1003,8 @@ body.theme-dark .rewind-datepicker-calendar .datepicker--cell.-current- {
     background: radial-gradient(circle, transparent 40%, var(--label-blue) calc(100% - 2px), var(--label-blue) 100%);
     animation: 1.5s linear infinite onboarding-hotspot-circle;
 }
+
+.fm-header-buttons .mega-button.fm-rewind:hover + .rw-whats-new-mini-promo-container:not(.suppressed),
+.rw-whats-new-mini-promo-container:hover:not(.suppressed) {
+    display: block !important;
+}

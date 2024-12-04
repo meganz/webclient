@@ -22054,7 +22054,7 @@ class Participant extends mixins.w9 {
     }, handle === u_handle ? REaCt().createElement(utils.zT, null, `${name} ${l.me}`) : REaCt().createElement(ui_contacts.ContactAwareName, {
       contact: M.u[handle],
       emoji: true
-    }), chatRoom.isMeeting && Call.isModerator(chatRoom, handle) && REaCt().createElement("span", null, REaCt().createElement("i", {
+    }), Call.isModerator(chatRoom, handle) && REaCt().createElement("span", null, REaCt().createElement("i", {
       className: `${this.baseIconClass} icon-admin-outline`
     }))), REaCt().createElement("div", {
       className: "status"
@@ -22251,7 +22251,7 @@ class Participants extends mixins.w9 {
                                             user-card-presence
                                             ${megaChat.userPresenceToCssClass(contact.presence)}
                                         `
-          }), chatRoom.isMeeting && Call.isModerator(chatRoom, handle) && REaCt().createElement("span", null, REaCt().createElement("i", {
+          }), Call.isModerator(chatRoom, handle) && REaCt().createElement("span", null, REaCt().createElement("i", {
             className: "sprite-fm-mono icon-admin-outline"
           })), REaCt().createElement("div", {
             className: "call-state"

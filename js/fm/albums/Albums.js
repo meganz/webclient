@@ -2204,10 +2204,8 @@ lazy(mega.gallery, 'albums', () => {
                             content: selections.length > 1
                                 ? mega.icu.format(l.added_items_to_albums, handles.length)
                                     .replace('%s', mega.icu.format(l.albums_count, selections.length))
-                                : handles.length > 1
-                                    ? mega.icu.format(l.added_items_to_album, handles.length)
-                                        .replace('%s', scope.albums.store[selections[0]].label)
-                                : l.added_item_to_album.replace('%s', scope.albums.store[selections[0]].label)
+                                : mega.icu.format(l.added_items_to_album, handles.length)
+                                    .replace('%s', limitNameLength(scope.albums.store[selections[0]].label))
                         });
                     }
                 },

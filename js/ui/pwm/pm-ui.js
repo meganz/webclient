@@ -100,6 +100,17 @@ mega.ui.pm = {
         'use strict';
 
         mega.ui.banner.show('', l.no_internet, '', 'error', false, true, true);
+
+        const importBtn = pmlayout.querySelector('.import-file');
+        const chooseFileBtn = pmlayout.querySelector('.choose-file');
+        const errorMessage = pmlayout.querySelector('.import-error-message');
+
+        if (mega.ui.pm.settings.importInFlight) {
+            errorMessage.classList.remove('hidden');
+            chooseFileBtn.disabled = false;
+            importBtn.disabled = false;
+            importBtn.loading = false;
+        }
     },
 
     comm: {

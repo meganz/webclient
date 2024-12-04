@@ -37,7 +37,13 @@ mega.ui.pm.settings = {
         this.importProvider = {
             'google': l.google_password_manager,
             'keepass': l.keepass,
-            'lastpass': l.lastpass
+            'lastpass': l.lastpass,
+            'dashlane': l.dashlane,
+            '1password': l['1password'],
+            'bitwarden': l.bitwarden,
+            'nordpass': l.nordpass,
+            'proton': l.proton,
+            'other': l.generic_csv
         };
 
         this.file = null;
@@ -177,9 +183,40 @@ mega.ui.pm.settings = {
                                     fileInput.value = '';
                                     mega.ui.pm.settings.file = null;
                                     mega.ui.pm.settings.importInFlight = false;
-                                    eventlog(mega.ui.pm.settings.importSelected === 'google' ? 590024
-                                        : mega.ui.pm.settings.importSelected === 'keepass' ? 590025
-                                            : 590026);
+                                    let importEventId;
+                                    switch (mega.ui.pm.settings.importSelected) {
+                                        case 'keepass':
+                                            importEventId = 500605;
+                                            break;
+                                        case 'lastpass':
+                                            importEventId = 500606;
+                                            break;
+                                        case 'dashlane':
+                                            importEventId = 500607;
+                                            break;
+                                        case '1password':
+                                            importEventId = 500608;
+                                            break;
+                                        case 'bitwarden':
+                                            importEventId = 500609;
+                                            break;
+                                        case 'nordpass':
+                                            importEventId = 500610;
+                                            break;
+                                        case 'proton':
+                                            importEventId = 500611;
+                                            break;
+                                        case 'other':
+                                            importEventId = 500612;
+                                            break;
+                                        default:
+                                            importEventId = 500604;
+                                    }
+                                    eventlog(importEventId);
+                                })
+                                .catch((ex) => {
+                                    importBtn.loading = false;
+                                    tell(ex);
                                 });
                         }
                         else {

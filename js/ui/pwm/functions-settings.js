@@ -48,6 +48,10 @@ lazy(mega.ui.pm.settings, 'utils', () => {
 
             for (let i = 1; i < lines.length; i++) {
 
+                if (lines[i].length === 0) {
+                    continue;
+                }
+
                 if (inQuotes) {
                     let split = [];
                     ({line: split, inQuotes} = this.splitCSVLine(lines[i], true));
@@ -58,21 +62,27 @@ lazy(mega.ui.pm.settings, 'utils', () => {
                     ({line: currentLine, inQuotes} = this.splitCSVLine(lines[i], false));
                 }
 
-                if (type === 'lastpass') {
-                    inQuotes = currentLine.length !== headers.length;
+                if (type === '1password') {
+                    inQuotes = !currentLine[8].length;
                 }
                 else if (type === 'keepass') {
                     inQuotes = !lines[i].endsWith('"');
                 }
-                else if (type === 'google' && lineEnd === 'windows') {
+                else if ((type === 'google' || type === 'other') && lineEnd === 'windows') {
                     inQuotes = !lines[i].trimEnd().endsWith(',')
                         && !lines[i].trimEnd().endsWith('"') && !lines[i].endsWith('\r');
+                }
+                else {
+                    inQuotes = currentLine.length !== headers.length;
                 }
 
                 if (!inQuotes && currentLine.length === headers.length) {
                     const obj = {};
                     for (let j = 0; j < headers.length; j++) {
                         obj[headers[j]] = currentLine[j].trim();
+                    }
+                    if (type === 'nordpass' && obj.type !== 'password' || type === 'proton' && obj.type !== 'login') {
+                        continue;
                     }
                     result.push(obj);
                 }
@@ -125,7 +135,7 @@ lazy(mega.ui.pm.settings, 'utils', () => {
 
             const {pm, pwmh} = mega;
             for (const entry of data) {
-                const {name} = entry;
+                const name = this.getDeduplicateName(entry.name);
                 await pm.createItem(entry, name, pwmh);
             }
 
@@ -138,28 +148,91 @@ lazy(mega.ui.pm.settings, 'utils', () => {
                 return ["Group", "Title", "Username", "Password", "URL", "Notes", "TOTP", "Icon", "Last Modified",
                         "Created"];
             }
-            else if (type === 'google') {
+            else if (type === 'google' || type === 'other') {
                 return ['name', 'url', 'username', 'password', 'note'];
             }
             else if (type === 'lastpass') {
                 return ['url', 'username', 'password', 'totp', 'extra', 'name', 'grouping', 'fav'];
             }
+            else if (type === 'nordpass') {
+                return [
+                    'name', 'url', 'additional_urls', 'username', 'password', 'note', 'cardholdername', 'cardnumber',
+                    'cvc', 'pin', 'expirydate', 'zipcode', 'folder', 'full_name', 'phone_number', 'email', 'address1',
+                    'address2', 'city', 'country', 'state', 'type', 'custom_fields'
+                ];
+            }
+            else if (type === 'bitwarden') {
+                return [
+                    'folder', 'favorite', 'type', 'name', 'notes', 'fields', 'reprompt', 'login_uri', 'login_username',
+                    'login_password', 'login_totp'
+                ];
+            }
+            else if (type === '1password') {
+                return ['Title', 'Url', 'Username', 'Password', 'OTPAuth', 'Favorite', 'Archived', 'Tags', 'Notes'];
+            }
+            else if (type === 'dashlane') {
+                return ['username', 'username2', 'username3', 'title', 'password', 'note', 'url', 'category', 'otpUrl'];
+            }
+            else if (type === 'proton') {
+                return [
+                    'type', 'name', 'url', 'email', 'username', 'password', 'note', 'totp', 'createTime', 'modifyTime',
+                    'vault'
+                ];
+            }
         },
 
+        /**
+         *
+         * @param {Object} entry Entry of the imported password line
+         * @param {string} type Import provider
+         * @returns {{pwm: {u: string, pwd: string, n: string, url: string}, name: string}}
+         * Mapped import line in password item
+         */
         getPasswordData(entry, type) {
 
             if (type === 'keepass') {
                 return {name: entry.Title, pwm: {pwd: entry.Password, u: entry.Username, n: entry.Notes,
                                                  url: entry.URL}};
             }
-            else if (type === 'google') {
-                return {name: entry.name, pwm: {pwd: entry.password, u: entry.username, n: entry.note,
-                                                url: entry.url}};
+            else if (type === 'google' || type === 'other' || type === 'nordpass' || type === 'proton') {
+                return {name: entry.name, pwm: {pwd: entry.password, u: entry.username, n: entry.note, url: entry.url}};
             }
             else if (type === 'lastpass') {
                 return {name: entry.name, pwm: {pwd: entry.password, u: entry.username, n: entry.extra,
                                                 url: entry.url}};
             }
+            else if (type === 'bitwarden') {
+                return {
+                    name: entry.name, pwm: {
+                        pwd: entry.login_password, u: entry.login_username, n: entry.notes,
+                        url: entry.login_uri
+                    }
+                };
+            }
+            else if (type === '1password') {
+                return {name: entry.Title, pwm: {pwd: entry.Password, u: entry.Username, n: entry.Notes,
+                                                 url: entry.Url}};
+            }
+            else if (type === 'dashlane') {
+                return {name: entry.title, pwm: {pwd: entry.password, u: entry.username, n: entry.note,
+                                                 url: entry.url}};
+            }
+        },
+
+        getDeduplicateName(passwordTitle) {
+
+            const existingNames = new Set(Object.values(M.d).map(item => item.name));
+            let newName = passwordTitle;
+            const match = newName.match(/\((\d+)\)$/);
+            const baseName = match ? newName.replace(/\(\d+\)$/, '').trim() : newName;
+            let counter = match ? parseInt(match[1], 10) : 1;
+
+            while (existingNames.has(newName)) {
+                newName = `${baseName} (${counter})`;
+                counter++;
+            }
+
+            return newName;
         }
     });
 });

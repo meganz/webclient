@@ -4686,9 +4686,10 @@ body.rtl .meetings-call .sidebar-wrapper .participants ul li .participants-menu-
   left: 0;
   right: unset;
 }
+body.rtl .meetings-call .stream-controls ul li .input-source-opener {
+  left: -20px;
+}
 body.rtl #schedule-dialog .meetings-select .mega-input .mega-input-dropdown {
   left: 0;
   right: auto;
 }
-
-/*# sourceMappingURL=chat-bundle.css.map */

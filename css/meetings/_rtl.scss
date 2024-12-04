@@ -40,6 +40,10 @@ body.rtl {
                 }
             }
         }
+
+        .stream-controls ul li .input-source-opener {
+            left: -20px;
+        }
     }
 
     #schedule-dialog .meetings-select .mega-input .mega-input-dropdown {

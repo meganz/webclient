@@ -17,6 +17,10 @@
     z-index: 1400;
 }
 
+.theme-dark .psa-holder .anouncement {
+    background: linear-gradient(to bottom, rgb(60, 60, 60) 0%, rgb(51, 51, 51) 100%);
+}
+
 .psa-holder .anouncement .content-box {
     align-items: flex-start;
     display: flex;

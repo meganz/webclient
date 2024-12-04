@@ -3113,25 +3113,30 @@ MegaGallery.handleResize = SoonFc(200, (entries) => {
     }
 });
 
-MegaGallery.dbAction = () => {
+MegaGallery.dbAction = async(p) => {
     'use strict';
 
     if (fmdb && fmdb.db !== null && fmdb.crashed !== 666) {
-        const ignoreHandles = MegaGallery.handlesArrToObj([
-            ...M.getTreeHandles('shares'),
-            ...M.getTreeHandles(M.RubbishID)
-        ]);
+        const res = [];
+        const parents = Object.create(null);
 
-        return fmdb.getbykey(
-            'f',
-            {
-                query: db => db.where('fa').notEqual(fmdb.toStore('')),
-                include: ({p}) => !ignoreHandles[p]
+        p = p || M.RootID;
+        await dbfetch.media(9e3, (r) => {
+            for (let i = r.length; i--;) {
+                const n = r[i];
+
+                if (!parents[n.p]) {
+                    parents[n.p] = 1 + (M.getNodeRoot(n.p) === p);
+                }
+                if (parents[n.p] > 1) {
+                    res.push(n);
+                }
             }
-        );
+        });
+        return res;
     }
 
-    return Promise.reject();
+    throw new Error('FMDB Unavailable.');
 };
 
 MegaGallery.handlesArrToObj = (array) => {

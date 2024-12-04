@@ -111,10 +111,10 @@ lazy(mega.gallery, 'albums', () => {
      * Launching the slideshow right away (in fullscreen mode)
      * @param {String} albumId Album ID
      * @param {Boolean} useFullscreen Skipping videos and playing in the fullscreen
-     * @param {Boolean} autoplay Whether to start the slideshow right away or not
+     * @param {Boolean} asVideo Whether to run the slideshow as a video player
      * @returns {void}
      */
-    scope.playSlideshow = (albumId, useFullscreen, autoplay) => {
+    scope.playSlideshow = (albumId, useFullscreen, asVideo) => {
         if (M.isInvalidUserStatus()) {
             return;
         }
@@ -125,16 +125,27 @@ lazy(mega.gallery, 'albums', () => {
             const selHandles = (scope.albums.grid && scope.albums.grid.timeline)
                 ? Object.keys(scope.albums.grid.timeline.selections)
                 : [];
-            const firstNode = (selHandles.length)
-                ? album.nodes.find((n) => scope.albums.grid.timeline.selections[n.h] && scope.isPreviewable(n))
-                : album.nodes.find((n) => !scope.isVideo(n) && scope.isPreviewable(n));
+            let firstNode = null;
+
+            const canBePlayed = n => scope.isPreviewable(n) && !scope.isVideo(n);
+
+            if (asVideo) {
+                $.autoplay = true;
+                firstNode = album.nodes.find(n => scope.albums.grid.timeline.selections[n.h] && scope.isVideo(n));
+            }
+            else if (selHandles.length) {
+                firstNode = album.nodes.find(n => scope.albums.grid.timeline.selections[n.h] && canBePlayed(n));
+            }
+            else {
+                firstNode = album.nodes.find(canBePlayed);
+            }
 
             if (!firstNode) {
                 console.warn('Could not find the first node for the slideshow...');
                 return;
             }
 
-            if (autoplay) {
+            if (asVideo) {
                 $.autoplay = firstNode.h;
             }
 

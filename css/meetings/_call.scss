@@ -228,3 +228,12 @@
         }
     }
 }
+
+.recording-info {
+    font: var(--text-body1);
+    color: var(--secondary-white);
+
+    .dropdown-white-arrow {
+        left: 20px;
+    }
+}

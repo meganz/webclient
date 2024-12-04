@@ -133,8 +133,9 @@ Our JavaScript Files
 * ``encrypter.js`` -- the encrypter which is used as a web worker to
   encrypt data while uploading
 * ``pdf.worker.js`` -- worker for PDF Reader in JavaScript, **this is a fork**, [compare the changes](https://github.com/mozilla/pdf.js/compare/master...meganz:master)
-* ``worker.sfuClient.bundle.js`` -- worker for [MEGA SFU client](https://github.com/meganz/sfu-client/)
-  for audio/video calls
+* ``js/chat/sfuClient.js`` -- audio/video call client engine [MEGA SFU client](https://github.com/meganz/sfu-client/)
+* ``worker.sfuClient.bundle.js`` -- crypto worker of the MEGA SFU client
+* ``worker.recorder.bundle.js`` -- call recording engine worker of the MEGA SFU client. This bundle includes the [mp4-muxer](https://github.com/Vanilagy/mp4-muxer) opensource library
 * ``js/avatar.js`` -- is used for avatar selection, cropping & scaling
   (all on the client side in the canvas)
 * ``js/cleartemp.js`` -- contains ``clearIt()`` which is used to purge

@@ -2133,6 +2133,9 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   font: var(--text-body2);
   background: var(--secondary-red);
 }
+.meetings-call div.recording-control .recording-ongoing .recording-icon.clickable {
+  cursor: help;
+}
 .meetings-call div.recording-control .recording-ongoing .recording-icon i {
   display: block;
   width: 8px;
@@ -3055,6 +3058,14 @@ body.theme-dark .mega-dialog.meetings-permissions-dialog .permissions-warning-co
   margin: 0;
   font: var(--text-body1);
   visibility: visible;
+}
+
+.recording-info {
+  font: var(--text-body1);
+  color: var(--secondary-white);
+}
+.recording-info .dropdown-white-arrow {
+  left: 20px;
 }
 
 .start-meeting {

@@ -140,6 +140,7 @@ module.exports = function(config) {
 
         // Our chat code.
         'js/chat/strongvelope.js',
+        'js/chat/sfuClient.js',
         'js/fm/linkinfohelper.js',
         'js/chat/plugins/urlFilter.js',
         'js/chat/plugins/emoticonShortcutsFilter.js',
@@ -151,6 +152,8 @@ module.exports = function(config) {
         'js/chat/plugins/geoLocationLinks.js',
         'js/chat/messages.js',
         'js/utils/emoji.js',
+        'worker.sfuClient.bundle.js',
+        'worker.recorder.bundle.js',
 
 
         // == Test utilities ==

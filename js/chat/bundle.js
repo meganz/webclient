@@ -23068,7 +23068,10 @@ class SidebarControls extends mixins.w9 {
 }
 // EXTERNAL MODULE: ./js/chat/ui/inviteParticipantsPanel.jsx
 const inviteParticipantsPanel = REQ_(815);
+// EXTERNAL MODULE: ./js/ui/dropdowns.jsx
+const dropdowns = REQ_(911);
 ;// ./js/chat/ui/meetings/call.jsx
+
 
 
 
@@ -23213,6 +23216,8 @@ class Call extends mixins.w9 {
       recorder: undefined,
       recordingConsentDialog: false,
       recordingConsented: false,
+      recordingActivePeer: undefined,
+      recordingTooltip: false,
       invitePanel: false,
       presenterThumbSelected: false,
       timeoutBanner: false,
@@ -23254,7 +23259,7 @@ class Call extends mixins.w9 {
           call,
           chatRoom
         } = this.props;
-        if (userHandle === this.state.recorder) {
+        if (userHandle === this.state.recorder && userHandle !== u_handle) {
           chatRoom.trigger('onRecordingStopped', {
             userHandle
           });
@@ -23424,8 +23429,13 @@ class Call extends mixins.w9 {
         }
         mBroadcaster.sendMessage('meetings:raisedHand', raisedHandPeers);
       }));
+      chatRoom.rebind(`onRecordingActivePeer.${NAMESPACE}`, (ev, {
+        userHandle
+      }) => this.setState({
+        recordingActivePeer: userHandle
+      }));
     };
-    this.unbindCallEvents = () => ['onCallPeerLeft', 'onCallPeerJoined', 'onCallLeft', 'wrOnUsersAllow', 'wrOnUsersEntered', 'wrOnUserLeft', 'alterUserPrivilege', 'onCallState', 'onRecordingStarted', 'onRecordingStopped', 'onCallEndTimeUpdated', 'onRaisedHandAdd', 'onRaisedHandDel'].map(event => this.props.chatRoom.off(`${event}.${NAMESPACE}`));
+    this.unbindCallEvents = () => ['onCallPeerLeft', 'onCallPeerJoined', 'onCallLeft', 'wrOnUsersAllow', 'wrOnUsersEntered', 'wrOnUserLeft', 'alterUserPrivilege', 'onCallState', 'onRecordingStarted', 'onRecordingStopped', 'onRecordingActivePeer', 'onCallEndTimeUpdated', 'onRaisedHandAdd', 'onRaisedHandDel'].map(event => this.props.chatRoom.off(`${event}.${NAMESPACE}`));
     this.handleCallMinimize = () => {
       const {
         call,
@@ -23604,18 +23614,13 @@ class Call extends mixins.w9 {
         eventlog(500287);
       }
       if (this.state.recorder) {
-        return msgDialog(`confirmation:!^${l.stop_recording_dialog_cta}!${l.stop_recording_nop_dialog_cta}`, undefined, l.stop_recording_dialog_heading, l.stop_recording_dialog_body, cb => cb && this.setState({
-          recorder: undefined
-        }, () => {
-          sfuClient.recordingStop();
-          ChatToast.quick(l.stopped_recording_toast);
-        }), 1);
+        return msgDialog(`confirmation:!^${l.stop_recording_dialog_cta}!${l.stop_recording_nop_dialog_cta}`, undefined, l.stop_recording_dialog_heading, l.stop_recording_dialog_body, cb => cb && sfuClient.recordingStop(), 1);
       }
       msgDialog(`warningb:!^${l.start_recording_dialog_cta}!${l[82]}`, null, l.notify_participants_dialog_heading, l.notify_participants_dialog_body, cb => {
         if (cb || cb === null) {
           return;
         }
-        call.sfuClient.recordingStart().then(() => {
+        call.sfuClient.recordingStart(this.onWeStoppedRecording).then(() => {
           this.setState({
             recorder: u_handle
           });
@@ -23625,10 +23630,23 @@ class Call extends mixins.w9 {
         }).catch(dump);
       }, 1);
     };
+    this.onWeStoppedRecording = err => {
+      this.setState({
+        recorder: undefined,
+        recordingActivePeer: undefined
+      }, () => {
+        if (err) {
+          ChatToast.quick(`${l.stopped_recording_toast} Error: ${err.message || err}`);
+        } else {
+          ChatToast.quick(l.stopped_recording_toast);
+        }
+      });
+    };
     this.renderRecordingControl = () => {
-      let _this$props$call2;
       const {
-        recorder
+        recorder,
+        recordingTooltip,
+        recordingActivePeer
       } = this.state;
       const isModerator = Call.isModerator(this.props.chatRoom, u_handle);
       const $$CONTAINER = ({
@@ -23644,28 +23662,50 @@ class Call extends mixins.w9 {
         onClick
       }, children);
       if (recorder) {
-        const simpletip = {
-          'data-simpletip': l.host_recording.replace('%NAME', nicknames.getNickname(recorder) || megaChat.plugins.userHelper.SIMPLETIP_USER_LOADER),
-          'data-simpletipposition': 'top',
-          'data-simpletipoffset': 5,
-          'data-simpletip-class': 'theme-dark-forced'
-        };
+        const isRecorder = isModerator && recorder === u_handle;
         return REaCt().createElement($$CONTAINER, {
+          recordingTooltip,
           className: "recording-fixed"
         }, REaCt().createElement("div", (0,esm_extends.A)({
           className: `
                             recording-ongoing
                             simpletip
-                            ${isModerator && recorder === u_handle ? '' : 'plain-background'}
+                            ${isRecorder ? '' : 'plain-background'}
                         `
-        }, recorder !== u_handle && simpletip), REaCt().createElement("span", {
-          className: "recording-icon"
-        }, "REC ", REaCt().createElement("i", null)), isModerator && recorder === u_handle && REaCt().createElement("span", {
+        }, recorder !== u_handle && {
+          'data-simpletip': l.host_recording.replace('%NAME', nicknames.getNickname(recorder) || megaChat.plugins.userHelper.SIMPLETIP_USER_LOADER),
+          'data-simpletipposition': 'top',
+          'data-simpletipoffset': 5,
+          'data-simpletip-class': 'theme-dark-forced'
+        }), REaCt().createElement("span", {
+          className: `
+                                recording-icon
+                                button
+                                ${recordingTooltip ? 'active-dropdown' : ''}
+                                ${isRecorder ? 'clickable' : ''}
+                            `,
+          onMouseEnter: () => isRecorder && this.setState({
+            recordingTooltip: true
+          }),
+          onMouseOut: () => isRecorder && delay('meetings-rec-hover', () => this.setState({
+            recordingTooltip: false
+          }), 1250)
+        }, "REC ", REaCt().createElement("i", null), REaCt().createElement(dropdowns.Dropdown, {
+          className: "recording-info theme-dark-forced",
+          active: recordingTooltip,
+          noArrow: false,
+          positionMy: "center top",
+          positionAt: "center bottom",
+          vertOffset: 40,
+          horizOffset: 30
+        }, REaCt().createElement("div", null, "Currently recording: ", nicknames.getNickname(recordingActivePeer)))), isRecorder && REaCt().createElement("span", {
           className: "recording-toggle",
           onClick: this.handleRecordingToggle
         }, l.record_stop_button)));
       }
-      const isOnHold = !!(((_this$props$call2 = this.props.call) == null ? void 0 : _this$props$call2.av) & Av.onHold);
+      const {
+        isOnHold
+      } = this.props.call;
       return isModerator && REaCt().createElement($$CONTAINER, {
         className: isOnHold ? 'disabled' : '',
         onClick: () => {
@@ -23963,7 +24003,7 @@ class Call extends mixins.w9 {
       raisedHandPeers,
       activeElement,
       hasOtherParticipants: call.hasOtherParticipant(),
-      isOnHold: call.sfuClient.isOnHold(),
+      isOnHold: call.sfuClient.isOnHold,
       isFloatingPresenter: (_ref = mode === MODE.MINI && !forcedLocal ? call.getActiveStream() : call.getLocalStream()) == null ? void 0 : _ref.hasScreen,
       onSpeakerChange: this.handleSpeakerChange,
       onModeChange: this.handleModeChange,
@@ -23986,9 +24026,7 @@ class Call extends mixins.w9 {
       onCallExpand: this.handleCallExpand,
       onCallEnd: this.handleCallEnd,
       onStreamToggle: this.handleStreamToggle,
-      onRecordingToggle: () => this.setState({
-        recorder: undefined
-      }, () => call.sfuClient.recordingStop()),
+      onRecordingToggle: () => call.sfuClient.recordingStop(),
       onChatToggle: this.handleChatToggle,
       onParticipantsToggle: this.handleParticipantsToggle,
       onAudioClick: () => call.toggleAudio(),
@@ -25216,7 +25254,7 @@ class Stream extends mixins.w9 {
         isPresenterNode,
         onLoadedData
       } = this.props;
-      if (call.sfuClient.isOnHold()) {
+      if (call.isOnHold) {
         return this.renderOnHoldVideoNode();
       }
       let VideoClass = videoNode.zu;

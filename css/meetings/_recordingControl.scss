@@ -68,6 +68,8 @@ div.recording-control {
             font: var(--text-body2);
             background: var(--secondary-red);
 
+            &.clickable { cursor: help; }
+
             i {
                 display: block;
                 width: 8px;

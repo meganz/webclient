@@ -121,4 +121,5 @@
     }
 
     SfuClient.kWorkerUrl = (is_extension ? '' : '/') + 'worker.sfuClient.bundle.js';
+    SfuClient.CallRecorder.kWorkerUrl = (is_extension ? '' : '/') + 'worker.recorder.bundle.js';
 })();

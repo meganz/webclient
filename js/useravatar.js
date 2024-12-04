@@ -40,8 +40,7 @@ var useravatar = (function() {
      * @returns {String}
      * @private
      */
-    function _getAvatarSVGDataURI(user) {
-
+    ns.getAvatarSVGDataURI = function(user) {
         var s = _getAvatarProperties(user);
         var $template = $('#avatar-svg').clone().removeClass('hidden')
             .find('svg').addClass('color' + s.colorIndex).end()
@@ -93,7 +92,7 @@ var useravatar = (function() {
         var bgBlock = '';
 
         if (element === 'ximg') {
-            return _getAvatarSVGDataURI(user);
+            return ns.getAvatarSVGDataURI(user);
         }
 
         var s = _getAvatarProperties(user);

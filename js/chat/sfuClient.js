@@ -28,13 +28,13 @@ var __webpack_exports__ = {};
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  S: () => (/* binding */ ConnState),
-  Z_: () => (/* binding */ SfuClient)
+  w$: () => (/* binding */ ConnState),
+  EP: () => (/* binding */ SfuClient)
 });
 
 // UNUSED EXPORTS: AudioPlayer, CallJoinPermission, ScreenShareType
 
-;// CONCATENATED MODULE: ../shared/termCodes.ts
+;// ../shared/termCodes.ts
 var TermCode;
 (function (TermCode) {
     // Normal conditions
@@ -72,7 +72,7 @@ var TermCode;
 ;
 /* harmony default export */ const termCodes = (TermCode);
 
-;// CONCATENATED MODULE: ../shared/av.ts
+;// ../shared/av.ts
 class Av {
     static hasCamAndScreen(av) {
         return ((av & Av.Camera) && (av & Av.Screen));
@@ -113,7 +113,7 @@ Av.Video = 30;
 Av.Recording = 64;
 Av.onHold = 128;
 
-;// CONCATENATED MODULE: ../shared/sdpCompress.ts
+;// ../shared/sdpCompress.ts
 const endl = "\r\n";
 class Ssrc {
     constructor(id) {
@@ -397,7 +397,7 @@ function compressedSdpToString(sdp) {
     return summary;
 }
 
-;// CONCATENATED MODULE: ../shared/base64.ts
+;// ../shared/base64.ts
 var b64 = [..."ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_="];
 function base64encode(data, offs, len) {
     const end = offs + len;
@@ -498,7 +498,7 @@ function base64DecodeToArr(str) {
     return out.value;
 }
 
-;// CONCATENATED MODULE: ./adaptation.ts
+;// ./adaptation.ts
 
 
 const kLogTag = "sfuAdapt:";
@@ -538,7 +538,7 @@ class SvcDriver {
         this.updatePlostWindow(plost);
         plost = this.fmaPlost = (this.fmaPlost * 2 + plost) / 3;
         do {
-            if (window.dSfuAdapt) {
+            if (self.dSfuAdapt) {
                 console.log(kLogTag, "rtt:", rtt.toFixed(1), "rttLower:", this.rttLower.toFixed(1), "rttUpper:", this.rttUpper.toFixed(1), "plost:", plost.toFixed(1), "fmaPlost:", this.fmaPlost.toFixed(1), "plostLower", this.plostLower.toFixed(1), "plostUpper:", this.plostUpper.toFixed(1));
             }
         } while (0);
@@ -555,7 +555,7 @@ class SvcDriver {
                 ? txBwidth
                 : (this.maTxKbps * 5 + txBwidth) / 6;
             do {
-                if (window.dSfuAdapt) {
+                if (self.dSfuAdapt) {
                     console.log(kLogTag, "scrshare: maTxKbps:", maTxKbps, "mom:", txBwidth);
                 }
             } while (0);
@@ -565,7 +565,7 @@ class SvcDriver {
         }
         if (plost > this.plostUpper) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.log(kLogTag, "Decreasing rxQ due to PACKET LOSS of", plost.toFixed(1));
                 }
             } while (0);
@@ -596,7 +596,7 @@ class SvcDriver {
             }
             else if (stats.vtxdly > 2500) {
                 do {
-                    if (window.d) {
+                    if (self.d) {
                         console.log(kLogTag, `scrnshare: Tx delay ${stats.vtxdly} ms too large, decreasing quality...`);
                     }
                 } while (0);
@@ -644,7 +644,7 @@ class SvcDriver {
         this.rttLower = rtt + SvcDriver.kRttLowerHeadroom;
         this.rttUpper = rtt + SvcDriver.kRttUpperHeadroom;
         do {
-            if (window.d) {
+            if (self.d) {
                 console.log(kLogTag, "Rtt floor set to", rtt.toFixed(2));
             }
         } while (0);
@@ -685,14 +685,14 @@ class SvcDriver {
                 hist.upFails++;
                 hist.tsValidTill = now + span;
                 do {
-                    if (window.d) {
+                    if (self.d) {
                         console.log(kLogTag, `decRxQuality[${this.currRxQuality} -> ${newQ}]: Marking rx quality switch up attempt as failed: critcal: ${!!critical}, for period: ${span}`);
                     }
                 } while (0);
             }
             else {
                 do {
-                    if (window.d) {
+                    if (self.d) {
                         console.log(kLogTag, `decRxQuality[${this.currRxQuality} -> ${newQ}]: not marking as failed: areaMatch: ${hist.hiArea === this.rxTotalArea()}, timeMatch: ${Date.now() - hist.tsMonitorTill}`);
                     }
                 } while (0);
@@ -717,7 +717,7 @@ class SvcDriver {
             histMatch = hist.upFails && kbpsMatch && rttMatch && hist.lowArea <= this.rxTotalArea();
             if (histMatch && (hist.tsValidTill - now) >= 0) {
                 do {
-                    if (window.d) {
+                    if (self.d) {
                         console.log(kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Not increasing rxQ, have failed recently`);
                     }
                 } while (0);
@@ -725,7 +725,7 @@ class SvcDriver {
             }
             else {
                 do {
-                    if (window.d) {
+                    if (self.d) {
                         console.log(kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: not failed(recently): upFails:${hist.upFails}, timeMatch: ${(hist.tsValidTill - now)}, kbpsMatch: ${kbpsMatch} (hist: ${hist.kbps}, curr: ${stats.rx}), rttMatch: ${rttMatch} (hist: ${hist.rtt.toFixed()}, curr: ${this.maRtt.toFixed()}), areaDiff: ${this.rxTotalArea() - hist.lowArea}`);
                     }
                 } while (0);
@@ -736,7 +736,7 @@ class SvcDriver {
             hist.kbps = stats.rx;
             hist.rtt = stats.rtt;
             do {
-                if (window.d) {
+                if (self.d) {
                     console.log(kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Same up-fail parameters, preserving fail descriptor`);
                 }
             } while (0);
@@ -748,7 +748,7 @@ class SvcDriver {
                 kbps: stats.rx, rtt: this.maRtt, lowArea: this.rxTotalArea()
             };
             do {
-                if (window.d) {
+                if (self.d) {
                     console.log(kLogTag, `incRxQuality[${this.currRxQuality} -> ${this.currRxQuality + 1}]: Created new up-fail descriptor`);
                 }
             } while (0);
@@ -769,7 +769,7 @@ class SvcDriver {
         this.tsNoSwitchUntil = Date.now() + deadTime;
         this.rxqSwitchSeqNo++;
         do {
-            if (window.d) {
+            if (self.d) {
                 console.log(kLogTag, `Switching rx SVC quality from ${this.currRxQuality} to ${newQ}: ${JSON.stringify(params)}`);
             }
         } while (0);
@@ -780,7 +780,7 @@ class SvcDriver {
         if (!this.rxRttDowngr) {
             if (this.currRxQuality > 0) {
                 do {
-                    if (window.d) {
+                    if (self.d) {
                         console.log(kLogTag, `Decreasing rxQ due to HIGH RTT of ${this.maRtt.toFixed()}, saving checkpoint`);
                     }
                 } while (0);
@@ -798,7 +798,7 @@ class SvcDriver {
             if ((this.fmaPlost <= this.plostLower) && (stats.rtt < 1000) && (Math.abs(stats.rtt - this.rxRttDowngr.lastRtt) < 16)) {
                 // rtt did not change
                 do {
-                    if (window.d) {
+                    if (self.d) {
                         console.log(kLogTag, `Decreased rxQ by ${nSteps} steps: rtt didnt change much (${stats.rtt - this.rxRttDowngr.lastRtt}), is not over 1000 and there is no extra packet loss. Updating rtt floor`);
                     }
                 } while (0);
@@ -812,7 +812,7 @@ class SvcDriver {
                 // rtt changed - could be decreasing from the quality downgrade, or still rising
                 // because of network conditions. Either way, we should further downgrade quality
                 do {
-                    if (window.d) {
+                    if (self.d) {
                         console.log(kLogTag, `Decreased rxQ by ${nSteps} steps: rtt ${stats.rtt} changed by ${Math.round(stats.rtt - this.rxRttDowngr.lastRtt)}, plost: ${this.fmaPlost.toFixed(1)}. Keeping current rtt floor of ${this.lowestRttSeen.toFixed(2)}`);
                     }
                 } while (0);
@@ -849,7 +849,7 @@ class SvcDriver {
             if (res.width && res.height) {
                 ar = this.client.screenAspectRatio = res.width / res.height;
                 do {
-                    if (window.d) {
+                    if (self.d) {
                         console.log(kLogTag, `Screen capture res: ${res.width}x${res.height} (aspect ratio: ${Math.round(ar * 1000) / 1000})`);
                     }
                 } while (0);
@@ -857,7 +857,7 @@ class SvcDriver {
             else {
                 ar = 1.78;
                 do {
-                    if (window.d) {
+                    if (self.d) {
                         console.log(kLogTag, "setTxQuality: Could not obtain screen track's resolution, assuming AR of", ar);
                     }
                 } while (0);
@@ -865,7 +865,7 @@ class SvcDriver {
         }
         params.width = Math.round(params.height * ar);
         do {
-            if (window.d) {
+            if (self.d) {
                 console.log(kLogTag, `Switching TX quality from ${this.currTxQuality} to ${newQ}: ${JSON.stringify(params)} (AR: ${this.client.screenAspectRatio ? this.client.screenAspectRatio.toFixed(3) : "unknown"})`);
             }
         } while (0);
@@ -941,7 +941,30 @@ SvcDriver.kMaxTxQualityIndex = SvcDriver.TxQuality.length - 1;
 SvcDriver.kDefaultTxQualityIndex = 3;
 SvcDriver.kScreenCaptureHeight = SvcDriver.TxQuality[SvcDriver.kMaxTxQualityIndex].scr.height;
 
-;// CONCATENATED MODULE: ./speak.ts
+;// ../shared/utils.ts
+function utils_assert(cond) {
+    if (!cond) {
+        throw new Error("Assertion failed");
+    }
+}
+function assertNotNull(cond) {
+    if (cond === null || cond === undefined) {
+        throw new Error("Assertion failed: value is null");
+    }
+}
+function newPromiseWithResolvers() {
+    let cbResolve;
+    let cbReject;
+    var pms = new Promise(function (resolve, reject) {
+        cbResolve = resolve;
+        cbReject = reject;
+    });
+    pms.resolve = cbResolve;
+    pms.reject = cbReject;
+    return pms;
+}
+
+;// ./speak.ts
 
 const speak_kLogTag = "SpeakDetector:";
 ;
@@ -1001,7 +1024,7 @@ class SpeakerDetector {
             const prev = this.currSpeakerCid;
             this.currSpeakerCid = maxLevelCid;
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(speak_kLogTag, "Active speaker changed to", maxLevelCid);
                 }
             } while (0);
@@ -1014,6 +1037,9 @@ class SpeakerDetector {
     enable(enable) {
         this.enabled = enable;
         this.currSpeakerCid = null;
+        if (enable) {
+            this.updateTimer();
+        }
     }
     updateTimer() {
         this.deleteTimer();
@@ -1109,7 +1135,7 @@ class MicSpeechDetector {
     attachToClientAudioInput() {
         if (this.ctx) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(speak_kLogTag, "Already attached");
                 }
             } while (0);
@@ -1118,7 +1144,7 @@ class MicSpeechDetector {
         const atrack = this.client.localAudioTrack();
         if (!atrack) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(speak_kLogTag, "Can't attach - client has no audio track");
                 }
             } while (0);
@@ -1192,37 +1218,62 @@ class MicSpeechDetector {
     }
 }
 
-;// CONCATENATED MODULE: ./recordingLogo.ts
+;// ./recordingLogo.ts
 //export default const kLogoImageBlobUrl = "data:image/svg+xml,%3Csvg xml:space='preserve' width='362' height='361.39999' viewBox='0 0 362 361.39998' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3Cpath fill='%23d9272e' d='M 180.7,0 C 80.9,0 0,80.9 0,180.7 c 0,99.8 80.9,180.7 180.7,180.7 99.8,0 180.7,-80.9 180.7,-180.7 C 361.4,80.9 280.5,0 180.7,0 Z m 93.8,244.6 c 0,3.1 -2.5,5.6 -5.6,5.6 h -23.6 c -3.1,0 -5.6,-2.5 -5.6,-5.6 v -72.7 c 0,-0.6 -0.7,-0.9 -1.2,-0.5 l -50,50 c -4.3,4.3 -11.4,4.3 -15.7,0 l -50,-50 c -0.4,-0.4 -1.2,-0.1 -1.2,0.5 v 72.7 c 0,3.1 -2.5,5.6 -5.6,5.6 H 92.4 c -3.1,0 -5.6,-2.5 -5.6,-5.6 V 116.8 c 0,-3.1 2.5,-5.6 5.6,-5.6 h 16.2 c 2.9,0 5.8,1.2 7.9,3.3 l 62.2,62.2 c 1.1,1.1 2.8,1.1 3.9,0 l 62.2,-62.2 c 2.1,-2.1 4.9,-3.3 7.9,-3.3 h 16.2 c 3.1,0 5.6,2.5 5.6,5.6 z' id='path2' /%3E%3C/svg%3E%0A";
 const kLogoImageBlobUrl = "data:image/svg+xml,%3Csvg width='400' height='400' viewBox='0 0 105.83333 105.83333' version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3Cellipse style='fill:%23d9272e;stroke:%23d9272e;stroke-width:0.3;image-rendering:optimizeQuality' cx='52.916664' cy='52.916668' rx='52.766827' ry='52.766823' /%3E%3Cpath fill='%232c2b2b' d='M 71.754659,33.510404 53.517721,51.730323 c -0.322518,0.322218 -0.820956,0.322218 -1.143473,0 L 34.10799,33.510404 c -0.615717,-0.615142 -1.436672,-0.966652 -2.316267,-0.966652 h -4.749814 c -0.908914,0 -1.641911,0.732313 -1.641911,1.640379 v 37.465075 c 0,0.908067 0.732997,1.640378 1.641911,1.640378 h 6.919481 c 0.908916,0 1.641911,-0.732311 1.641911,-1.640378 V 50.353577 c 0,-0.175755 0.205239,-0.263633 0.351838,-0.146462 l 14.659918,14.646237 c 1.260753,1.259576 3.342462,1.259576 4.603214,0 L 69.878189,50.207115 c 0.117279,-0.117171 0.351838,-0.02929 0.351838,0.146462 v 21.295629 c 0,0.908067 0.732996,1.640378 1.64191,1.640378 h 6.919482 c 0.908915,0 1.641911,-0.732311 1.641911,-1.640378 V 34.184131 c 0,-0.908066 -0.732996,-1.640379 -1.641911,-1.640379 h -4.749813 c -0.850276,0.02929 -1.671231,0.35151 -2.286947,0.966652 z' style='fill:%23ffffff;stroke-width:0.293061' /%3E%3C/svg%3E%0A";
 /* harmony default export */ const recordingLogo = (kLogoImageBlobUrl);
 
-;// CONCATENATED MODULE: ./recorder.ts
+;// ./recorder.ts
 
 
+
+class CallRecConfig {
+    constructor() {
+        this.videoCodecType = "avc"; //"vp9",
+        this.videoCodecConfig = "avc1.64001f"; //"vp09.02.10.10.01.09.16.09.01",
+        this.videoHeight = 720;
+        this.videoWidth = 1280;
+        this.videoFps = 25;
+        this.keyFrameInterval = 1000;
+        this.frameBorderColor = "#000";
+    }
+}
+class CaptionConfig {
+    constructor() {
+        this.fontSize = 24;
+        this.fontFamily = "sans-serif";
+        this.fill = "white";
+        this.x = -4;
+        this.y = -4;
+    }
+    get font() { return `${this.fontStyle ? `${this.fontStyle} ` : ''}${this.fontSize}px ${this.fontFamily}`; }
+}
 const recorder_kLogTag = "callRec:";
 class RecorderFileSink {
     constructor() {
         this.file = null;
         this.output = null;
+        this._pmsDone = newPromiseWithResolvers();
+        this.onData = (data, position) => {
+            // console.warn(`mux rx @${position}, len: ${data.byteLength}: ${
+            //    Array.from(data.slice(0, 160), (x: number) => x.toString(16))}`);
+            if (!this.output) {
+                do {
+                    if (self.d) {
+                        console.warn(recorder_kLogTag, "RecorderFileSink.onData: Not initialized");
+                    }
+                } while (0);
+                return;
+            }
+            this.output.write({ data, position, type: "write" });
+        };
     }
     async init() {
         this.file = await window.showSaveFilePicker({
-            suggestedName: "call-recording.webm",
-            types: [{ description: "WEBM video", accept: { "video/webm": [".webm"] } }]
+            suggestedName: "call-recording.mp4",
+            types: [{ description: "MP4 video", accept: { "video/mp4": [".mp4"] } }]
         });
-        this.output = await this.file.createWritable({ keepExistingData: false });
-    }
-    onData(data) {
-        if (!this.output) {
-            do {
-                if (window.d) {
-                    console.warn(recorder_kLogTag, "RecorderFileSink.onData: Not initialized");
-                }
-            } while (0);
-            return;
-        }
-        this.output.write(data);
+        this.output = await this.file.createWritable({ keepExistingData: false, mode: "exclusive" });
     }
     close() {
         if (!this.output) {
@@ -1230,37 +1281,71 @@ class RecorderFileSink {
         }
         this.output.close();
         this.output = this.file = null;
+        this.done.resolve();
     }
+    get done() { return this._pmsDone; }
 }
 class CallRecorder {
-    constructor(sender, sink, videoHeight) {
+    constructor(localSource, sink, onClose, userCfg) {
+        this.captionConfig = new CaptionConfig;
+        this.lastCommandId = 0;
         this.peerAudioInNodes = [];
-        this.videoHeight = 720;
-        this.videoInput = null;
-        this.recorder = null;
-        this.localAv = -1;
-        this.sender = sender;
+        this.videoSrcId = -1;
+        this.videoSrcReleaseCb = null;
+        this.onWorkerMessage = (evt) => {
+            const data = evt.data;
+            const op = data[0];
+            switch (op) {
+                case "r":
+                case "e": {
+                    if (data[1] === this.lastCommandId) {
+                        assert(this.pmsWorkerResult);
+                        this.pmsWorkerResult[op === "r" ? "resolve" : "reject"](data[2]);
+                        delete this.pmsWorkerResult;
+                    }
+                    else {
+                        do {
+                            if (self.d) {
+                                console.warn(recorder_kLogTag, "onWorkerMessage: Received response/error with unexpected commandId", data[1]);
+                            }
+                        } while (0);
+                    }
+                    return;
+                }
+                case "d": { // ArrayBuffer, bufByteOffset, bufByteLength, fileOffset
+                    this.sink.onData(data[1], data[2]);
+                    return;
+                }
+                case "c": { // close
+                    this.sink.close();
+                    this.onClose(data[1]);
+                    return;
+                }
+            }
+        };
+        this.localSource = localSource;
         this.sink = sink;
-        if (videoHeight) {
-            this.videoHeight = videoHeight;
+        this.onClose = onClose;
+        this.config = new CallRecConfig;
+        if (userCfg) {
+            Object.assign(this.config, userCfg);
         }
+        this.worker = new Worker(CallRecorder.kWorkerUrl);
+        this.worker.onmessage = this.onWorkerMessage;
+        this.worker.onerror = self.reportError;
     }
-    async init(peerTracks) {
-        this.initAudio(peerTracks);
-        await this.initWebrtcConn();
-        await this.initRecording();
+    async init(peerAudioTracks) {
+        this.throwIfDestroyed();
+        this.defaultAvatar = await loadImage(recordingLogo);
+        const atrack = this.initAudio(peerAudioTracks);
+        const readable = new MediaStreamTrackProcessor({ track: atrack }).readable;
+        return this.postToWorker("i", [this.config, readable,
+            this.audioCtx.sampleRate, this.audioDestNode.channelCount], [readable]);
     }
-    initAudio(peerTracks) {
-        this.audioCtx = new AudioContext();
-        this.audioMixer = this.audioCtx.createChannelMerger(peerTracks.length + 1);
-        this.audioDestNode = new MediaStreamAudioDestinationNode(this.audioCtx, {
-            channelCount: 1,
-            channelCountMode: "explicit"
-        });
-        this.audioMixer.connect(this.audioDestNode);
-        this.updatePeerInputs(peerTracks);
-    }
-    updatePeerInputs(peerTracks) {
+    updatePeerAudioInputs(peerTracks) {
+        if (this.destroyed) {
+            return;
+        }
         if (this.peerAudioInNodes.length) {
             for (const node of this.peerAudioInNodes) {
                 node.disconnect();
@@ -1269,60 +1354,32 @@ class CallRecorder {
         }
         for (const track of peerTracks) {
             const node = this.audioCtx.createMediaStreamSource(new MediaStream([track]));
-            node.connect(this.audioMixer);
             this.peerAudioInNodes.push(node);
+            node.connect(this.audioMixer);
         }
     }
-    async initWebrtcConn() {
-        let resolve;
-        const pms = new Promise((aResolve) => {
-            resolve = aResolve;
+    initAudio(peerAudioTracks) {
+        this.audioCtx = new AudioContext();
+        this.audioMixer = this.audioCtx.createChannelMerger(peerAudioTracks.length + 1);
+        this.audioDestNode = new MediaStreamAudioDestinationNode(this.audioCtx, {
+            channelCount: 1,
+            channelCountMode: "explicit"
         });
-        const config = { sdpSemantics: 'unified-plan', optional: [{ "googCpuOveruseDetection": false }] };
-        const pc1 = this.pc1 = new RTCPeerConnection(config);
-        const pc2 = this.pc2 = new RTCPeerConnection(config);
-        pc1.onicecandidate = (evt) => pc2.addIceCandidate(evt.candidate);
-        pc2.onicecandidate = (evt) => pc1.addIceCandidate(evt.candidate);
-        pc2.ontrack = (evt) => {
-            resolve(evt.track);
-        };
-        pc1.addTransceiver("video", { direction: "sendonly" });
-        const offer = await pc1.createOffer();
-        await pc1.setLocalDescription(offer);
-        await pc2.setRemoteDescription(pc1.localDescription);
-        const answer = await pc2.createAnswer();
-        await pc2.setLocalDescription(answer);
-        await pc1.setRemoteDescription(pc2.localDescription);
-        await pms;
-        this.videoTx = pc1.getTransceivers()[0].sender;
-        this.videoRx = pc2.getTransceivers()[0].receiver;
-        const params = this.videoTx.getParameters();
-        params.degradationPreference = "maintain-resolution";
-        params.maxBitrate = 1024000000;
-        await this.videoTx.setParameters(params);
-    }
-    async initRecording() {
-        const recStream = new MediaStream([this.audioDestNode.stream.getAudioTracks()[0], this.videoRx.track]);
-        const recorder = this.recorder = new MediaRecorder(recStream, { mimeType: 'video/webm;codecs="vp9,opus"' });
-        recorder.onstop = () => {
-            this.sink.close();
-            this.recorder = null;
-        };
-        recorder.ondataavailable = (ev) => {
-            // console.log("ondata");
-            this.sink.onData(ev.data);
-        };
+        this.audioMixer.connect(this.audioDestNode);
+        assert(!this.peerAudioInNodes.length);
+        this.updatePeerAudioInputs(peerAudioTracks);
+        return this.audioDestNode.stream.getAudioTracks()[0];
     }
     recordLocalAudio() {
-        const currLocalAudioTrack = this.sender.localAudioTrack();
-        if (this.localAudioInNode && this.recordedLocalAudioTrack !== currLocalAudioTrack) {
+        const currLocalAudioTrack = this.localSource.localAudioTrack();
+        if (this.localAudioInNode && this.localAudioTrack !== currLocalAudioTrack) {
             this.localAudioInNode.disconnect();
             delete this.localAudioInNode;
         }
         if (!this.localAudioInNode) {
             // the local audio track, once obtained, never changes, so we create the stream source node only once
             this.localAudioInNode = this.audioCtx.createMediaStreamSource(new MediaStream([currLocalAudioTrack]));
-            this.recordedLocalAudioTrack = currLocalAudioTrack;
+            this.localAudioTrack = currLocalAudioTrack;
         }
         this.localAudioInNode.connect(this.audioMixer);
     }
@@ -1331,167 +1388,221 @@ class CallRecorder {
             return;
         }
         this.localAudioInNode.disconnect();
-        delete this.recordedLocalAudioTrack;
+        delete this.localAudioTrack;
     }
-    async _setVideoTrack(vTrack) {
-        this.deinitStaticVideo();
-        const cloned = vTrack.clone();
-        try {
-            await cloned.applyConstraints({
-                resizeMode: "crop-and-scale",
-                height: { exact: this.videoHeight }
-                // width: this.videoHeight * 16 / 10
-            });
-            if (cloned.getSettings().height !== this.videoHeight) {
-                throw new Error("applyConstraints to resize video had no effect");
-            }
+    get hasVideoInput() {
+        return !!this.inVideoTrack;
+    }
+    setVideoInput(input, avatar, caption) {
+        if (this.destroyed) {
+            return Promise.resolve(0);
         }
-        catch (ex) {
+        if (!avatar) {
+            avatar = this.defaultAvatar;
+        }
+        // we may need to switch the local video (srcId === 0) between static, camera and screen.
+        // In that case, we don't change the srcId, so we have to execute before this check.
+        // However, it is better to directly call updateLocalVideo in this case
+        if (input === 0) {
+            return this.switchToLocalVideo(avatar, caption);
+        }
+        const isStatic = !isNaN(input);
+        const newSrcId = isStatic ? input : input.srcId;
+        if ((newSrcId === this.videoSrcId) &&
+            ((isStatic && !this.inVideoTrack) || (input.track === this.inVideoTrack))) {
             do {
-                if (window.d) {
-                    console.warn(recorder_kLogTag, "Can't convert video input to recording resolution, video file will change resolution:", ex.message);
+                if (self.d) {
+                    console.warn(recorder_kLogTag, `setVideoInput: Already recording ${isStatic ? "avatar" : "video"} of cid ${newSrcId}`);
                 }
             } while (0);
+            return Promise.resolve();
         }
-        if (this.isDestroyed()) { // destroyed meanwhile
-            return;
+        let newReleaseCb, videoIn;
+        if (!isStatic) {
+            newReleaseCb = input.releaseCb;
+            videoIn = input.track;
         }
-        return this.videoTx.replaceTrack(cloned);
+        else {
+            newReleaseCb = null;
+            videoIn = avatar;
+        }
+        return this.rawSetVideoTrack(videoIn, newSrcId, newReleaseCb, caption);
     }
-    switchToLocalVideo() {
-        if ((this.localAv & Av.Video) === 0) {
-            this.switchToStaticVideo();
-            return;
+    rawSetVideoTrack(videoIn, srcId, releaseCb, caption) {
+        if (this.destroyed) {
+            return Promise.reject("rawSetVideoTrack: recorder is destroyed");
         }
-        this._setVideoTrack((this.localAv & Av.ScreenHiRes)
-            ? this.sender.localScreenTrack()
-            : this.sender.localCameraTrack());
-    }
-    setVideoInput(vTrack, releaseCb) {
-        if (this.videoInput) {
-            if (this.videoInput.releaseCb) {
-                this.videoInput.releaseCb();
-            }
-            this.videoInput = null;
+        if ((this.videoSrcId === -1) && (this.localSource.availAv & Av.Audio)) {
+            this.recordLocalAudio(); // just starting, and we are unmuted
         }
-        if (vTrack) {
-            this.videoInput = { track: vTrack, releaseCb };
-            this._setVideoTrack(vTrack);
+        const oldReleaseCb = this.videoSrcReleaseCb;
+        this.videoSrcId = srcId;
+        this.videoSrcReleaseCb = releaseCb;
+        let vStream = (videoIn instanceof MediaStreamTrack)
+            ? (new MediaStreamTrackProcessor({ track: videoIn })).readable : null;
+        let wcap = caption ? this.makeCaption(caption) : caption;
+        let xfer;
+        let params;
+        let avatarLoadCb;
+        if (vStream) {
+            this.inVideoTrack = videoIn;
+            params = [vStream, srcId, wcap];
+            xfer = wcap ? [vStream, wcap.bitmap] : [vStream];
         }
-        else if (vTrack === 0) {
-            this.videoInput = vTrack;
-            this.switchToLocalVideo();
-        }
-        else if (vTrack === null) {
-            this.videoInput = vTrack;
-            this.switchToStaticVideo();
-        }
-    }
-    videoInputTrack() {
-        return this.videoInput ? this.videoInput.track : null;
-    }
-    async switchToStaticVideo() {
-        if (this.canvas) {
-            do {
-                if (window.d) {
-                    console.log(recorder_kLogTag, "switchToStaticVideo: Already in static video mode");
+        else {
+            delete this.inVideoTrack;
+            // we draw the caption on the static frame, so don't pass it to the worker
+            params = [videoIn, srcId, null];
+            // still need an empty xfer array for avatarLoadCb to push the video frame after creating it
+            xfer = [];
+            if (videoIn) { // videoIn is avatar - convert it to VideoFrame just before posting to worker
+                if ((typeof videoIn !== "string") && !(videoIn instanceof Image) && !videoIn.render) {
+                    throw new Error("Unknown type of avatar object");
                 }
-            } while (0);
-            return;
+                avatarLoadCb = async (params, xf) => {
+                    if (typeof videoIn === "string") { // blob image url
+                        videoIn = await loadImage(videoIn);
+                    }
+                    else if (videoIn.render) {
+                        videoIn = await videoIn.render();
+                    }
+                    else if (!(videoIn instanceof Image)) {
+                        throw new Error("Unknown avatar type");
+                    }
+                    const frame = params[0] = this.makeStaticVideoFrame(videoIn, wcap);
+                    xf.push(frame);
+                };
+            }
         }
-        const canv = this.canvas = window.document.createElement("canvas");
-        canv.height = this.videoHeight;
-        canv.width = this.videoHeight * 16 / 9;
-        const logo = new Image;
-        const pms = new Promise((resolve) => {
-            logo.onload = resolve;
+        return this.postToWorker("vi", params, xfer, avatarLoadCb)
+        .then((ret) => {
+            if (ret === 0) {
+                if (params[0] instanceof VideoFrame) { // destroyed: command was not actually executed
+                    params[0].close();
+                    console.warn("rawSetVideoTrack: Command ignored because we are destroyed, closed video frame");
+                }
+                return 0;
+            }
+        })
+        .finally(() => {
+            if (oldReleaseCb) {
+                oldReleaseCb();
+            }
         });
-        logo.src = recordingLogo;
-        await pms;
-        if (this.isDestroyed() || !this.canvas) {
+    }
+    switchToLocalVideo(avatar, caption) {
+        if (this.destroyed) {
+            return Promise.resolve(0);
+        }
+        const localAv = this.localSource.availAv;
+        let videoIn;
+        if (!(localAv & Av.Video)) {
+            videoIn = avatar;
+        }
+        else {
+            videoIn = ((localAv & Av.ScreenHiRes)
+                ? this.localSource.localScreenTrack()
+                : this.localSource.localCameraTrack());
+            assert(videoIn);
+        }
+        return this.rawSetVideoTrack(videoIn, 0, null, caption);
+    }
+    /* Serialize calls to worker - don't post new commands until current is executed and ACK-ed */
+    async postToWorker(op, params, xfer, guardedCb) {
+        while (this.pmsWorkerResult) {
+            await this.pmsWorkerResult;
+        }
+        if (this.destroyed) {
+            return 0; //  Promise.reject("Destroyed")
+        }
+        this.pmsWorkerResult = newPromiseWithResolvers();
+        if (guardedCb) {
+            try {
+                await guardedCb(params, xfer);
+            }
+            catch (ex) {
+                this.pmsWorkerResult.reject(ex);
+                return this.pmsWorkerResult;
+            }
+            ;
+        }
+        const cmdId = ++this.lastCommandId;
+        this.worker.postMessage([op, cmdId, params], xfer);
+        return this.pmsWorkerResult;
+    }
+    get videoInputId() {
+        return this.videoSrcId;
+    }
+    get videoInputTrack() {
+        return this.inVideoTrack;
+    }
+    async destroy() {
+        if (this.destroyed) {
             do {
-                if (window.d) {
-                    console.log(recorder_kLogTag, "switchToStaticVideo: destroyed or static video disabled while loading static image");
+                if (self.d) {
+                    console.warn(recorder_kLogTag, "destroy: already destroyed or destroying");
                 }
             } while (0);
-            return; // destroyed meanwhile, or stopped static video
+            return;
         }
-        const ctx = canv.getContext('2d');
-        ctx.drawImage(logo, (canv.width - logo.width) / 2, (canv.height - logo.height) / 2);
-        let tsPrev = Date.now();
-        this.staticVideoRefreshTimer = setInterval(() => {
-            this.canvas.getContext('2d').fillRect(0, 0, 1, 1);
-        }, 60);
-        const staticVtrack = this.canvas.captureStream(20).getVideoTracks()[0];
         do {
-            if (window.d) {
-                console.log(recorder_kLogTag, `static vtrack resolution: ${staticVtrack.getSettings().width}x${staticVtrack.getSettings().height}`);
+            if (self.d) {
+                console.warn(recorder_kLogTag, "Destroying...");
             }
         } while (0);
-        return this.videoTx.replaceTrack(staticVtrack);
-    }
-    deinitStaticVideo() {
-        if (!this.canvas) {
-            return;
-        }
-        clearInterval(this.staticVideoRefreshTimer);
-        delete this.staticVideoRefreshTimer;
-        delete this.canvas;
-    }
-    destroy() {
-        if (!this.videoRx) {
-            do {
-                if (window.d) {
-                    console.warn(recorder_kLogTag, "CallRecorder.destroy: already destroyed");
-                }
-            } while (0);
-            return;
-        }
-        if (this.recorder) {
-            this.recorder.stop();
-        }
-        this.pc1.close();
-        this.pc2.close();
-        delete this.pc1;
-        delete this.pc2;
-        this.deinitStaticVideo();
-        if (this.localAudioInNode) {
-            this.localAudioInNode.disconnect();
-            delete this.localAudioInNode;
+        await this.postToWorker("ds", undefined, undefined, () => {
+            this.destroyed = true;
+            this.stopRecordingLocalAudio();
+        });
+        if (this.videoSrcReleaseCb) {
+            try {
+                this.videoSrcReleaseCb();
+            }
+            catch (ex) { }
         }
         for (const node of this.peerAudioInNodes) {
             node.disconnect();
         }
-        delete this.peerAudioInNodes;
+        const _self = this;
+        delete _self.worker;
+        delete _self.peerAudioInNodes;
         this.audioMixer.disconnect();
-        delete this.audioMixer;
-        delete this.audioDestNode;
+        delete _self.audioMixer;
+        delete _self.audioDestNode;
         this.audioCtx.close();
-        delete this.audioCtx;
-        if (this.videoTx) {
-            if (this.videoTx.track) {
-                this.videoTx.track.stop();
-            }
-            delete this.videoTx;
-        }
-        if (this.videoRx) {
-            if (this.videoRx.track) {
-                this.videoRx.track.stop();
-            }
-            delete this.videoRx;
+        delete _self.audioCtx;
+        delete _self.audioFrameSrc;
+        return this.sink.done
+            .then(() => {
+            do {
+                if (self.d) {
+                    console.warn(recorder_kLogTag, "Destroyed");
+                }
+            } while (0);
+        });
+    }
+    get isDestroyed() {
+        return this.destroyed;
+    }
+    throwIfDestroyed() {
+        if (this.destroyed) {
+            throw new Error("Recorder destroyed");
         }
     }
-    isDestroyed() {
-        return !this.videoRx;
-    }
-    onLocalMediaChange(forcedUpdateAv) {
-        const av = this.sender.availAv;
-        let change = (this.localAv === -1) ? (Av.Audio | Av.Video) : this.localAv ^ av;
-        this.localAv = av;
-        if (forcedUpdateAv) {
-            change |= forcedUpdateAv;
+    onLocalMediaChange(changedAv) {
+        if (this.destroyed) {
+            do {
+                if (self.d) {
+                    console.warn(recorder_kLogTag, "onLocalMediaChange: destroyed");
+                }
+            } while (0);
+            return;
         }
-        if (change & Av.Audio) {
+        if (this.videoInputId === -1) { // we haven't started yet
+            return;
+        }
+        const av = this.localSource.availAv;
+        if (changedAv & Av.Audio) {
             if (av & Av.Audio) {
                 this.recordLocalAudio();
             }
@@ -1499,43 +1610,124 @@ class CallRecorder {
                 this.stopRecordingLocalAudio();
             }
         }
-        if (change & Av.Video) {
-            if (this.videoInput === 0) {
-                this.switchToLocalVideo();
-            }
-            else if (this.videoInput === null && !this.canvas) {
-                this.switchToStaticVideo();
-            }
+    }
+    onInputDeviceChange(changedAv) {
+        if ((changedAv & Av.Video) && (this.videoSrcId === 0)) { // we are recording local video, and camera changed
+            this.switchToLocalVideo(); // update video input
+        }
+        if ((changedAv & Av.Audio) && this.localAudioTrack) { // mic changed
+            this.recordLocalAudio();
         }
     }
-    start() {
-        this.onLocalMediaChange();
-        this.recorder.start(2000);
-    }
-    pause() {
-        this.recorder.pause();
+    pause(keepVideoSrc) {
+        this.throwIfDestroyed();
+        if (!keepVideoSrc) {
+            if (this.videoSrcReleaseCb) {
+                try {
+                    this.videoSrcReleaseCb();
+                }
+                catch (ex) { }
+                delete this.inVideoTrack;
+            }
+            this.videoSrcId = -1;
+        }
+        return this.postToWorker("p", [keepVideoSrc]);
     }
     resume() {
-        this.recorder.resume();
+        this.throwIfDestroyed();
+        return this.postToWorker("r");
     }
+    makeStaticVideoFrame(img, caption) {
+        this.throwIfDestroyed(); // because VideoFrame shouldn't be leaked
+        const cfg = this.config;
+        const canv = new OffscreenCanvas(cfg.videoWidth, cfg.videoHeight);
+        const ctx = canv.getContext("2d");
+        ctx.fillStyle = "#000";
+        ctx.fillRect(0, 0, cfg.videoWidth, cfg.videoHeight);
+        ctx.drawImage(img, (canv.width - img.width) / 2, (canv.height - img.height) / 2);
+        if (caption) {
+            ctx.drawImage(caption.bitmap, caption.x, caption.y);
+            caption.bitmap.close();
+        }
+        return new VideoFrame(canv, { timestamp: 0 });
+    }
+    updateVideoCaption(sourceId, caption) {
+        let wcap, xfer;
+        if (caption) {
+            wcap = this.makeCaption(caption);
+            xfer = [wcap.bitmap];
+        }
+        else {
+            wcap = caption;
+        }
+        return this.postToWorker("uc", [sourceId, wcap], xfer);
+    }
+    makeCaption(caption) {
+        let bmp;
+        if (typeof caption === "string") {
+            bmp = this.captionTextToImage(caption);
+        }
+        else if (caption instanceof ImageBitmap) {
+            bmp = caption;
+        }
+        else {
+            throw new Error("Unknown type of caption parameter");
+        }
+        const cfg = this.captionConfig;
+        const x = (cfg.x >= 0) ? cfg.x : this.config.videoWidth - bmp.width + cfg.x;
+        const y = (cfg.y >= 0) ? cfg.y : this.config.videoHeight - bmp.height + cfg.y;
+        return { bitmap: bmp, x, y };
+    }
+    captionTextToImage(text) {
+        const cfg = this.captionConfig;
+        const canv = new OffscreenCanvas(cfg.fontSize * text.length * 2, cfg.fontSize * 2);
+        const ctx = canv.getContext("2d");
+        ctx.font = cfg.font;
+        const metrics = ctx.measureText(text);
+        const width = Math.ceil(metrics.actualBoundingBoxRight + metrics.actualBoundingBoxLeft) + 1;
+        const height = Math.ceil(metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent) + 1;
+        canv.width = width;
+        canv.height = height;
+        // context gets reset after canvas resize, set font again
+        ctx.font = cfg.font;
+        ctx.textBaseline = "top";
+        ctx.fillStyle = "rgba(0,0,0,0)"; // transparent
+        ctx.fillRect(0, 0, width, height);
+        ctx.fillStyle = cfg.fill;
+        ctx.fillText(text, 0, 0, width);
+        if (cfg.stroke) {
+            ctx.strokeStyle = cfg.stroke;
+            ctx.strokeText(text, 0, 0, width);
+        }
+        return canv.transferToImageBitmap();
+    }
+    ;
+}
+CallRecorder.kWorkerUrl = "";
+function loadImage(url) {
+    const img = new Image;
+    return new Promise((resolve, reject) => {
+        img.onload = resolve.bind(null, img);
+        img.onerror = reject;
+        img.src = url;
+    });
+}
+function dumpCanvasToUrl(canv) {
+    canv.convertToBlob().then((blob) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            console.log(reader.result);
+        };
+        reader.readAsDataURL(blob);
+    });
 }
 
-
-;// CONCATENATED MODULE: ../shared/commitId.ts
-const COMMIT_ID = 'dd31ff5b28';
+const COMMIT_ID = 'c7a0dc6037';
 /* harmony default export */ const commitId = (COMMIT_ID);
 
-;// CONCATENATED MODULE: ./client.ts
+;// ./client.ts
 /* Mega SFU Client library */
-
-
-
-
-
-
-
-
-
+var gDebug = self.d ? 3 : 1;
 const client_kLogTag = "sfuClient:";
 var ConnState;
 (function (ConnState) {
@@ -1569,56 +1761,6 @@ const kAudioOutDeviceLsKey = "calls.audioOutId";
 const kMicDeviceLsKey = "calls.micId";
 const kCamDeviceLsKey = "calls.camId";
 class SfuClient {
-    constructor(userId, app, callKey, options) {
-        this.peers = new Map();
-        this._numRxHiRes = 0;
-        this._numRxVthumb = 0;
-        this._numRxAudio = 0;
-        this._isSharingScreen = false;
-        this._muteCamera = false;
-        this._muteAudio = false;
-        this._sendVthumb = false;
-        this._sendHires = false;
-        this._cameraTrack = null;
-        this._screenTrack = null;
-        this._audioTrack = null;
-        this._availAv = 0;
-        this._sentAv = 0;
-        this._joinRetries = 0;
-        this._forcedDisconnect = false;
-        this._joinTimeOffs = 0;
-        this._tsCallJoin = 0;
-        this._tsCallStart = 0;
-        this.statCtx = {};
-        this.hasConnStats = false;
-        this.maxPeers = 0;
-        this.micAudioLevel = 0;
-        this.tsMicAudioLevel = 0;
-        this._recordedVideoCid = null;
-        if (!SfuClient.platformHasSupport()) {
-            throw new Error("This browser does not support insertable streams");
-        }
-        if (!window.nacl) {
-            throw new Error("Nacl library not present in global namespace");
-        }
-        this.assert(options);
-        this.userId = userId;
-        this.app = app;
-        this._reqBarrier = new RequestBarrier;
-        this._connState = ConnState.kDisconnected;
-        this.options = options;
-        if (callKey) {
-            this.setCallKey(callKey);
-        }
-        this.numInputVideoTracks = options.numVideoSlots || SfuClient.kMaxVideoSlotsDefault;
-        this.cryptoWorker = new Worker(SfuClient.kWorkerUrl);
-        this.cryptoWorker.addEventListener("message", this.onCryptoWorkerEvent.bind(this));
-        this._svcDriver = new SvcDriver(this);
-        this.audioOutDeviceId = localStorage.getItem(kAudioOutDeviceLsKey);
-        this._speakerDetector = new SpeakerDetector(this);
-        this._statsRecorder = new StatsRecorder(this);
-        this.micMuteMonitor = new MicMuteMonitor(this);
-    }
     get micInputSeen() {
         return this.micMuteMonitor.micInputSeen;
     }
@@ -1645,10 +1787,73 @@ class SfuClient {
         this.remoteLogError(ex.message);
         throw ex;
     }
+    constructor(userId, app, callKey, options) {
+        this.peers = new Map();
+        this._numRxHiRes = 0;
+        this._numRxVthumb = 0;
+        this._numRxAudio = 0;
+        this._isSharingScreen = false;
+        this._muteCamera = false;
+        this._muteAudio = false;
+        this._sendVthumb = false;
+        this._sendHires = false;
+        this._cameraTrack = null;
+        this._screenTrack = null;
+        this._audioTrack = null;
+        this._availAv = 0;
+        this._sentAv = 0;
+        this._joinRetries = 0;
+        this._forcedDisconnect = false;
+        this._joinTimeOffs = 0;
+        this._tsCallJoin = 0;
+        this._tsCallStart = 0;
+        this.statCtx = {};
+        this.hasConnStats = false;
+        this.maxPeers = 0;
+        this.micAudioLevel = 0;
+        this.tsMicAudioLevel = 0;
+        this.onScreenSharingStoppedByUser = () => {
+            do {
+                if (self.d) {
+                    console.warn(client_kLogTag, "Screen sharing stopped by user");
+                }
+            } while (0);
+            // In theory this may be called immediately from within _getLocalTracks when the track onended
+            // handle is attached. In that case, we need to go through the message loop to avoid recursion
+            setTimeout(() => {
+                this._updateSentTracks(() => {
+                    this._isSharingScreen = false;
+                    this._fire("onScreenshare", false);
+                });
+            }, 0);
+        };
+        if (!SfuClient.platformHasSupport()) {
+            throw new Error("This browser does not support insertable streams");
+        }
+        if (!window.nacl) {
+            throw new Error("Nacl library not present in global namespace");
+        }
+        this.assert(options);
+        this.userId = userId;
+        this.app = app;
+        this._reqBarrier = new RequestBarrier;
+        this._connState = ConnState.kDisconnected;
+        this.options = options;
+        if (callKey) {
+            this.setCallKey(callKey);
+        }
+        this.numInputVideoTracks = options.numVideoSlots || SfuClient.kMaxVideoSlotsDefault;
+        this.cryptoWorker = new Worker(SfuClient.kWorkerUrl);
+        this.cryptoWorker.addEventListener("message", this.onCryptoWorkerEvent.bind(this));
+        this._svcDriver = new SvcDriver(this);
+        this.audioOutDeviceId = localStorage.getItem(kAudioOutDeviceLsKey);
+        this._statsRecorder = new StatsRecorder(this);
+        this.micMuteMonitor = new MicMuteMonitor(this);
+    }
     onCryptoWorkerEvent(event) {
         let msg = event.data;
         do {
-            if (window.d) {
+            if (self.d) {
                 console.log(client_kLogTag, "Message from crypto worker:", msg);
             }
         } while (0);
@@ -1707,20 +1912,20 @@ class SfuClient {
     onWsClose(event) {
         if (event && event.target !== this.conn) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "onWsClose: ignoring stale event for a previous websocket instance");
                 }
             } while (0);
             return;
         }
-        if (isNaN(this.termCode)) {
-            this.termCode = TermCode.kSigDisconn;
-        }
         do {
-            if (window.d) {
+            if (self.d) {
                 console.warn(client_kLogTag, "Signaling connection closed");
             }
         } while (0);
+        if (isNaN(this.termCode)) {
+            this.termCode = termCodes.kSigDisconn;
+        }
         delete this.conn;
         const willReconnect = this.willReconnect(); // decides based on this.termCode
         if (willReconnect) {
@@ -1728,10 +1933,11 @@ class SfuClient {
             this.scheduleReconnect();
         }
         else {
-            this.leaveCall(termCodes.kSigDisconn, ConnState.kDisconnected);
             if (this.callRecorder) {
                 this.recordingStop();
+                delete this.callRecorder;
             }
+            this.leaveCall(termCodes.kSigDisconn, ConnState.kDisconnected);
             this._stopLocalTracks();
         }
         this._fire("onDisconnect", this.termCode, willReconnect);
@@ -1754,6 +1960,8 @@ class SfuClient {
         }
         this._closeMediaConnection();
         this._destroyAllPeers(this.termCode);
+        this._speakerDetector.destroy(); // all peers are unregistered
+        delete this._speakerDetector;
     }
     async scheduleReconnect() {
         let delay = this._joinRetries++ * 500;
@@ -1761,7 +1969,7 @@ class SfuClient {
             delay = 2000;
         }
         do {
-            if (window.d) {
+            if (self.d) {
                 console.warn(client_kLogTag, "Reconnecting in", delay, "ms....");
             }
         } while (0);
@@ -1786,14 +1994,14 @@ class SfuClient {
         let method = this.app[evName];
         if (!method) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.log(client_kLogTag, `Unhandled event: ${evName}(${args.join(",")})`);
                 }
             } while (0);
             return;
         }
         do {
-            if (window.d) {
+            if (self.d) {
                 console.log(client_kLogTag, `fire [${evName}](${args.join(',')})`);
             }
         } while (0);
@@ -1809,7 +2017,7 @@ class SfuClient {
         const keyObj = await window.crypto.subtle.generateKey({ name: "AES-GCM", length: 128 }, true, ["encrypt", "decrypt"]);
         let key = await crypto.subtle.exportKey("raw", keyObj);
         do {
-            if (window.d) {
+            if (self.d) {
                 console.log(client_kLogTag, "Media key generated in", Date.now() - tsStart, "ms");
             }
         } while (0);
@@ -1828,7 +2036,7 @@ class SfuClient {
     async newKeyImmediate() {
         let key = this.currKey = await this.generateKey();
         this.assert(!this.keySetPromise); // previous calls must await for completion as well, which deletes the promise
-        const pms = this.keySetPromise = client_newPromiseWithResolveMethods();
+        const pms = this.keySetPromise = newPromiseWithResolvers();
         pms.keyId = key.id;
         this.cryptoWorker.postMessage(['ek', key.id, key.keyObj, true]);
         return pms;
@@ -1841,11 +2049,10 @@ class SfuClient {
     @returns Resolve as soon as key is generated
     */
     async rotateKey() {
-        var self = this;
         if (!this.sentAv) {
             if (this.noSendKeyRotated) {
                 do {
-                    if (window.d) {
+                    if (self.d) {
                         console.warn(client_kLogTag, "rotateKey: Not rotating, already done once, and we are not sending media");
                     }
                 } while (0);
@@ -1856,17 +2063,17 @@ class SfuClient {
             }
         }
         do {
-            if (window.d) {
+            if (self.d) {
                 console.warn(client_kLogTag, "Rotate key");
             }
         } while (0);
-        let key = await self.generateKey();
-        self.encryptAndSendLastKeyToAllPeers()
+        let key = await this.generateKey();
+        this.encryptAndSendLastKeyToAllPeers()
             .then(async () => {
             await msDelay(SfuClient.kRotateKeyUseDelay);
-            if (key.id > self.currKey.id) {
-                self.currKey = key;
-                self.cryptoWorker.postMessage(['ek', key.id, key.keyObj]);
+            if (key.id > this.currKey.id) {
+                this.currKey = key;
+                this.cryptoWorker.postMessage(['ek', key.id, key.keyObj]);
             }
         });
     }
@@ -1874,7 +2081,7 @@ class SfuClient {
         this.assert(key);
         var callKey = key instanceof ArrayBuffer ?
             new Uint32Array(key) :
-            new Uint32Array(hexToBin(key).buffer);
+            new Uint32Array(client_hexToBin(key).buffer);
         if (callKey.byteLength !== 16) {
             this.logError("Invalid format of call key: length is not 16 bytes");
             return;
@@ -1924,7 +2131,7 @@ class SfuClient {
         const peer = this.peers.get(msg.from);
         if (!peer) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "msgKey: Unknown peer cid", msg.from);
                 }
             } while (0);
@@ -1997,6 +2204,7 @@ class SfuClient {
         this.statCtx = {};
         this._statsRecorder.reset();
         this.micMuteMonitor.reinit();
+        this._speakerDetector = new SpeakerDetector(this);
         delete this._callJoinPermission;
         delete this.callLimits;
     }
@@ -2030,9 +2238,6 @@ class SfuClient {
                 }
                 this.inAudioTracks.set(slot.mid, slot);
             }
-            if (this.callRecorder) {
-                this.callRecorder.updatePeerInputs(this.getPeerInputTracks());
-            }
         };
         pc.onaddstream = (event) => {
             // LOGD("onAddStream");
@@ -2045,18 +2250,23 @@ class SfuClient {
         };
         pc.oniceconnectionstatechange = (ev) => {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.log(client_kLogTag, "onIceConnState:", pc.iceConnectionState);
                 }
             } while (0);
         };
         pc.onconnectionstatechange = (ev) => {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.log(client_kLogTag, "onConnState:", pc.connectionState);
                 }
             } while (0);
-            if (pc.connectionState === "failed") {
+            if (pc.connectionState === "connected") {
+                if (this.callRecorder) {
+                    this.callRecorder.updatePeerAudioInputs(this.getPeerAudioTracks());
+                }
+            }
+            else if (pc.connectionState === "failed") {
                 this.handleRtcDisconnect();
             }
         };
@@ -2068,7 +2278,7 @@ class SfuClient {
         let statsRec = this._statsRecorder;
         if (statsRec && statsRec.arrays.t.length === 0 && statsRec.tsStart && (Date.now() - statsRec.tsStart > 6000)) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "WebRTC connection failed, looks like no UDP connectivity");
                 }
             } while (0);
@@ -2076,7 +2286,7 @@ class SfuClient {
         }
         else {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "WebRTC connection failed, forcing full reconnect of client");
                 }
             } while (0);
@@ -2085,7 +2295,7 @@ class SfuClient {
     }
     _stopLocalTracks() {
         this._stopAndDelLocalTrack("_audioTrack");
-        this._stopAndDelLocalTrack("_cameraTrack");
+        this._stopAndDelCameraTrack();
         this._stopAndDelLocalTrack("_screenTrack");
     }
     /**
@@ -2144,7 +2354,7 @@ class SfuClient {
         let strMsg = JSON.stringify(msg);
         this.conn.send(strMsg);
         do {
-            if (window.d) {
+            if (self.d) {
                 console.log(client_kLogTag, "tx:\n", JSON.stringify(msg, logReplacerFunc));
             }
         } while (0);
@@ -2195,13 +2405,13 @@ class SfuClient {
         const tsStart = Date.now();
         await pc.setLocalDescription(offer);
         do {
-            if (window.d) {
+            if (self.d) {
                 console.log(client_kLogTag, "setLocalDescription took", Date.now() - tsStart, "ms");
             }
         } while (0);
         if (this._connState !== ConnState.kCallJoining) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "Call has ended meanwhile, aborting join");
                 }
             } while (0);
@@ -2226,7 +2436,7 @@ class SfuClient {
         this.assert(!(this.availAv & Av.Audio));
         if (this._connState !== ConnState.kCallJoining) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "Call has ended meanwhile, aborting join");
                 }
             } while (0);
@@ -2269,7 +2479,7 @@ class SfuClient {
         const pubKeyStr = base64ArrEncode(keyPair.publicKey);
         const signature = await this.app.signString(`sesskey|${this.callId}|${this.cid}|${pubKeyStr}`);
         do {
-            if (window.d) {
+            if (self.d) {
                 console.log(client_kLogTag, "Sess keypair generated in", Date.now() - tsStart, "ms");
             }
         } while (0);
@@ -2283,23 +2493,25 @@ class SfuClient {
         this[name] = null; // first null it, because onended handler will try to re-request it
         track.stop();
     }
+    _stopAndDelCameraTrack() {
+        this._stopAndDelLocalTrack("_cameraTrack");
+    }
     async _doGetLocalTracks() {
-        var self = this;
         // first, determine which tracks we need
-        let screen = self._isSharingScreen;
-        let camera = !self._muteCamera;
+        let screen = this._isSharingScreen;
+        let camera = !this._muteCamera;
         // get audio track when active speaker, even if muted. This will speed up unmuting
         let audio = this.isSpeaker;
         if (this._muteAudio && audio && this._audioGetFailedOnce) {
             audio = false;
         }
         // then, check what we have and what needs to change
-        var camChange = camera != (!!self._cameraTrack);
-        var screenChange = screen != (!!self._screenTrack);
-        var audioChange = audio != (!!self._audioTrack);
+        var camChange = camera != (!!this._cameraTrack);
+        var screenChange = screen != (!!this._screenTrack);
+        var audioChange = audio != (!!this._audioTrack);
         if (!(camChange || audioChange || screenChange)) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.log(client_kLogTag, "getLocalTracks: nothing to change");
                 }
             } while (0);
@@ -2309,25 +2521,25 @@ class SfuClient {
         // delete the tracks we disable, and prepare options for getting the ones we enable
         let promises = [];
         if (audioChange && !audio) {
-            self._stopAndDelLocalTrack("_audioTrack");
+            this._stopAndDelLocalTrack("_audioTrack");
         }
         if (camChange && !camera) {
-            self._stopAndDelLocalTrack("_cameraTrack");
+            this._stopAndDelCameraTrack();
         }
         if (screenChange && !screen) {
-            self._stopAndDelLocalTrack("_screenTrack");
+            this._stopAndDelLocalTrack("_screenTrack");
         }
         const gettingAudio = audioChange && audio;
         const gettingCam = camChange && camera;
         const gettingScreen = screenChange && screen;
         const tsStart = Date.now();
         do {
-            if (window.d) {
+            if (self.d) {
                 console.log(client_kLogTag, "Getting local media...");
             }
         } while (0);
         do {
-            if (window.d) {
+            if (self.d) {
                 console.log(client_kLogTag, "Device list:", await SfuClient.enumMediaDevices());
             }
         } while (0);
@@ -2337,7 +2549,7 @@ class SfuClient {
             if (micId) {
                 constraints = Object.assign({ deviceId: micId }, SfuClient.kAudioCaptureOptions);
                 do {
-                    if (window.d) {
+                    if (self.d) {
                         console.log(client_kLogTag, `Requesting audio input with id '${micId}'...`);
                     }
                 } while (0);
@@ -2345,45 +2557,55 @@ class SfuClient {
             else {
                 constraints = SfuClient.kAudioCaptureOptions;
                 do {
-                    if (window.d) {
+                    if (self.d) {
                         console.log(client_kLogTag, "Requesting default audio input...");
                     }
                 } while (0);
             }
             promises.push(navigator.mediaDevices.getUserMedia({ audio: constraints })
-                .then(function (stream) {
-                let atrack = self._audioTrack = stream.getAudioTracks()[0];
+                .then((stream) => {
+                let atrack = stream.getAudioTracks()[0];
+                if (this._connState === ConnState.kDisconnected) {
+                    do {
+                        if (self.d) {
+                            console.warn(client_kLogTag, "getLocalMedia: Disconnected meanwhile, stopping audio track");
+                        }
+                    } while (0);
+                    atrack.stop();
+                    return;
+                }
+                this._audioTrack = atrack;
                 if (!atrack) {
                     return Promise.reject("Local audio stream has no audio track");
                 }
-                delete self._audioGetFailedOnce;
+                delete this._audioGetFailedOnce;
                 atrack.onended = () => {
-                    if (self._audioTrack !== atrack) {
+                    if (this._audioTrack !== atrack) {
                         return;
                     }
                     atrack.onended = null;
                     do {
-                        if (window.d) {
+                        if (self.d) {
                             console.warn(client_kLogTag, `Input audio track '${atrack.label}' stopped: possibly device removed. Re-requesting audio input...`);
                         }
                     } while (0);
-                    self._fire("onMicDisconnected");
-                    self._restartInputDevice("_audioTrack", Av.Audio);
+                    this._fire("onMicDisconnected");
+                    this._restartInputDevice("_audioTrack", Av.Audio);
                 };
             })
-                .catch(function (err) {
-                self._audioGetFailedOnce = true; // avoid re-retying to get audio in advance
+                .catch((err) => {
+                this._audioGetFailedOnce = true; // avoid re-retying to get audio in advance
                 // We may be requesting audio in advance, without being asked by the user
                 // In that case, don't report the error
-                if (!self._muteAudio) {
-                    self._muteAudio = true;
+                if (!this._muteAudio) {
+                    this._muteAudio = true;
                     errors = addNullObjProperty(errors, "mic", err);
-                    self.logError("Error getting local mic:", err);
-                    self._fire("onLocalMediaQueryError", "mic", err);
+                    this.logError("Error getting local mic:", err);
+                    this._fire("onLocalMediaQueryError", "mic", err);
                     return Promise.reject(err);
                 }
                 else {
-                    self.logError("Error getting local mic (in advance):", err);
+                    this.logError("Error getting local mic (in advance):", err);
                 }
             }));
         }
@@ -2393,70 +2615,88 @@ class SfuClient {
             if (camId) {
                 constraints.deviceId = camId;
                 do {
-                    if (window.d) {
+                    if (self.d) {
                         console.log(client_kLogTag, `Requesting video input with deviceId ${camId}...`);
                     }
                 } while (0);
             }
             else {
                 do {
-                    if (window.d) {
+                    if (self.d) {
                         console.log(client_kLogTag, "Requesting default video input...");
                     }
                 } while (0);
             }
             promises.push(navigator.mediaDevices.getUserMedia({ video: constraints })
-                .then(async function (stream) {
-                self._cameraTrack = null;
+                .then(async (stream) => {
+                this._cameraTrack = null;
                 const vtrack = stream.getVideoTracks()[0];
+                if (this._connState === ConnState.kDisconnected) {
+                    do {
+                        if (self.d) {
+                            console.warn(client_kLogTag, "getLocalMedia: Disconnected meanwhile, stopping camera track");
+                        }
+                    } while (0);
+                    vtrack.stop();
+                    return;
+                }
+                this._cameraTrack = vtrack;
                 if (!vtrack) {
                     return Promise.reject("Local camera stream has no video track");
                 }
-                self._cameraTrack = vtrack;
                 vtrack.onended = () => {
-                    if (self._cameraTrack !== vtrack) {
+                    if (this._cameraTrack !== vtrack) {
                         return;
                     }
                     vtrack.onended = null;
                     do {
-                        if (window.d) {
+                        if (self.d) {
                             console.warn(client_kLogTag, `Input video track ${vtrack.label} stopped: possibly device removed. Re-requesting camera input...`);
                         }
                     } while (0);
-                    self._fire("onCameraDisconnected");
-                    self._restartInputDevice("_cameraTrack", Av.Video);
+                    this._fire("onCameraDisconnected");
+                    this._restartInputDevice("_cameraTrack", Av.Video);
                 };
             })
-                .catch(function (err) {
-                self._muteCamera = true;
+                .catch((err) => {
+                this._muteCamera = true;
                 errors = addNullObjProperty(errors, "camera", err);
-                self.logError("Error getting local camera:", err);
-                self._fire("onLocalMediaQueryError", "camera", err);
+                this.logError("Error getting local camera:", err);
+                this._fire("onLocalMediaQueryError", "camera", err);
                 return Promise.reject(err);
             }));
         }
         if (gettingScreen) {
             promises.push(navigator.mediaDevices.getDisplayMedia({ video: SfuClient.kScreenCaptureOptions })
-                .then(function (stream) {
-                let strack = self._screenTrack = stream.getVideoTracks()[0];
+                .then((stream) => {
+                let strack = stream.getVideoTracks()[0];
+                if (this._connState === ConnState.kDisconnected) {
+                    do {
+                        if (self.d) {
+                            console.warn(client_kLogTag, "getLocalMedia: Disconnected meanwhile, stopping screen track");
+                        }
+                    } while (0);
+                    strack.stop();
+                    return;
+                }
+                this._screenTrack = strack;
                 if (!strack) {
                     return Promise.reject("Local screen stream has no video track");
                 }
-                strack.onended = function () {
-                    self.onScreenSharingStoppedByUser();
-                };
+                strack.isScreen = true;
+                strack.onended = this.onScreenSharingStoppedByUser;
             })
-                .catch(function (err) {
-                self._isSharingScreen = false;
+                .catch((err) => {
+                this._isSharingScreen = false;
                 errors = addNullObjProperty(errors, "screen", err);
-                self.logError("Error getting local screen video:", err);
-                self._fire("onLocalMediaQueryError", "screen", err);
+                this.logError("Error getting local screen video:", err);
+                this._fire("onLocalMediaQueryError", "screen", err);
                 return Promise.reject(err);
             }));
         }
         if (!promises.length) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.log(client_kLogTag, "...nothing to get");
                 }
             } while (0);
@@ -2464,12 +2704,12 @@ class SfuClient {
         }
         await Promise.allSettled(promises);
         do {
-            if (window.d) {
+            if (self.d) {
                 console.log(client_kLogTag, "Get local media completed in", Date.now() - tsStart, "ms");
             }
         } while (0);
         if (errors) {
-            self._fire("onLocalMediaError", errors);
+            this._fire("onLocalMediaError", errors);
         }
         return true;
     }
@@ -2484,21 +2724,6 @@ class SfuClient {
             return this._reqBarrier.callFunc(this, this._doUpdateSentTracks, dontSendAv);
         }
     }
-    static getUserVideo() {
-        const camId = localStorage.getItem(kCamDeviceLsKey);
-        const constraints = Object.assign({}, SfuClient.kVideoCaptureOptions);
-        if (camId) {
-            constraints.deviceId = camId;
-        }
-        return navigator.mediaDevices.getUserMedia({ video: constraints })
-            .then(async (stream) => {
-            const vtrack = stream.getVideoTracks()[0];
-            if (!vtrack) {
-                return Promise.reject("No video track present");
-            }
-            return vtrack;
-        });
-    }
     /* Action is determined by:
     - SfuClient._muteAudio
     - SfuClient._muteCamera
@@ -2508,58 +2733,57 @@ class SfuClient {
     During the process sets SfuClient._isChangingLocalTracks
     */
     async _doUpdateSentTracks(dontSendAv) {
-        var self = this;
         const oldAvailAv = this.availAv;
         const oldSentAv = this.sentAv;
         const wasSendingHiRes = this.outVSpeakerTrack.isSendingTrack();
         try {
-            await self._doGetLocalTracks();
+            await this._doGetLocalTracks();
             if (!this.rtcConn || this.connState !== ConnState.kCallJoined) {
                 return;
             }
             let promises = [];
             // first, determine which tracks we want to obtain, and null sender tracks that we want disabled
-            if (self.isSpeaker) {
-                if (!self._muteAudio && self._audioTrack) {
+            if (this.isSpeaker) {
+                if (!this._muteAudio && this._audioTrack) {
                     // do a check in advance here (unlike elsewhere) to avoid unneeded restarts of the micMuteMonitor
-                    const already = self.outASpeakerTrack.sentTrack === self._audioTrack;
+                    const already = this.outASpeakerTrack.sentTrack === this._audioTrack;
                     if (!already) {
-                        promises.push(self.outASpeakerTrack.sendTrack(self._audioTrack));
+                        promises.push(this.outASpeakerTrack.sendTrack(this._audioTrack));
                         this.micMuteMonitor.restart();
                     }
                 }
                 else {
-                    promises.push(self.outASpeakerTrack.sendTrack(null));
+                    promises.push(this.outASpeakerTrack.sendTrack(null));
                     this.micMuteMonitor.stop();
                 }
             }
             else {
-                promises.push(self.outASpeakerTrack.sendTrack(null));
+                promises.push(this.outASpeakerTrack.sendTrack(null));
             }
             let hiresTrack = null;
             let vthumbTrack = null;
-            if (!self._cameraTrack) {
-                if (self._isSharingScreen) { // if no camera and sharing screen - both tracks are screen
+            if (!this._cameraTrack) {
+                if (this._isSharingScreen) { // if no camera and sharing screen - both tracks are screen
                     hiresTrack = vthumbTrack = this._screenTrack;
                 }
                 // otherwise no cam and no screen
             }
             else {
-                if (self._isSharingScreen) { // both cam and screen: hires is screen, vthumb is camera
-                    self._sendVthumb = true; // force sending vthumb - we must always send it when sending cam+screen
-                    hiresTrack = self._screenTrack;
-                    vthumbTrack = self._cameraTrack;
+                if (this._isSharingScreen) { // both cam and screen: hires is screen, vthumb is camera
+                    this._sendVthumb = true; // force sending vthumb - we must always send it when sending cam+screen
+                    hiresTrack = this._screenTrack;
+                    vthumbTrack = this._cameraTrack;
                 }
                 else { // only camera - both tracks are camera
-                    hiresTrack = vthumbTrack = self._cameraTrack;
+                    hiresTrack = vthumbTrack = this._cameraTrack;
                 }
             }
-            promises.push(self.outVSpeakerTrack.sendTrack(this._sendHires ? hiresTrack : null));
-            promises.push(self.outVThumbTrack.sendTrack(this._sendVthumb ? vthumbTrack : null));
+            promises.push(this.outVSpeakerTrack.sendTrack(this._sendHires ? hiresTrack : null));
+            promises.push(this.outVThumbTrack.sendTrack(this._sendVthumb ? vthumbTrack : null));
             let tsStart = Date.now();
             await Promise.all(promises);
             do {
-                if (window.d) {
+                if (self.d) {
                     console.log(client_kLogTag, "updateSentTracks took", Date.now() - tsStart, "ms");
                 }
             } while (0);
@@ -2569,20 +2793,20 @@ class SfuClient {
             }
         }
         finally {
-            self._updateAvailAndSentAv();
-            self.handleStartStopSend(oldSentAv);
-            let av = self.availAv;
+            this._updateAvailAndSentAv();
+            this.handleStartStopSend(oldSentAv);
+            let av = this.availAv;
             if (av !== oldAvailAv) {
                 if (!dontSendAv) {
-                    self._sendAvState();
+                    this._sendAvState();
                 }
                 const change = av ^ oldAvailAv;
-                self._fire("onLocalMediaChange", change);
+                this._fire("onLocalMediaChange", change);
                 if (change & Av.Audio) {
                     this._speakerDetector.onMicMute();
                 }
                 if (this.callRecorder) {
-                    this.callRecorder.onLocalMediaChange();
+                    this.callRecorder.onLocalMediaChange(change);
                 }
             }
         }
@@ -2593,7 +2817,7 @@ class SfuClient {
         }
         if (this.sentAv) { // start send
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "Starting to send media: broadcasting media key");
                 }
             } while (0);
@@ -2651,44 +2875,46 @@ class SfuClient {
     get txQuality() {
         return this._svcDriver ? this._svcDriver.currTxQuality : -1;
     }
-    getPeerInputTracks() {
+    getPeerAudioTracks() {
         const peerTracks = [];
         for (const slot of this.inAudioTracks.values()) {
             peerTracks.push(slot.xponder.receiver.track);
         }
         return peerTracks;
     }
-    async recordingStart(sink, videoHeight) {
+    /* Doesn't immediately start recording, but only when commanded to set video input */
+    async recordingStart(onClose, sink, res) {
         if (this.callRecorder) {
             throw new Error("Already recording call");
         }
         do {
-            if (window.d) {
+            if (self.d) {
                 console.log(client_kLogTag, "Starting call recording");
             }
         } while (0);
-        this._recordedVideoCid = null;
         if (!sink) {
             sink = new RecorderFileSink;
             await sink.init();
         }
-        this.callRecorder = new CallRecorder(this, sink, videoHeight);
-        await this.callRecorder.init(this.getPeerInputTracks());
-        this.callRecorder.start();
+        this.callRecorder = new CallRecorder(this, sink, (err) => {
+            this.recordingOnStop();
+            onClose(err);
+        }, res);
+        await this.callRecorder.init(this.getPeerAudioTracks());
         this._availAv |= Av.Recording;
         this._sendAvState();
     }
     get isRecording() {
-        return !!this.callRecorder;
+        return this.callRecorder && !this.callRecorder.destroyed;
     }
-    /**
-     * @returns
-     * null if not currently recording
-     * 0 if recording local video
-     * peer CID if recording peer's video
-     */
     get recordedVideoCid() {
-        return this.callRecorder ? this._recordedVideoCid : null;
+        return this.callRecorder ? this.callRecorder.videoInputId : -1;
+    }
+    get recHasVideoInput() {
+        return this.callRecorder ? this.callRecorder.hasVideoInput : false;
+    }
+    get recordedVideoTrack() {
+        return this.callRecorder ? this.callRecorder.videoInputTrack : null;
     }
     throwIfNotRecording() {
         if (!this.callRecorder) {
@@ -2708,11 +2934,13 @@ class SfuClient {
             return;
         }
         do {
-            if (window.d) {
-                console.log(client_kLogTag, "Stopping call recording");
+            if (self.d) {
+                console.log(client_kLogTag, "Stopping call recording...");
             }
         } while (0);
-        this.callRecorder.destroy();
+        return this.callRecorder.destroy();
+    }
+    recordingOnStop() {
         delete this.callRecorder;
         this._availAv &= ~Av.Recording;
         this._sendAvState();
@@ -2721,48 +2949,34 @@ class SfuClient {
      * @returns Whether recording to the specified peer was actually started, or recording was actually
      * stopped, in case cid is null
      */
-    recordingSetVideoSource(cid) {
-        if (!this.callRecorder) {
+    recSetVideoSource(cid, avatar, caption) {
+        if (!this.callRecorder || this.callRecorder.destroyed) {
             return false;
         }
-        if (cid === this._recordedVideoCid) {
-            do {
-                if (window.d) {
-                    console.warn(client_kLogTag, `Already recording peer ${cid}`);
-                }
-            } while (0);
-            return true;
-        }
-        this._recordedVideoCid = cid;
-        if (cid === 0 || cid === null) {
-            this.callRecorder.setVideoInput(cid);
+        if (cid === 0) {
+            this.callRecorder.switchToLocalVideo(avatar, caption).catch(dumpRejection);
             return true;
         }
         const peer = this.peers.get(cid);
-        if (!peer || !(peer.av & Av.HiResVideo)) {
-            this.callRecorder.setVideoInput(null);
+        if (!peer) {
             do {
-                if (window.d) {
-                    console.warn(client_kLogTag, peer ? `Peer ${cid} not sending hi-res video to record` : `Unknown peer with cid ${cid}`);
+                if (self.d) {
+                    console.warn(client_kLogTag, `setVideoSource: Unknown peer with cid ${cid}, switching to local video`);
                 }
             } while (0);
+            this.callRecorder.switchToLocalVideo(null).catch(dumpRejection);
             return false;
         }
-        peer._doStartRecording();
-        return true;
-    }
-    _maybeResumeRecordingPeer(peer) {
-        const recCid = this._recordedVideoCid;
-        if (!recCid || !this.callRecorder) {
-            return false;
+        if (!(peer.av & Av.HiResVideo)) {
+            this.callRecorder.setVideoInput(cid, avatar, caption).catch(dumpRejection);
+            do {
+                if (self.d) {
+                    console.warn(client_kLogTag, `Peer ${cid} not sending hi-res video to record`);
+                }
+            } while (0);
+            return true;
         }
-        if (recCid === peer.prevCid) {
-            this._recordedVideoCid = peer.cid; // peer reconnected, update recording cid
-        }
-        else if (recCid !== peer.cid) {
-            return false;
-        }
-        peer._doStartRecording();
+        peer._doStartRecording(caption);
         return true;
     }
     sentTracksString() {
@@ -2826,7 +3040,7 @@ class SfuClient {
         }
         if (mute === this._muteCamera) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "muteCamera: No change");
                 }
             } while (0);
@@ -2838,7 +3052,7 @@ class SfuClient {
         if (!mute && !this.isSpeaker) {
             const msg = "Can't unmute audio: no speak permission";
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, msg);
                 }
             } while (0);
@@ -2854,7 +3068,7 @@ class SfuClient {
         }
         if (mute === this._muteAudio) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "muteAudio: No change");
                 }
             } while (0);
@@ -2900,9 +3114,9 @@ class SfuClient {
         return (this[trackPropName]) ? this._restartInputDevice(trackPropName, mediaAv) : Promise.resolve();
     }
     _restartInputDevice(varName, mediaAv) {
-        // If sending that type of media changes state (i.e. was sent, and now can't be sent because device went aaway
+        // If sending that type of media changes state (i.e. was sent, and now can't be sent because device went away
         // and no more input devices for that media type, or vice versa), then updateSentTracks will take care of
-        // handling the change. If, however, we were and continue to be sending that media, but from a different input,
+        // handling the change. If, however, we were, and continue to be sending that media, but from a different input,
         // we have to notify only locally: the GUI via onLocalMediaChange, and the recorder to switch to the input track
         let prevState;
         return this._updateSentTracks(() => {
@@ -2910,7 +3124,7 @@ class SfuClient {
             prevState = !!track;
             if (prevState) {
                 if (varName === "_cameraTrack") {
-                    this._stopAndDelLocalTrack("_cameraTrack");
+                    this._stopAndDelCameraTrack();
                 }
                 else {
                     this[varName] = null; // first null it, in case a handler tries to restart it
@@ -2922,7 +3136,7 @@ class SfuClient {
             if (!!this[varName] === prevState) {
                 this._fire("onLocalMediaChange", mediaAv);
                 if (this.callRecorder) {
-                    this.callRecorder.onLocalMediaChange(mediaAv);
+                    this.callRecorder.onInputDeviceChange(mediaAv);
                 }
             }
         });
@@ -2980,7 +3194,7 @@ class SfuClient {
             this.audioOutDeviceId = deviceId;
         }, (ex) => {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "Audio output: Can't access specified device, falling back to default:", ex.msg || ex);
                 }
             } while (0);
@@ -2988,6 +3202,9 @@ class SfuClient {
         });
     }
     async putOnHold() {
+        if (this.callRecorder) {
+            this.callRecorder.pause();
+        }
         await this._updateSentTracks(() => {
             if (this._onHold) {
                 return;
@@ -3025,9 +3242,12 @@ class SfuClient {
             // reflect the actual state of the sent tracks, so that the actual delta is seen correctly
             this._availAv = Av.onHold;
         });
+        if (this.callRecorder) {
+            this.callRecorder.resume();
+        }
     }
-    isOnHold() {
-        return this._onHold != null;
+    get isOnHold() {
+        return !!this._onHold;
     }
     async enableScreenshare(enable) {
         if (this._onHold) {
@@ -3036,7 +3256,7 @@ class SfuClient {
         }
         if (enable === this._isSharingScreen) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "enableScreenshare: No change");
                 }
             } while (0);
@@ -3070,28 +3290,12 @@ class SfuClient {
         }
         else {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "Could not determine screensharing type from track label", label);
                 }
             } while (0);
             return ScreenShareType.kInvalid;
         }
-    }
-    onScreenSharingStoppedByUser() {
-        do {
-            if (window.d) {
-                console.warn(client_kLogTag, "Screen sharing stopped by user");
-            }
-        } while (0);
-        // In theory this may be called immediately from within _getLocalTracks when the track onended
-        // handle is attached. In that case, we need to go through the message loop to avoid recursion
-        var self = this;
-        setTimeout(function () {
-            self._updateSentTracks(() => {
-                self._isSharingScreen = false;
-                self._fire("onScreenshare", false);
-            });
-        }, 0);
     }
     _setConnState(state) {
         this._connState = state;
@@ -3108,7 +3312,7 @@ class SfuClient {
     }
     processMessage(msg) {
         do {
-            if (window.d) {
+            if (self.d) {
                 console.log(client_kLogTag, "rx:\n", JSON.stringify(msg, logReplacerFunc));
             }
         } while (0);
@@ -3120,7 +3324,7 @@ class SfuClient {
                 logMsg += ": " + msg.msg;
             }
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, logMsg);
                 }
             } while (0);
@@ -3129,7 +3333,7 @@ class SfuClient {
         }
         if (msg.warn != null) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "SFU server WARNING:", msg.warn);
                 }
             } while (0);
@@ -3145,7 +3349,7 @@ class SfuClient {
         }
         else {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "Ignoring unknown packet", msg.a || JSON.stringify(msg));
                 }
             } while (0);
@@ -3187,7 +3391,7 @@ class SfuClient {
         await this.newKeyImmediate();
         if (this.connState !== ConnState.kCallJoining) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "msgAnswer: Disconnected while joining(generating new key), aborting");
                 }
             } while (0);
@@ -3198,7 +3402,7 @@ class SfuClient {
             let tsStart = Date.now();
             sdp = sdpUncompress(msg.sdp);
             do {
-                if (window.d) {
+                if (self.d) {
                     console.log(client_kLogTag, "Setting answer SDP...");
                 }
             } while (0);
@@ -3208,7 +3412,7 @@ class SfuClient {
                 sdp: sdp
             }));
             do {
-                if (window.d) {
+                if (self.d) {
                     console.log(client_kLogTag, "setRemoteDescription took", Date.now() - tsStart, "ms");
                 }
             } while (0);
@@ -3237,6 +3441,7 @@ class SfuClient {
             this._updateSentTracks(null);
             this._fire("onCanSpeak");
         }
+        this._speakerDetector.enable(true);
         setTimeout(() => this.processInputQueue(), 0);
         if ((this.availAv & Av.Audio) === 0) { // no mute change happened (availAv is inited to 0), but we still need
             this._speakerDetector.onMicMute(); // to notify the detector to start monitoring speak-while-muted
@@ -3271,7 +3476,7 @@ class SfuClient {
     msgPeerJoin(msg) {
         if (!msg.cid || !msg.userId || msg.av == null) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "PEERJOIN packet missing required property");
                 }
             } while (0);
@@ -3282,7 +3487,7 @@ class SfuClient {
         if (!this._lastPeerJoinLeave || ((this._lastPeerJoinLeave.userId === msg.userId) &&
             (Date.now() - this._lastPeerJoinLeave.ts <= SfuClient.kPeerReconnNoKeyRotationPeriod))) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "This is the first peer, or they just reconnected, NOT rotating key");
                 }
             } while (0);
@@ -3298,7 +3503,7 @@ class SfuClient {
         let peer = this.peers.get(cid);
         if (!peer) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "PEERLEFT: Unknown peer cid", cid);
                 }
             } while (0);
@@ -3315,7 +3520,7 @@ class SfuClient {
             const peer = this.peers.get(cid);
             if (!peer) {
                 do {
-                    if (window.d) {
+                    if (self.d) {
                         console.warn(client_kLogTag, "Unknown peer cid", cid);
                     }
                 } while (0);
@@ -3397,7 +3602,7 @@ class SfuClient {
         this.assert(msg.user);
         if (!this.speakRequests.delete(msg.user)) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "msgSpeakReqDel: Speak request was not in our list");
                 }
             } while (0);
@@ -3425,7 +3630,7 @@ class SfuClient {
     async msgMuted(msg) {
         if ((msg.av & Av.Audio) === 0) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "MUTED received without audio flag");
                 }
             } while (0);
@@ -3506,7 +3711,7 @@ class SfuClient {
         this.assert(cid);
         if (cid === this.cid) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "msgAv: Received our own av flags");
                 }
             } while (0);
@@ -3515,7 +3720,7 @@ class SfuClient {
         let peer = this.peers.get(msg.cid);
         if (!peer) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "msgAv: Unknown peer with cid", msg.cid);
                 }
             } while (0);
@@ -3626,7 +3831,7 @@ class SfuClient {
         if (msg.wr) { // pushed from call to waiting room
             this.assert(this._callJoinPermission || this._callJoinPermission === 0);
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "Leaving call and entering waiting room");
                 }
             } while (0);
@@ -3654,7 +3859,7 @@ class SfuClient {
             }
             default:
                 do {
-                    if (window.d) {
+                    if (self.d) {
                         console.warn(client_kLogTag, `Operation "${msg.deny}" denied: ${msg.msg || "(no details)"}`);
                     }
                 } while (0);
@@ -3721,7 +3926,7 @@ class SfuClient {
     async pollStats() {
         if (this._connState !== ConnState.kCallJoined) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "pollStats called while not in kCallJoined state");
                 }
             } while (0);
@@ -3921,7 +4126,7 @@ class Slot {
     reassign(peer, iv) {
         this.peer = peer;
         // TODO: was parseInt(fromCid)
-        this.client.cryptoWorker.postMessage(['dt', this.mid, peer.cid, hexToBin(iv)]);
+        this.client.cryptoWorker.postMessage(['dt', this.mid, peer.cid, client_hexToBin(iv)]);
         this.active = true;
     }
     sendTrack(track) {
@@ -4244,7 +4449,7 @@ class VideoPlayer {
         // slot.players may have changed even if this.slot hasn't. That's why the check is at this late stage
         if (slot === this.slot) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "VideoPlayer._attachToTrack: Already attached to that slot");
                 }
             } while (0);
@@ -4254,7 +4459,7 @@ class VideoPlayer {
             const prevSlot = this.slot;
             this._detachFromCurrentTrack();
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, `VideoPlayer: replacing slot ${prevSlot.mid} with ${slot.mid}`);
                 }
             } while (0);
@@ -4285,7 +4490,7 @@ class VideoPlayer {
     destroy() {
         if (this.isDestroyed) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "VideoPlayer.destroy: Already destroying/destroyed");
                 }
             } while (0);
@@ -4314,7 +4519,7 @@ class AudioPlayer {
             player.setSinkId(sinkId)
                 .catch((ex) => {
                 do {
-                    if (window.d) {
+                    if (self.d) {
                         console.warn(client_kLogTag, "Can't access configured audio output device, falling back to default:", ex.message || ex);
                     }
                 } while (0);
@@ -4358,7 +4563,7 @@ function playerPlay(player, track, dontRestart) {
     player.play()
         .then(() => {
         do {
-            if (window.d) {
+            if (self.d) {
                 console.log(client_kLogTag, `play() returned after ${Date.now() - ts} ms`);
             }
         } while (0);
@@ -4406,7 +4611,7 @@ class Peer {
         this.version = info.v;
         this.av = info.av;
         this.strIvs = info.ivs;
-        this.keyDecryptIv = hexToBin(this.strIvs[0] + this.strIvs[1].substring(0, 8));
+        this.keyDecryptIv = client_hexToBin(this.strIvs[0] + this.strIvs[1].substring(0, 8));
         this.encryptKeyToUser = client.app.encryptKeyToUser.bind(client.app); // performance optimization
         client._addPeer(this);
         this.verifyAndDeriveSharedSessKey(info.pubk);
@@ -4416,7 +4621,6 @@ class Peer {
         if (!isInitialDump) {
             this._fire("onPeerJoined");
         }
-        client._maybeResumeRecordingPeer(this);
     }
     get isModerator() {
         let mods = this.client.moderators;
@@ -4430,7 +4634,7 @@ class Peer {
     get speakRequested() { return this._speakReq; }
     get isLeavingCall() { return this.isLeaving; }
     async verifyAndDeriveSharedSessKey(pubKey) {
-        const pms = this.sessSharedKey = client_newPromiseWithResolveMethods();
+        const pms = this.sessSharedKey = newPromiseWithResolvers();
         const items = pubKey.split(':');
         if (items.length !== 2) {
             throw new Error(`Bad pubkey format from peer ${this.userId}:${this.cid}`);
@@ -4448,7 +4652,7 @@ class Peer {
         const hkdfKey = await window.crypto.subtle.importKey("raw", dhSharedKey, "HKDF", false, ["deriveKey", "deriveBits"]);
         return crypto.subtle.deriveKey({
             name: "HKDF", hash: "SHA-256",
-            salt: hexToBin([this.strIvs[1], this.strIvs[2], this.client.strIvs[1], this.client.strIvs[2]].sort().join('')),
+            salt: client_hexToBin([this.strIvs[1], this.strIvs[2], this.client.strIvs[1], this.client.strIvs[2]].sort().join('')),
             info: new Uint8Array([])
         }, hkdfKey, { name: this.version === 1 ? "AES-GCM" : "AES-CBC", length: 256 }, false, ["encrypt", "decrypt"]);
     }
@@ -4457,7 +4661,7 @@ class Peer {
         let sharedKey = this.sessSharedKey;
         if (sharedKey) { // new clients, implementing ephemeral session key pair
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, `Using ephemeral session key for client ${this.userId}:${this.cid}`);
                 }
             } while (0);
@@ -4470,7 +4674,7 @@ class Peer {
             if (this.version === 1) {
                 encKeyBin = await crypto.subtle.encrypt({ name: "AES-GCM", iv: this.client.keyEncryptIv, tagLength: 32 }, sharedKey, key);
                 do {
-                    if (window.d) {
+                    if (self.d) {
                         console.warn(client_kLogTag, "Encrypting key with AES-GCM for protocol v1 peer");
                     }
                 } while (0);
@@ -4478,7 +4682,7 @@ class Peer {
             else {
                 encKeyBin = await crypto.subtle.encrypt({ name: "AES-CBC", iv: SfuClient.kZeroIv128 }, sharedKey, key);
                 do {
-                    if (window.d) {
+                    if (self.d) {
                         console.warn(client_kLogTag, "Encrypting key with AES-CBC for protocol v2 peer");
                     }
                 } while (0);
@@ -4487,7 +4691,7 @@ class Peer {
         }
         else { // old clients, using chat keys
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, `Using chat key (OLD crypto scheme) for client ${this.userId}:${this.cid}`);
                 }
             } while (0);
@@ -4656,7 +4860,7 @@ class Peer {
     _setHiResDivider(divider) {
         if (divider < 0 || divider > 2) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, `setHiResDivider: invalid resolution divider value (spatial layer offset) ${divider}, must be 0, 1 or 2`);
                 }
             } while (0);
@@ -4674,7 +4878,7 @@ class Peer {
         const av = msg.av;
         if (av === this.av) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "Peer.onAvChange: No actual change in av flags");
                 }
             } while (0);
@@ -4749,14 +4953,14 @@ class Peer {
         let method = this.handler[evName];
         if (!method) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, `Peer: Unhandled event: ${evName}(${args.join(",")})`);
                 }
             } while (0);
             return;
         }
         do {
-            if (window.d) {
+            if (self.d) {
                 console.log(client_kLogTag, `fire [${evName}](${args.join(',')})`);
             }
         } while (0);
@@ -4772,34 +4976,11 @@ class Peer {
             this.client.logError("Event handler for", evName, "threw exception:", ex.stack);
         }
     }
-    _doStartRecording() {
+    _doStartRecording(caption) {
         this.getHiResVideo(0, (player) => {
-            return new PeerRecorderLink(player, this.client.callRecorder);
+            return new PeerRecorderLink(player, this.client.callRecorder, caption);
         });
     }
-}
-function client_newPromiseWithResolveMethods() {
-    let cbResolve;
-    let cbReject;
-    var pms = new Promise(function (resolve, reject) {
-        cbResolve = resolve;
-        cbReject = reject;
-    });
-    pms.resolve = function (val) {
-        if (pms.done) {
-            return;
-        }
-        pms.done = true;
-        cbResolve(val);
-    };
-    pms.reject = function (err) {
-        if (pms.done) {
-            return;
-        }
-        pms.done = true;
-        cbReject(err);
-    };
-    return pms;
 }
 function randomBuf(binLen) {
     var bin = new Uint8Array(binLen);
@@ -4828,7 +5009,7 @@ function hexDigitVal(chCode) {
         return 10 + chCode - 65; // 'A'
     }
 }
-function hexToBin(hexStr) {
+function client_hexToBin(hexStr) {
     let bin = new Uint8Array(hexStr.length >>> 1);
     for (let pos = 0, binPos = 0; pos < hexStr.length; binPos++) {
         bin[binPos] = (hexDigitVal(hexStr.charCodeAt(pos++)) << 4) | hexDigitVal(hexStr.charCodeAt(pos++));
@@ -4878,7 +5059,7 @@ class MicMuteMonitor {
             this.fireWarning();
         }, MicMuteMonitor.kWarningTimeoutMs);
         do {
-            if (window.d) {
+            if (self.d) {
                 console.log(client_kLogTag, "Started mic muted monitor");
             }
         } while (0);
@@ -4931,7 +5112,7 @@ class StatsRecorder {
     onStats(sample) {
         if (!this.tsStart) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "statsRecoder: onStats called while we are not started");
                 }
             } while (0);
@@ -4958,7 +5139,7 @@ class StatsRecorder {
     submit(termReason) {
         if (!this.tsStart) {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "StatsRecorder.submit: was not started (tsStart is not set)");
                 }
             } while (0);
@@ -5006,7 +5187,7 @@ class StatsRecorder {
             data.sfu = new URL(client.url).host;
         }
         do {
-            if (window.d) {
+            if (self.d) {
                 console.log(client_kLogTag, `Posting stats to ${SfuClient.kStatServerUrl}/stats:\n`, data);
             }
         } while (0);
@@ -5015,7 +5196,7 @@ class StatsRecorder {
             body: JSON.stringify(data)
         }).catch((ex) => {
             do {
-                if (window.d) {
+                if (self.d) {
                     console.warn(client_kLogTag, "Failed to post stats:", ex.message);
                 }
             } while (0);
@@ -5046,18 +5227,22 @@ class StatsRecorder {
 }
 ;
 class PeerRecorderLink {
-    constructor(player, recorder) {
+    constructor(player, recorder, caption) {
         this.player = player;
         this.recorder = recorder;
+        this.caption = caption;
+        this.cid = player.peer.cid;
     }
     attachToTrack(track) {
         this.track = track;
-        this.recorder.setVideoInput(track, () => {
-            delete this.track; // makes detachFromTrack() ignore us
-            if (!this.player.isDestroyed) {
-                this.player.destroy(); // we may be called from detachFromTrack, being called from Player.destroy()
-            }
-        });
+        const caption = this.caption;
+        delete this.caption;
+        this.recorder.setVideoInput({ track, srcId: this.cid, releaseCb: () => {
+                delete this.track; // makes detachFromTrack() ignore us
+                if (!this.player.isDestroyed) {
+                    this.player.destroy(); // we may be called from detachFromTrack, being called from Player.destroy()
+                }
+            } }, null, caption).catch(dumpRejection);
     }
     detachFromTrack() {
         const track = this.track;
@@ -5065,18 +5250,24 @@ class PeerRecorderLink {
             return;
         }
         delete this.track;
-        if (this.recorder.videoInputTrack() === track) {
-            this.recorder.setVideoInput(null);
+        if (this.recorder.videoInputTrack === track) {
+            this.recorder.setVideoInput(this.cid, null, this.caption).catch(dumpRejection);
         }
     }
-    onPlayerDestroy() { }
+    onPlayerDestroy() {
+        // in case attachToTrack was never called, we need to dispose of the caption bitmap
+        if (this.caption instanceof ImageBitmap) {
+            this.caption.close();
+            delete this.caption;
+        }
+    }
     onAvChange(av, oldAv) {
         const peer = this.player.peer;
         if (peer.client.recordedVideoCid !== peer.cid) {
             return;
         }
         if (!(av & Av.HiResVideo)) {
-            this.recorder.setVideoInput(null);
+            this.recorder.setVideoInput(this.cid, null, this.caption).catch(dumpRejection);
         }
     }
 }
@@ -5094,14 +5285,20 @@ function addNullObjProperty(obj, name, val) {
         return obj;
     }
 }
+function dumpRejection(err) {
+    console.error("Unhandled promise rejection:", err.stack || err);
+}
+
 if (!SfuClient.platformHasSupport()) {
     console.error("This browser does not support insertable streams");
 }
+
 let ns = SfuClient;
+ns.CallRecorder = CallRecorder;
 ns.playerPlay = playerPlay;
 ns.playerStop = playerStop;
 ns.binToHex = binToHex;
-ns.hexToBin = hexToBin;
+ns.hexToBin = client_hexToBin;
 ns.base64ArrEncode = base64ArrEncode;
 ns.base64DecodeToArr = base64DecodeToArr;
 window.SfuClient = SfuClient;

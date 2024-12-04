@@ -350,7 +350,7 @@ class Stream extends MegaRenderMixin {
     renderMiniMode = (source) => {
         const { call, mode, minimized, isPresenterNode, onLoadedData } = this.props;
 
-        if (call.sfuClient.isOnHold()) {
+        if (call.isOnHold) {
             return this.renderOnHoldVideoNode();
         }
         let VideoClass = PeerVideoHiRes;

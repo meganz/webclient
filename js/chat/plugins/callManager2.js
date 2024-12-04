@@ -500,7 +500,6 @@
             const {sfuClient} = this;
             sfuClient.muteAudio(!audio);
             sfuClient.muteCamera(!video);
-            sfuClient.enableSpeakerDetector(true);
             return sfuClient.connect(url, this.callId, {isGroup: this.chatRoom.type !== "private"});
         }
         setOrganiser(userHandle) {
@@ -569,12 +568,12 @@
             this.recordActiveStream();
         }
         recordActiveStream() {
-            if (!this.sfuClient.isRecording) {
+            if (!this.sfuClient.isRecording || this.sfuClient.isOnHold) {
                 return;
             }
             const { peers, pinnedCid, localPeerStream, sfuClient } = this;
             let src, tag;
-            if (localPeerStream && localPeerStream.isScreen) {
+            if (localPeerStream.isScreen) {
                 src = localPeerStream;
                 tag = "local screen";
             }
@@ -591,19 +590,40 @@
             else if ((src = peers.find(p => p.av & Av.HiResVideo))) {
                 tag = "fallback: first peer with video";
             }
-            else if (localPeerStream && (localPeerStream.av & Av.Video)) {
+            else if (localPeerStream.av & Av.Video) {
                 src = localPeerStream;
                 tag = "fallback: local video";
             }
+            else if (src = this.getActiveSpeaker()) {
+                tag = "fallback: active speaker (no video)";
+            }
+            else if (src = peers.getItem(0)) {
+                tag = "fallback: first peer (no video)";
+            }
             else {
-                src = null;
-                tag = "fallback: no video";
+                tag = "fallback: (self) no video";
+                src = localPeerStream;
             }
-            const srcCid = src ? src.clientId : null;
-            if (srcCid !== sfuClient.recordedVideoCid) {
-                console.warn(`Recording: switching to video of cid ${srcCid} (${tag})`);
-                sfuClient.recordingSetVideoSource(srcCid);
+            assert(src);
+            const srcCid = src.clientId;
+            const handle = src.userHandle;
+            const hasVideo = (src.av & Av.HiResVideo) !== 0;
+            const isScreen = (src.av & Av.ScreenHiRes) !== 0;
+            const recTrack = sfuClient.recordedVideoTrack;
+            const recScreen = recTrack ? !!recTrack.isScreen : false;
+            if ((srcCid === sfuClient.recordedVideoCid) && (hasVideo === !!recTrack) && isScreen === recScreen) {
+                return; // no change
             }
+            this.chatRoom.trigger('onRecordingActivePeer', src);
+            const user = M.getUserByHandle(handle);
+            const caption = user ? user.name : null;
+            let avatar = avatars[handle]; // avatar can't be undefined
+            avatar = avatar
+                ? avatar.url
+                : new AvatarRenderer(handle);
+
+            console.warn(`Recording: switching to ${hasVideo ? "video" : "avatar"} of cid ${srcCid} (${tag})`);
+            sfuClient.recSetVideoSource(srcCid, avatar, caption);
         }
         onPeerAvChange(peer, av, oldAv) {
             const callManagerPeer = this.peers[peer.cid];
@@ -894,10 +914,11 @@
         }
         toggleHold() {
             if (this.av & SfuClient.Av.onHold) {
-                this.sfuClient.releaseHold();
+                return this.sfuClient.releaseHold() // wait completion, recorder will be resumed at the end
+                .then(() => this.recordActiveStream());
             }
             else {
-                this.sfuClient.putOnHold();
+                return this.sfuClient.putOnHold();
             }
         }
         hangUp(reason) {
@@ -1099,6 +1120,7 @@
             this.call = call;
             this.userHandle = u_handle;
             this.clientId = 0; // for pinnedCid
+            this.av = 0;
             this.consumers = new Set();
             this.vuLevelConsumers = new Set();
             this.sfuClient = call.sfuClient;
@@ -1175,13 +1197,26 @@
             return this.sfuClient.availAv & Av.Video;
         }
         get isOnHold() {
-            return this.sfuClient.isOnHold();
+            return this.sfuClient.isOnHold;
         }
         dynUpdateVideoQuality() {
             return false; // returing false will cause the caller VideoNode to update itself
         }
         destroy() {
             this.isDestroyed = true; // let VideoNode know we are destroyed
+        }
+    }
+    class AvatarRenderer {
+        constructor(userHandle) {
+            this.userHandle = userHandle;
+        }
+        render() {
+            return new Promise((resolve, reject) => {
+                const img = new Image;
+                img.onload = resolve.bind(null, img);
+                img.onerror = reject;
+                img.src = useravatar.getAvatarSVGDataURI(this.userHandle);
+            });
         }
     }
     /**

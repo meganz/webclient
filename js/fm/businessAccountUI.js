@@ -14,22 +14,21 @@ function BusinessAccountUI() {
     else {
         this.business = mega.buinsessController;
         this.initialized = true;
-        if (u_handle && u_attr) {
-
-            this.currAdmin = {
-                u: u_handle,
-                p: u_attr.b ? u_attr.b.bu : u_handle, // Parent account (for Pro Flexi there's only the current acct)
-                s: 0,
-                e: u_attr.email,
-                firstname: base64urlencode(to8(u_attr.firstname)),
-                lastname: base64urlencode(to8(u_attr.lastname)),
-                position: null,
-                idnum: null,
-                phonenum: null,
-                location: null,
-                isAdmin: true
-            };
-        }
+    }
+    if (u_handle && u_attr) {
+        this.currAdmin = {
+            u: u_handle,
+            p: u_attr.b ? u_attr.b.bu : u_handle, // Parent account (for Pro Flexi there's only the current acct)
+            s: 0,
+            e: u_attr.email,
+            firstname: base64urlencode(to8(u_attr.firstname)),
+            lastname: base64urlencode(to8(u_attr.lastname)),
+            position: null,
+            idnum: null,
+            phonenum: null,
+            location: null,
+            isAdmin: true
+        };
     }
 
     var mySelf = this;

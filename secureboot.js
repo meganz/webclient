@@ -2391,7 +2391,6 @@ else if (!browserUpdate) {
     jsl.push({f:'js/fm/ufssizecache.js', n: 'ufssizecache_js', j:1});
 
     // Pro pages Step 1 (Pro plan) and Step 2 (Pro payment)
-    jsl.push({f:'html/proplan.html', n: 'proplan', j:0});
     jsl.push({f:'html/planpricing.html', n: 'planpricing', j:0});
     jsl.push({f:'html/propay.html', n: 'propay', j:0});
     jsl.push({f:'html/js/pro.js', n: 'pro_js', j:1});

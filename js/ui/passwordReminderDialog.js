@@ -205,7 +205,14 @@
     class PasswordReminderDialog {
         constructor() {
             this.passwordReminderAttribute = new PasswordReminderAttribute(this, prop => {
-                this.recheck(prop !== 'lastSuccess' && prop !== 'dontShowAgain');
+                this.recheck(
+                    prop !== 'lastSuccess' &&
+                    prop !== 'dontShowAgain' &&
+                    prop !== 'masterKeyExported'
+                );
+                if (prop === 'masterKeyExported') {
+                    this.hideIcon();
+                }
             });
             this.succeeded = false;
             this.isLogout = false;
@@ -237,6 +244,7 @@
 
                 this.skipLink.text = l[967];
                 this.succeeded = true;
+                this.hideIcon();
                 eventlog(500319);
                 return;
             }
@@ -283,6 +291,7 @@
             await M.saveAs(a32_to_base64(window.u_k || ''), `${M.getSafeName(l[20830])}.txt`);
             mega.ui.toast.rack.addClass('above-fab');
             mega.ui.toast.show(l.recovery_key_download_toast);
+            this.passwordReminderAttribute.masterKeyExported = 1;
             this.showLogoutStep();
         }
 
@@ -435,6 +444,7 @@
 
             this.skipLink.text = l[1379];
             this.skipLink.removeClass('button-prd-skip');
+            this.skipLink.show();
             this.dialog.classList.remove('wrong', 'accepted');
 
             this.wrongLabel.classList.add('hidden');
@@ -527,6 +537,9 @@
             if (component.name === this.NAMESPACE) {
                 component.hide();
                 component.clear();
+            }
+            if ($.dialog === this.NAMESPACE) {
+                delete $.dialog;
             }
         }
 
@@ -750,12 +763,18 @@
 
             this.dialog.querySelector('.pass-reminder.container').classList.remove('hidden');
 
-            this.showLogoutStep();
+            if (this.promise) {
+                this.showLogoutStep();
+            }
+            else {
+                this.skipLink.hide();
+            }
         }
 
         showLogoutStep() {
-            this.skipLink.text = l.logout_proceed;
+            this.skipLink.text = this.promise ? l.logout_proceed : l.logout_password_confirm;
             this.skipLink.addClass('button-prd-skip');
+            this.skipLink.show();
         }
     }
 

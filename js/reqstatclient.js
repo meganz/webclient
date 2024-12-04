@@ -12,6 +12,29 @@ lazy(mega, 'requestStatusMonitor', () => {
             };
             super(handlers);
             this.buffer = false;
+            this.progress = -1;
+            this.visible = false;
+        }
+
+        show() {
+            this.visible = true;
+            if (this.progress >= 0) {
+                if (loadingInitDialog.active) {
+                    loadingInitDialog.step2(this.progress);
+                }
+                else {
+                    loadingDialog.showProgress(this.progress);
+                }
+            }
+        }
+
+        hide() {
+            if (this.visible) {
+                this.visible = false;
+                if (this.progress >= 0) {
+                    loadingDialog.hideProgress();
+                }
+            }
         }
 
         framing(data) {
@@ -62,7 +85,13 @@ lazy(mega, 'requestStatusMonitor', () => {
                     this.logger.log("*** No operation in progress");
                 }
 
-                loadingDialog.hideProgress();
+                if (this.progress >= 0) {
+                    if (this.visible) {
+                        loadingDialog.hideProgress();
+                    }
+                    this.progress = -1;
+                    api.retry();
+                }
 
                 return 2;
             }
@@ -122,11 +151,13 @@ lazy(mega, 'requestStatusMonitor', () => {
             const curr = view.getUint32(offset + 4, true);
             const end = view.getUint32(offset + 8, true);
 
-            const progress = curr / end * 100;
-            loadingDialog.showProgress(progress);
+            this.progress = curr / end * 100;
+            if (this.visible) {
+                loadingDialog.showProgress(this.progress);
+            }
 
             if (d) {
-                description += ` since ${start}, ${progress}% [${curr}/${end}]`;
+                description += ` since ${start}, ${this.progress}% [${curr}/${end}]`;
                 this.logger.log(description);
             }
 
@@ -160,14 +191,33 @@ lazy(mega, 'requestStatusMonitor', () => {
     };
 });
 
-mBroadcaster.once('startMega', () => {
+mBroadcaster.once('boot_done', () => {
     'use strict';
 
     if (is_iframed) {
         return;
     }
 
+    let hook;
     api.observe('setsid', () => {
+
+        if (!hook) {
+            const hide = () => mega.requestStatusMonitor.hide();
+            hook = (res) => {
+                queueMicrotask(hide);
+                return res;
+            };
+
+            api.hook(({channel}) => {
+
+                if (channel === 0 || channel === 4) {
+                    mega.requestStatusMonitor.show();
+
+                    // hide progress bar whenever this request completes.
+                    return hook;
+                }
+            });
+        }
         mega.requestStatusMonitor.init();
     });
 });

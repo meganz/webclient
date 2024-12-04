@@ -2797,5 +2797,4 @@ MegaUtils.prototype.updatePaymentCardState = () => {
     });
 };
 
-
 Object.freeze(MegaUtils.prototype);

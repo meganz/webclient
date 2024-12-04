@@ -1400,9 +1400,13 @@ button.fm-empty-button {
 .dropdown.input-sources .dropdown-item {
     padding: 0 4px;
 }
+.dropdown.input-sources .dropdown-item > div {
+    display: flex;
+    align-items: center;
+}
 .dropdown.input-sources .dropdown-item i {
-    float: right;
     --icon-size: 16px;
+    margin-inline-start: 8px;
 }
 .dropdown.input-sources hr {
     --divider-color: var(--stroke-grey-2);
@@ -1417,10 +1421,9 @@ button.fm-empty-button {
     padding: 0 4px;
 }
 .dropdown.input-sources div.av-device-name {
-    display: inline-block;
     overflow: hidden;
     text-overflow: ellipsis;
-    width: calc(100% - 32px);
+    width: auto;
 }
 
 .conversation-panel .call-user-limit-banner {

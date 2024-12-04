@@ -1500,7 +1500,7 @@ FileManager.prototype.updFileManagerUI = async function() {
             }
         }
 
-        if (UImain === 'pwm' && mega.ui.pm && mega.pwmh) {
+        if (UImain === 'pwm' && mega.pwmh && mega.pm && mega.pm.pwmFeature) {
             tryCatch(() => mega.ui.pm.list.initLayout().catch(reportError))();
         }
     }

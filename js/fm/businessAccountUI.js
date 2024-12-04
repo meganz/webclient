@@ -590,7 +590,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                     return;
                 }
 
-                if (!mySelf.checkCu25519(userHandle, mySelf.viewSubAccountInfoUI.bind(mySelf))) {
+                if (!mySelf.checkCu25519(userHandle, disableEnableSubUserClickHandler.bind(this))) {
                     return false;
                 }
 

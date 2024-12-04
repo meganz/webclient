@@ -664,7 +664,7 @@ function createTimeoutPromise(validateFunction, tick, timeout, waitForPromise, n
                 }
 
                 while (running) {
-                    await sleep(int);
+                    await tSleep(int);
 
                     if (debug) {
                         const now = performance.now();

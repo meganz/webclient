@@ -3968,6 +3968,9 @@ body.theme-dark .start-meeting-preview .preview-meeting {
 .meetings-alert-high {
   background: var(--secondary-red);
 }
+.meetings-alert-error {
+  background-color: var(--stroke-error);
+}
 .messages-block .meetings-alert {
   top: 12px;
   width: calc(100% - 25px);
@@ -4013,6 +4016,15 @@ body.theme-dark .start-meeting-preview .preview-meeting {
 }
 .meetings-alert.unsupported-call-alert:has(~ .conversation-panel:not(.hidden) .unsupported-call-alert-progress) {
   display: none;
+}
+.meetings-alert.history-timeout-banner .meetings-alert-content {
+  border-radius: 8px;
+  padding: 6px 40px 6px 8px;
+  width: 100%;
+}
+.meetings-alert.history-timeout-banner a {
+  float: right;
+  margin-right: 10px;
 }
 
 #schedule-dialog {

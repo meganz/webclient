@@ -69,7 +69,8 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             activeCallIds: null,
             meetingsLoading: null,
             options: {},
-            scheduledMeeting: undefined
+            scheduledMeeting: undefined,
+            historyTimedOut: false,
         }
     );
 
@@ -411,6 +412,8 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
             if (d) {
                 self.logger.warn("Timed out waiting to load hist for:", self.chatId || self.roomId);
             }
+            this.historyTimedOut = true;
+            this.trigger('onHistTimeoutChange');
             timer = null;
             _historyIsAvailable(false);
         });

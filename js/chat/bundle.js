@@ -3585,7 +3585,8 @@ const ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, c
     activeCallIds: null,
     meetingsLoading: null,
     options: {},
-    scheduledMeeting: undefined
+    scheduledMeeting: undefined,
+    historyTimedOut: false
   });
   this.roomId = roomId;
   this.instanceIndex = ChatRoom.INSTANCE_INDEX++;
@@ -3826,6 +3827,8 @@ const ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, c
       if (d) {
         self.logger.warn("Timed out waiting to load hist for:", self.chatId || self.roomId);
       }
+      this.historyTimedOut = true;
+      this.trigger('onHistTimeoutChange');
       timer = null;
       _historyIsAvailable(false);
     });
@@ -12123,7 +12126,8 @@ Alert.TYPE = {
   LIGHT: 'light',
   NEUTRAL: 'neutral',
   MEDIUM: 'medium',
-  HIGH: 'high'
+  HIGH: 'high',
+  ERROR: 'error'
 };
 // EXTERNAL MODULE: ./js/chat/ui/meetings/schedule/helpers.jsx
 const helpers = REQ_(110);
@@ -12599,6 +12603,11 @@ let conversationpanel_dec, _dec2, conversationpanel_class;
 const ENABLE_GROUP_CALLING_FLAG = true;
 const MAX_USERS_CHAT_PRIVATE = 100;
 const ALERTS_BASE_OFFSET = 4;
+const DISMISS_TRANSITIONS = {
+  NOT_SHOWN: 0,
+  SHOWN: 1,
+  DISMISSED: 2
+};
 class EndCallButton extends mixins.w9 {
   constructor(...args) {
     super(...args);
@@ -13657,7 +13666,8 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
       descriptionDialog: false,
       occurrencesLoading: false,
       waitingRoom: false,
-      callUserLimit: false
+      callUserLimit: false,
+      historyTimeOutBanner: DISMISS_TRANSITIONS.NOT_SHOWN
     };
     const {
       chatRoom
@@ -13831,6 +13841,17 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
         });
       }
     });
+    chatRoom.rebind(`onHistTimeoutChange.${this.getUniqueId()}`, () => {
+      if (this.state.historyTimeOutBanner === DISMISS_TRANSITIONS.NOT_SHOWN && chatRoom.historyTimedOut) {
+        this.setState({
+          historyTimeOutBanner: DISMISS_TRANSITIONS.SHOWN
+        });
+      } else if (this.state.historyTimeOutBanner && !chatRoom.historyTimedOut) {
+        this.setState({
+          historyTimeOutBanner: DISMISS_TRANSITIONS.NOT_SHOWN
+        });
+      }
+    });
     if (chatRoom.options.w) {
       chatRoom.rebind(`onMembersUpdated.${this.getUniqueId()}`, (ev, {
         userId,
@@ -13894,6 +13915,7 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
     this.props.chatRoom.unbind(`wrOnJoinNotAllowed.${this.getUniqueId()}`);
     this.props.chatRoom.unbind(`wrOnJoinAllowed.${this.getUniqueId()}`);
     megaChat.unbind(`onIncomingCall.${this.getUniqueId()}`);
+    this.props.chatRoom.unbind(`onHistTimeoutChange.${this.getUniqueId()}`);
   }
   componentDidUpdate(prevProps, prevState) {
     const self = this;
@@ -14707,6 +14729,20 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
       }, l.chat_key_failed_banner.substring(l.chat_key_failed_banner.indexOf('[A]') + 3, l.chat_key_failed_banner.indexOf('[/A]'))), l.chat_key_failed_banner.split('[/A]')[1]),
       onClose: () => this.setState({
         invalidKeysBanner: false
+      })
+    }), this.state.historyTimeOutBanner === DISMISS_TRANSITIONS.SHOWN && REaCt().createElement(Alert, {
+      type: Alert.TYPE.ERROR,
+      className: `
+                                    ${megaChat.chatUIFlags.convPanelCollapse ? 'full-span' : ''}
+                                    ${this.props.offset === ALERTS_BASE_OFFSET ? 'single_alert' : ''}
+                                    history-timeout-banner
+                                `,
+      offset: this.props.offset === ALERTS_BASE_OFFSET ? 0 : this.props.offset,
+      content: REaCt().createElement(REaCt().Fragment, null, l.chat_timeout_banner, REaCt().createElement("a", {
+        onClick: () => location.reload()
+      }, l[85])),
+      onClose: () => this.setState({
+        historyTimeOutBanner: DISMISS_TRANSITIONS.DISMISSED
       })
     }), REaCt().createElement(historyPanel.A, (0,esm_extends.A)({}, this.props, {
       onMessagesListScrollableMount: mls => {
@@ -21123,6 +21159,9 @@ const HistoryPanel = (_dec = (0,mixins.hG)(450, true), _class = class HistoryPan
   }
   isLoading() {
     const {chatRoom} = this.props;
+    if (chatRoom.historyTimedOut) {
+      return false;
+    }
     const mb = chatRoom.messagesBuff;
     return this.scrollPullHistoryRetrieval === true || chatRoom.activeSearches || mb.messagesHistoryIsLoading() || mb.joined === false || mb.isDecrypting;
   }
@@ -21211,7 +21250,7 @@ const HistoryPanel = (_dec = (0,mixins.hG)(450, true), _class = class HistoryPan
         self.enableScrollbar();
       }
       delete self.loadingShown;
-      if (mb.joined === true && !self.scrollPullHistoryRetrieval && mb.haveMoreHistory() === false) {
+      if (room.historyTimedOut || mb.joined === true && !self.scrollPullHistoryRetrieval && mb.haveMoreHistory() === false) {
         let headerText = l[8002];
         headerText = contactName ? headerText.replace('%s', `<span>${megaChat.html(contactName)}</span>`) : megaChat.html(room.getRoomTitle());
         messagesList.push(REaCt().createElement("div", {

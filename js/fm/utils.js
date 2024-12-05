@@ -1310,7 +1310,7 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
                 for (let i = 1; i < pageParts.length; i++) {
                     const queryParts = pageParts[i].split('=');
                     if (queryParts[0] === 'tab') {
-                        window.mProTab = queryParts[1].split('/')[0];
+                        M.setTabAndScroll(queryParts[1].split('/')[0]);
                     }
                     if (toPage.startsWith('propay_') && (queryParts[0] === 'm')) {
                         sessionStorage['pro.period'] = queryParts[1].split('/')[0];
@@ -1409,6 +1409,17 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
             });
             return false;
         }
+    }
+};
+
+MegaUtils.prototype.setTabAndScroll = function(target) {
+    'use strict';
+    if (target === 'flexi') {
+        window.mProTab = 'pro';
+        sessionStorage.mScrollTo = 'flexi';
+    }
+    else {
+        window.mProTab = target;
     }
 };
 

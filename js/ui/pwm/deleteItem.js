@@ -36,8 +36,6 @@
                             mega.ui.pm.comm.deleteItem([mega.ui.pm.list.passwordItem.item.h])
                                 .then(() => {
                                     mega.ui.toast.show(parseHTML(l.item_deleted.replace('%1', title)));
-                                    mega.ui.pm.list.passwordItem.domNode.classList.remove('active');
-                                    return mega.ui.pm.list.loadList();
                                 })
                                 .catch(tell);
                         }
@@ -74,8 +72,6 @@
                             mega.ui.pm.comm.deleteItem(Object.keys(M.c[mega.pwmh] || []))
                                 .then(() => {
                                     mega.ui.toast.show(l.succesfull_deletion_toast);
-                                    mega.ui.pm.list.passwordItem.domNode.classList.remove('active');
-                                    return mega.ui.pm.list.loadList();
                                 })
                                 .catch(tell)
                                 .finally(() => {

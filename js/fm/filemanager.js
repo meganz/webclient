@@ -1356,6 +1356,7 @@ FileManager.prototype.updFileManagerUI = async function() {
     var newcontact = false;
     var newpath = false;
     var newshare = false;
+    var newpassword = false;
     var selnode;
     const buildtree = (n) => {
         delay(`updFileManagerUI:buildtree:${n.h}`, () => {
@@ -1385,6 +1386,9 @@ FileManager.prototype.updFileManagerUI = async function() {
         }
         if (newNode.su) {
             newshare = true;
+        }
+        if (newNode.pwm) {
+            newpassword = true;
         }
         if (newNode.p && newNode.t) {
             treebuild[newNode.p] = 1;
@@ -1500,7 +1504,7 @@ FileManager.prototype.updFileManagerUI = async function() {
             }
         }
 
-        if (UImain === 'pwm' && mega.pwmh && mega.pm && mega.pm.pwmFeature) {
+        if (newpassword && UImain === 'pwm' && mega.pwmh && mega.pm && mega.pm.pwmFeature) {
             tryCatch(() => mega.ui.pm.list.initLayout().catch(reportError))();
         }
     }

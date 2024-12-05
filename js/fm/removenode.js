@@ -69,6 +69,11 @@ function removeUInode(h, parent) {
                 $('.fm-empty-chat').removeClass('hidden');
             }
             break;
+        case "pwm":
+            if (n && n.pwm && mega.pwmh && mega.pm && mega.pm.pwmFeature) {
+                tryCatch(() => mega.ui.pm.list.initLayout().catch(reportError))();
+            }
+            break;
         case M.RubbishID:
             if (!hasSubFolders) {
                 $('#treea_' + parent).removeClass('contains-folders expanded');

@@ -14,11 +14,7 @@ class MegaPasswordList extends MegaView {
         this.passwordItem = new MegaPasswordItemDetail();
         this.domNode.append(verticalDivider, this.passwordItem.domNode);
 
-        this.show();
         this.initEmptyState();
-
-        // Required for the webclient layout
-        this.initLayout(true).catch(reportError);
 
         // Initialising banner for extension installation
         const installBanner = new MegaBanner({
@@ -67,6 +63,13 @@ class MegaPasswordList extends MegaView {
         window.addEventListener('message', messageHandler);
 
         window.postMessage({type: 'check_mega_pass_extension_installed'}, '*');
+    }
+
+    show(){
+        super.show();
+
+        // Required for the webclient layout
+        this.initLayout(true).catch(reportError);
     }
 
     /**
@@ -225,6 +228,8 @@ class MegaPasswordList extends MegaView {
                 return;
             }
 
+            mega.ui.topnav.enableSearch();
+
             this.orderList();
             this.searchList(this.searchTerm);
         }
@@ -237,11 +242,9 @@ class MegaPasswordList extends MegaView {
             this.emptyStateCopy.append(parseHTML(l.error_fetching_items));
             this.emptyStateImage.className = 'error';
             this.emptyStateAction.show();
+            mega.ui.topnav.disableSearch();
+            this.searchTerm = '';
         }
-
-        const searchBar = mega.ui.topnav.domNode.querySelector('.search-bar');
-        searchBar.querySelector('.form-element').disabled = false;
-        searchBar.classList.remove('disabled');
     }
 
     /**
@@ -433,6 +436,8 @@ class MegaPasswordList extends MegaView {
             this.emptyStateTitle.textContent = l.empty_list_title;
             this.emptyStateCopy.textContent = l.empty_list_copy;
             this.emptyStateAction.hide();
+            mega.ui.topnav.disableSearch();
+            this.searchTerm = '';
         }
 
         return this.vaultPasswords.length;
@@ -451,6 +456,7 @@ class MegaPasswordList extends MegaView {
         }
 
         if (!this.selectedItem) {
+            this.passwordItem.domNode.classList.remove('active');
             this.selectedItem = document.componentSelector('.password-list .password-item');
             mega.ui.pm.comm.saveLastSelected(this.selectedItem.domNode.id);
         }

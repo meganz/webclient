@@ -2133,6 +2133,9 @@ body.theme-dark .lhp-container .lhp-filter-tag {
   font: var(--text-body2);
   background: var(--secondary-red);
 }
+.meetings-call div.recording-control .recording-ongoing .recording-icon.clickable {
+  cursor: help;
+}
 .meetings-call div.recording-control .recording-ongoing .recording-icon i {
   display: block;
   width: 8px;
@@ -3057,6 +3060,14 @@ body.theme-dark .mega-dialog.meetings-permissions-dialog .permissions-warning-co
   visibility: visible;
 }
 
+.recording-info {
+  font: var(--text-body1);
+  color: var(--secondary-white);
+}
+.recording-info .dropdown-white-arrow {
+  left: 20px;
+}
+
 .start-meeting {
   overflow: hidden;
   height: 520px;
@@ -3968,6 +3979,9 @@ body.theme-dark .start-meeting-preview .preview-meeting {
 .meetings-alert-high {
   background: var(--secondary-red);
 }
+.meetings-alert-error {
+  background-color: var(--stroke-error);
+}
 .messages-block .meetings-alert {
   top: 12px;
   width: calc(100% - 25px);
@@ -4013,6 +4027,15 @@ body.theme-dark .start-meeting-preview .preview-meeting {
 }
 .meetings-alert.unsupported-call-alert:has(~ .conversation-panel:not(.hidden) .unsupported-call-alert-progress) {
   display: none;
+}
+.meetings-alert.history-timeout-banner .meetings-alert-content {
+  border-radius: 8px;
+  padding: 6px 40px 6px 8px;
+  width: 100%;
+}
+.meetings-alert.history-timeout-banner a {
+  float: right;
+  margin-right: 10px;
 }
 
 #schedule-dialog {
@@ -4685,6 +4708,9 @@ body.rtl .meetings-call .sidebar-wrapper .participants ul li .status {
 body.rtl .meetings-call .sidebar-wrapper .participants ul li .participants-menu-content {
   left: 0;
   right: unset;
+}
+body.rtl .meetings-call .stream-controls ul li .input-source-opener {
+  left: -20px;
 }
 body.rtl #schedule-dialog .meetings-select .mega-input .mega-input-dropdown {
   left: 0;

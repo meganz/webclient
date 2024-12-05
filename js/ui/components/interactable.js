@@ -53,12 +53,9 @@ class MegaInteractable extends MegaComponent {
 
         // Disable and enable the interactable
         this.disabled = options.disabled;
-        this.loading = false;
 
-        if (options.loadSpinner) {
-            this.on('click', e => {
-                e.currentTarget.loading = !e.currentTarget.loading;
-            });
+        if (options.loaderColor) {
+            this.loaderColor = options.loaderColor;
         }
 
         if (options.onClick) {
@@ -81,34 +78,26 @@ class MegaInteractable extends MegaComponent {
     }
 
     get loading() {
-        return !!this.domNode.querySelector('.loading');
+        return this.domNode.classList.contains('loading');
     }
 
     set loading(stateBool) {
-        stateBool |= 0;
-        if (this.loading === stateBool) {
+        if (this.loading === !!stateBool) {
             return;
         }
 
-        if (stateBool) {
-            for (let i = 0; i < this.domNode.childNodes.length; i++) {
-                this.domNode.childNodes[i].style.display = "none";
-            }
+        const sprite = this.loaderColor === 'w' ? 'uni' : 'theme';
 
-            const loading_elem = document.createElement('i');
-            loading_elem.className = 'notification-loading-spinner sprite-mobile-fm-mono icon-loader-thin-outline '
-                + 'loading';
-            this.domNode.appendChild(loading_elem);
+        if (stateBool) {
+            this.addClass('loading', `sprite-fm-${sprite}-after`, 'icon-loader-throbber-light-outline-after');
         }
         else {
-            let elem;
-            for (let i = 0; i < this.domNode.childNodes.length; i++) {
-                elem = this.domNode.childNodes[i];
-                elem.removeAttribute('style');
-                if (elem.classList.contains("loading")) {
-                    elem.remove();
-                }
-            }
+            this.removeClass(
+                'loading',
+                'sprite-fm-theme-after',
+                'sprite-fm-uni-after',
+                'icon-loader-throbber-light-outline-after'
+            );
         }
     }
 

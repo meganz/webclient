@@ -1469,6 +1469,10 @@ function showLoginDialog(email, password) {
 
         closeDialog();
 
+        if (page.startsWith('propay_')) {
+            return loadSubPage('pro');
+        }
+
         return false;
     };
 
@@ -1755,6 +1759,12 @@ function showRegisterDialog(aPromise) {
             else {
                 $('.mega-dialog.registration-page-success').removeClass('hidden');
                 fm_showoverlay();
+            }
+        },
+
+        onDialogClosed: () => {
+            if (page.includes('propay')) {
+                loadSubPage('pro');
             }
         }
     }, aPromise);

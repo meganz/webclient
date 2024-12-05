@@ -88,7 +88,7 @@ export default class Datepicker extends React.Component {
 
     render() {
         const { NAMESPACE } = Datepicker;
-        const { value, name, className, placeholder, onFocus, onChange, onBlur } = this.props;
+        const { value, name, className, placeholder, isLoading, onFocus, onChange, onBlur } = this.props;
         const formattedValue = this.formatValue(value);
 
         return (
@@ -105,6 +105,7 @@ export default class Datepicker extends React.Component {
                             ${className || ''}
                         `}
                         autoComplete="off"
+                        disabled={isLoading}
                         placeholder={placeholder || ''}
                         value={formattedValue}
                         onFocus={ev => onFocus?.(ev)}
@@ -113,7 +114,7 @@ export default class Datepicker extends React.Component {
                     />
                     <i
                         className="sprite-fm-mono icon-calendar1"
-                        onClick={() => {
+                        onClick={isLoading ? null : () => {
                             if (this.datepicker) {
                                 this.datepicker.show();
                                 this.inputRef.current?.focus();

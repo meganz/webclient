@@ -41,7 +41,6 @@
     box-shadow: var(--mobile-shadow-strong);
     box-sizing: border-box;
     padding: 11px 24px;
-    width: 100%;
 }
 
 .toast-notification > button {

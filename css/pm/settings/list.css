@@ -94,10 +94,15 @@
     }
 }
 
-@media screen  and (min-width: 1080px) {
+@media screen and (min-width: 1080px) {
+    .mega-list-item.icon-button .mega-list-item-text,
+    .mega-list-item.text-button .mega-list-item-text {
+        flex: 1 100%;
+    }
 
-    .mega-list-item.icon-button .mega-list-item-text {
-        flex: 0 1 auto;
+    .mega-list-item.icon-button .mega-list-item-right,
+    .mega-list-item.text-button .mega-list-item-right {
+        flex: 1 0 auto;
     }
 
     .mega-list-item-right .small-button {

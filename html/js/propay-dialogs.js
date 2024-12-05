@@ -1689,34 +1689,7 @@ var addressDialog = {
 
         // Change the States depending on the selected country
         var changeStates = function(selectedCountryCode) {
-
-            // If postcode translations not set, then decalre them.
-            if (!addressDialog.localePostalCodeName) {
-
-                addressDialog.localePostalCodeName = freeze({
-                    "US": "ZIP Code",
-                    "CA": "Postal Code",
-                    "PH": "ZIP Code",
-                    "DE": "PLZ",
-                    "AT": "PLZ",
-                    "IN": "Pincode",
-                    "IE": "Eircode",
-                    "BR": "CEP",
-                    "IT": "CAP"
-                });
-            }
-
-            // If selecting a country whereby the postcode is named differently, update the placeholder value.
-            if (addressDialog.localePostalCodeName[selectedCountryCode]) {
-                if ($titleElemPostCode.length) {
-                    $postcodeInput
-                        .updateTitle(addressDialog.localePostalCodeName[selectedCountryCode]);
-                }
-                else {
-                    $postcodeInput.$input.attr('placeholder', addressDialog.localePostalCodeName[selectedCountryCode]);
-                }
-            }
-            else if ($titleElemPostCode.length) {
+            if ($titleElemPostCode.length) {
                 $postcodeInput.updateTitle(l[10659]);
             }
             else {
@@ -1810,6 +1783,10 @@ var addressDialog = {
     prefillInfo: function(billingInfo) {
         'use strict';
 
+        if (this.billingInfoFilled) {
+            return;
+        }
+
         const prefillMultipleInputs = (inputs, value) => {
             if (Array.isArray(inputs)) {
                 inputs.forEach(($megaInput) => {
@@ -1886,6 +1863,8 @@ var addressDialog = {
         if (noLname) {
             fillInputFromAttr(this.lastNameMegaInput, 'lname', 'lastname');
         }
+
+        this.billingInfoFilled = true;
     },
 
     /**
@@ -1977,6 +1956,16 @@ var addressDialog = {
         'use strict';
         var self = this;
         this.$rememberDetailsCheckbox = $(".remember-billing-info-wrapper").find(".checkbox");
+
+        // If the user has not checked the remember checkbox, clear the billing info fields
+        // We won't save the billing info, but may appear to the user that we do in this case if we don't clear it
+        if (!this.$rememberDetailsCheckbox.hasClass("checkboxOn")) {
+            const $billingInfoInputs = $('.content-block.address-block .mega-input', this.$dialog);
+            $('.address1, .address2, .city, .state, .postcode, .country, .taxcode', $billingInfoInputs)
+                .val('')
+                .parent().removeClass('valued');
+        }
+
         $(".remember-billing-info, .radio-txt", this.$dialog).rebind('click.commonevent', function() {
             if (self.$rememberDetailsCheckbox.hasClass('checkboxOn')) {
                 self.$rememberDetailsCheckbox.addClass('checkboxOff').removeClass('checkboxOn');
@@ -2627,7 +2616,7 @@ var addressDialog = {
             utcResult.EUR = false;
         }
 
-        if (isStripe) {
+        if (isStripe && !((typeof utcResult.EUR === 'object') && utcResult.EUR.error)) {
             this.stripeSaleId = null;
             if (utcResult.EUR) {
                 const $stripeDialog = $('.payment-stripe-dialog').toggleClass('edit', !!utcResult.edit);
@@ -2799,6 +2788,8 @@ var addressDialog = {
      */
     showError: function(utcResult) {
 
+        let callbackFn;
+
         // Generic error: Oops, something went wrong. Please try again later.
         var message = l[200] + ' ' + l[253];
 
@@ -2815,12 +2806,11 @@ var addressDialog = {
         // You have too many incomplete payments in the last 12 hours...
         else if (utcResult.EUR.error === ETEMPUNAVAIL) {
             message = l[7982];
+            callbackFn = addressDialog.closeDialog.bind(addressDialog);
         }
 
         // Show error dialog
-        msgDialog('warninga', l[7235], message, '', function() {
-            addressDialog.showDialog();
-        });
+        msgDialog('warninga', l[7235], message, '', callbackFn || addressDialog.showDialog.bind(addressDialog));
     },
 
     /**

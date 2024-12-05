@@ -77,7 +77,19 @@ export default class Select extends MegaRenderMixin {
 
     render() {
         const { NAMESPACE } = Select;
-        const { name, className, icon, typeable, options, value, format, onChange, onBlur, onSelect } = this.props;
+        const {
+            name,
+            className,
+            icon,
+            typeable,
+            options,
+            value,
+            format,
+            isLoading,
+            onChange,
+            onBlur,
+            onSelect
+        } = this.props;
 
         return (
             <div
@@ -92,7 +104,7 @@ export default class Select extends MegaRenderMixin {
                         dropdown-input
                         ${typeable ? 'typeable' : ''}
                     `}
-                    onClick={this.handleToggle}>
+                    onClick={isLoading ? null : this.handleToggle}>
                     {typeable ? null : value && <span>{format ? format(value) : value}</span>}
                     <input
                         ref={this.inputRef}

@@ -121,7 +121,9 @@ MegaRack.getSlot = function() {
 
     /* No free toasts found */
     if (this.slotList.length >= this.maxSlots) {
-        console.error("Too many slots");
+        if (d) {
+            console.warn("Too many slots");
+        }
         return false;
     }
 

@@ -74,7 +74,7 @@ class Participant extends MegaRenderMixin {
                         <Emoji>{`${name} ${l.me}`}</Emoji> :
                         <ContactAwareName contact={M.u[handle]} emoji={true}/>
                     }
-                    {chatRoom.isMeeting && Call.isModerator(chatRoom, handle) &&
+                    {Call.isModerator(chatRoom, handle) &&
                         <span>
                             <i className={`${this.baseIconClass} icon-admin-outline`}/>
                         </span>
@@ -349,7 +349,7 @@ export default class Participants extends MegaRenderMixin {
                                             ${megaChat.userPresenceToCssClass(contact.presence)}
                                         `}
                                         />
-                                        {chatRoom.isMeeting && Call.isModerator(chatRoom, handle) &&
+                                        {Call.isModerator(chatRoom, handle) &&
                                             <span>
                                                 <i className="sprite-fm-mono icon-admin-outline"/>
                                             </span>

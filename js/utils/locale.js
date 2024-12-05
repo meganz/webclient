@@ -1841,10 +1841,6 @@ mBroadcaster.once('boot_done', function populate_l() {
         .replace(/\[S\d]/g, '<span>')
         .replace(/\[\/S\d]/g, '</span>');
 
-    l.logout_recovery_key = escapeHTML(l.logout_recovery_key)
-        .replace('[A]', `<a href="${recoveryKeyLink}" target="_blank">`)
-        .replace('[/A]', '</a>');
-
     l.invite_subject_text = escapeHTML(encodeURIComponent(l.invite_subject_text));
     l.available_commission_tip = escapeHTML(l.available_commission_tip)
         .replace('[A]', '<a class="clickurl" href="/pro">').replace('[/A]', '</a>');
@@ -1993,6 +1989,10 @@ mBroadcaster.once('boot_done', function populate_l() {
     l.select_file_notes = escapeHTML(l.select_file_notes)
         .replace('[B]', '<b>')
         .replace('[/B]', '</b>');
+
+    l.import_notes = escapeHTML(l.import_notes)
+        .replace('[A]', `<a href="https://help.mega.io/pass/features/import-passwords" target="_blank">`)
+        .replace('[/A]', '</a>');
 
     l.referral_close_full = escapeHTML(l.referral_close_full)
         .replace('[A]', '<a href="https://mega.io/refer" target="_blank" class="clickurl">')

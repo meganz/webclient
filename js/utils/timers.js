@@ -153,6 +153,7 @@ lazy(self, 'tSleep', function tSleep() {
     const pending = new Set();
     const symbol = Symbol('^^tSleep::scheduler~~');
 
+    let pid = 0;
     let tid = null;
     let threshold = MAX_THRESHOLD;
 
@@ -181,6 +182,11 @@ lazy(self, 'tSleep', function tSleep() {
             if (self.d > 2) {
                 console.warn(`tSleep rescheduled for ${threshold | 0}ms`, pending);
             }
+            if (document.hidden && self.tSleep !== self.sleep) {
+                tid = -1;
+                const xid = ++pid;
+                return sleep(threshold / 1e3).then(() => xid === pid && dequeue());
+            }
             tid = gSetTimeout(dequeue, threshold);
         }
     };
@@ -201,7 +207,7 @@ lazy(self, 'tSleep', function tSleep() {
         resolve.now = performance.now();
         pending.add(resolve);
 
-        if (ts < threshold || !tid) {
+        if (ts + (RFP_THRESHOLD >> 1) < threshold || !tid) {
 
             dispatcher();
         }
@@ -456,13 +462,13 @@ lazy(self, 'sleep', function sleep() {
         }
     };
 
-    Promise.race([
+    Promise.resolve().then(() => Promise.race([
         mega.worklet, tSleep(11).then(() => {
             if (!worklet.ready) {
                 throw new SecurityError('Timed out.');
             }
         })
-    ]).then((ctx) => {
+    ])).then((ctx) => {
         // override as the only class instance.
         worklet = new worklet(ctx);
     }).catch(ex => {
@@ -516,6 +522,19 @@ lazy(self, 'sleep', function sleep() {
 
     /** @property mega.worklet */
     lazy(mega, 'worklet', function worklet() {
+        let done = 0;
+        const sleep = async(v) => {
+            const now = performance.now();
+
+            do {
+                (await mutex.lock(`mWorklet[trap]`))();
+                if (done) {
+                    break;
+                }
+                await fetch(`${apipath}wsc/_U4TFs5ASSag_yAtCFUWog&sn=qSJxhDnGfmw`).catch(nop);
+            }
+            while (performance.now() - now < v * 1e3);
+        };
         return Promise.resolve((async() => {
             ctx = ctx || new AudioContext();
 
@@ -523,7 +542,8 @@ lazy(self, 'sleep', function sleep() {
                 if (d) {
                     console.warn('[AudioWorklet] context state is %s...', ctx.state);
                 }
-                await Promise.resolve(ctx.resume()).catch(dump);
+                await Promise.race([sleep(4), ctx.resume()]).catch(dump);
+                done = 1;
 
                 if (ctx.state !== 'running') {
                     throw new SecurityError(`The AudioContext was not allowed to start (${ctx.state})`);
@@ -552,9 +572,9 @@ mBroadcaster.once('boot_done', tryCatch(() => {
     const logger = new MegaLogger(`GTR:${pid.toString(16)}`);
     const dump = (ex) => logger.error(ex, reportError(ex));
 
-    const IDLE_TIMEOUT = freeze({timeout: 100});
+    const IDLE_TIMEOUT = freeze({delay: 100});
     const IDLE_PIPELINE = {ts: 0, pid: 0, tasks: []};
-    const IDLE_THRESHOLD = IDLE_TIMEOUT.timeout << 4;
+    const IDLE_THRESHOLD = IDLE_TIMEOUT.delay << 2;
 
     const idleCallbackTaskSorter = (a, b) => b.ms - a.ms || b.pri - a.pri;
 
@@ -623,11 +643,14 @@ mBroadcaster.once('boot_done', tryCatch(() => {
         IDLE_PIPELINE.tasks.push(task);
 
         if (!IDLE_PIPELINE.pid) {
-            if (lax > 1 && !document.hidden) {
+            if (document.hidden) {
+                IDLE_PIPELINE.pid = sleep((IDLE_THRESHOLD - 50) / 1e3).then(idleCallbackHandler);
+            }
+            else if (lax > 1) {
                 IDLE_PIPELINE.pid = requestAnimationFrame(idleCallbackHandler);
             }
             else {
-                IDLE_PIPELINE.pid = requestIdleCallback(idleCallbackHandler, IDLE_TIMEOUT);
+                IDLE_PIPELINE.pid = scheduler.postTask(idleCallbackHandler, IDLE_TIMEOUT);
             }
             IDLE_PIPELINE.ts = performance.now();
         }

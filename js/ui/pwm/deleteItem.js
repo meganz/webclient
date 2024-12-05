@@ -5,7 +5,7 @@
         return {
             showConfirm() {
                 if (!navigator.onLine) {
-                    this.checkConnection();
+                    this.showConnectionErrorDialog();
                     return;
                 }
 
@@ -19,7 +19,7 @@
                     {
                         onSuccess: () => {
                             if (!navigator.onLine) {
-                                this.checkConnection();
+                                this.showConnectionErrorDialog();
                                 return;
                             }
 
@@ -33,27 +33,13 @@
                                                     mega.ui.pm.list.vaultPasswords[newSelectedId].h;
 
                             mega.ui.pm.comm.saveLastSelected(newSelected);
-                            mega.ui.pm.comm.deleteItem(mega.ui.pm.list.passwordItem.item.h)
+                            mega.ui.pm.comm.deleteItem([mega.ui.pm.list.passwordItem.item.h])
                                 .then(() => {
                                     mega.ui.toast.show(parseHTML(l.item_deleted.replace('%1', title)));
                                     mega.ui.pm.list.passwordItem.domNode.classList.remove('active');
                                     return mega.ui.pm.list.loadList();
                                 })
-                                .catch((ex) => {
-                                    // show dialog on api request errors
-                                    megaMsgDialog.render(
-                                        l.unsuccessful_action,
-                                        l.request_failed,
-                                        `${l.error_code}: ${ex}`,
-                                        '',
-                                        {
-                                            icon: 'sprite-pm-mono icon-alert-triangle-thin-outline warning',
-                                            buttons: [l.ok_button]
-                                        },
-                                        false,
-                                        true
-                                    );
-                                });
+                                .catch(tell);
                         }
                     },
                     {
@@ -64,7 +50,50 @@
                 );
             },
 
-            checkConnection() {
+            showConfirmAll(currentTarget) {
+                if (!navigator.onLine) {
+                    this.showConnectionErrorDialog();
+                    return;
+                }
+
+                megaMsgDialog.render(
+                    parseHTML(`<h2 class="text-container">${l.delete_all_dialog_title}</h2>`),
+                    l.delete_all_dialog_msg,
+                    '',
+                    {
+                        onSuccess: () => {
+                            if (!navigator.onLine) {
+                                this.showConnectionErrorDialog();
+                                return;
+                            }
+
+                            eventlog(500602);
+
+                            currentTarget.loading = true;
+
+                            mega.ui.pm.comm.deleteItem(Object.keys(M.c[mega.pwmh] || []))
+                                .then(() => {
+                                    mega.ui.toast.show(l.succesfull_deletion_toast);
+                                    mega.ui.pm.list.passwordItem.domNode.classList.remove('active');
+                                    return mega.ui.pm.list.loadList();
+                                })
+                                .catch(tell)
+                                .finally(() => {
+                                    currentTarget.loading = false;
+                                });
+                        }
+                    },
+                    {
+                        icon: 'sprite-pm-mono icon-x-circle-thin-outline error',
+                        buttons: [l.delete_item, l[82]],
+                        confirmButtonClass: 'destructive'
+                    },
+                    false,
+                    true
+                );
+            },
+
+            showConnectionErrorDialog() {
                 megaMsgDialog.render(
                     l.unable_to_delete,
                     l.check_connection,

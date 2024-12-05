@@ -311,7 +311,7 @@ def download_languages(resource, lang = []):
 
 def get_branch_resource_name(is_upload = False, is_force = False, is_override = False):
     branch_name = subprocess.check_output(['git', 'symbolic-ref', '--short','-q','HEAD'], universal_newlines=True).strip()
-    branch_resource_name =  RESOURCE + "-" + re.sub('[^A-Za-z0-9]+', '', branch_name)
+    branch_resource_name =  RESOURCE + "-" + re.sub('[^A-Za-z0-9]+', '', branch_name).lower()
     if branch_name in ["master", "develop"]:
         if is_upload:
             if is_override:

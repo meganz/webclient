@@ -936,8 +936,8 @@ table.fm .thumb .item-type-icon img {
 }
 .files-grid-view.user-management-view .user-management-list-table tbody tr td .icon-wrapper {
     display: inline-block;
-    -webkit-margin-start: 8px;
-    margin-inline-start: 8px;
+    -webkit-margin-end: 8px;
+    margin-inline-end: 8px;
     position: relative;
     cursor: pointer;
 }

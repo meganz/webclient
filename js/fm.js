@@ -914,12 +914,7 @@ function doClearbin(all) {
     msgDialog('clear-bin', l[14], l[15], l[1007], function(e) {
 
         if (e) {
-            M.clearRubbish(all).catch(dump).finally(() => {
-                if (mega.rewind) {
-                    eventlog(500531);
-                    mega.rewind.showRewindPromoDialog();
-                }
-            });
+            M.clearRubbish(all).catch(dump);
         }
     });
 }
@@ -2943,7 +2938,7 @@ function closeDialog(ev) {
         }
     }
 
-    if ($.dialog === 'prd') {
+    if ($.dialog === 'recoverykey-logout-overlay') {
         // PasswordReminderDialog manages its own states, so don't do anything.
         return;
     }

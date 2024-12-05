@@ -1742,6 +1742,23 @@ lazy(self, 'api', () => {
                 promise = promise.finally(() => inflight.remove(key));
             }
 
+            if (observers.hooks) {
+                const {channel, service} = instance;
+                for (let i = observers.hooks.length; i--;) {
+                    const res = observers.hooks[i]({channel, service, payload});
+
+                    if (res === false) {
+                        observers.hooks.splice(i, 1);
+                        if (!observers.hooks.length) {
+                            delete observers.hooks;
+                        }
+                    }
+                    else if (typeof res === 'function') {
+                        promise = promise.then(res);
+                    }
+                }
+            }
+
             return promise;
         },
 
@@ -2313,7 +2330,12 @@ lazy(self, 'api', () => {
          * @memberOf api
          */
         observe(what, callback) {
-            observers.set(what, callback);
+            observers.set(what, tryCatch(callback));
+
+            if (what === 'setsid' && apixs[2] && apixs[2].sid.endsWith(self.u_sid)) {
+                // sid already available, notify.
+                this.notify(what, self.u_sid);
+            }
         },
 
         /**
@@ -2325,11 +2347,31 @@ lazy(self, 'api', () => {
          * @private
          */
         notify(what, data) {
-            delay(`api:event-notify.${what}`, () => {
-                observers.find(what, (callback) => {
-                    queueMicrotask(callback.bind(null, data));
+
+            if (!observers[what] && observers.has(what)) {
+
+                queueMicrotask(() => {
+                    delete observers[what];
+
+                    observers.find(what, (callback) => {
+
+                        callback(data);
+                    });
                 });
-            });
+                observers[what] = 1;
+            }
+        },
+
+        /**
+         * Watcher for API requests.
+         * @param {Function} cb hook
+         * @memberOf api
+         */
+        hook(cb) {
+            if (!observers.hooks) {
+                observers.hooks = [];
+            }
+            observers.hooks.push(tryCatch(cb));
         },
 
         /**

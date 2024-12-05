@@ -2896,7 +2896,6 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
         GalleryNodeBlock.thumbCache = Object.create(null);
     }
 
-    const thumbSize = 240;
     const keys = [];
     const thumbBlocks = {};
 
@@ -2922,18 +2921,23 @@ MegaGallery.addThumbnails = (nodeBlocks) => {
             mega.gallery.pendingFaBlocks[h][width] = nodeBlocks[i];
             continue;
         }
-        else if (width <= thumbSize) {
-            if (thumbBlocks[nodeBlocks[i].node.h]) {
-                thumbBlocks[nodeBlocks[i].node.h].push(nodeBlocks[i]);
+        else if (width <= MEGAImageElement.THUMBNAIL_SIZE) {
+            const urlCache = thumbnails.get(fa);
+
+            if (urlCache) {
+                nodeBlocks[i].setThumb(urlCache, fa);
+            }
+            else if (thumbBlocks[h]) {
+                thumbBlocks[h].push(nodeBlocks[i]);
             }
             else {
-                thumbBlocks[nodeBlocks[i].node.h] = [nodeBlocks[i]];
+                thumbBlocks[h] = [nodeBlocks[i]];
             }
             continue;
         }
 
         if (GalleryNodeBlock.thumbCache[key]) {
-            nodeBlocks[i].setThumb(GalleryNodeBlock.thumbCache[key], nodeBlocks[i].node.fa);
+            nodeBlocks[i].setThumb(GalleryNodeBlock.thumbCache[key], fa);
             continue;
         }
 
@@ -3109,25 +3113,30 @@ MegaGallery.handleResize = SoonFc(200, (entries) => {
     }
 });
 
-MegaGallery.dbAction = () => {
+MegaGallery.dbAction = async(p) => {
     'use strict';
 
     if (fmdb && fmdb.db !== null && fmdb.crashed !== 666) {
-        const ignoreHandles = MegaGallery.handlesArrToObj([
-            ...M.getTreeHandles('shares'),
-            ...M.getTreeHandles(M.RubbishID)
-        ]);
+        const res = [];
+        const parents = Object.create(null);
 
-        return fmdb.getbykey(
-            'f',
-            {
-                query: db => db.where('fa').notEqual(fmdb.toStore('')),
-                include: ({p}) => !ignoreHandles[p]
+        p = p || M.RootID;
+        await dbfetch.media(9e3, (r) => {
+            for (let i = r.length; i--;) {
+                const n = r[i];
+
+                if (!parents[n.p]) {
+                    parents[n.p] = 1 + (M.getNodeRoot(n.p) === p);
+                }
+                if (parents[n.p] > 1) {
+                    res.push(n);
+                }
             }
-        );
+        });
+        return res;
     }
 
-    return Promise.reject();
+    throw new Error('FMDB Unavailable.');
 };
 
 MegaGallery.handlesArrToObj = (array) => {

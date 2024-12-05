@@ -3,7 +3,7 @@
 
     class MegaPasswordGenerator {
         constructor() {
-            this.dialog = new MegaMobileSheet({
+            this.dialog = new MegaSheet({
                 parentNode: document.body,
                 componentClassname: 'mega-sheet password-generator',
                 wrapperClassname: 'sheet'

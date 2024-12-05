@@ -1061,6 +1061,11 @@ function MessagesBuff(chatRoom, chatdInt) {
             delete self.$isDecryptingSharedFiles;
         }
 
+        if (chatRoom.historyTimedOut) {
+            chatRoom.historyTimedOut = false;
+            chatRoom.trigger('onHistTimeoutChange');
+        }
+
         chatRoom.trigger('onHistoryDecryptedDone');
     });
 
@@ -1184,6 +1189,10 @@ function MessagesBuff(chatRoom, chatdInt) {
                 // chat was active, when initial loading finished...request more messages
                 chatRoom.trigger('onChatShown.mb');
             }
+        }
+        if (chatRoom.historyTimedOut) {
+            chatRoom.historyTimedOut = false;
+            chatRoom.trigger('onHistTimeoutChange');
         }
     });
 

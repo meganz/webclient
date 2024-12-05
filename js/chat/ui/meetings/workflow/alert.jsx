@@ -11,6 +11,7 @@ export default class Alert extends MegaRenderMixin {
         NEUTRAL: 'neutral',
         MEDIUM: 'medium',
         HIGH: 'high',
+        ERROR: 'error'
     };
 
     componentWillUnmount() {

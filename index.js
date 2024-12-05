@@ -1367,21 +1367,13 @@ function init_page() {
         }
     }
     else if (page.substr(0, 7) === 'payment') {
-        var isBussiness = page.indexOf('-b') !== -1;
-
-        if (!isBussiness || is_mobile) {
-            // Load the Pro page in the background
-            parsepage(pages.proplan);
-            if (!isBussiness) {
-                pro.proplan.init();
-            }
-        }
-        else {
+        // If its a business page, redirect to .io/business
+        if (page.includes('-b')) {
             mega.redirect('mega.io', 'business', false, false);
         }
-
-        // Process the return URL from the payment provider and show a success/failure dialog if applicable
-        pro.proplan.processReturnUrlFromProvider(page);
+        else {
+            loadSubPage('pro');
+        }
     }
     else if (page === 'thanks') {
         let $dialogOverlay = $('.thankyou-dialog').removeClass('hidden');
@@ -3399,6 +3391,16 @@ mBroadcaster.once('boot_done', () => {
                 navigator.serviceWorker.register(`${is_extension ? '' : '/'}sw.js?v=1`).catch(dump);
             }
         }));
+    }
+
+    if (self.d > 0 && u_storage.apiHook) {
+        const stub = (cmd) => ({payload: {a}}) => {
+            if (cmd === a) {
+                console.warn(`caught(${a})`);
+                // debugger;
+            }
+        };
+        String(u_storage.apiHook).split(',').forEach((cmd) => api.hook(stub(cmd)));
     }
 
     if (!u_sid) {

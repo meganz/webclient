@@ -14,22 +14,21 @@ function BusinessAccountUI() {
     else {
         this.business = mega.buinsessController;
         this.initialized = true;
-        if (u_handle && u_attr) {
-
-            this.currAdmin = {
-                u: u_handle,
-                p: u_attr.b ? u_attr.b.bu : u_handle, // Parent account (for Pro Flexi there's only the current acct)
-                s: 0,
-                e: u_attr.email,
-                firstname: base64urlencode(to8(u_attr.firstname)),
-                lastname: base64urlencode(to8(u_attr.lastname)),
-                position: null,
-                idnum: null,
-                phonenum: null,
-                location: null,
-                isAdmin: true
-            };
-        }
+    }
+    if (u_handle && u_attr) {
+        this.currAdmin = {
+            u: u_handle,
+            p: u_attr.b ? u_attr.b.bu : u_handle, // Parent account (for Pro Flexi there's only the current acct)
+            s: 0,
+            e: u_attr.email,
+            firstname: base64urlencode(to8(u_attr.firstname)),
+            lastname: base64urlencode(to8(u_attr.lastname)),
+            position: null,
+            idnum: null,
+            phonenum: null,
+            location: null,
+            isAdmin: true
+        };
     }
 
     var mySelf = this;
@@ -590,7 +589,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
                     return;
                 }
 
-                if (!mySelf.checkCu25519(userHandle, mySelf.viewSubAccountInfoUI.bind(mySelf))) {
+                if (!mySelf.checkCu25519(userHandle, disableEnableSubUserClickHandler.bind(this))) {
                     return false;
                 }
 
@@ -746,7 +745,7 @@ BusinessAccountUI.prototype.viewSubAccountListUI = function (subAccounts, isBloc
 /**
  * get the status string of a sub-user
  * @param {Number} statusCode       a number represents the status code of a sub-user
- * @returns {String}                the status string (Active, disabled ...etc)
+ * @returns {String}                the status string (Active, deactivated ...etc)
  */
 BusinessAccountUI.prototype.subUserStatus = function (statusCode) {
     "use strict";
@@ -757,7 +756,7 @@ BusinessAccountUI.prototype.subUserStatus = function (statusCode) {
         return l[7379]; // pending
     }
     else if (statusCode === 11) {
-        return l.sub_user_disabled; // disabled
+        return l.sub_user_deactivated; // deactivated
     }
     else if (statusCode === 12) {
         return l[7376]; // deleted
@@ -3698,7 +3697,7 @@ BusinessAccountUI.prototype.showResetPasswordSubUserDialog = function(subUserHan
 
             })
             .catch((ex) => {
-                msgDialog('info', '', l[22082], api.strerror(ex));
+                msgDialog('info', '', l[22082], ex === ENOENT ? l.err_miss_sub_pw_reset : api.strerror(ex));
             });
     });
 

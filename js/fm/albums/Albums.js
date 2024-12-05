@@ -111,10 +111,10 @@ lazy(mega.gallery, 'albums', () => {
      * Launching the slideshow right away (in fullscreen mode)
      * @param {String} albumId Album ID
      * @param {Boolean} useFullscreen Skipping videos and playing in the fullscreen
-     * @param {Boolean} autoplay Whether to start the slideshow right away or not
+     * @param {Boolean} asVideo Whether to run the slideshow as a video player
      * @returns {void}
      */
-    scope.playSlideshow = (albumId, useFullscreen, autoplay) => {
+    scope.playSlideshow = (albumId, useFullscreen, asVideo) => {
         if (M.isInvalidUserStatus()) {
             return;
         }
@@ -125,16 +125,27 @@ lazy(mega.gallery, 'albums', () => {
             const selHandles = (scope.albums.grid && scope.albums.grid.timeline)
                 ? Object.keys(scope.albums.grid.timeline.selections)
                 : [];
-            const firstNode = (selHandles.length)
-                ? album.nodes.find((n) => scope.albums.grid.timeline.selections[n.h] && scope.isPreviewable(n))
-                : album.nodes.find((n) => !scope.isVideo(n) && scope.isPreviewable(n));
+            let firstNode = null;
+
+            const canBePlayed = n => scope.isPreviewable(n) && !scope.isVideo(n);
+
+            if (asVideo) {
+                $.autoplay = true;
+                firstNode = album.nodes.find(n => scope.albums.grid.timeline.selections[n.h] && scope.isVideo(n));
+            }
+            else if (selHandles.length) {
+                firstNode = album.nodes.find(n => scope.albums.grid.timeline.selections[n.h] && canBePlayed(n));
+            }
+            else {
+                firstNode = album.nodes.find(canBePlayed);
+            }
 
             if (!firstNode) {
                 console.warn('Could not find the first node for the slideshow...');
                 return;
             }
 
-            if (autoplay) {
+            if (asVideo) {
                 $.autoplay = firstNode.h;
             }
 
@@ -341,10 +352,10 @@ lazy(mega.gallery, 'albums', () => {
     /**
      * @returns {String[]}
      */
-    const unwantedHandles = () => MegaGallery.handlesArrToObj([
+    const unwantedHandles = tryCatch(() => MegaGallery.handlesArrToObj([
         ...M.getTreeHandles(M.RubbishID),
         ...M.getTreeHandles('shares')
-    ]);
+    ]));
 
     /**
      * Trimming name if it is too long
@@ -2193,10 +2204,8 @@ lazy(mega.gallery, 'albums', () => {
                             content: selections.length > 1
                                 ? mega.icu.format(l.added_items_to_albums, handles.length)
                                     .replace('%s', mega.icu.format(l.albums_count, selections.length))
-                                : handles.length > 1
-                                    ? mega.icu.format(l.added_items_to_album, handles.length)
-                                        .replace('%s', scope.albums.store[selections[0]].label)
-                                : l.added_item_to_album.replace('%s', scope.albums.store[selections[0]].label)
+                                : mega.icu.format(l.added_items_to_album, handles.length)
+                                    .replace('%s', limitNameLength(scope.albums.store[selections[0]].label))
                         });
                     }
                 },
@@ -4368,7 +4377,7 @@ lazy(mega.gallery, 'albums', () => {
             }
             else {
                 const fmNodes = Object.values(M.d);
-                const ignoreHandles = unwantedHandles();
+                const ignoreHandles = unwantedHandles() || false;
 
                 for (let i = 0; i < fmNodes.length; i++) {
                     if (!scope.isGalleryNode(fmNodes[i])) {
@@ -4600,7 +4609,7 @@ lazy(mega.gallery, 'albums', () => {
                     return [];
                 }
 
-                const ignoreHandles = unwantedHandles();
+                const ignoreHandles = unwantedHandles() || false;
 
                 for (let i = 0; i < sets.length; i++) {
                     albums.push(this.createAlbumData(sets[i], ignoreHandles));
@@ -4666,11 +4675,11 @@ lazy(mega.gallery, 'albums', () => {
 
         /**
          * @param {Object.<String, any>} data Set data to process
-         * @param {Object.<String, Boolean>} ignoreHandles Handles to ignore when add to the album
+         * @param {String[]|*} ignoreHandles Handles to ignore when add to the album
          * @param {Boolean} [isPublic] Whether the specified key is encrypted
-         * @returns {void}
+         * @returns {Object}
          */
-        createAlbumData({ e, at, k, id, ts, p, cts }, ignoreHandles, isPublic) {
+        createAlbumData({e, at, k, id, ts, p, cts}, ignoreHandles = false, isPublic = false) {
             const attr = at === '' || !at ? {} : isPublic
                 ? mega.sets.decryptPublicSetAttr(at, k)
                 : mega.sets.decryptSetAttr(at, k);
@@ -5177,19 +5186,12 @@ lazy(mega.gallery, 'albums', () => {
              * @returns {void}
              */
             const parseNodes = (nodes, skipDbFetch) => {
-                const ignoreHandles = unwantedHandles();
                 const handles = [];
 
                 if (Array.isArray(nodes)) {
                     for (let i = 0; i < nodes.length; i++) {
-                        if (!scope.isGalleryNode(nodes[i])) {
-                            continue;
-                        }
-
-                        const { fa, s, p, h, fv } = nodes[i];
-
-                        if (fa && s && !ignoreHandles[p] && !fv) {
-                            handles.push(h);
+                        if (scope.isGalleryNode(nodes[i])) {
+                            handles.push(nodes[i].h);
                         }
                     }
                 }
@@ -5210,7 +5212,8 @@ lazy(mega.gallery, 'albums', () => {
                 .then(parseNodes)
                 .catch(() => {
                     console.warn('Local DB failed. Fetching nodes from memory...');
-                    parseNodes(Object.values(M.d), true);
+                    const ignoreHandles = unwantedHandles() || false;
+                    parseNodes(Object.values(M.d).filter((n) => n.fa && !n.fv && !ignoreHandles[n.p]), true);
                 });
         }
 

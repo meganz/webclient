@@ -664,7 +664,7 @@ function createTimeoutPromise(validateFunction, tick, timeout, waitForPromise, n
                 }
 
                 while (running) {
-                    await sleep(int);
+                    await tSleep(int);
 
                     if (debug) {
                         const now = performance.now();
@@ -1549,7 +1549,7 @@ function mLogout(aCallback, force) {
                 if (window.waitsc) {
                     waitsc.stop();
                 }
-                return Promise.resolve(mega.ui.passwordReminderDialog.recheckLogoutDialog()).then(() => true);
+                return mega.ui.passwordReminderDialog.recheckLogoutDialog();
             }
             return proceed;
         })
@@ -2598,7 +2598,7 @@ function getTaxName(countryCode) {
         case "AU": return "GST";
         case "BO": return "IVA";
         case "BA": return "PDV";
-        case "BR": return "ICMS";
+        case "BR": return "CPF/CNPJ";
         case "CA": return "GST";
         case "CL": return "IVA";
         case "CO": return "IVA";

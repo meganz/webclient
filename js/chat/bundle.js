@@ -3585,7 +3585,8 @@ const ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, c
     activeCallIds: null,
     meetingsLoading: null,
     options: {},
-    scheduledMeeting: undefined
+    scheduledMeeting: undefined,
+    historyTimedOut: false
   });
   this.roomId = roomId;
   this.instanceIndex = ChatRoom.INSTANCE_INDEX++;
@@ -3826,6 +3827,8 @@ const ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, c
       if (d) {
         self.logger.warn("Timed out waiting to load hist for:", self.chatId || self.roomId);
       }
+      this.historyTimedOut = true;
+      this.trigger('onHistTimeoutChange');
       timer = null;
       _historyIsAvailable(false);
     });
@@ -12123,7 +12126,8 @@ Alert.TYPE = {
   LIGHT: 'light',
   NEUTRAL: 'neutral',
   MEDIUM: 'medium',
-  HIGH: 'high'
+  HIGH: 'high',
+  ERROR: 'error'
 };
 // EXTERNAL MODULE: ./js/chat/ui/meetings/schedule/helpers.jsx
 const helpers = REQ_(110);
@@ -12599,6 +12603,11 @@ let conversationpanel_dec, _dec2, conversationpanel_class;
 const ENABLE_GROUP_CALLING_FLAG = true;
 const MAX_USERS_CHAT_PRIVATE = 100;
 const ALERTS_BASE_OFFSET = 4;
+const DISMISS_TRANSITIONS = {
+  NOT_SHOWN: 0,
+  SHOWN: 1,
+  DISMISSED: 2
+};
 class EndCallButton extends mixins.w9 {
   constructor(...args) {
     super(...args);
@@ -12707,9 +12716,10 @@ class EndCallButton extends mixins.w9 {
         });
       }
       return this.renderButton({
-        label: peers ? l[5883] : l[5884],
-        onClick: () => call.hangUp()
-      });
+          label: peers ? l[5883] : l[5884],
+          onClick: () => call.hangUp()
+        })
+      ;
     }
     if (chatRoom.havePendingGroupCall()) {
       return this.IS_MODERATOR ? this.renderButton({
@@ -13656,7 +13666,8 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
       descriptionDialog: false,
       occurrencesLoading: false,
       waitingRoom: false,
-      callUserLimit: false
+      callUserLimit: false,
+      historyTimeOutBanner: DISMISS_TRANSITIONS.NOT_SHOWN
     };
     const {
       chatRoom
@@ -13830,6 +13841,17 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
         });
       }
     });
+    chatRoom.rebind(`onHistTimeoutChange.${this.getUniqueId()}`, () => {
+      if (this.state.historyTimeOutBanner === DISMISS_TRANSITIONS.NOT_SHOWN && chatRoom.historyTimedOut) {
+        this.setState({
+          historyTimeOutBanner: DISMISS_TRANSITIONS.SHOWN
+        });
+      } else if (this.state.historyTimeOutBanner && !chatRoom.historyTimedOut) {
+        this.setState({
+          historyTimeOutBanner: DISMISS_TRANSITIONS.NOT_SHOWN
+        });
+      }
+    });
     if (chatRoom.options.w) {
       chatRoom.rebind(`onMembersUpdated.${this.getUniqueId()}`, (ev, {
         userId,
@@ -13893,6 +13915,7 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
     this.props.chatRoom.unbind(`wrOnJoinNotAllowed.${this.getUniqueId()}`);
     this.props.chatRoom.unbind(`wrOnJoinAllowed.${this.getUniqueId()}`);
     megaChat.unbind(`onIncomingCall.${this.getUniqueId()}`);
+    this.props.chatRoom.unbind(`onHistTimeoutChange.${this.getUniqueId()}`);
   }
   componentDidUpdate(prevProps, prevState) {
     const self = this;
@@ -14707,6 +14730,20 @@ const ConversationPanel = (conversationpanel_dec = utils.Ay.SoonFcWrap(360), _de
       onClose: () => this.setState({
         invalidKeysBanner: false
       })
+    }), this.state.historyTimeOutBanner === DISMISS_TRANSITIONS.SHOWN && REaCt().createElement(Alert, {
+      type: Alert.TYPE.ERROR,
+      className: `
+                                    ${megaChat.chatUIFlags.convPanelCollapse ? 'full-span' : ''}
+                                    ${this.props.offset === ALERTS_BASE_OFFSET ? 'single_alert' : ''}
+                                    history-timeout-banner
+                                `,
+      offset: this.props.offset === ALERTS_BASE_OFFSET ? 0 : this.props.offset,
+      content: REaCt().createElement(REaCt().Fragment, null, l.chat_timeout_banner, REaCt().createElement("a", {
+        onClick: () => location.reload()
+      }, l[85])),
+      onClose: () => this.setState({
+        historyTimeOutBanner: DISMISS_TRANSITIONS.DISMISSED
+      })
     }), REaCt().createElement(historyPanel.A, (0,esm_extends.A)({}, this.props, {
       onMessagesListScrollableMount: mls => {
         this.messagesListScrollable = mls;
@@ -15403,6 +15440,10 @@ class Invite extends mixins.w9 {
   }
   render() {
     const {
+      className,
+      isLoading
+    } = this.props;
+    const {
       value,
       expanded,
       loading,
@@ -15412,13 +15453,15 @@ class Invite extends mixins.w9 {
       ref: this.containerRef,
       className: `
                     ${Invite.NAMESPACE}
-                    ${this.props.className || ''}
+                    ${className || ''}
                 `
     }, REaCt().createElement("div", {
       className: "multiple-input"
     }, REaCt().createElement("ul", {
       className: "token-input-list-mega",
-      onClick: ev => ev.target.classList.contains('token-input-list-mega') && this.setState({
+      onClick: ({
+        target
+      }) => isLoading ? null : target.classList.contains('token-input-list-mega') && this.setState({
         expanded: true
       })
     }, selected.map(handle => {
@@ -15435,7 +15478,7 @@ class Invite extends mixins.w9 {
         overflow: true
       }), REaCt().createElement("i", {
         className: "sprite-fm-mono icon-close-component",
-        onClick: () => this.handleSelect({
+        onClick: () => isLoading ? null : this.handleSelect({
           userHandle: handle
         })
       })));
@@ -15446,6 +15489,7 @@ class Invite extends mixins.w9 {
       type: "text",
       name: "participants",
       className: `${Invite.NAMESPACE}-input`,
+      disabled: isLoading,
       autoComplete: "off",
       placeholder: selected.length ? '' : l.schedule_participant_input,
       value,
@@ -15553,6 +15597,7 @@ class Datepicker extends REaCt().Component {
       name,
       className,
       placeholder,
+      isLoading,
       onFocus,
       onChange,
       onBlur
@@ -15572,6 +15617,7 @@ class Datepicker extends REaCt().Component {
                             ${className || ''}
                         `,
       autoComplete: "off",
+      disabled: isLoading,
       placeholder: placeholder || '',
       value: formattedValue,
       onFocus: ev => onFocus == null ? void 0 : onFocus(ev),
@@ -15579,7 +15625,7 @@ class Datepicker extends REaCt().Component {
       onBlur: ev => onBlur == null ? void 0 : onBlur(ev)
     }), REaCt().createElement("i", {
       className: "sprite-fm-mono icon-calendar1",
-      onClick: () => {
+      onClick: isLoading ? null : () => {
         if (this.datepicker) {
           let _this$inputRef$curren;
           this.datepicker.show();
@@ -15681,6 +15727,7 @@ class Select extends mixins.w9 {
       options,
       value,
       format,
+      isLoading,
       onChange,
       onBlur,
       onSelect
@@ -15697,7 +15744,7 @@ class Select extends mixins.w9 {
                         dropdown-input
                         ${typeable ? 'typeable' : ''}
                     `,
-      onClick: this.handleToggle
+      onClick: isLoading ? null : this.handleToggle
     }, typeable ? null : value && REaCt().createElement("span", null, format ? format(value) : value), REaCt().createElement("input", {
       ref: this.inputRef,
       type: "text",
@@ -15839,6 +15886,7 @@ class DateTime extends REaCt().Component {
     return REaCt().createElement(REaCt().Fragment, null, label && REaCt().createElement("span", null, label), REaCt().createElement(Datepicker, {
       name: `${Datepicker.NAMESPACE}-${name}`,
       className: isLoading ? 'disabled' : '',
+      isLoading,
       startDate,
       altField: `${Select.NAMESPACE}-${altField}`,
       value,
@@ -15861,6 +15909,7 @@ class DateTime extends REaCt().Component {
     }), REaCt().createElement(Select, {
       name: `${Select.NAMESPACE}-${altField}`,
       className: isLoading ? 'disabled' : '',
+      isLoading,
       typeable: true,
       options: filteredTimeIntervals,
       value: (() => typeof value === 'number' ? value : this.state.datepickerRef.currentDate.getTime())(),
@@ -15959,7 +16008,7 @@ class Recurring extends mixins.w9 {
       },
       monthDaysWarning: this.initialMonthDay > 28
     };
-    this.toggleView = (view, frequency, state) => this.setState({
+    this.toggleView = (view, frequency, state) => this.props.isLoading ? null : this.setState({
       view,
       frequency,
       ...state
@@ -15986,6 +16035,7 @@ class Recurring extends mixins.w9 {
         className: "inline",
         icon: true,
         value: posValues[posIdx].label,
+        isLoading: this.props.isLoading,
         options: posValues,
         onSelect: option => {
           this.setState(state => ({
@@ -16002,6 +16052,7 @@ class Recurring extends mixins.w9 {
         className: "inline",
         icon: true,
         value: dayValues[dayIdx].label,
+        isLoading: this.props.isLoading,
         options: dayValues,
         onSelect: option => {
           this.setState(state => ({
@@ -16025,6 +16076,7 @@ class Recurring extends mixins.w9 {
         name: `${Recurring.NAMESPACE}-interval`,
         value: interval > 0 ? interval : 1,
         icon: true,
+        isLoading: this.props.isLoading,
         options: [...Array(view === this.VIEWS.WEEKLY ? 52 : 12).keys()].map(value => {
           value += 1;
           return {
@@ -16152,7 +16204,7 @@ class Recurring extends mixins.w9 {
                                 ${isCurrentlySelected ? 'active' : ''}
                                 ${weekDays.length === 1 && isCurrentlySelected ? 'disabled' : ''}
                             `,
-        onClick: () => {
+        onClick: this.props.isLoading ? null : () => {
           if (view === this.VIEWS.WEEKLY) {
             return handleWeeklySelection(value, isCurrentlySelected);
           }
@@ -16171,6 +16223,10 @@ class Recurring extends mixins.w9 {
     }, (0,utils.lI)(mega.icu.format(view === this.VIEWS.MONTHLY ? l.recur_rate_monthly : l.recur_rate_weekly, interval > 0 ? interval : 1), "[S]", this.IntervalSelect));
   }
   renderEndControls() {
+    const {
+      isLoading,
+      onMount
+    } = this.props;
     const {
       end,
       prevEnd
@@ -16191,6 +16247,7 @@ class Recurring extends mixins.w9 {
     }, REaCt().createElement("input", {
       type: "radio",
       name: `${Recurring.NAMESPACE}-radio-end`,
+      disabled: isLoading,
       className: `
                                     uiTheme
                                     ${end ? 'radioOff' : 'radioOn'}
@@ -16205,12 +16262,10 @@ class Recurring extends mixins.w9 {
       className: "radio-txt"
     }, REaCt().createElement("span", {
       className: "recurring-radio-label",
-      onClick: () => {
-        this.setState(state => ({
-          end: undefined,
-          prevEnd: state.end || state.prevEnd
-        }));
-      }
+      onClick: () => isLoading ? null : this.setState(state => ({
+        end: undefined,
+        prevEnd: state.end || state.prevEnd
+      }))
     }, l.recurring_never))), REaCt().createElement("div", {
       className: "recurring-label-wrap"
     }, REaCt().createElement("div", {
@@ -16221,39 +16276,33 @@ class Recurring extends mixins.w9 {
     }, REaCt().createElement("input", {
       type: "radio",
       name: `${Recurring.NAMESPACE}-radio-end`,
+      disabled: isLoading,
       className: `
                                     uiTheme
                                     ${end ? 'radioOn' : 'radioOff'}
                                 `,
-      onChange: () => {
-        this.setState({
-          end: prevEnd || this.initialEnd
-        });
-      }
+      onChange: () => isLoading ? null : this.setState({
+        end: prevEnd || this.initialEnd
+      })
     })), REaCt().createElement("div", {
       className: "radio-txt"
     }, REaCt().createElement("span", {
       className: "recurring-radio-label",
-      onClick: () => {
-        return end ? null : this.setState({
-          end: prevEnd || this.initialEnd
-        });
-      }
+      onClick: () => isLoading || end ? null : this.setState({
+        end: prevEnd || this.initialEnd
+      })
     }, l.recurring_on), REaCt().createElement(Datepicker, {
       name: `${Recurring.NAMESPACE}-endDateTime`,
       position: "top left",
       startDate: end || this.initialEnd,
       selectedDates: [new Date(end)],
+      isLoading,
       value: end || prevEnd || '',
       placeholder: time2date(end || prevEnd || this.initialEnd / 1000, 18),
-      onMount: this.props.onMount,
-      onSelect: timestamp => {
-        this.setState({
-          end: timestamp
-        }, () => {
-          this.safeForceUpdate();
-        });
-      }
+      onMount,
+      onSelect: timestamp => this.setState({
+        end: timestamp
+      }, () => this.safeForceUpdate())
     })))));
   }
   renderDaily() {
@@ -16268,6 +16317,9 @@ class Recurring extends mixins.w9 {
   }
   renderMonthly() {
     const {
+      isLoading
+    } = this.props;
+    const {
       monthRule,
       monthDays,
       monthDaysWarning,
@@ -16279,7 +16331,7 @@ class Recurring extends mixins.w9 {
       className: "recurring-field-row"
     }, REaCt().createElement("div", {
       className: "recurring-radio-buttons",
-      onClick: ev => {
+      onClick: isLoading ? null : ev => {
         const {
           name,
           value
@@ -16301,6 +16353,7 @@ class Recurring extends mixins.w9 {
       type: "radio",
       name: `${Recurring.NAMESPACE}-radio-monthRule`,
       value: "day",
+      disabled: isLoading,
       className: `
                                         uiTheme
                                         ${monthRule === 'day' ? 'radioOn' : 'radioOff'}
@@ -16309,17 +16362,16 @@ class Recurring extends mixins.w9 {
       className: "radio-txt"
     }, REaCt().createElement("span", {
       className: "recurring-radio-label",
-      onClick: () => {
-        this.setState({
-          monthRule: this.MONTH_RULES.DAY
-        });
-      }
+      onClick: () => isLoading ? null : this.setState({
+        monthRule: this.MONTH_RULES.DAY
+      })
     }, l.recurring_frequency_day), REaCt().createElement("div", {
       className: "mega-input inline recurring-day"
     }, REaCt().createElement(Select, {
       name: `${Recurring.NAMESPACE}-monthDay`,
       icon: true,
       value: monthDays[0],
+      isLoading,
       options: [...Array(31).keys()].map(value => {
         value += 1;
         return {
@@ -16355,6 +16407,7 @@ class Recurring extends mixins.w9 {
       type: "radio",
       name: `${Recurring.NAMESPACE}-radio-monthRule`,
       value: "offset",
+      disabled: isLoading,
       className: `
                                         uiTheme
                                         ${monthRule === this.MONTH_RULES.OFFSET ? 'radioOn' : 'radioOff'}
@@ -16434,7 +16487,10 @@ class Recurring extends mixins.w9 {
       view
     } = this.state;
     return REaCt().createElement(Row, null, REaCt().createElement(Column, null), REaCt().createElement(Column, null, REaCt().createElement("div", {
-      className: NAMESPACE
+      className: `
+                            ${NAMESPACE}
+                            ${this.props.isLoading ? 'disabled' : ''}
+                        `
     }, REaCt().createElement("div", {
       className: `${NAMESPACE}-container`
     }, REaCt().createElement("div", {
@@ -17151,6 +17207,7 @@ class Schedule extends mixins.w9 {
       chatRoom: this.props.chatRoom,
       startDateTime,
       endDateTime,
+      isLoading,
       onMount: datepicker => {
         this.datepickerRefs.recurringEnd = datepicker;
       },
@@ -17163,6 +17220,7 @@ class Schedule extends mixins.w9 {
       className: "sprite-fm-mono icon-contacts"
     })), REaCt().createElement(Column, null, REaCt().createElement(Invite, {
       className: isLoading ? 'disabled' : '',
+      isLoading,
       participants,
       onSelect: this.handleParticipantSelect
     }))), REaCt().createElement(Switch, {
@@ -17216,6 +17274,7 @@ class Schedule extends mixins.w9 {
                                                 class="clickurl">
                                             `).replace('[/A]', '</a>')))) : null, REaCt().createElement(Textarea, {
       name: "description",
+      isLoading,
       invalid: descriptionInvalid,
       placeholder: l.schedule_description_input,
       value: description,
@@ -17323,6 +17382,7 @@ const Input = ({
     type: "text",
     name: `${Schedule.NAMESPACE}-${name}`,
     className: isLoading ? 'disabled' : '',
+    disabled: isLoading,
     autoFocus,
     autoComplete: "off",
     placeholder,
@@ -17353,10 +17413,11 @@ const Checkbox = ({
     className: `
                         checkdiv
                         ${checked ? 'checkboxOn' : 'checkboxOff'}
+                        ${isLoading ? 'disabled' : ''}
                     `
   }, REaCt().createElement("input", {
     name: `${Schedule.NAMESPACE}-${name}`,
-    className: isLoading ? 'disabled' : '',
+    disabled: isLoading,
     type: "checkbox",
     onChange: () => onToggle(name)
   }))), REaCt().createElement(Column, {
@@ -17364,7 +17425,7 @@ const Checkbox = ({
   }, REaCt().createElement("label", {
     htmlFor: `${Schedule.NAMESPACE}-${name}`,
     className: isLoading ? 'disabled' : '',
-    onClick: () => onToggle(name)
+    onClick: () => isLoading ? null : onToggle(name)
   }, label), subLabel && REaCt().createElement("div", {
     className: "sub-label"
   }, subLabel)));
@@ -17387,14 +17448,14 @@ const Switch = ({
                         schedule-label
                         ${isLoading ? 'disabled' : ''}
                     `,
-    onClick: () => onToggle(name)
+    onClick: () => isLoading ? null : onToggle(name)
   }, label), REaCt().createElement("div", {
     className: `
                         mega-switch
                         ${toggled ? 'toggle-on' : ''}
                         ${isLoading ? 'disabled' : ''}
                     `,
-    onClick: () => onToggle(name)
+    onClick: () => isLoading ? null : onToggle(name)
   }, REaCt().createElement("div", {
     className: `
                             mega-feature-switch
@@ -17425,6 +17486,7 @@ const Textarea = ({
     className: isLoading ? 'disabled' : '',
     placeholder,
     value,
+    readOnly: isLoading,
     onChange: ({
       target
     }) => onChange(target.value),
@@ -17449,7 +17511,7 @@ const Footer = ({
                         positive
                         ${isLoading ? 'disabled' : ''}
                     `,
-    onClick: () => !isLoading && onSubmit(),
+    onClick: () => isLoading ? null : onSubmit(),
     topic
   }, REaCt().createElement("span", null, isEdit ? l.update_meeting_button : l.schedule_meeting_button))));
 };
@@ -21097,6 +21159,9 @@ const HistoryPanel = (_dec = (0,mixins.hG)(450, true), _class = class HistoryPan
   }
   isLoading() {
     const {chatRoom} = this.props;
+    if (chatRoom.historyTimedOut) {
+      return false;
+    }
     const mb = chatRoom.messagesBuff;
     return this.scrollPullHistoryRetrieval === true || chatRoom.activeSearches || mb.messagesHistoryIsLoading() || mb.joined === false || mb.isDecrypting;
   }
@@ -21185,7 +21250,7 @@ const HistoryPanel = (_dec = (0,mixins.hG)(450, true), _class = class HistoryPan
         self.enableScrollbar();
       }
       delete self.loadingShown;
-      if (mb.joined === true && !self.scrollPullHistoryRetrieval && mb.haveMoreHistory() === false) {
+      if (room.historyTimedOut || mb.joined === true && !self.scrollPullHistoryRetrieval && mb.haveMoreHistory() === false) {
         let headerText = l[8002];
         headerText = contactName ? headerText.replace('%s', `<span>${megaChat.html(contactName)}</span>`) : megaChat.html(room.getRoomTitle());
         messagesList.push(REaCt().createElement("div", {
@@ -22028,7 +22093,7 @@ class Participant extends mixins.w9 {
     }, handle === u_handle ? REaCt().createElement(utils.zT, null, `${name} ${l.me}`) : REaCt().createElement(ui_contacts.ContactAwareName, {
       contact: M.u[handle],
       emoji: true
-    }), chatRoom.isMeeting && Call.isModerator(chatRoom, handle) && REaCt().createElement("span", null, REaCt().createElement("i", {
+    }), Call.isModerator(chatRoom, handle) && REaCt().createElement("span", null, REaCt().createElement("i", {
       className: `${this.baseIconClass} icon-admin-outline`
     }))), REaCt().createElement("div", {
       className: "status"
@@ -22225,7 +22290,7 @@ class Participants extends mixins.w9 {
                                             user-card-presence
                                             ${megaChat.userPresenceToCssClass(contact.presence)}
                                         `
-          }), chatRoom.isMeeting && Call.isModerator(chatRoom, handle) && REaCt().createElement("span", null, REaCt().createElement("i", {
+          }), Call.isModerator(chatRoom, handle) && REaCt().createElement("span", null, REaCt().createElement("i", {
             className: "sprite-fm-mono icon-admin-outline"
           })), REaCt().createElement("div", {
             className: "call-state"
@@ -23003,7 +23068,10 @@ class SidebarControls extends mixins.w9 {
 }
 // EXTERNAL MODULE: ./js/chat/ui/inviteParticipantsPanel.jsx
 const inviteParticipantsPanel = REQ_(815);
+// EXTERNAL MODULE: ./js/ui/dropdowns.jsx
+const dropdowns = REQ_(911);
 ;// ./js/chat/ui/meetings/call.jsx
+
 
 
 
@@ -23148,6 +23216,8 @@ class Call extends mixins.w9 {
       recorder: undefined,
       recordingConsentDialog: false,
       recordingConsented: false,
+      recordingActivePeer: undefined,
+      recordingTooltip: false,
       invitePanel: false,
       presenterThumbSelected: false,
       timeoutBanner: false,
@@ -23189,7 +23259,7 @@ class Call extends mixins.w9 {
           call,
           chatRoom
         } = this.props;
-        if (userHandle === this.state.recorder) {
+        if (userHandle === this.state.recorder && userHandle !== u_handle) {
           chatRoom.trigger('onRecordingStopped', {
             userHandle
           });
@@ -23359,8 +23429,13 @@ class Call extends mixins.w9 {
         }
         mBroadcaster.sendMessage('meetings:raisedHand', raisedHandPeers);
       }));
+      chatRoom.rebind(`onRecordingActivePeer.${NAMESPACE}`, (ev, {
+        userHandle
+      }) => this.setState({
+        recordingActivePeer: userHandle
+      }));
     };
-    this.unbindCallEvents = () => ['onCallPeerLeft', 'onCallPeerJoined', 'onCallLeft', 'wrOnUsersAllow', 'wrOnUsersEntered', 'wrOnUserLeft', 'alterUserPrivilege', 'onCallState', 'onRecordingStarted', 'onRecordingStopped', 'onCallEndTimeUpdated', 'onRaisedHandAdd', 'onRaisedHandDel'].map(event => this.props.chatRoom.off(`${event}.${NAMESPACE}`));
+    this.unbindCallEvents = () => ['onCallPeerLeft', 'onCallPeerJoined', 'onCallLeft', 'wrOnUsersAllow', 'wrOnUsersEntered', 'wrOnUserLeft', 'alterUserPrivilege', 'onCallState', 'onRecordingStarted', 'onRecordingStopped', 'onRecordingActivePeer', 'onCallEndTimeUpdated', 'onRaisedHandAdd', 'onRaisedHandDel'].map(event => this.props.chatRoom.off(`${event}.${NAMESPACE}`));
     this.handleCallMinimize = () => {
       const {
         call,
@@ -23539,18 +23614,13 @@ class Call extends mixins.w9 {
         eventlog(500287);
       }
       if (this.state.recorder) {
-        return msgDialog(`confirmation:!^${l.stop_recording_dialog_cta}!${l.stop_recording_nop_dialog_cta}`, undefined, l.stop_recording_dialog_heading, l.stop_recording_dialog_body, cb => cb && this.setState({
-          recorder: undefined
-        }, () => {
-          sfuClient.recordingStop();
-          ChatToast.quick(l.stopped_recording_toast);
-        }), 1);
+        return msgDialog(`confirmation:!^${l.stop_recording_dialog_cta}!${l.stop_recording_nop_dialog_cta}`, undefined, l.stop_recording_dialog_heading, l.stop_recording_dialog_body, cb => cb && sfuClient.recordingStop(), 1);
       }
       msgDialog(`warningb:!^${l.start_recording_dialog_cta}!${l[82]}`, null, l.notify_participants_dialog_heading, l.notify_participants_dialog_body, cb => {
         if (cb || cb === null) {
           return;
         }
-        call.sfuClient.recordingStart().then(() => {
+        call.sfuClient.recordingStart(this.onWeStoppedRecording).then(() => {
           this.setState({
             recorder: u_handle
           });
@@ -23560,10 +23630,23 @@ class Call extends mixins.w9 {
         }).catch(dump);
       }, 1);
     };
+    this.onWeStoppedRecording = err => {
+      this.setState({
+        recorder: undefined,
+        recordingActivePeer: undefined
+      }, () => {
+        if (err) {
+          ChatToast.quick(`${l.stopped_recording_toast} Error: ${err.message || err}`);
+        } else {
+          ChatToast.quick(l.stopped_recording_toast);
+        }
+      });
+    };
     this.renderRecordingControl = () => {
-      let _this$props$call2;
       const {
-        recorder
+        recorder,
+        recordingTooltip,
+        recordingActivePeer
       } = this.state;
       const isModerator = Call.isModerator(this.props.chatRoom, u_handle);
       const $$CONTAINER = ({
@@ -23579,28 +23662,50 @@ class Call extends mixins.w9 {
         onClick
       }, children);
       if (recorder) {
-        const simpletip = {
-          'data-simpletip': l.host_recording.replace('%NAME', nicknames.getNickname(recorder) || megaChat.plugins.userHelper.SIMPLETIP_USER_LOADER),
-          'data-simpletipposition': 'top',
-          'data-simpletipoffset': 5,
-          'data-simpletip-class': 'theme-dark-forced'
-        };
+        const isRecorder = isModerator && recorder === u_handle;
         return REaCt().createElement($$CONTAINER, {
+          recordingTooltip,
           className: "recording-fixed"
         }, REaCt().createElement("div", (0,esm_extends.A)({
           className: `
                             recording-ongoing
                             simpletip
-                            ${isModerator && recorder === u_handle ? '' : 'plain-background'}
+                            ${isRecorder ? '' : 'plain-background'}
                         `
-        }, recorder !== u_handle && simpletip), REaCt().createElement("span", {
-          className: "recording-icon"
-        }, "REC ", REaCt().createElement("i", null)), isModerator && recorder === u_handle && REaCt().createElement("span", {
+        }, recorder !== u_handle && {
+          'data-simpletip': l.host_recording.replace('%NAME', nicknames.getNickname(recorder) || megaChat.plugins.userHelper.SIMPLETIP_USER_LOADER),
+          'data-simpletipposition': 'top',
+          'data-simpletipoffset': 5,
+          'data-simpletip-class': 'theme-dark-forced'
+        }), REaCt().createElement("span", {
+          className: `
+                                recording-icon
+                                button
+                                ${recordingTooltip ? 'active-dropdown' : ''}
+                                ${isRecorder ? 'clickable' : ''}
+                            `,
+          onMouseEnter: () => isRecorder && this.setState({
+            recordingTooltip: true
+          }),
+          onMouseOut: () => isRecorder && delay('meetings-rec-hover', () => this.setState({
+            recordingTooltip: false
+          }), 1250)
+        }, "REC ", REaCt().createElement("i", null), REaCt().createElement(dropdowns.Dropdown, {
+          className: "recording-info theme-dark-forced",
+          active: recordingTooltip,
+          noArrow: false,
+          positionMy: "center top",
+          positionAt: "center bottom",
+          vertOffset: 40,
+          horizOffset: 30
+        }, REaCt().createElement("div", null, "Currently recording: ", nicknames.getNickname(recordingActivePeer)))), isRecorder && REaCt().createElement("span", {
           className: "recording-toggle",
           onClick: this.handleRecordingToggle
         }, l.record_stop_button)));
       }
-      const isOnHold = !!(((_this$props$call2 = this.props.call) == null ? void 0 : _this$props$call2.av) & Av.onHold);
+      const {
+        isOnHold
+      } = this.props.call;
       return isModerator && REaCt().createElement($$CONTAINER, {
         className: isOnHold ? 'disabled' : '',
         onClick: () => {
@@ -23898,7 +24003,7 @@ class Call extends mixins.w9 {
       raisedHandPeers,
       activeElement,
       hasOtherParticipants: call.hasOtherParticipant(),
-      isOnHold: call.sfuClient.isOnHold(),
+      isOnHold: call.sfuClient.isOnHold,
       isFloatingPresenter: (_ref = mode === MODE.MINI && !forcedLocal ? call.getActiveStream() : call.getLocalStream()) == null ? void 0 : _ref.hasScreen,
       onSpeakerChange: this.handleSpeakerChange,
       onModeChange: this.handleModeChange,
@@ -23921,9 +24026,7 @@ class Call extends mixins.w9 {
       onCallExpand: this.handleCallExpand,
       onCallEnd: this.handleCallEnd,
       onStreamToggle: this.handleStreamToggle,
-      onRecordingToggle: () => this.setState({
-        recorder: undefined
-      }, () => call.sfuClient.recordingStop()),
+      onRecordingToggle: () => call.sfuClient.recordingStop(),
       onChatToggle: this.handleChatToggle,
       onParticipantsToggle: this.handleParticipantsToggle,
       onAudioClick: () => call.toggleAudio(),
@@ -25151,7 +25254,7 @@ class Stream extends mixins.w9 {
         isPresenterNode,
         onLoadedData
       } = this.props;
-      if (call.sfuClient.isOnHold()) {
+      if (call.isOnHold) {
         return this.renderOnHoldVideoNode();
       }
       let VideoClass = videoNode.zu;
@@ -28895,14 +28998,13 @@ class Incoming extends _mixins1__.w9 {
                                     large
                                     round
                                     negative
-                                    ${unsupported ? 'disabled' : ''}
                                 `,
         icon: "icon-end-call",
-        simpletip: unsupported ? null : {
+        simpletip: {
           position: 'top',
           label: rejectLabel
         },
-        onClick: unsupported ? null : onReject
+        onClick: onReject
       }, react0().createElement("span", null, rejectLabel)), CALL_IN_PROGRESS ? this.renderSwitchControls() : this.renderAnswerControls()), unsupported && react0().createElement("div", {
         className: `${NAMESPACE}-unsupported`
       }, react0().createElement("div", {
@@ -29469,7 +29571,8 @@ class Local extends AbstractGenericMessage {
     }, REaCt().createElement("i", {
       className: `sprite-fm-mono ${message.cssClass}`
     }));
-    return message.showInitiatorAvatar ? grouped ? null : $$AVATAR : $$ICON;
+    return message.showInitiatorAvatar ? grouped ? null : $$AVATAR : $$ICON
+    ;
   }
   getMessageTimestamp() {
     let _this$props$message;
@@ -29569,7 +29672,8 @@ class Contact extends AbstractGenericMessage {
     if ((_this$props$chatRoom = this.props.chatRoom) != null && _this$props$chatRoom.isAnonymous()) {
       return this._doAddContact(contactEmail).then(addedEmail => this.DIALOG.ADDED(addedEmail)).catch(this.DIALOG.DUPLICATE);
     }
-    return Object.values(M.opc).some(opc => opc.m === contactEmail) ? this.DIALOG.DUPLICATE() : this._doAddContact(contactEmail).then(addedEmail => this.DIALOG.ADDED(addedEmail));
+    return Object.values(M.opc).some(opc => opc.m === contactEmail) ? this.DIALOG.DUPLICATE() : this._doAddContact(contactEmail).then(addedEmail => this.DIALOG.ADDED(addedEmail))
+    ;
   }
   _getContactAvatar(contact, className) {
     return REaCt().createElement(ui_contacts.Avatar, {

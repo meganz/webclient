@@ -94,7 +94,7 @@ class MegaMobileTab extends MegaComponent {
 
         tab.on('tap.tab', e => {
 
-            if (this.activeTab === e.target.key) {
+            if (this.activeTab === e.currentTarget.key) {
                 return false;
             }
 

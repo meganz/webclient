@@ -1,15 +1,15 @@
 mega.ui.pm = {
 
-    initUI() {
+    async initUI() {
         'use strict';
 
         if (!mega.pm.casRan) {
             mega.pm.casRan = true;
-            mega.pm.checkActiveSubscription().catch(tell);
+            await mega.pm.checkActiveSubscription().catch(tell);
 
             mBroadcaster.addListener('pagechange', page => {
-                if (page === 'fm/pwm' && !(u_attr.features && u_attr.features.length) && 'plan' in mega.pm) {
-                    if (mega.pm.plan.trial) {
+                if (page === 'fm/pwm' && !mega.pm.pwmFeature) {
+                    if (mega.pm.plan && mega.pm.plan.trial) {
                         this.subscription.freeTrial();
                     }
                     else {
@@ -78,6 +78,10 @@ mega.ui.pm = {
             fmholder.classList.remove('pmholder');
         }
 
+        if (!mega.pm.pwmFeature) {
+            return;
+        }
+
         if (this.list) {
             this.list.removeResizeListener();
         }
@@ -96,6 +100,17 @@ mega.ui.pm = {
         'use strict';
 
         mega.ui.banner.show('', l.no_internet, '', 'error', false, true, true);
+
+        const importBtn = pmlayout.querySelector('.import-file');
+        const chooseFileBtn = pmlayout.querySelector('.choose-file');
+        const errorMessage = pmlayout.querySelector('.import-error-message');
+
+        if (mega.ui.pm.settings.importInFlight) {
+            errorMessage.classList.remove('hidden');
+            chooseFileBtn.disabled = false;
+            importBtn.disabled = false;
+            importBtn.loading = false;
+        }
     },
 
     comm: {
@@ -343,3 +358,14 @@ mega.ui.pm = {
         }
     }
 };
+
+(mega => {
+    "use strict";
+
+    lazy(mega.ui.pm, 'overlay', () => new MegaOverlay({
+        parentNode: document.querySelector('.password-list-page'),
+        componentClassname: 'mega-overlay pm-overlay',
+        wrapperClassname: 'overlay'
+    }));
+
+})(window.mega);

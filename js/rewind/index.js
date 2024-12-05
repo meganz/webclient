@@ -74,6 +74,8 @@ lazy(mega, 'rewind', () => {
             });
 
             this.$fmHeaderButtons = $('.fm-header-buttons', '.fm-right-header');
+            this.$rwHeaderBtn = $('.fm-rewind', this.$fmHeaderButtons);
+            this.$rwMiniPromo = $('.rw-whats-new-mini-promo-container', this.$fmHeaderButtons);
 
             const openSidebarListener = (isAccUpgraded) => {
                 const listContainer = mega.rewind.getListContainer();
@@ -119,106 +121,42 @@ lazy(mega, 'rewind', () => {
             if (Date.now() - u_attr.since * 1000 < 30 * 24 * 60 * 60 * 1000) {
                 return;
             }
-            const $headerButton = $('.action.fm-rewind', this.$fmHeaderButtons);
-            $('.blinking-highlight-dot', $headerButton).addClass('hidden');
+            $('.blinking-highlight-dot', this.$rwHeaderBtn).addClass('hidden');
+            this.$rwMiniPromo.addClass('suppressed');
             return mega.attr.set2(null, 'rwHeaderDisc', 1, -2);
         }
 
-        showRewindPromoDialog() {
-            const $dialog = $('.rw-promo-dialog', '.mega-dialog-container');
-            const $actionButton = $('.btn-rw-promo-action', $dialog);
-            const isPro = this.getAccountType() !== ACCOUNT_TYPE_FREE;
-
-            if (isPro) {
-                $('.rw-promo-dialog-info-link', $dialog).addClass('hidden');
-                $('span', $actionButton).text(l[8742]);
-                $actionButton.rebind('click.rewind', () => {
-                    eventlog(500533);
-                    window.open(
-                        `${l.mega_help_host}/files-folders/rewind/how-do-i-use-rewind`,
-                        '_blank',
-                        'noopener,noreferrer'
-                    );
-                });
-            }
-            else {
-                $('.rw-promo-dialog-info-link', $dialog).removeClass('hidden');
-                $('span', $actionButton).text(l.upgrade_for_rewind);
-                $actionButton.rebind('click.rewind', () => {
-                    eventlog(500534);
-                    loadSubPage('pro');
-                });
-            }
-
-            M.safeShowDialog('rw-promo-dialog', () => $dialog);
-
-            $('.js-close', $dialog).rebind('click.rewind', () => {
-                $actionButton.off('click.rewind');
-                closeDialog();
-                return false;
-            });
-        }
-
-        showRewindMiniPromo() {
-
-            if (mega.rewindUi.sidebar.active || mega.rewindUtils.reinstate.inProgress) {
-                return;
-            }
-
-            const $rwMiniPromoContainer = $('.rw-whats-new-mini-promo-container', this.$fmHeaderButtons);
-            const $rwMiniPromoDlg = $('.rw-whats-new-mini-promo', $rwMiniPromoContainer);
-            const $rwHeaderBtn = $('.fm-rewind', this.$fmHeaderButtons);
-            const headerBtnOffset = $rwHeaderBtn.offset();
+        setMiniPromoEvents() {
             const isRTL = $('body').hasClass('rtl');
-
-            const unbindEvents = () => {
-                eventlog(500568, true);
-
-                $rwHeaderBtn.unbind('mouseleave.rewind');
-                $rwMiniPromoContainer.unbind("mouseleave.rewind");
-                $('.btn-rw-mini-promo-action', $rwMiniPromoContainer).unbind('click.rewind');
-            };
-
-            const bindEvents = () => {
-
-                $rwHeaderBtn.rebind('mouseleave.rewind', () => {
-                    if (!$rwMiniPromoContainer.is(':hover')) {
-                        unbindEvents();
-                        $rwMiniPromoContainer.addClass('hidden');
-                        return false;
-                    }
-                });
-
-                $('.btn-rw-mini-promo-action', $rwMiniPromoContainer)
-                    .rebind('click.rewind', () => {
-
-                        this.setHeaderButtonDiscovery()
-                            .then(() => this._startOnEvent(500565))
-                            .catch(dump);
-                    });
-
-                $rwMiniPromoContainer.rebind('mouseleave.rewind', () => {
-                    unbindEvents();
-                    $rwMiniPromoContainer.addClass('hidden');
-                    return false;
-                });
-
-                eventlog(500567, true);
-            };
+            const headerBtnOffset = this.$rwHeaderBtn.offset();
 
             const getOffsets = () => {
                 return {
                     left: isRTL
                         ? headerBtnOffset.left
-                        : headerBtnOffset.left - $rwMiniPromoContainer.outerWidth() + $rwHeaderBtn.outerWidth(),
-                    top: headerBtnOffset.top + $rwHeaderBtn.outerHeight(),
+                        : headerBtnOffset.left
+                            - this.$rwMiniPromo.outerWidth()
+                            + this.$rwHeaderBtn.outerWidth(),
+                    top: headerBtnOffset.top + this.$rwHeaderBtn.outerHeight(),
                 };
             };
 
-            $rwMiniPromoDlg.removeClass('hidden');
-            $rwMiniPromoContainer.removeClass('hidden');
-            $rwMiniPromoContainer.offset(getOffsets());
-            bindEvents();
+            this.$rwMiniPromo.offset(getOffsets());
+
+            this.$rwMiniPromo.rebind('mouseleave.rewind', () => {
+                if (!this.$rwHeaderBtn.is(':hover')) {
+                    eventlog(500568, true);
+                }
+            });
+
+            $('.btn-rw-mini-promo-action', this.$rwMiniPromo)
+                .rebind('click.rewind', () => {
+                    $('.rw-whats-new-mini-promo', this.$fmHeaderButtons).addClass('hidden');
+
+                    this.setHeaderButtonDiscovery()
+                        .then(() => this._startOnEvent(500565))
+                        .catch(dump);
+                });
         }
 
         async removeNodeListener() {
@@ -1913,24 +1851,41 @@ lazy(mega, 'rewind', () => {
                 .rebind('click.rewind.contextMenu', () => this._startOnEvent(500469, true));
         }
 
+        async shouldHideBlueDot() {
+            return Date.now() - u_attr.since * 1000 < 30 * 24 * 60 * 60 * 1000
+            || await Promise.resolve(mega.attr.get(u_handle, 'rwHeaderDisc', -2)).catch(nop) | 0;
+        }
+
         async bindHeaderButton() {
-            const $headerButton = $('.action.fm-rewind', this.$fmHeaderButtons);
+            const hideBlueDot = await this.shouldHideBlueDot();
 
-            const hideBlueDot =
-                    Date.now() - u_attr.since * 1000 < 30 * 24 * 60 * 60 * 1000
-                    || await Promise.resolve(mega.attr.get(u_handle, 'rwHeaderDisc', -2)).catch(nop) | 0;
-
-            // Blue dot (hotspot)
+            // Blue dot (hotspot) - only show mini promo and bind events if blue dot is visible
             if (hideBlueDot) {
-                $('.blinking-highlight-dot', $headerButton).addClass('hidden');
+                $('.blinking-highlight-dot', this.$rwHeaderBtn).addClass('hidden');
+                this.$rwHeaderBtn.unbind('mouseover.rewind');
+                this.$rwHeaderBtn.unbind('mouseleave.rewind');
+                this.$rwMiniPromo.addClass('suppressed');
             }
             else {
-                $('.blinking-highlight-dot', $headerButton).removeClass('hidden');
+                $('.blinking-highlight-dot', this.$rwHeaderBtn).removeClass('hidden');
+                this.$rwMiniPromo.removeClass('suppressed');
+                this.setMiniPromoEvents();
+
+                this.$rwHeaderBtn.rebind('mouseover.rewind', () => {
+                    $('.mega-dialog.rw-whats-new-mini-promo', this.$rwMiniPromo)
+                        .removeClass('hidden');
+                    this.setMiniPromoEvents();
+                    eventlog(500567, true);
+                });
+                this.$rwHeaderBtn.rebind('mouseleave.rewind', () => {
+                    if (!this.$rwMiniPromo.is(':hover')) {
+                        eventlog(500568, true);
+                    }
+                });
             }
 
-            $headerButton
+            this.$rwHeaderBtn
                 .removeClass('hidden')
-                .rebind('mouseenter.rewind', SoonFc(96, () => this.showRewindMiniPromo()))
                 .rebind('click.rewind.header', () => {
                     $('.rw-whats-new-mini-promo', this.$fmHeaderButtons).addClass('hidden');
 
@@ -1945,7 +1900,8 @@ lazy(mega, 'rewind', () => {
             $headerButton
                 .addClass('hidden')
                 .unbind('click.rewind.header')
-                .unbind('mouseenter.rewind');
+                .unbind('mouseover.rewind')
+                .unbind('mouseleave.rewind');
         }
 
         /**

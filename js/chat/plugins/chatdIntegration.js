@@ -1836,6 +1836,9 @@ ChatdIntegration.prototype.updateMessage = function(chatRoom, msgnum, newMessage
         console.error("Update message failed, because message  was not found", msgnum);
         return false;
     }
+    if (foundMsg.getState() === Message.STATE.NOT_SENT && newMessage === "") {
+        return self.chatd.discard(msg[Chatd.MsgField.MSGID], rawChatId);
+    }
     cipher = chatRoom.protocolHandler.encryptWithKeyId(newMessage, keyId, foundMsg.references, foundMsg.msgIdentity);
 
     return self.chatd.modify(rawChatId, msgnum, cipher);

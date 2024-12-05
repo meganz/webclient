@@ -19,6 +19,8 @@
     background: var(--mobile-icon-inverse);
     margin-inline-end: 15px;
     -webkit-margin-end: 15px;
+    border: 1px solid var(--mobile-border-strong-selected);
+    box-sizing: border-box;
 }
 
 .mobile .mega-checkbox .checkbox-wrapper {
@@ -35,4 +37,8 @@
     width: 200px;
     order: 1;
     flex-grow: 1;
+}
+
+.mega-checkbox input {
+    opacity: 0;
 }

@@ -57,11 +57,17 @@ p.timeline-day {
     margin: 0;
     color: var(--mobile-text-secondary);
 }
+.overlay-wrap.free-trial .header,
+.overlay-wrap.subscription-dialog .header {
+    width: 100%;
+    padding: 0;
+}
 
 .overlay-wrap.free-trial .main,
 .overlay-wrap.subscription-dialog .main {
     padding: 40px;
     box-sizing: border-box;
+    width: 100%;
 }
 
 .overlay-wrap.free-trial .actions .button,
@@ -74,6 +80,7 @@ p.timeline-day {
 .overlay-wrap.subscription-dialog .actions {
     padding: 0 40px 40px;
     margin-top: 0;
+    width: 100%;
 }
 
 .mega-sheet.free-trial .sheet,

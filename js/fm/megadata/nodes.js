@@ -1937,8 +1937,8 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
             // TODO: Improve the list rendering to only update each node if the action packet does not affect
             // list ordering.
             // Currently, we lack the detailed feature for this, which will be part of the PWM extension.
-            if (type === 'pwm' && mega.pm.pwmFeature) {
-                tryCatch(() => mega.ui.pm.list.loadList().catch(reportError))();
+            if (type === 'pwm' && n && n.pwm && mega.pm.pwmFeature) {
+                tryCatch(() => mega.ui.pm.list.initLayout().catch(reportError))();
             }
 
             if (this.isDynPage(this.currentdirid) > 1) {

@@ -42,7 +42,7 @@ mega.ui.pm = {
         else {
             mega.ui.pm.settings.closeUI();
 
-            if (nodeID) {
+            if (nodeID !== 'pwm') {
                 this.comm.saveLastSelected(nodeID);
             }
 

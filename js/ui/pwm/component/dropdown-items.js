@@ -9,7 +9,7 @@ class MegaDropdownItemList {
             wrapperClassname: 'dropdown'
         });
 
-        this.dropdownMenu.calcPosition = (event) => {
+        this.dropdownMenu.calcPosition = () => {
             if (!this.dropdownMenu.visible) {
                 return;
             }
@@ -19,7 +19,7 @@ class MegaDropdownItemList {
 
             options.optionsWrap.classList.remove('top', 'right');
 
-            const {bottom, left} = event.currentTarget.domNode.getBoundingClientRect();
+            const {bottom, left} = this.dropdown.domNode.getBoundingClientRect();
             const menuWidth = parseFloat(this.dropdownMenu.domNode.offsetWidth);
             const menuHeight = parseFloat(this.dropdownMenu.domNode.offsetHeight);
 

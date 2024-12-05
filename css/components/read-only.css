@@ -63,13 +63,22 @@
     --icon-size: 20px;
 }
 
+.read-only-field .read-only-actions button.icon-only {
+    background-color: transparent;
+    width: auto;
+    height: auto;
+    padding: 0 !important;
+    color: inherit;
+    --icon-size: 20px;
+}
+
+.read-only-field .read-only-actions button:last-child:not(:first-child) {
+    margin-inline-start: 16px;
+}
+
 .read-only-field .read-only-actions i {
     cursor: pointer;
     padding: 4px;
-}
-
-.read-only-field .read-only-actions i:last-child:not(:first-child) {
-    margin-inline-start: 16px;
 }
 
 .read-only-field .read-only-help {

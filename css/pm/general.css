@@ -5,8 +5,7 @@
     height: 24px;
 }
 
-.pm-main .manual-favicon,
-.password-item-form .manual-favicon {
+.pm-main .manual-favicon {
     color: var(--favicon-text-color);
     border-radius: 4px;
     display: flex;
@@ -16,23 +15,19 @@
     background-color: var(--mobile-surface-3);
 }
 
-.pm-main .manual-favicon.color0,
-.password-item-form .manual-favicon.color0 {
+.pm-main .manual-favicon.color0 {
     background-color: var(--mobile-indicator-yellow);
 }
 
-.pm-main .manual-favicon.color1,
-.password-item-form .manual-favicon.color1 {
+.pm-main .manual-favicon.color1 {
     background-color: var(--mobile-indicator-blue);
 }
 
-.pm-main .manual-favicon.color2,
-.password-item-form .manual-favicon.color2 {
+.pm-main .manual-favicon.color2 {
     background-color: var(--mobile-indicator-green);
 }
 
-.pm-main .favicon .favicon-brand img,
-.password-item-form .favicon .favicon-brand img {
+.pm-main .favicon .favicon-brand img {
     width: 24px;
     height: 24px;
 }

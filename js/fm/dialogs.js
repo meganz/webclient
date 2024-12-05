@@ -206,6 +206,9 @@
             // "Create new bucket"  label
             $('.dialog-newfolder-button span', $dialog).text(l.s4_create_bkt);
         }
+        else if (section === 's4' && !$.mcselected) {
+            $('.dialog-newfolder-button', $dialog).addClass('hidden');
+        }
         else {
             $('.dialog-newfolder-button span', $dialog).text(l[68]);
         }
@@ -337,13 +340,13 @@
 
             // Object storage icons
             if (section === 's4' && M.tree.s4) {
+                const cn = Object.values(M.tree.s4);
+
                 if (M.tree.s4[handle]) {
-                    name = l.obj_storage;
+                    name = cn.length === 1 ? l.obj_storage : name;
                     typeClass = 's4-object-storage';
                 }
                 else {
-                    const cn = Object.values(M.tree.s4);
-
                     for (let i = 0; i < cn.length; ++i) {
                         if (M.tree[cn[i].h] && M.tree[cn[i].h][handle]) {
                             typeClass = 's4-buckets';
@@ -1785,7 +1788,7 @@
 
             // // If not copying from contacts tab (Ie, sharing)
             if (!(section === 'cloud-drive' && (M.currentrootid === 'chat' || $.copyToShare))) {
-                if ($.mcselected && M.getNodeRights($.mcselected) > 0) {
+                if ($.mcselected && (section === 's4' || M.getNodeRights($.mcselected) > 0)) {
                     $('.dialog-newfolder-button', $dialog).removeClass('hidden');
                 }
                 else {

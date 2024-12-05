@@ -410,11 +410,11 @@ lazy(s4, 'utils', () => {
 
         renderContainerTree(dialog) {
             const wrapperClass = typeof dialog === 'string' && dialog || 'js-s4-tree-panel';
-            const s4Tree = document.querySelector(`.${wrapperClass}`);
-            const expIcon = s4Tree.querySelector('.js-cloudtree-expander');
+            const treeWrap = document.querySelector(`.${wrapperClass}`);
+            const expIcon = treeWrap.querySelector('.js-cloudtree-expander');
             const cn = this.getContainersList();
             const prefix = dialog ? 'mc' : '';
-            let ctrTree = s4Tree.querySelector('.s4 .tree');
+            let treeNode = treeWrap.querySelector('.s4 .tree');
 
             const createItem = (node, id, name, icon, staticItem) => {
                 const itemWrap = mCreateElement('li', {
@@ -423,7 +423,7 @@ lazy(s4, 'utils', () => {
                 }, node);
 
                 const itemNode = mCreateElement('span', {
-                    'class': `nw-fm-tree-item${M.tree[id] ? ' contains-folders' : ''}`,
+                    'class': `nw-fm-tree-item${M.tree[id] || M.tree.s4[id] ? ' contains-folders' : ''}`,
                     'id': `${prefix}treea_${id}`
                 }, itemWrap);
                 mCreateElement('span', {'class': 'nw-fm-tree-arrow'}, itemNode);
@@ -434,33 +434,52 @@ lazy(s4, 'utils', () => {
                 return itemWrap;
             };
 
-            ctrTree.textContent = '';
+            const treeClone = treeNode.cloneNode(true);
+            treeNode.textContent = '';
+
             if (expIcon) {
-                expIcon.classList.add('hidden');
+                if (cn.length) {
+                    expIcon.classList.remove('hidden');
+                }
+                else {
+                    expIcon.classList.add('hidden');
+                }
             }
 
             // Show container if multiple containers
             if (cn.length > 1) {
-                ctrTree = mCreateElement('ul', {'id': `${prefix}treesub_s4`}, ctrTree);
+                treeNode = mCreateElement('ul', {'id': `${prefix}treesub_s4`}, treeNode);
             }
 
             for (let i = 0; i < cn.length; i++) {
-                if (cn.length > 1) {
-                    ctrTree = createItem(ctrTree, cn[i].h, cn[i].name, 'icon-container-filled');
+                const cnNode = treeClone.querySelector(
+                    `#${prefix}tree${cn.length === 1 ? 'sub' : 'li'}_${cn[i].h}`
+                );
+
+                if (cnNode) {
+                    treeNode.appendChild(cnNode);
+                    M.buildtree({h: cn[i].h}, dialog, 's4');
+                    continue;
                 }
 
-                ctrTree = mCreateElement('ul', {
+                let wrapNode = treeNode;
+
+                if (cn.length > 1) {
+                    wrapNode = createItem(wrapNode, cn[i].h, cn[i].name, 'icon-container-filled');
+                }
+
+                wrapNode = mCreateElement('ul', {
                     'data-s4': cn[i].h,
                     'id': `${prefix}treesub_${cn[i].h}`,
-                }, ctrTree);
+                }, wrapNode);
 
                 if (!dialog) {
-                    createItem(ctrTree, `${cn[i].h}_keys`, l.s4_keys, 'icon-key', true);
+                    createItem(wrapNode, `${cn[i].h}_keys`, l.s4_keys, 'icon-key', true);
                     createItem(
-                        ctrTree, `${cn[i].h}_policies`, l.s4_policies, 'icon-policy-filled', true
+                        wrapNode, `${cn[i].h}_policies`, l.s4_policies, 'icon-policy-filled', true
                     );
-                    createItem(ctrTree, `${cn[i].h}_groups`, l.s4_groups, 'icon-contacts', true);
-                    createItem(ctrTree, `${cn[i].h}_users`, l.s4_users, 'icon-user-filled', true);
+                    createItem(wrapNode, `${cn[i].h}_groups`, l.s4_groups, 'icon-contacts', true);
+                    createItem(wrapNode, `${cn[i].h}_users`, l.s4_users, 'icon-user-filled', true);
                 }
 
                 if (expIcon) {

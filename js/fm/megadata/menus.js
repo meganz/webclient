@@ -614,16 +614,16 @@ MegaData.prototype.menuItems = async function menuItems(isTree) {
             items['.open-s4-item'] = 1;
         }
 
-        // Temporary block most of actions over the containers
+        // Block most of actions over the containers/keys/groups/policies
         if (s4Type === 'container' || !s4Type) {
-            delete items['.move-item'];
-            delete items['.rename-item'];
-            delete items['.add-star-item'];
-            delete items['.colour-label-items'];
-            delete items['.embedcode-item'];
-            delete items['.properties-versions'];
-            delete items['.clearprevious-versions'];
-            delete items['.remove-item'];
+            for (const item in items) {
+                delete items[item];
+            }
+
+            // Allow to remove multiple containers
+            if (s4Type === 'container' && s4.utils.getContainersList().length > 1) {
+                items['.remove-item'] = 1;
+            }
         }
         else if (s4Type === 'bucket') {
             delete items['.properties-item'];

@@ -380,8 +380,9 @@ MegaData.prototype.isCustomView = function(pathOrID) {
         result.type = 's4';
 
         if (s4path.length > 2) {
+            result.containerID = s4.utils.getBucketNode(s4path[2]).p || s4path[1];
             result.nodeID = s4path[2];
-            result.prefixPath = `${s4path[1]}/`;
+            result.prefixPath = `${result.containerID}/`;
             result.subType = ['keys', 'policies', 'users', 'groups'].includes(s4path[2]) ? s4path[2] : 'bucket';
         }
         else if (s4path.length === 2 && node.p !== M.RootID) {

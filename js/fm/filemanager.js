@@ -4992,7 +4992,7 @@ FileManager.prototype.initLeftPanel = function() {
         mega.gallery.albums.init();
     }
     else if (mega.gallery.canShowAddToAlbum()) {
-        mega.gallery.albums.initUserAlbums();
+        onIdle(() => mega.gallery.albums.initUserAlbums());
     }
 
     $('.js-lp-storage-usage').removeClass('hidden');

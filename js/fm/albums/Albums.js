@@ -352,10 +352,10 @@ lazy(mega.gallery, 'albums', () => {
     /**
      * @returns {String[]}
      */
-    const unwantedHandles = () => MegaGallery.handlesArrToObj([
+    const unwantedHandles = tryCatch(() => MegaGallery.handlesArrToObj([
         ...M.getTreeHandles(M.RubbishID),
         ...M.getTreeHandles('shares')
-    ]);
+    ]));
 
     /**
      * Trimming name if it is too long
@@ -4377,7 +4377,7 @@ lazy(mega.gallery, 'albums', () => {
             }
             else {
                 const fmNodes = Object.values(M.d);
-                const ignoreHandles = unwantedHandles();
+                const ignoreHandles = unwantedHandles() || false;
 
                 for (let i = 0; i < fmNodes.length; i++) {
                     if (!scope.isGalleryNode(fmNodes[i])) {
@@ -4609,7 +4609,7 @@ lazy(mega.gallery, 'albums', () => {
                     return [];
                 }
 
-                const ignoreHandles = unwantedHandles();
+                const ignoreHandles = unwantedHandles() || false;
 
                 for (let i = 0; i < sets.length; i++) {
                     albums.push(this.createAlbumData(sets[i], ignoreHandles));
@@ -4675,11 +4675,11 @@ lazy(mega.gallery, 'albums', () => {
 
         /**
          * @param {Object.<String, any>} data Set data to process
-         * @param {Object.<String, Boolean>} ignoreHandles Handles to ignore when add to the album
+         * @param {String[]|*} ignoreHandles Handles to ignore when add to the album
          * @param {Boolean} [isPublic] Whether the specified key is encrypted
-         * @returns {void}
+         * @returns {Object}
          */
-        createAlbumData({ e, at, k, id, ts, p, cts }, ignoreHandles, isPublic) {
+        createAlbumData({e, at, k, id, ts, p, cts}, ignoreHandles = false, isPublic = false) {
             const attr = at === '' || !at ? {} : isPublic
                 ? mega.sets.decryptPublicSetAttr(at, k)
                 : mega.sets.decryptSetAttr(at, k);
@@ -5186,19 +5186,12 @@ lazy(mega.gallery, 'albums', () => {
              * @returns {void}
              */
             const parseNodes = (nodes, skipDbFetch) => {
-                const ignoreHandles = unwantedHandles();
                 const handles = [];
 
                 if (Array.isArray(nodes)) {
                     for (let i = 0; i < nodes.length; i++) {
-                        if (!scope.isGalleryNode(nodes[i])) {
-                            continue;
-                        }
-
-                        const { fa, s, p, h, fv } = nodes[i];
-
-                        if (fa && s && !ignoreHandles[p] && !fv) {
-                            handles.push(h);
+                        if (scope.isGalleryNode(nodes[i])) {
+                            handles.push(nodes[i].h);
                         }
                     }
                 }
@@ -5219,7 +5212,8 @@ lazy(mega.gallery, 'albums', () => {
                 .then(parseNodes)
                 .catch(() => {
                     console.warn('Local DB failed. Fetching nodes from memory...');
-                    parseNodes(Object.values(M.d), true);
+                    const ignoreHandles = unwantedHandles() || false;
+                    parseNodes(Object.values(M.d).filter((n) => n.fa && !n.fv && !ignoreHandles[n.p]), true);
                 });
         }
 

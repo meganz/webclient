@@ -1127,25 +1127,6 @@ pro.propay = {
             }
         }
 
-        // If there is data about any previous plan they purchased
-        if (alarm.planExpired.lastPayment) {
-
-            // Get the number of months for the plan they last paid for
-            var lastPaymentMonths = alarm.planExpired.lastPayment.m;
-
-            // Find the radio option with the same number of months
-            var $monthOption = $(".payment-duration[data-plan-months='" + lastPaymentMonths + "']");
-
-            // If it can find it then select the radio option. Note: In some
-            // cases this may not be available (e.g. with upcoming A/B testing
-            if (!sessionStorage['pro.period'] && $monthOption.length) {
-                $('input', $monthOption).prop('checked', true);
-                $('.membership-radio', $monthOption).addClass('checked');
-                $('.membership-radio-label', $monthOption).addClass('checked');
-                return true;
-            }
-        }
-
         // Otherwise pre-select the chosen period (from previous page, or storage / transfer
         // quota dialog if a mini plan is shown there)
         // TODO: Handle different durations from different locations in a tidy way

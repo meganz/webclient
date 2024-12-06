@@ -76,8 +76,8 @@ class EndCallButton extends MegaRenderMixin {
                                     altCta: l.leave_anyway /* `Leave anyway` */,
                                 });
 
-                        const { recorder, sfuClient } = chatRoom.call;
-                        return recorder && recorder === u_handle ?
+                        const { recorderCid, sfuClient } = chatRoom.call;
+                        return recorderCid && recorderCid === sfuClient.cid ?
                             renderLeaveConfirm(doLeave, () => sfuClient.recordingStop()) :
                             doLeave();
                     }}
@@ -139,8 +139,8 @@ class EndCallButton extends MegaRenderMixin {
                                 icon="sprite-fm-mono icon-contacts"
                                 label={l.end_for_all}
                                 onClick={() => {
-                                    const { recorder, sfuClient } = call;
-                                    return recorder && recorder === u_handle ?
+                                    const { recorderCid, sfuClient } = call;
+                                    return recorderCid && recorderCid === u_handle ?
                                         renderEndConfirm(doEnd, () => sfuClient.recordingStop()) :
                                         doEnd();
                                 }}

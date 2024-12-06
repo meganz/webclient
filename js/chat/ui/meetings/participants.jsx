@@ -53,7 +53,7 @@ class Participant extends MegaRenderMixin {
             contact,
             handle,
             name,
-            recorder,
+            recorderCid,
             onCallMinimize,
             onSpeakerChange,
             onModeChange
@@ -81,7 +81,7 @@ class Participant extends MegaRenderMixin {
                     }
                 </div>
                 <div className="status">
-                    {recorder && recorder === handle ?
+                    {recorderCid === clientId || recorderCid === sfuClient.cid && handle === u_handle ?
                         <div className="recording-status">
                             <span />
                         </div> :
@@ -256,7 +256,7 @@ export default class Participants extends MegaRenderMixin {
             call,
             mode,
             chatRoom,
-            recorder,
+            recorderCid,
             raisedHandPeers,
             onCallMinimize,
             onSpeakerChange,
@@ -274,7 +274,7 @@ export default class Participants extends MegaRenderMixin {
                     contact={M.u[peer.userHandle] || undefined}
                     handle={peer.userHandle || u_handle}
                     name={peer.name || M.getNameByHandle(u_handle)}
-                    recorder={recorder}
+                    recorderCid={recorderCid}
                     raisedHandPeers={raisedHandPeers}
                     onCallMinimize={onCallMinimize}
                     onSpeakerChange={onSpeakerChange}

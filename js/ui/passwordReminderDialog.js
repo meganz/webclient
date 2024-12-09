@@ -385,7 +385,7 @@
             if (window.location.toString().includes('/cancel')) {
                 return;
             }
-            hideIfShown = hideIfShown && this.passwordField.value === '' && !this.isLogout;
+            hideIfShown = hideIfShown && (!this.passwordField || this.passwordField.value === '') && !this.isLogout;
 
             if (this.canShowDialog) {
                 // skip recheck in case:

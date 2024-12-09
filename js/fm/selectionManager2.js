@@ -525,6 +525,8 @@ class SelectionManager2_DOM extends SelectionManager2Base {
     }
 
     init() {
+        this.$selectionBar = $('.selection-status-bar');
+        this.$deselectBtn = $('.deselect-all', this.$selectionBar);
         var $uiSelectable = $('.fm-right-files-block .ui-selectable:visible:not(.hidden)');
 
         if ($uiSelectable.length === 1) {
@@ -535,6 +537,10 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
         $fmRightFilesBlock.rebind('selectablereinitialized.sm', (e) => {
             this.bindJqSelectable(e.target);
+        });
+
+        this.$deselectBtn.rebind('click', () => {
+            this.clear_selection();
         });
 
         this._boundEvents.push([$fmRightFilesBlock, 'selectablereinitialized.sm']);
@@ -838,6 +844,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             this.hideSelectionBar();
         }
         else {
+            const showRemoveAll = (this.currentdirid !== 'out-shares') && (this.currentdirid !== 'shares');
             var totalNodes = this.items.length;
 
             var itemsTotalSize = "";
@@ -868,13 +875,18 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 else { // Multiple items here
                     itemsNum = mega.icu.format(l.selected_count, itemsNum);
 
-                    notificationText = mega.icu.format(l[24672], totalNodes)
-                        .replace('%1', `<span class="sel-notif-count-total">${itemsNum}</span>`)
-                        .replace('%2', totalHtml);
+                    if (showRemoveAll) {
+                        notificationText = itemsNum + ' ' + totalHtml;
+                    }
+                    else {
+                        notificationText = mega.icu.format(l[24672], totalNodes)
+                            .replace('%1', `<span class="sel-notif-count-total">${itemsNum}</span>`)
+                            .replace('%2', totalHtml);
+                    }
                 }
             }
 
-            this.showSelectionBar(notificationText, itemsNum, itemsTotalSize, totalNodes);
+            this.showSelectionBar(notificationText, itemsNum, itemsTotalSize, totalNodes, showRemoveAll);
 
             if (scrollTo) {
                 this.scrollToElementProxyMethod(this.last_selected);
@@ -886,9 +898,12 @@ class SelectionManager2_DOM extends SelectionManager2Base {
      * Show the selection notification bar at the bottom of pages
      * @param notificationText
      */
-    showSelectionBar(notificationText, itemSelected, itemsTotalSize, totalNodes) {
+    showSelectionBar(notificationText, itemSelected, itemsTotalSize, totalNodes, showDeselectBtn) {
 
-        var $selectionBar = $('.selection-status-bar');
+        const $selectionBar = this.$selectionBar && this.$selectionBar[0]
+            ? this.$selectionBar
+            : $('.selection-status-bar');
+
         let scrollBarYClass = '';
         const $selCountElm = $('.sel-notif-count-total', $selectionBar);
 
@@ -905,6 +920,12 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         }
         else {
             $('.selection-bar-col', $selectionBar).empty();
+            showDeselectBtn = false;
+        }
+
+        if (this.currentlyShowingDeselect !== showDeselectBtn) {
+            this.$deselectBtn.toggleClass('hidden', !showDeselectBtn);
+            this.currentlyShowingDeselect = showDeselectBtn;
         }
 
         this.vSelectionBar = $('b', $selectionBar).get(0);

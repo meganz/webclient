@@ -10,7 +10,9 @@
             // List view mode
             '<table>' +
                 '<tr>' +
-                    '<td class="space-maintainer-start"></td>' +
+                    '<td class="space-maintainer-start">' +
+                        '<i class="sprite-fm-mono icon-check selected"></i>' +
+                    '</td>' +
                     '<td megatype="fav">' +
                         '<span class="grid-status-icon sprite-fm-mono icon-dot"></span>' +
                     '</td>' +
@@ -41,6 +43,7 @@
 
             // Icon view mode
             '<a class="data-block-view">' +
+                `<i class="sprite-fm-mono icon-check selected"></i>` +
                 '<span class="data-block-bg ">' +
                     '<span class="data-block-indicators">' +
                         '<span class="file-status-icon indicator sprite-fm-mono"></span>' +
@@ -175,7 +178,9 @@
             // List view mode
             '<table>' +
                 '<tr>' +
-                    '<td class="space-maintainer-start"></td>' +
+                    '<td class="space-maintainer-start">' +
+                        '<i class="sprite-fm-mono icon-check selected"></i>' +
+                    '</td>' +
                     '<td megatype="fav">' +
                         '<span class="grid-status-icon sprite-fm-mono icon-dot"></span>' +
                     '</td>' +
@@ -209,6 +214,7 @@
 
             // Icon view mode
             '<a class="data-block-view">' +
+                '<i class="sprite-fm-mono icon-check selected"></i>' +
                 '<span class="data-block-bg ">' +
                     '<span class="data-block-indicators">' +
                         '<span class="file-status-icon indicator sprite-fm-mono"></span>' +

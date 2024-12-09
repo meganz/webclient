@@ -135,6 +135,7 @@ class MegaSheet extends MegaOverlay {
 
         mainlayout.classList.add('fm-overlay');
         document.documentElement.classList.add('overlayed');
+        tryCatch(() => document.activeElement.blur())();
     }
 
     hide() {

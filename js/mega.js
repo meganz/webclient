@@ -335,6 +335,9 @@ if (typeof loadingInitDialog === 'undefined') {
     };
     loadingInitDialog.step2 = function(progress) {
         'use strict';
+        if (self.d > 0 && !(progress % 20)) {
+            console.info('loadingInitDialog.step2(%s)...', progress, !!this.progress, this.active);
+        }
         if (!this.active) {
             return;
         }
@@ -364,6 +367,9 @@ if (typeof loadingInitDialog === 'undefined') {
     loadingInitDialog.step3 = function(progress, delayStep) {
         'use strict';
 
+        if (self.d > 0) {
+            console.info('loadingInitDialog.step3(%s, %s)...', progress, delayStep, this.progress, this.active);
+        }
         if (this.progress) {
 
             // Don't show step 3 loading if on mobile
@@ -2112,6 +2118,7 @@ function initworkerpool() {
     const workerStateData = {
         d,
         u_k,
+        seqno,
         u_privk,
         u_handle,
         secureKeyMgr,
@@ -2340,6 +2347,10 @@ function tree_residue(data) {
     // store the residual f response for perusal once all workers signal that they're done
     this.residual.push(...data);
 
+    if (self.d > 0) {
+        this.logger.log('tree_residue()...', decWorkerPool.ok, this.residual);
+    }
+
     // request an "I am done" confirmation ({}) from all workers
     if (decWorkerPool.ok) {
         dumpsremaining = decWorkerPool.length;
@@ -2461,7 +2472,9 @@ function worker_procmsg(ev) {
 
             if (decWorkerPool.inflight) {
                 for (const api of decWorkerPool.inflight) {
-
+                    if (self.d > 0) {
+                        api.logger.log('residual acquired, resuming operations...', api.residual);
+                    }
                     if (api.residual[0]) {
                         api.residual[0].resolve();
                     }
@@ -2470,6 +2483,9 @@ function worker_procmsg(ev) {
                     }
                 }
                 decWorkerPool.inflight = null;
+            }
+            else if (self.d) {
+                console.info('decWorkerPool completed, but nothing pending inflight...');
             }
         }
     }
@@ -2482,6 +2498,9 @@ function loadfm(force) {
     "use strict";
     assert(!is_chatlink);
 
+    if (self.d > 0) {
+        console.log(`[${new Date().toISOString()}] begin loadfm() setup...`, is_fm(), loadfm.loaded, loadfm.loading);
+    }
     if (force) {
         localStorage.force = true;
         loadfm.loaded = false;
@@ -3727,6 +3746,9 @@ function init_chat(action) {
 function loadfm_callback(res) {
     'use strict';
 
+    if (self.d > 0) {
+        console.log(`[${new Date().toISOString()}] stepping into loadfm() completion...`, is_fm(), loadfm.fromapi, res);
+    }
     if ((parseInt(res) | 0) < 0 || res === undefined) {
         window.loadingInitDialog.hide();
 
@@ -3971,15 +3993,14 @@ function loadfm_done(mDBload) {
 
     window.loadingInitDialog.step3(56, 85);
 
+    if (self.d > 0) {
+        console.log(`[${new Date().toISOString()}] completing loadfm() setup...`, is_fm(), loadfm.fromapi, mDBload);
+    }
     mDBload = mDBload || !loadfm.fromapi;
 
     loadfm.loaded = Date.now();
     loadfm.loading = false;
     loadfm.fromapi = false;
-
-    if (d > 1) {
-        console.warn('loadfm_done called.', is_fm());
-    }
 
     mega.loadReport.procAPs       = Date.now() - mega.loadReport.stepTimeStamp;
     mega.loadReport.stepTimeStamp = Date.now();

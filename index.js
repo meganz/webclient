@@ -1536,6 +1536,7 @@ function init_page() {
     else if (page.substr(0, 5) === 'debug') {
         localStorage.d = 1;
         localStorage.minLogLevel = 0;
+        sessionStorage.mVerboseLog = 1;
         loadSubPage(page.substr(6) || 'fm');
         return location.reload(true);
     }
@@ -3331,6 +3332,15 @@ mBroadcaster.once('boot_done', () => {
     M = new MegaData();
 
     if (!self.is_karma) {
+        tryCatch(() => {
+            // The /debug page was visited,
+            // forward console.debug messages for these users
+            // that did not enable Verbose-level debugging...
+            if (self.d && sessionStorage.mVerboseLog) {
+                console.debug = console.log;
+            }
+        })();
+
         tryCatch(() => {
             Object.defineProperty(self, 'onbeforeunload', {
                 value: null,

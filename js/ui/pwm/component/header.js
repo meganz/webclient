@@ -4,15 +4,7 @@ class MegaHeader extends MegaMobileHeader {
 
         super(options);
 
-        /* Top block */
-
-        const menuButton = this.domNode.componentSelector('.top-block .menu');
-        menuButton.on('click.menu', () => {
-            menuButton.handleEvent('tap.list');
-        });
-
         /* Bottom block */
-
         const navNavigation = this.domNode.querySelector('.bottom-block .nav-navigation');
         navNavigation.textContent = '';
 
@@ -35,6 +27,68 @@ class MegaHeader extends MegaMobileHeader {
             eventlog(500562);
         });
 
+        const avatarBtn = new MegaLink({
+            parentNode: navActions,
+            type: 'normal',
+            componentClassname: 'avatar'
+        });
+
+        useravatar.loadAvatar(u_handle).finally(() => {
+
+            const avatarMeta = generateAvatarMeta(u_handle);
+
+            const shortNameEl = mCreateElement('span');
+            shortNameEl.textContent = avatarMeta.shortName;
+
+            const avatar = avatarMeta.avatarUrl
+                ? mCreateElement('div', {class: `avatar-wrapper ${u_handle} small-rounded-avatar`},
+                                 [mCreateElement('img', {src: avatarMeta.avatarUrl})])
+                : mCreateElement('div',
+                                 {class: `color${avatarMeta.color} avatar-wrapper ${u_handle} small-rounded-avatar`},
+                                 [shortNameEl]);
+
+            avatarBtn.domNode.appendChild(avatar);
+
+            this.avatarDialog = mCreateElement('div', {class: 'pm-account-dialog'}, [
+                mCreateElement('div', {class: 'avatar-header'}, [
+                    mCreateElement('div', {class: 'account-profile'}, [avatar.cloneNode(true)]),
+                    mCreateElement('div', {class: 'avatar-details'}, [
+                        mCreateElement('div', {class: 'pm-name ', 'data-simpletip': avatarMeta.fullName},
+                                       [document.createTextNode(avatarMeta.fullName)]),
+                        mCreateElement('div', {class: 'pm-email', 'data-simpletip': u_attr.email},
+                                       [document.createTextNode(u_attr.email)])
+                    ])
+                ]),
+
+                mCreateElement('div', {class: 'horizontal-divider'})
+            ]);
+
+            avatarBtn.rebind('click', event => {
+                if (avatarBtn.toggleClass('active')) {
+                    mega.ui.menu.addClass('avatar-menu');
+                    mega.ui.contextMenu.show({
+                        name: 'avatar-menu',
+                        event,
+                        eventTarget: avatarBtn,
+                        parentNode: this.avatarDialog
+                    });
+
+                    this.updateUserName(u_attr.fullname);
+                    this.updateEmail(u_attr.email);
+                }
+                else {
+                    mega.ui.menu.hide();
+                }
+            });
+
+            mega.ui.menu.on('hide.menu', () => {
+                mega.ui.menu.removeClass('avatar-menu');
+                avatarBtn.removeClass('active');
+                this.avatarDialog.querySelector('.pm-name').classList.remove('simpletip');
+                this.avatarDialog.querySelector('.pm-email').classList.remove('simpletip');
+            });
+        });
+
         // const alarmButton = new MegaButton({
         //     parentNode: navActions,
         //     type: 'icon',
@@ -47,39 +101,36 @@ class MegaHeader extends MegaMobileHeader {
         //     // TODO: Implement alarm button functionality
         // });
 
-        // const avatarButton = new MegaLink({
-        //     parentNode: navActions,
-        //     type: 'normal',
-        //     componentClassname: 'avatar'
-        // });
+    }
 
-        // useravatar.loadAvatar(u_handle).finally(() => {
+    updateUserName(newName) {
+        const elem = this.avatarDialog.querySelector('.pm-name');
+        elem.textContent = newName;
+        elem.dataset.simpletip = newName;
 
-        //     const avatarMeta = generateAvatarMeta(u_handle);
+        if (elem.scrollWidth > elem.offsetWidth) {
+            elem.classList.add('simpletip');
+        }
+        else {
+            elem.classList.remove('simpletip');
+        }
 
-        //     const shortNameEl = mCreateElement('span');
-        //     shortNameEl.textContent = avatarMeta.shortName;
+        mega.ui.menu.calcPosition();
+    }
 
-        //     const avatar = avatarMeta.avatarUrl
-        //         ? mCreateElement('img', {src: avatarMeta.avatarUrl})
-        //         : mCreateElement('div', {class: `color${avatarMeta.color}`},[shortNameEl]);
+    updateEmail(newEmail) {
+        const elem = this.avatarDialog.querySelector('.pm-email');
+        elem.textContent = newEmail;
+        elem.dataset.simpletip = newEmail;
 
-        //     avatarButton.domNode.appendChild(avatar);
+        if (elem.scrollWidth > elem.offsetWidth) {
+            elem.classList.add('simpletip');
+        }
+        else {
+            elem.classList.remove('simpletip');
+        }
 
-        //     avatarButton.on('click.account', () => {
-        //         // TODO: Implement popup for user account settings
-        //     });
-        // });
-
-        const treeDotButton = new MegaButton({
-            parentNode: navActions,
-            type: 'icon',
-            componentClassname: 'text-icon menu js-more-menu',
-            icon: 'sprite-fm-mono icon-side-menu',
-            iconSize: 24
-        });
-
-        treeDotButton.on('click', () => topMenu());
+        mega.ui.menu.calcPosition();
     }
 
     static init(update) {

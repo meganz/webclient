@@ -28,8 +28,10 @@ class MegaPasswordList extends MegaView {
         });
 
         installBanner.actionButton.on('click', () => {
-            const link = // TODO: ua.details.browser === 'Edgium' ? '' :
-                'https://chromewebstore.google.com/detail/mega-pass/deelhmmhejpicaaelihagchjjafjapjc';
+            const link = ua.details.browser === 'Edgium' ?
+                `https://microsoftedge.microsoft.com/addons/detail/mega-pass-secure-passwor/
+hjdopmdfeekbcakjbbienpbkdldkalfe`
+                : 'https://chromewebstore.google.com/detail/mega-pass/deelhmmhejpicaaelihagchjjafjapjc';
             window.open(link, '_blank', 'noopener,noreferrer');
         });
 

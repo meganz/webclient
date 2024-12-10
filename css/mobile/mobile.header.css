@@ -173,6 +173,7 @@
     margin: 0 auto;
     padding: 0;
     width: 24px;
+    display: block;
 }
 
 .filter {

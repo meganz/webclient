@@ -4127,7 +4127,9 @@ function wchecksum(data, seed) {
 
 function onIdle(callback) {
     'use strict';
-    self.scheduler.postTask(callback);
+    // requestIdleCallback() is no longer reliable, hence
+    // using our setTimeout() replacement in timers.js...
+    setTimeout(callback, 60);
 }
 
 function makeUUID(a) {

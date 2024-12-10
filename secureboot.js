@@ -3068,6 +3068,7 @@ else if (!browserUpdate) {
             'pwm:menu_css': {f:'css/pm/menu.css', n: 'pm_menu_css', j:2, w:1},
             'pwm:password_item_form_css': {f:'css/pm/password-item-form.css', n: 'pm_password_item_form_css', j:2, w:1},
             'pwm:subscription_dialog_css': {f:'css/pm/subscription-dialog.css', n: 'subscription_dialog_css', j:2, w:1},
+            'pwm:avatars_css': {f:'css/pm/avatars.css', n: 'pwm_avatars_css', j:2, w:1},
             'pwm:settings_css': {f:'css/pm/settings/settings.css', n: 'settings_css', j:2, w:1},
             'pwm:settings_list_css': {f:'css/pm/settings/list.css', n: 'settings_list_css', j:2, w:1},
 

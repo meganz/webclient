@@ -57,6 +57,7 @@ class MegaContextMenu extends MegaComponentGroup {
         }
         else if (this.name === 'avatar-menu') {
             menuItems['.logout'] = 1;
+            menuItems['.download-extension'] = 1;
             menuItems['.settings'] = 1;
         }
 
@@ -142,33 +143,25 @@ class MegaContextMenu extends MegaComponentGroup {
                 }
             },
             '.logout': {
-                text: 'Log out',
-                icon: 'sprite-pm-mono icon-log-out-thin-outline',
-                onClick: async() => {
-                    const content = await mega.ui.pm.recoveryLogout.init();
-
-                    mega.ui.overlay.show({
-                        name: 'recoverykey-logout-overlay',
-                        navImage: 'left-icon sprite-fm-illustration-wide img-mega-logo sk-elm icon-size-80',
-                        showClose: true,
-                        centered: true,
-                        classList: ['logout-overlay', 'with-top-nav'],
-                        icon: 'bell',
-                        title: l.logout_before,
-                        contents: [content]
-                    });
-
-                    mega.ui.overlay.one('close.overlay', () => {
-                        mega.ui.overlay.removeClass('logout-overlay', 'with-top-nav');
-                    });
+                text: l.mobile_settings_log_out_button,
+                icon: 'sprite-mobile-fm-mono icon-home-01-thin-outline',
+                onClick: () => mLogout()
+            },
+            '.download-extension': {
+                text: l.download_extension,
+                icon: 'sprite-pm-mono icon-magic-wand-thin-outline',
+                onClick: () => {
+                    const link = ua.details.browser === 'Edgium' ?
+                        `https://microsoftedge.microsoft.com/addons/detail/mega-pass-secure-passwor/
+hjdopmdfeekbcakjbbienpbkdldkalfe`
+                        : 'https://chromewebstore.google.com/detail/mega-pass/deelhmmhejpicaaelihagchjjafjapjc';
+                    window.open(link, '_blank', 'noopener,noreferrer');
                 }
             },
             '.settings': {
-                text: 'Settings',
+                text: l.mega_settings,
                 icon: 'sprite-pm-mono icon-settings-thin-outline',
-                onClick: () => {
-                    // TODO: Implement settings
-                }
+                onClick: () => loadSubPage('fm/account')
             }
         };
     });

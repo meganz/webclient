@@ -26,7 +26,8 @@ class MegaMenu extends MegaOverlay {
             centered: false
         });
 
-        this.calcPosition(options.event);
+        this.event = options.event;
+        this.calcPosition();
 
         // This is opened by click event.
         if (options.eventTarget) {
@@ -46,10 +47,9 @@ class MegaMenu extends MegaOverlay {
     /**
      * Calculate the position of the context menu dialog based on the target element
      *
-     * @param {*} event Event object
      * @returns {void}
      */
-    calcPosition(event) {
+    calcPosition() {
         if (!this.visible) {
             return;
         }
@@ -71,9 +71,9 @@ class MegaMenu extends MegaOverlay {
         // calculate the max width & height available for the context menu dialog
         const maxHeight = POPUP_HEIGHT - mega.ui.pm.POPUP_TOP_MARGIN;
 
-        if (event.type === 'contextmenu') {
-            posLeft = event.originalEvent.clientX;
-            posTop = event.originalEvent.clientY;
+        if (this.event.type === 'contextmenu') {
+            posLeft = this.event.originalEvent.clientX;
+            posTop = this.event.originalEvent.clientY;
 
             // if the left side of the popup is out of the window, move it to fit the right side of the window
             if (posLeft + menuWidth + mega.ui.pm.POPUP_SIDE_MARGIN > POPUP_WIDTH) {
@@ -85,11 +85,11 @@ class MegaMenu extends MegaOverlay {
             }
         }
         else {
-            const {top, bottom, right} = event.currentTarget.domNode.getBoundingClientRect();
+            const {top, bottom, right} = this.event.currentTarget.domNode.getBoundingClientRect();
 
             // calculate the position of the context menu dialog from the left & top of the target element
             posLeft = right - menuWidth;
-            posTop = bottom;
+            posTop = bottom + 12; // 12px space between the target element and the context menu dialog
 
             // check if top is at the second half of the popup.
             // if so, show the context menu dialog above the target element

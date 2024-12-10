@@ -218,9 +218,15 @@ MegaData.prototype.syncUsersFullname = async function(userId, chatHandle) {
         u_attr.name = user.name;
 
         $('.user-name, .top-menu-logged .name, .membership-big-txt.name').text(u_attr.fullname);
-        if (!is_mobile && M.currentdirid === 'account') {
-            accountUI.account.profiles.renderFirstName();
-            accountUI.account.profiles.renderLastName();
+
+        if (!is_mobile) {
+            if (M.currentdirid === 'account') {
+                accountUI.account.profiles.renderFirstName();
+                accountUI.account.profiles.renderLastName();
+            }
+            else if (mega.ui.menu && mega.ui.menu.name === 'avatar-menu' && mega.ui.menu.visible) {
+                mega.ui.header.updateUserName(u_attr.fullname);
+            }
         }
     }
 

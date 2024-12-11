@@ -1,9 +1,10 @@
-import {Button} from "../../../../buttons.jsx";
-import {Dropdown} from "../../../../dropdowns.jsx";
-import ContextMenu from "../../../../../chat/ui/contactsPanel/contextMenu.jsx";
-import React from "react";
-import {GenericNodePropsComponent} from "../genericNodePropsComponent";
-import { inProgressAlert } from '../../../../../chat/ui/meetings/call';
+import React from 'react';
+import { Button } from '../../../../buttons.jsx';
+import { Dropdown } from "../../../../dropdowns.jsx";
+import ContextMenu from '../../../../../chat/ui/contactsPanel/contextMenu.jsx';
+import { GenericNodePropsComponent } from '../genericNodePropsComponent.jsx';
+import { inProgressAlert } from '../../../../../chat/ui/meetings/call.jsx';
+import { EVENTS, VIEWS } from '../../../../../chat/ui/conversations.jsx';
 
 export class ColumnContactButtons extends GenericNodePropsComponent {
     static sortable = false;
@@ -45,7 +46,10 @@ export class ColumnContactButtons extends GenericNodePropsComponent {
                         className="mega-button action simpletip"
                         icon="sprite-fm-mono icon-chat"
                         attrs={{ 'data-simpletip': l[8632] }}
-                        onClick={() => loadSubPage('fm/chat/p/' + handle)}
+                        onClick={() => {
+                            loadSubPage(`fm/chat/p/${handle}`);
+                            megaChat.trigger(EVENTS.NAV_RENDER_VIEW, VIEWS.CHATS);
+                        }}
                     />
                     <Button
                         className="mega-button action simpletip"

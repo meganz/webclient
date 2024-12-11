@@ -8622,7 +8622,10 @@ ColumnContactVerifiedStatus.verifiedLabel = REaCt().createElement("div", {
 const dropdowns = REQ_(911);
 // EXTERNAL MODULE: ./js/chat/ui/meetings/call.jsx + 11 modules
 const call = REQ_(3);
+// EXTERNAL MODULE: ./js/chat/ui/conversations.jsx + 20 modules
+const conversations = REQ_(823);
 ;// ./js/chat/ui/contactsPanel/contextMenu.jsx
+
 
 
 
@@ -8685,7 +8688,8 @@ class ContextMenu extends mixins.w9 {
               createChatLink: false
             });
           }
-          return loadSubPage(`fm/chat/p/${contact.u}`);
+          loadSubPage(`fm/chat/p/${contact.u}`);
+          megaChat.trigger(conversations.qY.NAV_RENDER_VIEW, conversations.Vw.CHATS);
         })
       }), REaCt().createElement(dropdowns.DropdownItem, {
         icon: "sprite-fm-mono icon-send-files",
@@ -8772,6 +8776,7 @@ class ContextMenu extends mixins.w9 {
 
 
 
+
 class ColumnContactButtons extends genericNodePropsComponent.B {
   render() {
     const {
@@ -8806,7 +8811,10 @@ class ColumnContactButtons extends genericNodePropsComponent.B {
       attrs: {
         'data-simpletip': l[8632]
       },
-      onClick: () => loadSubPage(`fm/chat/p/${  handle}`)
+      onClick: () => {
+        loadSubPage(`fm/chat/p/${handle}`);
+        megaChat.trigger(conversations.qY.NAV_RENDER_VIEW, conversations.Vw.CHATS);
+      }
     }), REaCt().createElement(buttons.$, {
       className: "mega-button action simpletip",
       icon: "sprite-fm-mono icon-send-files",
@@ -9585,7 +9593,10 @@ class ContactProfile extends mixins.w9 {
         attrs: {
           'data-simpletip': l[8632]
         },
-        onClick: () => loadSubPage(`fm/chat/p/${handle}`)
+        onClick: () => {
+          loadSubPage(`fm/chat/p/${handle}`);
+          megaChat.trigger(conversations.qY.NAV_RENDER_VIEW, conversations.Vw.CHATS);
+        }
       }), REaCt().createElement(buttons.$, {
         className: "mega-button round simpletip",
         icon: "sprite-fm-mono icon-send-files",
@@ -19727,9 +19738,11 @@ class ConversationsApp extends mixins.w9 {
         });
       }
     });
-    megaChat.rebind(conversations_EVENTS.NAV_RENDER_VIEW, (ev, view) => {
-      if (Object.values(VIEWS).includes(view)) {
-        this.renderView(view);
+    megaChat.rebind(conversations_EVENTS.NAV_RENDER_VIEW, ({
+      data
+    }) => {
+      if (Object.values(VIEWS).includes(data)) {
+        this.renderView(data);
       }
     });
     megaChat.rebind('onCallTimeLimitExceeded', () => {

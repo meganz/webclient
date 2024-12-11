@@ -1,19 +1,19 @@
 import React from 'react';
-import {MegaRenderMixin} from '../../mixins';
-import {Avatar, ContactPresence} from '../contacts.jsx';
-import {Button} from '../../../ui/buttons.jsx';
-import {Dropdown} from '../../../ui/dropdowns.jsx';
+import { MegaRenderMixin } from '../../mixins';
+import { Avatar, ContactPresence } from '../contacts.jsx';
+import { Button } from '../../../ui/buttons.jsx';
+import { Dropdown } from '../../../ui/dropdowns.jsx';
 import { Emoji } from '../../../ui/utils.jsx';
 import ContactsPanel from './contactsPanel.jsx';
 import ContextMenu from './contextMenu.jsx';
-import FMView from "../../../ui/jsx/fm/fmView.jsx";
-import {ColumnFavIcon} from "../../../ui/jsx/fm/nodes/columns/columnFavIcon.jsx";
-import {ColumnSharedFolderName} from "../../../ui/jsx/fm/nodes/columns/columnSharedFolderName.jsx";
-import {ColumnSharedFolderAccess} from "../../../ui/jsx/fm/nodes/columns/columnSharedFolderAccess.jsx";
-import {ColumnSharedFolderButtons} from "../../../ui/jsx/fm/nodes/columns/columnSharedFolderButtons.jsx";
+import FMView from '../../../ui/jsx/fm/fmView.jsx';
+import { ColumnFavIcon } from '../../../ui/jsx/fm/nodes/columns/columnFavIcon.jsx';
+import { ColumnSharedFolderName } from '../../../ui/jsx/fm/nodes/columns/columnSharedFolderName.jsx';
+import { ColumnSharedFolderAccess } from '../../../ui/jsx/fm/nodes/columns/columnSharedFolderAccess.jsx';
+import { ColumnSharedFolderButtons } from '../../../ui/jsx/fm/nodes/columns/columnSharedFolderButtons.jsx';
 import Nil from './nil.jsx';
 import Link from '../link.jsx';
-import { inProgressAlert } from '../meetings/call.jsx';
+import { EVENTS, VIEWS } from '../conversations.jsx';
 
 export default class ContactProfile extends MegaRenderMixin {
     state = {
@@ -188,7 +188,10 @@ export default class ContactProfile extends MegaRenderMixin {
                                         className="mega-button round simpletip"
                                         icon="sprite-fm-mono icon-chat-filled"
                                         attrs={{ 'data-simpletip': l[8632] /* `Start new chat` */ }}
-                                        onClick={() => loadSubPage(`fm/chat/p/${handle}`)}
+                                        onClick={() => {
+                                            loadSubPage(`fm/chat/p/${handle}`);
+                                            megaChat.trigger(EVENTS.NAV_RENDER_VIEW, VIEWS.CHATS);
+                                        }}
                                     />
                                     <Button
                                         className="mega-button round simpletip"

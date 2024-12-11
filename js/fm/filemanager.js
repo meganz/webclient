@@ -4847,9 +4847,6 @@ FileManager.prototype.onSectionUIOpen = function(id) {
             selectionManager.clear_selection();
         }
     }
-    else if (id === 'conversations') {
-        mega.gallery.albums.initUserAlbums();
-    }
 
     // Revamp Implementation End
 
@@ -4994,9 +4991,6 @@ FileManager.prototype.initLeftPanel = function() {
 
     if ((isGallery || isAlbums) && mega.gallery.albums) {
         mega.gallery.albums.init();
-    }
-    else if (mega.gallery.canShowAddToAlbum()) {
-        onIdle(() => mega.gallery.albums.initUserAlbums());
     }
 
     $('.js-lp-storage-usage').removeClass('hidden');

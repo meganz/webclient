@@ -2235,7 +2235,9 @@ lazy(mega.gallery, 'albums', () => {
             }
         }
 
-        onMDialogShown() {
+        async onMDialogShown() {
+            await scope.albums.setUserAlbumsInStore();
+
             this.keys = Object.keys(scope.albums.store).filter(k => k.length !== predefinedKeyLength);
 
             this.updateSelectedCount();
@@ -2285,6 +2287,7 @@ lazy(mega.gallery, 'albums', () => {
                         cell.style.backgroundColor = 'white';
                         scope.unsetShimmering(cell);
                     };
+
                     if (album.nodes.length) {
                         nodeBlocks.push({el: cell, node: album.node || album.nodes[0], setThumb});
                     }
@@ -4596,24 +4599,39 @@ lazy(mega.gallery, 'albums', () => {
         }
 
         /**
+         * Adding user albums to mega.gallery.albums.store
+         * @returns {Object[]}
+         */
+        async setUserAlbumsInStore() {
+            if (scope.albumsRendered) {
+                return []; // No need to re-fetch same albums
+            }
+
+            const albums = [];
+            const sets = Object.values(await mega.sets.buildTmp());
+
+            if (!Array.isArray(sets) || !sets.length) {
+                return [];
+            }
+
+            const ignoreHandles = unwantedHandles() || false;
+
+            for (let i = 0; i < sets.length; i++) {
+                albums.push(this.createAlbumData(sets[i], ignoreHandles));
+            }
+
+            return albums;
+        }
+
+        /**
          * Generating buttons for User-created albums
          * @returns {Object[]}
          */
         async setUserAlbums() {
-            const albums = [];
+            let albums = [];
 
             if (!this.isPublic) {
-                const sets = Object.values(await mega.sets.buildTmp());
-
-                if (!Array.isArray(sets) || !sets.length) {
-                    return [];
-                }
-
-                const ignoreHandles = unwantedHandles() || false;
-
-                for (let i = 0; i < sets.length; i++) {
-                    albums.push(this.createAlbumData(sets[i], ignoreHandles));
-                }
+                albums = await this.setUserAlbumsInStore();
             }
 
             sortStore();
@@ -5163,7 +5181,6 @@ lazy(mega.gallery, 'albums', () => {
 
         /**
          * Fetching the data from the local DB for the albums
-         * @param {Boolean} skipInitUi Skipping init the albums UI
          * @returns {void}
          */
         static fetchDBDataFromGallery(skipInitUi = false) {
@@ -5171,12 +5188,7 @@ lazy(mega.gallery, 'albums', () => {
                 MegaGallery.dbActionPassed = true;
 
                 if (scope.albums.awaitingDbAction) {
-                    if (skipInitUi) {
-                        scope.albums.initUserAlbums();
-                    }
-                    else {
-                        scope.albums.init(handles);
-                    }
+                    scope.albums.init(handles);
                 }
             };
 
@@ -5465,26 +5477,6 @@ lazy(mega.gallery, 'albums', () => {
 
             const dialog = new AddToAlbumDialog(handles, selections);
             dialog.show();
-        }
-
-        initUserAlbums() {
-            if (!MegaGallery.dbActionPassed) {
-                if (this.awaitingDbAction) {
-                    return; // Some other part has already requested this
-                }
-
-                this.awaitingDbAction = true;
-
-                if (M.isGalleryPage()) {
-                    return; // Handles will be retrieved by Gallery
-                }
-
-                Albums.fetchDBDataFromGallery(true);
-                return; // Fetch will re-trigger Albums.initUserAlbums() the second time after the db data is retrieved
-            }
-
-            mega.gallery.albums.setUserAlbums();
-            mega.gallery.albums.subscribeToSetsChanges();
         }
     }
 

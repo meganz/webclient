@@ -37,7 +37,7 @@ class MegaPasswordItemDetail {
         });
 
         contextMenuBtn.on('click', event => {
-            if (contextMenuBtn.domNode.classList.toggle('active')) {
+            if (contextMenuBtn.toggleClass('active')) {
                 mega.ui.contextMenu.show({
                     name: 'item-detail-menu',
                     event,
@@ -66,15 +66,17 @@ class MegaPasswordItemDetail {
             grouped: true,
             actions: [{
                 icon: 'sprite-pm-mono icon-copy-user-thin-outline',
-                onClick: (e, field) => {
-                    mega.ui.pm.utils.copyPMToClipboard(field.inputValue, l.username_copied);
+                onClick() {
+                    mega.ui.pm.utils.copyPMToClipboard(this.inputValue, l.username_copied);
                     eventlog(500546);
+                    return false;
                 },
                 hint: l.copy_username
             }],
             label: l.username_label,
-            onClick: (e) => {
-                mega.ui.pm.utils.copyPMToClipboard(e.currentTarget.inputValue, l.username_copied);
+            onClick() {
+                mega.ui.pm.utils.copyPMToClipboard(this.inputValue, l.username_copied);
+                return false;
             }
         });
 
@@ -84,31 +86,34 @@ class MegaPasswordItemDetail {
             actions: [
                 {
                     icon: 'sprite-pm-mono icon-eye-thin-outline',
-                    onClick: (e, field) => {
-                        field.isPasswordVisible = !field.isPasswordVisible;
-                        e.target.className = field.isPasswordVisible ?
+                    onClick(e) {
+                        this.isPasswordVisible = !this.isPasswordVisible;
+                        const {domNode} = e.currentTarget;
+                        e.currentTarget.icon = this.isPasswordVisible ?
                             'sprite-pm-mono icon-eye-off-thin-outline simpletip' :
                             'sprite-pm-mono icon-eye-thin-outline simpletip';
-                        e.target.dataset.simpletip = field.isPasswordVisible ?
-                            l.hide_password : l.show_password;
-                        $(e.target).trigger('simpletipUpdated');
+                        domNode.dataset.simpletip = this.isPasswordVisible ? l.hide_password : l.show_password;
+                        $(domNode).trigger('simpletipUpdated');
                         eventlog(500547);
+                        return false;
                     },
                     hint: l.show_password
                 },
                 {
                     icon: 'sprite-pm-mono icon-copy-password-thin-outline',
-                    onClick: (e, field) => {
-                        mega.ui.pm.utils.copyPMToClipboard(field.inputValue, l[19602]);
+                    onClick() {
+                        mega.ui.pm.utils.copyPMToClipboard(this.inputValue, l[19602]);
                         eventlog(500548);
+                        return false;
                     },
                     hint: l[19601]
                 }
             ],
             label: l[909],
             isPassword: true,
-            onClick: (e) => {
-                mega.ui.pm.utils.copyPMToClipboard(e.currentTarget.inputValue, l[19602]);
+            onClick() {
+                mega.ui.pm.utils.copyPMToClipboard(this.inputValue, l[19602]);
+                return false;
             }
         });
 
@@ -129,16 +134,18 @@ class MegaPasswordItemDetail {
             actions: [
                 {
                     icon: 'sprite-pm-mono icon-copy-thin-outline',
-                    onClick: (e, field) => {
-                        mega.ui.pm.utils.copyPMToClipboard(field.inputValue, l.notes_copied);
+                    onClick() {
+                        mega.ui.pm.utils.copyPMToClipboard(this.inputValue, l.notes_copied);
                         eventlog(500550);
+                        return false;
                     },
                     hint: l.copy_notes
                 }
             ],
             label: l.notes_label,
-            onClick: (e) => {
-                mega.ui.pm.utils.copyPMToClipboard(e.currentTarget.inputValue, l.notes_copied);
+            onClick() {
+                mega.ui.pm.utils.copyPMToClipboard(this.inputValue, l.notes_copied);
+                return false;
             }
         });
 
@@ -170,6 +177,8 @@ class MegaPasswordItemDetail {
         this.usernameField[u ? 'removeClass' : 'addClass']('hidden');
         this.websiteField[url ? 'removeClass' : 'addClass']('hidden');
         this.notesField[n ? 'removeClass' : 'addClass']('hidden');
+        this.passwordField.isPasswordVisible = false;
+        this.passwordField.setActions(this.passwordField.actions);
 
         this.subHeaderTitle.textContent = this.item.name || url;
         this.subHeaderTitle.classList.add('simpletip');
@@ -196,5 +205,14 @@ class MegaPasswordItemDetail {
         if (!noShow) {
             this.domNode.classList.add('active');
         }
+
+        onIdle(() => {
+            if (this.domNode.Ps) {
+                this.domNode.Ps.update();
+            }
+            else {
+                this.domNode.Ps = new PerfectScrollbar(this.domNode);
+            }
+        });
     }
 }

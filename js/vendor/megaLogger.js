@@ -156,6 +156,11 @@
      * @private
      */
     const _intLevelToCall = freeze({
+        0xff01: 'group',
+        0xff02: 'groupEnd',
+        0xff03: 'groupCollapsed',
+        0xff80: 'time',
+        0xff81: 'timeEnd',
         '50': 'error',
         '40': 'error',
         '30': 'warn',
@@ -308,7 +313,7 @@
             const logLine = [];
             const logSeparator = '\u00B7';
             const logPath = this.getLoggerPath();
-            const levelName = _intToLevel[level] || "unknown";
+            const levelName = _intToLevel[level] || "\u{1F9E9}";
 
             if (options.printDate !== false) {
                 const logDate = options.dateFormatter(new Date());
@@ -327,7 +332,7 @@
                 logLine.push(args.shift());
             }
 
-            if (options.colorsEnabled) {
+            if (options.colorsEnabled && level < 0xff80) {
                 const bg = options.levelColors[levelName];
                 const tc = options.adaptiveTextColor && getYIQThreshold(bg) > 127 ? '000' : 'fff';
                 logStyle = `color:#${tc}; background-color: ${bg};${options.supColorStyle || ''}`;
@@ -496,6 +501,21 @@
         this._level = MegaLogger.LEVELS.DEBUG;
         this._log.apply(this, arguments);
     };
+
+    const stub = (name, level) => {
+        MegaLogger.prototype[name] = function() {
+            this._level = level | 0;
+            this._log.apply(this, arguments);
+        };
+    };
+
+    for (const k in _intLevelToCall) {
+        const v = _intLevelToCall[k];
+
+        if (!MegaLogger.prototype[v]) {
+            stub(v, k);
+        }
+    }
 
 
     /**

@@ -232,7 +232,7 @@ async function fmremove(selectedNodes, skipDelWarning) {
     }
 
     const handles = [...selectedNodes];
-    await dbfetch.coll(handles).catch(nop);
+    await dbfetch.coll(handles.filter((h) => h && h.length === 8)).catch(nop);
 
     if (handles.some((h) => M.d[h] && M.d[h].su)) {
         const promises = [];

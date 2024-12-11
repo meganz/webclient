@@ -162,6 +162,7 @@ FileManager.prototype.initS4FileManager = mutex('s4-object-storage.lock', functi
                 }
                 return s4.kernel.container.create(true);
             }
+            return mega.infinity && dbfetch.tree(cnt.map((n) => n.h), 0);
         })
         .then((h) => {
             this.buildtree({h: 's4'});

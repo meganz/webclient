@@ -9,6 +9,7 @@
  */
 lazy(mega, 'lite', () => {
     'use strict';
+    const inf = mega.infinity;
 
     /** Max load time in milliseconds */
     const maxLoadTimeInMs = localStorage.testLargeNodes ? 1000 : 1000 * 60 * 2;
@@ -28,7 +29,7 @@ lazy(mega, 'lite', () => {
 
         // Only Pro users can get Lite mode and skip checking the remaining logic if already in Infinity or Lite mode
         // NB: mega.infinity is the same mode but without any UI changes or options hidden (useful for future dev).
-        if (!u_attr.p || mega.infinity) {
+        if (!u_attr.p || inf) {
             return false;
         }
 

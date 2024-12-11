@@ -64,6 +64,10 @@ class MegaMobileBanner extends MegaComponent {
             componentClassname: 'text-icon'
         });
         this.xButton.on('tap.close', () => {
+            if (typeof this.collapsed !== 'undefined') {
+                this.collapsed = !this.collapsed;
+                return;
+            }
             this.trigger('close');
             this.hide();
         });
@@ -95,6 +99,7 @@ class MegaMobileBanner extends MegaComponent {
 
         this.title = '';
         this.text = '';
+        this.collapsed = false;
         this.icon = '';
         this.iconSize = '24';
         this.rightIcon = '';
@@ -104,6 +109,7 @@ class MegaMobileBanner extends MegaComponent {
 
         this.off('close');
         this.off('cta');
+        delete this._collapsed;
     }
 
     /**
@@ -404,6 +410,24 @@ class MegaMobileBanner extends MegaComponent {
 
     }
 
+    get collapsed() {
+        return this._collapsed;
+    }
+
+    set collapsed(collapse) {
+        this._collapsed = collapse;
+        this.xButton.icon =
+            `sprite-mobile-fm-mono ${collapse ? 'icon-arrow-down-thin-solid' : 'icon-arrow-up-thin-solid'}`;
+        const textNode = this.domNode.querySelector('.message-text');
+        if (collapse) {
+            textNode.classList.add('hidden');
+        }
+        else {
+            textNode.classList.remove('hidden');
+        }
+        this.actionButton[collapse ? 'hide' : 'show']();
+    }
+
     /**
      * Create MegaRacks at runtime as appropriate to display alerts and ads.
      *
@@ -417,7 +441,7 @@ class MegaMobileBanner extends MegaComponent {
 
         // Single alerts instant object
         mega.ui.alerts = new MegaRack({
-            parentNode: mainlayout,
+            parentNode: mega.ui.header.bannerHolder,
             componentClassname: 'banner-rack flow-up top',
             prependRack: true,
             childComponent: MegaMobileBanner,
@@ -467,6 +491,10 @@ class MegaMobileBanner extends MegaComponent {
                     this.iconSize = type === 'advertisement' ? '48' : '24';
                     this.closeButton = typeof closeBtn === 'undefined' ? true : closeBtn;
                     this.isSystemWide = typeof systemWide === 'undefined' ? true : systemWide;
+                    if (closeBtn === false) {
+                        this.closeButton = true;
+                        this.collapsed = false;
+                    }
                 });
             }
         };

@@ -11,6 +11,10 @@ class MegaMobileHeader extends MegaComponent {
         this.topBlock.className = 'block top-block';
         targetNode.appendChild(this.topBlock);
 
+        this.bannerHolder = document.createElement('div');
+        this.bannerHolder.className = 'block banner-block';
+        targetNode.appendChild(this.bannerHolder);
+
         targetNode = this.topBlock;
         let subNode = document.createElement('div');
         subNode.className = 'nav-navigation';

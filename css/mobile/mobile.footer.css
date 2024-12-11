@@ -4,11 +4,12 @@
     align-items: center;
     justify-content: flex-end;
     padding: 16px;
-    position: fixed;
+    position: relative;
     bottom: 0;
     right: 0;
     z-index: 100;
     transition: bottom 100ms linear;
+    transform: translateY(-100%);
 }
 
 .rtl .mega-footer {

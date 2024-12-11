@@ -20,12 +20,32 @@ if (typeof importScripts !== 'undefined') {
 
     self.postMessage = self.webkitPostMessage || self.postMessage;
 
+    /* eslint-disable no-use-before-define,no-empty-function,no-empty,strict */
+    const nop = self.lazy = () => {};
+    const tryCatch = self.tryCatch = (fn) => (...args) => {
+        // eslint-disable-next-line local-rules/hints
+        try {
+            return fn(...args);
+        }
+        catch (ex) {
+            console.warn('Caught worker exception.', ex);
+        }
+    };
+
+    const log = tryCatch(() => {
+        'use strict';
+        const pid = (Math.random() * Date.now() >>> 7).toString(36);
+        return tryCatch((m, ...args) => {
+            console.warn(`[${new Date().toISOString()}][${self.seqno | 0}/${pid}] ${m}`, ...args);
+        });
+    })() || nop;
+
     let jobs;
-    // eslint-disable-next-line strict
-    const init = ({d: debug, allowNullKeys, secureKeyMgr} = false) => {
+    const init = ({d, seqno, allowNullKeys, secureKeyMgr} = false) => {
 
         jobs = 0;
-        d = !!debug;
+        self.d = !!d;
+        self.seqno = seqno;
 
         // Set global to allow all-0 keys to be used (for those users that set localStorage flag)
         if (allowNullKeys) {
@@ -51,7 +71,7 @@ if (typeof importScripts !== 'undefined') {
                 const k = crypto_process_sharekey(req.n, req.k);
 
                 if (k === false) {
-                    console.warn(`Failed to decrypt RSA share key for ${req.n}: ${req.k}`);
+                    log(`Failed to decrypt RSA share key for ${req.n}: ${req.k}`);
                 }
                 else if (crypto_setsharekey2(req.n, k)) {
                     req.k = k;
@@ -73,13 +93,13 @@ if (typeof importScripts !== 'undefined') {
             let ok = false;
             if (crypto_handleauthcheck(req.h, req.ha)) {
                 if (d) {
-                    console.log("Successfully decrypted sharekeys for " + req.h);
+                    log(`Successfully decrypted sharekeys for ${req.h}`);
                 }
                 const key = decrypt_key(u_k_aes, base64_to_a32(req.k));
                 ok = crypto_setsharekey2(req.h, key);
             }
             if (!ok && d) {
-                console.warn("handleauthcheck failed for " + req.h);
+                log(`handleauthcheck failed for ${req.h}`);
             }
         }
         else if (req.u_k) {
@@ -90,6 +110,10 @@ if (typeof importScripts !== 'undefined') {
             u_handle = req.u_handle;
             u_privk = req.u_privk;
             u_k_aes = new sjcl.cipher.aes(req.u_k);
+
+            if (self.d) {
+                log('Worker ready.');
+            }
         }
         else if (req.n_h) {
             // setup folder link
@@ -103,7 +127,7 @@ if (typeof importScripts !== 'undefined') {
             Object.assign(self, req);
 
             if (d) {
-                console.debug('dec.worker: assign request.', JSON.stringify(req));
+                log('dec.worker: assign request.', JSON.stringify(req));
             }
         }
         else {
@@ -114,6 +138,10 @@ if (typeof importScripts !== 'undefined') {
                 sharekeys[h] = u_sharekeys[h][0];
             }
             jobs--;
+
+            if (self.d) {
+                log(`worker signaling completion, ${jobs}.`);
+            }
 
             // done - post state back to main thread
             self.postMessage({done: 1, jobs, sharekeys});
@@ -144,16 +172,6 @@ if (typeof importScripts !== 'undefined') {
             e.tik = performance.now();
         };
     }
-
-    /* eslint-disable no-use-before-define,no-empty-function,no-empty,strict */
-    lazy = () => {};
-    tryCatch = (fn) => (...args) => {
-        // eslint-disable-next-line local-rules/hints
-        try {
-            return fn(...args);
-        }
-        catch (ex) {}
-    };
 }
 
 function crypto_setsharekey2(h, sk) {
@@ -1009,7 +1027,7 @@ lazy(self, 'decWorkerPool', function decWorkerPool() {
     /** @class decWorkerPool */
     return new class extends Array {
         get url() {
-            const WORKER_VERSION = 7;
+            const WORKER_VERSION = 8;
             return `${window.is_extension || window.is_karma ? '' : '/'}nodedec.js?v=${WORKER_VERSION}`;
         }
 

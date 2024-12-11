@@ -380,8 +380,9 @@ MegaData.prototype.isCustomView = function(pathOrID) {
         result.type = 's4';
 
         if (s4path.length > 2) {
+            result.containerID = s4.utils.getBucketNode(s4path[2]).p || s4path[1];
             result.nodeID = s4path[2];
-            result.prefixPath = `${s4path[1]}/`;
+            result.prefixPath = `${result.containerID}/`;
             result.subType = ['keys', 'policies', 'users', 'groups'].includes(s4path[2]) ? s4path[2] : 'bucket';
         }
         else if (s4path.length === 2 && node.p !== M.RootID) {
@@ -1937,8 +1938,8 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
             // TODO: Improve the list rendering to only update each node if the action packet does not affect
             // list ordering.
             // Currently, we lack the detailed feature for this, which will be part of the PWM extension.
-            if (type === 'pwm' && mega.pm.pwmFeature) {
-                tryCatch(() => mega.ui.pm.list.loadList().catch(reportError))();
+            if (type === 'pwm' && n && n.pwm && mega.pm.pwmFeature) {
+                tryCatch(() => mega.ui.pm.list.initLayout().catch(reportError))();
             }
 
             if (this.isDynPage(this.currentdirid) > 1) {
@@ -2043,7 +2044,10 @@ MegaData.prototype.onRenameUIUpdate = function(itemHandle, newItemName) {
         if (!n.t && n.tvf > 0) {
             fileversioning.updateFileVersioningDialog(itemHandle);
         }
-        fm_updated(n);
+
+        if (M.currentrootid !== 'recents') {
+            fm_updated(n);
+        }
 
         if (document.getElementById(`treeli_${n.h}`)) {
             // Since n.h may not be a folder, we need to do some check to ensure we really need to do a tree redraw.

@@ -113,7 +113,7 @@ export default class ContactsPanel extends MegaRenderMixin {
         const receivedKeys = Object.keys(received || {});
         if (receivedKeys.length) {
             for (let i = receivedKeys.length; i--;) {
-                M.acceptPendingContactRequest(receivedKeys[i]);
+                M.acceptPendingContactRequest(receivedKeys[i]).catch(dump);
             }
         }
     };

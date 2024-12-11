@@ -9139,13 +9139,13 @@ class ReceivedRequests extends mixins.w9 {
           label: l[19505]
         }], [ColumnContactRequestsRcvdBtns, {
           onReject: handle => {
-            M.denyPendingContactRequest(handle);
+            M.denyPendingContactRequest(handle).catch(dump);
           },
           onBlock: handle => {
-            M.ignorePendingContactRequest(handle);
+            M.ignorePendingContactRequest(handle).catch(dump);
           },
           onAccept: handle => {
-            M.acceptPendingContactRequest(handle);
+            M.acceptPendingContactRequest(handle).catch(dump);
           }
         }]],
         keyProp: "p",
@@ -9664,7 +9664,7 @@ class ContactsPanel extends mixins.w9 {
       const receivedKeys = Object.keys(received || {});
       if (receivedKeys.length) {
         for (let i = receivedKeys.length; i--;) {
-          M.acceptPendingContactRequest(receivedKeys[i]);
+          M.acceptPendingContactRequest(receivedKeys[i]).catch(dump);
         }
       }
     };
@@ -9867,7 +9867,6 @@ class Breadcrumbs extends mixins.w9 {
   }
   getBreadcrumbNodeText(nodeId, prevNodeId) {
     const backupsId = M.BackupsId || 'backups';
-    const s4Container = M.getNodeByHandle(nodeId).s4 && M.getS4NodeType(nodeId) === 'container' && nodeId;
     switch (nodeId) {
       case M.RootID:
         return l[164];
@@ -9875,8 +9874,6 @@ class Breadcrumbs extends mixins.w9 {
         return l[167];
       case backupsId:
         return l.restricted_folder_button;
-      case s4Container:
-        return l.obj_storage;
       case 'shares':
         return prevNodeId && M.d[prevNodeId] ? M.d[prevNodeId].m : l[5589];
       default:
@@ -9983,7 +9980,15 @@ class Breadcrumbs extends mixins.w9 {
           breadcrumbClasses += " shared-with-me";
         }
         const prevNodeId = path[k - 1];
-        const nodeName = this.getBreadcrumbNodeText(nodeId, prevNodeId);
+        let nodeName = this.getBreadcrumbNodeText(nodeId, prevNodeId);
+        if (M.dyh) {
+          const {
+            localeName
+          } = M.dyh('breadcrumb-properties', handle);
+          if (localeName) {
+            nodeName = localeName;
+          }
+        }
         if (!nodeName) {
           return;
         }
@@ -12632,10 +12637,10 @@ class EndCallButton extends mixins.w9 {
             altCta: l.leave_anyway
           });
           const {
-            recorder,
+            recorderCid,
             sfuClient
           } = chatRoom.call;
-          return recorder && recorder === u_handle ? (0,streamControls.sX)(doLeave, () => sfuClient.recordingStop()) : doLeave();
+          return recorderCid && recorderCid === sfuClient.cid ? (0,streamControls.sX)(doLeave, () => sfuClient.recordingStop()) : doLeave();
         }
       });
     });
@@ -12707,10 +12712,10 @@ class EndCallButton extends mixins.w9 {
             label: l.end_for_all,
             onClick: () => {
               const {
-                recorder,
+                recorderCid,
                 sfuClient
               } = call;
-              return recorder && recorder === u_handle ? (0,streamControls._F)(doEnd, () => sfuClient.recordingStop()) : doEnd();
+              return recorderCid && recorderCid === u_handle ? (0,streamControls._F)(doEnd, () => sfuClient.recordingStop()) : doEnd();
             }
           }))
         });
@@ -22070,7 +22075,7 @@ class Participant extends mixins.w9 {
       contact,
       handle,
       name,
-      recorder,
+      recorderCid,
       onCallMinimize,
       onSpeakerChange,
       onModeChange
@@ -22097,7 +22102,7 @@ class Participant extends mixins.w9 {
       className: `${this.baseIconClass} icon-admin-outline`
     }))), REaCt().createElement("div", {
       className: "status"
-    }, recorder && recorder === handle ? REaCt().createElement("div", {
+    }, recorderCid === clientId || recorderCid === sfuClient.cid && handle === u_handle ? REaCt().createElement("div", {
       className: "recording-status"
     }, REaCt().createElement("span", null)) : null, REaCt().createElement("i", {
       className: `
@@ -22218,7 +22223,7 @@ class Participants extends mixins.w9 {
         call,
         mode,
         chatRoom,
-        recorder,
+        recorderCid,
         raisedHandPeers,
         onCallMinimize,
         onSpeakerChange,
@@ -22235,7 +22240,7 @@ class Participants extends mixins.w9 {
         contact: M.u[peer.userHandle] || undefined,
         handle: peer.userHandle || u_handle,
         name: peer.name || M.getNameByHandle(u_handle),
-        recorder,
+        recorderCid,
         raisedHandPeers,
         onCallMinimize,
         onSpeakerChange,
@@ -22503,7 +22508,7 @@ class Sidebar extends mixins.w9 {
         initialCallRinging,
         chatRoom,
         guest,
-        recorder,
+        recorderCid,
         raisedHandPeers,
         onInviteToggle,
         onCallMinimize,
@@ -22521,7 +22526,7 @@ class Sidebar extends mixins.w9 {
         initialCallRinging,
         chatRoom,
         guest,
-        recorder,
+        recorderCid,
         raisedHandPeers,
         onInviteToggle,
         onCallMinimize,
@@ -23143,11 +23148,13 @@ class RecordingConsentDialog extends mixins.w9 {
   }
   render() {
     const {
-      recorder,
+      peers,
+      recorderCid,
       onCallEnd,
       onClose
     } = this.props;
-    const recorderName = nicknames.getNickname(recorder).substr(0, ChatToastIntegration.MAX_NAME_CHARS);
+    const recordingPeer = peers[recorderCid];
+    const recorderName = nicknames.getNickname(recordingPeer).substr(0, ChatToastIntegration.MAX_NAME_CHARS);
     return REaCt().createElement(modalDialogs.A.ModalDialog, {
       dialogName: RecordingConsentDialog.dialogName,
       className: `
@@ -23213,7 +23220,7 @@ class Call extends mixins.w9 {
       onboardingUI: false,
       onboardingRecording: false,
       onboardingRaise: false,
-      recorder: undefined,
+      recorderCid: undefined,
       recordingConsentDialog: false,
       recordingConsented: false,
       recordingActivePeer: undefined,
@@ -23251,7 +23258,8 @@ class Call extends mixins.w9 {
         chatRoom
       } = this.props;
       chatRoom.rebind(`onCallPeerLeft.${NAMESPACE}`, (ev, {
-        userHandle
+        userHandle,
+        clientId
       }) => {
         const {
           minimized,
@@ -23259,9 +23267,10 @@ class Call extends mixins.w9 {
           call,
           chatRoom
         } = this.props;
-        if (userHandle === this.state.recorder && userHandle !== u_handle) {
+        if (clientId === this.state.recorderCid) {
           chatRoom.trigger('onRecordingStopped', {
-            userHandle
+            userHandle,
+            clientId
           });
         }
         if (minimized) {
@@ -23322,32 +23331,34 @@ class Call extends mixins.w9 {
         });
       }));
       chatRoom.rebind(`onRecordingStarted.${NAMESPACE}`, (ev, {
-        userHandle
+        userHandle,
+        clientId
       }) => {
-        if (!this.state.recorder) {
+        if (!this.state.recorderCid) {
           return this.state.recordingConsented ? this.setState({
-            recorder: userHandle
+            recorderCid: clientId
           }, () => {
-            ChatToast.quick(l.user_recording_toast.replace('%NAME', nicknames.getNickname(this.state.recorder).substr(0, ChatToastIntegration.MAX_NAME_CHARS)));
+            ChatToast.quick(l.user_recording_toast.replace('%NAME', nicknames.getNickname(userHandle).substr(0, ChatToastIntegration.MAX_NAME_CHARS)));
           }) : (() => {
             closeDialog();
             M.safeShowDialog(RecordingConsentDialog.dialogName, () => this.setState({
-              recorder: userHandle,
+              recorderCid: clientId,
               recordingConsentDialog: true
             }));
           })();
         }
       });
       chatRoom.rebind(`onRecordingStopped.${NAMESPACE}`, (ev, {
-        userHandle
+        userHandle,
+        clientId
       }) => {
         const {
-          recorder
+          recorderCid
         } = this.state;
         this.setState({
           recordingConsentDialog: false,
-          recorder: userHandle === recorder ? false : recorder
-        }, () => window.sfuClient && userHandle === recorder && ChatToast.quick(l.user_recording_nop_toast.replace('%NAME', nicknames.getNickname(userHandle).substr(0, ChatToastIntegration.MAX_NAME_CHARS))));
+          recorderCid: clientId === recorderCid ? false : recorderCid
+        }, () => window.sfuClient && clientId === recorderCid && ChatToast.quick(l.user_recording_nop_toast.replace('%NAME', nicknames.getNickname(userHandle).substr(0, ChatToastIntegration.MAX_NAME_CHARS))));
       });
       chatRoom.rebind(`onMutedBy.${NAMESPACE}`, (ev, {
         cid
@@ -23613,7 +23624,7 @@ class Call extends mixins.w9 {
       } else {
         eventlog(500287);
       }
-      if (this.state.recorder) {
+      if (this.state.recorderCid) {
         return msgDialog(`confirmation:!^${l.stop_recording_dialog_cta}!${l.stop_recording_nop_dialog_cta}`, undefined, l.stop_recording_dialog_heading, l.stop_recording_dialog_body, cb => cb && sfuClient.recordingStop(), 1);
       }
       msgDialog(`warningb:!^${l.start_recording_dialog_cta}!${l[82]}`, null, l.notify_participants_dialog_heading, l.notify_participants_dialog_body, cb => {
@@ -23621,8 +23632,9 @@ class Call extends mixins.w9 {
           return;
         }
         call.sfuClient.recordingStart(this.onWeStoppedRecording).then(() => {
+          call.recorderCid = this.state.recorderCid;
           this.setState({
-            recorder: u_handle
+            recorderCid: call.sfuClient.cid
           });
           this.handleModeChange(MODE.MAIN);
           call.recordActiveStream();
@@ -23630,21 +23642,13 @@ class Call extends mixins.w9 {
         }).catch(dump);
       }, 1);
     };
-    this.onWeStoppedRecording = err => {
-      this.setState({
-        recorder: undefined,
-        recordingActivePeer: undefined
-      }, () => {
-        if (err) {
-          ChatToast.quick(`${l.stopped_recording_toast} Error: ${err.message || err}`);
-        } else {
-          ChatToast.quick(l.stopped_recording_toast);
-        }
-      });
-    };
+    this.onWeStoppedRecording = err => this.isMounted() && this.setState({
+      recorderCid: undefined,
+      recordingActivePeer: undefined
+    }, () => err ? ChatToast.quick(`${l.stopped_recording_toast} Error: ${err.message || err}`) : ChatToast.quick(l.stopped_recording_toast));
     this.renderRecordingControl = () => {
       const {
-        recorder,
+        recorderCid,
         recordingTooltip,
         recordingActivePeer
       } = this.state;
@@ -23661,8 +23665,9 @@ class Call extends mixins.w9 {
                 `,
         onClick
       }, children);
-      if (recorder) {
-        const isRecorder = isModerator && recorder === u_handle;
+      if (recorderCid) {
+        const isRecorder = isModerator && recorderCid === sfuClient.cid;
+        const recordingPeer = this.props.peers[recorderCid];
         return REaCt().createElement($$CONTAINER, {
           recordingTooltip,
           className: "recording-fixed"
@@ -23672,8 +23677,8 @@ class Call extends mixins.w9 {
                             simpletip
                             ${isRecorder ? '' : 'plain-background'}
                         `
-        }, recorder !== u_handle && {
-          'data-simpletip': l.host_recording.replace('%NAME', nicknames.getNickname(recorder) || megaChat.plugins.userHelper.SIMPLETIP_USER_LOADER),
+        }, recorderCid !== sfuClient.cid && {
+          'data-simpletip': l.host_recording.replace('%NAME', nicknames.getNickname(recordingPeer) || megaChat.plugins.userHelper.SIMPLETIP_USER_LOADER),
           'data-simpletipposition': 'top',
           'data-simpletipoffset': 5,
           'data-simpletip-class': 'theme-dark-forced'
@@ -23716,7 +23721,7 @@ class Call extends mixins.w9 {
             this.flagMap.setSync(OBV4_FLAGS.CHAT_CALL_RECORDING, 1);
             this.flagMap.safeCommit();
           });
-          return isOnHold || recorder && recorder !== u_handle ? null : this.handleRecordingToggle();
+          return isOnHold || recorderCid && recorderCid !== sfuClient.cid ? null : this.handleRecordingToggle();
         }
       }, REaCt().createElement(meetings_button.A, {
         className: `
@@ -23973,7 +23978,7 @@ class Call extends mixins.w9 {
       everHadPeers,
       initialCallRinging,
       waitingRoomPeers,
-      recorder,
+      recorderCid,
       raisedHandPeers,
       recordingConsentDialog,
       invitePanel,
@@ -23998,7 +24003,7 @@ class Call extends mixins.w9 {
       stayOnEnd,
       everHadPeers,
       waitingRoomPeers,
-      recorder,
+      recorderCid,
       presenterThumbSelected,
       raisedHandPeers,
       activeElement,
@@ -24052,7 +24057,7 @@ class Call extends mixins.w9 {
       minimized,
       peers,
       chatRoom,
-      recorder,
+      recorderCid,
       hovered,
       raisedHandPeers,
       onboardingRaise,
@@ -24066,7 +24071,7 @@ class Call extends mixins.w9 {
         });
       },
       onRecordingToggle: () => this.setState({
-        recorder: undefined
+        recorderCid: undefined
       }, () => call.sfuClient.recordingStop()),
       onAudioClick: () => call.toggleAudio(),
       onVideoClick: () => call.toggleVideo(),
@@ -24176,7 +24181,8 @@ class Call extends mixins.w9 {
         });
       }
     }, REaCt().createElement("span", null, l.ok_button)))))), recordingConsentDialog && REaCt().createElement(RecordingConsentDialog, {
-      recorder,
+      peers,
+      recorderCid,
       onClose: () => this.setState({
         recordingConsentDialog: false,
         recordingConsented: true
@@ -25423,7 +25429,7 @@ class Minimized extends mixins.w9 {
       const {
         call,
         chatRoom,
-        recorder,
+        recorderCid,
         hasToRenderPermissionsWarning,
         renderPermissionsWarning,
         resetError,
@@ -25458,7 +25464,7 @@ class Minimized extends mixins.w9 {
               cta: l.assign_host_button,
               altCta: l.leave_anyway
             });
-            return recorder && recorder === u_handle ? (0,streamControls.sX)(doLeave, onRecordingToggle) : doLeave();
+            return recorderCid && recorderCid === sfuClient.cid ? (0,streamControls.sX)(doLeave, onRecordingToggle) : doLeave();
           }
         }, REaCt().createElement("span", null, l[5884]));
       });
@@ -27299,7 +27305,7 @@ class stream_Stream extends mixins.w9 {
       view,
       isOnHold,
       waitingRoomPeers,
-      recorder,
+      recorderCid,
       raisedHandPeers,
       isFloatingPresenter,
       onRecordingToggle,
@@ -27369,7 +27375,7 @@ class stream_Stream extends mixins.w9 {
       isPresenterNode: isFloatingPresenter,
       wrapperRef: this.wrapperRef,
       waitingRoomPeers,
-      recorder,
+      recorderCid,
       raisedHandPeers,
       onRecordingToggle,
       onAudioClick,
@@ -27472,10 +27478,10 @@ class StreamControls extends _mixins1__.w9 {
         className: "mega-button",
         onClick: () => {
           const {
-            recorder,
+            recorderCid,
             onRecordingToggle
           } = this.props;
-          return recorder && recorder === u_handle ? renderLeaveConfirm(doLeave, onRecordingToggle) : doLeave();
+          return recorderCid && recorderCid === sfuClient.cid ? renderLeaveConfirm(doLeave, onRecordingToggle) : doLeave();
         }
       }, react0().createElement("span", null, l.leave));
     });
@@ -27530,7 +27536,7 @@ class StreamControls extends _mixins1__.w9 {
       let _this$endContainerRef;
       const {
         chatRoom,
-        recorder,
+        recorderCid,
         onRecordingToggle,
         onCallEnd
       } = this.props;
@@ -27560,7 +27566,7 @@ class StreamControls extends _mixins1__.w9 {
         className: "meetings-end-options-content"
       }, react0().createElement(this.LeaveButton, {
         chatRoom,
-        recorder,
+        recorderCid,
         participants: chatRoom.getCallParticipants(),
         onLeave: onCallEnd,
         onConfirmDenied: onCallEnd
@@ -27571,7 +27577,7 @@ class StreamControls extends _mixins1__.w9 {
                             ${endCallPending ? 'disabled' : ''}
                         `,
         onClick: () => {
-          if (recorder && recorder === u_handle) {
+          if (recorderCid && recorderCid === sfuClient.cid) {
             return renderEndConfirm(doEnd, onRecordingToggle);
           }
           return doEnd();
@@ -27582,7 +27588,7 @@ class StreamControls extends _mixins1__.w9 {
       const {
         chatRoom,
         peers,
-        recorder,
+        recorderCid,
         onRecordingToggle,
         onCallEnd
       } = this.props;
@@ -27600,7 +27606,7 @@ class StreamControls extends _mixins1__.w9 {
               this.setActiveElement();
             });
           }
-          if (recorder && recorder === u_handle) {
+          if (recorderCid && recorderCid === sfuClient.cid) {
             return chatRoom.type === 'private' ? renderEndConfirm(onCallEnd, onRecordingToggle) : renderLeaveConfirm(onCallEnd, onRecordingToggle);
           }
           return onCallEnd();

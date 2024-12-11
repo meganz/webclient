@@ -1,0 +1,68 @@
+.pm-account-dialog {
+    max-width: 310px;
+    overflow: hidden;
+} 
+.account-profile {
+    margin-inline-end: 16px;
+    margin-left: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 100%;
+    text-align: center;
+}
+.avatar-details {
+    overflow: hidden;
+    white-space: nowrap;
+}
+.avatar-details .pm-name.simpletip {
+    font: var(--mobile-font-heading-h2);
+    display: -webkit-box;
+    white-space: normal;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    word-break: break-word;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.avatar-details .pm-email.simpletip {
+    color: var(--mobile-text-secondary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.avatar-details .pm-email.simpletip::after {
+    content: '';
+    display: block;
+}
+.account-profile div,
+.account-profile img {
+    width: 30px;
+    height: 30px;
+    border-radius: 100%;
+}
+.account-profile div {
+    box-sizing: border-box;
+}
+.avatar-header {
+    display: flex;
+    padding: 24px;
+    box-sizing: border-box;
+    align-items: center;
+}
+.horizontal-divider {
+    width: 262px;
+    border-top: 1px solid var(--mobile-border-strong);
+    margin: 0 24px;
+}
+.nav-elem .avatar-wrapper {
+    height: 24px;
+    line-height: inherit;
+} 
+.avatar-menu.mega-component.context-menu.menu-container.overlay-wrap {
+    width: 312px;
+}
+.avatar-wrapper {
+    line-height: 28px;
+}
+.nav-elem.normal.link:hover span {
+    color: inherit;
+}

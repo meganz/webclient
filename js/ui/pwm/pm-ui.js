@@ -42,7 +42,7 @@ mega.ui.pm = {
         else {
             mega.ui.pm.settings.closeUI();
 
-            if (nodeID) {
+            if (nodeID !== 'pwm') {
                 this.comm.saveLastSelected(nodeID);
             }
 
@@ -365,7 +365,8 @@ mega.ui.pm = {
     lazy(mega.ui.pm, 'overlay', () => new MegaOverlay({
         parentNode: document.querySelector('.password-list-page'),
         componentClassname: 'mega-overlay pm-overlay',
-        wrapperClassname: 'overlay'
+        wrapperClassname: 'overlay',
+        scrollOverlay: true,
     }));
 
 })(window.mega);

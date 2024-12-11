@@ -389,7 +389,7 @@ lazy(self, 'tSleep', function tSleep() {
 lazy(self, 'sleep', function sleep() {
     'use strict';
 
-    if (!window.isSecureContext || typeof Worklet === 'undefined' || !Worklet.prototype.addModule) {
+    if (!self.AudioWorkletNode || typeof Worklet === 'undefined' || !Worklet.prototype.addModule) {
         if (d) {
             console.warn('Weak sleep() implementation, using throttled-setTimeout()');
         }
@@ -531,7 +531,7 @@ lazy(self, 'sleep', function sleep() {
                 if (done) {
                     break;
                 }
-                await fetch(`${apipath}wsc/_U4TFs5ASSag_yAtCFUWog&sn=qSJxhDnGfmw`).catch(nop);
+                await fetch(`https://bt1.api.mega.co.nz/to?${v >> 1}`).catch(nop);
             }
             while (performance.now() - now < v * 1e3);
         };

@@ -148,7 +148,7 @@
             }
             if ((av ^ this.av) & Av.Recording) {
                 this.isRecording = !!(av & Av.Recording);
-                this.call.recorder = this.userHandle;
+                this.call.recorderCid = this.clientId;
                 megaChat.plugins.userHelper.fetchAllNames([this.userHandle], this.call.chatRoom)
                     .catch(dump)
                     .finally(() => {
@@ -548,7 +548,7 @@
             this.handlePeerScreenChange(peer.cid);
 
             this.peers[peer.cid].destroy();
-            this.chatRoom.trigger('onCallPeerLeft', { userHandle: peer.userId, reason });
+            this.chatRoom.trigger('onCallPeerLeft', { userHandle: peer.userId, clientId: peer.cid, reason });
             if (peer.userId !== u_handle) {
                 // Delay so that the ParticipantsNotice changes at the same time as the notification shows
                 tSleep(3).always(() => {

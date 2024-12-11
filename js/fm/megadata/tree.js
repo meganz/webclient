@@ -384,7 +384,9 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
                 node.textContent = name;
                 html = node.parentNode.parentNode;
 
-                if (folders[idx - 1] && (node = document.getElementById(_li + folders[idx - 1].h))) {
+                if (folders[idx - 1] && !(folders[idx - 1].t & M.IS_S4CRT)
+                    && (node = document.getElementById(_li + folders[idx - 1].h))) {
+
                     if (btd) {
                         console.debug('Buildtree, ' + curItemHandle + ' after ' + _li + folders[idx - 1].h, name);
                     }
@@ -975,6 +977,11 @@ MegaData.prototype.redrawTree = function(f) {
 
     if (M.currentrootid === M.RootID || String(M.currentdirid).match("^search/")) {
         M.buildtree(M.d[M.RootID], force);
+
+        // Update S4 tree if user removes the container
+        if (M.tree.s4) {
+            M.buildtree({h: 's4'}, force);
+        }
     }
     /*
     else if (M.currentrootid === M.InboxID) {
@@ -983,6 +990,9 @@ MegaData.prototype.redrawTree = function(f) {
     */
     else if (M.currentrootid === M.RubbishID) {
         M.buildtree({h: M.RubbishID}, force);
+    }
+    else if (M.currentrootid === 's4') {
+        M.buildtree({h: 's4'}, force);
     }
     else if (M.currentrootid === 'shares') {
         M.buildtree({h: 'shares'}, force);

@@ -166,7 +166,7 @@ table tr td:last-child::after {
     border-top: 1px solid var(--grid-hover-border);
 }
 
-.table-hover tr.ui-selected td::before {
+.table-hover tr.ui-selected:not(:hover) td::before {
     background: var(--surface-grey-4);
     border-bottom: 1px solid var(--stroke-grey-4);
     border-top: 1px solid var(--stroke-grey-4);
@@ -178,6 +178,30 @@ table tr td:last-child::after {
     background-repeat: no-repeat;
     background-position: 4px;
     border-left: 1px solid var(--stroke-grey-4);
+}
+.files-grid-view .table-hover tr.ui-selected td:first-child::before {
+    background-image: var(--checkbox-fill-active);
+}
+.table-hover tr i.selected {
+    display: none;
+    cursor: pointer;
+    position: absolute;
+    border-radius: 3px;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 2px;
+    color: var(--text-color-white-high);
+}
+.table-hover tr.ui-selected i.selected {
+    display: block;
+    background: var(--checkbox-fill-active);
+}
+.table-hover tr:not(.ui-selected):hover i.selected {
+    display: block;
+    background: var(--checkbox-fill-inactive-2);
+    outline: 1px solid var(--checkbox-border-inactive-2);
+
+    color: transparent;
 }
 .rtl .table-hover tr.ui-selected td:first-child::before {
     background-position: calc(100% - 4px);
@@ -371,6 +395,9 @@ table tr.ui-selected .grid-file-request-manage {
 .grid-table.fm.v-extras [megatype="extras"],
 .grid-table.fm.v-fileLoc [megatype="fileLoc"] {
     display: table-cell;
+}
+.grid-table.fm td.space-maintainer-start {
+    z-index: 1;
 }
 .mega-lite-mode .grid-table.fm.v-size [megatype="size"],
 .mega-lite-mode .grid-table.fm.v-versions [megatype="versions"] {
@@ -659,7 +686,7 @@ table.grid-table .undecryptable-zk .grid-status-icon.icon-info {
     --mask-color: var(--secondary-red);
 }
 
-table.grid-table tbody i:not(.verified-user-icon):not(.icon-dot) {
+table.grid-table tbody i:not(.verified-user-icon):not(.icon-dot):not(.selected) {
     --mask-color: var(--icon-rest);
     --icon-size: 24px;
     display: inline-block;
@@ -671,7 +698,7 @@ table.grid-table tbody .versioning-indicator i.icon-versions-previous {
     display: block;
 }
 
-table.grid-table tbody tr:not(.linked) .icon-link {
+table.grid-table tbody tr:not(.linked) td.own-data .icon-link {
     display: none;
 }
 
@@ -712,10 +739,11 @@ table.fm td {
 }
 table.fm [megatype="fav"] {
     text-align: center;
-    -webkit-padding-start: 5px;
-    padding-inline-start: 5px;
+    -webkit-padding-start: 30px;
+    padding-inline-start: 30px;
     -webkit-padding-end: 13px;
     padding-inline-end: 13px;
+    text-overflow: initial;
 }
 table.fm td[megatype="fname"] {
     min-width: 180px;
@@ -729,6 +757,11 @@ table.fm td:first-child {
     width: 0;
     -webkit-padding-start: 0;
     padding-inline-start: 0;
+}
+
+table.fm.grid-table:not(.v-fav) th:first-child,
+table.fm.grid-table:not(.v-fav) td:first-child {
+    width: 25px;
 }
 
 table.fm tr {

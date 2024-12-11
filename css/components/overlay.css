@@ -68,6 +68,10 @@
     height: 100%;
 }
 
+.overlay-wrap .main.ps {
+    box-sizing: border-box;
+}
+
 .mega-overlay.overlay-wrap .title,
 .mega-overlay.overlay-wrap .image {
     align-self: flex-start;

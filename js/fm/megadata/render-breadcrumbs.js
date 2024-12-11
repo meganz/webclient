@@ -241,13 +241,14 @@
                                 name = n.name || '';
                                 typeClass = n.t && 'folder' || '';
 
-                                const s4type = n.s4 && M.getS4NodeType(n);
-                                if (s4type === 'container') {
-                                    name = l.obj_storage;
-                                    typeClass = 's4-object-storage';
-                                }
-                                else if (s4type === 'bucket') {
-                                    typeClass = 's4-buckets';
+                                if (M.dyh) {
+                                    const {type, localeName} = M.dyh('breadcrumb-properties', handle);
+                                    if (type) {
+                                        typeClass = type;
+                                    }
+                                    if (localeName) {
+                                        name = localeName;
+                                    }
                                 }
                             }
                         }

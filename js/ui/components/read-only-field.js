@@ -101,25 +101,8 @@ class MegaReadOnlyField extends MegaComponent {
 
         // Create Action Buttons if provided
         if (options.actions && options.actions.length > 0) {
-            const actionButtons = document.createElement('div');
-            actionButtons.className = 'read-only-actions';
-            this.output.append(actionButtons);
-
-            for (const action of options.actions) {
-                const button = document.createElement('i');
-                button.className = action.icon;
-                button.addEventListener('click', (event) => {
-                    event.stopPropagation();  // Prevent the event from bubbling up
-                    action.onClick(event, this);
-                });
-                if (action.hint) {
-                    button.dataset.simpletip = action.hint;
-                    button.dataset.simpletipposition = 'top';
-                    button.dataset.simpletipoffset = '2';
-                    button.classList.add('simpletip');
-                }
-                actionButtons.append(button);
-            }
+            this.actions = options.actions;
+            this.setActions(options.actions);
         }
 
         // Handle Grouping if applicable
@@ -190,6 +173,36 @@ class MegaReadOnlyField extends MegaComponent {
         this.strenghtText.textContent = strength.string1;
         this.strengthCheck.className = `strength-checker ${strength.className}`;
         this.strenghtIcon.className = strength.icon;
+    }
+
+    setActions(actions) {
+        let actionButtons = this.domNode.querySelector('.read-only-actions');
+
+        if (!actionButtons) {
+            actionButtons = document.createElement('div');
+            actionButtons.className = 'read-only-actions';
+            this.output.append(actionButtons);
+        }
+
+        actionButtons.textContent = '';
+
+        for (const action of actions) {
+
+            const options = {
+                icon: action.icon,
+                onClick: action.onClick.bind(this),
+                type: 'icon',
+                parentNode: actionButtons,
+            };
+            const button = new MegaButton(options);
+
+            if (action.hint) {
+                button.domNode.dataset.simpletip = action.hint;
+                button.domNode.dataset.simpletipposition = 'top';
+                button.domNode.dataset.simpletipoffset = '2';
+                button.addClass('simpletip');
+            }
+        }
     }
 
     /**

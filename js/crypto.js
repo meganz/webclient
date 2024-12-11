@@ -414,7 +414,10 @@ function api_reqfailed(channel, error) {
                 M.account = null;
             }
             if (window.loadingDialog) {
-                loadingDialog.hide();
+                loadingDialog.hide('force');
+            }
+            if ($.dialog && $.dialog !== 'over-storage-quota') {
+                closeDialog();
             }
             M.showOverStorageQuota(e).catch(dump);
         }

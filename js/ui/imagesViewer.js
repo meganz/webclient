@@ -178,9 +178,25 @@ var slideshowid;
         steps = steps || slideshowsteps();
         if (steps[step].length > 0) {
             const newShownHandle = steps[step][0];
-            if ($.videoAutoFullScreen && is_video(M.getNodeByHandle(newShownHandle))) {
+            if (!newShownHandle) {
+                return;
+            }
+            else if ($.videoAutoFullScreen && is_video(M.getNodeByHandle(newShownHandle))) {
                 // Autoplay the next/prev video if it's in full screen mode
                 $.autoplay = newShownHandle;
+            }
+            else if (slideshowplay < 0 && !previews[newShownHandle]) {
+                if (d) {
+                    console.warn('Waiting for %s to have loaded, cur=%s...', newShownHandle, slideshowid, steps);
+                }
+                slideshowplay = newShownHandle;
+                if (!preqs[newShownHandle]) {
+                    if (d) {
+                        console.error('%s is not being fetched, forcefully doing so... debug & fix..', newShownHandle);
+                    }
+                    fetchsrc(newShownHandle);
+                }
+                return;
             }
 
             mBroadcaster.sendMessage(`slideshow:${dir}`, steps);
@@ -513,10 +529,12 @@ var slideshowid;
         slideshow_aborttimer();
 
         if (slideshowplay && !slideshowpause) {
-
             (slideshowTimer = tSleep(mega.slideshow.settings.speed.getValue() / 1e3))
                 .then(() => {
-                    slideshow_next();
+                    if (slideshowplay) {
+                        slideshowplay = -1;
+                        slideshow_next();
+                    }
                 })
                 .catch(dump);
 
@@ -1418,48 +1436,29 @@ var slideshowid;
             }
             else {
                 // Options icon
-                $('.v-btn.options', $overlay).rebind('click.media-viewer', function() {
+                $('.v-btn.options, .sl-btn.settings', $overlay).rebind('click.media-viewer-settings', function() {
                     var $this = $(this);
+                    const menu = $this.hasClass('settings') ? settingsMenu : optionsMenu;
 
                     if ($(this).hasClass('hidden')) {
                         return false;
                     }
                     if ($this.hasClass('active')) {
                         $this.removeClass('active deactivated');
-                        contextMenu.close(optionsMenu);
-                    }
-                    else {
-                        $this.addClass('active deactivated').trigger('simpletipClose');
-                        // xxx: no, this is not a window.open() call..
-                        // eslint-disable-next-line local-rules/open
-                        contextMenu.open(optionsMenu);
-                    }
-                    return false;
-                });
-
-                // Settings icon
-                $('.sl-btn.settings', $overlay).rebind('click.media-viewer-settings', function() {
-                    var $this = $(this);
-
-                    if ($(this).hasClass('hidden')) {
-                        return false;
-                    }
-                    if ($this.hasClass('active')) {
-                        $this.removeClass('active deactivated');
-                        $('i', $this).removeClass('icon-slider-filled');
-                        $('i', $this).addClass('icon-slider-outline');
-
-                        contextMenu.close(settingsMenu);
+                        if (menu === settingsMenu) {
+                            $('i', $this).removeClass('icon-slider-filled').addClass('icon-slider-outline');
+                        }
+                        contextMenu.close(menu);
                         $overlay.removeClass('context-menu-open');
                     }
                     else {
                         $this.addClass('active deactivated').trigger('simpletipClose');
-                        $('i', $this).removeClass('icon-slider-outline');
-                        $('i', $this).addClass('icon-slider-filled');
-
+                        if (menu === settingsMenu) {
+                            $('i', $this).removeClass('icon-slider-outline').addClass('icon-slider-filled');
+                        }
                         // xxx: no, this is not a window.open() call..
                         // eslint-disable-next-line local-rules/open
-                        contextMenu.open(settingsMenu);
+                        contextMenu.open(menu);
                         $overlay.addClass('context-menu-open');
                     }
                     return false;
@@ -1488,6 +1487,11 @@ var slideshowid;
 
                 // Close context menu
                 $overlay.rebind('mouseup.media-viewer', (e) => {
+                    const $target = $(e.target);
+                    if ($target.parent().is('.v-btn.options, .sl-btn.settings')) {
+                        // leave the click-handler dealing with it.
+                        return;
+                    }
 
                     $('.v-btn.options', $overlay).removeClass('active deactivated');
                     contextMenu.close(optionsMenu);
@@ -1675,15 +1679,13 @@ var slideshowid;
             fetchnext();
         }
         else {
-            if (!slideshowplay) {
+            if (is_video(n)) {
                 $('img', $imgWrap).attr('src', '');
-
-                if (is_video(n)) {
-                    $('.loader-grad', $content).removeClass('hidden');
-                }
-                else {
-                    $pendingBlock.removeClass('hidden');
-                }
+                $('.loader-grad', $content).removeClass('hidden');
+            }
+            else if (slideshowplay !== true) {
+                $('img', $imgWrap).attr('src', '');
+                $pendingBlock.removeClass('hidden');
             }
 
             if (!preqs[n.h]) {
@@ -1756,13 +1758,13 @@ var slideshowid;
             return false;
         }
 
-        var eot = function eot(id, err) {
-            delete preqs[id];
-            delete pfails[id];
+        var eot = function eot(h, err) {
+            delete preqs[h];
+            delete pfails[h];
             if (n.s > 13e7) {
-                return previewimg(id, null);
+                return previewimg(h, null);
             }
-            M.addDownload([id], false, err ? -1 : true);
+            M.addDownload([h], false, err ? -1 : true);
         };
         eot.timeout = 8500;
 
@@ -2481,14 +2483,28 @@ var slideshowid;
             blob = new Blob([uint8arr.buffer], {type: type});
         }
 
+        const processFullPreview = () => {
+            if (
+                slideshowplay === id
+                || (M.chat && typeof slideshowplay === 'string' && slideshowplay.split('!')[1] === id)
+            ) {
+                if (d) {
+                    console.warn('Dispatching slideshow-play for %s...', id);
+                }
+
+                slideshow_next();
+            }
+            else if (id === slideshow_handle()) {
+                previewsrc(id);
+            }
+        };
+
         if (previews[id]) {
             if (previews[id].full) {
                 if (d && previews[id].fromChat !== null) {
                     console.warn('Not overwriting a full preview...', id);
                 }
-                if (id === slideshow_handle()) {
-                    previewsrc(id);
-                }
+                processFullPreview();
                 return;
             }
             previews[id].prev = previews[id];
@@ -2515,9 +2531,7 @@ var slideshowid;
             previews[n.hash] = previews[id];
         }
 
-        if (id === slideshow_handle()) {
-            previewsrc(id);
-        }
+        processFullPreview();
 
         // Ensure we are not eating too much memory...
         tSleep.schedule(7, slideshow_freemem);

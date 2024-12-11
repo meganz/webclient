@@ -3390,7 +3390,7 @@ input.summary-ff-name.error {
     top: 2px;
     width: 16px;
     height: 16px;
-    margin: 4px 4px 4px 0;
+    margin: 9px 4px 9px 0;
 }
 .data-block-view .versioning-indicator i {
     --mask-color: var(--icon-rest);

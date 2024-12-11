@@ -33,6 +33,10 @@
     overflow: hidden;
 }
 
+.mega-header .banner-block {
+    padding: 0;
+}
+
 .mega-header .nav-navigation,
 .mega-header .nav-actions {
     display: flex;
@@ -173,6 +177,7 @@
     margin: 0 auto;
     padding: 0;
     width: 24px;
+    display: block;
 }
 
 .filter {

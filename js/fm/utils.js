@@ -1312,6 +1312,9 @@ MegaUtils.prototype.transferFromMegaCoNz = function(data) {
                     if (queryParts[0] === 'tab') {
                         window.mProTab = queryParts[1].split('/')[0];
                     }
+                    if (toPage.startsWith('propay_') && (queryParts[0] === 'm')) {
+                        sessionStorage['pro.period'] = queryParts[1].split('/')[0];
+                    }
                 }
             }
 

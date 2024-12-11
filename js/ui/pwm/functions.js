@@ -48,7 +48,23 @@ lazy(mega.ui.pm, 'utils', () => {
             const color = `color${hash % 3}`;
             elem.classList.add(color);
 
-            inner.innerText = name.substring(0, 1).toUpperCase() + name.substring(1, 2);
+            let graphemes = '\\p{Extended_Pictographic}(?:\\uFE0F)?(?:\\p{Emoji_Modifier})?';
+            graphemes = `${graphemes}(?:\\u200D${graphemes})*`;
+            const keycap = '[0-9#*]\\uFE0F?\\u20E3';
+            const set = '[\\p{sc=Han}\\p{sc=Hangul}\\p{sc=Hiragana}\\p{sc=Katakana}]';
+            const r = new RegExp(`^(${graphemes})|^(${keycap})|^(${set})|^.(?:${graphemes}|${keycap}|${set})`, 'u');
+            const hasEmoji = r.exec(name);
+            const fEmoji = hasEmoji && (hasEmoji[1] || hasEmoji[2] || hasEmoji[3]);
+
+            if (hasEmoji === null) {
+                inner.innerText = name[0].toUpperCase() + (name[1] || '');
+            }
+            else if (fEmoji) {
+                inner.innerText = fEmoji;
+            }
+            else {
+                inner.innerText = name[0].toUpperCase();
+            }
         },
 
         getHostname(url) {

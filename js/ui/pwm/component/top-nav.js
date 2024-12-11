@@ -21,6 +21,7 @@ class MegaTopNav extends MegaComponent {
         loggedContainer.append(searchInput);
 
         const searchMegaInput = new mega.ui.MegaInputs($(searchInput));
+        this.searchMegaInput = searchMegaInput;
         searchMegaInput.$wrapper.addClass('search-bar disabled');
 
         let wasBlurred = true;
@@ -76,6 +77,22 @@ class MegaTopNav extends MegaComponent {
         else {
             this.removeClass('logged-in');
         }
+    }
+
+    enableSearch() {
+        this.searchMegaInput.$input[0].disabled = false;
+        this.searchMegaInput.$wrapper.removeClass('disabled');
+    }
+
+    disableSearch() {
+        this.searchMegaInput.$input[0].disabled = true;
+        this.searchMegaInput.$wrapper.addClass('disabled');
+        this.resetSearch();
+    }
+
+    resetSearch() {
+        this.searchMegaInput.$input.val('');
+        this.searchMegaInput.$input.blur();
     }
 }
 

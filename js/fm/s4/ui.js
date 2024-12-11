@@ -56,7 +56,8 @@ lazy(s4, 'ui', () => {
 
                 if (s4Type === 'container') {
                     type = 's4-object-storage';
-                    localeName = l.obj_storage;
+                    localeName = s4.utils.getContainersList().length === 1
+                        ? l.obj_storage : M.getNameByHandle(id);
                 }
                 else if (s4Type === 'bucket') {
                     type = 's4-buckets';

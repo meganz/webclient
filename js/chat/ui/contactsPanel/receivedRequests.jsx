@@ -36,13 +36,13 @@ export default class ReceivedRequests extends MegaRenderMixin {
                 }],
                 [ColumnContactRequestsRcvdBtns, {
                     onReject: (handle) => {
-                        M.denyPendingContactRequest(handle);
+                        M.denyPendingContactRequest(handle).catch(dump);
                     },
                     onBlock: (handle) => {
-                        M.ignorePendingContactRequest(handle);
+                        M.ignorePendingContactRequest(handle).catch(dump);
                     },
                     onAccept: (handle) => {
-                        M.acceptPendingContactRequest(handle);
+                        M.acceptPendingContactRequest(handle).catch(dump);
                     }
                 }]
             ]}

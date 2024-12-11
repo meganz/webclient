@@ -460,6 +460,7 @@ class Stream extends MegaRenderMixin {
                 </div>
             );
         }
+
         const source = this.getStreamSource() || call.getLocalStream();
         return (
             <div
@@ -545,7 +546,7 @@ class Minimized extends MegaRenderMixin {
         const {
             call,
             chatRoom,
-            recorder,
+            recorderCid,
             hasToRenderPermissionsWarning,
             renderPermissionsWarning,
             resetError,
@@ -582,7 +583,7 @@ class Minimized extends MegaRenderMixin {
                                 });
 
                         return (
-                            recorder && recorder === u_handle ?
+                            recorderCid && recorderCid === sfuClient.cid ?
                                 renderLeaveConfirm(doLeave, onRecordingToggle) :
                                 doLeave()
                         );

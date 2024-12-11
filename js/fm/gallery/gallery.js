@@ -1350,7 +1350,12 @@ class MegaGallery {
                 selectionManager.clear_selection();
             }
 
-            selectionManager.add_to_selection(h);
+            if ($eTarget.hasClass('ui-selected')) {
+                selectionManager.remove_from_selection(h);
+            }
+            else {
+                selectionManager.add_to_selection(h);
+            }
 
             $.hideContextMenu(e);
 

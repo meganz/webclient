@@ -788,7 +788,7 @@ export default class Stream extends MegaRenderMixin {
         const { overlayed, page, streamsPerPage, floatDetached, wrToggled } = this.state;
         const {
             mode, call, chatRoom, minimized, peers, sidebar, hovered, forcedLocal, view, isOnHold, waitingRoomPeers,
-            recorder, raisedHandPeers, isFloatingPresenter, onRecordingToggle, onCallMinimize, onCallExpand,
+            recorderCid, raisedHandPeers, isFloatingPresenter, onRecordingToggle, onCallMinimize, onCallExpand,
             onModeChange, onAudioClick, onVideoClick, onCallEnd, onScreenSharingClick, onHoldClick, onSpeakerChange,
             onParticipantsToggle, setActiveElement
         } = this.props;
@@ -865,7 +865,7 @@ export default class Stream extends MegaRenderMixin {
                     isPresenterNode={isFloatingPresenter}
                     wrapperRef={this.wrapperRef}
                     waitingRoomPeers={waitingRoomPeers}
-                    recorder={recorder}
+                    recorderCid={recorderCid}
                     raisedHandPeers={raisedHandPeers}
                     onRecordingToggle={onRecordingToggle}
                     onAudioClick={onAudioClick}

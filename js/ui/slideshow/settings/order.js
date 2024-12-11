@@ -11,21 +11,27 @@ lazy(mega.slideshow.settings, 'order', () => {
         constructor() {
             super(
                 name,
-                'shuffle',
+                'default-order',
                 {
-                    shuffle: {
+                    'default-order': {
+                        cfg: 4,
+                        icon: 'icon-rectangle-stack',
+                        absolute: true,
+                        value: indexList => M.chat ? indexList.reverse() : indexList
+                    },
+                    'shuffle': {
                         cfg: 1,
                         icon: 'icon-shuffle',
-                        absolute: false,
+                        absolute: true,
                         value: (indexList) => shuffle(indexList)
                     },
-                    newest: {
+                    'newest': {
                         cfg: 2,
                         icon: 'icon-hourglass-new',
                         absolute: true,
                         value: (indexList, nodeList) => this._timeSort(indexList, nodeList, -1)
                     },
-                    oldest: {
+                    'oldest': {
                         cfg: 3,
                         icon: 'icon-hourglass-old',
                         absolute: true,
@@ -170,6 +176,9 @@ lazy(mega.slideshow.settings, 'order', () => {
         _timeSort(indexList, nodeList, d) {
             if (M.chat) {
                 return d === 1 ? indexList : indexList.reverse();
+            }
+            else if (page.startsWith('fm/recents')) {
+                return d === 1 ? indexList.reverse() : indexList;
             }
 
             return indexList.sort((a, b) => {

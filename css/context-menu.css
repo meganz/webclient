@@ -133,3 +133,6 @@
 .context-menu.closing {
     pointer-events: none;
 }
+.context-menu .options-menu {
+    width: 220px;
+}

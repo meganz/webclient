@@ -3930,9 +3930,9 @@ FileManager.prototype.addGridUI = function(refresh) {
 
     // enable add star on first column click (make favorite)
     $('.grid-table.shared-with-me tr td:first-child').add('.grid-table.out-shares tr td:first-child')
-        .add('.grid-table.fm tr td:nth-child(2)').rebind('click', function() {
+        .add('.grid-table.fm tr td:nth-child(2)').rebind('click', function(e) {
             $.hideContextMenu();
-            if (M.isInvalidUserStatus()) {
+            if (M.isInvalidUserStatus() || !e.target.classList.contains('sprite-fm-mono')) {
                 return;
             }
             var id = $(this).parent().attr('id');
@@ -4352,15 +4352,24 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
 
             const $this = $(this);
 
+            const checkboxClicked = e.target.classList.contains('icon-check');
+            const deSelect = checkboxClicked && $this.hasClass("ui-selected");
+
             if (e.shiftKey) {
                 selectionManager.shift_select_to($this.attr('id'), false, true, $.selected.length === 0);
             }
             else if (!e.ctrlKey && !e.metaKey) {
 
-                $.gridLastSelected = this;
-
-                selectionManager.clear_selection();
-                selectionManager.add_to_selection($this.attr('id'), true);
+                if (deSelect) {
+                    selectionManager.remove_from_selection($this.attr('id'), false);
+                }
+                else {
+                    if (!checkboxClicked) {
+                        $.gridLastSelected = this;
+                        selectionManager.clear_selection();
+                    }
+                    selectionManager.add_to_selection($this.attr('id'), true);
+                }
             }
             else if ($this.hasClass("ui-selected")) {
                 selectionManager.remove_from_selection($this.attr('id'), false);
@@ -4401,6 +4410,9 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
     // Open folder/file in filemanager
     let tappedItemId = '';
     $ddUIitem.rebind('dblclick.openTarget touchend.tabletOpenTarget', (e) => {
+        if (e.target.classList.contains('icon-check')) {
+            return false;
+        }
         let h = $(e.currentTarget).attr('id');
         const n = M.getNodeByHandle(h);
 

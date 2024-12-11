@@ -41,6 +41,10 @@ class MegaOverlay extends MegaComponent {
         subNode.className = 'main';
         targetNode.appendChild(subNode);
 
+        if (!is_mobile) {
+            overlay.Ps = new PerfectScrollbar(options.scrollOverlay ? overlay : subNode);
+        }
+
         targetNode = subNode;
 
         this.imageNode = subNode = document.createElement('div');
@@ -68,10 +72,6 @@ class MegaOverlay extends MegaComponent {
         this.footerNode = subNode = document.createElement('footer');
         subNode.className = 'overlay-footer hidden';
         targetNode.appendChild(subNode);
-
-        if (!is_mobile) {
-            overlay.Ps = new PerfectScrollbar(overlay);
-        }
     }
 
     get centered() {

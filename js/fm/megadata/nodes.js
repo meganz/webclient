@@ -2044,7 +2044,10 @@ MegaData.prototype.onRenameUIUpdate = function(itemHandle, newItemName) {
         if (!n.t && n.tvf > 0) {
             fileversioning.updateFileVersioningDialog(itemHandle);
         }
-        fm_updated(n);
+
+        if (M.currentrootid !== 'recents') {
+            fm_updated(n);
+        }
 
         if (document.getElementById(`treeli_${n.h}`)) {
             // Since n.h may not be a folder, we need to do some check to ensure we really need to do a tree redraw.

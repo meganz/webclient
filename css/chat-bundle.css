@@ -532,9 +532,26 @@
 }
 
 .stream .video-node-content .avatar-wrapper {
-  width: 96px;
-  height: 96px;
+  width: 16%;
+  height: 16%;
+  padding-bottom: 16%;
+}
+.stream .video-node-content .avatar-wrapper span {
   font: var(--text-h1);
+}
+@supports (container-type: size) {
+  .stream .video-node-content .avatar-wrapper {
+    container-type: size;
+  }
+  .stream .video-node-content .avatar-wrapper span {
+    font-size: 30cqw;
+  }
+}
+.stream .video-node-content .avatar-wrapper img {
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  border: 1px solid #333;
 }
 
 .float-video .video-node-content .avatar-wrapper {

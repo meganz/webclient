@@ -583,7 +583,7 @@ class Minimized extends MegaRenderMixin {
                                 });
 
                         return (
-                            recorderCid && recorderCid === sfuClient.cid ?
+                            recorderCid && recorderCid === call.sfuClient.cid ?
                                 renderLeaveConfirm(doLeave, onRecordingToggle) :
                                 doLeave()
                         );

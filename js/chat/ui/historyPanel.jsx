@@ -51,23 +51,22 @@ export default class HistoryPanel extends MegaRenderMixin {
                     break;
             }
         }
-    }
+    };
+
     componentWillMount() {
-        var self = this;
-        var chatRoom = self.props.chatRoom;
+        const { chatRoom } = this.props;
 
-        chatRoom.rebind('onHistoryDecrypted.cp', function() {
-            self.eventuallyUpdate();
-        });
+        chatRoom.rebind('onHistoryDecrypted.cp', () => this.eventuallyUpdate());
 
-        this._messagesBuffChangeHandler = chatRoom.messagesBuff.addChangeListener(SoonFc(function() {
+        this._messagesBuffChangeHandler = chatRoom.messagesBuff?.addChangeListener(SoonFc(() => {
             // wait for scrolling (if such is happening at the moment) to finish
-            if (self.isComponentEventuallyVisible()) {
-                $('.js-messages-scroll-area', self.findDOMNode()).trigger('forceResize', [true]);
+            if (this.isComponentEventuallyVisible()) {
+                $('.js-messages-scroll-area', this.findDOMNode()).trigger('forceResize', [true]);
             }
-            self.refreshUI();
+            this.refreshUI();
         }));
     }
+
     componentDidMount() {
         super.componentDidMount();
         const { chatRoom, onMount } = this.props;
@@ -84,17 +83,16 @@ export default class HistoryPanel extends MegaRenderMixin {
     }
     componentWillUnmount() {
         super.componentWillUnmount();
-        var self = this;
-        var chatRoom = self.props.chatRoom;
+        const { chatRoom } = this.props;
         if (this._messagesBuffChangeHandler) {
-            chatRoom.messagesBuff.removeChangeListener(this._messagesBuffChangeHandler);
+            chatRoom.messagesBuff?.removeChangeListener(this._messagesBuffChangeHandler);
             delete this._messagesBuffChangeHandler;
         }
 
-        window.removeEventListener('resize', self.handleWindowResize);
-        window.removeEventListener('keydown', self.handleKeyDown);
-        $(document).off("fullscreenchange.megaChat_" + chatRoom.roomId);
-        $(document).off('keydown.keyboardScroll_' + chatRoom.roomId);
+        window.removeEventListener('resize', this.handleWindowResize);
+        window.removeEventListener('keydown', this.handleKeyDown);
+        $(document).off(`fullscreenchange.megaChat_${chatRoom.roomId}`);
+        $(document).off(`keydown.keyboardScroll_${chatRoom.roomId}`);
     }
     componentDidUpdate(prevProps, prevState) {
         var self = this;

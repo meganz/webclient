@@ -81,7 +81,7 @@ class Participant extends MegaRenderMixin {
                     }
                 </div>
                 <div className="status">
-                    {recorderCid === clientId || recorderCid === sfuClient.cid && handle === u_handle ?
+                    {recorderCid === clientId || recorderCid === call.sfuClient.cid && handle === u_handle ?
                         <div className="recording-status">
                             <span />
                         </div> :

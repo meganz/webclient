@@ -226,7 +226,7 @@ export default class Join extends MegaRenderMixin {
                         <div className="chat-body">
                             <HistoryPanel
                                 chatRoom={chatRoom}
-                                onMount={(cmp) => cmp.messagesListScrollable.scrollToBottom()}
+                                onMount={cmp => cmp.messagesListScrollable?.scrollToBottom()}
                             />
                         </div>
                     )}

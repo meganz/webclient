@@ -814,10 +814,10 @@ export class ConversationRightArea extends MegaRenderMixin {
         if (
             !room.iAmOperator() ||
             room.isReadOnly() ||
-            room.messagesBuff.messages.length === 0 ||
+            room.messagesBuff?.messages.length === 0 ||
             (
-                room.messagesBuff.messages.length === 1 &&
-                room.messagesBuff.messages.getItem(0).dialogType === "truncated"
+                room.messagesBuff?.messages.length === 1 &&
+                room.messagesBuff?.messages.getItem(0).dialogType === "truncated"
             )
         ) {
             dontShowTruncateButton = true;
@@ -1271,7 +1271,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                     }
                                     <Button
                                         className="link-button light export-chat-button"
-                                        disabled={room.messagesBuff.messages.length === 0 || room.exportIo}
+                                        disabled={room.messagesBuff?.messages.length === 0 || room.exportIo}
                                         onClick={() => {
                                             room.exportToFile();
                                         }}
@@ -1372,7 +1372,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                 key="sharedFiles"
                                 title={l[19796] || 'Shared Files'}
                                 chatRoom={room}
-                                sharedFiles={room.messagesBuff.sharedFiles}
+                                sharedFiles={room.messagesBuff?.sharedFiles}
                             />
                             {room.type === "private" ?
                                 <IncSharesAccordionPanel key="incomingShares" title={l[5542]} chatRoom={room} /> :

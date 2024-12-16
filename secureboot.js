@@ -414,6 +414,10 @@ function getCleanSitePath(path) {
             }
             if (path.tab && path[0] === 'pro') {
                 window.mProTab = path.tab;
+                if (window.mProTab === 'flexi') {
+                    window.mProTab = 'pro';
+                    sessionStorage.mScrollTo = 'flexi';
+                }
             }
             if (path.m && path[0].startsWith('propay_')) {
                 sessionStorage['pro.period'] = path.m;

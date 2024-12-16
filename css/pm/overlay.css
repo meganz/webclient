@@ -166,6 +166,7 @@
 .overlay-wrap .content.ps {
     padding-inline-end: 12px;
     -webkit-pading-end: 12px;
+    box-sizing: border-box;
 }
 .overlay-wrap .actions {
     box-sizing: border-box;

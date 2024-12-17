@@ -403,12 +403,10 @@ lazy(mega, 'backupCenter', () => {
 
                     // Move backup to target folder
                     if (target) {
-
-                        await M.moveNodes([h], target, 3);
+                        await M.safeMoveNodes(target, [h]);
                     }
                     // Remove
                     else {
-
                         await M.safeRemoveNodes([h]);
                     }
                 }

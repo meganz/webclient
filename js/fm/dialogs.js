@@ -1054,7 +1054,7 @@
         }
 
         if (nodeRoot === M.RubbishID || $.copyToShare || $.selectFolderDialog
-            || !u_type || M.currentdirid === 'devices' || $.albumImport) {
+            || !u_type || $.albumImport) {
             $sharedMe.addClass('hidden');
         }
         else {

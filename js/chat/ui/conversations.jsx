@@ -202,9 +202,9 @@ class ConversationsApp extends MegaRenderMixin {
             }
         });
 
-        megaChat.rebind(EVENTS.NAV_RENDER_VIEW, (ev, view) => {
-            if (Object.values(VIEWS).includes(view)) {
-                this.renderView(view);
+        megaChat.rebind(EVENTS.NAV_RENDER_VIEW, ({ data }) => {
+            if (Object.values(VIEWS).includes(data)) {
+                this.renderView(data);
             }
         });
 

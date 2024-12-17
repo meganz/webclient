@@ -5,6 +5,7 @@ import { Avatar, ContactPresence } from '../contacts.jsx';
 import { Emoji } from '../../../ui/utils.jsx';
 import ContactsPanel from './contactsPanel.jsx';
 import { inProgressAlert } from '../meetings/call.jsx';
+import { EVENTS, VIEWS } from '../conversations.jsx';
 
 export default class ContextMenu extends MegaRenderMixin {
     EVENT_CLOSE = new Event('closeDropdowns');
@@ -72,7 +73,8 @@ export default class ContextMenu extends MegaRenderMixin {
                                         createChatLink: false
                                     });
                                 }
-                                return loadSubPage(`fm/chat/p/${contact.u}`);
+                                loadSubPage(`fm/chat/p/${contact.u}`);
+                                megaChat.trigger(EVENTS.NAV_RENDER_VIEW, VIEWS.CHATS);
                             })
                         }
                     />

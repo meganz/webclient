@@ -520,6 +520,14 @@ body.theme-dark .rewind-datepicker-calendar .datepicker--cell.-current- {
     text-decoration: underline;
 }
 
+
+.sidebar-container .content-upgrade .upgrade-description a.rewind-sidebar-upgrade-action::after {
+    display: block;
+    content: "\a";
+    white-space: pre;
+    height: 16px;
+}
+
 .sidebar .sidebar-container .sidebar-content .content-empty .empty-folder i {
     --mask-color: var(--surface-mid-grey);
     --icon-size: 196px;

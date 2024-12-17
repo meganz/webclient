@@ -8,7 +8,7 @@ mega.ui.pm = {
             await mega.pm.checkActiveSubscription().catch(tell);
 
             mBroadcaster.addListener('pagechange', page => {
-                if (page === 'fm/pwm' && !mega.pm.pwmFeature) {
+                if (page === 'fm/pwm' && !mega.pm.pwmFeature && !u_attr.b && !u_attr.pf) {
                     if (mega.pm.plan && mega.pm.plan.trial) {
                         this.subscription.freeTrial();
                     }
@@ -31,7 +31,8 @@ mega.ui.pm = {
             pmlayout.classList.remove('hidden');
         }
 
-        if (!mega.pm.pwmFeature) {
+        // Business and flexi user has read only access to password manager even it is expired
+        if (!mega.pm.pwmFeature && !u_attr.b && !u_attr.pf) {
             return;
         }
 

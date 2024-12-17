@@ -125,8 +125,11 @@
         background-size: 100px auto;
     }
     .loading-info li::after {
-        background-image: url(../images/mega/loading-sprite@2x.png);
-        background-size: 222px auto;
+        background-image: url(../loading-sprite_light@2x.png);
+        background-size: 225px auto;
+    }
+    .theme-dark .loading-info li::after {
+        background-image: url(../loading-sprite_dark@2x.png);
     }
     .new-bottom-pages .blog-new-full p.strong-paragraph.new-blog-icon {
         background-image: url(../images/mega/blogs/blog-post-sprite1@2x.png);

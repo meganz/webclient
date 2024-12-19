@@ -834,7 +834,11 @@ lazy(mega, 'backupCenter', () => {
             // If target is device card
             else if ($deviceCard.length === 1) {
 
-                menuItems = '.properties-item, .device-rename-item';
+                menuItems = '.properties-item';
+
+                if ($deviceCard.attr('data-id') && $deviceCard.attr('data-id') !== 'undefined') {
+                    menuItems += ', .device-rename-item';
+                }
 
                 // "Show in Cloud drive" for Backups only
                 if ($deviceCard.attr('data-handle') && M.d[$deviceCard.attr('data-handle')]) {
@@ -1346,7 +1350,7 @@ lazy(mega, 'backupCenter', () => {
             const $deviceEl = $('.backup-body.active', this.$contentBlock);
             const deviceId = $deviceEl.data('id');
 
-            if (deviceId) {
+            if (deviceId && deviceId !== 'undefined') {
 
                 var $dialog = $('.mega-dialog.device-rename-dialog');
                 var $input = $('input', $dialog);
@@ -1376,7 +1380,10 @@ lazy(mega, 'backupCenter', () => {
                         var value = $input.val();
                         errMsg = '';
 
-                        if (deviceName && deviceName !== value) {
+                        // deviceName might be empty in some cases
+                        // when deviceId is not included in user attr "dn"
+                        // user attr "dn" will be updated with the new deviceName anyway
+                        if (deviceName !== value) {
 
                             value = value.trim();
 

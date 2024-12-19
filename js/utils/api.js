@@ -1376,8 +1376,8 @@ lazy(self, 'api', () => {
     const catchup = new Set();
     const inflight = new Map();
     const observers = new MapSet();
-    const seenTreeFetch = new Set();
     const pendingTreeFetch = new Set();
+    const inflightTreeFetch = new Set();
     const logger = new MegaLogger(`api.xs${makeUUID().substr(-18)}`);
     const clone = ((clone) => (value) => clone(value))(window.Dexie && Dexie.deepClone || window.clone || echo);
     const cache = new LRULapse(12, 36, self.d > 0 && ((...args) => logger.debug('reply.cache flush', ...args)));
@@ -1817,12 +1817,16 @@ lazy(self, 'api', () => {
          */
         async tree(handles) {
 
-            if (Array.isArray(handles)) {
-
-                handles.forEach(pendingTreeFetch.add, pendingTreeFetch);
+            if (!Array.isArray(handles)) {
+                handles = [handles];
             }
-            else {
-                pendingTreeFetch.add(handles);
+
+            for (let i = handles.length; i--;) {
+                const h = handles[i];
+
+                if (!inflightTreeFetch.has(h)) {
+                    pendingTreeFetch.add(h);
+                }
             }
 
             return lock('tree-fetch.lock', async() => {
@@ -1833,11 +1837,8 @@ lazy(self, 'api', () => {
                 for (let i = pending.length; i--;) {
                     const n = pending[i];
 
-                    if (!seenTreeFetch.has(n) && (!M.d[n] || M.d[n].t && !M.c[n])) {
-
-                        payload.n.push(n);
-                        seenTreeFetch.add(n);
-                    }
+                    payload.n.push(n);
+                    inflightTreeFetch.add(n);
                 }
 
                 if (payload.n.length) {
@@ -1845,8 +1846,9 @@ lazy(self, 'api', () => {
                         logger.info('Requesting %d tree nodes...', payload.n.length);
                     }
                     const res = await this.req(payload, 4).catch(echo);
+                    inflightTreeFetch.clear();
 
-                    if (typeof res === 'number' && res < 0 && res !== EACCESS) {
+                    if (Number(res) < 0 && res !== EACCESS) {
                         throw res;
                     }
 

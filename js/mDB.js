@@ -1328,8 +1328,8 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
     'use strict';
     let bulk = false;
     let options = false;
-    if (typeof index !== 'string') {
-        options = index;
+    if (!index || typeof index !== 'string') {
+        options = index || {};
         index = options.index;
         anyof = anyof || options.anyof;
         where = where || options.where;
@@ -1357,18 +1357,34 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
         index = t.schema.primKey.keyPath;
     }
 
-    if (table === 'f' && index === 'h' && mega.infinity) {
+    if (table === 'f' && index === 'h' && mega.infinity && !options.localOnly) {
         p = [];
 
         if (anyof && (anyof[0] === 'p' || anyof[0] === 'h')) {
-            p.push(...anyof[1]);
+
+            p[p.t = anyof[0]] = 1;
         }
     }
+
+    /**
+    if (debug && anyof && anyof[0] === 'h') {
+        for (let i = anyof[1].length; i--;) {
+            if (M.d[anyof[1][i]]) {
+                debug(`> Node already on memory: ${anyof[1][i]}`);
+            }
+        }
+    }
+    /**/
 
     if (anyof) {
         // encrypt all values in the list
         for (i = anyof[1].length; i--;) {
-            anyof[1][i] = this.toStore(anyof[1][i]);
+            if (typeof anyof[1][i] === 'string') {
+                if (p.t) {
+                    p.push(anyof[1][i]);
+                }
+                anyof[1][i] = this.toStore(anyof[1][i]);
+            }
         }
 
         if (anyof[1].length > 1) {
@@ -1400,9 +1416,6 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
         for (let k = where.length; k--;) {
             // encrypt the filter values (logical AND is commutative, so we can reverse the order)
             if (typeof where[k][1] === 'string') {
-                if (p && where[k][0] === 'p') {
-                    p.push(where[k][1]);
-                }
                 if (!this._cache[where[k][1]]) {
                     this._cache[where[k][1]] = this.toStore(where[k][1]);
                 }
@@ -1453,9 +1466,11 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
                 }
             }
         }
-        const dbRecords = !!r.length;
+        const dbRecords = r.dbRecords = r.length;
 
-        console.time(`dirty-${pending.length}`);
+        if (debug) {
+            this.logger.time(`pending-read${pending.length}~${options.i || ''}`);
+        }
 
         // iterate transactions in reverse chronological order
         for (let tid = pending.length; tid--;) {
@@ -1551,7 +1566,10 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
                 }
             }
         }
-        console.timeEnd(`dirty-${pending.length}`);
+
+        if (debug) {
+            this.logger.timeEnd(`pending-read${pending.length}~${options.i || ''}`);
+        }
 
         // scan the result for updates/deletions/additions arising out of the matches found
         if (match) {
@@ -1618,21 +1636,61 @@ FMDB.prototype.getbykey = async function fmdb_getbykey(table, index, anyof, wher
     }
     else if (p.length) {
 
+        if (self.d) {
+            this.logger.group('Checking and requesting missing nodes to API...', p.t, `${p}`, p, r);
+        }
+
         // prepare to request missing nodes.
+        // @todo API-side support for getting the parent folder contents of specified single file-nodes
         for (let x, i = r.length; i--;) {
             const n = r[i];
 
-            if ((x = p.indexOf(n.h)) >= 0) {
-                p.splice(x, 1);
+            if (p.p) {
+                if ((x = p.indexOf(n.p)) >= 0) {
+                    p.splice(x, 1);
+                }
             }
-
-            if ((x = p.indexOf(n.p)) >= 0) {
+            else if ((x = p.indexOf(n.h)) >= 0) {
                 p.splice(x, 1);
             }
         }
 
         if (p.length) {
-            await api.tree(p);
+            await api.tree(p).catch(dump);
+
+            /**
+            if (debug) {
+                for (let i = p.length; i--;) {
+                    const h = p[i];
+                    const n = M.d[h];
+                    if (p.h ? n : n && n.t && M.c[h]) {
+                        debug(`< Node misplaced on memory: ${h}`, n.t, p.t);
+                    }
+                }
+            }
+            /**/
+
+            if (anyof) {
+                anyof = [p.t, [...p]];
+                const res = await this.getbykey(table, {...options, localOnly: 1, anyof}, anyof, where, limit);
+
+                if (p.h) {
+                    p = new Set();
+                    for (let i = res.length; i--;) {
+                        p.add(res[i].p);
+                    }
+
+                    if (p.size) {
+                        await api.tree([...p]).catch(dump);
+                    }
+                }
+
+                r.push(...res);
+            }
+        }
+
+        if (self.d) {
+            this.logger.groupEnd();
         }
     }
     return r || [];
@@ -1652,6 +1710,11 @@ FMDB.prototype.getchunk = async function(table, options, onchunk) {
         options.offset = -options.limit;
     }
 
+    // Keep track of the last 'f' node received;
+    // we may leave the loop running while nothing retrieved from
+    // DB but rather from the in-memory pending cache, otherwise.
+    let last = null;
+
     while (true) {
         if (mng) {
             options.offset += options.limit;
@@ -1665,6 +1728,22 @@ FMDB.prototype.getchunk = async function(table, options, onchunk) {
 
         if (r.length < limit) {
             break;
+        }
+
+        if (r.dbRecords === 0 && table === 'f') {
+            const h = r[0] && r[0].h;
+            if (!last) {
+                last = h;
+            }
+            else if (last === h) {
+                if (self.d) {
+                    this.logger.warn(`[getchunk] Received ${r.length} nodes, but none from DB, aborting...`);
+                }
+                break;
+            }
+            else {
+                last = null;
+            }
         }
     }
 };
@@ -3114,7 +3193,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
             }
 
             // fetch all top-level nodes
-            emplace(await fmdb.getbykey('f', 'h', ['p', [M.RootID, M.InboxID, M.RubbishID]]));
+            emplace(await fmdb.getbykey('f', {localOnly: true}, ['p', [M.RootID, M.InboxID, M.RubbishID]]));
         },
 
         /**
@@ -3199,7 +3278,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                 const opts = {
                     limit: 4,
                     offset: 0,
-                    where: [['p', handle]]
+                    anyof: ['p', [handle]]
                 };
                 const ack = (res) => {
                     if (ready) {
@@ -3299,21 +3378,22 @@ Object.defineProperty(self, 'dbfetch', (function() {
          * same as fetchchildren/dbfetch.get, but takes an array of handles.
          *
          * @param {Array} handles ufs-node handles
+         * @param {Object} [options] options to pass through to {@link fmdb.getbykey}
          * @returns {Promise} settle
          * @memberOf dbfetch
          */
-        async geta(handles) {
+        async geta(handles, options) {
             let bulk = handles.filter(h => !M.d[h]);
 
             if (bulk.length) {
                 await this.flushed();
-                emplace(await fmdb.getbykey('f', 'h', ['h', bulk]), true);
+                emplace(await fmdb.getbykey('f', options, ['h', bulk]), true);
             }
 
             bulk = handles.filter(h => M.d[h] && M.d[h].t && !M.c[h]);
             if (bulk.length) {
                 await this.flushed();
-                await this.tree(bulk, 0);
+                await this.tree(bulk, {...options, level: 0});
             }
 
             bulk = new Set();
@@ -3330,7 +3410,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
          * Fetch entire subtree.
          *
          * @param {Array} parents  Node handles
-         * @param {Number} [level] Recursion level, optional
+         * @param {Number|*} [level] Recursion level, or {@link fmdb.getbykey} options.
          * @returns {Promise}
          * @memberOf dbfetch
          */
@@ -3340,6 +3420,12 @@ Object.defineProperty(self, 'dbfetch', (function() {
             }
             const inflight = new Set();
             const {promise} = mega;
+
+            let options = false;
+            if (typeof level !== 'number') {
+                options = level || {};
+                level = 'level' in options ? options.level | 0 : -1;
+            }
 
             // check which parents have already been fetched - no need to fetch those
             // (since we do not purge loaded nodes, the presence of M.c for a node
@@ -3360,7 +3446,7 @@ Object.defineProperty(self, 'dbfetch', (function() {
                 if (p.length) {
 
                     // fetch children of all unfetched parents
-                    const r = await fmdb.getbykey('f', 'h', ['p', [...p]]);
+                    const r = await fmdb.getbykey('f', options, ['p', [...p]]);
 
                     // store fetched nodes
                     for (let i = p.length; i--;) {

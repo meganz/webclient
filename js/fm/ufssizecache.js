@@ -182,7 +182,7 @@ UFSSizeCache.prototype.save = async function(rootNode) {
         }
     }
     this.cache = null;
-    this.versions = null;
+    this.versions.clear();
 };
 
 // Add node to indexedDB

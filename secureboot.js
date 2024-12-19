@@ -975,6 +975,10 @@ Object.defineProperty(mega, 'refsuncom', {
 
 /** @property mega.infinity */
 lazy(mega, 'infinity', function() {
+    'use strict';
+    if (mega.flags.inf > 1) {
+        localStorage.megaLiteMode = 1;
+    }
     return mega.flags.inf > 0 || !!localStorage.mInfinity || !!localStorage.megaLiteMode;
 });
 

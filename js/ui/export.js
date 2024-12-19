@@ -2882,7 +2882,19 @@ function logExportEvt(type, target) {
     ExportLink.prototype._getExportLinkRequest = async function(nodeId) {
 
         const done = (handle) => {
+            const n = M.getNodeByHandle(nodeId);
+
             this.logger.warn('share-link progress...', this.nodesLeft, handle);
+
+            if (!n.ph) {
+                if (self.d) {
+                    this.logger.error(`public-node '${handle}' lost for ${nodeId} ?! restoring...`, mega.infinity, n);
+                }
+                if (n && handle) {
+                    n.ph = handle;
+                    M.nodeUpdated(n);
+                }
+            }
 
             if (!--this.nodesLeft) {
                 if (this.options.showExportLinkDialog) {
@@ -2923,7 +2935,7 @@ function logExportEvt(type, target) {
         }
 
         return api.screq(request)
-            .then(({handle}) => done(handle))
+            .then(({handle, result}) => done(handle || result))
             .catch((ex) => {
                 done(null);
                 throw ex;

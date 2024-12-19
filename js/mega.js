@@ -528,11 +528,15 @@ async function sc_fetcher() {
     if (d) {
         console.info('Retrieving from DB nodes required to parse action-packets...', handles);
     }
+
+    // Set local-only mode, in case we're running under Infinity.
+    const options = freeze({localOnly: true});
+
     // console.time('sc:fetcher');
 
     while (handles.length) {
         const bunch = handles.splice(0, 8192);
-        await dbfetch.geta(bunch).catch(dump);
+        await dbfetch.geta(bunch, options).catch(dump);
 
         // Retrieve all needed subtrees and file versions if any, and then finish the batch processing
         const subtree = new Set();
@@ -555,7 +559,7 @@ async function sc_fetcher() {
         }
 
         if (subtree.size) {
-            await dbfetch.tree([...subtree]).catch(dump);
+            await dbfetch.tree([...subtree], options).catch(dump);
         }
 
         for (let i = bunch.length; i--;) {
@@ -2409,23 +2413,31 @@ function worker_procmsg(ev) {
                 }
             }
             const ok = fmdb && !fmdb.crashed;
-            const emplace = mega.nobp || !ok || fminitialized || fmdb && fmdb.memoize || M.isInRoot(ev.data, true);
 
             // If `ufsc.cache` is not set, `ufsc.save()` was already called,
             // only in such a case we need to explicitly add new nodes to DB.
             // Under Infinity, this will ensure (M)tree[] nodes do consistently
             // remain in memory, which is a strong requirement for S4 (lhp)...
             const feed = ufsc.cache && ev.data.p;
-            if (feed) {
-                ufsc.feednode(ev.data);
+
+            // Additionally, in case we're under Infinity and incrementally loading nodes in the background,
+            // don't emplace anything into memory otherwise crawling nodes back to root won't work properly.
+            // @todo way to expunge nodes from memory, we've an overhead having to decrypt nodes out of FMDB next.
+            const inc = mega.infinity && !ufsc.cache;
+
+            const emplace = !inc
+                && (mega.nobp || !ok || fminitialized || fmdb && fmdb.memoize || M.isInRoot(ev.data, true));
+
+            if (emplace) {
+                emplacenode(ev.data);
             }
 
             if (!feed || !emplace) {
                 ufsc.addToDB(ev.data);
             }
 
-            if (emplace) {
-                emplacenode(ev.data);
+            if (feed) {
+                ufsc.feednode(ev.data);
             }
         }
     }
@@ -2758,10 +2770,17 @@ function dbfetchfm(residual) {
         mega.loadReport[key] = now - mega.loadReport.stepTimeStamp;
         mega.loadReport.stepTimeStamp = now;
     };
-    const finish = () => {
+    const finish = async() => {
 
         if (isFromAPI) {
             window.loadingInitDialog.step3(1, 20);
+        }
+
+        if (ufsc.cache) {
+            if (self.d) {
+                console.warn('Saving unhandled ufs-cache...', $.len(ufsc.cache), mega.infinity);
+            }
+            await ufsc.save().catch(dump);
         }
 
         return getsc(true);
@@ -3232,45 +3251,39 @@ function processOPC(a, ignoreDB) {
  */
 function processPH(publicHandles) {
     'use strict';
-    var nodeId;
-    var publicHandleId;
+    const promises = [];
     var UiExportLink = fminitialized && !is_mobile && new mega.UI.Share.ExportLink();
 
     for (var i = publicHandles.length; i--; ) {
-        var value = publicHandles[i];
-
-        nodeId = value.h;
-        if (!M.d[nodeId]) continue;
+        const share = {...publicHandles[i]};
+        const {h, d, down, p} = share;
 
         if (fmdb) {
-            if (value.d) {
-                fmdb.del('ph', nodeId);
+            if (d) {
+                fmdb.del('ph', h);
             }
             else {
-                fmdb.add('ph', { h : nodeId });
+                fmdb.add('ph', {h});
             }
         }
 
-        publicHandleId = value.ph;
-
         // remove exported link, down: 1
-        if (value.d) {
-            M.delNodeShare(nodeId, 'EXP');
+        if (d) {
+            promises.push(M.delNodeShare(h, 'EXP'));
 
             if (fminitialized && M.currentdirid === 'public-links') {
-                removeUInode(nodeId, value.p);
+                removeUInode(h, p);
 
                 if (typeof selectionManager !== 'undefined') {
-                    selectionManager.remove_from_selection(nodeId);
+                    selectionManager.remove_from_selection(h);
                 }
             }
 
             if (UiExportLink) {
-                UiExportLink.removeExportLinkIcon(nodeId);
+                UiExportLink.removeExportLinkIcon(h);
             }
         }
         else {
-            var share = clone(value);
             delete share.a;
             delete share.i;
             delete share.n;
@@ -3279,30 +3292,27 @@ function processPH(publicHandles) {
             share.u = 'EXP';
             share.r = 0;
 
-            if (M.d[nodeId].ph !== publicHandleId) {
-                M.d[nodeId].ph = publicHandleId;
-                M.nodeUpdated(M.d[nodeId]);
-            }
-
-            M.nodeShare(share.h, share);
+            promises.push(M.nodeShare(h, share));
 
             if (UiExportLink) {
-                UiExportLink.addExportLinkIcon(nodeId);
+                UiExportLink.addExportLinkIcon(h);
             }
         }
 
         if (is_mobile) {
-            mobile.cloud.updateLinkIcon(nodeId);
+            mobile.cloud.updateLinkIcon(h);
         }
 
-        if (UiExportLink && (value.down !== undefined)) {
-            UiExportLink.updateTakenDownItem(nodeId, value.down);
+        if (UiExportLink && down !== undefined) {
+            UiExportLink.updateTakenDownItem(h, down);
         }
 
         if (fminitialized && M.recentsRender) {
-            M.recentsRender.nodeChanged(nodeId);
+            M.recentsRender.nodeChanged(h);
         }
     }
+
+    return Promise.all(promises);
 }
 
 /**
@@ -3870,49 +3880,6 @@ function loadfm_callback(res) {
         eventlog(99695);
     }
 
-    /**
-    if (res.f) {
-        process_f(res.f);
-    }
-
-    // If we have shares, and if a share is for this node, record it on the nodes share list
-    if (res.s) {
-        if (d) {
-            console.info(`[f.s(${res.s.length})] %s`, res.s.map(n => `${n.h}*${n.u}`).sort());
-        }
-        for (let i = res.s.length; i--;) {
-            M.nodeShare(res.s[i].h, res.s[i]);
-        }
-    }
-
-    // Handle public/export links. Why here? Make sure that M.d already exists
-    if (res.ph) {
-        processPH(res.ph);
-    }
-
-    // Handle versioning nodes
-    if (res.f2) {
-        process_f(res.f2, true);
-    }
-
-    // This package is sent on hard refresh if owner have enabled or disabled PUF
-    if (res.uph) {
-        mega.fileRequest.processUploadedPuHandles(res.uph).dump('processUPH');
-    }
-
-    // decrypt hitherto undecrypted nodes
-    crypto_fixmissingkeys(missingkeys);
-
-    if (res.cr) {
-        crypto_procmcr(res.cr);
-    }
-
-    if (res.sr) {
-        crypto_procsr(res.sr);
-    }
-    setsn(currsn = res.sn);
-    /**/
-
     mega.loadReport.procNodeCount = Object.keys(M.d || {}).length;
     mega.loadReport.procNodes = Date.now() - mega.loadReport.stepTimeStamp;
     mega.loadReport.stepTimeStamp = Date.now();
@@ -3923,6 +3890,7 @@ function loadfm_callback(res) {
     // those dependent on in-memory-nodes from the initial load to set flags such as SHARED.
     return (async() => ufsc.save())().catch(dump)
         .then(() => {
+            const pending = [];
 
             window.loadingInitDialog.step3(35, 40);
 
@@ -3953,13 +3921,13 @@ function loadfm_callback(res) {
                     console.info(`[f.s(${res.s.length})] %s`, res.s.map(n => `${n.h}*${n.u}`).sort());
                 }
                 for (let i = res.s.length; i--;) {
-                    M.nodeShare(res.s[i].h, res.s[i]);
+                    pending.push(M.nodeShare(res.s[i].h, res.s[i]));
                 }
             }
 
             // Handle public/export links. Why here? Make sure that M.d already exists
             if (res.ph) {
-                processPH(res.ph);
+                pending.push(processPH(res.ph));
             }
 
             // This package is sent on hard refresh if owner have enabled or disabled PUF
@@ -3981,7 +3949,7 @@ function loadfm_callback(res) {
             // retrieve the initial batch of action packets, if any,
             // we'll then complete the process using loadfm_done()
             // (going through dbfetchfm() -> getsc() to do so)
-            return dbfetchfm();
+            return Promise.all(pending).catch(reportError).then(dbfetchfm);
         });
 }
 

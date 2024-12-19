@@ -1,8 +1,7 @@
 import React from 'react';
-import { MegaRenderMixin } from '../mixins';
 import ModalDialogsUI from './../../ui/modalDialogs.jsx';
 
-export default class PushSettingsDialog extends MegaRenderMixin {
+export default class PushSettingsDialog extends React.Component {
     static options = {
         // `30 Minutes`
         30: l[22012],

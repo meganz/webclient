@@ -3,6 +3,8 @@ import {MegaRenderMixin} from "../../../../../chat/mixins";
 import { ParsedHTML } from '../../../../utils';
 
 export class ColumnContactRequestsEmail extends MegaRenderMixin {
+    domRef = React.createRef();
+
     static sortable = true;
     static id = "email";
     static megatype = "email";
@@ -15,7 +17,7 @@ export class ColumnContactRequestsEmail extends MegaRenderMixin {
         const {nodeAdapter, currView} = this.props;
         let {node} = nodeAdapter.props;
 
-        return <td>
+        return <td ref={this.domRef}>
             {currView && currView === 'opc' ?
                 <span>
                     <i className="sprite-fm-uni icon-send-requests">

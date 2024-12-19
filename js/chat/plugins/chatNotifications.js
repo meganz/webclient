@@ -70,10 +70,9 @@ var ChatNotifications = function(megaChat, options) {
         const evtId = generateEventSuffixFromArguments('', 'chatNotifStopSound', rand(10000));
         const removeNotification = e => {
             if (e.data.callId === callId || !chatRoom.ringingCalls.exists(callId)) {
-                if (this._incomingDialogContainers[callId]) {
-                    const node = this._incomingDialogContainers[callId];
-                    ReactDOM.unmountComponentAtNode(node);
-                    node.parentNode.removeChild(node);
+                const incomingDialogContainer = this._incomingDialogContainers[callId];
+                if (incomingDialogContainer) {
+                    incomingDialogContainer.$$rootRef.unmount();
                     delete this._incomingDialogContainers[callId];
                 }
                 notification.forceStopSound(notificationSound);
@@ -121,9 +120,9 @@ var ChatNotifications = function(megaChat, options) {
             }
         });
 
-        this._incomingDialogContainers[callId] = dialogContainer;
-        document.body.append(dialogContainer);
-        ReactDOM.render(dialog, dialogContainer);
+        const $$rootRef = ReactDOM.createRoot(dialogContainer);
+        this._incomingDialogContainers[callId] = { $$rootRef, dialogContainer };
+        $$rootRef.render(dialog);
 
         callManager.on(`onRingingStopped${evtId}`, removeNotification);
         chatRoom.on(`onRoomDisconnected${evtId}`, triggerRingingStopped);

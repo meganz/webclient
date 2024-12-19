@@ -36,9 +36,9 @@ class ConversationMessageMixin extends ContactAwareComponent {
         }
     }
 
-    componentWillMount() {
-        if (super.componentWillMount) {
-            super.componentWillMount();
+    UNSAFE_componentWillMount() {
+        if (super.UNSAFE_componentWillMount) {
+            super.UNSAFE_componentWillMount();
         }
 
         const chatRoom = this.props.chatRoom;

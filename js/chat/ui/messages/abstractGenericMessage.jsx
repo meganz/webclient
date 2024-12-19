@@ -4,6 +4,7 @@ import { Avatar, ContactButton } from '../contacts.jsx';
 import { Emoji } from '../../../ui/utils.jsx';
 
 export default class AbstractGenericMessage extends ConversationMessageMixin {
+    domRef = React.createRef();
 
     getAvatar() {
         const contact = this.getContact() || Message.getContactForMessage(this.props.message);
@@ -70,6 +71,7 @@ export default class AbstractGenericMessage extends ConversationMessageMixin {
 
         return (
             <div
+                ref={this.domRef}
                 data-id={message.messageId}
                 className={`
                     ${this.getClassNames ? this.getClassNames() : grouped ? 'grouped' : ''}

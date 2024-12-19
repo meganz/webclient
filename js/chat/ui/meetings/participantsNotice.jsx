@@ -7,6 +7,7 @@ import { InviteParticipantsPanel } from "../inviteParticipantsPanel.jsx";
 
 export default class ParticipantsNotice extends MegaRenderMixin {
     static NAMESPACE = 'participants-notice';
+    domRef = React.createRef();
 
     constructor(props) {
         super(props);
@@ -124,7 +125,7 @@ export default class ParticipantsNotice extends MegaRenderMixin {
         }
 
         return (
-            <>
+            <div ref={this.domRef}>
                 {call.isSharingScreen() ? null : (
                     <LocalVideoHiRes
                         className="local-stream-mirrored"
@@ -133,7 +134,7 @@ export default class ParticipantsNotice extends MegaRenderMixin {
                     />
                 )}
                 {streamContainer(hasLeft ? this.renderUserAlone() : this.renderUserWaiting())}
-            </>
+            </div>
         );
     }
 }

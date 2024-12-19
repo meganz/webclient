@@ -17,6 +17,7 @@ export const VIEW = {
 };
 
 export default class WaitingRoom extends MegaRenderMixin {
+    domRef = React.createRef();
     redirectInterval = undefined;
 
     state = {
@@ -403,7 +404,7 @@ export default class WaitingRoom extends MegaRenderMixin {
         }
     };
 
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (this.props.havePendingCall !== nextProps.havePendingCall) {
             this.setState({ call: nextProps.havePendingCall }, () =>
                 this.state.view === VIEW.AWAIT && nextProps.havePendingCall && this.requestJoin()
@@ -451,6 +452,7 @@ export default class WaitingRoom extends MegaRenderMixin {
         return (
             <utils.RenderTo element={document.body}>
                 <div
+                    ref={this.domRef}
                     className={`
                         ${NAMESPACE}
                         join-meeting

@@ -212,6 +212,8 @@ export const rAFWrap = () => {
 
 export const trycatcher = () => (t, p, d) => (d.value = tryCatch(d.value)) && d;
 
+export const getUniqueId = () => makeUUID().slice(-12);
+
 export class MegaRenderMixin extends React.Component {
     constructor(props) {
         super(props);
@@ -385,40 +387,41 @@ export class MegaRenderMixin extends React.Component {
             this._recurseAddListenersIfNeeded("s", this.state);
         }
 
-        var node = this.findDOMNode();
+        const node = this.findDOMNode();
 
-        if (INTERSECTION_OBSERVER_AVAILABLE && !this.customIsEventuallyVisible) {
-            if (node) {
-                this.__intersectionVisibility = false;
-
-                onIdle(() => {
-                    // bug in IntersectionObserver, that caused the intersection observer to not fire the initial
-                    // visibility call once its initialized
-                    this.__intersectionObserverInstance = new IntersectionObserver(
-                        (entries) => {
-                            // IntersectionObserver may queue events. Check the latest.
-                            const entry = entries.pop();
-                            if (entry.intersectionRatio < 0.2 && !entry.isIntersecting) {
-                                this.__intersectionVisibility = false;
-                            }
-                            else {
-                                this.__intersectionVisibility = true;
-                                if (this._requiresUpdateOnResize) {
-                                    this.debouncedForceUpdate();
-                                }
-                            }
-
-                            if (this.onVisibilityChange) {
-                                this.onVisibilityChange(this.__intersectionVisibility);
-                            }
-                        },
-                        {
-                            threshold: 0.1
+        if (
+            INTERSECTION_OBSERVER_AVAILABLE &&
+            !this.customIsEventuallyVisible &&
+            node && node.nodeType
+        ) {
+            this.__intersectionVisibility = false;
+            onIdle(() => {
+                // bug in IntersectionObserver, that caused the intersection observer to not fire the initial
+                // visibility call once its initialized
+                this.__intersectionObserverInstance = new IntersectionObserver(
+                    (entries) => {
+                        // IntersectionObserver may queue events. Check the latest.
+                        const entry = entries.pop();
+                        if (entry.intersectionRatio < 0.2 && !entry.isIntersecting) {
+                            this.__intersectionVisibility = false;
                         }
-                    );
-                    this.__intersectionObserverInstance.observe(node);
-                });
-            }
+                        else {
+                            this.__intersectionVisibility = true;
+                            if (this._requiresUpdateOnResize) {
+                                this.debouncedForceUpdate();
+                            }
+                        }
+
+                        if (this.onVisibilityChange) {
+                            this.onVisibilityChange(this.__intersectionVisibility);
+                        }
+                    },
+                    {
+                        threshold: 0.1
+                    }
+                );
+                this.__intersectionObserverInstance.observe(node);
+            });
         }
         if (this.onResizeObserved) {
             if (!RESIZE_OBSERVER_AVAILABLE) {
@@ -440,7 +443,7 @@ export class MegaRenderMixin extends React.Component {
     }
     findDOMNode() {
         if (!this.domNode) {
-            this.domNode = ReactDOM.findDOMNode(this);
+            this.domNode = this.domRef?.current;
         }
         return this.domNode;
     }
@@ -833,7 +836,7 @@ export class MegaRenderMixin extends React.Component {
 
     }
 
-    componentWillReceiveProps(nextProps, nextContext) {
+    UNSAFE_componentWillReceiveProps(nextProps, nextContext) {
         if (localStorageProfileRenderFns) {
             // since this is not used in our app, we can use it as a pre-call hook to wrap render() fn's for
             // performance logging

@@ -1,5 +1,4 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../mixins';
 import Result from './result.jsx';
 import { API, LABELS } from './gifPanel.jsx';
 
@@ -18,7 +17,7 @@ const Nil = ({ children }) => (
     </div>
 );
 
-export default class ResultContainer extends MegaRenderMixin {
+export default class ResultContainer extends React.Component{
     intersectionObserver = null;
 
     initializeIntersectionObserver = () => {
@@ -51,24 +50,13 @@ export default class ResultContainer extends MegaRenderMixin {
     };
 
     componentDidMount() {
-        super.componentDidMount();
         this.initializeIntersectionObserver();
     }
 
     componentWillUnmount() {
-        super.componentWillUnmount();
-
         if (this.intersectionObserver) {
             this.intersectionObserver.disconnect();
             this.intersectionObserver = null;
-        }
-    }
-
-    componentWillReceiveProps(nextProps) {
-        super.componentWillReceiveProps(nextProps);
-
-        if (nextProps !== this.props) {
-            this.safeForceUpdate();
         }
     }
 
@@ -121,7 +109,8 @@ export default class ResultContainer extends MegaRenderMixin {
                         <img
                             className="emoji"
                             alt="\ud83d\ude10"
-                            src={`${staticpath}/images/mega/twemojis/2_v2/72x72/1f610.png`} />
+                            src={`${staticpath}/images/mega/twemojis/2_v2/72x72/1f610.png`}
+                        />
                         <strong>{LABELS.END_OF_RESULTS}</strong>
                     </div>
                 </>

@@ -1,11 +1,11 @@
 import React from 'react';
-import { compose, MegaRenderMixin } from '../../../mixins.js';
+import { compose } from '../../../mixins.js';
 import { Avatar } from '../../contacts.jsx';
 import { isGuest } from '../call.jsx';
 import Button from '../button.jsx';
 import { withPermissionsObserver } from '../permissionsObserver.jsx';
 
-class Preview extends MegaRenderMixin {
+class Preview extends React.Component {
     static NAMESPACE = 'preview-meeting';
 
     static STREAMS = {
@@ -114,17 +114,13 @@ class Preview extends MegaRenderMixin {
     };
 
     componentWillUnmount() {
-        super.componentWillUnmount();
         this.stopStream();
     }
 
     componentDidMount() {
-        super.componentDidMount();
-
         if (this.props.onToggle) {
             this.props.onToggle(this.state.audio, this.state.video);
         }
-
         this.setState({ avatarMeta: is_chatlink ? generateAvatarMeta(u_handle) : undefined });
     }
 

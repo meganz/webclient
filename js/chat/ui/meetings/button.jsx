@@ -1,7 +1,6 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../mixins';
 
-class Group extends MegaRenderMixin {
+class Group extends React.Component {
     static NAMESPACE = 'buttonGroup';
     static BASE_CLASS = 'button-group';
 
@@ -91,18 +90,16 @@ class Group extends MegaRenderMixin {
     }
 }
 
-class Button extends MegaRenderMixin {
+class Button extends React.Component {
     buttonRef = React.createRef();
 
     componentDidUpdate() {
-        super.componentDidUpdate();
         if (this.props.simpletip) {
             $(this.buttonRef.current).trigger('simpletipUpdated');
         }
     }
 
     componentDidMount() {
-        super.componentDidMount();
         if (this.props.didMount) {
             this.props.didMount(this);
         }

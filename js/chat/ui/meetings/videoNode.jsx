@@ -32,7 +32,7 @@ used in the RHP.       as thumbnail, only     main, self and
 */
 /** Base class for all video components - does the actual rendering */
 class VideoNode extends MegaRenderMixin {
-    nodeRef = React.createRef();
+    domRef = React.createRef();
     contRef = React.createRef();
     audioLevelRef = React.createRef();
     statsHudRef = React.createRef();
@@ -58,7 +58,7 @@ class VideoNode extends MegaRenderMixin {
     componentDidMount() {
         super.componentDidMount();
         this.source.registerConsumer(this);
-        this.props.didMount?.(this.nodeRef?.current);
+        this.props.didMount?.(this.domRef?.current);
         this.requestVideo(true);
         // [...] TODO: higher-order component
         this.raisedHandListener =
@@ -75,7 +75,7 @@ class VideoNode extends MegaRenderMixin {
     componentDidUpdate() {
         super.componentDidUpdate();
         if (this.props.didUpdate) {
-            this.props.didUpdate(this.nodeRef?.current);
+            this.props.didUpdate(this.domRef?.current);
         }
         this.requestVideo();
     }
@@ -102,11 +102,11 @@ class VideoNode extends MegaRenderMixin {
         video.ondblclick = e => {
             const { onDoubleClick, toggleFullScreen } = this.props;
             onDoubleClick?.(this.source, e);
-            if (toggleFullScreen && !document.fullscreenElement && this.nodeRef.current) {
+            if (toggleFullScreen && !document.fullscreenElement && this.domRef.current) {
                 if (typeof toggleFullScreen === 'function') {
                     toggleFullScreen(this);
                 }
-                this.nodeRef.current.requestFullscreen({ navigationUI: 'hide' });
+                this.domRef.current.requestFullscreen({ navigationUI: 'hide' });
             }
         };
         video.onloadeddata = (ev) => {
@@ -273,7 +273,7 @@ class VideoNode extends MegaRenderMixin {
             children,
             onClick
         } = this.props;
-        const { nodeRef, source, isLocal, isLocalScreen } = this;
+        const { domRef, source, isLocal, isLocalScreen } = this;
 
         if (!chatRoom.call) {
             return null;
@@ -284,7 +284,7 @@ class VideoNode extends MegaRenderMixin {
 
         return (
             <div
-                ref={nodeRef}
+                ref={domRef}
                 className={`
                     video-node
                     ${onClick ? 'clickable' : ''}
@@ -335,12 +335,12 @@ class DynVideo extends VideoNode {
         super.onAvChange();
     }
     dynRequestVideo(forceVisible) {
-        const {source} = this;
+        const { source, domRef } = this;
         if (source.isFake || source.isDestroyed) {
             return;
         }
         if (source.isStreaming() && this.isMounted()) { // && (this.isComponentVisible() || forceVisible))
-            const node = this.findDOMNode();
+            const node = domRef?.current;
             this.dynRequestVideoBySize(node.offsetHeight);
         }
         else {

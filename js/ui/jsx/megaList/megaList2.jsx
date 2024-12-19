@@ -50,7 +50,7 @@ export class MegaList2 extends MegaRenderMixin {
             nextProps.currentlyViewedEntry !== this.props.currentlyViewedEntry
         ) {
             invalidate = true;
-            this.ps.scrollToY(0);
+            this.domRef.scrollToY(0);
         }
 
         if (invalidate) {
@@ -68,10 +68,10 @@ export class MegaList2 extends MegaRenderMixin {
         var calculated = this._calculated = Object.create(null);
 
         lazy(calculated, 'scrollWidth', () => {
-            return this.ps.getClientWidth();
+            return this.domRef.getClientWidth();
         });
 
-        lazy(calculated, 'scrollHeight', () => this.ps.getClientHeight() - calculated.headerHeight);
+        lazy(calculated, 'scrollHeight', () => this.domRef.getClientHeight() - calculated.headerHeight);
 
         lazy(calculated, 'itemWidth', () => {
             if (this.props.listAdapter.itemWidth === false) {
@@ -86,7 +86,7 @@ export class MegaList2 extends MegaRenderMixin {
         lazy(calculated, 'headerHeight', () => this.props.headerHeight || 0);
 
         lazy(calculated, 'contentWidth', () => {
-            var contentWidth = this.ps.getContentWidth();
+            var contentWidth = this.domRef.getContentWidth();
             if (contentWidth) {
                 return contentWidth;
             }
@@ -106,14 +106,14 @@ export class MegaList2 extends MegaRenderMixin {
         });
 
         lazy(calculated, 'scrollLeft', () => {
-            return this.ps.getScrollPositionX();
+            return this.domRef.getScrollPositionX();
         });
         lazy(calculated, 'scrollTop', () => {
             if (this.adapterChangedDoRepaint) {
                 // fake scrollTop 0, until a repaint is done on the PS
                 return 0;
             }
-            return this.ps.getScrollPositionY();
+            return this.domRef.getScrollPositionY();
         });
         lazy(calculated, 'scrolledPercentX', () => {
             return 100 / calculated.scrollWidth * calculated.scrollLeft;
@@ -179,7 +179,7 @@ export class MegaList2 extends MegaRenderMixin {
 
         Object.defineProperty(M, 'rmItemsInView', {
             get: () => {
-                const c = this.ps && this._calculated || !1;
+                const c = this.domRef && this._calculated || !1;
                 return c.itemsPerPage + c.itemsPerRow | 0;
             },
             configurable: true
@@ -196,10 +196,10 @@ export class MegaList2 extends MegaRenderMixin {
 
         // scrolled out of the viewport if the last item in the list was removed? scroll back a little bit...
         if (
-            this.ps &&
+            this.domRef &&
             this._calculated.scrollHeight + this._calculated.scrollTop > this._calculated.contentHeight
         ) {
-            this.ps.scrollToY(
+            this.domRef.scrollToY(
                 this._calculated.contentHeight - this._calculated.scrollHeight
             );
         }
@@ -256,7 +256,7 @@ export class MegaList2 extends MegaRenderMixin {
 
         // have to scroll
         if (shouldScroll) {
-            this.ps.scrollToY(itemOffsetTop);
+            this.domRef.scrollToY(itemOffsetTop);
             onIdle(() => {
                 this.safeForceUpdate();
             });
@@ -308,9 +308,9 @@ export class MegaList2 extends MegaRenderMixin {
 
         this._firstRender = this._firstRender || this.props.viewmode !== M.viewmode;
 
-        if (this._firstRender && this.ps) {
+        if (this._firstRender && this.domRef) {
             this._firstRender = false;
-            Ps.update(this.ps.findDOMNode());
+            Ps.update(this.domRef?.$Node);
         }
     }
 
@@ -432,35 +432,37 @@ export class MegaList2 extends MegaRenderMixin {
 
         let listAdapterName = listAdapter.prototype.constructor.name;
 
-        return <>
-            <PerfectScrollbar
-                key={"ps_" + listAdapterName + "_" + viewMode}
-                options={this.options.perfectScrollOptions}
-                onUserScroll={this.onPsUserScroll}
-                className={className}
-                style={{
-                    'position': 'relative'
-                }}
-                ref={(instance) => {
-                    this.ps = instance;
-                }}>
-                <this.props.listAdapter
-                    containerClassName={this.props.containerClassName}
-                    key={"ps_" + listAdapterName + "_" + this.props.viewMode + "_la"}
-                    ref={(listAdapterInstance) => {
-                        this.listAdapterInstance = listAdapterInstance;
+        return (
+            <>
+                <PerfectScrollbar
+                    key={"ps_" + listAdapterName + "_" + viewMode}
+                    options={this.options.perfectScrollOptions}
+                    onUserScroll={this.onPsUserScroll}
+                    className={className}
+                    style={{
+                        'position': 'relative'
                     }}
-                    listContentRef={(listContent) => {
-                        this.listContent = listContent;
-                    }}
-                    header={header}
-                    megaList={this}
-                    calculated={this._calculated}
-                    {...listAdapterOpts}
-                >
-                    {nodes}
-                </this.props.listAdapter>
-            </PerfectScrollbar>
-        </>;
+                    ref={(instance) => {
+                        this.domRef = instance;
+                    }}>
+                    <this.props.listAdapter
+                        containerClassName={this.props.containerClassName}
+                        key={"ps_" + listAdapterName + "_" + this.props.viewMode + "_la"}
+                        ref={(listAdapterInstance) => {
+                            this.listAdapterInstance = listAdapterInstance;
+                        }}
+                        listContentRef={(listContent) => {
+                            this.listContent = listContent;
+                        }}
+                        header={header}
+                        megaList={this}
+                        calculated={this._calculated}
+                        {...listAdapterOpts}
+                    >
+                        {nodes}
+                    </this.props.listAdapter>
+                </PerfectScrollbar>
+            </>
+        );
     }
 }

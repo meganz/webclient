@@ -6,7 +6,7 @@ import { stringToTime } from './helpers.jsx';
 export default class Select extends MegaRenderMixin {
     static NAMESPACE = 'meetings-select';
 
-    containerRef = React.createRef();
+    domRef = React.createRef();
     inputRef = React.createRef();
     menuRef = React.createRef();
     optionRefs = {};
@@ -38,11 +38,12 @@ export default class Select extends MegaRenderMixin {
     }
 
     handleMousedown = ({ target }) =>
-        this.containerRef?.current.contains(target) ? null : this.setState({ expanded: false });
+        this.domRef?.current.contains(target) ? null : this.setState({ expanded: false });
 
     handleToggle = ({ target }) => {
         const menuRef = this.menuRef && this.menuRef.current;
-        if (target !== menuRef.domNode) {
+        const menuElement = menuRef.domRef?.current;
+        if (target !== menuElement) {
             const { value } = this.props;
             this.setState(state => ({ expanded: !state.expanded }), () => {
                 if (value && this.optionRefs[value]) {
@@ -93,7 +94,7 @@ export default class Select extends MegaRenderMixin {
 
         return (
             <div
-                ref={this.containerRef}
+                ref={this.domRef}
                 className={`
                     ${NAMESPACE}
                     ${className || ''}

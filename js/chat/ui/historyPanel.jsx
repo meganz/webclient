@@ -16,6 +16,7 @@ import ScheduleMetaChange from "./messages/scheduleMetaChange.jsx";
 export default class HistoryPanel extends MegaRenderMixin {
     $container = null;
     $messages = null;
+    domRef = React.createRef();
 
     state = {
         editing: false,
@@ -32,7 +33,7 @@ export default class HistoryPanel extends MegaRenderMixin {
     }
     onKeyboardScroll = ({ keyCode }) => {
         const scrollbar = this.messagesListScrollable;
-        const domNode = scrollbar?.domNode;
+        const domNode = scrollbar?.domRef?.current;
 
         if (domNode && this.isComponentEventuallyVisible() && !this.state.attachCloudDialog) {
             const scrollPositionY = scrollbar.getScrollPositionY();
@@ -53,7 +54,7 @@ export default class HistoryPanel extends MegaRenderMixin {
         }
     };
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         const { chatRoom } = this.props;
 
         chatRoom.rebind('onHistoryDecrypted.cp', () => this.eventuallyUpdate());
@@ -61,7 +62,7 @@ export default class HistoryPanel extends MegaRenderMixin {
         this._messagesBuffChangeHandler = chatRoom.messagesBuff?.addChangeListener(SoonFc(() => {
             // wait for scrolling (if such is happening at the moment) to finish
             if (this.isComponentEventuallyVisible()) {
-                $('.js-messages-scroll-area', this.findDOMNode()).trigger('forceResize', [true]);
+                $('.js-messages-scroll-area', this.domRef?.current).trigger('forceResize', [true]);
             }
             this.refreshUI();
         }));
@@ -99,7 +100,7 @@ export default class HistoryPanel extends MegaRenderMixin {
 
         self.eventuallyInit(false);
 
-        var domNode = self.findDOMNode();
+        const domNode = self.domRef?.current;
         var jml = domNode && domNode.querySelector('.js-messages-loading');
 
         if (jml) {
@@ -129,49 +130,38 @@ export default class HistoryPanel extends MegaRenderMixin {
         }
     }
     eventuallyInit(doResize) {
-        const self = this;
-
         // because..JSP would hijack some DOM elements, we need to wait with this...
-        if (self.initialised) {
+        if (this.initialised) {
             return;
         }
 
-        if (self.findDOMNode()) {
-            self.initialised = true;
+        const domNode = this.domRef?.current;
+        if (domNode) {
+            this.initialised = true;
         }
         else {
             return;
         }
 
-        $(self.findDOMNode()).rebind('resized.convpanel', function() {
-            self.handleWindowResize();
+        this.$messages = $('.messages.scroll-area > .perfectScrollbarContainer', this.$container);
+        this.$messages.droppable({
+            tolerance: 'pointer',
+            drop(e, ui) {
+                $.doDD(e, ui, 'drop', 1);
+            },
+            over(e, ui) {
+                $.doDD(e, ui, 'over', 1);
+            },
+            out(e, ui) {
+                $.doDD(e, ui, 'out', 1);
+            }
         });
 
-        self.$messages = $('.messages.scroll-area > .perfectScrollbarContainer', self.$container);
-
-
-        var droppableConfig = {
-            tolerance: 'pointer',
-            drop: function(e, ui) {
-                $.doDD(e,ui,'drop',1);
-            },
-            over: function(e, ui) {
-                $.doDD(e,ui,'over',1);
-            },
-            out: function(e, ui) {
-                $.doDD(e,ui,'out',1);
-            }
-        };
-
-        self.$messages.droppable(droppableConfig);
-
-        self.lastScrollPosition = null;
-        self.props.chatRoom.scrolledToBottom = true;
-        self.lastScrollHeight = 0;
-        self.lastUpdatedScrollHeight = 0;
+        this.lastScrollPosition = null;
+        this.props.chatRoom.scrolledToBottom = true;
 
         if (doResize !== false) {
-            self.handleWindowResize();
+            this.handleWindowResize();
         }
     }
     _handleWindowResize(e, scrollToBottom) {
@@ -249,7 +239,7 @@ export default class HistoryPanel extends MegaRenderMixin {
                             if (room.messagesBuff.haveMoreHistory()) {
                                 // Height of the messages, dividers, etc.. excluding the pusher.
                                 const innerHeight =
-                                    $('.messages.content-area > div', this.findDOMNode())
+                                    $('.messages.content-area > div', this.domRef?.current)
                                         .not('.hp-pusher')
                                         .toArray()
                                         .map(a => a.getBoundingClientRect().height)
@@ -770,6 +760,7 @@ export default class HistoryPanel extends MegaRenderMixin {
 
         return (
             <div
+                ref={this.domRef}
                 className={`
                     messages
                     scroll-area

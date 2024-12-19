@@ -17,7 +17,7 @@ export default class StreamHead extends MegaRenderMixin {
         CLICK_DIALOG: 'click'
     };
 
-    headRef = React.createRef();
+    domRef = React.createRef();
     durationRef = React.createRef();
     dialogRef = React.createRef();
     topicRef = React.createRef();
@@ -62,7 +62,7 @@ export default class StreamHead extends MegaRenderMixin {
      */
 
     closeTooltips = () => {
-        for (const node of this.headRef.current.querySelectorAll('.simpletip')) {
+        for (const node of this.domRef.current.querySelectorAll('.simpletip')) {
             node.dispatchEvent(StreamHead.EVENTS.SIMPLETIP);
         }
     };
@@ -95,7 +95,8 @@ export default class StreamHead extends MegaRenderMixin {
         if (this.state.dialog) {
             const { topicRef, dialogRef, delayProcID } = this;
             const topicElement = topicRef && topicRef.current;
-            const dialogElement = dialogRef && dialogRef.current && dialogRef.current.domNode;
+            const targetDialog = dialogRef && dialogRef.current && dialogRef.current;
+            const dialogElement = targetDialog.domRef?.current;
 
             if (topicElement.contains(target)) {
                 return;
@@ -259,7 +260,7 @@ export default class StreamHead extends MegaRenderMixin {
 
         return (
             <div
-                ref={this.headRef}
+                ref={this.domRef}
                 className={`${NAMESPACE}`}>
                 {dialog && <this.Dialog />}
                 <div className={`${NAMESPACE}-content theme-dark-forced`}>

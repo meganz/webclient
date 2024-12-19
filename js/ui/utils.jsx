@@ -1,55 +1,47 @@
-var React = require("react");
-var ReactDOM = require("react-dom");
+import React from 'react';
+import { createRoot } from 'react-dom';
+import { ContactAwareComponent, SoonFcWrap } from '../chat/mixins.js';
 
-import { ContactAwareComponent, SoonFcWrap } from "../chat/mixins";
-
-/**
- * A trick copied from http://jamesknelson.com/rendering-react-components-to-the-document-body/
- * so that we can render Dialogs into the body or other child element, different then the current component's child.
- */
 class RenderTo extends React.Component {
-    componentDidMount() {
-        if (super.componentDidMount) {
-            super.componentDidMount();
-        }
-        this.popup = document.createElement("div");
-        this._setClassNames();
-        if (this.props.style) {
-            $(this.popup).css(this.props.style);
-        }
-        this.props.element.appendChild(this.popup);
-        var self = this;
-        this._renderLayer(function() {
-            if (self.props.popupDidMount) {
-                self.props.popupDidMount(self.popup);
-            }
-        });
+    $$rootRef = undefined;
+    popupElement = undefined;
+
+    _setClassNames() {
+        this.popupElement.className = this.props.className || '';
     }
+
+    _renderLayer() {
+        this.$$rootRef.render(this.props.children);
+        queueMicrotask(() => this.props.popupDidMount?.(this.popupElement));
+    }
+
     componentDidUpdate() {
         this._setClassNames();
         this._renderLayer();
     }
+
     componentWillUnmount() {
-        if (super.componentWillUnmount) {
-            super.componentWillUnmount();
+        onIdle(() => this.$$rootRef.unmount());
+        this.props.popupWillUnmount?.(this.popupElement);
+        this.props.element.removeChild(this.popupElement);
+    }
+
+    componentDidMount() {
+        this.popupElement = document.createElement('div');
+        this.$$rootRef = createRoot(this.popupElement);
+        this._setClassNames();
+        if (this.props.style) {
+            $(this.popupElement).css(this.props.style);
         }
-        ReactDOM.unmountComponentAtNode(this.popup);
-        if (this.props.popupWillUnmount) {
-            this.props.popupWillUnmount(this.popup);
-        }
-        this.props.element.removeChild(this.popup);
+        this.props.element.appendChild(this.popupElement);
+        this._renderLayer();
     }
-    _setClassNames() {
-        this.popup.className = this.props.className ? this.props.className : "";
-    }
-    _renderLayer(cb) {
-        ReactDOM.render(this.props.children, this.popup, cb);
-    }
+
     render() {
         // Render a placeholder
         return null;
     }
-};
+}
 
 export const withOverflowObserver = Component =>
     class extends ContactAwareComponent {

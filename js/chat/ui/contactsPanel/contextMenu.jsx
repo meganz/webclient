@@ -1,5 +1,4 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../mixins';
 import { DropdownItem } from '../../../ui/dropdowns.jsx';
 import { Avatar, ContactPresence } from '../contacts.jsx';
 import { Emoji } from '../../../ui/utils.jsx';
@@ -7,7 +6,7 @@ import ContactsPanel from './contactsPanel.jsx';
 import { inProgressAlert } from '../meetings/call.jsx';
 import { EVENTS, VIEWS } from '../conversations.jsx';
 
-export default class ContextMenu extends MegaRenderMixin {
+export default class ContextMenu extends React.Component {
     EVENT_CLOSE = new Event('closeDropdowns');
 
     close = callback => {

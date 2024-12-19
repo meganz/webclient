@@ -6,10 +6,13 @@ var ContactsUI = require('./../ui/contacts.jsx');
 var PerfectScrollbar = require('./../../ui/perfectScrollbar.jsx').PerfectScrollbar;
 
 class ParticipantsList extends MegaRenderMixin {
+    domRef = React.createRef();
+
     static defaultProps = {
         'requiresUpdateOnResize': true,
         'contactCardHeight': 36
     };
+
     constructor(props) {
         super(props);
         this.state = {
@@ -28,7 +31,7 @@ class ParticipantsList extends MegaRenderMixin {
                 return null;
             }
 
-            var $node = $(self.findDOMNode());
+            var $node = $(self.domRef?.current);
             var $parentContainer = $node.closest('.chat-right-pad');
             var maxHeight = $parentContainer.outerHeight(true) -
                 $('.chat-right-head', $parentContainer).outerHeight(true) - 72;
@@ -95,66 +98,57 @@ class ParticipantsList extends MegaRenderMixin {
         self.doResizesOnComponentUpdate();
     }
     render() {
-        var self = this;
-        var room = this.props.chatRoom;
+        const { chatRoom } = this.props;
 
-        if (!room) {
+        if (!chatRoom) {
             // destroyed
             return null;
         }
 
-        var contacts = room.stateIsLeftOrLeaving() ? [] : room.getParticipantsExceptMe();
-        var contactListStyles = {};
-
-
-        // dont wait for render to finish to set height, otherwise there would be a minor flickering in the right
-        // pane
-        contactListStyles.height = Math.min(
-            this.calculateListHeight(), contacts.length * this.props.contactCardHeight
-        );
-
-
-        return <div className="chat-contacts-list" style={contactListStyles}>
-            <PerfectScrollbar
-                chatRoom={room}
-                members={room.members}
-                ref={function(ref) {
-                    self.contactsListScroll = ref;
-                }}
-                disableCheckingVisibility={true}
-                onUserScroll={SoonFc(self.onUserScroll.bind(self), 76)}
-                requiresUpdateOnResize={true}
-                onAnimationEnd={function() {
-                    self.safeForceUpdate();
-                }}
-                isVisible={self.props.chatRoom.isCurrentlyActive}
-                options={{
-                    suppressScrollX: true
-                }}
-            >
-                <ParticipantsListInner
-                    chatRoom={room}
-                    members={room.members}
-                    scrollPositionY={self.state.scrollPositionY}
-                    scrollHeight={self.state.scrollHeight}
+        return (
+            <div
+                ref={this.domRef}
+                className="chat-contacts-list">
+                <PerfectScrollbar
+                    chatRoom={chatRoom}
+                    members={chatRoom.members}
+                    ref={ref => {
+                        this.contactsListScroll = ref;
+                    }}
                     disableCheckingVisibility={true}
-                />
-            </PerfectScrollbar>
-        </div>
+                    onUserScroll={SoonFc(this.onUserScroll.bind(this), 76)}
+                    requiresUpdateOnResize={true}
+                    isVisible={chatRoom.isCurrentlyActive}
+                    options={{
+                        suppressScrollX: true
+                    }}>
+                    <ParticipantsListInner
+                        chatRoom={chatRoom}
+                        members={chatRoom.members}
+                        scrollPositionY={this.state.scrollPositionY}
+                        scrollHeight={this.state.scrollHeight}
+                        disableCheckingVisibility={true}
+                    />
+                </PerfectScrollbar>
+            </div>
+        );
     }
-};
+}
 
 
 
 
 class ParticipantsListInner extends MegaRenderMixin {
+    domRef = React.createRef();
+
     static defaultProps = {
-        'requiresUpdateOnResize': true,
-        'contactCardHeight': 32,
-        'scrollPositionY': 0,
-        'scrollHeight': 128,
-        'chatRoom': undefined
-    }
+        requiresUpdateOnResize: true,
+        contactCardHeight: 32,
+        scrollPositionY: 0,
+        scrollHeight: 128,
+        chatRoom: undefined
+    };
+
     render() {
         var room = this.props.chatRoom;
         var contactCardHeight = this.props.contactCardHeight;
@@ -323,7 +317,9 @@ class ParticipantsListInner extends MegaRenderMixin {
         }
 
         return (
-            <div className="chat-contacts-list-inner default-bg" style={contactListInnerStyles}>
+            <div
+                ref={this.domRef}
+                className="chat-contacts-list-inner default-bg" style={contactListInnerStyles}>
                 {contactsList}
             </div>
         );

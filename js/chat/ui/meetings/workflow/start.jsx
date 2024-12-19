@@ -1,12 +1,11 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../mixins';
 import ModalDialogsUI from '../../../../ui/modalDialogs.jsx';
 import Button from '../button.jsx';
 import Preview from './preview.jsx';
 import Link from '../../link.jsx';
 import { Emoji } from '../../../../ui/utils';
 
-export class Start extends MegaRenderMixin {
+export class Start extends React.Component {
     static NAMESPACE = 'start-meeting';
     static dialogName = `${Start.NAMESPACE}-dialog`;
 
@@ -97,7 +96,6 @@ export class Start extends MegaRenderMixin {
     };
 
     componentDidMount() {
-        super.componentDidMount();
         this.bindEvents();
         if ($.dialog === 'onboardingDialog') {
             closeDialog();
@@ -106,7 +104,6 @@ export class Start extends MegaRenderMixin {
     }
 
     componentWillUnmount() {
-        super.componentWillUnmount();
         $(document).unbind(`.${Start.NAMESPACE}`);
         if ($.dialog === Start.dialogName) {
             closeDialog();

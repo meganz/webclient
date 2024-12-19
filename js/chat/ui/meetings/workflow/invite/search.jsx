@@ -1,8 +1,7 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../../mixins';
 import Invite from './invite.jsx';
 
-export default class Search extends MegaRenderMixin {
+export default class Search extends React.Component {
     static inputRef = React.createRef();
 
     static focus = () => {

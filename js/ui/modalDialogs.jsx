@@ -5,13 +5,15 @@ import Forms from "./forms.jsx";
 
 var ContactsUI = require('./../chat/ui/contacts.jsx');
 
-export class ExtraFooterElement extends MegaRenderMixin {
+export class ExtraFooterElement extends React.Component {
     render() {
         return this.props.children;
     }
-};
+}
 
 class ModalDialog extends MegaRenderMixin {
+    domRef = React.createRef();
+
     static defaultProps = {
         'hideable': true,
         'noCloseOnClickOutside': false,
@@ -66,7 +68,7 @@ class ModalDialog extends MegaRenderMixin {
         });
     }
     onBlur(e) {
-        var $element = $(this.findDOMNode());
+        var $element = $(this.domRef?.current);
 
         if (
             (!e || !$(e.target).closest('.mega-dialog').is($element))
@@ -218,6 +220,7 @@ class ModalDialog extends MegaRenderMixin {
         return (
             <utils.RenderTo element={document.body} className="fm-modal-dialog" popupDidMount={this.onPopupDidMount}>
                 <div
+                    ref={this.domRef}
                     id={self.props.id}
                     className={classes}
                     aria-labelledby={self.props.dialogName ? self.props.dialogName + "-title" : null}
@@ -268,7 +271,7 @@ class ModalDialog extends MegaRenderMixin {
             </utils.RenderTo>
         );
     }
-};
+}
 
 
 

@@ -14,7 +14,7 @@ export class Schedule extends MegaRenderMixin {
     static NAMESPACE = 'schedule-dialog';
     static dialogName = `meetings-${Schedule.NAMESPACE}`;
 
-    wrapperRef = React.createRef();
+    domRef = React.createRef();
     scheduledMeetingRef = null;
     localStreamRef = '.float-video';
     datepickerRefs = [];
@@ -268,9 +268,9 @@ export class Schedule extends MegaRenderMixin {
             participants &&
             Array.isArray(participants) &&
             this.setState({ participants, isDirty: true }, () => {
-                const wrapperRef = this.wrapperRef && this.wrapperRef.current;
-                if (wrapperRef) {
-                    wrapperRef.reinitialise();
+                const domRef = this.domRef && this.domRef.current;
+                if (domRef) {
+                    domRef.reinitialise();
                 }
             })
         );
@@ -352,7 +352,7 @@ export class Schedule extends MegaRenderMixin {
         megaChat.off(this.incomingCallListener);
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         const { chatRoom } = this.props;
         if (chatRoom) {
             const { scheduledMeeting, publicLink, options } = chatRoom;
@@ -475,7 +475,7 @@ export class Schedule extends MegaRenderMixin {
                 />
 
                 <PerfectScrollbar
-                    ref={this.wrapperRef}
+                    ref={this.domRef}
                     className="fm-dialog-body"
                     options={{ suppressScrollX: true }}>
                     <Input

@@ -6,6 +6,7 @@ import ModalDialogsUI from './../../ui/modalDialogs.jsx';
 
 
 export class StartGroupChatWizard extends MegaRenderMixin {
+    domRef = React.createRef();
     inputContainerRef = React.createRef();
     inputRef = React.createRef();
 
@@ -295,7 +296,6 @@ export class StartGroupChatWizard extends MegaRenderMixin {
             );
         }
 
-
         return (
             <ModalDialogsUI.ModalDialog
                 step={self.state.step}
@@ -320,8 +320,9 @@ export class StartGroupChatWizard extends MegaRenderMixin {
                 }}
                 triggerResizeOnUpdate={true}
                 buttons={buttons}>
-
-                <div className="content-block">
+                <div
+                    ref={this.domRef}
+                    className="content-block">
                     {chatInfoElements}
                     <ContactPickerWidget
                         changedHashProp={self.state.step}

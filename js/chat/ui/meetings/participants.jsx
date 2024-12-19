@@ -11,6 +11,8 @@ import { Pin, Privilege } from './videoNodeMenu.jsx';
 import { AudioLevelIndicator } from './videoNode.jsx';
 
 class Participant extends MegaRenderMixin {
+    domRef = React.createRef();
+
     raisedHandListener = undefined;
     baseIconClass = 'sprite-fm-mono';
 
@@ -62,7 +64,9 @@ class Participant extends MegaRenderMixin {
         const hasRelationship = ContactsPanel.hasRelationship(contact);
 
         return (
-            <>
+            <div
+                ref={this.domRef}
+                className="participant-wrapper">
                 {this.state.raisedHandPeers.includes(handle) && !isOnHold ?
                     <div className="participant-signifier">
                         <i className="sprite-fm-uni icon-raise-hand" />
@@ -174,12 +178,13 @@ class Participant extends MegaRenderMixin {
                         </div>
                     </div>
                 </div>
-            </>
+            </div>
         );
     }
 }
 
 export default class Participants extends MegaRenderMixin {
+    domRef = React.createRef();
     muteRef = React.createRef();
 
     NAMESPACE = 'participants';
@@ -423,15 +428,22 @@ export default class Participants extends MegaRenderMixin {
                     ${allPeersMuted ? 'disabled' : ''}
                 `}
                 icon="sprite-fm-mono icon-mic-off-thin-outline"
-                onClick={() =>
-                    allPeersMuted ?
-                        null :
-                        this.setState({ allPeersMuted: true }, () => {
-                            this.props.call.sfuClient.mutePeer();
-                            ChatToast.quick(l.you_muted_all_peers /* `You've muted all participants` */);
-                            $(this.muteRef.current?.domNode).trigger('simpletipClose');
-                        })
-                }>
+                onClick={() => {
+                    const muteRef = this.muteRef?.current;
+                    const buttonRef = muteRef.buttonRef?.current;
+
+                    return (
+                        allPeersMuted ?
+                            null :
+                            this.setState({ allPeersMuted: true }, () => {
+                                this.props.call.sfuClient.mutePeer();
+                                ChatToast.quick(l.you_muted_all_peers /* `You've muted all participants` */);
+                                if (buttonRef) {
+                                    $(buttonRef).trigger('simpletipClose');
+                                }
+                            })
+                    );
+                }}>
                 {allPeersMuted ? l.all_muted /* `All muted` */ : l.mute_all /* `Mute all` */}
             </Button>
         );
@@ -467,7 +479,9 @@ export default class Participants extends MegaRenderMixin {
         const { filter } = this.state;
 
         return (
-            <div className={this.NAMESPACE}>
+            <div
+                ref={this.domRef}
+                className={this.NAMESPACE}>
                 {chatRoom.type === 'private' ?
                     null :
                     <div className={`${this.NAMESPACE}-nav`}>

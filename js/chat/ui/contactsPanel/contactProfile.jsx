@@ -16,14 +16,16 @@ import Link from '../link.jsx';
 import { EVENTS, VIEWS } from '../conversations.jsx';
 
 export default class ContactProfile extends MegaRenderMixin {
+    domRef = React.createRef();
+
     state = {
         selected: [],
         loading: true
     };
 
-    componentWillMount() {
-        if (super.componentWillMount) {
-            super.componentWillMount();
+    UNSAFE_componentWillMount() {
+        if (super.UNSAFE_componentWillMount) {
+            super.UNSAFE_componentWillMount();
         }
 
         const { handle } = this.props;
@@ -157,6 +159,7 @@ export default class ContactProfile extends MegaRenderMixin {
 
     render() {
         const { handle } = this.props;
+
         if (handle) {
             const contact = M.u[handle];
 
@@ -167,7 +170,9 @@ export default class ContactProfile extends MegaRenderMixin {
             const HAS_RELATIONSHIP = ContactsPanel.hasRelationship(contact);
 
             return (
-                <div className="contacts-profile">
+                <div
+                    ref={this.domRef}
+                    className="contacts-profile">
                     <this.Breadcrumb />
                     <div className="profile-content">
                         <div className="profile-head">
@@ -224,6 +229,7 @@ export default class ContactProfile extends MegaRenderMixin {
                 </div>
             );
         }
+
         return null;
     }
 }

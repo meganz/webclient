@@ -1,8 +1,7 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../mixins';
 import { LABELS } from './gifPanel.jsx';
 
-export default class SearchField extends MegaRenderMixin {
+export default class SearchField extends React.Component {
     static inputRef = React.createRef();
 
     static focus = () => (

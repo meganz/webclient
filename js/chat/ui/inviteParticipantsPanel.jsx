@@ -1,13 +1,13 @@
 import React from 'react';
-import { MegaRenderMixin } from '../mixins.js';
-import Call from "./meetings/call.jsx";
-import MiniUI from "../../ui/miniui.jsx";
-import { Button } from "../../ui/buttons.jsx";
-import { Dropdown, DropdownItem } from "../../ui/dropdowns.jsx";
+import Call from './meetings/call.jsx';
+import MiniUI from '../../ui/miniui.jsx';
+import { Button } from '../../ui/buttons.jsx';
+import { Dropdown, DropdownItem } from '../../ui/dropdowns.jsx';
 
 const NAMESPACE = 'invite-panel';
 
-export class InviteParticipantsPanel extends MegaRenderMixin {
+export class InviteParticipantsPanel extends React.Component {
+    domRef = React.createRef();
 
     state = {
         link: '',
@@ -28,7 +28,7 @@ export class InviteParticipantsPanel extends MegaRenderMixin {
         this.loading = chatRoom.updatePublicHandle(false, cim)
             .always(() => {
                 delete this.loading;
-                if (this.isMounted()) {
+                if (this.domRef.current) {
                     if (chatRoom.publicLink) {
                         this.setState({ link: `${getBaseUrl()}/${chatRoom.publicLink}` });
                     }
@@ -63,24 +63,31 @@ export class InviteParticipantsPanel extends MegaRenderMixin {
         const { chatRoom, disableLinkToggle, onAddParticipants } = this.props;
         const { link, copied } = this.state;
         const inCall = Call.isExpanded();
+
         if (this.loading) {
-            return <div
-                className={`
-                    ${NAMESPACE}
-                    ${inCall ? 'theme-dark-forced' : ''}
-                `}>
-                <header/>
-                <section className="content">
-                    <div className="content-block"/>
-                </section>
-            </div>;
+            return (
+                <div
+                    ref={this.domRef}
+                    className={`
+                        ${NAMESPACE}
+                        ${inCall ? 'theme-dark-forced' : ''}
+                    `}>
+                    <header/>
+                    <section className="content">
+                        <div className="content-block"/>
+                    </section>
+                </div>
+            );
         }
+
         const canInvite = !!(chatRoom.iAmOperator() || chatRoom.options[MCO_FLAGS.OPEN_INVITE]) && onAddParticipants;
         const canToggleLink = !disableLinkToggle && chatRoom.iAmOperator() && (chatRoom.isMeeting || chatRoom.topic);
         const mailto = `mailto:?to=&subject=${l.invite_subject_text}&body=${this.getInviteBody(true)}`;
         const copyText = chatRoom.isMeeting ? l.copy_meeting_link : l[1394]; /* `Copy (meeting) link` */
+
         return (
             <div
+                ref={this.domRef}
                 className={`
                     ${NAMESPACE}
                     ${inCall ? 'theme-dark-forced' : ''}
@@ -112,7 +119,7 @@ export class InviteParticipantsPanel extends MegaRenderMixin {
                                         if (link) {
                                             this.loading = chatRoom.updatePublicHandle(true).always(() => {
                                                 delete this.loading;
-                                                if (this.isMounted()) {
+                                                if (this.domRef.current) {
                                                     this.setState({ link: false });
                                                 }
                                             });
@@ -137,7 +144,7 @@ export class InviteParticipantsPanel extends MegaRenderMixin {
                                 copyToClipboard(link);
                                 this.setState({ copied: true }, () => {
                                     tSleep(3).then(() => {
-                                        if (this.isMounted()) {
+                                        if (this.domRef.current) {
                                             this.setState({ copied: false });
                                         }
                                     });

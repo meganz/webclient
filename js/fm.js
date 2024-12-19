@@ -3638,12 +3638,6 @@ function fm_resize_handler(force) {
     if (M.currentdirid !== 'transfers') {
         var treePaneWidth = Math.round($('.fm-left-panel:visible').outerWidth());
         var leftPaneWidth = Math.round($('.nw-fm-left-icons-panel:visible').outerWidth());
-        const margin = (treePaneWidth + leftPaneWidth) + "px";
-
-        if (megaChatIsReady && megaChat.resized) {
-            megaChat.resized();
-        }
-
         $('.popup.transfer-widget').outerWidth(treePaneWidth - 9);
     }
 

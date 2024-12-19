@@ -157,7 +157,6 @@ export default class ChatRouting {
         if (resolve) {
             onIdle(resolve);
         }
-        megaChat.safeForceUpdate();
 
         if (args.route.location !== location) {
             location = args.route.location;

@@ -8,7 +8,7 @@ import GifPanel from './gifPanel/gifPanel.jsx';
 import { PerfectScrollbar } from './../../ui/perfectScrollbar.jsx';
 
 export class TypingArea extends MegaRenderMixin {
-    typingAreaRef = React.createRef();
+    domRef = React.createRef();
 
     state = {
         emojiSearchQuery: false,
@@ -43,7 +43,7 @@ export class TypingArea extends MegaRenderMixin {
 
         slug = slug[0] === ':' || slug.substr(-1) === ':' ? slug : `:${slug}:`;
 
-        const textarea = $('.messages-textarea', this.typingAreaRef.current)[0];
+        const textarea = $('.messages-textarea', this.domRef.current)[0];
         const cursorPosition = this.getCursorPosition(textarea);
 
         this.setState({
@@ -99,7 +99,7 @@ export class TypingArea extends MegaRenderMixin {
         }
 
         if (!shouldTriggerUpdate) {
-            var $textarea = $('.chat-textarea:visible textarea:visible', self.typingAreaRef.current);
+            var $textarea = $('.chat-textarea:visible textarea:visible', self.domRef.current);
             if (!self._lastTextareaHeight || self._lastTextareaHeight !== $textarea.height()) {
                 self._lastTextareaHeight = $textarea.height();
                 shouldTriggerUpdate = true;
@@ -131,7 +131,7 @@ export class TypingArea extends MegaRenderMixin {
             return;
         }
 
-        var val = $.trim($('.chat-textarea:visible textarea:visible', this.typingAreaRef.current).val());
+        var val = $.trim($('.chat-textarea:visible textarea:visible', this.domRef.current).val());
 
         if (self.onConfirmTrigger(val) !== true) {
             self.setState({typedMessage: ""});
@@ -148,7 +148,7 @@ export class TypingArea extends MegaRenderMixin {
 
         if (val !== false && result !== false) {
             // scroll To 0 after sending a message.
-            $('.textarea-scroll', this.typingAreaRef.current).scrollTop(0);
+            $('.textarea-scroll', this.domRef.current).scrollTop(0);
         }
 
         if (persist) {
@@ -401,10 +401,10 @@ export class TypingArea extends MegaRenderMixin {
         }
 
         if (
-            $('.chat-textarea:visible textarea:visible', this.typingAreaRef.current).length > 0 &&
-            !$('.chat-textarea:visible textarea:visible:first', this.typingAreaRef.current).is(":focus")
+            $('.chat-textarea:visible textarea:visible', this.domRef.current).length > 0 &&
+            !$('.chat-textarea:visible textarea:visible:first', this.domRef.current).is(":focus")
         ) {
-            moveCursortoToEnd($('.chat-textarea:visible:first textarea', this.typingAreaRef.current)[0]);
+            moveCursortoToEnd($('.chat-textarea:visible:first textarea', this.domRef.current)[0]);
         }
     }
 
@@ -433,7 +433,7 @@ export class TypingArea extends MegaRenderMixin {
         });
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         const {chatRoom, initialText, persist} = this.props;
         const {megaChat, roomId} = chatRoom;
         const {persistedTypeArea} = megaChat.plugins;
@@ -492,7 +492,7 @@ export class TypingArea extends MegaRenderMixin {
         this.updateScroll();
 
         if (this.onUpdateCursorPosition) {
-            var el = $('.chat-textarea:visible:first textarea:visible', this.typingAreaRef.current)[0];
+            var el = $('.chat-textarea:visible:first textarea:visible', this.domRef.current)[0];
             el.selectionStart = el.selectionEnd = this.onUpdateCursorPosition;
             this.onUpdateCursorPosition = false;
         }
@@ -516,12 +516,12 @@ export class TypingArea extends MegaRenderMixin {
 
         // DONT update if not visible...
         if (!this.isComponentEventuallyVisible()
-            || !this.$node && !this.typingAreaRef && !this.typingAreaRef.current) {
+            || !this.$node && !this.domRef && !this.domRef.current) {
 
             return;
         }
 
-        var $node = this.$node = this.$node || this.typingAreaRef.current;
+        var $node = this.$node = this.$node || this.domRef.current;
         const $textarea = this.$textarea = this.$textarea || $('textarea:first', $node);
         const $scrollBlock = this.$scrollBlock = this.$scrollBlock || $textarea.closest('.textarea-scroll');
         const $preview = $('.message-preview', $scrollBlock)
@@ -738,7 +738,7 @@ export class TypingArea extends MegaRenderMixin {
 
         return (
             <div
-                ref={this.typingAreaRef}
+                ref={this.domRef}
                 className={`
                     typingarea-component
                     ${this.props.className}

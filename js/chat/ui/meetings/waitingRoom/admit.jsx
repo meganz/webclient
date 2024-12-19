@@ -9,6 +9,7 @@ import Link from "../../link";
 const NAMESPACE = 'admit';
 
 export default class Admit extends MegaRenderMixin {
+    domRef = React.createRef();
     peersWaitingRef = React.createRef();
 
     state = {
@@ -182,6 +183,7 @@ export default class Admit extends MegaRenderMixin {
         if (chatRoom.iAmOperator()) {
             return (
                 <div
+                    ref={this.domRef}
                     className={`
                         ${NAMESPACE}
                         theme-dark-forced

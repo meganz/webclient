@@ -92,7 +92,7 @@ export const filterAndSplitSources = (sources, call) => {
 };
 
 export default class Stream extends MegaRenderMixin {
-    wrapperRef = React.createRef();
+    domRef = React.createRef();
     containerRef = React.createRef();
 
     nodeRefs = [];
@@ -795,7 +795,7 @@ export default class Stream extends MegaRenderMixin {
 
         return (
             <div
-                ref={this.wrapperRef}
+                ref={this.domRef}
                 className={`
                     ${NAMESPACE}
                     ${sidebar ? '' : 'full'}
@@ -863,7 +863,7 @@ export default class Stream extends MegaRenderMixin {
                     sidebar={sidebar}
                     forcedLocal={forcedLocal}
                     isPresenterNode={isFloatingPresenter}
-                    wrapperRef={this.wrapperRef}
+                    wrapperRef={this.domRef}
                     waitingRoomPeers={waitingRoomPeers}
                     recorderCid={recorderCid}
                     raisedHandPeers={raisedHandPeers}

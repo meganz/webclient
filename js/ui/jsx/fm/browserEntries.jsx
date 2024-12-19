@@ -38,7 +38,7 @@ export default class BrowserEntries extends MegaRenderMixin {
         this.toggleSortBy = this.toggleSortBy.bind(this);
     }
 
-    componentWillMount() {
+    UNSAFE_componentWillMount() {
         this.lastCharKeyPressed = false;
         this.lastCharKeyIndex = -1;
     }

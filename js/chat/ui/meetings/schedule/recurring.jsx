@@ -12,6 +12,7 @@ import { DateTime } from './datetime.jsx';
 
 export default class Recurring extends MegaRenderMixin {
     static NAMESPACE = 'meetings-recurring';
+    domRef = React.createRef();
 
     VIEWS = {
         DAILY: 0x00,
@@ -583,7 +584,7 @@ export default class Recurring extends MegaRenderMixin {
     }
 
     // [...] Remove and refactor to separate components?
-    componentWillUpdate(nextProps, nextState) {
+    UNSAFE_componentWillUpdate(nextProps, nextState) {
         // Navigate to `Daily` -> reset selected week days
         if (this.state.view !== this.VIEWS.DAILY && nextState.view === this.VIEWS.DAILY) {
             nextState.weekDays = this.initialWeekDays;
@@ -641,6 +642,7 @@ export default class Recurring extends MegaRenderMixin {
                 <Column />
                 <Column>
                     <div
+                        ref={this.domRef}
                         className={`
                             ${NAMESPACE}
                             ${this.props.isLoading ? 'disabled' : ''}

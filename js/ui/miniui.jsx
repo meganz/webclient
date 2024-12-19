@@ -2,6 +2,8 @@ import React from 'react';
 import { MegaRenderMixin } from '../chat/mixins';
 
 class ToggleCheckbox extends MegaRenderMixin {
+    domRef = React.createRef();
+
     constructor(props) {
         super(props);
         this.state = {
@@ -20,6 +22,7 @@ class ToggleCheckbox extends MegaRenderMixin {
     render() {
         return (
             <div
+                ref={this.domRef}
                 className={`
                     mega-switch
                     ${this.props.className}

@@ -3,6 +3,8 @@ import React from "react";
 import {MegaRenderMixin} from "../../../../../chat/mixins";
 
 export class ColumnContactRequestsSentBtns extends MegaRenderMixin {
+    domRef = React.createRef();
+
     static sortable = true;
     static id = "grid-url-header-nw";
     static label = "";
@@ -18,25 +20,30 @@ export class ColumnContactRequestsSentBtns extends MegaRenderMixin {
         let {nodeAdapter} = this.props;
         let {node} = nodeAdapter.props;
 
-        return <td megatype={ColumnContactRequestsSentBtns.megatype} className={ColumnContactRequestsSentBtns.megatype}>
-            <div className="contact-item-controls contact-request-sent">
-                {!node.dts && this.reinviteAllowed(node.rts) &&
-                <Button
-                    className="mega-button action"
-                    icon="sprite-fm-mono icon-rewind"
-                    label={l[5861]}
-                    onClick={() => this.props.onReinvite(node.m)}
-                />
-                }
-                {!node.dts &&
-                    <Button
-                        className="mega-button action contact-reject"
-                        icon="sprite-fm-mono icon-close-component"
-                        label={l[82]}
-                        onClick={() => this.props.onReject(node.m)}
-                    />
-                }
-            </div>
-        </td>;
+        return (
+            <td
+                ref={this.domRef}
+                megatype={ColumnContactRequestsSentBtns.megatype}
+                className={ColumnContactRequestsSentBtns.megatype}>
+                <div className="contact-item-controls contact-request-sent">
+                    {!node.dts && this.reinviteAllowed(node.rts) &&
+                        <Button
+                            className="mega-button action"
+                            icon="sprite-fm-mono icon-rewind"
+                            label={l[5861]}
+                            onClick={() => this.props.onReinvite(node.m)}
+                        />
+                    }
+                    {!node.dts &&
+                        <Button
+                            className="mega-button action contact-reject"
+                            icon="sprite-fm-mono icon-close-component"
+                            label={l[82]}
+                            onClick={() => this.props.onReject(node.m)}
+                        />
+                    }
+                </div>
+            </td>
+        );
     }
 }

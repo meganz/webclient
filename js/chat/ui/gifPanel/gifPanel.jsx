@@ -1,5 +1,4 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../mixins';
 import { PerfectScrollbar } from '../../../ui/perfectScrollbar.jsx';
 import SearchField from './searchField.jsx';
 import ResultContainer from './resultContainer.jsx';
@@ -40,7 +39,8 @@ export const LABELS = freeze({
     }
 });
 
-export default class GifPanel extends MegaRenderMixin {
+export default class GifPanel extends React.Component {
+    domRef = React.createRef();
     pathRef = '';
     controllerRef = null;
     fetchRef = null;
@@ -110,7 +110,7 @@ export default class GifPanel extends MegaRenderMixin {
                     .then(response => response.json())
                     .then(({ data }) => {
                         this.fetchRef = this.pathRef = null;
-                        if (this.isMounted()) {
+                        if (this.domRef.current) {
                             if (data && data.length) {
                                 return this.setState(state => ({
                                     results: [...state.results, ...data],
@@ -198,7 +198,6 @@ export default class GifPanel extends MegaRenderMixin {
     };
 
     componentDidMount() {
-        super.componentDidMount();
         if (this.state.results && this.state.results.length === 0) {
             this.doFetch('trending');
         }
@@ -206,7 +205,6 @@ export default class GifPanel extends MegaRenderMixin {
     }
 
     componentWillUnmount() {
-        super.componentWillUnmount();
         this.unbindEvents();
     }
 
@@ -214,7 +212,9 @@ export default class GifPanel extends MegaRenderMixin {
         const { value, searching, results, loading, bottom, unavailable } = this.state;
 
         return (
-            <div className="gif-panel-wrapper">
+            <div
+                ref={this.domRef}
+                className="gif-panel-wrapper">
                 <div
                     className="gif-panel"
                     style={{ height: this.getContainerHeight() }}>

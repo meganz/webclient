@@ -38,7 +38,7 @@ export default class Datepicker extends React.Component {
         }
     };
 
-    containerRef = React.createRef();
+    domRef = React.createRef();
     inputRef = React.createRef();
     datepicker = null;
 
@@ -68,16 +68,16 @@ export default class Datepicker extends React.Component {
     }
 
     componentWillUnmount() {
-        if (this.containerRef && this.containerRef.current) {
-            $(this.containerRef.current).unbind(`keyup.${Datepicker.NAMESPACE}`);
+        if (this.domRef && this.domRef.current) {
+            $(this.domRef.current).unbind(`keyup.${Datepicker.NAMESPACE}`);
         }
     }
 
     componentDidMount() {
         M.require('datepicker_js').done(() => this.initialize());
 
-        if (this.containerRef && this.containerRef.current) {
-            $(this.containerRef.current).rebind(`keyup.${Datepicker.NAMESPACE}`, ({ keyCode }) => {
+        if (this.domRef && this.domRef.current) {
+            $(this.domRef.current).rebind(`keyup.${Datepicker.NAMESPACE}`, ({ keyCode }) => {
                 if (keyCode === 13 /* RET */) {
                     this.datepicker.hide();
                     return false;
@@ -93,7 +93,7 @@ export default class Datepicker extends React.Component {
 
         return (
             <div
-                ref={this.containerRef}
+                ref={this.domRef}
                 className={NAMESPACE}>
                 <div className="mega-input datepicker-input">
                     <input

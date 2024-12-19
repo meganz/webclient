@@ -100,10 +100,6 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
     this.activeSearches = 0;
     this.activeCallIds = new MegaDataMap(this);
     this.ringingCalls = new MegaDataMap(this);
-    this.ringingCalls.addChangeListener(() => {
-        // force full re-render since basically, the root `Conversations` app may need to render/remove a dialog
-        megaChat.safeForceUpdate();
-    });
 
     this.isMeeting = isMeeting;
     // Only applies when the user joins a call and the SFU kicks them out due to the user limitation for free plans.
@@ -401,8 +397,6 @@ var ChatRoom = function (megaChat, roomId, type, users, ctime, lastActivity, cha
         self.unbind('onMarkAsJoinRequested.initHist');
         self.unbind('onHistoryDecrypted.initHist');
         self.unbind('onMessagesHistoryDone.initHist');
-
-        self.megaChat.safeForceUpdate();
     };
     self.rebind('onHistoryDecrypted.initHist', _historyIsAvailable);
     self.rebind('onMessagesHistoryDone.initHist', _historyIsAvailable);
@@ -925,10 +919,6 @@ ChatRoom.prototype.updateFlags = function(f, updateUI) {
         else {
             megaChat.refreshConversations();
         }
-
-        if (megaChat.$conversationsAppInstance) {
-            megaChat.safeForceUpdate();
-        }
     }
     this.trackDataChange();
 };
@@ -1341,49 +1331,41 @@ ChatRoom.prototype.switchOffPublicMode = ChatRoom._fnRequireParticipantKeys(func
  * Show UI elements of this room
  */
 ChatRoom.prototype.show = function() {
-    var self = this;
-
-    if (self.isCurrentlyActive) {
+    if (this.isCurrentlyActive) {
         return false;
     }
-    self.megaChat.hideAllChats();
+    this.megaChat.hideAllChats();
 
     if (d) {
-        self.logger.debug(' ---- show');
+        this.logger.debug(' ---- show');
     }
 
     $.tresizer();
-    onIdle(function() {
-        self.scrollToChat();
-        self.trackDataChange();
+    onIdle(() => {
+        this.scrollToChat();
+        this.trackDataChange();
     });
-    self.isCurrentlyActive = true;
-    self.lastShownInUI = Date.now();
-    self.megaChat.setAttachments(self.roomId);
-    self.megaChat.lastOpenedChat = self.roomId;
-    self.megaChat.currentlyOpenedChat = self.roomId;
 
-    self.trigger('activity');
-    self.trigger('onChatShown');
+    this.isCurrentlyActive = true;
+    this.lastShownInUI = Date.now();
+    this.megaChat.setAttachments(this.roomId);
+    this.megaChat.lastOpenedChat = this.roomId;
+    this.megaChat.currentlyOpenedChat = this.roomId;
 
-    var tmp = self.megaChat.domSectionNode;
+    this.trigger('activity');
+    this.trigger('onChatShown');
 
-    if (self.type === 'public') {
-        tmp.classList.remove('privatechat');
-    }
-    else {
-        tmp.classList.add('privatechat');
-    }
+    let tmp = this.megaChat.rootDOMNode;
 
     if ((tmp = tmp.querySelector('.conversation-panels'))) {
         tmp.classList.remove('hidden');
 
-        if ((tmp = tmp.querySelector('.conversation-panel[data-room-id="' + self.chatId + '"]'))) {
+        if ((tmp = tmp.querySelector(`.conversation-panel[data-room-id="${this.chatId}"]`))) {
             tmp.classList.remove('hidden');
         }
     }
 
-    if ((tmp = document.getElementById('conversation_' + self.roomId))) {
+    if ((tmp = document.getElementById(`conversation_${this.roomId}`))) {
         // do not wait for ConversationsListItem to set the active class..
         tmp.classList.add('active');
     }
@@ -1396,11 +1378,13 @@ ChatRoom.prototype.scrollToChat = function() {
         const li = document.querySelector(`ul.conversations-pane li#conversation_${this.roomId}`);
         if (li && !verge.inViewport(li, -72 /* 2 x 36 px height buttons */)) {
             Object.values($chatTreePanePs).forEach(({ ref }) => {
-                const wrapOuterHeight = $(ref.domNode).outerHeight();
-                const itemOuterHeight = $('li:first', ref.domNode).outerHeight();
-                const pos = li.offsetTop;
-                if (ref.domNode.contains(li)) {
-                    ref.doProgramaticScroll?.(Math.max(0, pos - wrapOuterHeight / 2 + itemOuterHeight), true);
+                if (ref.domNode) {
+                    const wrapOuterHeight = $(ref.domNode).outerHeight();
+                    const itemOuterHeight = $('li:first', ref.domNode).outerHeight();
+                    const pos = li.offsetTop;
+                    if (ref.domNode.contains(li)) {
+                        ref.doProgramaticScroll?.(Math.max(0, pos - wrapOuterHeight / 2 + itemOuterHeight), true);
+                    }
                 }
             });
             this._scrollToOnUpdate = false;
@@ -1475,29 +1459,26 @@ ChatRoom.prototype.activateWindow = function() {
  * Hide the UI elements of this room
  */
 ChatRoom.prototype.hide = function() {
-    var self = this;
-
     if (d) {
-        self.logger.debug(' ---- hide', self.isCurrentlyActive);
-    }
-    self.isCurrentlyActive = false;
-    self.lastShownInUI = Date.now();
-
-    if (self.megaChat.currentlyOpenedChat === self.roomId) {
-        self.megaChat.currentlyOpenedChat = null;
+        this.logger.debug(' ---- hide', this.isCurrentlyActive);
     }
 
-    var tmp = self.megaChat.domSectionNode.querySelector('.conversation-panel[data-room-id="' + self.chatId + '"]');
-    if (tmp) {
-        tmp.classList.add('hidden');
+    this.isCurrentlyActive = false;
+    this.lastShownInUI = Date.now();
+
+    if (this.megaChat.currentlyOpenedChat === this.roomId) {
+        this.megaChat.currentlyOpenedChat = null;
     }
 
-    if ((tmp = document.getElementById('conversation_' + self.roomId))) {
+    let tmp = this.megaChat.rootDOMNode.querySelector(`.conversation-panel[data-room-id="${this.chatId}"]`);
+    tmp?.classList.add('hidden');
+
+    if ((tmp = document.getElementById(`conversation_${this.roomId}`))) {
         // do not wait for ConversationsListItem to remove the active class..
         tmp.classList.remove('active');
     }
 
-    self.trigger('onChatHidden', self.isCurrentlyActive);
+    this.trigger('onChatHidden', this.isCurrentlyActive);
 };
 
 /**

@@ -3,6 +3,8 @@ import {MegaRenderMixin} from "../../../../chat/mixins";
 import {GenericNodePropsComponent} from "./genericNodePropsComponent";
 
 export class GenericTableHeader extends MegaRenderMixin {
+    domRef = React.createRef();
+
     render() {
         let { sortBy, columns } = this.props;
 
@@ -47,11 +49,11 @@ export class GenericTableHeader extends MegaRenderMixin {
             );
         }
 
-        return <thead>
-            <tr>
-                {columnsRendered}
-            </tr>
-        </thead>;
+        return (
+            <thead ref={this.domRef}>
+                <tr>{columnsRendered}</tr>
+            </thead>
+        );
     }
 }
 export default class GenericTable extends GenericNodePropsComponent {

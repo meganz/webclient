@@ -1,7 +1,6 @@
 import React from 'react';
-import { MegaRenderMixin } from '../mixins';
 
-export default class Link extends MegaRenderMixin {
+export default class Link extends React.Component {
     IS_CLICK_URL = undefined;
 
     constructor(props) {
@@ -10,7 +9,6 @@ export default class Link extends MegaRenderMixin {
     }
 
     componentDidMount() {
-        super.componentDidMount();
         if (this.IS_CLICK_URL) {
             clickURLs();
         }

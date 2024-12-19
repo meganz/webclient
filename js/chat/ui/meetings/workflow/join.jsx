@@ -1,5 +1,4 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../mixins';
 import ModalDialogsUI from '../../../../ui/modalDialogs.jsx';
 import utils, { Emoji, ParsedHTML } from '../../../../ui/utils.jsx';
 import Button from '../button.jsx';
@@ -7,7 +6,7 @@ import Preview from './preview.jsx';
 import HistoryPanel from "../../historyPanel.jsx";
 import Link from '../../link.jsx';
 
-export default class Join extends MegaRenderMixin {
+export default class Join extends React.Component {
     static NAMESPACE = 'join-meeting';
 
     static VIEW = {
@@ -372,7 +371,6 @@ export default class Join extends MegaRenderMixin {
     };
 
     componentDidMount() {
-        super.componentDidMount();
         document.addEventListener('keydown', this.handleKeyDown);
         this.hidePanels();
         megaChat._joinDialogIsShown = true;
@@ -384,7 +382,6 @@ export default class Join extends MegaRenderMixin {
     }
 
     componentWillUnmount() {
-        super.componentWillUnmount();
         document.removeEventListener('keydown', this.handleKeyDown);
         this.showPanels();
         megaChat._joinDialogIsShown = false;

@@ -7,6 +7,7 @@ const SEARCH_STATUS_CLASS = 'search-field-status';
 const BASE_ICON_CLASS = 'sprite-fm-mono';
 
 export default class SearchField extends MegaRenderMixin {
+    domRef = React.createRef();
     static inputRef = React.createRef();
 
     static select = () => {
@@ -98,7 +99,9 @@ export default class SearchField extends MegaRenderMixin {
     render() {
         const { value, searching, status, onChange, onReset } = this.props;
         return (
-            <div className="search-field">
+            <div
+                ref={this.domRef}
+                className="search-field">
                 <i className={`${BASE_ICON_CLASS} icon-preview-reveal search-icon-find`} />
 
                 <input

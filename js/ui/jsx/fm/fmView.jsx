@@ -9,6 +9,8 @@ import BrowserEntries from "./browserEntries.jsx";
  */
 
 export default class FMView extends MegaRenderMixin {
+    domRef = React.createRef();
+
     constructor(props) {
         super(props);
 
@@ -416,48 +418,51 @@ export default class FMView extends MegaRenderMixin {
         }
     }
     render() {
-        return <div
-            className="content-container"
-            onClick={(ev) => {
-                $.hideContextMenu(ev);
-            }}>
-            <BrowserEntries
-                isLoading={this.state.isLoading || this.props.nodeLoading}
-                currentlyViewedEntry={this.props.currentlyViewedEntry}
-                entries={this.state.entries || []}
-                onExpand={(node) => {
-                    this.setState({
-                        'selected': [],
-                        'highlighted': []
-                    });
+        return (
+            <div
+                ref={this.domRef}
+                className="content-container"
+                onClick={(ev) => {
+                    $.hideContextMenu(ev);
+                }}>
+                <BrowserEntries
+                    isLoading={this.state.isLoading || this.props.nodeLoading}
+                    currentlyViewedEntry={this.props.currentlyViewedEntry}
+                    entries={this.state.entries || []}
+                    onExpand={(node) => {
+                        this.setState({
+                            'selected': [],
+                            'highlighted': []
+                        });
 
-                    this.props.onExpand(node[this.props.keyProp || 'h']);
-                }}
-                sortBy={this.state.sortBy}
-                folderSelectNotAllowed={this.props.folderSelectNotAllowed}
-                onAttachClicked={this.onAttachClicked}
-                viewMode={this.props.viewMode}
-                selected={this.state.selected}
-                highlighted={this.state.highlighted}
-                onContextMenu={this.props.onContextMenu ? this.props.onContextMenu : this.onContextMenu}
-                selectionManager={this.selectionManager}
-                ref={
-                    (browserEntries) => {
-                        this.browserEntries = browserEntries;
+                        this.props.onExpand(node[this.props.keyProp || 'h']);
+                    }}
+                    sortBy={this.state.sortBy}
+                    folderSelectNotAllowed={this.props.folderSelectNotAllowed}
+                    onAttachClicked={this.onAttachClicked}
+                    viewMode={this.props.viewMode}
+                    selected={this.state.selected}
+                    highlighted={this.state.highlighted}
+                    onContextMenu={this.props.onContextMenu || this.onContextMenu}
+                    selectionManager={this.selectionManager}
+                    ref={
+                        (browserEntries) => {
+                            this.browserEntries = browserEntries;
+                        }
                     }
-                }
-                onSortByChanged={(newState) => {
-                    this.onSortByChanged(newState);
-                }}
-                listAdapterColumns={this.props.listAdapterColumns}
-                currentdirid={this.props.currentdirid}
-                containerClassName={this.props.containerClassName}
-                headerContainerClassName={this.props.headerContainerClassName}
-                megaListItemHeight={this.props.megaListItemHeight}
-                keyProp={this.props.keyProp || 'h'}
-                NilComponent={this.props.NilComponent}
-                listAdapterOpts={this.props.listAdapterOpts}
-            />
-        </div>;
+                    onSortByChanged={(newState) => {
+                        this.onSortByChanged(newState);
+                    }}
+                    listAdapterColumns={this.props.listAdapterColumns}
+                    currentdirid={this.props.currentdirid}
+                    containerClassName={this.props.containerClassName}
+                    headerContainerClassName={this.props.headerContainerClassName}
+                    megaListItemHeight={this.props.megaListItemHeight}
+                    keyProp={this.props.keyProp || 'h'}
+                    NilComponent={this.props.NilComponent}
+                    listAdapterOpts={this.props.listAdapterOpts}
+                />
+            </div>
+        );
     }
 }

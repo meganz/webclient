@@ -16,18 +16,18 @@ import { IncSharesAccordionPanel } from './incomingSharesAccordionPanel.jsx';
 import { ChatlinkDialog } from './chatlinkDialog.jsx';
 import PushSettingsDialog from './pushSettingsDialog.jsx';
 import Call, { EXPANDED_FLAG, TYPE, inProgressAlert, isGuest } from './meetings/call.jsx';
-import HistoryPanel from "./historyPanel.jsx";
-import ComposedTextArea from "./composedTextArea.jsx";
-import Loading from "./meetings/workflow/loading.jsx";
-import Join from "./meetings/workflow/join.jsx";
+import HistoryPanel from './historyPanel.jsx';
+import ComposedTextArea from './composedTextArea.jsx';
+import Loading from './meetings/workflow/loading.jsx';
+import Join from './meetings/workflow/join.jsx';
 import Alert from './meetings/workflow/alert.jsx';
 import { isSameDay, isToday, isTomorrow } from './meetings/schedule/helpers.jsx';
 import { withHostsObserver } from './meetings/hostsObserver.jsx';
 import WaitingRoom from './meetings/waitingRoom/waitingRoom.jsx';
 import { renderEndConfirm, renderLeaveConfirm } from './meetings/streamControls';
-import { InviteParticipantsPanel } from "./inviteParticipantsPanel.jsx";
+import { InviteParticipantsPanel } from './inviteParticipantsPanel.jsx';
 import ChatOverlay, { ChatOverlays } from './chatOverlay.jsx';
-import Link from "./link.jsx";
+import Link from './link.jsx';
 
 const ENABLE_GROUP_CALLING_FLAG = true;
 const MAX_USERS_CHAT_PRIVATE = 100;
@@ -38,24 +38,8 @@ const DISMISS_TRANSITIONS = {
     DISMISSED: 2,
 };
 
-class EndCallButton extends MegaRenderMixin {
+class EndCallButton extends React.Component {
     IS_MODERATOR = Call.isModerator(this.props.chatRoom, u_handle);
-
-    EVENTS = ['onCallPeerJoined.endCallButton', 'onCallPeerLeft.endCallButton'];
-
-    shouldComponentUpdate() {
-        return true;
-    }
-
-    componentWillUnmount() {
-        super.componentWillUnmount();
-        this.EVENTS.map(ev => this.props.chatRoom.unbind(ev));
-    }
-
-    componentDidMount() {
-        super.componentDidMount();
-        this.EVENTS.map(ev => this.props.chatRoom.rebind(ev, () => this.safeForceUpdate()));
-    }
 
     LeaveButton = withHostsObserver(
         ({ hasHost, chatRoom, confirmLeave, onLeave }) => {
@@ -186,46 +170,36 @@ class EndCallButton extends MegaRenderMixin {
     }
 }
 
-class StartMeetingNotification extends MegaRenderMixin {
-    customIsEventuallyVisible = () => true;
-
-    render() {
-        const { chatRoom, offset, onWaitingRoomJoin, onStartCall } = this.props;
-
-        if (chatRoom.call || !megaChat.hasSupportForCalls) {
-            return null;
-        }
-
-        return (
-            <div
-                className="in-call-notif neutral start"
-                style={{ marginTop: offset }}
-                onClick={() => {
-                    eventlog(500288);
-                    if (chatRoom.options.w && !chatRoom.iAmOperator()) {
-                        return onWaitingRoomJoin();
-                    }
-                    return onStartCall(TYPE.AUDIO);
-                }}>
-                <button className="mega-button positive small">{l.schedule_start_aot}</button>
-            </div>
-        );
+const StartMeetingNotification = ({ chatRoom, offset, onWaitingRoomJoin, onStartCall }) => {
+    if (chatRoom.call || !megaChat.hasSupportForCalls) {
+        return null;
     }
-}
 
-export class JoinCallNotification extends MegaRenderMixin {
-    customIsEventuallyVisible = () => true;
+    return (
+        <div
+            className="in-call-notif neutral start"
+            style={{ marginTop: offset }}
+            onClick={() => {
+                eventlog(500288);
+                if (chatRoom.options.w && !chatRoom.iAmOperator()) {
+                    return onWaitingRoomJoin();
+                }
+                return onStartCall(TYPE.AUDIO);
+            }}>
+            <button className="mega-button positive small">{l.schedule_start_aot}</button>
+        </div>
+    );
+};
 
-    render() {
-        const { chatRoom, offset, rhpCollapsed } = this.props;
+export const JoinCallNotification = ({ chatRoom, offset, rhpCollapsed }) => {
+    if (chatRoom.call) {
+        return null;
+    }
 
-        if (chatRoom.call) {
-            return null;
-        }
-
-        if (!megaChat.hasSupportForCalls) {
-            // `There is an active call in this room, but your browser does not support calls.`
-            return <Alert
+    if (!megaChat.hasSupportForCalls) {
+        // `There is an active call in this room, but your browser does not support calls.`
+        return (
+            <Alert
                 className={`
                     ${rhpCollapsed ? 'full-span' : ''}
                     ${offset === ALERTS_BASE_OFFSET ? 'single-alert' : ''}
@@ -234,37 +208,39 @@ export class JoinCallNotification extends MegaRenderMixin {
                 offset={offset === ALERTS_BASE_OFFSET ? 0 : offset}
                 type={Alert.TYPE.MEDIUM}
                 content={l.active_call_not_supported}
-            />;
-        }
+            />
+        );
+    }
 
-        if (chatRoom.callUserLimited && !chatRoom.canJoinLimitedCall()) {
-            /* `Cannot join, this call can only support 100 participants. Reach out to organiser for more info` */
-            return <div
+    if (chatRoom.callUserLimited && !chatRoom.canJoinLimitedCall()) {
+        /* `Cannot join, this call can only support 100 participants. Reach out to organiser for more info` */
+        return (
+            <div
                 className="call-user-limit-banner"
                 style={{ marginTop: offset }}>
                 {l.call_join_user_limit_banner}
-            </div>;
-        }
-
-        return (
-            <div
-                className="in-call-notif neutral join"
-                style={{ marginTop: offset }}>
-                <i className="sprite-fm-mono icon-phone"/>
-                <ParsedHTML
-                    onClick={() => {
-                        return inProgressAlert(true, chatRoom)
-                            .then(() => chatRoom.joinCall())
-                            .catch((ex) => d && console.warn('Already in a call.', ex));
-                    }}>
-                    {(l[20460] || 'There is an active group call. [A]Join[/A]')
-                        .replace('[A]', '<button class="mega-button positive joinActiveCall small">')
-                        .replace('[/A]', '</button>')}
-                </ParsedHTML>
             </div>
         );
     }
-}
+
+    return (
+        <div
+            className="in-call-notif neutral join"
+            style={{ marginTop: offset }}>
+            <i className="sprite-fm-mono icon-phone"/>
+            <ParsedHTML
+                onClick={() => {
+                    return inProgressAlert(true, chatRoom)
+                        .then(() => chatRoom.joinCall())
+                        .catch((ex) => d && console.warn('Already in a call.', ex));
+                }}>
+                {(l[20460] || 'There is an active group call. [A]Join[/A]')
+                    .replace('[A]', '<button class="mega-button positive joinActiveCall small">')
+                    .replace('[/A]', '</button>')}
+            </ParsedHTML>
+        </div>
+    );
+};
 
 export const allContactsInChat = (participants) => {
     var currentContacts = M.u.keys();
@@ -291,6 +267,7 @@ export const excludedParticipants = (room) => {
 };
 
 class Occurrences extends MegaRenderMixin {
+    domRef = React.createRef();
     loadingMore = false;
 
     state = {
@@ -443,30 +420,29 @@ class Occurrences extends MegaRenderMixin {
     }
 
     render() {
-        const { chatRoom, scheduledMeeting } = this.props;
-        const { editDialog, occurrenceId } = this.state;
-
         return (
-            <>
-                <div className="chat-occurrences-list">
-                    <PerfectScrollbar
-                        chatRoom={chatRoom}
-                        ref={ref => {
-                            this.contactsListScroll = ref;
-                        }}
-                        disableCheckingVisibility={true}
-                        onUserScroll={ps => ps.isCloseToBottom(30) && this.loadOccurrences()}
-                        isVisible={this.isCurrentlyActive}
-                        options={{ suppressScrollX: true }}>
-                        <div className="chat-occurrences-list-inner">{this.renderOccurrences()}</div>
-                    </PerfectScrollbar>
-                </div>
-            </>
+            <div
+                ref={this.domRef}
+                className="chat-occurrences-list">
+                <PerfectScrollbar
+                    chatRoom={this.props.chatRoom}
+                    ref={ref => {
+                        this.contactsListScroll = ref;
+                    }}
+                    disableCheckingVisibility={true}
+                    onUserScroll={ps => ps.isCloseToBottom(30) && this.loadOccurrences()}
+                    isVisible={this.isCurrentlyActive}
+                    options={{ suppressScrollX: true }}>
+                    <div className="chat-occurrences-list-inner">{this.renderOccurrences()}</div>
+                </PerfectScrollbar>
+            </div>
         );
     }
 }
 
 export class ConversationRightArea extends MegaRenderMixin {
+    domRef = React.createRef();
+
     static defaultProps = {
         'requiresUpdateOnResize': true
     };
@@ -1020,7 +996,9 @@ export class ConversationRightArea extends MegaRenderMixin {
         }
 
         return (
-            <div className="chat-right-area">
+            <div
+                ref={this.domRef}
+                className="chat-right-area">
                 <PerfectScrollbar
                     className="chat-right-area conversation-details-scroll"
                     options={{ 'suppressScrollX': true }}
@@ -1043,7 +1021,7 @@ export class ConversationRightArea extends MegaRenderMixin {
                                     this.rightScroll.reinitialise();
                                 }
                                 if (this.participantsListRef) {
-                                    this.participantsListRef.safeForceUpdate();
+                                    this.participantsListRef.safeForceUpdate?.();
                                 }
                             })}
                             expandedPanel={{
@@ -1425,9 +1403,10 @@ export class ConversationRightArea extends MegaRenderMixin {
 }
 
 export class ConversationPanel extends MegaRenderMixin {
-    containerRef = React.createRef();
-    $container = null;
-    $messages = null;
+    domRef = React.createRef();
+    messagesBlockRef = React.createRef();
+    $container = undefined;
+    $messages = undefined;
 
     state = {
         startCallPopupIsActive: false,
@@ -1621,8 +1600,6 @@ export class ConversationPanel extends MegaRenderMixin {
             }
         });
 
-        this.eventuallyInit();
-
         // --
 
         megaChat.rebind(`${megaChat.plugins.meetingsManager.EVENTS.OCCURRENCES_UPDATE}.${this.getUniqueId()}`, () => {
@@ -1685,34 +1662,6 @@ export class ConversationPanel extends MegaRenderMixin {
         );
     }
 
-    eventuallyInit() {
-        var self = this;
-
-        // because..JSP would hijack some DOM elements, we need to wait with this...
-        if (self.initialised) {
-            return;
-        }
-        var $container = $(self.findDOMNode());
-
-        if ($container.length > 0) {
-            self.initialised = true;
-        }
-        else {
-            return;
-        }
-
-        var room = self.props.chatRoom;
-
-        // collapse on ESC pressed (exited fullscreen)
-        $(document)
-            .rebind("fullscreenchange.megaChat_" + room.roomId, function() {
-                if (self.isComponentEventuallyVisible()) {
-                    self.setState({isFullscreenModeEnabled: !!$(document).fullScreen()});
-                    self.forceUpdate();
-                }
-            });
-    }
-
     componentWillUnmount() {
         super.componentWillUnmount();
         var self = this;
@@ -1746,11 +1695,8 @@ export class ConversationPanel extends MegaRenderMixin {
         var self = this;
         var room = this.props.chatRoom;
 
-        self.eventuallyInit(false);
-
         room.megaChat.updateSectionUnreadCount();
 
-        var domNode = self.findDOMNode();
 
         if (prevState.messagesToggledInCall !== self.state.messagesToggledInCall || self.callJustEnded) {
             if (self.callJustEnded) {
@@ -1766,7 +1712,7 @@ export class ConversationPanel extends MegaRenderMixin {
         }
 
         if (prevProps.isActive === false && self.props.isActive === true) {
-            var $typeArea = $('.messages-textarea:visible:first', domNode);
+            const $typeArea = $('.messages-textarea:visible:first', this.$container);
             if ($typeArea.length === 1) {
                 $typeArea.trigger("focus");
                 moveCursortoToEnd($typeArea[0]);
@@ -1812,13 +1758,6 @@ export class ConversationPanel extends MegaRenderMixin {
         var contacts = room.getParticipantsExceptMe();
         var contactHandle;
         var contact;
-
-        var conversationPanelClasses = "conversation-panel " + (room.type === "public" ? "group-chat " : "") +
-            room.type + "-chat";
-
-        if (!room.isCurrentlyActive || megaChat._joinDialogIsShown) {
-            conversationPanelClasses += " hidden";
-        }
 
         var topicBlockClass = "chat-topic-block";
         if (room.type !== "public") {
@@ -1911,16 +1850,6 @@ export class ConversationPanel extends MegaRenderMixin {
                         </div>
                     </footer>
                 </ModalDialogsUI.ModalDialog>;
-        }
-
-        var chatLinkDialog;
-        if (self.state.chatLinkDialog === true) {
-            chatLinkDialog = <ChatlinkDialog
-                chatRoom={self.props.chatRoom}
-                onClose={() => {
-                    self.setState({'chatLinkDialog': false});
-                }}
-            />
         }
 
         let privateChatDialog;
@@ -2444,7 +2373,13 @@ export class ConversationPanel extends MegaRenderMixin {
 
         return (
             <div
-                className={conversationPanelClasses}
+                ref={this.domRef}
+                className={`
+                    conversation-panel
+                    ${room.type === 'public' ? 'group-chat ' : ''}
+                    ${room.type}-chat
+                    ${!room.isCurrentlyActive || megaChat._joinDialogIsShown ? 'hidden' : ''}
+                `}
                 onMouseMove={() => self.onMouseMove()}
                 data-room-id={self.props.chatRoom.chatId}>
                 {room.meetingsLoading && <Loading chatRoom={room} title={room.meetingsLoading.title} />}
@@ -2654,7 +2589,6 @@ export class ConversationPanel extends MegaRenderMixin {
                     /> : null}
 
                     {privateChatDialog}
-                    {chatLinkDialog}
                     {nonLoggedInJoinChatDialog}
                     {attachCloudDialog}
                     {sendContactDialog}
@@ -2664,6 +2598,12 @@ export class ConversationPanel extends MegaRenderMixin {
                     {pushSettingsDialog}
                     {descriptionDialog}
 
+                    {this.state.chatLinkDialog &&
+                        <ChatlinkDialog
+                            chatRoom={this.props.chatRoom}
+                            onClose={() => this.setState({ chatLinkDialog: false })}
+                        />
+                    }
 
                     <div className="dropdown body dropdown-arrow down-arrow tooltip not-sent-notification hidden">
                         <i className="dropdown-white-arrow"></i>
@@ -2746,7 +2686,7 @@ export class ConversationPanel extends MegaRenderMixin {
                     </div>
 
                     <div
-                        ref={this.containerRef}
+                        ref={this.messagesBlockRef}
                         className={`
                             messages-block
                             ${additionalClass}
@@ -2881,7 +2821,7 @@ export class ConversationPanel extends MegaRenderMixin {
                                     {l[20597] /* `Join Group` */}
                                 </div>
                             </div> :
-                            <ComposedTextArea chatRoom={room} parent={this} containerRef={this.containerRef}/>
+                            <ComposedTextArea chatRoom={room} parent={this} containerRef={this.messagesBlockRef}/>
                         }
                     </div>
                 </div>
@@ -2891,6 +2831,8 @@ export class ConversationPanel extends MegaRenderMixin {
 }
 
 export class ConversationPanels extends MegaRenderMixin {
+    domRef = React.createRef();
+
     notificationListener = 'meetings:notificationPermissions';
     notificationGranted = undefined;
     notificationHelpURL =
@@ -3052,7 +2994,9 @@ export class ConversationPanels extends MegaRenderMixin {
         const now = Date.now();
 
         return (
-            <div className="conversation-panels">
+            <div
+                ref={this.domRef}
+                className="conversation-panels">
                 {routingSection === 'contacts' || is_chatlink ?
                     null :
                     window.Notification && notificationsPermissions !== 'granted' &&
@@ -3108,19 +3052,13 @@ export class ConversationPanels extends MegaRenderMixin {
     }
 }
 
-export class EmptyConvPanel extends MegaRenderMixin {
-
+export class EmptyConvPanel extends React.Component {
     state = {
         linkData: '',
     };
 
     componentDidMount() {
-        super.componentDidMount();
-        (
-            M.account && M.account.contactLink ?
-                Promise.resolve(M.account.contactLink) :
-                api.send('clc')
-        )
+        (M.account && M.account.contactLink ? Promise.resolve(M.account.contactLink) : api.send('clc'))
             .then(res => {
                 if (this.isMounted() && typeof res === 'string') {
                     const prefix = res.startsWith('C!') ? '' : 'C!';

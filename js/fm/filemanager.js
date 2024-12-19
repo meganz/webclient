@@ -2820,17 +2820,6 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type, OnSelectCal
     // Using existing File selector dialog from chat.
     var dialogPlacer = document.createElement('div');
     var selected = [];
-    var constructor;
-    var doClose = function(noClearSelected) {
-        ReactDOM.unmountComponentAtNode(dialogPlacer);
-        constructor.domNode.remove();
-        dialogPlacer.remove();
-        if (!noClearSelected) {
-            selected = [];
-        }
-        closeDialog();
-    };
-
     var options = {
         'create-new-link': {
             title: l[20667],
@@ -2892,9 +2881,18 @@ FileManager.prototype.initFileAndFolderSelectDialog = function(type, OnSelectCal
         prop.customFilterFn = options[type].customFilterFn;
     }
 
-    var dialog = React.createElement(CloudBrowserModalDialogUI.CloudBrowserDialog, prop);
+    const $$dialogElement = React.createElement(CloudBrowserModalDialogUI.CloudBrowserDialog, prop);
+    const $$dialogRoot = ReactDOM.createRoot(dialogPlacer);
+    $$dialogRoot.render($$dialogElement);
 
-    constructor = ReactDOM.render(dialog, dialogPlacer);
+    const doClose = noClearSelected => {
+        $$dialogRoot.unmount();
+        dialogPlacer.remove();
+        if (!noClearSelected) {
+            selected = [];
+        }
+        closeDialog();
+    };
 };
 
 FileManager.prototype.initNewChatlinkDialog = function() {
@@ -2915,19 +2913,18 @@ FileManager.prototype.initNewChatlinkDialog = function() {
 
     loadingDialog.hide();
 
-    var dialogPlacer = document.createElement('div');
-
-    var dialog = React.createElement(StartGroupChatDialogUI.StartGroupChatWizard, {
-        name: "start-group-chat",
+    const dialogPlacer = document.createElement('div');
+    const $$dialogRoot = ReactDOM.createRoot(dialogPlacer);
+    const $$dialogElement = React.createElement(StartGroupChatDialogUI.StartGroupChatWizard, {
+        name: 'start-group-chat',
         flowType: 2,
-        onClose: function() {
-            ReactDOM.unmountComponentAtNode(dialogPlacer);
+        onClose: () => {
+            $$dialogRoot.unmount();
             dialogPlacer.remove();
             closeDialog();
         }
     });
-
-    ReactDOM.render(dialog, dialogPlacer);
+    $$dialogRoot.render($$dialogElement);
 };
 
 FileManager.prototype.initUIKeyEvents = function() {

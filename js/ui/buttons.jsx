@@ -1,9 +1,8 @@
 import React from 'react';
 import { MegaRenderMixin } from "../chat/mixins";
 
-let _buttonGroups = {};
-
 export class Button extends MegaRenderMixin {
+    domRef = React.createRef();
     buttonClass = `.button`;
 
     state = {
@@ -17,7 +16,7 @@ export class Button extends MegaRenderMixin {
         this.state.iconHovered = this.props.iconHovered || '';
     }
 
-    componentWillUpdate(nextProps, nextState) {
+    UNSAFE_componentWillUpdate(nextProps, nextState) {
         if (nextProps.disabled === true && nextState.focused === true) {
             nextState.focused = false;
         }
@@ -66,12 +65,11 @@ export class Button extends MegaRenderMixin {
     }
 
     renderChildren() {
-        var self = this;
-        if (React.Children.count(self.props.children) < 1) {
+        if (React.Children.count(this.props.children) < 1) {
             return null;
         }
 
-        return React.Children.map(this.props.children, function (child) {
+        return React.Children.map(this.props.children, child => {
             if (!child) {
                 return;
             }
@@ -81,34 +79,23 @@ export class Button extends MegaRenderMixin {
             }
 
             return React.cloneElement(child, {
-                active: self.state.focused,
-                closeDropdown: function() {
-                    self.setState({'focused': false});
-                    self.unbindEvents();
+                active: this.state.focused,
+                closeDropdown: () => {
+                    this.setState({ focused: false });
+                    this.unbindEvents();
                 },
-                onActiveChange: function(newVal) {
-                    var $element = $(self.findDOMNode());
-                    var $scrollables = $element.parents('.ps');
+                onActiveChange: newVal => {
+                    const $element = $(this.domRef?.current);
+                    const $scrollables = $element.parents('.ps');
                     if ($scrollables.length > 0) {
-                        if (newVal === true) {
-                            // disable scrolling
-                            $scrollables.each((k, element) => {
-                                Ps.disable(element);
-                            });
-                        }
-                        else {
-                            // enable back scrolling
-                            $scrollables.each((k, element) => {
-                                Ps.enable(element);
-                            });
-                        }
+                        $scrollables.map((k, element) => Ps[newVal ? 'disable' : 'enable'](element));
                     }
                     if (child.props.onActiveChange) {
-                        child.props.onActiveChange.call(this, newVal);
+                        child.props.onActiveChange(newVal);
                     }
                 }
             });
-        }.bind(this));
+        });
     }
 
     onBlur = e => {
@@ -116,13 +103,13 @@ export class Button extends MegaRenderMixin {
             return;
         }
 
-        if (!e || !$(e.target).closest(this.buttonClass).is(this.findDOMNode())) {
+        if (!e || !$(e.target).closest(this.buttonClass).is(this.domRef?.current)) {
             this.setState({ focused: false }, () => {
                 this.unbindEvents();
                 this.safeForceUpdate();
             });
         }
-    }
+    };
 
     unbindEvents() {
         $(document).off('keyup.button' + this.getUniqueId());
@@ -142,7 +129,7 @@ export class Button extends MegaRenderMixin {
         }
 
         if (
-            $(e.target).closest('.popup').closest(this.buttonClass).is(this.findDOMNode()) &&
+            $(e.target).closest('.popup').closest(this.buttonClass).is(this.domRef?.current) &&
             this.state.focused === true
         ) {
             e.preventDefault();
@@ -186,6 +173,7 @@ export class Button extends MegaRenderMixin {
 
         return (
             <TagName
+                ref={this.domRef}
                 className={`
                     button
                     ${className || ''}

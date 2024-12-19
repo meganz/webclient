@@ -1,12 +1,11 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../mixins';
 import { Avatar } from '../../contacts.jsx';
 import ModalDialogsUI from '../../../../ui/modalDialogs.jsx';
 import Button from '../button.jsx';
 import Call from '../call.jsx';
 import { Emoji } from '../../../../ui/utils.jsx';
 
-export default class Incoming extends MegaRenderMixin {
+export default class Incoming extends React.Component {
     static NAMESPACE = 'incoming-dialog';
 
     state = {
@@ -23,13 +22,11 @@ export default class Incoming extends MegaRenderMixin {
     }
 
     componentDidMount() {
-        super.componentDidMount();
         this._old$dialog = $.dialog;
         $.dialog = "chat-incoming-call";
     }
 
     componentWillUnmount() {
-        super.componentWillUnmount();
         $.dialog = this._old$dialog;
     }
 

@@ -8,7 +8,7 @@ export default class ModeSwitch extends MegaRenderMixin {
     static NAMESPACE = 'modeSwitch';
     static BASE_CLASS = 'mode';
 
-    containerRef = React.createRef();
+    domRef = React.createRef();
 
     state = {
         expanded: false,
@@ -17,7 +17,7 @@ export default class ModeSwitch extends MegaRenderMixin {
 
     handleMousedown = ({ target }) => {
         if (this.state.expanded || this.state.settings) {
-            return this.containerRef?.current?.contains(target) ? null : this.doClose();
+            return this.domRef?.current?.contains(target) ? null : this.doClose();
         }
     };
 
@@ -186,11 +186,11 @@ export default class ModeSwitch extends MegaRenderMixin {
     }
 
     render() {
-        const { Toggle, Option, Settings, containerRef, state, doToggle } = this;
+        const { Toggle, Option, Settings, domRef, state, doToggle } = this;
 
         return (
             <div
-                ref={containerRef}
+                ref={domRef}
                 className={ModeSwitch.BASE_CLASS}>
                 <Toggle />
                 <div

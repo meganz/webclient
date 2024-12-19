@@ -1,5 +1,4 @@
 import React from 'react';
-import { MegaRenderMixin } from '../mixins.js';
 import utils from './../../ui/utils.jsx';
 import { Button } from '../../ui/buttons.jsx';
 
@@ -15,7 +14,7 @@ const ChatOverlays = {
  *
  * @see ChatOverlays
  */
-export default class ChatOverlay extends MegaRenderMixin {
+export default class ChatOverlay extends React.Component {
 
     MegaLogo = () => <div className={`${NAMESPACE}-logo`}>
         <i className={`sprite-fm-illustration-wide ${mega.ui.isDarkTheme()

@@ -23,6 +23,7 @@ const ACTIONS = {
 const SEARCH_PANEL_CLASS = `search-panel`;
 
 export default class SearchPanel extends MegaRenderMixin {
+    domRef = React.createRef();
     wrapperRef = null;
 
     state = {
@@ -185,6 +186,7 @@ export default class SearchPanel extends MegaRenderMixin {
 
         return (
             <div
+                ref={this.domRef}
                 className={`
                     ${SEARCH_PANEL_CLASS}
                     ${searching ? 'expanded' : ''}

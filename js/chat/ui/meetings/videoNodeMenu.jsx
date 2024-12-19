@@ -95,6 +95,8 @@ export const Pin = ({ stream, mode, onSpeakerChange, onModeChange })  => {
 
 export default class VideoNodeMenu extends MegaRenderMixin {
     static NAMESPACE = 'node-menu';
+    domRef = React.createRef();
+
     ToggleCrop = ({videoNodeRef}) => {
         const videoNode = videoNodeRef?.current;
         if (!videoNode) {
@@ -127,11 +129,13 @@ export default class VideoNodeMenu extends MegaRenderMixin {
 
         if (isPresenterNode) {
             return (
-                <div className={`
-                    ${NAMESPACE}
-                    theme-dark-forced
-                    ${mode === MODE.THUMBNAIL ? '' : 'presenter'}
-                `}>
+                <div
+                    ref={this.domRef}
+                    className={`
+                        ${NAMESPACE}
+                        theme-dark-forced
+                        ${mode === MODE.THUMBNAIL ? '' : 'presenter'}
+                    `}>
                     <div className={`${NAMESPACE}-toggle`}>
                         <i
                             className={`sprite-fm-mono call-node-pin icon-pin${mode === MODE.MAIN ? '-off' : ''}`}
@@ -144,11 +148,13 @@ export default class VideoNodeMenu extends MegaRenderMixin {
                 </div>
             );
         }
-        const $$CONTROLS = { Contact, Pin, Privilege /* , ToggleCrop: this.ToggleCrop */};
 
         if (userHandle !== u_handle) {
+            const $$CONTROLS = { Contact, Pin, Privilege /* , ToggleCrop: this.ToggleCrop */};
+
             return (
                 <div
+                    ref={this.domRef}
                     className={`
                         ${NAMESPACE}
                         theme-dark-forced

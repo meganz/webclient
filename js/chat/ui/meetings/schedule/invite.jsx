@@ -6,7 +6,7 @@ import { Avatar, ContactAwareName, MAX_FREQUENTS } from '../../contacts.jsx';
 export default class Invite extends MegaRenderMixin {
     static NAMESPACE = 'meetings-invite';
 
-    containerRef = React.createRef();
+    domRef = React.createRef();
     wrapperRef = React.createRef();
     inputRef = React.createRef();
 
@@ -36,9 +36,9 @@ export default class Invite extends MegaRenderMixin {
     }
 
     handleMousedown = ({ target }) =>
-        this.containerRef &&
-        this.containerRef.current &&
-        this.containerRef.current.contains(target) ? null : this.setState({ expanded: false });
+        this.domRef &&
+        this.domRef.current &&
+        this.domRef.current.contains(target) ? null : this.setState({ expanded: false });
 
     getSortedContactsList = frequents => {
         const filteredContacts = [];
@@ -174,7 +174,7 @@ export default class Invite extends MegaRenderMixin {
 
         return (
             <div
-                ref={this.containerRef}
+                ref={this.domRef}
                 className={`
                     ${Invite.NAMESPACE}
                     ${className || ''}

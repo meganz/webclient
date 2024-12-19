@@ -161,16 +161,6 @@ MegaData.prototype.initShareAddDialog = function(alreadyAddedContacts, $extraCon
     var dialogPlacer = document.createElement('div');
     $.contactPickerSelected = alreadyAddedContacts; // Global variable for the selected item from the contacts picker
 
-    var closeShareAddDialog = function() {
-        closeDialog();
-
-        ReactDOM.unmountComponentAtNode(dialogPlacer);
-        dialogPlacer.remove();
-
-        fm_showoverlay();
-        renderShareDialogAccessList();
-    };
-
     // Detect the new added contact whether in the remove list or not
     var notRmContacts = function(handle) {
         if ($.removedContactsFromShare && $.removedContactsFromShare[handle]) {
@@ -309,11 +299,19 @@ MegaData.prototype.initShareAddDialog = function(alreadyAddedContacts, $extraCon
         }
     };
 
-    // Render the add more people share dialog from reactjs
-    var dialog = React.createElement(StartGroupChatDialogUI.StartGroupChatWizard, prop);
-    ReactDOM.render(dialog, dialogPlacer);
+    // Render the `Add people to folder` share dialog
+    const $$dialogElement =  React.createElement(StartGroupChatDialogUI.StartGroupChatWizard, prop);
+    const $$dialogRoot = ReactDOM.createRoot(dialogPlacer);
+    $$dialogRoot.render($$dialogElement);
+    onIdle(() => M.safeShowDialog('share-add', $('.mega-dialog.share-add-dialog')));
 
-    M.safeShowDialog('share-add', $('.mega-dialog.share-add-dialog'));
+    const closeShareAddDialog = () => {
+        closeDialog();
+        $$dialogRoot.unmount();
+        dialogPlacer.remove();
+        fm_showoverlay();
+        renderShareDialogAccessList();
+    };
 };
 
 /**

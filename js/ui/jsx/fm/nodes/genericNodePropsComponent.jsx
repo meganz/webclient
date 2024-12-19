@@ -15,14 +15,14 @@ export class GenericNodePropsComponent extends MegaRenderMixin {
             this.safeForceUpdate();
         }
     }
-    componentWillReceiveProps(nextProps) {
+    UNSAFE_componentWillReceiveProps(nextProps) {
         if (nextProps.highlighted !== this.props.highlighted) {
             this.safeForceUpdate();
         }
     }
-    componentWillMount() {
-        if (super.componentWillMount) {
-            super.componentWillMount();
+    UNSAFE_componentWillMount() {
+        if (super.UNSAFE_componentWillMount) {
+            super.UNSAFE_componentWillMount();
         }
 
         this.nodeProps?.use(this.changeListener);

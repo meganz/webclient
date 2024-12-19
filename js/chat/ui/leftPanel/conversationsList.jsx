@@ -134,6 +134,7 @@ export const Archived = ({ conversations, archivedUnmounting, onClose }) => {
 export class Meetings extends MegaRenderMixin {
     TABS = { UPCOMING: 0x00, PAST: 0x01 };
 
+    domRef = React.createRef();
     ongoingRef = React.createRef();
     navigationRef = React.createRef();
 
@@ -405,7 +406,9 @@ export class Meetings extends MegaRenderMixin {
             .filter(c => c.isDisplayable() && c.isMeeting && c.havePendingCall());
 
         return (
-            <div className={`${NAMESPACE}-meetings`}>
+            <div
+                ref={this.domRef}
+                className={`${NAMESPACE}-meetings`}>
                 <this.Ongoing ongoingMeetings={ongoingMeetings} />
                 <this.Navigation conversations={this.props.conversations} />
                 <div

@@ -4,6 +4,8 @@ import {MegaRenderMixin} from "../chat/mixins";
 import {ContactPickerWidget} from './../chat/ui/contacts.jsx';
 
 export class Dropdown extends MegaRenderMixin {
+    domRef = React.createRef();
+
     static defaultProps = {
         'requiresUpdateOnResize': true,
     };
@@ -14,7 +16,7 @@ export class Dropdown extends MegaRenderMixin {
         this.onResized = this.onResized.bind(this);
     }
 
-    componentWillUpdate(nextProps) {
+    UNSAFE_componentWillUpdate(nextProps) {
         // eslint-disable-next-line eqeqeq
         if (this.props.active != nextProps.active) {
             this.onActiveChange(nextProps.active);
@@ -197,26 +199,13 @@ export class Dropdown extends MegaRenderMixin {
         if (this.props.active !== true) {
             return null;
         }
-        var classes = "dropdown body " + (this.props.noArrow ? "" : "dropdown-arrow up-arrow") + " " +
-            this.props.className;
-
-        var styles;
-
-        // calculate and move the popup arrow to the correct position.
-        if (this.popupElement) {
-            styles = {
-                'zIndex': 123,
-                'position': 'absolute',
-                'width': this.props.styles ? this.props.styles.width : undefined
-            };
-        }
 
         var self = this;
 
         var child = null;
 
         if (this.props.children) {
-            child = <div>{self.renderChildren()}</div>;
+            child = <div ref={this.domRef}>{self.renderChildren()}</div>;
         }
         else if (this.props.dropdownItemGenerator) {
             child = this.props.dropdownItemGenerator(this);
@@ -231,22 +220,37 @@ export class Dropdown extends MegaRenderMixin {
             return null;
         }
 
-
-        return <utils.RenderTo element={document.body} className={classes} style={styles}
-            popupDidMount={(popupElement) => {
-                self.popupElement = popupElement;
-                self.onResized();
-            }}
-            popupWillUnmount={() => {
-                delete self.popupElement;
-            }}>
-            <div onClick={function() {
-                $(document.body).trigger('closeAllDropdownsExcept', self);
-            }}>
-                {this.props.noArrow ? null : <i className="dropdown-white-arrow"></i>}
-                {child}
-            </div>
-        </utils.RenderTo>;
+        return (
+            <utils.RenderTo
+                element={document.body}
+                className={`
+                    dropdown
+                    body
+                    ${this.props.noArrow ? '' : 'dropdown-arrow up-arrow'}
+                    ${this.props.className || ''}
+                `}
+                style={this.popupElement && {
+                    zIndex: 123,
+                    position: 'absolute',
+                    width: this.props.styles ? this.props.styles.width : undefined
+                }}
+                popupDidMount={popupElement => {
+                    this.popupElement = popupElement;
+                    this.onResized();
+                }}
+                popupWillUnmount={() => {
+                    delete this.popupElement;
+                }}>
+                <div
+                    ref={this.domRef}
+                    onClick={() => {
+                        $(document.body).trigger('closeAllDropdownsExcept', this);
+                    }}>
+                    {this.props.noArrow ? null : <i className="dropdown-white-arrow" />}
+                    {child}
+                </div>
+            </utils.RenderTo>
+        );
     }
 }
 
@@ -340,15 +344,19 @@ export class DropdownContactsSelector extends MegaRenderMixin {
 }
 
 export class DropdownItem extends MegaRenderMixin {
+    domRef = React.createRef();
+
     static defaultProps = {
         requiresUpdateOnResize: true
     };
+
     constructor(props) {
         super(props);
         this.state = {'isClicked': false};
         this.onClick = this.onClick.bind(this);
         this.onMouseOver = this.onMouseOver.bind(this);
     }
+
     renderChildren() {
         var self = this;
         return React.Children.map(this.props.children, function(child) {
@@ -361,6 +369,7 @@ export class DropdownItem extends MegaRenderMixin {
             return React.cloneElement(child, props);
         });
     }
+
     onClick(ev) {
         const { children, persistent, onClick } = this.props;
 
@@ -376,6 +385,7 @@ export class DropdownItem extends MegaRenderMixin {
 
         return onClick && onClick(ev);
     }
+
     onMouseOver(e) {
         if (this.props.submenu) {
             var $contextItem = $(e.target).closest(".contains-submenu");
@@ -403,10 +413,13 @@ export class DropdownItem extends MegaRenderMixin {
             $dropdown.find(".submenu").removeClass("active");
         }
     }
+
     render() {
         const { className, disabled, label, icon, submenu } = this.props;
+
         return (
             <div
+                ref={this.domRef}
                 className={`
                     dropdown-item
                     ${className ? className : ''}
@@ -422,4 +435,4 @@ export class DropdownItem extends MegaRenderMixin {
             </div>
         );
     }
-};
+}

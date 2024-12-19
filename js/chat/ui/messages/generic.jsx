@@ -14,6 +14,8 @@ const CLICKABLE_ATTACHMENT_CLASSES =
     '.message.data-title, .message.file-size, .data-block-view.semi-big, .data-block-view.medium';
 
 export default class GenericConversationMessage extends ConversationMessageMixin {
+    containerRef = React.createRef();
+
     constructor(props) {
         super(props);
 
@@ -33,7 +35,7 @@ export default class GenericConversationMessage extends ConversationMessageMixin
         const isMounted = this.isMounted();
 
         if (isBeingEdited && isMounted) {
-            const $generic = $(this.findDOMNode());
+            const $generic = $(this.containerRef?.current);
             const $textarea = $('textarea', $generic);
 
             if ($textarea.length > 0 && !$textarea.is(":focus")) {
@@ -56,11 +58,10 @@ export default class GenericConversationMessage extends ConversationMessageMixin
         super.componentDidMount();
 
         var self = this;
-        var $node = $(self.findDOMNode());
+        var $node = $(this.containerRef?.current);
 
         if (self.isBeingEdited() && self.isMounted()) {
-            var $generic = $(self.findDOMNode());
-            var $textarea = $('textarea', $generic);
+            var $textarea = $('textarea', $node);
             if ($textarea.length > 0 && !$textarea.is(":focus")) {
                 $textarea.trigger("focus");
                 moveCursortoToEnd($textarea[0]);
@@ -111,7 +112,7 @@ export default class GenericConversationMessage extends ConversationMessageMixin
     componentWillUnmount() {
         super.componentWillUnmount();
         var self = this;
-        var $node = $(self.findDOMNode());
+        var $node = $(this.containerRef?.current);
 
         self.props.message.off('onChange.GenericConversationMessage' + self.getUniqueId());
         $node.off('click.dropdownShortcut', CLICKABLE_ATTACHMENT_CLASSES);
@@ -417,6 +418,7 @@ export default class GenericConversationMessage extends ConversationMessageMixin
             isBeingEdited: () => this.isBeingEdited(),
             onDelete: (e, message) => this.doDelete(e, message),
         };
+        const $$CONTAINER = children => <div ref={this.containerRef}>{children}</div>;
 
         switch (true) {
             case MESSAGE.TYPE.REVOKED || MESSAGE.TYPE.REVOKE_ATTACHMENT:
@@ -460,15 +462,17 @@ export default class GenericConversationMessage extends ConversationMessageMixin
                 );
             case MESSAGE.TYPE.TEXT:
                 return (
-                    <Text
-                        {...MESSAGE.props}
-                        onEditToggle={editing => this.setState({ editing })}
-                        onDelete={MESSAGE.onDelete}
-                        onRetry={(e, message) => this.doRetry(e, message)}
-                        onCancelRetry={(e, message) => this.doCancelRetry(e, message)}
-                        isBeingEdited={MESSAGE.isBeingEdited}
-                        spinnerElement={spinnerElement}
-                    />
+                    $$CONTAINER(
+                        <Text
+                            {...MESSAGE.props}
+                            onEditToggle={editing => this.setState({ editing })}
+                            onDelete={MESSAGE.onDelete}
+                            onRetry={(e, message) => this.doRetry(e, message)}
+                            onCancelRetry={(e, message) => this.doCancelRetry(e, message)}
+                            isBeingEdited={MESSAGE.isBeingEdited}
+                            spinnerElement={spinnerElement}
+                        />
+                    )
                 );
             default:
                 return null;

@@ -1,7 +1,6 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../mixins';
 
-export default class Loading extends MegaRenderMixin {
+export default class Loading extends React.Component {
     static NAMESPACE = 'meetings-loading';
 
     PERMISSIONS = {
@@ -14,12 +13,10 @@ export default class Loading extends MegaRenderMixin {
     };
 
     componentWillUnmount() {
-        super.componentWillUnmount();
         megaChat.unbind(`onLocalMediaQueryError.${Loading.NAMESPACE}`);
     }
 
     componentDidMount() {
-        super.componentDidMount();
         // Close dropdown elements, popups
         document.dispatchEvent(new Event('closeDropdowns'));
         if ($.dialog) {
@@ -104,7 +101,6 @@ export default class Loading extends MegaRenderMixin {
 
     render() {
         const { pendingPermissions } = this.state;
-
         return (
             <div className={Loading.NAMESPACE}>
                 <div className={`${Loading.NAMESPACE}-content`}>

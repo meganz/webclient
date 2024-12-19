@@ -1,32 +1,33 @@
 var React = require("react");
 import {MegaRenderMixin} from "../mixins";
 
-class SharedFolderItem extends MegaRenderMixin {
-    render() {
-        var self = this;
-        var node = this.props.node;
-
-        return <div className={"chat-shared-block incoming " + (self.props.isLoading ? "is-loading" : "")}
+const SharedFolderItem = ({ node, isLoading }) => {
+    return (
+        <div
             key={node.h}
-            onClick={function() {
-                M.openFolder(node.h);
-            }}
-            onDoubleClick={function() {
-                M.openFolder(node.h);
-            }}>
-            <div className={"item-type-icon-90 icon-folder-incoming-90"}></div>
+            className={`
+                chat-shared-block
+                incoming
+                ${isLoading ? 'is-loading' : ''}
+            `}
+            onClick={() => M.openFolder(node.h)}
+            onDoubleClick={() => M.openFolder(node.h)}>
+            <div className="item-type-icon-90 icon-folder-incoming-90"/>
             <div className="chat-shared-info">
                 <span className="txt">{node.name}</span>
                 <span className="txt small">{fm_contains(node.tf, node.td)}</span>
             </div>
-        </div>;
-    }
+        </div>
+    );
 };
 
 class IncSharesAccordionPanel extends MegaRenderMixin {
-    componentWillMount() {
+    domRef = React.createRef();
+
+    UNSAFE_componentWillMount() {
         this.hadLoaded = false;
     }
+
     getContactHandle() {
         var self = this;
         var room = self.props.chatRoom;
@@ -36,6 +37,7 @@ class IncSharesAccordionPanel extends MegaRenderMixin {
         }
         return contactHandle;
     }
+
     render() {
         var self = this;
         var room = self.props.chatRoom;
@@ -118,19 +120,31 @@ class IncSharesAccordionPanel extends MegaRenderMixin {
             </div>;
         }
 
-        return <div className="chat-dropdown container">
-            <div className={"chat-dropdown header " + (this.props.expanded ? "expanded" : "")} onClick={function(e) {
-                self.props.onToggle(e);
-            }}>
-                <span>{this.props.title}</span>
-                <i className="sprite-fm-mono icon-arrow-down" />
+        return (
+            <div
+                ref={this.domRef}
+                className="chat-dropdown container">
+                <div
+                    className={`
+                        chat-dropdown
+                        header
+                        ${this.props.expanded ? 'expanded' : ''}
+                    `}
+                    onClick={this.props.onToggle}>
+                    <span>{this.props.title}</span>
+                    <i className="sprite-fm-mono icon-arrow-down" />
+                </div>
+                <div
+                    className={`
+                        chat-shared-files-container
+                        ${this.isLoadingMore ? 'is-loading' : ''}
+                    `}>
+                    {contents}
+                </div>
             </div>
-            <div className={"chat-shared-files-container" + (self.isLoadingMore ? "is-loading" : "")}>
-                {contents}
-            </div>
-        </div>;
+        );
     }
-};
+}
 
 
 export {

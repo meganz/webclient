@@ -2,7 +2,6 @@ import React from 'react';
 import ResultTable  from './resultTable.jsx';
 import ResultRow  from './resultRow.jsx';
 import { STATUS } from './searchPanel.jsx';
-import { MegaRenderMixin } from '../../mixins';
 
 export const TYPE = {
     MESSAGE: 1,
@@ -34,7 +33,7 @@ export const LABEL = {
     SEARCH_COMPLETE: l[23546]
 };
 
-export default class ResultContainer extends MegaRenderMixin {
+export default class ResultContainer extends React.Component {
 
     renderResults = (results, status, isFirstQuery, onSearchMessages) => {
 

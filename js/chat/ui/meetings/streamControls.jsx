@@ -44,6 +44,7 @@ export const renderEndConfirm = (onConfirm, onRecordingToggle) =>
 class StreamControls extends MegaRenderMixin {
     static NAMESPACE = 'stream-controls';
 
+    domRef = React.createRef();
     endContainerRef = React.createRef();
     endButtonRef = React.createRef();
 
@@ -595,6 +596,7 @@ class StreamControls extends MegaRenderMixin {
             <>
                 {blocked && renderBlockedWarning()}
                 <div
+                    ref={this.domRef}
                     className={StreamControls.NAMESPACE}>
                     {d && localStorage.callDebug ? this.renderDebug() : ''}
                     <ul>

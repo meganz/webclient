@@ -1,21 +1,16 @@
-var React = require("react");
-import {MegaRenderMixin} from '../mixins';
+import React from 'react';
 
-class WhosTyping extends MegaRenderMixin {
-    constructor(props) {
-        super(props);
-        this.state = {
-            currentlyTyping: {}
-        };
-    }
-    componentWillMount() {
-        var self = this;
-        var chatRoom = self.props.chatRoom;
+export class WhosTyping extends React.Component {
+    domRef = React.createRef();
 
-        chatRoom.bind("onParticipantTyping.whosTyping", function(e, user_handle, bCastCode) {
-            if (!self.isMounted()) {
-                return;
-            }
+    state = {
+        currentlyTyping: {}
+    };
+
+    componentDidMount() {
+        const { chatRoom } = this.props;
+
+        chatRoom.rebind('onParticipantTyping.whosTyping', (e, user_handle, bCastCode) => {
             if (user_handle === u_handle) {
                 return;
             }
@@ -29,7 +24,7 @@ class WhosTyping extends MegaRenderMixin {
                 // unknown user handle? no idea what to show in the "typing" are, so skip it.
                 return;
             }
-            const currentlyTyping = {...self.state.currentlyTyping};
+            const currentlyTyping = { ...this.state.currentlyTyping };
 
             if (currentlyTyping[u_h]) {
                 currentlyTyping[u_h].abort();
@@ -38,31 +33,27 @@ class WhosTyping extends MegaRenderMixin {
             if (bCastCode === 1) {
                 const timer = tSleep(5);
                 timer.then(() => {
-                    self.stoppedTyping(u_h);
+                    this.stoppedTyping(u_h);
                 });
 
                 currentlyTyping[u_h] = timer;
 
-                self.setState({
-                    currentlyTyping: currentlyTyping
-                });
+                this.setState({ currentlyTyping });
             }
             else {
-                self.stoppedTyping(u_h);
+                this.stoppedTyping(u_h);
             }
 
-            self.forceUpdate();
+            this.forceUpdate();
         });
     }
-    componentWillUnmount() {
-        super.componentWillUnmount();
-        var self = this;
-        var chatRoom = self.props.chatRoom;
 
-        chatRoom.off("onParticipantTyping.whosTyping");
+    componentWillUnmount() {
+        this.props.chatRoom.off('onParticipantTyping.whosTyping');
     }
+
     stoppedTyping(u_h) {
-        if (this.isMounted()) {
+        if (this.domRef.current) {
             const { currentlyTyping } = this.state;
             if (currentlyTyping[u_h]) {
                 const newState = {...currentlyTyping};
@@ -74,12 +65,10 @@ class WhosTyping extends MegaRenderMixin {
             }
         }
     }
+
     render() {
-        var self = this;
+        const users = Object.keys(this.state.currentlyTyping);
 
-        var typingElement = null;
-
-        const users = Object.keys(self.state.currentlyTyping);
         if (users.length > 0) {
             const names = users.map((u_h) => M.getNameByHandle(u_h)).filter(String);
 
@@ -95,31 +84,27 @@ class WhosTyping extends MegaRenderMixin {
                 namesDisplay = [names[0]];
             }
 
-            var msg;
-            if (areMultipleUsersTyping === true) {
-                msg = l[8872]
-                    .replace("%1", namesDisplay[0])
-                    .replace("%2", namesDisplay[1]);
-            }
-            else {
-                msg = l[8629].replace("%1", namesDisplay[0]);
-            }
-
-            typingElement = <div className="typing-block">
-                <div className="typing-text">{msg}</div>
-                <div className="typing-bounce">
-                    <div className="typing-bounce1"></div>
-                    <div className="typing-bounce2"></div>
-                    <div className="typing-bounce3"></div>
+            return (
+                <div
+                    ref={this.domRef}
+                    className="typing-block">
+                    <div className="typing-text">
+                        {areMultipleUsersTyping ?
+                            l[8872]
+                                .replace("%1", namesDisplay[0])
+                                .replace("%2", namesDisplay[1]) :
+                            l[8629].replace("%1", namesDisplay[0])
+                        }
+                    </div>
+                    <div className="typing-bounce">
+                        <div className="typing-bounce1" />
+                        <div className="typing-bounce2" />
+                        <div className="typing-bounce3" />
+                    </div>
                 </div>
-            </div>;
+            );
         }
 
-        return typingElement;
+        return null;
     }
-
-};
-
-export {
-    WhosTyping
-};
+}

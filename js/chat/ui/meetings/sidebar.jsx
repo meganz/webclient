@@ -19,7 +19,7 @@ const inviteAllowed = chatRoom => {
 };
 
 export default class Sidebar extends MegaRenderMixin {
-    containerRef = React.createRef();
+    domRef = React.createRef();
     historyPanel = null;
 
     renderHead = ({ title, children }) => {
@@ -81,7 +81,7 @@ export default class Sidebar extends MegaRenderMixin {
                     className="in-call"
                     onDeleteClicked={onDeleteMessage}
                 />
-                <ComposedTextArea chatRoom={chatRoom} parent={this} containerRef={this.containerRef} />
+                <ComposedTextArea chatRoom={chatRoom} parent={this} containerRef={this.domRef} />
             </>
         );
     };
@@ -96,7 +96,7 @@ export default class Sidebar extends MegaRenderMixin {
         return (
             <div className="sidebar-wrapper theme-dark-forced">
                 <div
-                    ref={this.containerRef}
+                    ref={this.domRef}
                     className={`
                         sidebar
                         ${view === VIEW.CHAT ? 'chat-opened' : 'theme-dark-forced'}

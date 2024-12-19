@@ -10,6 +10,7 @@ const MAX_STREAMS_PER_PAGE = 10;
 const SIMPLE_TIP = { position: 'top', offset: 5, className: 'theme-dark-forced' };
 
 export default class ParticipantsBlock extends MegaRenderMixin {
+    domRef = React.createRef();
     nodeMenuRef = React.createRef();
     dupNodeMenuRef = React.createRef();
 
@@ -226,7 +227,9 @@ export default class ParticipantsBlock extends MegaRenderMixin {
 
             if (sources.length <= (floatDetached ? MAX_STREAMS_PER_PAGE : MAX_STREAMS_PER_PAGE - 1)) {
                 return (
-                    <div className="stream-participants-block theme-dark-forced">
+                    <div
+                        ref={this.domRef}
+                        className="stream-participants-block theme-dark-forced">
                         <div className="participants-container">
                             <div
                                 className={`
@@ -252,7 +255,9 @@ export default class ParticipantsBlock extends MegaRenderMixin {
             const chunks = chunkNodes(sources, MAX_STREAMS_PER_PAGE);
 
             return (
-                <div className="carousel">
+                <div
+                    ref={this.domRef}
+                    className="carousel">
                     <div className="carousel-container" onWheel={(evt) => this.onScroll(chunks, evt)}>
                         <div className="stream-participants-block theme-dark-forced">
                             <div className="participants-container">

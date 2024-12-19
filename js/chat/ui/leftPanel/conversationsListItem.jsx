@@ -4,6 +4,7 @@ import utils, { OFlowParsedHTML, ParsedHTML } from '../../../ui/utils.jsx';
 import { Avatar, ContactPresence } from '../contacts.jsx';
 
 export default class ConversationsListItem extends MegaRenderMixin {
+    domRef = React.createRef();
 
     state = {
         isLoading: true,
@@ -243,6 +244,7 @@ export default class ConversationsListItem extends MegaRenderMixin {
 
         return (
             <li
+                ref={this.domRef}
                 id={id}
                 className={`
                     ${classString}

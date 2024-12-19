@@ -7,6 +7,7 @@ import SentRequests from './sentRequests.jsx';
 import ContactProfile from './contactProfile.jsx';
 
 export default class ContactsPanel extends MegaRenderMixin {
+    domRef = React.createRef();
     requestReceivedListener = null;
 
     static EVENTS = {
@@ -155,7 +156,9 @@ export default class ContactsPanel extends MegaRenderMixin {
         const { receivedRequestsCount } = state;
 
         return (
-            <div className="contacts-panel">
+            <div
+                ref={this.domRef}
+                className="contacts-panel">
                 <Navigation
                     view={view}
                     contacts={this.props.contacts}

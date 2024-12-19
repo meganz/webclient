@@ -388,6 +388,8 @@ export class ContactVerified extends MegaRenderMixin {
 }
 
 export class ContactPresence extends MegaRenderMixin {
+    domRef = React.createRef();
+
     static defaultProps = {
         manualDataChangeTracking: true,
         skipQueuedUpdatesOnResize: true
@@ -406,6 +408,7 @@ export class ContactPresence extends MegaRenderMixin {
 
         return (
             <div
+                ref={this.domRef}
                 className={`
                     user-card-presence
                     ${megaChat.userPresenceToCssClass(contact.presence)}
@@ -479,17 +482,22 @@ export class MembersAmount extends ContactAwareComponent {
 }
 
 export class ContactFingerprint extends MegaRenderMixin {
+    domRef = React.createRef();
+
     static defaultProps = {
         'manualDataChangeTracking': true,
         'skipQueuedUpdatesOnResize': true
-    }
+    };
+
     attachRerenderCallbacks() {
         this.addDataStructListenerForProperties(this.props.contact, [
             'fingerprint'
         ]);
     }
+
     render() {
-        var contact = this.props.contact;
+        const { contact, className } = this.props;
+
         if (!contact || !contact.u || is_chatlink) {
             return null;
         }
@@ -525,22 +533,24 @@ export class ContactFingerprint extends MegaRenderMixin {
             }
         }
 
-        var fingerprintCode = null;
-        if (infoBlocks.length > 0) {
-            fingerprintCode = <div className={`dropdown-fingerprint ${this.props.className || ''}`}>
-                <div className="contact-fingerprint-title">
-                    <span>{l[6872]}</span>
-                </div>
-                <div className="contact-fingerprint-txt selectable-txt">
-                    {infoBlocks}
-                </div>
-                {verifyButton}
-            </div>;
-        }
-
-        return fingerprintCode;
+        return (
+            infoBlocks.length ?
+                <div
+                    ref={this.domRef}
+                    className={`
+                        dropdown-fingerprint
+                        ${className || ''}
+                    `}>
+                    <div className="contact-fingerprint-title">
+                        <span>{l[6872]}</span>
+                    </div>
+                    <div className="contact-fingerprint-txt selectable-txt">{infoBlocks}</div>
+                    {verifyButton}
+                </div> :
+                null
+        );
     }
-};
+}
 
 
 export class Avatar extends ContactAwareComponent {
@@ -870,7 +880,7 @@ export class ContactItem extends ContactAwareComponent {
 
 export class ContactPickerWidget extends MegaRenderMixin {
     contactLinkListener = null;
-    containerRef = React.createRef();
+    domRef = React.createRef();
 
     static defaultProps = {
         multipleSelectedButtonLabel: false,
@@ -972,7 +982,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
 
     componentDidMount() {
         super.componentDidMount();
-        setContactLink(this.containerRef && this.containerRef.current);
+        setContactLink(this.domRef && this.domRef.current);
         this.contactLinkListener = mBroadcaster.addListener('contact:setContactLink', publicLink =>
             this.state.publicLink ? null : this.setState({ publicLink })
         );
@@ -991,9 +1001,9 @@ export class ContactPickerWidget extends MegaRenderMixin {
         }
     }
 
-    componentWillMount() {
-        if (super.componentWillMount) {
-            super.componentWillMount();
+    UNSAFE_componentWillMount() {
+        if (super.UNSAFE_componentWillMount) {
+            super.UNSAFE_componentWillMount();
         }
 
         var self = this;
@@ -1504,7 +1514,7 @@ export class ContactPickerWidget extends MegaRenderMixin {
         const searchPlaceholderMsg = mega.icu.format(l.search_contact_placeholder, totalContactsNum);
         return (
             <div
-                ref={this.containerRef}
+                ref={this.domRef}
                 className={`
                     ${this.props.className || ''}
                     ${extraClasses}
@@ -1595,34 +1605,36 @@ export class ContactPickerWidget extends MegaRenderMixin {
         );
     }
 }
-export class ContactPickerDialog extends MegaRenderMixin {
-    render() {
-        const {
-            active,
-            allowEmpty,
-            className,
-            exclude,
-            megaChat,
-            multiple,
-            multipleSelectedButtonLabel,
-            name,
-            nothingSelectedButtonLabel,
-            selectFooter,
-            singleSelectedButtonLabel,
-            inviteWarningLabel,
-            chatRoom,
-            onClose,
-            onSelectDone,
-        } = this.props;
-        return <ModalDialogs.ModalDialog
+
+export const ContactPickerDialog = ({
+    active,
+    allowEmpty,
+    className,
+    exclude,
+    megaChat,
+    multiple,
+    multipleSelectedButtonLabel,
+    name,
+    nothingSelectedButtonLabel,
+    selectFooter,
+    singleSelectedButtonLabel,
+    inviteWarningLabel,
+    chatRoom,
+    onClose,
+    onSelectDone,
+}) => {
+    return (
+        <ModalDialogs.ModalDialog
             name={name}
-            className={`${className} contact-picker-dialog contacts-search`}
-            onClose={onClose}
-        >
+            className={`
+                ${className}
+                contact-picker-dialog contacts-search
+            `}
+            onClose={onClose}>
             <ContactPickerWidget
                 active={active}
                 allowEmpty={allowEmpty}
-                className={'popup contacts-search small-footer'}
+                className="popup contacts-search small-footer"
                 contacts={M.u}
                 exclude={exclude}
                 megaChat={megaChat}
@@ -1636,6 +1648,6 @@ export class ContactPickerDialog extends MegaRenderMixin {
                 onClose={onClose}
                 onSelectDone={onSelectDone}
             />
-        </ModalDialogs.ModalDialog>;
-    }
-}
+        </ModalDialogs.ModalDialog>
+    );
+};

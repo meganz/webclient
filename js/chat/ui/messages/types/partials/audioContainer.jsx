@@ -1,8 +1,7 @@
 import React from 'react';
 import AudioPlayer from './audioPlayer.jsx';
-import { MegaRenderMixin } from '../../../../mixins.js';
 
-export default class AudioContainer extends MegaRenderMixin {
+export default class AudioContainer extends React.Component {
     state = {
         audioBlobUrl: null,
         loading: false
@@ -44,9 +43,6 @@ export default class AudioContainer extends MegaRenderMixin {
     }
 
     componentWillUnmount() {
-        if (super.componentWillUnmount) {
-            super.componentWillUnmount();
-        }
         URL.revokeObjectURL(this.state.audioBlobUrl);
     }
 

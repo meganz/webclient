@@ -1,9 +1,8 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../mixins';
 import { Dropdown, DropdownItem } from "../../../ui/dropdowns.jsx";
 import { Button } from "../../../ui/buttons.jsx";
 
-export default class FloatExtendedControls extends MegaRenderMixin {
+export default class FloatExtendedControls extends React.Component {
     static NAMESPACE = 'stream-extended-controls';
 
     isActive = type => {

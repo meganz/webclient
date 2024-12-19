@@ -93,9 +93,14 @@
             display: flex;
             margin: 0 15px;
 
+            .participant-wrapper {
+                display: flex;
+                width: 100%;
+            }
+
             .avatar-wrapper {
                 border-radius: 4px;
-                width: 24px;
+                max-width: 24px;
                 height: 24px;
                 margin: 7px 0 0 0;
 

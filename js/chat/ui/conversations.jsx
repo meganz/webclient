@@ -233,12 +233,15 @@ class ConversationsApp extends MegaRenderMixin {
 
     renderView(view) {
         this.setState({ view }, () => {
-            const { $chatTreePanePs, routingSection } = megaChat;
+            const { $chatTreePanePs, routingSection, currentlyOpenedChat } = megaChat;
             Object.values($chatTreePanePs).forEach(ref => ref.reinitialise?.());
             if (routingSection !== 'chat') {
                 loadSubPage('fm/chat');
             }
             megaChat.currentlyOpenedView = view;
+            if (!currentlyOpenedChat) {
+                megaChat.renderListing(null, false).catch(dump);
+            }
         });
     }
 
@@ -251,7 +254,6 @@ class ConversationsApp extends MegaRenderMixin {
         } = this.state;
         const isEmpty =
             chats &&
-            chats.every(c => c.isArchived()) &&
             routingSection === 'chat' &&
             !currentlyOpenedChat &&
             !is_chatlink;

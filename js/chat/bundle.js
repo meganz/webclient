@@ -2393,35 +2393,7 @@ Chat.prototype.renderListing = async function megaChatRenderListing(location, is
     room = valid(this.chats[this.lastOpenedChat]);
     if (!room) {
       let idx = 0;
-      const chats = [];
-      const meetings = [];
-      for (const room of Object.values(this.chats)) {
-        if (!room.isArchived()) {
-          if (room.isMeeting) {
-            meetings.push(room);
-          } else {
-            chats.push(room);
-          }
-        }
-      }
-      let rooms = chats;
-      let view;
-      if (this.currentlyOpenedView === conversations.Vw.MEETINGS) {
-        if (meetings.length) {
-          rooms = meetings;
-        } else {
-          view = conversations.Vw.CHATS;
-        }
-      } else if (!chats.length && meetings.length) {
-        rooms = meetings;
-        view = conversations.Vw.MEETINGS;
-      }
-      if (view) {
-        onIdle(() => {
-          this.trigger(conversations.qY.NAV_RENDER_VIEW, view);
-        });
-      }
-      rooms.sort(M.sortObjFn('lastActivity', -1));
+      const rooms = Object.values(this.chats).filter(r => this.currentlyOpenedView === null || r.isMeeting === !!this.currentlyOpenedView).sort(M.sortObjFn('lastActivity', -1));
       do {
         room = valid(rooms[idx]);
       } while (!room && ++idx < rooms.length);
@@ -13165,6 +13137,7 @@ class ConversationRightArea extends mixins.w9 {
     });
   }
   render() {
+    let _room$messagesBuff, _room$messagesBuff2, _room$messagesBuff3, _room$messagesBuff4, _room$messagesBuff5;
     const self = this;
     const {
       chatRoom: room,
@@ -13235,7 +13208,7 @@ class ConversationRightArea extends mixins.w9 {
     }
     const exParticipants = excludedParticipants(room);
     let dontShowTruncateButton = false;
-    if (!room.iAmOperator() || room.isReadOnly() || room.messagesBuff.messages.length === 0 || room.messagesBuff.messages.length === 1 && room.messagesBuff.messages.getItem(0).dialogType === "truncated") {
+    if (!room.iAmOperator() || room.isReadOnly() || ((_room$messagesBuff = room.messagesBuff) == null ? void 0 : _room$messagesBuff.messages.length) === 0 || ((_room$messagesBuff2 = room.messagesBuff) == null ? void 0 : _room$messagesBuff2.messages.length) === 1 && ((_room$messagesBuff3 = room.messagesBuff) == null ? void 0 : _room$messagesBuff3.messages.getItem(0).dialogType) === "truncated") {
       dontShowTruncateButton = true;
     }
     const renameButtonClass = `
@@ -13545,7 +13518,7 @@ class ConversationRightArea extends mixins.w9 {
       }
     })))), this.renderPushSettingsButton(), room.type === 'private' ? null : REaCt().createElement(REaCt().Fragment, null, room.scheduledMeeting && this.OptionsButton(waitingRoomButton), this.OptionsButton(openInviteButton), this.renderOptionsBanner(), AVseperator), REaCt().createElement(buttons.$, {
       className: "link-button light export-chat-button",
-      disabled: room.messagesBuff.messages.length === 0 || room.exportIo,
+      disabled: ((_room$messagesBuff4 = room.messagesBuff) == null ? void 0 : _room$messagesBuff4.messages.length) === 0 || room.exportIo,
       onClick: () => {
         room.exportToFile();
       }
@@ -13610,7 +13583,7 @@ class ConversationRightArea extends mixins.w9 {
       key: "sharedFiles",
       title: l[19796] || 'Shared Files',
       chatRoom: room,
-      sharedFiles: room.messagesBuff.sharedFiles
+      sharedFiles: (_room$messagesBuff5 = room.messagesBuff) == null ? void 0 : _room$messagesBuff5.sharedFiles
     }), room.type === "private" ? REaCt().createElement(IncSharesAccordionPanel, {
       key: "incomingShares",
       title: l[5542],
@@ -19772,13 +19745,17 @@ class ConversationsApp extends mixins.w9 {
     }, () => {
       const {
         $chatTreePanePs,
-        routingSection
+        routingSection,
+        currentlyOpenedChat
       } = megaChat;
       Object.values($chatTreePanePs).forEach(ref => ref.reinitialise == null ? void 0 : ref.reinitialise());
       if (routingSection !== 'chat') {
         loadSubPage('fm/chat');
       }
       megaChat.currentlyOpenedView = view;
+      if (!currentlyOpenedChat) {
+        megaChat.renderListing(null, false).catch(dump);
+      }
     });
   }
   render() {
@@ -19803,7 +19780,7 @@ class ConversationsApp extends mixins.w9 {
       freeCallEndedDialog,
       contactSelectorDialog
     } = this.state;
-    const isEmpty = chats && chats.every(c => c.isArchived()) && routingSection === 'chat' && !currentlyOpenedChat && !is_chatlink;
+    const isEmpty = chats && routingSection === 'chat' && !currentlyOpenedChat && !is_chatlink;
     const isLoading = !currentlyOpenedChat && megaChat.allChatsHadInitialLoadedHistory() === false && routingSection !== 'contacts';
     const rightPane = REaCt().createElement("div", {
       className: `

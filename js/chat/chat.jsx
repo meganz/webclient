@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import ConversationsUI, { EVENTS, VIEWS } from './ui/conversations.jsx';
+import ConversationsUI from './ui/conversations.jsx';
 
 require("./chatGlobalEventManager.jsx");
 // load chatRoom.jsx, so that its included in bundle.js, despite that ChatRoom is legacy ES ""class""
@@ -1619,40 +1619,9 @@ Chat.prototype.renderListing = async function megaChatRenderListing(location, is
 
         if (!room) {
             let idx = 0;
-            const chats = [];
-            const meetings = [];
-            // Filter rooms into chat/meetings sections in case the view is empty and another needs to be picked
-            for (const room of Object.values(this.chats)) {
-                if (!room.isArchived()) {
-                    if (room.isMeeting) {
-                        meetings.push(room);
-                    }
-                    else {
-                        chats.push(room);
-                    }
-                }
-            }
-            let rooms = chats;
-            let view;
-            if (this.currentlyOpenedView === VIEWS.MEETINGS) {
-                if (meetings.length) {
-                    rooms = meetings;
-                }
-                else {
-                    view = VIEWS.CHATS;
-                }
-            }
-            else if (!chats.length && meetings.length) {
-                rooms = meetings;
-                view = VIEWS.MEETINGS;
-            }
-            if (view) {
-                onIdle(() => {
-                    this.trigger(EVENTS.NAV_RENDER_VIEW, view);
-                });
-            }
-
-            rooms.sort(M.sortObjFn('lastActivity', -1));
+            const rooms = Object.values(this.chats)
+                .filter(r => this.currentlyOpenedView === null || r.isMeeting === !!this.currentlyOpenedView)
+                .sort(M.sortObjFn('lastActivity', -1));
 
             do {
                 room = valid(rooms[idx]);

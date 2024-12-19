@@ -4,7 +4,6 @@
     "format": "ownerChanged, time",
     "reject": [
         "chai",
-        "sinon",
-        "@types/react"
+        "sinon"
     ]
 }

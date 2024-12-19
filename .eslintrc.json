@@ -25,7 +25,7 @@
     "extends": [
         "eslint:recommended",
         "plugin:es/restrict-to-es2018",
-        "plugin:no-unsanitized/DOM",
+        "plugin:no-unsanitized/recommended-legacy",
         "plugin:sonarjs/recommended"
     ],
     "settings": {

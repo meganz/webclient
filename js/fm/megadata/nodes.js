@@ -108,11 +108,13 @@
         // node deletion traversal
         delNodeIterator.call(this, h, delInShareQ);
 
+        /**
         if (!isBeingMoved && delInShareQ.length) {
             const nodes = delInShareQ.map(uh => uh.substr(12));
 
             mega.keyMgr.enqueueShareRevocation(nodes);
         }
+        /**/
 
         if (fmdb && !ignoreDB) {
             // Perform DB deletions once we got acknowledge from API (action-packets)
@@ -3650,10 +3652,10 @@ lazy(MegaData.prototype, 'nodeShare', () => {
         M.su[s.u][h] = 1;
 
         // Restore Public link handle, we may do lose it from a move operation (d->t)
-        if (s.u === 'EXP' && !n.ph) {
+        if (s.u === 'EXP' && s.ph && (!n.ph || s.ph !== n.ph)) {
+            debug(`Updating public-handle for... ${n.h}, ${n.ph} -> ${s.ph}`, s, n);
             n.ph = s.ph;
             updnode = true;
-            debug('Restored lost public-handle...', s, n);
         }
 
         if (n.t) {
@@ -3744,12 +3746,15 @@ lazy(MegaData.prototype, 'nodeShare', () => {
  * Remove outbound share.
  * @param {String}  h    Node handle.
  * @param {String}  u    User handle to remove the associated share
- * @param {Boolean} okd  Whether API notified the node is no longer
- *                       shared with anybody else and therefore the
- *                       owner share key must be removed too.
  */
-MegaData.prototype.delNodeShare = function(h, u, okd) {
+MegaData.prototype.delNodeShare = async function(h, u) {
     "use strict";
+
+    if (!this.d[h]) {
+        console.assert(mega.infinity, 'just saying...');
+
+        await dbfetch.acquire(h);
+    }
 
     if (this.d[h] && typeof this.d[h].shares !== 'undefined') {
         var updnode;
@@ -3806,13 +3811,6 @@ MegaData.prototype.delNodeShare = function(h, u, okd) {
                 sharedUInode(h);
             }
         }
-    }
-
-    if (okd) {
-        // The node is no longer shared with anybody, ensure it's properly cleared..
-
-        // nb: ref to commit history.
-        console.error(`The 'okd' flag is discontinued.`);
     }
 };
 

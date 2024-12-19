@@ -1334,7 +1334,7 @@ function renameDialog() {
     "use strict";
 
     if ($.selected.length > 0) {
-        var n = M.d[$.selected[0]] || false;
+        const n = M.getNodeByHandle($.selected[0]);
         var ext = fileext(n.name);
         var $dialog = $('.mega-dialog.rename-dialog');
         var $input = $('input', $dialog);

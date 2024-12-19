@@ -160,7 +160,7 @@ lazy(mega.ui, 'searchbar', () => {
          * @return {undefined}
          */
         init() {
-            return this.refresh();
+            return this.refresh(true);
         },
 
         /**
@@ -206,7 +206,7 @@ lazy(mega.ui, 'searchbar', () => {
          *
          * @return {Promise} Returns a promise if logged in and things were fetched.
          */
-        async refresh() {
+        async refresh(onInit) {
             if (u_type > 0) {
                 await M.getPersistentData(`${u_handle}!ro`)
                     .then((recentlyOpened) => {
@@ -216,7 +216,7 @@ lazy(mega.ui, 'searchbar', () => {
 
                 // If we are in a public folder, we skip the node fetching
                 if (!pfid) {
-                    return this.fetchNodes();
+                    return Promise.resolve(onInit && mega.infinity && tSleep(9)).then(() => this.fetchNodes());
                 }
             }
         },

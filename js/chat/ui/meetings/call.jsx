@@ -1000,8 +1000,9 @@ export default class Call extends MegaRenderMixin {
     }
 
     renderRecordingControl = () => {
+        const { chatRoom, call, peers } = this.props;
         const { recorderCid, recordingTooltip, recordingActivePeer } = this.state;
-        const isModerator = Call.isModerator(this.props.chatRoom, u_handle);
+        const isModerator = Call.isModerator(chatRoom, u_handle);
         const $$CONTAINER = ({ className, onClick, children }) =>
             <div
                 className={`
@@ -1014,8 +1015,8 @@ export default class Call extends MegaRenderMixin {
             </div>;
 
         if (recorderCid) {
-            const isRecorder = isModerator && recorderCid === sfuClient.cid;
-            const recordingPeer = this.props.peers[recorderCid];
+            const isRecorder = isModerator && recorderCid === call.sfuClient.cid;
+            const recordingPeer = peers[recorderCid];
 
             return (
                 <$$CONTAINER
@@ -1027,7 +1028,7 @@ export default class Call extends MegaRenderMixin {
                             simpletip
                             ${isRecorder ? '' : 'plain-background'}
                         `}
-                        {...(recorderCid !== sfuClient.cid && {
+                        {...(recorderCid !== call.sfuClient.cid && {
                             'data-simpletip': l.host_recording.replace(
                                 '%NAME',
                                 nicknames.getNickname(recordingPeer) ||
@@ -1077,7 +1078,7 @@ export default class Call extends MegaRenderMixin {
             );
         }
 
-        const { isOnHold } = this.props.call;
+        const isOnHold = !!(call?.av & Av.onHold);
         return (
             isModerator &&
             <$$CONTAINER
@@ -1088,7 +1089,8 @@ export default class Call extends MegaRenderMixin {
                         this.flagMap.safeCommit();
                     });
                     return (
-                        isOnHold || recorderCid && recorderCid !== sfuClient.cid ? null : this.handleRecordingToggle()
+                        isOnHold ||
+                        recorderCid && recorderCid !== call.sfuClient.cid ? null : this.handleRecordingToggle()
                     );
                 }}>
                 <Button

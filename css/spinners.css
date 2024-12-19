@@ -118,7 +118,7 @@
     .loading-info li::after {
         -webkit-animation: rotate 0.8s infinite linear;
         animation: rotate 0.8s infinite linear;
-        background: 0 -504px no-repeat url(../images/mega/loading-sprite.png);
+        background: -110px -176px no-repeat url(../loading-sprite_light.png);
         content: '\00a0';
         display: block;
         display: inline-block;
@@ -133,10 +133,10 @@
     .loading-info li.loaded::after {
         -webkit-animation: none;
         animation: none;
-        background-position: -29px -501px;
+        background-position: -149px -174px;
     }
-    .theme-dark .loading-info li.loaded::after {
-        filter: invert(1);
+    .theme-dark .loading-info li::after {
+        background-image: url(../loading-sprite_dark.png);
     }
     .loader-progressbar {
         background-color: var(--progress-bar-fill4);

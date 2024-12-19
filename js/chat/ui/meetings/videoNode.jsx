@@ -184,17 +184,19 @@ class VideoNode extends MegaRenderMixin {
     }
 
     renderContent() {
-        const source = this.source;
+        const { source, contRef } = this;
+
         if (this.props.isPresenterNode || (source.av & Av.Camera)) {
             return (
                 <div
-                    ref={this.contRef}
+                    ref={contRef}
                     className="video-node-holder video-node-loading"
                 />
             );
         }
         delete this._lastResizeHeight;
-        return <Avatar contact={M.u[source.userHandle]}/>;
+
+        return <Avatar contact={M.u[source.userHandle]} />;
     }
 
     getStatusIcon(icon, label) {

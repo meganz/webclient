@@ -2,6 +2,7 @@
 lazy(mega, 'fileRequestCommon', () => {
     'use strict';
 
+    const DEBUG = self.d > 1;
     const logger = new MegaLogger('common', null, MegaLogger.getLogger('FileRequest'));
     const treeClass = 'file-request-folder';
 
@@ -74,7 +75,7 @@ lazy(mega, 'fileRequestCommon', () => {
                 $tree.addClass(treeClass);
             }
 
-            if (d) {
+            if (DEBUG) {
                 logger.info(
                     'common.addFileRequestIcon - Added node icon',
                     nodeId,
@@ -198,7 +199,7 @@ lazy(mega, 'fileRequestCommon', () => {
         }
 
         removePuHandle(puHandleNodeHandle, puHandlePublicHandle) {
-            if (d) {
+            if (DEBUG) {
                 logger.info('Storage.removePuHandle', {
                     puHandleNodeHandle,
                     puHandlePublicHandle
@@ -224,7 +225,7 @@ lazy(mega, 'fileRequestCommon', () => {
         }
 
         addPuHandle(puHandleNodeHandle, puHandlePublicHandle, data, pagePublicHandle) {
-            if (d) {
+            if (DEBUG) {
                 logger.info('Storage.addPuHandle', {
                     puHandleNodeHandle,
                     puHandlePublicHandle
@@ -247,12 +248,12 @@ lazy(mega, 'fileRequestCommon', () => {
                 title = data.msg;
                 description = data.description;
 
-                if (d) {
+                if (DEBUG) {
                     logger.info('Storage.addPuHandle - with data', puHandleNodeHandle, puHandlePublicHandle);
                 }
             }
 
-            if (d) {
+            if (DEBUG) {
                 logger.info(
                     'Storage.addPuHandle - puf add',
                     puHandlePublicHandle,
@@ -415,7 +416,7 @@ lazy(mega, 'fileRequestCommon', () => {
             puPagePublicHandle,
             puHandleState
         ) {
-            if (d) {
+            if (DEBUG) {
                 logger.info('Storage.updatePuHandlePageId', {
                     puHandlePublicHandle,
                     puPagePublicHandle,
@@ -441,7 +442,7 @@ lazy(mega, 'fileRequestCommon', () => {
                 }
             );
 
-            if (d) {
+            if (DEBUG) {
                 logger.info('Storage.updatePuHandlePageId - Update puf db', {
                     puHandlePublicHandle,
                     currentPuHandleObject
@@ -452,7 +453,7 @@ lazy(mega, 'fileRequestCommon', () => {
         }
 
         addPuPage(puPageObject) {
-            if (d) {
+            if (DEBUG) {
                 logger.info('Storage.addPuPage - Add PUP', {
                     puPageObject
                 });
@@ -511,7 +512,7 @@ lazy(mega, 'fileRequestCommon', () => {
                 }
             );
 
-            if (d) {
+            if (DEBUG) {
                 logger.info('Storage.addPuPage - Save PUP Object', {
                     puPageObject,
                     puHandleObject
@@ -605,7 +606,7 @@ lazy(mega, 'fileRequestCommon', () => {
         }
 
         updatePuPage(puPagePublicHandle, title, description) {
-            if (d) {
+            if (DEBUG) {
                 logger.info('Storage.updatePuPage - Update PUP', {
                     puPagePublicHandle,
                     title,
@@ -645,7 +646,7 @@ lazy(mega, 'fileRequestCommon', () => {
                 true
             );
 
-            if (d) {
+            if (DEBUG) {
                 logger.info('Storage.addPuPage - Save PUP Object', {
                     puPageObject,
                     puPagePublicHandle
@@ -654,7 +655,7 @@ lazy(mega, 'fileRequestCommon', () => {
         }
 
         updatePuHandle(puHandleNodeHandle, title, description) {
-            if (d) {
+            if (DEBUG) {
                 logger.info('Storage.updatePuHandle - update PUH', {
                     puHandleNodeHandle,
                     title,
@@ -673,7 +674,7 @@ lazy(mega, 'fileRequestCommon', () => {
         }
 
         removePuPage(puPagePublicHandle, puHandlePublicHandle) {
-            if (d) {
+            if (DEBUG) {
                 logger.info('Storage.removePuPage - Remove PUP', {
                     puPagePublicHandle,
                     puHandlePublicHandle
@@ -699,7 +700,7 @@ lazy(mega, 'fileRequestCommon', () => {
         }
 
         removePuPageByNodeHandle(puHandleNodeHandle) {
-            if (d) {
+            if (DEBUG) {
                 logger.info('Storage.removePuPageByNodeHandle', {
                     puHandleNodeHandle
                 });
@@ -871,7 +872,7 @@ lazy(mega, 'fileRequestCommon', () => {
 
     class FileRequestActionHandler {
         processPublicUploadHandle(actionPacket) {
-            if (window.d) {
+            if (DEBUG) {
                 logger.info('Handler.processPublicUploadHandle - Handle puh', actionPacket);
             }
 

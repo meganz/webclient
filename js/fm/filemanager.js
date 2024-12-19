@@ -2376,13 +2376,14 @@ FileManager.prototype.initContextUI = function() {
         M.openFolder(`discovery/${target}`);
     });
 
-    $(`${c}.open-cloud-item, ${c}.open-in-location, ${c}.open-s4-item`)
-        .rebind('click.openItem', () => {
+    $(`${c}.open-cloud-item, ${c}.open-in-location, ${c}.open-s4-item`).rebind('click.openItem', () => {
 
         const node = M.d[$.selected[0]];
 
         // Incoming Shares section if shared folder doestn't have parent
-        const target = node.su && (!node.p || !M.d[node.p]) ? 'shares' : node.p;
+        const target = node.su && (!node.p || !M.d[node.p])
+            ? 'shares'
+            : node.h === M.BackupsId ? node.h : node.p;
 
         if (mega.gallery.sections[M.currentdirid]) {
             M.fmTabState.gallery.prev = M.currentdirid;

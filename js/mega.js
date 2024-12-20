@@ -1211,7 +1211,9 @@ scparser.$add('ipc', {
 
 scparser.$add('ph', (a) => {
     'use strict';
-
+    if (folderlink) {
+        return;
+    }
     // exported link
     processPH([a]);
 

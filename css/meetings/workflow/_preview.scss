@@ -91,6 +91,11 @@
             width: 70px;
             box-sizing: border-box;
             text-align: center;
+
+            .signal-issue-background {
+                top: -6px;
+                right: -14px;
+            }
         }
 
         button.preview-meeting-control {

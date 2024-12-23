@@ -2,7 +2,7 @@
     max-width: 310px;
     overflow: hidden;
 } 
-.account-profile {
+.pm-account-dialog .account-profile {
     margin-inline-end: 16px;
     margin-left: 0;
     width: 30px;
@@ -10,11 +10,11 @@
     border-radius: 100%;
     text-align: center;
 }
-.avatar-details {
+.pm-account-dialog .avatar-details {
     overflow: hidden;
     white-space: nowrap;
 }
-.avatar-details .pm-name.simpletip {
+.pm-account-dialog .avatar-details .pm-name.simpletip {
     font: var(--mobile-font-heading-h2);
     display: -webkit-box;
     white-space: normal;
@@ -24,45 +24,45 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.avatar-details .pm-email.simpletip {
+.pm-account-dialog .avatar-details .pm-email.simpletip {
     color: var(--mobile-text-secondary);
     overflow: hidden;
     text-overflow: ellipsis;
 }
-.avatar-details .pm-email.simpletip::after {
+.pm-account-dialog .avatar-details .pm-email.simpletip::after {
     content: '';
     display: block;
 }
-.account-profile div,
-.account-profile img {
+.pm-account-dialog .account-profile div,
+.pm-account-dialog .account-profile img {
     width: 30px;
     height: 30px;
     border-radius: 100%;
 }
-.account-profile div {
+.pm-account-dialog .account-profile div {
     box-sizing: border-box;
 }
-.avatar-header {
+.pm-account-dialog .avatar-header {
     display: flex;
     padding: 24px;
     box-sizing: border-box;
     align-items: center;
 }
-.horizontal-divider {
+.pm-account-dialog .horizontal-divider {
     width: 262px;
     border-top: 1px solid var(--mobile-border-strong);
     margin: 0 24px;
 }
-.nav-elem .avatar-wrapper {
-    height: 24px;
-    line-height: inherit;
-} 
-.avatar-menu.mega-component.context-menu.menu-container.overlay-wrap {
-    width: 312px;
-}
-.avatar-wrapper {
+.pm-account-dialog .avatar-wrapper {
     line-height: 28px;
 }
-.nav-elem.normal.link:hover span {
+.mega-component.avatar.nav-elem .avatar-wrapper {
+    height: 24px;
+    line-height: inherit;
+}
+.mega-component.avatar.nav-elem.normal.link:hover span {
     color: inherit;
+}
+.avatar-menu.mega-component.context-menu.menu-container.overlay-wrap {
+    width: 312px;
 }

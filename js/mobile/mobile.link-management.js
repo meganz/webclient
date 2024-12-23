@@ -7,17 +7,23 @@ mobile.linkManagement = {
      * Show the overlay
      * @param {String} nodeHandle A public or regular node handle
      */
-    showOverlay: function(nodeHandle) {
+    async showOverlay(nodeHandle) {
         'use strict';
 
         this.handle = nodeHandle;
         this.node = M.getNodeByHandle(this.handle);
+        const linkExists = !!this.node.ph;
+
+        if (!linkExists
+            && await mega.sensitives.passShareCheck(nodeHandle).catch(echo) !== mega.sensitives.SAFE_TO_SHARE) {
+            return; // User did not allow sensitive share, or there was an error
+        }
 
         this.currentPassword = '';
         this.pwdProtectedLink = '';
 
         var tmpFn = async() => {
-            if (!this.node.ph) {
+            if (!linkExists) {
                 loadingDialog.show();
                 await this.manageLink(false);
                 loadingDialog.hide();

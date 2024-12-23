@@ -2,7 +2,8 @@ class GalleryNodeBlock {
     constructor(node, mode = 'a') {
         this.node = node;
         this.el = document.createElement('a');
-        this.el.className = 'data-block-view';
+
+        this.el.className = `data-block-view ${mega.sensitives.isSensitive(node) ? ' is-sensitive' : ''}`;
         this.el.id = node.h;
 
         if (mode === 'a') {
@@ -1932,7 +1933,7 @@ class MegaTargetGallery extends MegaGallery {
             subs = subs.concat(Object.keys(M.c[handles[i]]));
         }
 
-        const rubTree = MegaGallery.handlesArrToObj(M.getTreeHandles(M.RubbishID));
+        const rubTree = array.to.object(M.getTreeHandles(M.RubbishID), true);
 
         subs = subs.filter(h => {
             const n = M.d[h];
@@ -1941,7 +1942,8 @@ class MegaTargetGallery extends MegaGallery {
                 && !rubTree[h]
                 && !rubTree[n.p]
                 && !n.fv
-                && mega.gallery.isGalleryNode(n);
+                && mega.gallery.isGalleryNode(n)
+                && mega.sensitives.shouldShowNode(n);
         }).sort(this.sortByMtime.bind(this));
 
         for (const h of subs) {
@@ -2036,40 +2038,40 @@ class MegaMediaTypeGallery extends MegaGallery {
 
         let nodes = [];
         const cameraTree = MegaGallery.getCameraHandles();
-        const rubTree = MegaGallery.handlesArrToObj(M.getTreeHandles(M.RubbishID));
+        const rubTree = array.to.object(M.getTreeHandles(M.RubbishID), true);
+        const sharesTree = array.to.object(M.getTreeHandles('shares'), true);
+
+        const nodeIsValid = n => n && !n.t
+            && !rubTree[n.p]
+            && !sharesTree[n.p]
+            && n.s > 0
+            && !n.fv
+            && this.typeFilter(n, cameraTree)
+            && (this.id !== 'favourites' || n.fav)
+            && mega.sensitives.shouldShowNode(n);
 
         if (MegaGallery.dbActionPassed) {
-            nodes = Object.values(M.d).filter((n) =>
-                n.fa
-                && !rubTree[n.p]
-                && n.s > 0
-                && this.typeFilter(n, cameraTree)
-            );
+            nodes = Object.values(M.d).filter(nodeIsValid);
         }
         else {
-            const handles = [];
+            const validHandles = [];
             const dbNodes = await MegaGallery.dbAction()
                 .catch(() => { // Fetching all available nodes in case of DB failure
                     console.warn('Local DB failed. Fetching existing FM nodes.');
                     return Object.values(M.d);
                 });
 
-            for (let i = 0; i < dbNodes.length; i++) {
-                const n = dbNodes[i];
+            const dbHandles = dbNodes.map(({ h }) => h);
+            await dbfetch.geta(dbHandles).catch(nop);
 
-                if (!n.fa || !n.s || rubTree[n.p]) {
-                    continue;
-                }
+            for (let i = 0; i < dbHandles.length; i++) {
+                const n = M.d[dbHandles[i]];
 
-                handles.push(n.p);
-
-                if (this.typeFilter(n, cameraTree)) {
+                if (nodeIsValid(n)) {
+                    validHandles.push(n.p);
                     nodes.push(n);
-                    this.updNode[n.h] = n;
                 }
             }
-
-            await dbfetch.geta(handles).catch(nop);
 
             MegaGallery.dbActionPassed = true;
 
@@ -2077,7 +2079,7 @@ class MegaMediaTypeGallery extends MegaGallery {
 
             // Initializing albums here for the performace's sake
             if (mega.gallery.albums.awaitingDbAction) {
-                mega.gallery.albums.init();
+                mega.gallery.albums.init(validHandles);
             }
         }
 
@@ -2093,16 +2095,10 @@ class MegaMediaTypeGallery extends MegaGallery {
             return;
         }
 
-        const sharesTree = M.getTreeHandles('shares');
-
         for (var i = 0; i < nodes.length; i++) {
             var n = nodes[i];
 
-            if (this.nodes[n.h] || n.t || sharesTree.includes(n.p) || this.id === 'favourites' && !n.fav) {
-                continue;
-            }
-
-            if (!n.fv) {
+            if (!this.nodes[n.h]) {
                 this.nodes[n.h] = this.setGroup(n)[0];
             }
         }
@@ -2119,10 +2115,10 @@ class MegaMediaTypeGallery extends MegaGallery {
         const cameraTree = MegaGallery.getCameraHandles();
 
         if (!n.t && this.typeFilter(n, cameraTree)) {
-            const ignoreHandles = MegaGallery.handlesArrToObj([
-                ...M.getTreeHandles('shares'),
-                ...M.getTreeHandles(M.RubbishID)
-            ]);
+            const ignoreHandles = array.to.object(
+                [...M.getTreeHandles('shares'), ...M.getTreeHandles(M.RubbishID)],
+                true
+            );
             let toGallery = !ignoreHandles[n.p];
 
             if (this.id === 'favourites') {
@@ -2224,10 +2220,10 @@ mega.gallery.fillMainView = (list, mapper) => {
     console.assert(M.v.length === length, 'check this... filtered invalid entries.');
 };
 
-mega.gallery.handleNodeRemoval = (n) => {
+mega.gallery.handleNodeRemoval = tryCatch((n) => {
     'use strict';
 
-    if (M.isAlbumsPage()) {
+    if (M.albums) {
         mega.gallery.albums.onCDNodeRemove(n);
         mega.gallery.nodeUpdated = true;
     }
@@ -2239,7 +2235,7 @@ mega.gallery.handleNodeRemoval = (n) => {
         mega.gallery.nodeUpdated = true;
         mega.gallery.albumsRendered = false;
     }
-};
+});
 
 /**
  * Checking if the file is even available for the gallery
@@ -2280,8 +2276,10 @@ mega.gallery.canShowAddToAlbum = () => {
 mega.gallery.setShimmering = (el) => {
     'use strict';
 
+    const img = el.querySelector('img');
+
     // Image is already loaded
-    if (el.style.backgroundImage) {
+    if (img && img.complete) {
         return;
     }
 
@@ -2410,6 +2408,23 @@ mega.gallery.checkEveryGalleryDelete = h => {
         if (mega.gallery[key]) {
             mega.gallery[key].removeNodeByHandle(h);
         }
+    }
+};
+
+mega.gallery.handleNodeUpdate = (n) => {
+    'use strict';
+
+    if (M.gallery) {
+        tryCatch(() => mega.gallery.checkEveryGalleryUpdate(n))();
+        tryCatch(() => mega.gallery.albums.onCDNodeUpdate(n))();
+    }
+    else if (M.albums) {
+        tryCatch(() => mega.gallery.albums.onCDNodeUpdate(n))();
+        mega.gallery.nodeUpdated = true;
+    }
+    else {
+        mega.gallery.nodeUpdated = true;
+        mega.gallery.albumsRendered = false;
     }
 };
 
@@ -2748,9 +2763,8 @@ mega.gallery.updateButtonsStates = async(elements, galleryBtn) => {
         images: true,
         videos: true
     };
-    const { getItem } = await mega.gallery.prefs.init();
 
-    const res = getItem('web.locationPref');
+    const res = await mega.ccPrefs.getItem('web.locationPref');
 
     if (!res || typeof res !== 'object' || !elements[0].querySelector) {
         return;
@@ -2808,10 +2822,11 @@ async function galleryUI(id) {
 
     M.onTreeUIOpen(M.currentdirid);
 
-    if (pfid || M.gallery && !M.isGalleryPage() && !M.isAlbumsPage()) {
-        if (window.pfcol) {
-            return mega.gallery.albums.initPublicAlbum();
-        }
+    if (window.pfcol) {
+        return mega.gallery.albums.initPublicAlbum();
+    }
+
+    if (pfid || M.gallery && !M.albums && !M.isGalleryPage()) {
         id = !id || typeof id !== 'string' ? M.currentdirid : id;
         $('.view-links', '.gallery-tabs-bl').removeClass('hidden');
     }
@@ -3144,18 +3159,6 @@ MegaGallery.dbAction = async(p) => {
     throw new Error('FMDB Unavailable.');
 };
 
-MegaGallery.handlesArrToObj = (array) => {
-    'use strict';
-
-    const obj = Object.create(null);
-
-    for (let i = 0; i < array.length; i++) {
-        obj[array[i]] = true;
-    }
-
-    return obj;
-};
-
 lazy(mega.gallery, 'dbLoading', () => {
     'use strict';
 
@@ -3459,159 +3462,4 @@ lazy(mega.gallery, 'reporter', () => {
             }
         }
     };
-});
-
-lazy(mega.gallery, 'prefs', () => {
-    'use strict';
-
-    const prefKey = 'ccPref';
-    let data = {};
-
-    const saveUserAttribute = async() => {
-        const res = await Promise.resolve(mega.attr.get(u_attr.u, prefKey, false, true)).catch(dump);
-
-        if (res && res.cc && typeof res.cc === 'string') {
-            tryCatch(() => {
-                const tmp = JSON.parse(res.cc);
-                const tmpKeys = Object.keys(tmp);
-
-                for (let i = 0; i < tmpKeys.length; i++) {
-                    const key = tmpKeys[i];
-
-                    if (key === 'web') {
-                        continue;
-                    }
-
-                    data[key] = tmp[key];
-                }
-            })();
-        }
-
-        mega.attr.set(prefKey, { cc: JSON.stringify(data) }, false, true).catch(dump);
-    };
-
-    const p = {
-        init: async() => {
-            if (!u_attr) {
-                dump('Gallery preferences are disabled for guests...');
-                return;
-            }
-
-            if (p.getItem) {
-                return p;
-            }
-
-            if (!p.isInitializing) {
-                p.isInitializing = Promise.resolve(mega.attr.get(u_attr.u, prefKey, false, true)).catch(dump);
-
-                p.isInitializing
-                    .then((res) => {
-                        if (res && res.cc && typeof res.cc === 'string') {
-                            tryCatch(() => {
-                                data = JSON.parse(res.cc);
-                            })();
-                        }
-                    })
-                    .finally(() => {
-                        if (p.isInitializing) {
-                            delete p.isInitializing;
-                        }
-                    });
-            }
-
-            await p.isInitializing;
-
-            if (!p.getItem) {
-                /**
-                 * Getting the value by traversing through the dotted key
-                 * @param {String|String[]} keys Key(s) to use. Format is 'root.childKey1.childKey2...'
-                 * @param {Object.<String, any>} d Data to traverse through recursively
-                 * @returns {any}
-                 */
-                p.getItem = (keys, d) => {
-                    if (typeof keys === 'string') {
-                        keys = keys.split('.');
-                    }
-
-                    if (!d) {
-                        d = data;
-                    }
-
-                    const key = keys.shift();
-
-                    return (keys.length && d[key]) ? p.getItem(keys, d[key]) : d[key];
-                };
-
-                /**
-                 * Removing the value by traversing through the dotted key
-                 * @param {String|String[]} keys Key(s) to use. Format is 'root.childKey1.childKey2...'
-                 * @param {Object.<String, any>} d Data to traverse through recursively
-                 * @returns {void}
-                 */
-                p.removeItem = (keys, d) => {
-                    if (typeof keys === 'string') {
-                        keys = keys.split('.');
-                    }
-
-                    if (!d) {
-                        d = data;
-                    }
-
-                    const key = keys.shift();
-
-                    if (!d[key]) {
-                        saveUserAttribute();
-                        return;
-                    }
-
-                    if (keys.length) {
-                        p.removeItem(keys, d[key]);
-                    }
-                    else {
-                        delete d[key];
-                        saveUserAttribute();
-                    }
-                };
-
-                /**
-                 * Updating the value by traversing through the dotted key
-                 * @param {String|String[]} keys Key(s) to use. Format is 'root.childKey1.childKey2...'
-                 * @param {any} value Value to set
-                 * @param {Object.<String, any>} d Data to traverse through recursively
-                 * @returns {void}
-                 */
-                p.setItem = (keys, value, d) => {
-                    if (typeof keys === 'string') {
-                        keys = keys.split('.');
-                    }
-
-                    if (!d) {
-                        d = data;
-                    }
-
-                    const key = keys.shift();
-
-                    if (!d[key]) {
-                        d[key] = {};
-                    }
-
-                    if (!keys.length) {
-                        d[key] = value;
-                        saveUserAttribute();
-                        return;
-                    }
-
-                    if (typeof d[key] !== 'object') {
-                        d[key] = {};
-                    }
-
-                    p.setItem(keys, value, d[key]);
-                };
-            }
-
-            return p;
-        }
-    };
-
-    return p;
 });

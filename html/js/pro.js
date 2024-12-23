@@ -396,6 +396,10 @@ var pro = {
             if (pro.lastPaymentProviderId === bitcoinDialog.gatewayId) {
                 loadSubPage('fm/account/plan');
             }
+
+            if (actionPacket.p) {
+                mega.sensitives.onPlanUpgrade(a.p || 0);
+            }
         }
     },
 

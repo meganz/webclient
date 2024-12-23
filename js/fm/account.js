@@ -2455,6 +2455,9 @@ accountUI.fileManagement = {
         // Hide Recents
         this.hideRecents.render();
 
+        // Show sensitive nodes
+        this.showSen.render();
+
         // Drag and Drop
         this.dragAndDrop.render();
 
@@ -2773,6 +2776,29 @@ accountUI.fileManagement = {
                         mega.config.setn('showRecents', val);
                     }
                 });
+        }
+    },
+
+    showSen: {
+        render() {
+            'use strict';
+
+            if (mega.sensitives.featureEnabled) {
+                $('#show-hidden', accountUI.$contentBlock).parent().removeClass('hidden');
+                accountUI.inputs.switch.init(
+                    '#show-hidden',
+                    $('#show-hidden', accountUI.$contentBlock).parent(),
+                    mega.config.get('showSen'),
+                    (val) => {
+                        val = val && 1 || undefined;
+
+                        mega.config.setn('showSen', val);
+                        mega.sensitives.onConfigChange(val);
+                    });
+            }
+            else {
+                $('#show-hidden', accountUI.$contentBlock).parent().addClass('hidden');
+            }
         }
     },
 

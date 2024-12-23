@@ -2178,6 +2178,19 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
 .dialog-input-title-ontop:not(.birth).active input::placeholder{
    opacity: 0;
 }
+.sen-pro-only {
+    border: 1px solid var(--progress-bar-fill2);
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    color: var(--progress-bar-fill2);
+    font: var(--text-body2);
+    line-height: 0.5rem;
+    margin: 0;
+}
+.mobile .sen-pro-only {
+    position: absolute;
+    right: 0.25rem;
+}
 .payment-success-cloak {
     position: fixed;
     top: 0;
@@ -2831,7 +2844,7 @@ body.mobile .redeem-promo-page .mega-input.title-ontop {
     .pricing-page.medium-txt {
         font-size: 14px;
         line-height: 24px;
-        color: #3737337;
+        color: #373737;
     }
     .pricing-page.top-small-txt {
         font-size: 14px;

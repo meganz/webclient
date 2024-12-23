@@ -127,9 +127,7 @@ class GalleryTitleControl extends MComponent {
             }
         }
 
-        mega.gallery.prefs.init().then(({ setItem }) => {
-            setItem(this.locationPrefKey, location);
-        });
+        mega.ccPrefs.setItem(this.locationPrefKey, location).catch(tell);
     }
 
     clearLocationPreference() {
@@ -137,9 +135,7 @@ class GalleryTitleControl extends MComponent {
             delete this.rootBtn.dataset.locationPref;
         }
 
-        mega.gallery.prefs.init().then(({ removeItem }) => {
-            removeItem(this.locationPrefKey);
-        });
+        mega.ccPrefs.removeItem(this.locationPrefKey).catch(dump);
     }
 
     /**
@@ -248,10 +244,10 @@ class GalleryTitleControl extends MComponent {
                         passive: true
                     });
 
-                    mega.gallery.prefs.init().then(({ getItem }) => {
-                        const location = getItem(this.locationPrefKey);
-                        checkbox.checked = typeof(location || null) === 'string';
-                    });
+                    mega.ccPrefs.getItem(this.locationPrefKey)
+                        .then((location) => {
+                            checkbox.checked = typeof location === 'string';
+                        });
 
                     const onChange = (status) => {
                         checkbox.disabled = true;

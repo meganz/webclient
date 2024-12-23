@@ -89,6 +89,7 @@ body,
                 --text-color-black-high: rgba(51, 51, 51, 1);
                 --text-color-black-medium: rgba(51, 51, 51, 0.7);
                 --text-color-black-low: rgba(51, 51, 51, 0.4);
+                --text-color-black-medium-sensitive: rgba(51, 51, 51, 0.35);
 
             /* white */
 
@@ -96,6 +97,7 @@ body,
                 --text-color-white-high: rgba(255, 255, 255, 1);
                 --text-color-white-medium: rgba(255, 255, 255, 0.7);
                 --text-color-white-low: rgba(255, 255, 255, 0.4);
+                --text-color-white-medium-sensitive: rgba(255, 255, 255, 0.35);
 
             /* blue */
                 --text-color-blue: rgba(43, 166, 222, 1);
@@ -245,6 +247,7 @@ html .theme-light-forced {
         --text-color-success: rgba(0, 191, 165, 1);
         --text-color-warning: rgba(255, 153, 36, 1);
         --text-color-error: rgba(253, 62, 56, 1);
+        --text-color-medium-sensitive: var(--text-color-black-medium-sensitive);
 
     /* button */
 
@@ -490,6 +493,7 @@ html .theme-dark-forced {
         --text-color-success: rgba(90, 254, 232, 1);
         --text-color-warning: rgba(254, 195, 90, 1);
         --text-color-error: rgba(255, 126, 121, 1);
+        --text-color-medium-sensitive: var(--text-color-white-medium-sensitive);
 
     /* button */
 

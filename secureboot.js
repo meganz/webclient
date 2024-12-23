@@ -2263,8 +2263,14 @@ else if (!browserUpdate) {
     jsl.push({f:'js/utils/webgl.js', n: 'webgl_js', j:1});
     jsl.push({f:'js/utils/subtitles.js', n: 'subtitles_js', j: 1});
 
+    // Content consumption settings wrapper
+    jsl.push({f:'js/utils/cc-prefs.js', n: 'cc_prefs_js', j:1});
+
     // Sets and elements
     jsl.push({f:'js/utils/sets.js', n: 'fm_sets_js', j:1});
+
+    // Sensitive (aka. Hidden or Lock) nodes
+    jsl.push({f:'js/utils/sensitives.js', n: 'fm_sensitives_js', j:1});
 
     jsl.push({f:'js/vendor/dexie.js', n: 'dexie_js', j:1,w:5});
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});

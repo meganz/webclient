@@ -60,6 +60,9 @@ export default class GenericTable extends GenericNodePropsComponent {
     render() {
         let {node, index, listAdapterOpts, className, keyProp} = this.props;
 
+        // 1 - to hide, 2 - to show with opacity
+        const toApplySensitive = !!mega.sensitives.isSensitive(node) && (mega.sensitives.showGlobally ? 1 : 2);
+
         let columns = [];
         for (let i = 0; i < listAdapterOpts.columns.length; i++) {
             let customColumn = listAdapterOpts.columns[i];
@@ -95,7 +98,8 @@ export default class GenericTable extends GenericNodePropsComponent {
             "node_" + node[keyProp] + " " +
             (className && className(node) || "") + " " +
             (listClassName && listClassName(node) || "") + " " +
-            this.nodeProps?.classNames.join(" ")
+            this.nodeProps?.classNames.join(" ") +
+            (toApplySensitive ? (toApplySensitive === 1 ? ' is-sensitive' : ' hidden-as-sensitive') : '')
         }
         id={node[keyProp]}
         onContextMenu={(ev) => {

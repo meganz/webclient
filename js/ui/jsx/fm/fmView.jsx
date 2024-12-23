@@ -121,6 +121,7 @@ export default class FMView extends MegaRenderMixin {
         var entries = [];
 
         const minSearchLength = self.props.minSearchLength || 3;
+        const showSen = mega.sensitives.showGlobally;
 
         if (
             self.props.currentlyViewedEntry === "search" &&
@@ -130,7 +131,12 @@ export default class FMView extends MegaRenderMixin {
             M.getFilterBy(M.getFilterBySearchFn(self.props.searchValue))
                 .forEach(function(n) {
                     // skip contacts and invalid data.
-                    if (!n.h || n.h.length === 11 || n.fv) {
+                    if (
+                        !n.h
+                        || n.h.length === 11
+                        || n.fv
+                        || (!showSen && mega.sensitives.isSensitive(n))
+                    ) {
                         return;
                     }
                     if (self.props.customFilterFn && !self.props.customFilterFn(n)) {
@@ -146,6 +152,9 @@ export default class FMView extends MegaRenderMixin {
                 || self.props.dataSource || {}
             ).forEach((h) => {
                 if (this.dataSource[h]) {
+                    if (!showSen && mega.sensitives.isSensitive(this.dataSource[h])) {
+                        return;
+                    }
                     if (self.props.customFilterFn) {
                         if (self.props.customFilterFn(this.dataSource[h])) {
                             entries.push(this.dataSource[h]);

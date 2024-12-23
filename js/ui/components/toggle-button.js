@@ -67,6 +67,8 @@ class MegaToggleButton extends MegaComponent {
             subNode.role = options.role;
             subNode.id = options.id;
             subNode.disabled = options.disabled;
+            subNode.reversedValue = options.reversedValue | 0;
+            subNode.onChangeFunction = options.onChangeFunction;
             targetNode.appendChild(subNode);
 
             this.disabled = options.disabled || false;

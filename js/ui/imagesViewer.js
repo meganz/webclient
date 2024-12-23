@@ -276,8 +276,9 @@ var slideshowid;
         }
     }
 
-    function slideshow_favourite(n, $overlay) {
+    function slideshowNodeAttributes(n, $overlay) {
         var $favButton = $('.context-menu .favourite', $overlay);
+        const $senBtn = $('.context-menu .set-sensitive', $overlay);
         var root = M.getNodeRoot(n && n.h || false);
 
         if (!n
@@ -289,6 +290,7 @@ var slideshowid;
             || (M.getNodeByHandle(n.h) && !M.getNodeByHandle(n.h).u && M.getNodeRights(n.p) < 2)
         ) {
             $favButton.addClass('hidden');
+            $senBtn.addClass('hidden');
         }
         else {
             $favButton.removeClass('hidden');
@@ -330,6 +332,20 @@ var slideshowid;
             else {
                 $('span', $favButton).text(l[5871]);
                 $('i', $favButton).removeClass().addClass('sprite-fm-mono icon-favourite');
+            }
+
+            const sen = mega.sensitives.getSensitivityStatus([n.h]);
+            if (sen) {
+                $senBtn.removeClass('hidden');
+                const toHide = sen === 1;
+                mega.sensitives.applyMenuItemStyle($senBtn, toHide);
+
+                $senBtn.rebind('click.mediaviewer.sensitive_toggle', () => {
+                    mega.sensitives.toggleStatus([n.h], !$senBtn.hasClass('sensitive-added'));
+                });
+            }
+            else {
+                $senBtn.addClass('hidden');
             }
         }
     }
@@ -493,6 +509,7 @@ var slideshowid;
                     if ($getLinkBtn.hasClass('disabled')) {
                         return;
                     }
+
                     $getLinkBtn.addClass('disabled');
                     tSleep(3).then(() => $getLinkBtn.removeClass('disabled'));
 
@@ -1507,8 +1524,8 @@ var slideshowid;
                 });
             }
 
-            // Favourite Icon
-            slideshow_favourite(n, $overlay);
+            // Favourite and Sensitive icons
+            slideshowNodeAttributes(n, $overlay);
 
             // Remove Icon
             slideshow_remove(n, $overlay);
@@ -2603,5 +2620,6 @@ var slideshowid;
     global.slideshow_steps = slideshowsteps;
     global.previewsrc = previewsrc;
     global.previewimg = previewimg;
+    global.slideshowNodeAttributes = slideshowNodeAttributes;
 
 })(self);

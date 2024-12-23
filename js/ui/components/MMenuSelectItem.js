@@ -9,6 +9,7 @@ class MMenuSelectItem extends MComponent {
      * @param {String} props.rightIcon Icon on the right of the text
      * @param {String} props.additionalClasses Additional classes to add to the item along with global ones
      * @param {MMenuSelectItem} props.children Additional items to render when hovering above the item
+     * @param {Function} props.oncreate A callback to run when the item is created
      */
     constructor({
         label,
@@ -18,7 +19,8 @@ class MMenuSelectItem extends MComponent {
         leftIcon,
         rightIcon,
         additionalClasses,
-        children
+        children,
+        oncreate
     }) {
         super();
 
@@ -112,6 +114,10 @@ class MMenuSelectItem extends MComponent {
             this.subMenu.show(right + MContextMenu.offsetHoriz, y - 8, x - MContextMenu.offsetHoriz, bottom);
             this.el.classList.add('opened');
         });
+
+        if (typeof oncreate === 'function') {
+            oncreate(this, labelDiv);
+        }
     }
 
     buildElement() {

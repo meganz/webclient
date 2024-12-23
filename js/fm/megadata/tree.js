@@ -269,13 +269,15 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
                 node.classList.add('contains-folders');
             }
         }
+
         const tn = fmconfig.treenodes || Object.create(null);
         const dn = $.openedDialogNodes || Object.create(null);
 
         for (var idx = 0; idx < folders.length; idx++) {
             buildnode = false;
             curItemHandle = folders[idx].h;
-            containsc = this.tree[curItemHandle] || '';
+            containsc = this.tree[curItemHandle]
+                && Object.values(this.tree[curItemHandle]).some(mega.sensitives.shouldShowInTree) || '';
             name = folders[idx].name;
 
             if (folders[idx].t & M.IS_S4CRT) {
@@ -303,10 +305,13 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
                         node.classList.remove('contains-folders');
                     }
                 }
+
+                M.applySensitiveStatus(node, folders[idx]);
             }
             else {
                 node = this.tree$tmpl.cloneNode(true);
                 node.id = _li + curItemHandle;
+
                 if (_tf) {
                     node.classList.add('tree-item-on-filter-hidden');
                 }
@@ -334,6 +339,8 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
                 if (folders[idx].t & M.IS_LINKED) {
                     node.classList.add('linked');
                 }
+
+                M.applySensitiveStatus(node, folders[idx]);
 
                 var titleTooltip = [];
                 if (folders[idx].t & M.IS_TAKENDOWN) {
@@ -409,7 +416,6 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
                     }
                 }
             }
-
             if (_ts_l) {
                 node = document.getElementById(_li + curItemHandle);
                 if (node) {
@@ -1112,6 +1118,9 @@ MegaData.prototype.getTreeValue = function(n) {
     if (n.fav) {
         t |= M.IS_FAV;
     }
+    if (n.sen) {
+        t |= M.IS_SEN;
+    }
     if (M.su.EXP && M.su.EXP[n.h]) {
         t |= M.IS_LINKED;
     }
@@ -1507,5 +1516,27 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     if (d) {
         console.timeEnd('onTreeUIOpen');
         console.groupEnd();
+    }
+};
+
+/**
+ * @param {HTMLElement} domNode DOM Element to work with
+ * @param {Object} treeNode The node to work with
+ * @returns {void}
+ */
+MegaData.prototype.applySensitiveStatus = function(domNode, treeNode) {
+    'use strict';
+
+    if (!(treeNode.t & M.IS_SEN) || pfid) {
+        return;
+    }
+
+    if (mega.sensitives.showGlobally) {
+        domNode.classList.add('is-sensitive');
+        domNode.classList.remove('hidden-as-sensitive');
+    }
+    else {
+        domNode.classList.add('hidden-as-sensitive');
+        domNode.classList.remove('is-sensitive');
     }
 };

@@ -240,6 +240,16 @@
     background-color: var(--mobile-surface-node-icon-background);
 }
 
+/* Sensitive */
+a.is-sensitive .fm-item-img,
+a.is-sensitive .fm-item-name,
+a.is-sensitive .props span {
+    opacity: 0.5;
+}
+a.is-sensitive img {
+    filter: blur(1rem);
+}
+
 @media only screen and (min-width: 768px) {
     .grid-view .mega-node .fm-item-img i {
         --icon-size: 56px;

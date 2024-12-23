@@ -1296,17 +1296,27 @@
             if ($.dialog === 'onboardingDialog') {
                 closeDialog();
             }
-            M.safeShowDialog('copy', function() {
+
+            const openDialog = () => M.safeShowDialog('copy', () => {
                 if (typeof activeTab === 'function') {
                     onBeforeShown = activeTab;
                     activeTab = false;
                 }
+
                 if (typeof onBeforeShown === 'function') {
                     onBeforeShown($dialog);
                 }
+
                 handleOpenDialog(activeTab, M.RootID);
                 return $dialog;
             });
+
+            if (activeTab === 'conversations') {
+                mega.sensitives.passShareCheck($.selected).then(openDialog).catch(dump);
+            }
+            else {
+                openDialog();
+            }
         }
 
         return false;

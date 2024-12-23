@@ -1453,6 +1453,19 @@
             });
         };
 
+        uaPacketParserHandler['*!ccPref'] = (uh) => {
+
+            mega.attr.get(uh, "ccPref", false, true, (res, ctx) => {
+
+                u_attr[ctx.ua] = tlvstore.encrypt(res);
+
+                if (fminitialized && 'ccPrefs' in mega) {
+
+                    mega.ccPrefs.sync();
+                }
+            });
+        };
+
         uaPacketParserHandler['^!bak'] = (userHandle) => {
 
             mega.attr.get(userHandle, 'bak', -2, 1, (res, ctx) => {

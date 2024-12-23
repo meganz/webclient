@@ -43,9 +43,9 @@ class MegaMobileContextMenu extends MegaComponentGroup {
 
             this.addChild(key, tappableListItem);
 
-            tappableListItem.on('tap', () => {
+            tappableListItem.on('tap', (megaDataEvent, touchEvent) => {
                 this.sheet.hide();
-                item.onClick(this.handle);
+                item.onClick(this.handle, touchEvent);
 
                 return false;
             });
@@ -120,6 +120,14 @@ class MegaMobileContextMenu extends MegaComponentGroup {
         // download text
         if (items['.download-item']) {
             mega.ui.contextMenu.getChild('.download-item').text = node.t === 1 ? l[864] : l[58];
+        }
+
+        // Set sensitives
+        if (items['.add-sensitive-item']) {
+            const toHide = items['.add-sensitive-item'] === 1;
+            const {domNode} = mega.ui.contextMenu.getChild('.add-sensitive-item');
+
+            mega.sensitives.applyMenuItemStyle(domNode, toHide);
         }
 
         // This seem text editor context menu
@@ -571,6 +579,24 @@ mBroadcaster.once('boot_done', () => {
                     mobile.renameNode = new MobileNodeNameControl({type: 'rename'});
                 }
                 mobile.renameNode.show(nodeHandle);
+            }
+        },
+        '.add-sensitive-item': {
+            text: l.sen_hide,
+            icon: 'sprite-fm-mono icon-eye-hidden',
+            subMenu: false,
+            classNames: '',
+            onClick: (handle, event) => {
+                if (M.isInvalidUserStatus()) {
+                    return;
+                }
+
+                if (event.target.classList.contains('icon-help-circle-thin-outline')) {
+                    mega.sensitives.showOnboardingDialog(l.ok_button);
+                }
+                else {
+                    mega.sensitives.toggleStatus($.selected, !M.getNodeByHandle(handle).sen);
+                }
             }
         },
         '.add-star-item': {

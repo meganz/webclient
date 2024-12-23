@@ -70,3 +70,50 @@
     display: block;
     --mask-color: var(--icon-rest);
 }
+.is-sensitive,
+tr.is-sensitive td span.item-type-icon {
+    overflow: hidden;
+}
+.is-sensitive .file-block-title,
+.is-sensitive .block-view-file-type,
+.is-sensitive .item-type-icon-90,
+.is-sensitive .item-type-icon,
+.is-sensitive .dropdown-search-results-item-filename,
+tr.is-sensitive span.simpletip-breadcrumb,
+tr.is-sensitive span.tranfer-filetype-txt,
+tr.is-sensitive span.transfer-filetype-icon:not(.image),
+.fm-left-panel span.is-sensitive.nw-fm-tree-item,
+.fm-left-panel span.is-sensitive + ul span.nw-fm-tree-item,
+span.is-sensitive.dropdown,
+span.is-sensitive.dropdown-item,
+a.is-sensitive.fm-breadcrumbs,
+a.is-sensitive .dropdown-recently-opened-item-filename,
+a.is-sensitive .dropdown-search-results-item-location span,
+a.is-sensitive .dropdown-search-results-item-location,
+a.is-sensitive .dropdown-recently-opened-item-location,
+a.is-sensitive .dropdown-recently-opened-item-time {
+    opacity: 0.5;
+}
+a.is-sensitive img,
+div.is-sensitive img {
+    filter: blur(1rem);
+}
+.is-sensitive .dropdown-search-results-item-file-icon img {
+    filter: blur(2px);
+}
+tr.is-sensitive img,
+a.dropdown-recently-opened-item.is-sensitive img {
+    filter: blur(0.25rem);
+}
+tr.is-sensitive td.size,
+tr.is-sensitive td.type,
+tr.is-sensitive td.time,
+tr.is-sensitive td.playtime,
+tr.is-sensitive td.hd-versions {
+    color: var(--text-color-medium-sensitive);
+}
+span.hidden-as-sensitive,
+span.hidden-as-sensitive + ul,
+tr.hidden-as-sensitive {
+    display: none !important;
+}

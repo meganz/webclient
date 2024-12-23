@@ -130,6 +130,7 @@ MegaData.prototype.openSharingDialog = function(target) {
             }
         })
         .then(() => mega.keyMgr.setShareSnapshot(target))
+        .then(() => !M.getSharingUsers(target).length && mega.sensitives.passShareCheck(target))
         .then(() => M.safeShowDialog('share', showShareDlg))
         .catch(dump);
 };

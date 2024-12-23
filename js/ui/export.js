@@ -3028,7 +3028,11 @@ function logExportEvt(type, target) {
         $.itemExportEmbed = isEmbed;
         $.itemExport = nodesToProcess;
 
-        const openGetLinkDialog = openFn || (() => {
+        const openGetLinkDialog = openFn || (async() => {
+            if (($.itemExport.length > 1 || !M.getNodeShare($.itemExport[0]))
+                && await mega.sensitives.passShareCheck($.itemExport).catch(echo) !== mega.sensitives.SAFE_TO_SHARE) {
+                return;
+            }
 
             var exportLink = new mega.Share.ExportLink({
                 'showExportLinkDialog': true,
@@ -3210,6 +3214,11 @@ function logExportEvt(type, target) {
                 // Remove favourite (star)
                 M.favourite(nodeId, 0);
             }
+
+            if (M.getNodeByHandle(nodeId).sen) {
+                mega.sensitives.toggleStatus(nodeId, false);
+            }
+
             self.addTakenDownIcon(nodeId);
         }
         else {

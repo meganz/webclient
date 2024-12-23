@@ -1474,6 +1474,9 @@ scparser.$add('u', function(a) {
                 if (oldattr.fav !== n.fav) {
                     M.favouriteDomUpdate(n, n.fav);
                 }
+                if (oldattr.sen !== n.sen) {
+                    mega.sensitives.updateDom(n, n.sen);
+                }
                 if (oldattr.name !== n.name) {
                     M.onRenameUIUpdate(n.h, n.name);
                 }

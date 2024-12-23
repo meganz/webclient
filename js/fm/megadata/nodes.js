@@ -1924,18 +1924,7 @@ MegaData.prototype.nodeUpdated = function(n, ignoreDB) {
                 mega.fileTextEditor.clearCachedFileData(n.h);
             }
 
-            if (type === 'gallery' || this.gallery) {
-                tryCatch(() => mega.gallery.checkEveryGalleryUpdate(n))();
-                tryCatch(() => mega.gallery.albums.onCDNodeUpdate(n))();
-            }
-            else if (type === 'albums') {
-                tryCatch(() => mega.gallery.albums.onCDNodeUpdate(n))();
-                mega.gallery.nodeUpdated = true;
-            }
-            else {
-                mega.gallery.nodeUpdated = true;
-                mega.gallery.albumsRendered = false;
-            }
+            mega.gallery.handleNodeUpdate(n);
 
             // TODO: Improve the list rendering to only update each node if the action packet does not affect
             // list ordering.
@@ -2805,10 +2794,16 @@ MegaData.prototype.getCopyNodesSync = function fm_getcopynodesync(handles, names
             delete n.s4;
             delete n.lbl;
             delete n.fav;
+            delete n.sen;
         }
 
         // regardless to where the copy is remove rr
         delete n.rr;
+
+        // It is from incoming shares so need to clear sen attribute
+        if (sharer(n.h)) {
+            delete n.sen;
+        }
 
         // new node inherits all attributes
         nn.a = ab_to_base64(crypto_makeattr(n, nn));
@@ -2897,7 +2892,7 @@ MegaData.prototype.getRecentNodes = function(limit, until) {
             rubTree = rubFilter.tree;
             var nodes = Object.values(M.d)
                 .filter((n) => {
-                    return !n.t && n.ts > until && rubFilter(n);
+                    return !n.t && n.ts > until && rubFilter(n) && mega.sensitives.shouldShowNode(n);
                 });
 
             resolve(nodes, limit);
@@ -2936,7 +2931,8 @@ MegaData.prototype.getRecentNodes = function(limit, until) {
                 .then((nodes) => {
                     if (nodes.length) {
                         const sort = M.getSortByDateTimeFn();
-                        nodes = nodes.filter(n => !n.fv).sort((a, b) => sort(a, b, -1));
+                        nodes = nodes.filter(n => !n.fv && mega.sensitives.shouldShowNode(n))
+                            .sort((a, b) => sort(a, b, -1));
                         console.timeEnd("recents:collectNodes");
                         resolve(limit ? nodes.slice(0, limit) : nodes);
                         resolve = null;
@@ -4568,6 +4564,7 @@ MegaData.prototype.importFileLink = function importFileLink(ph, key, attr, srcNo
 
             // Remove original fav and lbl for new node.
             delete srcNode.fav;
+            delete srcNode.sen;
             delete srcNode.lbl;
 
             n.a = ab_to_base64(crypto_makeattr(srcNode));
@@ -4711,6 +4708,7 @@ MegaData.prototype.importFolderLinkNodes = function importFolderLinkNodes(nodes)
                         MegaDexie.create(u_handle)
                             .set(`import.${FLRootID}`, data)
                             .then(() => {
+                                resetSensitives();
                                 loadSubPage('fm');
                             })
                             .catch((ex) => {

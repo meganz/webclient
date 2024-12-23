@@ -29,19 +29,41 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
             const albumId = scope.getAlbumIdFromPath();
             const album = albums.store[albumId];
             const { filterFn, at, eIds, nodes } = album;
+            const { featureEnabled } = mega.sensitives;
             const options = [];
             let selectionsPreviewable = false;
+            let toApplySensitive = 2; // 0 - Disable, 1 - Hide, 2 - Unhide
 
             const isCoverChangeable = !filterFn
                 && selections.length === 1
                 && (!at.c || eIds[at.c] !== selections[0]);
             const onlyPlayableVideosSelected = selections.every((h) => !!is_video(M.d[h]));
 
-            for (let i = 0; i < selections.length; i++) {
-                if (scope.isPreviewable(M.d[selections[i]])) {
-                    selectionsPreviewable = true;
-                    break;
+            if (!mega.sensitives.isViewEnabled()
+                || selections.some((h) => !mega.sensitives.nodeCanBeSensitive(h))) {
+                toApplySensitive = 0;
+            }
+            else if (featureEnabled) {
+                let checksLeft = 2;
+
+                for (let i = 0; i < selections.length; i++) {
+                    if (!selectionsPreviewable && scope.isPreviewable(M.d[selections[i]])) {
+                        selectionsPreviewable = true;
+                        checksLeft--;
+                    }
+
+                    if (toApplySensitive !== 1 && !mega.sensitives.isSensitive(selections[i], false)) {
+                        toApplySensitive = 1;
+                    }
+
+                    // The rest of selections can be skipped, as all checks are passed
+                    if (checksLeft <= 0) {
+                        break;
+                    }
                 }
+            }
+            else {
+                toApplySensitive = 1;
             }
 
             if (onlyPlayableVideosSelected) {
@@ -114,6 +136,37 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                         }
                     }
                 });
+            }
+
+            if (toApplySensitive) {
+                if (toApplySensitive === 1) {
+                    options.push({
+                        label: l.sen_hide,
+                        icon: 'eye-hidden',
+                        click: () => {
+                            if (M.isInvalidUserStatus()) {
+                                return;
+                            }
+
+                            mega.sensitives.toggleStatus(selections, true);
+                        },
+                        oncreate: (item) => {
+                            mega.sensitives.applyProBadge($(item.el));
+                        }
+                    });
+                }
+                else {
+                    options.push({
+                        label: l.sen_unhide,
+                        icon: 'eye-reveal',
+                        click: () => {
+                            mega.sensitives.toggleStatus(selections, false);
+                        },
+                        oncreate: (item) => {
+                            mega.sensitives.applyProBadge($(item.el));
+                        }
+                    });
+                }
             }
 
             if (!filterFn) {
@@ -253,6 +306,7 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
 
             this._active = true;
             this._selected = false;
+            this.isSensitive = !!mega.sensitives.isSensitive(node);
 
             this.attachEvents(clickFn, dbclickFn, useMenu);
         }
@@ -304,6 +358,29 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
                 this.el.classList.remove('ui-selected');
                 this.el.removeChild(this.el.querySelector('i.icon-check-circle'));
                 this._selected = false;
+            }
+        }
+
+        get isSensitive() {
+            return this._sensitive;
+        }
+
+        /**
+         * @param {Boolean} status Sensitive status
+         * @returns {void}
+         */
+        set isSensitive(status) {
+            if (status === this._sensitive) {
+                return;
+            }
+
+            this._sensitive = status;
+
+            if (status) {
+                this.el.classList.add('is-sensitive');
+            }
+            else {
+                this.el.classList.remove('is-sensitive');
             }
         }
 
@@ -362,9 +439,19 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
         }
 
         setThumb(dataUrl) {
-            this.el.style.backgroundImage = `url('${dataUrl}')`;
+            let img = this.el.querySelector('img');
+
+            if (!img) {
+                img = document.createElement('img');
+                img.className = 'w-full h-full absolute';
+                this.el.appendChild(img);
+            }
+
+            img.src = dataUrl;
+
             this.el.style.backgroundColor = 'white';
             this.naturalSize = this.el.style.width;
+
             if (this.el.classList.contains('shimmer')) {
                 scope.unsetShimmering(this.el);
             }
@@ -1216,7 +1303,10 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
          * @returns {AlbumTimelineCell}
          */
         getCachedCell(node) {
-            if (!this.cellCache[node.h]) {
+            if (this.cellCache[node.h]) {
+                this.cellCache[node.h].isSensitive = !!mega.sensitives.isSensitive(node);
+            }
+            else {
                 this.cellCache[node.h] = new AlbumTimelineCell({
                     node,
                     clickFn: this.onNodeClick,
@@ -1432,6 +1522,16 @@ lazy(mega.gallery, 'AlbumTimeline', () => {
             }
 
             this.el.parentNode.prepend(this.zoomControls);
+        }
+
+        updateCell(node) {
+            const cell = this.cellCache[node.h];
+
+            if (!cell) {
+                return;
+            }
+
+            cell.isSensitive = !!mega.sensitives.isSensitive(node);
         }
 
         buildElement() {

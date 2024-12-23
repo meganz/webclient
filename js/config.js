@@ -116,7 +116,7 @@
             'cws', 'ctt', 'viewmode', 'dbDropOnLogout', 'dlThroughMEGAsync', 'sdss', 'tpp', 'ulddd',
             'cbvm', 'mgvm', 'uiviewmode', 'uisorting', 'uidateformat', 'skipsmsbanner', 'skipDelWarning', 'rsv0',
             'nowarnpl', 'zip64n', 'callemptytout', 'callinout', 'showHideChat', 'showRecents', 'nocallsup', 'cslrem',
-            'rsv2', 'noSubfolderMd', 'rwReinstate'
+            'showSen', 'noSubfolderMd', 'rwReinstate', 'rsv2', 'rsv3'
         ]
     });
     shrink.zero = new Set([...Object.keys(shrink.bitdef), 'xs1', 'xs2', 'xs3', 'xs4', 'xs5']);
@@ -557,6 +557,8 @@
             M.recentsRender.checkStatusChange();
         }
 
+        const sensitivesUpdated = mega.sensitives.onConfigChange(mega.config.get('showSen'));
+
         if (fmconfig.webtheme !== undefined) {
             mega.ui.setTheme(fmconfig.webtheme);
         }
@@ -579,18 +581,16 @@
         const sort = Object(fmconfig.sortmodes)[M.currentdirid];
 
         if (view !== undefined && M.viewmode !== view
+            || sensitivesUpdated
             || sort !== undefined && (sort.n !== M.sortmode.n || sort.d !== M.sortmode.d)) {
 
             M.openFolder(M.currentdirid, true);
         }
 
-        if (M.currentrootid === M.RootID) {
-            const tree = Object(fmconfig.treenodes);
+        if (sensitivesUpdated
+            || M.currentrootid === M.RootID && stringify(fmconfig.treenodes) !== M.treenodes) {
 
-            if (stringify(tree) !== M.treenodes) {
-
-                M.renderTree();
-            }
+            M.renderTree();
         }
     };
 

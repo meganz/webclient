@@ -2201,6 +2201,14 @@ FileManager.prototype.initContextUI = function() {
         M.favourite($.selected, newFavState);
     });
 
+    $(`${c}.add-sensitive-item`).rebind('click.sensitive_toggle', function() {
+        if (M.isInvalidUserStatus()) {
+            return;
+        }
+
+        mega.sensitives.toggleStatus($.selected, !this.classList.contains('sensitive-added'));
+    });
+
     $(`${c}.send-to-contact-item, ${c}.cd-send-to-contact-item`).rebind('click', (ev) => {
         openCopyDialog('conversations');
 
@@ -2626,7 +2634,7 @@ FileManager.prototype.createFolderUI = function() {
         else if (!M.isSafeName(name)) { // Check if folder name is valid
             errorMsg = name.length > 250 ? l.LongName : l[24708];
         }
-        else if (duplicated(name)) { // Check if folder name already exists
+        else if (duplicated(name, M.currentdirid)) { // Check if folder name already exists
             errorMsg = l[23219];
         }
 

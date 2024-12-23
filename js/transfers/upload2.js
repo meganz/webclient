@@ -667,6 +667,9 @@ var ulmanager = {
             if (r.fav) {
                 n.fav = r.fav;
             }
+            if (r.sen) {
+                n.sen = r.sen;
+            }
             if (r.lbl) {
                 n.lbl = r.lbl;
             }

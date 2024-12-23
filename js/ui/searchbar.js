@@ -719,7 +719,15 @@ lazy(mega.ui, 'searchbar', () => {
         const $ddLoader = $('.search-loader', $dropdownSearch);
 
         $ddLoader.removeClass('hidden');
-        const results = M.getFilterBy(M.getFilterBySearchFn(term));
+
+        const filterFn = (fn1, fn2) => {
+            return n => fn1(n) && fn2(n);
+        };
+
+        const results = M.getFilterBy(
+            filterFn(M.getFilterBySearchFn(term), ({ sen }) => !sen || mega.sensitives.showGlobally)
+        );
+
         const nodes = results.filter(n => n.p !== M.RubbishID)
             .sort((a, b) => a.name.localeCompare(b.name))
             .sort((a, b) => a.name.length - b.name.length);
@@ -776,6 +784,10 @@ lazy(mega.ui, 'searchbar', () => {
             $suffix.text(suffix);
             $dir.text(dir);
             $fileIcon.addClass(`icon-${fileIcon(node)}-24`);
+
+            if (mega.sensitives.isSensitive(node)) {
+                $item.addClass('is-sensitive');
+            }
 
             if (thumbUri) {
                 const $imgNode = $('img', $fileIcon);
@@ -879,6 +891,10 @@ lazy(mega.ui, 'searchbar', () => {
             $item.attr('data-id', handle);
             $item.attr('data-editable', editable);
 
+            if (mega.sensitives.isSensitive(node)) {
+                $item.addClass('is-sensitive');
+            }
+
             $icon.addClass(`icon-${iconClass}-24`);
             $('.dropdown-recently-opened-item-filename', $item).text(filename);
             $('.dropdown-recently-opened-item-location', $item).text(parentName);
@@ -902,7 +918,8 @@ lazy(mega.ui, 'searchbar', () => {
         for (let i = recentlyOpenedArr.length - 1, nb = 0;
             i >= 0 && nb < recentlyOpened.numFilesInView;
             i--, nb++) {
-            if (M.getNodeByHandle(recentlyOpenedArr[i].h)) {
+            const n = M.getNodeByHandle(recentlyOpenedArr[i].h);
+            if (n && (mega.sensitives.showGlobally || !mega.sensitives.isSensitive(n))) {
                 const item = makeRecentlyOpenedFileItem(recentlyOpenedArr[i]);
                 $recentlyOpenedBody.safeAppend(item);
             }

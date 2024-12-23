@@ -32,9 +32,20 @@ mobile.settings.fileManagement = Object.create(mobile.settingsHelper, {
                     value: 'nowarnpl',
                     id: 'nowarnpl',
                     label: l.setting_section_plink,
-                    sublabel: l.setting_plink_warn
+                    sublabel: l.setting_plink_warn,
+                    reversedValue: 1
                 }
             ];
+
+            if (mega.sensitives.featureEnabled) {
+                toggleArray.push({
+                    value: 'showSen',
+                    id: 'showSen',
+                    label: l.show_hidden_files,
+                    sublabel: l.show_hidden_files_txt,
+                    onChangeFunction: (val) => mega.sensitives.onConfigChange(val)
+                });
+            }
 
             // Build toggle components and store in togglesComponents array by id
             this.togglesComponents = [];
@@ -45,7 +56,11 @@ mobile.settings.fileManagement = Object.create(mobile.settingsHelper, {
                     ...toggle,
                     role: 'switch',
                     onChange: () => {
-                        mega.config.setn(toggleComponent.input.name, toggleComponent.checked ^ 1);
+                        const val = toggleComponent.checked ^ toggleComponent.input.reversedValue;
+                        mega.config.setn(toggleComponent.input.name, val);
+                        if (toggleComponent.input.onChangeFunction) {
+                            toggleComponent.input.onChangeFunction(val);
+                        }
                     }
                 });
                 this.togglesComponents[toggle.id] = toggleComponent;
@@ -83,7 +98,8 @@ mobile.settings.fileManagement = Object.create(mobile.settingsHelper, {
             for (const id in this.togglesComponents) {
                 if (this.togglesComponents.hasOwnProperty(id)) {
                     const toggleComponent = this.togglesComponents[id];
-                    toggleComponent.setButtonState(!mega.config.get(toggleComponent.input.name));
+                    const state = !!(mega.config.get(toggleComponent.input.name) ^ toggleComponent.input.reversedValue);
+                    toggleComponent.setButtonState(state);
                 }
             }
         },

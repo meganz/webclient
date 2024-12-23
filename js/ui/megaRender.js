@@ -1119,6 +1119,10 @@
                     elm.classList.remove('icon-dot');
                 }
 
+                if (mega.sensitives.shouldBlurNode(aNode)) {
+                    aTemplate.classList.add('is-sensitive');
+                }
+
                 if (isBackup) {
 
                     elm = aTemplate.querySelector(this.viewmode ? '.file-status-icon' : '.grid-status-icon');
@@ -1446,6 +1450,10 @@
                 }
 
                 this.addClasses(tmp, aProperties.classNames);
+
+                if (mega.sensitives.isSensitive(aNode)) {
+                    aTemplate.classList.add('is-sensitive');
+                }
 
                 return aTemplate;
             }

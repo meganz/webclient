@@ -19,7 +19,7 @@ MegaData.prototype.buildSubMenu = function(id) {
 
     csb = document.getElementById('sm_move');
     if (!csb || parseInt(csb.dataset.folders) !== rootTreeLen) {
-        if (rootTree) {
+        if (rootTree && Object.values(rootTree).some(mega.sensitives.shouldShowInTree)) {
             cs = ' contains-submenu sprite-fm-mono-after icon-arrow-right-after';
             sm = '<span class="dropdown body submenu" id="sm_' + rootID + '">'
                 + '<span id="csb_' + rootID + '"></span>' + arrow + '</span>';
@@ -57,14 +57,15 @@ MegaData.prototype.buildSubMenu = function(id) {
 
         folders.sort(M.getSortByNameFn2(1));
         for (var i = 0; i < folders.length; i++) {
-            if (folders[i].t & M.IS_S4CRT) {
+            if (folders[i].t & M.IS_S4CRT || !mega.sensitives.shouldShowInTree(folders[i])) {
                 continue;
             }
+
             var fid = escapeHTML(folders[i].h);
 
             cs = '';
             sm = '';
-            if (this.tree[fid]) {
+            if (this.tree[fid] && Object.values(this.tree[fid]).some(mega.sensitives.shouldShowInTree)) {
                 cs = ' contains-submenu sprite-fm-mono-after icon-arrow-right-after';
                 sm = '<span class="dropdown body submenu" id="sm_' + fid + '">'
                     + '<span id="csb_' + fid + '"></span>' + arrow + '</span>';
@@ -134,11 +135,13 @@ MegaData.prototype.checkSendToChat = function(isSearch, sourceRoot) {
 
 /**
  * Build an array of context-menu items to show for the selected node
+ * @param {Event} evt Event to pass
+ * @param {Boolean} isTree Whether this is a context menu invoked in a tree or not
  * @returns {Promise}
  */
 // @todo make eslint happy..
 // eslint-disable-next-line complexity,sonarjs/cognitive-complexity
-MegaData.prototype.menuItems = async function menuItems(isTree) {
+MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
     "use strict";
 
     console.assert($.selected);
@@ -356,6 +359,11 @@ MegaData.prototype.menuItems = async function menuItems(isTree) {
         M.colourLabelcmUpdate($.selected);
     }
 
+    const sen = mega.sensitives.getSensitivityStatus($.selected, evt);
+    if (sen) {
+        items['.add-sensitive-item'] = sen;
+    }
+
     if (M.checkSendToChat(isSearch, sourceRoot)) {
         items['.send-to-contact-item'] = 1;
     }
@@ -438,6 +446,7 @@ MegaData.prototype.menuItems = async function menuItems(isTree) {
             delete items['.play-item'];
             delete items['.preview-item'];
             delete items['.edit-file-item'];
+            delete items['.add-sensitive-item'];
 
             if ($.selected.length > 1 || selNode.t !== 1) {
                 delete items['.open-item'];
@@ -907,7 +916,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
         $(menuCMI).addClass('hidden');
 
         asyncShow = true;
-        M.menuItems()
+        M.menuItems(e)
             .then(() => {
                 onIdle(showContextMenu);
                 $(menuCMI).filter(items).removeClass('hidden');
@@ -1156,6 +1165,11 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
                     }
                 }
 
+                if (items['.add-sensitive-item']) {
+                    const toHide = items['.add-sensitive-item'] === 1;
+                    mega.sensitives.applyMenuItemStyle('.add-sensitive-item', toHide);
+                }
+
                 // We know the rewind-item is already active and passed the check
                 // We need to check the 2nd time if the source of event is on right location
                 if (items['.rewind-item']) {
@@ -1166,7 +1180,7 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
                 }
             };
 
-            M.menuItems(isTree)
+            M.menuItems(e, isTree)
                 .then((items) => {
                     const $menuCMI = $(menuCMI);
 

@@ -997,6 +997,9 @@ FMDB.prototype.stripnode = Object.freeze({
         if (f.fav !== undefined && !(f.fav | 0)) {
             delete f.fav;
         }
+        if (f.sen !== undefined && !(f.sen | 0)) {
+            delete f.sen;
+        }
         if (f.lbl !== undefined && !(f.lbl | 0)) {
             delete f.lbl;
         }

@@ -1338,3 +1338,10 @@ body.in-call .gif-panel .gif-panel-results {
 .context .dropdown-item.active i.sort-arrow {
     opacity: 1;
 }
+.context-menu .set-sensitive {
+    display: flex;
+}
+.context-menu .set-sensitive span {
+    width: auto;
+    flex-grow: 1;
+}

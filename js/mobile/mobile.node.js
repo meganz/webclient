@@ -133,6 +133,10 @@ class MegaMobileNode extends MegaComponent {
             if (this.fav) {
                 this.domNode.classList.add('favourited');
             }
+
+            if (this.sen) {
+                this.domNode.classList.add('is-sensitive');
+            }
         }
 
         this.domNode.classList.add('mobile', 'fm-item', ...classNames);
@@ -246,6 +250,10 @@ class MegaMobileNode extends MegaComponent {
         return this.node.fav && !folderlink;
     }
 
+    get sen() {
+        return !folderlink && mega.sensitives.shouldBlurNode(this.node);
+    }
+
     get time() {
         return M.currentCustomView.type === 'public-links' && this.linked ?
             time2date(this.linked.ts) : time2date(this.node.mtime || this.node.ts);
@@ -345,6 +353,10 @@ class MegaMobileNode extends MegaComponent {
 
         if (_shouldUpdate('fav')) {
             this.domNode.classList[this.fav ? 'add' : 'remove']('favourited');
+        }
+
+        if (_shouldUpdate('sen')) {
+            this.domNode.classList[this.sen ? 'add' : 'remove']('is-sensitive');
         }
 
         if (_shouldUpdate('lbl')) {

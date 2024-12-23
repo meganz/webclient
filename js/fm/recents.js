@@ -872,6 +872,10 @@ RecentsRender.prototype._renderFiles = function($newRow, action, actionId) {
             $.hideTopMenu();
             return M.contextMenuUI(e, 1) ? true : false;
         });
+
+    if (mega.sensitives.isSensitive(action[0])) {
+        $newRow.addClass('is-sensitive');
+    }
 };
 
 /**
@@ -965,6 +969,10 @@ RecentsRender.prototype._renderMedia = function($newRow, action, actionId) {
 
         if (node.fav) {
             $('.file-status-icon', $newThumb).addClass('sprite-fm-mono icon-favourite-filled');
+        }
+
+        if (mega.sensitives.isSensitive(node)) {
+            $newThumb.addClass('is-sensitive');
         }
 
         if (M.getNodeShare(node.h).down) {

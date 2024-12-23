@@ -34431,6 +34431,7 @@ class GenericGrid extends genericNodePropsComponent.B {
     } = this.props;
     const style = {};
     listAdapter.repositionItem(node, calculated, index, style);
+    const toApplySensitive = !!mega.sensitives.isSensitive(node) && (mega.sensitives.showGlobally ? 1 : 2);
     let image = null;
     let src = null;
     let isThumbClass = "";
@@ -34455,7 +34456,7 @@ class GenericGrid extends genericNodePropsComponent.B {
       fileStatusClass += " icon-favourite-filled";
     }
     return REaCt().createElement("a", {
-      className: `data-block-view megaListItem ui-droppable ui-draggable ui-draggable-handle ${  this.nodeProps.classNames.join(" ")  }${className && className(node) || ""}`,
+      className: `data-block-view megaListItem ui-droppable ui-draggable ui-draggable-handle ${  this.nodeProps.classNames.join(" ")  }${className && className(node) || ""  }${toApplySensitive ? toApplySensitive === 1 ? ' is-sensitive' : ' hidden-as-sensitive' : ''}`,
       id: `chat_${  node[keyProp]}`,
       onClick: e => {
         this.props.onClick(e, this.props.node);
@@ -34554,6 +34555,7 @@ class GenericTable extends genericNodePropsComponent.B {
       className,
       keyProp
     } = this.props;
+    const toApplySensitive = !!mega.sensitives.isSensitive(node) && (mega.sensitives.showGlobally ? 1 : 2);
     const columns = [];
     for (let i = 0; i < listAdapterOpts.columns.length; i++) {
       const customColumn = listAdapterOpts.columns[i];
@@ -34578,7 +34580,7 @@ class GenericTable extends genericNodePropsComponent.B {
     }
     const listClassName = listAdapterOpts.className;
     return REaCt().createElement("tr", {
-      className: `node_${  node[keyProp]  } ${  className && className(node) || ""  } ${  listClassName && listClassName(node) || ""  } ${  (_this$nodeProps = this.nodeProps) == null ? void 0 : _this$nodeProps.classNames.join(" ")}`,
+      className: `node_${  node[keyProp]  } ${  className && className(node) || ""  } ${  listClassName && listClassName(node) || ""  } ${  (_this$nodeProps = this.nodeProps) == null ? void 0 : _this$nodeProps.classNames.join(" ")  }${toApplySensitive ? toApplySensitive === 1 ? ' is-sensitive' : ' hidden-as-sensitive' : ''}`,
       id: node[keyProp],
       onContextMenu: ev => {
         if (this.props.onContextMenu) {
@@ -35476,9 +35478,10 @@ class FMView extends mixins.w9 {
     const order = sortBy[1] === "asc" ? 1 : -1;
     const entries = [];
     const minSearchLength = self.props.minSearchLength || 3;
+    const showSen = mega.sensitives.showGlobally;
     if (self.props.currentlyViewedEntry === "search" && self.props.searchValue && self.props.searchValue.length >= minSearchLength) {
       M.getFilterBy(M.getFilterBySearchFn(self.props.searchValue)).forEach((n) => {
-        if (!n.h || n.h.length === 11 || n.fv) {
+        if (!n.h || n.h.length === 11 || n.fv || !showSen && mega.sensitives.isSensitive(n)) {
           return;
         }
         if (self.props.customFilterFn && !self.props.customFilterFn(n)) {
@@ -35489,6 +35492,9 @@ class FMView extends mixins.w9 {
     } else {
       Object.keys(M.c[self.props.currentlyViewedEntry] || M.tree[self.props.currentlyViewedEntry] || self.props.dataSource || {}).forEach(h => {
         if (this.dataSource[h]) {
+          if (!showSen && mega.sensitives.isSensitive(this.dataSource[h])) {
+            return;
+          }
           if (self.props.customFilterFn) {
             if (self.props.customFilterFn(this.dataSource[h])) {
               entries.push(this.dataSource[h]);

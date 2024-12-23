@@ -19,7 +19,9 @@
                 }
 
                 const root = M.getNodeRoot(n.h);
-                return root !== M.RubbishID && root !== 'shares';
+                return root !== M.RubbishID
+                    && root !== 'shares'
+                    && mega.sensitives.shouldShowNode(n);
             },
             /**
              * Internal properties, populated as options.
@@ -422,7 +424,7 @@
         }
         // Skip M.renderMain and clear folder nodes for sections without viewmode switchers
         else if (this.chat || !id ||
-            (this.gallery && (!is_mobile || !pfcol)) ||
+            (this.gallery || window.pfcol && !is_mobile) ||
             id.substr(0, 7) === 'account' ||
             id.substr(0, 7) === 'devices' ||
             id.substr(0, 9) === 'dashboard' ||
@@ -437,7 +439,8 @@
                 // Remove shares-specific UI.
                 sharedFolderUI();
             }
-            if (this.gallery) {
+
+            if (this.gallery || window.pfcol) {
                 queueMicrotask(() => {
                     galleryUI(this.gallery > 1 && this.currentCustomView.nodeID);
                 });
@@ -841,8 +844,7 @@
 
             this.gallery = 2;
         }
-        else if (cv.type === 'gallery' || window.pfcol) {
-            this.albums = 1;
+        else if (cv.type === 'gallery') {
             this.gallery = 1;
         }
         else if (cv.type === 's4') {
@@ -874,7 +876,7 @@
             }
             return EAGAIN;
         }
-        else if (id && id.startsWith('albums')) {
+        else if (id && id.startsWith('albums') || window.pfcol) {
             this.albums = true;
         }
         else {

@@ -9,6 +9,13 @@ lazy(s4, 'kernel', () => {
     const EMPTY_OBJ = self.freeze(Object.create(null));
 
     const logger = new MegaLogger('S4Kernel', {
+        onCritical(msg) {
+            const stack = tryCatch(() => new Error('s').stack.split('\n').slice(6)[0].trim(), false)();
+            if (stack) {
+                msg = `${msg}.. ${stack}`;
+            }
+            eventlog(msg);
+        },
         throwOnAssertFail: true,
         printDate: 'rad' in mega,
         levelColors: {
@@ -22,6 +29,12 @@ lazy(s4, 'kernel', () => {
     });
     const clone = tryCatch((obj) => Dexie.deepClone(obj));
     const freeze = tryCatch((obj) => deepFreeze(clone(obj)));
+    const eventlog = tryCatch((...a) => {
+        if (self.d) {
+            logger.warn("\u26c8", ...a);
+        }
+        return self.buildOlderThan10Days || !self.d && self.eventlog(99644, JSON.stringify([1, ...a]));
+    });
 
     const te = new TextEncoder();
     const time = () => ~~(Date.now() / 1e3);
@@ -1660,7 +1673,7 @@ lazy(s4, 'kernel', () => {
                 const v = pl[k.toLowerCase()];
 
                 res.push(v);
-                assert(v, `Policy '${k}' does not exists...`);
+                logger.assert(v, `Policy '${k}' does not exists...`);
             }
 
             return res;
@@ -2114,6 +2127,20 @@ lazy(s4, 'kernel', () => {
 
     // ------------------------------------------------------------------------
 
+    const sup = Object.create(null);
+
+    if (self.is_karma) {
+        sup.karma = {
+            crc,
+            fromBase32,
+            getSignatureKey,
+            leftPadBase32,
+            ...privy.ak,
+            sign,
+            token
+        };
+    }
+
     return freeze({
         keys,
         user,
@@ -2127,6 +2154,7 @@ lazy(s4, 'kernel', () => {
         getS4NodeByHandle,
         validateS4Container,
         getS4BucketForObject,
+        ...sup,
         ...validator,
         getPublicAccessLevel(n) {
             let res = 0;

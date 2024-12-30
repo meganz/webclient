@@ -471,6 +471,20 @@ function init_page() {
                 : mega.redirect('mega.io', 'chatandmeetings', false, false);
         }
 
+        mega.ui.setTheme();
+        parsepage(pages.chatlink);
+
+        if (is_chatlink === EBLOCKED) {
+            // @todo do not load jsl3.chat files..
+            onIdle(() => {
+                if (is_mobile) {
+                    return mobile.chatlink.show(publicChatHandle, publicChatKey);
+                }
+                $('.chat-links-blocked').removeClass('hidden');
+            });
+            return;
+        }
+
         if (typeof is_chatlink !== 'object') {
             is_chatlink = Object.create(null);
         }
@@ -490,9 +504,6 @@ function init_page() {
             assert(!u_type);
             u_handle = "AAAAAAAAAAA";
         }
-
-        parsepage(pages.chatlink);
-
 
         const init = () => {
             init_chat(0x104DF11E5)
@@ -537,8 +548,6 @@ function init_page() {
         else {
             init();
         }
-
-        mega.ui.setTheme();
 
         return;
     }

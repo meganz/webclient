@@ -1,11 +1,17 @@
 <div class="mobile chat-links-preview hidden">
     <div class="chatlink-mobile-body">
         <i class="sprite-fm-uni icon-mega-logo"></i>
-        <h2 class="title">[$20596]</h2>
-        <h2 class="topic"></h2>
-        <span class="members" ></span>
-        <img src="{staticpath}images/mega/features/chat/icon_mobile_chatlink.svg"/>
-        <p>[$mobile_chat_link_tip] [$free_plan_bonus_info]</p>
+        <div class="chatlink-mobile-preview hidden">
+            <h2 class="title">[$20596]</h2>
+            <h2 class="topic"></h2>
+            <span class="members"></span>
+            <img src="{staticpath}images/mega/features/chat/icon_mobile_chatlink.svg"/>
+            <p>[$mobile_chat_link_tip] [$free_plan_bonus_info]</p>
+        </div>
+        <div class="chatlink-mobile-blocked hidden">
+            <h2 class="title">[$20641]</h2>
+            <span class="blocked">[$20642]</span>
+        </div>
         <div class="link-block">
             <button class="mega-button positive large btn-download-mega">[$1913]</button>
             <a class="">[$mobile_chat_link_btn_label]</a>
@@ -29,5 +35,17 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+<div class="section chat-links-blocked hidden">
+    <a href="https://mega.io/" rel="noopener noreferrer">
+        <i class="sprite-fm-uni icon-mega-logo"></i>
+    </a>
+    <h2 class="title">[$20641]</h2>
+    <p>[$20642]</p>
+    <div class="chat-links-blocked-btn-block hidden">
+        <button class="mega-button positive large btn-download-mega">[$1913]</button>
+        <a class="">[$mobile_chat_link_btn_label]</a>
     </div>
 </div>

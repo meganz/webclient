@@ -63,7 +63,7 @@
     "posthtml": "0.16.6",
     "posthtml-urls": "1.0.0",
     "webpack": "5.97.1",
-    "webpack-cli": "5.1.4"
+    "webpack-cli": "6.0.1"
   },
   "devDependencies": {
     "@babel/eslint-parser": "7.25.9",
@@ -75,7 +75,7 @@
     "eslint-plugin-local-rules": "3.0.2",
     "eslint-plugin-no-unsanitized": "4.1.2",
     "eslint-plugin-optimize-regex": "1.2.1",
-    "eslint-plugin-react": "7.37.2",
+    "eslint-plugin-react": "7.37.3",
     "eslint-plugin-sonarjs": "0.25.1",
     "eslint-plugin-unicorn": "55.0.0",
     "htmlhint": "1.1.4",

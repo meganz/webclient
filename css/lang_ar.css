@@ -277,6 +277,18 @@ body.ar .user-management-account-settings .invoice-detail .invoice-button {
     width: 620px;
 }
 
+/* FM table view */
+
+body.rtl table.fm.table-hover tr i.selected {
+    left: unset;
+    right: 2px;
+}
+
+body.rtl table.fm .item-type-icon {
+    left: auto;
+    right: 3px;
+}
+
 @media only screen and (-webkit-min-device-pixel-ratio: 1.5), only screen and (-o-min-device-pixel-ratio: 3/2), only screen and (min--moz-device-pixel-ratio: 1.5), only screen and (min-device-pixel-ratio: 1.5) {
     body.ar .improved-recovery-steps .recover-button.yes::before,
     body.ar .improved-recovery-steps .recover-button.no::before {

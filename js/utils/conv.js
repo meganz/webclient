@@ -390,7 +390,7 @@ function hex2bin(hex) {
                     }
                 }
                 else {
-                    while (n > 1) {
+                    while (n > 0) {
                         s = String.fromCharCode(Number(n & t[0])) + s;
                         n /= t[1];
                     }

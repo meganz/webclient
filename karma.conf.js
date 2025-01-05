@@ -16,7 +16,7 @@ module.exports = function(config) {
     files: [
         // == Basic test setup ==
         'test/test_main.js',
-        'test/test_utils.js',
+        'test/test_s4.js',
 
         // == Basics ==
         'js/vendor/jquery.js',
@@ -53,8 +53,10 @@ module.exports = function(config) {
         'js/utils/dom.js',
         'js/utils/events.js',
         'js/utils/locale.js',
+        'js/utils/md5.js',
         'js/utils/media.js',
         'js/utils/network.js',
+        'js/utils/s4.js',
         'js/utils/timers.js',
         'js/utils/watchdog.js',
         'js/utils/webgl.js',

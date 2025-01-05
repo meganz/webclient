@@ -47,8 +47,8 @@ mobile.cloud.actionBar = {
             addButton.show();
             mega.ui.toast.rack.addClass('above-fab');
         }
-        if (mega.flags.ab_ads) {
+        // if (mega.flags.ab_ads) {
             mega.commercials.init();
-        }
+        // }
     }
 };

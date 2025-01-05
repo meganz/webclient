@@ -2,31 +2,53 @@ var React = require("react");
 import {MegaRenderMixin} from "../chat/mixins";
 
 class AccordionPanel extends MegaRenderMixin {
-    render() {
-        var self = this;
-        var contentClass = self.props.className ? self.props.className : '';
+    domRef = React.createRef();
 
-        return <div className={`chat-dropdown container ${this.props.accordionClass || ''}`}>
-            <div className={"chat-dropdown header " + (this.props.expanded ? "expanded" : "")} onClick={function(e) {
-                self.props.onToggle(e);
-            }}>
-                <span>{this.props.title}</span>
-                <i className="sprite-fm-mono icon-arrow-down" />
+    render() {
+        const { accordionClass, expanded, title, className, children, onToggle} = this.props;
+
+        return (
+            <div
+                ref={this.domRef}
+                className={`
+                    chat-dropdown
+                    container
+                    ${accordionClass || ''}
+                `}>
+                <div
+                    className={`
+                        chat-dropdown
+                        header
+                        ${expanded ? 'expanded' : ''}
+                    `}
+                    onClick={onToggle}>
+                    <span>{title}</span>
+                    <i className="sprite-fm-mono icon-arrow-down"/>
+                </div>
+                {expanded ?
+                    <div
+                        className={`
+                            chat-dropdown
+                            content
+                            have-animation
+                            ${className | ''}
+                        `}>
+                        {children}
+                    </div> :
+                    null
+                }
             </div>
-            {this.props.expanded ? <div
-                className={"chat-dropdown content have-animation " + contentClass}>{this.props.children}</div> : null}
-        </div>;
+        );
     }
-};
+}
 
 class Accordion extends MegaRenderMixin {
-    constructor(props) {
-        super(props);
+    domRef = React.createRef();
 
-        this.state = {
-            'expandedPanel': this.props.expandedPanel
-        };
-    }
+    state = {
+        expandedPanel: this.props.expandedPanel
+    };
+
     onToggle(e, key) {
         // allow multiple opened panels at a time
         // var obj = clone(this.state.expandedPanel);
@@ -45,6 +67,7 @@ class Accordion extends MegaRenderMixin {
         this.setState({'expandedPanel': obj});
         this.props.onToggle && this.props.onToggle(key);
     }
+
     render() {
         var self = this;
 
@@ -83,9 +106,9 @@ class Accordion extends MegaRenderMixin {
             }
         });
 
-        return <div className={classes}>{accordionPanels}</div>;
+        return <div ref={this.domRef} className={classes}>{accordionPanels}</div>;
     }
-};
+}
 
 
 export { Accordion, AccordionPanel};

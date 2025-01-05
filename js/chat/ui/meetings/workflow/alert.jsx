@@ -4,7 +4,7 @@ import { MegaRenderMixin } from '../../../mixins';
 const NAMESPACE = 'meetings-alert';
 
 export default class Alert extends MegaRenderMixin {
-    alertRef = React.createRef();
+    domRef = React.createRef();
 
     static TYPE = {
         LIGHT: 'light',
@@ -21,12 +21,12 @@ export default class Alert extends MegaRenderMixin {
 
     componentDidUpdate() {
         super.componentDidUpdate();
-        this.props.onTransition?.(this.alertRef);
+        this.props.onTransition?.(this.domRef);
     }
 
     componentDidMount() {
         super.componentDidMount();
-        this.props.onTransition?.(this.alertRef);
+        this.props.onTransition?.(this.domRef);
     }
 
     render() {
@@ -35,7 +35,7 @@ export default class Alert extends MegaRenderMixin {
         if (content || children) {
             return (
                 <div
-                    ref={this.alertRef}
+                    ref={this.domRef}
                     className={`
                         ${NAMESPACE}
                         ${type ? `${NAMESPACE}-${type}` : ''}

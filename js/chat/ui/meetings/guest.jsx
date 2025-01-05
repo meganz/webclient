@@ -1,14 +1,12 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../mixins';
 import Button from './button.jsx';
 
-export default class Guest extends MegaRenderMixin {
+export default class Guest extends React.Component {
     state = {
         copy: ''
     };
 
     componentDidMount() {
-        super.componentDidMount();
         this.setState({ copy: `${l.free_storage_info__call.replace('%s', bytesToSize(mega.bstrg, 0))}` });
     }
 

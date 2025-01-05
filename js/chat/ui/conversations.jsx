@@ -24,11 +24,11 @@ export const EVENTS = {
 };
 
 class ConversationsApp extends MegaRenderMixin {
+    domRef = React.createRef();
     chatRoomRef = null;
     occurrenceRef = null;
 
     state = {
-        leftPaneWidth: Math.min(mega.config.get('leftPaneWidth') | 0, 400) || 384,
         startGroupChatDialog: false,
         startMeetingDialog: false,
         scheduleMeetingDialog: false,
@@ -80,7 +80,6 @@ class ConversationsApp extends MegaRenderMixin {
 
     componentDidMount() {
         super.componentDidMount();
-        var self = this;
 
         $(document).rebind('keydown.megaChatTextAreaFocus', e => {
             // prevent recursion!
@@ -148,47 +147,6 @@ class ConversationsApp extends MegaRenderMixin {
             }
         });
 
-
-        self.fmConfigLeftPaneListener = mBroadcaster.addListener('fmconfig:leftPaneWidth', function(value) {
-            if (value > 0) {
-                megaChat.$leftPane = megaChat.$leftPane || $('.conversationsApp .fm-left-panel');
-                delay('CoApp:fmc:thr', function() {
-                    self.setState({leftPaneWidth: value});
-                }, 75);
-                megaChat.$leftPane.width(value);
-                $('.fm-tree-panel', megaChat.$leftPane).width(value);
-                self.onResizeDoUpdate();
-            }
-        });
-
-
-        var lPaneResizableInit = function() {
-            megaChat.$leftPane = megaChat.$leftPane || $('.conversationsApp .fm-left-panel');
-
-            $.leftPaneResizableChat = new FMResizablePane(megaChat.$leftPane, {
-                ...$.leftPaneResizable.options,
-                maxWidth: 400
-            });
-        };
-
-        if (typeof($.leftPaneResizable) === 'undefined') {
-            mBroadcaster.once('fm:initialized', function() {
-                lPaneResizableInit();
-            });
-        }
-        else {
-            lPaneResizableInit();
-
-        }
-
-        megaChat.$leftPane = megaChat.$leftPane || $('.conversationsApp .fm-left-panel');
-        if (is_chatlink && !is_eplusplus) {
-            megaChat.$leftPane.addClass('hidden');
-        }
-        else {
-            megaChat.$leftPane.removeClass('hidden');
-        }
-
         // --
 
         megaChat.rebind(megaChat.plugins.meetingsManager.EVENTS.EDIT, (ev, chatOrOccurrence) => {
@@ -216,8 +174,6 @@ class ConversationsApp extends MegaRenderMixin {
     componentWillUnmount() {
         super.componentWillUnmount();
         $(document).off('keydown.megaChatTextAreaFocus');
-        mBroadcaster.removeListener(this.fmConfigLeftPaneListener);
-        delete this.props.megaChat.$conversationsAppInstance;
     }
 
     componentDidUpdate() {
@@ -250,7 +206,7 @@ class ConversationsApp extends MegaRenderMixin {
         const { routingSection, chatUIFlags, currentlyOpenedChat, chats } = megaChat;
         const {
             view, startGroupChatDialog, startMeetingDialog, scheduleMeetingDialog, scheduleOccurrenceDialog,
-            leftPaneWidth, callExpanded, freeCallEndedDialog, contactSelectorDialog
+            callExpanded, freeCallEndedDialog, contactSelectorDialog
         } = this.state;
         const isEmpty =
             chats &&
@@ -307,7 +263,7 @@ class ConversationsApp extends MegaRenderMixin {
 
         return (
             <div
-                key="conversationsApp"
+                ref={this.domRef}
                 className="conversationsApp">
 
                 {contactSelectorDialog && (
@@ -395,7 +351,6 @@ class ConversationsApp extends MegaRenderMixin {
                     views={VIEWS}
                     routingSection={routingSection}
                     conversations={chats}
-                    leftPaneWidth={leftPaneWidth}
                     renderView={view => this.renderView(view)}
                     startMeeting={() => {
                         this.startMeeting();

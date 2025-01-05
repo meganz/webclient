@@ -8,6 +8,8 @@ import FMView from "./jsx/fm/fmView.jsx";
 const MIN_SEARCH_LENGTH = 2;
 
 class CloudBrowserDialog extends MegaRenderMixin {
+    domRef = React.createRef();
+
     static defaultProps = {
         'selectLabel': l[8023],
         'openLabel': l[1710],
@@ -15,6 +17,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
         'hideable': true,
         'className': ''
     };
+
     constructor(props) {
         super(props);
         this.state = {
@@ -39,6 +42,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
         this.onBreadcrumbNodeClick = this.onBreadcrumbNodeClick.bind(this);
         this.onExpand = this.onExpand.bind(this);
     }
+
     onViewModeSwitch(newMode) {
         let currentViewMode = mega.config.get('cbvm') | 0;
         if (newMode === currentViewMode) {
@@ -76,6 +80,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
             });
         }
     }
+
     onClearSearchIconClick() {
         this.setState({
             'isActiveSearch': false,
@@ -128,6 +133,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
         this.setState(newState);
         this.clearSelectionAndHighlight();
     }
+
     searchProc() {
         const { searchText } = this.state;
         const newState = {
@@ -149,6 +155,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
         this.setState({'selected': nodes});
         this.props.onSelected(nodes);
     }
+
     onHighlighted(nodes) {
         this.setState({'highlighted': nodes});
 
@@ -156,6 +163,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
             this.props.onHighlighted(nodes);
         }
     }
+
     clearSelectionAndHighlight() {
         this.onSelected([]);
         this.onHighlighted([]);
@@ -163,12 +171,15 @@ class CloudBrowserDialog extends MegaRenderMixin {
             selectionManager.clear_selection();
         }
     }
+
     onPopupDidMount(elem) {
         this.domNode = elem;
     }
+
     onAttachClicked() {
         this.props.onAttachClicked();
     }
+
     onBreadcrumbNodeClick(nodeId) {
         if (nodeId === 'shares' || nodeId === 's4') {
             // Switch the active tab to `Incoming Shares`
@@ -188,6 +199,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
             });
         }
     }
+
     onExpand(nodeId) {
         this.setState({
             'currentlyViewedEntry': nodeId,
@@ -197,6 +209,7 @@ class CloudBrowserDialog extends MegaRenderMixin {
             'highlighted': [],
         });
     }
+
     render() {
         var self = this;
 
@@ -375,7 +388,9 @@ class CloudBrowserDialog extends MegaRenderMixin {
                 popupDidMount={self.onPopupDidMount}
                 buttons={buttons}>
 
-                <section className="content">
+                <section
+                    ref={this.domRef}
+                    className="content">
                     <div className="content-block">
                         <div className="fm-dialog-tabs">
                             <div

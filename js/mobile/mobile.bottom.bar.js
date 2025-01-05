@@ -6,7 +6,7 @@ class MegaMobileBottomBar extends MegaComponent {
 
         // If ads are disabled, use the original bottom bar
         // Otherwise create a new bottom bar wrapper and return the node for the bottom bar
-        const bottomNode = (options.adWrapper && mega.flags.ab_ads)
+        const bottomNode = (options.adWrapper /* && mega.flags.ab_ads*/)
             ? mega.commercials.addCommsToBottomBar(this.domNode, options.adWrapper === 'adFolder')
             : this.domNode;
 
@@ -69,7 +69,7 @@ class MegaMobileBottomBar extends MegaComponent {
         }
 
         // Create new ads in the bottom bar
-        if (options.adWrapper && mega.flags.ab_ads) {
+        if (options.adWrapper /* && mega.flags.ab_ads*/) {
             mega.commercials.createMobileBottomBarSlots(this.domNode, options.adWrapper === 'adFolder');
         }
     }

@@ -397,6 +397,9 @@ function crypto_makeattr(n, nn) {
     if (n.fav | 0) {
         ar.fav = n.fav | 0;
     }
+    if (n.sen | 0) {
+        ar.sen = n.sen | 0;
+    }
     if (n.lbl | 0) {
         ar.lbl = n.lbl | 0;
     }
@@ -440,7 +443,7 @@ function crypto_clearattr(n) {
     const dattrs = [
         'ar', 'des', 'devid', 'drvid', 'f', 'fav', 'gps',
         'hash', 'lbl', 'mtime', 'name',
-        'rr', 's4', 'tags', 'sds'
+        'rr', 's4', 'sds', 'sen', 'tags'
     ];
     const old = {};
 
@@ -502,6 +505,14 @@ function crypto_procattr(n, key) {
                     delete n.fav;
                 }
                 delete o.fav;
+            }
+
+            if (typeof o.sen != 'undefined') {
+                n.sen = o.sen | 0;
+                if (!n.sen) {
+                    delete n.sen;
+                }
+                delete o.sen;
             }
 
             if (typeof o['dev-id'] !== 'undefined') {
@@ -1027,7 +1038,7 @@ lazy(self, 'decWorkerPool', function decWorkerPool() {
     /** @class decWorkerPool */
     return new class extends Array {
         get url() {
-            const WORKER_VERSION = 8;
+            const WORKER_VERSION = 9;
             return `${window.is_extension || window.is_karma ? '' : '/'}nodedec.js?v=${WORKER_VERSION}`;
         }
 

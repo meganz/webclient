@@ -9,6 +9,9 @@ export default class GenericGrid extends GenericNodePropsComponent {
         let style = {};
         listAdapter.repositionItem(node, calculated, index, style);
 
+        // 1 - to hide, 2 - to show with opacity
+        const toApplySensitive = !!mega.sensitives.isSensitive(node) && (mega.sensitives.showGlobally ? 1 : 2);
+
         let image = null;
         let src = null;
         let isThumbClass = "";
@@ -34,7 +37,8 @@ export default class GenericGrid extends GenericNodePropsComponent {
         return <a
             className={"data-block-view megaListItem ui-droppable ui-draggable ui-draggable-handle " +
                 this.nodeProps.classNames.join(" ") +
-                (className && className(node) || "")
+                (className && className(node) || "") +
+                (toApplySensitive ? (toApplySensitive === 1 ? ' is-sensitive' : ' hidden-as-sensitive') : '')
             }
             id={"chat_" + node[keyProp]}
             onClick={(e) => {

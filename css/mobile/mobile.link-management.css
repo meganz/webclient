@@ -54,7 +54,8 @@
     position: relative;
 }
 
-.link-mgmt-container .toggle-container.decryption-key .decryption-key-message {
+.link-mgmt-container .toggle-container.decryption-key .decryption-key-message,
+.sensitive-onboarding-txt {
     font: var(--mobile-font-link-small-regular);
     color: var(--mobile-text-secondary);
 }

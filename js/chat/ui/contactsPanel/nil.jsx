@@ -1,11 +1,9 @@
 import React from 'react';
 import { Button } from '../../../ui/buttons.jsx';
-import { MegaRenderMixin } from '../../mixins';
 import { ParsedHTML } from '../../../ui/utils';
 
-export default class Nil extends MegaRenderMixin {
+export default class Nil extends React.Component {
     componentDidMount() {
-        super.componentDidMount();
         setContactLink();
     }
 

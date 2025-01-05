@@ -2,6 +2,8 @@ import React from 'react';
 import { MegaRenderMixin } from '../../../../mixins.js';
 
 export default class AudioPlayer extends MegaRenderMixin {
+    domRef = React.createRef();
+
     state = {
         currentTime: null,
         progressWidth: 0,
@@ -142,12 +144,16 @@ export default class AudioPlayer extends MegaRenderMixin {
         }
 
         return (
-            <div className="audio-player">
+            <div
+                ref={this.domRef}
+                className="audio-player">
                 {controls}
-                <div className="slider" ref={(slider) => {
-                    this.slider = slider;
-                }}>
-                    <div className="slider__progress" style={progressStyles} />
+                <div
+                    className="slider"
+                    ref={(slider) => {
+                        this.slider = slider;
+                    }}>
+                    <div className="slider__progress" style={progressStyles}/>
                     <div
                         className="slider__progress__pin"
                         style={{ left: `${progressWidth}%` }}

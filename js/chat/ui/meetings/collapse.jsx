@@ -1,7 +1,6 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../mixins';
 
-export default class Collapse extends MegaRenderMixin {
+export default class Collapse extends React.Component {
     state = {
         expanded: true
     };

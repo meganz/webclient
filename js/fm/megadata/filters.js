@@ -1,8 +1,13 @@
 MegaData.prototype.filterBy = function(f, omitVersions) {
     this.filter = f;
     this.v = [];
+
     for (var i in this.d) {
-        if ((!omitVersions || !this.d[i].fv) && f(this.d[i])) {
+        if (
+            (!omitVersions || !this.d[i].fv)
+            && f(this.d[i])
+            && mega.sensitives.shouldShowNode(this.d[i])
+        ) {
             this.v.push(this.d[i]);
         }
     }
@@ -15,6 +20,8 @@ MegaData.prototype.filterBy = function(f, omitVersions) {
  * of filtered results
  */
 MegaData.prototype.getFilterBy = function(f) {
+    'use strict';
+
     var v = [];
     for (var i in this.d) {
         if (f(this.d[i])) {
@@ -38,6 +45,8 @@ MegaData.prototype.getFilterBy = function(f) {
  * @returns {Object} duplicates if found
  */
 MegaData.prototype.filterByParent = function(id) {
+    'use strict';
+
     var i;
     var node;
 
@@ -53,54 +62,22 @@ MegaData.prototype.filterByParent = function(id) {
             }
         }
     }
-    // We should have a parent's childs into M.c, no need to traverse the whole M.d
-    else if (this.c[id] || id === 'public-links' || id === 'out-shares' || id === 'file-requests') {
-        var list;
-
-        if (id === 'public-links') {
-            list = this.su.EXP || {};
-        }
-        else if (id === 'out-shares') {
-            list = this.getOutShareTree();
-        }
-        else if (id === 'file-requests') {
-            list = mega.fileRequest.getPuHandleList();
-        }
-        else {
-            list = this.c[id];
-        }
-
-        this.v = Object.keys(list)
-            .map((h) => M.d[h])
-            .filter((n) => {
-                // Filter versioned file or undefined node.
-                if (!n || n.fv || M.gallery && !mega.gallery.isGalleryNode(n)) {
-                    return false;
-                }
-
-                if (n.s4 && n.p === this.RootID && this.getS4NodeType(n) === 'container') {
-                    return false;
-                }
-
-                // Filter label applies here.
-                return !(this.currentLabelFilter && !this.filterByLabel(n));
-            });
+    else if (this.c[id]) {
+        this.v = this.filterByLocation(this.c[id], mega.sensitives.shouldShowNode);
+    }
+    else if (id === 'file-requests') {
+        this.v = this.filterByLocation(mega.fileRequest.getPuHandleList());
+    }
+    else if (id === 'out-shares') {
+        this.v = this.filterByLocation(this.getOutShareTree());
+    }
+    else if (id === 'public-links') {
+        this.v = this.filterByLocation(this.su.EXP || {});
     }
     else {
         this.filterBy(function(node) {
             return (node.p === id);
         });
-    }
-
-    if (mega.ui.mNodeFilter && mega.ui.mNodeFilter.selectedFilters) {
-
-        for (let i = this.v.length; i--;) {
-
-            if (!mega.ui.mNodeFilter.match(this.v[i])) {
-
-                this.v.splice(i, 1);
-            }
-        }
     }
 };
 
@@ -269,4 +246,36 @@ MegaData.prototype.filterByLabel = function(node) {
         return false;
     }
     return true;
+};
+
+/**
+ * @param {Object<String, MegaNode>} nodes Predefined nodes to filter
+ * @param {Function} [filter] Filter function
+ * @returns {Array<MegaNode>} Filtered nodes
+ */
+MegaData.prototype.filterByLocation = function(nodes, filter) {
+    'use strict';
+
+    const res = [];
+    const hasNodeFilter = mega.ui.mNodeFilter && mega.ui.mNodeFilter.selectedFilters;
+
+    for (const h in nodes) {
+        const n = this.d[h];
+
+        if (
+            !n // Undefined node
+            || n.fv // Versioned file
+            || (n.s4 && n.p === M.RootID && this.getS4NodeType(n) === 'container') // S4 node
+            || (this.gallery && !mega.gallery.isGalleryNode(n)) // Non-media file in Gallery
+            || (this.currentLabelFilter && !this.filterByLabel(n)) // Filter label applies here
+            || (hasNodeFilter && !mega.ui.mNodeFilter.match(n))
+            || (filter && !filter(n))
+        ) {
+            continue;
+        }
+
+        res.push(n);
+    }
+
+    return res;
 };

@@ -128,11 +128,10 @@ export const inProgressAlert = (isJoin, chatRoom) => {
     });
 };
 
-class RecordingConsentDialog extends MegaRenderMixin {
+class RecordingConsentDialog extends React.Component {
     static dialogName = `${NAMESPACE}-consent`;
 
     componentWillUnmount() {
-        super.componentWillUnmount();
         if ($.dialog && $.dialog === RecordingConsentDialog.dialogName) {
             closeDialog();
         }
@@ -199,6 +198,8 @@ class RecordingConsentDialog extends MegaRenderMixin {
 // --
 
 export default class Call extends MegaRenderMixin {
+    domRef = React.createRef();
+
     recordingConsentDialog = `${NAMESPACE}-consent`;
 
     ephemeralAddListener = undefined;
@@ -1283,6 +1284,7 @@ export default class Call extends MegaRenderMixin {
 
         return (
             <div
+                ref={this.domRef}
                 className={`
                     meetings-call
                     ${minimized ? 'minimized' : ''}

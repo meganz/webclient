@@ -1,16 +1,18 @@
-import {ParsedHTML} from "../../ui/utils";
-
-var React = require("react");
-import {MegaRenderMixin} from './../mixins';
+import React from 'react';
+import { ParsedHTML } from '../../ui/utils.jsx';
+import { MegaRenderMixin } from './../mixins.js';
 
 
 export class EmojiAutocomplete extends MegaRenderMixin {
+    domRef = React.createRef();
+
     static defaultProps = {
         'requiresUpdateOnResize': true,
         'emojiSearchQuery': false,
         'disableCheckingVisibility': true,
         'maxEmojis': 12
-    }
+    };
+
     constructor(props) {
         super(props);
         this.state = {
@@ -268,15 +270,13 @@ export class EmojiAutocomplete extends MegaRenderMixin {
             );
         }
 
-        return <div className="textarea-autofill-bl">
-            <ParsedHTML tag="div" className="textarea-autofill-info">
-                {l.emoji_suggestion_instruction}
-            </ParsedHTML>
-            <div className="textarea-autofill-emoji">
-
-                {emojisDomList}
-
+        return (
+            <div
+                ref={this.domRef}
+                className="textarea-autofill-bl">
+                <ParsedHTML tag="div" className="textarea-autofill-info">{l.emoji_suggestion_instruction}</ParsedHTML>
+                <div className="textarea-autofill-emoji">{emojisDomList}</div>
             </div>
-        </div>;
+        );
     }
-};
+}

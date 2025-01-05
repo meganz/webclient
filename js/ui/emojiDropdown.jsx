@@ -4,7 +4,8 @@ var DropdownsUI = require('./dropdowns.jsx');
 var PerfectScrollbar = require('./perfectScrollbar.jsx').PerfectScrollbar;
 
 export class DropdownEmojiSelector extends MegaRenderMixin {
-    emojiSearchField = React.createRef();
+    domRef = React.createRef();
+    emojiSearchRef = React.createRef();
 
     static defaultProps = {
         'requiresUpdateOnResize': true,
@@ -149,7 +150,7 @@ export class DropdownEmojiSelector extends MegaRenderMixin {
             {self._generateEmoji(emoji)}
         </div>;
     }
-    componentWillUpdate(nextProps, nextState) {
+    UNSAFE_componentWillUpdate(nextProps, nextState) {
         if (
             nextState.searchValue !== this.state.searchValue ||
             nextState.browsingCategories !== this.state.browsingCategories
@@ -452,7 +453,7 @@ export class DropdownEmojiSelector extends MegaRenderMixin {
                         this.scrollableArea.scrollToY(categoryPosition);
                         this._onScrollChanged(categoryPosition);
 
-                        const {current} = this.emojiSearchField || !1;
+                        const {current} = this.emojiSearchRef || !1;
                         current?.focus();
                     }}>
                     <i className={`sprite-fm-mono ${categoryIcons[categoryName]}`} />
@@ -467,7 +468,7 @@ export class DropdownEmojiSelector extends MegaRenderMixin {
                         <div className="search-block emoji">
                             <i className="sprite-fm-mono icon-preview-reveal" />
                             <input
-                                ref={this.emojiSearchField}
+                                ref={this.emojiSearchRef}
                                 type="search"
                                 placeholder={l[102]}
                                 onChange={this.onSearchChange}
@@ -516,11 +517,9 @@ export class DropdownEmojiSelector extends MegaRenderMixin {
             popupContents = null;
         }
 
-
         return <DropdownsUI.Dropdown
             className="popup emoji"
             {...self.props}
-            ref="dropdown"
             isLoading={self.state.isLoading}
             loadFailed={self.state.loadFailed}
             visibleCategories={this.state.visibleCategories}
@@ -541,9 +540,10 @@ export class DropdownEmojiSelector extends MegaRenderMixin {
             }}
             searchValue={self.state.searchValue}
             browsingCategory={self.state.browsingCategory}
-            previewEmoji={self.state.previewEmoji}
-        >
-            {popupContents}
+            previewEmoji={self.state.previewEmoji}>
+            <div ref={this.domRef}>
+                {popupContents}
+            </div>
         </DropdownsUI.Dropdown>;
     }
-};
+}

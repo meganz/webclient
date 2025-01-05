@@ -2263,8 +2263,14 @@ else if (!browserUpdate) {
     jsl.push({f:'js/utils/webgl.js', n: 'webgl_js', j:1});
     jsl.push({f:'js/utils/subtitles.js', n: 'subtitles_js', j: 1});
 
+    // Content consumption settings wrapper
+    jsl.push({f:'js/utils/cc-prefs.js', n: 'cc_prefs_js', j:1});
+
     // Sets and elements
     jsl.push({f:'js/utils/sets.js', n: 'fm_sets_js', j:1});
+
+    // Sensitive (aka. Hidden or Lock) nodes
+    jsl.push({f:'js/utils/sensitives.js', n: 'fm_sensitives_js', j:1});
 
     jsl.push({f:'js/vendor/dexie.js', n: 'dexie_js', j:1,w:5});
     jsl.push({f:'js/functions.js', n: 'functions_js', j:1});
@@ -2341,7 +2347,7 @@ else if (!browserUpdate) {
     jsl.push({f:'js/vendor/perfect-scrollbar.js', n: 'ps_js', j:1,w:1});
     jsl.push({f:'js/ui/languageDialog.js', n: 'languageDialog_js', j:1,w:7});
     jsl.push({f:'css/jquery-ui.extra.css', n: 'jquery_ui_extra_css', j:2,w:5,c:1,d:1,cache:1});
-    // jsl.push({f:'js/ui/commercials.js', n: 'commercials', j:1,w:1});
+    jsl.push({f:'js/ui/commercials.js', n: 'commercials', j:1,w:1});
     jsl.push({f:'html/cookiepolicy.html', n: 'cookiepolicy', j:0});
     jsl.push({f:'css/cookiepolicy.css', n: 'cookiepolicy_css', j:2,w:5,c:1,d:1,cache:1});
 

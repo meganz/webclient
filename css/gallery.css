@@ -746,10 +746,10 @@
 .albums-grid-cell.rounded {
     border-radius: 0.25rem;
 }
-body.rtl .albums-grid-cell > div:not(.flex-row) {
+body.rtl .albums-grid-cell > div.details-area {
     text-align: right;
 }
-.albums-grid-cell > div:not(.flex-row) {
+.albums-grid-cell > div.details-area {
     background: linear-gradient(180deg, rgba(34, 34, 34, 0) 0%, rgba(34, 34, 34, 0.6) 100%);
     padding: 20px 24px;
     color: var(--text-color-white-high);
@@ -778,6 +778,7 @@ body.rtl .albums-grid-cell > div:not(.flex-row) {
     position: absolute;
     top: 1rem;
     right: 1rem;
+    z-index: 1;
 }
 .albums-tree-list {
     height: 0;

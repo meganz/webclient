@@ -46,11 +46,13 @@ class MMenuSelect extends MContextMenu {
                 icon,
                 iconRight,
                 classes,
-                children
+                children,
+                oncreate
             } = list[i];
+            const isClickable = typeof click === 'function';
 
             // Creating a new section here
-            if (!i || typeof click !== 'function') {
+            if (!i || !isClickable) {
                 if (section) {
                     section.appendChild(document.createElement('hr'));
                 }
@@ -72,13 +74,14 @@ class MMenuSelect extends MContextMenu {
 
             const item = new MMenuSelectItem({
                 label,
-                selectFn: typeof click === 'function' ? (item) => this.onItemSelect(i, item, click) : null,
+                selectFn: isClickable ? (item) => this.onItemSelect(i, item, click) : null,
                 selected,
                 selectable,
                 leftIcon: icon,
                 rightIcon: iconRight,
                 additionalClasses: itemClasses,
-                children
+                children,
+                oncreate
             });
 
             this._options.push(item);

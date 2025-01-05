@@ -819,7 +819,6 @@ ChatdIntegration.prototype.openChat = promisify(function(resolve, reject, chatIn
                 if (chatRoom.type !== roomType) {
                     chatRoom.type = roomType;
                     if (chatInfo.m === 0 && megaChat.currentlyOpenedChat === chatRoom.chatId) {
-                        $('.section.conversations').addClass('privatechat');
                         // url should be now /g/ instead of /c/
                         var roomUrl = chatRoom.getRoomUrl().replace("fm/", "");
                         M.openFolder(roomUrl);

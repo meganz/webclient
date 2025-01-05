@@ -1,17 +1,14 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../mixins';
 import { HAS_INTERSECTION_OBSERVER, NODE_CLASS, NODE_CONTAINER_CLASS } from './resultContainer.jsx';
 
-export default class Result extends MegaRenderMixin {
+export default class Result extends React.Component {
     resultRef = React.createRef();
 
     componentDidMount() {
-        super.componentDidMount();
         this.props.onMount?.(this.resultRef.current);
     }
 
     componentWillUnmount() {
-        super.componentWillUnmount();
         this.props.onUnmount?.(this.resultRef.current, 'unobserve');
     }
 

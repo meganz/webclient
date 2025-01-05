@@ -1,11 +1,14 @@
 import React from 'react';
-import { MegaRenderMixin } from "../mixins";
+import { getUniqueId } from "../mixins";
 import Call from './meetings/call.jsx';
-import {Button} from "../../ui/buttons";
+import { Button } from "../../ui/buttons";
 
 const NAMESPACE = 'chat-toast';
 
-export default class ChatToaster extends MegaRenderMixin {
+export default class ChatToaster extends React.Component {
+    uid = `${this.constructor.name}--${getUniqueId()}`;
+    domRef = React.createRef();
+
     state = {
         toast: null,
         endTime: 0,
@@ -17,10 +20,6 @@ export default class ChatToaster extends MegaRenderMixin {
         super(props);
         this.toasts = [];
         this.persistentToasts = [];
-    }
-
-    customIsEventuallyVisible() {
-        return M.chat;
     }
 
     /**
@@ -49,7 +48,7 @@ export default class ChatToaster extends MegaRenderMixin {
         const { isRootToaster, showDualNotifications, onShownToast } = this.props;
         const now = Date.now();
         if (this.toasts.length + this.persistentToasts.length) {
-            if (this.isMounted() && (!isRootToaster && Call.isExpanded() || M.chat)) {
+            if (this.domRef.current && (!isRootToaster && Call.isExpanded() || M.chat)) {
                 if (this.toasts.length && !shownToast) {
                     this.dispatchToast(this.toasts.shift(), now);
                 }
@@ -111,7 +110,6 @@ export default class ChatToaster extends MegaRenderMixin {
         const { fmToastId, endTime, silent } = options;
         const { onShownToast, onHideToast } = this.props;
         this.setState({toast, endTime: endTime || now + toast.getTTL(), fmToastId}, () => {
-            this.eventuallyUpdate();
             if (!silent) {
                 toast.onShown();
             }
@@ -223,9 +221,8 @@ export default class ChatToaster extends MegaRenderMixin {
     }
 
     componentDidMount() {
-        super.componentDidMount();
-        megaChat.rebind(`onChatToast.toaster${this.getUniqueId()}`, e => this.enqueueToast(e));
-        megaChat.rebind(`onChatToastFlush.toaster${this.getUniqueId()}`, () => this.flush());
+        megaChat.rebind(`onChatToast.toaster${this.uid}`, e => this.enqueueToast(e));
+        megaChat.rebind(`onChatToastFlush.toaster${this.uid}`, () => this.flush());
         onIdle(() => this.pollToasts());
         if (this.props.isRootToaster) {
             this.bpcListener = mBroadcaster.addListener('beforepagechange', tpage => {
@@ -256,9 +253,8 @@ export default class ChatToaster extends MegaRenderMixin {
     }
 
     componentWillUnmount() {
-        super.componentWillUnmount();
-        megaChat.off(`onChatToast.toaster${this.getUniqueId()}`);
-        megaChat.off(`onChatToastFlush.toaster${this.getUniqueId()}`);
+        megaChat.off(`onChatToast.toaster${this.uid}`);
+        megaChat.off(`onChatToastFlush.toaster${this.uid}`);
         if (this.bpcListener) {
             mBroadcaster.removeListener(this.bpcListener);
         }
@@ -274,7 +270,9 @@ export default class ChatToaster extends MegaRenderMixin {
         return (
             !hidden
             && !fmToastId
-            && <div className={`chat-toast-bar ${isRootToaster ? 'toaster-root' : ''}`}>
+            && <div
+                ref={this.domRef}
+                className={`chat-toast-bar ${isRootToaster ? 'toaster-root' : ''}`}>
                 {
                     showDualNotifications
                     && persistentToast
@@ -299,13 +297,12 @@ export default class ChatToaster extends MegaRenderMixin {
     }
 }
 
-class ChatToastMsg extends MegaRenderMixin {
+class ChatToastMsg extends React.Component {
     state = {
         value: '',
     };
 
     componentDidMount() {
-        super.componentDidMount();
         const { toast, onClose } = this.props;
         if (toast.updater && typeof toast.updater === 'function') {
             toast.updater();
@@ -331,7 +328,6 @@ class ChatToastMsg extends MegaRenderMixin {
     }
 
     componentWillUnmount() {
-        super.componentWillUnmount();
         if (this.updateInterval) {
             clearInterval(this.updateInterval);
         }

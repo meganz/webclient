@@ -1,5 +1,4 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../../mixins';
 import ModalDialogsUI from '../../../../../ui/modalDialogs.jsx';
 import Button from '../../button.jsx';
 import { ContactCard, MAX_FREQUENTS } from '../../../contacts.jsx';
@@ -19,7 +18,8 @@ export const HAS_CONTACTS = () => {
     }
 };
 
-export default class Invite extends MegaRenderMixin {
+export default class Invite extends React.Component {
+    domRef = React.createRef();
     wrapperRef = React.createRef();
 
     static NAMESPACE = 'invite-meeting';
@@ -114,7 +114,7 @@ export default class Invite extends MegaRenderMixin {
     getFrequentContacts = () =>
         megaChat.getFrequentContacts()
             .then(response => {
-                if (!this.isMounted()) {
+                if (!this.domRef.current) {
                     return;
                 }
 
@@ -237,7 +237,6 @@ export default class Invite extends MegaRenderMixin {
     };
 
     componentDidMount() {
-        super.componentDidMount();
         this.getFrequentContacts();
     }
 
@@ -251,12 +250,13 @@ export default class Invite extends MegaRenderMixin {
         return (
             <ModalDialogsUI.ModalDialog
                 {...this.state}
-                callPartsLength={callPartsLength}
+                ref={this.domRef}
                 name={NAMESPACE}
                 className={`
                     ${NAMESPACE}
                     dialog-template-tool
                 `}
+                callPartsLength={callPartsLength}
                 hideOverlay={true}
                 onClose={onClose}>
                 <div className={`${NAMESPACE}-head`}>

@@ -380,7 +380,8 @@ function hex2bin(hex) {
         ntoh: {
             value(n, endian = 'be') {
                 let s = '';
-                const t = typeof n === 'bigint' ? [255n, 256n] : [255, 256];
+                const cast = typeof n === 'bigint' ? BigInt : Number;
+                const t = [cast(255), cast(256)];
 
                 if (endian === 'be') {
                     while (n > 1) {
@@ -389,7 +390,7 @@ function hex2bin(hex) {
                     }
                 }
                 else {
-                    while (n > 1) {
+                    while (n > 0) {
                         s = String.fromCharCode(Number(n & t[0])) + s;
                         n /= t[1];
                     }

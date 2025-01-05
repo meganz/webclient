@@ -655,7 +655,7 @@ async function setupSingleDownloadPage(res) {
         }
     }
 
-    if (mega.flags.ab_ads && !is_mobile) {
+    if (/* mega.flags.ab_ads &&*/ !is_mobile) {
         mega.commercials.init();
     }
 }

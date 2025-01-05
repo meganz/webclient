@@ -1,5 +1,5 @@
-import React from "react";
-import ReactDOM from "react-dom";
+import React from 'react';
+import { createRoot } from 'react-dom';
 import ConversationsUI from './ui/conversations.jsx';
 
 require("./chatGlobalEventManager.jsx");
@@ -310,38 +310,38 @@ Chat.prototype.init = promisify(function(resolve, reject) {
     }
 
     Promise.allSettled(promises)
-        .then(function(res) {
-            const pub = Object.keys(self.publicChatKeys);
+        .then(res => {
+            const pub = Object.keys(this.publicChatKeys);
             return Promise.allSettled(
                 [res].concat(pub.map(pch => {
-                    return self.plugins.chatdIntegration.openChat(pch, true);
+                    return this.plugins.chatdIntegration.openChat(pch, true);
                 }))
             );
         })
-        .then(function(res) {
+        .then(res => {
             res = res[0].value.concat(res.slice(1));
-            self.logger.info('chats settled...', res);
+            this.logger.info('chats settled...', res);
 
             if (is_mobile) {
                 // No more business here...
                 return;
             }
 
-            // eslint-disable-next-line react/no-render-return-value
-            self.$conversationsAppInstance = ReactDOM.render(
-                self.$conversationsApp = <ConversationsUI.ConversationsApp
-                    megaChat={self}
-                    routingSection={self.routingSection}
-                    routingSubSection={self.routingSubSection}
-                    routingParams={self.routingParams}
-                />,
-                self.domSectionNode = document.querySelector(!is_chatlink ?
-                    '.section.conversations' : '.chat-links-preview > .chat-app-container')
+            const selector = is_chatlink ? '.chat-links-preview > .chat-app-container' : '.section.conversations';
+            const rootDOMNode = this.rootDOMNode = document.querySelector(selector);
+            const $$root = this.$$root = createRoot(rootDOMNode);
+            $$root.render(
+                <ConversationsUI.ConversationsApp
+                    megaChat={this}
+                    routingSection={this.routingSection}
+                    routingSubSection={this.routingSubSection}
+                    routingParams={this.routingParams}
+                />
             );
 
-            self.onChatsHistoryReady()
+            this.onChatsHistoryReady()
                 .then(() => {
-                    const room = self.getCurrentRoom();
+                    const room = this.getCurrentRoom();
                     if (room) {
                         room.scrollToChat();
                     }
@@ -349,22 +349,23 @@ Chat.prototype.init = promisify(function(resolve, reject) {
                 })
                 .dump('on-chat-history-loaded');
 
-            self.is_initialized = true;
-            self.registerUploadListeners();
-            self.trigger("onInit");
+            this.is_initialized = true;
+            this.registerUploadListeners();
+            this.trigger('onInit');
             mBroadcaster.sendMessage('chat_initialized');
-            setInterval(self.removeMessagesByRetentionTime.bind(self, null), 2e4);
+            setInterval(this.removeMessagesByRetentionTime.bind(this, null), 2e4);
 
-            self.autoJoinIfNeeded();
+            this.autoJoinIfNeeded();
 
             const scheduledMeetings = Object.values(Chat.mcsm);
             if (scheduledMeetings && scheduledMeetings.length) {
                 for (let i = scheduledMeetings.length; i--;) {
                     const scheduledMeeting = scheduledMeetings[i];
-                    self.plugins.meetingsManager.attachMeeting(scheduledMeeting);
+                    this.plugins.meetingsManager.attachMeeting(scheduledMeeting);
                     delete Chat.mcsm[scheduledMeeting.id];
                 }
             }
+
             if (notify) {
                 notify.countAndShowNewNotifications();
             }
@@ -447,12 +448,6 @@ Chat.prototype.cleanup = function(clean) {
     const room = this.getCurrentRoom();
     if (room) {
         room.hide();
-    }
-
-    const {$conversationsAppInstance: app} = this;
-    if (app) {
-        // update immediately, otherwise the app may become invisible and no unmounts would be done.
-        tryCatch(() => app.forceUpdate())();
     }
 
     M.chat = false;
@@ -918,59 +913,41 @@ Chat.prototype.dropAllDatabases = promisify(function(resolve, reject) {
  * @returns {*}
  */
 Chat.prototype.destroy = function(isLogout) {
-    var self = this;
-
-    if (self.is_initialized === false) {
+    if (!this.is_initialized) {
         return;
     }
 
-    self.isLoggingOut = isLogout;
+    this.isLoggingOut = isLogout;
 
     for (let i = 0; i < this.mbListeners.length; i++) {
         mBroadcaster.removeListener(this.mbListeners[i]);
     }
 
-    self.unregisterUploadListeners(true);
-    self.trigger('onDestroy', [isLogout]);
+    this.unregisterUploadListeners(true);
+    this.trigger('onDestroy', [isLogout]);
+    tryCatch(() => this.$$root.unmount())();
 
-    // unmount the UI elements, to reduce any unneeded.
-    try {
-        if (
-            self.$conversationsAppInstance &&
-            ReactDOM.findDOMNode(self.$conversationsAppInstance) &&
-            ReactDOM.findDOMNode(self.$conversationsAppInstance).parentNode
-        ) {
-            ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(self.$conversationsAppInstance).parentNode);
-        }
-    }
-    catch (e) {
-        console.error("Failed do destroy chat dom:", e);
-    }
-
-
-    self.chats.forEach( function(room, roomJid) {
+    this.chats.forEach((chatRoom, chatId) => {
         if (!isLogout) {
-            room.destroy(false, true);
+            chatRoom.destroy(false, true);
         }
-        self.chats.remove(roomJid);
+        this.chats.remove(chatId);
     });
 
     // must be set before chatd disconnect, because of potential .destroy -> reinit and event queueing.
-    self.is_initialized = false;
+    this.is_initialized = false;
 
     if (
-        self.plugins.chatdIntegration &&
-        self.plugins.chatdIntegration.chatd &&
-        self.plugins.chatdIntegration.chatd.shards
+        this.plugins.chatdIntegration &&
+        this.plugins.chatdIntegration.chatd &&
+        this.plugins.chatdIntegration.chatd.shards
     ) {
-        var shards = self.plugins.chatdIntegration.chatd.shards;
-        Object.keys(shards).forEach(function(k) {
-            shards[k].connectionRetryManager.options.functions.forceDisconnect();
-        });
+        const { shards } = this.plugins.chatdIntegration.chatd;
+        Object.keys(shards).forEach(shard => shards[shard].connectionRetryManager.options.functions.forceDisconnect());
     }
 
-    for (const pluginName in self.plugins) {
-        const plugin = self.plugins[pluginName];
+    for (const pluginName in this.plugins) {
+        const plugin = this.plugins[pluginName];
         if (plugin.destroy) {
             plugin.destroy();
         }
@@ -2669,12 +2646,6 @@ Chat.prototype.eventuallyAddDldTicketToReq = function(req) {
         req['cauth'] = currentRoom.publicChatHandle;
     }
 };
-
-Chat.prototype.safeForceUpdate = SoonFc(60, function forceAppUpdate() {
-    if (this.$conversationsAppInstance) {
-        this.$conversationsAppInstance.forceUpdate();
-    }
-});
 
 Chat.prototype.removeMessagesByRetentionTime = function(chatId) {
     if (this.chats.length > 0) {

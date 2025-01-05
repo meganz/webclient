@@ -93,14 +93,14 @@ class MessageRow extends MegaRenderMixin {
         return (
             <div
                 ref={node => {
-                    this.nodeRef = node;
+                    this.domRef = node;
                 }}
                 className={`
                     ${RESULT_ROW_CLASS}
                     message
                 `}
                 onClick={() =>
-                    openResult({ room, messageId: data.messageId, index }, () => onResultOpen(this.nodeRef))
+                    openResult({ room, messageId: data.messageId, index }, () => onResultOpen(this.domRef))
                 }>
                 <div className="message-result-avatar">
                     {isGroup ?
@@ -148,10 +148,10 @@ class ChatRow extends MegaRenderMixin {
         return (
             <div
                 ref={node => {
-                    this.nodeRef = node;
+                    this.domRef = node;
                 }}
                 className={RESULT_ROW_CLASS}
-                onClick={() => openResult({ room }, () => onResultOpen(this.nodeRef))}>
+                onClick={() => openResult({ room }, () => onResultOpen(this.domRef))}>
                 <div className="chat-topic-icon">
                     <i className="sprite-fm-uni icon-chat-group"/>
                 </div>
@@ -179,10 +179,10 @@ class MemberRow extends MegaRenderMixin {
         return (
             <div
                 ref={node => {
-                    this.nodeRef = node;
+                    this.domRef = node;
                 }}
                 className={RESULT_ROW_CLASS}
-                onClick={() => openResult({ room: room || contact.h }, () => onResultOpen(this.nodeRef))}>
+                onClick={() => openResult({ room: room || contact.h }, () => onResultOpen(this.domRef))}>
                 {isGroup ?
                     <div className="chat-topic-icon">
                         <i className="sprite-fm-uni icon-chat-group"/>

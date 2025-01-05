@@ -1,16 +1,20 @@
 import React from 'react';
-import { MegaRenderMixin } from '../../../mixins.js';
 import ModalDialogsUI from '../../../../ui/modalDialogs.jsx';
 
 const NAMESPACE = 'free-call-ended-dlg';
 
-export class FreeCallEnded extends MegaRenderMixin {
+export class FreeCallEnded extends React.Component {
+    domRef = React.createRef();
+
+    componentWillUnmount() {
+        if ($.dialog === NAMESPACE) {
+            closeDialog();
+        }
+    }
 
     componentDidMount() {
-        super.componentDidMount();
-
         M.safeShowDialog(NAMESPACE, () => {
-            if (!this.isMounted()) {
+            if (!this.domRef.current) {
                 throw new Error(`${NAMESPACE} dialog: component ${NAMESPACE} not mounted.`);
             }
             eventlog(500295);
@@ -18,51 +22,46 @@ export class FreeCallEnded extends MegaRenderMixin {
         });
     }
 
-    componentWillUnmount() {
-        super.componentWillUnmount();
-        if ($.dialog === NAMESPACE) {
-            closeDialog();
-        }
-    }
-
     render() {
         const { onClose } = this.props;
-        return <ModalDialogsUI.ModalDialog
-            className="mega-dialog"
-            id={NAMESPACE}
-            onClose={onClose}
-            dialogType="action"
-            dialogName={NAMESPACE}>
-            <header>
-                <div className="free-call-ended graphic">
-                    <img src={`${staticpath}images/mega/chat-upgrade-rocket.png`}/>
-                </div>
-            </header>
 
-            <section className="content">
-                <div className="content-block">
-                    <div className="dialog-body-text">
-                        <h3>
-                            {l.free_call_ended_dlg_text /* `Try one of our Pro plans to have longer duration calls` */}
-                        </h3>
-                        <span>{l.free_call_ended_dlg_subtext /* `Your call reached the 60 minute duration...` */}</span>
+        return (
+            <ModalDialogsUI.ModalDialog
+                id={NAMESPACE}
+                ref={this.domRef}
+                className="mega-dialog"
+                dialogType="action"
+                dialogName={NAMESPACE}
+                onClose={onClose}>
+                <header>
+                    <div className="free-call-ended graphic">
+                        <img src={`${staticpath}images/mega/chat-upgrade-rocket.png`}/>
                     </div>
-                </div>
-            </section>
+                </header>
 
-            <footer>
-                <div className="footer-container">
-                    <button
-                        className="mega-button positive large"
-                        onClick={() => {
-                            loadSubPage('pro');
-                            eventlog(500261);
-                            onClose();
-                        }}>
-                        <span>{l.upgrade_now}</span>
-                    </button>
-                </div>
-            </footer>
-        </ModalDialogsUI.ModalDialog>;
+                <section className="content">
+                    <div className="content-block">
+                        <div className="dialog-body-text">
+                            <h3>{l.free_call_ended_dlg_text}</h3>
+                            <span>{l.free_call_ended_dlg_subtext}</span>
+                        </div>
+                    </div>
+                </section>
+
+                <footer>
+                    <div className="footer-container">
+                        <button
+                            className="mega-button positive large"
+                            onClick={() => {
+                                loadSubPage('pro');
+                                eventlog(500261);
+                                onClose();
+                            }}>
+                            <span>{l.upgrade_now}</span>
+                        </button>
+                    </div>
+                </footer>
+            </ModalDialogsUI.ModalDialog>
+        );
     }
 }

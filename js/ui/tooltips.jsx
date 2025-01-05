@@ -2,23 +2,24 @@ var React = require("react");
 import {MegaRenderMixin} from "../chat/mixins";
 
 
-class Handler extends MegaRenderMixin {
-    static defaultProps = {
-        'hideable': true
-    };
+class Handler extends React.Component {
     render() {
-        var classes = "tooltip-handler" + (this.props.className ? " " + this.props.className : "");
-        return <span className={classes} onMouseOver={this.props.onMouseOver} onMouseOut={this.props.onMouseOut}>
-            {this.props.children}
-        </span>;
+        const { className, onMouseOver, onMouseOut, children } = this.props;
+        return (
+            <span
+                className={`
+                    tooltip-handler
+                    ${className || ''}
+                `}
+                onMouseOver={onMouseOver}
+                onMouseOut={onMouseOut}>
+                {children}
+            </span>
+        );
     }
-};
+}
 
-class Contents extends MegaRenderMixin {
-     static defaultProps = {
-        'hideable': true
-    };
-
+class Contents extends React.Component {
     render() {
         var className = 'tooltip-contents dropdown body tooltip ' + (this.props.className ? this.props.className : "");
 
@@ -36,10 +37,12 @@ class Contents extends MegaRenderMixin {
             return null;
         }
     }
-};
+}
 
 
 class Tooltip extends MegaRenderMixin {
+    domRef = React.createRef();
+
     constructor (props) {
         super(props);
         this.state = {
@@ -74,7 +77,7 @@ class Tooltip extends MegaRenderMixin {
             return;
         }
 
-        var $container = $(this.findDOMNode());
+        var $container = $(this.domRef?.current);
         var $el = $('.tooltip-handler', $container);
         var $tooltip = $('.tooltip-contents', $container);
 
@@ -165,14 +168,16 @@ class Tooltip extends MegaRenderMixin {
         });
 
         return (
-            <span className={this.props.className || ''}>
+            <span
+                ref={this.domRef}
+                className={this.props.className || ''}>
                 {handler}
                 {contents}
                 {others}
             </span>
         );
     }
-};
+}
 
 export default {
     Tooltip,

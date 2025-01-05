@@ -14,7 +14,13 @@ export const FILTER = {
 };
 
 class LeftPanel extends MegaRenderMixin {
+    domRef = React.createRef();
+
+    contactRequestsListener = undefined;
+    fmConfigLeftPaneListener = undefined;
+
     state =  {
+        leftPaneWidth: Math.min(mega.config.get('leftPaneWidth') | 0, 400) || 384,
         archived: false,
         archivedUnmounting: false,
         filter: '',
@@ -69,18 +75,29 @@ class LeftPanel extends MegaRenderMixin {
         super.componentWillUnmount();
         megaChat.unbind(`onUnreadCountUpdate.${NAMESPACE}`);
         mBroadcaster.removeListener(this.contactRequestsListener);
+        mBroadcaster.removeListener(this.fmConfigLeftPaneListener);
     }
 
     componentDidMount() {
         super.componentDidMount();
+
         megaChat.rebind(
             `onUnreadCountUpdate.${NAMESPACE}`,
             (ev, { unreadChats, unreadMeetings }) => {
                 this.setState({ unreadChats, unreadMeetings }, () => this.safeForceUpdate());
             }
         );
-        this.contactRequestsListener = mBroadcaster.addListener('fmViewUpdate:ipc', () =>
-            this.setState({ contactRequests: Object.keys(M.ipc).length })
+
+        this.contactRequestsListener = mBroadcaster.addListener(
+            'fmViewUpdate:ipc',
+            () => this.setState({ contactRequests: Object.keys(M.ipc).length })
+        );
+
+        $.leftPaneResizableChat = new FMResizablePane(this.domRef.current, { ...$.leftPaneResizable?.options });
+
+        this.fmConfigLeftPaneListener = mBroadcaster.addListener(
+            'fmconfig:leftPaneWidth',
+            value => this.setState(state => ({ leftPaneWidth: value || state.leftPaneWidth }))
         );
     }
 
@@ -90,7 +107,6 @@ class LeftPanel extends MegaRenderMixin {
             views,
             conversations,
             routingSection,
-            leftPaneWidth,
             renderView,
             startMeeting,
             scheduleMeeting,
@@ -100,6 +116,7 @@ class LeftPanel extends MegaRenderMixin {
 
         return (
             <div
+                ref={this.domRef}
                 className={`
                     fm-left-panel
                     chat-lp-body
@@ -107,7 +124,7 @@ class LeftPanel extends MegaRenderMixin {
                     ${is_chatlink && 'hidden' || ''}
                     ${megaChat._joinDialogIsShown && 'hidden' || ''}
                 `}
-                {...(leftPaneWidth && { width: leftPaneWidth })}>
+                {...(this.state.leftPaneWidth && { width: this.state.leftPaneWidth })}>
                 <div className="left-pane-drag-handle"/>
 
                 <SearchPanel/>
@@ -162,7 +179,7 @@ class LeftPanel extends MegaRenderMixin {
                             {view === MEETINGS &&
                                 <Meetings
                                     conversations={conversations}
-                                    leftPaneWidth={leftPaneWidth}
+                                    leftPaneWidth={this.state.leftPaneWidth}
                                 />
                             }
                             {view === CHATS &&

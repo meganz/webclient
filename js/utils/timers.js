@@ -479,8 +479,16 @@ lazy(self, 'sleep', function sleep() {
         delete window.sleep;
         window[`sl${'e'}ep`] = tSleep;
 
+        const t = performance.now();
         for (const res of pending) {
-            tSleep(res.ts / 1e3, res.data).then(res);
+            const {data, now, ts} = res;
+            const e = t - now;
+            if (e + MIN_THRESHOLD > ts) {
+                res(data);
+            }
+            else {
+                tSleep((ts - e) / 1e3, data).then(res);
+            }
         }
         pending.clear();
     }).finally(() => {

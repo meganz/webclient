@@ -1211,7 +1211,9 @@ scparser.$add('ipc', {
 
 scparser.$add('ph', (a) => {
     'use strict';
-
+    if (folderlink) {
+        return;
+    }
     // exported link
     processPH([a]);
 
@@ -1473,6 +1475,9 @@ scparser.$add('u', function(a) {
                 }
                 if (oldattr.fav !== n.fav) {
                     M.favouriteDomUpdate(n, n.fav);
+                }
+                if (oldattr.sen !== n.sen) {
+                    mega.sensitives.updateDom(n, n.sen);
                 }
                 if (oldattr.name !== n.name) {
                     M.onRenameUIUpdate(n.h, n.name);
@@ -4579,6 +4584,7 @@ mBroadcaster.once('boot_done', function() {
     });
 });
 
+/*
 mega.commercials = Object.create(null);
 mega.commercials.init = nop;
 mega.commercials.createMobileBottomBarSlots = nop;
@@ -4591,3 +4597,4 @@ mega.commercials.addCommsToBottomBar = (node) => {
     'use strict';
     return node;
 };
+*/

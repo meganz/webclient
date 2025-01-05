@@ -55,9 +55,9 @@ class MegaSheet extends MegaOverlay {
 
         this.domNode.megaSheetType = sheetType;
         this.domNode.classList.add(sheetType);
-        if (mega.flags.ab_ads) {
+        // if (mega.flags.ab_ads) {
             mega.commercials.updateOverlays(sheetType);
-        }
+        // }
     }
 
     get type() {

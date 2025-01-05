@@ -462,9 +462,12 @@ lazy(mega.utils, 'subtitles', () => {
                 else {
                     await M.fmSearchNodes(ext).then(() => {
                         for (const n of Object.keys(M.d)) {
-                            if (M.d[n].name && M.d[n].name.endsWith(ext) && !this._nodes.includes(M.d[n]) &&
-                                !M.getTreeHandles(M.RubbishID).includes(M.d[n].p) &&
-                                !M.getTreeHandles('shares').includes(M.d[n].p)) {
+                            if (M.d[n].name
+                                && M.d[n].name.endsWith(ext)
+                                && !this._nodes.includes(M.d[n])
+                                && !M.getTreeHandles(M.RubbishID).includes(M.d[n].p)
+                                && !M.getTreeHandles('shares').includes(M.d[n].p)
+                                && mega.sensitives.shouldShowNode(M.d[n], !!$.dialog)) {
                                 nodes.push(M.d[n]);
                             }
                         }

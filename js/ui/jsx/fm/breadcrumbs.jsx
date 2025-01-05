@@ -2,6 +2,8 @@ import React from 'react';
 import {MegaRenderMixin} from "../../../chat/mixins";
 
 export default class Breadcrumbs extends MegaRenderMixin {
+    domRef = React.createRef();
+
     constructor(props) {
         super(props);
 
@@ -84,7 +86,7 @@ export default class Breadcrumbs extends MegaRenderMixin {
         return true;
     }
     onGlobalClickHandler(e) {
-        let node = this.findDOMNode();
+        const node = this.domRef?.current;
         if (node.contains(e.target) || node === e.target) {
             return;
         }
@@ -193,36 +195,45 @@ export default class Breadcrumbs extends MegaRenderMixin {
                 breadcrumbDropdownContents = this.getBreadcrumbDropdownContents(extraPathItems);
             }
         }
-        return <div className={`fm-breadcrumbs-wrapper ${className || ""}`}>
-            <div className="fm-breadcrumbs-block">
+
+        return (
+            <div
+                ref={this.domRef}
+                className={`
+                    fm-breadcrumbs-wrapper
+                    ${className || ''}
+                `}>
+                <div className="fm-breadcrumbs-block">
+                    {breadcrumbDropdownContents.length ?
+                        <>
+                            <div className="crumb-overflow-link">
+                                <a
+                                    className="breadcrumb-dropdown-link dropdown"
+                                    onClick={() => {
+                                        this.setState({
+                                            breadcrumbDropdownVisible:
+                                                !this.state.breadcrumbDropdownVisible
+                                        });
+                                    }}>
+                                    <i className="menu-icon sprite-fm-mono icon-options icon24" />
+                                </a>
+                                <i className="sprite-fm-mono icon-arrow-right icon16" />
+                            </div>
+                            {breadcrumb}
+                        </> :
+                        breadcrumb
+                    }
+                </div>
                 {breadcrumbDropdownContents.length ?
-                    <>
-                        <div className="crumb-overflow-link">
-                            <a
-                                className="breadcrumb-dropdown-link dropdown"
-                                onClick={() => {
-                                    this.setState({
-                                        breadcrumbDropdownVisible:
-                                            !this.state.breadcrumbDropdownVisible
-                                    });
-                                }}>
-                                <i className="menu-icon sprite-fm-mono icon-options icon24">
-                                </i>
-                            </a>
-                            <i className="sprite-fm-mono icon-arrow-right icon16"></i>
-                        </div>
-                        {breadcrumb}
-                    </>
-                    : breadcrumb
+                    <div
+                        className={
+                            this.state.breadcrumbDropdownVisible ? 'breadcrumb-dropdown active' : 'breadcrumb-dropdown'
+                        }>
+                        {breadcrumbDropdownContents}
+                    </div> :
+                    ''
                 }
             </div>
-            {breadcrumbDropdownContents.length ?
-                <div className={this.state.breadcrumbDropdownVisible
-                    ? 'breadcrumb-dropdown active' : 'breadcrumb-dropdown'}>
-                    {breadcrumbDropdownContents}
-                </div>
-                : ''
-            }
-        </div>;
+        );
     }
 }

@@ -1,18 +1,19 @@
 import React from 'react';
 import { MegaRenderMixin, compose } from '../../mixins';
 import Nil from './nil.jsx';
-import FMView from "../../../ui/jsx/fm/fmView.jsx";
-import { ColumnContactName } from "../../../ui/jsx/fm/nodes/columns/columnContactName.jsx";
-import { ColumnContactStatus } from "../../../ui/jsx/fm/nodes/columns/columnContactStatus.jsx";
-import { ColumnContactLastInteraction } from "../../../ui/jsx/fm/nodes/columns/columnContactLastInteraction.jsx";
-import { ColumnContactVerifiedStatus } from "../../../ui/jsx/fm/nodes/columns/columnContactVerifiedStatus.jsx";
-import { ColumnContactButtons } from "../../../ui/jsx/fm/nodes/columns/columnContactButtons.jsx";
+import FMView from '../../../ui/jsx/fm/fmView.jsx';
+import { ColumnContactName } from '../../../ui/jsx/fm/nodes/columns/columnContactName.jsx';
+import { ColumnContactStatus } from '../../../ui/jsx/fm/nodes/columns/columnContactStatus.jsx';
+import { ColumnContactLastInteraction } from '../../../ui/jsx/fm/nodes/columns/columnContactLastInteraction.jsx';
+import { ColumnContactVerifiedStatus } from '../../../ui/jsx/fm/nodes/columns/columnContactVerifiedStatus.jsx';
+import { ColumnContactButtons } from '../../../ui/jsx/fm/nodes/columns/columnContactButtons.jsx';
 import { withUpdateObserver } from '../updateObserver.jsx';
 
 class ContactList extends MegaRenderMixin {
     static updateListener = 'getLastInteractions';
     static updateInterval = 6e4 /* 1 min */;
 
+    domRef = React.createRef();
     contextMenuRefs = [];
 
     state = {
@@ -98,7 +99,7 @@ class ContactList extends MegaRenderMixin {
         }
         const $$REF = this.contextMenuRefs[handle];
         if ($$REF && $$REF.isMounted()) {
-            const refNodePosition = $$REF.domNode && $$REF.domNode.getBoundingClientRect().x;
+            const refNodePosition = $$REF.domRef?.current && $$REF.domRef.current.getBoundingClientRect().x;
             this.setState({ contextMenuPosition: ev.clientX > refNodePosition ? null : ev.clientX }, () =>
                 $$REF.onClick(ev)
             );
@@ -133,7 +134,9 @@ class ContactList extends MegaRenderMixin {
 
         if (contacts && contacts.length > 1 /* First contact -> u_handle */) {
             return (
-                <div className="contacts-list">
+                <div
+                    ref={this.domRef}
+                    className="contacts-list">
                     <FMView
                         dataSource={contacts}
                         customFilterFn={(r) => {

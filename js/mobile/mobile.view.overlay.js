@@ -167,9 +167,9 @@ class MegaMobileViewOverlay extends MegaComponent {
 
         mobile.appBanner.updateBanner(nodeHandle);
 
-        if (mega.flags.ab_ads) {
+        // if (mega.flags.ab_ads) {
             mega.commercials.updateOverlays();
-        }
+        // }
     }
 
     /**
@@ -207,9 +207,9 @@ class MegaMobileViewOverlay extends MegaComponent {
             mobile.appBanner.hide();
         }
 
-        if (mega.flags.ab_ads) {
+        // if (mega.flags.ab_ads) {
             mega.commercials.updateOverlays();
-        }
+        // }
 
         // Unbind close the viewer event listeners
         if (this.bpcListener) {

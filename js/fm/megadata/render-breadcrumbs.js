@@ -431,7 +431,6 @@
             // Some items are not shown, so if we don't have a name, don't show this breadcrumb
             // Don't include the contact name (can be removed later if you want it back)
             if (name !== '') {
-
                 const isLastItem = isSimpletip ? i === lastPos + 1 : i === lastPos;
                 const isRoot = i === items.length - 1;
                 const icon = `${mega.ui.sprites.mono} icon-arrow-right`;

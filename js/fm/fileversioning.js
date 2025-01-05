@@ -148,6 +148,22 @@ var versiondialogid;
         },
 
         /**
+         * set/remove sensitive on all previous versions of a file.
+         * @param {hanlde} h file hanle.
+         * @param {Number} newSenState Sensitive state 0 or 1
+         */
+        sensitiveVersions(h, newSenState) {
+            return fileversioning.getAllVersions(h)
+                .then((versions) => {
+                    const promises = [];
+                    for (let i = 1; i < versions.length; i++) {
+                        promises.push(api.setNodeAttributes(versions[i], {sen: newSenState | 0}));
+                    }
+                    return Promise.allSettled(promises);
+                });
+        },
+
+        /**
          * set/remove labels on all previous versions of a file.
          * @param {hanlde} h file hanle.
          * @param {Number} labelId Numeric value of label
@@ -270,6 +286,10 @@ var versiondialogid;
 
                 if (file.fav) {
                     n.fav = file.fav;
+                }
+
+                if (file.sen) {
+                    n.sen = file.sen;
                 }
 
                 if (file.lbl) {

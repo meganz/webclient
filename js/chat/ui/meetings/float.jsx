@@ -16,7 +16,7 @@ import { withPermissionsObserver } from './permissionsObserver.jsx';
 import { withHostsObserver } from './hostsObserver.jsx';
 import { renderLeaveConfirm } from './streamControls';
 
-export default class FloatingVideo extends MegaRenderMixin {
+export default class FloatingVideo extends React.Component {
     collapseListener = null;
 
     static NAMESPACE = 'float-video';
@@ -50,12 +50,10 @@ export default class FloatingVideo extends MegaRenderMixin {
     };
 
     componentWillUnmount() {
-        super.componentWillUnmount();
         mBroadcaster.removeListener(this.collapseListener);
     }
 
     componentDidMount() {
-        super.componentDidMount();
         this.collapseListener = mBroadcaster.addListener('meetings:collapse', () => this.setState({ collapsed: true }));
     }
 
@@ -94,7 +92,7 @@ export default class FloatingVideo extends MegaRenderMixin {
 // --
 
 class Stream extends MegaRenderMixin {
-    containerRef = React.createRef();
+    domRef = React.createRef();
 
     DRAGGABLE = {
         POSITION: {
@@ -205,7 +203,7 @@ class Stream extends MegaRenderMixin {
 
     initDraggable = () => {
         const { minimized, wrapperRef } = this.props;
-        const containerEl = this.containerRef?.current;
+        const containerEl = this.domRef?.current;
 
         if (containerEl) {
             $(containerEl).draggable({
@@ -225,7 +223,7 @@ class Stream extends MegaRenderMixin {
 
     repositionDraggable = () => {
         const wrapperEl = this.props.wrapperRef?.current;
-        const localEl = this.containerRef?.current;
+        const localEl = this.domRef?.current;
 
         if (localEl.offsetLeft + localEl.offsetWidth > wrapperEl.offsetWidth) {
             localEl.style.left = 'unset';
@@ -445,7 +443,7 @@ class Stream extends MegaRenderMixin {
         if (collapsed) {
             return (
                 <div
-                    ref={this.containerRef}
+                    ref={this.domRef}
                     className={`
                         ${NAMESPACE}
                         collapsed
@@ -464,7 +462,7 @@ class Stream extends MegaRenderMixin {
         const source = this.getStreamSource() || call.getLocalStream();
         return (
             <div
-                ref={this.containerRef}
+                ref={this.domRef}
                 className={`
                     ${NAMESPACE}
                     ${IS_MINI_MODE ? 'mini' : ''}
@@ -500,6 +498,8 @@ class Stream extends MegaRenderMixin {
 class Minimized extends MegaRenderMixin {
     static NAMESPACE = 'float-video-minimized';
     static UNREAD_EVENT = 'onUnreadCountUpdate.localStreamNotifications';
+
+    domRef = React.createRef();
 
     SIMPLETIP_PROPS = { position: 'top', offset: 5, className: 'theme-dark-forced' };
     waitingPeersListener = undefined;
@@ -798,7 +798,9 @@ class Minimized extends MegaRenderMixin {
         const { unread, raisedHandPeers, waitingRoomPeers } = this.state;
 
         return (
-            <>
+            <div
+                ref={this.domRef}
+                className={`${FloatingVideo.NAMESPACE}-wrapper`}>
                 <div className={`${FloatingVideo.NAMESPACE}-overlay`}>
                     <Button
                         simpletip={{ ...this.SIMPLETIP_PROPS, label: l.expand_mini_call /* Expand */ }}
@@ -827,7 +829,7 @@ class Minimized extends MegaRenderMixin {
                     </div> :
                     null
                 }
-            </>
+            </div>
         );
     }
 }

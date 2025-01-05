@@ -196,9 +196,9 @@ class MegaOverlay extends MegaComponent {
 
         this.addClass('active');
 
-        if (mega.flags.ab_ads) {
+        // if (mega.flags.ab_ads) {
             mega.commercials.updateOverlays(undefined, true);
-        }
+        // }
     }
 
     hide(name) {
@@ -210,9 +210,9 @@ class MegaOverlay extends MegaComponent {
             this.name = undefined;
             this.trigger('hide');
 
-            if (mega.flags.ab_ads) {
+            // if (mega.flags.ab_ads) {
                 mega.commercials.updateOverlays();
-            }
+            // }
         }
     }
 

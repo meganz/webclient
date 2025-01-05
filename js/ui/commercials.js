@@ -119,14 +119,15 @@ lazy(mega, 'commercials', () => {
                 newPage = 'mobileFolderlink';
             }
             else if (M.currentdirid) {
-                if (M.currentrootid === M.RootID) {
-                    newSlots = [['mwebcdb'], ['mwebtcdb']];
-                    newPage = 'mobileClouddrive';
-                }
-                else {
-                    newSlots = [];
-                    newPage = 'mobileClouddrive';
-                }
+                // if (M.currentrootid === M.RootID) {
+                //    newSlots = [['mwebcdb'], ['mwebtcdb']];
+                //    newPage = 'mobileClouddrive';
+                // }
+                // else {
+                newSlots = [];
+                // newPage = 'mobileClouddrive';
+                newPage = '';
+                // }
             }
             else {
                 newSlots = [['mwebfilinkb'], ['mwebtfilinkb']];
@@ -147,15 +148,15 @@ lazy(mega, 'commercials', () => {
         else if (M.currentTreeType){
             switch (M.currentTreeType) {
                 case 'dashboard':
-                    newSlots = ['webdashsl'];
+                    // newSlots = ['webdashsl'];
                     newPage = 'home';
                     break;
                 case 'cloud-drive':
-                    newSlots = ['webcdsl'];
+                    // newSlots = ['webcdsl'];
                     newPage = 'clouddrive';
                     break;
                 case 'gallery':
-                    newSlots = ['webphsl'];
+                    // newSlots = ['webphsl'];
                     newPage = 'home';
                     break;
             }
@@ -373,7 +374,7 @@ lazy(mega, 'commercials', () => {
         else if (!resizeHandlerActive) {
             if (is_mobile) {
                 // eslint-disable-next-line no-use-before-define
-                initMobileResizeHandler(true);
+                initMobileResizeHandler();
             }
             else {
                 // eslint-disable-next-line no-use-before-define
@@ -387,7 +388,7 @@ lazy(mega, 'commercials', () => {
 
         $videoTheatreModeWrapper = $videoTheatreModeWrapper || $wrapper;
         $theatreMode = $theatreMode || $('.download.main-pad .download.transfer-wrapper', $videoTheatreModeWrapper);
-        if (!mega.flags.ab_ads || !$videoTheatreModeWrapper || currentPage !== 'filelink') {
+        if (/* !mega.flags.ab_ads ||*/ !$videoTheatreModeWrapper || currentPage !== 'filelink') {
             return;
         }
 
@@ -406,10 +407,16 @@ lazy(mega, 'commercials', () => {
 
     // This should only be called after an await csp.init() call
     const updateCommCookies = () => {
+        /*
         if (csp.has('ad') === adCookies || publicUser === undefined) {
             return;
         }
         adCookies = !!csp.has('ad');
+        */
+
+
+
+        adCookies = true;
         if (window.googletag) {
             googletag.pubads().setPrivacySettings({nonPersonalizedAds: adCookies});
         }
@@ -588,6 +595,7 @@ lazy(mega, 'commercials', () => {
     };
 
     const handleCommType = tryCatch((res) => {
+        /*
         if (publicUser) {
             window.onerror = dump;
 
@@ -618,23 +626,30 @@ lazy(mega, 'commercials', () => {
             }
         }
         else {
-            for (let i = 0; i < res.length; i++) {
-                if (!newUserClosedSlots.has(res[i].id.toLowerCase())) {
-                    createComm(res[i]);
-                }
+        */
+        for (let i = 0; i < res.length; i++) {
+            if (!newUserClosedSlots.has(res[i].id.toLowerCase())) {
+                createComm(res[i]);
             }
         }
+        // }
     });
 
     // Update current page, and get the comms that should be loaded
     const getComms = (getMobile, force) => {
 
-        publicUser = mShowAds && !u_attr && !u_handle && mega.flags.ab_adse && isPublicLink();
+        // publicUser = mShowAds && !u_attr && !u_handle && mega.flags.ab_adse && isPublicLink();
+        // publicUser = mShowAds && !u_attr && !u_handle && isPublicLink();
+
+        const publicL = isPublicLink();
+        if (u_attr && u_attr.p || !publicL || publicL.link.startsWith('collection/')) {
+            return;
+        }
 
         const stopUpdate = updateCurrentPage(getMobile);
 
-        if (!mega.flags.ab_ads
-            || ((is_mobile || currentPage === 'filelink') && !pageWidthInfo.showSlot)
+        if (/* !mega.flags.ab_ads            || */
+            ((is_mobile || currentPage === 'filelink') && !pageWidthInfo.showSlot)
             || stopUpdate) {
             return;
         }
@@ -710,7 +725,7 @@ lazy(mega, 'commercials', () => {
     // and return the new bottom bar node location.
     const addCommsToBottomBar = (bottomBar, isFolderLink) => {
 
-        if (!mega.flags.ab_ads || (currentPage === 'mobileFolderlink' && !isFolderLink)){
+        if (/* !mega.flags.ab_ads ||*/ (currentPage === 'mobileFolderlink' && !isFolderLink)){
             return bottomBar;
         }
 
@@ -738,7 +753,8 @@ lazy(mega, 'commercials', () => {
     // If comms are enabled, create new slots for comms to show in in the bottom bar
     const createMobileBottomBarSlots = (bottomBar, isFolderLink) => {
 
-        if (!mega.flags.ab_ads || (currentPage === 'mobileFolderlink' && !isFolderLink) || closeMobileFolderlinkSlots) {
+        if (/* !mega.flags.ab_ads || */
+            (currentPage === 'mobileFolderlink' && !isFolderLink) || closeMobileFolderlinkSlots) {
             return;
         }
 
@@ -763,7 +779,7 @@ lazy(mega, 'commercials', () => {
     // Create the commSlots for mobile cloud drive if they do not already exist
     const createMobileCloudDriveSlots = () => {
 
-        if (!mega.flags.ab_ads || !is_mobile || currentPage !== 'mobileClouddrive') {
+        if (/* !mega.flags.ab_ads ||*/ !is_mobile || currentPage !== 'mobileClouddrive') {
             return;
         }
 
@@ -959,7 +975,7 @@ lazy(mega, 'commercials', () => {
             isMobileCloudDrive = false;
         }
 
-        if (initialised || !mega.flags.ab_ads) {
+        if (initialised /* || !mega.flags.ab_ads*/) {
             return;
         }
 
@@ -981,7 +997,7 @@ lazy(mega, 'commercials', () => {
         }
 
         if (is_mobile) {
-            initMobileResizeHandler(true);
+            initMobileResizeHandler();
         }
         else {
             getComms();
@@ -1015,9 +1031,9 @@ lazy(mega, 'commercials', () => {
     // Usable from the console for testing, allows an account to force ads to show
     // This is only available if the ab_ads flag is set, so user has seen advertisement info (just to be safe)
     const forceComms = (value, unset) => {
-        if (!mega.flags.ab_ads) {
+        /* if (!mega.flags.ab_ads) {
             return;
-        }
+        }*/
 
         value = value || 0;
         let info;
@@ -1110,21 +1126,21 @@ lazy(mega, 'commercials', () => {
 
 mBroadcaster.addListener('csp:settingsSaved', () => {
     'use strict';
-    if (mega.flags.ab_adse) {
+    // if (mega.flags.ab_adse) {
         mega.commercials.updateCommCookies();
-    }
+    // }
 });
 
 mBroadcaster.addListener('login2', () => {
     'use strict';
-    if (mega.flags.ab_ads) {
+    // if (mega.flags.ab_ads) {
         mega.commercials.init(true);
-    }
+    // }
 });
 
 mBroadcaster.addListener('mega:openfolder', SoonFc(90, () => {
     'use strict';
-    if (mega.flags.ab_ads) {
+    // if (mega.flags.ab_ads) {
         mega.commercials.getComms(is_mobile);
-    }
+    // }
 }));

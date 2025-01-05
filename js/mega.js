@@ -4584,6 +4584,7 @@ mBroadcaster.once('boot_done', function() {
     });
 });
 
+/*
 mega.commercials = Object.create(null);
 mega.commercials.init = nop;
 mega.commercials.createMobileBottomBarSlots = nop;
@@ -4596,3 +4597,4 @@ mega.commercials.addCommsToBottomBar = (node) => {
     'use strict';
     return node;
 };
+*/

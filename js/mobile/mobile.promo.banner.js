@@ -51,9 +51,9 @@ class MegaMobilePromoBanner extends MegaOverlay {
             fmconfig.mobab = 1;
             eventlog(folderlink ? 99907 : 99909);
             this.hide();
-            if (mega.flags.ab_ads) {
+            // if (mega.flags.ab_ads) {
                 mega.commercials.updateOverlays();
-            }
+            // }
         });
     }
 
@@ -92,8 +92,8 @@ mBroadcaster.once('fm:initialized', () => {
 
     if (!fmconfig.mobab || folderlink) {
         mega.ui.promoBanner.show();
-        if (mega.flags.ab_ads) {
+        // if (mega.flags.ab_ads) {
             mega.commercials.updateOverlays('promo');
-        }
+        // }
     }
 });

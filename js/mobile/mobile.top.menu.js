@@ -342,9 +342,9 @@ class MegaMobileTopMenu extends MegaComponent {
 
         const page = MegaMobileTopMenu.getPageRoot();
 
-        if (mega.flags.ab_ads) {
+        // if (mega.flags.ab_ads) {
             mega.commercials.mobileFmTabHander();
-        }
+        // }
 
         for (const item of this.domNode.querySelectorAll('.menu-item')) {
 

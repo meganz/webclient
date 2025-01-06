@@ -87,6 +87,9 @@ export default class Contact extends AbstractGenericMessage {
 
         return (
             <Button
+                ref={ref => {
+                    this.buttonRef = ref;
+                }}
                 className="tiny-button"
                 icon="tiny-icon icons-sprite grey-dots">
                 <Dropdown
@@ -94,24 +97,25 @@ export default class Contact extends AbstractGenericMessage {
                     noArrow={true}
                     positionMy="left bottom"
                     positionAt="right bottom"
-                    horizOffset={4}
-                >
+                    horizOffset={4}>
                     <div className="dropdown-avatar rounded">
                         {this._getContactAvatar(contact, 'context-avatar')}
-                        {!isAnonView ?  <div className="dropdown-user-name">
-                            <div className="name">
-                                {HAS_RELATIONSHIP && (
-                                    // Contact is present within the contact list,
-                                    // i.e. contact relationship already established
-                                    this.isLoadingContactInfo() ? <em className="contact-name-loading"/> : name
-                                )}
-                                {!HAS_RELATIONSHIP && name}
-                                <ContactPresence className="small" contact={contact} />
-                            </div>
-                            <div className="email">
-                                {M.u[contact.u].m}
-                            </div>
-                        </div> : <div className="dropdown-user-name"></div>}
+                        {isAnonView ?
+                            <div className="dropdown-user-name" /> :
+                            <div className="dropdown-user-name">
+                                <div className="name">
+                                    {HAS_RELATIONSHIP && (
+                                        // Contact is present within the contact list,
+                                        // i.e. contact relationship already established
+                                        this.isLoadingContactInfo() ? <em className="contact-name-loading"/> : name
+                                    )}
+                                    {!HAS_RELATIONSHIP && name}
+                                    <ContactPresence className="small" contact={contact} />
+                                </div>
+                                <div className="email">
+                                    {M.u[contact.u].m}
+                                </div>
+                            </div>}
                     </div>
                     <ContactFingerprint contact={M.u[contact.u]} />
 
@@ -184,15 +188,21 @@ export default class Contact extends AbstractGenericMessage {
             contacts = [
                 ...contacts,
                 <div key={contact.u}>
-                    {!isAnonView ? <div className="message shared-info">
-                        <div className="message data-title selectable-txt">
-                            <Emoji>{M.getNameByHandle(contact.u)}</Emoji>
+                    {isAnonView ?
+                        <div className="message shared-info" /> :
+                        <div className="message shared-info">
+                            <div
+                                className="message data-title selectable-txt"
+                                onClick={this.buttonRef?.onClick}>
+                                <Emoji>{M.getNameByHandle(contact.u)}</Emoji>
+                            </div>
+                            {M.u[contact.u] ?
+                                <ContactVerified className="right-align" contact={M.u[contact.u]}/> :
+                                null
+                            }
+                            <div className="user-card-email selectable-txt">{contactEmail}</div>
                         </div>
-                        {M.u[contact.u] ?
-                            <ContactVerified className="right-align" contact={M.u[contact.u]}/> :
-                            null}
-                        <div className="user-card-email selectable-txt">{contactEmail}</div>
-                    </div> : <div className="message shared-info"></div>}
+                    }
                     <div className="message shared-data">
                         <div className="data-block-view semi-big">
                             {

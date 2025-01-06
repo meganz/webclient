@@ -29573,6 +29573,9 @@ class Contact extends AbstractGenericMessage {
       name += `(${  contact.m  })`;
     }
     return REaCt().createElement(buttons.$, {
+      ref: ref => {
+        this.buttonRef = ref;
+      },
       className: "tiny-button",
       icon: "tiny-icon icons-sprite grey-dots"
     }, REaCt().createElement(dropdowns.Dropdown, {
@@ -29583,7 +29586,9 @@ class Contact extends AbstractGenericMessage {
       horizOffset: 4
     }, REaCt().createElement("div", {
       className: "dropdown-avatar rounded"
-    }, this._getContactAvatar(contact, 'context-avatar'), !isAnonView ? REaCt().createElement("div", {
+    }, this._getContactAvatar(contact, 'context-avatar'), isAnonView ? REaCt().createElement("div", {
+      className: "dropdown-user-name"
+    }) : REaCt().createElement("div", {
       className: "dropdown-user-name"
     }, REaCt().createElement("div", {
       className: "name"
@@ -29594,9 +29599,7 @@ class Contact extends AbstractGenericMessage {
       contact
     })), REaCt().createElement("div", {
       className: "email"
-    }, M.u[contact.u].m)) : REaCt().createElement("div", {
-      className: "dropdown-user-name"
-    })), REaCt().createElement(ui_contacts.ContactFingerprint, {
+    }, M.u[contact.u].m))), REaCt().createElement(ui_contacts.ContactFingerprint, {
       contact: M.u[contact.u]
     }), HAS_RELATIONSHIP && REaCt().createElement(REaCt().Fragment, null, REaCt().createElement(dropdowns.DropdownItem, {
       icon: "sprite-fm-mono icon-user-filled",
@@ -29631,6 +29634,7 @@ class Contact extends AbstractGenericMessage {
     }
     let contacts = [];
     attachmentMeta.forEach(v => {
+      let _this$buttonRef;
       const contact = M.u && v.u in M.u && M.u[v.u].m ? M.u[v.u] : v;
       const contactEmail = contact.email ? contact.email : contact.m;
       if (!M.u[contact.u]) {
@@ -29645,18 +29649,19 @@ class Contact extends AbstractGenericMessage {
       }
       contacts = [...contacts, REaCt().createElement("div", {
         key: contact.u
-      }, !isAnonView ? REaCt().createElement("div", {
+      }, isAnonView ? REaCt().createElement("div", {
+        className: "message shared-info"
+      }) : REaCt().createElement("div", {
         className: "message shared-info"
       }, REaCt().createElement("div", {
-        className: "message data-title selectable-txt"
+        className: "message data-title selectable-txt",
+        onClick: (_this$buttonRef = this.buttonRef) == null ? void 0 : _this$buttonRef.onClick
       }, REaCt().createElement(utils.zT, null, M.getNameByHandle(contact.u))), M.u[contact.u] ? REaCt().createElement(ui_contacts.ContactVerified, {
         className: "right-align",
         contact: M.u[contact.u]
       }) : null, REaCt().createElement("div", {
         className: "user-card-email selectable-txt"
-      }, contactEmail)) : REaCt().createElement("div", {
-        className: "message shared-info"
-      }), REaCt().createElement("div", {
+      }, contactEmail)), REaCt().createElement("div", {
         className: "message shared-data"
       }, REaCt().createElement("div", {
         className: "data-block-view semi-big"
@@ -29694,6 +29699,7 @@ class Attachment extends AbstractGenericMessage {
     const attachmentMeta = message.getAttachmentMeta() || [];
     const files = [];
     for (let i = 0; i < attachmentMeta.length; i++) {
+      var _this$buttonRef;
       const v = attachmentMeta[i];
       if (this._isRevoked(v)) {
         continue;
@@ -29732,130 +29738,129 @@ class Attachment extends AbstractGenericMessage {
           }
         }));
       }
-      if (contact.u === u_handle) {
-        dropdown = REaCt().createElement(buttons.$, {
-          className: "tiny-button",
-          icon: "tiny-icon icons-sprite grey-dots"
-        }, REaCt().createElement(dropdowns.Dropdown, {
-          ref: refObj => {
-            this.dropdown = refObj;
-          },
-          className: "white-context-menu attachments-dropdown",
-          noArrow: true,
-          positionMy: "left top",
-          positionAt: "left bottom",
-          horizOffset: -4,
-          vertOffset: 3,
-          onBeforeActiveChange: newState => {
-            if (newState === true) {
-              this.forceUpdate();
-            }
-          },
-          dropdownItemGenerator: dd => {
-            const linkButtons = [];
-            const firstGroupOfButtons = [];
-            let revokeButton = null;
-            let downloadButton = null;
-            let addToAlbumButton = null;
-            if (message.isEditable && message.isEditable()) {
-              revokeButton = REaCt().createElement(dropdowns.DropdownItem, {
-                icon: "sprite-fm-mono icon-dialog-close",
-                label: l[83],
-                onClick: () => {
-                  chatRoom.megaChat.plugins.chatdIntegration.updateMessage(chatRoom, message.internalId || message.orderValue, "");
-                }
-              });
-            }
-            if (!M.d[v.h] && !NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
-              dbfetch.acquire(v.h).always(() => {
-                if (!M.d[v.h]) {
-                  NODE_DOESNT_EXISTS_ANYMORE[v.h] = true;
-                  dd.doRerender();
-                } else {
-                  dd.doRerender();
-                }
-              });
-              return REaCt().createElement("span", {
-                className: "loading"
-              }, l[5533]);
-            } else if (!NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
-              downloadButton = REaCt().createElement(dropdowns.DropdownItem, {
-                icon: "sprite-fm-mono icon-download-small",
-                label: l[1187],
-                disabled: mega.paywall,
-                onClick: () => this.props.onDownloadStart(v)
-              });
-              if (M.getNodeRoot(v.h) !== M.RubbishID) {
-                this.props.onAddLinkButtons(v.h, linkButtons);
-              }
-              firstGroupOfButtons.push(REaCt().createElement(dropdowns.DropdownItem, {
-                icon: "sprite-fm-mono icon-info",
-                label: l[6859],
-                key: "infoDialog",
-                onClick: () => {
-                  $.selected = [v.ch];
-                  mega.ui.mInfoPanel.initInfoPanel();
-                }
-              }));
-              this.props.onAddFavouriteButtons(v.h, firstGroupOfButtons);
-              linkButtons.push(REaCt().createElement(dropdowns.DropdownItem, {
-                icon: "sprite-fm-mono icon-send-to-chat",
-                label: l[17764],
-                key: "sendToChat",
-                disabled: mega.paywall,
-                onClick: () => {
-                  $.selected = [v.h];
-                  openCopyDialog('conversations');
-                }
-              }));
-              if (mega.gallery.isGalleryNode(v)) {
-                addToAlbumButton = REaCt().createElement(dropdowns.DropdownItem, {
-                  icon: "sprite-fm-mono rectangle-stack-plus-small-regular-outline",
-                  label: l.add_to_album,
-                  disabled: mega.paywall,
-                  onClick: () => mega.gallery.albums.addToAlbum([v.h])
-                });
-              }
-            }
-            if (!previewButton && firstGroupOfButtons.length === 0 && !downloadButton && !addToAlbumButton && linkButtons.length === 0 && !revokeButton) {
-              return null;
-            }
-            if (previewButton && (firstGroupOfButtons.length > 0 || downloadButton || addToAlbumButton || linkButtons.length > 0 || revokeButton)) {
-              previewButton = [previewButton, REaCt().createElement("hr", {
-                key: "preview-sep"
-              })];
-            }
-            return REaCt().createElement("div", null, previewButton, firstGroupOfButtons, firstGroupOfButtons.length > 0 ? REaCt().createElement("hr", null) : "", addToAlbumButton, addToAlbumButton ? REaCt().createElement("hr", null) : "", downloadButton, linkButtons, revokeButton && downloadButton ? REaCt().createElement("hr", null) : "", revokeButton);
+      dropdown = contact.u === u_handle ? REaCt().createElement(buttons.$, {
+        ref: ref => {
+          this.buttonRef = ref;
+        },
+        className: "tiny-button",
+        icon: "tiny-icon icons-sprite grey-dots"
+      }, REaCt().createElement(dropdowns.Dropdown, {
+        className: "white-context-menu attachments-dropdown",
+        noArrow: true,
+        positionMy: "left top",
+        positionAt: "left bottom",
+        horizOffset: -4,
+        vertOffset: 3,
+        onBeforeActiveChange: newState => {
+          if (newState === true) {
+            this.forceUpdate();
           }
-        }));
-      } else {
-        dropdown = REaCt().createElement(buttons.$, {
-          className: "tiny-button",
-          icon: "tiny-icon icons-sprite grey-dots"
-        }, REaCt().createElement(dropdowns.Dropdown, {
-          className: "white-context-menu attachments-dropdown",
-          noArrow: true,
-          positionMy: "left top",
-          positionAt: "left bottom",
-          horizOffset: -4,
-          vertOffset: 3
-        }, previewButton, previewButton && REaCt().createElement("hr", null), REaCt().createElement(dropdowns.DropdownItem, {
-          icon: "sprite-fm-mono icon-download-small",
-          label: l[1187],
-          disabled: mega.paywall,
-          onClick: () => this.props.onDownloadStart(v)
-        }), !is_chatlink && this._isUserRegistered() && REaCt().createElement(REaCt().Fragment, null, REaCt().createElement(dropdowns.DropdownItem, {
-          icon: "sprite-fm-mono icon-cloud",
-          label: l[1988],
-          disabled: mega.paywall,
-          onClick: () => this.props.onAddToCloudDrive(v, false)
-        }), REaCt().createElement(dropdowns.DropdownItem, {
-          icon: "sprite-fm-mono icon-send-to-chat",
-          label: l[17764],
-          disabled: mega.paywall,
-          onClick: () => this.props.onAddToCloudDrive(v, true)
-        }))));
-      }
+        },
+        dropdownItemGenerator: dd => {
+          const linkButtons = [];
+          const firstGroupOfButtons = [];
+          let revokeButton = null;
+          let downloadButton = null;
+          let addToAlbumButton = null;
+          if (message.isEditable && message.isEditable()) {
+            revokeButton = REaCt().createElement(dropdowns.DropdownItem, {
+              icon: "sprite-fm-mono icon-dialog-close",
+              label: l[83],
+              onClick: () => {
+                chatRoom.megaChat.plugins.chatdIntegration.updateMessage(chatRoom, message.internalId || message.orderValue, "");
+              }
+            });
+          }
+          if (!M.d[v.h] && !NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
+            dbfetch.acquire(v.h).always(() => {
+              if (!M.d[v.h]) {
+                NODE_DOESNT_EXISTS_ANYMORE[v.h] = true;
+                dd.doRerender();
+              } else {
+                dd.doRerender();
+              }
+            });
+            return REaCt().createElement("span", {
+              className: "loading"
+            }, l[5533]);
+          } else if (!NODE_DOESNT_EXISTS_ANYMORE[v.h]) {
+            downloadButton = REaCt().createElement(dropdowns.DropdownItem, {
+              icon: "sprite-fm-mono icon-download-small",
+              label: l[1187],
+              disabled: mega.paywall,
+              onClick: () => this.props.onDownloadStart(v)
+            });
+            if (M.getNodeRoot(v.h) !== M.RubbishID) {
+              this.props.onAddLinkButtons(v.h, linkButtons);
+            }
+            firstGroupOfButtons.push(REaCt().createElement(dropdowns.DropdownItem, {
+              icon: "sprite-fm-mono icon-info",
+              label: l[6859],
+              key: "infoDialog",
+              onClick: () => {
+                $.selected = [v.ch];
+                mega.ui.mInfoPanel.initInfoPanel();
+              }
+            }));
+            this.props.onAddFavouriteButtons(v.h, firstGroupOfButtons);
+            linkButtons.push(REaCt().createElement(dropdowns.DropdownItem, {
+              icon: "sprite-fm-mono icon-send-to-chat",
+              label: l[17764],
+              key: "sendToChat",
+              disabled: mega.paywall,
+              onClick: () => {
+                $.selected = [v.h];
+                openCopyDialog('conversations');
+              }
+            }));
+            if (mega.gallery.isGalleryNode(v)) {
+              addToAlbumButton = REaCt().createElement(dropdowns.DropdownItem, {
+                icon: "sprite-fm-mono rectangle-stack-plus-small-regular-outline",
+                label: l.add_to_album,
+                disabled: mega.paywall,
+                onClick: () => mega.gallery.albums.addToAlbum([v.h])
+              });
+            }
+          }
+          if (!previewButton && firstGroupOfButtons.length === 0 && !downloadButton && !addToAlbumButton && linkButtons.length === 0 && !revokeButton) {
+            return null;
+          }
+          if (previewButton && (firstGroupOfButtons.length > 0 || downloadButton || addToAlbumButton || linkButtons.length > 0 || revokeButton)) {
+            previewButton = [previewButton, REaCt().createElement("hr", {
+              key: "preview-sep"
+            })];
+          }
+          return REaCt().createElement("div", null, previewButton, firstGroupOfButtons, firstGroupOfButtons.length > 0 ? REaCt().createElement("hr", null) : "", addToAlbumButton, addToAlbumButton ? REaCt().createElement("hr", null) : "", downloadButton, linkButtons, revokeButton && downloadButton ? REaCt().createElement("hr", null) : "", revokeButton);
+        }
+      })) : REaCt().createElement(buttons.$, {
+        ref: ref => {
+          this.buttonRef = ref;
+        },
+        className: "tiny-button",
+        icon: "tiny-icon icons-sprite grey-dots"
+      }, REaCt().createElement(dropdowns.Dropdown, {
+        className: "white-context-menu attachments-dropdown",
+        noArrow: true,
+        positionMy: "left top",
+        positionAt: "left bottom",
+        horizOffset: -4,
+        vertOffset: 3
+      }, previewButton, previewButton && REaCt().createElement("hr", null), REaCt().createElement(dropdowns.DropdownItem, {
+        icon: "sprite-fm-mono icon-download-small",
+        label: l[1187],
+        disabled: mega.paywall,
+        onClick: () => this.props.onDownloadStart(v)
+      }), !is_chatlink && this._isUserRegistered() && REaCt().createElement(REaCt().Fragment, null, REaCt().createElement(dropdowns.DropdownItem, {
+        icon: "sprite-fm-mono icon-cloud",
+        label: l[1988],
+        disabled: mega.paywall,
+        onClick: () => this.props.onAddToCloudDrive(v, false)
+      }), REaCt().createElement(dropdowns.DropdownItem, {
+        icon: "sprite-fm-mono icon-send-to-chat",
+        label: l[17764],
+        disabled: mega.paywall,
+        onClick: () => this.props.onAddToCloudDrive(v, true)
+      }))));
       if (M.getNodeShare(v.h).down) {
         dropdown = null;
       }
@@ -29922,10 +29927,11 @@ class Attachment extends AbstractGenericMessage {
         })) : preview;
       }
       files.push(REaCt().createElement("div", {
-        className: attachmentClasses,
-        key: `atch-${  v.ch}`
+        key: `attachment-${v.ch}`,
+        className: attachmentClasses
       }, REaCt().createElement("div", {
-        className: "message shared-info"
+        className: "message shared-info",
+        onClick: (_this$buttonRef = this.buttonRef) == null ? void 0 : _this$buttonRef.onClick
       }, REaCt().createElement("div", {
         className: "message data-title selectable-txt"
       }, l[17669], REaCt().createElement("span", {
@@ -29936,9 +29942,9 @@ class Attachment extends AbstractGenericMessage {
         className: "clear"
       })));
     }
-    return REaCt().createElement(REaCt().Fragment, null, REaCt().createElement("div", {
+    return REaCt().createElement("div", {
       className: "message shared-block"
-    }, files));
+    }, files);
   }
 }
 // EXTERNAL MODULE: ./js/chat/mixins.js
@@ -31010,7 +31016,6 @@ class Giphy extends AbstractGenericMessage {
 
 
 
-const CLICKABLE_ATTACHMENT_CLASSES = '.message.data-title, .message.file-size, .data-block-view.semi-big, .data-block-view.medium';
 class GenericConversationMessage extends mixin.M {
   constructor(props) {
     super(props);
@@ -31046,43 +31051,14 @@ class GenericConversationMessage extends mixin.M {
   componentDidMount() {
     let _this$containerRef2;
     super.componentDidMount();
-    const self = this;
     const $node = $((_this$containerRef2 = this.containerRef) == null ? void 0 : _this$containerRef2.current);
-    if (self.isBeingEdited() && self.isMounted()) {
+    if (this.isBeingEdited() && this.isMounted()) {
       const $textarea = $('textarea', $node);
-      if ($textarea.length > 0 && !$textarea.is(":focus")) {
-        $textarea.trigger("focus");
+      if ($textarea.length > 0 && !$textarea.is(':focus')) {
+        $textarea.trigger('focus');
         moveCursortoToEnd($textarea[0]);
       }
     }
-    $node.rebind('click.dropdownShortcut', CLICKABLE_ATTACHMENT_CLASSES, (e) => {
-      const $target = $(e.target);
-      if ($target.hasClass('button')) {
-        return;
-      }
-      if ($target.hasClass('no-thumb-prev') || $target.parents('.no-thumb-prev').length) {
-        return;
-      }
-      let $block;
-      if ($target.is('.shared-data')) {
-        $block = $target;
-      } else if ($target.is(".shared-info") || $target.parents(".shared-info").length > 0) {
-        $block = $target.is(".shared-info") ? $target.next() : $target.parents(".shared-info").next();
-      } else {
-        $block = $target.parents('.message.shared-data');
-      }
-      Soon(() => {
-        $('.tiny-button', $block).trigger('click');
-      });
-    });
-  }
-  componentWillUnmount() {
-    let _this$containerRef3;
-    super.componentWillUnmount();
-    const self = this;
-    const $node = $((_this$containerRef3 = this.containerRef) == null ? void 0 : _this$containerRef3.current);
-    self.props.message.off(`onChange.GenericConversationMessage${  self.getUniqueId()}`);
-    $node.off('click.dropdownShortcut', CLICKABLE_ATTACHMENT_CLASSES);
   }
   haveMoreContactListeners() {
     if (!this.props.message || !this.props.message.meta) {
@@ -31334,28 +31310,28 @@ class GenericConversationMessage extends mixin.M {
       case MESSAGE.TYPE.REVOKED || MESSAGE.TYPE.REVOKE_ATTACHMENT:
         return null;
       case MESSAGE.TYPE.ATTACHMENT:
-        return REaCt().createElement(Attachment, (0,esm_extends.A)({}, MESSAGE.props, {
+        return $$CONTAINER(REaCt().createElement(Attachment, (0,esm_extends.A)({}, MESSAGE.props, {
           onPreviewStart: (v, e) => this._startPreview(v, e),
           onDownloadStart: v => this._startDownload(v),
           onAddLinkButtons: (h, arr) => this._addLinkButtons(h, arr),
           onAddToCloudDrive: (v, openSendToChat) => this._addToCloudDrive(v, openSendToChat),
           onAddFavouriteButtons: (h, arr) => this._addFavouriteButtons(h, arr)
-        }));
+        })));
       case MESSAGE.TYPE.CONTACT:
-        return REaCt().createElement(Contact, (0,esm_extends.A)({}, MESSAGE.props, {
+        return $$CONTAINER(REaCt().createElement(Contact, (0,esm_extends.A)({}, MESSAGE.props, {
           onDelete: MESSAGE.onDelete
-        }));
+        })));
       case MESSAGE.TYPE.VOICE_CLIP:
-        return REaCt().createElement(VoiceClip, (0,esm_extends.A)({}, MESSAGE.props, {
+        return $$CONTAINER(REaCt().createElement(VoiceClip, (0,esm_extends.A)({}, MESSAGE.props, {
           isBeingEdited: MESSAGE.isBeingEdited,
           onDelete: MESSAGE.onDelete
-        }));
+        })));
       case MESSAGE.TYPE.INLINE:
-        return REaCt().createElement(Local, MESSAGE.props);
+        return $$CONTAINER(REaCt().createElement(Local, MESSAGE.props));
       case MESSAGE.TYPE.GIPHY:
-        return REaCt().createElement(Giphy, (0,esm_extends.A)({}, MESSAGE.props, {
+        return $$CONTAINER(REaCt().createElement(Giphy, (0,esm_extends.A)({}, MESSAGE.props, {
           onDelete: MESSAGE.onDelete
-        }));
+        })));
       case MESSAGE.TYPE.TEXT:
         return $$CONTAINER(REaCt().createElement(Text, (0,esm_extends.A)({}, MESSAGE.props, {
           onEditToggle: editing => this.setState({
@@ -33022,11 +32998,12 @@ $: () => Button
 const _extends2__ = REQ_(168);
 const react0__ = REQ_(594);
 const react0 = REQ_.n(react0__);
-const _chat_mixins1__ = REQ_(137);
+const _chat_mixins_js1__ = REQ_(137);
 
 
 
-class Button extends _chat_mixins1__.w9 {
+const BLURRABLE_CLASSES = '.conversationsApp, .join-meeting, .main-blur-block';
+class Button extends _chat_mixins_js1__.w9 {
   constructor(props) {
     super(props);
     this.domRef = react0().createRef();
@@ -33071,7 +33048,7 @@ class Button extends _chat_mixins1__.w9 {
         } else if (react0().Children.count(this.props.children) > 0) {
           this.setState({
             focused: true
-          });
+          }, () => this.safeForceUpdate());
         }
       } else if (this.state.focused === true) {
         this.setState({
@@ -33087,12 +33064,7 @@ class Button extends _chat_mixins1__.w9 {
       nextState.focused = false;
     }
     if (this.state.focused !== nextState.focused && nextState.focused === true) {
-      $('.conversationsApp, .join-meeting, .main-blur-block').rebind(`mousedown.button${  this.getUniqueId()}`, this.onBlur);
-      $(document).rebind(`keyup.button${  this.getUniqueId()}`, e => {
-        if (this.state.focused === true && e.keyCode === 27) {
-          this.onBlur();
-        }
-      });
+      this.bindEvents();
       if (this._pageChangeListener) {
         mBroadcaster.removeListener(this._pageChangeListener);
       }
@@ -33101,19 +33073,6 @@ class Button extends _chat_mixins1__.w9 {
           this.onBlur();
         }
       });
-      $(document).rebind(`closeDropdowns.${  this.getUniqueId()}`, () => this.onBlur());
-      if (this.props.group) {
-        if (_buttonGroups[this.props.group] && _buttonGroups[this.props.group] !== this) {
-          _buttonGroups[this.props.group].setState({
-            focused: false
-          });
-          _buttonGroups[this.props.group].unbindEvents();
-        }
-        _buttonGroups[this.props.group] = this;
-      }
-    }
-    if (this.props.group && nextState.focused === false && _buttonGroups[this.props.group] === this) {
-      _buttonGroups[this.props.group] = null;
     }
   }
   componentWillUnmount() {
@@ -33149,17 +33108,21 @@ class Button extends _chat_mixins1__.w9 {
           if (child.props.onActiveChange) {
             child.props.onActiveChange(newVal);
           }
+          return newVal ? this.bindEvents() : this.unbindEvents();
         }
       });
     });
   }
+  bindEvents() {
+    $(BLURRABLE_CLASSES).rebind(`mousedown.button--${this.getUniqueId()}`, this.onBlur);
+    $(document).rebind(`keyup.button--${this.getUniqueId()}`, ev => this.state.focused === true && ev.keyCode === 27 && this.onBlur());
+    $(document).rebind(`closeDropdowns.${this.getUniqueId()}`, this.onBlur);
+  }
   unbindEvents() {
-    $(document).off(`keyup.button${  this.getUniqueId()}`);
-    $(document).off(`closeDropdowns.${  this.getUniqueId()}`);
-    $('.conversationsApp, .join-meeting, .main-blur-block').unbind(`mousedown.button${  this.getUniqueId()}`);
-    if (this._pageChangeListener) {
-      mBroadcaster.removeListener(this._pageChangeListener);
-    }
+    $(BLURRABLE_CLASSES).unbind(`mousedown.button--${this.getUniqueId()}`);
+    $(document).off(`keyup.button--${this.getUniqueId()}`);
+    $(document).off(`closeDropdowns.${this.getUniqueId()}`);
+    mBroadcaster.removeListener(this._pageChangeListener);
   }
   render() {
     const {

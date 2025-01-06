@@ -8,11 +8,6 @@ import Text from './types/text.jsx';
 import Giphy from './types/giphy.jsx';
 import { DropdownItem } from '../../../ui/dropdowns.jsx';
 
-
-// eslint-disable-next-line id-length
-const CLICKABLE_ATTACHMENT_CLASSES =
-    '.message.data-title, .message.file-size, .data-block-view.semi-big, .data-block-view.medium';
-
 export default class GenericConversationMessage extends ConversationMessageMixin {
     containerRef = React.createRef();
 
@@ -56,66 +51,14 @@ export default class GenericConversationMessage extends ConversationMessageMixin
 
     componentDidMount() {
         super.componentDidMount();
-
-        var self = this;
-        var $node = $(this.containerRef?.current);
-
-        if (self.isBeingEdited() && self.isMounted()) {
+        const $node = $(this.containerRef?.current);
+        if (this.isBeingEdited() && this.isMounted()) {
             var $textarea = $('textarea', $node);
-            if ($textarea.length > 0 && !$textarea.is(":focus")) {
-                $textarea.trigger("focus");
+            if ($textarea.length > 0 && !$textarea.is(':focus')) {
+                $textarea.trigger('focus');
                 moveCursortoToEnd($textarea[0]);
             }
         }
-
-        var SHARED_INFO_CLS = '.shared-info';
-        $node.rebind(
-            'click.dropdownShortcut',
-            CLICKABLE_ATTACHMENT_CLASSES,
-            function(e){
-                const $target = $(e.target);
-                if ($target.hasClass('button')) {
-                    // prevent recursion
-                    return;
-                }
-                if (
-                    $target.hasClass('no-thumb-prev')
-                    || $target.parents('.no-thumb-prev').length
-                ) {
-                    // don't show the dropdown clicking an item without thumbnail but do when clicking the meta info
-                    return;
-                }
-
-                let $block;
-                if ($target.is('.shared-data')) {
-                    $block = $target;
-                }
-                else if (
-                    $target.is(SHARED_INFO_CLS) || $target.parents(SHARED_INFO_CLS).length > 0
-                ) {
-                    $block = $target.is(SHARED_INFO_CLS) ?
-                        $target.next() : $target.parents(SHARED_INFO_CLS).next();
-                }
-                else {
-                    $block = $target.parents('.message.shared-data');
-                }
-
-
-                Soon(function() {
-                    // a delay is needed, otherwise React would receive the same click event and close the dropdown
-                    // even before displaying it in the UI.
-                    $('.tiny-button', $block).trigger('click');
-                });
-            });
-    }
-
-    componentWillUnmount() {
-        super.componentWillUnmount();
-        var self = this;
-        var $node = $(this.containerRef?.current);
-
-        self.props.message.off('onChange.GenericConversationMessage' + self.getUniqueId());
-        $node.off('click.dropdownShortcut', CLICKABLE_ATTACHMENT_CLASSES);
     }
 
     haveMoreContactListeners() {
@@ -425,40 +368,46 @@ export default class GenericConversationMessage extends ConversationMessageMixin
                 return null;
             case MESSAGE.TYPE.ATTACHMENT:
                 return (
-                    <Attachment
-                        {...MESSAGE.props}
-                        onPreviewStart={(v, e) => this._startPreview(v, e)}
-                        onDownloadStart={v => this._startDownload(v)}
-                        onAddLinkButtons={(h, arr) => this._addLinkButtons(h, arr)}
-                        onAddToCloudDrive={(v, openSendToChat) => this._addToCloudDrive(v, openSendToChat)}
-                        onAddFavouriteButtons={(h, arr) => this._addFavouriteButtons(h, arr)}
-                    />
+                    $$CONTAINER(
+                        <Attachment
+                            {...MESSAGE.props}
+                            onPreviewStart={(v, e) => this._startPreview(v, e)}
+                            onDownloadStart={v => this._startDownload(v)}
+                            onAddLinkButtons={(h, arr) => this._addLinkButtons(h, arr)}
+                            onAddToCloudDrive={(v, openSendToChat) => this._addToCloudDrive(v, openSendToChat)}
+                            onAddFavouriteButtons={(h, arr) => this._addFavouriteButtons(h, arr)}
+                        />
+                    )
                 );
             case MESSAGE.TYPE.CONTACT:
                 return (
-                    <Contact
-                        {...MESSAGE.props}
-                        onDelete={MESSAGE.onDelete}
-                    />
+                    $$CONTAINER(
+                        <Contact
+                            {...MESSAGE.props}
+                            onDelete={MESSAGE.onDelete}
+                        />
+                    )
                 );
             case MESSAGE.TYPE.VOICE_CLIP:
                 return (
-                    <VoiceClip
-                        {...MESSAGE.props}
-                        isBeingEdited={MESSAGE.isBeingEdited}
-                        onDelete={MESSAGE.onDelete}
-                    />
+                    $$CONTAINER(
+                        <VoiceClip
+                            {...MESSAGE.props}
+                            isBeingEdited={MESSAGE.isBeingEdited}
+                            onDelete={MESSAGE.onDelete}
+                        />
+                    )
                 );
             case MESSAGE.TYPE.INLINE:
-                return (
-                    <Local {...MESSAGE.props} />
-                );
+                return $$CONTAINER(<Local {...MESSAGE.props} />);
             case MESSAGE.TYPE.GIPHY:
                 return (
-                    <Giphy
-                        {...MESSAGE.props}
-                        onDelete={MESSAGE.onDelete}
-                    />
+                    $$CONTAINER(
+                        <Giphy
+                            {...MESSAGE.props}
+                            onDelete={MESSAGE.onDelete}
+                        />
+                    )
                 );
             case MESSAGE.TYPE.TEXT:
                 return (

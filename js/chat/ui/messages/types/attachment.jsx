@@ -4,7 +4,6 @@ import { Dropdown, DropdownItem } from '../../../../ui/dropdowns.jsx';
 import { Button } from '../../../../ui/buttons.jsx';
 
 export default class Attachment extends AbstractGenericMessage {
-
     _isRevoked(node) {
         return !M.chd[node.ch] || node.revoked;
     }
@@ -70,14 +69,14 @@ export default class Attachment extends AbstractGenericMessage {
                     </span>;
             }
 
-            if (contact.u === u_handle) {
-                dropdown = <Button
+            dropdown = contact.u === u_handle ?
+                <Button
+                    ref={ref => {
+                        this.buttonRef = ref;
+                    }}
                     className="tiny-button"
                     icon="tiny-icon icons-sprite grey-dots">
                     <Dropdown
-                        ref={(refObj) => {
-                            this.dropdown = refObj;
-                        }}
                         className="white-context-menu attachments-dropdown"
                         noArrow={true}
                         positionMy="left top"
@@ -205,11 +204,13 @@ export default class Attachment extends AbstractGenericMessage {
                                 {revokeButton && downloadButton ? <hr/> : ""}
                                 {revokeButton}
                             </div>;
-                        }}/>
-                </Button>;
-            }
-            else {
-                dropdown = <Button
+                        }}
+                    />
+                </Button> :
+                <Button
+                    ref={ref => {
+                        this.buttonRef = ref;
+                    }}
                     className="tiny-button"
                     icon="tiny-icon icons-sprite grey-dots">
                     <Dropdown
@@ -218,8 +219,7 @@ export default class Attachment extends AbstractGenericMessage {
                         positionMy="left top"
                         positionAt="left bottom"
                         horizOffset={-4}
-                        vertOffset={3}
-                    >
+                        vertOffset={3}>
                         {previewButton}
                         {previewButton && <hr/>}
                         <DropdownItem
@@ -246,7 +246,6 @@ export default class Attachment extends AbstractGenericMessage {
                         }
                     </Dropdown>
                 </Button>;
-            }
 
             if (M.getNodeShare(v.h).down) {
                 dropdown = null;
@@ -330,15 +329,17 @@ export default class Attachment extends AbstractGenericMessage {
             }
 
             files.push(
-                <div className={attachmentClasses} key={'atch-' + v.ch}>
-                    <div className="message shared-info">
+                <div
+                    key={`attachment-${v.ch}`}
+                    className={attachmentClasses}>
+                    <div
+                        className="message shared-info"
+                        onClick={this.buttonRef?.onClick}>
                         <div className="message data-title selectable-txt">
                             {l[17669] /* `Uploaded this file:` */}
                             <span className="file-name">{v.name}</span>
                         </div>
-                        <div className="message file-size">
-                            {bytesToSize(v.s)}
-                        </div>
+                        <div className="message file-size">{bytesToSize(v.s)}</div>
                     </div>
                     {preview}
                     <div className="clear" />
@@ -346,12 +347,6 @@ export default class Attachment extends AbstractGenericMessage {
             );
         }
 
-        return (
-            <>
-                <div className="message shared-block">
-                    {files}
-                </div>
-            </>
-        );
+        return <div className="message shared-block">{files}</div>;
     }
 }

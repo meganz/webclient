@@ -643,6 +643,7 @@ lazy(mega, 'commercials', () => {
 
         const publicL = isPublicLink();
         if (u_attr && u_attr.p || !publicL || publicL.link.startsWith('collection/')) {
+            hideComms(undefined, true);
             return;
         }
 
@@ -1138,9 +1139,9 @@ mBroadcaster.addListener('login2', () => {
     // }
 });
 
-mBroadcaster.addListener('mega:openfolder', SoonFc(90, () => {
+mBroadcaster.addListener('mega:openfolder', () => {
     'use strict';
     // if (mega.flags.ab_ads) {
         mega.commercials.getComms(is_mobile);
     // }
-}));
+});

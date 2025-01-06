@@ -1,5 +1,7 @@
 import React from 'react';
-import { MegaRenderMixin } from "../chat/mixins";
+import { MegaRenderMixin } from '../chat/mixins.js';
+
+const BLURRABLE_CLASSES = '.conversationsApp, .join-meeting, .main-blur-block';
 
 export class Button extends MegaRenderMixin {
     domRef = React.createRef();
@@ -22,14 +24,7 @@ export class Button extends MegaRenderMixin {
         }
 
         if (this.state.focused !== nextState.focused && nextState.focused === true) {
-            $('.conversationsApp, .join-meeting, .main-blur-block')
-                .rebind('mousedown.button' + this.getUniqueId(), this.onBlur);
-
-            $(document).rebind('keyup.button' + this.getUniqueId(), e => {
-                if (this.state.focused === true && e.keyCode === 27 /* `ESC` */) {
-                    this.onBlur();
-                }
-            });
+            this.bindEvents();
 
             if (this._pageChangeListener) {
                 mBroadcaster.removeListener(this._pageChangeListener);
@@ -40,22 +35,6 @@ export class Button extends MegaRenderMixin {
                     this.onBlur();
                 }
             });
-
-            $(document).rebind('closeDropdowns.' + this.getUniqueId(), () => this.onBlur());
-
-            // change the focused state to any other buttons in this group
-            if (this.props.group) {
-                if (_buttonGroups[this.props.group] && _buttonGroups[this.props.group] !== this) {
-                    _buttonGroups[this.props.group].setState({focused: false});
-                    _buttonGroups[this.props.group].unbindEvents();
-                }
-                _buttonGroups[this.props.group] = this;
-            }
-        }
-
-        // deactivate group if focused => false and i'm the currently "focused" in the group
-        if (this.props.group && nextState.focused === false &&  _buttonGroups[this.props.group] === this) {
-            _buttonGroups[this.props.group] = null;
         }
     }
 
@@ -93,6 +72,7 @@ export class Button extends MegaRenderMixin {
                     if (child.props.onActiveChange) {
                         child.props.onActiveChange(newVal);
                     }
+                    return newVal ? this.bindEvents() : this.unbindEvents();
                 }
             });
         });
@@ -111,14 +91,22 @@ export class Button extends MegaRenderMixin {
         }
     };
 
-    unbindEvents() {
-        $(document).off('keyup.button' + this.getUniqueId());
-        $(document).off('closeDropdowns.' + this.getUniqueId());
-        $('.conversationsApp, .join-meeting, .main-blur-block').unbind('mousedown.button' + this.getUniqueId());
+    bindEvents() {
+        $(BLURRABLE_CLASSES).rebind(`mousedown.button--${this.getUniqueId()}`, this.onBlur);
 
-        if (this._pageChangeListener) {
-            mBroadcaster.removeListener(this._pageChangeListener);
-        }
+        $(document).rebind(`keyup.button--${this.getUniqueId()}`, ev =>
+            this.state.focused === true && ev.keyCode === 27 /* `ESC` */ &&
+            this.onBlur()
+        );
+
+        $(document).rebind(`closeDropdowns.${this.getUniqueId()}`, this.onBlur);
+    }
+
+    unbindEvents() {
+        $(BLURRABLE_CLASSES).unbind(`mousedown.button--${this.getUniqueId()}`);
+        $(document).off(`keyup.button--${this.getUniqueId()}`);
+        $(document).off(`closeDropdowns.${this.getUniqueId()}`);
+        mBroadcaster.removeListener(this._pageChangeListener);
     }
 
     onClick = e => {
@@ -146,14 +134,14 @@ export class Button extends MegaRenderMixin {
                 this.props.onClick(this, e);
             }
             else if (React.Children.count(this.props.children) > 0) { // does it contain some kind of a popup/container?
-                this.setState({ focused: true });
+                this.setState({ focused: true }, () => this.safeForceUpdate());
             }
         }
         else if (this.state.focused === true) {
             this.setState({ focused: false });
             this.unbindEvents();
         }
-    }
+    };
 
     render() {
         const {

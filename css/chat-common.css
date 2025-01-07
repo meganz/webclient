@@ -1131,6 +1131,7 @@ button.fm-empty-button {
 .mega-dialog.meetings-call-ended-dialog header > div > .avatar {
     transform: scale(1.2);
 }
+
 .chat-links-logo-header {
     display: block;
     height: 44px;
@@ -1138,6 +1139,48 @@ button.fm-empty-button {
     overflow: visible;
     margin-top: 4px;
 }
+.chat-links-blocked {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.chat-links-blocked h2 {
+    font: var(--mobile-font-heading-h2);
+    color: var(--mobile-text-primary);
+    margin: 0;
+}
+.chat-links-blocked p {
+    font: var(--text-body1);
+    color: var(--text-color-low);
+    margin: 8px auto 16px;
+}
+.chat-links-blocked i {
+    width: 52px;
+    height: 52px;
+    margin: 0 0 30px
+}
+
+.chat-links-blocked .chat-links-blocked-btn-block {
+    display: flex;
+    flex-direction: column;
+    height: 140px;
+    padding: 0 40px 30px;
+    justify-content: space-around;
+    align-items: center;
+    text-align: center;
+}
+
+.chat-links-blocked .chat-links-blocked-btn-block a {
+    font: var(--text-h3);
+    text-decoration: underline;
+    color: var(--text-color-high);
+}
+
 .chat-links-preview,
 .chat-links-preview .chat-app-container {
     height: 100%;

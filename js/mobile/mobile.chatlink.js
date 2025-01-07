@@ -8,27 +8,19 @@ mobile.chatlink = {
      * @param {String} publicHandle The public chat link handle
      * @param {String} chatKey chat's key
      */
-    show: function(publicHandle, chatKey) {
-
+    async show(publicHandle, chatKey) {
         'use strict';
-
-        var $overlay = $('.mobile.chat-links-preview');
+        const $overlay = $('.mobile.chat-links-preview');
 
         $('.chatlink-mobile-body i', $overlay).rebind('click.home', () => {
             window.location = "/";
             return false;
         });
 
-
         $('.btn-download-mega', $overlay).rebind('click.appdld', () => {
             window.location = getMobileStoreLink();
             return false;
         });
-
-        // Get the <strong>MEGA</strong> mobile app now.
-        $('.chatlink-red-row > span', $overlay).html(
-            htmlentities(l[20620]).replace("[S]", "<strong>").replace("[/S]", "</strong>")
-        );
 
         // On click/tap
         $('a', $overlay).rebind('tap', () => {
@@ -37,39 +29,46 @@ mobile.chatlink = {
             // Start the download
             return goToMobileApp(`chat/${publicHandle}#${chatKey}`);
         });
+        let res = false;
+        let blocked = is_chatlink === EBLOCKED;
 
-        this.linkInfo = new LinkInfoHelper(
-            publicHandle,
-            chatKey,
-            false,
-            true
-        );
+        if (!blocked) {
+            if (!self.LinkInfoHelper) {
+                await init_chat(0x104DF11E5);
+            }
+            const linkInfo = new LinkInfoHelper(publicHandle, chatKey, false, true);
 
-        init_chat(0x104DF11E5)
-            .always(() => {
-                this.linkInfo.getInfo()
-                    .then((res) => {
-                        $('p', $overlay)
-                            .text(
-                                `${res.mr ? l.mobile_meeting_link_tip : l.mobile_chat_link_tip} ` +
-                                `${l.free_plan_bonus_info}`
-                            );
+            // Retrieve link details.
+            res = await linkInfo.getInfo();
 
-                        if (res.topic) {
-                            $('h2.topic', $overlay).safeHTML(megaChat.html(res.topic) || '');
-                        }
-
-                        if (res.ncm) {
-                            $('.members', $overlay).text(mega.icu.format(l[20233], res.ncm));
-                        }
-                    })
-                    .catch(dump);
-            });
+            blocked = linkInfo.failed === EBLOCKED;
+        }
 
         // Hide loader together with other desktop preview block
         $('.chat-links-preview', '.fmholder').addClass('hidden');
 
         // Show the overlay
         $overlay.removeClass('hidden');
+
+        if (blocked) {
+            return $('.chatlink-mobile-blocked', $overlay).removeClass('hidden');
+        }
+
+        $('.chatlink-mobile-preview', $overlay).removeClass('hidden');
+        $('p', $overlay)
+            .text(
+                // `Install the MEGA app to join the meeting/chat`
+                `${res.mr ? l.mobile_meeting_link_tip : l.mobile_chat_link_tip} ` +
+                // `Get secure and private cloud storage for free.`
+                `${l.free_plan_bonus_info}`
+            );
+
+        if (res.topic) {
+            $('h2.topic', $overlay).safeHTML(megaChat.html(res.topic) || '');
+        }
+
+        if (res.ncm) {
+            $('.members', $overlay).text(mega.icu.format(l[20233], res.ncm));
+        }
     }
 };

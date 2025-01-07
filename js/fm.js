@@ -2129,6 +2129,16 @@ function fillShareDialogWithContent(readonly) {
         generateShareDialogRow(u_attr.name, u_attr.email, 2, u_attr.u);
     }
 
+    // If pending request is rejected while we are changing persmissions - remove manually
+    if ($.changedPermissions) {
+        for (const h of Object.keys($.changedPermissions)) {
+            if (!userHandles.includes(h)) {
+                delete $.changedPermissions[h];
+                break;
+            }
+        }
+    }
+
     // Remove items in the removed contacts list
     for (var rmContact in $.removedContactsFromShare) {
         const rmContactIndex = userHandles.indexOf(rmContact);

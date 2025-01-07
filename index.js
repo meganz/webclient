@@ -451,7 +451,7 @@ function init_page() {
         loadingDialog.hide('force');
     }
 
-    if (is_chatlink || page.substr(0, 5) === 'chat/') {
+    if (is_chatlink || page.substr(0, 4) === 'chat') {
         if (fminitialized && megaChatIsReady) {
             // tried to navigate internally to a chat link, do a force redirect.
             // Can be triggered by the back button.
@@ -466,7 +466,7 @@ function init_page() {
         page = page.slice(0, 36);
         const [publicChatHandle, publicChatKey] = page.replace('chat/', '').split('#');
         if (!publicChatHandle || publicChatHandle.length !== 8 || !publicChatKey || publicChatKey.length !== 22) {
-            return u_type
+            return u_type || is_eplusplus
                 ? loadSubPage('fm/chat')
                 : mega.redirect('mega.io', 'chatandmeetings', false, false);
         }
@@ -1024,13 +1024,6 @@ function init_page() {
         else {
             init_login();
         }
-    }
-    else if (is_mobile && isEphemeral() && is_fm()) {
-        // Log out and redirect to start page it's the ephemeral session on mobile web
-        u_logout(true);
-        page = '';
-        loadSubPage('start');
-        return false;
     }
     else if (is_mobile && u_type && (page === 'fm/dashboard' || page === 'start')) {
         loadSubPage('fm');
@@ -2960,10 +2953,6 @@ function is_fm() {
     if (!r && (u_type !== false)) {
         r = page === '' || page === 'start' || page === 'index'
             || page.substr(0, 2) === 'fm' || page.substr(0, 7) === 'account';
-    }
-
-    if (!r && page.substr(0, 4) === "chat") {
-        r = true;
     }
 
     if (d > 2) {

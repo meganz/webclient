@@ -35,7 +35,8 @@
     }
 
     function addUpload(files, emptyFolders) {
-        var straight = $.doStraightUpload || Object(window.fmconfig).ulddd || M.currentrootid === M.RubbishID;
+        const straight = $.doStraightUpload || Object(window.fmconfig).ulddd
+            || M.currentrootid === M.RubbishID || files.length === 0;
 
         console.assert(M.isFileDragPage(page) || window.fminitialized, 'check this...');
 

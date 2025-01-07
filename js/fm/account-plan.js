@@ -644,6 +644,8 @@ accountUI.plan = {
             $cancelReason: null,
             $expiryTextBlock: null,
             $expiryDateBlock: null,
+            subOptions: null,
+            subOptionSwitcher: null,
 
             /**
              * Initialise the dialog
@@ -688,24 +690,44 @@ accountUI.plan = {
                     no_sub: 10,
                 };
 
-                // Shuffle the options
-                const optionArray = Object.keys(options);
-                for (let i = optionArray.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [optionArray[i], optionArray[j]] = [optionArray[j], optionArray[i]];
-                }
+                // M.randomise will randomise the array here
+                this.subOptions = array.randomize({
+                    1: [
+                        {
+                            text: l.c_s_o_donwload_files_only,
+                            val: 'a',
+                        },
+                        {
+                            text: l.c_s_o_store_files_temp,
+                            val: 'b',
+                        },
+                        {
+                            text: l.c_s_o_share_files_only,
+                            val: 'c',
+                        },
+                    ],
+                }, 2);
+
+                const optionArray = array.randomize(Object.keys(options));
 
                 const $template = $('.cancel-subscription-radio-template', this.$dialog);
                 const $optionArea = $('.content-block form.cancel-options', this.$dialog);
-                $optionArea.children('.built-option').remove();
+                $optionArea.children('.built-option, .radios-wrapper').remove();
 
-                for (let i = 0; i < optionArray.length; i++) {
+                for (let i = optionArray.length - 1; i >= 0; i--) {
                     const $radio = $template.clone().removeClass('hidden cancel-subscription-radio-template');
                     $('#subcancel_div', $radio).removeAttr('id');
                     $('#subcancel', $radio).val(options[optionArray[i]]).removeAttr('id');
                     $('.radio-txt', $radio).text(l[`cancel_sub_${optionArray[i]}_reason`]);
+                    if (this.subOptions[options[optionArray[i]]]) {
+                        $optionArea.safePrepend('<div class="hidden cancel-option-'
+                            + options[optionArray[i]] + ' radios-wrapper"></div>');
+                    }
                     $optionArea.safePrepend($radio.prop('outerHTML'));
+                    $optionArea.children()[0].getElementsByTagName('input')[0].dataset.pos = i + 1;
                 }
+
+                document.getElementById('subcancel8').dataset.pos = optionArray.length + 1;
 
                 this.$options = this.$dialog.find('.label-wrap');
                 this.$allowContactOptions = $('.allow-contact-wrapper', this.$dialog);
@@ -735,11 +757,62 @@ accountUI.plan = {
                 this.initClickReason();
                 this.initClickContactConfirm();
                 this.initCloseAndDontCancelButtons();
+                this.initSecondaryOptions();
 
                 this.$continueButton.rebind('click', () => {
                     this.sendSubCancelRequestToApi(subscription && subscription.id || null);
                     eventlog(500421);
                 });
+            },
+
+            initSecondaryOptions() {
+                'use strict';
+
+                const elementParents = [];
+
+                const switcherElements = {
+                    onElementChange: () => {
+                        for (const $parent of elementParents) {
+                            const $children = $('.suboption-radio', $parent);
+                            const hideElement = !!(!$children.length || $children.filter('.hidden').length);
+                            $parent.toggleClass('hidden', hideElement);
+                        }
+                    },
+                };
+
+                for (const key in this.subOptions) {
+                    switcherElements[key] = {
+                        $element: mega.templates.getTemplate('cancel-suboption-wrapper-temp'),
+                        $target: $('.cancel-option-' + key, this.$dialog),
+                        onElementAppend: ($element, extras) => {
+                            const $radioTemplate = $('.template', $element);
+                            for (let i = 0; i < extras.length; i++) {
+                                const $radio = $radioTemplate.clone().removeClass('hidden template');
+                                $('input', $radio).val(extras[i].val);
+                                $('.radio-txt', $radio).text(extras[i].text);
+                                $element.safeAppend($radio.prop('outerHTML'));
+                                $element.children('.label-wrap:not(.template)')[i]
+                                    .getElementsByTagName('input')[0].dataset.pos = String.fromCharCode(97 + i);
+                            }
+                            $radioTemplate.remove();
+
+                            $('.label-wrap', $element).rebind('click', (e) => {
+
+                                $element.closest('.radios-wrapper').removeClass('error');
+
+                                const $option = $(e.currentTarget);
+                                $('.radioOn', $element).addClass('radioOff').removeClass('radioOn');
+                                $('.suboption', $option).addClass('radioOn').removeClass('radioOff');
+                            });
+                        },
+                        extras: this.subOptions[key],
+                    };
+
+                    elementParents.push(switcherElements[key].$target);
+                }
+                this.subOptionSwitcher = this.subOptionSwitcher && this.subOptionSwitcher.remove();
+                this.subOptionSwitcher = mega.elementSwitcher(
+                    switcherElements, undefined, 'cancel-suboptions-switcher', true);
             },
 
             /**
@@ -921,6 +994,13 @@ accountUI.plan = {
                         this.$invalidDetailsDialog.addClass('hidden');
                         this.$textarea.trigger('blur');
                     }
+
+                    if (this.subOptions[value] && this.subOptionSwitcher && !$option.hasClass('cancel-option')) {
+                        this.subOptionSwitcher.showElement(value);
+                    }
+                    else {
+                        this.subOptionSwitcher.hide();
+                    }
                 });
             },
 
@@ -1016,22 +1096,44 @@ accountUI.plan = {
             sendSubCancelRequestToApi(subscriptionId) {
                 'use strict';
 
-                let reason;
+                const reasons = [];
                 let canContactUser;
 
                 // Check the user has answered all the survey questions
                 if (this.canAnswerSurvey) {
-                    const $optionSelected = $('.cancel-option.radioOn', this.$options);
+                    let reasonNum;
+                    let reasonPos;
+                    let selectSubOptionError = false;
+                    let $subOptionArea;
+                    let $chosenSubOption;
+
+                    const $optionSelected = $('div.cancel-option.radioOn', this.$options);
                     const isReasonSelected = $optionSelected.length;
 
                     const $selectedContactOption = $('.contact-option.radioOn', this.$allowContactOptions);
                     const isContactOptionSelected = $selectedContactOption.length;
 
-                    if (!isReasonSelected || !isContactOptionSelected) {
+                    if (isReasonSelected) {
+                        const parentInput = $optionSelected[0].parentElement.getElementsByTagName('input')[0];
+                        reasonNum = parentInput.value;
+                        reasonPos = parentInput.dataset.pos;
+                        if (this.subOptions[reasonNum]) {
+                            $subOptionArea = $('.cancel-option-' + reasonNum, this.$dialog);
+                            $chosenSubOption = $('input.radioOn', $subOptionArea);
+                            selectSubOptionError = !$chosenSubOption.length;
+                        }
+                    }
+
+
+                    if (!isReasonSelected || !isContactOptionSelected || selectSubOptionError) {
                         if (!isReasonSelected) {
                             this.$selectReasonDialog.removeClass('hidden');
                             this.$dialog.addClass('error-select-reason');
                         }
+                        else if (selectSubOptionError) {
+                            $subOptionArea.addClass('error');
+                        }
+
                         if (!isContactOptionSelected) {
                             this.$selectCanContactError.removeClass('hidden');
                             this.$dialog.addClass('error-select-contact');
@@ -1039,23 +1141,22 @@ accountUI.plan = {
                         return;
                     }
 
-                    const value = $('input', $optionSelected).val();
-                    const radioText = $('.radio-txt', $optionSelected.parent()).text().trim();
-                    canContactUser = $('input', $selectedContactOption).val() | 0;
+                    if (reasonNum === "8") {
+                        const reasonText = this.$textarea.val().trim();
 
-                    // The cancellation reason (r) sent to the API is the radio button text, or
-                    // when the chosen option is "Other (please provide details)" it is
-                    // what the user enters in the text field
-                    if (value === "8") {
-                        reason = this.$textarea.val().trim();
-
-                        if (!reason.length || reason.length > 1000) {
-                            this.showTextareaError(!reason.length);
+                        if (!reasonText.length || reasonText.length > 1000) {
+                            this.showTextareaError(!reasonText.length);
                             return;
                         }
+                        reasons.push({r: reasonNum, p: reasonPos, t: reasonText});
                     }
-                    else {
-                        reason = `${value} - ${radioText}`;
+                    else if (this.subOptions[reasonNum]) {
+                        const chosenSubOptionVal = $chosenSubOption.val();
+                        const chosenSubOptionPos = $chosenSubOption.data('pos');
+                        reasons.push({
+                            r: reasonNum + '.' + chosenSubOptionVal,
+                            p: reasonPos + '.' + chosenSubOptionPos,
+                        });
                     }
                 }
 
@@ -1068,8 +1169,8 @@ accountUI.plan = {
                 const ccReq = { a: 'cccs' };
                 const requests = [ccReq];
 
-                if (reason) {
-                    ccReq.r = reason;
+                if (reasons) {
+                    ccReq.r = reasons;
                 }
                 if (typeof canContactUser !== 'undefined') {
                     ccReq.cc = canContactUser;

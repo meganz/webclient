@@ -124,7 +124,13 @@ lazy(mega, 'elementSwitcher', () => {
 
         const hide = () => {
             if (currentElement) {
-                elements[currentElement].$element.addClass('hidden');
+                const {onElementChange} = elements;
+                const $element = elements[currentElement].$element;
+                $element.addClass('hidden');
+                if (typeof onElementChange === 'function') {
+                    onElementChange($element);
+                }
+                currentElement = undefined;
             }
         };
 

@@ -398,7 +398,7 @@ var pro = {
             }
 
             if (actionPacket.p) {
-                mega.sensitives.onPlanUpgrade(a.p || 0);
+                mega.sensitives.onPlanUpgrade(actionPacket.p || 0);
             }
         }
     },

@@ -419,6 +419,9 @@ lazy(mega, 'rewindUi', () => {
             if (upgradeSectionData) {
                 this.$contentUpgradeDescription.safeHTML(upgradeSectionData);
             }
+            else {
+                this.$contentUpgradeDescription.addClass('hidden');
+            }
             this.$contentUpgradePurchaseButton.addClass('hidden');
 
             if (rewindDescriptionData.hasUpgrade) {

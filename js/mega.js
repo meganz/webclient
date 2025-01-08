@@ -1643,6 +1643,8 @@ scparser.$add('sqac', (a) => {
                         if (mega.pm) {
                             mega.pm.hideSubsDialog();
                         }
+
+                        mega.sensitives.onPlanUpgrade();
                     });
                 }
             }

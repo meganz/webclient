@@ -295,7 +295,7 @@ var ChatNotifications = function(megaChat, options) {
 
             megaRoom
                 .rebind('onMessagesBuffAppend.chatNotifications', (e, message) => {
-                    onMessagesBuffHandler(e, message).catch(dump);
+                    return is_chatlink ? null : onMessagesBuffHandler(e, message).catch(dump);
                 })
                 .rebind('onChatShown.chatNotifications', function() {
                     onIdle(resetChatNotificationCounters);

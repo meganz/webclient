@@ -5448,6 +5448,18 @@ body.de .mega-dialog.contact-picker-widget {
     .mega-dialog.cancel-subscription-st1 form .label-wrap.built-option {
         margin-bottom: 12px;
     }
+    .mega-dialog.cancel-subscription-st1 form .radios-wrapper {
+        margin: 0 0 12px 24px
+    }
+    .mega-dialog.cancel-subscription-st1 .error-message {
+        display: none;
+    }
+    .mega-dialog.cancel-subscription-st1 .error .error-message {
+        display: block;
+        width: calc(100% + 24px);
+        margin-left: -24px;
+        margin-bottom: 8px;
+    }
     .mega-dialog.cancel-subscription-st1 form .textarea-and-banner {
         display: flex;
         flex-direction: column;
@@ -5483,8 +5495,8 @@ body.de .mega-dialog.contact-picker-widget {
         margin-top: 26px;
     }
     .mega-dialog.cancel-subscription-st1 footer {
-        margin-top: 20px;
-        padding: 24px 48px;
+        margin: 24px 48px;
+        padding-top: 20px;
         border-top: var(--dropdown-border);
     }
     .mega-dialog.cancel-subscription-st1 footer .footer-container {

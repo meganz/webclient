@@ -337,7 +337,7 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
             const radioOptions = document.createElement('div');
             radioOptions.className = 'cancel-sub-options';
 
-            const options = [
+            const options = array.randomize([
                 {
                     parentNode: radioOptions,
                     label: l.cancel_sub_temp_plan_reason,
@@ -401,12 +401,7 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
                     checked: false,
                     otherOption: false
                 },
-            ];
-
-            for (let i = options.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [options[i], options[j]] = [options[j], options[i]];
-            }
+            ]);
 
             options.push({
                 parentNode: radioOptions,

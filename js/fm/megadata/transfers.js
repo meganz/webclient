@@ -1376,6 +1376,9 @@ MegaData.prototype.addUpload = function(u, ignoreWarning, emptyFolders, target) 
     });
 
     makeDirPromise.then(() => {
+        if (!u.length) {
+            return u;
+        }
         var targets = Object.create(null);
 
         for (var i = u.length; i--;) {

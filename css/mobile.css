@@ -9649,7 +9649,7 @@ Thank You dialog
     margin: 16px auto;
 }
 .chatlink-mobile-body .members {
-    display: inline-block;
+    display: block;
     margin: 20px auto;
 }
 .chatlink-mobile-body .link-block {
@@ -9671,23 +9671,6 @@ Thank You dialog
     font: var(--text-h3);
     text-decoration: underline;
     color: var(--text-color-high);
-}
-
-.chatlink-red-row {
-    display: block;
-    background: linear-gradient(180deg, #FF626C 0%, #FF333A 100%);
-    color: white;
-    text-align: center;
-    height: 48px;
-    line-height: 42px;
-    position: relative;
-}
-.chatlink-red-row i {
-    display: inline-block;
-    float: right;
-    margin-top: 12px;
-    right: 12px;
-    position: absolute;
 }
 
 .chatlink-contents {

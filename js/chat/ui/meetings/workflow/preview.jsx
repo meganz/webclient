@@ -13,6 +13,7 @@ class Preview extends React.Component {
         VIDEO: 2
     };
 
+    domRef = React.createRef();
     videoRef = React.createRef();
     stream = null;
 
@@ -54,7 +55,7 @@ class Preview extends React.Component {
                 // Unable to start audio/video -> trigger media error, w/o enabling the control
                 const stream = type === Preview.STREAMS.AUDIO ? 'audio' : 'video';
                 return (
-                    this.isMounted &&
+                    this.domRef.current &&
                     this.setState(state => ({ [stream]: !state[stream] }), () => {
                         megaChat.trigger('onLocalMediaError', {
                             [type === Preview.STREAMS.AUDIO ? 'mic' : 'camera']: `${ex.name}: ${ex.message}`
@@ -132,6 +133,7 @@ class Preview extends React.Component {
 
         return (
             <div
+                ref={this.domRef}
                 className={`
                     ${NAMESPACE}
                     local-stream-mirrored

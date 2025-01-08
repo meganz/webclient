@@ -11612,6 +11612,7 @@ const composedTextArea = REQ_(77);
 class Loading extends REaCt().Component {
   constructor(...args) {
     super(...args);
+    this.domRef = REaCt().createRef();
     this.PERMISSIONS = {
       VIDEO: 'camera',
       AUDIO: 'microphone'
@@ -11629,7 +11630,7 @@ class Loading extends REaCt().Component {
         } = status;
         status.onchange = () => name === 'audio_capture' && this.queryPermissions(this.PERMISSIONS.VIDEO);
         if (state === 'prompt') {
-          return this.isMounted() && this.setState({
+          return this.domRef.current && this.setState({
             pendingPermissions: name
           });
         }
@@ -11698,6 +11699,7 @@ class Loading extends REaCt().Component {
       pendingPermissions
     } = this.state;
     return REaCt().createElement("div", {
+      ref: this.domRef,
       className: Loading.NAMESPACE
     }, REaCt().createElement("div", {
       className: `${Loading.NAMESPACE}-content`
@@ -24214,7 +24216,6 @@ const withMicObserver = Component => class extends _mixins1__.w9 {
   constructor(props) {
     super(props);
     this.namespace = `SO-${Component.NAMESPACE}`;
-    this.signalObserver = `onMicSignalDetected.${this.namespace}`;
     this.inputObserver = `onNoMicInput.${this.namespace}`;
     this.sendObserver = `onAudioSendDenied.${this.namespace}`;
     this.state = {
@@ -24224,15 +24225,8 @@ const withMicObserver = Component => class extends _mixins1__.w9 {
     this.renderSignalWarning = this.renderSignalWarning.bind(this);
     this.renderBlockedWarning = this.renderBlockedWarning.bind(this);
   }
-  unbindObservers() {
-    [this.signalObserver, this.inputObserver].map(observer => this.props.chatRoom.unbind(observer));
-  }
   bindObservers() {
-    this.props.chatRoom.rebind(this.signalObserver, ({
-      data: signal
-    }) => this.setState({
-      signal
-    })).rebind(this.inputObserver, () => this.setState({
+    this.props.chatRoom.rebind(this.inputObserver, () => this.setState({
       signal: false
     })).rebind(this.sendObserver, () => {
       this.setState({
@@ -24286,7 +24280,7 @@ const withMicObserver = Component => class extends _mixins1__.w9 {
   }
   componentWillUnmount() {
     super.componentWillUnmount();
-    this.unbindObservers();
+    this.props.chatRoom.unbind(this.inputObserver);
   }
   componentDidMount() {
     super.componentDidMount();
@@ -24609,7 +24603,9 @@ const withPermissionsObserver = Component => {
             this.childRef = child;
           }
         })
-      }, react0().createElement("i", {
+      }, react0().createElement("span", {
+        className: "signal-issue-background"
+      }), react0().createElement("i", {
         className: "sprite-fm-mono icon-exclamation-filled"
       }), this.state[`dialog-${av}`] && this.renderPermissionsDialog(av, child));
     }
@@ -28911,6 +28907,7 @@ const _permissionsObserver_jsx5__ = REQ_(542);
 class Preview extends react0().Component {
   constructor(props) {
     super(props);
+    this.domRef = react0().createRef();
     this.videoRef = react0().createRef();
     this.stream = null;
     this.state = {
@@ -28939,7 +28936,7 @@ class Preview extends react0().Component {
         }
       }).catch(ex => {
         const stream = type === Preview.STREAMS.AUDIO ? 'audio' : 'video';
-        return this.isMounted && this.setState(state => ({
+        return this.domRef.current && this.setState(state => ({
           [stream]: !state[stream]
         }), () => {
           megaChat.trigger('onLocalMediaError', {
@@ -29035,6 +29032,7 @@ class Preview extends react0().Component {
       className: 'theme-dark-forced'
     };
     return react0().createElement("div", {
+      ref: this.domRef,
       className: `
                     ${NAMESPACE}
                     local-stream-mirrored

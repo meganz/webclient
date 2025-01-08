@@ -5,7 +5,6 @@ import Button from './button.jsx';
 export const withMicObserver = Component =>
     class extends MegaRenderMixin {
         namespace = `SO-${Component.NAMESPACE}`;
-        signalObserver = `onMicSignalDetected.${this.namespace}`;
         inputObserver = `onNoMicInput.${this.namespace}`;
         sendObserver = `onAudioSendDenied.${this.namespace}`;
 
@@ -20,13 +19,8 @@ export const withMicObserver = Component =>
             this.renderBlockedWarning = this.renderBlockedWarning.bind(this);
         }
 
-        unbindObservers() {
-            [this.signalObserver, this.inputObserver].map(observer => this.props.chatRoom.unbind(observer));
-        }
-
         bindObservers() {
             this.props.chatRoom
-                .rebind(this.signalObserver, ({ data: signal }) => this.setState({ signal }))
                 .rebind(this.inputObserver, () => this.setState({ signal: false }))
                 .rebind(this.sendObserver, () => {
                     this.setState({ blocked: true }, () => {
@@ -83,7 +77,7 @@ export const withMicObserver = Component =>
 
         componentWillUnmount() {
             super.componentWillUnmount();
-            this.unbindObservers();
+            this.props.chatRoom.unbind(this.inputObserver);
         }
 
         componentDidMount() {

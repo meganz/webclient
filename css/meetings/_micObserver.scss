@@ -26,9 +26,22 @@
         right: -18px;
         --icon-size: 24px;
         --mask-color: var(--secondary-orange);
+        z-index: 1;
 
         .in-call &,
         .float-video-overlay & { right: -2px; }
+    }
+
+    .signal-issue-background {
+        position: absolute;
+        top: -3px;
+        right: 2px;
+        width: 17px;
+        height: 17px;
+        border-radius: 200px;
+        background: #FFF;
+
+        .float-video-overlay & { top: 0; }
     }
 
     .dropdown.button-group-menu & {

@@ -1036,9 +1036,22 @@ body div:has(+ div.dropdown.body.button-group-menu:hover) .float-video .video-no
   right: -18px;
   --icon-size: 24px;
   --mask-color: var(--secondary-orange);
+  z-index: 1;
 }
 .in-call .meetings-signal-issue i, .float-video-overlay .meetings-signal-issue i {
   right: -2px;
+}
+.meetings-signal-issue .signal-issue-background {
+  position: absolute;
+  top: -3px;
+  right: 2px;
+  width: 17px;
+  height: 17px;
+  border-radius: 200px;
+  background: #FFF;
+}
+.float-video-overlay .meetings-signal-issue .signal-issue-background {
+  top: 0;
 }
 .dropdown.button-group-menu .meetings-signal-issue {
   top: 34px;
@@ -3412,6 +3425,10 @@ body.theme-dark .start-meeting-preview .preview-meeting {
   width: 70px;
   box-sizing: border-box;
   text-align: center;
+}
+.preview-meeting-controls .preview-control-wrapper .signal-issue-background {
+  top: -6px;
+  right: -14px;
 }
 .preview-meeting-controls button.preview-meeting-control {
   display: inline;

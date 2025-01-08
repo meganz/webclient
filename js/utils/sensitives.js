@@ -348,10 +348,9 @@ function resetSensitives() {
             showOnboardingDialog,
             /**
              * Checking if plan level has changed
-             * @param {Number} newPlanLevel New level plan (if any)
              * @returns {void}
              */
-            onPlanUpgrade(newPlanLevel) {
+            onPlanUpgrade() {
                 if (!window.u_attr) {
                     window.location.reload(); // This is incorrect state, we need to reload the page
                 }
@@ -360,12 +359,15 @@ function resetSensitives() {
                     return;
                 }
 
-                featureEnabled = typeof newPlanLevel === 'number' && checkAccountPermission();
-                sensitives.showGlobally = !featureEnabled || showSen;
+                const prevValue = featureEnabled;
+                sensitives.resetGlobalParameters();
 
-                mega.gallery.nodeUpdated = true;
-                mega.gallery.albumsRendered = false;
-                M.openFolder(M.currentdirid, true);
+                if (prevValue !== featureEnabled) {
+                    resetSensitives();
+                    mega.gallery.nodeUpdated = true;
+                    mega.gallery.albumsRendered = false;
+                    M.openFolder(M.currentdirid, true);
+                }
             },
             /**
              * Get sensitivity for a selection of nodes.

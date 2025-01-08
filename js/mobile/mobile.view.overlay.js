@@ -340,7 +340,10 @@ class MegaMobileViewOverlay extends MegaComponent {
                     this.domNode.querySelector('.properties-breadcrumb').classList.add('hidden');
                 }
                 else {
-                    M.renderPathBreadcrumbs(nodeHandle, true);
+                    M.renderPathBreadcrumbs(
+                        nodeHandle,
+                        document.querySelector('.properties-breadcrumb .fm-breadcrumbs-wrapper')
+                    );
                 }
             }
 

@@ -422,7 +422,9 @@
                 // on idle so we can call renderPathBreadcrumbs only once the info dialog is rendered.
                 onIdle(() => {
                     // we pass the filehandle, so it is available if we search on files on search
-                    M.renderPathBreadcrumbs(n.h, true);
+                    M.renderPathBreadcrumbs(
+                        n.h, document.querySelector('.properties-breadcrumb .fm-breadcrumbs-wrapper')
+                    );
                     mBroadcaster.sendMessage('properties:finish', n.h);
                 });
             }

@@ -13,7 +13,7 @@
         "declaration-empty-line-before": null,
         "selector-class-pattern": null,
         "no-irregular-whitespace": true,
-        "property-disallowed-list": [ "text-transform" ],
+        "property-disallowed-list": [ "text-transform", "/^-webkit-(margin|padding)-(start|end)/" ],
         "selector-not-notation": "simple",
         "media-feature-range-notation": "prefix",
         "length-zero-no-unit": [
@@ -90,6 +90,12 @@
             true,
             {
                 "ignoreProperties": ["user-select"]
+            }
+        ],
+        "declaration-block-no-redundant-longhand-properties": [
+            true,
+            {
+                "ignore": ["inset"]
             }
         ]
     }

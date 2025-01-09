@@ -1725,7 +1725,6 @@ MegaData.prototype.labelSortMenuUI = function(event, rightClick) {
         tmpFn();
     }
 
-    delay('render:search_breadcrumbs', () => M.renderSearchBreadcrumbs());
     $.hideTopMenu();
     $.hideContextMenu();
     $menu.removeClass('hidden');

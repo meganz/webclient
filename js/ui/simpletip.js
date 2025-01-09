@@ -195,7 +195,10 @@
             if (isBreadcrumb) {
                 $node.addClass('breadcrumb-tip theme-dark-forced');
                 $textContainer.replaceWith($breadcrumbs);
-                M.renderPathBreadcrumbs($this.parent().parent().get(0).id, false, true);
+                M.renderPathBreadcrumbs(
+                    $this.parent().parent().get(0).id,
+                    document.querySelector('.simpletip-tooltip .fm-breadcrumbs-wrapper')
+                );
             }
 
             $currentNode = $node;

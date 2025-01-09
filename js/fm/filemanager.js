@@ -3220,8 +3220,6 @@ FileManager.prototype.initUIKeyEvents = function() {
                 scrollToElement($scrollBlock, sl);
             }
         }
-
-        M.renderSearchBreadcrumbs();
     });
 };
 
@@ -4303,7 +4301,6 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             $.selecting = true;
         },
         stop: () => {
-            M.renderSearchBreadcrumbs();
             $.selecting = false;
 
             // On drag stop and if the side Info panel is visible, update the information in it
@@ -4338,7 +4335,6 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
             }
         }
 
-        M.renderSearchBreadcrumbs();
         $.hideTopMenu();
 
         return !!M.contextMenuUI(e, 1);
@@ -4385,7 +4381,7 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                 $.gridLastSelected = this;
                 selectionManager.add_to_selection($this.attr('id'));
             }
-            M.renderSearchBreadcrumbs();
+
             $.hideContextMenu(e);
 
             if ($.hideTopMenu) {

@@ -310,7 +310,7 @@ mega.ui.pm.settings = {
             title: l.delete_passwords,
             items: {
                 'delete-all': {
-                    title: l.delete_all,
+                    title: l.delete_all_btn,
                     subtitle: l.delete_all_msg,
                     componentClassname: 'wrap',
                     textInteractable: {

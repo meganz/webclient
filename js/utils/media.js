@@ -102,6 +102,7 @@ is_image.def = {
     'JPG': 1,
     'JPEG': 1,
     'JFIF': 1,
+    'WEBP': 1,
     'GIF': 1,
     'BMP': 1,
     'PNG': 1
@@ -357,40 +358,6 @@ mThumbHandler.add('TIFF,TIF', function TIFThumbHandler(ab, cb) {
     });
 });
 
-mThumbHandler.add('WEBP', function WEBPThumbHandler(ab, cb) {
-    'use strict';
-
-    M.require('webpjs').tryCatch(function() {
-        var timeTag = 'webpjs.' + makeUUID();
-
-        if (d) {
-            console.debug('Creating WEBP thumbnail...', ab && ab.byteLength);
-            console.time(timeTag);
-        }
-
-        var canvas = webpToCanvas(new Uint8Array(ab), ab.byteLength);
-
-        if (d) {
-            console.timeEnd(timeTag);
-        }
-
-        if (canvas) {
-            ab = dataURLToAB(canvas.toDataURL());
-
-            if (d) {
-                console.log('webp2png %sx%s (%s bytes)', canvas.width, canvas.height, ab.byteLength);
-            }
-        }
-        else {
-            if (d) {
-                console.debug('WebP thumbnail creation failed.');
-            }
-            ab = null;
-        }
-        cb(ab);
-    });
-});
-
 mThumbHandler.add('PDF', function PDFThumbHandler(ab, cb) {
     'use strict';
 
@@ -494,11 +461,6 @@ tryCatch(() => {
             '/woAkAEAEogCAMAAPeESAAAVKqOMG7yc6/nyQ4fFtI3rDG21bWEJY7O9MEhIOIONi4LdHIrhMyApVJIA'
         ],
         [
-            'WEBP',
-            'image/webp',
-            'UklGRjoAAABXRUJQVlA4IC4AAACyAgCdASoCAAIALmk0mk0iIiIiIgBoSygABc6WWgAA/veff/0PP8bA//LwYAAA'
-        ],
-        [
             'AVIF',
             'image/avif',
             `AAAAHGZ0eXBtaWYxAAAAAG1pZjFhdmlmbWlhZgAAAPJtZXRhAAAAAAAAACtoZGxyAAAAAAAAAABwaWN0AAAAAAAAAAAAAAAAZ28tYXZp
@@ -524,7 +486,7 @@ tryCatch(() => {
     const test = (name, mime, data) => {
         const img = new Image();
         const done = () => {
-            if (!--count && self.d) {
+            if (!--count && self.d && supported.length) {
                 console.info(`This browser does support decoding ${supported} images.`);
             }
             img.onload = img.onerror = undefined;

@@ -1283,13 +1283,19 @@ class MEGACanvasElement extends MEGAImageElement {
             throw new MEGAException('The image is tainted!', {data, ctx: this}, 'SecurityError');
         }
 
-        if (type === 'broken') {
-            type = MEGAImageElement.THUMBNAIL_TYPE;
+        if (type === 'thumb' || type === 'broken') {
+            const {THUMBNAIL_TYPE, ALPHA_FORMAT, DEFAULT_FORMAT, DEFAULT_ALPHA} = MEGAImageElement;
+            const alpha = self.supWebPEncoding === true ? ALPHA_FORMAT : DEFAULT_ALPHA;
+
+            if ((type = THUMBNAIL_TYPE) === 'image/webp' && !self.supWebPEncoding) {
+                type = DEFAULT_FORMAT;
+            }
+            type = alpha === type || this.isTransparent(data) ? alpha : type;
         }
-        else if (type === 'thumb') {
-            type = this.isTransparent(data) ? MEGAImageElement.ALPHA_FORMAT : MEGAImageElement.THUMBNAIL_TYPE;
+        else if (type === 'image/webp' && self.supWebPEncoding === false) {
+            type = MEGAImageElement.DEFAULT_FORMAT;
         }
-        const blob = await this.convertToBlob(type, quality);
+        const blob = await this.convertToBlob(type, quality, MEGAImageElement.DEFAULT_FORMAT);
 
         if (this.engine === 'Gecko' && !this.postTaintedChecked) {
             const t = this.isTainted(await this.createImage(blob, 0, 0, 'imaged').catch(dump));
@@ -1302,16 +1308,29 @@ class MEGACanvasElement extends MEGAImageElement {
         return blob;
     }
 
-    convertToBlob(type, quality) {
+    async convertToBlob(type, quality, fallback) {
+        let blob;
         const {canvas} = this.ctx;
 
         if (typeof OffscreenCanvas !== 'undefined' && canvas instanceof OffscreenCanvas) {
-            return canvas.convertToBlob({type, quality});
+            blob = await canvas.convertToBlob({type, quality});
+        }
+        else {
+            blob = await new Promise((resolve) => canvas.toBlob(resolve, type, quality));
         }
 
-        return new Promise((resolve) => {
-            canvas.toBlob(resolve, type, quality);
-        });
+        if (blob.type !== type) {
+            if (self.d > 0) {
+                this.debug(`convertToBlob gave ${blob.type} but expected ${type}...`);
+            }
+
+            if (fallback && type !== fallback && blob.type !== fallback) {
+
+                return this.convertToBlob(fallback, quality);
+            }
+        }
+
+        return blob;
     }
 
     convertToArrayBuffer(type, quality) {
@@ -2165,11 +2184,6 @@ class MEGAWorkerController {
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-// @todo remove
-if (typeof zSleep === 'undefined') {
-    zSleep = () => new Promise(onIdle);
-}
-
 WebGLMEGAContext.test = async(...files) => {
     const canvas = new MEGACanvasElement();
     const now = Date.now();
@@ -2186,12 +2200,12 @@ WebGLMEGAContext.test = async(...files) => {
             continue;
         }
 
-        await zSleep();
+        await scheduler.yield();
         console.time(`c2d-${file.name}`);
         file.c2dResult = await canvas.createPreviewImage(file);
         console.timeEnd(`c2d-${file.name}`);
 
-        await zSleep();
+        await scheduler.yield();
         console.time(`webgl-${file.name}`);
         file.webglResult = await webgl.createPreviewImage(file);
         console.timeEnd(`webgl-${file.name}`);
@@ -2222,6 +2236,65 @@ WebGLMEGAContext.test = async(...files) => {
         await webgl.createImage(files[0].webglResult, 0, 0, 'terminal');
     }
     console.log(files);
+};
+
+WebGLMEGAContext.test2 = async(type = 'image/png') => {
+    const data = [];
+    const jpeg = freeze({type: 'image/jpeg'});
+    const webp = freeze({type: 'image/webp'});
+    const conv = async(source, options) => {
+        const view = Object.create(null);
+
+        await scheduler.yield();
+        let took = performance.now();
+        let image = await webgl.createPreviewImage(source, options);
+        took = performance.now() - took;
+        console.assert(image.type === options.type, `[prev] Expected ${options.type}, but got ${image.type}`);
+
+        view.preview = {type: image.type, size: image.size, took};
+
+        await scheduler.yield();
+        took = performance.now();
+        image = await webgl.createThumbnailImage(source, options);
+        took = performance.now() - took;
+        console.assert(image.type === options.type, `[thumb] Expected ${options.type}, but got ${image.type}`);
+
+        view.thumbnail = {type: image.type, size: image.size, took};
+        return view;
+    };
+    const test = async(source, width, height) => {
+        return {
+            jpeg: await conv(source, jpeg),
+            webp: await conv(source, webp),
+            source: {
+                res: `${height}p`,
+                type: source.type,
+                size: source.size
+            }
+        };
+    };
+    self.d = 4;
+
+    if (Array.isArray(type)) {
+        const files = [...type];
+
+        for (let i = files.length; i--;) {
+            const image = await MEGAImageElement.load(files[i]);
+            data.push(await test(files[i], image.width, image.height));
+        }
+    }
+    else {
+        let size = 240;
+        while (size < 3e3) {
+            const width = size <<= 1;
+            const height = width / 1.7777 | 0;
+            const source = await webgl.createImage(null, width, height, type);
+
+            data.push(await test(source, width, height));
+        }
+    }
+    self.d = 1;
+    console.table(data);
 };
 
 if (self.isWorkerScope) {
@@ -2313,7 +2386,7 @@ lazy(self, 'faceDetector', () => Promise.resolve((async() => {
                 'QAAAAAAAAAAAAAAAAAAAAr/xAAZEAABBQAAAAAAAAAAAAAAAAAGAAcxd7f/xAAVAQEBAAAAAAAAAAAAAAAAAAAFBv/EACA' +
                 'RAAADCQEAAAAAAAAAAAAAAAAEBwECBQY0N3J2srX/2gAMAwEAAhEDEQA/ADvj0lloPDqxmrGF0BbBvbwWSW1qdaTLHjEx/9kK';
 
-            const ctx = new MEGACanvasElement();
+            const ctx = new MEGACanvasElement(1, 1, {willReadFrequently: true});
             let temp = ctx.dataURLToBlob(sample);
             temp = await createImageBitmap(temp).catch(echo);
             temp = await ctx.drawImage(temp, 0, 0, 'imaged').catch(echo);
@@ -2323,6 +2396,14 @@ lazy(self, 'faceDetector', () => Promise.resolve((async() => {
 
             if (!self.supImageBitmap && debug) {
                 dump('This browser does lack proper ImageBitmap support.', value, temp);
+            }
+
+            temp = await ctx.getCanvasImageSource(sample).catch(echo);
+            temp = await ctx.drawImage(temp, 0, 0, 'image/webp').catch(echo);
+            Object.defineProperty(self, 'supWebPEncoding', {value: temp.type === 'image/webp'});
+
+            if (!self.supWebPEncoding && debug) {
+                dump('This browser does lack WebP encoding support.', temp);
             }
 
             queueMicrotask(() => {
@@ -2435,7 +2516,7 @@ lazy(self, 'faceDetector', () => Promise.resolve((async() => {
          * @memberOf webgl
          */
         lazy(webgl, 'getDynamicThumbnail', () => {
-            const type = mThumbHandler.sup.WEBP ? 'image/png' : 'image/webp';
+            const type = self.supWebPEncoding === false ? 'image/png' : 'image/webp';
 
             return async(buffer, size, options, branch) => {
                 if (typeof options === 'string') {
@@ -2465,6 +2546,7 @@ lazy(self, 'faceDetector', () => Promise.resolve((async() => {
                     apipath,
                     d: debug,
                     supImageBitmap: !!self.supImageBitmap,
+                    supWebPEncoding: !!self.supWebPEncoding,
                     engine: self.ua && self.ua.details.engine
                 };
                 return new MEGAWorkerController(gMessageHandler, props.canUseWorker ? data : false);
@@ -2638,9 +2720,10 @@ Object.defineProperties(MEGAImageElement, {
     THUMBNAIL_QUALITY: {value: 0.80},
     DEFAULT_QUALITY: {value: 0.9},
     DEFAULT_FORMAT: {value: 'image/jpeg'},
-    ALPHA_FORMAT: {value: 'image/png'},
-    PREVIEW_TYPE: {value: 'image/jpeg'},
-    THUMBNAIL_TYPE: {value: 'image/jpeg'},
+    DEFAULT_ALPHA: {value: 'image/png'},
+    ALPHA_FORMAT: {value: 'image/webp'},
+    PREVIEW_TYPE: {value: 'image/webp'},
+    THUMBNAIL_TYPE: {value: 'image/webp'},
     ASPECT_RATIO_4_3: {value: 4 / 3},
     ASPECT_RATIO_8_5: {value: 8 / 5},
     ASPECT_RATIO_16_9: {value: 16 / 9},

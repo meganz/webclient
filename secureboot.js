@@ -2898,7 +2898,6 @@ else if (!browserUpdate) {
         'support': {f:'html/support.html', n: 'support', j:0},
         'pdfjs': {f:'js/vendor/pdf.js', n: 'pdfjs', j:1},
         'tiffjs': {f:'js/vendor/tiff.js', n: 'tiffjs', j:1},
-        'webpjs': {f:'js/vendor/webp.js', n: 'webpjs', j:1},
         'videostream': {f:'js/vendor/videostream.js', n: 'videostream', j:1},
         'mediainfo': {f:'js/vendor/mediainfo.js', n: 'mediainfo', j:1},
         'zxcvbn_js': {f:'js/vendor/zxcvbn.js', n: 'zxcvbn_js', j:1},

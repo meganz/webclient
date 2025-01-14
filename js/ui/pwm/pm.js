@@ -154,32 +154,31 @@ mega.pm = {
      * Check if the user has an active pwm subscription.
      * Subscription cancellation takes effect only after the current subscription period ends.
      *
+     * @param {boolean} retry - Flag to indicate if the function is being called recursively.
+     *
      * @returns {Promise<*|Boolean>} False or undefined if the user has no active subscription.
      */
-    async checkActiveSubscription() {
+    async checkActiveSubscription(retry) {
         'use strict';
 
-        for (let i = 2; i--;) {
-            // if the Business or Pro flexi account has expired,
-            // it will have read-only access to the passwords
-            if (!this.validateUserStatus()) {
-                return false;
-            }
-            this.plan = await this.getPlanDetails();
+        // if the Business or Pro flexi account has expired,
+        // it will have read-only access to the passwords
+        if (!this.validateUserStatus()) {
+            return false;
+        }
+        this.plan = await this.getPlanDetails();
 
-            if (!this.plan || typeof this.plan === 'object') {
-                return this.plan !== undefined && (this.plan.trial
-                    ? mega.ui.pm.subscription.freeTrial()
-                    : mega.ui.pm.subscription.featurePlan());
-            }
-            const timer = this.pwmFeature[0] - Date.now() / 1e3;
+        if (!this.plan || typeof this.plan === 'object') {
+            return this.plan !== undefined && (this.plan.trial
+                ? mega.ui.pm.subscription.freeTrial()
+                : mega.ui.pm.subscription.featurePlan());
+        }
 
-            // set the timer only if the expiry time is less than or equal to 3 days
-            if (timer > 3 * 86400) {
-                break;
-            }
-            await tSleep(timer);
-            await M.getAccountDetails();
+        const timer = this.pwmFeature[0] - Date.now() / 1e3;
+
+        // set the timer only if the expiry time is less than or equal to 3 days
+        if (!retry && timer < 3 * 86400) {
+            tSleep(timer).then(() => M.getAccountDetails()).then(() => this.checkActiveSubscription(true));
         }
     },
 

@@ -37,22 +37,14 @@
      * Render the breadcrumbs at the top of the cloud drive, shares, public links and rubbish bin pages.
      *
      * @param {string} fileHandle - the id of the selected file or folder
+     * @param {Object} wrapperNode Custom breadcrumbs DOM node
      * @return {undefined}
      */
-    MegaData.prototype.renderPathBreadcrumbs = function(fileHandle, isInfoBlock = false, isSimpletip = false) {
-        let scope;
+    MegaData.prototype.renderPathBreadcrumbs = function(fileHandle, wrapperNode) {
+        const scope = wrapperNode
+            || document.querySelector('.fm-right-files-block .fm-right-header .fm-breadcrumbs-wrapper');
 
-        if (isInfoBlock) {
-            scope = document.querySelector('.properties-breadcrumb .fm-breadcrumbs-wrapper');
-        }
-        else if (isSimpletip) {
-            scope = document.querySelector('.simpletip-tooltip .fm-breadcrumbs-wrapper');
-        }
-        else {
-            scope = document.querySelector('.fm-right-files-block .fm-right-header .fm-breadcrumbs-wrapper');
-        }
-
-        if (!scope) {
+        if (typeof scope !== 'object') {
             console.assert(false, 'invalid scope');
             return;
         }
@@ -183,15 +175,14 @@
             breadcrumbClickHandler.call(this, id);
         });
 
-        // if on info dialog we do not want to open the file versioning dialog
-        if (!is_mobile && fileHandle && !isInfoBlock && !isSimpletip) {
+        // if in custom component we do not want to open the file versioning dialog
+        if (!is_mobile && fileHandle && !wrapperNode) {
             fileversioning.fileVersioningDialog(fileHandle);
         }
     };
 
     /**
      * Render the breadcrumbs at the bottom of the search page.
-     * TODO: unify this with MegaData.renderPathBreadcrumbs
      *
      * @return {undefined}
      */
@@ -202,80 +193,12 @@
             return;
         }
 
-        if (this.currentdirid && this.currentdirid.substr(0, 7) === 'search/') {
+        // Show Breadcrumbs bar instead of Selection bar only when 1 item is selected
+        if (M.currentdirid && M.currentdirid.includes('search/') &&
+            self.selectionManager && selectionManager.selected_list.length === 1) {
 
-            const showBreadcrumbs = () => {
-                // Show Breadcrumbs bar instead of Selection bar only when 1 item is selected
-                if (self.selectionManager && selectionManager.selected_list.length === 1) {
-
-                    const items = this.getPath(selectionManager.selected_list[0]);
-                    const dictionary = handle => {
-                        let id = '';
-                        let typeClass = '';
-                        let name = '';
-
-                        if (handle.length === 11 && this.u[handle]) {
-                            id = handle;
-                            typeClass = 'contacts-item';
-                            name = this.u[handle].m;
-                        }
-                        else if (handle === this.RootID && !folderlink) {
-                            id = this.RootID;
-                            typeClass = 'cloud-drive';
-                            name = l[164];
-                        }
-                        else if (handle === this.RubbishID) {
-                            id = this.RubbishID;
-                            typeClass = 'recycle-item';
-                            name = l[168];
-                        }
-                        else if (this.BackupsId && handle === this.BackupsId) {
-                            id = this.BackupsId;
-                            typeClass = 'backups';
-                            name = l.restricted_folder_button;
-                        }
-                        else {
-                            const n = this.d[handle];
-                            if (n) {
-                                id = n.h;
-                                name = n.name || '';
-                                typeClass = n.t && 'folder' || '';
-
-                                if (M.dyh) {
-                                    const {type, localeName} = M.dyh('breadcrumb-properties', handle);
-                                    if (type) {
-                                        typeClass = type;
-                                    }
-                                    if (localeName) {
-                                        name = localeName;
-                                    }
-                                }
-                            }
-                        }
-
-                        return {
-                            id,
-                            typeClass,
-                            name
-                        };
-                    };
-
-                    scope.classList.remove('hidden');
-                    selectionManager.hideSelectionBar();
-                    selectionManager.scrollToElementProxyMethod(selectionManager.last_selected);
-
-                    this.renderBreadcrumbs(items, scope, dictionary, id => {
-                        breadcrumbClickHandler.call(this, id);
-                    });
-                }
-                else {
-                    scope.classList.add('hidden');
-                }
-            };
-
-            // Toggle search bar and selection bar with delay
-            // Delay to allow the user to double click on item without it's position change
-            delay('renderSearchBreadcrumbs', showBreadcrumbs, 180);
+            scope.classList.remove('hidden');
+            this.renderPathBreadcrumbs(selectionManager.selected_list[0], scope);
         }
         else {
             scope.classList.add('hidden');

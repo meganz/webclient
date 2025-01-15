@@ -66,7 +66,7 @@
     "webpack-cli": "6.0.1"
   },
   "devDependencies": {
-    "@babel/eslint-parser": "7.25.9",
+    "@babel/eslint-parser": "7.26.5",
     "chai": "4.3.10",
     "eslint": "8.57.1",
     "eslint-plugin-compat": "6.0.2",
@@ -75,7 +75,7 @@
     "eslint-plugin-local-rules": "3.0.2",
     "eslint-plugin-no-unsanitized": "4.1.2",
     "eslint-plugin-optimize-regex": "1.2.1",
-    "eslint-plugin-react": "7.37.3",
+    "eslint-plugin-react": "7.37.4",
     "eslint-plugin-sonarjs": "0.25.1",
     "eslint-plugin-unicorn": "55.0.0",
     "htmlhint": "1.1.4",
@@ -91,11 +91,11 @@
     "karma-sinon": "1.0.5",
     "mocha": "11.0.1",
     "react-hot-loader": "4.13.1",
-    "sass": "1.83.0",
+    "sass": "1.83.1",
     "sass-loader": "16.0.4",
     "sinon": "15.0.3",
-    "stylelint": "16.12.0",
-    "stylelint-config-standard": "36.0.1",
+    "stylelint": "16.13.0",
+    "stylelint-config-standard": "37.0.0",
     "stylelint-no-unsupported-browser-features": "8.0.2",
     "webpack-dev-server": "5.2.0"
   }

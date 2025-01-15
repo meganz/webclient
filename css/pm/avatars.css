@@ -65,4 +65,5 @@
 }
 .avatar-menu.mega-component.context-menu.menu-container.overlay-wrap {
     width: 312px;
+    z-index: 220;
 }

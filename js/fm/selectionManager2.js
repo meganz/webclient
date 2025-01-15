@@ -899,6 +899,12 @@ class SelectionManager2_DOM extends SelectionManager2Base {
      * @param notificationText
      */
     showSelectionBar(notificationText, itemSelected, itemsTotalSize, totalNodes, showDeselectBtn) {
+        if (this.currentdirid.substr(0, 7) === 'search/') {
+            M.renderSearchBreadcrumbs();
+            this.updateScrollBar();
+            this.scrollToElementProxyMethod(this.last_selected);
+            return;
+        }
 
         const $selectionBar = this.$selectionBar && this.$selectionBar[0]
             ? this.$selectionBar
@@ -930,11 +936,10 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
         this.vSelectionBar = $('b', $selectionBar).get(0);
 
-        if (this.currentdirid.substr(0, 7) !== 'search/' || this.selected_list.length > 1) {
-            $selectionBar.removeClass('hidden');
-            this.updateScrollBar();
-            this.scrollToElementProxyMethod(this.last_selected);
-        }
+        $selectionBar.removeClass('hidden');
+        this.updateScrollBar();
+        this.scrollToElementProxyMethod(this.last_selected);
+
 
         this.showRequiredLinks();
     }
@@ -952,6 +957,9 @@ class SelectionManager2_DOM extends SelectionManager2Base {
 
         this.selected_totalSize = 0;
         this.vSelectionBar = null;
+
+        // Hide search breadcrumbs bar
+        M.renderSearchBreadcrumbs();
 
         this.updateScrollBar();
     }

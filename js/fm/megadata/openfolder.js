@@ -630,7 +630,6 @@
             loadSubPage(path);
         }
 
-        delay('render:search_breadcrumbs', () => M.renderSearchBreadcrumbs());
         M.initLabelFilter(this.v);
         // Potentially getting back?
         // M.treeSearchUI();

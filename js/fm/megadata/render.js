@@ -116,8 +116,6 @@ MegaData.prototype.rmSetupUI = function(u, refresh) {
         ev.currentTarget = target;
 
         if (isDefault) {
-            delay('render:search_breadcrumbs', () => M.renderSearchBreadcrumbs());
-
             if ($(this).hasClass('active')) {
                 $(this).removeClass('active');
             }

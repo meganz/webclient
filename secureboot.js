@@ -482,8 +482,7 @@ function geoStaticPath(cms) {
 
             // Set which countries will use which static server
             var northAmericaStaticCountries = 'AG AI AR BB BL BO BR BS BZ CA CL CO CO CR CU DO EC FK GD GF GL GT GY HN HT IS JM KN LC MX NI PA PE PR PY SR SR TT US UY VC VE VE VG VI';
-            var newZealandStaticCountries = 'AU FJ NC NZ';
-            var japanStaticCountries = 'JP TW PH HK MO KR SG KP BN BT MM MY TH VN';
+            var japanStaticCountries = 'JP TW PH HK MO KR SG KP BN BT MM MY TH VN AU FJ NC NZ';
 
             // Match on cookie e.g. "geoip=SG" returns array ['geoip=SG', 'SG']
             var cookieMatch = String(document.cookie).match(/geoip\s*\=\s*([A-Z]{2})/);
@@ -494,9 +493,6 @@ function geoStaticPath(cms) {
             }
             else if (cookieMatch && cookieMatch[1] && northAmericaStaticCountries.indexOf(cookieMatch[1]) > -1) {
                 return 'https://na.static.mega.co.nz/' + finalPath;
-            }
-            else if (cookieMatch && cookieMatch[1] && newZealandStaticCountries.indexOf(cookieMatch[1]) > -1) {
-                return 'https://nz.static.mega.co.nz/' + finalPath;
             }
         }
     }

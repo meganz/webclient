@@ -19,6 +19,10 @@
     transition: 200ms linear;
 }
 
+.device-centre-view {
+    border-top: unset;
+}
+
 .fm-right-files-block.emptied .fm-blocks-view:not(.shared-folder-content),
 .fm-right-files-block.emptied .fm-blocks-view.shared-view,
 .fm-right-files-block.emptied .shared-blocks-view,

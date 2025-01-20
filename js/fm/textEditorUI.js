@@ -275,7 +275,7 @@ mega.textEditorUI = new function TextEditorUI() {
                         bindEventsListner();
 
                         if (fh) {
-                            selectionManager.resetTo(fh, true);
+                            selectionManager.wantResetTo(fh, true);
                             fileName = M.d[fh].name;
                             $('.text-editor-file-name span', $editorContainer).text(fileName);
                         }
@@ -527,6 +527,10 @@ mega.textEditorUI = new function TextEditorUI() {
     this.doClose = function() {
         if (editor) {
             editor.setValue('');
+        }
+        if (window.selectionManager) {
+
+            selectionManager.restoreResetTo();
         }
         if ($containerDialog) {
             $containerDialog.addClass('hidden');

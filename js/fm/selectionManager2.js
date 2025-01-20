@@ -90,6 +90,22 @@ class SelectionManager2Base {
         return this.set_currently_selected(item, scrollTo);
     }
 
+    wantResetTo(item, scrollTo) {
+        if (this.selected_list.length !== 1
+            || this.get_currently_selected() !== item) {
+
+            this.clash = this.resetTo(item, scrollTo);
+        }
+        return this.clash;
+    }
+
+    restoreResetTo() {
+        if (this.clash === this.get_currently_selected()) {
+            delete this.clash;
+            this.clear_selection();
+        }
+    }
+
     /**
      * The idea of this method is to _validate_ and return the .currently-selected element.
      *
@@ -708,7 +724,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         return res;
     }
     set_currently_selected(nodeId, scrollTo) {
-        super.set_currently_selected(nodeId, scrollTo);
+        const res = super.set_currently_selected(nodeId, scrollTo);
 
         quickFinder.disable_if_active();
 
@@ -720,6 +736,8 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             $element.addClass("currently-selected");
             this.scrollToElementProxyMethod(this.last_selected);
         }
+
+        return res;
     }
     add_to_selection(nodeId, scrollTo, alreadySorted) {
         const res = super.add_to_selection(nodeId, scrollTo, alreadySorted);

@@ -1239,6 +1239,9 @@ FileManager.prototype.initFileManagerUI = function() {
                 else if (tab.root === 'chat') {
                     delay('chat-event-gen-nav', () => eventlog(500294));
                 }
+                else if (tab.root === 'pwm') {
+                    eventlog(500628);
+                }
 
                 break;
             }

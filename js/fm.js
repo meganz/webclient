@@ -231,6 +231,10 @@ function sharedUInode(nodeHandle, force) {
     if (!bExportLink) {
         UiExportLink.removeExportLinkIcon(nodeHandle);
     }
+
+    if (M.recentsRender) {
+        M.recentsRender.nodeChanged(nodeHandle);
+    }
 }
 
 /**

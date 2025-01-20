@@ -194,8 +194,10 @@
         }
 
         // Show Breadcrumbs bar instead of Selection bar only when 1 item is selected
-        if (M.currentdirid && M.currentdirid.includes('search/') &&
-            self.selectionManager && selectionManager.selected_list.length === 1) {
+        if (M.search
+            && self.selectionManager
+            && selectionManager.selected_list.length === 1
+        ) {
 
             scope.classList.remove('hidden');
             this.renderPathBreadcrumbs(selectionManager.selected_list[0], scope);

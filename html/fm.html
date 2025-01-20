@@ -538,6 +538,10 @@
             <i class="sprite-fm-mono icon-logout"></i>
             <span>[$5866]</span>
         </a>
+        <a class="dropdown-item togglepausesync-item">
+            <i class="sprite-fm-mono"></i>
+            <span></span>
+        </a>
         <a class="dropdown-item stopbackup-item">
             <i class="sprite-fm-mono icon-clear"></i>
             <span>[$stop_backup_button]</span>
@@ -670,12 +674,6 @@
                 </div>
                 <div class="beta-text"></div>
             </div>
-            <div class="nw-fm-left-icon backup-center sprite-fm-uni-before icon-backup-before js-fm-tab" aria-role="button" name="backup-center">
-                <div class="dark-tooltip">[$devices]</div>
-                <div class="nav-icon-label-container">
-                    <div class="nav-icon-label">[$devices]</div>
-                </div>
-            </div>
             <div class="nw-fm-left-icon user-management sprite-fm-uni-before icon-business-before hidden js-fm-tab" aria-role="button" name="user-management">
                 <div class="dark-tooltip">[$bsn_compare_users]</div>
                 <div class="nav-icon-label-container">
@@ -800,6 +798,18 @@
                             </div>
                         </div>
 
+                        <div class="fm-tree-panel js-device-centre-tree-panel">
+                            <button class="btn-myfiles js-lpbtn device-centre js-device-centre collapse" data-link="device-centre">
+                                <i class="sprite-fm-mono icon-dropdown js-cloudtree-expander hidden"></i>
+                                <i class="sprite-fm-mono icon-devices"></i>
+                                <span>[$device_centre]</span>
+                            </button>
+
+                            <div class="content-panel device-centre collapse">
+                                <ul class="tree"></ul>
+                            </div>
+                        </div>
+
                         <div class="fm-tree-panel js-s4-tree-panel hidden">
                             <button class="btn-myfiles js-lpbtn js-s4-btn s4 collapse" data-link="s4">
                                 <i class="sprite-fm-mono icon-dropdown js-cloudtree-expander hidden"></i>
@@ -818,10 +828,6 @@
 
                         <button class="btn-myfiles js-lpbtn faves js-fm-tab" data-link="faves">
                             <i class="sprite-fm-mono icon-favourite-filled"></i>[$gallery_favourites]
-                        </button>
-
-                        <button class="btn-myfiles js-lpbtn js-backups-btn backups js-fm-tab" data-link="backups">
-                            <i class="sprite-fm-mono icon-database-filled"></i>[$restricted_folder_button]
                         </button>
 
                         <button class="btn-myfiles js-lpbtn rubbish-bin js-fm-tab" data-link="bin">
@@ -954,19 +960,6 @@
                 </div>
 
                 <div class="content-panel shared-with-me"></div>
-
-                <!-- Backup centre left pane -->
-                <div class="content-panel backup-center">
-                    <div class="lp-header">
-                        <span>[$device_centre]</span>
-                    </div>
-                    <div class="lp-content-wrap">
-                        <button class="btn-myfiles devices js-fm-tab js-lpbtn" data-link="devices">
-                            <i class="sprite-fm-mono icon-pc-filled"></i>
-                            [$devices_button]
-                        </button>
-                    </div>
-                </div>
 
                 <div class="content-panel contacts"></div>
 
@@ -1496,6 +1489,20 @@
                         </div>
                         <span>[$s4_group_create_button]</span>
                     </button>
+
+                    <button class="mega-button action fm-add-syncs" title="[$add_syncs_button]">
+                        <div>
+                            <i class="sprite-fm-mono icon-sync icon-blue"></i>
+                        </div>
+                        <span>[$add_syncs_button]</span>
+                    </button>
+
+                    <button class="mega-button action fm-add-backup" title="[$add_backup_button]">
+                        <div>
+                            <i class="sprite-fm-mono icon-database icon-green"></i>
+                        </div>
+                        <span>[$add_backup_button]</span>
+                    </button>
                 </div>
 
                 <div class="filter-block fm body hidden">
@@ -1588,6 +1595,12 @@
                     <i class="fm-notification-close sprite-fm-mono icon-close-component"></i>
                 </div>
             </div>
+
+            <div class="fm-notification-block device-centre">
+                <i class="notification-block-icon sprite-fm-mono icon-offline"></i>
+                <span></span>
+            </div>
+
             <!-- Users Management Header -->
             <div class="fm-right-header-user-management hidden">
                 <div class="sub-loader js-ba-loader"></div>
@@ -1712,6 +1725,60 @@
                 </div>
             </div>
 
+            <div class="dc-filter-chips-wrapper hidden">
+                <i class="sprite-fm-mono icon-check selected-mark selected-mark-template hidden"></i>
+                <i class="sprite-fm-mono icon-question-filled simpletip tooltip-question-mark-template dropdown-inline-tooltip hidden"></i>
+                <div class="dc-filter-chips">
+                    <div class="dc-filter-chip-button dc-filter-chip-deviceactivity">
+                        <div class="dc-filter-chip-button-text">
+                            [$dc_fchips_all_devices]
+                        </div>
+                        <span class="nw-fm-tree-arrow rot-90"></span>
+                    </div>
+                    <div class="dc-filter-chip-button dc-filter-chip-folderactivity">
+                        <div class="dc-filter-chip-button-text">
+                            [$dc_fchips_all_folders]
+                        </div>
+                        <span class="nw-fm-tree-arrow rot-90"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="device-centre-shimmer hidden"></div>
+
+            <div class="device-centre-header hidden">
+                <div>
+                    <div class="device-centre-header-icon">
+                        <i class="device-centre-header-icon"></i>
+                    </div>
+                    <div class="device-centre-header-info">
+                        <div class="first-row">
+                            <div class="name"></div>
+                            <i class="device-centre-tooltip-icon sprite-fm-mono icon-info-filled simpletip hidden"
+                                data-simpletip=""
+                                data-simpletipposition="top"
+                                data-simpletipoffset="2">
+                            </i>
+                            <div class="options">
+                                <a href="" class="options-link hidden">
+                                    <i class="sprite-fm-mono icon-options"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="device-centre-item-info status"></div>
+                    </div>
+                </div>
+                <div class="device-centre-header-actions">
+                    <button class="mega-button secondary togglepause-button js-dc-togglepause-sync-button hidden" type="button">
+                        <i class="sprite-fm-mono"></i>
+                        <span></span>
+                    </button>
+                    <button class="mega-button negative stop-button js-dc-remove-sync-button hidden" type="button">
+                        <span></span>
+                    </button>
+                </div>
+            </div>
+
             <div class="fm-empty-section fm-empty-faves hidden">
                 <div class="fm-empty-pad">
                     <i class="section-icon sprite-fm-theme icon-empty-state-favourite"></i>
@@ -1730,6 +1797,52 @@
                         <button class="mega-button positive large fm-not-logged-button create-account">
                             <span>[$5582]</span>
                         </button>
+                    </div>
+                </div>
+            </div>
+            <div class="fm-empty-section fm-empty-device-list hidden">
+                <div class="fm-empty-pad">
+                    <i class="section-icon sprite-fm-theme icon-empty-state-backup"></i>
+                    <div class="fm-empty-cloud-txt">[$devices_empty_title]</div>
+                    <div class="fm-empty-description"></div>
+                    <div class="fm-app-links hidden">
+                        <div class="fm-mega-app-link-container">
+                            <button class="mega-app-desktop mega-button positive">[$download_desktop_app]</button>
+                            <button class="mega-app-mobile mega-button secondary">[$download_mobile_app]</button>
+                        </div>
+                    </div>
+                    <div class="fm-add-sb-actions hidden">
+                        <button class="mega-button action cta-add-backup" title="[$add_backup_button]">
+                            <div>
+                                <i class="sprite-fm-mono icon-database icon-green"></i>
+                            </div>
+                            <span>[$add_backup_button]</span>
+                        </button>
+                        <button class="mega-button action cta-add-syncs" title="[$add_syncs_button]">
+                            <div>
+                                <i class="sprite-fm-mono icon-sync icon-blue"></i>
+                            </div>
+                            <span>[$add_syncs_button]</span>
+                        </button>
+    
+                    </div>
+                </div>
+            </div>
+            <div class="fm-empty-section fm-no-active-devices hidden">
+                <div class="fm-empty-pad">
+                    <i class="section-icon sprite-fm-theme icon-empty-state-backup"></i>
+                    <div class="fm-empty-cloud-txt">[$dc_no_active_devices_title]</div>
+                    <div class="fm-empty-description">
+                        [$dc_no_active_devices_desc]
+                    </div>
+                </div>
+            </div>
+            <div class="fm-empty-section fm-no-active-folders hidden">
+                <div class="fm-empty-pad">
+                    <i class="section-icon icon-folder-3d"></i>
+                    <div class="fm-empty-cloud-txt">[$dc_no_active_folders_title]</div>
+                    <div class="fm-empty-description">
+                        [$dc_no_active_folders_desc]
                     </div>
                 </div>
             </div>
@@ -1891,6 +2004,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="fm-rewind-progress-section hidden">
                 <div class="content">
                     <div class="image"></div>
@@ -2682,6 +2796,69 @@
                 <!-- END Templates for Gallery list -->
             </div>
 			<div id="albums-view" class="flex-column hidden"></div>
+
+            <div class="device-centre-grid-view hidden">
+                <div class="devices grid-scrolling-table hidden">
+                    <div class="grid-wrapper">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table device-centre table-hover">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th megatype="fname" class="full-width-col" data-minwidth="250">
+                                        <div class="arrow name label desc sprite-fm-mono icon-dropdown">[$86]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th megatype="numFolders" width="258" data-minwidth="180">
+                                        <div class="arrow numFolders sprite-fm-mono icon-dropdown">[$device_centre_contain]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th megatype="size" width="118" data-minwidth="75">
+                                        <div class="arrow size sprite-fm-mono icon-dropdown">[$87]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th class="grid-url-header-nw" width="60"></th>
+                                    <th class="grid-empty-spacer"></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="folders grid-scrolling-table hidden">
+                    <div class="grid-wrapper">
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" class="grid-table device-centre table-hover">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th megatype="fname" class="full-width-col" data-minwidth="250">
+                                        <div class="arrow name label desc sprite-fm-mono icon-dropdown">[$86]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th megatype="type" width="258" data-minwidth="180">
+                                        <div class="arrow type sprite-fm-mono icon-dropdown">[$93]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th megatype="size" width="118" data-minwidth="75">
+                                        <div class="arrow size sprite-fm-mono icon-dropdown">[$87]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th megatype="timeAd" width="118" data-minwidth="75">
+                                        <div class="arrow date sprite-fm-mono icon-dropdown">[$17445]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th megatype="hbtime" width="118" data-minwidth="75">
+                                        <div class="arrow hbtime sprite-fm-mono icon-dropdown">[$last_updated_label]</div>
+                                        <div class="grid-view-resize">&nbsp;</div>
+                                    </th>
+                                    <th class="grid-url-header-nw" width="60"></th>
+                                    <th class="grid-empty-spacer"></th>
+                                </tr>
+                            </thead>
+                            <tbody></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
             <div class="s4-grid-view hidden">
                 <div class="s4-keys-management-scroll sticky-header-table-container hidden">
@@ -4287,6 +4464,12 @@
                                     <div class="mega-feature-switch no-trans-init"></div>
                                 </div>
                             </div>
+                            <div class="settings-sub-section">
+                                <div class="subtitle-txt">[$dc_confirm_pause_sync_setting_label]</div>
+                                <div class="mega-switch toggle-on" id="dcPause">
+                                    <div class="mega-feature-switch no-trans-init"></div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -4836,56 +5019,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Backup center - Backups section !-->
-        <section class="fm-right-block full-size backup hidden">
-
-            <div class="loading-spinner js-bc-loader">
-                <div class="main-loader"></div>
-            </div>
-
-            <!-- Empty section !-->
-            <div class="backup-center empty-section hidden">
-                <div class="empty-wrap">
-                    <i class="sprite-fm-theme icon-empty-state-backup"></i>
-                    <h2>[$no_backups_header]</h2>
-                    <div class="new-backup-wrapper">
-                        <div class="new-backup mobile">
-                            <i class="sprite-fm-mono icon-mobile"></i>
-                            <div class="title">
-                                [$backup_mobiles_header]
-                            </div>
-                            <div class="info">
-                                [$backup_mobiles_info]
-                            </div>
-                        </div>
-                        <div class="new-backup desktop">
-                            <i class="sprite-fm-mono icon-pc"></i>
-                            <div class="title">
-                                [$backup_pcs_header]
-                            </div>
-                            <div class="info">
-                                [$backup_pcs_info]
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Content block !-->
-            <div class="backup-center content-block hidden">
-                <div class="content-header">
-                    <button class="mega-button action js-backup-computer" title="[$new_backup_btn]">
-                        <div><i class="sprite-fm-mono icon-add-circle icon-green"></i></div>
-                        <span>[$new_backup_btn]</span>
-                    </button>
-                </div>
-
-                <div class="content-body">
-                    <div class="content-wrap"></div>
                 </div>
             </div>
         </section>
@@ -5723,6 +5856,10 @@
                     <div class="value name-value"></div>
                     <div class="takedown-warning">[$item_subject_to_takedown]</div>
                 </div>
+                <div class="info-data status-section">
+                    <div class="description">[$89]</div>
+                    <div class="device-centre-item-info"></div>
+                </div>
                 <div class="info-data type-section">
                     <div class="description">[$93]</div>
                     <div class="value type-value"></div>
@@ -5768,6 +5905,10 @@
                 <div class="info-data date-added-section">
                     <div class="description">[$info_panel_date_added]</div>
                     <div class="value date-added-value"></div>
+                </div>
+                <div class="info-data last-updated-section">
+                    <div class="description">[$last_updated_label]</div>
+                    <div class="value last-updated-value"></div>
                 </div>
                 <div class="info-data node-description-section bottom hidden">
                     <div class="description">[$info_panel_description]</div>

@@ -63,6 +63,80 @@
             '</a>'
         ],
 
+        'device-centre-devices': [
+            // List view mode
+            '<table>' +
+                '<tr>' +
+                    '<td></td>' +
+                    '<td megatype="fname">' +
+                        '<div ' +
+                            'class="device-centre-item-icon medium-file-icon item-type-icon-90"' +
+                        '>' +
+                        '</div>' +
+                        '<div class="device-centre-item-info-block">' +
+                            '<div class="device-centre-item-name"></div>' +
+                            '<div class="device-centre-item-info"></div>' +
+                        '</div>' +
+                    '</td>' +
+                    '<td megatype="numFolders">' +
+                        '<div class="device-centre-item-contain"></div>' +
+                    '</td>' +
+                    '<td megatype="size">' +
+                        '<div class="device-centre-item-size"></div>' +
+                    '</td>' +
+                    '<td class="grid-url-header-nw">' +
+                        '<a class="grid-url-arrow"><i class="sprite-fm-mono icon-options"></i></a>' +
+                    '</td>' +
+                    '<td class="space-maintainer-end" megatype="empty"></td>' +
+                '</tr>' +
+            '</table>',
+
+            // Icon view mode: view not available
+            '<span></span>'
+        ],
+
+        'device-centre-folders': [
+            // List view mode
+            '<table>' +
+                '<tr>' +
+                    '<td></td>' +
+                    '<td megatype="fname">' +
+                        '<div ' +
+                            'class="device-centre-item-icon medium-file-icon item-type-icon-90"' +
+                        '>' +
+                        '</div>' +
+                        '<div class="device-centre-item-info-block">' +
+                            '<div class="device-centre-item-name"></div>' +
+                            '<div class="device-centre-item-info"></div>' +
+                        '</div>' +
+                    '</td>' +
+                    '<td megatype="type">' +
+                        '<div class="device-centre-item-type"></div>' +
+                    '</td>' +
+                    '<td megatype="size">' +
+                        '<div class="device-centre-item-size"></div>' +
+                    '</td>' +
+                    '<td megatype="timeAd">' +
+                        '<div class="device-centre-item-added"></div>' +
+                    '</td>' +
+                    '<td megatype="hbtime">' +
+                        '<div class="device-centre-item-modified"></div>' +
+                    '</td>' +
+                    '<td megatype="extras" class="grid-url-field own-data">' +
+                        '<a class="grid-url-arrow"><i class="sprite-fm-mono icon-options"></i></a>' +
+                        '<span class="versioning-indicator">' +
+                            '<i class="sprite-fm-mono icon-versions-previous"></i>' +
+                        '</span>' +
+                        '<i class="sprite-fm-mono icon-link"></i>' +
+                    '</td>' +
+                    '<td class="space-maintainer-end" megatype="empty"></td>' +
+                '</tr>' +
+            '</table>',
+
+            // Icon view mode: view not available
+            '<span></span>'
+        ],
+
         'shares': [
             // List view mode
             '<table>' +
@@ -258,6 +332,14 @@
             '.grid-table.fm',
             '.fm-blocks-view.fm .file-block-scrolling',
         ],
+        'device-centre-devices': [
+            '.device-centre-grid-view .devices .grid-table.device-centre',
+            '.device-centre-blocks-scrolling'
+        ],
+        'device-centre-folders': [
+            '.device-centre-grid-view .folders .grid-table.device-centre',
+            '.device-centre-blocks-scrolling'
+        ],
         'shares': [
             '.shared-grid-view .grid-table.shared-with-me',
             '.shared-blocks-scrolling'
@@ -343,6 +425,9 @@
         else if (M.currentrootid === 'file-requests') {
             section = 'file-requests';
         }
+        else if (mega.devices.ui.isCustomRender()) {
+            section = mega.devices.ui.getRenderSection();
+        }
         else if (typeof aViewMode === 'string') {
             section = aViewMode;
 
@@ -359,8 +444,7 @@
             location =
                 M.currentdirid === 'public-links' ? 'mixed-content' :
                     M.currentrootid === M.RubbishID ? 'trashcan' :
-                        M.currentrootid === M.InboxID ? 'backups' :
-                            M.isDynPage(M.currentdirid) ? 'dyn-page' : location;
+                        M.isDynPage(M.currentdirid) ? 'dyn-page' : location;
         }
         else {
             this.chatIsReady = megaChatIsReady;
@@ -461,7 +545,7 @@
                     $('.fm-clearbin-button').addClass('hidden');
                 }
                 else if (String(M.currentdirid).substr(0, 7) === 'search/'
-                        || mega.ui.mNodeFilter.selectedFilters
+                        || mega.ui.mNodeFilter.selectedFilters.value
                         && M.currentrootid !== 'shares') {
                     $('.fm-empty-search').removeClass('hidden');
                 }
@@ -530,6 +614,28 @@
                 else if (M.isDynPage(M.currentdirid)) {
                     if (d > 2) {
                         console.log('Deferred dyn-page.', M.currentdirid);
+                    }
+                }
+                else if (M.currentCustomView && M.currentCustomView.type === mega.devices.rootId
+                    && mega.devices.ui.getRenderSection() !== 'cloud-drive') {
+
+                    // TODO: [iha] Add new empty states for (1. devices, 2. folders)
+                    // TODO: [iha] Check if we have the correct option selected
+                    const currSect = mega.devices.ui.getRenderSection();
+                    const filterData = mega.devices.ui.filterChipUtils.selectedFilters.data;
+
+                    switch (currSect) {
+                        case 'device-centre-devices':
+                            if (filterData && filterData.name === 'deviceactivity' && filterData.index === 0) {
+                                $('.fm-no-active-devices', '.fm-right-files-block').removeClass('hidden');
+                            }
+                            break;
+                        case 'device-centre-folders':
+                            if (filterData && filterData.name === 'folderactivity' && filterData.index === 0) {
+                                $('.fm-no-active-folders', '.fm-right-files-block').removeClass('hidden');
+                            }
+                            break;
+
                     }
                 }
                 else if (this.logger) {
@@ -884,14 +990,20 @@
              */
             '*': function(aNode, aHandle, aExtendedInfo) {
                 const props = {classNames: []};
-                const share = M.getNodeShare(aNode);
+                const share = M.getNodeShare(aNode.d ? aNode.h : aNode);
                 let itemIcon = fileIcon(aNode);
 
                 if (aNode.su) {
                     props.classNames.push('inbound-share');
                 }
 
-                if (aNode.s4 && M.getS4NodeType(aNode) === 'bucket') {
+                if (M.dcd[aNode.h]) {
+                    props.classNames.push('device-item');
+                }
+                else if (aNode.isDeviceFolder) {
+                    props.size = bytesToSize(aNode.tb || 0);
+                }
+                else if (aNode.s4 && M.getS4NodeType(aNode) === 'bucket') {
                     props.type = l.s4_bucket_type;
                     props.classNames.push('folder');
                     props.size = bytesToSize(aNode.tb || 0);
@@ -972,6 +1084,10 @@
                         props.labelC = this.labelsColors[colourLabel];
                     }
                 }
+                else if (!aExtendedInfo && aNode.d && share) {
+                    props.linked = true;
+                    props.classNames.push('linked');
+                }
                 if (aNode.su) {
                     props.parentName = l[5542];
                 }
@@ -983,6 +1099,20 @@
                     props.parentName = M.getNameByHandle(pHandle);
                 }
 
+                return props;
+            },
+            'device-centre-devices'(aNode, aHandle) {
+                const props = this.nodeProperties['*'].call(this, aNode, aHandle, false);
+                if (mega.devices.main) {
+                    mega.devices.main.run('updateProps', props, aNode);
+                }
+                return props;
+            },
+            'device-centre-folders'(aNode, aHandle) {
+                const props = this.nodeProperties['*'].call(this, aNode, aHandle, false);
+                if (mega.devices.main) {
+                    mega.devices.main.run('updateProps', props, aNode);
+                }
                 return props;
             },
             'shares': function(aNode, aHandle, aExtendedInfo) {
@@ -1110,25 +1240,14 @@
                 var tmp;
                 var title = [];
                 let elm;
-                const isBackup = this.location === 'backups'
-                    || this.location === 'mixed-content' && M.getNodeRoot(aNode.h) === M.InboxID;
 
                 if (aNode.fav && !folderlink && this.location !== 'trashcan' && M.currentrootid !== 'shares') {
                     elm = aTemplate.querySelector(this.viewmode ? '.file-status-icon' : '.grid-status-icon');
                     elm.classList.add('icon-favourite-filled');
                     elm.classList.remove('icon-dot');
                 }
-
                 if (mega.sensitives.shouldBlurNode(aNode)) {
                     aTemplate.classList.add('is-sensitive');
-                }
-
-                if (isBackup) {
-
-                    elm = aTemplate.querySelector(this.viewmode ? '.file-status-icon' : '.grid-status-icon');
-                    if (elm) {
-                        elm.classList.add('read-only');
-                    }
                 }
 
                 if (!aNode.t && aNode.tvf) {
@@ -1242,6 +1361,18 @@
                     }
                 }
 
+                return aTemplate;
+            },
+            'device-centre-devices'(aNode, aProperties, aTemplate) {
+                if (mega.devices.main) {
+                    mega.devices.main.run('updateTemplate', aProperties, aTemplate);
+                }
+                return aTemplate;
+            },
+            'device-centre-folders'(aNode, aProperties, aTemplate) {
+                if (mega.devices.main) {
+                    mega.devices.main.run('updateTemplate', aProperties, aTemplate);
+                }
                 return aTemplate;
             },
             'shares': function(aNode, aProperties, aTemplate) {

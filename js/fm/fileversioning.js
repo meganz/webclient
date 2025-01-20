@@ -521,10 +521,6 @@ var versiondialogid;
                 else if (a2[i] === M.RubbishID) {
                     name = l[167];
                 }
-                else if (M.BackupsId && a2[i] === M.BackupsId) {
-                    name = l.restricted_folder_button;
-                    hasArrow = false;
-                }
                 else if (a2[i] === 'messages') {
                     name = l[166];
                 }

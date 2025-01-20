@@ -82,7 +82,7 @@
 }
 #ob-dialog.mcob {
     width: 450px;
-    z-index: 121;
+    z-index: 202;
 }
 .overlayed #ob-dialog.mcob {
     visibility: hidden;

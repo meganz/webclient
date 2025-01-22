@@ -2753,8 +2753,6 @@ function dbfetchfm(residual) {
         return function(r) {
             if (tables[t] === 1) {
                 if (r.length > 0) {
-                    // only set chatmcf is there is anything returned
-                    // if not, this would force the chat to do a 'mcf' call
                     loadfm.chatmcf = r;
                 }
                 else {
@@ -2801,6 +2799,8 @@ function dbfetchfm(residual) {
     if (isFromAPI) {
         // Tree nodes are already in memory.
         delete tables.tree;
+        delete tables.mcf;
+        delete tables.mcsm;
     }
 
     if (d) {

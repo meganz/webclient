@@ -281,7 +281,7 @@
                 dashboardUI();
             },
             'device-centre'(id) {
-                mega.devices.ui.boot(id);
+                mega.devices.ui.render(id);
             },
             recents() {
                 openRecents();
@@ -340,7 +340,7 @@
             return M.openFolder('fm');
         }
 
-        if (this.currentrootid === this.InboxID) {
+        if (this.InboxID && this.currentrootid === this.InboxID) {
             return M.openFolder(mega.devices.rootId);
         }
 
@@ -573,12 +573,7 @@
                 this.doSort('name', 1);
             }
 
-            if (M.currentrootid === mega.devices.rootId) {
-                mega.devices.ui.initUI();
-            }
-            else {
-                this.renderMain();
-            }
+            this.renderMain();
 
             if (fminitialized && !is_mobile) {
                 var currentdirid = this.currentdirid;

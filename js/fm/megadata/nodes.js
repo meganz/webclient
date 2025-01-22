@@ -597,7 +597,8 @@ MegaData.prototype.isMediaDiscoveryPage = function(path) {
 
     path = String(path || this.currentdirid);
 
-    return M.gallery && (pfid && !pfcol || path !== M.RootID && M.currentrootid === M.RootID);
+    return M.gallery && (pfid && !pfcol || path !== M.RootID &&
+        (M.currentrootid === M.RootID || M.currentrootid === mega.devices.rootId));
 };
 
 /**

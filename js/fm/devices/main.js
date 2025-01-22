@@ -9,14 +9,16 @@ lazy(mega.devices, 'main', () => {
     const {
         utils: {
             /**
-             * {Object<section>} section - sections constants
-             */
-            section,
-
-            /**
              * {Object<MegaLogger>} logger - logger instance
              */
             logger,
+        },
+
+        models: {
+            /**
+             * {Object} syncSection - contains sections constants
+             */
+            syncSection,
         },
 
         sections: {
@@ -127,13 +129,13 @@ lazy(mega.devices, 'main', () => {
             this.section = null;
 
             if (M.currentdirid === rootId) {
-                this.section = section.devices;
+                this.section = syncSection.devices;
             }
             else {
                 const path = M.currentdirid.split('/');
                 this.section = path.length > 2 ?
-                    section.folderChildren :
-                    section.deviceFolders;
+                    syncSection.folderChildren :
+                    syncSection.deviceFolders;
             }
         }
 

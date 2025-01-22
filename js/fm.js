@@ -1383,11 +1383,9 @@ function renameDialog() {
                                         const {device} = mega.devices.ui.getCurrentDirData();
                                         const folder = device ? device.folders[n.h] : null;
                                         if (device && folder) {
-                                            mega.devices.ui.cacheClear();
                                             M.dcd[device.h].folders[folder.h].name = value;
-                                            mega.devices.tree.render().then(() => {
-                                                mega.devices.ui.header.refresh();
-                                            });
+                                            mega.devices.tree.render();
+                                            mega.devices.ui.header.refresh();
                                         }
                                     }
                                     else {

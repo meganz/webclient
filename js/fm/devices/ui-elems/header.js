@@ -6,6 +6,15 @@
 lazy(mega.devices.uiElems, 'Header', () => {
     'use strict';
 
+    const {
+        models: {
+            /**
+             * {Object} syncType - contains device folder types constants
+             */
+            syncType,
+        },
+    } = mega.devices;
+
     /**
      * Header for Device Centre
      */
@@ -64,10 +73,11 @@ lazy(mega.devices.uiElems, 'Header', () => {
             const {h, isDeviceFolder, name, icon, t, status} = item;
 
             this.$icon.removeClass().addClass(`device-centre-header-icon item-type-icon-90 icon-${icon}-90`);
-            this.$name.text(escapeHTML(name));
+            this.$name.text(name);
             this.$info.text('');
 
-            if (typeof renderStatusFn === 'function' && mega.devices.ui.isActive(item)) {
+            const {ui} = mega.devices;
+            if (typeof renderStatusFn === 'function' && ui.isActive(item)) {
                 renderStatusFn({
                     status,
                     itemNode: this.$info[0],
@@ -85,11 +95,12 @@ lazy(mega.devices.uiElems, 'Header', () => {
                 this.$tooltip.addClass('hidden');
             }
 
-            const { cameraUpload } = mega.devices.utils.deviceFolderType;
+            const { cameraUpload } = syncType;
 
             if (isDeviceFolder && t !== cameraUpload) {
+                const {ui} = mega.devices;
                 $('span', this.$removeButton).text(
-                    mega.devices.ui.isBackupRelated([M.currentCustomView.nodeID])
+                    ui.isBackupRelated([M.currentCustomView.nodeID])
                         ? l.stop_backup_button
                         : l.stop_syncing_button
 
@@ -175,7 +186,7 @@ lazy(mega.devices.uiElems, 'Header', () => {
                 cameraUpload,
                 mediaUpload,
                 backup,
-            } = mega.devices.utils.deviceFolderType;
+            } = syncType;
 
             switch (folder.t) {
                 case twoWay:

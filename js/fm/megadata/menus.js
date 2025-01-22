@@ -596,7 +596,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
         }
 
         if (M.currentCustomView.type === mega.devices.rootId && $.selected.length === 1) {
-            const {twoWay, oneWayUp, oneWayDown, backup} = mega.devices.utils.deviceFolderType;
+            const {twoWay, oneWayUp, oneWayDown, backup} = mega.devices.models.syncType;
             const id = $.selected[0];
 
             if (!M.dcd[id]) {
@@ -1431,10 +1431,36 @@ MegaData.prototype.adjustContextMenuPosition = function(e, m) {
     var mX = e.clientX;
     var mY = e.clientY;
 
+    // If a DOM element loses its children while ctx menu is opened from the ... menu,
+    // We need to search for the new `delegateTarget` to calculate offsets
+    // Currently only necessary for DC. Subject to change.
+    const getLostDelegate = (e) => {
+        const $target = $(e.currentTarget);
+        if ($target.attr('id')) {
+            const selector =
+                `.${[...e.delegateTarget.classList]
+                    .filter(c => c !== 'active')
+                    .join('.')}`;
+            const del = $(selector, $(`#${$target.attr('id')}`));
+            if (del.length) {
+                return del[0];
+            }
+            return false;
+        }
+    };
+
     var mPos;// menu position
     if (e.type === 'click' && !e.calculatePosition) {// Clicked on file-settings-icon
-        var ico = { 'x': e.delegateTarget.clientWidth, 'y': e.delegateTarget.clientHeight };
-        var icoPos = getHtmlElemPos(e.delegateTarget);// Get position of clicked file-settings-icon
+        let delegate = e.delegateTarget;
+        var ico = { 'x': delegate.clientWidth, 'y': delegate.clientHeight };
+        if (!ico.x && !ico.y && !document.contains(delegate)) {
+            delegate = getLostDelegate(e);
+            if (delegate) {
+                ico.x = delegate.clientWidth;
+                ico.y = delegate.clientHeight;
+            }
+        }
+        var icoPos = getHtmlElemPos(delegate);// Get position of clicked file-settings-icon
         mPos = M.reCalcMenuPosition(m, icoPos.x, icoPos.y, ico);
     }
     else {// right click

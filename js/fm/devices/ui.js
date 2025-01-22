@@ -30,14 +30,9 @@ lazy(mega.devices, 'ui', () => {
     } = mega.devices;
 
     /**
-     * {Number} cacheExpirationMillis - cache expiration time in milliseconds
+     * {Number} refreshMillis - update interval in milliseconds
      */
-    const cacheExpirationMillis = 30000;
-
-    /**
-     * {Number} updateIntervalMillis - update interval in milliseconds
-     */
-    const updateIntervalMillis = 30000;
+    const refreshMillis = 30000;
 
     /**
      * {String} refreshEventName - refresh event name
@@ -200,7 +195,9 @@ lazy(mega.devices, 'ui', () => {
          * @returns {undefined}
          */
         onItemSelect(index, item, clickFn, preventReload, autoSelected) {
-            const { name } = this;
+            const {name} = this;
+            const {ui} = mega.devices;
+            ui.clearSelection();
             selectedFilters.data = freeze({
                 name,
                 index,
@@ -382,14 +379,14 @@ lazy(mega.devices, 'ui', () => {
             };
 
             const refreshAfterRemoval = async() => {
-                const {ui, tree} = mega.devices;
-                ui.cacheClear();
+                const {ui} = mega.devices;
+                ui.clearLastReq();
 
                 if (ui.isCurrentPathDeviceFolder()) {
                     return M.openFolder(`${rootId}/${device.h}`);
                 }
 
-                await tree.render();
+                ui.render(M.currentdirid, false, true);
             };
 
             const dialogs = freeze({
@@ -585,12 +582,13 @@ lazy(mega.devices, 'ui', () => {
                 : 'pause';
 
             const proceedWithTogglePause = async() => {
-                const {ui, tree} = mega.devices;
                 await api.req(config.requests[action](selectedSync.id));
                 const sds = `${selectedSync.id}:${config.sdsCodes[action]}`;
                 await api.setNodeAttributes(node, {sds});
-                ui.cacheClear();
-                await tree.render();
+
+                const {ui} = mega.devices;
+                ui.clearLastReq();
+                return ui.render(M.currentdirid, false, true);
             };
 
             if (!folder.status.pausedSyncs && !mega.config.get('dcPause')) {
@@ -625,22 +623,17 @@ lazy(mega.devices, 'ui', () => {
             /**
              * {String} gridWrapperSelector - Grid wrapper query selector
              */
-            this.mainViewSelector = '.device-centre-view';
-
-            /**
-             * {String} gridWrapperSelector - Grid wrapper query selector
-             */
             this.gridWrapperSelector = '.device-centre-grid-view';
 
             /**
-             * {Boolean} isLoading - whether the device centre is loading data
-             */
-            this.isLoading = false;
-
-            /**
-             * {Number} lastReq - timestamp in milliseconds of last request
+             * {Number} lastReq - last time data req was made
              */
             this.lastReq = 0;
+
+            /**
+             * {Boolean} isLoading - whether data is being loaded
+             */
+            this.isLoading = false;
 
             /**
              * {String} selected - selected nodes before UI initialization
@@ -651,11 +644,6 @@ lazy(mega.devices, 'ui', () => {
              * {String} beforePageChangeListener - The ID identifying the event
              */
             this.beforePageChangeListener = null;
-
-            /*
-             * {Boolean} noDevices - Set to `true` if we have no devices, `false` by default
-             */
-            this.noDevices = true;
 
             /**
              * {jQuery} $fmMain - jQuery object
@@ -712,17 +700,17 @@ lazy(mega.devices, 'ui', () => {
              */
             this.$emptyAppDLButtons = $('.fm-app-links', this.$empty);
             /**
-             * {Shimmer} = shimmer - Shimmer instance
+             * {Shimmer} shimmer - Shimmer instance
              */
             this.shimmer = new Shimmer(this.$fmMain);
 
             /**
-             * {Notification} = notification - Notification instance
+             * {Notification} notification - Notification instance
              */
             this.notification = new Notification(this.$fmMain);
 
             /**
-             * {Header} = header - Header instance
+             * {Header} header - Header instance
              */
             this.header = new Header(this.$fmMain);
 
@@ -745,7 +733,6 @@ lazy(mega.devices, 'ui', () => {
                     },
                     appPromoPageNum: 1,
                 }),
-
                 /**
                  * {DesktopAppFeature} sync - DesktopAppFeature instance to handle sync
                  */
@@ -807,11 +794,9 @@ lazy(mega.devices, 'ui', () => {
                 /**
                  * Initializes the filter chips and shows/hides them.
                  * Also adjusts the visibility of the filter chip wrapper and sets the appropriate filters are active.
-                 *
-                 * @param {Function|null} onShow - Function to be called when the filter chips are shown
                  * @returns {undefined}
                  */
-                init(onShow) {
+                init() {
                     $dcFilterChipsWrapper.removeClass('hidden');
 
                     for (const name in filters) {
@@ -834,9 +819,6 @@ lazy(mega.devices, 'ui', () => {
                     $dcFilterChipsWrapper.toggleClass('hidden', hideWrapper);
 
                     if (!hideWrapper && !this.selectedFilters.manual) {
-                        if (typeof onShow === 'function') {
-                            onShow();
-                        }
                         this.toggleActiveFilter(true);
                         this.selectedFilters.manual = true;
                         M.openFolder(M.currentdirid, true);
@@ -942,22 +924,33 @@ lazy(mega.devices, 'ui', () => {
                 },
 
                 /**
+                 * Force re-applies currently selected filter, does not reload afterwards
+                 *
+                 * @returns {undefined}
+                 */
+                reapplyCurrentFilter() {
+                    if (selectedFilters.data) {
+                        const { name, index } = selectedFilters.data;
+                        this.autoSelect(name, index, true);
+                    }
+                },
+
+                /**
                  * Gets the currently selected filters.
                  * @returns {Object} - The current selected filters object.
                  */
                 get selectedFilters() {
                     return selectedFilters;
                 },
-
-                /**
-                 * Checks if an inactive option is selected.
-                 * @returns {boolean} - Returns `true` if inactive option is selected, otherwise `false`.
-                 */
-                get isInactiveSelected() {
-                    const {data} = mega.devices.ui.filterChipUtils.selectedFilters;
-                    return data && data.index;
-                }
             });
+        }
+
+        /**
+         * Checks if the device centre has devices.
+         * @returns {boolean} - Returns `true` if devices exist, otherwise `false`
+         */
+        get hasDevices() {
+            return M.dcd && Object.keys(M.dcd).length;
         }
 
         /**
@@ -983,7 +976,7 @@ lazy(mega.devices, 'ui', () => {
          *       since selectionManager was destroyed and initialised
          * @returns {void}
          */
-        initUI() {
+        init() {
             $('.files-grid-view.fm', this.$fmMain).addClass('hidden');
             $('.fm-blocks-view.fm', this.$fmMain).addClass('hidden');
             $('.gallery-view', this.$fmMain).addClass('hidden');
@@ -998,15 +991,31 @@ lazy(mega.devices, 'ui', () => {
         }
 
         /**
+         * Set lastReq to 0 to force fetch data
+         * @returns {void} void
+         */
+        clearLastReq() {
+            this.lastReq = 0;
+        }
+
+        /**
+         * Clear selection
+         * @returns {void} void
+         */
+        clearSelection() {
+            this.selected = null;
+            selectionManager.clear_selection();
+        }
+
+        /**
          * Boot tasks
          * @param {String} id - current dir id
          * @param {Boolean} isSkipPathCheck - whether to force load even path is not device centre
-         * @returns {void}
+         * @param {Boolean} skipShimmer - whether to skip shimmer
+         * @returns {Promise<void>} void
          */
-        async boot(id, isSkipPathCheck) {
-            if (this.isLoading) {
-                await this._waitUntilNotLoading();
-            }
+        async render(id, isSkipPathCheck, skipShimmer) {
+            await this._boot(skipShimmer);
 
             const path = id.split('/');
             if ((!path.length || path[0] !== rootId || path.length > 3) && !isSkipPathCheck) {
@@ -1015,42 +1024,41 @@ lazy(mega.devices, 'ui', () => {
             }
 
             this._setupListeners(id);
+            await mega.devices.tree.render();
             this._bindEvents();
 
-            if (M.currentrootid === rootId) {
-                this.shimmer.show();
-            }
+            if (this.hasDevices) {
+                const selected = this.selected && this.selected.length ?
+                    this.selected :
+                    selectionManager.selected_list;
 
-            $(this.mainViewSelector, this.$fmMain).addClass('hidden');
-
-            let isReady = false;
-            if ('tree' in mega.devices) {
-                await mega.devices.tree.render();
-                isReady = true;
-            }
-            else if (this.isDataExpired())  {
-                const data = await this.getData();
-                if (data && data[1] && data[1].length) {
-                    await Promise.resolve(M.require('devices'));
-                    if (M.currentdirid === id || isSkipPathCheck) {
-                        this.noDevices = false;
-                        await mega.devices.tree.render(data);
-                        isReady = true;
-                    }
+                for (let i = 0; i < selected.length; i++) {
+                    selectionManager.add_to_selection(selected[i], true);
                 }
+
+                if (M.currentrootid === rootId) {
+                    this.filterChipUtils.init();
+                }
+
+                if (this.filterChipUtils.selectedFilters.value) {
+                    M.filterByParent(M.currentdirid);
+                    if (!M.v.length) {
+                        this.header.hide();
+                    }
+                    M.renderMain();
+                }
+
+                await mega.ui.mInfoPanel.reRenderIfVisible(selected);
+            }
+            else if (M.currentrootid === id) {
+                this.showNoDevices();
+            }
+            else if (M.currentrootid === rootId) {
+                M.openFolder(rootId);
             }
 
             if (M.currentrootid === rootId) {
-                this.shimmer.hide();
-            }
-
-            if (!isReady) {
-                this._handleNotReadyOnBoot(id);
-            }
-            this._manageFiltersOnBoot();
-
-            if (M.currentrootid === rootId) {
-                delay(refreshEventName, () => this.boot(id).catch(dump), updateIntervalMillis);
+                delay(refreshEventName, () => this.render(id, false, true).catch(dump), refreshMillis);
             }
             else {
                 delay.cancel(refreshEventName);
@@ -1058,46 +1066,20 @@ lazy(mega.devices, 'ui', () => {
         }
 
         /**
-         * Returns devices data
-         * @returns {Promise<Array>} Data array
-         */
-        getData() {
-            this.isLoading = true;
-            return Promise.all([
-                mega.attr.get(u_handle, 'dn', false, true),
-                api.req({a: 'sf'})
-            ]).then(([deviceNames, {result: folders}]) => {
-                if (deviceNames) {
-                    deviceNames = mega.attr.decodeObjectValues(deviceNames);
-                }
-                return [
-                    deviceNames || {},
-                    Array.isArray(folders) && folders.length ? folders : [],
-                ];
-            }).catch((ex) => {
-                dump('mega.devices.ui.getData', ex);
-            }).finally(() => {
-                this.lastReq = Date.now();
-                this.isLoading = false;
-            });
-        }
-
-        /**
-         * Sets devices data
+         * Sets devices names
          * @param {Array} data - Devices data
          * @param {String} handle - Device handle
          * @returns {Promise<Array>} Data Array
          */
-        async setData(data, handle) {
-            return mega.attr.set('dn', mega.attr.encodeObjectValues(data), false, true)
-                .catch((ex) => {
-                    dump('mega.devices.ui.setData', ex);
-                }).finally(async() => {
-                    this.cacheClear();
-                    const {tree} = mega.devices;
-                    await tree.render();
-                    mega.ui.mInfoPanel.reRenderIfVisible([handle]);
-                });
+        async setDeviceNames(data, handle) {
+            data = await mega.devices.data.setDeviceNames(data);
+            for (const device of Object.values(M.dcd)) {
+                device.name = data[device.h];
+            }
+
+            await mega.devices.tree.render();
+            mega.devices.ui.filterChipUtils.reapplyCurrentFilter();
+            mega.ui.mInfoPanel.reRenderIfVisible([handle]);
         }
 
         /**
@@ -1108,7 +1090,7 @@ lazy(mega.devices, 'ui', () => {
          */
         async getOuterViewData(handle) {
             if (!Object.keys(M.dcd).length) {
-                await this.boot(M.currentdirid, true);
+                await this.render(M.currentdirid, true);
             }
 
             let folder = this._findFolder(handle);
@@ -1126,6 +1108,22 @@ lazy(mega.devices, 'ui', () => {
                 device: folder ? M.dcd[folder.d] : null,
                 folder,
             };
+        }
+
+        /**
+         * Returns deviec centre path for a node
+         * to be used only when current view is device centre
+         * @param {String} handle - Device handle
+         * @returns {Promise<Array>} path
+         */
+        async getNodePathFromOuterView(handle) {
+            const {folder} = await this.getOuterViewData(handle);
+            if (!folder) {
+                return [];
+            }
+
+            const path = M.getPath(handle);
+            return folder.getPath(path);
         }
 
         /**
@@ -1294,14 +1292,6 @@ lazy(mega.devices, 'ui', () => {
         }
 
         /**
-         * Returns whether data is expired or not
-         * @returns {Boolean} whether data is expired
-         */
-        isDataExpired() {
-            return Date.now() - this.lastReq > cacheExpirationMillis;
-        }
-
-        /**
          * Whether custom path must be rendered by a custom device centre handler
          * @returns {Boolean} whether is custom render
          */
@@ -1377,7 +1367,7 @@ lazy(mega.devices, 'ui', () => {
                     appIsInstalled = !err || is;
                 });
             }
-            if (this.noDevices) {
+            if (!this.hasDevices) {
                 if (appIsInstalled) {
                     this.hideAppDlButtons();
                     this.hideFmHeaderAddButtons();
@@ -1468,18 +1458,148 @@ lazy(mega.devices, 'ui', () => {
         }
 
         /**
-         * Waits until device centre is not loading
+         * Writes the vault property, necessary when moving the backup folder before removal
+         *  @param {string} h - node handle of the backup folder
+         *  @param {Object} req - API request payload
          * @returns {void}
          */
-        _waitUntilNotLoading() {
-            return new Promise((resolve) => {
-                const id = setInterval(() => {
-                    if (!this.isLoading) {
-                        clearInterval(id);
-                        resolve();
-                    }
-                }, 500);
+        ackVaultWriteAccess(h, req) {
+            if (h) {
+                assert(req.a === 'm' || req.a === 'a' || req.a === 'd');
+                req.vw = 1;
+            }
+            else if (d) {
+                console.error('Unexpected Vault-write attempt.', h, req);
+            }
+        }
+
+        /**
+         * Shows the device rename dialog
+         * @returns {void}
+         */
+        renameDevice() {
+            if (!$.selected.length) {
+                return;
+            }
+
+            const handle = $.selected[0];
+            const devNames = Object.create(null);
+            const currentDeviceData = M.dcd[handle];
+
+            for (const {h, name} of Object.values(M.dcd)) {
+                devNames[h] = name;
+            }
+
+            const deviceIconClass = `icon-${deviceIcon(
+                currentDeviceData.dua || currentDeviceData.name,
+                currentDeviceData.t
+            )}-90`;
+
+            const $dialog = $('.mega-dialog.device-rename-dialog', '.mega-dialog-container');
+            const $input = $('input', $dialog);
+            let errMsg = '';
+
+            M.safeShowDialog('device-rename-dialog', () => {
+                $dialog.removeClass('hidden').addClass('active');
+                $input.trigger("focus");
+                return $dialog;
             });
+
+            $('button.js-close, .device-rename-dialog-button.cancel', $dialog)
+                .rebind('click.dialogClose', closeDialog);
+
+            $('.device-rename-dialog-button.rename', $dialog).rebind('click.dcdialogRename', () => {
+                if ($dialog.hasClass('active')) {
+
+                    let value = $input.val();
+                    errMsg = '';
+
+                    if (currentDeviceData.name && currentDeviceData.name !== value) {
+
+                        value = value.trim();
+
+                        if (!value) {
+                            errMsg = l.device_rename_dialog_warning_empty;
+                        }
+                        else if (M.isSafeName(value) && value.length <= maxDeviceNameLength) {
+
+                            // Check for duplicate device names
+                            if (Object.values(devNames).includes(value)) {
+                                errMsg = l.device_rename_dialog_warning_duplicate;
+                            }
+                            else {
+                                devNames[handle] = value;
+                                this.setDeviceNames(devNames, handle).then(() => {
+                                    showToast('info', l.dc_device_renamed, null, null, null, null, 5000);
+                                });
+                            }
+                        }
+                        else if (value.length > maxDeviceNameLength) {
+                            errMsg = mega.icu.format(l.device_rename_dialog_warning_length, maxDeviceNameLength);
+                        }
+                        else {
+                            errMsg = l[24708];
+                        }
+
+                        if (errMsg) {
+                            $('.duplicated-input-warning span', $dialog).safeHTML(errMsg);
+                            $dialog.addClass('duplicate');
+                            $input.addClass('error');
+
+                            setTimeout(() => {
+                                $dialog.removeClass('duplicate');
+                                $input.removeClass('error');
+
+                                $input.trigger("focus");
+                            }, 2000);
+
+                            return;
+                        }
+                    }
+                    closeDialog();
+                }
+            });
+
+            $input.val(currentDeviceData.name);
+
+            $('.item-type-icon-90', $dialog)
+                .attr('class',
+                      `item-type-icon-90 ${deviceIconClass}`
+                );
+
+            $input.rebind('focus.dcRenameDialog', () => {
+                $dialog.addClass('focused');
+            });
+
+            $input.rebind('blur.dcRenameDialog', () => {
+                $dialog.removeClass('focused');
+            });
+
+            $input.rebind('keydown.dcRenameDialog', (event) => {
+                // distingushing only keydown evet, then checking if it's Enter in order to preform the action'
+                if (event.keyCode === 13) { // Enter
+                    $('.device-rename-dialog-button.rename', $dialog).click();
+                }
+                else if (event.keyCode === 27) { // ESC
+                    closeDialog();
+                }
+                else {
+                    $dialog.removeClass('duplicate').addClass('active');
+                    $input.removeClass('error');
+                }
+            });
+        }
+
+        /**
+         * Checks the 'active' status of a device or a folder based on its heartbeat
+         * @param {Object} dcItem - The device or folder must have the `status` attribute
+         * @returns {Boolean} Whether the device or folder is active
+         */
+        isActive(dcItem) {
+            if (!dcItem || !dcItem.status || !dcItem.status.lastHeartbeat) {
+                return false;
+            }
+            return Date.now() / 1000 - dcItem.status.lastHeartbeat <= hbActivityThreshold;
         }
 
         /**
@@ -1575,42 +1695,6 @@ lazy(mega.devices, 'ui', () => {
         }
 
         /**
-         * Handles actions to do when not ready on device centre boot
-         * @param {String} id - current dir id
-         * @returns {void}
-         */
-        _handleNotReadyOnBoot(id) {
-            if (M.currentrootid === id) {
-                this.noDevices = true;
-                this.showNoDevices();
-            }
-            else if (M.currentrootid === rootId) {
-                this.noDevices = false;
-                M.openFolder(rootId);
-            }
-            else {
-                this.lastReq = 0;
-            }
-        }
-
-        /**
-         * MAnages filter chips on device centre boot
-         * @returns {void}
-         */
-        _manageFiltersOnBoot() {
-            if (this.filterChipUtils.selectedFilters.value) {
-                M.filterByParent(M.currentdirid);
-                if (!M.v.length) {
-                    this.header.hide();
-                }
-                M.renderMain();
-            }
-            else if (this.getRenderSection() !== 'cloud-drive') {
-                this.filterChipUtils.init(() => this.shimmer.show());
-            }
-        }
-
-        /**
          * Scans all device folders until folder determined by handle is found or null otherwise
          * @param {String} handle - folder handle to find
          * @returns {DeviceCentreFolder|null} Folder object or null
@@ -1631,155 +1715,41 @@ lazy(mega.devices, 'ui', () => {
         }
 
         /**
-         * Writes the vault property, necessary when moving the backup folder before removal
-         *  @param {string} h - node handle of the backup folder
-         *  @param {Object} req - API request payload
-         * @returns {void}
+         * Boot tasks
+         * - show / hide shimmer
+         * - Load sources if necessary
+         * - Fetches data
+         * @param {Boolean} skipShimmer - whether to skip shimmer
+         * @returns {Promise<void>} void
          */
-        ackVaultWriteAccess(h, req) {
-            if (h) {
-                assert(req.a === 'm' || req.a === 'a' || req.a === 'd');
-                req.vw = 1;
-            }
-            else if (d) {
-                console.error('Unexpected Vault-write attempt.', h, req);
-            }
-        }
+        async _boot(skipShimmer) {
+            const hasToFetch = !this.isLoading && Date.now() - this.lastReq > refreshMillis - 1000;
 
-        /**
-         * Clears the current device centre data cache to trigger a fresh fetch
-         * @returns {void}
-         */
-        cacheClear() {
-            this.lastReq = 0;
-        }
-
-        /**
-         * Shows the device rename dialog
-         * @returns {void}
-         */
-        renameDevice() {
-
-            if (!$.selected.length) {
-                return;
+            if (hasToFetch && !skipShimmer && M.currentrootid === rootId) {
+                this.isLoading = true;
+                this.shimmer.show();
             }
 
-            const handle = $.selected[0];
-            const devNames = Object.create(null);
-            const currentDeviceData = M.dcd[handle];
-
-            for (const {h, name} of Object.values(M.dcd)) {
-                devNames[h] = name;
+            if (!('tree' in mega.devices)) {
+                await Promise.resolve(M.require('devices'));
             }
 
-            const deviceIconClass = `icon-${deviceIcon(
-                currentDeviceData.dua || currentDeviceData.name,
-                currentDeviceData.t
-            )}-90`;
+            if (hasToFetch) {
+                this.isLoading = true;
+                return mega.devices.data.fetch()
+                    .then((data) => {
+                        M.dcd = typeof data === 'object' && data || Object.create(null);
+                    })
+                    .catch(dump)
+                    .finally(() => {
+                        this.isLoading = false;
+                        this.lastReq = Date.now();
+                        this.shimmer.hide();
+                    });
+            }
 
-            const $dialog = $('.mega-dialog.device-rename-dialog', '.mega-dialog-container');
-            const $input = $('input', $dialog);
-            let errMsg = '';
-
-            M.safeShowDialog('device-rename-dialog', () => {
-                $dialog.removeClass('hidden').addClass('active');
-                $input.trigger("focus");
-                return $dialog;
-            });
-
-            $('button.js-close, .device-rename-dialog-button.cancel', $dialog)
-                .rebind('click.dialogClose', closeDialog);
-
-            $('.device-rename-dialog-button.rename', $dialog).rebind('click.dcdialogRename', () => {
-                if ($dialog.hasClass('active')) {
-
-                    let value = $input.val();
-                    errMsg = '';
-
-                    if (currentDeviceData.name && currentDeviceData.name !== value) {
-
-                        value = value.trim();
-
-                        if (!value) {
-                            errMsg = l.device_rename_dialog_warning_empty;
-                        }
-                        else if (M.isSafeName(value) && value.length <= maxDeviceNameLength) {
-
-                            // Check for duplicate device names
-                            if (Object.values(devNames).includes(value)) {
-                                errMsg = l.device_rename_dialog_warning_duplicate;
-                            }
-                            else {
-                                devNames[handle] = value;
-                                this.setData(devNames, handle).then(() => {
-                                    showToast('info', l.dc_device_renamed, null, null, null, null, 5000);
-                                });
-                            }
-                        }
-                        else if (value.length > maxDeviceNameLength) {
-                            errMsg = mega.icu.format(l.device_rename_dialog_warning_length, maxDeviceNameLength);
-                        }
-                        else {
-                            errMsg = l[24708];
-                        }
-
-                        if (errMsg) {
-                            $('.duplicated-input-warning span', $dialog).safeHTML(errMsg);
-                            $dialog.addClass('duplicate');
-                            $input.addClass('error');
-
-                            setTimeout(() => {
-                                $dialog.removeClass('duplicate');
-                                $input.removeClass('error');
-
-                                $input.trigger("focus");
-                            }, 2000);
-
-                            return;
-                        }
-                    }
-                    closeDialog();
-                }
-            });
-
-            $input.val(currentDeviceData.name);
-
-            $('.item-type-icon-90', $dialog)
-                .attr('class',
-                      `item-type-icon-90 ${deviceIconClass}`
-                );
-
-            $input.rebind('focus.dcRenameDialog', () => {
-                $dialog.addClass('focused');
-            });
-
-            $input.rebind('blur.dcRenameDialog', () => {
-                $dialog.removeClass('focused');
-            });
-
-            $input.rebind('keydown.dcRenameDialog', (event) => {
-                // distingushing only keydown evet, then checking if it's Enter in order to preform the action'
-                if (event.keyCode === 13) { // Enter
-                    $('.device-rename-dialog-button.rename', $dialog).click();
-                }
-                else if (event.keyCode === 27) { // ESC
-                    closeDialog();
-                }
-                else {
-                    $dialog.removeClass('duplicate').addClass('active');
-                    $input.removeClass('error');
-                }
-            });
-        }
-
-        /**
-         * Checks the 'active' status of a device or a folder based on its heartbeat
-         * @param {Object} data - The device or folder data, must have the `status` attribute
-         * @returns {Boolean} Whether the device or folder is active
-         */
-        isActive(data) {
-            return Date.now() / 1000 - data.status.lastHeartbeat
-                <= hbActivityThreshold;
+            this.isLoading = false;
+            this.shimmer.hide();
         }
     };
 });

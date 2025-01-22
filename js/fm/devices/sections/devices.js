@@ -9,14 +9,16 @@ lazy(mega.devices.sections, 'devices', () => {
     const {
         utils: {
             /**
-             * {Object<section>} section - sections constants
-             */
-            section,
-
-            /**
              * {StatusUI} StatusUI - Status UI handler
              */
             StatusUI,
+        },
+
+        models: {
+            /**
+             * {Object} syncSection - contains sections constants
+             */
+            syncSection,
         },
 
         /**
@@ -40,7 +42,7 @@ lazy(mega.devices.sections, 'devices', () => {
          * {String} section - section name
          */
         static get section() {
-            return section.devices;
+            return syncSection.devices;
         }
 
         /**
@@ -87,29 +89,38 @@ lazy(mega.devices.sections, 'devices', () => {
 
         /**
          * Update the DOM Node template passed for UI renderisation
+         * @param {MegaNode} aNode - node
          * @param {Object} aProperties - node properties
          * @param {Object} aTemplate - The DOM Node template
          * @returns {void}
          */
-        updateTemplate(aProperties, aTemplate) {
-            aTemplate.querySelector('.device-centre-item-icon').classList.add(`icon-${aProperties.icon}-90`);
-            aTemplate.querySelector('.device-centre-item-name').textContent = aProperties.name;
+        updateTemplate(aNode, aProperties, aTemplate) {
+            const elIcon = aTemplate.querySelector('.device-centre-item-icon');
+            const elName = aTemplate.querySelector('.device-centre-item-name');
+            const elInfo = aTemplate.querySelector('.device-centre-item-info');
+            const elContain = aTemplate.querySelector('.device-centre-item-contain');
+            const elSize = aTemplate.querySelector('.device-centre-item-size');
 
-            const {ui} = mega.devices;
-            if (aProperties.status && !ui.filterChipUtils.isInactiveSelected) {
-                StatusUI.get(aProperties.status).render({
-                    status: aProperties.status,
-                    itemNode: aTemplate.querySelector('.device-centre-item-info'),
-                    iClass: 'dc-status',
-                    isDevice: true,
-                });
+            if (elIcon && elName && elInfo && elContain && elSize) {
+                elIcon.classList.add(`icon-${aProperties.icon}-90`);
+                elName.textContent = aProperties.name;
+
+                const {ui} = mega.devices;
+                if (ui.isActive(aNode)) {
+                    StatusUI.get(aProperties.status).render({
+                        status: aProperties.status,
+                        itemNode: elInfo,
+                        iClass: 'dc-status',
+                        isDevice: true,
+                    });
+                }
+
+                const nFolders = mega.icu.format(l.folder_count, aProperties.folders);
+                const nFiles = mega.icu.format(l.file_count, aProperties.files);
+
+                elContain.textContent = `${nFolders}, ${nFiles}`;
+                elSize.textContent = aProperties.size;
             }
-
-            const nFolders = mega.icu.format(l.folder_count, aProperties.folders);
-            const nFiles = mega.icu.format(l.file_count, aProperties.files);
-
-            aTemplate.querySelector('.device-centre-item-contain').textContent = `${nFolders}, ${nFiles}`;
-            aTemplate.querySelector('.device-centre-item-size').textContent = aProperties.size;
         }
 
         /**
@@ -118,6 +129,10 @@ lazy(mega.devices.sections, 'devices', () => {
          * @returns {void}
          */
         _renderItems() {
+            if (M.viewmode) {
+                M.viewmode = 0;
+            }
+
             M.v = Object.values(M.dcd);
 
             const {n, d} = fmconfig.sortmodes[M.currentdirid] || {n: 'name', d: 1};

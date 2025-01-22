@@ -642,7 +642,7 @@ lazy(mega, 'commercials', () => {
         // publicUser = mShowAds && !u_attr && !u_handle && isPublicLink();
 
         const publicL = isPublicLink();
-        if (u_attr && u_attr.p || !publicL || publicL.link.startsWith('collection/')) {
+        if (u_attr && u_attr.p || !publicL || String(publicL.link || publicL).startsWith('collection/')) {
             hideComms(undefined, true);
             return;
         }

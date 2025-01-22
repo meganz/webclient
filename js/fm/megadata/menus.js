@@ -566,7 +566,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
 
     // If in MEGA Lite mode, temporarily hide any Download, Copy and Manage Share options while in the Shared area
     if (mega.lite.inLiteMode && (M.currentrootid === 'shares' || M.currentrootid === 'out-shares')) {
-        delete items['.download-item'];
+        // delete items['.download-item'];
         delete items['.copy-item'];
         delete items['.sh4r1ng-item'];
         delete items['.remove-item'];

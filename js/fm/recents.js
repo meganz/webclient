@@ -1414,14 +1414,22 @@ RecentsRender.prototype._handleSelectionClick = function(e, handle, $element) {
 
 /**
  * Trigger for when a single node gets changes (renamed, etc).
- * This will attempt to re-redner the action that houses the node.
+ * This will attempt to re-render the action that houses the node or the breadcrumb if its parent.
+ * The parent/breadcrumb can change if its share status or name is changed
  * For large changes, like moving the file, the RecentsRender.updateState() should be called instead.
  *
  * @param handle
  */
 RecentsRender.prototype.nodeChanged = function(handle) {
     'use strict';
-    if (handle && M.d[handle] && this._nodeActionMap[handle] && this._dynamicList) {
+    // Parent/breadcrumb change
+    if (this._isBreadcrumb(handle)) {
+        const nodeId = $(`#${handle}`, '.fm-recents.container')
+            .closest('.fm-recents.content-row').attr('id');
+        this._updateNodeBreadcrumb(nodeId);
+    }
+    // Action row change
+    else if (handle && M.d[handle] && this._nodeActionMap[handle] && this._dynamicList) {
         var actionId = this._nodeActionMap[handle];
         var action = this.actionIdMap[actionId];
         if (action) {
@@ -1459,6 +1467,18 @@ RecentsRender.prototype.nodeChanged = function(handle) {
     } else if (this._dynamicList.active) {
         this.updateState();
     }
+};
+
+/**
+ * Utility function, used to check whether a handle belongs to a row item or its path breadcrumb
+ *
+ * @param {String} handle The handle to check
+ * @returns {Boolean} Whether the handle belongs to a breadcrumb
+ * @private
+ */
+RecentsRender.prototype._isBreadcrumb = function(handle) {
+    'use strict';
+    return $(`#${handle}`, '.fm-recents.container').hasClass('parent-folder-name');
 };
 
 /**
@@ -1723,4 +1743,39 @@ RecentsRender.prototype._updateNodeName = function(node) {
         }
     }
     return false;
+};
+
+/**
+ * Update the path breadcrumb of a rendered node.
+ * @param {String} id The handle of the action row, NOT the parent/breadcrumb handle
+ * @returns {Boolean} If the update was handled.
+ * @private
+ */
+RecentsRender.prototype._updateNodeBreadcrumb = function(id) {
+    'use strict';
+    M.getRecentActionsList().then(actions => {
+        this._fillActionIds(actions);
+        for (let i = 0; i < actions.length; i++) {
+            const $item = $(this._renderCache[actions[i].id]);
+            if ($item.length && $item.attr('id') === id) {
+                this.actionIdMap[actions[i].id] = actions[i];
+                return actions[i];
+            }
+        }
+    }).then(action => {
+        if (action) {
+            const $oldBreadcrumb = $('.fm-recents.breadcrumbs', `#${id}`);
+            $oldBreadcrumb.empty();
+            // Correct names
+            for (let i = 0; i < action.path.length; i++) {
+                const updNode = M.getNodeByHandle(action.path[i].h);
+                if (updNode && updNode.name) {
+                    action.path[i].name = updNode.name;
+                }
+            }
+            this.populateBreadCrumb($oldBreadcrumb, action);
+            return true;
+        }
+        return false;
+    });
 };

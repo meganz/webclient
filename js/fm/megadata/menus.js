@@ -121,8 +121,9 @@ MegaData.prototype.checkSendToChat = function(isSearch, sourceRoot) {
             let n = M.d[$.selected[i]];
             const nRoot = isSearch ? n && n.u === u_handle && M.getNodeRoot($.selected[i]) : sourceRoot;
 
-            if (!n || n.t && (nRoot !== M.RootID && nRoot !== M.InboxID && nRoot !== 's4'
-                && !M.isDynPage(nRoot)) || nRoot === M.RubbishID) {
+            if (!n || n.t && (nRoot !== M.RootID && nRoot !== M.InboxID &&
+                nRoot !== 's4' && nRoot !== mega.devices.rootId && !M.isDynPage(nRoot)) ||
+                nRoot === M.RubbishID) {
 
                 return false;
             }
@@ -193,7 +194,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
                 items['.open-item'] = 1;
             }
 
-            if ((sourceRoot === M.RootID || sourceRoot === 's4'
+            if ((sourceRoot === M.RootID || sourceRoot === 's4' || sourceRoot === mega.devices.rootId
                 || M.isDynPage(M.currentrootid)) && !folderlink) {
 
                 let exp = false;
@@ -227,7 +228,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
                         items[`.file-request-copy-link${fileRequestPageClass}`] = 1;
                         items[`.file-request-remove${fileRequestPageClass}`] = 1;
                     }
-                    else {
+                    else if (sourceRoot !== mega.devices.rootId || selNode.t !== 5) {
                         items[`.file-request-create`] = 1;
                     }
                 }
@@ -408,6 +409,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
         delete items['.copy-item'];
         delete items['.rename-item'];
         delete items['.remove-item'];
+        delete items[mega.devices.ui.desktopApp.common.pauseMenuItemSelector];
         if (M.currentdirid !== 'favourites') {
             delete items['.add-star-item'];
         }
@@ -419,7 +421,8 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
     }
 
     if ((sourceRoot === M.RootID
-         || sourceRoot === 's4' || M.isDynPage(M.currentrootid)) && !folderlink) {
+         || sourceRoot === 's4' || sourceRoot === mega.devices.rootId ||
+         M.isDynPage(M.currentrootid)) && !folderlink) {
 
         items['.move-item'] = 1;
         items['.getlink-item'] = 1;
@@ -517,6 +520,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
 
         if (!removeItemFlag) {
             delete items['.remove-item'];
+            delete items[mega.devices.ui.desktopApp.common.pauseMenuItemSelector];
             delete items['.move-item'];
         }
 
@@ -562,14 +566,15 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
 
     // If in MEGA Lite mode, temporarily hide any Download, Copy and Manage Share options while in the Shared area
     if (mega.lite.inLiteMode && (M.currentrootid === 'shares' || M.currentrootid === 'out-shares')) {
-        delete items['.download-item'];
+        // delete items['.download-item'];
         delete items['.copy-item'];
         delete items['.sh4r1ng-item'];
         delete items['.remove-item'];
+        delete items[mega.devices.ui.desktopApp.common.pauseMenuItemSelector];
     }
 
     if (restrictedFolders || $.selected.length === 1
-        && sourceRoot === M.InboxID) {
+        && (sourceRoot === M.InboxID || M.currentCustomView.type === mega.devices.rootId)) {
 
         delete items['.open-cloud-item'];
         delete items['.open-in-location'];
@@ -581,6 +586,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
 
         if (!self.vw) {
             delete items['.remove-item'];
+            delete items[mega.devices.ui.desktopApp.common.pauseMenuItemSelector];
         }
 
         let cl = new mega.Share.ExportLink();
@@ -589,17 +595,59 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
             return items;
         }
 
+        if (M.currentCustomView.type === mega.devices.rootId && $.selected.length === 1) {
+            const {twoWay, oneWayUp, oneWayDown, backup} = mega.devices.models.syncType;
+            const id = $.selected[0];
+
+            if (!M.dcd[id]) {
+                const {device} = mega.devices.ui.getCurrentDirData();
+                const folder = device.folders[id];
+
+                if (mega.devices.ui.isBackupRelated($.selected)) {
+                    delete items['.file-request-create'];
+                    if (folder) {
+                        items['.stopbackup-item'] = 1;
+                    }
+                }
+                else {
+                    items['.move-item'] = 1;
+                    items['.getlink-item'] = 1;
+                    items['.open-cloud-item'] = 1;
+                    items['.rename-item'] = 1;
+                    items['.add-star-item'] = 1;
+                    items['.colour-label-items'] = 1;
+                    items['.remove-item'] = 1;
+
+                    if (folder && folder.t === twoWay) {
+                        items['.stopsync-item'] = 1;
+                    }
+                }
+
+                if (folder && [twoWay, oneWayUp, oneWayDown, backup].includes(folder.t)) {
+                    items[mega.devices.ui.desktopApp.common.pauseMenuItemSelector] = 1;
+                    const $togglePauseOption = $(
+                        mega.devices.ui.desktopApp.common.pauseMenuItemSelector,'.dropdown.context');
+                    const $icon = $('.sprite-fm-mono', $togglePauseOption);
+                    const $label = $('span', $togglePauseOption);
+
+                    if (folder.status.pausedSyncs) {
+                        $icon.removeClass('icon-pause-thin');
+                        $icon.addClass('icon-play-small-regular-outline');
+                        $label.text(l.dc_run);
+                    }
+                    else {
+                        $icon.removeClass('icon-play-small-regular-outline');
+                        $icon.addClass('icon-pause-thin');
+                        $label.text(l.dc_pause);
+                    }
+                }
+            }
+        }
+
         cl = new mega.Share();
 
         if (cl.hasExportLink($.selected)) {
             items['.removelink-item'] = 1;
-        }
-
-        if (M.currentrootid === M.InboxID && $.selected.length === 1
-            && ((selNode.devid || selNode.drvid) && selNode.td > 0
-            || M.d[selNode.p].devid || M.d[selNode.p].drvid || selNode.h === M.BackupsId)) {
-
-            items['.view-in-bc-item'] = 1;
         }
 
         items['.getlink-item'] = 1;
@@ -965,8 +1013,12 @@ MegaData.prototype.contextMenuUI = function contextMenuUI(e, ll, items) {
          id = undefined;
          }*/
 
-        // In case that id belongs to contact, 11 char length
-        if (id && (id.length === 11)) {
+        // In case that id belongs to devices tree
+        if (currNodeClass && currNodeClass.includes('device-item')) {
+            e.preventDefault();
+            mega.devices.tree.contextMenu(e);
+        }
+        else if (id && id.length === 11) {
             var $contactDetails = m.find('.dropdown-contact-details');
             var username = M.getNameByHandle(id) || '';
 
@@ -1379,10 +1431,36 @@ MegaData.prototype.adjustContextMenuPosition = function(e, m) {
     var mX = e.clientX;
     var mY = e.clientY;
 
+    // If a DOM element loses its children while ctx menu is opened from the ... menu,
+    // We need to search for the new `delegateTarget` to calculate offsets
+    // Currently only necessary for DC. Subject to change.
+    const getLostDelegate = (e) => {
+        const $target = $(e.currentTarget);
+        if ($target.attr('id')) {
+            const selector =
+                `.${[...e.delegateTarget.classList]
+                    .filter(c => c !== 'active')
+                    .join('.')}`;
+            const del = $(selector, $(`#${$target.attr('id')}`));
+            if (del.length) {
+                return del[0];
+            }
+            return false;
+        }
+    };
+
     var mPos;// menu position
     if (e.type === 'click' && !e.calculatePosition) {// Clicked on file-settings-icon
-        var ico = { 'x': e.delegateTarget.clientWidth, 'y': e.delegateTarget.clientHeight };
-        var icoPos = getHtmlElemPos(e.delegateTarget);// Get position of clicked file-settings-icon
+        let delegate = e.delegateTarget;
+        var ico = { 'x': delegate.clientWidth, 'y': delegate.clientHeight };
+        if (!ico.x && !ico.y && !document.contains(delegate)) {
+            delegate = getLostDelegate(e);
+            if (delegate) {
+                ico.x = delegate.clientWidth;
+                ico.y = delegate.clientHeight;
+            }
+        }
+        var icoPos = getHtmlElemPos(delegate);// Get position of clicked file-settings-icon
         mPos = M.reCalcMenuPosition(m, icoPos.x, icoPos.y, ico);
     }
     else {// right click

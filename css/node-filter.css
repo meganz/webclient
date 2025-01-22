@@ -59,6 +59,9 @@
 .m-dropdown-item.hide-radio-on:active img {
     --mask-color: var(--icon-rest);
 }
+.m-dropdown-item.hide-radio-on > div {
+    align-items: center;
+}
 .m-dropdown-item.hide-radio-on.selected {
     background: var(--surface-grey-2);
     color: var(--text-color-medium);
@@ -116,4 +119,8 @@ span.hidden-as-sensitive,
 span.hidden-as-sensitive + ul,
 tr.hidden-as-sensitive {
     display: none !important;
+}
+.m-dropdown-item.hide-radio-on .dropdown-inline-tooltip {
+    margin-left: 4px;
+    margin-right: 4px;
 }

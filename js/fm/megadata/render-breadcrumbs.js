@@ -50,6 +50,10 @@
         }
 
         let items = this.getPath(fileHandle || this.currentdirid);
+        if (M.currentrootid === mega.devices.rootId) {
+            items = mega.devices.ui.getFolderChildrenPath(items);
+        }
+
         const hasRewind = scope.classList.contains('rewind');
 
         const dictionary = handle => {
@@ -102,15 +106,12 @@
                 messages: () => {
                     typeClass = 'messages';
                     name = l[166];
-                }
+                },
+                [mega.devices.rootId]: () => {
+                    typeClass = mega.devices.rootId;
+                    name = l.device_centre;
+                },
             };
-
-            if (this.BackupsId) {
-                cases[this.BackupsId] = () => {
-                    typeClass = 'backups';
-                    name = l.restricted_folder_button;
-                };
-            }
 
             if (cases[handle]) {
                 cases[handle]();
@@ -125,6 +126,13 @@
                         typeClass = 'folder';
                     }
                 }
+                else {
+                    const {name: deviceName} = this.dcd[handle] || {};
+                    if (deviceName) {
+                        name = deviceName;
+                    }
+                }
+
                 if (handle.length === 11) {
                     typeClass = 'contact selectable-txt';
 
@@ -167,18 +175,29 @@
             };
         };
 
-        this.renderBreadcrumbs(items, scope, dictionary, id => {
-            if (hasRewind) {
-                return;
+
+        if (M.search) {
+            const node = M.d[items[0]];
+            const isBackup = node && M.getNodeRoot(node.h) === M.InboxID;
+            if (isBackup) {
+                items = mega.devices.ui.getNodePathFromOuterView(node.h);
             }
-
-            breadcrumbClickHandler.call(this, id);
-        });
-
-        // if in custom component we do not want to open the file versioning dialog
-        if (!is_mobile && fileHandle && !wrapperNode) {
-            fileversioning.fileVersioningDialog(fileHandle);
         }
+
+        Promise.resolve(items)
+            .then((items) => {
+                this.renderBreadcrumbs(items, scope, dictionary, id => {
+                    if (hasRewind) {
+                        return;
+                    }
+                    breadcrumbClickHandler.call(this, id);
+                });
+                // if in custom component we do not want to open the file versioning dialog
+                if (!is_mobile && fileHandle && !wrapperNode) {
+                    fileversioning.fileVersioningDialog(fileHandle);
+                }
+            })
+            .catch(tell);
     };
 
     /**
@@ -194,8 +213,10 @@
         }
 
         // Show Breadcrumbs bar instead of Selection bar only when 1 item is selected
-        if (M.currentdirid && M.currentdirid.includes('search/') &&
-            self.selectionManager && selectionManager.selected_list.length === 1) {
+        if (M.search
+            && self.selectionManager
+            && selectionManager.selected_list.length === 1
+        ) {
 
             scope.classList.remove('hidden');
             this.renderPathBreadcrumbs(selectionManager.selected_list[0], scope);
@@ -235,9 +256,6 @@
             }
             else if (item.type === 'cloud-drive') {
                 icon = 'icon-cloud';
-            }
-            else if (item.type === 'backups') {
-                icon = 'icon-database-filled';
             }
             else if (item.type === 'folder' || item.type === 'folder-link') {
                 icon = 'icon-folder-filled';
@@ -442,7 +460,8 @@
             'shares',
             'out-shares',
             'public-links',
-            'file-requests'
+            'file-requests',
+            mega.devices.rootId
         ];
         mBroadcaster.sendMessage('trk:event', 'breadcrumb', 'click', id);
 
@@ -464,16 +483,26 @@
                 && M.currentCustomView.type !== 'albums'
                 && !(M.currentCustomView.prefixPath === 'discovery/' && id === M.RootID)
             ) {
-                id = M.currentCustomView.prefixPath + id;
+                id = M.currentCustomView.type === mega.devices.rootId ?
+                    mega.devices.ui.getCurrentDirPath(id) :
+                    M.currentCustomView.prefixPath + id;
+            }
+            else if (M.getNodeRoot(id) === M.InboxID) {
+                id = mega.devices.ui.getNodeURLPathFromOuterView(n, !n.t);
             }
 
-            this.openFolder(id)
+            Promise.resolve(id)
+                .then((id) => this.openFolder(id))
                 .always(() => {
                     if (toSelect) {
                         $.selected = [toSelect];
                         reselect(1);
                     }
-                });
+                })
+                .catch(tell);
+        }
+        else if (M.dcd[id]) {
+            this.openFolder(`device-centre/${id}`);
         }
         else if (specialCases.includes(id)) {
             this.openFolder(id);

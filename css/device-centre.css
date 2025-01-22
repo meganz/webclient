@@ -1,0 +1,443 @@
+/* ======================================== *\
+   grid-table device-centre
+\* ======================================== */
+
+@media only screen and (max-width: 1368px) and (min-width: 320px)  {
+    table.device-centre td:nth-child(2) {
+        width: 150px !important;
+    }
+
+    .contacts-panel table.device-centre td:nth-child(2) {
+        width: 240px !important;
+    }
+}
+
+table.device-centre td {
+    z-index: 0;
+    vertical-align: middle;
+    height: 56px;
+}
+
+/* Hide the size column in MEGA Lite mode */
+.mega-lite-mode table.device-centre th:nth-child(4),
+.mega-lite-mode table.device-centre td:nth-child(4) {
+    display: none;
+}
+
+table.device-centre .avatar-wrapper {
+    position: absolute;
+    top: 14px;
+    margin: 0;
+}
+
+table.device-centre .item-type-icon-90 {
+    --icon-size: 48px;
+    left: 0;
+    position: absolute;
+    top: 4px;
+}
+
+.rtl table.device-centre .item-type-icon-90 {
+    right: 0;
+}
+
+table.device-centre tr.is-sensitive .item-type-icon-90 {
+    opacity: unset;
+}
+
+table.device-centre tr.is-sensitive {
+    opacity: 0.5;
+}
+
+table.device-centre .device-centre-item-info-block .device-centre-item-name {
+    color: var(--text-color-high);
+    font: var(--text-body1);
+    display: block;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+table.device-centre .device-centre-item-info-block .device-centre-item-info {
+    color: var(--text-color-low);
+    align-items: center;
+    display: flex;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+table.device-centre .device-centre-item-size {
+    font: var(--text-body2);
+}
+table.device-centre .device-centre-item-contain {
+    color: var(--text-color-medium);
+    display: block;
+}
+
+table.device-centre .device-centre-item-added,
+table.device-centre .device-centre-item-modified {
+    font: var(--text-body2);
+    white-space: nowrap;
+}
+
+/* ============================ *\
+    device-centre-grid-view
+\* ============================ */
+
+.device-centre-grid-view {
+    box-sizing: border-box;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    border-top: 1px solid var(--surface-grey-2);
+}
+
+.fm-right-files-block.emptied .device-centre-grid-view {
+    display: none;
+}
+
+.fm-empty-section.fm-empty-device-list .fm-empty-description {
+    max-width: 426px;
+}
+
+.fm-empty-section.fm-no-active-devices > .fm-empty-pad,
+.fm-empty-section.fm-no-active-folders > .fm-empty-pad {
+    width: 432px;
+}
+
+.fm-empty-section.fm-no-active-devices .fm-empty-description a,
+.fm-empty-section.fm-no-active-folders .fm-empty-description a,
+.fm-empty-section.fm-no-active-devices .fm-empty-description .js-inactive-filter-select,
+.fm-empty-section.fm-no-active-folders .fm-empty-description .js-inactive-filter-select {
+    cursor: pointer;
+    text-decoration: underline;
+    color: var(--secondary-blue); 
+}
+
+.fm-empty-section.fm-no-active-folders .icon-folder-3d {
+    background-image: url("../images/mega/icons-3d/icon-folder-3d.png");
+    background-size: contain;
+    display: block;
+    margin: 0 auto;
+    width: var(--icon-size, 256px);
+    height: var(--icon-size, 256px);
+}
+
+.rtl .device-centre-grid-view .grid-table {
+    direction: rtl;
+}
+
+.device-centre-grid-view .grid-table {
+    table-layout: fixed;
+    min-width: 1000px;
+}
+
+.device-centre-grid-view .grid-table th:first-child,
+.device-centre-grid-view .grid-table td:first-child {
+    width: 0;
+    padding: 0;
+}
+
+.device-centre-grid-view .grid-table th:last-child,
+.device-centre-grid-view .grid-table td:last-child {
+    padding-right: 0;
+}
+
+.rtl .device-centre-grid-view .grid-table td:last-child {
+    padding-left: 0;
+}
+
+.device-centre-grid-view .grid-table td.grid-url-field a.grid-url-arrow {
+    top: 25%;
+}
+
+/* ============================ *\
+    device-centre-blocks
+\* ============================ */
+
+.device-centre-item-info-block {
+    padding: 0 0 0 51px;
+    font: var(--text-body1);
+    display: block;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.rtl .device-centre-item-info-block {
+    padding: 0 51px 0 0;
+}
+
+.data-block-view .device-centre-contain {
+    width: 16px;
+    height: 16px;
+    float: left;
+    padding: 0;
+    --mask-color: var(--icon-rest);
+    margin-top: 4px;
+    margin-right: 4px;
+    background-image: none;
+}
+.data-block-view .device-centre-info {
+    display: block;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    color: var(--text-color-medium);
+}
+
+/* ============================ *\
+    device-header
+\* ============================ */
+
+.device-centre-header {
+    position: relative;
+    min-height: 128px;
+    background: var(--surface-grey-1);
+    border-top: 1px solid var(--surface-grey-2);
+    border-bottom: 1px solid var(--surface-grey-2);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.rtl .device-centre-header {
+    direction: rtl;
+}
+
+.device-centre-header div {
+    display: inline-block;
+    vertical-align: middle;
+    max-width: 100%;
+}
+
+.device-centre-header > div {
+    display: flex !important;
+    align-items: center;
+}
+
+.device-centre-header .device-centre-header-data {
+    flex-grow: 1;
+    max-width: calc(100% - 250px);
+}
+
+.device-centre-header .first-row {
+    width: 100%;
+}
+
+.device-centre-header-actions {
+    display: flex !important;
+}
+
+.device-centre-header-actions .mega-button > span {
+    white-space: nowrap;
+}
+
+.device-centre-header-actions .togglepause-button {
+    margin-right: 16px;
+    padding: 6px 12px;
+}
+
+.rtl .device-centre-header-actions .togglepause-button {
+    margin-left: 16px;
+}
+
+.device-centre-header-icon{
+    --icon-size: 96px;
+}
+
+.device-centre-header-info {
+    overflow: hidden;
+    position: relative;
+    flex-grow: 1;
+}
+
+.device-centre-header-info .name {
+    font: var(--text-h2);
+    color: var(--text-color-high);
+    max-width: calc(100% - 100px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.device-centre-header-info .device-centre-tooltip-icon {
+    --icon-size: 18px;
+    margin-top: 6px;
+    --mask-color: var(--icon-inactive);
+    transition: var(--transition-color);
+}
+
+.device-centre-header-info .device-centre-tooltip-icon:hover {
+    --mask-color: var(--icon-rest);
+}
+
+.device-centre-header-info .options-link {
+    position: relative;
+    opacity: 1;
+    width: 24px;
+    height: 24px;
+    left: 0;
+}
+
+.device-centre-header-info .options-link i {
+    --icon-size: 24px;
+    --mask-color: var(--icon-inactive);
+}
+.device-centre-header-info .options-link:hover i,
+.device-centre-header-info .options-link.active i {
+    --mask-color: var(--icon-rest);
+}
+
+.device-centre-header-info .status {
+    align-items: center;
+    display: flex;
+    font: var(--text-body1);
+}
+
+/* ============================ *\
+    device-centre-item-info
+\* ============================ */
+
+.device-centre-item-info {
+    align-items: center;
+    display: flex;
+    font: var(--text-body2);
+}
+
+.device-centre-item-info div {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: inherit;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.device-centre-header .device-centre-item-info i.dc-status,
+.device-centre-header .device-centre-item-info i.dc-status-tip,
+.device-centre-grid-view table.device-centre tbody .device-centre-item-info-block .device-centre-item-info i.dc-status,
+.device-centre-grid-view table.device-centre tbody .device-centre-item-info-block .device-centre-item-info i.dc-status-tip,
+.device-centre-item-info i.dc-status,
+.device-centre-item-info i.dc-status-tip {
+    --icon-size: 18px;
+    vertical-align: top;
+}
+
+.device-centre-header .device-centre-item-info.status i.dc-status,
+.device-centre-header .device-centre-item-info.status i.dc-status-tip,
+.device-centre-grid-view table.device-centre tbody .device-centre-item-info-block .device-centre-item-info i.dc-status,
+.device-centre-grid-view table.device-centre tbody .device-centre-item-info-block .device-centre-item-info i.dc-status-tip,
+.device-centre-item-info i.dc-status,
+.device-centre-item-info i.dc-status-tip {
+    vertical-align: text-top;
+}
+
+.device-centre-header .device-centre-item-info .status-text,
+.device-centre-grid-view table.device-centre tbody .device-centre-item-info-block .device-centre-item-info .status-text,
+.device-centre-item-info .status-text {
+    padding: 0 2px;
+}
+
+.device-centre-header .device-centre-item-info .success,
+.device-centre-grid-view table.device-centre tbody .device-centre-item-info-block .device-centre-item-info .success,
+.device-centre-item-info .success {
+    --mask-color: var(--text-color-success);
+    color: var(--text-color-success);
+}
+
+.device-centre-header .device-centre-item-info .error,
+.device-centre-grid-view table.device-centre tbody .device-centre-item-info-block .device-centre-item-info .error,
+.device-centre-item-info .error {
+    --mask-color: var(--text-color-error);
+    color: var(--text-color-error);
+}
+
+.device-centre-header .device-centre-item-info .warning,
+.device-centre-grid-view table.device-centre tbody .device-centre-item-info-block .device-centre-item-info .warning,
+.device-centre-item-info .warning {
+    --mask-color: var(--text-color-warning);
+    color: var(--text-color-warning);
+}
+
+.device-centre-header .device-centre-item-info .in-progress,
+.device-centre-grid-view table.device-centre tbody .device-centre-item-info-block .device-centre-item-info .in-progress,
+.device-centre-item-info .in-progress {
+    --mask-color: var(--secondary-blue);
+    color: var(--text-color-info);
+}
+
+.device-centre-header .device-centre-item-info .tip-icon,
+.device-centre-grid-view table.device-centre tbody .device-centre-item-info-block .device-centre-item-info .tip-icon,
+.device-centre-item-info .tip-icon {
+    --mask-color: var(--icon-inactive);
+    transition: var(--transition-color);
+}
+
+.device-centre-header .device-centre-item-info .tip-icon:hover,
+.device-centre-grid-view table.device-centre tbody .device-centre-item-info-block .device-centre-item-info .tip-icon:hover,
+.device-centre-item-info .tip-icon:hover {
+    --mask-color: var(--icon-rest);
+}
+
+.info-panel-visible.rtl .info-data .device-centre-item-info {
+    direction: rtl;
+}
+
+/* Device Centre Filter chips */
+
+/* For the wrapper and filter chips */
+.dc-filter-chips-wrapper {
+    margin-left: 12px;
+    margin-right: 12px;
+    min-height: 36px;
+    display: flex;
+
+    /* 
+    REMOVE min-height
+
+    height: fit-content;
+    padding-top: 6px;
+    padding-bottom: 12px;
+    */
+}
+.rtl .dc-filter-chips-wrapper {
+    flex-direction: row-reverse;
+}
+.dc-filter-chips-wrapper .dc-filter-chips {
+    width: fit-content;
+    display: flex;
+    margin-left: 4px;
+}
+.rtl .dc-filter-chips-wrapper .dc-filter-chips {
+    flex-direction: row-reverse;
+}
+.dc-filter-chips .dc-filter-reset {
+    display: flex;
+    height: 24px;
+    color: var(--text-color-info);
+    align-items: center;
+    cursor: pointer;
+}
+.dc-filter-chips .dc-filter-chip-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 24px;
+    margin-left: 4px;
+    margin-right: 4px;
+    padding-left: 12px;
+    padding-right: 12px;
+    border-radius: 12px;
+    background: var(--surface-grey-2);
+    cursor: pointer;
+}
+.dc-filter-chips .dc-filter-chip-button .dc-filter-chip-button-text {
+    color: var(--stroke-main-inverted);
+}
+.rtl .dc-filter-chips .dc-filter-chip-button .nw-fm-tree-arrow::before {
+    transform: rotate(90deg) !important;
+}
+.dc-filter-chips .dc-filter-chip-button.selected {
+    background: rgba(0, 191, 165, 0.30);
+}

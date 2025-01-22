@@ -90,6 +90,22 @@ class SelectionManager2Base {
         return this.set_currently_selected(item, scrollTo);
     }
 
+    wantResetTo(item, scrollTo) {
+        if (this.selected_list.length !== 1
+            || this.get_currently_selected() !== item) {
+
+            this.clash = this.resetTo(item, scrollTo);
+        }
+        return this.clash;
+    }
+
+    restoreResetTo() {
+        if (this.clash === this.get_currently_selected()) {
+            delete this.clash;
+            this.clear_selection();
+        }
+    }
+
     /**
      * The idea of this method is to _validate_ and return the .currently-selected element.
      *
@@ -508,7 +524,9 @@ class SelectionManager2_DOM extends SelectionManager2Base {
      */
     constructor($selectable, eventHandlers) {
         super(eventHandlers);
-        this.currentdirid = M.currentdirid;
+        this.currentdirid = M.currentrootid === mega.devices.rootId ?
+            M.currentCustomView.nodeID :
+            M.currentdirid;
         this._boundEvents = [];
         this.init();
         this.$selectable = $selectable;
@@ -708,7 +726,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         return res;
     }
     set_currently_selected(nodeId, scrollTo) {
-        super.set_currently_selected(nodeId, scrollTo);
+        const res = super.set_currently_selected(nodeId, scrollTo);
 
         quickFinder.disable_if_active();
 
@@ -720,6 +738,8 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             $element.addClass("currently-selected");
             this.scrollToElementProxyMethod(this.last_selected);
         }
+
+        return res;
     }
     add_to_selection(nodeId, scrollTo, alreadySorted) {
         const res = super.add_to_selection(nodeId, scrollTo, alreadySorted);
@@ -740,6 +760,10 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 const e = M.megaRender ? M.megaRender.getDOMNode(n) : document.getElementById(n);
                 if ((n = M.d[n])) {
                     selectionSize += n.t ? n.tb : n.s;
+                }
+                else if (M.dcd[n]) {
+                    n = M.dcd[n];
+                    selectionSize += n.tb || 0;
                 }
                 else if (M.dyh) {
                     selectionSize = 0;
@@ -838,6 +862,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         ) {
             return false;
         }
+
         let itemsNum = this.selected_list.filter(h => h !== this.currentdirid).length;
 
         if (itemsNum === 0) {
@@ -1048,8 +1073,8 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             const { dataset } = selectionLinkWrapper.querySelector('.selection-links-wrapper .delete');
             dataset.simpletip = M.getSelectedRemoveLabel($.selected);
 
-            if ((sourceRoot === M.RootID || sourceRoot === 's4'
-                 || M.isDynPage(sourceRoot)) && !folderlink) {
+            if ((sourceRoot === M.RootID || sourceRoot === 's4' ||
+                M.isDynPage(sourceRoot) || sourceRoot === mega.devices.rootId) && !folderlink) {
 
                 const cl = new mega.Share.ExportLink();
 
@@ -1102,6 +1127,14 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             else if (!folderlink && M.currentrootid !== 'shares' && M.currentdirid !== 'shares'
                 || M.currentrootid === 'shares' && M.currentdirid !== 'shares' && M.d[M.currentdirid].r === 2) {
                 __showBtn('delete');
+            }
+
+            if (M.dcd[selNode.h]) {
+                __hideButton('link');
+                __hideButton('share');
+                __hideButton('sendto');
+                __hideButton('download');
+                __hideButton('delete');
             }
 
             if (M.currentdirid === 'file-requests') {

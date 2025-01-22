@@ -1128,6 +1128,10 @@ var slideshowid;
         }
 
         if (close) {
+            if (window.selectionManager) {
+
+                selectionManager.restoreResetTo();
+            }
             sessionStorage.removeItem('previewNode');
             sessionStorage.removeItem('previewTime');
             zoom_mode = false;
@@ -1237,7 +1241,7 @@ var slideshowid;
 
         slideshowid = n.ch || n.h;
         if (window.selectionManager) {
-            selectionManager.resetTo(n.h);
+            selectionManager.wantResetTo(n.h);
         }
         else {
             $.selected = [n.h];

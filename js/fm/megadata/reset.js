@@ -21,6 +21,9 @@ MegaData.prototype.reset = function() {
     this.chd = Object.create(null);
     this.chc = Object.create(null);
 
+    // device centre data
+    this.dcd = Object.create(null);
+
     this.suba = Object.create(null);
     if (typeof MegaDataMap !== 'undefined') {
         this.u = new MegaDataMap();
@@ -32,6 +35,7 @@ MegaData.prototype.reset = function() {
     this.filter = false;
     this.sortfn = false;
     this.sortd = false;
+    this.skipSortByTypeAsDefault = false;
     this.rendered = false;
     this.RootID = undefined;
     this.RubbishID = undefined;

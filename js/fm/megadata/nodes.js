@@ -244,6 +244,7 @@ MegaData.prototype.getPath = function(id) {
             || mega.gallery.sections[id]
             || id === 'file-requests'
             || id === 's4'
+            || id === mega.devices.rootId
             || id === 'pwm'
         ) {
             result.push(id);
@@ -252,6 +253,9 @@ MegaData.prototype.getPath = function(id) {
             // Get S4 subpath for subpages other than Containers and Buckets
             // Container and Bucket will using existing method as it's node handle exist in M.d.
             return s4.utils.getS4SubPath(cv.original);
+        }
+        else if (cv.type === mega.devices.rootId) {
+            return cv.original.split('/').reverse();
         }
         else if (cv.type === 'pwm' && id === 'account') {
             // Get PWM subpath only for account subpage
@@ -323,6 +327,10 @@ MegaData.prototype.getPath = function(id) {
                 result[i + 1] = 'file-requests';
                 break;
             }
+            else if (cv.type === mega.devices.rootId) {
+                result[i + 1] = mega.devices.rootId;
+                break;
+            }
             else if (cv.type === 'pwm' && cv.nodeID === result[i]) {
                 result[i + 1] = 'pwm';
                 break;
@@ -361,6 +369,7 @@ MegaData.prototype.isCustomView = function(pathOrID) {
     }
     var result = Object.create(null);
     const node = M.getNodeByHandle(pathOrID.substr(0, 8));
+
     result.original = pathOrID;
 
     // Basic gallery view
@@ -468,6 +477,17 @@ MegaData.prototype.isCustomView = function(pathOrID) {
         result.prefixTree = 'fr_';
         result.prefixPath = '';
     }
+    else if (pathOrID.startsWith(mega.devices.rootId)) {
+        result.original = pathOrID.replace(/device-centre_/g, 'device-centre/');
+
+        const aPath = result.original.split('/');
+        result.nodeID = aPath[aPath.length - 1];
+
+        result.type = mega.devices.rootId;
+        result.prefixTree = '';
+        result.prefixPath = `${mega.devices.rootId}/`;
+    }
+
     else if (pathOrID === 'pwm' || pathOrID === mega.pwmh) {
         result.type = 'pwm';
         result.nodeID = mega.pwmh;
@@ -488,6 +508,7 @@ MegaData.prototype.isCustomView = function(pathOrID) {
     else {
         result = false;
     }
+
     return result;
 };
 
@@ -576,7 +597,8 @@ MegaData.prototype.isMediaDiscoveryPage = function(path) {
 
     path = String(path || this.currentdirid);
 
-    return M.gallery && (pfid && !pfcol || path !== M.RootID && M.currentrootid === M.RootID);
+    return M.gallery && (pfid && !pfcol || path !== M.RootID &&
+        (M.currentrootid === M.RootID || M.currentrootid === mega.devices.rootId));
 };
 
 /**
@@ -1252,9 +1274,9 @@ MegaData.prototype.moveNodes = async function(n, t, folderConflictResolution) {
                 let n = targets[t][i];
                 const req = {a: 'm', t, n};
 
-                if (this.getNodeRoot(req.n) === this.InboxID) {
-
-                    mega.backupCenter.ackVaultWriteAccess(req.n, req);
+                if (this.getNodeRoot(req.n) === this.InboxID
+                    && M.currentCustomView.type === mega.devices.rootId) {
+                    mega.devices.ui.ackVaultWriteAccess(req.n, req);
                 }
                 request.push(processmove(req));
 
@@ -1502,8 +1524,9 @@ MegaData.prototype.safeRemoveNodes = function(handles) {
         if (toDel.length) {
             for (i = toDel.length; i--;) {
                 const req = {a: 'd', n: toDel[i]};
-                if (M.getNodeRoot(req.n) === M.InboxID) {
-                    mega.backupCenter.ackVaultWriteAccess(req.n, req);
+                if (M.getNodeRoot(req.n) === M.InboxID
+                    && M.currentCustomView.type === mega.devices.rootId) {
+                    mega.devices.ui.ackVaultWriteAccess(req.n, req);
                 }
                 promises.push(api.screq(req));
             }
@@ -3943,7 +3966,6 @@ MegaData.prototype.getNameByHandle = function(handle) {
                     [M.RootID]: l[164],
                     [M.InboxID]: l[166],
                     [M.RubbishID]: l[167],
-                    [M.BackupsId]: l.restricted_folder_button
                 };
                 result = map[handle] || result;
             }
@@ -3988,6 +4010,10 @@ MegaData.prototype.getNodeByHandle = function(handle) {
                 return n;
             }
         }
+    }
+
+    if (M.dcd[handle]) {
+        return M.dcd[handle];
     }
 
     return false;
@@ -4055,7 +4081,10 @@ MegaData.prototype.nodeRemovalUIRefresh = function(handle, parent) {
 
             if (target && this.getNodeRoot(handle) !== root) {
                 if (customView) {
-                    target = target === this.RootID ? customView.type : customView.prefixPath + target;
+                    const {type, original, prefixPath} = customView;
+                    target = target === this.RootID ?
+                        type :
+                        type === mega.devices.rootId ? original : prefixPath + target;
                 }
                 promise = this.openFolder(target);
             }
@@ -4160,11 +4189,6 @@ MegaData.prototype.getDashboardData = function() {
     res.ishares = { cnt: s.inshares.items, size: s.inshares.bytes, xfiles: s.inshares.files };
     res.oshares = { cnt: s.outshares.items, size: s.outshares.bytes };
 
-    res.backups = {
-        cnt: this.d[this.BackupsId] ? this.d[this.BackupsId].td : 0,
-        size: this.d[this.BackupsId] ? this.d[this.BackupsId].tb : 0,
-        xfiles: this.d[this.BackupsId] ? this.d[this.BackupsId].tf : 0
-    };
     res.links = { cnt: s.links.folders, size: s.links.bytes, xfiles: s.links.files };
     res.versions = {
         cnt: s[this.RootID].vfiles + s[this.InboxID].vfiles,
@@ -4218,7 +4242,7 @@ MegaData.prototype.emptySharefolderUI = tryCatch(function(lSel) {
     let selectedView = null;
     let emptyBlock = null;
     let clonedEmptyBlock = null;
-    const emptyBlockFilter = mega.ui.mNodeFilter && mega.ui.mNodeFilter.selectedFilters
+    const emptyBlockFilter = mega.ui.mNodeFilter && mega.ui.mNodeFilter.selectedFilters.value
         ? '.fm-empty-search' : '.fm-empty-folder';
 
     if (!contentBlock) {

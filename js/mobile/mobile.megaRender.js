@@ -17,9 +17,6 @@ class MobileMegaRender {
             case M.RubbishID:
                 this.location = 'trashcan';
                 break;
-            case M.InboxID:
-                this.location = 'backups';
-                break;
         }
 
         this.numInsertedDOMNodes = 0;

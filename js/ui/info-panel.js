@@ -8,6 +8,88 @@ lazy(mega.ui, 'mInfoPanel', () => {
     // Other constants
     const visibleClass = 'info-panel-visible';
 
+
+    /**
+     * Returns current info rendered device handle
+     * @returns {String} rendered device handle
+     */
+    const getDeviceIdFromRenderedPath = tryCatch(() => {
+        const dcElem = document.querySelector('.info-data.path-section [data-node-id="device-centre"]');
+        if (dcElem) {
+            const deviceElem = dcElem.nextElementSibling;
+            return deviceElem.dataset.nodeId;
+        }
+        return '';
+    });
+
+    /**
+     * From the selected node handle, get the path to the node
+     * @param {MegaNode|Object} node - node to get path from
+     * @param {Boolean} [isBackup] - true if getting path from backup view
+     * @returns {Promise<String>} folder/file path
+     */
+    const getPath = async(node, isBackup) => {
+        let pathItems;
+
+        if (M.currentrootid === mega.devices.rootId) {
+            pathItems = mega.devices.ui.getFullPath(node.h);
+        }
+        else if (isBackup) {
+            pathItems = await mega.devices.ui.getNodeFullPathFromOuterView(node);
+        }
+        else {
+            pathItems = M.getPath(node.h);
+        }
+
+        // return false when no path found
+        if (pathItems && !pathItems.length) {
+            return false;
+        }
+
+        const path = document.createElement('div');
+
+        // Reverse order so the root node is first
+        pathItems.reverse();
+
+        for (let i = 0; i < pathItems.length; i++) {
+
+            const pathItemHandle = pathItems[i];
+            const node = M.getNodeByHandle(pathItemHandle);
+            const $span = document.createElement('span');
+            let nodeName = node.name;
+
+            // Add Cloud drive for the initial handle
+            if (pathItemHandle === M.RootID) {
+                nodeName = l[164];
+            }
+            else if (pathItemHandle === M.RubbishID) {
+                nodeName = l[167];
+            }
+            else if (pathItemHandle === mega.devices.rootId) {
+                nodeName = l.device_centre;
+            }
+
+            // Skip if no node name available
+            if (!nodeName) {
+                continue;
+            }
+
+            // Add the folder/file name and an ID of the handle so we can add a click handler for it later
+            $span.textContent = nodeName;
+            $span.dataset.nodeId = pathItemHandle === mega.devices.rootId ? mega.devices.rootId : node.h;
+
+            // Keep building up the path HTML
+            path.appendChild($span);
+
+            // Add the path separator except for the last item
+            if (i < pathItems.length - 1) {
+                path.appendChild(document.createTextNode(' \u{3E} '));
+            }
+        }
+
+        return path;
+    };
+
     /**
      * Logic to reset panel to default, clear values, icons etc
      * @returns {undefined}
@@ -19,14 +101,18 @@ lazy(mega.ui, 'mInfoPanel', () => {
 
         $('.name-section .description', $container).addClass('hidden');
         $('.name-value', $container).text('');
+        $('.status-section', $container).addClass('hidden');
+        $('.device-centre-item-info', $container).text('');
         $('.type-section', $container).addClass('hidden');
         $('.type-value', $container).text('');
         $('.size-value', $container).text('');
         $('.path-section', $container).addClass('hidden');
         $('.path-value', $container).text('');
         $('.date-added-section', $container).addClass('hidden');
+        $('.last-updated-section', $container).addClass('hidden');
         $('.last-modified-section', $container).addClass('hidden');
         $('.date-added-value', $container).text('');
+        $('.last-updated-value', $container).text('');
         $('.contains-section', $container).addClass('hidden');
         $('.contains-value', $container).text('');
         $('.permissions-section', $container).addClass('hidden');
@@ -90,6 +176,10 @@ lazy(mega.ui, 'mInfoPanel', () => {
 
             const node = nodes[i];
 
+            if (M.dcd[node.h]) {
+                return mega.icu.format(l.device_count, nodes.length);
+            }
+
             if (node.t) {
                 folderCount++;
             }
@@ -112,73 +202,11 @@ lazy(mega.ui, 'mInfoPanel', () => {
         let totalBytes = 0;
 
         for (let i = 0; i < nodes.length; i++) {
-
             const node = nodes[i];
-
-            if (node.t) {
-                totalBytes += node.tb;
-            }
-            else {
-                totalBytes += node.s;
-            }
+            totalBytes += node.t || M.dcd[node.h] ? node.tb : node.s;
         }
 
         return bytesToSize(totalBytes);
-    }
-
-    /**
-     * From the selected node handle, get the path to the node
-     * @param {String} node node
-     * @returns {String} folder/file path
-     */
-    function getPath(node) {
-
-        const pathItems = M.getPath(node.h);
-
-        // return false when no path found
-        if (pathItems && !pathItems.length) {
-            return false;
-        }
-
-        const path = document.createElement('div');
-
-        // Reverse order so the root node is first
-        pathItems.reverse();
-
-        for (let i = 0; i < pathItems.length; i++) {
-
-            const pathItemHandle = pathItems[i];
-            const node = M.getNodeByHandle(pathItemHandle);
-            const $span = document.createElement('span');
-            let nodeName = node.name;
-
-            // Add Cloud drive for the initial handle
-            if (pathItemHandle === M.RootID) {
-                nodeName = l[164];
-            }
-            else if (pathItemHandle === M.RubbishID) {
-                nodeName = l[167];
-            }
-
-            // Skip if no node name available
-            if (!nodeName) {
-                continue;
-            }
-
-            // Add the folder/file name and an ID of the handle so we can add a click handler for it later
-            $span.textContent = nodeName;
-            $span.dataset.nodeId = node.h;
-
-            // Keep building up the path HTML
-            path.appendChild($span);
-
-            // Add the path separator except for the last item
-            if (i < pathItems.length - 1) {
-                path.appendChild(document.createTextNode(' \u{3E} '));
-            }
-        }
-
-        return path;
     }
 
     /**
@@ -197,7 +225,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
             const node = nodes[i];
 
             // If type folder, total up the dirs and files in the folder
-            if (node.t) {
+            if (node.t || M.dcd[node.h] || node.isDeviceFolder) {
                 totalSubDirCount += node.td;
                 totalSubFilesCount += node.tf;
                 selectionIncludesDir = true;
@@ -222,39 +250,54 @@ lazy(mega.ui, 'mInfoPanel', () => {
         $('.path-value span', $container).rebind('click.pathClick', function() {
 
             const nodeHandle = $(this).attr('data-node-id');
-            const node = M.getNodeByHandle(nodeHandle);
-
-            // If type folder, open it in the cloud drive
-            if (node.t) {
-                M.openFolder(nodeHandle);
-            }
-
-            // If an image, load the slideshow
-            else if (is_image2(node)) {
-                slideshow(nodeHandle);
-            }
-
-            // If it's a video, load the video viewer
-            else if (is_video(node)) {
-                $.autoplay = nodeHandle;
-                slideshow(nodeHandle);
-            }
-
-            // If a text file, load the text editor
-            else if (is_text(node)) {
-
-                loadingDialog.show();
-
-                mega.fileTextEditor.getFile(nodeHandle).done((data) => {
-                    loadingDialog.hide();
-                    mega.textEditorUI.setupEditor(node.name, data, nodeHandle);
-                }).fail(() => {
-                    loadingDialog.hide();
-                });
+            // Device centre root
+            if (nodeHandle === mega.devices.rootId) {
+                M.openFolder(mega.devices.rootId);
             }
             else {
-                // Download
-                M.addDownload([nodeHandle]);
+                const node = M.getNodeByHandle(nodeHandle);
+
+                // If type folder open on nodeHandle
+                if (node && node.t || M.dcd[nodeHandle]) {
+                    const deviceHandle = getDeviceIdFromRenderedPath();
+                    if (deviceHandle) {
+                        const path = nodeHandle === deviceHandle ?
+                            `${mega.devices.rootId}/${deviceHandle}` :
+                            `${mega.devices.rootId}/${deviceHandle}/${nodeHandle}`;
+                        M.openFolder(path);
+                    }
+                    else {
+                        M.openFolder(nodeHandle);
+                    }
+                }
+
+                // If an image, load the slideshow
+                else if (is_image2(node)) {
+                    slideshow(nodeHandle);
+                }
+
+                // If it's a video, load the video viewer
+                else if (is_video(node)) {
+                    $.autoplay = nodeHandle;
+                    slideshow(nodeHandle);
+                }
+
+                // If a text file, load the text editor
+                else if (is_text(node)) {
+
+                    loadingDialog.show();
+
+                    mega.fileTextEditor.getFile(nodeHandle).done((data) => {
+                        loadingDialog.hide();
+                        mega.textEditorUI.setupEditor(node.name, data, nodeHandle);
+                    }).fail(() => {
+                        loadingDialog.hide();
+                    });
+                }
+                else {
+                    // Download
+                    M.addDownload([nodeHandle]);
+                }
             }
         });
     }
@@ -289,6 +332,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
     function getIconForMultipleNodes(selectedNodes) {
 
         const totalNodeCount = selectedNodes.length;
+        let devicesCount = 0;
         let regularFolderCount = 0;
         let incomingSharedFolderCount = 0;
         let outgoingSharedFolderCount = 0;
@@ -299,7 +343,10 @@ lazy(mega.ui, 'mInfoPanel', () => {
 
             const node = selectedNodes[i];
 
-            if (typeof node.r === 'number') {
+            if (M.dcd[node.h]) {
+                devicesCount++;
+            }
+            else if (typeof node.r === 'number') {
                 incomingSharedFolderCount++;
             }
             else if (node.t & M.IS_SHARED || M.ps[node.h] || M.getNodeShareUsers(node, 'EXP').length) {
@@ -310,6 +357,11 @@ lazy(mega.ui, 'mInfoPanel', () => {
             }
         }
         isFolders = incomingSharedFolderCount + outgoingSharedFolderCount + regularFolderCount;
+
+        // If all selected nodes are devices, show the generic device icon
+        if (devicesCount === totalNodeCount) {
+            return 'pc';
+        }
 
         // If all selected nodes are incoming shares, show the incoming share icon
         if (incomingSharedFolderCount === totalNodeCount) {
@@ -414,14 +466,23 @@ lazy(mega.ui, 'mInfoPanel', () => {
             return getSelectedFolderAndFileCount(selectedNodes);
         }
 
-        return selectedNodes[0].ch ? selectedNodes[0].name : M.getNameByHandle(selectedNodes);
+        if (selectedNodes[0].ch) {
+            return selectedNodes[0].name;
+        }
+
+        const dcd = M.dcd[selectedNodes[0].h];
+        if (dcd) {
+            return dcd.name;
+        }
+
+        return M.getNameByHandle(selectedNodes);
     }
 
     function hideFeature(node) {
 
         // Hide for S4 nodes
         const isS4 = 'kernel' in s4 && s4.kernel.getS4NodeType(node.h);
-        return M.RootID === node.h && !folderlink || node.devid || isS4;
+        return M.RootID === node.h && !folderlink || isS4 || M.dcd[node.h];
     }
 
     /**
@@ -649,14 +710,13 @@ lazy(mega.ui, 'mInfoPanel', () => {
         }
 
         /**
-         * Check if the selected nodes is shared or backups node
+         * Check if the selected nodes is shared node
          * @param {Array} nodes The selected nodes
          * @returns {Boolean} Returns true if the nodes have tags
          */
         function selectedNodesIsShared(nodes) {
             for (let i = nodes.length; i--;) {
-                if (sharer(nodes[i]) ||
-                    M.BackupsId && M.getNodeRoot(nodes[i]) === M.getNodeByHandle(M.BackupsId).p) {
+                if (sharer(nodes[i])) {
                     return true;
                 }
             }
@@ -1167,7 +1227,14 @@ lazy(mega.ui, 'mInfoPanel', () => {
             return;
         }
 
-        const node = selectedNodes[0];
+        let node = selectedNodes[0];
+        const deviceHandle = getDeviceIdFromRenderedPath();
+        if (deviceHandle && M.dcd[deviceHandle]) {
+            const folder = M.dcd[deviceHandle].folders[node.h];
+            if (folder) {
+                node = folder;
+            }
+        }
         const nodeIcon = fileIcon(node);
 
         // Update DOM
@@ -1243,7 +1310,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
             let versionCount;
 
             // Get total bytes for folder, or the file size
-            totalSize = bytesToSize(node.t ? node.tb : node.s);
+            totalSize = bytesToSize(node.t || M.dcd[node.h] ? node.tb : node.s);
 
             // Hide versioning details temporarily, due to it not working correctly in MEGA Lite / Infinity
             if (node.tvf && !mega.lite.inLiteMode) {
@@ -1334,22 +1401,219 @@ lazy(mega.ui, 'mInfoPanel', () => {
     }
 
     /**
+     * Renders sync status
+     * @param {Object} $container - parent container element
+     * @param {MegaNode} node - node to render status for
+     * @returns {undefined}
+     */
+    function renderSyncStatus($container, node) {
+        let dcItem;
+        let status = false;
+        const device = M.dcd[node.h];
+
+        const $statusSection = $('.status-section', $container);
+        $statusSection.addClass('hidden');
+
+        if (device) {
+            dcItem = device;
+            const {status: dStatus} = device;
+            status = dStatus;
+        }
+        else {
+            const deviceHandle = getDeviceIdFromRenderedPath();
+            if (M.dcd[deviceHandle]) {
+                const folder = M.dcd[deviceHandle].folders[node.h];
+                dcItem = folder;
+                status = folder ? folder.status : false;
+            }
+        }
+
+        if (status && dcItem && mega.devices.ui.isActive(dcItem)) {
+            $statusSection.removeClass('hidden');
+
+            const $itemInfo = $('.device-centre-item-info', $statusSection);
+            $itemInfo.empty();
+            mega.devices.utils.StatusUI.get(status).render({
+                status,
+                itemNode: $itemInfo[0],
+                iClass: 'dc-status',
+                isDevice: !!device,
+                skipBannerManagement: true,
+            });
+        }
+    }
+
+    /**
+     * Renders header
+     * @param {Object} $container - parent container element
+     * @param {Array<MegaNode>} selectedNodes - list of selected nodes
+     * @returns {undefined}
+     */
+    function renderHeader($container, selectedNodes) {
+        const panelTitle = getPanelTitle(selectedNodes);
+        $('.header-title', $container).text(panelTitle);
+    }
+
+    /**
+     * Renders title
+     * @param {Object} $container - parent container element
+     * @param {Array<MegaNode>} selectedNodes - list of selected nodes
+     * @returns {undefined}
+     */
+    function renderTitle($container, selectedNodes) {
+        const nodeName = getNodeName(selectedNodes);
+        if (nodeName) {
+            $('.name-section .description', $container).removeClass('hidden');
+            $('.name-value', $container).text(nodeName);
+        }
+    }
+
+    /**
+     * Renders last modified
+     * @param {Object} $container - parent container element
+     * @param {MegaNode} node - node to render status for
+     * @returns {undefined}
+     */
+    function renderLastModified($container, node) {
+        const lastModified = getDate(node.mtime);
+        if (lastModified) {
+            $('.last-modified-section', $container).removeClass('hidden');
+            $('.last-modified-value', $container).text(lastModified);
+        }
+    }
+
+    /**
+     * Renders date added
+     * @param {Object} $container - parent container element
+     * @param {MegaNode} node - node to render status for
+     * @returns {undefined}
+     */
+    function renderDateAdded($container, node) {
+        const dateAdded = getDate(node.ts);
+        if (dateAdded) {
+            $('.date-added-section', $container).removeClass('hidden');
+            $('.date-added-value', $container).text(dateAdded);
+        }
+    }
+
+    /**
+     * Renders node type
+     * @param {Object} $container - parent container element
+     * @param {MegaNode} node - node to render status for
+     * @param {DeviceCentreFolder} folder - device centre folder
+     * @param {Array<MegaNode>} selectedNodes - list of selected nodes
+     * @returns {undefined}
+     */
+    function renderType($container, node, folder, selectedNodes) {
+        let type;
+        if (selectedNodes.length > 1) {
+            type = l[1025]; // Multiple items
+        }
+        else {
+            type = node.t && !folder ? l[1049] : filetype(folder || node, 0);
+        }
+
+        if (type) {
+            $('.type-value', $container).text(type);
+        }
+    }
+
+    /**
+     * Renders last updated
+     * @param {Object} $container - parent container element
+     * @param {MegaNode} node - node to render status for
+     * @param {DeviceCentreFolder} folder - device centre folder
+     * @returns {undefined}
+     */
+    function renderLastUpdated($container, node, folder) {
+        const hb = folder ? folder.hb : node.hb;
+        if (hb && hb.ts) {
+            const lastUpdated = getDate(hb.ts);
+            if (lastUpdated) {
+                $('.last-updated-section', $container).removeClass('hidden');
+                $('.last-updated-value', $container).text(lastUpdated);
+            }
+        }
+    }
+
+    /**
+     * Renders last updated
+     * @param {Object} $container - parent container element
+     * @param {String} permissionsText - permissions text
+     * @param {String} permissionsIcon - permissions icon class
+     * @returns {undefined}
+     */
+    function renderPermissions($container, permissionsText, permissionsIcon) {
+        $('.permissions-section', $container).removeClass('hidden');
+        $(`.permissions-icon.${permissionsIcon}`, $container).removeClass('hidden');
+        $('.permissions-value', $container).text(permissionsText);
+    }
+
+    /**
+     * Renders contains count
+     * @param {Object} $container - parent container element
+     * @param {MegaNode} node - node to render status for
+     * @param {Array<MegaNode>} selectedNodes - list of selected nodes
+     * @returns {undefined}
+     */
+    function renderContains($container, node, selectedNodes) {
+        let containsText;
+
+        // If multiple nodes selected
+        if (selectedNodes.length > 1) {
+            containsText = getContainsCount(selectedNodes);
+        }
+        else if (node.t || M.dcd[node.h]) {
+            containsText = getContainsCount([node]);
+        }
+
+        // If this selection has subfolders and files, show it
+        if (containsText) {
+            $('.contains-section', $container).removeClass('hidden');
+            $('.contains-value', $container).text(containsText);
+        }
+    }
+
+    /**
+     * Renders node path
+     * @param {Object} $container - parent container element
+     * @param {MegaNode} node - node to render status for
+     * @param {Boolean} isBackup - whether it's a backup node
+     * @returns {Promise<void>} void
+     */
+    async function renderPath($container, node, isBackup) {
+        // Get single node data
+        const path = await getPath(node, isBackup);
+        const isUndecrypted = missingkeys[node.h];
+
+        // Name for undecrypted node
+        if (isUndecrypted) {
+            $('.name-value', $container).text(l[8649]);
+            $container.addClass('undecryptable');
+            showToast('clipboard', M.getUndecryptedLabel(node));
+        }
+        // If this single node selection has a Path, show it and should be decrypted
+        else if (path) {
+            $('.path-section', $container).removeClass('hidden');
+            $('.path-value', $container).empty().get(0).appendChild(path);
+
+            addClickHandlerForPathValues();
+        }
+    }
+
+    /**
      * Main render function
      * @param {Array} selectedNodeHandles Array of selected nodes
-     * @returns {undefined|Object} The jquery object of the warning dialog
+     * @returns {Promise<undefined|Object>} The jquery object of the warning dialog
      */
-    function renderInfo(selectedNodeHandles) {
+    async function renderInfo(selectedNodeHandles) {
 
         let node;
-        let nodeType;
-        let containsText;
-        let path;
-        let dateAdded;
-        let lastModified;
         let permissionsText;
         let permissionsIcon;
         let ownerText;
-        let isUndecrypted = false;
+        let folder;
+        let isBackup = false;
 
         // Of there are no selected nodes, return
         if (!selectedNodeHandles.length) {
@@ -1371,26 +1635,18 @@ lazy(mega.ui, 'mInfoPanel', () => {
             return;
         }
 
-        // If multiple nodes selected
-        if (selectedNodeHandles.length > 1) {
-            nodeType = l[1025]; // Multiple items
-            containsText = getContainsCount(selectedNodes);
-        }
-        else {
+        if (selectedNodes.length === 1) {
             // Single node selected
             node = selectedNodes[0];
 
-            // Get single node data
-            nodeType = node.t ? l[1049] : filetype(node, 0);
-            path = getPath(node);
-            dateAdded = getDate(node.ts);
-            lastModified = getDate(node.mtime);
-            isUndecrypted = missingkeys[node.h];
+            isBackup = M.getNodeRoot(node.h) === M.InboxID;
 
-            // If type folder, we need to show the total of the contents (or empty folder if empty)
-            if (node.t) {
-                containsText = getContainsCount([node]);
-            }
+            const {device} = await(M.currentrootid === mega.devices.rootId ?
+                mega.devices.ui.getCurrentDirData() :
+                isBackup ? mega.devices.ui.getOuterViewData(node.h) : {}
+            );
+
+            folder = device ? device.folders[node.h] : null;
 
             // Get the permissions data if applicable
             ({ permissionsText, permissionsIcon, ownerText } = getSingleNodePermissionsData(node));
@@ -1400,71 +1656,38 @@ lazy(mega.ui, 'mInfoPanel', () => {
         resetToDefault();
         initOrUpdateScrollBlock(node);
 
-        // Get data
-        const panelTitle = getPanelTitle(selectedNodes);
-        const nodeName = getNodeName(selectedNodes);
+        renderHeader($container, selectedNodes);
+        renderTitle($container, selectedNodes);
+        renderType($container, node, folder, selectedNodes);
+        renderContains($container, node, selectedNodes);
 
-        // Update DOM
-        $('.header-title', $container).text(panelTitle);
-        $('.name-value', $container).text(nodeName);
-        $('.type-value', $container).text(nodeType);
+        if (node) {
+            renderLastModified($container, node);
 
-        // If this selection has subfolders and files, show it
-        if (containsText) {
-            $('.contains-section', $container).removeClass('hidden');
-            $('.contains-value', $container).text(containsText);
-        }
+            // If this single node selection is an In-share with permissions information, show it
+            if (permissionsText) {
+                renderPermissions($container, permissionsText, permissionsIcon);
+            }
+            else {
+                // Show the Type except for In-shares and Backups sections where we do not show it
+                if (!M.dcd[node.h]) {
+                    $('.type-section', $container).removeClass('hidden');
+                }
 
-        // Name for undecrypted node
-        if (isUndecrypted) {
-            $('.name-value', $container).text(l[8649]);
-            $container.addClass('undecryptable');
-            showToast('clipboard', M.getUndecryptedLabel(node));
-        }
-        // If this single node selection has a Path, show it and should be decrypted
-        else if (path) {
-            $('.path-section', $container).removeClass('hidden');
-            $('.path-value', $container).get(0).appendChild(path);
-
-            addClickHandlerForPathValues();
-        }
-
-        // If this single node selection has a Date Modified, show it
-        if (lastModified) {
-            $('.last-modified-section', $container).removeClass('hidden');
-            $('.last-modified-value', $container).text(lastModified);
-        }
-
-        // If this single node selection is an In-share with permissions information, show it
-        if (permissionsText) {
-            $('.permissions-section', $container).removeClass('hidden');
-            $(`.permissions-icon.${permissionsIcon}`, $container).removeClass('hidden');
-            $('.permissions-value', $container).text(permissionsText);
-        }
-        else {
-            // Show the Type except for In-shares and Backups sections where we do not show it
-            if (M.currentdirid !== M.BackupsId) {
-                $('.type-section', $container).removeClass('hidden');
+                // If this single node selection has a Date Added, show it (NB: don't show for in-shares)
+                renderDateAdded($container, node);
+                renderLastUpdated($container, node, folder);
             }
 
-            // If this single node selection has a Date Added, show it (NB: don't show for in-shares)
-            if (dateAdded) {
-                $('.date-added-section', $container).removeClass('hidden');
-                $('.date-added-value', $container).text(dateAdded);
-            }
+            await renderPath($container, node, isBackup);
+            renderSyncStatus($container, node);
+            renderNodeDescription(node);
         }
 
         // If this single node selection is an inshare with an owner, show who owns it
         if (ownerText) {
             $('.owner-section', $container).removeClass('hidden');
             $('.owner-value', $container).safeHTML(ownerText);
-        }
-
-        // If just one node selected, show the Name label (just showing the # of files/folders instead for multiple)
-        if (selectedNodeHandles.length === 1) {
-            $('.name-section .description', $container).removeClass('hidden');
-
-            renderNodeDescription(node);
         }
 
         // Render icons/thumbnails as applicable
@@ -1493,9 +1716,12 @@ lazy(mega.ui, 'mInfoPanel', () => {
 
         /**
          * Sets up the info panel
-         * @returns {undefined}
+         * @returns {Promise<undefined>}
          */
-        initInfoPanel() {
+        async initInfoPanel() {
+
+            // Render the selected node info into the panel
+            await renderInfo($.selected);
 
             // Scroll to element
             scrollToNode($.selected[0]);
@@ -1511,9 +1737,6 @@ lazy(mega.ui, 'mInfoPanel', () => {
                 $.tresizer();
             });
 
-            // Render the selected node info into the panel
-            renderInfo($.selected);
-
             // Trigger a resize for the grid tiles to move
             $.tresizer();
         },
@@ -1521,7 +1744,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
         /**
          * Re-render the contents of the Info panel if they selected a new node/s while the panel is already open
          * @param {Array} selectedNodes An array of the handles that are selected in the UI (e.g. call with $.selected)
-         * @returns {undefined}
+         * @returns {Promise<undefined>}
          */
         reRenderIfVisible(selectedNodes) {
 

@@ -42,6 +42,7 @@
             "queueMicrotask",
             "reportError",
             "requestIdleCallback",
+            "scheduler",
             "structuredClone",
             "WeakRef"
         ],

@@ -900,16 +900,13 @@
             if (id && id.substr(0, 9) === 'versions/') {
                 id = id.substr(9);
             }
-            if (!id) {
-                id = this.RootID;
+            if (id === 'devices' || (!id || M.d[id] && M.d[id].p === this.InboxID)) {
+                return M.openFolder(mega.devices.rootId);
             }
             else if ((sink = pipe.has(id))) {
                 if (d) {
                     console.info(`Using deferred sink for ${id}...`);
                 }
-            }
-            else if (id === 'devices' || this.InboxID && this.d[id] && this.d[id].p === this.InboxID) {
-                return this.openFolder(mega.devices.rootId);
             }
             else if (!this.d[id] || this.d[id].t && !this.c[id]) {
                 fetchDBNodes = !id || id.length !== 8 ? -1 : !!window.fmdb;

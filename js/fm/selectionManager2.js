@@ -1137,28 +1137,6 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 __hideButton('delete');
             }
 
-            if (M.currentCustomView && M.currentCustomView.type === mega.devices.rootId && sharer(selNode.h)) {
-
-                const section = mega.devices.ui.getRenderSection();
-
-                if (section === 'device-centre-folders') {
-                    __hideButton('delete');
-                    __hideButton('link');
-                    __hideButton('share');
-                    __hideButton('sendto');
-                }
-                else if (section === 'cloud-drive') {
-                    if (selNode.t) {
-                        __hideButton('sendto');
-                    }
-                    if (M.getNodeRights(selNode.h) > 1) {
-                        __hideButton('link');
-                        __hideButton('share');
-                    }
-                }
-
-            }
-
             if (M.currentdirid === 'file-requests') {
                 __hideButton('link');
                 __hideButton('share');

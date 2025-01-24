@@ -2305,7 +2305,7 @@ var dlmanager = {
     },
 
     // MEGAsync dialog If filesize is too big for downloading through browser
-    showMEGASyncOverlay(onSizeExceed, dlStateError, initialSlide, event) {
+    showMEGASyncOverlay: function(onSizeExceed, dlStateError) {
         'use strict';
 
         //M.require('megasync_js').dump();
@@ -2326,39 +2326,17 @@ var dlmanager = {
         $overlay.show();
 
         var $slides = $overlay.find('.megasync-slide');
-
-        let $currentSlide = initialSlide ?
-            $slides.filter(`.megasync-slide.slide${initialSlide}`) :
-            $slides.filter('.megasync-slide:not(.hidden)').first();
-
-        if (!$currentSlide.length) {
-            $currentSlide = $slides.filter('.megasync-slide:not(.hidden)').first();
-        }
-
+        var $currentSlide = $slides.filter('.megasync-slide:not(.hidden)').first();
         var $sliderControl = $('button.megasync-slider', $overlay);
         var $sliderPrevButton = $sliderControl.filter('.prev');
         var $sliderNextButton = $sliderControl.filter('.next');
 
         $slides.removeClass('prev current next');
         $currentSlide.addClass('current');
-
-        const $prevSlide = $currentSlide.prev().not('.hidden');
-        if ($prevSlide.length) {
-            $prevSlide.addClass('prev');
-            $sliderPrevButton.removeClass('disabled');
-        }
-        else {
-            $sliderPrevButton.addClass('disabled');
-        }
-
-        const $nextSlide = $currentSlide.next().not('.hidden');
-        if ($nextSlide.length) {
-            $nextSlide.addClass('next');
-            $sliderNextButton.removeClass('disabled');
-        }
-        else {
-            $sliderNextButton.addClass('disabled');
-        }
+        $currentSlide.prev().not('.hidden').addClass('prev');
+        $currentSlide.next().not('.hidden').addClass('next');
+        $sliderPrevButton.addClass('disabled');
+        $sliderNextButton.removeClass('disabled');
 
         $sliderControl.rebind('click', function() {
             var $this = $(this);
@@ -2405,10 +2383,6 @@ var dlmanager = {
         }
 
         $('button.download-megasync', $overlay).rebind('click', function() {
-            if (event) {
-                eventlog(event);
-            }
-
             if (typeof megasync === 'undefined') {
                 console.error('Failed to load megasync.js');
             }

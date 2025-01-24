@@ -1854,68 +1854,6 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     -webkit-margin-start: 6px;
     margin-inline-start: 6px;
 }
-.device-centre .nw-fm-tree-item .success {
-    --mask-color: var(--text-color-success);
-    color: var(--text-color-success);
-}
-.device-centre .nw-fm-tree-item .error {
-    --mask-color: var(--text-color-error);
-    color: var(--text-color-error);
-}
-.device-centre .nw-fm-tree-item .warning {
-    --mask-color: var(--text-color-warning);
-    color: var(--text-color-warning);
-}
-.device-centre .nw-fm-tree-item .in-progress {
-    --mask-color: var(--secondary-blue);
-    color: var(--text-color-info);
-}
-.device-centre .nw-fm-tree-item .tip-icon {
-    --mask-color: var(--icon-inactive);
-    transition: var(--transition-color);
-}
-.device-centre .nw-fm-tree-item .tip-icon:hover {
-    --mask-color: var(--icon-rest);
-}
-
-.rtl .device-centre .nw-fm-tree-item .dc-fm-tree-icon-group {
-    min-width: 76px;
-}
-
-.device-centre .nw-fm-tree-item .dc-fm-tree-status {
-    --icon-size: 18px;
-    left: 26px;
-    position: absolute;
-    top: 8px;
-}
-.rtl .device-centre .nw-fm-tree-item .dc-fm-tree-status {
-    right: 26px;
-}
-.device-centre .nw-fm-tree-item .dc-fm-tree-status-tip {
-    --icon-size: 18px;
-    left: 6px;
-    position: absolute;
-    top: 8px;
-}
-.rtl .device-centre .nw-fm-tree-item .dc-fm-tree-status-tip {
-    right: 6px;
-}
-.device-centre .nw-fm-tree-item .dc-fm-tree-icon {
-    --icon-size: 28px;
-    left: 44px;
-    position: absolute;
-    top: 2px;
-}
-.rtl .device-centre .nw-fm-tree-item .dc-fm-tree-icon {
-    right: 44px;
-}
-.device-centre .nw-fm-tree-item .dc-fm-tree-name {
-    padding: 2px 0 2px 76px;
-    font: var(--text-body1);
-    display: inline-block;
-    box-sizing: border-box;
-    color: var(--stroke-link-inverted);
-}
 .nw-tree-panel-arrows:hover, .nw-tree-panel-arrows.active {
     opacity: 1;
 }
@@ -2432,6 +2370,7 @@ ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul ul .nw-fm-tree-item {
     justify-content: center;
     margin: 6px 0;
 }
+.mega-lite-mode .nw-fm-left-icon.backup-center,
 .mega-lite-mode .nw-fm-left-icon.gallery {
     display: none;
 }
@@ -4693,9 +4632,9 @@ span.orange {
     margin-inline-start: 4px;
     cursor: pointer;
 }
-
-/* Temporarily hide Versions in the dashboard bottom table for MEGA Lite mode until supported properly */
-.mega-lite-mode .account.data-table .account-data-item-versions {
+/* Temporarily hide Versions and Backups in the dashboard bottom table for MEGA Lite mode until supported properly */
+.mega-lite-mode .account.data-table .account-data-item-versions,
+.mega-lite-mode .account.data-table .account-data-item-backups {
 	display: none;
 }
 .account.data-table i.versioning-settings:hover {
@@ -12292,57 +12231,6 @@ a.pr-faded-link {
 }
 
 /* End utility classes */
-
-/* Device Centre Shimmer */
-
-.device-centre-shimmer {
-    height: 100%;
-    width: 100%;
-    background-color: var(--surface-main);
-    position: absolute;
-    z-index: 202;
-}
-
-.device-centre-shimmer-element {
-    background-color: var(--icon-inactive);
-    transition: var(--transition-bg-color);
-}
-
-.device-centre-shimmer-container {
-    height: 80px;
-    display: flex;
-    align-items: center;
-    padding-left: 26px;
-    margin-left: 12px;
-}
-
-.device-centre-shimmer-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 6px;
-}
-
-.device-centre-shimmer-info {
-    display: flex;
-    flex-direction: column;
-    align-items: start;
-    margin-left: 12px;
-}
-
-.device-centre-shimmer-name {
-    width: 160px;
-    height: 12px;
-    border-radius: 6px;
-    margin-bottom: 8px;
-}
-
-.device-centre-shimmer-status {
-    width: 86px;
-    height: 10px;
-    border-radius: 6px;
-}
-
-/* End Device Centre Shimmer */
 
 /* Tablet devices */
 

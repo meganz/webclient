@@ -246,6 +246,9 @@ var notificationBanner = {
         if (M.currentdirid === 'recents') {
             activeFMContainer = '.fm-recents.container';
         }
+        else if (M.currentdirid === 'devices') {
+            activeFMContainer = '.fm-right-block.full-size';
+        }
 
         if (bannerShown) {
             if (M.currentdirid === 'albums') {

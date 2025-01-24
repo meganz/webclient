@@ -119,6 +119,16 @@ MegaData.prototype.buildtree = function(n, dialog, stype, sSubMap) {
         stype = "public-links";
         cvtree = M.getPublicLinkTree();
     }
+    else if (n.h === M.BackupsId) {
+        if (typeof dialog === 'undefined') {
+            const lPaneButton = document.querySelector('.js-lp-myfiles .js-backups-btn');
+
+            if (lPaneButton.classList.contains('hidden')) {
+                lPaneButton.classList.remove('hidden');
+            }
+        }
+        stype = "backups";
+    }
     else if (n.h === M.RubbishID) {
         if (typeof dialog === 'undefined') {
             $('.content-panel.rubbish-bin').html('<ul id="treesub_' + escapeHTML(M.RubbishID) + '"></ul>');
@@ -525,7 +535,7 @@ MegaData.prototype.initTreePanelSorting = function() {
     // Sorting sections for tree panels, dialogs, and per field.
     // XXX: do NOT change the order, add new entries at the tail, and ask before removing anything..
     const sections = [
-        'folder-link', 'contacts', 'conversations',
+        'folder-link', 'contacts', 'conversations', 'backups',
         'shared-with-me', 'cloud-drive', 'rubbish-bin',
         'out-shares', 'public-links', 's4'
     ];
@@ -1226,7 +1236,7 @@ MegaData.prototype.addTreeUI = function() {
             if ($uls.length > 1) {
                 $.selected = $uls.attrs('id')
                     .map(function(id) {
-                        return id.replace(/treea_+|(os_|pl_|device-centre_)/g, '');
+                        return id.replace(/treea_+|(os_|pl_)/g, '');
                     });
             }
             else {
@@ -1356,6 +1366,9 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     else if (cv) {
         this.onSectionUIOpen(id_r || id_s);
     }
+    else if (this.InboxID && id_r === this.InboxID) {
+        this.onSectionUIOpen('backups');
+    }
     else if (id_r === this.RootID) {
         this.onSectionUIOpen('cloud-drive');
     }
@@ -1379,9 +1392,6 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
     }
     else if (id_s === 'recents') {
         this.onSectionUIOpen('recents');
-    }
-    else if (id_s === mega.devices.rootId) {
-        this.onSectionUIOpen(mega.devices.rootId);
     }
     else if (M.isDynPage(id_s)) {
         this.onSectionUIOpen(id_s);
@@ -1445,7 +1455,9 @@ MegaData.prototype.onTreeUIOpen = function(id, event, ignoreScroll) {
 
     if (target) {
         target.classList.add('selected');
-        if (fmconfig.uiviewmode | 0 && fmconfig.viewmode === 2 || getFmViewMode(id) === 2) {
+        if ((fmconfig.uiviewmode | 0) && fmconfig.viewmode === 2 ||
+            typeof fmconfig.viewmodes !== 'undefined' && typeof fmconfig.viewmodes[id] !== 'undefined'
+            && fmconfig.viewmodes[id] === 2) {
             target.classList.add('on-gallery');
         }
     }

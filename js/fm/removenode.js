@@ -141,26 +141,18 @@ function removeUInode(h, parent) {
                 mega.gallery.showEmpty(M.currentdirid);
             }
             break;
-        default: {
+        default:
             if (M.chat || String(M.currentdirid).includes('user-management') || M.isAlbumsPage()) {
                 break;
             }
-
-            const isRemoveEffectiveInCurrentDir = M.currentrootid !== mega.devices.rootId
-                || !mega.devices.ui.isCustomRender();
-
             if (!hasSubFolders) {
                 $('#treea_' + parent).removeClass('contains-folders expanded');
             }
-            if (isRemoveEffectiveInCurrentDir) {
-                $(`#${h}`).remove();// remove item
-            }
+            $('#' + h).remove();// remove item
             $('#treeli_' + h).remove();// remove folder and subfolders
             if (!hasItems) {
 
-                if (isRemoveEffectiveInCurrentDir) {
-                    __markEmptied();
-                }
+                __markEmptied();
                 if (M.gallery) {
                     $('.files-grid-view').addClass('hidden');
 
@@ -190,10 +182,7 @@ function removeUInode(h, parent) {
                             $('.fm-empty-search').removeClass('hidden');
                             $('.fm-right-files-block:not(.in-chat) .search-bottom-wrapper').addClass('hidden');
                         }
-                        else if (isRemoveEffectiveInCurrentDir) {
-                            if (M.currentrootid === mega.devices.rootId) {
-                                mega.devices.ui.header.hide();
-                            }
+                        else {
                             $('.fm-empty-folder').removeClass('hidden');
                         }
                     }
@@ -201,7 +190,6 @@ function removeUInode(h, parent) {
                 $('.grid-table.fm tbody tr').remove();
             }
             break;
-        }
     }
 
     // Remove item in subtitles dialog

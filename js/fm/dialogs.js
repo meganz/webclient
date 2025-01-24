@@ -182,11 +182,6 @@
         else if ($.selectFolderDialog && section === 'cloud-drive' && $.mcselected !== M.RootID) {
             $btn.removeClass('disabled');
         }
-        else if (M.currentCustomView.type === mega.devices.rootId && $.dialog === 'stop-backup') {
-            // Enforce Selection
-            $.selected = [M.currentCustomView.nodeID];
-            $btn.removeClass('disabled');
-        }
         else {
             var forceEnabled = $.copyToShare || $.copyToUpload || $.onImportCopyNodes || $.saveToDialog || $.nodeSaveAs;
 

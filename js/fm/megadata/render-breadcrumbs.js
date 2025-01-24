@@ -50,10 +50,6 @@
         }
 
         let items = this.getPath(fileHandle || this.currentdirid);
-        if (M.currentrootid === mega.devices.rootId) {
-            items = mega.devices.ui.getFolderChildrenPath(items);
-        }
-
         const hasRewind = scope.classList.contains('rewind');
 
         const dictionary = handle => {
@@ -106,12 +102,15 @@
                 messages: () => {
                     typeClass = 'messages';
                     name = l[166];
-                },
-                [mega.devices.rootId]: () => {
-                    typeClass = mega.devices.rootId;
-                    name = l.device_centre;
-                },
+                }
             };
+
+            if (this.BackupsId) {
+                cases[this.BackupsId] = () => {
+                    typeClass = 'backups';
+                    name = l.restricted_folder_button;
+                };
+            }
 
             if (cases[handle]) {
                 cases[handle]();
@@ -126,13 +125,6 @@
                         typeClass = 'folder';
                     }
                 }
-                else {
-                    const {name: deviceName} = this.dcd[handle] || {};
-                    if (deviceName) {
-                        name = deviceName;
-                    }
-                }
-
                 if (handle.length === 11) {
                     typeClass = 'contact selectable-txt';
 
@@ -245,6 +237,9 @@
             }
             else if (item.type === 'cloud-drive') {
                 icon = 'icon-cloud';
+            }
+            else if (item.type === 'backups') {
+                icon = 'icon-database-filled';
             }
             else if (item.type === 'folder' || item.type === 'folder-link') {
                 icon = 'icon-folder-filled';
@@ -449,8 +444,7 @@
             'shares',
             'out-shares',
             'public-links',
-            'file-requests',
-            mega.devices.rootId
+            'file-requests'
         ];
         mBroadcaster.sendMessage('trk:event', 'breadcrumb', 'click', id);
 
@@ -472,9 +466,7 @@
                 && M.currentCustomView.type !== 'albums'
                 && !(M.currentCustomView.prefixPath === 'discovery/' && id === M.RootID)
             ) {
-                id = M.currentCustomView.type === mega.devices.rootId ?
-                    mega.devices.ui.getCurrentDirPath(id) :
-                    M.currentCustomView.prefixPath + id;
+                id = M.currentCustomView.prefixPath + id;
             }
 
             this.openFolder(id)
@@ -484,9 +476,6 @@
                         reselect(1);
                     }
                 });
-        }
-        else if (M.dcd[id]) {
-            this.openFolder(`device-centre/${id}`);
         }
         else if (specialCases.includes(id)) {
             this.openFolder(id);

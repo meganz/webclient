@@ -728,7 +728,7 @@ lazy(mega.ui, 'searchbar', () => {
             filterFn(M.getFilterBySearchFn(term), ({ sen }) => !sen || mega.sensitives.showGlobally)
         );
 
-        const nodes = results.filter(n => n.p !== M.RubbishID && !mega.devices.ui.isDeprecatedBackups(n))
+        const nodes = results.filter(n => n.p !== M.RubbishID)
             .sort((a, b) => a.name.localeCompare(b.name))
             .sort((a, b) => a.name.length - b.name.length);
 
@@ -809,7 +809,7 @@ lazy(mega.ui, 'searchbar', () => {
         }
 
         $('.dropdown-search-results-item', $dropdownResults).rebind('click.searchbar', (e) => {
-            let h = $(e.currentTarget).attr('id');
+            const h = $(e.currentTarget).attr('id');
             const n = M.getNodeByHandle(h);
 
             hideDropdown();
@@ -822,14 +822,7 @@ lazy(mega.ui, 'searchbar', () => {
                     $.ofShowNoFolders = true;
                 }
                 $('.top-context-menu').addClass('hidden');
-
-                const isBackup = M.getNodeRoot(n) === M.InboxID;
-                if (isBackup) {
-                    // Backup type folder target only available in device centre
-                    h = mega.devices.ui.getNodeURLPathFromOuterView(n);
-                }
-
-                Promise.resolve(h).then((h) => M.openFolder(h)).catch(tell);
+                M.openFolder(h);
             }
             else if (M.getNodeRoot(n.h) === M.RubbishID) {
                 propertiesDialog();

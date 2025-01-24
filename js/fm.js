@@ -612,8 +612,9 @@ function fmtopUI() {
     if ($fmShareButton.length) {
         // Show share button unless for root id, out shares, s4, etc
         const pages = ['s4', 'out-shares', 'shares', 'file-requests', 'faves', M.RubbishID];
-        const dirPages = [M.RootID, M.currentrootid];
-        const showButton = !pages.includes(M.currentrootid) && !dirPages.includes(M.currentdirid);
+        const dirPages = [M.BackupsId, M.RootID, M.currentrootid];
+        const showButton = !pages.includes(M.currentrootid) && !dirPages.includes(M.currentdirid)
+            && M.currentrootid !== (M.BackupsId && M.getNodeByHandle(M.BackupsId).p);
 
         if (showButton) {
             const h = String(M.currentdirid).split('/').pop();
@@ -662,7 +663,6 @@ function fmtopUI() {
     $('.fm-clearbin-button,.fm-add-user,.fm-new-folder,.fm-file-upload,.fm-folder-upload,.fm-uploads')
         .add('.fm-new-shared-folder,.fm-new-link')
         .add('.fm-new-file-request')
-        .add('.fm-add-syncs, .fm-add-backup')
         .addClass('hidden');
     $('.fm-new-folder').removeClass('filled-input');
     $('.fm-right-files-block').removeClass('visible-notification rubbish-bin');
@@ -818,17 +818,6 @@ function fmtopUI() {
                 }
             }
         }
-        else if (M.currentrootid === mega.devices.rootId) {
-            if (mega.devices.ui.isCustomRender()) {
-                $('.fm-files-view-icon', document).addClass('hidden');
-            }
-            else if (!mega.devices.ui.isBackupRelated([M.currentdirid.split('/').pop()])) {
-                showUploadBlock();
-            }
-
-            $('.fm-right-files-block', document).addClass('visible-notification');
-            mega.devices.ui.handleAddBtnVisibility();
-        }
         else if (String(M.currentdirid).length === 8
             && M.getNodeRights(M.currentdirid) > 0) {
 
@@ -895,6 +884,11 @@ function fmLeftMenuUI() {
     // handle the Inbox section use cases
     if (M.InboxID && M.currentdirid === M.InboxID) {
         M.openFolder(M.RootID);
+    }
+
+    // handle the Backups button changes
+    if (!M.BackupsId) {
+        $('.js-lp-myfiles .js-backups-btn', '.fmholder').addClass('hidden');
     }
 
     // handle the RubbishBin icon changes
@@ -1184,7 +1178,7 @@ function FMShortcuts() {
 
             var remItems = selectionManager.get_selected();
             if (remItems.length === 0 || (M.getNodeRights(M.currentdirid || '') | 0) < 2 ||
-                M.currentrootid === M.InboxID) {
+                M.currentrootid === M.InboxID || M.currentdirid === 'devices') {
                 return; // dont do anything.
             }
 
@@ -1377,24 +1371,8 @@ function renameDialog() {
                             errMsg = l[23219];
                         }
                         else if (!s4Folder || !(errMsg = s4.ui.getInvalidNodeNameError(n, value))) {
-                            M.rename(n.h, value)
-                                .then(() => {
-                                    if (M.currentrootid === mega.devices.rootId) {
-                                        const {device} = mega.devices.ui.getCurrentDirData();
-                                        const folder = device ? device.folders[n.h] : null;
-                                        if (device && folder) {
-                                            mega.devices.ui.cacheClear();
-                                            M.dcd[device.h].folders[folder.h].name = value;
-                                            mega.devices.tree.render().then(() => {
-                                                mega.devices.ui.header.refresh();
-                                            });
-                                        }
-                                    }
-                                    else {
-                                        mega.devices.ui.updateFolderName(n);
-                                    }
-                                })
-                                .catch(tell);
+
+                            M.rename(n.h, value).catch(tell);
                         }
                     }
                     else if (value.length > 250) {
@@ -1727,9 +1705,7 @@ function msgDialog(type, title, msg, submsg, callback, checkboxSetting) {
                 || checkboxSetting === 'skipcdtos4'
                 || checkboxSetting === 'skips4tocd'
                 || checkboxSetting === 'skips4tos4'
-                || checkboxSetting === 'rwReinstate'
-                || checkboxSetting === 'dcPause', checkboxSetting);
-
+                || checkboxSetting === 'rwReinstate', checkboxSetting);
 
             $('#msgDialog .checkbox-block .checkdiv,' +
                 '#msgDialog .checkbox-block input')
@@ -3204,11 +3180,8 @@ function createFolderDialog(close) {
                     return awaitingPromise;
                 }
 
-                const {type, original} = M.currentCustomView;
-                const id = type === mega.devices.rootId ? original : Object(M.d[h]).p || target;
-
                 // By default, auto-select the newly created folder as long no awaiting promise
-                return M.openFolder(id)
+                return M.openFolder(Object(M.d[h]).p || target)
                     .always(() => {
                         $.selected = [h];
                         reselect(1);
@@ -3623,9 +3596,6 @@ function fm_resize_handler(force) {
         else {
             initPerfectScrollbar($('.grid-scrolling-table', '.out-shared-grid-view'));
         }
-    }
-    else if (M.currentrootid === mega.devices.rootId && !M.viewmode && mega.devices.ui.isCustomRender()) {
-        initPerfectScrollbar($('.grid-scrolling-table', mega.devices.ui.gridWrapperSelector));
     }
     else if (M.currentdirid === 'transfers') {
         fm_tfsupdate(); // this will call $.transferHeader();

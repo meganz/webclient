@@ -2478,9 +2478,6 @@ accountUI.fileManagement = {
 
         // Rewind
         this.rewind.render();
-
-        // Device Centre pause sync/backup folders
-        this.deviceCentrePause.render();
     },
 
     versioning: {
@@ -2925,21 +2922,6 @@ accountUI.fileManagement = {
                 $(showRewindConfirmId, accountUI.$contentBlock).parent(),
                 !mega.config.get('rwReinstate'),
                 val => mega.config.setn('rwReinstate', val ^ 1)
-            );
-        }
-    },
-
-    deviceCentrePause: {
-        render() {
-            'use strict';
-
-            var showPauseConfirmId = '#dcPause';
-
-            accountUI.inputs.switch.init(
-                showPauseConfirmId,
-                $(showPauseConfirmId, accountUI.$contentBlock).parent(),
-                !mega.config.get('dcPause'),
-                val => mega.config.setn('dcPause', val ^ 1)
             );
         }
     }

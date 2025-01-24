@@ -74,18 +74,6 @@ MegaData.prototype.filterByParent = function(id) {
     else if (id === 'public-links') {
         this.v = this.filterByLocation(this.su.EXP || {});
     }
-    else if (mega.devices && mega.devices.ui
-        && M.currentCustomView.type === mega.devices.rootId
-        && mega.devices.ui.filterChipUtils.selectedFilters.value) {
-
-        for (let i = this.v.length; i--;) {
-
-            if (!mega.devices.ui.filterChipUtils.match(this.v[i])) {
-
-                this.v.splice(i, 1);
-            }
-        }
-    }
     else {
         this.filterBy(function(node) {
             return (node.p === id);
@@ -222,7 +210,7 @@ MegaData.prototype.getFilterBySearchFn = function(searchTerm) {
         catch (ex) {}
     }
 
-    if (mega.ui.mNodeFilter.selectedFilters.value) {
+    if (mega.ui.mNodeFilter.selectedFilters) {
         if (regex) {
             return (n) => n.name && regex.test(n.name) && mega.ui.mNodeFilter.match(n);
         }
@@ -240,9 +228,7 @@ MegaData.prototype.getFilterBySearchFn = function(searchTerm) {
     return function(node) {
         return node.name && node.name.toLowerCase().includes(str)
             && node.p !== 'contacts'
-            && !(node.s4 && node.p === M.RootID && M.getS4NodeType(node) === 'container')
-            && node.h !== M.InboxID && node.p !== M.InboxID
-            && !mega.devices.ui.isDeprecatedBackups(node);
+            && !(node.s4 && node.p === M.RootID && M.getS4NodeType(node) === 'container');
     };
 };
 
@@ -271,7 +257,7 @@ MegaData.prototype.filterByLocation = function(nodes, filter) {
     'use strict';
 
     const res = [];
-    const hasNodeFilter = mega.ui.mNodeFilter && mega.ui.mNodeFilter.selectedFilters.value;
+    const hasNodeFilter = mega.ui.mNodeFilter && mega.ui.mNodeFilter.selectedFilters;
 
     for (const h in nodes) {
         const n = this.d[h];

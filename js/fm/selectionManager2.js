@@ -524,9 +524,7 @@ class SelectionManager2_DOM extends SelectionManager2Base {
      */
     constructor($selectable, eventHandlers) {
         super(eventHandlers);
-        this.currentdirid = M.currentrootid === mega.devices.rootId ?
-            M.currentCustomView.nodeID :
-            M.currentdirid;
+        this.currentdirid = M.currentdirid;
         this._boundEvents = [];
         this.init();
         this.$selectable = $selectable;
@@ -761,10 +759,6 @@ class SelectionManager2_DOM extends SelectionManager2Base {
                 if ((n = M.d[n])) {
                     selectionSize += n.t ? n.tb : n.s;
                 }
-                else if (M.dcd[n]) {
-                    n = M.dcd[n];
-                    selectionSize += n.tb || 0;
-                }
                 else if (M.dyh) {
                     selectionSize = 0;
                 }
@@ -862,7 +856,6 @@ class SelectionManager2_DOM extends SelectionManager2Base {
         ) {
             return false;
         }
-
         let itemsNum = this.selected_list.filter(h => h !== this.currentdirid).length;
 
         if (itemsNum === 0) {
@@ -1073,8 +1066,8 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             const { dataset } = selectionLinkWrapper.querySelector('.selection-links-wrapper .delete');
             dataset.simpletip = M.getSelectedRemoveLabel($.selected);
 
-            if ((sourceRoot === M.RootID || sourceRoot === 's4' ||
-                M.isDynPage(sourceRoot) || sourceRoot === mega.devices.rootId) && !folderlink) {
+            if ((sourceRoot === M.RootID || sourceRoot === 's4'
+                 || M.isDynPage(sourceRoot)) && !folderlink) {
 
                 const cl = new mega.Share.ExportLink();
 
@@ -1127,14 +1120,6 @@ class SelectionManager2_DOM extends SelectionManager2Base {
             else if (!folderlink && M.currentrootid !== 'shares' && M.currentdirid !== 'shares'
                 || M.currentrootid === 'shares' && M.currentdirid !== 'shares' && M.d[M.currentdirid].r === 2) {
                 __showBtn('delete');
-            }
-
-            if (M.dcd[selNode.h]) {
-                __hideButton('link');
-                __hideButton('share');
-                __hideButton('sendto');
-                __hideButton('download');
-                __hideButton('delete');
             }
 
             if (M.currentdirid === 'file-requests') {

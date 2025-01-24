@@ -352,6 +352,11 @@ lazy(mega.devices, 'ui', () => {
                 }
 
                 const node = M.getNodeByHandle(h);
+                const isRejectedNode = !node || sharer(node.h) && M.getNodeRights(node.h) < 2;
+
+                if (isRejectedNode) {
+                    return;
+                }
 
                 // If `id` is not a folder handle, stop the sync/backup
                 if (id && id !== h) {
@@ -576,6 +581,11 @@ lazy(mega.devices, 'ui', () => {
             };
 
             const node = M.getNodeByHandle(nodeHandle);
+            const isRejectedNode = !node || sharer(node.h) && M.getNodeRights(node.h) < 2;
+
+            if (isRejectedNode) {
+                return;
+            }
 
             const action = folder.status.pausedSyncs
                 ? 'resume'
@@ -1062,6 +1072,18 @@ lazy(mega.devices, 'ui', () => {
             }
             else {
                 delay.cancel(refreshEventName);
+            }
+        }
+
+        /**
+         * Refresh UI
+         * @returns {Promise<void>} void
+         */
+        refresh() {
+            this.clearLastReq();
+            if (M.currentrootid === rootId) {
+                $.hideContextMenu();
+                return this.render(M.currentdirid, false, true);
             }
         }
 

@@ -1432,7 +1432,6 @@ lazy(mega.ui, 'mInfoPanel', () => {
             $statusSection.removeClass('hidden');
 
             const $itemInfo = $('.device-centre-item-info', $statusSection);
-            $itemInfo.empty();
             mega.devices.utils.StatusUI.get(status).render({
                 status,
                 itemNode: $itemInfo[0],
@@ -1462,10 +1461,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
      */
     function renderTitle($container, selectedNodes) {
         const nodeName = getNodeName(selectedNodes);
-        if (nodeName) {
-            $('.name-section .description', $container).removeClass('hidden');
-            $('.name-value', $container).text(nodeName);
-        }
+        $('.name-value', $container).text(nodeName);
     }
 
     /**
@@ -1662,6 +1658,7 @@ lazy(mega.ui, 'mInfoPanel', () => {
         renderContains($container, node, selectedNodes);
 
         if (node) {
+            renderSyncStatus($container, node);
             renderLastModified($container, node);
 
             // If this single node selection is an In-share with permissions information, show it
@@ -1680,14 +1677,19 @@ lazy(mega.ui, 'mInfoPanel', () => {
             }
 
             await renderPath($container, node, isBackup);
-            renderSyncStatus($container, node);
-            renderNodeDescription(node);
         }
 
         // If this single node selection is an inshare with an owner, show who owns it
         if (ownerText) {
             $('.owner-section', $container).removeClass('hidden');
             $('.owner-value', $container).safeHTML(ownerText);
+        }
+
+        // If just one node selected, show the Name label (just showing the # of files/folders instead for multiple)
+        if (selectedNodeHandles.length === 1) {
+            $('.name-section .description', $container).removeClass('hidden');
+
+            renderNodeDescription(node);
         }
 
         // Render icons/thumbnails as applicable

@@ -175,29 +175,18 @@
             };
         };
 
-
-        if (M.search) {
-            const node = M.d[items[0]];
-            const isBackup = node && M.getNodeRoot(node.h) === M.InboxID;
-            if (isBackup) {
-                items = mega.devices.ui.getNodePathFromOuterView(node.h);
+        this.renderBreadcrumbs(items, scope, dictionary, id => {
+            if (hasRewind) {
+                return;
             }
-        }
 
-        Promise.resolve(items)
-            .then((items) => {
-                this.renderBreadcrumbs(items, scope, dictionary, id => {
-                    if (hasRewind) {
-                        return;
-                    }
-                    breadcrumbClickHandler.call(this, id);
-                });
-                // if in custom component we do not want to open the file versioning dialog
-                if (!is_mobile && fileHandle && !wrapperNode) {
-                    fileversioning.fileVersioningDialog(fileHandle);
-                }
-            })
-            .catch(tell);
+            breadcrumbClickHandler.call(this, id);
+        });
+
+        // if in custom component we do not want to open the file versioning dialog
+        if (!is_mobile && fileHandle && !wrapperNode) {
+            fileversioning.fileVersioningDialog(fileHandle);
+        }
     };
 
     /**
@@ -487,19 +476,14 @@
                     mega.devices.ui.getCurrentDirPath(id) :
                     M.currentCustomView.prefixPath + id;
             }
-            else if (M.getNodeRoot(id) === M.InboxID) {
-                id = mega.devices.ui.getNodeURLPathFromOuterView(n, !n.t);
-            }
 
-            Promise.resolve(id)
-                .then((id) => this.openFolder(id))
+            this.openFolder(id)
                 .always(() => {
                     if (toSelect) {
                         $.selected = [toSelect];
                         reselect(1);
                     }
-                })
-                .catch(tell);
+                });
         }
         else if (M.dcd[id]) {
             this.openFolder(`device-centre/${id}`);

@@ -1365,13 +1365,13 @@
             },
             'device-centre-devices'(aNode, aProperties, aTemplate) {
                 if (mega.devices.main) {
-                    mega.devices.main.run('updateTemplate', aNode, aProperties, aTemplate);
+                    mega.devices.main.run('updateTemplate', aProperties, aTemplate);
                 }
                 return aTemplate;
             },
             'device-centre-folders'(aNode, aProperties, aTemplate) {
                 if (mega.devices.main) {
-                    mega.devices.main.run('updateTemplate', aNode, aProperties, aTemplate);
+                    mega.devices.main.run('updateTemplate', aProperties, aTemplate);
                 }
                 return aTemplate;
             },

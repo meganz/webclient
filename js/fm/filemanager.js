@@ -3054,12 +3054,8 @@ FileManager.prototype.initUIKeyEvents = function() {
             if ($.selected && $.selected.length > 0) {
                 var n = M.d[$.selected[0]];
 
-
-                if (!M.dcd[$.selected[0]] && M.getNodeRoot(n.h) === M.RubbishID) {
+                if (M.getNodeRoot(n.h) === M.RubbishID) {
                     propertiesDialog();
-                }
-                else if (M.currentrootid === mega.devices.rootId || M.dcd[$.selected[0]]) {
-                    M.openFolder(mega.devices.ui.getCurrentDirPath($.selected[0]));
                 }
                 else if (n && n.t) {
                     M.openFolder(n.h);
@@ -3558,7 +3554,6 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
     $('.out-shared-grid-view').addClass('hidden');
     $('.files-grid-view.fm').addClass('hidden');
     $('.fm-blocks-view.fm').addClass('hidden');
-    mega.devices.ui.$gridWrapper.addClass('hidden');
 
     if (this.currentdirid === 'shares') {
         $('.shared-blocks-view').removeClass('hidden');
@@ -3573,11 +3568,6 @@ FileManager.prototype.addIconUI = function(aQuiet, refresh) {
 
         $(viewModeClass).removeClass('hidden');
         initPerfectScrollbar($(viewModeClass));
-    }
-    else if (this.currentrootid === mega.devices.rootId && mega.devices.ui.isCustomRender()) {
-        mega.devices.ui.$gridWrapper.removeClass('hidden');
-        const handler = this.currentdirid === mega.devices.rootId ? '.devices' : '.folders';
-        initPerfectScrollbar($(`${handler}.grid-scrolling-table`, mega.devices.ui.gridWrapperSelector));
     }
     // user management ui update is handled in Business Account classes.
     else if (this.v.length && !M.isGalleryPage()) {
@@ -3834,7 +3824,6 @@ FileManager.prototype.addGridUI = function(refresh) {
     $('.out-shared-blocks-view').addClass('hidden');
     $('.out-shared-grid-view').addClass('hidden');
     $('.files-grid-view.fm').addClass('hidden');
-    mega.devices.ui.$gridWrapper.addClass('hidden');
 
     if (this.currentdirid === 'shares') {
         $('.shared-grid-view').removeClass('hidden');
@@ -3851,7 +3840,6 @@ FileManager.prototype.addGridUI = function(refresh) {
         initPerfectScrollbar($(viewModeClass, '.shared-details-block'));
     }
     else if (this.currentrootid === mega.devices.rootId && mega.devices.ui.isCustomRender()) {
-        mega.devices.ui.$gridWrapper.removeClass('hidden');
         const handler = this.currentdirid === mega.devices.rootId ? '.devices' : '.folders';
         initPerfectScrollbar($(`${handler}.grid-scrolling-table`, mega.devices.ui.gridWrapperSelector));
     }

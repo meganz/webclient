@@ -9,6 +9,11 @@ lazy(mega.devices.sections, 'folderChildren', () => {
     const {
         utils: {
             /**
+             * {Object<section>} section - sections constants
+             */
+            section,
+
+            /**
              * {StatusUI} StatusUI - Status UI handler
              */
             StatusUI,
@@ -17,13 +22,6 @@ lazy(mega.devices.sections, 'folderChildren', () => {
              * {Object<MegaLogger>} logger - logger instance
              */
             logger,
-        },
-
-        models: {
-            /**
-             * {Object} syncSection - contains sections constants
-             */
-            syncSection,
         },
 
         /**
@@ -57,7 +55,7 @@ lazy(mega.devices.sections, 'folderChildren', () => {
          * {String} section - section name
          */
         static get section() {
-            return syncSection.folderChildren;
+            return section.folderChildren;
         }
 
         /**
@@ -84,10 +82,8 @@ lazy(mega.devices.sections, 'folderChildren', () => {
             const hasToRenderHeader = !!folder;
 
             if (!folder) {
-                if (!M.c[h]) {
-                    logger.debug('mega.devices.sections.folderChildren dbfetch.get', h);
-                    await dbfetch.get(h);
-                }
+                logger.debug('mega.devices.sections.folderChildren dbfetch.get', h);
+                await dbfetch.get(h);
                 folder = ui.getFolderInPath(M.getPath(h));
 
                 if (!folder) {
@@ -130,7 +126,16 @@ lazy(mega.devices.sections, 'folderChildren', () => {
 
             const {n, d} = fmconfig.sortmodes[M.currentdirid] || {n: 'name', d: 1};
             M.doSort(n, d);
+
+            const selected = ui.selected && ui.selected.length ?
+                ui.selected :
+                selectionManager.selected_list;
+
             M.renderMain();
+
+            if (selected) {
+                selectionManager.add_to_selection(selected[0], true);
+            }
 
             if (!M.v.length &&
                 !(mega.ui.mNodeFilter && mega.ui.mNodeFilter.selectedFilters.value)) {

@@ -17,6 +17,16 @@ lazy(mega.devices, 'tree', () => {
              * {StatusUI} StatusUI - Status UI handler
              */
             StatusUI,
+
+            /**
+             * {ApiDataParser} ApiDataParser - API data parser
+             */
+            ApiDataParser,
+
+            /**
+             * {Object<MegaLogger>} logger - logger instance
+             */
+            logger,
         },
 
         /**
@@ -74,20 +84,30 @@ lazy(mega.devices, 'tree', () => {
         }
 
         /**
-         * Renders tree UI
+         * Renders UI for passed as argument or retrieving data if undefined
+         * @param {Array|undefined} data - data to render or retrieve
          * @returns {Promise<void>} void
          */
-        render() {
+        render(data) {
             if (this.isReady) {
                 this.isReady = false;
 
                 const selectedId = M.currentCustomView.nodeID;
                 this._selectChild(selectedId);
 
-                this._renderRoot(selectedId);
-                this._renderChildren(selectedId);
-                this.isReady = true;
-                return mega.devices.main.render();
+                return this._handleData(data)
+                    .then(() => {
+                        this._renderRoot(selectedId);
+                        if (this.isNewData) {
+                            this._renderChildren(selectedId);
+                        }
+                    })
+                    .catch(tell)
+                    .finally(() => {
+                        this.isReady = true;
+                        const {main} = mega.devices;
+                        main.render();
+                    });
             }
         }
 
@@ -114,6 +134,28 @@ lazy(mega.devices, 'tree', () => {
                 }
             }
             M.contextMenuUI(e, 8, items.join(', '));
+        }
+
+        /**
+         * Parses data passed as argument or gets new data in case not data passed and data is expired
+         * Fetches device folder handles from DB in case new data
+         * @param {Array|undefined} data - data to parse or fetch
+         * @returns {Promise<void>} void
+         */
+        async _handleData(data = []) {
+            this.isNewData = data.length || ui.isDataExpired() && (data = await ui.getData());
+
+            if (this.isNewData) {
+                const [apiDeviceNames = {}, apiFolders = []] = data || [];
+                const handles = [...new Set(apiFolders.map((f) => f.h))];
+
+                logger.debug('mega.devices.ui dbfetch.geta', handles);
+                await dbfetch.geta(handles);
+
+                ApiDataParser.parse(apiFolders, apiDeviceNames);
+
+                logger.debug('mega.devices.ui M.dcd', M.dcd);
+            }
         }
 
         /**

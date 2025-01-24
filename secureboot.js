@@ -2370,8 +2370,6 @@ else if (!browserUpdate) {
         jsl.push({f:'js/fm/transfer-progress-widget.js', n: 'tpw_js', j:1});
 
         // minimal device centre resources
-        jsl.push({f:'js/fm/devices/models.js', n: 'devices_models_js', j: 1, w: 1});
-        jsl.push({f:'js/fm/devices/data.js', n: 'devices_data_js', j: 1, w: 1});
         jsl.push({f:'js/fm/devices/ui-elems/header.js', n: 'devices_ui_elems_header_js', j: 1, w: 1});
         jsl.push({f:'js/fm/devices/ui-elems/shimmer.js', n: 'devices_ui_elems_shimmer_js', j: 1, w: 1});
         jsl.push({f:'js/fm/devices/ui-elems/notification.js', n: 'devices_ui_elems_notification_js', j: 1, w: 1});
@@ -3009,6 +3007,8 @@ else if (!browserUpdate) {
             'rewind_storage_js': {f:'js/rewind/storage.js', n: 'rewind_storage_js', j: 1, w: 1}
         },
         'devices': {
+            'devices_model_device_js': {f:'js/fm/devices/model/device.js', n: 'devices_model_device_js', j: 1, w: 1},
+            'devices_model_folder_js': {f:'js/fm/devices/model/folder.js', n: 'devices_model_folder_js', j: 1, w: 1},
             'devices_utils_js': {f:'js/fm/devices/utils.js', n: 'devices_utils_js', j: 1, w: 1},
             'devices_tree_js': {f:'js/fm/devices/tree.js', n: 'devices_tree_js', j: 1, w: 1},
             'devices_main_js': {f:'js/fm/devices/main.js', n: 'devices_main_js', j: 1, w: 1},

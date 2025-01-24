@@ -662,8 +662,8 @@ dashboardUI.updateCloudDataWidget = function() {
     const files = l.file_count;
     const folders = l.folder_count;
     const data = M.getDashboardData();
-    const locale = [files, folders, files, folders, folders, folders];
-    const map = ['files', 'folders', 'rubbish', 'ishares', 'oshares', 'links', 'versions'];
+    const locale = [files, folders, files, folders, folders, folders, folders];
+    const map = ['files', 'folders', 'rubbish', 'ishares', 'oshares', 'backups', 'links', 'versions'];
 
     $('.data-item .links-s').rebind('click', function() {
         loadSubPage('fm/public-links');
@@ -685,6 +685,15 @@ dashboardUI.updateCloudDataWidget = function() {
         return false;
     });
 
+    $('.backups', '.data-item').rebind('click.openBC', () => {
+
+        if (!M.BackupsId) {
+            return false;
+        }
+        M.openFolder(M.BackupsId);
+        return false;
+    });
+
     $('.account.data-item .versioning-settings').rebind('click', function() {
         loadSubPage('fm/account/file-management');
     });
@@ -694,7 +703,7 @@ dashboardUI.updateCloudDataWidget = function() {
             const props = data[map[idx]];
             let {cnt, xfiles, size} = props;
 
-            let str = idx < 6 ? mega.icu.format(locale[idx], cnt, true) : cnt;
+            let str = idx < 7 ? mega.icu.format(locale[idx], cnt, true) : cnt;
 
             if (props.xfiles > 0) {
                 str += `, ${mega.icu.format(files, xfiles, true)}`;

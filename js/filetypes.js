@@ -632,7 +632,7 @@ function filetype(n, getFullType, ik) {
         return ext[fext][1];
     }
 
-    if (M.currentrootid === mega.devices.rootId && typeof n === 'object' && n.typeText) {
+    if (M.currentrootid === mega.devices.rootId && typeof n === 'object') {
         return n.typeText;
     }
 

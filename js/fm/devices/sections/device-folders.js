@@ -9,16 +9,14 @@ lazy(mega.devices.sections, 'deviceFolders', () => {
     const {
         utils: {
             /**
+             * {Object<section>} section - sections constants
+             */
+            section,
+
+            /**
              * {StatusUI} StatusUI - Status UI handler
              */
             StatusUI,
-        },
-
-        models: {
-            /**
-             * {Object} syncSection - contains sections constants
-             */
-            syncSection,
         },
 
         /**
@@ -52,7 +50,7 @@ lazy(mega.devices.sections, 'deviceFolders', () => {
          * {String} section - section name
          */
         static get section() {
-            return syncSection.deviceFolders;
+            return section.deviceFolders;
         }
 
         /**
@@ -101,42 +99,27 @@ lazy(mega.devices.sections, 'deviceFolders', () => {
 
         /**
          * Update the DOM Node template passed for UI renderisation
-         * @param {MegaNode} aNode - node
          * @param {Object} aProperties - node properties
          * @param {Object} aTemplate - The DOM Node template
          * @returns {void}
          */
-        updateTemplate(aNode, aProperties, aTemplate) {
-            const elIcon = aTemplate.querySelector('.device-centre-item-icon');
-            const elName = aTemplate.querySelector('.device-centre-item-name');
-            const elInfo = aTemplate.querySelector('.device-centre-item-info');
-            const elType = aTemplate.querySelector('.device-centre-item-type');
-            const elSize = aTemplate.querySelector('.device-centre-item-size');
-            const elAdded = aTemplate.querySelector('.device-centre-item-added');
-            const elModified = aTemplate.querySelector('.device-centre-item-modified');
+        updateTemplate(aProperties, aTemplate) {
+            aTemplate.querySelector('.device-centre-item-icon').classList.add(`icon-${aProperties.icon}-90`);
+            aTemplate.querySelector('.device-centre-item-name').textContent = aProperties.name;
 
-            if (mega.sensitives.shouldBlurNode(M.d[aNode.h])) {
-                aTemplate.classList.add('is-sensitive');
+            const {ui} = mega.devices;
+            if (aProperties.status && !ui.filterChipUtils.isInactiveSelected) {
+                StatusUI.get(aProperties.status).render({
+                    status: aProperties.status,
+                    itemNode: aTemplate.querySelector('.device-centre-item-info'),
+                    iClass: 'dc-status',
+                });
             }
 
-            if (elIcon && elName && elInfo && elType && elSize && elAdded && elModified) {
-                elIcon.classList.add(`icon-${aProperties.icon}-90`);
-                elName.textContent = aProperties.name;
-
-                const {ui} = mega.devices;
-                if (ui.isActive(aNode)) {
-                    StatusUI.get(aProperties.status).render({
-                        status: aProperties.status,
-                        itemNode: elInfo,
-                        iClass: 'dc-status',
-                    });
-                }
-
-                elType.textContent = aProperties.type;
-                elSize.textContent = aProperties.size;
-                elAdded.textContent = aProperties.time;
-                elModified.textContent = aProperties.lastHeartbeat;
-            }
+            aTemplate.querySelector('.device-centre-item-type').textContent = aProperties.type;
+            aTemplate.querySelector('.device-centre-item-size').textContent = aProperties.size;
+            aTemplate.querySelector('.device-centre-item-added').textContent = aProperties.time;
+            aTemplate.querySelector('.device-centre-item-modified').textContent = aProperties.lastHeartbeat;
         }
 
         /**
@@ -159,11 +142,7 @@ lazy(mega.devices.sections, 'deviceFolders', () => {
          * @returns {void}
          */
         _renderItems(device) {
-            if (M.viewmode) {
-                M.viewmode = 0;
-            }
-
-            M.v = Object.values(device.folders).filter(n => mega.sensitives.shouldShowNode(n.h));
+            M.v = Object.values(device.folders);
 
             const {n, d} = fmconfig.sortmodes[M.currentdirid] || {n: 'name', d: 1};
             M.doSort(n, d);

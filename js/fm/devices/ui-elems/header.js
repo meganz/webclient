@@ -97,7 +97,10 @@ lazy(mega.devices.uiElems, 'Header', () => {
 
             const { cameraUpload } = syncType;
 
-            if (isDeviceFolder && t !== cameraUpload) {
+            const node = M.getNodeByHandle(h);
+            const isRejectedNode = !node || sharer(node.h) && M.getNodeRights(node.h) < 2;
+
+            if (isDeviceFolder && t !== cameraUpload && !isRejectedNode) {
                 const {ui} = mega.devices;
                 $('span', this.$removeButton).text(
                     ui.isBackupRelated([M.currentCustomView.nodeID])

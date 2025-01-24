@@ -179,6 +179,9 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
     const sourceRoot = M.getSelectedSourceRoot(isSearch, isTree);
     let restrictedFolders = false;
     const isInShare = M.currentrootid === 'shares';
+    const isDCInShare =
+        !is_mobile && M.currentCustomView && M.currentCustomView.type === mega.devices.rootId
+        && selNode && !!sharer(selNode.h);
 
     if (selNode && selNode.su && !M.d[selNode.p]) {
         items['.leaveshare-item'] = 1;
@@ -194,7 +197,8 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
                 items['.open-item'] = 1;
             }
 
-            if ((sourceRoot === M.RootID || sourceRoot === 's4' || sourceRoot === mega.devices.rootId
+            if ((sourceRoot === M.RootID || sourceRoot === 's4'
+                || sourceRoot === mega.devices.rootId && !isDCInShare
                 || M.isDynPage(M.currentrootid)) && !folderlink) {
 
                 let exp = false;
@@ -272,7 +276,9 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
             }
         }
 
-        if (M.currentCustomView || M.currentdirid && M.currentdirid.startsWith('search/')) {
+        if (M.currentCustomView
+            && (M.currentCustomView.type === mega.devices.rootId && !isDCInShare)
+            || M.currentdirid && M.currentdirid.startsWith('search/')) {
             items['.open-cloud-item'] = 1;
             if (folderlink) {
                 items['.open-in-location'] = 1;
@@ -285,7 +291,7 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
         if (M.getNodeRights(selNode.h) > 1) {
             items['.rename-item'] = 1;
 
-            if (!isInShare) {
+            if (!(isInShare || isDCInShare)) {
                 items['.add-star-item'] = 1;
                 items['.colour-label-items'] = 1;
 
@@ -421,8 +427,9 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
     }
 
     if ((sourceRoot === M.RootID
-         || sourceRoot === 's4' || sourceRoot === mega.devices.rootId ||
-         M.isDynPage(M.currentrootid)) && !folderlink) {
+         || sourceRoot === 's4'
+         || sourceRoot === mega.devices.rootId && !isDCInShare
+         || M.isDynPage(M.currentrootid)) && !folderlink) {
 
         items['.move-item'] = 1;
         items['.getlink-item'] = 1;
@@ -574,7 +581,9 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
     }
 
     if (restrictedFolders || $.selected.length === 1
-        && (sourceRoot === M.InboxID || M.currentCustomView.type === mega.devices.rootId)) {
+        && (sourceRoot === M.InboxID
+            || M.currentCustomView.type === mega.devices.rootId
+        )) {
 
         delete items['.open-cloud-item'];
         delete items['.open-in-location'];
@@ -603,9 +612,12 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
                 const {device} = mega.devices.ui.getCurrentDirData();
                 const folder = device.folders[id];
 
+                const node = M.getNodeByHandle(id);
+                const isRejectedNode = !node || sharer(node.h) && M.getNodeRights(node.h) < 2;
+
                 if (mega.devices.ui.isBackupRelated($.selected)) {
                     delete items['.file-request-create'];
-                    if (folder) {
+                    if (folder && !isRejectedNode) {
                         items['.stopbackup-item'] = 1;
                     }
                 }
@@ -618,12 +630,12 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
                     items['.colour-label-items'] = 1;
                     items['.remove-item'] = 1;
 
-                    if (folder && folder.t === twoWay) {
+                    if (folder && folder.t === twoWay && !isRejectedNode) {
                         items['.stopsync-item'] = 1;
                     }
                 }
 
-                if (folder && [twoWay, oneWayUp, oneWayDown, backup].includes(folder.t)) {
+                if (folder && [twoWay, oneWayUp, oneWayDown, backup].includes(folder.t) && !isRejectedNode) {
                     items[mega.devices.ui.desktopApp.common.pauseMenuItemSelector] = 1;
                     const $togglePauseOption = $(
                         mega.devices.ui.desktopApp.common.pauseMenuItemSelector,'.dropdown.context');
@@ -688,6 +700,27 @@ MegaData.prototype.menuItems = async function menuItems(evt, isTree) {
         }
         else if (s4Type === 'object') {
             items['.managepuburl-item'] = 1;
+        }
+    }
+
+    // Device centre - inshares exclusions
+    if (isDCInShare) {
+        delete items['.add-to-album'];
+        delete items['.sh4r1ng-item'];
+        delete items['.getlink-item'];
+        delete items['.add-star-item'];
+        delete items['.embedcode-item'];
+        delete items['.colour-label-items'];
+
+        const section = mega.devices.ui.getRenderSection();
+
+        if (section === 'device-centre-folders') {
+            delete items['.move-item'];
+            delete items['.remove-item'];
+            delete items['.send-to-contact-item'];
+        }
+        else if (section === 'cloud-drive' && selNode.t) {
+            delete items['.send-to-contact-item'];
         }
     }
 

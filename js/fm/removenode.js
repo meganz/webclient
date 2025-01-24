@@ -204,6 +204,10 @@ function removeUInode(h, parent) {
         }
     }
 
+    if (n && n.su && !M.d[n.p] && mega.devices.ui) {
+        mega.devices.ui.refresh();
+    }
+
     // Remove item in subtitles dialog
     if ($.subtitlesMegaRender && $.subtitlesMegaRender.nodeMap) {
         $.subtitlesMegaRender.revokeDOMNode(h, true);

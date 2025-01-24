@@ -4426,14 +4426,14 @@ FileManager.prototype.addSelectDragDropUI = function(refresh) {
                 h = M.currentrootid + '/' + h;
             }
             else if (M.currentrootid === mega.devices.rootId) {
-                h = mega.devices.ui.getCurrentDirPath(n.h);
+                h = mega.devices.ui.getCurrentDirPath(node.h);
             }
             else if (M.dyh) {
                 h = M.dyh('folder-id', h);
             }
             else if (M.getNodeRoot(n.h) === M.InboxID) {
                 // Backup type folder target only available in device centre
-                h = mega.devices.ui.getNodeURLPathFromOuterView(n);
+                h = mega.devices.ui.getNodeURLPathFromOuterView(node);
             }
 
             Promise.resolve(h).then((h) => M.openFolder(h)).catch(tell);

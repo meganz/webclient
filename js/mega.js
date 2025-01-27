@@ -1797,7 +1797,7 @@ scparser.$add('_sn', function(a) {
     if (d) {
         console.info(` --- New SN: ${a.sn}`);
     }
-    onIdle(() => setsn(a.sn));
+    setsn(a.sn);
 
     // rewrite accumulated RSA keys to AES to save CPU & bandwidth & space
     crypto_node_rsa2aes();
@@ -2145,6 +2145,50 @@ function initworkerpool() {
     }
 }
 
+Object.defineProperty(fm_fullreload, 'sink', {
+    value(reason) {
+        'use strict';
+
+        if (self.fminitialized) {
+
+            if (window.loadingDialog) {
+                // 1141: 'Please be patient.'
+                loadingInitDialog.hide('force');
+                loadingDialog.show(reason, l[1141]);
+                loadingDialog.show = loadingDialog.hide = nop;
+            }
+
+            mBroadcaster.crossTab.leave();
+            watchdog.notify(`halt(${reason})`);
+
+            // stop further SC processing
+            window.execsc = nop;
+
+            // and error reporting, if any
+            window.onerror = null;
+
+            // nuke w/sc connection
+            getsc.stop(-1, reason);
+
+            window.getsc = nop;
+            window.waitsc = nop;
+
+            getsc.stop = nop;
+            getsc.validate = nop;
+
+            // shutdown chat..
+            if (self.megaChatIsReady) {
+                megaChat.destroy(true);
+            }
+
+            // abort any scheduled task
+            if (self.delay) {
+                delay.abort();
+            }
+        }
+    }
+});
+
 /**
  * Queue a DB invalidation-plus-reload request to the FMDB subsystem.
  * If it isn't up, reload directly.
@@ -2167,6 +2211,8 @@ async function fm_fullreload(light, logMsg) {
     // without restarting them.
     // until then - it's the sledgehammer method; can't be anything
     // more surgical :(
+    fm_fullreload.sink('full-reload');
+
     if (light !== true) {
         if (light instanceof MEGAPIRequest) {
             light.abort();
@@ -2179,27 +2225,7 @@ async function fm_fullreload(light, logMsg) {
             localStorage.force = 1;
             delete sessionStorage.lightTreeReload;
         }
-
     }
-
-    if (window.loadingDialog) {
-        // 1141: 'Please be patient.'
-        loadingInitDialog.hide('force');
-        loadingDialog.show('full-reload', l[1141]);
-        loadingDialog.show = loadingDialog.hide = nop;
-    }
-
-    // stop further SC processing
-    window.execsc = nop;
-
-    // and error reporting, if any
-    window.onerror = null;
-
-    // nuke w/sc connection
-    getsc.stop(-1, 'full-reload');
-    window.getsc = nop;
-    getsc.stop = nop;
-    getsc.validate = nop;
 
     return Promise.allSettled([
         fmdb && fmdb.invalidate(),
@@ -2581,9 +2607,9 @@ function loadfm(force) {
                     console.time(`get-tree(f:db)`);
                 }
 
-                fmdb.init(localStorage.force)
+                Promise.all([fmdb.init(localStorage.force), mBroadcaster.setup()])
                     .catch(dump)
-                    .then(fetchfm)
+                    .then((a) => fetchfm(a && a[0]))
                     .catch((ex) => {
                         console.error(ex);
                         siteLoadError(ex, 'loadfm');

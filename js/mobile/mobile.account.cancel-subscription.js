@@ -642,7 +642,7 @@ mobile.settings.account.cancelSubscription = Object.create(mobile.settingsHelper
                 mobile.showToast(l[6999], 4);
 
                 // Notify any other open tabs of the cancelled subscription
-                mBroadcaster.crossTab.notify('cancelSub', 1);
+                watchdog.notify('refresh-account-ui');
             }).catch(tell);
         }
     }
